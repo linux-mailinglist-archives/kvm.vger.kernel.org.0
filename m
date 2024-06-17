@@ -1,233 +1,166 @@
-Return-Path: <kvm+bounces-19756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2122790A301
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 06:06:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D018590A6C1
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 09:16:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A488F1F22332
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 04:06:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5276B1F24BE9
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 07:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A873A1802D9;
-	Mon, 17 Jun 2024 04:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A22187358;
+	Mon, 17 Jun 2024 07:16:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="VZ/v6+RV"
+	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="hzdDpVN0"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11olkn2062.outbound.protection.outlook.com [40.92.18.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB3810A2A;
-	Mon, 17 Jun 2024 04:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.18.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718597180; cv=fail; b=Z5CK8CklfepN6N3Cf/oUeQa8wPJPB/mh1boFg7/1nn9aoGThA8jSXzcyWJDBipe0O+0No9K5VG8q86BvYY/Xw0BwSsyJneVJyfbU07gtCScM98lq+WCrYiWt756EvE6uqF8cqOlCMDCzyGp/eBFAE9iifYqZamtocpFMhgjaZns=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718597180; c=relaxed/simple;
-	bh=3DYu666y+uW2udMQ1LH8sT2CcS93AJtgJeLsggLXJIY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=r5KsY16+EQRpU5o7wdE1Y8PFjH8wXSWLGSPHvMmQqrwga34X45PLR7xWzkJY+jaOGuio1+XKKGwG0FFfK2mfZ8AbEuOcf0Y+Lx8GaF7NCe2cXxi6mxmQjog6FQ4u/n+PYiwa0GC5yLkC3zlHX85NSx/IuNe25nlanDsa7TOjVvA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=VZ/v6+RV; arc=fail smtp.client-ip=40.92.18.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GQ2edO/7vnIs7yG9Qem+Ga08jaVWDrU1Ib843iu+DrQjoIsJBdeJFD6ZMMDErsgKL3InUOtRDbjro1lzUdtZymn22BZ1JbBHayMhEK/zKV6W78CAxXjIR+ZSs/JcXzU2oHmcRKJY3660ho80yYfQ8tXj1Hdf6mSRs3+ode2etBH66ugT2saXxZAhQERAWC/BofDNZIImG9CC2YYm7xFbek1o4ZwcVbfvoXbRBVrtMWW8azxyfk+hhRUOC3NXbgUWO8wQmZezm3w1yBOr16DvcH48YC8E2CYplurm2n5G2cvaWhlK/NYk+yQfMVwYcqLogrOyRTOUsiX9hFcOxR6Mpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/zI7G52kAvmPQ+ebPAQUKDO8+uZrUG2Pk1M6l1K3GgU=;
- b=fJ4ScllnXgLR+nNCIKNiKbeC84zJHFb8a2Bo0BYmwbOPo9TrT2QgkjxB3bYh5RN1t8ttsoLc1aLKY4pKJGTvx3LBqFDeVLvqgly9rrEVYr4qMulPLP7NE5AlyyPKlDZ559l1nW1pPrehDnnmkNeiBWgi+bp8jVdSabHgPp9Ecj2vX722YTBCneWYDggbH+jMQVvJOizfwMzyX+bz0hDE0lTE4e5uMufJaC4EZcE1yyrRx3iifmXIr3BUL2rvHRa17wTvRYDg8b/KwNwEUzTGTEaCXDq3YFJQM1s2kj5QZWLxr82lr4ROVkTnElRYPTrTNt2XRNff5a7zjqThoA+J3w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/zI7G52kAvmPQ+ebPAQUKDO8+uZrUG2Pk1M6l1K3GgU=;
- b=VZ/v6+RVj6G8aiXWN09dG/iJ8FB5XIx+Ii17r6seLqnd+fGZ3yucvXXfcNAmJNJuxqeLX7Jx2Y/fO6jaLEnDfgY6OGPqyziBP3l60OAG2dvP5nPt89u1q9osSUqSckjTHxzyhYr0a/A+MrE59aGpBgfXMhdrCa9lu/X9XztNRd/uMp/j+hcyk0FNlFgWr859UMWBG+DAkRZ0PCeTdQFEOXIwLAq49U+7yt2Y5ia0CnVylQVfN3mKvyajZMqjejJxvHi78x81ch69pb0omUyTfLRn9um6aqZ0/iC5R6x4mhFcEUxMnc4/HMIR3vN5g4Unr1kJGOVO1H4h+RcQ6vmqHA==
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com (2603:10b6:805:33::23)
- by SJ0PR02MB7645.namprd02.prod.outlook.com (2603:10b6:a03:329::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Mon, 17 Jun
- 2024 04:06:15 +0000
-Received: from SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df]) by SN6PR02MB4157.namprd02.prod.outlook.com
- ([fe80::cedd:1e64:8f61:b9df%2]) with mapi id 15.20.7677.024; Mon, 17 Jun 2024
- 04:06:15 +0000
-From: Michael Kelley <mhklinux@outlook.com>
-To: Catalin Marinas <catalin.marinas@arm.com>
-CC: Steven Price <steven.price@arm.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>,
-	Marc Zyngier <maz@kernel.org>, Will Deacon <will@kernel.org>, James Morse
-	<james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Suzuki K
- Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Joey Gouly <joey.gouly@arm.com>, Alexandru
- Elisei <alexandru.elisei@arm.com>, Christoffer Dall
-	<christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
-	"linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>, Ganapatrao
- Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: RE: [PATCH v3 00/14] arm64: Support for running as a guest in Arm CCA
-Thread-Topic: [PATCH v3 00/14] arm64: Support for running as a guest in Arm
- CCA
-Thread-Index:
- AQHatysPRYaUedD8SEOOWptuNOqVvrG7hVGQgADmoQCAAA8XwIAEWhgAgABd+QCAABqzAIAKGFwQ
-Date: Mon, 17 Jun 2024 04:06:15 +0000
-Message-ID:
- <SN6PR02MB4157B95E74A3865C44F6132ED4CD2@SN6PR02MB4157.namprd02.prod.outlook.com>
-References: <20240605093006.145492-1-steven.price@arm.com>
- <SN6PR02MB415739D48B10C26D2673F3FED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <ZmMjam3-L807AFR-@arm.com>
- <SN6PR02MB41571B5C2C9C59B0DF5F4E7ED4FB2@SN6PR02MB4157.namprd02.prod.outlook.com>
- <ZmbWpNOc7MiJEjqL@arm.com>
- <SN6PR02MB4157E83EAFA5EBEF5C5889BFD4C62@SN6PR02MB4157.namprd02.prod.outlook.com>
- <Zmc73jAL2XdLU49P@arm.com>
-In-Reply-To: <Zmc73jAL2XdLU49P@arm.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-tmn: [o1v+mIqT5cE6fPVXe6lez/pjj9e6s2cc]
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SN6PR02MB4157:EE_|SJ0PR02MB7645:EE_
-x-ms-office365-filtering-correlation-id: d9b524dc-9896-43a4-eb53-08dc8e82d550
-x-microsoft-antispam:
- BCL:0;ARA:14566002|461199025|1602099009|440099025|4302099010|3412199022|102099029;
-x-microsoft-antispam-message-info:
- 5H/M3KBLlSN0ivzLZk+2yUgRgnrNX70F8NByob0nZ4Rb9ILB/K43ZTrbtpYlbmZvjPY54G0Sg67fvj4DXLpccpUbfhloBiu086gduFvHZQ/oA5dCM0LCk7KV+OLfT1oCglNSdwOnpPtxCiHbKf0kiZvpxSv6VpqkASoFhHM2bkSThwgkj+h18TSMWbu1/N+LGUmUvh/qAXaaODJ4+siJBq5LOG8JwMqmVL3PYmrV1BHZEenrg2KcRWEAqwMBz/pBQj85VdPyaBKEqmFQaH9I66t/gmN0xUB3uR38Lb0UzOr1CZW5jO5Omh+WT0qqeisXsKFJGHPOCiVQnyACKMw9VWhrlPJUcks/7H4YOOHjpc+RpmPGWr79vsA7GpoM52ojcNwhZVyLKoCinGgUXeu+NdBAFDpp/Ks3sS4x/aK8HYib3jzR3H7HIW8DOGRJjRrsf9ecJxMv5ZwdCxc+I7wClXoh71An7/7AIUp0tWuZ+dFr3XiQt23s3Vudtn1zv7GFstUCSvsWNspWmLk1QJ3nSNUTHQbbD0e16/9HWQ+KLWUA1fJEy59jmjaWOcsxkqEzVHYSsXfboxZlJ2B6sN8h6GTkhUCFynFz8L+rOroVIDZBjQp4Av4ggpkMwe1nGUvgtOKw/d1rmnarLN2akuef3c9JvxTqrQaLkGwgZzdK0SOMRKH0hTkxhYtaYydqRII5
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?RxrpkyEIR1HTnG/HHZENwjdTjzoTYwes/hThO/xlISbUI/2Bc2piZICiSOyq?=
- =?us-ascii?Q?MjlAOVR8w0VTVM7TUIwOXA18ha7/Jdre9IR0jcG4rqCh3KcFJAuuBXieHUEQ?=
- =?us-ascii?Q?5zIDSpphFTz27GFWlXnWwf0t9i1JQW/UEUkI6BqeRJVTCAkCywLBOtgMdacR?=
- =?us-ascii?Q?GwkGWPspwmhEGKh1szS8LrpZ5v2lO4OSGbO4O3mb51uQGKBPfnCdisEj1dz1?=
- =?us-ascii?Q?ONLCYFo6kjdX+w1H4j9PivVbxYKLGUJ+ycMdxpoK+IS+uQsigS45wt1UY3KF?=
- =?us-ascii?Q?cFUQUu+i7T/ULWV+SzoHIEJiyV1vAKDfNDfkbL/N35YIFlFlF0Mkz8d5Hsve?=
- =?us-ascii?Q?lKkEN2k557QHmrPaUpYXCHu9XsaiqwhxTpXA5b+HCwdJ4hLTxn4CmvY4fE/2?=
- =?us-ascii?Q?eofWeZg6H2bqZKoJsCAcCm1PEOGPcgCNEhDG4z3oTb4XvE1mwUbNF9H7ZZaf?=
- =?us-ascii?Q?vFqD+UrlfBthln48xXmIi3E5X+ujWCXBVGTQlsKXvhDts11Mck0OZXB+6zwQ?=
- =?us-ascii?Q?yj9uMnHC7+EJYjXf8En21NtIZpIrhGV1qymzR/LVGKYsmSGMADT4gXsIEIwN?=
- =?us-ascii?Q?McDJ3UZROCiEbe+FuN+yPjuqWMaeM4o2ZYySl00lkl7tiRWcGRgA6GnUCCHs?=
- =?us-ascii?Q?GVQHDY5u6lx7dKRw7HUEn0/0R3uZg9vFicIrROM+ihAbS1wt5WN6YuYxGVfK?=
- =?us-ascii?Q?FHeAHmS+XGv3E/TtNVyLYHhtSEFUqffi74dqxmkOB+P94kjJ2f3nJu+riMMi?=
- =?us-ascii?Q?kXxM6Kp5PKg4xvIM3+fvX88aYsyNjmIk3J1NkgCZ5dWTZyuaAHHyqcXPrKjr?=
- =?us-ascii?Q?O+U+ic+qSfNxAgC1+pVrc2z2ntNFaKrpKxwOloKs9W4YF3JUOq7TFHccthz7?=
- =?us-ascii?Q?8iZ5St19xtl8AgnW5wvpjqOw0/wYZ+U5lMq8AgqFGUp6jwJSax6Aeq6Xt1AF?=
- =?us-ascii?Q?Z4gsCkWWFR4OFPsOFkuAGlzfsgcDVUL0vSXJCHTLUDJ4wGzEbSbMZaPzCn2T?=
- =?us-ascii?Q?elLFH+8O0J4LYAZEDjfgGq05vZNRsBbHXRTzYsnenucVcFE6xyt8cxW4lM+U?=
- =?us-ascii?Q?OS4TFOtS2uXvL9iT70UkNOZ8kkM0bZ+pN4cfhdheaiCqwpm/SIhLiH1hOICG?=
- =?us-ascii?Q?+1SOP1LxTIVPMLDLP6ZWU1W5BKaG01nns70PEwmdJW9dkTsYgFL/KzSdNx9o?=
- =?us-ascii?Q?55m373M1qfbstE8X9j4k30m+oGAOhVjgr81my1ZKHW8cx9qYTOKN4i2BWwY?=
- =?us-ascii?Q?=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8990012B87
+	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 07:16:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718608565; cv=none; b=lUJ1lafl0FMRbIIM99KQ/ShRtIrnQJJF6/c9I6gQwQu7RMZ4ryS7wYLwRxGZ3Kgv86c9X+RPmsn3l9RSqVBP8R+p/60VoeztFzGqf/6Zq99MwvE4bil33I2G/k6WnczsXDNiyD6JwBvYWj36q/iyP+tiS8OagDiylLZafJthNKU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718608565; c=relaxed/simple;
+	bh=cuDSBdpPdzoRMpfLksgkThnD0jKS0PgMjGok1vgiGpA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lY6sXf1mcR9F77iQNX17htfeECcZoBzoiEYs3LPyJkqgjviG6FIcPmAl+JT8DQDHU2WBgFRiVPSM98pmP3q072Oxv8mnFnWv095SQvqiaVyP1J1BqLc42aBflcsC8ylMG+Z/i1DV8dsCBx3h/qPfh/aB4Spf1LGwaG7JcSszuGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=hzdDpVN0; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57cc30eaf0aso1496461a12.2
+        for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 00:16:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=grsecurity.net; s=grsec; t=1718608561; x=1719213361; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QsFvZw6+tVhrenFtiZxMq8S/1O3E/Vsbhy2LABani3w=;
+        b=hzdDpVN0bn0lPO9whpDC/On8pl5JzOBALWxq5ung5ZMoX4zhIS3VO8uost7xKSYDUB
+         oanblp6IRdDHtDYs8+3AcKc8xs/zshFsM8h1UHkXAzIsn8KNug/OY7kXDueEHYHtOEtg
+         O9Nddodr+W8PLxL5oKJrrIkP5qi0lh2qOjNjIFdLkjZUFc6G8nDmt/fhVx19eYOIhNAo
+         XEuzWizrw1jGbIjFDsImRDIf1nOiL2gHxyLmhiJcRP+XXEz+Ag8+5QoS3H+V2WL+K4A6
+         D/UiAKwWlTTxXTdxWcnust+5GPGY3FAyVwjeZZ3jM2TkqT3AE1VywTFonktmPjqEO31D
+         UDWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718608561; x=1719213361;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QsFvZw6+tVhrenFtiZxMq8S/1O3E/Vsbhy2LABani3w=;
+        b=VjFdGhlpsqs1hm5kI/SMmLSdW7HHBi2751PQk1DvPifm3w6QJI+DcS94rI1WrzlTb9
+         O1TMqytYVljeiQJVE2TUi6oyemO4JGmKjImU168NKOb1mz3FzjNS6ZkHcXAjXsPLfZqf
+         PcfgrGWHch/bpxdWu4wSeAYbjb/fTofhOiJ+97XfMzALV1VBY2u6lKHD40QDWj/DRj7x
+         qlo7AxLDug0tVEc0j7ASKW8dhWeYj7zqXjA4TfiNcpp0NXdYKfnFfnHaAUPv7WRDELw9
+         1WNjEuYLXsRYsqyM50yDS/PIL8o0lTCqezr8bi9VeXzA8rNGirVSDSbzxn2pGJp5JYwL
+         AthA==
+X-Forwarded-Encrypted: i=1; AJvYcCVY4I/JkKyFG+xU6+8AjNHWY25I5oQErNpHkp6OItzo6lpDElkIHW5ZxhnGhUeuRKhha2iHkPNDcrLuEcMKnoH1xaY3
+X-Gm-Message-State: AOJu0YwOVFljlre1KZxn+CbXymNPD818YBLnLeY2E+imy5LamXbNThI9
+	Eer6M/vIKW8sV438HefY9unr46kRaARzOQn7N5e7YczHZiU1WLk1gEeHkYaGbQA=
+X-Google-Smtp-Source: AGHT+IGCpClrLBYRoU36HVh+/jPE564yR/kr+8wFpIdgqMLQyygVCvp2CPZRL76mflg/XzuQdHigbg==
+X-Received: by 2002:a50:d5c2:0:b0:57c:77a1:d1da with SMTP id 4fb4d7f45d1cf-57cbd4f98b6mr7794454a12.0.1718608560476;
+        Mon, 17 Jun 2024 00:16:00 -0700 (PDT)
+Received: from ?IPV6:2003:f6:af09:2800:d77a:f11c:c1c6:8f79? (p200300f6af092800d77af11cc1c68f79.dip0.t-ipconnect.de. [2003:f6:af09:2800:d77a:f11c:c1c6:8f79])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb743adf1sm5987828a12.93.2024.06.17.00.15.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 17 Jun 2024 00:16:00 -0700 (PDT)
+Message-ID: <c823dc67-9400-4fae-9816-4f25e2d74c0a@grsecurity.net>
+Date: Mon, 17 Jun 2024 09:16:04 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR02MB4157.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: d9b524dc-9896-43a4-eb53-08dc8e82d550
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-originalarrivaltime: 17 Jun 2024 04:06:15.5251
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR02MB7645
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/4] KVM: Limit check IDs for KVM_SET_BOOT_CPU_ID
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+References: <20240612215415.3450952-1-minipli@grsecurity.net>
+ <20240612215415.3450952-4-minipli@grsecurity.net>
+ <ZmxxZo0Y-UBb9Ztq@google.com>
+ <e45bffb8-d67c-4f95-a2ea-4097d03348f3@grsecurity.net>
+ <ZmypzAkNLr3b-Xps@google.com>
+Content-Language: en-US, de-DE
+From: Mathias Krause <minipli@grsecurity.net>
+Autocrypt: addr=minipli@grsecurity.net; keydata=
+ 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
+ RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
+In-Reply-To: <ZmypzAkNLr3b-Xps@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Catalin Marinas <catalin.marinas@arm.com> Sent: Monday, June 10, 2024=
- 10:46 AM
->=20
-> On Mon, Jun 10, 2024 at 05:03:44PM +0000, Michael Kelley wrote:
-> > From: Catalin Marinas <catalin.marinas@arm.com> Sent: Monday, June 10, =
-2024 3:34 AM
-> > > I wonder whether something like __GFP_DECRYPTED could be used to get
-> > > shared memory from the allocation time and avoid having to change the
-> > > vmalloc() ranges. This way functions like netvsc_init_buf() would get
-> > > decrypted memory from the start and vmbus_establish_gpadl() would not
-> > > need to call set_memory_decrypted() on a vmalloc() address.
-> >
-> > I would not have any conceptual objections to such an approach. But I'm
-> > certainly not an expert in that area so I'm not sure what it would take
-> > to make that work for vmalloc(). I presume that __GFP_DECRYPTED
-> > should also work for kmalloc()?
-> >
-> > I've seen the separate discussion about a designated pool of decrypted
-> > memory, to avoid always allocating a new page and decrypting when a
-> > smaller allocation is sufficient. If such a pool could also work for pa=
-ge size
-> > or larger allocations, it would have the additional benefit of concentr=
-ating
-> > decrypted allocations in fewer 2 Meg large pages vs. scattering whereve=
-r
-> > and forcing the break-up of more large page mappings in the direct map.
->=20
-> Yeah, my quick, not fully tested hack here:
->=20
-> https://lore.kernel.org/linux-arm-kernel/ZmNJdSxSz-sYpVgI@arm.com/=20
->=20
-> It's the underlying page allocator that gives back decrypted pages when
-> the flag is passed, so it should work for alloc_pages() and friends. The
-> kmalloc() changes only ensure that we have separate caches for this
-> memory and they are not merged. It needs some more work on kmem_cache,
-> maybe introducing a SLAB_DECRYPTED flag as well as not to rely on the
-> GFP flag.
->=20
-> For vmalloc(), we'd need a pgprot_decrypted() macro to ensure the
-> decrypted pages are marked with the appropriate attributes (arch
-> specific), otherwise it's fairly easy to wire up if alloc_pages() gives
-> back decrypted memory.
->=20
-> > I'll note that netvsc devices can be added or removed from a running VM=
-.
-> > The vmalloc() memory allocated by netvsc_init_buf() can be freed, and/o=
-r
-> > additional calls to netvsc_init_buf() can be made at any time -- they a=
-ren't
-> > limited to initial Linux boot.  So the mechanism for getting decrypted
-> > memory at allocation time must be reasonably dynamic.
->=20
-> I think the above should work. But, of course, we'd have to get this
-> past the mm maintainers, it's likely that I missed something.
+On 14.06.24 22:36, Sean Christopherson wrote:
+> On Fri, Jun 14, 2024, Mathias Krause wrote:
+>> On 14.06.24 18:35, Sean Christopherson wrote:
+>> However, this still doesn't prevent creating VMs that have no BSP as the
+>> actual vCPU ID assignment only happens later, when vCPUs are created.
+>>
+>> But, I guess, that's no real issue. If userland insists on not having a
+>> BSP, so be it.
+> 
+> "struct kvm" is zero-allocated, so the BSP will default to vCPU0.  I wouldn't be
+> at all surprised if VMMs rely on that (after looking, that does appear to be the
+> case for our VMM).
 
-Having thought about this a few days, I like the model of telling the
-memory allocators to decrypt/re-encrypt the memory, instead of the
-caller having to explicitly do set_memory_decrypted()/encrypted().
-I'll add some further comments to the thread with your initial
-implementation.
+Sure, zero-initialized by default makes a lot of sense. I too would
+assume that CPU0 is the BSP.
 
->=20
-> > Rejecting vmalloc() addresses may work for the moment -- I don't know
-> > when CCA guests might be tried on Hyper-V.  The original SEV-SNP and TD=
-X
-> > work started that way as well. :-) Handling the vmalloc() case was adde=
-d
-> > later, though I think on x86 the machinery to also flip all the alias P=
-TEs was
-> > already mostly or completely in place, probably for other reasons. So
-> > fixing the vmalloc() case was more about not assuming that the underlyi=
-ng
-> > physical address range is contiguous. Instead, each page must be proces=
-sed
-> > independently, which was straightforward.
->=20
-> There may be a slight performance impact but I guess that's not on a
-> critical path. Walking the page tables and changing the vmalloc ptes
-> should be fine but for each page, we'd have to break the linear map,
-> flush the TLBs, re-create the linear map. Those TLBs may become a
-> bottleneck, especially on hardware with lots of CPUs and the
-> microarchitecture. Note that even with a __GFP_DECRYPTED attribute, we'd
-> still need to go for individual pages in the linear map.
+However, I was thinking more along the lines:
 
-Agreed. While synthetic devices can come-and-go anytime, it's pretty
-rare in the grand scheme of things. I guess we would have to try it on
-a system with high CPU count, but even if the code needed to "pace
-itself" to avoid hammering the TLBs too hard, that would be OK.
+--- a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
++++ b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
+@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
+        run_vm_bsp(0);
+        run_vm_bsp(1);
+        run_vm_bsp(0);
++       run_vm_bsp(42);
 
-Michael
+        check_set_bsp_busy();
+ }
+
+As in: having two vCPUs with IDs 0 and 1 but the BSP with an ID outside
+of that range, e.g. 42 in this case.
+
+That's still a working setup but without any dedicated BSP, so may cause
+some hickups for real operating systems. But, again, if a user does this
+on purpose and things break, well, can keep the pieces.
+
+Thanks,
+Mathias
 
