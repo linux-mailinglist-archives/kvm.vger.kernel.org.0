@@ -1,130 +1,202 @@
-Return-Path: <kvm+bounces-19779-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19780-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FD1E90B130
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:13:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 861EE90B1B2
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9129B28470F
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 14:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21B8128945D
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 14:23:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407E51AB352;
-	Mon, 17 Jun 2024 13:27:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA30F1A2C1F;
+	Mon, 17 Jun 2024 13:34:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i5PghTYI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ekTksabl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D191C1AAE00
-	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 13:27:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893B919A289;
+	Mon, 17 Jun 2024 13:34:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718630839; cv=none; b=PDgX1R1mO53iOXVj7DTGopT5Oqb+DByHL9ghTYwxnsoAh0a1Q4OYWsL+SKevtAh6jtCyvnAHTsPZ+vdbVDcY8FweZ0z8WrXizvlagP9l8T8y0h+4VKmx4mTl2t+RfFINu25eFog4mXytv3LuOgyG107X+710JJgZ8Tqxu4Jkxbs=
+	t=1718631262; cv=none; b=bu50RTC61dUWkCJWJ4xooJFiCneSQl1hWBs3SyvXgsihY3A2xU/Raq/xxvSamnzhEftjZmuWIKcKj68uIMEYkOXsjHtjq1rw+39FUmpDT8cz111k5cDzySyHx6UCKIc4gsDpkZP5gfAlct3qyDL+JpWoO/qzBE4cBShFYisLNWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718630839; c=relaxed/simple;
-	bh=BVnGMwoCZw7PxuD/QNYyTuQeJ5mFD9HFP2ibNF1eTeU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bkgroSqa2r9izTSA6nKGHzGkbSLtNKBvvxJNDtypXvzY0QkWp7CC4ZaYHwBPNhMO5XxN0KWG7xy+kj4pQREdON5pN6siy9ful/Uj1jDnIgCzBeC29Rp8/neIhfJe39rJ6/Ec0NyRFCOOUJ+LyIBK7a/xdH2I3/cj4tb11wZztVs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i5PghTYI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718630836;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=q84CXo0wUI7hBoP/Wd2wSAm0e9Fj0ilpl/ZCzDP0aQQ=;
-	b=i5PghTYIepihevBRuItljHPsah5efHB+yZ8gh9KcCj6voyoLE8ubQaTBSmEYmES/NHRoGl
-	CQII62CDSwOTiIFHmMW2wU8qPV6Kuz02I2SFJQ6szHLIHZz0ksn0xJqEZmcOIbxVNhHN36
-	SbKB1c6QQqm7R23rvhIqcnrdak8XJpI=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-178-EV0x60pyO_GrlTk2IdbUMg-1; Mon, 17 Jun 2024 09:27:15 -0400
-X-MC-Unique: EV0x60pyO_GrlTk2IdbUMg-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2ebea1c1124so33720751fa.1
-        for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 06:27:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718630834; x=1719235634;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q84CXo0wUI7hBoP/Wd2wSAm0e9Fj0ilpl/ZCzDP0aQQ=;
-        b=RY4FXfPYsBy4vXc1R4iqafjcefXLgyhR/CnWOO5ZvXzSebi1e+uUqo60O57aNTuprT
-         jiV3/oGQwIU/4zMnLiZv9hXkdOLwDt06vsnGZ1Z2Qey1DXj7zZ7Ymcwx9kuxJDqT5XtS
-         4tfMWg/qSEIx4HNWT/JkgwPvP0a0VXmy41n2WQJEPaDWE65+tDXBpx96Q4M7F7lRjpxj
-         N4qWdcX33cAshninL9FmeQvcWKeK3KtM2poGLsP4c7Qb5ov03GgYMXiDPBpJZiMnG8vE
-         TES80T2qdqlmDRU6xT4dIFmqdL5aFrBrdXRHSjwv4DVDkpG/x/FftLz7Ck0bW7V43oSA
-         IiAA==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ3vtEouByq5ny9p60I3+uFhg3rWG4GciYN6vLizxEnBeKxdsekPjP/qA2H3zaAwQ90R+pWovoT/1n6t6p15A0LmdA
-X-Gm-Message-State: AOJu0YxsV+xgl/QG237iCMOxcpo5RX64vS11KkWbFHx59/zqp0oTAjiQ
-	2APuvmI7+A0U8Pa62QxAeXLPEPcYXp4HYlkK4rQmqVDx4PHcrpDjK7PWMtrocnWGI2DzFBQ2yUw
-	2Q0P5pC+8cjK83AO137uNuIcuWVMWHx+VZkudsuWqTk8vkoL10Q==
-X-Received: by 2002:a05:6512:20c6:b0:52c:881b:73c0 with SMTP id 2adb3069b0e04-52ca6e64378mr6296638e87.17.1718630833651;
-        Mon, 17 Jun 2024 06:27:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEpnKGZZT8Zk3aPPgtEsPpln7bsKIoo+bG+Ridg0DdcuVdy5+34CRZh9UkBKQn9c7obciZzKg==
-X-Received: by 2002:a05:6512:20c6:b0:52c:881b:73c0 with SMTP id 2adb3069b0e04-52ca6e64378mr6296612e87.17.1718630833121;
-        Mon, 17 Jun 2024 06:27:13 -0700 (PDT)
-Received: from redhat.com ([2a06:c701:7439:b500:58cc:2220:93ce:7c4a])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607509348esm11832788f8f.17.2024.06.17.06.27.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 17 Jun 2024 06:27:12 -0700 (PDT)
-Date: Mon, 17 Jun 2024 09:27:06 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Greg KH <gregkh@linuxfoundation.org>, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH] vringh: add MODULE_DESCRIPTION()
-Message-ID: <20240617092653-mutt-send-email-mst@kernel.org>
-References: <20240516-md-vringh-v1-1-31bf37779a5a@quicinc.com>
- <7da04855-13a1-49f9-9336-424a9b6c6ad8@quicinc.com>
+	s=arc-20240116; t=1718631262; c=relaxed/simple;
+	bh=+NRvjYKiPdpSkNjcQbOvp8EwA2yizV06H2BtcziH4TQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KQ28s0yqduTA02CwcRBx+tIv3eg1uf/ruA0fLFmYJqWD86R6xr92A4mrtzafN0Ds8+3xEbx0/2J3EroEusSWPFkojffcdDL6szqxKVGEhKAbaBnPamwF9BsbRWJF4urALbQgOa2RQJ5iJff0T2XQncpsx3RgTSBEArgQtOJNcAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ekTksabl; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718631261; x=1750167261;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=+NRvjYKiPdpSkNjcQbOvp8EwA2yizV06H2BtcziH4TQ=;
+  b=ekTksablmRZhxINmZ1fSTyc5cGoPXFVa3wqxvn51z1yIgQn7uWG+htM8
+   p6YAT0k3oCDlYP7gBgZeMZCQXXJLvckOShnUEBeWmls/UQUtqtxxxflDD
+   54ubRG7naMGqAlgYuLu/LMtQG7LoqMj6tCvQ8Y77q6Iq+n7RsdaXVKvQq
+   ruCVNSBCJauKuYGdpGzI97pjTyzerjxIdIJuFUd/dGDLcF6FYPePu/Ddi
+   WF8bGohtCrL1NpF303PWakkI8IgiS24Rd+AlaooUKzDqO6U33R23qFdKT
+   lpkuga01SQL05XFHT5tK3ym4shbYxb2Ap1A8FKuoV4y6crsnJutitRN7D
+   g==;
+X-CSE-ConnectionGUID: dIog4OngRqKhCDmznUh2AQ==
+X-CSE-MsgGUID: 4KHujEn2TSKymNcMWTOhEw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11105"; a="19279522"
+X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
+   d="scan'208";a="19279522"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 06:34:20 -0700
+X-CSE-ConnectionGUID: qUk3iqm3SluzvTXSZqCQ5w==
+X-CSE-MsgGUID: hnTKSXKxSEOCc66OkHUxgg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
+   d="scan'208";a="41285400"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 06:34:19 -0700
+Received: from [10.212.91.105] (kliang2-mobl1.ccr.corp.intel.com [10.212.91.105])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by linux.intel.com (Postfix) with ESMTPS id C8AE820B5703;
+	Mon, 17 Jun 2024 06:34:16 -0700 (PDT)
+Message-ID: <5fcf4471-bcf9-43af-93a0-dcc4fae27449@linux.intel.com>
+Date: Mon, 17 Jun 2024 09:34:15 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7da04855-13a1-49f9-9336-424a9b6c6ad8@quicinc.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 07/54] perf: Add generic exclude_guest support
+To: Peter Zijlstra <peterz@infradead.org>
+Cc: Mingwei Zhang <mizhang@google.com>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
+ Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>,
+ Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
+ <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
+ Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
+ Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+ gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
+ Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+ maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
+ kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
+References: <20240506053020.3911940-8-mizhang@google.com>
+ <20240507085807.GS40213@noisy.programming.kicks-ass.net>
+ <902c40cc-6e0b-4b2f-826c-457f533a0a76@linux.intel.com>
+ <20240611120641.GF8774@noisy.programming.kicks-ass.net>
+ <0a403a6c-8d55-42cb-a90c-c13e1458b45e@linux.intel.com>
+ <20240612111732.GW40213@noisy.programming.kicks-ass.net>
+ <e72c847f-a069-43e4-9e49-37c0bf9f0a8b@linux.intel.com>
+ <20240613091507.GA17707@noisy.programming.kicks-ass.net>
+ <3755c323-6244-4e75-9e79-679bd05b13a4@linux.intel.com>
+ <f4da2fb2-fa09-4d2b-a78d-1b459ada6d09@linux.intel.com>
+ <20240617075123.GX40213@noisy.programming.kicks-ass.net>
+Content-Language: en-US
+From: "Liang, Kan" <kan.liang@linux.intel.com>
+In-Reply-To: <20240617075123.GX40213@noisy.programming.kicks-ass.net>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jun 15, 2024 at 02:50:11PM -0700, Jeff Johnson wrote:
-> On 5/16/2024 6:57 PM, Jeff Johnson wrote:
-> > Fix the allmodconfig 'make w=1' issue:
-> > 
-> > WARNING: modpost: missing MODULE_DESCRIPTION() in drivers/vhost/vringh.o
-> > 
-> > Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
-> > ---
-> >  drivers/vhost/vringh.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/drivers/vhost/vringh.c b/drivers/vhost/vringh.c
-> > index 7b8fd977f71c..73e153f9b449 100644
-> > --- a/drivers/vhost/vringh.c
-> > +++ b/drivers/vhost/vringh.c
-> > @@ -1614,4 +1614,5 @@ EXPORT_SYMBOL(vringh_need_notify_iotlb);
-> >  
-> >  #endif
-> >  
-> > +MODULE_DESCRIPTION("host side of a virtio ring");
-> >  MODULE_LICENSE("GPL");
-> > 
-> > ---
-> > base-commit: 7f094f0e3866f83ca705519b1e8f5a7d6ecce232
-> > change-id: 20240516-md-vringh-c43803ae0ba4
-> > 
+
+
+On 2024-06-17 3:51 a.m., Peter Zijlstra wrote:
+> On Thu, Jun 13, 2024 at 02:04:36PM -0400, Liang, Kan wrote:
+>>>>  static enum event_type_t get_event_type(struct perf_event *event)
+>>>> @@ -3340,9 +3388,14 @@ ctx_sched_out(struct perf_event_context
+>>>>  	 * would only update time for the pinned events.
+>>>>  	 */
+>>>>  	if (is_active & EVENT_TIME) {
+>>>> +		bool stop;
+>>>> +
+>>>> +		stop = !((ctx->is_active & event_type) & EVENT_ALL) &&
+>>>> +		       ctx == &cpuctx->ctx;
+>>>> +			
+>>>>  		/* update (and stop) ctx time */
+>>>>  		update_context_time(ctx);
+>>>> -		update_cgrp_time_from_cpuctx(cpuctx, ctx == &cpuctx->ctx);
+>>>> +		update_cgrp_time_from_cpuctx(cpuctx, stop);
+>>
+>> For the event_type == EVENT_GUEST, the "stop" should always be the same
+>> as "ctx == &cpuctx->ctx". Because the ctx->is_active never set the
+>> EVENT_GUEST bit.
+>> Why the stop is introduced?
 > 
-> Just following up to see if anything else is needed to pick this up.
+> Because the ctx_sched_out() for vPMU should not stop time, 
 
-I tagged this, will be in the next pull.
+But the implementation seems stop the time.
 
-Thanks!
+The ctx->is_active should be (EVENT_ALL | EVENT_TIME) for most of cases.
 
+When a vPMU is scheduling in (invoke ctx_sched_out()), the event_type
+should only be EVENT_GUEST.
+
+!((ctx->is_active & event_type) & EVENT_ALL) should be TRUE.
+
+For a CPU context, ctx == &cpuctx->ctx is TRUE as well.
+
+The update_cgrp_time_from_cpuctx(cpuctx, TRUE) stops the time by
+deactivate the cgroup, __store_release(&info->active, 0).
+
+If an user try to read the cgroup events when a guest is running. The
+update_cgrp_time_from_event() doesn't update the cgrp time. So both time
+and counter are stopped.
+
+> only the
+> 'normal' sched-out should stop time.
+
+If the guest is the only case which we want to keep the time for, I
+think we may use a straightforward check as below.
+
+	stop = !(event_type & EVENT_GUEST) && ctx == &cpuctx->ctx;
+
+> 
+> 
+>>>> @@ -3949,6 +4015,8 @@ ctx_sched_in(struct perf_event_context *
+>>>>  		return;
+>>>>  
+>>>>  	if (!(is_active & EVENT_TIME)) {
+>>>> +		/* EVENT_TIME should be active while the guest runs */
+>>>> +		WARN_ON_ONCE(event_type & EVENT_GUEST);
+>>>>  		/* start ctx time */
+>>>>  		__update_context_time(ctx, false);
+>>>>  		perf_cgroup_set_timestamp(cpuctx);
+>>>> @@ -3979,8 +4047,11 @@ ctx_sched_in(struct perf_event_context *
+>>>>  		 * the exclude_guest events.
+>>>>  		 */
+>>>>  		update_context_time(ctx);
+>>>> -	} else
+>>>> +		update_cgrp_time_from_cpuctx(cpuctx, false);
+>>
+>>
+>> In the above ctx_sched_out(), the cgrp_time is stopped and the cgrp has
+>> been set to inactive.
+>> I think we need a perf_cgroup_set_timestamp(cpuctx) here to restart the
+>> cgrp_time, Right?
+> 
+> So the idea was to not stop time when we schedule out for the vPMU, as
+> per the above.
+> 
+>> Also, I think the cgrp_time is different from the normal ctx->time. When
+>> a guest is running, there must be no cgroup. It's OK to disable the
+>> cgrp_time. If so, I don't think we need to track the guest_time for the
+>> cgrp.
+> 
+> Uh, the vCPU thread is/can-be part of a cgroup, and different guests
+> part of different cgroups. The CPU wide 'guest' time is all time spend
+> in guets, but the cgroup view of things might differ, depending on how
+> the guets are arranged in cgroups, no?
+> 
+> As such, we need per cgroup guest tracking.
+
+Got it.
+
+Thanks,
+Kan
 
