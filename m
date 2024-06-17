@@ -1,410 +1,314 @@
-Return-Path: <kvm+bounces-19828-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19829-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5521390BF28
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 00:45:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D72F90BFDF
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 01:44:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA7F31F22A01
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 22:45:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83D64B21FB8
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 23:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EA0E19923F;
-	Mon, 17 Jun 2024 22:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C64A199EB0;
+	Mon, 17 Jun 2024 23:44:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="fuht5j6I"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="La5yroiG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBE9188CD1
-	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 22:45:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718664317; cv=none; b=q1W2HgT/BIQmenyqje5hjjAAkT5GEojR/pk0Iy9FaVMibQSkCqhGHIrZw1Gn536Su5bmebl1RRfI7H6rZ1LfOgkociR5oJ0jJl7RnOD+xKp/2daIyxP1b9b2zV5D1BQsw3XWGcqgR1MARmjZEn0XtJ22tsoSCHBitR/JGcFoG7s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718664317; c=relaxed/simple;
-	bh=oDPZsylHu8oMlhuemPSN0OzR33tCoi7dhcBDU5lMuo8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NBLM0OrMCJtLCNJOJWZXVaYifjYBNI0oaE3dtPu8hvBtgceQwk8TmwgmSOBxx1gj2LGEMmOP375a0cviaNQ9xJbJSJsHXJgpT5/36hJ7FpR0H9BDeBWVDmC6N8X5ZAjUunm4TluCAmXz6RgC1TVlNyddhYKoYFqpJI4Zza2RChc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=fuht5j6I; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=ogb2oPLw0K8yQaNWabVlU+xrr/B3+c7tj89apN2R/IE=; b=fuht5j6IP1OrFblx
-	xjAzahV8LH4UKbrrE4nyx+d19V0DvXzA0YspH0+34HjV2L1rqS6btGPQjnFHyf/RYK4mr+Niy4ws/
-	lKkpzH+LAG4LzLIc37/YCpvtkmpt2VKEfqHQRCv2B4nqQtzOYQPyb0rhzf0USCsY5uZId4+grU0KP
-	1YhtEipfTRqC3N/tyz0ZOWSiVHiBmHz6IFLSk1BBtpQ72NmaV/L25X5vkHcZjhhEN4qVIHfSAGWaU
-	BfAWit8+E95ad/GeTlSiw0WKpw8Ko9M1BCFyIAvcBz6ESCR9UP7JzatqMVgbd6M1hnG4KiaXUtKpB
-	nCK0JQYXVmfHQ9xqkw==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1sJL66-006mPe-2Y;
-	Mon, 17 Jun 2024 22:45:10 +0000
-Date: Mon, 17 Jun 2024 22:45:10 +0000
-From: "Dr. David Alan Gilbert" <dave@treblig.org>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Cc: Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	qemu-devel@nongnu.org, David Hildenbrand <david@redhat.com>,
-	Ilya Leoshkevich <iii@linux.ibm.com>,
-	Daniel Henrique Barboza <danielhb413@gmail.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Mark Burton <mburton@qti.qualcomm.com>, qemu-s390x@nongnu.org,
-	Peter Maydell <peter.maydell@linaro.org>, kvm@vger.kernel.org,
-	Laurent Vivier <lvivier@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Alexandre Iooss <erdnaxe@crans.org>, qemu-arm@nongnu.org,
-	Alexander Graf <agraf@csgraf.de>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Marco Liebel <mliebel@qti.qualcomm.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Roman Bolshakov <rbolshakov@ddn.com>, qemu-ppc@nongnu.org,
-	Mahmoud Mandour <ma.mandourr@gmail.com>,
-	Cameron Esfahani <dirty@apple.com>,
-	Jamie Iles <quic_jiles@quicinc.com>,
-	Richard Henderson <richard.henderson@linaro.org>
-Subject: Re: [PATCH 9/9] contrib/plugins: add ips plugin example for cost
- modeling
-Message-ID: <ZnC8diDXnNuwkExR@gallifrey>
-References: <20240612153508.1532940-1-alex.bennee@linaro.org>
- <20240612153508.1532940-10-alex.bennee@linaro.org>
- <ZmoM2Sac97PdXWcC@gallifrey>
- <777e1b13-9a4f-4c32-9ff7-9cedf7417695@linaro.org>
- <Zmy9g1U1uP1Vhx9N@gallifrey>
- <616df287-a167-4a05-8f08-70a78a544929@linaro.org>
- <ZnCi4hcyR8wMMnK4@gallifrey>
- <4e5fded0-d1a9-4494-a66d-6488ce1bcb33@linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE2BDDDA6;
+	Mon, 17 Jun 2024 23:44:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718667864; cv=fail; b=PrNT5zPbWcVzmOiFtXjtxuQohRkrwMU8XR3q8NgvWZMXzw1eBr0jjoxm5mpGm1Y2wzIgjwySBVxFXGD387bd2tizpIu17nr8ipHSOA4pzd49DzPOygq8YAXHFTwYH+y8YauJQGv9p9VuoqseRr0e2/euUK8yRqgPlFEsxku3gxo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718667864; c=relaxed/simple;
+	bh=sjFWunXfeunWVwuHnzqIRXWcoe3xR9/D1tRZ7nyXrrU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=BVZa1bLsEn/SMFkE2M9ycmLzGFBOyqsv5GLj0Quo/qS3+3h1nXHSMkYd98lJzJq7+FjszQFzXPd/lR30u+bSQx+WYtTQb5AFrGEKzDmZ5Xxe2P2oXj+i96UDybHVSgu3qaA937sf6G2ZCO+dO3zQf5lolM98b9k2+tizi2I5JIw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=La5yroiG; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718667862; x=1750203862;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sjFWunXfeunWVwuHnzqIRXWcoe3xR9/D1tRZ7nyXrrU=;
+  b=La5yroiGlf35nzCmpWxfoVsVyM/9/gOTz56thrQmpC3/Xghm1GjdIA7Q
+   GYHmVro9r5cMi2BiwmirNZNvoCn8NcdPsPkl/90PATLpbg4b7jqe4jHwi
+   lgupPZDbLK7KhgvsZCNYT0iN48qy7NxTIGRy2z73PyKOOmrmF532EaLJb
+   06LVF2TeW2wY6nlrjcVg6ejUZE9K+yxVnoULa/Mp5mkKfMMx3BMcQvOu6
+   koUXOZnlHCQ5cykjj2vtNd2j/5/1c/6w4QyKHRCZtMbV0bZew4x/3fM+F
+   T9inPaTEJMFIc/kCqSDWVPWzbZ4um1bPcO603+5iKDCPOzbwP1oFArCZX
+   g==;
+X-CSE-ConnectionGUID: q6375mVOTHq4YsgeI27akA==
+X-CSE-MsgGUID: cucubrmOSFy9t1jqZ6QfrA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11106"; a="33055897"
+X-IronPort-AV: E=Sophos;i="6.08,246,1712646000"; 
+   d="scan'208";a="33055897"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 16:44:20 -0700
+X-CSE-ConnectionGUID: HhROUWP3TlqS3wLhT2VyUg==
+X-CSE-MsgGUID: jiIvDdMUTUScJ/a6gbubkQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,246,1712646000"; 
+   d="scan'208";a="41291122"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 17 Jun 2024 16:44:20 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 17 Jun 2024 16:44:19 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 17 Jun 2024 16:44:19 -0700
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 17 Jun 2024 16:44:19 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SNXlEmlv/XGmpObTHIM45XtRb3wZ7nVdz2PsdUqj9ng4bpNOhGALdEC7elV7YCAFmEtxtrw4Q1ULCuhJ6ZaafMaGFuN8oi9pN+WzqcZdqNcHh06b9olhKZpqF2SmfE3StcAJqlUsn2ffrCHT4Sn9IZbrkr5H0XYcD7GoidosFEkuIOfyIXLTsiPQwP6SPNWixAQnHq3yMd7u0EFqMu3PCdJShg2cAbitzVdFLfS0aBVSYOHiFqKLrDeqEpIsptuAwacOarN23tFGSPA23udmge/me8DtxM2secqXEpAzoRiCnSXb+RdLEqPsHd7lxGusl2wpLYQNHUeyYMfRzYtyYg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EuqBYo6h3zOu8GheQ6VD8VJHRTxvHXcHlpY9Kmq1Aq0=;
+ b=Sciwm+9H6VUwDsKtiaNucvmZcN/BdgtBZY1orW390iBFCSTWlqMSwBDFQ2dA0JgpXu6fFmAs0uCnxa9oNGUH/QHdakQJcTnPRsZvkm/4mOKwItXmLPxOR3WVRtqBgYyFR3fYtnJIjrWl4tYlAhixFEaBB4kF9LjcYIPYMnI+BAm0ngkh5zBfR510S0mxJIRPmKokNP7JisPr5+MK4FMCV+1PR3Z0oqIJK6CJNQMHHOWijAceriYrPPyfrBMJLBxADvsgcwzRPGzorN+1syOmokNdrmGRHep2KHlMlLUMvYfeGPAvNTcZtCqTmqfU4xzL6WYmUYYN4EpOMrXr/aqljg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by PH0PR11MB5077.namprd11.prod.outlook.com (2603:10b6:510:3b::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Mon, 17 Jun
+ 2024 23:44:16 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b%5]) with mapi id 15.20.7677.030; Mon, 17 Jun 2024
+ 23:44:16 +0000
+Message-ID: <5bb2d7fc-cfe9-4abd-a291-7ad56db234b3@intel.com>
+Date: Tue, 18 Jun 2024 11:44:07 +1200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 037/130] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend
+ specific
+To: Sean Christopherson <seanjc@google.com>
+CC: Tina Zhang <tina.zhang@intel.com>, Hang Yuan <hang.yuan@intel.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, Bo2 Chen <chen.bo@intel.com>,
+	"sagis@google.com" <sagis@google.com>, "isaku.yamahata@linux.intel.com"
+	<isaku.yamahata@linux.intel.com>, Erdem Aktas <erdemaktas@google.com>,
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, Isaku Yamahata <isaku.yamahata@intel.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <Zj1Ty6bqbwst4u_N@google.com>
+ <49b7402c-8895-4d53-ad00-07ce7863894d@intel.com>
+ <20240509235522.GA480079@ls.amr.corp.intel.com> <Zj4phpnqYNoNTVeP@google.com>
+ <50e09676-4dfc-473f-8b34-7f7a98ab5228@intel.com>
+ <Zle29YsDN5Hff7Lo@google.com>
+ <f2952ae37a2bdaf3eb53858e54e6cc4986c62528.camel@intel.com>
+ <ZliUecH-I1EhN7Ke@google.com>
+ <38210be0e7cc267a459d97d70f3aff07855b7efd.camel@intel.com>
+ <405dd8997aaaf33419be6b0fc37974370d63fd8c.camel@intel.com>
+ <ZmzaqRy2zjvlsDfL@google.com>
+Content-Language: en-US
+From: "Huang, Kai" <kai.huang@intel.com>
+In-Reply-To: <ZmzaqRy2zjvlsDfL@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR03CA0378.namprd03.prod.outlook.com
+ (2603:10b6:a03:3a1::23) To BL1PR11MB5978.namprd11.prod.outlook.com
+ (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <4e5fded0-d1a9-4494-a66d-6488ce1bcb33@linaro.org>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 22:44:46 up 40 days,  9:58,  1 user,  load average: 0.08, 0.06, 0.01
-User-Agent: Mutt/2.2.12 (2023-09-09)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|PH0PR11MB5077:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a72b6d4-df2b-4aa3-9795-08dc8f276672
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|1800799021|376011;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?WHlKZDdRMFdPMSsrRkpvdGpuelhUVGZ3TSsycjlqS3BxekJUbWJkR2RNejc4?=
+ =?utf-8?B?UGxNcjBKQzJWUzMrclJYLzhCQUgzUGhtQk5xYWc2Sm5Tbzk3cGtvOWhXd0wy?=
+ =?utf-8?B?c1E2bVoyVXdkTU9NV05PdThKYWUvMTQ2MnhUOXZoUVBhSGhybnRHMmxEYjlS?=
+ =?utf-8?B?Zjg5bC9KaDN5N0FYZ3JScW1Ga3o4UkNvYS8vSHdvcWJLdlNoTnhWczI3bFp3?=
+ =?utf-8?B?QTR0Z1NRd3RSTEV4b2JUMHc5UTJwVXE2ZmE2eFhnR04vaTM0RUs4WFg0aHZE?=
+ =?utf-8?B?THcyR29TSVF4eS9vaHBvRk9TSjBhWW9ueGI5clRPTlMvVys2clY3N0hKeFdR?=
+ =?utf-8?B?bDdPa1BobmNmbXRYOCtHYm9iakM0WEthdy8rZ3FJWnQxT3c1OENjaHZQbGN2?=
+ =?utf-8?B?djBxYnQ3NmozNmNhWURmUUNYNE82M1VKZWFDRVNpaWNMME9HV1I3RmxFeWpT?=
+ =?utf-8?B?YkZtZGFtaGlUMkRkN3V3cU5Najh6QTVweDZoaXFJbGwvYkZvWkRjWFE0dzc5?=
+ =?utf-8?B?dk1uMEtISDVzR0JuY3I4TU5MK1NGZTJMcDJoRTVobVY0c1FlaVY1OEEyUFEx?=
+ =?utf-8?B?YUlzTXNscDNkK2pkRzlraW9XMVgvNk9DTHMrTzlza3hud1BSWUY4Zmk4ODRQ?=
+ =?utf-8?B?OXNoT3ZDQndaL0UvSXBwcUlRMzE1ZFQyRlhRa0JVTEVsVHdUdjVValRTKzFt?=
+ =?utf-8?B?WlZ0SVAzSHV1TFBIRU9vdEthU1orWmRXdmxqdlRjaS9BM3I1SHZyZVJ5amZp?=
+ =?utf-8?B?NDlwcklVZEhGbU9QbmFOK2M1RXpxUWtUM0Ruc01QclVhMDRYbXVGT2hSTGZQ?=
+ =?utf-8?B?RWluMFFtVlR3bWNWNWUrenpPVndTNGlrckdxazAydEdwTkh2cEgzNlZWbSt0?=
+ =?utf-8?B?dklTZ0lpVit4OTBHVVlaRXZjQk9tREhSSXNzSnh4aUF0cGhxQU9hSTI1SHJn?=
+ =?utf-8?B?UExqMng1L21PekdRZnYzMGZiNnd3RVB1VDVhNmhodmtyazI4OGVFMzdqLzV2?=
+ =?utf-8?B?dDVnY2hubjZQb2RQdThSNE5VSXRkTFIzdnBIbTBRTEUxbWR4NWJYZXpuVDQy?=
+ =?utf-8?B?djVmcERlLzdaZ28xWDRZeWw3MDFxQjN1clRVckxNQzEvaWl4SVFBa2pJQTBx?=
+ =?utf-8?B?RW5nTmJvUlhVMUFoVjhndjg1TGFsa3dWSm80REFDRUNIQjRxMFNmZm1QWXdr?=
+ =?utf-8?B?eE45UFBldDJDMmR3SWR3bVVKVnBwd3ppRmoxUUxuTzFjVC9QTHNDZVhuVzNK?=
+ =?utf-8?B?RTZQc3lJRGhmUG0wT2I3VEcweU5zd2FqY1Qza3VaRURETUVEVkh6ZkhtbWpY?=
+ =?utf-8?B?NlNHcURjQTM3NHlCNG1iL2VSWTc5ZGhnSTFFWmNXQTNvSWRMdnk3WWxBdklu?=
+ =?utf-8?B?dmJ6NzNtM2lTTGVpemVoZXRMeTZCaklLc3ZHQ2NZQmdaYTNDYUNJOWRPOWhU?=
+ =?utf-8?B?Z28rOER1b0dBY1ZvL0V1bzBVOHR0bnJZWjZjS3VOL2gvQXRvMFpjcUdHQkF2?=
+ =?utf-8?B?dlVyR2hMTkdhWTNXZnY3RFVXSTJjYVpaSFNsWEYxSmVZMmlRelJFNWhET3Fp?=
+ =?utf-8?B?U3ZiS2IvQWhySWQydmN3SmRjU2NXbWhYTEhPZWVJMjNLM3ppNUVlaGRzZkc3?=
+ =?utf-8?B?RDQwTGlDSnZxTStZeVhMNXJ5Q3lLSDVYR3VxM3haUzI0UWwzMzByaS9FUWlu?=
+ =?utf-8?B?VFptT1cyeUNzQ1Y0ZHFkSENjRmJ3LzBuRnloWk5XMGpHSDhFdFhBS2Qrallt?=
+ =?utf-8?Q?P2r4xTPVbcJbUPfEuwUUX5cDyhDEraP+A+pBXbE?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(1800799021)(376011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UkJBSlIrdExNQ3lWakFEUm8xMkRXdVIyVS96bG5Xa0p5UnQzNkgrZUhBYkk3?=
+ =?utf-8?B?aVNkWjhHU2Fva3RhekhnZWJBSkRLU2FxMXJrNTFEUnhxWkxnZ0xBd1VtRWRH?=
+ =?utf-8?B?OTBYVWZvSktlSEVwbjBYL1BjeUFha0lLbHZrQVlPMFpPNXh4S0xkbDkyQlE1?=
+ =?utf-8?B?RWF1TnFhbE56Vk56bmtsU0RaN3JIUlI5S3VNNVJOTmJ0UlI4RTNoLzR5MGFC?=
+ =?utf-8?B?WXp6LytqNVJkcm5kWXJVSm9jY2l1UW5GeDIyNkQrQkJ2VUdPc0VPcnJUV0RG?=
+ =?utf-8?B?OGJ5YXlRV2xyTTdGNVpHVmVjcUx5YkNwNC9rbG1pU2xjQzVnQTJ0RWFGOStq?=
+ =?utf-8?B?MHFNeHhQQy82elZVNHZmaFZvbnFDN1pVWERzRmNvMXg1amhKQkpoS0lTR3Bl?=
+ =?utf-8?B?R2FUWGhMK1VjVFl2M0ZBenk3V3Q1Q1Jlb2U3NGFIek1UZWExMVdvaU1KZ242?=
+ =?utf-8?B?TlhNSE4zc2VCRXBLZk5CamttUlhMS0Q0N2Q4OWpFaWUyN2V4NzZ6NW5SQ0Q3?=
+ =?utf-8?B?VFd5MUFkYVpCUFpDMUoxbjdJTlZPZmptU3JCZTJPRE56cG5HS1NiU0NyZy9B?=
+ =?utf-8?B?bDNGdm81RjY2Yjc5aXhxTnF4b3MyRys2aG1Cblg0RVJIVThtOC9DR3hpa2I5?=
+ =?utf-8?B?eG5OZkNhdTJoelJMU1VVSHVFNnhIaHdGRWkvOEl1eVJ1VmJ6QUE5cThXbjhw?=
+ =?utf-8?B?Wkg5RER0WjRVVHFGdjRPZ01TV1NFZVkveUQ4cHhrOWZGRC9BbGxOcm0rZHZr?=
+ =?utf-8?B?L2RXdWtGZmVERERLSUpCNktFdWhKYzdxSTYwUkZjUnVRZXhsSWlYNysyVlhw?=
+ =?utf-8?B?WnhxQ3lSZFZwSllPRzFzSHhuV3Q3NUF2SlAxL0VjQkRTK1ZKSXArKzlwTGsx?=
+ =?utf-8?B?V2dQWmxCZUN1OWYxUmg2ZTZxeTQ3eDNQK2tUUnJMT0QvSjZKY1dYc1ZZaFJo?=
+ =?utf-8?B?L2c0VE1SdzlqdmNOYW5XSmd6WDlYQnlablZwOEk5VXc5QkRmaUYwQVREK044?=
+ =?utf-8?B?cWRFTHlLYjlwVjBXN1V3WW0rRDZYbkVrakpIS0h5d3k5N3FSZmJEZXMrWDlR?=
+ =?utf-8?B?b3EzR3c1UmZDbCtQejZjWmt3R2VaTU9ITjZUS09UeXdleXhjZGNWaERGU0Qx?=
+ =?utf-8?B?ZjFtQVN1TWhXVHBwMXphaExIMTR0ZGVsTWxmNng0cEh3UTZ1TnNvckkrT3Ey?=
+ =?utf-8?B?NmIrcUxRUkZ5TGliQVpIU1RRWkFYMHUrSXNndlZWQ1gvTHNEaEhUZ3pmTmUv?=
+ =?utf-8?B?d0k0d2FkTVMxbHduY2NVaDFiRmt4dGVUbFkrQTltQjhaa0RmeXlDNlJpNk9u?=
+ =?utf-8?B?KzJoMWVkdTNFYTErbjNiQlhpY3lIQkZhdnZUYURNM21sQUF1ZlFCZmtNL2Jz?=
+ =?utf-8?B?S2lXcnR1dXdMcVNlOWRRY0xWMzQyQ2VoNzAvOHhSaWRQRkF5RGtKRy9Ram5N?=
+ =?utf-8?B?d2NaQlNncWtTdUVQMVBHMUhZZ2JJSVVTMTJWSVhOeGQ2ZjJ0R2x3d29TR05y?=
+ =?utf-8?B?RlZKcktYM2tUVDQyQi8vaUhBa0N2LzhOV3d6Tit1YmdqY01TMXlpSVZDYjlk?=
+ =?utf-8?B?SnhmSE1iZHhSSUlDanEyVVorZ0owd2hnSFlZejI4MGZkbEZvVWFwZmgwNk5i?=
+ =?utf-8?B?dmdQWjBDdG1vTGZWWHgzS2JVL2ZIVU1QYjR2MW8zODFhYXAxMGFBYXBvMThH?=
+ =?utf-8?B?dTJFdWphTVpQOVMwSkdXYVlReXJTbUdEeFQ4VXM5TlNPWVQ3VVE0U1Zaa1hP?=
+ =?utf-8?B?RjVxSUlYYXJXaDdpZWg0T0pnRkVuUUg3NXU0a0YyR2l1VTdPTVZaK2w5eEJP?=
+ =?utf-8?B?TDdndzRPdmFVblp6ZnlLVVBFK3lJSXR0bFVjSlEvRkVzV2NlYjZHcTNYTTdv?=
+ =?utf-8?B?clFZR1RWNEtPL2IrVEJMMGdZOVlTUjJYU0JVYnNlOW00bXUxUTZSaVVhZHdm?=
+ =?utf-8?B?TFkvNDFsUWtrdytjUk92aTRqYzduN2p3TXpmZjJqT1JXbnd5dXN0YXAvSWpC?=
+ =?utf-8?B?d3VyRUdXVHo0T1d2TUd4Y1ptVlkxQUUwYWdhNy9Ma2FjajdtTkJQeWttOEVw?=
+ =?utf-8?B?NWJEaGQxcVZqd0EydlF5STZjOENXVnJFSGhja0d0QXRaTWU3VGllclJRV25U?=
+ =?utf-8?Q?S3fnNh5UMk6mnAoqNbcIVisQR?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a72b6d4-df2b-4aa3-9795-08dc8f276672
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jun 2024 23:44:16.6710
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kYL8WlvI9TLBCTTdbl7gS94HsRNHqmZA/YZexF6XWkX2Qnlsvh+VKvyfF8sdRy3cnzJ6cXGvMyckVjgFgmg0DQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5077
+X-OriginatorOrg: intel.com
 
-* Pierrick Bouvier (pierrick.bouvier@linaro.org) wrote:
-> On 6/17/24 13:56, Dr. David Alan Gilbert wrote:
-> > * Pierrick Bouvier (pierrick.bouvier@linaro.org) wrote:
-> > > On 6/14/24 15:00, Dr. David Alan Gilbert wrote:
-> > > > * Pierrick Bouvier (pierrick.bouvier@linaro.org) wrote:
-> > > > > Hi Dave,
-> > > > > 
-> > > > > On 6/12/24 14:02, Dr. David Alan Gilbert wrote:
-> > > > > > * Alex Bennée (alex.bennee@linaro.org) wrote:
-> > > > > > > From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> > > > > > > 
-> > > > > > > This plugin uses the new time control interface to make decisions
-> > > > > > > about the state of time during the emulation. The algorithm is
-> > > > > > > currently very simple. The user specifies an ips rate which applies
-> > > > > > > per core. If the core runs ahead of its allocated execution time the
-> > > > > > > plugin sleeps for a bit to let real time catch up. Either way time is
-> > > > > > > updated for the emulation as a function of total executed instructions
-> > > > > > > with some adjustments for cores that idle.
-> > > > > > 
-> > > > > > A few random thoughts:
-> > > > > >      a) Are there any definitions of what a plugin that controls time
-> > > > > >         should do with a live migration?
-> > > > > 
-> > > > > It's not something that was considered as part of this work.
-> > > > 
-> > > > That's OK, the only thing is we need to stop anyone from hitting problems
-> > > > when they don't realise it's not been addressed.
-> > > > One way might be to add a migration blocker; see include/migration/blocker.h
-> > > > then you might print something like 'Migration not available due to plugin ....'
-> > > > 
-> > > 
-> > > So basically, we could make a call to migrate_add_blocker(), when someone
-> > > request time_control through plugin API?
-> > > 
-> > > IMHO, it's something that should be part of plugin API (if any plugin calls
-> > > qemu_plugin_request_time_control()), instead of the plugin code itself. This
-> > > way, any plugin getting time control automatically blocks any potential
-> > > migration.
-> > 
-> > Note my question asked for a 'any definitions of what a plugin ..' - so
-> > you could define it that way, another one is to think that in the future
-> > you may allow it and the plugin somehow interacts with migration not to
-> > change time at certain migration phases.
-> > 
+
+
+On 15/06/2024 12:04 pm, Sean Christopherson wrote:
+> On Fri, Jun 14, 2024, Kai Huang wrote:
+>> On Tue, 2024-06-04 at 10:48 +0000, Huang, Kai wrote:
+>>> On Thu, 2024-05-30 at 16:12 -0700, Sean Christopherson wrote:
+>>>> On Thu, May 30, 2024, Kai Huang wrote:
+>>>>> On Wed, 2024-05-29 at 16:15 -0700, Sean Christopherson wrote:
+>>>>>> In the unlikely event there is a legitimate reason for max_vcpus_per_td being
+>>>>>> less than KVM's minimum, then we can update KVM's minimum as needed.  But AFAICT,
+>>>>>> that's purely theoretical at this point, i.e. this is all much ado about nothing.
+>>>>>
+>>>>> I am afraid we already have a legitimate case: TD partitioning.  Isaku
+>>>>> told me the 'max_vcpus_per_td' is lowed to 512 for the modules with TD
+>>>>> partitioning supported.  And again this is static, i.e., doesn't require
+>>>>> TD partitioning to be opt-in to low to 512.
+>>>>
+>>>> So what's Intel's plan for use cases that creates TDs with >512 vCPUs?
+>>>
+>>> I checked with TDX module guys.  Turns out the 'max_vcpus_per_td' wasn't
+>>> introduced because of TD partitioning, and they are not actually related.
+>>>
+>>> They introduced this to support "topology virtualization", which requires
+>>> a table to record the X2APIC IDs for all vcpus for each TD.  In practice,
+>>> given a TDX module, the 'max_vcpus_per_td', a.k.a, the X2APIC ID table
+>>> size reflects the physical logical cpus that *ALL* platforms that the
+>>> module supports can possibly have.
+>>>
+>>> The reason of this design is TDX guys don't believe there's sense in
+>>> supporting the case where the 'max_vcpus' for one single TD needs to
+>>> exceed the physical logical cpus.
+>>>
+>>> So in short:
+>>>
+>>> - The "max_vcpus_per_td" can be different depending on module versions. In
+>>> practice it reflects the maximum physical logical cpus that all the
+>>> platforms (that the module supports) can possibly have.
+>>>
+>>> - Before CSPs deploy/migrate TD on a TDX machine, they must be aware of
+>>> the "max_vcpus_per_td" the module supports, and only deploy/migrate TD to
+>>> it when it can support.
+>>>
+>>> - For TDX 1.5.xx modules, the value is 576 (the previous number 512 isn't
+>>> correct); For TDX 2.0.xx modules, the value is larger (>1000).  For future
+>>> module versions, it could have a smaller number, depending on what
+>>> platforms that module needs to support.  Also, if TDX ever gets supported
+>>> on client platforms, we can image the number could be much smaller due to
+>>> the "vcpus per td no need to exceed physical logical cpus".
+>>>
+>>> We may ask them to support the case where 'max_vcpus' for single TD
+>>> exceeds the physical logical cpus, or at least not to low down the value
+>>> any further for future modules (> 2.0.xx modules).  We may also ask them
+>>> to give promise to not low the number to below some certain value for any
+>>> future modules.  But I am not sure there's any concrete reason to do so?
+>>>
+>>> What's your thinking?
 > 
-> I would be in favor to forbid usage for now in this context. I'm not sure
-> why people would play with migration and plugins generally at this time
-> (there might be experiments or use cases I'm not aware of), so a simple
-> barrier preventing that seems ok.
+> It's a reasonable restriction, e.g. KVM_CAP_NR_VCPUS is already capped at number
+> of online CPUs, although userspace is obviously allowed to create oversubscribed
+> VMs.
 > 
-> This plugin is part of an experiment where we implement a qemu feature
-> (icount=auto in this case) by using plugins. If it turns into a successful
-> usage and this plugin becomes popular, we can always lift the limitation
-> later.
+> I think the sane thing to do is document that TDX VMs are restricted to the number
+> of logical CPUs in the system, have KVM_CAP_MAX_VCPUS enumerate exactly that, and
+> then sanity check that max_vcpus_per_td is greater than or equal to what KVM
+> reports for KVM_CAP_MAX_VCPUS. >
+> Stating that the maximum number of vCPUs depends on the whims TDX module doesn't
+> provide a predictable ABI for KVM, i.e. I don't want to simply forward TDX's
+> max_vcpus_per_td to userspace.
 
-Sounds reasonable to me.
 
-Dave
+This sounds good to me.  I think it should be also OK for client too, if 
+TDX ever gets supported for client.
 
-> @Alex, would you like to add this now (icount=auto is still not removed from
-> qemu), or wait for integration, and add this as another patch?
-> 
-> > > > > >      b) The sleep in migration/dirtyrate.c points out g_usleep might
-> > > > > >         sleep for longer, so reads the actual wall clock time to
-> > > > > >         figure out a new 'now'.
-> > > > > 
-> > > > > The current API mentions time starts at 0 from qemu startup. Maybe we could
-> > > > > consider in the future to change this behavior to retrieve time from an
-> > > > > existing migrated machine.
-> > > > 
-> > > > Ah, I meant for (b) to be independent of (a) - not related to migration; just
-> > > > down to the fact you used g_usleep in the plugin and a g_usleep might sleep
-> > > > for a different amount of time than you asked.
-> > > > 
-> > > 
-> > > We know that, and the plugin is not meant to be "cycle accurate" in general,
-> > > we just set a upper bound for number of instructions we can execute in a
-> > > given amount of time (1/10 second for now).
-> > > 
-> > > We compute the new time based on how many instructions effectively ran on
-> > > the most used cpu, so even if we slept a bit more than expected, it's
-> > > correct.
-> > 
-> > Ah OK.
-> > 
-> > Dave
-> > 
-> > > > > >      c) A fun thing to do with this would be to follow an external simulation
-> > > > > >         or 2nd qemu, trying to keep the two from running too far past
-> > > > > >         each other.
-> > > > > > 
-> > > > > 
-> > > > > Basically, to slow the first one, waiting for the replicated one to catch
-> > > > > up?
-> > > > 
-> > > > Yes, something like that.
-> > > > 
-> > > > Dave
-> > > > 
-> > > > > > Dave >
-> > > > > > > Examples
-> > > > > > > --------
-> > > > > > > 
-> > > > > > > Slow down execution of /bin/true:
-> > > > > > > $ num_insn=$(./build/qemu-x86_64 -plugin ./build/tests/plugin/libinsn.so -d plugin /bin/true |& grep total | sed -e 's/.*: //')
-> > > > > > > $ time ./build/qemu-x86_64 -plugin ./build/contrib/plugins/libips.so,ips=$(($num_insn/4)) /bin/true
-> > > > > > > real 4.000s
-> > > > > > > 
-> > > > > > > Boot a Linux kernel simulating a 250MHz cpu:
-> > > > > > > $ /build/qemu-system-x86_64 -kernel /boot/vmlinuz-6.1.0-21-amd64 -append "console=ttyS0" -plugin ./build/contrib/plugins/libips.so,ips=$((250*1000*1000)) -smp 1 -m 512
-> > > > > > > check time until kernel panic on serial0
-> > > > > > > 
-> > > > > > > Tested in system mode by booting a full debian system, and using:
-> > > > > > > $ sysbench cpu run
-> > > > > > > Performance decrease linearly with the given number of ips.
-> > > > > > > 
-> > > > > > > Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-> > > > > > > Message-Id: <20240530220610.1245424-7-pierrick.bouvier@linaro.org>
-> > > > > > > ---
-> > > > > > >     contrib/plugins/ips.c    | 164 +++++++++++++++++++++++++++++++++++++++
-> > > > > > >     contrib/plugins/Makefile |   1 +
-> > > > > > >     2 files changed, 165 insertions(+)
-> > > > > > >     create mode 100644 contrib/plugins/ips.c
-> > > > > > > 
-> > > > > > > diff --git a/contrib/plugins/ips.c b/contrib/plugins/ips.c
-> > > > > > > new file mode 100644
-> > > > > > > index 0000000000..db77729264
-> > > > > > > --- /dev/null
-> > > > > > > +++ b/contrib/plugins/ips.c
-> > > > > > > @@ -0,0 +1,164 @@
-> > > > > > > +/*
-> > > > > > > + * ips rate limiting plugin.
-> > > > > > > + *
-> > > > > > > + * This plugin can be used to restrict the execution of a system to a
-> > > > > > > + * particular number of Instructions Per Second (ips). This controls
-> > > > > > > + * time as seen by the guest so while wall-clock time may be longer
-> > > > > > > + * from the guests point of view time will pass at the normal rate.
-> > > > > > > + *
-> > > > > > > + * This uses the new plugin API which allows the plugin to control
-> > > > > > > + * system time.
-> > > > > > > + *
-> > > > > > > + * Copyright (c) 2023 Linaro Ltd
-> > > > > > > + *
-> > > > > > > + * SPDX-License-Identifier: GPL-2.0-or-later
-> > > > > > > + */
-> > > > > > > +
-> > > > > > > +#include <stdio.h>
-> > > > > > > +#include <glib.h>
-> > > > > > > +#include <qemu-plugin.h>
-> > > > > > > +
-> > > > > > > +QEMU_PLUGIN_EXPORT int qemu_plugin_version = QEMU_PLUGIN_VERSION;
-> > > > > > > +
-> > > > > > > +/* how many times do we update time per sec */
-> > > > > > > +#define NUM_TIME_UPDATE_PER_SEC 10
-> > > > > > > +#define NSEC_IN_ONE_SEC (1000 * 1000 * 1000)
-> > > > > > > +
-> > > > > > > +static GMutex global_state_lock;
-> > > > > > > +
-> > > > > > > +static uint64_t max_insn_per_second = 1000 * 1000 * 1000; /* ips per core, per second */
-> > > > > > > +static uint64_t max_insn_per_quantum; /* trap every N instructions */
-> > > > > > > +static int64_t virtual_time_ns; /* last set virtual time */
-> > > > > > > +
-> > > > > > > +static const void *time_handle;
-> > > > > > > +
-> > > > > > > +typedef struct {
-> > > > > > > +    uint64_t total_insn;
-> > > > > > > +    uint64_t quantum_insn; /* insn in last quantum */
-> > > > > > > +    int64_t last_quantum_time; /* time when last quantum started */
-> > > > > > > +} vCPUTime;
-> > > > > > > +
-> > > > > > > +struct qemu_plugin_scoreboard *vcpus;
-> > > > > > > +
-> > > > > > > +/* return epoch time in ns */
-> > > > > > > +static int64_t now_ns(void)
-> > > > > > > +{
-> > > > > > > +    return g_get_real_time() * 1000;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static uint64_t num_insn_during(int64_t elapsed_ns)
-> > > > > > > +{
-> > > > > > > +    double num_secs = elapsed_ns / (double) NSEC_IN_ONE_SEC;
-> > > > > > > +    return num_secs * (double) max_insn_per_second;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static int64_t time_for_insn(uint64_t num_insn)
-> > > > > > > +{
-> > > > > > > +    double num_secs = (double) num_insn / (double) max_insn_per_second;
-> > > > > > > +    return num_secs * (double) NSEC_IN_ONE_SEC;
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void update_system_time(vCPUTime *vcpu)
-> > > > > > > +{
-> > > > > > > +    int64_t elapsed_ns = now_ns() - vcpu->last_quantum_time;
-> > > > > > > +    uint64_t max_insn = num_insn_during(elapsed_ns);
-> > > > > > > +
-> > > > > > > +    if (vcpu->quantum_insn >= max_insn) {
-> > > > > > > +        /* this vcpu ran faster than expected, so it has to sleep */
-> > > > > > > +        uint64_t insn_advance = vcpu->quantum_insn - max_insn;
-> > > > > > > +        uint64_t time_advance_ns = time_for_insn(insn_advance);
-> > > > > > > +        int64_t sleep_us = time_advance_ns / 1000;
-> > > > > > > +        g_usleep(sleep_us);
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    vcpu->total_insn += vcpu->quantum_insn;
-> > > > > > > +    vcpu->quantum_insn = 0;
-> > > > > > > +    vcpu->last_quantum_time = now_ns();
-> > > > > > > +
-> > > > > > > +    /* based on total number of instructions, what should be the new time? */
-> > > > > > > +    int64_t new_virtual_time = time_for_insn(vcpu->total_insn);
-> > > > > > > +
-> > > > > > > +    g_mutex_lock(&global_state_lock);
-> > > > > > > +
-> > > > > > > +    /* Time only moves forward. Another vcpu might have updated it already. */
-> > > > > > > +    if (new_virtual_time > virtual_time_ns) {
-> > > > > > > +        qemu_plugin_update_ns(time_handle, new_virtual_time);
-> > > > > > > +        virtual_time_ns = new_virtual_time;
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    g_mutex_unlock(&global_state_lock);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void vcpu_init(qemu_plugin_id_t id, unsigned int cpu_index)
-> > > > > > > +{
-> > > > > > > +    vCPUTime *vcpu = qemu_plugin_scoreboard_find(vcpus, cpu_index);
-> > > > > > > +    vcpu->total_insn = 0;
-> > > > > > > +    vcpu->quantum_insn = 0;
-> > > > > > > +    vcpu->last_quantum_time = now_ns();
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void vcpu_exit(qemu_plugin_id_t id, unsigned int cpu_index)
-> > > > > > > +{
-> > > > > > > +    vCPUTime *vcpu = qemu_plugin_scoreboard_find(vcpus, cpu_index);
-> > > > > > > +    update_system_time(vcpu);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void every_quantum_insn(unsigned int cpu_index, void *udata)
-> > > > > > > +{
-> > > > > > > +    vCPUTime *vcpu = qemu_plugin_scoreboard_find(vcpus, cpu_index);
-> > > > > > > +    g_assert(vcpu->quantum_insn >= max_insn_per_quantum);
-> > > > > > > +    update_system_time(vcpu);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void vcpu_tb_trans(qemu_plugin_id_t id, struct qemu_plugin_tb *tb)
-> > > > > > > +{
-> > > > > > > +    size_t n_insns = qemu_plugin_tb_n_insns(tb);
-> > > > > > > +    qemu_plugin_u64 quantum_insn =
-> > > > > > > +        qemu_plugin_scoreboard_u64_in_struct(vcpus, vCPUTime, quantum_insn);
-> > > > > > > +    /* count (and eventually trap) once per tb */
-> > > > > > > +    qemu_plugin_register_vcpu_tb_exec_inline_per_vcpu(
-> > > > > > > +        tb, QEMU_PLUGIN_INLINE_ADD_U64, quantum_insn, n_insns);
-> > > > > > > +    qemu_plugin_register_vcpu_tb_exec_cond_cb(
-> > > > > > > +        tb, every_quantum_insn,
-> > > > > > > +        QEMU_PLUGIN_CB_NO_REGS, QEMU_PLUGIN_COND_GE,
-> > > > > > > +        quantum_insn, max_insn_per_quantum, NULL);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +static void plugin_exit(qemu_plugin_id_t id, void *udata)
-> > > > > > > +{
-> > > > > > > +    qemu_plugin_scoreboard_free(vcpus);
-> > > > > > > +}
-> > > > > > > +
-> > > > > > > +QEMU_PLUGIN_EXPORT int qemu_plugin_install(qemu_plugin_id_t id,
-> > > > > > > +                                           const qemu_info_t *info, int argc,
-> > > > > > > +                                           char **argv)
-> > > > > > > +{
-> > > > > > > +    for (int i = 0; i < argc; i++) {
-> > > > > > > +        char *opt = argv[i];
-> > > > > > > +        g_auto(GStrv) tokens = g_strsplit(opt, "=", 2);
-> > > > > > > +        if (g_strcmp0(tokens[0], "ips") == 0) {
-> > > > > > > +            max_insn_per_second = g_ascii_strtoull(tokens[1], NULL, 10);
-> > > > > > > +            if (!max_insn_per_second && errno) {
-> > > > > > > +                fprintf(stderr, "%s: couldn't parse %s (%s)\n",
-> > > > > > > +                        __func__, tokens[1], g_strerror(errno));
-> > > > > > > +                return -1;
-> > > > > > > +            }
-> > > > > > > +        } else {
-> > > > > > > +            fprintf(stderr, "option parsing failed: %s\n", opt);
-> > > > > > > +            return -1;
-> > > > > > > +        }
-> > > > > > > +    }
-> > > > > > > +
-> > > > > > > +    vcpus = qemu_plugin_scoreboard_new(sizeof(vCPUTime));
-> > > > > > > +    max_insn_per_quantum = max_insn_per_second / NUM_TIME_UPDATE_PER_SEC;
-> > > > > > > +
-> > > > > > > +    time_handle = qemu_plugin_request_time_control();
-> > > > > > > +    g_assert(time_handle);
-> > > > > > > +
-> > > > > > > +    qemu_plugin_register_vcpu_tb_trans_cb(id, vcpu_tb_trans);
-> > > > > > > +    qemu_plugin_register_vcpu_init_cb(id, vcpu_init);
-> > > > > > > +    qemu_plugin_register_vcpu_exit_cb(id, vcpu_exit);
-> > > > > > > +    qemu_plugin_register_atexit_cb(id, plugin_exit, NULL);
-> > > > > > > +
-> > > > > > > +    return 0;
-> > > > > > > +}
-> > > > > > > diff --git a/contrib/plugins/Makefile b/contrib/plugins/Makefile
-> > > > > > > index 0b64d2c1e3..449ead1130 100644
-> > > > > > > --- a/contrib/plugins/Makefile
-> > > > > > > +++ b/contrib/plugins/Makefile
-> > > > > > > @@ -27,6 +27,7 @@ endif
-> > > > > > >     NAMES += hwprofile
-> > > > > > >     NAMES += cache
-> > > > > > >     NAMES += drcov
-> > > > > > > +NAMES += ips
-> > > > > > >     ifeq ($(CONFIG_WIN32),y)
-> > > > > > >     SO_SUFFIX := .dll
-> > > > > > > -- 
-> > > > > > > 2.39.2
-> > > > > > > 
--- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+IIUC we can consult the @nr_cpu_ids or num_possible_cpus() to get the 
+"number of logical CPUs in the system".  And we can reject to use the 
+TDX module if 'max_vcpus_per_td' turns to be smaller.
+
+I think the relevant question is is whether we should still report 
+"number of logical CPUs in the system" via KVM_CAP_MAX_VCPUS?  Because 
+if doing so, this still means the userspace will need to check 
+KVM_CAP_MAX_VCPUS vm extention on per-vm basis.
+
+And if it does, then from userspace's perspective, it actually doesn't 
+matter whether underneath the per-vm KVM_CAP_MAX_VCPUS is limited by TDX 
+or the system cpus (also see below).
+
+The userspace cannot tell the difference anyway.  It just needs to 
+change to query KVM_CAP_MAX_VCPUS to per-vm basis.
+
+Or, we could limit this to TDX guest ONLY:
+
+The KVM_CAP_MAX_VCPUS is still global.  However for TDX specifically, 
+the userspace should use other way to query the number of LPs the system 
+supports (I assume there should be existing ABI for this?).
+
+But looks this isn't something nice?
 
