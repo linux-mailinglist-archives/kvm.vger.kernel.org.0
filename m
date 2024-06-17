@@ -1,202 +1,207 @@
-Return-Path: <kvm+bounces-19780-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19781-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 861EE90B1B2
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:23:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B022F90B2B0
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 16:45:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21B8128945D
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 14:23:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AED66B262E5
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 14:31:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA30F1A2C1F;
-	Mon, 17 Jun 2024 13:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4828C19B58D;
+	Mon, 17 Jun 2024 13:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ekTksabl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dsmH4dZE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893B919A289;
-	Mon, 17 Jun 2024 13:34:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03461B3F2A
+	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 13:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718631262; cv=none; b=bu50RTC61dUWkCJWJ4xooJFiCneSQl1hWBs3SyvXgsihY3A2xU/Raq/xxvSamnzhEftjZmuWIKcKj68uIMEYkOXsjHtjq1rw+39FUmpDT8cz111k5cDzySyHx6UCKIc4gsDpkZP5gfAlct3qyDL+JpWoO/qzBE4cBShFYisLNWY=
+	t=1718632051; cv=none; b=Jl4eGYr0xKHaDyY41rVtHSFYBylf3szx9FuLr+aNEe5Q/axG+FD111Gz3JpyySBWzXqrj/+xrHw/HC9WE7bgPN/mjWioJfXvNygQ9SytmuCUPqFj5hv0EaG0aSbQu3NjZe8RQ/lDKLasv5C6yrt70/cNUiceae6MDSIjIiD/gwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718631262; c=relaxed/simple;
-	bh=+NRvjYKiPdpSkNjcQbOvp8EwA2yizV06H2BtcziH4TQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KQ28s0yqduTA02CwcRBx+tIv3eg1uf/ruA0fLFmYJqWD86R6xr92A4mrtzafN0Ds8+3xEbx0/2J3EroEusSWPFkojffcdDL6szqxKVGEhKAbaBnPamwF9BsbRWJF4urALbQgOa2RQJ5iJff0T2XQncpsx3RgTSBEArgQtOJNcAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ekTksabl; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718631261; x=1750167261;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+NRvjYKiPdpSkNjcQbOvp8EwA2yizV06H2BtcziH4TQ=;
-  b=ekTksablmRZhxINmZ1fSTyc5cGoPXFVa3wqxvn51z1yIgQn7uWG+htM8
-   p6YAT0k3oCDlYP7gBgZeMZCQXXJLvckOShnUEBeWmls/UQUtqtxxxflDD
-   54ubRG7naMGqAlgYuLu/LMtQG7LoqMj6tCvQ8Y77q6Iq+n7RsdaXVKvQq
-   ruCVNSBCJauKuYGdpGzI97pjTyzerjxIdIJuFUd/dGDLcF6FYPePu/Ddi
-   WF8bGohtCrL1NpF303PWakkI8IgiS24Rd+AlaooUKzDqO6U33R23qFdKT
-   lpkuga01SQL05XFHT5tK3ym4shbYxb2Ap1A8FKuoV4y6crsnJutitRN7D
-   g==;
-X-CSE-ConnectionGUID: dIog4OngRqKhCDmznUh2AQ==
-X-CSE-MsgGUID: 4KHujEn2TSKymNcMWTOhEw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11105"; a="19279522"
-X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
-   d="scan'208";a="19279522"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 06:34:20 -0700
-X-CSE-ConnectionGUID: qUk3iqm3SluzvTXSZqCQ5w==
-X-CSE-MsgGUID: hnTKSXKxSEOCc66OkHUxgg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,244,1712646000"; 
-   d="scan'208";a="41285400"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 06:34:19 -0700
-Received: from [10.212.91.105] (kliang2-mobl1.ccr.corp.intel.com [10.212.91.105])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by linux.intel.com (Postfix) with ESMTPS id C8AE820B5703;
-	Mon, 17 Jun 2024 06:34:16 -0700 (PDT)
-Message-ID: <5fcf4471-bcf9-43af-93a0-dcc4fae27449@linux.intel.com>
-Date: Mon, 17 Jun 2024 09:34:15 -0400
+	s=arc-20240116; t=1718632051; c=relaxed/simple;
+	bh=9vMowxz1Q+3I2YwsUDY+sWrqcLKaTWtnkDjXYlErIX0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YuLuwzJvI/onIUnjTLoo9Kfi/2sSWeRLxnWP1VEXavj+DBFyOZNB6VEPUPH6FoKvBHyvwEP7eOJpbl660QgkK01Vh54NRZ7DEym2XVUisLiNvEPxd46NNFky+U5XhneXWEtR01HprkcWm4Vxfv2/V8/+CIFNLdz+S1r1P5aVVVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dsmH4dZE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718632048;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DxMIasYgmKOwN2Uh/eYVqv+BqAex9HFyWItgJcmfmCI=;
+	b=dsmH4dZE0HueNly4q5+oEVHbuC+g4yekrGde/O4pZrpZCEk0ioOW/J46is5WDdqtJ9jkrT
+	g3AA5HnjUY8jts5YQIvm1+EO8cadgca2sZ17/LQvYxQjHcDIGl7IFVaqcvIkhwdGH5mwFK
+	vPQT8Aqx+eZQX5KlOE5kI3YTdHfWW6k=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-411-71ijZc8IOF-KiU1u47W-5g-1; Mon, 17 Jun 2024 09:47:26 -0400
+X-MC-Unique: 71ijZc8IOF-KiU1u47W-5g-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-421739476b3so38309715e9.2
+        for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 06:47:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718632045; x=1719236845;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DxMIasYgmKOwN2Uh/eYVqv+BqAex9HFyWItgJcmfmCI=;
+        b=wNsS+HRSxpmhos6Og+Ux5/os+KalHHPnrMyOgaxH7YU7HMkl2cVZoOQFxHYI6OVnto
+         SzEJRQ/u1QSz9L8PJ4LL0XrLI8AlvMT87UivluBSp0vMsD8vQCmHqOfnLtp12DfBY6ur
+         GwQY9qEAsfP3wTk+tvyD4CEkxqLp64mvrGEy6fBqYkRIm8CAd7CTRCeOFZkei0Yo9t+F
+         DJnwFEf6wYPFG9y6VFIfNJxFsLkRaQ7Nw7IwF3Njm85geft/R47SZHdQMGYRzss0qJa7
+         4ZYOVoU/kOISyXlYKqU2RhPWiHw9mLPI3JvNnwCAmObWkDi7rOeTPqmKGlqA4rTj9DEC
+         FLqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWalYFPBM+O6TzL3Hgtfu+lt575BSMlJGljY78ZVowOUUU1gOA7IOgvc8+WERNOSHdHNtsEhZkYCbPp0JlSlg1GGCNn
+X-Gm-Message-State: AOJu0YxWIF6xmMZwRcV958lgWL3gTF8Kv3yRk+fxq025wZvIU9SmB3jT
+	GOln9J9WgpsCDHIzobBcwoQfGZirtIanwX/ThRNohXY3fYjpgqHWkQWP4X2NgloQLD8UgQL8HHt
+	14p6wtmWIWmzzv5ahRXMDyNwp6YXh95F6OpktmQ9SjL7TRDIZ2A==
+X-Received: by 2002:a05:600c:3b06:b0:422:1705:7549 with SMTP id 5b1f17b1804b1-42304844acamr91904715e9.25.1718632045323;
+        Mon, 17 Jun 2024 06:47:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFDkRJ1ZBxBFsxD0RRnuf9bQWNjc837sVUfnG+M/dHrjMGzbYj/nvXPGpSefPzRBftuhU0mNA==
+X-Received: by 2002:a05:600c:3b06:b0:422:1705:7549 with SMTP id 5b1f17b1804b1-42304844acamr91904525e9.25.1718632044859;
+        Mon, 17 Jun 2024 06:47:24 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:7439:b500:58cc:2220:93ce:7c4a])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-360750acd7csm11936995f8f.52.2024.06.17.06.47.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 17 Jun 2024 06:47:24 -0700 (PDT)
+Date: Mon, 17 Jun 2024 09:47:21 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Parav Pandit <parav@nvidia.com>, Jason Wang <jasowang@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Cindy Lu <lulu@redhat.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH 1/2] vdpa: support set mac address from vdpa tool
+Message-ID: <20240617094314-mutt-send-email-mst@kernel.org>
+References: <20240611053239.516996-1-lulu@redhat.com>
+ <20240611185810.14b63d7d@kernel.org>
+ <ZmlAYcRHMqCgYBJD@nanopsycho.orion>
+ <CACGkMEtKFZwPpzjNBv2j6Y5L=jYTrW4B8FnSLRMWb_AtqqSSDQ@mail.gmail.com>
+ <PH0PR12MB5481BAABF5C43F9500D2852CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <ZnAETXPWG2BvyqSc@nanopsycho.orion>
+ <PH0PR12MB5481F6F62D8E47FB6DFAD206DCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <ZnAgefA1ge11bbFp@nanopsycho.orion>
+ <PH0PR12MB548116966222E720D831AA4CDCCD2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <ZnAz8xchRroVOyCY@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 07/54] perf: Add generic exclude_guest support
-To: Peter Zijlstra <peterz@infradead.org>
-Cc: Mingwei Zhang <mizhang@google.com>,
- Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Dapeng Mi <dapeng1.mi@linux.intel.com>, Kan Liang <kan.liang@intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Manali Shukla
- <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>,
- Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
- Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
- gce-passthrou-pmu-dev@google.com, Samantha Alt <samantha.alt@intel.com>,
- Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
- maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
- kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
-References: <20240506053020.3911940-8-mizhang@google.com>
- <20240507085807.GS40213@noisy.programming.kicks-ass.net>
- <902c40cc-6e0b-4b2f-826c-457f533a0a76@linux.intel.com>
- <20240611120641.GF8774@noisy.programming.kicks-ass.net>
- <0a403a6c-8d55-42cb-a90c-c13e1458b45e@linux.intel.com>
- <20240612111732.GW40213@noisy.programming.kicks-ass.net>
- <e72c847f-a069-43e4-9e49-37c0bf9f0a8b@linux.intel.com>
- <20240613091507.GA17707@noisy.programming.kicks-ass.net>
- <3755c323-6244-4e75-9e79-679bd05b13a4@linux.intel.com>
- <f4da2fb2-fa09-4d2b-a78d-1b459ada6d09@linux.intel.com>
- <20240617075123.GX40213@noisy.programming.kicks-ass.net>
-Content-Language: en-US
-From: "Liang, Kan" <kan.liang@linux.intel.com>
-In-Reply-To: <20240617075123.GX40213@noisy.programming.kicks-ass.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZnAz8xchRroVOyCY@nanopsycho.orion>
 
-
-
-On 2024-06-17 3:51 a.m., Peter Zijlstra wrote:
-> On Thu, Jun 13, 2024 at 02:04:36PM -0400, Liang, Kan wrote:
->>>>  static enum event_type_t get_event_type(struct perf_event *event)
->>>> @@ -3340,9 +3388,14 @@ ctx_sched_out(struct perf_event_context
->>>>  	 * would only update time for the pinned events.
->>>>  	 */
->>>>  	if (is_active & EVENT_TIME) {
->>>> +		bool stop;
->>>> +
->>>> +		stop = !((ctx->is_active & event_type) & EVENT_ALL) &&
->>>> +		       ctx == &cpuctx->ctx;
->>>> +			
->>>>  		/* update (and stop) ctx time */
->>>>  		update_context_time(ctx);
->>>> -		update_cgrp_time_from_cpuctx(cpuctx, ctx == &cpuctx->ctx);
->>>> +		update_cgrp_time_from_cpuctx(cpuctx, stop);
->>
->> For the event_type == EVENT_GUEST, the "stop" should always be the same
->> as "ctx == &cpuctx->ctx". Because the ctx->is_active never set the
->> EVENT_GUEST bit.
->> Why the stop is introduced?
+On Mon, Jun 17, 2024 at 03:02:43PM +0200, Jiri Pirko wrote:
+> Mon, Jun 17, 2024 at 01:48:02PM CEST, parav@nvidia.com wrote:
+> >
+> >> From: Jiri Pirko <jiri@resnulli.us>
+> >> Sent: Monday, June 17, 2024 5:10 PM
+> >> 
+> >> Mon, Jun 17, 2024 at 11:44:53AM CEST, parav@nvidia.com wrote:
+> >> >
+> >> >> From: Jiri Pirko <jiri@resnulli.us>
+> >> >> Sent: Monday, June 17, 2024 3:09 PM
+> >> >>
+> >> >> Mon, Jun 17, 2024 at 04:57:23AM CEST, parav@nvidia.com wrote:
+> >> >> >
+> >> >> >
+> >> >> >> From: Jason Wang <jasowang@redhat.com>
+> >> >> >> Sent: Monday, June 17, 2024 7:18 AM
+> >> >> >>
+> >> >> >> On Wed, Jun 12, 2024 at 2:30 PM Jiri Pirko <jiri@resnulli.us> wrote:
+> >> >> >> >
+> >> >> >> > Wed, Jun 12, 2024 at 03:58:10AM CEST, kuba@kernel.org wrote:
+> >> >> >> > >On Tue, 11 Jun 2024 13:32:32 +0800 Cindy Lu wrote:
+> >> >> >> > >> Add new UAPI to support the mac address from vdpa tool
+> >> >> >> > >> Function
+> >> >> >> > >> vdpa_nl_cmd_dev_config_set_doit() will get the MAC address
+> >> >> >> > >> from the vdpa tool and then set it to the device.
+> >> >> >> > >>
+> >> >> >> > >> The usage is: vdpa dev set name vdpa_name mac
+> >> >> >> > >> **:**:**:**:**:**
+> >> >> >> > >
+> >> >> >> > >Why don't you use devlink?
+> >> >> >> >
+> >> >> >> > Fair question. Why does vdpa-specific uapi even exist? To have
+> >> >> >> > driver-specific uapi Does not make any sense to me :/
+> >> >> >>
+> >> >> >> It came with devlink first actually, but switched to a dedicated uAPI.
+> >> >> >>
+> >> >> >> Parav(cced) may explain more here.
+> >> >> >>
+> >> >> >Devlink configures function level mac that applies to all protocol
+> >> >> >devices
+> >> >> (vdpa, rdma, netdev) etc.
+> >> >> >Additionally, vdpa device level mac can be different (an additional
+> >> >> >one) to
+> >> >> apply to only vdpa traffic.
+> >> >> >Hence dedicated uAPI was added.
+> >> >>
+> >> >> There is 1:1 relation between vdpa instance and devlink port, isn't it?
+> >> >> Then we have:
+> >> >>        devlink port function set DEV/PORT_INDEX hw_addr ADDR
+> >> >>
+> >> >Above command is privilege command done by the hypervisor on the port
+> >> function.
+> >> >Vpda level setting the mac is similar to a function owner driver setting the
+> >> mac on the self netdev (even though devlink side has configured some mac for
+> >> it).
+> >> >For example,
+> >> >$ ip link set dev wlan1 address 00:11:22:33:44:55
+> >> 
+> >> Hmm, under what sceratio exacly this is needed?
+> >The administrator on the host creating a vdpa device for the VM wants to configure the mac address for the VM.
+> >This administrator may not have the access to the devlink port function.
+> >Or he may just prefer a different MAC (theoretical case).
 > 
-> Because the ctx_sched_out() for vPMU should not stop time, 
-
-But the implementation seems stop the time.
-
-The ctx->is_active should be (EVENT_ALL | EVENT_TIME) for most of cases.
-
-When a vPMU is scheduling in (invoke ctx_sched_out()), the event_type
-should only be EVENT_GUEST.
-
-!((ctx->is_active & event_type) & EVENT_ALL) should be TRUE.
-
-For a CPU context, ctx == &cpuctx->ctx is TRUE as well.
-
-The update_cgrp_time_from_cpuctx(cpuctx, TRUE) stops the time by
-deactivate the cgroup, __store_release(&info->active, 0).
-
-If an user try to read the cgroup events when a guest is running. The
-update_cgrp_time_from_event() doesn't update the cgrp time. So both time
-and counter are stopped.
-
-> only the
-> 'normal' sched-out should stop time.
-
-If the guest is the only case which we want to keep the time for, I
-think we may use a straightforward check as below.
-
-	stop = !(event_type & EVENT_GUEST) && ctx == &cpuctx->ctx;
-
+> Right, but that is not reason for new uapi but rather reason to alter
+> existing devlink model to have the "host side". We discussed this many
+> times.
 > 
 > 
->>>> @@ -3949,6 +4015,8 @@ ctx_sched_in(struct perf_event_context *
->>>>  		return;
->>>>  
->>>>  	if (!(is_active & EVENT_TIME)) {
->>>> +		/* EVENT_TIME should be active while the guest runs */
->>>> +		WARN_ON_ONCE(event_type & EVENT_GUEST);
->>>>  		/* start ctx time */
->>>>  		__update_context_time(ctx, false);
->>>>  		perf_cgroup_set_timestamp(cpuctx);
->>>> @@ -3979,8 +4047,11 @@ ctx_sched_in(struct perf_event_context *
->>>>  		 * the exclude_guest events.
->>>>  		 */
->>>>  		update_context_time(ctx);
->>>> -	} else
->>>> +		update_cgrp_time_from_cpuctx(cpuctx, false);
->>
->>
->> In the above ctx_sched_out(), the cgrp_time is stopped and the cgrp has
->> been set to inactive.
->> I think we need a perf_cgroup_set_timestamp(cpuctx) here to restart the
->> cgrp_time, Right?
+> >
+> >> I mean, the VM that has VDPA device can actually do that too. 
+> >VM cannot do. Virtio spec do not allow modifying the mac address.
 > 
-> So the idea was to not stop time when we schedule out for the vPMU, as
-> per the above.
+> I see. Any good reason to not allow that?
 > 
->> Also, I think the cgrp_time is different from the normal ctx->time. When
->> a guest is running, there must be no cgroup. It's OK to disable the
->> cgrp_time. If so, I don't think we need to track the guest_time for the
->> cgrp.
 > 
-> Uh, the vCPU thread is/can-be part of a cgroup, and different guests
-> part of different cgroups. The CPU wide 'guest' time is all time spend
-> in guets, but the cgroup view of things might differ, depending on how
-> the guets are arranged in cgroups, no?
+> >
+> >> That is the actual function owner.
+> >vdpa is not mapping a whole VF to the VM.
+> >It is getting some synthetic PCI device composed using several software (kernel) and user space layers.
+> >so VM is not the function owner.
 > 
-> As such, we need per cgroup guest tracking.
+> Sure, but owner of the netdev side, to what the mac is related. That is
+> my point.
 
-Got it.
 
-Thanks,
-Kan
+I don't know what this discussion is about, at this point.
+For better or worse, vdpa gained interfaces for provisioning
+new devices. Yes the solution space was wide but it's been there
+for years so kind of too late to try and make people
+move to another interface for that.
+
+Having said that, vdpa interfaces are all built around
+virtio spec. Let's try to stick to that.
+
+
+-- 
+MST
+
 
