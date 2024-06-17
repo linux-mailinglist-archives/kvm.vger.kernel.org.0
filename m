@@ -1,166 +1,154 @@
-Return-Path: <kvm+bounces-19757-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19758-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D018590A6C1
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 09:16:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 33BCD90A7B3
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 09:51:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5276B1F24BE9
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 07:16:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD8FE1F24920
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 07:51:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A22187358;
-	Mon, 17 Jun 2024 07:16:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B0A18FDA6;
+	Mon, 17 Jun 2024 07:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="hzdDpVN0"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="vQ85Xupg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8990012B87
-	for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 07:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 733BD38396;
+	Mon, 17 Jun 2024 07:51:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718608565; cv=none; b=lUJ1lafl0FMRbIIM99KQ/ShRtIrnQJJF6/c9I6gQwQu7RMZ4ryS7wYLwRxGZ3Kgv86c9X+RPmsn3l9RSqVBP8R+p/60VoeztFzGqf/6Zq99MwvE4bil33I2G/k6WnczsXDNiyD6JwBvYWj36q/iyP+tiS8OagDiylLZafJthNKU=
+	t=1718610701; cv=none; b=e7HlzFe/Mef0mbyFcRPc7OIifp5zuq/QNujbQnCcaB2eD6VmaYFRossxlWDYKeUey5sXr6DdyuLK3Lzl7uzylC6G2f4OaPbmZQK1T9RxG+cW/DKu3eLH0WWKeEI3h4G1bY4Qx5Qwmc8CXHnk8aXCvVPqm3ntawnWBX+UBhyUHHY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718608565; c=relaxed/simple;
-	bh=cuDSBdpPdzoRMpfLksgkThnD0jKS0PgMjGok1vgiGpA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lY6sXf1mcR9F77iQNX17htfeECcZoBzoiEYs3LPyJkqgjviG6FIcPmAl+JT8DQDHU2WBgFRiVPSM98pmP3q072Oxv8mnFnWv095SQvqiaVyP1J1BqLc42aBflcsC8ylMG+Z/i1DV8dsCBx3h/qPfh/aB4Spf1LGwaG7JcSszuGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=hzdDpVN0; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57cc30eaf0aso1496461a12.2
-        for <kvm@vger.kernel.org>; Mon, 17 Jun 2024 00:16:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1718608561; x=1719213361; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=QsFvZw6+tVhrenFtiZxMq8S/1O3E/Vsbhy2LABani3w=;
-        b=hzdDpVN0bn0lPO9whpDC/On8pl5JzOBALWxq5ung5ZMoX4zhIS3VO8uost7xKSYDUB
-         oanblp6IRdDHtDYs8+3AcKc8xs/zshFsM8h1UHkXAzIsn8KNug/OY7kXDueEHYHtOEtg
-         O9Nddodr+W8PLxL5oKJrrIkP5qi0lh2qOjNjIFdLkjZUFc6G8nDmt/fhVx19eYOIhNAo
-         XEuzWizrw1jGbIjFDsImRDIf1nOiL2gHxyLmhiJcRP+XXEz+Ag8+5QoS3H+V2WL+K4A6
-         D/UiAKwWlTTxXTdxWcnust+5GPGY3FAyVwjeZZ3jM2TkqT3AE1VywTFonktmPjqEO31D
-         UDWg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718608561; x=1719213361;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QsFvZw6+tVhrenFtiZxMq8S/1O3E/Vsbhy2LABani3w=;
-        b=VjFdGhlpsqs1hm5kI/SMmLSdW7HHBi2751PQk1DvPifm3w6QJI+DcS94rI1WrzlTb9
-         O1TMqytYVljeiQJVE2TUi6oyemO4JGmKjImU168NKOb1mz3FzjNS6ZkHcXAjXsPLfZqf
-         PcfgrGWHch/bpxdWu4wSeAYbjb/fTofhOiJ+97XfMzALV1VBY2u6lKHD40QDWj/DRj7x
-         qlo7AxLDug0tVEc0j7ASKW8dhWeYj7zqXjA4TfiNcpp0NXdYKfnFfnHaAUPv7WRDELw9
-         1WNjEuYLXsRYsqyM50yDS/PIL8o0lTCqezr8bi9VeXzA8rNGirVSDSbzxn2pGJp5JYwL
-         AthA==
-X-Forwarded-Encrypted: i=1; AJvYcCVY4I/JkKyFG+xU6+8AjNHWY25I5oQErNpHkp6OItzo6lpDElkIHW5ZxhnGhUeuRKhha2iHkPNDcrLuEcMKnoH1xaY3
-X-Gm-Message-State: AOJu0YwOVFljlre1KZxn+CbXymNPD818YBLnLeY2E+imy5LamXbNThI9
-	Eer6M/vIKW8sV438HefY9unr46kRaARzOQn7N5e7YczHZiU1WLk1gEeHkYaGbQA=
-X-Google-Smtp-Source: AGHT+IGCpClrLBYRoU36HVh+/jPE564yR/kr+8wFpIdgqMLQyygVCvp2CPZRL76mflg/XzuQdHigbg==
-X-Received: by 2002:a50:d5c2:0:b0:57c:77a1:d1da with SMTP id 4fb4d7f45d1cf-57cbd4f98b6mr7794454a12.0.1718608560476;
-        Mon, 17 Jun 2024 00:16:00 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af09:2800:d77a:f11c:c1c6:8f79? (p200300f6af092800d77af11cc1c68f79.dip0.t-ipconnect.de. [2003:f6:af09:2800:d77a:f11c:c1c6:8f79])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb743adf1sm5987828a12.93.2024.06.17.00.15.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 17 Jun 2024 00:16:00 -0700 (PDT)
-Message-ID: <c823dc67-9400-4fae-9816-4f25e2d74c0a@grsecurity.net>
-Date: Mon, 17 Jun 2024 09:16:04 +0200
+	s=arc-20240116; t=1718610701; c=relaxed/simple;
+	bh=NG8gvLsGeGERZcnN9LKe5/vwkRczxp/GUoWZxf+l7ME=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rAZJ6JELNk8GN51oOq8oB6q80zl6cQPL6dnsiUiykM7mHvXF85ijWQu3m5KP8CuFSx/xjHGFhjj8cEX0nfv9avtTOYEDqRd8+fO0tLOD0c9HFte8mpfupxVcEiXkFdtGklLzJg2eA2CA/L9I0Ks4uDuyUouGpJoGOEvJDucqwIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=vQ85Xupg; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=IAmKegLYI+0e826keswLRf8FGni5PR5ZQKaV8HRzyrU=; b=vQ85Xupglat8LtsLeL3JFW9akS
+	FbnIJABe9IR7/BZY3pzSg0IESab/IIpQvTUyjwOsi1nWVgMiBHw6aNkbEt/vDNWV5KzQ61PQPUiBz
+	CJxQ9zujfWM2bEPI3ubIS+lFg2ypvCdr5KfcuaBEEqarM5huIcxWVPm5JWNoa6wvBGXqeOpgwnBvk
+	b4Z+jJMzAvU78zgIxbG5jVonU3bo/lAL9OmfRm6bbU2SwrIy6be6a2+1j//ZO1N88I0ThlNrdvx1p
+	ZM+B3fWx0sSlmuHpCv4Upz6kM4ohLlbZMSpYuPYp24ZdUis+SJwczJYp9logGtSxUpmQpWKiW7D+5
+	g8T42pkg==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sJ799-00000001v2O-3R7x;
+	Mon, 17 Jun 2024 07:51:25 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 332EB30088D; Mon, 17 Jun 2024 09:51:23 +0200 (CEST)
+Date: Mon, 17 Jun 2024 09:51:23 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: "Liang, Kan" <kan.liang@linux.intel.com>
+Cc: Mingwei Zhang <mizhang@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Kan Liang <kan.liang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Jim Mattson <jmattson@google.com>,
+	Stephane Eranian <eranian@google.com>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	gce-passthrou-pmu-dev@google.com,
+	Samantha Alt <samantha.alt@intel.com>,
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+	maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
+	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH v2 07/54] perf: Add generic exclude_guest support
+Message-ID: <20240617075123.GX40213@noisy.programming.kicks-ass.net>
+References: <20240506053020.3911940-8-mizhang@google.com>
+ <20240507085807.GS40213@noisy.programming.kicks-ass.net>
+ <902c40cc-6e0b-4b2f-826c-457f533a0a76@linux.intel.com>
+ <20240611120641.GF8774@noisy.programming.kicks-ass.net>
+ <0a403a6c-8d55-42cb-a90c-c13e1458b45e@linux.intel.com>
+ <20240612111732.GW40213@noisy.programming.kicks-ass.net>
+ <e72c847f-a069-43e4-9e49-37c0bf9f0a8b@linux.intel.com>
+ <20240613091507.GA17707@noisy.programming.kicks-ass.net>
+ <3755c323-6244-4e75-9e79-679bd05b13a4@linux.intel.com>
+ <f4da2fb2-fa09-4d2b-a78d-1b459ada6d09@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] KVM: Limit check IDs for KVM_SET_BOOT_CPU_ID
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
-References: <20240612215415.3450952-1-minipli@grsecurity.net>
- <20240612215415.3450952-4-minipli@grsecurity.net>
- <ZmxxZo0Y-UBb9Ztq@google.com>
- <e45bffb8-d67c-4f95-a2ea-4097d03348f3@grsecurity.net>
- <ZmypzAkNLr3b-Xps@google.com>
-Content-Language: en-US, de-DE
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <ZmypzAkNLr3b-Xps@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f4da2fb2-fa09-4d2b-a78d-1b459ada6d09@linux.intel.com>
 
-On 14.06.24 22:36, Sean Christopherson wrote:
-> On Fri, Jun 14, 2024, Mathias Krause wrote:
->> On 14.06.24 18:35, Sean Christopherson wrote:
->> However, this still doesn't prevent creating VMs that have no BSP as the
->> actual vCPU ID assignment only happens later, when vCPUs are created.
->>
->> But, I guess, that's no real issue. If userland insists on not having a
->> BSP, so be it.
+On Thu, Jun 13, 2024 at 02:04:36PM -0400, Liang, Kan wrote:
+> >>  static enum event_type_t get_event_type(struct perf_event *event)
+> >> @@ -3340,9 +3388,14 @@ ctx_sched_out(struct perf_event_context
+> >>  	 * would only update time for the pinned events.
+> >>  	 */
+> >>  	if (is_active & EVENT_TIME) {
+> >> +		bool stop;
+> >> +
+> >> +		stop = !((ctx->is_active & event_type) & EVENT_ALL) &&
+> >> +		       ctx == &cpuctx->ctx;
+> >> +			
+> >>  		/* update (and stop) ctx time */
+> >>  		update_context_time(ctx);
+> >> -		update_cgrp_time_from_cpuctx(cpuctx, ctx == &cpuctx->ctx);
+> >> +		update_cgrp_time_from_cpuctx(cpuctx, stop);
 > 
-> "struct kvm" is zero-allocated, so the BSP will default to vCPU0.  I wouldn't be
-> at all surprised if VMMs rely on that (after looking, that does appear to be the
-> case for our VMM).
+> For the event_type == EVENT_GUEST, the "stop" should always be the same
+> as "ctx == &cpuctx->ctx". Because the ctx->is_active never set the
+> EVENT_GUEST bit.
+> Why the stop is introduced?
 
-Sure, zero-initialized by default makes a lot of sense. I too would
-assume that CPU0 is the BSP.
+Because the ctx_sched_out() for vPMU should not stop time, only the
+'normal' sched-out should stop time.
 
-However, I was thinking more along the lines:
 
---- a/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
-+++ b/tools/testing/selftests/kvm/x86_64/set_boot_cpu_id.c
-@@ -136,6 +136,7 @@ int main(int argc, char *argv[])
-        run_vm_bsp(0);
-        run_vm_bsp(1);
-        run_vm_bsp(0);
-+       run_vm_bsp(42);
+> >> @@ -3949,6 +4015,8 @@ ctx_sched_in(struct perf_event_context *
+> >>  		return;
+> >>  
+> >>  	if (!(is_active & EVENT_TIME)) {
+> >> +		/* EVENT_TIME should be active while the guest runs */
+> >> +		WARN_ON_ONCE(event_type & EVENT_GUEST);
+> >>  		/* start ctx time */
+> >>  		__update_context_time(ctx, false);
+> >>  		perf_cgroup_set_timestamp(cpuctx);
+> >> @@ -3979,8 +4047,11 @@ ctx_sched_in(struct perf_event_context *
+> >>  		 * the exclude_guest events.
+> >>  		 */
+> >>  		update_context_time(ctx);
+> >> -	} else
+> >> +		update_cgrp_time_from_cpuctx(cpuctx, false);
+> 
+> 
+> In the above ctx_sched_out(), the cgrp_time is stopped and the cgrp has
+> been set to inactive.
+> I think we need a perf_cgroup_set_timestamp(cpuctx) here to restart the
+> cgrp_time, Right?
 
-        check_set_bsp_busy();
- }
+So the idea was to not stop time when we schedule out for the vPMU, as
+per the above.
 
-As in: having two vCPUs with IDs 0 and 1 but the BSP with an ID outside
-of that range, e.g. 42 in this case.
+> Also, I think the cgrp_time is different from the normal ctx->time. When
+> a guest is running, there must be no cgroup. It's OK to disable the
+> cgrp_time. If so, I don't think we need to track the guest_time for the
+> cgrp.
 
-That's still a working setup but without any dedicated BSP, so may cause
-some hickups for real operating systems. But, again, if a user does this
-on purpose and things break, well, can keep the pieces.
+Uh, the vCPU thread is/can-be part of a cgroup, and different guests
+part of different cgroups. The CPU wide 'guest' time is all time spend
+in guets, but the cgroup view of things might differ, depending on how
+the guets are arranged in cgroups, no?
 
-Thanks,
-Mathias
+As such, we need per cgroup guest tracking.
+
 
