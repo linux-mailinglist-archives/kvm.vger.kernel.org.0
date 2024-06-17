@@ -1,171 +1,142 @@
-Return-Path: <kvm+bounces-19788-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19789-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49CCC90B438
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 17:27:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C73FD90B451
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 17:29:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0D8C282707
-	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 15:27:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E7051F27A6B
+	for <lists+kvm@lfdr.de>; Mon, 17 Jun 2024 15:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1822017BB7;
-	Mon, 17 Jun 2024 14:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1146137925;
+	Mon, 17 Jun 2024 15:01:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="clhRAdt9"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="MD4o4Y5B"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3EF4D51D;
-	Mon, 17 Jun 2024 14:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACD8755888;
+	Mon, 17 Jun 2024 15:00:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718636189; cv=none; b=J3aDlsDSoS4wX/8rFtzuU+WKjM0oxrpGFaKQBJnYgEsGA+oXABAOr3d8g3z97arFysc7F3TU2K1i7Y3qsUcfxakqb9t+H7U0+MHgI77X3Ho3aXsNGvTOT6xKs3QDEthtH64d/1kGzLXXzZqQM2rSDFRQxm29Q2UULqvTIcYi7RA=
+	t=1718636461; cv=none; b=iFCiMzN82Zig9d1ASSb8immBR/lyCj9BlBVkz5U7e1lHpLtcNGe2Y9WNna4vFDNr7B5fwnFeV4bETPKXvb2K29Br+Ltu4JRcfmiTSAqVnAxcwbut6x7DimQnzY8V8APgo50mNUH7eS5P5rp4y2jJHg/gLHUulVAXSNq70pZo8TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718636189; c=relaxed/simple;
-	bh=1g98WIt6DK45Ckxrtdcr5vChfA+pfghexrdjwxiI8YA=;
+	s=arc-20240116; t=1718636461; c=relaxed/simple;
+	bh=kNhCpF9yy4ozI+EhT1JRqFNTV1nZBZe9zUnBYVOWTKE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qr55YnDrBCJpQf2T8uN56HAEMFITZsJGSYO0W3Gh+7SJ6C6cbhJ6iU9ralQoa7qpmUEThezsS1AiUojlnCIAiI6fZby3OqW+7bzgP+j8NMrzXclCkp2uwIbm0EqtLAoj/gf5KBGogL0WlRajrDSiykuJgrqYGO3AnFXbXC0geuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=clhRAdt9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F573C2BD10;
-	Mon, 17 Jun 2024 14:56:26 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="clhRAdt9"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1718636183;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6bcwrvbIl7+eEjyyGJoXxh1mehCsgFRYWHRM/zwpUAQ=;
-	b=clhRAdt9QmHzMaEEzVai+8NS5mBwqdWC/f0sKn8iKNRjAYqBW9N3E2L8sbjmiy2SQkZGk0
-	hK8NYQAMg8k+eCY6yhiOMg3Eok18XjHMRfrN68QDTwANHVK37YKOUoOk4GYwZc7KCjnUD+
-	5Jm/fDnndt2OgFIS0O5m9q1UI47PGCA=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 071c720a (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Mon, 17 Jun 2024 14:56:22 +0000 (UTC)
-Date: Mon, 17 Jun 2024 16:56:17 +0200
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>,
-	Vlastimil Babka <vbabka@suse.cz>, Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <ZnBOkZClsvAUa_5X@zx2c4.com>
-References: <80e03b02-7e24-4342-af0b-ba5117b19828@paulmck-laptop>
- <Zmru7hhz8kPDPsyz@pc636>
- <7efde25f-6af5-4a67-abea-b26732a8aca1@paulmck-laptop>
- <Zmsuswo8OPIhY5KJ@pc636>
- <cb51bc57-47b8-456a-9ac0-f8aa0931b144@paulmck-laptop>
- <ZmszOd5idhf2Cb-v@pc636>
- <b03b007f-3afa-4ad4-b76b-dea7b3aa2bc3@paulmck-laptop>
- <Zmw5FTX752g0vtlD@pc638.lan>
- <ZmybGZDbXkw7JTjc@zx2c4.com>
- <ZnA_QFvuyABnD3ZA@pc636>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ppM6sFJIvdmATaSMV4lQxE3LD+e10iRXCAyhCDClp2QzfeOM47mOUyZZBmcnokpvbpO5NZuJTEvryfqwmMkKmVXbThmwMaGlSCs6qX7RyqsTx9Jr+pePj/DlE57iaJaEHSRIC/jUPBgAFa6oRmeXMkZDpIg0TS+F4u6XJtSv4nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=MD4o4Y5B; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=ob7EjVWS74YHIzO0+xs/iszj8jCcXUxw7ZhVkRSF93I=; b=MD4o4Y5BSNU0Xp6t440QmxGt2Q
+	NdXHS2ibYHTvzEAkzK9x1hm6Cuh/5jGqpvKe2w2yO+LWvImKXyRLWkgVQSoS997pacOJ9qttRpU67
+	l2mGnE/dVsAILaOmeuRkcmcvVyEeVTAyDvL3DunWbTVjHcvlg1oNOoQxu1UsCD5VCGoyqwvZXn6Ry
+	dslJrdK6UbXNF9bza8KYgduB7zrdjQgsgPrI7AsfjM+axd1KKSYcCTUxYxGpYJvstVBpa5hnMSkj1
+	LtLcDjqrPiaooftmnqSBWAob627cLkFTl49GRp9RJGNEXto0Y3B+FzVpy0xeEpTF0vY0kKZLtrY1h
+	tJYHqYjw==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sJDqe-00000002Dyl-04tO;
+	Mon, 17 Jun 2024 15:00:44 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id E97AE30024D; Mon, 17 Jun 2024 17:00:38 +0200 (CEST)
+Date: Mon, 17 Jun 2024 17:00:38 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: "Liang, Kan" <kan.liang@linux.intel.com>
+Cc: Mingwei Zhang <mizhang@google.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Xiong Zhang <xiong.y.zhang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Kan Liang <kan.liang@intel.com>,
+	Zhenyu Wang <zhenyuw@linux.intel.com>,
+	Manali Shukla <manali.shukla@amd.com>,
+	Sandipan Das <sandipan.das@amd.com>,
+	Jim Mattson <jmattson@google.com>,
+	Stephane Eranian <eranian@google.com>,
+	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>,
+	gce-passthrou-pmu-dev@google.com,
+	Samantha Alt <samantha.alt@intel.com>,
+	Zhiyuan Lv <zhiyuan.lv@intel.com>, Yanfei Xu <yanfei.xu@intel.com>,
+	maobibo <maobibo@loongson.cn>, Like Xu <like.xu.linux@gmail.com>,
+	kvm@vger.kernel.org, linux-perf-users@vger.kernel.org
+Subject: Re: [PATCH v2 07/54] perf: Add generic exclude_guest support
+Message-ID: <20240617150038.GW8774@noisy.programming.kicks-ass.net>
+References: <902c40cc-6e0b-4b2f-826c-457f533a0a76@linux.intel.com>
+ <20240611120641.GF8774@noisy.programming.kicks-ass.net>
+ <0a403a6c-8d55-42cb-a90c-c13e1458b45e@linux.intel.com>
+ <20240612111732.GW40213@noisy.programming.kicks-ass.net>
+ <e72c847f-a069-43e4-9e49-37c0bf9f0a8b@linux.intel.com>
+ <20240613091507.GA17707@noisy.programming.kicks-ass.net>
+ <3755c323-6244-4e75-9e79-679bd05b13a4@linux.intel.com>
+ <f4da2fb2-fa09-4d2b-a78d-1b459ada6d09@linux.intel.com>
+ <20240617075123.GX40213@noisy.programming.kicks-ass.net>
+ <5fcf4471-bcf9-43af-93a0-dcc4fae27449@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZnA_QFvuyABnD3ZA@pc636>
+In-Reply-To: <5fcf4471-bcf9-43af-93a0-dcc4fae27449@linux.intel.com>
 
-On Mon, Jun 17, 2024 at 03:50:56PM +0200, Uladzislau Rezki wrote:
-> On Fri, Jun 14, 2024 at 09:33:45PM +0200, Jason A. Donenfeld wrote:
-> > On Fri, Jun 14, 2024 at 02:35:33PM +0200, Uladzislau Rezki wrote:
-> > > +	/* Should a destroy process be deferred? */
-> > > +	if (s->flags & SLAB_DEFER_DESTROY) {
-> > > +		list_move_tail(&s->list, &slab_caches_defer_destroy);
-> > > +		schedule_delayed_work(&slab_caches_defer_destroy_work, HZ);
-> > > +		goto out_unlock;
-> > > +	}
-> > 
-> > Wouldn't it be smoother to have the actual kmem_cache_free() function
-> > check to see if it's been marked for destruction and the refcount is
-> > zero, rather than polling every one second? I mentioned this approach
-> > in: https://lore.kernel.org/all/Zmo9-YGraiCj5-MI@zx2c4.com/ -
-> > 
-> >     I wonder if the right fix to this would be adding a `should_destroy`
-> >     boolean to kmem_cache, which kmem_cache_destroy() sets to true. And
-> >     then right after it checks `if (number_of_allocations == 0)
-> >     actually_destroy()`, and likewise on each kmem_cache_free(), it
-> >     could check `if (should_destroy && number_of_allocations == 0)
-> >     actually_destroy()`. 
-> > 
-> I do not find pooling as bad way we can go with. But your proposal
-> sounds reasonable to me also. We can combine both "prototypes" to
-> one and offer.
+On Mon, Jun 17, 2024 at 09:34:15AM -0400, Liang, Kan wrote:
 > 
-> Can you post a prototype here?
+> 
+> On 2024-06-17 3:51 a.m., Peter Zijlstra wrote:
+> > On Thu, Jun 13, 2024 at 02:04:36PM -0400, Liang, Kan wrote:
+> >>>>  static enum event_type_t get_event_type(struct perf_event *event)
+> >>>> @@ -3340,9 +3388,14 @@ ctx_sched_out(struct perf_event_context
+> >>>>  	 * would only update time for the pinned events.
+> >>>>  	 */
+> >>>>  	if (is_active & EVENT_TIME) {
+> >>>> +		bool stop;
+> >>>> +
+> >>>> +		stop = !((ctx->is_active & event_type) & EVENT_ALL) &&
+> >>>> +		       ctx == &cpuctx->ctx;
+> >>>> +			
+> >>>>  		/* update (and stop) ctx time */
+> >>>>  		update_context_time(ctx);
+> >>>> -		update_cgrp_time_from_cpuctx(cpuctx, ctx == &cpuctx->ctx);
+> >>>> +		update_cgrp_time_from_cpuctx(cpuctx, stop);
+> >>
+> >> For the event_type == EVENT_GUEST, the "stop" should always be the same
+> >> as "ctx == &cpuctx->ctx". Because the ctx->is_active never set the
+> >> EVENT_GUEST bit.
+> >> Why the stop is introduced?
+> > 
+> > Because the ctx_sched_out() for vPMU should not stop time, 
+> 
+> But the implementation seems stop the time.
+> 
+> The ctx->is_active should be (EVENT_ALL | EVENT_TIME) for most of cases.
+> 
+> When a vPMU is scheduling in (invoke ctx_sched_out()), the event_type
+> should only be EVENT_GUEST.
+> 
+> !((ctx->is_active & event_type) & EVENT_ALL) should be TRUE.
 
-This is untested, but the simplest, shortest possible version would be:
+Hmm.. yeah, I think I might've gotten that wrong.
 
-diff --git a/mm/slab.h b/mm/slab.h
-index 5f8f47c5bee0..907c0ea56c01 100644
---- a/mm/slab.h
-+++ b/mm/slab.h
-@@ -275,6 +275,7 @@ struct kmem_cache {
- 	unsigned int inuse;		/* Offset to metadata */
- 	unsigned int align;		/* Alignment */
- 	unsigned int red_left_pad;	/* Left redzone padding size */
-+	bool is_destroyed;		/* Destruction happens when no objects */
- 	const char *name;		/* Name (only for display!) */
- 	struct list_head list;		/* List of slab caches */
- #ifdef CONFIG_SYSFS
-diff --git a/mm/slab_common.c b/mm/slab_common.c
-index 1560a1546bb1..f700bed066d9 100644
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -494,8 +494,8 @@ void kmem_cache_destroy(struct kmem_cache *s)
- 		goto out_unlock;
+> > only the
+> > 'normal' sched-out should stop time.
+> 
+> If the guest is the only case which we want to keep the time for, I
+> think we may use a straightforward check as below.
+> 
+> 	stop = !(event_type & EVENT_GUEST) && ctx == &cpuctx->ctx;
 
- 	err = shutdown_cache(s);
--	WARN(err, "%s %s: Slab cache still has objects when called from %pS",
--	     __func__, s->name, (void *)_RET_IP_);
-+	if (err)
-+		s->is_destroyed = true;
- out_unlock:
- 	mutex_unlock(&slab_mutex);
- 	cpus_read_unlock();
-diff --git a/mm/slub.c b/mm/slub.c
-index 1373ac365a46..7db8fe90a323 100644
---- a/mm/slub.c
-+++ b/mm/slub.c
-@@ -4510,6 +4510,8 @@ void kmem_cache_free(struct kmem_cache *s, void *x)
- 		return;
- 	trace_kmem_cache_free(_RET_IP_, x, s);
- 	slab_free(s, virt_to_slab(x), x, _RET_IP_);
-+	if (s->is_destroyed)
-+		kmem_cache_destroy(s);
- }
- EXPORT_SYMBOL(kmem_cache_free);
-
-@@ -5342,9 +5344,6 @@ static void free_partial(struct kmem_cache *s, struct kmem_cache_node *n)
- 		if (!slab->inuse) {
- 			remove_partial(n, slab);
- 			list_add(&slab->slab_list, &discard);
--		} else {
--			list_slab_objects(s, slab,
--			  "Objects remaining in %s on __kmem_cache_shutdown()");
- 		}
- 	}
- 	spin_unlock_irq(&n->list_lock);
+So I think I was trying to get stop true when there weren't in fact
+events on, that is when we got in without EVENT_ALL bits, but perhaps
+that case isn't relevant.
 
 
