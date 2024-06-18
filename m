@@ -1,331 +1,136 @@
-Return-Path: <kvm+bounces-19863-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19864-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D194690D3A8
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 16:10:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A0DD90D5DF
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 16:46:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D77C21C246DB
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 14:10:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE28A1F21703
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 14:46:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49098139584;
-	Tue, 18 Jun 2024 13:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22D25139CFE;
+	Tue, 18 Jun 2024 14:34:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="FPtT5eS7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ugFny4E1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF89A13790B
-	for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 13:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1BA82139C1
+	for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 14:34:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718718743; cv=none; b=NFcYYfCWVnc2REW7dJVWjgUzA6wmZcLhHUoNZWZ/Z8C9pMi2qFxgs+H+OzTJ/xBjjyjWMQpaZsAohUFmlLUxQN+JXf8g9X13P9lW308RshHu19o+u2WGznOceOf5920txSMG8zykW6qXEzCkk6yl6JNVWvnWkJo6yh9IOulXmX0=
+	t=1718721259; cv=none; b=Tk0Q17EEt4rzoQdctivNIqWam3ZoSV9H4SWN3CJTeo7jWJpKjhZmoQP65a3XyHoB4uUh+CgRi8EP/kE5z5q5v5KjP0ILx3+6nuAkoHni0U2Fzc385u0/R+9bEdUujT284kDf9g4rdhWESWgKEDBhkDk3WwDO1UxuPNyA6Ho8MoI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718718743; c=relaxed/simple;
-	bh=6ji8bImoZphxUZlGZKL5B1WUGYaN4s5foLziwZaot34=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oqlx4JZtrFz6ZwGTHoYbTtBn229psT2/uTHklEkP8cT8Hg8CrY94yJBr+u7DSwBA4lNAQB3RYKZum9+GxBCrU3PX9rwPAGp0ElShrqiDhbwH04ePZZowYsnB4JNaSOuzE8uNpmmuHR//vwMgYBn3SvUN6Hxof+0PB+vuBnCZpAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=FPtT5eS7; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4217a96de38so39745565e9.1
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 06:52:20 -0700 (PDT)
+	s=arc-20240116; t=1718721259; c=relaxed/simple;
+	bh=yqIFQcKxXGEMDkvNg3xeGa5fyRgqgp+DUsjUnWY1/Gw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YIbqWFNlvsZ0NATs9uxIRmm+AnbJwnd7IJhbimzD/rD6KtzxSGb0ZSCUKLlxYQpvnFn+AlXKndifskpR+1bo9vOGetOsyM0zw/2q0HHKikrIhEuK9VDFnnzhfsv8+CNwX31LCXiNVeAbPct+BfBgZYMDUG+ZJ48ibVnNxwzgOEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ugFny4E1; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7060b6e7e78so1601706b3a.1
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 07:34:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=suse.com; s=google; t=1718718739; x=1719323539; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Bif8Dk+Gwh0B8c6YxRG9d+wF5fvhza7hN5IkBJa7yMQ=;
-        b=FPtT5eS7VaBp1OsTq1Gn2QLj26RqbM5j7uK95ArK9+pU8tvlyUH/xv5n5GOmll0jFD
-         8/VOnv4VrDc+5T05UMlzD393YFtmRRi14R5d/W/a3HGL28MH6WPNdt6KHd1WvbGD55ev
-         QkQrRXaqzwr1gNxJU511SUtqHLonAbIekedWlJsf1vIJ+U8YUxIhgGekmtgE/hcxsmj/
-         3qBoZrn3HtmB4BxIyUHKS62bJc5OO5VJpGT574zcABs6q5k0bOVB9n8MK4F8e1o69fEb
-         GJ/82CbD8B7FzD1B9H6QXu+2gtZH04C1rStwGCZLjvP6s+D1URFP68xzxjzFddgJfhLK
-         xNQA==
+        d=google.com; s=20230601; t=1718721257; x=1719326057; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yqIFQcKxXGEMDkvNg3xeGa5fyRgqgp+DUsjUnWY1/Gw=;
+        b=ugFny4E1ZpmxeXR9M5fq1Cq3EOKLFTRBJYLZqPBCARM9VEHm83FrLYdfyXBtn1AHBN
+         hJBrTCQeEnvyueXvP8AtYbFasqvWrXQvlgHDR1ZAeLjP1pb3/932n5oJ6JPivbBQM5pw
+         fjgSXMzxnF9SlubA8i69Cgjy7tv1YZ8s2BYu0aANQMoVQE1uuEd/tAalGoSJOM2Xyny4
+         cUsLmmxayIgmA6QEr+VjvFWbyQWSlh61sK/goCDtxmimbiATMaxJWdwmyGRX4sYDMiAb
+         f/rJTilVu9gEarjCdBofWx2GdElcZBrahu8UByJUKgwL0YvrggJVyr1XcDO2yClVfetY
+         jx5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718718739; x=1719323539;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Bif8Dk+Gwh0B8c6YxRG9d+wF5fvhza7hN5IkBJa7yMQ=;
-        b=cjGD6ZN8qP3f6mp8/PVw550+zPnuEfKC18Hm9rwISusJasS7NtN1+o7HcvWLhaToXB
-         49bgsa0PKyIkVUd5FgK1EQ0bBIa4rN5HKU7vFacZRT9wzfKF8/rwRk4Ogh+3GRP+6vJ4
-         DmH3qRxrxxetZd7LwPmLA5Y1y0oPzkJXAezBCt4VukDtWXPxgKUdEs61CsozAFi65qBS
-         Xi3Gpm/poDqMlMiqXuzgJmhPQFGJSQ5p7SXQO0A6F9qogBDa7GJM7Mtwuz3BmyWWR3mp
-         Lg/rvximFlbldiSJqFeGeQkLsVouKHkMte2VnFDY/xG0lDxZt4u8yrdIDUBPikqqttvV
-         Toxg==
-X-Forwarded-Encrypted: i=1; AJvYcCWze1hP8sxuph0Uv6sQ1YT/0RlaK9dWLIWk9xtNiofV6R0v0pPtVzo1Kq3KKpl7feyHdR9srDmA/I8Tjz+kWEORWPf5
-X-Gm-Message-State: AOJu0Yxc/P2P0AfAfY3L2f3D9sV2yzu8RqZcZ9dLcAkA8VVsJv++ZWRP
-	JE6InGxzsshjnCw53VWqrhzKlpx5DI7TeOq/AyiLpQ5kzNru0eZ+eF0b+o6d1wg=
-X-Google-Smtp-Source: AGHT+IGe9QQWwMJrGfB2O4fZVYflKAtUzGz49+pn9fRyvLAyJPHj5WAU6UpUgoQ9tXE7ZmEhXmLKpA==
-X-Received: by 2002:a05:600c:3d88:b0:422:dfb0:8644 with SMTP id 5b1f17b1804b1-4230484918cmr104030475e9.33.1718718739242;
-        Tue, 18 Jun 2024 06:52:19 -0700 (PDT)
-Received: from ?IPV6:2a10:bac0:b000:7579:7285:c2ff:fedd:7e3a? ([2a10:bac0:b000:7579:7285:c2ff:fedd:7e3a])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-422f5f33bcfsm186576125e9.1.2024.06.18.06.52.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jun 2024 06:52:18 -0700 (PDT)
-Message-ID: <d8b657a4-ab2d-417e-be24-cbbd7ce99380@suse.com>
-Date: Tue, 18 Jun 2024 16:52:17 +0300
+        d=1e100.net; s=20230601; t=1718721257; x=1719326057;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=yqIFQcKxXGEMDkvNg3xeGa5fyRgqgp+DUsjUnWY1/Gw=;
+        b=Jhdl77Wmgo+RaiJqVrLL3Q94XA461URuNjdSWgqJvWtpEonwPX9EVMgIdT0gvM1nk8
+         hewwA81zJ/Jrtn282mkojhNO6SgPftW2NjZLzgF+NJb/C92nAUGP0mBuLT1pSUqvxozK
+         w9+hXD+oAMbTO2IALAnt6DTImSNhOSHc3Hv1cNuDJ24N8N7IododII3GwoOmBB6dRl5v
+         Og8tQFMqms7P1bRWUMO7TpYxCzFyrvbhUYqnN8Qi9g1v3N83cebOXzT9Sply4iQzcskY
+         laLxV2PpYIKl2v/yT65lCMbgzHYTgDOI40f82cD+7rs10XHPVg+cCkFO3IBMgf7yfmM4
+         m4Nw==
+X-Forwarded-Encrypted: i=1; AJvYcCVeea9oR7I2o4dNbEeM6tC/EJVEPIiplF/f82sWYDopOBXmpSNjopMQPrOVgFo7pNjrhPi1g95GuLD0PKhakEXGhguq
+X-Gm-Message-State: AOJu0Yz7jzyjONLlmol66FlpANe3LYvHVoTVaWa+x8dQ4D51P93hcmb5
+	a0F12OmTL7XmgU/o5iInrflFq+wAze1suXyuPKTFYABtlavRBT+C8XkA+lWHAoJwgigi+hQ0EOU
+	Pwg==
+X-Google-Smtp-Source: AGHT+IG3JGOL9bs1zaJKnhpZD+RqiN+/G8Oc/GvkAyT1mttqJo9peSaQvwcPj9sY5qwVXrpoxbz2Dn+7FCQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:3695:b0:706:1ae4:b49d with SMTP id
+ d2e1a72fcca58-70628f80c1cmr94b3a.1.1718721257089; Tue, 18 Jun 2024 07:34:17
+ -0700 (PDT)
+Date: Tue, 18 Jun 2024 07:34:15 -0700
+In-Reply-To: <ZnAMsuQsR97mMb4a@yzhao56-desk.sh.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 7/9] x86/virt/tdx: Print TDX module basic information
-To: Kai Huang <kai.huang@intel.com>, linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, dave.hansen@intel.com, dan.j.williams@intel.com,
- kirill.shutemov@linux.intel.com, rick.p.edgecombe@intel.com,
- peterz@infradead.org, tglx@linutronix.de, bp@alien8.de, mingo@redhat.com,
- hpa@zytor.com, seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
- isaku.yamahata@intel.com, binbin.wu@linux.intel.com
-References: <cover.1718538552.git.kai.huang@intel.com>
- <f81ed362dcb88bdb60859b998d5b9a4ee258a5f3.1718538552.git.kai.huang@intel.com>
-From: Nikolay Borisov <nik.borisov@suse.com>
-Content-Language: en-US
-In-Reply-To: <f81ed362dcb88bdb60859b998d5b9a4ee258a5f3.1718538552.git.kai.huang@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240613060708.11761-1-yan.y.zhao@intel.com> <aa43556ea7b98000dc7bc4495e6fe2b61cf59c21.camel@intel.com>
+ <ZnAMsuQsR97mMb4a@yzhao56-desk.sh.intel.com>
+Message-ID: <ZnGa550k46ow2N3L@google.com>
+Subject: Re: [PATCH 0/5] Introduce a quirk to control memslot zap behavior
+From: Sean Christopherson <seanjc@google.com>
+To: Yan Zhao <yan.y.zhao@intel.com>
+Cc: Rick P Edgecombe <rick.p.edgecombe@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "sagis@google.com" <sagis@google.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "dmatlack@google.com" <dmatlack@google.com>, 
+	Kai Huang <kai.huang@intel.com>, Isaku Yamahata <isaku.yamahata@intel.com>, 
+	Erdem Aktas <erdemaktas@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 
-
-
-On 16.06.24 г. 15:01 ч., Kai Huang wrote:
-> Currently the kernel doesn't print any information regarding the TDX
-> module itself, e.g. module version.  Printing such information is not
-> mandatory for initializing the TDX module, but in practice such
-> information is useful, especially to the developers.
-
-It's understood that it's not mandatory to print any information, just 
-remove this sentence and leave the "In practice such...."
-
-> 
-> For instance, there are couple of use cases for dumping module basic
-> information:
-> 
-> 1) When something goes wrong around using TDX, the information like TDX
->     module version, supported features etc could be helpful [1][2].
-> 
-> 2) For Linux, when the user wants to update the TDX module, one needs to
->     replace the old module in a specific location in the EFI partition
->     with the new one so that after reboot the BIOS can load it.  However,
->     after kernel boots, currently the user has no way to verify it is
->     indeed the new module that gets loaded and initialized (e.g., error
->     could happen when replacing the old module).  With the module version
->     dumped the user can verify this easily.
-> 
-> So dump the basic TDX module information:
-> 
->   - TDX module type: Debug or Production.
->   - TDX_FEATURES0: Supported TDX features.
->   - TDX module version, and the build date.
-> 
-> And dump the information right after reading global metadata, so that
-> this information is printed no matter whether module initialization
-> fails or not.
-
-Instead of printing this on 3 separate rows why not print something like:
-
-"Initialising TDX Module $NUMERIC_VERSION ($BUILD_DATE 
-$PRODUCTION_STATE), $TDX_FEATURES"
-
-That way:
-a) You convey the version information
-b) You explicitly state that initialisation has begun and make no 
-guarantees that because this has been printed the module is indeed 
-properly initialised. I'm thinking if someone could be mistaken that if 
-this information is printed this surely means that the module is 
-properly working, which is not the case.
-
-
-
-> 
-> The actual dmesg will look like:
-> 
->    virt/tdx: Production module.
->    virt/tdx: TDX_FEATURES0: 0xfbf
->    virt/tdx: Module version: 1.5.00.00.0481, build_date: 20230323
-> 
-> Link: https://lore.kernel.org/lkml/e2d844ad-182a-4fc0-a06a-d609c9cbef74@suse.com/T/#m352829aedf6680d4628c7e40dc40b332eda93355 [1]
-> Link: https://lore.kernel.org/lkml/e2d844ad-182a-4fc0-a06a-d609c9cbef74@suse.com/T/#m351ebcbc006d2e5bc3e7650206a087cb2708d451 [2]
-> Signed-off-by: Kai Huang <kai.huang@intel.com>
-> ---
->   arch/x86/virt/vmx/tdx/tdx.c | 67 +++++++++++++++++++++++++++++++++++++
->   arch/x86/virt/vmx/tdx/tdx.h | 33 +++++++++++++++++-
->   2 files changed, 99 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
-> index 4683884efcc6..ced40e3b516e 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.c
-> +++ b/arch/x86/virt/vmx/tdx/tdx.c
-> @@ -319,6 +319,61 @@ static int stbuf_read_sysmd_multi(const struct field_mapping *fields,
->   	return 0;
->   }
->   
-> +#define TD_SYSINFO_MAP_MOD_INFO(_field_id, _member)	\
-> +	TD_SYSINFO_MAP(_field_id, struct tdx_sysinfo_module_info, _member)
-
-What's the point of this define, simply use the raw TD_SYSINFO_MAP 
-inside the respective function. It doesn't really add any value 
-especially everything is encapsulated in one function. Literally you add 
-it so that you don't have to type "struct tdx_sysinfo_module_info" on 
-each of the 2 lines this define is used...
-
-> +
-> +static int get_tdx_module_info(struct tdx_sysinfo_module_info *modinfo)
-> +{
-> +	static const struct field_mapping fields[] = {
-> +		TD_SYSINFO_MAP_MOD_INFO(SYS_ATTRIBUTES, sys_attributes),
-> +		TD_SYSINFO_MAP_MOD_INFO(TDX_FEATURES0,  tdx_features0),
-> +	};
-> +
-> +	return stbuf_read_sysmd_multi(fields, ARRAY_SIZE(fields), modinfo);
-> +}
-> +
-> +#define TD_SYSINFO_MAP_MOD_VERSION(_field_id, _member)	\
-> +	TD_SYSINFO_MAP(_field_id, struct tdx_sysinfo_module_version, _member)
-
-DITTO
-
-> +
-> +static int get_tdx_module_version(struct tdx_sysinfo_module_version *modver)
-> +{
-> +	static const struct field_mapping fields[] = {
-> +		TD_SYSINFO_MAP_MOD_VERSION(MAJOR_VERSION,    major),
-> +		TD_SYSINFO_MAP_MOD_VERSION(MINOR_VERSION,    minor),
-> +		TD_SYSINFO_MAP_MOD_VERSION(UPDATE_VERSION,   update),
-> +		TD_SYSINFO_MAP_MOD_VERSION(INTERNAL_VERSION, internal),
-> +		TD_SYSINFO_MAP_MOD_VERSION(BUILD_NUM,	     build_num),
-> +		TD_SYSINFO_MAP_MOD_VERSION(BUILD_DATE,	     build_date),
-> +	};
-> +
-> +	return stbuf_read_sysmd_multi(fields, ARRAY_SIZE(fields), modver);
-> +}
-> +
-> +static void print_basic_sysinfo(struct tdx_sysinfo *sysinfo)
-> +{
-> +	struct tdx_sysinfo_module_version *modver = &sysinfo->module_version;
-> +	struct tdx_sysinfo_module_info *modinfo = &sysinfo->module_info;
-> +	bool debug = modinfo->sys_attributes & TDX_SYS_ATTR_DEBUG_MODULE;
-> +
-> +	pr_info("%s module.\n", debug ? "Debug" : "Production");
-> +
-> +	pr_info("TDX_FEATURES0: 0x%llx\n", modinfo->tdx_features0);
-> +
-> +	/*
-> +	 * TDX module version encoding:
-> +	 *
-> +	 *   <major>.<minor>.<update>.<internal>.<build_num>
-> +	 *
-> +	 * When printed as text, <major> and <minor> are 1-digit,
-> +	 * <update> and <internal> are 2-digits and <build_num>
-> +	 * is 4-digits.
-> +	 */
-> +	pr_info("Module version: %u.%u.%02u.%02u.%04u, build_date: %u\n",
-> +			modver->major,		modver->minor,
-> +			modver->update,		modver->internal,
-> +			modver->build_num,	modver->build_date);
-> +}
-> +
->   #define TD_SYSINFO_MAP_TDMR_INFO(_field_id, _member)	\
->   	TD_SYSINFO_MAP(_field_id, struct tdx_sysinfo_tdmr_info, _member)
->   
-> @@ -339,6 +394,16 @@ static int get_tdx_tdmr_sysinfo(struct tdx_sysinfo_tdmr_info *tdmr_sysinfo)
->   
->   static int get_tdx_sysinfo(struct tdx_sysinfo *sysinfo)
->   {
-> +	int ret;
-> +
-> +	ret = get_tdx_module_info(&sysinfo->module_info);
-> +	if (ret)
-> +		return ret;
-> +
-> +	ret = get_tdx_module_version(&sysinfo->module_version);
-> +	if (ret)
-> +		return ret;
-> +
->   	return get_tdx_tdmr_sysinfo(&sysinfo->tdmr_info);
->   }
->   
-> @@ -1121,6 +1186,8 @@ static int init_tdx_module(void)
->   	if (ret)
->   		return ret;
->   
-> +	print_basic_sysinfo(&sysinfo);
-> +
->   	/*
->   	 * To keep things simple, assume that all TDX-protected memory
->   	 * will come from the page allocator.  Make sure all pages in the
-> diff --git a/arch/x86/virt/vmx/tdx/tdx.h b/arch/x86/virt/vmx/tdx/tdx.h
-> index 6b61dc67b0af..d80ec797fbf1 100644
-> --- a/arch/x86/virt/vmx/tdx/tdx.h
-> +++ b/arch/x86/virt/vmx/tdx/tdx.h
-> @@ -31,6 +31,15 @@
->    *
->    * See Table "Global Scope Metadata", TDX module 1.5 ABI spec.
->    */
-
-nit:
-
-[Not related to this patch but still a problem in its own]
-
-Those fields are defined in the global_metadata.json which is part of 
-the  "Intel TDX Module v1.5 ABI Definitions" and not the 1.5 ABI spec, 
-as the ABI spec is the pdf.
-
-> +#define MD_FIELD_ID_SYS_ATTRIBUTES		0x0A00000200000000ULL
-> +#define MD_FIELD_ID_TDX_FEATURES0		0x0A00000300000008ULL
-> +#define MD_FIELD_ID_BUILD_DATE			0x8800000200000001ULL
-> +#define MD_FIELD_ID_BUILD_NUM			0x8800000100000002ULL
-> +#define MD_FIELD_ID_MINOR_VERSION		0x0800000100000003ULL
-> +#define MD_FIELD_ID_MAJOR_VERSION		0x0800000100000004ULL
-> +#define MD_FIELD_ID_UPDATE_VERSION		0x0800000100000005ULL
-> +#define MD_FIELD_ID_INTERNAL_VERSION		0x0800000100000006ULL
-> +
->   #define MD_FIELD_ID_MAX_TDMRS			0x9100000100000008ULL
->   #define MD_FIELD_ID_MAX_RESERVED_PER_TDMR	0x9100000100000009ULL
->   #define MD_FIELD_ID_PAMT_4K_ENTRY_SIZE		0x9100000100000010ULL
-> @@ -124,8 +133,28 @@ struct tdmr_info_list {
->    *
->    * Note not all metadata fields in each class are defined, only those
->    * used by the kernel are.
-> + *
-> + * Also note the "bit definitions" are architectural.
->    */
->   
-> +/* Class "TDX Module Info" */
-> +struct tdx_sysinfo_module_info {
-> +	u32 sys_attributes;
-> +	u64 tdx_features0;
-> +};
-> +
-> +#define TDX_SYS_ATTR_DEBUG_MODULE	0x1
-> +
-> +/* Class "TDX Module Version" */
-> +struct tdx_sysinfo_module_version {
-> +	u16 major;
-> +	u16 minor;
-> +	u16 update;
-> +	u16 internal;
-> +	u16 build_num;
-> +	u32 build_date;
-> +};
-> +
->   /* Class "TDMR Info" */
->   struct tdx_sysinfo_tdmr_info {
->   	u16 max_tdmrs;
-> @@ -134,7 +163,9 @@ struct tdx_sysinfo_tdmr_info {
->   };
->   
->   struct tdx_sysinfo {
-> -	struct tdx_sysinfo_tdmr_info tdmr_info;
-> +	struct tdx_sysinfo_module_info		module_info;
-> +	struct tdx_sysinfo_module_version	module_version;
-> +	struct tdx_sysinfo_tdmr_info		tdmr_info;
->   };
->   
->   #endif
+T24gTW9uLCBKdW4gMTcsIDIwMjQsIFlhbiBaaGFvIHdyb3RlOgo+IE9uIEZyaSwgSnVuIDE0LCAy
+MDI0IGF0IDA0OjAxOjA3QU0gKzA4MDAsIEVkZ2Vjb21iZSwgUmljayBQIHdyb3RlOgo+ID4gT24g
+VGh1LCAyMDI0LTA2LTEzIGF0IDE0OjA2ICswODAwLCBZYW4gWmhhbyB3cm90ZToKPiA+ID4gwqDC
+oMKgwqDCoCBhKSBBZGQgYSBjb25kaXRpb24gZm9yIFREWCBWTSB0eXBlIGluIGt2bV9hcmNoX2Zs
+dXNoX3NoYWRvd19tZW1zbG90KCkKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoCBiZXNpZGVzIHRoZSB0
+ZXN0aW5nIG9mIGt2bV9jaGVja19oYXNfcXVpcmsoKS4gSXQgaXMgc2ltaWxhciB0bwo+ID4gPiDC
+oMKgwqDCoMKgwqDCoMKgICJhbGwgbmV3IFZNIHR5cGVzIGhhdmUgdGhlIHF1aXJrIGRpc2FibGVk
+Ii4gZS5nLgo+ID4gPiAKPiA+ID4gwqDCoMKgwqDCoMKgwqDCoCBzdGF0aWMgaW5saW5lIGJvb2wg
+a3ZtX21lbXNsb3RfZmx1c2hfemFwX2FsbChzdHJ1Y3Qga3ZtCj4gPiA+ICprdm0pwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqAKPiA+
+ID4ge8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAKPiA+ID4gwqDCoCAK
+PiA+ID4gwqDCoMKgwqDCoMKgwqDCoCDCoMKgwqDCoCByZXR1cm4ga3ZtLT5hcmNoLnZtX3R5cGUg
+IT0gS1ZNX1g4Nl9URFhfVk0KPiA+ID4gJibCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqAga3ZtX2NoZWNrX2hhc19xdWlyayhrdm0sCj4gPiA+IEtWTV9Y
+ODZfUVVJUktfU0xPVF9aQVBfQUxMKTvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgCj4g
+PiA+IMKgwqDCoMKgwqDCoMKgwqAgfQo+ID4gPiDCoMKgwqDCoMKgwqDCoMKgIAo+ID4gPiDCoMKg
+wqDCoMKgIGIpIEluaXQgdGhlIGRpc2FibGVkX3F1aXJrcyBiYXNlZCBvbiBWTSB0eXBlIGluIGtl
+cm5lbCwgZXh0ZW5kCj4gPiA+IMKgwqDCoMKgwqDCoMKgwqAgZGlzYWJsZWRfcXVpcmsgcXVlcnlp
+bmcvc2V0dGluZyBpbnRlcmZhY2UgdG8gZW5mb3JjZSB0aGUgcXVpcmsgdG8KPiA+ID4gwqDCoMKg
+wqDCoMKgwqDCoCBiZSBkaXNhYmxlZCBmb3IgVERYLgoKVGhlcmUncyBhbHNvIG9wdGlvbjoKCiAg
+ICAgICAgICAgIGMpIEluaXQgZGlzYWJsZWRfcXVpcmtzIGJhc2VkIG9uIFZNIHR5cGUuCgpJLmUu
+IGxldCB1c2Vyc3BhY2UgZW5hYmxlIHRoZSBxdWlyay4gIElmIHRoZSBWTU0gd2FudHMgdG8gc2hv
+b3QgaXRzIFREWCBWTSBndWVzdHMsCnRoZW4gc28gYmUgaXQuICBUaGF0IHNhaWQsIEkgZG9uJ3Qg
+bGlrZSB0aGlzIG9wdGlvbiBiZWNhdXNlIGl0IHdvdWxkIGNyZWF0ZSBhIHZlcnkKYml6YXJyZSBB
+QkkuCgo+ID4gCj4gPiBJJ2QgcHJlZmVyIHRvIGdvIHdpdGggb3B0aW9uIChhKSBoZXJlLiBCZWNh
+dXNlIHdlIGRvbid0IGhhdmUgYW55IGJlaGF2aW9yCj4gPiBkZWZpbmVkIHlldCBmb3IgS1ZNX1g4
+Nl9URFhfVk0sIHdlIGRvbid0IHJlYWxseSBuZWVkIHRvICJkaXNhYmxlIGEgcXVpcmsiIG9mIGl0
+LgoKSSB2b3RlIGZvciAoYSkgYXMgd2VsbC4KCj4gPiBJbnN0ZWFkIHdlIGNvdWxkIGp1c3QgZGVm
+aW5lIEtWTV9YODZfUVVJUktfU0xPVF9aQVBfQUxMIHRvIGJlIGFib3V0IHRoZSBiZWhhdmlvcgo+
+ID4gb2YgdGhlIGV4aXN0aW5nIHZtX3R5cGVzLiBJdCB3b3VsZCBiZSBhIGZldyBsaW5lcyBvZiBk
+b2N1bWVudGF0aW9uIHRvIHNhdmUKPiA+IGltcGxlbWVudGluZyBhbmQgbWFpbnRhaW5pbmcgYSB3
+aG9sZSBpbnRlcmZhY2Ugd2l0aCBzcGVjaWFsIGxvZ2ljIGZvciBURFguIFNvIHRvCj4gPiBtZSBp
+dCBkb2Vzbid0IHNlZW0gd29ydGggaXQsIHVubGVzcyB0aGVyZSBpcyBzb21lIG90aGVyIHVzZXIg
+Zm9yIGEgbmV3IG1vcmUKPiA+IGNvbXBsZXggcXVpcmsgaW50ZXJmYWNlLgo+IFdoYXQgYWJvdXQg
+aW50cm9kdWNpbmcgYSBmb3JjZWQgZGlzYWJsZWRfcXVpcmsgZmllbGQ/CgpOYWgsIGl0J2QgcmVx
+dWlyZSBtYW51YWwgb3B0LWluIGZvciBldmVyeSBWTSB0eXBlIGZvciBhbG1vc3Qgbm8gYmVuZWZp
+dC4gIEluIGZhY3QsCklNTyB0aGUgY29kZSBpdHNlbGYgd291bGQgYmUgYSBuZXQgbmVnYXRpdmUg
+dmVyc3VzOgoKCQlyZXR1cm4ga3ZtLT5hcmNoLnZtX3R5cGUgPT0gS1ZNX1g4Nl9ERUZBVUxUX1ZN
+ICYmCgkJICAgICAgIGt2bV9jaGVja19oYXNfcXVpcmsoa3ZtLCBLVk1fWDg2X1FVSVJLX1NMT1Rf
+WkFQX0FMTCk7CgpiZWNhdXNlIGV4cGxpY2l0bHkgY2hlY2tpbmcgZm9yIEtWTV9YODZfREVGQVVM
+VF9WTSB3b3VsZCBkaXJlY3RseSBtYXRjaCB0aGUKZG9jdW1lbnRhdGlvbiAod2hpY2ggd291bGQg
+c3RhdGUgdGhhdCB0aGUgcXVpcmsgb25seSBhcHBsaWVzIHRvIERFRkFVTFRfVk0pLgo=
 
