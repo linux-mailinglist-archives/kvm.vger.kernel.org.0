@@ -1,152 +1,111 @@
-Return-Path: <kvm+bounces-19866-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19867-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF5F490D635
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 16:55:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F04E390D650
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 16:57:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 679332914F0
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 14:55:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 230261C24BDE
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 14:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C7115442A;
-	Tue, 18 Jun 2024 14:49:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C973148313;
+	Tue, 18 Jun 2024 14:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="L4AzBa4T"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxs0alx0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F45153819
-	for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 14:49:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C9D2139C1;
+	Tue, 18 Jun 2024 14:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718722189; cv=none; b=tOyPPFTjMoc9rhrLmA/7LQBm//tMLteRch4tjA4rtI6nDMhc5vmW1NQxihXy7EznFLOE+v9BSmhYstpJj8asCQVGhZf7qNrjJSFaDvagCcc3s+PcaqW8GF5S7vtF6xm9QiQCI7IoCXkVtd82Mq2Mrc+POaELfxWQd9QlavPEsfc=
+	t=1718722507; cv=none; b=eSS8SR6AR2iRZuzEhMYvr+XiKHhuIroA5hjNv8A9AySw1mk8U/Rq2PSWGEiLW1Vqw5GKYypb1uU1s4kZxbMz9azRo+SnRszHMX5+cv5xepeFhROSq7dxCgOkYumKT9pYLKvhGrQnNQ+RYWG/fO+ABQndP4igbY9tVjMTlGbmJZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718722189; c=relaxed/simple;
-	bh=sS4KfRfJJiUqihLxcYtcY+Mfy1Ulb126w+Wc3l+706c=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=h6p9jxDBsizwuOiRVfNlVs93PACvsEvGFx9FhU1ueX57veSkK3mok5XHxHj5pIsGSUHM62aq0NHTvtNvnEL9CqxDrqVmEWD6r7qPSckEm9NIWWy7aFwt7iYeFTc9NaA525iajY8c1rcJmOD4nnwWEFJ0IdfignsxLmgn40ZF4MM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=L4AzBa4T; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1f70c5242eeso44046725ad.3
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 07:49:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718722186; x=1719326986; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CTIp2bgGTA/tlgQkxUpOKFr0N9Q3zohXJu7y3VJNXEg=;
-        b=L4AzBa4T2B135Q3Y5vmRh/Lz4XLIdOqrmF/A/LQAN3+2H4Ns44hjr5VSlgWRUk5GhE
-         efsBHBbWBW9I1CQAxQTdGpC1Won+i+5fCjZS/hQDJU1J/1Rypo6SrjoI9kEc+Dv2+1bk
-         PJdPH/AtzHdQ3/GGzDTaweXMMSyEQVTzKyAOmRbspHJ8rczAe/XifT9YBgd08igyk1SO
-         FaeC/LVSVPWgPwKWxh+Fn1MuSEbF26swCkjrUJd2vGN+ldPnZGewFcowyqld45/7PXG6
-         2z4p/l21JjOdG8IjDQhaxSdoc1HYhJ4PFh362xNyDviKpZ7Jat31V+wdOl/Gs668ABqt
-         UaeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718722186; x=1719326986;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CTIp2bgGTA/tlgQkxUpOKFr0N9Q3zohXJu7y3VJNXEg=;
-        b=PyY9Xiw+n5kMwTqKnpUU04GLXxi48VTETwhEW4c8cNafXNs08o70IsTbASIpV8qyx7
-         E2Rr3Ef3e8iJSm9b8hXziBidhDmJzeW3/Sd8S++XuUIEnqvOMMbBbJz4OmCgojzqd7wo
-         hIKGLw0YDhW1AQlp4vuEcnQKiHQw9l5OLa5QnfaLhNuyyHPCKxJnz7GIka+jjQYD3TNH
-         RYpZnbGfyQNWGGTt95NRMFqqhPdYf5AdmwolLTDPTitWvp2G/5BPVYwnUxW0e9BcA6sq
-         hiMSn0At+Uxa83COI7Bxv7vasZuL+ubozThMbM9WjlcDnmtB1bfm5e2A0hONFdrAn4Rj
-         ggyQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcbVwBdJWYeAgfBK0viVki2yeVFlxDQhd3K+4EP9rPwyKpGOSzB3lKLiGiAlE8bGF01yC/qvDMTGTSUqI9NIIUIAPL
-X-Gm-Message-State: AOJu0YyS4WMlSlwcQSIsxLqIiYc2UA6ktUiLHyrlAmsorI4T19MkVXxj
-	9Am+WjSPSPCysjTO5IpN4zhero60CaTyWlNN1bremuTqA8fqN0mjZdWMSLTcg2XYXa82F9yvvr3
-	q/Q==
-X-Google-Smtp-Source: AGHT+IF4aKcWBFfiWCx7LxGuRbyviEwKtzksGT/KMvnW6maaVMM8cx45zq+A4lMs7oOAJ6NS2QXY68JhpeQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:e851:b0:1f4:76f6:63bc with SMTP id
- d9443c01a7336-1f8625d54cemr3345535ad.7.1718722185726; Tue, 18 Jun 2024
- 07:49:45 -0700 (PDT)
-Date: Tue, 18 Jun 2024 07:49:43 -0700
-In-Reply-To: <5bb2d7fc-cfe9-4abd-a291-7ad56db234b3@intel.com>
+	s=arc-20240116; t=1718722507; c=relaxed/simple;
+	bh=4N2mkqWw4oVDZXaqiKIREnReDpxgfXGU4iX5l5GVKA8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gYPcN/h/wpiVR22senpd2rPQgGFiOdnnWtrkv1CpvKiepC7guQsiHf3vVMLlZIByhREhAutCDJ+/7BVAkkJKy3CZnhwNeh42jK4GXYyDMdu5FFOc4IIH+XpUzCO3uBrr3UcBebRevwXrEi22RMGCEvnEE6ynVEMaRYFu97uh+rs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxs0alx0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BEB07C3277B;
+	Tue, 18 Jun 2024 14:55:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718722506;
+	bh=4N2mkqWw4oVDZXaqiKIREnReDpxgfXGU4iX5l5GVKA8=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=lxs0alx0YtToRHCm6zAsalV7YBw/LX1s6CBqu8/+6OPIq/1oH5hkEKrK4KrN88ej7
+	 vZNA2DbVrBIiYXJ/4W7TbAs07nglBd6sFQSIbi/JVUwZ+0dtdiIEqeYTBgrgPu7PKn
+	 H5gVdtoB7M23x6a8LVLM62zM60fhvB7X1y/2iD7IN5W+b2Mj3adjCPOpEdgFfbRkOp
+	 aXcmduqfHSlbzdWqZi8Gy/OSjc9Q6GzfHrvJ1HFW1nRLm4jbDPXqemb1j0yPKE+VBz
+	 CGmeZiSQWWFiOtg6qylODPcpEJvvG2FsWOKL5JyIeWzB8hDIH+CH/mP/yPsdbtR67V
+	 aseB6qvfMj9EA==
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a6f04afcce1so715096766b.2;
+        Tue, 18 Jun 2024 07:55:06 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVa83VZSYTWT6r8UmjSpeaOTwIAg9n7rdLcBcP0/jWjAst2+5Vg2pE+/xCeB+EDeQuxswQUJ6yWnxSRx/t7kWHqZ9qlFSQp08Sp6+NKpdry1KfdYmu2PjZYYtx2T1RuDPf/
+X-Gm-Message-State: AOJu0YxiUubDD0Pp6L3jbQ/Iym7EF+7N88bK0LbIlDOTOz6fHktKvuTD
+	Y2xA0tb/gxyQEwvh9Ekfz9wKB+kVStu8Wia85z+1prsvXhGwncMMSawDbdiMYjEmSrMGQR0feWa
+	jNGvbsj5ZXVYHXqnIm7KgtlxCTkk=
+X-Google-Smtp-Source: AGHT+IGxiXPbEMxpPDDWWILuim67EpiBCnDI9u/o2oiytHGesfTPI2v7VbQSw8eWzbi1QtTSUhamNG2ED8uuyyDDYq0=
+X-Received: by 2002:a17:906:fc01:b0:a6f:2e80:6e04 with SMTP id
+ a640c23a62f3a-a6f60d3775emr972581966b.19.1718722505332; Tue, 18 Jun 2024
+ 07:55:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240509235522.GA480079@ls.amr.corp.intel.com>
- <Zj4phpnqYNoNTVeP@google.com> <50e09676-4dfc-473f-8b34-7f7a98ab5228@intel.com>
- <Zle29YsDN5Hff7Lo@google.com> <f2952ae37a2bdaf3eb53858e54e6cc4986c62528.camel@intel.com>
- <ZliUecH-I1EhN7Ke@google.com> <38210be0e7cc267a459d97d70f3aff07855b7efd.camel@intel.com>
- <405dd8997aaaf33419be6b0fc37974370d63fd8c.camel@intel.com>
- <ZmzaqRy2zjvlsDfL@google.com> <5bb2d7fc-cfe9-4abd-a291-7ad56db234b3@intel.com>
-Message-ID: <ZnGehy1JK_V0aJQR@google.com>
-Subject: Re: [PATCH v19 037/130] KVM: TDX: Make KVM_CAP_MAX_VCPUS backend specific
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Tina Zhang <tina.zhang@intel.com>, Hang Yuan <hang.yuan@intel.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, Bo2 Chen <chen.bo@intel.com>, 
-	"sagis@google.com" <sagis@google.com>, 
-	"isaku.yamahata@linux.intel.com" <isaku.yamahata@linux.intel.com>, Erdem Aktas <erdemaktas@google.com>, 
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240618010013.66332-1-yang.lee@linux.alibaba.com> <2812c8ae-62c2-1ac5-087d-202891a513b6@loongson.cn>
+In-Reply-To: <2812c8ae-62c2-1ac5-087d-202891a513b6@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 18 Jun 2024 22:54:55 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6ALi1cvt6MB8cXP2QNg77P84vWP4kthaZLyQJURMBv8w@mail.gmail.com>
+Message-ID: <CAAhV-H6ALi1cvt6MB8cXP2QNg77P84vWP4kthaZLyQJURMBv8w@mail.gmail.com>
+Subject: Re: [PATCH -next] LoongArch: KVM: Remove unneeded semicolon
+To: maobibo <maobibo@loongson.cn>
+Cc: Yang Li <yang.lee@linux.alibaba.com>, zhaotianrui@loongson.cn, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	Abaci Robot <abaci@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 18, 2024, Kai Huang wrote:
-> On 15/06/2024 12:04 pm, Sean Christopherson wrote:
-> > On Fri, Jun 14, 2024, Kai Huang wrote:
-> > > > - The "max_vcpus_per_td" can be different depending on module versions. In
-> > > > practice it reflects the maximum physical logical cpus that all the
-> > > > platforms (that the module supports) can possibly have.
-> > 
-> > It's a reasonable restriction, e.g. KVM_CAP_NR_VCPUS is already capped at number
-> > of online CPUs, although userspace is obviously allowed to create oversubscribed
-> > VMs.
-> > 
-> > I think the sane thing to do is document that TDX VMs are restricted to the number
-> > of logical CPUs in the system, have KVM_CAP_MAX_VCPUS enumerate exactly that, and
-> > then sanity check that max_vcpus_per_td is greater than or equal to what KVM
-> > reports for KVM_CAP_MAX_VCPUS. >
-> > Stating that the maximum number of vCPUs depends on the whims TDX module doesn't
-> > provide a predictable ABI for KVM, i.e. I don't want to simply forward TDX's
-> > max_vcpus_per_td to userspace.
-> 
-> This sounds good to me.  I think it should be also OK for client too, if TDX
-> ever gets supported for client.
-> 
-> IIUC we can consult the @nr_cpu_ids or num_possible_cpus() to get the
-> "number of logical CPUs in the system".  And we can reject to use the TDX
-> module if 'max_vcpus_per_td' turns to be smaller.
+Queued, thanks.
 
-I assume TDX is incompatible with actual physical CPU hotplug?  If so, we can and
-should use num_present_cpus().  If  loading the TDX module completely disables
-onlining CPUs, then we can use num_online_cpus().
+Huacai
 
-> I think the relevant question is is whether we should still report "number
-> of logical CPUs in the system" via KVM_CAP_MAX_VCPUS?  Because if doing so,
-> this still means the userspace will need to check KVM_CAP_MAX_VCPUS vm
-> extention on per-vm basis.
-
-Yes.
-
-> And if it does, then from userspace's perspective, it actually doesn't
-> matter whether underneath the per-vm KVM_CAP_MAX_VCPUS is limited by TDX or
-> the system cpus (also see below).
-
-It matters because I don't want KVM's ABI to be tied to the whims of the TDX module.
-Today, there's no limitations on the max number of vCPUs.  Tomorrow, it's limited
-by the number of pCPUs.  Three days from now, I don't want to find out that the
-TDX module is limiting the number of vCPUs based on some other new criteria.
-
-> The userspace cannot tell the difference anyway.  It just needs to change to
-> query KVM_CAP_MAX_VCPUS to per-vm basis.
-> 
-> Or, we could limit this to TDX guest ONLY:
-> 
-> The KVM_CAP_MAX_VCPUS is still global.  However for TDX specifically, the
-> userspace should use other way to query the number of LPs the system
-> supports (I assume there should be existing ABI for this?).
-> 
-> But looks this isn't something nice?
-
-What's wrong with querying KVM_CAP_MAX_VCPUS on the VM file descriptor?
+On Tue, Jun 18, 2024 at 10:06=E2=80=AFAM maobibo <maobibo@loongson.cn> wrot=
+e:
+>
+>
+>
+> On 2024/6/18 =E4=B8=8A=E5=8D=889:00, Yang Li wrote:
+> > ./arch/loongarch/kvm/exit.c:764:2-3: Unneeded semicolon
+> >
+> > Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> > Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=3D9343
+> > Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+> > ---
+> >   arch/loongarch/kvm/exit.c | 2 +-
+> >   1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> > index c86e099af5ca..a68573e091c0 100644
+> > --- a/arch/loongarch/kvm/exit.c
+> > +++ b/arch/loongarch/kvm/exit.c
+> > @@ -761,7 +761,7 @@ static void kvm_handle_service(struct kvm_vcpu *vcp=
+u)
+> >       default:
+> >               ret =3D KVM_HCALL_INVALID_CODE;
+> >               break;
+> > -     };
+> > +     }
+> >
+> >       kvm_write_reg(vcpu, LOONGARCH_GPR_A0, ret);
+> >   }
+> >
+> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+>
+>
 
