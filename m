@@ -1,362 +1,193 @@
-Return-Path: <kvm+bounces-19889-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19890-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8609A90DD6F
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 22:29:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C87F190DDFD
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 23:07:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EF281F22BE6
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 20:29:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F3EA282C8F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 21:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DEBF1741DA;
-	Tue, 18 Jun 2024 20:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050EC176AC8;
+	Tue, 18 Jun 2024 21:06:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eWO9seBw"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="s/cWb0fX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2059.outbound.protection.outlook.com [40.107.94.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E533739AEC
-	for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 20:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718742585; cv=none; b=nyIyzPJTxQnxG85ZfiuTz01zBNe1E5OD7efQa0L/LUt2ZeL6XsRYgfYu2ToLXRR54q2iI/3l/Grbc3vUZROcdGMXbOFptRHxhUC/NCv/q82lKU9Sd1Bb2pjO/oBxQDz5XP9LR4h+UreMi2gMFM7dJcJvxxPMFQABrslPfRbzSdg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718742585; c=relaxed/simple;
-	bh=0EY5kqxsoldm7cuYsyNd9fah7kjTj3xoaitJlbVR78k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ne5csXLHvYzZqjoGSYwYk2if5lPJHpUgkqyX55C0p1E2qfGFaG2a7hV7KDZoTzSlVUGtAD3F5TE8ErxrldUS9tHnKpudfwr4/e1DIBgCEXqCAtNdwoxNfQ/VgLv4bXIONUucnMIEEQkA133EEma0bYIQGKvAgt8SATtXPrIhkA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eWO9seBw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718742582;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SG1pahsNFyeWnRJMLnP/UTfWOjHeAffBOrHctLI/8J8=;
-	b=eWO9seBwNGXIvvw0CqC0CYPQXhwuscz9mCiLMUE+IXQz9GqQwzbnMhXCKGhG3GPiMTDeLi
-	/xy3eW4PU8nVZ03X1D8wqprMMW1Miga5iRA1/f1I9Mx+0gxm0hOCB9J7l3F9x6qc042fCZ
-	0Mc9NtDu0PTz4Iw7pxICUPCVcaKPpAc=
-Received: from mail-oa1-f71.google.com (mail-oa1-f71.google.com
- [209.85.160.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-679-H9Ao9DSkOfaNu4IOZnhIOA-1; Tue, 18 Jun 2024 16:29:41 -0400
-X-MC-Unique: H9Ao9DSkOfaNu4IOZnhIOA-1
-Received: by mail-oa1-f71.google.com with SMTP id 586e51a60fabf-25443e5e1baso7325839fac.3
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 13:29:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718742581; x=1719347381;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SG1pahsNFyeWnRJMLnP/UTfWOjHeAffBOrHctLI/8J8=;
-        b=oo63vYvVIOrc/vvhG9YswoyWaSk1N2jxPygenvcklCYjknIx/yPLhNuTKCRg7yppz1
-         3saQUUxvfHZEfP55Z2whVVDUD6Czmok+vBVACvBm2gUp2IEa8ao3uRYAnUu0LrTgXpSn
-         3r7+T3not7zVh880yEg8Kd7YOVxriZAgJy8USCFoYYhGhQ43GTydkBwHnrIfFvtTUl+4
-         L1z86Kaf5IVTxKxmdIrLTbUCmrraY/Nrp1DHznrb/m9DnPnRpBKUr6L6iA1ZxlSXOXIw
-         NiCcsivSuv86hM4ojWsspTCnPdKwagh8n260SJ3ZEgFCsbanZkgH7jANCs/yDvlfbX2g
-         BRzA==
-X-Forwarded-Encrypted: i=1; AJvYcCVTkfPrMSRj5GfzrEGv6HrrkZ5r7Lay3EwaaLCEKqvNlIVaihwjtV0xO6KfYcH46fCK2SOFp10BRgg4Qw/OC3GnZqGS
-X-Gm-Message-State: AOJu0YyTBCaVI9aENqXUQGOkj+IuqLZP3rvBRCyd1GvlGEapWm2pioCC
-	a4HBQcXb4NrLkjifirvBRrYM7HU3eJuLTonCPvKjaIL7SY9yiwl9rDzg5SMXYtIGufgiteUR4LV
-	0YfdCW5uR/H6Uh2d0XxP6HQVGmDcpt81tOFHyqzLz3h9kWbYF0Q==
-X-Received: by 2002:a05:6870:6593:b0:254:ab8e:471b with SMTP id 586e51a60fabf-25c94e48921mr1087675fac.50.1718742580731;
-        Tue, 18 Jun 2024 13:29:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFDdgr3Spkd8lHoFHFSmzJEvst+OAsL3TJQBtRNfBw7S0f8ei8LxcslOnai254xYA7CMuWGVQ==
-X-Received: by 2002:a05:6870:6593:b0:254:ab8e:471b with SMTP id 586e51a60fabf-25c94e48921mr1087658fac.50.1718742580376;
-        Tue, 18 Jun 2024 13:29:40 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-6fb5b75648asm1937270a34.72.2024.06.18.13.29.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 13:29:39 -0700 (PDT)
-Date: Tue, 18 Jun 2024 14:29:37 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Fred Griffoul <fgriffo@amazon.co.uk>
-Cc: <griffoul@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, Will
- Deacon <will@kernel.org>, Waiman Long <longman@redhat.com>, Zefan Li
- <lizefan.x@bytedance.com>, Tejun Heo <tj@kernel.org>, Johannes Weiner
- <hannes@cmpxchg.org>, Mark Rutland <mark.rutland@arm.com>, Marc Zyngier
- <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Mark Brown
- <broonie@kernel.org>, Ard Biesheuvel <ardb@kernel.org>, Joey Gouly
- <joey.gouly@arm.com>, Ryan Roberts <ryan.roberts@arm.com>, Jeremy Linton
- <jeremy.linton@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
- <yi.l.liu@intel.com>, Kevin Tian <kevin.tian@intel.com>, Eric Auger
- <eric.auger@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, "Christian
- Brauner" <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, "Reinette
- Chatre" <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>,
- <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
- <kvm@vger.kernel.org>, <cgroups@vger.kernel.org>
-Subject: Re: [PATCH v6 2/2] vfio/pci: add interrupt affinity support
-Message-ID: <20240618142937.553f8f1e.alex.williamson@redhat.com>
-In-Reply-To: <20240611174430.90787-3-fgriffo@amazon.co.uk>
-References: <20240611174430.90787-1-fgriffo@amazon.co.uk>
-	<20240611174430.90787-3-fgriffo@amazon.co.uk>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D265516D4E4;
+	Tue, 18 Jun 2024 21:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718744813; cv=fail; b=GUbYocp8+8TbPVsIydvA4kE2vTZoAxtFdo/a68V1OjYzsdLpomfM+u9OW3MW4yV+oxOE7ieLzqnD+mhh2pHp+iGERgONvPyAUFZDo5NGD10/10wGs9NoNB62qGdogwwq0TjnLxFEIHklZswx8Gy710CZlndWMhKhU8kEf+4RYEo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718744813; c=relaxed/simple;
+	bh=p3PHA56xTqFQvc2FhXJaFSlqsLej07I2bxZFV1cm+kA=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=sF7Usnjlji/x2S3sNYf/tR5MQxW61Uc0VsHnkN+zZfiHg4jh8ZgrQ0CrGvCWKqe1nCUVQ2tbW5BcByYfkP5+yn3Y4uZz5Y6jYqymCwyNXcarcs34Gyj6yTsWAlEM1Yw8p+VSJUwkSWk697NyXDA5jD5XfNOpODa1HBmmLpUyOY4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=s/cWb0fX; arc=fail smtp.client-ip=40.107.94.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=arzbXuih76eEB2YlJiaD+3BNj4tuKN5r0NakEhsiO11GKsZ6t1c4BTlGk9NYS0MabV7U9ztSCePnl9b8Pd7tJpL++YmLMNZi30e3sZK3KiLKSwpiuTiELV7yfX3Go/EccJ1Uq3R/+ziBSzIQ4qe5R8QztWPIue+fS/Hcv9H6UAlZ6mbopETRJ2oUjotgONxWwoBGhu7TUyy9+N3e2Fxjj8sDikJuox7RGwGb0mBx/HfIkowwHRrI2POGcf0G4lOkwV1q4VCi8+0M20l4kAaZN1o2K4WXFtjr+hl9sPKcREQyFNtEpD4JBjCVrmF3bES8CUHAfpPqzxbr4fafBpApaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eDqauxyGSdzeBymjR5CnVUMw1LGhR35xAU0m98v5Wd0=;
+ b=hub8f23ef+q1C01aWWDR0GDQdPMnox5IGDO/lmCYKzGo1Ec88PzKDxAj4ciDds5Uk8RJLHXFDF9CHnl6UmCRxoBjpjsrMEWti5egda8Jhs4LXtp7bXCBzeWDt5VgsHJQT0f80QJ5NudBYoevDulS5MmlYSKyBeo6bh83ZGWhRtwy3/o1Ax4WFBJGMvi3S2/EjmSQd9/IyTCcs6Boye/iG6VxUe0Jqw/meB34QqWjAuq2JmyFFNY8JIVGdFOOlqsY9J5eqDfCe5IH/k799NTZb5yb9+zHwCs03lbzyiRV8QeZiCi29uZDLj+KgAxVXM8Gf7bhwmTlGpn8xus8uKn51A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eDqauxyGSdzeBymjR5CnVUMw1LGhR35xAU0m98v5Wd0=;
+ b=s/cWb0fX+EyOzU5YHEnkKplj8APkvjU95NwuS0BA1Y3YewiV6uz/vIBgCGz4JA0Ps+YGylUOn6a+5o5I5ID7TeH64JzFNvr8znK5kKgMBcPZ/jUHytuQdaZoVuJnMPTxD7yyvvG4lyFZK2kR5gcu8iARxE1s41lUA/BXHxZFNlE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com (2603:10b6:208:387::17)
+ by PH7PR12MB6417.namprd12.prod.outlook.com (2603:10b6:510:1ff::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Tue, 18 Jun
+ 2024 21:06:49 +0000
+Received: from BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::bf0:d462:345b:dc52]) by BL1PR12MB5732.namprd12.prod.outlook.com
+ ([fe80::bf0:d462:345b:dc52%6]) with mapi id 15.20.7677.030; Tue, 18 Jun 2024
+ 21:06:46 +0000
+Message-ID: <afe9e396-e912-bf8b-ba80-5ed3296b920a@amd.com>
+Date: Tue, 18 Jun 2024 16:06:43 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v9 04/24] virt: sev-guest: Add SNP guest request structure
+Content-Language: en-US
+To: Nikunj A Dadhania <nikunj@amd.com>, linux-kernel@vger.kernel.org,
+ bp@alien8.de, x86@kernel.org, kvm@vger.kernel.org
+Cc: mingo@redhat.com, tglx@linutronix.de, dave.hansen@linux.intel.com,
+ pgonda@google.com, seanjc@google.com, pbonzini@redhat.com
+References: <20240531043038.3370793-1-nikunj@amd.com>
+ <20240531043038.3370793-5-nikunj@amd.com>
+From: Tom Lendacky <thomas.lendacky@amd.com>
+In-Reply-To: <20240531043038.3370793-5-nikunj@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SA9PR03CA0027.namprd03.prod.outlook.com
+ (2603:10b6:806:20::32) To BL1PR12MB5732.namprd12.prod.outlook.com
+ (2603:10b6:208:387::17)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5732:EE_|PH7PR12MB6417:EE_
+X-MS-Office365-Filtering-Correlation-Id: be817c94-9799-4f87-c06f-08dc8fda8fee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|366013|1800799021|376011|7416011;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?RDV1T01jd0lXWHFOUGovZDRwNHlqL1BtaEJOUEhDaUo0Y2RvN0c0UnpHclRy?=
+ =?utf-8?B?QUJtVUd0RkJJQmN0VHY1QWYwNVZXOHNZZE1xWE9ZZjlGaWFBWE5CeUNYczJn?=
+ =?utf-8?B?M2JodGRpMkdrYzV4UEdwRHY2SW92R202L1FXL21iS3ZVZGFsRGNBUjUxVE1I?=
+ =?utf-8?B?UGJCUlhmM1g4OVBNWGxDS2k5VmREellJWkk1bGtrdnVRdXNTZ0p0REFDWFIw?=
+ =?utf-8?B?U0ZoZ0YvNEtaN2trcldHUThDaVJLcXhuYnF2SnRnOVRaYlV5Ym5zd3dGZmJh?=
+ =?utf-8?B?Y3Y0dHRzVThkVzBIQktTTWd5S1oxZ3JXV05WWWZiTDdWNVZaN29yYVYwcHAz?=
+ =?utf-8?B?Y0JJQktLOW01SHIrS3dzcWVRM0JEN3VoYUh4enI3bTY2TDZQY3JhaWhCdnhB?=
+ =?utf-8?B?NDRhcG1nVHZlVUxsakRaaEZpT3g1MUw4NFF6V0lZYnhvWko5NlZacGhSUElT?=
+ =?utf-8?B?alBjeWFEU3JCNS9MSXM1R1AyaGxGYjdEclpkMTFIdTdPamk2NUE4blJYZE1s?=
+ =?utf-8?B?aXJUVWxPaGJaMWxrbEpvUGIrVFJYOExxbjBBTmRNNzl6SENJaTg4a3BpUWNH?=
+ =?utf-8?B?b08zVkdZQ1gwUnNRcStTSGxySWltVFdmMDdDMHVKZmxNWUxmeGVrOTI5YUZv?=
+ =?utf-8?B?a0FXU0p5N2Nna3ArMkRWSUR6bGNhNUViY29KNWxjMnhsYzNJekZPVGJOd0th?=
+ =?utf-8?B?T0k3MDYvS3I0UzY4dk50MmNUUkNTc0JjSkJUR3VDSFBJRGdTTGRPYVg5eHNk?=
+ =?utf-8?B?ci9yQnhPdkFyK3hKeitITnhEN0hmWmlucXBVWmxWaFVBVlV0Z0lzQ0cwdlcw?=
+ =?utf-8?B?MGI4a2xMeXNrTVF6SGkwUWMvdFhlV1lXbEFVUzRRVTVpQzdTdUsrTWk3UTV4?=
+ =?utf-8?B?dkthMGoxUVhTanFqNnJueW9HMWNOTGJrQmZFb1lTSWVjVW0zRWpuWXV5alFO?=
+ =?utf-8?B?aXBCcWF0UEpiaUFZR2lxaVdxUmRkRFptYkpTM0xwcHhSYmhIUzRZZ0hhUGQy?=
+ =?utf-8?B?WWxqUllwbURSSmVXcUgwV2RpaTE1WjdzbzFvN1dkRUpxQjlvTk1VblZWbXcr?=
+ =?utf-8?B?alBNWkFtdkF2cGhEYU9SV3NucUhlKy9DWmt5OFFWOUNlaUM0RjllRCtmS3FW?=
+ =?utf-8?B?Zmd5NHJTL0VpNXQrOWNQQjhiQlNWOEVCLzMvdENNRUt6WjA3TWJUdUU4U29a?=
+ =?utf-8?B?dGFyc3dWdnVpeEhhelBxaXRXRExpa3dZTVNVTnhDQTdLVFpicXhFait6eWhi?=
+ =?utf-8?B?UzR2Y1lFTXBla2V2Nll0cHZaRWlNVG9yaXRmUVQ4aThTaFFSMEtXSHRlamVU?=
+ =?utf-8?B?YS95b1lZQi9od0pZQzV4L3Y3eE1pWVF5ZTJqTWh1aEtDazRHT0xWcTYzaVFX?=
+ =?utf-8?B?bVRSZkdMMXdZbnU0d0VnUERnYkVyRUtCbHhVaWVSd0phOXljaThvT08rcUpI?=
+ =?utf-8?B?akNaaVJlODB5WjBVVFBzYndkNTU4TWFVc3Uyb1hRTnBFNGE1Tno2Wkt6QUd4?=
+ =?utf-8?B?WmhQN2Y0amxSaTdPMWtaVUV6d2I3RFZScVhzc3N6SWwrWTJEdnc1aHBaWmll?=
+ =?utf-8?B?bGV4MkIyM3Y1aGxDNUFvQXZFL3g3Wko0d0p1ZkVNRllpWDB4NWt0c3ZvZzBM?=
+ =?utf-8?B?WlN2ckNiaGpwM1NoTS9iQVZkN1BBeUdQNVZ2MGtKdXl3VVZSMm1rNXBZNnlx?=
+ =?utf-8?B?WGg2akIrYXZjVlVXVGtrUUxuanBmT0ZPOHhGZmlYYXE4bWZ2Y3Y1U3BQMzlU?=
+ =?utf-8?Q?zXEvmKEUamwUXFyTmA=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5732.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(366013)(1800799021)(376011)(7416011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?KzFJYVE1ckFBeGlUUHRnbVlZVzR3S055NHBXREdYdXlmd01tdko0cHJERGVR?=
+ =?utf-8?B?VDBBbjBuWlViWGF5MnNRbUhVcGtBR2lMdWJ1ZGgxMWZXeEtqRXpCODk3RE5Q?=
+ =?utf-8?B?TnhVMGc1WjFrVnpCdFRVc251N3dod0tQK08xcHpvN29ralZVMFdLNExJai9C?=
+ =?utf-8?B?bjZwTUY4VWgvYmwrOVdHWW1ubDVPU0dtNm1abG91b0NqbzY0ZE1pNGlEQmRS?=
+ =?utf-8?B?RFp6Qk9hcE9aZSthenlwV0YvWkxWcE80RnI2VGJ5bzMyTng0SmswbHJKbHQ3?=
+ =?utf-8?B?dlVHbDVMUjB5N2F1US9yeFEwb24vS3Y1M2tIZXBsN1VuUG4wb2d5bDlZRkpV?=
+ =?utf-8?B?ekJUaXIySm1GUkh1bmhKVE9KR0hPNlZTTUFBK3g1SjlEZENJd3VSdmZQMjJv?=
+ =?utf-8?B?cjRLbXl5OUNZRFZySnhQcGo5VGI1eE4wT0lJU2E4eE1DZWFmeDV3Nk0rdnhP?=
+ =?utf-8?B?VHQ0R1NlZmkrajBmVVhjaTNSTFB3R2k5TE9lZjhRWWFsVVpSeGtndUlZZXZz?=
+ =?utf-8?B?VS9Ua1l1M2xaZEhzS2JWRkJ4YmFQSjlHNXJtNTJoR3k3aHlyamFuQjZTQS9T?=
+ =?utf-8?B?cjZGMi9rOEVGUWE1S003MWgrb1BOZU0yY1VSdlpiT0NUTG04SWpKZ0Z2OGxw?=
+ =?utf-8?B?aGsyV1dLak9qZFBySndsV0pjVVZtNm9hUEhSSmlqbzU1aVlYandidjBTRVJT?=
+ =?utf-8?B?MjFLVk44UVFXNGVhbWhQbjJQMm5lMzdlOElialVwNXJHOG5XNHRPZndXUEQx?=
+ =?utf-8?B?dDJwbDdkclJnV2d6NWllZmhrTDE4OEhtamY1KzdPbm9ZZWw3SE1LVlJBbExl?=
+ =?utf-8?B?SzR3TXpZVkJ5anQwcUZkL0pNOW90NEFUL1BJVGFCWGZaZVdUdUJnMlFUaUdm?=
+ =?utf-8?B?K0ZGVWp1czVWTnhkNFVmeWVuNlJETkRBTkF2ZVhOUVY1T1g2RUZOU3dDc3Qz?=
+ =?utf-8?B?Q0NiWHZ6a3RMK0xjUVl0MWNIbkliREFTR0wvdU5LemlWK2dxQitIVE1aZW9T?=
+ =?utf-8?B?aVNqR3ozcDBWZ0s5VXZmcWFqbjRaYzIwcEV4S3hKek43SFphQU91YXBGaXhG?=
+ =?utf-8?B?cll5RFF3RklLNXQ2d1E5SnAxNnNtYjhoYVRJZmlESDhrc3NBSHRQRXVIVHRS?=
+ =?utf-8?B?aWlPNFl0WnJlUFNsNjBvRHI5amYyNkFYdVhxV1BvUnI3emEwQTJ2Qmtianlm?=
+ =?utf-8?B?eFJkbzVkaEhGNW13ajl2RGZGMEFoYjl4a21OU1dwbWhNRDBLR2ozWGpodWxM?=
+ =?utf-8?B?bGlWQ1NsbmQ5KzErYUZ1eGhoUnkyTG0wckJNRGp2YVFlbUFibEtKZkxYeG5v?=
+ =?utf-8?B?RUNoSUd5VnhzaC9oUEFYUVpweVBYT0NhMEVudnR6dW5neWtqRUVPUDJpNnVL?=
+ =?utf-8?B?aG1rNitmRjErWEdsdEdYUFB3Zm9UUnN2ZHB2Vy9xZ2FBbThCaVNqdDRNaU1i?=
+ =?utf-8?B?cm1RelF2cGRSUW4xQ2F6c2cxWXRjV3oxL2RCREhJUzhlc3RYazlRV29UUjFY?=
+ =?utf-8?B?VlkwUlZsWEplNkMyMk5vLzRiZUN3dS9sZjdnUEY2WkJTa2kxLyttcGhCWWVt?=
+ =?utf-8?B?MEVNYllzMlFlblJxVkRjMUxxVmJ0dU9MSSswYWpHQXpJSzVDVXBsUEVRaUhW?=
+ =?utf-8?B?NTNlVHhsN25uditNYUhtdXJ2UUZaK05ERnFpKzdFdjJIYmF6MFJaVFU0Qmlh?=
+ =?utf-8?B?L3FNbGNkVnk4b2FnWU1TOXY2eHZJMW91SHErRHYvOVpqZVBlSUVHOW8zZ2ZH?=
+ =?utf-8?B?NFppWHIzWGNoZkxKTlBPUjRjZlVTTzBsbEoweHNiTmRUUHg3NWxDR1ZyaDk4?=
+ =?utf-8?B?WDg1L20wNjNCY2dKNWNJQ05TYkY2VEZiYXBaNU82VGw4VXE4NnhMZnFuN1JN?=
+ =?utf-8?B?TnhCak1DY21lQnA1SG9QanErMENXbjVHOCtINTkrNnBXb3J0cUFCTkM4M0pS?=
+ =?utf-8?B?bll1NDUwbzZXbG5seE1KVHZrOFRVWU9jVlU5QWg3WkdDMHRvbkVHNzJ1WGMy?=
+ =?utf-8?B?dDA4bDBjdWZJVXQxZWQxRWxZZVB6NW90M0JSdUNHbFZyV2VXaFdKUlpBNU1B?=
+ =?utf-8?B?dUs4dlo1WTNjWmNWNmorY25vVGszODdMazZ3WlBKQmdLUS9yMDlVd2tzU2Ft?=
+ =?utf-8?Q?awvy1RTp7UQccFPj8lW1WI8mV?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: be817c94-9799-4f87-c06f-08dc8fda8fee
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5732.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2024 21:06:46.1636
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 31k+ZOHREajQWcm6A3M1b/tX/kL8N0CJ15v3kDTfQUIFu1eRvacWgEcxnPkPEnh8vqF+rkQdst4YSZ34njBw7w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6417
 
-On Tue, 11 Jun 2024 17:44:25 +0000
-Fred Griffoul <fgriffo@amazon.co.uk> wrote:
+On 5/30/24 23:30, Nikunj A Dadhania wrote:
+> Add a snp_guest_req structure to simplify the function arguments. This
+> structure will be used to call the SNP Guest message request API instead
+> of passing a long list of parameters.
+> 
+> Update the snp_issue_guest_request() prototype to include the new guest
+> request structure and move all the sev-guest.h header content to sev.h.
+> 
+> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
 
-> The usual way to configure a device interrupt from userland is to write
-> the /proc/irq/<irq>/smp_affinity or smp_affinity_list files. When using
-> vfio to implement a device driver or a virtual machine monitor, this may
-> not be ideal: the process managing the vfio device interrupts may not be
-> granted root privilege, for security reasons. Thus it cannot directly
-> control the interrupt affinity and has to rely on an external command.
-> 
-> This patch extends the VFIO_DEVICE_SET_IRQS ioctl() with a new data flag
-> to specify the affinity of interrupts of a vfio pci device.
-> 
-> The CPU affinity mask argument must be a subset of the process cpuset,
-> otherwise an error -EPERM is returned.
-> 
-> The vfio_irq_set argument shall be set-up in the following way:
-> 
-> - the 'flags' field have the new flag VFIO_IRQ_SET_DATA_CPUSET set
-> as well as VFIO_IRQ_SET_ACTION_TRIGGER.
-> 
-> - the variable-length 'data' field is a cpu_set_t structure, as
-> for the sched_setaffinity() syscall, the size of which is derived
-> from 'argsz'.
-> 
-> Signed-off-by: Fred Griffoul <fgriffo@amazon.co.uk>
+Reviewed-by: Tom Lendacky <thomas.lendacky@amd.com>
+
 > ---
->  drivers/vfio/pci/vfio_pci_core.c  |  2 +-
->  drivers/vfio/pci/vfio_pci_intrs.c | 41 +++++++++++++++++++++++++++++++
->  drivers/vfio/vfio_main.c          | 15 ++++++++---
->  include/uapi/linux/vfio.h         | 15 ++++++++++-
->  4 files changed, 67 insertions(+), 6 deletions(-)
+>  arch/x86/include/asm/sev.h              |  78 ++++++++++-
+>  drivers/virt/coco/sev-guest/sev-guest.h |  69 ----------
+>  arch/x86/kernel/sev.c                   |  15 ++-
+>  drivers/virt/coco/sev-guest/sev-guest.c | 169 +++++++++++++-----------
+>  4 files changed, 177 insertions(+), 154 deletions(-)
+>  delete mode 100644 drivers/virt/coco/sev-guest/sev-guest.h
 > 
-> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-> index 80cae87fff36..fbc490703031 100644
-> --- a/drivers/vfio/pci/vfio_pci_core.c
-> +++ b/drivers/vfio/pci/vfio_pci_core.c
-> @@ -1174,7 +1174,7 @@ static int vfio_pci_ioctl_get_irq_info(struct vfio_pci_core_device *vdev,
->  		return -EINVAL;
->  	}
->  
-> -	info.flags = VFIO_IRQ_INFO_EVENTFD;
-> +	info.flags = VFIO_IRQ_INFO_EVENTFD | VFIO_IRQ_INFO_CPUSET;
->  
->  	info.count = vfio_pci_get_irq_count(vdev, info.index);
->  
-> diff --git a/drivers/vfio/pci/vfio_pci_intrs.c b/drivers/vfio/pci/vfio_pci_intrs.c
-> index 8382c5834335..b339c42cb1c0 100644
-> --- a/drivers/vfio/pci/vfio_pci_intrs.c
-> +++ b/drivers/vfio/pci/vfio_pci_intrs.c
-> @@ -19,6 +19,7 @@
->  #include <linux/vfio.h>
->  #include <linux/wait.h>
->  #include <linux/slab.h>
-> +#include <linux/cpuset.h>
->  
->  #include "vfio_pci_priv.h"
->  
-> @@ -82,6 +83,40 @@ vfio_irq_ctx_alloc(struct vfio_pci_core_device *vdev, unsigned long index)
->  	return ctx;
->  }
->  
-> +static int vfio_pci_set_affinity(struct vfio_pci_core_device *vdev,
-> +				 unsigned int start, unsigned int count,
-> +				 struct cpumask *irq_mask)
-> +{
-> +	cpumask_var_t allowed_mask;
-> +	int irq, err = 0;
-> +	unsigned int i;
-> +
-> +	if (!alloc_cpumask_var(&allowed_mask, GFP_KERNEL))
-> +		return -ENOMEM;
-> +
-> +	cpuset_cpus_allowed(current, allowed_mask);
-> +	if (!cpumask_subset(irq_mask, allowed_mask)) {
-> +		err = -EPERM;
-> +		goto finish;
-> +	}
-> +
-> +	for (i = start; i < start + count; i++) {
-> +		irq = pci_irq_vector(vdev->pdev, i);
-> +		if (irq < 0) {
-> +			err = -EINVAL;
-> +			break;
-> +		}
-> +
-> +		err = irq_set_affinity(irq, irq_mask);
-> +		if (err)
-> +			break;
-> +	}
-
-Sorry I didn't have an opportunity to reply to your previous comments,
-but you stated:
-
-On Tue, 11 Jun 2024 09:58:48 +0100
-Frederic Griffoul <griffoul@gmail.com> wrote:
-> My main use case is to configure NVMe queues in a virtual machine monitor
-> to interrupt only the physical CPUs assigned to that vmm. Then we can
-> set the same cpu_set_t to all the admin and I/O queues with a single ioctl().
-
-So if I interpolate a little, the vmm's cpuset is likely set elsewhere
-by some management tool, but that management tool isn't monitoring
-registration of interrupts so you want the vmm to make some default
-choice about interrupt affinity as they're enabled.  If that's all we
-want, couldn't we just add a flag that directs the existing SET_IRQS
-ioctl to call irq_set_affinity() based on the cpuset_cpus_allowed()
-when called with DATA_EVENTFD|ACTION_TRIGGER?
-
-What you're proposing here has a lot more versatility, but it's also
-not clear how the vmm would really make an optimal choice at this
-granularity.  Whether it's better to target an interrupt to the pCPU
-running the vCPU where the guest has configured affinity isn't even
-necessarily the right choice.  It could be for posted interrupts, but
-could also induce a vmexit otherwise.  Is the vCPU necessarily even
-within the allowed cpuset of the vmm itself when this ioctl is called?
-
-I also wonder if there might be something through the irqbypass
-framework where the interrupt consumer could direct the affinity of the
-interrupt producer.
-
-It'd really be preferable to see a viable userspace application of this
-to prove it's worthwhile.
-
-> +
-> +finish:
-> +	free_cpumask_var(allowed_mask);
-> +	return err;
-> +}
-> +
->  /*
->   * INTx
->   */
-> @@ -665,6 +700,9 @@ static int vfio_pci_set_intx_trigger(struct vfio_pci_core_device *vdev,
->  	if (!is_intx(vdev))
->  		return -EINVAL;
->  
-> +	if (flags & VFIO_IRQ_SET_DATA_CPUSET)
-> +		return vfio_pci_set_affinity(vdev, start, count, data);
-> +
->  	if (flags & VFIO_IRQ_SET_DATA_NONE) {
->  		vfio_send_intx_eventfd(vdev, vfio_irq_ctx_get(vdev, 0));
->  	} else if (flags & VFIO_IRQ_SET_DATA_BOOL) {
-> @@ -713,6 +751,9 @@ static int vfio_pci_set_msi_trigger(struct vfio_pci_core_device *vdev,
->  	if (!irq_is(vdev, index))
->  		return -EINVAL;
->  
-> +	if (flags & VFIO_IRQ_SET_DATA_CPUSET)
-> +		return vfio_pci_set_affinity(vdev, start, count, data);
-> +
->  	for (i = start; i < start + count; i++) {
->  		ctx = vfio_irq_ctx_get(vdev, i);
->  		if (!ctx)
-> diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
-> index e97d796a54fb..2e4f4e37cf89 100644
-> --- a/drivers/vfio/vfio_main.c
-> +++ b/drivers/vfio/vfio_main.c
-> @@ -1505,23 +1505,30 @@ int vfio_set_irqs_validate_and_prepare(struct vfio_irq_set *hdr, int num_irqs,
->  		size = 0;
->  		break;
->  	case VFIO_IRQ_SET_DATA_BOOL:
-> -		size = sizeof(uint8_t);
-> +		size = size_mul(hdr->count, sizeof(uint8_t));
->  		break;
->  	case VFIO_IRQ_SET_DATA_EVENTFD:
-> -		size = sizeof(int32_t);
-> +		size = size_mul(hdr->count, sizeof(int32_t));
-> +		break;
-> +	case VFIO_IRQ_SET_DATA_CPUSET:
-> +		size = hdr->argsz - minsz;
-> +		if (size < cpumask_size())
-> +			return -EINVAL;
-> +		if (size > cpumask_size())
-> +			size = cpumask_size();
-
-You previously stated that a valid cpu_set_t could be smaller than a
-cpumask_var_t, but it looks like we're handling that as an error here?
-Truncating user data that's too large seems no more correct than
-masking in user data that's too small.  Thanks,
-
-Alex
-
->  		break;
->  	default:
->  		return -EINVAL;
->  	}
->  
->  	if (size) {
-> -		if (hdr->argsz - minsz < hdr->count * size)
-> +		if (hdr->argsz - minsz < size)
->  			return -EINVAL;
->  
->  		if (!data_size)
->  			return -EINVAL;
->  
-> -		*data_size = hdr->count * size;
-> +		*data_size = size;
->  	}
->  
->  	return 0;
-> diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-> index 2b68e6cdf190..d2edf6b725f8 100644
-> --- a/include/uapi/linux/vfio.h
-> +++ b/include/uapi/linux/vfio.h
-> @@ -530,6 +530,10 @@ struct vfio_region_info_cap_nvlink2_lnkspd {
->   * Absence of the NORESIZE flag indicates that vectors can be enabled
->   * and disabled dynamically without impacting other vectors within the
->   * index.
-> + *
-> + * The CPUSET flag indicates the interrupt index supports setting
-> + * its affinity with a cpu_set_t configured with the SET_IRQ
-> + * ioctl().
->   */
->  struct vfio_irq_info {
->  	__u32	argsz;
-> @@ -538,6 +542,7 @@ struct vfio_irq_info {
->  #define VFIO_IRQ_INFO_MASKABLE		(1 << 1)
->  #define VFIO_IRQ_INFO_AUTOMASKED	(1 << 2)
->  #define VFIO_IRQ_INFO_NORESIZE		(1 << 3)
-> +#define VFIO_IRQ_INFO_CPUSET		(1 << 4)
->  	__u32	index;		/* IRQ index */
->  	__u32	count;		/* Number of IRQs within this index */
->  };
-> @@ -580,6 +585,12 @@ struct vfio_irq_info {
->   *
->   * Note that ACTION_[UN]MASK specify user->kernel signaling (irqfds) while
->   * ACTION_TRIGGER specifies kernel->user signaling.
-> + *
-> + * DATA_CPUSET specifies the affinity for the range of interrupt vectors.
-> + * It must be set with ACTION_TRIGGER in 'flags'. The variable-length 'data'
-> + * array is the CPU affinity mask represented as a 'cpu_set_t' structure, as
-> + * for the sched_setaffinity() syscall argument: the 'argsz' field is used
-> + * to check the actual cpu_set_t size.
->   */
->  struct vfio_irq_set {
->  	__u32	argsz;
-> @@ -587,6 +598,7 @@ struct vfio_irq_set {
->  #define VFIO_IRQ_SET_DATA_NONE		(1 << 0) /* Data not present */
->  #define VFIO_IRQ_SET_DATA_BOOL		(1 << 1) /* Data is bool (u8) */
->  #define VFIO_IRQ_SET_DATA_EVENTFD	(1 << 2) /* Data is eventfd (s32) */
-> +#define VFIO_IRQ_SET_DATA_CPUSET	(1 << 6) /* Data is cpu_set_t */
->  #define VFIO_IRQ_SET_ACTION_MASK	(1 << 3) /* Mask interrupt */
->  #define VFIO_IRQ_SET_ACTION_UNMASK	(1 << 4) /* Unmask interrupt */
->  #define VFIO_IRQ_SET_ACTION_TRIGGER	(1 << 5) /* Trigger interrupt */
-> @@ -599,7 +611,8 @@ struct vfio_irq_set {
->  
->  #define VFIO_IRQ_SET_DATA_TYPE_MASK	(VFIO_IRQ_SET_DATA_NONE | \
->  					 VFIO_IRQ_SET_DATA_BOOL | \
-> -					 VFIO_IRQ_SET_DATA_EVENTFD)
-> +					 VFIO_IRQ_SET_DATA_EVENTFD | \
-> +					 VFIO_IRQ_SET_DATA_CPUSET)
->  #define VFIO_IRQ_SET_ACTION_TYPE_MASK	(VFIO_IRQ_SET_ACTION_MASK | \
->  					 VFIO_IRQ_SET_ACTION_UNMASK | \
->  					 VFIO_IRQ_SET_ACTION_TRIGGER)
-
 
