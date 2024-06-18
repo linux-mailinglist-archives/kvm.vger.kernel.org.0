@@ -1,49 +1,47 @@
-Return-Path: <kvm+bounces-19834-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19835-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF88A90C19D
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 03:48:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E58290C1B2
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 04:06:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA7C52838DC
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 01:48:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3E3282DCB
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 02:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1126518645;
-	Tue, 18 Jun 2024 01:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 671301C2A3;
+	Tue, 18 Jun 2024 02:06:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB361C697;
-	Tue, 18 Jun 2024 01:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF9241AACB;
+	Tue, 18 Jun 2024 02:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718675286; cv=none; b=mfACiNlEfFkK4YXCyQgLBGbphFttriAV7Q/ic2sHiuR6/BOL9IRbCgLkFgEMJ+8r8UYTK3Hn9oIRkVfdBlF9GH5+qgLAgSkMcfxIAFdcYb2qQJOqdGh65rXHa6glIv8DLSzW7c3Mm8aAPtriEGVqOvrUCE/asY8Z+Gm3b2FMHWM=
+	t=1718676395; cv=none; b=A/S5OjJOV8C2QYlahorRDtZUpRrr+HFiNd5Po2HbkOJ7X2GgMFqG2KZ+DeJ5/sQ7Hw1cadEhoZZnGOJLM0Q//b8xsDh3P9Hv0akWnzlXGQ42UaTfh6U3SgdIUmlk0H06vXy5GQS3o78gbhBbd7JWlJwrhCp/BLnmYVmpZ0DQdzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718675286; c=relaxed/simple;
-	bh=9nibZJ0FWduyum7S7nLwNvrtxl5PR55RgEHP66fZR1A=;
+	s=arc-20240116; t=1718676395; c=relaxed/simple;
+	bh=VYCCYlKWXeUhSxO6sMCybR/FclqdgxrQaf06urbyiRA=;
 	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=jwA7VdXpzv6fdapX2ErwgoWobPJ1PNRcxOUJYrSEUUpDW5OoNwpOJw+TYpZsE32gZxIRZCpS2T6MTFjjWPo/2kFmgONSMzpdlsrZTDbjYuGebzLcp6ToERi/KpZ2TP+U3ALcfOEmzPI+Iu2waRGHfvw11u+InSkS6ZxSbuLerJ0=
+	 In-Reply-To:Content-Type; b=FI+9n4L/JFxNGvIhGECoafDldbrepVcFtUR3+BDNxlNVRnZJAFFaPXM2PB8UtcYf34zPLjRrpyw7ZBCPAQoADjUV+bNknpIk/sSKgiF6kIx1r8f7DIwqtQoHMkMnnxkcqqp3a0Xx99UexLs4xZL8SN+EpLLeweDJuSL8pJpgU50=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8CxvOpR53Bmi8cHAA--.30934S3;
-	Tue, 18 Jun 2024 09:48:01 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8CxyOmk63BmTcgHAA--.18134S3;
+	Tue, 18 Jun 2024 10:06:28 +0800 (CST)
 Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxBMVO53Bm16omAA--.17683S3;
-	Tue, 18 Jun 2024 09:48:00 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: Delay secondary mmu tlb flush before
- guest entry
-To: Sean Christopherson <seanjc@google.com>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, WANG Xuerui <kernel@xen0n.name>,
- kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-References: <20240615025930.1408266-1-maobibo@loongson.cn>
- <ZnBNCYZHuflw83jq@google.com>
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxhsWf63BmXq8mAA--.17247S3;
+	Tue, 18 Jun 2024 10:06:26 +0800 (CST)
+Subject: Re: [PATCH -next] LoongArch: KVM: Remove unneeded semicolon
+To: Yang Li <yang.lee@linux.alibaba.com>, zhaotianrui@loongson.cn,
+ chenhuacai@kernel.org
+Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
+References: <20240618010013.66332-1-yang.lee@linux.alibaba.com>
 From: maobibo <maobibo@loongson.cn>
-Message-ID: <756c9cb4-35b9-4523-7ac7-9a70bdf6ddba@loongson.cn>
-Date: Tue, 18 Jun 2024 09:47:58 +0800
+Message-ID: <2812c8ae-62c2-1ac5-087d-202891a513b6@loongson.cn>
+Date: Tue, 18 Jun 2024 10:06:23 +0800
 User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
  Thunderbird/68.7.0
 Precedence: bulk
@@ -52,20 +50,20 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZnBNCYZHuflw83jq@google.com>
+In-Reply-To: <20240618010013.66332-1-yang.lee@linux.alibaba.com>
 Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxBMVO53Bm16omAA--.17683S3
+X-CM-TRANSID:AQAAf8AxhsWf63BmXq8mAA--.17247S3
 X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7tF1Dur47Gry5JFW8WF1xZwc_yoW8tF4fpF
-	97uFs5JF4Fgr1xta42vwnxWrsxXrs3Kr1293W3KFW5Ar4aqF1kXFykKFZxZFyUXw4rAa1I
-	qFyrJw1avFZ8tacCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+X-Coremail-Antispam: 1Uk129KBj9xXoWruF4xKr1rGr4xKF18uFy3GFX_yoW3KFg_uF
+	WxJw4I9rZ5Jay8u3Wjgw4rGa4rXw1kJFZYvFyUZr1fGan8JrWrZrZYgas5Aw1vqrW7CFZx
+	AaykX3Z8Cw1jvosvyTuYvTs0mTUanT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbxkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVWUCVW8JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WUJVW8JwA2z4x0Y4vEx4A2jsIE14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
 	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
 	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
 	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
@@ -76,78 +74,32 @@ X-Coremail-Antispam: 1Uk129KBj93XoW7tF1Dur47Gry5JFW8WF1xZwc_yoW8tF4fpF
 	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8zwZ7UU
 	UUU==
 
-Sean,
 
-Thanks for reviewing the patch, we are not familiar with open source 
-community, it gives us much helps.
 
-On 2024/6/17 下午10:49, Sean Christopherson wrote:
-> On Sat, Jun 15, 2024, Bibo Mao wrote:
->> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
->> index c87b6ea0ec47..98078e01dd55 100644
->> --- a/arch/loongarch/include/asm/kvm_host.h
->> +++ b/arch/loongarch/include/asm/kvm_host.h
->> @@ -30,6 +30,7 @@
->>   #define KVM_PRIVATE_MEM_SLOTS		0
->>   
->>   #define KVM_HALT_POLL_NS_DEFAULT	500000
->> +#define KVM_REQ_TLB_FLUSH_GPA		KVM_ARCH_REQ(0)
->>   
->>   #define KVM_GUESTDBG_SW_BP_MASK		\
->>   	(KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)
->> @@ -190,6 +191,7 @@ struct kvm_vcpu_arch {
->>   
->>   	/* vcpu's vpid */
->>   	u64 vpid;
->> +	unsigned long flush_gpa;
+On 2024/6/18 上午9:00, Yang Li wrote:
+> ./arch/loongarch/kvm/exit.c:764:2-3: Unneeded semicolon
 > 
-> Side topic, GPAs should really use "gpa_t" instead of "unsigned long", otherwise
-> 32-bit kernels running on CPUs with 64-bit physical addresses will fail miserably
-> (which may or may not be a problem in practice for LoongArch).
-Sure, will modify.
-
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=9343
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
+> ---
+>   arch/loongarch/kvm/exit.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
 > 
->> diff --git a/arch/loongarch/kvm/tlb.c b/arch/loongarch/kvm/tlb.c
->> index 02535df6b51f..55f7f3621e38 100644
->> --- a/arch/loongarch/kvm/tlb.c
->> +++ b/arch/loongarch/kvm/tlb.c
->> @@ -21,12 +21,9 @@ void kvm_flush_tlb_all(void)
->>   	local_irq_restore(flags);
->>   }
->>   
->> +/* Called with irq disabled */
+> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> index c86e099af5ca..a68573e091c0 100644
+> --- a/arch/loongarch/kvm/exit.c
+> +++ b/arch/loongarch/kvm/exit.c
+> @@ -761,7 +761,7 @@ static void kvm_handle_service(struct kvm_vcpu *vcpu)
+>   	default:
+>   		ret = KVM_HCALL_INVALID_CODE;
+>   		break;
+> -	};
+> +	}
+>   
+>   	kvm_write_reg(vcpu, LOONGARCH_GPR_A0, ret);
+>   }
 > 
-> Rather than add a comment, add:
-> 
-> 	lockdep_assert_irqs_disabled()
-Good point, will modify.
-
-> 
-> in the function.
-> 
->>   void kvm_flush_tlb_gpa(struct kvm_vcpu *vcpu, unsigned long gpa)
->>   {
->> -	unsigned long flags;
->> -
->> -	local_irq_save(flags);
->>   	gpa &= (PAGE_MASK << 1);
->>   	invtlb(INVTLB_GID_ADDR, read_csr_gstat() & CSR_GSTAT_GID, gpa);
->> -	local_irq_restore(flags);
->>   }
->> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->> index 9e8030d45129..ae9ae88c11db 100644
->> --- a/arch/loongarch/kvm/vcpu.c
->> +++ b/arch/loongarch/kvm/vcpu.c
->> @@ -51,6 +51,16 @@ static int kvm_check_requests(struct kvm_vcpu *vcpu)
->>   	return RESUME_GUEST;
->>   }
->>   
->> +/* Check pending request with irq disabled */
-> 
-> Same thing here.
-Will modify in next version.
-
-Regards
-Bibo Mao
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
 
