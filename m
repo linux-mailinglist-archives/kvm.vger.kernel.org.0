@@ -1,283 +1,169 @@
-Return-Path: <kvm+bounces-19882-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19883-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E952490DABA
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 19:33:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C6A90DB22
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 19:53:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 98CB91F244D2
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 17:33:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B38B1F2559E
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 17:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEAC14F118;
-	Tue, 18 Jun 2024 17:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A386B15099C;
+	Tue, 18 Jun 2024 17:53:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W8gOOmbY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QkOp7f3+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD80146D4D
-	for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 17:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB551CAB3;
+	Tue, 18 Jun 2024 17:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718731948; cv=none; b=AG6hVA8+6cTLUvEP1XQ7v86BjBKFI9l/S0ciLjKspjEYG7usFfBOCdti86hICQlIrytlyt58Ca2Id/jy48vty+WyD4e6PJCkX5kuF/30THRe/ZpTIl8AIDAnGIn8KX7I3d2GZB3MMQhJChUK4L1VAqib0ee4pHHm6dm+uaPXDxo=
+	t=1718733192; cv=none; b=kSnnQIlXIyDZyMZIYrelGg5GpzzE6UVIcyin8UH+Cn7AikQJZPF1edfIg/CtsI+3QhrLSzWz/BdGb4Lhqgcik4J3r6Bbu1xp4dfhvaAk5tE3UbgB3lG0SGUE+s+KKQ2jmG0EiCcr8SJfHHDDLh31KRjqUovHz7Jsg2z5iI6Hb6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718731948; c=relaxed/simple;
-	bh=Hu+FYb6PXyf1xaV7Tf3xHtffCUNny7P9Dsa272vQ6fg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ql7bBo4RX439lmKrHR0LYnwheRMgMch5KAVz17Y6JG+39qZovXGofaEYQEr2/WmTO6a9ZjApVL2NUKytTZJidBCe3SD3uqF0JqQhQnx9+9uVwaGfKi87YvnTc/JhYvcrIs9HpNTOvU5S4A7MlLu98IkOrb1PeZ1F9wM4w2rZsrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W8gOOmbY; arc=none smtp.client-ip=209.85.215.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-6e4e6230f42so42386a12.0
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 10:32:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718731946; x=1719336746; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uJ0IRqtJQTxYM5sbu/JBOLam6TAEXhPiQOr+HxYnzUE=;
-        b=W8gOOmbYfc3jUFde3EAEvht92PUXFEEgQ1SWrKC4bDJNM7Zemhy32Jb07M+q12gcA3
-         RFfwzgTcMoNk/NLqgCF1+Js730G8zPKgAEZdloM4yGZvP6WIkpw4eEWSyVDBR719e43F
-         cs0tU4UmypqwNzSi4ypvb/Rgd8CJpVFUOpLcybx7b8Bt2hDRmMKITsGbF3LMKtogMuML
-         xXc8cm3ZLcVIRhFdGaWJgZH6wsdjjpufQHsIbFZmuwcLqKzuntBnLfsFyWmE7HXKBl5T
-         mC67PMy7xAmAvfvAncHmxPmsjzIVD/B/KHUtMbu4PrINNBGZPWpU4HLLn0YlLhMHA60n
-         wkig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718731946; x=1719336746;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uJ0IRqtJQTxYM5sbu/JBOLam6TAEXhPiQOr+HxYnzUE=;
-        b=a5E7P7fXxlAKZd0FDRFN5GCT0lawEkqQqQ3WLcpj0MXYyfLMns+3j6mYjydRhEbb5S
-         FroO+sQsnhNtfZcdyAN8JewF8J2wBXkbW4rga9JTMVQZGZQdCtrsGHldXewphvq7xCZs
-         3xB2lxW0doe7y3zDbLGt040hfo72r6bf7oJonbm2F+DaXqI1HkqYKkYI7wUdPqICv3tl
-         b1w7AGwewHO/j8a9aYHA+JZvczWILI39PayV9++DSpjyEDIzQ+7By/oDz8FGCVkJs7Uv
-         Y9z1NxOitM3aYOOgEY28/OFy3A11kA8cyHioPZ/3lvnr+Cz+16o2slRwBmdNxQA9g9Qf
-         Jdfw==
-X-Gm-Message-State: AOJu0YzE7tw2tnQ//hjEn1r/gskx0KYhKfdh0Z7xRfCi1aU57GOHlwoo
-	nsCop0/En8JindPmGWHO8M7QfQXdyJWVEW+vGmZIgag1zpjcp18nhXwM6S4r
-X-Google-Smtp-Source: AGHT+IHkLL4UhbVsE2pTLofbKhxmfl27h0FIlAgw5Vx/t7KgFu3OHOmecQE0PalhWlfXeyW89WK2Kw==
-X-Received: by 2002:a17:90a:6d24:b0:2c2:12d:fa01 with SMTP id 98e67ed59e1d1-2c6c951fa1bmr4819776a91.11.1718731945445;
-        Tue, 18 Jun 2024 10:32:25 -0700 (PDT)
-Received: from JRT-PC.. ([202.166.44.78])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c4a75ee5a5sm13529305a91.17.2024.06.18.10.32.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 Jun 2024 10:32:25 -0700 (PDT)
-From: James Raphael Tiovalen <jamestiotio@gmail.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Cc: andrew.jones@linux.dev,
-	atishp@rivosinc.com,
-	cade.richard@berkeley.edu,
-	James Raphael Tiovalen <jamestiotio@gmail.com>
-Subject: [kvm-unit-tests PATCH 4/4] riscv: sbi: Add test for timer extension
-Date: Wed, 19 Jun 2024 01:30:53 +0800
-Message-ID: <20240618173053.364776-5-jamestiotio@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240618173053.364776-1-jamestiotio@gmail.com>
-References: <20240618173053.364776-1-jamestiotio@gmail.com>
+	s=arc-20240116; t=1718733192; c=relaxed/simple;
+	bh=1oG2z1L2HMCk/Y21GlrePdx7AXyrdRLAZGfQqNCTU9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hU2aa3P504iXMC1l6vLhXLIbQNepjd4AH8WLt94DPsNA7mEIN/5HYCHTkxQ6HT3Gci4rhNr5y0GLapeSQoG4woMhDbp8Lt9x2xb2Jgw5EUmVHAe2ppeVYx99Ci+xFayR5+C3nShY+YC/V11QrtUop5/rAzv6agxBm4meoPyyaMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QkOp7f3+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 078A0C3277B;
+	Tue, 18 Jun 2024 17:53:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718733192;
+	bh=1oG2z1L2HMCk/Y21GlrePdx7AXyrdRLAZGfQqNCTU9I=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=QkOp7f3+vMry8cAs4SIc1hm/gEn1nrjiwL7M2c0KKPR9yiamR54iaHuuCRGK7piGG
+	 +n42AXTyIq0ngAFYyq7228+ThonPylf7E7oMdT2aYR9Pj835uWmAGVPiU6S9gfNyhB
+	 yfkIq9lqKnRI9OARD5J0WUk6ozDPQ5dA8rkdgqCxf/WalWf2keAEK6iXZgRM6fR4Ch
+	 vHY9axBAPsFEWk9+VWTA6AYH4XWKV//PM6aKm/qaUrDDo0afnO6WO7QxPGZLE4pl9Y
+	 oz/l1kLMvMAbKJ2LAF3HRzkHJxiudjKsFXTmeXVFEuWrvtx/MztlGXtyweNvs6fNs6
+	 OSLwxNqjqPupw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id A0B31CE05B6; Tue, 18 Jun 2024 10:53:11 -0700 (PDT)
+Date: Tue, 18 Jun 2024 10:53:11 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
+ <Zmrkkel0Fo4_g75a@zx2c4.com>
+ <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+ <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
+ <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
+ <ZnCDgdg1EH6V7w5d@pc636>
+ <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
 
-Add a test for the set_timer function of the time extension. The test
-checks that:
-- The time extension is available
-- The time counter monotonically increases
-- The installed timer interrupt handler is called
-- The timer interrupt is received within a reasonable time frame
+On Tue, Jun 18, 2024 at 07:21:42PM +0200, Vlastimil Babka wrote:
+> On 6/18/24 6:48 PM, Paul E. McKenney wrote:
+> > On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
+> >> > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
+> >> > >> +
+> >> > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
+> >> > >> +
+> >> > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
+> >> > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
+> >> > > wanted to avoid initially.
+> >> > 
+> >> > I wanted to avoid new API or flags for kfree_rcu() users and this would
+> >> > be achieved. The barrier is used internally so I don't consider that an
+> >> > API to avoid. How difficult is the implementation is another question,
+> >> > depending on how the current batching works. Once (if) we have sheaves
+> >> > proven to work and move kfree_rcu() fully into SLUB, the barrier might
+> >> > also look different and hopefully easier. So maybe it's not worth to
+> >> > invest too much into that barrier and just go for the potentially
+> >> > longer, but easier to implement?
+> >> > 
+> >> Right. I agree here. If the cache is not empty, OK, we just defer the
+> >> work, even we can use a big 21 seconds delay, after that we just "warn"
+> >> if it is still not empty and leave it as it is, i.e. emit a warning and
+> >> we are done.
+> >> 
+> >> Destroying the cache is not something that must happen right away. 
+> > 
+> > OK, I have to ask...
+> > 
+> > Suppose that the cache is created and destroyed by a module and
+> > init/cleanup time, respectively.  Suppose that this module is rmmod'ed
+> > then very quickly insmod'ed.
+> > 
+> > Do we need to fail the insmod if the kmem_cache has not yet been fully
+> > cleaned up?
+> 
+> We don't have any such link between kmem_cache and module to detect that, so
+> we would have to start tracking that. Probably not worth the trouble.
 
-The timer interrupt delay can be set using the TIMER_DELAY environment
-variable. If the variable is not set, the default delay value is
-1000000. The time interval used to validate the timer interrupt is
-between the specified delay and double the delay. Because of this, the
-test might fail if the delay is too short. Hence, we set the default
-delay value as the minimum value.
+Fair enough!
 
-This test has been verified on RV32 and RV64 with OpenSBI using QEMU.
+> >  If not, do we have two versions of the same kmem_cache in
+> > /proc during the overlap time?
+> 
+> Hm could happen in /proc/slabinfo but without being harmful other than
+> perhaps confusing someone. We could filter out the caches being destroyed
+> trivially.
 
-Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
----
- lib/riscv/asm/csr.h |  6 ++++
- lib/riscv/asm/sbi.h |  5 +++
- riscv/sbi.c         | 87 +++++++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 98 insertions(+)
+Or mark them in /proc/slabinfo?  Yet another column, yay!!!  Or script
+breakage from flagging the name somehow, for example, trailing "/"
+character.
 
-diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-index da58b0ce..c4435650 100644
---- a/lib/riscv/asm/csr.h
-+++ b/lib/riscv/asm/csr.h
-@@ -12,6 +12,7 @@
- #define CSR_STVAL		0x143
- #define CSR_SIP			0x144
- #define CSR_SATP		0x180
-+#define CSR_TIME		0xc01
- 
- #define SSTATUS_SIE		(_AC(1, UL) << 1)
- 
-@@ -108,5 +109,10 @@
- 				: "memory");			\
- })
- 
-+#define wfi()							\
-+({								\
-+	__asm__ __volatile__("wfi" ::: "memory");		\
-+})
-+
- #endif /* !__ASSEMBLY__ */
- #endif /* _ASMRISCV_CSR_H_ */
-diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-index d82a384d..eb4c77ef 100644
---- a/lib/riscv/asm/sbi.h
-+++ b/lib/riscv/asm/sbi.h
-@@ -18,6 +18,7 @@ enum sbi_ext_id {
- 	SBI_EXT_BASE = 0x10,
- 	SBI_EXT_HSM = 0x48534d,
- 	SBI_EXT_SRST = 0x53525354,
-+	SBI_EXT_TIME = 0x54494D45,
- };
- 
- enum sbi_ext_base_fid {
-@@ -37,6 +38,10 @@ enum sbi_ext_hsm_fid {
- 	SBI_EXT_HSM_HART_SUSPEND,
- };
- 
-+enum sbi_ext_time_fid {
-+	SBI_EXT_TIME_SET_TIMER = 0,
-+};
-+
- struct sbiret {
- 	long error;
- 	long value;
-diff --git a/riscv/sbi.c b/riscv/sbi.c
-index 762e9711..6ad1dff6 100644
---- a/riscv/sbi.c
-+++ b/riscv/sbi.c
-@@ -6,8 +6,13 @@
-  */
- #include <libcflat.h>
- #include <stdlib.h>
-+#include <asm/csr.h>
-+#include <asm/interrupt.h>
-+#include <asm/processor.h>
- #include <asm/sbi.h>
- 
-+static bool timer_work;
-+
- static void help(void)
- {
- 	puts("Test SBI\n");
-@@ -19,6 +24,18 @@ static struct sbiret __base_sbi_ecall(int fid, unsigned long arg0)
- 	return sbi_ecall(SBI_EXT_BASE, fid, arg0, 0, 0, 0, 0, 0);
- }
- 
-+static struct sbiret __time_sbi_ecall(int fid, unsigned long arg0)
-+{
-+	return sbi_ecall(SBI_EXT_TIME, fid, arg0, 0, 0, 0, 0, 0);
-+}
-+
-+static void timer_interrupt_handler(struct pt_regs *regs)
-+{
-+	timer_work = true;
-+	toggle_timer_interrupt(false);
-+	local_irq_disable();
-+}
-+
- static bool env_or_skip(const char *env)
- {
- 	if (!getenv(env)) {
-@@ -112,6 +129,75 @@ static void check_base(void)
- 	report_prefix_pop();
- }
- 
-+static void check_time(void)
-+{
-+	struct sbiret ret;
-+	unsigned long begin, end, duration;
-+	const unsigned long default_delay = 1000000;
-+	unsigned long delay = getenv("TIMER_DELAY")
-+				? MAX(strtol(getenv("TIMER_DELAY"), NULL, 0), default_delay)
-+				: default_delay;
-+
-+	report_prefix_push("time");
-+
-+	ret = __base_sbi_ecall(SBI_EXT_BASE_PROBE_EXT, SBI_EXT_TIME);
-+
-+	if (ret.error) {
-+		report_fail("probing for time extension failed");
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	if (!ret.value) {
-+		report_skip("time extension not available");
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	begin = csr_read(CSR_TIME);
-+	end = csr_read(CSR_TIME);
-+	if (begin >= end) {
-+		report_fail("time counter has decreased");
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	report_prefix_push("set_timer");
-+
-+	install_irq_handler(IRQ_SUPERVISOR_TIMER, timer_interrupt_handler);
-+	local_irq_enable();
-+
-+	begin = csr_read(CSR_TIME);
-+	ret = __time_sbi_ecall(SBI_EXT_TIME_SET_TIMER, csr_read(CSR_TIME) + delay);
-+
-+	if (ret.error) {
-+		report_fail("setting timer failed");
-+		install_irq_handler(IRQ_SUPERVISOR_TIMER, NULL);
-+		report_prefix_pop();
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	toggle_timer_interrupt(true);
-+
-+	while ((!timer_work) && (csr_read(CSR_TIME) <= (begin + delay)))
-+		wfi();
-+
-+	end = csr_read(CSR_TIME);
-+	report(timer_work, "timer interrupt received");
-+
-+	install_irq_handler(IRQ_SUPERVISOR_TIMER, NULL);
-+	__time_sbi_ecall(SBI_EXT_TIME_SET_TIMER,  -1);
-+
-+	duration = end - begin;
-+	if (timer_work)
-+		report((duration >= delay) && (duration <= (delay + delay)), "timer delay honored");
-+
-+	report_prefix_pop();
-+
-+	report_prefix_pop();
-+}
-+
- int main(int argc, char **argv)
- {
- 
-@@ -122,6 +208,7 @@ int main(int argc, char **argv)
- 
- 	report_prefix_push("sbi");
- 	check_base();
-+	check_time();
- 
- 	return report_summary();
- }
--- 
-2.43.0
+> Sysfs and debugfs might be more problematic as I suppose directory names
+> would clash. I'll have to check... might be even happening now when we do
+> detect leaked objects and just leave the cache around... thanks for the
+> question.
 
+"It is a service that I provide."  ;-)
+
+But yes, we might be living with it already and there might already
+be ways people deal with it.
+
+							Thanx, Paul
+
+> >> > > Since you do it asynchronous can we just repeat
+> >> > > and wait until it a cache is furry freed?
+> >> > 
+> >> > The problem is we want to detect the cases when it's not fully freed
+> >> > because there was an actual read. So at some point we'd need to stop the
+> >> > repeats because we know there can no longer be any kfree_rcu()'s in
+> >> > flight since the kmem_cache_destroy() was called.
+> >> > 
+> >> Agree. As noted above, we can go with 21 seconds(as an example) interval
+> >> and just perform destroy(without repeating).
+> >> 
+> >> --
+> >> Uladzislau Rezki
+> 
 
