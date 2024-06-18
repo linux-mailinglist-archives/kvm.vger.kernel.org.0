@@ -1,237 +1,321 @@
-Return-Path: <kvm+bounces-19837-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19838-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 435DE90C277
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 05:28:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38A5E90C32F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 07:48:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 493E6B20F7B
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 03:28:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25E7D1C218C8
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 05:48:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A77C19B58D;
-	Tue, 18 Jun 2024 03:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70551B285;
+	Tue, 18 Jun 2024 05:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GpXIrxhL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cpyo+eIc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0812A33DF;
-	Tue, 18 Jun 2024 03:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A812923A9
+	for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 05:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718681320; cv=none; b=rgWDYoQytJaSWRDl3GeVnbLdHDdMXMZ5Lz6nYqaAvNjVyRSlucpQcJpBLdNvxYxQm0N2z/voWjZ4AwayLFv2Rfs24H5Lq6mer6LRQf5+sVZQoayTB1wcbd9XEO4xPCgyJzLpB0ESlU+r9S5aeJqp8Me+0R3jYpPRVmevwWawCbY=
+	t=1718689716; cv=none; b=jA+GFD6U73hOGDkpn0RDK5fp4FqaOmaIessiTP9aLIxgKsg3ItJ7HoD8f3jjFenMqZyM5f4LnH6c7Rc39i282WtbAfZLNLt6PlZE5KA8ewNCqw4SrNj9QGjfZn4DRS2kQE53jLFQKIllCyWY9vhruvOY3K4NZX494FEiv1hjqtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718681320; c=relaxed/simple;
-	bh=ynM9ShbfFif8uOoK2k0aPFZ9XtuYmV3vn2cQ+gF8Jek=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kxuw/XZ02f89eGt6uQXlgKPJMui5hL6UGWCvQ96MZOejIZIUqj9pn8Eq3uVCFpkJN1aBoVyTU37212bTxcTD0qYTNg2v9oWULd/GDT+hETrpM1EObiv7PihCl9luUDL/sGYfvnYeRNyJrGmR9cRr6x8zRzSZgZfD623eha0n+sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GpXIrxhL; arc=none smtp.client-ip=198.175.65.20
+	s=arc-20240116; t=1718689716; c=relaxed/simple;
+	bh=aDSCb2xB7clfj25Nf3Wn+g8ffbs7mLcrAmopAV3ANw4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nk+0vgN1UqRcqmd3J6RonGfQmA2pSUEYUqx1kJuYM/maDynb1nSMbjNLuHGuRdEJQ4wVuVJ7rCm/XoCxmqw+ztnRu3VyM3my25DLgqvEetlWq8E4Y/ZK+3RAhj5Z6OCL7C0JD9kot9X3puMBkYdMtDbQIPRefRZNq+uGMU4OF0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cpyo+eIc; arc=none smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718681319; x=1750217319;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=ynM9ShbfFif8uOoK2k0aPFZ9XtuYmV3vn2cQ+gF8Jek=;
-  b=GpXIrxhLEKC6B3z0uKiqJR+yFsCj1n7gl4WzfzyGA91Zosg8rzGKxWU6
-   7ZIihLtMYuBVnh7VzrpPCK/tlB1WwrPzL7dSPjW9ozBtg8qM9vKODpIkp
-   wmGbqJgtSR2cxWIaiq8t1WDYtYdVszqqUECo4IR1qxyEJ5rUoIwJ+1KP4
-   i3+xB6nC0haBAbuiSj/wkbiyelYzZG2/jJ+PqmlV51JluUzaA26pVN+Lc
-   QyxLiXLg8kuWOiogsLA1ENqrOo03/RNrl21c+jsOUdrFGVdT3wqPIgOG6
-   foGOBbXOTrp789IjwhsNMJfgvDp9fj37mnfnJnk7nBhMblXHFo4Rx/6Bt
-   A==;
-X-CSE-ConnectionGUID: VeIHqVFFTyWbYtlmTFxd+Q==
-X-CSE-MsgGUID: AbP5IA8hQSWJabby4S3aUQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11106"; a="15367658"
+  t=1718689714; x=1750225714;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=aDSCb2xB7clfj25Nf3Wn+g8ffbs7mLcrAmopAV3ANw4=;
+  b=cpyo+eIcmcxzgnqR0HuEwZbarQ2IjvJzZjz5T8lOLhYRlxRv/m58iTqN
+   lNAUEnft/I8kNM3sgIjFHxN7TLHT6H7zU9wpRlwvfGNepToPWZat5EPKC
+   NPXyD94DdTGoX0lN0u8h0d6bzPxKtMruqUDV3t9GhdKC9bA9JDaZSVfBX
+   DpeTd39LeJEJDvE/3rzrzd//MxeXtsKGL9dXPYM3IiSNhY1vqeMgmtBcD
+   yLg2cxEdiVzwWej2tkSb0aDSrwEd8CFnw0uN055xZpYiBnqUsgd6A2vIx
+   yp6I28O9ClBh1LmNcf8+vBNRqY3X36WVcbXbpSgcOGcPUD05DJHYrgsnR
+   g==;
+X-CSE-ConnectionGUID: gAHEPWAYQm2zMnxoJYb+tw==
+X-CSE-MsgGUID: L9q8RxElS1S7KW6KHZkZDw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11106"; a="18457189"
 X-IronPort-AV: E=Sophos;i="6.08,246,1712646000"; 
-   d="scan'208";a="15367658"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 20:28:38 -0700
-X-CSE-ConnectionGUID: 2QDsvqbKRDu8wtzBPw988Q==
-X-CSE-MsgGUID: NIXYOHcjQhaHFY5INH5WOA==
+   d="scan'208";a="18457189"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 22:48:33 -0700
+X-CSE-ConnectionGUID: qIhQEVLCTJSCbRoEcsSRCA==
+X-CSE-MsgGUID: izOTE8LZRzWVzXstTIFBSg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,246,1712646000"; 
-   d="scan'208";a="41268516"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by fmviesa007.fm.intel.com with ESMTP; 17 Jun 2024 20:28:35 -0700
-Date: Tue, 18 Jun 2024 11:28:34 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com
-Subject: Re: [PATCH v19 085/130] KVM: TDX: Complete interrupts after tdexit
-Message-ID: <20240618032834.a6tuv353vk6vqybw@yy-desk-7060>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <aa6a927214a5d29d5591a0079f4374b05a82a03f.1708933498.git.isaku.yamahata@intel.com>
- <20240617080729.j5nottky5bjmgdmf@yy-desk-7060>
- <c1426d14-3c00-4956-89a3-c06336905330@linux.intel.com>
+   d="scan'208";a="42116217"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.125.242.247]) ([10.125.242.247])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jun 2024 22:48:32 -0700
+Message-ID: <00a74cb3-4f03-4eb3-a969-04293841f64a@linux.intel.com>
+Date: Tue, 18 Jun 2024 13:48:29 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c1426d14-3c00-4956-89a3-c06336905330@linux.intel.com>
-User-Agent: NeoMutt/20171215
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v6 2/4] x86: Add test case for LAM_SUP
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com,
+ robert.hu@linux.intel.com
+References: <20240122085354.9510-1-binbin.wu@linux.intel.com>
+ <20240122085354.9510-3-binbin.wu@linux.intel.com>
+ <ZmCtVWQ_7KdMqcmf@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZmCtVWQ_7KdMqcmf@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 17, 2024 at 05:07:56PM +0800, Binbin Wu wrote:
->
->
-> On 6/17/2024 4:07 PM, Yuan Yao wrote:
-> > On Mon, Feb 26, 2024 at 12:26:27AM -0800, isaku.yamahata@intel.com wrote:
-> > > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > >
-> > > This corresponds to VMX __vmx_complete_interrupts().  Because TDX
-> > > virtualize vAPIC, KVM only needs to care NMI injection.
-> > >
-> > > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > > Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
-> > > ---
-> > > v19:
-> > > - move tdvps_management_check() to this patch
-> > > - typo: complete -> Complete in short log
-> > > ---
-> > >   arch/x86/kvm/vmx/tdx.c | 10 ++++++++++
-> > >   arch/x86/kvm/vmx/tdx.h |  4 ++++
-> > >   2 files changed, 14 insertions(+)
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > > index 83dcaf5b6fbd..b8b168f74dfe 100644
-> > > --- a/arch/x86/kvm/vmx/tdx.c
-> > > +++ b/arch/x86/kvm/vmx/tdx.c
-> > > @@ -535,6 +535,14 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> > >   	 */
-> > >   }
-> > >
-> > > +static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
-> > > +{
-> > > +	/* Avoid costly SEAMCALL if no nmi was injected */
-> > > +	if (vcpu->arch.nmi_injected)
-> > > +		vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
-> > > +							      TD_VCPU_PEND_NMI);
-> > > +}
-> > Looks this leads to NMI injection delay or even won't be
-> > reinjected if KVM_REQ_EVENT is not set on the target cpu
-> > when more than 1 NMIs are pending there.
-> >
-> > On normal VM, KVM uses NMI window vmexit for injection
-> > successful case to rasie the KVM_REQ_EVENT again for remain
-> > pending NMIs, see handle_nmi_window(). KVM also checks
-> > vectoring info after VMEXIT for case that the NMI is not
-> > injected successfully in this vmentry vmexit round, and
-> > raise KVM_REQ_EVENT to try again, see __vmx_complete_interrupts().
-> >
-> > In TDX, consider there's no way to get vectoring info or
-> > handle nmi window vmexit, below checking should cover both
-> > scenarios for NMI injection:
-> >
-> > diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> > index e9c9a185bb7b..9edf446acd3b 100644
-> > --- a/arch/x86/kvm/vmx/tdx.c
-> > +++ b/arch/x86/kvm/vmx/tdx.c
-> > @@ -835,9 +835,12 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> >   static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
-> >   {
-> >          /* Avoid costly SEAMCALL if no nmi was injected */
-> > -       if (vcpu->arch.nmi_injected)
-> > +       if (vcpu->arch.nmi_injected) {
-> >                  vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
-> >                                                                TD_VCPU_PEND_NMI);
-> > +               if (vcpu->arch.nmi_injected || vcpu->arch.nmi_pending)
-> > +                       kvm_make_request(KVM_REQ_EVENT, vcpu);
->
-> For nmi_injected, it should be OK because TD_VCPU_PEND_NMI is still set.
-> But for nmi_pending, it should be checked and raise event.
 
-Right, I just forgot the tdx module can do more than "hardware":
 
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index e9c9a185bb7b..3530a4882efc 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -835,9 +835,16 @@ void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- static void tdx_complete_interrupts(struct kvm_vcpu *vcpu)
- {
-        /* Avoid costly SEAMCALL if no nmi was injected */
--       if (vcpu->arch.nmi_injected)
-+       if (vcpu->arch.nmi_injected) {
-                vcpu->arch.nmi_injected = td_management_read8(to_tdx(vcpu),
-                                                              TD_VCPU_PEND_NMI);
-+               /*
-+                  tdx module will retry injection in case of TD_VCPU_PEND_NMI,
-+                  so don't need to set KVM_REQ_EVENT for it again.
-+                */
-+               if (!vcpu->arch.nmi_injected && vcpu->arch.nmi_pending)
-+                       kvm_make_request(KVM_REQ_EVENT, vcpu);
-+       }
- }
+On 6/6/2024 2:24 AM, Sean Christopherson wrote:
+> On Mon, Jan 22, 2024, Binbin Wu wrote:
+>> diff --git a/x86/lam.c b/x86/lam.c
+>> new file mode 100644
+>> index 00000000..0ad16be5
+>> --- /dev/null
+>> +++ b/x86/lam.c
+>> @@ -0,0 +1,243 @@
+>> +/*
+>> + * Intel LAM unit test
+>> + *
+>> + * Copyright (C) 2023 Intel
+>> + *
+>> + * Author: Robert Hoo <robert.hu@linux.intel.com>
+>> + *         Binbin Wu <binbin.wu@linux.intel.com>
+>> + *
+>> + * This work is licensed under the terms of the GNU LGPL, version 2 or
+>> + * later.
+>> + */
+>> +
+>> +#include "libcflat.h"
+>> +#include "processor.h"
+>> +#include "desc.h"
+>> +#include "vmalloc.h"
+>> +#include "alloc_page.h"
+>> +#include "vm.h"
+>> +#include "asm/io.h"
+>> +#include "ioram.h"
+>> +
+>> +#define FLAGS_LAM_ACTIVE	BIT_ULL(0)
+>> +#define FLAGS_LA57		BIT_ULL(1)
+>> +
+>> +struct invpcid_desc {
+>> +	u64 pcid : 12;
+>> +	u64 rsv  : 52;
+>> +	u64 addr;
+>> +};
+>> +
+>> +static inline bool is_la57(void)
+>> +{
+>> +	return !!(read_cr4() & X86_CR4_LA57);
+>> +}
+>> +
+>> +static inline bool lam_sup_active(void)
+> Needs an "is_" prefix.  And be consistent, e.g. is_lam_sup() to go with is_la57(),
+> or is_lam_sup_enabled() and is_la57_enabled().  I'd probably vote for the latter,
+> though KVM does have is_paging() and the like, so I'm fine either way.
+>
+> And these belong in processor.h
+
+OK, will use is_lam_sup_enabled() / is_la57_enabled() and move them to 
+processor.h.
 
 >
-> I remember there was a discussion in the following link:
-> https://lore.kernel.org/kvm/20240402065254.GY2444378@ls.amr.corp.intel.com/
-> It said  tdx_vcpu_run() will ignore force_immediate_exit.
-> If force_immediate_exit is igored for TDX, then the nmi_pending handling
-> could still be delayed if the previous NMI was injected successfully.
+>> +{
+>> +	return !!(read_cr4() & X86_CR4_LAM_SUP);
+>> +}
+>> +
+>> +static void cr4_set_lam_sup(void *data)
+>> +{
+>> +	unsigned long cr4;
+>> +
+>> +	cr4 = read_cr4();
+>> +	write_cr4_safe(cr4 | X86_CR4_LAM_SUP);
+>> +}
+>> +
+>> +static void cr4_clear_lam_sup(void *data)
+>> +{
+>> +	unsigned long cr4;
+>> +
+>> +	cr4 = read_cr4();
+>> +	write_cr4_safe(cr4 & ~X86_CR4_LAM_SUP);
+>> +}
+> Please drop these helpers and instead use _safe() variants when possible, e.g.
+>
+> 	vector = write_cr4_safe(cr4 | X86_CR4_LAM_SUP);
+> 	report(has_lam ? !vector : vector == GP_VECTOR,
+> 	       "Expected CR4.LAM_SUP=1 to %s" ? has_lam ? "succeed" : "#GP");
+>
+> 	vector = write_cr4_safe(cr4 & ~X86_CR4_LAM_SUP);
+> 	report(!vector, "Expected CR4.LAM_SUP=0 to succeed");
+OK.
 
-Yes, not sure the possibility of meeting this in real use
-case, I know it happens in some testing, e.g. the kvm
-unit test's multiple NMI tesing.
+>
+>> +static void test_cr4_lam_set_clear(bool has_lam)
+>> +{
+>> +	bool fault;
+>> +
+>> +	fault = test_for_exception(GP_VECTOR, &cr4_set_lam_sup, NULL);
+>> +	report((fault != has_lam) && (lam_sup_active() == has_lam),
+>> +	       "Set CR4.LAM_SUP");
+>> +
+>> +	fault = test_for_exception(GP_VECTOR, &cr4_clear_lam_sup, NULL);
+>> +	report(!fault, "Clear CR4.LAM_SUP");
+>> +}
+>> +
+>> +/* Refer to emulator.c */
+>> +static void do_mov(void *mem)
+>> +{
+>> +	unsigned long t1, t2;
+>> +
+>> +	t1 = 0x123456789abcdefull & -1ul;
+>> +	asm volatile("mov %[t1], (%[mem])\n\t"
+>> +		     "mov (%[mem]), %[t2]"
+>> +		     : [t2]"=r"(t2)
+>> +		     : [t1]"r"(t1), [mem]"r"(mem)
+>> +		     : "memory");
+>> +	report(t1 == t2, "Mov result check");
+>> +}
+>> +
+>> +static u64 test_ptr(u64 arg1, u64 arg2, u64 arg3, u64 arg4)
+> There's no reason to name these arg1..arg4.  And unless I'm missing something,
+> there's no need for these flags at all.  All the info is derived from vCPU state,
+> so just re-grab it.  The cost of a CR4 read is negligible relative to the expected
+> runtime of these tests.
+The reason for these arguments is the userspace pointer will be tested 
+in userspace using the same function,
+and CR3/CR4 can not be read in ring3, so these CR3/CR4 LAM/LA57 related 
+information needs to be passed.
+
+Based on your comment and the comment from patch 3
+https://lore.kernel.org/kvm/ZmC0GC3wAdiO0Dp2@google.com/
+Does the number of arguments bothering you?
+If not, I can pass CR3 and CR4 value to test_ptr() and let the test 
+function to retrieve LAM information itself.
+I.e, the 4 inputs will be CR3, CR4, memory pointer, is_mmio.
+
 
 >
+>> +{
+>> +	bool lam_active = !!(arg1 & FLAGS_LAM_ACTIVE);
+>> +	u64 lam_mask = arg2;
+>> +	u64 *ptr = (u64 *)arg3;
+>> +	bool is_mmio = !!arg4;
+>> +	bool fault;
+>> +
+>> +	fault = test_for_exception(GP_VECTOR, do_mov, ptr);
+>> +	report(!fault, "Test untagged addr (%s)", is_mmio ? "MMIO" : "Memory");
+>> +
+>> +	ptr = (u64 *)set_la_non_canonical((u64)ptr, lam_mask);
+>> +	fault = test_for_exception(GP_VECTOR, do_mov, ptr);
+>> +	report(fault != lam_active,"Test tagged addr (%s)",
+>> +	       is_mmio ? "MMIO" : "Memory");
+>> +
+>> +	return 0;
+>> +}
+>> +
+>> +static void do_invlpg(void *mem)
+>> +{
+>> +	invlpg(mem);
+>> +}
+>> +
+>> +static void do_invlpg_fep(void *mem)
+>> +{
+>> +	asm volatile(KVM_FEP "invlpg (%0)" ::"r" (mem) : "memory");
+>> +}
+>> +
+>> +/* invlpg with tagged address is same as NOP, no #GP expected. */
+>> +static void test_invlpg(u64 lam_mask, void *va, bool fep)
+>> +{
+>> +	bool fault;
+>> +	u64 *ptr;
+>> +
+>> +	ptr = (u64 *)set_la_non_canonical((u64)va, lam_mask);
+>> +	if (fep)
+>> +		fault = test_for_exception(GP_VECTOR, do_invlpg_fep, ptr);
+>> +	else
+>> +		fault = test_for_exception(GP_VECTOR, do_invlpg, ptr);
+> INVLPG never faults, so don't bother with wrappers.  If INVPLG faults, the test
+> fails, i.e. mission accomplished.
+
+OK.
 >
-> > +       }
-> >   }
-> >
-> > > +
-> > >   struct tdx_uret_msr {
-> > >   	u32 msr;
-> > >   	unsigned int slot;
-> > > @@ -663,6 +671,8 @@ fastpath_t tdx_vcpu_run(struct kvm_vcpu *vcpu)
-> > >   	vcpu->arch.regs_avail &= ~VMX_REGS_LAZY_LOAD_SET;
-> > >   	trace_kvm_exit(vcpu, KVM_ISA_VMX);
-> > >
-> > > +	tdx_complete_interrupts(vcpu);
-> > > +
-> > >   	return EXIT_FASTPATH_NONE;
-> > >   }
-> > >
-> > > diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-> > > index 44eab734e702..0d8a98feb58e 100644
-> > > --- a/arch/x86/kvm/vmx/tdx.h
-> > > +++ b/arch/x86/kvm/vmx/tdx.h
-> > > @@ -142,6 +142,8 @@ static __always_inline void tdvps_vmcs_check(u32 field, u8 bits)
-> > >   			 "Invalid TD VMCS access for 16-bit field");
-> > >   }
-> > >
-> > > +static __always_inline void tdvps_management_check(u64 field, u8 bits) {}
-> > > +
-> > >   #define TDX_BUILD_TDVPS_ACCESSORS(bits, uclass, lclass)				\
-> > >   static __always_inline u##bits td_##lclass##_read##bits(struct vcpu_tdx *tdx,	\
-> > >   							u32 field)		\
-> > > @@ -200,6 +202,8 @@ TDX_BUILD_TDVPS_ACCESSORS(16, VMCS, vmcs);
-> > >   TDX_BUILD_TDVPS_ACCESSORS(32, VMCS, vmcs);
-> > >   TDX_BUILD_TDVPS_ACCESSORS(64, VMCS, vmcs);
-> > >
-> > > +TDX_BUILD_TDVPS_ACCESSORS(8, MANAGEMENT, management);
-> > > +
-> > >   static __always_inline u64 td_tdcs_exec_read64(struct kvm_tdx *kvm_tdx, u32 field)
-> > >   {
-> > >   	struct tdx_module_args out;
-> > > --
-> > > 2.25.1
-> > >
-> > >
+>> +
+>> +	report(!fault, "%sINVLPG with tagged addr", fep ? "fep: " : "");
+>> +}
+>> +
+>> +static void do_invpcid(void *desc)
+>> +{
+>> +	struct invpcid_desc *desc_ptr = (struct invpcid_desc *)desc;
+>> +
+>> +	asm volatile("invpcid %0, %1" :
+>> +	                              : "m" (*desc_ptr), "r" (0UL)
+>> +	                              : "memory");
+>> +}
+> Similar thing here, invpcid() belongs in processor.h, alongside invpcid_safe().
+
+OK, I think I can use invpcid_safe() directly for test cases.
+
+
 >
+>> +/* LAM doesn't apply to the linear address in the descriptor of invpcid */
+>> +static void test_invpcid(u64 flags, u64 lam_mask, void *data)
+>> +{
+>> +	/*
+>> +	 * Reuse the memory address for the descriptor since stack memory
+>> +	 * address in KUT doesn't follow the kernel address space partitions.
+>> +	 */
+>> +	struct invpcid_desc *desc_ptr = (struct invpcid_desc *)data;
+>> +	bool lam_active = !!(flags & FLAGS_LAM_ACTIVE);
+>> +	bool fault;
+>> +
+>> +	if (!this_cpu_has(X86_FEATURE_PCID) ||
+> I don't _think_ we need to check for PCID support.  It's a KVM/QEMU bug if INVPCID
+> is advertised but it doesn't work for the "all PCIDs" flavor.
+OK, will remove it.
+
+>
+>> +	    !this_cpu_has(X86_FEATURE_INVPCID)) {
+>> +		report_skip("INVPCID not supported");
+>> +		return;
+>> +	}
+>> +
+> ...
+>
+>> diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+>> index 3fe59449..224df45b 100644
+>> --- a/x86/unittests.cfg
+>> +++ b/x86/unittests.cfg
+>> @@ -491,3 +491,13 @@ file = cet.flat
+>>   arch = x86_64
+>>   smp = 2
+>>   extra_params = -enable-kvm -m 2048 -cpu host
+>> +
+>> +[intel-lam]
+>> +file = lam.flat
+>> +arch = x86_64
+>> +extra_params = -enable-kvm -cpu host
+>> +
+>> +[intel-no-lam]
+>> +file = lam.flat
+>> +arch = x86_64
+>> +extra_params = -enable-kvm -cpu host,-lam
+> Hrm, not something that needs to be solved now, but we really need a better
+> interface for iterating over features in tests :-/
+
 
