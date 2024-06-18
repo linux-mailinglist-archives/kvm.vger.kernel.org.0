@@ -1,126 +1,155 @@
-Return-Path: <kvm+bounces-19896-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19897-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6AFA90DEA5
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 23:44:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5200490DEA9
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 23:46:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70EA22825BA
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 21:44:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78BCF1C2132F
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 21:46:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3CC178393;
-	Tue, 18 Jun 2024 21:44:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3A6178378;
+	Tue, 18 Jun 2024 21:46:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s5HoV1R3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zxdzwrbl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844E115EFAF
-	for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 21:43:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A519216DC19
+	for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 21:46:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718747039; cv=none; b=lBMgU96dt4v2pKsAb869bS9Bn4iga/nTdBlcjUr/tGo2Bg5n5T8Dfhk1fIaF/LXrSv1+6kbKlHRfvlcnJKiaPvRt/jW7YMgokuihfWZe/tOoqhKm0MaxyBQAyNTPngAkqHCeq7WgPLmrU1pidPygViQ1PVvvWbnGJYl27nKNg+M=
+	t=1718747172; cv=none; b=TnOSuH5KqISRN03usH2JtamYcFj95QYQlQQ/V9kDkFpPREqUN3CP2O6fFA6w9U/AELlMEzgRgWAVah/CgoGqlHrEQZECjTYbvk94isGPF4v9+5Mj8EGRIXF/4gKghj/W5so9zlkpoqRjIv3CxtDGZB2y6rZPNBFGVhjCMFOwTGw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718747039; c=relaxed/simple;
-	bh=DLUk1H1l4ZeqIjMc1pYUzfOJVR3vak2kdq+12go0bhQ=;
+	s=arc-20240116; t=1718747172; c=relaxed/simple;
+	bh=AvNrF8DODCk953bLRKAikN4GelqcLbbbV8JPr5mz4Yg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=IkpwhlicYXaMBk4/UpKnfhjF/Higb/Qn75/qL836HxMzuqt7Sl97p+sTbAwIvyWsvu/6q2IJhXdr5m4IvbGYBsk8LnRusMdmSDxkKvSI5CUNPQsvmwmrn1E748wuKwyu9WGd+59N6A5JoeYbrPih8xV7OL0KhrNH4JelYJTB8c4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s5HoV1R3; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=b/mQzWV1aMVz2BhqwDElEOOF8ZHO3qUK3HZRtiMCmT3yAu0i/ZOXcIOtya2Btoth+jTJbZNywn4HkVDkPgLt3h77K7nJbDMDNFjaAS3lHECwrm1wWpW92+vZ7ofpIkit645AmwZEN5t6ALV2zudflZCQd0tPLjfSnrdUhmO/4hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zxdzwrbl; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dff4a650404so4424135276.3
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 14:43:58 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6e67742bee6so3494565a12.1
+        for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 14:46:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718747037; x=1719351837; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1718747170; x=1719351970; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xDoltJVQ7zR6NCEuSMFubyNCVkbnipGqI79mQtN+sq4=;
-        b=s5HoV1R3BIfXbeKIgz/fe9vyQNFG5eI+wVdeKsVneXyaq+U9/Z1gAMhZMf/nTrXb0a
-         duUyquAVKMfJBd8T7Mdhr3Eeak2qeHo0/vYSpQGkH69GvWT6cRQ8m27/UQHZAMwNb3LS
-         iMh8OeUhmwmm9zNBVGQMyGKeFFn57zlSFA2zjx/hyj1NU04I1ihpQn5y+d0j0FPuTc7O
-         URQZGypnNUxUOxiEicdZkQapz19OeaDFaPOV3XiU+xyYN3npWzRIkeISP5bm/FJSui+1
-         bgjCD8G8ANJBXz7PtyIE3XX0piwa9CL/jhn1PMPW5TMFgzTB/SEd7KeM71/3RKF/cagZ
-         Kf3g==
+        bh=TIQ3kfXDxnvR9vG4GruL5d0nx4Vqm1FEFplJ13qNH0E=;
+        b=ZxdzwrblSrSF42CAEXLA1jx8+vbX2lFLs+4R2u6TLlvOAlRZZBSAjxHFOVsCscCaA5
+         Am6TXHRzsNawU6wlVAVtoKr+s6xGsYM1big6yVeLjsgk1oEh9gCcVISZindABB2P+SzD
+         VGDzL8nQOmGwbEA3q/wCAqGfepOLxCNbiFZz7fUsOTwpao5Db+EqtG06XgCCpEbjpSaa
+         G5B4TnDIEMf8VIvpFspaOwr1FUZgT4IPLkcwSadtFfW1/Vr1bU4lnCeBXr9kXOqBI5lE
+         +HKQbsnoE/AEwpc4zAknuAlC/7o3tW6wrM2rjWMtxbT0rTqDd8UGNBByDnqpd4jZXnzy
+         Bpdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718747037; x=1719351837;
+        d=1e100.net; s=20230601; t=1718747170; x=1719351970;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xDoltJVQ7zR6NCEuSMFubyNCVkbnipGqI79mQtN+sq4=;
-        b=Wx/s3E7SytY/GkiB3JtHr2Xo76JHfPPUBfvqKFG5WpJqGYAe3zm2LBP10ssw+P1Hut
-         1G6jPJytJep3Jh7FTlZ3ZxjQ95wON4OQvIIhMXPd/iXmv/qJ/ij2ptN/Ng6dqSRo12TD
-         DiakvY36dh82tVDG5KRCI/FMkx4zESa/WOk5ukZ6MoZoK1fYBmekv/4M6voI9VUEzxF/
-         JjFj/Roez0Pdmvhu8x6sxN2vz1mT43A1I+AwN/eVCjlYrSB1JWpkYRep54cf7PFY6FM1
-         UAoUl/ea5O+ewjwMbgxienTAk7d/HF1nfJUN3ROhv6nSfVKN9Y85Dpv6j37UepE1uMW0
-         jTuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUVUVrV1i84WX+TyXrX7Ueij68TOfePjUI+t0bBUpgIGshKVDdYOFJbak/EM9q4t13bD5L/H/DI11RxT9aIT1PLHvDa
-X-Gm-Message-State: AOJu0YyH+VB7xJ9K45rPsq40OyjEvk0EfBC/Yqju1hts6a56KKUEWhB4
-	D2JQaz5Ma/EFnoC1sTF3ZIRJIn9ltT7ORfXmU4ayaFmOkEY6rEAzivbjVqIMsX9pFWkmZrMx3Jn
-	vMA==
-X-Google-Smtp-Source: AGHT+IGbprsDdgHYY1PfaO8dbpnyRSi4ZlsM6r4nYlbWbmwkVMmNuHK1CDeg8OXRFAAI5wAMi0F3mFM3pa4=
+        bh=TIQ3kfXDxnvR9vG4GruL5d0nx4Vqm1FEFplJ13qNH0E=;
+        b=o0tLp8/znq1MTSklypFv0jAEGaHGK/ORpyBJb93E4yQz10dQAJP+GL3y3XlE96+5fW
+         5qCkLmYHZTgrY6TZYBIFpQYRCyqPy8Piux5RCkcja3qwedS+e9pSDKVJ4yPoxHF0bwtZ
+         iwNmE/8oLR2t2H+nCPECrk6ZqZETCLSqC/YaVxsRJu0kb4AhX4m0JGEXcR1uRj/KVOjf
+         Gv/EU9yTbP65iXPKc9egakEgsGrPM+j9GhWXUpA3Dz3pUIHJ0Ezi3sKKaa3dBrL6tXpv
+         zoVxiKmJdAQsC2jucFKI4N6sI3GzEMK4EbxU2YgPWFySD0jYkQdS4sNe8RM0oPCuAW7I
+         Xf2w==
+X-Forwarded-Encrypted: i=1; AJvYcCXneKaFz44+UPfWilXyH8VryzpTB+9AUFt0Fj/+i8Nv/uClQQNWhDDzHBNgP1+YPVdI4Lv/aXL5gxE1NTUvL3f6LFON
+X-Gm-Message-State: AOJu0YwiwcVnGypHPCq/k0S7S/dLJ36HejUi03iygZh3611J3QdIP20/
+	YNAX9dJZK7ASPUUCss58qWhshgyJJ9nEBBoxLxYPC25EeCfpbbdux8CKwZWAyDhNINeLSsDlvdg
+	Chg==
+X-Google-Smtp-Source: AGHT+IE+ru0espGFuS9wOdmMbFbdZv75qYL5SavI9BTUhtxXWisV6HlT8PRog/sZ2FbZ3VLCGnYpMd1Rd88=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:51:0:b0:dff:36ec:fdbe with SMTP id
- 3f1490d57ef6-e02be23cdebmr62359276.12.1718747037555; Tue, 18 Jun 2024
- 14:43:57 -0700 (PDT)
-Date: Tue, 18 Jun 2024 14:43:55 -0700
-In-Reply-To: <20240614202859.3597745-2-minipli@grsecurity.net>
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:5a8:b0:6e6:831f:c3f0 with SMTP id
+ 41be03b00d2f7-710b9e10287mr1950a12.11.1718747169797; Tue, 18 Jun 2024
+ 14:46:09 -0700 (PDT)
+Date: Tue, 18 Jun 2024 14:46:08 -0700
+In-Reply-To: <20240614202859.3597745-5-minipli@grsecurity.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240614202859.3597745-1-minipli@grsecurity.net> <20240614202859.3597745-2-minipli@grsecurity.net>
-Message-ID: <ZnH_m_83ip2rdpbC@google.com>
-Subject: Re: [PATCH v3 1/5] KVM: Reject overly excessive IDs in KVM_CREATE_VCPU
+References: <20240614202859.3597745-1-minipli@grsecurity.net> <20240614202859.3597745-5-minipli@grsecurity.net>
+Message-ID: <ZnIAIGJpErWhfHns@google.com>
+Subject: Re: [PATCH v3 4/5] KVM: selftests: Test max vCPU IDs corner cases
 From: Sean Christopherson <seanjc@google.com>
 To: Mathias Krause <minipli@grsecurity.net>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	Emese Revfy <re.emese@gmail.com>, PaX Team <pageexec@freemail.hu>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Jun 14, 2024, Mathias Krause wrote:
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 14841acb8b95..b04e87f6568f 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -4200,12 +4200,20 @@ static void kvm_create_vcpu_debugfs(struct kvm_vcpu *vcpu)
->  /*
->   * Creates some virtual cpus.  Good luck creating more than one.
->   */
-> -static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, u32 id)
-> +static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
->  {
->  	int r;
->  	struct kvm_vcpu *vcpu;
->  	struct page *page;
+> The KVM_CREATE_VCPU ioctl ABI had an implicit integer truncation bug,
+> allowing 2^32 aliases for a vCPU ID by setting the upper 32 bits of a 64
+> bit ioctl() argument.
+> 
+> It also allowed excluding a once set boot CPU ID.
+> 
+> Verify this no longer works and gets rejected with an error.
+> 
+> Signed-off-by: Mathias Krause <minipli@grsecurity.net>
+> ---
+> v3:
+> - test BOOT_CPU_ID interaction too
+> 
+>  .../kvm/x86_64/max_vcpuid_cap_test.c          | 22 +++++++++++++++++--
+>  1 file changed, 20 insertions(+), 2 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c b/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
+> index 3cc4b86832fe..c2da915201be 100644
+> --- a/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/max_vcpuid_cap_test.c
+> @@ -26,19 +26,37 @@ int main(int argc, char *argv[])
+>  	TEST_ASSERT(ret < 0,
+>  		    "Setting KVM_CAP_MAX_VCPU_ID beyond KVM cap should fail");
 >  
-> +	/*
-> +	 * KVM tracks vCPU IDs as 'int', be kind to userspace and reject
-> +	 * too-large values instead of silently truncating.
-> +	 *
-> +	 * Also ensure we're not breaking this assumption by accidentally
-> +	 * pushing KVM_MAX_VCPU_IDS above INT_MAX.
-
-I tweaked this slightly because it's not just accidental changes we need to
-guard against, and to "hint" that vcpu_id really should be an "unsigned int".
-
-	/*
-	 * KVM tracks vCPU IDs as 'int', be kind to userspace and reject
-	 * too-large values instead of silently truncating.
-	 *
-	 * Ensure KVM_MAX_VCPU_IDS isn't pushed above INT_MAX without first
-	 * changing the storage type (at the very least, IDs should be tracked
-	 * as unsigned ints).
-	 */
-
-> +	 */
-> +	BUILD_BUG_ON(KVM_MAX_VCPU_IDS > INT_MAX);
->  	if (id >= KVM_MAX_VCPU_IDS)
->  		return -EINVAL;
+> +	/* Test BOOT_CPU_ID interaction (MAX_VCPU_ID cannot be lower) */
+> +	if (kvm_has_cap(KVM_CAP_SET_BOOT_CPU_ID)) {
+> +		vm_ioctl(vm, KVM_SET_BOOT_CPU_ID, (void *)MAX_VCPU_ID);
+> +
+> +		/* Try setting KVM_CAP_MAX_VCPU_ID below BOOT_CPU_ID */
+> +		ret = __vm_enable_cap(vm, KVM_CAP_MAX_VCPU_ID, MAX_VCPU_ID - 1);
+> +		TEST_ASSERT(ret < 0,
+> +			    "Setting KVM_CAP_MAX_VCPU_ID below BOOT_CPU_ID should fail");
+> +	}
+> +
+>  	/* Set KVM_CAP_MAX_VCPU_ID */
+>  	vm_enable_cap(vm, KVM_CAP_MAX_VCPU_ID, MAX_VCPU_ID);
 >  
+> -
+>  	/* Try to set KVM_CAP_MAX_VCPU_ID again */
+>  	ret = __vm_enable_cap(vm, KVM_CAP_MAX_VCPU_ID, MAX_VCPU_ID + 1);
+>  	TEST_ASSERT(ret < 0,
+>  		    "Setting KVM_CAP_MAX_VCPU_ID multiple times should fail");
+>  
+> -	/* Create vCPU with id beyond KVM_CAP_MAX_VCPU_ID cap*/
+> +	/* Create vCPU with id beyond KVM_CAP_MAX_VCPU_ID cap */
+>  	ret = __vm_ioctl(vm, KVM_CREATE_VCPU, (void *)MAX_VCPU_ID);
+>  	TEST_ASSERT(ret < 0, "Creating vCPU with ID > MAX_VCPU_ID should fail");
+>  
+> +	/* Create vCPU with id beyond UINT_MAX */
+
+I changed this comment to
+
+	/* Create vCPU with bits 63:32 != 0, but an otherwise valid id */
+
+mostly because it's specifically testing the bad truncation of the upper bits,
+but also because I initially misinterpreted the intent and confused it with the
+INT_MAX BUILD_BUG_ON().
+
+> +	ret = __vm_ioctl(vm, KVM_CREATE_VCPU, (void *)(1L << 32));
+> +	TEST_ASSERT(ret < 0, "Creating vCPU with ID > UINT_MAX should fail");
+> +
+> +	/* Create vCPU with id within bounds */
+> +	ret = __vm_ioctl(vm, KVM_CREATE_VCPU, (void *)0);
+> +	TEST_ASSERT(ret >= 0, "Creating vCPU with ID 0 should succeed");
+> +
+> +	close(ret);
+>  	kvm_vm_free(vm);
+>  	return 0;
+>  }
 > -- 
 > 2.30.2
 > 
