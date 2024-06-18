@@ -1,141 +1,171 @@
-Return-Path: <kvm+bounces-19874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E3A090D9D4
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 18:49:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1506A90DA54
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 19:07:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 441AF1C21FE2
-	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 16:49:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B02BE28234B
+	for <lists+kvm@lfdr.de>; Tue, 18 Jun 2024 17:07:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD0EF13C683;
-	Tue, 18 Jun 2024 16:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D729D13DB8D;
+	Tue, 18 Jun 2024 17:06:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HrsVOBE2"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="hQgI7JIu"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03olkn2073.outbound.protection.outlook.com [40.92.57.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B398C208CB;
-	Tue, 18 Jun 2024 16:48:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718729330; cv=none; b=jbg/uu8GG9hE1MoY1R0Mqs7kcEvPTzfgcRkftRjsJ5oZeqxq18SNY2PjUV214xbX5CNuf504alFtWxI9Y9LA5rofXrZMoHSLK9l/Xbkb7hQZoiOqaIxdly7eEMr0MWisEzVXK23fSNen6zRI5BZO/TJnIJ8/WIcBFxVqRXE34vg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718729330; c=relaxed/simple;
-	bh=VfDzdOd/PBJM9nA6j0ZKm8qJpomLK1rSxnmNGkn9m68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aOLKfLMuCC57noxrPfuliRpwDJrU6nxGNO2ViY6mmqwtkgH9IJ+4HalyitruXzGGG3pIN3uduNZTcuQ9kZNc1Ly62OPPShpOi+Yh4eZSdW4biap8BMW2jafWs9XCopCclQBdHAd7ar55rUHNOw5JSM1uBR38aIQeU86L+KsZJxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HrsVOBE2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DFD3C3277B;
-	Tue, 18 Jun 2024 16:48:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718729330;
-	bh=VfDzdOd/PBJM9nA6j0ZKm8qJpomLK1rSxnmNGkn9m68=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=HrsVOBE2UZX8+X+ns3WoipKKPnQlrXf46/WVd5Z8R08kgkeXyQZpJ3xbNp53mW9mR
-	 heTRYbFX6QLq79sc4TX3gceaCliIC49fBjdslD9tSepbzuQXYzZj/oR4qg+oxqMyUR
-	 SCgHWoeY3y1GSVheT8IwuCrjcwTBFwfw/ymCcCO5j+RDeWy1MibPA2MpM/dmvBceqn
-	 Md4s8MgF8TnOTenuVi09xWbCE2J+QqwjQUEIo4ueSno6A8qEYdy9kKtKI9Xs5ZQFI+
-	 q4wO1JBGHQ9K5vJ3V09XPmAG/dclEEFW0Db1j3pHWmIKKjhVTZmif7rRNHjHUNgQzz
-	 SZsG2RVZhy0Qg==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id B9F83CE05B6; Tue, 18 Jun 2024 09:48:49 -0700 (PDT)
-Date: Tue, 18 Jun 2024 09:48:49 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: Vlastimil Babka <vbabka@suse.cz>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	kasan-dev <kasan-dev@googlegroups.com>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <Zmov7ZaL-54T9GiM@zx2c4.com>
- <Zmo9-YGraiCj5-MI@zx2c4.com>
- <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
- <Zmrkkel0Fo4_g75a@zx2c4.com>
- <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
- <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
- <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
- <ZnCDgdg1EH6V7w5d@pc636>
- <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
- <ZnFT1Czb8oRb0SE7@pc636>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ACF513AD12;
+	Tue, 18 Jun 2024 17:06:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.57.73
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718730412; cv=fail; b=dfPFGxCOMXXOtbAo3RA5SUEjsC/QlSrESLXe6GcD7oErkfKMJxIRBR58E6LCnYeU/2gKoxHpvBl6xHFWNjudWNP9LqJy8/vtk5BXRWApVaZOb3uyMlRbv/CY/i62P6JiFd5qdDeeNQbQmKQhvrYuGJIVup+nOwVXHDB+E25Wpaw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718730412; c=relaxed/simple;
+	bh=Iu0KXbmaSbcHGv+qwxX7KvdlFvAuc6tP2WDDM+laUrY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iuDuN+FEqEitXCsfiMsiwrnmmzas+BYe03jRI0GpDuFAls+EvvgnEsQqtNAEfaSjLWqabBY6qeQn4ik87qAepHF6L0UnDrrjPQMeYahJAwioLabxJwM92js+DgXnI48KbGC8NGgkpk31gscEgDQNHdADSJsFuV+2M1CqZ4lnZN4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=hQgI7JIu; arc=fail smtp.client-ip=40.92.57.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=VdrhjlRXS16MtRUS90zrssAPnAofUbvBeQyTFFTgE39nQRDCBHuOvZeuLCeODxPn9H250zXhrJsB2UkJvlEhIt1EFzXO/u3KuASqj/QLjIo97FUgKFnoFtuChYD/VJhh3B2YIvISQAiHe3MgLcQjomeeSIOXQcLC9PbX+bHkoMzN1btXJoWk903Vo/teh6gHcieLn8V2t0eFYYZlC/+ElwmkVpHaPGWsybxEmu2OxAsWuQgcW5D/L8ik+ngXU6eHxhiF6riY8YERifcwfSi9E2RTruwQZX5mUUd5DEcilD6myJR3WljqQHFiA1SNDUxHCejx/VgI2MpSna8FjZ+NUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Iu0KXbmaSbcHGv+qwxX7KvdlFvAuc6tP2WDDM+laUrY=;
+ b=LujtaQL4cAg712+CXud41OudpSD2uPBa/jmCHP/uf3s+dlSMNWHAaUB7a9YmgbmL9HembIbBlm7AjLDv27vQLNUeGwmRSwjOv3TAEuDLN/xcfEJR7dYzkyvj2lOzoLZ6Va6+wDJjMoeat0YUWw8EOdwbXKt08UVBbVFOWOV3i/NHsuSmyTE+s2LeKLyI1Ad1eCUM/igA29kDrrRUbqxcx1rI2ixJc9GIvyjm56xNfbrMc9UtPD0Ecv6xBlEfkSmsczE/rxKQoGg3PYG20+2GYO4ltU/KBqCMDjJYNKhxTrHLurMb+17SDAw9fBOo6oOo4OSh107so4XlEtIzqVjz1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Iu0KXbmaSbcHGv+qwxX7KvdlFvAuc6tP2WDDM+laUrY=;
+ b=hQgI7JIux7IBRlgqVA5XLR9YBMB/c3cJ58ilNQNvaG10xoEmKHRqdxgmXikrQLahwWZ2bLLWSuc0OgmSUwackkPli1PEMwJ7Ex/NfODbxzqwIt5QXie84QN1XK7uhNO7wdMZcuL+hgNEbDCh9OkRCJkiVNRt0HNjYdA3nJUWMnUqpEqSfp9HTkC7bE73O0HQZr9yN77sR5zGwURHz3yWkZ+m7ggUzyGJcD2yFsvBYMbXOWImjC/JzOi0fyV0P9AlxrIg9B0277Nt9s7xYWQ2eLSQOYUpqs05ZEJrjDzGEulSkNgm+86NZq/UOZUaFAazgZw9QGnx8x30ThNZq0dNdQ==
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
+ by PAXP194MB1469.EURP194.PROD.OUTLOOK.COM (2603:10a6:102:1a8::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.30; Tue, 18 Jun
+ 2024 17:06:48 +0000
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7677.030; Tue, 18 Jun 2024
+ 17:06:47 +0000
+From: Luigi Leonardi <luigi.leonardi@outlook.com>
+To: mvaralar@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	luigi.leonardi@outlook.com,
+	marco.pinn95@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	sgarzare@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next 2/2] vsock/virtio: avoid enqueue packets when work queue is empty
+Date: Tue, 18 Jun 2024 19:05:54 +0200
+Message-ID:
+ <AS2P194MB2170E2A932679C37B87562539ACE2@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <jjewa7jiltjnoauat3nnaeezhtcwi6k4xf5mkllykcqw4gyfgi@glwzqxp5r76q>
+References: <jjewa7jiltjnoauat3nnaeezhtcwi6k4xf5mkllykcqw4gyfgi@glwzqxp5r76q>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [AgMXQ0+TrTSac1IRUDK8vMcI5sKrDLqn]
+X-ClientProxiedBy: MI1P293CA0013.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:2::15) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:20b:642::8)
+X-Microsoft-Original-Message-ID:
+ <20240618170553.48483-2-luigi.leonardi@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZnFT1Czb8oRb0SE7@pc636>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|PAXP194MB1469:EE_
+X-MS-Office365-Filtering-Correlation-Id: e10ddb0e-e87c-4bb8-b6a9-08dc8fb9097e
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199025|3412199022|440099025|1710799023;
+X-Microsoft-Antispam-Message-Info:
+	GXLH3XrMs99QVvm2DSUDQPUrv9wsWA2RqpYolBzgjeeTD57nczT3wNvcqQV1DpkH4rO40ixDWL37BK5TciCPZ2BiQPW+r0/En1Da3sGyoT+1ZnMLZZQPzYcN67xZP0r3Nu/nxvbPOHGFSz0OrHB5pzZ/qRrGo0wk1E1WexTcXvyLEuNqcAK2PbO8yoHsD53IDnb6VNhs8ooyGiDgN0vge2mkeXs/tfsKrYm5gTP9gFX8iEYf9ydTu9KIrVH99VoSkZKN0uBwDHuFV7CSRL/yt/ROfvGw37eClxNA3rEWPuDliRWFjBpFljAjtq6qady45SP5nQAA6QutwHUgntEXb55/kx6u1zLva+JswA7pP2604mA1VZ6o69LAwAYg0gcjQsFZDsBJ8K9WPDJYwKvJWTIfgUPr72IH2KzHssg6lTpRICEyTIs5acHPCAqc6pRkTtE+CWBGfIMxfGHKmDIw5xcyJXXlA6P91rWbEw62iGrS4xU7USNeHqfp6BcfLMxV4AVuzzOy1bsjebbgRhZvo+DF7d3acQyiGv42Tj0aJb3Zfsa0IwEKA2MF+RTYuXQtlsvLBSBuSvfMwv66Dg+U2VIMxjzDY+ONVMHjonYPFVewgH+gqJKl/bGDc2e7ByEo
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?THM3jP8BrBcgpi/9SXSbdazmP9E83RetHPss/bn9InqdiB+usQ2VxGdGgivh?=
+ =?us-ascii?Q?woazaDPnTgZWyYvOq8OlcOfMMfz5Vjkj34l6QCzTirF85MYU4nWdLPjkW6U+?=
+ =?us-ascii?Q?WjKWDe8YeBaBouVIAu6phBLUv1V99cyit08z00VFKn+VkOTJ3tS1iJt+r4Ry?=
+ =?us-ascii?Q?UfkJ13Tr9sgxyuAp0W9hwGblPBYOJmlJLXyI97wVF36fdvGZwiewEPc19P1V?=
+ =?us-ascii?Q?lF3mEfMbkMnKACUTWy8VNKQXUzcQ7w6u5HYlaNkm8WF6dsnCn6VK7p2MTbFK?=
+ =?us-ascii?Q?LyxFPcFGeV7iv7dqJcBv370bFq0QlzZCFwCTarwft4AvBE+uEJWvDjRMPsFX?=
+ =?us-ascii?Q?eB4kdfwdeXVVUidKWgpACMc5GhLNDiWcrgqiG/RAfKNCl6fjdALI3Xjt3/Q0?=
+ =?us-ascii?Q?Ly6g14QCTto4vge6IzdcPy+Rl5CMSeFqIKHNafaR7RR1W4ESzlixU2pFFi7o?=
+ =?us-ascii?Q?2svnaeJlYY9f3POgPPLQWwbGW41CNvd0XKyl+EH2XZB3sl0YZl/go+VdDazx?=
+ =?us-ascii?Q?grQW6RKB8yRuF2bJTM/f8JgjaI/wj6NH2SVKbj7lhGhOZe4L/ntktzQTRwGX?=
+ =?us-ascii?Q?cdhDV4b+CHqlJRwSE7/gf4d7xKI/EIXp3FEyHmX5nE2hGGzWw/qGM7AGdt+H?=
+ =?us-ascii?Q?k83oS6yZWKvyfKq3pLoBXnsRtBImdOZREorztGBIEzVOu3OQ2PNfVqUPugqD?=
+ =?us-ascii?Q?k89BElELL2jXfq+e9guOVYogBF/gkGDMwUP7+0fudGHbOQFFnge6RguPw4l/?=
+ =?us-ascii?Q?9lcOravW7zTwynag62/7o9CheY0NNTfPBEdEejSw16IXVTH4wvEBG+XFWVM4?=
+ =?us-ascii?Q?kc1eP+Kp58fUFFFP0lHg6lfpU9rXHDfP/hxJm/Ep3uc79WyTzvoNNqcyObSZ?=
+ =?us-ascii?Q?PA/xnyXgPK8ZZcTRJUTNyKzp6gSBTx6nJyFlZi3AyADW9d6mh9t0rBY9bVHe?=
+ =?us-ascii?Q?dNQ467goQk9VkiqvuyRRwo5lJsy8QCxgCT7ACe6YInY6ZQ1y6JtFjR4oeza2?=
+ =?us-ascii?Q?sge8EVuS7fP7FNyC5hoV+cloCQrLg+gvMpSGtsYOnsg7IjHSuEODeqsHWma8?=
+ =?us-ascii?Q?Zb8IOGR+5Iv7qKbuc367J6tb0GmnSCD+/aDnYJkiiFpa+X28gxucLzkSF7WY?=
+ =?us-ascii?Q?6nlewSLsVbfGByywqu6Sn4yJhgvhitQrmpOVUWEri09+eAtRs8TWigGW+BLn?=
+ =?us-ascii?Q?gzA/VI95UuAhVHCJrBIkbc3UDDS8VcUyXSkL1ciHsPWGbHJJIx72Xlmhqb7R?=
+ =?us-ascii?Q?B0k4EulATAXdETj6MWfi?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e10ddb0e-e87c-4bb8-b6a9-08dc8fb9097e
+X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jun 2024 17:06:47.4068
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXP194MB1469
 
-On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
-> > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
-> > >> +
-> > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
-> > >> +
-> > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
-> > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
-> > > wanted to avoid initially.
-> > 
-> > I wanted to avoid new API or flags for kfree_rcu() users and this would
-> > be achieved. The barrier is used internally so I don't consider that an
-> > API to avoid. How difficult is the implementation is another question,
-> > depending on how the current batching works. Once (if) we have sheaves
-> > proven to work and move kfree_rcu() fully into SLUB, the barrier might
-> > also look different and hopefully easier. So maybe it's not worth to
-> > invest too much into that barrier and just go for the potentially
-> > longer, but easier to implement?
-> > 
-> Right. I agree here. If the cache is not empty, OK, we just defer the
-> work, even we can use a big 21 seconds delay, after that we just "warn"
-> if it is still not empty and leave it as it is, i.e. emit a warning and
-> we are done.
-> 
-> Destroying the cache is not something that must happen right away. 
+Hi Stefano and Matias,
 
-OK, I have to ask...
+@Stefano Thanks for your review(s)! I'll send a V2 by the end of the week.
 
-Suppose that the cache is created and destroyed by a module and
-init/cleanup time, respectively.  Suppose that this module is rmmod'ed
-then very quickly insmod'ed.
+@Matias
 
-Do we need to fail the insmod if the kmem_cache has not yet been fully
-cleaned up?  If not, do we have two versions of the same kmem_cache in
-/proc during the overlap time?
+Thanks for your feedback!
 
-							Thanx, Paul
+> I think It would be interesting to know what exactly the test does
 
-> > > Since you do it asynchronous can we just repeat
-> > > and wait until it a cache is furry freed?
-> > 
-> > The problem is we want to detect the cases when it's not fully freed
-> > because there was an actual read. So at some point we'd need to stop the
-> > repeats because we know there can no longer be any kfree_rcu()'s in
-> > flight since the kmem_cache_destroy() was called.
-> > 
-> Agree. As noted above, we can go with 21 seconds(as an example) interval
-> and just perform destroy(without repeating).
-> 
-> --
-> Uladzislau Rezki
+It's relatively easy: I used fio's pingpong mode. This mode is specifically
+for measuring the latency, the way it works is by sending packets,
+in my case, from the host to the guest. and waiting for the other side
+to send them back. The latency I wrote in the commit is the "completion
+latency". The total throughput on my system is around 16 Gb/sec.
+
+> if the test is triggering the improvement
+
+Yes! I did some additional testing and I can confirm you that during this
+test, the worker queue is never used!
+
+> If I understand correctly, this patch focuses on the
+> case in which the worker queue is empty
+
+Correct!
+
+> I think the test can always send packets at a frequency so the worker queue
+> is always empty. but maybe, this is a corner case and most of the time the
+> worker queue is not empty in a non-testing environment.
+
+I'm not sure about this, but IMHO this optimization is free, there is no
+penalty for using it, in the worst case the system will work as usual.
+In any case, I'm more than happy to do some additional testing, do you have
+anything in mind?
+
+Luigi
 
