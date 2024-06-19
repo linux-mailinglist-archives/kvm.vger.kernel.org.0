@@ -1,118 +1,133 @@
-Return-Path: <kvm+bounces-35619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35632-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 264ECA1331F
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 07:30:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97179A13564
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 09:33:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E5983A72C9
-	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 06:30:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A2AD3A4913
+	for <lists+kvm@lfdr.de>; Thu, 16 Jan 2025 08:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4171917F4;
-	Thu, 16 Jan 2025 06:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB541D5CE3;
+	Thu, 16 Jan 2025 08:32:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mvgeZedZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FpbUqyUK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A71324A7E8;
-	Thu, 16 Jan 2025 06:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208931991BB;
+	Thu, 16 Jan 2025 08:32:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737009036; cv=none; b=oKf9tcLA0dKCVXWMjK6ifEISl5ogYnNKawFsmOxcVvBmWw4CjoubC8FJCLYml9vChFYmf/hrVec2m+g22bKruJ+EWsWHcszTSdJE52Vm2e/FsaglxavskHiqGEtVrXsBq3H5VsILMyv8sQydZR3wjS84FfS7xtIK56AE1ZWmrf8=
+	t=1737016375; cv=none; b=j1tUTEGo7GI+WqulOlrqnNk6w24aKxO4sg4okuD7mv8Wagrgi22IAoXmzLWiQ6AIogXblTPN0K+ZQ4pw61EpC3DI69w/3w+Bq7f9DF5ElrmnV7zzm6U3lEN+1GtGm2NzCjGaLUzGas8VQoj76V31UMdl0LtWjNnTuZugXu1a+jA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737009036; c=relaxed/simple;
-	bh=ut1JOVcPzfgRH2hUsRRNYPuANJf/H9HJMFbAwMwApUk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eqBQHVzQyD5z9Cg8h5EpMNbUwhFSwgZZAl0meN3AtX0QVw/cK0SZEBeR/FyL3BDJzRiBI6ahaHurRkzWHXj8tu2nIuCS0gIE7qXuk022JlcWJWTi/PYGgtUVEiwmitZT500DIzFxp6vD1F6vFQG8Bid8y0MolKny42Q7vsX3jOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mvgeZedZ; arc=none smtp.client-ip=192.198.163.7
+	s=arc-20240116; t=1737016375; c=relaxed/simple;
+	bh=VGrWjvhJhhUTVfrWrN34OBRcBc2wi3Pd0KUwUFHy7HQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bxkPozW8rm+LQB4zHiZtAlMrwtzGlC4v42OR5NW8m9OAmowdi8tNyHFHoFROSl4vL78hL26O3eGrUY5Wq3I+q38ORnKt4tVlO6X1VayeX9wnIAuh7wfxaggTiayscQ9XSfTHGTqp86zcjum1k+aMln8JITKY4Cx3JRITmtg31Io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FpbUqyUK; arc=none smtp.client-ip=198.175.65.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737009036; x=1768545036;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ut1JOVcPzfgRH2hUsRRNYPuANJf/H9HJMFbAwMwApUk=;
-  b=mvgeZedZrnvB2F1F3+7z9wkuoPxiY+SDtZE7kp2QW49Eh2dsz6R3A2hW
-   GLZBA6No0OSU3oN2QiO6oQoFGtEc1KoumgZpu9kSot8B+tNXV4+VVRgpn
-   BLHd3VwwATlVjQRHPuitEbdwt/b29AZdS/T2QuLBq915P4sx6PBbOrgYJ
-   Zf8HuWt3JakpNUWHUmJPxfuviggHkmc0ZQnK8TbC4ZZDdgZrY4gNXUqlH
-   Diyp2hgpehP2GFMKusI3yZhYsXel4VJKaSHsEkMRmkNjEpQiuqm6/Cvb8
-   EDbD4rtIHCaY6E4fmOQg8wQnYL4MJefJ0HnJVY2gVHPtPtPqMqUI0SBAS
-   g==;
-X-CSE-ConnectionGUID: eifLsZ3cTpG9nyC5mJweBQ==
-X-CSE-MsgGUID: 3dgNwhg4SF6vZQ3spa7k1w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="62748753"
+  t=1737016375; x=1768552375;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VGrWjvhJhhUTVfrWrN34OBRcBc2wi3Pd0KUwUFHy7HQ=;
+  b=FpbUqyUKLgNFG+nm4yXJRJDWyBwnf0z1xzDuLj9Z3J1Rc2u3Ltw1alVK
+   PP+QQavVU5rkVuz/09G0G+2wR0HHKatirlmGHtVjxuLbegtpPyzV1Nsvt
+   YdfvKLVmGH/1a/CKClV7DYe+r5nVbq+qFpvl0vlK3BGMmVFVEmUwxa5KT
+   +AGUSWlkekrxiZU1tg8V0P2EwdEvd6KcUiGHLOm3YXy1zWxIyuE4Zay04
+   f1Q5QkSt+24xj+V/7H5HoiejBlQW8Kv14s/oLT45VfhaTd3CN0pSKwnLf
+   cJ3p2Ie9nVzTf58MWbUaGTPfp4X+TZLPZCbF+OrbC1AhoTSxlaxsx1yFC
+   w==;
+X-CSE-ConnectionGUID: 1QgLggWiTjut7nKEhpRSHg==
+X-CSE-MsgGUID: uDgruy7WQwmwzXcimfQ5Wg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11316"; a="48782703"
 X-IronPort-AV: E=Sophos;i="6.13,208,1732608000"; 
-   d="scan'208";a="62748753"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 22:30:35 -0800
-X-CSE-ConnectionGUID: mKgRXg2bRKmgkMYJmmbVYw==
-X-CSE-MsgGUID: xv/nDJXJTqmrs6EZSu9ZsA==
+   d="scan'208";a="48782703"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jan 2025 00:32:54 -0800
+X-CSE-ConnectionGUID: RHQ6cZtPQfClhhKO2tTqFw==
+X-CSE-MsgGUID: eaHL4luvRdGgumdMQzCsTA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,208,1732608000"; 
-   d="scan'208";a="105923393"
-Received: from dliang1-mobl.ccr.corp.intel.com (HELO [10.238.10.216]) ([10.238.10.216])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jan 2025 22:30:32 -0800
-Message-ID: <5c220a51-d956-4434-992b-8f97f8d00922@linux.intel.com>
-Date: Thu, 16 Jan 2025 14:30:30 +0800
+   d="scan'208";a="105178638"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa009.jf.intel.com with ESMTP; 16 Jan 2025 00:32:49 -0800
+Date: Thu, 20 Jun 2024 07:39:36 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jason Gunthorpe <jgg@nvidia.com>,
+	Christian =?utf-8?B?S8O2bmln?= <christian.koenig@amd.com>,
+	Leon Romanovsky <leonro@nvidia.com>, kvm@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-media@vger.kernel.org,
+	linaro-mm-sig@lists.linaro.org, sumit.semwal@linaro.org,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com, aik@amd.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	leon@kernel.org, baolu.lu@linux.intel.com, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 01/12] dma-buf: Introduce dma_buf_get_pfn_unlocked()
+ kAPI
+Message-ID: <ZnNsOOqM4ziy2reV@yilunxu-OptiPlex-7050>
+References: <58e97916-e6fd-41ef-84b4-bbf53ed0e8e4@amd.com>
+ <Z38FCOPE7WPprYhx@yilunxu-OptiPlex-7050>
+ <Z4F2X7Fu-5lprLrk@phenom.ffwll.local>
+ <20250110203838.GL5556@nvidia.com>
+ <Z4Z4NKqVG2Vbv98Q@phenom.ffwll.local>
+ <20250114173103.GE5556@nvidia.com>
+ <Z4d4AaLGrhRa5KLJ@phenom.ffwll.local>
+ <20250115093234.GB6805@lst.de>
+ <20250115133419.GN5556@nvidia.com>
+ <20250116053348.GA24046@lst.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/7] fixup! KVM: TDX: Implement hooks to propagate changes
- of TDP MMU mirror page table
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: pbonzini@redhat.com, seanjc@google.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, rick.p.edgecombe@intel.com,
- kai.huang@intel.com, adrian.hunter@intel.com, reinette.chatre@intel.com,
- xiaoyao.li@intel.com, tony.lindgren@intel.com, dmatlack@google.com,
- isaku.yamahata@intel.com, isaku.yamahata@gmail.com
-References: <20250113020925.18789-1-yan.y.zhao@intel.com>
- <20250113021301.18962-1-yan.y.zhao@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20250113021301.18962-1-yan.y.zhao@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250116053348.GA24046@lst.de>
 
+On Thu, Jan 16, 2025 at 06:33:48AM +0100, Christoph Hellwig wrote:
+> On Wed, Jan 15, 2025 at 09:34:19AM -0400, Jason Gunthorpe wrote:
+> > > Or do you mean some that don't have pages associated with them, and
+> > > thus have pfn_valid fail on them?  They still have a PFN, just not
+> > > one that is valid to use in most of the Linux MM.
+> > 
+> > He is talking about private interconnect hidden inside clusters of
+> > devices.
+> > 
+> > Ie the system may have many GPUs and those GPUs have their own private
+> > interconnect between them. It is not PCI, and packets don't transit
+> > through the CPU SOC at all, so the IOMMU is not involved.
+> > 
+> > DMA can happen on that private interconnect, but from a Linux
+> > perspective it is not DMA API DMA, and the addresses used to describe
+> > it are not part of the CPU address space. The initiating device will
+> > have a way to choose which path the DMA goes through when setting up
+> > the DMA.
+> 
+> So how is this in any way relevant to dma_buf which operates on
+> a dma_addr_t right now and thus by definition can't be used for
+> these?
 
+One part of dma-buf is the fd-based machanism for exporters to share
+buffers across devices & subsystems, while still have buffer's lifetime
+controlled by exporters.  Another part is the way the importers use
+the buffer (i.e. the dma_addr_t based kAPI).
 
+The fd-based exporting machanism is what we want to dmaareuse for buffer
+sharing. But we are pursuing some extended buffer sharing and DMA usage
+which doesn't fit into existing DMA API mapping, e.g. for GPA/userspace
+IOVA accessing, or IIUC other side channel DMA, multi-channel DMA ...
 
-On 1/13/2025 10:13 AM, Yan Zhao wrote:
-> Return -EBUSY instead of -EAGAIN when tdh_mem_sept_add() encounters any err
-> of TDX_OPERAND_BUSY.
->
-> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
-> ---
->   arch/x86/kvm/vmx/tdx.c | 5 +++--
->   1 file changed, 3 insertions(+), 2 deletions(-)
->
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index 09677a4cd605..4fb9faca5db2 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -1740,8 +1740,9 @@ int tdx_sept_link_private_spt(struct kvm *kvm, gfn_t gfn,
->   
->   	err = tdh_mem_sept_add(to_kvm_tdx(kvm)->tdr_pa, gpa, tdx_level, hpa, &entry,
->   			       &level_state);
-> -	if (unlikely(err == TDX_ERROR_SEPT_BUSY))
-> -		return -EAGAIN;
-> +	if (unlikely(err & TDX_OPERAND_BUSY))
-
-Some issue here as mentioned in the previous patch.
-
-> +		return -EBUSY;
-> +
->   	if (KVM_BUG_ON(err, kvm)) {
->   		pr_tdx_error_2(TDH_MEM_SEPT_ADD, err, entry, level_state);
->   		return -EIO;
-
+Thanks,
+Yilun 
 
