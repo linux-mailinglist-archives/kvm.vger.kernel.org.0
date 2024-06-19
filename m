@@ -1,147 +1,98 @@
-Return-Path: <kvm+bounces-19924-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19925-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22E2690E362
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 08:28:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4B0690E415
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 09:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AD8A1C23415
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 06:28:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4495D1F23C9A
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 07:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324016D1B4;
-	Wed, 19 Jun 2024 06:28:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272FE757F3;
+	Wed, 19 Jun 2024 07:11:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b="V0twpEms"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="VQtpHdXo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8266BB33
-	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 06:28:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5B46139;
+	Wed, 19 Jun 2024 07:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718778518; cv=none; b=Ic1YnkmktViXKExrjpION4F9tasA8356wAhd6yvU9bNUIC1uSQkKYMtj5XthwgbNDyaa1omtE0afrUEFVzU0wvhxG3CDHEs5IkOnbpBFcJlbbM4zsAxPb+1/goAXsqL/kQzUJIEbm7X2dAb7q7JDGlS7LmSpX3uRuIpIv7N7wI8=
+	t=1718781114; cv=none; b=sSETAqWBYXsZz7apqrZT3OkcdgVP4ttwA2Tj5KiDZe3Yx6CtayML/1wIgKG777TEQOHfRw8h1r7akjuT2AC0vGRPBYaUI9fELfi+1Ax98xKK4bEOIA5gXPlAmsZDj5qooNrRf+V8pOM+2D7FSiUP2NM6P9YgrgXazbsQZMEYCi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718778518; c=relaxed/simple;
-	bh=7B/kXtoNela2Io9cwIyvyV6hQdiRl08PQhP5Nb1KpUc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OQFA6I+dxZxZb/ciNDHtU5IjkeidwVdIKDw6ytMqI61LPm2y+JHIztXkHFHHK9z51qURIbsgc5wYEJbfgPxnazxvCoddKafHc/m9yuNg2mFSG8o+7ua41Chk90B1dw4wlOuv8W9NMlblBdRT+gleFFtYTj/nLsRz71auO7R1Be0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net; spf=pass smtp.mailfrom=opensrcsec.com; dkim=pass (2048-bit key) header.d=grsecurity.net header.i=@grsecurity.net header.b=V0twpEms; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=grsecurity.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensrcsec.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ebe0a81dc8so66551001fa.2
-        for <kvm@vger.kernel.org>; Tue, 18 Jun 2024 23:28:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=grsecurity.net; s=grsec; t=1718778514; x=1719383314; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=r4B3sv9t3XzOxxWpo+MGeTh8MGOoofV5d/OJ3PnZP4A=;
-        b=V0twpEms6ID0pZAahg5coGOalgqk92oDHi96JijBwTW/kf1UFxMbdkDoPl8h7FzIfn
-         6PhPswip614VwP/R8klQ6+CHThHMbH6OEpY15wbLElMPpUOQpIgMCRwhZOEVNDxah/Tb
-         TjC8bIMUdWZ9xI+aIuk4aQvDwAG1btg9IXbAfj5DTG5PYqL0c35bYL++6939ExiE0e2F
-         TnQIVRDxnVm7LCENX1OvA+6bw9r+Zrid4RfluY599oeg75ma7A6pwTfnMcd2QNHiZr2f
-         oPhQsIaMmBR+fxO2CN4Umxj75b9RDRwi5wdEVsP+mc40uLv2uY3TDJGsdVePRBLbP0EP
-         Vmng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718778514; x=1719383314;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r4B3sv9t3XzOxxWpo+MGeTh8MGOoofV5d/OJ3PnZP4A=;
-        b=njhIavAVmRMoMk6Q696vf2ELcwH9H+0+tMiKtKSVM/gzsB8ueVtMj7N+NZ0nO2TjKn
-         aGmudibq87B0Ss0GssjLQEzVHHCG08/POKQ0kfgQrpmeJF865168a9iHGyG8/brOg1Rv
-         49BTBMbD5t1vFGW0oR4NzEfZnwoHeYujapxvbq3L6CP8i16Ws4fmu4uAKPNnLHIh4Yy4
-         NZau2A/6nPwsI6gBPtQVn7D5OPZLptR97pJ2rUCjhAdgMhKoLXUjggydpK75gYzGrMAi
-         BzZlQeb6w6yL4iwus8+NFQUco7ncT9xdPGSCzHaky4NCRvLgfSiyPnsbk5NlyNz5Jlj9
-         pkIQ==
-X-Gm-Message-State: AOJu0YwXxm0iRiXexuntcCrA4dkCFxqFiiMW1bQT1J4lwPEplNJEtTdA
-	NHUaHVoxHDOD2ubjOGGOvXE/FgjlHKvYOquH4tGtIj2HxoYpTOfYbrXi3O2UIGVTdMAi/iQMHZo
-	q
-X-Google-Smtp-Source: AGHT+IGy1KWsNYh7LDHfZiibSelfPGx3iZv2trzkDqdetJFLEG4g56xBD9XU/fFJVddanY53SClPAA==
-X-Received: by 2002:ac2:5459:0:b0:52c:1d8a:9716 with SMTP id 2adb3069b0e04-52ccaa33d0fmr1005805e87.19.1718778514514;
-        Tue, 18 Jun 2024 23:28:34 -0700 (PDT)
-Received: from ?IPV6:2003:f6:af24:6f00:6a55:ce52:a405:13f2? (p200300f6af246f006a55ce52a40513f2.dip0.t-ipconnect.de. [2003:f6:af24:6f00:6a55:ce52:a405:13f2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3607510340fsm16204298f8f.93.2024.06.18.23.28.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 Jun 2024 23:28:34 -0700 (PDT)
-Message-ID: <10b6e1aa-1ded-4447-9c97-2b054d563e48@grsecurity.net>
-Date: Wed, 19 Jun 2024 08:28:34 +0200
+	s=arc-20240116; t=1718781114; c=relaxed/simple;
+	bh=I6BMr7urVqkHRkOofvwW7G9049g5an3rHmjy9UpkPkA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gj/ML2GxISDSbNgI9aupawTf0uCs7SkIlLXbmCWi3BcCFNIUDVbHfd5gxGQq4kZwPBTPtfCxbhM0pTnsEFbRfG7xVSNor95Zyg8ScnJCKwHZQtgaXjLSdsB2XwTn/ERG8PHNm/2YQErN/7tHhX80jzUwXf7l08Advsn/pOcRlfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=VQtpHdXo; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=nlvFZMAkvLJTfCK9T+AzrUEhqJZvzchat7YFdkYhZjU=; b=VQtpHdXoL7GZYinBbsHYIYbzDU
+	AINMRCs7yQegfWh++V179ldiyB514epJ6Yu3xhLVriMWd5FGjs+g6yfQcQIOVNj/Lj1lgRHcQPcez
+	8ZXikCaXeIpkP3IxpebzOgKgqEkNkfo4XmqVhwWBb5eHIsN1zsaCE7jpRSRnTGFlvBeAzDJ/lyENB
+	ZJLoUOtPCGcQg+4wLvbHH2bzJOsmHpV32pUqd7ewSBeU7EYvi/00upJ/0nC2RXPx+jvTele1/C0Uy
+	TxPD5ah7MAbBiTNrJr7O4ie00KzdzSD1o6o3RLhG4Z2G9VyllEw+nqdX4dQ2WlJ7jw83Aq67GTRjC
+	Idy9gOZw==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sJpU0-000000009BV-147R;
+	Wed, 19 Jun 2024 07:11:52 +0000
+Date: Wed, 19 Jun 2024 00:11:52 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Gerd Bayer <gbayer@linux.ibm.com>,
+	Matthew Rosato <mjrosato@linux.ibm.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] vfio/pci: Tolerate oversized BARs by disallowing
+ mmap
+Message-ID: <ZnKEuCP7o6KurJvq@infradead.org>
+References: <20240529-vfio_pci_mmap-v3-0-cd217d019218@linux.ibm.com>
+ <20240529-vfio_pci_mmap-v3-2-cd217d019218@linux.ibm.com>
+ <20240618095134.41478bbf.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 0/5] KVM: Reject vCPU IDs above 2^32
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>
-References: <20240614202859.3597745-1-minipli@grsecurity.net>
- <171874680480.1901529.15135385772186699569.b4-ty@google.com>
-Content-Language: en-US, de-DE
-From: Mathias Krause <minipli@grsecurity.net>
-Autocrypt: addr=minipli@grsecurity.net; keydata=
- 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
- RzDVkdgPJkL/NFTKZHo5foFXNi89kA==
-In-Reply-To: <171874680480.1901529.15135385772186699569.b4-ty@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240618095134.41478bbf.alex.williamson@redhat.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On 18.06.24 23:41, Sean Christopherson wrote:
-> On Fri, 14 Jun 2024 22:28:54 +0200, Mathias Krause wrote:
->> This small series evolved from a single vCPU ID limit check to
->> multiple ones, including sanity checks among them and enhanced
->> selftests.
+On Tue, Jun 18, 2024 at 09:51:34AM -0600, Alex Williamson wrote:
+> > -		if (!resource_size(res))
+> > +		if (!resource_size(res) ||
+> > +		    resource_size(res) > (IOREMAP_END + 1 - IOREMAP_START))
+> >  			goto no_mmap;
+> >  
+> >  		if (resource_size(res) >= PAGE_SIZE) {
+> > 
 > 
-> Applied to kvm-x86 generic, with a few tweaks (emails incoming).  Thanks!
+> A powerpc build reports:
 > 
-> [1/5] KVM: Reject overly excessive IDs in KVM_CREATE_VCPU
->       https://github.com/kvm-x86/linux/commit/8b8e57e5096e
-> [2/5] KVM: x86: Limit check IDs for KVM_SET_BOOT_CPU_ID
->       https://github.com/kvm-x86/linux/commit/7c305d5118e6
-> [3/5] KVM: x86: Prevent excluding the BSP on setting max_vcpu_ids
->       https://github.com/kvm-x86/linux/commit/d29bf2ca1404
-> [4/5] KVM: selftests: Test max vCPU IDs corner cases
->       https://github.com/kvm-x86/linux/commit/4b451a57809c
-> [5/5] KVM: selftests: Test vCPU boot IDs above 2^32
->       https://github.com/kvm-x86/linux/commit/438a496b9041
+> ERROR: modpost: "__kernel_io_end" [drivers/vfio/pci/vfio-pci-core.ko] undefined!
+> 
+> Looks like only __kernel_io_start is exported.  Thanks,
 
-Looking good, thanks Sean!
+And exported code has no business looking at either one.
 
-Mathias
+I think the right thing here is a core PCI quirk to fix the BAR
+size of the ISM device instead of this hack in vfio.
+
 
