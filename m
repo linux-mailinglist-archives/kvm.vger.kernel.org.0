@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-20016-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20017-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE82E90F90E
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 00:36:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11A9F90F910
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 00:37:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F891B2136B
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 22:36:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9682282A0B
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 22:37:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1C515B157;
-	Wed, 19 Jun 2024 22:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BF5D15B97A;
+	Wed, 19 Jun 2024 22:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="efXdoIgL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="emEu+3dk"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4114654D;
-	Wed, 19 Jun 2024 22:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E69078B4C;
+	Wed, 19 Jun 2024 22:36:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718836585; cv=none; b=mkKm5B1Z7/w8B97/l7NzXqz4ankmUpGKDnUGT5Vv72iyahE6um6pgd0ZeXF5XD+gqGjVJ+L3gORIt9+F959NCjB8jcHDS4rhuPwDiD4M+030qIelIbixkaVyjF+CN9fWEr/ddDaEtnRuVileA8UjRBSvij4XggDn5KlzL2UM1vQ=
+	t=1718836586; cv=none; b=jXLGlVsN4xPG2j8KeSleQaZpiWHH/biztUwJ2e4FF+TAZqCaHYp/QSV5mw3grxDCF+v+NztBO2lUT0KPzeLH1KO3nafwXBd23vfoKn2nLRKZUujlJYvjVFwRCHHCEcPFJMNJLtY90zxkE4J2hmH43JV5M/SXmUntnM6NDNe8bGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718836585; c=relaxed/simple;
-	bh=VmemIAUgnP3098dvCm7mVzhdbNFuPHYOops+7ZyOUTo=;
+	s=arc-20240116; t=1718836586; c=relaxed/simple;
+	bh=6dxHJHSyzVYkO+5qHI+2tvAIjnNMVt3ppzElFHrEfZQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YZSnYcIq/Mgheb0b/fyr7NyhoLkLfk7kj6nyZA1XeFmTtIWBzNY2eDeixu6DLF650fxGm9TECbcs+Zecpnf1cSWtIbzfr4C3GEtfnOVDgpYd+aP9AVhV7l+ew77Xgc0JlyQThpYe1jdsR06W0YKa6paPygM1Bmis0qNCTJxhCYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=efXdoIgL; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=Z1g8a8PFAC3FA8snbrKjPcFzH4cT7duaJc8kIKhsR+Vi5O5FgXsRD1C3XNcKOwoA8iEK4FD3+wX4rP6UpWVA+OHoJiTZ0tQRGt/Urh+a6dRzO3ncro1jVpUZpxtw7/KgrWxkXvfwuIskIL09VImmp1eY9o99Ps5c5nXQJP2J6GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=emEu+3dk; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718836583; x=1750372583;
+  t=1718836584; x=1750372584;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=VmemIAUgnP3098dvCm7mVzhdbNFuPHYOops+7ZyOUTo=;
-  b=efXdoIgLdfAu0jCZIXIPp/wacNRJtHgEi0qbVmr1QJjvgKaYxl86bgf4
-   0rU5hYIMRamv9CzTNfXuAsd+2DEkvlRi+cafIwNU7p01W0nF+RJAjS40B
-   nRzvir7elQ8x5R2IJbDXUeVjLX8yNrc38aweSw7nFxGSJ6vL2SGb6SxvG
-   aUpDawkzWGRI1MSLlConMTsnjmQVu+eXyJ3xCb9Airdy2c8gwWdC/F1OT
-   0J/2wntLe/QXjaAJ59wssu22dF6o2CrDSje8hbdqqHtNtXQco8yJOU/iR
-   FaDWvvcemYeiDX90/CRYG93LSz28ENeHShg7GXCn+vl2iCbbftj4ja/ZB
+  bh=6dxHJHSyzVYkO+5qHI+2tvAIjnNMVt3ppzElFHrEfZQ=;
+  b=emEu+3dkztJ41bmZs6NRV2YV8OToy8raIBRuwcYiXSWQlrlA1Jjwdl3b
+   ZFc5ODrBv+TI6Vsb4ybdo0tx9ZjWWTchjYDcToxiu8KbwSmpkN+XF4w3u
+   dzI4s5FtSg9cPVO5Y3umZE0HkNWiVjY70vcfyr53clH+9/ZBr4cML5kGM
+   B8B4t1eCSCfaFem+VVO/K2GFHkBPTkhIh8ThJ+4PIAeUWRnw5tSPpZYCq
+   KHMl2l3CGTMkDsExgBYfVm7UnTlrwLv1T6aQlfb5JopgA79DxTfij7aw6
+   iMjD0f3iR0T1pTadMFHTXU897b6mqiQu7LHrP6GPDf9xx4BJUP5qOc47l
    A==;
-X-CSE-ConnectionGUID: 5xZxmEB8SHS9F17/2e2xIg==
-X-CSE-MsgGUID: vNpONqOuQHKykU1iW80Ezg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="15931928"
+X-CSE-ConnectionGUID: gzyFqTKUTWmNnvoz6/UV6g==
+X-CSE-MsgGUID: MLnVaETAQG+FYm8H8jJnew==
+X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="15931931"
 X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
-   d="scan'208";a="15931928"
+   d="scan'208";a="15931931"
 Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 15:36:20 -0700
-X-CSE-ConnectionGUID: ZS6iWqvrReW330pvwa2taA==
-X-CSE-MsgGUID: Hq8nqKhnQECcppOjhIpM4A==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 15:36:21 -0700
+X-CSE-ConnectionGUID: Zn0tsKaISYiqOhNkcnEERw==
+X-CSE-MsgGUID: XgG1c06KQkeBFqHTFleNiQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
-   d="scan'208";a="72793319"
+   d="scan'208";a="72793322"
 Received: from ivsilic-mobl2.amr.corp.intel.com (HELO rpedgeco-desk4.intel.com) ([10.209.54.39])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 15:36:19 -0700
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 15:36:20 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -69,10 +69,11 @@ Cc: kai.huang@intel.com,
 	linux-kernel@vger.kernel.org,
 	sagis@google.com,
 	yan.y.zhao@intel.com,
-	rick.p.edgecombe@intel.com
-Subject: [PATCH v3 01/17] KVM: x86/tdp_mmu: Rename REMOVED_SPTE to FROZEN_SPTE
-Date: Wed, 19 Jun 2024 15:35:58 -0700
-Message-Id: <20240619223614.290657-2-rick.p.edgecombe@intel.com>
+	rick.p.edgecombe@intel.com,
+	Isaku Yamahata <isaku.yamahata@intel.com>
+Subject: [PATCH v3 02/17] KVM: Add member to struct kvm_gfn_range for target alias
+Date: Wed, 19 Jun 2024 15:35:59 -0700
+Message-Id: <20240619223614.290657-3-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240619223614.290657-1-rick.p.edgecombe@intel.com>
 References: <20240619223614.290657-1-rick.p.edgecombe@intel.com>
@@ -84,224 +85,170 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Rename REMOVED_SPTE to FROZEN_SPTE so that it can be used for other
-multi-part operations.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-REMOVED_SPTE is used as a non-present intermediate value for multi-part
-operations that can happen when a thread doesn't have an MMU write lock.
-Today these operations are when removing PTEs.
+Add new members to strut kvm_gfn_range to indicate which mapping
+(private-vs-shared) to operate on: enum kvm_gfn_range_filter
+attr_filter. Update the core zapping operations to set them appropriately.
 
-However, future changes will want to use the same concept for setting a
-PTE. In that case the REMOVED_SPTE name does not quite fit. So rename it
-to FROZEN_SPTE so it can be used for both types of operations.
+TDX utilizes two GPA aliases for the same memslots, one for memory that is
+for private memory and one that is for shared. For private memory, KVM
+cannot always perform the same operations it does on memory for default
+VMs, such as zapping pages and having them be faulted back in, as this
+requires guest coordination. However, some operations such as guest driven
+conversion of memory between private and shared should zap private memory.
 
-Also rename the relevant helpers and comments that refer to "removed"
-within the context of the SPTE value. Take care to not update naming
-referring the "remove" operations, which are still distinct.
+Internally to the MMU, private and shared mappings are tracked on separate
+roots. Mapping and zapping operations will operate on the respective GFN
+alias for each root (private or shared). So zapping operations will by
+default zap both aliases. Add fields in struct kvm_gfn_range to allow
+callers to specify which aliases so they can only target the aliases
+appropriate for their specific operation.
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+There was feedback that target aliases should be specified such that the
+default value (0) is to operate on both aliases. Several options were
+considered. Several variations of having separate bools defined such
+that the default behavior was to process both aliases. They either allowed
+nonsensical configurations, or were confusing for the caller. A simple
+enum was also explored and was close, but was hard to process in the
+caller. Instead, use an enum with the default value (0) reserved as a
+disallowed value. Catch ranges that didn't have the target aliases
+specified by looking for that specific value.
+
+Set target alias with enum appropriately for these MMU operations:
+ - For KVM's mmu notifier callbacks, zap shared pages only because private
+   pages won't have a userspace mapping
+ - For setting memory attributes, kvm_arch_pre_set_memory_attributes()
+   chooses the aliases based on the attribute.
+ - For guest_memfd invalidations, zap private only.
+
+Link: https://lore.kernel.org/kvm/ZivIF9vjKcuGie3s@google.com/
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
 TDX MMU Prep v3:
- - New patch
+ - Fix typo in comment (Paolo)
+ - Remove KVM_PROCESS_PRIVATE_AND_SHARED (Paolo)
+ - Remove outdated reference to exclude_{private,shared} (Paolo)
+ - Set process member in new kvm_mmu_zap_memslot_leafs() function
+ - Rename process -> filter (Paolo)
+
+TDX MMU Prep:
+ - Replaced KVM_PROCESS_BASED_ON_ARG with BUGGY_KVM_INVALIDATION to follow
+   the original suggestion and not populte kvm_handle_gfn_range(). And add
+   WARN_ON_ONCE().
+ - Move attribute specific logic into kvm_vm_set_mem_attributes()
+ - Drop Sean's suggested-by tag as the solution has changed
+ - Re-write commit log
+
+v18:
+ - rebased to kvm-next
+
+v3:
+ - Drop the KVM_GFN_RANGE flags
+ - Updated struct kvm_gfn_range
+ - Change kvm_arch_set_memory_attributes() to return bool for flush
+ - Added set_memory_attributes x86 op for vendor backends
+ - Refined commit message to describe TDX care concretely
 ---
- arch/x86/kvm/mmu/mmu.c     |  2 +-
- arch/x86/kvm/mmu/spte.c    |  2 +-
- arch/x86/kvm/mmu/spte.h    | 10 ++++-----
- arch/x86/kvm/mmu/tdp_mmu.c | 42 +++++++++++++++++++-------------------
- 4 files changed, 28 insertions(+), 28 deletions(-)
+ arch/x86/kvm/mmu/mmu.c   |  6 ++++++
+ include/linux/kvm_host.h |  6 ++++++
+ virt/kvm/guest_memfd.c   |  2 ++
+ virt/kvm/kvm_main.c      | 14 ++++++++++++++
+ 4 files changed, 28 insertions(+)
 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 61982da8c8b2..828c70ead96f 100644
+index 828c70ead96f..f41c498fcdb5 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -3455,7 +3455,7 @@ static int fast_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		 * available as the vCPU holds a reference to its root(s).
- 		 */
- 		if (WARN_ON_ONCE(!sptep))
--			spte = REMOVED_SPTE;
-+			spte = FROZEN_SPTE;
+@@ -7451,6 +7451,12 @@ bool kvm_arch_pre_set_memory_attributes(struct kvm *kvm,
+ 	if (WARN_ON_ONCE(!kvm_arch_has_private_mem(kvm)))
+ 		return false;
  
- 		if (!is_shadow_present_pte(spte))
- 			break;
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index a5e014d7bc62..59cac37615b6 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -383,7 +383,7 @@ void kvm_mmu_set_mmio_spte_mask(u64 mmio_value, u64 mmio_mask, u64 access_mask)
- 	 * not set any RWX bits.
- 	 */
- 	if (WARN_ON((mmio_value & mmio_mask) != mmio_value) ||
--	    WARN_ON(mmio_value && (REMOVED_SPTE & mmio_mask) == mmio_value))
-+	    WARN_ON(mmio_value && (FROZEN_SPTE & mmio_mask) == mmio_value))
- 		mmio_value = 0;
- 
- 	if (!mmio_value)
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index 5dd5405fa07a..86e5259aa824 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -200,7 +200,7 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
- 
- /*
-  * If a thread running without exclusive control of the MMU lock must perform a
-- * multi-part operation on an SPTE, it can set the SPTE to REMOVED_SPTE as a
-+ * multi-part operation on an SPTE, it can set the SPTE to FROZEN_SPTE as a
-  * non-present intermediate value. Other threads which encounter this value
-  * should not modify the SPTE.
-  *
-@@ -210,14 +210,14 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
-  *
-  * Only used by the TDP MMU.
-  */
--#define REMOVED_SPTE	(SHADOW_NONPRESENT_VALUE | 0x5a0ULL)
-+#define FROZEN_SPTE	(SHADOW_NONPRESENT_VALUE | 0x5a0ULL)
- 
- /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
--static_assert(!(REMOVED_SPTE & SPTE_MMU_PRESENT_MASK));
-+static_assert(!(FROZEN_SPTE & SPTE_MMU_PRESENT_MASK));
- 
--static inline bool is_removed_spte(u64 spte)
-+static inline bool is_frozen_spte(u64 spte)
- {
--	return spte == REMOVED_SPTE;
-+	return spte == FROZEN_SPTE;
++	/* Unmap the old attribute page. */
++	if (range->arg.attributes & KVM_MEMORY_ATTRIBUTE_PRIVATE)
++		range->attr_filter = KVM_FILTER_SHARED;
++	else
++		range->attr_filter = KVM_FILTER_PRIVATE;
++
+ 	return kvm_unmap_gfn_range(kvm, range);
  }
  
- /* Get an SPTE's index into its parent's page table (and the spt array). */
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 36539c1b36cd..16b54208e8d7 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -365,8 +365,8 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- 			 * value to the removed SPTE value.
+diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+index c3c922bf077f..8dce85962583 100644
+--- a/include/linux/kvm_host.h
++++ b/include/linux/kvm_host.h
+@@ -260,11 +260,17 @@ union kvm_mmu_notifier_arg {
+ 	unsigned long attributes;
+ };
+ 
++enum kvm_gfn_range_filter {
++	KVM_FILTER_SHARED		= BIT(0),
++	KVM_FILTER_PRIVATE		= BIT(1),
++};
++
+ struct kvm_gfn_range {
+ 	struct kvm_memory_slot *slot;
+ 	gfn_t start;
+ 	gfn_t end;
+ 	union kvm_mmu_notifier_arg arg;
++	enum kvm_gfn_range_filter attr_filter;
+ 	bool may_block;
+ };
+ bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range);
+diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+index 9714add38852..86aaf26c1144 100644
+--- a/virt/kvm/guest_memfd.c
++++ b/virt/kvm/guest_memfd.c
+@@ -109,6 +109,8 @@ static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
+ 			.end = slot->base_gfn + min(pgoff + slot->npages, end) - pgoff,
+ 			.slot = slot,
+ 			.may_block = true,
++			/* guest memfd is relevant to only private mappings. */
++			.attr_filter = KVM_FILTER_PRIVATE,
+ 		};
+ 
+ 		if (!found_memslot) {
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 81b90bf03f2f..93c7b227aae0 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -635,6 +635,11 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hva_range(struct kvm *kvm,
  			 */
- 			for (;;) {
--				old_spte = kvm_tdp_mmu_write_spte_atomic(sptep, REMOVED_SPTE);
--				if (!is_removed_spte(old_spte))
-+				old_spte = kvm_tdp_mmu_write_spte_atomic(sptep, FROZEN_SPTE);
-+				if (!is_frozen_spte(old_spte))
- 					break;
- 				cpu_relax();
- 			}
-@@ -397,11 +397,11 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- 			 * No retry is needed in the atomic update path as the
- 			 * sole concern is dropping a Dirty bit, i.e. no other
- 			 * task can zap/remove the SPTE as mmu_lock is held for
--			 * write.  Marking the SPTE as a removed SPTE is not
-+			 * write.  Marking the SPTE as a frozen SPTE is not
- 			 * strictly necessary for the same reason, but using
--			 * the remove SPTE value keeps the shared/exclusive
-+			 * the frozen SPTE value keeps the shared/exclusive
- 			 * paths consistent and allows the handle_changed_spte()
--			 * call below to hardcode the new value to REMOVED_SPTE.
-+			 * call below to hardcode the new value to FROZEN_SPTE.
- 			 *
- 			 * Note, even though dropping a Dirty bit is the only
- 			 * scenario where a non-atomic update could result in a
-@@ -413,10 +413,10 @@ static void handle_removed_pt(struct kvm *kvm, tdp_ptep_t pt, bool shared)
- 			 * it here.
- 			 */
- 			old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte,
--							  REMOVED_SPTE, level);
-+							  FROZEN_SPTE, level);
- 		}
- 		handle_changed_spte(kvm, kvm_mmu_page_as_id(sp), gfn,
--				    old_spte, REMOVED_SPTE, level, shared);
-+				    old_spte, FROZEN_SPTE, level, shared);
- 	}
+ 			gfn_range.arg = range->arg;
+ 			gfn_range.may_block = range->may_block;
++			/*
++			 * HVA-based notifications aren't relevant to private
++			 * mappings as they don't have a userspace mapping.
++			 */
++			gfn_range.attr_filter = KVM_FILTER_SHARED;
  
- 	call_rcu(&sp->rcu_head, tdp_mmu_free_sp_rcu_callback);
-@@ -490,19 +490,19 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 	 */
- 	if (!was_present && !is_present) {
- 		/*
--		 * If this change does not involve a MMIO SPTE or removed SPTE,
-+		 * If this change does not involve a MMIO SPTE or frozen SPTE,
- 		 * it is unexpected. Log the change, though it should not
- 		 * impact the guest since both the former and current SPTEs
- 		 * are nonpresent.
- 		 */
- 		if (WARN_ON_ONCE(!is_mmio_spte(kvm, old_spte) &&
- 				 !is_mmio_spte(kvm, new_spte) &&
--				 !is_removed_spte(new_spte)))
-+				 !is_frozen_spte(new_spte)))
- 			pr_err("Unexpected SPTE change! Nonpresent SPTEs\n"
- 			       "should not be replaced with another,\n"
- 			       "different nonpresent SPTE, unless one or both\n"
- 			       "are MMIO SPTEs, or the new SPTE is\n"
--			       "a temporary removed SPTE.\n"
-+			       "a temporary frozen SPTE.\n"
- 			       "as_id: %d gfn: %llx old_spte: %llx new_spte: %llx level: %d",
- 			       as_id, gfn, old_spte, new_spte, level);
- 		return;
-@@ -540,7 +540,7 @@ static inline int __tdp_mmu_set_spte_atomic(struct tdp_iter *iter, u64 new_spte)
- 	 * and pre-checking before inserting a new SPTE is advantageous as it
- 	 * avoids unnecessary work.
- 	 */
--	WARN_ON_ONCE(iter->yielded || is_removed_spte(iter->old_spte));
-+	WARN_ON_ONCE(iter->yielded || is_frozen_spte(iter->old_spte));
+ 			/*
+ 			 * {gfn(page) | page intersects with [hva_start, hva_end)} =
+@@ -2450,6 +2455,14 @@ static __always_inline void kvm_handle_gfn_range(struct kvm *kvm,
+ 	gfn_range.arg = range->arg;
+ 	gfn_range.may_block = range->may_block;
  
- 	/*
- 	 * Note, fast_pf_fix_direct_spte() can also modify TDP MMU SPTEs and
-@@ -603,26 +603,26 @@ static inline int tdp_mmu_zap_spte_atomic(struct kvm *kvm,
- 	 * in its place before the TLBs are flushed.
- 	 *
- 	 * Delay processing of the zapped SPTE until after TLBs are flushed and
--	 * the REMOVED_SPTE is replaced (see below).
-+	 * the FROZEN_SPTE is replaced (see below).
- 	 */
--	ret = __tdp_mmu_set_spte_atomic(iter, REMOVED_SPTE);
-+	ret = __tdp_mmu_set_spte_atomic(iter, FROZEN_SPTE);
- 	if (ret)
- 		return ret;
++	/*
++	 * If/when KVM supports more attributes beyond private .vs shared, this
++	 * _could_ set KVM_FILTER_{SHARED,PRIVATE} appropriately if the entire target
++	 * range already has the desired private vs. shared state (it's unclear
++	 * if that is a net win).  For now, KVM reaches this point if and only
++	 * if the private flag is being toggled, i.e. all mappings are in play.
++	 */
++
+ 	for (i = 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
+ 		slots = __kvm_memslots(kvm, i);
  
- 	kvm_flush_remote_tlbs_gfn(kvm, iter->gfn, iter->level);
- 
- 	/*
--	 * No other thread can overwrite the removed SPTE as they must either
-+	 * No other thread can overwrite the frozen SPTE as they must either
- 	 * wait on the MMU lock or use tdp_mmu_set_spte_atomic() which will not
--	 * overwrite the special removed SPTE value. Use the raw write helper to
-+	 * overwrite the special frozen SPTE value. Use the raw write helper to
- 	 * avoid an unnecessary check on volatile bits.
- 	 */
- 	__kvm_tdp_mmu_write_spte(iter->sptep, SHADOW_NONPRESENT_VALUE);
- 
- 	/*
- 	 * Process the zapped SPTE after flushing TLBs, and after replacing
--	 * REMOVED_SPTE with 0. This minimizes the amount of time vCPUs are
--	 * blocked by the REMOVED_SPTE and reduces contention on the child
-+	 * FROZEN_SPTE with 0. This minimizes the amount of time vCPUs are
-+	 * blocked by the FROZEN_SPTE and reduces contention on the child
- 	 * SPTEs.
- 	 */
- 	handle_changed_spte(kvm, iter->as_id, iter->gfn, iter->old_spte,
-@@ -652,12 +652,12 @@ static u64 tdp_mmu_set_spte(struct kvm *kvm, int as_id, tdp_ptep_t sptep,
- 
- 	/*
- 	 * No thread should be using this function to set SPTEs to or from the
--	 * temporary removed SPTE value.
-+	 * temporary frozen SPTE value.
- 	 * If operating under the MMU lock in read mode, tdp_mmu_set_spte_atomic
- 	 * should be used. If operating under the MMU lock in write mode, the
--	 * use of the removed SPTE should not be necessary.
-+	 * use of the frozen SPTE should not be necessary.
- 	 */
--	WARN_ON_ONCE(is_removed_spte(old_spte) || is_removed_spte(new_spte));
-+	WARN_ON_ONCE(is_frozen_spte(old_spte) || is_frozen_spte(new_spte));
- 
- 	old_spte = kvm_tdp_mmu_write_spte(sptep, old_spte, new_spte, level);
- 
-@@ -1126,7 +1126,7 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
- 		 * If SPTE has been frozen by another thread, just give up and
- 		 * retry, avoiding unnecessary page table allocation and free.
- 		 */
--		if (is_removed_spte(iter.old_spte))
-+		if (is_frozen_spte(iter.old_spte))
- 			goto retry;
- 
- 		if (iter.level == fault->goal_level)
+@@ -2506,6 +2519,7 @@ static int kvm_vm_set_mem_attributes(struct kvm *kvm, gfn_t start, gfn_t end,
+ 	struct kvm_mmu_notifier_range pre_set_range = {
+ 		.start = start,
+ 		.end = end,
++		.arg.attributes = attributes,
+ 		.handler = kvm_pre_set_memory_attributes,
+ 		.on_lock = kvm_mmu_invalidate_begin,
+ 		.flush_on_ret = true,
 -- 
 2.34.1
 
