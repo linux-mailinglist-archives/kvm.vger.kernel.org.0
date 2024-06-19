@@ -1,99 +1,125 @@
-Return-Path: <kvm+bounces-20002-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20003-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE0F90F520
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 19:32:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 377EA90F54F
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 19:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF2FB283430
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 17:32:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D42DD1F22F29
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 17:40:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA398155A5B;
-	Wed, 19 Jun 2024 17:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D18A15623B;
+	Wed, 19 Jun 2024 17:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mQM5QXIt"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iKjIRTgG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEACB2139D1;
-	Wed, 19 Jun 2024 17:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4B171411D7
+	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 17:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718818320; cv=none; b=H39ZFhWcH6xH+IXXN6ZGz8Vwm74snQ+S5IKrxSI6YUaZTXUoRd6ehQMgF5zl0WucFw2jlBnIh7xP30xrW7Givh3tPvSdvA3VpuB2ILCToIDwhZYRZycejkuBphb2skLshW70nkKvmwxKIBeDZbPgli28mTdXXlkJaurdSBK/3EA=
+	t=1718818852; cv=none; b=IN+RIzWV1rrrp15ODmFUiGAkyFtLDYrwgpto2etYpQwfx9mbNt04YwyvNMrwZyOq85nGrKqkh74RZPhoVg1qjPvOPDIyHRw6NGZN6DU8iCZU0CXjtf6U+emPwTeenvyqepsVqT2nNy7KVEi+zWC35QZsqpsRR0pQCGD5rWURBHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718818320; c=relaxed/simple;
-	bh=Mw7LIUiugtdZZuHFybQbmbix1eukq5dcFpQhjX9nH/8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L1pOBAb/Su/2A0y2VdbHAQFf5iT85u4CwxX2bljvTOXMETTEnPOZU5D+Vf/+cm/YgAJSPMVqWfF4KWxHNCtV4zIqZ392y6WSpUpu/lbob1CEclfkt7p+Y8XLGijZRYuFEujjztWF6ie3F3n7Tr7RRSiYymx9YUTTJJ8eXX7y6gQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mQM5QXIt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C857C32786;
-	Wed, 19 Jun 2024 17:31:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718818320;
-	bh=Mw7LIUiugtdZZuHFybQbmbix1eukq5dcFpQhjX9nH/8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mQM5QXItO5CQmXw6l/M0J8VfPMifngGLU6Fibd7nXVnfDg7dHOK8GjJKktiT2i0mF
-	 MNr1+IlItwJJEE6T1SQjTXZEemi048HB/w4osBkDQzU344pOkgttSJeB6uU95qYXxD
-	 XGEgNMauemZ6e2UWJkKLRRbV6bRTJWecKsErpQMuSxc+asRAIGVzAVrW8IEOyLQBjC
-	 GT+qfR1QPB+BC7cnR0A2ruyJcjcb8klh4v4RDUK9MN7W3GRsYG9M+E5zDJc3FLY9yl
-	 tSknn25Bca/Lxf+tI+UEIXICOjg9UdZznuRFPhIWOQv9Ycx4kyWtZavgSHCgoqTDR2
-	 ESHshqPBbqdKg==
-Date: Wed, 19 Jun 2024 18:31:55 +0100
-From: Conor Dooley <conor@kernel.org>
-To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
-	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	devicetree@vger.kernel.org, kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH 1/5] dt-bindings: riscv: add Zaamo and Zalrsc ISA
- extension description
-Message-ID: <20240619-unknowing-matrimony-84e1e16efeef@spud>
-References: <20240619153913.867263-1-cleger@rivosinc.com>
- <20240619153913.867263-2-cleger@rivosinc.com>
+	s=arc-20240116; t=1718818852; c=relaxed/simple;
+	bh=6ZpQQhOBVU+C76jBiSGWWOfkxXfgx/HvuP/83NJOZXU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ds+nJiAjt69llbg1IB/ThQmkuLRjdXB7MDuDu7u5MRM1i5BmsS39Na2Az87zOqJsgEZQN//c57AQ2xZiLgrNccKe1qKXXj5NcgQgj3V9fYV4u/ttvwmp6D38OiocnMCJ+/TSpDFvg9/tQ2rS1W9dhKmBnW6hortckcslb/jE0dU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iKjIRTgG; arc=none smtp.client-ip=91.218.175.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718818847;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Us4fqCI5z6GkVlgltQOu7uUui4bViYbesL5BeljsKdk=;
+	b=iKjIRTgGVE82arVtDJ3yPBYpvXzDju3MbDNvWFF5dstkkoAOQPzasJLZ4WWicIRPa7Ykt3
+	9og8Ec2cQajrdW4eEgzwyyLdx9qWEAQsQqJWhhwEgjOfjFKvrFvZdLU/uSkYKP22dFKxZO
+	9FO2ZXL/LzMEXjS+jEUDYy1EFCP5xoM=
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: sebott@redhat.com
+X-Envelope-To: shahuang@redhat.com
+X-Envelope-To: eric.auger@redhat.com
+X-Envelope-To: oliver.upton@linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org,
+	Sebastian Ott <sebott@redhat.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v5 00/10] KVM: arm64: Allow userspace to modify CTR_EL0
+Date: Wed, 19 Jun 2024 17:40:26 +0000
+Message-ID: <20240619174036.483943-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="WElrE+kfa4QQLVIV"
-Content-Disposition: inline
-In-Reply-To: <20240619153913.867263-2-cleger@rivosinc.com>
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+
+As I'd mentioned on the list, here is my rework of Sebastian's CTR_EL0
+series. Changes this time around:
+
+ - Drop the cross-validation of the guest's CTR_EL0 with CLIDR_EL1 and
+   the CCSIDR_EL1 hierarchy, instead independently checking these
+   registers against the system's CTR_EL0 value.
+
+ - Rework the idregs debugfs interface to print all VM scoped feature ID
+   registers, which now includes CTR_EL0.
+
+ - Only reset the VM scoped value of CTR_EL0 once for a VM
+
+ - Make feature ID register accesses go through read / write helpers,
+   with the intention of abstracting the layout of the registers +
+   adding sanity checks to writers.
+
+What I didn't do after all is come up with a better generic way to store
+ID registers at the VM scope, but the hope is that the accessors will
+make that trivial to change in the future.
+
+Oliver Upton (5):
+  KVM: arm64: Get sys_reg encoding from descriptor in
+    idregs_debug_show()
+  KVM: arm64: Make idregs debugfs iterator search sysreg table directly
+  KVM: arm64: Use read-only helper for reading VM ID registers
+  KVM: arm64: Add helper for writing ID regs
+  KVM: arm64: nv: Use accessors for modifying ID registers
+
+Sebastian Ott (5):
+  KVM: arm64: unify code to prepare traps
+  KVM: arm64: Treat CTR_EL0 as a VM feature ID register
+  KVM: arm64: show writable masks for feature registers
+  KVM: arm64: rename functions for invariant sys regs
+  KVM: selftests: arm64: Test writes to CTR_EL0
+
+ arch/arm64/include/asm/kvm_emulate.h          |  40 +--
+ arch/arm64/include/asm/kvm_host.h             |  26 +-
+ arch/arm64/kvm/arm.c                          |   2 +-
+ arch/arm64/kvm/nested.c                       | 256 +++++++++---------
+ arch/arm64/kvm/pmu-emul.c                     |   2 +-
+ arch/arm64/kvm/sys_regs.c                     | 140 ++++++----
+ .../selftests/kvm/aarch64/set_id_regs.c       |  16 ++
+ 7 files changed, 262 insertions(+), 220 deletions(-)
 
 
---WElrE+kfa4QQLVIV
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+-- 
+2.45.2.627.g7a2c4fd464-goog
 
-On Wed, Jun 19, 2024 at 05:39:08PM +0200, Cl=E9ment L=E9ger wrote:
-> Add description for the Zaamo and Zalrsc ISA extension[1].
->=20
-> Link: https://github.com/riscv/riscv-zaamo-zalrsc [1]
-> Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
-
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
-
---WElrE+kfa4QQLVIV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnMWCwAKCRB4tDGHoIJi
-0o10AQD+YJeDB9kDq+cmYMtglAAQi08gU/ZdO6csF0EgoJE9RgEA3vqPEx9kf8/3
-FHxUErBZs27ZSQXpY2OxrNHoYQsUrwc=
-=d4WG
------END PGP SIGNATURE-----
-
---WElrE+kfa4QQLVIV--
 
