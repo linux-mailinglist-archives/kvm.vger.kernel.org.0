@@ -1,171 +1,202 @@
-Return-Path: <kvm+bounces-19945-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19946-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14ECC90E593
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 10:33:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCD3F90E605
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 10:39:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DCB91C21BFD
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 08:33:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BBA9B20EF7
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 08:39:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CADF680C16;
-	Wed, 19 Jun 2024 08:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1A17D3F5;
+	Wed, 19 Jun 2024 08:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YpjtO1A2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bpG6Q8OR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871EF8062E
-	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 08:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 410B679952
+	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 08:39:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718785950; cv=none; b=CsDzR6kTey58R1GBM8xwbTPt+CWxDNkawiwODRx5EfSubXSNfKD+1OLIEoh8OLI4cG/F+bdL2Iuiz00AE0Hh/Spb6YWGIyHF10v4uQVR0O4uupnBv/frAW4vyTZNOYD3Ec0G+H7zA0BRFh5BdDk8/EepT/Ur9i2jHdTPefbRVRo=
+	t=1718786356; cv=none; b=COKNYrz1p2ptbVPjoVizqwArWoUjNsEpxFe8xEicmt+yyCvXb2alWdzMQjPp1cAdGJXvs2O5Hr5q2K5W5BRePlE/XvGv6CGgdW8YnsDUY58uNVLUI1DQ+hNvh0tw7FilXG4wVO5+BOh4G1KcrqCjWUn/Uy/eSCfLpGBV/vMKW0o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718785950; c=relaxed/simple;
-	bh=I96RkC4xfGimI+iZ2geT9XHUh0BU0vYjRgveulZ7u5M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q/Uu1gA3afk3RVLwDm/5dGX98mZw5JoWkKSBzxhhU3g1H85dMu4Dm3vKWKMjATpqh5o6sf2/z7O4/EO8Ey4Rxv3FG2uBNqw0uNMRwrTz94Sk8tw4nn3N98+QsNjFClPVQR2vKDDX3DprcyM2VXPrEtHhzGMdMYg872jj2xKqR+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YpjtO1A2; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718785947;
+	s=arc-20240116; t=1718786356; c=relaxed/simple;
+	bh=LryhlDSILRALTJjaAexiT8ERLeQX0NmxlxBlH+oLbbc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rOm2l3B12eHLch/XsVStCLYs8SNP/HqpjvgoP9yXWsjcmOWj7uk6r9W245LCwXfpASApMf6tGu7ZpWvdD/Z86rejOaB2vd77l/q7BNsjIazit/J/u1M/4ysIwHpOsYuRHN3F7yrhRNOxG+tjKFpYf0dRHZGhLfV8mNFkm+QGOt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bpG6Q8OR; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: jamestiotio@gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718786351;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=YOUVrsFqTcI6hNO1ofc9efuSDWP7z/I3VahfSx2CWU4=;
-	b=YpjtO1A2atTzMQGR0R8LC8hdOSUzLSie9thWsWhslJBdIfzrXmIfssdDru4Q2lxNIHS6cj
-	i9LcSLekRvv1Zo0hyn785VyV9fGXed2yIAMYBHjkfVDhUwM8017L8SCV7szs0Je9HbGjJd
-	CoP+ph+uJpj1iDP0u9oc4ANKhOp5/t0=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-482-bwNdooy7PYmIH39rXBvjfw-1; Wed,
- 19 Jun 2024 04:32:21 -0400
-X-MC-Unique: bwNdooy7PYmIH39rXBvjfw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id AA4ED195609E;
-	Wed, 19 Jun 2024 08:32:19 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 4D43C19560AF;
-	Wed, 19 Jun 2024 08:32:17 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	Raghavendra Rao Ananta <rananta@google.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v10 3/3] KVM: selftests: aarch64: Add invalid filter test in pmu_event_filter_test
-Date: Wed, 19 Jun 2024 04:31:56 -0400
-Message-Id: <20240619083200.1047073-4-shahuang@redhat.com>
-In-Reply-To: <20240619083200.1047073-1-shahuang@redhat.com>
-References: <20240619083200.1047073-1-shahuang@redhat.com>
+	bh=MvLXJXivXAvpMZPRU/vFz6SvKkSXQa1mHb+NWXJaJdc=;
+	b=bpG6Q8ORpILBlhbdxRY5xFZvikARGnRbxu26//n9++ae4//wrLQ2vnTJMV8EyVI7ShIeX6
+	qWN1CWPalVeJPO8KMxoKrkKSh+8djlyPZg6RdADwNvQdWMFKy44JZHMNbjT9Ed5pPGelgn
+	uBF1mj09OxkKYRymP3AgeQ4VYXLwX38=
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: kvm-riscv@lists.infradead.org
+X-Envelope-To: atishp@rivosinc.com
+X-Envelope-To: cade.richard@berkeley.edu
+Date: Wed, 19 Jun 2024 10:39:08 +0200
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu
+Subject: Re: [kvm-unit-tests PATCH 3/4] riscv: Add methods to toggle
+ interrupt enable bits
+Message-ID: <20240619-3ba7acf7b1504529899f6cc9@orel>
+References: <20240618173053.364776-1-jamestiotio@gmail.com>
+ <20240618173053.364776-4-jamestiotio@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240618173053.364776-4-jamestiotio@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Add the invalid filter test which sets the filter beyond the event
-space and sets the invalid action to double check if the
-KVM_ARM_VCPU_PMU_V3_FILTER will return the expected error.
+On Wed, Jun 19, 2024 at 01:30:52AM GMT, James Raphael Tiovalen wrote:
+> Add some helper methods to toggle the interrupt enable bits in the SIE
+> register.
+> 
+> Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
+> ---
+>  riscv/Makefile            |  1 +
+>  lib/riscv/asm/csr.h       |  7 +++++++
+>  lib/riscv/asm/interrupt.h | 12 ++++++++++++
+>  lib/riscv/interrupt.c     | 39 +++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 59 insertions(+)
+>  create mode 100644 lib/riscv/asm/interrupt.h
+>  create mode 100644 lib/riscv/interrupt.c
+> 
+> diff --git a/riscv/Makefile b/riscv/Makefile
+> index 919a3ebb..108d4481 100644
+> --- a/riscv/Makefile
+> +++ b/riscv/Makefile
+> @@ -30,6 +30,7 @@ cflatobjs += lib/memregions.o
+>  cflatobjs += lib/on-cpus.o
+>  cflatobjs += lib/vmalloc.o
+>  cflatobjs += lib/riscv/bitops.o
+> +cflatobjs += lib/riscv/interrupt.o
+>  cflatobjs += lib/riscv/io.o
+>  cflatobjs += lib/riscv/isa.o
+>  cflatobjs += lib/riscv/mmu.o
+> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+> index c1777744..da58b0ce 100644
+> --- a/lib/riscv/asm/csr.h
+> +++ b/lib/riscv/asm/csr.h
+> @@ -4,15 +4,22 @@
+>  #include <linux/const.h>
+>  
+>  #define CSR_SSTATUS		0x100
+> +#define CSR_SIE			0x104
+>  #define CSR_STVEC		0x105
+>  #define CSR_SSCRATCH		0x140
+>  #define CSR_SEPC		0x141
+>  #define CSR_SCAUSE		0x142
+>  #define CSR_STVAL		0x143
+> +#define CSR_SIP			0x144
+>  #define CSR_SATP		0x180
+>  
+>  #define SSTATUS_SIE		(_AC(1, UL) << 1)
+>  
+> +#define SIE_SSIE		(_AC(1, UL) << 1)
+> +#define SIE_STIE		(_AC(1, UL) << 5)
+> +#define SIE_SEIE		(_AC(1, UL) << 9)
+> +#define SIE_LCOFIE		(_AC(1, UL) << 13)
+> +
+>  /* Exception cause high bit - is an interrupt if set */
+>  #define CAUSE_IRQ_FLAG		(_AC(1, UL) << (__riscv_xlen - 1))
+>  
+> diff --git a/lib/riscv/asm/interrupt.h b/lib/riscv/asm/interrupt.h
+> new file mode 100644
+> index 00000000..b760afbb
+> --- /dev/null
+> +++ b/lib/riscv/asm/interrupt.h
+> @@ -0,0 +1,12 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +#ifndef _ASMRISCV_INTERRUPT_H_
+> +#define _ASMRISCV_INTERRUPT_H_
+> +
+> +#include <stdbool.h>
+> +
+> +void toggle_software_interrupt(bool enable);
+> +void toggle_timer_interrupt(bool enable);
+> +void toggle_external_interrupt(bool enable);
+> +void toggle_local_cof_interrupt(bool enable);
+> +
+> +#endif /* _ASMRISCV_INTERRUPT_H_ */
+> diff --git a/lib/riscv/interrupt.c b/lib/riscv/interrupt.c
+> new file mode 100644
+> index 00000000..bc0e16f1
+> --- /dev/null
+> +++ b/lib/riscv/interrupt.c
+> @@ -0,0 +1,39 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +/*
+> + * Copyright (C) 2024, James Raphael Tiovalen <jamestiotio@gmail.com>
+> + */
+> +#include <libcflat.h>
+> +#include <asm/csr.h>
+> +#include <asm/interrupt.h>
+> +
+> +void toggle_software_interrupt(bool enable)
+> +{
+> +	if (enable)
+> +		csr_set(CSR_SIE, SIE_SSIE);
+> +	else
+> +		csr_clear(CSR_SIE, SIE_SSIE);
+> +}
+> +
+> +void toggle_timer_interrupt(bool enable)
+> +{
+> +	if (enable)
+> +		csr_set(CSR_SIE, SIE_STIE);
+> +	else
+> +		csr_clear(CSR_SIE, SIE_STIE);
+> +}
+> +
+> +void toggle_external_interrupt(bool enable)
+> +{
+> +	if (enable)
+> +		csr_set(CSR_SIE, SIE_SEIE);
+> +	else
+> +		csr_clear(CSR_SIE, SIE_SEIE);
+> +}
+> +
+> +void toggle_local_cof_interrupt(bool enable)
+> +{
+> +	if (enable)
+> +		csr_set(CSR_SIE, SIE_LCOFIE);
+> +	else
+> +		csr_clear(CSR_SIE, SIE_LCOFIE);
+> +}
+> -- 
+> 2.43.0
+>
 
-Reviewed-by: Raghavendra Rao Ananta <rananta@google.com>
-Reviewed-by: Eric Auger <eric.auger@redhat.com>
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- .../kvm/aarch64/pmu_event_filter_test.c       | 38 +++++++++++++++++++
- 1 file changed, 38 insertions(+)
+Most of this patch seems premature since the series only needs
+toggle_timer_interrupt(). Also, I think lib/riscv/interrupt.c
+is premature because something like toggle_timer_interrupt()
+can be a static inline in a new lib/riscv/asm/timer.h file.
 
-diff --git a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-index 308b8677e08e..1abbe6d8deb2 100644
---- a/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-+++ b/tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
-@@ -8,6 +8,7 @@
-  * This test checks if the guest only see the limited pmu event that userspace
-  * sets, if the guest can use those events which user allow, and if the guest
-  * can't use those events which user deny.
-+ * It also checks that setting invalid filter ranges return the expected error.
-  * This test runs only when KVM_CAP_ARM_PMU_V3, KVM_ARM_VCPU_PMU_V3_FILTER
-  * is supported on the host.
-  */
-@@ -31,6 +32,7 @@ struct vpmu_vm {
- 
- static struct vpmu_vm vpmu_vm;
- 
-+#define KVM_PMU_EVENT_INVALID 3
- #define FILTER_NR 10
- 
- struct test_desc {
-@@ -181,6 +183,40 @@ static void destroy_vpmu_vm(void)
- 	kvm_vm_free(vpmu_vm.vm);
- }
- 
-+static void test_invalid_filter(void)
-+{
-+	struct kvm_pmu_event_filter invalid;
-+	int ret;
-+
-+	pr_info("Test: test_invalid_filter\n");
-+
-+	memset(&vpmu_vm, 0, sizeof(vpmu_vm));
-+
-+	vpmu_vm.vm = vm_create(1);
-+	vpmu_vm.vcpu = vm_vcpu_add_with_vpmu(vpmu_vm.vm, 0, guest_code);
-+	vpmu_vm.gic_fd = vgic_v3_setup(vpmu_vm.vm, 1, 64);
-+	__TEST_REQUIRE(vpmu_vm.gic_fd >= 0,
-+		       "Failed to create vgic-v3, skipping");
-+
-+	/* The max event number is (1 << 16), set a range largeer than it. */
-+	invalid = __DEFINE_FILTER(BIT(15), BIT(15) + 1, KVM_PMU_EVENT_ALLOW);
-+	ret = __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_FILTER, &invalid);
-+	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter range "
-+		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
-+		    ret, errno);
-+
-+	/* Set the Invalid action. */
-+	invalid = __DEFINE_FILTER(0, 1, KVM_PMU_EVENT_INVALID);
-+	ret = __kvm_device_attr_set(vpmu_vm.vcpu->fd, KVM_ARM_VCPU_PMU_V3_CTRL,
-+				    KVM_ARM_VCPU_PMU_V3_FILTER, &invalid);
-+	TEST_ASSERT(ret && errno == EINVAL, "Set Invalid filter action "
-+		    "ret = %d, errno = %d (expected ret = -1, errno = EINVAL)",
-+		    ret, errno);
-+
-+	destroy_vpmu_vm();
-+}
-+
- static void run_test(struct test_desc *t)
- {
- 	pr_info("Test: %s\n", t->name);
-@@ -311,4 +347,6 @@ int main(void)
- 	TEST_REQUIRE(kvm_pmu_support_events());
- 
- 	run_tests();
-+
-+	test_invalid_filter();
- }
--- 
-2.40.1
+And please provide two functions rather than a toggle with
+a parameter, i.e.
 
+  timer_interrupt_enable() / timer_interrupt_disable()
+
+Thanks,
+drew
 
