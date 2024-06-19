@@ -1,139 +1,160 @@
-Return-Path: <kvm+bounces-19988-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19989-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7332790EF7E
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 15:55:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEC8790EF94
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 16:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E4851C216BF
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 13:55:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CFCD1C21AAD
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 14:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FF314F9D9;
-	Wed, 19 Jun 2024 13:55:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCED150987;
+	Wed, 19 Jun 2024 14:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLDfWOkJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S9Nd1see"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731221DFF7;
-	Wed, 19 Jun 2024 13:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B34D26A;
+	Wed, 19 Jun 2024 14:00:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718805304; cv=none; b=g1pwxgDaj1uqeTBhYevSxn2/dPCOV16Huq5qx2H6HXX/I1pdCsFnq7Cd8QuEqgspQlMC2DCflzDa/LtyxhADu+gTTMHIO51lKx0hC0A2N9xm6Wn+FVxhmT4fsjp8NNJYUiiXmOC3Jn4+j5X9uk5h6uE8xme42w8MN6wkuoXPlJs=
+	t=1718805629; cv=none; b=LT0BP/3giZNOwWvlxHmM1Dlti6eG4qomDkBT4+0znLOuuOHac51Z7F7mXiHN9HY4xEB1Tmy41RSOBkEY+ltVtR1KuPtc54OT9y4uyphuZtK7safOvcJxtSblrx96neWMvWTtJ7ejEIPyJlVFeFa2HWK12yMpPVs1wo+aSFc0UW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718805304; c=relaxed/simple;
-	bh=2L+1+gYamAC+cVSHQFSO0PZ1BNdypHQRZrJb2/vZugA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Jm+9YFo0yip9Pe/UZDRMoZlAckBeTZRqD9a75Lf6kUtto6MlbqggJ+jT1lCWMrQLAg+0xzGojJ4wIf12X8MGpKG3vpoa26y3y522rhWRB7rDa97xlLExFsabBoDVjXHFUkrMQcTSBL9t/q+nrRa+1SG99977iR0AmbkRxzxGuhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLDfWOkJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DB5BC2BBFC;
-	Wed, 19 Jun 2024 13:55:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1718805304;
-	bh=2L+1+gYamAC+cVSHQFSO0PZ1BNdypHQRZrJb2/vZugA=;
-	h=Date:From:To:Cc:Subject:From;
-	b=eLDfWOkJs16coIdHaDXkWEYi4Ygwc7SSM9NMfot3FR8z4eYvk5oGV0UWLHh2CRWYk
-	 eO4+M4u6nMa4C0pWij/NKtp8q2GAKl1h29Rbv+2dQ74MNYrVJpPUBZ012KJZpxgWwY
-	 jwV/SQQUEO3QSPTg22SLHPP3MiJ9ExIa26+nSf/j+1uAg6v9aqJ15MX9MIUXi70RUl
-	 bNi0B8NLH+YgUn7xh2zs+Wk4wlMlUdcoAbJUztUxrxWHrM/kRVW4bVXRZfQ34R+1Qu
-	 wZ4T/bcd+1beBKR2+b0e55vjHMJAlvD9E+D2bqk1+7fWz/J85xPLMuexQ3jphpKJ0X
-	 g3Eu2NxKJveQw==
-Date: Wed, 19 Jun 2024 14:54:59 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
-Cc: Ashish Kalra <ashish.kalra@amd.com>, Borislav Petkov <bp@alien8.de>,
-	Brijesh Singh <brijesh.singh@amd.com>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Michael Roth <michael.roth@amd.com>,
-	Tom Lendacky <thomas.lendacky@amd.com>
-Subject: linux-next: manual merge of the kvm tree with the tip tree
-Message-ID: <ZnLjMxzFE6UCPhqi@sirena.org.uk>
+	s=arc-20240116; t=1718805629; c=relaxed/simple;
+	bh=k3gSboAJc+MvETXcfhdx81BB8B2hrN6M6hXGZXPOdq0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EsIuSD4OEoPC8FiRo+11o2Sx2fZwKAB5iyQseSakbCIAk+s+j00tSfFP92vCQ8UUaoEqFOH8LBLRutD6TU19syKAcIruQAMT7gEuSNcuhfiQOE+OPxB3T4dObK2OuxK+0U5HYI0MzNby3MbQn1TNnThMG3NkkJfUiZ3CpnYClIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S9Nd1see; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JDR102003196;
+	Wed, 19 Jun 2024 14:00:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:subject:from:to:cc:date:in-reply-to:references
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	k3gSboAJc+MvETXcfhdx81BB8B2hrN6M6hXGZXPOdq0=; b=S9Nd1seeM2taZwhn
+	3Go0MPxv9KF29c3xx+SsDcbtZlLa8/ddvAX1ckUKXEnp7prf8VbtZK3wmMOWAEuK
+	XE4TRDXdtNu/f2aebtfk8NcL1hUsc5wEfrM9KKDk2yoHC0aJdubXBjU4sDZP0sF9
+	zCeHWOwwwzdpQ8VgmdoXmp9JRCS0HvjD6TT94VB1Kclw2Subfjw2MghuuWCxysvr
+	T207gexiGQNz1aoV1iAaOs6EFqNR3OOlLsdtz1wYhfU0VjmZ6pXrUi/YCFgT/W20
+	J/HUD3yWjhw7Nz7C8WY3q6We7IScQAsw+ozQtmDoA0JWozJanbfSQymMB3udcqe0
+	KM0KWg==
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yux3fgfma-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 14:00:24 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45JCAgh6023990;
+	Wed, 19 Jun 2024 14:00:22 GMT
+Received: from smtprelay03.wdc07v.mail.ibm.com ([172.16.1.70])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ysp9qd1w7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 14:00:22 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay03.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45JE0IlJ11666108
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Jun 2024 14:00:20 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 53B0058069;
+	Wed, 19 Jun 2024 14:00:16 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 569F95808E;
+	Wed, 19 Jun 2024 14:00:15 +0000 (GMT)
+Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.159.49])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 19 Jun 2024 14:00:15 +0000 (GMT)
+Message-ID: <8ae9b1bef0e8ef4689873911c8ae5c9a921401a9.camel@linux.ibm.com>
+Subject: Re: [PATCH] s390/cio: add missing MODULE_DESCRIPTION() macros
+From: Eric Farman <farman@linux.ibm.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Jeff Johnson
+ <quic_jjohnson@quicinc.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Matthew
+ Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kernel-janitors@vger.kernel.org
+Date: Wed, 19 Jun 2024 10:00:14 -0400
+In-Reply-To: <20240619123255.4b1a6c6d.pasic@linux.ibm.com>
+References: 
+	<20240615-md-s390-drivers-s390-cio-v1-1-8fc9584e8595@quicinc.com>
+	 <064eb313-2f38-479d-80bd-14777f7d3d62@linux.ibm.com>
+	 <afdde0842680698276df0856dd8b896dac692b56.camel@linux.ibm.com>
+	 <20240619123255.4b1a6c6d.pasic@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nQUwDpK7LRDpRSib"
-Content-Disposition: inline
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 3U6wkBpOZZvOXgSq-0KAzS0OtU9mEOAY
+X-Proofpoint-GUID: 3U6wkBpOZZvOXgSq-0KAzS0OtU9mEOAY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 clxscore=1015 phishscore=0 mlxlogscore=943 spamscore=0
+ mlxscore=0 malwarescore=0 suspectscore=0 adultscore=0 impostorscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406190104
 
+On Wed, 2024-06-19 at 12:32 +0200, Halil Pasic wrote:
+> On Tue, 18 Jun 2024 16:11:33 -0400
+> Eric Farman <farman@linux.ibm.com> wrote:
+>=20
+> > > > +MODULE_DESCRIPTION("VFIO based Physical Subchannel device
+> > > > driver");=C2=A0=20
+> > >=20
+> > > Halil/Mathew/Eric,
+> > > Could you please comment on this ?=C2=A0=20
+> >=20
+> > That's what is in the prologue, and is fine.
+>=20
+> Eric can you explain it to me why is the attribute "physical"
+> appropriate
+> here? I did a quick grep for "Physical Subchannel" only turned up
+> hits
+> in vfio-ccw.
 
---nQUwDpK7LRDpRSib
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+One hit, in the prologue comment of this module. "Physical device" adds
+three to the tally, but only one of those is in vfio-ccw so we should
+expand your query regarding "physical" vs "emulated" vs "virtual" in
+the context of, say, tape devices.
 
-Hi all,
+>=20
+> My best guess is that "physical" was somehow intended to mean the
+> opposite of "virtual". But actually it does not matter if our
+> underlying
+> subchannel is emulated or not, at least AFAIU.
 
-Today's linux-next merge of the kvm tree got a conflict in:
+I also believe this was intended to mean "not virtual," regardless of
+whether there's emulation taking place underneath. That point is moot
+since I don't see that information being surfaced, such that the driver
+can only work with "physical" subchannels.
 
-  arch/x86/include/asm/sev-common.h
+I'm fine with removing it if it bothers you, but I don't see it as an
+issue.
 
-between commit:
+Thanks,
+Eric
 
-  34ff659017359 ("x86/sev: Use kernel provided SVSM Calling Areas")
+>=20
+> Regards,
+> Halil
 
-=66rom the tip tree and commit:
-
-  d46b7b6a5f9ec ("KVM: SEV: Add support to handle MSR based Page State Chan=
-ge VMGEXIT")
-
-=66rom the kvm tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
-diff --cc arch/x86/include/asm/sev-common.h
-index e90d403f2068b,8647cc05e2f49..0000000000000
---- a/arch/x86/include/asm/sev-common.h
-+++ b/arch/x86/include/asm/sev-common.h
-@@@ -98,19 -109,9 +109,22 @@@ enum psc_op=20
-  	/* GHCBData[63:32] */				\
-  	(((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
- =20
- +/* GHCB Run at VMPL Request/Response */
- +#define GHCB_MSR_VMPL_REQ		0x016
- +#define GHCB_MSR_VMPL_REQ_LEVEL(v)			\
- +	/* GHCBData[39:32] */				\
- +	(((u64)(v) & GENMASK_ULL(7, 0) << 32) |		\
- +	/* GHCBDdata[11:0] */				\
- +	GHCB_MSR_VMPL_REQ)
- +
- +#define GHCB_MSR_VMPL_RESP		0x017
- +#define GHCB_MSR_VMPL_RESP_VAL(v)			\
- +	/* GHCBData[63:32] */				\
- +	(((u64)(v) & GENMASK_ULL(63, 32)) >> 32)
- +
-+ /* Set highest bit as a generic error response */
-+ #define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) | GHCB_MSR_PSC_RESP)
-+=20
-  /* GHCB Hypervisor Feature Request/Response */
-  #define GHCB_MSR_HV_FT_REQ		0x080
-  #define GHCB_MSR_HV_FT_RESP		0x081
-
---nQUwDpK7LRDpRSib
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZy4zIACgkQJNaLcl1U
-h9Ac1ggAgkntQi6/mci/5sPhuewuaPr/pC/ZfJHq+36pfpdyL6J13Tq30j1ZVnr5
-h9WfzGd8g4wyOUN0jfXJRunOtDbYDNi/B2r+rLikhtUW0VKPKsPl1xQX2pODRvYN
-Zg9+Nj4WQ+Ir5zslNjNF97+4IExUaxSDkqeja8LlZ5PEzOPGpuLriYJEAH9D7svp
-I9BFrGeOG87IKfRS+skYEwDFTiTTcsgDuZ4S8GeYA1M4tDJXSLiVT1aDWhTKbnhT
-KS0/2KwhngcdcSDR6xlhs/xvzwkTtsTVza1IpGG10r8rOp53LRNRa39pG9kDKGn2
-qmBgRuJFC8jL3/XDNnlNKzk2kuxdAQ==
-=cDeN
------END PGP SIGNATURE-----
-
---nQUwDpK7LRDpRSib--
 
