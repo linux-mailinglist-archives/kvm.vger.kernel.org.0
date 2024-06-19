@@ -1,165 +1,176 @@
-Return-Path: <kvm+bounces-19976-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19980-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66ECC90EA39
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 13:59:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 456FF90EA4C
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 14:02:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16681282C0A
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 11:59:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 266501C20C37
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 12:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BFE13E041;
-	Wed, 19 Jun 2024 11:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3F9213EFEE;
+	Wed, 19 Jun 2024 12:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RRTJu2t0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UJ7/eVmy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com [209.85.167.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E11B13212E;
-	Wed, 19 Jun 2024 11:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAFFFC1F
+	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 12:01:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718798355; cv=none; b=UR4+OClufTqWpCoxtg3xqrij4lTH2q0PhoDcu1YaMQ4FxkYLhYrwst36m00r93mDP8BjTvQQ5yyFVJvUo4IRKZn68GMPs/lpYf3nsTzmqPswJPFRmlR/+GGTOaBfXzPKBk6hme7nP+10EmADjGaVnE5okY4kk5dRFPKR3t3iewY=
+	t=1718798514; cv=none; b=IR0Wa+bUwUCpRaPrXEi3NmN9VfqXm1IsjFNlyDFWIg4g9zxLugyFpFpkDFww8tWVR9ROy9KtPvElxwlV9UtqvHYn13saUy3GV68KFQO4AaEKdpeKiOXnLM8RiztU8YuOh33UkY1DyRBRrOsXJGlN63CSmuxf3d2CleO5U5oc0R8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718798355; c=relaxed/simple;
-	bh=Tge6lc+3Uv9nGSmPICO4Y2gKi4AiqtpP5Cab+yPOd08=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gXWzko0ExD0RDZTs/2y+4poXX1tix0+cogEpaa/IUr5fSK5lHs7zXLo1J/zinZLDnfUlAJulK3nU3OxvRCLtp+7eBGQJVnbyxVOlH5eXnwXWFpFUSfYWfTV78HzKhj9UtJVYGVXY3i9g2q7juu71UXF+Gq0ttjuHhM3caROs0lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RRTJu2t0; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JBQalq029498;
-	Wed, 19 Jun 2024 11:59:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=x6P7aXzxoRWeK
-	iEzojjkjPtPXR7eYYbR4fDPbFWD9lM=; b=RRTJu2t0gZRgP3z2fcauFAoglUOeR
-	MzadwYS26I933wObaaq4ET2tVw6GOQwPTnOVOTdyQZMHCbisb3U3yxT5HZ3S+7GW
-	81KeL8NcfJJjF7PaX/+5nYtxeqsg7ZL/pXVTnjL0pKP5Umo0jqTVB5+BN9pwN+9c
-	72kp5oNW4/IGBIHfIhMMmizb9T2l4WwYqRpx17eeTVG/jKak0DVxBCF2fTa00hch
-	r+NG5DTcT9zH8wLkI6IUEMmScxS4o6PsmYNeT4iPMSf7D/SL3pukgJop2+fLzBa0
-	64Bycp1XZvSs5SVcK4AH16oc8nA3hjMkL0OcrZlJ3JaETTOGbyHfqWPTA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yuwy0r6jv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 11:59:10 +0000 (GMT)
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45JBvnl4012054;
-	Wed, 19 Jun 2024 11:59:10 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yuwy0r6jt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 11:59:10 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45JB5OLp013440;
-	Wed, 19 Jun 2024 11:59:09 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ysr03up8d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 11:59:09 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45JBx3W744958046
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Jun 2024 11:59:05 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B04E92004E;
-	Wed, 19 Jun 2024 11:59:03 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 64FB22004F;
-	Wed, 19 Jun 2024 11:59:03 +0000 (GMT)
-Received: from dilbert5.boeblingen.de.ibm.com (unknown [9.152.212.201])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 19 Jun 2024 11:59:03 +0000 (GMT)
-From: Gerd Bayer <gbayer@linux.ibm.com>
-To: Alex Williamson <alex.williamson@redhat.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>,
-        Niklas Schnelle <schnelle@linux.ibm.com>,
-        Ramesh Thomas <ramesh.thomas@intel.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        Ankit Agrawal <ankita@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-        Halil Pasic <pasic@linux.ibm.com>, Ben Segal <bpsegal@us.ibm.com>,
-        "Tian, Kevin" <kevin.tian@intel.com>,
-        Julian Ruess <julianr@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>
-Subject: [PATCH v6 3/3] vfio/pci: Fix typo in macro to declare accessors
-Date: Wed, 19 Jun 2024 13:58:47 +0200
-Message-ID: <20240619115847.1344875-4-gbayer@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240619115847.1344875-1-gbayer@linux.ibm.com>
-References: <20240619115847.1344875-1-gbayer@linux.ibm.com>
+	s=arc-20240116; t=1718798514; c=relaxed/simple;
+	bh=FYVRkfdWOHFIaNl93eRsJCgFbdWq9Zi5DUBQJDGT+mM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Aj34uLwpS8GgO0mBwJBntplr8m6aHcRJGHW3hMh12FLAtfJKvHilR9sHOpS4wxt3/mz/Z/vjpyDn0ZUI+mxP/c4V66Myax6USf3Vj2pOtcyPQXhvn2CTHrteyaJLGCIdayBsjsqCASS1JyKB3VTZfNyjFOzYrX7wbNcsiZ287oA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UJ7/eVmy; arc=none smtp.client-ip=209.85.167.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3d229baccc4so3139188b6e.1
+        for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 05:01:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718798511; x=1719403311; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iOim+GQVHsUMHPzr0/zmYaztK3VZnG5jmRJWacqKqkM=;
+        b=UJ7/eVmyUTRWAT2Y60xDGiljeheMkQeOky862/m14dmhpbSvMgDHMCH4B+xRlRu994
+         cpOy69zrsxh5Had2/qN3TTg1FgW58DQcKyN8F6yxkPTFULPWgJhxnjyD61pV8JhIupuz
+         f336PMB+MK2r3IsdfMQykPN5q65RQKGzDqXzJ/aCYQSavtQHa6qsqKHdPKX42sqX+MdU
+         Rc7Wb0/WoP5n+qztwW2vz1p0dUCh2YyBVg2qRUyVqDS+SpvebLynJijKyfu7IRSnHlS6
+         TK8DzEJZfd77H2/2qmaAFr1HOQpZtrJPRGfd0F2irFZpMZg8aQmzj6MJkypNg/YIkpxd
+         w6Vw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718798511; x=1719403311;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iOim+GQVHsUMHPzr0/zmYaztK3VZnG5jmRJWacqKqkM=;
+        b=Q3p9ESITGsVgFpoX54Hg7dztir/FZkI9++2JCTo+CEo9LxmZE7GIQenfO0eugZMQD+
+         7Mn6B0MymozXM6xwTwfHv5VrABrmqLEpPS8V/8lzVPb2QZPtnzXDsEnDaBe0eIXoZBAn
+         txjOulJmqD11K4r9YP9aBMXQB1ADgx6ED53KLzzHHxHyfnxek/7pkTT8zebqIGV/lPyH
+         1ABZvZf3E4omYaL3KwwiLwgudTx9ShAuuPzccgpJRuKDbC1HXdXg5GXBsqp5vD2Dl1IF
+         OgmmspGsHeyc8S9FmEVy1sixzHkZR9pzbUPCHogkmg6ftTDKxx9ugKQMUl+UB9Wzi/rL
+         qtWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWp7ukPLUGaZ4DF+s/isi1wp6/DDWGyJ4pF7J1FCTKCw+wXC/UoxVK71f9JDzcQXQB6Djd+BSCj9CsD0r6tu1w08X5a
+X-Gm-Message-State: AOJu0Yyt+iI1zeOoy+cC3FUeOi6W8BT1PC4yzOSUqkdYbbiALbfXQ9Sm
+	WqZn7j63FXN39eGOFtunc4UQn5eSkhX17qNrwmIdZZAmVENRnYmjkdsdU4M3cG6b2QaTVusUfpg
+	6PIEIQS6qQ5Yt8XeAXCi+fEQCy6K9RLqnrGNf
+X-Google-Smtp-Source: AGHT+IEn8HCT0+a4ly7gvmO3sbJl6r+3UVNd8+bJNqdKRtJx00yvI5NJhWVel34eQ5lTMDMcqvOsVTaCCjBhWoD15B8=
+X-Received: by 2002:a05:6808:128b:b0:3d5:1f50:188a with SMTP id
+ 5614622812f47-3d51f5028a9mr1376646b6e.24.1718798511327; Wed, 19 Jun 2024
+ 05:01:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: UGH1znYv87LgQ2rhlQOmElIb9-BCeiZm
-X-Proofpoint-ORIG-GUID: EmAmxowTE3nod-QLpwzmlxzg3gOBmVSo
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
- mlxlogscore=898 mlxscore=0 malwarescore=0 clxscore=1015 priorityscore=1501
- suspectscore=0 lowpriorityscore=0 bulkscore=0 spamscore=0 phishscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2405170001
- definitions=main-2406190088
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
+ <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com> <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
+ <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com> <20240619115135.GE2494510@nvidia.com>
+In-Reply-To: <20240619115135.GE2494510@nvidia.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Wed, 19 Jun 2024 13:01:14 +0100
+Message-ID: <CA+EHjTz_=J+bDpqciaMnNja4uz1Njcpg5NVh_GW2tya-suA7kQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: David Hildenbrand <david@redhat.com>, John Hubbard <jhubbard@nvidia.com>, 
+	Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>, maz@kernel.org, 
+	kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	pbonzini@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Correct spelling of DECLA[RA]TION
+Hi Jason,
 
-Suggested-by: Ramesh Thomas <ramesh.thomas@intel.com>
-Signed-off-by: Gerd Bayer <gbayer@linux.ibm.com>
----
- include/linux/vfio_pci_core.h | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+On Wed, Jun 19, 2024 at 12:51=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> w=
+rote:
+>
+> On Wed, Jun 19, 2024 at 10:11:35AM +0100, Fuad Tabba wrote:
+>
+> > To be honest, personally (speaking only for myself, not necessarily
+> > for Elliot and not for anyone else in the pKVM team), I still would
+> > prefer to use guest_memfd(). I think that having one solution for
+> > confidential computing that rules them all would be best. But we do
+> > need to be able to share memory in place, have a plan for supporting
+> > huge pages in the near future, and migration in the not-too-distant
+> > future.
+>
+> I think using a FD to control this special lifetime stuff is
+> dramatically better than trying to force the MM to do it with struct
+> page hacks.
+>
+> If you can't agree with the guest_memfd people on how to get there
+> then maybe you need a guest_memfd2 for this slightly different special
+> stuff instead of intruding on the core mm so much. (though that would
+> be sad)
+>
+> We really need to be thinking more about containing these special
+> things and not just sprinkling them everywhere.
 
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.h
-index 7b45f70f84c3..fbb472dd99b3 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -137,26 +137,26 @@ bool vfio_pci_core_range_intersect_range(loff_t buf_start, size_t buf_cnt,
- 					 loff_t *buf_offset,
- 					 size_t *intersect_count,
- 					 size_t *register_offset);
--#define VFIO_IOWRITE_DECLATION(size) \
-+#define VFIO_IOWRITE_DECLARATION(size) \
- int vfio_pci_core_iowrite##size(struct vfio_pci_core_device *vdev,	\
- 			bool test_mem, u##size val, void __iomem *io);
- 
--VFIO_IOWRITE_DECLATION(8)
--VFIO_IOWRITE_DECLATION(16)
--VFIO_IOWRITE_DECLATION(32)
-+VFIO_IOWRITE_DECLARATION(8)
-+VFIO_IOWRITE_DECLARATION(16)
-+VFIO_IOWRITE_DECLARATION(32)
- #ifdef iowrite64
--VFIO_IOWRITE_DECLATION(64)
-+VFIO_IOWRITE_DECLARATION(64)
- #endif
- 
--#define VFIO_IOREAD_DECLATION(size) \
-+#define VFIO_IOREAD_DECLARATION(size) \
- int vfio_pci_core_ioread##size(struct vfio_pci_core_device *vdev,	\
- 			bool test_mem, u##size *val, void __iomem *io);
- 
--VFIO_IOREAD_DECLATION(8)
--VFIO_IOREAD_DECLATION(16)
--VFIO_IOREAD_DECLATION(32)
-+VFIO_IOREAD_DECLARATION(8)
-+VFIO_IOREAD_DECLARATION(16)
-+VFIO_IOREAD_DECLARATION(32)
- #ifdef ioread64
--VFIO_IOREAD_DECLATION(64)
-+VFIO_IOREAD_DECLARATION(64)
- #endif
- 
- #endif /* VFIO_PCI_CORE_H */
--- 
-2.45.2
+I agree that we need to agree :) This discussion has been going on
+since before LPC last year, and the consensus from the guest_memfd()
+folks (if I understood it correctly) is that guest_memfd() is what it
+is: designed for a specific type of confidential computing, in the
+style of TDX and CCA perhaps, and that it cannot (or will not) perform
+the role of being a general solution for all confidential computing.
 
+> > The approach we're taking with this proposal is to instead restrict
+> > the pinning of protected memory. If the host kernel can't pin the
+> > memory, then a misbehaving process can't trick the host into accessing
+> > it.
+>
+> If the memory can't be accessed by the CPU then it shouldn't be mapped
+> into a PTE in the first place. The fact you made userspace faults
+> (only) work is nifty but still an ugly hack to get around the fact you
+> shouldn't be mapping in the first place.
+>
+> We already have ZONE_DEVICE/DEVICE_PRIVATE to handle exactly this
+> scenario. "memory" that cannot be touched by the CPU but can still be
+> specially accessed by enlightened components.
+>
+> guest_memfd, and more broadly memfd based instead of VMA based, memory
+> mapping in KVM is a similar outcome to DEVICE_PRIVATE.
+>
+> I think you need to stay in the world of not mapping the memory, one
+> way or another.
+
+As I mentioned earlier, that's my personal preferred option.
+
+> > > 3) How can we be sure we don't need other long-term pins (IOMMUs?) in
+> > >     the future?
+> >
+> > I can't :)
+>
+> AFAICT in the pKVM model the IOMMU has to be managed by the
+> hypervisor..
+
+I realized that I misunderstood this. At least speaking for pKVM, we
+don't need other long term pins as long as the memory is private. The
+exclusive pin is dropped when the memory is shared.
+
+> > We are gating it behind a CONFIG flag :)
+> >
+> > Also, since pin is already overloading the refcount, having the
+> > exclusive pin there helps in ensuring atomic accesses and avoiding
+> > races.
+>
+> Yeah, but every time someone does this and then links it to a uAPI it
+> becomes utterly baked in concrete for the MM forever.
+
+I agree. But if we can't modify guest_memfd() to fit our needs (pKVM,
+Gunyah), then we don't really have that many other options.
+
+Thanks!
+/fuad
+
+> Jason
 
