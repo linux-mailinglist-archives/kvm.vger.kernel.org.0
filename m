@@ -1,147 +1,158 @@
-Return-Path: <kvm+bounces-19941-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19942-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D67290E583
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 10:31:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 293B790E589
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 10:32:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF9772830E2
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 08:31:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BC191C210C8
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 08:32:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2004F7E56B;
-	Wed, 19 Jun 2024 08:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A2027E56B;
+	Wed, 19 Jun 2024 08:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BJy67NmN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YtvxvdzM"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797757B3EB
-	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 08:31:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4845A7BAF4
+	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 08:32:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718785866; cv=none; b=ZV63kl4pSDpXfDO1CAREDjph4NtZaLq85Mfr0LWfbyaA5PfQaMRNun9e8/M2Ub7ZZwNvomPy0wjKIet55jzVMsYSUk5/YeFTiXtRQ6T+xtfAV+PcMyQttWVxR2ebP+VoW9F01w7urb6KhTnQdoj+VMJYCJT4LeS1pYPJov46u8U=
+	t=1718785937; cv=none; b=FK6ZaeBVfmkGQNd3qh9/Haf2/hS0pbe38k12782R03itBxTCGTEr7WdTmWcrh1HOjVueKmZdOpHZ59u5zkGL5U1t+qTTZXRPQCm2tf7uZwhGdQNss3WBr4H8Dqb9pDHNw1QECWKmnATLvV4jLYTy61k82eIClEXiXx1cXQqjGWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718785866; c=relaxed/simple;
-	bh=Jg/LhxDWgBow8xex4QEPFx4XAujKc07RBYSibT0BSmg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ljIQeYTjT7dycobb/AwEhzaYHU3t+VphmRW0wEiXwcKWwaEr/pfTDDVbRCPsWji+SSP+6GLL77jnw42OHogw47Ejq/P9aPbkDn8S/izx/RazNd32iGJ4d2UZ95FQgoUZxFvXcZQKNxwZ18G/q15H1ecj9/RJUNGlFWpZjRU2Gzs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BJy67NmN; arc=none smtp.client-ip=95.215.58.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: jamestiotio@gmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718785859;
+	s=arc-20240116; t=1718785937; c=relaxed/simple;
+	bh=+2joTCwEvbc7KrZi+nMHbY004XoRVtUhnAflVlD9NYU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OJPb44r0mY1H3q9x7i5xtnqrjt2Yw3I0WGecTen7/McYLKolibUf3EeouIWpVLGca9JPVsHOX+4xeUvXVmIW/xWr8A7ajGgOM8DLE+evRsH/8d3vixmO4tzMxjm0lpCynHumg1GGz6JcDbUiNYr88FhD+49MOB/HmnewgVUqttE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YtvxvdzM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718785935;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d0R2bWWd5V85nriXvhkkwm8qakajLHVJtklfbxwq77k=;
-	b=BJy67NmNfMvH+JJ53Scb+1veXXykLh0eq6GIzOyrcYnMhCE0S9kLnyO9yOqx/zOAge/K/Z
-	C2btTiufbgpMetCJYOBUldHEAxacYsenxyMDYPXo/gucFkVE5t/wdxD8lDxIcy34mcTkDw
-	FIu4LGEurL1aFwy4vc+DNwkR3yQDAJU=
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: kvm-riscv@lists.infradead.org
-X-Envelope-To: atishp@rivosinc.com
-X-Envelope-To: cade.richard@berkeley.edu
-Date: Wed, 19 Jun 2024 10:30:56 +0200
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: James Raphael Tiovalen <jamestiotio@gmail.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	atishp@rivosinc.com, cade.richard@berkeley.edu
-Subject: Re: [kvm-unit-tests PATCH 2/4] riscv: Update exception cause list
-Message-ID: <20240619-5747f9b7cf121c71889128a7@orel>
-References: <20240618173053.364776-1-jamestiotio@gmail.com>
- <20240618173053.364776-3-jamestiotio@gmail.com>
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SVHHXWeH5aQFZ8JdFAToDf6m3aAxA4I0hr87LTb8rSI=;
+	b=YtvxvdzMT9PiQq55bDd0UfNzbSLYGQo+oq0k/0MpRrX+8CKrx3o7n3gIkY2zeNUtevvx6f
+	VO3dkqrWDhIgXlJGhL+qnMsHgzYk3r0YJbgVQSd19lrhOLwnssB3UJkknCGC5qYHVzbvm/
+	8LTiYOa3wNyLJ4IsP6XTeZQbhWOqTwA=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-553-WiZ7PL65PtqmKAuadzP8eg-1; Wed,
+ 19 Jun 2024 04:32:10 -0400
+X-MC-Unique: WiZ7PL65PtqmKAuadzP8eg-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CE2501955E84;
+	Wed, 19 Jun 2024 08:32:07 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0C41819560AF;
+	Wed, 19 Jun 2024 08:32:04 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v10 0/3] KVM: selftests: aarch64: Introduce pmu_event_filter_test
+Date: Wed, 19 Jun 2024 04:31:53 -0400
+Message-Id: <20240619083200.1047073-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240618173053.364776-3-jamestiotio@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Wed, Jun 19, 2024 at 01:30:51AM GMT, James Raphael Tiovalen wrote:
-> Update the list of exception and interrupt causes to follow the latest
-> RISC-V privileged ISA specification (version 20240411).
-> 
-> Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
-> ---
->  lib/riscv/asm/csr.h       | 15 +++++++++------
->  lib/riscv/asm/processor.h |  2 +-
->  2 files changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-> index d5879d2a..c1777744 100644
-> --- a/lib/riscv/asm/csr.h
-> +++ b/lib/riscv/asm/csr.h
-> @@ -26,15 +26,18 @@
->  #define EXC_STORE_MISALIGNED	6
->  #define EXC_STORE_ACCESS	7
->  #define EXC_SYSCALL		8
-> -#define EXC_HYPERVISOR_SYSCALL	9
-> -#define EXC_SUPERVISOR_SYSCALL	10
-> +#define EXC_SUPERVISOR_SYSCALL	9
->  #define EXC_INST_PAGE_FAULT	12
->  #define EXC_LOAD_PAGE_FAULT	13
->  #define EXC_STORE_PAGE_FAULT	15
-> -#define EXC_INST_GUEST_PAGE_FAULT	20
-> -#define EXC_LOAD_GUEST_PAGE_FAULT	21
-> -#define EXC_VIRTUAL_INST_FAULT		22
-> -#define EXC_STORE_GUEST_PAGE_FAULT	23
-> +#define EXC_SOFTWARE_CHECK	18
-> +#define EXC_HARDWARE_ERROR	19
+The test is inspired by the pmu_event_filter_test which implemented by x86. On
+the arm64 platform, there is the same ability to set the pmu_event_filter
+through the KVM_ARM_VCPU_PMU_V3_FILTER attribute. So add the test for arm64.
 
-The above changes don't update the exception cause list to the latest
-spec, they drop the defines supporting the hypervisor extension's
-augmentations (see Section 18.6.1 of the 20240411 priv spec).
+The series first create the helper function which can be used
+for the vpmu related tests. Then, it implement the test.
 
-> +
-> +/* Interrupt causes */
-> +#define IRQ_SUPERVISOR_SOFTWARE	1
-> +#define IRQ_SUPERVISOR_TIMER	5
-> +#define IRQ_SUPERVISOR_EXTERNAL	9
-> +#define IRQ_COUNTER_OVERFLOW	13
+Changelog:
+----------
+v9->v10:
+  - Remove the first_filter checking in the prepare_expected_pmce function.
+  - Add a new macro EVENT_[ALLOW|DENY] to make the definition of filter more
+  readable.
+  - Some small improvements.
 
-These are fine, but we could also add the defines for the hypervisor
-extension's augmentations. I also usually just copy+paste the defines
-from Linux since I prefer name consistency.
+v8->v9:
+  - Rebased to latest kvm-arm/next.
 
->  
->  #ifndef __ASSEMBLY__
->  
-> diff --git a/lib/riscv/asm/processor.h b/lib/riscv/asm/processor.h
-> index 767b1caa..5942ed2e 100644
-> --- a/lib/riscv/asm/processor.h
-> +++ b/lib/riscv/asm/processor.h
-> @@ -4,7 +4,7 @@
->  #include <asm/csr.h>
->  #include <asm/ptrace.h>
->  
-> -#define EXCEPTION_CAUSE_MAX	16
-> +#define EXCEPTION_CAUSE_MAX	64
+v7->v8:
+  - Rebased to kvm-arm/next.
+  - Deleted the GIC layout related staff.
+  - Fixed the checking logic in the kvm_pmu_support_events.
 
-If we want to test the H extension, then we'll want 20-23, but everything
-else is custom or reserved, so we don't need to allocate handler pointer
-space all the way up to 64 as they'll never be used.
+v6->v7:
+  - Rebased to v6.9-rc3.
 
-Thanks,
-drew
+v5->v6:
+  - Rebased to v6.9-rc1.
+  - Collect RB.
+  - Add multiple filter test.
 
->  #define INTERRUPT_CAUSE_MAX	16
->  
->  typedef void (*exception_fn)(struct pt_regs *);
-> -- 
-> 2.43.0
-> 
-> 
-> -- 
-> kvm-riscv mailing list
-> kvm-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/kvm-riscv
+v4->v5:
+  - Rebased to v6.8-rc6.
+  - Refactor the helper function, make it fine-grained and easy to be used.
+  - Namimg improvements.
+  - Use the kvm_device_attr_set() helper.
+  - Make the test descriptor array readable and clean.
+  - Delete the patch which moves the pmu related helper to vpmu.h.
+  - Remove the kvm_supports_pmu_event_filter() function since nobody will run
+  this on a old kernel.
+
+v3->v4:
+  - Rebased to the v6.8-rc2.
+
+v2->v3:
+  - Check the pmceid in guest code instead of pmu event count since different
+  hardware may have different event count result, check pmceid makes it stable
+  on different platform.                        [Eric]
+  - Some typo fixed and commit message improved.
+
+v1->v2:
+  - Improve the commit message.                 [Eric]
+  - Fix the bug in [enable|disable]_counter.    [Raghavendra & Marc]
+  - Add the check if kvm has attr KVM_ARM_VCPU_PMU_V3_FILTER.
+  - Add if host pmu support the test event throught pmceid0.
+  - Split the test_invalid_filter() to another patch. [Eric]
+
+Shaoqin Huang (3):
+  KVM: selftests: aarch64: Add helper function for the vpmu vcpu
+    creation
+  KVM: selftests: aarch64: Introduce pmu_event_filter_test
+  KVM: selftests: aarch64: Add invalid filter test in
+    pmu_event_filter_test
+
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../kvm/aarch64/pmu_event_filter_test.c       | 352 ++++++++++++++++++
+ .../kvm/aarch64/vpmu_counter_access.c         |  32 +-
+ .../selftests/kvm/include/aarch64/vpmu.h      |  28 ++
+ 4 files changed, 387 insertions(+), 26 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/aarch64/pmu_event_filter_test.c
+ create mode 100644 tools/testing/selftests/kvm/include/aarch64/vpmu.h
+
+-- 
+2.40.1
+
 
