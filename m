@@ -1,292 +1,136 @@
-Return-Path: <kvm+bounces-19954-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DAFD90E7A5
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 11:58:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4194490E85C
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 12:33:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD0D6B2171C
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 09:58:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E24591F21FC0
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 10:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948771369AC;
-	Wed, 19 Jun 2024 09:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 135A912FB0A;
+	Wed, 19 Jun 2024 10:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="qofmvByi";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="gupKfMs7";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="fm026ELG";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="mIDPKRxh"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VymZb0Dq"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DF86F2F8;
-	Wed, 19 Jun 2024 09:56:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16F2578C91;
+	Wed, 19 Jun 2024 10:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718791011; cv=none; b=r8BKyzvohHJj4L5HEQXQKmpa401X1C7I9MA2mid33M/nk9Hs5nhkc03st2J0HcWSDnOYWEXKjWUVJSMO/VqPEEq/mzD4CqQE0Ws+KaKZ7hEBWnLw8O51hv2RQ+hELeHhruFTXywCFhWg42Ww140PFVGLuOsSHUj1zrN4kXWjsY0=
+	t=1718793189; cv=none; b=HDVr9OYqNI1E7bmUgi5VdhhpIQOi4WIfjG1rJwpKIEcFmZiA8L03nOi0bIZfYcc3yPmL66pAQaOSMCL63SswIUzCLZSeTKJpQV8LxhKqsLNYkO3zUKhidTg+pJ5pcBL0GHl619Manbn22P0eGTDOfAe1+I6uYnnvR/7sWbKWBfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718791011; c=relaxed/simple;
-	bh=3b+AhgiDeU6IAw+CpzAdDH9WQMz/rhrEU3CNa/Rm0aI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=l3ckVB25aJdTZcaPiX2u+NxEZofKG3Kp7pAEr+22njHGTeGN8A0UyUbjEL0oagB+kNAu6noqgZO56CEDuYvzLg63kjJVTFZ6k0eaGMcgw5twsnvyBm+V7ktgiTPTh7HL7Gcpp7/pga5yh57rzAyF+G42x7ppQtFiFjs30DvWdYk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=qofmvByi; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=gupKfMs7; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=fm026ELG; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=mIDPKRxh; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 38C1B21A68;
-	Wed, 19 Jun 2024 09:56:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718791006; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=7HsdT/0BmhQCEN4xtZRZ/6IP2e/RgequrjnLXOsGUD4=;
-	b=qofmvByiwh9txghqFFaZHtHYcvvtoruECQKK85wgvUWpINzXKrxBDd3dIm6gWN8YbzwGgJ
-	A7L/Y2Pg3FyhCvXKAQLmT0G8T24tn1Aoa3XSVI+b0gzz97qsEc0lE2igwYoJdPqJUG5QGo
-	URb+LU6YpES8EPt056xGfNWxpKdhWjQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718791006;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=7HsdT/0BmhQCEN4xtZRZ/6IP2e/RgequrjnLXOsGUD4=;
-	b=gupKfMs73Ln2FnpeGnuIiQSlwpm1BhXXq3wgjhS7GF/09X4fm86BQn8pwcU8nZLRrZ7NN7
-	hYqyTp2nv99+4sCA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=fm026ELG;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=mIDPKRxh
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1718791005; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=7HsdT/0BmhQCEN4xtZRZ/6IP2e/RgequrjnLXOsGUD4=;
-	b=fm026ELGq6BkHmcELQZZCTQiX0MN4Inb1RMFy9azGsRfLytjbQTOGvgk5bIdqHJ8tlMosO
-	DDVto9qoiwdLmW+NWCaZveZnchc3OjsmUFEJiqIG69ieiVc0x3cPNWGJRnIE+3N73TYF7V
-	yJR0gWJjCN1izPKDljaRkv3rHPJLwQ0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1718791005;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=7HsdT/0BmhQCEN4xtZRZ/6IP2e/RgequrjnLXOsGUD4=;
-	b=mIDPKRxhF2NZb5RgZhLf/KfA8bn7biMpB/GzGJynYW9bP8KrM+RbLs0FrJAsuOnd9d3uoJ
-	aH9dBJjbN+pTPTCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id EE1E013ABD;
-	Wed, 19 Jun 2024 09:56:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id SkqIOVyrcmbCOAAAD6G6ig
-	(envelope-from <vbabka@suse.cz>); Wed, 19 Jun 2024 09:56:44 +0000
-Message-ID: <c208e95d-9aa9-476f-9dee-0242a2d6a24f@suse.cz>
-Date: Wed, 19 Jun 2024 11:56:44 +0200
+	s=arc-20240116; t=1718793189; c=relaxed/simple;
+	bh=UrZRPJUMF85098sOggzaqUsbYYJWPI5tGohEdROwtpk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IL+8fzhTyhk+1M3i9GAB8tUgydpJeeCeXp/KogxBATxs6atPmkToYHgSDZeq9ywsK5mBVE6jLJX/khdfySLAl09nbwMdWj9/TV1hmSYQh6hJwgTTEgAC0xK6VbwIpBqGmwTlRLVqgFsbqoG0Q5Eoe7IADEOPmQPt8m6frFFb6Ko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VymZb0Dq; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JATtdE016633;
+	Wed, 19 Jun 2024 10:33:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	EmFnM2M6vINWkHXs613zLTG1TdJP9EUBcYSfppMV+yQ=; b=VymZb0DqgymUQD+t
+	U9ygY+RCVEDplpFs+wg0VDyn4wboiGPTiY6QBI2pzeqjxv4+YWI6lhvSYonPyoIm
+	b9+swAivHcFPir4Di+Bj5eHuNuq5XfP6Eb8/FL03YRZdpsvZ1enJSZc/A2/qLbJh
+	4a3HUjsCFj9aeQl/RLQinT1sF1w3saZTZv9Wgbz0Rl7OAw2ubQizWFeVp97jpfOK
+	df/szhLREn9JHiaJ5T3tCauzZnUd+K+4hQUouHAbU/YygksUz+oS8yxDdEEiE7m2
+	RwUJCMyPsYz1jAVbP3WqdAdPsnVRP8dJeOEbVbMezZeqtv4/kWDOI26ZqqVzVtrK
+	GjDMtw==
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yuwm6007g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 10:33:04 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45J8exqE011027;
+	Wed, 19 Jun 2024 10:33:03 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yspsnb9gu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 19 Jun 2024 10:33:03 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45JAWvJn44695938
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 19 Jun 2024 10:32:59 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 84D052004E;
+	Wed, 19 Jun 2024 10:32:57 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 97F1020043;
+	Wed, 19 Jun 2024 10:32:56 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.42.81])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed, 19 Jun 2024 10:32:56 +0000 (GMT)
+Date: Wed, 19 Jun 2024 12:32:55 +0200
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Eric Farman <farman@linux.ibm.com>
+Cc: Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Jeff Johnson
+ <quic_jjohnson@quicinc.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Matthew
+ Rosato <mjrosato@linux.ibm.com>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        kernel-janitors@vger.kernel.org, Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH] s390/cio: add missing MODULE_DESCRIPTION() macros
+Message-ID: <20240619123255.4b1a6c6d.pasic@linux.ibm.com>
+In-Reply-To: <afdde0842680698276df0856dd8b896dac692b56.camel@linux.ibm.com>
+References: <20240615-md-s390-drivers-s390-cio-v1-1-8fc9584e8595@quicinc.com>
+	<064eb313-2f38-479d-80bd-14777f7d3d62@linux.ibm.com>
+	<afdde0842680698276df0856dd8b896dac692b56.camel@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Content-Language: en-US
-To: Uladzislau Rezki <urezki@gmail.com>, "Paul E. McKenney"
- <paulmck@kernel.org>
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>, Jakub Kicinski <kuba@kernel.org>,
- Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
- kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
- linux-trace-kernel@vger.kernel.org,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, kvm@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
- wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
- ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
- linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
- netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
- kasan-dev <kasan-dev@googlegroups.com>
-References: <Zmo9-YGraiCj5-MI@zx2c4.com>
- <08ee7eb2-8d08-4f1f-9c46-495a544b8c0e@paulmck-laptop>
- <Zmrkkel0Fo4_g75a@zx2c4.com> <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
- <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
- <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz> <ZnCDgdg1EH6V7w5d@pc636>
- <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz> <ZnFT1Czb8oRb0SE7@pc636>
- <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
- <ZnKqPqlPD3Rl04DZ@pc636>
-From: Vlastimil Babka <vbabka@suse.cz>
-Autocrypt: addr=vbabka@suse.cz; keydata=
- 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
- EP+ylKVEKb0Q2A==
-In-Reply-To: <ZnKqPqlPD3Rl04DZ@pc636>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-4.50 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	MX_GOOD(-0.01)[];
-	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[29];
-	FREEMAIL_TO(0.00)[gmail.com,kernel.org];
-	MIME_TRACE(0.00)[0:+];
-	SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FREEMAIL_CC(0.00)[zx2c4.com,kernel.org,inria.fr,vger.kernel.org,lists.linux.dev,efficios.com,lists.ozlabs.org,linux.ibm.com,csgroup.eu,gmail.com,lists.zx2c4.com,suse.de,netapp.com,oracle.com,talpey.com,netfilter.org,googlegroups.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.cz:+];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Queue-Id: 38C1B21A68
-X-Spam-Flag: NO
-X-Spam-Score: -4.50
-X-Spam-Level: 
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: kwRyS9oDx2UqRyENfPbHRtoLutxEkTs1
+X-Proofpoint-ORIG-GUID: kwRyS9oDx2UqRyENfPbHRtoLutxEkTs1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-19_02,2024-06-17_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 adultscore=0
+ malwarescore=0 priorityscore=1501 mlxscore=0 impostorscore=0
+ suspectscore=0 spamscore=0 bulkscore=0 lowpriorityscore=0 mlxlogscore=992
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406190077
 
-On 6/19/24 11:51 AM, Uladzislau Rezki wrote:
-> On Tue, Jun 18, 2024 at 09:48:49AM -0700, Paul E. McKenney wrote:
->> On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
->> > > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
->> > > >> +
->> > > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
->> > > >> +
->> > > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
->> > > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
->> > > > wanted to avoid initially.
->> > > 
->> > > I wanted to avoid new API or flags for kfree_rcu() users and this would
->> > > be achieved. The barrier is used internally so I don't consider that an
->> > > API to avoid. How difficult is the implementation is another question,
->> > > depending on how the current batching works. Once (if) we have sheaves
->> > > proven to work and move kfree_rcu() fully into SLUB, the barrier might
->> > > also look different and hopefully easier. So maybe it's not worth to
->> > > invest too much into that barrier and just go for the potentially
->> > > longer, but easier to implement?
->> > > 
->> > Right. I agree here. If the cache is not empty, OK, we just defer the
->> > work, even we can use a big 21 seconds delay, after that we just "warn"
->> > if it is still not empty and leave it as it is, i.e. emit a warning and
->> > we are done.
->> > 
->> > Destroying the cache is not something that must happen right away. 
->> 
->> OK, I have to ask...
->> 
->> Suppose that the cache is created and destroyed by a module and
->> init/cleanup time, respectively.  Suppose that this module is rmmod'ed
->> then very quickly insmod'ed.
->> 
->> Do we need to fail the insmod if the kmem_cache has not yet been fully
->> cleaned up?  If not, do we have two versions of the same kmem_cache in
->> /proc during the overlap time?
->> 
-> No fail :) If same cache is created several times, its s->refcount gets
-> increased, so, it does not create two entries in the "slabinfo". But i
-> agree that your point is good! We need to be carefully with removing and
-> simultaneous creating.
+On Tue, 18 Jun 2024 16:11:33 -0400
+Eric Farman <farman@linux.ibm.com> wrote:
 
-Note that this merging may be disabled or not happen due to various flags on
-the cache being incompatible with it. And I want to actually make sure it
-never happens for caches being already destroyed as that would lead to
-use-after-free (the workfn doesn't recheck the refcount in case a merge
-would happen during the grace period)
-
---- a/mm/slab_common.c
-+++ b/mm/slab_common.c
-@@ -150,9 +150,10 @@ int slab_unmergeable(struct kmem_cache *s)
- #endif
-
-        /*
--        * We may have set a slab to be unmergeable during bootstrap.
-+        * We may have set a cache to be unmergeable during bootstrap.
-+        * 0 is for cache being destroyed asynchronously
-         */
--       if (s->refcount < 0)
-+       if (s->refcount <= 0)
-                return 1;
-
-        return 0;
-
-> From the first glance, there is a refcounter and a global "slab_mutex"
-> which is used to protect a critical section. Destroying is almost fully
-> protected(as noted above, by a global mutex) with one exception, it is:
+> > > +MODULE_DESCRIPTION("VFIO based Physical Subchannel device
+> > > driver");  
+> > 
+> > Halil/Mathew/Eric,
+> > Could you please comment on this ?  
 > 
-> static void kmem_cache_release(struct kmem_cache *s)
-> {
-> 	if (slab_state >= FULL) {
-> 		sysfs_slab_unlink(s);
-> 		sysfs_slab_release(s);
-> 	} else {
-> 		slab_kmem_cache_release(s);
-> 	}
-> }
-> 
-> this one can race, IMO.
-> 
-> --
-> Uladzislau Rezki
+> That's what is in the prologue, and is fine.
 
+Eric can you explain it to me why is the attribute "physical" appropriate
+here? I did a quick grep for "Physical Subchannel" only turned up hits
+in vfio-ccw.
+
+My best guess is that "physical" was somehow intended to mean the
+opposite of "virtual". But actually it does not matter if our underlying
+subchannel is emulated or not, at least AFAIU.
+
+Regards,
+Halil
 
