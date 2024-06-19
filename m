@@ -1,233 +1,139 @@
-Return-Path: <kvm+bounces-19987-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19988-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F8AB90EF35
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 15:41:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7332790EF7E
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 15:55:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 349CF1F21FC2
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 13:41:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E4851C216BF
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 13:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA2F13DDC0;
-	Wed, 19 Jun 2024 13:41:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FF314F9D9;
+	Wed, 19 Jun 2024 13:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NxiKizfJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eLDfWOkJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1897914B96E
-	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 13:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731221DFF7;
+	Wed, 19 Jun 2024 13:55:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718804482; cv=none; b=OkjwMrXkw5FtmXJ2NMgMG3f83fn3Ck+4aGMSYLobysJQ1D0ngypxYPxpEUt0wB6bSMRx3kI5nM0ec3AiU0atQl+XGJ/XCjk2Ig+qCQv/Lenhv4jrNt3dcDcQr92lTgrewbYaTo7YHPEcqM48KJ76qJ5iMhNDaktghr23FcwwCnE=
+	t=1718805304; cv=none; b=g1pwxgDaj1uqeTBhYevSxn2/dPCOV16Huq5qx2H6HXX/I1pdCsFnq7Cd8QuEqgspQlMC2DCflzDa/LtyxhADu+gTTMHIO51lKx0hC0A2N9xm6Wn+FVxhmT4fsjp8NNJYUiiXmOC3Jn4+j5X9uk5h6uE8xme42w8MN6wkuoXPlJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718804482; c=relaxed/simple;
-	bh=2UHDI2XxwOvWyEzmuJdHe248WK5SMSQoAl8C2lNYnF8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WxpzUGVnaEDrGsxqyE09AMxXD5zMo+W0LmlmlV/Vnha6Gp6zyZ9nUW384Xylc2QAPLXlH/FXzpkiaajB1OU0o6jLgYK4xaULmWF8HP+TLgy118reewHHVQVN0aY8n7ebohQ3xohY02QDc8WZCojWyUXJvFuQWepSyT1+n23yuXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NxiKizfJ; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-57a4d7ba501so8273631a12.2
-        for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 06:41:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1718804479; x=1719409279; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xq+r7usRX/S+4Xtw72+s6ED4D41EE/ebQwhi1xrEsac=;
-        b=NxiKizfJvinvOV5R0OcD7jWZACj9F6fEN50IZP8y760Zcz9R/vineiwnJlqXPYRZHO
-         TF+ze/LVDSkn3Hkqgvg2HKwLbthEiPIEP10tS78c1kdjuF0t/9GQNzZCsa6tzoJEz1Ng
-         s8xYXc1mTLGVm0qSA3EMNytbad+hwyxEMvBsipbIxhpjFJ7nF7wUPsid6AHXZsN41zwz
-         5SWSVC9cJxl25hDfU0XvlH1IGMNjhDn88w9eovEE8BbWo+KCvdlPPtPWC/iBTvHd4nG/
-         P+h/0S1BbXNCTNk0g4csoBFUrNP5SMImBuiZmz2986Q32xU8hGNDNGkoO6dl4FVymST/
-         PJIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718804479; x=1719409279;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Xq+r7usRX/S+4Xtw72+s6ED4D41EE/ebQwhi1xrEsac=;
-        b=PoU1RSC9KwYdxiFASmunkZgBaH0wHrCntnZB/lvQO8K2AcQBsJOXR1dZSDMwKJHof+
-         t0F/JeeiOuQBYxLdhHBVBdcrbV85+nxVy40FqqGZt7dktsG0xT1L+4MoRrikzll0aizB
-         keVPyaY5cP5uNth365u9AgGigUenpA5/LIU838W9jhVTS329fc72eQLeW9t1URdrpd4S
-         OZtBPvxdv8HEgSrwqXNBGQYJWZNdhzyJzeFzCSo6S3qW2fkQTE+6fOXuWg3WXNFxuSR9
-         e0JEN2qpMro/jSBtA1pbPT1y/Dgc9Fw5uEuYzt+xGuq/2+fQmq3ZXXGEURFc3hibKZLp
-         3jzw==
-X-Gm-Message-State: AOJu0Yw8A0UIJiiQXwhKnJIiXDj4m9t040p19qCIT2MAEVGNOh71E8D6
-	HqzLA7L9lmdGOI23Z4Y7+lLrrHpB2TCA1rD3eabopuzF96F6UtKfVymQKcAQuju9VcVKeouC1oo
-	WLu1Mr5ySZzENLD4TuZXjC9STwNI=
-X-Google-Smtp-Source: AGHT+IHAxrkbW8tTRLluOV8D0Dh87IDRZSSauJptbq/0i/C0K3w9s8M1TK6Rtm4KpV501gXV7C9tjCUMu+zc2X7Idrg=
-X-Received: by 2002:a17:906:9c92:b0:a6e:f533:ce28 with SMTP id
- a640c23a62f3a-a6fab6071cfmr201835866b.12.1718804479113; Wed, 19 Jun 2024
- 06:41:19 -0700 (PDT)
+	s=arc-20240116; t=1718805304; c=relaxed/simple;
+	bh=2L+1+gYamAC+cVSHQFSO0PZ1BNdypHQRZrJb2/vZugA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Jm+9YFo0yip9Pe/UZDRMoZlAckBeTZRqD9a75Lf6kUtto6MlbqggJ+jT1lCWMrQLAg+0xzGojJ4wIf12X8MGpKG3vpoa26y3y522rhWRB7rDa97xlLExFsabBoDVjXHFUkrMQcTSBL9t/q+nrRa+1SG99977iR0AmbkRxzxGuhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eLDfWOkJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2DB5BC2BBFC;
+	Wed, 19 Jun 2024 13:55:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718805304;
+	bh=2L+1+gYamAC+cVSHQFSO0PZ1BNdypHQRZrJb2/vZugA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=eLDfWOkJs16coIdHaDXkWEYi4Ygwc7SSM9NMfot3FR8z4eYvk5oGV0UWLHh2CRWYk
+	 eO4+M4u6nMa4C0pWij/NKtp8q2GAKl1h29Rbv+2dQ74MNYrVJpPUBZ012KJZpxgWwY
+	 jwV/SQQUEO3QSPTg22SLHPP3MiJ9ExIa26+nSf/j+1uAg6v9aqJ15MX9MIUXi70RUl
+	 bNi0B8NLH+YgUn7xh2zs+Wk4wlMlUdcoAbJUztUxrxWHrM/kRVW4bVXRZfQ34R+1Qu
+	 wZ4T/bcd+1beBKR2+b0e55vjHMJAlvD9E+D2bqk1+7fWz/J85xPLMuexQ3jphpKJ0X
+	 g3Eu2NxKJveQw==
+Date: Wed, 19 Jun 2024 14:54:59 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Paolo Bonzini <pbonzini@redhat.com>, KVM <kvm@vger.kernel.org>
+Cc: Ashish Kalra <ashish.kalra@amd.com>, Borislav Petkov <bp@alien8.de>,
+	Brijesh Singh <brijesh.singh@amd.com>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Next Mailing List <linux-next@vger.kernel.org>,
+	Michael Roth <michael.roth@amd.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>
+Subject: linux-next: manual merge of the kvm tree with the tip tree
+Message-ID: <ZnLjMxzFE6UCPhqi@sirena.org.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240618173053.364776-1-jamestiotio@gmail.com>
- <20240618173053.364776-4-jamestiotio@gmail.com> <20240619-3ba7acf7b1504529899f6cc9@orel>
-In-Reply-To: <20240619-3ba7acf7b1504529899f6cc9@orel>
-From: James R T <jamestiotio@gmail.com>
-Date: Wed, 19 Jun 2024 21:40:42 +0800
-Message-ID: <CAA_Li+uQqXxb7REhDX6pzX0-T+p-WdmBcvJk9ZLK9p7TF6MtjQ@mail.gmail.com>
-Subject: Re: [kvm-unit-tests PATCH 3/4] riscv: Add methods to toggle interrupt
- enable bits
-To: Andrew Jones <andrew.jones@linux.dev>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, atishp@rivosinc.com, 
-	cade.richard@berkeley.edu
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="nQUwDpK7LRDpRSib"
+Content-Disposition: inline
+
+
+--nQUwDpK7LRDpRSib
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 19, 2024 at 4:39=E2=80=AFPM Andrew Jones <andrew.jones@linux.de=
-v> wrote:
->
-> On Wed, Jun 19, 2024 at 01:30:52AM GMT, James Raphael Tiovalen wrote:
-> > Add some helper methods to toggle the interrupt enable bits in the SIE
-> > register.
-> >
-> > Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
-> > ---
-> >  riscv/Makefile            |  1 +
-> >  lib/riscv/asm/csr.h       |  7 +++++++
-> >  lib/riscv/asm/interrupt.h | 12 ++++++++++++
-> >  lib/riscv/interrupt.c     | 39 +++++++++++++++++++++++++++++++++++++++
-> >  4 files changed, 59 insertions(+)
-> >  create mode 100644 lib/riscv/asm/interrupt.h
-> >  create mode 100644 lib/riscv/interrupt.c
-> >
-> > diff --git a/riscv/Makefile b/riscv/Makefile
-> > index 919a3ebb..108d4481 100644
-> > --- a/riscv/Makefile
-> > +++ b/riscv/Makefile
-> > @@ -30,6 +30,7 @@ cflatobjs +=3D lib/memregions.o
-> >  cflatobjs +=3D lib/on-cpus.o
-> >  cflatobjs +=3D lib/vmalloc.o
-> >  cflatobjs +=3D lib/riscv/bitops.o
-> > +cflatobjs +=3D lib/riscv/interrupt.o
-> >  cflatobjs +=3D lib/riscv/io.o
-> >  cflatobjs +=3D lib/riscv/isa.o
-> >  cflatobjs +=3D lib/riscv/mmu.o
-> > diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-> > index c1777744..da58b0ce 100644
-> > --- a/lib/riscv/asm/csr.h
-> > +++ b/lib/riscv/asm/csr.h
-> > @@ -4,15 +4,22 @@
-> >  #include <linux/const.h>
-> >
-> >  #define CSR_SSTATUS          0x100
-> > +#define CSR_SIE                      0x104
-> >  #define CSR_STVEC            0x105
-> >  #define CSR_SSCRATCH         0x140
-> >  #define CSR_SEPC             0x141
-> >  #define CSR_SCAUSE           0x142
-> >  #define CSR_STVAL            0x143
-> > +#define CSR_SIP                      0x144
-> >  #define CSR_SATP             0x180
-> >
-> >  #define SSTATUS_SIE          (_AC(1, UL) << 1)
-> >
-> > +#define SIE_SSIE             (_AC(1, UL) << 1)
-> > +#define SIE_STIE             (_AC(1, UL) << 5)
-> > +#define SIE_SEIE             (_AC(1, UL) << 9)
-> > +#define SIE_LCOFIE           (_AC(1, UL) << 13)
-> > +
-> >  /* Exception cause high bit - is an interrupt if set */
-> >  #define CAUSE_IRQ_FLAG               (_AC(1, UL) << (__riscv_xlen - 1)=
-)
-> >
-> > diff --git a/lib/riscv/asm/interrupt.h b/lib/riscv/asm/interrupt.h
-> > new file mode 100644
-> > index 00000000..b760afbb
-> > --- /dev/null
-> > +++ b/lib/riscv/asm/interrupt.h
-> > @@ -0,0 +1,12 @@
-> > +/* SPDX-License-Identifier: GPL-2.0-only */
-> > +#ifndef _ASMRISCV_INTERRUPT_H_
-> > +#define _ASMRISCV_INTERRUPT_H_
-> > +
-> > +#include <stdbool.h>
-> > +
-> > +void toggle_software_interrupt(bool enable);
-> > +void toggle_timer_interrupt(bool enable);
-> > +void toggle_external_interrupt(bool enable);
-> > +void toggle_local_cof_interrupt(bool enable);
-> > +
-> > +#endif /* _ASMRISCV_INTERRUPT_H_ */
-> > diff --git a/lib/riscv/interrupt.c b/lib/riscv/interrupt.c
-> > new file mode 100644
-> > index 00000000..bc0e16f1
-> > --- /dev/null
-> > +++ b/lib/riscv/interrupt.c
-> > @@ -0,0 +1,39 @@
-> > +// SPDX-License-Identifier: GPL-2.0-only
-> > +/*
-> > + * Copyright (C) 2024, James Raphael Tiovalen <jamestiotio@gmail.com>
-> > + */
-> > +#include <libcflat.h>
-> > +#include <asm/csr.h>
-> > +#include <asm/interrupt.h>
-> > +
-> > +void toggle_software_interrupt(bool enable)
-> > +{
-> > +     if (enable)
-> > +             csr_set(CSR_SIE, SIE_SSIE);
-> > +     else
-> > +             csr_clear(CSR_SIE, SIE_SSIE);
-> > +}
-> > +
-> > +void toggle_timer_interrupt(bool enable)
-> > +{
-> > +     if (enable)
-> > +             csr_set(CSR_SIE, SIE_STIE);
-> > +     else
-> > +             csr_clear(CSR_SIE, SIE_STIE);
-> > +}
-> > +
-> > +void toggle_external_interrupt(bool enable)
-> > +{
-> > +     if (enable)
-> > +             csr_set(CSR_SIE, SIE_SEIE);
-> > +     else
-> > +             csr_clear(CSR_SIE, SIE_SEIE);
-> > +}
-> > +
-> > +void toggle_local_cof_interrupt(bool enable)
-> > +{
-> > +     if (enable)
-> > +             csr_set(CSR_SIE, SIE_LCOFIE);
-> > +     else
-> > +             csr_clear(CSR_SIE, SIE_LCOFIE);
-> > +}
-> > --
-> > 2.43.0
-> >
->
-> Most of this patch seems premature since the series only needs
-> toggle_timer_interrupt(). Also, I think lib/riscv/interrupt.c
-> is premature because something like toggle_timer_interrupt()
-> can be a static inline in a new lib/riscv/asm/timer.h file.
->
+Hi all,
 
-Got it. In that case, I will combine the changes with the actual test
-since we will be adding only the timer interrupt code.
+Today's linux-next merge of the kvm tree got a conflict in:
 
-> And please provide two functions rather than a toggle with
-> a parameter, i.e.
->
->   timer_interrupt_enable() / timer_interrupt_disable()
->
+  arch/x86/include/asm/sev-common.h
 
-Sure, will do that.
+between commit:
 
-> Thanks,
-> drew
+  34ff659017359 ("x86/sev: Use kernel provided SVSM Calling Areas")
 
-Best regards,
-James Raphael Tiovalen
+=66rom the tip tree and commit:
+
+  d46b7b6a5f9ec ("KVM: SEV: Add support to handle MSR based Page State Chan=
+ge VMGEXIT")
+
+=66rom the kvm tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+diff --cc arch/x86/include/asm/sev-common.h
+index e90d403f2068b,8647cc05e2f49..0000000000000
+--- a/arch/x86/include/asm/sev-common.h
++++ b/arch/x86/include/asm/sev-common.h
+@@@ -98,19 -109,9 +109,22 @@@ enum psc_op=20
+  	/* GHCBData[63:32] */				\
+  	(((u64)(val) & GENMASK_ULL(63, 32)) >> 32)
+ =20
+ +/* GHCB Run at VMPL Request/Response */
+ +#define GHCB_MSR_VMPL_REQ		0x016
+ +#define GHCB_MSR_VMPL_REQ_LEVEL(v)			\
+ +	/* GHCBData[39:32] */				\
+ +	(((u64)(v) & GENMASK_ULL(7, 0) << 32) |		\
+ +	/* GHCBDdata[11:0] */				\
+ +	GHCB_MSR_VMPL_REQ)
+ +
+ +#define GHCB_MSR_VMPL_RESP		0x017
+ +#define GHCB_MSR_VMPL_RESP_VAL(v)			\
+ +	/* GHCBData[63:32] */				\
+ +	(((u64)(v) & GENMASK_ULL(63, 32)) >> 32)
+ +
++ /* Set highest bit as a generic error response */
++ #define GHCB_MSR_PSC_RESP_ERROR (BIT_ULL(63) | GHCB_MSR_PSC_RESP)
++=20
+  /* GHCB Hypervisor Feature Request/Response */
+  #define GHCB_MSR_HV_FT_REQ		0x080
+  #define GHCB_MSR_HV_FT_RESP		0x081
+
+--nQUwDpK7LRDpRSib
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmZy4zIACgkQJNaLcl1U
+h9Ac1ggAgkntQi6/mci/5sPhuewuaPr/pC/ZfJHq+36pfpdyL6J13Tq30j1ZVnr5
+h9WfzGd8g4wyOUN0jfXJRunOtDbYDNi/B2r+rLikhtUW0VKPKsPl1xQX2pODRvYN
+Zg9+Nj4WQ+Ir5zslNjNF97+4IExUaxSDkqeja8LlZ5PEzOPGpuLriYJEAH9D7svp
+I9BFrGeOG87IKfRS+skYEwDFTiTTcsgDuZ4S8GeYA1M4tDJXSLiVT1aDWhTKbnhT
+KS0/2KwhngcdcSDR6xlhs/xvzwkTtsTVza1IpGG10r8rOp53LRNRa39pG9kDKGn2
+qmBgRuJFC8jL3/XDNnlNKzk2kuxdAQ==
+=cDeN
+-----END PGP SIGNATURE-----
+
+--nQUwDpK7LRDpRSib--
 
