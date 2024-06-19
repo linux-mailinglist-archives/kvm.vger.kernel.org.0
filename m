@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-20010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20011-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05FE590F559
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 19:41:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B1A190F55A
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 19:41:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A72FA1F217A1
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 17:41:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2DDD1F213F6
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 17:41:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B398157A74;
-	Wed, 19 Jun 2024 17:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6205D157E93;
+	Wed, 19 Jun 2024 17:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UHYxaX3b"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vwtNSwpV"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
+Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C623A15749E
-	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 17:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C83415667E
+	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 17:41:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718818868; cv=none; b=Jzd8ecYsu5cY+EVOkUBhe4rthRHcUeA3WWSrvtTjJOjZoLyrKWJNv8b32xXxw1HkSLduw9GRoEitoumeZwAsaO/CS/qfy66HzkvvfGeYaiXv6icY6i5/koBfh6+pf3WcR5mp4+8qLUrDwAc55ELWmFu3TlxAsBHkRKaHz0EaKOk=
+	t=1718818869; cv=none; b=EPgODc6xzP+a+kH8lK+FKXdFkLMRG3lV3RRle5181R6/5Uhij463ftCJ8b2xQR2K+iyeUPVKKV0FBzOhnBjS01jvJqf9CV55EymVseSIK4jEmFuAoErEJIMnOTUmJvLqnJ/KNLLjKFm9m7inKU/mlCQwgpOcwVDGqX6cKhcGULs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718818868; c=relaxed/simple;
-	bh=zOqxcZFmHJGpOGhcGGZoWFGb540H7cmo5WXxVc/vqKI=;
+	s=arc-20240116; t=1718818869; c=relaxed/simple;
+	bh=O9MO5ksgfZKE6Psjp/NK1WSZjNKbR3uQC4OGuUJZ1x8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NaumNJtM7axzYDf07+qfZO23HwXV0A75githbKWNUS9pMkitpbv/oCk+ZctU4yOAuvv2kc45XFAaeihwYtiumMcbyvFAH40+dL15wUHbNlpQA5CQC8gX0ZTrcJ5v8J9yIxByKNtAzx05TBxB7bcBPTtQ+rQUr0aLPrr1L0gaysU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UHYxaX3b; arc=none smtp.client-ip=91.218.175.171
+	 MIME-Version; b=Gt1CBq5d1Bv3lkiFqWRDECPsOdf6liWD94OD3nGZp29JcLpgY+vNa2ki2z94lVCI1aMy5zOeh3EhgaCkYEoAB8m4Qb9NzcDQdq0hJhDROFXZfCbBGMCnt+422ytFCV/ujBt4Dla5ojqmS9CqPPN9KR3BzhLTKx23f+/+zk6a9CA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vwtNSwpV; arc=none smtp.client-ip=91.218.175.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718818864;
+	t=1718818866;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=bPZ0x6Ubna/kLUCCemSwfEP2cYkCcPNTFZJJq7A7Wo4=;
-	b=UHYxaX3bDW/lrwnMU1SkooVVc+MPRGRxQjkfNFbBhifG692n55uCNqE+yLEJkFZHRoJH/F
-	TZ/Q7LpVbo7zlSSipZMTaMJ0Gg8WXt4BQg2A04YHYd4rA60K/IJfnFfIaq9cBh0mnrKcWq
-	04QgrDRN9xWekXoxvoPJNpqNH4Wj9VQ=
+	bh=JFicmG6gjOgSjsYwgMKo9ydmBK5VIdzL4WrGLPRClyU=;
+	b=vwtNSwpVzIQxtVqqJsRX9i/XyVLvP+HPJVfMS2FS76Gj/zFHOjiUbWlq9n4DbRQkVzBUqh
+	Gvzfog5GjoJXaS4p5P1OCAsfAiidME6gcj7NrRJBBQF8HvCFVO0GGzlLTmZRnFeMg0KgNr
+	bVi56t72BG+GfH9BOaOeNyZLhl7zP/w=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -63,9 +63,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	Shaoqin Huang <shahuang@redhat.com>,
 	Eric Auger <eric.auger@redhat.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v5 07/10] KVM: arm64: Treat CTR_EL0 as a VM feature ID register
-Date: Wed, 19 Jun 2024 17:40:33 +0000
-Message-ID: <20240619174036.483943-8-oliver.upton@linux.dev>
+Subject: [PATCH v5 08/10] KVM: arm64: show writable masks for feature registers
+Date: Wed, 19 Jun 2024 17:40:34 +0000
+Message-ID: <20240619174036.483943-9-oliver.upton@linux.dev>
 In-Reply-To: <20240619174036.483943-1-oliver.upton@linux.dev>
 References: <20240619174036.483943-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -79,108 +79,57 @@ X-Migadu-Flow: FLOW_OUT
 
 From: Sebastian Ott <sebott@redhat.com>
 
-CTR_EL0 is currently handled as an invariant register, thus
-guests will be presented with the host value of that register.
+Instead of using ~0UL provide the actual writable mask for
+non-id feature registers in the output of the
+KVM_ARM_GET_REG_WRITABLE_MASKS ioctl.
 
-Add emulation for CTR_EL0 based on a per VM value. Userspace can
-switch off DIC and IDC bits and reduce DminLine and IminLine sizes.
-Naturally, ensure CTR_EL0 is trapped (HCR_EL2.TID2=1) any time that a
-VM's CTR_EL0 differs from hardware.
+This changes the mask for the CTR_EL0 and CLIDR_EL1 registers.
 
 Signed-off-by: Sebastian Ott <sebott@redhat.com>
-Reviewed-by: Shaoqin Huang <shahuang@redhat.com>
+Reviewed-by: Eric Auger <eric.auger@redhat.com>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/include/asm/kvm_host.h |  4 ++++
- arch/arm64/kvm/sys_regs.c         | 20 ++++++++++----------
- 2 files changed, 14 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 19 +++++--------------
+ 1 file changed, 5 insertions(+), 14 deletions(-)
 
-diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
-index 26042875d6fc..f6de08e81d49 100644
---- a/arch/arm64/include/asm/kvm_host.h
-+++ b/arch/arm64/include/asm/kvm_host.h
-@@ -329,6 +329,8 @@ struct kvm_arch {
- #define KVM_ARM_ID_REG_NUM	(IDREG_IDX(sys_reg(3, 0, 0, 7, 7)) + 1)
- 	u64 id_regs[KVM_ARM_ID_REG_NUM];
- 
-+	u64 ctr_el0;
-+
- 	/* Masks for VNCR-baked sysregs */
- 	struct kvm_sysreg_masks	*sysreg_masks;
- 
-@@ -1335,6 +1337,8 @@ static inline u64 *__vm_id_reg(struct kvm_arch *ka, u32 reg)
- 	switch (reg) {
- 	case sys_reg(3, 0, 0, 1, 0) ... sys_reg(3, 0, 0, 7, 7):
- 		return &ka->id_regs[IDREG_IDX(reg)];
-+	case SYS_CTR_EL0:
-+		return &ka->ctr_el0;
- 	default:
- 		WARN_ON_ONCE(1);
- 		return NULL;
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index a467ff4290a7..a12f3bdfb43d 100644
+index a12f3bdfb43d..d8d2a7880576 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -1583,6 +1583,9 @@ static bool is_feature_id_reg(u32 encoding)
-  */
- static inline bool is_vm_ftr_id_reg(u32 id)
- {
-+	if (id == SYS_CTR_EL0)
-+		return true;
-+
- 	return (sys_reg_Op0(id) == 3 && sys_reg_Op1(id) == 0 &&
- 		sys_reg_CRn(id) == 0 && sys_reg_CRm(id) >= 1 &&
- 		sys_reg_CRm(id) < 8);
-@@ -1898,7 +1901,7 @@ static bool access_ctr(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
- 	if (p->is_write)
- 		return write_to_read_only(vcpu, p, r);
+@@ -2486,7 +2486,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
  
--	p->regval = read_sanitised_ftr_reg(SYS_CTR_EL0);
-+	p->regval = kvm_read_vm_id_reg(vcpu->kvm, SYS_CTR_EL0);
- 	return true;
- }
- 
-@@ -2487,7 +2490,10 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	{ SYS_DESC(SYS_CCSIDR_EL1), access_ccsidr },
+ 	{ SYS_DESC(SYS_CLIDR_EL1), access_clidr, reset_clidr, CLIDR_EL1,
+-	  .set_user = set_clidr },
++	  .set_user = set_clidr, .val = ~CLIDR_EL1_RES0 },
  	{ SYS_DESC(SYS_CCSIDR2_EL1), undef_access },
  	{ SYS_DESC(SYS_SMIDR_EL1), undef_access },
  	{ SYS_DESC(SYS_CSSELR_EL1), access_csselr, reset_unknown, CSSELR_EL1 },
--	{ SYS_DESC(SYS_CTR_EL0), access_ctr },
-+	ID_WRITABLE(CTR_EL0, CTR_EL0_DIC_MASK |
-+			     CTR_EL0_IDC_MASK |
-+			     CTR_EL0_DminLine_MASK |
-+			     CTR_EL0_IminLine_MASK),
- 	{ SYS_DESC(SYS_SVCR), undef_access },
+@@ -4046,20 +4046,11 @@ int kvm_vm_ioctl_get_reg_writable_masks(struct kvm *kvm, struct reg_mask_range *
+ 		if (!is_feature_id_reg(encoding) || !reg->set_user)
+ 			continue;
  
- 	{ PMU_SYS_REG(PMCR_EL0), .access = access_pmcr, .reset = reset_pmcr,
-@@ -3725,18 +3731,11 @@ FUNCTION_INVARIANT(midr_el1)
- FUNCTION_INVARIANT(revidr_el1)
- FUNCTION_INVARIANT(aidr_el1)
+-		/*
+-		 * For ID registers, we return the writable mask. Other feature
+-		 * registers return a full 64bit mask. That's not necessary
+-		 * compliant with a given revision of the architecture, but the
+-		 * RES0/RES1 definitions allow us to do that.
+-		 */
+-		if (is_vm_ftr_id_reg(encoding)) {
+-			if (!reg->val ||
+-			    (is_aa32_id_reg(encoding) && !kvm_supports_32bit_el0()))
+-				continue;
+-			val = reg->val;
+-		} else {
+-			val = ~0UL;
++		if (!reg->val ||
++		    (is_aa32_id_reg(encoding) && !kvm_supports_32bit_el0())) {
++			continue;
+ 		}
++		val = reg->val;
  
--static u64 get_ctr_el0(struct kvm_vcpu *v, const struct sys_reg_desc *r)
--{
--	((struct sys_reg_desc *)r)->val = read_sanitised_ftr_reg(SYS_CTR_EL0);
--	return ((struct sys_reg_desc *)r)->val;
--}
--
- /* ->val is filled in by kvm_sys_reg_table_init() */
- static struct sys_reg_desc invariant_sys_regs[] __ro_after_init = {
- 	{ SYS_DESC(SYS_MIDR_EL1), NULL, get_midr_el1 },
- 	{ SYS_DESC(SYS_REVIDR_EL1), NULL, get_revidr_el1 },
- 	{ SYS_DESC(SYS_AIDR_EL1), NULL, get_aidr_el1 },
--	{ SYS_DESC(SYS_CTR_EL0), NULL, get_ctr_el0 },
- };
- 
- static int get_invariant_sys_reg(u64 id, u64 __user *uaddr)
-@@ -4086,7 +4085,8 @@ static void vcpu_set_hcr(struct kvm_vcpu *vcpu)
- 		vcpu->arch.hcr_el2 |= HCR_FWB;
- 
- 	if (cpus_have_final_cap(ARM64_HAS_EVT) &&
--	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE))
-+	    !cpus_have_final_cap(ARM64_MISMATCHED_CACHE_TYPE) &&
-+	    kvm_read_vm_id_reg(kvm, SYS_CTR_EL0) == read_sanitised_ftr_reg(SYS_CTR_EL0))
- 		vcpu->arch.hcr_el2 |= HCR_TID4;
- 	else
- 		vcpu->arch.hcr_el2 |= HCR_TID2;
+ 		if (put_user(val, (masks + KVM_ARM_FEATURE_ID_RANGE_INDEX(encoding))))
+ 			return -EFAULT;
 -- 
 2.45.2.627.g7a2c4fd464-goog
 
