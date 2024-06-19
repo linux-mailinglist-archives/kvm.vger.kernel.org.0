@@ -1,227 +1,187 @@
-Return-Path: <kvm+bounces-19956-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19957-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 218C190E8D2
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 12:57:45 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1799690E93D
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 13:22:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D94E1C20B64
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 10:57:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44E2AB2359A
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 11:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC95913213A;
-	Wed, 19 Jun 2024 10:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41A113D2A2;
+	Wed, 19 Jun 2024 11:22:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OkwKW890"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OE0RMUMW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468A681722;
-	Wed, 19 Jun 2024 10:57:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6B9135A6D;
+	Wed, 19 Jun 2024 11:22:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718794655; cv=none; b=XE/xn7qhODYr77myAVbSCZdYKCr49iX6LT2SubB2cfP71pIbDuAhVxKgv6lR5l0EEjUMOfbWkKBKGNZS1d45zcaPRl2zw6g+PfVjgFjuo364Hp1s6Mh+GlK69LkxqiUZvNkenJ7Vgw7EHhRLeFqpuQkuxrtgW+bjdyBjjYJ03H4=
+	t=1718796140; cv=none; b=AVD1eRwH6w9/Mftajmm2bWZnRBskPsBT/kVX73naDP6k1+C+F7JILlXg7qa0abPH6suGIwZuBEoIcoinkbs2D7kSzAyLSyiMO0x66UmzwQVHKW8rQJKWrwSnGfLGay8qdCNz120UgoprXpBJ87064LpaAufav5APVqA61fY8rMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718794655; c=relaxed/simple;
-	bh=rqkfNevT7Hd2vagvCsHg2K0XwyiJSO1L2xF4faX5lMI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=nTAtNXnDjjqkiTmIzTeryhm3EYKK2wd0d45+1HTzFTJYaCFbq23iQlFkD23BT/n4tHhTWDck6Emt0Eu41Knv+n1lSXIXlY0J+JStGVVzxvVxO9u4+cG8hrzn47UQkRlxFMP9hwswv1eOOOJvY8kSagVRDoC/QWrYgx8jLMsgnBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OkwKW890; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45JAuSUw018913;
-	Wed, 19 Jun 2024 10:57:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:subject:from:to:cc:date:in-reply-to:references
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	P/olsSsVL26fvJj5rU3rvUfN4OtzXKn82T/ywI7oSgg=; b=OkwKW890TkmUdWQX
-	PB70u6Hc8cCs4o/OdlWuep2i2Owkzc6rfCRSGMBorNzETfs+2+EaiyJmMhZUIqhh
-	HveHP65jVvxoG7chYMPP6ItQN7GUs8CV9ivJcYmp+WRjrvt5Z4JPnVHKU9nOugj2
-	l9CGBJ548BhWKmTY3+nebaktrfEGxPo6jqYJxGqng6/ErM3IytJx1XhbEfegzcJq
-	nOizIn0cukesVoxq4PXzFCfNJvV36LuxfTyELBbuOvFMh4/lYuEbqJgvx4HZheyy
-	PXtDXW3LP6bIUEomjjBOsA32nSVT+jLPr1MvIhs8zJrZYlqEQCQPDYDHQW03E9Rk
-	pwQ3Aw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yux0qr06y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 10:57:25 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45JAvPxb020556;
-	Wed, 19 Jun 2024 10:57:25 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yux0qr05w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 10:57:25 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45JAib0w011027;
-	Wed, 19 Jun 2024 10:56:52 GMT
-Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yspsnbdmj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 19 Jun 2024 10:56:52 +0000
-Received: from smtpav01.dal12v.mail.ibm.com (smtpav01.dal12v.mail.ibm.com [10.241.53.100])
-	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45JAunLg16646810
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 19 Jun 2024 10:56:51 GMT
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A168458066;
-	Wed, 19 Jun 2024 10:56:49 +0000 (GMT)
-Received: from smtpav01.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B10DB58062;
-	Wed, 19 Jun 2024 10:56:47 +0000 (GMT)
-Received: from oc-fedora.boeblingen.de.ibm.com (unknown [9.152.212.217])
-	by smtpav01.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 19 Jun 2024 10:56:47 +0000 (GMT)
-Message-ID: <76a840711f7c073e52149107aa62045c462d7033.camel@linux.ibm.com>
-Subject: Re: [PATCH v3 2/3] vfio/pci: Tolerate oversized BARs by disallowing
- mmap
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Christoph Hellwig <hch@infradead.org>,
-        Alex Williamson
-	 <alex.williamson@redhat.com>
-Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Gerd
- Bayer <gbayer@linux.ibm.com>,
-        Matthew Rosato <mjrosato@linux.ibm.com>,
-        Jason Gunthorpe <jgg@ziepe.ca>, linux-s390@vger.kernel.org,
-        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Date: Wed, 19 Jun 2024 12:56:47 +0200
-In-Reply-To: <ZnKEuCP7o6KurJvq@infradead.org>
-References: <20240529-vfio_pci_mmap-v3-0-cd217d019218@linux.ibm.com>
-	 <20240529-vfio_pci_mmap-v3-2-cd217d019218@linux.ibm.com>
-	 <20240618095134.41478bbf.alex.williamson@redhat.com>
-	 <ZnKEuCP7o6KurJvq@infradead.org>
-Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
- keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
+	s=arc-20240116; t=1718796140; c=relaxed/simple;
+	bh=75uxE1jIS7U/gZgImO3O5k1fhrGtDx8xK2bnlmud6ek=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=e9hG8Mu+hUCukq50a22nZ4clt1cYa/BHXO9I51GTvI3Ga5K1cl/1dV22XOcIueUPCenTro/qOFo5Rmm4+9kYiVjPUZ/Y1K4BmP0o1ZpOE6bl1Ue6jFqF5kUdGGwM2DniBsGuIZ0DsQtOj2GkG58YiAbaKIMspM47IJ1zedLY7vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OE0RMUMW; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2ebdfe26217so60994721fa.2;
+        Wed, 19 Jun 2024 04:22:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1718796136; x=1719400936; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1We8+J1M8/iGwbEuKq9QLdgleuBIYYNVC3Jie6+7WKQ=;
+        b=OE0RMUMWjmwTtHxwSC4/QTw7VP4UWIGmzyY3G60c8oHmQcSXvGGu4pU0Tj+aAk3yPj
+         /TTAdEwqMfUAFnC8a+YXBOoaNNU2iL3V+G05cF1LQiduL9icX43CyQlHITKJb2cABUJm
+         XArxR7y3DBv2aGz96LS77mX3BV3kyUvH3ykaQ5DsFurdylle+q3Mf4Q7Y9jXRnEfp0H5
+         oUoK5sxPkUDQashXt1x3+NJavosmhcA4V0IqUiYX2g4+lqFUhQqFC1o6uf6rvYyQRA5u
+         Y5X291yrUXOlSP2aish46TVfkHTTWuJsxujUSDNJ2fmAV+2Tqh1wFJDhltWJ3FxDWNU1
+         OScA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718796136; x=1719400936;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1We8+J1M8/iGwbEuKq9QLdgleuBIYYNVC3Jie6+7WKQ=;
+        b=iT+cNrdnGcRfgzPtRn2eV6CNRohnYCP/dS28lW59LfiyTS6oEZ8nj74ajSp+0fN7Pw
+         EMLF7KcVmwDcpEMbWKeFWBOQAglIlDnAI7cW8XkEziOi5bF9yePwk2h5UaRcjsRJVup1
+         nH6HUSnbJ0+HWBzDA6dbKdFCmxiYab4ufS6welvZmEKPtiG96JA7y4SnXGSUTfdmwm2m
+         OcC5V3TMoXdhd9i8F/T8AM58whzxWEpvt41+KzPuCqRuN6H2c4aQUVWE4Cuu/JONj3gb
+         KhYE/B/5HCMUzbaj3UJ+Tq4ZwMGNAbdKmrD3/8g1uRn6vFrKjtq3bOOmOxeY9eYXJlG4
+         gvCw==
+X-Forwarded-Encrypted: i=1; AJvYcCUYzhSmLisSheX6vi4V6i7ZLOIh3wGQK+SM3YPSf4aA/fTa/6daYzDhhCc+TiesUBeLqcnymwAeDhKm6GmkA6yfU0whN3kjzDPhKmxCXwz9BzTSJgDVQU1H6QN4CXFVV5uxFkiE9Uip+LEkACdj9G3iBYs8K7IF0OLaezYgP6DRvyM3UdFP2s+LdhK9KawS0R/TAQV9de0uWp7uvPn+fsAxzuCJsGdMjadhm6UBOMJUPAxWWFOkoQibEhnCi6lnLouAg4m2cpZTSU4TILCsctSYqjYh68PK7PsyYepU+HoxiB7DDhYKPmIz2voRyAdbTkktwAYzfITCz5GLiANk+dksq9MmTN9imEIzQ8aoVn7zv3nZkTGvgiYSxeEzswzUY9SyMSfVCRsXPJc4XAt9zMV72HZW7cVa1FPToxn3RPlCqXEVrSqwzVCtlgKwjg==
+X-Gm-Message-State: AOJu0YxeHZ0KQJp3btvZ3dg98HpiQKlSe6dway4K/BCxRoQELEkVl9gy
+	x2QLEgvuw4dEAIX3Z2csXlkXaxYOHSckCCb6kYTP+DWyqnPcPc50
+X-Google-Smtp-Source: AGHT+IHY6I+1wjnfCL5bVO3aTBj0asX2DB6+TLCQy1IxnGK2EyJpAdTHcDYhDhl1lF4pI5isZiqATw==
+X-Received: by 2002:a2e:7818:0:b0:2ec:3bc4:3e36 with SMTP id 38308e7fff4ca-2ec3ceb6a56mr15076241fa.14.1718796136224;
+        Wed, 19 Jun 2024 04:22:16 -0700 (PDT)
+Received: from pc636 (host-90-233-216-238.mobileonline.telia.com. [90.233.216.238])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2ec05c78126sm19577951fa.81.2024.06.19.04.22.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 Jun 2024 04:22:15 -0700 (PDT)
+From: Uladzislau Rezki <urezki@gmail.com>
+X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
+Date: Wed, 19 Jun 2024 13:22:12 +0200
+To: Vlastimil Babka <vbabka@suse.cz>
+Cc: Uladzislau Rezki <urezki@gmail.com>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
+	linux-trace-kernel@vger.kernel.org,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	kasan-dev <kasan-dev@googlegroups.com>
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Message-ID: <ZnK_ZLlFM6MrdEah@pc636>
+References: <Zmrkkel0Fo4_g75a@zx2c4.com>
+ <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+ <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
+ <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
+ <ZnCDgdg1EH6V7w5d@pc636>
+ <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
+ <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <ZnKqPqlPD3Rl04DZ@pc636>
+ <c208e95d-9aa9-476f-9dee-0242a2d6a24f@suse.cz>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: EEI8S_fqxJw6mDxx4IybdmV-UAoMPzan
-X-Proofpoint-ORIG-GUID: gHaDyIaIr7LEvs9oS9lXc79rCiqeFh4D
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-19_02,2024-06-19_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- impostorscore=0 priorityscore=1501 mlxscore=0 phishscore=0 bulkscore=0
- adultscore=0 lowpriorityscore=0 spamscore=0 mlxlogscore=999 clxscore=1011
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406190081
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c208e95d-9aa9-476f-9dee-0242a2d6a24f@suse.cz>
 
-On Wed, 2024-06-19 at 00:11 -0700, Christoph Hellwig wrote:
-> On Tue, Jun 18, 2024 at 09:51:34AM -0600, Alex Williamson wrote:
-> > > -		if (!resource_size(res))
-> > > +		if (!resource_size(res) ||
-> > > +		    resource_size(res) > (IOREMAP_END + 1 - IOREMAP_START))
-> > >  			goto no_mmap;
-> > > =20
-> > >  		if (resource_size(res) >=3D PAGE_SIZE) {
-> > >=20
-> >=20
-> > A powerpc build reports:
-> >=20
-> > ERROR: modpost: "__kernel_io_end" [drivers/vfio/pci/vfio-pci-core.ko] u=
-ndefined!
-> >=20
-> > Looks like only __kernel_io_start is exported.  Thanks,
->=20
-> And exported code has no business looking at either one.
->=20
-> I think the right thing here is a core PCI quirk to fix the BAR
-> size of the ISM device instead of this hack in vfio.
->=20
+On Wed, Jun 19, 2024 at 11:56:44AM +0200, Vlastimil Babka wrote:
+> On 6/19/24 11:51 AM, Uladzislau Rezki wrote:
+> > On Tue, Jun 18, 2024 at 09:48:49AM -0700, Paul E. McKenney wrote:
+> >> On Tue, Jun 18, 2024 at 11:31:00AM +0200, Uladzislau Rezki wrote:
+> >> > > On 6/17/24 8:42 PM, Uladzislau Rezki wrote:
+> >> > > >> +
+> >> > > >> +	s = container_of(work, struct kmem_cache, async_destroy_work);
+> >> > > >> +
+> >> > > >> +	// XXX use the real kmem_cache_free_barrier() or similar thing here
+> >> > > > It implies that we need to introduce kfree_rcu_barrier(), a new API, which i
+> >> > > > wanted to avoid initially.
+> >> > > 
+> >> > > I wanted to avoid new API or flags for kfree_rcu() users and this would
+> >> > > be achieved. The barrier is used internally so I don't consider that an
+> >> > > API to avoid. How difficult is the implementation is another question,
+> >> > > depending on how the current batching works. Once (if) we have sheaves
+> >> > > proven to work and move kfree_rcu() fully into SLUB, the barrier might
+> >> > > also look different and hopefully easier. So maybe it's not worth to
+> >> > > invest too much into that barrier and just go for the potentially
+> >> > > longer, but easier to implement?
+> >> > > 
+> >> > Right. I agree here. If the cache is not empty, OK, we just defer the
+> >> > work, even we can use a big 21 seconds delay, after that we just "warn"
+> >> > if it is still not empty and leave it as it is, i.e. emit a warning and
+> >> > we are done.
+> >> > 
+> >> > Destroying the cache is not something that must happen right away. 
+> >> 
+> >> OK, I have to ask...
+> >> 
+> >> Suppose that the cache is created and destroyed by a module and
+> >> init/cleanup time, respectively.  Suppose that this module is rmmod'ed
+> >> then very quickly insmod'ed.
+> >> 
+> >> Do we need to fail the insmod if the kmem_cache has not yet been fully
+> >> cleaned up?  If not, do we have two versions of the same kmem_cache in
+> >> /proc during the overlap time?
+> >> 
+> > No fail :) If same cache is created several times, its s->refcount gets
+> > increased, so, it does not create two entries in the "slabinfo". But i
+> > agree that your point is good! We need to be carefully with removing and
+> > simultaneous creating.
+> 
+> Note that this merging may be disabled or not happen due to various flags on
+> the cache being incompatible with it. And I want to actually make sure it
+> never happens for caches being already destroyed as that would lead to
+> use-after-free (the workfn doesn't recheck the refcount in case a merge
+> would happen during the grace period)
+> 
+> --- a/mm/slab_common.c
+> +++ b/mm/slab_common.c
+> @@ -150,9 +150,10 @@ int slab_unmergeable(struct kmem_cache *s)
+>  #endif
+> 
+>         /*
+> -        * We may have set a slab to be unmergeable during bootstrap.
+> +        * We may have set a cache to be unmergeable during bootstrap.
+> +        * 0 is for cache being destroyed asynchronously
+>          */
+> -       if (s->refcount < 0)
+> +       if (s->refcount <= 0)
+>                 return 1;
+> 
+>         return 0;
+> 
+OK, i see such flags, SLAB_NO_MERGE. Then i was wrong, it can create two
+different slabs.
 
-I see your point. Sadly the situation with this oversized BAR is
-somewhat complex and while it's certainly quirky, I'm not sure a PCI
-quirk is a good fit. The reason the ISM device claims the 256 TiB BAR
-size is that it uses the offset into the BAR via our PCI Store Block
-instruction to encode additional information. The data encoded there
-called a DMB request is used to identify the target buffer in which the
-ISM device stores the data. This allows the device to do an entire data
-transfer with a single synchronous PCI Store Block instruction and
-without having to IOMMU map the data being sent or storing it somewhere
-else in between. This works as conceptually on the send side the data
-is simply stored at an offset into the BAR while on the receiving side
-it comes in as a DMA from the device all as a single instruction
-execution. And yes I'm aware that such synchronous end-to-end
-operations aren't something actual PCI devices can do. Don't shoot the
-messenger.
+Thanks!
 
-In short, the ISM BAR 0 is stupidly large but this is intentional. It
-not fitting in the VMAP is simply the least crazy filter I could come
-up with to keep the ISM device from causing trouble for use of vfio-pci
-mmap() for other, normal, PCI devices.
-
-Thanks,
-Niklas
-
+--
+Uladzislau Rezki
 
