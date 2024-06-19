@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-19926-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-19927-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE8890E49C
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 09:35:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9865590E4A2
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 09:37:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 208EA1F21AC0
-	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 07:35:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C559280FEA
+	for <lists+kvm@lfdr.de>; Wed, 19 Jun 2024 07:37:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8F7763F7;
-	Wed, 19 Jun 2024 07:35:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27C9763FC;
+	Wed, 19 Jun 2024 07:36:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Rkdy0DN9"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PrF0U2IZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA7E217C91
-	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 07:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6604C208B0
+	for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 07:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718782545; cv=none; b=hGdcQ8elSfjbLfuNe2I14mEX/S2ti6121b5YAEt5vmQcocaS5R/+rhJS8T6yOAaoIknzJLgUOaMNQ2cCkVmGGBnHClVMFMhP0IPZWSb6qnM7RPchmqcbHqtX1QmyFYiJLuEG4iU9yzPPV2xflXh1vU4r2CcGmfUWIVA2l0Z+XH0=
+	t=1718782617; cv=none; b=sUlsNflAHXWQAopUdRK/TtcC+V/HphVrMnb32N6exiH+IbwiqsdM6nmlTkpGC+yug3jSCgoFeFVc2PL403JMhlqnVs6EJN1rU4nrUEr1kO5EX7Rk/DOwCwLUiinT/n18RJbSLbcXALoHNWhi/MiiR3RwoMQXLxWv4pvWkLkX27g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718782545; c=relaxed/simple;
-	bh=n7L4gAKePlyQfuld9+8h2aASK4cWdZDrEKk6rP9ulKE=;
+	s=arc-20240116; t=1718782617; c=relaxed/simple;
+	bh=8I6pTjPh0kYpWgjoKDlVVpKq9oDtSWNDlTxtUhD6s6g=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=B8uCSFbH0xeoP8OlldlHl9+jHHn5jhbN6h79Oaq/ZLQxfHNrLmDZvXzVgAkkOZDDbsisrhWZNSrwoJE2WzmLZIy6YxpuJvxQdf6JfBFCxUn6q2YJSfReWtHGNyNdVCN59Ws4XpkHyNzHvVrLwXIpYBLl6IB845sZ45l5nHf9k8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Rkdy0DN9; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=DsgznsXC+prG48/tblNfE/QX8/EtFUMJrhrpGivyYPTpTaJUaR7K1U5iyNfM9ro5m9PSV7CDHGAjiO1pGfmAUEmACl2exIOsdZGRtvHSuTCDPeacCEdf6rpHUqkJ8Efs8MDsNHxwCTwm5vR8es6zdoN3F9RCrn9YbOxCTU2y15M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PrF0U2IZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718782542;
+	s=mimecast20190719; t=1718782615;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=q/BQulokRbiv0wrCAWzsfhXc40RD7RvdpYrqYPWW0K0=;
-	b=Rkdy0DN9FUg601VHgFU3ac4WYqiJRfzRSfAJHzBZfiaAJOlJHMSupXf1CN4uR8q4uc8bVx
-	mgbdOGe6yeN/m48Ka3mHMTuZJZfykHVIfg+Cwboq7QzfZ+uHhGzgDPDGNvfVTGz8mKk8KF
-	fqVY9VSolr/mIEEvwYkO8kC0ENnKO18=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=FKN7pCbwNXNR2oZ0vCGG6a4JVJdB6sjhErjEy/PC2Qg=;
+	b=PrF0U2IZ7xiGT0LJcPLaUJKHyQSKIkGt2Vlj7nSAdkykE5Z3pzPOoe9SA0OEe4P+tDGUgM
+	v5FXTzKQxzCatZenWvmS8GAxYqOQZhcqUkiuB1oB5pyGczkiEdfoVgppsyxn/RmrbuzBo7
+	vPN8kb7UU4TEgNzlH2RxvxU/5Q/Q9GY=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-43-Y-vY95XvM1CE9LAcxEITSQ-1; Wed, 19 Jun 2024 03:35:41 -0400
-X-MC-Unique: Y-vY95XvM1CE9LAcxEITSQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-795bb25ae28so119283585a.0
-        for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 00:35:41 -0700 (PDT)
+ us-mta-616-uVSu5Yo4McmZd3b5veSJLw-1; Wed, 19 Jun 2024 03:36:52 -0400
+X-MC-Unique: uVSu5Yo4McmZd3b5veSJLw-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-632588b1bdeso85041047b3.2
+        for <kvm@vger.kernel.org>; Wed, 19 Jun 2024 00:36:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718782540; x=1719387340;
+        d=1e100.net; s=20230601; t=1718782612; x=1719387412;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=q/BQulokRbiv0wrCAWzsfhXc40RD7RvdpYrqYPWW0K0=;
-        b=XYY/eR94c4VXT8aw6vIfm4DVGwCSNqzXvyCAJZZsGlZx6/XlVo/W76py0foz5TbdpY
-         EUIxunet1EGveTUyqy+/Hkt78GgBbpD79f1qx/dujzOmtrAVCGuufZxW7NrNdNxgaGjy
-         4lucQz1t1mprKLch56oxp4nWX8S02emyQrkT51mvhBPMtb4AWbgmH3OAZ/6llXaTZQ6J
-         32vwoKQLrgdaNuZuG9JeuXxxH+/Nbd+8S7mAaiPxE9U9UCSfCLg8wanha9ZMKA/I7AK8
-         8+PJe3cyvkVvLn2DwofqQRReUbNLaPxuWnT1IhZ78vhpV0xcgmu/DbTsmrsab39id5o8
-         OD6w==
-X-Forwarded-Encrypted: i=1; AJvYcCWso13yZ2XlzdbRUAbll6fJp3uOFGAQDc/Iu/i81jUfw/3zToOhZZoTh7kYTVuBQKN0CTDlFF160w+w2TLDNyIYn8Br
-X-Gm-Message-State: AOJu0YzVP8Fb1wXa1LSmRFQ/aRLhqTJHCY5zr8QRY1O0iqDWjtx8W0xL
-	RksFumyq1Bzg1zGbgLX/EIOgXFkmvLYtysR0DXx15Ya0kgGnfV+czyWK8cPvRdGWgg3KlDNHyel
-	p2cNRkd/5Ph3RzKJxaQwY9UhzrvfMkGQkOd3CIXpg6O2E5T7SIMdHlBsQKQ==
-X-Received: by 2002:a05:620a:4244:b0:797:f5ee:91d with SMTP id af79cd13be357-79bb3631838mr388962685a.24.1718782540594;
-        Wed, 19 Jun 2024 00:35:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEMmqqguxQCN8SZleowNGrch5Z/OQRIx49idbwBka8IY6uOdIvgROYxtc3m6xIk3THUjzpucA==
-X-Received: by 2002:a05:620a:4244:b0:797:f5ee:91d with SMTP id af79cd13be357-79bb3631838mr388958785a.24.1718782539327;
-        Wed, 19 Jun 2024 00:35:39 -0700 (PDT)
+        bh=FKN7pCbwNXNR2oZ0vCGG6a4JVJdB6sjhErjEy/PC2Qg=;
+        b=RxmychxEQhKzYvjPwonFI+CjI0/UdVNbDbFt5iAXhMb8TdxMB9dXkfrCQDxpGgeUiq
+         e/e+pLMC76JLwwhm8oBm01jPySYWwYxb7b5JgBiFGiYEckrRZJqHuKuVc4ehizhihyF1
+         0v3V6zQ0Y1yk8yGnicmIG8meIlOn+rE5bpuuElZeD4y8LKeqVKds4xefHnb9+ECCznPQ
+         IaFI3pD0VaNkxYBkTl9Ok66TUIYogHNSDatLB/tcTkv46YErpcey11pBV507HArlTnCG
+         cSIYFEubb+yxc3hXMhdW/8XUGTS0bX4ywjodLf5a5vFDx6eqsFIIQ1Gi6zNTEYTFlLxc
+         etyw==
+X-Forwarded-Encrypted: i=1; AJvYcCWCDUj+HIrfxh6o5DqktdZWgCQ9+kF6Q2pOsla5tVF9VjKIUuLavi2Ai0OOfac5FpPSQjslYETi1Rem/eDDybbIxJlt
+X-Gm-Message-State: AOJu0Yxoub04xc6BJtgekAOX7heooHYVSGNs/fm3vJs7w9L8uAgbfPrI
+	kyOWklnytjZlb4ufAnnJmOXmox0kWsFrNqEcNtVehrYlJZaw3AsB9Trl1ZCL9hGt2rNfFAqNkj5
+	knCvRL4OlwWiDTFjYYooIb5L5AWbB3Kl/ynWqguOOlpzlcLbQo1QTUi5QKQ==
+X-Received: by 2002:a05:690c:80f:b0:617:fe2a:a0aa with SMTP id 00721157ae682-63a8d736f33mr20983367b3.6.1718782611631;
+        Wed, 19 Jun 2024 00:36:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHY3ls7Lj2wTVguyvN7QXDl6Nps22MorY8S4k9zgQzzRlL9htvXZUfDErmUL0ipHv7azpKqUQ==
+X-Received: by 2002:a05:690c:80f:b0:617:fe2a:a0aa with SMTP id 00721157ae682-63a8d736f33mr20983247b3.6.1718782611282;
+        Wed, 19 Jun 2024 00:36:51 -0700 (PDT)
 Received: from [192.168.0.4] (ip-109-43-178-117.web.vodafone.de. [109.43.178.117])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-444ab89f4e1sm3465311cf.85.2024.06.19.00.35.37
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b4f8f26213sm13169156d6.103.2024.06.19.00.36.49
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 19 Jun 2024 00:35:39 -0700 (PDT)
-Message-ID: <a262802c-f0f4-4004-9acb-cb97d94980c6@redhat.com>
-Date: Wed, 19 Jun 2024 09:35:35 +0200
+        Wed, 19 Jun 2024 00:36:50 -0700 (PDT)
+Message-ID: <13dba16c-bf21-4fc7-b99e-ad483ec72180@redhat.com>
+Date: Wed, 19 Jun 2024 09:36:47 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,13 +83,13 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [kvm-unit-tests PATCH v10 14/15] powerpc/gitlab-ci: Upgrade
- powerpc to Fedora 40
+Subject: Re: [kvm-unit-tests PATCH v10 10/15] powerpc: Remove remnants of
+ ppc64 directory and build structure
 To: Nicholas Piggin <npiggin@gmail.com>
 Cc: Laurent Vivier <lvivier@redhat.com>, Andrew Jones
  <andrew.jones@linux.dev>, linuxppc-dev@lists.ozlabs.org, kvm@vger.kernel.org
 References: <20240612052322.218726-1-npiggin@gmail.com>
- <20240612052322.218726-15-npiggin@gmail.com>
+ <20240612052322.218726-11-npiggin@gmail.com>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -134,27 +134,25 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240612052322.218726-15-npiggin@gmail.com>
+In-Reply-To: <20240612052322.218726-11-npiggin@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 12/06/2024 07.23, Nicholas Piggin wrote:
-> QEMU has fixed a number of powerpc test fails in Fedora 40, so upgrade
-> to that image.
+> This moves merges ppc64 directories and files into powerpc, and
+> merges the 3 makefiles into one.
 > 
-> Other architectures seem to be okay with Fedora 40 except for x86-64,
-> which fails some xsave and realmode tests, so only change powerpc to
-> start with.
+> The configure --arch=powerpc option is aliased to ppc64 for
+> good measure.
 > 
+> Acked-by: Thomas Huth <thuth@redhat.com>
 > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
 > ---
->   .gitlab-ci.yml | 2 ++
->   1 file changed, 2 insertions(+)
 
-FYI, I've pushed now the generic patch to bump all jobs to F40, so I think 
-you can drop this one here from your queue now.
+Seems like this patch does not apply cleanly anymore, could you please rebase?
 
-  Thomas
+  Thanks,
+   Thomas
 
 
 
