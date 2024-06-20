@@ -1,71 +1,219 @@
-Return-Path: <kvm+bounces-20075-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20076-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A53FF91047B
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 14:49:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FFF91057B
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 15:10:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3312FB24801
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 12:49:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C9951C20993
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 13:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E65DF1ACE91;
-	Thu, 20 Jun 2024 12:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1301AD3F5;
+	Thu, 20 Jun 2024 13:08:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jye64+iQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B38C1AB91C;
-	Thu, 20 Jun 2024 12:48:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210841ACE65
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 13:08:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718887725; cv=none; b=i1aRrKvm0ex9NhGMtxOt+qe/P0OV286e29FU9VY/LvAXZaD9Xld50ItZL2rfHgY5hHrhu3qOPaxuRa45r2xYbqYJU5XmKgWKLh62CFMEBulGBfTABsZJJKDRegbEN8Et+MrB0FR7l5Jd9F76JG5Ca348FSfERAngPLWNhVfUqgM=
+	t=1718888891; cv=none; b=Akoq+TVNpf17lKgAm+KtbjiqbEdWfAAmQ/PSvd7xEB5edilZSa3mYimdZuCmC6W8KwvEiwYywsqQypnNIWqkFfs2+/McDInTpExxr8V7A+z1OX0qwgbjGs+MS1Np7FT47nIYv3ZTQZw8n5OaRs1Q/k+HkTDOmHkuVFtniZhqvpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718887725; c=relaxed/simple;
-	bh=GlC3AyVm0DzPtO4YMlUdHoFLgvGg1FyRZ04zug1OFOA=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=VNHsQyqL4c+WBaSyZYLJBcJOFQRqcE10GoCF020hTd2LwsicyfJroUeXuPS+5R22liiQxpsynonICQHpo3skzJwU/gJiX4smM3gGW8cLJHsCOQcobAH/PHnrhO5QASZgDWfr3FyEZxP2wrEYZN3BfCoKCx7CzVSwRNcPmUUxEVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4W4gJw1sK0z4wcJ;
-	Thu, 20 Jun 2024 22:48:32 +1000 (AEST)
-From: Michael Ellerman <patch-notifications@ellerman.id.au>
-To: linuxppc-dev@lists.ozlabs.org, Michael Ellerman <mpe@ellerman.id.au>
-Cc: linux-fsdevel@vger.kernel.org, brauner@kernel.org, aik@amd.com, torvalds@linux-foundation.org, kvm@vger.kernel.org, tpearson@raptorengineering.com, sbhat@linux.ibm.com, Paul Mackerras <paulus@ozlabs.org>
-In-Reply-To: <20240614122910.3499489-1-mpe@ellerman.id.au>
-References: <20240614122910.3499489-1-mpe@ellerman.id.au>
-Subject: Re: [PATCH] KVM: PPC: Book3S HV: Prevent UAF in kvm_spapr_tce_attach_iommu_group()
-Message-Id: <171888750930.804969.9625740096908801774.b4-ty@ellerman.id.au>
-Date: Thu, 20 Jun 2024 22:45:09 +1000
+	s=arc-20240116; t=1718888891; c=relaxed/simple;
+	bh=Nd5/hPdaVzyaCPja9J9QJBucAO/XJpZ+1uhijZYQ7fg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OPimOzMSg2+NPnHBiNAcJayf/lu/f3DFX9MQvYeEH9WC5IrWOVqcDbgqDy1gTYb6pqHOZ9HMsGF1Z4PiqHFPN5GnhZ3f5OMi0mIn3kZOgSL4bfBGvBGs+Gs3HuV7SFdPztM2161sAP8V1Dzocyn+A8QsWNtNupZACmQIGQDbs6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jye64+iQ; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-423b89f9042so136085e9.1
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 06:08:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1718888887; x=1719493687; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sokuciGEMqDWfb/GyCKAbwKFQZy9XN+HQFh0M9GkJEc=;
+        b=jye64+iQUf5Q22WYI1bW2qakhtko/K6W5NB1dXd/wdVeLgH5b8VP9R3SJjkU5Xg/Qg
+         NTkGml8A1f3UfF3IVPp/XroIcpCVV0ed2h8JV7hMFZH+bWmNt7flwiPFB4zNJcOjsrfk
+         MU58yhn0vKKAJJVzwmsmdqMZLBsK0k45PsUlWtXm5MpJ2ga/UFy5m/UUfJ3iDdCkuj04
+         lAJDLk9uDGhOoiOVzhYu1UXWSQX9ok6rsgLhdh8ATjEzHBSwhkcNtqmEWEZcsot9IOAu
+         yJL4xmekP5Tt+qPD5Nmx645PRWhY6Tc+43L2Zv0dRr+gmjWnRGS2AuKsUjhCG0jv/X1y
+         cQoQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718888887; x=1719493687;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sokuciGEMqDWfb/GyCKAbwKFQZy9XN+HQFh0M9GkJEc=;
+        b=psT2IFgQpm2M42m5dMBiBWMzKYVKjyp8jCZsTQMtdD6sccm/GE9v5qpa5AojAal+TK
+         GCUunsIOCVMmlZx4Q49XndH8ZshYwKrYQac+HgucTe65URPHl+bs7I+qKAMr7+X6ogXj
+         2LnRkXGfEsuEuBJIgMyCE4okStL6z1Rr14DuBiwG3R+duKCh9I18wIO+0x768bjpNCPL
+         HitNTLD01Dq7kkF6pUDBcCgJgzZ9Ot++DO1UcVs+FGAcpK9mpKhArwOtERS/Y/7wJDto
+         pG8wdkDzI6Tn+be7L9KEmBCYdBjZb/PQXD01om1o+3+dg0fwUG8xgV5tWhOqS99fHF+0
+         RZbw==
+X-Forwarded-Encrypted: i=1; AJvYcCV3z3a94ivgaWiRbQXbuFHfXeC4cITVFuIQj9Ay1B6CuYeuAQnPQPBK1b7J4/DquNSgUMtlPS3KFKp5ISd+kUp8KC9H
+X-Gm-Message-State: AOJu0Yzunh/a5H1Bevdl3J3GpUNR+yIoEPXeJvkl3OGkh7H3UiRbRFFw
+	vNh0kMiUaunGmGaHnJwD0pB4muRFX07oYRpjNab5JDfuNVQWaNhxX8/4NmG8aQ==
+X-Google-Smtp-Source: AGHT+IHp9bazFhbmExqFkMfkC/8CdeFqGQa/Ablhwe0BqRz1q3OFlFoqlZtJH067QyRn9E0j/SDL1Q==
+X-Received: by 2002:a05:600c:4e0c:b0:41b:8715:1158 with SMTP id 5b1f17b1804b1-424758fd22bmr3600115e9.6.1718888887221;
+        Thu, 20 Jun 2024 06:08:07 -0700 (PDT)
+Received: from google.com (205.215.190.35.bc.googleusercontent.com. [35.190.215.205])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36075c6fa4esm19579496f8f.67.2024.06.20.06.08.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 06:08:06 -0700 (PDT)
+Date: Thu, 20 Jun 2024 13:08:02 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: John Hubbard <jhubbard@nvidia.com>,
+	Elliot Berman <quic_eberman@quicinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+	maz@kernel.org, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+	Fuad Tabba <tabba@google.com>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
+Message-ID: <ZnQpslcah7dcSS8z@google.com>
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
+ <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
+ <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
 
-On Fri, 14 Jun 2024 22:29:10 +1000, Michael Ellerman wrote:
-> Al reported a possible use-after-free (UAF) in kvm_spapr_tce_attach_iommu_group().
+Hi David,
+
+On Wed, Jun 19, 2024 at 09:37:58AM +0200, David Hildenbrand wrote:
+> Hi,
 > 
-> It looks up `stt` from tablefd, but then continues to use it after doing
-> fdput() on the returned fd. After the fdput() the tablefd is free to be
-> closed by another thread. The close calls kvm_spapr_tce_release() and
-> then release_spapr_tce_table() (via call_rcu()) which frees `stt`.
+> On 19.06.24 04:44, John Hubbard wrote:
+> > On 6/18/24 5:05 PM, Elliot Berman wrote:
+> > > In arm64 pKVM and QuIC's Gunyah protected VM model, we want to support
+> > > grabbing shmem user pages instead of using KVM's guestmemfd. These
+> > > hypervisors provide a different isolation model than the CoCo
+> > > implementations from x86. KVM's guest_memfd is focused on providing
+> > > memory that is more isolated than AVF requires. Some specific examples
+> > > include ability to pre-load data onto guest-private pages, dynamically
+> > > sharing/isolating guest pages without copy, and (future) migrating
+> > > guest-private pages.  In sum of those differences after a discussion in
+> > > [1] and at PUCK, we want to try to stick with existing shmem and extend
+> > > GUP to support the isolation needs for arm64 pKVM and Gunyah.
 > 
-> [...]
+> The main question really is, into which direction we want and can develop
+> guest_memfd. At this point (after talking to Jason at LSF/MM), I wonder if
+> guest_memfd should be our new target for guest memory, both shared and
+> private. There are a bunch of issues to be sorted out though ...
+> 
+> As there is interest from Red Hat into supporting hugetlb-style huge pages
+> in confidential VMs for real-time workloads, and wasting memory is not
+> really desired, I'm going to think some more about some of the challenges
+> (shared+private in guest_memfd, mmap support, migration of !shared folios,
+> hugetlb-like support, in-place shared<->private conversion, interaction with
+> page pinning). Tricky.
+> 
+> Ideally, we'd have one way to back guest memory for confidential VMs in the
+> future.
+> 
+> 
+> Can you comment on the bigger design goal here? In particular:
+> 
+> 1) Who would get the exclusive PIN and for which reason? When would we
+>    pin, when would we unpin?
+> 
+> 2) What would happen if there is already another PIN? Can we deal with
+>    speculative short-term PINs from GUP-fast that could introduce
+>    errors?
+> 
+> 3) How can we be sure we don't need other long-term pins (IOMMUs?) in
+>    the future?
 
-Applied to powerpc/fixes.
+Can you please clarify more about the IOMMU case?
 
-[1/1] KVM: PPC: Book3S HV: Prevent UAF in kvm_spapr_tce_attach_iommu_group()
-      https://git.kernel.org/powerpc/c/a986fa57fd81a1430e00b3c6cf8a325d6f894a63
+pKVM has no merged upstream IOMMU support at the moment, although
+there was an RFC a while a go [1], also there would be a v2 soon.
 
-cheers
+In the patches KVM (running in EL2) will manage the IOMMUs including
+the page tables and all pages used in that are allocated from the
+kernel.
+
+These patches don't support IOMMUs for guests. However, I don't see
+why would that be different from the CPU? as once the page is pinned
+it can be owned by a guest and that would be reflected in the
+hypervisor tracking, the CPU stage-2 and IOMMU page tables as well.
+
+[1] https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-philippe@linaro.org/
+
+Thanks,
+Mostafa
+
+> 
+> 4) Why are GUP pins special? How one would deal with other folio
+>    references (e.g., simply mmap the shmem file into a different
+>    process).
+> 
+> 5) Why you have to bother about anonymous pages at all (skimming over s
+>    some patches), when you really want to handle shmem differently only?
+> 
+> > > To that
+> > > end, we introduce the concept of "exclusive GUP pinning", which enforces
+> > > that only one pin of any kind is allowed when using the FOLL_EXCLUSIVE
+> > > flag is set. This behavior doesn't affect FOLL_GET or any other folio
+> > > refcount operations that don't go through the FOLL_PIN path.
+> 
+> So, FOLL_EXCLUSIVE would fail if there already is a PIN, but !FOLL_EXCLUSIVE
+> would succeed even if there is a single PIN via FOLL_EXCLUSIVE? Or would the
+> single FOLL_EXCLUSIVE pin make other pins that don't have FOLL_EXCLUSIVE set
+> fail as well?
+> 
+> > > 
+> > > [1]: https://lore.kernel.org/all/20240319143119.GA2736@willie-the-truck/
+> > > 
+> > 
+> > Hi!
+> > 
+> > Looking through this, I feel that some intangible threshold of "this is
+> > too much overloading of page->_refcount" has been crossed. This is a very
+> > specific feature, and it is using approximately one more bit than is
+> > really actually "available"...
+> 
+> Agreed.
+> 
+> > 
+> > If we need a bit in struct page/folio, is this really the only way? Willy
+> > is working towards getting us an entirely separate folio->pincount, I
+> > suppose that might take too long? Or not?
+> 
+> Before talking about how to implement it, I think we first have to learn
+> whether that approach is what we want at all, and how it fits into the
+> bigger picture of that use case.
+> 
+> > 
+> > This feels like force-fitting a very specific feature (KVM/CoCo handling
+> > of shmem pages) into a more general mechanism that is running low on
+> > bits (gup/pup).
+> 
+> Agreed.
+> 
+> > 
+> > Maybe a good topic for LPC!
+> 
+> The KVM track has plenty of guest_memfd topics, might be a good fit there.
+> (or in the MM track, of course)
+> 
+> -- 
+> Cheers,
+> 
+> David / dhildenb
+> 
 
