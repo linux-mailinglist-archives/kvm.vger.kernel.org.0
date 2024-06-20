@@ -1,379 +1,207 @@
-Return-Path: <kvm+bounces-20049-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66D1090FF3B
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 10:46:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C9390FF3E
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 10:47:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B8221C21548
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 08:46:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6043FB22AEC
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 08:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B913019DF98;
-	Thu, 20 Jun 2024 08:44:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F008319FA72;
+	Thu, 20 Jun 2024 08:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="jXhPvDcH"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gTypdvf2"
 X-Original-To: kvm@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 556C219AD5C;
-	Thu, 20 Jun 2024 08:44:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2C0C19DF64;
+	Thu, 20 Jun 2024 08:44:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718873073; cv=none; b=Gn5HA/YTRW8u/IjO2hsPdSpCdKilL2ea3OwGZi3J9UZ301Z/wfl6ysIv8Zr+5G2hSvG+Vw+9q7qZ17z0TVaz1FmEj5KGGgjrlQpmxMCrnlU10nQsobKVPbNl2fNSL4vHqELx6+wgGsFri7LX1LqxqjxgoyDk1SoeMMn9LRW4Oss=
+	t=1718873075; cv=none; b=oBS5XdPGKQ7bOJaLi7Mq6yzaoMCMbYoy9Dbk2Hw/wTBinmDsIRFShmd8ThEIjB6W7HM3naFNwjL42O0nTUrv5T+PMs4QZ2miBa51nXIkB9jbZqU3QpsbxkvabhHQO/2km099ndQJtzkelPXOrty6/N4TeGKTX7JZwmCRXSvzWis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718873073; c=relaxed/simple;
-	bh=9ppbWfvN5wQaZwwUws1Lo98Waa7W+SrawaAN4bbtQvA=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=OsLUbRZbo0qhF/VtJ+cFO1bppKvQRoUKVGSjWqwvLcBtNa1uMGfAZ+2VRoGLqpBQInj8AWcO8JUEzTMWEWlC0d5y2n98FgVq2bx2Yn+kVMT/XWN+nijN9CWk8Fl2HKjNkRjUOJZk3Beo/NTnCZKc4fixa1zpHI632Jix+ox7XE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=jXhPvDcH; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1718873062; h=Message-ID:Subject:Date:From:To;
-	bh=uxEOLC+BYL67glPcCyaAEcZAqD6z7DdJedmKkGkTTKU=;
-	b=jXhPvDcHEqoGysuJsfee+bQw0pHw7VCko94UPx3uMUKj0vCrQJrVAM/gU/rekkaz+z5EkSUvpor5Z3sqeD1sI88s+i4a82MbciJFWsP5ykmHcRNtHSffb6hwkJEbVWaaGbxTdPWTjlDqoAuwUt8tfW77oMfkx6F3ArLG8BVbq4o=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033032014031;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=25;SR=0;TI=SMTPD_---0W8qglLH_1718873060;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W8qglLH_1718873060)
-          by smtp.aliyun-inc.com;
-          Thu, 20 Jun 2024 16:44:21 +0800
-Message-ID: <1718872778.4831812-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v9 2/6] virtio: remove support for names array entries being null.
-Date: Thu, 20 Jun 2024 16:39:38 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- David Hildenbrand <david@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- linux-um@lists.infradead.org,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org
-References: <20240424091533.86949-1-xuanzhuo@linux.alibaba.com>
- <20240424091533.86949-3-xuanzhuo@linux.alibaba.com>
- <20240620035749-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240620035749-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1718873075; c=relaxed/simple;
+	bh=ly4NBxLP+IfyhZ72WkmAB+qyAyjntow6va62j+tSK2U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KH8GDtE5G1WftnwKjpMHU+EyyIVGS6bZ5RmpC4odQIueL+r+ycgvj7QL6T/6ii3iyVfCWnKvf9ODznvgViy7O2rPbHtFoiPt3hzStI7BVRQ+3uMzbFOIx4wYb9kHLxpNIJfCY/JS+wSNRezqNRf3+OE8Id9HuWyANc5MQrzuiTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gTypdvf2; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718873073; x=1750409073;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=ly4NBxLP+IfyhZ72WkmAB+qyAyjntow6va62j+tSK2U=;
+  b=gTypdvf2zXBl3rla69Jsp4CJFxItYbzeZm0AveuQXB04RotC8SKNa7j8
+   ogY4e4Y5mPcnlH33ZdMCRzZ2x6e7ERtRKSHDckac5w9DZJ4438QjYLjgP
+   2krAWlrBXsSNgr79qjifmvc6I1C3Hu5eRLmGPw75WMNPOZkJB5beAgI4t
+   Bz1Ea3k/C7WrIz2TGev9H3taB8tAnV4hoecWrnxc/r2cdC7zPj1VXsJ3+
+   ktEfp9F4+P2tkmXOFLP6gC29qhPj9a6G0BC7zoo2RMjZznbbCbduC1mdK
+   5rKRsJ/UfdxRm+ZnDQlmBsxfr4UuXhj+ObwHY5mdlCrxIdcNYVteLsv2r
+   Q==;
+X-CSE-ConnectionGUID: 6LMvOpSpTfaUNVbl5k6aVg==
+X-CSE-MsgGUID: Yfwz9aClTS2iDrH2L9WoVQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="15955090"
+X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
+   d="scan'208";a="15955090"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 01:44:32 -0700
+X-CSE-ConnectionGUID: 1hFuia17TUqkjulNsFs3Zg==
+X-CSE-MsgGUID: QLcnBzIPRSuRIohfM/K9lA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
+   d="scan'208";a="42051034"
+Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.224.116]) ([10.124.224.116])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 01:44:29 -0700
+Message-ID: <e693adab-9fa3-47fd-b62f-c3f2589ffe7f@linux.intel.com>
+Date: Thu, 20 Jun 2024 16:44:26 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 16/17] KVM: x86/tdp_mmu: Propagate tearing down mirror
+ page tables
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ kai.huang@intel.com, dmatlack@google.com, erdemaktas@google.com,
+ isaku.yamahata@gmail.com, linux-kernel@vger.kernel.org, sagis@google.com,
+ yan.y.zhao@intel.com, Isaku Yamahata <isaku.yamahata@intel.com>
+References: <20240619223614.290657-1-rick.p.edgecombe@intel.com>
+ <20240619223614.290657-17-rick.p.edgecombe@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240619223614.290657-17-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Thu, 20 Jun 2024 04:02:45 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> On Wed, Apr 24, 2024 at 05:15:29PM +0800, Xuan Zhuo wrote:
-> > commit 6457f126c888 ("virtio: support reserved vqs") introduced this
-> > support. Multiqueue virtio-net use 2N as ctrl vq finally, so the logic
-> > doesn't apply. And not one uses this.
-> >
-> > On the other side, that makes some trouble for us to refactor the
-> > find_vqs() params.
-> >
-> > So I remove this support.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > Acked-by: Jason Wang <jasowang@redhat.com>
-> > Acked-by: Eric Farman <farman@linux.ibm.com> # s390
-> > Acked-by: Halil Pasic <pasic@linux.ibm.com>
+
+
+On 6/20/2024 6:36 AM, Rick Edgecombe wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 >
+> Integrate hooks for mirroring page table operations for cases where TDX
+> will zap PTEs or free page tables.
 >
-> I don't mind, but this patchset is too big already.
-> Why do we need to make this part of this patchset?
-
-
-If some the pointers of the names is NULL, then in the virtio ring,
-we will have a trouble to index from the arrays(names, callbacks...).
-Becasue that the idx of the vq is not the index of these arrays.
-
-If the names is [NULL, "rx", "tx"], the first vq is the "rx", but index of the
-vq is zero, but the index of the info of this vq inside the arrays is 1.
-
-So I do this commit.  I will update the commit log in next version.
-
-Thanks.
-
-
-
+> Like other Coco technologies, TDX has the concept of private and shared
+> memory. For TDX the private and shared mappings are managed on separate
+> EPT roots. The private half is managed indirectly though calls into a
+> protected runtime environment called the TDX module, where the shared half
+> is managed within KVM in normal page tables.
 >
+> Since calls into the TDX module are relatively slow, walking private page
+> tables by making calls into the TDX module would not be efficient. Because
+> of this, previous changes have taught the TDP MMU to keep a mirror root,
+> which is separate, unmapped TDP root that private operations can be
+> directed to. Currently this root is disconnected from the guest. Now add
+> plumbing to propagate changes to the "external" page tables being
+> mirrored. Just create the x86_ops for now, leave plumbing the operations
+> into the TDX module for future patches.
 >
-> > ---
-> >  arch/um/drivers/virtio_uml.c           |  8 ++++----
-> >  drivers/remoteproc/remoteproc_virtio.c | 11 ++++-------
-> >  drivers/s390/virtio/virtio_ccw.c       |  8 ++++----
-> >  drivers/virtio/virtio_mmio.c           | 11 ++++-------
-> >  drivers/virtio/virtio_pci_common.c     | 18 +++++++++---------
-> >  drivers/virtio/virtio_vdpa.c           | 11 ++++-------
-> >  include/linux/virtio_config.h          |  2 +-
-> >  7 files changed, 30 insertions(+), 39 deletions(-)
-> >
-> > diff --git a/arch/um/drivers/virtio_uml.c b/arch/um/drivers/virtio_uml.c
-> > index 8adca2000e51..773f9fc4d582 100644
-> > --- a/arch/um/drivers/virtio_uml.c
-> > +++ b/arch/um/drivers/virtio_uml.c
-> > @@ -1019,8 +1019,8 @@ static int vu_find_vqs(struct virtio_device *vdev, unsigned nvqs,
-> >  		       struct irq_affinity *desc)
-> >  {
-> >  	struct virtio_uml_device *vu_dev = to_virtio_uml_device(vdev);
-> > -	int i, queue_idx = 0, rc;
-> >  	struct virtqueue *vq;
-> > +	int i, rc;
-> >
-> >  	/* not supported for now */
-> >  	if (WARN_ON(nvqs > 64))
-> > @@ -1032,11 +1032,11 @@ static int vu_find_vqs(struct virtio_device *vdev, unsigned nvqs,
-> >
-> >  	for (i = 0; i < nvqs; ++i) {
-> >  		if (!names[i]) {
-> > -			vqs[i] = NULL;
-> > -			continue;
-> > +			rc = -EINVAL;
-> > +			goto error_setup;
-> >  		}
-> >
-> > -		vqs[i] = vu_setup_vq(vdev, queue_idx++, callbacks[i], names[i],
-> > +		vqs[i] = vu_setup_vq(vdev, i, callbacks[i], names[i],
-> >  				     ctx ? ctx[i] : false);
-> >  		if (IS_ERR(vqs[i])) {
-> >  			rc = PTR_ERR(vqs[i]);
-> > diff --git a/drivers/remoteproc/remoteproc_virtio.c b/drivers/remoteproc/remoteproc_virtio.c
-> > index 25b66b113b69..7f58634fcc41 100644
-> > --- a/drivers/remoteproc/remoteproc_virtio.c
-> > +++ b/drivers/remoteproc/remoteproc_virtio.c
-> > @@ -119,9 +119,6 @@ static struct virtqueue *rp_find_vq(struct virtio_device *vdev,
-> >  	if (id >= ARRAY_SIZE(rvdev->vring))
-> >  		return ERR_PTR(-EINVAL);
-> >
-> > -	if (!name)
-> > -		return NULL;
-> > -
-> >  	/* Search allocated memory region by name */
-> >  	mem = rproc_find_carveout_by_name(rproc, "vdev%dvring%d", rvdev->index,
-> >  					  id);
-> > @@ -187,15 +184,15 @@ static int rproc_virtio_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
-> >  				 const bool * ctx,
-> >  				 struct irq_affinity *desc)
-> >  {
-> > -	int i, ret, queue_idx = 0;
-> > +	int i, ret;
-> >
-> >  	for (i = 0; i < nvqs; ++i) {
-> >  		if (!names[i]) {
-> > -			vqs[i] = NULL;
-> > -			continue;
-> > +			ret = -EINVAL;
-> > +			goto error;
-> >  		}
-> >
-> > -		vqs[i] = rp_find_vq(vdev, queue_idx++, callbacks[i], names[i],
-> > +		vqs[i] = rp_find_vq(vdev, i, callbacks[i], names[i],
-> >  				    ctx ? ctx[i] : false);
-> >  		if (IS_ERR(vqs[i])) {
-> >  			ret = PTR_ERR(vqs[i]);
-> > diff --git a/drivers/s390/virtio/virtio_ccw.c b/drivers/s390/virtio/virtio_ccw.c
-> > index d7569f395559..6cdd29952bc0 100644
-> > --- a/drivers/s390/virtio/virtio_ccw.c
-> > +++ b/drivers/s390/virtio/virtio_ccw.c
-> > @@ -696,7 +696,7 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
-> >  {
-> >  	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
-> >  	dma64_t *indicatorp = NULL;
-> > -	int ret, i, queue_idx = 0;
-> > +	int ret, i;
-> >  	struct ccw1 *ccw;
-> >
-> >  	ccw = ccw_device_dma_zalloc(vcdev->cdev, sizeof(*ccw), NULL);
-> > @@ -705,11 +705,11 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
-> >
-> >  	for (i = 0; i < nvqs; ++i) {
-> >  		if (!names[i]) {
-> > -			vqs[i] = NULL;
-> > -			continue;
-> > +			ret = -EINVAL;
-> > +			goto out;
-> >  		}
-> >
-> > -		vqs[i] = virtio_ccw_setup_vq(vdev, queue_idx++, callbacks[i],
-> > +		vqs[i] = virtio_ccw_setup_vq(vdev, i, callbacks[i],
-> >  					     names[i], ctx ? ctx[i] : false,
-> >  					     ccw);
-> >  		if (IS_ERR(vqs[i])) {
-> > diff --git a/drivers/virtio/virtio_mmio.c b/drivers/virtio/virtio_mmio.c
-> > index 173596589c71..c3c8dd282952 100644
-> > --- a/drivers/virtio/virtio_mmio.c
-> > +++ b/drivers/virtio/virtio_mmio.c
-> > @@ -386,9 +386,6 @@ static struct virtqueue *vm_setup_vq(struct virtio_device *vdev, unsigned int in
-> >  	else
-> >  		notify = vm_notify;
-> >
-> > -	if (!name)
-> > -		return NULL;
-> > -
-> >  	/* Select the queue we're interested in */
-> >  	writel(index, vm_dev->base + VIRTIO_MMIO_QUEUE_SEL);
-> >
-> > @@ -496,7 +493,7 @@ static int vm_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
-> >  {
-> >  	struct virtio_mmio_device *vm_dev = to_virtio_mmio_device(vdev);
-> >  	int irq = platform_get_irq(vm_dev->pdev, 0);
-> > -	int i, err, queue_idx = 0;
-> > +	int i, err;
-> >
-> >  	if (irq < 0)
-> >  		return irq;
-> > @@ -511,11 +508,11 @@ static int vm_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
-> >
-> >  	for (i = 0; i < nvqs; ++i) {
-> >  		if (!names[i]) {
-> > -			vqs[i] = NULL;
-> > -			continue;
-> > +			vm_del_vqs(vdev);
-> > +			return -EINVAL;
-> >  		}
-> >
-> > -		vqs[i] = vm_setup_vq(vdev, queue_idx++, callbacks[i], names[i],
-> > +		vqs[i] = vm_setup_vq(vdev, i, callbacks[i], names[i],
-> >  				     ctx ? ctx[i] : false);
-> >  		if (IS_ERR(vqs[i])) {
-> >  			vm_del_vqs(vdev);
-> > diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
-> > index b655fccaf773..eda71c6e87ee 100644
-> > --- a/drivers/virtio/virtio_pci_common.c
-> > +++ b/drivers/virtio/virtio_pci_common.c
-> > @@ -292,7 +292,7 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned int nvqs,
-> >  {
-> >  	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-> >  	u16 msix_vec;
-> > -	int i, err, nvectors, allocated_vectors, queue_idx = 0;
-> > +	int i, err, nvectors, allocated_vectors;
-> >
-> >  	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
-> >  	if (!vp_dev->vqs)
-> > @@ -302,7 +302,7 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned int nvqs,
-> >  		/* Best option: one for change interrupt, one per vq. */
-> >  		nvectors = 1;
-> >  		for (i = 0; i < nvqs; ++i)
-> > -			if (names[i] && callbacks[i])
-> > +			if (callbacks[i])
-> >  				++nvectors;
-> >  	} else {
-> >  		/* Second best: one for change, shared for all vqs. */
-> > @@ -318,8 +318,8 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned int nvqs,
-> >  	allocated_vectors = vp_dev->msix_used_vectors;
-> >  	for (i = 0; i < nvqs; ++i) {
-> >  		if (!names[i]) {
-> > -			vqs[i] = NULL;
-> > -			continue;
-> > +			err = -EINVAL;
-> > +			goto error_find;
-> >  		}
-> >
-> >  		if (!callbacks[i])
-> > @@ -328,7 +328,7 @@ static int vp_find_vqs_msix(struct virtio_device *vdev, unsigned int nvqs,
-> >  			msix_vec = allocated_vectors++;
-> >  		else
-> >  			msix_vec = VP_MSIX_VQ_VECTOR;
-> > -		vqs[i] = vp_setup_vq(vdev, queue_idx++, callbacks[i], names[i],
-> > +		vqs[i] = vp_setup_vq(vdev, i, callbacks[i], names[i],
-> >  				     ctx ? ctx[i] : false,
-> >  				     msix_vec);
-> >  		if (IS_ERR(vqs[i])) {
-> > @@ -363,7 +363,7 @@ static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned int nvqs,
-> >  		const char * const names[], const bool *ctx)
-> >  {
-> >  	struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-> > -	int i, err, queue_idx = 0;
-> > +	int i, err;
-> >
-> >  	vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
-> >  	if (!vp_dev->vqs)
-> > @@ -378,10 +378,10 @@ static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned int nvqs,
-> >  	vp_dev->per_vq_vectors = false;
-> >  	for (i = 0; i < nvqs; ++i) {
-> >  		if (!names[i]) {
-> > -			vqs[i] = NULL;
-> > -			continue;
-> > +			err = -EINVAL;
-> > +			goto out_del_vqs;
-> >  		}
-> > -		vqs[i] = vp_setup_vq(vdev, queue_idx++, callbacks[i], names[i],
-> > +		vqs[i] = vp_setup_vq(vdev, i, callbacks[i], names[i],
-> >  				     ctx ? ctx[i] : false,
-> >  				     VIRTIO_MSI_NO_VECTOR);
-> >  		if (IS_ERR(vqs[i])) {
-> > diff --git a/drivers/virtio/virtio_vdpa.c b/drivers/virtio/virtio_vdpa.c
-> > index e803db0da307..e82cca24d6e6 100644
-> > --- a/drivers/virtio/virtio_vdpa.c
-> > +++ b/drivers/virtio/virtio_vdpa.c
-> > @@ -161,9 +161,6 @@ virtio_vdpa_setup_vq(struct virtio_device *vdev, unsigned int index,
-> >  	bool may_reduce_num = true;
-> >  	int err;
-> >
-> > -	if (!name)
-> > -		return NULL;
-> > -
-> >  	if (index >= vdpa->nvqs)
-> >  		return ERR_PTR(-ENOENT);
-> >
-> > @@ -370,7 +367,7 @@ static int virtio_vdpa_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
-> >  	struct cpumask *masks;
-> >  	struct vdpa_callback cb;
-> >  	bool has_affinity = desc && ops->set_vq_affinity;
-> > -	int i, err, queue_idx = 0;
-> > +	int i, err;
-> >
-> >  	if (has_affinity) {
-> >  		masks = create_affinity_masks(nvqs, desc ? desc : &default_affd);
-> > @@ -380,11 +377,11 @@ static int virtio_vdpa_find_vqs(struct virtio_device *vdev, unsigned int nvqs,
-> >
-> >  	for (i = 0; i < nvqs; ++i) {
-> >  		if (!names[i]) {
-> > -			vqs[i] = NULL;
-> > -			continue;
-> > +			err = -EINVAL;
-> > +			goto err_setup_vq;
-> >  		}
-> >
-> > -		vqs[i] = virtio_vdpa_setup_vq(vdev, queue_idx++,
-> > +		vqs[i] = virtio_vdpa_setup_vq(vdev, i,
-> >  					      callbacks[i], names[i], ctx ?
-> >  					      ctx[i] : false);
-> >  		if (IS_ERR(vqs[i])) {
-> > diff --git a/include/linux/virtio_config.h b/include/linux/virtio_config.h
-> > index da9b271b54db..1c79cec258f4 100644
-> > --- a/include/linux/virtio_config.h
-> > +++ b/include/linux/virtio_config.h
-> > @@ -56,7 +56,7 @@ typedef void vq_callback_t(struct virtqueue *);
-> >   *	callbacks: array of callbacks, for each virtqueue
-> >   *		include a NULL entry for vqs that do not need a callback
-> >   *	names: array of virtqueue names (mainly for debugging)
-> > - *		include a NULL entry for vqs unused by driver
-> > + *		MUST NOT be NULL
+> Add two operations for tearing down page tables, one for freeing page
+> tables (free_external_spt) and one for zapping PTEs (remove_external_spte).
+> Define them such that remove_external_spte will perform a TLB flush as
+> well. (in TDX terms "ensure there are no active translations").
 >
-> Do not shout - just drop "include a NULL entry" text - not being NULL
-> is default assumption for pointers.
+> TDX MMU support will exclude certain MMU operations, so only plug in the
+> mirroring x86 ops where they will be needed. For zapping/freeing, only
+> hook tdp_mmu_iter_set_spte() which is use used for mapping and linking
+                                         ^
+                                         extra "use"
+
+Also, this sentence is a bit confusing about "used for mapping and linking".
+
+> PTs. Don't bother hooking tdp_mmu_set_spte_atomic() as it is only used for
+> zapping PTEs in operations unsupported by TDX: zapping collapsible PTEs and
+> kvm_mmu_zap_all_fast().
 >
-> >   *	Returns 0 on success or error status
-> >   * @del_vqs: free virtqueues found by find_vqs().
-> >   * @synchronize_cbs: synchronize with the virtqueue callbacks (optional)
-> > --
-> > 2.32.0.3.g01195cf9f
+> In previous changes to address races around concurrent populating using
+> tdp_mmu_set_spte_atomic(), a solution was introduced to temporarily set
+> REMOVED_SPTE in the mirrored page tables while performing the external
+   ^
+  FROZEN_SPTE
+
+> operations. Such a solution is not needed for the tear down paths in TDX
+> as these will always be performed with the mmu_lock held for write.
+> Sprinkle some KVM_BUG_ON()s to reflect this.
 >
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Co-developed-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> ---
+> TDX MMU Prep v3:
+>   - Rename mirrored->external (Paolo)
+>   - Drop new_spte arg from reflect_removed_spte() (Paolo)
+>   - ...and drop was_present and is_present bools (Paolo)
+>   - Use base_gfn instead of sp->gfn (Paolo)
+>   - Better comment on logic that bugs if doing tdp_mmu_set_spte() on
+>     present PTE. (Paolo)
+>   - Move comment around KVM_BUG_ON() in __tdp_mmu_set_spte_atomic() to this
+>     patch, and add better comment. (Paolo)
+>   - In remove_external_spte(), remove was_leaf bool, skip duplicates
+>     present check and add comment.
+>   - Rename REMOVED_SPTE to FROZEN_SPTE (Paolo)
+>
+> TDX MMU Prep v2:
+>   - Split from "KVM: x86/tdp_mmu: Support TDX private mapping for TDP MMU"
+>   - Rename x86_ops from "private" to "reflect"
+>   - In response to "sp->mirrored_spt" rename helpers to "mirrored"
+>   - Remove unused present mirroring support in tdp_mmu_set_spte()
+>   - Merge reflect_zap_spte() into reflect_remove_spte()
+>   - Move mirror zapping logic out of handle_changed_spte()
+>   - Add some KVM_BUG_ONs
+> ---
+>   arch/x86/include/asm/kvm-x86-ops.h |  2 ++
+>   arch/x86/include/asm/kvm_host.h    |  8 +++++
+>   arch/x86/kvm/mmu/tdp_mmu.c         | 51 +++++++++++++++++++++++++++++-
+>   3 files changed, 60 insertions(+), 1 deletion(-)
+>
+> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> index 3ef19fcb5e42..18a83b211c90 100644
+> --- a/arch/x86/include/asm/kvm-x86-ops.h
+> +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> @@ -97,6 +97,8 @@ KVM_X86_OP_OPTIONAL_RET0(get_mt_mask)
+>   KVM_X86_OP(load_mmu_pgd)
+>   KVM_X86_OP_OPTIONAL(link_external_spt)
+>   KVM_X86_OP_OPTIONAL(set_external_spte)
+> +KVM_X86_OP_OPTIONAL(free_external_spt)
+> +KVM_X86_OP_OPTIONAL(remove_external_spte)
+>   KVM_X86_OP(has_wbinvd_exit)
+>   KVM_X86_OP(get_l2_tsc_offset)
+>   KVM_X86_OP(get_l2_tsc_multiplier)
+> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> index 12ff04135a0e..dca623ffa903 100644
+> --- a/arch/x86/include/asm/kvm_host.h
+> +++ b/arch/x86/include/asm/kvm_host.h
+> @@ -1745,6 +1745,14 @@ struct kvm_x86_ops {
+>   	int (*set_external_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+>   				 kvm_pfn_t pfn_for_gfn);
+>   
+> +	/* Update external page tables for page table about to be freed */
+Nit: Add "." at the end of the sentence.
+
+> +	int (*free_external_spt)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+> +				 void *external_spt);
+> +
+> +	/* Update external page table from spte getting removed, and flush TLB */
+Ditto
+
+> +	int (*remove_external_spte)(struct kvm *kvm, gfn_t gfn, enum pg_level level,
+> +				    kvm_pfn_t pfn_for_gfn);
+> +
+>   	bool (*has_wbinvd_exit)(void);
+>   
+>   	u64 (*get_l2_tsc_offset)(struct kvm_vcpu *vcpu);
+[...]
 
