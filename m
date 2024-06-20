@@ -1,160 +1,181 @@
-Return-Path: <kvm+bounces-20162-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20163-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC1C991122E
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 21:34:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBE25911243
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 21:37:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDDE11C22BDF
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 19:34:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD83D1C22A0F
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 19:37:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC9E1B9AB9;
-	Thu, 20 Jun 2024 19:34:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B84091BA091;
+	Thu, 20 Jun 2024 19:37:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="TRg/AU6x"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Uv0tDssc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8992E1AC765
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 19:34:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 143AF1B9AD6;
+	Thu, 20 Jun 2024 19:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718912043; cv=none; b=rnO0GirqMnbIvh6ldyJ2BcnPwj96KlY4gff22wYJztPEEkV9LG59wz9gdrG3bSVj2CCaUEggUuujJUt7voTb+mXKTtHS3pB73Jdyg62DuwVHClNbyz8zY+Qr4G2e12k0Vly68SfgvKIrGyTYYy4slQfgnJp8NTqw9xumpQNZnLw=
+	t=1718912227; cv=none; b=VXhrGdKY5UNuV5dxOvuTarY2KBo1KDYTzxudxSyn6GbMtUV6VEzYG3bU62v5oKWa7uUpRE4LlBng1niNYIhnTobI4HHcAJgiYgpxKw7dS2CH4w9inxi7CM39bCLuvoN/F/VxowdcQriH6tZ1WndZmamDgKXajBIwjPa//ZC+Zc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718912043; c=relaxed/simple;
-	bh=LMJhwXKqZKwDoZfSA47gsl66tl0ZA7Fm/pP5alDoprs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TXpIQ1biT9CpyuzlKukuc6oR/iilchteJlaxQHmqBzMj55cvn0WXgNZ0qK4ZBczq0j6cg9nQDIhr0JzcwSFloy2KakzHpHYovnOLzFpelP3AYfqN4oFK5x44PWG4P5Lto2gqN4zNP4bUZcFJCh8nLwnw76XgBecz372Fo6fndAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=TRg/AU6x; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-364b2f92388so875624f8f.2
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 12:34:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1718912040; x=1719516840; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=rxmltmQrKwAluprbf/AG1nvFIcYg57/7dnDwU0ucSDg=;
-        b=TRg/AU6xn0QynAsK3cPILwt66lEG2EAah7zOWtJabjOCMFDXIZgJXx/IDHDmZwPpcx
-         sKiDC7V0d4AjZMsDNXnDCpX6erlmw/6TbA9MxOFGKspaIdylqp04+kZ2OJCB0rcTCiQx
-         LMCwxaH7gUuA53pLWjPhdgw6uCOYg0kcme/1U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718912040; x=1719516840;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=rxmltmQrKwAluprbf/AG1nvFIcYg57/7dnDwU0ucSDg=;
-        b=sl17kaCHIu6q51JEFIMKjeLtrAXH7YVkofvm7Kf3kTBOMb9XDuSIT7N4TR9hbD4b6A
-         zqquW8uBIz/BCD7O8SSj1VhQjc+6g+RKnlB4gXyXuowxuJYZ5quViWgODFUIGgWKzBfI
-         rRCpYXKZYouEKvjXZAlymbpEZ4aXM1jK2H4S7+ClkRl47trhH7rWx6kDDdP7SqAus+36
-         loqv6bHNzeAxnpgi0nM0mP7S1e/DT4pg8OZCOpHFekl/nR8tGy6eVdR6wobbc/w/gR3O
-         K+Uo94VscwOSTTW9hayqjnl1AwKahO5sBq1bclS1xZqB+59J85N3WLBHnxg9u4da3ifb
-         k0Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCWyICJnPYvuKvbEwmblUYBifp97u6BXorjJLkPs388G9afwOZZSoYdtIsinLNEbEPww41N6q5y6Lc3OEqtQnQoFWSNP
-X-Gm-Message-State: AOJu0YxHPL7rL/GJvWRT5pXIoK3jUUZi5oQIs0ptqisFtrs49tdPZEto
-	roXUZSWRH4Y3f1RtE52B5dCrweZw+5FqA4ToRSai8eFeEozZQ7apJ6s6mom2VTgI0ef/XDKm5I8
-	rgMspfLhU
-X-Google-Smtp-Source: AGHT+IHBQA6CHNryd4H+1sibl8e8BVdjqdKtXvMFbodBuBc6ghldja3d7iIiSu1nmZcLJkBhEtscoQ==
-X-Received: by 2002:a5d:4b4b:0:b0:360:79d2:a822 with SMTP id ffacd0b85a97d-363170ecbcfmr4177249f8f.14.1718912039885;
-        Thu, 20 Jun 2024 12:33:59 -0700 (PDT)
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com. [209.85.221.47])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fcf549443sm3247366b.138.2024.06.20.12.33.59
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 12:33:59 -0700 (PDT)
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-35f2d723ef0so993563f8f.1
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 12:33:59 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCXnthYtGD1xupKunJ0Gn1moXrfmx3UcMQWtHSGUujuzuG7MKedTMJmyxEPWZ2ZrFNMZ6w9X8s/sn6CV5wes+gnhV2+k
-X-Received: by 2002:a5d:6152:0:b0:35f:308a:cab0 with SMTP id
- ffacd0b85a97d-363170ecbe5mr4379764f8f.13.1718911595412; Thu, 20 Jun 2024
- 12:26:35 -0700 (PDT)
+	s=arc-20240116; t=1718912227; c=relaxed/simple;
+	bh=yZz3lSM2+eyxM8s5zcUsYg12gHFKn/bb+Dk6U7uPnJs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=p4DJUWZdG9dJDM0heFYx5uXwdGkeufYmr4nbsbTV5YwdjNf53oEE6zaCKhHdLQjDonoSvCA/AfxQCp4TYbDO0xqiTQBrEDwrXjxfYczXV9zOLZ8d8wGJvuIVYNXO3s/vYK+eyBQewne7ZxjlyAF+97xvg9qSSpwR1ka4OWHaYa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Uv0tDssc; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718912226; x=1750448226;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=yZz3lSM2+eyxM8s5zcUsYg12gHFKn/bb+Dk6U7uPnJs=;
+  b=Uv0tDsscAZ2VHP2lyRo/z4EmRS1ykap8rvHH3rp0R/VkC24rY57LWjlr
+   XXiDGLiGzY8HM2Vde0ZY4YoG2yAN16coEUH+PiIIW7BP9ip7Zw7JZ5ESt
+   5TpXp4n1k219p9ldyG4XSKOHjOiL7NT7fnvazggKAuWbfJVHYW5aSFo7s
+   f8P14KeWAq5fYnwBNtg7MTj9b8ySeEtk0Gq0nlAJgxoswIeG7zZHT/h4Y
+   zF12BrIF/hHpAHK3gqNKqFP5Pa+hc6wAH+wJalw6tuOgc5W3qyOeyijIp
+   EUyVhxRgjgRBJ9vhUa36qgQmx++pcvsq/1qPVCw0zHVhjw8FzHpWGSnEh
+   w==;
+X-CSE-ConnectionGUID: YSZGvN5gSKGdtCrgBH/O0g==
+X-CSE-MsgGUID: a7F6Z5ZkRECUrycot67ncQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11109"; a="15754131"
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="15754131"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 12:37:05 -0700
+X-CSE-ConnectionGUID: x18nf85+Teic2oICoGRKXg==
+X-CSE-MsgGUID: FgbdG7gjRByz6F9l8eM6Pw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,252,1712646000"; 
+   d="scan'208";a="42806941"
+Received: from wjayasek-mobl1.amr.corp.intel.com (HELO rpedgeco-desk4.intel.com) ([10.209.71.12])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 12:37:06 -0700
+From: Rick Edgecombe <rick.p.edgecombe@intel.com>
+To: yan.y.zhao@intel.com
+Cc: dmatlack@google.com,
+	erdemaktas@google.com,
+	isaku.yamahata@intel.com,
+	kai.huang@intel.com,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pbonzini@redhat.com,
+	rick.p.edgecombe@intel.com,
+	sagis@google.com,
+	seanjc@google.com
+Subject: [PATCH] KVM: x86/mmu: Implement memslot deletion for TDX
+Date: Thu, 20 Jun 2024 12:37:01 -0700
+Message-Id: <20240620193701.374519-1-rick.p.edgecombe@intel.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240613060708.11761-1-yan.y.zhao@intel.com>
+References: <20240613060708.11761-1-yan.y.zhao@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240620175703.605111-1-yury.norov@gmail.com> <CAHk-=wiUTXC452qbypG3jW6XCZGfc8d-iehSavxn5JkQ=sv0zA@mail.gmail.com>
- <ZnR1tQN01kN97G_F@yury-ThinkPad>
-In-Reply-To: <ZnR1tQN01kN97G_F@yury-ThinkPad>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 20 Jun 2024 12:26:18 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wjv-DkukaKb7f04WezyPjRERp=xfxv34j5fA8cDQ_JudA@mail.gmail.com>
-Message-ID: <CAHk-=wjv-DkukaKb7f04WezyPjRERp=xfxv34j5fA8cDQ_JudA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/40] lib/find: add atomic find_bit() primitives
-To: Yury Norov <yury.norov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
-	Akinobu Mita <akinobu.mita@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Christian Brauner <brauner@kernel.org>, Damien Le Moal <damien.lemoal@opensource.wdc.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, David Disseldorp <ddiss@suse.de>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gregory Greenman <gregory.greenman@intel.com>, 
-	Hans Verkuil <hverkuil@xs4all.nl>, Hans de Goede <hdegoede@redhat.com>, 
-	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>, 
-	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Karsten Graul <kgraul@linux.ibm.com>, Karsten Keil <isdn@linux-pingi.de>, 
-	Kees Cook <keescook@chromium.org>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Martin Habets <habetsm.xilinx@gmail.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <monstr@monstr.eu>, 
-	Nicholas Piggin <npiggin@gmail.com>, Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>, Rob Herring <robh@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Sean Christopherson <seanjc@google.com>, 
-	Shuai Xue <xueshuai@linux.alibaba.com>, Stanislaw Gruszka <stf_xl@wp.pl>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Will Deacon <will@kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org, 
-	ath10k@lists.infradead.org, dmaengine@vger.kernel.org, iommu@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-m68k@lists.linux-m68k.org, linux-media@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-net-drivers@amd.com, 
-	linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	mpi3mr-linuxdrv.pdl@broadcom.com, netdev@vger.kernel.org, 
-	sparclinux@vger.kernel.org, x86@kernel.org, 
-	Alexey Klimov <alexey.klimov@linaro.org>, Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>, 
-	Matthew Wilcox <willy@infradead.org>, Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Sergey Shtylyov <s.shtylyov@omp.ru>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On Thu, 20 Jun 2024 at 11:32, Yury Norov <yury.norov@gmail.com> wrote:
->
-> Is that in master already? I didn't get any email, and I can't find
-> anything related in the master branch.
+Force TDX VMs to use the KVM_X86_QUIRK_SLOT_ZAP_ALL behavior.
 
-It's 5d272dd1b343 ("cpumask: limit FORCE_NR_CPUS to just the UP case").
+TDs cannot use the fast zapping operation to implement memslot deletion for
+a couple reasons:
+1. KVM cannot zap TDX private PTEs and re-fault them without coordinating
+   with the guest. This is due to the TDs needing to "accept" memory. So an
+   operation to delete a memslot needs to limit the private zapping to the
+   range of the memslot.
+2. For reason (1), kvm_mmu_zap_all_fast() is limited to direct (shared)
+   roots. This means it will not zap the mirror (private) PTEs. If a
+   memslot is deleted with private memory mapped, the private memory would
+   remain mapped in the TD. Then if later the gmem fd was whole punched,
+   the pages could be freed on the host while still mapped in the TD. This
+   is because that operation would no longer have the memslot to map the
+   pgoff to the gfn.
 
-> > New rule: before you send some optimization, you need to have NUMBERS.
->
-> I tried to underline that it's not a performance optimization at my
-> best.
+To handle the first case, userspace could simply set the
+KVM_X86_QUIRK_SLOT_ZAP_ALL quirk for TDs. This would prevent the issue in
+(1), but it is not sufficient to resolve (2) because the problems there
+extend beyond the userspace's TD, to affecting the rest of the host. So the
+zap-leafs-only behavior is required for both
 
-If it's not about performance, then it damn well shouldn't be 90%
-inline functions in a header file.
+A couple options were considered, including forcing
+KVM_X86_QUIRK_SLOT_ZAP_ALL to always be on for TDs, however due to the
+currently limited quirks interface (no way to query quirks, or force them
+to be disabled), this would require developing additional interfaces. So
+instead just do the simple thing and make TDs always do the zap-leafs
+behavior like when KVM_X86_QUIRK_SLOT_ZAP_ALL is disabled.
 
-If it's a helper function, it needs to be a real function elsewhere. Not this:
+While at it, have the new behavior apply to all non-KVM_X86_DEFAULT_VM VMs,
+as the previous behavior was not ideal (see [0]). It is assumed until
+proven otherwise that the other VM types will not be exposed to the bug[1]
+that derailed that effort.
 
- include/linux/find_atomic.h                  | 324 +++++++++++++++++++
+Memslot deletion needs to zap both the private and shared mappings of a
+GFN, so update the attr_filter field in kvm_mmu_zap_memslot_leafs() to
+include both.
 
-because either performance really matters, in which case you need to
-show profiles, or performance doesn't matter, in which case it damn
-well shouldn't have special cases for small bitsets that double the
-size of the code.
+Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
+Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Link: https://lore.kernel.org/kvm/20190205205443.1059-1-sean.j.christopherson@intel.com/ [0]
+Link: https://patchwork.kernel.org/project/kvm/patch/20190205210137.1377-11-sean.j.christopherson@intel.com [1]
+---
 
-              Linus
+Here is the patch for TDX integration. It is not needed until we can
+actually create KVM_X86_TDX_VMs.
+
+Admittedly, this kind of combines two changes, but the amount of code is
+very small so I left it as one patch.
+
+ arch/x86/kvm/mmu.h     | 6 ++++++
+ arch/x86/kvm/mmu/mmu.c | 3 ++-
+ 2 files changed, 8 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/mmu.h b/arch/x86/kvm/mmu.h
+index 7b12ba761c51..72ed6c07719a 100644
+--- a/arch/x86/kvm/mmu.h
++++ b/arch/x86/kvm/mmu.h
+@@ -335,4 +335,10 @@ static inline bool kvm_is_addr_direct(struct kvm *kvm, gpa_t gpa)
+ 
+ 	return !gpa_direct_bits || (gpa & gpa_direct_bits);
+ }
++
++static inline bool kvm_memslot_flush_zap_all(struct kvm *kvm)
++{
++	return kvm->arch.vm_type == KVM_X86_DEFAULT_VM &&
++	       kvm_check_has_quirk(kvm, KVM_X86_QUIRK_SLOT_ZAP_ALL);
++}
+ #endif
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 42faad76806a..8212bf77af70 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -6993,6 +6993,7 @@ static void kvm_mmu_zap_memslot_leafs(struct kvm *kvm, struct kvm_memory_slot *s
+ 		.start = slot->base_gfn,
+ 		.end = slot->base_gfn + slot->npages,
+ 		.may_block = true,
++		.attr_filter = KVM_FILTER_PRIVATE | KVM_FILTER_SHARED,
+ 	};
+ 	bool flush = false;
+ 
+@@ -7013,7 +7014,7 @@ static void kvm_mmu_zap_memslot_leafs(struct kvm *kvm, struct kvm_memory_slot *s
+ void kvm_arch_flush_shadow_memslot(struct kvm *kvm,
+ 				   struct kvm_memory_slot *slot)
+ {
+-	if (kvm_check_has_quirk(kvm, KVM_X86_QUIRK_SLOT_ZAP_ALL))
++	if (kvm_memslot_flush_zap_all(kvm))
+ 		kvm_mmu_zap_all_fast(kvm);
+ 	else
+ 		kvm_mmu_zap_memslot_leafs(kvm, slot);
+-- 
+2.34.1
+
 
