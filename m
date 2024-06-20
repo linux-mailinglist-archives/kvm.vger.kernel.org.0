@@ -1,171 +1,119 @@
-Return-Path: <kvm+bounces-20137-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20120-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FE21910E10
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 19:06:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93329910D74
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:47:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36EC21F224F4
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 17:06:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4D8EDB21CEB
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E4B1B3F2F;
-	Thu, 20 Jun 2024 17:06:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950F31B29BB;
+	Thu, 20 Jun 2024 16:47:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tmoFFeuU"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cAhph4ut"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D251B3F04;
-	Thu, 20 Jun 2024 17:06:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD290156256
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 16:47:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718903195; cv=none; b=BvvoeRwlUPFXc5U6hwf8dRKNtpguuKu3vDB1DUWc1WcvVAISgJkySqfdKGa0YLw5MAwu3SXWjX9HKXegUSGCjAsD0VtM7zHoKH3H7Q3+JSHgMTUPucsvfx3wKSeI/hPOETuWxozSSxCo6svXG4fyC9EyZ951qN29SLtl6HcrAsw=
+	t=1718902030; cv=none; b=eiGwxs+GgTXImwdUDaTSqSy/N6QeYpqpO0qRTKADMLSD31XkK9dlEY71RIU0ZT64die231trDjTSanL5cYuWwj4t8ITQoGWuEmNXtrSEYzB84R4/JlNBY10wEQIXnloRnnmIAka1q2MfrZaIjEPkf3FvWCNC1vDHEV2mocipo3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718903195; c=relaxed/simple;
-	bh=D8GNszom3gfSinVxUUAd+HaAnGPLUQb3yGJik8CU6aY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NonFitNotTg6x7oVYoqBUBUEPeLO/xKdAJUjuYXgg4AF6WXzF4T5SsaXVjpDoSkjPDSkjvitCpx26/Q0ToONJ6H/QOj7cyU1FPKGFCCFwllp517p+TKkkFeHXdow3XpY+3KVRNk87bd+m4QFITUkt4p8EHEI2DtPNL6G3UPWT3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tmoFFeuU; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45KGaInX028217;
-	Thu, 20 Jun 2024 17:06:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	63fApaAvxT9C25rFVU9vTgfVye3/NVOon9MKbMNaE1E=; b=tmoFFeuUXLn6r3jW
-	hd4Sx8aIyDwZ2AX+AeaPBNMAIJ3rg1N/RN/r+ee5Rw6s6tFlz9abEQ7Qo3P8feNY
-	Mhp0KcMZeyblS2JVSOf5BNY914sKngThWCy93ODKAGWh7CsIWONJVs923PXlXjgn
-	EE+I6Eu7NR12n4wvaboRJxMgXlz3QVweNxj6rblc0sTL4uwhzDeKpozqiTzHZyL9
-	l5KKEVmsPMEGE3JzH5K5qQTBEO8qTxCg/Seeu8V0OYmrNV3jZhCQKsL/UwsR5bQY
-	yOpcTKGbin9sgg1xa7Hym9+l/q3qC38OcEPK/Yp59lcwqk5K4yfLEJN1SSu+4Rz6
-	UiPhfQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yvndp8jkn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Jun 2024 17:06:29 +0000 (GMT)
-Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45KH3KgO008037;
-	Thu, 20 Jun 2024 17:06:29 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yvndp8jkk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Jun 2024 17:06:29 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45KFPrd9019646;
-	Thu, 20 Jun 2024 17:06:28 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3ysnp1rect-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Jun 2024 17:06:28 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45KH6MV552888024
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 20 Jun 2024 17:06:24 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A0EC520040;
-	Thu, 20 Jun 2024 17:06:22 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0A59320065;
-	Thu, 20 Jun 2024 17:06:22 +0000 (GMT)
-Received: from p-imbrenda (unknown [9.171.47.175])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 20 Jun 2024 17:06:21 +0000 (GMT)
-Date: Thu, 20 Jun 2024 18:41:25 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Cc: Nico =?UTF-8?B?QsO2aHI=?= <nrb@linux.ibm.com>,
-        Janosch Frank
- <frankja@linux.ibm.com>, linux-s390@vger.kernel.org,
-        Nicholas Piggin
- <npiggin@gmail.com>, kvm@vger.kernel.org,
-        David Hildenbrand
- <david@redhat.com>,
-        Andrew Jones <andrew.jones@linux.dev>, Thomas Huth
- <thuth@redhat.com>
-Subject: Re: [kvm-unit-tests PATCH v3 3/7] s390x: Add sie_is_pv
-Message-ID: <20240620184125.12a1d908@p-imbrenda>
-In-Reply-To: <20240620141700.4124157-4-nsg@linux.ibm.com>
-References: <20240620141700.4124157-1-nsg@linux.ibm.com>
-	<20240620141700.4124157-4-nsg@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1718902030; c=relaxed/simple;
+	bh=RnCOOp7IFdwfmtZ+upmhDazSohqvNm8iTeQSUYvd/c0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S+c9XpPBnQMg/hkVBffhVxNkqg3yCq0WjFGh9+yr/bFW5keyK3JwGpdXfMhEFXA1E/OUj02bgY3aJdRMX45GudVFVFH4W+wEGWrtyLYSyPVacHMI1syw3e7Qo3nAdhxMQ0UuAFr3DxSakORtD9/OvDy3q+6nJaDlb6KaLLE8NC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cAhph4ut; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: kvmarm@lists.linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1718902022;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JznYArgtRf/uSrUvrG9m9fcDQH+e12uEyuDMKGlj2ME=;
+	b=cAhph4utm8Fv2NMjgZmn/G2fe8p3h1RnexWobyvZ6x6LvRJ9990/KRWRJM+Zmok3c0a0Zj
+	DVrVwXPr00N6dcS3ttAkYleM3vXvN6I3Igz1YGdbzcqnYJZw+iDCRyG3BGcgX97LIvh4+Q
+	kr+GE5HArFtBZTaeCGB69i+7QYaFZ0U=
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: tabba@google.com
+X-Envelope-To: oliver.upton@linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: kvmarm@lists.linux.dev
+Cc: Marc Zyngier <maz@kernel.org>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	kvm@vger.kernel.org,
+	Fuad Tabba <tabba@google.com>,
+	Oliver Upton <oliver.upton@linux.dev>
+Subject: [PATCH v3 00/15] KVM: arm64: nv: FPSIMD/SVE, plus some other CPTR goodies
+Date: Thu, 20 Jun 2024 16:46:37 +0000
+Message-ID: <20240620164653.1130714-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: M1sqy55d0kXvyYkrrlAHvGJweeQFMMr0
-X-Proofpoint-ORIG-GUID: 6dBXVpTbaShXT7gHETfTiIxhzQvLhl8D
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-20_08,2024-06-20_04,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
- bulkscore=0 mlxscore=0 suspectscore=0 malwarescore=0 phishscore=0
- mlxlogscore=949 spamscore=0 adultscore=0 lowpriorityscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2405170001 definitions=main-2406200122
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 20 Jun 2024 16:16:56 +0200
-Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
+v2 -> v3:
+ - Reorder patches to fix bisection (Marc)
+ - Use helper that returns ZCR_ELx offset, so it can be used to handle
+   reads and writes (Marc)
 
-> Add a function to check if a guest VM is currently running protected.
-> 
-> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+v2: https://lore.kernel.org/kvmarm/20240613201756.3258227-1-oliver.upton@linux.dev/
 
-Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Jintack Lim (1):
+  KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
 
-> ---
->  lib/s390x/sie.h | 6 ++++++
->  lib/s390x/sie.c | 4 ++--
->  2 files changed, 8 insertions(+), 2 deletions(-)
-> 
-> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
-> index c1724cf2..53cd767f 100644
-> --- a/lib/s390x/sie.h
-> +++ b/lib/s390x/sie.h
-> @@ -281,6 +281,12 @@ void sie_expect_validity(struct vm *vm);
->  uint16_t sie_get_validity(struct vm *vm);
->  void sie_check_validity(struct vm *vm, uint16_t vir_exp);
->  void sie_handle_validity(struct vm *vm);
-> +
-> +static inline bool sie_is_pv(struct vm *vm)
-> +{
-> +	return vm->sblk->sdf == 2;
-> +}
-> +
->  void sie_guest_sca_create(struct vm *vm);
->  void sie_guest_create(struct vm *vm, uint64_t guest_mem, uint64_t guest_mem_len);
->  void sie_guest_destroy(struct vm *vm);
-> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
-> index 40936bd2..0fa915cf 100644
-> --- a/lib/s390x/sie.c
-> +++ b/lib/s390x/sie.c
-> @@ -59,7 +59,7 @@ void sie(struct vm *vm)
->  	/* When a pgm int code is set, we'll never enter SIE below. */
->  	assert(!read_pgm_int_code());
->  
-> -	if (vm->sblk->sdf == 2)
-> +	if (sie_is_pv(vm))
->  		memcpy(vm->sblk->pv_grregs, vm->save_area.guest.grs,
->  		       sizeof(vm->save_area.guest.grs));
->  
-> @@ -98,7 +98,7 @@ void sie(struct vm *vm)
->  	/* restore the old CR 13 */
->  	lctlg(13, old_cr13);
->  
-> -	if (vm->sblk->sdf == 2)
-> +	if (sie_is_pv(vm))
->  		memcpy(vm->save_area.guest.grs, vm->sblk->pv_grregs,
->  		       sizeof(vm->save_area.guest.grs));
->  }
+Marc Zyngier (4):
+  KVM: arm64: nv: Handle CPACR_EL1 traps
+  KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
+  KVM: arm64: nv: Add trap description for CPTR_EL2
+  KVM: arm64: nv: Add additional trap setup for CPTR_EL2
+
+Oliver Upton (10):
+  KVM: arm64: nv: Forward SVE traps to guest hypervisor
+  KVM: arm64: nv: Handle ZCR_EL2 traps
+  KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
+  KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
+  KVM: arm64: nv: Use guest hypervisor's max VL when running nested
+    guest
+  KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
+  KVM: arm64: Spin off helper for programming CPTR traps
+  KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
+  KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
+  KVM: arm64: Allow the use of SVE+NV
+
+ arch/arm64/include/asm/kvm_emulate.h    |  55 +++++++++
+ arch/arm64/include/asm/kvm_host.h       |   6 +
+ arch/arm64/include/asm/kvm_nested.h     |   4 +-
+ arch/arm64/kvm/arm.c                    |   5 -
+ arch/arm64/kvm/emulate-nested.c         |  91 ++++++++++++++
+ arch/arm64/kvm/fpsimd.c                 |  19 ++-
+ arch/arm64/kvm/handle_exit.c            |  19 ++-
+ arch/arm64/kvm/hyp/include/hyp/switch.h |  24 +++-
+ arch/arm64/kvm/hyp/vhe/switch.c         | 156 ++++++++++++++++++++----
+ arch/arm64/kvm/nested.c                 |   3 +-
+ arch/arm64/kvm/sys_regs.c               |  38 ++++++
+ 11 files changed, 376 insertions(+), 44 deletions(-)
+
+
+base-commit: 1613e604df0cd359cf2a7fbd9be7a0bcfacfabd0
+-- 
+2.45.2.741.gdbec12cfda-goog
 
 
