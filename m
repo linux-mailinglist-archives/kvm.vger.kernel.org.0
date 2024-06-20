@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-20131-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20132-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4447F910D80
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:48:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 901E1910D87
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:49:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E46791F2195F
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:48:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8734B25B09
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC1271B47D5;
-	Thu, 20 Jun 2024 16:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63721B4C31;
+	Thu, 20 Jun 2024 16:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="alz0b7Wp"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="skqt5qEU"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320AA1B4C24
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 16:47:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17621B4C2C
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 16:47:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718902046; cv=none; b=So6LSeHB0Th8NrM9kM+nUMHwV5K5FxlC2SsmIJyocc4nQwSbbxGlP7O/y56REn+/Zm1CkvNs/Qjum+OkMt/U/gSlqaF1Y3dzi23wTt82t4rIo+iAbcJg+F40/mNpHHMLWC25Z+wmvR6Tyv7nR0fUjkcPTH4vI+yFPGMtrKiSAuw=
+	t=1718902049; cv=none; b=kIf01BticrgkxRKLQUYR6ATGcEvCyECoXYiVcM+3bdSRgLtY3aahChAvsRNoHATJjKmkLJZBLgHWfLvvmXajf9x82yRXnHdWx3qX+jmXWlJdLu+8wZx2XqMhmy6Nndhq1J89T+rz23EOpuqUI9n5bMf9+MynuaKCH/ICaomqtfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718902046; c=relaxed/simple;
-	bh=C5LEmrBiHT1xTeApGrYyneEYQCpGBT/Ty7lSjeiHStA=;
+	s=arc-20240116; t=1718902049; c=relaxed/simple;
+	bh=AB7fFKaZ4IzZn209XJyuszZvhI37LCYwB3JZOQnIwPc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Zd6pcn9NDMXD3+IsD9ph5v4JDWDsvX7K/tgXqCjQWsaGm08WSeTotZK8jiDCRvtUHESAPsRuHts0PPUIOpudOs8CliM0jLV+1UPlpJ30EDyZLhtHBJAzacYFmzKUr9u03G41a1PlRHhuRsdcO0CxN0yJfrcf9Dqhi6t5/jQYuUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=alz0b7Wp; arc=none smtp.client-ip=95.215.58.187
+	 MIME-Version; b=EF+kvf/QIYwy+ExIwwIbELeMhypluA5uhTJM2GpcEqDokeEt3t26QYBSpn01D+/meb1jIxWOb8mVdyBuh5TYKTB7e/xf6a4GuNhauXnG44SdtFptfJoZMYdUXjcTUDQdcGcmZjrT+Jwzij9a6PPqbiY+C0YWoM36dCvm1TA2OpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=skqt5qEU; arc=none smtp.client-ip=95.215.58.189
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718902042;
+	t=1718902045;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sHh2kb1Z2Qr4oSw9MwaKbtA4JNckM/+p9o6iCRwIjxg=;
-	b=alz0b7WpkSSpddQOfhfzSGKS499wvF8Z7tQOLbIx1gKByOgmXA9Z6REO1oDwnpjcs/Uf2j
-	EuEMumEnZRREdD+hJqOKp8NJhRsh/OckI2lFcCNi4Au4fb4Sz5Kt2sUT2NHlwB+/03aIG6
-	xkv1KZUD9bGtm5BnpveWuFQb8YLXwq0=
+	bh=NAN7p6f7rgTiinz1pWiC7BoeIE5/rA20oN+kCgrXMGk=;
+	b=skqt5qEUKdD4gmmJdjkRja67McNVpEwCIsA8Mpx3yq8Pvz5TOzW8sjT049KFybDEC+tzgp
+	W+dLXD1o9oaF5HLSgQf12XJUZB1ioNTovPQE6+5KIXBBgj/5jiQk9VF9/IDTF/pltYQLBe
+	8wMOhgqCzn8P2hoGsEb8iZP4jNHiaCU=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -59,9 +59,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 11/15] KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
-Date: Thu, 20 Jun 2024 16:46:48 +0000
-Message-ID: <20240620164653.1130714-12-oliver.upton@linux.dev>
+Subject: [PATCH v3 12/15] KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
+Date: Thu, 20 Jun 2024 16:46:49 +0000
+Message-ID: <20240620164653.1130714-13-oliver.upton@linux.dev>
 In-Reply-To: <20240620164653.1130714-1-oliver.upton@linux.dev>
 References: <20240620164653.1130714-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -73,68 +73,37 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-Start folding the guest hypervisor's FP/SVE traps into the value
-programmed in hardware. Note that as of writing this is dead code, since
-KVM does a full put() / load() for every nested exception boundary which
-saves + flushes the FP/SVE state.
+From: Marc Zyngier <maz@kernel.org>
 
-However, this will become useful when we can keep the guest's FP/SVE
-state alive across a nested exception boundary and the host no longer
-needs to conservatively program traps.
+We are missing the propagation of CPTR_EL2.{TCPAC,TTA} into
+the CPACR format. Make sure we preserve these bits.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 31 +++++++++++++++++++++++++++++++
- 1 file changed, 31 insertions(+)
+ arch/arm64/include/asm/kvm_nested.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index 925de4b4efd2..b0b1935a3626 100644
---- a/arch/arm64/kvm/hyp/vhe/switch.c
-+++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -67,6 +67,8 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
+diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
+index 5e0ab0596246..a11ed921d4e0 100644
+--- a/arch/arm64/include/asm/kvm_nested.h
++++ b/arch/arm64/include/asm/kvm_nested.h
+@@ -32,7 +32,7 @@ static inline u64 translate_tcr_el2_to_tcr_el1(u64 tcr)
  
- static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
+ static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
  {
-+	u64 cptr;
-+
- 	/*
- 	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
- 	 * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
-@@ -85,6 +87,35 @@ static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
- 		__activate_traps_fpsimd32(vcpu);
- 	}
+-	u64 cpacr_el1 = 0;
++	u64 cpacr_el1 = CPACR_ELx_RES1;
  
-+	/*
-+	 * Layer the guest hypervisor's trap configuration on top of our own if
-+	 * we're in a nested context.
-+	 */
-+	if (!vcpu_has_nv(vcpu) || is_hyp_ctxt(vcpu))
-+		goto write;
+ 	if (cptr_el2 & CPTR_EL2_TTA)
+ 		cpacr_el1 |= CPACR_ELx_TTA;
+@@ -41,6 +41,8 @@ static inline u64 translate_cptr_el2_to_cpacr_el1(u64 cptr_el2)
+ 	if (!(cptr_el2 & CPTR_EL2_TZ))
+ 		cpacr_el1 |= CPACR_ELx_ZEN;
+ 
++	cpacr_el1 |= cptr_el2 & (CPTR_EL2_TCPAC | CPTR_EL2_TAM);
 +
-+	cptr = vcpu_sanitised_cptr_el2(vcpu);
-+
-+	/*
-+	 * Pay attention, there's some interesting detail here.
-+	 *
-+	 * The CPTR_EL2.xEN fields are 2 bits wide, although there are only two
-+	 * meaningful trap states when HCR_EL2.TGE = 0 (running a nested guest):
-+	 *
-+	 *  - CPTR_EL2.xEN = x0, traps are enabled
-+	 *  - CPTR_EL2.xEN = x1, traps are disabled
-+	 *
-+	 * In other words, bit[0] determines if guest accesses trap or not. In
-+	 * the interest of simplicity, clear the entire field if the guest
-+	 * hypervisor has traps enabled to dispel any illusion of something more
-+	 * complicated taking place.
-+	 */
-+	if (!(SYS_FIELD_GET(CPACR_ELx, FPEN, cptr) & BIT(0)))
-+		val &= ~CPACR_ELx_FPEN;
-+	if (!(SYS_FIELD_GET(CPACR_ELx, ZEN, cptr) & BIT(0)))
-+		val &= ~CPACR_ELx_ZEN;
-+
-+write:
- 	write_sysreg(val, cpacr_el1);
+ 	return cpacr_el1;
  }
  
 -- 
