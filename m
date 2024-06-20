@@ -1,124 +1,181 @@
-Return-Path: <kvm+bounces-20135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20139-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 880A2910D82
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:49:14 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDA58910E18
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 19:07:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B98AB1C21975
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:49:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42B08B27E98
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 17:07:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5805E1B4C56;
-	Thu, 20 Jun 2024 16:47:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0258A1B374E;
+	Thu, 20 Jun 2024 17:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="U4nWGIaR"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="elzH6YaZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-173.mta1.migadu.com (out-173.mta1.migadu.com [95.215.58.173])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 191D31B4C48
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 16:47:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06BE1B3730;
+	Thu, 20 Jun 2024 17:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718902053; cv=none; b=h8nidUxVUBcylCz93bvUOGNVrQsxPr9hLzQgjH7YfGD0wlRaZsFAWBtt3b2ja1PCwXMnorVCr/xenF/ldEaYTdt8ROlrdvhOnln3h049owoIfHLQBfF7iEKBPr3HGPIWOBEeRRQnyB9ckncVDjEsy/dNQBR0IUj9g94UgOnqM/Y=
+	t=1718903205; cv=none; b=cUZaLWLojhYwU5WG8t/R3z6g5Dj/3Ek1T2hEA5woWC4fmFXxJJ1X6jnK2+26eXAFyIZM3Cg6Z6ugufXDn2C9y2PAvINWRwsXJz9wFGOcxpWX9WunbMPWfvvW1iGr26zg6gk7NoEQejeOlr8REzywHVqFZdIO3FDj0uKpmYHtfhA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718902053; c=relaxed/simple;
-	bh=eEcShQr/X3WmlCmwaIzpGFc3Jk0ZwrbBaOMtiuwG4HA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=gLUG4BU6PWeWblZ1QlcBK1Q9mhrCm7mCs2TgW2GC7sEZzM0WKhHxt7hsK0luhUXkn1mj0CHYkQ914R56IDrEoq5Qs9HibI8FaHSvGaiMe5p6wIzLODFKYbbk4q9V+1SNIVC6LXgTjZi6KBANvJvGnD8pAehvfRqSDsfde9KJ0XQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=U4nWGIaR; arc=none smtp.client-ip=95.215.58.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718902050;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Bsfr5ty35fbLYRU7XMGH77z8ls/kA62MLRgj2uAwsLE=;
-	b=U4nWGIaRXlgskXoWzOU8/MsxVGfsc4li1dHfFygLdbmZZkrBhXc17ioPZW5+0f/BZV288I
-	wpCxnGZZn+BjihBi45bpzmo4353euOwzQjyCPqoItngHoj4rlXIdYfrTHurBI070ThsHjX
-	IWFRlbNLgg5xe/oYtIvY/rMgZvRR6qY=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: tabba@google.com
-X-Envelope-To: oliver.upton@linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Fuad Tabba <tabba@google.com>,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 15/15] KVM: arm64: Allow the use of SVE+NV
-Date: Thu, 20 Jun 2024 16:46:52 +0000
-Message-ID: <20240620164653.1130714-16-oliver.upton@linux.dev>
-In-Reply-To: <20240620164653.1130714-1-oliver.upton@linux.dev>
-References: <20240620164653.1130714-1-oliver.upton@linux.dev>
+	s=arc-20240116; t=1718903205; c=relaxed/simple;
+	bh=udpc/kk0BBK4oghHC+Ru/LzmE7FXsRqCjmWD78lnEHc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ufcbMFZ7drJgdcsJJcpNw7rijhhHVAJPpfeCcN/wDc40xyaaWGRt+Molu2yDdo/m+MkpjZVIxIVuIhDq0W6svrWFtM/Plq3xG+Djvftli2J/NkmvGqOFz228wqSygXWDYzwT0ZMAxjAAZI6Ahee8jU9YBX1klz1nCajnDOKOCSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=elzH6YaZ; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45KG9en8017869;
+	Thu, 20 Jun 2024 17:06:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	zSItsgXQrLHHlpWDDFMljBOzpUdXaztzKzN9Br2ZKok=; b=elzH6YaZB84PVqC4
+	QmznHjjsBKnLoAF5q2TBhgQIqbqwE6bbn15nKBjULbVH/Gy98r8doAgN2+lTbotx
+	HL6AQn3XtRCaYCZYU/liTI6bH8n8Xguo+sRQ44PXZLfz2qylH8qy1RWvujpHMv4Z
+	wXyIa6dSIP4dhaL/f3vg3YA13FUgupLXXwgx3fweZ9PHMn0bLbPKiJ9EZWTnj9Gh
+	QgNJJIuIiafU6bV08DIFYucnfl8CWLDixg4ua/m+EEdiaNsLA2B4+EzlKqXD3XUy
+	U0sUtHdhhzx1XWYgLM9iu38GiWf8lgkennYB7fkA/XQPZAa2MeRIsrfVgffyg1a+
+	CZpWKA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yvp7crh9f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Jun 2024 17:06:34 +0000 (GMT)
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45KH6YUB018868;
+	Thu, 20 Jun 2024 17:06:34 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yvp7crh9a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Jun 2024 17:06:34 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45KGhDK4013488;
+	Thu, 20 Jun 2024 17:06:33 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ysr047wsf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 20 Jun 2024 17:06:33 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45KH6RX945482256
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 20 Jun 2024 17:06:29 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6D3DF20040;
+	Thu, 20 Jun 2024 17:06:27 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D0A0E20043;
+	Thu, 20 Jun 2024 17:06:26 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.171.47.175])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 20 Jun 2024 17:06:26 +0000 (GMT)
+Date: Thu, 20 Jun 2024 18:47:11 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Cc: Nico =?UTF-8?B?QsO2aHI=?= <nrb@linux.ibm.com>,
+        Janosch Frank
+ <frankja@linux.ibm.com>,
+        Nicholas Piggin <npiggin@gmail.com>, Thomas Huth
+ <thuth@redhat.com>,
+        Andrew Jones <andrew.jones@linux.dev>,
+        David
+ Hildenbrand <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH v3 4/7] s390x: Add function for checking
+ diagnose intercepts
+Message-ID: <20240620184711.50bd463c@p-imbrenda>
+In-Reply-To: <20240620141700.4124157-5-nsg@linux.ibm.com>
+References: <20240620141700.4124157-1-nsg@linux.ibm.com>
+	<20240620141700.4124157-5-nsg@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: YLJ6q0fEno9T5olU8W9bxFUawizSXynW
+X-Proofpoint-GUID: i1rjVn3bEPF74v8WK4sYLV_cMDv_jY4e
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-20_07,2024-06-20_04,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ spamscore=0 clxscore=1015 bulkscore=0 adultscore=0 mlxlogscore=999
+ impostorscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ malwarescore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2405170001 definitions=main-2406200118
 
-Allow SVE and NV to mix now that everything is in place to handle it
-correctly.
+On Thu, 20 Jun 2024 16:16:57 +0200
+Nina Schoetterl-Glausch <nsg@linux.ibm.com> wrote:
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
----
- arch/arm64/kvm/arm.c    | 5 -----
- arch/arm64/kvm/nested.c | 3 +--
- 2 files changed, 1 insertion(+), 7 deletions(-)
+> sie_is_diag_icpt() checks if the intercept is due to an expected
+> diagnose call and is valid.
+> It subsumes pv_icptdata_check_diag.
+> 
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 
-diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-index 9996a989b52e..e2c934728f73 100644
---- a/arch/arm64/kvm/arm.c
-+++ b/arch/arm64/kvm/arm.c
-@@ -1419,11 +1419,6 @@ static int kvm_vcpu_init_check_features(struct kvm_vcpu *vcpu,
- 	    test_bit(KVM_ARM_VCPU_PTRAUTH_GENERIC, &features))
- 		return -EINVAL;
- 
--	/* Disallow NV+SVE for the time being */
--	if (test_bit(KVM_ARM_VCPU_HAS_EL2, &features) &&
--	    test_bit(KVM_ARM_VCPU_SVE, &features))
--		return -EINVAL;
--
- 	if (!test_bit(KVM_ARM_VCPU_EL1_32BIT, &features))
- 		return 0;
- 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 6813c7c7f00a..0aefc3e1b9a7 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -41,13 +41,12 @@ static u64 limit_nv_id_reg(u32 id, u64 val)
- 		break;
- 
- 	case SYS_ID_AA64PFR0_EL1:
--		/* No AMU, MPAM, S-EL2, RAS or SVE */
-+		/* No AMU, MPAM, S-EL2, or RAS */
- 		val &= ~(GENMASK_ULL(55, 52)	|
- 			 NV_FTR(PFR0, AMU)	|
- 			 NV_FTR(PFR0, MPAM)	|
- 			 NV_FTR(PFR0, SEL2)	|
- 			 NV_FTR(PFR0, RAS)	|
--			 NV_FTR(PFR0, SVE)	|
- 			 NV_FTR(PFR0, EL3)	|
- 			 NV_FTR(PFR0, EL2)	|
- 			 NV_FTR(PFR0, EL1));
--- 
-2.45.2.741.gdbec12cfda-goog
+
+[...]
+
+
+> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
+> index 0fa915cf..d4ba2a40 100644
+> --- a/lib/s390x/sie.c
+> +++ b/lib/s390x/sie.c
+> @@ -42,6 +42,59 @@ void sie_check_validity(struct vm *vm, uint16_t vir_exp)
+>  	report(vir_exp == vir, "VALIDITY: %x", vir);
+>  }
+>  
+> +bool sie_is_diag_icpt(struct vm *vm, unsigned int diag)
+> +{
+> +	union {
+> +		struct {
+> +			uint64_t     : 16;
+> +			uint64_t ipa : 16;
+> +			uint64_t ipb : 32;
+> +		};
+> +		struct {
+> +			uint64_t          : 16;
+> +			uint64_t opcode   :  8;
+> +			uint64_t r_1      :  4;
+> +			uint64_t r_2      :  4;
+> +			uint64_t r_base   :  4;
+> +			uint64_t displace : 12;
+> +			uint64_t zero     : 16;
+> +		};
+> +	} instr = { .ipa = vm->sblk->ipa, .ipb = vm->sblk->ipb };
+> +	uint8_t icptcode;
+> +	uint64_t code;
+> +
+> +	switch (diag) {
+> +	case 0x44:
+> +	case 0x9c:
+> +	case 0x288:
+> +	case 0x308:
+> +		icptcode = ICPT_PV_NOTIFY;
+> +		break;
+> +	case 0x500:
+> +		icptcode = ICPT_PV_INSTR;
+> +		break;
+> +	default:
+> +		/* If a new diag is introduced add it to the cases above! */
+> +		assert_msg(false, "unknown diag");
+
+just a nit, but would it be possible to also print the diag number that
+causes the error?
+
+
+otherwise looks good
+
 
 
