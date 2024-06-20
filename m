@@ -1,87 +1,114 @@
-Return-Path: <kvm+bounces-20076-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20077-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86FFF91057B
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 15:10:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B56569106CF
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 15:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C9951C20993
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 13:10:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AF0EB22340
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 13:52:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1301AD3F5;
-	Thu, 20 Jun 2024 13:08:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B391AD491;
+	Thu, 20 Jun 2024 13:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jye64+iQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FHXIc83i"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210841ACE65
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 13:08:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A328175E
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 13:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718888891; cv=none; b=Akoq+TVNpf17lKgAm+KtbjiqbEdWfAAmQ/PSvd7xEB5edilZSa3mYimdZuCmC6W8KwvEiwYywsqQypnNIWqkFfs2+/McDInTpExxr8V7A+z1OX0qwgbjGs+MS1Np7FT47nIYv3ZTQZw8n5OaRs1Q/k+HkTDOmHkuVFtniZhqvpA=
+	t=1718891536; cv=none; b=U3aYO7Aa5cMP9qXaS5uWmxv1hEOkASdGt+DcLde2xAf/B2u3L9H7QyNijyHn6m3yk+LrIwchypTkwSHMY7P4i8ThBgr5mw8l9CcnempTDlFTVdmRmX6g1YTrLmDl9YMEc6flEdto7i0+RZWRkEeOycTseAGD4dmJEJwpXKeWXwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718888891; c=relaxed/simple;
-	bh=Nd5/hPdaVzyaCPja9J9QJBucAO/XJpZ+1uhijZYQ7fg=;
+	s=arc-20240116; t=1718891536; c=relaxed/simple;
+	bh=kZFzGdFBvUz4Gg6I42gew9txHyVBgSQU2rWpWdCqIqw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OPimOzMSg2+NPnHBiNAcJayf/lu/f3DFX9MQvYeEH9WC5IrWOVqcDbgqDy1gTYb6pqHOZ9HMsGF1Z4PiqHFPN5GnhZ3f5OMi0mIn3kZOgSL4bfBGvBGs+Gs3HuV7SFdPztM2161sAP8V1Dzocyn+A8QsWNtNupZACmQIGQDbs6Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jye64+iQ; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-423b89f9042so136085e9.1
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 06:08:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718888887; x=1719493687; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sokuciGEMqDWfb/GyCKAbwKFQZy9XN+HQFh0M9GkJEc=;
-        b=jye64+iQUf5Q22WYI1bW2qakhtko/K6W5NB1dXd/wdVeLgH5b8VP9R3SJjkU5Xg/Qg
-         NTkGml8A1f3UfF3IVPp/XroIcpCVV0ed2h8JV7hMFZH+bWmNt7flwiPFB4zNJcOjsrfk
-         MU58yhn0vKKAJJVzwmsmdqMZLBsK0k45PsUlWtXm5MpJ2ga/UFy5m/UUfJ3iDdCkuj04
-         lAJDLk9uDGhOoiOVzhYu1UXWSQX9ok6rsgLhdh8ATjEzHBSwhkcNtqmEWEZcsot9IOAu
-         yJL4xmekP5Tt+qPD5Nmx645PRWhY6Tc+43L2Zv0dRr+gmjWnRGS2AuKsUjhCG0jv/X1y
-         cQoQ==
+	 Content-Type:Content-Disposition:In-Reply-To; b=DIC5F97MqJnouqOgWj+MSbYHHF4bWIdm84/h8aJgTvfHORY3KaU6HqE6MU5MTdTjfLq8W79MVhy44Xa6mLjtfgf0pEvqUymV5hprTokXWJhwHB5NrRdQvqaZP112hJ4Hgk1q0Cpj2gNQaSJetpw2vKDQziNkoNyVXl6rL3WUmfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FHXIc83i; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718891534;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CNpcAjabNj7U5Kjrejmg/ilwXEXZseiB+OI7rnWLE5Q=;
+	b=FHXIc83i1IFWAuvZ7bO1DC+WKv5kV+miQ9+UeFzbllGG7IQGwEqhEEpG5b7My3VBZLCRwE
+	vGv4l6uxgC43fjtyqXPlfwu4TFkoZzWg32rmnDSGoY18Ri2n3Vsn6gHGTvibppJ4mU6o4N
+	4Ak8M9xODdGIz2cae0ZdVPJVzUGHUU4=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-623-5hCJ6vJ8Md2QECNgaJuuJw-1; Thu, 20 Jun 2024 09:52:12 -0400
+X-MC-Unique: 5hCJ6vJ8Md2QECNgaJuuJw-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-57851ae6090so530699a12.3
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 06:52:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718888887; x=1719493687;
+        d=1e100.net; s=20230601; t=1718891531; x=1719496331;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sokuciGEMqDWfb/GyCKAbwKFQZy9XN+HQFh0M9GkJEc=;
-        b=psT2IFgQpm2M42m5dMBiBWMzKYVKjyp8jCZsTQMtdD6sccm/GE9v5qpa5AojAal+TK
-         GCUunsIOCVMmlZx4Q49XndH8ZshYwKrYQac+HgucTe65URPHl+bs7I+qKAMr7+X6ogXj
-         2LnRkXGfEsuEuBJIgMyCE4okStL6z1Rr14DuBiwG3R+duKCh9I18wIO+0x768bjpNCPL
-         HitNTLD01Dq7kkF6pUDBcCgJgzZ9Ot++DO1UcVs+FGAcpK9mpKhArwOtERS/Y/7wJDto
-         pG8wdkDzI6Tn+be7L9KEmBCYdBjZb/PQXD01om1o+3+dg0fwUG8xgV5tWhOqS99fHF+0
-         RZbw==
-X-Forwarded-Encrypted: i=1; AJvYcCV3z3a94ivgaWiRbQXbuFHfXeC4cITVFuIQj9Ay1B6CuYeuAQnPQPBK1b7J4/DquNSgUMtlPS3KFKp5ISd+kUp8KC9H
-X-Gm-Message-State: AOJu0Yzunh/a5H1Bevdl3J3GpUNR+yIoEPXeJvkl3OGkh7H3UiRbRFFw
-	vNh0kMiUaunGmGaHnJwD0pB4muRFX07oYRpjNab5JDfuNVQWaNhxX8/4NmG8aQ==
-X-Google-Smtp-Source: AGHT+IHp9bazFhbmExqFkMfkC/8CdeFqGQa/Ablhwe0BqRz1q3OFlFoqlZtJH067QyRn9E0j/SDL1Q==
-X-Received: by 2002:a05:600c:4e0c:b0:41b:8715:1158 with SMTP id 5b1f17b1804b1-424758fd22bmr3600115e9.6.1718888887221;
-        Thu, 20 Jun 2024 06:08:07 -0700 (PDT)
-Received: from google.com (205.215.190.35.bc.googleusercontent.com. [35.190.215.205])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36075c6fa4esm19579496f8f.67.2024.06.20.06.08.06
+        bh=CNpcAjabNj7U5Kjrejmg/ilwXEXZseiB+OI7rnWLE5Q=;
+        b=XUCDT1cyYYcZZVDAfJa6HqdAAOHn+kh690qDcq1cENb4C+Ds6e8senaqojvxMrbR8E
+         lgQV+VA3Hq1/3i3DisFTyBFEYzynboU6mMLJl5vjAdHqn0MTfvtDMt+iYERRD2IDatMb
+         j6pWOtaoQ3INW1a2omg8rlKZJZGIAjinJwPq3Q9Pb+Tnd6z4EiwvKUPIGC7rZsksBUX5
+         sWQ9eLyyBSCYkRV6D8PbjmD4pBiz7gNMjZH5O2mviJhTUZiiZl1PsjMJ+RngMiORUY9t
+         i6xeEYUkZiwMoSpw0JLUAeAObxVN4prud2XJUprd81CWteyfSz60rraVecWFLi1+Hfxu
+         YWew==
+X-Forwarded-Encrypted: i=1; AJvYcCVJUTXwXkrkgpj6e7z4u15zCx+FI8ucF793eTLB6nHHboWOi1zS82IQN9k4hv4NRaLyt8o0DjsjntjVB3yLfdLebi1x
+X-Gm-Message-State: AOJu0Yz84g1QNbh0xsn/rf2NDLHFFbOsPyVsYE7sX1oKGNij68ucaHmO
+	N0qLQP9Q3E65zviVGFCi7CSphjPmUIhZz/CaVb5nXOqQHdgndaDBZCxtWKfkXD32RLWAWIt2EwB
+	txMVSnSQ7OdiyBET9czp/gsU34FGyWVzHOKTJpIilrULwc9Metw==
+X-Received: by 2002:a50:aad7:0:b0:578:3335:6e88 with SMTP id 4fb4d7f45d1cf-57d07c59ce6mr3503150a12.0.1718891531434;
+        Thu, 20 Jun 2024 06:52:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF90OFOGv2ZZVHJ5dm1EVg30XUQltEQfgDt90ACAE1nuPoxRvgkNZnMIK5JtmqXjWOLvdB0xw==
+X-Received: by 2002:a50:aad7:0:b0:578:3335:6e88 with SMTP id 4fb4d7f45d1cf-57d07c59ce6mr3503106a12.0.1718891530819;
+        Thu, 20 Jun 2024 06:52:10 -0700 (PDT)
+Received: from redhat.com ([2.52.146.100])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb743b026sm9630648a12.97.2024.06.20.06.52.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 06:08:06 -0700 (PDT)
-Date: Thu, 20 Jun 2024 13:08:02 +0000
-From: Mostafa Saleh <smostafa@google.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: John Hubbard <jhubbard@nvidia.com>,
-	Elliot Berman <quic_eberman@quicinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>,
-	maz@kernel.org, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
-	Fuad Tabba <tabba@google.com>, Jason Gunthorpe <jgg@nvidia.com>
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-Message-ID: <ZnQpslcah7dcSS8z@google.com>
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
- <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
- <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
+        Thu, 20 Jun 2024 06:52:10 -0700 (PDT)
+Date: Thu, 20 Jun 2024 09:51:58 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Jason Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+	kvm@vger.kernel.org, Wei Wang <wei.w.wang@intel.com>
+Subject: Re: [PATCH vhost v9 2/6] virtio: remove support for names array
+ entries being null.
+Message-ID: <20240620070717-mutt-send-email-mst@kernel.org>
+References: <20240424091533.86949-1-xuanzhuo@linux.alibaba.com>
+ <20240424091533.86949-3-xuanzhuo@linux.alibaba.com>
+ <20240620035749-mutt-send-email-mst@kernel.org>
+ <1718872778.4831812-1-xuanzhuo@linux.alibaba.com>
+ <20240620044839-mutt-send-email-mst@kernel.org>
+ <1718874293.698573-2-xuanzhuo@linux.alibaba.com>
+ <20240620054548-mutt-send-email-mst@kernel.org>
+ <1718880548.281809-3-xuanzhuo@linux.alibaba.com>
+ <20240620065602-mutt-send-email-mst@kernel.org>
+ <1718881448.8979208-6-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -90,130 +117,180 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
+In-Reply-To: <1718881448.8979208-6-xuanzhuo@linux.alibaba.com>
 
-Hi David,
+On Thu, Jun 20, 2024 at 07:04:08PM +0800, Xuan Zhuo wrote:
+> On Thu, 20 Jun 2024 07:02:42 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Thu, Jun 20, 2024 at 06:49:08PM +0800, Xuan Zhuo wrote:
+> > > On Thu, 20 Jun 2024 06:01:54 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > On Thu, Jun 20, 2024 at 05:04:53PM +0800, Xuan Zhuo wrote:
+> > > > > On Thu, 20 Jun 2024 05:01:08 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > > On Thu, Jun 20, 2024 at 04:39:38PM +0800, Xuan Zhuo wrote:
+> > > > > > > On Thu, 20 Jun 2024 04:02:45 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > > > > > > > On Wed, Apr 24, 2024 at 05:15:29PM +0800, Xuan Zhuo wrote:
+> > > > > > > > > commit 6457f126c888 ("virtio: support reserved vqs") introduced this
+> > > > > > > > > support. Multiqueue virtio-net use 2N as ctrl vq finally, so the logic
+> > > > > > > > > doesn't apply. And not one uses this.
+> > > > > > > > >
+> > > > > > > > > On the other side, that makes some trouble for us to refactor the
+> > > > > > > > > find_vqs() params.
+> > > > > > > > >
+> > > > > > > > > So I remove this support.
+> > > > > > > > >
+> > > > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
+> > > > > > > > > Acked-by: Eric Farman <farman@linux.ibm.com> # s390
+> > > > > > > > > Acked-by: Halil Pasic <pasic@linux.ibm.com>
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > I don't mind, but this patchset is too big already.
+> > > > > > > > Why do we need to make this part of this patchset?
+> > > > > > >
+> > > > > > >
+> > > > > > > If some the pointers of the names is NULL, then in the virtio ring,
+> > > > > > > we will have a trouble to index from the arrays(names, callbacks...).
+> > > > > > > Becasue that the idx of the vq is not the index of these arrays.
+> > > > > > >
+> > > > > > > If the names is [NULL, "rx", "tx"], the first vq is the "rx", but index of the
+> > > > > > > vq is zero, but the index of the info of this vq inside the arrays is 1.
+> > > > > >
+> > > > > >
+> > > > > > Ah. So actually, it used to work.
+> > > > > >
+> > > > > > What this should refer to is
+> > > > > >
+> > > > > > commit ddbeac07a39a81d82331a312d0578fab94fccbf1
+> > > > > > Author: Wei Wang <wei.w.wang@intel.com>
+> > > > > > Date:   Fri Dec 28 10:26:25 2018 +0800
+> > > > > >
+> > > > > >     virtio_pci: use queue idx instead of array idx to set up the vq
+> > > > > >
+> > > > > >     When find_vqs, there will be no vq[i] allocation if its corresponding
+> > > > > >     names[i] is NULL. For example, the caller may pass in names[i] (i=4)
+> > > > > >     with names[2] being NULL because the related feature bit is turned off,
+> > > > > >     so technically there are 3 queues on the device, and name[4] should
+> > > > > >     correspond to the 3rd queue on the device.
+> > > > > >
+> > > > > >     So we use queue_idx as the queue index, which is increased only when the
+> > > > > >     queue exists.
+> > > > > >
+> > > > > >     Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> > > > > >     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > > > > >
+> > > > >
+> > > > > That just work for PCI.
+> > > > >
+> > > > > The trouble I described is that we can not index in the virtio ring.
+> > > > >
+> > > > > In virtio ring, we may like to use the vq.index that do not increase
+> > > > > for the NULL.
+> > > > >
+> > > > >
+> > > > > >
+> > > > > > Which made it so setting names NULL actually does not reserve a vq.
+> > > > > >
+> > > > > > But I worry about non pci transports - there's a chance they used
+> > > > > > a different index with the balloon. Did you test some of these?
+> > > > > >
+> > > > >
+> > > > > Balloon is out of spec.
+> > > > >
+> > > > > The vq.index does not increase for the name NULL. So the Balloon use the
+> > > > > continuous id. That is out of spec.
+> > > >
+> > > >
+> > > > I see. And apparently the QEMU implementation is out of spec, too,
+> > > > so they work fine. And STATS is always on in QEMU.
+> > > >
+> > > > That change by Wei broke the theoretical config which has
+> > > > !STATS but does have FREE_PAGE. We never noticed - not many people
+> > > > ever bothered with FREE_PAGE.
+> > > >
+> > > > However QEMU really is broken in a weird way.
+> > > > In particular if it exposes STATS but driver does not
+> > > > configure STATS then QEMU still has the stats vq.
+> > > > Things will break then.
+> > > >
+> > > >
+> > > > In short, it's a mess, and it needs thought.
+> > > > At this point I suggest we keep the ability to set
+> > > > names to NULL in case we want to just revert Wei's patch.
+> > > >
+> > > >
+> > > >
+> > > > > That does not matter for this patchset.
+> > > > > The name NULL is always skipped.
+> > > > >
+> > > > > Thanks.
+> > > >
+> > > >
+> > > > Let's keep this patchset as small as possible.
+> > > > Keep the existing functionality, we'll do cleanups
+> > > > later.
+> > >
+> > >
+> > > I am ok. But we need a idx to index the info of the vq.
+> > >
+> > > How about a new element "cfg_idx" to virtio_vq_config.
+> > >
+> > > struct virtio_vq_config {
+> > > 	unsigned int nvqs;
+> > > ->	unsigned int cfg_idx;
+> > >
+> > > 	struct virtqueue   **vqs;
+> > > 	vq_callback_t      **callbacks;
+> > > 	const char         **names;
+> > > 	const bool          *ctx;
+> > > 	struct irq_affinity *desc;
+> > > };
+> > >
+> > >
+> > > That is setted by transport. The virtio ring can use this to index the info
+> > > of the vq. Then the #1 #2 commits can be dropped.
+> > >
+> > >
+> > > Thanks.
+> > >
+> >
+> > I'm not sure why you need this in the API.
+> >
+> >
+> > Actually now I think about it, the whole struct is weird.
+> > I think nvqs etc should be outside the struct.
+> > All arrays are the same size, why not:
+> >
+> > struct virtio_vq_config {
+> >  	vq_callback_t      callback;
+> >  	const char         *name;
+> >  	const bool          ctx;
+> > };
+> >
+> > And find_vqs should get an array of these.
+> > Leave the rest of params alone.
+> 
+> 
+> YES, this is great.
+> 
+> I thought about this.
+> 
+> The trouble is that all the callers need to be changed.
+> That are too many.
+> 
+> Thanks.
+> 
 
-On Wed, Jun 19, 2024 at 09:37:58AM +0200, David Hildenbrand wrote:
-> Hi,
-> 
-> On 19.06.24 04:44, John Hubbard wrote:
-> > On 6/18/24 5:05 PM, Elliot Berman wrote:
-> > > In arm64 pKVM and QuIC's Gunyah protected VM model, we want to support
-> > > grabbing shmem user pages instead of using KVM's guestmemfd. These
-> > > hypervisors provide a different isolation model than the CoCo
-> > > implementations from x86. KVM's guest_memfd is focused on providing
-> > > memory that is more isolated than AVF requires. Some specific examples
-> > > include ability to pre-load data onto guest-private pages, dynamically
-> > > sharing/isolating guest pages without copy, and (future) migrating
-> > > guest-private pages.  In sum of those differences after a discussion in
-> > > [1] and at PUCK, we want to try to stick with existing shmem and extend
-> > > GUP to support the isolation needs for arm64 pKVM and Gunyah.
-> 
-> The main question really is, into which direction we want and can develop
-> guest_memfd. At this point (after talking to Jason at LSF/MM), I wonder if
-> guest_memfd should be our new target for guest memory, both shared and
-> private. There are a bunch of issues to be sorted out though ...
-> 
-> As there is interest from Red Hat into supporting hugetlb-style huge pages
-> in confidential VMs for real-time workloads, and wasting memory is not
-> really desired, I'm going to think some more about some of the challenges
-> (shared+private in guest_memfd, mmap support, migration of !shared folios,
-> hugetlb-like support, in-place shared<->private conversion, interaction with
-> page pinning). Tricky.
-> 
-> Ideally, we'd have one way to back guest memory for confidential VMs in the
-> future.
-> 
-> 
-> Can you comment on the bigger design goal here? In particular:
-> 
-> 1) Who would get the exclusive PIN and for which reason? When would we
->    pin, when would we unpin?
-> 
-> 2) What would happen if there is already another PIN? Can we deal with
->    speculative short-term PINs from GUP-fast that could introduce
->    errors?
-> 
-> 3) How can we be sure we don't need other long-term pins (IOMMUs?) in
->    the future?
+Not too many.
 
-Can you please clarify more about the IOMMU case?
 
-pKVM has no merged upstream IOMMU support at the moment, although
-there was an RFC a while a go [1], also there would be a v2 soon.
+> >
+> >
+> > >
+> > > >
+> > > >
+> > > > > > --
+> > > > > > MST
+> > > > > >
+> > > >
+> >
 
-In the patches KVM (running in EL2) will manage the IOMMUs including
-the page tables and all pages used in that are allocated from the
-kernel.
-
-These patches don't support IOMMUs for guests. However, I don't see
-why would that be different from the CPU? as once the page is pinned
-it can be owned by a guest and that would be reflected in the
-hypervisor tracking, the CPU stage-2 and IOMMU page tables as well.
-
-[1] https://lore.kernel.org/kvmarm/20230201125328.2186498-1-jean-philippe@linaro.org/
-
-Thanks,
-Mostafa
-
-> 
-> 4) Why are GUP pins special? How one would deal with other folio
->    references (e.g., simply mmap the shmem file into a different
->    process).
-> 
-> 5) Why you have to bother about anonymous pages at all (skimming over s
->    some patches), when you really want to handle shmem differently only?
-> 
-> > > To that
-> > > end, we introduce the concept of "exclusive GUP pinning", which enforces
-> > > that only one pin of any kind is allowed when using the FOLL_EXCLUSIVE
-> > > flag is set. This behavior doesn't affect FOLL_GET or any other folio
-> > > refcount operations that don't go through the FOLL_PIN path.
-> 
-> So, FOLL_EXCLUSIVE would fail if there already is a PIN, but !FOLL_EXCLUSIVE
-> would succeed even if there is a single PIN via FOLL_EXCLUSIVE? Or would the
-> single FOLL_EXCLUSIVE pin make other pins that don't have FOLL_EXCLUSIVE set
-> fail as well?
-> 
-> > > 
-> > > [1]: https://lore.kernel.org/all/20240319143119.GA2736@willie-the-truck/
-> > > 
-> > 
-> > Hi!
-> > 
-> > Looking through this, I feel that some intangible threshold of "this is
-> > too much overloading of page->_refcount" has been crossed. This is a very
-> > specific feature, and it is using approximately one more bit than is
-> > really actually "available"...
-> 
-> Agreed.
-> 
-> > 
-> > If we need a bit in struct page/folio, is this really the only way? Willy
-> > is working towards getting us an entirely separate folio->pincount, I
-> > suppose that might take too long? Or not?
-> 
-> Before talking about how to implement it, I think we first have to learn
-> whether that approach is what we want at all, and how it fits into the
-> bigger picture of that use case.
-> 
-> > 
-> > This feels like force-fitting a very specific feature (KVM/CoCo handling
-> > of shmem pages) into a more general mechanism that is running low on
-> > bits (gup/pup).
-> 
-> Agreed.
-> 
-> > 
-> > Maybe a good topic for LPC!
-> 
-> The KVM track has plenty of guest_memfd topics, might be a good fit there.
-> (or in the MM track, of course)
-> 
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-> 
 
