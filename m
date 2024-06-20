@@ -1,157 +1,169 @@
-Return-Path: <kvm+bounces-20155-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCF939110EF
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 20:29:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBE5491109F
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 20:17:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 970FCB2A018
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:13:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9272528D376
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:17:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC661BD8E1;
-	Thu, 20 Jun 2024 18:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E86991BB68C;
+	Thu, 20 Jun 2024 18:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="V+wOkkYY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="St2w1jjR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6BF1BD8E0
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 18:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEA5A172BAB
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 18:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718906481; cv=none; b=BgvfYqdUyc0WeZu+ov0Bi53SZYviXDw6TGjdAchbtm++jYRbpXN1ZF8deCqk3nRNtes7EhTdfIZNEiAwif/SemC11zjzewT6T6bA2sT2FAM2qFuNhqoNMHpqbp4DLGAbGLzgWYz59ADvofE8nE/F0ns+1M8kHv3BJyLUIiZnaNw=
+	t=1718907206; cv=none; b=td6NnFIGCyn+1y17KiBVJgEIuIaEZITshzwVRrwaU15ILEbji7KbKEkzg7C8KUQC+txVZwncYZXbPTtcMO+Cp+SU84PWsGo5f9JW9y2JVjd8D914+dYjnvDw+lPYjXZ/HyXKCQXRfdNy2NVMiFqYzmonjw/2N+/Qs8poSIoIOsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718906481; c=relaxed/simple;
-	bh=29OxgEL3l6wtk/wr9HSlAcydEGnms+qvS9bonjZCeq4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bbX+L8jtmcG6zQPGeAg52mc8Vhz8WCy3cqCybOf2+5gtIUmjXLAWcdoYnN41jVLcMICPAKFZ7sFRfrqgww4Pi+v8p93JGt577uzM4UzWCK3sGmwjO1P7yTMwYTYqOFZwwhrSp9O9KYVGmr5f3+gumaLjCRqD+cAdcOngaab8/Pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=V+wOkkYY; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2eaae2a6dc1so23333031fa.0
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 11:01:18 -0700 (PDT)
+	s=arc-20240116; t=1718907206; c=relaxed/simple;
+	bh=EkQ74mIuZ5fmAIpUTCR52YETFKCZ1LkD1Q4d79bF9gI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YsvErkrBaMBDFyZEgBltJZG+Not7lqZENA7+ZFnvoR7F7xcfX07YlFrHMwXrwSqHCcPWYPe66DwwPvx5ZiWrjKQcfrOiVTPiVY47wxFZirXLhCBN13hF5SJZwx0RrDvFzqUkCSF4Tri185GVlhC4qK6oRfI4AHZiYfqlWtwBpSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=St2w1jjR; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62f3c5f5bf7so19493707b3.0
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 11:13:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1718906477; x=1719511277; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=fuatl8An2r1cXJScFESolD1f90VPFvdc9a3mKIi/oro=;
-        b=V+wOkkYYR8Vr1ouUmxA3Rz1kx9u301U6NkRgSuN3yRAswX2FJyGU3pvUngiUunJRv6
-         zgsUhdbIHal3pvOlYRw3IcZGg5d38PnlxHon172utGDFdgrJpl8ZX+eIi0p8XUI851JK
-         ml2xzptai5M1N9BqvW1Yj+AYtd2x3/p6BaO04=
+        d=google.com; s=20230601; t=1718907202; x=1719512002; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YMf6bHWa3WYlKn5BTDJ8mzHqJJrcfbUTWWG9rzjzXEI=;
+        b=St2w1jjRjO4uZZSFZ9k4T5xNJnYnC+c/kYAw3sdPqGE7OFISQl6Aeg0J3JllT9fAvn
+         aJhC3UfH0Q1U4+dOf99osMmDpxXoF4wbiJ8fUxCs8R8d8F1XYR0np+qrkRskBXDlofm3
+         KNH5BNsweARlm0q8n/ge/ZjAx5GKumcplAbD43HXsrilidl4kXY0nOwjR/CiVO83vMYF
+         a8bO+UeMXPWrtUkOpcb70+gUUpHwDcrQ2JwR4C7Vc3M5QZtPoOS2jxGMfrRlFGt4AOfN
+         YrTIoXDio0DboFDIcLb51KxjsRkoDHpmEk0QLZAWGibUA5sSl1/Ga+3QPha1/wnDM5Uk
+         srHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718906477; x=1719511277;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fuatl8An2r1cXJScFESolD1f90VPFvdc9a3mKIi/oro=;
-        b=WWrlHx1kbz1ZQsJf1Juqjw7VuuHF3xIOgE0B26oeA5Ap1Key6J0bznfeuP5SNEe88p
-         uuP6hSMTHqjbBRjFtV0X8EuaF0j38FqEayPxVIqCQTZBDRHR1g9FewsUnrqJev4dkuVh
-         JwfF8W/ZtLj4mdojbkdoy9u0hqBhWCR7m2k5xDhd5Jd4bUKmzHtlUnma29U6ugzrLlN1
-         b3Kf7A0klZ0w6MQ6SuPhaPbTWhwv0FTLdCxlvlg2dZJ/HyxDn/FE+IV6YkkiLY4BuKX0
-         coudAusFNRhJ9b9xxV6BTxpw8WgAP2kam+5zaaYrNm94eQMAqJ8h/Ue9n5q4kcImx25o
-         c+BA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGiXQxkgrhet65U40AX9lIKu4pdpXElusMn+RocWM4wKiBTVkjmcJaUa8cPtNRbP4Hitp8gO3AMmB1p0n8LWJ45ejS
-X-Gm-Message-State: AOJu0YxQEx4BXHd7coBeiR9GBDQ4KMuQGcmrY/0cYJiERi5hGQH0jwV3
-	WrnDFSuGnIq221PcYzTpy0m4uCFxFjYEEBo9l7Zxy1WxOWisXE85fCc1k4DI3vRUi1LwHiTPdOm
-	WpIJWtRHC
-X-Google-Smtp-Source: AGHT+IGMzFfJMZ/fo2Lb6xzeqBAww82teyK1SR9D3gd1OZsO9kFqOwgceC8X5ex3XeAQ5/720KDaZg==
-X-Received: by 2002:a2e:8712:0:b0:2eb:ea6f:f2c2 with SMTP id 38308e7fff4ca-2ec3ced12f6mr49127811fa.24.1718906477215;
-        Thu, 20 Jun 2024 11:01:17 -0700 (PDT)
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com. [209.85.128.53])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f56db61ebsm784651566b.56.2024.06.20.11.01.16
-        for <kvm@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 11:01:16 -0700 (PDT)
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4230366ad7bso13888255e9.1
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 11:01:16 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVe18+6iWoIyElZHsdDckS4X6+heKlxLtACOx6nPmQvgfnCOmtsVflXLmeI50yQT5lAMRpWWUp8k8ybeIoN1QHQaRVY
-X-Received: by 2002:a50:96cf:0:b0:57c:5874:4f5c with SMTP id
- 4fb4d7f45d1cf-57d07ea857fmr5124279a12.32.1718906455555; Thu, 20 Jun 2024
- 11:00:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718907202; x=1719512002;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=YMf6bHWa3WYlKn5BTDJ8mzHqJJrcfbUTWWG9rzjzXEI=;
+        b=leJiyGRHZ06yv85g1BOX+HOESOUEyjod1WnshOM1RrLks/nnbXxijpft3AhnX49fLg
+         /iXRzAyDkn9fxf5GZ4LQzO/9ErJqL+KewJfabV01dPgJwIRDSP6Tr05uH4/snD2vCrz8
+         yaoZ+XULiehnpK8i8PHtGFGrQlQrk71pWHje7Y2ypZgEV9JbJrSm//VNszEHB6bmx/+Y
+         Ts+vxRx4rZxbdXdAPeRmFZUFoO42ptoaUN5PWb3qQHl4ssrafaVEroGdmsiG/Q2UY+K5
+         c85vEcJEUUNYeEj4AVKfp229g97qqazf+HDSpDliex+/91bL7duhBauM3W5IN194qCpm
+         RMPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUeTlxbDFUX2LYKONTsYeDMgNCHxhHdJas3NI9+mDZ2lgpnC28OCgKaVLEu9SZFvOqTtvHGngYs04HYPbzcZctNZ6B0
+X-Gm-Message-State: AOJu0YziJDL9Nvbw1PLwowohQtEyqo9qPGNZtZ9cHTJLrXyZgPoEONtz
+	Of/ZjR+zOQxyTgfNjZ/TZRy0aGZFG06L4/zdUQSfP1zcmbk/2IDDg7g9HCUDOt77uaEXFPT1WOp
+	Jwg==
+X-Google-Smtp-Source: AGHT+IHj65srhREZE1E3IcSiXfDYLsTilyE3EaAXWu2gQuzsizOP8c6SaYdY5Ud/AiA3ZvB3NTHF6q9xvZ8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:fc5:b0:62d:48f:30e8 with SMTP id
+ 00721157ae682-63a8dc09c71mr14779407b3.1.1718907202341; Thu, 20 Jun 2024
+ 11:13:22 -0700 (PDT)
+Date: Thu, 20 Jun 2024 11:13:21 -0700
+In-Reply-To: <20240619182128.4131355-3-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240620175703.605111-1-yury.norov@gmail.com>
-In-Reply-To: <20240620175703.605111-1-yury.norov@gmail.com>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Thu, 20 Jun 2024 11:00:38 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wiUTXC452qbypG3jW6XCZGfc8d-iehSavxn5JkQ=sv0zA@mail.gmail.com>
-Message-ID: <CAHk-=wiUTXC452qbypG3jW6XCZGfc8d-iehSavxn5JkQ=sv0zA@mail.gmail.com>
-Subject: Re: [PATCH v4 00/40] lib/find: add atomic find_bit() primitives
-To: Yury Norov <yury.norov@gmail.com>
-Cc: linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	"H. Peter Anvin" <hpa@zytor.com>, "James E.J. Bottomley" <jejb@linux.ibm.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, "Md. Haris Iqbal" <haris.iqbal@ionos.com>, 
-	Akinobu Mita <akinobu.mita@gmail.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Borislav Petkov <bp@alien8.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	Christian Brauner <brauner@kernel.org>, Damien Le Moal <damien.lemoal@opensource.wdc.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, David Disseldorp <ddiss@suse.de>, 
-	Edward Cree <ecree.xilinx@gmail.com>, Eric Dumazet <edumazet@google.com>, 
-	Fenghua Yu <fenghua.yu@intel.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gregory Greenman <gregory.greenman@intel.com>, 
-	Hans Verkuil <hverkuil@xs4all.nl>, Hans de Goede <hdegoede@redhat.com>, 
-	Hugh Dickins <hughd@google.com>, Ingo Molnar <mingo@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Jason Gunthorpe <jgg@ziepe.ca>, Jens Axboe <axboe@kernel.dk>, 
-	Jiri Pirko <jiri@resnulli.us>, Jiri Slaby <jirislaby@kernel.org>, Kalle Valo <kvalo@kernel.org>, 
-	Karsten Graul <kgraul@linux.ibm.com>, Karsten Keil <isdn@linux-pingi.de>, 
-	Kees Cook <keescook@chromium.org>, Leon Romanovsky <leon@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Martin Habets <habetsm.xilinx@gmail.com>, 
-	Mauro Carvalho Chehab <mchehab@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Michal Simek <monstr@monstr.eu>, 
-	Nicholas Piggin <npiggin@gmail.com>, Oliver Neukum <oneukum@suse.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Ping-Ke Shih <pkshih@realtek.com>, Rich Felker <dalias@libc.org>, Rob Herring <robh@kernel.org>, 
-	Robin Murphy <robin.murphy@arm.com>, Sean Christopherson <seanjc@google.com>, 
-	Shuai Xue <xueshuai@linux.alibaba.com>, Stanislaw Gruszka <stf_xl@wp.pl>, 
-	Steven Rostedt <rostedt@goodmis.org>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	Thomas Gleixner <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Will Deacon <will@kernel.org>, Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	GR-QLogic-Storage-Upstream@marvell.com, alsa-devel@alsa-project.org, 
-	ath10k@lists.infradead.org, dmaengine@vger.kernel.org, iommu@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-arm-msm@vger.kernel.org, linux-block@vger.kernel.org, 
-	linux-bluetooth@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	linux-m68k@lists.linux-m68k.org, linux-media@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-net-drivers@amd.com, 
-	linux-pci@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-serial@vger.kernel.org, linux-sh@vger.kernel.org, 
-	linux-sound@vger.kernel.org, linux-usb@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, 
-	mpi3mr-linuxdrv.pdl@broadcom.com, netdev@vger.kernel.org, 
-	sparclinux@vger.kernel.org, x86@kernel.org, 
-	Alexey Klimov <alexey.klimov@linaro.org>, Bart Van Assche <bvanassche@acm.org>, Jan Kara <jack@suse.cz>, 
-	Matthew Wilcox <willy@infradead.org>, Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>, 
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>, Sergey Shtylyov <s.shtylyov@omp.ru>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+References: <20240619182128.4131355-1-dapeng1.mi@linux.intel.com> <20240619182128.4131355-3-dapeng1.mi@linux.intel.com>
+Message-ID: <ZnRxQSG_wnZma3H9@google.com>
+Subject: Re: [PATCH 2/2] selftests: kvm: Reduce verbosity of "Random seed" messages
+From: Sean Christopherson <seanjc@google.com>
+To: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>, 
+	Xiong Zhang <xiong.y.zhang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
+	Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>, 
+	Dapeng Mi <dapeng1.mi@intel.com>, Yi Lai <yi1.lai@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Thu, 20 Jun 2024 at 10:57, Yury Norov <yury.norov@gmail.com> wrote:
->
->
-> The typical lock-protected bit allocation may look like this:
+On Thu, Jun 20, 2024, Dapeng Mi wrote:
+> Huge number of "Random seed:" messages are printed when running
+> pmu_counters_test. It leads to the regular test output is totally
+> flooded by these over-verbose messages.
+> 
+> Downgrade "Random seed" message printing level to debug and prevent it
+> to be printed in normal case.
 
-If it looks like this, then nobody cares. Clearly the user in question
-never actually cared about performance, and you SHOULD NOT then say
-"let's optimize this that nobody cares about":.
+I completely agree this is annoying, but the whole point of printing the seed is
+so that the seed is automatically captured if a test fails, e.g. so that the
+failure can be reproduced if it is dependent on some random decision.
 
-Yury, I spend an inordinate amount of time just double-checking your
-patches. I ended up having to basically undo one of them just days
-ago.
+Rather than simply hiding the message, what if print the seed if and only if it
+changes?
 
-New rule: before you send some optimization, you need to have NUMBERS.
+--
+From: Sean Christopherson <seanjc@google.com>
+Date: Thu, 20 Jun 2024 10:29:53 -0700
+Subject: [PATCH] KVM: selftests: Print the seed for the guest pRNG iff it has
+ changed
 
-Some kind of "look, this code is visible in profiles, so we actually care".
+Print the guest's random seed during VM creation if and only if the seed
+has changed since the seed was last printed.  The vast majority of tests,
+if not all tests at this point, set the seed during test initialization
+and never change the seed, i.e. printing it every time a VM is created is
+useless noise.
 
-Because without numbers, I'm just not going to pull anything from you.
-These insane inlines for things that don't matter need to stop.
+Snapshot and print the seed during early selftest init to play nice with
+tests that use the kselftests harness, at the cost of printing an unused
+seed for tests that change the seed during test-specific initialization,
+e.g. dirty_log_perf_test.  The kselftests harness runs each testcase in a
+separate process that is forked from the original process before creating
+each testcase's VM, i.e. waiting until first VM creation will result in
+the seed being printed by each testcase despite it never changing.  And
+long term, the hope/goal is that setting the seed will be handled by the
+core framework, i.e. that the dirty_log_perf_test wart will naturally go
+away.
 
-And if they *DO* matter, you need to show that they matter.
+Reported-by: Yi Lai <yi1.lai@intel.com>
+Reported-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ tools/testing/selftests/kvm/lib/kvm_util.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-               Linus
+diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
+index ad00e4761886..56b170b725b3 100644
+--- a/tools/testing/selftests/kvm/lib/kvm_util.c
++++ b/tools/testing/selftests/kvm/lib/kvm_util.c
+@@ -21,6 +21,7 @@
+ 
+ uint32_t guest_random_seed;
+ struct guest_random_state guest_rng;
++static uint32_t last_guest_seed;
+ 
+ static int vcpu_mmap_sz(void);
+ 
+@@ -434,7 +435,10 @@ struct kvm_vm *__vm_create(struct vm_shape shape, uint32_t nr_runnable_vcpus,
+ 	slot0 = memslot2region(vm, 0);
+ 	ucall_init(vm, slot0->region.guest_phys_addr + slot0->region.memory_size);
+ 
+-	pr_info("Random seed: 0x%x\n", guest_random_seed);
++	if (guest_random_seed != last_guest_seed) {
++		pr_info("Random seed: 0x%x\n", guest_random_seed);
++		last_guest_seed = guest_random_seed;
++	}
+ 	guest_rng = new_guest_random_state(guest_random_seed);
+ 	sync_global_to_guest(vm, guest_rng);
+ 
+@@ -2319,7 +2323,8 @@ void __attribute((constructor)) kvm_selftest_init(void)
+ 	/* Tell stdout not to buffer its content. */
+ 	setbuf(stdout, NULL);
+ 
+-	guest_random_seed = random();
++	guest_random_seed = last_guest_seed = random();
++	pr_info("Random seed: 0x%x\n", guest_random_seed);
+ 
+ 	kvm_selftest_arch_init();
+ }
+
+base-commit: c81b138d5075c6f5ba3419ac1d2a2e7047719c14
+-- 
 
