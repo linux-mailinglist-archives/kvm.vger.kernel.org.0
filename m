@@ -1,461 +1,260 @@
-Return-Path: <kvm+bounces-20051-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20052-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 939F090FF70
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 10:51:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1D3690FFC9
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 11:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1F302858FC
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 08:51:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16CD51F219E7
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 09:01:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921B21A4F22;
-	Thu, 20 Jun 2024 08:48:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897B119ADB8;
+	Thu, 20 Jun 2024 09:00:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3pQBhQm+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EqYzJlIR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-vs1-f50.google.com (mail-vs1-f50.google.com [209.85.217.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D383319939B
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 08:48:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAF757C6C9
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 09:00:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718873297; cv=none; b=fho8bm5m1uW7ARpfi+4vk103zDc+YswhnpNmDQDpmyv98MVS4f1BBf+HPO6RN1B7BmgjEc+4lA/u3/A8c0Qx2jwAQNZ9TynUyzNi00sFK5Czdkg+Mpz66sWNgBGAEEhj9FBpT1JOxCd6NT84YMVgz/QVZTpF+wU9hLbQSI7Q6HA=
+	t=1718874053; cv=none; b=PpckEaZsxRLnD1w6NRSbpFvSpIvISjmGVZSo5cV2jTamM5LsefxI8FlNgexRmmJcphQzzp41Hw/Ovh6q/Y6UlC0y8aW3vJIrLrpDRB8DDk082LfwG58WdIObtYSm6OWeygaMPnucRGfGbNMTl4fyaZ+RZarYEMzyN7M4N6ngmZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718873297; c=relaxed/simple;
-	bh=oWPtw0QtaFsH1/E9pl1fDuu8ryfWebNgGgY+iHzXzWA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LbOUO3X8I+Mi6goRPnfIDLAtRuZSEgVGz5UqYp5+MSURoE/PPV/EcVsOewauXrG7PwMUjZIXrkn67UWE6EjYHZdOxR6kTB/XivO7WnVGzctnPQbR+ipD9MEsIGv9pJoeE/gJA8E93IFRub32nBscOg5cFyRciMPXtyuBoamQGY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3pQBhQm+; arc=none smtp.client-ip=209.85.217.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vs1-f50.google.com with SMTP id ada2fe7eead31-48c4c5c0614so217890137.1
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 01:48:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718873295; x=1719478095; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MaguyLJRfckUMNCt0LbPp1LmWhc5UBYEsFNMYuWx6U4=;
-        b=3pQBhQm+I0Y58HE5JrmyVYey9mO7VQVUWCE9JjU4mEwNa2CTlkYsRg6wzQC5UdcCVY
-         lxcQ47c4ST1F9j1T0sUycEgB6Ycww/wOU0/iTCk1OBX8Z2k0oir++Al6y+SDNFi9CDAc
-         l1bijyufj4nzR2uK7IK8nFy7SlcerWIoP6fY5YY7fp0zv4cVgVP3m6+ulp4lVpjdHv0H
-         r1PhWYrhvdBft7QGIFT9VeSPHKpRc3Hj66QSFFedSecfCUy5tdm5eih5BctpppA54w1c
-         Zx/Og1LS5mXokDsFzE9oHws8tV6Ej9s2ZUmrcbkVU2ggBKGZFG5sZWQAGWoTVPMrzErK
-         8iag==
+	s=arc-20240116; t=1718874053; c=relaxed/simple;
+	bh=goWA/GhwWrrFrWZffN97ckNSsmx1+Ao/Qkn5wo9lWEA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aXib7NvqsDAnuDzkb0P02MRP1jOmQAytLAZmfksCsePAHOr6Mi/l2jc8GzC/KxHYPjkTpNmucd05HK/S0ILYMqof0c1gAcyY+KJRv+fhAhYwrWK/RmbD8GplJtA+n4GYbJ6SYXSFvAwe0VfWpRx3snr8KH1c79nj1YVxhzxP5mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EqYzJlIR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718874050;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=9X/I36k5SWaheNfC/42dOzlw6jEc4rfuDMkNMoqwybI=;
+	b=EqYzJlIRMNY5cwFVsVXQy9a0CQl/hI3vv3zfU8tuqW85npylL67ksKk+JOqyZfnkfJyPlb
+	l55sjI1BBu1DJZQjk3Vi+cbAZBi1s/0T0IKW0Kkc/uUMHQQuI0pAS44ch3bHZihB+KzgK0
+	B4wHnyEs+f48KlxDZ1xEXNofccQewcw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-586-nA0gGWbzOdyYz3tKGJhFVQ-1; Thu, 20 Jun 2024 05:00:48 -0400
+X-MC-Unique: nA0gGWbzOdyYz3tKGJhFVQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-423034c6119so4738535e9.2
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 02:00:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718873295; x=1719478095;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MaguyLJRfckUMNCt0LbPp1LmWhc5UBYEsFNMYuWx6U4=;
-        b=Qy1LOqbRqxKBM547578eSANoVeLQkR+GAeQzMvmoRsLRA+Ag2oP3y0HaqkR43r4fCj
-         beIsMUfvUfqQBtcn8U4lzOs1EQaqfQ5SlyhJE7UsMNJwtRKWKIpSYygzMpWD1BOsNtlF
-         3bX9GcNvRHiywfUFfNGCs7nwd3/qiKto8qzS0bzhp6HZu16wHfBEExvoyXahj+CTFPPx
-         f77TDNOjGLDJQUj+H204n/mLKuCWVIfE3i12s+wChmgIvxUOmLBE2pr64BO8yFHuzjIM
-         fJk8YCR4YIzz5VhT6GuaN50nAinYKA3rzOqoa6+a0mXzqGUfhgsBbkv9h4393aWDvt2F
-         e68A==
-X-Forwarded-Encrypted: i=1; AJvYcCWo11lguTnZyjOzLc+T/mjRYstBvNptMaB0C9iHSoOQlFMDHgRCWmddlm8CgZneTaRvduDftXa7r81LioxHOUxWSh0v
-X-Gm-Message-State: AOJu0Yxft0wfHZLfaEYPJPDU1LLTb9X9IAHO3ycHEH0MwDfnkqVXLK9L
-	csu3ugK8Oj1xUrWzL6gi/6Lgxtp2JmiERgyB0LOS9116VbhYbcRqHKgoX3EqxzWMjVjgVMg1UBz
-	XLdXy9FG+treznbsDFAYYsGEfuz8iY9xDn4kL
-X-Google-Smtp-Source: AGHT+IHJHzGsTLlHdkGDfsllSRh8iQMAMrbMYzPHQDEIz67b8VjhtYs5x/lKsIwdroHEofnKgRGum5trjIiYD3NwmSE=
-X-Received: by 2002:a05:6102:83b:b0:48f:1ec2:2921 with SMTP id
- ada2fe7eead31-48f1ec22ad1mr2601049137.3.1718873294579; Thu, 20 Jun 2024
- 01:48:14 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718874047; x=1719478847;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=9X/I36k5SWaheNfC/42dOzlw6jEc4rfuDMkNMoqwybI=;
+        b=KUATO58JAVuXa0eu/OIypAj7B/lJL/fMTFsV6jNJjJsz3S56kI6H/Jgq49EN63ggZD
+         ZWmCtBkrJxFMeLreu+x52SQfonvx61ZI0au9QVWRkv1cQexx2e2kG4KCBCC643gq2b6P
+         E/FylSIsqcODCK02U6hnDosRKUAlKBNuDkOTl+yAdWTn5FlWZp204Q4U9O4JLm1rN627
+         E56TpZlty7oj2C/70JmbPSpAYGPagAmxMvjAFG1fT5jJ3WFhJiEe7qqjLHQPsi1o9vo5
+         Obcu2fTysjlpFYL/NWwR78K2E9Bf7F7BoIdiPwXFtBAYqpq8g3rMvjGBX8wF5F87ROEy
+         L4nw==
+X-Forwarded-Encrypted: i=1; AJvYcCXS9J7Q51oeL2YcsosG+ooMaoYZsaFwyW3aR6ba2gWhgi828PZDB/NxvNmkY847emLvVkdkbS20JDuX7gQMgkvJYUU9
+X-Gm-Message-State: AOJu0YyWsYQ5vrIn++F7SRbvLT9H02LI3rRmU1wQSJCNhTRa6SQjJRGc
+	tS3TOXC6T6IJPqZAY8TjZRc7Vw/AOH634UYyp1oIuVdKndtB2QHBhfkjIHPYJKjUMooLgxXdmyO
+	0wddZ0KoVHxHUhAhkzDZast+hH+6w4ek/TfGYav7DBydw4J/Z/Q==
+X-Received: by 2002:a05:600c:2252:b0:424:798a:f7f2 with SMTP id 5b1f17b1804b1-424798afd71mr26045185e9.3.1718874047394;
+        Thu, 20 Jun 2024 02:00:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHG3895woTA6InJys+Ae/6783ZPh2VzIdoDlDRU2iq840wYkAZ9w8f8sci8YmejvT5y7gagHA==
+X-Received: by 2002:a05:600c:2252:b0:424:798a:f7f2 with SMTP id 5b1f17b1804b1-424798afd71mr26044825e9.3.1718874046959;
+        Thu, 20 Jun 2024 02:00:46 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c719:5b00:61af:900f:3aef:3af3? (p200300cbc7195b0061af900f3aef3af3.dip0.t-ipconnect.de. [2003:cb:c719:5b00:61af:900f:3aef:3af3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4247d208e08sm17944335e9.35.2024.06.20.02.00.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Jun 2024 02:00:46 -0700 (PDT)
+Message-ID: <26aa1ad6-fcdd-4fe2-b763-6938555f93db@redhat.com>
+Date: Thu, 20 Jun 2024 11:00:45 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
- <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com> <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
- <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com> <489d1494-626c-40d9-89ec-4afc4cd0624b@redhat.com>
-In-Reply-To: <489d1494-626c-40d9-89ec-4afc4cd0624b@redhat.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Thu, 20 Jun 2024 09:47:38 +0100
-Message-ID: <CA+EHjTzuqd5PYdZzAGWTjH+EyhomCeGSaFvDjgZfU7GUAWqu9A@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-To: David Hildenbrand <david@redhat.com>
-Cc: John Hubbard <jhubbard@nvidia.com>, Elliot Berman <quic_eberman@quicinc.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>, maz@kernel.org, kvm@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	pbonzini@redhat.com, Jason Gunthorpe <jgg@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To: Fuad Tabba <tabba@google.com>
+Cc: John Hubbard <jhubbard@nvidia.com>,
+ Elliot Berman <quic_eberman@quicinc.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, maz@kernel.org, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ pbonzini@redhat.com, Jason Gunthorpe <jgg@nvidia.com>
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
+ <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
+ <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
+ <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com>
+ <489d1494-626c-40d9-89ec-4afc4cd0624b@redhat.com>
+ <CA+EHjTzuqd5PYdZzAGWTjH+EyhomCeGSaFvDjgZfU7GUAWqu9A@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CA+EHjTzuqd5PYdZzAGWTjH+EyhomCeGSaFvDjgZfU7GUAWqu9A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi David,
+>> Yes, and I think we might have to revive that discussion, unfortunately.
+>> I started thinking about this, but did not reach a conclusion. Sharing
+>> my thoughts.
+>>
+>> The minimum we might need to make use of guest_memfd (v1 or v2 ;) ) not
+>> just for private memory should be:
+>>
+>> (1) Have private + shared parts backed by guest_memfd. Either the same,
+>>       or a fd pair.
+>> (2) Allow to mmap only the "shared" parts.
+>> (3) Allow in-place conversion between "shared" and "private" parts.
+> 
+> These three were covered (modulo bugs) in the guest_memfd() RFC I'd
+> sent a while back:
+> 
+> https://lore.kernel.org/all/20240222161047.402609-1-tabba@google.com/
 
-On Wed, Jun 19, 2024 at 1:16=E2=80=AFPM David Hildenbrand <david@redhat.com=
-> wrote:
->
-> On 19.06.24 11:11, Fuad Tabba wrote:
-> > Hi John and David,
-> >
-> > Thank you for your comments.
-> >
-> > On Wed, Jun 19, 2024 at 8:38=E2=80=AFAM David Hildenbrand <david@redhat=
-.com> wrote:
-> >>
-> >> Hi,
-> >>
-> >> On 19.06.24 04:44, John Hubbard wrote:
-> >>> On 6/18/24 5:05 PM, Elliot Berman wrote:
-> >>>> In arm64 pKVM and QuIC's Gunyah protected VM model, we want to suppo=
-rt
-> >>>> grabbing shmem user pages instead of using KVM's guestmemfd. These
-> >>>> hypervisors provide a different isolation model than the CoCo
-> >>>> implementations from x86. KVM's guest_memfd is focused on providing
-> >>>> memory that is more isolated than AVF requires. Some specific exampl=
-es
-> >>>> include ability to pre-load data onto guest-private pages, dynamical=
-ly
-> >>>> sharing/isolating guest pages without copy, and (future) migrating
-> >>>> guest-private pages.  In sum of those differences after a discussion=
- in
-> >>>> [1] and at PUCK, we want to try to stick with existing shmem and ext=
-end
-> >>>> GUP to support the isolation needs for arm64 pKVM and Gunyah.
-> >>
-> >> The main question really is, into which direction we want and can
-> >> develop guest_memfd. At this point (after talking to Jason at LSF/MM),=
- I
-> >> wonder if guest_memfd should be our new target for guest memory, both
-> >> shared and private. There are a bunch of issues to be sorted out thoug=
-h ...
-> >>
-> >> As there is interest from Red Hat into supporting hugetlb-style huge
-> >> pages in confidential VMs for real-time workloads, and wasting memory =
-is
-> >> not really desired, I'm going to think some more about some of the
-> >> challenges (shared+private in guest_memfd, mmap support, migration of
-> >> !shared folios, hugetlb-like support, in-place shared<->private
-> >> conversion, interaction with page pinning). Tricky.
-> >>
-> >> Ideally, we'd have one way to back guest memory for confidential VMs i=
-n
-> >> the future.
-> >
-> > As you know, initially we went down the route of guest memory and
-> > invested a lot of time on it, including presenting our proposal at LPC
-> > last year. But there was resistance to expanding it to support more
-> > than what was initially envisioned, e.g., sharing guest memory in
-> > place migration, and maybe even huge pages, and its implications such
-> > as being able to conditionally mmap guest memory.
->
-> Yes, and I think we might have to revive that discussion, unfortunately.
-> I started thinking about this, but did not reach a conclusion. Sharing
-> my thoughts.
->
-> The minimum we might need to make use of guest_memfd (v1 or v2 ;) ) not
-> just for private memory should be:
->
-> (1) Have private + shared parts backed by guest_memfd. Either the same,
->      or a fd pair.
-> (2) Allow to mmap only the "shared" parts.
-> (3) Allow in-place conversion between "shared" and "private" parts.
+I remember there was a catch to it (either around mmap or pinning 
+detection -- or around support for huge pages in the future; maybe these 
+count as BUGs :) ).
 
-These three were covered (modulo bugs) in the guest_memfd() RFC I'd
-sent a while back:
+I should probably go back and revisit the whole thing, I was only CCed 
+on some part of it back then.
 
-https://lore.kernel.org/all/20240222161047.402609-1-tabba@google.com/
+> 
+>> (4) Allow migration of the "shared" parts.
+> 
+> We would really like that too, if they allow us :)
+> 
+>> A) Convert shared -> private?
+>> * Must not be GUP-pinned
+>> * Must not be mapped
+>> * Must not reside on ZONE_MOVABLE/MIGRATE_CMA
+>> * (must rule out any other problematic folio references that could
+>>      read/write memory, might be feasible for guest_memfd)
+>>
+>> B) Convert private -> shared?
+>> * Nothing to consider
+>>
+>> C) Map something?
+>> * Must not be private
+> 
+> A,B and C were covered (again, modulo bugs) in the RFC.
+> 
+>> For ordinary (small) pages, that might be feasible.
+>> (ZONE_MOVABLE/MIGRATE_CMA might be feasible, but maybe we could just not
+>> support them initially)
+>>
+>> The real fun begins once we want to support huge pages/large folios and
+>> can end up having a mixture of "private" and "shared" per huge page. But
+>> really, that's what we want in the end I think.
+> 
+> I agree.
+> 
+>> Unless we can teach the VM to not convert arbitrary physical memory
+>> ranges on a 4k basis to a mixture of private/shared ... but I've been
+>> told we don't want that. Hm.
+>>
+>>
+>> There are two big problems with that that I can see:
+>>
+>> 1) References/GUP-pins are per folio
+>>
+>> What if some shared part of the folio is pinned but another shared part
+>> that we want to convert to private is not? Core-mm will not provide the
+>> answer to that: the folio maybe pinned, that's it. *Disallowing* at
+>> least long-term GUP-pins might be an option.
+> 
+> Right.
+> 
+>> To get stuff into an IOMMU, maybe a per-fd interface could work, and
+>> guest_memfd would track itself which parts are currently "handed out",
+>> and with which "semantics" (shared vs. private).
+>>
+>> [IOMMU + private parts might require that either way? Because, if we
+>> dissallow mmap, how should that ever work with an IOMMU otherwise].
+> 
+> Not sure if IOMMU + private makes that much sense really, but I think
+> I might not really understand what you mean by this.
 
-> (4) Allow migration of the "shared" parts.
+A device might be able to access private memory. In the TDX world, this 
+would mean that a device "speaks" encrypted memory.
 
-We would really like that too, if they allow us :)
+At the same time, a device might be able to access shared memory. Maybe 
+devices can do both?
 
-> A) Convert shared -> private?
-> * Must not be GUP-pinned
-> * Must not be mapped
-> * Must not reside on ZONE_MOVABLE/MIGRATE_CMA
-> * (must rule out any other problematic folio references that could
->     read/write memory, might be feasible for guest_memfd)
->
-> B) Convert private -> shared?
-> * Nothing to consider
->
-> C) Map something?
-> * Must not be private
+What do do when converting between private and shared? I think it 
+depends on various factors (e.g., device capabilities).
 
-A,B and C were covered (again, modulo bugs) in the RFC.
+[...]
 
-> For ordinary (small) pages, that might be feasible.
-> (ZONE_MOVABLE/MIGRATE_CMA might be feasible, but maybe we could just not
-> support them initially)
->
-> The real fun begins once we want to support huge pages/large folios and
-> can end up having a mixture of "private" and "shared" per huge page. But
-> really, that's what we want in the end I think.
+>> I recall quite some details with memory renting or so on pKVM ... and I
+>> have to refresh my memory on that.
+> 
+> I really would like to get to a place where we could investigate and
+> sort out all of these issues. It would be good to know though, what,
+> in principle (and not due to any technical limitations), we might be
+> allowed to do and expand guest_memfd() to do, and what out of
+> principle is off the table.
 
-I agree.
+As Jason said, maybe we need a revised model that can handle
+[...] private+shared properly.
 
-> Unless we can teach the VM to not convert arbitrary physical memory
-> ranges on a 4k basis to a mixture of private/shared ... but I've been
-> told we don't want that. Hm.
->
->
-> There are two big problems with that that I can see:
->
-> 1) References/GUP-pins are per folio
->
-> What if some shared part of the folio is pinned but another shared part
-> that we want to convert to private is not? Core-mm will not provide the
-> answer to that: the folio maybe pinned, that's it. *Disallowing* at
-> least long-term GUP-pins might be an option.
+-- 
+Cheers,
 
-Right.
+David / dhildenb
 
-> To get stuff into an IOMMU, maybe a per-fd interface could work, and
-> guest_memfd would track itself which parts are currently "handed out",
-> and with which "semantics" (shared vs. private).
->
-> [IOMMU + private parts might require that either way? Because, if we
-> dissallow mmap, how should that ever work with an IOMMU otherwise].
-
-Not sure if IOMMU + private makes that much sense really, but I think
-I might not really understand what you mean by this.
-
-> 2) Tracking of mappings will likely soon be per folio.
->
-> page_mapped() / folio_mapped() only tell us if any part of the folio is
-> mapped. Of course, what always works is unmapping the whole thing, or
-> walking the rmap to detect if a specific part is currently mapped.
-
-This might complicate things a but, but we could be conservative, at
-least initially in what we allow to be mapped.
-
->
-> Then, there is the problem of getting huge pages into guest_memfd (using
-> hugetlb reserves, but not using hugetlb), but that should be solvable.
->
->
-> As raised in previous discussions, I think we should then allow the
-> whole guest_memfd to be mapped, but simply SIGBUS/... when trying to
-> access a private part. We would track private/shared internally, and
-> track "handed out" pages to IOMMUs internally. FOLL_LONGTERM would be
-> disallowed.
->
-> But that's only the high level idea I had so far ... likely ignore way
-> too many details.
->
-> Is there broader interest to discuss that and there would be value in
-> setting up a meeting and finally make progress with that?
->
-> I recall quite some details with memory renting or so on pKVM ... and I
-> have to refresh my memory on that.
-
-I really would like to get to a place where we could investigate and
-sort out all of these issues. It would be good to know though, what,
-in principle (and not due to any technical limitations), we might be
-allowed to do and expand guest_memfd() to do, and what out of
-principle is off the table.
-
-> >
-> > To be honest, personally (speaking only for myself, not necessarily
-> > for Elliot and not for anyone else in the pKVM team), I still would
-> > prefer to use guest_memfd(). I think that having one solution for
-> > confidential computing that rules them all would be best. But we do
-> > need to be able to share memory in place, have a plan for supporting
-> > huge pages in the near future, and migration in the not-too-distant
-> > future.
->
-> Yes, huge pages are also of interest for RH. And memory-overconsumption
-> due to having partially used huge pages in private/shared memory is not
-> desired.
->
-> >
-> > We are currently shipping pKVM in Android as it is, warts and all.
-> > We're also working on upstreaming the rest of it. Currently, this is
-> > the main blocker for us to be able to upstream the rest (same probably
-> > applies to Gunyah).
-> >
-> >> Can you comment on the bigger design goal here? In particular:
-> >
-> > At a high level: We want to prevent a misbehaving host process from
-> > crashing the system when attempting to access (deliberately or
-> > accidentally) protected guest memory. As it currently stands in pKVM
-> > and Gunyah, the hypervisor does prevent the host from accessing
-> > (private) guest memory. In certain cases though, if the host attempts
-> > to access that memory and is prevented by the hypervisor (either out
-> > of ignorance or out of malice), the host kernel wouldn't be able to
-> > recover, causing the whole system to crash.
-> >
-> > guest_memfd() prevents such accesses by not allowing confidential
-> > memory to be mapped at the host to begin with. This works fine for us,
-> > but there's the issue of being able to share memory in place, which
-> > implies mapping it conditionally (among others that I've mentioned).
-> >
-> > The approach we're taking with this proposal is to instead restrict
-> > the pinning of protected memory. If the host kernel can't pin the
-> > memory, then a misbehaving process can't trick the host into accessing
-> > it.
->
-> Got it, thanks. So once we pinned it, nobody else can pin it. But we can
-> still map it?
-
-This proposal (the exclusive gup) places no limitations on mapping,
-only on pinning. If private memory is mapped and then accessed, then
-the worst thing that could happen is the userspace process gets
-killed, potentially taking down the guest with it (if that process
-happens to be the VMM for example).
-
-The reason why we care about pinning is to ensure that the host kernel
-doesn't access protected memory, thereby crashing the system.
-
-> >
-> >>
-> >> 1) Who would get the exclusive PIN and for which reason? When would we
-> >>      pin, when would we unpin?
-> >
-> > The exclusive pin would be acquired for private guest pages, in
-> > addition to a normal pin. It would be released when the private memory
-> > is released, or if the guest shares that memory.
->
-> Understood.
->
-> >
-> >> 2) What would happen if there is already another PIN? Can we deal with
-> >>      speculative short-term PINs from GUP-fast that could introduce
-> >>      errors?
-> >
-> > The exclusive pin would be rejected if there's any other pin
-> > (exclusive or normal). Normal pins would be rejected if there's an
-> > exclusive pin.
->
-> Makes sense, thanks.
->
-> >
-> >> 3) How can we be sure we don't need other long-term pins (IOMMUs?) in
-> >>      the future?
-> >
-> > I can't :)
->
-> :)
->
-> >
-> >> 4) Why are GUP pins special? How one would deal with other folio
-> >>      references (e.g., simply mmap the shmem file into a different
-> >>      process).
-> >
-> > Other references would crash the userspace process, but the host
-> > kernel can handle them, and shouldn't cause the system to crash. The
-> > way things are now in Android/pKVM, a userspace process can crash the
-> > system as a whole.
->
-> Okay, so very Android/pKVM specific :/
-
-Gunyah too.
-
-> >
-> >> 5) Why you have to bother about anonymous pages at all (skimming over =
-s
-> >>      some patches), when you really want to handle shmem differently o=
-nly?
-> >
-> > I'm not sure I understand the question. We use anonymous memory for pKV=
-M.
-> >
->
-> "we want to support grabbing shmem user pages instead of using KVM's
-> guestmemfd" indicated to me that you primarily care about shmem with
-> FOLL_EXCLUSIVE?
-
-Right, maybe we should have clarified this better when we sent out this ser=
-ies.
-
-This patch series is meant as an alternative to guest_memfd(), and not
-as something to be used in conjunction with it. This came about from
-the discussions we had with you and others back when Elliot and I sent
-our respective RFCs, and found that there was resistance into adding
-guest_memfd() support that would make it practical to use with pKVM or
-Gunyah.
-
-https://lore.kernel.org/all/ZdfoR3nCEP3HTtm1@casper.infradead.org/
-
-Thanks again for your ideas and comments!
-/fuad
-
-> >>>> To that
-> >>>> end, we introduce the concept of "exclusive GUP pinning", which enfo=
-rces
-> >>>> that only one pin of any kind is allowed when using the FOLL_EXCLUSI=
-VE
-> >>>> flag is set. This behavior doesn't affect FOLL_GET or any other foli=
-o
-> >>>> refcount operations that don't go through the FOLL_PIN path.
-> >>
-> >> So, FOLL_EXCLUSIVE would fail if there already is a PIN, but
-> >> !FOLL_EXCLUSIVE would succeed even if there is a single PIN via
-> >> FOLL_EXCLUSIVE? Or would the single FOLL_EXCLUSIVE pin make other pins
-> >> that don't have FOLL_EXCLUSIVE set fail as well?
-> >
-> > A FOLL_EXCLUSIVE would fail if there's any other pin. A normal pin
-> > (!FOLL_EXCLUSIVE) would fail if there's a FOLL_EXCLUSIVE pin. It's the
-> > PIN to end all pins!
-> >
-> >>>>
-> >>>> [1]: https://lore.kernel.org/all/20240319143119.GA2736@willie-the-tr=
-uck/
-> >>>>
-> >>>
-> >>> Hi!
-> >>>
-> >>> Looking through this, I feel that some intangible threshold of "this =
-is
-> >>> too much overloading of page->_refcount" has been crossed. This is a =
-very
-> >>> specific feature, and it is using approximately one more bit than is
-> >>> really actually "available"...
-> >>
-> >> Agreed.
-> >
-> > We are gating it behind a CONFIG flag :)
->
-> ;)
->
-> >
-> > Also, since pin is already overloading the refcount, having the
-> > exclusive pin there helps in ensuring atomic accesses and avoiding
-> > races.
-> >
-> >>>
-> >>> If we need a bit in struct page/folio, is this really the only way? W=
-illy
-> >>> is working towards getting us an entirely separate folio->pincount, I
-> >>> suppose that might take too long? Or not?
-> >>
-> >> Before talking about how to implement it, I think we first have to lea=
-rn
-> >> whether that approach is what we want at all, and how it fits into the
-> >> bigger picture of that use case.
-> >>
-> >>>
-> >>> This feels like force-fitting a very specific feature (KVM/CoCo handl=
-ing
-> >>> of shmem pages) into a more general mechanism that is running low on
-> >>> bits (gup/pup).
-> >>
-> >> Agreed.
-> >>
-> >>>
-> >>> Maybe a good topic for LPC!
-> >>
-> >> The KVM track has plenty of guest_memfd topics, might be a good fit
-> >> there. (or in the MM track, of course)
-> >
-> > We are planning on submitting a proposal for LPC (see you in Vienna!) :=
-)
->
-> Great!
->
-> --
-> Cheers,
->
-> David / dhildenb
->
 
