@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-20128-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20129-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71949910D7C
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:48:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC91C910D7D
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:48:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2E271C221E9
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:48:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08D621C22CDD
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:48:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3871B47C7;
-	Thu, 20 Jun 2024 16:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69E21B47D0;
+	Thu, 20 Jun 2024 16:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="xNNpJcci"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="a+ytgbh/"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta1.migadu.com (out-186.mta1.migadu.com [95.215.58.186])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C20EC1B47B2
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 16:47:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA8381B47CD
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 16:47:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718902040; cv=none; b=dyA0f3Rsb096W9vX9K9aUVuO5uysabnVMKF05VVfLKaC9osgCemnTqdtBgd7blXy3mG6t8Lbb0wSV1nA8FY0JNhzEy94Re8BGgjpJiprJ+X+ttADEvJErmurZNriHZJ8C4b79Ol2Py+7BF8WZVhXsp49/SJgDDKgXbLdr4oIbkY=
+	t=1718902043; cv=none; b=kvaTtoly97q3wQWlRHN9VXjgls052Qlu0Cni87y8ZzmGbCKShk6RwLqF2yAtcU0rRlyoBhS16g3FvdzMFmP+WcQ8ADs1YlZvPL0Wwy9UfPVr8WlIgFr9f+ADajEFegJcrO3zCPrdkJf23sxOllQQO5TzwSUC0dBqrwDNaBe5mjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718902040; c=relaxed/simple;
-	bh=eHFcSnx/FrqvvY+4VU8ze04GVmd2fbF4l7dDs6USX/U=;
+	s=arc-20240116; t=1718902043; c=relaxed/simple;
+	bh=VC3cAS1vVLoMoF5Tcsry/hVzapF0FahnZnOna4JN5yI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kjI58B2WSNpzO0sPuZ4t2a1PXCy88bKp6qiom73cbByxsP4nXGOskprZTt1exVYfIr99M2GmjPKR7tQWKgBbb9Czbb0gYVqfLoFeEwtvSdymL9NC0/4K+m3EK8lGeOYi+NbILrIBcGXVbTVZNK3yh9kfhUuuKhL0OCFQCgYfwxg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=xNNpJcci; arc=none smtp.client-ip=95.215.58.186
+	 MIME-Version; b=X9o0Tn1mMV6xhHKuNiy6+/94I6uU7QfJ6uLS6W2PSswKdfjH7ntXNgc77B0APWLmS8YsOA0zLQFasEouEcaJ7+qO34yoNyIhfPby1QpHZsMpi7Cx15h2p9gKjnAlJoCteLWUx0Zrn6kbiPWVGqnjJmcbWZnXBdqrAktO0TSH/4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=a+ytgbh/; arc=none smtp.client-ip=95.215.58.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Envelope-To: kvmarm@lists.linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1718902037;
+	t=1718902038;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cStQMLZGUlCbmuI60XeY0OY25KBZNZcrijUKFbj3MYQ=;
-	b=xNNpJcci+IX/dKs2+h8LpwC8LyofKfTBiVRoLC0USlzPbHawItPjiRUAmyBNcwiOaz1SDt
-	PRKwlY4AQMYs7DcF0S7Xg4eUt6hJEl+zkXrajRewuJ8m234VLszNqc6Lp7oDXiKdx1GePQ
-	1qNIX14kE/2+3pWBH6kjhI1uZOYI+aw=
+	bh=VqLkG/Vh8Bov5AOtu1PNtbm0dwVwhXMlOkximXK5PoU=;
+	b=a+ytgbh/ArUlnySWyK44RFFDYDICgO+ixGaZ5/s5rb7gCMaDmflmBL3kiDUaHM/osLw1gT
+	+7v0IybqQ/Uc+lHhBVUKthykeRtkiBON81Mo9lWY4idY5/hjQvu9aHIAD8fQS7QIQCLtBs
+	kGlFnxqlpRfQljowqXrnAKmLCecXdAQ=
 X-Envelope-To: maz@kernel.org
 X-Envelope-To: james.morse@arm.com
 X-Envelope-To: suzuki.poulose@arm.com
@@ -59,9 +59,9 @@ Cc: Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org,
 	Fuad Tabba <tabba@google.com>,
 	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH v3 08/15] KVM: arm64: Spin off helper for programming CPTR traps
-Date: Thu, 20 Jun 2024 16:46:45 +0000
-Message-ID: <20240620164653.1130714-9-oliver.upton@linux.dev>
+Subject: [PATCH v3 09/15] KVM: arm64: nv: Handle CPACR_EL1 traps
+Date: Thu, 20 Jun 2024 16:46:46 +0000
+Message-ID: <20240620164653.1130714-10-oliver.upton@linux.dev>
 In-Reply-To: <20240620164653.1130714-1-oliver.upton@linux.dev>
 References: <20240620164653.1130714-1-oliver.upton@linux.dev>
 Precedence: bulk
@@ -73,86 +73,75 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-A subsequent change to KVM will add preliminary support for merging a
-guest hypervisor's CPTR traps with that of KVM. Prepare by spinning off
-a new helper for managing CPTR traps.
+From: Marc Zyngier <maz@kernel.org>
 
-Avoid reading CPACR_EL1 for the baseline trap config, and start off with
-the most restrictive set of traps that is subsequently relaxed.
+Handle CPACR_EL1 accesses when running a VHE guest. In order to
+limit the cost of the emulation, implement it ass a shallow exit.
 
-Reviewed-by: Marc Zyngier <maz@kernel.org>
+In the other cases:
+
+- this is a nVHE L1 which will write to memory, and we don't trap
+
+- this is a L2 guest:
+
+  * the L1 has CPTR_EL2.TCPAC==0, and the L2 has direct register
+   access
+
+  * the L1 has CPTR_EL2.TCPAC==1, and the L2 will trap, but the
+    handling is defered to the general handling for forwarding
+
+Signed-off-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
 ---
- arch/arm64/kvm/hyp/vhe/switch.c | 49 ++++++++++++++++-----------------
- 1 file changed, 24 insertions(+), 25 deletions(-)
+ arch/arm64/kvm/hyp/vhe/switch.c | 32 +++++++++++++++++++++++++++++++-
+ 1 file changed, 31 insertions(+), 1 deletion(-)
 
 diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-index d7af5f46f22a..697253673d7b 100644
+index 697253673d7b..564655277594 100644
 --- a/arch/arm64/kvm/hyp/vhe/switch.c
 +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-@@ -65,6 +65,29 @@ static u64 __compute_hcr(struct kvm_vcpu *vcpu)
- 	return hcr | (__vcpu_sys_reg(vcpu, HCR_EL2) & ~NV_HCR_GUEST_EXCLUDE);
+@@ -261,10 +261,40 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	return true;
  }
  
-+static void __activate_cptr_traps(struct kvm_vcpu *vcpu)
++static bool kvm_hyp_handle_cpacr_el1(struct kvm_vcpu *vcpu, u64 *exit_code)
 +{
-+	/*
-+	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
-+	 * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
-+	 * except for some missing controls, such as TAM.
-+	 * In this case, CPTR_EL2.TAM has the same position with or without
-+	 * VHE (HCR.E2H == 1) which allows us to use here the CPTR_EL2.TAM
-+	 * shift value for trapping the AMU accesses.
-+	 */
-+	u64 val = CPACR_ELx_TTA | CPTR_EL2_TAM;
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	int rt;
 +
-+	if (guest_owns_fp_regs()) {
-+		val |= CPACR_ELx_FPEN;
-+		if (vcpu_has_sve(vcpu))
-+			val |= CPACR_ELx_ZEN;
++	if (!is_hyp_ctxt(vcpu) || esr_sys64_to_sysreg(esr) != SYS_CPACR_EL1)
++		return false;
++
++	rt = kvm_vcpu_sys_get_rt(vcpu);
++
++	if ((esr & ESR_ELx_SYS64_ISS_DIR_MASK) == ESR_ELx_SYS64_ISS_DIR_READ) {
++		vcpu_set_reg(vcpu, rt, __vcpu_sys_reg(vcpu, CPTR_EL2));
 +	} else {
-+		__activate_traps_fpsimd32(vcpu);
++		vcpu_write_sys_reg(vcpu, vcpu_get_reg(vcpu, rt), CPTR_EL2);
++		__activate_cptr_traps(vcpu);
 +	}
 +
-+	write_sysreg(val, cpacr_el1);
++	__kvm_skip_instr(vcpu);
++
++	return true;
 +}
 +
- static void __activate_traps(struct kvm_vcpu *vcpu)
- {
- 	u64 val;
-@@ -91,31 +114,7 @@ static void __activate_traps(struct kvm_vcpu *vcpu)
- 		}
- 	}
- 
--	val = read_sysreg(cpacr_el1);
--	val |= CPACR_ELx_TTA;
--	val &= ~(CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN |
--		 CPACR_EL1_SMEN_EL0EN | CPACR_EL1_SMEN_EL1EN);
--
--	/*
--	 * With VHE (HCR.E2H == 1), accesses to CPACR_EL1 are routed to
--	 * CPTR_EL2. In general, CPACR_EL1 has the same layout as CPTR_EL2,
--	 * except for some missing controls, such as TAM.
--	 * In this case, CPTR_EL2.TAM has the same position with or without
--	 * VHE (HCR.E2H == 1) which allows us to use here the CPTR_EL2.TAM
--	 * shift value for trapping the AMU accesses.
--	 */
--
--	val |= CPTR_EL2_TAM;
--
--	if (guest_owns_fp_regs()) {
--		if (vcpu_has_sve(vcpu))
--			val |= CPACR_EL1_ZEN_EL0EN | CPACR_EL1_ZEN_EL1EN;
--	} else {
--		val &= ~(CPACR_EL1_FPEN_EL0EN | CPACR_EL1_FPEN_EL1EN);
--		__activate_traps_fpsimd32(vcpu);
--	}
--
--	write_sysreg(val, cpacr_el1);
-+	__activate_cptr_traps(vcpu);
- 
- 	write_sysreg(__this_cpu_read(kvm_hyp_vector), vbar_el1);
- }
++static bool kvm_hyp_handle_sysreg_vhe(struct kvm_vcpu *vcpu, u64 *exit_code)
++{
++	if (kvm_hyp_handle_cpacr_el1(vcpu, exit_code))
++		return true;
++
++	return kvm_hyp_handle_sysreg(vcpu, exit_code);
++}
++
+ static const exit_handler_fn hyp_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]		= NULL,
+ 	[ESR_ELx_EC_CP15_32]		= kvm_hyp_handle_cp15_32,
+-	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg,
++	[ESR_ELx_EC_SYS64]		= kvm_hyp_handle_sysreg_vhe,
+ 	[ESR_ELx_EC_SVE]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_FP_ASIMD]		= kvm_hyp_handle_fpsimd,
+ 	[ESR_ELx_EC_IABT_LOW]		= kvm_hyp_handle_iabt_low,
 -- 
 2.45.2.741.gdbec12cfda-goog
 
