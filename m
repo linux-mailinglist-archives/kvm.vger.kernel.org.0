@@ -1,135 +1,165 @@
-Return-Path: <kvm+bounces-20183-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20184-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A03179115D5
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 00:48:01 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 404929115ED
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 00:53:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56334283332
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 22:48:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B24111F22C3A
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 22:53:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCDFD143723;
-	Thu, 20 Jun 2024 22:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBFFA147C74;
+	Thu, 20 Jun 2024 22:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jzDuUyQG"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="j17AFsNe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5324D79949;
-	Thu, 20 Jun 2024 22:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47A51422B6
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 22:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718923669; cv=none; b=CzkGQmJMWZ8eqsktGXK4K47asKhjogkx4ayaZ5anF3OF1R1zM2cpCSyPFpNDURD50aFiI9DZ1NxQlXviMBxEWPhVx5YT2nhUQPr8X/Ye8phXNVwhFTB7kOMC+uSP2ROhkPoWaYMwux5qXwIbnpex3g/xGB+iMoPmumqeeerzwRM=
+	t=1718923971; cv=none; b=ZbYX/uK59VOQTs/RHyP9FlGldA7R7ZR1Im1PTvUIww8u17SvTq8aBv1JcrXaIgTSJeceKD1NcFktGHztju70A5m67ruqVw5W1FkRd+h30NJZsNM5vMowB/eaFdj2d6Bc1qBsRGLwgCtrkbCxFpCKwUyYFbZ0wsBMQQq7qQNBVgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718923669; c=relaxed/simple;
-	bh=VVG0u6kJx6gy9QOoxI0WCnMXxw0wTHsd0ZhQUmx+USY=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mRmmIuyuFDCd55xpGC9COrhv+USOcDApPYmeWjQz7EsJItYhS7jot0fyyJaOUGNshuRbMIaOuaZhQAu9aT2DPHwMqcvJcED/hjmAXllm83ODX77/aw1mJ+bOfDZBDRDLElRpYnzwteJq6Ff0MkYF3+lWiLcMq7YHJfRSvVsZ+rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jzDuUyQG; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45KHL5uN010657;
-	Thu, 20 Jun 2024 22:47:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=UzU1DFJ4xrF/xX5fZgyh2T96
-	UuT9FhaFK+d/7JtKvNI=; b=jzDuUyQGbn/J5EKIcYa/VYyT6OqYGWRl6bqvdfBm
-	3wqaJ1kW3cK+p3bp+S8gDKtYC2fjQKzeafmoZOdNL5jgDJAlv5dHmWM3iYx6boFC
-	k3gtvbWxU1U6uPELCKJJklxknTxfqq857nvR8yrOnU0E9WFI57Y3Bp5sAlzTgSxP
-	0f1K34rmJ/hg4RCtOtL9GNcM1T599TPeJFAUNzYoeb8Xd6afUpkGpFgfo8YHSuak
-	Ygf1FYljOGhG+Cu69kI4+siX7WaQyk9h1FQpyeb6AY3tfs5IsyMmfEppO7aK18nC
-	IBAAIYcIebPJBK0YN1PA30VlduHppw5LISHTDmfqwYJtMw==
-Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yvrrc8stu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Jun 2024 22:47:26 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45KMlORB009447
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 20 Jun 2024 22:47:24 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.80.80.8) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 20 Jun 2024 15:47:24 -0700
-Date: Thu, 20 Jun 2024 15:47:23 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>,
-        Christoph Hellwig <hch@infradead.org>,
-        John Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>,
-        <maz@kernel.org>, <kvm@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <pbonzini@redhat.com>
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-Message-ID: <20240620140516768-0700.eberman@hu-eberman-lv.qualcomm.com>
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
- <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
- <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
- <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com>
- <20240619115135.GE2494510@nvidia.com>
- <ZnOsAEV3GycCcqSX@infradead.org>
- <CA+EHjTxaCxibvGOMPk9Oj5TfQV3J3ZLwXk83oVHuwf8H0Q47sA@mail.gmail.com>
- <20240620135540.GG2494510@nvidia.com>
- <6d7b180a-9f80-43a4-a4cc-fd79a45d7571@redhat.com>
- <20240620142956.GI2494510@nvidia.com>
+	s=arc-20240116; t=1718923971; c=relaxed/simple;
+	bh=b4OU7ew9TNZmH+SM+NlNs4apyxJrTNMEMMgy/KhMBoY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N7Kigsgygpf/gfMaYkOCxAZjZRgewzYgw0XmF9C0cL7UhpVjSaZVLoQwM5QCuN/NwdK4jiROB8H/tRi/vLw4Yxm5rL0jKv/q1mljmUU9sxSMpKEamvIuDc5aJOULWQt8q39jAI3QlHF4PK5/bQhWTYk3pNbtaG0dCKaWjYpUACc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=j17AFsNe; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1f9aeb96b93so11075625ad.3
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 15:52:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1718923968; x=1719528768; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=HpVIY4+aAbkXXiS+A3JdTJqHYqpOhUBTuW6XcJDBl9k=;
+        b=j17AFsNeaRVfBj7I4u4dAU9JkhNTGwczsMZHOhvQYDEwfW6MMtAIl37Tas/N81RkY/
+         lovnENL+gCaquaG++zZt9eSGqVacuWcC58Yi+rLsm4AociFialMkvPduLgRAJkj3oJoj
+         bNrbDEEurJD6t+PrnlqDCabTVfHzCWt3/EEyqL+zdulMljxHeeuOHqH9VwEJgQlGq/Be
+         OTHhA2CU7JiV2ufee6DXzKkZUyg0ulGkp2JKDwSyr9va4xGJe3LQDLNvFQRGAw8f5LTG
+         YgKmiLQujL2tAMqek/hu6uxV2Y/6ExtUXo0hXb2YgaBZekxmOJSvOd6xlpbCXn+J2jUr
+         ALQw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718923968; x=1719528768;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HpVIY4+aAbkXXiS+A3JdTJqHYqpOhUBTuW6XcJDBl9k=;
+        b=lRouj6meRw6H2HBc/8snP1adVtwhAhFnwSP1QerafICy5RyPgX8LFE4aZNpGOwhUfC
+         AbF/7qitBvCUiqXn6Sakmqtzoz6B+9ZCPdfOv560mCj3xF/zyYfYCSkF4Qk76mDoCLjV
+         NiyOnRb+zWP/QqGK0qG8Mm3jlCqU7eXbsIJyK4NiPvCNHHrAMY5JWeFBkm9hVFg5xoGx
+         pIl/YXHPquuSIcfg74dzmrkh4BvKdaNznqRN0CSdq2V2vTtI0H2LuoCVF9YRczNNvkep
+         UPb64FNY22AN/z7rq6OuTBjV0hoW4zhDuyPAjme+ix+acQz8B5EbnAteAZw+Iz+qY2Rj
+         922g==
+X-Forwarded-Encrypted: i=1; AJvYcCVzFhhU0NBak8UR3qRvzsBGJJhnWb21cJSxZBsOVRoY3OKY+X2edFnIYMPlQ+8CSfb0hnRU5qSEzuJwzzJU2VwX7TY6
+X-Gm-Message-State: AOJu0YyPCa8blIVYkOBKZ/8sDVuJSJ0RzIA3Z9cyXngrCAdzuvxxkBAF
+	heHaw6IYSYAlKXkJRoxevFlqMivzqoxE2vdcHIyDCZJ259VL/uR7J598xXw1K50=
+X-Google-Smtp-Source: AGHT+IF+zqZ+Lx0RC6ue/poxgqOnOX1TFmx08Oct1RZJyaZY/hmhQDmLsojlT/WUXfCqsCQxo77OvQ==
+X-Received: by 2002:a17:902:7447:b0:1f7:c56:58a3 with SMTP id d9443c01a7336-1f9aa3e980bmr64928225ad.26.1718923967881;
+        Thu, 20 Jun 2024 15:52:47 -0700 (PDT)
+Received: from ghost ([50.145.13.30])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1f9ebbb2a0esm1331205ad.254.2024.06.20.15.52.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 15:52:47 -0700 (PDT)
+Date: Thu, 20 Jun 2024 15:52:44 -0700
+From: Charlie Jenkins <charlie@rivosinc.com>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Conor Dooley <conor@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH 3/5] riscv: hwprobe: export Zaamo and Zalrsc extensions
+Message-ID: <ZnSyvLKC+xXlW1i+@ghost>
+References: <20240619153913.867263-1-cleger@rivosinc.com>
+ <20240619153913.867263-4-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20240620142956.GI2494510@nvidia.com>
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: rmA4Wwy_3KWwSQd6c-bmt4HkSHSDNN4N
-X-Proofpoint-ORIG-GUID: rmA4Wwy_3KWwSQd6c-bmt4HkSHSDNN4N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-20_10,2024-06-20_04,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 mlxlogscore=771 spamscore=0 lowpriorityscore=0
- phishscore=0 bulkscore=0 adultscore=0 mlxscore=0 suspectscore=0
- malwarescore=0 clxscore=1011 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2406140001 definitions=main-2406200166
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240619153913.867263-4-cleger@rivosinc.com>
 
-On Thu, Jun 20, 2024 at 11:29:56AM -0300, Jason Gunthorpe wrote:
-> On Thu, Jun 20, 2024 at 04:01:08PM +0200, David Hildenbrand wrote:
-> > Regarding huge pages: assume the huge page (e.g., 1 GiB hugetlb) is shared,
-> > now the VM requests to make one subpage private. 
+On Wed, Jun 19, 2024 at 05:39:10PM +0200, Clément Léger wrote:
+> Export the Zaamo and Zalrsc extensions to userspace using hwprobe.
 > 
-> I think the general CC model has the shared/private setup earlier on
-> the VM lifecycle with large runs of contiguous pages. It would only
-> become a problem if you intend to to high rate fine granual
-> shared/private switching. Which is why I am asking what the actual
-> "why" is here.
+> Signed-off-by: Clément Léger <cleger@rivosinc.com>
+> ---
+>  Documentation/arch/riscv/hwprobe.rst  | 8 ++++++++
+>  arch/riscv/include/uapi/asm/hwprobe.h | 2 ++
+>  arch/riscv/kernel/sys_hwprobe.c       | 2 ++
+>  3 files changed, 12 insertions(+)
 > 
+> diff --git a/Documentation/arch/riscv/hwprobe.rst b/Documentation/arch/riscv/hwprobe.rst
+> index 25d783be2878..6836a789a9b1 100644
+> --- a/Documentation/arch/riscv/hwprobe.rst
+> +++ b/Documentation/arch/riscv/hwprobe.rst
+> @@ -235,6 +235,14 @@ The following keys are defined:
+>         supported as defined in the RISC-V ISA manual starting from commit
+>         c732a4f39a4 ("Zcmop is ratified/1.0").
+>  
+> +  * :c:macro:`RISCV_HWPROBE_EXT_ZAAMO`: The Zaamo extension is supported as
+> +       defined in the in the RISC-V ISA manual starting from commit e87412e621f1
+> +       ("integrate Zaamo and Zalrsc text (#1304)").
+> +
+> +  * :c:macro:`RISCV_HWPROBE_EXT_ZALRSC`: The Zalrsc extension is supported as
+> +       defined in the in the RISC-V ISA manual starting from commit e87412e621f1
+> +       ("integrate Zaamo and Zalrsc text (#1304)").
+> +
+>  * :c:macro:`RISCV_HWPROBE_KEY_CPUPERF_0`: A bitmask that contains performance
+>    information about the selected set of processors.
+>  
+> diff --git a/arch/riscv/include/uapi/asm/hwprobe.h b/arch/riscv/include/uapi/asm/hwprobe.h
+> index 920fc6a586c9..52cd161e9a94 100644
+> --- a/arch/riscv/include/uapi/asm/hwprobe.h
+> +++ b/arch/riscv/include/uapi/asm/hwprobe.h
+> @@ -71,6 +71,8 @@ struct riscv_hwprobe {
+>  #define		RISCV_HWPROBE_EXT_ZCD		(1ULL << 45)
+>  #define		RISCV_HWPROBE_EXT_ZCF		(1ULL << 46)
+>  #define		RISCV_HWPROBE_EXT_ZCMOP		(1ULL << 47)
+> +#define		RISCV_HWPROBE_EXT_ZAAMO		(1ULL << 48)
+> +#define		RISCV_HWPROBE_EXT_ZALRSC	(1ULL << 49)
+>  #define RISCV_HWPROBE_KEY_CPUPERF_0	5
+>  #define		RISCV_HWPROBE_MISALIGNED_UNKNOWN	(0 << 0)
+>  #define		RISCV_HWPROBE_MISALIGNED_EMULATED	(1 << 0)
+> diff --git a/arch/riscv/kernel/sys_hwprobe.c b/arch/riscv/kernel/sys_hwprobe.c
+> index 3d1aa13a0bb2..e09f1bc3af17 100644
+> --- a/arch/riscv/kernel/sys_hwprobe.c
+> +++ b/arch/riscv/kernel/sys_hwprobe.c
+> @@ -116,6 +116,8 @@ static void hwprobe_isa_ext0(struct riscv_hwprobe *pair,
+>  		EXT_KEY(ZCA);
+>  		EXT_KEY(ZCB);
+>  		EXT_KEY(ZCMOP);
+> +		EXT_KEY(ZAAMO);
+> +		EXT_KEY(ZALRSC);
+>  
+>  		/*
+>  		 * All the following extensions must depend on the kernel
+> -- 
+> 2.45.2
+> 
+> 
+> _______________________________________________
+> linux-riscv mailing list
+> linux-riscv@lists.infradead.org
+> http://lists.infradead.org/mailman/listinfo/linux-riscv
 
-I'd let Fuad comment if he's aware of any specific/concrete Anrdoid
-usecases about converting between shared and private. One usecase I can
-think about is host providing large multimedia blobs (e.g. video) to the
-guest. Rather than using swiotlb, the CC guest can share pages back with
-the host so host can copy the blob in, possibly using H/W accel. I
-mention this example because we may not need to support shared/private
-conversions at granularity finer than huge pages. The host and guest can
-negotiate the minimum size that can be converted and you never run into
-issue where subpages of a folio are differently shared. I can't think of
-a usecase where we need such granularity for converting private/shared.
-
-Jason, do you have scenario in mind? I couldn't tell if we now had a
-usecase or are brainstorming a solution to have a solution.
-
-Thanks,
-Elliot
+Reviewed-by: Charlie Jenkins <charlie@rivosinc.com>
 
 
