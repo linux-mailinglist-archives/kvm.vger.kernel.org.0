@@ -1,178 +1,324 @@
-Return-Path: <kvm+bounces-20060-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20062-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30664910132
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 12:11:17 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33B24910140
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 12:16:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2713285384
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 10:11:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B24A51F22C68
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 10:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6126E1A8C33;
-	Thu, 20 Jun 2024 10:11:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93AF31A8C19;
+	Thu, 20 Jun 2024 10:16:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KQCt7FNv"
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F031D1A8C01;
-	Thu, 20 Jun 2024 10:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718878265; cv=none; b=EVTVQ6kLO4ooEbJzawqCCmx1Wn2ktabRYC9qEyKyNVjDvczsmKYyFCFccb+8jT4yThTYrSWU3y7qF+ugVpQgDDgc5Xh+90na+v9XrwsRGaD2RE4BTBgrQElID3v98XmQTKHQKeXgs4ddZDuvd2bA4alW2pMy+iEhPirhmPKtwMo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718878265; c=relaxed/simple;
-	bh=P4nGO6WoNahjKeS7KnCYubElsszhtWZMVWf8oaNq4AY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cyyzFSxzDtSebbjGzFfXJPGj2DfBdFxqiX6EXduV4rJ46zTUxuScI0lkL0vHPvL8v0ZG5qt1CJK58Tf6IWVflKDTtmhX7P6DMOYxMCxivfxlPG1eGx5Ztgzb2yk72myuWlozTQwdNHyEp3OTvh5zTa8kcteX0gWC+Gj493bbly4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4W4bnL6HGMz6K99B;
-	Thu, 20 Jun 2024 18:09:26 +0800 (CST)
-Received: from lhrpeml500006.china.huawei.com (unknown [7.191.161.198])
-	by mail.maildlp.com (Postfix) with ESMTPS id EEE0314058E;
-	Thu, 20 Jun 2024 18:10:59 +0800 (CST)
-Received: from lhrpeml500005.china.huawei.com (7.191.163.240) by
- lhrpeml500006.china.huawei.com (7.191.161.198) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4FD628;
+	Thu, 20 Jun 2024 10:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718878565; cv=fail; b=hdR+plH0ga6TVGx6m2IR7O4GFHnzO0OUuUycleR74th555fMfTapYJJ4kIU8ORDjc8WUL/8DtLpUyp8cgzoSDd4KiZ5yEpI0J7efyN9c8igPONI0SnpcDRHuudBU29g9CYk4ncVWA3TiZkDAuAnxYV26no7k9ARPADCgkx9sKtE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718878565; c=relaxed/simple;
+	bh=ppXVJ7JGBLb02NMq3EcxZfmlTOb0ksDnsvp4neHPNAM=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=ry4nW9X5UrIIdkFXp7jnBQKoo2QICMCabBKQXKua2Yn4q1OskhZBb4gZ8OQVCr5PC8hA3XJ18zf4/aKmBdQwNUiEaUGZYhXTSDAdqiMIA+9E1xOywSKv/i84ewRnZUM8gNn2IejmKYe6YKZGz7wKhJ3nIktXbQIZXN9SHFD8HR4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KQCt7FNv; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1718878564; x=1750414564;
+  h=date:from:to:cc:subject:message-id:reply-to:references:
+   in-reply-to:mime-version;
+  bh=ppXVJ7JGBLb02NMq3EcxZfmlTOb0ksDnsvp4neHPNAM=;
+  b=KQCt7FNvH2eA1qnSQziVEnBzz6itbH8ffG658+lFGwjCaalSnSCm/Cu6
+   iSG4mTMM9cJ84VxQUPQL10PFCDgAAWUs1hMVcIshbiAQQC0YWFLVLwtkL
+   1NZYbkFxLuXKcKrmKpeeNN9Lh+zPrNbez0x6sKC55iPEsrYCGS8VtREaN
+   3sZx4418i18VUZvAz1HEB8+tnVeeBK4FB/ppS2yk7RVK/rHBwBIq8naIX
+   Xff9+0oGuMVT4CeOTRw0tII5eKBHHlw9FOYgsk8WPnnL7+a77x0ScXL3x
+   bNg1YI1YzXt2OkcvjnjdHVERDen7JN22Iy9WGtfSFe+wqrAoE4eORM5Da
+   Q==;
+X-CSE-ConnectionGUID: g1Ls0NaHTQOcn7rviJ5VsQ==
+X-CSE-MsgGUID: tPZVXH7hQyGBQY9gVNzTnA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="41248911"
+X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
+   d="scan'208";a="41248911"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2024 03:16:03 -0700
+X-CSE-ConnectionGUID: z9flMIXDQ5e3FXybW9nasw==
+X-CSE-MsgGUID: rWRv/8sDT9OsGwmaoCYOrg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
+   d="scan'208";a="72925162"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Jun 2024 03:16:02 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Thu, 20 Jun 2024 03:16:02 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Thu, 20 Jun 2024 03:16:02 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 20 Jun 2024 11:10:59 +0100
-Received: from lhrpeml500005.china.huawei.com ([7.191.163.240]) by
- lhrpeml500005.china.huawei.com ([7.191.163.240]) with mapi id 15.01.2507.039;
- Thu, 20 Jun 2024 11:10:59 +0100
-From: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-To: Sean Christopherson <seanjc@google.com>, Catalin Marinas
-	<catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, Marc Zyngier
-	<maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, Huacai Chen
-	<chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, Anup Patel
-	<anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, "Palmer
- Dabbelt" <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, "Heiko
- Carstens" <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, "Alexander
- Gordeev" <agordeev@linux.ibm.com>, Christian Borntraeger
-	<borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, "Claudio
- Imbrenda" <imbrenda@linux.ibm.com>, Thomas Gleixner <tglx@linutronix.de>,
-	"Ingo Molnar" <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, "Peter
- Zijlstra" <peterz@infradead.org>, Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>, Tony Krowiak <akrowiak@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>, Jason Herne <jjherne@linux.ibm.com>,
-	Harald Freudenberger <freude@linux.ibm.com>, Alex Williamson
-	<alex.williamson@redhat.com>, Andy Lutomirski <luto@kernel.org>
-CC: "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "kvmarm@lists.linux.dev"
-	<kvmarm@lists.linux.dev>, "linux-mips@vger.kernel.org"
-	<linux-mips@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>,
-	"kvm-riscv@lists.infradead.org" <kvm-riscv@lists.infradead.org>,
-	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>,
-	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-perf-users@vger.kernel.org" <linux-perf-users@vger.kernel.org>, "Anish
- Ghulati" <aghulati@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>,
-	Andrew Thornton <andrewth@google.com>
-Subject: RE: [PATCH 00/26] KVM: vfio: Hide KVM internals from others
-Thread-Topic: [PATCH 00/26] KVM: vfio: Hide KVM internals from others
-Thread-Index: AQHZ6DUkZqOCX4TQLUabDzpapjtX9LHSHHZQ
-Date: Thu, 20 Jun 2024 10:10:59 +0000
-Message-ID: <504fa0a7264d4762afda2f13c3525ce5@huawei.com>
-References: <20230916003118.2540661-1-seanjc@google.com>
-In-Reply-To: <20230916003118.2540661-1-seanjc@google.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 15.1.2507.39; Thu, 20 Jun 2024 03:15:52 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SwH62BgWDFB94TH0CJmC8Dr2sCmCxRUtBZlaC1rCG1IgC87RUqBnfPyTP5U+cQUcmMQEeAyrEzq1CBQ0tzG/2XyjlXpslXiBMdR8TGeOyu+dDjngh/TvIeTtdSa23Y19zxKwvwao95AZ02IhA+lFrmLTIbAGIlBnzvq2qXLGlwj5eysUdwgidPKDsLNjmcVoeo4M/YY7bwHNAU0ThYm7hj0eloXeeSGusuVMRqEEOwtA6sqprz6tLoKIIMU2rnLtJ/P14Re6qm1pzz1SXj/Fj8WA3WHa8PuMit7GWSeK+AszrlZ6lcThkPGYgTXaBXShU/yEDY2lnrf1qG5LHY01Dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=IrI6m78cIv5yKCMYnCZFqdoEZCyxcQ85WrwFtKJqNqQ=;
+ b=iidcRG90HsyLHavGIV2nro75M1ycW9JCe3laJEuuoqo9J/qegIrFkvasEluBvdOKsfZqI+dOQJ8WCtSp7e+GAHksxdDdd3DoaLbPSm4adzZ5TkE7L0554qZXbzHE8iQ2LZOVFHXZN99Og+n3pWJp48/UG/5FarEaXsD7OahMyPpQL+jH3wtz1BV0DkkidFXzt/HN7NE3lhM9anKZ93y6AfQ0VwahWP2PDd5tAw9vVw/FBO8OwkTCvs+F75nyTGz4Ua9MKVdTfwqptzfV/0OY0SK1POP4GZC14vWiG8jqmI1TxmK+qiepKgGpuBaZwlgVPOeK88V8cj9W2N22sxMgjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
+ PH7PR11MB6835.namprd11.prod.outlook.com (2603:10b6:510:1ee::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7677.25; Thu, 20 Jun 2024 10:15:50 +0000
+Received: from DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
+ ([fe80::e971:d8f4:66c4:12ca%6]) with mapi id 15.20.7677.030; Thu, 20 Jun 2024
+ 10:15:50 +0000
+Date: Thu, 20 Jun 2024 18:14:42 +0800
+From: Yan Zhao <yan.y.zhao@intel.com>
+To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <alex.williamson@redhat.com>, <kevin.tian@intel.com>, <jgg@nvidia.com>,
+	<peterx@redhat.com>, <ajones@ventanamicro.com>
+Subject: Re: [PATCH] vfio: Reuse file f_inode as vfio device inode
+Message-ID: <ZnQBEmjEFoO39rRO@yzhao56-desk.sh.intel.com>
+Reply-To: Yan Zhao <yan.y.zhao@intel.com>
+References: <20240617095332.30543-1-yan.y.zhao@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240617095332.30543-1-yan.y.zhao@intel.com>
+X-ClientProxiedBy: SG2PR04CA0151.apcprd04.prod.outlook.com (2603:1096:4::13)
+ To DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|PH7PR11MB6835:EE_
+X-MS-Office365-Filtering-Correlation-Id: d4c028f5-83f9-4e3b-720b-08dc9111f581
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|376011|366013|1800799021;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?qQlLTpjWVeUIVm0eSbvVlyjFsmprj4rSBRr1/LLA2hkVZ1Mtqd6SUq+7FV7X?=
+ =?us-ascii?Q?AQpJ6hWNw4Ncr0q8b3IpajDAvRbocU3C0xEAdE1Co2eSU1sAVSu3xeWF/EL0?=
+ =?us-ascii?Q?B4522HVAcjj25UY2VTFqwEr2O4dnl9H9h29BzqxEB3IT8LLI5Bt7/eusLX/Z?=
+ =?us-ascii?Q?lClSEvb74wG9ZVZQm3LGl0aw8Migdp+VPOnjenYjoZ9FKhR52NiFDdZGnAyQ?=
+ =?us-ascii?Q?kfjHU748RTiQP7lXKVkAUFjhNg/apebYXbrKagmLt9ICU/S1DRqmIzD00rn1?=
+ =?us-ascii?Q?CTESCwlYZwFh3i4iFPvECSLVz1eztorQOGNM6XIosHz2ZxQUSP+dKhfwJTbe?=
+ =?us-ascii?Q?Ev3pxRdt/TsYVu/q/kE2Obd4fuj7FY17S9iAtB3WoxyfIPiIOa67YrkCIo41?=
+ =?us-ascii?Q?U/mJSbkPOslf81NLefHWPKs0j5VLXYU314eqURP/Z0gucS6TKAZZYi4wzJHG?=
+ =?us-ascii?Q?eYUiPPOkqIRfJ72FuYDhRR36T8zb1bEZEN0r5pmSFd/nuUxABfI6m65hKO0x?=
+ =?us-ascii?Q?Yruk+bIgH5P/2BT79d9U+g/QOyhbbOs+9AT+fA1Y5AVh2TZpVrw+H8RQUIjo?=
+ =?us-ascii?Q?9rpsp3taboXjd3Kq1/+SkE/IaYQMjEeh5I6XCfQbfGsr5c4KNhGUaqHK0hY6?=
+ =?us-ascii?Q?PoG+KFZK/4AXEsBxtvtOnh0K6RTwkRmidNTtWWraA4R4Pz3ICcvRryeq4qUP?=
+ =?us-ascii?Q?AmqUSg+g4qmq7FOaadEa4PUFEP/tn8LxAf7ZiJuS5p0mRFIYJaAKsZELgVWv?=
+ =?us-ascii?Q?6c14wKeffyc/mFTFLAvmDfUqOcXw1ev0vFO6D56VNZqD0wNuF/LrD1T1eY3v?=
+ =?us-ascii?Q?tkYNmC+asVTKE8+/F33vAI8j4LwWNM3bfXAUwJqoAEQYNzRGK2O45ev9GNYR?=
+ =?us-ascii?Q?iRJ+3OPopMI9UvyOpZl0dOvpEwhJmYTqGi/B9yEKEJNtix4RtjUXmt+yIkdp?=
+ =?us-ascii?Q?ZWQ5qVhDSCRwFyBNs+tR5KC/oGKPx85zS2NEH/+/uu/sELXMC1Vp2yzTsIua?=
+ =?us-ascii?Q?+QXfaBlQqmoIBnc8v1LrWf4OQGP+czfWWgNQWwyBL/YAB1ulRggWtaQE/gP8?=
+ =?us-ascii?Q?I/AeboFOU+W+znwsGCdxnUxPNcaTYCDncjLsAE1x3wlRn8lZY56hkKwS5f4g?=
+ =?us-ascii?Q?7wSnvE0IVg9N817ypW57AJ66VJM+Cqpa8pzpzhRiK5IO4pvjkkOwObchfTJs?=
+ =?us-ascii?Q?mUmzKU+wYc0QTUJpCr1+AKoz6mbzl/X6d0Z2ZuiEBzNZHaF135+PXJI1OCWG?=
+ =?us-ascii?Q?KJXhXO4uC7SVpkZUfnjOM0li5HQjjDjMtyQ9+a4bSHF7oX6J+gxvwFmQPH+M?=
+ =?us-ascii?Q?JfThxiEYE0SRx28L4dm1RktF?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(376011)(366013)(1800799021);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?+VNbtKPoCFFuCzbK0CZxqZxP/mi1sex3l8o/WEGI/MhOXXXcmvOn1auYtozq?=
+ =?us-ascii?Q?sMFfpldll2n71EJIUBlG6r0egKtuKtFdxN/cNIEv61Z4OT5j0ZVBxzibUixQ?=
+ =?us-ascii?Q?5ajgmDJnvZGxGLGh43cET3oYOFDx8XbtQ4P1rfONkR4qBuiVCgeZfKRr+4J3?=
+ =?us-ascii?Q?u5dAdjWrWqvs07+DeAcfvyPTN6E5vqlSg5da3RrH0d4ZuGgdcnVmumNU0xcM?=
+ =?us-ascii?Q?ouRNOj14huN1+NpR2FDVJhz1Kj9mK8zXZTkC6jGU54r8eIi3OqvqkEj6sQgA?=
+ =?us-ascii?Q?FqpGoqQTK9FRUc2pAOwAmFIemcwDibEn6LGECdq2eADp+JZjeIVvn4WVi59h?=
+ =?us-ascii?Q?k+c7Q04p5qZfMArU8JZnNJkI90gtDwqjpObweGb2enUqADdZVi+xz6ZML0yq?=
+ =?us-ascii?Q?WoEWTXfjGi07gwZnfyyXK031b2rfHHqNpzUa/DLTtWQ/dXaax9QXpOc3uKzc?=
+ =?us-ascii?Q?Lr/pBthSvTvOvEy9lXA5ImK/63C/myKUTvcRzMk23PSKQFSwvrSOGMnPAaPt?=
+ =?us-ascii?Q?S91DftTCuD5LLmZmmpLXC2DIx3kN5NR+jMMVbz5ihjCPbE6gTGbN80IHteI0?=
+ =?us-ascii?Q?2N13dM70hq+u50VLyXEnkvoyYF/E5AEQok68/r+oC16mCpd7nbn5+Qkjh7vd?=
+ =?us-ascii?Q?edsxNU4GdlVWYPYOnfBDpHK/+M1bFldPU1JtO0N3Rw9cdBXsRtoyRNW9OG9C?=
+ =?us-ascii?Q?VCwvUKTds5Dl4SFNuELZ5W0qH4aJEvwGbuCMp0XZwF8qqncF9tcwkCliES8v?=
+ =?us-ascii?Q?nJEIOaNsm+q9B/lydqPu9j5DQ5h0Izyl/GsXbPYZ/JWWWxUSZ5PBQtk9rkiW?=
+ =?us-ascii?Q?bhLORm7jJ2W/4sE8o55vL4AtXVGSvlj5qmPySKr9uum+um8T0UGS3f8ev+Wt?=
+ =?us-ascii?Q?2A1T/lj8U9foDnnr3BCEGPHpfEvZhqXbZlNNF6sMb3sh5FUz7l+LytXm2ClG?=
+ =?us-ascii?Q?UYjH+9IS4GHnLKEBvpUHAmx30+bZkdj39N6kD8ltZ9q+m+GrM1Tbjc0YcoGN?=
+ =?us-ascii?Q?JoXTiyrqJlD9ebv2bx5wn02NTKehVrtL+24I9RwDMBT063IIvSa6l45lNmaI?=
+ =?us-ascii?Q?VeOhEusfTQLlgL8wjRW1gtViMcs6uPUWSZ+/UxqoxYvd2mngT7facH0HHYTc?=
+ =?us-ascii?Q?WfSjUM8qs5g6eJNU1w3D/uxT2yNHZJO08X43Zwaz41Dlc6vEoOPaXQtrIiMI?=
+ =?us-ascii?Q?bliLLlzytCay7HtL9UCgafuZlINBsakc0sXZ6ZrV78yH2Qnzy6VMT49pbInA?=
+ =?us-ascii?Q?az5J6pLCvfKI/WS7d8OAvAARPWJ1T1GYMZX9tzRbHD71fC98fpAax02C1dtT?=
+ =?us-ascii?Q?/YOGxmmzZsEvPVLRqeCtZGyYGhSn/6MHFzZXhrF/CB3gSBqSEKgj0jWKVrqj?=
+ =?us-ascii?Q?yWJj9Vi3kKd0tLbEPX8P11LLsPp/GAwwIiegVsC7tG//ucyfV2i2mCIQuYPX?=
+ =?us-ascii?Q?OSgUM28b/SrYyN9Emt4EE5bZ8pXvWfSYntXgfH41bBZhGFWLKcVaKJmD60uZ?=
+ =?us-ascii?Q?5F5JA8f5iDAoGh/g3cNxPGzLlGfA5GQgVEoyEmRVdet/aWBvIUPOKCWtawQs?=
+ =?us-ascii?Q?PNLhn3jzF2B93RfFX8SWCBa62C7yUneMiY3/0zSE?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d4c028f5-83f9-4e3b-720b-08dc9111f581
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 10:15:50.0428
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ACh8PPk+kscGDv9wCwhwE9jv26uQJktu4NqE5zEWwhOjhsfKDEuNU08LObBas9c6zDxcDD+4oxizupKcmIVNzQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6835
+X-OriginatorOrg: intel.com
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogU2VhbiBDaHJpc3RvcGhl
-cnNvbiA8c2VhbmpjQGdvb2dsZS5jb20+DQo+IFNlbnQ6IFNhdHVyZGF5LCBTZXB0ZW1iZXIgMTYs
-IDIwMjMgMTozMSBBTQ0KPiBUbzogQ2F0YWxpbiBNYXJpbmFzIDxjYXRhbGluLm1hcmluYXNAYXJt
-LmNvbT47IFdpbGwgRGVhY29uDQo+IDx3aWxsQGtlcm5lbC5vcmc+OyBNYXJjIFp5bmdpZXIgPG1h
-ekBrZXJuZWwub3JnPjsgT2xpdmVyIFVwdG9uDQo+IDxvbGl2ZXIudXB0b25AbGludXguZGV2Pjsg
-SHVhY2FpIENoZW4gPGNoZW5odWFjYWlAa2VybmVsLm9yZz47IE1pY2hhZWwNCj4gRWxsZXJtYW4g
-PG1wZUBlbGxlcm1hbi5pZC5hdT47IEFudXAgUGF0ZWwgPGFudXBAYnJhaW5mYXVsdC5vcmc+OyBQ
-YXVsDQo+IFdhbG1zbGV5IDxwYXVsLndhbG1zbGV5QHNpZml2ZS5jb20+OyBQYWxtZXIgRGFiYmVs
-dA0KPiA8cGFsbWVyQGRhYmJlbHQuY29tPjsgQWxiZXJ0IE91IDxhb3VAZWVjcy5iZXJrZWxleS5l
-ZHU+OyBIZWlrbw0KPiBDYXJzdGVucyA8aGNhQGxpbnV4LmlibS5jb20+OyBWYXNpbHkgR29yYmlr
-IDxnb3JAbGludXguaWJtLmNvbT47DQo+IEFsZXhhbmRlciBHb3JkZWV2IDxhZ29yZGVldkBsaW51
-eC5pYm0uY29tPjsgQ2hyaXN0aWFuIEJvcm50cmFlZ2VyDQo+IDxib3JudHJhZWdlckBsaW51eC5p
-Ym0uY29tPjsgSmFub3NjaCBGcmFuayA8ZnJhbmtqYUBsaW51eC5pYm0uY29tPjsNCj4gQ2xhdWRp
-byBJbWJyZW5kYSA8aW1icmVuZGFAbGludXguaWJtLmNvbT47IFRob21hcyBHbGVpeG5lcg0KPiA8
-dGdseEBsaW51dHJvbml4LmRlPjsgSW5nbyBNb2xuYXIgPG1pbmdvQHJlZGhhdC5jb20+OyBCb3Jp
-c2xhdiBQZXRrb3YNCj4gPGJwQGFsaWVuOC5kZT47IERhdmUgSGFuc2VuIDxkYXZlLmhhbnNlbkBs
-aW51eC5pbnRlbC5jb20+Ow0KPiB4ODZAa2VybmVsLm9yZzsgUGV0ZXIgWmlqbHN0cmEgPHBldGVy
-ekBpbmZyYWRlYWQub3JnPjsgQXJuYWxkbyBDYXJ2YWxobyBkZQ0KPiBNZWxvIDxhY21lQGtlcm5l
-bC5vcmc+OyBTZWFuIENocmlzdG9waGVyc29uIDxzZWFuamNAZ29vZ2xlLmNvbT47DQo+IFBhb2xv
-IEJvbnppbmkgPHBib256aW5pQHJlZGhhdC5jb20+OyBUb255IEtyb3dpYWsNCj4gPGFrcm93aWFr
-QGxpbnV4LmlibS5jb20+OyBIYWxpbCBQYXNpYyA8cGFzaWNAbGludXguaWJtLmNvbT47IEphc29u
-IEhlcm5lDQo+IDxqamhlcm5lQGxpbnV4LmlibS5jb20+OyBIYXJhbGQgRnJldWRlbmJlcmdlciA8
-ZnJldWRlQGxpbnV4LmlibS5jb20+Ow0KPiBBbGV4IFdpbGxpYW1zb24gPGFsZXgud2lsbGlhbXNv
-bkByZWRoYXQuY29tPjsgQW5keSBMdXRvbWlyc2tpDQo+IDxsdXRvQGtlcm5lbC5vcmc+DQo+IENj
-OiBsaW51eC1hcm0ta2VybmVsQGxpc3RzLmluZnJhZGVhZC5vcmc7IGt2bWFybUBsaXN0cy5saW51
-eC5kZXY7IGxpbnV4LQ0KPiBtaXBzQHZnZXIua2VybmVsLm9yZzsga3ZtQHZnZXIua2VybmVsLm9y
-ZzsgbGludXhwcGMtZGV2QGxpc3RzLm96bGFicy5vcmc7DQo+IGt2bS1yaXNjdkBsaXN0cy5pbmZy
-YWRlYWQub3JnOyBsaW51eC1yaXNjdkBsaXN0cy5pbmZyYWRlYWQub3JnOyBsaW51eC0NCj4gczM5
-MEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc7IGxpbnV4LXBl
-cmYtDQo+IHVzZXJzQHZnZXIua2VybmVsLm9yZzsgQW5pc2ggR2h1bGF0aSA8YWdodWxhdGlAZ29v
-Z2xlLmNvbT47IFZlbmthdGVzaA0KPiBTcmluaXZhcyA8dmVua2F0ZXNoc0BjaHJvbWl1bS5vcmc+
-OyBBbmRyZXcgVGhvcm50b24NCj4gPGFuZHJld3RoQGdvb2dsZS5jb20+DQo+IFN1YmplY3Q6IFtQ
-QVRDSCAwMC8yNl0gS1ZNOiB2ZmlvOiBIaWRlIEtWTSBpbnRlcm5hbHMgZnJvbSBvdGhlcnMNCj4g
-DQo+IFRoaXMgaXMgYSBib3JkZXJsaW5lIFJGQyBzZXJpZXMgdG8gaGlkZSBLVk0ncyBpbnRlcm5h
-bHMgZnJvbSB0aGUgcmVzdCBvZg0KPiB0aGUga2VybmVsLCB3aGVyZSAiaW50ZXJuYWxzIiBtZWFu
-cyBkYXRhIHN0cnVjdHVyZXMsIGVudW1zLCAjZGVmaW5lcywNCj4gQVBJcywgZXRjLiB0aGF0IGFy
-ZSBpbnRlbmRlZCB0byBiZSBLVk0tb25seSwgYnV0IGFyZSBleHBvc2VkIGV2ZXJ5d2hlcmUNCj4g
-ZHVlIHRvIGt2bV9ob3N0LmggKGFuZCBvdGhlciBoZWFkZXJzKSBsaXZpbmcgaW4gdGhlIGdsb2Jh
-bCBpbmNsdWRlIHBhdGhzLg0KPiANCj4gVGhlIG1vdGl2aWF0aW9uIGZvciBoaWRpbmcgS1ZNJ3Mg
-aW50ZXJuYWxzIGlzIHRvIGFsbG93ICpzYWZlbHkqIGxvYWRpbmcgYQ0KPiAibmV3IiBLVk0gbW9k
-dWxlIHdpdGhvdXQgaGF2aW5nIHRvIHJlYm9vdCB0aGUgaG9zdC4gIFdoZXJlICJuZXciIGRvZXNu
-J3QNCj4gaGF2ZSB0byBiZSBzdHJpY3RseSBuZXdlciwganVzdCBhIGRpZmZlcmVudCBpbmNhcm5h
-dGlvbiBvZiBLVk0uICBIaWRpbmcNCj4gS1ZNJ3MgaW50ZXJuYWxzIG1lYW5zIHRob3NlIGFzc2V0
-cyBjYW4gY2hhbmdlIGFjcm9zcyBLVk0gaW5zdGFuY2VzDQo+IHdpdGhvdXQNCj4gYnJlYWtpbmcg
-dGhpbmdzLCBlLmcuIHdvdWxkIGFsbG93IG1vZGlmeWluZyB0aGUgbGF5b3V0IG9mIHN0cnVjdCBr
-dm1fdmNwdQ0KPiB0byBpbnRyb2R1Y2UgbmV3IGZpZWxkcyByZWxhdGVkIHRvIGEgbmV3IGZlYXR1
-cmUgb3IgbWl0aWdhdGlvbiBmb3IgaGFyZHdhcmUNCj4gYnVncy4NCj4gDQo+IFRoZSBlbmQgZ29h
-bCBmb3IgYWxsIG9mIHRoaXMgaXMgdG8gYWxsb3cgbG9hZGluZyBhbmQgcnVubmluZyBtdWx0aXBs
-ZQ0KPiBpbnN0YW5jZXMgb2YgS1ZNICh0aGUgbW9kdWxlKSBzaW11bHRhbmVvdXNseSBvbiBhIHNp
-bmdsZSBob3N0LCBlLmcuIHRvDQo+IGRlcGxveSBmaXhlcywgbWl0aWdhdGlvbnMsIGFuZC9vciBu
-ZXcgZmVhdHVyZXMgd2l0aG91dCBoYXZpbmcgdG8gZHJhaW4NCj4gYWxsIFZNcyBmcm9tIHRoZSBo
-b3N0Lg0KPiANCj4gRm9yIG5vdywgdGhlIGltbWVkaWF0ZSBnb2FsIGlzIHRvIGdldCBLVk0gdG8g
-YSBzdGF0ZSB3aGVyZSBLVk0geDg2IGRvZXNuJ3QNCj4gZXhwb3NlIGFueXRoaW5nIHRvIHRoZSBi
-cm9hZGVyIHdvcmxkIHRoYXQgaXNuJ3QgaW50ZW5kZWQgZm9yIGV4dGVybmFsDQo+IGNvbnN1bXB0
-aW9uLCBlLmcuIHRoZSBwYWdlIHdyaXRlLXRyYWNraW5nIEFQSXMgdXNlZCBieSBLVk0tR1QuDQo+
-IA0KPiBJIHNheSB0aGlzIGlzIGJvcmRlcmxpbmUgUkZDIGJlY2F1c2UgSSBkb24ndCB0aGluayBJ
-J3ZlICJmb3JtYWxseSIgcHJvcG9zZWQNCj4gdGhlIGlkZWEgb2YgaGlkaW5nIEtWTSBpbnRlcm5h
-bHMgYmVmb3JlIG5vdy4gIEkgZGVjaWRlZCBub3QgdG8gdGFnIHRoaXMgUkZDDQo+IGJlY2F1c2Ug
-dGhlIGNoYW5nZXMgZW5kZWQgdXAgYmVpbmcgbm90IF90aGF0XyBpbnZhc2l2ZSwgYW5kIGV2ZXJ5
-dGhpbmcNCj4gYmVmb3JlIHRoZSBsYXN0IHNpeCBwYXRjaGVzIGlzIHdvcnRod2hpbGUgZXZlbiBp
-ZiBoaWRpbmcgaW50ZXJuYWxzIGlzDQo+IHVsdGltYXRlbHkgcmVqZWN0ZWQgKElNTykuDQo+IA0K
-PiBUaGlzIHdvdWxkIGlkZWFsbHkgYmUgfjUgc2VwYXJhdGUgc2VyaWVzLCBhbmQgSSBjZXJ0YWlu
-bHkgaGF2ZSBubyBvYmplY3Rpb24NCj4gaWYgdGhhdCdzIGhvdyB3ZSB3YW50IHRvIGdldCB0aGlz
-IHN0dWZmIG1lcmdlZC4gIEUuZy4gKDEpIFZGSU8gY2xlYW51cHMsDQo+ICgyKSBkcm9wIEhBVkVf
-S1ZNLCAoMykgY2xlYW4gdXAgbWFrZWZpbGVzLCAoNCkgeDg2IHBlcmYgY2xlYW51cCwgYW5kDQo+
-ICg1KSBmaW5hbCBwdXNoIGZvciBoaWRpbmcgc3RhdGUuICBUaGUgSEFWRV9LVk0gYW5kIHZpcnQv
-a3ZtIGluY2x1ZGUgc3R1ZmYNCj4gaXNuJ3Qgc3RyaWN0bHkgbmVjZXNzYXJ5LCBidXQgSSBpbmNs
-dWRlZCB0aGVtIGhlcmUgYmVjYXVzZSB0aGV5J3JlDQo+IHJlbGF0aXZlbHkgbWlub3IgKGluIHRo
-ZSBncmFuZCBzY2hlbWUpLg0KDQpIaSBTZWFuLA0KDQpKdXN0IHRob3VnaHQgb2YgY2hlY2tpbmcg
-d2l0aCB5b3Ugb24gdGhpcyBzZXJpZXMuIERvIHlvdSBoYXZlIHBsYW5zIHRvIHJldml2ZSB0aGlz
-DQpzZXJpZXM/IFRoZSByZWFzb24gSSBhbSBhc2tpbmcgaXMsIG9uIEFSTTY0L0tWTSBzaWRlIHdl
-IGRvIGhhdmUgYSByZXF1aXJlbWVudA0KdG8gc2hhcmUgdGhlIEtWTSBWTUlEIHdpdGggU01NVVYz
-LiBQbGVhc2Ugc2VlIHRoZSBSRkMgSSBzZW50IG91dCBlYXJsaWVyIHRoaXMNCnllYXJbMV0uIFRo
-ZSBzZXJpZXMgYmFzaWNhbGx5IHByb3ZpZGVzIGEgd2F5IGZvciBLVk0gdG8gcGluIGEgVk1JRCBh
-bmQgYWxzbw0KYXNzb2NpYXRlcyBhbiBpb21tdWZkIGN0eCB3aXRoIGEgc3RydWN0IGt2bSAqIHRv
-IHJldHJpZXZlIHRoYXQgVk1JRC4gDQoNCkFzIG1lbnRpb25lZCBhYm92ZSwgc29tZSBvZiB0aGUg
-cGF0Y2hlcyBpbiB0aGlzIHNlcmllcyhlc3BlY2lhbGx5IDEtNCAmIDYpIHRoYXQNCmRvZXMgdGhl
-IFZGSU8gY2xlYW51cHMgYW5kIGRyb3BwaW5nIENPTkZJR19LVk1fVkZJTyBsb29rcyB2ZXJ5IHN0
-cmFpZ2h0Zm9yd2FyZA0KYW5kIHVzZWZ1bC4gSSBhbSB0aGlua2luZyBvZiBpbmNsdWRpbmcgdGhv
-c2Ugd2hlbiBJIHJlLXNwaW4gbXkgUkZDIHNlcmllcywgaWYgdGhhdOKAmXMgb2suDQoNClBsZWFz
-ZSBsZXQgbWUga25vdyB5b3VyIHRob3VnaHRzLg0KDQpUaGFua3MsDQpTaGFtZWVyDQoNClsxXS4g
-aHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvbGludXgtaW9tbXUvMjAyNDAyMDkxMTU4MjQuR0EyOTIy
-NDQ2QG15cmljYS8NCg0K
+On Mon, Jun 17, 2024 at 05:53:32PM +0800, Yan Zhao wrote:
+...
+> diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+> index ded364588d29..aaef188003b6 100644
+> --- a/drivers/vfio/group.c
+> +++ b/drivers/vfio/group.c
+> @@ -268,31 +268,14 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+>  	if (ret)
+>  		goto err_free;
+>  
+> -	/*
+> -	 * We can't use anon_inode_getfd() because we need to modify
+> -	 * the f_mode flags directly to allow more than just ioctls
+> -	 */
+> -	filep = anon_inode_getfile("[vfio-device]", &vfio_device_fops,
+> -				   df, O_RDWR);
+> +	filep = vfio_device_get_pseudo_file(device);
+If getting an inode from vfio_fs_type is not a must, maybe we could use
+anon_inode_create_getfile() here?
+Then changes to group.c and vfio_main.c can be simplified as below:
+
+diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+index ded364588d29..7f2f7871403f 100644
+--- a/drivers/vfio/group.c
++++ b/drivers/vfio/group.c
+@@ -269,29 +269,22 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+                goto err_free;
+
+        /*
+-        * We can't use anon_inode_getfd() because we need to modify
+-        * the f_mode flags directly to allow more than just ioctls
++        * Get a unique inode from anon_inodefs
+         */
+-       filep = anon_inode_getfile("[vfio-device]", &vfio_device_fops,
+-                                  df, O_RDWR);
++       filep = anon_inode_create_getfile("[vfio-device]", &vfio_device_fops, df,
++                                         O_RDWR, NULL);
+        if (IS_ERR(filep)) {
+                ret = PTR_ERR(filep);
+                goto err_close_device;
+        }
+-
+-       /*
+-        * TODO: add an anon_inode interface to do this.
+-        * Appears to be missing by lack of need rather than
+-        * explicitly prevented.  Now there's need.
+-        */
+        filep->f_mode |= (FMODE_PREAD | FMODE_PWRITE);
+
+        /*
+-        * Use the pseudo fs inode on the device to link all mmaps
+-        * to the same address space, allowing us to unmap all vmas
+-        * associated to this device using unmap_mapping_range().
++        * mmaps are linked to the address space of the filep->f_inode.
++        * Save the inode in device->inode to allow unmap_mapping_range() to
++        * unmap all vmas.
+         */
+-       filep->f_mapping = device->inode->i_mapping;
++       device->inode = filep->f_inode;
+
+        if (device->group->type == VFIO_NO_IOMMU)
+                dev_warn(device->dev, "vfio-noiommu device opened by user "
+
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index a5a62d9d963f..c9dac788411b 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -192,8 +192,6 @@ static void vfio_device_release(struct device *dev)
+        if (device->ops->release)
+                device->ops->release(device);
+
+-       iput(device->inode);
+-       simple_release_fs(&vfio.vfs_mount, &vfio.fs_count);
+        kvfree(device);
+ }
+
+@@ -248,22 +246,6 @@ static struct file_system_type vfio_fs_type = {
+        .kill_sb = kill_anon_super,
+ };
+
+-static struct inode *vfio_fs_inode_new(void)
+-{
+-       struct inode *inode;
+-       int ret;
+-
+-       ret = simple_pin_fs(&vfio_fs_type, &vfio.vfs_mount, &vfio.fs_count);
+-       if (ret)
+-               return ERR_PTR(ret);
+-
+-       inode = alloc_anon_inode(vfio.vfs_mount->mnt_sb);
+-       if (IS_ERR(inode))
+-               simple_release_fs(&vfio.vfs_mount, &vfio.fs_count);
+-
+-       return inode;
+-}
+-
+ /*
+  * Initialize a vfio_device so it can be registered to vfio core.
+  */
+@@ -282,11 +264,6 @@ static int vfio_init_device(struct vfio_device *device, struct device *dev,
+        init_completion(&device->comp);
+        device->dev = dev;
+        device->ops = ops;
+-       device->inode = vfio_fs_inode_new();
+-       if (IS_ERR(device->inode)) {
+-               ret = PTR_ERR(device->inode);
+-               goto out_inode;
+-       }
+
+        if (ops->init) {
+                ret = ops->init(device);
+@@ -301,9 +278,6 @@ static int vfio_init_device(struct vfio_device *device, struct device *dev,
+        return 0;
+
+ out_uninit:
+-       iput(device->inode);
+-       simple_release_fs(&vfio.vfs_mount, &vfio.fs_count);
+-out_inode:
+        vfio_release_device_set(device);
+        ida_free(&vfio.device_ida, device->index);
+        return ret;
+
+
+> diff --git a/drivers/vfio/vfio.h b/drivers/vfio/vfio.h
+> index 50128da18bca..1f8915f79fbb 100644
+> --- a/drivers/vfio/vfio.h
+> +++ b/drivers/vfio/vfio.h
+> @@ -35,6 +35,7 @@ struct vfio_device_file *
+>  vfio_allocate_device_file(struct vfio_device *device);
+>  
+>  extern const struct file_operations vfio_device_fops;
+> +struct file *vfio_device_get_pseudo_file(struct vfio_device *device);
+>  
+>  #ifdef CONFIG_VFIO_NOIOMMU
+>  extern bool vfio_noiommu __read_mostly;
+> @@ -420,6 +421,7 @@ static inline void vfio_cdev_cleanup(void)
+>  {
+>  }
+>  #endif /* CONFIG_VFIO_DEVICE_CDEV */
+> +struct file *vfio_device_get_pseduo_file(struct vfio_device *device);
+Sorry, this line was included by mistake.
 
