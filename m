@@ -1,168 +1,159 @@
-Return-Path: <kvm+bounces-20181-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20182-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823A09115C2
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 00:32:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F70B9115C7
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 00:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30770282A29
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 22:32:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70C18B21728
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 22:38:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D7214038F;
-	Thu, 20 Jun 2024 22:32:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF92913FD86;
+	Thu, 20 Jun 2024 22:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ziWgiCQs"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KZsaEMas"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0BCB6F2F1
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 22:32:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27A464A98
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 22:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718922751; cv=none; b=hoRwBXBliwNvZD4iMxC1RmsMfQ6fH3Gdbk4dXKflCXuU5ajCBB9dwEP0xqm2FdPDVVLjDut0YqZFxBAi8oCNVgdhx9/eGwd4aU+J13ctPUK9FD0xViIYGrbWHdYH+nTCe7RBanR2uP+EGSaemM5DDvHz7tJF1+la550WSuj2LRg=
+	t=1718923108; cv=none; b=cdQbj8SLLc5E6PB0aDD+SLS2GK4e9lJRywNXQDU2fvDXSp5fq9QveMuOtRWRdl9rG290KW9mGyUFp4jGzGEEkr4Ow6e1Yn+cCQzl4pTltuz8gggp8FtuWn0/j0DdvC6I0qsNAvzvqq7j0ylqvg6tDVIZvNRgcyzTWQJsrYF9/fs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718922751; c=relaxed/simple;
-	bh=wPyrfyOcJKrFlQqdsvbVInKDWmVrmJ7EXk00664mnVY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bbIv6gg2bnb+xEg5TY876Hhe0JH4LUZ9jV+aDdh3PTXsXCChJiG8d17grE3Y+gPXYe5efTBmcdTj09zOeDtQreVTEkbkuddUjO0zljd0D6Ba1W9u5Mjck+GPVuQsbqicCdnzqZZI0tfz6OLkV3m77GMdKmitBnKY+22qFBwSvpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ziWgiCQs; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-63bf23f8fbcso25775837b3.0
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 15:32:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718922749; x=1719527549; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=auxotihlkK8h83W2bzIbhNSOdi4xEkdwqnFVqelIJic=;
-        b=ziWgiCQsN9kHQVwWz8Jd4IxEBbuqnWoj8jhuS3W+HMzXKnyaXj1Y7wW9Odo/BEkVXs
-         WOHDy9T3CvcmONF+9FL8ZxJM7EJ+f9wHhnLJly+WbDucpb7feu9MfCYbiqkyRrL8o6dF
-         pKV04Rn/3VVE+BQwZaKhb3kDrSgMIWT9KHajvToounQ+NkOffF6IHQ0Xybr6mCz7+beX
-         h6Mytig4cQZtgcHnC3kKSveZ6tBEDqepaA4iXjqa0oJKLngkhHHUFI5PVZUYn2yLpotE
-         iM8x0bdOAcQ2fYQzEWFCHJfAXTuhtoOk/M6Aoj5lNFyopW1lqj+32WX0dg3Nd5qCYc1C
-         AA+w==
+	s=arc-20240116; t=1718923108; c=relaxed/simple;
+	bh=VOuCa+MPCCl3givMRzpSCjpRslsZff9GQepro4NAr6I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PG3drWA2ydERmeQYhTDHRfRVt22iw8DIJgBfrG0ma8LIzw8jElK8CK/FiFkTT4PVEcjHj3sMA8nqaCxeuMK2cRsyxSec1uZyRFjHmVQCFChUOsFSINpMgokySgUkDg17UDliWBUbvqU2PYslskNbnfVZTVw/aO6G82jN/ScDTjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KZsaEMas; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718923105;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=t8D3dmzG19niJdL2hQsK7/5l5eZyzfyE93p8lztrR+c=;
+	b=KZsaEMasP4NBT63ByNlHpO1tMyY+VKkSdHpXRRmvU2Zj60YZrQnP6eMQBnUcMOYUAQ3HX/
+	TdowX61ZMxd0rS8dXMxDOAoydF6yI0tlgQ7zXBgqArv3eRdMSHGNQsV7/43WIMIGbms/2T
+	1CKQcBsriZSiR/7HulSD3g+lYqSCSUE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-637-wE77e-i1PqanVibPlUJHdQ-1; Thu, 20 Jun 2024 18:38:24 -0400
+X-MC-Unique: wE77e-i1PqanVibPlUJHdQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3643d0e3831so976857f8f.0
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 15:38:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718922749; x=1719527549;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=auxotihlkK8h83W2bzIbhNSOdi4xEkdwqnFVqelIJic=;
-        b=Kmj359BHh0wFOLq3rMsYZGQqglbSfREKJMS/b8FnpxG0omDj32Z0zzCGFnVoPB47U7
-         wXRQvK21L1p8+50kJxZOzdrJxcRltABA1b+IMHV3xfYCyETIz2c2X4l9ozTtKki3Zsaz
-         AN4HrWhf7ADOcw/b3etIpg2MrPZc9vy+wJo4Xw66OEe3Oq2s+ZCGiotE0eWAda6ZMPQr
-         K4bAkASViLrGZlG8R/lzXJOukxfCwtOi3zPwLgnQC313cLw5j7f9QB61Nk9e7TIyjh6p
-         L8/s3iLoL1/2+VqIvOXMQB6W7Beu00sejOK7VypZ/hEzsi28J7QTae9XRc/LhgaPNNAp
-         1dlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVAxzciVnjFop9rdslh3eUY+BkBAtqx+YUst70bNgS+kwQHRP50zXf7sXbzRYCw6jup6TFltqCfoKzzhxzn4uq558rI
-X-Gm-Message-State: AOJu0YwuOQbn3h1wnE4qN1iem4DjEZI5kEqlnsbymtUJdy41hR71aV9l
-	9cNL80w+Kka7ZIfkyp1QiajM8izFN7Nu9/T+4IIvEME5Nf3sAHT8DbGh7JLtYCP/JwocsdNz4Rq
-	T0Q==
-X-Google-Smtp-Source: AGHT+IGHcNRLshBOMyztBLTs8rVKhKRXiJZQJYiLLVyOYcXhh1aFZDp6gOCGM/6iHRYpAGgEpAN5Al5CfjI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6105:b0:62f:5d17:3628 with SMTP id
- 00721157ae682-63a8ae564c0mr15344897b3.0.1718922748971; Thu, 20 Jun 2024
- 15:32:28 -0700 (PDT)
-Date: Thu, 20 Jun 2024 15:32:27 -0700
-In-Reply-To: <53d1e7c5-3e77-467b-be33-a618c3bb6cb3@redhat.com>
+        d=1e100.net; s=20230601; t=1718923103; x=1719527903;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=t8D3dmzG19niJdL2hQsK7/5l5eZyzfyE93p8lztrR+c=;
+        b=UifQiFMs7Wy2gDrtRz7ca8PrW/uhD3HgXFce+csMXr4fNTx+cG0gvhrqZQxJBZZsft
+         dfDdSdoqcRL/srX7K2aNORD7rcES7w6NbW4tw2O3YxohRfqeXfXlyDbbz8B+ymaEBC4h
+         jSRLkfWNecroFVfqbviwZjoviBFknvNHwQGbvZ0QzhSTB/9B31lLLd1NIk5OJcuyfdeM
+         AVkBFbhjmYPfYX59G8Z5P+19AMil4YIKXavMXPqA8HNVO0BXud35pMMwQ48q+TOd7WCH
+         crOKg7r53u2FtH8nFtvua6KxUVBabmABN6NyA6Pz2OioqvNTi2spYv98WzzVC+iaXmZD
+         S7sQ==
+X-Gm-Message-State: AOJu0Ywe27qg2/rZgu0JvcZLB9lWrr2BSO4uXTVq/ICBH8dcYkO36wDv
+	B6g63T40OLlZNvvLuwBW8Z6NuZd4UyMWGBMShDurjzoxrwbJ+JgBp1F1MdPIXp7pc83U1W26r8h
+	Y6qIeDGO2ktATFJu0ATGS0iEsrxyU6/B3SrTdggYxwNW4AJk9lQ==
+X-Received: by 2002:a5d:452d:0:b0:355:230:e2d3 with SMTP id ffacd0b85a97d-363177a3d04mr5005665f8f.20.1718923102930;
+        Thu, 20 Jun 2024 15:38:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGpv8Gz8XlnT3+hH/f//Vbpx5NsdgRvBQ/T9v2WZfpjdrlEaO0H7Ue+ITy+SKzENggG57KoxQ==
+X-Received: by 2002:a5d:452d:0:b0:355:230:e2d3 with SMTP id ffacd0b85a97d-363177a3d04mr5005659f8f.20.1718923102557;
+        Thu, 20 Jun 2024 15:38:22 -0700 (PDT)
+Received: from [192.168.10.81] ([151.62.196.71])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a6fcf5605aesm16068866b.151.2024.06.20.15.38.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 20 Jun 2024 15:38:22 -0700 (PDT)
+Message-ID: <45dade46-c45f-47f0-bfae-ae526d02651a@redhat.com>
+Date: Fri, 21 Jun 2024 00:38:21 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <ZnOsAEV3GycCcqSX@infradead.org> <CA+EHjTxaCxibvGOMPk9Oj5TfQV3J3ZLwXk83oVHuwf8H0Q47sA@mail.gmail.com>
- <20240620135540.GG2494510@nvidia.com> <6d7b180a-9f80-43a4-a4cc-fd79a45d7571@redhat.com>
- <20240620142956.GI2494510@nvidia.com> <385a5692-ffc8-455e-b371-0449b828b637@redhat.com>
- <20240620163626.GK2494510@nvidia.com> <66a285fc-e54e-4247-8801-e7e17ad795a6@redhat.com>
- <ZnSRZcap1dc2_WBV@google.com> <53d1e7c5-3e77-467b-be33-a618c3bb6cb3@redhat.com>
-Message-ID: <ZnSt-_dkjStvT1WB@google.com>
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-From: Sean Christopherson <seanjc@google.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Fuad Tabba <tabba@google.com>, 
-	Christoph Hellwig <hch@infradead.org>, John Hubbard <jhubbard@nvidia.com>, 
-	Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>, maz@kernel.org, 
-	kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 4/5] KVM: x86: Ensure a full memory barrier is emitted in
+ the VM-Exit path
+To: Sean Christopherson <seanjc@google.com>,
+ Lai Jiangshan <jiangshanlai@gmail.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Josh Triplett <josh@joshtriplett.org>
+Cc: kvm@vger.kernel.org, rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Kevin Tian <kevin.tian@intel.com>, Yan Zhao <yan.y.zhao@intel.com>,
+ Yiwei Zhang <zzyiwei@google.com>
+References: <20240309010929.1403984-1-seanjc@google.com>
+ <20240309010929.1403984-5-seanjc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20240309010929.1403984-5-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 20, 2024, David Hildenbrand wrote:
-> On 20.06.24 22:30, Sean Christopherson wrote:
-> > On Thu, Jun 20, 2024, David Hildenbrand wrote:
-> > > On 20.06.24 18:36, Jason Gunthorpe wrote:
-> > > > On Thu, Jun 20, 2024 at 04:45:08PM +0200, David Hildenbrand wrote:
-> > > > 
-> > > > > If we could disallow pinning any shared pages, that would make life a lot
-> > > > > easier, but I think there were reasons for why we might require it. To
-> > > > > convert shared->private, simply unmap that folio (only the shared parts
-> > > > > could possibly be mapped) from all user page tables.
-> > > > 
-> > > > IMHO it should be reasonable to make it work like ZONE_MOVABLE and
-> > > > FOLL_LONGTERM. Making a shared page private is really no different
-> > > > from moving it.
-> > > > 
-> > > > And if you have built a VMM that uses VMA mapped shared pages and
-> > > > short-term pinning then you should really also ensure that the VM is
-> > > > aware when the pins go away. For instance if you are doing some virtio
-> > > > thing with O_DIRECT pinning then the guest will know the pins are gone
-> > > > when it observes virtio completions.
-> > > > 
-> > > > In this way making private is just like moving, we unmap the page and
-> > > > then drive the refcount to zero, then move it.
-> > > Yes, but here is the catch: what if a single shared subpage of a large folio
-> > > is (validly) longterm pinned and you want to convert another shared subpage
-> > > to private?
-> > > 
-> > > Sure, we can unmap the whole large folio (including all shared parts) before
-> > > the conversion, just like we would do for migration. But we cannot detect
-> > > that nobody pinned that subpage that we want to convert to private.
-> > > 
-> > > Core-mm is not, and will not, track pins per subpage.
-> > > 
-> > > So I only see two options:
-> > > 
-> > > a) Disallow long-term pinning. That means, we can, with a bit of wait,
-> > >     always convert subpages shared->private after unmapping them and
-> > >     waiting for the short-term pin to go away. Not too bad, and we
-> > >     already have other mechanisms disallow long-term pinnings (especially
-> > >     writable fs ones!).
-> > 
-> > I don't think disallowing _just_ long-term GUP will suffice, if we go the "disallow
-> > GUP" route than I think it needs to disallow GUP, period.  Like the whole "GUP
-> > writes to file-back memory" issue[*], which I think you're alluding to, short-term
-> > GUP is also problematic.  But unlike file-backed memory, for TDX and SNP (and I
-> > think pKVM), a single rogue access has a high probability of being fatal to the
-> > entire system.
+On 3/9/24 02:09, Sean Christopherson wrote:
+> From: Yan Zhao <yan.y.zhao@intel.com>
 > 
-> Disallowing short-term should work, in theory, because the
+> Ensure a full memory barrier is emitted in the VM-Exit path, as a full
+> barrier is required on Intel CPUs to evict WC buffers.  This will allow
+> unconditionally honoring guest PAT on Intel CPUs that support self-snoop.
+> 
+> As srcu_read_lock() is always called in the VM-Exit path and it internally
+> has a smp_mb(), call smp_mb__after_srcu_read_lock() to avoid adding a
+> second fence and make sure smp_mb() is called without dependency on
+> implementation details of srcu_read_lock().
 
-By "short-term", I assume you mean "long-term"?  Or am I more lost than I realize?
+Do you really need mfence or is a locked operation enough?  mfence is 
+mb(), not smp_mb().
 
-> writes-to-fileback has different issues (the PIN is not the problem but the
-> dirtying).
->
-> It's more related us not allowing long-term pins for FSDAX pages, because
-> the lifetime of these pages is determined by the FS.
-> 
-> What we would do is
-> 
-> 1) Unmap the large folio completely and make any refaults block.
-> -> No new pins can pop up
-> 
-> 2) If the folio is pinned, busy-wait until all the short-term pins are
->    gone.
+Paolo
 
-This is the step that concerns me.   "Relatively short time" is, well, relative.
-Hmm, though I suppose if userspace managed to map a shared page into something
-that pins the page, and can't force an unpin, e.g. by stopping I/O?, then either
-there's a host userspace bug or a guest bug, and so effectively hanging the vCPU
-that is waiting for the conversion to complete is ok.
+> +	/*
+> +	 * Call this to ensure WC buffers in guest are evicted after each VM
+> +	 * Exit, so that the evicted WC writes can be snooped across all cpus
+> +	 */
+> +	smp_mb__after_srcu_read_lock();
 
-> 3) Safely convert the relevant subpage from shared -> private
-> 
-> Not saying it's the best approach, but it should be doable.
 
