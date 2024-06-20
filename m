@@ -1,276 +1,197 @@
-Return-Path: <kvm+bounces-20095-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20099-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923E49108BB
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:45:37 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A1599109AA
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 17:22:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49989285091
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 14:45:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC2AB1F2276B
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 15:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC5A81AE850;
-	Thu, 20 Jun 2024 14:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F5F41B0115;
+	Thu, 20 Jun 2024 15:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UM5CDvSQ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="olnsNHCr"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B161E497
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 14:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A810D1AF6B1
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 15:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718894717; cv=none; b=tC3CDGksrJYuvXzSSCz6itj3ShO2zHyB8wXHc1bWlZcmjHfVlWQ9/TbEbvu8F0hdJD+3Fb+wt4LULAOZbbhL1V/OSv/W/vtvcRmsURxxDknqlodLk28rSjkB48aenvmxBK/61XBMJ2o3xqMETFHh6GAz2DC5/zzCP96Q0VZw9QU=
+	t=1718896953; cv=none; b=X/7/vMtoP76W/txMID7nI1c58NaNSH9YsDHP/ANfi0wBRl0KSjmIE4qrB4cfMo781PnXPOMGzTqTQ1qTwFaJCVi6ZorHx5QwkvfRVy9uzuqv9ra4iDEPYxc0hNAB9Zfga5digm6UpYo2wpkAaMovSd1alJ3UIhoSg0Luvod83Fw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718894717; c=relaxed/simple;
-	bh=ALksFnrKrcGn12QSjQcEuQIf8P+ZdXhTU6QEsfAxmlc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=S6OznBX89j9soBo5fN9wHXwwH0mXPyL9BNZOUtKgYOxnwPcT6aYBHBflcY3BQ08gtIbPY72T6HHZsrgkqX4GMn1MjHZe99TW5RiGjeMSh3s2YGKwJQ/lJaJvN8Z27rF8zMe2TmdAyYfsFM/ZQkJ+2BKNT5hc/TjfGNcbeb5ckkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UM5CDvSQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718894714;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=CJbY92tZcmS6AFMXxjNinJra1MdkazuQMLItm3eS/94=;
-	b=UM5CDvSQ0+8HOFAayImkQSI2LX0tLcoouJa/u4FrK/v7RcdP/1isO/+YxvR8yCCk4kQlGz
-	G4SEoDiGAisen6N+DdiaYQ5nR6sZB48/9mt9nO1bZuqs75E8KpWzqBg3t+8vFxmLpdMpAx
-	xheMWnlUdVOsR+YR+x+3aiNEl15C6LQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-325-NhVdlxu5P92ytIBiEzfLyw-1; Thu, 20 Jun 2024 10:45:12 -0400
-X-MC-Unique: NhVdlxu5P92ytIBiEzfLyw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-421f43ddc2aso8197445e9.1
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 07:45:12 -0700 (PDT)
+	s=arc-20240116; t=1718896953; c=relaxed/simple;
+	bh=VEQ56xyItML+3tsJHWOD0QpeSFTmo5CLhf/r/phMT0o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=FHuv2I7rr1kVv08Tu/hBHwipF3K5dyIB5GsV2oI+NnoGYoJZA8MgAh6aYC1G+OYn23IlMro0+63DMmi9LXQYX28gZ+ELPa2ukeJCRzoUwa8Bta3ZjeVgmS6mwkqW8LKMK1APTaPv5ypmo588xk+C7n1VCIRbs8LRXbPwcMmr35I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=olnsNHCr; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52bc29c79fdso1122489e87.1
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 08:22:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1718896949; x=1719501749; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=GwfYtHiFW+MpVchR1W1uIXCNJBxRS/LzmnaKh+rSEqQ=;
+        b=olnsNHCrJk+cu5bDfPSuLI37jeXenra2xeWkcUT3xG6agjrCSFqRbTO6p6T5zxJRao
+         n/lXeMuOibzkMu4N8iciGRVSkf/21qjTBIEcNADKdnGqp0HehbSPtLaQte4RwQ0hx+PY
+         8OgzDKBPK/+C/cEiK+GOnBrZ6fAhqiMMrmxCPGg9CJyy2tLSamBfTirB5lPjp69Lc6W7
+         a84aCQLJnKTs1YGGSItcAg6JeEun+amkc0azH6sEAf5xMIQ8MXiSVkrzUDLy3uJbuo9a
+         n/iZxJ/7zzwp9x8xPWyBVKHtidE/nOqkQ7HJs5bbnkl479aQy7j0ketzl0buOc+ybXss
+         QxvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718894711; x=1719499511;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=CJbY92tZcmS6AFMXxjNinJra1MdkazuQMLItm3eS/94=;
-        b=DlD3rjWT+r/IS7tiBkkY7FJKzhbbjRYRtgYWa4BKvg3AXFb8FOKbMuxJ82rj+mCEk/
-         HnUYR6NuCfZFxcjLOzaT1UdZ9siDNRBN5AfjhcjFBDbcyedDNL0DlwHygsWfawAMsdhp
-         C4w6ay47BSoeMY6Q/OXVN5FHTm7VZdk4CoDDhI6ptt7dyCxy77hhD2cNn5El5rrkgT/2
-         PefVIVC3myqSdeydeIuMgcicCaVW+6OMKIP6Eggg0/E7rqjmNM+qc3/sHAOupVu6sMU3
-         MkXq7SbNfpyOTX4it9kC+Y8ZS2J2LRDbaXML3ikUuoLgcvGwmfPqQRh6tsdKgzfJ644m
-         8svg==
-X-Forwarded-Encrypted: i=1; AJvYcCXc18AyE/4MvsmLDwiFe04GfsSx5OLqqt5XoshBLSxQVI795FF3OcUKPHJPvHr9pb+g0+gUIImWPsWWLNsKPcWXZlHd
-X-Gm-Message-State: AOJu0YzvKBfuPcsSZ3LWdBl9HKBoDomO4+0OvPl9G+TPzA9RUCPk4ZvN
-	CcMDjh5uW10vDisukkq5Ksria61uOfXg3hWZMFsasq2aL7TTwck0vk8wg7l3/Z13Th6k72tHtqB
-	ab9uJj/61JN6QInJl9gwTAkmi9/KtxqlOhbTOud1Pb2XVGVV6ug==
-X-Received: by 2002:a05:600c:68c5:b0:422:6765:271c with SMTP id 5b1f17b1804b1-4247517e003mr43369795e9.20.1718894711488;
-        Thu, 20 Jun 2024 07:45:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEKuCXPZ7Phm93DcTUNnHXYK16JnGZOeEfUrlDl01RVTYUaUYKRZaRjwAw2Hbkju/eEkt47hg==
-X-Received: by 2002:a05:600c:68c5:b0:422:6765:271c with SMTP id 5b1f17b1804b1-4247517e003mr43369545e9.20.1718894710957;
-        Thu, 20 Jun 2024 07:45:10 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c719:5b00:61af:900f:3aef:3af3? (p200300cbc7195b0061af900f3aef3af3.dip0.t-ipconnect.de. [2003:cb:c719:5b00:61af:900f:3aef:3af3])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3621a4a17e6sm7025688f8f.19.2024.06.20.07.45.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 20 Jun 2024 07:45:10 -0700 (PDT)
-Message-ID: <385a5692-ffc8-455e-b371-0449b828b637@redhat.com>
-Date: Thu, 20 Jun 2024 16:45:08 +0200
+        d=1e100.net; s=20230601; t=1718896949; x=1719501749;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GwfYtHiFW+MpVchR1W1uIXCNJBxRS/LzmnaKh+rSEqQ=;
+        b=DK57i1hevc0y3ifCUcRNiv9GWZJqC2DMWyFwjtLH6N5QVlyU6G32Fj3u7gm/28VFVz
+         wKCeUeETGrbmuRvfSbDawREKiEdIP8qqYzxxyTiy14qBmgdMEQVd81RPT8Ye+EZdlDD/
+         v7xWK1K/PqGrRdwEhC5Lrqz081AL6+AW2qnRleP4fDNr8EqyQtls8FBySd9NMShdwc5c
+         tmi3dt03dX9m+AtUBX9h9GkGrPOACAkMktS8v2nkNdEPcsoIL0hnk/RiCocC2e6x0bqT
+         GIhlkz4mgHibGB9zsIhnzyxd9U3g6gahUL8nX5nydwptwlnhIjGkoRet7eWMxh3c0Nqm
+         jSXg==
+X-Forwarded-Encrypted: i=1; AJvYcCXterjvlbERiwBfETxgi0RFWUmUNx05yVge/FXr6fE20uw3bJWjChtXMygxid6l7oEAPuocotz92NRXAtfmJBrQZ2qL
+X-Gm-Message-State: AOJu0YzrE+oZQWO6TeiMv/wt+l4Ub33lz1ZG5Trfsm0rOXG+Ja0pddFN
+	2trCYOW8nTqFgNtlpPu1gt7ZwibvfUeUCYG0Qy4in9KBQUl1YVIAMTSL7r2oPHU=
+X-Google-Smtp-Source: AGHT+IHZreEf/CgFmxklps2fJVXNdKgoEAsSXSn/BfkNWtTHxKRx0rK3p7tmSxgo5+bmw/ROdFHpnQ==
+X-Received: by 2002:a05:6512:3123:b0:52b:bdbd:2c54 with SMTP id 2adb3069b0e04-52ccaa369acmr4081172e87.34.1718896946911;
+        Thu, 20 Jun 2024 08:22:26 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6f600cde92sm708227466b.205.2024.06.20.08.22.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 08:22:22 -0700 (PDT)
+Received: from draig.lan (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id F14C35F7B1;
+	Thu, 20 Jun 2024 16:22:20 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	kvm@vger.kernel.org,
+	qemu-ppc@nongnu.org,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jamie Iles <quic_jiles@quicinc.com>,
+	David Hildenbrand <david@redhat.com>,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	Mark Burton <mburton@qti.qualcomm.com>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	qemu-arm@nongnu.org,
+	Laurent Vivier <lvivier@redhat.com>,
+	Alexander Graf <agraf@csgraf.de>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Marco Liebel <mliebel@qti.qualcomm.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Thomas Huth <thuth@redhat.com>,
+	qemu-s390x@nongnu.org,
+	Cameron Esfahani <dirty@apple.com>,
+	Alexandre Iooss <erdnaxe@crans.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	"Dr. David Alan Gilbert" <dave@treblig.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Mahmoud Mandour <ma.mandourr@gmail.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH v2 00/12] maintainer updates pre-PR (gdbstub, plugins, time control)
+Date: Thu, 20 Jun 2024 16:22:08 +0100
+Message-Id: <20240620152220.2192768-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Fuad Tabba <tabba@google.com>, Christoph Hellwig <hch@infradead.org>,
- John Hubbard <jhubbard@nvidia.com>, Elliot Berman
- <quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>,
- Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- maz@kernel.org, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, pbonzini@redhat.com
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
- <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
- <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
- <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com>
- <20240619115135.GE2494510@nvidia.com> <ZnOsAEV3GycCcqSX@infradead.org>
- <CA+EHjTxaCxibvGOMPk9Oj5TfQV3J3ZLwXk83oVHuwf8H0Q47sA@mail.gmail.com>
- <20240620135540.GG2494510@nvidia.com>
- <6d7b180a-9f80-43a4-a4cc-fd79a45d7571@redhat.com>
- <20240620142956.GI2494510@nvidia.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240620142956.GI2494510@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 
-On 20.06.24 16:29, Jason Gunthorpe wrote:
-> On Thu, Jun 20, 2024 at 04:01:08PM +0200, David Hildenbrand wrote:
->> On 20.06.24 15:55, Jason Gunthorpe wrote:
->>> On Thu, Jun 20, 2024 at 09:32:11AM +0100, Fuad Tabba wrote:
->>>> Hi,
->>>>
->>>> On Thu, Jun 20, 2024 at 5:11 AM Christoph Hellwig <hch@infradead.org> wrote:
->>>>>
->>>>> On Wed, Jun 19, 2024 at 08:51:35AM -0300, Jason Gunthorpe wrote:
->>>>>> If you can't agree with the guest_memfd people on how to get there
->>>>>> then maybe you need a guest_memfd2 for this slightly different special
->>>>>> stuff instead of intruding on the core mm so much. (though that would
->>>>>> be sad)
->>>>>
->>>>> Or we're just not going to support it at all.  It's not like supporting
->>>>> this weird usage model is a must-have for Linux to start with.
->>>>
->>>> Sorry, but could you please clarify to me what usage model you're
->>>> referring to exactly, and why you think it's weird? It's just that we
->>>> have covered a few things in this thread, and to me it's not clear if
->>>> you're referring to protected VMs sharing memory, or being able to
->>>> (conditionally) map a VM's memory that's backed by guest_memfd(), or
->>>> if it's the Exclusive pin.
->>>
->>> Personally I think mapping memory under guest_memfd is pretty weird.
->>>
->>> I don't really understand why you end up with something different than
->>> normal CC. Normal CC has memory that the VMM can access and memory it
->>> cannot access. guest_memory is supposed to hold the memory the VMM cannot
->>> reach, right?
->>>
->>> So how does normal CC handle memory switching between private and
->>> shared and why doesn't that work for pKVM? I think the normal CC path
->>> effectively discards the memory content on these switches and is
->>> slow. Are you trying to make the switch content preserving and faster?
->>>
->>> If yes, why? What is wrong with the normal CC model of slow and
->>> non-preserving shared memory?
->>
->> I'll leave the !huge page part to Fuad.
->>
->> Regarding huge pages: assume the huge page (e.g., 1 GiB hugetlb) is shared,
->> now the VM requests to make one subpage private.
-> 
-> I think the general CC model has the shared/private setup earlier on
-> the VM lifecycle with large runs of contiguous pages. It would only
-> become a problem if you intend to to high rate fine granual
-> shared/private switching. Which is why I am asking what the actual
-> "why" is here.
+Hi,
 
-I am not an expert on that, but I remember that the way memory 
-shared<->private conversion happens can heavily depend on the VM use 
-case, and that under pKVM we might see more frequent conversion, without 
-even going to user space.
+This is the current state of my maintainer trees. The gdbstub patches
+are just minor clean-ups. The main feature this brings in is the
+ability for plugins to control time. This has been discussed before
+but represents the first time plugins can "control" the execution of
+the core. The idea would be to eventually deprecate the icount auto
+modes in favour of a plugin and just use icount for deterministic
+execution and record/replay.
 
-> 
->> How to handle that without eventually running into a double
->> memory-allocation? (in the worst case, allocating a 1GiB huge page
->> for shared and for private memory).
-> 
-> I expect you'd take the linear range of 1G of PFNs and fragment it
-> into three ranges private/shared/private that span the same 1G.
-> 
-> When you construct a page table (ie a S2) that holds these three
-> ranges and has permission to access all the memory you want the page
-> table to automatically join them back together into 1GB entry.
-> 
-> When you construct a page table that has only access to the shared,
-> then you'd only install the shared hole at its natural best size.
-> 
-> So, I think there are two challenges - how to build an allocator and
-> uAPI to manage this sort of stuff so you can keep track of any
-> fractured pfns and ensure things remain in physical order.
-> 
-> Then how to re-consolidate this for the KVM side of the world.
+v2
+  - merged in Pierrick's fixes
+  - added migration blocker
+  - added Max's plugin tweak
 
-Exactly!
+I'll send the PR on Monday if nothing comes up. The following still need review:
 
-> 
-> guest_memfd, or something like it, is just really a good answer. You
-> have it obtain the huge folio, and keep track on its own which sub
-> pages can be mapped to a VMA because they are shared. KVM will obtain
-> the PFNs directly from the fd and KVM will not see the shared
-> holes. This means your S2's can be trivially constructed correctly.
-> 
-> No need to double allocate..
+  plugins: add migration blocker
 
-Yes, that's why my thinking so far was:
+Alex.
 
-Let guest_memfd (or something like that) consume huge pages (somehow, 
-let it access the hugetlb reserves). Preallocate that memory once, as 
-the VM starts up: just like we do with hugetlb in VMs.
+Akihiko Odaki (1):
+  plugins: Ensure register handles are not NULL
 
-Let KVM track which parts are shared/private, and if required, let it 
-map only the shared parts to user space. KVM has all information to make 
-these decisions.
+Alex Bennée (7):
+  include/exec: add missing include guard comment
+  gdbstub: move enums into separate header
+  sysemu: add set_virtual_time to accel ops
+  qtest: use cpu interface in qtest_clock_warp
+  sysemu: generalise qtest_warp_clock as qemu_clock_advance_virtual_time
+  plugins: add time control API
+  plugins: add migration blocker
 
-If we could disallow pinning any shared pages, that would make life a 
-lot easier, but I think there were reasons for why we might require it. 
-To convert shared->private, simply unmap that folio (only the shared 
-parts could possibly be mapped) from all user page tables.
+Max Chou (1):
+  accel/tcg: Avoid unnecessary call overhead from
+    qemu_plugin_vcpu_mem_cb
 
-Of course, there might be alternatives, and I'll be happy to learn about 
-them. The allcoator part would be fairly easy, and the uAPI part would 
-similarly be comparably easy. So far the theory :)
+Pierrick Bouvier (3):
+  qtest: move qtest_{get, set}_virtual_clock to accel/qtest/qtest.c
+  contrib/plugins: add Instructions Per Second (IPS) example for cost
+    modeling
+  plugins: fix inject_mem_cb rw masking
 
-> 
-> I'm kind of surprised the CC folks don't want the same thing for
-> exactly the same reason. It is much easier to recover the huge
-> mappings for the S2 in the presence of shared holes if you track it
-> this way. Even CC will have this problem, to some degree, too.
-
-Precisely! RH (and therefore, me) is primarily interested in existing 
-guest_memfd users at this point ("CC"), and I don't see an easy way to 
-get that running with huge pages in the existing model reasonably well ...
+ include/exec/gdbstub.h                        |  11 +-
+ include/gdbstub/enums.h                       |  21 +++
+ include/qemu/qemu-plugin.h                    |  27 +++
+ include/qemu/timer.h                          |  15 ++
+ include/sysemu/accel-ops.h                    |  18 +-
+ include/sysemu/cpu-timers.h                   |   3 +-
+ include/sysemu/qtest.h                        |   2 -
+ accel/hvf/hvf-accel-ops.c                     |   2 +-
+ accel/kvm/kvm-all.c                           |   2 +-
+ accel/qtest/qtest.c                           |  13 ++
+ accel/tcg/plugin-gen.c                        |   4 +-
+ accel/tcg/tcg-accel-ops.c                     |   2 +-
+ contrib/plugins/ips.c                         | 164 ++++++++++++++++++
+ gdbstub/user.c                                |   1 +
+ monitor/hmp-cmds.c                            |   3 +-
+ plugins/api.c                                 |  47 ++++-
+ plugins/core.c                                |   4 +-
+ ...t-virtual-clock.c => cpus-virtual-clock.c} |   5 +
+ system/cpus.c                                 |  11 ++
+ system/qtest.c                                |  37 +---
+ system/vl.c                                   |   1 +
+ target/arm/hvf/hvf.c                          |   2 +-
+ target/arm/hyp_gdbstub.c                      |   2 +-
+ target/arm/kvm.c                              |   2 +-
+ target/i386/kvm/kvm.c                         |   2 +-
+ target/ppc/kvm.c                              |   2 +-
+ target/s390x/kvm/kvm.c                        |   2 +-
+ util/qemu-timer.c                             |  26 +++
+ accel/tcg/ldst_common.c.inc                   |   8 +-
+ contrib/plugins/Makefile                      |   1 +
+ plugins/qemu-plugins.symbols                  |   2 +
+ stubs/meson.build                             |   2 +-
+ 32 files changed, 377 insertions(+), 67 deletions(-)
+ create mode 100644 include/gdbstub/enums.h
+ create mode 100644 contrib/plugins/ips.c
+ rename stubs/{cpus-get-virtual-clock.c => cpus-virtual-clock.c} (68%)
 
 -- 
-Cheers,
-
-David / dhildenb
+2.39.2
 
 
