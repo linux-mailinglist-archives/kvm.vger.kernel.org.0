@@ -1,210 +1,252 @@
-Return-Path: <kvm+bounces-20117-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20118-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89F86910BC7
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:17:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37ADB910D21
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 18:36:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD32F1C23FE9
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:17:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1F0F2810B5
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 16:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E0C1B29B1;
-	Thu, 20 Jun 2024 16:16:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA171B3731;
+	Thu, 20 Jun 2024 16:33:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cWt8BUm8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aKBNCDef"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA39D19EEBC
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 16:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F381B29BC
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 16:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718900206; cv=none; b=T1I83oLxLWRaIC/PaaAWPZn4YNjWwgkmcvevu63lucT4cS3y3fsWGvPX7iLz0IlRVlcqkMplUoiAC36ISr1I6Sc52pYekk5cRnFa+p5JWp9gRWt3tPpiv0hhsEhX38g8sZWtZUmd4ROftay41n6VtbTlyuBxy8th0Z6dm1Lmg90=
+	t=1718901201; cv=none; b=TXIVECVc5Y95YNucHH0PvwCc3PfwE1Sl70bwbINZTV5LW11VeTOqgQY0aeurIsdiIHnZhUA8AUK5qPvJ7Q51VQAVhLNTL3Ihrx7Hz7rZij7ymK0RbbX7XDkXkYy0NKMmVGm5qb/kcPO7YMeyPQ+fjQt5IM7XyZ4CpJdczKA4++c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718900206; c=relaxed/simple;
-	bh=3F25YNJFqKhy4bYsXBenLOYPz74lQQHcEZxBGefIBRw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=k4BL716U0JaDJpf8yKaPpaK2on7rlRvFqECcgqdFXlRlkUe7+wQDFXvOzxLWnlTHcsVikN+QF01IPi9tsv7rZxEpCQsAmjdTw252E7f+0fiMEQbR26Gqde5fe3h8clLGJfHfW/oyG7SlmlMDzTnJ8LLq/mBRyl1d8cffwZmtu7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cWt8BUm8; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1718901201; c=relaxed/simple;
+	bh=UxbdEJzEfTFGGdJutifmUiiqZYkHXI3z/2GfVjcxnU0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mL+IYlccqFziEWVNSMI58IKrhHlXPmjpB4P00txNB2dJO3nZNy1Ji+0uUARSe3WpC8bYEx1SXQlHdlBUTGlGDOQd9m+uLRAItuF/VYWNHs/hxJD2sHGJbDUuhBHg7uc+BpaQOgVhAun1dhAHTvDsBLADWqm8DauHBlCVfBENqKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aKBNCDef; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dfa73db88dcso1891585276.0
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 09:16:43 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-422954bbe29so147515e9.1
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 09:33:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718900202; x=1719505002; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BCZKNDHzfJBJVhIBZvZUEBrTAzEooayjC9bbFQcCP8A=;
-        b=cWt8BUm8x6qqhvFOl+nu0cuN47U+5GFlCU2pacqruvMtmRDjfiRJqfr7ehGWjOssoK
-         qhlmF1sqrS3X1PxYfxLMKH5v/UiZNvausVy+uNhJ/1PYjgHYz3vei/uVQ+eFMLsJVRvZ
-         PNOMz7Q/MoDiGqH6zsrI4NFZAskNHq8Ock2j4OwUTnhmRGKLQnXXczlXPJLUw1fXybWN
-         iyQhjK3vv7Hg6WdOWUtesXmMUe31lf4N+b9uKAYMNUoXaNzIf4JGBXa/dg/hLVlyfArr
-         zoVbFTuXHB3AH4djunUeKtEoaL8sOPdu+5zd4AncyNCWtFDaI7++Oz9yBv1qnsYwv3gI
-         JmFQ==
+        d=google.com; s=20230601; t=1718901198; x=1719505998; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4B53UjI6PoAGWaCsloRkiHZtuTpGHM2ZWrCUhiNKWNY=;
+        b=aKBNCDefQ8eWTyPfXJ9RtovKFKfxPq8D8X4PC1xQ3oQe3+eZTogbm4dH8debKbJiR7
+         X04ZlMc4OFNOvjKqqu4ElN/5/dspZOY1gICTkF/Ugizm4KoQADbw6w0S65PSPEjZoenY
+         CZks5w7KxyTKhPMzue6BQuDPLUI0idYbmFi5fgzYIwiTrz9hFxVOENEAGO/+AJMv+vqa
+         6gPJgNXiw1ZeY25o9d/p4w9xb7rvF1JJwP55WmkcSw5h6THtWMS7KbCfxMQ8bXmOepZr
+         WGVKZ7RKEi3pi0I2oPVLCMh6H+P54JJp7sO8FH6oapLtmOzTm3PYMr3N4SpmTKbp/kgq
+         +2fQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718900202; x=1719505002;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BCZKNDHzfJBJVhIBZvZUEBrTAzEooayjC9bbFQcCP8A=;
-        b=g4+yJ7PXL/0GwtIV8J6iuBeC1jBOrM7yroxyOIoMtZ82Ngcly08YN7+fDVREGNz4JS
-         R0Ego2nOMj/Sq8gvlOfMASHfneVd3lMptNGZqicFcaJiB9Dzo0hYFvOX5hu71+IBYjTG
-         XZUnyKRQl1XCDfft319231SzxP6DBA919R1ph+O8+oHaOse3/KYzQUtuyGdf6RJr9+mu
-         VNAidjJjyUTgM5wPxshSrKofC06RcbY/llGLpkUDtVild0iHwjlUHmZA7vG0vzJgaQ7z
-         Xr8tC/cYfPtcgn18Ca9WbIqnmUWz2HD30+WwhVbfvjLlYGL8/28iwJ/e/uITHoBLCzz8
-         /k0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVZOw9qFP71RpDL0cpYDd/+Kqi0vAg4FzDlP9Sagl+5gQc8s0EzEPDK9KoeYWc0qn1y+L+4Yl1YQ7HMwOXGwZWAHjvm
-X-Gm-Message-State: AOJu0YxDSaur8szZtJ7VsW/YnTx84rle7kqce/jXLDpKY66enHlsPs4L
-	VGLKeogrOfb8dcpd4AMSoZEyLtX7uko7G+imIWY8ZkdcIic1iPlYfLXNzc3rGjNTDE/tcn3Grti
-	L4A==
-X-Google-Smtp-Source: AGHT+IHAW5Cu6uLeC2DeFrvw8mg2Wa8Sr6zlHDRn6IX74FBYp/Cbjsm3VmzOc1NPaMgFbVqucolfGz2nfUI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:ab33:0:b0:df4:d6ca:fed0 with SMTP id
- 3f1490d57ef6-e02be133adfmr219127276.4.1718900202676; Thu, 20 Jun 2024
- 09:16:42 -0700 (PDT)
-Date: Thu, 20 Jun 2024 09:16:41 -0700
-In-Reply-To: <20240619182128.4131355-2-dapeng1.mi@linux.intel.com>
+        d=1e100.net; s=20230601; t=1718901198; x=1719505998;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4B53UjI6PoAGWaCsloRkiHZtuTpGHM2ZWrCUhiNKWNY=;
+        b=D3m96UeLd3NJIhNt6IgiPSVqiF0kdU87xYw+yoI+l7jikbcsg9wREQRtbBzaKrlTfF
+         qlP9OL4hkp3dFRC7UcuIhosUnkG1HFlsSqlQZSU15ywaZcSOzQaYDp5qjksx2k03amdp
+         K6w9roXE4LND6yx1YXwW4iGB9V4gVcFvHFmigWc35GjJRB/qtpKStFyn6uIYG11Y25QB
+         /ZmqCpGVC7wKyXgRuiu9W7be5STnHmjzB5g5UGs/uH+vF/u5dAVPWVdXOy1NY/FCUOrl
+         dgqmieGPTj4PYlhi8a6plndJJzjvx8OSK5lPw8yxtdmqE4O77/FACS+DtE6c15qCLPb/
+         /CQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXOcI8NF4sy1fNOiOJ8Az/MwM1fk4i/hf+0VON7RgrCjU7GJNlqbT1s04IFlJksQqkI+uceYmiJijFMXT2WeCEqIntD
+X-Gm-Message-State: AOJu0Yym4cw51/Vm/axeEdmtnAnZjrCm9XU/cyEy6ZBL0rgU8oSinlC3
+	WzquFmdG/8xo5PaTHPTvoFCaa6f2Suh4fAd+3pMtgQnrgaq7A78c/RTWqSxgKQ==
+X-Google-Smtp-Source: AGHT+IEz2SgAboLf42+BQNW/d36kQQhVc7F1UusAvGsQvMHx+tzIbLyscYR5TmIlxga6H6/BKgdcwQ==
+X-Received: by 2002:a05:600c:34d6:b0:424:7ac9:4d9a with SMTP id 5b1f17b1804b1-4247ac95619mr2095555e9.1.1718901197463;
+        Thu, 20 Jun 2024 09:33:17 -0700 (PDT)
+Received: from google.com (205.215.190.35.bc.googleusercontent.com. [35.190.215.205])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4247d0c9e27sm30767025e9.23.2024.06.20.09.33.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 Jun 2024 09:33:16 -0700 (PDT)
+Date: Thu, 20 Jun 2024 16:33:12 +0000
+From: Mostafa Saleh <smostafa@google.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: John Hubbard <jhubbard@nvidia.com>,
+	Elliot Berman <quic_eberman@quicinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+	maz@kernel.org, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, pbonzini@redhat.com,
+	Fuad Tabba <tabba@google.com>, Jason Gunthorpe <jgg@nvidia.com>
+Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
+Message-ID: <ZnRZyBy_uxtjQHsz@google.com>
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
+ <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
+ <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
+ <ZnQpslcah7dcSS8z@google.com>
+ <1ab73f42-9397-4fc7-8e62-2627b945f729@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240619182128.4131355-1-dapeng1.mi@linux.intel.com> <20240619182128.4131355-2-dapeng1.mi@linux.intel.com>
-Message-ID: <ZnRV6XrKkVwZB2TN@google.com>
-Subject: Re: [PATCH 1/2] KVM: x86/pmu: Define KVM_PMC_MAX_GENERIC for platform independence
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Xiong Zhang <xiong.y.zhang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
-	Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>, 
-	Dapeng Mi <dapeng1.mi@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1ab73f42-9397-4fc7-8e62-2627b945f729@redhat.com>
 
-On Thu, Jun 20, 2024, Dapeng Mi wrote:
-> The existing macro, KVM_INTEL_PMC_MAX_GENERIC, ambiguously represents the
-> maximum supported General Purpose (GP) counter number for both Intel and
-> AMD platforms. This could lead to issues if AMD begins to support more GP
-> counters than Intel.
+Hi David,
+
+On Thu, Jun 20, 2024 at 04:14:23PM +0200, David Hildenbrand wrote:
+> On 20.06.24 15:08, Mostafa Saleh wrote:
+> > Hi David,
+> > 
+> > On Wed, Jun 19, 2024 at 09:37:58AM +0200, David Hildenbrand wrote:
+> > > Hi,
+> > > 
+> > > On 19.06.24 04:44, John Hubbard wrote:
+> > > > On 6/18/24 5:05 PM, Elliot Berman wrote:
+> > > > > In arm64 pKVM and QuIC's Gunyah protected VM model, we want to support
+> > > > > grabbing shmem user pages instead of using KVM's guestmemfd. These
+> > > > > hypervisors provide a different isolation model than the CoCo
+> > > > > implementations from x86. KVM's guest_memfd is focused on providing
+> > > > > memory that is more isolated than AVF requires. Some specific examples
+> > > > > include ability to pre-load data onto guest-private pages, dynamically
+> > > > > sharing/isolating guest pages without copy, and (future) migrating
+> > > > > guest-private pages.  In sum of those differences after a discussion in
+> > > > > [1] and at PUCK, we want to try to stick with existing shmem and extend
+> > > > > GUP to support the isolation needs for arm64 pKVM and Gunyah.
+> > > 
+> > > The main question really is, into which direction we want and can develop
+> > > guest_memfd. At this point (after talking to Jason at LSF/MM), I wonder if
+> > > guest_memfd should be our new target for guest memory, both shared and
+> > > private. There are a bunch of issues to be sorted out though ...
+> > > 
+> > > As there is interest from Red Hat into supporting hugetlb-style huge pages
+> > > in confidential VMs for real-time workloads, and wasting memory is not
+> > > really desired, I'm going to think some more about some of the challenges
+> > > (shared+private in guest_memfd, mmap support, migration of !shared folios,
+> > > hugetlb-like support, in-place shared<->private conversion, interaction with
+> > > page pinning). Tricky.
+> > > 
+> > > Ideally, we'd have one way to back guest memory for confidential VMs in the
+> > > future.
+> > > 
+> > > 
+> > > Can you comment on the bigger design goal here? In particular:
+> > > 
+> > > 1) Who would get the exclusive PIN and for which reason? When would we
+> > >     pin, when would we unpin?
+> > > 
+> > > 2) What would happen if there is already another PIN? Can we deal with
+> > >     speculative short-term PINs from GUP-fast that could introduce
+> > >     errors?
+> > > 
+> > > 3) How can we be sure we don't need other long-term pins (IOMMUs?) in
+> > >     the future?
+> > 
+> > Can you please clarify more about the IOMMU case?
+> > 
+> > pKVM has no merged upstream IOMMU support at the moment, although
+> > there was an RFC a while a go [1], also there would be a v2 soon.
+> > 
+> > In the patches KVM (running in EL2) will manage the IOMMUs including
+> > the page tables and all pages used in that are allocated from the
+> > kernel.
+> > 
+> > These patches don't support IOMMUs for guests. However, I don't see
+> > why would that be different from the CPU? as once the page is pinned
+> > it can be owned by a guest and that would be reflected in the
+> > hypervisor tracking, the CPU stage-2 and IOMMU page tables as well.
 > 
-> To resolve this, a new platform-independent macro, KVM_PMC_MAX_GENERIC,
-> is introduced to represent the maximum GP counter number across all x86
-> platforms.
+> So this is my thinking, it might be flawed:
 > 
-> No logic changes are introduced in this patch.
+> In the "normal" world (e.g., vfio), we FOLL_PIN|FOLL_LONGTERM the pages to
+> be accessible by a dedicated device. We look them up in the page tables to
+> pin them, then we can map them into the IOMMU.
 > 
-> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
-> ---
->  arch/x86/include/asm/kvm_host.h | 9 +++++----
->  arch/x86/kvm/svm/pmu.c          | 2 +-
->  arch/x86/kvm/vmx/pmu_intel.c    | 2 ++
->  3 files changed, 8 insertions(+), 5 deletions(-)
+> Devices that cannot speak "private memory" should only access shared memory.
+> So we must not have "private memory" mapped into their IOMMU.
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 57440bda4dc4..18137be6504a 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -534,11 +534,12 @@ struct kvm_pmc {
->  
->  /* More counters may conflict with other existing Architectural MSRs */
->  #define KVM_INTEL_PMC_MAX_GENERIC	8
-> -#define MSR_ARCH_PERFMON_PERFCTR_MAX	(MSR_ARCH_PERFMON_PERFCTR0 + KVM_INTEL_PMC_MAX_GENERIC - 1)
-> -#define MSR_ARCH_PERFMON_EVENTSEL_MAX	(MSR_ARCH_PERFMON_EVENTSEL0 + KVM_INTEL_PMC_MAX_GENERIC - 1)
-> +#define KVM_AMD_PMC_MAX_GENERIC	6
-> +#define KVM_PMC_MAX_GENERIC		KVM_INTEL_PMC_MAX_GENERIC
+> Devices that can speak "private memory" may either access shared or private
+> memory. So we may have"private memory" mapped into their IOMMU.
+> 
 
-Since we're changing the macro, maybe take the opportunity to use a better name?
-E.g. KVM_MAX_NR_GP_COUNTERS?  And then in a follow-up patch, give fixed counters
-the same treatment, e.g. KVM_MAX_NR_FIXED_COUNTERS.  Or maybe KVM_MAX_NR_GP_PMCS
-and KVM_MAX_NR_FIXED_PMCS?
+Private pages must not be accessible to devices owned by the
+host, and for that we have the same rules as the CPU:
+A) The hypervisor doesn’t trust the host, and must enforce that using the CPU
+   stage-2 MMU.
+B) It’s preferable that userspace doesn’t, and hence these patches (or guest_memfd...)
 
-> +#define MSR_ARCH_PERFMON_PERFCTR_MAX	(MSR_ARCH_PERFMON_PERFCTR0 + KVM_PMC_MAX_GENERIC - 1)
-> +#define MSR_ARCH_PERFMON_EVENTSEL_MAX	(MSR_ARCH_PERFMON_EVENTSEL0 + KVM_PMC_MAX_GENERIC - 1)
+We need the same rules for DMA, otherwise it is "simple" to instrument a DMA attack,
+so we need a protection by the IOMMU. pKVM at the moment provides 2 ways of
+establishing that (each has their own trade-off which are not relevant here):
 
-And I'm very, very tempted to say we should simply delete these two, along with
-MSR_ARCH_PERFMON_FIXED_CTR_MAX, and just open code the "end" MSR in the one user.
-Especially since "KVM" doesn't appear anyone in the name, i.e. because the names
-misrepresent KVM's semi-arbitrary max as the *architectural* max.
+1) pKVM manages the IOMMUs and provides a hypercall interface to map/unmap in
+   the IOMMU, looking at the rules
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 6ad19d913d31..547dfe40d017 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -7432,17 +7432,20 @@ static void kvm_probe_msr_to_save(u32 msr_index)
-                     intel_pt_validate_hw_cap(PT_CAP_num_address_ranges) * 2))
-                        return;
-                break;
--       case MSR_ARCH_PERFMON_PERFCTR0 ... MSR_ARCH_PERFMON_PERFCTR_MAX:
-+       case MSR_ARCH_PERFMON_PERFCTR0 ...
-+            MSR_ARCH_PERFMON_PERFCTR0 + KVM_MAX_NR_GP_COUNTERS - 1:
-                if (msr_index - MSR_ARCH_PERFMON_PERFCTR0 >=
-                    kvm_pmu_cap.num_counters_gp)
-                        return;
-                break;
--       case MSR_ARCH_PERFMON_EVENTSEL0 ... MSR_ARCH_PERFMON_EVENTSEL_MAX:
-+       case MSR_ARCH_PERFMON_EVENTSEL0 ...
-+            MSR_ARCH_PERFMON_EVENTSEL0 + KVM_MAX_NR_GP_COUNTERS - 1:
-                if (msr_index - MSR_ARCH_PERFMON_EVENTSEL0 >=
-                    kvm_pmu_cap.num_counters_gp)
-                        return;
-                break;
--       case MSR_ARCH_PERFMON_FIXED_CTR0 ... MSR_ARCH_PERFMON_FIXED_CTR_MAX:
-+       case MSR_ARCH_PERFMON_FIXED_CTR0 ...
-+            MSR_ARCH_PERFMON_FIXED_CTR0 + KVM_MAR_NR_FIXED_COUNTERS - 1:
-                if (msr_index - MSR_ARCH_PERFMON_FIXED_CTR0 >=
-                    kvm_pmu_cap.num_counters_fixed)
-                        return;
+   For A), pKVM has its own per-page metadata which tracks page state, which can
+   prevent mapping private pages in the IOMMU and transitioning pages to private
+   if they are mapped in the IOMMU.
 
->  #define KVM_PMC_MAX_FIXED	3
->  #define MSR_ARCH_PERFMON_FIXED_CTR_MAX	(MSR_ARCH_PERFMON_FIXED_CTR0 + KVM_PMC_MAX_FIXED - 1)
-> -#define KVM_AMD_PMC_MAX_GENERIC	6
->  
->  struct kvm_pmu {
->  	u8 version;
-> @@ -554,7 +555,7 @@ struct kvm_pmu {
->  	u64 global_status_rsvd;
->  	u64 reserved_bits;
->  	u64 raw_event_mask;
-> -	struct kvm_pmc gp_counters[KVM_INTEL_PMC_MAX_GENERIC];
-> +	struct kvm_pmc gp_counters[KVM_PMC_MAX_GENERIC];
->  	struct kvm_pmc fixed_counters[KVM_PMC_MAX_FIXED];
->  
->  	/*
-> diff --git a/arch/x86/kvm/svm/pmu.c b/arch/x86/kvm/svm/pmu.c
-> index 6e908bdc3310..2fca247798eb 100644
-> --- a/arch/x86/kvm/svm/pmu.c
-> +++ b/arch/x86/kvm/svm/pmu.c
-> @@ -218,7 +218,7 @@ static void amd_pmu_init(struct kvm_vcpu *vcpu)
->  	int i;
->  
->  	BUILD_BUG_ON(KVM_AMD_PMC_MAX_GENERIC > AMD64_NUM_COUNTERS_CORE);
-> -	BUILD_BUG_ON(KVM_AMD_PMC_MAX_GENERIC > INTEL_PMC_MAX_GENERIC);
-> +	BUILD_BUG_ON(KVM_AMD_PMC_MAX_GENERIC > KVM_PMC_MAX_GENERIC);
->  
->  	for (i = 0; i < KVM_AMD_PMC_MAX_GENERIC ; i++) {
->  		pmu->gp_counters[i].type = KVM_PMC_GP;
-> diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-> index fb5cbd6cbeff..a4b0bee04596 100644
-> --- a/arch/x86/kvm/vmx/pmu_intel.c
-> +++ b/arch/x86/kvm/vmx/pmu_intel.c
-> @@ -570,6 +570,8 @@ static void intel_pmu_init(struct kvm_vcpu *vcpu)
->  	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
->  	struct lbr_desc *lbr_desc = vcpu_to_lbr_desc(vcpu);
->  
-> +	BUILD_BUG_ON(KVM_INTEL_PMC_MAX_GENERIC > KVM_PMC_MAX_GENERIC);
+   For B), userspace won’t be able to map private pages(through VFIO/IOMMUFD), as
+   the hypercall interface would fail if the pages are private.
 
-Rather than BUILD_BUG_ON() for both Intel and AMD, can't we just do?
+   This proposal is the one on the list.
 
-#define KVM_MAX_NR_GP_COUNTERS max(KVM_INTEL_PMC_MAX_GENERIC, KVM_AMD_PMC_MAX_GENERIC)
+2) pKVM manages a second stage of the IOMMU (as SMMUv3), and let the kernel map what
+   it wants in stage-1 and pKVM would use a mirrored page table of the CPU MMU stage-2.
 
-> +
->  	for (i = 0; i < KVM_INTEL_PMC_MAX_GENERIC; i++) {
->  		pmu->gp_counters[i].type = KVM_PMC_GP;
->  		pmu->gp_counters[i].vcpu = vcpu;
+   For A) Similar to the CPU, stage-2 IOMMU will protect the private pages.
+
+   For B) userspace can map private pages in the first stage IOMMU, and that would
+   result in stage-2 fault, AFAIK, SMMUv3 is the only Arm implementation that
+   supports nesting in Linux, for that the driver would only print a page fault,
+   and ideally the kernel wouldn’t crash, although that is really hardware
+   dependant how it handle faults, and I guess assigning a device through VFIO
+   to userspace comes with similar risks already (bogus MMIO access can
+   crash the system).
+
+   This proposal only exists in Android at the moment(However I am working on
+   getting an SMMUv3 compliant implementation that can be posted upstream).
+
+> 
+> What I see (again, I might be just wrong):
+> 
+> 1) How would the device be able to grab/access "private memory", if not
+>    via the user page tables?
+
+I hope the above answers the question, but just to confirmn, a device owned by
+the host shouldn’t access the memory as the host kernel is not trusted and
+can instrument DMA attacks. Device assignment (passthrough) is another story.
+
+> 2) How would we be able to convert shared -> private, if there is a
+>    longterm pin from that IOMMU? We must dynamically unmap it from the
+>    IOMMU.
+
+Depending on which solution from the above, for
+1) The transition from shared -> private would fail
+2) The private page would be unmapped from the stage-2 IOMMU (similar to the
+   stage-2 CPU MMU)
+
+> 
+> I assume when you're saying "In the patches KVM (running in EL2) will manage
+> the IOMMUs  including the page tables", this is easily solved by not relying
+> on pinning: KVM just knows what to update and where. (which is a very
+> different model than what VFIO does)
+> 
+
+Yes, that's is not required to protect private memory.
+
+Thanks,
+Mostafa
+
+> Thanks!
+> 
 > -- 
-> 2.34.1
+> Cheers,
+> 
+> David / dhildenb
 > 
 
