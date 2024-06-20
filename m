@@ -1,79 +1,82 @@
-Return-Path: <kvm+bounces-20069-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20070-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD958910272
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 13:24:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D05991031E
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 13:38:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90F321C215EF
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 11:24:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EA0F1C2207D
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 11:38:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CC61AB8E0;
-	Thu, 20 Jun 2024 11:24:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 804231AC249;
+	Thu, 20 Jun 2024 11:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dG40Erzq"
 X-Original-To: kvm@vger.kernel.org
-Received: from baidu.com (mx24.baidu.com [111.206.215.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BB51AB34D
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 11:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.206.215.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34BC39FD7;
+	Thu, 20 Jun 2024 11:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718882672; cv=none; b=NfYYeBIk1557cUtkilNvwGs9Q4+utKHr58XGM96WhfY/JKTzid+NzW/1uXoWoUDPkOc1j9y61LZtzD6ky44TubrFWqAEvRCGOWfwbppchMX11VmdKPYnGcBXpHiDMKqGEqKo7EbEYSiFiERJP5oKvB3YL/iLkMPOGCw8Sa71omE=
+	t=1718883355; cv=none; b=NA1c/z6SFpW+klYwpB0+FF6fYgZbwYul3CBAsPh9EQfbDG3EuO6ATsQDF8A+jPVsfzbk2uX+I4LLbH39+4CMiz3hheNDsw/Sc/NMmBLg+NH01iHmDvcA8dzaBJk3ahswuhtExFhLRME4qwQB8UVmYxoLIaiNJni5bClJ9aVGBjE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718882672; c=relaxed/simple;
-	bh=2VaOccW8lMYjeUaN3+kBsMhc3bDiu/AkOpsqY7Hln7k=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NMqaGHZdqXiLBVsNfJCG0UbthHkofFnsUZRT6CYXBwYATiJ3hlpA6JoNe8pX3N4z4iepZMTMq0QEMol3lzxjj0bxT9hZh92KFU7VoQX55U1ZbTHQbTjCvQ3yORC30YkRTg96tHW2lW3iKPWkpnG4fXW8j9E/yi6/bR6Q81Gfv0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=111.206.215.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-From: "Li,Rongqing" <lirongqing@baidu.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "wanpengli@tencent.com"
-	<wanpengli@tencent.com>, "tglx@linutronix.de" <tglx@linutronix.de>,
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>,
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org"
-	<x86@kernel.org>, "hpa@zytor.com" <hpa@zytor.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>
-Subject: =?utf-8?B?UkU6IFvlpJbpg6jpgq7ku7ZdIFJlOiBbUEFUQ0hdIHg4Ni9rdm06IGZpeCB0?=
- =?utf-8?Q?he_decrypted_pages_free_in_kvmclock?=
-Thread-Topic: =?utf-8?B?W+WklumDqOmCruS7tl0gUmU6IFtQQVRDSF0geDg2L2t2bTogZml4IHRoZSBk?=
- =?utf-8?Q?ecrypted_pages_free_in_kvmclock?=
-Thread-Index: AQHau6ncmV9I7Fhn7Ea4YIctRpRDL7HLI7gAgAVs2bA=
-Date: Thu, 20 Jun 2024 11:23:06 +0000
-Message-ID: <e4aa32b943c34834ac07649840feb549@baidu.com>
-References: <20240611024835.43671-1-lirongqing@baidu.com>
- <87frtcrmxz.fsf@redhat.com>
-In-Reply-To: <87frtcrmxz.fsf@redhat.com>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-baidu-bdmsfe-datecheck: 1_BJHW-Mail-Ex16_2024-06-20 19:23:06:863
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1718883355; c=relaxed/simple;
+	bh=CminykxElvtsp9RCbjQJrrHIs3yDI3EQY6fMsH1tv5o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UOOLjmEzs9N0cxvMGsgtwdBe4r1tdjsNfipkgQwNJ//2HaDwobzzRYTUxmmCcpf1OeQSfTr5Yu/VXqf/NZaYv4ldmFiXMbpVDiJfONVTaGqxGQNpAmo3yACbTu0i+bycFlSJ5rkjzJJPKg26HFlYnDjm/iUkTHVTYAyNARAKEfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dG40Erzq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A706FC32781;
+	Thu, 20 Jun 2024 11:35:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1718883355;
+	bh=CminykxElvtsp9RCbjQJrrHIs3yDI3EQY6fMsH1tv5o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dG40ErzqREfWw7nrKr8404DUT0lFh0zQKO5tloS7o1cLwUUgr2N5UPgSthw8d7pKB
+	 yFyUf9gVwsDUuitZrz3o4dVHRFRRWd2Vffqc/x91gdVpAIZ6mPA3atbkkCQEFMJVSX
+	 M3tqIYvU0A/ULdiuvTEdY68BItt0WsF3ECpY8g4NE6hz8ad3ZLCf6d84s6PS/9VZH6
+	 wOoVChiyMllEh8XM6em6/9j61/WKneO5B1SSerBslYZkf00uXIaNWdT3ZEJOeVhMZf
+	 Rx80rjxl+NII9R6yeeciaFDDxWKV24PnqMsHTO8/608h0lGwCoCGPOMf3nDI8RpyT5
+	 x6/C48Onk9dmQ==
+Date: Thu, 20 Jun 2024 12:35:50 +0100
+From: Will Deacon <will@kernel.org>
+To: =?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Vincent Donnefort <vdonnefort@google.com>
+Subject: Re: [PATCH v5 3/8] KVM: arm64: nVHE: Simplify invalid_host_el2_vect
+Message-ID: <20240620113549.GA4625@willie-the-truck>
+References: <20240610063244.2828978-1-ptosi@google.com>
+ <20240610063244.2828978-4-ptosi@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Baidu-BdMsfe-DateCheck: 1_BJHW-Mail-Ex12_2024-06-20 19:23:06:982
-X-FEAS-Client-IP: 10.127.64.35
-X-FE-Last-Public-Client-IP: 100.100.100.38
-X-FE-Policy-ID: 52:10:53:SYSTEM
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240610063244.2828978-4-ptosi@google.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-DQoNCj4gDQo+IA0KPiBPdXQgb2YgY3VyaW9zaXR5LA0KPiANCj4gc2hvdWxkbid0IHdlIHJhdGhl
-ciB0cnkgdG8gbWFrZSBzZXRfbWVtb3J5X2RlY3J5cHRlZCgpIG1vcmUgYXRvbWljIHRvIGF2b2lk
-DQo+IHRoZSBuZWVkIHRvIGh1bnQgZG93biBhbGwgdXNlcnMgb2YgdGhlIEFQST8gRS5nLiBpbiBI
-eXBlci1WJ3MNCj4gX192bWJ1c19lc3RhYmxpc2hfZ3BhZGwoKSBJIHNlZToNCj4gDQo+ICAgICAg
-cmV0ID0gc2V0X21lbW9yeV9kZWNyeXB0ZWQoKHVuc2lnbmVkIGxvbmcpa2J1ZmZlciwNCj4gICAg
-ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBQRk5fVVAoc2l6ZSkpOw0KPiAgICAgIGlmIChy
-ZXQpIHsNCj4gICAgICAgICAgICAgIGRldl93YXJuKCZjaGFubmVsLT5kZXZpY2Vfb2JqLT5kZXZp
-Y2UsDQo+IAkgICAgIC4uLg0KPiANCj4gZG9lc24ndCBpdCBoYXZlIHRoZSBleGFjdCBzYW1lIGlz
-c3VlIHlvdSdyZSB0cnlpbmcgdG8gYWRkcmVzcyBmb3Iga3ZtY2xvY2s/DQo+IA0KDQpUaGlzIHBh
-dGNoIHNob3VsZCBzaG93IHRoZSByZWFzb24NCg0KaHR0cHM6Ly9sa21sLm9yZy9sa21sLzIwMjMv
-MTAvMjQvMTM2OQ0KDQp0aGFua3MNCg0KLUxpDQo=
+On Mon, Jun 10, 2024 at 07:32:32AM +0100, Pierre-Clément Tosi wrote:
+> The invalid_host_el2_vect macro is used by EL2{t,h} handlers in nVHE
+> *host* context, which should never run with a guest context loaded.
+> Therefore, remove the superfluous vCPU context check and branch
+> unconditionally to hyp_panic.
+> 
+> Signed-off-by: Pierre-Clément Tosi <ptosi@google.com>
+> ---
+>  arch/arm64/kvm/hyp/nvhe/host.S | 6 ------
+>  1 file changed, 6 deletions(-)
+
+Acked-by: Will Deacon <will@kernel.org>
+
+Will
 
