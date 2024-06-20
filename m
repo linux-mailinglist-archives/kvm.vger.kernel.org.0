@@ -1,115 +1,105 @@
-Return-Path: <kvm+bounces-20035-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20036-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FA8490FB84
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 05:06:23 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0723790FBB5
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 05:36:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CDCB281BD2
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 03:06:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BACBF1F2280A
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 03:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 294DB1E535;
-	Thu, 20 Jun 2024 03:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CnPtMkdy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7A023774;
+	Thu, 20 Jun 2024 03:36:00 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE1F1BF3F;
-	Thu, 20 Jun 2024 03:06:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46FDB3C00;
+	Thu, 20 Jun 2024 03:35:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718852774; cv=none; b=DPqdyixboGmjpKa68Gz8rSsDpnNl914kbDVwZb2C/OOSUwPaTLVpTegTC4GDl2XlMx4OFACY9xvXK7oWIYPvFkKWLXNhBlEc41Zg8aplwqcAXzGcDlE+hqbAgsmnyRhD6RZdoWAvyk3wJerofn5RvkRqxj7EUVwsLvVRV82DdCY=
+	t=1718854559; cv=none; b=V56ZdFFeCG8LVpTqC9MtdbkNqkVxi4aYdV03Ynq75fjdoGKB080G9ZypSqIsa/Mfvf4woHIB13itoe6Fb8C+MMn00k4mqUSLUmGiSNWQ2/8xVfctZ0U47yaub2UfBMiXWc7M85BxGwI6HzPhjl3oZ9juMiFfJ+ZAS7v61fLv5vM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718852774; c=relaxed/simple;
-	bh=+TiDdWFghcssxRQ+mZJFAXhs8tsVnC7tqfb+Nels7K8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pa0ydPP5Aw+NsmDrotuzOfha57qEEUJ8FUe9wzlHgnOauaCaWiyJiJRONRH+AcYcEBzeAwKJWvRO8y7D0vUkRXmjDezp3sfbTNGCupfpovp7wo4g00j5hF2pysk9/4eN0iFp6INBa7+y5s4biNii/oSzDjf9zgNL+ky0QyGlQ+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CnPtMkdy; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1718852773; x=1750388773;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+TiDdWFghcssxRQ+mZJFAXhs8tsVnC7tqfb+Nels7K8=;
-  b=CnPtMkdyDFoSJz97+bCpHUsPwsWUxN097DLM4ErGHj81WCoy2GpoO65b
-   3lvtrmT578hm5FwH6AJUojlU0DwoYylle0TguphXR2WoCvT1dGLvmHwHE
-   TzJcgfkK72ngOv6JE86QeQkvuiM97WzkDz7Tz9b1oa7iWK2zuh86u6QYW
-   QySd2Sn2kvyHRn+TmVm5KX7Qrv+19/8NB1vA/xShtLUPs5oq6+gq2qumr
-   2jy2CvwQPvZ6ZSiySGAJo1IltUnf7ahnLm8q3TxagDzZ9uJr07BgUBHnx
-   8VUOPc8FMXypX0nL6+1rcwnQ3+AyFJr66FJFfnMIR2usmTrz6/NzSzPoI
-   A==;
-X-CSE-ConnectionGUID: Hz56s0RCTGCYtid6+jNF0Q==
-X-CSE-MsgGUID: c7ePYqmeRgay5cGCRVBdow==
-X-IronPort-AV: E=McAfee;i="6700,10204,11108"; a="12155897"
-X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
-   d="scan'208";a="12155897"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jun 2024 20:06:13 -0700
-X-CSE-ConnectionGUID: GaaSKUuFRtK56OgAejTiBQ==
-X-CSE-MsgGUID: WyYZ1FFCQl6C6hrukb6ryA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,251,1712646000"; 
-   d="scan'208";a="42201605"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 19 Jun 2024 20:06:10 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sK87k-0007Fx-11;
-	Thu, 20 Jun 2024 03:06:08 +0000
-Date: Thu, 20 Jun 2024 11:05:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Bibo Mao <maobibo@loongson.cn>, Tianrui Zhao <zhaotianrui@loongson.cn>,
+	s=arc-20240116; t=1718854559; c=relaxed/simple;
+	bh=pxEJn23nT6+sqxNt5VIguQ2SC4vykVQraEA5VugQ+mQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bfFC3hBRxDfjPB3i81Kyflc6ztpswAOu0cyOfXLepnJI1v/WyQxo2IuH5O9bgjfp7zP7h7OsrfBc3s4TZoN7cYWJUEbf+cRhVpYeMeGzjDgoNFOrn1HOyez+nizE7KXk88+IlyW6XHxRt9hClJl8InllMLdXUzLTS+MFyFCovZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8Bx3+uZo3NmSWkIAA--.18063S3;
+	Thu, 20 Jun 2024 11:35:53 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cx78eYo3Nm6ugpAA--.35757S2;
+	Thu, 20 Jun 2024 11:35:53 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
 	Huacai Chen <chenhuacai@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, WANG Xuerui <kernel@xen0n.name>,
-	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 6/6] LoongArch: KVM: Mark page accessed and dirty with
- page ref added
-Message-ID: <202406201000.BjivosoH-lkp@intel.com>
-References: <20240619080940.2690756-7-maobibo@loongson.cn>
+Cc: WANG Xuerui <kernel@xen0n.name>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] LoongArch: KVM: Sync pending interrupt when getting ESTAT from user mode
+Date: Thu, 20 Jun 2024 11:35:52 +0800
+Message-Id: <20240620033552.2739845-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240619080940.2690756-7-maobibo@loongson.cn>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8Cx78eYo3Nm6ugpAA--.35757S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Hi Bibo,
+Currently interrupt is posted and cleared with async mode, and it is saved
+in SW state vcpu::arch::irq_pending and vcpu::arch::irq_clear. When vcpu
+is ready to run, interrupt is synced to ESTAT CSR register from SW state
+vcpu::arch::irq_pending at guest entrance.
 
-kernel test robot noticed the following build warnings:
+During VM migration stage, vcpu is put into stopped state, however
+pending interrupt is not synced to ESTAT CSR register. So there will be
+interrupt lost when VCPU is stopped and migrated to other host machines.
 
-[auto build test WARNING on 92e5605a199efbaee59fb19e15d6cc2103a04ec2]
+Here when ESTAT CSR register is read from VMM user mode, pending
+interrupt is synced to ESTAT also. So that VMM can get correct pending
+interrupt.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Bibo-Mao/LoongArch-KVM-Delay-secondary-mmu-tlb-flush-until-guest-entry/20240619-161831
-base:   92e5605a199efbaee59fb19e15d6cc2103a04ec2
-patch link:    https://lore.kernel.org/r/20240619080940.2690756-7-maobibo%40loongson.cn
-patch subject: [PATCH v2 6/6] LoongArch: KVM: Mark page accessed and dirty with page ref added
-config: loongarch-defconfig (https://download.01.org/0day-ci/archive/20240620/202406201000.BjivosoH-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240620/202406201000.BjivosoH-lkp@intel.com/reproduce)
+Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+---
+ arch/loongarch/kvm/vcpu.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406201000.BjivosoH-lkp@intel.com/
+diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+index b747bd8bc037..81622cd055af 100644
+--- a/arch/loongarch/kvm/vcpu.c
++++ b/arch/loongarch/kvm/vcpu.c
+@@ -371,9 +371,18 @@ static int _kvm_getcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 *val)
+ 		return -EINVAL;
+ 
+ 	if (id == LOONGARCH_CSR_ESTAT) {
++		preempt_disable();
++		vcpu_load(vcpu);
++		/*
++		 * Sync pending interrupt into estat so that interrupt
++		 * remains during migration stage
++		 */
++		kvm_deliver_intr(vcpu);
+ 		/* ESTAT IP0~IP7 get from GINTC */
+ 		gintc = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_GINTC) & 0xff;
+ 		*val = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_ESTAT) | (gintc << 2);
++		vcpu_put(vcpu);
++		preempt_enable();
+ 		return 0;
+ 	}
+ 
 
-All warnings (new ones prefixed by >>):
-
->> arch/loongarch/kvm/mmu.o: warning: objtool: __jump_table+0x0: special: can't find orig instruction
-
-
-objdump-func vmlinux.o __jump_table:
-
+base-commit: 92e5605a199efbaee59fb19e15d6cc2103a04ec2
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.39.3
+
 
