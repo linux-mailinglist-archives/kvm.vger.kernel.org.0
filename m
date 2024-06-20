@@ -1,74 +1,74 @@
-Return-Path: <kvm+bounces-20098-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 463B09109A9
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 17:22:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44C489109AB
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 17:22:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01DA6283C29
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 15:22:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6819E1C216F7
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 15:22:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B011AF6BD;
-	Thu, 20 Jun 2024 15:22:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 976F61B0120;
+	Thu, 20 Jun 2024 15:22:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="d33g02an"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="ox8J7eZV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01D851AB91B
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 15:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF7F1AD486
+	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 15:22:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718896951; cv=none; b=CmaniTqjA3UznLB3DEEjo4KK3c2RSFweedbMbECr7f7B7poMQJjQbk8O104LspDsA+yUMBrpNyl0D6YS6HG2mSjGMD7TQ+MqVPLotSR3ojwpSZoVflAXBPr/cCJP9+KkVvGadsmUJibi5Cq4K1lTIH7nQEo7/Q+OO5mJMt8MbNI=
+	t=1718896953; cv=none; b=X/tO4mvYgFVygK+fUP7U3jyzTJ6z8ZC1dAKAa5Eyt8ycVptBb1pGp3QJKbr2vJ5CJChfxBYtzD9lvNS2F72PHKgcEZZ2M1hKDavqs+T6AF87/dVURFNtdqLNiln5hAykvxMbAf8/RJTeigEXLj18W/CNgUIIjDpbBAnGSqwWgZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718896951; c=relaxed/simple;
-	bh=x0KN3Mbd8aMVqPHdgl1/SMy2aZnIAphEJs/rdAHKmrw=;
+	s=arc-20240116; t=1718896953; c=relaxed/simple;
+	bh=LWQ0eRFkADYmGUcTVY4hJ+pbgRc491C2SQ/i8aBPBiI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hgr/l1YYhA5kGAe+LKu5NvuTOSO+C7Eha7K8g3qqeE4eD37rbei9voC1XIl8uLeMrPggeAI7rGQScIBRYonpFMpikX/ZOfiPUsmXzJg0y2pFaUrbXEQiWIOls26fKsT4mrrKbcGI55rofsq3jk009QU5unAOs7G6vT6q71GVPqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=d33g02an; arc=none smtp.client-ip=209.85.208.50
+	 MIME-Version:Content-Type; b=HTA7cTtXvyldAwnQtdBMh5M9TkSjUBseGc4fnfGzjerPo7eWMZCylDRmwz8z0po16snjg1yfUsUM7PN6rO0BGCyXLZKYi/qzQAvgLV7L1dw4T7rmbPrDaonbE/buQ6MkOjjFQWP40m7bPIWt+Gn0HfNfeAIDtRVBt5ZnbGSYezk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=ox8J7eZV; arc=none smtp.client-ip=209.85.208.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-57d1679ee83so1031878a12.2
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 08:22:29 -0700 (PDT)
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-57cbc2a2496so1252259a12.0
+        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 08:22:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1718896948; x=1719501748; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1718896949; x=1719501749; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GJDItK1lJ7pU44CkysDABVIUb9quWUurAs3tDshcfJY=;
-        b=d33g02anEkaGb2oAj6f5puwMLJH+XqUU0wBW1ly6KJFMd1O4o+NT8QfXqiUM+7ZcwC
-         tgcfuNC6JK5D21ZwoQyYXiiXSthUBanSXu4KJ1Sd/pt0vZgA+Zh5kt5g4LY4t8SrGu1H
-         06TduZTuAATsmdQLJG/7mmNxTRKomwezxm+jKaRKGaJtGsjbshvrd4Lk0DElgCQ3dORo
-         KhIskuV+gT/K34rTZ4pQklWk0E+iafXoOgTuNSpYBip5ZO8hjuNV7D6tpASOBcuq355v
-         YvEXJWbzggs8RjpzEsG8zAnUVxiS8U2j6lB7jXGSQrMj1EFicj4Xruz182OZpt4HVjaC
-         /Vmg==
+        bh=/X0IxOQD+UVox1iqgN/w4twKxD3yeUu+cfpZug2C5Oo=;
+        b=ox8J7eZVQV3HzTHLVqJ+Szj+UNbNFdmbpJQ/3+pHyS/YMB8KqvIF33NalLunh2XB7r
+         Jzv2iWbe6H5UOe23ZQXEOu5MNzSFd1bUyN18sU+6JE3UwxUi9fhJ/CM0T6AjAFcKTqOy
+         dsfbg6hqjtseln0nOGDOVp0CBJq498IFAWBnES9MytL6W6NyFteN3RlnsILQcixSxbGZ
+         9bP/tApd+IUC2vIcKRrZc11J63JUX0BP/X8OkK5QrUmEYOQUFZattWbxFfBpXHjSThbM
+         U87dWnhA97AE5W9CVNgosZHXckCZuyKJJkIVWzpLhdtZAyD8JVs/Irz3Q2YCcgotNcdn
+         MqCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718896948; x=1719501748;
+        d=1e100.net; s=20230601; t=1718896949; x=1719501749;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GJDItK1lJ7pU44CkysDABVIUb9quWUurAs3tDshcfJY=;
-        b=apegAAU5TgvNKJegHUllAycTt8oAf/04zcVuD7cN7AKz1W+g28HNgCjmcXe5TTJL4N
-         P9ZWGFI5j7/I5+JYTZOBofffmK8YOox/9P5K5FExUVBCHqAV2igsHXBSqmRaViQbl2yU
-         llIPz9YiZbsFXJwJjMS+NKWRhQMBdqY/G+dIeSMXlsU1H22WYUbT+4yP6iGDKxD9e5nn
-         0wFnsay+b7/kt2gJaLwglGGHHnBfYoVjTHLrAKqjaHSnC6SnATRak2boiE/M9Ukd9vmG
-         VZj0/H0R0j9ZerTfGywwGDRpdrcG0HFk70/X4r82nopd/fHMT4f6gbwnfZJMi6ofQGeN
-         hOpQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXgdoQ0Kxf0uZdhkF5yMG0tKR/ZcoZmAGsWWZnJGMOm/XMmY9MuAgpo6IiRov13eqXM+lIBjD/zxDrHGIjzUzFgdnVm
-X-Gm-Message-State: AOJu0Yxwz5QbYAiTOl5lPtbsxrfHMIaTrj56bt4Y7YUtxdk2J7rQP6jh
-	jaaBLzkPSSqhxFyduGsByFSK/temnt0jhTyiB7mv8UGGehcHNxGJjaxt2dNdhbs=
-X-Google-Smtp-Source: AGHT+IH0DozvQRi/LaMdJtXI1+l7Oz911+HmQ8KveXTxshkIx5oakUEt56iH61txi2255uJDmlcM0w==
-X-Received: by 2002:a50:cd97:0:b0:57d:61a:7f20 with SMTP id 4fb4d7f45d1cf-57d07e6ba6cmr3862286a12.3.1718896948159;
+        bh=/X0IxOQD+UVox1iqgN/w4twKxD3yeUu+cfpZug2C5Oo=;
+        b=Q82d9Uqs3+/lW9+KvHbh9WSfaln5UEP8u+wxdR/wpyXxXKPPw862Z/4TDrQL1KPu1H
+         2kqHIxcqcBfgoGVof1C4/2Hmke6sS6kUt7gaPZDRvtODGPPjg5fzFGlU9Xe1NfoYKweQ
+         V2jXQiupH0suFHiXruh6CdzefkY9iHbD1ckeagQkn1+q5Cy0jJnyQE5ZfR0lpdEkDNn/
+         mtQahEGxEkPT56CKLPkIM0Uv9TYVZWTHVBq/8V8j6H4uW4DqxnXk7hkH7ZwW3ZA0XF+C
+         blF5EWfpLKc3UMojvYKyOm7IVr1Ath7Rt6EcVQwLhyYaXFBbOI59fA+eUBr402MzjVoe
+         pjRg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnWI/W7ekVf2Z9ulSQYyZgfAQXDBAg6E+05e575vMauEi2xRscpJQk1uh2MKX3w8ZBV1xwn+ncLuftja6/ga+s/SaW
+X-Gm-Message-State: AOJu0YwKpFLF+cudSsSjjOyLXm8+8UYuc6tDJhhOeVACIvZLHBosuoJK
+	+S740zfcUz1n8K/Mkk+gP/PTT1uiyQmfbpNwelzYfxI2IYUFwt78N+s2Zuctvpo=
+X-Google-Smtp-Source: AGHT+IFnftecJ/1MRTQF1ZOm+xWFpcYdRKEdC+4UG5LvASjIC+lNz5bhVZnty9lEhOtdxKLlbFvYZw==
+X-Received: by 2002:a50:ccca:0:b0:57a:2475:6a16 with SMTP id 4fb4d7f45d1cf-57d07e7bc1bmr5166576a12.11.1718896948929;
         Thu, 20 Jun 2024 08:22:28 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d16160c18sm1609800a12.26.2024.06.20.08.22.21
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb72e9943sm9855578a12.51.2024.06.20.08.22.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 20 Jun 2024 08:22:22 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 51EE45F9F4;
+	by draig.lan (Postfix) with ESMTP id 6C5285F9FB;
 	Thu, 20 Jun 2024 16:22:21 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: qemu-devel@nongnu.org
@@ -99,11 +99,10 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	"Dr. David Alan Gilbert" <dave@treblig.org>,
 	Marcelo Tosatti <mtosatti@redhat.com>,
 	Mahmoud Mandour <ma.mandourr@gmail.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH v2 03/12] plugins: Ensure register handles are not NULL
-Date: Thu, 20 Jun 2024 16:22:11 +0100
-Message-Id: <20240620152220.2192768-4-alex.bennee@linaro.org>
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+Subject: [PATCH v2 04/12] sysemu: add set_virtual_time to accel ops
+Date: Thu, 20 Jun 2024 16:22:12 +0100
+Message-Id: <20240620152220.2192768-5-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240620152220.2192768-1-alex.bennee@linaro.org>
 References: <20240620152220.2192768-1-alex.bennee@linaro.org>
@@ -116,42 +115,127 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
+We are about to remove direct calls to individual accelerators for
+this information and will need a central point for plugins to hook
+into time changes.
 
-Ensure register handles are not NULL so that a plugin can assume NULL is
-invalid as a register handle.
-
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
-Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
-Message-Id: <20240612153508.1532940-4-alex.bennee@linaro.org>
-Message-Id: <20240229-null-v1-1-e716501d981e@daynix.com>
+Reviewed-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
 Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20240530220610.1245424-2-pierrick.bouvier@linaro.org>
 ---
- plugins/api.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ include/sysemu/accel-ops.h                     | 18 +++++++++++++++++-
+ include/sysemu/cpu-timers.h                    |  3 ++-
+ ...et-virtual-clock.c => cpus-virtual-clock.c} |  5 +++++
+ system/cpus.c                                  | 11 +++++++++++
+ stubs/meson.build                              |  2 +-
+ 5 files changed, 36 insertions(+), 3 deletions(-)
+ rename stubs/{cpus-get-virtual-clock.c => cpus-virtual-clock.c} (68%)
 
-diff --git a/plugins/api.c b/plugins/api.c
-index 5a0a7f8c71..6bdb26bbe3 100644
---- a/plugins/api.c
-+++ b/plugins/api.c
-@@ -507,7 +507,7 @@ static GArray *create_register_handles(GArray *gdbstub_regs)
-         }
+diff --git a/include/sysemu/accel-ops.h b/include/sysemu/accel-ops.h
+index ef91fc28bb..a088672230 100644
+--- a/include/sysemu/accel-ops.h
++++ b/include/sysemu/accel-ops.h
+@@ -20,7 +20,12 @@
+ typedef struct AccelOpsClass AccelOpsClass;
+ DECLARE_CLASS_CHECKERS(AccelOpsClass, ACCEL_OPS, TYPE_ACCEL_OPS)
  
-         /* Create a record for the plugin */
--        desc.handle = GINT_TO_POINTER(grd->gdb_reg);
-+        desc.handle = GINT_TO_POINTER(grd->gdb_reg + 1);
-         desc.name = g_intern_string(grd->name);
-         desc.feature = g_intern_string(grd->feature_name);
-         g_array_append_val(find_data, desc);
-@@ -528,7 +528,7 @@ int qemu_plugin_read_register(struct qemu_plugin_register *reg, GByteArray *buf)
+-/* cpus.c operations interface */
++/**
++ * struct AccelOpsClass - accelerator interfaces
++ *
++ * This structure is used to abstract accelerator differences from the
++ * core CPU code. Not all have to be implemented.
++ */
+ struct AccelOpsClass {
+     /*< private >*/
+     ObjectClass parent_class;
+@@ -44,7 +49,18 @@ struct AccelOpsClass {
+ 
+     void (*handle_interrupt)(CPUState *cpu, int mask);
+ 
++    /**
++     * @get_virtual_clock: fetch virtual clock
++     * @set_virtual_clock: set virtual clock
++     *
++     * These allow the timer subsystem to defer to the accelerator to
++     * fetch time. The set function is needed if the accelerator wants
++     * to track the changes to time as the timer is warped through
++     * various timer events.
++     */
+     int64_t (*get_virtual_clock)(void);
++    void (*set_virtual_clock)(int64_t time);
++
+     int64_t (*get_elapsed_ticks)(void);
+ 
+     /* gdbstub hooks */
+diff --git a/include/sysemu/cpu-timers.h b/include/sysemu/cpu-timers.h
+index d86738a378..7bfa960fbd 100644
+--- a/include/sysemu/cpu-timers.h
++++ b/include/sysemu/cpu-timers.h
+@@ -96,8 +96,9 @@ int64_t cpu_get_clock(void);
+ 
+ void qemu_timer_notify_cb(void *opaque, QEMUClockType type);
+ 
+-/* get the VIRTUAL clock and VM elapsed ticks via the cpus accel interface */
++/* get/set VIRTUAL clock and VM elapsed ticks via the cpus accel interface */
+ int64_t cpus_get_virtual_clock(void);
++void cpus_set_virtual_clock(int64_t new_time);
+ int64_t cpus_get_elapsed_ticks(void);
+ 
+ #endif /* SYSEMU_CPU_TIMERS_H */
+diff --git a/stubs/cpus-get-virtual-clock.c b/stubs/cpus-virtual-clock.c
+similarity index 68%
+rename from stubs/cpus-get-virtual-clock.c
+rename to stubs/cpus-virtual-clock.c
+index fd447d53f3..af7c1a1d40 100644
+--- a/stubs/cpus-get-virtual-clock.c
++++ b/stubs/cpus-virtual-clock.c
+@@ -6,3 +6,8 @@ int64_t cpus_get_virtual_clock(void)
  {
-     g_assert(current_cpu);
- 
--    return gdb_read_register(current_cpu, buf, GPOINTER_TO_INT(reg));
-+    return gdb_read_register(current_cpu, buf, GPOINTER_TO_INT(reg) - 1);
+     return cpu_get_clock();
+ }
++
++void cpus_set_virtual_clock(int64_t new_time)
++{
++    /* do nothing */
++}
+diff --git a/system/cpus.c b/system/cpus.c
+index f8fa78f33d..d3640c9503 100644
+--- a/system/cpus.c
++++ b/system/cpus.c
+@@ -229,6 +229,17 @@ int64_t cpus_get_virtual_clock(void)
+     return cpu_get_clock();
  }
  
- struct qemu_plugin_scoreboard *qemu_plugin_scoreboard_new(size_t element_size)
++/*
++ * Signal the new virtual time to the accelerator. This is only needed
++ * by accelerators that need to track the changes as we warp time.
++ */
++void cpus_set_virtual_clock(int64_t new_time)
++{
++    if (cpus_accel && cpus_accel->set_virtual_clock) {
++        cpus_accel->set_virtual_clock(new_time);
++    }
++}
++
+ /*
+  * return the time elapsed in VM between vm_start and vm_stop.  Unless
+  * icount is active, cpus_get_elapsed_ticks() uses units of the host CPU cycle
+diff --git a/stubs/meson.build b/stubs/meson.build
+index f15b48d01f..772a3e817d 100644
+--- a/stubs/meson.build
++++ b/stubs/meson.build
+@@ -29,7 +29,7 @@ endif
+ if have_block or have_ga
+   stub_ss.add(files('replay-tools.c'))
+   # stubs for hooks in util/main-loop.c, util/async.c etc.
+-  stub_ss.add(files('cpus-get-virtual-clock.c'))
++  stub_ss.add(files('cpus-virtual-clock.c'))
+   stub_ss.add(files('icount.c'))
+   stub_ss.add(files('graph-lock.c'))
+   if linux_io_uring.found()
 -- 
 2.39.2
 
