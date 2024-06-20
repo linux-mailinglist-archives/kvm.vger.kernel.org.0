@@ -1,296 +1,225 @@
-Return-Path: <kvm+bounces-20077-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20078-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B56569106CF
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 15:52:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FFF99106E1
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 15:56:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AF0EB22340
-	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 13:52:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB66D2824E6
+	for <lists+kvm@lfdr.de>; Thu, 20 Jun 2024 13:56:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89B391AD491;
-	Thu, 20 Jun 2024 13:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C0B1AD9E6;
+	Thu, 20 Jun 2024 13:55:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FHXIc83i"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BBlbmiTA"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2059.outbound.protection.outlook.com [40.107.93.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A328175E
-	for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 13:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718891536; cv=none; b=U3aYO7Aa5cMP9qXaS5uWmxv1hEOkASdGt+DcLde2xAf/B2u3L9H7QyNijyHn6m3yk+LrIwchypTkwSHMY7P4i8ThBgr5mw8l9CcnempTDlFTVdmRmX6g1YTrLmDl9YMEc6flEdto7i0+RZWRkEeOycTseAGD4dmJEJwpXKeWXwY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718891536; c=relaxed/simple;
-	bh=kZFzGdFBvUz4Gg6I42gew9txHyVBgSQU2rWpWdCqIqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DIC5F97MqJnouqOgWj+MSbYHHF4bWIdm84/h8aJgTvfHORY3KaU6HqE6MU5MTdTjfLq8W79MVhy44Xa6mLjtfgf0pEvqUymV5hprTokXWJhwHB5NrRdQvqaZP112hJ4Hgk1q0Cpj2gNQaSJetpw2vKDQziNkoNyVXl6rL3WUmfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FHXIc83i; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718891534;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CNpcAjabNj7U5Kjrejmg/ilwXEXZseiB+OI7rnWLE5Q=;
-	b=FHXIc83i1IFWAuvZ7bO1DC+WKv5kV+miQ9+UeFzbllGG7IQGwEqhEEpG5b7My3VBZLCRwE
-	vGv4l6uxgC43fjtyqXPlfwu4TFkoZzWg32rmnDSGoY18Ri2n3Vsn6gHGTvibppJ4mU6o4N
-	4Ak8M9xODdGIz2cae0ZdVPJVzUGHUU4=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-5hCJ6vJ8Md2QECNgaJuuJw-1; Thu, 20 Jun 2024 09:52:12 -0400
-X-MC-Unique: 5hCJ6vJ8Md2QECNgaJuuJw-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-57851ae6090so530699a12.3
-        for <kvm@vger.kernel.org>; Thu, 20 Jun 2024 06:52:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718891531; x=1719496331;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CNpcAjabNj7U5Kjrejmg/ilwXEXZseiB+OI7rnWLE5Q=;
-        b=XUCDT1cyYYcZZVDAfJa6HqdAAOHn+kh690qDcq1cENb4C+Ds6e8senaqojvxMrbR8E
-         lgQV+VA3Hq1/3i3DisFTyBFEYzynboU6mMLJl5vjAdHqn0MTfvtDMt+iYERRD2IDatMb
-         j6pWOtaoQ3INW1a2omg8rlKZJZGIAjinJwPq3Q9Pb+Tnd6z4EiwvKUPIGC7rZsksBUX5
-         sWQ9eLyyBSCYkRV6D8PbjmD4pBiz7gNMjZH5O2mviJhTUZiiZl1PsjMJ+RngMiORUY9t
-         i6xeEYUkZiwMoSpw0JLUAeAObxVN4prud2XJUprd81CWteyfSz60rraVecWFLi1+Hfxu
-         YWew==
-X-Forwarded-Encrypted: i=1; AJvYcCVJUTXwXkrkgpj6e7z4u15zCx+FI8ucF793eTLB6nHHboWOi1zS82IQN9k4hv4NRaLyt8o0DjsjntjVB3yLfdLebi1x
-X-Gm-Message-State: AOJu0Yz84g1QNbh0xsn/rf2NDLHFFbOsPyVsYE7sX1oKGNij68ucaHmO
-	N0qLQP9Q3E65zviVGFCi7CSphjPmUIhZz/CaVb5nXOqQHdgndaDBZCxtWKfkXD32RLWAWIt2EwB
-	txMVSnSQ7OdiyBET9czp/gsU34FGyWVzHOKTJpIilrULwc9Metw==
-X-Received: by 2002:a50:aad7:0:b0:578:3335:6e88 with SMTP id 4fb4d7f45d1cf-57d07c59ce6mr3503150a12.0.1718891531434;
-        Thu, 20 Jun 2024 06:52:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF90OFOGv2ZZVHJ5dm1EVg30XUQltEQfgDt90ACAE1nuPoxRvgkNZnMIK5JtmqXjWOLvdB0xw==
-X-Received: by 2002:a50:aad7:0:b0:578:3335:6e88 with SMTP id 4fb4d7f45d1cf-57d07c59ce6mr3503106a12.0.1718891530819;
-        Thu, 20 Jun 2024 06:52:10 -0700 (PDT)
-Received: from redhat.com ([2.52.146.100])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57cb743b026sm9630648a12.97.2024.06.20.06.52.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 20 Jun 2024 06:52:10 -0700 (PDT)
-Date: Thu, 20 Jun 2024 09:51:58 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Vadim Pasternak <vadimp@nvidia.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E248348CCD;
+	Thu, 20 Jun 2024 13:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718891748; cv=fail; b=skB3CmB8hkHz1hmNgu+ixohR9O3sD368jH2nzpBv3wWJLrMegkqJm8OjmjysthyzDRH/eMIn7Bi+U9DS7iYgIVnasR8GgFUxx2EjGaJSSf2DOs4f3aJd51v8D7ddyGP0MJ0gi0oko6xzLSs60kTTQbog1iGz8tLFySsyHnF1wDM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718891748; c=relaxed/simple;
+	bh=nI15mm40W7zMyr7NZlfXOB1PNXbWIH5RM1mA0Or4Yok=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=rha1Q4KYQsEOjzD292yAGle07m+jeGPN3HlZSJyhKPBEMXNAvu/o0P2wxfXya4327PqP9wYscK0ftubjRy/sGPnR4XZxd1FWTYTiWLD8uvl3SjfQJKNWK3Cq1UVaCz5KzZ4j/FqnC/zNWUpJmyvRtv+Cig8RsYY591wnvc2uDWo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BBlbmiTA; arc=fail smtp.client-ip=40.107.93.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T9fMiN9cvdkp5C+V647OdRHi7WqjXAk1F/Y70vjLnFijE5FfQXGjO99JgShO7TVjG2Ftr5JZzG6joHz5gobVBsp3R9pBJ1R4mM7aE2SI9PnrSobJ6zP6QnCl4Op+RDWYxdMZHGB8PDznH598cMKZCISHLPYk/xOZZh971LGNEKeZwlbmbjPynXi4AtQSIrubcQkFi3Q/WorZ48ukzkeM5fKECF1V9ZYYEdC2FAL1UhOYgxeJODBZQQR/H6OSGzFdmG7q4AXteMYg8FLOGqvCPW8NFkSjHQOP9hqktE/ivzIH18eD4wVpsaVaSNgY8IORoq7PF9jtpXtVV7xsDYzRlA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/IsWb3NVnOr8uUFvzDtaqHlzaVg9d+GNRRJgkOyoth4=;
+ b=knW9ReQ7MEbcyrTyzU2cT4jTESwiaDssb/1cQOwcp7Jmre8Rud8ROxp5ymgT1RKRoXzN7TQS/ukLUIr9gINIOHLqyAjEedF+AoUGH88BfRVaUeIho4ll+babSQrLCh+IY0g2iDyGKUYGltgiNxN3ysr3tT9eWqlgh+4asSVbcxq3tCNc1QxEHL1mcwfG97AR6UGkf7+/r2XmcpHvnMGR5ruXY3nm3sr9ba9V5gTckhO8csmG++LOirv1PwD5pIe0oSPm5ZTQVn02PLJnvxpJVfz1OAmE1rsYY2imb04sn9ioATdVkIlcklV1AGnmvg6gEiqpAsKxueLvqToBRxNbZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/IsWb3NVnOr8uUFvzDtaqHlzaVg9d+GNRRJgkOyoth4=;
+ b=BBlbmiTAOkrDYo1f0gIHGLjGOMmmYzfKmRrpCia6RnQtishkjNvZAWYfO4HzGzpWaILM/Pu2yU7er+wz3aIsDX1w42t8mfiEAe1L3BQO8XGc9QWNB+Aersccsl0X+2jDIJLgD271ZsKojBqWDlET/9avvMxx7I2pkTfo0M55LSdLPVqF9s6a+Ky0u/ivvSAImdaGbyAGu4r+z8HX7ijI/iDmmA3kwZEGQmHklKQEQyQJ6p4kiXcEJzz9oQuvDiZ3uJg38/vSPzFLVvWUMwTU/O8lCqbHR8OVpyIi/RtFmUiNHQlUjUEXq4OOhm2RkL+PMslmuqDbLzvRnFCtMQotqA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
+ by PH7PR12MB9256.namprd12.prod.outlook.com (2603:10b6:510:2fe::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Thu, 20 Jun
+ 2024 13:55:43 +0000
+Received: from DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
+ ([fe80::c296:774b:a5fc:965e%5]) with mapi id 15.20.7677.030; Thu, 20 Jun 2024
+ 13:55:43 +0000
+Date: Thu, 20 Jun 2024 10:55:40 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Fuad Tabba <tabba@google.com>
+Cc: Christoph Hellwig <hch@infradead.org>,
 	David Hildenbrand <david@redhat.com>,
-	Jason Wang <jasowang@redhat.com>, linux-um@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
-	kvm@vger.kernel.org, Wei Wang <wei.w.wang@intel.com>
-Subject: Re: [PATCH vhost v9 2/6] virtio: remove support for names array
- entries being null.
-Message-ID: <20240620070717-mutt-send-email-mst@kernel.org>
-References: <20240424091533.86949-1-xuanzhuo@linux.alibaba.com>
- <20240424091533.86949-3-xuanzhuo@linux.alibaba.com>
- <20240620035749-mutt-send-email-mst@kernel.org>
- <1718872778.4831812-1-xuanzhuo@linux.alibaba.com>
- <20240620044839-mutt-send-email-mst@kernel.org>
- <1718874293.698573-2-xuanzhuo@linux.alibaba.com>
- <20240620054548-mutt-send-email-mst@kernel.org>
- <1718880548.281809-3-xuanzhuo@linux.alibaba.com>
- <20240620065602-mutt-send-email-mst@kernel.org>
- <1718881448.8979208-6-xuanzhuo@linux.alibaba.com>
+	John Hubbard <jhubbard@nvidia.com>,
+	Elliot Berman <quic_eberman@quicinc.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+	maz@kernel.org, kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, pbonzini@redhat.com
+Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
+Message-ID: <20240620135540.GG2494510@nvidia.com>
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
+ <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
+ <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
+ <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com>
+ <20240619115135.GE2494510@nvidia.com>
+ <ZnOsAEV3GycCcqSX@infradead.org>
+ <CA+EHjTxaCxibvGOMPk9Oj5TfQV3J3ZLwXk83oVHuwf8H0Q47sA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CA+EHjTxaCxibvGOMPk9Oj5TfQV3J3ZLwXk83oVHuwf8H0Q47sA@mail.gmail.com>
+X-ClientProxiedBy: BL1PR13CA0292.namprd13.prod.outlook.com
+ (2603:10b6:208:2bc::27) To DM6PR12MB3849.namprd12.prod.outlook.com
+ (2603:10b6:5:1c7::26)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1718881448.8979208-6-xuanzhuo@linux.alibaba.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|PH7PR12MB9256:EE_
+X-MS-Office365-Filtering-Correlation-Id: c6332ba6-6459-4dba-0462-08dc9130acda
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230037|1800799021|366013|376011|7416011;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UEtnMjNjU21BSXBqSUdsKzhDVXd1TVNPbmlENlA4bVJ3eDM4bUV5K2NmWkNv?=
+ =?utf-8?B?S2hQT2ZNK2thLzkyb2V3U1lRcEQ1eTEyek9LS29uem1iclhQT3dTbGZlenpT?=
+ =?utf-8?B?c29GTk9JRmlnUGh0Uk96TFRDZ2F3WnJaR2lqR0Zoc1g5aUl4bkRTRWtuRS8v?=
+ =?utf-8?B?SzFMemdlc2wxU3Bqb0dsbFhBWnhKVjlDTCs0dlZTbHJZb1ZtRGFlY1FGVlo4?=
+ =?utf-8?B?WElad1pnNlRmZjNkRkxaQnRPK21FZUZtTDdHRWh1RUxiYlNySVZ3bGlSR3dF?=
+ =?utf-8?B?NXBSSTlna0p3Z2k2aldqSk5GSWRqL0ozcWxYQlFtL09UMTQrY1UvVVoxWUs3?=
+ =?utf-8?B?bWhERGFmci90RTR6NUJnYmkwY1lFMWRWdUkvemtIYW4vaGl6Y21lWFFXVHpk?=
+ =?utf-8?B?dzJIWnJNWTJ3bEpRV0pnYWZkZ0hKaHBMeitUUlRPSWpwYVVjZEZQdVBCbzFQ?=
+ =?utf-8?B?MTlpY004UXdJRXhINGRnT21nV3RMVHlIZHR4a3prR3dTUndudjVnR1VCam5m?=
+ =?utf-8?B?UlZjbWFsVVIvcU5FdW50bytIMnhoVXFOUlBwM0YvQmZvVHRnK0Uvbk1DVXhD?=
+ =?utf-8?B?a0tIbDZNUHZHbXlweU9mcXRMWWsxUDY2VWUrQ2FsSFVaM2pYYnlBUkVwS01P?=
+ =?utf-8?B?c053TVliZE5hZUQzcXQxL2Z1bEhQTmk4Y05NTWxZN1NESWJkL21zblNubXBF?=
+ =?utf-8?B?aXliWFRmbmlKc1R0TU44SEVPZW5yQ3FLZlRheVk5dmpxdWoreEVHZXNWbG95?=
+ =?utf-8?B?VnE1Y3B2MktaWTdmQ1JMLzRETllxRnpEbngwc25tYlN4MU5PdzFBZkZXMWps?=
+ =?utf-8?B?WEVUMkRiUDhiZWl5M0poV2x6YXFSN2ljcG45MnlVWEVmQXlHRVhZOXF0MUUy?=
+ =?utf-8?B?alM5S3YwNlVReTZwbTFBMnBGRFBoM09VOW9wM0l0V2lNUlpndkdTWDNNZHhj?=
+ =?utf-8?B?d1JCNC9UN3ZEdktqd3htdjdiemVhS2lGNkN3VDdoaUJTUGtWVWoveTFyTit3?=
+ =?utf-8?B?TVhTc1lKWEg3YTJJUWtJQ0I0bVdiMlNnVGQrZFMyOFFvTmtUdjA1WGhxYk9O?=
+ =?utf-8?B?akE0eVo4MTFGMkdIZGJkZ1h6aVlxNWI2WTFYa3lKOFNkMUFGS2pPVVF6dVBV?=
+ =?utf-8?B?SEpFY2lmb1BoTXBFMUdzZkMyWmdyR0sxa0w1Q3lmcXBrY2tQWnVoSlFIWFR0?=
+ =?utf-8?B?Z0MzNUpoTVcrdUpnR2hUNllLWlNnNHV3eFIrUFdubWw1b3VMN2VGTWlmSWNr?=
+ =?utf-8?B?Z1JRRjFlMDZwMEN5QmFDalZ1ZHdjaUlleE01dUxxemprOCt2UjZkV3NzVXJQ?=
+ =?utf-8?B?OEROTnBLaHdXeks5THpnOGJlVFZuTGZJZ0FlTWZJUVI2UVJXR25DN2Nvck1B?=
+ =?utf-8?B?b21xNmkxOHlUTEJIamxtb0JjZFBtRlk3bGNMSTdlWHlZaEtnMUdlaUhmRHlm?=
+ =?utf-8?B?MzVZUFh3ejNsTnUyMUI4OXVPMkJDdzhlY1VMcHhOZ0JqV1E3bHgvZTZ2c3pN?=
+ =?utf-8?B?ekhTam4wWlZFbTMwMy9OMHR0UWpRNWZSVEVYKytiMk1RcE1zekU1TTd3Wnll?=
+ =?utf-8?B?NWJWT0NZbEdBc01Db0tFYUhsbFV4bGFIVU1IL0FxQmlpZFRRT0VCZzdaZnQ4?=
+ =?utf-8?B?NmxjMHRUZ0g2dWdLSG5nNUl6VnZvbzhBTTk2RW1Od1NubDVIT3VpSDRneUhS?=
+ =?utf-8?B?ZGpRTEw4eEVHN25xNkxWcEo5ZWpDT0RpZTNVMjVrM25KYzF6eWNodFN0VWZy?=
+ =?utf-8?Q?3kZchIMpqiOdmNsHQ4ABU1/FqyYIQn+8VX+qzg+?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(1800799021)(366013)(376011)(7416011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SnFXY1BHQWZUaEhwbGg0TjdQRndtZ1B5YytJUFRXV2MyMTRYVzdyRTBPTFcy?=
+ =?utf-8?B?NXlFTVRVdnZVbUtYVlRFdmNueGFBZU1IUzQ0QTAyalRNUFRLUkJxM3NBMTBO?=
+ =?utf-8?B?cnV2WnJiUk9neW40YzdaOUtVYm5CdkQ5L0VBN1gyWkJMOVhwSVo3WUtYbjEz?=
+ =?utf-8?B?bG9BN2Q1RjFWVVdxbUdHK3ZwVlI3cGRBWkhHS3VDZzVhMFZkaFJyY1FEM2Ew?=
+ =?utf-8?B?K2dkakJyMTBrd1VoY3BKd2ZSZlYwNDNIL2UxQk1YVkFwelJZQXdNcDdYaUdY?=
+ =?utf-8?B?ejhFSGlqSDlmMzRtWW5rMmowZnc2a21TWHNsQmtBTTlrNzVmTGlIWlJDNVp4?=
+ =?utf-8?B?MmpNNGs4ZmZHMVl4NDk0by9UU2NhcnhnNmJRL2QwY1UwN1N3OWptbzFZbXor?=
+ =?utf-8?B?WkdZdGRjT2NMWVhIVG5nWFQzMXBXUjMrcjhXOE4rREFsU0RvVDF6WDhJemRw?=
+ =?utf-8?B?NDJOOEU3K0tlc1AxQngzcmRIYy9CVldaclFQb21aejR6enJSWk5OS054VVlZ?=
+ =?utf-8?B?S3FUbGQxbVl5QWlOQ0MwYld6UTAyRmZUZFNGS29NYmhEYmNsSFM2aW9sdE9G?=
+ =?utf-8?B?ZW5ya3AvaGwxbXpYVXJodFhRN25IMTRVRDVqNExaN3hmYXFQNklWMFI5a1FC?=
+ =?utf-8?B?QnEyQWZkMHNwRDlhSkR0SlNuSTcrcTRqcDNXS2dESHFnSm9lc0N2aGhNRzMv?=
+ =?utf-8?B?c0tMcjMwSFFYK2UvMWdkRzVpTXowQ2pMQnc4WHRGNjMyWWU5MDhSaVlSejJz?=
+ =?utf-8?B?REdsOVU0L1VRTVRYOEZPK3BPSHVpcnZuR0duc1g5Rng2YnZBOFU3MGhudloy?=
+ =?utf-8?B?NytFakZxd0NzaEw3SkZWaVZXaXBoaEpjcGRwWC9UY2syY0MveFpuMXdOOXRW?=
+ =?utf-8?B?OGdEUnhRVEszdU9GUWFxbDhaNGloVDk3UVVJNGVHTm50ZWlkT3BuUFdjVEZF?=
+ =?utf-8?B?QzhtWkJNSkVrQW5lRlkvQkxNYko0cnYxUHVhTmNOYnNuNHlPWUtEL1JYNEhR?=
+ =?utf-8?B?Ly80ZmZMdWw5czRYMFRNYjMyR0RMVDJrb3lDQVQ5V2JwUGxFMU9YSEN4QmVu?=
+ =?utf-8?B?bzdhVS9Uc3lJVTRMSzNPQ1BZTnNyeHJSQnVGY3JXekpVK0U5Z3lPM3VDUUUx?=
+ =?utf-8?B?RDJFTGtaODdMT1IyaHo4amZUR3pxdExJQitxK2FZSXQ0ZTQvaUZXZG4vRjl3?=
+ =?utf-8?B?cnpJUjFWODlVRHhkejFGMmI1YVdMZ1R1MjlmSTlmUlBZeWNBYkI0aWtHMzls?=
+ =?utf-8?B?TGJiK21Bd3hJRUJ2VHpBZVFJdmlmZVp2Nzh3bVBFY20vcjM2UHRrdlhUWitV?=
+ =?utf-8?B?cHFBeUQrRVYxYlhoUVUzV1Z6cHpuRmJKZ1M5TVFvRk5BcFJXN2FtQ1VYaXdJ?=
+ =?utf-8?B?aFJkbVBqSG1kZEdpdzVLdDA3WWJQZVQ1cHNGdlRhRkxPTHdwUHBNekJkMGVl?=
+ =?utf-8?B?eVpiZEx0V2VZdnhNWEtQU3dnekpBV25VVDc5UkZLSGVZcWJzdGtKMEV4Y3Va?=
+ =?utf-8?B?ZE5iVUlmeWcwa0Fwc3pJUnZURkJQSXo0dTZvbE1YdXVEd1krK0dCKzFWTzlT?=
+ =?utf-8?B?ekJseFFkZCtJUlhJZ1ZFYzR5U2VHcENXa0lpU3VTQnBXS2RpVjJaMXFPMFpG?=
+ =?utf-8?B?V0JYMGp6bmxLL0RZU003eEcvNy9zNDVJTzZha2Vra0JCQ0FZbmdPYk4zaFNX?=
+ =?utf-8?B?TkYwVmtwU29pUTM5OFJwb0kyeU4rZTRPQkJ0Q3pGYlg5M2hBKzlTTXptb1l6?=
+ =?utf-8?B?ZGRRYS9qV2ROZGsrK0g0Z0VUZW9kUGZVRU8ybUMwbk5MdytNL04yRFJOb1BM?=
+ =?utf-8?B?WkZSalV2am5qeUpWRysyMTNrM25YR25NRHd4L0ZnUnd2RTRLN2NhdWJvMDJU?=
+ =?utf-8?B?ZFZJVmhHRzU1M1J2cXhLQTdnb0lENWQvVTNBTEt5K1R2ZFVBRCtYaSsvd2hU?=
+ =?utf-8?B?MHRUZDJHUjl1TjVnSkh2QWVINnpJRTYxZ0tIZ2JySjIyeUM2ZFRBZStvWmkz?=
+ =?utf-8?B?M1R5cUd5d25nR2toMmxmZDk4UnZKVXRMR0RSZC9NcU1hT1E2WmhlMUd2REdO?=
+ =?utf-8?B?NE1iU25aT2xlS2hKd2RXUmRWenVPM3l1dTYxTlR2MTYwZ2E4c0laN05wUWx4?=
+ =?utf-8?Q?B9Z0=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6332ba6-6459-4dba-0462-08dc9130acda
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2024 13:55:42.9243
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: gS2b0uF2ZOS/nrxSpAg3wV9EXjNTPUHFJR65jWGL7ukrFJ32z3GcreGvfh97s56X
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9256
 
-On Thu, Jun 20, 2024 at 07:04:08PM +0800, Xuan Zhuo wrote:
-> On Thu, 20 Jun 2024 07:02:42 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > On Thu, Jun 20, 2024 at 06:49:08PM +0800, Xuan Zhuo wrote:
-> > > On Thu, 20 Jun 2024 06:01:54 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > On Thu, Jun 20, 2024 at 05:04:53PM +0800, Xuan Zhuo wrote:
-> > > > > On Thu, 20 Jun 2024 05:01:08 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > > > On Thu, Jun 20, 2024 at 04:39:38PM +0800, Xuan Zhuo wrote:
-> > > > > > > On Thu, 20 Jun 2024 04:02:45 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
-> > > > > > > > On Wed, Apr 24, 2024 at 05:15:29PM +0800, Xuan Zhuo wrote:
-> > > > > > > > > commit 6457f126c888 ("virtio: support reserved vqs") introduced this
-> > > > > > > > > support. Multiqueue virtio-net use 2N as ctrl vq finally, so the logic
-> > > > > > > > > doesn't apply. And not one uses this.
-> > > > > > > > >
-> > > > > > > > > On the other side, that makes some trouble for us to refactor the
-> > > > > > > > > find_vqs() params.
-> > > > > > > > >
-> > > > > > > > > So I remove this support.
-> > > > > > > > >
-> > > > > > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > > > > > Acked-by: Jason Wang <jasowang@redhat.com>
-> > > > > > > > > Acked-by: Eric Farman <farman@linux.ibm.com> # s390
-> > > > > > > > > Acked-by: Halil Pasic <pasic@linux.ibm.com>
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > I don't mind, but this patchset is too big already.
-> > > > > > > > Why do we need to make this part of this patchset?
-> > > > > > >
-> > > > > > >
-> > > > > > > If some the pointers of the names is NULL, then in the virtio ring,
-> > > > > > > we will have a trouble to index from the arrays(names, callbacks...).
-> > > > > > > Becasue that the idx of the vq is not the index of these arrays.
-> > > > > > >
-> > > > > > > If the names is [NULL, "rx", "tx"], the first vq is the "rx", but index of the
-> > > > > > > vq is zero, but the index of the info of this vq inside the arrays is 1.
-> > > > > >
-> > > > > >
-> > > > > > Ah. So actually, it used to work.
-> > > > > >
-> > > > > > What this should refer to is
-> > > > > >
-> > > > > > commit ddbeac07a39a81d82331a312d0578fab94fccbf1
-> > > > > > Author: Wei Wang <wei.w.wang@intel.com>
-> > > > > > Date:   Fri Dec 28 10:26:25 2018 +0800
-> > > > > >
-> > > > > >     virtio_pci: use queue idx instead of array idx to set up the vq
-> > > > > >
-> > > > > >     When find_vqs, there will be no vq[i] allocation if its corresponding
-> > > > > >     names[i] is NULL. For example, the caller may pass in names[i] (i=4)
-> > > > > >     with names[2] being NULL because the related feature bit is turned off,
-> > > > > >     so technically there are 3 queues on the device, and name[4] should
-> > > > > >     correspond to the 3rd queue on the device.
-> > > > > >
-> > > > > >     So we use queue_idx as the queue index, which is increased only when the
-> > > > > >     queue exists.
-> > > > > >
-> > > > > >     Signed-off-by: Wei Wang <wei.w.wang@intel.com>
-> > > > > >     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > > > > >
-> > > > >
-> > > > > That just work for PCI.
-> > > > >
-> > > > > The trouble I described is that we can not index in the virtio ring.
-> > > > >
-> > > > > In virtio ring, we may like to use the vq.index that do not increase
-> > > > > for the NULL.
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > Which made it so setting names NULL actually does not reserve a vq.
-> > > > > >
-> > > > > > But I worry about non pci transports - there's a chance they used
-> > > > > > a different index with the balloon. Did you test some of these?
-> > > > > >
-> > > > >
-> > > > > Balloon is out of spec.
-> > > > >
-> > > > > The vq.index does not increase for the name NULL. So the Balloon use the
-> > > > > continuous id. That is out of spec.
-> > > >
-> > > >
-> > > > I see. And apparently the QEMU implementation is out of spec, too,
-> > > > so they work fine. And STATS is always on in QEMU.
-> > > >
-> > > > That change by Wei broke the theoretical config which has
-> > > > !STATS but does have FREE_PAGE. We never noticed - not many people
-> > > > ever bothered with FREE_PAGE.
-> > > >
-> > > > However QEMU really is broken in a weird way.
-> > > > In particular if it exposes STATS but driver does not
-> > > > configure STATS then QEMU still has the stats vq.
-> > > > Things will break then.
-> > > >
-> > > >
-> > > > In short, it's a mess, and it needs thought.
-> > > > At this point I suggest we keep the ability to set
-> > > > names to NULL in case we want to just revert Wei's patch.
-> > > >
-> > > >
-> > > >
-> > > > > That does not matter for this patchset.
-> > > > > The name NULL is always skipped.
-> > > > >
-> > > > > Thanks.
-> > > >
-> > > >
-> > > > Let's keep this patchset as small as possible.
-> > > > Keep the existing functionality, we'll do cleanups
-> > > > later.
-> > >
-> > >
-> > > I am ok. But we need a idx to index the info of the vq.
-> > >
-> > > How about a new element "cfg_idx" to virtio_vq_config.
-> > >
-> > > struct virtio_vq_config {
-> > > 	unsigned int nvqs;
-> > > ->	unsigned int cfg_idx;
-> > >
-> > > 	struct virtqueue   **vqs;
-> > > 	vq_callback_t      **callbacks;
-> > > 	const char         **names;
-> > > 	const bool          *ctx;
-> > > 	struct irq_affinity *desc;
-> > > };
-> > >
-> > >
-> > > That is setted by transport. The virtio ring can use this to index the info
-> > > of the vq. Then the #1 #2 commits can be dropped.
-> > >
-> > >
-> > > Thanks.
-> > >
+On Thu, Jun 20, 2024 at 09:32:11AM +0100, Fuad Tabba wrote:
+> Hi,
+> 
+> On Thu, Jun 20, 2024 at 5:11 AM Christoph Hellwig <hch@infradead.org> wrote:
 > >
-> > I'm not sure why you need this in the API.
+> > On Wed, Jun 19, 2024 at 08:51:35AM -0300, Jason Gunthorpe wrote:
+> > > If you can't agree with the guest_memfd people on how to get there
+> > > then maybe you need a guest_memfd2 for this slightly different special
+> > > stuff instead of intruding on the core mm so much. (though that would
+> > > be sad)
 > >
-> >
-> > Actually now I think about it, the whole struct is weird.
-> > I think nvqs etc should be outside the struct.
-> > All arrays are the same size, why not:
-> >
-> > struct virtio_vq_config {
-> >  	vq_callback_t      callback;
-> >  	const char         *name;
-> >  	const bool          ctx;
-> > };
-> >
-> > And find_vqs should get an array of these.
-> > Leave the rest of params alone.
+> > Or we're just not going to support it at all.  It's not like supporting
+> > this weird usage model is a must-have for Linux to start with.
 > 
-> 
-> YES, this is great.
-> 
-> I thought about this.
-> 
-> The trouble is that all the callers need to be changed.
-> That are too many.
-> 
-> Thanks.
-> 
+> Sorry, but could you please clarify to me what usage model you're
+> referring to exactly, and why you think it's weird? It's just that we
+> have covered a few things in this thread, and to me it's not clear if
+> you're referring to protected VMs sharing memory, or being able to
+> (conditionally) map a VM's memory that's backed by guest_memfd(), or
+> if it's the Exclusive pin.
 
-Not too many.
+Personally I think mapping memory under guest_memfd is pretty weird.
 
+I don't really understand why you end up with something different than
+normal CC. Normal CC has memory that the VMM can access and memory it
+cannot access. guest_memory is supposed to hold the memory the VMM cannot
+reach, right?
 
-> >
-> >
-> > >
-> > > >
-> > > >
-> > > > > > --
-> > > > > > MST
-> > > > > >
-> > > >
-> >
+So how does normal CC handle memory switching between private and
+shared and why doesn't that work for pKVM? I think the normal CC path
+effectively discards the memory content on these switches and is
+slow. Are you trying to make the switch content preserving and faster?
 
+If yes, why? What is wrong with the normal CC model of slow and
+non-preserving shared memory? Are you trying to speed up IO in these
+VMs by dynamically sharing pages instead of SWIOTLB?
+
+Maybe this was all explained, but I reviewed your presentation and the
+cover letter for the guest_memfd patches and I still don't see the why
+in all of this.
+
+Jason
 
