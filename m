@@ -1,185 +1,230 @@
-Return-Path: <kvm+bounces-20218-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20219-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D2F6911F15
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:44:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16501911F18
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:44:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 919A81F25D3B
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 08:44:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95F781F25E9B
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 08:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D31416DEC2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B48C816DEDF;
 	Fri, 21 Jun 2024 08:44:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ef8SrTBG"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="ACUln0wN"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8877016D9B7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F6716D9B9
 	for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 08:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718959443; cv=none; b=OCyyIBaM01k6o9hZ3G19UViqknTj8BqECCmIn9O9xnx3tzY2EuGcjlFQ9mSil2UxF4MIit3GOG94g2uOOE462nZxcuQeUSSKSOGYmN+6hg417lrd2RRWxoQpivyVG77NP/1I81BxR2jmuaZqm/lrrkCJ2Fizwdt4WIdGPNyQNgA=
+	t=1718959443; cv=none; b=NTAZw9VIqX1boSda3QmwTMf0czpOR0xejV3W7lP3UdM1gUQN2EKhcKxTH2fGmoWoT2hIqghBG1p7q4EzOl1O2nIhvM7BRWArqrwZ9PgHWox56g/7Fq1YsWXhDEHsr1+3pPpgxEugXp4+6YJV2cYsF+J/vSu2Rjow855XoAv+nV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1718959443; c=relaxed/simple;
-	bh=PUmN4XsW0Nz9edwBR5542tFh9arkVyDs5u6ltSHiJUE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rCsGetiO1Ioam8zFJKZxtshAwS7reNam1s8bXC8EAzJg9SR21h2OrJaCgprODBf/ZXqYEZM3T+4Hq8SZOhIg435+UQZVSMcmVQvXlWyUPT+lQFo/roIvoO/FPtlJGr87sDO9+yx9IUft+ijo56YYo4XKI5/RBbTurln6uvbgrTI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ef8SrTBG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1718959440;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=VU90d8rIY7+e8nZJdYV+B/wIyrHGdSqZeVXkqOxNvFc=;
-	b=ef8SrTBGL50vcveU5RLxXQDX3dm9vv5CNCKfw2z7jGGUcx/mD8HnYgQC6Hz0AVqMFFOVQG
-	z6eB14Ige80vrwZpZQlw4Y0TjuGJ3u4GsDFO+7p+d6M/ZK0HHu0MwqaniQ51hKQziA7Jtv
-	03tImzE0qq0YbYBpOUaXTU7o3xTH1Yc=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-447-UB7dUSy7N_-5g4osBvn5-w-1; Fri, 21 Jun 2024 04:43:58 -0400
-X-MC-Unique: UB7dUSy7N_-5g4osBvn5-w-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3648793ae51so965622f8f.2
-        for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 01:43:58 -0700 (PDT)
+	bh=Jbwg4HBbsos0LMHx3qJn3rslKNY3axIyHOu21SZsnAQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B3P4V69lnpXNEtmADUNSbQHnkeQE665jLnQAZHLsQNMmkz38iXOgi/6AXSuXWGMp5aIObrcd1s1LUnMZu2U7yTQyDGguP4NBloGnsy98UYo2imr7W0x7Vem9wYer0a88Mz6c0NvjXId9rmwjNypkMon+CxuYH+V7TYLQkZnViXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=ACUln0wN; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a62ef52e837so199026566b.3
+        for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 01:44:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1718959440; x=1719564240; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y0W/yXjQFyqiu4YF3eksrFfEO800rJtGZTMEqwAB9lw=;
+        b=ACUln0wN5MBr2W0zWjXeykApLeYWCRLxefBYwuoLqahTF1ci18I+QPwmvZ0wkHn4AV
+         VNwkHNDBLpfaWca8On9V7L1Vn1Pg8fq4i7qjubIIPnp0pFbsO37LaNA4TQNiPHE9dOfl
+         W2FH+qwewdL/y1nRv5uzISbbqo8ekF7TlB4MpABRjSCnHIlhMDL9oGW4TCENB3UzmJa7
+         AbF8askcY530QM6oIkYRMex5NSOYc0Oji/coxVt76xAsbs2NK+Zg9LRkx4j8wphRDHDi
+         Ew1TlqxuHrEDpXpuUKQ08ZjZLnSfN8C+xBmgeCZzY7GvljC5Ud9tfGlrN2e9X2cmG2z4
+         r9Zw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718959437; x=1719564237;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=VU90d8rIY7+e8nZJdYV+B/wIyrHGdSqZeVXkqOxNvFc=;
-        b=XjGMbPg4IXD+LzY5eBrsiwJabru5vWyGIqk4MlmE2SUgwkNTqdI87Pz3K98NArrn2L
-         /E/Mij6vu+LWWNUvE7tP2yZKBOnt2D+6Rt9l3ncCtX5QQHuXW0nQymmOwY9r0FUN/6gG
-         JP64OEO8VHJKGz5JLEt+mdfPKWZFYA4LMQFfp9ZiRJOYCLvZKnkvsUH4SyMCNN0BwGx3
-         wVVZETbMtDhBsl3BGeVjJCb4uOr9Hveb3k1MdrdEGBYrKh5+uXlXfG8j861ftd2Td+/j
-         vpZZ1MWlcmf+rx0av6oWkzRGYAavoU1+J72OrL/6n0k125mj/6GOVUpekzKBQ/g7Gstn
-         QV4w==
-X-Forwarded-Encrypted: i=1; AJvYcCU+Oja1qHmwtSj09IQoUD55TlaA1R5uC92rwZubkpGr3rSCIe1v7n8wh3Iedle29wSuTLB0DEwi9OBV878c6Q/Sule6
-X-Gm-Message-State: AOJu0YwRnX+v6fucZMLwAyzAnPTmIXAzutQMkWUy8Kx8kptUopyJSDr0
-	7etKXh3dkwF2DPGmMV3U7c8zdLDzl/UDSp+Xy/YhAylCcI5HwVWJWXvT1oRRBjIVPNDzkOR3IcY
-	mAU1Zj/i9IlsuLqD/ABQr7C0sU+Apz+ZNP4YQyXkG8Aa5KzEheQ==
-X-Received: by 2002:adf:ea01:0:b0:35f:1bc3:50b0 with SMTP id ffacd0b85a97d-36319a855bamr5420986f8f.63.1718959437639;
-        Fri, 21 Jun 2024 01:43:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFiasjYrLg90qQVpUX0kw3ikfNJqrMMvB9SgRGxmoh8eFyR1j+l0uMDDPJS1zuvGqqtRVJD+w==
-X-Received: by 2002:adf:ea01:0:b0:35f:1bc3:50b0 with SMTP id ffacd0b85a97d-36319a855bamr5420970f8f.63.1718959437216;
-        Fri, 21 Jun 2024 01:43:57 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c725:e600:4063:2059:fd18:9d65? (p200300cbc725e60040632059fd189d65.dip0.t-ipconnect.de. [2003:cb:c725:e600:4063:2059:fd18:9d65])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36638f86566sm1069864f8f.64.2024.06.21.01.43.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 21 Jun 2024 01:43:56 -0700 (PDT)
-Message-ID: <4c8b81a0-3a76-4802-875f-f26ff1844955@redhat.com>
-Date: Fri, 21 Jun 2024 10:43:55 +0200
+        d=1e100.net; s=20230601; t=1718959440; x=1719564240;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y0W/yXjQFyqiu4YF3eksrFfEO800rJtGZTMEqwAB9lw=;
+        b=If5q/djEkmD2/mfgi5PpCI7KVPjPDhotXjvzdwX9Chn8FdCYT47LraDGWwkU9BX9lb
+         7qjlYR6UOFR0p2GWLH5/ntGuoaJNLWgYzSuk7Lj0XLV3Fi3b4Vekel1rlveeL/6/ZDeU
+         2fT0ATa0vVHyZAE2jmJw6nLvq0wIgnPjSgp8THzN2cNRH3UTFqdTOLL857qsIhyxnpr0
+         jo2kMuSOH08KyStl+/VS1jSp089PZwt7QHkwu07dAoL+8C199FqFVkvAs1G55cKP9YJK
+         hf9HRhiPdIeczgsQZl5aR3o5Zet7MqTtkw2xvV9KCya2Im1QFTNx6/L5ucv3/jvLrY6q
+         Esyw==
+X-Forwarded-Encrypted: i=1; AJvYcCV+7zdd58X329JYVjOQeRUSGkZyPis/UhdxzaG5XAb+MgkTvbtq/uHPft68kOXvLBbaunKrZTbgtfv3J3+byKV1K8lI
+X-Gm-Message-State: AOJu0YxZGF6aeXdpT5smsCGdzX2veRfkuJ1yZoZrUWGrHumqfiJTLw26
+	HARCtVeOEqFdb5PIhDQstWj11S/ApCpNVjT+XqWE3qPwiD3Bnf0xoEHjk3qsScQ=
+X-Google-Smtp-Source: AGHT+IGCvv5/dIqWzwFU7HWVxrBDIamtXxsPzF9wPVhiKm9PMGOYERORN5v/XksMktGyjYh/7LB0lA==
+X-Received: by 2002:a17:907:b9d2:b0:a6f:50ae:e06 with SMTP id a640c23a62f3a-a6fab778851mr473339566b.53.1718959439838;
+        Fri, 21 Jun 2024 01:43:59 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fcf428bb5sm59484866b.13.2024.06.21.01.43.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 01:43:59 -0700 (PDT)
+Date: Fri, 21 Jun 2024 10:43:58 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, apatel@ventanamicro.com, alex@ghiti.fr, 
+	greentime.hu@sifive.com, vincent.chen@sifive.com, Jinyu Tang <tjytimi@163.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Anup Patel <anup@brainfault.org>, 
+	Conor Dooley <conor.dooley@microchip.com>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	Atish Patra <atishp@rivosinc.com>, wchen <waylingii@gmail.com>, Samuel Ortiz <sameo@rivosinc.com>, 
+	=?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, Evan Green <evan@rivosinc.com>, 
+	Xiao Wang <xiao.w.wang@intel.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, "Mike Rapoport (IBM)" <rppt@kernel.org>, 
+	Kemeng Shi <shikemeng@huaweicloud.com>, Samuel Holland <samuel.holland@sifive.com>, 
+	Jisheng Zhang <jszhang@kernel.org>, Charlie Jenkins <charlie@rivosinc.com>, 
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>, Leonardo Bras <leobras@redhat.com>
+Subject: Re: [PATCH v5 1/4] RISC-V: Add Svade and Svadu Extensions Support
+Message-ID: <20240621-d1b77d43adacaa34337238c2@orel>
+References: <20240605121512.32083-1-yongxuan.wang@sifive.com>
+ <20240605121512.32083-2-yongxuan.wang@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-To: Fuad Tabba <tabba@google.com>, Sean Christopherson <seanjc@google.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, John Hubbard <jhubbard@nvidia.com>,
- Elliot Berman <quic_eberman@quicinc.com>,
- Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, maz@kernel.org, kvm@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- pbonzini@redhat.com
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
- <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
- <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
- <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com>
- <20240619115135.GE2494510@nvidia.com>
- <CA+EHjTz_=J+bDpqciaMnNja4uz1Njcpg5NVh_GW2tya-suA7kQ@mail.gmail.com>
- <ZnRMn1ObU8TFrms3@google.com>
- <CA+EHjTxvOyCqWRMTS3mXHznQtAJzDJLgqdS0Er2GA9FGdxd1vA@mail.gmail.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <CA+EHjTxvOyCqWRMTS3mXHznQtAJzDJLgqdS0Er2GA9FGdxd1vA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240605121512.32083-2-yongxuan.wang@sifive.com>
 
->> Again from that thread, one of most important aspects guest_memfd is that VMAs
->> are not required.  Stating the obvious, lack of VMAs makes it really hard to drive
->> swap, reclaim, migration, etc. from code that fundamentally operates on VMAs.
->>
->>   : More broadly, no VMAs are required.  The lack of stage-1 page tables are nice to
->>   : have; the lack of VMAs means that guest_memfd isn't playing second fiddle, e.g.
->>   : it's not subject to VMA protections, isn't restricted to host mapping size, etc.
->>
->> [1] https://lore.kernel.org/all/Zfmpby6i3PfBEcCV@google.com
->> [2] https://lore.kernel.org/all/Zg3xF7dTtx6hbmZj@google.com
+On Wed, Jun 05, 2024 at 08:15:07PM GMT, Yong-Xuan Wang wrote:
+> Svade and Svadu extensions represent two schemes for managing the PTE A/D
+> bits. When the PTE A/D bits need to be set, Svade extension intdicates
+> that a related page fault will be raised. In contrast, the Svadu extension
+> supports hardware updating of PTE A/D bits. Since the Svade extension is
+> mandatory and the Svadu extension is optional in RVA23 profile, by default
+> the M-mode firmware will enable the Svadu extension in the menvcfg CSR
+> when only Svadu is present in DT.
 > 
-> I wonder if it might be more productive to also discuss this in one of
-> the PUCKs, ahead of LPC, in addition to trying to go over this in LPC.
+> This patch detects Svade and Svadu extensions from DT and adds
+> arch_has_hw_pte_young() to enable optimization in MGLRU and
+> __wp_page_copy_user() when we have the PTE A/D bits hardware updating
+> support.
+> 
+> Co-developed-by: Jinyu Tang <tjytimi@163.com>
+> Signed-off-by: Jinyu Tang <tjytimi@163.com>
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> ---
+>  arch/riscv/Kconfig               |  1 +
+>  arch/riscv/include/asm/csr.h     |  1 +
+>  arch/riscv/include/asm/hwcap.h   |  2 ++
+>  arch/riscv/include/asm/pgtable.h | 14 +++++++++++++-
+>  arch/riscv/kernel/cpufeature.c   |  2 ++
+>  5 files changed, 19 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/riscv/Kconfig b/arch/riscv/Kconfig
+> index b94176e25be1..dbfe2be99bf9 100644
+> --- a/arch/riscv/Kconfig
+> +++ b/arch/riscv/Kconfig
+> @@ -36,6 +36,7 @@ config RISCV
+>  	select ARCH_HAS_PMEM_API
+>  	select ARCH_HAS_PREPARE_SYNC_CORE_CMD
+>  	select ARCH_HAS_PTE_SPECIAL
+> +	select ARCH_HAS_HW_PTE_YOUNG
+>  	select ARCH_HAS_SET_DIRECT_MAP if MMU
+>  	select ARCH_HAS_SET_MEMORY if MMU
+>  	select ARCH_HAS_STRICT_KERNEL_RWX if MMU && !XIP_KERNEL
+> diff --git a/arch/riscv/include/asm/csr.h b/arch/riscv/include/asm/csr.h
+> index 25966995da04..524cd4131c71 100644
+> --- a/arch/riscv/include/asm/csr.h
+> +++ b/arch/riscv/include/asm/csr.h
+> @@ -195,6 +195,7 @@
+>  /* xENVCFG flags */
+>  #define ENVCFG_STCE			(_AC(1, ULL) << 63)
+>  #define ENVCFG_PBMTE			(_AC(1, ULL) << 62)
+> +#define ENVCFG_ADUE			(_AC(1, ULL) << 61)
+>  #define ENVCFG_CBZE			(_AC(1, UL) << 7)
+>  #define ENVCFG_CBCFE			(_AC(1, UL) << 6)
+>  #define ENVCFG_CBIE_SHIFT		4
+> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/hwcap.h
+> index e17d0078a651..35d7aa49785d 100644
+> --- a/arch/riscv/include/asm/hwcap.h
+> +++ b/arch/riscv/include/asm/hwcap.h
+> @@ -81,6 +81,8 @@
+>  #define RISCV_ISA_EXT_ZTSO		72
+>  #define RISCV_ISA_EXT_ZACAS		73
+>  #define RISCV_ISA_EXT_XANDESPMU		74
+> +#define RISCV_ISA_EXT_SVADE             75
+> +#define RISCV_ISA_EXT_SVADU		76
+>  
+>  #define RISCV_ISA_EXT_XLINUXENVCFG	127
+>  
+> diff --git a/arch/riscv/include/asm/pgtable.h b/arch/riscv/include/asm/pgtable.h
+> index aad8b8ca51f1..7287ea4a6160 100644
+> --- a/arch/riscv/include/asm/pgtable.h
+> +++ b/arch/riscv/include/asm/pgtable.h
+> @@ -120,6 +120,7 @@
+>  #include <asm/tlbflush.h>
+>  #include <linux/mm_types.h>
+>  #include <asm/compat.h>
+> +#include <asm/cpufeature.h>
+>  
+>  #define __page_val_to_pfn(_val)  (((_val) & _PAGE_PFN_MASK) >> _PAGE_PFN_SHIFT)
+>  
+> @@ -288,7 +289,6 @@ static inline pte_t pud_pte(pud_t pud)
+>  }
+>  
+>  #ifdef CONFIG_RISCV_ISA_SVNAPOT
+> -#include <asm/cpufeature.h>
+>  
+>  static __always_inline bool has_svnapot(void)
+>  {
+> @@ -624,6 +624,18 @@ static inline pgprot_t pgprot_writecombine(pgprot_t _prot)
+>  	return __pgprot(prot);
+>  }
+>  
+> +/*
+> + * Both Svade and Svadu control the hardware behavior when the PTE A/D bits need to be set. By
+> + * default the M-mode firmware enables the hardware updating scheme when only Svadu is present in
+> + * DT.
+> + */
+> +#define arch_has_hw_pte_young arch_has_hw_pte_young
+> +static inline bool arch_has_hw_pte_young(void)
+> +{
+> +	return riscv_has_extension_unlikely(RISCV_ISA_EXT_SVADU) &&
+> +	       !riscv_has_extension_likely(RISCV_ISA_EXT_SVADE);
 
-I don't know in  which context you usually discuss that, but I could 
-propose that as a topic in the bi-weekly MM meeting.
+It's hard to guess what is, or will be, more likely to be the correct
+choice of call between the _unlikely and _likely variants. But, while we
+assume svade is most prevalent right now, it's actually quite unlikely
+that 'svade' will be in the DT, since DTs haven't been putting it there
+yet. Anyway, it doesn't really matter much and maybe the _unlikely vs.
+_likely variants are better for documenting expectations than for
+performance.
 
-This would, of course, be focused on the bigger MM picture: how to mmap, 
-how how to support huge pages, interaction with page pinning, ... So 
-obviously more MM focused once we are in agreement that we want to 
-support shared memory in guest_memfd and how to make that work with core-mm.
+> +}
+> +
+>  /*
+>   * THP functions
+>   */
+> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufeature.c
+> index 5ef48cb20ee1..58565798cea0 100644
+> --- a/arch/riscv/kernel/cpufeature.c
+> +++ b/arch/riscv/kernel/cpufeature.c
+> @@ -301,6 +301,8 @@ const struct riscv_isa_ext_data riscv_isa_ext[] = {
+>  	__RISCV_ISA_EXT_DATA(ssaia, RISCV_ISA_EXT_SSAIA),
+>  	__RISCV_ISA_EXT_DATA(sscofpmf, RISCV_ISA_EXT_SSCOFPMF),
+>  	__RISCV_ISA_EXT_DATA(sstc, RISCV_ISA_EXT_SSTC),
+> +	__RISCV_ISA_EXT_DATA(svade, RISCV_ISA_EXT_SVADE),
+> +	__RISCV_ISA_EXT_DATA(svadu, RISCV_ISA_EXT_SVADU),
+>  	__RISCV_ISA_EXT_DATA(svinval, RISCV_ISA_EXT_SVINVAL),
+>  	__RISCV_ISA_EXT_DATA(svnapot, RISCV_ISA_EXT_SVNAPOT),
+>  	__RISCV_ISA_EXT_DATA(svpbmt, RISCV_ISA_EXT_SVPBMT),
+> -- 
+> 2.17.1
+>
 
-Discussing if we want shared memory in guest_memfd might be betetr 
-suited for a different, more CC/KVM specific meeting (likely the "PUCKs" 
-mentioned here?).
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
--- 
-Cheers,
-
-David / dhildenb
-
+Thanks,
+drew
 
