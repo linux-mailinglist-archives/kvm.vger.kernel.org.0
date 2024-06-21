@@ -1,220 +1,215 @@
-Return-Path: <kvm+bounces-20232-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20233-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71FED912229
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 12:20:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 377BF91224D
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 12:23:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27F2C287846
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:20:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A292D1F28237
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967AB17106F;
-	Fri, 21 Jun 2024 10:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31EFA171E53;
+	Fri, 21 Jun 2024 10:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="BFvmdqp/"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="kDTT6JVg"
 X-Original-To: kvm@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA02172BC4;
-	Fri, 21 Jun 2024 10:18:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4974171095;
+	Fri, 21 Jun 2024 10:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718965125; cv=none; b=hGPE/R0WQ2wW9+QT/5643YY0A1xir6BfZBD+kie3qewPo+cXKKsjlDCFbtMAWc9q29cxDMGPSbI+UuPbgS1CsHlxAoVA4v0nKlFDKzrveYTsClnTYnRMeMl4PaHui9vZohuKbFPbSY1DbvwiIgtEXtkl7yPgxGiyf7pAIy03Huk=
+	t=1718965346; cv=none; b=rR0zrK9Xnvh7+YnuAp/fjTrMM2QcTT6SdmNyZVFD6SNuTWwp+yMqSzew1+51GE48dTVm+jTK6kXsMQChBy3FlZbQ5NvhJdNg3FK0kI/BPRWpIofMvqt4kr0bAShRErEZVAkFr5JQrEM8MP0jmlUqTEiFxaqWznfyFMon1gNEFxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718965125; c=relaxed/simple;
-	bh=N1yo7secwogxuEPVHJ5Vld6lZEvYNi5oKI8TVPWuc8g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UVjF9VI8c5+RaeYUtIbP1G+yUDtI79EaOKY1bi7ILtrsUO5KF40vyjvPFFl3cdjI3aZ+mv8IzYFrgOb4iperLoOeHx/h9bXGkQ0ZIzNR6WSh0Kdx/kb4AfFS3l8kaX24SBN6BayjprtycpupcKJ0JVxiUgw0MhE/ge9SFkXakY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=BFvmdqp/; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1718965124; x=1750501124;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=N1yo7secwogxuEPVHJ5Vld6lZEvYNi5oKI8TVPWuc8g=;
-  b=BFvmdqp/zlHshCSNpDaGQ5mSlnXuO0KIX1YzXPweEtwYYfvIoKWAW5Jm
-   91T2uBcCZVbi90IlBx78OVFSaA6hS2cJCHU9AloDQMel6QZrdTiymCj8J
-   e0VcGfZJL2Nf//vXJaGyNXO1TmjFseM/FsVTrsVP5AWod5/n5XLLBSwFc
-   0m/yuuLr0NYXvuG8X4yw2eQWbvKfR5Icm0tDeKuITzSDO8ybGmnt1G+0o
-   V/Lt7nSIzJzFKu+8TWL5FjFLuCI7+UR+8O4E5rgCNO/aeMUfgXeCeGn2S
-   73Kkxcg7mM6f226t33BjpB/7XxEu1x34CGRVgVN0EvAQ/vWz5m/C60F1R
-   g==;
-X-CSE-ConnectionGUID: HFkKWv5gQi6XJez7y6X/8g==
-X-CSE-MsgGUID: D4+6zTj7RaSh21uL4J0goA==
-X-IronPort-AV: E=Sophos;i="6.08,254,1712646000"; 
-   d="asc'?scan'208";a="28968692"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jun 2024 03:18:42 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 21 Jun 2024 03:18:15 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex02.mchp-main.com (10.10.85.144)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Fri, 21 Jun 2024 03:18:12 -0700
-Date: Fri, 21 Jun 2024 11:17:53 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Alexandre Ghiti <alex@ghiti.fr>
-CC: Anup Patel <apatel@ventanamicro.com>, Conor Dooley <conor@kernel.org>,
-	Yong-Xuan Wang <yongxuan.wang@sifive.com>, <linux-kernel@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <kvm-riscv@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <ajones@ventanamicro.com>, <greentime.hu@sifive.com>,
-	<vincent.chen@sifive.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
-	<krzk+dt@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer
- Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
-	<devicetree@vger.kernel.org>
-Subject: Re: [PATCH v5 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
-Message-ID: <20240621-viewless-mural-f5992a247992@wendy>
-References: <20240605121512.32083-1-yongxuan.wang@sifive.com>
- <20240605121512.32083-3-yongxuan.wang@sifive.com>
- <20240605-atrium-neuron-c2512b34d3da@spud>
- <CAK9=C2XH7-RdVpojX8GNW-WFTyChW=sTOWs8_kHgsjiFYwzg+g@mail.gmail.com>
- <40a7d568-3855-48fb-a73c-339e1790f12f@ghiti.fr>
+	s=arc-20240116; t=1718965346; c=relaxed/simple;
+	bh=TIQPrXwtPrBb2xR+E8JUyrOCQGo5HL53+xppydYYS0o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bK/Xt9Axy9jYf+zBkmcyQY5OU/PrMd3fvIkFJYEawBFe4nqRgqVd/G37MG8gdJcuNYEOHb3EVev1gqwZQWlaqZFVJao1ZQ+HRB9dXh7AJiV26poCVoxHNfNkWpzssiqCgsG7Dil94Rhy7SNrCn+Ues87e4Q2ti4vfLqkoANeWe4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=kDTT6JVg; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45L9SUPd029793;
+	Fri, 21 Jun 2024 10:22:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=qAgKdlvJiaR93zpf9odqulM7vQ
+	NS3bQ6TLmE6TFY8UI=; b=kDTT6JVgKxz2+PD3MkAFRHqyZnXqkUG5l+cj536mh2
+	D3P7LEc/8y+R/mzPkyoI8AFArgeKW0pIHzDf/99iPmHvLA0m9O3vFZo3tv2/mpEj
+	fDoHxpvNY/bX2REdz9kRcJvNOAWs/Mmj3mLceqH300mE1A5rL+6Dc/jtjjXEnJYN
+	2Ha5qcucTO+LgAuLohf9pXKtA+ugT46za0gAeg6VIj/Bmx2fErs77i96f9qfj10F
+	nGJv1DatGT2hh8j5kzI7YGNV2W8GtsD7mDfBB1Q6xiljss4Uu8qwNNRPfC1bU898
+	eMUAGe+hRIDQPOKGA71EPd6lYnKPk0+VvNu2IjKB2wPA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yw6wtr4s9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Jun 2024 10:22:22 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45LAMMk4017705;
+	Fri, 21 Jun 2024 10:22:22 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yw6wtr4s8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Jun 2024 10:22:22 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45L9FiuX019922;
+	Fri, 21 Jun 2024 10:22:21 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yvrqupm3c-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 21 Jun 2024 10:22:21 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45LAMF0n51380504
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 21 Jun 2024 10:22:17 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 80C4320259;
+	Fri, 21 Jun 2024 10:22:15 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 59A2E20258;
+	Fri, 21 Jun 2024 10:22:15 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 21 Jun 2024 10:22:15 +0000 (GMT)
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Thomas Huth <thuth@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>, Nico Boehr <nrb@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        David Hildenbrand <david@redhat.com>
+Subject: [kvm-unit-tests PATCH v1] s390x: Split and rework cpacf query functions
+Date: Fri, 21 Jun 2024 12:22:12 +0200
+Message-Id: <20240621102212.3311494-1-nsg@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="/Q/JsluL++EEkeZ1"
-Content-Disposition: inline
-In-Reply-To: <40a7d568-3855-48fb-a73c-339e1790f12f@ghiti.fr>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 8PP-rodhGDz1f2NwTFx4yEJuoexzman0
+X-Proofpoint-ORIG-GUID: Esh4FnuQATZ__trmmMY__oj19CZJl2UH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-21_04,2024-06-20_04,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 impostorscore=0
+ mlxlogscore=999 mlxscore=0 bulkscore=0 clxscore=1015 malwarescore=0
+ suspectscore=0 spamscore=0 adultscore=0 lowpriorityscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2406210073
 
---/Q/JsluL++EEkeZ1
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Cherry-pick 830999bd7e72 ("s390/cpacf: Split and rework cpacf query functions")
+from the kernel:
 
-On Fri, Jun 21, 2024 at 10:37:21AM +0200, Alexandre Ghiti wrote:
-> On 20/06/2024 08:25, Anup Patel wrote:
-> > On Wed, Jun 5, 2024 at 10:25=E2=80=AFPM Conor Dooley <conor@kernel.org>=
- wrote:
-> > > On Wed, Jun 05, 2024 at 08:15:08PM +0800, Yong-Xuan Wang wrote:
-> > > > Add entries for the Svade and Svadu extensions to the riscv,isa-ext=
-ensions
-> > > > property.
-> > > >=20
-> > > > Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> > > > ---
-> > > >   .../devicetree/bindings/riscv/extensions.yaml | 30 ++++++++++++++=
-+++++
-> > > >   1 file changed, 30 insertions(+)
-> > > >=20
-> > > > diff --git a/Documentation/devicetree/bindings/riscv/extensions.yam=
-l b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> > > > index 468c646247aa..1e30988826b9 100644
-> > > > --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-> > > > +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> > > > @@ -153,6 +153,36 @@ properties:
-> > > >               ratified at commit 3f9ed34 ("Add ability to manually =
-trigger
-> > > >               workflow. (#2)") of riscv-time-compare.
-> > > >=20
-> > > > +        - const: svade
-> > > > +          description: |
-> > > > +            The standard Svade supervisor-level extension for rais=
-ing page-fault
-> > > > +            exceptions when PTE A/D bits need be set as ratified i=
-n the 20240213
-> > > > +            version of the privileged ISA specification.
-> > > > +
-> > > > +            Both Svade and Svadu extensions control the hardware b=
-ehavior when
-> > > > +            the PTE A/D bits need to be set. The default behavior =
-for the four
-> > > > +            possible combinations of these extensions in the devic=
-e tree are:
-> > > > +            1. Neither svade nor svadu in DT: default to svade.
-> > > I think this needs to be expanded on, as to why nothing means svade.
-> > Actually if both Svade and Svadu are not present in DT then
-> > it is left to the platform and OpenSBI does nothing.
-> >=20
-> > > > +            2. Only svade in DT: use svade.
-> > > That's a statement of the obvious, right?
-> > >=20
-> > > > +            3. Only svadu in DT: use svadu.
-> > > This is not relevant for Svade.
-> > >=20
-> > > > +            4. Both svade and svadu in DT: default to svade (Linux=
- can switch to
-> > > > +               svadu once the SBI FWFT extension is available).
-> > > "The privilege level to which this devicetree has been provided can s=
-witch to
-> > > Svadu if the SBI FWFT extension is available".
-> > >=20
-> > > > +        - const: svadu
-> > > > +          description: |
-> > > > +            The standard Svadu supervisor-level extension for hard=
-ware updating
-> > > > +            of PTE A/D bits as ratified at commit c1abccf ("Merge =
-pull request
-> > > > +            #25 from ved-rivos/ratified") of riscv-svadu.
-> > > > +
-> > > > +            Both Svade and Svadu extensions control the hardware b=
-ehavior when
-> > > > +            the PTE A/D bits need to be set. The default behavior =
-for the four
-> > > > +            possible combinations of these extensions in the devic=
-e tree are:
-> > > @Anup/Drew/Alex, are we missing some wording in here about it only be=
-ing
-> > > valid to have Svadu in isolation if the provider of the devicetree has
-> > > actually turned on Svadu? The binding says "the default behaviour", b=
-ut
-> > > it is not the "default" behaviour, the behaviour is a must AFAICT. If
-> > > you set Svadu in isolation, you /must/ have turned it on. If you set
-> > > Svadu and Svade, you must have Svadu turned off?
-> > Yes, the wording should be more of requirement style using
-> > must or may.
-> >=20
-> > How about this ?
-> > 1) Both Svade and Svadu not present in DT =3D> Supervisor may
-> >      assume Svade to be present and enabled or it can discover
-> >      based on mvendorid, marchid, and mimpid.
-> > 2) Only Svade present in DT =3D> Supervisor must assume Svade
-> >      to be always enabled. (Obvious)
-> > 3) Only Svadu present in DT =3D> Supervisor must assume Svadu
-> >      to be always enabled. (Obvious)
->=20
->=20
-> I agree with all of that, but the problem is how can we guarantee that
-> openSBI actually enabled svadu?=20
-Conflation of an SBI implementation and OpenSBI aside, if the devicetree
-property is defined to mean that "the supervisor must assume svadu to be
-always enabled", then either it is, or the firmware's description of the
-hardware is broken and it's not the supervisor's problem any more. It's
-not the kernel's job to validate that the devicetree matches the
-hardware.
+    Rework the cpacf query functions to use the correct RRE
+    or RRF instruction formats and set register fields within
+    instructions correctly.
 
-> This is not the case for now.
+Fixes: a555dc6b16bf ("s390x: add cpacf.h from Linux")
+Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+---
+ lib/s390x/asm/cpacf.h | 77 +++++++++++++++++++++++++++++++++++++------
+ 1 file changed, 67 insertions(+), 10 deletions(-)
 
-What "is not the case for now"? My understanding was that, at the
-moment, nothing happens with Svadu in OpenSBI. In turn, this means that
-there should be no devicetrees containing Svadu (per this binding's
-description) and therefore no problem?
+diff --git a/lib/s390x/asm/cpacf.h b/lib/s390x/asm/cpacf.h
+index 378cd5cf..ba53ec31 100644
+--- a/lib/s390x/asm/cpacf.h
++++ b/lib/s390x/asm/cpacf.h
+@@ -137,19 +137,76 @@
+ 
+ typedef struct { unsigned char bytes[16]; } cpacf_mask_t;
+ 
+-static __always_inline void __cpacf_query(unsigned int opcode, cpacf_mask_t *mask)
++static __always_inline void __cpacf_query_rre(u32 opc, u8 r1, u8 r2,
++					      cpacf_mask_t *mask)
+ {
+-	register unsigned long r0 asm("0") = 0;	/* query function */
+-	register unsigned long r1 asm("1") = (unsigned long) mask;
++	asm volatile(
++		"	la	%%r1,%[mask]\n"
++		"	xgr	%%r0,%%r0\n"
++		"	.insn	rre,%[opc] << 16,%[r1],%[r2]\n"
++		: [mask] "=R" (*mask)
++		: [opc] "i" (opc),
++		  [r1] "i" (r1), [r2] "i" (r2)
++		: "cc", "r0", "r1");
++}
+ 
++static __always_inline void __cpacf_query_rrf(u32 opc,
++					      u8 r1, u8 r2, u8 r3, u8 m4,
++					      cpacf_mask_t *mask)
++{
+ 	asm volatile(
+-		"	spm 0\n" /* pckmo doesn't change the cc */
+-		/* Parameter regs are ignored, but must be nonzero and unique */
+-		"0:	.insn	rrf,%[opc] << 16,2,4,6,0\n"
+-		"	brc	1,0b\n"	/* handle partial completion */
+-		: "=m" (*mask)
+-		: [fc] "d" (r0), [pba] "a" (r1), [opc] "i" (opcode)
+-		: "cc");
++		"	la	%%r1,%[mask]\n"
++		"	xgr	%%r0,%%r0\n"
++		"	.insn	rrf,%[opc] << 16,%[r1],%[r2],%[r3],%[m4]\n"
++		: [mask] "=R" (*mask)
++		: [opc] "i" (opc), [r1] "i" (r1), [r2] "i" (r2),
++		  [r3] "i" (r3), [m4] "i" (m4)
++		: "cc", "r0", "r1");
++}
++
++static __always_inline void __cpacf_query(unsigned int opcode,
++					  cpacf_mask_t *mask)
++{
++	switch (opcode) {
++	case CPACF_KIMD:
++		__cpacf_query_rre(CPACF_KIMD, 0, 2, mask);
++		break;
++	case CPACF_KLMD:
++		__cpacf_query_rre(CPACF_KLMD, 0, 2, mask);
++		break;
++	case CPACF_KM:
++		__cpacf_query_rre(CPACF_KM, 2, 4, mask);
++		break;
++	case CPACF_KMA:
++		__cpacf_query_rrf(CPACF_KMA, 2, 4, 6, 0, mask);
++		break;
++	case CPACF_KMAC:
++		__cpacf_query_rre(CPACF_KMAC, 0, 2, mask);
++		break;
++	case CPACF_KMC:
++		__cpacf_query_rre(CPACF_KMC, 2, 4, mask);
++		break;
++	case CPACF_KMCTR:
++		__cpacf_query_rrf(CPACF_KMCTR, 2, 4, 6, 0, mask);
++		break;
++	case CPACF_KMF:
++		__cpacf_query_rre(CPACF_KMF, 2, 4, mask);
++		break;
++	case CPACF_KMO:
++		__cpacf_query_rre(CPACF_KMO, 2, 4, mask);
++		break;
++	case CPACF_PCC:
++		__cpacf_query_rre(CPACF_PCC, 0, 0, mask);
++		break;
++	case CPACF_PCKMO:
++		__cpacf_query_rre(CPACF_PCKMO, 0, 0, mask);
++		break;
++	case CPACF_PRNO:
++		__cpacf_query_rre(CPACF_PRNO, 2, 4, mask);
++		break;
++	default:
++		asm volatile(".error \"bad opcode\"");
++	}
+ }
+ 
+ static inline int __cpacf_check_opcode(unsigned int opcode)
 
-Thanks,
-Conor.
+base-commit: 66fdb0333237161fb9644b4a41a200af5b8d20e9
+-- 
+2.44.0
 
---/Q/JsluL++EEkeZ1
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnVTUQAKCRB4tDGHoIJi
-0umAAP9Ky5jmwL/vxKQCCEHnHdguojF9KRICh/OKTjjNr83q0QD+M27FYa47s7qx
-aJWtzNZgU73VI8rgfcbj5zSeT7XqZQQ=
-=l7ge
------END PGP SIGNATURE-----
-
---/Q/JsluL++EEkeZ1--
 
