@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-20280-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20281-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 221C09126E9
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 15:44:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A113D9126EC
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 15:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C61DF1F248CF
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 13:44:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 313E81F26FF8
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 13:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B00EC122;
-	Fri, 21 Jun 2024 13:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E2F374DD;
+	Fri, 21 Jun 2024 13:45:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="i/E02Icw"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="z9BmFa+i"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2044.outbound.protection.outlook.com [40.107.243.44])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2055.outbound.protection.outlook.com [40.107.243.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E256208C3;
-	Fri, 21 Jun 2024 13:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C370C2BB05;
+	Fri, 21 Jun 2024 13:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.55
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718977482; cv=fail; b=PrHKlOSZwWzSzisZM9kPudhGQWmXZ3SQGuNRXHiKO9lTgHQ8K4EXHqQ+kWm7O/YcI0Rhl2Ru3Hd2NqLbNfvBJxYEoerPaWEfB/297TujtJb7an72Z4te5wNm8nuo7VSg/UATafP/3p80jaRgZQMUJajVOkV5g9WMx/iC+bxmdwE=
+	t=1718977503; cv=fail; b=Y9DYbmSIChYnHGIEJ7QXyMaARg5GM5qoCZOn/kUqpjWWh6gvhEKfbusLBSTwiT9tzPQeIGeG+b1Za3yAh1rIZsBDpgO9rkZymLl0yhdcaYTpwC5O3Y+cXYxLIlLZDEcYCUrvCP7abNU/3XJ2RMTCvDzog/Je8PGsELRiOddT3EA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718977482; c=relaxed/simple;
-	bh=frz7C35SsL/9qz+5rPDyNWHpYjGZebcqCxbe5Il+JA8=;
+	s=arc-20240116; t=1718977503; c=relaxed/simple;
+	bh=p0Fl43iD/jg4aikoF7FA7LLjLiCdQe1TQOIuHhw9LWE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T9wZN+sd6FApKtfBlRjYjuNYQvLJ3bgv6B1iTxQbG/DQhOQ9RjxYyZvyeoLPLfK7RNpg9o7FVASmQYcN8O+dM1uUcjbMZ8xYATyLl+VhTuf1l+NxSj/gPjxdNV2EbFb/OZFg7u0YNYn4R3uJ2Q4s6NLTTniMGfdsAmOZBATilV4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=i/E02Icw; arc=fail smtp.client-ip=40.107.243.44
+	 MIME-Version:Content-Type; b=KIYPnPVK5++IjC7tYjJa0edhcv8/3WDQhcvv2Bt4X1UiS07qQ4Zx6fSL8extOKY3s+jht/6v+6Tip0ZWzL7q95TqjP2ipp7NLkrQO4DRC1OczacUEWb0levM9nBxvNrc3OmCgIGFZNIXQHoatjatnYofXQp8WOPFWzGQdfJ5MMU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=z9BmFa+i; arc=fail smtp.client-ip=40.107.243.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kVrJuBvRAMvCQbOXizhIQKlk1j62uyoRvrAo3NZ+NIBMBk6SIrZxEMY+Ep5I4QVYSrzIlP1rXaj1rLaCU/dK5U10FkcQ9w6ZfYAz6Vag6JNgpsO6VEuTUOIyUikNNGfHiDrO7nwDvAcJJxcg83GynYsSrGiYu0rzuHUjwm9+qDuxhfTPQdzjXxdN1iIfF2gc0klfhV70ig+p7uH9qvprZ0E/gWSiOKpvcGmQUnY7e2J9bcTmMM+jfTCgJ+9sNGEYxgAhCy/3jXwUMf4wjOTrfJMODLw3q3iokW0gzxIt2ZP6+0RJeAK4sZn6+ZoXWMoC7/57uvN8M6S6In0DmZlU6A==
+ b=ey1/3ly8LFwKxpNol3rQaG048BZt6qSjdMzIhnBMapXD7l26oYKDw7HIRedU31LW7WArXqH5jD5rQ3Cv56y/bsbu8GJLcXZgqo/wZPtVhq4avKrwqmvjgokIaX0/2MRMQGE4LotrnpL0z05UL+tg6D3FRTXJLAuyR9RACTxOddJEDZkL95i+9uedibyQuTNgCUkALiYjjaKr3zUChPhVyMfxZYukUZ5Qjjiif9CPd2T6Y57cxI2WTHBvgqPjZsracoXyFMraAYCR3wLSP/WveN8HmyEuw56FApguoaxMHGNt2K7BqNEUs1HucLnN+S1EtlT6qxHHiIDQc2VTab8dZQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3CssA1f2np/3Tc0sjD6PvMPlUe+dJxpdzAc6K4V37EE=;
- b=NFFzdLcY4HZpON+KAgcSOLYdO/4MC0aQWMq4VocQyurnucW5kWQIl0sMA9/QyPPNnyCwgYqpe4gsadT0Q+Xi2LhSqI2vyd3ctuwpRh/FZxSZ70EX6wldK1b8E57HKwaiNZpTmgg6WhKDY1Xp50e+iBEC0E5W5npq6InSpwdcTVOvVb21iAi/1tQ8XZAhkieJvKxSCimYHu7rPWCy4Yn6K0E+8rgrdza17N/IRXaMSWIVqGFz/m2mu45cYQ0++JkiHDmE5wPR11rpkuzj0ZoHfygM50EC6jXP2/gLMYTpqPLkX2EAAQOZ+daNftES8E1+y2o8/1t1WUBJxqbcr3S08Q==
+ bh=1rFHjJ7FA6xCIfBuTgTQX3oWquuruZMWrjWs98o694E=;
+ b=Ae3+2w5YHFkvr4wCPEabGhgMdhIUAMIZz7q7nkGFy/ez7zOOfKaFYLmX+GmFyeASWWTg4Y+FD7wDZgWGuzBG7G989lxpYlZMx42n+hhoQPeJ+CNKfnZhJFdC6kQWn6FHihaFINLMBpSgpSqngS/xLcSoN7flqpNVktr45EU5/btUZGMCVRTi7NJLFAaE7DLjx/xSiEdjxF/bpHuzf2oSqI81SzoUpHK6/vAAzhk5D+6BtBVTFxy0JuNTfR+Q0dy/j2aqULf3AXmoTDDMoa9UeBnzQKiLL+VPWizBM307YWVKvV4BRjpfIaqSGhIAga3Z8lhOwAfHWLkl5x5Ll49oJg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3CssA1f2np/3Tc0sjD6PvMPlUe+dJxpdzAc6K4V37EE=;
- b=i/E02IcwgpsmdXplmKV9AqvbTM28+BDDQeGAmjCTmKdsXHtJN01lIQLuMhNZaEUAmwlAiwwTYARaG/PrcQ/MFQSRGRL6SEH8t+EspoxB2QgjmgvOmF74+EWw6eYM4NQDwz7vlICNq1MEISuMtFO9YaCwixKX296HkF1m8doZDlQ=
-Received: from DS0PR17CA0013.namprd17.prod.outlook.com (2603:10b6:8:191::11)
- by IA1PR12MB7735.namprd12.prod.outlook.com (2603:10b6:208:421::8) with
+ bh=1rFHjJ7FA6xCIfBuTgTQX3oWquuruZMWrjWs98o694E=;
+ b=z9BmFa+ifGogN9f3P/lxrVIeL3nIGBv/B20gCpkxYzVtBs5E4kBpI4QCo9bPfIYW/1XBkWmk08lOus/b1kcvA7bgyfVemBgxi6s71WO2ldswi42U3r5ykL+aKaaAHMKGxIAWSvKH7SFOrrax5SC126cNR3BFPd7KPykyBGCx8vo=
+Received: from DS0PR17CA0002.namprd17.prod.outlook.com (2603:10b6:8:191::25)
+ by LV2PR12MB5942.namprd12.prod.outlook.com (2603:10b6:408:171::19) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Fri, 21 Jun
- 2024 13:44:37 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.31; Fri, 21 Jun
+ 2024 13:44:58 +0000
 Received: from CY4PEPF0000EE38.namprd03.prod.outlook.com
- (2603:10b6:8:191:cafe::a1) by DS0PR17CA0013.outlook.office365.com
- (2603:10b6:8:191::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.36 via Frontend
- Transport; Fri, 21 Jun 2024 13:44:37 +0000
+ (2603:10b6:8:191:cafe::8d) by DS0PR17CA0002.outlook.office365.com
+ (2603:10b6:8:191::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7677.37 via Frontend
+ Transport; Fri, 21 Jun 2024 13:44:58 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,11 +65,11 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CY4PEPF0000EE38.mail.protection.outlook.com (10.167.242.10) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.15 via Frontend Transport; Fri, 21 Jun 2024 13:44:37 +0000
+ 15.20.7677.15 via Frontend Transport; Fri, 21 Jun 2024 13:44:58 +0000
 Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 21 Jun
- 2024 08:44:36 -0500
+ 2024 08:44:57 -0500
 From: Michael Roth <michael.roth@amd.com>
 To: <kvm@vger.kernel.org>
 CC: <linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
@@ -77,9 +77,9 @@ CC: <linux-coco@lists.linux.dev>, <linux-kernel@vger.kernel.org>,
 	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <pgonda@google.com>,
 	<ashish.kalra@amd.com>, <bp@alien8.de>, <pankaj.gupta@amd.com>,
 	<liam.merwick@oracle.com>
-Subject: [PATCH v1 3/5] KVM: SEV: Provide support for SNP_EXTENDED_GUEST_REQUEST NAE event
-Date: Fri, 21 Jun 2024 08:40:39 -0500
-Message-ID: <20240621134041.3170480-4-michael.roth@amd.com>
+Subject: [PATCH v1 4/5] KVM: Introduce KVM_EXIT_COCO exit type
+Date: Fri, 21 Jun 2024 08:40:40 -0500
+Message-ID: <20240621134041.3170480-5-michael.roth@amd.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20240621134041.3170480-1-michael.roth@amd.com>
 References: <20240621134041.3170480-1-michael.roth@amd.com>
@@ -95,160 +95,320 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE38:EE_|IA1PR12MB7735:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1512c487-640a-485e-d666-08dc91f84af2
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE38:EE_|LV2PR12MB5942:EE_
+X-MS-Office365-Filtering-Correlation-Id: 29723535-fb6f-4043-ab0c-08dc91f8574e
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230037|376011|36860700010|7416011|1800799021|82310400023;
+	BCL:0;ARA:13230037|82310400023|376011|36860700010|1800799021|7416011;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?wU8PAY9Pju9CT+a0lne2cDEA1mMPmSBSeGXFfnqYrBp1Qqf0u2XabVW+9o+K?=
- =?us-ascii?Q?MZ3qlZ7ggaMrstcpE34+OUtDozOffnODmaktdidesO6z42jStpm6HrxHvCgT?=
- =?us-ascii?Q?itCJgG0hBkLgB2v9m4q8IhLuQVD5FMMiX/8FUxiyaGXcmyJT9YBHXElZtZsY?=
- =?us-ascii?Q?cOoZnlgrwUvzHYaaOHfvYaz9uN213fBf9+ubyJ2VauK8TPmMoZsgY65OsX58?=
- =?us-ascii?Q?Yk4wcVGtiGBdoZrAtFhMbg77X/WqURpJWwgy6tcxzoRZT++T1lW9SvU/geDn?=
- =?us-ascii?Q?OU8nyx51yvky7t045ZYCfI6OguLY1B0bw7XN/dxKuMnQeDbyOzNIGj36EjaR?=
- =?us-ascii?Q?Tk5nLmV0lio1Qml5Md5eNV+PQ7fqxzVHGbosjtLR70CMO+3cEkHkHrRwg7aQ?=
- =?us-ascii?Q?/bqDAydcQGuILXeKMt7nrDxI2At+gUNHOQYdzS6MU7NAzONVpzz/rcCRQmat?=
- =?us-ascii?Q?WiW210AzHvxxvBcekAfvdsCCzsd90Gf/w7i7ze50glofsqUBQ0v+7cmaJ0B2?=
- =?us-ascii?Q?Yv09iGi6vesa13SyOGDUT5RULUfsOul23EgF0cq0aupzeQG55CYG8xx/iweD?=
- =?us-ascii?Q?QSAMlEKQ/rR23fWPRAvqVLOpG6q0LWuBL0repijUmIpSCsK7fLEyMlRa+Cfm?=
- =?us-ascii?Q?fAeQAJIIMc8/rJnOmt8by6BJu+2MfzuLSzAvWtGQDZMLvzLV6JPP2OAEs32/?=
- =?us-ascii?Q?s1kFzXUXFKIGmH4toZHTYBA9i8g/Z7wSduUhOIVcOTdDG0MD0mZKrUaOmj6x?=
- =?us-ascii?Q?TS62ivEBXAREu/mWECXQ+Z69JMbPwd+GNx71avSdauMbNegc9F06qKR8DK45?=
- =?us-ascii?Q?fsrHQOvCppGh1av4H34mWhfdD9Msrs/4Wh2c4XDp29EtzdFwZCxxL6O/Tjws?=
- =?us-ascii?Q?LI1L/o7R8TStt2Kb+waXLxIuO9mT7qMwiGQEH80IFaKbgu1+srwNdzvzaUNQ?=
- =?us-ascii?Q?C/pVwnJ2Qp0b320saQ95SBb2Bl+AaUjUWgjlBcpN8ajERErP1/Kq3iBq2X4O?=
- =?us-ascii?Q?hT5J3q9QLa850MNMu3Vr8I59WOJSRSwsaLzHi6aLFWLUB4gVj6ZXrjdbgJks?=
- =?us-ascii?Q?VeGplprb4qakHrCM2r92Gb6DrJIUE6Du5f3KGzWmpGlLDUyMat5jPkI4iFjD?=
- =?us-ascii?Q?st4KQs9z8+eGxB2QlIXakzz5EV1iIWZzfFTGJShTjCoc1wgsQgYlOsctP8/N?=
- =?us-ascii?Q?2Mlx4Tc8ENB00Hfalzl55x6kRCyfZKe8/x8URPFyfJcBCJds48vRDPWgsg0m?=
- =?us-ascii?Q?RiNF6QK1fDo76xZPifVRxh1jfeKQMboDk3Ck1Cri5sDnpjaZeCOrupsgfHAS?=
- =?us-ascii?Q?By+/Nwh5HeHXx4s8F7IqEX6o/Eny4j7dqGbjpKP5V4vRZ/yqJ/31Y/uzHwtn?=
- =?us-ascii?Q?2QGpZr/lXq4d1JYRPVKSe+SNnDGfZjZy7/+psyTnBnPV2fcY8A=3D=3D?=
+	=?us-ascii?Q?VVClA9Ep78FcsYkE6UvoAwyCh/9+AoPSDfG2gHiZ2Lm/B069Im802/qamTdu?=
+ =?us-ascii?Q?CdiAEewDKCgLyQNbFFzdwJPLhN4Igyj+hGld3YrKQaLdARWtokdvRQA0yMAb?=
+ =?us-ascii?Q?F8UeiZ2/wVtL91RDgH/GPaXdLD0b3/smHrMkrupDNAYtPmYl7M2jvgKv890J?=
+ =?us-ascii?Q?LJi2HnmvPaZcRe/G8GvlSQijbBKvK/rt1PmFhz8dQYboNQxE0eH7U/AMiiZI?=
+ =?us-ascii?Q?RExPGA0YPlxlNs9IP4fwDQsFS/ZzT6nIiuXdPqggT8cLm+mcWO2X7vgAIvP+?=
+ =?us-ascii?Q?C/F+cC7VGYTSOYlFhy7lg+DD5sBJkDoNkkBx/PlKLoLR5RyQ8BIoCX/AbANS?=
+ =?us-ascii?Q?0Uth00R6Cbeb6KIChfKi2NgLH1LTZQlCCnk126AI/99mSiK751pVS4PMDgtJ?=
+ =?us-ascii?Q?XcnpaqEwazere78xB+WC/REIj9+15ec+S/xF31GhbFrWa8kIngljSW24tpUF?=
+ =?us-ascii?Q?e1ZXvIZYwZ/JKckGhcSmw4+BwnN2k2jpjXbwKwkauc49hVmhatBhuDAhFDmO?=
+ =?us-ascii?Q?rQgQ1hrpFAhEWM0u4M2RmH541F1xhgWJl+m9+Bug6LbUeZ7U3L2oHLAbmGV/?=
+ =?us-ascii?Q?i3H5FcSOPjHg6F+SZBvWOe3UBse7hSrhxMkH8HKYb3AaTr6JmbBvyYbJBdqV?=
+ =?us-ascii?Q?Zg92JRiJ5bv3TjpCbtUxtMMrIh9Z/ea3posgabakmLPIXQRE4rQMPdIMFpPE?=
+ =?us-ascii?Q?6adIEH1Hp8ZoYze+1lP2Ir7QCr/1tWx3zT2/QAa32pqNjG5xyj2ANSyiCg8B?=
+ =?us-ascii?Q?TL88DLYLU1wsXLCWXQqRiEr3sVfPdKrpb4HfFP71863QY6icAqnK4rwt4sVF?=
+ =?us-ascii?Q?qSNO/N2EpKR3ZaeDpfVkMSuPTbI/2Qe4Or+Jr2TDWh4r/Q54jBCRSMcAfRU6?=
+ =?us-ascii?Q?V9qId7PfXPIoxlxXHSZT7dLTKu+UTyiZm6+P1oryA3hvP3xvao71X45M0V4l?=
+ =?us-ascii?Q?Hgo0mKWnAhkzr9+YEVgJ2LG7nAF9UFF+lht03RsIEC262NbyYfuI1wIDnq7m?=
+ =?us-ascii?Q?VfxPfWXGXFrC+8lsS1kq2wT4HNqTazHKC54CsOlMLoCjvBTlTgF2Aobz+5jK?=
+ =?us-ascii?Q?JoX9cd5fUhR4BH983Fyy400FNiO96plB36AcRZvKKD1uzCx0SNF90DYOWa/n?=
+ =?us-ascii?Q?R59df7e39nUwEDk6unAbG5yTcTW+5vbooLevFv4hTJVj8K6uz9yVXG9QuA7M?=
+ =?us-ascii?Q?wywe7s2X6MhJ1i2ZL7O5LJTVFK13yEUJf4/X7De75KzlAXB6rNGxpVnz2Oxn?=
+ =?us-ascii?Q?ZZlxbtVzJH/CMp2pU1+LBKE/8zJcIL5lcySzC+0Dxg4OEIWWZfxXJcc3JCoU?=
+ =?us-ascii?Q?BbTbwMJ7Vg4c538PATaL+XTRiQ/xRgjhIdWU3zsqBMEIonBHfS7K92PqdSP4?=
+ =?us-ascii?Q?DUpz7H7ODa5K/nTDl9L1KzoEkuz2z6pACxPa1skQ8R6WOE0yTQ=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(376011)(36860700010)(7416011)(1800799021)(82310400023);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230037)(82310400023)(376011)(36860700010)(1800799021)(7416011);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2024 13:44:37.3863
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2024 13:44:58.1208
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1512c487-640a-485e-d666-08dc91f84af2
+X-MS-Exchange-CrossTenant-Network-Message-Id: 29723535-fb6f-4043-ab0c-08dc91f8574e
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	CY4PEPF0000EE38.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB7735
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5942
 
-Version 2 of GHCB specification added support for the SNP Extended Guest
-Request Message NAE event. This event serves a nearly identical purpose
-to the previously-added SNP_GUEST_REQUEST event, but for certain message
-types it allows the guest to supply a buffer to be used for additional
-information in some cases.
+Confidential VMs have a number of additional requirements on the host
+side which might involve interactions with userspace. One such case is
+with SEV-SNP guests, where the host can optionally provide a certificate
+table to the guest when it issues an attestation request to firmware
+(see GHCB 2.0 specification regarding "SNP Extended Guest Requests").
+This certificate table can then be used to verify the endorsement key
+used by firmware to sign the attestation report.
 
-Currently the GHCB spec only defines extended handling of this sort in
-the case of attestation requests, where the additional buffer is used to
-supply a table of certificate data corresponding to the attestion
-report's signing key. Support for this extended handling will require
-additional KVM APIs to handle coordinating with userspace.
+While it is possible for guests to obtain the certificates through other
+means, handling it via the host provides more flexibility in being able
+to keep the certificate data in sync with the endorsement key throughout
+host-side operations that might resulting in the endorsement key
+changing.
 
-Whether or not the hypervisor opts to provide this certificate data is
-optional. However, support for processing SNP_EXTENDED_GUEST_REQUEST
-GHCB requests is required by the GHCB 2.0 specification for SNP guests,
-so for now implement a stub implementation that provides an empty
-certificate table to the guest if it supplies an additional buffer, but
-otherwise behaves identically to SNP_GUEST_REQUEST.
+In the case of KVM, userspace will be responsible for fetching the
+certificate table and keeping it in sync with any modifications to the
+endorsement key. Define a new KVM_EXIT_* event where userspace is
+provided with the GPA of the buffer the guest has provided as part of
+the attestation request so that userspace can write the certificate data
+into it.
+
+Since there is potential for additional CoCo-related events in the
+future, introduce this in the form of a more general KVM_EXIT_COCO exit
+type that handles multiple sub-types, similarly to KVM_EXIT_HYPERCALL,
+and then define a KVM_EXIT_COCO_REQ_CERTS sub-type to handle the actual
+certificate-fetching mentioned above.
+
+Also introduce a KVM_CAP_EXIT_COCO capability to enable/disable
+individual sub-types, similarly to KVM_CAP_EXIT_HYPERCALL. Since actual
+support for KVM_EXIT_COCO_REQ_CERTS will be enabled in a subsequent
+patch, don't yet allow it to be enabled.
 
 Signed-off-by: Michael Roth <michael.roth@amd.com>
 ---
- arch/x86/kvm/svm/sev.c | 60 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 60 insertions(+)
+ Documentation/virt/kvm/api.rst  | 109 ++++++++++++++++++++++++++++++++
+ arch/x86/include/asm/kvm_host.h |   1 +
+ arch/x86/kvm/x86.c              |  13 ++++
+ include/uapi/linux/kvm.h        |  20 ++++++
+ 4 files changed, 143 insertions(+)
 
-diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 7338b987cadd..b5dcf36b50f5 100644
---- a/arch/x86/kvm/svm/sev.c
-+++ b/arch/x86/kvm/svm/sev.c
-@@ -3323,6 +3323,7 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 			goto vmgexit_err;
- 		break;
- 	case SVM_VMGEXIT_GUEST_REQUEST:
-+	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
- 		if (!sev_snp_guest(vcpu->kvm))
- 			goto vmgexit_err;
- 		break;
-@@ -4005,6 +4006,62 @@ static int snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_
- 	return ret;
- }
+diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+index ecfa25b505e7..2eea9828d9aa 100644
+--- a/Documentation/virt/kvm/api.rst
++++ b/Documentation/virt/kvm/api.rst
+@@ -7122,6 +7122,97 @@ Please note that the kernel is allowed to use the kvm_run structure as the
+ primary storage for certain register types. Therefore, the kernel may use the
+ values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
  
-+/*
-+ * As per GHCB spec (see "SNP Extended Guest Request"), the certificate table
-+ * is terminated by 24-bytes of zeroes.
-+ */
-+static const u8 empty_certs_table[24];
++::
 +
-+static int snp_handle_ext_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
-+{
-+	struct kvm *kvm = svm->vcpu.kvm;
-+	u8 msg_type;
++		/* KVM_EXIT_COCO */
++		struct kvm_exit_coco {
++		#define KVM_EXIT_COCO_REQ_CERTS			0
++		#define KVM_EXIT_COCO_MAX			1
++			__u8 nr;
++			__u8 pad0[7];
++			union {
++				struct {
++					__u64 gfn;
++					__u32 npages;
++		#define KVM_EXIT_COCO_REQ_CERTS_ERR_INVALID_LEN		1
++		#define KVM_EXIT_COCO_REQ_CERTS_ERR_GENERIC		(1 << 31)
++					__u32 ret;
++				} req_certs;
++			};
++		};
 +
-+	if (!sev_snp_guest(kvm) || !PAGE_ALIGNED(req_gpa) || !PAGE_ALIGNED(resp_gpa))
-+		return -EINVAL;
++KVM_EXIT_COCO events are intended to handle cases where a confidential
++VM requires some action on the part of userspace, or cases where userspace
++needs to be informed of some activity relating to a confidential VM.
 +
-+	if (kvm_read_guest(kvm, req_gpa + offsetof(struct snp_guest_msg_hdr, msg_type),
-+			   &msg_type, 1))
-+		goto abort_request;
++A `kvm_exit_coco` structure is defined to encapsulate the data to be sent to
++or returned by userspace. The `nr` field defines the specific type of event
++that needs to be serviced, and that type is used as a discriminator to
++determine which union type should be used for input/output.
 +
-+	/*
-+	 * As per GHCB spec, requests of type MSG_REPORT_REQ also allow for
-+	 * additional certificate data to be provided alongside the attestation
-+	 * report via the guest-provided data pages indicated by RAX/RBX. The
-+	 * certificate data is optional and requires additional KVM enablement
-+	 * to provide an interface for userspace to provide it, but KVM still
-+	 * needs to be able to handle extended guest requests either way. So
-+	 * provide a stub implementation that will always return an empty
-+	 * certificate table in the guest-provided data pages.
-+	 */
-+	if (msg_type == SNP_MSG_REPORT_REQ) {
-+		struct kvm_vcpu *vcpu = &svm->vcpu;
-+		u64 data_npages;
-+		gpa_t data_gpa;
++The parameters for each of these event/union types are documented below:
 +
-+		if (!kvm_ghcb_rax_is_valid(svm) || !kvm_ghcb_rbx_is_valid(svm))
-+			goto abort_request;
++  - ``KVM_EXIT_COCO_REQ_CERTS``
 +
-+		data_gpa = vcpu->arch.regs[VCPU_REGS_RAX];
-+		data_npages = vcpu->arch.regs[VCPU_REGS_RBX];
++    This event provides a way to request certificate data from userspace and
++    have it written into guest memory. This is intended primarily to handle
++    attestation requests made by SEV-SNP guests (using the Extended Guest
++    Requests GHCB command as defined by the GHCB 2.0 specification for SEV-SNP
++    guests), where additional certificate data corresponding to the
++    endorsement key used by firmware to sign an attestation report can be
++    optionally provided by userspace to pass along to the guest together with
++    the firmware-provided attestation report.
 +
-+		if (!PAGE_ALIGNED(data_gpa))
-+			goto abort_request;
++    In the case of ``KVM_EXIT_COCO_REQ_CERTS`` events, the `req_certs` union
++    type is used. KVM will supply in `gfn` the non-private guest page that
++    userspace should use to write the contents of certificate data. In the
++    case of SEV-SNP, the format of this certificate data is defined in the
++    GHCB 2.0 specification (see section "SNP Extended Guest Request"). KVM
++    will also supply in `npages` the number of contiguous pages available
++    for writing the certificate data into.
 +
-+		if (data_npages &&
-+		    kvm_write_guest(kvm, data_gpa, empty_certs_table,
-+				    sizeof(empty_certs_table)))
-+			goto abort_request;
-+	}
++      - If the supplied number of pages is sufficient, userspace must write
++        the certificate table blob (in the format defined by the GHCB spec)
++        into the address corresponding to `gfn` and set `ret` to 0 to indicate
++        success. If no certificate data is available, then userspace can
++        either write an empty certificate table into the address corresponding
++        to `gfn`, or it can disable ``KVM_EXIT_COCO_REQ_CERTS`` (via
++        ``KVM_CAP_EXIT_COCO``), in which case KVM will handle returning an
++        empty certificate table to the guest.
 +
-+	return snp_handle_guest_req(svm, req_gpa, resp_gpa);
++      - If the number of pages supplied is not sufficient, userspace must set
++        the required number of pages in `npages` and then set `ret` to
++        ``KVM_EXIT_COCO_REQ_CERTS_ERR_INVALID_LEN``.
 +
-+abort_request:
-+	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
-+				SNP_GUEST_ERR(SNP_GUEST_VMM_ERR_GENERIC, 0));
-+	return 1; /* resume guest */
-+}
++      - If some other error occurred, userspace must set `ret` to
++        ``KVM_EXIT_COCO_REQ_CERTS_ERR_GENERIC``.
 +
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -4282,6 +4339,9 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 	case SVM_VMGEXIT_GUEST_REQUEST:
- 		ret = snp_handle_guest_req(svm, control->exit_info_1, control->exit_info_2);
++    NOTE: In the case of SEV-SNP, the endorsement key used by firmware may
++    change as a result of management activities like updating SEV-SNP firmware
++    or loading new endorsement keys, so some care should be taken to keep the
++    returned certificate data in sync with the actual endorsement key in use by
++    firmware at the time the attestation request is sent to SNP firmware. The
++    recommended scheme to do this is:
++
++      - The VMM should obtain a shared or exclusive lock on the path the
++        certificate blob file resides at before reading it and returning it to
++        KVM, and continue to hold the lock until the attestation request is
++        actually sent to firmware. To facilitate this, the VMM can set the
++        ``immediate_exit`` flag of kvm_run just after supplying the certificate
++        data, and just before and resuming the vCPU. This will ensure the vCPU
++        will exit again to userspace with ``-EINTR`` after it finishes fetching
++        the attestation request from firmware, at which point the VMM can
++        safely drop the file lock.
++
++      - Tools/libraries that perform updates to SNP firmware TCB values or
++        endorsement keys (e.g. via /dev/sev interfaces such as ``SNP_COMMIT``,
++        ``SNP_SET_CONFIG``, or ``SNP_VLEK_LOAD``, see
++        Documentation/virt/coco/sev-guest.rst for more details) in such a way
++        that the certificate blob needs to be updated, should similarly take an
++        exclusive lock on the certificate blob for the duration of any updates
++        to endorsement keys or the certificate blob contents to ensure that
++        VMMs using the above scheme will not return certificate blob data that
++        is out of sync with the endorsement key used by firmware.
+ 
+ 6. Capabilities that can be enabled on vCPUs
+ ============================================
+@@ -8895,6 +8986,24 @@ Do not use KVM_X86_SW_PROTECTED_VM for "real" VMs, and especially not in
+ production.  The behavior and effective ABI for software-protected VMs is
+ unstable.
+ 
++8.42 KVM_CAP_EXIT_COCO
++----------------------
++
++:Capability: KVM_CAP_EXIT_COCO
++:Architectures: x86
++:Type: vm
++
++This capability, if enabled, will cause KVM to exit to userspace with
++KVM_EXIT_COCO exit reason to process certain events related to confidential
++guests.
++
++Calling KVM_CHECK_EXTENSION for this capability will return a bitmask of
++KVM_EXIT_COCO event types that can be configured to exit to userspace.
++
++The argument to KVM_ENABLE_CAP is also a bitmask, and must be a subset
++of the result of KVM_CHECK_EXTENSION.  KVM will forward to userspace
++the event types whose corresponding bit is in the argument.
++
+ 9. Known KVM API problems
+ =========================
+ 
+diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+index cef323c801f2..4b90208f9df0 100644
+--- a/arch/x86/include/asm/kvm_host.h
++++ b/arch/x86/include/asm/kvm_host.h
+@@ -1429,6 +1429,7 @@ struct kvm_arch {
+ 	struct kvm_x86_msr_filter __rcu *msr_filter;
+ 
+ 	u32 hypercall_exit_enabled;
++	u64 coco_exit_enabled;
+ 
+ 	/* Guest can access the SGX PROVISIONKEY. */
+ 	bool sgx_provisioning_allowed;
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a6968eadd418..94c3a82b02c7 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -125,6 +125,8 @@ static u64 __read_mostly cr4_reserved_bits = CR4_RESERVED_BITS;
+ #define KVM_X2APIC_API_VALID_FLAGS (KVM_X2APIC_API_USE_32BIT_IDS | \
+                                     KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK)
+ 
++#define KVM_EXIT_COCO_VALID_MASK 0
++
+ static void update_cr8_intercept(struct kvm_vcpu *vcpu);
+ static void process_nmi(struct kvm_vcpu *vcpu);
+ static void __kvm_set_rflags(struct kvm_vcpu *vcpu, unsigned long rflags);
+@@ -4826,6 +4828,9 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+ 	case KVM_CAP_VM_TYPES:
+ 		r = kvm_caps.supported_vm_types;
  		break;
-+	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
-+		ret = snp_handle_ext_guest_req(svm, control->exit_info_1, control->exit_info_2);
++	case KVM_CAP_EXIT_COCO:
++		r = KVM_EXIT_COCO_VALID_MASK;
 +		break;
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
+ 	default:
+ 		break;
+ 	}
+@@ -6748,6 +6753,14 @@ int kvm_vm_ioctl_enable_cap(struct kvm *kvm,
+ 		}
+ 		mutex_unlock(&kvm->lock);
+ 		break;
++	case KVM_CAP_EXIT_COCO:
++		if (cap->args[0] & ~KVM_EXIT_COCO_VALID_MASK) {
++			r = -EINVAL;
++			break;
++		}
++		kvm->arch.coco_exit_enabled = cap->args[0];
++		r = 0;
++		break;
+ 	default:
+ 		r = -EINVAL;
+ 		break;
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index e5af8c692dc0..8a3a76679224 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -135,6 +135,22 @@ struct kvm_xen_exit {
+ 	} u;
+ };
+ 
++struct kvm_exit_coco {
++#define KVM_EXIT_COCO_REQ_CERTS		0
++#define KVM_EXIT_COCO_MAX		1
++	__u8 nr;
++	__u8 pad0[7];
++	union {
++		struct {
++			__u64 gfn;
++			__u32 npages;
++#define KVM_EXIT_COCO_REQ_CERTS_ERR_INVALID_LEN		1
++#define KVM_EXIT_COCO_REQ_CERTS_ERR_GENERIC		(1 << 31)
++			__u32 ret;
++		} req_certs;
++	};
++};
++
+ #define KVM_S390_GET_SKEYS_NONE   1
+ #define KVM_S390_SKEYS_MAX        1048576
+ 
+@@ -178,6 +194,7 @@ struct kvm_xen_exit {
+ #define KVM_EXIT_NOTIFY           37
+ #define KVM_EXIT_LOONGARCH_IOCSR  38
+ #define KVM_EXIT_MEMORY_FAULT     39
++#define KVM_EXIT_COCO             40
+ 
+ /* For KVM_EXIT_INTERNAL_ERROR */
+ /* Emulate instruction failed. */
+@@ -433,6 +450,8 @@ struct kvm_run {
+ 			__u64 gpa;
+ 			__u64 size;
+ 		} memory_fault;
++		/* KVM_EXIT_COCO */
++		struct kvm_exit_coco coco;
+ 		/* Fix the size of the union. */
+ 		char padding[256];
+ 	};
+@@ -918,6 +937,7 @@ struct kvm_enable_cap {
+ #define KVM_CAP_GUEST_MEMFD 234
+ #define KVM_CAP_VM_TYPES 235
+ #define KVM_CAP_PRE_FAULT_MEMORY 236
++#define KVM_CAP_EXIT_COCO 237
+ 
+ struct kvm_irq_routing_irqchip {
+ 	__u32 irqchip;
 -- 
 2.25.1
 
