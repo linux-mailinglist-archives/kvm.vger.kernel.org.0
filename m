@@ -1,276 +1,195 @@
-Return-Path: <kvm+bounces-20215-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20216-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF37911E99
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:24:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D91911EDA
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:33:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DAA21C21342
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 08:24:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA5D11F2458A
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 08:33:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404A616D33D;
-	Fri, 21 Jun 2024 08:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C70816D4FF;
+	Fri, 21 Jun 2024 08:33:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K8TjsYdi"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="M1Tfl6tr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ua1-f54.google.com (mail-ua1-f54.google.com [209.85.222.54])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C254A83A09
-	for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 08:24:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6872B16D31E
+	for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 08:33:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718958260; cv=none; b=pJFWfj2KqY5uGCSElxKwyA91fMdbbr3KziIq/rLoeO2ksyiyoVPaVVuq9UNsBVpGuADVN7mPb7WqNEUw/vhiGLCmqBbKqgRLoyHdgO7NlBa4V91DIj9PuK0dO8QIZLSXT1yyseY3z2XrIvW/WTJ0wXu6kkahvptL4pb5RW0GEGk=
+	t=1718958789; cv=none; b=bkCWDq13o1P2c4aYONDuC9NOjvD5URmKA19e9DUNZ+lVhQiAHEkLssvfboGjBRKclLu1aFN4ycfrHH0LOFJ8mk41Zhdi5HYU0JGtMBd7gHWYrkofNdXtlSASJfPf3uIJVfUrn7h48ukQLtwRT6FYWCTxOdSh4JUL9djQe8hZ1ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718958260; c=relaxed/simple;
-	bh=zNb31ljHYMVCkZLfGOU3WfbbUpuUMo7NTgMJDQTRcKc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nGkMv/dqaCZbOjLU2uvoYy//Vc1vmzMdZETteq7i6iJxLOiSYgvxtc1F1IzRPZY+JidTZ3OWhNPG1/9OpW6+YllgFFERcSdraURok8kfrhW6RLlS7URVWvnctwv+MN+y1vX66VP6pQ7AKBFv5EIiVpy0ZJyatFVnr6yUY7qsuZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K8TjsYdi; arc=none smtp.client-ip=209.85.222.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ua1-f54.google.com with SMTP id a1e0cc1a2514c-80d6c63af28so481754241.0
-        for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 01:24:18 -0700 (PDT)
+	s=arc-20240116; t=1718958789; c=relaxed/simple;
+	bh=ClkkVMk172JzTt1UKddhO3yky07U34zX40msQkUvvNU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HVUwZKexqqaeh8oJcOOKs68I3wiQ1dtQlet5ioGAEE+vSDV8EqD1WI+9PPqvq5oxGjK/jyhTto3qvcBNgJd0UzNAk4rWGhiStdrEu0bslrP/Ni677dl11l62m5KRrKvMqy3/4+qinCQG0ce6I4j7tw3kTMUDcMxtykgmsnyy41Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=M1Tfl6tr; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a6fc30e3237so179084066b.1
+        for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 01:33:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1718958258; x=1719563058; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hSL4jxfV9+DvzrB5xjyOhPkA4JDFq4ANvkv63lZh6Ho=;
-        b=K8TjsYdiD7kZJZbBfwTUAiUFNTHViBXFGQngxHYwrxLUpbelkzCaPX635p540o76/W
-         RLOv6fibpMqPI8+oDVQN+pApxzlCIbfSTTjTei4jkvqMVEMtU3NTGtLGdP0Us0EzRN0+
-         DbfKKa5Q+kY4oPkzkRiQlp7CRCzboGsY+0OsTrbxtgQPcKEgh1vwAGN6fWppy7fe4JJ7
-         gsVFwySyNJKH35bCfY/HIZJUwAlVaWhrpTRcMOpYr0jbUBtDYF1cHb58tYiX1gWvROOj
-         S/EKTmvvNms4fog7s0CZkNPVkvJSCod6wHPtDkpKbcCRnxKbl43xUXnPVTcJe77MfVqJ
-         zoCQ==
+        d=ventanamicro.com; s=google; t=1718958786; x=1719563586; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=13CmNwUXr5VhUsxq5NU9l1BI3PLV5wmazLWOuEQIO+k=;
+        b=M1Tfl6trDck75NtmR/Mwa8r/2jZT9CBvtE9svuh1nTGQKi1Y1PB2wzzSawBnCySKeE
+         AO/9qv9fFzsGxKmGV6W2GNlUn5wZ3BVSv+gm4gf+T/fJrAwQLgRoLdnEzMiX5hqOn1PI
+         XHxCSy7wd8P9RgQ+qurxaYCGCXHCOqQ5y3xVaYOj0J58ZoiaQble30YejLv21Wb10zcQ
+         2gHsKsu5KK4Dn10F3D8vtMwif8LHVzkxir/lFsqN+a61snXvU69Yh0toavTAy1RACw07
+         ytryHUfPk6cRk6yB1pK2i2p3FT2S5gpcK6Epfa6fZplsBFw+4LJUrC2rZazJ62WDC1yT
+         wA4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1718958258; x=1719563058;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hSL4jxfV9+DvzrB5xjyOhPkA4JDFq4ANvkv63lZh6Ho=;
-        b=ESj+3mKx4IAL5MNs14RoVX2qMU1pZPpQ2s3LpMoY6UqHrRUSpSLsIZcL5MFXjOHj5N
-         MKEQzauehwBLAGckVmXAg+J9Rp216jn6n8gv+PJJR8J38K4Ebpx10CXFWEQiChvHq8J2
-         R60/TZoPrzqKt4UBgSD9NuJFCUfJNt0ejX1mQLrzjoAS0MLhxBmAv+s4NX8it6cs3cje
-         ZSveXg61sn+BsC60a6n4d90jwvrkU8/j0ffbAc1FD5D1Ry+qmKTIXZZgNw297SH7k/1X
-         R6AZ9eZTHE3Z6WMy9h++jUkmrXO9F+kbo8Uf4fbBCUu7hrPwUHAobI1CxKts1CAy3Aj0
-         uS9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXIWLsX9v9lStl19pc1HkjSC/fakEPUBC+8//fymQavfqikYYBK7hF6uAw5UeiEKLz22wnwrZH66YpJsx0b++M9ZFXV
-X-Gm-Message-State: AOJu0YwAboKXX66dJLGf+5EPVTBKtC+WynDxRi6sEN2+WB8DWx/pBMEG
-	oibLBBazs63Zpr3IM0T8mRbFNguum4Gn6uXCplFrInMOeVagen0tpZrqg81RjG50qweQ5Gm/98P
-	Cjw+GdzGhC0uC+9fmhkZlC0xPSY6+hl04zP4D
-X-Google-Smtp-Source: AGHT+IFOm3+J7HmNxfiqvxOkkiwF5vyaMcHsOCQZWMdwd3gCNyLm2HD7cdpJGLriJIJX24RcWbLSAdpJ42Ukykvu0xA=
-X-Received: by 2002:a05:6102:743:b0:48f:205e:9b8 with SMTP id
- ada2fe7eead31-48f205e0aafmr5713897137.34.1718958257567; Fri, 21 Jun 2024
- 01:24:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1718958786; x=1719563586;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=13CmNwUXr5VhUsxq5NU9l1BI3PLV5wmazLWOuEQIO+k=;
+        b=OQGdG0gfty68JAkssrzIlEM7GZ37SqbOenbRx0vqf2q/lwrZFozGJgay5Zre9T3oQR
+         O7wHk6pRBjwqzo4AWwceEfgEXidBfoDDsTcqai7jPMCMw36bH0lRN91gE+ehUHrml/Aw
+         JFOM0nGcQOXT0LroKOWXhuu0ZWNmDSvYuZyumRJctZakQ4ekgGNhBiT4puV3erbQSxR6
+         TnSPzyYY8uav0W7oNQfUNaCsnJASI/g4LyVZzPhCnxCU/wTWKrmONF37ZBQXhfYMr37r
+         dt91ESo5L9AlHQruLAfwRQ1MHG42N4Zqn88E8hS4zZAJhZ4UPzf7ilfpa/2THlyCnKbb
+         weKw==
+X-Forwarded-Encrypted: i=1; AJvYcCUA6PwgoQohtwu0PrXBT4HTqZgGoTMAbvPJ9/1IHJek3jM/UVJwOZo0HLfZtyLJrM3CBXwdLlbKgceoV1tjRxraAYcn
+X-Gm-Message-State: AOJu0YyVrW8ZBSMEVS4i3fwiPn9BH8bniJHWkrqWpRM7OEtitftuhuwA
+	EYjqT3wFSxdfcCIj+goHvsF+xkH1oyF36fYguPmHF90SN3eGGXaExHpkGy8KlEo=
+X-Google-Smtp-Source: AGHT+IHvj0QAH2876hMCNrT7ElOxqJnXNZ06Sc4+oHnPw0f7XyOBJdmylote20qcntY2N07KCc4kBw==
+X-Received: by 2002:a17:907:a4c7:b0:a6f:b69e:8c98 with SMTP id a640c23a62f3a-a6fb69e8d25mr438502466b.62.1718958785171;
+        Fri, 21 Jun 2024 01:33:05 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a6fcf56ed53sm57395866b.217.2024.06.21.01.33.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 21 Jun 2024 01:33:04 -0700 (PDT)
+Date: Fri, 21 Jun 2024 10:33:03 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Anup Patel <apatel@ventanamicro.com>
+Cc: Conor Dooley <conor@kernel.org>, 
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, alex@ghiti.fr, greentime.hu@sifive.com, 
+	vincent.chen@sifive.com, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org
+Subject: Re: [PATCH v5 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
+Message-ID: <20240621-10d503a9a2e7d54e67db102c@orel>
+References: <20240605121512.32083-1-yongxuan.wang@sifive.com>
+ <20240605121512.32083-3-yongxuan.wang@sifive.com>
+ <20240605-atrium-neuron-c2512b34d3da@spud>
+ <CAK9=C2XH7-RdVpojX8GNW-WFTyChW=sTOWs8_kHgsjiFYwzg+g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
- <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com> <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
- <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com>
- <20240619115135.GE2494510@nvidia.com> <CA+EHjTz_=J+bDpqciaMnNja4uz1Njcpg5NVh_GW2tya-suA7kQ@mail.gmail.com>
- <ZnRMn1ObU8TFrms3@google.com>
-In-Reply-To: <ZnRMn1ObU8TFrms3@google.com>
-From: Fuad Tabba <tabba@google.com>
-Date: Fri, 21 Jun 2024 09:23:41 +0100
-Message-ID: <CA+EHjTxvOyCqWRMTS3mXHznQtAJzDJLgqdS0Er2GA9FGdxd1vA@mail.gmail.com>
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-To: Sean Christopherson <seanjc@google.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, David Hildenbrand <david@redhat.com>, John Hubbard <jhubbard@nvidia.com>, 
-	Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>, maz@kernel.org, 
-	kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	pbonzini@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAK9=C2XH7-RdVpojX8GNW-WFTyChW=sTOWs8_kHgsjiFYwzg+g@mail.gmail.com>
 
-Hi Sean,
-
-On Thu, Jun 20, 2024 at 4:37=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
->
-> On Wed, Jun 19, 2024, Fuad Tabba wrote:
-> > Hi Jason,
+On Thu, Jun 20, 2024 at 11:55:44AM GMT, Anup Patel wrote:
+> On Wed, Jun 5, 2024 at 10:25 PM Conor Dooley <conor@kernel.org> wrote:
 > >
-> > On Wed, Jun 19, 2024 at 12:51=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.co=
-m> wrote:
+> > On Wed, Jun 05, 2024 at 08:15:08PM +0800, Yong-Xuan Wang wrote:
+> > > Add entries for the Svade and Svadu extensions to the riscv,isa-extensions
+> > > property.
 > > >
-> > > On Wed, Jun 19, 2024 at 10:11:35AM +0100, Fuad Tabba wrote:
+> > > Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> > > ---
+> > >  .../devicetree/bindings/riscv/extensions.yaml | 30 +++++++++++++++++++
+> > >  1 file changed, 30 insertions(+)
 > > >
-> > > > To be honest, personally (speaking only for myself, not necessarily
-> > > > for Elliot and not for anyone else in the pKVM team), I still would
-> > > > prefer to use guest_memfd(). I think that having one solution for
-> > > > confidential computing that rules them all would be best. But we do
-> > > > need to be able to share memory in place, have a plan for supportin=
-g
-> > > > huge pages in the near future, and migration in the not-too-distant
-> > > > future.
+> > > diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > index 468c646247aa..1e30988826b9 100644
+> > > --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > @@ -153,6 +153,36 @@ properties:
+> > >              ratified at commit 3f9ed34 ("Add ability to manually trigger
+> > >              workflow. (#2)") of riscv-time-compare.
 > > >
-> > > I think using a FD to control this special lifetime stuff is
-> > > dramatically better than trying to force the MM to do it with struct
-> > > page hacks.
-> > >
-> > > If you can't agree with the guest_memfd people on how to get there
-> > > then maybe you need a guest_memfd2 for this slightly different specia=
-l
-> > > stuff instead of intruding on the core mm so much. (though that would
-> > > be sad)
-> > >
-> > > We really need to be thinking more about containing these special
-> > > things and not just sprinkling them everywhere.
+> > > +        - const: svade
+> > > +          description: |
+> > > +            The standard Svade supervisor-level extension for raising page-fault
+> > > +            exceptions when PTE A/D bits need be set as ratified in the 20240213
+> > > +            version of the privileged ISA specification.
+> > > +
+> > > +            Both Svade and Svadu extensions control the hardware behavior when
+> > > +            the PTE A/D bits need to be set. The default behavior for the four
+> > > +            possible combinations of these extensions in the device tree are:
+> > > +            1. Neither svade nor svadu in DT: default to svade.
 > >
-> > I agree that we need to agree :) This discussion has been going on
-> > since before LPC last year, and the consensus from the guest_memfd()
-> > folks (if I understood it correctly) is that guest_memfd() is what it
-> > is: designed for a specific type of confidential computing, in the
-> > style of TDX and CCA perhaps, and that it cannot (or will not) perform
-> > the role of being a general solution for all confidential computing.
->
-> That isn't remotely accurate.  I have stated multiple times that I want g=
-uest_memfd
-> to be a vehicle for all VM types, i.e. not just CoCo VMs, and most defini=
-tely not
-> just TDX/SNP/CCA VMs.
+> > I think this needs to be expanded on, as to why nothing means svade.
+> 
+> Actually if both Svade and Svadu are not present in DT then
+> it is left to the platform and OpenSBI does nothing.
 
-I think that there might have been a slight misunderstanding between
-us. I just thought that that's what you meant by:
+This is a good point, and maybe it's worth integrating something that
+states this case is technically unknown into the final text. (Even though
+historically this has been assumed to mean svade.)
 
-: And I'm saying say we should stand firm in what guest_memfd _won't_
-support, e.g.
-: swap/reclaim and probably page migration should get a hard "no".
-
-https://lore.kernel.org/all/Zfmpby6i3PfBEcCV@google.com/
-
-> What I am staunchly against is piling features onto guest_memfd that will=
- cause
-> it to eventually become virtually indistinguishable from any other file-b=
-ased
-> backing store.  I.e. while I want to make guest_memfd usable for all VM *=
-types*,
-> making guest_memfd the preferred backing store for all *VMs* and use case=
-s is
-> very much a non-goal.
->
-> From an earlier conversation[1]:
->
->  : In other words, ditch the complexity for features that are well served=
- by existing
->  : general purpose solutions, so that guest_memfd can take on a bit of co=
-mplexity to
->  : serve use cases that are unique to KVM guests, without becoming an unm=
-aintainble
->  : mess due to cross-products.
-> > > > Also, since pin is already overloading the refcount, having the
-> > > > exclusive pin there helps in ensuring atomic accesses and avoiding
-> > > > races.
-> > >
-> > > Yeah, but every time someone does this and then links it to a uAPI it
-> > > becomes utterly baked in concrete for the MM forever.
+> 
 > >
-> > I agree. But if we can't modify guest_memfd() to fit our needs (pKVM,
-> > Gunyah), then we don't really have that many other options.
->
-> What _are_ your needs?  There are multiple unanswered questions from our =
-last
-> conversation[2].  And by "needs" I don't mean "what changes do you want t=
-o make
-> to guest_memfd?", I mean "what are the use cases, patterns, and scenarios=
- that
-> you want to support?".
+> > > +            2. Only svade in DT: use svade.
+> >
+> > That's a statement of the obvious, right?
+> >
+> > > +            3. Only svadu in DT: use svadu.
+> >
+> > This is not relevant for Svade.
+> >
+> > > +            4. Both svade and svadu in DT: default to svade (Linux can switch to
+> > > +               svadu once the SBI FWFT extension is available).
+> >
+> > "The privilege level to which this devicetree has been provided can switch to
+> > Svadu if the SBI FWFT extension is available".
+> >
+> > > +        - const: svadu
+> > > +          description: |
+> > > +            The standard Svadu supervisor-level extension for hardware updating
+> > > +            of PTE A/D bits as ratified at commit c1abccf ("Merge pull request
+> > > +            #25 from ved-rivos/ratified") of riscv-svadu.
+> > > +
+> > > +            Both Svade and Svadu extensions control the hardware behavior when
+> > > +            the PTE A/D bits need to be set. The default behavior for the four
+> > > +            possible combinations of these extensions in the device tree are:
+> >
+> > @Anup/Drew/Alex, are we missing some wording in here about it only being
+> > valid to have Svadu in isolation if the provider of the devicetree has
+> > actually turned on Svadu? The binding says "the default behaviour", but
+> > it is not the "default" behaviour, the behaviour is a must AFAICT. If
+> > you set Svadu in isolation, you /must/ have turned it on. If you set
+> > Svadu and Svade, you must have Svadu turned off?
+> 
+> Yes, the wording should be more of requirement style using
+> must or may.
+> 
+> How about this ?
 
-I think Quentin's reply in this thread outlines what it is pKVM would
-like to do, and why it's different from, e.g., TDX:
-https://lore.kernel.org/all/ZnUsmFFslBWZxGIq@google.com/
+I'm mostly just +1'ing everything below, but with a minor wording change
+suggestion
 
-To summarize, our requirements are the same as other CC
-implementations, except that we don't want to pay a penalty for
-operations that pKVM (and Gunyah) can do more efficiently than
-encryption-based CC, e.g., in-place conversion of private -> shared.
+> 1) Both Svade and Svadu not present in DT => Supervisor may
 
-Apart from that, we are happy to use an interface that can support our
-needs, or at least that we can extend in the (near) future to do that.
-Whether it's guest_memfd() or something else.
+Neither Svade nor Svadu present...
 
->  : What's "hypervisor-assisted page migration"?  More specifically, what'=
-s the
->  : mechanism that drives it?
+>     assume Svade to be present and enabled or it can discover
+>     based on mvendorid, marchid, and mimpid.
+> 2) Only Svade present in DT => Supervisor must assume Svade
+>     to be always enabled. (Obvious)
+> 3) Only Svadu present in DT => Supervisor must assume Svadu
+>     to be always enabled. (Obvious)
+> 4) Both Svade and Svadu present in DT => Supervisor must
+>     assume Svadu turned-off at boot time. To use Svadu, supervisor
+>     must explicitly enable it using the SBI FWFT extension.
+> 
+> IMO, the #2 and #3 are definitely obvious but still worth mentioning.
 
-I believe what Will specifically meant by this is that, we can add
-hypervisor support for migration in pKVM for the stage 2 page tables.
-
-We don't have a detailed implementation for this yet, of course, since
-there's no point yet until we know whether we're going with
-guest_memfd(), or another alternative.
-
->  : Do you happen to have a list of exactly what you mean by "normal mm st=
-uff"?  I
->  : am not at all opposed to supporting .mmap(), because long term I also =
-want to
->  : use guest_memfd for non-CoCo VMs.  But I want to be very conservative =
-with respect
->  : to what is allowed for guest_memfd.   E.g. host userspace can map gues=
-t_memfd,
->  : and do operations that are directly related to its mapping, but that's=
- about it.
->
-> That distinction matters, because as I have stated in that thread, I am n=
-ot
-> opposed to page migration itself:
->
->  : I am not opposed to page migration itself, what I am opposed to is add=
-ing deep
->  : integration with core MM to do some of the fancy/complex things that l=
-ead to page
->  : migration.
-
-So it's not a "hard no"? :)
-
-> I am generally aware of the core pKVM use cases, but I AFAIK I haven't se=
-en a
-> complete picture of everything you want to do, and _why_.
-> E.g. if one of your requirements is that guest memory is managed by core-=
-mm the
-> same as all other memory in the system, then yeah, guest_memfd isn't for =
-you.
-> Integrating guest_memfd deeply into core-mm simply isn't realistic, at le=
-ast not
-> without *massive* changes to core-mm, as the whole point of guest_memfd i=
-s that
-> it is guest-first memory, i.e. it is NOT memory that is managed by core-m=
-m (primary
-> MMU) and optionally mapped into KVM (secondary MMU).
-
-It's not a requirement that guest memory is managed by the core-mm.
-But, like we mentioned, support for in-place conversion from
-shared->private, huge pages, and eventually migration are.
-
-> Again from that thread, one of most important aspects guest_memfd is that=
- VMAs
-> are not required.  Stating the obvious, lack of VMAs makes it really hard=
- to drive
-> swap, reclaim, migration, etc. from code that fundamentally operates on V=
-MAs.
->
->  : More broadly, no VMAs are required.  The lack of stage-1 page tables a=
-re nice to
->  : have; the lack of VMAs means that guest_memfd isn't playing second fid=
-dle, e.g.
->  : it's not subject to VMA protections, isn't restricted to host mapping =
-size, etc.
->
-> [1] https://lore.kernel.org/all/Zfmpby6i3PfBEcCV@google.com
-> [2] https://lore.kernel.org/all/Zg3xF7dTtx6hbmZj@google.com
-
-I wonder if it might be more productive to also discuss this in one of
-the PUCKs, ahead of LPC, in addition to trying to go over this in LPC.
-
-Cheers,
-/fuad
+Thanks,
+drew
 
