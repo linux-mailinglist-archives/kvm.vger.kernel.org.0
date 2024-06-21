@@ -1,163 +1,163 @@
-Return-Path: <kvm+bounces-20229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2561F912131
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 11:50:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EC3F9121F9
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 12:16:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8EAF2B21FEA
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 09:50:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF4FE1C2230F
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D32C16FF39;
-	Fri, 21 Jun 2024 09:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C975A17B43C;
+	Fri, 21 Jun 2024 10:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="PgCkBM9U"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="lPa50+kF"
 X-Original-To: kvm@vger.kernel.org
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04olkn2020.outbound.protection.outlook.com [40.92.74.20])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E3916F854;
-	Fri, 21 Jun 2024 09:49:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.74.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718963383; cv=fail; b=La0IGtDqz2AmMfiyCbmuoVnRhyeUiHU9O2efpxXI7HC8WLFmWfpnRKLq+YrxYORqkCVaXlv7q1p+RpBUq+iCt1WgBJkXLGmp+GmKYaog21xL2I/3gzc2IzDMm/DuxClWwWpyc+IufMPTm/M2KCMKbXBXTGdfmRBCzNbOBWxD/9I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718963383; c=relaxed/simple;
-	bh=kRsyUuGg7dYrLwd+WSfLJf36EQDHVciiQyBkW8vqBLk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eMW2wQhlVUk6+cxmkKeQPBhNansT70ap6BpKDW7EZEeErT32AnkfQ3eyWjUsfuwLdDRLPAcvcgE3yMTXGbfkj3Wl6JYzTefOsnox0unP9M1ygRz8a0lkuvMRooAIN7SulWxOTggiyme/ZDgyzwrh2fH+HMSyIak63sdi8/npRP4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=PgCkBM9U; arc=fail smtp.client-ip=40.92.74.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DOHqIbgggRVrDne2/6ttSZD0pp/sbAMv4rLUvncXMaTdI57RMJGlaHsaZLQ0JzSA8NJG2VSBr2MX8c/yfIx9mYibVwHyDHxuWr/iKbChhIaQ6LQGC0v2eZyDa4TnGlu4Osmf36vHhZ8LlCtS8xX4458eOyJYmXUTq6IpuEjGtbb2fnVZlw9AIZ8dPtuX6pqFyEtqZHVq0+FwkVp/kk5JUz/5YuDmooBq0ujYcc2EwgVGHbC9nFEq6EvnqdPT8jVXpXEWDVl/1ZhaP5XKax6R8YipIdOpIRF9CNTEfFf5pSNWQpHu/4V2APqoBOsm8kh210oh13L9Bk+GHzEOs09VRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kRsyUuGg7dYrLwd+WSfLJf36EQDHVciiQyBkW8vqBLk=;
- b=PoktW7FgDA1G99iVzxRhGV+Xdj7j84v1YP9Xe7BOFsPWM9zGx9jCyGCMaB5TOb3BKq9yMUQo42TG59jVyC3Lx3VAf23JaW1W7QHHd15Yrmn1/hiRfRv1Z93Wmq7zFCrtnuagiO3o4V1JfUyWbAbjtjnv5leBAkeqe6xWjdBQmPw2lEEz/2+U0jfU1VqlO4ohIMGR/D+CDl4KCVgnlOatFAjNp2jL6gzgJpS+6a6E1S2pMrzhYQFw/RYs0j3izM5cFeVPmolJwmCFBxVwVOQHwLqAKo5rWEz93lLvLS3PKXDQcTIikIuS92nC20H1FCH+yybmz6nL73kT4GAZWW0Uvw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kRsyUuGg7dYrLwd+WSfLJf36EQDHVciiQyBkW8vqBLk=;
- b=PgCkBM9U5miTBMmegnHCUExW35Oksg72LPiRuk7Vm9OcgLwtWWFOIZo+q8WXkdmwwk7JdaclTQoaqNexn8EQpXY7yn8azL4vOlpWtWXcO5iMV3ty8xnG2pmHPiGKukes4Bw5abvlj1iXuH69Q6EZIsvmRyNAFpk9B+yEtM+6n2e+e8atSFW7imAb8upUPpdFyeOhCMIDitguigVOhg+RlU+uIuQzmwbduKozwF+bFAToiIvZ+hcsuzw4HN6rjFqhtK3qYD0jk9CA0GEA/WxDb3JtRz4Zy+j+w7uJkR479DFUwf7BxlPAoTlKQ4vhyFxu3dhL95WuVqwK4zNMB8UVhw==
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
- by AS8P194MB2113.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:635::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.21; Fri, 21 Jun
- 2024 09:49:39 +0000
-Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7698.017; Fri, 21 Jun 2024
- 09:49:39 +0000
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-To: mvaralar@redhat.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	kvm@vger.kernel.org,
-	luigi.leonardi@outlook.com,
-	marco.pinn95@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	sgarzare@redhat.com,
-	stefanha@redhat.com,
-	virtualization@lists.linux.dev
-Subject: Re: [PATCH net-next 2/2] vsock/virtio: avoid enqueue packets when work queue is empty
-Date: Fri, 21 Jun 2024 11:47:51 +0200
-Message-ID:
- <AS2P194MB2170634139F2B2E0216047BA9AC92@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <ZnVAsjkK11cE2fTI@fedora>
-References: <ZnVAsjkK11cE2fTI@fedora>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [/+p1cY0JgD6CZYcwk444UpeY/VwPLTPl]
-X-ClientProxiedBy: MI1P293CA0017.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:3::13) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:20b:642::8)
-X-Microsoft-Original-Message-ID:
- <20240621094751.7092-1-luigi.leonardi@outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B115171648;
+	Fri, 21 Jun 2024 10:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1718964772; cv=none; b=L/64TbsCggDh/Be0hW7dpuwQTFYzEUeWwd2qO7rR+nXEqHLlqHAOG9uEJlP3ewvGQ6JftQIDEAHVPZjID1rBtBUtC2npOv6452dFJH5Fx/Oy6f8BQPrt9pdUimw8ged5FMaBaV/426PtPIFbd8bcwKS/SzVIZcr+WoRTHwhqros=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1718964772; c=relaxed/simple;
+	bh=qIPAKUsfdrunLjZpUxB95w4pFXbAFx7meVdFYH0CVL0=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ty8bP+ZUXESJO5KBmuI4GElS/e7/aOp5gm0wzkuWhf4Ch3AFZ6/xFDodGZz4B1ostpEsyAcCFihMXEunM5HR1tJA7GTGCdR7tt8b5hfCyxpYptgu5BK+2g0T7kbAXcS4GPIXjgVuPKVzXfEgiO77HUpkHvGA+rh0ZoSQ4CSgf0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=lPa50+kF; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1718964770; x=1750500770;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qIPAKUsfdrunLjZpUxB95w4pFXbAFx7meVdFYH0CVL0=;
+  b=lPa50+kFeslLsy49zPO6gdpc/lko+oHrlou8TIYUM/N9yvxFcY7p1dXe
+   X+ihXtVwbphsbef+wNKrAqcsZDZTTY+3Rb8t91IBPvMI2htHjsY/sXL+W
+   ThOOSWOWjipuL0k/7W07K6xQNEtizdCyko6tuspW5zpyzL4gQZ6HDfwqp
+   3sY8mTRaG6P9Ae4tzB+iau62PmIu1aMin7yj35a+FZbjpfT3Woc+vNbqy
+   Vy0Yb/WNs+s6dSKR65/jc1GivtP9mvgfbCqXxMto1htEpukEUVQ+j2CC5
+   u1G6Utt5fPbH1yX8jDCwR1z27Nz5Cd7eciCMLRF+n7z6g8NVhSBdqvCPk
+   g==;
+X-CSE-ConnectionGUID: +aZhim/bRGe+fZL72SyFNQ==
+X-CSE-MsgGUID: nsaDAPolS1GA6r4yoC3nFw==
+X-IronPort-AV: E=Sophos;i="6.08,254,1712646000"; 
+   d="asc'?scan'208";a="28315238"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 21 Jun 2024 03:12:48 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 21 Jun 2024 03:12:17 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Fri, 21 Jun 2024 03:12:14 -0700
+Date: Fri, 21 Jun 2024 11:11:56 +0100
+From: Conor Dooley <conor.dooley@microchip.com>
+To: Andrew Jones <ajones@ventanamicro.com>
+CC: Anup Patel <apatel@ventanamicro.com>, Conor Dooley <conor@kernel.org>,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>, <linux-kernel@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>, <kvm-riscv@lists.infradead.org>,
+	<kvm@vger.kernel.org>, <alex@ghiti.fr>, <greentime.hu@sifive.com>,
+	<vincent.chen@sifive.com>, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+	<krzk+dt@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, Palmer
+ Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+	<devicetree@vger.kernel.org>
+Subject: Re: [PATCH v5 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
+Message-ID: <20240621-flanking-twiddling-c3b6c9108438@wendy>
+References: <20240605121512.32083-1-yongxuan.wang@sifive.com>
+ <20240605121512.32083-3-yongxuan.wang@sifive.com>
+ <20240605-atrium-neuron-c2512b34d3da@spud>
+ <CAK9=C2XH7-RdVpojX8GNW-WFTyChW=sTOWs8_kHgsjiFYwzg+g@mail.gmail.com>
+ <20240621-10d503a9a2e7d54e67db102c@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|AS8P194MB2113:EE_
-X-MS-Office365-Filtering-Correlation-Id: ec6c5cfe-835c-4bfe-e7e0-08dc91d77779
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199025|440099025|3412199022|1710799023;
-X-Microsoft-Antispam-Message-Info:
-	YhFnrG1Dy1j1y4sm3BfhH4Duo10n1J/t8vFk6uhdt64iNbxedirnWQgONHwEJqt6JdWVS29TrmlIhgbv68GGziN4CJwTD+7SYovo5W8cbW2Q89rBUSqPbILZgOSdezR2ApTke2rUH+hbpdnO8ettiQ21RZBFyZRWgKoTWnKZgakrC+XeREJt9rK4jwafrMRMqmSKo/mvknpNbTHC+ufpJeG/TG8vnDupMGvfMMqoQTJwsRl65Y5xZoVHIWTUUuADuDOmCkYyRXnFkG1dY13uCbgT4RBa6PQdU7EEai9gpcv+AK09iwkPg//dnMoQ4QlG95wJScXoFmHEZr1qtHUag1kMLjjekJ1U3cfginY8h8oX2B+BCJprfgphQ7uJtT+NkmY7vQD/h5b/VlXWCulGZvZ7QoxYKJrTHx5hLNNI7s0HXQcjTZM5usk9Fi4R+FL/rbA+Tlo3b06iiH5+wWPT8fn36xioB+Tuox6wqALJYpyuPOvJerrYqWNV4AY9gISC2tmB6BYw3YdINYhQaaocAIqQKcmP++UIPf+zxslKh0mP2rRPBtWSK3indmQHi9jTCXsRLZWZp2o1kKNPGRI13f+7AevVNVGOb72VB4YGI66hh9FITXCWwb9Ycrfne3f6
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1b0a74GsfdygrRvDZyeTpR25u6mAn2zxFkuklkIxmrSkCk9H6upyYvyW1ZlR?=
- =?us-ascii?Q?bQjXdq6Om+XITui2qcC5Qd01Mv6f9qYC+Fg9gkKHel0OtzGGF9OVSmzyvqdH?=
- =?us-ascii?Q?H4+jdMIAotdrN0HtfsdE3GgQPNHNRP4xp10/JMX/8Xs+jPc7378weF/15P9S?=
- =?us-ascii?Q?hkyyIEPQGv6GiSKDLwf3VL/83RCPXvkSYIf/R0/qs+20me9Z47GzZ/bK0m79?=
- =?us-ascii?Q?RZkbYzYLpRmI3m993VS+s/YE3sPfPRtPnZQCz4bubuzOMX6RhZ2AVlF4fHNX?=
- =?us-ascii?Q?zMm5GEwpvk/DECZcJVmBBzDXKyn9eSW9xEKxGkzQ12D09J+vh4GOuIU34/hc?=
- =?us-ascii?Q?KZJHsObWKHLjCp2HqkQC4NgH6EkxEID0laIijGNYsxrghpeV7+46GvEFXerB?=
- =?us-ascii?Q?6ny+rMcclkAGnsqzrKvoq2IMtlHo6e7YTCQYd6mHq8vw141cfG6d/fFVxV3U?=
- =?us-ascii?Q?amg9zs/1UqU74o9n1lKrBLlXaSyJK42qrgX51cbCh8Wxch89xDMk9LOi69v0?=
- =?us-ascii?Q?1v2/HltgF2ncgZoHBcT2m8815SK6TQsAh9quudXUIG2wKGe26pWkVtTYU2+x?=
- =?us-ascii?Q?J7ZbUnPqrwktJNgOuBRCj6t+UknTHRNdqbqM4hjhucP+HWHyDwndzqkHVkX5?=
- =?us-ascii?Q?TFbzP/+Zw++GuY0t8JYlAhe0U6gMPPJuuwXdrFq4DxLSLUML40nLgIBcmDq9?=
- =?us-ascii?Q?RF0cXY2gts0iQToqnxz/kr9RJQIon3kL/ZWLa1oEZcWD09D9G58eEW7CegDe?=
- =?us-ascii?Q?0MjnMyVqpi2CckjoRKH7WDSpDNpbGz/1T6Nli6/7pVYup6sX+y2fXfvAYypz?=
- =?us-ascii?Q?clez69OhSuPHZL7DW4u8XktUJNpfc0GpVGyMTvZmdCs3HuFDrTRjbWy1JRGh?=
- =?us-ascii?Q?CorjKS2KVWCuc6x3uOV8yoIQWdY0tu8aQ6pSrF7Gs2HxyQ4r1VJcZH1XNHQS?=
- =?us-ascii?Q?5njqn7lXc6ltoLkQ9S3BfGR9RC21tNqsgEvyeddnDYBEj9nTcayTZ2nAX4mY?=
- =?us-ascii?Q?/FkryaZkHHXaWhJzmqXqIdLICEvXDVXh01qSO/c0k65HxZkzmm5XmWDyzRaQ?=
- =?us-ascii?Q?U1z64ZAf2XAO1R3m/gdNlim6WfBL8AKPW2gD/4k4LAopkGbsUhv6ko8JQFpr?=
- =?us-ascii?Q?M5g1fmdVRu548nZi4zYD0XqDiBLNJSanE4gjdWb65iu7FnfeZuUdEPFmEnnO?=
- =?us-ascii?Q?irVtBgDQY8zF8PQzx0gZWXNtbb/iYKihTU5RlHChSDl9D/u8sFEmfxigF+vd?=
- =?us-ascii?Q?4EOlpbb07jcPnJ0W8ipt?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec6c5cfe-835c-4bfe-e7e0-08dc91d77779
-X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2024 09:49:39.1605
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8P194MB2113
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="uIOl3MGYsZNkzbCU"
+Content-Disposition: inline
+In-Reply-To: <20240621-10d503a9a2e7d54e67db102c@orel>
 
-Hi Matias,
+--uIOl3MGYsZNkzbCU
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> > > I think the test can always send packets at a frequency so the worker queue
-> > > is always empty. but maybe, this is a corner case and most of the time the
-> > > worker queue is not empty in a non-testing environment.
-> >
-> > I'm not sure about this, but IMHO this optimization is free, there is no
-> > penalty for using it, in the worst case the system will work as usual.
-> > In any case, I'm more than happy to do some additional testing, do you have
-> > anything in mind?
-> >
-> Sure!, this is very a interesting improvement and I am in favor for
-> that! I was only thinking out loud ;)
+On Fri, Jun 21, 2024 at 10:33:03AM +0200, Andrew Jones wrote:
+> On Thu, Jun 20, 2024 at 11:55:44AM GMT, Anup Patel wrote:
+> > On Wed, Jun 5, 2024 at 10:25=E2=80=AFPM Conor Dooley <conor@kernel.org>=
+ wrote:
+> > >
+> > > On Wed, Jun 05, 2024 at 08:15:08PM +0800, Yong-Xuan Wang wrote:
+> > > > Add entries for the Svade and Svadu extensions to the riscv,isa-ext=
+ensions
+> > > > property.
+> > > >
+> > > > Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> > > > ---
+> > > >  .../devicetree/bindings/riscv/extensions.yaml | 30 +++++++++++++++=
+++++
+> > > >  1 file changed, 30 insertions(+)
+> > > >
+> > > > diff --git a/Documentation/devicetree/bindings/riscv/extensions.yam=
+l b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > > index 468c646247aa..1e30988826b9 100644
+> > > > --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > > +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > > @@ -153,6 +153,36 @@ properties:
+> > > >              ratified at commit 3f9ed34 ("Add ability to manually t=
+rigger
+> > > >              workflow. (#2)") of riscv-time-compare.
+> > > >
+> > > > +        - const: svade
+> > > > +          description: |
+> > > > +            The standard Svade supervisor-level extension for rais=
+ing page-fault
+> > > > +            exceptions when PTE A/D bits need be set as ratified i=
+n the 20240213
+> > > > +            version of the privileged ISA specification.
+> > > > +
+> > > > +            Both Svade and Svadu extensions control the hardware b=
+ehavior when
+> > > > +            the PTE A/D bits need to be set. The default behavior =
+for the four
+> > > > +            possible combinations of these extensions in the devic=
+e tree are:
+> > > > +            1. Neither svade nor svadu in DT: default to svade.
+> > >
+> > > I think this needs to be expanded on, as to why nothing means svade.
+> >=20
+> > Actually if both Svade and Svadu are not present in DT then
+> > it is left to the platform and OpenSBI does nothing.
+>=20
+> This is a good point, and maybe it's worth integrating something that
+> states this case is technically unknown into the final text. (Even though
+> historically this has been assumed to mean svade.)
 
-No worries :)
+If that is assumed to mean svade at the moment, then that's what it has
+to mean going forwards also.
 
-> I asked previous questions
-> because, in my mind, I was thinking that this improvement would trigger
-> only for the first bunch of packets, i.e., when the worker queue is
-> empty so its effect would be seen "only at the beginning of the
-> transmission" until the worker-queue begins to fill. If I understand
-> correctly, the worker-queue starts to fill just after the virtqueue is
-> full, am I right?
+--uIOl3MGYsZNkzbCU
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Correct! Packets are enqueued in the worker-queue only if the virtqueue
-is full.
+-----BEGIN PGP SIGNATURE-----
 
-Luigi
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnVR7AAKCRB4tDGHoIJi
+0oVHAP4siHUZEfCCwMM83p0CPjCOAJEGoNcOdr0nkhPzLVIczAD/Q7yiuanMfYXr
+nzrBjtDPUd3Y5QR0QzLeGN78fexxmAw=
+=728p
+-----END PGP SIGNATURE-----
+
+--uIOl3MGYsZNkzbCU--
 
