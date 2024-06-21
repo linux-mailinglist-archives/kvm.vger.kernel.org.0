@@ -1,38 +1,81 @@
-Return-Path: <kvm+bounces-20217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0AB911EED
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:37:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D2F6911F15
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 10:44:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A8201C2143F
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 08:37:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 919A81F25D3B
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 08:44:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 826FE16D4FE;
-	Fri, 21 Jun 2024 08:37:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D31416DEC2;
+	Fri, 21 Jun 2024 08:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ef8SrTBG"
 X-Original-To: kvm@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5F116D31E;
-	Fri, 21 Jun 2024 08:37:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8877016D9B7
+	for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 08:44:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718959052; cv=none; b=CFMZhq1WOUjLcXlPgDdAl3lEh1FW676LqVoJe1dmOCXbS+F4wPKmUAVRIt56BmucbbkSlj+Yieo97oVdSdMXjRNQ7UDDWsMcdzevnArN1HWt8ACvJcZibAJeD0ClOMRMDLLlHwTRx+uISFAJb5KTLpZwtrhO8WVAXyAZEeJmpTQ=
+	t=1718959443; cv=none; b=OCyyIBaM01k6o9hZ3G19UViqknTj8BqECCmIn9O9xnx3tzY2EuGcjlFQ9mSil2UxF4MIit3GOG94g2uOOE462nZxcuQeUSSKSOGYmN+6hg417lrd2RRWxoQpivyVG77NP/1I81BxR2jmuaZqm/lrrkCJ2Fizwdt4WIdGPNyQNgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718959052; c=relaxed/simple;
-	bh=vQbkzYO5D64OlUwNV48NR4emSRgPe77OGdkJraE8QTQ=;
+	s=arc-20240116; t=1718959443; c=relaxed/simple;
+	bh=PUmN4XsW0Nz9edwBR5542tFh9arkVyDs5u6ltSHiJUE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EBhclMOU1IuPDfqdlEtfyRI+ZDdeBbPfBFTpHDdIKmA0uuSAA7SxKeEH30TV1z8pzem9HX7p8rnnnFlEOxNru/mdIt6KMcPq3JODUTC2W/ceHE2KwEcRmQFgvaNQi5VHbmckgSefe1acdePZt64nfThBOS48nRHXBFAHQAbjIUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr; spf=pass smtp.mailfrom=ghiti.fr; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ghiti.fr
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B540B240011;
-	Fri, 21 Jun 2024 08:37:25 +0000 (UTC)
-Message-ID: <40a7d568-3855-48fb-a73c-339e1790f12f@ghiti.fr>
-Date: Fri, 21 Jun 2024 10:37:21 +0200
+	 In-Reply-To:Content-Type; b=rCsGetiO1Ioam8zFJKZxtshAwS7reNam1s8bXC8EAzJg9SR21h2OrJaCgprODBf/ZXqYEZM3T+4Hq8SZOhIg435+UQZVSMcmVQvXlWyUPT+lQFo/roIvoO/FPtlJGr87sDO9+yx9IUft+ijo56YYo4XKI5/RBbTurln6uvbgrTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ef8SrTBG; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1718959440;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=VU90d8rIY7+e8nZJdYV+B/wIyrHGdSqZeVXkqOxNvFc=;
+	b=ef8SrTBGL50vcveU5RLxXQDX3dm9vv5CNCKfw2z7jGGUcx/mD8HnYgQC6Hz0AVqMFFOVQG
+	z6eB14Ige80vrwZpZQlw4Y0TjuGJ3u4GsDFO+7p+d6M/ZK0HHu0MwqaniQ51hKQziA7Jtv
+	03tImzE0qq0YbYBpOUaXTU7o3xTH1Yc=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-447-UB7dUSy7N_-5g4osBvn5-w-1; Fri, 21 Jun 2024 04:43:58 -0400
+X-MC-Unique: UB7dUSy7N_-5g4osBvn5-w-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3648793ae51so965622f8f.2
+        for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 01:43:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1718959437; x=1719564237;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=VU90d8rIY7+e8nZJdYV+B/wIyrHGdSqZeVXkqOxNvFc=;
+        b=XjGMbPg4IXD+LzY5eBrsiwJabru5vWyGIqk4MlmE2SUgwkNTqdI87Pz3K98NArrn2L
+         /E/Mij6vu+LWWNUvE7tP2yZKBOnt2D+6Rt9l3ncCtX5QQHuXW0nQymmOwY9r0FUN/6gG
+         JP64OEO8VHJKGz5JLEt+mdfPKWZFYA4LMQFfp9ZiRJOYCLvZKnkvsUH4SyMCNN0BwGx3
+         wVVZETbMtDhBsl3BGeVjJCb4uOr9Hveb3k1MdrdEGBYrKh5+uXlXfG8j861ftd2Td+/j
+         vpZZ1MWlcmf+rx0av6oWkzRGYAavoU1+J72OrL/6n0k125mj/6GOVUpekzKBQ/g7Gstn
+         QV4w==
+X-Forwarded-Encrypted: i=1; AJvYcCU+Oja1qHmwtSj09IQoUD55TlaA1R5uC92rwZubkpGr3rSCIe1v7n8wh3Iedle29wSuTLB0DEwi9OBV878c6Q/Sule6
+X-Gm-Message-State: AOJu0YwRnX+v6fucZMLwAyzAnPTmIXAzutQMkWUy8Kx8kptUopyJSDr0
+	7etKXh3dkwF2DPGmMV3U7c8zdLDzl/UDSp+Xy/YhAylCcI5HwVWJWXvT1oRRBjIVPNDzkOR3IcY
+	mAU1Zj/i9IlsuLqD/ABQr7C0sU+Apz+ZNP4YQyXkG8Aa5KzEheQ==
+X-Received: by 2002:adf:ea01:0:b0:35f:1bc3:50b0 with SMTP id ffacd0b85a97d-36319a855bamr5420986f8f.63.1718959437639;
+        Fri, 21 Jun 2024 01:43:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFiasjYrLg90qQVpUX0kw3ikfNJqrMMvB9SgRGxmoh8eFyR1j+l0uMDDPJS1zuvGqqtRVJD+w==
+X-Received: by 2002:adf:ea01:0:b0:35f:1bc3:50b0 with SMTP id ffacd0b85a97d-36319a855bamr5420970f8f.63.1718959437216;
+        Fri, 21 Jun 2024 01:43:57 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c725:e600:4063:2059:fd18:9d65? (p200300cbc725e60040632059fd189d65.dip0.t-ipconnect.de. [2003:cb:c725:e600:4063:2059:fd18:9d65])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36638f86566sm1069864f8f.64.2024.06.21.01.43.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 21 Jun 2024 01:43:56 -0700 (PDT)
+Message-ID: <4c8b81a0-3a76-4802-875f-f26ff1844955@redhat.com>
+Date: Fri, 21 Jun 2024 10:43:55 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -40,128 +83,103 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
+Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
+To: Fuad Tabba <tabba@google.com>, Sean Christopherson <seanjc@google.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, John Hubbard <jhubbard@nvidia.com>,
+ Elliot Berman <quic_eberman@quicinc.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
+ Matthew Wilcox <willy@infradead.org>, maz@kernel.org, kvm@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ pbonzini@redhat.com
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
+ <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
+ <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
+ <CA+EHjTxWWEHfjZ9LJqZy+VCk43qd3SMKiPF7uvAwmDdPeVhrvQ@mail.gmail.com>
+ <20240619115135.GE2494510@nvidia.com>
+ <CA+EHjTz_=J+bDpqciaMnNja4uz1Njcpg5NVh_GW2tya-suA7kQ@mail.gmail.com>
+ <ZnRMn1ObU8TFrms3@google.com>
+ <CA+EHjTxvOyCqWRMTS3mXHznQtAJzDJLgqdS0Er2GA9FGdxd1vA@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
-To: Anup Patel <apatel@ventanamicro.com>, Conor Dooley <conor@kernel.org>
-Cc: Yong-Xuan Wang <yongxuan.wang@sifive.com>, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org,
- kvm@vger.kernel.org, ajones@ventanamicro.com, greentime.hu@sifive.com,
- vincent.chen@sifive.com, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- devicetree@vger.kernel.org
-References: <20240605121512.32083-1-yongxuan.wang@sifive.com>
- <20240605121512.32083-3-yongxuan.wang@sifive.com>
- <20240605-atrium-neuron-c2512b34d3da@spud>
- <CAK9=C2XH7-RdVpojX8GNW-WFTyChW=sTOWs8_kHgsjiFYwzg+g@mail.gmail.com>
-From: Alexandre Ghiti <alex@ghiti.fr>
-In-Reply-To: <CAK9=C2XH7-RdVpojX8GNW-WFTyChW=sTOWs8_kHgsjiFYwzg+g@mail.gmail.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CA+EHjTxvOyCqWRMTS3mXHznQtAJzDJLgqdS0Er2GA9FGdxd1vA@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alex@ghiti.fr
+Content-Transfer-Encoding: 7bit
 
-On 20/06/2024 08:25, Anup Patel wrote:
-> On Wed, Jun 5, 2024 at 10:25 PM Conor Dooley <conor@kernel.org> wrote:
->> On Wed, Jun 05, 2024 at 08:15:08PM +0800, Yong-Xuan Wang wrote:
->>> Add entries for the Svade and Svadu extensions to the riscv,isa-extensions
->>> property.
->>>
->>> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
->>> ---
->>>   .../devicetree/bindings/riscv/extensions.yaml | 30 +++++++++++++++++++
->>>   1 file changed, 30 insertions(+)
->>>
->>> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Documentation/devicetree/bindings/riscv/extensions.yaml
->>> index 468c646247aa..1e30988826b9 100644
->>> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
->>> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
->>> @@ -153,6 +153,36 @@ properties:
->>>               ratified at commit 3f9ed34 ("Add ability to manually trigger
->>>               workflow. (#2)") of riscv-time-compare.
->>>
->>> +        - const: svade
->>> +          description: |
->>> +            The standard Svade supervisor-level extension for raising page-fault
->>> +            exceptions when PTE A/D bits need be set as ratified in the 20240213
->>> +            version of the privileged ISA specification.
->>> +
->>> +            Both Svade and Svadu extensions control the hardware behavior when
->>> +            the PTE A/D bits need to be set. The default behavior for the four
->>> +            possible combinations of these extensions in the device tree are:
->>> +            1. Neither svade nor svadu in DT: default to svade.
->> I think this needs to be expanded on, as to why nothing means svade.
-> Actually if both Svade and Svadu are not present in DT then
-> it is left to the platform and OpenSBI does nothing.
->
->>> +            2. Only svade in DT: use svade.
->> That's a statement of the obvious, right?
+>> Again from that thread, one of most important aspects guest_memfd is that VMAs
+>> are not required.  Stating the obvious, lack of VMAs makes it really hard to drive
+>> swap, reclaim, migration, etc. from code that fundamentally operates on VMAs.
 >>
->>> +            3. Only svadu in DT: use svadu.
->> This is not relevant for Svade.
+>>   : More broadly, no VMAs are required.  The lack of stage-1 page tables are nice to
+>>   : have; the lack of VMAs means that guest_memfd isn't playing second fiddle, e.g.
+>>   : it's not subject to VMA protections, isn't restricted to host mapping size, etc.
 >>
->>> +            4. Both svade and svadu in DT: default to svade (Linux can switch to
->>> +               svadu once the SBI FWFT extension is available).
->> "The privilege level to which this devicetree has been provided can switch to
->> Svadu if the SBI FWFT extension is available".
->>
->>> +        - const: svadu
->>> +          description: |
->>> +            The standard Svadu supervisor-level extension for hardware updating
->>> +            of PTE A/D bits as ratified at commit c1abccf ("Merge pull request
->>> +            #25 from ved-rivos/ratified") of riscv-svadu.
->>> +
->>> +            Both Svade and Svadu extensions control the hardware behavior when
->>> +            the PTE A/D bits need to be set. The default behavior for the four
->>> +            possible combinations of these extensions in the device tree are:
->> @Anup/Drew/Alex, are we missing some wording in here about it only being
->> valid to have Svadu in isolation if the provider of the devicetree has
->> actually turned on Svadu? The binding says "the default behaviour", but
->> it is not the "default" behaviour, the behaviour is a must AFAICT. If
->> you set Svadu in isolation, you /must/ have turned it on. If you set
->> Svadu and Svade, you must have Svadu turned off?
-> Yes, the wording should be more of requirement style using
-> must or may.
->
-> How about this ?
-> 1) Both Svade and Svadu not present in DT => Supervisor may
->      assume Svade to be present and enabled or it can discover
->      based on mvendorid, marchid, and mimpid.
-> 2) Only Svade present in DT => Supervisor must assume Svade
->      to be always enabled. (Obvious)
-> 3) Only Svadu present in DT => Supervisor must assume Svadu
->      to be always enabled. (Obvious)
+>> [1] https://lore.kernel.org/all/Zfmpby6i3PfBEcCV@google.com
+>> [2] https://lore.kernel.org/all/Zg3xF7dTtx6hbmZj@google.com
+> 
+> I wonder if it might be more productive to also discuss this in one of
+> the PUCKs, ahead of LPC, in addition to trying to go over this in LPC.
 
+I don't know in  which context you usually discuss that, but I could 
+propose that as a topic in the bi-weekly MM meeting.
 
-I agree with all of that, but the problem is how can we guarantee that 
-openSBI actually enabled svadu? This is not the case for now.
+This would, of course, be focused on the bigger MM picture: how to mmap, 
+how how to support huge pages, interaction with page pinning, ... So 
+obviously more MM focused once we are in agreement that we want to 
+support shared memory in guest_memfd and how to make that work with core-mm.
 
+Discussing if we want shared memory in guest_memfd might be betetr 
+suited for a different, more CC/KVM specific meeting (likely the "PUCKs" 
+mentioned here?).
 
-> 4) Both Svade and Svadu present in DT => Supervisor must
->      assume Svadu turned-off at boot time. To use Svadu, supervisor
->      must explicitly enable it using the SBI FWFT extension.
->
-> IMO, the #2 and #3 are definitely obvious but still worth mentioning.
->
->>> +            1. Neither svade nor svadu in DT: default to svade.
->>> +            2. Only svade in DT: use svade.
->> These two are not relevant to Svadu, I'd leave them out.
->>
->>> +            3. Only svadu in DT: use svadu.
->> Again, statement of the obvious?
->>
->>> +            4. Both svade and svadu in DT: default to svade (Linux can switch to
->>> +               svadu once the SBI FWFT extension is available).
->> Same here as in the Svade entry.
->>
->> Thanks,
->> Conor.
->>
-> Regards,
-> Anup
->
-> _______________________________________________
-> linux-riscv mailing list
-> linux-riscv@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-riscv
+-- 
+Cheers,
+
+David / dhildenb
+
 
