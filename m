@@ -1,135 +1,122 @@
-Return-Path: <kvm+bounces-20296-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20297-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB42F912BBA
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 18:48:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15B30912BE9
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 18:55:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25C4C1C2663F
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 16:48:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C146F1F22446
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 16:55:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35FB91662F3;
-	Fri, 21 Jun 2024 16:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7707B16A93D;
+	Fri, 21 Jun 2024 16:54:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="A+IJsWTy"
+	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="BISOTScV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C3C15AACD;
-	Fri, 21 Jun 2024 16:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B56515AACD;
+	Fri, 21 Jun 2024 16:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1718988513; cv=none; b=d7Jbp01N4V68KuJt4IgIQ4lNqFBIUejZiYBUcUyz3vNxcMaSsQ2GPzCQN2W2qUcml4SqhNTRDjYyubwHu66T4MFExTt2FOcDFM807S8Gy9tO0wncrCvSEV7vDnyRb02W8TT1TdDXvDnDCnTvX5bjFb5xjfHzHWOIboxwxFfu1Gk=
+	t=1718988879; cv=none; b=dUkZEtOIjb1p95OYhCffcZrFRZZuGapwltNRW6m6RUn2bQ5DF0FOUb+lPeasmr51jrZZzomkigIhy7/JFP3ZP7umRcZAHQAglFbFM2imwjuQTdT91ED+VWQSYJCwpbhkldveRlVVYoDAv52nqfdsZSCMbMtQBIHt3IhhM8h5I+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1718988513; c=relaxed/simple;
-	bh=2oDv7yWK4jWUecZVTx9gl68b5tjRysNEgybb/kT8zWk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I2Hul496hNR7dyb8mgKVCWXhHIK89ZBQ8mb81lG62SST3agYYYpsE2qY57JRQ1NTV2qy7YNC6UhuitatsWVq0Ok26hdFWs1gJm61IuCbG1jhxoprcDZAI5WJqINYJ/MFrL4IhA7X/tG7o+5oVXhJql2BmKG2pFHDrnOHDACWl/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=A+IJsWTy; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45L8i1Ng021385;
-	Fri, 21 Jun 2024 16:48:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=DxXR79j7IAQOq7IjTwDrGmIl
-	/JNCaDgNGNDv5UsM/nM=; b=A+IJsWTyqO4MoOJvSaM34NxxhBRkTfx9CDox+fRJ
-	y6NGRZMHeb6oFmWIb5RCzMoFfx64oA/bpei9N3NKgo0Jm51NHrm5HUyhwFUzSHRc
-	dUJPA84czm1SahtW+SLp/1+uX1Hr3LTM1ji5tWmDnWGLkUEjc0F09kipnv+1a5qJ
-	A5Y1WK5bOU+LcvFW6aNPn74IsiCmZh05aZ3EgKXpS8zgl1pCS8nyMpcjmCKTLCof
-	Tzv/sXNTMwq/+pHsuXnQPvyR6YytMlyGus8VTKgJgAqM10rlkfV3sQQ/fc4dtTpr
-	Qc6/CJgrD2ZXcfOZ1Vu5TKzxAlsIHx89whPICXNjPFlZAg==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3yw69213ps-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Jun 2024 16:48:10 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45LGm8w3005843
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 21 Jun 2024 16:48:08 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 21 Jun 2024 09:48:07 -0700
-Date: Fri, 21 Jun 2024 09:48:06 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Quentin Perret <qperret@google.com>
-CC: David Hildenbrand <david@redhat.com>, Jason Gunthorpe <jgg@nvidia.com>,
-        Fuad Tabba <tabba@google.com>, Christoph Hellwig <hch@infradead.org>,
-        John
- Hubbard <jhubbard@nvidia.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        Shuah Khan <shuah@kernel.org>, Matthew Wilcox <willy@infradead.org>,
-        <maz@kernel.org>, <kvm@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <linux-mm@kvack.org>,
-        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <pbonzini@redhat.com>
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-Message-ID: <20240621093120954-0700.eberman@hu-eberman-lv.qualcomm.com>
-References: <ZnOsAEV3GycCcqSX@infradead.org>
- <CA+EHjTxaCxibvGOMPk9Oj5TfQV3J3ZLwXk83oVHuwf8H0Q47sA@mail.gmail.com>
- <20240620135540.GG2494510@nvidia.com>
- <6d7b180a-9f80-43a4-a4cc-fd79a45d7571@redhat.com>
- <20240620142956.GI2494510@nvidia.com>
- <20240620140516768-0700.eberman@hu-eberman-lv.qualcomm.com>
- <20240620231814.GO2494510@nvidia.com>
- <ZnUsmFFslBWZxGIq@google.com>
- <c05f2a97-5863-4da7-bfae-2d6873a62ebe@redhat.com>
- <ZnVG9oZL4GT0uFy_@google.com>
+	s=arc-20240116; t=1718988879; c=relaxed/simple;
+	bh=p9rgC8AhEGnxn7glekQ57NbVbRgVqVE9M3IVR52QWCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DhcClmtY5pl+tKOO917AwTrnRf8wsNb9qp8O50SJUxs1xx2De6v8p4jitO1LIS2gAr9tSwXPdB7eu1znmh0ZuwMOvVoRnr0je69CvZmC0KVnqRJ62WH5dTzlxv40UXhoHEx/f6lwUvmAYkncV1B5fbic4YEbmJSzAe22DScATKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=BISOTScV; arc=none smtp.client-ip=65.109.113.108
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
+Received: from localhost (localhost.localdomain [127.0.0.1])
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 077ED40E01F9;
+	Fri, 21 Jun 2024 16:54:34 +0000 (UTC)
+X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
+Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
+	header.d=alien8.de
+Received: from mail.alien8.de ([127.0.0.1])
+	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id fk6kBdSQxNjV; Fri, 21 Jun 2024 16:54:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
+	t=1718988868; bh=ZxRYh4NdlH+RU/ASZJKjkd8D8lAlZCa4l3GUh195iIM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BISOTScVi+Zf7bXTrwyspo/9rkZhXd/dnuajqD5GRTgC0FFP6wUf0kIm65fun6oas
+	 v8yyW9jWhhP29sS/gwP/hr1UhcNSj7kmTLPW4Yo7pK00kbKAwcrk4AH1pb0VVpVU9d
+	 +RczkHu2laUFi//ihaNdIwcNfkV0xNQO7Aga7Eo2nOMpACtePCkOcvHkIuDPFyezBV
+	 fg7AdnXLQYo1EKfiSNGQIxzgSTxH6TerFCAKaLnZKKbBO8KCxnY6IOpONSPpA572L6
+	 JeBcBTqPOHKvxRB9WlHZ8shggBc1n8Cl4IFWXKBpbJVds02cpI0bMTBqv6xL9a0zaS
+	 sxLTZR37L6MGlY0266+nGIvIxMoOjxZZPGQKzsfXEplqxEqfu1MX8Xc3Us+Ur8TeSp
+	 R/D67bWFm8Cx5dR/BOb5CWvm96ufKoXxSBqu7hp4kj01R5QQDdqGalP4+7g/CRV3i4
+	 Q1+1uYNTs+ZRfY0d+2WVnPMbjhloQi+5csTRWYwy3Y0gnm4aEWKfBNiVLB9FAfmVa7
+	 eYRjdlkefAZE10eUcFnh4buHNWunB6lm6Dhlc3HjSQXLCPHb2U+w3OQ4R/qp7sS08b
+	 89SyiL3L0ju8AwDz6gET7XyNIdiXTPPKFS8IYK0z0pKx7K77S4kPIwgukJlma7Vzaj
+	 2YS4NihruCz1bc+gLDdcWOKY=
+Received: from zn.tnic (p5de8ee85.dip0.t-ipconnect.de [93.232.238.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	(No client certificate requested)
+	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EFB5540E01D6;
+	Fri, 21 Jun 2024 16:54:16 +0000 (UTC)
+Date: Fri, 21 Jun 2024 18:54:10 +0200
+From: Borislav Petkov <bp@alien8.de>
+To: Nikunj A Dadhania <nikunj@amd.com>
+Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
+	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
+	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
+	pbonzini@redhat.com
+Subject: Re: [PATCH v9 03/24] virt: sev-guest: Make payload a variable length
+ array
+Message-ID: <20240621165410.GIZnWwMo80ZsPkFENV@fat_crate.local>
+References: <20240531043038.3370793-1-nikunj@amd.com>
+ <20240531043038.3370793-4-nikunj@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ZnVG9oZL4GT0uFy_@google.com>
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: _kjYZRfv7U_QpYslJuL5ZSJCgoCZ6bnT
-X-Proofpoint-GUID: _kjYZRfv7U_QpYslJuL5ZSJCgoCZ6bnT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-21_08,2024-06-21_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 clxscore=1015
- bulkscore=0 lowpriorityscore=0 malwarescore=0 adultscore=0 mlxscore=0
- priorityscore=1501 spamscore=0 impostorscore=0 phishscore=0
- mlxlogscore=371 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406210121
+In-Reply-To: <20240531043038.3370793-4-nikunj@amd.com>
 
-On Fri, Jun 21, 2024 at 09:25:10AM +0000, Quentin Perret wrote:
-> On Friday 21 Jun 2024 at 10:02:08 (+0200), David Hildenbrand wrote:
-> > Sure, there might be cases like "pKVM can handle access to private pages in
-> > user page mappings", "AMD-SNP will not crash the host if writing to private
-> > pages" but there are not factors that really make a difference for a common
-> > solution.
+On Fri, May 31, 2024 at 10:00:17AM +0530, Nikunj A Dadhania wrote:
+> Currently, guest message is PAGE_SIZE bytes and payload is hard-coded to
+> 4000 bytes, assuming snp_guest_msg_hdr structure as 96 bytes.
 > 
-> Sure, there isn't much value in differentiating on these things. One
-> might argue that we could save one mmap() on the private->shared
-> conversion path by keeping all of guest_memfd mapped in userspace
-> including private memory, but that's most probably not worth the
-> effort of re-designing the whole thing just for that, so let's forget
-> that.
-> 
-> The ability to handle stage-2 faults in the kernel has implications in
-> other places however. It means we don't need to punch holes in the
-> kernel linear map when donating memory to a guest for example, even with
-> 'crazy' access patterns like load_unaligned_zeropad(). So that's good.
-> 
+> Remove the structure size assumption and hard-coding of payload size and
+> instead use variable length array.
 
-The ability to handle stage-2 faults in the kernel is something that's
-specific to arm64 pKVM though. We do want to punch holes in the linear
-map for Gunyah case. I don't think this is blocking issue. I only want
-to point out we can't totally ignore the linear map.
+I don't understand here what hard-coding is being removed?
 
-Thanks,
-Elliot
+It is simply done differently:
 
+from
+
+> -     snp_dev->request = alloc_shared_pages(dev, sizeof(struct snp_guest_msg));
+
+to
+
+> +     snp_dev->request = alloc_shared_pages(dev, SNP_GUEST_MSG_SIZE);
+
+Maybe I'm missing the point here but do you mean by removing the hard-coding
+this:
+
++#define SNP_GUEST_MSG_SIZE 4096
++#define SNP_GUEST_MSG_PAYLOAD_SIZE (SNP_GUEST_MSG_SIZE - sizeof(struct snp_guest_msg))
+
+where the msg payload size will get computed at build time and you won't have
+to do that 4000 in the struct definition:
+
+	u8 payload[4000];
+
+?
+
+-- 
+Regards/Gruss,
+    Boris.
+
+https://people.kernel.org/tglx/notes-about-netiquette
 
