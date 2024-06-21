@@ -1,106 +1,111 @@
-Return-Path: <kvm+bounces-20314-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20315-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF81913088
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 00:44:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0CD5913094
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 00:50:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BFA76B27C07
-	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 22:44:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 555791F22E93
+	for <lists+kvm@lfdr.de>; Fri, 21 Jun 2024 22:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1E116F0FD;
-	Fri, 21 Jun 2024 22:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3BF16EBE2;
+	Fri, 21 Jun 2024 22:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="OypKgA6p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zAxAqElu"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55D83170832
-	for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 22:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CBA715D1
+	for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 22:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719009667; cv=none; b=CsAGFkiRTjOOEcfBb96RoZgZmwylcSjfrAlOE1UMXVkkfAyQzTql+u8/0zKi2sUW/TFKeO1TJCxX/4ILb364CgiFJdxCfV7Sggrxn7YEsrCQlTzLTc90IO8aYudG7Nk32jDetw4YOS9v3fhDFeDFfit5CS11T7S5edoHx6NOlng=
+	t=1719010209; cv=none; b=Jz1IcZgfzInut0gPsxb12JsRFCKqgRi2yA4o8V67Gsr1KE3CsYsiXKKo0rImtaTCLF7aAMCuvVqO+eIC81eTfiYPyV9xUjWDpEjJwmItQMIzs1ohqt2fX28XyVcHKwtkqAuTGUwVFzyB+DxDHYPN8ffItTZQmGflgLXb4Dbf6hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719009667; c=relaxed/simple;
-	bh=t24dQDkS/RraAb5M8thD/yvwGzrVtvv2HInGY8vPPVI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CSvQtgD7IvkLoSbpZvYPw7H7L0hWEQgv+bcRLjPLX5K5Pyq/ivv0ao79OOeUejmd1hTlTmZ+D0KAbtF7JwjFHt6NmjLU3Nj2nO381xKCsUB1g+Lh8UOUnW9mhnTEJmWyMri/7DAF6+/BrG0eV3RvHG3MROOYfBnwo4JF81ti7tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=OypKgA6p; arc=none smtp.client-ip=95.215.58.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: kvmarm@lists.linux.dev
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1719009661;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=k44kEMr3JDkUE7H0F2GKzTt2reCTKR8SGFNS6J7QYh0=;
-	b=OypKgA6pg+AYWFutruWuHNsyB7mVBYbtXRCyL2/w82/4ka3rs7Z4sqIWtkPnzWD872zkKF
-	dPkzvLTpc4vDfLK2foEVYhCmGCdq6egZ/9/bKSCRuAT15F/bPBMl0B+klA1ehVyYRqz94X
-	LNjKAAq9GaCz0gk6qwu5PNQNeeRtiKE=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: oliver.upton@linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: kvmarm@lists.linux.dev
-Cc: Marc Zyngier <maz@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	kvm@vger.kernel.org,
-	Oliver Upton <oliver.upton@linux.dev>
-Subject: [PATCH] KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
-Date: Fri, 21 Jun 2024 22:40:44 +0000
-Message-ID: <20240621224044.2465901-1-oliver.upton@linux.dev>
+	s=arc-20240116; t=1719010209; c=relaxed/simple;
+	bh=3zRIh8KzXJ6Ra6H3n0sDHtr/3zSB/lFhiNs0azBMWes=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=PD7sp44jWDGh0OIi/ExQS9ldz3yqNqJeW/tkzsZKC9XM9Ai4qYM6Gdf9GhI+KQJsII9m/aX8mwBXhoyiqtrhoNG8HvNi6EwQQIQLtV+Z7rX76VXi0JTz1iKuoR/FLuSCLnSQlpEDjLpJOb334eJE2sTDxEt5hCB0N+dLWec3SqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zAxAqElu; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7065b598e6cso771650b3a.3
+        for <kvm@vger.kernel.org>; Fri, 21 Jun 2024 15:50:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719010207; x=1719615007; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Q7RHoEtb8Rzzz6WiOsYTQYUFPpHS28vcIRhAXWsKW58=;
+        b=zAxAqElu6JGnKggPhajvzbljOBidOKWncA0AfeFeH/aqOYcz99QvQ/2LeduuPb8K8P
+         qY+aCXjvwMOVQ6kCXSpP2pVtfEph/RLQxfRW9utN/+1L771B8yQHJvZ0xBHrEx/PDkoD
+         9BLA9zA/+dEmiXGecuhi1SX+1ziUkGsVcsW/MwXzb/qXc8TuOC0L38WvF3+PrScy9y7c
+         Ul/3auZOTtRBzK5ZlIrYRZgGdEEEhzaFkubCv+6HHvRabh6iEo95M+KoqoreL9pYDZRK
+         owZxI0B26plb1ZicsX/48UknhtjMl9HW3+fhdn1GlzXDRdofNN7gNZ8JOY0CBjt9ID+s
+         VhCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719010207; x=1719615007;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q7RHoEtb8Rzzz6WiOsYTQYUFPpHS28vcIRhAXWsKW58=;
+        b=xVP5BPGj82XZ1KrD6zVQdNka/u8ns9bY/L/ceWYZU51Mi7+5ck9afuXYUC9Q8dmbVb
+         WXZBgMxEgeoBD21EfQEKnQtWSvY/N4ZTP4G58eqCfcVT6QiePwaKclhYUwqI6SR82uBx
+         vfXTtia/pd3+OtS/ReBbCv5f0V+ZZWdGlDXtgClZqpRqKw9bJ9O1hz3jYzCcxxFatzjS
+         MsRTiciAc7T4ck1aA1GkSogGYl7zMaJ4WlRd6+QftfLc/ktQLPxru4/q7iqmTQHcQhyk
+         Fri8u+2ATBSIZhlChYBbnFMQDKoDrOKbL6ay5EV4JCLv/5CrARLUWNOqfKwovpL+/kv1
+         CBfA==
+X-Forwarded-Encrypted: i=1; AJvYcCUwqF6fXIng4I89F76tUjcYWB8s3bLJlbBObqptw7pxjom6arMDDMC8rrql2wKrOq3i2anX1Mxidk5x5xNObUsLao7S
+X-Gm-Message-State: AOJu0Yx7V2XedIDGOtieb4mjyPIKkWmFIH4GZmUj1YJPWoWMwP86qhoj
+	qNjQpOstHqXfZKYwtr35/ua5bEP+ajtQ+5KVRBmUl0IWeOcJQcNEJ+BeOrpqziPJjJwQkmy2esk
+	nliLdM5Apyw==
+X-Google-Smtp-Source: AGHT+IGUNSGDCAMvu/N6mc9mTooMoSP2JZcPo0wSCkILZD0T1B3W7g35AqUGS8a7DGzIR/3/bIJH+J1SbP3cyA==
+X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
+ (user=jmattson job=sendgmr) by 2002:a05:6a00:8687:b0:706:29ea:7131 with SMTP
+ id d2e1a72fcca58-70629eac8bfmr30394b3a.2.1719010207181; Fri, 21 Jun 2024
+ 15:50:07 -0700 (PDT)
+Date: Fri, 21 Jun 2024 15:48:54 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.741.gdbec12cfda-goog
+Message-ID: <20240621224946.4083742-1-jmattson@google.com>
+Subject: [PATCH] KVM: x86: Complain about an attempt to change the APIC base address
+From: Jim Mattson <jmattson@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Cc: Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Marc reports that L1 VMs aren't booting with the NV series applied to
-today's kvmarm/next. After bisecting the issue, it appears that
-44241f34fac9 ("KVM: arm64: nv: Use accessors for modifying ID
-registers") is to blame.
+KVM does not support changing the APIC's base address. Prior to commit
+3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or
+APIC base"), it emitted a rate-limited warning about this. Now, it's
+just silently broken.
 
-Poking around at the issue a bit further, it'd appear that the value for
-ID_AA64PFR0_EL1 is complete garbage, as 'val' still contains the value
-we set ID_AA64ISAR1_EL1 to.
+Use vcpu_unimpl() to complain about this unsupported operation. Even a
+rate-limited error message is better than complete silence.
 
-Fix the read-modify-write pattern to actually use ID_AA64PFR0_EL1 as the
-starting point. Excuse me as I return to my shame cube.
-
-Reported-by: Marc Zyngier <maz@kernel.org>
-Fixes: 44241f34fac9 ("KVM: arm64: nv: Use accessors for modifying ID registers")
-Signed-off-by: Oliver Upton <oliver.upton@linux.dev>
+Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
+Signed-off-by: Jim Mattson <jmattson@google.com>
 ---
- arch/arm64/kvm/nested.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/x86/kvm/lapic.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index f02089d98445..96029a95d106 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -815,7 +815,7 @@ static void limit_nv_id_regs(struct kvm *kvm)
- 	kvm_set_vm_id_reg(kvm, SYS_ID_AA64ISAR1_EL1, val);
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index acd7d48100a1..5284dddab337 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2583,6 +2583,8 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
  
- 	/* No AMU, MPAM, S-EL2, or RAS */
--	kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1);
-+	val = kvm_read_vm_id_reg(kvm, SYS_ID_AA64PFR0_EL1);
- 	val &= ~(GENMASK_ULL(55, 52)	|
- 		 NV_FTR(PFR0, AMU)	|
- 		 NV_FTR(PFR0, MPAM)	|
-
-base-commit: a9e3d7734719d5b58f260edc15dce3ea4dc3d313
+ 	if ((value & MSR_IA32_APICBASE_ENABLE) &&
+ 	     apic->base_address != APIC_DEFAULT_PHYS_BASE) {
++		vcpu_unimpl(vcpu, "APIC base %#llx is not %#llx",
++			    apic->base_address, APIC_DEFAULT_PHYS_BASE);
+ 		kvm_set_apicv_inhibit(apic->vcpu->kvm,
+ 				      APICV_INHIBIT_REASON_APIC_BASE_MODIFIED);
+ 	}
 -- 
 2.45.2.741.gdbec12cfda-goog
 
