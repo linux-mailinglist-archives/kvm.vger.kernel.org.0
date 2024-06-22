@@ -1,173 +1,79 @@
-Return-Path: <kvm+bounces-20323-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20324-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 976029133A3
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 14:01:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B4B49134C1
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 17:21:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4320C1F21FFF
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 12:01:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B23751F23999
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 15:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95AC5A788;
-	Sat, 22 Jun 2024 12:01:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD9716FF2A;
+	Sat, 22 Jun 2024 15:21:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CWaCrU20"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MHKFBZn8"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1135A14B955;
-	Sat, 22 Jun 2024 12:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0956B660;
+	Sat, 22 Jun 2024 15:21:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719057696; cv=none; b=HjRwwDyNMV/xLVKWWZHxpY9xA0XW2k9OfJ8VncvT+5FLQ4iVhQfJL1l9ha4EJOtH0eyku+oL0b8m6ZLL3lhtXMpKCpMVFm6c0QUB+aTXn9Dcqt7LJR/v7Hp/IvMMYmJetqPpMCzKXcGJX8YQOgcIRAMWqQqk3MkqNPw4bKUsyOY=
+	t=1719069669; cv=none; b=rs9qqQbPywoiagKimIOUmDFTq6IaHN4lZHdhiPJ075mL8L+URIbaSIDYR66b18nuixZH0trv1ctz8MfxCr2/lbuau1WKedfd83UhwTR/ZeOeqlxz0kZTgEJk2xqW2O1hBmkZc+KuEB8utc6P40H8bO43HXlGzGSnKdWPtJB84Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719057696; c=relaxed/simple;
-	bh=4IxETGVg4/bc2jI5lLzgI9phYpsgH2CfHaJhgcXMNNU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=agtkYSQ2fxrIUFd+Lmeg+eTYzDG+yc86A3BXRSD59xAUPAzjUdZIz/FwGhFaC9GRU+0uyBa0ka5NTNSaNt5+0m+73CBnQ1FpEWdo7vSjr3Ju4CnoYYyqGiCHnVAHkZx5Cjox2xRTcVrH+3WOb2bqV9YF5zRxkO1/c75YYvBCXc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CWaCrU20; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52FC5C3277B;
-	Sat, 22 Jun 2024 12:01:32 +0000 (UTC)
+	s=arc-20240116; t=1719069669; c=relaxed/simple;
+	bh=reXOg+ZVcl2rfHZSYk6CqaM1Qr5wpQ8KZkToPZt3TKw=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Lty0ogcFQ2YdtMI3afFRJnJY2lz9nQidcFxvFM17ClnzE5ymiL9ojWUAy6hLZOAhZID8lSyIiBSCqLWicZ208ika1J1qeldgBAUySggcqyP9LE1jgj8A6/pOfPGmU+/E9eNoz8wAu/E2XTBo2J6uKPZIoGAoGVGE1sFXK+85V8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MHKFBZn8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A1BC7C4AF07;
+	Sat, 22 Jun 2024 15:21:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719057695;
-	bh=4IxETGVg4/bc2jI5lLzgI9phYpsgH2CfHaJhgcXMNNU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CWaCrU20NmFrhv6fqL/qkygH4JAUO+yFKNXsfDcsn8YVtQwHKMpnzvSgUL42gzMw8
-	 b9/0E3260B7BoLTOVfteBcG5GSp/r9EyCKp2jGjTJR3PsV6z72mAAZwDiLHVyTXSck
-	 roeyXDyEv3JSguVA/7Y5gs4GEijb0XRfhT7m+egXGEfPh3MTf1/M11Hq7du9vowcfM
-	 3PcNurM9jRoV9lTnqr8IaKHpBieoaCcodDWTk4KHjE6pLF6C2bBshrpWMlTcncfITL
-	 D7nq/FipswdGKwtnj/EbcoF36LV7GN1u9w9Lpo+sCNBOjqGwa+NaKeZYZwx28oFt3J
-	 9TnNnYdNoaZYw==
-Date: Sat, 22 Jun 2024 13:01:30 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Andrew Jones <ajones@ventanamicro.com>
-Cc: Alexandre Ghiti <alex@ghiti.fr>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Anup Patel <apatel@ventanamicro.com>,
-	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-	greentime.hu@sifive.com, vincent.chen@sifive.com,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org
-Subject: Re: [PATCH v5 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
-Message-ID: <20240622-stride-unworn-6e3270a326e5@spud>
-References: <20240605-atrium-neuron-c2512b34d3da@spud>
- <CAK9=C2XH7-RdVpojX8GNW-WFTyChW=sTOWs8_kHgsjiFYwzg+g@mail.gmail.com>
- <40a7d568-3855-48fb-a73c-339e1790f12f@ghiti.fr>
- <20240621-viewless-mural-f5992a247992@wendy>
- <edcd3957-0720-4ab4-bdda-58752304a53a@ghiti.fr>
- <20240621-9bf9365533a2f8f97cbf1f5e@orel>
- <20240621-glutton-platonic-2ec41021b81b@spud>
- <20240621-a56e848050ebbf1f7394e51f@orel>
- <20240621-surging-flounder-58a653747e1d@spud>
- <20240621-8422c24612ae40600f349f7c@orel>
+	s=k20201202; t=1719069669;
+	bh=reXOg+ZVcl2rfHZSYk6CqaM1Qr5wpQ8KZkToPZt3TKw=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=MHKFBZn8vnQiGDJkjAcYrVTuggVNq+jK83k14FN/CWzkw0Bkra7r27WreB3WOZpFp
+	 W70wP87NbfvTToL7E0oG/hsuT/RNNp3JleCEojceruWHYb2ocu28aOyUwtmC6FwiNJ
+	 M7AOK842aVwZkgUb8VmrYQ8aDog8HKN0oAsFiOW/qAJbntHO/sEeEUfr50oQz48aAz
+	 NHzOm4mSjdo8IjX5i1am0yWqBRS4XJ19zmg8U2HHrUELgZ7JIr2Pb30dr3pErQEmT8
+	 kMzCjrd9sjz7eCI5epOS+ZqRGsafrwMiGmmMuOZGWk0ZLoGFLhaHDyED2ugZjWnvej
+	 B703/SntJZENw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9853FC43619;
+	Sat, 22 Jun 2024 15:21:09 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM fixes for Linux 6.10-rc5
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240622064128.135621-1-pbonzini@redhat.com>
+References: <20240622064128.135621-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240622064128.135621-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: e159d63e6940a2a16bb73616d8c528e93b84a6bb
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: fe37fe2a5e98f96ffc0b938a05ec73ab84bf3587
+Message-Id: <171906966961.9703.8310033795492598234.pr-tracker-bot@kernel.org>
+Date: Sat, 22 Jun 2024 15:21:09 +0000
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="ZMOCsO9fyo4yCpOo"
-Content-Disposition: inline
-In-Reply-To: <20240621-8422c24612ae40600f349f7c@orel>
 
+The pull request you sent on Sat, 22 Jun 2024 02:41:28 -0400:
 
---ZMOCsO9fyo4yCpOo
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-On Fri, Jun 21, 2024 at 05:08:01PM +0200, Andrew Jones wrote:
-> On Fri, Jun 21, 2024 at 03:58:18PM GMT, Conor Dooley wrote:
-> > On Fri, Jun 21, 2024 at 04:52:09PM +0200, Andrew Jones wrote:
-> > > On Fri, Jun 21, 2024 at 03:04:47PM GMT, Conor Dooley wrote:
-> > > > On Fri, Jun 21, 2024 at 03:15:10PM +0200, Andrew Jones wrote:
-> > > > > On Fri, Jun 21, 2024 at 02:42:15PM GMT, Alexandre Ghiti wrote:
-> >=20
-> > > > > I understand the concern; old SBI implementations will leave svad=
-u in the
-> > > > > DT but not actually enable it. Then, since svade may not be in th=
-e DT if
-> > > > > the platform doesn't support it or it was left out on purpose, Li=
-nux will
-> > > > > only see svadu and get unexpected exceptions. This is something w=
-e could
-> > > > > force easily with QEMU and an SBI implementation which doesn't do=
- anything
-> > > > > for svadu. I hope vendors of real platforms, which typically prov=
-ide their
-> > > > > own firmware and DTs, would get this right, though, especially si=
-nce Linux
-> > > > > should fail fast in their testing when they get it wrong.
-> > > >=20
-> > > > I'll admit, I wasn't really thinking here about something like QEMU=
- that
-> > > > puts extensions into the dtb before their exact meanings are decided
-> > > > upon. I almost only ever think about "real" systems, and in those c=
-ases
-> > > > I would expect that if you can update the representation of the har=
-dware
-> > > > provided to (or by the firmware to Linux) with new properties, then=
- updating
-> > > > the firmware itself should be possible.
-> > > >=20
-> > > > Does QEMU have the this exact problem at the moment? I know it puts
-> > > > Svadu in the max cpu, but does it enable the behaviour by default, =
-even
-> > > > without the SBI implementation asking for it?
-> > >=20
-> > > Yes, because QEMU has done hardware A/D updating since it first start=
-ed
-> > > supporting riscv, which means it did svadu when neither svadu nor sva=
-de
-> > > were in the DT. The "fix" for that was to ensure we have svadu and !s=
-vade
-> > > by default, which means we've perfectly realized Alexandre's concern.=
-=2E.
-> > > We should be able to change the named cpu types that don't support sv=
-adu
-> > > to only have svade in their DTs, since that would actually be fixing =
-those
-> > > cpu types, but we'll need to discuss how to proceed with the generic =
-cpu
-> > > types like 'max'.
-> >=20
-> > Correct me please, since I think I am misunderstanding: At the moment
-> > QEMU does A/D updating whether or not the SBI implantation asks for it,
-> > with the max CPU. The SBI implementation doesn't understand Svadu and
-> > won't strip it. The kernel will get a DT with Svadu in it, but Svadu wi=
-ll
-> > be enabled, so it is not a problem.
->=20
-> Oh, of course you're right! I managed to reverse things some odd number of
-> times (more than once!) in my head and ended up backwards...
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/fe37fe2a5e98f96ffc0b938a05ec73ab84bf3587
 
-I mean, I've been really confused about this whole thing the entire
-time, so ye..
+Thank you!
 
-Speaking of QEMU, what happens if I try to turn on svade and svadu in
-QEMU? It looks like there's some handling of it that does things
-conditionally based !svade && svade, but I couldn't tell if it would do
-what we are describing in this thread.
-
---ZMOCsO9fyo4yCpOo
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZna9GgAKCRB4tDGHoIJi
-0h3EAQCEzS530QLTXXBLPksl2mQ8sX+WkbvTcdwou3zq2avSrgEA6hNFxVSOme2f
-3YECDPsNJ8996blTH6mu6XZ5ht3fRAg=
-=pKba
------END PGP SIGNATURE-----
-
---ZMOCsO9fyo4yCpOo--
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
