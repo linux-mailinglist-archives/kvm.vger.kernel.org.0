@@ -1,79 +1,95 @@
-Return-Path: <kvm+bounces-20324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20325-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B4B49134C1
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 17:21:19 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B561C913590
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 20:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B23751F23999
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 15:21:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F5D8B21E2F
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 18:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BD9716FF2A;
-	Sat, 22 Jun 2024 15:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBA72D60A;
+	Sat, 22 Jun 2024 18:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MHKFBZn8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q3Z7g/Zr"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0956B660;
-	Sat, 22 Jun 2024 15:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8E917C69
+	for <kvm@vger.kernel.org>; Sat, 22 Jun 2024 18:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719069669; cv=none; b=rs9qqQbPywoiagKimIOUmDFTq6IaHN4lZHdhiPJ075mL8L+URIbaSIDYR66b18nuixZH0trv1ctz8MfxCr2/lbuau1WKedfd83UhwTR/ZeOeqlxz0kZTgEJk2xqW2O1hBmkZc+KuEB8utc6P40H8bO43HXlGzGSnKdWPtJB84Ns=
+	t=1719079887; cv=none; b=VgybU0er71akbAKArTibSXndbC6SnFVsbGGSIo7JyYIhCqfbLTVoJYett8evqEk61AkXTsqthSDPQylOFqGUneUJDS3zXzoxPg6d7gyiST4UVq38fSudhrrH7TW8qrxjfe85V3p0YofgmcByHvaI6rkQdOfRpp9AiZvqpicGkdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719069669; c=relaxed/simple;
-	bh=reXOg+ZVcl2rfHZSYk6CqaM1Qr5wpQ8KZkToPZt3TKw=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=Lty0ogcFQ2YdtMI3afFRJnJY2lz9nQidcFxvFM17ClnzE5ymiL9ojWUAy6hLZOAhZID8lSyIiBSCqLWicZ208ika1J1qeldgBAUySggcqyP9LE1jgj8A6/pOfPGmU+/E9eNoz8wAu/E2XTBo2J6uKPZIoGAoGVGE1sFXK+85V8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MHKFBZn8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A1BC7C4AF07;
-	Sat, 22 Jun 2024 15:21:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719069669;
-	bh=reXOg+ZVcl2rfHZSYk6CqaM1Qr5wpQ8KZkToPZt3TKw=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=MHKFBZn8vnQiGDJkjAcYrVTuggVNq+jK83k14FN/CWzkw0Bkra7r27WreB3WOZpFp
-	 W70wP87NbfvTToL7E0oG/hsuT/RNNp3JleCEojceruWHYb2ocu28aOyUwtmC6FwiNJ
-	 M7AOK842aVwZkgUb8VmrYQ8aDog8HKN0oAsFiOW/qAJbntHO/sEeEUfr50oQz48aAz
-	 NHzOm4mSjdo8IjX5i1am0yWqBRS4XJ19zmg8U2HHrUELgZ7JIr2Pb30dr3pErQEmT8
-	 kMzCjrd9sjz7eCI5epOS+ZqRGsafrwMiGmmMuOZGWk0ZLoGFLhaHDyED2ugZjWnvej
-	 B703/SntJZENw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9853FC43619;
-	Sat, 22 Jun 2024 15:21:09 +0000 (UTC)
-Subject: Re: [GIT PULL] KVM fixes for Linux 6.10-rc5
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240622064128.135621-1-pbonzini@redhat.com>
-References: <20240622064128.135621-1-pbonzini@redhat.com>
-X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240622064128.135621-1-pbonzini@redhat.com>
-X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
-X-PR-Tracked-Commit-Id: e159d63e6940a2a16bb73616d8c528e93b84a6bb
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: fe37fe2a5e98f96ffc0b938a05ec73ab84bf3587
-Message-Id: <171906966961.9703.8310033795492598234.pr-tracker-bot@kernel.org>
-Date: Sat, 22 Jun 2024 15:21:09 +0000
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+	s=arc-20240116; t=1719079887; c=relaxed/simple;
+	bh=dpnIIbuNmw/yXedwiT0BZEq/YFk4luywAuQejbAzBWA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cXYD9OXmfkR1PcKbwtLOmKnsjkURb96ifahRNeL/imPfr1HXC82sWmqyGV1Um/jxJpUxmdyHEggBNG4lrj8Jvi96oBbF9Bn/6wGVDDeOuq6cjslFWhyLIE3WeDilIkl0rOJB63BHgVpBPbmdaO8HgdJoz3owwuUryxjcgBEl+Ok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q3Z7g/Zr; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: oliver.upton@linux.dev
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1719079881;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+fa/31WHXvK8y3wUSKWM7ddloPmwAShICM7ksLk7Ds=;
+	b=q3Z7g/ZrawMO1Jj+2+8U/brpIx+aWSOofnGEA/zCtL73IAGZZKbmyaqJWEenWF2osTP97E
+	TKwzUBL8Ykv3rysSrwqkzObpnlj6QqQcO4rZ7iQ+7iwcJNyffLXB3gcDBII8NdKDG9scFH
+	6q5VBZwMOic7uwTjCnTcX9y7s27aHaA=
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: yuzenghui@huawei.com
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: kvm@vger.kernel.org
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	kvmarm@lists.linux.dev
+Cc: Zenghui Yu <yuzenghui@huawei.com>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Marc Zyngier <maz@kernel.org>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH] KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
+Date: Sat, 22 Jun 2024 18:11:09 +0000
+Message-ID: <171907984340.2922035.2124351086655706702.b4-ty@linux.dev>
+In-Reply-To: <20240621224044.2465901-1-oliver.upton@linux.dev>
+References: <20240621224044.2465901-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The pull request you sent on Sat, 22 Jun 2024 02:41:28 -0400:
+On Fri, 21 Jun 2024 22:40:44 +0000, Oliver Upton wrote:
+> Marc reports that L1 VMs aren't booting with the NV series applied to
+> today's kvmarm/next. After bisecting the issue, it appears that
+> 44241f34fac9 ("KVM: arm64: nv: Use accessors for modifying ID
+> registers") is to blame.
+> 
+> Poking around at the issue a bit further, it'd appear that the value for
+> ID_AA64PFR0_EL1 is complete garbage, as 'val' still contains the value
+> we set ID_AA64ISAR1_EL1 to.
+> 
+> [...]
 
-> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+Applied to kvmarm/next, thanks!
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/fe37fe2a5e98f96ffc0b938a05ec73ab84bf3587
+[1/1] KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
+      https://git.kernel.org/kvmarm/kvmarm/c/33d85a93c6c3
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+--
+Best,
+Oliver
 
