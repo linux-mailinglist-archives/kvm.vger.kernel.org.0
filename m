@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-20325-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20326-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B561C913590
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 20:11:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5ED41913591
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 20:11:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F5D8B21E2F
-	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 18:11:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAEC1B2103B
+	for <lists+kvm@lfdr.de>; Sat, 22 Jun 2024 18:11:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBA72D60A;
-	Sat, 22 Jun 2024 18:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A7772D60A;
+	Sat, 22 Jun 2024 18:11:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="q3Z7g/Zr"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Uw9GAdys"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A8E917C69
-	for <kvm@vger.kernel.org>; Sat, 22 Jun 2024 18:11:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B8F17C69
+	for <kvm@vger.kernel.org>; Sat, 22 Jun 2024 18:11:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719079887; cv=none; b=VgybU0er71akbAKArTibSXndbC6SnFVsbGGSIo7JyYIhCqfbLTVoJYett8evqEk61AkXTsqthSDPQylOFqGUneUJDS3zXzoxPg6d7gyiST4UVq38fSudhrrH7TW8qrxjfe85V3p0YofgmcByHvaI6rkQdOfRpp9AiZvqpicGkdc=
+	t=1719079907; cv=none; b=Pi35LUwS9wBFInmCcF04+QKrjjMStTNbnoyKCkpdHTM1atZTApSRzm0jePzMTymKf9EcmXQQzuZh9OqdxdA0tCbkHWIKEWIeppw+CCpZwLj7VROKBJZN7gD3hz18xLgbhes0D6OkdMe7pE4A7zvmi4iFUAlxsxjEjUrerFZklQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719079887; c=relaxed/simple;
-	bh=dpnIIbuNmw/yXedwiT0BZEq/YFk4luywAuQejbAzBWA=;
+	s=arc-20240116; t=1719079907; c=relaxed/simple;
+	bh=d2LNPAq7fK626gKlLPB5CXfTr0T/bJfbrXYCQHghlME=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cXYD9OXmfkR1PcKbwtLOmKnsjkURb96ifahRNeL/imPfr1HXC82sWmqyGV1Um/jxJpUxmdyHEggBNG4lrj8Jvi96oBbF9Bn/6wGVDDeOuq6cjslFWhyLIE3WeDilIkl0rOJB63BHgVpBPbmdaO8HgdJoz3owwuUryxjcgBEl+Ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=q3Z7g/Zr; arc=none smtp.client-ip=91.218.175.176
+	 MIME-Version:Content-Type; b=TCcCDdQno8J0HIAHs+w+H63ZEB9rj1TH1mATnkv+lwj5Cd5QiE6NK2Y/YGP2dYLrx4Pmujgqd3XawphPTbY/QBCWSHhyxQpbh3evI9M2fDhHXFWgaAkDXR0vmz+BYTqvgScDk09Zg96S4xDOsI02A6OSX80s6yrJghEcfQNSqGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Uw9GAdys; arc=none smtp.client-ip=95.215.58.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Envelope-To: oliver.upton@linux.dev
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1719079881;
+	t=1719079903;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/+fa/31WHXvK8y3wUSKWM7ddloPmwAShICM7ksLk7Ds=;
-	b=q3Z7g/ZrawMO1Jj+2+8U/brpIx+aWSOofnGEA/zCtL73IAGZZKbmyaqJWEenWF2osTP97E
-	TKwzUBL8Ykv3rysSrwqkzObpnlj6QqQcO4rZ7iQ+7iwcJNyffLXB3gcDBII8NdKDG9scFH
-	6q5VBZwMOic7uwTjCnTcX9y7s27aHaA=
+	bh=UiCNktgQ2BGKd0x5MWOPZUe5B4f2UrwqJVUmPmayKdo=;
+	b=Uw9GAdysZxt+dEoCEq8ueSLIVztZzklnQ5H2gDt5Q4tQzsSd6DKkRxFCdUxaK1O6UtGqs1
+	iSipPMc6Sl5059DYkU4CQQoHs++8zpp0w3XhYe91yAR/cZfcwlKadroPWxuIfdzn4DjgwR
+	zmTuSbRG2PhjmCuw39fm+QxvBnbiHEE=
 X-Envelope-To: kvmarm@lists.linux.dev
 X-Envelope-To: yuzenghui@huawei.com
 X-Envelope-To: james.morse@arm.com
@@ -57,11 +57,11 @@ Cc: Zenghui Yu <yuzenghui@huawei.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Marc Zyngier <maz@kernel.org>,
 	kvm@vger.kernel.org
-Subject: Re: [PATCH] KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
-Date: Sat, 22 Jun 2024 18:11:09 +0000
-Message-ID: <171907984340.2922035.2124351086655706702.b4-ty@linux.dev>
-In-Reply-To: <20240621224044.2465901-1-oliver.upton@linux.dev>
-References: <20240621224044.2465901-1-oliver.upton@linux.dev>
+Subject: Re: [PATCH] KVM: selftests: Assert that MPIDR_EL1 is unchanged across vCPU reset
+Date: Sat, 22 Jun 2024 18:11:33 +0000
+Message-ID: <171907984340.2922035.15334849502762820051.b4-ty@linux.dev>
+In-Reply-To: <20240621225045.2472090-1-oliver.upton@linux.dev>
+References: <20240621225045.2472090-1-oliver.upton@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,22 +72,20 @@ Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On Fri, 21 Jun 2024 22:40:44 +0000, Oliver Upton wrote:
-> Marc reports that L1 VMs aren't booting with the NV series applied to
-> today's kvmarm/next. After bisecting the issue, it appears that
-> 44241f34fac9 ("KVM: arm64: nv: Use accessors for modifying ID
-> registers") is to blame.
+On Fri, 21 Jun 2024 22:50:45 +0000, Oliver Upton wrote:
+> commit 606af8293cd8 ("KVM: selftests: arm64: Test vCPU-scoped feature ID
+> registers") intended to test that MPIDR_EL1 is unchanged across vCPU
+> reset but failed at actually doing so.
 > 
-> Poking around at the issue a bit further, it'd appear that the value for
-> ID_AA64PFR0_EL1 is complete garbage, as 'val' still contains the value
-> we set ID_AA64ISAR1_EL1 to.
+> Add the missing assertion.
+> 
 > 
 > [...]
 
 Applied to kvmarm/next, thanks!
 
-[1/1] KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
-      https://git.kernel.org/kvmarm/kvmarm/c/33d85a93c6c3
+[1/1] KVM: selftests: Assert that MPIDR_EL1 is unchanged across vCPU reset
+      https://git.kernel.org/kvmarm/kvmarm/c/7ff163c26dd3
 
 --
 Best,
