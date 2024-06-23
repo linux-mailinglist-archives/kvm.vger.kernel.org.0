@@ -1,217 +1,245 @@
-Return-Path: <kvm+bounces-35931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-35936-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD50BA16555
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 03:24:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C3A4A16634
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 05:53:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7ABB87A24F8
-	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 02:24:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97D71169B38
+	for <lists+kvm@lfdr.de>; Mon, 20 Jan 2025 04:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDA5A41C71;
-	Mon, 20 Jan 2025 02:24:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 724A9155316;
+	Mon, 20 Jan 2025 04:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="XGlXC/Vb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AB+NAedf"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2071.outbound.protection.outlook.com [40.107.244.71])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE0E8F6B;
-	Mon, 20 Jan 2025 02:24:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.71
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737339860; cv=fail; b=XPM08RpiBiUlSGlj4TY+FpIozhH7vKz37hJ+UeSM7qpMJ6563/hVlt+QKX8psgV7juWt9KEPn44WMdgUqYYjGfN3Av+1YpY/HFAEYKUawT2Hb564XuHq/fx3uYlWvBsxWFFQ9W1ub7oXUUHj1mIY4yePeFsTr6Xo91Q4aXCofFE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737339860; c=relaxed/simple;
-	bh=6Drs3dTKkUDrJd/Dxg1J8oAz2hJG5OjxfVhUUEAzLkE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=A36bmdhd8DG8L1etWZhWSmIxEf/LZj9g5B1L/h1VOHOJqXHRTdiMRMXbzlAznQNIJb9MUO+iboz8Lh1h9A90ZYl8GB/jzxHPD5Df6zqNZhApnXLFLWz2Dlf9fnt45PSP4gKeXPrDRr9Guf86I5gD8TAdUF02fs4alsj9TuQAopI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=XGlXC/Vb; arc=fail smtp.client-ip=40.107.244.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wp+IdHufUgyV04SL6JGM91sNLShvu39zZ+H3VSDR6msZ8E6jWLaB/IMm/loQei+um8ue+hUYFC24Qi2NIW9LHvYkbHPr7x8wbGgpvvqoEGGpKxzYW/xjerdjkWjNkyZy4FoN21KNcKfJ1/wY2p2pc9zhHcXxL47d17VgxNVdVPiQFaiv8ZWMTa5zc27pUfKdqVF8ifuTZYeDszc5Un9GRrtnPtsMeL/U4kGXIZuS8/6prHwDli38aBPi3cyM0kwBIXIaiv4z+jMI8W9qU4Zydm6zxka1qPe9BlCU2q1QVycRxShhvjoF/V5DUra0Cuh5ucUF3ZFBJaE9F2ZBx9dekw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6Drs3dTKkUDrJd/Dxg1J8oAz2hJG5OjxfVhUUEAzLkE=;
- b=xGsSCv95KaAHQ/w1kvi867qVoJXFWxSJp13cMT7fZTt97HeM7GK991BVkiz1TV6XJa6D/kHkTdOBFDZ/PnDOnEv2M/U9/2M2kC7BLuIEWVHtwa4DXx78amEHzJhbh06tHjItAGV+hxoNOmUVXRfAiNg4nKaynMLNNT836wHz48dREsn1vjEl/L9v7xC5yliY6PYGesTRyxdJi36CGfEFFPkviN71qzkshL5X5ySNPObZ58RE18j2HRSvD5LiopAldNNglxYm7rfpjr6gfe7fh3ikeKAje0iP0av9fheV/dWVD0r+UPbDIW2FrPahBcrLo/9CUK73ezvTseIR6qTUew==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6Drs3dTKkUDrJd/Dxg1J8oAz2hJG5OjxfVhUUEAzLkE=;
- b=XGlXC/VbOY/feeedOFUsr8C7f7j8roUqmfHI0M1Rn4Wg9oDrVqhu2xGD3iJndVRh5aWJ2dSbqV5fYzI/6rK5QIrOx4r6KWf/mYT7WXlSJ8K1p4qt6dBDxt7Wh3AvXi0p2Xf7KuZhvv9BLcTFgovJFX6c6nng7mH/v5AssmI30HRjK0eRkCC8ZKMfJKk2Pxoutm+fW3UuVdGOeTNjUCi3TxQcITaAZ8RjzuGxYD+3+oFI7YCpKslY/t0XmaMannl1vHyRb5QWHMo3ysM7EGMinB7bO/QUVDxX8tMt9pUOq1R+iQtEeDFMmBhF96ysfqiyptYpRfjIgBO43nLqvYmw8g==
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com (2603:10b6:806:2bc::21)
- by CH3PR12MB9284.namprd12.prod.outlook.com (2603:10b6:610:1c7::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.21; Mon, 20 Jan
- 2025 02:24:14 +0000
-Received: from SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::ae1b:d89a:dfb6:37c2]) by SA1PR12MB7199.namprd12.prod.outlook.com
- ([fe80::ae1b:d89a:dfb6:37c2%5]) with mapi id 15.20.8356.020; Mon, 20 Jan 2025
- 02:24:14 +0000
-From: Ankit Agrawal <ankita@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: Jason Gunthorpe <jgg@nvidia.com>, Yishai Hadas <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com"
-	<shameerali.kolothum.thodi@huawei.com>, "kevin.tian@intel.com"
-	<kevin.tian@intel.com>, Zhi Wang <zhiw@nvidia.com>, Aniket Agashe
-	<aniketa@nvidia.com>, Neo Jia <cjia@nvidia.com>, Kirti Wankhede
-	<kwankhede@nvidia.com>, "Tarun Gupta (SW-GPU)" <targupta@nvidia.com>, Vikram
- Sethi <vsethi@nvidia.com>, Andy Currid <acurrid@nvidia.com>, Alistair Popple
-	<apopple@nvidia.com>, John Hubbard <jhubbard@nvidia.com>, Dan Williams
-	<danw@nvidia.com>, "Anuj Aggarwal (SW-GPU)" <anuaggarwal@nvidia.com>, Matt
- Ochs <mochs@nvidia.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v4 3/3] vfio/nvgrace-gpu: Check the HBM training and C2C
- link status
-Thread-Topic: [PATCH v4 3/3] vfio/nvgrace-gpu: Check the HBM training and C2C
- link status
-Thread-Index: AQHbaTjDvXSIdfxj4keeAz0umh3JrbMbxNQAgAMrU3c=
-Date: Mon, 20 Jan 2025 02:24:14 +0000
-Message-ID:
- <SA1PR12MB7199DB6748D147F434404629B0E72@SA1PR12MB7199.namprd12.prod.outlook.com>
-References: <20250117233704.3374-1-ankita@nvidia.com>
-	<20250117233704.3374-4-ankita@nvidia.com>
- <20250117205232.37dbabe3.alex.williamson@redhat.com>
-In-Reply-To: <20250117205232.37dbabe3.alex.williamson@redhat.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR12MB7199:EE_|CH3PR12MB9284:EE_
-x-ms-office365-filtering-correlation-id: 00fd152c-4b03-4639-907f-08dd38f98886
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?iso-8859-1?Q?aUV8c0fYZH9ouM6sOvx4bax8BrfVxaosk78deZt1mpLI/uFpISLHFiKmtp?=
- =?iso-8859-1?Q?mu5mozLuDKoNA1v/3jy8s30d1xRjtm4b3Z8SjAfZ9BUY867vXKnDeMxGIO?=
- =?iso-8859-1?Q?3OHdpmsO13YdPvWJjVgW5c5gH41q4d9GZNINkMivPue4rvhkaVHvlTr5Fa?=
- =?iso-8859-1?Q?0K9NQT+ph6bRP9AW48JqKjOZIupDV/kJDE9teOEIwnBjqbrZQ1Dy9h1nSC?=
- =?iso-8859-1?Q?ziLpbBx7bG0n+nj6r6BWpzsC6qQL/+bKWr3QceS/6tukSKGI3CgDXsfYwH?=
- =?iso-8859-1?Q?hfti7KbCokaMOEv4d7pGBy2NqJxVGgevZ6NX1HdMjS/vzTZKU2djjjPmQ0?=
- =?iso-8859-1?Q?2f7/aNckJ7xaYFIZpC7OA5NIIThmTXW6qzLkX6fS53WbbF4dfBQOFTy+7i?=
- =?iso-8859-1?Q?jD7RVK41RDbrCtkJdfaxoh/x6o5EXriHPncJ/uRYaqTnQMOnn0FfiLFR87?=
- =?iso-8859-1?Q?Pj+mT3vJCJCXYneQvg5JslK+qnorcaWX5eEThnljmKubJU4qZYWF3eJhW0?=
- =?iso-8859-1?Q?dXG2/ChaH64WogGEsY/CCzmFHuu/Hawq8p4saBDdUpb8NA1t1LC7WnvnmV?=
- =?iso-8859-1?Q?ed+YRmlsuczN9nb6qT4iZohyLzPc3xJ/7eVduQU1V+4TxWhFX19Nj8kHV7?=
- =?iso-8859-1?Q?e9qB0elgV7Q7QmHBZeHFbDDYPsX9aPKl5vjzEgUxBsW1SzinnmR4s5UNZO?=
- =?iso-8859-1?Q?c18n4dF4Tw7iqLhgi2qG7PO4UXdCiLVqN57Yl+ZzzhZGUvX54jGu1+zBBn?=
- =?iso-8859-1?Q?BrUG/9ayPXLaq+tIEyXKgyIVJgHox19QdRXycePEuyZ1ttZ/8F5it/EdDl?=
- =?iso-8859-1?Q?Of0Alud0G6ME/g/QEpE7O4+3gCZWYOEBot5aVeRbJo0zRZR7rx1A06/Z1N?=
- =?iso-8859-1?Q?48o4svI3an19vV5qb8TKXem5CPn+8Z3mV48wz9SuCpGt3TxJydL+muarPE?=
- =?iso-8859-1?Q?w7uNT4A86HpRyiOpLROLrgxu3rUjWXyEaI4fsEiCiSvDZITzcM8xT+RcdZ?=
- =?iso-8859-1?Q?0I8kgXOb4b8cGumjcYnWXWhV6Pw7KbTN4CKdd11ZQ8Ee4WkO1RvANKIUOF?=
- =?iso-8859-1?Q?VwI2fgKa21ZXoN1QDIJGvSeXpEsP4kRVuH+rRFYKOI2HsbjrkGalCvKAcR?=
- =?iso-8859-1?Q?Kem9T1xu4cW+KXvJje9b+2TMiUjqRz/+W5ZbC4yale5dNX42Q9hShfI/+c?=
- =?iso-8859-1?Q?9t1+rsttM0tP11u0TicUR/pOjFGFNkNSO0zjKT96StMc2OxEq+5ZyLqbJx?=
- =?iso-8859-1?Q?c1M/kXPAxKCiFSTmS1beu3nPnvSyzZa8zbambXhow5g795VF5bh8ViaWrA?=
- =?iso-8859-1?Q?+GnWjfw6bJ9IpQd1vWHSag7Rcs3G99GJOdVZ8lY7yZGKpgr0Op1cb2U9s6?=
- =?iso-8859-1?Q?8FXLw0uJBQwbHmTiBbibSWQPjTEoWZF4uhkF0lBA7dNr2HECM6gtNiOLAa?=
- =?iso-8859-1?Q?HhuGRBQpGjMtC/q6An4/FhbjLaqwPyzTfFzG15Pj62QPwp5v9JKDSeEtuO?=
- =?iso-8859-1?Q?ncJwyZ3ivc2reFwrlWcS+N?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR12MB7199.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?iso-8859-1?Q?yH8lha7xXhwpPWpFZj6wGfP8RVSvv8PJHpq7hi97KbRfVYb3qWgJYEIIl8?=
- =?iso-8859-1?Q?v9+5rMMruQVErmcCZtRx5WukLZQMGRpVaQbKT3XQH1f3hePRpn7EyXq4Kk?=
- =?iso-8859-1?Q?UruGGhWMwJK1hOkZKJ+O1VrJlIJT0L/WQ4qwVwuzctXcDKldSLrQsR5J15?=
- =?iso-8859-1?Q?U1mK4uN8MT1d7HQ99lwN7vWXeyl8cIeWwGg9uoocEgoXCgl4/3aJGd28dI?=
- =?iso-8859-1?Q?AhZJ1ItNWN2jaPDggNMqB1x60+kCbFqr/3H0omG3L3q0lWinBm59TjSOc1?=
- =?iso-8859-1?Q?VrlgiZ92RUDvwbj55VWCTm9HgReyRTeKcwhtKu/PyMW88FZ6Q+LG3sBR+2?=
- =?iso-8859-1?Q?ZCiUw9wlH5KGlyMucu1Jiw+LwC1kisjZyi2K5hY2gJa7WK4wc8uegU+iGT?=
- =?iso-8859-1?Q?FqjV7Hf0Jmyon0e1qXi9tm0+Fo09eJioF7DKdzU0afEL94DiI55xLyUUDz?=
- =?iso-8859-1?Q?yQ4SeiWHGYrQBNzWPOdRnqEgS9YpLfsF9KMN9yRiAvmpbdRgadUFKSv0QC?=
- =?iso-8859-1?Q?edbL4jTeBJPqCM8/axA8c2pkj0kf9SWe4fN9y7cnMvyxb9TCakeJt6Bp4m?=
- =?iso-8859-1?Q?VY/w8zgihSADRAmH++SS6pvx3hqWV/mJG290mijqMDfS5dyYATx4rKbBDl?=
- =?iso-8859-1?Q?/KAMnGgeD4fb6R3uCFBy6bD9n29PyeGr+Mds5VYz788om3N9RS9K/ZgfpC?=
- =?iso-8859-1?Q?MGpD5350wKCDiMXWzTaXUdek4HAgPxtVIdnKpbKSLupN/eG/Y0+mo8PJ9A?=
- =?iso-8859-1?Q?xRyc+2DxIxSk2OxfG+fqHaNc3owBotmZ01bR2hW2JDqlhfMuMcejRFzF6s?=
- =?iso-8859-1?Q?Tn6MW5FATx/k07LwFztQ1LhjgpppAX+7B3CFW76nZT6DIlGeFXMlo/CkYw?=
- =?iso-8859-1?Q?iMtWgXl6FF4KhtN/tc3+XiRc2RKyBw4DWK4IOqr7Th8wBrYAg+m3SdeD9t?=
- =?iso-8859-1?Q?yGkypDbXMdSUzfVR9cBXcl0ywLYQINXLnZFaddx8Rz7eL5hzjM22eHuhpB?=
- =?iso-8859-1?Q?VnOnBQmYRfvcCDly/SDdwVFpwZpXDWApdMIVuXHj+h368jZ2oRxm9HWxdw?=
- =?iso-8859-1?Q?UzfNdK/PApZFLLNkTMIczIjdCmKSg0hh2mLpQob0zUUue3mQcOSaiDGcL8?=
- =?iso-8859-1?Q?A7QLdIHhY20qdk9WhVZb2kGyJ/4r6kojnwGBF5rWetB9/ilU/pY2spdSN8?=
- =?iso-8859-1?Q?TtKEf8jHDEUgjoECKSOPpttqc6DaXDHFLCLBXk8Y/Wo6SaNg8aHUgfMV7Y?=
- =?iso-8859-1?Q?C02ETubMU8UWl6NEqwAluIOePyMYjZWPakDazlQkIWvRU54jaoGL1jw/1U?=
- =?iso-8859-1?Q?mzxgLHwckLHhoua+YBA4S/CcsJ6YicjDjaej6QwGR/fDw4vttcVaxbKcsX?=
- =?iso-8859-1?Q?6jM17Qwh4rTsXa3zBiSTKnrALH0BR10dOsniw/WHTO5/27mP3n0x9LPAI+?=
- =?iso-8859-1?Q?tecZZffkJEpX4KmDFEmJ2AzZi2PBgkpfebwZSW0pkJaKP82r73prhUmsLV?=
- =?iso-8859-1?Q?8povBWNIy04umVywLmc9ZQkD3Wsf/U5OHLu65O7z/WIcR5xU6x/y9qci/l?=
- =?iso-8859-1?Q?XTOmpaHgKulnjyppttJTZdspt3xLCJnh28j+6aWgA+pqWW3Xt03hL6u2eF?=
- =?iso-8859-1?Q?lEXfZa2UOCeuQ=3D?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AA013CFA6;
+	Mon, 20 Jan 2025 04:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737348803; cv=none; b=Eif6hyjvOwGUdb/AcU98DfVOUp9qJtdEzn/rGcL7nzDERtky2EfC1fRMq5hRn3wQEpxgOjKi3kdNIPrkDQXFJqpmKurRHZojDw9fhRksaZ0kDC5jtWHjlqZK+33JrAnXv27+6h2EefPzOw4eSr6qScX0NE1cbSJ9xTvr+gBfT4w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737348803; c=relaxed/simple;
+	bh=Y0xUv/KrGZMTDVn3d6aDjHsZO9ljCANXeLbTh4Y3AmU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Qd5SstJaigaqcZUGvG/BEIPv0PcaL6SioiMTSThN0oD4QD353KCkjklmmO1wXoCeuZmAqVGtuRfnDZQ25Pa2hIzJMNflmHxheEWeXTIjD6rJlll1htYLSmsIxJC5Wkc2lbK3nh1VO53FVQVgMyNuDZh3gtjFZtJvBi5JHjOOtPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AB+NAedf; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737348802; x=1768884802;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Y0xUv/KrGZMTDVn3d6aDjHsZO9ljCANXeLbTh4Y3AmU=;
+  b=AB+NAedfBwPyBmUQNbagOES/N0hlOJhjzEwYecWIgsJ6ruahVvWNlqpw
+   OJPxXxv2nUa39UHZWmVft9Ur31jDH1eNVTUlnZPUyF2ZuccmI30i8OGzd
+   Mg52CQE1lxSo3/D5oLsljkLtaxm4eZI1bZ7QrRamYATbyFvlMQGNF/+Vu
+   GDSsO7srDBMuXhHkFH1ntgbIGNiOjUwcyYGfTEzCOWWlwFod+QDTT8EyK
+   cv/wvxRamriVEjb+P4cQtxPlIYXrR2Vf+IZ3H9GOlGRXkxZQ4u2QfAUxQ
+   oLwzIP2GhcXF+yLmVI5N0H9OSrBWhJ1uNcAFssYQQ2d8TWVW+ieZWBxBP
+   w==;
+X-CSE-ConnectionGUID: +i7wqT37T5yWulO+10vYDg==
+X-CSE-MsgGUID: 7C6SEItjRqe4t52PZQLgdg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11320"; a="36926152"
+X-IronPort-AV: E=Sophos;i="6.13,218,1732608000"; 
+   d="scan'208";a="36926152"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jan 2025 20:53:21 -0800
+X-CSE-ConnectionGUID: pzuQM0SDQPu1WYfF97IPTg==
+X-CSE-MsgGUID: 3MYTX9d4QRCtd/oYUVB0Lw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="137273330"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by fmviesa001.fm.intel.com with ESMTP; 19 Jan 2025 20:53:16 -0800
+Date: Mon, 24 Jun 2024 03:59:53 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Baolu Lu <baolu.lu@linux.intel.com>, Alexey Kardashevskiy <aik@amd.com>,
+	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	sumit.semwal@linaro.org, christian.koenig@amd.com,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	daniel.vetter@ffwll.ch, leon@kernel.org, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
+ private device
+Message-ID: <Znh+uTMe/wX2RIJm@yilunxu-OptiPlex-7050>
+References: <Z3/7/PQCLi1GE5Ry@yilunxu-OptiPlex-7050>
+ <20250110133116.GF5556@nvidia.com>
+ <Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050>
+ <20250113164935.GP5556@nvidia.com>
+ <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050>
+ <20250114133553.GB5556@nvidia.com>
+ <17cd9b77-4620-4883-9a6a-8d1cab822c88@amd.com>
+ <20250115130102.GM5556@nvidia.com>
+ <f1ac048f-64b1-4343-ab86-ad98c24a44f5@linux.intel.com>
+ <20250117132523.GA5556@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR12MB7199.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00fd152c-4b03-4639-907f-08dd38f98886
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Jan 2025 02:24:14.4707
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: oy6yG0Kquo3TDIF/ZwEdQ8zMQ/z7AQpR+do7iDUsu24FgE7dTx+7tkSTW75XW27Y4a68ruXl4z6ppRnr48w2cQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9284
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250117132523.GA5556@nvidia.com>
 
-=0A=
->> +EXPORT_SYMBOL_GPL(vfio_pci_memory_lock_and_enable);=0A=
->>=0A=
->>=A0 void vfio_pci_memory_unlock_and_restore(struct vfio_pci_core_device *=
-vdev, u16 cmd)=0A=
->>=A0 {=0A=
->>=A0=A0=A0=A0=A0=A0 pci_write_config_word(vdev->pdev, PCI_COMMAND, cmd);=
-=0A=
->>=A0=A0=A0=A0=A0=A0 up_write(&vdev->memory_lock);=0A=
->>=A0 }=0A=
->> +EXPORT_SYMBOL_GPL(vfio_pci_memory_unlock_and_restore);=0A=
->>=0A=
->>=A0 static unsigned long vma_to_pfn(struct vm_area_struct *vma)=0A=
->>=A0 {=0A=
->=0A=
-> The access is happening before the device is exposed to the user, the=0A=
-> above are for handling conditions while there may be races with user=0A=
-> access, this is totally unnecessary.=0A=
-=0A=
-Right. What I could do to reuse the code is to take out the part=0A=
-related to locking/unlocking as new functions and export that.=0A=
-The current vfio_pci_memory_lock_and_enable() would take the lock=0A=
-and call the new function. Same for vfio_pci_memory_unlock_and_restore().=
-=0A=
-The nvgrace module could also call that new function. Does that sound=0A=
-reasonable?=0A=
-=0A=
-> Does this delay even need to happen in the probe function, or could it=0A=
-> happen in the open_device callback?=A0 That would still be before user=0A=
-> access, but if we expect it to generally work, it would allow the=0A=
-> training to happen in the background up until the user tries to open=0A=
-> the device.=A0 Thanks,=0A=
->=0A=
-> Alex=0A=
-=0A=
-The thought process is that since it is purely bare metal coming to proper=
-=0A=
-state while boot, the nvgrace module should probably wait for the startup=
-=0A=
-to complete during probe() instead of delaying until open() time.=0A=
-=0A=
-- Ankit Agrawal=
+On Fri, Jan 17, 2025 at 09:25:23AM -0400, Jason Gunthorpe wrote:
+> On Fri, Jan 17, 2025 at 09:57:40AM +0800, Baolu Lu wrote:
+> > On 1/15/25 21:01, Jason Gunthorpe wrote:
+> > > On Wed, Jan 15, 2025 at 11:57:05PM +1100, Alexey Kardashevskiy wrote:
+> > > > On 15/1/25 00:35, Jason Gunthorpe wrote:
+> > > > > On Tue, Jun 18, 2024 at 07:28:43AM +0800, Xu Yilun wrote:
+> > > > > 
+> > > > > > > is needed so the secure world can prepare anything it needs prior to
+> > > > > > > starting the VM.
+> > > > > > OK. From Dan's patchset there are some touch point for vendor tsm
+> > > > > > drivers to do secure world preparation. e.g. pci_tsm_ops::probe().
+> > > > > > 
+> > > > > > Maybe we could move to Dan's thread for discussion.
+> > > > > > 
+> > > > > > https://lore.kernel.org/linux-
+> > > > > > coco/173343739517.1074769.13134786548545925484.stgit@dwillia2-
+> > > > > > xfh.jf.intel.com/
+> > > > > I think Dan's series is different, any uapi from that series should
+> > > > > not be used in the VMM case. We need proper vfio APIs for the VMM to
+> > > > > use. I would expect VFIO to be calling some of that infrastructure.
+> > > > Something like this experiment?
+> > > > 
+> > > > https://github.com/aik/linux/commit/
+> > > > ce052512fb8784e19745d4cb222e23cabc57792e
+> > > Yeah, maybe, though I don't know which of vfio/iommufd/kvm should be
+> > > hosting those APIs, the above does seem to be a reasonable direction.
+> > > 
+> > > When the various fds are closed I would expect the kernel to unbind
+> > > and restore the device back.
+> > 
+> > I am curious about the value of tsm binding against an iomnufd_vdevice
+> > instead of the physical iommufd_device.
+> 
+> Interesting question
+>  
+> > It is likely that the kvm pointer should be passed to iommufd during the
+> > creation of a viommu object. 
+> 
+> Yes, I fully expect this
+> 
+> > If my recollection is correct, the arm
+> > smmu-v3 needs it to obtain the vmid to setup the userspace event queue:
+> 
+> Right now it will use a VMID unrelated to KVM. BTM support on ARM will
+> require syncing the VMID with KVM.
+> 
+> AMD and Intel may require the KVM for some reason as well.
+> 
+> For CC I'm expecting the KVM fd to be the handle for the cVM, so any
+> RPCs that want to call into the secure world need the KVM FD to get
+> the cVM's identifier. Ie a "bind to cVM" RPC will need the PCI
+> information and the cVM's handle.
+
+I also expect this.
+
+> 
+> From that perspective it does make sense that any cVM related APIs,
+> like "bind to cVM" would be against the VDEVICE where we have a link
+> to the VIOMMU which has the KVM. On the iommufd side the VIOMMU is
+> part of the object hierarchy, but does not necessarily have to force a
+> vIOMMU to appear in the cVM.
+> 
+> But it also seems to me that VFIO should be able to support putting
+> the device into the RUN state
+
+Firstly I think VFIO should support putting device into *LOCKED* state.
+From LOCKED to RUN, there are many evidence fetching and attestation
+things that only guest cares. I don't think VFIO needs to opt-in.
+
+But that doesn't impact this concern. I actually think VFIO should
+provide 'bind' uAPI to support these device side configuration things
+rather than iommufd uAPI. IIUC iommufd should only do the setup on
+IOMMU side.
+
+The switching of TDISP state to LOCKED involves device side
+differences that should be awared by the device owner, VFIO driver.
+
+E.g. as we previously mentioned, to check if all MMIOs are never mapped.
+
+Another E.g. invalidate MMIOs when device is to be LOCKED, some Pseudo
+Code:
+
+@@ -1494,7 +1494,15 @@ static int vfio_pci_ioctl_tsm_bind(struct vfio_pci_core_device *vdev,
+        if (!kvm)
+                return -ENOENT;
+
++       down_write(&vdev->memory_lock);
++       vfio_pci_dma_buf_move(vdev, true);
++
+        ret = pci_tsm_dev_bind(pdev, kvm, &bind.intf_id);
++
++       if (__vfio_pci_memory_enabled(vdev))
++               vfio_pci_dma_buf_move(vdev, false);
++       up_write(&vdev->memory_lock);
+
+
+BTW, we may still need viommu/vdevice APIs during 'bind', if some IOMMU
+side configurations are required by secure world. TDX does have some.
+
+> without involving KVM or cVMs.
+
+It may not be feasible for all vendors. I believe AMD would have one
+firmware call that requires cVM handle *AND* move device into LOCKED
+state. It really depends on firmware implementation.
+
+So I'm expecting a coarse TSM verb pci_tsm_dev_bind() for vendors to do
+any host side preparation and put device into LOCKED state.
+
+> 
+> > Intel TDX connect implementation also needs a reference to the kvm
+> > pointer to obtain the secure EPT information. This is crucial because
+> > the CPU's page table must be shared with the iommu. 
+> 
+> I thought kvm folks were NAKing this sharing entirely? Or is the
+
+I believe this is still Based on the general EPT sharing idea, is it?
+
+There are several major reasons for the objection. In general, KVM now
+has many "page non-present" tricks in EPT, which are not applicable to
+IOPT. If shared, KVM has to take IOPT concerns into account, which is
+quite a burden for KVM maintaining.
+
+> secure EPT in the secure world and not directly managed by Linux?
+
+Yes, the secure EPT is in the secure world and managed by TDX firmware.
+Now a SW Mirror Secure EPT is introduced in KVM and managed by KVM
+directly, and KVM will finally use firmware calls to propagate Mirror
+Secure EPT changes to secure EPT.
+
+Secure EPT are controlled by TDX module, basically KVM cannot play any
+of the tricks. And TDX firmware should ensure any SEPT setting would be
+applicable for Secure IOPT. I hope this could remove most of the
+concerns.
+
+I remember we've talked about SEPT sharing architechture for TDX TIO
+before, but didn't get information back from KVM folks. Not sure how
+things will go. Maybe will find out when we have some patches posted.
+
+Thanks,
+Yilun
+
+> 
+> AFAIK AMD is going to mirror the iommu page table like today.
+> 
+> ARM, I suspect, will not have an "EPT" under Linux control, so
+> whatever happens will be hidden in their secure world.
+> 
+> Jason
 
