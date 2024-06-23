@@ -1,123 +1,236 @@
-Return-Path: <kvm+bounces-20334-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20335-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A2D913981
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 12:18:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BBCA3913AFF
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 15:46:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 854B81C214C4
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 10:18:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E15651C20CA6
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 13:46:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DF612D205;
-	Sun, 23 Jun 2024 10:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E3061836F4;
+	Sun, 23 Jun 2024 13:44:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gpp7I21V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dx/CjLks"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2839470;
-	Sun, 23 Jun 2024 10:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4032A1836D8;
+	Sun, 23 Jun 2024 13:44:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719137920; cv=none; b=NRiUOksUoNs3/MAm7xU3CYlhbETYb3+82+Cdu2jBCNL/KYZUUo0wshLpqpazCxHbJMD6Mo0qVcdgN4yioqjttYCcI7i3S9e03wB9TvXkS58wSxnnw5Ijhm/jpdMuAwz6iNtY4AuVn9kIruA5zzTNc98gNzPjAWo3si8rybP5k2k=
+	t=1719150260; cv=none; b=M7CCUZ4q7GCpLH9V152HQ+dfgxJT6xBiZZemg++t79E9X4WRM8C0aLIfCGbKoblsSnTtOPSr8uZqxduFYgBAMiv5cxPb6e5RQcmbUQunrHdbHMin227MeeBj0IGaU1hddPWYsf/6mLjnqr0HMh2kh012bn0Vwd8UmMPegtTnXlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719137920; c=relaxed/simple;
-	bh=YvSVXJdBQKWUuhk9Qus9TV4AhCWxwK8gs3Y89XMznTI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iGcEZAuY7zWCTt/zUF9t2U/GEJoc+wTMhSNd8wyQTGLpVf+Y04d+B6RtBG8u43kIJW8QMa9Kff+u77HYNGF8hfCTiB6AiBWwOmZiSw4ml2+EnwMdW+0xcQeH7oGM1dUUUwd5dTdBlvS1KlV2oL2gF76ZUEeuT3ZT9XVzhKzwmZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gpp7I21V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 780F7C32782;
-	Sun, 23 Jun 2024 10:18:39 +0000 (UTC)
+	s=arc-20240116; t=1719150260; c=relaxed/simple;
+	bh=D+u11N6meZgue2RjrKJKF/KRFSvT9tdbZSH27n2GtsM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=VuqPUIyvkRgHsfcexJAFgUgHy292ToANIVrHMSS5hllunI6nEnLie5gD48Ke+s369hI3mjY1fAoepTur/mYfYR4MqEcc1jPe/gX1ExVobthzz1PkrLi8Z38vCrfTfQwIy3CAOxEUGQbs7Q2DqfW9ox/VUSF5/PjoSYLQFsza9tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dx/CjLks; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52BC5C2BD10;
+	Sun, 23 Jun 2024 13:44:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719137919;
-	bh=YvSVXJdBQKWUuhk9Qus9TV4AhCWxwK8gs3Y89XMznTI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=gpp7I21Vk/LF2bkbXohHJUXdbaUjuIKA26Vck4ESRK2TDVtOdLDWtqN8mxPcxfGxb
-	 gzAbsiscGjZSSGHBtaf2Q0aiH3l2caAEOGXNoIkGOmm4XGxtsElE4uKgKRJpWjVTiT
-	 lvej8KYHB+Y0YGYPYUnivy8OElXkxPfTYsRoYfyvYKt7llKfW85lQNZHFZdvH3wLEY
-	 b0G9twTcDqWZBIvib9qv/iUV0oUMhEvUh8ALp38+9KpterAMFwxojOlhkZF6eCY+xk
-	 VfpWxBuoG8JY8YhNaSQrKKignxrrWu2mIn3X3yceHbI3ziIma6QYh1kJJ0Y9Hua8hb
-	 hQE9zy1xtU9AQ==
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a689ad8d1f6so422383766b.2;
-        Sun, 23 Jun 2024 03:18:39 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWGQ6EC+qF42BJrffSsrmsLtl2EsCPCbyb8dEKAuEtuP7NpifC3PwYC7gGfw2CdVYdSwvU/dksJ4CPgsx44wURMvUN6JhJb3Js4ASodPLMZm+ouqnDZ6Qf3Pxbm3nw/tuCJ
-X-Gm-Message-State: AOJu0YwA59SN4ePC8zDfZu1Cm4qFMH3jgawO86AmT0uZ6Z4+SACrampw
-	XTjuOhe14Y5m5dsyLlLrMZzQD/3GHRk4YDif6q/twJVY78Yvt262ldZ+/McvdLnSMOO6t7TzRzv
-	DvSE5FYtqDF7/KNKyvx0FkJNPhJk=
-X-Google-Smtp-Source: AGHT+IETl9tcGslgNmKwUQFdKXbdPsmbNWyuSxrrYzFXcGEQW2pW/t5Kw9wATH526H1HJQU6acmvH1WEciSIgB/l4d8=
-X-Received: by 2002:a17:906:a8d:b0:a6e:fccc:e4a with SMTP id
- a640c23a62f3a-a7245b4a3c3mr96498966b.0.1719137917974; Sun, 23 Jun 2024
- 03:18:37 -0700 (PDT)
+	s=k20201202; t=1719150260;
+	bh=D+u11N6meZgue2RjrKJKF/KRFSvT9tdbZSH27n2GtsM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=dx/CjLksXqwUsGX9RBlZHkHgRLF60rFDDrU54FzYCuBPqLP2WTDBBcOU8FOAKan28
+	 4xkosT+b/wJ4NKmZayyhwMIe5uuJ+ITPBL+bU4uVH09c0Yb+5IMrFK+73e6VhM+wB7
+	 bMq9qgU1NdmMDLAuHgOF1V+9TARA5lqQVTzcx0tPUEHfiWknJWSv41Dmg20IG9uGdg
+	 KlpkCm92poikR82dDaLvGkbYjN4V+rZ+MH2ehIwiJLJp65QcVs4WoFv1iQp1JsDNv7
+	 cbaPDGPFwky7b0cNaT9BmC9KMoNRXvTcvLhZRERSIXFngY+A1CM8GAfloftX6d8qr+
+	 UPMCwfMgUJ7XQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Sasha Levin <sashal@kernel.org>,
+	kvm@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.9 09/21] vfio: Create vfio_fs_type with inode per device
+Date: Sun, 23 Jun 2024 09:43:42 -0400
+Message-ID: <20240623134405.809025-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240623134405.809025-1-sashal@kernel.org>
+References: <20240623134405.809025-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240619080940.2690756-1-maobibo@loongson.cn> <20240619080940.2690756-5-maobibo@loongson.cn>
-In-Reply-To: <20240619080940.2690756-5-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 23 Jun 2024 18:18:27 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H74raJ9eEWEHr=aN6LhVvNUyP6TLEDH006M6AnoE8tkPg@mail.gmail.com>
-Message-ID: <CAAhV-H74raJ9eEWEHr=aN6LhVvNUyP6TLEDH006M6AnoE8tkPg@mail.gmail.com>
-Subject: Re: [PATCH v2 4/6] LoongArch: KVM: Add memory barrier before update
- pmd entry
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, 
-	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.9.6
+Content-Transfer-Encoding: 8bit
 
-Hi, Bibo,
+From: Alex Williamson <alex.williamson@redhat.com>
 
-On Wed, Jun 19, 2024 at 4:09=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> When updating pmd entry such as allocating new pmd page or splitting
-> huge page into normal page, it is necessary to firstly update all pte
-> entries, and then update pmd entry.
->
-> It is weak order with LoongArch system, there will be problem if other
-> vcpus sees pmd update firstly however pte is not updated. Here smp_wmb()
-> is added to assure this.
-Memory barriers should be in pairs in most cases. That means you may
-lose smp_rmb() in another place.
+[ Upstream commit b7c5e64fecfa88764791679cca4786ac65de739e ]
 
-Huacai
+By linking all the device fds we provide to userspace to an
+address space through a new pseudo fs, we can use tools like
+unmap_mapping_range() to zap all vmas associated with a device.
 
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
->  arch/loongarch/kvm/mmu.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> index 1690828bd44b..7f04edfbe428 100644
-> --- a/arch/loongarch/kvm/mmu.c
-> +++ b/arch/loongarch/kvm/mmu.c
-> @@ -163,6 +163,7 @@ static kvm_pte_t *kvm_populate_gpa(struct kvm *kvm,
->
->                         child =3D kvm_mmu_memory_cache_alloc(cache);
->                         _kvm_pte_init(child, ctx.invalid_ptes[ctx.level -=
- 1]);
-> +                       smp_wmb(); /* make pte visible before pmd */
->                         kvm_set_pte(entry, __pa(child));
->                 } else if (kvm_pte_huge(*entry)) {
->                         return entry;
-> @@ -746,6 +747,7 @@ static kvm_pte_t *kvm_split_huge(struct kvm_vcpu *vcp=
-u, kvm_pte_t *ptep, gfn_t g
->                 val +=3D PAGE_SIZE;
->         }
->
-> +       smp_wmb();
->         /* The later kvm_flush_tlb_gpa() will flush hugepage tlb */
->         kvm_set_pte(ptep, __pa(child));
->
-> --
-> 2.39.3
->
+Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+Reviewed-by: Kevin Tian <kevin.tian@intel.com>
+Link: https://lore.kernel.org/r/20240530045236.1005864-2-alex.williamson@redhat.com
+Signed-off-by: Alex Williamson <alex.williamson@redhat.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/vfio/device_cdev.c |  7 ++++++
+ drivers/vfio/group.c       |  7 ++++++
+ drivers/vfio/vfio_main.c   | 44 ++++++++++++++++++++++++++++++++++++++
+ include/linux/vfio.h       |  1 +
+ 4 files changed, 59 insertions(+)
+
+diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
+index e75da0a70d1f8..bb1817bd4ff31 100644
+--- a/drivers/vfio/device_cdev.c
++++ b/drivers/vfio/device_cdev.c
+@@ -39,6 +39,13 @@ int vfio_device_fops_cdev_open(struct inode *inode, struct file *filep)
+ 
+ 	filep->private_data = df;
+ 
++	/*
++	 * Use the pseudo fs inode on the device to link all mmaps
++	 * to the same address space, allowing us to unmap all vmas
++	 * associated to this device using unmap_mapping_range().
++	 */
++	filep->f_mapping = device->inode->i_mapping;
++
+ 	return 0;
+ 
+ err_put_registration:
+diff --git a/drivers/vfio/group.c b/drivers/vfio/group.c
+index 610a429c61912..ded364588d297 100644
+--- a/drivers/vfio/group.c
++++ b/drivers/vfio/group.c
+@@ -286,6 +286,13 @@ static struct file *vfio_device_open_file(struct vfio_device *device)
+ 	 */
+ 	filep->f_mode |= (FMODE_PREAD | FMODE_PWRITE);
+ 
++	/*
++	 * Use the pseudo fs inode on the device to link all mmaps
++	 * to the same address space, allowing us to unmap all vmas
++	 * associated to this device using unmap_mapping_range().
++	 */
++	filep->f_mapping = device->inode->i_mapping;
++
+ 	if (device->group->type == VFIO_NO_IOMMU)
+ 		dev_warn(device->dev, "vfio-noiommu device opened by user "
+ 			 "(%s:%d)\n", current->comm, task_pid_nr(current));
+diff --git a/drivers/vfio/vfio_main.c b/drivers/vfio/vfio_main.c
+index e97d796a54fba..a5a62d9d963f7 100644
+--- a/drivers/vfio/vfio_main.c
++++ b/drivers/vfio/vfio_main.c
+@@ -22,8 +22,10 @@
+ #include <linux/list.h>
+ #include <linux/miscdevice.h>
+ #include <linux/module.h>
++#include <linux/mount.h>
+ #include <linux/mutex.h>
+ #include <linux/pci.h>
++#include <linux/pseudo_fs.h>
+ #include <linux/rwsem.h>
+ #include <linux/sched.h>
+ #include <linux/slab.h>
+@@ -43,9 +45,13 @@
+ #define DRIVER_AUTHOR	"Alex Williamson <alex.williamson@redhat.com>"
+ #define DRIVER_DESC	"VFIO - User Level meta-driver"
+ 
++#define VFIO_MAGIC 0x5646494f /* "VFIO" */
++
+ static struct vfio {
+ 	struct class			*device_class;
+ 	struct ida			device_ida;
++	struct vfsmount			*vfs_mount;
++	int				fs_count;
+ } vfio;
+ 
+ #ifdef CONFIG_VFIO_NOIOMMU
+@@ -186,6 +192,8 @@ static void vfio_device_release(struct device *dev)
+ 	if (device->ops->release)
+ 		device->ops->release(device);
+ 
++	iput(device->inode);
++	simple_release_fs(&vfio.vfs_mount, &vfio.fs_count);
+ 	kvfree(device);
+ }
+ 
+@@ -228,6 +236,34 @@ struct vfio_device *_vfio_alloc_device(size_t size, struct device *dev,
+ }
+ EXPORT_SYMBOL_GPL(_vfio_alloc_device);
+ 
++static int vfio_fs_init_fs_context(struct fs_context *fc)
++{
++	return init_pseudo(fc, VFIO_MAGIC) ? 0 : -ENOMEM;
++}
++
++static struct file_system_type vfio_fs_type = {
++	.name = "vfio",
++	.owner = THIS_MODULE,
++	.init_fs_context = vfio_fs_init_fs_context,
++	.kill_sb = kill_anon_super,
++};
++
++static struct inode *vfio_fs_inode_new(void)
++{
++	struct inode *inode;
++	int ret;
++
++	ret = simple_pin_fs(&vfio_fs_type, &vfio.vfs_mount, &vfio.fs_count);
++	if (ret)
++		return ERR_PTR(ret);
++
++	inode = alloc_anon_inode(vfio.vfs_mount->mnt_sb);
++	if (IS_ERR(inode))
++		simple_release_fs(&vfio.vfs_mount, &vfio.fs_count);
++
++	return inode;
++}
++
+ /*
+  * Initialize a vfio_device so it can be registered to vfio core.
+  */
+@@ -246,6 +282,11 @@ static int vfio_init_device(struct vfio_device *device, struct device *dev,
+ 	init_completion(&device->comp);
+ 	device->dev = dev;
+ 	device->ops = ops;
++	device->inode = vfio_fs_inode_new();
++	if (IS_ERR(device->inode)) {
++		ret = PTR_ERR(device->inode);
++		goto out_inode;
++	}
+ 
+ 	if (ops->init) {
+ 		ret = ops->init(device);
+@@ -260,6 +301,9 @@ static int vfio_init_device(struct vfio_device *device, struct device *dev,
+ 	return 0;
+ 
+ out_uninit:
++	iput(device->inode);
++	simple_release_fs(&vfio.vfs_mount, &vfio.fs_count);
++out_inode:
+ 	vfio_release_device_set(device);
+ 	ida_free(&vfio.device_ida, device->index);
+ 	return ret;
+diff --git a/include/linux/vfio.h b/include/linux/vfio.h
+index 8b1a298204091..000a6cab2d318 100644
+--- a/include/linux/vfio.h
++++ b/include/linux/vfio.h
+@@ -64,6 +64,7 @@ struct vfio_device {
+ 	struct completion comp;
+ 	struct iommufd_access *iommufd_access;
+ 	void (*put_kvm)(struct kvm *kvm);
++	struct inode *inode;
+ #if IS_ENABLED(CONFIG_IOMMUFD)
+ 	struct iommufd_device *iommufd_device;
+ 	u8 iommufd_attached:1;
+-- 
+2.43.0
+
 
