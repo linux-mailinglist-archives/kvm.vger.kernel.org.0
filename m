@@ -1,169 +1,227 @@
-Return-Path: <kvm+bounces-20328-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20329-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C22A8913801
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 07:45:35 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD0A69138D4
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 09:54:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DC372837BF
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 05:45:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8D92B213B2
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 07:54:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4081CF8F;
-	Sun, 23 Jun 2024 05:45:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3695EE97;
+	Sun, 23 Jun 2024 07:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="gPVBR3ZU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fjzVTtlN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EE207FD;
-	Sun, 23 Jun 2024 05:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E61A1EB25;
+	Sun, 23 Jun 2024 07:54:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719121527; cv=none; b=PuG2aPJmmM/by8+NOu73XyhOxRnZS5BiN3eYjAqTVrI4h4TpwFR34eICBdYJ+VlQ7GRApgCOCFOTRYAVXoNoy/INut9zBXaG58QI3FXGJDv3kh8G2rFScMhcMd7uQGabklIfV1YLODbS9jObJ94UspKhueYtoiRJyTK7BegjWnc=
+	t=1719129280; cv=none; b=Rn14AzdQOnYrYH7bV3cIXSyOGLpf1RY+sRMelYE724Hx3S/G8pBfOKBMxGisg4lQa1ECgPHCJ8E5tllMzmcuX+ChW/tqTwHkPO7UInJWF3g62woUWZHBLABRWE4qiZo2o0aYJ0xrJtRQqsV5zc8HgclECBdR/RaUe7/bn27C1Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719121527; c=relaxed/simple;
-	bh=Dsv+gvnAeJEM2c+WjU2T9ZUKpqGuD33nzFQBPE7WR3s=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=UMTBbuOmuceabb0uo1r9R0ULEoSIE6T1ot4rldUJS+M0AW5PfWk9JUh9IeSb+LkUvsweIiBLCOUHNdivUs6xzGIwIZpG7ngCnE+EkhT+o3WO13+rAj01VmIw4upGHQJBpszyvOdfTvigHGl5DpXlNDCWvEsxpNtCLXmvjJ4FhYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=gPVBR3ZU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45N4u8sW013316;
-	Sun, 23 Jun 2024 05:45:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=Al3xT5HMJ512bAKdS0RGU8
-	tdONKW04l3wjQ6Jc5WzSE=; b=gPVBR3ZUXxOWzDyVPjF/YKEc3Dvand76qaLnYf
-	dQTyDvQZsm/SkfD81j0wYroZi0c09A6O4JbVVi7LfvMxBCBkT7A3vZ6oJuPf+ofR
-	dgEWEgc21y6tFAd1njPQVyLaBYpNCbQ5Pk+i/Zy6sX1dCuBt5kn+VTGsyAHXGzO3
-	boCLb1FecHOIExA78u8PMaOyUp2pzQfuzRUEN9JIWO6wzJNjidjyEZtk+Zxhh//Y
-	YrWxG7B4wW2RnMZpYaTO2c8SykNqtwmp+1zu4FJFmyJ68nGPHWqbtQvq4IxMEN8o
-	GCPeKMyMAypqMwFLxLRcHe5D7hDTdm6boeiyFpraD09s6V9g==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3ywpu11cnf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 23 Jun 2024 05:45:01 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 45N5j0LT009558
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 23 Jun 2024 05:45:00 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sat, 22 Jun
- 2024 22:44:59 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Sat, 22 Jun 2024 22:44:55 -0700
-Subject: [PATCH v2] KVM: x86: add missing MODULE_DESCRIPTION() macros
+	s=arc-20240116; t=1719129280; c=relaxed/simple;
+	bh=ThHtxcaKKJwtVm2xy20agXL0ZX0dERp9fOWFUzR3UYE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KinioCwlc6IyDdeS4/OxS41RCb+zGavjGSHItwIUUmpoeIjWEye4UNPw+4mFI+BPrA9FnSk4peYoupov0W4eeAvgALYc938HpI6fwTzTajfXhD4DeKSOUVAatl9NTpi7fWxMBsSdyhs91rsXwpvus60QWvDhY6WRKs4FEUFW9Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fjzVTtlN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09F50C4AF07;
+	Sun, 23 Jun 2024 07:54:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719129280;
+	bh=ThHtxcaKKJwtVm2xy20agXL0ZX0dERp9fOWFUzR3UYE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=fjzVTtlNvcqEcEWoI7PTcgEaP05YEThGRVzHIK+T6emDKWo8EkJMekvfW1cPoYFya
+	 vjydGf3Sd/2ZstS/C+7waFpTNrcI9NLsxjhQ/TfsKeFgC11WZshIyQBblMP/omiNzQ
+	 XZ5jTNGITRb+QC4fg8u65nSUzvtELaA43wyItCiOVr6+i/5J23dUZeR0MwIyZGcbW6
+	 I/U23FwBgitUtHKhx0SEPU9vAwQP1de4tYhKcpNpOQ4PQHJ8F+Ab7J4041O3kIEhlg
+	 Fl00t73NSaZwRKFIycU5UqHxhqKk1V01IFCH9J7Bw6IshO9DGUYqpImBcL0fYHBm07
+	 7PWIUpGJ8oJHQ==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a724e067017so13570166b.0;
+        Sun, 23 Jun 2024 00:54:39 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWCu1Mn3BwTONovQFrHaRjkDrhNk+5zHW+K7hoWZNOGv9Zy7mrEA2ZexGPBDkXC4OEtci/YEaxGx5z98J7qE3WA7gmxSQ5y0LnwpdDGlAtm9uz9LKMS8ovQ3DieYle6awIw
+X-Gm-Message-State: AOJu0Yz9trxsiI8QhxeMKcDT9a3w5e9CeEvEN01J71/ktY9f9K8a0FdD
+	6lmtGp9N2Qd6fyhKB0L7nZ+KtB27q1GmwK5iKnG75mVZoxIYSYCI9TUZl+1KQ6I3GL5YgyaCWH9
+	dPmMgLgKrotCGlFKu5Lbe1RpEl9c=
+X-Google-Smtp-Source: AGHT+IGdC1A4u0QMdJ5YUs7riJv01FR+EPkPDRGgR5UUavmgBTFDjQAr6hX4Lj47/t24hlDFWdbZw/JP6EbumzLYr88=
+X-Received: by 2002:a17:906:81b:b0:a6f:cf64:a5d9 with SMTP id
+ a640c23a62f3a-a7245c483a1mr76829066b.49.1719129278558; Sun, 23 Jun 2024
+ 00:54:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240622-md-kvm-v2-1-29a60f7c48b1@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAFe2d2YC/2WNwQ6DIBAFf8Vw7jZA1Zie+h+NB1ihblqwBSU2h
- n8veu1xknlvNhZNIBPZtdpYMIkiTb6APFUMR+UfBmgozCSXNW9kB26AZ3Jwaa3kGmvVaM6K/A7
- G0noc3fvCWkUDOiiP4z5/kV9WcCrOJuz6SHGewvfIJrGP/gpJgAAUumstt40Q8vZZCMnjGSfH+
- pzzD77Q2tW9AAAA
-To: Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini
-	<pbonzini@redhat.com>,
-        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
-	<mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>,
-        "H. Peter Anvin"
-	<hpa@zytor.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Jeff Johnson
-	<quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.14.0
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: jzzs4qQWZSnhSPoMVAu-13mhhTuHhGkz
-X-Proofpoint-ORIG-GUID: jzzs4qQWZSnhSPoMVAu-13mhhTuHhGkz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-22_19,2024-06-21_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- clxscore=1011 malwarescore=0 lowpriorityscore=0 priorityscore=1501
- adultscore=0 phishscore=0 mlxlogscore=861 bulkscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406230042
+References: <20240619080940.2690756-1-maobibo@loongson.cn> <20240619080940.2690756-2-maobibo@loongson.cn>
+In-Reply-To: <20240619080940.2690756-2-maobibo@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Sun, 23 Jun 2024 15:54:26 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7zF7zDZQ0tHtZndTmWDteaV=nAwXL3Q1P2zcJssVt7tA@mail.gmail.com>
+Message-ID: <CAAhV-H7zF7zDZQ0tHtZndTmWDteaV=nAwXL3Q1P2zcJssVt7tA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/6] LoongArch: KVM: Delay secondary mmu tlb flush
+ until guest entry
+To: Bibo Mao <maobibo@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, 
+	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix the following allmodconfig 'make W=1' warnings when building for x86:
-WARNING: modpost: missing MODULE_DESCRIPTION() in arch/x86/kvm/kvm.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in arch/x86/kvm/kvm-intel.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in arch/x86/kvm/kvm-amd.o
+Hi, Bibo,
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
-Changes in v2:
-- Per Sean:
-  - updated SVM and VMX descriptions to add "support for"
-  - updated kvm_main description to use the term Hypervisor (in 2 places)
-- Link to v1: https://lore.kernel.org/r/20240528-md-kvm-v1-1-c1b86f0f5112@quicinc.com
----
- arch/x86/kvm/svm/svm.c | 1 +
- arch/x86/kvm/vmx/vmx.c | 1 +
- virt/kvm/kvm_main.c    | 3 ++-
- 3 files changed, 4 insertions(+), 1 deletion(-)
+On Wed, Jun 19, 2024 at 4:09=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
+e:
+>
+> If there is page fault for secondary mmu, there needs tlb flush
+What does "secondary mmu" in this context mean? Maybe "guest mmu"?
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c8dc25886c16..e484a95ffbad 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -53,6 +53,7 @@
- #include "svm_onhyperv.h"
- 
- MODULE_AUTHOR("Qumranet");
-+MODULE_DESCRIPTION("KVM support for SVM (AMD-V) extensions");
- MODULE_LICENSE("GPL");
- 
- #ifdef MODULE
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index 6051fad5945f..2ec2b7105056 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -74,6 +74,7 @@
- #include "posted_intr.h"
- 
- MODULE_AUTHOR("Qumranet");
-+MODULE_DESCRIPTION("KVM support for VMX (Intel VT-x) extensions");
- MODULE_LICENSE("GPL");
- 
- #ifdef MODULE
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 14841acb8b95..ffe4ba998225 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -1,6 +1,6 @@
- // SPDX-License-Identifier: GPL-2.0-only
- /*
-- * Kernel-based Virtual Machine driver for Linux
-+ * Kernel-based Virtual Machine (KVM) Hypervisor
-  *
-  * This module enables machines with Intel VT-x extensions to run virtual
-  * machines without emulation or binary translation.
-@@ -74,6 +74,7 @@
- #define ITOA_MAX_LEN 12
- 
- MODULE_AUTHOR("Qumranet");
-+MODULE_DESCRIPTION("Kernel-based Virtual Machine (KVM) Hypervisor");
- MODULE_LICENSE("GPL");
- 
- /* Architectures should define their poll value according to the halt latency */
+Huacai
 
----
-base-commit: 2bfcfd584ff5ccc8bb7acde19b42570414bf880b
-change-id: 20240528-md-kvm-36f20bc4a5b0
-
+> operation indexed with fault gpa address and VMID. VMID is stored
+> at register CSR_GSTAT and will be reload or recalculated during
+> guest entry.
+>
+> Currently CSR_GSTAT is not saved and restored during vcpu context
+> switch, it is recalculated during guest entry. So CSR_GSTAT is in
+> effect only when vcpu runs in guest mode, however it may be not in
+> effected if vcpu exits to host mode, since register CSR_GSTAT may
+> be stale, it maybe records VMID of last scheduled vcpu, rather than
+> current vcpu.
+>
+> Function kvm_flush_tlb_gpa() should be called with its real VMID,
+> here move it to guest entrance. Also arch specific request id
+> KVM_REQ_TLB_FLUSH_GPA is added to flush tlb, and it can be optimized
+> if VMID is updated, since all guest tlb entries will be invalid if
+> VMID is updated.
+>
+> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> ---
+>  arch/loongarch/include/asm/kvm_host.h |  2 ++
+>  arch/loongarch/kvm/main.c             |  1 +
+>  arch/loongarch/kvm/mmu.c              |  4 ++--
+>  arch/loongarch/kvm/tlb.c              |  5 +----
+>  arch/loongarch/kvm/vcpu.c             | 18 ++++++++++++++++++
+>  5 files changed, 24 insertions(+), 6 deletions(-)
+>
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
+de/asm/kvm_host.h
+> index c87b6ea0ec47..32c4948f534f 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -30,6 +30,7 @@
+>  #define KVM_PRIVATE_MEM_SLOTS          0
+>
+>  #define KVM_HALT_POLL_NS_DEFAULT       500000
+> +#define KVM_REQ_TLB_FLUSH_GPA          KVM_ARCH_REQ(0)
+>
+>  #define KVM_GUESTDBG_SW_BP_MASK                \
+>         (KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)
+> @@ -190,6 +191,7 @@ struct kvm_vcpu_arch {
+>
+>         /* vcpu's vpid */
+>         u64 vpid;
+> +       gpa_t flush_gpa;
+>
+>         /* Frequency of stable timer in Hz */
+>         u64 timer_mhz;
+> diff --git a/arch/loongarch/kvm/main.c b/arch/loongarch/kvm/main.c
+> index 86a2f2d0cb27..844736b99d38 100644
+> --- a/arch/loongarch/kvm/main.c
+> +++ b/arch/loongarch/kvm/main.c
+> @@ -242,6 +242,7 @@ void kvm_check_vpid(struct kvm_vcpu *vcpu)
+>                 kvm_update_vpid(vcpu, cpu);
+>                 trace_kvm_vpid_change(vcpu, vcpu->arch.vpid);
+>                 vcpu->cpu =3D cpu;
+> +               kvm_clear_request(KVM_REQ_TLB_FLUSH_GPA, vcpu);
+>         }
+>
+>         /* Restore GSTAT(0x50).vpid */
+> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+> index 98883aa23ab8..9e39d28fec35 100644
+> --- a/arch/loongarch/kvm/mmu.c
+> +++ b/arch/loongarch/kvm/mmu.c
+> @@ -908,8 +908,8 @@ int kvm_handle_mm_fault(struct kvm_vcpu *vcpu, unsign=
+ed long gpa, bool write)
+>                 return ret;
+>
+>         /* Invalidate this entry in the TLB */
+> -       kvm_flush_tlb_gpa(vcpu, gpa);
+> -
+> +       vcpu->arch.flush_gpa =3D gpa;
+> +       kvm_make_request(KVM_REQ_TLB_FLUSH_GPA, vcpu);
+>         return 0;
+>  }
+>
+> diff --git a/arch/loongarch/kvm/tlb.c b/arch/loongarch/kvm/tlb.c
+> index 02535df6b51f..ebdbe9264e9c 100644
+> --- a/arch/loongarch/kvm/tlb.c
+> +++ b/arch/loongarch/kvm/tlb.c
+> @@ -23,10 +23,7 @@ void kvm_flush_tlb_all(void)
+>
+>  void kvm_flush_tlb_gpa(struct kvm_vcpu *vcpu, unsigned long gpa)
+>  {
+> -       unsigned long flags;
+> -
+> -       local_irq_save(flags);
+> +       lockdep_assert_irqs_disabled();
+>         gpa &=3D (PAGE_MASK << 1);
+>         invtlb(INVTLB_GID_ADDR, read_csr_gstat() & CSR_GSTAT_GID, gpa);
+> -       local_irq_restore(flags);
+>  }
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 9e8030d45129..b747bd8bc037 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -51,6 +51,16 @@ static int kvm_check_requests(struct kvm_vcpu *vcpu)
+>         return RESUME_GUEST;
+>  }
+>
+> +static void kvm_late_check_requests(struct kvm_vcpu *vcpu)
+> +{
+> +       lockdep_assert_irqs_disabled();
+> +       if (kvm_check_request(KVM_REQ_TLB_FLUSH_GPA, vcpu))
+> +               if (vcpu->arch.flush_gpa !=3D INVALID_GPA) {
+> +                       kvm_flush_tlb_gpa(vcpu, vcpu->arch.flush_gpa);
+> +                       vcpu->arch.flush_gpa =3D INVALID_GPA;
+> +               }
+> +}
+> +
+>  /*
+>   * Check and handle pending signal and vCPU requests etc
+>   * Run with irq enabled and preempt enabled
+> @@ -101,6 +111,13 @@ static int kvm_pre_enter_guest(struct kvm_vcpu *vcpu=
+)
+>                 /* Make sure the vcpu mode has been written */
+>                 smp_store_mb(vcpu->mode, IN_GUEST_MODE);
+>                 kvm_check_vpid(vcpu);
+> +
+> +               /*
+> +                * Called after function kvm_check_vpid()
+> +                * Since it updates csr_gstat used by kvm_flush_tlb_gpa()=
+,
+> +                * also it may clear KVM_REQ_TLB_FLUSH_GPA pending bit
+> +                */
+> +               kvm_late_check_requests(vcpu);
+>                 vcpu->arch.host_eentry =3D csr_read64(LOONGARCH_CSR_EENTR=
+Y);
+>                 /* Clear KVM_LARCH_SWCSR_LATEST as CSR will change when e=
+nter guest */
+>                 vcpu->arch.aux_inuse &=3D ~KVM_LARCH_SWCSR_LATEST;
+> @@ -994,6 +1011,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+>         struct loongarch_csrs *csr;
+>
+>         vcpu->arch.vpid =3D 0;
+> +       vcpu->arch.flush_gpa =3D INVALID_GPA;
+>
+>         hrtimer_init(&vcpu->arch.swtimer, CLOCK_MONOTONIC, HRTIMER_MODE_A=
+BS_PINNED);
+>         vcpu->arch.swtimer.function =3D kvm_swtimer_wakeup;
+> --
+> 2.39.3
+>
 
