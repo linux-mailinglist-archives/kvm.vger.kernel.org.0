@@ -1,184 +1,206 @@
-Return-Path: <kvm+bounces-20332-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20333-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552C7913974
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 12:14:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C95B91397A
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 12:15:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCD4F1F2228D
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 10:14:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB8921F2244F
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 10:15:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0276D12D205;
-	Sun, 23 Jun 2024 10:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0272B664;
+	Sun, 23 Jun 2024 10:15:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yeax3TV8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aZBIjQUe"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 288862F2D;
-	Sun, 23 Jun 2024 10:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93FA47B3FD
+	for <kvm@vger.kernel.org>; Sun, 23 Jun 2024 10:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719137672; cv=none; b=eMq8H8xv2xJrTdNponKq7tQCxrynPLblfQmLAsmI53sX4OCd4dhPvKAbcb+6LT2D/d/7UIkFHkcq41T1C64iHn9oqFKuCm2udilzmpdeosPv5p8BBEXpFu0Z/IbdtlAKSXOwFnFKVKSJ6+98Q0yeF6IkEqCsupAzjJQRFpgeMLg=
+	t=1719137708; cv=none; b=SVzTUs5vvkUrXoLipi5gFRPeCg1OVdH5CxWOO8cc+Nxjh6A3CW+PGVIXge4kzHHpeGrCvKqdsa3/mj/4G/rndJdbNW5qj92FpII22ch2Wko+dJEgJIOPLLa8B8RKT4ralvyJNVpRJyY9+KoKEakGpv3E12minGNPXFLvPtX84M0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719137672; c=relaxed/simple;
-	bh=BZlC/ZevG7rNZB+An/8lQl1qYs2YQHp78gl2A6TVgss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QGmKOWJ6D7ntGNjluNajYkxrFKmkIMuA6nJcPGWxH+QlxCf+l1jr6GRmzvkeqUZGyY4rgiH8itHv55P6wUF8SBnojxIOuYh5/lYUvJ5dOUcE4TaJU0T+vZDTLfsiQF8nC9YwxxXVU2jaVt4or0v4yD79esxKMDP0kX+dZqqd3dA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yeax3TV8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 067B3C4AF09;
-	Sun, 23 Jun 2024 10:14:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719137672;
-	bh=BZlC/ZevG7rNZB+An/8lQl1qYs2YQHp78gl2A6TVgss=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Yeax3TV85qsXBTAp84fR8Se2MlNyPLGpoGlpL2ValOuuPWxiu4d4pxZr4fCZBSFuo
-	 57C/138HqoHv/3p9QngbY7bmnQoG7qtR+3IyUM+nsVY/MXpEwRivsY/rh/QK6SS5gz
-	 NULmhedM03sTKnrxjQzIuH/VG+mKnKvozuoY1r8apQljpCJba8d1ROY/sImC3vKegR
-	 ShO0FeoM92fD5ajp0ZRx5tzH3ZH+kC8A/yMuRzRJf8Llxxu5zdjkiLn5zSUH58VHTI
-	 94jxd5NVFQoZ5ciZEsFeWNgRJOaXrrb1dkjvCgfzVrMbpwtGjbne3MBFOV0rs/UtRH
-	 +Dvake5szy2GQ==
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-57d1d45ba34so3620209a12.3;
-        Sun, 23 Jun 2024 03:14:31 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCW8hMc16LE70ICp92UIn8O83wIycfn5eTk7JfP+VyqJ/gq4bx0aWacwH7UFHTqOypAUDoHsVJfkGfJO+hidheeYJutrwCvtC93CWVmiYjNtNuOqxrI1gW5nm/AEOsAtsx+6
-X-Gm-Message-State: AOJu0Yzg9DxykQoNpccOIV6iS5jXHvN1970OjTL6684ySQDXsSZO93vY
-	aQwiOSBcq+j76HsRCRTt+5R443jcPBREcxOF+z+ak8x1OyUxSezYfGnkEUvbaoWP++9AIvNS08W
-	PJCD7gfO4hclhaKDd4LSZh5N2+zA=
-X-Google-Smtp-Source: AGHT+IFwRyIcVSZvyXuz/Y5ENfaFoKjmeiBwqiYsSvIY+pVoBRHNwxCJKvllX7B4eNayMPzNqbM8OHgJEYlbks1+9Q4=
-X-Received: by 2002:a17:907:d509:b0:a6f:27e6:8892 with SMTP id
- a640c23a62f3a-a7245dc9697mr132487866b.60.1719137670505; Sun, 23 Jun 2024
- 03:14:30 -0700 (PDT)
+	s=arc-20240116; t=1719137708; c=relaxed/simple;
+	bh=OuR2sYZAr2eBHxaMxpLs26oNyCGBj4JLZvUZ0k+VmS8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OHEbMMgnb92G241FnyByIK8fecpWrsFj0TUSY532I5qWywpJ9K4Cm+9bsWYZBlZBnwTyEMMIKmkyIvFpBkAfz8iY16RBSZArm0LHctLkJp1fjCPpymrfextRZaN0TCsliz31Yvr0tdbNo633wSCFOGWwXjaEPJS+Y0SqAp0HmIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aZBIjQUe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719137704;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sOci2B9Gr4WI6Fbop3cV6xh51JciMNHVROXI0Qgvuqs=;
+	b=aZBIjQUeGKIO1FQp5W1oNjRQpDASA35eq+HF3GawsyzUVDEO3hYoZZED111KafQWNjv/y7
+	DVzLW34wQFtazkjRa9sri9bPFgt6D7zd5Pby/9s3TdSXxwnWUzVf6s644W/pq0D3a3Pf2P
+	qBV3i3vIMUFD36/XdQaMV83GsJhUJJo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-686-x_CRDQSvNPGGGodS58m5gQ-1; Sun, 23 Jun 2024 06:15:03 -0400
+X-MC-Unique: x_CRDQSvNPGGGodS58m5gQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-366e0a4c965so490071f8f.1
+        for <kvm@vger.kernel.org>; Sun, 23 Jun 2024 03:15:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719137702; x=1719742502;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sOci2B9Gr4WI6Fbop3cV6xh51JciMNHVROXI0Qgvuqs=;
+        b=i6OfqETf1rHlMv+eLo38ToICXOJt/39vGFXfG0vyyHj/y6QmsUfnyn2/4iuFTU45Sb
+         iHYVrkZ2JEvIkJPypK/H1clOl9bK4TNwn8O4S90pdEAy05AsXm715k1/I/lZx7nwNrAL
+         4aD1Awsq4Zxmim6vUOZWdenzx+QKjecQHcUZ6D4u1BEd+VN3Jc8BmxQePw0qz3Q/rcGM
+         4bXO3xkOAU3WR2A5KvnyKPdd4FcjAmHCAcWIPf123US73NtoumhVN1yYtq+EMDuk7TFm
+         x5S9GlDEqq7L14Lpj2gUI7JGj3fSUkfs/+maY+TTA6PAQ56iyrcoFfOa1CZky8YiShCd
+         HvUw==
+X-Forwarded-Encrypted: i=1; AJvYcCVLpTyW0+PFeq84j3ld/9aNsedwWaH6vG7Lf3Q8PS2odmN/jZ4111u0iqC35C21hPsWiRW5autBU2QauovaHiZYqjnC
+X-Gm-Message-State: AOJu0Yz1t1jtXbfIvJPLmfELrr2hAdsOK0KpxG5NoEpwTovuWGDrpUj5
+	KVYfg3YbOQrZD22tzT+QFpWPfeUMi3+NrmcRUl2Y9gYsbQjEHqOcP/SLkyX005rIAdvqMtJQEb4
+	dlrH/TSaCZiULGOj/NaEfadBKXixY62Cb8oUcJ72H1jOQ2CVWbQ==
+X-Received: by 2002:a05:6000:dcd:b0:35f:1c34:adfc with SMTP id ffacd0b85a97d-366e96bf06bmr1002438f8f.67.1719137701822;
+        Sun, 23 Jun 2024 03:15:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFPPDC3HI60pWL+wtMB9iK/gooIH7i9Iz/3lSKlTGUXQzR11017FM83y2VnixVMSw+lIyxO0Q==
+X-Received: by 2002:a05:6000:dcd:b0:35f:1c34:adfc with SMTP id ffacd0b85a97d-366e96bf06bmr1002414f8f.67.1719137701075;
+        Sun, 23 Jun 2024 03:15:01 -0700 (PDT)
+Received: from redhat.com ([2.52.146.100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366389b861bsm6874269f8f.29.2024.06.23.03.14.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 Jun 2024 03:15:00 -0700 (PDT)
+Date: Sun, 23 Jun 2024 06:14:53 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Vadim Pasternak <vadimp@nvidia.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Eric Farman <farman@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	David Hildenbrand <david@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	"linux-um@lists.infradead.org" <linux-um@lists.infradead.org>,
+	"platform-driver-x86@vger.kernel.org" <platform-driver-x86@vger.kernel.org>,
+	"linux-remoteproc@vger.kernel.org" <linux-remoteproc@vger.kernel.org>,
+	"linux-s390@vger.kernel.org" <linux-s390@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH vhost v9 2/6] virtio: remove support for names array
+ entries being null.
+Message-ID: <20240623061141-mutt-send-email-mst@kernel.org>
+References: <20240424091533.86949-1-xuanzhuo@linux.alibaba.com>
+ <20240424091533.86949-3-xuanzhuo@linux.alibaba.com>
+ <20240620035749-mutt-send-email-mst@kernel.org>
+ <1718872778.4831812-1-xuanzhuo@linux.alibaba.com>
+ <20240620044839-mutt-send-email-mst@kernel.org>
+ <DS0PR11MB6373310FBF95058B8FE8CD95DCCA2@DS0PR11MB6373.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240527074644.836699-1-maobibo@loongson.cn> <20240527074644.836699-5-maobibo@loongson.cn>
-In-Reply-To: <20240527074644.836699-5-maobibo@loongson.cn>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 23 Jun 2024 18:14:19 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7wdMH=fdGhtxcJ9zY+H-PKT2q0rgrsEPm+LhBgCqNsjQ@mail.gmail.com>
-Message-ID: <CAAhV-H7wdMH=fdGhtxcJ9zY+H-PKT2q0rgrsEPm+LhBgCqNsjQ@mail.gmail.com>
-Subject: Re: [PATCH v3 4/4] LoongArch: KVM: Add VM LBT feature detection support
-To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DS0PR11MB6373310FBF95058B8FE8CD95DCCA2@DS0PR11MB6373.namprd11.prod.outlook.com>
 
-Hi, Bibo,
+On Sat, Jun 22, 2024 at 06:07:35AM +0000, Wang, Wei W wrote:
+> On Thursday, June 20, 2024 5:01 PM, Michael S. Tsirkin wrote:
+> > On Thu, Jun 20, 2024 at 04:39:38PM +0800, Xuan Zhuo wrote:
+> > > On Thu, 20 Jun 2024 04:02:45 -0400, "Michael S. Tsirkin" <mst@redhat.com>
+> > wrote:
+> > > > On Wed, Apr 24, 2024 at 05:15:29PM +0800, Xuan Zhuo wrote:
+> > > > > commit 6457f126c888 ("virtio: support reserved vqs") introduced
+> > > > > this support. Multiqueue virtio-net use 2N as ctrl vq finally, so
+> > > > > the logic doesn't apply. And not one uses this.
+> > > > >
+> > > > > On the other side, that makes some trouble for us to refactor the
+> > > > > find_vqs() params.
+> > > > >
+> > > > > So I remove this support.
+> > > > >
+> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > > > > Acked-by: Jason Wang <jasowang@redhat.com>
+> > > > > Acked-by: Eric Farman <farman@linux.ibm.com> # s390
+> > > > > Acked-by: Halil Pasic <pasic@linux.ibm.com>
+> > > >
+> > > >
+> > > > I don't mind, but this patchset is too big already.
+> > > > Why do we need to make this part of this patchset?
+> > >
+> > >
+> > > If some the pointers of the names is NULL, then in the virtio ring, we
+> > > will have a trouble to index from the arrays(names, callbacks...).
+> > > Becasue that the idx of the vq is not the index of these arrays.
+> > >
+> > > If the names is [NULL, "rx", "tx"], the first vq is the "rx", but
+> > > index of the vq is zero, but the index of the info of this vq inside the arrays is
+> > 1.
+> > 
+> > 
+> > Ah. So actually, it used to work.
+> > 
+> > What this should refer to is
+> > 
+> > commit ddbeac07a39a81d82331a312d0578fab94fccbf1
+> > Author: Wei Wang <wei.w.wang@intel.com>
+> > Date:   Fri Dec 28 10:26:25 2018 +0800
+> > 
+> >     virtio_pci: use queue idx instead of array idx to set up the vq
+> > 
+> >     When find_vqs, there will be no vq[i] allocation if its corresponding
+> >     names[i] is NULL. For example, the caller may pass in names[i] (i=4)
+> >     with names[2] being NULL because the related feature bit is turned off,
+> >     so technically there are 3 queues on the device, and name[4] should
+> >     correspond to the 3rd queue on the device.
+> > 
+> >     So we use queue_idx as the queue index, which is increased only when the
+> >     queue exists.
+> > 
+> >     Signed-off-by: Wei Wang <wei.w.wang@intel.com>
+> >     Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > 
+> 
+> The approach was taken to prevent the creation (by the device) of unnecessary
+> queues that would remain unused when the feature bit is turned off. Otherwise,
+> the device is required to create all conditional queues regardless of their necessity.
+> 
+> > 
+> > Which made it so setting names NULL actually does not reserve a vq.
+> 
+> If there is a need for an explicit queue reservation, it might be feasible to assign
+> a specific name to the queue(e.g. "reserved")?
+> This will require the device to have the reserved queue added.
 
-On Mon, May 27, 2024 at 3:46=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
-e:
->
-> Before virt machine or vcpu is created, vmm need check supported
-> features from KVM. Here ioctl command KVM_HAS_DEVICE_ATTR is added
-> for VM, and macro KVM_LOONGARCH_VM_FEAT_CTRL is added to check
-> supported feature.
->
-> Three sub-features relative with LBT are added, in later any new
-> feature can be added if it is used for vmm. The sub-features is
->  KVM_LOONGARCH_VM_FEAT_X86BT
->  KVM_LOONGARCH_VM_FEAT_ARMBT
->  KVM_LOONGARCH_VM_FEAT_MIPSBT
->
-> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> ---
->  arch/loongarch/include/uapi/asm/kvm.h |  6 ++++
->  arch/loongarch/kvm/vm.c               | 44 ++++++++++++++++++++++++++-
->  2 files changed, 49 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/inclu=
-de/uapi/asm/kvm.h
-> index 656aa6a723a6..ed12e509815c 100644
-> --- a/arch/loongarch/include/uapi/asm/kvm.h
-> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> @@ -91,6 +91,12 @@ struct kvm_fpu {
->  #define KVM_IOC_CSRID(REG)             LOONGARCH_REG_64(KVM_REG_LOONGARC=
-H_CSR, REG)
->  #define KVM_IOC_CPUCFG(REG)            LOONGARCH_REG_64(KVM_REG_LOONGARC=
-H_CPUCFG, REG)
->
-> +/* Device Control API on vm fd */
-> +#define KVM_LOONGARCH_VM_FEAT_CTRL     0
-> +#define  KVM_LOONGARCH_VM_FEAT_X86BT   0
-> +#define  KVM_LOONGARCH_VM_FEAT_ARMBT   1
-> +#define  KVM_LOONGARCH_VM_FEAT_MIPSBT  2
-I think LBT should be vcpu features rather than vm features, which is
-the same like CPUCFG and FP/SIMD.
+That's quite a hack, NULL as a special value is much more
+idiomatic.
 
-Moreover, this patch can be merged to the 2nd one.
+Given driver and qemu are both non spec compliant but *in splightly
+different ways* I think we should just fix both the driver and qemu to
+be spec compliant.
 
-Huacai
 
-> +
->  /* Device Control API on vcpu fd */
->  #define KVM_LOONGARCH_VCPU_CPUCFG      0
->  #define KVM_LOONGARCH_VCPU_PVTIME_CTRL 1
-> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
-> index 6b2e4f66ad26..09e05108c68b 100644
-> --- a/arch/loongarch/kvm/vm.c
-> +++ b/arch/loongarch/kvm/vm.c
-> @@ -99,7 +99,49 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long=
- ext)
->         return r;
->  }
->
-> +static int kvm_vm_feature_has_attr(struct kvm *kvm, struct kvm_device_at=
-tr *attr)
-> +{
-> +       switch (attr->attr) {
-> +       case KVM_LOONGARCH_VM_FEAT_X86BT:
-> +               if (cpu_has_lbt_x86)
-> +                       return 0;
-> +               return -ENXIO;
-> +       case KVM_LOONGARCH_VM_FEAT_ARMBT:
-> +               if (cpu_has_lbt_arm)
-> +                       return 0;
-> +               return -ENXIO;
-> +       case KVM_LOONGARCH_VM_FEAT_MIPSBT:
-> +               if (cpu_has_lbt_mips)
-> +                       return 0;
-> +               return -ENXIO;
-> +       default:
-> +               return -ENXIO;
-> +       }
-> +}
-> +
-> +static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr=
-)
-> +{
-> +       switch (attr->group) {
-> +       case KVM_LOONGARCH_VM_FEAT_CTRL:
-> +               return kvm_vm_feature_has_attr(kvm, attr);
-> +       default:
-> +               return -ENXIO;
-> +       }
-> +}
-> +
->  int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned lo=
-ng arg)
->  {
-> -       return -ENOIOCTLCMD;
-> +       struct kvm *kvm =3D filp->private_data;
-> +       void __user *argp =3D (void __user *)arg;
-> +       struct kvm_device_attr attr;
-> +
-> +       switch (ioctl) {
-> +       case KVM_HAS_DEVICE_ATTR:
-> +               if (copy_from_user(&attr, argp, sizeof(attr)))
-> +                       return -EFAULT;
-> +
-> +               return kvm_vm_has_attr(kvm, &attr);
-> +       default:
-> +               return -EINVAL;
-> +       }
->  }
-> --
-> 2.39.3
->
+> > 
+> > But I worry about non pci transports - there's a chance they used a different
+> > index with the balloon. Did you test some of these?
+> > 
+> > --
+> > MST
+> > 
+
 
