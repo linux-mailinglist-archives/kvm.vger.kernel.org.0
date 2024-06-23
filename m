@@ -1,151 +1,308 @@
-Return-Path: <kvm+bounces-20330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A3019138D6
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 09:56:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E48AF91396F
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 12:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEE80281F23
-	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 07:56:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E392EB22607
+	for <lists+kvm@lfdr.de>; Sun, 23 Jun 2024 10:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E70A5EE97;
-	Sun, 23 Jun 2024 07:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED6412D1E8;
+	Sun, 23 Jun 2024 10:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bc4qwU92"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bn9xMcAd"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2FC61EB25;
-	Sun, 23 Jun 2024 07:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61D3982C67;
+	Sun, 23 Jun 2024 10:11:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719129354; cv=none; b=A1QCbxPtuXFpe3h4Eb3IrSGcSeiB/tAwlIamNSWlqvD0uDy77G/PJqoosNdtlVUcIgQXQyYwVo+11JEu7FM7RrhBZxhQmtwcNsMr4XEamZi6eIeWK5T6dsz1JiszGgOGpBb9SuAaiUbXMzNbxeePAFBJsP2A+t+XEMqgz3qPSPA=
+	t=1719137512; cv=none; b=B+HDioqwRLEsOkX4eb2IJQrtllLzmmGENSdNesUGOuzFNeiyN3fpEi2tT4lqlYjRr7fDPURXxG40DX9shqS7SBT5q+zpvksAa0vsdJXWnrD0EPN6Nw7xWQJVdQejvQ3VL5sNYApaPcJ76rJsR8VmAeQodlNDHXeJO+dAyhIbRjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719129354; c=relaxed/simple;
-	bh=rgqojQtganfsNyFa5sKdGm6qZZFIx5JMG901agYQJ3Y=;
+	s=arc-20240116; t=1719137512; c=relaxed/simple;
+	bh=UUY0EKFbtHDpNNMJ6x+IcJHo44grxkhEVKMk5APQydQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HHKz0YavlfqXqrmSFkryPU2UATmHBmS6bdoUGGBXmo6EUYrGtM0Yj4EincN0ZeQInVLLaZXQmtb4JAv6ChNxLULtTv9Cpe5PV0ShD5eAz7m79JtH/FcMj7KM+I2HV7ueXTdEJtd44uWh33lZsqGxeQPhKnJwct0yJKndRHRMxMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bc4qwU92; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 502FBC32786;
-	Sun, 23 Jun 2024 07:55:54 +0000 (UTC)
+	 To:Cc:Content-Type; b=lwO1kpMoLZdUZ5HlXZQlbLxRR86PiJmddTLjzPFZTzE5uw1Uk/PGkpNWiz2SIymB80jiDzocp2YerKccgUByot2R80QDppPPpAvKc/4JgukDTjgVBIa4giuXnuyZJJiC8Jz2vXlrVyR7Ukk96e9ksisAjx0Ye8heGPPvTlgblyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bn9xMcAd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCF1DC2BD10;
+	Sun, 23 Jun 2024 10:11:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719129354;
-	bh=rgqojQtganfsNyFa5sKdGm6qZZFIx5JMG901agYQJ3Y=;
+	s=k20201202; t=1719137511;
+	bh=UUY0EKFbtHDpNNMJ6x+IcJHo44grxkhEVKMk5APQydQ=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=Bc4qwU92Zb/N2WusRI/aj8UNKx2EGgS1JYl8M7ePpx4Hfl79eqAjK+NyeVW3pB5oN
-	 jdC/ivW4vJeKaWF8sk0u2WSer+tkovp7OIZrTa+3GeekSMDS2XFW4oVXMZZhWYISs6
-	 qUVGh6+ZV2j+S3zTJsFDd48mxfFWWmb2fgaWSF86B9LgiiebAxQMaqCyVXHjUxeLpc
-	 X3MRvuPbdgO4u0jU35S9LKyQcsLR/lOso62/6Xm5Rt/6X51zNARNtanceCHDP/5Vcy
-	 qoHfsElgjjkGwYb5GSLTJ2/UvLJLY2rlEJ92cZuLD9lXXukun5hf0pryNp37VIiY9q
-	 iHST5xIDk1F5Q==
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57d05e0017aso3961484a12.1;
-        Sun, 23 Jun 2024 00:55:54 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWzX1E7Aa1qvAGTEspCzmR4oTqEK9ThUrYtJpCChHIKh2zdTu4g/dQWISXXhuT3eKzFcLioeThLnJLEv0iXV5IyBTYFf5UcbFTXNrmgtPIT4kpLP1g499JwBZn6pEa7XDvz
-X-Gm-Message-State: AOJu0Yw8EDsLtugUMW1yNliCQXU/mGy3bgPTKNv93GaDs+9N4gbq5Q1p
-	B2oEZdjQc5Uu+/5AQE7Gda0pxyeqpOfOvSTOmcxh1It3cKQOH6/xywiRCKposBzH1Ht4+KAy7rI
-	0IzuGqv6R4zG8808gKg4XQRxeZY8=
-X-Google-Smtp-Source: AGHT+IH+q68pgvGWid8lDdf6e6JaOfr/7TiTueM58nZbAb66L6ay5EsP+L8r6fjfH5a4bJV8RQ9epsJMUv2TD/h/QaQ=
-X-Received: by 2002:a50:9f8d:0:b0:57d:1627:93ed with SMTP id
- 4fb4d7f45d1cf-57d457a1540mr1638421a12.22.1719129352908; Sun, 23 Jun 2024
- 00:55:52 -0700 (PDT)
+	b=Bn9xMcAd9+CR8jZA3h4iMqY4GBAhKcV3Z47UIrueRxjpD5SJ1mbhkwQqE/uI/zPPn
+	 Rx40dDn7Tb2ReolaxM9jKtbCg4oP8vRK0fGrfxF8oSZ4rr9cJVrjrARKTQckBlzcsr
+	 4g5RyLiTJmlDArPnzQr4gc7ETJznxqtJe0fBNeKPuxym9inhzu6t3DBkbHDZlBZvqH
+	 QJ0/mlSbvsPZ+MQxfz1ycn1vs6wY2J5VVNa1cLshGo4Z6YzreqN+YoGSwG7RJ7vb9U
+	 9pK98hbRU1fIA0rohiroWqgGaq6b56k3etFNmLYQuyVKq1ccyAoKFIFrJHPFWdceci
+	 YAUrvX2sDXt2w==
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-57cbc66a0a6so2331910a12.1;
+        Sun, 23 Jun 2024 03:11:51 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXTxNFTosanaOd6Y72S85dxTVLfBSediXWFcg8J1Kfz7g31I8XpECVRanoSc37Kisf/tkX1gN1eOzgEiUHHQDXv2IM+4lg1BbJCznYCt1nZo9hV5EW0H/08EG640/oDgGY9
+X-Gm-Message-State: AOJu0YyhPLrKc+cJSTYZFYY0djW9A1abSUZ5QFlBZPPSVF3pfgeOFGou
+	zHkCZFbL2nBInMMdHX05Xv3EtquOjx53FNiRbUFYc0oqc0EgsUc8JcSHz2YrnpNu27+D36IlLjb
+	PGCd3YDRNeHFVzAW3VA3CvwkVbfU=
+X-Google-Smtp-Source: AGHT+IFaWt9kWADrSXuYKdHqoR3Ju4y0R08V2mfZ8XeBiNIiqNBhAYgyJ2FEkt2rKcK6yd9mE6ne1eeWh33cQpRth3U=
+X-Received: by 2002:a50:cdd5:0:b0:57c:f948:bf19 with SMTP id
+ 4fb4d7f45d1cf-57d44c12baemr2258546a12.7.1719137510399; Sun, 23 Jun 2024
+ 03:11:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240619080940.2690756-1-maobibo@loongson.cn> <20240619080940.2690756-3-maobibo@loongson.cn>
-In-Reply-To: <20240619080940.2690756-3-maobibo@loongson.cn>
+References: <20240527074644.836699-1-maobibo@loongson.cn> <20240527074644.836699-2-maobibo@loongson.cn>
+In-Reply-To: <20240527074644.836699-2-maobibo@loongson.cn>
 From: Huacai Chen <chenhuacai@kernel.org>
-Date: Sun, 23 Jun 2024 15:55:42 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7YXHwfdy-DFAd6_qPXdqbBVUSHq0U8Hu1eEgdtN_b+OA@mail.gmail.com>
-Message-ID: <CAAhV-H7YXHwfdy-DFAd6_qPXdqbBVUSHq0U8Hu1eEgdtN_b+OA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] LoongArch: KVM: Select huge page only if secondary
- mmu supports it
+Date: Sun, 23 Jun 2024 18:11:38 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6VpRzxAvVVifoXXHGK=46R4uO+Jp2aSbzsW-Gr0QPfHQ@mail.gmail.com>
+Message-ID: <CAAhV-H6VpRzxAvVVifoXXHGK=46R4uO+Jp2aSbzsW-Gr0QPfHQ@mail.gmail.com>
+Subject: Re: [PATCH v3 1/4] LoongArch: KVM: Add HW Binary Translation
+ extension support
 To: Bibo Mao <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, 
-	Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, loongarch@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 Hi, Bibo,
 
-On Wed, Jun 19, 2024 at 4:09=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
+On Mon, May 27, 2024 at 3:46=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> wrot=
 e:
 >
-> Currently page level selection about secondary mmu depends on memory
-> slot and page level about host mmu. There will be problem if page level
-> of secondary mmu is zero already. So page level selection should depend
-> on the following three conditions.
->  1. Memslot is aligned for huge page and vm is not migrating.
->  2. Page level of host mmu is huge page also.
->  3. Page level of secondary mmu is suituable for huge page, it cannot
-> be normal page since it is not supported to merge normal pages into
-> huge page now.
+> Loongson Binary Translation (LBT) is used to accelerate binary translatio=
+n,
+> which contains 4 scratch registers (scr0 to scr3), x86/ARM eflags (eflags=
+)
+> and x87 fpu stack pointer (ftop).
+>
+> Like FPU extension, here late enabling method is used for LBT. LBT contex=
+t
+> is saved/restored on vcpu context switch path.
 >
 > Signed-off-by: Bibo Mao <maobibo@loongson.cn>
 > ---
->  arch/loongarch/include/asm/kvm_mmu.h |  2 +-
->  arch/loongarch/kvm/mmu.c             | 16 +++++++++++++---
->  2 files changed, 14 insertions(+), 4 deletions(-)
+>  arch/loongarch/include/asm/kvm_host.h |  8 ++++
+>  arch/loongarch/include/asm/kvm_vcpu.h | 10 +++++
+>  arch/loongarch/kvm/exit.c             |  9 ++++
+>  arch/loongarch/kvm/vcpu.c             | 59 ++++++++++++++++++++++++++-
+>  4 files changed, 85 insertions(+), 1 deletion(-)
 >
-> diff --git a/arch/loongarch/include/asm/kvm_mmu.h b/arch/loongarch/includ=
-e/asm/kvm_mmu.h
-> index 099bafc6f797..d06ae0e0dde5 100644
-> --- a/arch/loongarch/include/asm/kvm_mmu.h
-> +++ b/arch/loongarch/include/asm/kvm_mmu.h
-> @@ -55,7 +55,7 @@ static inline void kvm_set_pte(kvm_pte_t *ptep, kvm_pte=
-_t val)
->  static inline int kvm_pte_write(kvm_pte_t pte) { return pte & _PAGE_WRIT=
-E; }
->  static inline int kvm_pte_dirty(kvm_pte_t pte) { return pte & _PAGE_DIRT=
-Y; }
->  static inline int kvm_pte_young(kvm_pte_t pte) { return pte & _PAGE_ACCE=
-SSED; }
-> -static inline int kvm_pte_huge(kvm_pte_t pte) { return pte & _PAGE_HUGE;=
- }
-> +static inline int kvm_pte_huge(kvm_pte_t pte)  { return !!(pte & _PAGE_H=
-UGE); }
-Why do we need this change?
-
-Huacai
-
+> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inclu=
+de/asm/kvm_host.h
+> index 2eb2f7572023..88023ab59486 100644
+> --- a/arch/loongarch/include/asm/kvm_host.h
+> +++ b/arch/loongarch/include/asm/kvm_host.h
+> @@ -133,6 +133,7 @@ enum emulation_result {
+>  #define KVM_LARCH_LASX         (0x1 << 2)
+>  #define KVM_LARCH_SWCSR_LATEST (0x1 << 3)
+>  #define KVM_LARCH_HWCSR_USABLE (0x1 << 4)
+> +#define KVM_LARCH_LBT          (0x1 << 5)
 >
->  static inline kvm_pte_t kvm_pte_mkyoung(kvm_pte_t pte)
->  {
-> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> index 9e39d28fec35..c6351d13ca1b 100644
-> --- a/arch/loongarch/kvm/mmu.c
-> +++ b/arch/loongarch/kvm/mmu.c
-> @@ -858,10 +858,20 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsi=
-gned long gpa, bool write)
+>  struct kvm_vcpu_arch {
+>         /*
+> @@ -166,6 +167,7 @@ struct kvm_vcpu_arch {
 >
->         /* Disable dirty logging on HugePages */
->         level =3D 0;
-> -       if (!fault_supports_huge_mapping(memslot, hva, write)) {
-> -               level =3D 0;
-> -       } else {
-> +       if (fault_supports_huge_mapping(memslot, hva, write)) {
-> +               /* Check page level about host mmu*/
->                 level =3D host_pfn_mapping_level(kvm, gfn, memslot);
-> +               if (level =3D=3D 1) {
-> +                       /*
-> +                        * Check page level about secondary mmu
-> +                        * Disable hugepage if it is normal page on
-> +                        * secondary mmu already
-> +                        */
-> +                       ptep =3D kvm_populate_gpa(kvm, NULL, gpa, 0);
-> +                       if (ptep && !kvm_pte_huge(*ptep))
-> +                               level =3D 0;
-> +               }
+>         /* FPU state */
+>         struct loongarch_fpu fpu FPU_ALIGN;
+> +       struct loongarch_lbt lbt;
+>
+>         /* CSR state */
+>         struct loongarch_csrs *csr;
+> @@ -235,6 +237,12 @@ static inline bool kvm_guest_has_lasx(struct kvm_vcp=
+u_arch *arch)
+>         return arch->cpucfg[2] & CPUCFG2_LASX;
+>  }
+>
+> +static inline bool kvm_guest_has_lbt(struct kvm_vcpu_arch *arch)
+> +{
+> +       return arch->cpucfg[2] & (CPUCFG2_X86BT | CPUCFG2_ARMBT
+> +                                       | CPUCFG2_MIPSBT);
+> +}
 > +
->                 if (level =3D=3D 1) {
->                         gfn =3D gfn & ~(PTRS_PER_PTE - 1);
->                         pfn =3D pfn & ~(PTRS_PER_PTE - 1);
+>  /* Debug: dump vcpu state */
+>  int kvm_arch_vcpu_dump_regs(struct kvm_vcpu *vcpu);
+>
+> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/inclu=
+de/asm/kvm_vcpu.h
+> index d7e51300a89f..ec46009be29b 100644
+> --- a/arch/loongarch/include/asm/kvm_vcpu.h
+> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
+> @@ -75,6 +75,16 @@ static inline void kvm_save_lasx(struct loongarch_fpu =
+*fpu) { }
+>  static inline void kvm_restore_lasx(struct loongarch_fpu *fpu) { }
+>  #endif
+>
+> +#ifdef CONFIG_CPU_HAS_LBT
+> +int kvm_own_lbt(struct kvm_vcpu *vcpu);
+> +#else
+> +static inline int kvm_own_lbt(struct kvm_vcpu *vcpu) { return -EINVAL; }
+> +static inline void kvm_lose_lbt(struct kvm_vcpu *vcpu) { }
+> +static inline void kvm_enable_lbt_fpu(struct kvm_vcpu *vcpu,
+> +                                       unsigned long fcsr) { }
+> +static inline void kvm_check_fcsr(struct kvm_vcpu *vcpu) { }
+> +#endif
+It is better to keep symmetry here. That means also declare
+kvm_lose_lbt for CONFIG_CPU_HAS_LBT, and move the last two functions
+to .c because they are static.
+
+> +
+>  void kvm_init_timer(struct kvm_vcpu *vcpu, unsigned long hz);
+>  void kvm_reset_timer(struct kvm_vcpu *vcpu);
+>  void kvm_save_timer(struct kvm_vcpu *vcpu);
+> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
+> index e2abd97fb13f..e1bd81d27fd8 100644
+> --- a/arch/loongarch/kvm/exit.c
+> +++ b/arch/loongarch/kvm/exit.c
+> @@ -835,6 +835,14 @@ static int kvm_handle_hypercall(struct kvm_vcpu *vcp=
+u)
+>         return ret;
+>  }
+>
+> +static int kvm_handle_lbt_disabled(struct kvm_vcpu *vcpu)
+> +{
+> +       if (kvm_own_lbt(vcpu))
+> +               kvm_queue_exception(vcpu, EXCCODE_INE, 0);
+> +
+> +       return RESUME_GUEST;
+> +}
+> +
+>  /*
+>   * LoongArch KVM callback handling for unimplemented guest exiting
+>   */
+> @@ -867,6 +875,7 @@ static exit_handle_fn kvm_fault_tables[EXCCODE_INT_ST=
+ART] =3D {
+>         [EXCCODE_LASXDIS]               =3D kvm_handle_lasx_disabled,
+>         [EXCCODE_GSPR]                  =3D kvm_handle_gspr,
+>         [EXCCODE_HVC]                   =3D kvm_handle_hypercall,
+> +       [EXCCODE_BTDIS]                 =3D kvm_handle_lbt_disabled,
+>  };
+>
+>  int kvm_handle_fault(struct kvm_vcpu *vcpu, int fault)
+> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> index 382796f1d3e6..8f80d1a2dcbb 100644
+> --- a/arch/loongarch/kvm/vcpu.c
+> +++ b/arch/loongarch/kvm/vcpu.c
+> @@ -6,6 +6,7 @@
+>  #include <linux/kvm_host.h>
+>  #include <linux/entry-kvm.h>
+>  #include <asm/fpu.h>
+> +#include <asm/lbt.h>
+>  #include <asm/loongarch.h>
+>  #include <asm/setup.h>
+>  #include <asm/time.h>
+> @@ -952,12 +953,64 @@ int kvm_arch_vcpu_ioctl_set_fpu(struct kvm_vcpu *vc=
+pu, struct kvm_fpu *fpu)
+>         return 0;
+>  }
+>
+> +#ifdef CONFIG_CPU_HAS_LBT
+> +int kvm_own_lbt(struct kvm_vcpu *vcpu)
+> +{
+> +       if (!kvm_guest_has_lbt(&vcpu->arch))
+> +               return -EINVAL;
+> +
+> +       preempt_disable();
+> +       set_csr_euen(CSR_EUEN_LBTEN);
+> +
+> +       _restore_lbt(&vcpu->arch.lbt);
+> +       vcpu->arch.aux_inuse |=3D KVM_LARCH_LBT;
+> +       preempt_enable();
+> +       return 0;
+> +}
+> +
+> +static void kvm_lose_lbt(struct kvm_vcpu *vcpu)
+> +{
+> +       preempt_disable();
+> +       if (vcpu->arch.aux_inuse & KVM_LARCH_LBT) {
+> +               _save_lbt(&vcpu->arch.lbt);
+> +               clear_csr_euen(CSR_EUEN_LBTEN);
+> +               vcpu->arch.aux_inuse &=3D ~KVM_LARCH_LBT;
+> +       }
+> +       preempt_enable();
+> +}
+> +
+> +static void kvm_enable_lbt_fpu(struct kvm_vcpu *vcpu, unsigned long fcsr=
+)
+It is better to rename it to kvm_own_lbt_tm().
+
+> +{
+> +       /*
+> +        * if TM is enabled, top register save/restore will
+> +        * cause lbt exception, here enable lbt in advance
+> +        */
+> +       if (fcsr & FPU_CSR_TM)
+> +               kvm_own_lbt(vcpu);
+> +}
+> +
+> +static void kvm_check_fcsr(struct kvm_vcpu *vcpu)
+> +{
+> +       unsigned long fcsr;
+> +
+> +       if (vcpu->arch.aux_inuse & KVM_LARCH_FPU)
+> +               if (!(vcpu->arch.aux_inuse & KVM_LARCH_LBT)) {
+The condition can be simplified " if (vcpu->arch.aux_inuse &
+(KVM_LARCH_FPU|KVM_LARCH_LBT) =3D=3D KVM_LARCH_FPU)"
+
+> +                       fcsr =3D read_fcsr(LOONGARCH_FCSR0);
+> +                       kvm_enable_lbt_fpu(vcpu, fcsr);
+> +               }
+> +}
+> +#endif
+> +
+>  /* Enable FPU and restore context */
+>  void kvm_own_fpu(struct kvm_vcpu *vcpu)
+>  {
+>         preempt_disable();
+>
+> -       /* Enable FPU */
+> +       /*
+> +        * Enable FPU for guest
+> +        * We set FR and FRE according to guest context
+> +        */
+> +       kvm_enable_lbt_fpu(vcpu, vcpu->arch.fpu.fcsr);
+>         set_csr_euen(CSR_EUEN_FPEN);
+>
+>         kvm_restore_fpu(&vcpu->arch.fpu);
+> @@ -977,6 +1030,7 @@ int kvm_own_lsx(struct kvm_vcpu *vcpu)
+>         preempt_disable();
+>
+>         /* Enable LSX for guest */
+> +       kvm_enable_lbt_fpu(vcpu, vcpu->arch.fpu.fcsr);
+>         set_csr_euen(CSR_EUEN_LSXEN | CSR_EUEN_FPEN);
+>         switch (vcpu->arch.aux_inuse & KVM_LARCH_FPU) {
+>         case KVM_LARCH_FPU:
+> @@ -1011,6 +1065,7 @@ int kvm_own_lasx(struct kvm_vcpu *vcpu)
+>
+>         preempt_disable();
+>
+> +       kvm_enable_lbt_fpu(vcpu, vcpu->arch.fpu.fcsr);
+>         set_csr_euen(CSR_EUEN_FPEN | CSR_EUEN_LSXEN | CSR_EUEN_LASXEN);
+>         switch (vcpu->arch.aux_inuse & (KVM_LARCH_FPU | KVM_LARCH_LSX)) {
+>         case KVM_LARCH_LSX:
+> @@ -1042,6 +1097,7 @@ void kvm_lose_fpu(struct kvm_vcpu *vcpu)
+>  {
+>         preempt_disable();
+>
+> +       kvm_check_fcsr(vcpu);
+>         if (vcpu->arch.aux_inuse & KVM_LARCH_LASX) {
+>                 kvm_save_lasx(&vcpu->arch.fpu);
+>                 vcpu->arch.aux_inuse &=3D ~(KVM_LARCH_LSX | KVM_LARCH_FPU=
+ | KVM_LARCH_LASX);
+> @@ -1064,6 +1120,7 @@ void kvm_lose_fpu(struct kvm_vcpu *vcpu)
+>                 /* Disable FPU */
+>                 clear_csr_euen(CSR_EUEN_FPEN);
+>         }
+> +       kvm_lose_lbt(vcpu);
+>
+>         preempt_enable();
+>  }
 > --
 > 2.39.3
 >
