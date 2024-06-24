@@ -1,107 +1,93 @@
-Return-Path: <kvm+bounces-20370-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20371-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1442C914368
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 09:16:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3E6F91436C
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 09:17:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75166B20E91
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 07:16:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9ED21F24156
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 07:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FBE34503C;
-	Mon, 24 Jun 2024 07:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03EFE3C099;
+	Mon, 24 Jun 2024 07:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UzI4bQWa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017F23D393;
-	Mon, 24 Jun 2024 07:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6A0381B1
+	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 07:16:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719213331; cv=none; b=i6TGR1BRJeyRAKso3GuO5xaSZscJknjDkJNTQGF9Yil9D/0/DgvRs4OVJ17nLpbv+oNkVI379kArk5hF9CFeEJ3Ji1NDlKhiiA6shhj7SRBcl7WbyaVBVJ1dOxAdiwp8Z0Qtk8B42TrvNgw5Zoy1cFkWVXlKjffPG5MVw//hy7s=
+	t=1719213420; cv=none; b=Q485e8F3UNqmZFOYVv7cZQBRx2gU0R35WH4MjJPw6eDJpE+pSKaZDDOsLzwCAPBAuHe9COaJdYpPTmuKxFFDEouLMwPmqo2Myov1/ynrpl4UYTBB0It7AKoNC25ELa5MM5G3QWOTEz4vuab/25TYxB60JBBCpHywe23xZQko2Pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719213331; c=relaxed/simple;
-	bh=tMij1kigYbysiBVjoK1zx02otlNc/5BcBakZSzod/Sw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZwEDr14GrPtlFXRdpVda3Zki6af2tCVKi+MkF+oUassSJ9xGPX6zy19FzObHqgw6sQB1pqo79pZC082WgzuJ8wHRLNLdqwpWV1v30ezMZRh47XeHmqlIQL2O8RuyoK0UNs8ENQRqNgkG/Dn81rXPHkSUANEUmImQGC9tTiBoEzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.213])
-	by gateway (Coremail) with SMTP id _____8AxnOrSHHlmJnEJAA--.37961S3;
-	Mon, 24 Jun 2024 15:14:26 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.213])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxMMTPHHlmftsuAA--.9847S9;
-	Mon, 24 Jun 2024 15:14:25 +0800 (CST)
-From: Bibo Mao <maobibo@loongson.cn>
-To: Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>,
-	Sean Christopherson <seanjc@google.com>,
-	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	WANG Rui <wangrui@loongson.cn>
-Subject: [PATCH v3 7/7] LoongArch: KVM: Sync pending interrupt when getting ESTAT from user mode
-Date: Mon, 24 Jun 2024 15:14:22 +0800
-Message-Id: <20240624071422.3473789-8-maobibo@loongson.cn>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240624071422.3473789-1-maobibo@loongson.cn>
-References: <20240624071422.3473789-1-maobibo@loongson.cn>
+	s=arc-20240116; t=1719213420; c=relaxed/simple;
+	bh=xLXRqMHtTJplrNTM4G72ikgB7r/JLCZ3tnpY5j0npaU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mwvV9OYXM7QgYW7Bo06JntHrn4WJE+LaJz7rbRszrWWLHgtWJNIPoqJ21/COQznAB4mxYC1Wo4uDC7oA0kH+AX9VPO5aK7fR0dRs86tVJNYyq/n1DZTZHgiq38g/dnbgAXT72TiJ1Ce8ZpcBPXx8r8L2NE6KdQFOdrpchAnSFgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UzI4bQWa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 979E1C4AF09
+	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 07:16:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719213419;
+	bh=xLXRqMHtTJplrNTM4G72ikgB7r/JLCZ3tnpY5j0npaU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=UzI4bQWactX3dXMbpSGEFg+tcDmy5Qp1ig+GeVME6Ljeh25CC0gIpTwgAYhzX8Xfx
+	 Unub5nzsN5BCi/1bevpxBMj3T/uJQ+VQbrL3pObuwsL3I8v1T0hPxDZc8EM6mvwdfH
+	 dSKmr8wQOmPcnZX/xZ1/qG+AngXAhUwtYwQfBCn8dx/yOLYx5YOowedNRUUlaTOVHJ
+	 hcSFnLGRhbLNwzPC02oaLR9KAs74t5TYs1qkS3RnYKWGWZ6JUcwK1CKC7LrlnaEiRQ
+	 zBxkNZoSKYuw1l7Rn1BlBBuNYuNsfwjgigApgfx1/qLMlMH+XZqEcqk9vQWkRk/XsV
+	 vFlDLSoOUehoA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 7B0E8C53BB8; Mon, 24 Jun 2024 07:16:59 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218980] [VM boot] Guest Kernel hit BUG: kernel NULL pointer
+ dereference, address: 0000000000000010 and WARNING: CPU: 0 PID: 218 at
+ arch/x86/kernel/fpu/core.c:57 x86_task_fpu+0x17/0x20
+Date: Mon, 24 Jun 2024 07:16:59 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: hongyu.ning@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: attachments.created
+Message-ID: <bug-218980-28872-A9FOtw9Uo8@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218980-28872@https.bugzilla.kernel.org/>
+References: <bug-218980-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8DxMMTPHHlmftsuAA--.9847S9
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
 
-Currently interrupt is posted and cleared with asynchronous mode, and it
-is saved in SW state vcpu::arch::irq_pending and vcpu::arch::irq_clear.
-When vcpu is ready to run, pending interrupt is written back to ESTAT
-CSR register from SW state vcpu::arch::irq_pending at guest entrance.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218980
 
-During VM migration stage, vcpu is put into stopped state, however
-pending interrupt is not synced to ESTAT CSR register. So there will be
-interrupt lost when VCPU is migrated to other host machines.
+--- Comment #3 from hongyuni (hongyu.ning@intel.com) ---
+Created attachment 306488
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306488&action=3Dedit
+Call_Trace_decoded.log
 
-Here when ESTAT CSR register is read from VMM user mode, pending
-interrupt is synchronized to ESTAT also. So that vcpu can get correct
-pending interrupt.
+--=20
+You may reply to this email to add a comment.
 
-Signed-off-by: Bibo Mao <maobibo@loongson.cn>
----
- arch/loongarch/kvm/vcpu.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-index b747bd8bc037..6b612b8390f7 100644
---- a/arch/loongarch/kvm/vcpu.c
-+++ b/arch/loongarch/kvm/vcpu.c
-@@ -371,6 +371,17 @@ static int _kvm_getcsr(struct kvm_vcpu *vcpu, unsigned int id, u64 *val)
- 		return -EINVAL;
- 
- 	if (id == LOONGARCH_CSR_ESTAT) {
-+		preempt_disable();
-+		vcpu_load(vcpu);
-+		/*
-+		 * Sync pending interrupt into estat so that interrupt
-+		 * remains during migration stage
-+		 */
-+		kvm_deliver_intr(vcpu);
-+		vcpu->arch.aux_inuse &= ~KVM_LARCH_SWCSR_LATEST;
-+		vcpu_put(vcpu);
-+		preempt_enable();
-+
- 		/* ESTAT IP0~IP7 get from GINTC */
- 		gintc = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_GINTC) & 0xff;
- 		*val = kvm_read_sw_gcsr(csr, LOONGARCH_CSR_ESTAT) | (gintc << 2);
--- 
-2.39.3
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
