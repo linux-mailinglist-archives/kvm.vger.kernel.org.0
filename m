@@ -1,93 +1,185 @@
-Return-Path: <kvm+bounces-20362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20372-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D32839142F5
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 08:44:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85556914378
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 09:21:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 089E01C22014
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 06:44:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 309B428500D
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 07:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074D444361;
-	Mon, 24 Jun 2024 06:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1083C684;
+	Mon, 24 Jun 2024 07:21:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ryg1saf8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i2xPC8LG"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 318193F9FC
-	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 06:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5430E18AE4;
+	Mon, 24 Jun 2024 07:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719211491; cv=none; b=my8jZOx8ZaCQ+IhyQv7D1piYUpgXFsviQQUaFDBqk38uZoo8w+Y68A56t37nDyMxHf+dfERX/7IpHF2boo3M5rI82qkC1/TpPWDr5CgCgXnHbAnECkPgsfcvlQbwcn+k9Or9G0ebMUR+DkHwOqR3zW0yCrCbcNy4LHxE6QPbEUQ=
+	t=1719213680; cv=none; b=IOpqIr/4ZHpFmiQ6TmE2PMX2RF4iKqKHXNgg1gBJyQRYVuc4y2I6Hq4Xr4NN7qQsLfUF5K6O+0dchhKgAv6sv47Bx9bEOPHlwHGOxi1+t9lRzMFGAdnWKdZiIkMDmQpY2E/8f9ETHphOB1zHXIDZfKBOgokoSWQyUj9v8aZxTKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719211491; c=relaxed/simple;
-	bh=FIjttnVCN/+cyqeDAOXlwq4dR4RJtGK617Q1vxRRKYE=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=o1qPy5ByEg2G1a2t0hDZmkjp5X+FipnyiT6ePRFwN6O3fo5QadAiuL67JkQtTNshaMGwB0301nsBbaDU1NycptZchL/mTl8BNJtQfQZnGHhQz3esjs3xfv55cnAronL6+1j7yifgFMPBfNLHXi2oNG5MSp9+5KvpIa+CpSW01LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ryg1saf8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D1D3EC32789
-	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 06:44:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719211490;
-	bh=FIjttnVCN/+cyqeDAOXlwq4dR4RJtGK617Q1vxRRKYE=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ryg1saf88mH7pAvslvpANApmKVTK6FItPd/rPilgR3KyizOEqx28UuOlQsf2WV2fl
-	 PLIZvdGuXpq/sEZK36Bxlu49lWFGKd+Irq60GbOKaQyrFtHRUwAUq8FcLtICuUvVkR
-	 bcvFhe0Zu5TysUsuAI9GM7c83gaKY0CGABieLRfBANsN4R98oidQPVi8L6p357LEi5
-	 mZcSaC1HNlfoJ8VVaHSQfmlr0UNjxNpL2DSk4M2al4OKfwCkuEdmMPNpxe9T8ZnKZ3
-	 /9p0ov/xncMzqi9aVZQm8cc/lze3yGCFAlfAcclqs+xG2R2qWk953s2+cR6oUC26N3
-	 WjO1tycS46DBA==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id CB10BC53B7E; Mon, 24 Jun 2024 06:44:50 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 218980] [VM boot] Guest Kernel hit BUG: kernel NULL pointer
- dereference, address: 0000000000000010 and WARNING: CPU: 0 PID: 218 at
- arch/x86/kernel/fpu/core.c:57 x86_task_fpu+0x17/0x20
-Date: Mon, 24 Jun 2024 06:44:50 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: hongyu.ning@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-218980-28872-wO8Ra586yq@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-218980-28872@https.bugzilla.kernel.org/>
-References: <bug-218980-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1719213680; c=relaxed/simple;
+	bh=UqTNpMPv9Au1QNY0/qPLXKj+m6DdxTulR24aZJ3g2Qg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=XqiAu7ML5I0RGZ8yNSOYnUeL7xX3Cfv1mq2TdQcp+3VrFKIfob712/VZzdwBC3CUzqwHebaVmRj0iJQ/5H18mdpZqcdL8sedKdKjFJ4GE0d2bH+ZJJUwt7z2GfYg/7L1AVl6a1b6WaeyDnB6DZ7UC06EKkH5H5+zZw+Gw6xwDBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i2xPC8LG; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719213678; x=1750749678;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=UqTNpMPv9Au1QNY0/qPLXKj+m6DdxTulR24aZJ3g2Qg=;
+  b=i2xPC8LGSCVG/hmTbUSTf1R7yV+UnEy0pKlNWZZIDGGQpPi7Tv0MGJ0Z
+   mQZA27Gy63LaqCCVFt7UMH6mUUXBeE0gR0Ae35Fxr38C4XqRqgbTmIPWV
+   jFfxqGr2Ytu2Mlceu8wwua85pYjXmtB0H3HvKfaXVdJ9uIFmQIbCDUkLQ
+   qfJsJ7/tqm81YNNg2Mu+s6+F2oS0ZLpGA7nXg/PEtiY/Fu9h21Mn1Hfnt
+   RUFa7rZkgGGgJtOpEweXd3xY30o/BJTS7GD3jL1y6CHF7Y/ZOBw2REmb/
+   cKXl5lSvjbqib0sZJrTcHLuM+JN7m8N5XsahPZdCvUCiVHGB3iBe4PwhY
+   g==;
+X-CSE-ConnectionGUID: Peo2D4MITG2Pzsvo4Ede4A==
+X-CSE-MsgGUID: CFa+umnmTpSnj4vE9/fCiA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11112"; a="41574842"
+X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
+   d="scan'208";a="41574842"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2024 00:21:17 -0700
+X-CSE-ConnectionGUID: CHlNj0UQRi+imeKHeudEiw==
+X-CSE-MsgGUID: 2JD8MfOZRU+hKE60SVjGfg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
+   d="scan'208";a="43085338"
+Received: from vkasired-desk2.fm.intel.com ([10.105.128.132])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2024 00:21:17 -0700
+From: Vivek Kasireddy <vivek.kasireddy@intel.com>
+To: dri-devel@lists.freedesktop.org,
+	kvm@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Vivek Kasireddy <vivek.kasireddy@intel.com>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Robin Murphy <robin.murphy@arm.com>,
+	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
+	Daniel Vetter <daniel.vetter@ffwll.ch>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Kevin Tian <kevin.tian@intel.com>
+Subject: [PATCH v2 0/3] vfio/pci: Allow MMIO regions to be exported through dma-buf
+Date: Sun, 23 Jun 2024 23:53:08 -0700
+Message-ID: <20240624065552.1572580-1-vivek.kasireddy@intel.com>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D218980
+This is an attempt to revive the patches posted by Jason Gunthorpe at:
+https://patchwork.kernel.org/project/linux-media/cover/0-v2-472615b3877e+28f7-vfio_dma_buf_jgg@nvidia.com/
 
---- Comment #2 from hongyuni (hongyu.ning@intel.com) ---
-Created attachment 306487
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D306487&action=3Dedit
-vm_boot_pass.log
+Here is the cover letter text from Jason's original series:
+"dma-buf has become a way to safely acquire a handle to non-struct page
+memory that can still have lifetime controlled by the exporter. Notably
+RDMA can now import dma-buf FDs and build them into MRs which allows for
+PCI P2P operations. Extend this to allow vfio-pci to export MMIO memory
+from PCI device BARs.
 
---=20
-You may reply to this email to add a comment.
+This series supports a use case for SPDK where a NVMe device will be owned
+by SPDK through VFIO but interacting with a RDMA device. The RDMA device
+may directly access the NVMe CMB or directly manipulate the NVMe device's
+doorbell using PCI P2P.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+However, as a general mechanism, it can support many other scenarios with
+VFIO. I imagine this dmabuf approach to be usable by iommufd as well for
+generic and safe P2P mappings."
+
+In addition to the SPDK use-case mentioned above, the capability added
+in this patch series can also be useful when a buffer (located in device
+memory such as VRAM) needs to be shared between any two dGPU devices or
+instances (assuming one of them is bound to VFIO PCI) as long as they
+are P2P DMA compatible.
+
+The original series has been augmented to include a mmap handler to
+provide CPU access to the dmabuf and support for creating the dmabuf
+from multiple ranges of a region.
+
+Changelog:
+
+v1 -> v2:
+- Rebase on 6.10-rc4
+- Update the copyright year in dma_buf.c (Zhu Yanjun)
+- Check the revoked flag during mmap() and also revoke the mappings
+  as part of move when access to the MMIO space is disabled (Alex)
+- Include VM_ALLOW_ANY_UNCACHED and VM_IO flags for mmap (Alex)
+- Fix memory leak of ranges when creation of priv fails (Alex)
+- Check return value of vfio_device_try_get_registration() (Alex)
+- Invoke dma_buf move for runtime PM and FLR cases as well (Alex)
+- Add a separate patch to have all the feature functions take
+  the core device pointer instead of the main device ptr (Alex)
+- Use the regular DMA APIs (that were part of original series) instead
+  of PCI P2P DMA APIs while mapping the dma_buf (Jason)
+- Rename the region's ranges from p2p_areas to dma_ranges (Jason)
+- Add comments in vfio_pci_dma_buf_move() to describe how the locking
+  is expected to work (Jason)
+
+This series is available at:
+https://gitlab.freedesktop.org/Vivek/drm-tip/-/commits/vfio_dmabuf_2
+
+along with additional patches for Qemu and Spice here:
+https://gitlab.freedesktop.org/Vivek/qemu/-/commits/vfio_dmabuf_2
+https://gitlab.freedesktop.org/Vivek/spice/-/commits/encode_dmabuf_v8
+
+This series is tested using the following method:
+- Run Qemu with the following relevant options:
+  qemu-system-x86_64 -m 4096m ....
+  -device vfio-pci,host=0000:03:00.0
+  -device virtio-vga,max_outputs=1,blob=true,xres=1920,yres=1080
+  -spice port=3001,gl=on,disable-ticketing=on,preferred-codec=gstreamer:h264
+  -object memory-backend-memfd,id=mem1,size=4096M
+  -machine memory-backend=mem1 ...
+- Run upstream Weston with the following options in the Guest VM:
+  ./weston --drm-device=card1 --additional-devices=card0
+
+where card1 is a DG2 dGPU (assigned to vfio-pci and using xe driver
+in Guest VM), card0 is virtio-gpu.
+
+Cc: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Christoph Hellwig <hch@lst.de>
+Cc: Robin Murphy <robin.murphy@arm.com>
+Cc: Christian König <christian.koenig@amd.com>
+Cc: Daniel Vetter <daniel.vetter@ffwll.ch>
+Cc: Gerd Hoffmann <kraxel@redhat.com>
+Cc: Alex Williamson <alex.williamson@redhat.com>
+Cc: Kevin Tian <kevin.tian@intel.com>
+
+Vivek Kasireddy (3):
+  vfio: Export vfio device get and put registration helpers
+  vfio/pci: Share the core device pointer while invoking feature
+    functions
+  vfio/pci: Allow MMIO regions to be exported through dma-buf
+
+ drivers/vfio/pci/Makefile          |   1 +
+ drivers/vfio/pci/dma_buf.c         | 438 +++++++++++++++++++++++++++++
+ drivers/vfio/pci/vfio_pci_config.c |  22 +-
+ drivers/vfio/pci/vfio_pci_core.c   |  50 ++--
+ drivers/vfio/pci/vfio_pci_priv.h   |  23 ++
+ drivers/vfio/vfio_main.c           |   2 +
+ include/linux/vfio.h               |   2 +
+ include/linux/vfio_pci_core.h      |   1 +
+ include/uapi/linux/vfio.h          |  25 ++
+ 9 files changed, 542 insertions(+), 22 deletions(-)
+ create mode 100644 drivers/vfio/pci/dma_buf.c
+
+-- 
+2.45.1
+
 
