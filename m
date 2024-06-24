@@ -1,180 +1,130 @@
-Return-Path: <kvm+bounces-20386-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56D7991477F
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:29:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 092BF9147DF
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:55:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C830A1F22EF7
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 10:29:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DE8284AFD
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 10:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C47136E17;
-	Mon, 24 Jun 2024 10:29:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RR0c0+ac"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E47C137772;
+	Mon, 24 Jun 2024 10:55:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E036B3BBF2;
-	Mon, 24 Jun 2024 10:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B98B2F24;
+	Mon, 24 Jun 2024 10:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719224960; cv=none; b=NlL/Au6AuJgXN72diZi27wB5tMLWgbCAE0lif43PQgLvIwt2GFYw267Kvn5pS3wBS6SQ5WN9cQCtJTVFfQNgan6J3Oaxubb2EVXxfNe72bxA7Jw2GkZ98rnXDESZ0HbuLw+R+ZUFtZkgeTiCdIj/+8C+bzE0MNNsWAZnENUbvpY=
+	t=1719226509; cv=none; b=SyQGnMk5gBHqY7wqtbL3tQ5WnPahwMAXUiGmxE/0A4BXOfUha/Rp9XMynI6G2AIEFyW0RSROUgrngf2NyR98fHYy5k786QdAwCxS6wueHT08zNWW0cohrKYPL+XQZCAgshwf5teWgu+qdv0uv6cC65VK01rOUvX5PfKCojqP8QY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719224960; c=relaxed/simple;
-	bh=wNeAG9yIK0CZl4N/ZkvXzvReYFJ5z22Ul9DecMcs2k4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iULAN8kUD0YoJ0cMj2EC6sbh1n5MRCjme3y6EKWdmFkCVVTh90HlsL5zQFsQV0eSEUmtlaevMxx54l1mfjsfjPpaRI/Rq9lHbZbTEPQxBD+ZSPG/D/w5mi+GyOn823bSqPoviG2NJUCaNzOMz2QQXpl57aiCt6JHc1nKdaIZArg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RR0c0+ac; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1719224959; x=1750760959;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=wNeAG9yIK0CZl4N/ZkvXzvReYFJ5z22Ul9DecMcs2k4=;
-  b=RR0c0+ac84k6ftIqr5qrbitbQnOjleuaqa2scbLpUQq0PpKEy7I+6XRv
-   JdVbNjr+LQP/lwMSQDDe2I+ODVmrYadb7TOvGVPep+0sdgvQ++pzN9jgm
-   sTxcxQw4AO7TCe76/j5CHYGnFjMxiBW0kZVYq7JNc4GSJyO1jh/ool5qZ
-   XB9xybuo0g9Q5gBgCg7NJR3L/S49kI6GuZy+AHo+rDv57QdJVXpX4t8cm
-   /xoV4duUxrN7fCbL3b53TtwmzKHE8oTftzPu/TJU0IhwRBEvLdoZuSwF4
-   KGrpSRspt2y5+poUEC6EAwxG62yCiCgNwSx+DEY5wJUkhZVSfyRod3V95
-   Q==;
-X-CSE-ConnectionGUID: waFIp9S2RTGCYk7TOATuyQ==
-X-CSE-MsgGUID: TZMuc6vpTuuD6P8hbW5QIA==
-X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
-   d="asc'?scan'208";a="28414746"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jun 2024 03:29:17 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 24 Jun 2024 03:28:59 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex04.mchp-main.com (10.10.85.152)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Mon, 24 Jun 2024 03:28:56 -0700
-Date: Mon, 24 Jun 2024 11:28:41 +0100
-From: Conor Dooley <conor.dooley@microchip.com>
-To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
-CC: Conor Dooley <conor@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Paul
- Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>, Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Anup Patel
-	<anup@brainfault.org>, Shuah Khan <shuah@kernel.org>, Atish Patra
-	<atishp@atishpatra.org>, <linux-doc@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <kvm@vger.kernel.org>,
-	<kvm-riscv@lists.infradead.org>, <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH v7 08/16] riscv: add ISA parsing for Zca, Zcf, Zcd and Zcb
-Message-ID: <20240624-remission-dominoes-9f22be5ba999@wendy>
-References: <20240619113529.676940-1-cleger@rivosinc.com>
- <20240619113529.676940-9-cleger@rivosinc.com>
- <20240623-cornbread-preteen-4ec287aa165c@spud>
- <c59a8897-34a1-4dc3-b68b-35dddf55c937@rivosinc.com>
+	s=arc-20240116; t=1719226509; c=relaxed/simple;
+	bh=Azy9ITJyQFSFf7+tiTgAYOzxp7NONG+jBcbI9NfETxE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ipVX7PkyUgC7d8mdCE2nSbQhVg2aW1H4stZJdsZOsWf9GFRO8zCidLeDVZIbtq9mA24EhhFFo5gdoa1qOyzeDKSOj9i2o3qG/nTAxJGka1DLI0kaExMpJ93nuPaljyKn15AYrLrW9OTOsrIcLvTpOYGh7a5gL4UqCWwbBgSFrwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DA84DA7;
+	Mon, 24 Jun 2024 03:55:31 -0700 (PDT)
+Received: from bogus (e103737-lin.cambridge.arm.com [10.1.197.49])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 34B993F73B;
+	Mon, 24 Jun 2024 03:55:02 -0700 (PDT)
+Date: Mon, 24 Jun 2024 11:54:59 +0100
+From: Sudeep Holla <sudeep.holla@arm.com>
+To: Ankur Arora <ankur.a.arora@oracle.com>
+Cc: linux-pm@vger.kernel.org, kvm@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	catalin.marinas@arm.com, will@kernel.org, tglx@linutronix.de,
+	mingo@redhat.com, bp@alien8.de, x86@kernel.org, hpa@zytor.com,
+	pbonzini@redhat.com, wanpengli@tencent.com, vkuznets@redhat.com,
+	rafael@kernel.org, daniel.lezcano@linaro.org, peterz@infradead.org,
+	arnd@arndb.de, lenb@kernel.org, mark.rutland@arm.com,
+	harisokn@amazon.com, joao.m.martins@oracle.com,
+	boris.ostrovsky@oracle.com, konrad.wilk@oracle.com
+Subject: Re: [PATCH 8/9] arm64: support cpuidle-haltpoll
+Message-ID: <ZnlQg9kcAWG443re@bogus>
+References: <20240430183730.561960-1-ankur.a.arora@oracle.com>
+ <20240430183730.561960-9-ankur.a.arora@oracle.com>
+ <20240619121711.jid3enfzak7vykyn@bogus>
+ <871q4pc0f9.fsf@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="022xOD13U5wpppzg"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <c59a8897-34a1-4dc3-b68b-35dddf55c937@rivosinc.com>
+In-Reply-To: <871q4pc0f9.fsf@oracle.com>
 
---022xOD13U5wpppzg
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Mon, Jun 24, 2024 at 10:24:51AM +0200, Cl=E9ment L=E9ger wrote:
->=20
->=20
-> On 23/06/2024 17:42, Conor Dooley wrote:
-> > On Wed, Jun 19, 2024 at 01:35:18PM +0200, Cl=E9ment L=E9ger wrote:
-> >> The Zc* standard extension for code reduction introduces new extension=
-s.
-> >> This patch adds support for Zca, Zcf, Zcd and Zcb. Zce, Zcmt and Zcmp
-> >> are left out of this patch since they are targeting microcontrollers/
-> >> embedded CPUs instead of application processors.
+On Fri, Jun 21, 2024 at 04:59:22PM -0700, Ankur Arora wrote:
+> 
+> Sudeep Holla <sudeep.holla@arm.com> writes:
+> 
+> > On Tue, Apr 30, 2024 at 11:37:29AM -0700, Ankur Arora wrote:
+> >> Add architectural support for the cpuidle-haltpoll driver by defining
+> >> arch_haltpoll_*(). Also select ARCH_HAS_OPTIMIZED_POLL since we have
+> >> an optimized polling mechanism via smp_cond_load*().
 > >>
-> >> Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
-> >> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-> >> ---
-> >>  arch/riscv/include/asm/hwcap.h |  4 +++
-> >>  arch/riscv/kernel/cpufeature.c | 55 +++++++++++++++++++++++++++++++++-
-> >>  2 files changed, 58 insertions(+), 1 deletion(-)
+> >> Add the configuration option, ARCH_CPUIDLE_HALTPOLL to allow
+> >> cpuidle-haltpoll to be selected.
 > >>
-> >> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/h=
-wcap.h
-> >> index 18859277843a..b12ae3f2141c 100644
-> >> --- a/arch/riscv/include/asm/hwcap.h
-> >> +++ b/arch/riscv/include/asm/hwcap.h
-> >> @@ -87,6 +87,10 @@
-> >>  #define RISCV_ISA_EXT_ZVE64F		78
-> >>  #define RISCV_ISA_EXT_ZVE64D		79
-> >>  #define RISCV_ISA_EXT_ZIMOP		80
-> >> +#define RISCV_ISA_EXT_ZCA		81
-> >> +#define RISCV_ISA_EXT_ZCB		82
-> >> +#define RISCV_ISA_EXT_ZCD		83
-> >> +#define RISCV_ISA_EXT_ZCF		84
-> >> =20
-> >>  #define RISCV_ISA_EXT_XLINUXENVCFG	127
-> >> =20
-> >> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufea=
-ture.c
-> >> index a3af976f36c9..aa631fe49b7c 100644
-> >> --- a/arch/riscv/kernel/cpufeature.c
-> >> +++ b/arch/riscv/kernel/cpufeature.c
-> >> @@ -111,6 +111,9 @@ static int riscv_ext_zicboz_validate(const struct =
-riscv_isa_ext_data *data,
-> >> =20
-> >>  #define __RISCV_ISA_EXT_DATA(_name, _id) _RISCV_ISA_EXT_DATA(_name, _=
-id, NULL, 0, NULL)
-> >> =20
-> >> +#define __RISCV_ISA_EXT_DATA_VALIDATE(_name, _id, _validate) \
-> >> +			_RISCV_ISA_EXT_DATA(_name, _id, NULL, 0, _validate)
-> >> +
-> >>  /* Used to declare pure "lasso" extension (Zk for instance) */
-> >>  #define __RISCV_ISA_EXT_BUNDLE(_name, _bundled_exts) \
-> >>  	_RISCV_ISA_EXT_DATA(_name, RISCV_ISA_EXT_INVALID, _bundled_exts, \
-> >> @@ -122,6 +125,37 @@ static int riscv_ext_zicboz_validate(const struct=
- riscv_isa_ext_data *data,
-> >>  #define __RISCV_ISA_EXT_SUPERSET_VALIDATE(_name, _id, _sub_exts, _val=
-idate) \
-> >>  	_RISCV_ISA_EXT_DATA(_name, _id, _sub_exts, ARRAY_SIZE(_sub_exts), _v=
-alidate)
-> >> =20
-> >> +static int riscv_ext_zca_depends(const struct riscv_isa_ext_data *dat=
-a,
-> >=20
-> > It's super minor, but my OCD doesn't like this being called "depends"
-> > when the others are all called "validate".
->=20
-> Ok, let's make a deal. You review patch 14/16 and I'll make the machine
-> part of you happy and call this function validate ;)
+> >> Note that we limit cpuidle-haltpoll support to when the event-stream is
+> >> available. This is necessary because polling via smp_cond_load_relaxed()
+> >> uses WFE to wait for a store which might not happen for an prolonged
+> >> period of time. So, ensure the event-stream is around to provide a
+> >> terminating condition.
+> >>
+> >
+> > Currently the event stream is configured 10kHz(1 signal per 100uS IIRC).
+> > But the information in the cpuidle states for exit latency and residency
+> > is set to 0(as per drivers/cpuidle/poll_state.c). Will this not cause any
+> > performance issues ?
+> 
+> No I don't think there's any performance issue.
+>
 
-I generally avoid the hwprobe patches intentionally :) I'm not even
-expecting a respin for this tbh, I'd like to just get it in so that I
-can do things on top of it.
+Thanks for the confirmation, that was my assumption as well.
 
---022xOD13U5wpppzg
-Content-Type: application/pgp-signature; name="signature.asc"
+> When the core is waiting in WFE for &thread_info->flags to
+> change, and set_nr_if_polling() happens, the CPU will come out
+> of the wait quickly.
+> So, the exit latency, residency can be reasonably set to 0.
+>
 
------BEGIN PGP SIGNATURE-----
+Sure
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnlKWAAKCRB4tDGHoIJi
-0qTZAQDW6NkBEEY0BpVBm4oazaou8r5axQXRsRokUPZuDY/Q/wEA7XbMZLRFekMt
-ZYMxRfkbyf9XPgmg2W/WvyHnahDlhA4=
-=Ozsy
------END PGP SIGNATURE-----
+> If, however, there is no store to &thread_info->flags, then the event
+> stream is what would cause us to come out of the WFE and check if
+> the poll timeout has been exceeded.
+> In that case, there was no work to be done, so there was nothing
+> to wake up from.
+>
 
---022xOD13U5wpppzg--
+This is exactly what I was referring when I asked about performance, but
+it looks like it is not a concern for the reason specified about.
+
+> So, in either circumstance there's no performance loss.
+>
+> However, when we are polling under the haltpoll governor, this might
+> mean that we spend more time polling than determined based on the
+> guest_halt_poll_ns. But, that would only happen in the last polling
+> iteration.
+>
+> So, I'd say, at worst no performance loss. But, we would sometimes
+> poll for longer than necessary before exiting to the host.
+>
+
+Does it make sense to add some comment that implies briefly what we
+have discussed here ? Mainly why 0 exit and target residency values
+are fine and how worst case WFE wakeup doesn't impact the performance.
+
+--
+Regards,
+Sudeep
 
