@@ -1,114 +1,139 @@
-Return-Path: <kvm+bounces-20376-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20377-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5335C91440F
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 09:59:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8543914489
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 10:20:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E58328173D
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 07:59:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 152821C2105E
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 08:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2EAE49625;
-	Mon, 24 Jun 2024 07:59:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3268E61FDF;
+	Mon, 24 Jun 2024 08:20:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m39zAjLS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Gl5H9rdZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C041744C9B;
-	Mon, 24 Jun 2024 07:59:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58C961FC0
+	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 08:20:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719215961; cv=none; b=ObonzwCe94kHM2xu9CVnblVDw5/mbQQElUYYE7JfkWe7eJGbE0W2WTizVKeirjC4MieKSz6wsguYUYH1lYFZ0KukvJ5KVMii1/0/7qL4y7ltkX5fk6YYhFBFaqEokWoX7QnB3/ArnI2cZaed1tF9GsljMvBl4LOq2nIGeh0plnU=
+	t=1719217221; cv=none; b=moiLyYAKKKuTC2kFofAeIvrAPHi8IOiYLKhw/EwCNqJ8woDg1euCiMAZaQc8i6Sr57VPgTZLCvofNfej//Bi8v/qUC7/pheg83x0u5gjdZcIMZIA9PC50KVAEnLvOUKC6mNW6SqAn53iUoWl5SJt8veqWcnW1oKad3xUEgjOrdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719215961; c=relaxed/simple;
-	bh=QntOMA/EaWu3YyHYV9Nv3W9AgkqJjlizJ596FnHTCNs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=alOLewGd9iGRrnqDc2VSgXxM0JNRuEAehhllrWWUExLl5gWgHOII1pdf2O3ZxvOshtnBT2W51ttwrGQ93rsR2eTBMn1XTfD6z2DyBFU+QJ5c2YBlMlge9rQk7+aMUxgvz98zkuKqYTrO9nB4EZWrA8U4sABGOWb/Lhy4b/w7xFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m39zAjLS; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-70673c32118so780467b3a.3;
-        Mon, 24 Jun 2024 00:59:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719215959; x=1719820759; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kzXc1XEvc7I6+EQc2welv6znEDHAmFhzo0VrZbtQ65k=;
-        b=m39zAjLS8D6WYT6MVTSOoBFVdnzR5W7Mnri9yb5zqP2XSS1ezsS5j3vh2cdKDcowrC
-         1lcuDIOF0dh1exg0mbjTk/ctBhQcvBbD3VAAUd+llZGAcSwYsvTs2o32XdMUDlZ1E7Cx
-         uCLq2TByFc7qZ8vx7A4tkVa7wixZliWV1/nY/etOWs55hojJ4PwJibWwZpjyOqIrjWrd
-         iPkpRjBNlj6E8GBXXHuaOwO9ImNkmuU1Q4QBoi54IRQyqfAJmHh9Hu/kQe2pMQa5ng85
-         kAZNDB4kprP7x6wXjGfsb5nFeAsmkGVeMcR0G9OHAfQB3tRqu921u/jA8iWAizJiz6CU
-         MfYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719215959; x=1719820759;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kzXc1XEvc7I6+EQc2welv6znEDHAmFhzo0VrZbtQ65k=;
-        b=ryq1L9iYv46zErFEWDROMSzvjaeVihCya5nnMCZsCK3Hj/sY2MkvH7Z1iMPnuoAc4s
-         dcXPRFfEofZXJI0W85dC4D4eAYMTLvmRlL5WYTBb3kr0GVqUlH1P24OjDKT8pDgwiXKP
-         WIdlgbTePIQu2eaxLkIZ+ozZQwp9CA0dwYW44gTSlVMtXILVjm14uHfCqTM1DryPRzBx
-         f5sjWHPTtLjMlicvcwc1ewbKSn7EndU/pQgpPbMW26aAEJhwsYtBCaRjHb4+T9mMtHGO
-         6//MRbYDG3wwNGv7G6q9TimKE76rE/tgDjq6EvDQP98uZNceX1+Ud8P9LznjGvi/R1b+
-         tteQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXE4+ezwwNMrjIZ3+I/CGTaufrFphRBtGa5Zjhhwdg3euRS6mE8HCobHC5vlpjqRYrxHWCNDD01Vz4YFKRV3ddi46bt5425DNhJZxIGk5wVMSIP2RGkPQn27sjbsG5r1JLt
-X-Gm-Message-State: AOJu0YwJz1eaBUULaKmjVY4uyxTLnGgxqws4iquDohn7aF23YUh9g7Zu
-	guW5IJXzlDab7R5FGOKt+gvMmu+GxGBvJ7lRr+15fOrfeqTBg0NgXK/gyA==
-X-Google-Smtp-Source: AGHT+IEir6yYTOYhpeuMaCrSh2h0bZVTgDMe4yTSTENkJ44ehqWjRYb9y7g9NK8KazdPzT3tww1Dsg==
-X-Received: by 2002:a05:6a00:2389:b0:705:972a:53f with SMTP id d2e1a72fcca58-706745bbd68mr4264360b3a.18.1719215958847;
-        Mon, 24 Jun 2024 00:59:18 -0700 (PDT)
-Received: from localhost.localdomain ([118.32.98.101])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7065107c446sm5588834b3a.37.2024.06.24.00.59.17
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Mon, 24 Jun 2024 00:59:18 -0700 (PDT)
-From: yskelg@gmail.com
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: MichelleJin <shjy180909@gmail.com>,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yunseong Kim <yskelg@gmail.com>
-Subject: [PATCH] tools/kvm_stat: update exit reasons for userspace
-Date: Mon, 24 Jun 2024 16:58:21 +0900
-Message-ID: <20240624075820.71583-2-yskelg@gmail.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1719217221; c=relaxed/simple;
+	bh=GBbVrRtqaC9Uc8IVZ89+z4flR2yKlxZBRwKjcTHwNlQ=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=hYm7Hj/CXf3Ruh8jg2k2SJIRqZpJzYBHTW3+8qGBW0Hl3Awe8kfq+gwK+U+PPUdGruo+N7NSB4br87IC8EATjRO11stgsOYxKRijUV3LqaKTBJQgCZVk8USRF/bNG6T5GC2rXWcwpPv0vFhsH+PzkN4/5mfzGXRZGVrDuccFnTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Gl5H9rdZ; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719217219; x=1750753219;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=GBbVrRtqaC9Uc8IVZ89+z4flR2yKlxZBRwKjcTHwNlQ=;
+  b=Gl5H9rdZNwgxkjGAKKp7ALqqeZ2LC7/NbXCUHbFcdUp8JI1+6lzlRmWp
+   w1BoOhjEKYGZPPJZkOudWQae/OLRJj79g5sVd90tBrqiGneaclr5JDIjt
+   e4ijJIkqjApQ5DcpuA81cDcBfCICQxmbTyBFTFLrMbXPOhWgwT+h560h2
+   pe6psLbA58BazUs0QdNncvIz7RkbRjw5YInr6d4X3KoeYAIMiO2hRxdW0
+   X2T9CjHiTbyLtrpr/KFUvecBOT9r4j+qCSQJG/UsR0SIk9bz/o4iUOlO7
+   pNx6pZ/wmkTLlF1YA2bLa7K8JH4S7VSnfAGUYO+szR0mlU2J2gAzflaPk
+   w==;
+X-CSE-ConnectionGUID: 7uZdwUxvTRCMkztSB/CYMA==
+X-CSE-MsgGUID: eIISLLmcQ+WhKCFtQKSyfA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11112"; a="15930255"
+X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
+   d="scan'208";a="15930255"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2024 01:20:19 -0700
+X-CSE-ConnectionGUID: Kv4VgrVtRJecK8Qh3ljF2w==
+X-CSE-MsgGUID: NW/j8MNBTdG3mGc0dLVPQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
+   d="scan'208";a="48392723"
+Received: from unknown (HELO [10.238.9.0]) ([10.238.9.0])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jun 2024 01:20:18 -0700
+Message-ID: <1be3d379-9052-4284-8ad8-70b03050fa91@linux.intel.com>
+Date: Mon, 24 Jun 2024 16:20:15 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [kvm-unit-tests PATCH v6 4/4] x86: Add test case for INVVPID with
+ LAM
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com,
+ robert.hu@linux.intel.com
+References: <20240122085354.9510-1-binbin.wu@linux.intel.com>
+ <20240122085354.9510-5-binbin.wu@linux.intel.com>
+ <ZmC0_4ZN---IZEdk@google.com>
+ <d1c80ad9-9551-479a-84b5-dfe9b13fc9a2@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <d1c80ad9-9551-479a-84b5-dfe9b13fc9a2@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-From: Yunseong Kim <yskelg@gmail.com>
 
-Update EXIT_REASONS from source, including 2 USERSPACE_EXIT_REASONS:
-'KVM_EXIT_LOONGARCH_IOCSR' and 'KVM_EXIT_MEMORY_FAULT'.
 
-Link: https://lore.kernel.org/all/20231121225650.390246-3-namhyung@kernel.org/
-Link: https://lore.kernel.org/lkml/ZbVLbkngp4oq13qN@kernel.org/
-Signed-off-by: Yunseong Kim <yskelg@gmail.com>
----
- tools/kvm/kvm_stat/kvm_stat | 2 ++
- 1 file changed, 2 insertions(+)
+On 6/18/2024 1:55 PM, Binbin Wu wrote:
+>
+>
+> On 6/6/2024 2:57 AM, Sean Christopherson wrote:
+>> On Mon, Jan 22, 2024, Binbin Wu wrote:
+>>> +    if (this_cpu_has(X86_FEATURE_LA57) && read_cr4() & X86_CR4_LA57)
+>> Checking for feature support seems superfluous, e.g. LA57 should 
+>> never be set if
+>> it's unsupported.  Then you can do
+>>
+>>     lam_mask = is_la57_enabled() ? LAM57_MASK : LAM48_MASK;
+> OK, will drop the feature check.
+>
+>>
+>>> +        lam_mask = LAM57_MASK;
+>>> +
+>>> +    vaddr = alloc_vpage();
+>>> +    install_page(current_page_table(), virt_to_phys(alloc_page()), 
+>>> vaddr);
+>>> +    /*
+>>> +     * Since the stack memory address in KUT doesn't follow kernel 
+>>> address
+>>> +     * space partition rule, reuse the memory address for 
+>>> descriptor and
+>>> +     * the target address in the descriptor of invvpid.
+>>> +     */
+>>> +    operand = (struct invvpid_operand *)vaddr;
+>> Why bother backing the virtual address?  MOV needs a valid 
+>> translation, but
+>> INVVPID does not (ditto for INVLPG and INVPCID, though it might be 
+>> simpler and
+>> easier to just use the allocated address for those).
+>
+> OK, will remove the unnecessary code.
 
-diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
-index 15bf00e79e3f..eec6c00e3ff9 100755
---- a/tools/kvm/kvm_stat/kvm_stat
-+++ b/tools/kvm/kvm_stat/kvm_stat
-@@ -288,6 +288,8 @@ USERSPACE_EXIT_REASONS = {
-     'RISCV_SBI':        35,
-     'RISCV_CSR':        36,
-     'NOTIFY':           37,
-+    'LOONGARCH_IOCSR':  38,
-+    'MEMORY_FAULT':     39
- }
- 
- IOCTL_NUMBERS = {
--- 
-2.45.2
+Sorry, the backing is still needed here.
+The target address inside the invvpid descriptor (operand->gla) doesn't 
+need a valid translation, but the invvpid descriptor itself needs a 
+valid translation.
+
+>
+>>
+>>> +    operand->vpid = 0xffff;
+>>> +    operand->gla = (u64)vaddr;
+>>> +    operand = (struct invvpid_operand 
+>>> *)set_la_non_canonical((u64)operand,
+>>> +                                 lam_mask);
+>>> +    fault = test_for_exception(GP_VECTOR, ds_invvpid, operand);
+>>> +    report(!fault, "INVVPID (LAM on): tagged operand");
+>
+>
 
 
