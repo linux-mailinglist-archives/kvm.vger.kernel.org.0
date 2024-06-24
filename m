@@ -1,164 +1,180 @@
-Return-Path: <kvm+bounces-20387-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B85BC914790
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:36:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D7991477F
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:29:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7422C285E1D
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 10:36:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C830A1F22EF7
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 10:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5061369BE;
-	Mon, 24 Jun 2024 10:36:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8C47136E17;
+	Mon, 24 Jun 2024 10:29:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="RR0c0+ac"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx2.zhaoxin.com (mx2.zhaoxin.com [203.110.167.99])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7218125D6
-	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 10:36:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.110.167.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E036B3BBF2;
+	Mon, 24 Jun 2024 10:29:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719225402; cv=none; b=aeKbprp+OkH9yX6Jz7//cTN6JoLnO3uWurYTpTn9ko6jMcUjfdblVlGmZsyETByp9DS9kfS0VI8RbKpt3kTyBI4Cr0SR79mc9sD4RcWvB2iq2/x0Sz/rW98TdPmJl79JUWbfwab2Nfwo1AUQcemnVga4fJ1RV57QGwafsnBbtyE=
+	t=1719224960; cv=none; b=NlL/Au6AuJgXN72diZi27wB5tMLWgbCAE0lif43PQgLvIwt2GFYw267Kvn5pS3wBS6SQ5WN9cQCtJTVFfQNgan6J3Oaxubb2EVXxfNe72bxA7Jw2GkZ98rnXDESZ0HbuLw+R+ZUFtZkgeTiCdIj/+8C+bzE0MNNsWAZnENUbvpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719225402; c=relaxed/simple;
-	bh=tTUAoQJINFZUHAgTrXklFwCvGAYatodAk8ivp4ixXok=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=uiidvIlnBtzQsrU1rIWV3B+CVe99AgUyjQk8Pfc7sqftpDJTnKkjD9bqis2xXfSbBNhfR/qM6pOhWitgeoF3nh1ARpMvilVKlB29qHZiZ849+rxDwNahSWjKbdDQt0ASDx1tdyPWtATZcaDJ0d3i1PTvimbeT0YsL2D1eTftqFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com; spf=pass smtp.mailfrom=zhaoxin.com; arc=none smtp.client-ip=203.110.167.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zhaoxin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zhaoxin.com
-X-ASG-Debug-ID: 1719224459-1eb14e2e60b9290001-HEqcsx
-Received: from ZXSHMBX2.zhaoxin.com (ZXSHMBX2.zhaoxin.com [10.28.252.164]) by mx2.zhaoxin.com with ESMTP id 84MmLcTc9kLKvesU (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NO); Mon, 24 Jun 2024 18:20:59 +0800 (CST)
-X-Barracuda-Envelope-From: EwanHai-oc@zhaoxin.com
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Received: from zxbjmbx1.zhaoxin.com (10.29.252.163) by ZXSHMBX2.zhaoxin.com
- (10.28.252.164) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 24 Jun
- 2024 18:20:59 +0800
-Received: from [10.28.66.62] (10.28.66.62) by zxbjmbx1.zhaoxin.com
- (10.29.252.163) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 24 Jun
- 2024 18:20:58 +0800
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.252.164
-Message-ID: <8d816541-2546-42a8-b6db-bd9d50729b36@zhaoxin.com>
-X-Barracuda-RBL-Trusted-Forwarder: 10.28.66.62
-Date: Mon, 24 Jun 2024 06:20:58 -0400
+	s=arc-20240116; t=1719224960; c=relaxed/simple;
+	bh=wNeAG9yIK0CZl4N/ZkvXzvReYFJ5z22Ul9DecMcs2k4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iULAN8kUD0YoJ0cMj2EC6sbh1n5MRCjme3y6EKWdmFkCVVTh90HlsL5zQFsQV0eSEUmtlaevMxx54l1mfjsfjPpaRI/Rq9lHbZbTEPQxBD+ZSPG/D/w5mi+GyOn823bSqPoviG2NJUCaNzOMz2QQXpl57aiCt6JHc1nKdaIZArg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=RR0c0+ac; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1719224959; x=1750760959;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wNeAG9yIK0CZl4N/ZkvXzvReYFJ5z22Ul9DecMcs2k4=;
+  b=RR0c0+ac84k6ftIqr5qrbitbQnOjleuaqa2scbLpUQq0PpKEy7I+6XRv
+   JdVbNjr+LQP/lwMSQDDe2I+ODVmrYadb7TOvGVPep+0sdgvQ++pzN9jgm
+   sTxcxQw4AO7TCe76/j5CHYGnFjMxiBW0kZVYq7JNc4GSJyO1jh/ool5qZ
+   XB9xybuo0g9Q5gBgCg7NJR3L/S49kI6GuZy+AHo+rDv57QdJVXpX4t8cm
+   /xoV4duUxrN7fCbL3b53TtwmzKHE8oTftzPu/TJU0IhwRBEvLdoZuSwF4
+   KGrpSRspt2y5+poUEC6EAwxG62yCiCgNwSx+DEY5wJUkhZVSfyRod3V95
+   Q==;
+X-CSE-ConnectionGUID: waFIp9S2RTGCYk7TOATuyQ==
+X-CSE-MsgGUID: TZMuc6vpTuuD6P8hbW5QIA==
+X-IronPort-AV: E=Sophos;i="6.08,261,1712646000"; 
+   d="asc'?scan'208";a="28414746"
+X-Amp-Result: UNKNOWN
+X-Amp-Original-Verdict: FILE UNKNOWN
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 24 Jun 2024 03:29:17 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 24 Jun 2024 03:28:59 -0700
+Received: from wendy (10.10.85.11) by chn-vm-ex04.mchp-main.com (10.10.85.152)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
+ Transport; Mon, 24 Jun 2024 03:28:56 -0700
+Date: Mon, 24 Jun 2024 11:28:41 +0100
+From: Conor Dooley <conor.dooley@microchip.com>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+CC: Conor Dooley <conor@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Paul
+ Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>, Krzysztof
+ Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Anup Patel
+	<anup@brainfault.org>, Shuah Khan <shuah@kernel.org>, Atish Patra
+	<atishp@atishpatra.org>, <linux-doc@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <kvm@vger.kernel.org>,
+	<kvm-riscv@lists.infradead.org>, <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH v7 08/16] riscv: add ISA parsing for Zca, Zcf, Zcd and Zcb
+Message-ID: <20240624-remission-dominoes-9f22be5ba999@wendy>
+References: <20240619113529.676940-1-cleger@rivosinc.com>
+ <20240619113529.676940-9-cleger@rivosinc.com>
+ <20240623-cornbread-preteen-4ec287aa165c@spud>
+ <c59a8897-34a1-4dc3-b68b-35dddf55c937@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] target/i386/kvm: Refine VMX controls setting for
- backward compatibility
-From: Ewan Hai <ewanhai-oc@zhaoxin.com>
-X-ASG-Orig-Subj: Re: [PATCH v3] target/i386/kvm: Refine VMX controls setting for
- backward compatibility
-To: <mtosatti@redhat.com>, Xiaoyao Li <xiaoyao.li@intel.com>,
-	<pbonzini@redhat.com>
-CC: <kvm@vger.kernel.org>, <qemu-devel@nongnu.org>, <ewanhai@zhaoxin.com>,
-	<cobechen@zhaoxin.com>, <zhao1.liu@intel.com>
-References: <20240624095806.214525-1-ewanhai-oc@zhaoxin.com>
-Content-Language: en-US
-In-Reply-To: <20240624095806.214525-1-ewanhai-oc@zhaoxin.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZXSHCAS1.zhaoxin.com (10.28.252.161) To
- zxbjmbx1.zhaoxin.com (10.29.252.163)
-X-Barracuda-Connect: ZXSHMBX2.zhaoxin.com[10.28.252.164]
-X-Barracuda-Start-Time: 1719224459
-X-Barracuda-Encrypted: ECDHE-RSA-AES128-GCM-SHA256
-X-Barracuda-URL: https://10.28.252.36:4443/cgi-mod/mark.cgi
-X-Virus-Scanned: by bsmtpd at zhaoxin.com
-X-Barracuda-Scan-Msg-Size: 3148
-X-Barracuda-BRTS-Status: 1
-X-Barracuda-Bayes: INNOCENT GLOBAL 0.0000 1.0000 -2.0210
-X-Barracuda-Spam-Score: -2.02
-X-Barracuda-Spam-Status: No, SCORE=-2.02 using global scores of TAG_LEVEL=1000.0 QUARANTINE_LEVEL=1000.0 KILL_LEVEL=9.0 tests=
-X-Barracuda-Spam-Report: Code version 3.2, rules version 3.2.3.126687
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------------------------
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="022xOD13U5wpppzg"
+Content-Disposition: inline
+In-Reply-To: <c59a8897-34a1-4dc3-b68b-35dddf55c937@rivosinc.com>
 
-Sorry for my oversight, I am adding the maintainers who were
-missed in the previous email.
+--022xOD13U5wpppzg
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-On 6/24/24 05:58, EwanHai wrote:
-> Commit 4a910e1 ("target/i386: do not set unsupported VMX secondary
-> execution controls") implemented a workaround for hosts that have
-> specific CPUID features but do not support the corresponding VMX
-> controls, e.g., hosts support RDSEED but do not support RDSEED-Exiting.
->
-> In detail, commit 4a910e1 introduced a flag `has_msr_vmx_procbased_clts2`.
-> If KVM has `MSR_IA32_VMX_PROCBASED_CTLS2` in its msr list, QEMU would
-> use KVM's settings, avoiding any modifications to this MSR.
->
-> However, this commit (4a910e1) didn't account for cases in older Linux
-> kernels(4.17~5.2) where `MSR_IA32_VMX_PROCBASED_CTLS2` is in
-> `kvm_feature_msrs`-obtained by ioctl(KVM_GET_MSR_FEATURE_INDEX_LIST),
-> but not in `kvm_msr_list`-obtained by ioctl(KVM_GET_MSR_INDEX_LIST).
-> As a result,it did not set the `has_msr_vmx_procbased_clts2` flag based
-> on `kvm_msr_list` alone, even though KVM does maintain the value of
-> this MSR.
->
-> This patch supplements the above logic, ensuring that
-> `has_msr_vmx_procbased_clts2` is correctly set by checking both MSR
-> lists, thus maintaining compatibility with older kernels.
->
-> Signed-off-by: EwanHai <ewanhai-oc@zhaoxin.com>
-> ---
-> Changes in v3:
-> - Use a more precise version range in the comment, specifically "4.17~5.2"
-> instead of "<5.3".
->
-> Changes in v2:
-> - Adjusted some punctuation in the commit message as per suggestions.
-> - Added comments to the newly added code to indicate that it is a compatibility fix.
->
-> v1 link:
-> https://lore.kernel.org/all/20230925071453.14908-1-ewanhai-oc@zhaoxin.com/
->
-> v2 link:
-> https://lore.kernel.org/all/20231127034326.257596-1-ewanhai-oc@zhaoxin.com/
-> ---
->   target/i386/kvm/kvm.c | 15 +++++++++++++++
->   1 file changed, 15 insertions(+)
->
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index 7ad8072748..a7c6c5b2d0 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -2386,6 +2386,7 @@ void kvm_arch_do_init_vcpu(X86CPU *cpu)
->   static int kvm_get_supported_feature_msrs(KVMState *s)
->   {
->       int ret = 0;
-> +    int i;
->   
->       if (kvm_feature_msrs != NULL) {
->           return 0;
-> @@ -2420,6 +2421,20 @@ static int kvm_get_supported_feature_msrs(KVMState *s)
->           return ret;
->       }
->   
-> +   /*
-> +    * Compatibility fix:
-> +    * Older Linux kernels (4.17~5.2) report MSR_IA32_VMX_PROCBASED_CTLS2
-> +    * in KVM_GET_MSR_FEATURE_INDEX_LIST but not in KVM_GET_MSR_INDEX_LIST.
-> +    * This leads to an issue in older kernel versions where QEMU,
-> +    * through the KVM_GET_MSR_INDEX_LIST check, assumes the kernel
-> +    * doesn't maintain MSR_IA32_VMX_PROCBASED_CTLS2, resulting in
-> +    * incorrect settings by QEMU for this MSR.
-> +    */
-> +    for (i = 0; i < kvm_feature_msrs->nmsrs; i++) {
-> +        if (kvm_feature_msrs->indices[i] == MSR_IA32_VMX_PROCBASED_CTLS2) {
-> +            has_msr_vmx_procbased_ctls2 = true;
-> +        }
-> +    }
->       return 0;
->   }
->   
+On Mon, Jun 24, 2024 at 10:24:51AM +0200, Cl=E9ment L=E9ger wrote:
+>=20
+>=20
+> On 23/06/2024 17:42, Conor Dooley wrote:
+> > On Wed, Jun 19, 2024 at 01:35:18PM +0200, Cl=E9ment L=E9ger wrote:
+> >> The Zc* standard extension for code reduction introduces new extension=
+s.
+> >> This patch adds support for Zca, Zcf, Zcd and Zcb. Zce, Zcmt and Zcmp
+> >> are left out of this patch since they are targeting microcontrollers/
+> >> embedded CPUs instead of application processors.
+> >>
+> >> Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
+> >> Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
+> >> ---
+> >>  arch/riscv/include/asm/hwcap.h |  4 +++
+> >>  arch/riscv/kernel/cpufeature.c | 55 +++++++++++++++++++++++++++++++++-
+> >>  2 files changed, 58 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/arch/riscv/include/asm/hwcap.h b/arch/riscv/include/asm/h=
+wcap.h
+> >> index 18859277843a..b12ae3f2141c 100644
+> >> --- a/arch/riscv/include/asm/hwcap.h
+> >> +++ b/arch/riscv/include/asm/hwcap.h
+> >> @@ -87,6 +87,10 @@
+> >>  #define RISCV_ISA_EXT_ZVE64F		78
+> >>  #define RISCV_ISA_EXT_ZVE64D		79
+> >>  #define RISCV_ISA_EXT_ZIMOP		80
+> >> +#define RISCV_ISA_EXT_ZCA		81
+> >> +#define RISCV_ISA_EXT_ZCB		82
+> >> +#define RISCV_ISA_EXT_ZCD		83
+> >> +#define RISCV_ISA_EXT_ZCF		84
+> >> =20
+> >>  #define RISCV_ISA_EXT_XLINUXENVCFG	127
+> >> =20
+> >> diff --git a/arch/riscv/kernel/cpufeature.c b/arch/riscv/kernel/cpufea=
+ture.c
+> >> index a3af976f36c9..aa631fe49b7c 100644
+> >> --- a/arch/riscv/kernel/cpufeature.c
+> >> +++ b/arch/riscv/kernel/cpufeature.c
+> >> @@ -111,6 +111,9 @@ static int riscv_ext_zicboz_validate(const struct =
+riscv_isa_ext_data *data,
+> >> =20
+> >>  #define __RISCV_ISA_EXT_DATA(_name, _id) _RISCV_ISA_EXT_DATA(_name, _=
+id, NULL, 0, NULL)
+> >> =20
+> >> +#define __RISCV_ISA_EXT_DATA_VALIDATE(_name, _id, _validate) \
+> >> +			_RISCV_ISA_EXT_DATA(_name, _id, NULL, 0, _validate)
+> >> +
+> >>  /* Used to declare pure "lasso" extension (Zk for instance) */
+> >>  #define __RISCV_ISA_EXT_BUNDLE(_name, _bundled_exts) \
+> >>  	_RISCV_ISA_EXT_DATA(_name, RISCV_ISA_EXT_INVALID, _bundled_exts, \
+> >> @@ -122,6 +125,37 @@ static int riscv_ext_zicboz_validate(const struct=
+ riscv_isa_ext_data *data,
+> >>  #define __RISCV_ISA_EXT_SUPERSET_VALIDATE(_name, _id, _sub_exts, _val=
+idate) \
+> >>  	_RISCV_ISA_EXT_DATA(_name, _id, _sub_exts, ARRAY_SIZE(_sub_exts), _v=
+alidate)
+> >> =20
+> >> +static int riscv_ext_zca_depends(const struct riscv_isa_ext_data *dat=
+a,
+> >=20
+> > It's super minor, but my OCD doesn't like this being called "depends"
+> > when the others are all called "validate".
+>=20
+> Ok, let's make a deal. You review patch 14/16 and I'll make the machine
+> part of you happy and call this function validate ;)
 
+I generally avoid the hwprobe patches intentionally :) I'm not even
+expecting a respin for this tbh, I'd like to just get it in so that I
+can do things on top of it.
+
+--022xOD13U5wpppzg
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnlKWAAKCRB4tDGHoIJi
+0qTZAQDW6NkBEEY0BpVBm4oazaou8r5axQXRsRokUPZuDY/Q/wEA7XbMZLRFekMt
+ZYMxRfkbyf9XPgmg2W/WvyHnahDlhA4=
+=Ozsy
+-----END PGP SIGNATURE-----
+
+--022xOD13U5wpppzg--
 
