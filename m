@@ -1,224 +1,189 @@
-Return-Path: <kvm+bounces-36083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-36089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D84A176C3
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 06:01:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31EDFA1773A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 07:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99433188B1E9
-	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 05:02:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DB6D16A71A
+	for <lists+kvm@lfdr.de>; Tue, 21 Jan 2025 06:05:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86EE19DF98;
-	Tue, 21 Jan 2025 05:01:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD81B1547E7;
+	Tue, 21 Jan 2025 06:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Wfrz83/E"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yt+d5F2W"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2079.outbound.protection.outlook.com [40.107.244.79])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5088F14900F;
-	Tue, 21 Jan 2025 05:01:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737435708; cv=fail; b=aHysrQT7J0OGQZI+I5ViUz2H8e8b2OVm23G4imoUET2w75J5gJXrUaXQe+5MM8B1sVUW7VhEN9RzomYv1yi09XQBFL2y+ISk1X6nvKM/fHuIB25IxNchQRQj0CUIVpXNfnJ/HdT1PpBEogyWEsNIVEU3WkbSTcHvuMY1hnFzdXk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737435708; c=relaxed/simple;
-	bh=uThBtxXGVPpOY9RTj0/pRZsH4B46eaJBKF2IIt+uXb0=;
-	h=From:To:CC:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=jQQCA9yFbXxk7ry5eG5xegahcQj6dnfViLhFFj5636bserDaPeu05YUpVHuieqguQGDUdq+7ly4oqyZKoGexN/oVPCW8dA5fQwcxMHizxfaXTRvOJ2++hJVlKbvDdx7uKANeYA2YPuh8Pogt8GpwXJEM+lsoAi8L5v1GDDp+TUk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Wfrz83/E; arc=fail smtp.client-ip=40.107.244.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dDPrnBKRSwIywpAftO8zemV56u14FqDmF83qu4/j541f0YG+ufsEOzKXCK0k/dLhrWXm9wcXHkZ8kYgTcvLtcRBrLqtDF8t4Jx1tMBZyoHsQcvlLYlta3VW1ILwnGZKTmOB1KTwE1QA++opRfTBr3YagfgtCVTH2TlMxE8HGlIwvmYaZl+xSWq7+KX/4AKQXdlUc4feejwBa6t2QV8eKMDAE9GAptQdU0y9wLFHLEydHkUB+sB5u6pw2XbRSXsG0GPVwI3w8nW9AfIMJyC9VNV1UNg1Xbnv7r18wOl8RSOzO3zHaeIFzXSU+ADuKOEkDk5O+fZUwWzPGLiOP4ymKHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NHjhLNKvCDJtgCobNBeGein8ZxTxkNrWUnzyQ+KDlns=;
- b=BpZPfF2c5UZcMQJFSuW7Mmd3M7/tZNXTCrKgthskhqpdqcJ/9izaeB724MgGAjYzDpbRrwtVb78SADhsgR7miYJwNuWguMR0R//6JFysOlzEb5AO4EvGc8MjZpMAS/TecA/zc/3ogI6tc9usPpplPV/0sE++fsyCeiDUTKnaGdCAQs0aIExBjV5xbLIpQ3aG0oLhiSr6W6QoBoXhMMiBUeobattxtV3LMlS94ZOwtzNegz5ByTcu4nZXlSWVQQSA1tLqAwH3+n/6/SUH7tiWy6Y3v2nQr5caW8p5ZKUNpPHUXTK5oowHqrcc9ER3RRNhzf9+T2i5eBesyCU58r1eyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=sjtu.edu.cn smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NHjhLNKvCDJtgCobNBeGein8ZxTxkNrWUnzyQ+KDlns=;
- b=Wfrz83/Epcn/ITl4do6i9Y/OSCKa0Hqh6p+mdngzVhG6Hs0pl8qOm3LZec0N9VsmcDR+5B8UDqWG9zDBcsR9ClS9C3494vCEokXdpkziZhG56zlJnamKMtGiHDxqA0IGB8vqTEGhnfN5keduZqPvUsG16ddxhw78xdm7npHDQ6I=
-Received: from BN7PR02CA0035.namprd02.prod.outlook.com (2603:10b6:408:20::48)
- by SA3PR12MB8439.namprd12.prod.outlook.com (2603:10b6:806:2f7::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8335.18; Tue, 21 Jan
- 2025 05:01:43 +0000
-Received: from BL6PEPF0001AB54.namprd02.prod.outlook.com
- (2603:10b6:408:20:cafe::f) by BN7PR02CA0035.outlook.office365.com
- (2603:10b6:408:20::48) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8356.21 via Frontend Transport; Tue,
- 21 Jan 2025 05:01:43 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL6PEPF0001AB54.mail.protection.outlook.com (10.167.241.6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.8377.8 via Frontend Transport; Tue, 21 Jan 2025 05:01:41 +0000
-Received: from BLR-L1-NDADHANI (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 20 Jan
- 2025 23:01:38 -0600
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: Zheyun Shen <szy0127@sjtu.edu.cn>, <thomas.lendacky@amd.com>,
-	<seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
-	<kevinloughlin@google.com>, <mingo@redhat.com>, <bp@alien8.de>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Zheyun Shen
-	<szy0127@sjtu.edu.cn>
-Subject: Re: [PATCH v5 3/3] KVM: SVM: Flush cache only on CPUs running SEV
- guest
-In-Reply-To: <20250120120503.470533-4-szy0127@sjtu.edu.cn>
-References: <20250120120503.470533-1-szy0127@sjtu.edu.cn>
- <20250120120503.470533-4-szy0127@sjtu.edu.cn>
-Date: Tue, 21 Jan 2025 05:01:35 +0000
-Message-ID: <85frlcvjyo.fsf@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1009913AA5D;
+	Tue, 21 Jan 2025 06:05:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737439544; cv=none; b=Z72j0BMETEb2QphrUCt9ZsjHo2VKfwLh3tAVCkjSUCZ4OWoZfGjBcyf6VyRR0JfGUcQZXhFu7P9sSqZy77OhSJst1lO7DFBJwweYztkWzHbjzwVSqIoGhulYtRsSeIdUF9K6rRXQ08bbBRvJqIZLNe+2mSbDZNj33it/CAceMxk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737439544; c=relaxed/simple;
+	bh=EICKAbt6ehTM275az3a+HO8w7Dd752OxSdIpuT+vXjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pCNYS9GgBWrtYnXwEUKbwaiHipfHasy968MRf59EibH/fvdARY5lgqLRKcjTD/dpbpgFTLU2Z6pcrIxUNTLNfxhbn2C8SI1q1ZHXfF5XzrvnY8otFlwqLaXZuECW3X1iIi//2bzUnjvMzXPntXOUlzn5QMW0XjujIEva5D85G5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yt+d5F2W; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737439544; x=1768975544;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=EICKAbt6ehTM275az3a+HO8w7Dd752OxSdIpuT+vXjw=;
+  b=Yt+d5F2WlwRFkOk63jibIQKoE7SROOqtylx+M/tf4WibNSghpvBNy3Iw
+   X+AJUJYHTXo/X0Z1WJb8c/mDxVGD5tdcOWB3goJipY4R9One/Kr/BrIgI
+   ODmAS1rSs3op6Nfp3oiqOc5CiizUXDa1Zq6neszFPLo67HGY0nDXe33Gu
+   sHlCuOu4tdDIiWpFR6AeZoBsLGqp3SrNurlfZupOrPfp17Bfe6+tajBSL
+   M1650GgrSK+ILxedg73Roz9FTJr9cIPLxr6B3Hxn+FA/qX6HUQbPPIJhQ
+   6OrAZlYgH9wodpbIazXB+bpemRMZNnCM3uDnD2g35eQxr19t4o02V+mw3
+   Q==;
+X-CSE-ConnectionGUID: plIqbp8eQ+mF69SF27wjuQ==
+X-CSE-MsgGUID: bqsemsFSTcKrY22v5PdxOA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="37947878"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="37947878"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jan 2025 22:05:42 -0800
+X-CSE-ConnectionGUID: tHJjq00eSoirj4Z7Z0C1/g==
+X-CSE-MsgGUID: KEwSyQz7S/mHimzNYrB6sw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,221,1732608000"; 
+   d="scan'208";a="106509090"
+Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
+  by orviesa009.jf.intel.com with ESMTP; 20 Jan 2025 22:05:36 -0800
+Date: Tue, 25 Jun 2024 05:12:10 +0800
+From: Xu Yilun <yilun.xu@linux.intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Baolu Lu <baolu.lu@linux.intel.com>, Alexey Kardashevskiy <aik@amd.com>,
+	kvm@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-media@vger.kernel.org, linaro-mm-sig@lists.linaro.org,
+	sumit.semwal@linaro.org, christian.koenig@amd.com,
+	pbonzini@redhat.com, seanjc@google.com, alex.williamson@redhat.com,
+	vivek.kasireddy@intel.com, dan.j.williams@intel.com,
+	yilun.xu@intel.com, linux-coco@lists.linux.dev,
+	linux-kernel@vger.kernel.org, lukas@wunner.de, yan.y.zhao@intel.com,
+	daniel.vetter@ffwll.ch, leon@kernel.org, zhenzhong.duan@intel.com,
+	tao1.su@intel.com
+Subject: Re: [RFC PATCH 08/12] vfio/pci: Create host unaccessible dma-buf for
+ private device
+Message-ID: <ZnnhKtA2n4s1CLyf@yilunxu-OptiPlex-7050>
+References: <Z4Hp9jvJbhW0cqWY@yilunxu-OptiPlex-7050>
+ <20250113164935.GP5556@nvidia.com>
+ <ZnDGqww5SLbVD6ET@yilunxu-OptiPlex-7050>
+ <20250114133553.GB5556@nvidia.com>
+ <17cd9b77-4620-4883-9a6a-8d1cab822c88@amd.com>
+ <20250115130102.GM5556@nvidia.com>
+ <f1ac048f-64b1-4343-ab86-ad98c24a44f5@linux.intel.com>
+ <20250117132523.GA5556@nvidia.com>
+ <Znh+uTMe/wX2RIJm@yilunxu-OptiPlex-7050>
+ <20250120132525.GH5556@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB54:EE_|SA3PR12MB8439:EE_
-X-MS-Office365-Filtering-Correlation-Id: d1dc2249-0ddb-44d9-fdc6-08dd39d8b20d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|82310400026|36860700013|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?jybYxQsP4d5vh9Ir2b4tap534L8yQJ6IM3b+7GRJQesJ5kheyErZuUzu1rXv?=
- =?us-ascii?Q?oy9j3gQcE0QjXzSMXsAbGkHDP7Z3HM/cl9ZNs2mcu/k19PhlQ3FEHWVC+epH?=
- =?us-ascii?Q?GfloXHv3wE9pPEWwCb8+6C9XVcuprdWaRhnhRF38zvAPiaggrCpAPRNxX27/?=
- =?us-ascii?Q?HeR3j94lfboS2OmwWyYGz0W8sB67poyf3ya5T6AXSxhLdDxF7otaO3YzHXBS?=
- =?us-ascii?Q?wVEzDOMe+ZcbT5Op8RDkYSFttqPbpy13SBjoldMRWgS1NC8g9aCgK5XZJKpW?=
- =?us-ascii?Q?yrZZgvC1dtpFb1hGxbtAkmBvftsk2w8Q7E0Xnz62Qwfq9tsD1fwiECvn55t1?=
- =?us-ascii?Q?rZklWrRqcrRaN+zgoLYR4qCf9XfSrTFXIVOq8Cau4ICNN9hjEBYEZueHWTUO?=
- =?us-ascii?Q?6KvnH+BEbCoeblqfUbvlo4FQGsBVoi/IfPM7pFYMy6U+i90XyuMzt/+hu1Xf?=
- =?us-ascii?Q?x1eB2w6PpgRAAJHKF/ykmrx6gMaEA+Pni+ZK0iAiP1WimbKrPcOoggxQGELz?=
- =?us-ascii?Q?GZFk3eC++xDRN5FMvC/cI5XfqvnuTYZkKUn4Jyg4Kny+Wdoq3X7AGejgqqNG?=
- =?us-ascii?Q?XX43mn1rkrez5ywsJ+vzsJkbErfxVIajojuhNQAlM2V9u9Kts9v9cZYYSOEG?=
- =?us-ascii?Q?0SKpu92YH1mJTwD7nDY6agrtcBVkIPAMyjq4neJ3M1AaO5ScJe5em20hzwmn?=
- =?us-ascii?Q?9NA9Wgi6+wBFyv/1iYhcIEIxC7rD4rkbol6OHNBQ3LDKrhlzPHqOkNtsFJyC?=
- =?us-ascii?Q?K5VYvOIZVwAUUxQHHHdV4w9pgXXoN9Y6AY1ekiMEW9ogeq0OY+rTVxaRlGqI?=
- =?us-ascii?Q?hH4zYofd5vCn4oSGQMU7duonsPeRxAwzz2u71HCYnSUxNUQqaqg6mFFJEUQU?=
- =?us-ascii?Q?Wsp9So9O0tMOybF5p8woyHZCXCwmpPb+5Rln4kVxx8DaCylSu5YSS3P4Tj1+?=
- =?us-ascii?Q?S10qL+f1UtETYQN802RqovLFZqS1qF0bZikKJAcptOZKxgS6jQ/90eU1Pgw0?=
- =?us-ascii?Q?1kuR2wl017PFiC/gyU9zE+XkRtkltDRCOK8JArO8ATZaHNeoO18p1A4R2nh4?=
- =?us-ascii?Q?G19RI5tP3OTkt3LHbMiG8ZL0Ginm3LcH/2CCSc1+9cczQEN9ziXvMfkIiwgD?=
- =?us-ascii?Q?9RqHNnHCSqapHDwEgQ+rY6IPqKWAaOkrPENlm8MVjKjkSOR8f2ArPQC3qgb7?=
- =?us-ascii?Q?uFJZwmXn3RXZT8shOIDskkU6ZfZnN5hHKULP05wP+Bjy0phijnYnlEZ17Pt2?=
- =?us-ascii?Q?8rd2MO6BKADmF81NKJz3pKmY/CtZfcB2OGvyeY5MiLFKrC6VaQMvSf00ZNjQ?=
- =?us-ascii?Q?FjrbAfH/YAmsxrp/karhxcpAa1CK+vvLHy1cZw4sllA6yvdkAShz0yBAXncq?=
- =?us-ascii?Q?R7NoOI8huj5qyaXsnEhPG13MxFoZEs+oxL24Wymh4r6n/rlsZtZaMJ1gI2RG?=
- =?us-ascii?Q?6srmsZqh+PuXATyzkYRctJD9g9zCKAXxQoC1SRbADjH22d7qhz6ASp4rcqg5?=
- =?us-ascii?Q?bCgsv+I8vOLK+6k=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(82310400026)(36860700013)(7053199007);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jan 2025 05:01:41.8833
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d1dc2249-0ddb-44d9-fdc6-08dd39d8b20d
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB54.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8439
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250120132525.GH5556@nvidia.com>
 
-Zheyun Shen <szy0127@sjtu.edu.cn> writes:
+On Mon, Jan 20, 2025 at 09:25:25AM -0400, Jason Gunthorpe wrote:
+> On Mon, Jun 24, 2024 at 03:59:53AM +0800, Xu Yilun wrote:
+> > > But it also seems to me that VFIO should be able to support putting
+> > > the device into the RUN state
+> > 
+> > Firstly I think VFIO should support putting device into *LOCKED* state.
+> > From LOCKED to RUN, there are many evidence fetching and attestation
+> > things that only guest cares. I don't think VFIO needs to opt-in.
+> 
+> VFIO is not just about running VMs. If someone wants to run DPDK on
+> VFIO they should be able to get the device into a RUN state and work
+> with secure memory without requiring a KVM. Yes there are many steps
+> to this, but we should imagine how it can work.
 
-> On AMD CPUs without ensuring cache consistency, each memory page
-> reclamation in an SEV guest triggers a call to wbinvd_on_all_cpus(),
-> thereby affecting the performance of other programs on the host.
->
-> Typically, an AMD server may have 128 cores or more, while the SEV guest
-> might only utilize 8 of these cores. Meanwhile, host can use qemu-affinity
-> to bind these 8 vCPUs to specific physical CPUs.
->
-> Therefore, keeping a record of the physical core numbers each time a vCPU
-> runs can help avoid flushing the cache for all CPUs every time.
->
-> Suggested-by: Sean Christopherson <seanjc@google.com>
-> Signed-off-by: Zheyun Shen <szy0127@sjtu.edu.cn>
-> ---
->  arch/x86/kvm/svm/sev.c | 39 ++++++++++++++++++++++++++++++++++++---
->  arch/x86/kvm/svm/svm.c |  2 ++
->  arch/x86/kvm/svm/svm.h |  5 ++++-
->  3 files changed, 42 insertions(+), 4 deletions(-)
->
-> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 1ce67de9d..91469edd1 100644
-> --- a/arch/x86/kvm/svm/sev.c
-> +++ b/arch/x86/kvm/svm/sev.c
-> @@ -252,6 +252,36 @@ static void sev_asid_free(struct kvm_sev_info *sev)
->  	sev->misc_cg = NULL;
->  }
->  
-> +static struct cpumask *sev_get_wbinvd_dirty_mask(struct kvm *kvm)
-> +{
-> +	struct kvm_sev_info *sev = &to_kvm_svm(kvm)->sev_info;
+Interesting Question. I've never thought about native TIO before.
 
-There is a helper to get sev_info: to_kvm_sev_info(), if you use that,
-sev_get_wbinvd_dirty_mask() helper will not be needed.
+And you are also thinking about VFIO usage in CoCo-VM. So I believe
+VFIO could be able to support putting the device into the RUN state,
+but no need a uAPI for that, this happens when VFIO works as a TEE
+attester.
 
-> +
-> +	return sev->wbinvd_dirty_mask;
-> +}
-> +
-> +void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-> +{
-> +	/*
-> +	 * To optimize cache flushes when memory is reclaimed from an SEV VM,
-> +	 * track physical CPUs that enter the guest for SEV VMs and thus can
-> +	 * have encrypted, dirty data in the cache, and flush caches only for
-> +	 * CPUs that have entered the guest.
-> +	 */
-> +	cpumask_set_cpu(cpu, sev_get_wbinvd_dirty_mask(vcpu->kvm));
-> +}
-> +
-> +static void sev_do_wbinvd(struct kvm *kvm)
-> +{
-> +	struct cpumask *dirty_mask = sev_get_wbinvd_dirty_mask(kvm);
-> +
-> +	/*
-> +	 * TODO: Clear CPUs from the bitmap prior to flushing.  Doing so
-> +	 * requires serializing multiple calls and having CPUs mark themselves
-> +	 * "dirty" if they are currently running a vCPU for the VM.
-> +	 */
-> +	wbinvd_on_many_cpus(dirty_mask);
-> +}
+In different cases, VFIO plays different roles:
 
-Something like the below
+1. TEE helper, but itself is out of TEE.
+2. TEE attester, it is within the TEE.
+3. TEE user, it is within the TEE.
 
-void sev_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
-{
-        /* ... */
-        cpumask_set_cpu(cpu, to_kvm_sev_info(kvm)->wbinvd_dirty_mask);
-}
+As a TEE helper, it works on a untrusted device and help put the device
+in LOCKED state, waiting for attestation. For VM use case, VM acts as the
+attester to do attestation and move device into trusted/RUN state (lets
+say 'accept'). The attestation and accept could be direct talks between
+attester and device (maybe via TSM sysfs node), because from
+LOCKED -> RUN VFIO doesn't change its way of handling device so seems
+no need to introduce extra uAPIs and complexity just for passing the
+talks. That's my expectation of VFIO's responsibility as a TEE
+helper - serve until LOCKED, no care about the rest, UNLOCK rollbacks
+everything.
 
-static void sev_do_wbinvd(struct kvm *kvm)
-{
-        /* ... */
-        wbinvd_on_many_cpus(to_kvm_sev_info(kvm)->wbinvd_dirty_mask);
-}
+I imagine in bare metal, if DPDK works as an attester (within TEE) and
+VFIO still as a TEE helper (out of TEE), this model seems still work.
 
-Regards,
-Nikunj
 
+
+When VFIO works as a TEE user in VM, it means an attester (e.g. PCI
+subsystem) has already moved the device to RUN state. So VFIO & DPDK
+are all TEE users, no need to manipulate TDISP state between them.
+AFAICS, this is the most preferred TIO usage in CoCo-VM.
+
+When VFIO works as a TEE attester in VM, it means the VM's PCI
+subsystem leaves the attestation work to device drivers. VFIO should do
+the attestation and accept before pass through to DPDK, again no need to
+manipulate TDISP state between them.
+
+I image the possibility TIO happens on bare metal, that a device is
+configured as waiting for attestation by whatever kernel module, then
+PCI subsystem or VFIO try to attest, accept and use it, just the same as
+in CoCo VM.
+
+> 
+> > > without involving KVM or cVMs.
+> > 
+> > It may not be feasible for all vendors. 
+> 
+> It must be. A CC guest with an in kernel driver can definately get the
+> PCI device into RUN, so VFIO running in the guest should be able as
+> well.
+
+You are talking about VFIO in CoCo-VM as an attester, then definiately
+yes.
+
+> 
+> > I believe AMD would have one firmware call that requires cVM handle
+> > *AND* move device into LOCKED state. It really depends on firmware
+> > implementation.
+> 
+> IMHO, you would not use the secure firmware if you are not using VMs.
+> 
+> > Yes, the secure EPT is in the secure world and managed by TDX firmware.
+> > Now a SW Mirror Secure EPT is introduced in KVM and managed by KVM
+> > directly, and KVM will finally use firmware calls to propagate Mirror
+> > Secure EPT changes to secure EPT.
+> 
+> If the secure world managed it then the secure world can have rules
+> that work with the IOMMU as well..
+
+Yes.
+
+Thanks,
+Yilun
+
+> 
+> Jason
 
