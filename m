@@ -1,78 +1,92 @@
-Return-Path: <kvm+bounces-20391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D761A91490F
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 13:44:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38CDB9149CA
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 14:27:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06AEA1C23895
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 11:44:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC17A28488B
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 761BC13A86A;
-	Mon, 24 Jun 2024 11:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF2D13B7BC;
+	Mon, 24 Jun 2024 12:27:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eeKOOHDZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IFhnipz0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 126211386DA
-	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 11:44:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582194776A
+	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 12:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719229453; cv=none; b=gJBp6evLg/B1RpmWqcE6vr+k7fy4MvLpC5/A65oZWu/VpENjGXC3Od4SE/3CvTX7nZwSOBhXJg5TkpKFmrsVJMb0x4TpdHdz2xwTy/iWaMpUE5WbxOmNdwuw2RlmYz+aL+gMeo/XIQN76G347gXB4WhzYDSN1N5M4R/YtURaS1I=
+	t=1719232034; cv=none; b=KxgHNoTI28pOceI/YwxpZvW4Lgcc2YeA1kG1nesmtNDRn1OKdUNY65hIE/W7B3zcjU0kv4/CgZ9C3YFR6RO5e8E1Tk4xBa0mh/FAVDmXLplKl6xxCyegl+ryUnXjxglsKECNgBiFqlPGPAo+rWpGkyrOQHtyJYWBqa/mmi5tfbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719229453; c=relaxed/simple;
-	bh=a5KUWQ2Qf1E9wLj/6ox0unB+WKoNQyeWHnqEFsuIu6c=;
+	s=arc-20240116; t=1719232034; c=relaxed/simple;
+	bh=sUiqSzz7409Eumfc0OjBFtrSGLxTwrPN1xTUSXIFu7k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T4/h6z3rWLCYdp53bhzB3s5umSiuszdTW8SGFCnrFMJplavOjfTrQsHVm2aNIr09V/B6WTZwMWYcBXuvqMQKwdvaMPgGjuEMXoZJYss8BMpgzpkWYOsgc9OLllv51LJGuOQDlmh6p+gLw2puhJZjQKF1cjO6FLA21wjspcE1lGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eeKOOHDZ; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=goFkmbkAE7SGp4ZuNttNC3O1/poOhR1R8ogE5FaS5d2ZBy9gWPgU073T1JiUqmv+UDDUDT/mmE5DKfORWiChV5caZDKG9sm3FYaPnhZDM9FA00Vw8Pj32G0MvubvXCrJc69J6k+b6zaIz2+sRuvIpF5QaHShAKWzESM3T5AFf5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IFhnipz0; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719229450;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	s=mimecast20190719; t=1719232031;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cXMlOCTBH9ppGiREvrYGHGuZ92vyek5UuwObkNJ0g1I=;
-	b=eeKOOHDZh07WDTcDJnjClw+8N2uncTb3omUxVKfuDez2FDFSWeGNqr06fVqTmjOsmgZjHF
-	BRPgdS4u1/WOsbPKiGzAiKAfBjcL0veSTBBad6Y9u2qgH+WshTp+TkUUmSUkjYr+x+x4fC
-	RA9mfWnRbMM9QtRzpbhMS6OfGq6vcnQ=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-193-cK_p3YuiMISorwLMxdqKRw-1; Mon,
- 24 Jun 2024 07:44:07 -0400
-X-MC-Unique: cK_p3YuiMISorwLMxdqKRw-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 54B071956089;
-	Mon, 24 Jun 2024 11:44:06 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.226])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8B2001954B13;
-	Mon, 24 Jun 2024 11:44:01 +0000 (UTC)
-Date: Mon, 24 Jun 2024 12:43:57 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>,
+	bh=2TWK+sfwtHYlg1TGDTvMfWnHFSmraa886QsMrQY+oCU=;
+	b=IFhnipz0mft5QJiGdlauvImE/FrqwlvQj53N0Y10fNTtpEGPsMlR78lpjk31rm2kaB9eLL
+	K5I8yMBnvWoXVp6pPjtCbEfDtCg8n72wAZXdTR7FxpMBsiCRXNWbVI/JkR7D0khCnV50T0
+	84rN8dq+evqtWvL7BIM1Swi3aHWEsIA=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-608-tAxwYD3sNPCaCfrEZOdFug-1; Mon, 24 Jun 2024 08:27:09 -0400
+X-MC-Unique: tAxwYD3sNPCaCfrEZOdFug-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52cdbc21fa2so1701691e87.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 05:27:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719232028; x=1719836828;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2TWK+sfwtHYlg1TGDTvMfWnHFSmraa886QsMrQY+oCU=;
+        b=cPzaeZ2SB9cnEbajp2XOSWzk65SsOhXhN7awvizkXXRByB9DUeObNGXwSXX9fW1wQu
+         1G2tQY10KCEOVHPLDMTgljGC6oUu3nFkD4+clyAVOQ1or+wCYHqA4SWm8Z3EfhYYGKit
+         nSjLumch8Hrezq8VCYRuElnvZJ9YXo9rTrOBl5Grxgs7FfQfZYNB0U8Opafrdq0R+Ll1
+         lLQ+nv4ucDAIYGRPFxkuEFb1s8x3YoU3Y03DV2HVf0lxzjhyOVgbRYw7OeaqAsoei/RM
+         1DvC0W+htZ6dSQdbrym0FF9v3Y3CiKSGj5VjpCZhcXSI8r95xbw6NJOMz/mwyPHogdKO
+         tvlA==
+X-Forwarded-Encrypted: i=1; AJvYcCWkaOBqyYPnn2I/bLTdI6TkD8VhFuoOdWN0+qTK7z//eBAqlmNKzSgWzohduRC/+iMnKXpyLYVBP61egH4Jejke5sBE
+X-Gm-Message-State: AOJu0YyhyouCavhMRsKiIcsKwjzwtdVUe613xkSYDCvlGJLdDk2rS8wo
+	2YXEWPWV/8gUy5nqSf+7MamhDyk4mXGhAivk9AoR78TsWj/R9oQPy1K5BLtpEgg3KoguxMqh7xF
+	j3ZuI2spGariPPYNLI0iZ17YI1XstRPoIvWagvC3vV4Kp/TSHWA==
+X-Received: by 2002:ac2:5ded:0:b0:52c:dac0:59f8 with SMTP id 2adb3069b0e04-52ce185fb12mr2622560e87.53.1719232027863;
+        Mon, 24 Jun 2024 05:27:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGypNezLYvbgrPRJVO8xMHU9PQhPBSJ/O+uOgMOiAgMLLFOYLeIE4z87cK0nU4upF/BOyuLkA==
+X-Received: by 2002:ac2:5ded:0:b0:52c:dac0:59f8 with SMTP id 2adb3069b0e04-52ce185fb12mr2622542e87.53.1719232027066;
+        Mon, 24 Jun 2024 05:27:07 -0700 (PDT)
+Received: from redhat.com ([2.52.146.100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-366bd575f6asm9284881f8f.6.2024.06.24.05.27.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jun 2024 05:27:06 -0700 (PDT)
+Date: Mon, 24 Jun 2024 08:27:01 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
 	Michael Roth <michael.roth@amd.com>,
 	Eduardo Habkost <eduardo@habkost.net>,
 	Richard Henderson <richard.henderson@linaro.org>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, kvm@vger.kernel.org,
 	Markus Armbruster <armbru@redhat.com>,
 	Eric Blake <eblake@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
 Subject: Re: [PATCH] i386: revert defaults to 'legacy-vm-type=true' for
  SEV(-ES) guests
-Message-ID: <Znlb_WtHpPHXa6zH@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+Message-ID: <20240624080458-mutt-send-email-mst@kernel.org>
 References: <20240614103924.1420121-1-berrange@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -80,16 +94,12 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 In-Reply-To: <20240614103924.1420121-1-berrange@redhat.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Ping, any comments for this ?
-
-On Fri, Jun 14, 2024 at 11:39:24AM +0100, Daniel P. Berrangé wrote:
+On Fri, Jun 14, 2024 at 11:39:24AM +0100, Daniel P. Berrang� wrote:
 > The KVM_SEV_INIT2 ioctl was only introduced in Linux 6.10, which will
 > only have been released for a bit over a month when QEMU 9.1 is
 > released.
@@ -115,7 +125,46 @@ On Fri, Jun 14, 2024 at 11:39:24AM +0100, Daniel P. Berrangé wrote:
 > with their new major releases where they can guarantee the kernel
 > will always provide the required functionality.
 > 
-> Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> Signed-off-by: Daniel P. Berrang� <berrange@redhat.com>
+
+This makes sense superficially, so
+
+Acked-by: Michael S. Tsirkin <mst@redhat.com>
+
+and I'll let kvm maintainers merge this.
+
+However I wonder, wouldn't it be better to refactor this:
+
+    if (x86_klass->kvm_type(X86_CONFIDENTIAL_GUEST(sev_common)) == KVM_X86_DEFAULT_VM) {
+        cmd = sev_es_enabled() ? KVM_SEV_ES_INIT : KVM_SEV_INIT;
+        
+        ret = sev_ioctl(sev_common->sev_fd, cmd, NULL, &fw_error);
+    } else {
+        struct kvm_sev_init args = { 0 };
+                
+        ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_INIT2, &args, &fw_error);
+    }   
+
+to something like:
+
+if (x86_klass->kvm_type(X86_CONFIDENTIAL_GUEST(sev_common)) != KVM_X86_DEFAULT_VM) {
+        struct kvm_sev_init args = { 0 };
+                
+        ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_INIT2, &args, &fw_error);
+	if (ret && errno == ENOTTY) {
+		cmd = sev_es_enabled() ? KVM_SEV_ES_INIT : KVM_SEV_INIT;
+
+		ret = sev_ioctl(sev_common->sev_fd, cmd, NULL, &fw_error);
+	}
+}
+
+
+Yes I realize this means measurement will then depend on the host
+but it seems nicer than failing guest start, no?
+
+
+
+
 > ---
 >  hw/i386/pc.c      |  1 -
 >  qapi/qom.json     | 12 ++++++------
@@ -177,13 +226,5 @@ On Fri, Jun 14, 2024 at 11:39:24AM +0100, Daniel P. Berrangé wrote:
 >  /* guest info specific sev/sev-es */
 > -- 
 > 2.45.1
-> 
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
