@@ -1,186 +1,175 @@
-Return-Path: <kvm+bounces-20397-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20396-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 517A1914A56
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 14:40:27 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BF49914A55
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 14:40:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 063E0280EFF
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:40:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42BF2B23A3F
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A5DD13D62A;
-	Mon, 24 Jun 2024 12:39:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34C8413D523;
+	Mon, 24 Jun 2024 12:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="XL9lThaf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Alua9aeK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAB313D24C;
-	Mon, 24 Jun 2024 12:39:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D07713D60D
+	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 12:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719232758; cv=none; b=hjjmlAOop0WICQFcked74lOTGmQyoA5TnqpG5xH+fnUoVTzWgEUobLNKRDST8hXWwII5QCsoBhBfR8rXFYitQXRdmSdpDiBwKf0IINNHHfQCrPSM4U4QaKKvYqUT7X0FHfvTzgyQnbpxB93NPWcMEherh4om7knZuJxHxjoOkZg=
+	t=1719232752; cv=none; b=L4pIRVoNFrOYp0wIN9q8rX6m7YegXC4s/DLMgxc1mawSu8lFi5+YeJL0uLoZTQ49ilEFVjZJr+Pw8+DQ+Y2yo+7RLkFi0IyXPtVFEAtyQ0Wrv35O9j8OzmS1CA2mtjjXewmGE1O7EnAya7xeFPpiILYr3Tnma27PzHwar+6UylA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719232758; c=relaxed/simple;
-	bh=csIOidFbK9g0l4zoRHI5iNtf/AxhpMIfdrawPnTEYDk=;
-	h=Subject:From:To:Cc:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lexVdcDPx5pupPgNpx+AUgzvFwKDw74WVoTC88kmmlBEtbftktgk8+n6EFK8tw6D9U2bBmagdpHiqJfzQzi7+vUv7fmXJsYbFhxqpb2G0No2YwU6nfDXXSq+9j4UPU0N6jlFmnZ4kWVKdazcJxdU7S4PYErimlafyuX4cTaVeXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=XL9lThaf; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45OBwbsJ032681;
-	Mon, 24 Jun 2024 12:38:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	subject:from:to:cc:date:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	nqsZiY+nwGHdS7f7Tvj9s9qjRvXJEGZNaAFiWBYtykA=; b=XL9lThafpmvOxWwI
-	HJOBEg5YPMdyEB0J2EIeXEU3QBhaeFP1LFREbSXYhklt0RMkqqspQ5F8i80MXGSF
-	mPoy8NZbgq6GC552HJU4bX48aHdDh2Zmon5G/fcVfA8/nkIZympO3CBjOC8yPynx
-	+VQhI56xzKRUAUUr9LBmUkyUBSwiBxYgxiRzArHsdnirLSGOZFxMJkv4ETd/ovg4
-	KOOhiEMSRh5IabNDMjNfiPVpdFbIGjXC9oAG7tcM00Pekw4iDklQz7qdolvYRV92
-	g88/OCtsEwr+gFR2HK8mF5t12IWE3dMDTuwMVVF06EMx9e857RtHbiXkU+EL5+UA
-	3fcWSw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yy8d1r3k5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Jun 2024 12:38:57 +0000 (GMT)
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45OCcux1011518;
-	Mon, 24 Jun 2024 12:38:56 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yy8d1r3jy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Jun 2024 12:38:56 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45OBJY8c000402;
-	Mon, 24 Jun 2024 12:38:55 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yxbn30aqb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 24 Jun 2024 12:38:55 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45OCcoNm22217148
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 24 Jun 2024 12:38:52 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 33DBA20043;
-	Mon, 24 Jun 2024 12:38:50 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BA15E20040;
-	Mon, 24 Jun 2024 12:38:46 +0000 (GMT)
-Received: from [172.17.0.2] (unknown [9.3.101.175])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 24 Jun 2024 12:38:46 +0000 (GMT)
-Subject: [PATCH v4 3/6] powerpc/pseries/iommu: Use the iommu table[0] for IOV
- VF's DDW
-From: Shivaprasad G Bhat <sbhat@linux.ibm.com>
-To: mpe@ellerman.id.au, tpearson@raptorengineering.com,
-        alex.williamson@redhat.com, linuxppc-dev@lists.ozlabs.org, aik@amd.com
-Cc: npiggin@gmail.com, christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org,
-        naveen.n.rao@linux.ibm.com, gbatra@linux.vnet.ibm.com,
-        brking@linux.vnet.ibm.com, sbhat@linux.ibm.com, aik@ozlabs.ru,
-        jgg@ziepe.ca, ruscur@russell.cc, robh@kernel.org,
-        sanastasio@raptorengineering.com, linux-kernel@vger.kernel.org,
-        joel@jms.id.au, kvm@vger.kernel.org, msuchanek@suse.de,
-        oohall@gmail.com, mahesh@linux.ibm.com, jroedel@suse.de,
-        vaibhav@linux.ibm.com, svaidy@linux.ibm.com
-Date: Mon, 24 Jun 2024 12:38:46 +0000
-Message-ID: <171923272328.1397.1817843961216868850.stgit@linux.ibm.com>
-In-Reply-To: <171923268781.1397.8871195514893204050.stgit@linux.ibm.com>
-References: <171923268781.1397.8871195514893204050.stgit@linux.ibm.com>
-User-Agent: StGit/1.5
+	s=arc-20240116; t=1719232752; c=relaxed/simple;
+	bh=C8cMy3/diK06yU+v17G87rROvVKCDW6mK/cZHhNOidc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QTLkoqQFdmGnxOeMv/UKBYeSMz83+JHy3ghi2ebvc0qclXzEy7R3Jg1RwhvMw1PHBfWccNfd5F3dDFxur3QoeRk4eI+lW+M4e7fNoZRpi3XdBoyeF/j0FJ4SmpjcMm+9FT5lXtcGgshnKlUScktAY6bsJOTSvTdY2F0vd8fPor0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Alua9aeK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719232749;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XCkXiUAP422+GKIba8BKRNsoqDrd/P+DTSVD2LrppTk=;
+	b=Alua9aeKEXnhV4zgefkPnB16hKXkPZPQ62o1rXr917bRF0hmrTTNBKycZn3+LW5sv9tSj1
+	2LUAiMMfd7BA8yY3scVKV/qskR5S1Low6xkLnTtoMrvEAUwOgXepYrygPDLooBsM+wLFfV
+	hwIiF+YUlI0PH1D9gzrB3mEW5GyndAQ=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-73-uYoI1mJAPMaD3NhUTvDxgQ-1; Mon,
+ 24 Jun 2024 08:39:06 -0400
+X-MC-Unique: uYoI1mJAPMaD3NhUTvDxgQ-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0259819560AD;
+	Mon, 24 Jun 2024 12:39:05 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.226])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4FC0819560BF;
+	Mon, 24 Jun 2024 12:38:59 +0000 (UTC)
+Date: Mon, 24 Jun 2024 13:38:56 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>, kvm@vger.kernel.org,
+	Markus Armbruster <armbru@redhat.com>,
+	Eric Blake <eblake@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Subject: Re: [PATCH] i386: revert defaults to 'legacy-vm-type=true' for
+ SEV(-ES) guests
+Message-ID: <Znlo4GMgJ91nKyft@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240614103924.1420121-1-berrange@redhat.com>
+ <20240624080458-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 8ZDvxGqDFe7tSfPQjmVzxf2E6LzVreo3
-X-Proofpoint-GUID: virIjsEmh2ekjJyw7d7Kk7Wodf8KGzpU
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-24_09,2024-06-24_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 spamscore=0 malwarescore=0 suspectscore=0 bulkscore=0
- adultscore=0 lowpriorityscore=0 phishscore=0 mlxscore=0 impostorscore=0
- mlxlogscore=898 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406240099
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240624080458-mutt-send-email-mst@kernel.org>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-This patch basically brings consistency with PowerNV approach
-to use the first freely available iommu table when the default
-window is removed.
+On Mon, Jun 24, 2024 at 08:27:01AM -0400, Michael S. Tsirkin wrote:
+> On Fri, Jun 14, 2024 at 11:39:24AM +0100, Daniel P. Berrangé wrote:
+> > The KVM_SEV_INIT2 ioctl was only introduced in Linux 6.10, which will
+> > only have been released for a bit over a month when QEMU 9.1 is
+> > released.
+> > 
+> > The SEV(-ES) support in QEMU has been present since 2.12 dating back
+> > to 2018. With this in mind, the overwhealming majority of users of
+> > SEV(-ES) are unlikely to be running Linux >= 6.10, any time in the
+> > forseeable future.
+> > 
+> > IOW, defaulting new QEMU to 'legacy-vm-type=false' means latest QEMU
+> > machine types will be broken out of the box for most SEV(-ES) users.
+> > Even if the kernel is new enough, it also affects the guest measurement,
+> > which means that their existing tools for validating measurements will
+> > also be broken by the new default.
+> > 
+> > This is not a sensible default choice at this point in time. Revert to
+> > the historical behaviour which is compatible with what most users are
+> > currently running.
+> > 
+> > This can be re-evaluated a few years down the line, though it is more
+> > likely that all attention will be on SEV-SNP by this time. Distro
+> > vendors may still choose to change this default downstream to align
+> > with their new major releases where they can guarantee the kernel
+> > will always provide the required functionality.
+> > 
+> > Signed-off-by: Daniel P. Berrangé <berrange@redhat.com>
+> 
+> This makes sense superficially, so
+> 
+> Acked-by: Michael S. Tsirkin <mst@redhat.com>
+> 
+> and I'll let kvm maintainers merge this.
+> 
+> However I wonder, wouldn't it be better to refactor this:
+> 
+>     if (x86_klass->kvm_type(X86_CONFIDENTIAL_GUEST(sev_common)) == KVM_X86_DEFAULT_VM) {
+>         cmd = sev_es_enabled() ? KVM_SEV_ES_INIT : KVM_SEV_INIT;
+>         
+>         ret = sev_ioctl(sev_common->sev_fd, cmd, NULL, &fw_error);
+>     } else {
+>         struct kvm_sev_init args = { 0 };
+>                 
+>         ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_INIT2, &args, &fw_error);
+>     }   
+> 
+> to something like:
+> 
+> if (x86_klass->kvm_type(X86_CONFIDENTIAL_GUEST(sev_common)) != KVM_X86_DEFAULT_VM) {
+>         struct kvm_sev_init args = { 0 };
+>                 
+>         ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_INIT2, &args, &fw_error);
+> 	if (ret && errno == ENOTTY) {
+> 		cmd = sev_es_enabled() ? KVM_SEV_ES_INIT : KVM_SEV_INIT;
+> 
+> 		ret = sev_ioctl(sev_common->sev_fd, cmd, NULL, &fw_error);
+> 	}
+> }
+> 
+> 
+> Yes I realize this means measurement will then depend on the host
+> but it seems nicer than failing guest start, no?
 
-The pSeries iommu code convention has been that the table[0] is
-for the default 32 bit DMA window and the table[1] is for the
-64 bit DDW.
+IMHO having an invariant measurement for a given guest configuration
+is a critical guarantee. We should not be allowing guest attestation
+to break as a side-effect of upgrading a software component, while
+keeping the guest config unchanged.
 
-With VFs having only 1 DMA window, the default has to be removed
-for creating the larger DMA window. The existing code uses the
-table[1] for that, while marking the table[0] as NULL. This is
-fine as long as the host driver itself uses the device.
+IOW, I'd view measurement as being "guest ABI", and versioned machine
+types are there to provide invariant guest ABI.
 
-For the VFIO user, on pSeries there is no way to skip table[0]
-as the VFIO subdriver uses the first freely available table.
-The window 0, when created as 64-bit DDW in that context would
-still be on table[0], as the maximum number of windows is 1.
+Personally, if we want simplicitly then just not using KVM_SEV_INIT2
+at all would be the easiest option. SEV/SEV-ES are legacy technology
+at this point, so we could be justified in leaving it unchanged and
+only focusing on SEV-SNP. Unless someone can say what the critical
+*must have* benefit of using KVM_SEV_INIT2 is ?
 
-This won't have any impact for the host driver as the table is
-fetched from the device's iommu_table_base.
-
-Signed-off-by: Shivaprasad G Bhat <sbhat@linux.ibm.com>
----
- arch/powerpc/platforms/pseries/iommu.c |   12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
-
-diff --git a/arch/powerpc/platforms/pseries/iommu.c b/arch/powerpc/platforms/pseries/iommu.c
-index 97b9a4e6bf8a..d2ac6c19cf9b 100644
---- a/arch/powerpc/platforms/pseries/iommu.c
-+++ b/arch/powerpc/platforms/pseries/iommu.c
-@@ -155,7 +155,7 @@ static void iommu_pseries_free_group(struct iommu_table_group *table_group,
- #endif
- 
- 	/* Default DMA window table is at index 0, while DDW at 1. SR-IOV
--	 * adapters only have table on index 1.
-+	 * adapters only have table on index 0(if not direct mapped).
- 	 */
- 	if (table_group->tables[0])
- 		iommu_tce_table_put(table_group->tables[0]);
-@@ -1527,6 +1527,11 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn)
- 			clean_dma_window(pdn, win64->value);
- 			goto out_del_list;
- 		}
-+		if (default_win_removed) {
-+			iommu_tce_table_put(pci->table_group->tables[0]);
-+			pci->table_group->tables[0] = NULL;
-+			set_iommu_table_base(&dev->dev, NULL);
-+		}
- 	} else {
- 		struct iommu_table *newtbl;
- 		int i;
-@@ -1556,15 +1561,12 @@ static bool enable_ddw(struct pci_dev *dev, struct device_node *pdn)
- 					    1UL << len, page_shift, NULL, &iommu_table_lpar_multi_ops);
- 		iommu_init_table(newtbl, pci->phb->node, start, end);
- 
--		pci->table_group->tables[1] = newtbl;
-+		pci->table_group->tables[default_win_removed ? 0 : 1] = newtbl;
- 
- 		set_iommu_table_base(&dev->dev, newtbl);
- 	}
- 
- 	if (default_win_removed) {
--		iommu_tce_table_put(pci->table_group->tables[0]);
--		pci->table_group->tables[0] = NULL;
--
- 		/* default_win is valid here because default_win_removed == true */
- 		of_remove_property(pdn, default_win);
- 		dev_info(&dev->dev, "Removed default DMA window for %pOF\n", pdn);
-
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
