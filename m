@@ -1,221 +1,327 @@
-Return-Path: <kvm+bounces-20384-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20385-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B3C19146EF
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:04:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C766914737
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 12:18:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE4981C2228E
-	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 10:04:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B1D81F24F09
+	for <lists+kvm@lfdr.de>; Mon, 24 Jun 2024 10:18:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D3A136647;
-	Mon, 24 Jun 2024 10:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27DDC136982;
+	Mon, 24 Jun 2024 10:18:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="igu2GpDe"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UZn3PewD"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2054.outbound.protection.outlook.com [40.107.223.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D6B63A8C0;
-	Mon, 24 Jun 2024 10:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719223441; cv=fail; b=IhSOurzDWKmIJlf/YtJ8HJn4bFfoXs5COySisey6oe5H1oH0mPD7FMlZFoiINr6sjVOzijf8pjYRnDHi31tt/3flANwum8HkTwptaNnVV1qK2ND6Y2o1jCnK6zsxiVryUZq17Yf3iahELqM07K4CBl0q2PudTpr2I16eljyQm/w=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719223441; c=relaxed/simple;
-	bh=bOwihgpc+9l7de8xxXlrzGi865mO3L7XWWf/FXmhK2o=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=PksUg/ZxyKfbPzv5q//MHq31S8kbK0tb63KNDH9Nl68uunjsWzxefypvcePqigFf/BFazYdkKSKlJzyejfe+RK5yOQll4vjLQdzaEC4an5Gv5yVwx6TcU7Qw1IIvy0elp8LFpwBaKxDaRw0o+YYI6Za4RJoKs+TBZVU8/jY+h2o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=igu2GpDe; arc=fail smtp.client-ip=40.107.223.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nPGTXyR/kEzGwvXZL+4bfBnPPIAyikpDpDPL6pKCs9kX9PyUoPptrMCOAH0SD/pt71xKcHo50sdXbH+KkgZquzFSF+bWJwukwtwcRKv6gCRZpV7iF7f52vTFWlVZsyhsdl7q++jsZbCYXEGxYKe9DTxAUsbecruTYO1jd+r/T+elLPM16NTbUUOPMuGzTsDokAuH+EAuXNFxf/UN3VL7FCNgekdhjqpPS/0ceSG2sjnJqoq7+9KzhUccYU2+SXklichuDpF8sTnTw5YeCpFMVC0mCrBk2F4hlsHHRnkIsf0/KQqrnEmzfWwuW7WJFimV7y1Ub8mMMh2IccT+bDCpgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oejQyvo2uZ4MG2Un4eqQONFe4RQeeHtZPv41u00kemI=;
- b=DXKEeA34tZNT2eS2igwHqwHH6EaskbTPoKvB/biT3RQ6KiYe1CAjSA8EowzQ69Y9Ik5vSZNa4Cvm0zIqloiMoCJr6G4JZHvWh0pMXHmxRfY+JaIsZM51TA1CPro09NbhLOHuEFTT064KmvjYL2n6hOjFhp20WSzjSHZcWe1B2NIcQoF3cJqvmGQzIKClO3DtwQ5KCqNezXTCuCEqueWdtweEAPzj2HuMrXQnGoLEt5UihhMvnKXe1slH45Z4xHUW+v7fzISgeVhcCB3SY53p89S7CyMtVMJ3Ds00PCRU+eqFI5vOYAgCTkbNSAK6iq2oPu0jeJqUJZqsueI2vW5nSA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oejQyvo2uZ4MG2Un4eqQONFe4RQeeHtZPv41u00kemI=;
- b=igu2GpDehk7zYoSU+mtxQY7ZPinncqj4yMwSUHfcBiC2YVBQoKH2YaNMyNELRel9JjqWSAA7/l2nfdlAYf++mTGzJuo0xwyRI6PTVQrqEogbyK3hI1p12SjN2hKPSz8hvJvm3X9mFy03ONQG6uL7ZuBvjBWMuYzDj0eHnellakc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com (2603:10b6:8:96::19) by
- SA1PR12MB7409.namprd12.prod.outlook.com (2603:10b6:806:29c::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.21; Mon, 24 Jun
- 2024 10:03:55 +0000
-Received: from DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec]) by DS7PR12MB6309.namprd12.prod.outlook.com
- ([fe80::b890:920f:cf3b:5fec%5]) with mapi id 15.20.7698.025; Mon, 24 Jun 2024
- 10:03:55 +0000
-Message-ID: <a97feb03-7bd6-2dd0-d22b-ebeda9895dd1@amd.com>
-Date: Mon, 24 Jun 2024 15:33:46 +0530
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.0.3
-Subject: Re: [PATCH v9 03/24] virt: sev-guest: Make payload a variable length
- array
-To: Borislav Petkov <bp@alien8.de>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
- kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
- dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
- pbonzini@redhat.com
-References: <20240531043038.3370793-1-nikunj@amd.com>
- <20240531043038.3370793-4-nikunj@amd.com>
- <20240621165410.GIZnWwMo80ZsPkFENV@fat_crate.local>
- <7586ae76-71ba-2d6b-aa00-24f5ff428905@amd.com>
- <20240624061117.GBZnkOBR5FVW8i6qsG@fat_crate.local>
-From: "Nikunj A. Dadhania" <nikunj@amd.com>
-In-Reply-To: <20240624061117.GBZnkOBR5FVW8i6qsG@fat_crate.local>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0P287CA0006.INDP287.PROD.OUTLOOK.COM
- (2603:1096:a01:d9::12) To DS7PR12MB6309.namprd12.prod.outlook.com
- (2603:10b6:8:96::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA9D7E59A
+	for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 10:18:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719224322; cv=none; b=f0u1MQx3qPEbGmDrGLZZTEQn1HkH3SCaOdzAHqeVkbLPNrB/VpMMl1D6C9YiIhmxKa4w0nKRBYL1c5Kn/pRbEH70FZ8rTUmbUA3hh8oaozz5gJ7kaQ67QVWE3bPOFMRjBpJig/dmNRtKbyqDbusHKKbvpvjSGYlsxuxIN0F7Mxw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719224322; c=relaxed/simple;
+	bh=mu9qN0X4swM8SXL/0AkYe+XSznsheQgIE6YKlwYmWpY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fvnTo27A7CSEoj8sj3Wgxu2JvcZxWOfGBtRw2B1DALaPBica8562wMVS8gNOxTnbVNFNM/Ho7kavv2GFHgVGo+tFr0rX0RKi9AsULfKSWpw00AeAjBaeaGTGgMsvjWTTubfQICCr32NnT4OUgkJ+YGkgHwHIUigfn0A1L549gW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UZn3PewD; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57cc1c00b97so3882200a12.0
+        for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 03:18:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1719224319; x=1719829119; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YNgw6jE6+Mh361eYuvFy3mgdndxGrJV55+5IHn+HTVw=;
+        b=UZn3PewDJflSgeRJjnN8VGRWSyjVyZZfX43S+tpGC4l6XFVsO4s294dwyir6l4PGxU
+         EK7vztgTjehyCaeFaF9vv2RiANQB4W8YEFN1gmlKbXxWWHvf2Dpznsn4WStG3J3a0Lnq
+         ZBTdlwZZjuVPuSFDMVM5S/XwSCyDZTAAHzHPoQss+tKSm+2SpXWvRtpewvNYJdTfEGER
+         WL9LeoGp1tXYHKPSsX/+hYDYEDhuLKwAPY2bqW/+RMMM2b/W4CWd30TCeAlMygDQoO/R
+         5oKkRmgJJ5Eoxi8/JXGoDN2WxCkwLo28BEhQVFPYtlkEmPLDpiwJylcwgfu+qbuGZ0PJ
+         OAIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719224319; x=1719829119;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YNgw6jE6+Mh361eYuvFy3mgdndxGrJV55+5IHn+HTVw=;
+        b=PGhnkCC8Swqv7aA5srdzDDYFzlLnS/DR2gt8Pu8LqNdSnL//tUxU8vjD7YNL9dJchB
+         w4rDVRfZ9Faw2v5SY8ajRxppU57YIKKB8uezIsntVeLhb8P85AxCaNYeEoeved86CvyP
+         Na3bZ0AucNc+e8u5C4FeFngfB6n51pFOjtkcqra4rJS+f1wcMojmEypno5iojDzMVpUF
+         s0G0IAIWLuk01hmHFIET4w53FF563XXFTnGqqiysGJNzNcUuoF/L3EBIOtQK+vR+l0KJ
+         7VFfHpCCldTY7M4szfyZ/sL+5ho1+QZnSwWCTqGOR7Ag0sB1awZmPZANo/742NxZXeaj
+         uOMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXUWl39TeAEZ+18OZrYjUaCxT8/fVDhOuCBVanEQE/8k0i1Mpi5icLXFb9GqIS+1AXefXOimryq6JbyiGHqpWr0EOnl
+X-Gm-Message-State: AOJu0YxyHzHOhbXJ5ip1lsyTK7uLnlft37WV9hAlV/ZH9EArd9dCMLZw
+	n3cpOInUYTHQQ+0bBQO1oP96GRcL8daoE2n5j4t7S42EijAxho3pxE4qj1zTjL4=
+X-Google-Smtp-Source: AGHT+IFtBtI8kXui4zGfQhOuThPJ8k4YDr7dZReao4k4WveA0Eah33vTmROC7oKSSZwE2aEx907Pzg==
+X-Received: by 2002:a50:d79b:0:b0:57c:dbf6:931f with SMTP id 4fb4d7f45d1cf-57d4bd56bc0mr2499112a12.5.1719224318334;
+        Mon, 24 Jun 2024 03:18:38 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-57d30563440sm4509938a12.84.2024.06.24.03.18.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 24 Jun 2024 03:18:37 -0700 (PDT)
+Received: from draig.lan (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 840DD5FA0D;
+	Mon, 24 Jun 2024 11:18:36 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: qemu-devel@nongnu.org
+Cc: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Pierrick Bouvier <pierrick.bouvier@linaro.org>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Cameron Esfahani <dirty@apple.com>,
+	Roman Bolshakov <rbolshakov@ddn.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	"Dr. David Alan Gilbert" <dave@treblig.org>,
+	Alexander Graf <agraf@csgraf.de>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Daniel Henrique Barboza <danielhb413@gmail.com>,
+	Halil Pasic <pasic@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Thomas Huth <thuth@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Ilya Leoshkevich <iii@linux.ibm.com>,
+	kvm@vger.kernel.org (open list:Overall KVM CPUs),
+	qemu-arm@nongnu.org (open list:ARM TCG CPUs),
+	qemu-ppc@nongnu.org (open list:PowerPC TCG CPUs),
+	qemu-s390x@nongnu.org (open list:S390 KVM CPUs)
+Subject: [PULL 02/12] gdbstub: move enums into separate header
+Date: Mon, 24 Jun 2024 11:18:26 +0100
+Message-Id: <20240624101836.193761-3-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240624101836.193761-1-alex.bennee@linaro.org>
+References: <20240624101836.193761-1-alex.bennee@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6309:EE_|SA1PR12MB7409:EE_
-X-MS-Office365-Filtering-Correlation-Id: 99f83e4c-e687-4c34-83ca-08dc9434f526
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230037|7416011|376011|1800799021|366013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?aXdNYXdLVFRmUlQ2akhsTUF2Z1dDNFphcWNvTmVZYTFoZ1VpQmJWQ21rU0pB?=
- =?utf-8?B?SDEvTktxcDBMREdEL3RSZVNBeCt3R2lpQWcza0dGU3FFTzg2R2lGak5hU2Fz?=
- =?utf-8?B?R0NodkcxV2oyeXVWRVRrV3A3V3ByT0xneGxwZzNsbjY0NU40M1ZCdzV5cWQz?=
- =?utf-8?B?bmpLaXB4YWpUVldDODA4R3V5SWgweVNaOVkwWTNQeTRiWG91T3FwK0g5Y0ow?=
- =?utf-8?B?b0d0NEZQSWlFMktZeWI3dk5yYk1vdnFwSHovcXo0L0ZvcDJOQUdBcnBBVXdm?=
- =?utf-8?B?Z2lNWTJWcGswbTVCWFpVN1U5NlF3NjNrcEUzbSszM09ZdGllTmZwaW95RWFL?=
- =?utf-8?B?Z3FQYm4rTytKS0tMcDN3RitaSGZML3Blai9MUVJpaFpoYWQ3TzRvWXJkNnJ1?=
- =?utf-8?B?dEtTMXAwTW8wSzNXUDZUeTFUbk5FNmhEV0pXYmJKcVN2Q0FoelcwY2IzL1JM?=
- =?utf-8?B?VHdHNGQwUHNPSzJGcUh6TDFnTjFGeE80ZzNVN3VlbWtid1BaVk5pNkZHbGUr?=
- =?utf-8?B?S1E5VklsQVJZWDBXYzV2ZWVzVEN5M09LdTQ4ZVM3Y0g4N1FJa2dyOGZ2c2pr?=
- =?utf-8?B?K3FxNmx1TjVYSkdTcW5nZTNYelhKenNVNzBaU09ieXlUL3JlOXgzWUFmRnM4?=
- =?utf-8?B?dllNU0prL2xZd1JhN1VRazdHakF3MHhMUDJpU3R5WFpFYWtDalBDcFY1bFY2?=
- =?utf-8?B?TCtMVjA4TEZWeElwYUhRYzB5U0labmNETEo4SjNQdlNOT2xvU0V1STBneURW?=
- =?utf-8?B?WFdSaEVlT1djdnZ5cU9YVDRqMXU0WnlsczF1R0FFTHNhbTNhdGRaQVhHTUFE?=
- =?utf-8?B?NVJEczJsK3AyYXVwVTFhRmtlTDc5VVE1bmFYQ0l6eUR5RUpSTE9CM3hubmJZ?=
- =?utf-8?B?WjRzdFU3YlpIaExhZlRTMkIxZW1rZTY1WFJVMFhpb1l6TVlRMldYWExSa2hF?=
- =?utf-8?B?K1YvZWoyU2VaOFM2ZVYzbjQ2WDdabGFWckNUNFZBY2xFWFhqUjR5WG9mSjB5?=
- =?utf-8?B?cWdONk9ycUMxS2tDRHJsSnBNSHo5NGVyT0tlK2tGbWNZN1FoQlEyTUdIb3Jp?=
- =?utf-8?B?Nml6NG5QOHMzRzk5bjVhbERtaHRzNXY2L25NSGkveTJicXdMKzhLKzBtaGhV?=
- =?utf-8?B?Vjd4Y09NYXp1Um5KOHZ6a1BROFpkV1RwSXAyQzJ3SnBuV3ZoQ1JxaE14c0Rz?=
- =?utf-8?B?V3hRbFNzWDRSdlhCQ3ZHUkNyUUtxR1MzU0tQZUpUUEl3TDdnK3dBR2gyd0du?=
- =?utf-8?B?UVFTN0ZsUnZJdDVNMWRGV09TVjdQWHBnQis2ZzlnUG1EMEJ2enRqRWx4Ukx1?=
- =?utf-8?B?M2dDc3V0TmcxYldaRlNpK0VNWHBQTkZoYkZRMXp3MjN1QlVDczMxOXRiWVFX?=
- =?utf-8?B?eFlGT1hvOUhKQ1dyamc0NEpFdmlKMUVnbU43SFV2SEZEQ3h6aW1KNFpRUENI?=
- =?utf-8?B?dGtnb0hkSHpRWURYNHJ0cDZyL0tyNVdJb29rNmROVnpMV2xicFhDOWk4aFpB?=
- =?utf-8?B?UFlQZktOSmo4WUs0WFhxSENUWm9URFNPeE9UL3hOaU5GdTQ4dzF3S2F5ejJn?=
- =?utf-8?B?WEorWW5KelFCZEVSREhRUDg2Vm9zSFViSi9CcENSbStYMWFPTzl4T3JUZlZZ?=
- =?utf-8?B?dUxmeDNQazIySk9wOTUvUWdNeEJoSDlkZnFjbnhzSjZYbUdjZzA3K0o2emx5?=
- =?utf-8?B?bGpFQi9FSVRzVEhxbTNYRG4va21hQVZNUmcyMC9BMlRVM1Y4anAxMktoZnN4?=
- =?utf-8?Q?LE7t9Fie6ilX8IMxAzUmvztKluB6i3tb7vBuABq?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6309.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230037)(7416011)(376011)(1800799021)(366013);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NjZhTEdmRStwRk5HL1pMZXdXRzY2WXRWWkxkYVpQTTBPcWVaeXJpMlJUMkpB?=
- =?utf-8?B?dm4wRUdjSUxXNUhrREtoS2RLblk2S25xL2d3SWhLQmR2SUlLWUtMUjVTaTkx?=
- =?utf-8?B?WXJwb3YyL0V2aEJvdDUwclNzcmE4SmFUdmljSlIrQ2tYcDNvQ0NlODdIUzJp?=
- =?utf-8?B?dlJUR3ZNV2Z5MHhYajBxeGtpVTRCTWR6RnFZYUVxc1ZXMUVhYVRwNG9KMXI2?=
- =?utf-8?B?dlJpcTAxbHVGRVRrQVAzUktzM2dWM08vaHY1QWZJVmUxMXQwekZHVzZHRE9t?=
- =?utf-8?B?YzZVajRBMHQ5MytIWXJUbHVWejQ2dXdlY2puRDlGWWtGSzRvM09yT3RaVVFk?=
- =?utf-8?B?aVpTdHBvYytaY3BLYkw5aGkrRUNmOTV0NGZlWnpqNUlPVFJQVUdORlhBOHhu?=
- =?utf-8?B?ZERHMXZTejlmTmoxNGhVSGJtR2hlNTJmbExXd0VBTTV2SkJFYXlxaTM1dUR5?=
- =?utf-8?B?cVAraUc2U0VFM0hkNzdsTnBRSkpweFEwd2xuUEFGWWxCOHoreThjYThOS2Jp?=
- =?utf-8?B?cGtoeFUxaE9SRm9DR1E4SGtBL3NmbG1xdlQ4RFpiRERpSS9rVm02Skx5SktL?=
- =?utf-8?B?NmhacDNzd0c4eUFrRWxXclBzOFMwZmQ2WDM0TkgyNWlDc0lvbzJJdTNtUEFE?=
- =?utf-8?B?cDlkZS94TFg3dDZBMUpRM1RPTkEvczQ1cmw4czZmTDNSNDZET0p2d0VLcW5I?=
- =?utf-8?B?MlN2NjBTbGhMYVdSc3hKT24rRWJBaFNHbjFPbnNyQ1Z3MGdMMUQ2RUVnYkxo?=
- =?utf-8?B?MnNRbmV1WC96Q2V1RlFzUHdBOVdKSkIzeU1obS93YzRqWENsclpVMCsvTnhy?=
- =?utf-8?B?a29FOFBhejVadUViV2Fad3dWSnRPa2JFSGxQYVlWV0c5NmZmSmNBS1FDOXZz?=
- =?utf-8?B?bGtLRHJNWDhQQXZwUmVlWllydFVtcEpFUWY2RVFWWjloN0tnaHNVcEIwZ2Q5?=
- =?utf-8?B?VWZFTThKUkg0dzMvRU1GNjdxdE4ySmhsNFJxWnhKQkljQ1MxbGpIZ1phOFN2?=
- =?utf-8?B?djBPOUlnN01OSEpuNnljS1ZVOG5XR0tyUDFpcWE5KzVGODJPQ3h3cGZjTmxh?=
- =?utf-8?B?K1hpSW9Qb3Zuejh0bHJUWkFyMXFleXdrZXFCMjhBWU5mdUFGa0pRcXBMamRU?=
- =?utf-8?B?L1g0ZFN3YlJOMjNZaHVLQ2hIY2FQRGFOeTV4UXVHb05wY1d6LzQramJKL3JV?=
- =?utf-8?B?Sk5rZEJLRmRhOVB5WkQ1VG9OZ1Iwa1dUb21XenpFRWlhZUtvelJ6bWlFeC9R?=
- =?utf-8?B?bGFQTVc1Wll2VjZCb2Zob3dVYWFRVmwxT3J0anJIREZCZTVVMDVFckdHcll6?=
- =?utf-8?B?dExHa3duTUhVWVQ4NzNpQWtocEcxaWp2czl4SHRacFhFL1RLb0cySGplVGli?=
- =?utf-8?B?dHNDV1dlbERvaytqZG5xKzJ5RzA0MlMyRWJhNThJZ0JOVTNVSmtBRHMyclJi?=
- =?utf-8?B?bVRPdk80d3ZvMmYrenJCcXcvYXBZY2hZclI1czREc0FjN1lwQnVSNTFwOHNF?=
- =?utf-8?B?R2FTYTlKN3piSUE0VTRHMzlpMklsQTZoUVRwUVNyWHh5MEdDNzEza0wwTzNQ?=
- =?utf-8?B?by90RmhkS1lMd2N3MFZPMTVGYm8vc3k0blBCMzZWblNZd2JHNEJyTy9BZHE4?=
- =?utf-8?B?a24xWjBjcUFMWWFMUVQzMERYSFpzai9ObUtubEYzRnJadE9vME1VRFVLSGZN?=
- =?utf-8?B?QldkSmdXM2IzNnpiR0Z1MG5tTG1lN05UMDloTHlkWitvTzhkVEVqOWNScVZr?=
- =?utf-8?B?cHh4a0NCZ2lMbDRWcDBDNnU3a3Q1L3A0bFVndXFqa0RlSXdDMEZ0U05XU2o3?=
- =?utf-8?B?eHE0YUJQTVEwQjdLZXpNd0hPanpGYzUzY2tuWWtxZlZDTGJReS9IMGFKVTdN?=
- =?utf-8?B?S3NPYlRXK2JRS0FPR0lWaWJjQjMvbHdYRHJUS2loK1k4RkJRRkwrdEZZanRz?=
- =?utf-8?B?OGwyQWdlZ2w3U0JDcGxsZWlrVzVQUzhPU1l2UmhaM0l1U0IranJMdXlMY0pn?=
- =?utf-8?B?VU0rLzZXYU1qQ3l4eGRhckdLZGkvai9VcWJrbjV3dERkN01DY0N0WjcwbUlK?=
- =?utf-8?B?cXVKSTZTQXhpNUQvZk5SOHdjendvd3J6M3VHMHVvUFR0OU16M2dEeWNjMnQy?=
- =?utf-8?Q?zB5MsySffI+C+2imxD9xPlXMM?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99f83e4c-e687-4c34-83ca-08dc9434f526
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6309.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2024 10:03:55.5398
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Fq9zcOIqu/HkAotZUuqFnoIu0xFJUgVI0H45s9f1TV/32ldHL0bYOkVmJ8qN/ZrDRd0rkNks8qAEdhd3j5Y5Rg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7409
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+This is an experiment to further reduce the amount we throw into the
+exec headers. It might not be as useful as I initially thought because
+just under half of the users also need gdbserver_start().
 
+Reviewed-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Reviewed-by: Richard Henderson <richard.henderson@linaro.org>
+Message-Id: <20240620152220.2192768-3-alex.bennee@linaro.org>
 
-On 6/24/2024 11:41 AM, Borislav Petkov wrote:
-> On Sun, Jun 23, 2024 at 09:46:09PM +0530, Nikunj A. Dadhania wrote:
->> Yes, payload was earlier fixed at 4000 bytes, without considering the size
->> of snp_guest_msg.
-> 
-> Sorry, you'd need to try explaining this again. Who wasn't considering the
-> size of snp_guest_msg?
+diff --git a/include/exec/gdbstub.h b/include/exec/gdbstub.h
+index 008a92198a..1bd2c4ec2a 100644
+--- a/include/exec/gdbstub.h
++++ b/include/exec/gdbstub.h
+@@ -1,15 +1,6 @@
+ #ifndef GDBSTUB_H
+ #define GDBSTUB_H
+ 
+-#define DEFAULT_GDBSTUB_PORT "1234"
+-
+-/* GDB breakpoint/watchpoint types */
+-#define GDB_BREAKPOINT_SW        0
+-#define GDB_BREAKPOINT_HW        1
+-#define GDB_WATCHPOINT_WRITE     2
+-#define GDB_WATCHPOINT_READ      3
+-#define GDB_WATCHPOINT_ACCESS    4
+-
+ typedef struct GDBFeature {
+     const char *xmlname;
+     const char *xml;
+diff --git a/include/gdbstub/enums.h b/include/gdbstub/enums.h
+new file mode 100644
+index 0000000000..c4d54a1d08
+--- /dev/null
++++ b/include/gdbstub/enums.h
+@@ -0,0 +1,21 @@
++/*
++ * gdbstub enums
++ *
++ * Copyright (c) 2024 Linaro Ltd
++ *
++ * SPDX-License-Identifier: GPL-2.0-or-later
++ */
++
++#ifndef GDBSTUB_ENUMS_H
++#define GDBSTUB_ENUMS_H
++
++#define DEFAULT_GDBSTUB_PORT "1234"
++
++/* GDB breakpoint/watchpoint types */
++#define GDB_BREAKPOINT_SW        0
++#define GDB_BREAKPOINT_HW        1
++#define GDB_WATCHPOINT_WRITE     2
++#define GDB_WATCHPOINT_READ      3
++#define GDB_WATCHPOINT_ACCESS    4
++
++#endif /* GDBSTUB_ENUMS_H */
+diff --git a/accel/hvf/hvf-accel-ops.c b/accel/hvf/hvf-accel-ops.c
+index b2a37a2229..ac08cfb9f3 100644
+--- a/accel/hvf/hvf-accel-ops.c
++++ b/accel/hvf/hvf-accel-ops.c
+@@ -52,7 +52,7 @@
+ #include "qemu/main-loop.h"
+ #include "exec/address-spaces.h"
+ #include "exec/exec-all.h"
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ #include "sysemu/cpus.h"
+ #include "sysemu/hvf.h"
+ #include "sysemu/hvf_int.h"
+diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+index 854cb86b22..2b4ab89679 100644
+--- a/accel/kvm/kvm-all.c
++++ b/accel/kvm/kvm-all.c
+@@ -27,7 +27,7 @@
+ #include "hw/pci/msi.h"
+ #include "hw/pci/msix.h"
+ #include "hw/s390x/adapter.h"
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ #include "sysemu/kvm_int.h"
+ #include "sysemu/runstate.h"
+ #include "sysemu/cpus.h"
+diff --git a/accel/tcg/tcg-accel-ops.c b/accel/tcg/tcg-accel-ops.c
+index 1433e38f40..3c19e68a79 100644
+--- a/accel/tcg/tcg-accel-ops.c
++++ b/accel/tcg/tcg-accel-ops.c
+@@ -35,7 +35,7 @@
+ #include "exec/exec-all.h"
+ #include "exec/hwaddr.h"
+ #include "exec/tb-flush.h"
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ 
+ #include "hw/core/cpu.h"
+ 
+diff --git a/gdbstub/user.c b/gdbstub/user.c
+index edeb72efeb..e34b58b407 100644
+--- a/gdbstub/user.c
++++ b/gdbstub/user.c
+@@ -18,6 +18,7 @@
+ #include "exec/gdbstub.h"
+ #include "gdbstub/syscalls.h"
+ #include "gdbstub/user.h"
++#include "gdbstub/enums.h"
+ #include "hw/core/cpu.h"
+ #include "trace.h"
+ #include "internals.h"
+diff --git a/monitor/hmp-cmds.c b/monitor/hmp-cmds.c
+index 45ee3a9e1f..f601d06ab8 100644
+--- a/monitor/hmp-cmds.c
++++ b/monitor/hmp-cmds.c
+@@ -15,8 +15,9 @@
+ 
+ #include "qemu/osdep.h"
+ #include "exec/address-spaces.h"
+-#include "exec/gdbstub.h"
+ #include "exec/ioport.h"
++#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ #include "monitor/hmp.h"
+ #include "qemu/help_option.h"
+ #include "monitor/monitor-internal.h"
+diff --git a/system/vl.c b/system/vl.c
+index a3eede5fa5..cfcb674425 100644
+--- a/system/vl.c
++++ b/system/vl.c
+@@ -68,6 +68,7 @@
+ #include "sysemu/numa.h"
+ #include "sysemu/hostmem.h"
+ #include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ #include "qemu/timer.h"
+ #include "chardev/char.h"
+ #include "qemu/bitmap.h"
+diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
+index 45e2218be5..ef9bc42738 100644
+--- a/target/arm/hvf/hvf.c
++++ b/target/arm/hvf/hvf.c
+@@ -33,7 +33,7 @@
+ #include "trace/trace-target_arm_hvf.h"
+ #include "migration/vmstate.h"
+ 
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ 
+ #define MDSCR_EL1_SS_SHIFT  0
+ #define MDSCR_EL1_MDE_SHIFT 15
+diff --git a/target/arm/hyp_gdbstub.c b/target/arm/hyp_gdbstub.c
+index ebde2899cd..f120d55caa 100644
+--- a/target/arm/hyp_gdbstub.c
++++ b/target/arm/hyp_gdbstub.c
+@@ -12,7 +12,7 @@
+ #include "qemu/osdep.h"
+ #include "cpu.h"
+ #include "internals.h"
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ 
+ /* Maximum and current break/watch point counts */
+ int max_hw_bps, max_hw_wps;
+diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+index 7cf5cf31de..70f79eda33 100644
+--- a/target/arm/kvm.c
++++ b/target/arm/kvm.c
+@@ -31,7 +31,7 @@
+ #include "hw/pci/pci.h"
+ #include "exec/memattrs.h"
+ #include "exec/address-spaces.h"
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ #include "hw/boards.h"
+ #include "hw/irq.h"
+ #include "qapi/visitor.h"
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index 7ad8072748..dd8b0f3313 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -38,7 +38,7 @@
+ #include "hyperv.h"
+ #include "hyperv-proto.h"
+ 
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ #include "qemu/host-utils.h"
+ #include "qemu/main-loop.h"
+ #include "qemu/ratelimit.h"
+diff --git a/target/ppc/kvm.c b/target/ppc/kvm.c
+index 005f2239f3..2c3932200b 100644
+--- a/target/ppc/kvm.c
++++ b/target/ppc/kvm.c
+@@ -39,7 +39,7 @@
+ #include "migration/qemu-file-types.h"
+ #include "sysemu/watchdog.h"
+ #include "trace.h"
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ #include "exec/memattrs.h"
+ #include "exec/ram_addr.h"
+ #include "sysemu/hostmem.h"
+diff --git a/target/s390x/kvm/kvm.c b/target/s390x/kvm/kvm.c
+index 1b494ecc20..94181d9281 100644
+--- a/target/s390x/kvm/kvm.c
++++ b/target/s390x/kvm/kvm.c
+@@ -40,7 +40,7 @@
+ #include "sysemu/hw_accel.h"
+ #include "sysemu/runstate.h"
+ #include "sysemu/device_tree.h"
+-#include "exec/gdbstub.h"
++#include "gdbstub/enums.h"
+ #include "exec/ram_addr.h"
+ #include "trace.h"
+ #include "hw/s390x/s390-pci-inst.h"
+-- 
+2.39.2
 
-Sorry, I meant snp_guest_msg_hdr here.
-
-snp_guest_msg includes header and payload. There is an implicit assumption 
-that the snp_guest_msg_hdr will always be 96 bytes, and with that assumption 
-the payload array size is set to 4000 bytes magic number. 
-
-
-> AFAICT, the code currently does sizeof(struct snp_guest_msg) which contains
-> both the header *and* the payload.
-> 
-> What could help is if you structure your commit message this way:
-
-How about the below commit message:
-
------------------------------------------------------------------------
-Currently, snp_guest_msg includes a message header (96 bytes) and a
-payload (4000 bytes). There is an implicit assumption here that the SNP
-message header will always be 96 bytes, and with that assumption the
-payload array size has been set to 4000 bytes magic number. If any new
-member is added to the SNP message header, the SNP guest message will
-span more than a page.
-
-Instead of using magic number '4000' for the payload array in the
-snp_guest_msg structure, use a variable length array for payload. Allocate 
-snp_guest_msg of constant size (SNP_GUEST_MSG_SIZE=4096). This will ensure
-that message size won't grow beyond the page size even if the message header
-size increases. Also, add SNP_GUEST_MSG_PAYLOAD_SIZE for checking buffer
-over runs.
-
-While at it, rename the local guest message variables for clarity.
------------------------------------------------------------------------
-
-Regards
-Nikunj
 
