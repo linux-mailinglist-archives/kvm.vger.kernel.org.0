@@ -1,161 +1,202 @@
-Return-Path: <kvm+bounces-20464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 475D4916527
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 12:20:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCFD0916557
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 12:38:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0EB22823B0
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 10:20:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B4D12826DC
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 10:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5DD14BF8B;
-	Tue, 25 Jun 2024 10:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA5114A4E9;
+	Tue, 25 Jun 2024 10:38:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="L/qxmsN9"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="UeeRG0da"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5AAE147C91
-	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 10:19:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F1F1145B32
+	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 10:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719310762; cv=none; b=hOBElzCMtwe70ulRvCalPQ+Hrk04O+OKetDNdb79SJWlxf9EaLzaRaZgih/kqW+w8l61/l354ix2fkx7+lpigByRQGF7q4Qnt9Rl6JJUwF2+Df7oC3PuzvaV2GojGIYRvlG4b3jtv8v5961xpeA0J9OZvxBu/gTA4bgU0eC0L9I=
+	t=1719311889; cv=none; b=WZduW87It7e5umOpyoP7w9L/vzoHX0roTZ7LRhY4sSCREzSyLrhR1vU8YV6mesIc4a4REFi3XchkHLEzCvpajhsI1ILZVIiW7N53oKKkaBHd3kLHFKzooIMyqYB55b1sTxSzg5HEqdYbIl/wVoye0b4KynoVLjXpdE3LANIN1kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719310762; c=relaxed/simple;
-	bh=8OPDctfvuC9BxpIbhEk7MshqYOmXZXxn59puCcy8xCI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KoG320YS92ljLBzdHcraZ4tLK+exT+lIMSY5qHCfly8V6P02J0//B4zOr42vGiv97zLTvZJKJZ2lHItsDzbIvwCVxW28T5myNJEMYzYrY33YYyAjGdBGkssoiJFNqfJyMY1ZlE7Jo1VHNBL1we+RKClKehx/8KgkWwOYQOozyJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=L/qxmsN9; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2ec002caeb3so67957141fa.2
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 03:19:20 -0700 (PDT)
+	s=arc-20240116; t=1719311889; c=relaxed/simple;
+	bh=Dt10cvcOpgsb0/P0osWcNRM2YJE61QCIjA1sJzVnVpI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JXiAOVhSeW4LXfgNK+Itvm6c2fU4D5+n54X+o/tx0d6B6MH5aNF43OZbDVuxdvf51f8wDEHH78esCOuVE5W9konvbEeDvcAQeUwBVmUm9ihcpSM55KwVMprq+V9W2KRIv+zgWFjbuxHO/Pa7Pz5sB27JHr6K+VMCbO5ugak2cPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=UeeRG0da; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57cb9a370ddso6073340a12.1
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 03:38:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1719310759; x=1719915559; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e4j7Av8Nq59GpAFUJYmcgApSr33u/5sSai5UJj1fYMw=;
-        b=L/qxmsN9iWN1FoO6iZWD4DzOaHUfNedNaAiAY/o2GHmDKJuFHeiaEjslPDYLF380fE
-         CgROcxUX5ixrHaCULnWPF7zpJ+jjSCoPJbIccH0LqdG4SyqMl/Mshv/z3s0EFQ9YnuVT
-         zH1TggYqamWz4U6xSRDVihzWWx1IpdKOOMmMz6gfwy0sbQU1jE/ptRZALGH8sUdW1K1A
-         5Xfk0DVje1oKiMZp6lqnp+WXmUh8+7L1r4WwF8eV0/xq/ZEleGG4+cel8OSMTW5OBXes
-         FgK/KprpkSEUELdymOcyvzVqVPpOVxI+9NMR+JldpBqqUPWyRAP3j59V541uF3ZQBSfv
-         6p7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719310759; x=1719915559;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=sifive.com; s=google; t=1719311885; x=1719916685; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=e4j7Av8Nq59GpAFUJYmcgApSr33u/5sSai5UJj1fYMw=;
-        b=oxpv+/dAQjU0DT2VJ6ti/34V+1SjumBzuP74fkrtuJx+aogt1Yhji5IK4ectvKVETa
-         3BDHaz8cJI+vn7lH6eCJDn8VfoOKAjaFHTXVXoKGIzl8BnZA9Ak7A2lloZnpBpb2OSx8
-         bXgeeyVezRUZoVwYalgFMe3lZ7SicYPoacA1NKfWHlOTkQe2P4+wOE0TR98gKe2vnx17
-         asweMKMue3IBEDRVTJqA3uiU4sUbBtCEGkq2seKr49nkzYQl/fIcB0kxSBLFXqZC+M2f
-         oiphKOlM6Z34lQt26BfrlS3teelQ6TqJJXxhinA6Aii7qtl6pj8HGsxs45lDiRvQ4y4T
-         db6w==
-X-Forwarded-Encrypted: i=1; AJvYcCUm6pfvg3jPT/kwO4bibjHl0SXY4Bt+xeiVhPsLITXkLDFHmdFd+1vSwFXgfQvoxfiyZLlVlrW8qmnVIr028sqED7qu
-X-Gm-Message-State: AOJu0Yyi2kae627T52YR5/SdOFrxOG+7v3P65/zhK7K9oCgG0/wPGssX
-	fAWZonfrCbkrlKLsAjy2soeDWm7CtfTtqw6FQLb69BIEG5UZb1/feDQJZ58Y8CA=
-X-Google-Smtp-Source: AGHT+IHW4ivi9v86O85GxGwVRU8LzjOJfbe+LC73TyIg8LE7Mbff3CySVIzVfV1boeAtnfeBaCShnQ==
-X-Received: by 2002:a2e:9495:0:b0:2ec:440c:4e1c with SMTP id 38308e7fff4ca-2ec57967bcemr43276741fa.11.1719310758595;
-        Tue, 25 Jun 2024 03:19:18 -0700 (PDT)
-Received: from localhost ([185.71.170.219])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-424817a9f11sm164326695e9.18.2024.06.25.03.19.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 25 Jun 2024 03:19:18 -0700 (PDT)
-Date: Tue, 25 Jun 2024 12:19:16 +0200
-From: Andrew Jones <ajones@ventanamicro.com>
-To: Conor Dooley <conor@kernel.org>
-Cc: Alexandre Ghiti <alex@ghiti.fr>, 
-	Conor Dooley <conor.dooley@microchip.com>, Anup Patel <apatel@ventanamicro.com>, 
-	Yong-Xuan Wang <yongxuan.wang@sifive.com>, linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org, greentime.hu@sifive.com, 
-	vincent.chen@sifive.com, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org
-Subject: Re: [PATCH v5 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
-Message-ID: <20240625-6fb62d7ea4b9f6106e27e149@orel>
-References: <CAK9=C2XH7-RdVpojX8GNW-WFTyChW=sTOWs8_kHgsjiFYwzg+g@mail.gmail.com>
- <40a7d568-3855-48fb-a73c-339e1790f12f@ghiti.fr>
- <20240621-viewless-mural-f5992a247992@wendy>
- <edcd3957-0720-4ab4-bdda-58752304a53a@ghiti.fr>
- <20240621-9bf9365533a2f8f97cbf1f5e@orel>
- <20240621-glutton-platonic-2ec41021b81b@spud>
- <20240621-a56e848050ebbf1f7394e51f@orel>
- <20240621-surging-flounder-58a653747e1d@spud>
- <20240621-8422c24612ae40600f349f7c@orel>
- <20240622-stride-unworn-6e3270a326e5@spud>
+        bh=dgACs1Zq8zO5lFcqRU3bBruH/XX+msPS49ZLh765+hU=;
+        b=UeeRG0daNJVDG3izlV6tDo+PGKIdXxCb0kflmPj4goLO2YuvmzzkxbUBfcjZ4WzTQ9
+         TXKdzNdHc4SMru3PlT7TEyt4wnUxkNUtxvKdXen/rYbjTaFrZa/k4Q7v0fmRNHmeP5aY
+         NTAlBX+sA4vbeTxXOrq+WNlHaRxcdtb0t0oZ0ru3vWGbQKCAgTNQDNwFnoI+79/T85W3
+         uIlm9QTzcGIp0PCjegku6f7XgNslxhN6ILbRD2qCirwujakqenb24CX8V/kJGjgYBUCV
+         IxkL3dsFeRcGcR91ufEEiWnvWXgsAXDI1ZQpuPyi76gofeQ78T1EogzzR8q0LRXFCAF3
+         VMtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719311885; x=1719916685;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dgACs1Zq8zO5lFcqRU3bBruH/XX+msPS49ZLh765+hU=;
+        b=QG40sm87vlZ66SosyLX21Yn7eA4Onm8KgYXA8R+PwXPRhsm1buhSHi3GmZq3Q57ITN
+         ouq67+oWHdkeMe6+IPAs0OThuHANeuwd/1+QS+f+U0s1+E0NIN2KJgALtcPWLsurwXUr
+         6j+J10n9YumqKgSRM4weE0QKbR+i82pTkX0uYSJneEQ4n/lZk5B3lIqRvQzydgC2tMQ0
+         RYHZ+7FZM0g6Q5mdgwDO7jotDEWZnqloJkFGjLQOErV/gAqqLxJSMq00lrlNXeH9dTm0
+         0kj1n2Tp2QKuU4N4UPkoz95bgzH7Sxc/+DyT2WBCfPm1YOau4N3Y1QxHtG9J2git/nlg
+         A91g==
+X-Forwarded-Encrypted: i=1; AJvYcCUOZjQstTZFef/nlhkrnxHM5ZMZWtLpn58hqinQ9p+Y21fyn5Di8k3pEf7QUfb0vgiRe7foTHINSHG4s0s2jPhTPUqe
+X-Gm-Message-State: AOJu0YwTOcrrT8HagtVL8Td7tqNHBfIRSJ2bWBuHrVBXmzKAvCcuYzTh
+	MiJ274ouvbtq8dW+gRGa6lgpV121QfUXnyxz3CQNvl+wZR/C9cMfdMQnzxqIeJ1XshT3HYYY/Ym
+	TEeOwe75q0DXbN5HNDn/RKpxW33BOPpLvLfgLWw==
+X-Google-Smtp-Source: AGHT+IEOGwcd6y/gx12jEq+6dGlJLUlszkJPcbr1MdpHUe7LAywiaX+cvkxEPjNM34TUSpxkVh5v/jOigUd5w64NKMg=
+X-Received: by 2002:a50:d716:0:b0:57c:9ccd:c626 with SMTP id
+ 4fb4d7f45d1cf-57d4bddfbfbmr4573117a12.39.1719311885379; Tue, 25 Jun 2024
+ 03:38:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240622-stride-unworn-6e3270a326e5@spud>
+References: <20240605121512.32083-1-yongxuan.wang@sifive.com>
+ <20240605121512.32083-2-yongxuan.wang@sifive.com> <20240621-d1b77d43adacaa34337238c2@orel>
+ <20240621-nutty-penknife-ca541ee5108d@wendy> <20240621-b22a7c677a8d61c26feaa75b@orel>
+ <20240621-pushpin-exclude-1b4f38ae7e8d@wendy> <20240621-a69c8f97e566ebd3a82654c1@orel>
+In-Reply-To: <20240621-a69c8f97e566ebd3a82654c1@orel>
+From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Date: Tue, 25 Jun 2024 18:37:53 +0800
+Message-ID: <CAMWQL2jWPD77f2gz_N8HM+YdKev-8RvOCOUgm5-uxq-5VTvCXw@mail.gmail.com>
+Subject: Re: [PATCH v5 1/4] RISC-V: Add Svade and Svadu Extensions Support
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: Conor Dooley <conor.dooley@microchip.com>, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, apatel@ventanamicro.com, alex@ghiti.fr, 
+	greentime.hu@sifive.com, vincent.chen@sifive.com, 
+	Jinyu Tang <tjytimi@163.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Anup Patel <anup@brainfault.org>, Mayuresh Chitale <mchitale@ventanamicro.com>, 
+	Atish Patra <atishp@rivosinc.com>, wchen <waylingii@gmail.com>, 
+	Samuel Ortiz <sameo@rivosinc.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <cleger@rivosinc.com>, 
+	Evan Green <evan@rivosinc.com>, Xiao Wang <xiao.w.wang@intel.com>, 
+	Alexandre Ghiti <alexghiti@rivosinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	"Mike Rapoport (IBM)" <rppt@kernel.org>, Kemeng Shi <shikemeng@huaweicloud.com>, 
+	Samuel Holland <samuel.holland@sifive.com>, Jisheng Zhang <jszhang@kernel.org>, 
+	Charlie Jenkins <charlie@rivosinc.com>, "Matthew Wilcox (Oracle)" <willy@infradead.org>, 
+	Leonardo Bras <leobras@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jun 22, 2024 at 01:01:30PM GMT, Conor Dooley wrote:
-> On Fri, Jun 21, 2024 at 05:08:01PM +0200, Andrew Jones wrote:
-> > On Fri, Jun 21, 2024 at 03:58:18PM GMT, Conor Dooley wrote:
-> > > On Fri, Jun 21, 2024 at 04:52:09PM +0200, Andrew Jones wrote:
-> > > > On Fri, Jun 21, 2024 at 03:04:47PM GMT, Conor Dooley wrote:
-> > > > > On Fri, Jun 21, 2024 at 03:15:10PM +0200, Andrew Jones wrote:
-> > > > > > On Fri, Jun 21, 2024 at 02:42:15PM GMT, Alexandre Ghiti wrote:
-> > > 
-> > > > > > I understand the concern; old SBI implementations will leave svadu in the
-> > > > > > DT but not actually enable it. Then, since svade may not be in the DT if
-> > > > > > the platform doesn't support it or it was left out on purpose, Linux will
-> > > > > > only see svadu and get unexpected exceptions. This is something we could
-> > > > > > force easily with QEMU and an SBI implementation which doesn't do anything
-> > > > > > for svadu. I hope vendors of real platforms, which typically provide their
-> > > > > > own firmware and DTs, would get this right, though, especially since Linux
-> > > > > > should fail fast in their testing when they get it wrong.
-> > > > > 
-> > > > > I'll admit, I wasn't really thinking here about something like QEMU that
-> > > > > puts extensions into the dtb before their exact meanings are decided
-> > > > > upon. I almost only ever think about "real" systems, and in those cases
-> > > > > I would expect that if you can update the representation of the hardware
-> > > > > provided to (or by the firmware to Linux) with new properties, then updating
-> > > > > the firmware itself should be possible.
-> > > > > 
-> > > > > Does QEMU have the this exact problem at the moment? I know it puts
-> > > > > Svadu in the max cpu, but does it enable the behaviour by default, even
-> > > > > without the SBI implementation asking for it?
-> > > > 
-> > > > Yes, because QEMU has done hardware A/D updating since it first started
-> > > > supporting riscv, which means it did svadu when neither svadu nor svade
-> > > > were in the DT. The "fix" for that was to ensure we have svadu and !svade
-> > > > by default, which means we've perfectly realized Alexandre's concern...
-> > > > We should be able to change the named cpu types that don't support svadu
-> > > > to only have svade in their DTs, since that would actually be fixing those
-> > > > cpu types, but we'll need to discuss how to proceed with the generic cpu
-> > > > types like 'max'.
-> > > 
-> > > Correct me please, since I think I am misunderstanding: At the moment
-> > > QEMU does A/D updating whether or not the SBI implantation asks for it,
-> > > with the max CPU. The SBI implementation doesn't understand Svadu and
-> > > won't strip it. The kernel will get a DT with Svadu in it, but Svadu will
-> > > be enabled, so it is not a problem.
-> > 
-> > Oh, of course you're right! I managed to reverse things some odd number of
-> > times (more than once!) in my head and ended up backwards...
-> 
-> I mean, I've been really confused about this whole thing the entire
-> time, so ye..
-> 
-> Speaking of QEMU, what happens if I try to turn on svade and svadu in
-> QEMU? It looks like there's some handling of it that does things
-> conditionally based !svade && svade, but I couldn't tell if it would do
-> what we are describing in this thread.
+Hi Conor, Andrew and Alexandre,
 
-It'll use exception mode, but {m,h}envcfg.ADUE is still provided to allow
-software to switch to hardware updating when FWFT exists. So I think we're
-good to go.
+On Fri, Jun 21, 2024 at 8:06=E2=80=AFPM Andrew Jones <ajones@ventanamicro.c=
+om> wrote:
+>
+> On Fri, Jun 21, 2024 at 12:00:32PM GMT, Conor Dooley wrote:
+> > On Fri, Jun 21, 2024 at 12:42:32PM +0200, Andrew Jones wrote:
+> > > On Fri, Jun 21, 2024 at 11:24:19AM GMT, Conor Dooley wrote:
+> > > > On Fri, Jun 21, 2024 at 10:43:58AM +0200, Andrew Jones wrote:
+> ...
+> > > > > It's hard to guess what is, or will be, more likely to be the cor=
+rect
+> > > > > choice of call between the _unlikely and _likely variants. But, w=
+hile we
+> > > > > assume svade is most prevalent right now, it's actually quite unl=
+ikely
+> > > > > that 'svade' will be in the DT, since DTs haven't been putting it=
+ there
+> > > > > yet. Anyway, it doesn't really matter much and maybe the _unlikel=
+y vs.
+> > > > > _likely variants are better for documenting expectations than for
+> > > > > performance.
+> > > >
+> > > > binding hat off, and kernel hat on, what do we actually do if there=
+'s
+> > > > neither Svadu or Svade in the firmware's description of the hardwar=
+e?
+> > > > Do we just arbitrarily turn on Svade, like we already do for some
+> > > > extensions:
+> > > >   /*
+> > > >    * These ones were as they were part of the base ISA when the
+> > > >    * port & dt-bindings were upstreamed, and so can be set
+> > > >    * unconditionally where `i` is in riscv,isa on DT systems.
+> > > >    */
+> > > >   if (acpi_disabled) {
+> > > >           set_bit(RISCV_ISA_EXT_ZICSR, isainfo->isa);
+> > > >           set_bit(RISCV_ISA_EXT_ZIFENCEI, isainfo->isa);
+> > > >           set_bit(RISCV_ISA_EXT_ZICNTR, isainfo->isa);
+> > > >           set_bit(RISCV_ISA_EXT_ZIHPM, isainfo->isa);
+> > > >   }
+> > > >
+> > >
+> > > Yes, I think that's reasonable, assuming we do it in the final "pass"=
+,
+> > > where we're sure svadu isn't present.
+> >
+> > I haven't thought about specifically when to do it, but does it need to
+> > be in the final pass? If we were to, on each CPU, enable it if Svadu
+> > isn't there, we'd either end up with a system that I suspect we're not
+> > going to be supporting or the correct result. Or am I misunderstanding,
+> > and it will be valid to have a subset of CPUs that have Svadu enabled
+> > from the bootloader?
+> >
+> > Note that it would not be problematic to have 3 CPUs with Svade + Svadu
+> > and a 4th with only Svade in the DT because we would just not use the
+> > FWFT mechanism to enable Svadu. It's just the Svadu in isolation case
+> > that I'm asking about.
+>
+> I wasn't thinking about the potential of mixmatched A/D udpating. I'm
+> pretty sure this will be one of those things that is all or none. I
+> was more concerned with getting the result right and I had just been
+> too lazy to double check that the block of code you pointed out is
+> in the right place to be sure there's no svadu. Now that I look, I
+> believe it is.
+>
+> >
+> > > Doing this is a good idea since
+> > > we'll be able to simplify conditions, as we can just use 'if (svade)'
+> > > since !svade would imply svadu. With FWFT and both, we'll want to rem=
+ove
+> > > svade from the isa bitmap when enabling svadu.
+> >
+> > Right I would like to move the various extension stuff in this
+> > direction, where they have a bit more intelligence to them, and don't
+> > just reflect the state in DT/ACPI directly.
+> > I've got some patches in mind once Clement's Zca etc patchset
+> > is merged, think I posted one or two as replies to conversations on
+> > the list already. An example would be disabling the vector crypto
+> > extensions if we've had to disable vector, or as you suggest here,
+> > dropping Svade if we have turned on Svadu using FWFT. I think that make=
+s
+> > the APIs more understandable to developers and more useful than they ar=
+e
+> > at the moment, where to use vector crypto you also need to check vector
+> > itself for the code to be correct. If I call
+> > riscv_isa_extension_available(), and it returns true, the extension
+> > should be usable IMO.
 
-Thanks,
-drew
+Thank you all very much! I will update the code so that
+riscv_isa_extension_available()
+can reflect the platform's behavior.
+
+Regards,
+Yong-Xuan
+
+>
+> Sounds good to me.
+>
+> Thanks,
+> drew
 
