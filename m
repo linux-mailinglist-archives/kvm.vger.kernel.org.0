@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-20439-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20440-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB12F915BEC
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 03:56:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5274C915BEF
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 03:58:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 539CCB21F78
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 01:56:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83E5B1C2150D
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 01:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3C720309;
-	Tue, 25 Jun 2024 01:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB6A20309;
+	Tue, 25 Jun 2024 01:58:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aQW4ZNe6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gdd0kIx5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA571BC2F
-	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 01:56:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E32210EE;
+	Tue, 25 Jun 2024 01:58:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719280580; cv=none; b=ri3wD6sBwpN6xs27Crzxi/IhJXdP+ddaz3IT4XmlBB18fGsyUkYblFHH2faOav1+VNxC+fH7JrzXKmIUlWUWjZu2NrVRQmDmUJRc17ipG7QUka4NbnZaGmwA1gxchry7LPVOxNk800AQUZRn4MVAdWYf1kywa9+14OPzckfCfLk=
+	t=1719280703; cv=none; b=CQWwp8fUaZc6jEYb0PxfY433Fi64RfGRgTluj91Ds0YODEu+M7lfSxv/wS7g7l00U+idPZScl/5SWWqz0AekLx81DI1g44IjzqDcJyA628yIJTD7Pmo5UHnr7eumvORxAlZqd2aMPu50Cb3MQFBm+43phXLZJuijDa2QCSHhnDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719280580; c=relaxed/simple;
-	bh=esq/oSzRwy7/cYJxmdYp5IZKdjJ+2ZYgZSOpvT3tMHg=;
+	s=arc-20240116; t=1719280703; c=relaxed/simple;
+	bh=KpwFigx0oOWXjMOYZz58HXc0+E7kwucLq2c7X9GenNQ=;
 	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=cLuL4ybCQg6BdbWLmGE+54uNvzNs+XOp5vRT98U2/cWLBS9rVuFoSEJ/x/SR4irHAYYkUSUfS3RpKQ3y8fBm2WKjyVk3/nGFZVe6r6ua693bsp8+oWTPBtCljpJC9F+ZC2tAfz30e1RiT0ZPFYiPvtx5DFYPcwMb/5tlEykTLTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aQW4ZNe6; arc=none smtp.client-ip=209.85.210.181
+	 References:In-Reply-To; b=s/Lv3Ll8F2BiI5qsJctryNdCQ3kM12YQwOpvJsfM705foXNXHP0pGKHrJBUXJTv+wen+8PVJgjXcRcdMWVqInP2NPjpXe+jftBTUQLaHqdbyCg+EkDNA6iY+mKDR+bh3gMnlDLoDadj0VdyedSbAtQx+Sup0aeDVFHGvKiuebzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gdd0kIx5; arc=none smtp.client-ip=209.85.167.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-7067108f2cdso1817511b3a.1
-        for <kvm@vger.kernel.org>; Mon, 24 Jun 2024 18:56:19 -0700 (PDT)
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3d361cf5755so2916914b6e.2;
+        Mon, 24 Jun 2024 18:58:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719280578; x=1719885378; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1719280701; x=1719885501; darn=vger.kernel.org;
         h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NYZY7E/hXC2pNdw5CSObSFWNa8KKNDbdi6VPYKf3QG8=;
-        b=aQW4ZNe6yBXpY082CEDllBLInAbcqKJMYlqzxsIRl3YDtbs90agiDtPnGXk/UElF+w
-         vacmPxkaqRuV4gOlAczyAEwpyvfVYiRaIYoMzRZTVFQxdNenk95PeFyiZcxjxyks1iRY
-         s+hqlckzAlraldBSRQrR3YQKQdoYG3PuOtnwbkPN1iU/278NF63gKkswoq8RuDfpr2hM
-         O3GX4TTFnxdD8Judt9IHT/xcyD7VhMn62+7UQmFzCWmtiwAJQcUa0q36/yiRNB37JThN
-         I3vuXlM+yXDw00UH7w/Xel3xUXYHA+gIYvCB2BCNLDsTXnPl1WaD+X7Vzpni9jBOmzEi
-         IAQg==
+        bh=39QeQrzDw8rQX3IGT/Rcm1p33OqxFDQDDDG1ZjS6TCw=;
+        b=Gdd0kIx50/QOYtc9ZrzsQXyPd/8GkcC7g33K6iTL25XrVGQcTiCJI3PuvmgEt6YvBj
+         ICNRzGx4AaNq6veL9ITCgZDcqJom5aZ/45zGgH3FULnmJy0h+li92w4hJNmWTN59CT8Q
+         03SOmDR9PkyrEPFz4eMdQ2CCG1b0HTVAjr2gaVBzMKoBXRvmZXEnn1ld+jc1vFn3u9eE
+         d+y0mwrXCEq9evLT1yq7OS3ijcV7oVqc4aIQzIOcigIEN53E9bjBQVi3NxbI9+TRW/m5
+         9yAv7CGalBq6TrbJIbE6W1So7X9/x4HmXlnlytyZOfpYepN+u9DrXRoLj6IUXWns8k/U
+         fzZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719280578; x=1719885378;
+        d=1e100.net; s=20230601; t=1719280701; x=1719885501;
         h=in-reply-to:references:to:from:subject:cc:message-id:date
          :content-transfer-encoding:mime-version:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=NYZY7E/hXC2pNdw5CSObSFWNa8KKNDbdi6VPYKf3QG8=;
-        b=U2T47zIGXyVaYGbKr2DoM6NXceLm9wSDDDp1vakDPLiaXOMpi5Dmw6iO+Ik1JXaa+S
-         auUutcWGN0S9QkX5SaA+GFEmVTG7hSdUqbd/IoTPFId2HC5GAUYDkLZQ2czQw9yVpbij
-         TvN2YRyKVYSTZGqVEJCACac2IH6mS3Bu5Ux6rL1K6XPIzIVvSTRtCVz+HyDoHaJgC2eA
-         ytItM/gGjukLODwJE9AV7yoDvtZknzH9rRWdWNVYSt298FQAkfB2xUZS8UyJdnCPW+qL
-         og2loOeKM04/AfVG5Qdg9b9hbrQajuA1ub4HkwKIkjUslo1OwkMW3F4XZZzHSO1rSdq8
-         YN7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVtVcts5ahlq9YImKCk2MBylACGUDMvZEOEB2H7c8jjAaByM6oBWBFRlK2SAgNLKeKzFkqR2OxsXxHjJx6TGhSur7WD
-X-Gm-Message-State: AOJu0YzYyCVjn3TNqHFwTv/k9aQHbiNmo54XttR7yiI+5mq3ZmA6LfKe
-	ZqccsKOFECCBKu5a08yQzI13CCcoAsPeU4SxaNuFa0bKPxdnPq4QZjRd3w==
-X-Google-Smtp-Source: AGHT+IE2waZlPGm4HkckDWuZTNRDoL0wrQGRaanKL/AYe6vof56/3DBV9xSAOq7mrPTVi5VkMVf2Jg==
-X-Received: by 2002:a05:6a00:2d81:b0:706:6c70:e583 with SMTP id d2e1a72fcca58-70670f19356mr9194230b3a.19.1719280578440;
-        Mon, 24 Jun 2024 18:56:18 -0700 (PDT)
+        bh=39QeQrzDw8rQX3IGT/Rcm1p33OqxFDQDDDG1ZjS6TCw=;
+        b=g89ckGoSmBZ+QSwJGkPeDG6SN7FjqJx8cXNepTrRDS8wqGpFmg0UK+SamO1dJnxExb
+         LsyuqedYR5eTnolBbENPCOw+TvHGcPOjHD9Wh8+UtzZkCMZ932NC3be9y4bt2ycRzJ/2
+         2hBfRs5iDIsx2rrlSH2K9ieWQwdi+ugleEGpq2adSPbXvvlCsIEJtPJUORLrL4IRfsOq
+         Hfi9UyFPJEK6MiG74Ua+l9yzLV4arI0xlY4yCqRMB0Wm8MFy0ZvACFPJiKMDby5Q9Z3M
+         EhxGojDKOg27ljkagddvRXjhUFK5HENprI2noGxn8lrV17/fJCJ5r2B4VidYkJ5DhP5W
+         hIaw==
+X-Forwarded-Encrypted: i=1; AJvYcCU7OVdRlBxeFTNbDzAIjt5w8BcNf1kdDBC7orfsj50LU0KA9J84hLbgHewlYinZMIkRPU3f1yAZBxhPVs4w9TIYb2GN
+X-Gm-Message-State: AOJu0YzF/BGloNDL8MPtTKPurAOlLrJm6qt5TXte8TAGf5I167r259iT
+	SakfN+0/Wfvwqi9ES6hYolgWWihv/HEQsulBaI8wIUKg9U0iIP74
+X-Google-Smtp-Source: AGHT+IFURooh52M5Miq69+BtfwJjqssaGDXJYAr73ilbd6HecPITsbHb9J4P5exIJZCwKKVQ4XRJTA==
+X-Received: by 2002:a05:6808:d52:b0:3d2:2773:581 with SMTP id 5614622812f47-3d545a54d47mr6695166b6e.47.1719280701138;
+        Mon, 24 Jun 2024 18:58:21 -0700 (PDT)
 Received: from localhost (118-211-5-80.tpgi.com.au. [118.211.5.80])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70651cd4ea3sm7033630b3a.99.2024.06.24.18.56.15
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7068d251418sm1910610b3a.194.2024.06.24.18.58.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 24 Jun 2024 18:56:17 -0700 (PDT)
+        Mon, 24 Jun 2024 18:58:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -75,96 +75,72 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Date: Tue, 25 Jun 2024 11:56:12 +1000
-Message-Id: <D28Q3J98V4EC.1RXWN7UR4A3J7@gmail.com>
-Cc: "Laurent Vivier" <lvivier@redhat.com>, "Andrew Jones"
- <andrew.jones@linux.dev>, <linuxppc-dev@lists.ozlabs.org>,
- <kvm@vger.kernel.org>
-Subject: Re: [kvm-unit-tests PATCH v10 08/15] powerpc: add pmu tests
+Date: Tue, 25 Jun 2024 11:58:15 +1000
+Message-Id: <D28Q53OCJH1L.YZMTUSA3620Y@gmail.com>
+Cc: <linux-s390@vger.kernel.org>, <kvm@vger.kernel.org>, "David Hildenbrand"
+ <david@redhat.com>, "Andrew Jones" <andrew.jones@linux.dev>, "Thomas Huth"
+ <thuth@redhat.com>
+Subject: Re: [kvm-unit-tests PATCH v3 3/7] s390x: Add sie_is_pv
 From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Thomas Huth" <thuth@redhat.com>
+To: "Nina Schoetterl-Glausch" <nsg@linux.ibm.com>,
+ =?utf-8?q?Nico_B=C3=B6hr?= <nrb@linux.ibm.com>, "Janosch Frank"
+ <frankja@linux.ibm.com>, "Claudio Imbrenda" <imbrenda@linux.ibm.com>
 X-Mailer: aerc 0.17.0
-References: <20240612052322.218726-1-npiggin@gmail.com>
- <20240612052322.218726-9-npiggin@gmail.com>
- <5bfe90ca-96aa-405b-a4b9-86ec4a497366@redhat.com>
-In-Reply-To: <5bfe90ca-96aa-405b-a4b9-86ec4a497366@redhat.com>
+References: <20240620141700.4124157-1-nsg@linux.ibm.com>
+ <20240620141700.4124157-4-nsg@linux.ibm.com>
+In-Reply-To: <20240620141700.4124157-4-nsg@linux.ibm.com>
 
-On Wed Jun 19, 2024 at 4:39 AM AEST, Thomas Huth wrote:
-> On 12/06/2024 07.23, Nicholas Piggin wrote:
-> > Add some initial PMU testing.
-> >=20
-> > - PMC5/6 tests
-> > - PMAE / PMI test
-> > - BHRB basic tests
-> >=20
-> > Signed-off-by: Nicholas Piggin <npiggin@gmail.com>
-> > ---
-> ...
-> > diff --git a/powerpc/pmu.c b/powerpc/pmu.c
-> > new file mode 100644
-> > index 000000000..bdc45e167
-> > --- /dev/null
-> > +++ b/powerpc/pmu.c
-> > @@ -0,0 +1,562 @@
-> ...
-> > +static void test_pmc5_with_ldat(void)
-> > +{
-> > +	unsigned long pmc5_1, pmc5_2;
-> > +	register unsigned long r4 asm("r4");
-> > +	register unsigned long r5 asm("r5");
-> > +	register unsigned long r6 asm("r6");
-> > +	uint64_t val;
-> > +
-> > +	reset_mmcr0();
-> > +	mtspr(SPR_PMC5, 0);
-> > +	mtspr(SPR_MMCR0, mfspr(SPR_MMCR0) & ~(MMCR0_FC | MMCR0_FC56));
-> > +	asm volatile(".rep 20 ; nop ; .endr" ::: "memory");
-> > +	mtspr(SPR_MMCR0, mfspr(SPR_MMCR0) | (MMCR0_FC | MMCR0_FC56));
-> > +	pmc5_1 =3D mfspr(SPR_PMC5);
-> > +
-> > +	val =3D 0xdeadbeef;
-> > +	r4 =3D 0;
-> > +	r5 =3D 0xdeadbeef;
-> > +	r6 =3D 100;
-> > +	reset_mmcr0();
-> > +	mtspr(SPR_PMC5, 0);
-> > +	mtspr(SPR_MMCR0, mfspr(SPR_MMCR0) & ~(MMCR0_FC | MMCR0_FC56));
-> > +	asm volatile(".rep 10 ; nop ; .endr ; ldat %0,%3,0x10 ; .rep 10 ; nop=
- ; .endr" : "=3Dr"(r4), "+r"(r5), "+r"(r6) : "r"(&val) :"memory");
+On Fri Jun 21, 2024 at 12:16 AM AEST, Nina Schoetterl-Glausch wrote:
+> Add a function to check if a guest VM is currently running protected.
 >
-> Looks like older versions of Clang do not like this instruction:
+> Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+
+Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+
+> ---
+>  lib/s390x/sie.h | 6 ++++++
+>  lib/s390x/sie.c | 4 ++--
+>  2 files changed, 8 insertions(+), 2 deletions(-)
 >
->   /tmp/pmu-4fda98.s: Assembler messages:
->   /tmp/pmu-4fda98.s:1685: Error: unrecognized opcode: `ldat'
->   clang-13: error: assembler command failed with exit code 1 (use -v to s=
-ee=20
-> invocation)
->
-> Could you please work-around that issue?
-
-Ah, just catching up with this -- thanks for working it out.
-
-I will fix.
-
->
-> Also, please break the very long line here. Thanks!
-
-Sure.
-
-Thanks,
-Nick
-
->
-> > +	mtspr(SPR_MMCR0, mfspr(SPR_MMCR0) | (MMCR0_FC | MMCR0_FC56));
-> > +	pmc5_2 =3D mfspr(SPR_PMC5);
-> > +	assert(r4 =3D=3D 0xdeadbeef);
-> > +	assert(val =3D=3D 0xdeadbeef);
-> > +
-> > +	/* TCG does not count instructions around syscalls correctly */
-> > +	report_kfail(host_is_tcg, pmc5_1 !=3D pmc5_2 + 1,
-> > +		     "PMC5 counts instructions with ldat");
-> > +}
->
->   Thomas
+> diff --git a/lib/s390x/sie.h b/lib/s390x/sie.h
+> index c1724cf2..53cd767f 100644
+> --- a/lib/s390x/sie.h
+> +++ b/lib/s390x/sie.h
+> @@ -281,6 +281,12 @@ void sie_expect_validity(struct vm *vm);
+>  uint16_t sie_get_validity(struct vm *vm);
+>  void sie_check_validity(struct vm *vm, uint16_t vir_exp);
+>  void sie_handle_validity(struct vm *vm);
+> +
+> +static inline bool sie_is_pv(struct vm *vm)
+> +{
+> +	return vm->sblk->sdf =3D=3D 2;
+> +}
+> +
+>  void sie_guest_sca_create(struct vm *vm);
+>  void sie_guest_create(struct vm *vm, uint64_t guest_mem, uint64_t guest_=
+mem_len);
+>  void sie_guest_destroy(struct vm *vm);
+> diff --git a/lib/s390x/sie.c b/lib/s390x/sie.c
+> index 40936bd2..0fa915cf 100644
+> --- a/lib/s390x/sie.c
+> +++ b/lib/s390x/sie.c
+> @@ -59,7 +59,7 @@ void sie(struct vm *vm)
+>  	/* When a pgm int code is set, we'll never enter SIE below. */
+>  	assert(!read_pgm_int_code());
+> =20
+> -	if (vm->sblk->sdf =3D=3D 2)
+> +	if (sie_is_pv(vm))
+>  		memcpy(vm->sblk->pv_grregs, vm->save_area.guest.grs,
+>  		       sizeof(vm->save_area.guest.grs));
+> =20
+> @@ -98,7 +98,7 @@ void sie(struct vm *vm)
+>  	/* restore the old CR 13 */
+>  	lctlg(13, old_cr13);
+> =20
+> -	if (vm->sblk->sdf =3D=3D 2)
+> +	if (sie_is_pv(vm))
+>  		memcpy(vm->save_area.guest.grs, vm->sblk->pv_grregs,
+>  		       sizeof(vm->save_area.guest.grs));
+>  }
 
 
