@@ -1,233 +1,407 @@
-Return-Path: <kvm+bounces-20501-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20502-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829B79172F3
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 23:09:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A539173B0
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 23:51:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 029CC1F22E98
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 21:09:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBF8AB20D6F
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 21:51:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4180217DE2A;
-	Tue, 25 Jun 2024 21:09:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D1617E460;
+	Tue, 25 Jun 2024 21:51:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iQfJUTzx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hUWMi3iF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD0816B39A;
-	Tue, 25 Jun 2024 21:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719349771; cv=fail; b=XxCWsEk1b0t03449srZG5+IyAXglWKDkYMnDe9CxAYDjix/umcFndwiMB0m2AvlWBeEl+7AUeijEHNqw7gfyBFGNR9k8k8T3SNr4s+YDaQuqcAPkDXsjSmu61/OwNcXMMMg2kTaBXFcVDcEfpXGvdNo8Flx3OYXDj41pmgUouPY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719349771; c=relaxed/simple;
-	bh=HiPPIamz4BSBSCcT2K2OmnaN/UqmeqkCVW7M2CEkS2U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=As0H4j0B6Iy3lWJmJbq35bM29q6djQfl2jmiRb0ZcoN28x/Bf96PCkVKD8Hlhqj+Y93gbDQ74BcdPV5DBrNRI0MXS9x6OaHCVlCECgrLRMa77mM6MqZvh3TKjhCLtEy5HhIKkjXFILyfB7o+CgMJIGuURAftd2y3Rpkt4+KLQPU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iQfJUTzx; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719349770; x=1750885770;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-id:content-transfer-encoding:
-   mime-version;
-  bh=HiPPIamz4BSBSCcT2K2OmnaN/UqmeqkCVW7M2CEkS2U=;
-  b=iQfJUTzx9KHjjHM5AgnNbEm0yc5jcZRH7yp+63YCr1Y26gaZVAs6flKd
-   FA5ijoAd0j5GuHObNa+to50KqBeXGUDZkg7lXF6V2BMEB5L/RVt629N0Q
-   kcRow9HaPv/nJyiqp0mLDAgZd/LSDMog2grUwWgYvGsz4Cd7t4tjO0ozo
-   VB9bM0hYeERzNicH39vhDNgN0Ml2C/XwwWPzKMHPUU9yQb9F/b7vtnQci
-   IjtcazCBQ/VsA/Pd7y9x026ookigubDzS3NjnoQze+F36rwc3IyxoV9CT
-   cXLM/jjfSyDmz/lb8v3VjQ5B4znHju1oyqb++b+spxf9S4dyJdnkcvQWe
-   g==;
-X-CSE-ConnectionGUID: Fsv5uxV6R8WrwyzM++4vJA==
-X-CSE-MsgGUID: euQPk7N5T92cHbXnyaRUxw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="19287038"
-X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="19287038"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 14:09:29 -0700
-X-CSE-ConnectionGUID: Ov/YybGsTQ+dFbpcQyYPsQ==
-X-CSE-MsgGUID: rL09i+B6SNyfPgKHQSSNjg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
-   d="scan'208";a="43844305"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Jun 2024 14:09:30 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 25 Jun 2024 14:09:28 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 25 Jun 2024 14:09:28 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 25 Jun 2024 14:09:28 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 25 Jun 2024 14:09:28 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P/6VPyQYZwldfkMFaZ+Mg6j55LxO2SdO1nGXj1ccsaxrJfErQ8qVh7SYhcnr+/bUcQDik3cXHUjCq1r9F9sC3FPT6447+pgle1SslFfj1MpoKxuCZLU3fdJ342yW7kvjyVAm0QwnK3z3KSYHdbQE1X9O8acYdRxlWgml72yNu6W8rCOME+6WPf+sfMEb2ibODRmhvfNX2cLqjmaZqJtqAohXbtZOrA7mnt7AyGHCvGowTmSREoT3i0vlG4pjRecy8HgDoWSKEOTUi71FFWkx4okqOQUXr1wCKivfWTHrQitUGH72UMAb66zDgbB+WQfVeV8uZA9OKNj5HIzSl3XpNQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HiPPIamz4BSBSCcT2K2OmnaN/UqmeqkCVW7M2CEkS2U=;
- b=D0e2cCI5wpjYOpSx2T/iF8+S2FMRFb9sSBMI6fGbdbCyEg6dQH0d+yjnm21/9nWAeVQI/3NBfYgiq7ge75dxfbReTGi8P/rLPSk0eXoHOc4ENYQpXWwwtf+3RJ7TMxJk4tOedn6c6t7qQuPD4aAXTHL9CHuHs2Arm1Sf1BY+hqWeah+MHls0jTm0/bAcvfI+KD+CxghkxsyH2+ajFYjXo+1BDjXTvzpM013iZbvB4PEhyQeGNOjEzDXXdgt5cPlc/Gi4ad5IgTa2S337H1bNsHKfBA2oGmdTzTXtPQ0l3Kp10X8jCX+Hl6rYBHfUUZ2FaO8IUpXYrZyKWLaAcizmVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com (2603:10b6:208:372::10)
- by SA1PR11MB8394.namprd11.prod.outlook.com (2603:10b6:806:37c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.19; Tue, 25 Jun
- 2024 21:09:26 +0000
-Received: from MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9]) by MN0PR11MB5963.namprd11.prod.outlook.com
- ([fe80::edb2:a242:e0b8:5ac9%4]) with mapi id 15.20.7698.025; Tue, 25 Jun 2024
- 21:09:25 +0000
-From: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"binbin.wu@linux.intel.com" <binbin.wu@linux.intel.com>, "Yamahata, Isaku"
-	<isaku.yamahata@intel.com>
-CC: "Zhang, Tina" <tina.zhang@intel.com>, "seanjc@google.com"
-	<seanjc@google.com>, "Yuan, Hang" <hang.yuan@intel.com>, "Huang, Kai"
-	<kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>, "sagis@google.com"
-	<sagis@google.com>, "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"Aktas, Erdem" <erdemaktas@google.com>, "Chatre, Reinette"
-	<reinette.chatre@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
-	"sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH v19 110/130] KVM: TDX: Handle TDX PV MMIO hypercall
-Thread-Topic: [PATCH v19 110/130] KVM: TDX: Handle TDX PV MMIO hypercall
-Thread-Index: AQHadnrQBvAJmB6j80e0mbgOJfCyfbHYq/+AgADu9YA=
-Date: Tue, 25 Jun 2024 21:09:25 +0000
-Message-ID: <07e410205a9eb87ab7f364b7b3e808e4f7d15b7f.camel@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
-	 <a4421e0f2eafc17b4703c920936e32489d2382a3.1708933498.git.isaku.yamahata@intel.com>
-	 <560f3796-5a41-49fb-be6e-558bbe582996@linux.intel.com>
-In-Reply-To: <560f3796-5a41-49fb-be6e-558bbe582996@linux.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.44.4-0ubuntu2 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR11MB5963:EE_|SA1PR11MB8394:EE_
-x-ms-office365-filtering-correlation-id: d4bb651e-45af-4b45-b1a9-08dc955b181e
-x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230038|1800799022|366014|376012|38070700016;
-x-microsoft-antispam-message-info: =?utf-8?B?UkVYZXcvMklNOWxrZFhEcUdhNlBNdHJ2aU1pd0ozU3pXeWRXeDNyZGpQTmZ1?=
- =?utf-8?B?elVCN0pIdEs4d09Lak9zWEJyUzRCS1M1M2V1TjViMkpoNTUrMFBGbmdFU0V0?=
- =?utf-8?B?Y0w1SVhFY3g2Z2paays3cVdkN1V2emJpa2svQmhERWJCSHUxRnBJS1VhUG51?=
- =?utf-8?B?V3AyQkVqb25yWVpwWHVmcDlTZGZwa1BpUVQ2WkhwSXpQOGFXd3dXVkxMT1pj?=
- =?utf-8?B?VktZdGhuUEY3OUZaaFFHWnExTzY3c3FpdjhMcGsxUnhYdVJ5dE1xZlhFMmFK?=
- =?utf-8?B?T25EMUhycm5QMEE4WWNDY3U4Mno0bkpONUdQN1dINVR1UWFwam1lazZxQWxC?=
- =?utf-8?B?Nnc4OGQvMTJBV3RmcU5yLzRxQkZIWnhuU2RpeC9NV0dLbzhHMGNmS3JYNWZn?=
- =?utf-8?B?dzYvWm1ST2ZqV0t1Mjh2ZGpQYzd4UUpjc2QwWGd4QXBWZU9OdzJlUHAyWnA5?=
- =?utf-8?B?Q0pMQVg4K0ExUWtVTGxib2xtQUR6NmVpaHIyL2RyVjdSS20reVdtMERXZ0dR?=
- =?utf-8?B?anNiODJESjZpWjBRcHRuZHdiOWtzT0ZvTlB0Y2kwTVAzN0dpQjNnYkRFbDhB?=
- =?utf-8?B?bFFpSGFiSHdUVzdHcCtuRWZ1b2tWYzAwVjh1VTAyVDZQOE1FK29Da2JkWDJV?=
- =?utf-8?B?QUs2OTRVV2hHNnZoNUM5RHRFTUJHNlkwNmZTS3B3Wm82UUNUOUpRSmhWcElC?=
- =?utf-8?B?Tno2QklUMGxhOUxETDNQSWVld3RVekovR3k1MEYzMlo4LytjeWFlNXpUOGhs?=
- =?utf-8?B?WFJYRElZbGdHaGlEbGw4dHZZV1JsZUlnWHFLUUNPS0pwbExjN0JWYWNKd01L?=
- =?utf-8?B?V21EcEpMRTAzMHk2SFllQ0MrLy9tWWk0eDlwMk1ZT1ZybGJ2akFOM3E3Z3lQ?=
- =?utf-8?B?Zk1Tb0tmTzE2MHlBUHdNckNNLzRwZDBjUjU0c0g2eCtRWkh2K21MMGUzYk4w?=
- =?utf-8?B?S1BSRFdjOUNyR1dhVnJSMTZDV2hBb1JVNGROWXNxd1BTUVltNkw1elNOMGND?=
- =?utf-8?B?QnEvQXJOREovSTRuc2Y4UFB0b2JHYisvS3BUcmdieHh6ZUl6YnE0YnVlNWdU?=
- =?utf-8?B?eExtNjVCV2lIRktsRlpKTlVMOTg5SUpNWnQrSm05OXRleEt2dzFTcWNLcWZ1?=
- =?utf-8?B?eFV6R29LYS93K09GTnl6WmMzWDRJTnY1TGFkUm1vTCtJRE5zOFNmQ1BUQnhV?=
- =?utf-8?B?Y3I2em9ldHMvQ0tIWnRsNmlMeXZkMndKcVpuRmlFK29ZdDNRaGo5ZDMwZUNv?=
- =?utf-8?B?U3VYcDE4Y2dnVlRIVVpqd0IrbFExc01WV2oyeVprZUUyTlgzZWU5YlBDNVBo?=
- =?utf-8?B?NGNoZjZmbmJZS2I0VEtWWTBkMldKd0N5Qjg2OFU0MTdOM0c0bGRETnNIemx6?=
- =?utf-8?B?U0tZcDhhZVZ5NEtyV2pHekFza0pPQUxWcS9qSFUzNFBsaW1tOEJhY2F6NTEz?=
- =?utf-8?B?bVdLRzlrWGpEM1hnVzJJcWFBYmhnRTRYYWdjcWQ0MnFSNFlycFV5UW9SKzRq?=
- =?utf-8?B?QzV2RXhvenU3R1d4VUFibnViTFdyMmxZODBIT05jdmwvbitPaVJ6N2l5T08w?=
- =?utf-8?B?b0x1TVZ3T2M2VWVUMXhNL0lBWjk1KzVnQ1Q4R3ZIZzA0TUhvZFE1Ry9rNU9o?=
- =?utf-8?B?czdQSzBockVFckxyaVVuY2RvbGlmU25admFTZEkrOWFwUjVGa0lNRTk4ckw1?=
- =?utf-8?B?MWJNRlM1VHhoaTFlVVpkaXVhSjhuSkl6S0RrN2VFRGQrVnU1em5RMFYzZWgx?=
- =?utf-8?B?R0lBQkl2alJSYzBFaktJVHlpN3pzRGVIY1N3eng1TmpxampGYXFENitKaVZV?=
- =?utf-8?Q?r3yVv6Hf0wmQEsw0HP/NIMplYfDxgYRwNmGAQ=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR11MB5963.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230038)(1800799022)(366014)(376012)(38070700016);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Z0h1bUM0M2tlUU1uS1BodXY2UDBPQkNHQ1BkZlV1Z1FOVDRwUnBDMnVWcjhn?=
- =?utf-8?B?eVlZSDBKdUFkWmdMVHErSHhXNHlNTkVFUTU2dmh2V2FRVGpDM2g3SEtpN0Qw?=
- =?utf-8?B?OWtpTS9kRjlnS3RZbTFTWG5KWTE0WitFVXN6eDBmbzhlK2hIc050WkpvbGxD?=
- =?utf-8?B?KzZUZ1dZTnd4cFN2MW1mU2M4dVNCS0hiZmgrY1B5MGdyTTh4dzM2NEUyZGxL?=
- =?utf-8?B?UkdGZ2cvN3hHS2pLTWx3aSt6bGpMMXBGeFREaWhNbWpKc3U4OVdTYWhiWFhy?=
- =?utf-8?B?QWc4bzFUSjR6VnNaNW1NNnNSMnNXRndJVDNKNGYvK1FjNGFPSWpVcWIxaDNE?=
- =?utf-8?B?eHJub29FeDlpM2VpUHIxeXdmbFhCdlRiZkFMZVl6Y2RlNUhKaHppWGJRN1FJ?=
- =?utf-8?B?am1SYzEzMWgraHdpNUdkTHpuMTkrYURnYVVXQW1kRDJMNnVpc3MyaWNrNDhF?=
- =?utf-8?B?OXRuMUgwTXQwWGZCT0Jzdk52TWdEcW9tY09xdUJ1bXl6UGxKc0FkenhKcVpC?=
- =?utf-8?B?Yk12OWQvdnhPUW1ieVdoWUw3RFptb29tYzVEOVdaMlhnakJONjVvNkgwanR1?=
- =?utf-8?B?K1ROTjVQS2xpSU5neWhXUTJ2L3QwdFNvYkpOT2ZRQ3grRVJWM1lEU0lwRHo0?=
- =?utf-8?B?bjJqK3JxVjFXMmxpaVNFbjRDTFh1VjVKVEtnczZMTjhJNTFoOStNRElMcmhZ?=
- =?utf-8?B?eE5VT2FoU3FFcXVKMFgyckl2RTFOamsrQ0gyOXgwVVVOR05vamN5WHBFZG1M?=
- =?utf-8?B?Z1ladWhUOXBRUitjSDFOcWRqWFRucmVLWElsRkJjN2hWTlAvY0kzYUwwVms0?=
- =?utf-8?B?ZTRJTFozMjJUajNhbGp2SWNid2lZOG4rRUNYd3phMVVzZUk0dmhnNjZpdXkw?=
- =?utf-8?B?YzZLQjhKWS9Mb3o1aGduZjV3YktWaEV2RldKUGlMbEJPUnNSb0tnMFdVK0x2?=
- =?utf-8?B?MHZ2S1poV2hDbGZJaHJRY3dEK28wQkRBUnc0NWc1MmdwU1IvUHZKcUM3SDc4?=
- =?utf-8?B?VU50YnF2dHhKVXZjRjJNOXlwR0FzRXRzSmNNcnBxRUtzZ1BYM3ZkWGJOOFhS?=
- =?utf-8?B?NDlXdUx0RGg1ZW9UZ0lDYnZQUmxpL3A3WEN3aUVTL29mcDFxNGtBTlJNQXEv?=
- =?utf-8?B?TWd2bnEvVmdFdVc1WlRXT0NySE1ONHFVTGdTODg0cTczeHhmL3ExV2lUbHpt?=
- =?utf-8?B?dFZva0xzSS95bE8wK1hyd1FuZmFocmJNOE9NTGJla24rNHQ1Slc4VzB1YjhD?=
- =?utf-8?B?Ym1hUVIrNThkSlgxd2tUV1ArSUZtdnZ3MCtnb0dZN2dwaitxZk96SkhVWWlB?=
- =?utf-8?B?c2tybFlnT0YwYjRVMzlSNVo0ank3bnp0cEppcFNETS9rRlFaQmx1em1KSEls?=
- =?utf-8?B?ajROSzB2aUtaMDEvMXdHRGVYMjRzOXFrZEg4RVpMYkdGVjlWVmt2ekdreSsz?=
- =?utf-8?B?RllZdEdnWE5URzcyY0ZRbjJweDZqci9CQkpmTWZWK3ZDYWM1cVBLbUM3VHRu?=
- =?utf-8?B?SXB1eko4NGJyM2ZyYkVURWxMVXlHV3U5V01QUkZqSHRMVXo3bmNVaGlIRy9k?=
- =?utf-8?B?ZXB3VVdvTnR5VnN1d0pzcWlzeGxjYkVYbGpUTTBpVUdhNENjaGFha01pOTJt?=
- =?utf-8?B?bDZhRXhEb05qN1Vhb0h0SmpNNjR3QUlmaDVqV2xkM1g3Q3RFNHlNSVFnZ3pT?=
- =?utf-8?B?Tnp4VExPVnYveEN3Wk15V2g1VTBvTUZhT3QyU003K3NZR0VPSzFxcVZ4dytj?=
- =?utf-8?B?WHVnVjVKNlkvWkVpZ1RuMENXdmpYRExFanZXTFlVSUVNdERhT2x6cTZHSFhv?=
- =?utf-8?B?SytySFdPMUtOOVZqcWkwb0ttMkkwTkFjQm8yWmxqOXI2U2RXN0tWZysvT0lO?=
- =?utf-8?B?bTNYZUZzWlpSTEVSdGF4ZnlGdGk5UElPeWo2UzkvVUhpWjRjckJOeWtSbkdo?=
- =?utf-8?B?N09XbXFUWVY3ellLSnNMMlp0ZXdETFJieUZMKytoR2tiamsxYXI4VWVSbk9X?=
- =?utf-8?B?ZERBTjRVRXE5cWNZS3ZHWEVmRy9ZRkZhTEhUYkVxMkVOWUQ5cXFMbDc5RHdo?=
- =?utf-8?B?QUd0THJ4RlBQUUpXbXErOG1mdHptWTUrUWFORWF5amM1QmhvK3o5YmhzS1Fi?=
- =?utf-8?B?UVZsaUk5NE5hQzNQcERKRkQrT0haY2d1L2JaZHA3RGFPNTVzKzB5eG5HM2pO?=
- =?utf-8?Q?0BvZmxytFJ7n933U0fFsnGw=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FBB20551D1DC744DB440C358AC55E1D3@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 992C517C9F5
+	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 21:51:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719352289; cv=none; b=P+IBZoHXmaLpCc798W6Ll+KwzdUnnAyZqsSPG3TIHHudowHz6U5QBaKIlT3jm2pb65A/TZD3MKJ3Tf/wmEQEfaubidn2+ZSQ+VS2uPmItpDMvS58wMqYLEN3/+16/6f0lRwpNhPz4+U28mOXCSgc0VPr6A//YonjZVSf05aWol8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719352289; c=relaxed/simple;
+	bh=AT8D6alYtf4RR0xiN4Z9L/UneNv0hq930q3GS7Ydrbo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=etzECq5aSqRFqewHY6HUUdve6074bCDqLnGz8Xg9t6Ze6F0VhFWZ2dJO2xfn640IuVLM04fro4eMEy+jKeTw0rFwUiejponEHpHqd629N1+EhKt09bCCfljXS4AoSrTkeMYO40QehaeW6gzmtel7AS1GXWha3h7DWm2UMClhtDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hUWMi3iF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719352285;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=PtEx5Ys2Z6Te8ry2HAvk6jzSJqsxDILA8PjYfjH4L/w=;
+	b=hUWMi3iF3GQ1Bdw9DdhqN6eJ7aMnq+kUHloKhHddF3BynLxoI7Gl1pLdOcIXSEpu70Tmrg
+	hjKsW8E5bEEJvPuo/6CI5q6+IoBhxL+NM4rSQ7e6tvG9UFwrgCZi8MdcYD9yZAGudutkAp
+	FJ6jzmI6fuOwKB7cIpzJtwOLLjac/2o=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-382-Jj2NwOkzPdu25V1fEAqGjQ-1; Tue, 25 Jun 2024 17:51:24 -0400
+X-MC-Unique: Jj2NwOkzPdu25V1fEAqGjQ-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-43e39de4d18so14147021cf.1
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 14:51:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719352284; x=1719957084;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PtEx5Ys2Z6Te8ry2HAvk6jzSJqsxDILA8PjYfjH4L/w=;
+        b=GSOlpQRFVXE8paaxRwWyF+TqPsN5Q1buSpXC9LanHtUJsNTZzDSuYK3yXvuC3LSWV/
+         0K4+l7IdOv4M7/9GbgtjydHf4wKqpiBkzUXZb43aYHHwXq+hItu9pNIUVuwKQjjyknGK
+         byStS2j5S5tLn+PAI4YXu2BgTbFURFId50PKWBKVQmp8PIapax+Lb1preGYZ+miIztFZ
+         f53GErOu6Z5nqA8na4DMJqyXHW0mC6iLa1+LsokYL7Fo8FEoRUc9PDHODnynP77uVXr4
+         13WKIKSY/ULrkHDtI+gFAJg3Tn+vdTUKZgIx69TMmNGtLVTBsG9e/Xuo0ntGKJu+LCQC
+         Paaw==
+X-Forwarded-Encrypted: i=1; AJvYcCXsejo5KbDk30D+jkFUdjAsv+tgYGD0zJE3VAsUCEFbljwhFJmq76Zpel/VTd+h5Ra99OAkszXIfoF3Efn7Styp5l2/
+X-Gm-Message-State: AOJu0YwtDEMUd3pOWGzzCOm38SY+OZta7cG+44D52lSKZeSglCzgQyEy
+	sTUaKmrc8FnSQwGDSY8+kOIaQkwNU9TIKrUj7qCLiEPJFtAXrC5PhD+rhGzHIL4knUiFNQdvWTn
+	w19ufSPPTVtnaiaL6kqyyh8STHaiJS2gJ1M0cSdUV2iAbdvVSJg==
+X-Received: by 2002:ac8:5f0a:0:b0:444:d0ac:55ca with SMTP id d75a77b69052e-444d0ac5ad1mr94252421cf.1.1719352283457;
+        Tue, 25 Jun 2024 14:51:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFclyD9N2aasjk+a7W2KXCAU8kAYrJ/VQxeWvdmVoC2YZ0kzmesEZB8/St7gMiEEROZWgjBpw==
+X-Received: by 2002:ac8:5f0a:0:b0:444:d0ac:55ca with SMTP id d75a77b69052e-444d0ac5ad1mr94252211cf.1.1719352282770;
+        Tue, 25 Jun 2024 14:51:22 -0700 (PDT)
+Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-444c2c3e5b5sm60008411cf.75.2024.06.25.14.51.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 Jun 2024 14:51:22 -0700 (PDT)
+Date: Tue, 25 Jun 2024 17:51:19 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Shota Imamura <cosocaf@gmail.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+	David Hildenbrand <david@redhat.com>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Fabiano Rosas <farosas@suse.de>,
+	"open list:Overall KVM CPUs" <kvm@vger.kernel.org>
+Subject: Re: [PATCH 1/2] migration: Implement dirty ring
+Message-ID: <Zns71-6ksavoe5fd@x1n>
+References: <20240620094714.871727-1-cosocaf@gmail.com>
+ <20240620094714.871727-2-cosocaf@gmail.com>
+ <ZnnEOJSSsjG0D009@x1n>
+ <CAJo9nWxWrWYa9fpiDSphKaErR5XPFVzuxgXQd4_CPVtXfb7=Qg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR11MB5963.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d4bb651e-45af-4b45-b1a9-08dc955b181e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2024 21:09:25.8661
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 3Y8CnHxQW8oLvCcvJpjXUNmPhhLesCTfqcNr3AYtF7iM1qBrRUJ01jGYChZfN8lJdzqg45PgLWJzZ0x4GR+Ll0UUQYAyogaOxpMGO9bY6KA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB8394
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAJo9nWxWrWYa9fpiDSphKaErR5XPFVzuxgXQd4_CPVtXfb7=Qg@mail.gmail.com>
 
-T24gVHVlLCAyMDI0LTA2LTI1IGF0IDE0OjU0ICswODAwLCBCaW5iaW4gV3Ugd3JvdGU6DQo+ID4g
-K8KgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGdwYSA9IHZjcHUtPm1taW9fZnJhZ21lbnRz
-WzBdLmdwYTsNCj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgc2l6ZSA9IHZjcHUt
-Pm1taW9fZnJhZ21lbnRzWzBdLmxlbjsNCj4gDQo+IFNpbmNlIE1NSU8gY3Jvc3MgcGFnZSBib3Vu
-ZGFyeSBpcyBub3QgYWxsb3dlZCBhY2NvcmRpbmcgdG8gdGhlIGlucHV0IA0KPiBjaGVja3MgZnJv
-bSBURFZNQ0FMTCwgdGhlc2UgbW1pb19mcmFnbWVudHNbXSBpcyBub3QgbmVlZGVkLg0KPiBKdXN0
-IHVzZSB2Y3B1LT5ydW4tPm1taW8ucGh5c19hZGRyIGFuZCB2Y3B1LT5ydW4tPm1taW8ubGVuPw0K
-DQpDYW4gd2UgYWRkIGEgY29tbWVudCBvciBzb21ldGhpbmcgdG8gdGhhdCBjaGVjaywgb24gd2h5
-IEtWTSBkb2Vzbid0IGhhbmRsZSBpdD8NCklzIGl0IGRvY3VtZW50ZWQgc29tZXdoZXJlIGluIHRo
-ZSBURFggQUJJIHRoYXQgaXQgaXMgbm90IGV4cGVjdGVkIHRvIGJlDQpzdXBwb3J0ZWQ/DQo=
+On Tue, Jun 25, 2024 at 08:10:23PM +0900, Shota Imamura wrote:
+> Dear Peter Xu,
+> 
+> Thank you for your feedback.
+> 
+> > It looks like this patch will introduce a ring but still it keeps the
+> > bitmaps around.
+> >
+> > Could you elaborate your motivation of this work? It’ll be interesting to
+> > know whether you did any kind of measurement around it.
+> 
+> First of all, I apologize for the lack of explanation.
+> To provide more details, the motivation for this work stems from the
+> current QEMU implementation, where pages obtained from the KVM ring are set
+> into the KVMSlot/RAMList/RAMBlock bitmaps. Consequently, when the migration
+> thread sends data, it ends up scanning the bitmap (resulting in O(N) time
+> complexity). I aimed to improve this situation.
+
+So is this a research project?  Or do you have explicit goals, e.g. on
+reducing migration time, or make migration easier to converge?
+
+These information might be helpful for reviewers to understand the ultimate
+goal of this series.
+
+> 
+> Here are the steps and considerations in my implementation plan:
+> 
+> 1. Call MigrationOps::ram_save_target_page inside kvm_dirty_ring_reap_one.
+> 
+> The approach involves QEMU holding neither bitmaps nor rings and sending
+> immediately. However, this would require non-migration threads (like accel
+> threads) to send pages, necessitating a synchronization mechanism with the
+> migration thread, which I deemed would increase code complexity.
+> Additionally, if future non-KVM accels provided their rings, we would have
+> to write similar code in different places, increasing future maintenance
+> costs. For these reasons, I decided against an implementation where page
+> sending occurs within accel/kvm and opted for a separate ring within QEMU.
+
+Yes this won't trivially work cleanly, as ram_save_target_page() requires
+migration context.  It may also not be thread-safe too.  E.g. qemufile
+isn't thread-safe.
+
+"maybe" it'll be easier to do it the other way round: allowing migration to
+fetch entry from a ring by calling a registered ring op.
+
+> 
+> 2. Use a ring as an alternative to bitmaps.
+> 
+> The approach involves implementing a ring within QEMU and inserting pages
+> into the ring instead of setting them into bitmaps in functions like
+> kvm_dirty_ring_mark_page, cpu_physical_memory_set_dirty_lebitmap, and
+> cpu_physical_memory_set_dirty_range. Then, pages are retrieved from the
+> ring in ram_find_and_save_block.
+
+(I think this might be what I mentioned above)
+
+> However, this approach necessitates immediate sending of pages when the
+> ring is full, which might involve non-migration threads sending pages,
+> leading to the same issues as mentioned in step 1. Given the ring has a
+> limited capacity, if there are enough dirty pages to fill the ring, the
+> cost difference between operating the ring and scanning the entire bitmap
+> would be negligible.  Hence, I decided to fall back to bitmaps when the
+> ring is full.
+
+Right, that was also what I found - the ring may not work as well when the
+guest is very busy.  Here the question is migration is normally more
+challenging when that is the case.. and when with a pretty idle guest it's
+easier to migrate anyway even with bitmap-only.  I think I noticed that
+pretty late.
+
+> 
+> 3. Use bitmaps when the ring is full.
+> 
+> The approach involves setting bitmaps while simultaneously inserting pages
+> into the ring in functions like kvm_dirty_ring_mark_page,
+> cpu_physical_memory_set_dirty_lebitmap, and
+> cpu_physical_memory_set_dirty_range. If the ring is not full, it is used in
+> ram_find_and_save_block; otherwise, bitmaps are used. This way, only the
+> migration thread sends pages. Additionally, by checking if a page is
+> already in the ring (O(1) complexity), redundant entries are avoided.
+> However, enqueuing and dequeuing are handled by different threads, which
+> could result in a situation where pages exist in the bitmap but not in the
+> ring once it is full. Identifying these pages would require locking and
+> scanning the entire bitmap.
+
+Yes, is this series using this approach?
+
+I think the ring effect may be minimum if there is the bitmap already,
+because as long as the ring can fallback (to avoid hanging a vcpu for a
+long time) it means the bitmap can contain useful data and the bitmap scans
+will be needed, then it kind of invalidates the ring's benefit, IMHO.
+
+What I was thinking a long time ago was something like this: we only use
+ring, as you said in (2) above, so no bitmap.  Then the migration core can
+look like this:
+
+  migration_thread():
+    count=0
+    while () {
+        count++
+        if ((count % ENFORCE_BACKGROUND_COUNT == 0) ||
+            ring_empty())
+            send_page(background.pop())
+        else
+            send_page(ring.pop())
+    }
+
+To explain it a bit:
+
+  - we will have two page iterators:
+
+    - background.pop() means we pop one background page.  Here since we
+    don't have a bitmap, we can't scan anything, the background page will
+    be an iterator that will migrate the guest memory from page 0 to page
+    N-1 (considering there's N guest pages), once and for all.  It means we
+    pop guest page 0, then 1, ... until N-1, then it's all done.  After
+    this iteration, nothing will be needed in background, all dirty will
+    only reside in the ring.
+
+    - ring.pop() means we fetch one entry from the ring.
+
+  - here ENFORCE_BACKGROUND_COUNT will guarantee the background work can
+    always make some progress over time, so that at some point it'll flush
+    empty and only ring entries left.  Otherwise if we do things like "if
+    (!ring_empty()) send_page(ring.pop())" it can happen that we keep
+    sending ring pages but we never sent the initial round of RAMs, so it
+    will never completes.
+
+Then the background migration doesn't need to keep iterating but only
+happen once, and then we know we've finished.
+
+That will be a totally different way to describe migration.  I don't know
+whether it'll make sense at all.  There're a lot of hard questions to
+answer, e.g. besides MIGRATION we also have TCG/VGA bitmap consumers, and
+we need to know how to handle them.  It's also just challenging to remove
+all bitmap layers because there're just a huge lot of them in QEMU..
+
+I'm not sure whether above would help at all, but let me still put this
+here, maybe it'll let you think about something useful.
+
+> 
+> 4. Use two rings to revert to the ring after falling back to the bitmap
+> within a round.
+> 
+> As mentioned earlier, once the fallback to the bitmap occurs, pages that
+> get dirty after the ring is full cannot be captured by the ring. This would
+> necessitate using bitmaps until the final round or periodically locking and
+> scanning the entire bitmap to synchronize with the ring. To improve this, I
+> considered using two rings: one for enqueueing and one for dequeuing. Pages
+> are inserted into the enqueue ring in functions like
+> kvm_dirty_ring_mark_page and cpu_physical_memory_set_dirty_range, and the
+> rings are swapped in migration_sync_bitmap, with pages being retrieved in
+> ram_find_and_save_block. This way, each call to migration_sync_bitmap (or
+> ram_state_pending_exact) determines whether to use the ring or the bitmap
+> in subsequent rounds.
+> 
+> Based on this reasoning, I implemented a system that combines bitmaps and
+> rings.
+> 
+> Regarding performance, my local environment might be insufficient for
+> proper measurement, but I obtained the following results by migrating after
+> booting the latest Linux and Buildroot with an open login shell:
+> 
+> Commands used:
+> ```
+> # src
+> sudo ./qemu-system-x86_64 \
+> -accel kvm,dirty-ring-size=1024 \
+> -m 8G \
+> -boot c \
+> -kernel ~/path/to/linux/arch/x86/boot/bzImage \
+> -hda ~/path/to/buildroot/output/images/rootfs.ext4 \
+> -append "root=/dev/sda rw console=ttyS0,115200 acpi=off" \
+> -nographic \
+> -migration dirty-logging=ring,dirty-ring-size=1024
+> 
+> # dst
+> sudo ./qemu-system-x86_64 \
+> -accel kvm,dirty-ring-size=1024 \
+> -m 8G \
+> -boot c \
+> -kernel ~/path/to/linux/arch/x86/boot/bzImage \
+> -hda ~/path/to/buildroot/output/images/rootfs.ext4 \
+> -append "root=/dev/sda rw console=ttyS0,115200 acpi=off" \
+> -nographic \
+> -incoming tcp:0:4444
+> 
+> # hmp
+> migrate_set_parameter max-bandwidth 1250
+> migrate tcp:0:4444
+> info migrate
+> ```
+> 
+> Results for each memory size, measured 5 times:
+> ```
+> # ring -m 8G
+> total time: 418 ms
+> total time: 416 ms
+> total time: 415 ms
+> total time: 416 ms
+> total time: 416 ms
+> 
+> # bitmap -m 8G
+> total time: 434 ms
+> total time: 421 ms
+> total time: 423 ms
+> total time: 430 ms
+> total time: 429 ms
+> 
+> # ring -m 16G
+> total time: 847 ms
+> total time: 852 ms
+> total time: 850 ms
+> total time: 848 ms
+> total time: 852 ms
+> 
+> # bitmap -m 16G
+> total time: 860 ms
+> total time: 862 ms
+> total time: 858 ms
+> total time: 859 ms
+> total time: 861 ms
+> 
+> # ring -m 32G
+> total time: 1616 ms
+> total time: 1625 ms
+> total time: 1612 ms
+> total time: 1612 ms
+> total time: 1630 ms
+> 
+> # bitmap -m 32G
+> total time: 1714 ms
+> total time: 1724 ms
+> total time: 1718 ms
+> total time: 1714 ms
+> total time: 1714 ms
+> 
+> # ring -m 64G
+> total time: 3451 ms
+> total time: 3452 ms
+> total time: 3449 ms
+> total time: 3451 ms
+> total time: 3450 ms
+> 
+> # bitmap -m 64G
+> total time: 3550 ms
+> total time: 3553 ms
+> total time: 3552 ms
+> total time: 3550 ms
+> total time: 3553 ms
+> 
+> # ring -m 96G
+> total time: 5185 ms
+> total time: 5186 ms
+> total time: 5183 ms
+> total time: 5191 ms
+> total time: 5191 ms
+> 
+> # bitmap -m 96G
+> total time: 5385 ms
+> total time: 5388 ms
+> total time: 5386 ms
+> total time: 5392 ms
+> total time: 5592 ms
+> ```
+> 
+> It is natural that the implemented ring completes migration faster for all
+> memory sizes, given that the conditions favor the ring due to the minimal
+> memory workload. By the way, these are total migration times, with much of
+> the overhead attributed to page sending and other IO operations.
+
+It's interesting to know there's already a perf difference.  I wonder how
+that happened, though, if the bitmap is still there, and it looks like the
+scan will still be needed anyway.
+
+I didn't look where a ring full event in kvm can imply halting the vcpu
+threads, if with that, and if the vcpu is dirtying something it can even
+dirty it slower, it can contributes to a less total dirty pages to move.
+Then maybe the total migration time is reduced because of that.  But I'm
+not sure.
+
+> 
+> I plan to conduct more detailed measurements going forward, but if you have
+> any recommendations for good measurement methods, please let me know.
+> 
+> > I remember adding such option is not suggested. We may consider using
+> > either QMP to setup a migration parameter, or something else.
+> 
+> I apologize for implementing this without knowledge of QEMU's policy.
+> I will remove this option and instead implement it using
+> migrate_set_parameter or migrate_set_capability. Is this approach
+> acceptable?
+> 
+> This is my first time contributing to QEMU, so I appreciate your guidance.
+
+Not sure how you nail this, but IMHO this can be a very research-level
+projects.  I'm not sure what's your goal, if it's about contributing to
+qemu there can be more solid problems to solve.  Let me know if it is the
+case. At least I am not crystal clear on how to best leverage the rings
+yet, I guess, even though it feels like a pretty neat design.
+
+Thanks,
+
+-- 
+Peter Xu
+
 
