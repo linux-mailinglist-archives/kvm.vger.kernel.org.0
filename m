@@ -1,222 +1,128 @@
-Return-Path: <kvm+bounces-20490-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CC0391699C
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 15:57:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BED6291697F
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 15:54:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 793F4B20AF3
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 13:57:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F08BA1C230D5
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 13:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A9816F912;
-	Tue, 25 Jun 2024 13:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F315168C33;
+	Tue, 25 Jun 2024 13:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BrMpNS56"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FCD16729D;
-	Tue, 25 Jun 2024 13:55:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E7216729D
+	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 13:53:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719323739; cv=none; b=moIJwNOqg0Si7+8/N/i7HWh0oMvjeL6JpD5AnqcANymq0CzV3hxtVZ2Xj1YP4RF0qJ15yn4y0K3rC4qwuOX9DVFQc2/7xW7jgI47Exwyw6BvqwLl8ORM9QK4jwNU4CQdJGdBOCskahxzbuPyU/fGx6oLg1KSDooiZyOiUFdKe9s=
+	t=1719323603; cv=none; b=TymtlTwtSGK8jajvi0HPpqtQxqzaxQ94VJeh6RBH+JxhNGiXUx5H59fSAuoF2ksHUAGbo/bj+kUlGG8xNRG9zOP5bVBVZzG3dznOnBZlbboq4L7mF9qaT2kqVCYLZu5kjRzC/u606wlEHXP/XLX9FkWEYdvm3crwh0m3QhMf0Hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719323739; c=relaxed/simple;
-	bh=qojYIiLlVBn1RSQjDWl+bE5Qe0/KRzEy5j3Uos3uMNk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YDC69eDwzMmcPdrMCnusaheFPneIkaQED03iSGiGN/UfrgUbwL9bSl1+/fl6qqdKxacnAPV9CXWh2ZrqFDGelNSPv54x6D2sw0YT+MIMPy+NC8ghsmqs8F9x2drV+z9Z49yumDtqLEX2t3RO3gon06EcTPk23kdORMxwD7eo2dI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4W7mSw4g6gzZg1h;
-	Tue, 25 Jun 2024 21:51:12 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id BE8C614022E;
-	Tue, 25 Jun 2024 21:55:35 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 25 Jun 2024 21:55:35 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, David
- Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Chuck
- Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Trond Myklebust
-	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>
-Subject: [PATCH net-next v9 05/13] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Tue, 25 Jun 2024 21:52:08 +0800
-Message-ID: <20240625135216.47007-6-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240625135216.47007-1-linyunsheng@huawei.com>
-References: <20240625135216.47007-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1719323603; c=relaxed/simple;
+	bh=VDqj8FLLXt2GlyHOeiwwgvCcHIxT7PLjCZ1Sav3JPg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n8+emcQ1mcMH/gMUUe7SfMGTz2DWrkYi+CXXr6zxhYst2Ayu/iDpZGc4ST3U3GWxcGy7up+hH0MfQgZJjxqTnFfr95qUOs+Ik0awgmYGSxoFIOORxHXRsCI7FX9+cffUK9O4ktsqeYAxLDh1+YkSC2EJIcHCgiREVwC6kwXuREE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BrMpNS56; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719323602; x=1750859602;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VDqj8FLLXt2GlyHOeiwwgvCcHIxT7PLjCZ1Sav3JPg4=;
+  b=BrMpNS56gGRgnxfCeEDoOl2S94Q5L7NiOqbpri/J5Y9qgINGDUWHtaCS
+   W3pspwY/vp3/GNkd31IdnqfOQEv97Ff/6K32PbakuU0RH1HL7HfZbEReI
+   coKdxEVZ8pyBeSCdJnTfT89IlXKCpj8F4+3hL9F+DG8Sn2sHBMc4yEnTo
+   1bGBMMJErYwQ3VxFKPdBZzqtMSxyZQ5TUv6rjQq2WFi/625xoCLIrpL/t
+   EbVTg66M5jYioVwNH7b6JA8HMRitx5WRS3YorlM0bLk83yoCQIaioeV29
+   uvwEe8fepzC4kDb2ZkxWesJSmzdLXvbb7e3dOSNpTNLNjx7Dtw3nMwJik
+   g==;
+X-CSE-ConnectionGUID: vQv2B2oXRGON7eEfykADUA==
+X-CSE-MsgGUID: q9Z6KJdiTkaki+GQvDKVQw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="20119522"
+X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
+   d="scan'208";a="20119522"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 06:53:22 -0700
+X-CSE-ConnectionGUID: JQb3GVzcQ+6FV7eH1DDqzg==
+X-CSE-MsgGUID: Gt67F+chRiWxW5GuUeWN4A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,264,1712646000"; 
+   d="scan'208";a="43539764"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa010.jf.intel.com with ESMTP; 25 Jun 2024 06:53:19 -0700
+Date: Tue, 25 Jun 2024 22:08:53 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Ewan Hai <ewanhai-oc@zhaoxin.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>, pbonzini@redhat.com,
+	mtosatti@redhat.com, kvm@vger.kernel.org, qemu-devel@nongnu.org,
+	ewanhai@zhaoxin.com, cobechen@zhaoxin.com
+Subject: Re: [PATCH v3] target/i386/kvm: Refine VMX controls setting for
+ backward compatibility
+Message-ID: <ZnrPdZdgcBSY1sMi@intel.com>
+References: <20240624095806.214525-1-ewanhai-oc@zhaoxin.com>
+ <ZnqSj4PGrUeZ7OT1@intel.com>
+ <53119b66-3528-41d6-ac44-df166699500a@zhaoxin.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <53119b66-3528-41d6-ac44-df166699500a@zhaoxin.com>
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
+[snip]
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- drivers/vhost/net.c             |  2 +-
- include/linux/page_frag_cache.h | 10 ++++++++++
- mm/page_frag_test.c             |  2 +-
- net/core/skbuff.c               |  6 +++---
- net/rxrpc/conn_object.c         |  4 +---
- net/rxrpc/local_object.c        |  4 +---
- net/sunrpc/svcsock.c            |  6 ++----
- 7 files changed, 19 insertions(+), 15 deletions(-)
+> > Additionally, has_msr_vmx_vmfunc has the similar compat issue. I think
+> > it deserves a fix, too.
+> > 
+> > -Zhao
+> Thanks for your reply. In fact, I've tried to process has_msr_vmx_vmfunc in
+> the same
+> way as has_msr_vmx_procbased_ctls in this patch, but when I tested on Linux
+> kernel
+> 4.19.67, I encountered an "error: failed to set MSR 0x491 to 0x***".
+> 
+> This issue is due to Linux kernel commit 27c42a1bb ("KVM: nVMX: Enable
+> VMFUNC
+> for the L1 hypervisor", 2017-08-03) exposing VMFUNC to the QEMU guest
+> without
+> corresponding VMFUNC MSR modification code, leading to an error when QEMU
+> attempts
+> to set the VMFUNC MSR. This bug affects kernels from 4.14 to 5.2, with a fix
+> introduced
+> in 5.3 by Paolo (e8a70bd4e "KVM: nVMX: allow setting the VMFUNC controls
+> MSR", 2019-07-02).
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 6691fac01e0d..b2737dc0dc50 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index c6fde197a6eb..6ac3a25089d1 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -23,6 +23,16 @@ struct page_frag_cache {
- 	bool pfmemalloc;
- };
- 
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
-diff --git a/mm/page_frag_test.c b/mm/page_frag_test.c
-index a0bd0ca5f343..cdffebc20a10 100644
---- a/mm/page_frag_test.c
-+++ b/mm/page_frag_test.c
-@@ -341,7 +341,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_frag.va = NULL;
-+	page_frag_cache_init(&test_frag);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 6a84cc929505..59d42d642067 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -749,14 +749,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 
- 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 		local_bh_enable();
-@@ -846,7 +846,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc_va(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 42d20412c1c3..4b1e87187614 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
- }
--- 
-2.33.0
+It looks like this fix was not ported to the 4.19 stable kernel.
 
+> So the fix for has_msr_vmx_vmfunc is clearly different from
+> has_msr_vmx_procbased_ctls2.
+> However, due to the different kernel support situations, I have not yet come
+> up with a suitable
+> way to handle the compatibility of has_msr_vmx_procbased_ctls2 across
+> different kernel versions.
+> 
+> Therefore, should we consider only fixing has_msr_vmx_procbased_ctls2 this
+> time and addressing
+> has_msr_vmx_vmfunc in a future patch when the timing is more appropriate?
+> 
+
+I agree this fix should focus on MSR_IA32_VMX_PROCBASED_CTLS2.
+
+But I think at least we need a comment (maybe a TODO) to note the case of
+has_msr_vmx_vmfunc in a followup patch.
+
+Let's wait and see what Paolo will say.
+
+-Zhao
 
