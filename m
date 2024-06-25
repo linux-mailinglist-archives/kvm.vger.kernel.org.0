@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-20473-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 829E1916888
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 15:01:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2811C916889
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 15:01:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 239C51F228BF
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 13:01:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D65F128670E
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 13:01:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8F515FA67;
-	Tue, 25 Jun 2024 13:00:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D30681607AF;
+	Tue, 25 Jun 2024 13:00:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GptRfIhf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="asaxG/sF"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAD5F158A26;
-	Tue, 25 Jun 2024 13:00:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A55315E5B8;
+	Tue, 25 Jun 2024 13:00:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719320450; cv=none; b=Uy4gP+rhqDk7SA+LhLgsyL8xy/HI7wfGxA3RZJ/toUylH0jokT37Vq72o5OE1uHWAhEA1KsmlqeKrvPBlilvYoRCWpanJhFeOl24+qOZ6wm+Ynf8nZYzYwG2ZWlq3yvMHFS6cvCFZ9QoolX4SsvgR0f66hbSHGHEIvrzhRZL8Q0=
+	t=1719320450; cv=none; b=T4lwTdEXT2UvOP/3kAkSLgDSqNRSgfFr6PLz1keCfqF7fR+om2KSssXJKChgKhjSg7otazlRSHeegFajtM6hiXemNZMHE2NWIOLlcdzdFnaQ11Q6w4vI+zIQ/oz1grh7TJ9zbRXwmI3ao6sh9Ty22YMHYLyhFrNOcQAuXky0PqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719320450; c=relaxed/simple;
-	bh=HKHiosdszVDPIXaLiJmlPJYZG0rJiJAcy+UXCae4Ugw=;
+	bh=ADorFG0VRvlOjHCobfWLs0ZsG4Mia8Zf6GgI3pzbQLY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=P3+N/y063CcCcQrwr1OLHy4jRzb4HqKRIjnPmWt2rsQCK95UmmFWFOZW3DOuIUdL/QGqTyzGN2+P5bHgjFaMuQq8L5EcFans6MM2jBhz9kxRf83/r8ElS1fJWU5/vxhRJiguBQvO832scuncJhNjSMJBsndF8C0lgYlzQlveKp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GptRfIhf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A2F38C4AF0B;
+	 MIME-Version; b=MRQ28q31pQyT0ry0F8Yp4u7S5/DN5rMcJTD518ROi/QGVIXpLQTEbmX9OWqQMSZnIN/AOXDWV9ppxdPPNKxR1eVEwdWrKG3oGyknGvn5PUdDLuhWKRgYkbVYcA3gNxfGs5M51TUvv9jqHbao8cg5zDTYBLUd+ov5OcRZYxlBm7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=asaxG/sF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D768EC4AF07;
 	Tue, 25 Jun 2024 13:00:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719320449;
-	bh=HKHiosdszVDPIXaLiJmlPJYZG0rJiJAcy+UXCae4Ugw=;
+	bh=ADorFG0VRvlOjHCobfWLs0ZsG4Mia8Zf6GgI3pzbQLY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GptRfIhfumlCyM41wfNl49CuYNakMFkJCwBK72Y++mc/XbNcYsTfask/ULU19Dv0L
-	 16/V95qE4UqCXt/eQJOzdXoBevKPgp+lS77UmedpkIk17Eca9zpQg3wIXDRL2G9xOX
-	 dQpS+Anb+d0ewFsPBK5x4AcSIooH2HkTv9mWbzaFGAVx+A3FzNdhP8SDqEQ1nmH2p/
-	 XCJrA54gSDamxl8a/SPWBlZeUyQP7h5rDaqPUoJpm613Sw/imQNazL5BqnjyMXFY0V
-	 uESzIF7zBCkJP22KWvwm35BLIbyfrv6H5Aph2RwNwLyyfqpH2TEx1Lp7/L13x8FGaf
-	 eF+lCTEsVwj5Q==
+	b=asaxG/sFUo0nPmnOePobXI3ZOcabYJywNkSfwKLkAPLcyy96s6uh/n1EF52Rd/iBz
+	 uUwCHquUNqtznnOr2sFWw/RHI/JL+uVKcG2v2NjVWwO7puIXAMR+Q+MwiLgUYf/4Xi
+	 UNLkPSY/CnBxZKVJbUrCaZjhS2AeHVFBOBjAvh2hZwmHnzPxkMm+B9kcz48QL8sMB6
+	 x8FAp39tRv9woSjJKs6/tQOZbzKFB1VnwvA3jLIwZ1SLqTdMz39j15WKmCPsjrraW3
+	 /N+2LkuOZQK8ZlPHKI+oSWX3+Z1VxWCptl1jW6gdwYnIog7zm1GGH9b2Oic7pkW4gE
+	 lxU2zRgFm0txQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sM5mx-0079X4-UE;
-	Tue, 25 Jun 2024 14:00:47 +0100
+	id 1sM5my-0079X4-3S;
+	Tue, 25 Jun 2024 14:00:48 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -56,9 +56,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH 4/5] KVM: arm64: Make PIR{,E0}_EL1 save/restore conditional on FEAT_TCRX
-Date: Tue, 25 Jun 2024 14:00:41 +0100
-Message-Id: <20240625130042.259175-6-maz@kernel.org>
+Subject: [PATCH 5/5] KVM: arm64: Honor trap routing for TCR2_EL1
+Date: Tue, 25 Jun 2024 14:00:42 +0100
+Message-Id: <20240625130042.259175-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240625130042.259175-1-maz@kernel.org>
 References: <20240625130042.259175-1-maz@kernel.org>
@@ -74,75 +74,79 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-As per the architecture, if FEAT_S1PIE is implemented, then FEAT_TCRX
-must be implemented as well.
+TCR2_EL1 handling is missing the handling of its trap configuration:
 
-Take advantage of this to avoid checking for S1PIE when TCRX isn't
-implemented.
+- HCRX_EL2.TCR2En must be handled in conjunction with HCR_EL2.{TVM,TRVM}
+
+- HFG{R,W}TR_EL2.TCR_EL1 does apply to TCR2_EL1 as well
+
+Without these two controls being implemented, it is impossible to
+correctly route TCR2_EL1 traps.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 24 +++++++++++++---------
- 1 file changed, 14 insertions(+), 10 deletions(-)
+ arch/arm64/kvm/emulate-nested.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index ea2aeeff61db7..4c0fdabaf8aec 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -73,8 +73,14 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, TTBR0_EL1)	= read_sysreg_el1(SYS_TTBR0);
- 	ctxt_sys_reg(ctxt, TTBR1_EL1)	= read_sysreg_el1(SYS_TTBR1);
- 	ctxt_sys_reg(ctxt, TCR_EL1)	= read_sysreg_el1(SYS_TCR);
--	if (ctxt_has_tcrx(ctxt))
-+	if (ctxt_has_tcrx(ctxt)) {
- 		ctxt_sys_reg(ctxt, TCR2_EL1)	= read_sysreg_el1(SYS_TCR2);
-+
-+		if (ctxt_has_s1pie(ctxt)) {
-+			ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
-+			ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
-+		}
-+	}
- 	ctxt_sys_reg(ctxt, ESR_EL1)	= read_sysreg_el1(SYS_ESR);
- 	ctxt_sys_reg(ctxt, AFSR0_EL1)	= read_sysreg_el1(SYS_AFSR0);
- 	ctxt_sys_reg(ctxt, AFSR1_EL1)	= read_sysreg_el1(SYS_AFSR1);
-@@ -84,10 +90,6 @@ static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, CONTEXTIDR_EL1) = read_sysreg_el1(SYS_CONTEXTIDR);
- 	ctxt_sys_reg(ctxt, AMAIR_EL1)	= read_sysreg_el1(SYS_AMAIR);
- 	ctxt_sys_reg(ctxt, CNTKCTL_EL1)	= read_sysreg_el1(SYS_CNTKCTL);
--	if (ctxt_has_s1pie(ctxt)) {
--		ctxt_sys_reg(ctxt, PIR_EL1)	= read_sysreg_el1(SYS_PIR);
--		ctxt_sys_reg(ctxt, PIRE0_EL1)	= read_sysreg_el1(SYS_PIRE0);
--	}
- 	ctxt_sys_reg(ctxt, PAR_EL1)	= read_sysreg_par();
- 	ctxt_sys_reg(ctxt, TPIDR_EL1)	= read_sysreg(tpidr_el1);
+diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
+index 54090967a3356..2fa2d5fc37d60 100644
+--- a/arch/arm64/kvm/emulate-nested.c
++++ b/arch/arm64/kvm/emulate-nested.c
+@@ -79,6 +79,8 @@ enum cgt_group_id {
+ 	CGT_MDCR_E2TB,
+ 	CGT_MDCR_TDCC,
  
-@@ -149,8 +151,14 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, CPACR_EL1),	SYS_CPACR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR0_EL1),	SYS_TTBR0);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, TTBR1_EL1),	SYS_TTBR1);
--	if (ctxt_has_tcrx(ctxt))
-+	if (ctxt_has_tcrx(ctxt)) {
- 		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR2_EL1),	SYS_TCR2);
++	CGT_HCRX_TCR2En,
 +
-+		if (ctxt_has_s1pie(ctxt)) {
-+			write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
-+			write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
-+		}
-+	}
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, ESR_EL1),	SYS_ESR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR0_EL1),	SYS_AFSR0);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR1_EL1),	SYS_AFSR1);
-@@ -160,10 +168,6 @@ static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, CONTEXTIDR_EL1), SYS_CONTEXTIDR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, AMAIR_EL1),	SYS_AMAIR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, CNTKCTL_EL1), SYS_CNTKCTL);
--	if (ctxt_has_s1pie(ctxt)) {
--		write_sysreg_el1(ctxt_sys_reg(ctxt, PIR_EL1),	SYS_PIR);
--		write_sysreg_el1(ctxt_sys_reg(ctxt, PIRE0_EL1),	SYS_PIRE0);
--	}
- 	write_sysreg(ctxt_sys_reg(ctxt, PAR_EL1),	par_el1);
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL1),	tpidr_el1);
+ 	/*
+ 	 * Anything after this point is a combination of coarse trap
+ 	 * controls, which must all be evaluated to decide what to do.
+@@ -89,6 +91,7 @@ enum cgt_group_id {
+ 	CGT_HCR_TTLB_TTLBIS,
+ 	CGT_HCR_TTLB_TTLBOS,
+ 	CGT_HCR_TVM_TRVM,
++	CGT_HCR_TVM_TRVM_HCRX_TCR2En,
+ 	CGT_HCR_TPU_TICAB,
+ 	CGT_HCR_TPU_TOCU,
+ 	CGT_HCR_NV1_nNV2_ENSCXT,
+@@ -345,6 +348,12 @@ static const struct trap_bits coarse_trap_bits[] = {
+ 		.mask		= MDCR_EL2_TDCC,
+ 		.behaviour	= BEHAVE_FORWARD_ANY,
+ 	},
++	[CGT_HCRX_TCR2En] = {
++		.index		= HCRX_EL2,
++		.value 		= 0,
++		.mask		= HCRX_EL2_TCR2En,
++		.behaviour	= BEHAVE_FORWARD_ANY,
++	},
+ };
  
+ #define MCB(id, ...)						\
+@@ -359,6 +368,8 @@ static const enum cgt_group_id *coarse_control_combo[] = {
+ 	MCB(CGT_HCR_TTLB_TTLBIS,	CGT_HCR_TTLB, CGT_HCR_TTLBIS),
+ 	MCB(CGT_HCR_TTLB_TTLBOS,	CGT_HCR_TTLB, CGT_HCR_TTLBOS),
+ 	MCB(CGT_HCR_TVM_TRVM,		CGT_HCR_TVM, CGT_HCR_TRVM),
++	MCB(CGT_HCR_TVM_TRVM_HCRX_TCR2En,
++					CGT_HCR_TVM, CGT_HCR_TRVM, CGT_HCRX_TCR2En),
+ 	MCB(CGT_HCR_TPU_TICAB,		CGT_HCR_TPU, CGT_HCR_TICAB),
+ 	MCB(CGT_HCR_TPU_TOCU,		CGT_HCR_TPU, CGT_HCR_TOCU),
+ 	MCB(CGT_HCR_NV1_nNV2_ENSCXT,	CGT_HCR_NV1_nNV2, CGT_HCR_ENSCXT),
+@@ -622,6 +633,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
+ 	SR_TRAP(SYS_MAIR_EL1,		CGT_HCR_TVM_TRVM),
+ 	SR_TRAP(SYS_AMAIR_EL1,		CGT_HCR_TVM_TRVM),
+ 	SR_TRAP(SYS_CONTEXTIDR_EL1,	CGT_HCR_TVM_TRVM),
++	SR_TRAP(SYS_TCR2_EL1,		CGT_HCR_TVM_TRVM_HCRX_TCR2En),
+ 	SR_TRAP(SYS_DC_ZVA,		CGT_HCR_TDZ),
+ 	SR_TRAP(SYS_DC_GVA,		CGT_HCR_TDZ),
+ 	SR_TRAP(SYS_DC_GZVA,		CGT_HCR_TDZ),
+@@ -1071,6 +1083,7 @@ static const struct encoding_to_trap_config encoding_to_fgt[] __initconst = {
+ 	SR_FGT(SYS_TPIDRRO_EL0,		HFGxTR, TPIDRRO_EL0, 1),
+ 	SR_FGT(SYS_TPIDR_EL1,		HFGxTR, TPIDR_EL1, 1),
+ 	SR_FGT(SYS_TCR_EL1,		HFGxTR, TCR_EL1, 1),
++	SR_FGT(SYS_TCR2_EL1,		HFGxTR, TCR_EL1, 1),
+ 	SR_FGT(SYS_SCXTNUM_EL0,		HFGxTR, SCXTNUM_EL0, 1),
+ 	SR_FGT(SYS_SCXTNUM_EL1, 	HFGxTR, SCXTNUM_EL1, 1),
+ 	SR_FGT(SYS_SCTLR_EL1, 		HFGxTR, SCTLR_EL1, 1),
 -- 
 2.39.2
 
