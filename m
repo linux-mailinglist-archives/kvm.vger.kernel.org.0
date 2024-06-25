@@ -1,239 +1,201 @@
-Return-Path: <kvm+bounces-20456-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20457-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F3491600A
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 09:30:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E95AA9160B2
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 10:11:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F13DB22EAA
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 07:30:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6609F1F22558
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 08:11:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F52146D6F;
-	Tue, 25 Jun 2024 07:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD421148319;
+	Tue, 25 Jun 2024 08:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="pCDQOEMn"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="QGLjFDGI"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-bc08.mail.infomaniak.ch (smtp-bc08.mail.infomaniak.ch [45.157.188.8])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E789446A1
-	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 07:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.157.188.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE981474AF;
+	Tue, 25 Jun 2024 08:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719300624; cv=none; b=tL4t24VvDzT77LQPrx/NVToiajxbvlk3KQMY6Bg2qoNetDn368mKo0TcElIYq5pC4FINb4lXFPWVPGnyeDQ1RZe6C7gUrx6IBkgasEfD8G3iBacQfmzyvO75FJcwu/63+K0x15DQ1yprtg/a4rvtUQYU8LS7ODZ4umqb+5QhGck=
+	t=1719303089; cv=none; b=NQIshKqizoqKokEHqpx6ms517ddiZAAU7sa857ytnk+ozqbT7GLqUQQUPLPbhaJa7WpQ03myvUrD9qq+1sf2zzyyHkMDSshIh2vGN+luLfQC9/8ZYF0f5iZzEFa+Wre2IaX4fJd84NNNNXq9J0CWC9GAL3N0PtmqYr4xmg4BnZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719300624; c=relaxed/simple;
-	bh=sUBaU/FvbLdbIG/IXrLS4YLaVtkIz31GlebSsDtA8MQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HgyM77gWUNkQDyqe2ALa9XHno5Pw8QlWwtSpW+V1GQx4m2OtZc3heSKkGK9RhdIjCJqHAw4kS17qQZ3XeAqUaD/mV5zGiIJzOHLqAvkqkjz+BrLOmdW7uMxbpSJdL5VD5O6teF/enlD+DTQQ3KP0doDqDkZUIus1UFvTQAFQQNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=pCDQOEMn; arc=none smtp.client-ip=45.157.188.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0000.mail.infomaniak.ch (smtp-4-0000.mail.infomaniak.ch [10.7.10.107])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4W7c1H1VjLzxZj;
-	Tue, 25 Jun 2024 09:30:11 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1719300611;
-	bh=N9/Li0oihzuU0OqmOKmBJLlI/krZIDIC0SG3onOkcIY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pCDQOEMnBxpAcxYBd7aIXCEZ31Q487781Icg164BpPQ70YNxcuUHOYMTPTfSrkD9g
-	 5Ojtd2qf6DaM9o2KkNflfsluTpuEtiozflVQLEznO28t9YT0LejregE2Mlya5TvDCl
-	 YfbVPrKeYpeIWsLaaWm99JRqPMbXPCfg+FYuZFac=
-Received: from unknown by smtp-4-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4W7c1F1XVHzVtp;
-	Tue, 25 Jun 2024 09:30:09 +0200 (CEST)
-Date: Tue, 25 Jun 2024 09:30:07 +0200
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mark Brown <broonie@kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Kees Cook <keescook@chromium.org>, Shuah Khan <shuah@kernel.org>, 
-	Shuah Khan <skhan@linuxfoundation.org>
-Cc: Christian Brauner <brauner@kernel.org>, 
-	Linus Torvalds <torvalds@linux-foundation.org>, Sean Christopherson <seanjc@google.com>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>, Shengyu Li <shengyu.li.evgeny@gmail.com>, 
-	Brendan Higgins <brendanhiggins@google.com>, David Gow <davidgow@google.com>, 
-	"David S . Miller" <davem@davemloft.net>, Florian Fainelli <florian.fainelli@broadcom.com>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, Jon Hunter <jonathanh@nvidia.com>, Ron Economos <re@w6rz.net>, 
-	Ronald Warsow <rwarsow@gmx.de>, Stephen Rothwell <sfr@canb.auug.org.au>, 
-	Will Drewry <wad@chromium.org>, kernel test robot <oliver.sang@intel.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, netdev@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH v1] selftests/harness: Fix tests timeout and race
- condition
-Message-ID: <20240625.Ohyook0Geeno@digikod.net>
-References: <20240621180605.834676-1-mic@digikod.net>
+	s=arc-20240116; t=1719303089; c=relaxed/simple;
+	bh=P4QUIiQcI3eVT9M6HjZjSUJwjB5SBq2vK92a3mbXcwU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=NX8UKYV/r19dm3zO0UzS/iIhScOblTS31mTVoffMlqqyxUN5grVDG2qFkTcYlV7Z8VAJC+Zc8AinHGTMdCDkqYdQdc4VsZnqynpdqg1cPcga8prkqWzJD+NGYX03G0DQfmkyfBw9VkIqjc5LjApRGVATBe5IgMorxTQm7aiFgTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=QGLjFDGI; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45P7uRPk017823;
+	Tue, 25 Jun 2024 08:11:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:subject:from:to:cc:date:in-reply-to:references
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	Wp2FddHtQsTC+choX+hj2LYAdn2RfWxL3mKlZ6jY/Yk=; b=QGLjFDGIsd/Dkf0p
+	ndtsYc3WjXpwZ4bqFxiTtyZWIn1IBfA+/dDrySQP1+hXaGGIeo6lxezFEibQwiDS
+	SeF+yzWRjBz0muf6g54t4hRGzy+VB7VDcgmd6RSf4O2sxMt32F4GFh2G8Jk8cEOr
+	88gB452gZtCN+CRe+SzeyTSLcilJQkivMqqiO9YxH3+e/XYKupzaFW7IDZx2LsDs
+	7bSAnGs/XLEJdRh/38IYwcDi3OgeO95JjrsjiM8whrmdXswTl2mb2b2Xt9PHNzmy
+	AeiiTMMNwoYbo0a/bXw8Sjq2c+E/nOtNNTkG9ZRp7m+OkUnF8yGpXRFk9rGBRiJb
+	Opqrhw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yyre888w4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 08:11:16 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45P87CdN001626;
+	Tue, 25 Jun 2024 08:11:16 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yyre888w2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 08:11:16 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45P70Zmk008183;
+	Tue, 25 Jun 2024 08:11:14 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yx9b0ngck-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 08:11:14 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45P8B9S422741258
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Jun 2024 08:11:11 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1F10C20043;
+	Tue, 25 Jun 2024 08:11:09 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9BF4F2004D;
+	Tue, 25 Jun 2024 08:11:08 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.29.84])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 25 Jun 2024 08:11:08 +0000 (GMT)
+Message-ID: <12c7ba9be7804d31f4aaa4bd804716732add1561.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 4/7] s390x: Add function for checking
+ diagnose intercepts
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Nicholas Piggin <npiggin@gmail.com>,
+        Claudio Imbrenda
+ <imbrenda@linux.ibm.com>,
+        Nico =?ISO-8859-1?Q?B=F6hr?= <nrb@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>
+Cc: Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>,
+        David Hildenbrand
+	 <david@redhat.com>, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org
+Date: Tue, 25 Jun 2024 10:11:08 +0200
+In-Reply-To: <D28QHQGLKAKJ.NZ0V3NUSSFP8@gmail.com>
+References: <20240620141700.4124157-1-nsg@linux.ibm.com>
+	 <20240620141700.4124157-5-nsg@linux.ibm.com>
+	 <D28QHQGLKAKJ.NZ0V3NUSSFP8@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240621180605.834676-1-mic@digikod.net>
-X-Infomaniak-Routing: alpha
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: GzoBypElhhwxxr9FvxaKRgNuJyORVvb_
+X-Proofpoint-GUID: nbObyaQjKIWAqTSvQsOAegOdFhLZ8aGP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-25_04,2024-06-24_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ malwarescore=0 impostorscore=0 priorityscore=1501 phishscore=0 bulkscore=0
+ spamscore=0 clxscore=1015 lowpriorityscore=0 mlxlogscore=999 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
+ definitions=main-2406250058
 
-I pushed it to my next branch.
+On Tue, 2024-06-25 at 12:14 +1000, Nicholas Piggin wrote:
+> On Fri Jun 21, 2024 at 12:16 AM AEST, Nina Schoetterl-Glausch wrote:
+> > sie_is_diag_icpt() checks if the intercept is due to an expected
+> > diagnose call and is valid.
+> > It subsumes pv_icptdata_check_diag.
+> >=20
+> > Signed-off-by: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+> > ---
+> >  lib/s390x/pv_icptdata.h | 42 --------------------------------
+> >  lib/s390x/sie.h         | 12 ++++++++++
+> >  lib/s390x/sie.c         | 53 +++++++++++++++++++++++++++++++++++++++++
+> >  s390x/pv-diags.c        |  8 +++----
+> >  s390x/pv-icptcode.c     | 11 ++++-----
+> >  s390x/pv-ipl.c          |  7 +++---
+> >  6 files changed, 76 insertions(+), 57 deletions(-)
+> >  delete mode 100644 lib/s390x/pv_icptdata.h
 
-Mark, Shuah, and others, please let me know if kselftest and KernelCI
-are better with that.
+[...]
 
-On Fri, Jun 21, 2024 at 08:06:05PM +0200, Mickaël Salaün wrote:
-> We cannot use CLONE_VFORK because we also need to wait for the timeout
-> signal.
-> 
-> Restore tests timeout by using the original fork() call in __run_test()
-> but also in __TEST_F_IMPL().  Also fix a race condition when waiting for
-> the test child process.
-> 
-> Because test metadata are shared between test processes, only the
-> parent process must set the test PID (child).  Otherwise, t->pid may be
-> set to zero, leading to inconsistent error cases:
-> 
->   #  RUN           layout1.rule_on_mountpoint ...
->   # rule_on_mountpoint: Test ended in some other way [127]
->   #            OK  layout1.rule_on_mountpoint
->   ok 20 layout1.rule_on_mountpoint
-> 
-> As safeguards, initialize the "status" variable with a valid exit code,
-> and handle unknown test exits as errors.
-> 
-> The use of fork() introduces a new race condition in landlock/fs_test.c
-> which seems to be specific to hostfs bind mounts, but I haven't found
-> the root cause and it's difficult to trigger.  I'll try to fix it with
-> another patch.
-> 
-> Cc: Christian Brauner <brauner@kernel.org>
-> Cc: Günther Noack <gnoack@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Kees Cook <keescook@chromium.org>
-> Cc: Mark Brown <broonie@kernel.org>
-> Cc: Shuah Khan <shuah@kernel.org>
-> Cc: Will Drewry <wad@chromium.org>
-> Cc: stable@vger.kernel.org
-> Closes: https://lore.kernel.org/r/9341d4db-5e21-418c-bf9e-9ae2da7877e1@sirena.org.uk
-> Fixes: a86f18903db9 ("selftests/harness: Fix interleaved scheduling leading to race conditions")
-> Fixes: 24cf65a62266 ("selftests/harness: Share _metadata between forked processes")
-> Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> Link: https://lore.kernel.org/r/20240621180605.834676-1-mic@digikod.net
-> ---
->  tools/testing/selftests/kselftest_harness.h | 43 ++++++++++++---------
->  1 file changed, 24 insertions(+), 19 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kselftest_harness.h b/tools/testing/selftests/kselftest_harness.h
-> index b634969cbb6f..40723a6a083f 100644
-> --- a/tools/testing/selftests/kselftest_harness.h
-> +++ b/tools/testing/selftests/kselftest_harness.h
-> @@ -66,8 +66,6 @@
->  #include <sys/wait.h>
->  #include <unistd.h>
->  #include <setjmp.h>
-> -#include <syscall.h>
-> -#include <linux/sched.h>
->  
->  #include "kselftest.h"
->  
-> @@ -82,17 +80,6 @@
->  #  define TH_LOG_ENABLED 1
->  #endif
->  
-> -/* Wait for the child process to end but without sharing memory mapping. */
-> -static inline pid_t clone3_vfork(void)
-> -{
-> -	struct clone_args args = {
-> -		.flags = CLONE_VFORK,
-> -		.exit_signal = SIGCHLD,
-> -	};
-> -
-> -	return syscall(__NR_clone3, &args, sizeof(args));
-> -}
-> -
->  /**
->   * TH_LOG()
->   *
-> @@ -437,7 +424,7 @@ static inline pid_t clone3_vfork(void)
->  		} \
->  		if (setjmp(_metadata->env) == 0) { \
->  			/* _metadata and potentially self are shared with all forks. */ \
-> -			child = clone3_vfork(); \
-> +			child = fork(); \
->  			if (child == 0) { \
->  				fixture_name##_setup(_metadata, self, variant->data); \
->  				/* Let setup failure terminate early. */ \
-> @@ -1016,7 +1003,14 @@ void __wait_for_test(struct __test_metadata *t)
->  		.sa_flags = SA_SIGINFO,
->  	};
->  	struct sigaction saved_action;
-> -	int status;
-> +	/*
-> +	 * Sets status so that WIFEXITED(status) returns true and
-> +	 * WEXITSTATUS(status) returns KSFT_FAIL.  This safe default value
-> +	 * should never be evaluated because of the waitpid(2) check and
-> +	 * SIGALRM handling.
-> +	 */
-> +	int status = KSFT_FAIL << 8;
-> +	int child;
->  
->  	if (sigaction(SIGALRM, &action, &saved_action)) {
->  		t->exit_code = KSFT_FAIL;
-> @@ -1028,7 +1022,15 @@ void __wait_for_test(struct __test_metadata *t)
->  	__active_test = t;
->  	t->timed_out = false;
->  	alarm(t->timeout);
-> -	waitpid(t->pid, &status, 0);
-> +	child = waitpid(t->pid, &status, 0);
-> +	if (child == -1 && errno != EINTR) {
-> +		t->exit_code = KSFT_FAIL;
-> +		fprintf(TH_LOG_STREAM,
-> +			"# %s: Failed to wait for PID %d (errno: %d)\n",
-> +			t->name, t->pid, errno);
-> +		return;
-> +	}
-> +
->  	alarm(0);
->  	if (sigaction(SIGALRM, &saved_action, NULL)) {
->  		t->exit_code = KSFT_FAIL;
-> @@ -1083,6 +1085,7 @@ void __wait_for_test(struct __test_metadata *t)
->  				WTERMSIG(status));
->  		}
->  	} else {
-> +		t->exit_code = KSFT_FAIL;
->  		fprintf(TH_LOG_STREAM,
->  			"# %s: Test ended in some other way [%u]\n",
->  			t->name,
-> @@ -1218,6 +1221,7 @@ void __run_test(struct __fixture_metadata *f,
->  	struct __test_xfail *xfail;
->  	char test_name[1024];
->  	const char *diagnostic;
-> +	int child;
->  
->  	/* reset test struct */
->  	t->exit_code = KSFT_PASS;
-> @@ -1236,15 +1240,16 @@ void __run_test(struct __fixture_metadata *f,
->  	fflush(stdout);
->  	fflush(stderr);
->  
-> -	t->pid = clone3_vfork();
-> -	if (t->pid < 0) {
-> +	child = fork();
-> +	if (child < 0) {
->  		ksft_print_msg("ERROR SPAWNING TEST CHILD\n");
->  		t->exit_code = KSFT_FAIL;
-> -	} else if (t->pid == 0) {
-> +	} else if (child == 0) {
->  		setpgrp();
->  		t->fn(t, variant);
->  		_exit(t->exit_code);
->  	} else {
-> +		t->pid = child;
->  		__wait_for_test(t);
->  	}
->  	ksft_print_msg("         %4s  %s\n",
-> 
-> base-commit: 83a7eefedc9b56fe7bfeff13b6c7356688ffa670
-> -- 
-> 2.45.2
-> 
-> 
+> > +bool sie_is_diag_icpt(struct vm *vm, unsigned int diag)
+> > +{
+> > +	union {
+> > +		struct {
+> > +			uint64_t     : 16;
+> > +			uint64_t ipa : 16;
+> > +			uint64_t ipb : 32;
+> > +		};
+> > +		struct {
+> > +			uint64_t          : 16;
+> > +			uint64_t opcode   :  8;
+> > +			uint64_t r_1      :  4;
+> > +			uint64_t r_2      :  4;
+> > +			uint64_t r_base   :  4;
+> > +			uint64_t displace : 12;
+> > +			uint64_t zero     : 16;
+> > +		};
+> > +	} instr =3D { .ipa =3D vm->sblk->ipa, .ipb =3D vm->sblk->ipb };
+> > +	uint8_t icptcode;
+> > +	uint64_t code;
+> > +
+> > +	switch (diag) {
+> > +	case 0x44:
+> > +	case 0x9c:
+> > +	case 0x288:
+> > +	case 0x308:
+> > +		icptcode =3D ICPT_PV_NOTIFY;
+> > +		break;
+> > +	case 0x500:
+> > +		icptcode =3D ICPT_PV_INSTR;
+> > +		break;
+> > +	default:
+> > +		/* If a new diag is introduced add it to the cases above! */
+> > +		assert_msg(false, "unknown diag");
+> > +	}
+> > +
+> > +	if (sie_is_pv(vm)) {
+> > +		if (instr.r_1 !=3D 0 || instr.r_2 !=3D 2 || instr.r_base !=3D 5)
+> > +			return false;
+> > +		if (instr.displace)
+> > +			return false;
+> > +	} else {
+> > +		icptcode =3D ICPT_INST;
+> > +	}
+> > +	if (vm->sblk->icptcode !=3D icptcode)
+> > +		return false;
+> > +	if (instr.opcode !=3D 0x83 || instr.zero)
+> > +		return false;
+> > +	code =3D instr.r_base ? vm->save_area.guest.grs[instr.r_base] : 0;
+> > +	code =3D (code + instr.displace) & 0xffff;
+> > +	return code =3D=3D diag;
+> > +}
+>=20
+> It looks like this transformation is equivalent for the PV case.
+
+Yes, the PV case just has hardcoded values that we want to check.
+
+> You
+> could put the switch into the sie_is_pv() branch? Otherwise looks okay.
+
+I want to validate diag for both PV and non PV.
+>=20
+> Reviewed-by: Nicholas Piggin <npiggin@gmail.com>
+
+Thanks!
 
