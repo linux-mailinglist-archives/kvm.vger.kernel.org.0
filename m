@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-20481-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20486-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72FE691690D
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 15:36:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DF44916913
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 15:37:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A46791C251A4
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 13:36:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D546E28AA7A
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 13:37:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E4EC16D9B4;
-	Tue, 25 Jun 2024 13:35:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDBA616FF33;
+	Tue, 25 Jun 2024 13:35:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kxAVPM/q"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLX+nqOH"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3E4169AE4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD6FB16E879;
 	Tue, 25 Jun 2024 13:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719322524; cv=none; b=KmJasiE4uj2gNP7TVdi8K4aW74UArQLtzThMDXAcbsRToDPIHWxTNE1haCcOPboU0c4/45+5UkvWjp9Ylp2QEFp60LyPCYP0r7oG+b5rgbenE+cfa0YknKHinAmWbgTG2TOXTcYkAvIOgYM5ZbJ0wtOsxfOVA+WVPqU4R4HjMCg=
+	t=1719322525; cv=none; b=p6AaR1eSERnRRM0nxZGq1PiMJHvipXgf8FVWloaIVjZBGYs2iIuSGymhrmqIMDoXSbEa9fJFn/BuOkODee1GtV8x0KGx7ygmL4pbewsB6lB9C19uZVRpUi3/y2TfmjgXQAeyOVTopS1jTED8Hd/aZ28IQoyx2WTRTOPfL19/AY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719322524; c=relaxed/simple;
-	bh=URJ463LZf+NhFwc+Irio0BcLleDjSg1ELTU95sX4nPM=;
+	s=arc-20240116; t=1719322525; c=relaxed/simple;
+	bh=O2khzE1fdyGIte4KZD309c05XGX8LSqpr8bp0t6E7fg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=p/aEV3BNiw+8Wjo2R4OdMGXgyuFr2AdOQgzx5bIe2eYY9jCtEMTewOOAZ9AUMIBl46iJVQmTlZ9pY+N1ZraRwQUBYmKS8N6iAucsvApMOxd0WiaGMrWomvGKDR6sTbEvtrFWAlFi64OBJDd/F+EL0Mmq/gGgFXkdO/ijZxr4aEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kxAVPM/q; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C7ABC4AF0A;
+	 MIME-Version; b=aYnsP876qEhP4kI5YeoWR4LWMDKdf1IsTa4cZPy1oO5goFBEhci4nNRhNXmPuM3dyit4x7PE7Ti+GEktUhnDbk2DEFkqY+I1rPkIUcUMSK/ecGlZsvYs6DLj0i1cwNQn8AD8zyPWPBu+QU2gfo0VLn7VikcztsXFoaPCnLWFKhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLX+nqOH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6CE0CC32781;
 	Tue, 25 Jun 2024 13:35:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1719322524;
-	bh=URJ463LZf+NhFwc+Irio0BcLleDjSg1ELTU95sX4nPM=;
+	bh=O2khzE1fdyGIte4KZD309c05XGX8LSqpr8bp0t6E7fg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kxAVPM/qxi5uVu5SpiZE4GKIl22W7F9yzlC8UKeU3+9GUDwwI1cRwp2mtl0ptZLBW
-	 /ypK+ROFNW6HB5RtPZqEDWw4MU89+32iGh2dmjb1nUSj8TgxfAwqVmkWtb0jVeLr86
-	 v8YBtQiSdqbJHvJIosf5cnE7gRp+yCP2Op3L0zmI5tmpE557nmgPz7EwsCBUt3pLeD
-	 hfwNCbrBRZbVnSb/EzmJypFu7wOBCJGPTxAuyGn8F5yQfrczUMRVmFwIv7FkNuAPmM
-	 Bi8VT51e/m4/KqisgOKlu9G2xO7MeJpLlPD5QQc9ZV0ntQy62u5xabElwVdMHF1clY
-	 zIv4OWQdxDV2Q==
+	b=lLX+nqOHNTx8D/kGeB8eYVf0gddOZM7yDKUgumJ/Y+vK102AnxX16Y909cO5qVgG2
+	 d/nC8/ievD3Ub4VpqW1u7IKU8PSSJ9D9qW9//T9s3waeq53+yZr84akLWXBGrrUKp7
+	 tI/gg0Fy+vUD3AicZsKY+eGD3RPB5J+bF1if+yx0qPpxykMD6TK8JqJdkMRC/Zlx2y
+	 zZYE8W+yXJrd/6khoRakP+xS0+gUXaxZADp5RQVCaPM4mlxUN/jvfKsxmHfsuZQLbv
+	 7ZRI7yLTnPgmxw1EG5ljztSTyrjl+25sIex3uLMrCfjYNqZ6AOKzSHL0lHxSNzuP2g
+	 Rm+dyyzkaWvag==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sM6KQ-007A6l-I8;
+	id 1sM6KQ-007A6l-No;
 	Tue, 25 Jun 2024 14:35:22 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -56,9 +56,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: [PATCH 04/12] KVM: arm64: nv: Honor absence of FEAT_PAN2
-Date: Tue, 25 Jun 2024 14:35:03 +0100
-Message-Id: <20240625133508.259829-5-maz@kernel.org>
+Subject: [PATCH 05/12] KVM: arm64: make kvm_at() take an OP_AT_*
+Date: Tue, 25 Jun 2024 14:35:04 +0100
+Message-Id: <20240625133508.259829-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240625133508.259829-1-maz@kernel.org>
 References: <20240625133508.259829-1-maz@kernel.org>
@@ -74,29 +74,57 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If our guest has been configured without PAN2, make sure that
-AT S1E1{R,W}P will generate an UNDEF.
+From: Joey Gouly <joey.gouly@arm.com>
 
+To allow using newer instructions that current assemblers don't know about,
+replace the `at` instruction with the underlying SYS instruction.
+
+Signed-off-by: Joey Gouly <joey.gouly@arm.com>
+Cc: Marc Zyngier <maz@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>
+Cc: Will Deacon <will@kernel.org>
+Reviewed-by: Marc Zyngier <maz@kernel.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ arch/arm64/include/asm/kvm_asm.h       | 3 ++-
+ arch/arm64/kvm/hyp/include/hyp/fault.h | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 832c6733db307..06c39f191b5ec 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -4585,6 +4585,10 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
- 						HFGITR_EL2_TLBIRVAAE1OS	|
- 						HFGITR_EL2_TLBIRVAE1OS);
+diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
+index 2181a11b9d925..25f49f5fc4a63 100644
+--- a/arch/arm64/include/asm/kvm_asm.h
++++ b/arch/arm64/include/asm/kvm_asm.h
+@@ -10,6 +10,7 @@
+ #include <asm/hyp_image.h>
+ #include <asm/insn.h>
+ #include <asm/virt.h>
++#include <asm/sysreg.h>
  
-+	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN2))
-+		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_ATS1E1RP |
-+						HFGITR_EL2_ATS1E1WP);
-+
- 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
- 		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
- 						HFGxTR_EL2_nPIR_EL1);
+ #define ARM_EXIT_WITH_SERROR_BIT  31
+ #define ARM_EXCEPTION_CODE(x)	  ((x) & ~(1U << ARM_EXIT_WITH_SERROR_BIT))
+@@ -259,7 +260,7 @@ extern u64 __kvm_get_mdcr_el2(void);
+ 	asm volatile(							\
+ 	"	mrs	%1, spsr_el2\n"					\
+ 	"	mrs	%2, elr_el2\n"					\
+-	"1:	at	"at_op", %3\n"					\
++	"1:	" __msr_s(at_op, "%3") "\n"				\
+ 	"	isb\n"							\
+ 	"	b	9f\n"						\
+ 	"2:	msr	spsr_el2, %1\n"					\
+diff --git a/arch/arm64/kvm/hyp/include/hyp/fault.h b/arch/arm64/kvm/hyp/include/hyp/fault.h
+index 9e13c1bc2ad54..487c06099d6fc 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/fault.h
++++ b/arch/arm64/kvm/hyp/include/hyp/fault.h
+@@ -27,7 +27,7 @@ static inline bool __translate_far_to_hpfar(u64 far, u64 *hpfar)
+ 	 * saved the guest context yet, and we may return early...
+ 	 */
+ 	par = read_sysreg_par();
+-	if (!__kvm_at("s1e1r", far))
++	if (!__kvm_at(OP_AT_S1E1R, far))
+ 		tmp = read_sysreg_par();
+ 	else
+ 		tmp = SYS_PAR_EL1_F; /* back to the guest */
 -- 
 2.39.2
 
