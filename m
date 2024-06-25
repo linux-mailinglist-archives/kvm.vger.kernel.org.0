@@ -1,313 +1,169 @@
-Return-Path: <kvm+bounces-20454-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20455-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7806915F36
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 09:01:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0545915F83
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 09:08:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2D35DB22C58
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 07:01:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AD11284D4F
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 07:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757CB146A61;
-	Tue, 25 Jun 2024 07:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA7661494D1;
+	Tue, 25 Jun 2024 07:06:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nfEVRvUi"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ihn+IZGF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1ECC146593;
-	Tue, 25 Jun 2024 07:01:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11CF114901B;
+	Tue, 25 Jun 2024 07:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719298867; cv=none; b=G0brDoqownTrtqod8I680E6RhhWvtkIII4ZOV/dR3bOWwoNVTMTLfF5OEW2eqIKb3PnoyBb6TsOUXzj4BTQTpMVp1YAHcPCNiMw+WhW6KFWSetQNYG6wWIasmHGDufaEhjqds6my6wIZgN6b8uHCD+cl/tMXr7wUfXP8BO1wn+E=
+	t=1719299186; cv=none; b=SJWa4p3WuHtfpFzaqS9BENvHv5HxfPsm+ptXPs6l0wp8axHlUTXTTKA6u+hC/EyuHtukYHmMYP10hKXhwXe6oO20dKIxsERmOzzWVQUdTIPRuBSa9BhExZFiQaURtb+9DxvumicHKzg9364yLD4uHz6axlmAR/kw4gbrQCD+uyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719298867; c=relaxed/simple;
-	bh=xeepw0436JvXkF7t5SqHEVBLg8MBJ44psADaGMG57fA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=otbDbUAq58YCXk2gbD8p+OFiB8o3tpkga+mhdIc/pBLgZPIoBR1TyeZDo0rxVZoChnKB67ag4AWgK2ZrrG5T9Dc9oqSBU2W8HFfaIaarS+C75HCgXhHUNrnpNfHLin28OITjNUOs9p0Q8mZameHZ2J3zzPLQBzLwIN/5GXB0nR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nfEVRvUi; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719298866; x=1750834866;
-  h=message-id:date:mime-version:subject:from:to:cc:
-   references:in-reply-to:content-transfer-encoding;
-  bh=xeepw0436JvXkF7t5SqHEVBLg8MBJ44psADaGMG57fA=;
-  b=nfEVRvUiK9DOzEnBaZp54IwYnfRxCTZI/EtC5ryRAKN1gEwj37dce5Aj
-   RKlDggrBLuxNOWmJUKG5FMx9dZquRv9J9WwyJeRnjfTU+SudNHh4nuDWu
-   rP+jKphl12pUT98+hKEUy/WPgfbtV+BcjU8MfLe6YfK0BoK2Ssw5Emqzd
-   GV0r9SMMgo6nhXsNAFKh6qVAav2euQr58RbTycQlFDQslX44Mts3rqKCF
-   v3EbR4VxZQ0EzMZGYgyPtGxi04loS9VnU946+LGUP6Km+3R37NmrZaLLl
-   Njx7/LLeqQuMn/YIM58DHgxToGiopYqfSgX7btnhUzSH+ht+AZwnKeXaR
-   A==;
-X-CSE-ConnectionGUID: RsPtHC17R5ClF8dH9X8Sow==
-X-CSE-MsgGUID: MT3QWbYRSqSyuvlw+Q/wyw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11113"; a="26986978"
-X-IronPort-AV: E=Sophos;i="6.08,263,1712646000"; 
-   d="scan'208";a="26986978"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 00:01:05 -0700
-X-CSE-ConnectionGUID: dcJs2ek7QNSojUybXKCtVg==
-X-CSE-MsgGUID: B/o0JsmDTmirdHG4WG967Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,263,1712646000"; 
-   d="scan'208";a="43614242"
-Received: from qunyang-mobl1.ccr.corp.intel.com (HELO [10.238.2.59]) ([10.238.2.59])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 00:01:02 -0700
-Message-ID: <7fb2b31e-3c4b-4092-a60b-92aaa43821ae@linux.intel.com>
-Date: Tue, 25 Jun 2024 15:00:59 +0800
+	s=arc-20240116; t=1719299186; c=relaxed/simple;
+	bh=ID8U5OSxgYwXxSbviBAOTbMQBsuBvXwx/c289TgPnYI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=j/zFI7ub8L8vBL0EKkk0ovLBg5oVkgtGgkAbarz/MUfwxCYKnJbPu8EfnVgD5EfGmUzhTzycoEcf8DfCWkMr5hO9PVzLyFOMcgDwoR1ED9sQz54xpq9Ll+4tRX2eVYCDf+RBJ8+onoEwJsZN4qkOasXf5GCIu7ogXIh/yR1I3YY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ihn+IZGF; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45P6plPX006771;
+	Tue, 25 Jun 2024 07:06:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:subject:from:to:cc:date:in-reply-to:references
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	0dh98OiGcjyBRxaeJW5dhBodNCgsPnObIIsCgSMn8ZI=; b=ihn+IZGF6aFK1xEj
+	ByNBVSVhJNhaai/SvwlJ/rZtSw1JkHbsMn6lZdYPpqqHSWypYlEmZ9/qnCnSlPrV
+	iLfjrTqZ2ZKdy9ZlgXaykRWp4EWBjRIUF7G/BDFRKYE6o6c+luECJHneXlIlI+1D
+	gZOQiVZaG3DI1PHLco1eB6xGX7uAx+c/X2+lMhY0o7PPn9QsQ/inwqL1L+L21Ix5
+	Mq893YvptIblLlQ+hJ7apxQlxYXQB9/k+zhdajPLB8/poQq9QPS1FPMKkHJG9BL2
+	kYZNzGCZbZj1c2cRBPVCOStJJD8GPzsNAUnrpuElHZgT84zIB2iVDk91vaUgTI+B
+	ni522A==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yyr7c85jr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 07:06:12 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45P76CRj032186;
+	Tue, 25 Jun 2024 07:06:12 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3yyr7c85jp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 07:06:12 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45P6nU2T008229;
+	Tue, 25 Jun 2024 07:06:11 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yx9b0n844-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 25 Jun 2024 07:06:11 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45P7654l53084448
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 25 Jun 2024 07:06:07 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6BC5C2004E;
+	Tue, 25 Jun 2024 07:06:05 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D82CA20040;
+	Tue, 25 Jun 2024 07:06:04 +0000 (GMT)
+Received: from li-978a334c-2cba-11b2-a85c-a0743a31b510.ibm.com (unknown [9.171.29.84])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 25 Jun 2024 07:06:04 +0000 (GMT)
+Message-ID: <3d4335edb1091bbf91d8329a152f006003930b60.camel@linux.ibm.com>
+Subject: Re: [kvm-unit-tests PATCH v3 1/7] lib: Add pseudo random functions
+From: Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+To: Nicholas Piggin <npiggin@gmail.com>, Nico Boehr <nrb@linux.ibm.com>,
+        Thomas Huth <thuth@redhat.com>, Andrew Jones <andrew.jones@linux.dev>
+Cc: linux-s390@vger.kernel.org, Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Janosch Frank
+ <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Date: Tue, 25 Jun 2024 09:06:04 +0200
+In-Reply-To: <D28RMVNELBHS.HJUXVDHDPAC4@gmail.com>
+References: <20240620141700.4124157-1-nsg@linux.ibm.com>
+	 <20240620141700.4124157-2-nsg@linux.ibm.com>
+	 <D28RMVNELBHS.HJUXVDHDPAC4@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 110/130] KVM: TDX: Handle TDX PV MMIO hypercall
-From: Binbin Wu <binbin.wu@linux.intel.com>
-To: isaku.yamahata@intel.com, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- Sean Christopherson <sean.j.christopherson@intel.com>,
- Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <a4421e0f2eafc17b4703c920936e32489d2382a3.1708933498.git.isaku.yamahata@intel.com>
- <560f3796-5a41-49fb-be6e-558bbe582996@linux.intel.com>
-Content-Language: en-US
-In-Reply-To: <560f3796-5a41-49fb-be6e-558bbe582996@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: uAFWB8ndUoUx9H6j1fpkdcsmUvqsz8S7
+X-Proofpoint-ORIG-GUID: eNEctS8mlVLUv_3oEtbmkvOc47nQKMO_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-25_03,2024-06-24_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 adultscore=0
+ phishscore=0 priorityscore=1501 mlxlogscore=727 bulkscore=0 clxscore=1015
+ mlxscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2406250051
 
+On Tue, 2024-06-25 at 13:08 +1000, Nicholas Piggin wrote:
+> On Fri Jun 21, 2024 at 12:16 AM AEST, Nina Schoetterl-Glausch wrote:
 
+[...]
 
-On 6/25/2024 2:54 PM, Binbin Wu wrote:
->
->
-> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
->> From: Sean Christopherson <sean.j.christopherson@intel.com>
->>
->> Export kvm_io_bus_read and kvm_mmio tracepoint and wire up TDX PV MMIO
->> hypercall to the KVM backend functions.
->>
->> kvm_io_bus_read/write() searches KVM device emulated in kernel of the 
->> given
->> MMIO address and emulates the MMIO.  As TDX PV MMIO also needs it, 
->> export
->> kvm_io_bus_read().  kvm_io_bus_write() is already exported.  TDX PV MMIO
->> emulates some of MMIO itself.  To add trace point consistently with x86
->> kvm, export kvm_mmio tracepoint.
->>
->> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
->> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->> ---
->>   arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++++++++++++++++++++++++++
->>   arch/x86/kvm/x86.c     |   1 +
->>   virt/kvm/kvm_main.c    |   2 +
->>   3 files changed, 117 insertions(+)
->>
->> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->> index 55fc6cc6c816..389bb95d2af0 100644
->> --- a/arch/x86/kvm/vmx/tdx.c
->> +++ b/arch/x86/kvm/vmx/tdx.c
->> @@ -1217,6 +1217,118 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
->>       return ret;
->>   }
->>   +static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
->> +{
->> +    unsigned long val = 0;
->> +    gpa_t gpa;
->> +    int size;
->> +
->> +    KVM_BUG_ON(vcpu->mmio_needed != 1, vcpu->kvm);
->> +    vcpu->mmio_needed = 0;
-> mmio_needed is used by instruction emulator to setup the complete 
-> callback.
-> Since TDX handle MMIO in a PV way, mmio_needed is not needed here.
->
->> +
->> +    if (!vcpu->mmio_is_write) {
-> It's also needed by instruction emulator, we can use 
-> vcpu->run->mmio.is_write instead.
->
->> +        gpa = vcpu->mmio_fragments[0].gpa;
->> +        size = vcpu->mmio_fragments[0].len;
->
-> Since MMIO cross page boundary is not allowed according to the input 
-> checks from TDVMCALL, these mmio_fragments[] is not needed.
-> Just use vcpu->run->mmio.phys_addr and vcpu->run->mmio.len?
->
->> +
->> +        memcpy(&val, vcpu->run->mmio.data, size);
->> +        tdvmcall_set_return_val(vcpu, val);
->> +        trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
->> +    }
->
-> Tracepoint for KVM_TRACE_MMIO_WRITE is missing when it is handled in 
-> userspace.
->
-> Also, the return code is only set when the emulation is done in 
-> kernel, but not set when it's handled in userspace.
->
->> +    return 1;
->> +}
->
-> How about the fixup as following:
->
-> @@ -1173,19 +1173,18 @@ static int tdx_emulate_io(struct kvm_vcpu 
-> *vcpu) static int tdx_complete_mmio(struct kvm_vcpu *vcpu) { unsigned 
-> long val = 0; - gpa_t gpa; - int size; - - vcpu->mmio_needed = 0; - - 
-> if (!vcpu->mmio_is_write) { - gpa = vcpu->mmio_fragments[0].gpa; - 
-> size = vcpu->mmio_fragments[0].len; + gpa_t gpa = 
-> vcpu->run->mmio.phys_addr; + int size = vcpu->run->mmio.len; + if 
-> (vcpu->run->mmio.is_write) { + trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, 
-> size, gpa, &val); + } else { memcpy(&val, vcpu->run->mmio.data, size); 
-> tdvmcall_set_return_val(vcpu, val); 
-> trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val); } + + 
-> tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS); return 1; }
->
-Sorry for the mess.
+> >     I tested the implementation in the following way:
+> >    =20
+> >     cat <<'EOF' > rand.py
+> >     #!/usr/bin/python3
+> >    =20
+> >     def prng32(seed):
+> >         from hashlib import sha256
+> >         state =3D seed.to_bytes(8, byteorder=3D"big")
+> >         while True:
+> >             state =3D sha256(state).digest()
+> >             for i in range(8):
+> >                 yield int.from_bytes(state[i*4:(i+1)*4], byteorder=3D"b=
+ig")
+> >    =20
+> >     r =3D prng32(0)
+> >     for i in range(100):
+> >         print(f"{next(r):08x}")
+> >    =20
+> >     EOF
+> >    =20
+> >     cat <<'EOF' > rand.c
+> >     #include <stdio.h>
+> >     #include "rand.h"
+> >    =20
+> >     void main(void)
+> >     {
+> >     	prng_state state =3D prng_init(0);
+> >     	for (int i =3D 0; i < 100; i++) {
+> >     		printf("%08x\n", prng32(&state));
+> >     	}
+> >     }
+> >     EOF
+> >     cat <<'EOF' > libcflat.h
+> >     #define ARRAY_SIZE(_a) (sizeof(_a)/sizeof((_a)[0]))
+> >     EOF
+> >     chmod +x rand.py
+> >     ln -s lib/rand.c librand.c
+> >     gcc -Ilib librand.c rand.c
+> >     diff <(./a.out) <(./rand.py)
+>=20
+> Cool... you made a unit test for the unit tests. We could start a
+> make check? :)
 
-@@ -1173,19 +1173,18 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
-  static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
-  {
-         unsigned long val = 0;
--       gpa_t gpa;
--       int size;
--
--       vcpu->mmio_needed = 0;
--
--       if (!vcpu->mmio_is_write) {
--               gpa = vcpu->mmio_fragments[0].gpa;
--               size = vcpu->mmio_fragments[0].len;
-+       gpa_t gpa = vcpu->run->mmio.phys_addr;
-+       int size = vcpu->run->mmio.len;
+I wouldn't complain about it, but my test is a bit hacky and I don't
+expect the code to get touched much.
+>=20
+> Acked-by: Nicholas Piggin <npiggin@gmail.com>
+>=20
+> Thanks,
+> Nick
 
-+       if (vcpu->run->mmio.is_write) {
-+               trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
-+       } else {
-                 memcpy(&val, vcpu->run->mmio.data, size);
-                 tdvmcall_set_return_val(vcpu, val);
-                 trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
-         }
-+
-+       tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS);
-         return 1;
-  }
-
->
->
->> +
->> +static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, 
->> int size,
->> +                 unsigned long val)
->> +{
->> +    if (kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, gpa, size, 
->> &val) &&
->> +        kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
->> +        return -EOPNOTSUPP;
->> +
->> +    trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
->> +    return 0;
->> +}
->> +
->> +static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, 
->> int size)
->> +{
->> +    unsigned long val;
->> +
->> +    if (kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev, gpa, size, 
->> &val) &&
->> +        kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
->> +        return -EOPNOTSUPP;
->> +
->> +    tdvmcall_set_return_val(vcpu, val);
->> +    trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
->> +    return 0;
->> +}
->> +
->> +static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
->> +{
->> +    struct kvm_memory_slot *slot;
->> +    int size, write, r;
->> +    unsigned long val;
->> +    gpa_t gpa;
->> +
->> +    KVM_BUG_ON(vcpu->mmio_needed, vcpu->kvm);
->> +
-> [...]
->> +
->> +    /* Request the device emulation to userspace device model. */
->> +    vcpu->mmio_needed = 1;
->> +    vcpu->mmio_is_write = write;
-> Then they can be dropped.
->
->
->> +    vcpu->arch.complete_userspace_io = tdx_complete_mmio;
->> +
->> +    vcpu->run->mmio.phys_addr = gpa;
->> +    vcpu->run->mmio.len = size;
->> +    vcpu->run->mmio.is_write = write;
->> +    vcpu->run->exit_reason = KVM_EXIT_MMIO;
->> +
->> +    if (write) {
->> +        memcpy(vcpu->run->mmio.data, &val, size);
->> +    } else {
->> +        vcpu->mmio_fragments[0].gpa = gpa;
->> +        vcpu->mmio_fragments[0].len = size;
-> These two lines can be dropped as well.
->
->> + trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, gpa, NULL);
->> +    }
->> +    return 0;
->> +
->> +error:
->> +    tdvmcall_set_return_code(vcpu, TDVMCALL_INVALID_OPERAND);
->> +    return 1;
->> +}
->> +
->
-> - /* Request the device emulation to userspace device model. */ - 
-> vcpu->mmio_needed = 1; - vcpu->mmio_is_write = write; 
-> vcpu->arch.complete_userspace_io = tdx_complete_mmio; 
-> vcpu->run->mmio.phys_addr = gpa; @@ -1265,13 +1272,11 @@ static int 
-> tdx_emulate_mmio(struct kvm_vcpu *vcpu) vcpu->run->mmio.is_write = 
-> write; vcpu->run->exit_reason = KVM_EXIT_MMIO; - if (write) { + if 
-> (write) memcpy(vcpu->run->mmio.data, &val, size); - } else { - 
-> vcpu->mmio_fragments[0].gpa = gpa; - vcpu->mmio_fragments[0].len = 
-> size; + else trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, 
-> gpa, NULL); - } + return 0;
->
->
->
--       /* Request the device emulation to userspace device model. */
--       vcpu->mmio_needed = 1;
--       vcpu->mmio_is_write = write;
-         vcpu->arch.complete_userspace_io = tdx_complete_mmio;
-
-         vcpu->run->mmio.phys_addr = gpa;
-@@ -1265,13 +1272,11 @@ static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
-         vcpu->run->mmio.is_write = write;
-         vcpu->run->exit_reason = KVM_EXIT_MMIO;
-
--       if (write) {
-+       if (write)
-                 memcpy(vcpu->run->mmio.data, &val, size);
--       } else {
--               vcpu->mmio_fragments[0].gpa = gpa;
--               vcpu->mmio_fragments[0].len = size;
-+       else
-                 trace_kvm_mmio(KVM_TRACE_MMIO_READ_UNSATISFIED, size, 
-gpa, NULL);
--       }
-+
-         return 0;
 
