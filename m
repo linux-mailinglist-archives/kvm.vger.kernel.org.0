@@ -1,318 +1,137 @@
-Return-Path: <kvm+bounces-20505-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20506-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DBB791744D
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 00:35:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 251209174AC
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 01:27:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21C6B287202
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 22:35:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4970281E6D
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 23:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685191802C1;
-	Tue, 25 Jun 2024 22:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECED217F500;
+	Tue, 25 Jun 2024 23:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gysGch8L"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lFNLoKxi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E0917FAC4
-	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 22:35:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8319917D88C
+	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 23:27:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719354907; cv=none; b=AW0g2ikpcOl0nlj5obe0ZPDVFALn3DSIpZ6r0UDa13SAipSe7aCY5KEpXqX2lQqPtuJN3ig3aIjUjER9XOhZPFGzCZedMG6RFHIbTAgo3AsexVH7FLRydARTigj4FZDrK3bUHQ2TowhLRfti4Z/uq2cK/RfPdJYMHOgHONrpO30=
+	t=1719358030; cv=none; b=AtodAW1mGt7lLL0D03Z6umer7xNRIWjjyYNgn2mrA3d1GhnnNyg1oOJbvFbIW/+nfzFN2CKo2mz/iE4VWJIIHD2POlxk/Gaa4ZwaoCdfY7jWu70RfViIASy5rnicx7xv9JSsO/J2wWBzFy9kl+FrooAnqQ8hxK3N0WdXtLXNpzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719354907; c=relaxed/simple;
-	bh=Nz14t21hcHX1PDz4gX9brGggz6D63/l/IGgEClEx/P4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ie+8ItsSUo6oQQath/cZQh9wwOHNwU1odBHUHN5EE726R6EW1xyLLrKmz8cSU3CRSeFQw8b02zUUeAi2AbCQXmQwnIwCG8336KpH2mJnBGnGMfg8V9JT+HyveQysf5DKStAAs/u5JhGQjybIy+ZNjGJaqmO3GXvoq664vlFhP2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gysGch8L; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1719358030; c=relaxed/simple;
+	bh=rYYmEPcqcQ9NMGqGAnMHOlrWwSNiwufqAydwaFEWLrQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HV7cyTdtodF/po6XruvJffdigyfBlB2fP4+0MeOjKcGmTTOGYglm6XGPKpNlynaIa1zkmkv9LxIkVzvqJvRcfReC3TZmeFs5coL3YA+Vr2d6u7d0b+Iwwp0bETvgs0EieOn6p3cYIO5cej3QnAvgQ56Guz7OS1joW3lx+NBev3s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lFNLoKxi; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-63bf1d3fb2dso134764847b3.1
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 15:35:05 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso3286a12.0
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 16:27:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719354905; x=1719959705; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=87Jin1neXman428FZaPVpz5vAZT4i6hdnDg6P39Dvmk=;
-        b=gysGch8Lr+ZJ8ZK1ZKAjLss5CfsUDUxdga3ngMC9+qrw+gD0rZ48JCU4hceJu9FJDz
-         84yiSLkRkGlpchiV8Nix4CBJSWAvLb2rxB4tnVNo++7Ftz8rSEGUwrOPx6DTjAMxjjh2
-         9bmcyZMWIG+xG8YzDFvmp+kr3xORJzdP54pKgQ8hLFhSj37DsGmfH/SrSXxBOrKQemAA
-         KAHntA4RXke433RupEuwlbUGe1Ovt3WhIEaoy6vpzJoeQB2/wZQhsmdCDWr/n0h6Ufqq
-         nqL2DzL+XOjyTN43rcbRSXn8V4IQP9zMEFbiRTbb7XRocjs7EKTkpMO5kuVw86H/tezz
-         dQ9A==
+        d=google.com; s=20230601; t=1719358027; x=1719962827; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S96OdWC18KC7h+HryfBM4Z35r1uFfJ2/I3Xrp+/QQmM=;
+        b=lFNLoKxiGwCm7kqHfExztxX597bCTfR36Rh6pYFZ8DRNCpjY0hZv8VbAVy2xfBv20h
+         rVQJw2iaQ94vAD1HhOSY+WyNSOVIYeUc1EwBI0fEyB3r/wmmBT6NGt8suwNTZAfInPn4
+         lRRcVHCvFCn/t7HxDlnR+z/Ev3MIGyhvRUgN6wyMMO9llrIWo8P6JwPLDeCGYk/vcXa/
+         lXcwmSITxkGXIIdCyj48PFSHHQJVbUKUpjq4CL/kKg4BIzkhi+uw8GC/R3ASf4lNgZMc
+         FU7XNNDB0ygEj8a84O/cguHTHkSZZyimwb2BMMmIHFmWfZQBe3jv4mjv5/BbYC34TRE2
+         NEPA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719354905; x=1719959705;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=87Jin1neXman428FZaPVpz5vAZT4i6hdnDg6P39Dvmk=;
-        b=XB9YgdmTpjHGZlCH6QZitp6e3OOULnA+MTxPeBZS6mK1I8fEVZbBaQn/+rXjf01P6Y
-         +zN1FhbV6gnXMs+EUAu/B5GcTtIjIm/12esvSuYMa6SSKrwKcK+TEgSYK+i7vwJN/FzQ
-         ZpRgaR+QNcxLZJ3EhT8xDw3NMaVVSeD4RI22AGQiXC8FheC1IgnKQ+IYe+fajDc+7VSv
-         rH2xy/8y/0clY5s7HsFZCsO0dNPhg+X2hBR8ZjQKTTbuOE4fclj3/3mD+5tljeZkQ4VD
-         sG3djgr8XUMoYZpwqYyAAicx7s5KBbvYjRCSmcWyhgsmQDsmJL8F7qGeeFv9ZDmOMkdS
-         QQBA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpItG1FgkBMvohFQmwH/So0GXXAvVPo4TxhUewjvOWklnyrK42i7a8yRSik/BdUNQG8QT9ewqomuDkQseyjECAWf1B
-X-Gm-Message-State: AOJu0Yw23Wr0BijOK/9j0Hcu6tFaC59yKF9CDZkiZFUJpuOJKQXtqEq8
-	ovqPgxVlEqZHd8b8quJ/vC4pgLPtfoJlXoAMlFH80n2jedvUpmJotZ8a7jYwVGJKuokyGsZezLD
-	eHQ==
-X-Google-Smtp-Source: AGHT+IEGuPw81A+vd3VK4UXWXuPsSlJshJybw2PugwKr4mE141Kgqb4D3k0bZmkq8unTm2UAe55tWdXFj6o=
-X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
- (user=edliaw job=sendgmr) by 2002:a05:690c:6112:b0:61c:89a4:dd5f with SMTP id
- 00721157ae682-643a76e6dd7mr1219237b3.0.1719354904824; Tue, 25 Jun 2024
- 15:35:04 -0700 (PDT)
-Date: Tue, 25 Jun 2024 22:34:45 +0000
-In-Reply-To: <20240625223454.1586259-1-edliaw@google.com>
+        d=1e100.net; s=20230601; t=1719358027; x=1719962827;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S96OdWC18KC7h+HryfBM4Z35r1uFfJ2/I3Xrp+/QQmM=;
+        b=m5m9P+gFYVvgp5J4UMMbZP01xlpTVjSCudQZqRhm+/tmvaQhrPSI0HQMqwgSs6RTIx
+         S1hSu2zo5tb3JUqKjF1MCV5D6GeZKq1LHumDDO798hToEVKYq5Z9+T6AAV6BqRoVDVXh
+         1AcgLOiuEwIxMRqAaV2MEMTKFaUUXEU/D339CGommDuOryeglWb8m1bs2M4AkCqfFoKT
+         HA8vX8eSljGO1F5OGRZpLKW7jitYzXuOsYKCmxQiufdYIVTpexgyQTI5kPJbBxraEbeO
+         3SwuamGUHDXaZqxzxOkioQ84kK6Dng8xuOwRMi74Frz2dr36Q7oYd91LaRrTgINQ3Lvj
+         iwUw==
+X-Gm-Message-State: AOJu0Yyx1T48yJH2UN/B8dC1/SjFRwl99UBBMOyQuDlY8VxdmS1sFSga
+	WL36wJOOhRFJGI2oLvdqb6/TS6vfaSEhusp41yln30HOcOKq8RdgB/OfOAy88RWWtGOF82IUi4R
+	99Zx7OwXKpHj/BiWRbpjm+1hjld8oXOss+RaNlGuBry5spm1KAWb9
+X-Google-Smtp-Source: AGHT+IFxVSonzGYibIBkNz88obJaOkfp6dpG3dswKL2fmlAw6lj/gtC8qtIwQBCVLXne/B5Sr4ewb3GEPtVn2Qkf7eY=
+X-Received: by 2002:a05:6402:27cf:b0:57d:6e52:fff6 with SMTP id
+ 4fb4d7f45d1cf-58359057f79mr45571a12.5.1719358026508; Tue, 25 Jun 2024
+ 16:27:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240625223454.1586259-1-edliaw@google.com>
-X-Mailer: git-send-email 2.45.2.803.g4e1b14247a-goog
-Message-ID: <20240625223454.1586259-2-edliaw@google.com>
-Subject: [PATCH v7 1/1] selftests: Centralize -D_GNU_SOURCE= to CFLAGS in lib.mk
-From: Edward Liaw <edliaw@google.com>
-To: linux-kselftest@vger.kernel.org, Eric Biederman <ebiederm@xmission.com>, 
-	Kees Cook <kees@kernel.org>, Shuah Khan <shuah@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Darren Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>, 
-	"=?UTF-8?q?Andr=C3=A9=20Almeida?=" <andrealmeid@igalia.com>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Fenghua Yu <fenghua.yu@intel.com>, 
-	Reinette Chatre <reinette.chatre@intel.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Jarkko Sakkinen <jarkko@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>
-Cc: linux-kernel@vger.kernel.org, usama.anjum@collabora.com, seanjc@google.com, 
-	kernel-team@android.com, Edward Liaw <edliaw@google.com>, linux-mm@kvack.org, 
-	iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	linux-sgx@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>
+MIME-Version: 1.0
+References: <f6bca5b0f9fc1584ef73d8ef71ac25e2c656b81e.camel@redhat.com>
+ <ZmxTFFt1FdkJb6wK@google.com> <3a3e1514fb48b415b46045c76969cc211198b114.camel@redhat.com>
+In-Reply-To: <3a3e1514fb48b415b46045c76969cc211198b114.camel@redhat.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Tue, 25 Jun 2024 16:26:50 -0700
+Message-ID: <CALMp9eTmez1TrQ6i+R8p7qJrkBNgTS8Xwf2XPw=x2RDcwe3Ekw@mail.gmail.com>
+Subject: Re: kvm selftest 'msr' fails on some skylake cpus
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Centralize the _GNU_SOURCE definition to CFLAGS in lib.mk.  Remove
-redundant defines from Makefiles that import lib.mk.  Convert any usage
-of "#define _GNU_SOURCE 1" to "#define _GNU_SOURCE".
+On Mon, Jun 17, 2024 at 11:29=E2=80=AFAM Maxim Levitsky <mlevitsk@redhat.co=
+m> wrote:
+>
+> On Fri, 2024-06-14 at 07:26 -0700, Sean Christopherson wrote:
+> > On Thu, Jun 13, 2024, Maxim Levitsky wrote:
+> > > Hi!
+> > >
+> > > This kvm unit test tests that all reserved bits of the MSR_IA32_FLUSH=
+_CMD #GP, but apparently
+> > > on some systems this test fails.
+> > >
+> > > For example I reproduced this on:
+> > >
+> > > model name  : Intel(R) Xeon(R) CPU E3-1260L v5 @ 2.90GHz
+> > > stepping    : 3
+> > > microcode   : 0xf0
+> > >
+> > >
+> > > As I see in the 'vmx_vcpu_after_set_cpuid', we passthough this msr to=
+ the guest AS IS,
+> > > thus the unit test tests the microcode.
+> > >
+> > > So I suspect that the test actually caught a harmless microcode bug.
+> >
+> > Yeah, we encountered the same thing and came to the same conclusion.
+> >
+> > > What do you think we should do to workaround this? Maybe disable this=
+ check on
+> > > affected cpus or turn it into a warning because MSR_IA32_FLUSH_CMD re=
+served bits
+> > > test doesn't test KVM?
+> >
+> > Ya, Mingwei posted a patch[*] to force KVM to emulate the faulting acce=
+sses, which
+> > more or less does exactly that, but preserves a bit of KVM coverage.  I=
+'ll get a
+> > KUT pull request sent to Paolo today, I've got a sizeable number of cha=
+nges ready.
+> >
+> > [*] https://lore.kernel.org/all/20240417232906.3057638-3-mizhang@google=
+.com
+> >
+>
+> This works for me.
+> Thanks,
+>
+> Best regards,
+>         Maxim Levitsky
 
-This uses the form "-D_GNU_SOURCE=", which is equivalent to
-"#define _GNU_SOURCE".
+Sean and/or Paolo,
 
-Otherwise using "-D_GNU_SOURCE" is equivalent to "-D_GNU_SOURCE=1" and
-"#define _GNU_SOURCE 1", which is less commonly seen in source code and
-would require many changes in selftests to avoid redefinition warnings.
-
-Suggested-by: John Hubbard <jhubbard@nvidia.com>
-Signed-off-by: Edward Liaw <edliaw@google.com>
----
- tools/testing/selftests/exec/Makefile             | 1 -
- tools/testing/selftests/futex/functional/Makefile | 2 +-
- tools/testing/selftests/intel_pstate/Makefile     | 2 +-
- tools/testing/selftests/iommu/Makefile            | 2 --
- tools/testing/selftests/kvm/Makefile              | 2 +-
- tools/testing/selftests/lib.mk                    | 3 +++
- tools/testing/selftests/mm/thuge-gen.c            | 2 +-
- tools/testing/selftests/net/Makefile              | 2 +-
- tools/testing/selftests/net/tcp_ao/Makefile       | 2 +-
- tools/testing/selftests/proc/Makefile             | 1 -
- tools/testing/selftests/resctrl/Makefile          | 2 +-
- tools/testing/selftests/ring-buffer/Makefile      | 1 -
- tools/testing/selftests/riscv/mm/Makefile         | 2 +-
- tools/testing/selftests/sgx/Makefile              | 2 +-
- tools/testing/selftests/tmpfs/Makefile            | 1 -
- 15 files changed, 12 insertions(+), 15 deletions(-)
-
-diff --git a/tools/testing/selftests/exec/Makefile b/tools/testing/selftests/exec/Makefile
-index ab67d58cfab7..ba012bc5aab9 100644
---- a/tools/testing/selftests/exec/Makefile
-+++ b/tools/testing/selftests/exec/Makefile
-@@ -1,7 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- CFLAGS = -Wall
- CFLAGS += -Wno-nonnull
--CFLAGS += -D_GNU_SOURCE
- 
- ALIGNS := 0x1000 0x200000 0x1000000
- ALIGN_PIES        := $(patsubst %,load_address.%,$(ALIGNS))
-diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
-index 994fa3468f17..f79f9bac7918 100644
---- a/tools/testing/selftests/futex/functional/Makefile
-+++ b/tools/testing/selftests/futex/functional/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- INCLUDES := -I../include -I../../ $(KHDR_INCLUDES)
--CFLAGS := $(CFLAGS) -g -O2 -Wall -D_GNU_SOURCE= -pthread $(INCLUDES) $(KHDR_INCLUDES)
-+CFLAGS := $(CFLAGS) -g -O2 -Wall -pthread $(INCLUDES) $(KHDR_INCLUDES)
- LDLIBS := -lpthread -lrt
- 
- LOCAL_HDRS := \
-diff --git a/tools/testing/selftests/intel_pstate/Makefile b/tools/testing/selftests/intel_pstate/Makefile
-index 05d66ef50c97..f45372cb00fe 100644
---- a/tools/testing/selftests/intel_pstate/Makefile
-+++ b/tools/testing/selftests/intel_pstate/Makefile
-@@ -1,5 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
--CFLAGS := $(CFLAGS) -Wall -D_GNU_SOURCE
-+CFLAGS := $(CFLAGS) -Wall
- LDLIBS += -lm
- 
- ARCH ?= $(shell uname -m 2>/dev/null || echo not)
-diff --git a/tools/testing/selftests/iommu/Makefile b/tools/testing/selftests/iommu/Makefile
-index 32c5fdfd0eef..fd6477911f24 100644
---- a/tools/testing/selftests/iommu/Makefile
-+++ b/tools/testing/selftests/iommu/Makefile
-@@ -2,8 +2,6 @@
- CFLAGS += -Wall -O2 -Wno-unused-function
- CFLAGS += $(KHDR_INCLUDES)
- 
--CFLAGS += -D_GNU_SOURCE
--
- TEST_GEN_PROGS :=
- TEST_GEN_PROGS += iommufd
- TEST_GEN_PROGS += iommufd_fail_nth
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index ac280dcba996..4ee37abf70ff 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -231,7 +231,7 @@ LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
- endif
- CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
- 	-Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFIG_64BIT \
--	-D_GNU_SOURCE -fno-builtin-memcmp -fno-builtin-memcpy \
-+	-fno-builtin-memcmp -fno-builtin-memcpy \
- 	-fno-builtin-memset -fno-builtin-strnlen \
- 	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
- 	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
-diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
-index 7b299ed5ff45..d6edcfcb5be8 100644
---- a/tools/testing/selftests/lib.mk
-+++ b/tools/testing/selftests/lib.mk
-@@ -196,6 +196,9 @@ endef
- clean: $(if $(TEST_GEN_MODS_DIR),clean_mods_dir)
- 	$(CLEAN)
- 
-+# Build with _GNU_SOURCE by default
-+CFLAGS += -D_GNU_SOURCE=
-+
- # Enables to extend CFLAGS and LDFLAGS from command line, e.g.
- # make USERCFLAGS=-Werror USERLDFLAGS=-static
- CFLAGS += $(USERCFLAGS)
-diff --git a/tools/testing/selftests/mm/thuge-gen.c b/tools/testing/selftests/mm/thuge-gen.c
-index d50dc71cac32..e4370b79b62f 100644
---- a/tools/testing/selftests/mm/thuge-gen.c
-+++ b/tools/testing/selftests/mm/thuge-gen.c
-@@ -13,7 +13,7 @@
-    sudo ipcs | awk '$1 == "0x00000000" {print $2}' | xargs -n1 sudo ipcrm -m
-    (warning this will remove all if someone else uses them) */
- 
--#define _GNU_SOURCE 1
-+#define _GNU_SOURCE
- #include <sys/mman.h>
- #include <linux/mman.h>
- #include <stdlib.h>
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index bc3925200637..8eaffd7a641c 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0
- # Makefile for net selftests
- 
--CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
-+CFLAGS +=  -Wall -Wl,--no-as-needed -O2 -g
- CFLAGS += -I../../../../usr/include/ $(KHDR_INCLUDES)
- # Additional include paths needed by kselftest.h
- CFLAGS += -I../
-diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-index 522d991e310e..bd88b90b902b 100644
---- a/tools/testing/selftests/net/tcp_ao/Makefile
-+++ b/tools/testing/selftests/net/tcp_ao/Makefile
-@@ -26,7 +26,7 @@ LIB	:= $(LIBDIR)/libaotst.a
- LDLIBS	+= $(LIB) -pthread
- LIBDEPS	:= lib/aolib.h Makefile
- 
--CFLAGS	:= -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing
-+CFLAGS	+= -Wall -O2 -g -fno-strict-aliasing
- CFLAGS	+= $(KHDR_INCLUDES)
- CFLAGS	+= -iquote ./lib/ -I ../../../../include/
- 
-diff --git a/tools/testing/selftests/proc/Makefile b/tools/testing/selftests/proc/Makefile
-index 6066f607f758..ee424a9f075f 100644
---- a/tools/testing/selftests/proc/Makefile
-+++ b/tools/testing/selftests/proc/Makefile
-@@ -1,6 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
- CFLAGS += -Wall -O2 -Wno-unused-function
--CFLAGS += -D_GNU_SOURCE
- LDFLAGS += -pthread
- 
- TEST_GEN_PROGS :=
-diff --git a/tools/testing/selftests/resctrl/Makefile b/tools/testing/selftests/resctrl/Makefile
-index 021863f86053..f408bd6bfc3d 100644
---- a/tools/testing/selftests/resctrl/Makefile
-+++ b/tools/testing/selftests/resctrl/Makefile
-@@ -1,6 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- 
--CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE
-+CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2
- CFLAGS += $(KHDR_INCLUDES)
- 
- TEST_GEN_PROGS := resctrl_tests
-diff --git a/tools/testing/selftests/ring-buffer/Makefile b/tools/testing/selftests/ring-buffer/Makefile
-index 627c5fa6d1ab..23605782639e 100644
---- a/tools/testing/selftests/ring-buffer/Makefile
-+++ b/tools/testing/selftests/ring-buffer/Makefile
-@@ -1,7 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0
- CFLAGS += -Wl,-no-as-needed -Wall
- CFLAGS += $(KHDR_INCLUDES)
--CFLAGS += -D_GNU_SOURCE
- 
- TEST_GEN_PROGS = map_test
- 
-diff --git a/tools/testing/selftests/riscv/mm/Makefile b/tools/testing/selftests/riscv/mm/Makefile
-index c333263f2b27..4664ed79e20b 100644
---- a/tools/testing/selftests/riscv/mm/Makefile
-+++ b/tools/testing/selftests/riscv/mm/Makefile
-@@ -3,7 +3,7 @@
- # Originally tools/testing/arm64/abi/Makefile
- 
- # Additional include paths needed by kselftest.h and local headers
--CFLAGS += -D_GNU_SOURCE -std=gnu99 -I.
-+CFLAGS += -std=gnu99 -I.
- 
- TEST_GEN_FILES := mmap_default mmap_bottomup
- 
-diff --git a/tools/testing/selftests/sgx/Makefile b/tools/testing/selftests/sgx/Makefile
-index 867f88ce2570..03b5e13b872b 100644
---- a/tools/testing/selftests/sgx/Makefile
-+++ b/tools/testing/selftests/sgx/Makefile
-@@ -12,7 +12,7 @@ OBJCOPY := $(CROSS_COMPILE)objcopy
- endif
- 
- INCLUDES := -I$(top_srcdir)/tools/include
--HOST_CFLAGS := -Wall -Werror -g $(INCLUDES) -fPIC
-+HOST_CFLAGS := -Wall -Werror -g $(INCLUDES) -fPIC $(CFLAGS)
- HOST_LDFLAGS := -z noexecstack -lcrypto
- ENCL_CFLAGS += -Wall -Werror -static-pie -nostdlib -ffreestanding -fPIE \
- 	       -fno-stack-protector -mrdrnd $(INCLUDES)
-diff --git a/tools/testing/selftests/tmpfs/Makefile b/tools/testing/selftests/tmpfs/Makefile
-index aa11ccc92e5b..3be931e1193f 100644
---- a/tools/testing/selftests/tmpfs/Makefile
-+++ b/tools/testing/selftests/tmpfs/Makefile
-@@ -1,6 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0-only
- CFLAGS += -Wall -O2
--CFLAGS += -D_GNU_SOURCE
- 
- TEST_GEN_PROGS :=
- TEST_GEN_PROGS += bug-link-o-tmpfile
--- 
-2.45.2.803.g4e1b14247a-goog
-
+I'm still waiting for this to show up. :)
 
