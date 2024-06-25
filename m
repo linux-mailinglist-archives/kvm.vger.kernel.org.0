@@ -1,108 +1,129 @@
-Return-Path: <kvm+bounces-20493-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20494-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75B50916ABB
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 16:41:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B3CB916B06
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 16:51:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7AA91C217B1
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 14:41:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13727B22049
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 14:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD65016D4CA;
-	Tue, 25 Jun 2024 14:40:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 572D616F0F6;
+	Tue, 25 Jun 2024 14:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G4PxwaZp"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9BA516CD0A
-	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 14:40:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 674F616D33B;
+	Tue, 25 Jun 2024 14:51:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719326416; cv=none; b=Q2o0nh2PxpImUXq+LyX4g2YADHleYexJzuUjUXGSBkotCE4QuY0MhKs8WGrOEyYnnACpSzDTDaonpxL2NpKS6aPw5LZvatGAwGi6huu23/AbaAEzftC4iSZXaAiw8FumXQ4jEjO7oKWk9S7D+21izoHBT5BkF9xTLheHbsUmuKs=
+	t=1719327065; cv=none; b=bshVKgYm+gcpbBDjMHOpzgxN4r4yDGUaRL6GJ4sT6tCIn6Zy5AuxKFWGpmCfvZeGzNFYM7O/khx5WR5iJZYQvME8v97GFKK2Y66X1bc1F+1KtdDyvm8MiU5SMRjU56LG6Q3lMyGLrRJGVigwJ6TvVRZSj3mvoJhpRlhWtDuKACE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719326416; c=relaxed/simple;
-	bh=g2OcnpR9Vr2xV3mX5BqIKQPIXjsSgI5slclVS1pdFUQ=;
+	s=arc-20240116; t=1719327065; c=relaxed/simple;
+	bh=h7/s1erSrTInKP/WfJXKAlirzQaaLfNgEqTkzmlNeWk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fO8e6EHnV+dSD8DN1eZAuC5iAGVYqIMTdZRcfnSPhsnEYExd0pZvIN5Q/J6yvAYbJ3IEIMDj6mUQRRSHOdx8NHTCmyWCza6c7Vyvg+QsfA3alreZbef4LSJ9kdezZhf9QYLtU3P/iwkLgnyJfL2OL8kxbhKjIpH+ll1sn5bwoGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3B633339;
-	Tue, 25 Jun 2024 07:40:39 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 16FDC3F73B;
-	Tue, 25 Jun 2024 07:40:12 -0700 (PDT)
-Date: Tue, 25 Jun 2024 15:40:10 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: Re: [PATCH 2/5] KVM: arm64: Get rid of HCRX_GUEST_FLAGS
-Message-ID: <20240625144010.GB1517668@e124191.cambridge.arm.com>
-References: <20240625130042.259175-1-maz@kernel.org>
- <20240625130042.259175-3-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=tmDV18FeomUYhiNpg9fqyM+OIVAi/7kIX7Dz+/X8TgxYypDPiIfn/pjnW3wwRiJDcx/1+ACMmajnThkeW2mdqIxWPuA2qx/EEYdCHQYc8bfIdJFDTR8o1djwPD212PJLKw2hXgPzolWgl+/U9ykImgwo4TsKP0rVj3i7N5lPmNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G4PxwaZp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82C64C32781;
+	Tue, 25 Jun 2024 14:51:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719327064;
+	bh=h7/s1erSrTInKP/WfJXKAlirzQaaLfNgEqTkzmlNeWk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G4PxwaZptC/mrLUYem2vzCWclAWJx9yUlEjjlguMsEA9cwvaZ4yPel74R2ZxiLnvR
+	 A2oNPJYNkBWtKFXwwhHJiaCYvXTF85t20gmIgjaqjwc1odeAUqS9bIF2/4hZKUwz3+
+	 6qqo97tDKElp69yt/8DzNYaYXcvGfR9a4QHsztGl/X50GjCD/s+0y+miYPoM0eB+Xi
+	 ev3nMUoY2hiJLqfosv4jiwJwBtFfZRh0wDz2YnKgLyxzrB7w0EEVm8/HHCOh+0QRa7
+	 Uvdv5NSIsVY142FaeawS/1wDcH5JjVEmljs2c60LL5lHTt3YwP/RWL8WfIenQjuzS/
+	 j64abmeLhVVmQ==
+Date: Tue, 25 Jun 2024 15:50:59 +0100
+From: Conor Dooley <conor@kernel.org>
+To: =?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <cleger@rivosinc.com>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Anup Patel <anup@brainfault.org>, Shuah Khan <shuah@kernel.org>,
+	Atish Patra <atishp@atishpatra.org>, linux-doc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org, kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org, linux-kselftest@vger.kernel.org,
+	Charlie Jenkins <charlie@rivosinc.com>
+Subject: Re: [PATCH v7 01/16] dt-bindings: riscv: add Zimop ISA extension
+ description
+Message-ID: <20240625-blimp-richly-f5828cbfe6a6@spud>
+References: <20240619113529.676940-1-cleger@rivosinc.com>
+ <20240619113529.676940-2-cleger@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="9PA0Wx6xMQTCxIcL"
 Content-Disposition: inline
-In-Reply-To: <20240625130042.259175-3-maz@kernel.org>
+In-Reply-To: <20240619113529.676940-2-cleger@rivosinc.com>
 
-On Tue, Jun 25, 2024 at 02:00:38PM +0100, Marc Zyngier wrote:
-> HCRX_GUEST_FLAGS gives random KVM hackers the impression that
-> they can stuff bits in this macro and unconditionally enable
-> features in the guest.
-> 
-> In general, this is wrong (we have been there with FEAT_MOPS,
-> and again with FEAT_TCRX).
-> 
-> Document that HCRX_EL2.SMPME is an exception rather than the rule,
-> and get rid of HCRX_GUEST_FLAGS.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
+
+--9PA0Wx6xMQTCxIcL
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jun 19, 2024 at 01:35:11PM +0200, Cl=E9ment L=E9ger wrote:
+> Add description for the Zimop (May-Be-Operations) ISA extension which
+> was ratified in commit 58220614a5f of the riscv-isa-manual.
+>=20
+> Signed-off-by: Cl=E9ment L=E9ger <cleger@rivosinc.com>
+> Reviewed-by: Charlie Jenkins <charlie@rivosinc.com>
+
+Acked-by: Conor Dooley <conor.dooley@microchip.com>
+
 > ---
->  arch/arm64/include/asm/kvm_arm.h | 1 -
->  arch/arm64/kvm/sys_regs.c        | 8 +++++++-
->  2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> index e6682a3ace5af..d81cc746e0ebd 100644
-> --- a/arch/arm64/include/asm/kvm_arm.h
-> +++ b/arch/arm64/include/asm/kvm_arm.h
-> @@ -102,7 +102,6 @@
->  #define HCR_HOST_NVHE_PROTECTED_FLAGS (HCR_HOST_NVHE_FLAGS | HCR_TSC)
->  #define HCR_HOST_VHE_FLAGS (HCR_RW | HCR_TGE | HCR_E2H)
->  
-> -#define HCRX_GUEST_FLAGS (HCRX_EL2_SMPME)
->  #define HCRX_HOST_FLAGS (HCRX_EL2_MSCEn | HCRX_EL2_TCR2En | HCRX_EL2_EnFPM)
->  
->  /* TCR_EL2 Registers bits */
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 71996d36f3751..8e22232c4b0f4 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -4062,7 +4062,13 @@ void kvm_init_sysreg(struct kvm_vcpu *vcpu)
->  		vcpu->arch.hcr_el2 |= HCR_TTLBOS;
->  
->  	if (cpus_have_final_cap(ARM64_HAS_HCX)) {
-> -		vcpu->arch.hcrx_el2 = HCRX_GUEST_FLAGS;
-> +		/*
-> +		 * In general, all HCRX_EL2 bits are gated by a feature.
-> +		 * The only reason we can set SMPME without checking any
-> +		 * feature is that its effects are not directly observable
-> +		 * from the guest.
-> +		 */
-> +		vcpu->arch.hcrx_el2 = HCRX_EL2_SMPME;
->  
->  		if (kvm_has_feat(kvm, ID_AA64ISAR2_EL1, MOPS, IMP))
->  			vcpu->arch.hcrx_el2 |= (HCRX_EL2_MSCEn | HCRX_EL2_MCE2);
+>  Documentation/devicetree/bindings/riscv/extensions.yaml | 5 +++++
+>  1 file changed, 5 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Do=
+cumentation/devicetree/bindings/riscv/extensions.yaml
+> index cfed80ad5540..e214679ab6da 100644
+> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> @@ -363,6 +363,11 @@ properties:
+>              ratified in the 20191213 version of the unprivileged ISA
+>              specification.
+> =20
+> +        - const: zimop
+> +          description:
+> +            The standard Zimop extension version 1.0, as ratified in com=
+mit
+> +            58220614a5f ("Zimop is ratified/1.0") of the riscv-isa-manua=
+l.
+> +
+>          - const: ztso
+>            description:
+>              The standard Ztso extension for total store ordering, as rat=
+ified
+> --=20
+> 2.45.2
+>=20
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+--9PA0Wx6xMQTCxIcL
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnrZUwAKCRB4tDGHoIJi
+0h+2AQD3yl1OivAnczjSlHzmMNfjOS/06MsBmq0xtbv8bTLpNAD/RzbgHtntHnej
+NyEPsFHW7yXdXAU1j8rFsiMmhti6igo=
+=/o9k
+-----END PGP SIGNATURE-----
+
+--9PA0Wx6xMQTCxIcL--
 
