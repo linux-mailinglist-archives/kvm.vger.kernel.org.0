@@ -1,137 +1,125 @@
-Return-Path: <kvm+bounces-20506-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20507-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 251209174AC
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 01:27:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 282599174C9
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 01:34:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4970281E6D
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 23:27:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 566FB1C2017E
+	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 23:34:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECED217F500;
-	Tue, 25 Jun 2024 23:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC21180A7E;
+	Tue, 25 Jun 2024 23:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lFNLoKxi"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="V/wG5oku"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8319917D88C
-	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 23:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBD817F4F5
+	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 23:34:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719358030; cv=none; b=AtodAW1mGt7lLL0D03Z6umer7xNRIWjjyYNgn2mrA3d1GhnnNyg1oOJbvFbIW/+nfzFN2CKo2mz/iE4VWJIIHD2POlxk/Gaa4ZwaoCdfY7jWu70RfViIASy5rnicx7xv9JSsO/J2wWBzFy9kl+FrooAnqQ8hxK3N0WdXtLXNpzU=
+	t=1719358458; cv=none; b=atCAg0Wb6FhupXMrl98N2eCpElVjfyKIRcnq5RmSUUuN3P1iPx9x2q4hadMsMk1F+MZf+wk4js6kb2tmyDhauk5KresUcwArUDYnAQBrMcxlMQm60yUaQRPpJhU3Ma2onXEdmxDuCsWDGd98oMHepi3R8fAG7AHawgYl8R92Y8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719358030; c=relaxed/simple;
-	bh=rYYmEPcqcQ9NMGqGAnMHOlrWwSNiwufqAydwaFEWLrQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HV7cyTdtodF/po6XruvJffdigyfBlB2fP4+0MeOjKcGmTTOGYglm6XGPKpNlynaIa1zkmkv9LxIkVzvqJvRcfReC3TZmeFs5coL3YA+Vr2d6u7d0b+Iwwp0bETvgs0EieOn6p3cYIO5cej3QnAvgQ56Guz7OS1joW3lx+NBev3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lFNLoKxi; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso3286a12.0
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 16:27:08 -0700 (PDT)
+	s=arc-20240116; t=1719358458; c=relaxed/simple;
+	bh=JW5+38U/vcohXyeiKPUGkpLsj7sweQrd3uPWwGSP2dA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PeT5FvlGv0EKPEAUyzs1ZiArdy23nzQ0J1Oois1L+i5TGTRzUboFTYjU2/eWIwq5/cNHe/DUiTktLBwCz5ACXypiaBzcxS91Ie5CTKOAIg8z0NKFHDidWpgLy4WRqKqI7WNfffBA5G3wkKAiBFWgVHlcQXXG5vuz2z4pfim/W+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=V/wG5oku; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3745eb24ffaso3359785ab.1
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 16:34:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719358027; x=1719962827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S96OdWC18KC7h+HryfBM4Z35r1uFfJ2/I3Xrp+/QQmM=;
-        b=lFNLoKxiGwCm7kqHfExztxX597bCTfR36Rh6pYFZ8DRNCpjY0hZv8VbAVy2xfBv20h
-         rVQJw2iaQ94vAD1HhOSY+WyNSOVIYeUc1EwBI0fEyB3r/wmmBT6NGt8suwNTZAfInPn4
-         lRRcVHCvFCn/t7HxDlnR+z/Ev3MIGyhvRUgN6wyMMO9llrIWo8P6JwPLDeCGYk/vcXa/
-         lXcwmSITxkGXIIdCyj48PFSHHQJVbUKUpjq4CL/kKg4BIzkhi+uw8GC/R3ASf4lNgZMc
-         FU7XNNDB0ygEj8a84O/cguHTHkSZZyimwb2BMMmIHFmWfZQBe3jv4mjv5/BbYC34TRE2
-         NEPA==
+        d=linuxfoundation.org; s=google; t=1719358455; x=1719963255; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fLoxHe91BqYGbErrOqOVZAihyCRQ1/q/QL1BRJCrC+o=;
+        b=V/wG5okuWv18Vfa9pCOLL2nMRWl0biru0lnT4hzlLivPncC8sUFRvm6gMENvRd81ux
+         QxzPGLVY1A39TY2Xzr/l8CPnCCX9uwuvpizox9qSO1liYdMtH4JUSn4TZnVi60Ig1RYx
+         IIvjxXMb9wbIZszaG50NROd83GnyXknc7sdyA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719358027; x=1719962827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S96OdWC18KC7h+HryfBM4Z35r1uFfJ2/I3Xrp+/QQmM=;
-        b=m5m9P+gFYVvgp5J4UMMbZP01xlpTVjSCudQZqRhm+/tmvaQhrPSI0HQMqwgSs6RTIx
-         S1hSu2zo5tb3JUqKjF1MCV5D6GeZKq1LHumDDO798hToEVKYq5Z9+T6AAV6BqRoVDVXh
-         1AcgLOiuEwIxMRqAaV2MEMTKFaUUXEU/D339CGommDuOryeglWb8m1bs2M4AkCqfFoKT
-         HA8vX8eSljGO1F5OGRZpLKW7jitYzXuOsYKCmxQiufdYIVTpexgyQTI5kPJbBxraEbeO
-         3SwuamGUHDXaZqxzxOkioQ84kK6Dng8xuOwRMi74Frz2dr36Q7oYd91LaRrTgINQ3Lvj
-         iwUw==
-X-Gm-Message-State: AOJu0Yyx1T48yJH2UN/B8dC1/SjFRwl99UBBMOyQuDlY8VxdmS1sFSga
-	WL36wJOOhRFJGI2oLvdqb6/TS6vfaSEhusp41yln30HOcOKq8RdgB/OfOAy88RWWtGOF82IUi4R
-	99Zx7OwXKpHj/BiWRbpjm+1hjld8oXOss+RaNlGuBry5spm1KAWb9
-X-Google-Smtp-Source: AGHT+IFxVSonzGYibIBkNz88obJaOkfp6dpG3dswKL2fmlAw6lj/gtC8qtIwQBCVLXne/B5Sr4ewb3GEPtVn2Qkf7eY=
-X-Received: by 2002:a05:6402:27cf:b0:57d:6e52:fff6 with SMTP id
- 4fb4d7f45d1cf-58359057f79mr45571a12.5.1719358026508; Tue, 25 Jun 2024
- 16:27:06 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1719358455; x=1719963255;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fLoxHe91BqYGbErrOqOVZAihyCRQ1/q/QL1BRJCrC+o=;
+        b=gS4EmXSEO3ENr1Sy7yClXq6f3ks+0SZ1hsi/00ywCT3rMKccAfLSXdA23nQjTcq5LN
+         RmENDPg5pOZPm04wZEzT9sIEiz0oG5Cz2Y0XRSw58TO6TEe6M5Y5Wk7TejUBzmPDT8OF
+         Xl+evtuLr9hFhUaP8YkHHiEt9p8KNKhT7Qaz5tQQB8vL8yt1UG2UsN72XFCFUUOry9fz
+         ZAylSfHTlVwtRC3xbJ5mKLjpXXBdsaqa1/Fq/ejYmkt6VvtVQehXTA8+nuoH1PH8PlN/
+         5s1yiWxfRGD9kTjZXmmqkm1X4aeKgdeQ7YOweh5Cl/Q8+GSnHayEo+niMjLfNCwOtp0W
+         t2Dw==
+X-Forwarded-Encrypted: i=1; AJvYcCX3lNCDFuAYUgTPc/9uB+Xrznd7sysMhm9mxqFQHJtKrmb9oFcj0wCBQjXh95443eweifwBQ0UZ03T112l4XtBbse1A
+X-Gm-Message-State: AOJu0YwiM87Guu/Zt4GRFfV2EoZBHADK3VETqTKVSHuMf2DKK+4ivJs0
+	75HLjGvHbIFlGnK/C6KvUliscq4ciu/+7yTnxae0ZxPlOXIUDL6qd5kTiJ0cIn0=
+X-Google-Smtp-Source: AGHT+IHFxsdnrHHCJW39/Lbu9cUGENC+vnEtRYVDBjLq63CwNtPtBkCUmNgYxOl/tyW+mRbcBoYz8w==
+X-Received: by 2002:a05:6602:3148:b0:7f3:9ef8:30a4 with SMTP id ca18e2360f4ac-7f39ef8334dmr991110139f.1.1719358455001;
+        Tue, 25 Jun 2024 16:34:15 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4bb458ba8efsm645345173.8.2024.06.25.16.34.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 25 Jun 2024 16:34:14 -0700 (PDT)
+Message-ID: <f975fe76-92f4-4af0-a91d-0f3d8938f6b2@linuxfoundation.org>
+Date: Tue, 25 Jun 2024 17:34:13 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f6bca5b0f9fc1584ef73d8ef71ac25e2c656b81e.camel@redhat.com>
- <ZmxTFFt1FdkJb6wK@google.com> <3a3e1514fb48b415b46045c76969cc211198b114.camel@redhat.com>
-In-Reply-To: <3a3e1514fb48b415b46045c76969cc211198b114.camel@redhat.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Tue, 25 Jun 2024 16:26:50 -0700
-Message-ID: <CALMp9eTmez1TrQ6i+R8p7qJrkBNgTS8Xwf2XPw=x2RDcwe3Ekw@mail.gmail.com>
-Subject: Re: kvm selftest 'msr' fails on some skylake cpus
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, Maxim Levitsky <mlevitsk@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 00/13] Centralize _GNU_SOURCE definition into lib.mk
+To: Andrew Morton <akpm@linux-foundation.org>, Edward Liaw <edliaw@google.com>
+Cc: linux-kselftest@vger.kernel.org, Eric Biederman <ebiederm@xmission.com>,
+ Kees Cook <kees@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Peter Zijlstra <peterz@infradead.org>, Darren Hart <dvhart@infradead.org>,
+ Davidlohr Bueso <dave@stgolabs.net>, =?UTF-8?Q?Andr=C3=A9_Almeida?=
+ <andrealmeid@igalia.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Kevin Tian <kevin.tian@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>, linux-kernel@vger.kernel.org,
+ usama.anjum@collabora.com, seanjc@google.com, kernel-team@android.com,
+ linux-mm@kvack.org, iommu@lists.linux.dev, kvm@vger.kernel.org,
+ netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-sgx@vger.kernel.org,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20240624232718.1154427-1-edliaw@google.com>
+ <20240625135234.d52ef77c0d84cb19d37dc44f@linux-foundation.org>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20240625135234.d52ef77c0d84cb19d37dc44f@linux-foundation.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 17, 2024 at 11:29=E2=80=AFAM Maxim Levitsky <mlevitsk@redhat.co=
-m> wrote:
->
-> On Fri, 2024-06-14 at 07:26 -0700, Sean Christopherson wrote:
-> > On Thu, Jun 13, 2024, Maxim Levitsky wrote:
-> > > Hi!
-> > >
-> > > This kvm unit test tests that all reserved bits of the MSR_IA32_FLUSH=
-_CMD #GP, but apparently
-> > > on some systems this test fails.
-> > >
-> > > For example I reproduced this on:
-> > >
-> > > model name  : Intel(R) Xeon(R) CPU E3-1260L v5 @ 2.90GHz
-> > > stepping    : 3
-> > > microcode   : 0xf0
-> > >
-> > >
-> > > As I see in the 'vmx_vcpu_after_set_cpuid', we passthough this msr to=
- the guest AS IS,
-> > > thus the unit test tests the microcode.
-> > >
-> > > So I suspect that the test actually caught a harmless microcode bug.
-> >
-> > Yeah, we encountered the same thing and came to the same conclusion.
-> >
-> > > What do you think we should do to workaround this? Maybe disable this=
- check on
-> > > affected cpus or turn it into a warning because MSR_IA32_FLUSH_CMD re=
-served bits
-> > > test doesn't test KVM?
-> >
-> > Ya, Mingwei posted a patch[*] to force KVM to emulate the faulting acce=
-sses, which
-> > more or less does exactly that, but preserves a bit of KVM coverage.  I=
-'ll get a
-> > KUT pull request sent to Paolo today, I've got a sizeable number of cha=
-nges ready.
-> >
-> > [*] https://lore.kernel.org/all/20240417232906.3057638-3-mizhang@google=
-.com
-> >
->
-> This works for me.
-> Thanks,
->
-> Best regards,
->         Maxim Levitsky
+On 6/25/24 14:52, Andrew Morton wrote:
+> On Mon, 24 Jun 2024 23:26:09 +0000 Edward Liaw <edliaw@google.com> wrote:
+> 
+>> Centralizes the definition of _GNU_SOURCE into lib.mk and addresses all
+>> resulting macro redefinition warnings.
+>>
+>> These patches will need to be merged in one shot to avoid redefinition
+>> warnings.
+> 
+> Yes, please do this as a single patch and resend?
 
-Sean and/or Paolo,
+Since the change is limited to makefiles and one source file
+we can manage it with one patch.
 
-I'm still waiting for this to show up. :)
+Please send single patch and I will apply to next and we can resolve
+conflicts if any before the merge window rolls around.
+
+thanks,
+-- Shuah
 
