@@ -1,100 +1,187 @@
-Return-Path: <kvm+bounces-20564-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20565-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 069A5918708
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 18:14:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7A9F918725
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 18:18:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 090BF1C22DF6
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 16:14:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA8EA1C22851
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 16:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6839218F2D1;
-	Wed, 26 Jun 2024 16:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA3E18EFF5;
+	Wed, 26 Jun 2024 16:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="o9mZYRiB"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dyj6u244"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38DB718FC65
-	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 16:11:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAE2181CE1
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 16:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719418283; cv=none; b=QXOvjhKE9qLt2m4jwkqW9fr9kfmfR6M4VczPkr9Pz9q4WZBFdsuc7/DRA8iV1KNY4PdOCdFYA/PLAP0jrMngF4XIrD/PjPqwNah6ROJ+ibUsjWvhSOA9cLuuaNX6kFeRldd8deAijQZ8UoAhrnJezKfnVzMZfG7FGLyiLz0D6o0=
+	t=1719418685; cv=none; b=j6wGc/V4SF/3XsPLAykEQgQex8r1M22wp/dYQ/X2vOXEYso2YcVPIx20jl6XixjPdu1xe1ok8FfYVBL5ShXBC7QPKgHOLiOvknP5I5NnFdQuETfSKvTZte6bjWO1GJLV6nY7w0tAjNo8H1wj6i70kVGpP39YLT7Dr6GU4liBPt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719418283; c=relaxed/simple;
-	bh=6hPh2jNpnxRa+iRt/wOd9PFb9G5Q4pISzFnEJuLmEMc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iGzv2C034ZP/0Qh2cKckyvJcjrWmmpJ+3c05Wlt/LzT84ZAqdYCVgFhcR60sJwbFqjqccwwhwmtRBiA5qXYCnTafmQtlG/qm0Gt1SrQCJD5Kg8BIH2lx3IUAoRZSFyRuCnRqRFAn333Xiv3m69z7dzENo/QjOO4p5ydBKJC9ttI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=o9mZYRiB; arc=none smtp.client-ip=209.85.215.169
+	s=arc-20240116; t=1719418685; c=relaxed/simple;
+	bh=D+1RmGdHktCfyEPUpa/XJuiM3as8ij+ZNbuGlJ8Z1AY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=pYXFCFGPHax+NL62XGPpq5yL+7byiKeWBoMPj/NR0kbHdvAL7It4ED9hJjFUP8RcuZTcCxK1CRIYHGwO9CMNGwgjfX5wzZNsltm8scWrS9dHrk40oA3OilGPV6BmujRH1e4IlEXLEebc1cvpuTxu5iyZIwPtBKqoxWWIezf7G6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dyj6u244; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-709423bc2e5so5340532a12.0
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 09:11:22 -0700 (PDT)
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ec1620a956so82825251fa.1
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 09:18:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1719418281; x=1720023081; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6hPh2jNpnxRa+iRt/wOd9PFb9G5Q4pISzFnEJuLmEMc=;
-        b=o9mZYRiBTDmvF1xQOvyURFP2Hg0NDIG9F8NdiGVgbPunfQXgTvcVGYlJUiP/7C/Z/D
-         Rwbo5Y3jm8QGrmtxOF65wTHwhd4waHkJMIdXd04/VUtW5JSGEL/CIqUkq/wjrPL4LuJ5
-         z3ebYqTJ3AgHjaNr7+2hynmVrYjpt+08UMQbDEuK1Ned5vSp/pmkmMW67FkQy5+02J7R
-         iLdzup2f3BbwSudIT2JAz1KR+hvjvs/Ja9Ur1kmu+6KK6qcf0UIAf80+Tu+NVnE2CeS6
-         JL+OCXoxrbcjpFLD1vsKebzvzVBJnj+OZZk550BJY8BwNRP2VibW1XSqdXihoPkauR0P
-         2juw==
+        d=linaro.org; s=google; t=1719418681; x=1720023481; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DcB6IPPrpjOpTbKaDWEUmYeQ2UAfTwqRY22CEK/B2iA=;
+        b=dyj6u244wogGgX94yQHZBjBhaCWdN3B5iw0I+vV2cLoR0nA0QPfIDa/TLMkpayQkgV
+         mTLW+q36f0Y7espi0kiPktdzitbGwXksWBxM4VUIB/bBJfISeMMkHlNi8IPxIDILD2xW
+         i1mrKrU0+uwpoWu3JU2r17FPaNa38bWyGQZE4D2gYcoG4MeJ7t4/FNHaU1oss+M2zQb9
+         YieX3KpHSIZzMYRHct1H7eOes33Z/VU5n5DONJVqrFaMTult3wFpCgbAAsC4U2wuHy/u
+         l5Mmfu7P4UCKNsJe4Ljv+Qwfco9w5ZNEA7pFwokk7JQvkIXuoJWI+afN17JczRedJq2G
+         mNdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719418281; x=1720023081;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6hPh2jNpnxRa+iRt/wOd9PFb9G5Q4pISzFnEJuLmEMc=;
-        b=RjXX967MuwLWGxUVKPRZ4hLgYXN1WRy0J3WSFTjaDX8BT94jD9lSLZkIMMT4BXCs+Y
-         eQeCP77YnYjs9iGKLAjIn4tItXfbeFNgJBo1gUkvxhHO0Fd4IJIQEj6gn1UNy3GEA6P8
-         rhOz2VwUd0rC47iW63+ZdajWUrYk459OIet2Phl1IqNPufB4v4MtINBZjjUtrd5ZwG5s
-         bGIXoxyWqiBtu8xWWKF0kDIIYThSm3QQpy0O+GSsGglGMy0dtdezCkc/26hn46uXd69S
-         gMqAFmdnmDq5AJ6ScAENTcrL8firUWRqqpnBm3/d4VodTAHKACwLxwx0Nsd4tmDvjr2k
-         xhBw==
-X-Forwarded-Encrypted: i=1; AJvYcCVlpfcvVU8oyUeKIN45NpfCRWo0rgCiHUndjvaG+zqyPqxyw/mX4v+koVfG4C43hGYgjaJ51YgbxB+VM0g7ASiKNXCF
-X-Gm-Message-State: AOJu0YxkKcb6aeQ0r1fbAHNEI0Htm5C7CkFn1OvBre2W30GruSvBV8Ed
-	aj3M/xC3NFzIx8zzsL6Ti/vpPeZNTQGh1n4sc0IdmGfInJYOgD3CepvW2umxIzA=
-X-Google-Smtp-Source: AGHT+IHC47SL3YL58+TOsXVm5csg84mkvIQSRf8ZA9YqVU1DF5X2zyje9Qa6k3HZFU0AH++1GHXfSw==
-X-Received: by 2002:a05:6a20:da90:b0:1b4:da55:e1be with SMTP id adf61e73a8af0-1bcf7e75050mr14143102637.14.1719418281472;
-        Wed, 26 Jun 2024 09:11:21 -0700 (PDT)
-Received: from [192.168.0.4] (174-21-76-141.tukw.qwest.net. [174.21.76.141])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7069b36b540sm3308925b3a.66.2024.06.26.09.11.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 26 Jun 2024 09:11:21 -0700 (PDT)
-Message-ID: <730a96e7-4e8b-4d67-b7f2-1362d7473be7@linaro.org>
-Date: Wed, 26 Jun 2024 09:11:19 -0700
+        d=1e100.net; s=20230601; t=1719418681; x=1720023481;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DcB6IPPrpjOpTbKaDWEUmYeQ2UAfTwqRY22CEK/B2iA=;
+        b=JjaO6iknlgvSH+FfTaFDgj3+iQB17rEI80BwVFtlZX5QWPV4bbpGVCvAJu7HGXQobe
+         UDlgnD0Ob9JyeZt3OuONhcqDN2bAbJRLxgcmZFg5/mZim3gzV+ynl8jw2e61HLVkXSyn
+         s63ILHFnwZCLnJwA/ipMuZEnU8GCl+6TrpNrXZf5OAv881M6qL2qaTX7dnoHwZCfU7dU
+         OWTEyBXvTVii+3dSC2VSLEZybYvpZ3AFX7bJChtgEG0+aHhlxfDamDC3Gz189OaIjhj3
+         58JP4yIw04gMSmElPoNdbho0Fhn/X8HsKnJZdQN7Sj/gMFwOeq0xZsW38h/piOjNu9Wr
+         axkg==
+X-Forwarded-Encrypted: i=1; AJvYcCW6OsaGmujQ8+dBbkICJC9K0LPa6l2jrAG4fPEbLnWia2kb+tvq9diBT6R7TNJmAwX21CGEsO3brgoDXySE0+EPj+ov
+X-Gm-Message-State: AOJu0YwzJSMqhcFdloVxLhgYSopseSq21Y0e1H00uDItOXEq9hU6il2b
+	y+BKk8CerpS1rVXIuNuzFlhsaEntywSvd/9zaE19IQzRKVA15HkMKc5ZNNg4W9OOvT41h6vk9LI
+	h
+X-Google-Smtp-Source: AGHT+IFfXwEtsh+T/sDn+2rc5XBZnHCaEiUAyswzSvtd5UKEMWXGnkc3/U4D8XcR5I/y5ovhWxbUow==
+X-Received: by 2002:a05:651c:211d:b0:2ec:5dfc:a64e with SMTP id 38308e7fff4ca-2ec5dfca6demr78654281fa.0.1719418681072;
+        Wed, 26 Jun 2024 09:18:01 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-581e920112dsm1974823a12.93.2024.06.26.09.18.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 09:18:00 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 78D215F8AA;
+	Wed, 26 Jun 2024 17:17:59 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org,  Paolo Bonzini <pbonzini@redhat.com>,  Marcelo
+ Tosatti <mtosatti@redhat.com>,  "open list:X86 KVM CPUs"
+ <kvm@vger.kernel.org>
+Subject: Re: [RFC PATCH] target/i386: restrict SEV to 64 bit host builds
+In-Reply-To: <ZnwjtOxQy1iiRoFh@redhat.com> ("Daniel P. =?utf-8?Q?Berrang?=
+ =?utf-8?Q?=C3=A9=22's?= message of
+	"Wed, 26 Jun 2024 15:20:36 +0100")
+References: <20240626140307.1026816-1-alex.bennee@linaro.org>
+	<ZnwjtOxQy1iiRoFh@redhat.com>
+Date: Wed, 26 Jun 2024 17:17:59 +0100
+Message-ID: <87r0cjoeyw.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH] target/i386: restrict SEV to 64 bit host builds
-To: =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- qemu-devel@nongnu.org
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marcelo Tosatti
- <mtosatti@redhat.com>, "open list:X86 KVM CPUs" <kvm@vger.kernel.org>
-References: <20240626140307.1026816-1-alex.bennee@linaro.org>
-Content-Language: en-US
-From: Richard Henderson <richard.henderson@linaro.org>
-In-Reply-To: <20240626140307.1026816-1-alex.bennee@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 6/26/24 07:03, Alex Bennée wrote:
-> While the format
-> strings could use more portable types there isn't much we can do about
-> casting uint64_t into a pointer.
+Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
 
-Use uintptr_t, obviously.
+> On Wed, Jun 26, 2024 at 03:03:07PM +0100, Alex Benn=C3=A9e wrote:
+>> Re-enabling the 32 bit host build on i686 showed the recently merged
+>> SEV code doesn't take enough care over its types. While the format
+>> strings could use more portable types there isn't much we can do about
+>> casting uint64_t into a pointer. The easiest solution seems to be just
+>> to disable SEV for a 32 bit build. It's highly unlikely anyone would
+>> want this functionality anyway.
+>>=20
+>> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+>> ---
+>>  target/i386/sev.h       | 2 +-
+>>  target/i386/meson.build | 4 ++--
+>>  2 files changed, 3 insertions(+), 3 deletions(-)
+>>=20
+>> diff --git a/target/i386/sev.h b/target/i386/sev.h
+>> index 858005a119..b0cb9dd7ed 100644
+>> --- a/target/i386/sev.h
+>> +++ b/target/i386/sev.h
+>> @@ -45,7 +45,7 @@ typedef struct SevKernelLoaderContext {
+>>      size_t cmdline_size;
+>>  } SevKernelLoaderContext;
+>>=20=20
+>> -#ifdef CONFIG_SEV
+>> +#if defined(CONFIG_SEV) && defined(HOST_X86_64)
+>>  bool sev_enabled(void);
+>>  bool sev_es_enabled(void);
+>>  bool sev_snp_enabled(void);
+>> diff --git a/target/i386/meson.build b/target/i386/meson.build
+>> index 075117989b..d2a008926c 100644
+>> --- a/target/i386/meson.build
+>> +++ b/target/i386/meson.build
+>> @@ -6,7 +6,7 @@ i386_ss.add(files(
+>>    'xsave_helper.c',
+>>    'cpu-dump.c',
+>>  ))
+>> -i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c', 'confident=
+ial-guest.c'))
+>> +i386_ss.add(when: ['CONFIG_SEV', 'HOST_X86_64'], if_true: files('host-c=
+pu.c', 'confidential-guest.c'))
+>>=20=20
+>>  # x86 cpu type
+>>  i386_ss.add(when: 'CONFIG_KVM', if_true: files('host-cpu.c'))
+>> @@ -21,7 +21,7 @@ i386_system_ss.add(files(
+>>    'cpu-apic.c',
+>>    'cpu-sysemu.c',
+>>  ))
+>> -i386_system_ss.add(when: 'CONFIG_SEV', if_true: files('sev.c'), if_fals=
+e: files('sev-sysemu-stub.c'))
+>> +i386_system_ss.add(when: ['CONFIG_SEV', 'HOST_X86_64'], if_true: files(=
+'sev.c'), if_false: files('sev-sysemu-stub.c'))
+>>=20=20
+>>  i386_user_ss =3D ss.source_set()
+>
+> Instead of changing each usage of CONFIG_SEV, is it better to
+> prevent it getting enabled in the first place ?
+>
+> eg. move
+>
+>   #CONFIG_SEV=3Dn
+>
+> From
+>
+>   configs/devices/i386-softmmu/default.mak
+>
+> to
+>
+>   configs/devices/x86_64-softmmu/default.mak
+>
+> And then also change
+>
+>   hw/i386/Kconfig
+>
+> to say
+>
+>   config SEV
+>       bool
+>       select X86_FW_OVMF
+>       depends on KVM && X86_64
 
+I was wondering if I could do it all with Kconfig. Will respin thanks.
 
-r~
+>
+>
+> With regards,
+> Daniel
+
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
