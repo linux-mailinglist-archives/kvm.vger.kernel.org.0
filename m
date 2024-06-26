@@ -1,133 +1,102 @@
-Return-Path: <kvm+bounces-20531-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20532-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F13B69179D8
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 09:38:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5198917A9A
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 10:14:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CE9FB231E4
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 07:37:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B81011C23C2F
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 08:13:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FA315F32D;
-	Wed, 26 Jun 2024 07:37:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBAEE1607B6;
+	Wed, 26 Jun 2024 08:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LTSGT5eJ"
+	dkim=pass (1024-bit key) header.d=zoho.com header.i=ToddAndMargo@zoho.com header.b="Lv5HBcm4"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from sender4-pp-o91.zoho.com (sender4-pp-o91.zoho.com [136.143.188.91])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD8721FBB;
-	Wed, 26 Jun 2024 07:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719387455; cv=none; b=q2FrthtLFHTUixRtxswg9sC8GZlkfRt+oYbT2YQ0cIuwjWpQjsWZ2ohKkul02icY29on53y8tRlP4p4Y/UD9X3l9ppz4VzeawAJxVLaaWLRKJUL9nM9egDXxgfa9WTFDcTAsW60xM09YimL0CHHWnlDSs8KqE3wkyCXt68EOAA8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719387455; c=relaxed/simple;
-	bh=ndOzFlNF7mgXZbFomdTEHkww/+uY25Qtzri+zDpcuNU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DnOeX7IQQkhygJz9q3N2BuTq6udat8f3pF2W+BgKCqo+gmwNHKSVbRyiGjd4sCr1Dxv/k6ishLCIvQF5G3XwK9mrmCXFrC9vQXALQbjHEo2CG13gkhEzbGukrTSnzGsti/NtEGAacikMPRbkLVttjkHFPY/MCvP+1xuciInqNYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LTSGT5eJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 903C5C32789;
-	Wed, 26 Jun 2024 07:37:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719387455;
-	bh=ndOzFlNF7mgXZbFomdTEHkww/+uY25Qtzri+zDpcuNU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=LTSGT5eJpaTgQVTluRtjprVjIcx53X7vmbk1X7v+8wg93zEvg+wfgByOPa2yjy4Aq
-	 isnyIW4pGbQ9hZTyoRjVCtHzkfC8d2jQHzUJrYUGhIVwNZ2b4hyAv5jd+aEMgmGEj3
-	 xmFuYL2l5mF42JYtCjwMrGcOzrJ1bEz2A2c4R0ecUYjQAE/OeTT7T6t11zHwTVsSj7
-	 Xe6fgdpTYunXVod1KtwtENq3wJx89AzVH2UkCJf9mzBLjoDEaMtjgzcsVmovTkeKLu
-	 FSPtXdzza1bzyhaSWyYh7q7y8weh/yGVRBQ1Qaepj0MqV9NpFE9ZCDNdHel4+Nqyth
-	 BGFfrj+djDicg==
-From: Amit Shah <amit@kernel.org>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	x86@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: amit.shah@amd.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	kim.phillips@amd.com,
-	david.kaplan@amd.com
-Subject: [PATCH v2] KVM: SVM: let alternatives handle the cases when RSB filling is required
-Date: Wed, 26 Jun 2024 09:37:19 +0200
-Message-ID: <20240626073719.5246-1-amit@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DA215FA75
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 08:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.91
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719389628; cv=pass; b=H/rxJbLVUP5lrhmXCC2wpXxYYPQ8/a6wyhgt56HU4YLEaAbprzQh/tGEBnKrceHXE0xBFxQaJfDxV5iTUMhVqdQJfMugdanoHxPXMwJYGGkh6owNSczRPHjkGaUn1swEGiC2hHN4N1ehhpbdnpUfjxHUVbofwjE+m5mXwWlYjIY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719389628; c=relaxed/simple;
+	bh=vjyQh6Lnb/dhBS20q4sa/HtsnfRzFddK5U3+D3yj/m4=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Content-Type; b=HKmRdkEjyJXeUm+NOM9b50KLcMe2+SJUzpT1/i96RVfLxBNVD/JUWzhRuimHQRp71vcr5bR2yS283qXDHgAIi3c38keQ23f8xrDeRFXrYxOffPLd/+CRQMraVYpeU1YVdCO0wRjvr9Y+wpkrJc3kCBNuNmSYLKl6jRWLkXarCOs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zoho.com; spf=pass smtp.mailfrom=zoho.com; dkim=pass (1024-bit key) header.d=zoho.com header.i=ToddAndMargo@zoho.com header.b=Lv5HBcm4; arc=pass smtp.client-ip=136.143.188.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=zoho.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zoho.com
+ARC-Seal: i=1; a=rsa-sha256; t=1719389625; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=OOZ27MWdyj0biVxvsbgrBiCvktkhYoMl/YZ+ivJggNpVEdBscFpUGBNuSIKW8YcwRPdT/q0wow8GvAqzwLeShWwoehjBcEaYZPHB5PEZWX1EWGmzc61mXqSiupZE6c3l6BWU1T3z1uK0LHGZp91QzyEAruiF6PXvCy0oqus4dUk=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1719389625; h=Content-Type:Content-Transfer-Encoding:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To:Cc; 
+	bh=wZbzsMvHFqVEef8goKnUx6Au2p32aFS0Ys4pF0Gk7B8=; 
+	b=fUMtVwxWP7njmh5Ns+zGhmV+J86XDuKEZlGu6GoSrhnvrbz09hiS7Zo80uJKUcXa8QujNht+H1NldLTh0fuhrJXh67YwYQeB+T6KHP7noW+4FhuEUN0vIsj6ruZ5pKaEr9I6w2GKcPtddfZJiQ3edMw0x9yY4JahrhKfbHEjZAc=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=zoho.com;
+	spf=pass  smtp.mailfrom=ToddAndMargo@zoho.com;
+	dmarc=pass header.from=<ToddAndMargo@zoho.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1719389625;
+	s=zm2022; d=zoho.com; i=ToddAndMargo@zoho.com;
+	h=Message-ID:Date:Date:MIME-Version:From:From:Subject:Subject:To:To:Content-Type:Content-Transfer-Encoding:Feedback-ID:Message-Id:Reply-To:Cc;
+	bh=wZbzsMvHFqVEef8goKnUx6Au2p32aFS0Ys4pF0Gk7B8=;
+	b=Lv5HBcm4yDHF/Jrj84/iExppmET53nPvWcE+O9bpCptejYECoO/zTacSzl46w94C
+	4zuyhhAu3zPSsduAYHDJ1oodi5K5i1Co7VSQFzvnMNJCFrQrP98A2MtIqIsU2GFMBNC
+	bg/9BeBtMEPynS8jpn9t+6dKXra3jmyt880AAdEI=
+Received: by mx.zohomail.com with SMTPS id 171938962411856.06237972413203;
+	Wed, 26 Jun 2024 01:13:44 -0700 (PDT)
+Message-ID: <8f0e51ba-c4f6-421d-98a6-e0a3052ee8d7@zoho.com>
+Date: Wed, 26 Jun 2024 01:13:43 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: ToddAndMargo <ToddAndMargo@zoho.com>
+Subject: How do I ShareHost Files With KVM
+To: kvm@vger.kernel.org
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+Feedback-ID: rr080112276767779e494b98a52e052ac90000f20e894ccfde966984488ee4d54aee360214c0d40c0c955b17:zu08011226ae25d4112ffca76e505b314c000075bf07a257e8082f24a49413823cc0ab53a4404fbf9e2291:rf08011226e250669d29cdfb2b550a3fea00005369f3383118df0ba1a2f8d26b6b324e39a890cc81952875:ZohoMail
+X-ZohoMailClient: External
 
-From: Amit Shah <amit.shah@amd.com>
+Hi All,
 
-Remove superfluous RSB filling after a VMEXIT when the CPU already has
-flushed the RSB after a VMEXIT when AutoIBRS is enabled.
+Fedora 39
+qemu-kvm-8.1.3-5.fc39.x86_64
+virt-manager-4.1.0-3.fc39.noarch
 
-The initial implementation for adding RETPOLINES added an ALTERNATIVES
-implementation for filling the RSB after a VMEXIT in
+Windows 11
 
-commit 117cc7a908c836 ("x86/retpoline: Fill return stack buffer on vmexit")
+How do I Share Host Files (Fedora 39) with
+Windows 11 (client) with KVM?
 
-Later, X86_FEATURE_RSB_VMEXIT was added in
+I have been reading this virt-manager how to:
+     https://chrisirwin.ca/posts/sharing-host-files-with-kvm/
 
-commit 2b129932201673 ("x86/speculation: Add RSB VM Exit protections")
-
-The AutoIBRS (on AMD CPUs) feature implementation added in
-
-commit e7862eda309ecf ("x86/cpu: Support AMD Automatic IBRS")
-
-used the already-implemented logic for EIBRS in
-spectre_v2_determine_rsb_fill_type_on_vmexit() -- but did not update the
-code at VMEXIT to act on the mode selected in that function -- resulting
-in VMEXITs continuing to clear the RSB when RETPOLINES are enabled,
-despite the presence of AutoIBRS.
-
-Signed-off-by: Amit Shah <amit.shah@amd.com>
-
----
-v2:
- - tweak commit message re: Boris's comments.
----
- arch/x86/kvm/svm/vmenter.S | 8 ++------
- 1 file changed, 2 insertions(+), 6 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-index a0c8eb37d3e1..2ed80aea3bb1 100644
---- a/arch/x86/kvm/svm/vmenter.S
-+++ b/arch/x86/kvm/svm/vmenter.S
-@@ -209,10 +209,8 @@ SYM_FUNC_START(__svm_vcpu_run)
- 7:	vmload %_ASM_AX
- 8:
+He is leaving out how to mount in Windows
+and his "Filesystem Passthrough"
  
--#ifdef CONFIG_MITIGATION_RETPOLINE
- 	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
--	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
--#endif
-+	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
- 
- 	/* Clobbers RAX, RCX, RDX.  */
- 	RESTORE_HOST_SPEC_CTRL
-@@ -348,10 +346,8 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
- 
- 2:	cli
- 
--#ifdef CONFIG_MITIGATION_RETPOLINE
- 	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
--	FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
--#endif
-+	FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
- 
- 	/* Clobbers RAX, RCX, RDX, consumes RDI (@svm) and RSI (@spec_ctrl_intercepted). */
- 	RESTORE_HOST_SPEC_CTRL
+https://chrisirwin.ca/posts/sharing-host-files-with-kvm/add-filesystem.png
+
+is a lot different than mine
+     https://imgur.com/pqPcLo0.png
+
+Anyone have a better howto?
+-T
+
+
 -- 
-2.45.2
-
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Computers are like air conditioners.
+They malfunction when you open windows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
