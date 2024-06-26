@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-20512-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20513-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6C0091754E
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 02:42:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12ABE917584
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 03:22:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94E872823CC
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 00:42:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAB0F1F236FB
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 01:22:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A35C2E9;
-	Wed, 26 Jun 2024 00:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFEB0EEDD;
+	Wed, 26 Jun 2024 01:22:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YoUHPSQX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GkZGMvfg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101566FDC
-	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 00:42:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A85428FA
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 01:21:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719362533; cv=none; b=I9yTcKEMPcIq+S7HHpA2e4LyInwM7Sg0q2GDGCdg5V5qhbpVqk9Z3tL6iBdJ1bk6dlrxAt4cSJ4APONzyOlulaP4vGD4/A6z0zeJyRBg1yjZNsAYdZlSV3Menxjjwd8HxAAKrKQlbaf/0ICEvhDN86LPCe3LRtIVawZE0WKBGwE=
+	t=1719364919; cv=none; b=OMFQhqeYVAkuOKAC72qV4AKVdmN8wES6FoYavoVSL6zAwywRg91bh5jSer/BuWN3Sf+xfrCJXEm/Qt/3TAuCcxwvxJLnj5hQSyEhnwqXRia/a0yHc6nFOKBH7jH8KaOdGVcelkNlMDvd1J08oHI/bSz4SS4FgplZomhBPVMkI9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719362533; c=relaxed/simple;
-	bh=3rsZiF+YKH21/TXG3S46bL21vyEJD44mnnURl//ORSg=;
+	s=arc-20240116; t=1719364919; c=relaxed/simple;
+	bh=UFZ9PY+GDSA9BNrYdHIS8Xjr5b2tAoCZFEY+1AZ/7t0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ghhHrfpSfeBqv7NdPar+8uAskxVeseWw5cBGxNeOkSRFQ8A8xf8vB5yfTiJMiQKs+8oBaieJYa/ZWCisXlRmzUeFgMDcwQ8Vc+RzfR4VmO+h5VYdRH2xD3Pou5nC2AD0jrDivO5NuCz5Yv0plCgb2cdo/NxVxbSFwuMNfjI08z8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YoUHPSQX; arc=none smtp.client-ip=209.85.208.48
+	 To:Cc:Content-Type; b=IuMdv7PLg0D0Zleo/NpJji7kiMZTQchK1fhcKaHt6P7Lq4QQa10DukRcYWvNYXkdI47TFZl0XsElcC40SuHw3/afGDpTZliU1LktLu72Ayz3k2ugBA2WBoTm9m5rAVnvUpgQGKDCD9JFE0nn4RWnurTsvdE66OPID0hk1TIjasw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GkZGMvfg; arc=none smtp.client-ip=209.85.208.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-57d16251a07so3813a12.1
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 17:42:11 -0700 (PDT)
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-57a16f4b8bfso4220a12.0
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 18:21:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719362530; x=1719967330; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1719364916; x=1719969716; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=3rsZiF+YKH21/TXG3S46bL21vyEJD44mnnURl//ORSg=;
-        b=YoUHPSQXYfD85e2T8/e1Wsz4wBnQflvo73ho0pQ8fWAQjFMX2MxdjKg7QSflQfXQH+
-         wk0AISvKM4A362jbObC2dSY8kZCoNSJGFpSBd2mu7XTKIJFq1Yp8Hzyo32f7Via8oqTM
-         r9VyrpHSMplEKkygRd/3HallLVEkDp0nc+ZA7e89lnRyWlj8HN6M5tkokFkA9LYbt2Oo
-         aJms0VFeVlpjvmqY5fl8QR3QcbX8JNd87cB7G4Cc/RyWI0oP99n5Xu9w64IQekzTx+ZX
-         c6xOKjQQtIBnMLtIq4O9CleqvpHBZvoFamF4QIRBXhvBJm2bv9DgmIFaX8j9MNc77TJr
-         ycfA==
+        bh=MDXzXy/x3VAMGE4telAkJ0AkS3Dvfn3YkfUIsKfqDwQ=;
+        b=GkZGMvfgAI49yVVsmSpWIGoHLaoP/xV0isZn8oFvvVPA44TeI1mDa1usl22SkfHZ5u
+         rlwjzez2s5Df+2/G4Vf7lu2vyZ/iisy8LiJV1I9erVTdIHEFXRnxZ8I+4dWrqGNHjuw7
+         jO39BrsSc7a2cIgXC7p9iMGXIjfPj3a1BT4s2AMEe65QaIBvLYZdOrxFhpAS1J6X1pbQ
+         m5ejjxU4byMZ4LXZWwQB/7al2dMMBjxdTKIRiCSplmiyBBe1T/IMGbjmbNV4o82WFwPP
+         /8mU5irTWLC/SkU4NuLkCICMOwlvFMZWvKMPrH8QH4JS63Fss+k/0yLJGiCeb5YeZWV4
+         RQRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719362530; x=1719967330;
+        d=1e100.net; s=20230601; t=1719364916; x=1719969716;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=3rsZiF+YKH21/TXG3S46bL21vyEJD44mnnURl//ORSg=;
-        b=qCbWgUbxAvSrcsZd9PicRxX+hnZIrfwjJjeSHYebIKWDhWF78HiinCJrLguN0Prqa0
-         TvVJxT25mBjE7ov5aDJTqZQ2Js/iv8aKHsgEskrqwD25ohS+6ZuebZdC7EZ4I6WMQRsw
-         tFVzYOVcP9H+c7fMnEi9Qq89Q1yxJwMhnwINTURq2YmM+V8eEOYs+TkNUKUcmzkjvY0Y
-         0L7f3cTsDXaV9jSKjED9vRjAUxQIWOwiWViV47ghFdwquxk0u00AzR4HoBv+lDlseUUV
-         y3a4wBfF3RMGzBEtcngIA3C1J3JE2WyL6YCNKv0x/TtgAOo/9nr0SGsryl9Xz0prKAxN
-         68kw==
-X-Forwarded-Encrypted: i=1; AJvYcCWXVNLqrr5l7dP01zQMNOva5uXwXwcJIqaVZg53E6j8xlOxL1SsQhhg8vGlgHF0ikMrhFS+0T3Wlj7wcA3wz0c8pe9x
-X-Gm-Message-State: AOJu0YweJkPSJdnFZFfr+2iaWUjMtQMK+2/qVJQlHzhPVcwm66x2F0vi
-	Wl5ZX1xfwTkouqUZZhcN+C9OPnwxYjVnFfhqSCUNtRjz0cIOA4P7ce7Evs7ZagLD+eZJ4x2REXQ
-	+jVML7BeWVO3oD4DSbPLtzyr7EB67qN7BqUDy
-X-Google-Smtp-Source: AGHT+IGUXAlcvcMko36NsFRWvk/yokhIRPBWv9q08BRYzOrubTf08XRl+aiyThoXu6xpKOFOPHi5N+LFI2IN9m/bLcI=
-X-Received: by 2002:a05:6402:26c7:b0:57c:b712:47b5 with SMTP id
- 4fb4d7f45d1cf-583311be705mr113643a12.4.1719362530203; Tue, 25 Jun 2024
- 17:42:10 -0700 (PDT)
+        bh=MDXzXy/x3VAMGE4telAkJ0AkS3Dvfn3YkfUIsKfqDwQ=;
+        b=gw10CGB0bKUz4ED8d5/lbLgPa8fvrwO83Qm3fqYVZ7fS9HKAvKQ46Gi3OFEf6K8IQm
+         QQPt7DgKTa2ukdJql82++3IxIPpBHfnCrFblLkSI9y+dXHWb9D5gjPCjJF69YF2EFNYN
+         pO1kpCuG8MGs4Pn5bdz2qoTYG2x2NBLpYHCO7JQf5I+pbhCpF1ZuEx+UQhWGwwHm912p
+         ZbgIG8b7OMfmN+6QPupUgWT/JiCmh5IZswPz6XIRoMAK9b5Qryq0kUN4G+unbQbHxJ1s
+         pw71fda1xPdpx3/ZBMPAyXpYZMtl//6bggEYJVgYKZCfTXupXK2NwogfVck2I/+c9awT
+         P80w==
+X-Forwarded-Encrypted: i=1; AJvYcCUPHSc9pbjmDUNSn21PCirj574YFdfZyQNxCXn3O6sMXh5HQdX7091gW/6UEJMAaBxb3k4UUaJlI4Lo8prGIzuO5hSI
+X-Gm-Message-State: AOJu0Yw2J+Mxu7xOSPptuQqeNUWLTkABzTCmL47ckkPSu3Fv8GJ4rwTT
+	28pcahud6SVCHDwfNtilMZV8Q1uCezMZxu3GzQN+hIxm0KQbBJyGh8XpZ6ibq4Yj/ilmPLqax6A
+	P88HTOv9EUODekb3D4UiTLud6vbo7UvZ3a7kI
+X-Google-Smtp-Source: AGHT+IHX6Dw13lvp9tA5r1Nr3EDVBrqZjzt46+AZrMqkD9VDrFcqyfsc9zQwLVqS3nH7c8fc7LBij/O5GqbVZ/GRwBU=
+X-Received: by 2002:a05:6402:350c:b0:582:f117:548e with SMTP id
+ 4fb4d7f45d1cf-5832c353bf0mr116598a12.0.1719364915083; Tue, 25 Jun 2024
+ 18:21:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,11 +72,11 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240624232718.1154427-1-edliaw@google.com> <20240625135234.d52ef77c0d84cb19d37dc44f@linux-foundation.org>
- <f975fe76-92f4-4af0-a91d-0f3d8938f6b2@linuxfoundation.org>
-In-Reply-To: <f975fe76-92f4-4af0-a91d-0f3d8938f6b2@linuxfoundation.org>
+ <f975fe76-92f4-4af0-a91d-0f3d8938f6b2@linuxfoundation.org> <CAG4es9V0XAqe-eqPgjU+sdRS00VOEr0Xda1Dv-gtfEvqsODjiw@mail.gmail.com>
+In-Reply-To: <CAG4es9V0XAqe-eqPgjU+sdRS00VOEr0Xda1Dv-gtfEvqsODjiw@mail.gmail.com>
 From: Edward Liaw <edliaw@google.com>
-Date: Tue, 25 Jun 2024 17:41:42 -0700
-Message-ID: <CAG4es9V0XAqe-eqPgjU+sdRS00VOEr0Xda1Dv-gtfEvqsODjiw@mail.gmail.com>
+Date: Tue, 25 Jun 2024 18:21:27 -0700
+Message-ID: <CAG4es9WHUSC7qm_6fJjQm5nM_iYEjXO75DWC8e5tzqc7fLEtfw@mail.gmail.com>
 Subject: Re: [PATCH v6 00/13] Centralize _GNU_SOURCE definition into lib.mk
 To: Shuah Khan <skhan@linuxfoundation.org>
 Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kselftest@vger.kernel.org, 
@@ -97,33 +97,42 @@ Cc: Andrew Morton <akpm@linux-foundation.org>, linux-kselftest@vger.kernel.org,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 25, 2024 at 4:34=E2=80=AFPM Shuah Khan <skhan@linuxfoundation.o=
-rg> wrote:
+On Tue, Jun 25, 2024 at 5:41=E2=80=AFPM Edward Liaw <edliaw@google.com> wro=
+te:
 >
-> On 6/25/24 14:52, Andrew Morton wrote:
-> > On Mon, 24 Jun 2024 23:26:09 +0000 Edward Liaw <edliaw@google.com> wrot=
-e:
+> On Tue, Jun 25, 2024 at 4:34=E2=80=AFPM Shuah Khan <skhan@linuxfoundation=
+.org> wrote:
 > >
-> >> Centralizes the definition of _GNU_SOURCE into lib.mk and addresses al=
-l
-> >> resulting macro redefinition warnings.
-> >>
-> >> These patches will need to be merged in one shot to avoid redefinition
-> >> warnings.
+> > On 6/25/24 14:52, Andrew Morton wrote:
+> > > On Mon, 24 Jun 2024 23:26:09 +0000 Edward Liaw <edliaw@google.com> wr=
+ote:
+> > >
+> > >> Centralizes the definition of _GNU_SOURCE into lib.mk and addresses =
+all
+> > >> resulting macro redefinition warnings.
+> > >>
+> > >> These patches will need to be merged in one shot to avoid redefiniti=
+on
+> > >> warnings.
+> > >
+> > > Yes, please do this as a single patch and resend?
 > >
-> > Yes, please do this as a single patch and resend?
+> > Since the change is limited to makefiles and one source file
+> > we can manage it with one patch.
+> >
+> > Please send single patch and I will apply to next and we can resolve
+> > conflicts if any before the merge window rolls around.
 >
-> Since the change is limited to makefiles and one source file
-> we can manage it with one patch.
->
-> Please send single patch and I will apply to next and we can resolve
-> conflicts if any before the merge window rolls around.
+> Sounds good, I sent:
+> https://lore.kernel.org/linux-kselftest/20240625223454.1586259-1-edliaw@g=
+oogle.com
 
-Sounds good, I sent:
-https://lore.kernel.org/linux-kselftest/20240625223454.1586259-1-edliaw@goo=
-gle.com
+I realized that in this v6 patch, I had accidentally sent it in the
+middle of a rebase, so it's missing the last change to
+selftests/tmpfs.  I've fixed it in v7.
 
 >
-> thanks,
-> -- Shuah
+> >
+> > thanks,
+> > -- Shuah
 
