@@ -1,187 +1,141 @@
-Return-Path: <kvm+bounces-20565-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20566-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A9F918725
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 18:18:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3E9C91872A
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 18:19:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA8EA1C22851
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 16:18:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A3551F22CCF
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 16:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AA3E18EFF5;
-	Wed, 26 Jun 2024 16:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50D7218EFCF;
+	Wed, 26 Jun 2024 16:19:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dyj6u244"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="TfEjLyFO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAE2181CE1
-	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 16:18:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FDC1891BA
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 16:18:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719418685; cv=none; b=j6wGc/V4SF/3XsPLAykEQgQex8r1M22wp/dYQ/X2vOXEYso2YcVPIx20jl6XixjPdu1xe1ok8FfYVBL5ShXBC7QPKgHOLiOvknP5I5NnFdQuETfSKvTZte6bjWO1GJLV6nY7w0tAjNo8H1wj6i70kVGpP39YLT7Dr6GU4liBPt8=
+	t=1719418739; cv=none; b=T2vh6RzK54b7S2fz2EmFvwP204ls/vfhORei+d9Pd4SzSlJ6O/BfvpqqRyIqWaNHWXqJptre99Vv6eDK3zIVD29OJcAaO4zPlB0uvNqNg3j+D4Bq7wKyKzOT2V8gPsKw3p2jcgUmNlDSX7pnND+HA9kNC8eqi8FTmLRL2KP3IM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719418685; c=relaxed/simple;
-	bh=D+1RmGdHktCfyEPUpa/XJuiM3as8ij+ZNbuGlJ8Z1AY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=pYXFCFGPHax+NL62XGPpq5yL+7byiKeWBoMPj/NR0kbHdvAL7It4ED9hJjFUP8RcuZTcCxK1CRIYHGwO9CMNGwgjfX5wzZNsltm8scWrS9dHrk40oA3OilGPV6BmujRH1e4IlEXLEebc1cvpuTxu5iyZIwPtBKqoxWWIezf7G6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dyj6u244; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ec1620a956so82825251fa.1
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 09:18:03 -0700 (PDT)
+	s=arc-20240116; t=1719418739; c=relaxed/simple;
+	bh=n6XWrveWu9ZibcNSjFbwHuOZZQqE7pIo1MO/Ikzqq8o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UjiGsJoqFqBhaZpwzt9OJiKt6dqet/lYrJNMNfeRfqwsRcSQcVREDheS+M0ZESqpZlH6eAejsfiPYbZvstAuqVScfjlxs3cnUogPxSfNq/qU7bRIgFjfXMVVUeEPlGrVHOeZQHUxfZTrOZo6IKgKCUhTzqGal6PPb7afDa3wimg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=TfEjLyFO; arc=none smtp.client-ip=209.85.167.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52cd6784aa4so6322884e87.3
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 09:18:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1719418681; x=1720023481; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DcB6IPPrpjOpTbKaDWEUmYeQ2UAfTwqRY22CEK/B2iA=;
-        b=dyj6u244wogGgX94yQHZBjBhaCWdN3B5iw0I+vV2cLoR0nA0QPfIDa/TLMkpayQkgV
-         mTLW+q36f0Y7espi0kiPktdzitbGwXksWBxM4VUIB/bBJfISeMMkHlNi8IPxIDILD2xW
-         i1mrKrU0+uwpoWu3JU2r17FPaNa38bWyGQZE4D2gYcoG4MeJ7t4/FNHaU1oss+M2zQb9
-         YieX3KpHSIZzMYRHct1H7eOes33Z/VU5n5DONJVqrFaMTult3wFpCgbAAsC4U2wuHy/u
-         l5Mmfu7P4UCKNsJe4Ljv+Qwfco9w5ZNEA7pFwokk7JQvkIXuoJWI+afN17JczRedJq2G
-         mNdg==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1719418736; x=1720023536; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JOXAoPOZbipJ93XdyhTiv94Fgw7fYvC41s+vnDXKabQ=;
+        b=TfEjLyFO26NVBTjzcou8iMefJLkruqj4BdbYOMK5lL7NnDsnZ5Kui85qm9+DM2QPLU
+         f7qeKE9IuMHOBWrQYr7NDg5ErHJZvwJ0/D6USkvidV5On6miKWXEYi5n3BLkOF4/YJJN
+         RLU4GEn1dNodemfB0eT+HOboTQ/1VqHVNdX4tRrQC+Gul3LuDLaIAr3BAu0wUN5leg4V
+         MY5sKBZN02mL/LW+TTjJ/fPxwzlmToIj9320FtmNLPMACPsPkg88Avncj5NPv6jWrM21
+         0t++fD+PAsbXSBUFM1IWKJ5Bq3I2v+55c0/XhI/Tym+KXfJhKLecl2UhgRc5v5BePV72
+         bPlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719418681; x=1720023481;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1719418736; x=1720023536;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DcB6IPPrpjOpTbKaDWEUmYeQ2UAfTwqRY22CEK/B2iA=;
-        b=JjaO6iknlgvSH+FfTaFDgj3+iQB17rEI80BwVFtlZX5QWPV4bbpGVCvAJu7HGXQobe
-         UDlgnD0Ob9JyeZt3OuONhcqDN2bAbJRLxgcmZFg5/mZim3gzV+ynl8jw2e61HLVkXSyn
-         s63ILHFnwZCLnJwA/ipMuZEnU8GCl+6TrpNrXZf5OAv881M6qL2qaTX7dnoHwZCfU7dU
-         OWTEyBXvTVii+3dSC2VSLEZybYvpZ3AFX7bJChtgEG0+aHhlxfDamDC3Gz189OaIjhj3
-         58JP4yIw04gMSmElPoNdbho0Fhn/X8HsKnJZdQN7Sj/gMFwOeq0xZsW38h/piOjNu9Wr
-         axkg==
-X-Forwarded-Encrypted: i=1; AJvYcCW6OsaGmujQ8+dBbkICJC9K0LPa6l2jrAG4fPEbLnWia2kb+tvq9diBT6R7TNJmAwX21CGEsO3brgoDXySE0+EPj+ov
-X-Gm-Message-State: AOJu0YwzJSMqhcFdloVxLhgYSopseSq21Y0e1H00uDItOXEq9hU6il2b
-	y+BKk8CerpS1rVXIuNuzFlhsaEntywSvd/9zaE19IQzRKVA15HkMKc5ZNNg4W9OOvT41h6vk9LI
-	h
-X-Google-Smtp-Source: AGHT+IFfXwEtsh+T/sDn+2rc5XBZnHCaEiUAyswzSvtd5UKEMWXGnkc3/U4D8XcR5I/y5ovhWxbUow==
-X-Received: by 2002:a05:651c:211d:b0:2ec:5dfc:a64e with SMTP id 38308e7fff4ca-2ec5dfca6demr78654281fa.0.1719418681072;
-        Wed, 26 Jun 2024 09:18:01 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-581e920112dsm1974823a12.93.2024.06.26.09.18.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 09:18:00 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 78D215F8AA;
-	Wed, 26 Jun 2024 17:17:59 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org,  Paolo Bonzini <pbonzini@redhat.com>,  Marcelo
- Tosatti <mtosatti@redhat.com>,  "open list:X86 KVM CPUs"
- <kvm@vger.kernel.org>
-Subject: Re: [RFC PATCH] target/i386: restrict SEV to 64 bit host builds
-In-Reply-To: <ZnwjtOxQy1iiRoFh@redhat.com> ("Daniel P. =?utf-8?Q?Berrang?=
- =?utf-8?Q?=C3=A9=22's?= message of
-	"Wed, 26 Jun 2024 15:20:36 +0100")
-References: <20240626140307.1026816-1-alex.bennee@linaro.org>
-	<ZnwjtOxQy1iiRoFh@redhat.com>
-Date: Wed, 26 Jun 2024 17:17:59 +0100
-Message-ID: <87r0cjoeyw.fsf@draig.linaro.org>
+        bh=JOXAoPOZbipJ93XdyhTiv94Fgw7fYvC41s+vnDXKabQ=;
+        b=U9l9Li7s/zZkmsm0GcuQIsguX+cb82WaUU2dZGlH5DeWTOLg+kV3t0x7I0S7ITelwe
+         CtjjrjP1UCWrQAx1AJhgeX4Y4JSZM56kIylj6bcBudwMtqCR/0PjQz/73CZxITSv5KBo
+         4Puf0uF15pWFAaUi1Q43n6fRsNCXQdA82TBF4lc0Z5JHUuQeXcjgvAfUBHibAHC+oeA1
+         EbPLBVkfiNr8+QL1vydz3WUeN58QTcMHS7z31g8xWFfH82qWW05J4e434/htkKHuj1QU
+         l9vXrNzST0EFsgQPQX6iy+QaKZK76s2wxlepiQM6vMOqeMjZfYeZ5jQ3G7k+zsHSwMvC
+         xXLw==
+X-Forwarded-Encrypted: i=1; AJvYcCXq8KLEHFE24St1bbLtRbiySBprrvGv9zpdOza/2XzGaOXu0Akq5RvSGTV1rmvBOJVCARyUX+O3t8bJ8PPmO77i2Vqx
+X-Gm-Message-State: AOJu0YyprsTfUBcUJJH6DliVr2VP8ht9ERo1yE2aXWfpWlrdEQ32fQqe
+	Dboqbc+hN25PgoXDC7iuwRsLKV5H5Nw8cY33DDFHTCzX23Az2wI33ZpyYTpd1iMsLDR/btuhVQ9
+	R4vO/yCzwCxBLjXrO4ABhL6VuCA+3yxqp8GIyXA==
+X-Google-Smtp-Source: AGHT+IHNMa1ftMAu8i49jJuPkee7HG52HPPQSvV++KhF04KmDg7GQRHQsI3P2aVaZhduWTy7dwIB7UF0h0Ip+fgNqPY=
+X-Received: by 2002:a05:6512:2111:b0:52c:7fe8:6489 with SMTP id
+ 2adb3069b0e04-52cf5110982mr2440255e87.63.1719418736102; Wed, 26 Jun 2024
+ 09:18:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20240626-misc_perf_fixes-v3-0-de3f8ed88dab@rivosinc.com>
+ <20240626-misc_perf_fixes-v3-2-de3f8ed88dab@rivosinc.com> <96ff4dd2-db66-4653-80e9-97d4f1381581@sifive.com>
+In-Reply-To: <96ff4dd2-db66-4653-80e9-97d4f1381581@sifive.com>
+From: Atish Kumar Patra <atishp@rivosinc.com>
+Date: Wed, 26 Jun 2024 09:18:46 -0700
+Message-ID: <CAHBxVyHx9hTRPosizV_yn6DUZi-MTNTrAbJdkV3049D-qsDHcw@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] drivers/perf: riscv: Reset the counter to hpmevent
+ mapping while starting cpus
+To: Samuel Holland <samuel.holland@sifive.com>
+Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org, 
+	Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, 
+	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Conor Dooley <conor.dooley@microchip.com>, 
+	Palmer Dabbelt <palmer@rivosinc.com>, Alexandre Ghiti <alexghiti@rivosinc.com>, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On Wed, Jun 26, 2024 at 6:24=E2=80=AFAM Samuel Holland
+<samuel.holland@sifive.com> wrote:
+>
+> On 2024-06-26 2:23 AM, Atish Patra wrote:
+> > From: Samuel Holland <samuel.holland@sifive.com>
+> >
+> > Currently, we stop all the counters while a new cpu is brought online.
+> > However, the hpmevent to counter mappings are not reset. The firmware m=
+ay
+> > have some stale encoding in their mapping structure which may lead to
+> > undesirable results. We have not encountered such scenario though.
+> >
+>
+> This needs:
+>
+> Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
+>
 
-> On Wed, Jun 26, 2024 at 03:03:07PM +0100, Alex Benn=C3=A9e wrote:
->> Re-enabling the 32 bit host build on i686 showed the recently merged
->> SEV code doesn't take enough care over its types. While the format
->> strings could use more portable types there isn't much we can do about
->> casting uint64_t into a pointer. The easiest solution seems to be just
->> to disable SEV for a 32 bit build. It's highly unlikely anyone would
->> want this functionality anyway.
->>=20
->> Signed-off-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
->> ---
->>  target/i386/sev.h       | 2 +-
->>  target/i386/meson.build | 4 ++--
->>  2 files changed, 3 insertions(+), 3 deletions(-)
->>=20
->> diff --git a/target/i386/sev.h b/target/i386/sev.h
->> index 858005a119..b0cb9dd7ed 100644
->> --- a/target/i386/sev.h
->> +++ b/target/i386/sev.h
->> @@ -45,7 +45,7 @@ typedef struct SevKernelLoaderContext {
->>      size_t cmdline_size;
->>  } SevKernelLoaderContext;
->>=20=20
->> -#ifdef CONFIG_SEV
->> +#if defined(CONFIG_SEV) && defined(HOST_X86_64)
->>  bool sev_enabled(void);
->>  bool sev_es_enabled(void);
->>  bool sev_snp_enabled(void);
->> diff --git a/target/i386/meson.build b/target/i386/meson.build
->> index 075117989b..d2a008926c 100644
->> --- a/target/i386/meson.build
->> +++ b/target/i386/meson.build
->> @@ -6,7 +6,7 @@ i386_ss.add(files(
->>    'xsave_helper.c',
->>    'cpu-dump.c',
->>  ))
->> -i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c', 'confident=
-ial-guest.c'))
->> +i386_ss.add(when: ['CONFIG_SEV', 'HOST_X86_64'], if_true: files('host-c=
-pu.c', 'confidential-guest.c'))
->>=20=20
->>  # x86 cpu type
->>  i386_ss.add(when: 'CONFIG_KVM', if_true: files('host-cpu.c'))
->> @@ -21,7 +21,7 @@ i386_system_ss.add(files(
->>    'cpu-apic.c',
->>    'cpu-sysemu.c',
->>  ))
->> -i386_system_ss.add(when: 'CONFIG_SEV', if_true: files('sev.c'), if_fals=
-e: files('sev-sysemu-stub.c'))
->> +i386_system_ss.add(when: ['CONFIG_SEV', 'HOST_X86_64'], if_true: files(=
-'sev.c'), if_false: files('sev-sysemu-stub.c'))
->>=20=20
->>  i386_user_ss =3D ss.source_set()
->
-> Instead of changing each usage of CONFIG_SEV, is it better to
-> prevent it getting enabled in the first place ?
->
-> eg. move
->
->   #CONFIG_SEV=3Dn
->
-> From
->
->   configs/devices/i386-softmmu/default.mak
->
-> to
->
->   configs/devices/x86_64-softmmu/default.mak
->
-> And then also change
->
->   hw/i386/Kconfig
->
-> to say
->
->   config SEV
->       bool
->       select X86_FW_OVMF
->       depends on KVM && X86_64
+Oops. Sorry I missed that.
 
-I was wondering if I could do it all with Kconfig. Will respin thanks.
+@Alexandre Ghiti @Palmer Dabbelt : Can you add that while picking up
+the patch or should I respin a v4 ?
 
+> otherwise your commit message looks fine to me.
 >
+> > Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> > ---
+> >  drivers/perf/riscv_pmu_sbi.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.=
+c
+> > index a2e4005e1fd0..94bc369a3454 100644
+> > --- a/drivers/perf/riscv_pmu_sbi.c
+> > +++ b/drivers/perf/riscv_pmu_sbi.c
+> > @@ -762,7 +762,7 @@ static inline void pmu_sbi_stop_all(struct riscv_pm=
+u *pmu)
+> >        * which may include counters that are not enabled yet.
+> >        */
+> >       sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP,
+> > -               0, pmu->cmask, 0, 0, 0, 0);
+> > +               0, pmu->cmask, SBI_PMU_STOP_FLAG_RESET, 0, 0, 0);
+> >  }
+> >
+> >  static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
+> >
 >
-> With regards,
-> Daniel
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
 
