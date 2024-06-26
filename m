@@ -1,107 +1,150 @@
-Return-Path: <kvm+bounces-20514-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20515-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AD359175EE
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 03:58:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B3159175FD
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 04:05:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67E601C2141A
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 01:58:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1282F1F23090
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 02:05:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D338C14F62;
-	Wed, 26 Jun 2024 01:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08AF1C290;
+	Wed, 26 Jun 2024 02:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eigubmSy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h0SNx8dR"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64CBD1D530;
-	Wed, 26 Jun 2024 01:58:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51AB1643A
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 02:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719367108; cv=none; b=WOz2APMI7zMXiRvm6fcchysqqdUqtXuhlLuJp4ns337+gInF2cljQ3zwok8zw3JffbxA0ArdccBLsfizc/BSDARNTIG7quFtPgfsFZVG6QDVJ7uj3uAtPNDTsxbXa0IQ0tdJmbULKJ3OgAT6zNI1jzyq5uSwGdm6W/x9uHAXfn8=
+	t=1719367513; cv=none; b=rEpc0xZSuKTTwA9Oh83QTyWJaE6/I2K0avHKFkGB35sr8gHsvA9siLCGDitsFXrb22p0/C0SaXVzGEwvx/fGyH1urCHC4mMH14+2uZVsZ0aZ29lg5CMeIKU+5IyeUrsrWZ2mM3w/BvRKBnFgG63yEgidGQxD63x5jOR+r3tZADU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719367108; c=relaxed/simple;
-	bh=BGJQ/NML6MG7AsyBe/Q9WpGnnYFAdXDeS+xVeOQIm78=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=f1awu1mrJponW9c0VVYLVK9vXGG3mVx5JYUoH3Ii82y7dGyYpCZN5i8biUrhivzvys088E2wmVKiv2FECiMVnr2vR6UlVPukrvr4V2Pakh3qpmVUd1j9lRUjHtNpX2eKhzO3K7oerAUEoV3jwsFcHeHwCciXPHvpNd8ofyZLORM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eigubmSy; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719367106; x=1750903106;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=BGJQ/NML6MG7AsyBe/Q9WpGnnYFAdXDeS+xVeOQIm78=;
-  b=eigubmSybISWNiLODzxHCxs2jEQtVlRzkR9VuarN+Sj6GAg+PXNrHCbh
-   MfC8TjyeZIvc5noRJEAqvZ7di6mcxZMiLeuzjmVv46iFgdi8IQA2lK7NF
-   end7ionBfRM8WRf3PFMwa3xy5QdGnS/SBqEZRFEqVwd5qeFduwtaxsPt2
-   fXozeertB19lONd1VrHwHA/cqnXrQdbIpFICkdfWn2GSmHY9iM36N1+ui
-   dfazOl8YcE5JEVXwo3ZtfNRl+UpY7FYGbrc7z2gZUGUuV1TiT4QKv3jFG
-   ieOwYhHW0GciSja1XUOwYOOJY8GUmi0EulqbARly1jpYHc4fTYQz1DjJs
-   g==;
-X-CSE-ConnectionGUID: I9eqvD76T0utrZQySrihyg==
-X-CSE-MsgGUID: kVpgRXM5Rde9VybSz2sSQw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="16562230"
-X-IronPort-AV: E=Sophos;i="6.08,265,1712646000"; 
-   d="scan'208";a="16562230"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 18:58:25 -0700
-X-CSE-ConnectionGUID: chjdGxvsQN+UmJeaoxT1uA==
-X-CSE-MsgGUID: 9cGUqliyRFKvqz2e9fJp8Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.08,265,1712646000"; 
-   d="scan'208";a="44273252"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.232.203]) ([10.124.232.203])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2024 18:58:04 -0700
-Message-ID: <b2824879-113a-4214-8bd0-f8f71bd18735@linux.intel.com>
-Date: Wed, 26 Jun 2024 09:57:55 +0800
+	s=arc-20240116; t=1719367513; c=relaxed/simple;
+	bh=Luw7BOjHJYPbZPDlmdRmXC6owSO+bJqIepLDrNKSrGA=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LF0mMLfEgN6LlkjcKU+WFJVotqyvhx5V+rUldDVjTTq3+3YeNPDALZrCkgtANT/1kqPOfihBJJF8YI3UKQEE3+DCe5otaMbm1a2J0O4t972J/itgI+sV2Eod6Ynj9Y9/mdxKP27kHh2J9AZY+PR+PX+OclPy/svMABzGrRRBSLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h0SNx8dR; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-63bca8ce79eso133353357b3.1
+        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 19:05:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719367510; x=1719972310; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n9S+kxdxQATqJifY7BuigX+QJw9dzfSNdsmhVE8yZi4=;
+        b=h0SNx8dRjEy/MxJBZF5S6AB6xtJuNwHG9ATEMzOLHTZdZAj348kC7q322otFOPYd7W
+         4W/kTsZMWRDexS6Peb/2v25Vy4noQaf+AAxwC0mKpepNx7cOwHKy7Fdaq0U77YHAzHiZ
+         zDi/BYJMCTZNEn/hqbNI31QVx5PWNXYlgvlMRAkeMSZgi36Zlt3J79GRG+2tufnma/KO
+         vtEqlvGnVIg7QjO/IwNcn4nocqTlFOoNYluk17YnvsfdWXzt3g4emycnFyleflgZ8uB3
+         m6bWq55dPh5SP/gBKuWOuC9S5D79t6GgGf5kP7wRGh172J502DdhCdDpMsNO0/IbFT8Z
+         z8Cg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719367510; x=1719972310;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=n9S+kxdxQATqJifY7BuigX+QJw9dzfSNdsmhVE8yZi4=;
+        b=JfvndH+ULY9JyRNAEeXE4l68nynbYoDebti4axJFkQs/7A1B13yYxftsOZ+sq8QAdx
+         6KnJB/XBLAnAhU8ieICAYB+jKTiJ3PWPy6daBuAGJOrQYY+IbSIFR4MzLY8PgWHPlt9o
+         He931U7pgigTaXEkNlU5XLWBurwgUSEBCUFInPVGDfCTdxD2R2HXGiH7H4sP4YYyTctu
+         Csb8NISVUF+oeL4Y2Ein4OFk2/x39UKoVmyz0trR0IaDCkYPubnTc5UU6vxAig7UgjUQ
+         LZ3m4iRUqLYx/i43NcLmnZR9MAc9N8SMQ+Y32yGKqRjriA7XawoVEkUAW11cmjyIUSqM
+         0nQA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtKdrBOIuY5NolJwWAury+IJTQbvcIYpdsj3/Z4cVUDI2NnAcuGhYqu2Gnh3fikpBfCWRIJ6JgE05rJsYuyZHB7QKT
+X-Gm-Message-State: AOJu0YxZYmCHAu/F9CY7CKVfCh/0YjxDU3eNnpgotrn14el0iF8uPhvF
+	oNbfwsxIWtz7H3wWjHtAxxf4h6z6/JoqWUWcL1F1JcKTEJQg+7NbcyCQfjQImzonTvl4EnzjAcA
+	wjQ==
+X-Google-Smtp-Source: AGHT+IHGSt5yIaXE03KIRkkcoLX0j8JTKvl4SszD7Hd9WLurAsb2+UpER/smAZNtYJLctAfSK4QFj+AlOPQ=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:6086:b0:62c:fa1a:21e7 with SMTP id
+ 00721157ae682-643adb94892mr3021757b3.6.1719367510590; Tue, 25 Jun 2024
+ 19:05:10 -0700 (PDT)
+Date: Tue, 25 Jun 2024 19:05:09 -0700
+In-Reply-To: <CALMp9eTmez1TrQ6i+R8p7qJrkBNgTS8Xwf2XPw=x2RDcwe3Ekw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] selftests: kvm: Reduce verbosity of "Random seed"
- messages
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
- Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Like Xu <like.xu.linux@gmail.com>,
- Jinrong Liang <cloudliang@tencent.com>, Dapeng Mi <dapeng1.mi@intel.com>,
- Yi Lai <yi1.lai@intel.com>
-References: <20240619182128.4131355-1-dapeng1.mi@linux.intel.com>
- <20240619182128.4131355-3-dapeng1.mi@linux.intel.com>
- <ZnRxQSG_wnZma3H9@google.com>
- <ee06d465-b84b-4c75-9155-3fa5db9f3325@linux.intel.com>
- <ZnWAMqimqze1a12H@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <ZnWAMqimqze1a12H@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <f6bca5b0f9fc1584ef73d8ef71ac25e2c656b81e.camel@redhat.com>
+ <ZmxTFFt1FdkJb6wK@google.com> <3a3e1514fb48b415b46045c76969cc211198b114.camel@redhat.com>
+ <CALMp9eTmez1TrQ6i+R8p7qJrkBNgTS8Xwf2XPw=x2RDcwe3Ekw@mail.gmail.com>
+Message-ID: <Znt3VVa5q_bdCZey@google.com>
+Subject: Re: kvm selftest 'msr' fails on some skylake cpus
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jun 25, 2024, Jim Mattson wrote:
+> On Mon, Jun 17, 2024 at 11:29=E2=80=AFAM Maxim Levitsky <mlevitsk@redhat.=
+com> wrote:
+> >
+> > On Fri, 2024-06-14 at 07:26 -0700, Sean Christopherson wrote:
+> > > On Thu, Jun 13, 2024, Maxim Levitsky wrote:
+> > > > Hi!
+> > > >
+> > > > This kvm unit test tests that all reserved bits of the MSR_IA32_FLU=
+SH_CMD #GP, but apparently
+> > > > on some systems this test fails.
+> > > >
+> > > > For example I reproduced this on:
+> > > >
+> > > > model name  : Intel(R) Xeon(R) CPU E3-1260L v5 @ 2.90GHz
+> > > > stepping    : 3
+> > > > microcode   : 0xf0
+> > > >
+> > > >
+> > > > As I see in the 'vmx_vcpu_after_set_cpuid', we passthough this msr =
+to the guest AS IS,
+> > > > thus the unit test tests the microcode.
+> > > >
+> > > > So I suspect that the test actually caught a harmless microcode bug=
+.
+> > >
+> > > Yeah, we encountered the same thing and came to the same conclusion.
+> > >
+> > > > What do you think we should do to workaround this? Maybe disable th=
+is check on
+> > > > affected cpus or turn it into a warning because MSR_IA32_FLUSH_CMD =
+reserved bits
+> > > > test doesn't test KVM?
+> > >
+> > > Ya, Mingwei posted a patch[*] to force KVM to emulate the faulting ac=
+cesses, which
+> > > more or less does exactly that, but preserves a bit of KVM coverage. =
+ I'll get a
+> > > KUT pull request sent to Paolo today, I've got a sizeable number of c=
+hanges ready.
+> > >
+> > > [*] https://lore.kernel.org/all/20240417232906.3057638-3-mizhang@goog=
+le.com
+> > >
+> >
+> > This works for me.
+> > Thanks,
+> >
+> > Best regards,
+> >         Maxim Levitsky
+>=20
+> Sean and/or Paolo,
+>=20
+> I'm still waiting for this to show up. :)
 
-On 6/21/2024 9:29 PM, Sean Christopherson wrote:
-> On Fri, Jun 21, 2024, Dapeng Mi wrote:
->>> --
->>> From: Sean Christopherson <seanjc@google.com>
->>> Date: Thu, 20 Jun 2024 10:29:53 -0700
->>> Subject: [PATCH] KVM: selftests: Print the seed for the guest pRNG iff it has
->>>  changed
->> s/iff/if/
-> "iff" is shorthand for "if and only if".  I try to write out the full "if and only
-> if" when possible, but use "iff" in shortlogs when I want to squeeze in more words.
+13a12056be1e4939dadbd0d2cfb65df400832905 x86: msr: testing MSR_IA32_FLUSH_C=
+MD reserved bits only in KVM emulation
+51b87946279cf6e9248ceacf0f27833b6ebeef5e x86: Add FEP support on read/write=
+ register instructions
 
-Good to know. Thanks.
-
-
-
-
+/drop mic
 
