@@ -1,135 +1,172 @@
-Return-Path: <kvm+bounces-20568-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20569-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20C6991879A
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 18:40:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93564918814
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 19:00:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC36128A9E8
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 16:40:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 132B81F244FD
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 17:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 938F618FC63;
-	Wed, 26 Jun 2024 16:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098C318FDB1;
+	Wed, 26 Jun 2024 17:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UVEeMRkK"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="uYz11j4x"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B742518EFEB;
-	Wed, 26 Jun 2024 16:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FAAD13BC02
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 17:00:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719419994; cv=none; b=p8SwQtCtyxJlBsF44YDagg1ykhMiAeTFtst6NR/LToG5roSnziwpei+JWQ94Zeu3eXlzZEvbMy6tw2bQqYvPg35Rt9uOSDE57rMuUBZVR6A1xzXiUoptLz599a1Q/jqX2h6eRekdIYtJMZmwMSaWTBjIDT0u2HcgACYdyXx301k=
+	t=1719421227; cv=none; b=Bw5KeX5h4N25dUD1/vJ+fj/VrFQmCPuz37Hw9aExChzbLmpY1LlFIVV9Gz4zIiNjVTj4Q6yTla51fQ6+Wij7wOz5RK0pDXgsEmpMR2htemiC5q9XkHZvi29jdZUbaYlwxrcPTeUGBaaG2KyCkSw0lqQjA0VMx2SaOoadFXbQQG0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719419994; c=relaxed/simple;
-	bh=2PIGptfu7Q6IJYjxdK4gnMcXpRqy+KgrEzlHWeWHipg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gdVy4vL0FedeTks7hkRByOQLkKo8EIDewXcrXIc8ou5XLRboPm1JAGfwDZy3PPl/wr8GVN/Y/Dyv/ypUvcn+bk6T6AvkRHcUOuzGavHdJXHniCc6GegrQrY0W+6MFodAIYrr+17XXPRs282D5/+tiyC6QTtuhZ30rgsodnTRoLA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UVEeMRkK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10966C32789;
-	Wed, 26 Jun 2024 16:39:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719419994;
-	bh=2PIGptfu7Q6IJYjxdK4gnMcXpRqy+KgrEzlHWeWHipg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=UVEeMRkK91SZfmGSS4KOvWnt+VMC1hj25VJkNV95C414FgBfOEXos8yU+6ls5YVX+
-	 rGKvDVSHjHvMd/SgQJVBKWeV5R4by02/TT0prfUcJcC0beCPDQhOQkPcJhXhON+v9H
-	 fgTApVTS3doKRbsSMiXFP8wKi3XGjV9Anq37vAFVNwuSCJekV0aowMTieJTL1qks7w
-	 uyZQ2niXeXh1qkR1Rtd66AoP68zG4qzehgVRYVlAgBQbnQ8WR5CV0/l5SCJtbyWe4U
-	 Ktd4GlozG/zGYUnfWJf+sUKyObD1mpqjYw2MeeyDxvgoQsKm6cb6VKOsQQMHkJf2K+
-	 OMPttVlqoz74A==
-Date: Wed, 26 Jun 2024 17:39:49 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Atish Kumar Patra <atishp@rivosinc.com>
-Cc: Samuel Holland <samuel.holland@sifive.com>,
-	linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org,
-	Atish Patra <atishp@atishpatra.org>,
-	Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Conor Dooley <conor.dooley@microchip.com>,
-	Palmer Dabbelt <palmer@rivosinc.com>,
-	Alexandre Ghiti <alexghiti@rivosinc.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v3 2/3] drivers/perf: riscv: Reset the counter to
- hpmevent mapping while starting cpus
-Message-ID: <20240626-spyglass-clutter-4ff4d7b26dd4@spud>
-References: <20240626-misc_perf_fixes-v3-0-de3f8ed88dab@rivosinc.com>
- <20240626-misc_perf_fixes-v3-2-de3f8ed88dab@rivosinc.com>
- <96ff4dd2-db66-4653-80e9-97d4f1381581@sifive.com>
- <CAHBxVyHx9hTRPosizV_yn6DUZi-MTNTrAbJdkV3049D-qsDHcw@mail.gmail.com>
- <20240626-eraser-unselect-99e68a1f5a3e@spud>
+	s=arc-20240116; t=1719421227; c=relaxed/simple;
+	bh=qdX85xonqFgdnC5XdjHlts6a4TQihmAd8zEkekmA8Ug=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=esjq4K2/qh4ty5oAEq1ipXzinb3rY16c4lBkvKlVHvUnzfrCP6qrFcoXX0Z5w42qcLM2NZDsON9kz0UwonyMb7lZ5CnzGBv4OYzixtY0iI/ZpNkhtpBmb6JybdKuwYvMUCO0HL7e5kIXUJa1VQ5+bP7dUe8GfWkwgKwTpN9gO1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=uYz11j4x; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-361785bfa71so5272206f8f.2
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 10:00:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1719421223; x=1720026023; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=x6yy8q2jpoHXlXg85ZR/IswxE+kPuXBhTZOVGyO+mIA=;
+        b=uYz11j4xbxGXTcld95cJ1uvxYKvHwdrfzMDc1+XiwIPBeJ6xmZcfJ8TVjHTIJq7NMm
+         IaShDBWaLJiulr636kktbw8N3mVL4A6YyRDqrRUxvHIAqVNRFuZthMFxJGtvlY5mclYt
+         R0oWiP1rPI3E2/DrcPD4xJrJX48hIZ3T/IzTeCv27EZXqtzkLCZMPq8L+83svdw00DsD
+         A9/0l/uVMfcZBdBAwFoZHsJOu4f9ozriu73xv04loB0b4gR55kp7yGjk2e1JCvWSyDZE
+         76WP8RFuvUDLGwU1J//B2HBV/E9BOyUGCgPiYnqYDEc90ejp27td1nUGY0YFMWYwpmIF
+         BMRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719421223; x=1720026023;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=x6yy8q2jpoHXlXg85ZR/IswxE+kPuXBhTZOVGyO+mIA=;
+        b=t6do0c8crv+N9JqsMjgunNajg9oAlluHT3f20SIAjeJCIY1hY8QuLZvGq97rgw58wH
+         EJe2cUchqzt6Sc36dBhEt30pu/S/7f1zFHn4dXhTBbEPyDm6uHU/PNHI6h9v1yW79E2p
+         mHIG1kPeikYcln3WBp1EUMg6M7fFmJnOGM503h/ZeP+FRSCY+ekrz7rWBU4A4yZPgf37
+         QA+buRZZt8q/+iEos68bIVFJyrZEsHuSMnsCrKSHtVEwDWCf6mEdB2Yv9l7lhwu8G2Wj
+         UWBG2IM6o4YQK6Vp3bdjbY+t9QMXp5T4DZ0MjnTtLPf3oMG/Rag2+NSFZC8krLT+63P/
+         gI6Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUEAa7HCa0B/HuvtUYgk/XoFfMQgj4K8lhnxOQOnRZrcBvHOTHb4GPQaawLSpUbaYujwW5AwNPljyCmmU9acVyeGzss
+X-Gm-Message-State: AOJu0Yzaao/2nffvL5pl6mWSrl+SZD6XoHuspx5TxNdWZilfKxS+AFxH
+	fTSpOcJUUQlCcBf/wJg5wURr51bu0aQfSQuWfs9apQAPPw7SkIsMY2C5Ej+Se3GVhMlJmXW6h19
+	l
+X-Google-Smtp-Source: AGHT+IHekq5X45p/uxBeKBBUxxp+qRbVObCTDUz7b0tXridZSYxP52Ve467QzaCptI5BxhMcyTmvdw==
+X-Received: by 2002:a5d:4712:0:b0:35f:1128:2514 with SMTP id ffacd0b85a97d-366e7a0fc96mr6581641f8f.32.1719421222777;
+        Wed, 26 Jun 2024 10:00:22 -0700 (PDT)
+Received: from [192.168.69.100] ([176.187.212.234])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3663a8c8b27sm16258033f8f.104.2024.06.26.10.00.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jun 2024 10:00:22 -0700 (PDT)
+Message-ID: <2756549c-867d-43c0-a332-beac708da443@linaro.org>
+Date: Wed, 26 Jun 2024 19:00:20 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="FU7Zc89k4QCiR7WV"
-Content-Disposition: inline
-In-Reply-To: <20240626-eraser-unselect-99e68a1f5a3e@spud>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] target/i386: restrict SEV to 64 bit host builds
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Marcelo Tosatti <mtosatti@redhat.com>,
+ "open list:X86 KVM CPUs" <kvm@vger.kernel.org>
+References: <20240626140307.1026816-1-alex.bennee@linaro.org>
+ <ZnwjtOxQy1iiRoFh@redhat.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <ZnwjtOxQy1iiRoFh@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+On 26/6/24 16:20, Daniel P. Berrangé wrote:
+> On Wed, Jun 26, 2024 at 03:03:07PM +0100, Alex Bennée wrote:
+>> Re-enabling the 32 bit host build on i686 showed the recently merged
+>> SEV code doesn't take enough care over its types. While the format
+>> strings could use more portable types there isn't much we can do about
+>> casting uint64_t into a pointer. The easiest solution seems to be just
+>> to disable SEV for a 32 bit build. It's highly unlikely anyone would
+>> want this functionality anyway.
+>>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>> ---
+>>   target/i386/sev.h       | 2 +-
+>>   target/i386/meson.build | 4 ++--
+>>   2 files changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/target/i386/sev.h b/target/i386/sev.h
+>> index 858005a119..b0cb9dd7ed 100644
+>> --- a/target/i386/sev.h
+>> +++ b/target/i386/sev.h
+>> @@ -45,7 +45,7 @@ typedef struct SevKernelLoaderContext {
+>>       size_t cmdline_size;
+>>   } SevKernelLoaderContext;
+>>   
+>> -#ifdef CONFIG_SEV
+>> +#if defined(CONFIG_SEV) && defined(HOST_X86_64)
+>>   bool sev_enabled(void);
+>>   bool sev_es_enabled(void);
+>>   bool sev_snp_enabled(void);
+>> diff --git a/target/i386/meson.build b/target/i386/meson.build
+>> index 075117989b..d2a008926c 100644
+>> --- a/target/i386/meson.build
+>> +++ b/target/i386/meson.build
+>> @@ -6,7 +6,7 @@ i386_ss.add(files(
+>>     'xsave_helper.c',
+>>     'cpu-dump.c',
+>>   ))
+>> -i386_ss.add(when: 'CONFIG_SEV', if_true: files('host-cpu.c', 'confidential-guest.c'))
+>> +i386_ss.add(when: ['CONFIG_SEV', 'HOST_X86_64'], if_true: files('host-cpu.c', 'confidential-guest.c'))
+>>   
+>>   # x86 cpu type
+>>   i386_ss.add(when: 'CONFIG_KVM', if_true: files('host-cpu.c'))
+>> @@ -21,7 +21,7 @@ i386_system_ss.add(files(
+>>     'cpu-apic.c',
+>>     'cpu-sysemu.c',
+>>   ))
+>> -i386_system_ss.add(when: 'CONFIG_SEV', if_true: files('sev.c'), if_false: files('sev-sysemu-stub.c'))
+>> +i386_system_ss.add(when: ['CONFIG_SEV', 'HOST_X86_64'], if_true: files('sev.c'), if_false: files('sev-sysemu-stub.c'))
+>>   
+>>   i386_user_ss = ss.source_set()
+> 
+> Instead of changing each usage of CONFIG_SEV, is it better to
+> prevent it getting enabled in the first place ?
+> 
+> eg. move
+> 
+>    #CONFIG_SEV=n
+> 
+> From
+> 
+>    configs/devices/i386-softmmu/default.mak
+> 
+> to
+> 
+>    configs/devices/x86_64-softmmu/default.mak
+> 
+> And then also change
+> 
+>    hw/i386/Kconfig
+> 
+> to say
+> 
+>    config SEV
+>        bool
+>        select X86_FW_OVMF
+>        depends on KVM && X86_64
 
---FU7Zc89k4QCiR7WV
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Both are *targets*, IIUC we want to disable on *hosts*.
 
-On Wed, Jun 26, 2024 at 05:37:07PM +0100, Conor Dooley wrote:
-> On Wed, Jun 26, 2024 at 09:18:46AM -0700, Atish Kumar Patra wrote:
-> > On Wed, Jun 26, 2024 at 6:24=E2=80=AFAM Samuel Holland
-> > <samuel.holland@sifive.com> wrote:
-> > >
-> > > On 2024-06-26 2:23 AM, Atish Patra wrote:
-> > > > From: Samuel Holland <samuel.holland@sifive.com>
-> > > >
-> > > > Currently, we stop all the counters while a new cpu is brought onli=
-ne.
-> > > > However, the hpmevent to counter mappings are not reset. The firmwa=
-re may
-> > > > have some stale encoding in their mapping structure which may lead =
-to
-> > > > undesirable results. We have not encountered such scenario though.
-> > > >
-> > >
-> > > This needs:
-> > >
-> > > Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
-> > >
-> >=20
-> > Oops. Sorry I missed that.
-> >=20
-> > @Alexandre Ghiti
->=20
-> What's Alex going to be able to do?
->=20
-> > @Palmer Dabbelt : Can you add that while picking up
-> > the patch or should I respin a v4 ?
->=20
-> b4 should pick the signoff up though. "perf: RISC-V: Check standard
-> event availability" seems to be missing your signoff though...
-
-Huh, this doesn't really make sense. I meant:
-	b4 should pick the signoff up, though "perf: RISC-V: Check standard
-	event availability" seems to be missing your signoff...
-
---FU7Zc89k4QCiR7WV
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZnxEVAAKCRB4tDGHoIJi
-0hINAP48KsydcVtxBdutJ7PLHDXPIJwaexLkCAn12KujpGyUXwD/ayGbi7swPtlU
-FUXHQj/AMQOOQenoBkNfM/k44jEYCQE=
-=a7Yq
------END PGP SIGNATURE-----
-
---FU7Zc89k4QCiR7WV--
 
