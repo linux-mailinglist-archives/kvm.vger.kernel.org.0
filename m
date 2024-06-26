@@ -1,175 +1,145 @@
-Return-Path: <kvm+bounces-20575-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20576-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1376E9198BC
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 22:09:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B1B91995B
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 22:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 827FA1F2241C
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 20:09:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9034EB24DDB
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 20:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8F46192B84;
-	Wed, 26 Jun 2024 20:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE151940B5;
+	Wed, 26 Jun 2024 20:41:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IEKL4PXV"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="3WE2z3Aa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B380E1922FF
-	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 20:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123FB1940B7
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 20:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719432531; cv=none; b=grd94AdaeZIRY/YDv9WOFzTOzP6zFf1AqK1aQKgO8ezMTSDLu2XCXz2kqE2mr/cDM3x0ilJA5aSUr2HnkBAXIPF7Tji5Xxhyj+ezCuQOHsk+s07On5bTvFDKSsU5IaUHt8XpL/v+XMRZMVm8chV94kWMqTKzM7+JhEAH1pWv2nE=
+	t=1719434468; cv=none; b=QC8ad5xqDaM/iPqKegSsSEDr1tgPycO+APYCOVwPdLD9j9aLjg1qquq50ltmK0ncTs/1le5M/dzBHN7lhdjt7DIgpxY2q65QLqSvLK6AQu/AOUnrt78w3vjStEcrEg75tEwCYizJVBLytvlCgkWajI/TFXuZ0J0YvQXN4MPM5b0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719432531; c=relaxed/simple;
-	bh=4S0EVxaJe8fpJ7++KuVyrQMRoO8WSKD0yaA4rxhijs8=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Sp48X50Gd+5XA6nD7/hS38gh/6I8eK0waqgA4qYB52pws3h2nfesVDfxo4oppjxGhbzbEa8BzNToJGnMjB/xdKPKV1tMqQBK23gxL0kzzOZZyenYRBF/+OjQlXRJpj1gar7iBTz0mbHQ6s4rPqzn1M91zg1yAn2KvbWBOouwWzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IEKL4PXV; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2c7430b3c4bso8767523a91.1
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 13:08:49 -0700 (PDT)
+	s=arc-20240116; t=1719434468; c=relaxed/simple;
+	bh=qsh8GM7rmgPgv/T2+aRZxiz6dVPWlf2/jKN650uItuk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QsO9djfeNeCeGGNThe8mwknlwLHdhwmC71dcRGkFeN41w55bL127RVRKErzIasskgKz1VBd+Mm7mPHF31C8L8K6CXkNNUmSs1rQ7jcGGIWtWR1iuI0WH4Xc5EjvZrG++MaT/R30ch8ciUBlecdmVMW6MK1SR2V7R8bNKdIUj15o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=3WE2z3Aa; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-52db1a5b3f8so1031496e87.1
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 13:41:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719432529; x=1720037329; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZUK64owq78D+nkswI+vsRdMEdD3oJn8Wq+egIOghUI=;
-        b=IEKL4PXVO0GlCgwOxnCdQYybwkGM5V46ZfWYAaT7ALdCVTwQv7Yl5J0UDZgy2qcouM
-         CHO6cwzwIaZdrMUE1zM6LymCv54Ya8E9YSdXiwnm3V9PGjeloCtImZPLyGWD7jxD5onA
-         TVWkfFgfiu2bZ86GVwbxFLNOmAU02vhmbA3gVBRnAlZC19bRk8zKBDFNED+Np1sN4cKG
-         nGZ1Tl5kTz/CwwpmAZbXzuQ45lUi9rOTWcmlFZP4ZO2a7TIcGLo1egvsGyS6ZP4T3MTr
-         Xyvq4oXlUBcsP7QUjHjBn+s+crlW1s9zuPUXtsRhxUB3BL3EoEY5ThMRIWzqWBxbzR6L
-         hV0Q==
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1719434463; x=1720039263; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GvqpZm+deOZ11Eji88xBj8E0l9mzRvWeVq0FD6NU9YA=;
+        b=3WE2z3AajBs9zKwvfvMxQvxqRbk2iQFzx2E1ld5vv4GmtehXa6s+1L+O2x1nrt85Hn
+         fs71lX0bfQ2eNkNVp/pVb+9A+DBetmHMj4Horfb8/hc2VHPe8cR93I3FMnW34WIcZJLs
+         sFyOLDHbeF3Ay5mYJpd2WdxUzSA/kQdKELJBg0yrmb+Vd8Vri/K8AR+0bXab0vZCVLXb
+         VknWqhEuDhPehm84F8Uj773Clp7SY+B/SiU1IY5eASMxyTCsyL+UmiCRgs/PS4nqsRnJ
+         O798Bd/QsvroD0ijda5MPHN+VX8+mn8LvGKepBowaJENmBAHUub4t/JXJ+pSvng9vyJw
+         M5Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719432529; x=1720037329;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZUK64owq78D+nkswI+vsRdMEdD3oJn8Wq+egIOghUI=;
-        b=rljlow1OF74BNJRBQXKZpvMYyPaVHztQWvAlvI88X4wNizswf+++Z0utO2CUP5F+eA
-         fyzo/+/DW7vG1rKVAvPgjgEIlyrrjS1NN1LDWRTDmGhkwPtxkkK/oQZxKqwR6krZEw0h
-         62ECVTt4oAa55YmctxmUC43yXZP3NOHhSmKSO0IKXi4HWYrZNxmHTBeCoFjUvFOFWVXJ
-         P4hvskEcOEHwd4YdsweU7QVkdXmgrJUp7JOeKLUMaHlsXitErbFk99s1u0d2+6s85Lcn
-         ORMe8+55k+AwcwlMj0L6En/humzFR2zvzpf1Qq28fhJfe+cYhMpYEgIUyctyyyuMHB01
-         9VIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW3XyYcZvX59GngSicOfnXE2jwbK9TOtjVgG1yiIJO9/PjnynNrc7yns1GypZh0WLrm+cSDmwtbEmGuBVTlTsirldpH
-X-Gm-Message-State: AOJu0Yzng80agq3JOZYHij53k+/YLUmZq7Eq4GIkGRt+KCr9eCXzNL45
-	ymgSx9gy8Zy0qKJ+XXVEuSjP6EbuqKTPNlQq3s5U3IaHBrpwd6zBrqpoRawm2CNX5b63zV0bDao
-	fdg==
-X-Google-Smtp-Source: AGHT+IFobNEQjS9eARQk343geD0ViRI6gKHOTxtiSoNxckgqOSHSLxWkgoxi1wsgrpQuiN+Asg30a0OYQEc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4d8c:b0:2bd:f679:24ac with SMTP id
- 98e67ed59e1d1-2c857c4b24emr39492a91.0.1719432528807; Wed, 26 Jun 2024
- 13:08:48 -0700 (PDT)
-Date: Wed, 26 Jun 2024 13:08:47 -0700
-In-Reply-To: <20240625-bug5-v1-1-e072ed5fce85@gmail.com>
+        d=1e100.net; s=20230601; t=1719434463; x=1720039263;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GvqpZm+deOZ11Eji88xBj8E0l9mzRvWeVq0FD6NU9YA=;
+        b=RIW2xh6Dq+VPxjmyBDxWfqTHVXQpEPhmzVQFO1mgfToxMhPiDaUq/LyPghTXBhZrNN
+         hUI4vVOPPqSmxoMGlAjJYqChkxba4omnGpctSsvgOJk5VPYihR371WlUT196drKG0bRW
+         JhsXi5F7kuEDSDMnKsUfkisURxuAAS+D/Mzc9p6Q8nyDn93bUq2KZq9HfnPgNl1v5yMi
+         gzYKJ/ehgIccms1pnSDP11asOHXjZTHLA0mphtqxBWo6RH8j9Of/uedlYrUTa9SStX7D
+         Q5sZ6io/tbXXsCwqUKAB66mvg6PMvNua4UzllnHSFxaIFByq47XUH0wwDFVffOY0Ok2p
+         gpNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW+UTQOxK0dGkCvrVCHOsIG7eALljxSL/+2WlQGzntQcKFzy/gzX5rjsd4YojcWNWsZK+HhwCYLchTJX/6JVDuv4czz
+X-Gm-Message-State: AOJu0YyqP7IO8MoPSvGEFaHHuUE2N4Ew/xXc2pV7reSWS0JgpnZpHnST
+	YXjXKK89GkMoKYBwW9t+lH+P3cGrYCw9QdKn9zfP2IEGYY1IagaFsjmLHYEr1t0GU6JR5USQXLI
+	sYQn8yaNCDHi9soHVmPzG2imp9SmwMQdJPzSmeg==
+X-Google-Smtp-Source: AGHT+IENbv1JB8KrYfz9k4cJJbNQpQvc3N1XgF/oP1hbnTMuUKfGE8n6eqcvVdPstQafQqQTqXppzX65dn8nHDLTa8k=
+X-Received: by 2002:a05:6512:a90:b0:52c:c4b3:7e95 with SMTP id
+ 2adb3069b0e04-52e7038ba94mr23119e87.18.1719434463152; Wed, 26 Jun 2024
+ 13:41:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240625-bug5-v1-1-e072ed5fce85@gmail.com>
-Message-ID: <Znx1T_hHNA_uThf2@google.com>
-Subject: Re: [PATCH] kvm: Fix warning in__kvm_gpc_refresh
-From: Sean Christopherson <seanjc@google.com>
-To: Pei Li <peili.dev@gmail.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linuxfoundation.org, 
-	syzkaller-bugs@googlegroups.com, llvm@lists.linux.dev, 
-	syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240626-misc_perf_fixes-v3-0-de3f8ed88dab@rivosinc.com>
+ <20240626-misc_perf_fixes-v3-2-de3f8ed88dab@rivosinc.com> <96ff4dd2-db66-4653-80e9-97d4f1381581@sifive.com>
+ <CAHBxVyHx9hTRPosizV_yn6DUZi-MTNTrAbJdkV3049D-qsDHcw@mail.gmail.com>
+ <20240626-eraser-unselect-99e68a1f5a3e@spud> <20240626-spyglass-clutter-4ff4d7b26dd4@spud>
+In-Reply-To: <20240626-spyglass-clutter-4ff4d7b26dd4@spud>
+From: Atish Kumar Patra <atishp@rivosinc.com>
+Date: Wed, 26 Jun 2024 13:40:52 -0700
+Message-ID: <CAHBxVyEg2uKKdikXib77JDmCKs8qDGJHvj3stsFgCgO0U9omRg@mail.gmail.com>
+Subject: Re: [PATCH v3 2/3] drivers/perf: riscv: Reset the counter to hpmevent
+ mapping while starting cpus
+To: Conor Dooley <conor@kernel.org>
+Cc: Samuel Holland <samuel.holland@sifive.com>, linux-riscv@lists.infradead.org, 
+	kvm-riscv@lists.infradead.org, Atish Patra <atishp@atishpatra.org>, 
+	Anup Patel <anup@brainfault.org>, Will Deacon <will@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Andrew Jones <ajones@ventanamicro.com>, 
+	Conor Dooley <conor.dooley@microchip.com>, Palmer Dabbelt <palmer@rivosinc.com>, 
+	Alexandre Ghiti <alexghiti@rivosinc.com>, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 25, 2024, Pei Li wrote:
-> Check for invalid hva address stored in data before calling
-> kvm_gpc_activate_hva() instead of only compare with 0.
-> 
-> Reported-by: syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=fd555292a1da3180fc82
-> Tested-by: syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
-> Signed-off-by: Pei Li <peili.dev@gmail.com>
-> ---
-> Syzbot reports a warning message in __kvm_gpc_refresh(). This warning
-> requires at least one of gpa and uhva to be valid.
-> WARNING: CPU: 0 PID: 5090 at arch/x86/kvm/../../../virt/kvm/pfncache.c:259 __kvm_gpc_refresh+0xf17/0x1090 arch/x86/kvm/../../../virt/kvm/pfncache.c:259
-> 
-> We are calling it from kvm_gpc_activate_hva(). This function always calls
-> __kvm_gpc_activate() with INVALID_GPA. Thus, uhva must be valid to
-> disable this warning.
-> 
-> This patch checks for invalid hva address as well instead of only
-> comparing hva with 0 before calling kvm_gpc_activate_hva()
-> 
-> syzbot has tested the proposed patch and the reproducer did not trigger
-> any issue.
-> 
-> Tested on:
-> 
-> commit:         55027e68 Merge tag 'input-for-v6.10-rc5' of git://git...
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16ea803a980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=e40800950091403a
-> dashboard link: https://syzkaller.appspot.com/bug?extid=fd555292a1da3180fc82
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> patch:          https://syzkaller.appspot.com/x/patch.diff?x=16eeb53e980000
-> 
-> Note: testing is done by a robot and is best-effort only.
-> ---
->  arch/x86/kvm/xen.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index f65b35a05d91..de5f34492405 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -881,7 +881,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
->  			r = kvm_gpc_activate(&vcpu->arch.xen.vcpu_info_cache,
->  					     data->u.gpa, sizeof(struct vcpu_info));
->  		} else {
-> -			if (data->u.hva == 0) {
-> +			if (data->u.hva == 0 || kvm_is_error_hva(data->u.hva)) {
->  				kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_info_cache);
->  				r = 0;
->  				break;
+On Wed, Jun 26, 2024 at 9:39=E2=80=AFAM Conor Dooley <conor@kernel.org> wro=
+te:
+>
+> On Wed, Jun 26, 2024 at 05:37:07PM +0100, Conor Dooley wrote:
+> > On Wed, Jun 26, 2024 at 09:18:46AM -0700, Atish Kumar Patra wrote:
+> > > On Wed, Jun 26, 2024 at 6:24=E2=80=AFAM Samuel Holland
+> > > <samuel.holland@sifive.com> wrote:
+> > > >
+> > > > On 2024-06-26 2:23 AM, Atish Patra wrote:
+> > > > > From: Samuel Holland <samuel.holland@sifive.com>
+> > > > >
+> > > > > Currently, we stop all the counters while a new cpu is brought on=
+line.
+> > > > > However, the hpmevent to counter mappings are not reset. The firm=
+ware may
+> > > > > have some stale encoding in their mapping structure which may lea=
+d to
+> > > > > undesirable results. We have not encountered such scenario though=
+.
+> > > > >
+> > > >
+> > > > This needs:
+> > > >
+> > > > Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
+> > > >
+> > >
+> > > Oops. Sorry I missed that.
+> > >
+> > > @Alexandre Ghiti
+> >
+> > What's Alex going to be able to do?
+> >
 
-Hmm, I think what we want is to return -EINVAL in this case, not deactivate the
-region.   I could have sworn KVM does that.  Gah, I caught
-KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA during review, but missed this one.  So to fix
-this immediate bug, and avoid similar issues in the future, this?
+He is collecting the fixes patches in the RISC-V tree and pinged for
+revision for this patch last week.
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index 93814d3850eb..622fe24da910 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -741,7 +741,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
-                } else {
-                        void __user * hva = u64_to_user_ptr(data->u.shared_info.hva);
- 
--                       if (!PAGE_ALIGNED(hva) || !access_ok(hva, PAGE_SIZE)) {
-+                       if (!PAGE_ALIGNED(hva)) {
-                                r = -EINVAL;
-                        } else if (!hva) {
-                                kvm_gpc_deactivate(&kvm->arch.xen.shinfo_cache);
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index 0ab90f45db37..728d2c1b488a 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -438,6 +438,9 @@ int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
- 
- int kvm_gpc_activate_hva(struct gfn_to_pfn_cache *gpc, unsigned long uhva, unsigned long len)
- {
-+       if (!access_ok((void __user *)uhva, len))
-+               return -EINVAL;
-+
-        return __kvm_gpc_activate(gpc, INVALID_GPA, uhva, len);
- }
+> > > @Palmer Dabbelt : Can you add that while picking up
+> > > the patch or should I respin a v4 ?
+> >
+> > b4 should pick the signoff up though. "perf: RISC-V: Check standard
+> > event availability" seems to be missing your signoff though...
+>
+> Huh, this doesn't really make sense. I meant:
+>         b4 should pick the signoff up, though "perf: RISC-V: Check standa=
+rd
+>         event availability" seems to be missing your signoff...
 
+Strange. I modified and sent the patch using b4 as well. It's missing
+my sign off too.
 
