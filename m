@@ -1,250 +1,147 @@
-Return-Path: <kvm+bounces-20550-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20551-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EB469180A4
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 14:09:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81D809180FA
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 14:35:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A59581F21DB6
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 12:09:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17257B23A4F
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 12:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63EF11836C8;
-	Wed, 26 Jun 2024 12:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF0E181BB7;
+	Wed, 26 Jun 2024 12:35:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YAaOmiIm"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OtD948vO"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63308180A8B;
-	Wed, 26 Jun 2024 12:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8751E51D;
+	Wed, 26 Jun 2024 12:35:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719403719; cv=none; b=SywcSiHDZ3tvaYdwLEl8J9SsypIVcPXPpy+Fcufh+FD++sBMpmsnZllSoMvN0kAfxXfDFL2oN2bgtC6rFhDBbdIAzi2TrQSDOIsJweKLjHdT3ARWyHAMX8C5uFDtRHcvIslDBKlFQjOZYD5h2SCHMtSneCdVn2VhPTMQES2F/Dg=
+	t=1719405312; cv=none; b=A5JpG9XGtl0NwWvpzXytIYtFEH3g/EQC2JXkBv23hPweEJ8JtOB6k1mwlzu7FjGlKkbMnFfHNvpLToEl/LF5nzqQgMx9qDGr9WfcDXbPgXOlC9emf/weymqeXvD2OvfveWH4kNwK45n60Jeu72D13E4KzgjbZGCH8EJV6LPTFMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719403719; c=relaxed/simple;
-	bh=nvDfXqaIOIUJdUBc+mRwRInSMBLlZkoumqHWKxk+OCo=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jzGvK3PL7xP8nM5z+mTO74N+6bmW5t3WPjGkmdTlfsSZjxxbjkwGKY3bdISt6U+/doL0ZJB4lYYBLxz1zuowgKBXGAnSYgibMKybQ0wWWVzm9SAPly73C8k9GiSsAPFGvam4hMq7HRUImopBlyYoyrUgfSR7ThDnvaSYEuD7KXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YAaOmiIm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E315FC4AF0A;
-	Wed, 26 Jun 2024 12:08:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719403718;
-	bh=nvDfXqaIOIUJdUBc+mRwRInSMBLlZkoumqHWKxk+OCo=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=YAaOmiImw+HgUXc79wbJ3Fz9+DQ3EUxNl66Equ/Ot6u1YWOCHFyXA3V/ql9tvtPF1
-	 d0Pf7KsafcBZ+mUaqbVuCbyz2UqpUqEg72iuDf/GeKUenIjVC3uXFfM5uMOghaDv1W
-	 XBJcrwybMUBGtpJaydfMdW635rkFZ42uO3qMhXsdMoezbJsT4CMzLoQ2wZS4VmQmBo
-	 lNzW9tq4dDki1HolGQJqeVI+w0gVQvoMFBHO9bOF9Ev5dp1763qs4MboZKbDQTONRJ
-	 m1KKVcBsfMj2bel8SlMOr1aCr5rDa1a2RNNqLzAi/XNoLkmJakYgTtarMfemmAtJ+e
-	 6PMQCHKRw9MtA==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6846C30653;
-	Wed, 26 Jun 2024 12:08:38 +0000 (UTC)
-From: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>
-Date: Wed, 26 Jun 2024 14:08:37 +0200
-Subject: [PATCH net-next v3 3/3] test/vsock: add ioctl unsent bytes test
+	s=arc-20240116; t=1719405312; c=relaxed/simple;
+	bh=vI/1o0+2hln9lPAnOOhXh21rWmGrsxGmQIF93754w34=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qkhvM6RFY1zaBCGfGgUX29M/ApwqTu0/K4EmBevtQB+62f3+ETHyb0T+CZVB4CxvO8pWyTgeAECvOP9mt/H089pFYgVk3j3Y18iDH4ExqQizrexnWV1Vvx+zxj14MDaONsFLCsFn2OK2QN0OPP+Qtkb/+IFePerxV8kgMI6ceSA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OtD948vO; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45QCSZS8025519;
+	Wed, 26 Jun 2024 12:34:58 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=1M3uab7xvRx35jrrCl/rxHpIST
+	fv19tWewf+1efpx6w=; b=OtD948vO4kYLvlKeLdrGojELI607ol+Bdi5QKdj4B7
+	yejJdB8NyP/WsJDAPaEwDwPrE8k86q+e/lEzuaZQYLIIUZ3BbDAyXCWT86t+UI4C
+	O5HbtGfbErWa+T7K44vLC5pivj8C/0Yf0HM0pFUEPP6NbcXc3vezjOAPGxmCc3vQ
+	GzDFUFgdDy8iFfVVsloj5SI199EJgqALeg6euYfxCFypxlAMjXmPbo8bCDHiMsWU
+	W5srlo08pQuyVKsLuOnZhkW6cL7w6ZCy8pTaPGx9AP5kOuEvZ4DvFowdAOwoqwiv
+	pJvwMxTHKTVA8G1ao3XZpmYEexFQslIcrUslW+oAEpbA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 400k16g0py-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jun 2024 12:34:58 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45QCYvt0005532;
+	Wed, 26 Jun 2024 12:34:58 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 400k16g0pw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jun 2024 12:34:57 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45Q9sYvn020058;
+	Wed, 26 Jun 2024 12:34:57 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yxb5mm429-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 26 Jun 2024 12:34:57 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45QCYpuG18547158
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 26 Jun 2024 12:34:53 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A207D2004F;
+	Wed, 26 Jun 2024 12:34:51 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1C8E52004E;
+	Wed, 26 Jun 2024 12:34:50 +0000 (GMT)
+Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.in.ibm.com (unknown [9.204.206.66])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 26 Jun 2024 12:34:49 +0000 (GMT)
+From: Gautam Menghani <gautam@linux.ibm.com>
+To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
+        naveen.n.rao@linux.ibm.com
+Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
+        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] arch/powerpc/kvm: Avoid extra checks when emulating HFSCR bits
+Date: Wed, 26 Jun 2024 18:04:45 +0530
+Message-ID: <20240626123447.66104-1-gautam@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240626-ioctl_next-v3-3-63be5bf19a40@outlook.com>
-References: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
-In-Reply-To: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
- Luigi Leonardi <luigi.leonardi@outlook.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1719403717; l=5287;
- i=luigi.leonardi@outlook.com; s=20240626; h=from:subject:message-id;
- bh=FDpHJLS9kfgD7unmHav2FhVRFU78BRFdz0KEgUfk8vw=;
- b=TuJ/P23fgGZ+s3Q91ayKbKfOaprwu5UZ0qqn6gFtrq8ov1iB0WPwIR0+sGOZdCQ+FB1H5Mftb
- tzM1kHGr4WXB/CDMlKi/OlyMAXR2t2qoIjkAYK5dkLJ1lS8tIQeAwPb
-X-Developer-Key: i=luigi.leonardi@outlook.com; a=ed25519;
- pk=RYXD8JyCxGnx/izNc/6b3g3pgpohJMAI0LJ7ynxXzi8=
-X-Endpoint-Received: by B4 Relay for luigi.leonardi@outlook.com/20240626
- with auth_id=177
-X-Original-From: Luigi Leonardi <luigi.leonardi@outlook.com>
-Reply-To: luigi.leonardi@outlook.com
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: OLd1RCc2EWjGPQmFqe7jpg_cZK6BSujC
+X-Proofpoint-ORIG-GUID: 0NX8MqzH6XRyWYsOpeiK1bk-GVisM4-E
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-26_06,2024-06-25_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ phishscore=0 mlxlogscore=826 impostorscore=0 malwarescore=0 clxscore=1011
+ priorityscore=1501 lowpriorityscore=0 mlxscore=0 suspectscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2406260092
 
-From: Luigi Leonardi <luigi.leonardi@outlook.com>
+When a KVM guest tries to use a feature disabled by HFSCR, it exits to
+the host for emulation support, and the code checks for all bits which
+are emulated. Avoid checking all the bits by using a switch case.
 
-Introduce two tests, one for SOCK_STREAM and one for SOCK_SEQPACKET, which checks
-after a packet is delivered, that the number of unsent bytes is zero,
-using ioctl SIOCOUTQ.
-
-Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
 ---
- tools/testing/vsock/util.c       |  6 +--
- tools/testing/vsock/util.h       |  3 ++
- tools/testing/vsock/vsock_test.c | 85 ++++++++++++++++++++++++++++++++++++++++
- 3 files changed, 91 insertions(+), 3 deletions(-)
+ arch/powerpc/kvm/book3s_hv.c | 16 ++++++++++++----
+ 1 file changed, 12 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
-index 554b290fefdc..a3d448a075e3 100644
---- a/tools/testing/vsock/util.c
-+++ b/tools/testing/vsock/util.c
-@@ -139,7 +139,7 @@ int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_po
- }
+diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
+index 99c7ce825..a72fd2543 100644
+--- a/arch/powerpc/kvm/book3s_hv.c
++++ b/arch/powerpc/kvm/book3s_hv.c
+@@ -1922,14 +1922,22 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
  
- /* Connect to <cid, port> and return the file descriptor. */
--static int vsock_connect(unsigned int cid, unsigned int port, int type)
-+int vsock_connect(unsigned int cid, unsigned int port, int type)
- {
- 	union {
- 		struct sockaddr sa;
-@@ -226,8 +226,8 @@ static int vsock_listen(unsigned int cid, unsigned int port, int type)
- /* Listen on <cid, port> and return the first incoming connection.  The remote
-  * address is stored to clientaddrp.  clientaddrp may be NULL.
-  */
--static int vsock_accept(unsigned int cid, unsigned int port,
--			struct sockaddr_vm *clientaddrp, int type)
-+int vsock_accept(unsigned int cid, unsigned int port,
-+		 struct sockaddr_vm *clientaddrp, int type)
- {
- 	union {
- 		struct sockaddr sa;
-diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
-index e95e62485959..fff22d4a14c0 100644
---- a/tools/testing/vsock/util.h
-+++ b/tools/testing/vsock/util.h
-@@ -39,6 +39,9 @@ struct test_case {
- void init_signals(void);
- unsigned int parse_cid(const char *str);
- unsigned int parse_port(const char *str);
-+int vsock_connect(unsigned int cid, unsigned int port, int type);
-+int vsock_accept(unsigned int cid, unsigned int port,
-+		 struct sockaddr_vm *clientaddrp, int type);
- int vsock_stream_connect(unsigned int cid, unsigned int port);
- int vsock_bind_connect(unsigned int cid, unsigned int port,
- 		       unsigned int bind_port, int type);
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index f851f8961247..76bd17b4b291 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -20,6 +20,8 @@
- #include <sys/mman.h>
- #include <poll.h>
- #include <signal.h>
-+#include <sys/ioctl.h>
-+#include <linux/sockios.h>
- 
- #include "vsock_test_zerocopy.h"
- #include "timeout.h"
-@@ -1238,6 +1240,79 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
- 	}
- }
- 
-+#define MSG_BUF_IOCTL_LEN 64
-+static void test_unsent_bytes_server(const struct test_opts *opts, int type)
-+{
-+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-+	int client_fd;
-+
-+	client_fd = vsock_accept(VMADDR_CID_ANY, 1234, NULL, type);
-+	if (client_fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	recv_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
-+	control_writeln("RECEIVED");
-+
-+	close(client_fd);
-+}
-+
-+static void test_unsent_bytes_client(const struct test_opts *opts, int type)
-+{
-+	unsigned char buf[MSG_BUF_IOCTL_LEN];
-+	int ret, fd, sock_bytes_unsent;
-+
-+	fd = vsock_connect(opts->peer_cid, 1234, type);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	for (int i = 0; i < sizeof(buf); i++)
-+		buf[i] = rand() & 0xFF;
-+
-+	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
-+	control_expectln("RECEIVED");
-+
-+	ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
-+	if (ret < 0) {
-+		if (errno == EOPNOTSUPP) {
-+			fprintf(stderr, "Test skipped\n");
-+		} else {
-+			perror("ioctl");
-+			exit(EXIT_FAILURE);
-+		}
-+	} else if (ret == 0 && sock_bytes_unsent != 0) {
-+		fprintf(stderr,
-+			"Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
-+			sock_bytes_unsent);
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	close(fd);
-+}
-+
-+static void test_stream_unsent_bytes_client(const struct test_opts *opts)
-+{
-+	test_unsent_bytes_client(opts, SOCK_STREAM);
-+}
-+
-+static void test_stream_unsent_bytes_server(const struct test_opts *opts)
-+{
-+	test_unsent_bytes_server(opts, SOCK_STREAM);
-+}
-+
-+static void test_seqpacket_unsent_bytes_client(const struct test_opts *opts)
-+{
-+	test_unsent_bytes_client(opts, SOCK_SEQPACKET);
-+}
-+
-+static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
-+{
-+	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
-+}
-+
- #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
- /* This define is the same as in 'include/linux/virtio_vsock.h':
-  * it is used to decide when to send credit update message during
-@@ -1523,6 +1598,16 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_rcvlowat_def_cred_upd_client,
- 		.run_server = test_stream_cred_upd_on_low_rx_bytes,
- 	},
-+	{
-+		.name = "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes",
-+		.run_client = test_stream_unsent_bytes_client,
-+		.run_server = test_stream_unsent_bytes_server,
-+	},
-+	{
-+		.name = "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes",
-+		.run_client = test_seqpacket_unsent_bytes_client,
-+		.run_server = test_seqpacket_unsent_bytes_server,
-+	},
- 	{},
- };
- 
-
+ 		r = EMULATE_FAIL;
+ 		if (cpu_has_feature(CPU_FTR_ARCH_300)) {
+-			if (cause == FSCR_MSGP_LG)
++			switch (cause) {
++			case FSCR_MSGP_LG:
+ 				r = kvmppc_emulate_doorbell_instr(vcpu);
+-			if (cause == FSCR_PM_LG)
++				break;
++			case FSCR_PM_LG:
+ 				r = kvmppc_pmu_unavailable(vcpu);
+-			if (cause == FSCR_EBB_LG)
++				break;
++			case FSCR_EBB_LG:
+ 				r = kvmppc_ebb_unavailable(vcpu);
+-			if (cause == FSCR_TM_LG)
++				break;
++			case FSCR_TM_LG:
+ 				r = kvmppc_tm_unavailable(vcpu);
++				break;
++			default:
++				break;
++			}
+ 		}
+ 		if (r == EMULATE_FAIL) {
+ 			kvmppc_core_queue_program(vcpu, SRR1_PROGILL |
 -- 
 2.45.2
-
 
 
