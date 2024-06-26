@@ -1,229 +1,150 @@
-Return-Path: <kvm+bounces-20529-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20530-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8152591799D
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 09:25:22 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6E539179B0
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 09:29:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4AA11C218F7
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 07:25:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 288321F24782
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 07:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05E6B161326;
-	Wed, 26 Jun 2024 07:24:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D596115B10D;
+	Wed, 26 Jun 2024 07:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="P2pl5PsI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jmPj3ZSX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8A115F3E6
-	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 07:24:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1A145978;
+	Wed, 26 Jun 2024 07:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719386663; cv=none; b=HFDNEq6WzcMDyoGTqr8+YZSt9MIqHM6P4MeDlUdqMXpfEomsgN32b4LBGQ+auTx+88v9w+UXlh4kwvWzvwJTmiaxGIJ70hniNkrGyan0+qVE56dyrU6LeameH4j22vnYU3R24/HzrW+/6nQgCn40L0ALw93TEGGZ6SWRx1tVj0Q=
+	t=1719386971; cv=none; b=JXgLsdzQXECaiHTr30rjjSy65xYRCjRTGVewmokB1zxkGCaj9oDtlOOQ1kjr+iWPhs9CVXsexdjmkcvQBMAjn1P0wASkDAyGD8FcLcFJLXrqb/ex00Uqn9vA8UcRC7lksf7BVGYj0HEjlg/syFm9ou7cXMo9i7usPYiJ2lzrXB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719386663; c=relaxed/simple;
-	bh=VUWBEtm/D4zb4F+2qjBSmtWv1T8UgXgKWmKRuYOYU7Q=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=GUaoaSIsWkM5KWlUwGFzGbqV0vKsK1IKwl6KUxGDVLcIqtnNnNZGzTThHZLdPnSEcdR+8otcbG+Cv1B/PxJECgC7RuCoMdjjfGjVcxvrTE46OfOz/z+o7PoiX4QOE8h4lBChA+k8Yr/TudcL9qEBTwzj3/qTt8j2MG6lwZdQxtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=P2pl5PsI; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-7066463c841so3028967b3a.1
-        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 00:24:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1719386661; x=1719991461; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Hrss5oGak6lOGeNrtNh2TIJslk06xEuOEGM+GgwCDDo=;
-        b=P2pl5PsIIqZmUyC7OQUu6TBp3grS1OlsczFX8BSvHcLnUU20z3e0imjpscfwEhZ6J1
-         KlJLiZngaVBgAiCYgEgwrUbhPrWjbMV+nxDJpHVdQuHHMuICnEveXUndJvuWqPtkIekm
-         rRcES9K11Gu+T+9hsBR+cKONj/vVgYrmIo+zyYp0dPHRDzdPlwF0je7oMNZT8UrGbXFD
-         f9DrP3rBfPkbZJYS9YSRteJLPzW8a/93l5bia8qXDOgZEF3gxvtgpjKaIy6T+iMXkgzK
-         QSiDn/GBkOUwYq+z1UaSaBf7Tx9I0z6QYoyZqinymmv6IBfdSG/un45zpFUW3xKS5Hw1
-         wopg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719386661; x=1719991461;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hrss5oGak6lOGeNrtNh2TIJslk06xEuOEGM+GgwCDDo=;
-        b=rV9vddnr+K19WK35nLmFPSfB6QxVwHjAGj5l3aAcSqNAPGlhr+kSD5xTa2R3ATHfW/
-         VjqO4MmA73QJby0SxihHGG9FbLnp2GoR0Uj1lc5H8JNV5oruWuOeFYwsM9T6f6EiBewm
-         M73gKjcCuW+xfEbs37vGwLEPkxR+3lm+Nh+QkIPVbNjjM1ijDkPG6OXoZpD7RPD0LbzA
-         FEAvP/J9UUu3zP4sC8fnXp35A79MKZ0ekMb56onk3rM7IKixLdXCg1m9BzdICltrmjbv
-         ggDwD5gar5Z6ViC3K58yG77FJX9ZHULw0M3WviXszchlpxV/3kt9vZesQjCO8p4YXiKP
-         5SNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBR1Us9mbiOqjjyYLDL98SVt64Wip1hu7URJE7UXQ8hduSUu1NPFr/+Rn02kjNvIUNsIq8S2fRasqZqgf8J5qEFUSc
-X-Gm-Message-State: AOJu0YyRzDZeCly0M6+5kydQ7bqppCUaJyurlVfgWI7WGWpnXpf1AEKo
-	XI4mQ4BINCeGkgCaS7tEyg0Tp+lf2orws5mVLSpETjLjKpZuydmtKyxswXqw5sM=
-X-Google-Smtp-Source: AGHT+IFvQFItmxduKUYuJVMymGEvvdaLRWz3IbarvmEbIrChrbcL8pGYz4tAs8BSP+va+caASzcEaw==
-X-Received: by 2002:a62:e817:0:b0:705:ddb0:5260 with SMTP id d2e1a72fcca58-706743ad900mr9780867b3a.0.1719386660966;
-        Wed, 26 Jun 2024 00:24:20 -0700 (PDT)
-Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-706984a721csm2692218b3a.37.2024.06.26.00.24.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 00:24:20 -0700 (PDT)
-From: Atish Patra <atishp@rivosinc.com>
-Date: Wed, 26 Jun 2024 00:23:03 -0700
-Subject: [PATCH v3 3/3] perf: RISC-V: Check standard event availability
+	s=arc-20240116; t=1719386971; c=relaxed/simple;
+	bh=J0eWAsgVkY1jYjZlKFdqP2bghj/1MBcjAvvnIMRcUIc=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=QsdDZ+Itk8lIqpfTIppqN2cjYBdhkz5qhirar1pdUyVHAglHE0XqTa4+t9jnIw3HP07netShlGpYOLC6nNc5Pbt34at8g0dqQwx1c1/KX9av35QXfR0GGaZjv5/qTgjS1LkYYbQ0HNz9lRnGcdPOCoYbcgbDufvwe0lWvZScotQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jmPj3ZSX; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719386970; x=1750922970;
+  h=message-id:date:mime-version:subject:from:to:cc:
+   references:in-reply-to:content-transfer-encoding;
+  bh=J0eWAsgVkY1jYjZlKFdqP2bghj/1MBcjAvvnIMRcUIc=;
+  b=jmPj3ZSX57vHb3MJ8IeyfV/d/H6W2Mb3rK7tYwLs55qEiLNuiHQbrPrh
+   x3d5RBkVrFfHNnJQ/UB+e0uP/ZqAlbIdv59yVotIfWUWJg6nId/w6eWFU
+   fUjGe0/7iXjmNtgp97Koh/DJhkOryB40c2nAZdLdzuaMPCTa3VPj3mkbZ
+   78lRRjor/x51svzt+E6hDHVjPcmwf8WEE0kfx2aiknDZu947YiSD1pOu8
+   GzcSdvm+O6OsHFpHWpoA2TQvifEcKniM1N8jUhy3GuRbY/zYG+Mjt0OZW
+   1KIhh7gh8ugtSO85v4Br5VyPzLiaJ3OeVCf0e36I1lF/O/tPv37tYF1MA
+   g==;
+X-CSE-ConnectionGUID: cduVZm3uTZifxoAqGDIGAA==
+X-CSE-MsgGUID: KbRK6O8qTf6Hr2Wtipln6g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11114"; a="27848495"
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="27848495"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 00:29:29 -0700
+X-CSE-ConnectionGUID: L/A/1mnXS3Gudf3zXbZmqw==
+X-CSE-MsgGUID: fZ6EKJvmSLippSfOtShXcg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.08,266,1712646000"; 
+   d="scan'208";a="44624811"
+Received: from qunyang-mobl1.ccr.corp.intel.com (HELO [10.238.2.59]) ([10.238.2.59])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2024 00:29:25 -0700
+Message-ID: <80d06351-3c34-40e9-aecc-524aaeb644f7@linux.intel.com>
+Date: Wed, 26 Jun 2024 15:29:22 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240626-misc_perf_fixes-v3-3-de3f8ed88dab@rivosinc.com>
-References: <20240626-misc_perf_fixes-v3-0-de3f8ed88dab@rivosinc.com>
-In-Reply-To: <20240626-misc_perf_fixes-v3-0-de3f8ed88dab@rivosinc.com>
-To: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org
-Cc: Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, 
- Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
- Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Andrew Jones <ajones@ventanamicro.com>, 
- Conor Dooley <conor.dooley@microchip.com>, 
- Samuel Holland <samuel.holland@sifive.com>, 
- Palmer Dabbelt <palmer@rivosinc.com>, 
- Alexandre Ghiti <alexghiti@rivosinc.com>, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- kvm@vger.kernel.org, Atish Patra <atishp@rivosinc.com>
-X-Mailer: b4 0.15-dev-13183
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v19 110/130] KVM: TDX: Handle TDX PV MMIO hypercall
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Yamahata, Isaku" <isaku.yamahata@intel.com>
+Cc: "Zhang, Tina" <tina.zhang@intel.com>,
+ "seanjc@google.com" <seanjc@google.com>, "Yuan, Hang" <hang.yuan@intel.com>,
+ "Huang, Kai" <kai.huang@intel.com>, "Chen, Bo2" <chen.bo@intel.com>,
+ "sagis@google.com" <sagis@google.com>,
+ "isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
+ "Aktas, Erdem" <erdemaktas@google.com>,
+ "Chatre, Reinette" <reinette.chatre@intel.com>,
+ "pbonzini@redhat.com" <pbonzini@redhat.com>,
+ "sean.j.christopherson@intel.com" <sean.j.christopherson@intel.com>,
+ Chao Gao <chao.gao@intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <a4421e0f2eafc17b4703c920936e32489d2382a3.1708933498.git.isaku.yamahata@intel.com>
+ <560f3796-5a41-49fb-be6e-558bbe582996@linux.intel.com>
+ <07e410205a9eb87ab7f364b7b3e808e4f7d15b7f.camel@intel.com>
+ <edfc5edc-4bf7-4bc6-b760-c9d4341acc9d@linux.intel.com>
+Content-Language: en-US
+In-Reply-To: <edfc5edc-4bf7-4bc6-b760-c9d4341acc9d@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-From: Samuel Holland <samuel.holland@sifive.com>
 
-The RISC-V SBI PMU specification defines several standard hardware and
-cache events. Currently, all of these events are exposed to userspace,
-even when not actually implemented. They appear in the `perf list`
-output, and commands like `perf stat` try to use them.
 
-This is more than just a cosmetic issue, because the PMU driver's .add
-function fails for these events, which causes pmu_groups_sched_in() to
-prematurely stop scheduling in other (possibly valid) hardware events.
+On 6/26/2024 10:09 AM, Binbin Wu wrote:
+>
+>
+> On 6/26/2024 5:09 AM, Edgecombe, Rick P wrote:
+>> On Tue, 2024-06-25 at 14:54 +0800, Binbin Wu wrote:
+>>>> +               gpa = vcpu->mmio_fragments[0].gpa;
+>>>> +               size = vcpu->mmio_fragments[0].len;
+>>> Since MMIO cross page boundary is not allowed according to the input
+>>> checks from TDVMCALL, these mmio_fragments[] is not needed.
+>>> Just use vcpu->run->mmio.phys_addr and vcpu->run->mmio.len?
+>> Can we add a comment or something to that check, on why KVM doesn't 
+>> handle it?
+>> Is it documented somewhere in the TDX ABI that it is not expected to be
+>> supported?
+> TDX GHCI doesn't have such restriction.
+>
+> According to the reply from Isaku in the below link, I think current 
+> restriction is due to software implementation for simplicity.
+> https://lore.kernel.org/kvm/20240419173423.GD3596705@ls.amr.corp.intel.com/ 
+>
+> +       /* Disallow MMIO crossing page boundary for simplicity. */
+> +       if (((gpa + size - 1) ^ gpa) & PAGE_MASK)
+>                 goto error;
+>
+> According to 
+> https://lore.kernel.org/all/165550567214.4207.3700499203810719676.tip-bot2@tip-bot2/,
+> for Linux as TDX guest, it rejects EPT violation #VEs that split pages 
+> based on the reason "MMIO accesses are supposed to be naturally 
+> aligned and therefore never cross page boundaries" to handle the 
+> load_unaligned_zeropad() case.
+>
+> I am not sure "MMIO accesses are supposed to be naturally aligned" is 
+> true for all other OS as TDX guest, though.
+>
+> Any suggestion?
+>
+>
+Had some discussion with Gao, Chao.
 
-Add logic to check which events are supported by the hardware (i.e. can
-be mapped to some counter), so only usable events are reported to
-userspace. Since the kernel does not know the mapping between events and
-possible counters, this check must happen during boot, when no counters
-are in use. Make the check asynchronous to minimize impact on boot time.
+For TDX PV MMIO hypercall, it has got the GPA already.
+I.e, we don't need to worry about case of "contiguous in virtual memory, 
+but not be contiguous in physical memory".
 
-Fixes: e9991434596f ("RISC-V: Add perf platform driver based on SBI PMU extension")
+Also, the size of the PV MMIO access is limited to 1, 2, 4, 8 bytes. No 
+need to be split.
 
-Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
-Reviewed-by: Atish Patra <atishp@rivosinc.com>
-Tested-by: Atish Patra <atishp@rivosinc.com>
----
- arch/riscv/kvm/vcpu_pmu.c    |  2 +-
- drivers/perf/riscv_pmu_sbi.c | 42 ++++++++++++++++++++++++++++++++++++++++--
- 2 files changed, 41 insertions(+), 3 deletions(-)
+So, for TDX, there is no need to use vcpu->mmio_fragments[] even if the 
+MMIO access crosses page boundary.
+The check for "Disallow MMIO crossing page boundary" can be removed and 
+no extra fragments handling needed.
 
-diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-index 04db1f993c47..bcf41d6e0df0 100644
---- a/arch/riscv/kvm/vcpu_pmu.c
-+++ b/arch/riscv/kvm/vcpu_pmu.c
-@@ -327,7 +327,7 @@ static long kvm_pmu_create_perf_event(struct kvm_pmc *pmc, struct perf_event_att
- 
- 	event = perf_event_create_kernel_counter(attr, -1, current, kvm_riscv_pmu_overflow, pmc);
- 	if (IS_ERR(event)) {
--		pr_err("kvm pmu event creation failed for eidx %lx: %ld\n", eidx, PTR_ERR(event));
-+		pr_debug("kvm pmu event creation failed for eidx %lx: %ld\n", eidx, PTR_ERR(event));
- 		return PTR_ERR(event);
- 	}
- 
-diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
-index 94bc369a3454..4e842dcedfba 100644
---- a/drivers/perf/riscv_pmu_sbi.c
-+++ b/drivers/perf/riscv_pmu_sbi.c
-@@ -20,6 +20,7 @@
- #include <linux/cpu_pm.h>
- #include <linux/sched/clock.h>
- #include <linux/soc/andes/irq.h>
-+#include <linux/workqueue.h>
- 
- #include <asm/errata_list.h>
- #include <asm/sbi.h>
-@@ -114,7 +115,7 @@ struct sbi_pmu_event_data {
- 	};
- };
- 
--static const struct sbi_pmu_event_data pmu_hw_event_map[] = {
-+static struct sbi_pmu_event_data pmu_hw_event_map[] = {
- 	[PERF_COUNT_HW_CPU_CYCLES]		= {.hw_gen_event = {
- 							SBI_PMU_HW_CPU_CYCLES,
- 							SBI_PMU_EVENT_TYPE_HW, 0}},
-@@ -148,7 +149,7 @@ static const struct sbi_pmu_event_data pmu_hw_event_map[] = {
- };
- 
- #define C(x) PERF_COUNT_HW_CACHE_##x
--static const struct sbi_pmu_event_data pmu_cache_event_map[PERF_COUNT_HW_CACHE_MAX]
-+static struct sbi_pmu_event_data pmu_cache_event_map[PERF_COUNT_HW_CACHE_MAX]
- [PERF_COUNT_HW_CACHE_OP_MAX]
- [PERF_COUNT_HW_CACHE_RESULT_MAX] = {
- 	[C(L1D)] = {
-@@ -293,6 +294,34 @@ static const struct sbi_pmu_event_data pmu_cache_event_map[PERF_COUNT_HW_CACHE_M
- 	},
- };
- 
-+static void pmu_sbi_check_event(struct sbi_pmu_event_data *edata)
-+{
-+	struct sbiret ret;
-+
-+	ret = sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_CFG_MATCH,
-+			0, cmask, 0, edata->event_idx, 0, 0);
-+	if (!ret.error) {
-+		sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP,
-+			  ret.value, 0x1, SBI_PMU_STOP_FLAG_RESET, 0, 0, 0);
-+	} else if (ret.error == SBI_ERR_NOT_SUPPORTED) {
-+		/* This event cannot be monitored by any counter */
-+		edata->event_idx = -EINVAL;
-+	}
-+}
-+
-+static void pmu_sbi_check_std_events(struct work_struct *work)
-+{
-+	for (int i = 0; i < ARRAY_SIZE(pmu_hw_event_map); i++)
-+		pmu_sbi_check_event(&pmu_hw_event_map[i]);
-+
-+	for (int i = 0; i < ARRAY_SIZE(pmu_cache_event_map); i++)
-+		for (int j = 0; j < ARRAY_SIZE(pmu_cache_event_map[i]); j++)
-+			for (int k = 0; k < ARRAY_SIZE(pmu_cache_event_map[i][j]); k++)
-+				pmu_sbi_check_event(&pmu_cache_event_map[i][j][k]);
-+}
-+
-+static DECLARE_WORK(check_std_events_work, pmu_sbi_check_std_events);
-+
- static int pmu_sbi_ctr_get_width(int idx)
- {
- 	return pmu_ctr_list[idx].width;
-@@ -478,6 +507,12 @@ static int pmu_sbi_event_map(struct perf_event *event, u64 *econfig)
- 	u64 raw_config_val;
- 	int ret;
- 
-+	/*
-+	 * Ensure we are finished checking standard hardware events for
-+	 * validity before allowing userspace to configure any events.
-+	 */
-+	flush_work(&check_std_events_work);
-+
- 	switch (type) {
- 	case PERF_TYPE_HARDWARE:
- 		if (config >= PERF_COUNT_HW_MAX)
-@@ -1359,6 +1394,9 @@ static int pmu_sbi_device_probe(struct platform_device *pdev)
- 	if (ret)
- 		goto out_unregister;
- 
-+	/* Asynchronously check which standard events are available */
-+	schedule_work(&check_std_events_work);
-+
- 	return 0;
- 
- out_unregister:
-
--- 
-2.34.1
 
 
