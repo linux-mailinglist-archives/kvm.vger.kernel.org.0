@@ -1,118 +1,126 @@
-Return-Path: <kvm+bounces-20510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3656917513
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 01:56:13 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 591F891752E
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 02:12:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 314BD1C21243
-	for <lists+kvm@lfdr.de>; Tue, 25 Jun 2024 23:56:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9E5AB22E8A
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 00:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B4B17FAA9;
-	Tue, 25 Jun 2024 23:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K4S8XLkb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF3C1FDA;
+	Wed, 26 Jun 2024 00:12:38 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33F311494DE
-	for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 23:56:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A783D819;
+	Wed, 26 Jun 2024 00:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719359766; cv=none; b=A2GeA6hekYNv7UMUAGtuHO63sOFW0Adm4gNG+t5C3iYIXk1Kyhlx9JV+8ebjuV5kjMyxkgQoeCWNR2EUqzYzUBFGTW3R+kpmd5Fpf8ipWuLVlwwFwTY5z91VqAkMqqt3N3FxFZxrd9Ol7llMdpAMGueevxoPYKVbc5EfFdMoELo=
+	t=1719360757; cv=none; b=bPKpeJSpwLcPnuyYSqdjtXVTyFlW0VPE2I3nv9mUPNp1g/0LHi6q5rwSATEs62cJvA4NuGkXQ88Ucd2cHhNTUJC2cHlLAFRZCiXzX6/WMmX3YGVw+6XUlx4o2ETpNbmtmPIgh5hZaO0vAmZTtcwiR/A+7cyuORJSd2ac+DOPmi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719359766; c=relaxed/simple;
-	bh=8HVAWnEatRzErHg93AOTBHo6059UvymtLk7JxiwifK0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=J2VHr8PUb+mbYnAutCGMw4qSYxpkBqW/lL5yzUkvwyoryBWmjdhUQAd+n9h3xuWFU2Kz9s48APNs1oKyhaGjJ9Eey5NZYXLgOJo+uGcdXdxbSJpIDoEyctYBsyVamyVsNB1fL9uRTkjd/7f+hZGMllR5ZpsC+bTfxMXqzrKGgYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K4S8XLkb; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-72492056db7so74747a12.0
-        for <kvm@vger.kernel.org>; Tue, 25 Jun 2024 16:56:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719359764; x=1719964564; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=u3X1I1Y8ZUf6tVfHHUIKpskeZ4FxLp94vJvfXK6CgwY=;
-        b=K4S8XLkbCFwiV+BG3s6EFcqW4fXtxh6JOwq2M35ddoicsyUUHU+y/A1cLMdBPnUP1t
-         tID/+T6hVwOZLxwnhNK9Atu3CeDYOgLO2i0zzfPgkZJa+ciLkSafPMnr1X7M+I+s0VDV
-         ai2rwBnvZ98x7dd/RharwUXpr9G+5MUK0tsOMB5NkONtS1KedPFxkMoKl18PAUAoEpft
-         IZAnfbJK+ohqgyjCy/ncTcqUVOFnlz+VBQYyvoOpaw2v1W64FcujiKvbIo0Ygv09AaIK
-         2/LHoqCli7y3qyD1t5qZY+F1LVrBr4raWqws6ib3A4mz2qRzyli/meTsJoxSs0LwHYZr
-         ZVbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719359764; x=1719964564;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=u3X1I1Y8ZUf6tVfHHUIKpskeZ4FxLp94vJvfXK6CgwY=;
-        b=fV2rJ1H5K63coxDZNl0+w9VfEM5oSRTeyDX36E/ZQvNwKnGrWFOhJuV6cx0A8mHb6O
-         0W6CzfGpVmAMrKybSdpyqK3cka3moXnRWSqmHpoZVC7EwkVGyywqoqY6zbsbN2TfQdyb
-         sEE6cLKV5aTMbY4re93rgLUWvkDzv3cf9HdqC6zGqR80Kkx9hN949HIkrBw5Y0ncSF9X
-         epnyp++9Lb6hmjC03DDeWEYm1WmOMPU0jXtvrvyL+H13qpxlxZixZAxwuF3fAiOkcS/S
-         rK48sQSsE7Lyjm5O4m+vVogCR7PG7kwdrFWusKoJk1vqT4URJz1HLdHPBcmlFMC4bGL9
-         vO3g==
-X-Forwarded-Encrypted: i=1; AJvYcCV0y+5LgTE0ixKSy2Qyj7znqh9NcLwlC/QbJss/Hoao7oQiDWKo+g1JNEe9yPHap0G+3VNpHJeejAzpFzPh+uWdAVVt
-X-Gm-Message-State: AOJu0YxvFiC8cRfRZuvKtVeAyNi3UvQCakuMjbtVV/fpZ48IP/HJ612o
-	6t6Msa2eduDIq1f589+NA+P+OjknVP/YVI75Zx7bB+DweTSYIeD7Rso4l+z+HUbiJ6uHJZC1S94
-	N3kA7q/tIEA==
-X-Google-Smtp-Source: AGHT+IFPnj57GoSmYTiLRNINE2X7pTVJT3ux5c8j3vt9pY2jqQGKbJZWT+Y5reQUo57kLJ8xAbY2SHl+rBfn2A==
-X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
- (user=jmattson job=sendgmr) by 2002:a63:b514:0:b0:6f3:b24:6c27 with SMTP id
- 41be03b00d2f7-71acab11218mr24870a12.5.1719359764319; Tue, 25 Jun 2024
- 16:56:04 -0700 (PDT)
-Date: Tue, 25 Jun 2024 16:53:48 -0700
+	s=arc-20240116; t=1719360757; c=relaxed/simple;
+	bh=Di2v1aCgxQbeNZ3G+5jaCus/A3dLdp3TNrO30NfoLj8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m7yp60KU5XhgDGiqA/IbpuhY4Piai/qbvh1BWlC+bZ+N/l/Bnc/jyC3ue5MATd+jSOf7pfSLzAntcxS/F3LTRO3jhcvyMeWHCn4Yd3fOLCAx+rSytgMGtwznz1lHzw8IYeeJromUpCzMOeZ5HxyJpKvdsRtOuiuJqgz4+i+NjuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8DADD339;
+	Tue, 25 Jun 2024 17:12:58 -0700 (PDT)
+Received: from [192.168.20.22] (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F00693F766;
+	Tue, 25 Jun 2024 17:12:29 -0700 (PDT)
+Message-ID: <ce332c4d-d564-45b5-ae4d-87b569976276@arm.com>
+Date: Tue, 25 Jun 2024 19:12:28 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.741.gdbec12cfda-goog
-Message-ID: <20240625235554.2576349-1-jmattson@google.com>
-Subject: [PATCH v2] KVM: x86: Complain about an attempt to change the APIC
- base address
-From: Jim Mattson <jmattson@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
-Cc: Jim Mattson <jmattson@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 02/14] arm64: Detect if in a realm and set RIPAS RAM
+Content-Language: en-US
+To: Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ Steven Price <steven.price@arm.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-3-steven.price@arm.com> <20240612104023.GB4602@myrica>
+From: Jeremy Linton <jeremy.linton@arm.com>
+In-Reply-To: <20240612104023.GB4602@myrica>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-KVM does not support changing the APIC's base address. Prior to commit
-3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or
-APIC base"), it emitted a rate-limited warning about this. Now, it's
-just silently broken.
+Hi,
 
-Use vcpu_unimpl() to complain about this unsupported operation. Even a
-rate-limited error message is better than complete silence.
+On 6/12/24 05:40, Jean-Philippe Brucker wrote:
+> On Wed, Jun 05, 2024 at 10:29:54AM +0100, Steven Price wrote:
+>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>
+>> Detect that the VM is a realm guest by the presence of the RSI
+>> interface.
+>>
+>> If in a realm then all memory needs to be marked as RIPAS RAM initially,
+>> the loader may or may not have done this for us. To be sure iterate over
+>> all RAM and mark it as such. Any failure is fatal as that implies the
+>> RAM regions passed to Linux are incorrect - which would mean failing
+>> later when attempting to access non-existent RAM.
+>>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Co-developed-by: Steven Price <steven.price@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+> 
+>> +static bool rsi_version_matches(void)
+>> +{
+>> +	unsigned long ver_lower, ver_higher;
+>> +	unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
+>> +						&ver_lower,
+>> +						&ver_higher);
+> 
+> There is a regression on QEMU TCG (in emulation mode, not running under KVM):
+> 
+>    qemu-system-aarch64 -M virt -cpu max -kernel Image -nographic
+> 
+> This doesn't implement EL3 or EL2, so SMC is UNDEFINED (DDI0487J.a R_HMXQS),
+> and we end up with an undef instruction exception. So this patch would
+> also break hardware that only implements EL1 (I don't know if it exists).
 
-Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
-Signed-off-by: Jim Mattson <jmattson@google.com>
----
- Changes in v2:
-  * Changed format specifiers from "%#llx" to "%#x"
-  * Cast apic->base_address to unsigned int for printing
- 
- arch/x86/kvm/lapic.c | 3 +++
- 1 file changed, 3 insertions(+)
+To note: i've found out the hard way this set breaks a qemu+kvm+ACPI 
+setup as well, for roughly the same reason. I imagine we want kernels 
+which can boot in either a realm or a normal guest.
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index acd7d48100a1..43ac05d10b2e 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2583,6 +2583,9 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
- 
- 	if ((value & MSR_IA32_APICBASE_ENABLE) &&
- 	     apic->base_address != APIC_DEFAULT_PHYS_BASE) {
-+		vcpu_unimpl(vcpu, "APIC base %#x is not %#x",
-+			    (unsigned int)apic->base_address,
-+			    APIC_DEFAULT_PHYS_BASE);
- 		kvm_set_apicv_inhibit(apic->vcpu->kvm,
- 				      APICV_INHIBIT_REASON_APIC_BASE_MODIFIED);
- 	}
--- 
-2.45.2.741.gdbec12cfda-goog
+I delayed the version check a bit and then, did enough that 
+arm_smcccc_1_1_invoke() could replace arm_smccc_smc() in 
+invoke_rsi_fn_smc_with_res(). Which naturally gets it booting again, the 
+larger implications i've not considered yet.
+
+
+
+
+> 
+> The easiest fix is to detect the SMC conduit through the PSCI node in DT.
+> SMCCC helpers already do this, but we can't use them this early in the
+> boot. I tested adding an early probe to the PSCI driver to check this, see
+> attached patches.
+> 
+> Note that we do need to test the conduit after finding a PSCI node,
+> because even though it doesn't implement EL2 in this configuration, QEMU
+> still accepts PSCI HVCs in order to support SMP.
+> 
+> Thanks,
+> Jean
+> 
 
 
