@@ -1,147 +1,135 @@
-Return-Path: <kvm+bounces-20551-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20552-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81D809180FA
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 14:35:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 555AD918244
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 15:25:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17257B23A4F
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 12:35:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 886981C21E74
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 13:24:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF0E181BB7;
-	Wed, 26 Jun 2024 12:35:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867AC181D0E;
+	Wed, 26 Jun 2024 13:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OtD948vO"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ZP9aKADi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B8751E51D;
-	Wed, 26 Jun 2024 12:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53995181CE1
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 13:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719405312; cv=none; b=A5JpG9XGtl0NwWvpzXytIYtFEH3g/EQC2JXkBv23hPweEJ8JtOB6k1mwlzu7FjGlKkbMnFfHNvpLToEl/LF5nzqQgMx9qDGr9WfcDXbPgXOlC9emf/weymqeXvD2OvfveWH4kNwK45n60Jeu72D13E4KzgjbZGCH8EJV6LPTFMk=
+	t=1719408285; cv=none; b=lg/StGbXkr1t1DiGcUy6HMFO92ky6rQCaHSfANhYwzKX55/YAmT7irZ/FdFuUxT3E10V0R+oXPrN16b/JyQ2PKba8XRkmQHqFVGtl7yB/Z0yY6wv+fhx08/3ewNb66hZiuW5CNO6Bbw7sWKvK8QKXFW/yIA599JYcGQ1mZngtKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719405312; c=relaxed/simple;
-	bh=vI/1o0+2hln9lPAnOOhXh21rWmGrsxGmQIF93754w34=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qkhvM6RFY1zaBCGfGgUX29M/ApwqTu0/K4EmBevtQB+62f3+ETHyb0T+CZVB4CxvO8pWyTgeAECvOP9mt/H089pFYgVk3j3Y18iDH4ExqQizrexnWV1Vvx+zxj14MDaONsFLCsFn2OK2QN0OPP+Qtkb/+IFePerxV8kgMI6ceSA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OtD948vO; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45QCSZS8025519;
-	Wed, 26 Jun 2024 12:34:58 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=pp1; bh=1M3uab7xvRx35jrrCl/rxHpIST
-	fv19tWewf+1efpx6w=; b=OtD948vO4kYLvlKeLdrGojELI607ol+Bdi5QKdj4B7
-	yejJdB8NyP/WsJDAPaEwDwPrE8k86q+e/lEzuaZQYLIIUZ3BbDAyXCWT86t+UI4C
-	O5HbtGfbErWa+T7K44vLC5pivj8C/0Yf0HM0pFUEPP6NbcXc3vezjOAPGxmCc3vQ
-	GzDFUFgdDy8iFfVVsloj5SI199EJgqALeg6euYfxCFypxlAMjXmPbo8bCDHiMsWU
-	W5srlo08pQuyVKsLuOnZhkW6cL7w6ZCy8pTaPGx9AP5kOuEvZ4DvFowdAOwoqwiv
-	pJvwMxTHKTVA8G1ao3XZpmYEexFQslIcrUslW+oAEpbA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 400k16g0py-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jun 2024 12:34:58 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45QCYvt0005532;
-	Wed, 26 Jun 2024 12:34:58 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 400k16g0pw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jun 2024 12:34:57 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45Q9sYvn020058;
-	Wed, 26 Jun 2024 12:34:57 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yxb5mm429-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 26 Jun 2024 12:34:57 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45QCYpuG18547158
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 26 Jun 2024 12:34:53 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A207D2004F;
-	Wed, 26 Jun 2024 12:34:51 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1C8E52004E;
-	Wed, 26 Jun 2024 12:34:50 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.in.ibm.com (unknown [9.204.206.66])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 26 Jun 2024 12:34:49 +0000 (GMT)
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        naveen.n.rao@linux.ibm.com
-Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] arch/powerpc/kvm: Avoid extra checks when emulating HFSCR bits
-Date: Wed, 26 Jun 2024 18:04:45 +0530
-Message-ID: <20240626123447.66104-1-gautam@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1719408285; c=relaxed/simple;
+	bh=0gdryHBCLxjbkn2nn9kVoQ75BunZ6TaLK7IoY+AEzJ8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oOaR/AS43Og5v+O9b+p3W1hzc7BSZW3ULUcUsi5JXThg4o7tHN1y292srse3v0Cb2fu/8qtx8hdQPrYxC3qX5yM/RW/3amy3aTUR3r7zvfrqmDEpO8YdFF1xoahyz+n5S39QP6evUSzgGY4hvyIGqla7Br/3g4ckj0WWS8uS4Jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=ZP9aKADi; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3d55c28cd0dso841075b6e.3
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 06:24:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1719408283; x=1720013083; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Wkp55ahjVZ0Rfp573fGCok3PgZ8FQzhwmhHHebz4g1I=;
+        b=ZP9aKADioZThtluG5R6R6SBUdoG84x+ycRWK1vh8HPzLhHiTSmL5Yup12rqKJFx2P5
+         e4Cs36G80h4RNKSKUU6sIi1mwHV7HQ9OY7jTGwXtkwHvb3JM1VbWLG2QTcPeDwzwuMe7
+         fdTv5IWG/d3hsSCxIQyEtNVIbPu/JtmEP7XKYqW3PDRNNRlyDfmTnLejNmmZb3RHvPY0
+         gefO2iuBf8OOod9vMvSLvrMBSMdDdMLwKdkyXHsn5zfVuKt/eX6wUaDlfdesAiWZC3jx
+         dwWDCGJ4XfuRdytRTcnucHMs0nbASOaqpKMpMSl9jXrzNv6kQv737WVFF9/FemOWvP9E
+         PBSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719408283; x=1720013083;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wkp55ahjVZ0Rfp573fGCok3PgZ8FQzhwmhHHebz4g1I=;
+        b=Y4IIR1Ncdz14Gb6JwqyO0bSsCWrEGN9enIRMcbKtBQa4l45Od0qcNp7SpxKyAAviIo
+         hNK6URq2nAR/1ewjeLnqA8H3tMhTl4wkRE5ubt0a30L4Uqojc0mCjukMZkGl365CMU8U
+         nnTApdno+8x/MCP1zAzRSwAL+GdcQuLDZgFD3bfQ3d7uKgKEj03pmhZH190FHxXpDUdn
+         kl2VkGjezGzmUxj0oCVNgojNwAOEB1ZXNJbOx+Pn7uwl0aU9rIDDLItkHlsoJJzlXnNQ
+         G+bjEpgyanY/UWSUHGgZnLW9epwwZ51/lJSOhtHrML4DeznaXfPNsnbgLADfAVHBGXUi
+         eyqA==
+X-Forwarded-Encrypted: i=1; AJvYcCWrs5YmzNfMhXgnhbb21hQHk06Y7r9G6ZuBnSaW3hzJKnXtT93qQ8x2x9bqLi6GvzVjxrhnTXVeiW4QjG152BOBcYH8
+X-Gm-Message-State: AOJu0Yyhu/Wt8HNVQm17EOm1Utm3mS5Zv2fLPxFU4ZjTIClLNiDCK8fI
+	PrnjSpqUZPYlC/yr5ZDz0eZwklm635pBLJKOuKnk0gKHI3eiUloG77qYkDQ7+EE=
+X-Google-Smtp-Source: AGHT+IGjUEEcz36KEcz+5nyRJUX3HiZuhEGJ4dUtFILeDTtVRJBPYTVudg8HhkaZzHTox5uiPEmTvA==
+X-Received: by 2002:a05:6808:f87:b0:3d2:83:341c with SMTP id 5614622812f47-3d545a89b08mr12556384b6e.51.1719408283452;
+        Wed, 26 Jun 2024 06:24:43 -0700 (PDT)
+Received: from [100.64.0.1] ([147.124.94.167])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3d5344086c5sm2320908b6e.0.2024.06.26.06.24.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 26 Jun 2024 06:24:42 -0700 (PDT)
+Message-ID: <96ff4dd2-db66-4653-80e9-97d4f1381581@sifive.com>
+Date: Wed, 26 Jun 2024 08:24:38 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: OLd1RCc2EWjGPQmFqe7jpg_cZK6BSujC
-X-Proofpoint-ORIG-GUID: 0NX8MqzH6XRyWYsOpeiK1bk-GVisM4-E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-26_06,2024-06-25_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- phishscore=0 mlxlogscore=826 impostorscore=0 malwarescore=0 clxscore=1011
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 suspectscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406260092
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/3] drivers/perf: riscv: Reset the counter to hpmevent
+ mapping while starting cpus
+To: Atish Patra <atishp@rivosinc.com>, linux-riscv@lists.infradead.org,
+ kvm-riscv@lists.infradead.org
+Cc: Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>,
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Andrew Jones <ajones@ventanamicro.com>,
+ Conor Dooley <conor.dooley@microchip.com>,
+ Palmer Dabbelt <palmer@rivosinc.com>,
+ Alexandre Ghiti <alexghiti@rivosinc.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org
+References: <20240626-misc_perf_fixes-v3-0-de3f8ed88dab@rivosinc.com>
+ <20240626-misc_perf_fixes-v3-2-de3f8ed88dab@rivosinc.com>
+Content-Language: en-US
+From: Samuel Holland <samuel.holland@sifive.com>
+In-Reply-To: <20240626-misc_perf_fixes-v3-2-de3f8ed88dab@rivosinc.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-When a KVM guest tries to use a feature disabled by HFSCR, it exits to
-the host for emulation support, and the code checks for all bits which
-are emulated. Avoid checking all the bits by using a switch case.
+On 2024-06-26 2:23 AM, Atish Patra wrote:
+> From: Samuel Holland <samuel.holland@sifive.com>
+> 
+> Currently, we stop all the counters while a new cpu is brought online.
+> However, the hpmevent to counter mappings are not reset. The firmware may
+> have some stale encoding in their mapping structure which may lead to
+> undesirable results. We have not encountered such scenario though.
+> 
 
-Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_hv.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+This needs:
 
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index 99c7ce825..a72fd2543 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -1922,14 +1922,22 @@ static int kvmppc_handle_exit_hv(struct kvm_vcpu *vcpu,
- 
- 		r = EMULATE_FAIL;
- 		if (cpu_has_feature(CPU_FTR_ARCH_300)) {
--			if (cause == FSCR_MSGP_LG)
-+			switch (cause) {
-+			case FSCR_MSGP_LG:
- 				r = kvmppc_emulate_doorbell_instr(vcpu);
--			if (cause == FSCR_PM_LG)
-+				break;
-+			case FSCR_PM_LG:
- 				r = kvmppc_pmu_unavailable(vcpu);
--			if (cause == FSCR_EBB_LG)
-+				break;
-+			case FSCR_EBB_LG:
- 				r = kvmppc_ebb_unavailable(vcpu);
--			if (cause == FSCR_TM_LG)
-+				break;
-+			case FSCR_TM_LG:
- 				r = kvmppc_tm_unavailable(vcpu);
-+				break;
-+			default:
-+				break;
-+			}
- 		}
- 		if (r == EMULATE_FAIL) {
- 			kvmppc_core_queue_program(vcpu, SRR1_PROGILL |
--- 
-2.45.2
+Signed-off-by: Samuel Holland <samuel.holland@sifive.com>
+
+otherwise your commit message looks fine to me.
+
+> Signed-off-by: Atish Patra <atishp@rivosinc.com>
+> ---
+>  drivers/perf/riscv_pmu_sbi.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/perf/riscv_pmu_sbi.c b/drivers/perf/riscv_pmu_sbi.c
+> index a2e4005e1fd0..94bc369a3454 100644
+> --- a/drivers/perf/riscv_pmu_sbi.c
+> +++ b/drivers/perf/riscv_pmu_sbi.c
+> @@ -762,7 +762,7 @@ static inline void pmu_sbi_stop_all(struct riscv_pmu *pmu)
+>  	 * which may include counters that are not enabled yet.
+>  	 */
+>  	sbi_ecall(SBI_EXT_PMU, SBI_EXT_PMU_COUNTER_STOP,
+> -		  0, pmu->cmask, 0, 0, 0, 0);
+> +		  0, pmu->cmask, SBI_PMU_STOP_FLAG_RESET, 0, 0, 0);
+>  }
+>  
+>  static inline void pmu_sbi_stop_hw_ctrs(struct riscv_pmu *pmu)
+> 
 
 
