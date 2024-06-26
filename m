@@ -1,307 +1,170 @@
-Return-Path: <kvm+bounces-20562-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20563-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E04D918733
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 18:21:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A4319186F4
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 18:12:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C73CEB27E83
-	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 16:09:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F0BF1C21C7F
+	for <lists+kvm@lfdr.de>; Wed, 26 Jun 2024 16:12:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98E119069E;
-	Wed, 26 Jun 2024 16:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9019D19007C;
+	Wed, 26 Jun 2024 16:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="jPxUpbne"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d07QHLT4"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2073.outbound.protection.outlook.com [40.107.101.73])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034C618EFCC;
-	Wed, 26 Jun 2024 16:05:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719417951; cv=fail; b=HzepSE/bqAUYWgPrXcoVCkVPvMrOgQagDF8ZL8qySY1Sd2UjZb+m40gV3zXIqvQBILIe4OQyn3pGqQWNYoWo+pWunu4ujGmR1LMpmYUZAr/lF4aquJtsX4usvgxjhL+FcVzornX6VCvUU0UZRoOmCYnpma9Rylw7DmC9ZttH18U=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719417951; c=relaxed/simple;
-	bh=AXu54D/7jELgZgHjOi61LLDAgmkQxRAZClCSabRf2Qk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pyWy0IC90zfyXpF9HotclA11Bu7kxsQ+jmfC35wbik9WALBNPcFjXZIMFlY5neacotADY16rA3Co+FHcflX/QnC867+gT35bjfUp1f2jnlrnw4wPiMA+ARjdnjoCYX7G0zZCI6oM0EAFFWDqpDCqD7Uv16rozCl4VhEB2NPKRBw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=jPxUpbne; arc=fail smtp.client-ip=40.107.101.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V1Gmdm2y1TnJYH0Bf+KOn/l0bAPtMkvjuBc9WCHXNcNJHhFuB7Qn+4MeLnRFWS1+7uBuUpuIOxeOTO1138kOOCqFHZLuQZkuN4arwGtpa8q5aunuPF1U3V6N+wUJ4yNY3r4LyyTKNO/TMwe6ESw+9kk6vgljIuqteS6D3U5iSYsyFP+H2oWsfek8I4rZTaZ/G92TLuYv/XL/DFZIkaERHb7KLLkhAvQxLri/I94cYPOMI81nnfkchpVaIEukRfI1ws4EfCk28befsahwtzoLeBSthtukWTJ721oq8TwhTqJNHuDCkmiQRSoI7RxmWdwxuQB1zkarv6OIaQJiTrn58g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b9P0ypJwcNpn/YgqlAdOGUPPzj65wPYbQ+XAKrvOGT0=;
- b=l8/Pg4AgmBG6ZGgu8qV/FKXtrY7/8T9nTGLwEguBrg5szzA0eGp75RxEU95yFFw1PJPLZPGZtfEAL8SNWsmcY+f7FgsKQsSTBa9SEAhFgfUriG+1vVLD/Qdf8xK9TXIk8emYATjCKHj0IpH30wkp40MrVuwBYgaHQmKNmCGshq6z0yB2LzNa7HPekd5g3vPjf+oaH6SLFk9XJoRFFEWp9qLea23+o2eFxKcYoMgMO26ESANZQFuH+g3I1Z5aLmq3p69cwAyzfO+v0y4rgRXu1Fu0qEU+gwq0lb8ol4sSlYZGm+qw1GznsWiYCYHg4fUVGG4prwjDB2h08RwiL14f3g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=b9P0ypJwcNpn/YgqlAdOGUPPzj65wPYbQ+XAKrvOGT0=;
- b=jPxUpbnej7mGduuUUmjHiM8KYMdAT04g5HOw4RfuvscleItpiLA8agsm7C442AlNH000UQnQ3GeqbwBhs2/oZda+UhX0YMG2kAjQe91B93zEvS5lmAlCdu9F6T5nudXOOumxdY5LWyXOCFC1mrPkFC9tyQ5sZzUZfdAKlCfPDyI=
-Received: from PH8PR20CA0024.namprd20.prod.outlook.com (2603:10b6:510:23c::19)
- by MN0PR12MB5835.namprd12.prod.outlook.com (2603:10b6:208:37a::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7698.30; Wed, 26 Jun
- 2024 16:05:42 +0000
-Received: from SJ1PEPF0000231B.namprd03.prod.outlook.com
- (2603:10b6:510:23c:cafe::91) by PH8PR20CA0024.outlook.office365.com
- (2603:10b6:510:23c::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.24 via Frontend
- Transport; Wed, 26 Jun 2024 16:05:40 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SJ1PEPF0000231B.mail.protection.outlook.com (10.167.242.232) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7677.15 via Frontend Transport; Wed, 26 Jun 2024 16:05:39 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 26 Jun
- 2024 11:05:38 -0500
-Date: Wed, 26 Jun 2024 10:45:31 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <kvm@vger.kernel.org>, <linux-coco@lists.linux.dev>,
-	<linux-kernel@vger.kernel.org>, <x86@kernel.org>, <pbonzini@redhat.com>,
-	<jroedel@suse.de>, <thomas.lendacky@amd.com>, <pgonda@google.com>,
-	<ashish.kalra@amd.com>, <bp@alien8.de>, <pankaj.gupta@amd.com>,
-	<liam.merwick@oracle.com>, Brijesh Singh <brijesh.singh@amd.com>, "Alexey
- Kardashevskiy" <aik@amd.com>
-Subject: Re: [PATCH v1 1/5] KVM: SEV: Provide support for SNP_GUEST_REQUEST
- NAE event
-Message-ID: <6sczq2nmoefcociyffssdtoav2zjtuenzmhybgdtqyyvk5zps6@nnkw2u74j7pu>
-References: <20240621134041.3170480-1-michael.roth@amd.com>
- <20240621134041.3170480-2-michael.roth@amd.com>
- <ZnwecZ5SZ8MrTRRT@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F3519006E
+	for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 16:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719418136; cv=none; b=V/AraX9PxAi7jcg+SXyIoXYQsBlIvA+kFsokELxL/KOtaoa6SxxZuWxTQVU/fS14nB16L9hnuW9LDC+iGdRugqJeMWHJTKZXg7VY7UHcFUNLsjilLuRNt15sedi+3mCNHPQwtAkwCCqG/yjUGuVsr42wAl1FxCEsg6vAxUaQUOo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719418136; c=relaxed/simple;
+	bh=xo/Fvy3VWe+IOb9gaFCgMqegSWf3xAl4oMjZiNogyys=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=SILGr80uNbyqfRTD5ynkYDmc/qn0Fkm45CndIQzX3eIryHObcCin5fVsm9K4Dl7w9sK3z1ez2VY+QGZG+7wiWNjr/bCWfN8GZeOrbIWk2Gf8TaLV2gROFKJY/HrfIjC6waqaHoCc5JTl82UbzM5IQ4pOyPHRzJXVco4uqs677hQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d07QHLT4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719418134;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eOXoFSz42GQtnLTfmd+KYCNYIISW1s5m+Yb3vhlcrdw=;
+	b=d07QHLT4NQGoek7Dj6XGZ/ZSd4ZOcpUpC8RAznx7We6oKOUHDfawBhV2ojU972P6bSVCnH
+	jJV2YYA8hhvjFPv3Fcmp91fVZ+c5R07OBhqRyIm0lxhI6pz1TYCWJs1YFlFawgM54iyl7+
+	N3sSlTATjI8bSDc6ULuw/TnJxJzoZC8=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-530-MOVvNOHrNm6w8NWOrcmltQ-1; Wed, 26 Jun 2024 12:08:52 -0400
+X-MC-Unique: MOVvNOHrNm6w8NWOrcmltQ-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6b551a62a5eso64643416d6.2
+        for <kvm@vger.kernel.org>; Wed, 26 Jun 2024 09:08:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719418132; x=1720022932;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eOXoFSz42GQtnLTfmd+KYCNYIISW1s5m+Yb3vhlcrdw=;
+        b=j3CtklLp86OwAymR6vySfcpIz0+lBIRGeXLgxckRdWZ+7LVmHFmApih8bXHTMZ0u9O
+         kS5CbvjdKPgem5ePmKA5Q4P3ITaePc1E6ez9fgY3pREM/dd4i/JRfAt2SRJHGXyf6iLs
+         lm3J26hy6g6vLH0nmxRRHYAUWlTJ2ZlUreXJ6Og7NJDdfKXJaBNCjMczbg0qcM2bGRKY
+         /OTPNvAvzsY9EAHQ8nwCsf/gObYwxPnXYoTungJPeJlweV4EKrqz9ezv+S/1hljNo7f6
+         Mfx4k8GBsrxGVKeQBid/qyaWOIdfyG+jalTs/TGzW3hoCGqMoOZDkOwkDJEA5goaNW/N
+         a0nw==
+X-Gm-Message-State: AOJu0Yzf5K+mLqT36r64dUmPPITxSjXuG1uMUD4EqdsY7RXhpASY0CvK
+	CJNrX/nqBepKs6SsgZfvN0PXq4YMLGbhDDylkjBgZBLKCDwZanVvZ0n473VZ662Jy7vVoYmSmRW
+	u4F5OAdPOtmOcPm04n29Kbl/4XZbwORuot+y+tu1QTFq8E8wtEz4Zp1nLNMiHwvOXg43Qn3rsZw
+	NvtRwZ7U5R9ED2Wgmv0xiZB9l1HYtWYs7xtg==
+X-Received: by 2002:a0c:e413:0:b0:6b0:7b72:4e1 with SMTP id 6a1803df08f44-6b540d34701mr107894156d6.65.1719418132013;
+        Wed, 26 Jun 2024 09:08:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFLkbLeXZob5Ys+oMUQQ1Zl7PQDQFc/oBoDS0ZXL7TrOaVEasSAaj57ZMlGv6EUEyv9i4yF+w==
+X-Received: by 2002:a0c:e413:0:b0:6b0:7b72:4e1 with SMTP id 6a1803df08f44-6b540d34701mr107893606d6.65.1719418131367;
+        Wed, 26 Jun 2024 09:08:51 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b52b16e9basm46889376d6.6.2024.06.26.09.08.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 Jun 2024 09:08:51 -0700 (PDT)
+Message-ID: <cefafca99f046a89e111e6972ed02199ef95c250.camel@redhat.com>
+Subject: Re: [PATCH 1/1] KVM: selftests: pmu_counters_test: increase
+ robustness of LLC cache misses
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Paolo Bonzini <pbonzini@redhat.com>, linux-kselftest@vger.kernel.org, 
+ Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org, Sean
+ Christopherson <seanjc@google.com>
+Date: Wed, 26 Jun 2024 12:08:50 -0400
+In-Reply-To: <20240621204305.1730677-2-mlevitsk@redhat.com>
+References: <20240621204305.1730677-1-mlevitsk@redhat.com>
+	 <20240621204305.1730677-2-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <ZnwecZ5SZ8MrTRRT@google.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF0000231B:EE_|MN0PR12MB5835:EE_
-X-MS-Office365-Filtering-Correlation-Id: 724cb405-bf59-401c-2b42-08dc95f9d31f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230038|36860700011|376012|7416012|1800799022|82310400024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?8kZJsQddM7zs1YUEj8UMMOlPqfmoXxAux1xsRdW7Y8RBGH0454UxcMEeA+Wp?=
- =?us-ascii?Q?mSwLxgljwNIU+Dqbraqer6PXqyM7JuOJp/xJrEhQ1gJ550N80fSAEiiaEJU2?=
- =?us-ascii?Q?7Qt2kTGOpZMWuFiGTLuFD0iivjj+YwQF5RkcSeIbF9nHGeH4BI9i/j/5VhnT?=
- =?us-ascii?Q?IMSUFBDAg6Gas6F3mLxr4bFnjSixrwSV7teFgkEu55MbLH8OlnkYi/+W/2FO?=
- =?us-ascii?Q?fipAel1/l1yxhskOJj/MjbS0KLlmo1NtYm1C1OXOdakSF1O4ZukopqziRmH/?=
- =?us-ascii?Q?xBQ1dcOYHsU8kiHUfUXc49JnI7b8ZnQOMsJuSzP91Ht7BjVAX2A9uUTPj7O1?=
- =?us-ascii?Q?0Z8rZ79Rv+v8LV17PQzRw7cDuOrEzjKcSIaloQ6VF/sO2Y2snJAHIq9eLyIo?=
- =?us-ascii?Q?ZKCzbspXimcdTHpOsTqZKrd9F33utbKCPdy3HC0A5PQEcc4IZW4zd44Q05K6?=
- =?us-ascii?Q?cj1mWAsFIPqMVE7RYf4dEKB5PwC8wDALsPiPN5LCP4U9rL3217Fi6wkw0Bzu?=
- =?us-ascii?Q?eAyNZbJMVa1foeHlfBzxVbrkdWSRbQ6X/3HfseOO+EvuK4+Dv59iWYm6lWVI?=
- =?us-ascii?Q?HLDM8MZaI8AGx9jwdV7eHI4SdxwIbFhHTHid91QniulM5l+HD6C9WHF0qqtd?=
- =?us-ascii?Q?Rvu+ix2s8AiWUApoKqKI2ip1uvfpOP9G1XK3AnxaGGf5KlVgu+RLS4dlNS5W?=
- =?us-ascii?Q?sJUaFrTb3+f/yg/OxXCmzOmBppUE3X6lAgs7Vh8kcbtYyludysBtEWaigdMx?=
- =?us-ascii?Q?K8TfM8E7lgvr68EgXRgrL7lzRmRSyOi7SUtouUSJ7C+4iB1N/N1qMTHQ6El2?=
- =?us-ascii?Q?y7m6nQusRo7vVDVXdoWa8YOBb3VSTKgegcMiU+T6vzX3wHKtBeLopJc8u32I?=
- =?us-ascii?Q?1elbHQJy2T3q34t2cUgXb1MCkuGvOffFoN335F7z2qnxu1Vm0CgH4JpyeaYK?=
- =?us-ascii?Q?N9RlL7BWKH55oWvwhiyQyjCGf2VhsFYW62sA51uI/SWCc+XGCbIlMukhECQz?=
- =?us-ascii?Q?eAugdY3nNlrNdonh1O8Q5ULJSjqO6vybbVWBfOs8quzV36sMpVgQgZ5Tc61U?=
- =?us-ascii?Q?9KVNBJXpmO6l924paLpfCT6XBM/j+jsH7lSoAwW8EimUaLsGwbjc+0z/2I4n?=
- =?us-ascii?Q?Oa5WFKtsdpFAzsrDg5vJmeXRGIKQF7q12+AP9bcfNZoxzF80N/VItFjPJLX4?=
- =?us-ascii?Q?QCe7WIbxO/Ch3psaLJvZJyBbe/yBS4D9P9uqAPxVZWodeSZThgXGtrpzcora?=
- =?us-ascii?Q?/MABli52L10SWPsesvSeuEqFKmOQcxOXEG6V0xFN6Kdq5auWHYuQxkLnf54l?=
- =?us-ascii?Q?jUPGiuw6kxnDydTXtpnBzdTvSqqxw1kY8eVPS8X5SRc9JPtOlJbEDM3Lm/qy?=
- =?us-ascii?Q?+NqnY4g=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230038)(36860700011)(376012)(7416012)(1800799022)(82310400024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2024 16:05:39.9792
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 724cb405-bf59-401c-2b42-08dc95f9d31f
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF0000231B.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5835
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jun 26, 2024 at 06:58:09AM -0700, Sean Christopherson wrote:
-> On Fri, Jun 21, 2024, Michael Roth wrote:
-> > @@ -3939,6 +3944,67 @@ static int sev_snp_ap_creation(struct vcpu_svm *svm)
-> >  	return ret;
-> >  }
-> >  
-> > +static int snp_handle_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t resp_gpa)
-> > +{
-> > +	struct sev_data_snp_guest_request data = {0};
-> > +	struct kvm *kvm = svm->vcpu.kvm;
-> > +	kvm_pfn_t req_pfn, resp_pfn;
-> > +	sev_ret_code fw_err = 0;
-> > +	int ret;
-> > +
-> > +	if (!sev_snp_guest(kvm) || !PAGE_ALIGNED(req_gpa) || !PAGE_ALIGNED(resp_gpa))
-> > +		return -EINVAL;
-> > +
-> > +	req_pfn = gfn_to_pfn(kvm, gpa_to_gfn(req_gpa));
+On Fri, 2024-06-21 at 16:43 -0400, Maxim Levitsky wrote:
+> Currently this test does a single CLFLUSH on its memory location
+> but due to speculative execution this might not cause LLC misses.
 > 
-> This is going to sound odd, but I think we should use gfn_to_page(), i.e. require
-> that the page be a refcounted page so that it can be pinned.  Long story short,
-> one of my learnings from the whole non-refcounted pages saga is that doing DMA
-> to unpinned pages outside of mmu_lock is wildly unsafe, and for all intents and
-> purposes the ASP is a device doing DMA.  I'm also pretty sure KVM should actually
-> *pin* pages, as in FOLL_PIN, but I'm ok tackling that later.
+> Instead, do a cache flush on each loop iteration to confuse the prediction
+> and make sure that cache misses always occur.
 > 
-> For now, using gfn_to_pages() would avoid creating ABI (DMA to VM_PFNMAP and/or
-> VM_MIXEDMAP memory) that KVM probably doesn't want to support in the long term.
-
-That seems reasonable. Will switch this to gfn_to_page().
-
+> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+> ---
+>  .../selftests/kvm/x86_64/pmu_counters_test.c  | 20 +++++++++----------
+>  1 file changed, 9 insertions(+), 11 deletions(-)
 > 
-> [*] https://lore.kernel.org/all/20240229025759.1187910-1-stevensd@google.com
-> 
-> > +	if (is_error_noslot_pfn(req_pfn))
-> > +		return -EINVAL;
-> > +
-> > +	resp_pfn = gfn_to_pfn(kvm, gpa_to_gfn(resp_gpa));
-> > +	if (is_error_noslot_pfn(resp_pfn)) {
-> > +		ret = EINVAL;
-> > +		goto release_req;
-> > +	}
-> > +
-> > +	if (rmp_make_private(resp_pfn, 0, PG_LEVEL_4K, 0, true)) {
-> > +		ret = -EINVAL;
-> > +		kvm_release_pfn_clean(resp_pfn);
-> > +		goto release_req;
-> > +	}
-> 
-> I don't see how this is safe.  KVM holds no locks, i.e. can't guarantee that the
-> resp_pfn stays private for the duration of the operation.  And on the opposite
+> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> index 96446134c00b7..ddc0b7e4a888e 100644
+> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
+> @@ -14,8 +14,8 @@
+>   * instructions that are needed to set up the loop and then disabled the
+>   * counter.  1 CLFLUSH/CLFLUSHOPT/NOP, 1 MFENCE, 2 MOV, 2 XOR, 1 WRMSR.
+>   */
+> -#define NUM_EXTRA_INSNS		7
+> -#define NUM_INSNS_RETIRED	(NUM_BRANCHES + NUM_EXTRA_INSNS)
+> +#define NUM_EXTRA_INSNS		5
+> +#define NUM_INSNS_RETIRED	(NUM_BRANCHES * 2 + NUM_EXTRA_INSNS)
+>  
+>  static uint8_t kvm_pmu_version;
+>  static bool kvm_has_perf_caps;
+> @@ -133,9 +133,8 @@ static void guest_assert_event_count(uint8_t idx,
+>   * doesn't need to be clobbered as the input value, @pmc_msr, is restored
+>   * before the end of the sequence.
+>   *
+> - * If CLFUSH{,OPT} is supported, flush the cacheline containing (at least) the
+> - * start of the loop to force LLC references and misses, i.e. to allow testing
+> - * that those events actually count.
+> + * If CLFUSH{,OPT} is supported, flush the cacheline containing the CLFUSH{,OPT}
+> + * instruction on each loop iteration to ensure that LLC cache misses happen.
+>   *
+>   * If forced emulation is enabled (and specified), force emulation on a subset
+>   * of the measured code to verify that KVM correctly emulates instructions and
+> @@ -145,10 +144,9 @@ static void guest_assert_event_count(uint8_t idx,
+>  #define GUEST_MEASURE_EVENT(_msr, _value, clflush, FEP)				\
+>  do {										\
+>  	__asm__ __volatile__("wrmsr\n\t"					\
+> -			     clflush "\n\t"					\
+> -			     "mfence\n\t"					\
+> -			     "1: mov $" __stringify(NUM_BRANCHES) ", %%ecx\n\t"	\
+> -			     FEP "loop .\n\t"					\
+> +			     " mov $" __stringify(NUM_BRANCHES) ", %%ecx\n\t"	\
+> +			     "1: " clflush "\n\t"				\
+> +			     FEP "loop 1b\n\t"					\
+>  			     FEP "mov %%edi, %%ecx\n\t"				\
+>  			     FEP "xor %%eax, %%eax\n\t"				\
+>  			     FEP "xor %%edx, %%edx\n\t"				\
+> @@ -163,9 +161,9 @@ do {										\
+>  	wrmsr(pmc_msr, 0);							\
+>  										\
+>  	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
+> -		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt 1f", FEP);	\
+> +		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt .", FEP);	\
+>  	else if (this_cpu_has(X86_FEATURE_CLFLUSH))				\
+> -		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflush 1f", FEP);	\
+> +		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflush .", FEP);	\
+>  	else									\
+>  		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "nop", FEP);		\
+>  										\
 
-When the page is set to private with asid=0,immutable=true arguments,
-this puts the page in a special 'firmware-owned' state that specifically
-to avoid any changes to the page state happening from under the ASPs feet.
-The only way to switch the page to any other state at this point is to
-issue the SEV_CMD_SNP_PAGE_RECLAIM request to the ASP via
-snp_page_reclaim().
+Any update? The test patched with this patch survived about 3 days of running
+in a loop.
 
-I could see the guest shooting itself in the foot by issuing 2 guest
-requests with the same req_pfn/resp_pfn, but on the KVM side whichever
-request issues rmp_make_private() first would succeed, and then the
-2nd request would generate an EINVAL to userspace.
+Best regards,
+	Maxim Levitsky
 
-In that sense, rmp_make_private()/snp_page_reclaim() sort of pair to
-lock/unlock a page that's being handed to the ASP. But this should be
-better documented either way.
-
-> resp_pfn stays private for the duration of the operation.  And on the opposite
-> side, KVM can't guarantee that resp_pfn isn't being actively used by something
-> in the kernel, e.g. KVM might induce an unexpected #PF(RMP).
-> 
-> Why can't KVM require that the response/destination page already be private?  I'm
-
-Hmm. This is a bit tricky. The GHCB spec states:
-
-  The Guest Request NAE event requires two unique pages, one page for the
-  request and one page for the response. Both pages must be assigned to the
-  hypervisor (shared). The guest must supply the guest physical address of
-  the pages (i.e., page aligned) as input.
-
-  The hypervisor must translate the guest physical address (GPA) of each
-  page into a system physical address (SPA). The SPA is used to verify that
-  the request and response pages are assigned to the hypervisor.
-
-At least for req_pfn, this makes sense because the header of the message
-is actually plain text, and KVM does need to parse it to read the message
-type from the header. It's just the req/resp payload that are encrypted
-by the guest/firmware, i.e. it's not relying on hardware-based memory
-encryption in this case.
-
-Because of that though, I think we could potential address this by
-allocating the req/resp page as separate pages outside of guest memory,
-and simply copy the contents to/from the GPAs provided by the guest.
-I'll look more into this approach.
-
-If we go that route I think some of the concerns above go away as well,
-but we might still need to a lock or something to serialize access to
-these separate/intermediate pages to avoid needed to allocate them every
-time or per-request.
-
-> also somewhat confused by the reclaim below.  If KVM converts the response page
-> back to shared, doesn't that clobber the data?  If so, how does the guest actually
-> get the response?  I feel like I'm missing something.
-
-In this case we're just setting it immutable/firmware-owned, which just
-happens to be equivalent (in terms of the RMP table) to a guest-owned page,
-but with rmp_entry.ASID=0/rmp_entry.immutable=true instead of
-rmp_entry.ASID=<guest asid>/rmp_entry.immutable=false. So the contents remain
-intact/readable after the reclaim.
-
-> 
-> Regardless of whether or not I'm missing something, this needs comments, and the
-> changelog needs to be rewritten with --verbose to explain what's going on.  
-
-Sure, will add more comments and details in the commit msg for v2.
-
-> 
-> > +	data.gctx_paddr = __psp_pa(to_kvm_sev_info(kvm)->snp_context);
-> > +	data.req_paddr = __sme_set(req_pfn << PAGE_SHIFT);
-> > +	data.res_paddr = __sme_set(resp_pfn << PAGE_SHIFT);
-> > +
-> > +	ret = sev_issue_cmd(kvm, SEV_CMD_SNP_GUEST_REQUEST, &data, &fw_err);
-> > +	if (ret)
-> > +		return ret;
-> 
-> This leaks both req_pfn and resp_pfn.
-
-Yes, this one should be fixed up by the v1-revised version of the patch.
-
-Thanks!
-
--Mike
-
-> 
-> > +
-> > +	/*
-> > +	 * If reclaim fails then there's a good chance the guest will no longer
-> > +	 * be runnable so just let userspace terminate the guest.
-> > +	 */
-> > +	if (snp_page_reclaim(kvm, resp_pfn)) {
-> > +		return -EIO;
-> > +		goto release_req;
-> > +	}
-> > +
-> > +	/*
-> > +	 * As per GHCB spec, firmware failures should be communicated back to
-> > +	 * the guest via SW_EXITINFO2 rather than be treated as immediately
-> > +	 * fatal.
-> > +	 */
-> > +	ghcb_set_sw_exit_info_2(svm->sev_es.ghcb,
-> > +				SNP_GUEST_ERR(ret ? SNP_GUEST_VMM_ERR_GENERIC : 0,
-> > +					      fw_err));
-> > +
-> > +	ret = 1; /* resume guest */
-> > +	kvm_release_pfn_dirty(resp_pfn);
-> > +
-> > +release_req:
-> > +	kvm_release_pfn_clean(req_pfn);
-> > +	return ret;
-> > +}
 
