@@ -1,184 +1,147 @@
-Return-Path: <kvm+bounces-20611-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20612-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3617A91AA52
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 17:04:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F003B91AB86
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 17:37:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B0071C241E9
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 15:04:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EC151C22CEF
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 15:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24A0198E90;
-	Thu, 27 Jun 2024 15:04:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75D071991A1;
+	Thu, 27 Jun 2024 15:35:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGOGnNq7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NrVxTj/C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15A419883C;
-	Thu, 27 Jun 2024 15:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DF52199EB9
+	for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 15:35:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719500642; cv=none; b=AYuVD5yED7C+x0YvO+loDWKYn55iSMY+8pvuBPVl/N53v2Piql8M+vGicjnG6WSATsv/s9QtY2dC7IxmrRikov8R0TIsLUPL2GpbGrTcnHmI8FyPXCMbaFHAJ+ec4FYdOFMxdQjxF4g48Zyv1//DWfvHdxJpU829cNRilJ7p2GM=
+	t=1719502504; cv=none; b=U2lsm04RkO/zba3Mtbco4RIbP44fReLatfS6oTAVP+ZafqALDZ0wWHu/fSzxjoGV9y0pWNxaCUDb6u98jvQia774DNv92IrgTrvG2oQBVbeWdMALJ/lfIKHry3uqOxAfnJYy1/FgdiiagnT+cax8I3NtTPU2HWlLGKPdIHuOUIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719500642; c=relaxed/simple;
-	bh=l73llJCUIKUxRecupdaIxSy64eMLHxkbYexteymENJA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=t8KwU/hoBvS7HfSlq2FGsVFqzv99FM+8bZKUSIpzp9yrLq3RpiWJG2R5jIEwnl0GSFuUxIan3+kBue5DMkKntlmU9fm2j+Nq87Jq4H17ueTYNZz4uwd11NUDXCebXdmxqFJBk2KpUifGR/+cupvg6X3FRHPP8xKmisHXIbvkErs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGOGnNq7; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-648b9d03552so16761547b3.2;
-        Thu, 27 Jun 2024 08:04:00 -0700 (PDT)
+	s=arc-20240116; t=1719502504; c=relaxed/simple;
+	bh=B4B+7Qegfc8xqRAIl73gUCcFR/R5LPG8JWLBvTTX94w=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=eXYft0SRNQHte4WyLCa3cm/Qx0GLAae2dvcEGpf10KfyNF8125PfN8VPNbT5GUgo2CJuuFIS5EK+uVKcXOnw1DcjnxacmgpWSUaRDUv348XM/EacsoBvPIYnK/v5iq+xysR6jYZfLYVIGxpolFToejti/fBe3VRVa/taBafG+40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NrVxTj/C; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62d032a07a9so171215987b3.2
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 08:35:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719500640; x=1720105440; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8RPqAWJX29gQXV8+Zzq9GyOhgk6BXLzXmKNl8pcyJtY=;
-        b=EGOGnNq73dzcxKg0jp7j98jqlPKBeW6zs9GGC07y7ql2vqhzWdL537oLkm7HshHBIX
-         tS4tu+yelnRJyiw1U29BYZWC3qSv0P5gk6ftG3Cl013Ct2ChI0Q8kMtBiAmQj8DLGfi+
-         UdwTaD30cz5WkixebR9CJdUsgQMAmrMER10mXT6K5Gk6O6dkEkKwKrprdcL139XhoAO3
-         gq7Qy9LMvtt326qnr/amCTJAKh39EWYVDmcYLoc/3GSRMnK8aHBBOpPUNmFUGf+s917Q
-         MS6tHbnF3SsOqTIB3QVNTRoONAUGUsVjqhX9ji0fzYRo/ZqNAJLPyT4vW6UJUiI6KXTO
-         nR8w==
+        d=google.com; s=20230601; t=1719502502; x=1720107302; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=jwfQmZ9NIpbsBfaBGly2IYRr+v7gRdeIIwzA8stq+iM=;
+        b=NrVxTj/CixlZIZjkRuWYlFSJ0OjE8IU0QnuLch/D4wEe0T+X/btVuXMnX+xghyxLlu
+         q8F8RlZng1sttVbHGf+3JmBGZ7ff09pzGS7lIDP1+WoqSVnIgssvp2V53jIhAWYFW1m3
+         aYWcrVLnxhh4d6eeVHZbGozAgVZ2wxnms4IJinL75u2I1v4VnByCTNFeA/r3FyWdYOat
+         hDsJ86j55TaNuXJAZP6U7Uf5JFygWt4Dm6uHzmYGk0HSDxq4N6U+Hm/Kg0oxHH6V34lb
+         tTPTMWChkqNExFjMjVjJ/502o/TpFliar6hh4ZCkBb3Jg0D5gBswNrrKpk6ibs25dfxe
+         5udg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719500640; x=1720105440;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8RPqAWJX29gQXV8+Zzq9GyOhgk6BXLzXmKNl8pcyJtY=;
-        b=f/IjtuqFqDbuzCf+ZYPX68MBHFUUgaVZivatoBLk4y/kI8efMECGNv1EF7dw8gbIRd
-         szZ2smj9H8/dDQsbPlzjE+vIKgSAwwU9chZF9QMT5XikpQz/Wn7ToLoOUBL89gZTIC6O
-         dCS1cwrf7ggQr6udc+oqkHXUw/TymDUIm53pTxihQDxJob36li4IqSXsHXNCHLA5xE/j
-         m1aDCOJLAb6iA3xy0o+rFLF1ZjzBSvBXyzrrQ0NQy0Q/YKVXM3TzfIqIG0MrtkpVt30R
-         RmchYDIQUfWtyMOxJdi9Yh7gv+ZVI5YoKPpM2rG6CUT/6ZRe3Kg8EG9OC/egP6SjLQs4
-         fdlg==
-X-Forwarded-Encrypted: i=1; AJvYcCXJ21/IsH9qSUQXvWmtxVYkTfT32NsZW0FZAfehHSDQAhCqkhtZvDLjumWi71Ba00XzIiGmpVFEgGbMw0/uoOYz9/gIwB3HN8S8+It7
-X-Gm-Message-State: AOJu0YxSqm9uRAm9lMsoYMHtjTZ5KigUn+jrFJOF7aWbOy5/9j8WloK5
-	V9QufY3eyAPIWPNAlaF9S4QekXfPOZ+o6+bh5lm4GIzAAK8au8lqU58mHy8z
-X-Google-Smtp-Source: AGHT+IHKPiZpyKzGZOIL3xcH+XD1DwotbRWUXOrtZQP4/3YIqhVff++wSdOu73KnfBIM4SnpEwRkxw==
-X-Received: by 2002:a05:690c:6c0d:b0:618:ce10:2fcd with SMTP id 00721157ae682-643aa5a426dmr160071517b3.26.1719500639499;
-        Thu, 27 Jun 2024 08:03:59 -0700 (PDT)
-Received: from [127.0.1.1] (107-197-105-120.lightspeed.sntcca.sbcglobal.net. [107.197.105.120])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6497a755ad2sm2770537b3.76.2024.06.27.08.03.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 27 Jun 2024 08:03:59 -0700 (PDT)
-From: Pei Li <peili.dev@gmail.com>
-Date: Thu, 27 Jun 2024 08:03:56 -0700
-Subject: [PATCH v2] kvm: Fix warning in__kvm_gpc_refresh
+        d=1e100.net; s=20230601; t=1719502502; x=1720107302;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jwfQmZ9NIpbsBfaBGly2IYRr+v7gRdeIIwzA8stq+iM=;
+        b=JKC5KFKNaLNbSrWs75GnHftwQZ83suP/WsVge3/TC2FDUnLUdnCkiiBQGfZAbWey9z
+         8r/PH+tqdnFBAL3q2APq7MDNq5jcxqMkDz+rJyiNruVGHykVfgYgSFPJEQfnFgzvdq2q
+         BkMZLB4mwQzuSp9kBSR/drEiYJnryG0ACwd8z1xIMz3bs7rmNzSSZ1lTeeV0IvPiv556
+         12a9nDv2m5FOXZ3CIL44LV40fGDdgTCq4vzbIMVXgx7BSWitEM/HqY3W5IpL4xz9EL5j
+         hKW5P6vHXeINJYJMVq078F6Q76yPPQL1w1iyUh0OBcHpA8L19iNv4kQJVqKatErDdLkN
+         yp4g==
+X-Forwarded-Encrypted: i=1; AJvYcCVzcM62yCF4dVbO3XtBRC2t5sD+4lJOUZYe7jbhNqAzA6vxDTUtT11gi7vUBsYt2t7QKznCA3TkkTN9WFHO0YUVj7Uv
+X-Gm-Message-State: AOJu0YyZljJQsFOEECDd6Anys4+FUcyTLfCXyEJXDb69e2yOHN2RmmBw
+	27sXLVbaf0uUgAtK5nUWS8KFPjofKSlPZ8SE7SdWvtxkVl5BG5jua5oDYGtyrHB+7PkUuhpuDJp
+	Alw==
+X-Google-Smtp-Source: AGHT+IHEi2Jyn7G4AkqbarTu97kFAUKrcEOi465mYHsg50AqIgEPtVFdPWfoFGoEoYmptmXIFg5d8pn8ivU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2b84:b0:e02:c739:367 with SMTP id
+ 3f1490d57ef6-e0303fe4816mr697575276.13.1719502502278; Thu, 27 Jun 2024
+ 08:35:02 -0700 (PDT)
+Date: Thu, 27 Jun 2024 08:35:00 -0700
+In-Reply-To: <87320ee5-8a66-6437-8c91-c6de1b7d80c1@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240627-bug5-v2-1-2c63f7ee6739@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAFt/fWYC/13MywrCMBCF4VcpszaSTJ0qrnwP6aJNpumAvZBoU
- Ere3dily/9w+DaIHIQjXKsNAieJsswl8FCBHbvZsxJXGlDjSTdIqn95UuTqGntiMo2Bcl0DD/L
- emXtbepT4XMJnV5P5rX9AMsoo1mdkR4PlC9381MnjaJcJ2pzzF1jDf06YAAAA
-To: David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, 
- Sean Christopherson <seanjc@google.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, 
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
- "H. Peter Anvin" <hpa@zytor.com>, Nathan Chancellor <nathan@kernel.org>, 
- Nick Desaulniers <ndesaulniers@google.com>, 
- Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
- skhan@linuxfoundation.org, linux-kernel-mentees@lists.linuxfoundation.org, 
- syzkaller-bugs@googlegroups.com, llvm@lists.linux.dev, 
- syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com, 
- Pei Li <peili.dev@gmail.com>
-X-Mailer: b4 0.15-dev-13183
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1719500637; l=3041;
- i=peili.dev@gmail.com; s=20240625; h=from:subject:message-id;
- bh=l73llJCUIKUxRecupdaIxSy64eMLHxkbYexteymENJA=;
- b=Q6AcEfxFpP9UNEK+Is8AMNrTHFxa+L3BtOlJnguHVBEfUlnNBuNoRPOKwzHwnZlGMGU8jDnuP
- O7DDJoKQC6WBBXgb7f9M59UF437eNqYW1ygW3LzJjccTFadkoS8MP6h
-X-Developer-Key: i=peili.dev@gmail.com; a=ed25519;
- pk=I6GWb2uGzELGH5iqJTSK9VwaErhEZ2z2abryRD6a+4Q=
+Mime-Version: 1.0
+References: <20240621134041.3170480-1-michael.roth@amd.com>
+ <20240621134041.3170480-2-michael.roth@amd.com> <ZnwecZ5SZ8MrTRRT@google.com>
+ <6sczq2nmoefcociyffssdtoav2zjtuenzmhybgdtqyyvk5zps6@nnkw2u74j7pu>
+ <ZnxMSEVR_2NRKMRy@google.com> <fbzi5bals5rmva3efgdpnljsfzdbehg4akwli7b5io7kqs3ikw@qfpdpxfec7ks>
+ <ZnxyAWmKIu680R_5@google.com> <87320ee5-8a66-6437-8c91-c6de1b7d80c1@amd.com>
+Message-ID: <Zn2GpHFZkXciuJOw@google.com>
+Subject: Re: [PATCH v1 1/5] KVM: SEV: Provide support for SNP_GUEST_REQUEST
+ NAE event
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com, 
+	jroedel@suse.de, pgonda@google.com, ashish.kalra@amd.com, bp@alien8.de, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Check for invalid hva address stored in data and return -EINVAL before
-calling into __kvm_gpc_activate().
+On Thu, Jun 27, 2024, Tom Lendacky wrote:
+> On 6/26/24 14:54, Sean Christopherson wrote:
+> > On Wed, Jun 26, 2024, Michael Roth wrote:
+> >>> What about the host kernel though?  I don't see anything here that ensures resp_pfn
+> >>> isn't "regular" memory, i.e. that ensure the page isn't being concurrently accessed
+> >>> by the host kernel (or some other userspace process).
+> >>>
+> >>> Or is the "private" memory still accessible by the host?
+> >>
+> >> It's accessible, but it is immutable according to RMP table, so so it would
+> >> require KVM to be elsewhere doing a write to the page,
+> > 
+> > I take it "immutable" means "read-only"?  If so, it would be super helpful to
+> > document that in the APM.  I assumed "immutable" only meant that the RMP entry
+> > itself is immutable, and that Assigned=AMD-SP is what prevented host accesses.
+> 
+> Not quite. It depends on the page state associated with the page. For
+> example, Hypervisor-Fixed pages have the immutable bit set, but can be
+> read and written.
+> 
+> The page states are documented in the SNP API (Chapter 5, Page
+> Management):
 
-Reported-by: syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=fd555292a1da3180fc82
-Tested-by: syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
-Signed-off-by: Pei Li <peili.dev@gmail.com>
----
-Syzbot reports a warning message in __kvm_gpc_refresh(). This warning
-requires at least one of gpa and uhva to be valid.
-WARNING: CPU: 0 PID: 5090 at arch/x86/kvm/../../../virt/kvm/pfncache.c:259 __kvm_gpc_refresh+0xf17/0x1090 arch/x86/kvm/../../../virt/kvm/pfncache.c:259
+Heh, but then that section says:
 
-We are calling it from kvm_gpc_activate_hva(). This function always calls
-__kvm_gpc_activate() with INVALID_GPA. Thus, uhva must be valid to
-disable this warning.
+  Pages in the Firmware state are owned by the firmware. Because the RMP.Immutable
+                                                         ^^^^^^^^^^^^^^^^^^^^^^^^^
+  bit is set, the hypervisor cannot write to Firmware pages nor alter the RMP entry
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  with the RMPUPDATE instruction.
 
-This patch checks for invalid hva address and return -EINVAL before
-calling __kvm_gpc_activate().
+which to me very clearly suggests that the RMP.Immutable bit is what makes the
+page read-only.
 
-syzbot has tested the proposed patch and the reproducer did not trigger
-any issue.
+Can you ask^Wbribe someone to add a "Table 11. Page State Properties" or something?
+E.g. to explicitly list out the read vs. write protections and the state of the
+page's data (encrypted, integrity-protected, zeroed?, etc).  I've read through
+all of "5.2 Page States" and genuinely have no clue as to what protections most
+of the states have.
 
-Tested on:
+Ah, never mind, I found "Table 15-39. RMP Memory Access Checks" in the APM.  FWIW,
+that somewhat contradicts this blurb from the SNP ABI spec:
 
-commit:         afcd4813 Merge tag 'mm-hotfixes-stable-2024-06-26-17-2..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1427e301980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e40800950091403a
-dashboard link: https://syzkaller.appspot.com/bug?extid=fd555292a1da3180fc82
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13838f3e980000
+  The content of a Context page is encrypted and integrity protected so that the
+  hypervisor cannot read or write to it.
 
-Note: testing is done by a robot and is best-effort only.
----
-Changes in v2:
-- Adapted Sean's suggestion to check for valid address before calling
-  into __kvm_gpc_activate().
-- Link to v1: https://lore.kernel.org/r/20240625-bug5-v1-1-e072ed5fce85@gmail.com
----
- arch/x86/kvm/xen.c  | 2 +-
- virt/kvm/pfncache.c | 3 +++
- 2 files changed, 4 insertions(+), 1 deletion(-)
+I also find that statement confusing.  IIUC, the fact that the Context page is
+encrypted and integrity protected doesn't actually have anything to do with the
+host's ability to access the data.  The host _can_ read the data, but it will get
+ciphertext.  But the host can't write the data because the page isn't HV-owned.
 
-diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-index f65b35a05d91..67bb4e89c399 100644
---- a/arch/x86/kvm/xen.c
-+++ b/arch/x86/kvm/xen.c
-@@ -741,7 +741,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
- 		} else {
- 			void __user * hva = u64_to_user_ptr(data->u.shared_info.hva);
- 
--			if (!PAGE_ALIGNED(hva) || !access_ok(hva, PAGE_SIZE)) {
-+			if (!PAGE_ALIGNED(hva)) {
- 				r = -EINVAL;
- 			} else if (!hva) {
- 				kvm_gpc_deactivate(&kvm->arch.xen.shinfo_cache);
-diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-index e3453e869e92..f0039efb9e1e 100644
---- a/virt/kvm/pfncache.c
-+++ b/virt/kvm/pfncache.c
-@@ -430,6 +430,9 @@ int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
- 
- int kvm_gpc_activate_hva(struct gfn_to_pfn_cache *gpc, unsigned long uhva, unsigned long len)
- {
-+	if (!access_ok((void __user *)uhva, len))
-+		return -EINVAL;
-+
- 	return __kvm_gpc_activate(gpc, INVALID_GPA, uhva, len);
- }
- 
-
----
-base-commit: 2bfcfd584ff5ccc8bb7acde19b42570414bf880b
-change-id: 20240625-bug5-5d332b5e5161
-
-Best regards,
--- 
-Pei Li <peili.dev@gmail.com>
-
+Actually, isn't the intregrity protected part wrong?  I thought one of the benefits
+of SNP vs. ES is that the RMP means the VMSA doesn't have to be integrity protected,
+and so VMRUN and #VMEXIT transitions are faster because the CPU doesn't need to do
+as much work.
 
