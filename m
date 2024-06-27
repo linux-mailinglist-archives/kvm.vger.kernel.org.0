@@ -1,143 +1,152 @@
-Return-Path: <kvm+bounces-20620-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20621-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE2CB91AEC7
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 20:07:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E656F91AEDA
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 20:15:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A7851F227A6
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 18:07:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D39F282961
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 18:15:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625B019AA62;
-	Thu, 27 Jun 2024 18:07:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 265F319AA5C;
+	Thu, 27 Jun 2024 18:14:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C3fQPu8l"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="HjE087sO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4960914D6EB
-	for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 18:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847EF19AA41
+	for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 18:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719511631; cv=none; b=h80i+LgZ25pWLkInM4ZyGCs+pvhk0wLAa0PMTXDY9vA6+nCXMWtR/V/YyujVp8hggo4DVmFhGgBTjgzp/oUdiErSrPt0WMeCLMUUkCCS9L/Yap6Z58bucF7Nt21uAeHCiR7zB6kzfKcUccYFIuVYi49IULGUOjHRBJpCLSyKArE=
+	t=1719512088; cv=none; b=AqTfc3j2G1STODn77VmRkBFxWCP5gvEKQ0BZC515Vts85moEtgyPoKx1szNj8NR8sEGfLjy5H/daql/JRfXDw2opJhfzAKRfFna150QXIbtAxnzaI4cePWAaN3K6rkXZZ/r/QP++M6/PApeTjYo1SHcor0nUql6Wm/AvFJvd/+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719511631; c=relaxed/simple;
-	bh=EAiH5AcxDGizDsjRBCmIonmcVf1bNXt8AIH/QALB0Ns=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FKsJt1s44x2uWhO9YBoI3hLNQBpy9XZJB+P6sTt0t9PEBtQzuS+GPEpuGok1Kn1FTbmuJJmrPFjpii5XIn5krE77Nkv4xD9KzzFnnMEpvxkFiDSLEhnz9ovOnpr+DTyEI2+0btRd5S3EE4VJk0jGuPVB+wrod8vMo9KeQs62jIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C3fQPu8l; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7225d0435a9so3527927a12.2
-        for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 11:07:10 -0700 (PDT)
+	s=arc-20240116; t=1719512088; c=relaxed/simple;
+	bh=2cK5AxOV9l+UMy4wzDeUFqdeQNcGCtOHicEYrQngggg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZgoR83cthGGTuH8qH9mP/Dx++LdLW1zbtcH0e/3E7TpuUrqqCdR1OiUpl0TwD6pNKr/J1kyyOHu2Mf3i71wu+16OUg7P2AK3WcIFirAEONKsUSAIVDWTvrPpl864c+hXVLJ1gnFsAJLOEtMXBwuyy9+1sh2VHwVqUlePmSbjpwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=HjE087sO; arc=none smtp.client-ip=209.85.166.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7f3d2f12d26so7010039f.1
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 11:14:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719511629; x=1720116429; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ly6j+LQp+Ou/MLEtOL32JfRKdC+LpNg62gKylauHIOE=;
-        b=C3fQPu8leLvo+fMkuxHrRO/B5L9L7Nj/TIW0RKBypiH/Y3YSU9gL65fKcN0AqYcs5T
-         SG7rM3ZCyhbwlnGRieU3os9fV0ZBs5FFBuYQl6d6xI+V3OOfgMmlFi+SLsO6MbXqfHo5
-         wNiQ8mYke+j52265nH6Ikzc/6DkKBHfhjyxxn82Cv99oQU9MWQ3ll/qZPkzYbhf7E0dQ
-         0sdFxWcoojliciaUoDN/HNicaEZQ7X3l2jWAVB6U48wsznKxujzdkpvqMQs/j7yrgiek
-         2wAAey6lsEWQT9zPbLSOmlvQnDWK2IcIEK8EfHXRg16IfQ/ud8XKcx5gcmhEp8kO/AFw
-         1DLg==
+        d=linuxfoundation.org; s=google; t=1719512085; x=1720116885; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oMHKqtsViAFQ8XOx3exriIx8afAjHEvNWX9sCBFwKMs=;
+        b=HjE087sOGZTN0DJOfWF5kD74/RlY+ZWkCZTQdzqHwACHVT+XeJ3v/wzclu6TgfWMJR
+         ckOJTOO7FmDiilRiO5qzrn3K2fdxlDXL5IEto+jQiZxO0UT0ZMXpqjTF9QuRiplIsdRy
+         5S9NaPOquoVvKRUQs+LbXGcA4uc6fv6j+JwpQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719511629; x=1720116429;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ly6j+LQp+Ou/MLEtOL32JfRKdC+LpNg62gKylauHIOE=;
-        b=iizrQDnULgBCYsvfaMhtEYHhrwPStyiD6QJEg8x04ybHyx8ZlEBFze0k3BPxw7tLFJ
-         GDlFjRT/jKaG39ik2CtLJoQqvng0zVTeH+YGeNPbmTtRr2Mtlbot0HO00eL4CmjLBmQF
-         vahbCFRJGxYBg9BBu5J11AXIvlW2ca/YtM/6XcnNRxwaMWPQeAX9R0xe6pP35WvdqAtl
-         qI77jk12TmSwBqxLDC2dNPbltIzqX+gP+XA9BDExDOiBzTZV/nQBcmC09v6/JPrpQrFw
-         mr2/gn83BHOt5QKXh16xwgYfUvFSq9WpWiOj2/jL4Fcazbh4138+S1SvlfMKQowFZg0B
-         /Jsg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4VJtBdV69dO6pJbSgXZNHw4accsrsLyXgcTtxH9CRPYE+pIyUoIt9VG47BPIwkDPnfWGkF8iJR2IcWrEyKLVn1Mra
-X-Gm-Message-State: AOJu0YyQFs9W5DuFJyEdGIl2P5IZDQmJUjV98YoCIh6fbVPbMrNC5HEi
-	5Jm3EZdToNut69dRHiUUXfmIKDyKubYGzkPQtikgtgLHP2/JwGBKtvekeviajngk1yqwJ+q4HqJ
-	DdA==
-X-Google-Smtp-Source: AGHT+IGB7UmqG7gr2s7ZFzglQssq+22/a1ExsgepdyatAXjw/z8ykZWCdPSekWALd2u1nA+fi04auchOvYs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:591:b0:71a:e413:b0ef with SMTP id
- 41be03b00d2f7-71b5a24f606mr39867a12.3.1719511628344; Thu, 27 Jun 2024
- 11:07:08 -0700 (PDT)
-Date: Thu, 27 Jun 2024 11:07:06 -0700
-In-Reply-To: <30988934-c325-64eb-a4b1-8f3e46b53a55@amd.com>
+        d=1e100.net; s=20230601; t=1719512085; x=1720116885;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oMHKqtsViAFQ8XOx3exriIx8afAjHEvNWX9sCBFwKMs=;
+        b=bSwKTVj4fvYRuASYsyBfYlZdGk26QZb2QYN+M+uCpKk5ani9Z7VWV2CfiW7vOl+WsK
+         s1tZe15HfMqj3tCItGIAwPnUBgkU7nhtYQ1tU75DOeg0YKnMxgobE3wZHFzrbQjGP6hX
+         CW6wMYoL3xZKQ13JmbcjNS/nhRoollKqheppFrgfsswmmm1uni71iZHH64h12FKdLGGY
+         SRWdjdPz3hAsANHIrlyzhl7d6Td7ReAKEwgb24CM37wIb3ErRUb0Vw/h4Oaks1uzqD6R
+         Fa8r9cxNpjqLFir1OIZlCZa22M8qgpafyJbTlEIyJZU4LWITDoL2w0b2waH+hF3Glwv4
+         4mmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX8djs6U8Zjd3ljEurbqWLdo1CkA5nBv0MOZW70FG3Co0gNgdJstW2sNNGzxZn/jBnqYEWVXZMf1wfLWIOfxJtBkyh9
+X-Gm-Message-State: AOJu0Yya6YKM3POaXNKyNSJkC4LzOFjYX9S89us4yJXQ/3jK7WS4fbvF
+	Xc43zoXojwYQ742DhQDebgDrcRPJpZrjQQVHmvvBbq0uOvFSOWsa7jR6ey3a+iU=
+X-Google-Smtp-Source: AGHT+IFUG5O1SrOnPJRNTLD5kODnctBl78frxmuDBYLRyoOk4cGdplKcVn3bQ6BYVahLxGENnJxatg==
+X-Received: by 2002:a5d:984e:0:b0:7f3:9dd3:15bf with SMTP id ca18e2360f4ac-7f39dd317famr1350449739f.0.1719512085576;
+        Thu, 27 Jun 2024 11:14:45 -0700 (PDT)
+Received: from [192.168.1.128] ([38.175.170.29])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-7f61ce9d654sm2994739f.13.2024.06.27.11.14.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 27 Jun 2024 11:14:45 -0700 (PDT)
+Message-ID: <af55d4ae-fefb-4235-a175-83e947ec4c25@linuxfoundation.org>
+Date: Thu, 27 Jun 2024 12:14:43 -0600
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240621134041.3170480-1-michael.roth@amd.com>
- <20240621134041.3170480-2-michael.roth@amd.com> <ZnwecZ5SZ8MrTRRT@google.com>
- <6sczq2nmoefcociyffssdtoav2zjtuenzmhybgdtqyyvk5zps6@nnkw2u74j7pu>
- <ZnxMSEVR_2NRKMRy@google.com> <fbzi5bals5rmva3efgdpnljsfzdbehg4akwli7b5io7kqs3ikw@qfpdpxfec7ks>
- <ZnxyAWmKIu680R_5@google.com> <87320ee5-8a66-6437-8c91-c6de1b7d80c1@amd.com>
- <Zn2GpHFZkXciuJOw@google.com> <30988934-c325-64eb-a4b1-8f3e46b53a55@amd.com>
-Message-ID: <Zn2qSl2zAjCKAgSi@google.com>
-Subject: Re: [PATCH v1 1/5] KVM: SEV: Provide support for SNP_GUEST_REQUEST
- NAE event
-From: Sean Christopherson <seanjc@google.com>
-To: Tom Lendacky <thomas.lendacky@amd.com>
-Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com, 
-	jroedel@suse.de, pgonda@google.com, ashish.kalra@amd.com, bp@alien8.de, 
-	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
-	Brijesh Singh <brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 1/1] selftests: Centralize -D_GNU_SOURCE= to CFLAGS in
+ lib.mk
+To: Edward Liaw <edliaw@google.com>, linux-kselftest@vger.kernel.org,
+ Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
+ Darren Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
+ =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
+ Paolo Bonzini <pbonzini@redhat.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Fenghua Yu <fenghua.yu@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Jarkko Sakkinen <jarkko@kernel.org>,
+ Dave Hansen <dave.hansen@linux.intel.com>
+Cc: linux-kernel@vger.kernel.org, usama.anjum@collabora.com,
+ seanjc@google.com, kernel-team@android.com, linux-mm@kvack.org,
+ iommu@lists.linux.dev, kvm@vger.kernel.org, netdev@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ linux-sgx@vger.kernel.org, John Hubbard <jhubbard@nvidia.com>,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20240625223454.1586259-1-edliaw@google.com>
+ <20240625223454.1586259-2-edliaw@google.com>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <20240625223454.1586259-2-edliaw@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 27, 2024, Tom Lendacky wrote:
-> On 6/27/24 10:35, Sean Christopherson wrote:
-> >> The page states are documented in the SNP API (Chapter 5, Page
-> >> Management):
-> > 
-> > Heh, but then that section says:
-> > 
-> >   Pages in the Firmware state are owned by the firmware. Because the RMP.Immutable
-> >                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
-> >   bit is set, the hypervisor cannot write to Firmware pages nor alter the RMP entry
-> >   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> >   with the RMPUPDATE instruction.
-> > 
-> > which to me very clearly suggests that the RMP.Immutable bit is what makes the
-> > page read-only.
-> > 
-> > Can you ask^Wbribe someone to add a "Table 11. Page State Properties" or something?
-> > E.g. to explicitly list out the read vs. write protections and the state of the
-> > page's data (encrypted, integrity-protected, zeroed?, etc).  I've read through
-> > all of "5.2 Page States" and genuinely have no clue as to what protections most
-> > of the states have.
+On 6/25/24 16:34, Edward Liaw wrote:
+> Centralize the _GNU_SOURCE definition to CFLAGS in lib.mk.  Remove
+> redundant defines from Makefiles that import lib.mk.  Convert any usage
+> of "#define _GNU_SOURCE 1" to "#define _GNU_SOURCE".
 > 
-> I'll get with the document owner and provide that feedback and see what we
-> can do to remove some of the ambiguity and improve upon it.
-
-Thanks!
-
-> > Ah, never mind, I found "Table 15-39. RMP Memory Access Checks" in the APM.  FWIW,
-> > that somewhat contradicts this blurb from the SNP ABI spec:
-> > 
-> >   The content of a Context page is encrypted and integrity protected so that the
-> >   hypervisor cannot read or write to it.
-> > 
-> > I also find that statement confusing.  IIUC, the fact that the Context page is
-> > encrypted and integrity protected doesn't actually have anything to do with the
-> > host's ability to access the data.  The host _can_ read the data, but it will get
-> > ciphertext.  But the host can't write the data because the page isn't HV-owned.
-> > 
-> > Actually, isn't the intregrity protected part wrong?  I thought one of the benefits
+> This uses the form "-D_GNU_SOURCE=", which is equivalent to
+> "#define _GNU_SOURCE".
 > 
-> The RMP protection is what helps provide the integrity protection. So if a
-> hypervisor tries to write to a non-hypervisor owned page, it will generate
-> an RMP #PF. If the page can't be RMPUPDATEd (the immutable bit is set for
-> the page in the RMP), then the page can't be written to by the hypervisor.
+> Otherwise using "-D_GNU_SOURCE" is equivalent to "-D_GNU_SOURCE=1" and
+> "#define _GNU_SOURCE 1", which is less commonly seen in source code and
+> would require many changes in selftests to avoid redefinition warnings.
+> 
+> Suggested-by: John Hubbard <jhubbard@nvidia.com>
+> Signed-off-by: Edward Liaw <edliaw@google.com>
+> ---
+>   tools/testing/selftests/exec/Makefile             | 1 -
+>   tools/testing/selftests/futex/functional/Makefile | 2 +-
+>   tools/testing/selftests/intel_pstate/Makefile     | 2 +-
+>   tools/testing/selftests/iommu/Makefile            | 2 --
+>   tools/testing/selftests/kvm/Makefile              | 2 +-
+>   tools/testing/selftests/lib.mk                    | 3 +++
+>   tools/testing/selftests/mm/thuge-gen.c            | 2 +-
+>   tools/testing/selftests/net/Makefile              | 2 +-
+>   tools/testing/selftests/net/tcp_ao/Makefile       | 2 +-
+>   tools/testing/selftests/proc/Makefile             | 1 -
+>   tools/testing/selftests/resctrl/Makefile          | 2 +-
+>   tools/testing/selftests/ring-buffer/Makefile      | 1 -
+>   tools/testing/selftests/riscv/mm/Makefile         | 2 +-
+>   tools/testing/selftests/sgx/Makefile              | 2 +-
+>   tools/testing/selftests/tmpfs/Makefile            | 1 -
+>   15 files changed, 12 insertions(+), 15 deletions(-)
+> 
 
-My confusion (ok, maybe it's more annoyance than true confusion) is that that
-applies to _all_ non-hypervisor pages, not just Context pages.  Reading things
-from a "the exception proves the rule" viewpoint, stating that Context pages are
-encrypted and integrity protected strongly suggests that all other pages are NOT
-encrypted and NOT integrity protected.
+Andrew,
+
+I am seeing merge conflicts with mm and exec tests. Might be
+better to have you take this through your tree?
+
+Acked-by: Shuah Khan <skhan@linuxfoundation.org>
+
+thanks,
+-- Shuah
+
 
