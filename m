@@ -1,147 +1,163 @@
-Return-Path: <kvm+bounces-20622-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20623-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 749E991AF47
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 20:47:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C58991B019
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 22:08:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0589EB2148E
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 18:47:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39DE31F21EBD
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 20:08:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141921993A2;
-	Thu, 27 Jun 2024 18:47:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 775F819CCF9;
+	Thu, 27 Jun 2024 20:07:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ut63iVYr"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hAKUb/Wd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB7EA3D;
-	Thu, 27 Jun 2024 18:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3783945BE4;
+	Thu, 27 Jun 2024 20:07:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719514049; cv=none; b=prPHdTsVuSALnMKIIDRg4CpM7Q+hTUJy8StO3mKPEfELJo4TwO6jui5iypBoJju+B4z4YpCb0O2MQ2jvb97VZOuEK0MIFhPlBeUikAxnmjB/N6yJof0875ynHZIQ2NX2vCkmFW5pzudOriPSrldUcJsgHgXTx5SQl9BH4Kh1Vro=
+	t=1719518873; cv=none; b=Jv0Qx5f6hYO0rKsLeG0bl2Av0SjpXDky1On7IdlBPVe7NF0NJZ6zrP229Nc5YXyKXYmx/hjzO1JQbJCugyNTi3YCTCNOdFFjYMZyhg4Xugdg7cpruT7NvGXL3iFSgdwP+YofWPo7aUd+BhrhLeE1LSOkYd510twrCK+hEIJ73II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719514049; c=relaxed/simple;
-	bh=GaCqT394L+OfOjnXqqaONMuWIgXdgFyw3HHLwRraFLI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VsQOdGRw28Shfn4AUhk69erxCyD0MtyG6fv2qjC6sECgatHhdaXo2yWJdlJvZfMvXBzycg1OYTZY5VEyTDKssFt19kQY/FJxULtmQUeI/ueU7jNMDESgGpFlQmRb7CaGpVmHSORz77cdGh6NnoaqtntF4eamMSvOIrX390M2nXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ut63iVYr; arc=none smtp.client-ip=148.163.156.1
+	s=arc-20240116; t=1719518873; c=relaxed/simple;
+	bh=83yGZ3R1Ly3XPruqqMAsZ1YGaheFcdjcFyebTzNiK18=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WIxHuobZPv5EKuZkqvsMRvQ/C9mPGI79doOvG3VYwJnT3OFwTcMm+1pvO0/fNry4TOaSh8+LOFL5R9k1SNhIT6tcXyPFntM07mpVV1gmHPHTTRrTGFCNWrHFy2J6o34/Uwpa/iQ/X/fa1OS138uXfZHsyK8DxUHGLEtFcemvA7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hAKUb/Wd; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45RIT6Rv006551;
-	Thu, 27 Jun 2024 18:47:24 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	kVqQoMWdc00828fjx8VCUxmo5WMeccVdx43pwpIg4rA=; b=Ut63iVYrQbzgkk+3
-	UFU0lfgZwtqU0JDrqtZ0pRKXB0iCYSBkE33BtwdeJs8CD8ThUe+RHG1cWBrnCyYA
-	Zl03VgOp0P9CZSBA4U/t5J+abllTAs4mVTZLAj9I97o99GJAyFcS5lTIXtYWG9mC
-	vsQI+kkDu1ZdUhYGYlS0/qY3zF/cSYEL5N8oMMJz5YdZyo1YowJx6KrYA2XjBfeJ
-	VUCmndulxCB7b/QAt/eEJAHkCICIbEsxX0jATCpTULZ8cADmtgNU6pNVhse1y+wR
-	eVsiqiTTOlAdSP7efADgOWPo4vkXL99lhfyaWYslVs3tmhY9BHeDp4+NZqB1EZki
-	HpC9Fw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401dcy8157-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 18:47:23 +0000 (GMT)
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45RIlNWV002541;
-	Thu, 27 Jun 2024 18:47:23 GMT
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45RJusSN026670;
+	Thu, 27 Jun 2024 20:07:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=lvB63fX9XV6cYgWhJCwCq9Puai
+	YYLnCqY5W6u+PzBRw=; b=hAKUb/WdLVuZE9z2Fbv3AaHZY6YRu2iU9aLQEfaJ4e
+	+XJKf7gcL5cvCfRtnDGvWUkvAtZOKsd/6vQHdwP+Tw3FWuuMs8ktWJ1pRrxd3Y/2
+	fXEWV88JfIwrSxrBm3NT+kI+zRLCZv2rSAfRz1nyKlNFdIHxdVytfax6ZY2sn6Ar
+	Xsg3UlaBYJglyrHFh+Saa0nnMqIygjWYZKWzqR57LLNHPxeNj81psQSJXyJa1n16
+	wdcQHd8gE8EpFVh8BwKd5jGpUCM9gVqF9flF0mqxsohhMdqa43+DV2yYh+e551c3
+	PlVH3ySdt49YKmoeJtcGUMrQ/mWzFw7d83yC7t9kYDWQ==
 Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401dcy8152-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401dtyg4nm-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 18:47:23 +0000 (GMT)
+	Thu, 27 Jun 2024 20:07:48 +0000 (GMT)
 Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45RFUGlJ000574;
-	Thu, 27 Jun 2024 18:47:22 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yxaenc5w9-1
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45RIOhgI000564;
+	Thu, 27 Jun 2024 20:07:48 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yxaench6a-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 18:47:21 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45RIlGcH54591790
+	Thu, 27 Jun 2024 20:07:47 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45RK7g9v18743580
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Jun 2024 18:47:18 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2042220043;
-	Thu, 27 Jun 2024 18:47:16 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 62B9620040;
-	Thu, 27 Jun 2024 18:47:15 +0000 (GMT)
-Received: from darkmoore (unknown [9.179.5.203])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu, 27 Jun 2024 18:47:15 +0000 (GMT)
-Date: Thu, 27 Jun 2024 20:47:13 +0200
-From: Christoph Schlameuss <schlameuss@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>,
-        Paolo Bonzini
- <pbonzini@redhat.com>
-Cc: linux-s390@vger.kernel.org, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        linux-doc@vger.kernel.org
-Subject: Re: [PATCH] s390/kvm: Reject memory region operations for ucontrol
- VMs
-Message-ID: <20240627204713.099e1a5d.schlameuss@linux.ibm.com>
-In-Reply-To: <35cb7d12-d93b-4fbb-98fe-10ce2e6358f2@linux.ibm.com>
-References: <20240624095902.29375-1-schlameuss@linux.ibm.com>
-	<CABgObfYxZZdwe94u7OvHPUx+u4fDEJLnBEQbk1hdYs_Zy0D2hA@mail.gmail.com>
-	<35cb7d12-d93b-4fbb-98fe-10ce2e6358f2@linux.ibm.com>
-Organization: IBM
+	Thu, 27 Jun 2024 20:07:44 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E89A220043;
+	Thu, 27 Jun 2024 20:07:41 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D89A42004B;
+	Thu, 27 Jun 2024 20:07:41 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 27 Jun 2024 20:07:41 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+	id 78EABE030B; Thu, 27 Jun 2024 22:07:41 +0200 (CEST)
+From: Eric Farman <farman@linux.ibm.com>
+To: Matthew Rosato <mjrosato@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>
+Cc: Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH] s390/vfio_ccw: Fix target addresses of TIC CCWs
+Date: Thu, 27 Jun 2024 22:07:40 +0200
+Message-Id: <20240627200740.373192-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: uoKwXKGyxipDEj4_r9fvlrjD-pB-GlEc
-X-Proofpoint-GUID: 1LVx65-JroayqNhx6hpopgKFC3PTJqRz
+X-Proofpoint-GUID: Sc4KRCwRu6D9OuaA84j0TJCrPOnfPlVH
+X-Proofpoint-ORIG-GUID: Sc4KRCwRu6D9OuaA84j0TJCrPOnfPlVH
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-06-27_14,2024-06-27_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 clxscore=1015
- adultscore=0 bulkscore=0 impostorscore=0 spamscore=0 priorityscore=1501
- mlxscore=0 phishscore=0 lowpriorityscore=0 suspectscore=0 mlxlogscore=651
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2406270138
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
+ priorityscore=1501 lowpriorityscore=0 mlxlogscore=999 adultscore=0
+ clxscore=1015 impostorscore=0 mlxscore=0 malwarescore=0 suspectscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2406270147
 
-On Thu, 27 Jun 2024 14:32:51 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+The processing of a Transfer-In-Channel (TIC) CCW requires locating
+the target of the CCW in the channel program, and updating the
+address to reflect what will actually be sent to hardware.
 
-> On 6/27/24 13:53, Paolo Bonzini wrote:
-> > On Mon, Jun 24, 2024 at 11:59=E2=80=AFAM Christoph Schlameuss
-> > <schlameuss@linux.ibm.com> wrote: =20
-> >>
-> >> This change rejects the KVM_SET_USER_MEMORY_REGION and
-> >> KVM_SET_USER_MEMORY_REGION2 ioctls when called on a ucontrol VM.
-> >> This is neccessary since ucontrol VMs have kvm->arch.gmap set to 0 and
-> >> would thus result in a null pointer dereference further in.
-> >> Memory management needs to be performed in userspace and using the
-> >> ioctls KVM_S390_UCAS_MAP and KVM_S390_UCAS_UNMAP.
-> >>
-> >> Also improve s390 specific documentation for KVM_SET_USER_MEMORY_REGION
-> >> and KVM_SET_USER_MEMORY_REGION2. =20
-> >=20
-> > Would be nice to have a selftest for ucontrol VMs, too... just saying :)
-> >=20
-> > Paolo
-> >  =20
->=20
-> Already in the works, he just hasn't posted it yet :)
-> We did do a couple rounds of internal feedback on the tests first.
+An error exists where the 64-bit virtual address is truncated to
+32-bits (variable "cda") when performing this math. Since s390
+addresses of that size are 31-bits, this leaves that additional
+bit enabled such that the resulting I/O triggers a channel
+program check. This shows up occasionally when booting a KVM
+guest from a passthrough DASD device:
 
-I do also have a test case for this specifically, but it depends on the
-base fixture. So I would send it together with that soon.
+  ..snip...
+  Interrupt Response Block Data:
+  : 0x0000000000003990
+      Function Ctrl : [Start]
+      Activity Ctrl :
+      Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
+      Device Status :
+      Channel Status : [Program-Check]
+      cpa=: 0x00000000008d0018
+      prev_ccw=: 0x0000000000000000
+      this_ccw=: 0x0000000000000000
+  ...snip...
+  dasd-ipl: Failed to run IPL1 channel program
 
-Christoph
+The channel program address of "0x008d0018" in the IRB doesn't
+look wrong, but tracing the CCWs shows the offending bit enabled:
+
+  ccw=0x0000012e808d0000 cda=00a0b030
+  ccw=0x0000012e808d0008 cda=00a0b038
+  ccw=0x0000012e808d0010 cda=808d0008
+  ccw=0x0000012e808d0018 cda=00a0b040
+
+Fix the calculation of the TIC CCW's data address such that it points
+to a valid 31-bit address regardless of the input address.
+
+Fixes: bd36cfbbb9e1 ("s390/vfio_ccw_cp: use new address translation helpers")
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
+---
+ drivers/s390/cio/vfio_ccw_cp.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+index 6e5c508b1e07..fd8cb052f096 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.c
++++ b/drivers/s390/cio/vfio_ccw_cp.c
+@@ -495,8 +495,9 @@ static int ccwchain_fetch_tic(struct ccw1 *ccw,
+ 	list_for_each_entry(iter, &cp->ccwchain_list, next) {
+ 		ccw_head = iter->ch_iova;
+ 		if (is_cpa_within_range(ccw->cda, ccw_head, iter->ch_len)) {
+-			cda = (u64)iter->ch_ccw + dma32_to_u32(ccw->cda) - ccw_head;
+-			ccw->cda = u32_to_dma32(cda);
++			/* Calculate offset of TIC target */
++			cda = dma32_to_u32(ccw->cda) - ccw_head;
++			ccw->cda = virt_to_dma32(iter->ch_ccw) + cda;
+ 			return 0;
+ 		}
+ 	}
+-- 
+2.40.1
+
 
