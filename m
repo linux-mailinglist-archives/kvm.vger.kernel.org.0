@@ -1,166 +1,131 @@
-Return-Path: <kvm+bounces-20615-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20616-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 076EE91AE5A
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 19:42:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF34191AE8B
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 19:51:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B22B1C20F1B
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 17:42:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ACA228267D
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 17:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88BE319A2AD;
-	Thu, 27 Jun 2024 17:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD60A19CCE4;
+	Thu, 27 Jun 2024 17:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bRAQV1Dp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IIYJcPU9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BF913A276
-	for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 17:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EBF19AA4B;
+	Thu, 27 Jun 2024 17:50:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719510142; cv=none; b=KBkXOuojWa35mqj97SAIo0dJWNqR/6LON8//w9XF/eSV7PK9/E3kO4WxXwEP2tMiv4Lsm//UM2PLCbWGkoX4DMe8Zd4/nDsttrzvHGTtlz9QF8oLN7d5AijMW5Af745lHJIjO0IoseI1MRGPfJdeaA2zox1Hk4YpokZVI43dT+g=
+	t=1719510656; cv=none; b=TOB56bUYTvTazjWFAkdp/95aTqAMkPGA4FwgSUX19/AacbYBrGCWmIDMJ3z7xpUIg01pjxcfKhuv3L8UpXBsb6rkJXSdInlxXCq+cJ7twTnTej4Z9UEDq3Ggw4HZYNqH6lS79bvca5KkGqWswhZ1Nlshrdce94yhzMlM8dcOd5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719510142; c=relaxed/simple;
-	bh=QWiCFle1OjlmoDLkJTUXa/Nbue5uZFbpxYfIHw4qoco=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=G9l28OYHB0WxJX4FEgmGhz5NCzaS8YVHuZK3lp758vjv5smk6XeqUXsE3fmcIvQoC2EmVQFekMJATbqTaxIAm/aNpzoyD9fQZCWYqn0qXB+WxcNIstd0hljeHv3C9WgtGo92XxV7g0PMFitvgyscrflL/YeD+OwSbvwFoWVUADw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bRAQV1Dp; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-632588b1bdeso157195947b3.2
-        for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 10:42:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719510140; x=1720114940; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1sQpJMlhaOImbaZsmQPczRmnXse/xZ0ADeEMYCxzlHY=;
-        b=bRAQV1Dp5u5Adi3cLjCobR05EDS+7XtfTblwgoAQ6i0LcBITtl2aeHrQrK6R7gsqrU
-         nGoKGSCKkH7iE1905nRzgCDq7fxDRqVM5XfgQffNnxluFhMafO1kBlDPb65eGwCmQGuA
-         GCN0nkdv2HB+2kyW0I1B4SF71atzgayuRyAUVkPeUu1nrPZriuvch9r/gk1wb/Rj/qta
-         xg0apBKlYyGT8iwS4HhkB4ImrXR3+8KDhlg19rxa1HrXSqFnWV/AMXSJDVzwV9PpDKYp
-         YozyGDw5xHRPwaJXJwwaGU1WGxtaKvszww9E+pxr2sNP8QmHZC3S8tWjbBm9SFiPQno/
-         GjTQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719510140; x=1720114940;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1sQpJMlhaOImbaZsmQPczRmnXse/xZ0ADeEMYCxzlHY=;
-        b=cSczmm4WyscXCSIujJbmPleTxvtkE2qARuq3XV750FOtJuubhUhS4qDrEy5noSjjox
-         ZUxmjqNoUZV6eYitTBqmgr1TITI7W5K+UYpyVri4N7WvP6zy7genV1wTZs8BzmBkzfun
-         bavPGSPiUomd089Dq0/bQ7XuQaqCaku9s4rBeCDtBS2X2h2gqS+g8rB1qhWYLLeXW9ux
-         90+P4iDKgPgwfHBLWtq0yUKy5GFxtRHsBCPePjN6g4WC2BJRvbeLTmjE2ig3c3aHceLm
-         2t4TFZFedvM2+RAZzNCBo3Op0a0VthAQxqGJljkD918IlRoshLaTFvgSkUDmvUHGoqS2
-         DpVA==
-X-Gm-Message-State: AOJu0YwOKj7SMPHWS6oM9qIr1QYCc0wHvlK6D6fbe27QnljMVKxSCi/z
-	MdREtT/dZz94TciIBX2Utukwt6E9U0tq/1o/aIfKaQW3MrEoZ4X11zfdBSj9/aY+Fv6gAJgh3CR
-	Z1A==
-X-Google-Smtp-Source: AGHT+IE8qFFP1ajg6w4kSm8Qn4ro9HS/brjSiPL5I1EbZHI/6XKc4cVAGbMPmz4OZwpyYhZSw4GJu61Pw7M=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:c16:b0:631:9b3b:525d with SMTP id
- 00721157ae682-642997c4d57mr470617b3.4.1719510140198; Thu, 27 Jun 2024
- 10:42:20 -0700 (PDT)
-Date: Thu, 27 Jun 2024 10:42:18 -0700
-In-Reply-To: <20240621204305.1730677-2-mlevitsk@redhat.com>
+	s=arc-20240116; t=1719510656; c=relaxed/simple;
+	bh=gOn5wCkQoaz4jCvDxmaxx4Rr4gNeBfnRgSNDr4QSj8U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=crIdX34rEGjhI68hNnRpmvhM1Zl7I6fzNJB1U1OvTklJr8ejRX5CyaJr2rzphzaMXu70emK5ggW6mAaezCn29sBB60rKNhuBdraZ8Y1Ewq0clqFrWsUlUApH1T7wp00MUvsdlUdBsiAKlo2PEdTLiqcWvI3VwpOEHrYC32GWwvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IIYJcPU9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8B55CC2BD10;
+	Thu, 27 Jun 2024 17:50:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719510656;
+	bh=gOn5wCkQoaz4jCvDxmaxx4Rr4gNeBfnRgSNDr4QSj8U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=IIYJcPU97Y+PRAS/+YU/5ccbncoZV1uCz57lAqil+V1ijTPByVKGTQFMqmdIktpow
+	 mgUXuwPMGB0hxBKAEtQcmsJRe0kgoK0G4CxAqoS4UnqOc+s7QEYIHK2kt44seSLDnZ
+	 Gh7dIhAcmLSHgaptDShKUVITRiz/vLPn0qdyGC0znkbWHWytZ7ePFuuj2lU7mHIg0F
+	 X0+78irzHOMSVd8cMwuP/4tg088CmEcvevRxvvPs6wzwg65cMt+rL64nQ95qH5Tx37
+	 GB4x63Y5pxbKsGJf0RlDoEvN+uEIHgUB3AusDoc3p6pdooB0KA3nJdCVz0InBkVSKv
+	 iBdVjZUdtNUDQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5FC7EC43445;
+	Thu, 27 Jun 2024 17:50:56 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240621204305.1730677-1-mlevitsk@redhat.com> <20240621204305.1730677-2-mlevitsk@redhat.com>
-Message-ID: <Zn2ker_KZ7Fk-7W1@google.com>
-Subject: Re: [PATCH 1/1] KVM: selftests: pmu_counters_test: increase
- robustness of LLC cache misses
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	linux-kselftest@vger.kernel.org, Shuah Khan <shuah@kernel.org>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v7 00/16] Add support for a few Zc* extensions,
+ Zcmop and Zimop
+From: patchwork-bot+linux-riscv@kernel.org
+Message-Id: 
+ <171951065638.6762.17635047001193885957.git-patchwork-notify@kernel.org>
+Date: Thu, 27 Jun 2024 17:50:56 +0000
+References: <20240619113529.676940-1-cleger@rivosinc.com>
+In-Reply-To: <20240619113529.676940-1-cleger@rivosinc.com>
+To: =?utf-8?b?Q2zDqW1lbnQgTMOpZ2VyIDxjbGVnZXJAcml2b3NpbmMuY29tPg==?=@codeaurora.org
+Cc: linux-riscv@lists.infradead.org, corbet@lwn.net, paul.walmsley@sifive.com,
+ palmer@dabbelt.com, aou@eecs.berkeley.edu, conor@kernel.org, robh@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, anup@brainfault.org, shuah@kernel.org,
+ atishp@atishpatra.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-kselftest@vger.kernel.org
 
-On Fri, Jun 21, 2024, Maxim Levitsky wrote:
-> Currently this test does a single CLFLUSH on its memory location
-> but due to speculative execution this might not cause LLC misses.
+Hello:
+
+This series was applied to riscv/linux.git (for-next)
+by Palmer Dabbelt <palmer@rivosinc.com>:
+
+On Wed, 19 Jun 2024 13:35:10 +0200 you wrote:
+> Add support for (yet again) more RVA23U64 missing extensions. Add
+> support for Zimop, Zcmop, Zca, Zcf, Zcd and Zcb extensions ISA string
+> parsing, hwprobe and kvm support. Zce, Zcmt and Zcmp extensions have
+> been left out since they target microcontrollers/embedded CPUs and are
+> not needed by RVA23U64.
 > 
-> Instead, do a cache flush on each loop iteration to confuse the prediction
-> and make sure that cache misses always occur.
+> Since Zc* extensions states that C implies Zca, Zcf (if F and RV32), Zcd
+> (if D), this series modifies the way ISA string is parsed and now does
+> it in two phases. First one parses the string and the second one
+> validates it for the final ISA description.
 > 
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  .../selftests/kvm/x86_64/pmu_counters_test.c  | 20 +++++++++----------
->  1 file changed, 9 insertions(+), 11 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> index 96446134c00b7..ddc0b7e4a888e 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> @@ -14,8 +14,8 @@
->   * instructions that are needed to set up the loop and then disabled the
->   * counter.  1 CLFLUSH/CLFLUSHOPT/NOP, 1 MFENCE, 2 MOV, 2 XOR, 1 WRMSR.
->   */
-> -#define NUM_EXTRA_INSNS		7
-> -#define NUM_INSNS_RETIRED	(NUM_BRANCHES + NUM_EXTRA_INSNS)
-> +#define NUM_EXTRA_INSNS		5
-> +#define NUM_INSNS_RETIRED	(NUM_BRANCHES * 2 + NUM_EXTRA_INSNS)
+> [...]
 
-The comment above is stale.  I also think it's worth adding a macro to capture
-that the '2' comes from having two instructions in the loop body (three, if we
-keep the MFENCE).
+Here is the summary with links:
+  - [v7,01/16] dt-bindings: riscv: add Zimop ISA extension description
+    https://git.kernel.org/riscv/c/a57b68bc315c
+  - [v7,02/16] riscv: add ISA extension parsing for Zimop
+    https://git.kernel.org/riscv/c/2467c2104f1f
+  - [v7,03/16] riscv: hwprobe: export Zimop ISA extension
+    https://git.kernel.org/riscv/c/36f8960de887
+  - [v7,04/16] RISC-V: KVM: Allow Zimop extension for Guest/VM
+    https://git.kernel.org/riscv/c/fb2a3d63efef
+  - [v7,05/16] KVM: riscv: selftests: Add Zimop extension to get-reg-list test
+    https://git.kernel.org/riscv/c/ca5446406914
+  - [v7,06/16] dt-bindings: riscv: add Zca, Zcf, Zcd and Zcb ISA extension description
+    https://git.kernel.org/riscv/c/e9f9946cad7b
+  - [v7,07/16] riscv: add ISA extensions validation callback
+    https://git.kernel.org/riscv/c/625034abd52a
+  - [v7,08/16] riscv: add ISA parsing for Zca, Zcf, Zcd and Zcb
+    https://git.kernel.org/riscv/c/ba4cd855839d
+  - [v7,09/16] riscv: hwprobe: export Zca, Zcf, Zcd and Zcb ISA extensions
+    https://git.kernel.org/riscv/c/0ad70db5eb21
+  - [v7,10/16] RISC-V: KVM: Allow Zca, Zcf, Zcd and Zcb extensions for Guest/VM
+    https://git.kernel.org/riscv/c/d964e8f2ae65
+  - [v7,11/16] KVM: riscv: selftests: Add some Zc* extensions to get-reg-list test
+    https://git.kernel.org/riscv/c/d27c34a73514
+  - [v7,12/16] dt-bindings: riscv: add Zcmop ISA extension description
+    https://git.kernel.org/riscv/c/700556a73bc7
+  - [v7,13/16] riscv: add ISA extension parsing for Zcmop
+    https://git.kernel.org/riscv/c/164d644059cf
+  - [v7,14/16] riscv: hwprobe: export Zcmop ISA extension
+    https://git.kernel.org/riscv/c/fc078ea317cc
+  - [v7,15/16] RISC-V: KVM: Allow Zcmop extension for Guest/VM
+    https://git.kernel.org/riscv/c/29cf9b803e6e
+  - [v7,16/16] KVM: riscv: selftests: Add Zcmop extension to get-reg-list test
+    https://git.kernel.org/riscv/c/e212d92d1a86
 
->  static uint8_t kvm_pmu_version;
->  static bool kvm_has_perf_caps;
-> @@ -133,9 +133,8 @@ static void guest_assert_event_count(uint8_t idx,
->   * doesn't need to be clobbered as the input value, @pmc_msr, is restored
->   * before the end of the sequence.
->   *
-> - * If CLFUSH{,OPT} is supported, flush the cacheline containing (at least) the
-> - * start of the loop to force LLC references and misses, i.e. to allow testing
-> - * that those events actually count.
-> + * If CLFUSH{,OPT} is supported, flush the cacheline containing the CLFUSH{,OPT}
-> + * instruction on each loop iteration to ensure that LLC cache misses happen.
->   *
->   * If forced emulation is enabled (and specified), force emulation on a subset
->   * of the measured code to verify that KVM correctly emulates instructions and
-> @@ -145,10 +144,9 @@ static void guest_assert_event_count(uint8_t idx,
->  #define GUEST_MEASURE_EVENT(_msr, _value, clflush, FEP)				\
->  do {										\
->  	__asm__ __volatile__("wrmsr\n\t"					\
-> -			     clflush "\n\t"					\
-> -			     "mfence\n\t"					\
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Based on your testing, it's probably ok to drop the mfence, but I don't see any
-reason to do so.  It's not like that mfence meaningfully affects the runtime, and
-anything easy/free we can do to avoid flaky tests is worth doing.
 
-I'll post and apply a v2, with a prep patch to add a NUM_INSNS_PER_LOOP macro and
-keep the MFENCE (I'll be offline all of next week, and don't want to push anything
-to -next tomorrow, even though the risk of breaking anything is minimal).
-
-> -			     "1: mov $" __stringify(NUM_BRANCHES) ", %%ecx\n\t"	\
-> -			     FEP "loop .\n\t"					\
-> +			     " mov $" __stringify(NUM_BRANCHES) ", %%ecx\n\t"	\
-> +			     "1: " clflush "\n\t"				\
-> +			     FEP "loop 1b\n\t"					\
->  			     FEP "mov %%edi, %%ecx\n\t"				\
->  			     FEP "xor %%eax, %%eax\n\t"				\
->  			     FEP "xor %%edx, %%edx\n\t"				\
-> @@ -163,9 +161,9 @@ do {										\
->  	wrmsr(pmc_msr, 0);							\
->  										\
->  	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
-> -		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt 1f", FEP);	\
-> +		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt .", FEP);	\
->  	else if (this_cpu_has(X86_FEATURE_CLFLUSH))				\
-> -		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflush 1f", FEP);	\
-> +		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflush .", FEP);	\
->  	else									\
->  		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "nop", FEP);		\
->  										\
-> -- 
-> 2.26.3
-> 
 
