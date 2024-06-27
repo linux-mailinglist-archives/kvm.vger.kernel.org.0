@@ -1,228 +1,143 @@
-Return-Path: <kvm+bounces-20619-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20620-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F54191AEB4
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 20:04:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE2CB91AEC7
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 20:07:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6E6F1F22779
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 18:04:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A7851F227A6
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 18:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3127919B590;
-	Thu, 27 Jun 2024 18:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 625B019AA62;
+	Thu, 27 Jun 2024 18:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="beENtNyA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C3fQPu8l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460B519B3D8;
-	Thu, 27 Jun 2024 18:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4960914D6EB
+	for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 18:07:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719511456; cv=none; b=Af+8qQV7EFyZJ2KoB1vyW+abiuCwzwSdZ4uqFW4akyP4XgFKqqobZMtiXkgks4Gqh/5ITcwwVi9L4t+7v0NYQBKz2LKF/aOcw4iLjMpx2XXbOXaowyyr1X2n7sX5aivF9s7Cfex5z6ymZHNPODlwURQOaX45XxO0ZsrUgkdc0Lk=
+	t=1719511631; cv=none; b=h80i+LgZ25pWLkInM4ZyGCs+pvhk0wLAa0PMTXDY9vA6+nCXMWtR/V/YyujVp8hggo4DVmFhGgBTjgzp/oUdiErSrPt0WMeCLMUUkCCS9L/Yap6Z58bucF7Nt21uAeHCiR7zB6kzfKcUccYFIuVYi49IULGUOjHRBJpCLSyKArE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719511456; c=relaxed/simple;
-	bh=xPBudM6c7EpUeLvld2BxPoWXQJ5Se924hvk1RFd3G6E=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Eq2V88Oau5UApLOr9Tl6WOx+AGCx7bwlgaRoT2qTa5O5ihCMvZ8ku6JAxSx347N59VB5xA79giBT17qMKzBylMUF4g8tiU3vqc6tOuyB1pg6zszl5eiHy/5vxayzCiuHpAC7lUqfFnbh1yJKNBV+3XG/79FH4REffi6DBxWQVZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=beENtNyA; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45RHt9vZ020951;
-	Thu, 27 Jun 2024 18:04:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=GaSyLEFTZPmfQ
-	v/jKB+v0N0VlfjVe3VXTictJ2evy4U=; b=beENtNyAWeWRb0u3r4Tq8+4IO+fp/
-	u4AllyIFtdQNm2Zqk520FptW+x0bUFVhU0HmPJs9OQQmEQu0rzK6UwADeP2Ydp9a
-	OVWon46oZq7YG+QpB7Krhjv08gTNs+BJwd9iJwPy8w7blpm62ZVcK44rT8SNQoXV
-	QoNhFdMRJ73JDj/cHesNNZVkYG/xDs3EORVhrMZQ4aovEQL+5S0rbdASxpBUeurH
-	QirXEPwcpqjsw6Wl3sFZ7DL5vDFH4sK463GpAIoml3O+heXr/a9dwaAM5eOD9iAb
-	kaxLdqblnaj8bDCQ3F1uZb4E/VaeZ+3AL/40Z28xDvylLzuIQN3QKLCcw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401aaf0f4m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 18:04:06 +0000 (GMT)
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45RI461E003618;
-	Thu, 27 Jun 2024 18:04:06 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401aaf0f4h-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 18:04:06 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45RH1Ht7000388;
-	Thu, 27 Jun 2024 18:04:05 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yxbn3kpdb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 18:04:05 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45RI401r52101472
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Jun 2024 18:04:02 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 049A120043;
-	Thu, 27 Jun 2024 18:04:00 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 20BF120040;
-	Thu, 27 Jun 2024 18:03:58 +0000 (GMT)
-Received: from li-c6426e4c-27cf-11b2-a85c-95d65bc0de0e.ibm.com.com (unknown [9.43.107.18])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 27 Jun 2024 18:03:57 +0000 (GMT)
-From: Gautam Menghani <gautam@linux.ibm.com>
-To: mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
-        naveen.n.rao@linux.ibm.com
-Cc: Gautam Menghani <gautam@linux.ibm.com>, linuxppc-dev@lists.ozlabs.org,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [RFC PATCH 2/2] arch/powerpc/kvm: Fix doorbells for nested KVM guests on PowerNV
-Date: Thu, 27 Jun 2024 23:33:36 +0530
-Message-ID: <20240627180342.110238-3-gautam@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240627180342.110238-1-gautam@linux.ibm.com>
-References: <20240627180342.110238-1-gautam@linux.ibm.com>
+	s=arc-20240116; t=1719511631; c=relaxed/simple;
+	bh=EAiH5AcxDGizDsjRBCmIonmcVf1bNXt8AIH/QALB0Ns=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=FKsJt1s44x2uWhO9YBoI3hLNQBpy9XZJB+P6sTt0t9PEBtQzuS+GPEpuGok1Kn1FTbmuJJmrPFjpii5XIn5krE77Nkv4xD9KzzFnnMEpvxkFiDSLEhnz9ovOnpr+DTyEI2+0btRd5S3EE4VJk0jGuPVB+wrod8vMo9KeQs62jIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C3fQPu8l; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7225d0435a9so3527927a12.2
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 11:07:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719511629; x=1720116429; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ly6j+LQp+Ou/MLEtOL32JfRKdC+LpNg62gKylauHIOE=;
+        b=C3fQPu8leLvo+fMkuxHrRO/B5L9L7Nj/TIW0RKBypiH/Y3YSU9gL65fKcN0AqYcs5T
+         SG7rM3ZCyhbwlnGRieU3os9fV0ZBs5FFBuYQl6d6xI+V3OOfgMmlFi+SLsO6MbXqfHo5
+         wNiQ8mYke+j52265nH6Ikzc/6DkKBHfhjyxxn82Cv99oQU9MWQ3ll/qZPkzYbhf7E0dQ
+         0sdFxWcoojliciaUoDN/HNicaEZQ7X3l2jWAVB6U48wsznKxujzdkpvqMQs/j7yrgiek
+         2wAAey6lsEWQT9zPbLSOmlvQnDWK2IcIEK8EfHXRg16IfQ/ud8XKcx5gcmhEp8kO/AFw
+         1DLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719511629; x=1720116429;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ly6j+LQp+Ou/MLEtOL32JfRKdC+LpNg62gKylauHIOE=;
+        b=iizrQDnULgBCYsvfaMhtEYHhrwPStyiD6QJEg8x04ybHyx8ZlEBFze0k3BPxw7tLFJ
+         GDlFjRT/jKaG39ik2CtLJoQqvng0zVTeH+YGeNPbmTtRr2Mtlbot0HO00eL4CmjLBmQF
+         vahbCFRJGxYBg9BBu5J11AXIvlW2ca/YtM/6XcnNRxwaMWPQeAX9R0xe6pP35WvdqAtl
+         qI77jk12TmSwBqxLDC2dNPbltIzqX+gP+XA9BDExDOiBzTZV/nQBcmC09v6/JPrpQrFw
+         mr2/gn83BHOt5QKXh16xwgYfUvFSq9WpWiOj2/jL4Fcazbh4138+S1SvlfMKQowFZg0B
+         /Jsg==
+X-Forwarded-Encrypted: i=1; AJvYcCV4VJtBdV69dO6pJbSgXZNHw4accsrsLyXgcTtxH9CRPYE+pIyUoIt9VG47BPIwkDPnfWGkF8iJR2IcWrEyKLVn1Mra
+X-Gm-Message-State: AOJu0YyQFs9W5DuFJyEdGIl2P5IZDQmJUjV98YoCIh6fbVPbMrNC5HEi
+	5Jm3EZdToNut69dRHiUUXfmIKDyKubYGzkPQtikgtgLHP2/JwGBKtvekeviajngk1yqwJ+q4HqJ
+	DdA==
+X-Google-Smtp-Source: AGHT+IGB7UmqG7gr2s7ZFzglQssq+22/a1ExsgepdyatAXjw/z8ykZWCdPSekWALd2u1nA+fi04auchOvYs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:591:b0:71a:e413:b0ef with SMTP id
+ 41be03b00d2f7-71b5a24f606mr39867a12.3.1719511628344; Thu, 27 Jun 2024
+ 11:07:08 -0700 (PDT)
+Date: Thu, 27 Jun 2024 11:07:06 -0700
+In-Reply-To: <30988934-c325-64eb-a4b1-8f3e46b53a55@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 1D2yhyqCjFWvCxRP6573BkfsyD0CxaOI
-X-Proofpoint-GUID: 2rztb_3aQXPD9vAx38KYtkN3lVoL9WWv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-27_13,2024-06-27_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 clxscore=1015 suspectscore=0 bulkscore=0 impostorscore=0
- adultscore=0 mlxscore=0 priorityscore=1501 phishscore=0 lowpriorityscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406270132
+Mime-Version: 1.0
+References: <20240621134041.3170480-1-michael.roth@amd.com>
+ <20240621134041.3170480-2-michael.roth@amd.com> <ZnwecZ5SZ8MrTRRT@google.com>
+ <6sczq2nmoefcociyffssdtoav2zjtuenzmhybgdtqyyvk5zps6@nnkw2u74j7pu>
+ <ZnxMSEVR_2NRKMRy@google.com> <fbzi5bals5rmva3efgdpnljsfzdbehg4akwli7b5io7kqs3ikw@qfpdpxfec7ks>
+ <ZnxyAWmKIu680R_5@google.com> <87320ee5-8a66-6437-8c91-c6de1b7d80c1@amd.com>
+ <Zn2GpHFZkXciuJOw@google.com> <30988934-c325-64eb-a4b1-8f3e46b53a55@amd.com>
+Message-ID: <Zn2qSl2zAjCKAgSi@google.com>
+Subject: Re: [PATCH v1 1/5] KVM: SEV: Provide support for SNP_GUEST_REQUEST
+ NAE event
+From: Sean Christopherson <seanjc@google.com>
+To: Tom Lendacky <thomas.lendacky@amd.com>
+Cc: Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com, 
+	jroedel@suse.de, pgonda@google.com, ashish.kalra@amd.com, bp@alien8.de, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, 
+	Brijesh Singh <brijesh.singh@amd.com>, Alexey Kardashevskiy <aik@amd.com>
+Content-Type: text/plain; charset="us-ascii"
 
-commit 6398326b9ba1("KVM: PPC: Book3S HV P9: Stop using vc->dpdes")
-introduced an optimization to use only vcpu->doorbell_request for SMT
-emulation for Power9 and above guests, but the code for nested guests 
-still relies on the old way of handling doorbells, due to which an L2
-guest cannot be booted with XICS with SMT>1. The command to repro
-this issue is:
+On Thu, Jun 27, 2024, Tom Lendacky wrote:
+> On 6/27/24 10:35, Sean Christopherson wrote:
+> >> The page states are documented in the SNP API (Chapter 5, Page
+> >> Management):
+> > 
+> > Heh, but then that section says:
+> > 
+> >   Pages in the Firmware state are owned by the firmware. Because the RMP.Immutable
+> >                                                          ^^^^^^^^^^^^^^^^^^^^^^^^^
+> >   bit is set, the hypervisor cannot write to Firmware pages nor alter the RMP entry
+> >   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> >   with the RMPUPDATE instruction.
+> > 
+> > which to me very clearly suggests that the RMP.Immutable bit is what makes the
+> > page read-only.
+> > 
+> > Can you ask^Wbribe someone to add a "Table 11. Page State Properties" or something?
+> > E.g. to explicitly list out the read vs. write protections and the state of the
+> > page's data (encrypted, integrity-protected, zeroed?, etc).  I've read through
+> > all of "5.2 Page States" and genuinely have no clue as to what protections most
+> > of the states have.
+> 
+> I'll get with the document owner and provide that feedback and see what we
+> can do to remove some of the ambiguity and improve upon it.
 
-qemu-system-ppc64 \
-	-drive file=rhel.qcow2,format=qcow2 \
-	-m 20G \
-	-smp 8,cores=1,threads=8 \
-	-cpu  host \
-	-nographic \
-	-machine pseries,ic-mode=xics -accel kvm
+Thanks!
 
-Fix the plumbing to utilize vcpu->doorbell_request instead of vcore->dpdes 
-on P9 and above.
+> > Ah, never mind, I found "Table 15-39. RMP Memory Access Checks" in the APM.  FWIW,
+> > that somewhat contradicts this blurb from the SNP ABI spec:
+> > 
+> >   The content of a Context page is encrypted and integrity protected so that the
+> >   hypervisor cannot read or write to it.
+> > 
+> > I also find that statement confusing.  IIUC, the fact that the Context page is
+> > encrypted and integrity protected doesn't actually have anything to do with the
+> > host's ability to access the data.  The host _can_ read the data, but it will get
+> > ciphertext.  But the host can't write the data because the page isn't HV-owned.
+> > 
+> > Actually, isn't the intregrity protected part wrong?  I thought one of the benefits
+> 
+> The RMP protection is what helps provide the integrity protection. So if a
+> hypervisor tries to write to a non-hypervisor owned page, it will generate
+> an RMP #PF. If the page can't be RMPUPDATEd (the immutable bit is set for
+> the page in the RMP), then the page can't be written to by the hypervisor.
 
-Fixes: 6398326b9ba1 ("KVM: PPC: Book3S HV P9: Stop using vc->dpdes")
-Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
----
- arch/powerpc/kvm/book3s_hv.c        |  9 ++++++++-
- arch/powerpc/kvm/book3s_hv_nested.c | 20 ++++++++++++++++----
- 2 files changed, 24 insertions(+), 5 deletions(-)
-
-diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-index cea28ac05923..0586fa636707 100644
---- a/arch/powerpc/kvm/book3s_hv.c
-+++ b/arch/powerpc/kvm/book3s_hv.c
-@@ -4178,6 +4178,9 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vcpu *vcpu, u64 time_limit, uns
- 	}
- 	hvregs.hdec_expiry = time_limit;
- 
-+	// clear doorbell bit as hvregs already has the info
-+	vcpu->arch.doorbell_request = 0;
-+
- 	/*
- 	 * When setting DEC, we must always deal with irq_work_raise
- 	 * via NMI vs setting DEC. The problem occurs right as we
-@@ -4694,6 +4697,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 	struct kvm_nested_guest *nested = vcpu->arch.nested;
- 	unsigned long flags;
- 	u64 tb;
-+	bool doorbell_pending;
- 
- 	trace_kvmppc_run_vcpu_enter(vcpu);
- 
-@@ -4752,6 +4756,9 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 	 */
- 	smp_mb();
- 
-+	doorbell_pending = !cpu_has_feature(CPU_FTR_ARCH_300) &&
-+				vcpu->arch.doorbell_request;
-+
- 	if (!nested) {
- 		kvmppc_core_prepare_to_enter(vcpu);
- 		if (test_bit(BOOK3S_IRQPRIO_EXTERNAL,
-@@ -4769,7 +4776,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u64 time_limit,
- 				lpcr |= LPCR_MER;
- 		}
- 	} else if (vcpu->arch.pending_exceptions ||
--		   vcpu->arch.doorbell_request ||
-+		   doorbell_pending ||
- 		   xive_interrupt_pending(vcpu)) {
- 		vcpu->arch.ret = RESUME_HOST;
- 		goto out;
-diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3s_hv_nested.c
-index 05f5220960c6..b34eefa6b268 100644
---- a/arch/powerpc/kvm/book3s_hv_nested.c
-+++ b/arch/powerpc/kvm/book3s_hv_nested.c
-@@ -32,7 +32,10 @@ void kvmhv_save_hv_regs(struct kvm_vcpu *vcpu, struct hv_guest_state *hr)
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 
- 	hr->pcr = vc->pcr | PCR_MASK;
--	hr->dpdes = vc->dpdes;
-+	if (cpu_has_feature(CPU_FTR_ARCH_300))
-+		hr->dpdes = vcpu->arch.doorbell_request;
-+	else
-+		hr->dpdes = vc->dpdes;
- 	hr->hfscr = vcpu->arch.hfscr;
- 	hr->tb_offset = vc->tb_offset;
- 	hr->dawr0 = vcpu->arch.dawr0;
-@@ -105,7 +108,10 @@ static void save_hv_return_state(struct kvm_vcpu *vcpu,
- {
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 
--	hr->dpdes = vc->dpdes;
-+	if (cpu_has_feature(CPU_FTR_ARCH_300))
-+		hr->dpdes = vcpu->arch.doorbell_request;
-+	else
-+		hr->dpdes = vc->dpdes;
- 	hr->purr = vcpu->arch.purr;
- 	hr->spurr = vcpu->arch.spurr;
- 	hr->ic = vcpu->arch.ic;
-@@ -143,7 +149,10 @@ static void restore_hv_regs(struct kvm_vcpu *vcpu, const struct hv_guest_state *
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 
- 	vc->pcr = hr->pcr | PCR_MASK;
--	vc->dpdes = hr->dpdes;
-+	if (cpu_has_feature(CPU_FTR_ARCH_300))
-+		vcpu->arch.doorbell_request = hr->dpdes;
-+	else
-+		vc->dpdes = hr->dpdes;
- 	vcpu->arch.hfscr = hr->hfscr;
- 	vcpu->arch.dawr0 = hr->dawr0;
- 	vcpu->arch.dawrx0 = hr->dawrx0;
-@@ -170,7 +179,10 @@ void kvmhv_restore_hv_return_state(struct kvm_vcpu *vcpu,
- {
- 	struct kvmppc_vcore *vc = vcpu->arch.vcore;
- 
--	vc->dpdes = hr->dpdes;
-+	if (cpu_has_feature(CPU_FTR_ARCH_300) && !vcpu->arch.doorbell_request)
-+		vcpu->arch.doorbell_request = hr->dpdes;
-+	else
-+		vc->dpdes = hr->dpdes;
- 	vcpu->arch.hfscr = hr->hfscr;
- 	vcpu->arch.purr = hr->purr;
- 	vcpu->arch.spurr = hr->spurr;
--- 
-2.45.1
-
+My confusion (ok, maybe it's more annoyance than true confusion) is that that
+applies to _all_ non-hypervisor pages, not just Context pages.  Reading things
+from a "the exception proves the rule" viewpoint, stating that Context pages are
+encrypted and integrity protected strongly suggests that all other pages are NOT
+encrypted and NOT integrity protected.
 
