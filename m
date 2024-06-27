@@ -1,163 +1,154 @@
-Return-Path: <kvm+bounces-20623-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20624-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C58991B019
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 22:08:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F7C91B1F5
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 00:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39DE31F21EBD
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 20:08:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D636B252CE
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 22:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 775F819CCF9;
-	Thu, 27 Jun 2024 20:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA3D1A0B07;
+	Thu, 27 Jun 2024 22:05:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hAKUb/Wd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HNHUFCvz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3783945BE4;
-	Thu, 27 Jun 2024 20:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4FF1A08D6
+	for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 22:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719518873; cv=none; b=Jv0Qx5f6hYO0rKsLeG0bl2Av0SjpXDky1On7IdlBPVe7NF0NJZ6zrP229Nc5YXyKXYmx/hjzO1JQbJCugyNTi3YCTCNOdFFjYMZyhg4Xugdg7cpruT7NvGXL3iFSgdwP+YofWPo7aUd+BhrhLeE1LSOkYd510twrCK+hEIJ73II=
+	t=1719525955; cv=none; b=rQafLBylyAcCiXD/qFQNKvFGQgpR7xh7ZIilyTjyFBt5auSqIg57obfrMmLiKQwbN839jUTA1+D4/O2CMvmZGTWMwIS14RUvA9WbCQ6g92F7T8qcW/OcvT9oSMtmdFPlYCsyrMhyFmYoOKXsrSeiOEDJsCB4o6mVbdxgUVViIdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719518873; c=relaxed/simple;
-	bh=83yGZ3R1Ly3XPruqqMAsZ1YGaheFcdjcFyebTzNiK18=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WIxHuobZPv5EKuZkqvsMRvQ/C9mPGI79doOvG3VYwJnT3OFwTcMm+1pvO0/fNry4TOaSh8+LOFL5R9k1SNhIT6tcXyPFntM07mpVV1gmHPHTTRrTGFCNWrHFy2J6o34/Uwpa/iQ/X/fa1OS138uXfZHsyK8DxUHGLEtFcemvA7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hAKUb/Wd; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45RJusSN026670;
-	Thu, 27 Jun 2024 20:07:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=pp1; bh=lvB63fX9XV6cYgWhJCwCq9Puai
-	YYLnCqY5W6u+PzBRw=; b=hAKUb/WdLVuZE9z2Fbv3AaHZY6YRu2iU9aLQEfaJ4e
-	+XJKf7gcL5cvCfRtnDGvWUkvAtZOKsd/6vQHdwP+Tw3FWuuMs8ktWJ1pRrxd3Y/2
-	fXEWV88JfIwrSxrBm3NT+kI+zRLCZv2rSAfRz1nyKlNFdIHxdVytfax6ZY2sn6Ar
-	Xsg3UlaBYJglyrHFh+Saa0nnMqIygjWYZKWzqR57LLNHPxeNj81psQSJXyJa1n16
-	wdcQHd8gE8EpFVh8BwKd5jGpUCM9gVqF9flF0mqxsohhMdqa43+DV2yYh+e551c3
-	PlVH3ySdt49YKmoeJtcGUMrQ/mWzFw7d83yC7t9kYDWQ==
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401dtyg4nm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 20:07:48 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45RIOhgI000564;
-	Thu, 27 Jun 2024 20:07:48 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yxaench6a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 27 Jun 2024 20:07:47 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45RK7g9v18743580
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 27 Jun 2024 20:07:44 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E89A220043;
-	Thu, 27 Jun 2024 20:07:41 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D89A42004B;
-	Thu, 27 Jun 2024 20:07:41 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu, 27 Jun 2024 20:07:41 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
-	id 78EABE030B; Thu, 27 Jun 2024 22:07:41 +0200 (CEST)
-From: Eric Farman <farman@linux.ibm.com>
-To: Matthew Rosato <mjrosato@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc: Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter Oberparleiter <oberpar@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
-Subject: [PATCH] s390/vfio_ccw: Fix target addresses of TIC CCWs
-Date: Thu, 27 Jun 2024 22:07:40 +0200
-Message-Id: <20240627200740.373192-1-farman@linux.ibm.com>
-X-Mailer: git-send-email 2.40.1
+	s=arc-20240116; t=1719525955; c=relaxed/simple;
+	bh=GPka9uH0tbnuzJFPMYjQ/2ZBGJ77SVwzIe7FH4suRuM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jr77I+fxU0JMT4IHHsHjbVDjc+r7QQ2mdBV3uJcOQ3BadPwbNxLI5I+7A/UK9/M7E+HkoFlzgRIQUgkwtbEd9ui5LuAThvNhCYeD+WjMLBtR/Myi6nLEXzJkyRUoC0bTPmMChNmJ3e72uftLuw32Vezg0newLtvr4AboBKULtas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HNHUFCvz; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719525952;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=X1trEn5o04941xk6vp/8nx318y7mfTBtf0H5o3zSA70=;
+	b=HNHUFCvzRObCsSSJjbBzEznMv6Wy02YylIPxeMAR0xVR6W//g2AUg7Fs7QxEns0wPw2iB9
+	qU+CKdFoatzW/ojhZTIdieG845MGIor7ct4waBNDRUJaiTWAg0UKpMYMslTd3Rb3BXko30
+	UNUYV12WvwOcjbGC8XdpUuTryVFzTLo=
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
+ [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-452-aaxJJ9VrOH6bgR_dbF-3nA-1; Thu, 27 Jun 2024 18:05:51 -0400
+X-MC-Unique: aaxJJ9VrOH6bgR_dbF-3nA-1
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-379c2ff145dso9199255ab.1
+        for <kvm@vger.kernel.org>; Thu, 27 Jun 2024 15:05:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719525950; x=1720130750;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X1trEn5o04941xk6vp/8nx318y7mfTBtf0H5o3zSA70=;
+        b=hyyTWjhDFjZiWvQrA7fbTOD0MprT5Q8uXH05jReSjzcTlDFQ3zGrMUOga8T1mf+SGc
+         RF2U24H9padpCl29AVDQW2FwRJ2/dxbMBvYk2sXlc0+UjU/0EGm5ai4ItcFuXiZGLR2Q
+         C/uaJG5sr0CdLiWzf2ot1IJJleqX6LpzcnmZOcVQpyLDidI+K9/oBO7QN93n1I0w6Lsj
+         51DT6ozv2YdO0BUlbb040JEtFcn8YHn5Ly/WRs53rccfbGebb//Ji7w1aBar/XEFK3fJ
+         WwkKdSfiK0q1hqANFCftxyk5EWgjvRmQryW1ge5IEPFQmEZ0CxTvWUbbjAQPlCQwPGGp
+         Xgmg==
+X-Forwarded-Encrypted: i=1; AJvYcCXj5tdqCGqrRSY1uF2A6X/0MWCqwbg3+4ToE6q7ecfLRsOCUX9i524iYM5prR27aI4sx0qqzkXIh/x7arHf3mV/ydW4
+X-Gm-Message-State: AOJu0Yxp0CXuVNsx5dgz0S9L1BsBAxDIlpQy+xFnyaH+kIr1H/Jro/v5
+	6GV0lOt31rWBfPgIk00rzu3uZgJDxbYEcwCwZ+M5QZhogCedYhV1klvfGeWeAsmdQt/AcoBH9kI
+	e0aPCPlDs1Fdm0EuyKOb4jaBPCuwU+JSXR/vnfIDuQrbG/xQ/Ww==
+X-Received: by 2002:a92:d98c:0:b0:376:3fad:bb82 with SMTP id e9e14a558f8ab-37998213149mr19053425ab.2.1719525950606;
+        Thu, 27 Jun 2024 15:05:50 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHWyN9z1P+4hFoDr0ILN126oWRY+ZLqxo7RK8d3Xv3l6qhXSmy135HJFuBTabIJvwAzxzW0Hg==
+X-Received: by 2002:a92:d98c:0:b0:376:3fad:bb82 with SMTP id e9e14a558f8ab-37998213149mr19053305ab.2.1719525950275;
+        Thu, 27 Jun 2024 15:05:50 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4bb73e084c8sm161260173.80.2024.06.27.15.05.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 27 Jun 2024 15:05:49 -0700 (PDT)
+Date: Thu, 27 Jun 2024 16:05:47 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Gerd
+ Bayer <gbayer@linux.ibm.com>, Matthew Rosato <mjrosato@linux.ibm.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, linux-s390@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v4 3/4] vfio/pci: Disable mmap() non-compliant BARs
+Message-ID: <20240627160547.2879c6b3.alex.williamson@redhat.com>
+In-Reply-To: <20240626-vfio_pci_mmap-v4-3-7f038870f022@linux.ibm.com>
+References: <20240626-vfio_pci_mmap-v4-0-7f038870f022@linux.ibm.com>
+	<20240626-vfio_pci_mmap-v4-3-7f038870f022@linux.ibm.com>
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Sc4KRCwRu6D9OuaA84j0TJCrPOnfPlVH
-X-Proofpoint-ORIG-GUID: Sc4KRCwRu6D9OuaA84j0TJCrPOnfPlVH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-27_14,2024-06-27_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 phishscore=0
- priorityscore=1501 lowpriorityscore=0 mlxlogscore=999 adultscore=0
- clxscore=1015 impostorscore=0 mlxscore=0 malwarescore=0 suspectscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406270147
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The processing of a Transfer-In-Channel (TIC) CCW requires locating
-the target of the CCW in the channel program, and updating the
-address to reflect what will actually be sent to hardware.
+On Wed, 26 Jun 2024 13:15:50 +0200
+Niklas Schnelle <schnelle@linux.ibm.com> wrote:
 
-An error exists where the 64-bit virtual address is truncated to
-32-bits (variable "cda") when performing this math. Since s390
-addresses of that size are 31-bits, this leaves that additional
-bit enabled such that the resulting I/O triggers a channel
-program check. This shows up occasionally when booting a KVM
-guest from a passthrough DASD device:
+> When VFIO_PCI_MMAP is enabled for s390 in a future commit and the ISM
+> device is passed-through to a KVM guest QEMU attempts to eagerly mmap()
+> its BAR. This fails because the 256 TiB large BAR does not fit in the
+> virtual map. Besides this issue mmap() of the ISM device's BAR is not
+> useful either as even a partial mapping won't be usable from user-space
+> without a vfio-pci variant driver. A previous commit ensures that pdev->
+> non_compliant_bars is set for ISM so use this to disallow mmap() with
+> the expecation that mmap() of non-compliant BARs is not advisable in the
+> general case either.
+> 
+> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> ---
+>  drivers/vfio/pci/vfio_pci_core.c | 5 ++---
+>  1 file changed, 2 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
+> index 987c7921affa..0e9d46575776 100644
+> --- a/drivers/vfio/pci/vfio_pci_core.c
+> +++ b/drivers/vfio/pci/vfio_pci_core.c
+> @@ -128,10 +128,9 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_core_device *vdev)
+>  
+>  		/*
+>  		 * The PCI core shouldn't set up a resource with a
+> -		 * type but zero size. But there may be bugs that
+> -		 * cause us to do that.
+> +		 * type but zero size or non-compliant BARs.
+>  		 */
+> -		if (!resource_size(res))
+> +		if (!resource_size(res) || vdev->pdev->non_compliant_bars)
+>  			goto no_mmap;
+>  
+>  		if (resource_size(res) >= PAGE_SIZE) {
+> 
 
-  ..snip...
-  Interrupt Response Block Data:
-  : 0x0000000000003990
-      Function Ctrl : [Start]
-      Activity Ctrl :
-      Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
-      Device Status :
-      Channel Status : [Program-Check]
-      cpa=: 0x00000000008d0018
-      prev_ccw=: 0x0000000000000000
-      this_ccw=: 0x0000000000000000
-  ...snip...
-  dasd-ipl: Failed to run IPL1 channel program
+The non_compliant_bars flag causes pci_read_bases() to exit, shouldn't
+that mean the resource is not setup and resource_size() is zero and
+explicitly testing the non_compliant_bars flag is redundant?  Or does
+s390 do this somewhere else?
 
-The channel program address of "0x008d0018" in the IRB doesn't
-look wrong, but tracing the CCWs shows the offending bit enabled:
+The non_compliant_bars flag is defined as /* Broken BARs; ignore them */
+so it'd be pretty strange if they had a resource size and we chose to
+still expose them with read-write access... why wouldn't we just
+deny-list the device from use with vfio-pci?
 
-  ccw=0x0000012e808d0000 cda=00a0b030
-  ccw=0x0000012e808d0008 cda=00a0b038
-  ccw=0x0000012e808d0010 cda=808d0008
-  ccw=0x0000012e808d0018 cda=00a0b040
+Also probably worth an explicit comment in the commit log why pci-sysfs
+mmap support doesn't need to be bypassed on s390.  Thanks,
 
-Fix the calculation of the TIC CCW's data address such that it points
-to a valid 31-bit address regardless of the input address.
-
-Fixes: bd36cfbbb9e1 ("s390/vfio_ccw_cp: use new address translation helpers")
-Signed-off-by: Eric Farman <farman@linux.ibm.com>
----
- drivers/s390/cio/vfio_ccw_cp.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
-index 6e5c508b1e07..fd8cb052f096 100644
---- a/drivers/s390/cio/vfio_ccw_cp.c
-+++ b/drivers/s390/cio/vfio_ccw_cp.c
-@@ -495,8 +495,9 @@ static int ccwchain_fetch_tic(struct ccw1 *ccw,
- 	list_for_each_entry(iter, &cp->ccwchain_list, next) {
- 		ccw_head = iter->ch_iova;
- 		if (is_cpa_within_range(ccw->cda, ccw_head, iter->ch_len)) {
--			cda = (u64)iter->ch_ccw + dma32_to_u32(ccw->cda) - ccw_head;
--			ccw->cda = u32_to_dma32(cda);
-+			/* Calculate offset of TIC target */
-+			cda = dma32_to_u32(ccw->cda) - ccw_head;
-+			ccw->cda = virt_to_dma32(iter->ch_ccw) + cda;
- 			return 0;
- 		}
- 	}
--- 
-2.40.1
+Alex
 
 
