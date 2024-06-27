@@ -1,193 +1,229 @@
-Return-Path: <kvm+bounces-20586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20587-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37727919E2F
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 06:33:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31F6D91A22A
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 11:05:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1B5D285D55
-	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 04:33:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDFB5282DA8
+	for <lists+kvm@lfdr.de>; Thu, 27 Jun 2024 09:05:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EE381BC58;
-	Thu, 27 Jun 2024 04:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80BCC13792B;
+	Thu, 27 Jun 2024 09:05:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MUmvprrI"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="IwEios3b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98C51BF24;
-	Thu, 27 Jun 2024 04:33:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22CFA4206D;
+	Thu, 27 Jun 2024 09:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719462784; cv=none; b=b8FMREU9/yHdL9AmbocrAPua4h1LZDm8c6pBqKR7JkS5UuOS/NKpPRHAAvaMtTZUDsJV9UU6zDKFt9kQ2HRwzQNqJep94xfWY4mpJmhaRGIX2xdVo59aJ+KDB2L5T6X52tXErZIOIvJSIk9KgbGena4qzPXwrTurxtT8jy2cyQU=
+	t=1719479131; cv=none; b=eSgSRaGGL11JPzP235/16n5eWFQOKA+Demgmk0Ckn6Gwp8zSoVM9AOVdeG+imAg+tNF9Ut/6u5IwRFFmdb/XgXXhUmYf/19pi9VDf0YrOOjbxRmEMLn4O2k236dfyjNGFb3z+gWafWiG0NUoMm4Ntqjis2dqOjxH2CsOvWatCeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719462784; c=relaxed/simple;
-	bh=WD7ygdR68fxGerBxzAyZ9F2yuKfXe8eASuhKeQ3vInM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RhQrN47CpsCP70uUCU3AR7TdS48oaeJq9lLAyZLkuekMcfzUBuy8ZE2Em0QtaPtMFeT1tYPos0jl7QqSzjfaFA8wpTQKuVvVmoJB/vDvtDuSYzpwnTt3Ej7QZ6qPC85s/0eZsimdVzg6TpKS1jtHXZcqj4JjSvYp7hsRQBYBzWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MUmvprrI; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-6fa11ac8695so4436038a34.3;
-        Wed, 26 Jun 2024 21:33:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1719462782; x=1720067582; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jlc5LgsXr7L99X3k84Y8N6qLtAVEf7V0a7Hh7lgRJ00=;
-        b=MUmvprrIfp0qA4vs0vHoJT0QAyd9Vd9d3ujfXTlhUevmI1gLrUaPDq28DsYaBQI+YB
-         ugA4X3FjU8eTKMJFpaWWgheeFzfLkpqTPtRGsG3qGqskTzENBjGvBvmozQYyxWL2wQrl
-         fM4++VheDiMZ9thvaKpRq+8bwRb9zeFuwGUAe1mmuaIPvjatm5VIIIqRw7BFUWCYB+xQ
-         66KdxMuivluwddYw01W8mLCm2kBysY003MgV7TDKQADKl30RgfAcax7xhPajer752Hg2
-         JIMa1qiba75meYhBoQOS4zHq0ovbebk5R/jeBQtbvLFMC08+ExZxAGy9m8cqTTpD3l6t
-         lodQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719462782; x=1720067582;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jlc5LgsXr7L99X3k84Y8N6qLtAVEf7V0a7Hh7lgRJ00=;
-        b=nuPp/1SGqCrGFfexTPaxuIPH11NzVvEHdPIjWUpjFC+o0DJ03g+QrCAuVROuEvES0m
-         r0Bu3TLUZfxKgvEWOxaasEjpbhUJzQCtBR3a0RnYZcrQbMqRqHcfhgAdpk+EFyK9fEAK
-         AtfbZdHwLCHaHmwyzpSnnFvi7gki+Cc2+s4t/AVVE+rjVIAM7r7LLnp/1wYDBg4NB6Ii
-         8md4fKn9z4YSavd7xz2+Eex17+61kLgFZxj1xMx9P54pr+mBcxrXQc/JzZAi7MN61Gft
-         YvEGXgrnhNZCw8VExWmG6sStIZ79S5INv9ysr8hwoCpbeeGSaUK5f0lrMVyYHeLci/gv
-         zJtQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVPTVbmiCYtpxgARrCRikUbM7OnJ7NJE70vQSmneTsyWyobxkNN6YSi7uORnupYf3O9XiYJQsvNvp4J17XDOI8AIhCmX9eCt2yz2q1nCnEhDcYPztyAymJuxeAGeR/H4ORG
-X-Gm-Message-State: AOJu0YzOus7Lm6MFJZ0zjK+zyGN33ylnn5xxEVbJRNyMgvx79xwXFMBM
-	0/kX62YeKKzvd7hBxwi4Socu42ZD2Yk2vBoxHALYl6ulXyzq9F3l
-X-Google-Smtp-Source: AGHT+IH+fV5+BoybY7N3LWHXzO46q6X8FmrZYM08XafaolZE1UQamSNMo9xYPVyx0z78L6CPS1aW7w==
-X-Received: by 2002:a05:6830:1449:b0:6f9:9540:76a8 with SMTP id 46e09a7af769-700b11f0eedmr14010345a34.13.1719462781861;
-        Wed, 26 Jun 2024 21:33:01 -0700 (PDT)
-Received: from ubuntu-linux-22-04-02-desktop (107-197-105-120.lightspeed.sntcca.sbcglobal.net. [107.197.105.120])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-701efc09e51sm157847a34.18.2024.06.26.21.33.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 26 Jun 2024 21:33:01 -0700 (PDT)
-Date: Wed, 26 Jun 2024 21:32:58 -0700
-From: Pei Li <peili.dev@gmail.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-	linux-kernel-mentees@lists.linuxfoundation.org,
-	syzkaller-bugs@googlegroups.com, llvm@lists.linux.dev,
-	syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
-Subject: Re: [PATCH] kvm: Fix warning in__kvm_gpc_refresh
-Message-ID: <ZnzrekGQc24r0Gny@ubuntu-linux-22-04-02-desktop>
-References: <20240625-bug5-v1-1-e072ed5fce85@gmail.com>
- <Znx1T_hHNA_uThf2@google.com>
+	s=arc-20240116; t=1719479131; c=relaxed/simple;
+	bh=deqiYAvd1iB7EyIWNxXDoyPDnzBKL9T2PVLQ7Y2gUZ8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ArqBAhX4B6hjuxiEPE+5N4B9XN2OGaNcsojfoB5aRNwZ56TxfU2rytiV/0+YJqGNJUt4lDZBzZs/JnwJ2TmSI/QV0MGZnYZBFu3avnOcxd9xFBdGGgPNvrFkVDJ870VITMQUHhpOwD/HSjTg+kKHYWOxTrkZ8vXvRHS21+0BUnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=IwEios3b; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45R90FxY004042;
+	Thu, 27 Jun 2024 09:05:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=y6uJ7LyGg0Tg0n5NaKpJJC8aDH
+	UdUYpUhBdgwFVZSs8=; b=IwEios3bRX+8yHznhm++rKiHaud8I6gtAP737s3Ant
+	xzbrDs/N4TBIFuAn/Om8nbhvAj856QRV9LxAWdSF3u+/eBBQPlTLhx1ybH0dcRLt
+	dTk3JWI/QcIUWd6FzZKVa3HZo7NVzY21Ai4pxBTicSUeTa1W7Ebm/k9Vpz5n6voi
+	Jv4B5zwMpJSg5SLOhm6NGewrGEgdFhr0ULBvtzO3Ldm9XfeuRXfPs7DK5pVKMQ9V
+	NsTohfpl2DrQK2WBigCdWymexFsMLXAT8XdZzIFIPt8CcVuXNi+0aE913YsydaWl
+	aUIcwEV3mIUB2b1hNAOBsPcKBdVzRx0WvhsT/Cie+/Kg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4010718pd0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 27 Jun 2024 09:05:27 +0000 (GMT)
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45R95Rr2013281;
+	Thu, 27 Jun 2024 09:05:27 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4010718pcx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 27 Jun 2024 09:05:27 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45R7dh3t008152;
+	Thu, 27 Jun 2024 09:05:26 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yx9b12287-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 27 Jun 2024 09:05:26 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45R95KeQ47972748
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 27 Jun 2024 09:05:22 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A44B42004D;
+	Thu, 27 Jun 2024 09:05:20 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 64A692004F;
+	Thu, 27 Jun 2024 09:05:20 +0000 (GMT)
+Received: from b35lp69.lnxne.boe (unknown [9.152.108.100])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 27 Jun 2024 09:05:20 +0000 (GMT)
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+To: KVM <kvm@vger.kernel.org>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>
+Subject: [PATCH 1/1] KVM: s390: fix LPSWEY handling
+Date: Thu, 27 Jun 2024 11:05:20 +0200
+Message-ID: <20240627090520.4667-1-borntraeger@linux.ibm.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <Znx1T_hHNA_uThf2@google.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Nur2WMLn1KOCS4NAMmd7eBHXZIVqL8oK
+X-Proofpoint-GUID: Qc_LIbVqyMI8-o-pCeW6FgjOATrIcLxv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-27_05,2024-06-25_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=935 spamscore=0
+ impostorscore=0 bulkscore=0 adultscore=0 suspectscore=0 lowpriorityscore=0
+ priorityscore=1501 mlxscore=0 clxscore=1015 malwarescore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
+ definitions=main-2406270067
 
-On Wed, Jun 26, 2024 at 01:08:47PM -0700, Sean Christopherson wrote:
-> On Tue, Jun 25, 2024, Pei Li wrote:
-> > Check for invalid hva address stored in data before calling
-> > kvm_gpc_activate_hva() instead of only compare with 0.
-> > 
-> > Reported-by: syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
-> > Closes: https://syzkaller.appspot.com/bug?extid=fd555292a1da3180fc82
-> > Tested-by: syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
-> > Signed-off-by: Pei Li <peili.dev@gmail.com>
-> > ---
-> > Syzbot reports a warning message in __kvm_gpc_refresh(). This warning
-> > requires at least one of gpa and uhva to be valid.
-> > WARNING: CPU: 0 PID: 5090 at arch/x86/kvm/../../../virt/kvm/pfncache.c:259 __kvm_gpc_refresh+0xf17/0x1090 arch/x86/kvm/../../../virt/kvm/pfncache.c:259
-> > 
-> > We are calling it from kvm_gpc_activate_hva(). This function always calls
-> > __kvm_gpc_activate() with INVALID_GPA. Thus, uhva must be valid to
-> > disable this warning.
-> > 
-> > This patch checks for invalid hva address as well instead of only
-> > comparing hva with 0 before calling kvm_gpc_activate_hva()
-> > 
-> > syzbot has tested the proposed patch and the reproducer did not trigger
-> > any issue.
-> > 
-> > Tested on:
-> > 
-> > commit:         55027e68 Merge tag 'input-for-v6.10-rc5' of git://git...
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=16ea803a980000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=e40800950091403a
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=fd555292a1da3180fc82
-> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> > patch:          https://syzkaller.appspot.com/x/patch.diff?x=16eeb53e980000
-> > 
-> > Note: testing is done by a robot and is best-effort only.
-> > ---
-> >  arch/x86/kvm/xen.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> > index f65b35a05d91..de5f34492405 100644
-> > --- a/arch/x86/kvm/xen.c
-> > +++ b/arch/x86/kvm/xen.c
-> > @@ -881,7 +881,7 @@ int kvm_xen_vcpu_set_attr(struct kvm_vcpu *vcpu, struct kvm_xen_vcpu_attr *data)
-> >  			r = kvm_gpc_activate(&vcpu->arch.xen.vcpu_info_cache,
-> >  					     data->u.gpa, sizeof(struct vcpu_info));
-> >  		} else {
-> > -			if (data->u.hva == 0) {
-> > +			if (data->u.hva == 0 || kvm_is_error_hva(data->u.hva)) {
-> >  				kvm_gpc_deactivate(&vcpu->arch.xen.vcpu_info_cache);
-> >  				r = 0;
-> >  				break;
-> 
-> Hmm, I think what we want is to return -EINVAL in this case, not deactivate the
-> region.   I could have sworn KVM does that.  Gah, I caught
-> KVM_XEN_ATTR_TYPE_SHARED_INFO_HVA during review, but missed this one.  So to fix
-> this immediate bug, and avoid similar issues in the future, this?
-> 
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 93814d3850eb..622fe24da910 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -741,7 +741,7 @@ int kvm_xen_hvm_set_attr(struct kvm *kvm, struct kvm_xen_hvm_attr *data)
->                 } else {
->                         void __user * hva = u64_to_user_ptr(data->u.shared_info.hva);
->  
-> -                       if (!PAGE_ALIGNED(hva) || !access_ok(hva, PAGE_SIZE)) {
-> +                       if (!PAGE_ALIGNED(hva)) {
->                                 r = -EINVAL;
->                         } else if (!hva) {
->                                 kvm_gpc_deactivate(&kvm->arch.xen.shinfo_cache);
-> diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
-> index 0ab90f45db37..728d2c1b488a 100644
-> --- a/virt/kvm/pfncache.c
-> +++ b/virt/kvm/pfncache.c
-> @@ -438,6 +438,9 @@ int kvm_gpc_activate(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned long len)
->  
->  int kvm_gpc_activate_hva(struct gfn_to_pfn_cache *gpc, unsigned long uhva, unsigned long len)
->  {
-> +       if (!access_ok((void __user *)uhva, len))
-> +               return -EINVAL;
-> +
->         return __kvm_gpc_activate(gpc, INVALID_GPA, uhva, len);
->  }
-> 
-Thanks Sean. I’ll test and work on v2 based on your suggestions.
+in rare cases, e.g. for injecting a machine check we do intercept all
+load PSW instructions via ICTL_LPSW. With facility 193 a new variant
+LPSWEY was added. KVM needs to handle that as well.
 
-Best regards,
+Fixes: a3efa8429266 ("KVM: s390: gen_facilities: allow facilities 165, 193, 194 and 196")
+Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+---
+ arch/s390/include/asm/kvm_host.h |  1 +
+ arch/s390/kvm/kvm-s390.c         |  1 +
+ arch/s390/kvm/kvm-s390.h         | 16 ++++++++++++++++
+ arch/s390/kvm/priv.c             | 32 ++++++++++++++++++++++++++++++++
+ 4 files changed, 50 insertions(+)
 
-Pei
+diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
+index 95990461888f..9281063636a7 100644
+--- a/arch/s390/include/asm/kvm_host.h
++++ b/arch/s390/include/asm/kvm_host.h
+@@ -427,6 +427,7 @@ struct kvm_vcpu_stat {
+ 	u64 instruction_io_other;
+ 	u64 instruction_lpsw;
+ 	u64 instruction_lpswe;
++	u64 instruction_lpswey;
+ 	u64 instruction_pfmf;
+ 	u64 instruction_ptff;
+ 	u64 instruction_sck;
+diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
+index 50b77b759042..8e04c7f0c90c 100644
+--- a/arch/s390/kvm/kvm-s390.c
++++ b/arch/s390/kvm/kvm-s390.c
+@@ -132,6 +132,7 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
+ 	STATS_DESC_COUNTER(VCPU, instruction_io_other),
+ 	STATS_DESC_COUNTER(VCPU, instruction_lpsw),
+ 	STATS_DESC_COUNTER(VCPU, instruction_lpswe),
++	STATS_DESC_COUNTER(VCPU, instruction_lpswey),
+ 	STATS_DESC_COUNTER(VCPU, instruction_pfmf),
+ 	STATS_DESC_COUNTER(VCPU, instruction_ptff),
+ 	STATS_DESC_COUNTER(VCPU, instruction_sck),
+diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
+index 111eb5c74784..c61966cae121 100644
+--- a/arch/s390/kvm/kvm-s390.h
++++ b/arch/s390/kvm/kvm-s390.h
+@@ -138,6 +138,22 @@ static inline u64 kvm_s390_get_base_disp_s(struct kvm_vcpu *vcpu, u8 *ar)
+ 	return (base2 ? vcpu->run->s.regs.gprs[base2] : 0) + disp2;
+ }
+ 
++static inline u64 kvm_s390_get_base_disp_siy(struct kvm_vcpu *vcpu, u8 *ar)
++{
++	u32 base1 = vcpu->arch.sie_block->ipb >> 28;
++	u32 disp1 = ((vcpu->arch.sie_block->ipb & 0x0fff0000) >> 16) +
++			((vcpu->arch.sie_block->ipb & 0xff00) << 4);
++
++	/* The displacement is a 20bit _SIGNED_ value */
++	if (disp1 & 0x80000)
++		disp1+=0xfff00000;
++
++	if (ar)
++		*ar = base1;
++
++	return (base1 ? vcpu->run->s.regs.gprs[base1] : 0) + (long)(int)disp1;
++}
++
+ static inline void kvm_s390_get_base_disp_sse(struct kvm_vcpu *vcpu,
+ 					      u64 *address1, u64 *address2,
+ 					      u8 *ar_b1, u8 *ar_b2)
+diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+index 1be19cc9d73c..1a49b89706f8 100644
+--- a/arch/s390/kvm/priv.c
++++ b/arch/s390/kvm/priv.c
+@@ -797,6 +797,36 @@ static int handle_lpswe(struct kvm_vcpu *vcpu)
+ 	return 0;
+ }
+ 
++static int handle_lpswey(struct kvm_vcpu *vcpu)
++{
++	psw_t new_psw;
++	u64 addr;
++	int rc;
++	u8 ar;
++
++	vcpu->stat.instruction_lpswey++;
++
++	if (!test_kvm_facility(vcpu->kvm, 193))
++		return kvm_s390_inject_program_int(vcpu, PGM_OPERATION);
++
++	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
++		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
++
++	addr = kvm_s390_get_base_disp_siy(vcpu, &ar);
++	if (addr & 7)
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
++
++	rc = read_guest(vcpu, addr, ar, &new_psw, sizeof(new_psw));
++	if (rc)
++		return kvm_s390_inject_prog_cond(vcpu, rc);
++
++	vcpu->arch.sie_block->gpsw = new_psw;
++	if (!is_valid_psw(&vcpu->arch.sie_block->gpsw))
++		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
++
++	return 0;
++}
++
+ static int handle_stidp(struct kvm_vcpu *vcpu)
+ {
+ 	u64 stidp_data = vcpu->kvm->arch.model.cpuid;
+@@ -1462,6 +1492,8 @@ int kvm_s390_handle_eb(struct kvm_vcpu *vcpu)
+ 	case 0x61:
+ 	case 0x62:
+ 		return handle_ri(vcpu);
++	case 0x71:
++		return handle_lpswey(vcpu);
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+-- 
+2.45.0
 
 
