@@ -1,101 +1,94 @@
-Return-Path: <kvm+bounces-20701-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20702-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E11D91C956
-	for <lists+kvm@lfdr.de>; Sat, 29 Jun 2024 00:56:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A70CF91C957
+	for <lists+kvm@lfdr.de>; Sat, 29 Jun 2024 00:56:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52F651F23F0A
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 22:56:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5198A1F242BC
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 22:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D042F82498;
-	Fri, 28 Jun 2024 22:56:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD38282480;
+	Fri, 28 Jun 2024 22:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gjkBSF5P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h00hyica"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8105374F6
-	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 22:56:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF82D8002A
+	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 22:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719615364; cv=none; b=B3p5N44ctZ8tKlwp0oAQHYCaKeUaA6nDhH4jR61t42Xard36I0m6cCh8+yToU3atz0e6d2D8mfv1Ecm8KmwnG5OoXIICvhUP/2xGRd4Qk0HSzjY29yB82/tvotLgMMzhpkn/TpMRtaT39MvJNul4KeVauOrUtsn4tCebKmij5dg=
+	t=1719615373; cv=none; b=PCaWVjBqmM9gqAV3LnwWa9qGm+gzt143+wKywmrTG2dkBsuOwZLkA0ET5E8+s5w7NUFrJoiYJlijpq/JuXeNaCGsf8aaF7XHepQ9tko/AT+IdphpPWgBDmhDvt7qO4UBDppcSojeNHSFdx4E5QbSQWWRg6AQvCsCt9K+v6YBiAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719615364; c=relaxed/simple;
-	bh=LVM3uqkTSyhKCZpetJYUvE3Yr/mF1UV3sFe8vrzMhE8=;
+	s=arc-20240116; t=1719615373; c=relaxed/simple;
+	bh=L+fOIAr4AA2NeSFEj4Yztvg+DtC6WUPFs/UC73gr4ns=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=JkGQ6pOYussO4vGX3Zc4zIZOLWHxMF5rgeFuvgY78KwEtfEpu4YufP9PoyiNBY3knCfMkvdEVaJQk+dEtwuq+L7o2iRiGQEJbdSEIXRlX3gnjfhGYshsez0usZ1DXi8B5g4Kf0Cfuti/PTnxkejhJZfhiVTSIdvq7N4h2uIRe5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gjkBSF5P; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=FVJ/PjDvS0SprHJFMhleBKfaD181VZXQHypc6QCcNe6aEir4Fked5Izht8P9WjcXl+p26BsJwf3tfBD9ilCL9KeuKYZblPHqHmMlx9XXK/1KnhOwCm7cKdMfM5iLiGRlVDtGDgEYy4pO7h333YjRfCJRhulHP4JN+w5HG18680E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h00hyica; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6818fa37eecso952683a12.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 15:56:02 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-64a6cda8ba1so19741697b3.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 15:56:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719615362; x=1720220162; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1719615371; x=1720220171; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ttnlucE2BUFc3AsSQbZS8PZZ80YXekALgZ+NzdoS5mQ=;
-        b=gjkBSF5PUGjnFbZ6f+6VucXH7n7M6wcC7/eYirkF0fwVE7/EDPR/ReulTBZpgSEcXD
-         HHjmwR2f/KqfNWgpNBm1x3GUua74CQVO2oc97RhG/578xOWJmULrfZULygThwUWYsGmn
-         3yWl9xS+sqqwPhv7Glvr6JusSuQTgYTeGtcbjm9i7Dl3hbKrvBJUfcgCS47kMWer3dun
-         cO2rVl6YWGXdWh8VfaKaTi9Pmw9YLMOQrW8Q8ATObIvv+sjEy5qAAmWDIbOGh9g66BN1
-         1ji2i6QhZaYrL+OAF0sBBp+1tEeeXnk0M15wo1EWK0LsZz8pxOtq2zgNymha3wRNRvmc
-         EZCA==
+        bh=ett8EUgkCChBBFZPNOi8YRDRFZwYWqwN5UfqzbKYiro=;
+        b=h00hyicaW24OuX+g4MVMtVQYch09u7dzLT1VfG38TU3PdVKDc5/zTaozT927zcihg7
+         bfJkhtpTR7PnRchlRJSb7DwKEPDJGNlAEneU6kNBNOnkkq+nwjSw0MQbd8w5/fCR0Wk6
+         KJCP7QKtdUqwigwCnDSdF75oFG/K+fw104FAq1/4NEGQB/ONX3h7TuWMFJBiKkKqRc/C
+         4frhLuuawoWJPQbizDEyQPeLXTfnXjvM0IpuJXJGOdLr/fzzxYdAZXAnYdgQSpNvIQsA
+         ZmXfVVOeuT8KX9e1vV/iJrWuDk9V7cZIVe6otzDvZO1Dv4AgtZze2wANvtQgEIP3LJsz
+         4pRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719615362; x=1720220162;
+        d=1e100.net; s=20230601; t=1719615371; x=1720220171;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ttnlucE2BUFc3AsSQbZS8PZZ80YXekALgZ+NzdoS5mQ=;
-        b=UYpSkAPaPVICupRJsQ1CQNZOSJJtc6F66W0TZwQalD6ZojWPpn6UNfHn/IrUM1eLSE
-         uB6fVc+BYj2FpzqKDn0SHw/UBz9zlJ+oB6hCUmsIKkCWAkA4l2V0kNgX8wyeBnI2N2AG
-         XB1gSqSjdVSm27+olsC1PctzO/aw577Rv8fMnXPn2jbKp8ODBfTcgXRdEQqbv7LAOqKY
-         h4CFP1syZJTla79+s7sAShgw4NCr1qyR+2kr2sJ/VcosiOcppLGQFuTsvY5pQzX/6eW+
-         a1wn9ti99qVHU+Rb08JOPqZ/Bj8S0WtcKNV5W509IYGmzGIzD+BzvOIEuyf45SG1b2mu
-         N9xg==
-X-Gm-Message-State: AOJu0YzLpsQPt2T2X3w8JVkBMP6KK4LwxdCtcgz8QYXrqM9Q/jlXI17X
-	uFpKC1rKnOPvlp0oun57pn0kniRd4E7Ce/6OH7iQSTe8O+jGbt7H1kw3XBe9vJtcYa57dR6H7zb
-	b0Q==
-X-Google-Smtp-Source: AGHT+IGhT9nWsTP7CsdKQU4fzRBs3sRnyPYbvYxeAui3yoao7EDlWEgc/ibfFsDaevUVjLGQihFbGVHjUFE=
+        bh=ett8EUgkCChBBFZPNOi8YRDRFZwYWqwN5UfqzbKYiro=;
+        b=PkdiZLtybtrSFriPVs4bCfxaGfl/p5ZxZEyhmb6i4qhBtVgELT/pAWxERVvx1FJCmj
+         y6xZuPOrIebS3QR/4UwjaTBxw9uHH7eBs9RcPYLQACXhtv3O6bq/M38wf+SkGkjqtEtX
+         LJmBizCYeX7ZWxCNjGfQE4nIUiNW8cN+2Ub/mN6dcM3XwIbtMuQA6I8iDAI7nHv+6ryq
+         PbK4G160Qg9PaX5Th0U1s1zupld+tYxIJwNG9ldhd0gX+nuUl0zDVIPLJzsdLlEyFIUm
+         1jSAF/8mRK6BiRVmF0Sf9hRtJ/GCXbx7ABvSBugwrQdKG4XkLM7RsuVeiyB37+MzvwlQ
+         dMzw==
+X-Gm-Message-State: AOJu0YzmaJ0MCq3rshIcpbbybe++g33/Y7aevnzBoLHefaySW9Mgqmfc
+	J2j2ZIMmaEZbbAg2rGRczULL8+2lxBhEJ9rvyQBg0LejVcQNBwfks05LD5dBu1ww4OYqAoKmVFa
+	+fw==
+X-Google-Smtp-Source: AGHT+IErHV0m/rgbDyGw/iYSe33elKPccJcr4ocbrNmlvHFRBLK9zesZOHth0AxILsW58uGLoMQ9wkIB0YI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:3d04:0:b0:6e5:62bf:f905 with SMTP id
- 41be03b00d2f7-71ace6d26f4mr47242a12.10.1719615361864; Fri, 28 Jun 2024
- 15:56:01 -0700 (PDT)
-Date: Fri, 28 Jun 2024 15:55:22 -0700
-In-Reply-To: <20240627-bug5-v2-1-2c63f7ee6739@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:7201:b0:62c:f01d:3470 with SMTP id
+ 00721157ae682-643ad4ce738mr2573057b3.6.1719615370836; Fri, 28 Jun 2024
+ 15:56:10 -0700 (PDT)
+Date: Fri, 28 Jun 2024 15:55:24 -0700
+In-Reply-To: <20240624012016.46133-1-flyingpeng@tencent.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240627-bug5-v2-1-2c63f7ee6739@gmail.com>
+References: <20240624012016.46133-1-flyingpeng@tencent.com>
 X-Mailer: git-send-email 2.45.2.803.g4e1b14247a-goog
-Message-ID: <171961374413.228500.7729150745631933428.b4-ty@google.com>
-Subject: Re: [PATCH v2] kvm: Fix warning in__kvm_gpc_refresh
+Message-ID: <171961453123.238606.1528286693480959202.b4-ty@google.com>
+Subject: Re: [PATCH] KVM: X86: Remove unnecessary GFP_KERNEL_ACCOUNT for
+ temporary variables
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, David Woodhouse <dwmw2@infradead.org>, Paul Durrant <paul@xen.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, 
-	Justin Stitt <justinstitt@google.com>, Pei Li <peili.dev@gmail.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	skhan@linuxfoundation.org, linux-kernel-mentees@lists.linuxfoundation.org, 
-	syzkaller-bugs@googlegroups.com, llvm@lists.linux.dev, 
-	syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
+To: Sean Christopherson <seanjc@google.com>, pbonzini@redhat.com, flyingpenghao@gmail.com
+Cc: kvm@vger.kernel.org, Peng Hao <flyingpeng@tencent.com>
 Content-Type: text/plain; charset="utf-8"
 
-On Thu, 27 Jun 2024 08:03:56 -0700, Pei Li wrote:
-> Check for invalid hva address stored in data and return -EINVAL before
-> calling into __kvm_gpc_activate().
+On Mon, 24 Jun 2024 09:20:16 +0800, flyingpenghao@gmail.com wrote:
+> Some variables allocated in kvm_arch_vcpu_ioctl are released when
+> the function exits, so there is no need to set GFP_KERNEL_ACCOUNT.
 
-Applied to kvm-x86 fixes, thanks!
+Applied to kvm-x86 misc, thanks!
 
-[1/1] kvm: Fix warning in__kvm_gpc_refresh
-      https://github.com/kvm-x86/linux/commit/ebbdf37ce9ab
+[1/1] KVM: X86: Remove unnecessary GFP_KERNEL_ACCOUNT for temporary variables
+      https://github.com/kvm-x86/linux/commit/dd103407ca31
 
 --
 https://github.com/kvm-x86/linux/tree/next
