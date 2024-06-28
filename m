@@ -1,279 +1,309 @@
-Return-Path: <kvm+bounces-20667-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20668-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2DA491BCE3
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 12:53:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90D0591BD34
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 13:16:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51DDA1F20593
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 10:53:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45B70282D11
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 11:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DAF155A5C;
-	Fri, 28 Jun 2024 10:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2501615623A;
+	Fri, 28 Jun 2024 11:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NKddnA9v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvgDbvC4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B782139A8
-	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 10:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719571977; cv=fail; b=E7c+S0gx8kFm55EcXQLdxr+d+Dje/747Pl1hoZfu0IPtse1vTivD/fPh8DzA4H6VoTxMAYyNA0Ek2o4C1X3LQvRjC+aP2+8gKKTOpG8PwFqYD6QPscmu26C8LgPHJYLSiaPISEyWYLGrIJ/UFZMrlS3kVkFy3rG4UnEPwkpKZKs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719571977; c=relaxed/simple;
-	bh=mrsRbiZsLOzES7tW94esztLt3oAzhRquq88fJ3VGWzc=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LxxyqNFF7kWoQMPiY7kIJFFQmnQkzrT0nqn+9yQOofiQhOH9eQT3ZdrioVj8EVL83CaQhwkjZDFblZuTootYjwwi7w+9vu7fS8sI0EYE0zmzI52luc6/h+AZ+kqvi8S/NGCF8zKEhi3jjTQj5BakTVXYQLhqZQpUK+U4MCa0ySY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NKddnA9v; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719571975; x=1751107975;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mrsRbiZsLOzES7tW94esztLt3oAzhRquq88fJ3VGWzc=;
-  b=NKddnA9v1g9nf8R1gDPbbzcI0tJZNQaXixLLfigPZDe6o1TRt7/LKGZj
-   lJXgnCAdshE9FzbSXCI8dhOFNVv9U8WtdrhbQo0mPn2nyjB5zM1Ll7drJ
-   TX4Z3ETQRnZtDgCdQIW3P+jW160o7WlRruXIjKt8WwX7c771oUGh+u7Dw
-   UDX9IQ+kkKlR0nTnHzkC9fW5r0Wv0v4Tw+J+G9jbZVGWvO0zinHYQ1d++
-   jtRqS1DRiL7BpkCa4a35Ldva0byURwkSo3KLV0XkY2aCVW5+n3AIiUEs8
-   ciOketO3aaQlZ82ugCDHMuuoQvnAFBGoIPhYN+4/deJRfmlP8+KLCznhG
-   Q==;
-X-CSE-ConnectionGUID: /PxkMechQpKJ9ZIe/Yf6lg==
-X-CSE-MsgGUID: 6vhccqehTNyEfb5t2Kl4Bg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="27434897"
-X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
-   d="scan'208";a="27434897"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2024 03:52:55 -0700
-X-CSE-ConnectionGUID: ElnX0U5QS5W0R0ZIjw7Vnw==
-X-CSE-MsgGUID: nqsbgkQbSYK4XoBmmVt7kw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
-   d="scan'208";a="44539929"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Jun 2024 03:52:54 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 28 Jun 2024 03:52:54 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 28 Jun 2024 03:52:54 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 28 Jun 2024 03:52:54 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 28 Jun 2024 03:52:53 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kdZM2RVNtPw/Y28QqNUNCW8HPDJyzdcvwiRwwQ8p9p/R91fb8dt5gzdD8VshJWhqbyQ8PmT6+U3IIVOnpfjXhqiMdLLJFbxsgI6fzXtTpbhWvW2t1aYnwx1VeDgNvvy2OfzNMPaM3ozRMn4DX0lyGShkmqWxF5vOmHyGEHW0fRLcO9sUOgmrQEgitm+6wrmMZjBdcKshtfIluUB+mdJErSfVDjTJhP9m3wKEPhPzXktruZ6sqJPtrvYajATmBuhAXVBPNkWIglHoqoMEYtWT8jNgR6XushirhzbykFk6QCAyzUgXha+AhFHhgNFxHPCJjbkuvFcVR5dVC4V7VBlUww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PbuZGirJnjVY/x32GXi5fO42AcyEnTqhoc0OcmMz7XY=;
- b=ExVlBn5JvqahCDruxbTyJbEnEv/bHw5R+saVBwl5pnI3mScWTWHJu/XjgVKZe1JcUlFyNAHHEOQ0TR/QdRTVWalLjlcQd5P1BuMu17LOE0R97EDyhBRNjrtM0gCWcv1xllLBHmH796Uc1CjyFLFDzYkDp9BIJcKrwPdgwT0NNeKbmEQRflbjDjYiJLtx7hZgo+F/Od0Q31F3QuvApXnbe0TorB0P5iK9tb3driC3o5+g2GumV/Gqnmb+dim+wXBOyhuqg5S2rnK675iOVGpJFB1fAqTASclm2JyuKDD91dffjsvHjD5ipi1tNu4PeCuqOHqZdN0vGW+hC2BxVb95cg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
- by MW4PR11MB5776.namprd11.prod.outlook.com (2603:10b6:303:183::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.26; Fri, 28 Jun
- 2024 10:52:51 +0000
-Received: from DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a]) by DS0PR11MB7529.namprd11.prod.outlook.com
- ([fe80::d244:15cd:1060:941a%3]) with mapi id 15.20.7719.022; Fri, 28 Jun 2024
- 10:52:50 +0000
-Message-ID: <1f45d1d8-5bab-4a53-89c1-d97afb5a7c07@intel.com>
-Date: Fri, 28 Jun 2024 18:56:45 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/6] iommu/vt-d: Make helpers support modifying present
- pasid entry
-To: Baolu Lu <baolu.lu@linux.intel.com>, <joro@8bytes.org>, <jgg@nvidia.com>,
-	<kevin.tian@intel.com>
-CC: <alex.williamson@redhat.com>, <robin.murphy@arm.com>,
-	<eric.auger@redhat.com>, <nicolinc@nvidia.com>, <kvm@vger.kernel.org>,
-	<chao.p.peng@linux.intel.com>, <iommu@lists.linux.dev>
-References: <20240628085538.47049-1-yi.l.liu@intel.com>
- <20240628085538.47049-4-yi.l.liu@intel.com>
- <d4601f60-a2b9-4660-9b10-d05391e87e77@linux.intel.com>
-Content-Language: en-US
-From: Yi Liu <yi.l.liu@intel.com>
-In-Reply-To: <d4601f60-a2b9-4660-9b10-d05391e87e77@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SG3P274CA0020.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::32)
- To DS0PR11MB7529.namprd11.prod.outlook.com (2603:10b6:8:141::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD9A1865A
+	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 11:16:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719573398; cv=none; b=sHZ81r5XDNqwT5JYJhQU2Cy8EbL6D8flt+xHh7Lp9fLpG4fui01ANlkqb/WCiBcPRBghssCTSxdfAJ/9gatUb3VO0WUxQTS+lvXPOkExMhpkzaubEFxmmm/ZZ9mgiMXLO9EvP8ZfdV4o5HkFPIicToVtkf97Gwn3E88ydd6wO3w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719573398; c=relaxed/simple;
+	bh=cB2Lot4axGNas2OU5FTaj1NgaR3at77/54FACPAlKc8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mBnZvvnhibFct4tB8BuhSmOmYxJN4cFd8In0aVVA8ETcdAvACeKjF3BjbEBYffpTyRRgt7NR7HOZyPVmXK+BzDfci1VipNCWv6TDNyGCWaoo0GVCTr7ZhtvjeoUhJmRN6XAGS6GH9ZoCFBpLpHnGZ7NlcxDi8NSWR7HNJU0wmGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FvgDbvC4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719573395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZlGqYCvpxUtS+VdKueIF34H2lavVthiHCNvJIyMxjQk=;
+	b=FvgDbvC4C/woUSCEx+yanSrez8gh5wWphFXnesczqEccoFXcB1JFv0iXxNa2UU1zpSa/Rh
+	h8rjAcH5uikTE4YHBF8VQ95ovk8Vv82i0ns7g+wVQQJvQ8lDr2hQd9dKKoqIuGataPGQ23
+	JZ3cSYgZMiXkBmUKT+hnqM8VNZwhFi4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-691-vreBmDcyO_iDi_lObmhEng-1; Fri, 28 Jun 2024 07:16:34 -0400
+X-MC-Unique: vreBmDcyO_iDi_lObmhEng-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-425643fb4fbso4420985e9.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 04:16:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719573392; x=1720178192;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZlGqYCvpxUtS+VdKueIF34H2lavVthiHCNvJIyMxjQk=;
+        b=sUVRVM8XX43/LDYD/pK+rJs7J5nOGhcGnaVBO9jxNL2yuchEBSg0hl96lTidKTazQp
+         HF63gs6qfWJn6TfHp7RQOCsKr2vrdulT3/IagI0fxik21U8TiuLvMF0fucInrbeZV16B
+         r037+QIak+qI6UAB2TFLc6rB0qwv2t/ey3nA48X3QZRKFM1bjalb8YfcFuGBfe0YO5Si
+         ABnZzD/SthOqrWPklhPbcGHT2R8J8Tx832r9HxDdpsb2rqMMMqNnx6xhhAUj+9tg0UOx
+         HWhCou9E+Mu3B86NTJjhtWNp9DeMXiPx6/6heisen4LmcPGJJqth7f/4gUsPYfi9tnz+
+         AIng==
+X-Forwarded-Encrypted: i=1; AJvYcCX/xsBcY51xSONg1m/XI5qTZT8Yo8qS4QzDAmCtlnCLXC6vKlgnJiZKooMrmF+tCzGJc+SdKxnbSTZ1NFieV5XaxLgN
+X-Gm-Message-State: AOJu0YzpVg6iiKt8fgZMEAwRnafVCnCoZjihJW4AgivM/J9XkPjJ4hvS
+	L1mpkV5qFEzqg/uTxuRG1EuPPhdzvQoxsbe9uJVUtIeQfVVulP2KTQSm41EfYkC/0tWpx7kacZS
+	JW5aXhepwWgVGW5MSOFuf4Ek+H7pWu5PSg+L2F8dIzO8281AVxg==
+X-Received: by 2002:a05:600c:a29f:b0:425:5ea6:236 with SMTP id 5b1f17b1804b1-4255ea60371mr49514005e9.28.1719573391986;
+        Fri, 28 Jun 2024 04:16:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEyPwfEwM5GqciNJwTRavZB5JFhzJ9CBQ2fFV7Dql3t6q6MFOInK4WYOf9EpanV+QVZr8fUGw==
+X-Received: by 2002:a05:600c:a29f:b0:425:5ea6:236 with SMTP id 5b1f17b1804b1-4255ea60371mr49513745e9.28.1719573391339;
+        Fri, 28 Jun 2024 04:16:31 -0700 (PDT)
+Received: from sgarzare-redhat ([193.207.134.173])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b063485sm30356325e9.21.2024.06.28.04.16.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 04:16:30 -0700 (PDT)
+Date: Fri, 28 Jun 2024 13:16:24 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: luigi.leonardi@outlook.com
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	kvm@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/3] vsock/virtio: add SIOCOUTQ support for
+ all virtio based transports
+Message-ID: <7ejdsieevuooprdaprn2ymqqv5ssd2fntlp6tsodeu6pvnuvue@chzg6ww45bni>
+References: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
+ <20240626-ioctl_next-v3-2-63be5bf19a40@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB7529:EE_|MW4PR11MB5776:EE_
-X-MS-Office365-Filtering-Correlation-Id: e1d19740-f51e-4fe8-d307-08dc9760745d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016|7416014;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?QnVZMGZrd2o3TFNhS2Uwb1VhcEZLOFVISEd2RDhNZEo0eFR1VWllVEhydFNt?=
- =?utf-8?B?K1BUeHJ6ZzdFQk44ZlZ1aGJucWZFMDZQbnI4dHMxT3BzL0ltRjZzWitXaFhE?=
- =?utf-8?B?MjNGTG9kYnRDdUJJdUxnVTc1c3FlOElWeWxLbHJMSVpjZ3M1L0NaeTBLK3Vs?=
- =?utf-8?B?ZHlWblU1MlZQb052KythSVFUVDFxbkRsc0U0N1VUcFV2QXdxdWZPSm9Kcnd3?=
- =?utf-8?B?aXdoMlpJdmpWZDNVdlp2cmRRRVVCbUUwTFB2bGpWb1pNSWZTTFlRNFpOTEto?=
- =?utf-8?B?Nnk2YnZsZ20ydGdqb1pzOGM0NzAzeER1Sm9MalhPYmJDMEd0WDJUOE1IRlhr?=
- =?utf-8?B?WXZpTW02alovWnVncWVJMXR3eDROZUU2emF5eG10Q01ieVNIWVdrWWpwdFhp?=
- =?utf-8?B?Z052bVpzc1czaVNHU2Q3dW5ZUGZVYWRsa3pYaytKbFdScHNkYTNmN3V1M3V1?=
- =?utf-8?B?VTFEcERmQng0K2RCSlNhYmxBRlpSNEsvTFJBYVRZZDRxMVhjRHBQSjl0bVFS?=
- =?utf-8?B?ekU3UWRRU1dzSjZLbnh3KzFreHdDc1NTcGpxRURGaFJKUzJnVkFqYUVHbkx4?=
- =?utf-8?B?dGZVY3FZUU9xU0ZoVnRiOTcyS0I1VU1iN2Y4NDgrMnp1ZjB1Ukx2bzFXUmxG?=
- =?utf-8?B?cno5aUZBQWRyaW1YV2dpcjlhNWpQanB4K3hYVWI2MFQ5WFZEWERnVjVDL3M0?=
- =?utf-8?B?N3h0T3pIallZc3M0NDlLSTcya3BORVlkcExCTzFXNXAyOTRKQ055VnYyRUFK?=
- =?utf-8?B?aGJ5UmZJWE9SeUZEOTloM1VHYkRudDlKbHBqODdOOE5IeW9VRVB2N200OWU1?=
- =?utf-8?B?N0lNeXZNSGJtUjhPTzhWZ0xEYjZncWNWeXFKZmVMMUEya3JLYndrUUlINmhB?=
- =?utf-8?B?dDkxSE5hTjJ2TFg0VXlFL3JyMlpVWXZ6UlhRb1k2WmV4TDNkU0V1MTR4WWdu?=
- =?utf-8?B?MXBJZ0dudytwL1ZreXg3MEN3R2hmVWZJVnppMWJkWFh6VXQzUk82Y0FJbWth?=
- =?utf-8?B?SzBXdnFWK0Y3Q2dTc3F3U0VWeGZWNnBha2lJNHpadVl4UTY1OVRZWnc4cGVK?=
- =?utf-8?B?OHcwUm41SGVqZ1pIM3hhTHd2QWlKR1VXTVJXY0tJUlVDTGZoTkMzaUl2SmUx?=
- =?utf-8?B?NWRxeTdoK2dVdlIwdmdRaHhGbUxVSlBhQjlBUjlwbytMZ0NxOUt5TEJiTE04?=
- =?utf-8?B?VzNmaHVrU3M5K2lOZUFlMEJHQTFLWnFaMHdwYnhXbmdqUXdPcUtIR0xFSFBM?=
- =?utf-8?B?emJtYmh2cmJqK0psWXI5V2w4SWJTbkJyeUZwTW8vUVVYWnlJYkVmdUpmVHZF?=
- =?utf-8?B?YlhrakE4MVlId0Jxd3pXT054YlI5UEZPS2tNbE1uTUY1NHc0MDZ6SmtSUTBE?=
- =?utf-8?B?U25YTkRTSk0zWFd0Wm1LamZnczJpMXBkTGN3TDBBRExoRktaMm9waElpU0tT?=
- =?utf-8?B?VVNZcDRndEFHRytxbXh2QlJMbmthYU5jK3NMOEQxOWY0NW9mVXpkdGdCSjd6?=
- =?utf-8?B?UDdQY2o4UHJnMXpwdVBCQ3BsVDVHMzZ3VlNpNUxReDVVbExxWHU4ZEJGM3Ax?=
- =?utf-8?B?Y25mRWRWLytJR213czgvWFhoNFpYVmJYdjE3VXZNUUNBbnFpUmdQQXZDVjNY?=
- =?utf-8?B?RDRyYUNWcnJGVk9vd2RReUlVc2pLR1pNaHord1VXK0hWcjRDVGtOMGVXSHRm?=
- =?utf-8?B?c0pmRmFXWVZvQVNlS2NVbGZnWmNPMFhhVXhWWWF5UGV5bklNRTBOR3lLQnpz?=
- =?utf-8?B?NEVpQU1TMVBNZ0FCb3Eza1hPUE5rY0orQ2JRc1FaNGQweS9RWkFvSElvU1U0?=
- =?utf-8?B?Q1pJME5OejFzaGZRUlBaUT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7529.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?WUNscGVNeEIrOGQrN2pjZUpQRk5IVm8zK3YwYnFFNFROUlgwOUNmSDdkSytT?=
- =?utf-8?B?NXE1T1ZySlJhY2V0eXd5NUVGV2NwT3VhSlJiRkhVQTEwQ2tLQTRmdkdIdnQ2?=
- =?utf-8?B?cFNrZ0JkeFk2cXc2NXNtVjBPaVh3aEJzdGtsSmlQNTB0K2xKWUpza3lpajMx?=
- =?utf-8?B?ZVRuMDkwZGdxN3FWQ25QeCtKWEZTa2d2ZzN3L0FJN2RBcXc1S2UvZEJPa0dJ?=
- =?utf-8?B?QTdqaHZ0UG0zRGluM0owT1gyNWhqWVRCRVExMWNwc2dFQXRxZXRKUnlrTmZm?=
- =?utf-8?B?NzFKbnFNWSs5Y045cmhNSXJzNXFyOCtBWk5HaTMzY1oxazRoSkwzOCtXVGUy?=
- =?utf-8?B?RGx5Uit4UTVZUzF3bEVWNE1UTnNlRUxLclg4Q3pCUEJYNThJVVY2d0hIRjZU?=
- =?utf-8?B?OWZEZ0dVbDRFSk1EbU1zS3VMSjE5VmJNMFhnTVpEaFh6UmR6YXk2Q0EyTTVY?=
- =?utf-8?B?b1VkcjRhYVA4MDdGbjhSUXhpSnVhd3JxYzNReDU1ZStEWlFlV1JtUXRBdXE1?=
- =?utf-8?B?NklieWFTaityNkl5M2NKOGFidk1wV1lJVlRLL0xBQjJNTXNaa0V6RWZuZG53?=
- =?utf-8?B?Z2lvdCtKQlQ2bHFDQlVPWnczRnhRUE93Uk9CN014YndwOGRyQS9RMnFMQ3N4?=
- =?utf-8?B?Rkw5NEFpQlE4SmtiaEQ0NThBN0p1M056T3g3STBaeXZhWWdSaTVlbE5Hb2Js?=
- =?utf-8?B?b1FzVEgzelg4RUIwbUQ1cGt4WUNYb3VIZzFzOEpRNDV1MDhKS2YxMmJjQ1JP?=
- =?utf-8?B?dzhrQjdabDZFK0s0QVdmcENFczVpNSsranVCbGltcEhyVkoxVDZDcitmZ2th?=
- =?utf-8?B?aE1BQXJ6MGtiNk91cE5hbXJuL2J0djE1dFpSSklhSWd1Y3IvQ3Y2andsZzBY?=
- =?utf-8?B?TUtubHNHQnVuRTd0czl5QndWZHJQWUF4cCtCeE42Z2R5eHoybTZYWHJQTjlZ?=
- =?utf-8?B?aFV0SWtBWVQ4MGNzY3hzelZGRjBGeFNoNW5NN2lGeFpXcHVsYjhCbE9kVlhv?=
- =?utf-8?B?bjIreit6Q01TKzZvS2ltS0hqNVE5dzdwc0lhbHhDZFRNbTQ5T1I4RytURUcz?=
- =?utf-8?B?Rzc2WnQwcTl6Q1FjZWVkT0VOU0lFeUxxa3l2UGIrSGNaMjFQV0xsSHdITEtN?=
- =?utf-8?B?N0pZSmdDeUdGbUtEc3UwMVFSUnhoQktDeFZCbUIzUFdSRkpUaEg2bjdmd1ZC?=
- =?utf-8?B?ZDF3UmtBakJVM3pxOFVHcTVpZitkbE5qa0Q4dGVmaVVDY2p5S3NsWnp2MkFB?=
- =?utf-8?B?NDV5VktpM3A3Ky9vQUVqNXMzTUFjUlJ1VXVLSmI4SnFHR1B2M0VRYTNvKzlQ?=
- =?utf-8?B?bDU4TktRRnFHblVBTEp2WkJaQWtSRW9waVRVbDNEL2JSK213MmJRUkhnTllo?=
- =?utf-8?B?M2hhUnpNT3FRTkgzUGpPM2ZhV0FHc2swWkY0ZGNzRm5PcUVmSEloMkRFdWpH?=
- =?utf-8?B?VjZqVE1DWi9Ndzl4K1FRWEErWXRLaEFNQzNEaHhUTmV4YlBhM0xITjlyUEF2?=
- =?utf-8?B?cFdSV01lQ2dNNFVGTGJvTUIyTUhkcGl5NXQrQ0lxQ0NSTTM0Z2d2bUxocjVQ?=
- =?utf-8?B?NngzaWw1S1VBQXZZWEY2MS9oaktuUDQ1Z0NrSmdMaUxKc0tQS0VkZ3ZUU0lP?=
- =?utf-8?B?MGxvSVhFSkhMMFp2KzZaemFYb3RnMVhFSnc1cHpiOUNmMDI2cy9WVDYwR1Jm?=
- =?utf-8?B?SHJuK3FqaXFrMkdFVVRjanBuTFJwSGZXNjVrTXJjcC94MnRXRm9rNmpmU1JF?=
- =?utf-8?B?N2Mvdkx3eTd3cFhzdlAzUWZyMDlwa29meFJkOGlIcU5ZYmxpdGd3SzRJU3B3?=
- =?utf-8?B?Sk1HcHVTR25qdTZ6WHNHN2Q0WGY4Mkh5ajgwa01qWUVsczRhZ1ROMWMvYlA3?=
- =?utf-8?B?SnZ5KzNMMTdNQ0VQU203SUNLU2VBM3E1Nnh0UnlxamlOTGxzZXdnVVF6Z3Ry?=
- =?utf-8?B?NitodXNsc2hjQTNFQllUajRadk1Rck1JYnIzMllLUUl2Q01VTjg4a0lTdzc2?=
- =?utf-8?B?U2RFb3lFZE43T1kzOElWRFo3UUFPL3htU3puM2c5OFpzaHhCTmY5Um9jNUpC?=
- =?utf-8?B?TkhRZ2VCZWF0T2t3d0xDSkM4UTUxNmJQbm9XbmowZHVETkFrQkdtalZYTHlw?=
- =?utf-8?Q?l6cGWZJwUAnrcmjET/S54ZOTL?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e1d19740-f51e-4fe8-d307-08dc9760745d
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7529.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2024 10:52:50.7891
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iDgA2XMBDtIe+SfHUxFNSazJoYuynocI3kms0nV7w9YIestCYPtpzFJWHMxxMpmuToUY9CaLNQrsxKsmEqP6pg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5776
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240626-ioctl_next-v3-2-63be5bf19a40@outlook.com>
 
-On 2024/6/28 17:52, Baolu Lu wrote:
-> On 2024/6/28 16:55, Yi Liu wrote:
->> To handle domain replacement, set_dev_pasid op needs to modify a present
->> pasid entry. One way is sharing the most logics of remove_dev_pasid() in
->> the beginning of set_dev_pasid() to remove the old config. But this means
->> the set_dev_pasid path needs to rollback to the old config if it fails to
->> set up the new pasid entry. This needs to invoke the set_dev_pasid op of
->> the old domain. It breaks the iommu layering a bit. Another way is
->> implementing the set_dev_pasid() without rollback to old hardware config.
->> This can be achieved by implementing it in the order of preparing the
->> dev_pasid info for the new domain, modify the pasid entry, then undo the
->> dev_pasid info of the old domain, and if failed, undo the dev_pasid info
->> of the new domain. This would keep the old domain unchanged.
->>
->> Following the second way, needs to make the pasid entry set up helpers
->> support modifying present pasid entry.
->>
->> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
->> ---
->>   drivers/iommu/intel/pasid.c | 37 ++++++++++++-------------------------
->>   1 file changed, 12 insertions(+), 25 deletions(-)
->>
->> diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
->> index b18eebb479de..5d3a12b081a2 100644
->> --- a/drivers/iommu/intel/pasid.c
->> +++ b/drivers/iommu/intel/pasid.c
->> @@ -314,6 +314,9 @@ int intel_pasid_setup_first_level(struct intel_iommu 
->> *iommu,
->>           return -EINVAL;
->>       }
->> +    /* Clear the old configuration if it already exists */
->> +    intel_pasid_tear_down_entry(iommu, dev, pasid, false, true);
->> +
+On Wed, Jun 26, 2024 at 02:08:36PM GMT, Luigi Leonardi via B4 Relay wrote:
+>From: Luigi Leonardi <luigi.leonardi@outlook.com>
+>
+>Introduce support for stream_bytes_unsent and seqpacket_bytes_unsent
+>ioctl for virtio_transport, vhost_vsock and vsock_loopback.
+>
+>For all transports the unsent bytes counter is incremented
+>in virtio_transport_get_credit.
+>
+>In the virtio_transport (G2H) the counter is decremented each
+>time the host notifies the guest that it consumed the skbuffs.
+>In vhost-vsock (H2G) the counter is decremented after the skbuff
+>is queued in the virtqueue.
+>In vsock_loopback the counter is decremented after the skbuff is
+>dequeued.
+>
+>Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+>---
+> drivers/vhost/vsock.c                   |  4 +++-
+> include/linux/virtio_vsock.h            |  7 +++++++
+> net/vmw_vsock/virtio_transport.c        |  4 +++-
+> net/vmw_vsock/virtio_transport_common.c | 35 +++++++++++++++++++++++++++++++++
+> net/vmw_vsock/vsock_loopback.c          |  7 +++++++
+> 5 files changed, 55 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index ec20ecff85c7..dba8b3ea37bf 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -244,7 +244,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 					restart_tx = true;
+> 			}
+>
+>-			consume_skb(skb);
+>+			virtio_transport_consume_skb_sent(skb, true);
+> 		}
+> 	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
+> 	if (added)
+>@@ -451,6 +451,8 @@ static struct virtio_transport vhost_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+>+		.unsent_bytes             = virtio_transport_bytes_unsent,
 
-[1]
+The callback is named `unsent_bytes`, I'd use something similar also
+in the function name, so `virtio_transport_unsent_bytes`, or the
+opposite renaming the callback, as you prefer, but I'd use the same
+for both.
 
->>       spin_lock(&iommu->lock);
->>       pte = intel_pasid_get_entry(dev, pasid);
->>       if (!pte) {
->> @@ -321,13 +324,6 @@ int intel_pasid_setup_first_level(struct intel_iommu 
->> *iommu,
->>           return -ENODEV;
->>       }
->> -    if (pasid_pte_is_present(pte)) {
->> -        spin_unlock(&iommu->lock);
->> -        return -EBUSY;
->> -    }
->> -
->> -    pasid_clear_entry(pte);
->> -
->>       /* Setup the first level page table pointer: */
->>       pasid_set_flptr(pte, (u64)__pa(pgd));
-> 
-> The above changes the previous assumption that when a new page table is
-> about to be set up on a PASID, there should be no existing one still in
-> place.
+>+
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+>diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>index c82089dee0c8..e74c12878213 100644
+>--- a/include/linux/virtio_vsock.h
+>+++ b/include/linux/virtio_vsock.h
+>@@ -134,6 +134,8 @@ struct virtio_vsock_sock {
+> 	u32 peer_fwd_cnt;
+> 	u32 peer_buf_alloc;
+>
 
-actually, this does not break the assumption. In [1]. it already clears the
-pasid entry.
+Can you remove this extra empty line, so it's clear that it is
+protected by tx_lock?
 
-> Is this a requirement for the replace functionality?
+>+	size_t bytes_unsent;
+>+
+> 	/* Protected by rx_lock */
+> 	u32 fwd_cnt;
+> 	u32 last_fwd_cnt;
+>@@ -193,6 +195,11 @@ s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
+> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
+> u32 virtio_transport_seqpacket_has_data(struct vsock_sock *vsk);
+>
+>+size_t virtio_transport_bytes_unsent(struct vsock_sock *vsk);
+>+
+>+void virtio_transport_consume_skb_sent(struct sk_buff *skb,
+>+				       bool consume);
+>+
+> int virtio_transport_do_socket_init(struct vsock_sock *vsk,
+> 				 struct vsock_sock *psk);
+> int
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index 43d405298857..fc62d2818c2c 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -311,7 +311,7 @@ static void virtio_transport_tx_work(struct work_struct *work)
+>
+> 		virtqueue_disable_cb(vq);
+> 		while ((skb = virtqueue_get_buf(vq, &len)) != NULL) {
+>-			consume_skb(skb);
+>+			virtio_transport_consume_skb_sent(skb, true);
+> 			added = true;
+> 		}
+> 	} while (!virtqueue_enable_cb(vq));
+>@@ -540,6 +540,8 @@ static struct virtio_transport virtio_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+>+		.unsent_bytes             = virtio_transport_bytes_unsent,
+>+
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+>diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>index 16ff976a86e3..3a7fa36f306b 100644
+>--- a/net/vmw_vsock/virtio_transport_common.c
+>+++ b/net/vmw_vsock/virtio_transport_common.c
+>@@ -463,6 +463,26 @@ void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_inc_tx_pkt);
+>
+>+void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
+>+{
+>+	struct sock *s = skb->sk;
+>+
+>+	if (s && skb->len) {
+>+		struct vsock_sock *vs = vsock_sk(s);
+>+		struct virtio_vsock_sock *vvs;
+>+
+>+		vvs = vs->trans;
+>+
+>+		spin_lock_bh(&vvs->tx_lock);
+>+		vvs->bytes_unsent -= skb->len;
+>+		spin_unlock_bh(&vvs->tx_lock);
+>+	}
+>+
+>+	if (consume)
+>+		consume_skb(skb);
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
+>+
+> u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+> {
+> 	u32 ret;
+>@@ -475,6 +495,7 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
+> 	if (ret > credit)
+> 		ret = credit;
+> 	vvs->tx_cnt += ret;
+>+	vvs->bytes_unsent += ret;
+> 	spin_unlock_bh(&vvs->tx_lock);
+>
+> 	return ret;
+>@@ -488,6 +509,7 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit)
+>
+> 	spin_lock_bh(&vvs->tx_lock);
+> 	vvs->tx_cnt -= credit;
+>+	vvs->bytes_unsent -= credit;
+> 	spin_unlock_bh(&vvs->tx_lock);
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_put_credit);
+>@@ -1090,6 +1112,19 @@ void virtio_transport_destruct(struct vsock_sock *vsk)
+> }
+> EXPORT_SYMBOL_GPL(virtio_transport_destruct);
+>
+>+size_t virtio_transport_bytes_unsent(struct vsock_sock *vsk)
+>+{
+>+	struct virtio_vsock_sock *vvs = vsk->trans;
+>+	size_t ret;
+>+
+>+	spin_lock_bh(&vvs->tx_lock);
+>+	ret = vvs->bytes_unsent;
+>+	spin_unlock_bh(&vvs->tx_lock);
+>+
+>+	return ret;
+>+}
+>+EXPORT_SYMBOL_GPL(virtio_transport_bytes_unsent);
+>+
+> static int virtio_transport_reset(struct vsock_sock *vsk,
+> 				  struct sk_buff *skb)
+> {
+>diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
+>index 6dea6119f5b2..9098613561e3 100644
+>--- a/net/vmw_vsock/vsock_loopback.c
+>+++ b/net/vmw_vsock/vsock_loopback.c
+>@@ -98,6 +98,8 @@ static struct virtio_transport loopback_transport = {
+> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
+> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
+>
+>+		.unsent_bytes             = virtio_transport_bytes_unsent,
+>+
+> 		.read_skb = virtio_transport_read_skb,
+> 	},
+>
+>@@ -123,6 +125,11 @@ static void vsock_loopback_work(struct work_struct *work)
+> 	spin_unlock_bh(&vsock->pkt_queue.lock);
+>
+> 	while ((skb = __skb_dequeue(&pkts))) {
+>+		/* Decrement the bytes_sent counter without deallocating skb
+                                  ^
+Should be `bytes_unsent` ?
 
-Replace would surely need to modify a present pasid entry. But this patch
-only moves adds the pasid entry tear down and prq drain into the helpers.
+>+		 * It is freed by the receiver.
+>+		 */
+>+		virtio_transport_consume_skb_sent(skb, false);
+>+
 
--- 
-Regards,
-Yi Liu
+nit: no need for this new empty line.
+
+> 		virtio_transport_deliver_tap_pkt(skb);
+> 		virtio_transport_recv_pkt(&loopback_transport, skb);
+> 	}
+>
+>-- 
+>2.45.2
+>
+>
+>
+
 
