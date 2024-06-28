@@ -1,123 +1,164 @@
-Return-Path: <kvm+bounces-20633-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20634-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E37B91B6B6
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 08:06:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4031B91B6DB
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 08:16:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 276B21C22264
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 06:06:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C127C282692
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 06:16:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285FD4D8BC;
-	Fri, 28 Jun 2024 06:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E05A55898;
+	Fri, 28 Jun 2024 06:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d6WQsR9k"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fKO05Pcs"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC82658AD0
-	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 06:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D87554278;
+	Fri, 28 Jun 2024 06:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719554723; cv=none; b=Egwjs11Bdm3sIgw039m2yvPeOwVMROZom6Dn4PiQ+JtcV6ZxI/+OrWes5kZdFhAS1rBkJ1F5xfHJSxp2RSKbfri3Jstoht38nJq+HQCfmaU63FNdjdbcixKOKRSUMVdF9utp/euy5PZJF42XOrlU+W0t6UhFmDLdr7J3nXf62b0=
+	t=1719555378; cv=none; b=m3JdQqozjplqsj19z7vIkzW8MwfBwUE9lh6FFXbRuk77lmk3T06Mb3S0hOCz3jXuMPLap/hqQCURiYeb+4FAUZ8DIRSp11ACqKJgSEAW+ZjedsHOWAE9sh2adwAT1IghHJiaiFNRv0wNwRXYpyL4CDBAv41gqK4Z0Zko64c/P9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719554723; c=relaxed/simple;
-	bh=xSiJ5L74EeCZilqppN+5V8jJKnnXkvFKwD8VAftCPj4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E2RBtRN1Gh+1V+yxlYxUILmrGXO6kY+naiP4uWTfwtVQnAHw4gMOOGN3wWCuuNV7eKsCu5y60uh/+jHXOcwSNIF3hVZctGIRXyB69tezeuqf/g/vrhlaAH9MQzl6t5UqnWHxKcF6AgyGD5Bq7UbPt7Si66z1i6ruo/N3t3WvFGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d6WQsR9k; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719554720;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=82yWG8Vl+Le/9WjBwfHlK8sLf94k5LjwViXN1KBGyHs=;
-	b=d6WQsR9k9m7QZHi3qpB5A56mVqeQYDuxoC0eINzd1DeF1p7OYRPwjsxj9xwMuRUM8u1D9+
-	heNmzwiL4+xs2uI3NFw8s0MJclUOJYLUpkFU4WyH4zz3+6ezIcouAIE9SCZuc5JwhO/sA1
-	qB1sZQVfb0NCEBDqWSsGknbB+iHA+Ec=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-44-V4jOVgGQNcScVriSkjyevw-1; Fri,
- 28 Jun 2024 02:05:10 -0400
-X-MC-Unique: V4jOVgGQNcScVriSkjyevw-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1AB001955DA6;
-	Fri, 28 Jun 2024 06:05:08 +0000 (UTC)
-Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 32E2F1945CB1;
-	Fri, 28 Jun 2024 06:05:06 +0000 (UTC)
-From: Shaoqin Huang <shahuang@redhat.com>
-To: Oliver Upton <oliver.upton@linux.dev>,
-	Marc Zyngier <maz@kernel.org>,
-	kvmarm@lists.linux.dev
-Cc: Shaoqin Huang <shahuang@redhat.com>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 2/2] KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
-Date: Fri, 28 Jun 2024 02:04:52 -0400
-Message-Id: <20240628060454.1936886-3-shahuang@redhat.com>
-In-Reply-To: <20240628060454.1936886-1-shahuang@redhat.com>
-References: <20240628060454.1936886-1-shahuang@redhat.com>
+	s=arc-20240116; t=1719555378; c=relaxed/simple;
+	bh=VHivx3TXk6rbGD53jPWHJbhtFADdjRmAebTMKel3LII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QONk+iqQ1nihFFXC/VauK26iNxKin1B7Q2vDtA0groFwsy4w0DDXE/zvvABz30RCDUeGTVVMsWmH5lAD9JSSBZ5kGRXPux+YWi1QCriHLJw9QZtZsVOsCKhEOER3zi0Z67Po4IYPxCeVvbepUP42EvfFUu9XOlh3F3jzdqRg/Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fKO05Pcs; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719555377; x=1751091377;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=VHivx3TXk6rbGD53jPWHJbhtFADdjRmAebTMKel3LII=;
+  b=fKO05Pcs/ho9TK8Zlhv4JaJKS72QKEnVRBJXXQDY03MpnChX5xQxa5v5
+   OBRqy9y3npWi+/3SgfCIHFjIKSUZw64m9F/vUHjkmFAGNmi6KCs1KHSgM
+   qFbtgpZehF0umLMIVrthQoq2/2CB0WkGzChq3TsSWgJxgRXtv7LSklcbn
+   NF7CKuyIXFkBSsDVCRMYtmw9/O3msPQv6/prrJ/U2sphJhmn79U2T1Q7j
+   fAZ3Xc7T4lbL5hWqszd6c59+6ZVWqbjh16w8T6YSo4sL0CKPiwFYBC8AB
+   CJXmMYUYL94IL75jxKMkYvIWCtcROwZWGoCzl182V8xO7HnV4vrtZv3t0
+   g==;
+X-CSE-ConnectionGUID: WGG2NTRHRySHc3rhQMS4Cw==
+X-CSE-MsgGUID: 4JAUWHoUTnaRMTCXH1Q38g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="28118913"
+X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
+   d="scan'208";a="28118913"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 23:16:15 -0700
+X-CSE-ConnectionGUID: 1Db3jF/gRaSXKeo8tyf+bA==
+X-CSE-MsgGUID: LPQGGceOT/GqBxTXASLnug==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
+   d="scan'208";a="44548736"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 27 Jun 2024 23:16:08 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sN4ty-000Gs2-0m;
+	Fri, 28 Jun 2024 06:16:06 +0000
+Date: Fri, 28 Jun 2024 14:15:45 +0800
+From: kernel test robot <lkp@intel.com>
+To: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>,
+	Stefano Garzarella <sgarzare@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, Luigi Leonardi <luigi.leonardi@outlook.com>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl
+ for all vsock socket types.
+Message-ID: <202406281355.d1jNVGBc-lkp@intel.com>
+References: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
 
-Add writable test for the ID_AA64PFR1_EL1 register.
+Hi Luigi,
 
-Signed-off-by: Shaoqin Huang <shahuang@redhat.com>
----
- tools/testing/selftests/kvm/aarch64/set_id_regs.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+kernel test robot noticed the following build warnings:
 
-diff --git a/tools/testing/selftests/kvm/aarch64/set_id_regs.c b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-index a7de39fa2a0a..7fd4d6f26456 100644
---- a/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-+++ b/tools/testing/selftests/kvm/aarch64/set_id_regs.c
-@@ -133,6 +133,13 @@ static const struct reg_ftr_bits ftr_id_aa64pfr0_el1[] = {
- 	REG_FTR_END,
- };
- 
-+static const struct reg_ftr_bits ftr_id_aa64pfr1_el1[] = {
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, MTE, ID_AA64PFR1_EL1_MTE_NI),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, SSBS, ID_AA64PFR1_EL1_SSBS_NI),
-+	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64PFR1_EL1, BT, 0),
-+	REG_FTR_END,
-+};
-+
- static const struct reg_ftr_bits ftr_id_aa64mmfr0_el1[] = {
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, ECV, 0),
- 	REG_FTR_BITS(FTR_LOWER_SAFE, ID_AA64MMFR0_EL1, EXS, 0),
-@@ -199,6 +206,7 @@ static struct test_feature_reg test_regs[] = {
- 	TEST_REG(SYS_ID_AA64ISAR1_EL1, ftr_id_aa64isar1_el1),
- 	TEST_REG(SYS_ID_AA64ISAR2_EL1, ftr_id_aa64isar2_el1),
- 	TEST_REG(SYS_ID_AA64PFR0_EL1, ftr_id_aa64pfr0_el1),
-+	TEST_REG(SYS_ID_AA64PFR1_EL1, ftr_id_aa64pfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR0_EL1, ftr_id_aa64mmfr0_el1),
- 	TEST_REG(SYS_ID_AA64MMFR1_EL1, ftr_id_aa64mmfr1_el1),
- 	TEST_REG(SYS_ID_AA64MMFR2_EL1, ftr_id_aa64mmfr2_el1),
+[auto build test WARNING on 50b70845fc5c22cf7e7d25b57d57b3dca1725aa5]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Luigi-Leonardi-via-B4-Relay/vsock-add-support-for-SIOCOUTQ-ioctl-for-all-vsock-socket-types/20240627-023902
+base:   50b70845fc5c22cf7e7d25b57d57b3dca1725aa5
+patch link:    https://lore.kernel.org/r/20240626-ioctl_next-v3-1-63be5bf19a40%40outlook.com
+patch subject: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl for all vsock socket types.
+config: i386-randconfig-141-20240628 (https://download.01.org/0day-ci/archive/20240628/202406281355.d1jNVGBc-lkp@intel.com/config)
+compiler: gcc-8 (Ubuntu 8.4.0-3ubuntu2) 8.4.0
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202406281355.d1jNVGBc-lkp@intel.com/
+
+smatch warnings:
+net/vmw_vsock/af_vsock.c:1321 vsock_do_ioctl() warn: unsigned 'n_bytes' is never less than zero.
+
+vim +/n_bytes +1321 net/vmw_vsock/af_vsock.c
+
+  1295	
+  1296	static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
+  1297				  int __user *arg)
+  1298	{
+  1299		struct sock *sk = sock->sk;
+  1300		struct vsock_sock *vsk;
+  1301		int retval;
+  1302	
+  1303		vsk = vsock_sk(sk);
+  1304	
+  1305		switch (cmd) {
+  1306		case SIOCOUTQ: {
+  1307			size_t n_bytes;
+  1308	
+  1309			if (!vsk->transport || !vsk->transport->unsent_bytes) {
+  1310				retval = -EOPNOTSUPP;
+  1311				break;
+  1312			}
+  1313	
+  1314			if (vsk->transport->unsent_bytes) {
+  1315				if (sock_type_connectible(sk->sk_type) && sk->sk_state == TCP_LISTEN) {
+  1316					retval = -EINVAL;
+  1317					break;
+  1318				}
+  1319	
+  1320				n_bytes = vsk->transport->unsent_bytes(vsk);
+> 1321				if (n_bytes < 0) {
+  1322					retval = n_bytes;
+  1323					break;
+  1324				}
+  1325	
+  1326				retval = put_user(n_bytes, arg);
+  1327			}
+  1328			break;
+  1329		}
+  1330		default:
+  1331			retval = -ENOIOCTLCMD;
+  1332		}
+  1333	
+  1334		return retval;
+  1335	}
+  1336	
+
 -- 
-2.40.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
