@@ -1,130 +1,189 @@
-Return-Path: <kvm+bounces-20688-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20689-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B03691C51B
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 19:45:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E0191C60F
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 20:48:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 255D21F238A8
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 17:45:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DA35B251A5
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 18:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F6041CD5D1;
-	Fri, 28 Jun 2024 17:44:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5991157CAC;
+	Fri, 28 Jun 2024 18:48:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KJWaBZZC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tz9qzgO1"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9711CCCBB;
-	Fri, 28 Jun 2024 17:44:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72B53FB88
+	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 18:48:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719596683; cv=none; b=qQjP0EcKWgtxrE1qJ1sp1d8d65TmCpkFr90zMFtETWbJxwhD3MNo2jVKSDTmIdjqYqSnap1X72goO5Knjssc79GhHCMKfomYWzNNHbZr3VLKOtId/kNQ8YAVETlKqj3MY520b/KTxy21ljCGU4ZwZ9ZW7V1aaW/Q9W4ebRQBL+M=
+	t=1719600501; cv=none; b=mw0WMcTXNlFCH8toHeeD8FLq17YO3xfOV5X648qUfrBC07QdgKwu3GVmTGwuad1IgC0ov0xlq8j9bR+ta1eJrLonBB49Vl+r3tp3TJPHsCrbWliLvfPhOEi0DBM3J3NSjmPjRvzOSyr5/j2ZplMyx8XBBPa1TFv3zqi9nqSTvuw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719596683; c=relaxed/simple;
-	bh=g1u+wiuG/EMk/O94sM/CCvl1CRAmDj8SpBlEI20QD9A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AamTdRCh/Cs0oajHgLGHY4UgQI2j+EX5FpekNkQBJ0+TFVyz4abz7JNN+bdv0EHHwjGIvU9Gb9Q3239cFhgS8rs1yancQYPdmIRNCiWaqBMxbl0GEOp09FF+rIH21RDISLyMBjUgfaSmeD2Ub1OIy7J48OHvDepIIPTh5S8V+eE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KJWaBZZC; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45SHStPV027419;
-	Fri, 28 Jun 2024 17:44:39 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=g
-	1u+wiuG/EMk/O94sM/CCvl1CRAmDj8SpBlEI20QD9A=; b=KJWaBZZCHkMP0zxou
-	wCks+gi5WQT6kbkTPLZaqKzoNkzMRifYzSopd9sGYqmEwFNMsem4LtmMhlbNgKxl
-	BT1E5s3yF4srVRi6aSXr9nd9idK1q2wDRKanzb4bhy70QLD3ja5tTmTVzaHsqf4/
-	TpFebmF/XRnGgjOXI74zdmw6Ez5Vu0YbWtHvXDKU7rokrs28Q+EfdwEUA09GKGc/
-	epUqx2RTzQyHG02YT7v9ofgaJl9BaxCdR71QROU/oxAJma6uK6xH/N9wUPWN0hLd
-	Uth7Ytii5csj0Yr1nG6lrom4efzaTT12q/mST+ccIkLk0i33HfeI9H4PVqKgL9ri
-	XH4Vg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4021kt0164-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 17:44:39 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45SHfOJ1013582;
-	Fri, 28 Jun 2024 17:44:39 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4021kt015u-8
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 17:44:39 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45SEQjmX019897;
-	Fri, 28 Jun 2024 16:55:12 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yxb5n13qx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 16:55:11 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45SGt66618809268
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 28 Jun 2024 16:55:08 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C26E2004B;
-	Fri, 28 Jun 2024 16:55:06 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DF76820063;
-	Fri, 28 Jun 2024 16:55:05 +0000 (GMT)
-Received: from [9.171.56.135] (unknown [9.171.56.135])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 28 Jun 2024 16:55:05 +0000 (GMT)
-Message-ID: <845b1fcb-d976-4414-a883-7eacbe55ed02@linux.ibm.com>
-Date: Fri, 28 Jun 2024 18:55:05 +0200
+	s=arc-20240116; t=1719600501; c=relaxed/simple;
+	bh=ohOu82hKGb5O5vKCUnXPReCL/omt2P2cGsq6dzVpQgg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IPpuJUOLv2kUI887xif1gu7P7/U/Gc64gPILkxZxNLQP1JeQ+xF9DRrlnJGLVRLMOME61xry4n9fQIMuDwQY5lfpqfjTPvZSyqwiIybFnLsRzI4OrFBKci3Yt3O/zSwNaTBHKv4pzfVIUxE1KCuTA7cWBMdAn5tl39bkTT8QyFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tz9qzgO1; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-57d16251a07so1896a12.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 11:48:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1719600498; x=1720205298; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=abJZGCGg9p3AOHP9CmO0KWDwdL1MOoAGeXSRn8P2SRI=;
+        b=tz9qzgO1A6KeptWzG/jL4LrAbMgTzkp8d2uaXLFQj2ZCRs/tBxR13Kp0VbLZS+bd7P
+         MDeBJtSffSCAqFuR2h4snAaGXcr6SnA9sbhKGdOMcjnuq2ypsoPG7mmsNEGeG/vef4MP
+         hTL8SPqOrLsN/V1UkCRa9ZKW3TLPuCzCDiLooPunK3vFtMEoKuyTYVXrzdtkbUh3+6J6
+         SHlNUeQLGiAsEausPgkxVmk44T4e68GcLfgtwoyUYwQLW4ieGEfa58xvNlTQ0daQ4aqg
+         34swiID1QV+CUWRXVYL3zfZ9iI5ZWucLOevtmUZtuQlazV7cn5YU9tIjY7X9l19vwZL3
+         y5ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719600498; x=1720205298;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=abJZGCGg9p3AOHP9CmO0KWDwdL1MOoAGeXSRn8P2SRI=;
+        b=gEvzmqLKKzhORbBim368c4UHiJ+C+ADRiBgqtd0ZIws1dUL3CWShNCE8OXpZyOq6PK
+         WdkfkxzuZGEADUgh/FVAGDfiv96B47QU1jSRo+gVLNji/s5ZBxxP3pjVVrnLpUcPa0PS
+         6I7XlLIZ3AkT+AZNCsObXz9MKBLSxYW8qOZ1OagAybfp0KvCksT2ekyghl4NALmyj+5F
+         +UPXU2C2gXWfmkrfTkkm1+W53mL+8iXzuKg/uGBo4wrMMNqEOkhx5om8FlWH0s0LgrZ3
+         5KNtWIO3LsIVXgmDnvroWp0eoA9NlbnKK/jNO270hFFT9OayECUqvtyorUkJBquen3X2
+         6dSw==
+X-Forwarded-Encrypted: i=1; AJvYcCWsQMPHY2mHNi4s0XgTMN7JfA7oksgxbZSmaNVTFKcwi+T5ogkBdkaFFOW10KRXNccXbIlNyrmYjbW+okgYe4zSyN8Q
+X-Gm-Message-State: AOJu0YxGuZos5vkPmkO+5HgvmLujvgi2BEF8fCcW+7uvI99Qy2uoacdw
+	frF/nFXs84zjZamiJgVzerbuCr4onuThQbZR6PQIrx1JtYwlmR5a5jiLWAuuSfPwfsdnREVx2aa
+	IxO8R/8qA98JIB/LM/chCeZtAjbHBheqd7Lvj
+X-Google-Smtp-Source: AGHT+IGvihwbUhusHWWPdSiPPgnic5+W6UFEhcbEi6LwWX3TzgMS2Jus/PkdwrB0oVy3pMw/VwbpYLaEqgYy9fp4c1M=
+X-Received: by 2002:a50:f68d:0:b0:57c:bb0d:5e48 with SMTP id
+ 4fb4d7f45d1cf-5872f673e4bmr22935a12.2.1719600498008; Fri, 28 Jun 2024
+ 11:48:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/1] KVM: s390: fix LPSWEY handling
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: Heiko Carstens <hca@linux.ibm.com>, KVM <kvm@vger.kernel.org>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-References: <20240627090520.4667-1-borntraeger@linux.ibm.com>
- <20240627095720.8660-D-hca@linux.ibm.com>
- <23e861e2-d184-4367-acc9-3e72c48c3282@linux.ibm.com>
- <20240628172259.1e172f35@p-imbrenda.boeblingen.de.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <20240628172259.1e172f35@p-imbrenda.boeblingen.de.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fnfXNAMDmAnupe0DUW9vo7BB1gbYOYr4
-X-Proofpoint-ORIG-GUID: SXvg07TKRGw7AYrXPB0d3vNaKYXwYUru
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-28_12,2024-06-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- malwarescore=0 adultscore=0 spamscore=0 suspectscore=0 priorityscore=1501
- bulkscore=0 mlxlogscore=749 phishscore=0 clxscore=1015 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2406280129
+References: <20240626073719.5246-1-amit@kernel.org> <Zn7gK9KZKxBwgVc_@google.com>
+In-Reply-To: <Zn7gK9KZKxBwgVc_@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 28 Jun 2024 11:48:01 -0700
+Message-ID: <CALMp9eSfZsGTngMSaWbFrdvMoWHyVK_SWf9W1Ps4BFdwAzae_g@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: SVM: let alternatives handle the cases when RSB
+ filling is required
+To: Sean Christopherson <seanjc@google.com>
+Cc: Amit Shah <amit@kernel.org>, pbonzini@redhat.com, x86@kernel.org, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, amit.shah@amd.com, 
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, 
+	dave.hansen@linux.intel.com, hpa@zytor.com, kim.phillips@amd.com, 
+	david.kaplan@amd.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jun 28, 2024 at 9:09=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Wed, Jun 26, 2024, Amit Shah wrote:
+> > ---
+> >  arch/x86/kvm/svm/vmenter.S | 8 ++------
+> >  1 file changed, 2 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
+> > index a0c8eb37d3e1..2ed80aea3bb1 100644
+> > --- a/arch/x86/kvm/svm/vmenter.S
+> > +++ b/arch/x86/kvm/svm/vmenter.S
+> > @@ -209,10 +209,8 @@ SYM_FUNC_START(__svm_vcpu_run)
+> >  7:   vmload %_ASM_AX
+> >  8:
+> >
+> > -#ifdef CONFIG_MITIGATION_RETPOLINE
+> >       /* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET=
+! */
+> > -     FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLI=
+NE
+> > -#endif
+> > +     FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VME=
+XIT
+>
+> Out of an abundance of paranoia, shouldn't this be?
+>
+>         FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VME=
+XIT,\
+>                            X86_FEATURE_RSB_VMEXIT_LITE
+>
+> Hmm, but it looks like that would incorrectly trigger the "lite" flavor f=
+or
+> families 0xf - 0x12.  I assume those old CPUs aren't affected by whatever=
+ on earth
+> EIBRS_PBRSB is.
+>
+>         /* AMD Family 0xf - 0x12 */
+>         VULNWL_AMD(0x0f,        NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS |=
+ NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_BHI),
+>         VULNWL_AMD(0x10,        NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS |=
+ NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_BHI),
+>         VULNWL_AMD(0x11,        NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS |=
+ NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_BHI),
+>         VULNWL_AMD(0x12,        NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS |=
+ NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_BHI),
+>
+>         /* FAMILY_ANY must be last, otherwise 0x0f - 0x12 matches won't w=
+ork */
+>         VULNWL_AMD(X86_FAMILY_ANY,      NO_MELTDOWN | NO_L1TF | NO_MDS | =
+NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_EIBRS_PBRSB | NO_BHI),
+>         VULNWL_HYGON(X86_FAMILY_ANY,    NO_MELTDOWN | NO_L1TF | NO_MDS | =
+NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_EIBRS_PBRSB | NO_BHI),
 
+Your assumption is correct. As for why the cpu_vuln_whitelist[]
+doesn't say so explicitly, you need to read between the lines...
 
-Am 28.06.24 um 17:22 schrieb Claudio Imbrenda:
-[...]
-> disp1 = sign_extend64(disp1, 20);
+>        /*
+>         * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the Intel f=
+eature
+>         * flag and protect from vendor-specific bugs via the whitelist.
+>         *
+>         * Don't use AutoIBRS when SNP is enabled because it degrades host
+>         * userspace indirect branch performance.
+>         */
+>        if ((x86_arch_cap_msr & ARCH_CAP_IBRS_ALL) ||
+>            (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
+>             !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
+>                setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
+>                if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB) &&
+>                    !(x86_arch_cap_msr & ARCH_CAP_PBRSB_NO))
+>                        setup_force_cpu_bug(X86_BUG_EIBRS_PBRSB);
+>        }
 
-[...]
+Families 0FH through 12H don't have EIBRS or AutoIBRS, so there's no
+cpu_vuln_whitelist[] lookup. Hence, no need to set the NO_EIBRS_PBRSB
+bit, even if it is accurate.
 
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-
-I dropped this RB since I did use 19 instead of 20 for sign_extend64
+> >
+> >       /* Clobbers RAX, RCX, RDX.  */
+> >       RESTORE_HOST_SPEC_CTRL
+> > @@ -348,10 +346,8 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
+> >
+> >  2:   cli
+> >
+> > -#ifdef CONFIG_MITIGATION_RETPOLINE
+> >       /* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET=
+! */
+> > -     FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
+> > -#endif
+> > +     FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
+> >
+> >       /* Clobbers RAX, RCX, RDX, consumes RDI (@svm) and RSI (@spec_ctr=
+l_intercepted). */
+> >       RESTORE_HOST_SPEC_CTRL
+> > --
+> > 2.45.2
+> >
+>
 
