@@ -1,98 +1,137 @@
-Return-Path: <kvm+bounces-20631-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20632-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77F5B91B684
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 07:48:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61C9491B6AF
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 08:05:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C64F2834D0
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 05:48:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 093F81F21448
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 06:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3765B4645B;
-	Fri, 28 Jun 2024 05:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F3A54D8BE;
+	Fri, 28 Jun 2024 06:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="d/Pz2trK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JtdGV2u+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CCE4CE04;
-	Fri, 28 Jun 2024 05:48:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF604654D
+	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 06:05:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719553713; cv=none; b=YNYj0gttlZrFfVsVsQycklI/fFtc/Lkqc61tb2KgapI/VMbLofVB6kPx84Tx/5mo6V5QIbA7rJ9vv8iXqbr5+6I9YZ40zzveKT5MHV6QtUwcCwIAsB7Vz7ybo2JWVcwzMux60pXP2hewvfmgqEfOgyZ2DqBv1Rdorqc7GoFaeDg=
+	t=1719554712; cv=none; b=S8aezb3F0phMHxelpKXnrkBd6T2tQe0aLx8AlYYkvpTTwLZBz266w4tLJIHGJkPwBMS3PpqTfxMXGJkurpm/kdQYW31+gVYaEA9FwDUQQelzm+WBOTvCH2zuqlSaYYBFyV+E63lnVFK2YU+EKOm0SEoN6lvybWwhPSN4wvlPKNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719553713; c=relaxed/simple;
-	bh=Q7WKdA+hXAXxgy3HlHSu/1B6QEXdSV/MXBkZGhnG1mc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T5jlFfkjJeRrRk+To+BApqaKb7XWK0PHwZKPWvVBmb+MgZwq1SnZoAn9ViZ2sbf3hBKFUoKq9PQxh/xyZr8JVKCL1b0RiwWCLPrgMRqtUCSRCtCAHPYRj0Beyp51rmTbIg6fjIp4xxmrRCc7ocj415jRS6Of+t4elcZ0vIBXIjc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=d/Pz2trK; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id CE13340E0027;
-	Fri, 28 Jun 2024 05:48:25 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id wjRQb-ly-jwM; Fri, 28 Jun 2024 05:48:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1719553702; bh=1KU5WjFQ9OJnMvH5xK9i0KmW4ZpX/9vw0VqmKD1BVww=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d/Pz2trKsApd/38kYUe3Xe8yY7jGH5jrB6FRDgJ0at3d5icC02X1q0QdnNUd1fzQ/
-	 6QifQubLf5X7Vl4+HddBG7IEbEPMUdy26xm4YOxeAVzZHhTZj/Er0Cqy5DlMQnN4xd
-	 ENo3dJhiA45BVtezOI1O6DVKz4sEIpqfyyxYjGwpIX6ACiNNKHcAfcihLX5C9gBoKy
-	 VUayowiGzw/JoMtzXzwsSuWDH94fN/0+mZs4c5pXBsKR8FNHSPeCYiXMug6FHKbM7J
-	 2Nr8knj31IEjNETCvb71aMHl8PXP5C0myYk9WOb2XTvV004gBOcS0JA9I9RJ+YwNPU
-	 FLOvu1j+u2LyOj5cvvi1YB3GdG3l43mgQ0IOzQo8/p1HCml1Fa5S5y6cbNri69rKx9
-	 IAzDPt4DdlbJvv6QF0Jpvt2Vz6hE6uiN/q+bM14unFUQrz3Xt4I8oNEZAT3SEMypNE
-	 DADh1QKBVUgAwlRTyvOn3uhXUNlSN564mymnM6CGGu09EklqKix6Tlr84bGN7zdA1b
-	 Hl/N8BaKGElBGh774HtuNszd8OnqNuGyiSYITHlK7KX3YWzevtfkSIf+yaeWoRqffj
-	 gKkMGDfrHPlI2RP2KHBNkb639KruVP9noEcaDOS/DTfZstqZBuUr8zeh0pnfCFrE/d
-	 Ht9/tFRpGOgXVHIkL36vx/LA=
-Received: from nazgul.tnic (unknown [24.134.159.81])
+	s=arc-20240116; t=1719554712; c=relaxed/simple;
+	bh=lU1XvXjiFFxsti9Je9vlciruaCZtXmC+z+HqWsgjafU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YpSlnRn0jmTh/FEkE05oGw1Kiwsxq1+gGGZbYCPAuBMSoCuMqD9tpK/iNf0KyMuL0ExwkRNGiB/eeLfZpd69g7kWR41OqgjVY8DPMn/snbgVR0CGTF1jJLRcIk+c5obkiYsUf1bv9/zhDZmCamUdCsvU7oJakYuvtu2ijofvMFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JtdGV2u+; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719554709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ajvn4ITctkTMolN6abYxpt2/qWjVElb6xUSFcHxU6sg=;
+	b=JtdGV2u+8g8Kc1ujLZhReX8T3pOeq5bzZd2uvPD2u5hgxvkPA5Wmtg5s7UdKujzrMqral4
+	BGE2OIz0LD/vdaCwQ2QYAuvY0jPxy0sJe0XblPYPyTa8ypJgqZigz8qVdulMBNjFt5fxX8
+	wuRLfcDD4adMQ2NoASldHu99357Vbns=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-554-Uu0m_sE3NF6Jx4ije6529w-1; Fri,
+ 28 Jun 2024 02:05:05 -0400
+X-MC-Unique: Uu0m_sE3NF6Jx4ije6529w-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id A4D8040E0192;
-	Fri, 28 Jun 2024 05:48:11 +0000 (UTC)
-Date: Fri, 28 Jun 2024 07:48:31 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: "Nikunj A. Dadhania" <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v10 06/24] virt: sev-guest: Simplify VMPCK and sequence
- number assignments
-Message-ID: <20240628054831.GAZn5Or1GyxAzAdqt0@fat_crate.local>
-References: <20240621123903.2411843-1-nikunj@amd.com>
- <20240621123903.2411843-7-nikunj@amd.com>
- <20240625170450.GMZnr4surYmBPd94lC@fat_crate.local>
- <97f596b5-5ced-867f-5246-03345d06bed6@amd.com>
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5C1E91955DA6;
+	Fri, 28 Jun 2024 06:05:03 +0000 (UTC)
+Received: from virt-mtcollins-01.lab.eng.rdu2.redhat.com (virt-mtcollins-01.lab.eng.rdu2.redhat.com [10.8.1.196])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0819419560A3;
+	Fri, 28 Jun 2024 06:04:59 +0000 (UTC)
+From: Shaoqin Huang <shahuang@redhat.com>
+To: Oliver Upton <oliver.upton@linux.dev>,
+	Marc Zyngier <maz@kernel.org>,
+	kvmarm@lists.linux.dev
+Cc: Shaoqin Huang <shahuang@redhat.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	James Morse <james.morse@arm.com>,
+	kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH v3 0/2] Allow userspace to change ID_AA64PFR1_EL1
+Date: Fri, 28 Jun 2024 02:04:50 -0400
+Message-Id: <20240628060454.1936886-1-shahuang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <97f596b5-5ced-867f-5246-03345d06bed6@amd.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Fri, Jun 28, 2024 at 09:55:28AM +0530, Nikunj A. Dadhania wrote:
-> Yes, changed in following patch 07/24. Do you want me to pull those
-> changes to this patch ?
+Allow userspace to change the guest-visible value of the register with
+some severe limitation:
 
-Nah, not needed.
+  - No changes to features not virtualized by KVM (MPAM_frac, RAS_frac,
+    SME, RNDP_trap).
+
+  - No changes to features (CSV2_frac, NMI, MTE_frac, GCS, THE, MTEX,
+    DF2, PFAR) which haven't been added into the ftr_id_aa64pfr1[].
+    Because the struct arm64_ftr_bits definition for each feature in the
+    ftr_id_aa64pfr1[] is used by arm64_check_features. If they're not
+    existing in the ftr_id_aa64pfr1[], the for loop won't check the if
+    the new_val is safe for those features.
+
+For the question why can't those fields be hidden depending on the VM
+configuration? I don't find there is the related VM configuration, maybe we
+should add the new VM configuration?
+
+I'm not sure I'm right, so if there're any problems please help to point out and
+I will fix them.
+
+Also add the selftest for it.
+
+Changelog:
+----------
+v2 -> v3:
+  * Give more description about why only part of the fields can be writable.
+  * Updated the writable mask by referring the latest ARM spec.
+
+v1 -> v2:
+  * Tackling the full register instead of single field.
+  * Changing the patch title and commit message.
+
+RFCv1 -> v1:
+  * Fix the compilation error.
+  * Delete the machine specific information and make the description more
+    generable.
+
+RFCv1: https://lore.kernel.org/all/20240612023553.127813-1-shahuang@redhat.com/
+v1: https://lore.kernel.org/all/20240617075131.1006173-1-shahuang@redhat.com/
+v2: https://lore.kernel.org/all/20240618063808.1040085-1-shahuang@redhat.com/
+
+Shaoqin Huang (2):
+  KVM: arm64: Allow userspace to change ID_AA64PFR1_EL1
+  KVM: selftests: aarch64: Add writable test for ID_AA64PFR1_EL1
+
+ arch/arm64/kvm/sys_regs.c                         | 4 +++-
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c | 8 ++++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
 
 -- 
-Regards/Gruss,
-    Boris.
+2.40.1
 
-https://people.kernel.org/tglx/notes-about-netiquette
 
