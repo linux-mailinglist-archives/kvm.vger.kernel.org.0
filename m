@@ -1,171 +1,178 @@
-Return-Path: <kvm+bounces-20680-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20681-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5FB91C27D
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 17:21:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D91BE91C29C
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 17:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7C642802AB
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 15:21:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07B391C211C9
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 15:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1884C1CB301;
-	Fri, 28 Jun 2024 15:20:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 516D01C233D;
+	Fri, 28 Jun 2024 15:26:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L281UsoW"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="hzUkfmyS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADDF11C2336;
-	Fri, 28 Jun 2024 15:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDDB1E878;
+	Fri, 28 Jun 2024 15:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719588001; cv=none; b=PTOlQjg9GB2BFMbejZMQPAqyPnfhMJDqSiJumMd/SaJdVOxxqjm3BZeQ6GxK8lNIx3oSNXIlKYsj5cbubDUeTPUO/siulm9aMNhiT/mkPlSL2vdKVjKCUBRs5pWkq8N95eKGokCFNTRESaico+fIeEWDpuSZZ0pxCdd42BafRAA=
+	t=1719588410; cv=none; b=c72nCUaP7nZItKT9V7/Co/hQD0X6dl8ojrtUwN8eDwnry4ngbQGxSBePdxETTkLYSOE7GwfHCIpIbkwUOUVda3uCw1BxsK/SFsZeyJfJahdjRwMLieGqy38fhaU0Yza+lCD955NMYe5uYpH5PaCPdQMW8CyfgUdf94rxqgjAcoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719588001; c=relaxed/simple;
-	bh=3I4qytfU1UkShz8BnwuREmBojQJIahzWA24/ByvF5Os=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IPLppcf4kO8romoKbCWBH1fQU/tb/XB5iNtMWMqlhLqQ3y+zWFUxqCl55XLgH+tSbny/XwoBCzddusQv43yGXpdbogBbSAjZDM+zW9YBoYf2+X935DYyfH4Xmm/rWV3hiNo0riadiwb5qXakxCXrN6E13lIJINTs9jkwzGFNsiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L281UsoW; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719588000; x=1751124000;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3I4qytfU1UkShz8BnwuREmBojQJIahzWA24/ByvF5Os=;
-  b=L281UsoWVssHfMl+PfA04aEGS84eiFvZd2O6v6/dy2XcFprt+wszWpz9
-   DvgAB+Oqc7vDLQPMlqlvLiHgTS+RISU/hjOK61wTjh4P548SDE5VfPnyt
-   zn4wzTev9imAWDOapcMLtUTZ+Pnt5rd3d/v6JSAgkeXDv0SWKf3LdK1fg
-   jCiaxSDI5bvhrUNhH7dAzgcP9dOM1E0v1GK8tz2gYny/ygqz0hHqHmURZ
-   XglTTzg6bQy3bz/PfSKJTD5xKpgWs9Ldhx2/YVdahopcmrmJx3XRCpunD
-   rbBalrwP+Hj87kd7TE0rp5ruGPXmBOG8IYld18XLIbxZF63WFsT5j3+mY
-   Q==;
-X-CSE-ConnectionGUID: MGoOhvq6QNih6FoaftcOOw==
-X-CSE-MsgGUID: Kdv8Vbm7QridZPxGg8PBXw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11117"; a="42195707"
-X-IronPort-AV: E=Sophos;i="6.09,169,1716274800"; 
-   d="scan'208";a="42195707"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2024 08:19:59 -0700
-X-CSE-ConnectionGUID: w/00j5kkSKC7Ae7PujqBPQ==
-X-CSE-MsgGUID: rb0JCCsZRNiSX+Z+MEO3yQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,169,1716274800"; 
-   d="scan'208";a="75972129"
-Received: from yzhao56-desk.sh.intel.com ([10.239.159.62])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2024 08:19:57 -0700
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: alex.williamson@redhat.com,
-	kevin.tian@intel.com,
-	jgg@nvidia.com,
-	yi.l.liu@intel.com,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH] vfio: Get/put KVM only for the first/last vfio_df_open/close in cdev path
-Date: Fri, 28 Jun 2024 23:18:45 +0800
-Message-ID: <20240628151845.22166-1-yan.y.zhao@intel.com>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1719588410; c=relaxed/simple;
+	bh=bOdk9e3ONqASY0ghc4ezQAiv5Knyu/QoY9p3DKOQ+xM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=r3O48+vmG7WGhzr/hPB1BGXCM8awYcBEo01wNCWQLxAC+fXK8jsKpoJCo8rmjmfJKSSWUGQcp28AeugpYXph6ApqSI4XK5BKqNX5YjjW3msSkX1U8CEhA0nfT6e/MH0IWlvcruQaG+huq6+SegESwpu+gWLuIOHe0UZ4psNU0+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=hzUkfmyS; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45SFQlJB032083;
+	Fri, 28 Jun 2024 15:26:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	U15gTK2jCnWsIlxP9h9R0Wj2ET/URq9jX8ATEMg3E/g=; b=hzUkfmyS+Nurt3K7
+	gA9XfFHounlQI4AO9YV+1eGhWyAZaGUShRHMMbOddtkJZYo+C3nPO7UNl/J//w9j
+	wJAKe1hAr6uE+aYw5rDc/svJdmWk/z68ElwoJEljw3FrEIjaLQ2lVXEovWW5F4IR
+	gxlK6TTQe70k9DdG/JeqU1VRQh1dv1bO/PDZcXA6D131BjevFhaZafOnwozoKDg3
+	1PEFyDmnV144FW1N9/TWNGuN+XfDASciPDSMAjAfo6pfz1XoDg+jrcJB2J4YNgNj
+	K1KMIkkyHTQpdHfZ6K5GgfDt9+o6xGnhURZcI6zPHZZ+SVYN7sESe5gsA0l16t+P
+	DRGICg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401wn7rdpp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Jun 2024 15:26:46 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45SFQk38032028;
+	Fri, 28 Jun 2024 15:26:46 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401wn7rdng-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Jun 2024 15:26:46 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45SDsBjV019672;
+	Fri, 28 Jun 2024 15:23:06 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yx9xqh1rf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Jun 2024 15:23:06 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45SFN0Bf33358406
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 28 Jun 2024 15:23:03 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E10622004D;
+	Fri, 28 Jun 2024 15:23:00 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9A0D720043;
+	Fri, 28 Jun 2024 15:23:00 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 28 Jun 2024 15:23:00 +0000 (GMT)
+Date: Fri, 28 Jun 2024 17:22:59 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>, KVM <kvm@vger.kernel.org>,
+        Janosch
+ Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390 <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>,
+        Sven
+ Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH 1/1] KVM: s390: fix LPSWEY handling
+Message-ID: <20240628172259.1e172f35@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <23e861e2-d184-4367-acc9-3e72c48c3282@linux.ibm.com>
+References: <20240627090520.4667-1-borntraeger@linux.ibm.com>
+	<20240627095720.8660-D-hca@linux.ibm.com>
+	<23e861e2-d184-4367-acc9-3e72c48c3282@linux.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 1Mv0SV4VEbo4KrVI7m3F1rElxHrW7nPl
+X-Proofpoint-ORIG-GUID: 6HGI77rFZ_rRchE5EORPFAGRPSdmhLyo
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-28_10,2024-06-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 adultscore=0
+ malwarescore=0 mlxlogscore=830 bulkscore=0 phishscore=0 clxscore=1015
+ spamscore=0 impostorscore=0 lowpriorityscore=0 mlxscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2406280113
 
-In the device cdev path, adjust the handling of the KVM reference count to
-only increment with the first vfio_df_open() and decrement after the final
-vfio_df_close(). This change addresses a KVM reference leak that occurs
-when a device cdev file is opened multiple times and attempts to bind to
-iommufd repeatedly.
+On Fri, 28 Jun 2024 16:53:20 +0200
+Christian Borntraeger <borntraeger@linux.ibm.com> wrote:
 
-Currently, vfio_df_get_kvm_safe() is invoked prior to each vfio_df_open()
-in the cdev path during iommufd binding. The corresponding
-vfio_device_put_kvm() is executed either when iommufd is unbound or if an
-error occurs during the binding process.
+> Am 27.06.24 um 11:57 schrieb Heiko Carstens:
+> > On Thu, Jun 27, 2024 at 11:05:20AM +0200, Christian Borntraeger wrote:  
+> >> in rare cases, e.g. for injecting a machine check we do intercept all
+> >> load PSW instructions via ICTL_LPSW. With facility 193 a new variant
+> >> LPSWEY was added. KVM needs to handle that as well.
+> >>
+> >> Fixes: a3efa8429266 ("KVM: s390: gen_facilities: allow facilities 165, 193, 194 and 196")
+> >> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+> >> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+> >> ---
+> >>   arch/s390/include/asm/kvm_host.h |  1 +
+> >>   arch/s390/kvm/kvm-s390.c         |  1 +
+> >>   arch/s390/kvm/kvm-s390.h         | 16 ++++++++++++++++
+> >>   arch/s390/kvm/priv.c             | 32 ++++++++++++++++++++++++++++++++
+> >>   4 files changed, 50 insertions(+)  
+> > 
+> > ...
+> >   
+> >> +static inline u64 kvm_s390_get_base_disp_siy(struct kvm_vcpu *vcpu, u8 *ar)
+> >> +{
+> >> +	u32 base1 = vcpu->arch.sie_block->ipb >> 28;
+> >> +	u32 disp1 = ((vcpu->arch.sie_block->ipb & 0x0fff0000) >> 16) +
 
-However, issues arise when a device binds to iommufd more than once. The
-second vfio_df_open() will fail during iommufd binding, and
-vfio_device_put_kvm() will be triggered, setting device->kvm to NULL.
-Consequently, when iommufd is unbound from the first successfully bound
-device, vfio_device_put_kvm() becomes ineffective, leading to a leak in the
-KVM reference count.
+long disp1 = ... 
 
-Below is the calltrace that will be produced in this scenario when the KVM
-module is unloaded afterwards, reporting "BUG kvm_vcpu (Tainted: G S):
-Objects remaining in kvm_vcpu on __kmem_cache_shutdown()".
+> >> +			((vcpu->arch.sie_block->ipb & 0xff00) << 4);
+> >> +
+> >> +	/* The displacement is a 20bit _SIGNED_ value */
+> >> +	if (disp1 & 0x80000)
+> >> +		disp1+=0xfff00000;
 
-Call Trace:
- <TASK>
- dump_stack_lvl+0x80/0xc0
- slab_err+0xb0/0xf0
- ? __kmem_cache_shutdown+0xc1/0x4e0
- ? rcu_is_watching+0x11/0x50
- ? lock_acquired+0x144/0x3c0
- __kmem_cache_shutdown+0x1b7/0x4e0
- kmem_cache_destroy+0xa6/0x260
- kvm_exit+0x80/0xc0 [kvm]
- vmx_exit+0xe/0x20 [kvm_intel]
- __x64_sys_delete_module+0x143/0x250
- ? ktime_get_coarse_real_ts64+0xd3/0xe0
- ? syscall_trace_enter+0x143/0x210
- do_syscall_64+0x6f/0x140
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+disp1 = sign_extend64(disp1, 20);
 
-Fixes: 5fcc26969a16 ("vfio: Add VFIO_DEVICE_BIND_IOMMUFD")
-Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
----
- drivers/vfio/device_cdev.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+> >> +
+> >> +	if (ar)
+> >> +		*ar = base1;
+> >> +
+> >> +	return (base1 ? vcpu->run->s.regs.gprs[base1] : 0) + (long)(int)disp1;
 
-diff --git a/drivers/vfio/device_cdev.c b/drivers/vfio/device_cdev.c
-index bb1817bd4ff3..3b85d01d1b27 100644
---- a/drivers/vfio/device_cdev.c
-+++ b/drivers/vfio/device_cdev.c
-@@ -65,6 +65,7 @@ long vfio_df_ioctl_bind_iommufd(struct vfio_device_file *df,
- {
- 	struct vfio_device *device = df->device;
- 	struct vfio_device_bind_iommufd bind;
-+	bool put_kvm = false;
- 	unsigned long minsz;
- 	int ret;
- 
-@@ -101,12 +102,15 @@ long vfio_df_ioctl_bind_iommufd(struct vfio_device_file *df,
- 	}
- 
- 	/*
--	 * Before the device open, get the KVM pointer currently
-+	 * Before the device's first open, get the KVM pointer currently
- 	 * associated with the device file (if there is) and obtain
--	 * a reference.  This reference is held until device closed.
-+	 * a reference.  This reference is held until device's last closed.
- 	 * Save the pointer in the device for use by drivers.
- 	 */
--	vfio_df_get_kvm_safe(df);
-+	if (device->open_count == 0) {
-+		vfio_df_get_kvm_safe(df);
-+		put_kvm = true;
-+	}
- 
- 	ret = vfio_df_open(df);
- 	if (ret)
-@@ -129,7 +133,8 @@ long vfio_df_ioctl_bind_iommufd(struct vfio_device_file *df,
- out_close_device:
- 	vfio_df_close(df);
- out_put_kvm:
--	vfio_device_put_kvm(device);
-+	if (put_kvm)
-+		vfio_device_put_kvm(device);
- 	iommufd_ctx_put(df->iommufd);
- 	df->iommufd = NULL;
- out_unlock:
++ disp1;
 
-base-commit: 6ba59ff4227927d3a8530fc2973b80e94b54d58f
--- 
-2.43.2
+> >> +}  
+> > 
+> > You may want to use sign_extend32() or sign_extend64() instead of open-coding.  
+> 
+> Something like sign_extend64(disp1, 31)
+> I actually find that harder to read, but I am open for other opinions.
 
+I think what he meant is what I wrote above, but it doesn't matter too
+much.
+
+
+with or without the above improvements:
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
