@@ -1,164 +1,233 @@
-Return-Path: <kvm+bounces-20634-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20635-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4031B91B6DB
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 08:16:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31BB191B8FE
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 09:52:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C127C282692
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 06:16:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56178287AF2
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 07:52:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E05A55898;
-	Fri, 28 Jun 2024 06:16:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3EE143864;
+	Fri, 28 Jun 2024 07:52:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fKO05Pcs"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="V9frxGw+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D87554278;
-	Fri, 28 Jun 2024 06:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB0614532C
+	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 07:52:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719555378; cv=none; b=m3JdQqozjplqsj19z7vIkzW8MwfBwUE9lh6FFXbRuk77lmk3T06Mb3S0hOCz3jXuMPLap/hqQCURiYeb+4FAUZ8DIRSp11ACqKJgSEAW+ZjedsHOWAE9sh2adwAT1IghHJiaiFNRv0wNwRXYpyL4CDBAv41gqK4Z0Zko64c/P9Q=
+	t=1719561126; cv=none; b=Fyc8FCxaJJPwzJdsXQdgIuE1Gfn7Q2/mnyWaT8wMpkHWxFQlVmOTblPTQAGNfYGqL3qWp2pa8OSEvAfj/TIA0c7sNV8TevNoenSfiXLDiJ+Jq7aGhKD3TFh+3PGeVkk9ELpuAp47Zl9359yJNBuPBIXGfGWXGxi8j4mR7M0qhPc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719555378; c=relaxed/simple;
-	bh=VHivx3TXk6rbGD53jPWHJbhtFADdjRmAebTMKel3LII=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QONk+iqQ1nihFFXC/VauK26iNxKin1B7Q2vDtA0groFwsy4w0DDXE/zvvABz30RCDUeGTVVMsWmH5lAD9JSSBZ5kGRXPux+YWi1QCriHLJw9QZtZsVOsCKhEOER3zi0Z67Po4IYPxCeVvbepUP42EvfFUu9XOlh3F3jzdqRg/Lw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fKO05Pcs; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719555377; x=1751091377;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VHivx3TXk6rbGD53jPWHJbhtFADdjRmAebTMKel3LII=;
-  b=fKO05Pcs/ho9TK8Zlhv4JaJKS72QKEnVRBJXXQDY03MpnChX5xQxa5v5
-   OBRqy9y3npWi+/3SgfCIHFjIKSUZw64m9F/vUHjkmFAGNmi6KCs1KHSgM
-   qFbtgpZehF0umLMIVrthQoq2/2CB0WkGzChq3TsSWgJxgRXtv7LSklcbn
-   NF7CKuyIXFkBSsDVCRMYtmw9/O3msPQv6/prrJ/U2sphJhmn79U2T1Q7j
-   fAZ3Xc7T4lbL5hWqszd6c59+6ZVWqbjh16w8T6YSo4sL0CKPiwFYBC8AB
-   CJXmMYUYL94IL75jxKMkYvIWCtcROwZWGoCzl182V8xO7HnV4vrtZv3t0
-   g==;
-X-CSE-ConnectionGUID: WGG2NTRHRySHc3rhQMS4Cw==
-X-CSE-MsgGUID: 4JAUWHoUTnaRMTCXH1Q38g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="28118913"
-X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
-   d="scan'208";a="28118913"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2024 23:16:15 -0700
-X-CSE-ConnectionGUID: 1Db3jF/gRaSXKeo8tyf+bA==
-X-CSE-MsgGUID: LPQGGceOT/GqBxTXASLnug==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
-   d="scan'208";a="44548736"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 27 Jun 2024 23:16:08 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sN4ty-000Gs2-0m;
-	Fri, 28 Jun 2024 06:16:06 +0000
-Date: Fri, 28 Jun 2024 14:15:45 +0800
-From: kernel test robot <lkp@intel.com>
-To: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org, Luigi Leonardi <luigi.leonardi@outlook.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl
- for all vsock socket types.
-Message-ID: <202406281355.d1jNVGBc-lkp@intel.com>
-References: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
+	s=arc-20240116; t=1719561126; c=relaxed/simple;
+	bh=EQnkaeiVzliUJR5h0Fr7U2mwCLH2PFeHVytjBFr15sU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BNZFalcn3zx+SifAgr8h1Qnop7oqJrpu3i91EihRCAOr4MiJxD368GcVqaNI/EGSMvKuy9smNbBOatWpoelPZV3kHxFSHR+BrTvaCeqwXaunGBTQ2/0bV1wf5aETasBPkLkWC+5VBYcT1OtcdsuOHfrjYFLuKTpyj4oqdtI7J9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=V9frxGw+; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5b53bb4bebaso155115eaf.0
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 00:52:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1719561123; x=1720165923; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lfk2FSfAfTy7rTZuEBD/W0oaye5LlvyVrrLcE/eP+AI=;
+        b=V9frxGw+TWEPYHSq8Ar0+9i1u/B0YCPIVI9rYp9DOiWE31J1CGdiQGj/GQ3CEVHD0C
+         xp7lIYqpStplazpxgegnvev/YPmkIZapqNuRpM5JsL7f8YSahFUYg5cQuLjfqgzSBJOR
+         Imuds7Elk3WBXUiGsHwp2umzi7JgScSstm6+RzkFNvUyB4fDWEmJr3yp8pzh/47zp5xh
+         eQkJZ5CTByhwz/ZrykwMiS0npXypSr04L10tsWSwcD73QmKu3/tyLGepj83UWmVi6cea
+         eYitJAeo3Rnt/nyY+KrLpFhdo8yvNNMZOoQOqaBVKq7Nr55+MkSpfovM3tRRO9uPgD8m
+         JBIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719561123; x=1720165923;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lfk2FSfAfTy7rTZuEBD/W0oaye5LlvyVrrLcE/eP+AI=;
+        b=JuwyXWkh3jaPFxyPEAo8SF+qvs0NoNtduhpDYFBBzI0UQPSPfbHYOpzNVe92ZNQuXI
+         cElWPC3/h+G26H3CNrlG/zZ+MtWSI5V2iQ7qkGX16u/+QObccLhzA5o0GZiIl8NBULAq
+         pq4SrnWdZMZ6/NP2mbL3llHK3e+AOJ7qnqrhFDfTZgGcXQwKFjMeWzmdj4RvpWBovPno
+         WaSqdkXfdT1fDfuW2tG0EyetNN5yMsOiBg5GhdPWzNYAVDywZW4w8NjXoAbn1tC17ic2
+         wuNFc6bx+COEQxOYsI89uIBhnQof+2xLO6QdAXc0c3fUuiFML9LQDViq5Il2ocgZ012x
+         2PSg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3Y3gezxs7+neLreBb99iR+ETvLoSsbWzTlCF8TFVjBEdP866eUuFQu3OSTtodXpg8IYz6D5PZDB0BI93wwg69fHcT
+X-Gm-Message-State: AOJu0Yz1S3GD3rC/nvUc6GZRgt9qNNp/CJkjraZUgLzGRMmEvDnYai2h
+	6XitzL5B130c8qcjEAZxJJyairgsMSZaTz3fj8LYlSC9KRj8mv/gfvXT2/ltx1Q=
+X-Google-Smtp-Source: AGHT+IGJY3zwz2Dh3ONBt7zBT44037cWL19x8gYpDsscR2++QxJYS7DFgyh8r/X4g1UFT/8YlTY5Ng==
+X-Received: by 2002:a05:6358:9497:b0:1a6:5ef1:c372 with SMTP id e5c5f4694b2df-1a65ef1c9c7mr603886655d.26.1719561123194;
+        Fri, 28 Jun 2024 00:52:03 -0700 (PDT)
+Received: from atishp.ba.rivosinc.com ([64.71.180.162])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c69b53bf2sm685068a12.2.2024.06.28.00.52.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 28 Jun 2024 00:52:02 -0700 (PDT)
+From: Atish Patra <atishp@rivosinc.com>
+Subject: [PATCH v4 0/3] Assorted fixes in RISC-V PMU driver
+Date: Fri, 28 Jun 2024 00:51:40 -0700
+Message-Id: <20240628-misc_perf_fixes-v4-0-e01cfddcf035@rivosinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240626-ioctl_next-v3-1-63be5bf19a40@outlook.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIxrfmYC/2WNwQrCMBBEf6Xs2UhImho8+R+llJps7B7alKwEp
+ eTfjQVPHt8Mb2YHxkTIcG12SJiJKa4V2lMDbp7WBwrylUFJ1cpOGbEQu3HDFMZAL2RhnLkEY4y
+ 3ykK1toRHUaV+qDwTP2N6HwdZf9PfVve3lbWQwqMOFr21frrfEuXItLqziwsMpZQPn0Cn3bEAA
+ AA=
+To: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org
+Cc: Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, 
+ Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+ Paul Walmsley <paul.walmsley@sifive.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, Andrew Jones <ajones@ventanamicro.com>, 
+ Conor Dooley <conor.dooley@microchip.com>, 
+ Samuel Holland <samuel.holland@sifive.com>, 
+ Palmer Dabbelt <palmer@rivosinc.com>, 
+ Alexandre Ghiti <alexghiti@rivosinc.com>, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ kvm@vger.kernel.org, Atish Patra <atishp@rivosinc.com>, garthlei@pku.edu.cn
+X-Mailer: b4 0.15-dev-13183
 
-Hi Luigi,
+This series contains 3 fixes out of which the first one is a new fix
+for invalid event data reported in lkml[2]. The last two are v3 of Samuel's
+patch[1]. I added the RB/TB/Fixes tag and moved 1 unrelated change
+to its own patch. I also changed an error message in kvm vcpu_pmu from
+pr_err to pr_debug to avoid redundant failure error messages generated
+due to the boot time quering of events implemented in the patch[1]
 
-kernel test robot noticed the following build warnings:
+Here is the original cover letter for the patch[1]
 
-[auto build test WARNING on 50b70845fc5c22cf7e7d25b57d57b3dca1725aa5]
+Before this patch:
+$ perf list hw
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Luigi-Leonardi-via-B4-Relay/vsock-add-support-for-SIOCOUTQ-ioctl-for-all-vsock-socket-types/20240627-023902
-base:   50b70845fc5c22cf7e7d25b57d57b3dca1725aa5
-patch link:    https://lore.kernel.org/r/20240626-ioctl_next-v3-1-63be5bf19a40%40outlook.com
-patch subject: [PATCH net-next v3 1/3] vsock: add support for SIOCOUTQ ioctl for all vsock socket types.
-config: i386-randconfig-141-20240628 (https://download.01.org/0day-ci/archive/20240628/202406281355.d1jNVGBc-lkp@intel.com/config)
-compiler: gcc-8 (Ubuntu 8.4.0-3ubuntu2) 8.4.0
+List of pre-defined events (to be used in -e or -M):
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202406281355.d1jNVGBc-lkp@intel.com/
+  branch-instructions OR branches                    [Hardware event]
+  branch-misses                                      [Hardware event]
+  bus-cycles                                         [Hardware event]
+  cache-misses                                       [Hardware event]
+  cache-references                                   [Hardware event]
+  cpu-cycles OR cycles                               [Hardware event]
+  instructions                                       [Hardware event]
+  ref-cycles                                         [Hardware event]
+  stalled-cycles-backend OR idle-cycles-backend      [Hardware event]
+  stalled-cycles-frontend OR idle-cycles-frontend    [Hardware event]
 
-smatch warnings:
-net/vmw_vsock/af_vsock.c:1321 vsock_do_ioctl() warn: unsigned 'n_bytes' is never less than zero.
+$ perf stat -ddd true
 
-vim +/n_bytes +1321 net/vmw_vsock/af_vsock.c
+ Performance counter stats for 'true':
 
-  1295	
-  1296	static int vsock_do_ioctl(struct socket *sock, unsigned int cmd,
-  1297				  int __user *arg)
-  1298	{
-  1299		struct sock *sk = sock->sk;
-  1300		struct vsock_sock *vsk;
-  1301		int retval;
-  1302	
-  1303		vsk = vsock_sk(sk);
-  1304	
-  1305		switch (cmd) {
-  1306		case SIOCOUTQ: {
-  1307			size_t n_bytes;
-  1308	
-  1309			if (!vsk->transport || !vsk->transport->unsent_bytes) {
-  1310				retval = -EOPNOTSUPP;
-  1311				break;
-  1312			}
-  1313	
-  1314			if (vsk->transport->unsent_bytes) {
-  1315				if (sock_type_connectible(sk->sk_type) && sk->sk_state == TCP_LISTEN) {
-  1316					retval = -EINVAL;
-  1317					break;
-  1318				}
-  1319	
-  1320				n_bytes = vsk->transport->unsent_bytes(vsk);
-> 1321				if (n_bytes < 0) {
-  1322					retval = n_bytes;
-  1323					break;
-  1324				}
-  1325	
-  1326				retval = put_user(n_bytes, arg);
-  1327			}
-  1328			break;
-  1329		}
-  1330		default:
-  1331			retval = -ENOIOCTLCMD;
-  1332		}
-  1333	
-  1334		return retval;
-  1335	}
-  1336	
+              4.36 msec task-clock                       #    0.744 CPUs utilized
+                 1      context-switches                 #  229.325 /sec
+                 0      cpu-migrations                   #    0.000 /sec
+                38      page-faults                      #    8.714 K/sec
+         4,375,694      cycles                           #    1.003 GHz                         (60.64%)
+           728,945      instructions                     #    0.17  insn per cycle
+            79,199      branches                         #   18.162 M/sec
+            17,709      branch-misses                    #   22.36% of all branches
+           181,734      L1-dcache-loads                  #   41.676 M/sec
+             5,547      L1-dcache-load-misses            #    3.05% of all L1-dcache accesses
+     <not counted>      LLC-loads                                                               (0.00%)
+     <not counted>      LLC-load-misses                                                         (0.00%)
+     <not counted>      L1-icache-loads                                                         (0.00%)
+     <not counted>      L1-icache-load-misses                                                   (0.00%)
+     <not counted>      dTLB-loads                                                              (0.00%)
+     <not counted>      dTLB-load-misses                                                        (0.00%)
+     <not counted>      iTLB-loads                                                              (0.00%)
+     <not counted>      iTLB-load-misses                                                        (0.00%)
+     <not counted>      L1-dcache-prefetches                                                    (0.00%)
+     <not counted>      L1-dcache-prefetch-misses                                               (0.00%)
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+       0.005860375 seconds time elapsed
+
+       0.000000000 seconds user
+       0.010383000 seconds sys
+
+After this patch:
+$ perf list hw
+
+List of pre-defined events (to be used in -e or -M):
+
+  branch-instructions OR branches                    [Hardware event]
+  branch-misses                                      [Hardware event]
+  cache-misses                                       [Hardware event]
+  cache-references                                   [Hardware event]
+  cpu-cycles OR cycles                               [Hardware event]
+  instructions                                       [Hardware event]
+
+$ perf stat -ddd true
+
+ Performance counter stats for 'true':
+
+              5.16 msec task-clock                       #    0.848 CPUs utilized
+                 1      context-switches                 #  193.817 /sec
+                 0      cpu-migrations                   #    0.000 /sec
+                37      page-faults                      #    7.171 K/sec
+         5,183,625      cycles                           #    1.005 GHz
+           961,696      instructions                     #    0.19  insn per cycle
+            85,853      branches                         #   16.640 M/sec
+            20,462      branch-misses                    #   23.83% of all branches
+           243,545      L1-dcache-loads                  #   47.203 M/sec
+             5,974      L1-dcache-load-misses            #    2.45% of all L1-dcache accesses
+   <not supported>      LLC-loads
+   <not supported>      LLC-load-misses
+   <not supported>      L1-icache-loads
+   <not supported>      L1-icache-load-misses
+   <not supported>      dTLB-loads
+            19,619      dTLB-load-misses
+   <not supported>      iTLB-loads
+             6,831      iTLB-load-misses
+   <not supported>      L1-dcache-prefetches
+   <not supported>      L1-dcache-prefetch-misses
+
+       0.006085625 seconds time elapsed
+
+       0.000000000 seconds user
+       0.013022000 seconds sys
+
+Changes in v4:
+
+- Added SoB tags.
+- Improved the commit message in patch 1
+- Link to v3: https://lore.kernel.org/r/20240626-misc_perf_fixes-v3-0-de3f8ed88dab@rivosinc.com
+
+Changes in v3:
+ - Added one more fix
+ - Separated an unrelated change to its own patch.
+ - Rebase and Added RB/TB/Fixes tag.
+ - Changed a error message in kvm code to avoid unnecessary failures
+   at guest booting.
+Changes in v2:
+ - Move the event checking to a workqueue to make it asynchronous
+ - Add more details to the commit message based on the v1 discussion
+
+[1] https://lore.kernel.org/linux-riscv/20240418014652.1143466-1-samuel.holland@sifive.com/
+[2] https://lore.kernel.org/all/CC51D53B-846C-4D81-86FC-FBF969D0A0D6@pku.edu.cn/
+
+Signed-off-by: Atish Patra <atishp@rivosinc.com>
+---
+Atish Patra (1):
+      drivers/perf: riscv: Do not update the event data if uptodate
+
+Samuel Holland (2):
+      drivers/perf: riscv: Reset the counter to hpmevent mapping while starting cpus
+      perf: RISC-V: Check standard event availability
+
+ arch/riscv/kvm/vcpu_pmu.c    |  2 +-
+ drivers/perf/riscv_pmu.c     |  2 +-
+ drivers/perf/riscv_pmu_sbi.c | 44 +++++++++++++++++++++++++++++++++++++++++---
+ 3 files changed, 43 insertions(+), 5 deletions(-)
+---
+base-commit: 55027e689933ba2e64f3d245fb1ff185b3e7fc81
+change-id: 20240625-misc_perf_fixes-5c57f555d828
+--
+Regards,
+Atish patra
+
 
