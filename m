@@ -1,309 +1,161 @@
-Return-Path: <kvm+bounces-20668-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20669-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90D0591BD34
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 13:16:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E09B191BE57
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 14:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45B70282D11
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 11:16:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E3921F2426F
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 12:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2501615623A;
-	Fri, 28 Jun 2024 11:16:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE32215689A;
+	Fri, 28 Jun 2024 12:17:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FvgDbvC4"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Tkhlzdvv"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBD9A1865A
-	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 11:16:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D178E1DFF7;
+	Fri, 28 Jun 2024 12:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719573398; cv=none; b=sHZ81r5XDNqwT5JYJhQU2Cy8EbL6D8flt+xHh7Lp9fLpG4fui01ANlkqb/WCiBcPRBghssCTSxdfAJ/9gatUb3VO0WUxQTS+lvXPOkExMhpkzaubEFxmmm/ZZ9mgiMXLO9EvP8ZfdV4o5HkFPIicToVtkf97Gwn3E88ydd6wO3w=
+	t=1719577042; cv=none; b=ZKwTWo8yHLiy9AQaSr3rqtsozMKzvY7V10V9Tp98bza8u6jfJ1S0dvOlEE4opQW6RVZM4ccw6nRLB8NhSqnIugL5rryvI6OkT5JBDEN/VcxHSRCCP6dV9/2lEWSM0I+YzFrvdEBXBSM9Z+ZetiLA5kzeIdypQo70CX6EM/m+0Ss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719573398; c=relaxed/simple;
-	bh=cB2Lot4axGNas2OU5FTaj1NgaR3at77/54FACPAlKc8=;
+	s=arc-20240116; t=1719577042; c=relaxed/simple;
+	bh=1SgN/tEnZZx6s1xUcHs1AhgAUQy2FdqJzbkjEkWOx6o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mBnZvvnhibFct4tB8BuhSmOmYxJN4cFd8In0aVVA8ETcdAvACeKjF3BjbEBYffpTyRRgt7NR7HOZyPVmXK+BzDfci1VipNCWv6TDNyGCWaoo0GVCTr7ZhtvjeoUhJmRN6XAGS6GH9ZoCFBpLpHnGZ7NlcxDi8NSWR7HNJU0wmGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FvgDbvC4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719573395;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZlGqYCvpxUtS+VdKueIF34H2lavVthiHCNvJIyMxjQk=;
-	b=FvgDbvC4C/woUSCEx+yanSrez8gh5wWphFXnesczqEccoFXcB1JFv0iXxNa2UU1zpSa/Rh
-	h8rjAcH5uikTE4YHBF8VQ95ovk8Vv82i0ns7g+wVQQJvQ8lDr2hQd9dKKoqIuGataPGQ23
-	JZ3cSYgZMiXkBmUKT+hnqM8VNZwhFi4=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-691-vreBmDcyO_iDi_lObmhEng-1; Fri, 28 Jun 2024 07:16:34 -0400
-X-MC-Unique: vreBmDcyO_iDi_lObmhEng-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-425643fb4fbso4420985e9.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 04:16:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719573392; x=1720178192;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZlGqYCvpxUtS+VdKueIF34H2lavVthiHCNvJIyMxjQk=;
-        b=sUVRVM8XX43/LDYD/pK+rJs7J5nOGhcGnaVBO9jxNL2yuchEBSg0hl96lTidKTazQp
-         HF63gs6qfWJn6TfHp7RQOCsKr2vrdulT3/IagI0fxik21U8TiuLvMF0fucInrbeZV16B
-         r037+QIak+qI6UAB2TFLc6rB0qwv2t/ey3nA48X3QZRKFM1bjalb8YfcFuGBfe0YO5Si
-         ABnZzD/SthOqrWPklhPbcGHT2R8J8Tx832r9HxDdpsb2rqMMMqNnx6xhhAUj+9tg0UOx
-         HWhCou9E+Mu3B86NTJjhtWNp9DeMXiPx6/6heisen4LmcPGJJqth7f/4gUsPYfi9tnz+
-         AIng==
-X-Forwarded-Encrypted: i=1; AJvYcCX/xsBcY51xSONg1m/XI5qTZT8Yo8qS4QzDAmCtlnCLXC6vKlgnJiZKooMrmF+tCzGJc+SdKxnbSTZ1NFieV5XaxLgN
-X-Gm-Message-State: AOJu0YzpVg6iiKt8fgZMEAwRnafVCnCoZjihJW4AgivM/J9XkPjJ4hvS
-	L1mpkV5qFEzqg/uTxuRG1EuPPhdzvQoxsbe9uJVUtIeQfVVulP2KTQSm41EfYkC/0tWpx7kacZS
-	JW5aXhepwWgVGW5MSOFuf4Ek+H7pWu5PSg+L2F8dIzO8281AVxg==
-X-Received: by 2002:a05:600c:a29f:b0:425:5ea6:236 with SMTP id 5b1f17b1804b1-4255ea60371mr49514005e9.28.1719573391986;
-        Fri, 28 Jun 2024 04:16:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEyPwfEwM5GqciNJwTRavZB5JFhzJ9CBQ2fFV7Dql3t6q6MFOInK4WYOf9EpanV+QVZr8fUGw==
-X-Received: by 2002:a05:600c:a29f:b0:425:5ea6:236 with SMTP id 5b1f17b1804b1-4255ea60371mr49513745e9.28.1719573391339;
-        Fri, 28 Jun 2024 04:16:31 -0700 (PDT)
-Received: from sgarzare-redhat ([193.207.134.173])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4256b063485sm30356325e9.21.2024.06.28.04.16.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 04:16:30 -0700 (PDT)
-Date: Fri, 28 Jun 2024 13:16:24 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: luigi.leonardi@outlook.com
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/3] vsock/virtio: add SIOCOUTQ support for
- all virtio based transports
-Message-ID: <7ejdsieevuooprdaprn2ymqqv5ssd2fntlp6tsodeu6pvnuvue@chzg6ww45bni>
-References: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
- <20240626-ioctl_next-v3-2-63be5bf19a40@outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mUfbCm1ui5D/AN1mIcCsk/QRrrFpHd05mqOS0KlZScwilaqWEBzmj7/ZSA51t5E+9nca3xkEU9epucKXPTMndBO9XjBvVCBbqK5v5HBCRfxPbQiNsBv0ax5Zx5Radsv59625jXZrL6lPAgnJIDlHzOl0PWTK02TFkUpEA4I8+gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Tkhlzdvv; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45SBvgFp019107;
+	Fri, 28 Jun 2024 12:17:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pp1; bh=l/4YLNpmn43UtWF92gB2zQkTMb8
+	jPxStygRmg3uldyE=; b=TkhlzdvvW7goC3Zune1d4w2vTlcgGJBigaodcurt5jG
+	LHDGEG0v25cI+ElNrq2WdcvgdJb8dk+ksqLPZKfdAa57daBhZ5wp0O3UmNzo2kTA
+	7t+gwgRfQXy7FU/jgRKAmvwJILSrQfJAA0LruS8PNNinH6sgEKUj4DAa9NLgiVbX
+	/B3ccBHyOfaXx2Xxdkee2AXsdtRFYrSt8iajuZRUglfn2799/aHY32/uFSyyjZXb
+	r/s9mrDXYJ+TtUajYmhZC5DetonPOWCV7o/AFlIscx2FWi8wocj+o3gdsbv2DaOc
+	fzYgYdCC7/22mfT/4b+K0DjqEHNYPc9851WvmRD/mYg==
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401qgbgtv0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Jun 2024 12:17:17 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45SBZIYH019949;
+	Fri, 28 Jun 2024 12:17:16 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yxb5n01fv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Jun 2024 12:17:16 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45SCHBnu45810128
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 28 Jun 2024 12:17:13 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 425C220040;
+	Fri, 28 Jun 2024 12:17:11 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C3E6F2005A;
+	Fri, 28 Jun 2024 12:17:10 +0000 (GMT)
+Received: from osiris (unknown [9.171.26.144])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 28 Jun 2024 12:17:10 +0000 (GMT)
+Date: Fri, 28 Jun 2024 14:17:09 +0200
+From: Heiko Carstens <hca@linux.ibm.com>
+To: Eric Farman <farman@linux.ibm.com>
+Cc: Matthew Rosato <mjrosato@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org
+Subject: Re: [PATCH] s390/vfio_ccw: Fix target addresses of TIC CCWs
+Message-ID: <20240628121709.14360-B-hca@linux.ibm.com>
+References: <20240627200740.373192-1-farman@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240626-ioctl_next-v3-2-63be5bf19a40@outlook.com>
+In-Reply-To: <20240627200740.373192-1-farman@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: yvIygTKM3wfQ7o1pNICz94RTVaMHABJg
+X-Proofpoint-GUID: yvIygTKM3wfQ7o1pNICz94RTVaMHABJg
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-28_08,2024-06-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ priorityscore=1501 suspectscore=0 spamscore=0 phishscore=0 mlxscore=0
+ adultscore=0 mlxlogscore=813 impostorscore=0 lowpriorityscore=0
+ clxscore=1015 malwarescore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2406140001 definitions=main-2406280088
 
-On Wed, Jun 26, 2024 at 02:08:36PM GMT, Luigi Leonardi via B4 Relay wrote:
->From: Luigi Leonardi <luigi.leonardi@outlook.com>
->
->Introduce support for stream_bytes_unsent and seqpacket_bytes_unsent
->ioctl for virtio_transport, vhost_vsock and vsock_loopback.
->
->For all transports the unsent bytes counter is incremented
->in virtio_transport_get_credit.
->
->In the virtio_transport (G2H) the counter is decremented each
->time the host notifies the guest that it consumed the skbuffs.
->In vhost-vsock (H2G) the counter is decremented after the skbuff
->is queued in the virtqueue.
->In vsock_loopback the counter is decremented after the skbuff is
->dequeued.
->
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->---
-> drivers/vhost/vsock.c                   |  4 +++-
-> include/linux/virtio_vsock.h            |  7 +++++++
-> net/vmw_vsock/virtio_transport.c        |  4 +++-
-> net/vmw_vsock/virtio_transport_common.c | 35 +++++++++++++++++++++++++++++++++
-> net/vmw_vsock/vsock_loopback.c          |  7 +++++++
-> 5 files changed, 55 insertions(+), 2 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index ec20ecff85c7..dba8b3ea37bf 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -244,7 +244,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 					restart_tx = true;
-> 			}
->
->-			consume_skb(skb);
->+			virtio_transport_consume_skb_sent(skb, true);
-> 		}
-> 	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
-> 	if (added)
->@@ -451,6 +451,8 @@ static struct virtio_transport vhost_transport = {
-> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
-> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
->
->+		.unsent_bytes             = virtio_transport_bytes_unsent,
+On Thu, Jun 27, 2024 at 10:07:40PM +0200, Eric Farman wrote:
+> The processing of a Transfer-In-Channel (TIC) CCW requires locating
+> the target of the CCW in the channel program, and updating the
+> address to reflect what will actually be sent to hardware.
+> 
+> An error exists where the 64-bit virtual address is truncated to
+> 32-bits (variable "cda") when performing this math. Since s390
 
-The callback is named `unsent_bytes`, I'd use something similar also
-in the function name, so `virtio_transport_unsent_bytes`, or the
-opposite renaming the callback, as you prefer, but I'd use the same
-for both.
+...
 
->+
-> 		.read_skb = virtio_transport_read_skb,
-> 	},
->
->diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
->index c82089dee0c8..e74c12878213 100644
->--- a/include/linux/virtio_vsock.h
->+++ b/include/linux/virtio_vsock.h
->@@ -134,6 +134,8 @@ struct virtio_vsock_sock {
-> 	u32 peer_fwd_cnt;
-> 	u32 peer_buf_alloc;
->
+> Fix the calculation of the TIC CCW's data address such that it points
+> to a valid 31-bit address regardless of the input address.
+> 
+> Fixes: bd36cfbbb9e1 ("s390/vfio_ccw_cp: use new address translation helpers")
+> Signed-off-by: Eric Farman <farman@linux.ibm.com>
+> ---
+>  drivers/s390/cio/vfio_ccw_cp.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+> index 6e5c508b1e07..fd8cb052f096 100644
+> --- a/drivers/s390/cio/vfio_ccw_cp.c
+> +++ b/drivers/s390/cio/vfio_ccw_cp.c
+> @@ -495,8 +495,9 @@ static int ccwchain_fetch_tic(struct ccw1 *ccw,
+>  	list_for_each_entry(iter, &cp->ccwchain_list, next) {
+>  		ccw_head = iter->ch_iova;
+>  		if (is_cpa_within_range(ccw->cda, ccw_head, iter->ch_len)) {
+> -			cda = (u64)iter->ch_ccw + dma32_to_u32(ccw->cda) - ccw_head;
+> -			ccw->cda = u32_to_dma32(cda);
+> +			/* Calculate offset of TIC target */
+> +			cda = dma32_to_u32(ccw->cda) - ccw_head;
+> +			ccw->cda = virt_to_dma32(iter->ch_ccw) + cda;
 
-Can you remove this extra empty line, so it's clear that it is
-protected by tx_lock?
+I would suggest to rename cda to "offset", since that reflects what it is
+now. Also this code needs to take care of type checking, which will fail now
+due to dma32_t type (try "make C=1 drivers/s390/cio/vfio_ccw_cp.o).
 
->+	size_t bytes_unsent;
->+
-> 	/* Protected by rx_lock */
-> 	u32 fwd_cnt;
-> 	u32 last_fwd_cnt;
->@@ -193,6 +195,11 @@ s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
-> s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
-> u32 virtio_transport_seqpacket_has_data(struct vsock_sock *vsk);
->
->+size_t virtio_transport_bytes_unsent(struct vsock_sock *vsk);
->+
->+void virtio_transport_consume_skb_sent(struct sk_buff *skb,
->+				       bool consume);
->+
-> int virtio_transport_do_socket_init(struct vsock_sock *vsk,
-> 				 struct vsock_sock *psk);
-> int
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index 43d405298857..fc62d2818c2c 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -311,7 +311,7 @@ static void virtio_transport_tx_work(struct work_struct *work)
->
-> 		virtqueue_disable_cb(vq);
-> 		while ((skb = virtqueue_get_buf(vq, &len)) != NULL) {
->-			consume_skb(skb);
->+			virtio_transport_consume_skb_sent(skb, true);
-> 			added = true;
-> 		}
-> 	} while (!virtqueue_enable_cb(vq));
->@@ -540,6 +540,8 @@ static struct virtio_transport virtio_transport = {
-> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
-> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
->
->+		.unsent_bytes             = virtio_transport_bytes_unsent,
->+
-> 		.read_skb = virtio_transport_read_skb,
-> 	},
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 16ff976a86e3..3a7fa36f306b 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -463,6 +463,26 @@ void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_inc_tx_pkt);
->
->+void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
->+{
->+	struct sock *s = skb->sk;
->+
->+	if (s && skb->len) {
->+		struct vsock_sock *vs = vsock_sk(s);
->+		struct virtio_vsock_sock *vvs;
->+
->+		vvs = vs->trans;
->+
->+		spin_lock_bh(&vvs->tx_lock);
->+		vvs->bytes_unsent -= skb->len;
->+		spin_unlock_bh(&vvs->tx_lock);
->+	}
->+
->+	if (consume)
->+		consume_skb(skb);
->+}
->+EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
->+
-> u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
-> {
-> 	u32 ret;
->@@ -475,6 +495,7 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
-> 	if (ret > credit)
-> 		ret = credit;
-> 	vvs->tx_cnt += ret;
->+	vvs->bytes_unsent += ret;
-> 	spin_unlock_bh(&vvs->tx_lock);
->
-> 	return ret;
->@@ -488,6 +509,7 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit)
->
-> 	spin_lock_bh(&vvs->tx_lock);
-> 	vvs->tx_cnt -= credit;
->+	vvs->bytes_unsent -= credit;
-> 	spin_unlock_bh(&vvs->tx_lock);
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_put_credit);
->@@ -1090,6 +1112,19 @@ void virtio_transport_destruct(struct vsock_sock *vsk)
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_destruct);
->
->+size_t virtio_transport_bytes_unsent(struct vsock_sock *vsk)
->+{
->+	struct virtio_vsock_sock *vvs = vsk->trans;
->+	size_t ret;
->+
->+	spin_lock_bh(&vvs->tx_lock);
->+	ret = vvs->bytes_unsent;
->+	spin_unlock_bh(&vvs->tx_lock);
->+
->+	return ret;
->+}
->+EXPORT_SYMBOL_GPL(virtio_transport_bytes_unsent);
->+
-> static int virtio_transport_reset(struct vsock_sock *vsk,
-> 				  struct sk_buff *skb)
-> {
->diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
->index 6dea6119f5b2..9098613561e3 100644
->--- a/net/vmw_vsock/vsock_loopback.c
->+++ b/net/vmw_vsock/vsock_loopback.c
->@@ -98,6 +98,8 @@ static struct virtio_transport loopback_transport = {
-> 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
-> 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
->
->+		.unsent_bytes             = virtio_transport_bytes_unsent,
->+
-> 		.read_skb = virtio_transport_read_skb,
-> 	},
->
->@@ -123,6 +125,11 @@ static void vsock_loopback_work(struct work_struct *work)
-> 	spin_unlock_bh(&vsock->pkt_queue.lock);
->
-> 	while ((skb = __skb_dequeue(&pkts))) {
->+		/* Decrement the bytes_sent counter without deallocating skb
-                                  ^
-Should be `bytes_unsent` ?
+You could write the above as:
 
->+		 * It is freed by the receiver.
->+		 */
->+		virtio_transport_consume_skb_sent(skb, false);
->+
+			ccw->cda = virt_to_dma32((void *)iter->ch_ccw + cda);
 
-nit: no need for this new empty line.
+Note that somebody :) introduced a similar bug in cp_update_scsw(). I guess
+you could add this hunk to your patch:
 
-> 		virtio_transport_deliver_tap_pkt(skb);
-> 		virtio_transport_recv_pkt(&loopback_transport, skb);
-> 	}
->
->-- 
->2.45.2
->
->
->
+@@ -915,7 +915,7 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
+ 	 * in the ioctl directly. Path status changes etc.
+ 	 */
+ 	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+-		ccw_head = (u32)(u64)chain->ch_ccw;
++		ccw_head = (__force u32)virt_to_dma32(chain->ch_ccw);
+ 		/*
+ 		 * On successful execution, cpa points just beyond the end
+ 		 * of the chain.
 
+Furthermore it looks to me like the ch_iova member of struct ccwchain should
+get a dma32_t type instead of u64. The same applies to quite a few variables
+to the code. I could give this a try, but I think it would be better if
+somebody who knows what he is doing would address this :)
 
