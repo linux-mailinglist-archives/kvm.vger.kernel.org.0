@@ -1,65 +1,40 @@
-Return-Path: <kvm+bounces-20664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14AA791BBE7
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 11:52:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C88EB91BC0C
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 11:59:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3C921F21EE4
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 09:52:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87606285870
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 09:59:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088CD15443B;
-	Fri, 28 Jun 2024 09:52:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iMxdY2S2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD81415443B;
+	Fri, 28 Jun 2024 09:59:36 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A050815382F
-	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 09:52:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1CC8153810;
+	Fri, 28 Jun 2024 09:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719568335; cv=none; b=kOCCn0q3TlSIbGwaHc7c12pqaxsWDThXb3x1NhqioiVi/XggjBY4rHqxyPxwB+C+qZBGZF572GK44Rf33eWTV5JTyiA6xdmZKdPy1XOgGv5iitq/Du75xi7Ww4G7XfkQe+NxlAeOo4iuCX5GRIeSGCQnsHx9Ss6RX96Ee5vYpVY=
+	t=1719568776; cv=none; b=hD6ql1+I069Kw2I3MLuOljJKqwOQQ2wwBdrSJSB2XCfgwOuJaqUotsB2Tak2DYKovvXV7uKyQtDOIAtD+fBRo7sv5plW4Lp09E82BMCYQH4y5qd/2LTsJwh750rwz+5XyFHyofPq65jmRrhqCP04ppVMtyDEwtsiMUAwY5zxwto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719568335; c=relaxed/simple;
-	bh=bHCsNfwADDIPZKA9xOh9MpedbmFnGolru6X2sK0qgEo=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PHYYM/SCc0TPhbaSwl0fuQZ10f3Fz8GRSmS2wlu4bDyFa9XM3ES2SyITYHREAzk79De2pTUP6nY9Ery/us3B6/cQsUFjlpqWc/ieD+BZT9/gRBToyWlHpQwSBDiPCPoIinq2NY8ygjAsUzEsTRgSc0Nkw86dSndPkKnlWH94Jxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iMxdY2S2; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719568332; x=1751104332;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=bHCsNfwADDIPZKA9xOh9MpedbmFnGolru6X2sK0qgEo=;
-  b=iMxdY2S2TucPlvky/LNBEMAI88J6ukuxoMDvniGQVV5/D4dFHKfVNXfo
-   Z81rmuiU+J6R/7qkoAo5U4Ijf63FScgn8rcgYHug8J8qTFeeAVFpg12E6
-   yF+q0ftxd7paixn3w3mkUU8OecrY3506uXPZXrHTH094ypie5Jm1UMmm4
-   3z9QBHeVQHg1qsk5hz0yTqvXbFRt9lzV+tqc1aptq/mrLKQuSLZOJRZjH
-   DtzczffNWKGfeAhM2EQQHWp9v6zAReg/AOJ5rHGQlUKMW2H8rp7KCv2Qt
-   X1ywr22gQtzlnP7UhF3PSZWiikrrNGCg4PiDp5h/EM1fwCLU/VpHPQ/5n
-   Q==;
-X-CSE-ConnectionGUID: TdEVg9a0RPSBLem0CPdSlg==
-X-CSE-MsgGUID: WuRL7AWQQ9yjqQd5AVg4XA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11116"; a="20617195"
-X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
-   d="scan'208";a="20617195"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2024 02:52:12 -0700
-X-CSE-ConnectionGUID: bGWW7UWTRHSmsbPjZGmFdQ==
-X-CSE-MsgGUID: ZfN95a0LTAqFpPrf5jq7Rg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,168,1716274800"; 
-   d="scan'208";a="49868937"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.125.248.220]) ([10.125.248.220])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2024 02:52:09 -0700
-Message-ID: <d4601f60-a2b9-4660-9b10-d05391e87e77@linux.intel.com>
-Date: Fri, 28 Jun 2024 17:52:06 +0800
+	s=arc-20240116; t=1719568776; c=relaxed/simple;
+	bh=apYPCiCCBhhW47PGckaJryPnErPTII7yZQmGkZShW+g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ucs9N9QMrOOarKRs2XZ779a+W4rdkdx6My+QVfuyoUbJFkyNQugzY1Jcn738beWxlxpvOxtVQ+DfHYrJuC0mo+r9PWXCI5tTttwb3q5TtkVvlkeiyQIf0ja/ke41bNo3asHp3s4itR4vSqEHncdEampGPajplo8U6ut6vNCM7K4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E4C1B106F;
+	Fri, 28 Jun 2024 02:59:56 -0700 (PDT)
+Received: from [10.1.29.17] (e122027.cambridge.arm.com [10.1.29.17])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 571CF3F6A8;
+	Fri, 28 Jun 2024 02:59:28 -0700 (PDT)
+Message-ID: <01b48dc0-8f69-435c-86c5-bc22ea148e3a@arm.com>
+Date: Fri, 28 Jun 2024 10:59:26 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,76 +42,136 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, alex.williamson@redhat.com,
- robin.murphy@arm.com, eric.auger@redhat.com, nicolinc@nvidia.com,
- kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev
-Subject: Re: [PATCH 3/6] iommu/vt-d: Make helpers support modifying present
- pasid entry
-To: Yi Liu <yi.l.liu@intel.com>, joro@8bytes.org, jgg@nvidia.com,
- kevin.tian@intel.com
-References: <20240628085538.47049-1-yi.l.liu@intel.com>
- <20240628085538.47049-4-yi.l.liu@intel.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20240628085538.47049-4-yi.l.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Subject: Re: [PATCH v3 12/14] arm64: realm: Support nonsecure ITS emulation
+ shared
+To: Michael Kelley <mhklinux@outlook.com>,
+ "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>,
+ "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240605093006.145492-1-steven.price@arm.com>
+ <20240605093006.145492-13-steven.price@arm.com>
+ <SN6PR02MB415702A53E8516F1BEEC7EDAD4CD2@SN6PR02MB4157.namprd02.prod.outlook.com>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <SN6PR02MB415702A53E8516F1BEEC7EDAD4CD2@SN6PR02MB4157.namprd02.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2024/6/28 16:55, Yi Liu wrote:
-> To handle domain replacement, set_dev_pasid op needs to modify a present
-> pasid entry. One way is sharing the most logics of remove_dev_pasid() in
-> the beginning of set_dev_pasid() to remove the old config. But this means
-> the set_dev_pasid path needs to rollback to the old config if it fails to
-> set up the new pasid entry. This needs to invoke the set_dev_pasid op of
-> the old domain. It breaks the iommu layering a bit. Another way is
-> implementing the set_dev_pasid() without rollback to old hardware config.
-> This can be achieved by implementing it in the order of preparing the
-> dev_pasid info for the new domain, modify the pasid entry, then undo the
-> dev_pasid info of the old domain, and if failed, undo the dev_pasid info
-> of the new domain. This would keep the old domain unchanged.
+On 17/06/2024 04:54, Michael Kelley wrote:
+> From: Steven Price <steven.price@arm.com> Sent: Wednesday, June 5, 2024 2:30 AM
+>>
+>> Within a realm guest the ITS is emulated by the host. This means the
+>> allocations must have been made available to the host by a call to
+>> set_memory_decrypted(). Introduce an allocation function which performs
+>> this extra call.
+>>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> Changes since v2:
+>>  * Drop 'shared' from the new its_xxx function names as they are used
+>>    for non-realm guests too.
+>>  * Don't handle the NUMA_NO_NODE case specially - alloc_pages_node()
+>>    should do the right thing.
+>>  * Drop a pointless (void *) cast.
+>> ---
+>>  drivers/irqchip/irq-gic-v3-its.c | 90 ++++++++++++++++++++++++--------
+>>  1 file changed, 67 insertions(+), 23 deletions(-)
+>>
+>> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
+>> index 40ebf1726393..ca72f830f4cc 100644
+>> --- a/drivers/irqchip/irq-gic-v3-its.c
+>> +++ b/drivers/irqchip/irq-gic-v3-its.c
+>> @@ -18,6 +18,7 @@
+>>  #include <linux/irqdomain.h>
+>>  #include <linux/list.h>
+>>  #include <linux/log2.h>
+>> +#include <linux/mem_encrypt.h>
+>>  #include <linux/memblock.h>
+>>  #include <linux/mm.h>
+>>  #include <linux/msi.h>
+>> @@ -27,6 +28,7 @@
+>>  #include <linux/of_pci.h>
+>>  #include <linux/of_platform.h>
+>>  #include <linux/percpu.h>
+>> +#include <linux/set_memory.h>
+>>  #include <linux/slab.h>
+>>  #include <linux/syscore_ops.h>
+>>
+>> @@ -163,6 +165,7 @@ struct its_device {
+>>  	struct its_node		*its;
+>>  	struct event_lpi_map	event_map;
+>>  	void			*itt;
+>> +	u32			itt_order;
+>>  	u32			nr_ites;
+>>  	u32			device_id;
+>>  	bool			shared;
+>> @@ -198,6 +201,30 @@ static DEFINE_IDA(its_vpeid_ida);
+>>  #define gic_data_rdist_rd_base()	(gic_data_rdist()->rd_base)
+>>  #define gic_data_rdist_vlpi_base()	(gic_data_rdist_rd_base() + SZ_128K)
+>>
+>> +static struct page *its_alloc_pages_node(int node, gfp_t gfp,
+>> +					 unsigned int order)
+>> +{
+>> +	struct page *page;
+>> +
+>> +	page = alloc_pages_node(node, gfp, order);
+>> +
+>> +	if (page)
+>> +		set_memory_decrypted((unsigned long)page_address(page),
+>> +				     1 << order);
 > 
-> Following the second way, needs to make the pasid entry set up helpers
-> support modifying present pasid entry.
+> There's been considerable discussion on the x86 side about
+> what to do when set_memory_decrypted() or set_memory_encrypted()
+> fails. The conclusions are:
 > 
-> Signed-off-by: Yi Liu<yi.l.liu@intel.com>
-> ---
->   drivers/iommu/intel/pasid.c | 37 ++++++++++++-------------------------
->   1 file changed, 12 insertions(+), 25 deletions(-)
+> 1) set_memory_decrypted()/encrypted() *could* fail due to a
+> compromised/malicious host, due to a bug somewhere in the
+> software stack, or due to resource constraints (x86 might need to
+> split a large page mapping, and need to allocate additional page
+> table pages, which could fail).
 > 
-> diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
-> index b18eebb479de..5d3a12b081a2 100644
-> --- a/drivers/iommu/intel/pasid.c
-> +++ b/drivers/iommu/intel/pasid.c
-> @@ -314,6 +314,9 @@ int intel_pasid_setup_first_level(struct intel_iommu *iommu,
->   		return -EINVAL;
->   	}
->   
-> +	/* Clear the old configuration if it already exists */
-> +	intel_pasid_tear_down_entry(iommu, dev, pasid, false, true);
-> +
->   	spin_lock(&iommu->lock);
->   	pte = intel_pasid_get_entry(dev, pasid);
->   	if (!pte) {
-> @@ -321,13 +324,6 @@ int intel_pasid_setup_first_level(struct intel_iommu *iommu,
->   		return -ENODEV;
->   	}
->   
-> -	if (pasid_pte_is_present(pte)) {
-> -		spin_unlock(&iommu->lock);
-> -		return -EBUSY;
-> -	}
-> -
-> -	pasid_clear_entry(pte);
-> -
->   	/* Setup the first level page table pointer: */
->   	pasid_set_flptr(pte, (u64)__pa(pgd));
+> 2) The guest memory that was the target of such a failed call could
+> be left in an indeterminate state that the guest could not reliably
+> undo or correct. The guest's view of the page's decrypted/encrypted
+> state might not match the host's view. Therefore, any such guest
+> memory must be leaked rather than being used or put back on the
+> free list.
+> 
+> 3) After some discussion, we decided not to panic in such a case.
+> Instead, set_memory_decrypted()/encrypted() generates a WARN,
+> as well as returns a failure result. The most security conscious
+> users could set panic_on_warn=1 in their VMs, and thereby stop
+> further operation if there any indication that the transition between
+> encrypted and decrypt is suspect. The caller of these functions
+> also can take explicit action in the case of a failure.
+> 
+> It seems like the same guidelines should apply here. On the x86
+> side we've also cleaned up cases where the return value isn't
+> checked, like here and the use of set_memory_encrypted() below.
 
-The above changes the previous assumption that when a new page table is
-about to be set up on a PASID, there should be no existing one still in
-place.
+Very good points - this code was lacking error handling. I think you are
+also right that the correct situation when set_memory_{en,de}crypted()
+fails is to WARN() and leak the page. It's something that shouldn't
+happen with a well behaving host and it's unclear how to safely recover
+the page - so leaking the page is the safest result. And the WARN()
+approach gives the user the option as to whether this is fatal via
+panic_on_warn.
 
-Is this a requirement for the replace functionality?
+Thanks,
+Steve
 
-Best regards,
-baolu
 
