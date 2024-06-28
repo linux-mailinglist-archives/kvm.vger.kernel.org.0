@@ -1,228 +1,187 @@
-Return-Path: <kvm+bounces-20686-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20687-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0488191C3CA
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 18:36:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EFA3291C3D7
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 18:38:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE3722844D2
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 16:36:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 971DC284E07
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 16:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5001C9EC5;
-	Fri, 28 Jun 2024 16:36:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345451C9ED8;
+	Fri, 28 Jun 2024 16:37:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DjZZwSh2"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="F9/8Xzhw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D7227713;
-	Fri, 28 Jun 2024 16:35:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A641C9EA1;
+	Fri, 28 Jun 2024 16:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719592559; cv=none; b=d4dSS7K9UWYOWocCNxpOScEkRZdeAL9tRY4Q3GMPoUvTyA7jigSoSzskNpEC0E1HoETTlek9uc6mhGLWZwS6Z876hp0p+ZxkX8cM7OZfGM8fRE+q2cPXfWVna9mrJd7RgJEWyTfsU9QBN5ccQu4XP3dcI2FlnH8RILfc6/CyW7I=
+	t=1719592672; cv=none; b=cZlFZN8ntvzipt2feH5lPqKWClIgpDVa7ee9te5OL7Hd0Qr908rYS73FyJv5S3MPierFJZt2ZNKinwVIwufzhiDx5g7E1beG21m0quNBnhKX/jJvPQnFkyIH5Ajyr3Jge9AGtQy6Fj2O57+WdxKzCrt2QPCMpoMArWLMv51zXOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719592559; c=relaxed/simple;
-	bh=GWQynfy+nKb6z46ePo9Kx4EYXNUd9zPCjd0pKZCEcCE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=cDVS8LUdPMvJa2pZ3iu+0adGFdPGPtK1HvlWPsXgm1kEP7LW0lrlAybuMdjlItWM2MifxY8L7WfapP5T5gGYp1M7TQqpEwfTOmxXvYxRD9gZZVP6AwZbbCchxqb6hIMyYmReudsMjXqnKOe/pGT+rXtcwrnPY7wVwtzeLJZpvDQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DjZZwSh2; arc=none smtp.client-ip=148.163.156.1
+	s=arc-20240116; t=1719592672; c=relaxed/simple;
+	bh=diDmk6lh36euLLibWiB8nlrDa2dMe9l4zluxmU6MhH0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Lmz2TMWYxRRSgiQiKJjfDh8EiICxsMUdoOGSKbO9LYiqbjwPWwKBz37ml1X4RNcjcYIAGYM3TWb6BmKBrPZqxdmi2yWmPRJmQ9qe/TdA3ZlHhipkTPUBBIPOSGd7AYZXl/CbEcDR1YAr38r5ivy+C7n3yHewPRa7ZyzhmmyQa6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=F9/8Xzhw; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45SFT8ur001218;
-	Fri, 28 Jun 2024 16:35:56 GMT
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45SGbnuK012702;
+	Fri, 28 Jun 2024 16:37:49 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=pp1; bh=vskFbtLj82CA3Xm6IBQIVs7rFR
-	qZI81nk1OwFoGmJLE=; b=DjZZwSh2jyzS1gtpT6cdVqSc1Ln5Gr0bm5eQm95dew
-	DkY+jzqb6wv1jx9HpQxkdM35UrJWzB7PljK5pPMZT34cZSu4ARR98Gfp0umDMknk
-	Zsq+E0faq4vSnfYG7Nfq46v2giczSqa0QLmnw2eB+57tkd7vuwP4s0GWXwuaYxzL
-	5Lrl4sn2E9HXP0HU6M50aPDti/7qJvbQx0kzd8Y2Qh6gqKHDn2MTzEZDkaw4lT01
-	rDWw/fZU7vQkW2DeePh4fk4qw6gN4NQW7Ufz1BQZp0IocGH+g1H5Q60zFisVXN/z
-	cJs+4Eo1TVVL6Qo2D/rSPKVkETm/PXGTZRtG51VLbs9g==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401yuhg5yf-1
+	:to:cc:subject:date:message-id:content-transfer-encoding
+	:mime-version; s=pp1; bh=w7Af+UOzoo5Wr5+ifRNqH5SY/bGEakCOIUhRmiA
+	YMlo=; b=F9/8Xzhwqsy4aWuDL1R4KoFXRi4QEDr2+psd6rybTfeuRhrxlTBo7ky
+	+lylCgkygZi4ZrWNWCESchAkAIpZ45lFWiI3PbIR8UrAtIjRctaqqlo6JhoHzEo+
+	FoL5sRJJQ6cy16Qq7kBG9NZNNhy/teTn1p3k81c+ayD1yJ2nymSBhteyM5dMe1cd
+	8Nuad1YLg8XG+AIlRvXmIZDdxeT+rHuxTe8KEnatHdhNqYadOwwaqmpahfo0Wxsi
+	x8BYXpoKwRZc72IF2sx1ko0L2jPp3ukqUDkPqImG5CHisMXvDZQvsc5BvJ5qiMaD
+	y4QaguKOsELnH2OMLuN7az8YcKNjJyw==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401kyustbf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 16:35:55 +0000 (GMT)
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45SGZtsT011337;
-	Fri, 28 Jun 2024 16:35:55 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401yuhg5ya-1
+	Fri, 28 Jun 2024 16:37:48 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45SGQupj018099;
+	Fri, 28 Jun 2024 16:37:48 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yx8xusj7y-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 16:35:55 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45SG0Xlk008172;
-	Fri, 28 Jun 2024 16:35:54 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3yx9b19h1f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 16:35:54 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45SGZlEj59048222
+	Fri, 28 Jun 2024 16:37:48 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45SGbg0D53608822
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 28 Jun 2024 16:35:50 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D49F02004E;
-	Fri, 28 Jun 2024 16:35:47 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 930752004B;
-	Fri, 28 Jun 2024 16:35:47 +0000 (GMT)
-Received: from b35lp69.lnxne.boe (unknown [9.152.108.100])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 28 Jun 2024 16:35:47 +0000 (GMT)
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-To: KVM <kvm@vger.kernel.org>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390 <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>
-Subject: [PATCH v2] KVM: s390: fix LPSWEY handling
-Date: Fri, 28 Jun 2024 18:35:47 +0200
-Message-ID: <20240628163547.2314-1-borntraeger@linux.ibm.com>
-X-Mailer: git-send-email 2.45.0
+	Fri, 28 Jun 2024 16:37:44 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 982102004D;
+	Fri, 28 Jun 2024 16:37:42 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 87E8120040;
+	Fri, 28 Jun 2024 16:37:42 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Fri, 28 Jun 2024 16:37:42 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 4958)
+	id 1A87FE030B; Fri, 28 Jun 2024 18:37:42 +0200 (CEST)
+From: Eric Farman <farman@linux.ibm.com>
+To: Matthew Rosato <mjrosato@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>
+Cc: Vineeth Vijayan <vneethv@linux.ibm.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
+        kvm@vger.kernel.org, Eric Farman <farman@linux.ibm.com>
+Subject: [PATCH v2] s390/vfio_ccw: Fix target addresses of TIC CCWs
+Date: Fri, 28 Jun 2024 18:37:38 +0200
+Message-Id: <20240628163738.3643513-1-farman@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 5TU4kN3lpvoabxDI51DFBc5F9VIQaKSQ
+X-Proofpoint-ORIG-GUID: 5TU4kN3lpvoabxDI51DFBc5F9VIQaKSQ
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: 5m6A08zPwiI-sDc7gUZtk1dgIfI7DFAL
-X-Proofpoint-GUID: NzyzyrKF1_bEfXA3EGna9a3jvzA6XvOG
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-06-28_12,2024-06-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
- adultscore=0 suspectscore=0 mlxscore=0 malwarescore=0 clxscore=1015
- impostorscore=0 mlxlogscore=957 phishscore=0 priorityscore=1501
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2406280121
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 clxscore=1015
+ priorityscore=1501 mlxscore=0 suspectscore=0 phishscore=0 impostorscore=0
+ lowpriorityscore=0 spamscore=0 malwarescore=0 bulkscore=0 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
+ definitions=main-2406280121
 
-in rare cases, e.g. for injecting a machine check we do intercept all
-load PSW instructions via ICTL_LPSW. With facility 193 a new variant
-LPSWEY was added. KVM needs to handle that as well.
+The processing of a Transfer-In-Channel (TIC) CCW requires locating
+the target of the CCW in the channel program, and updating the
+address to reflect what will actually be sent to hardware.
 
-Fixes: a3efa8429266 ("KVM: s390: gen_facilities: allow facilities 165, 193, 194 and 196")
-Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
-Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+An error exists where the 64-bit virtual address is truncated to
+32-bits (variable "cda") when performing this math. Since s390
+addresses of that size are 31-bits, this leaves that additional
+bit enabled such that the resulting I/O triggers a channel
+program check. This shows up occasionally when booting a KVM
+guest from a passthrough DASD device:
+
+  ..snip...
+  Interrupt Response Block Data:
+  : 0x0000000000003990
+      Function Ctrl : [Start]
+      Activity Ctrl :
+      Status Ctrl : [Alert] [Primary] [Secondary] [Status-Pending]
+      Device Status :
+      Channel Status : [Program-Check]
+      cpa=: 0x00000000008d0018
+      prev_ccw=: 0x0000000000000000
+      this_ccw=: 0x0000000000000000
+  ...snip...
+  dasd-ipl: Failed to run IPL1 channel program
+
+The channel program address of "0x008d0018" in the IRB doesn't
+look wrong, but tracing the CCWs shows the offending bit enabled:
+
+  ccw=0x0000012e808d0000 cda=00a0b030
+  ccw=0x0000012e808d0008 cda=00a0b038
+  ccw=0x0000012e808d0010 cda=808d0008
+  ccw=0x0000012e808d0018 cda=00a0b040
+
+Fix the calculation of the TIC CCW's data address such that it points
+to a valid 31-bit address regardless of the input address.
+
+Fixes: bd36cfbbb9e1 ("s390/vfio_ccw_cp: use new address translation helpers")
+Signed-off-by: Eric Farman <farman@linux.ibm.com>
 ---
- arch/s390/include/asm/kvm_host.h |  1 +
- arch/s390/kvm/kvm-s390.c         |  1 +
- arch/s390/kvm/kvm-s390.h         | 15 +++++++++++++++
- arch/s390/kvm/priv.c             | 32 ++++++++++++++++++++++++++++++++
- 4 files changed, 49 insertions(+)
 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 95990461888f..9281063636a7 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -427,6 +427,7 @@ struct kvm_vcpu_stat {
- 	u64 instruction_io_other;
- 	u64 instruction_lpsw;
- 	u64 instruction_lpswe;
-+	u64 instruction_lpswey;
- 	u64 instruction_pfmf;
- 	u64 instruction_ptff;
- 	u64 instruction_sck;
-diff --git a/arch/s390/kvm/kvm-s390.c b/arch/s390/kvm/kvm-s390.c
-index 50b77b759042..8e04c7f0c90c 100644
---- a/arch/s390/kvm/kvm-s390.c
-+++ b/arch/s390/kvm/kvm-s390.c
-@@ -132,6 +132,7 @@ const struct _kvm_stats_desc kvm_vcpu_stats_desc[] = {
- 	STATS_DESC_COUNTER(VCPU, instruction_io_other),
- 	STATS_DESC_COUNTER(VCPU, instruction_lpsw),
- 	STATS_DESC_COUNTER(VCPU, instruction_lpswe),
-+	STATS_DESC_COUNTER(VCPU, instruction_lpswey),
- 	STATS_DESC_COUNTER(VCPU, instruction_pfmf),
- 	STATS_DESC_COUNTER(VCPU, instruction_ptff),
- 	STATS_DESC_COUNTER(VCPU, instruction_sck),
-diff --git a/arch/s390/kvm/kvm-s390.h b/arch/s390/kvm/kvm-s390.h
-index 111eb5c74784..1b326f3c3383 100644
---- a/arch/s390/kvm/kvm-s390.h
-+++ b/arch/s390/kvm/kvm-s390.h
-@@ -138,6 +138,21 @@ static inline u64 kvm_s390_get_base_disp_s(struct kvm_vcpu *vcpu, u8 *ar)
- 	return (base2 ? vcpu->run->s.regs.gprs[base2] : 0) + disp2;
- }
- 
-+static inline u64 kvm_s390_get_base_disp_siy(struct kvm_vcpu *vcpu, u8 *ar)
-+{
-+	u32 base1 = vcpu->arch.sie_block->ipb >> 28;
-+	s64 disp1;
-+       
-+	/* The displacement is a 20bit _SIGNED_ value */
-+	disp1 = sign_extend64(((vcpu->arch.sie_block->ipb & 0x0fff0000) >> 16) +
-+			      ((vcpu->arch.sie_block->ipb & 0xff00) << 4), 19);
-+
-+	if (ar)
-+		*ar = base1;
-+
-+	return (base1 ? vcpu->run->s.regs.gprs[base1] : 0) + disp1;
-+}
-+
- static inline void kvm_s390_get_base_disp_sse(struct kvm_vcpu *vcpu,
- 					      u64 *address1, u64 *address2,
- 					      u8 *ar_b1, u8 *ar_b2)
-diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
-index 1be19cc9d73c..1a49b89706f8 100644
---- a/arch/s390/kvm/priv.c
-+++ b/arch/s390/kvm/priv.c
-@@ -797,6 +797,36 @@ static int handle_lpswe(struct kvm_vcpu *vcpu)
- 	return 0;
- }
- 
-+static int handle_lpswey(struct kvm_vcpu *vcpu)
-+{
-+	psw_t new_psw;
-+	u64 addr;
-+	int rc;
-+	u8 ar;
-+
-+	vcpu->stat.instruction_lpswey++;
-+
-+	if (!test_kvm_facility(vcpu->kvm, 193))
-+		return kvm_s390_inject_program_int(vcpu, PGM_OPERATION);
-+
-+	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
-+		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
-+
-+	addr = kvm_s390_get_base_disp_siy(vcpu, &ar);
-+	if (addr & 7)
-+		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
-+
-+	rc = read_guest(vcpu, addr, ar, &new_psw, sizeof(new_psw));
-+	if (rc)
-+		return kvm_s390_inject_prog_cond(vcpu, rc);
-+
-+	vcpu->arch.sie_block->gpsw = new_psw;
-+	if (!is_valid_psw(&vcpu->arch.sie_block->gpsw))
-+		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
-+
-+	return 0;
-+}
-+
- static int handle_stidp(struct kvm_vcpu *vcpu)
+Notes:
+    v2:
+     - [HC] Fix dma32/int warning on make C=1
+     - [HC] Rename cda variable to offset
+     - [HC] Fix similar bug in cp_update_scsw()
+    v1: https://lore.kernel.org/r/20240627200740.373192-1-farman@linux.ibm.com/
+
+ drivers/s390/cio/vfio_ccw_cp.c | 9 +++++----
+ 1 file changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/s390/cio/vfio_ccw_cp.c b/drivers/s390/cio/vfio_ccw_cp.c
+index 6e5c508b1e07..5f6e10225627 100644
+--- a/drivers/s390/cio/vfio_ccw_cp.c
++++ b/drivers/s390/cio/vfio_ccw_cp.c
+@@ -490,13 +490,14 @@ static int ccwchain_fetch_tic(struct ccw1 *ccw,
+ 			      struct channel_program *cp)
  {
- 	u64 stidp_data = vcpu->kvm->arch.model.cpuid;
-@@ -1462,6 +1492,8 @@ int kvm_s390_handle_eb(struct kvm_vcpu *vcpu)
- 	case 0x61:
- 	case 0x62:
- 		return handle_ri(vcpu);
-+	case 0x71:
-+		return handle_lpswey(vcpu);
- 	default:
- 		return -EOPNOTSUPP;
+ 	struct ccwchain *iter;
+-	u32 cda, ccw_head;
++	u32 offset, ccw_head;
+ 
+ 	list_for_each_entry(iter, &cp->ccwchain_list, next) {
+ 		ccw_head = iter->ch_iova;
+ 		if (is_cpa_within_range(ccw->cda, ccw_head, iter->ch_len)) {
+-			cda = (u64)iter->ch_ccw + dma32_to_u32(ccw->cda) - ccw_head;
+-			ccw->cda = u32_to_dma32(cda);
++			/* Calculate offset of TIC target */
++			offset = dma32_to_u32(ccw->cda) - ccw_head;
++			ccw->cda = virt_to_dma32((void *)iter->ch_ccw + offset);
+ 			return 0;
+ 		}
  	}
+@@ -914,7 +915,7 @@ void cp_update_scsw(struct channel_program *cp, union scsw *scsw)
+ 	 * in the ioctl directly. Path status changes etc.
+ 	 */
+ 	list_for_each_entry(chain, &cp->ccwchain_list, next) {
+-		ccw_head = (u32)(u64)chain->ch_ccw;
++		ccw_head = dma32_to_u32(virt_to_dma32(chain->ch_ccw));
+ 		/*
+ 		 * On successful execution, cpa points just beyond the end
+ 		 * of the chain.
 -- 
-2.45.0
+2.40.1
 
 
