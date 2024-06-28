@@ -1,134 +1,250 @@
-Return-Path: <kvm+bounces-20639-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20640-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E963391BA3A
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 10:39:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A009391BA63
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 10:50:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0F791F20EEA
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 08:39:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0754CB22914
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 08:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8A414B06C;
-	Fri, 28 Jun 2024 08:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C5414D702;
+	Fri, 28 Jun 2024 08:50:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b="Shy2uYiA"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cB3DcOzg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.alien8.de (mail.alien8.de [65.109.113.108])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FAAD14F98;
-	Fri, 28 Jun 2024 08:39:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.109.113.108
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C2592139D4;
+	Fri, 28 Jun 2024 08:50:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719563965; cv=none; b=qyIpnvdRFXkWl4Hg4yQZXbr8VV5z4tlKDzTppVGVQ58d29Q7a52KZunyrYCMA/jSWNd7kzAGZh6nayNd6HJXniPHKpEkXmkJ7WVThearhDe54MiUAFGTWHdcenZH8kRKMfbJzrZIxJf2ZqjgaSL1+prYgLOIqu61hUaFo1Ol7Kc=
+	t=1719564607; cv=none; b=KNo1E/ZKMJzhw3+KJDkVXasYW4xZpX5GpEVoJ6BGgCxjr3m3Jj6Urty50W5n6BgFsDi3kiyTH6wPiuX/8uqCJafdMyrtPastbFCefRi/oGVBe66HfaDCZj76rxCd+3Jf4jGRJp5hHGfkq7n0pcKr3HBtvqKVP4xubyvhlOkNNgE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719563965; c=relaxed/simple;
-	bh=CMvIU3Q5KXspV87Df2eVYvbsA4fubNV11mkmbeKmxas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hivkoUn1C978ZGbB68DFMzKgoQ85kGgwTIjELJBaZAX8ysOxWFbDFEQYe3LGBe3hHGZxKLJDt7+ebiKa1vej6sQ1Ua86zJyIalFef/OroAAQaDBk6fO3CUrheI7cvTXOHhjSyNhIfef2giByRgiRiwj57s5Tae9k/fEYhnxEcaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de; spf=pass smtp.mailfrom=alien8.de; dkim=pass (4096-bit key) header.d=alien8.de header.i=@alien8.de header.b=Shy2uYiA; arc=none smtp.client-ip=65.109.113.108
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alien8.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alien8.de
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTP id 6E3D540E0027;
-	Fri, 28 Jun 2024 08:39:21 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at mail.alien8.de
-Authentication-Results: mail.alien8.de (amavisd-new); dkim=pass (4096-bit key)
-	header.d=alien8.de
-Received: from mail.alien8.de ([127.0.0.1])
-	by localhost (mail.alien8.de [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id ai-3D3DBxyTB; Fri, 28 Jun 2024 08:39:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alien8.de; s=alien8;
-	t=1719563958; bh=yjV8mA0tjQNdFq+u3e3W9D1Gzi5n8+CoX3byN9eQsrY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Shy2uYiAx1gFfrFXkaagSkI6rxoNUwJm4F8fwgVdXueZGm10cjkGYK34QtYDn7XcE
-	 NJBdJxb2AHo1WH4NVGzdtIDsfyyBrg6Dq6ByrtmNMiaHedvFiZrAOlVun8fG1ZNPmC
-	 wYDv75VfMLz0/LDzKA7m8nQGeAgFtajXGoUagSOKLgB3ZeEnUds665lc56bbqn+FiG
-	 2pzoowuQKEdAV9Fl6nOTt0JIgO8wh2aX57AgsoxMvZljTdj2QS3xw6OXj5zGO/D9ve
-	 Fy3Y+5leXFWcKzhlYmoTEFpuwdKUaTN+L2+ZZvf6cAK51//VtgI6V302/QIIyq48B0
-	 BbY3HuxRpSyAfbGMV+zuYWFC9ntv1hr0eYlXgYHZ8NUWWWze0cGbIBKvjSsgRb2yMn
-	 +roQOQobSUD8V6YiCz5bqdXwBvmVxILld8gzYdZA1Ux0diAaWOQmaZr22DkydIUTrm
-	 6LIZbyuYbi6uPDrN2ZsLQx7PIFaTOEOK3uiuaX35oENy+Vwy9cAVzP852agE4c+fFq
-	 K/VYT+eP1xsmEbxCXpRE8cWNzjv23Zg1ioM7uNoBkTpuTFRHJYTCoXiMHCdiwYKa/y
-	 QWB00owveCC0S/5xU5jAFCxatQmfy5IrqOMUeRYY666d8V6ZR5cmLcAfzKHXe5xOa4
-	 RfXpFCr246HRrFGkPg9QmxLY=
-Received: from nazgul.tnic (business-24-134-159-81.pool2.vodafone-ip.de [24.134.159.81])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature ECDSA (P-256) server-digest SHA256)
-	(No client certificate requested)
-	by mail.alien8.de (SuperMail on ZX Spectrum 128k) with ESMTPSA id EC7EB40E0219;
-	Fri, 28 Jun 2024 08:39:06 +0000 (UTC)
-Date: Fri, 28 Jun 2024 10:39:33 +0200
-From: Borislav Petkov <bp@alien8.de>
-To: Nikunj A Dadhania <nikunj@amd.com>
-Cc: linux-kernel@vger.kernel.org, thomas.lendacky@amd.com, x86@kernel.org,
-	kvm@vger.kernel.org, mingo@redhat.com, tglx@linutronix.de,
-	dave.hansen@linux.intel.com, pgonda@google.com, seanjc@google.com,
-	pbonzini@redhat.com
-Subject: Re: [PATCH v10 08/24] virt: sev-guest: Take mutex in
- snp_send_guest_request()
-Message-ID: <20240628083933.GAZn52xedNc4YbyvQY@fat_crate.local>
-References: <20240621123903.2411843-1-nikunj@amd.com>
- <20240621123903.2411843-9-nikunj@amd.com>
+	s=arc-20240116; t=1719564607; c=relaxed/simple;
+	bh=XUflaohcWvYShUnMWniTitLP78sYs5dsruzLHvueNWk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=jVTIq8tmorP8CttbTQGk+aVqS1DEkTPBb6P88/nkP79yDwSuaIFNbA+of/p2qdAh63yEfNYECc3zIcZn5hY0XcqpF1LtGBMHjiALCq4piq9GI6Mmkbfhay4SccLUQUJDBia3gff8dgOqTLvaWOSuXOfiFCx6dhS18T7/+1qWo0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cB3DcOzg; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45S8QsVF005995;
+	Fri, 28 Jun 2024 08:49:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:subject:from:to:cc:date:in-reply-to:references
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	1LiVLh/4t2TyA15F3OgW+0GLmMUkAbdoUNd2a2a2vN0=; b=cB3DcOzg+Rn2BYEs
+	8Jsvqu6pIQ0GA4l1n+2+Xray4mjS4FslAEo6mKlpOZAcreGqNnrGFYSH3n4053zH
+	WP/ET5zvhzoiCiIkIP4BWRjgXEGqhUsaU5eDU5g4ZHupJcppmWfCwF52wNmLv8BN
+	8EONMDXT3FlPM5OzOBmc8NaGAYrJgM2L3atvo7VLuAhVVq7JxskuttyCFEn9kxno
+	PcyBNbn+iGEve1VfIhP2p4TfNCNGGn1N+7fmxJcdjbjH2+rKw/DXLWHLsnIi6ylY
+	6fkRmBVeOPjVgY1m5UJncBERTiBpdc3ElVWunimjJlI8iPVIZHYsF6VIsop2B/te
+	kR3odA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401pm6rerj-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Jun 2024 08:49:48 +0000 (GMT)
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 45S8nmMM009041;
+	Fri, 28 Jun 2024 08:49:48 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401pm6rerg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Jun 2024 08:49:48 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45S7mDxJ000402;
+	Fri, 28 Jun 2024 08:49:47 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yxbn3q2xm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 28 Jun 2024 08:49:47 +0000
+Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45S8ni301638992
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 28 Jun 2024 08:49:46 GMT
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8BAB65805A;
+	Fri, 28 Jun 2024 08:49:44 +0000 (GMT)
+Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 22A5858051;
+	Fri, 28 Jun 2024 08:49:42 +0000 (GMT)
+Received: from [9.171.12.251] (unknown [9.171.12.251])
+	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 28 Jun 2024 08:49:41 +0000 (GMT)
+Message-ID: <d63e329056954e1e211b8215773c1fb7861dc014.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 3/4] vfio/pci: Disable mmap() non-compliant BARs
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Gerd
+ Bayer <gbayer@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date: Fri, 28 Jun 2024 10:49:41 +0200
+In-Reply-To: <20240627160547.2879c6b3.alex.williamson@redhat.com>
+References: <20240626-vfio_pci_mmap-v4-0-7f038870f022@linux.ibm.com>
+	 <20240626-vfio_pci_mmap-v4-3-7f038870f022@linux.ibm.com>
+	 <20240627160547.2879c6b3.alex.williamson@redhat.com>
+Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240621123903.2411843-9-nikunj@amd.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Wyw7XCPKsEFmwF33OycVkpQCjW14s_Fx
+X-Proofpoint-GUID: wjfoI3cJNvfIR70fEyirB0vCuv2P-zvA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-06-28_04,2024-06-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 suspectscore=0 spamscore=0 malwarescore=0 clxscore=1015
+ impostorscore=0 mlxlogscore=893 mlxscore=0 adultscore=0 lowpriorityscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2406280061
 
-On Fri, Jun 21, 2024 at 06:08:47PM +0530, Nikunj A Dadhania wrote:
-> SNP command mutex is used to serialize access to the shared buffer, command
-> handling and message sequence number races.
+On Thu, 2024-06-27 at 16:05 -0600, Alex Williamson wrote:
+> On Wed, 26 Jun 2024 13:15:50 +0200
+> Niklas Schnelle <schnelle@linux.ibm.com> wrote:
+>=20
+> > When VFIO_PCI_MMAP is enabled for s390 in a future commit and the ISM
+> > device is passed-through to a KVM guest QEMU attempts to eagerly mmap()
+> > its BAR. This fails because the 256 TiB large BAR does not fit in the
+> > virtual map. Besides this issue mmap() of the ISM device's BAR is not
+> > useful either as even a partial mapping won't be usable from user-space
+> > without a vfio-pci variant driver. A previous commit ensures that pdev-=
+>
+> > non_compliant_bars is set for ISM so use this to disallow mmap() with
+> > the expecation that mmap() of non-compliant BARs is not advisable in th=
+e
+> > general case either.
+> >=20
+> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> > ---
+> >  drivers/vfio/pci/vfio_pci_core.c | 5 ++---
+> >  1 file changed, 2 insertions(+), 3 deletions(-)
+> >=20
+> > diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_p=
+ci_core.c
+> > index 987c7921affa..0e9d46575776 100644
+> > --- a/drivers/vfio/pci/vfio_pci_core.c
+> > +++ b/drivers/vfio/pci/vfio_pci_core.c
+> > @@ -128,10 +128,9 @@ static void vfio_pci_probe_mmaps(struct vfio_pci_c=
+ore_device *vdev)
+> > =20
+> >  		/*
+> >  		 * The PCI core shouldn't set up a resource with a
+> > -		 * type but zero size. But there may be bugs that
+> > -		 * cause us to do that.
+> > +		 * type but zero size or non-compliant BARs.
+> >  		 */
+> > -		if (!resource_size(res))
+> > +		if (!resource_size(res) || vdev->pdev->non_compliant_bars)
+> >  			goto no_mmap;
+> > =20
+> >  		if (resource_size(res) >=3D PAGE_SIZE) {
+> >=20
+>=20
+> The non_compliant_bars flag causes pci_read_bases() to exit, shouldn't
+> that mean the resource is not setup and resource_size() is zero and
+> explicitly testing the non_compliant_bars flag is redundant?  Or does
+> s390 do this somewhere else?
+>=20
+> The non_compliant_bars flag is defined as /* Broken BARs; ignore them */
+> so it'd be pretty strange if they had a resource size and we chose to
+> still expose them with read-write access... why wouldn't we just
+> deny-list the device from use with vfio-pci?
+>=20
+> Also probably worth an explicit comment in the commit log why pci-sysfs
+> mmap support doesn't need to be bypassed on s390.  Thanks,
+>=20
+> Alex
+>=20
 
-serialize access to ... races?
+Uhh, you're right. With pdev->non_compliant_bars we don't get the
+resources filled in at all due to the check in pci_read_bases(), the
+structs are however still allocated. Consequently IORESOURCE_MEM is
+unset (and resource_size(res) is 0) and the existing IORESOURCE_MEM
+check already ignores the ISM device here. Funnily enough this doesn't
+seem to cause issues for the ISM driver itself because of the way it
+bypasses normal PCI access and doesn't use ioremap() nor the MMIO
+access helpers. Honestlym I think pdev->non_compliant_bars might still
+be the right thing. This BAR is special enough that anything other than
+the ISM driver is probably served best by just ignoring it. We could
+then just drop this patch. I think this would also take care of pci-
+sysfs mmap ignoring ISM if s390x were to set HAVE_PCI_MMAP.
 
-Needs re-formulation.
-
-> As part of the preparation for moving SEV guest driver common code and
-> making mutex private, take the mutex in snp_send_guest_request() instead of
-> snp_guest_ioctl(). This will result in locking behavior change as detailed
-> below:
-> 
-> Current locking behaviour:
-> 
->     snp_guest_ioctl()
->       mutex_lock(&snp_cmd_mutex)
->         get_report()/get_derived_key()/get_ext_report()
->           snp_send_guest_request()
->     	...
->       mutex_unlock(&snp_cmd_mutex)
-> 
-> New locking behaviour:
-> 
->     snp_guest_ioctl()
->       get_report()/get_derived_key()/get_ext_report()
->         snp_send_guest_request()
->            guard(mutex)(&snp_cmd_mutex)
->              ...
-
-Why is it ok to grab the mutex in snp_send_guest_request()?
-
-Folks need to learn to stop spelling out what the patch does but WHY it
-does it and WHY is it ok?!?
-
-> Remove multiple lockdep check in the sev-guest driver as they are redundant
-> now.
-
-More "what" redundancy.
-
-"The new locking region covers <bla> and that is ok because of <foo>."
-
-This is what your commit message should say.
-
--- 
-Regards/Gruss,
-    Boris.
-
-https://people.kernel.org/tglx/notes-about-netiquette
+Thanks,
+Niklas
 
