@@ -1,143 +1,172 @@
-Return-Path: <kvm+bounces-20684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C482B91C354
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 18:09:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E37D491C3A3
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 18:20:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2D131C23509
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 16:09:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A5EE28447D
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 16:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865B51C8FDB;
-	Fri, 28 Jun 2024 16:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230541C9EC5;
+	Fri, 28 Jun 2024 16:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ACrxuD85"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MX7Mj5hU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 579AA157E91
-	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 16:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AEF220DE8;
+	Fri, 28 Jun 2024 16:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719590959; cv=none; b=MsRSdPJO6/AYvXmwxDpKU3XfVpg74eik6z/CpSBa1aFiZAvgqor8B+I3AKNqdPOEIqEfauMSLV4TT21D2hu8XCTXWDU8KX+IhUjD4pRuQUUMr/QG6SNom2ERAJDTM8f1hG1W8RijIVP7TkaNWPRJxBqz4UZw1c+by/xOLoucR7M=
+	t=1719591591; cv=none; b=E1fEgGHQ6I8szd2AiqJ+kBiYjG+RwJVPeNRycko8EX6nUsjo8HClZ7k3N8L6TwxinP2D8k3mIpqt9csVccb1xdggSMRkcMMERgpwnRmlfYyy/eTBscF104rzflFiQdjifnZYYVRVZr6+1G5vVq3kfFU3lS6H+MMdPPb4Nwad2P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719590959; c=relaxed/simple;
-	bh=xSiS5VbBTWtHkMjKE2FM2x8QgKqasXrVFPcpXxJBCgY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mocUPUB7smI9EO4j69yov+hRBcaqxyuAfSTdZONUMBv0HAhnWSQzcOD0C0w560o909uXA+k+Dp1zfxEZZcP0Dp7k20FRzKTi1Rq/oNbino+xJBwOgm2/jVTibEDCYL80c80PyKMFnSfThY5+fOZvqMg2iXUqtEP0xxvFSTKTcWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ACrxuD85; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-643acc141cbso8622857b3.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 09:09:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719590957; x=1720195757; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+dLquM4FkT/DoL6SKER0hksUwO28Urfz4ARvtIF4KV8=;
-        b=ACrxuD85npxF2sDckIotp0Zetm0RVFfhRzm4nDfgqWP7MfB5RWNKnL3J3Bn+qZ+kFS
-         56ywuwwvhT6HMl0wfQEqxdAmuiEejUEVc7JdR+04ABJUbzxX1KfIhzhJqaLZa8umEio2
-         QLNHTSbART3obQGDdUu8AJ3bEaLvfsIvRfDawauPfY1+bQaNxm6pgeNXczdhws4xkQ+x
-         bYx0F/f/HO6bDM8MK0MMUdv0tLPvhpASLf3tNhqOZjO0tsHcH0EUDwzhRf/ZbmGRqAEp
-         xp1RQS8xy7KWipIAzMqX1jB19PYmMYIQRHnfrNQuxqrckYQ8Jscjfre4O88ayU+GCfG2
-         4o6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719590957; x=1720195757;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+dLquM4FkT/DoL6SKER0hksUwO28Urfz4ARvtIF4KV8=;
-        b=kkEjj8sxFJFuHm3Ba489naFrrx5wcihAkQNoxhxQ/xeSgBeMDKmWdZ2+VBU8y3dw+1
-         0JNCBHM0T3f/PJu3TWhjVJkqn2M2ixW+wB0AS4raFd/ZRolWyjZv5jRZ1ZHz57V9DGl4
-         Ipfku0fE3xYAUMLUNe+x3q/iehjewjNAPUUWnCqU1iz2ETtFQZriym/k0oLh79T78Km3
-         rPxCzkELTAFpW19z8I6jkTtC8qJ4RFsVHCwZUjLCsQgPBCP5y/LqD6Z0ipXBPjwB04Cq
-         kHfPAT0+GQK86JOZZoigCZdIAqSQmcUcfvqcfSvLXod5VB6KL7wD5TYrMnDFVvZwT4P/
-         7now==
-X-Forwarded-Encrypted: i=1; AJvYcCUHM47I04y6rIEPLreOEHPxUBs9SP0nZj9LEvBkBstuUnMO43QGl1fIlmeHUoZl5GGWt2vDZy6jhFacnahLqLw/V+60
-X-Gm-Message-State: AOJu0Yza3+cSNl3uUp6rcV96AoE53KAS4RIR7hneLVefFtjcPAOFynEM
-	StFnrAdRJt6uFG8nSsKsdu6a9eVeaYoiC9qumssPjup9z0GofIT4q1kQ+yHP6u/ZniGE26mLjhJ
-	HCw==
-X-Google-Smtp-Source: AGHT+IHJY/lTxp/95vjfGeiS7oXbM4P6tRf14ezu1AV3VayEqpmqGBX9AHi66wPOpt9anlmG2eQslSmpJn4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:8451:0:b0:627:edcb:cbe2 with SMTP id
- 00721157ae682-64af5dfeb07mr216687b3.5.1719590957359; Fri, 28 Jun 2024
- 09:09:17 -0700 (PDT)
-Date: Fri, 28 Jun 2024 09:09:15 -0700
-In-Reply-To: <20240626073719.5246-1-amit@kernel.org>
+	s=arc-20240116; t=1719591591; c=relaxed/simple;
+	bh=LTxkkD/nY6lAd8Hm4iCQkiN/eHwDOA5Fki8VgmfgnRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s3W/rVdYG0c5H+TgH9jp9qYxJU6QaSBjAWHJZdiBADOMR+2DDGRqfrMjecAU5CiHfJG18cFPDKSV7YBUfkWMTwkSTTKnQVMrFSN7XL7LgdW1TPoKjTn6Ggu4LfiSpyppoJdXzl9Jmxd49uZtD4zglE0yyMykbESumrkROha6UKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MX7Mj5hU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2EAF5C116B1;
+	Fri, 28 Jun 2024 16:19:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719591590;
+	bh=LTxkkD/nY6lAd8Hm4iCQkiN/eHwDOA5Fki8VgmfgnRc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MX7Mj5hUhLiE91UIq2inljrT60PLH9e8l6QTgC6ZQNvAMBidqlAsUFcUWgh37xNtR
+	 hYDylhmsqCO1JbsewHKDHXasQRX+xLjibcRc7V3aV9D/23ehealjzGCzLAVTdkVLs+
+	 Qgmr2AIxylzGm8Vnz+W8zUvWobyOtbCGH3ImingcbS9miMBh7ILHe0QHegrE5SlZdD
+	 K3KFM2wBj4ib6ehtDKUtfgNuCw2TQRbDywW1I+NIhYzzbYvRBf3Sy7sL8/WaYVsgAD
+	 0V9b/A9JonF9gwm94KX6WWQwbU8dIQea/cXq/isAShfpX/FTIhMdkyb4uH/IWyJRZl
+	 j1Piq1IPNhbwg==
+Date: Fri, 28 Jun 2024 17:19:46 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
+	greentime.hu@sifive.com, vincent.chen@sifive.com,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org
+Subject: Re: [PATCH v6 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
+Message-ID: <20240628-clamp-vineyard-c7cdd40a6d50@spud>
+References: <20240628093711.11716-1-yongxuan.wang@sifive.com>
+ <20240628093711.11716-3-yongxuan.wang@sifive.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240626073719.5246-1-amit@kernel.org>
-Message-ID: <Zn7gK9KZKxBwgVc_@google.com>
-Subject: Re: [PATCH v2] KVM: SVM: let alternatives handle the cases when RSB
- filling is required
-From: Sean Christopherson <seanjc@google.com>
-To: Amit Shah <amit@kernel.org>
-Cc: pbonzini@redhat.com, x86@kernel.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, amit.shah@amd.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	kim.phillips@amd.com, david.kaplan@amd.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="zVY6bc51HzyyBUYM"
+Content-Disposition: inline
+In-Reply-To: <20240628093711.11716-3-yongxuan.wang@sifive.com>
 
-On Wed, Jun 26, 2024, Amit Shah wrote:
+
+--zVY6bc51HzyyBUYM
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Jun 28, 2024 at 05:37:06PM +0800, Yong-Xuan Wang wrote:
+> Add entries for the Svade and Svadu extensions to the riscv,isa-extensions
+> property.
+>=20
+> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
 > ---
->  arch/x86/kvm/svm/vmenter.S | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-> index a0c8eb37d3e1..2ed80aea3bb1 100644
-> --- a/arch/x86/kvm/svm/vmenter.S
-> +++ b/arch/x86/kvm/svm/vmenter.S
-> @@ -209,10 +209,8 @@ SYM_FUNC_START(__svm_vcpu_run)
->  7:	vmload %_ASM_AX
->  8:
->  
-> -#ifdef CONFIG_MITIGATION_RETPOLINE
->  	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
-> -	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
-> -#endif
-> +	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
+>  .../devicetree/bindings/riscv/extensions.yaml | 28 +++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b/Do=
+cumentation/devicetree/bindings/riscv/extensions.yaml
+> index 468c646247aa..c3d053ce7783 100644
+> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> @@ -153,6 +153,34 @@ properties:
+>              ratified at commit 3f9ed34 ("Add ability to manually trigger
+>              workflow. (#2)") of riscv-time-compare.
+> =20
+> +        - const: svade
+> +          description: |
+> +            The standard Svade supervisor-level extension for SW-managed=
+ PTE A/D
+> +            bit updates as ratified in the 20240213 version of the privi=
+leged
+> +            ISA specification.
+> +
+> +            Both Svade and Svadu extensions control the hardware behavio=
+r when
+> +            the PTE A/D bits need to be set. The default behavior for th=
+e four
+> +            possible combinations of these extensions in the device tree=
+ are:
+> +            1) Neither Svade nor Svadu present in DT =3D>
 
-Out of an abundance of paranoia, shouldn't this be?
+>                 It is technically
+> +               unknown whether the platform uses Svade or Svadu. Supervi=
+sor may
+> +               assume Svade to be present and enabled or it can discover=
+ based
+> +               on mvendorid, marchid, and mimpid.
 
-	FILL_RETURN_BUFFER %_ASM_CX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT,\
-			   X86_FEATURE_RSB_VMEXIT_LITE
+I would just write "for backwards compatibility, if neither Svade nor
+Svadu appear in the devicetree the supervisor may assume Svade to be
+present and enabled". If there are systems that this behaviour causes
+problems for, we can deal with them iff they appear. I don't think
+looking at m*id would be sufficient here anyway, since the firmware can
+have an impact. I'd just drop that part entirely.
 
-Hmm, but it looks like that would incorrectly trigger the "lite" flavor for
-families 0xf - 0x12.  I assume those old CPUs aren't affected by whatever on earth
-EIBRS_PBRSB is.
+> +            2) Only Svade present in DT =3D> Supervisor must assume Svad=
+e to be
+> +               always enabled. (Obvious)
 
-	/* AMD Family 0xf - 0x12 */
-	VULNWL_AMD(0x0f,	NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_BHI),
-	VULNWL_AMD(0x10,	NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_BHI),
-	VULNWL_AMD(0x11,	NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_BHI),
-	VULNWL_AMD(0x12,	NO_MELTDOWN | NO_SSB | NO_L1TF | NO_MDS | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_BHI),
+nit: I'd drop the "(Obvious)" comments from here.
 
-	/* FAMILY_ANY must be last, otherwise 0x0f - 0x12 matches won't work */
-	VULNWL_AMD(X86_FAMILY_ANY,	NO_MELTDOWN | NO_L1TF | NO_MDS | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_EIBRS_PBRSB | NO_BHI),
-	VULNWL_HYGON(X86_FAMILY_ANY,	NO_MELTDOWN | NO_L1TF | NO_MDS | NO_SWAPGS | NO_ITLB_MULTIHIT | NO_MMIO | NO_EIBRS_PBRSB | NO_BHI),
+Cheers,
+Conor.
 
->  
->  	/* Clobbers RAX, RCX, RDX.  */
->  	RESTORE_HOST_SPEC_CTRL
-> @@ -348,10 +346,8 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
->  
->  2:	cli
->  
-> -#ifdef CONFIG_MITIGATION_RETPOLINE
->  	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
-> -	FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
-> -#endif
-> +	FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
->  
->  	/* Clobbers RAX, RCX, RDX, consumes RDI (@svm) and RSI (@spec_ctrl_intercepted). */
->  	RESTORE_HOST_SPEC_CTRL
-> -- 
-> 2.45.2
-> 
+> +            3) Only Svadu present in DT =3D> Supervisor must assume Svad=
+u to be
+> +               always enabled. (Obvious)
+> +            4) Both Svade and Svadu present in DT =3D> Supervisor must a=
+ssume
+> +               Svadu turned-off at boot time. To use Svadu, supervisor m=
+ust
+> +               explicitly enable it using the SBI FWFT extension.
+> +
+> +        - const: svadu
+> +          description: |
+> +            The standard Svadu supervisor-level extension for hardware u=
+pdating
+> +            of PTE A/D bits as ratified at commit c1abccf ("Merge pull r=
+equest
+> +            #25 from ved-rivos/ratified") of riscv-svadu. Please refer t=
+o Svade
+> +            dt-binding description for more details.
+> +
+>          - const: svinval
+>            description:
+>              The standard Svinval supervisor-level extension for fine-gra=
+ined
+> --=20
+> 2.17.1
+>=20
+
+--zVY6bc51HzyyBUYM
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZn7ioQAKCRB4tDGHoIJi
+0mVMAQCK/SejlGwyghvHwynQhnjL6X2rPW6tv4CtsmOgM3pYaAD+L/W8OKitFsGd
+/L1I8rbFj1EVzu2iWs17GMSaDJIGZgU=
+=ykY3
+-----END PGP SIGNATURE-----
+
+--zVY6bc51HzyyBUYM--
 
