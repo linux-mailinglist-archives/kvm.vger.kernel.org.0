@@ -1,182 +1,149 @@
-Return-Path: <kvm+bounces-20674-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20675-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23EBD91C02C
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 16:01:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B2991C0CD
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 16:25:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3EF8284D09
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 14:01:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 195F91F21B4B
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 14:25:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3BF1BE845;
-	Fri, 28 Jun 2024 14:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718AB1C004A;
+	Fri, 28 Jun 2024 14:25:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WVmxTSuw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="awk/kFsL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1461A1422C5;
-	Fri, 28 Jun 2024 14:01:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DDB1E517;
+	Fri, 28 Jun 2024 14:25:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719583273; cv=none; b=be6YT6lCTWQqQRtqXM5u3DSYdIKNPvvhgP59HMsbbU7RDbjGtlRwQ8+ik1+YNuCRUT2m4E1nsNKYUEE4vMOHYuSMSbuDk6Mq/1CShNLpcJRgi2wtEuca7MB3UEPM7dDgvXar38fdVebwkC4t5lylhQO0As1fYiqRAZhGTLsKW7k=
+	t=1719584721; cv=none; b=I8DN+QH+Ctn18qg081l5O3AgJygCIdR5Jln4JhUyFLo9bpwtdzWWq5AAFDOivMCjpmMgKsLJzcRAZFqHwWFoBHiNJun9QO23owbof07osQVoTt8a3DGIdTIhWVpRvgCMO0CsKphbujcFu6IwbGFCD0ncfK4pHSB1D9XF5cXKbYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719583273; c=relaxed/simple;
-	bh=d0rwe+OmBo+p2vOpAmYUqGYZhF4Hs7xlhu5I3tWMQY4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tif3BFrspqGfbCubjXJIHDzVMdyVKIcM2daGREW1HEY7NyFJ0WfWV+uIZ/sdBzNxx909nSkxe3MPk8mCSy3Hci353J5Pabtq0z7ogOVrDnq6dwV0cjjYGO/H6YOqCnYLVboW5ACVR+qNB4won2CNgQiy4kvGodK8lJ4Ufpz8GEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WVmxTSuw; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 45SDukUu026927;
-	Fri, 28 Jun 2024 14:01:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:subject:from:to:cc:date:in-reply-to:references
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	r13813M341o1NEWkU/PWkbjRxQH3kZHydYecB+djrfE=; b=WVmxTSuwcnQHGoi/
-	nZBm7rRurMYHjehkRB/fU3DRiyqsAq8lmPtmZtxfH/cHm/NWz0QqEuAE04lx8IsB
-	OszNVhr9T9g7hWq4ZHwW9yg5yfBZnnT24ZtLDTNa5zOEU5Fqevd38vlhZDBZfp/I
-	3hO+rOq9MvEybpawTXxlbMj89IspugypBP2Ck59yt+h6EYXYaa85BfWUdTjHuIrZ
-	pti8/sLhtPsKm0E6NdGHc3WVZcUtz+NDjob2sWXE2+CW2sYO0fHTNp9yiNbzmAYN
-	/IsRd3oLO+ihVgEaFmq11KiDnH0kdZsaStcHEv6GFIDyur3w46ltoWj9eDV8FIqf
-	bkQvVQ==
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 401wn985fc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 14:01:09 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 45SBJYws032606;
-	Fri, 28 Jun 2024 14:01:08 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3yxbn3r9eh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 28 Jun 2024 14:01:08 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 45SE15aC36962794
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 28 Jun 2024 14:01:07 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 35AF05807C;
-	Fri, 28 Jun 2024 14:01:05 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7C40D58063;
-	Fri, 28 Jun 2024 14:01:04 +0000 (GMT)
-Received: from li-479af74c-31f9-11b2-a85c-e4ddee11713b.ibm.com (unknown [9.61.140.200])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 28 Jun 2024 14:01:04 +0000 (GMT)
-Message-ID: <ec54a7715380f09bec96c41dea4c942df292de18.camel@linux.ibm.com>
-Subject: Re: [PATCH] s390/vfio_ccw: Fix target addresses of TIC CCWs
-From: Eric Farman <farman@linux.ibm.com>
-To: Heiko Carstens <hca@linux.ibm.com>
-Cc: Matthew Rosato <mjrosato@linux.ibm.com>,
-        Halil Pasic
- <pasic@linux.ibm.com>,
-        Vineeth Vijayan <vneethv@linux.ibm.com>,
-        Peter
- Oberparleiter <oberpar@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>, linux-s390@vger.kernel.org,
-        kvm@vger.kernel.org
-Date: Fri, 28 Jun 2024 10:01:04 -0400
-In-Reply-To: <20240628134008.14360-G-hca@linux.ibm.com>
-References: <20240627200740.373192-1-farman@linux.ibm.com>
-	 <20240628121709.14360-B-hca@linux.ibm.com>
-	 <0f7db180c7f3ece66685c50df7ef38ab81cac03b.camel@linux.ibm.com>
-	 <20240628134008.14360-G-hca@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.2 (3.52.2-1.fc40) 
+	s=arc-20240116; t=1719584721; c=relaxed/simple;
+	bh=Zo4QNEftC90ngAD8RC20T2f2OvX59Lz7ga6iZJ6sNfw=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=EtSX2IvLRL9+ZboaHTD2upVSTX2aw1hOlGkhGwJUFUYt5ujmZu0q2N9b7vysjYS0ZrSsPe02e2j0LUkCEYhVyMOtF4ENqiz+f24eFmyuszoCGvvoZSHwX1C0zSE8n47w1wqfqL6kI15d1Ot8b5R4SymPopUOO0ksVM0mMTbmjyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=awk/kFsL; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-3658197cdbbso376302f8f.3;
+        Fri, 28 Jun 2024 07:25:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719584718; x=1720189518; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VeAwXuF7+pmymrZyPiqRkGCZGiMSVwcLFpTO8NXP0nk=;
+        b=awk/kFsLrOSJVUBDtOgzLw0qJbtYnItfQxbteZe1VFEFpFMBv26+vdaISis2q5ZMhU
+         f/b5uvyvOMcA1+KX8YIglrL0TSfkuGc+ugPzer3ALo/7lh7I2YW49Z8eHALjpTkroob0
+         paG5OGOS9AK0xeEfAfxw0nEOiHDTUAXE/0eBDcF+I3G7auf4tQx5XIgf/10sAyrEkThv
+         cIptU7x/mJmOF03EN7vLdDrr5f1C4BwzWuxR+9ldtZbr9K63rq50OA/b4pIqXmUhMAVg
+         9Yv595G4dsF2lozWtKEj8FyKDBb1m1Sddu6vHOOYRHRdjeD4+/Q2E3D4RE2SBt7dKA9I
+         nxpQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719584718; x=1720189518;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VeAwXuF7+pmymrZyPiqRkGCZGiMSVwcLFpTO8NXP0nk=;
+        b=qHUYQ7kqEa/PmW81WNZAzitBzicNrMY/ftSLFCKSF4RE3FhKYa0A3wX1VXb0/R5LFO
+         XUGnsyzInJ9lVLqEHzdpUJs0P6ht1BfS0oGg5TcTMDTmr83MF5+TMMn4RtT283Vjm5v/
+         U+Pvs56J0wePkQxiXTg6176d7LsIU+5OXJTwt5vKIHEjyp8U8U5iUUNbRC8RxMUzP9HH
+         7yHp3iZO1D8N7CuHOBSpWUNHw18izXSk29b5prpl6EHdqKoiggbYXFLj59rCJ9XfZI3N
+         SLGANjNoMkN1vXgcPg42o+gO4SMdlqLsY/9Sp6o6F3n4D1mSw4why2W3tiC2TjgKLx8C
+         5rJA==
+X-Forwarded-Encrypted: i=1; AJvYcCXH40/hmMZIJR1stl8cGEWK4iEml6c8aaZ8fDDa6xzGT0zX8H4RJu7fddfJ2JpSq7Xqkak1emg5/G3joZ/96aij9REq3RVtM71TfLS0
+X-Gm-Message-State: AOJu0Yyr00kFylvdrT2ckfbZv+UeT197vMWW6pvtdaeSwbl95l2GIuM7
+	DFTIkqhSqEbjRH8YcsueiYCIMcq9EXN+wfoH94vqs/CkICmvbznf
+X-Google-Smtp-Source: AGHT+IFTYNRmuabn1FZnyKG4Uik1w/ofEuzazYAzcKR3V8UFSfbfjagdPNoyM0oNWquKxkwJrJckjg==
+X-Received: by 2002:adf:f782:0:b0:35f:2725:7ae2 with SMTP id ffacd0b85a97d-366e9628e80mr11865862f8f.57.1719584718199;
+        Fri, 28 Jun 2024 07:25:18 -0700 (PDT)
+Received: from [10.95.168.202] (54-240-197-235.amazon.com. [54.240.197.235])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3675a0d8d9fsm2458985f8f.26.2024.06.28.07.25.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 28 Jun 2024 07:25:17 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <4e25df0e-000c-4af7-a34f-ba831623aab8@xen.org>
+Date: Fri, 28 Jun 2024 15:25:15 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: NavTHPwgFRn5oXL8VKbOe1E-We7S2g3J
-X-Proofpoint-GUID: NavTHPwgFRn5oXL8VKbOe1E-We7S2g3J
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-06-28_09,2024-06-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 lowpriorityscore=0
- malwarescore=0 spamscore=0 phishscore=0 priorityscore=1501 impostorscore=0
- suspectscore=0 adultscore=0 bulkscore=0 mlxlogscore=779 clxscore=1015
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2406280104
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: [PATCH v2] kvm: Fix warning in__kvm_gpc_refresh
+To: Pei Li <peili.dev@gmail.com>, David Woodhouse <dwmw2@infradead.org>,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Nathan Chancellor <nathan@kernel.org>,
+ Nick Desaulniers <ndesaulniers@google.com>, Bill Wendling
+ <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ skhan@linuxfoundation.org, linux-kernel-mentees@lists.linuxfoundation.org,
+ syzkaller-bugs@googlegroups.com, llvm@lists.linux.dev,
+ syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
+References: <20240627-bug5-v2-1-2c63f7ee6739@gmail.com>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <20240627-bug5-v2-1-2c63f7ee6739@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 2024-06-28 at 15:40 +0200, Heiko Carstens wrote:
-> On Fri, Jun 28, 2024 at 09:31:56AM -0400, Eric Farman wrote:
-> > > > dma32_to_u32(ccw->cda) - ccw_head;
-> > > > -			ccw->cda =3D u32_to_dma32(cda);
-> > > > +			/* Calculate offset of TIC target */
-> > > > +			cda =3D dma32_to_u32(ccw->cda) - ccw_head;
-> > > > +			ccw->cda =3D virt_to_dma32(iter->ch_ccw) +
-> > > > cda;
-> > >=20
-> > > I would suggest to rename cda to "offset", since that reflects what
-> > > it is
-> > > now. Also this code needs to take care of type checking, which will
-> > > fail now
-> > > due to dma32_t type (try "make C=3D1 drivers/s390/cio/vfio_ccw_cp.o).
->=20
-> ...
->=20
-> > I was poking at that code yesterday because it seemed suspect, but as I
-> > wasn't getting an explicit failure (versus the CPC generated by hw), I
-> > opted to leave it for now. I agree they should both be fixed up.
->=20
-> ...
->=20
-> > > I guess
-> > > you could add this hunk to your patch:
-> > >=20
-> > > @@ -915,7 +915,7 @@ void cp_update_scsw(struct channel_program *cp,
-> > > union scsw *scsw)
-> > > =C2=A0	 * in the ioctl directly. Path status changes etc.
-> > > =C2=A0	 */
-> > > =C2=A0	list_for_each_entry(chain, &cp->ccwchain_list, next) {
-> > > -		ccw_head =3D (u32)(u64)chain->ch_ccw;
-> > > +		ccw_head =3D (__force u32)virt_to_dma32(chain-
-> > > > ch_ccw);
-> > > =C2=A0		/*
-> > > =C2=A0		 * On successful execution, cpa points just beyond
-> > > the end
-> > > =C2=A0		 * of the chain.
->=20
-> ...
->=20
-> > > Furthermore it looks to me like the ch_iova member of struct ccwchain
-> > > should
-> > > get a dma32_t type instead of u64. The same applies to quite a few
-> > > variables
-> > > to the code.=C2=A0
-> >=20
-> > Agreed. I started this some time back after the IDAW code got reworked,
-> > but have been sidetracked. The problem with ch_iova is more apparent
-> > after the dma32 stuff.
-> >=20
-> > > I could give this a try, but I think it would be better if
-> > > somebody who knows what he is doing would address this :)
-> >=20
-> > I'll finish them up. But v2 will have to wait until after my holiday.
-> > Thanks for reminding me of the typechecking!
->=20
-> I hope you didn't get me wrong: from my point of view we want one or
-> two small patches (the above hunks), which fix the bugs, if you
-> agree.
->=20
-> And then address the type checking stuff at a later point in time.
+On 27/06/2024 16:03, Pei Li wrote:
+> Check for invalid hva address stored in data and return -EINVAL before
+> calling into __kvm_gpc_activate().
+> 
+> Reported-by: syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=fd555292a1da3180fc82
+> Tested-by: syzbot+fd555292a1da3180fc82@syzkaller.appspotmail.com
+> Signed-off-by: Pei Li <peili.dev@gmail.com>
+> ---
+> Syzbot reports a warning message in __kvm_gpc_refresh(). This warning
+> requires at least one of gpa and uhva to be valid.
+> WARNING: CPU: 0 PID: 5090 at arch/x86/kvm/../../../virt/kvm/pfncache.c:259 __kvm_gpc_refresh+0xf17/0x1090 arch/x86/kvm/../../../virt/kvm/pfncache.c:259
+> 
+> We are calling it from kvm_gpc_activate_hva(). This function always calls
+> __kvm_gpc_activate() with INVALID_GPA. Thus, uhva must be valid to
+> disable this warning.
+> 
+> This patch checks for invalid hva address and return -EINVAL before
+> calling __kvm_gpc_activate().
+> 
+> syzbot has tested the proposed patch and the reproducer did not trigger
+> any issue.
+> 
+> Tested on:
+> 
+> commit:         afcd4813 Merge tag 'mm-hotfixes-stable-2024-06-26-17-2..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1427e301980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=e40800950091403a
+> dashboard link: https://syzkaller.appspot.com/bug?extid=fd555292a1da3180fc82
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> patch:          https://syzkaller.appspot.com/x/patch.diff?x=13838f3e980000
+> 
+> Note: testing is done by a robot and is best-effort only.
+> ---
+> Changes in v2:
+> - Adapted Sean's suggestion to check for valid address before calling
+>    into __kvm_gpc_activate().
+> - Link to v1: https://lore.kernel.org/r/20240625-bug5-v1-1-e072ed5fce85@gmail.com
+> ---
+>   arch/x86/kvm/xen.c  | 2 +-
+>   virt/kvm/pfncache.c | 3 +++
+>   2 files changed, 4 insertions(+), 1 deletion(-)
+> 
 
--ENOCOFFEE. Sorry, I did misunderstand. I'll send the small patches
-later this morning.
-
->=20
-> (btw: your mailer adds lot's of extra line wraps)
->=20
-
-Ugh. Thanks for the heads up.
+Reviewed-by: Paul Durrant <paul@xen.org>
 
