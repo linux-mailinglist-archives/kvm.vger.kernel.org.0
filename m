@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-20699-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20700-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08A9491C940
-	for <lists+kvm@lfdr.de>; Sat, 29 Jun 2024 00:47:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC4C091C94E
+	for <lists+kvm@lfdr.de>; Sat, 29 Jun 2024 00:51:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1A251F23444
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 22:47:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C0BD28229D
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 22:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68B6F82480;
-	Fri, 28 Jun 2024 22:47:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D342782485;
+	Fri, 28 Jun 2024 22:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qTEtxyk+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qb5Ac7+X"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26C471DA5F
-	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 22:46:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911B5374F6
+	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 22:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719614821; cv=none; b=GnRdKWEY47PyHD/dwcTzt0d2jwzPtNh4dCSf7qaXpVsLy6/DWWeRnCnuwDbT/Y9uH07WmOklkORtRXcY4z/Y73obx0oP/JNSqfeJOx+rtjSiRuzIUOsn+xPUmZhvRQLE6oxkoEgOV4gVXqYcGfm4byE8KIS7hTqehZMW9ySS2iU=
+	t=1719615056; cv=none; b=LSavXYK0FLh95zzUEvqUsBrjwMMPvXlunvREtxgjtT77fBvivzrg+pQWQc5bwyg9JgZUju3872UULzrG8Tz25gnFNcPiKmnSUsNVWTXn7wpp0uX8tFJk3pmzLEf0d/n/4+DJKQGgYuRyh/yXUsv+jascW5ruBcCjR0ikBH75T/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719614821; c=relaxed/simple;
-	bh=1rm+2QXZvWJIdH1pbYM8kEGJ0tmdpnbCYdV+icbh3Wg=;
+	s=arc-20240116; t=1719615056; c=relaxed/simple;
+	bh=jy93R+AfsRqMAGlNONjXHx3MTwYmbc0o5Y+QyO4nU/E=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=o1J/gxBq/i01TmDo4IQzuLhi43+bqNJ5iPjN2cUJUnqXAsyo1pRTb8N5Fd+4/UTPqVCM0S71scSgI9E+fwOLPw2sQ4staTLCvwwWsjjBm5lkvNhq6KwL81biKyfUGQ3HDmzKO7N0G6+V1UU2mZ9usPpM1k3gtm2WbRuDh/8Fy9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qTEtxyk+; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=TbBu+WWxxWTVIHCn1rNe1JQo2x7O4mI/zdckrn0RJt5NOIAn3NfoszSd8Pjg65++WcMde9uPuS1JRjJD5Q7NBgN0eqVL6pWb6zLCd7R6p4K0sPFZYJkYIzjto/hGfDjOqCK8Xdc3q1eQ/ezk8CRQea8d8ikM+UzyXHVCTTo7cKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qb5Ac7+X; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-643acc141cbso12528797b3.1
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 15:46:59 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e02bb41247dso1853464276.1
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 15:50:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1719614819; x=1720219619; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1719615053; x=1720219853; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c553QvwYlm1gsxBaq0BWcW6YmP4giZ2L7AzyIKkPgyc=;
-        b=qTEtxyk+5sBHE9npi1Pt2IdbfQgfmqYxfX01uanbur9x4H2nL5u9EmNs10nw8BLtMy
-         Pdnb7d0NhntaM9kM8cMIfIdcSGArsCyb+Mizz/uaBPKewrSjgFIJ2AFaEzQyUrgIiv1y
-         uVEr+8bCa0gtVJKKO8kE6gXidhEVIGW3LX1vIw/UT9ck2AyBJ57Odz4vmvEsjM4r6dFt
-         H++5x01hDQzsNZye8ibRwk6ck0GfaZ5d2VIfb7w0SJmFCUmgJM+qcDiwGxCvB7FMX0Zm
-         l9yU08Es+D8qosmGEJkpg3lIIWa485dRG4/r0su5PXQVNRUAzGULL3i22/pV22CKlUXs
-         K1Dw==
+        bh=Bu4QFZ07Tx/IOVEaQ53Qnu94rStFQkBj6hOEerB+McQ=;
+        b=qb5Ac7+XumS+Qxp9YK3Mu4zbYPCTOqrs1VxUfIs1ysp57H7t9qeCI59K7LIUTraBN1
+         KdduSod7m8qMmrt8lgYz5o3AZwR5UKEVutzD9Oxzx8c5H5WtkvMTmj6dDUfelBEZ4B/e
+         F7QgcoMnYTpm/JWahRHtkqMjhvVoxGTLPCc+9ugvwIDX1FbO0ra6vHPm/c0R4P22e3zs
+         g0YjsZo2ESpysVMTl5dq7sy7RRn4lYw2PSuNszaPn/LCGc1nMywGBj8uEP8JrJBJ0Ps0
+         wz1ZEcKQr2Mob8p9u8uCnh10woOg2o1Axox7vpKRfjLX3/RqKMpddvVnn1OrK9ZnqbqG
+         2lCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719614819; x=1720219619;
+        d=1e100.net; s=20230601; t=1719615053; x=1720219853;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=c553QvwYlm1gsxBaq0BWcW6YmP4giZ2L7AzyIKkPgyc=;
-        b=qRcbkH8tmlqB4kPQZo359yOPjOq+B6C2qmMHYdTdSks3l5HKFxwAoN4KaoB+DxmBnU
-         baHMhHQ52+jKMfRtuoAqRMZJiTaYZBFavZ1sl7cCp86Jz5mD7Io4m0bi28he6MRqxlY2
-         dyoEHay8SXxRabxv23c9N9E16WuBSjOAsrA8AXytVnrwTUde3UxYzTJDyaqTMROoYzIK
-         7B92VLkJ6Tf1Ijx6GihDnaQhez5CkFJCj1t53ZHJA5Gxoipr1XYiZZgxfifIRkCHpsi6
-         EqdHNJH3j0rBmjnhBnvEPx+hRD5vzvggomhEonQzw86I0POqibkjN/uHQPjF68AjXH9A
-         u0PA==
-X-Forwarded-Encrypted: i=1; AJvYcCXbMdMOgJ30HmKzi9S4V2hiCAdGsD8UI10gCkbg3SolHAuYGAuMbLQRPflePiASMK4gJpgMhoPy35m7Ipb5SSQHZNTx
-X-Gm-Message-State: AOJu0YxbJWdTA742LKL5zTdQH4XKjZQyEI6lqSNbjaUhLign43EKkgRn
-	D9lanB2fg4566SLuMdtch3YLqW9kcrMyODwzar1TGO39/FCjoCBZj65PHMjYnj5Q94T0xxgBDpc
-	yYA==
-X-Google-Smtp-Source: AGHT+IGbOFOcq+TOC4/0immBeMnJQ2HimuXSOoFdC2haiG042WexdfLtZnLaiyDfntCqDBCvZMky5p0H+oM=
+        bh=Bu4QFZ07Tx/IOVEaQ53Qnu94rStFQkBj6hOEerB+McQ=;
+        b=w0viq72xgsHtLtNp5/XJ+HiLJiaRuF5t3kERyg6PgEtDVReN/XASNSEaJ2uXM2cxeX
+         c2OZ3q8TCrfwaASJA9aKON98dirnI939Hvy11uYGEqMEHH3RrgTOuB9de8aRUfnzsOio
+         FbcSctvbOoja19fqE9YARjnDKRfQjrc2K66akKCdVLlWZwRrQQwQ5KnvMT+oU/5APUem
+         gDfy3s86C0Q1z7cfQ+tD1vtp5t35r2HYqy2PaJUNO1JQmtzF86Aa5BUAtXWqVChhAIRb
+         I+8uDNXCugRKtn2hYFj0j7QRS1RATiwGki6yGnmCFYxv0saLqRMP4gnpjO572QGMZeeX
+         COVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWvzWoFEsfJdpMAT9BOdjMgpL00O4Pb8SyiN0U0Mc8sHUfwMQq06A9StKVe60dL+shuqfkRtO0f+X1ITM9EIYpF2reT
+X-Gm-Message-State: AOJu0YxByxsJgThgW2jpVfU8mLBres0JRuLl8svlyepbAfVryeiaJpSc
+	J1ReIbwS2rkfzj/fVwDt4GutJZ/4rOBlJCGnN7wDJ3Kk+5A/OedLgsVEecLuw1cU2DCq9cJW1JA
+	Q3w==
+X-Google-Smtp-Source: AGHT+IF/h7suUpPHaE6SsxKCTMo0m7O49IXDLR+c+LZnvsQxH+QhzdDpJWmE+hfpq58JCkdgFZQmcKv7iBg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:8303:0:b0:64b:5675:3ff5 with SMTP id
- 00721157ae682-64b56754363mr53627b3.2.1719614819050; Fri, 28 Jun 2024 15:46:59
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1109:b0:e03:3683:e67f with SMTP id
+ 3f1490d57ef6-e033683e751mr15350276.5.1719615053446; Fri, 28 Jun 2024 15:50:53
  -0700 (PDT)
-Date: Fri, 28 Jun 2024 15:46:57 -0700
-In-Reply-To: <5aa86285d1c1d7fe1960e3fe490f4b22273977e6.1718214999.git.reinette.chatre@intel.com>
+Date: Fri, 28 Jun 2024 15:50:51 -0700
+In-Reply-To: <2fccf35715b5ba8aec5e5708d86ad7015b8d74e6.1718214999.git.reinette.chatre@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <cover.1718214999.git.reinette.chatre@intel.com> <5aa86285d1c1d7fe1960e3fe490f4b22273977e6.1718214999.git.reinette.chatre@intel.com>
-Message-ID: <Zn89YTYQcEEu9Jrw@google.com>
-Subject: Re: [PATCH V9 1/2] KVM: selftests: Add x86_64 guest udelay() utility
+References: <cover.1718214999.git.reinette.chatre@intel.com> <2fccf35715b5ba8aec5e5708d86ad7015b8d74e6.1718214999.git.reinette.chatre@intel.com>
+Message-ID: <Zn8-S-QFSzm8du90@google.com>
+Subject: Re: [PATCH V9 2/2] KVM: selftests: Add test for configure of x86 APIC
+ bus frequency
 From: Sean Christopherson <seanjc@google.com>
 To: Reinette Chatre <reinette.chatre@intel.com>
 Cc: isaku.yamahata@intel.com, pbonzini@redhat.com, erdemaktas@google.com, 
@@ -85,57 +86,151 @@ Cc: isaku.yamahata@intel.com, pbonzini@redhat.com, erdemaktas@google.com,
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Jun 12, 2024, Reinette Chatre wrote:
-> ---
->  .../selftests/kvm/include/x86_64/processor.h    | 17 +++++++++++++++++
->  .../selftests/kvm/lib/x86_64/processor.c        | 11 +++++++++++
->  2 files changed, 28 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> index c0c7c1fe93f9..383a0f7fa9ef 100644
-> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> @@ -23,6 +23,7 @@
->  
->  extern bool host_cpu_is_intel;
->  extern bool host_cpu_is_amd;
-> +extern uint32_t tsc_khz;
+> +/*
+> + * Pick 25MHz for APIC bus frequency. Different enough from the default 1GHz.
+> + * User can override via command line.
+> + */
+> +static uint64_t apic_hz = 25 * 1000 * 1000;
+> +
+> +/*
+> + * Delay in msec that guest uses to determine APIC bus frequency.
+> + * User can override via command line.
+> + */
+> +static unsigned long delay_ms = 100;
 
-This should be guest_tsc_khz, because it most definitely isn't guaranteed to be
-the host TSC frequency.  And because it's global, we should try to avoid variable
-shadowing, e.g. tsc_scaling_sync.c also defines tsc_khz.
+There's no need for these to be global, it's easy enough to pass them as params
+to apic_guest_code().  Making is_x2apic is wortwhile as it cuts down on the noise,
+but for these, I think it's better to keep them local.
 
-Which, by the by, probably needs to be addressed, i.e. we should probably add a
-helper for setting KVM_SET_TSC_KHZ+guest_tsc_khz.
+> +
+> +/*
+> + * Possible TDCR values with matching divide count. Used to modify APIC
+> + * timer frequency.
+> + */
+> +static struct {
+> +	uint32_t tdcr;
+> +	uint32_t divide_count;
 
-I think it also makes sense to have this be a 64-bit value, even though KVM
-*internally* tracks a 32-bit value.  That way we don't have to worry about
-casting to avoid truncation.
+These can/should all be const.
 
->  /* Forced emulation prefix, used to invoke the emulator unconditionally. */
->  #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
-> @@ -816,6 +817,22 @@ static inline void cpu_relax(void)
->  	asm volatile("rep; nop" ::: "memory");
->  }
->  
-> +static inline void udelay(unsigned long usec)
+> +} tdcrs[] = {
+> +	{0x0, 2},
+> +	{0x1, 4},
+> +	{0x2, 8},
+> +	{0x3, 16},
+> +	{0x8, 32},
+> +	{0x9, 64},
+> +	{0xa, 128},
+> +	{0xb, 1},
+> +};
+> +
+> +/* true if x2APIC test is running, false if xAPIC test is running. */
+> +static bool is_x2apic;
+> +
+> +static void apic_enable(void)
 > +{
-> +	uint64_t start, now, cycles;
+> +	if (is_x2apic)
+> +		x2apic_enable();
+> +	else
+> +		xapic_enable();
+> +}
 > +
-> +	GUEST_ASSERT(tsc_khz);
-> +	cycles = tsc_khz / 1000 * usec;
+> +static uint32_t apic_read_reg(unsigned int reg)
+> +{
+> +	return is_x2apic ? x2apic_read_reg(reg) : xapic_read_reg(reg);
+> +}
 > +
-> +	start = rdtsc();
-> +	for (;;) {
-> +		now = rdtsc();
-> +		if (now - start >= cycles)
+> +static void apic_write_reg(unsigned int reg, uint32_t val)
+> +{
+> +	if (is_x2apic)
+> +		x2apic_write_reg(reg, val);
+> +	else
+> +		xapic_write_reg(reg, val);
+> +}
+> +
+> +static void apic_guest_code(void)
+> +{
+> +	uint64_t tsc_hz = (uint64_t)tsc_khz * 1000;
+> +	const uint32_t tmict = ~0u;
+> +	uint64_t tsc0, tsc1, freq;
+> +	uint32_t tmcct;
+> +	int i;
+> +
+> +	apic_enable();
+> +
+> +	/*
+> +	 * Setup one-shot timer.  The vector does not matter because the
+> +	 * interrupt should not fire.
+> +	 */
+> +	apic_write_reg(APIC_LVTT, APIC_LVT_TIMER_ONESHOT | APIC_LVT_MASKED);
+> +
+> +	for (i = 0; i < ARRAY_SIZE(tdcrs); i++) {
+> +
+> +		apic_write_reg(APIC_TDCR, tdcrs[i].tdcr);
+> +		apic_write_reg(APIC_TMICT, tmict);
+> +
+> +		tsc0 = rdtsc();
+> +		udelay(delay_ms * 1000);
+> +		tmcct = apic_read_reg(APIC_TMCCT);
+> +		tsc1 = rdtsc();
+> +
+> +		/*
+> +		 * Stop the timer _after_ reading the current, final count, as
+> +		 * writing the initial counter also modifies the current count.
+> +		 */
+> +		apic_write_reg(APIC_TMICT, 0);
+> +
+> +		freq = (tmict - tmcct) * tdcrs[i].divide_count * tsc_hz / (tsc1 - tsc0);
+> +		/* Check if measured frequency is within 1% of configured frequency. */
+
+1% is likely too aggressive, i.e. we'll get false failures due to host activity.
+On our systems, even a single pr_warn() in the timer path causes failure.  For
+now, I think 5% is good enough, e.g. it'll catch cases where KVM is waaay off.
+If we want to do better (or that's still too tight), then we can add a '-t <tolerance'
+param or something.
+
+> +		GUEST_ASSERT(freq < apic_hz * 101 / 100);
+> +		GUEST_ASSERT(freq > apic_hz * 99 / 100);
+
+Combine these into a single assert, and print the params, i.e. don't rely on the
+line number to figure out what's up.
+
+		__GUEST_ASSERT(freq < apic_hz * 105 / 100 && freq > apic_hz * 95 / 100,
+			       "Frequency = %lu (wanted %lu - %lu), bus = %lu, div = %u, tsc = %lu",
+			       freq, apic_hz * 95 / 100, apic_hz * 105 / 100,
+			       apic_hz, tdcrs[i].divide_count, tsc_hz);
+
+> +int main(int argc, char *argv[])
+> +{
+> +	int opt;
+> +
+> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_X86_APIC_BUS_CYCLES_NS));
+> +
+> +	while ((opt = getopt(argc, argv, "d:f:h")) != -1) {
+> +		switch (opt) {
+> +		case 'f':
+> +			apic_hz = atol(optarg);
 > +			break;
-> +		cpu_relax();
+> +		case 'd':
+> +			delay_ms = atol(optarg);
+> +			break;
+> +		case 'h':
+> +			help(argv[0]);
+> +			exit(0);
+> +		default:
+> +			help(argv[0]);
+> +			exit(1);
 
-Given that this is guest code, we should omit the PAUSE so that it doesn't trigger
-PLE exits, i.e. to make the delay as accurate as possible.  Then this simply becomes:
+Heh, selftests are anything but consistent, but this should be exit(KSFT_SKIP)
+for both.
 
-	start = rdtsc();
-	do {
-		now = rdtsc();
-	} while (now - start < cycles);
+> +		}
+> +	}
+> +
+> +	run_apic_bus_clock_test(false);
+> +	run_apic_bus_clock_test(true);
+> +}
+> -- 
+> 2.34.1
+> 
 
