@@ -1,74 +1,76 @@
-Return-Path: <kvm+bounces-20635-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20636-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31BB191B8FE
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 09:52:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20FFD91B901
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 09:52:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56178287AF2
-	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 07:52:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1BCD281B31
+	for <lists+kvm@lfdr.de>; Fri, 28 Jun 2024 07:52:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E3EE143864;
-	Fri, 28 Jun 2024 07:52:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4913146D54;
+	Fri, 28 Jun 2024 07:52:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="V9frxGw+"
+	dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b="K8MLtgJy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB0614532C
-	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 07:52:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C83145340
+	for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 07:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719561126; cv=none; b=Fyc8FCxaJJPwzJdsXQdgIuE1Gfn7Q2/mnyWaT8wMpkHWxFQlVmOTblPTQAGNfYGqL3qWp2pa8OSEvAfj/TIA0c7sNV8TevNoenSfiXLDiJ+Jq7aGhKD3TFh+3PGeVkk9ELpuAp47Zl9359yJNBuPBIXGfGWXGxi8j4mR7M0qhPc=
+	t=1719561127; cv=none; b=cCDg1dsrIWvObXS64Dq1sevfaT+2OG3J92LCpw97HW2wqsxX6SD0A1No1gNyJ4rGau4lgIyVLjH3tQ6MU+NrXyUU7NcWrDSFdVXJblhRCunBZaNyNIFXVnhSVpGNV94XJtS3MQD6aZjPc5DqxHfZ9BaI0/er4lSXPxJjiWXslwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719561126; c=relaxed/simple;
-	bh=EQnkaeiVzliUJR5h0Fr7U2mwCLH2PFeHVytjBFr15sU=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=BNZFalcn3zx+SifAgr8h1Qnop7oqJrpu3i91EihRCAOr4MiJxD368GcVqaNI/EGSMvKuy9smNbBOatWpoelPZV3kHxFSHR+BrTvaCeqwXaunGBTQ2/0bV1wf5aETasBPkLkWC+5VBYcT1OtcdsuOHfrjYFLuKTpyj4oqdtI7J9o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=V9frxGw+; arc=none smtp.client-ip=209.85.161.47
+	s=arc-20240116; t=1719561127; c=relaxed/simple;
+	bh=Ark6jD3S2s0EGCk/kplfkHpXwZMR4vMqPsKy7BXH++g=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Te0roLUP9Q/8SqQm79b/PCb7NXxIIoFckNuHHiMfecYiy+1L5hdnUxT9222koFIRFLc08nFCKBOKLNUoBsh1rXbwEN8C5QC17oHEz1u/fxuqmolBP5eaVei/5lc4opc1p5PfDxkCVUHp7rm9WOilWJ+IukKc0YarJcMMsr06H+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com; spf=pass smtp.mailfrom=rivosinc.com; dkim=pass (2048-bit key) header.d=rivosinc-com.20230601.gappssmtp.com header.i=@rivosinc-com.20230601.gappssmtp.com header.b=K8MLtgJy; arc=none smtp.client-ip=209.85.219.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rivosinc.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rivosinc.com
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5b53bb4bebaso155115eaf.0
-        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 00:52:04 -0700 (PDT)
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e02b79c6f21so270560276.2
+        for <kvm@vger.kernel.org>; Fri, 28 Jun 2024 00:52:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1719561123; x=1720165923; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lfk2FSfAfTy7rTZuEBD/W0oaye5LlvyVrrLcE/eP+AI=;
-        b=V9frxGw+TWEPYHSq8Ar0+9i1u/B0YCPIVI9rYp9DOiWE31J1CGdiQGj/GQ3CEVHD0C
-         xp7lIYqpStplazpxgegnvev/YPmkIZapqNuRpM5JsL7f8YSahFUYg5cQuLjfqgzSBJOR
-         Imuds7Elk3WBXUiGsHwp2umzi7JgScSstm6+RzkFNvUyB4fDWEmJr3yp8pzh/47zp5xh
-         eQkJZ5CTByhwz/ZrykwMiS0npXypSr04L10tsWSwcD73QmKu3/tyLGepj83UWmVi6cea
-         eYitJAeo3Rnt/nyY+KrLpFhdo8yvNNMZOoQOqaBVKq7Nr55+MkSpfovM3tRRO9uPgD8m
-         JBIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719561123; x=1720165923;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=rivosinc-com.20230601.gappssmtp.com; s=20230601; t=1719561125; x=1720165925; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Lfk2FSfAfTy7rTZuEBD/W0oaye5LlvyVrrLcE/eP+AI=;
-        b=JuwyXWkh3jaPFxyPEAo8SF+qvs0NoNtduhpDYFBBzI0UQPSPfbHYOpzNVe92ZNQuXI
-         cElWPC3/h+G26H3CNrlG/zZ+MtWSI5V2iQ7qkGX16u/+QObccLhzA5o0GZiIl8NBULAq
-         pq4SrnWdZMZ6/NP2mbL3llHK3e+AOJ7qnqrhFDfTZgGcXQwKFjMeWzmdj4RvpWBovPno
-         WaSqdkXfdT1fDfuW2tG0EyetNN5yMsOiBg5GhdPWzNYAVDywZW4w8NjXoAbn1tC17ic2
-         wuNFc6bx+COEQxOYsI89uIBhnQof+2xLO6QdAXc0c3fUuiFML9LQDViq5Il2ocgZ012x
-         2PSg==
-X-Forwarded-Encrypted: i=1; AJvYcCX3Y3gezxs7+neLreBb99iR+ETvLoSsbWzTlCF8TFVjBEdP866eUuFQu3OSTtodXpg8IYz6D5PZDB0BI93wwg69fHcT
-X-Gm-Message-State: AOJu0Yz1S3GD3rC/nvUc6GZRgt9qNNp/CJkjraZUgLzGRMmEvDnYai2h
-	6XitzL5B130c8qcjEAZxJJyairgsMSZaTz3fj8LYlSC9KRj8mv/gfvXT2/ltx1Q=
-X-Google-Smtp-Source: AGHT+IGJY3zwz2Dh3ONBt7zBT44037cWL19x8gYpDsscR2++QxJYS7DFgyh8r/X4g1UFT/8YlTY5Ng==
-X-Received: by 2002:a05:6358:9497:b0:1a6:5ef1:c372 with SMTP id e5c5f4694b2df-1a65ef1c9c7mr603886655d.26.1719561123194;
-        Fri, 28 Jun 2024 00:52:03 -0700 (PDT)
+        bh=eu+2wcx6ARI0Khk7sEf+LxSnsWz3kwiEgnTb6o13mh0=;
+        b=K8MLtgJykJ6umJOFTmnh7i1rJ0JFUa2EJUnCBDKyJyVwabXGhCIUaHu7iofA4qsI2e
+         te5ZDAz3DRBbn+Phaj7JETpQCxB7PkW4fx8SexCL4w138FEa43FrSA8Pc/bZh2bIRQm1
+         maxY0NkVU/w0q4RI125XHdn0viFOqJiw68wgjakzpz6/wzV20yhBTXWB3O4aHzpSK+TP
+         ih3SxkzZznifi60f6IaWvfGPr5laqppuSGejZB2nlG7rEXlxec3N3M9p31bemXsAZ2Y2
+         DzuVQGrMG7UpHvYm5gQ/v8NOkBhpduTmYGq8j4mT/EMCtw/y0GRnVeWO3u6tKOlFTNFA
+         9MFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719561125; x=1720165925;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eu+2wcx6ARI0Khk7sEf+LxSnsWz3kwiEgnTb6o13mh0=;
+        b=vdXZu4cF8xgTatol3iIbXhgH2OqcNYbwj8squ+BRtfNVjk5k+ie5jB0d07Xn9DVRRb
+         Hs0XLilHHzUunEWW/Tux/BytfooRvYoZ6dKJSJul4u7onDuM+b+YRY4L5tt9bw0klLq4
+         z900Hwq/iIESAgwq29/60msIyABm9RPsYyOCy6PAA3aq4ll5JnliKdjjyqAEZj7gkj8L
+         uZ26OKcR3jdWsVN3+AOBTUtv5j2FB0ahm8jXGYYJk4CDyMkDGzeS7v0YjcWCiFNeE63E
+         3gF+YqqZ1pDmOQEoNAVri4LohrO6650yxnNmifGNLnTBjSrVDXZNWVdaeB7k76XFvHso
+         c28g==
+X-Forwarded-Encrypted: i=1; AJvYcCVMEIZ4zzNLrQOOOIjC7QjkxuM2zPdwWCypDXWO4oexKVDvAQh4OKMzbwKegwqPeje1dM49Xku2BsD4T3wYJ/eyiibS
+X-Gm-Message-State: AOJu0YyoBH13hzpQmMP0M3jCDqO6drLfsVBDuFiQUVDrlHxhjr3E3jIu
+	CY/CJhngh+oYi7RdNcxZ3UIaKywJXdHfz+G7XXJKlqsySASnlgybz61uEMmEmU8=
+X-Google-Smtp-Source: AGHT+IEZUhwullYVKgF25a+0boKvH0ownItzxOgMvrt6D0RnS9rjqr16EhSB3iPBE5ZjBx8I+fBacw==
+X-Received: by 2002:a05:6902:1701:b0:e03:48ed:d275 with SMTP id 3f1490d57ef6-e0348edd2d9mr4844561276.61.1719561125224;
+        Fri, 28 Jun 2024 00:52:05 -0700 (PDT)
 Received: from atishp.ba.rivosinc.com ([64.71.180.162])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c69b53bf2sm685068a12.2.2024.06.28.00.52.01
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-72c69b53bf2sm685068a12.2.2024.06.28.00.52.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 28 Jun 2024 00:52:02 -0700 (PDT)
+        Fri, 28 Jun 2024 00:52:04 -0700 (PDT)
 From: Atish Patra <atishp@rivosinc.com>
-Subject: [PATCH v4 0/3] Assorted fixes in RISC-V PMU driver
-Date: Fri, 28 Jun 2024 00:51:40 -0700
-Message-Id: <20240628-misc_perf_fixes-v4-0-e01cfddcf035@rivosinc.com>
+Date: Fri, 28 Jun 2024 00:51:41 -0700
+Subject: [PATCH v4 1/3] drivers/perf: riscv: Do not update the event data
+ if uptodate
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -77,10 +79,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAIxrfmYC/2WNwQrCMBBEf6Xs2UhImho8+R+llJps7B7alKwEp
- eTfjQVPHt8Mb2YHxkTIcG12SJiJKa4V2lMDbp7WBwrylUFJ1cpOGbEQu3HDFMZAL2RhnLkEY4y
- 3ykK1toRHUaV+qDwTP2N6HwdZf9PfVve3lbWQwqMOFr21frrfEuXItLqziwsMpZQPn0Cn3bEAA
- AA=
+Message-Id: <20240628-misc_perf_fixes-v4-1-e01cfddcf035@rivosinc.com>
+References: <20240628-misc_perf_fixes-v4-0-e01cfddcf035@rivosinc.com>
+In-Reply-To: <20240628-misc_perf_fixes-v4-0-e01cfddcf035@rivosinc.com>
 To: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org
 Cc: Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>, 
  Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
@@ -94,140 +95,43 @@ Cc: Atish Patra <atishp@atishpatra.org>, Anup Patel <anup@brainfault.org>,
  kvm@vger.kernel.org, Atish Patra <atishp@rivosinc.com>, garthlei@pku.edu.cn
 X-Mailer: b4 0.15-dev-13183
 
-This series contains 3 fixes out of which the first one is a new fix
-for invalid event data reported in lkml[2]. The last two are v3 of Samuel's
-patch[1]. I added the RB/TB/Fixes tag and moved 1 unrelated change
-to its own patch. I also changed an error message in kvm vcpu_pmu from
-pr_err to pr_debug to avoid redundant failure error messages generated
-due to the boot time quering of events implemented in the patch[1]
+In case of an counter overflow, the event data may get corrupted
+if called from an external overflow handler. This happens because
+we can't update the counter without starting it when SBI PMU
+extension is in use. However, the prev_count has been already
+updated at the first pass while the counter value is still the
+old one.
 
-Here is the original cover letter for the patch[1]
+The solution is simple where we don't need to update it again
+if it is already updated which can be detected using hwc state.
+The event state in the overflow handler is updated in the following
+patch. Thus, this fix can't be backported to kernel version where
+overflow support was added.
 
-Before this patch:
-$ perf list hw
+Fixes: a8625217a054 ("drivers/perf: riscv: Implement SBI PMU snapshot function")
 
-List of pre-defined events (to be used in -e or -M):
-
-  branch-instructions OR branches                    [Hardware event]
-  branch-misses                                      [Hardware event]
-  bus-cycles                                         [Hardware event]
-  cache-misses                                       [Hardware event]
-  cache-references                                   [Hardware event]
-  cpu-cycles OR cycles                               [Hardware event]
-  instructions                                       [Hardware event]
-  ref-cycles                                         [Hardware event]
-  stalled-cycles-backend OR idle-cycles-backend      [Hardware event]
-  stalled-cycles-frontend OR idle-cycles-frontend    [Hardware event]
-
-$ perf stat -ddd true
-
- Performance counter stats for 'true':
-
-              4.36 msec task-clock                       #    0.744 CPUs utilized
-                 1      context-switches                 #  229.325 /sec
-                 0      cpu-migrations                   #    0.000 /sec
-                38      page-faults                      #    8.714 K/sec
-         4,375,694      cycles                           #    1.003 GHz                         (60.64%)
-           728,945      instructions                     #    0.17  insn per cycle
-            79,199      branches                         #   18.162 M/sec
-            17,709      branch-misses                    #   22.36% of all branches
-           181,734      L1-dcache-loads                  #   41.676 M/sec
-             5,547      L1-dcache-load-misses            #    3.05% of all L1-dcache accesses
-     <not counted>      LLC-loads                                                               (0.00%)
-     <not counted>      LLC-load-misses                                                         (0.00%)
-     <not counted>      L1-icache-loads                                                         (0.00%)
-     <not counted>      L1-icache-load-misses                                                   (0.00%)
-     <not counted>      dTLB-loads                                                              (0.00%)
-     <not counted>      dTLB-load-misses                                                        (0.00%)
-     <not counted>      iTLB-loads                                                              (0.00%)
-     <not counted>      iTLB-load-misses                                                        (0.00%)
-     <not counted>      L1-dcache-prefetches                                                    (0.00%)
-     <not counted>      L1-dcache-prefetch-misses                                               (0.00%)
-
-       0.005860375 seconds time elapsed
-
-       0.000000000 seconds user
-       0.010383000 seconds sys
-
-After this patch:
-$ perf list hw
-
-List of pre-defined events (to be used in -e or -M):
-
-  branch-instructions OR branches                    [Hardware event]
-  branch-misses                                      [Hardware event]
-  cache-misses                                       [Hardware event]
-  cache-references                                   [Hardware event]
-  cpu-cycles OR cycles                               [Hardware event]
-  instructions                                       [Hardware event]
-
-$ perf stat -ddd true
-
- Performance counter stats for 'true':
-
-              5.16 msec task-clock                       #    0.848 CPUs utilized
-                 1      context-switches                 #  193.817 /sec
-                 0      cpu-migrations                   #    0.000 /sec
-                37      page-faults                      #    7.171 K/sec
-         5,183,625      cycles                           #    1.005 GHz
-           961,696      instructions                     #    0.19  insn per cycle
-            85,853      branches                         #   16.640 M/sec
-            20,462      branch-misses                    #   23.83% of all branches
-           243,545      L1-dcache-loads                  #   47.203 M/sec
-             5,974      L1-dcache-load-misses            #    2.45% of all L1-dcache accesses
-   <not supported>      LLC-loads
-   <not supported>      LLC-load-misses
-   <not supported>      L1-icache-loads
-   <not supported>      L1-icache-load-misses
-   <not supported>      dTLB-loads
-            19,619      dTLB-load-misses
-   <not supported>      iTLB-loads
-             6,831      iTLB-load-misses
-   <not supported>      L1-dcache-prefetches
-   <not supported>      L1-dcache-prefetch-misses
-
-       0.006085625 seconds time elapsed
-
-       0.000000000 seconds user
-       0.013022000 seconds sys
-
-Changes in v4:
-
-- Added SoB tags.
-- Improved the commit message in patch 1
-- Link to v3: https://lore.kernel.org/r/20240626-misc_perf_fixes-v3-0-de3f8ed88dab@rivosinc.com
-
-Changes in v3:
- - Added one more fix
- - Separated an unrelated change to its own patch.
- - Rebase and Added RB/TB/Fixes tag.
- - Changed a error message in kvm code to avoid unnecessary failures
-   at guest booting.
-Changes in v2:
- - Move the event checking to a workqueue to make it asynchronous
- - Add more details to the commit message based on the v1 discussion
-
-[1] https://lore.kernel.org/linux-riscv/20240418014652.1143466-1-samuel.holland@sifive.com/
-[2] https://lore.kernel.org/all/CC51D53B-846C-4D81-86FC-FBF969D0A0D6@pku.edu.cn/
-
+Reported-by: garthlei@pku.edu.cn
+Closes:https://lore.kernel.org/all/CC51D53B-846C-4D81-86FC-FBF969D0A0D6@pku.edu.cn/
 Signed-off-by: Atish Patra <atishp@rivosinc.com>
 ---
-Atish Patra (1):
-      drivers/perf: riscv: Do not update the event data if uptodate
+ drivers/perf/riscv_pmu.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Samuel Holland (2):
-      drivers/perf: riscv: Reset the counter to hpmevent mapping while starting cpus
-      perf: RISC-V: Check standard event availability
+diff --git a/drivers/perf/riscv_pmu.c b/drivers/perf/riscv_pmu.c
+index 78c490e0505a..0a02e85a8951 100644
+--- a/drivers/perf/riscv_pmu.c
++++ b/drivers/perf/riscv_pmu.c
+@@ -167,7 +167,7 @@ u64 riscv_pmu_event_update(struct perf_event *event)
+ 	unsigned long cmask;
+ 	u64 oldval, delta;
+ 
+-	if (!rvpmu->ctr_read)
++	if (!rvpmu->ctr_read || (hwc->state & PERF_HES_UPTODATE))
+ 		return 0;
+ 
+ 	cmask = riscv_pmu_ctr_get_width_mask(event);
 
- arch/riscv/kvm/vcpu_pmu.c    |  2 +-
- drivers/perf/riscv_pmu.c     |  2 +-
- drivers/perf/riscv_pmu_sbi.c | 44 +++++++++++++++++++++++++++++++++++++++++---
- 3 files changed, 43 insertions(+), 5 deletions(-)
----
-base-commit: 55027e689933ba2e64f3d245fb1ff185b3e7fc81
-change-id: 20240625-misc_perf_fixes-5c57f555d828
---
-Regards,
-Atish patra
+-- 
+2.34.1
 
 
