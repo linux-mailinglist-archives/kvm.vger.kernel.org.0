@@ -1,160 +1,109 @@
-Return-Path: <kvm+bounces-20733-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20734-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2081D91D1F6
-	for <lists+kvm@lfdr.de>; Sun, 30 Jun 2024 16:09:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E7B591D217
+	for <lists+kvm@lfdr.de>; Sun, 30 Jun 2024 16:20:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0ED3281CDA
-	for <lists+kvm@lfdr.de>; Sun, 30 Jun 2024 14:09:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 527F41C20AEB
+	for <lists+kvm@lfdr.de>; Sun, 30 Jun 2024 14:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5DE14E2E8;
-	Sun, 30 Jun 2024 14:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5426315279E;
+	Sun, 30 Jun 2024 14:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hIpyXJeD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="el+PO6ZO"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282897E572;
-	Sun, 30 Jun 2024 14:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F026012D1E0
+	for <kvm@vger.kernel.org>; Sun, 30 Jun 2024 14:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719756579; cv=none; b=r2wYkIEbqxJsB8iWwaJP6jQHFC48/coFD2HDLwPHD9DC2q5Oq+0atxVuJZ7L1yWGDfsyhjeK7G/MnZu9zs+Ood6BexsvtBlFDFivRA9MpjUiD8p/Dvhqvgr8m+UdLs39jI0OWegCsKDCC/2zlBiBe50ppBlus1WpgNK0ewc6BDo=
+	t=1719757204; cv=none; b=r/13FFLIbzDb2RXkVPElYaNh4L/5oXQcC2fk4qVS406Og7keFAlqgAsg0MF6eV+67fmYukyT5qebe/PjT9PlCEZlG+DEcOuOER1k0lgCT7MYd45nR0NBGvzQTlCj6VzFvbIjltAXxAo6OGwi7mJ+2P7x0KbtXhheaUk1/ECdoak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719756579; c=relaxed/simple;
-	bh=/xCCulK2LDvM6T4DDK3IaPZekIJJ7Gq+2ykmVNaX2YM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WMPAxB2gcmQYmSFun+UbT/Kwa7uZt9pYFPcEQIn2FZB2RFPgnowxTxP3WTHFgBp+6vlRtmkcIW8eV45m+wccWU3TUiEFeki38X5Kn6QqG5gJGDphJsnb5fE2u7T8qIo4lgAwX8pZag4uRSXPx8KYCcTsj6+KUxYJ5OtUW/Ze6Ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hIpyXJeD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB1F4C2BD10;
-	Sun, 30 Jun 2024 14:09:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719756578;
-	bh=/xCCulK2LDvM6T4DDK3IaPZekIJJ7Gq+2ykmVNaX2YM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hIpyXJeDjyxKeeaNxtVJX644yi5CswNk4QOjMTn10ZTy8z1URm5QSFhuiPgNw2BhM
-	 3rkcWZCDMNXDAjRewXOwPJmp/XooFrSToztonDGy77Mh6n25fc2TmQ65BCxE8Miet/
-	 OcWwcQgbQMo263ZlWTOwuxWs5mIwksFrbnFxNiHzV88do6qwZzHOknD66IVKY3GNQe
-	 ragVgaD33bELePr9TIUPh/g7LMsGZ/8oEGcwGWCc1M5Mlep1ngwSknu6qtSFHxrJso
-	 p5JP0fHbVDZtLXOf5KI2fggU9uw8qIpOu1AmEgHLyvNZ2wnse79/850GDego4u9XZz
-	 tk/wLpivtFLTg==
-Date: Sun, 30 Jun 2024 15:09:33 +0100
-From: Conor Dooley <conor@kernel.org>
-To: Jessica Clarke <jrtc27@jrtc27.com>
-Cc: Yong-Xuan Wang <yongxuan.wang@sifive.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	linux-riscv <linux-riscv@lists.infradead.org>,
-	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org,
-	Greentime Hu <greentime.hu@sifive.com>,
-	Vincent Chen <vincent.chen@sifive.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>
-Subject: Re: [PATCH v6 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
-Message-ID: <20240630-caboose-diameter-7e73bf86da49@spud>
-References: <20240628093711.11716-1-yongxuan.wang@sifive.com>
- <20240628093711.11716-3-yongxuan.wang@sifive.com>
- <20240628-clamp-vineyard-c7cdd40a6d50@spud>
- <402C3422-0248-4C0F-991E-C0C4BBB0FA72@jrtc27.com>
+	s=arc-20240116; t=1719757204; c=relaxed/simple;
+	bh=eTc2YyVWuxbQUdkhQcyvQnlYMPaW5lHGn2BtXhfjlms=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=aiFDurg0C+5rTLrnNpPVnWOqIM8qioEIQ8FWGWRcvbFvs8N4aZk01Zr3yUYhmAIu8DExFcEVRxOWCxNmC3EAOvd4cx8xuwdXg0o+LcqBVcqhillb6+XC8SsYD4WvSirngMip1d6kCRnVmTGX8PDhoEzLle7L/L7CMH0yeJLMLQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=el+PO6ZO; arc=none smtp.client-ip=209.85.208.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2ec50d4e47bso21064311fa.2
+        for <kvm@vger.kernel.org>; Sun, 30 Jun 2024 07:20:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719757200; x=1720362000; darn=vger.kernel.org;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eTc2YyVWuxbQUdkhQcyvQnlYMPaW5lHGn2BtXhfjlms=;
+        b=el+PO6ZOWimg6VFmZf97gKpu3XMHXxbNJYZl7eHcIJJxHkR3XBGnyyyNHc6tmWnQJD
+         HRb87e4SmLkT//VAOF3QR0bCy2iQedty5Icm//w4BAvEkIl4/cYYnU2iS51DJsi071z2
+         H4nFKN/1NWEKyIRSPn9XH//oVfNzGIr6LNgSuIeVir0fqPI8KE7/5m8EwknOahNnwpHO
+         ZgcZGkfu6usKYjdpOcKoeVoQbLDT/LW5rNhRz1mxvoayQNTwuRQJ0jlSTTVqyGPEOAK5
+         DpuIBkkpBptk7MhlhlpshyQQPYdpg0Jdn5I7Ev0qie24OEcpzuaRv+9s/W3FV/5SeV0p
+         F9lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719757200; x=1720362000;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eTc2YyVWuxbQUdkhQcyvQnlYMPaW5lHGn2BtXhfjlms=;
+        b=Et6dEylJ0wTVLc/xL4RMzPDE6PjoEkFLTCWyvsY8jaRS0sa6rSZr73cgGtjpMNubQh
+         FpcO4UEkbzXYSboDbQFTNyEppoTnATrC35kvszXSzIXrkqlCR8Ksum9ug8z/10NLLOty
+         knYJdDjO/qmLIeHmB+ApaBbeV5x/Z/VFDGse2IdLjGiWNj6YMmU10073KBCVDGzfCIuh
+         sXoIxtdF8iTrEdYLCR3fcyCXpUqVpHe15H6Xa8uFrdNV5mLjzLEdIeSKrWyEJVUtXK63
+         6YCYjFIwiphmrENFfcM0bwtf3rdpaKWuI6HJRBUqn5z9Hmby8d2au7904FvmrTOjeFIr
+         ElZA==
+X-Gm-Message-State: AOJu0Ywv6B6sRNfATsQneoY0YJijNtiu0hTpGP+gKWLt3xdHTN3rwuYi
+	G6xsnkPodTKd5r6OcIpGlzumAdEyw7q7MLZKgfJSGSq455Hj4YQZaf85GbV2Crv8DpdQoI7GlpQ
+	VJkC2fl5qU+dCPmEnqZcEdrOIC1wIO94O
+X-Google-Smtp-Source: AGHT+IEBBPxQtR3yHslHxjTEZ9ZFs7FTRHd6GJsrXpesluLPr9FgQ4/ImBLl30DonJLBrfXaRQOZn4FId7RGgXvXosc=
+X-Received: by 2002:a2e:bc19:0:b0:2eb:d924:43fb with SMTP id
+ 38308e7fff4ca-2ee5e6bc6f7mr24924631fa.41.1719757200097; Sun, 30 Jun 2024
+ 07:20:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="VstelAVsSG0eBIgw"
-Content-Disposition: inline
-In-Reply-To: <402C3422-0248-4C0F-991E-C0C4BBB0FA72@jrtc27.com>
+From: Chloe Alverti <xloi.alverti@gmail.com>
+Date: Sun, 30 Jun 2024 09:19:47 -0500
+Message-ID: <CANpuKBNY0M+22K5T=UMz8iiqWwXy1jaWJNcOerrNK5Nhgqd1Hg@mail.gmail.com>
+Subject: Using PEBS from qemu-kvm
+To: kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
+Hello to all,
 
---VstelAVsSG0eBIgw
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+I am using qemu to set-up a VM on a Sapphire Rapid server.
+I am running linux kernel 6.6.14 in both guest and host.
+I enable kvm for the guest and I pass the --cpu host flag to qemu.
 
-On Sat, Jun 29, 2024 at 02:09:34PM +0100, Jessica Clarke wrote:
-> On 28 Jun 2024, at 17:19, Conor Dooley <conor@kernel.org> wrote:
-> >=20
-> > On Fri, Jun 28, 2024 at 05:37:06PM +0800, Yong-Xuan Wang wrote:
-> >> Add entries for the Svade and Svadu extensions to the riscv,isa-extens=
-ions
-> >> property.
-> >>=20
-> >> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> >> ---
-> >> .../devicetree/bindings/riscv/extensions.yaml | 28 +++++++++++++++++++
-> >> 1 file changed, 28 insertions(+)
-> >>=20
-> >> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml b=
-/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >> index 468c646247aa..c3d053ce7783 100644
-> >> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> >> @@ -153,6 +153,34 @@ properties:
-> >>             ratified at commit 3f9ed34 ("Add ability to manually trigg=
-er
-> >>             workflow. (#2)") of riscv-time-compare.
-> >>=20
-> >> +        - const: svade
-> >> +          description: |
-> >> +            The standard Svade supervisor-level extension for SW-mana=
-ged PTE A/D
-> >> +            bit updates as ratified in the 20240213 version of the pr=
-ivileged
-> >> +            ISA specification.
-> >> +
-> >> +            Both Svade and Svadu extensions control the hardware beha=
-vior when
-> >> +            the PTE A/D bits need to be set. The default behavior for=
- the four
-> >> +            possible combinations of these extensions in the device t=
-ree are:
-> >> +            1) Neither Svade nor Svadu present in DT =3D>
-> >=20
-> >>                It is technically
-> >> +               unknown whether the platform uses Svade or Svadu. Supe=
-rvisor may
-> >> +               assume Svade to be present and enabled or it can disco=
-ver based
-> >> +               on mvendorid, marchid, and mimpid.
-> >=20
-> > I would just write "for backwards compatibility, if neither Svade nor
-> > Svadu appear in the devicetree the supervisor may assume Svade to be
-> > present and enabled". If there are systems that this behaviour causes
-> > problems for, we can deal with them iff they appear. I don't think
-> > looking at m*id would be sufficient here anyway, since the firmware can
-> > have an impact. I'd just drop that part entirely.
->=20
-> Older QEMU falls into that category, as do Bluespec=E2=80=99s soft-cores =
-(which
-> ours are derived from at Cambridge). I feel that, in reality, one
-> should be prepared to handle both trapping and atomic updates if
-> writing an OS that aims to support case 1.
+My understanding is that there is some PEBS virtualization support in
+place within kvm. However in the above set-up if I try:
 
-I guess that is actually what we should put in then, to use an
-approximation of your wording, something like
-	Neither Svade nor Svadu present in DT =3D> Supervisor software should be
-	prepared to handle either hardware updating of the PTE A/D bits or page
-	faults when they need updated
-?
+perf record -e instructions:p ls -- I get back "unchecked MSR access
+error: WRMSR to 0x3f1 (tried to write 0x0000000000000002)"
 
---VstelAVsSG0eBIgw
-Content-Type: application/pgp-signature; name="signature.asc"
+if I try perf record -e instructions:ppp ls -- I get back that the PMU
+HW does not support sampling.
 
------BEGIN PGP SIGNATURE-----
+Also I see in dmesg that in the guest, PEBS has fmt-0 (format)
+configured while in the host it is fmt-4.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZoFnHQAKCRB4tDGHoIJi
-0ndoAP93+tDDtA9REzbCkIEltVoxfZckvSQWizwwYg211bfpVwEAr32+ixQYgkK/
-rHueZ5hB231ndT82y+Y9rNscAzTMUwA=
-=tz48
------END PGP SIGNATURE-----
+In general, I would like to use PEBS within the guest to take a trace
+of sampled instructions that cause LLC misses.
 
---VstelAVsSG0eBIgw--
+At this point, it is not clear to me if this is even possible.
+
+Could you please let me know if I can use PEBS for my purpose at all,
+and if yes what configuration am I missing?
+Is there some other VMM that I should be using and not qemu?
+
+Thank you very much in advance!
+Best Regards,
+Chloe
+
+P.S.: PEBS sampling works fine in the host.
 
