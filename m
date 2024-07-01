@@ -1,142 +1,150 @@
-Return-Path: <kvm+bounces-20765-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20759-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADC7891D947
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 09:45:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A763791D8E8
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 09:29:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CA4A1F223E2
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 07:45:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C943C1C214B9
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 07:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 163037C086;
-	Mon,  1 Jul 2024 07:45:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D9774079;
+	Mon,  1 Jul 2024 07:28:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="bjfOkcVJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WgVZyZ5A"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CED3B7D3F5;
-	Mon,  1 Jul 2024 07:44:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135941B809
+	for <kvm@vger.kernel.org>; Mon,  1 Jul 2024 07:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719819899; cv=none; b=f5dZ6VBpAN07nT99ElSeXbc3brOpRaZ+PL9pR4+utabihY6xwCPN6fo4Eo8M3bkBIN75g/gcVqeL5M0snzMYtc1icgeR0mAXPzfu1r7pVJz/GIAVCchQQ3JvI2bKcre/xscMEfrA+URQvXzdO+jlaY5CqB/6qeSY0RaN1dqcdZM=
+	t=1719818934; cv=none; b=Bfk9WUFid6R6y6bVUMaV7J4WTEViU0ZbO1oqMZnD9agAIJQVsrqATU7okyZYVZMUqBDxeD34GqnkSQhkPCkTx69jGWpYLfZZhZNYkBcIrAbf4H24LEV0t1jaupJVoL+/PldVnkavqJxAfbs+8/0hUEVoEqBl+Vp9+fiYaQfQ9FI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719819899; c=relaxed/simple;
-	bh=lpwAcjkhxndLvnwB5Nx6W8zptJZLhmlAq7MTrXTXmMM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KqUKfJawpISvntxhyiNXJ/1Esl5BWQIFvsfhzbb2zdufYB8AhJMv8sJscKUc7Pbjgf6v3J2F8K60dswzTBT1XlJa9nMQXneZTG15euiLasaYin7UY5CIJy7triaYG1ehqqZZ8T8ntCwCBESJGg/I2+ZR4L9OyqdlzxAMIkiSIIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=bjfOkcVJ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4617ReOT008005;
-	Mon, 1 Jul 2024 07:44:56 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=l
-	mhLMFgBN7xyC4nacR7O9WI9deW2eELIFTtnHom714A=; b=bjfOkcVJe20c7uBkF
-	NK4yjfdliYb8sncI4Q+smGEwFwDTZRnBIP7a6juWJJAOUrigo85nEUCdnyCnPFzZ
-	DqaWW3svZvPDoPtjr1zgBv8m4AnBetq1XK3j3ONN79LqEvxFV1keY9yGCvIOYYj4
-	zP/LslQ646Conm3P3yHRuQ4JKugrqsCLS2p6gbVSsfkRGMDKiCUGRws0y9CbqN9/
-	4iDpwpj57UmC/18L5elEq8L2lrmbTdx2lIGkjz6T0acR6wJKHcYMCLv5OfsuY6h/
-	8CU7mHQ9poxGVb5gBewwb2lJyohiSPEKU7nJ3pxVC/QOe+OpruG0LxSMaXB3Fdee
-	k6Abw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 403q6xg67c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Jul 2024 07:44:55 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4617itw5001968;
-	Mon, 1 Jul 2024 07:44:55 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 403q6xg66h-25
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Jul 2024 07:44:55 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4614jujG029146;
-	Mon, 1 Jul 2024 07:27:55 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 402x3mnvc1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 01 Jul 2024 07:27:55 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4617RncK55378394
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 1 Jul 2024 07:27:51 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8DFDD20040;
-	Mon,  1 Jul 2024 07:27:49 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 49B832004D;
-	Mon,  1 Jul 2024 07:27:49 +0000 (GMT)
-Received: from [9.152.224.222] (unknown [9.152.224.222])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon,  1 Jul 2024 07:27:49 +0000 (GMT)
-Message-ID: <513ac5d3-c0ef-4b07-bce2-84fabab9fdb7@linux.ibm.com>
-Date: Mon, 1 Jul 2024 09:27:49 +0200
+	s=arc-20240116; t=1719818934; c=relaxed/simple;
+	bh=C3XgTaqXTJLfV+dYqggjwpqqsS/5TxePRukp0hfKeeE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mj9r1wbl4IDwRaihsD0gAr7urC2QaD07jAmsjcZSP9B1WMooSpR2vphZbYMNhM1ZPNxJIm6vZntsrLJOmg16nRf3s+Z8RG57XbLbZYOq8KcxxYX2FZcjkTMvxEXccOZn7SGh1FhpFcFNJEUK5saBk6qwVrOFva+hJP+ciHNLJSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WgVZyZ5A; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1719818932; x=1751354932;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=C3XgTaqXTJLfV+dYqggjwpqqsS/5TxePRukp0hfKeeE=;
+  b=WgVZyZ5AjiNOXXjscmN/3j53C3Ez9HDnTpx1vBdM142vfKqjTB+PLBe3
+   S9pZ2R98quoHPTJiaCjHpJefmuzn2iYh9Ve/UCabg5QSsv6L0R16uPpY9
+   VJxWv6AcwwCfMq0ZBtKyMARO1roTMfGwWk26TO3lizix+12nE8Bq84kh5
+   yflnPKOUWNLenWytp0p6fdvNtK5cJRRCCJFCgawWBEDP/9c8qL0hM2/iZ
+   SCwX+OdZWKlIz2SR3tou64iQizYsJV1rQGJGW0qAQ8QLK8mhKYY8OWGTp
+   HzqUN3dC6hCJ9M5QvewdBNvAEBVorc9uxS3LF/1J7UOqSUkpQAnRyHN4L
+   Q==;
+X-CSE-ConnectionGUID: 4ZFzeNRcTC2HR2T8r8RBpQ==
+X-CSE-MsgGUID: am0gBbtyTgyJS0DM0uBtRA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11119"; a="34466021"
+X-IronPort-AV: E=Sophos;i="6.09,175,1716274800"; 
+   d="scan'208";a="34466021"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 00:28:51 -0700
+X-CSE-ConnectionGUID: ShGVZEpSTniQ6AY79lJuWA==
+X-CSE-MsgGUID: PwcOXTKiRxi/JSa8ngD/Iw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,175,1716274800"; 
+   d="scan'208";a="45520736"
+Received: from unknown (HELO litbin-desktop.sh.intel.com) ([10.239.156.93])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 00:28:48 -0700
+From: Binbin Wu <binbin.wu@linux.intel.com>
+To: kvm@vger.kernel.org
+Cc: seanjc@google.com,
+	pbonzini@redhat.com,
+	chao.gao@intel.com,
+	robert.hu@linux.intel.com,
+	robert.hoo.linux@gmail.com,
+	binbin.wu@linux.intel.com
+Subject: [kvm-unit-tests PATCH v7 0/5] x86: Add test cases for LAM
+Date: Mon,  1 Jul 2024 15:30:05 +0800
+Message-ID: <20240701073010.91417-1-binbin.wu@linux.intel.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] KVM: s390: fix LPSWEY handling
-To: Sven Schnelle <svens@linux.ibm.com>
-Cc: KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        linux-s390
- <linux-s390@vger.kernel.org>,
-        Thomas Huth <thuth@redhat.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Marc Hartmayer <mhartmay@linux.ibm.com>
-References: <20240628163547.2314-1-borntraeger@linux.ibm.com>
- <yt9do77h7ige.fsf@linux.ibm.com>
- <0d870c8d-2be8-485c-9320-4f779bccf552@linux.ibm.com>
- <yt9dfrst7ew0.fsf@linux.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <yt9dfrst7ew0.fsf@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: nx9JgP1pWB6NLL_JEwE_to5aN7ZROr4T
-X-Proofpoint-ORIG-GUID: pAdbnQXLfyIqG-du5ntA9xQTLSwVBp-Q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-01_06,2024-06-28_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=779
- priorityscore=1501 lowpriorityscore=0 spamscore=0 suspectscore=0
- bulkscore=0 impostorscore=0 mlxscore=0 malwarescore=0 clxscore=1015
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407010056
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Intel Linear-address masking (LAM) [1], modifies the checking that is applied to
+*64-bit* linear addresses, allowing software to use of the untranslated address
+bits for metadata.
+
+The patch series add test cases for KVM LAM:
+
+Patch 1 moves struct invpcid_desc to header file for new test cases.
+Patch 2 makes change to allow setting of CR3 LAM bits in vmlaunch tests.
+Patch 3~5 add test cases for LAM supervisor mode and user mode, including:
+- For supervisor mode
+  CR4.LAM_SUP toggle
+  Memory/MMIO access with tagged pointer
+  INVLPG
+  INVPCID
+  INVVPID (also used to cover VMX instruction VMExit path)
+- For user mode
+  CR3 LAM bits toggle 
+  Memory/MMIO access with tagged pointer
+
+[1] Intel ISE https://cdrdv2.intel.com/v1/dl/getContent/671368
+    Chapter Linear Address Masking (LAM)
+---
+Changelog:
+v7
+- Move struct invpcid_desc to header file instead of defining a new copy in lam.c.
+- Rename is_la57()/lam_sup_active() to is_la57_enabled()/is_lam_sup_enabled(),
+  and move them to processor.h (Sean)
+- Drop cr4_set_lam_sup()/cr4_clear_lam_sup() and use write_cr4_safe() instead. (Sean)
+- Add get_lam_mask() to get lam status based on the address and vCPU state. (Sean)
+- Drop the wrappers for INVLPG since INVLPG never faults. (Sean)
+- Drop the wrapper for INVPCID and use invpcid_safe() instead. (Sean)
+- Drop the check for X86_FEATURE_PCID. (Sean)
+- Rename lam_{u48,u57}_active() to is_lam_{u48,u57}_enabled(), and move them to
+  processor.h (Sean)
+- Test LAM userspace address in kernel mode directly to simplify the interface
+  of test_ptr() since LAM identifies a address as kernel or user only based on
+  the address itself.
+- Add comments about the virtualization hole of CR3 LAM bits.
+- Drop the check of X86_FEATURE_LA57 when check LA57. (Sean)
+
+v6
+- https://lore.kernel.org/kvm/20240122085354.9510-1-binbin.wu@linux.intel.com/
+
+v5
+- https://lore.kernel.org/kvm/20230530024356.24870-1-binbin.wu@linux.intel.com/
+
+Binbin Wu (4):
+  x86: Move struct invpcid_desc to processor.h
+  x86: Allow setting of CR3 LAM bits if LAM supported
+  x86: Add test cases for LAM_{U48,U57}
+  x86: Add test case for INVVPID with LAM
+
+Robert Hoo (1):
+  x86: Add test case for LAM_SUP
+
+ lib/x86/processor.h |  41 +++++++
+ x86/Makefile.x86_64 |   1 +
+ x86/lam.c           | 281 ++++++++++++++++++++++++++++++++++++++++++++
+ x86/pcid.c          |   6 -
+ x86/unittests.cfg   |  10 ++
+ x86/vmx_tests.c     |  51 +++++++-
+ 6 files changed, 382 insertions(+), 8 deletions(-)
+ create mode 100644 x86/lam.c
 
 
-Am 01.07.24 um 09:25 schrieb Sven Schnelle:
->>>> +	vcpu->arch.sie_block->gpsw = new_psw;
->>>> +	if (!is_valid_psw(&vcpu->arch.sie_block->gpsw))
->>>> +		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
->>> Shouldn't the gpsw get updated with new_psw after the check? POP
->>> says "The operation
->>> is suppressed on all addressing and protection exceptions."
->>
->> Only for exception of the instruction but not for the target PSW.
->> POP says:
->>
->> The other PSW fields which are to be loaded by the
->> instruction are not checked for validity before they are
->> loaded. However, immediately after loading, a speci-
->> fication exception is recognized, and a program inter-
->> ruption occurs, when any of the following is true for
->> the newly loaded PSW
-> 
-> Ok, sorry for the noise.
+base-commit: d301d0187f5db09531a1c2c7608997cc3b0a5c7d
+-- 
+2.43.2
 
-You can repend by doing a review and send an RB or other feedback :-)
 
