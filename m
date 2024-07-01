@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-20743-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20744-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FC3F91D552
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 02:21:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B86C91D560
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 02:22:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 429ED1C209E8
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 00:21:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7A8C1F24D62
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 00:22:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30CDC4A3E;
-	Mon,  1 Jul 2024 00:14:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B5B15A87B;
+	Mon,  1 Jul 2024 00:15:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nL7ym+if"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ardPy4tT"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5422B4315D;
-	Mon,  1 Jul 2024 00:14:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9951015A847;
+	Mon,  1 Jul 2024 00:15:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719792883; cv=none; b=i9lRzbpNkb2ulKWlMCzrQWLczAgCSXTLPah+VE7mavLUIAwxx23KdFDRSpF3nmGkdhtCY10ekfJlGyIPnBtlmM6WcmNEvDRROV6BTZMqxKoPZSSEN1dvdi7mr0E0J/md7qdZP9MRHnjeUSYX+PrfuXjrCBWGssTfSFt7kbuamVE=
+	t=1719792901; cv=none; b=GpfRXJquCVh1CPeghslHgCCJF8Bnjeq9P3ZMuIhAz3ouipArHTI42qOTj/RvbcLMMynJdssK/15xAZFw8UL0AYHMw7s8fzWlxTXnV1vKx2ZVotnVcdL97O1cMkv3Cyt1NNUL3cFZ5f0xc4iF7+7Vp1WZUV2HWyVArk/WLyHpvOY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719792883; c=relaxed/simple;
-	bh=bTgEOnmPgOyG6B2nRHRseuUUfUXtcdGR4HmyiaqhKpY=;
+	s=arc-20240116; t=1719792901; c=relaxed/simple;
+	bh=FghuhVddxfTldsnZJ2YUHW9LvaA7bab7q7wnKQEy0a0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kT1EuHfkHQmsUOl98jP2nY7ImIWVmCBbP+Y0fGKEHrZEirBAnmcy2R7t6+Eh9VFAYHuvov75ExOEPNzL2/qV/JIMXhAxIhSuWdluGP+gi1LH+EqObVBlHq6dkWYOMwT7oZku3Xk7S/nCbnbPqYaKgB9QxLRwx62lw95mK+2ZMVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nL7ym+if; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B54C4AF0A;
-	Mon,  1 Jul 2024 00:14:41 +0000 (UTC)
+	 MIME-Version; b=GMKQjI6nF8KyhT2K1wqqX1Ui3F9np3vlmmFQ+cdmPAyO195TAfZB+jDI/K/8Hnw0s0U60ism0kx2EfoYFtti9y5z+CRM2ZTIY4qnAkZreThFpj2unFWlF0KszMOLInKH5Kvgkq7IQ1u4MV1FnjwgOyUuoQCFomeBXoE1tmoSpvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ardPy4tT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92902C4AF0B;
+	Mon,  1 Jul 2024 00:15:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719792882;
-	bh=bTgEOnmPgOyG6B2nRHRseuUUfUXtcdGR4HmyiaqhKpY=;
+	s=k20201202; t=1719792901;
+	bh=FghuhVddxfTldsnZJ2YUHW9LvaA7bab7q7wnKQEy0a0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nL7ym+if/wWjpbH8+D4wbKdo7kesJmMBfq5inh2cUKKeO1ugsPRTHn8ZgywgLOaZi
-	 vExHCyizMXhpDOcuuh5oJHrw8F56Ap21xj6NaZnM7XGsHJnMS8WLHLobuwC9ZwREFo
-	 pnk8NTTQ+AfGJCIqRI1fVhvyiz4ZgThLJMDcQfP9kvfPGM2WlqVucP2rB8hhb9mR8y
-	 /52C/xLQ0cOtV89QnVQdcAphAX1o7foODkcZ8Wh4z/r1hXyycyVfIWCC9wCXXvpOKw
-	 pWwS2FKUL+G0yme3T67jr60HM4tcIRNvNfcatfH7sljWnjhfJ/CakUsvsVbL1bZ4Ta
-	 1O9al+fjWv0rg==
+	b=ardPy4tTYsJoccUH+FfoJaQQYCBRmdRq9wiK5LahJtLRK6U5x8MjzBn5+wa8xtwhI
+	 eYjNAHQ6WHWEoKc/B3IuqHNh58pA5ex8neZdf87sBaPMYgAs7sWLhW0JrSgurcWSCU
+	 Xp5cIPFpWXf8ZxheT8455CR4HQVit+xlN/nh8cnM1nWk9DgFdm3Gfdua8UsDFGOE5c
+	 5Nav+nXxMXn7s6JrqjXzxTtwbVWSAylTo3tHU8CutFr3UJCcmFsb+YOs+pEy50KU8f
+	 zz+fQMrgAUUbDbYSQnGmHkTCwVhYhxpI4qi4oO/tizStl5q7LhYq8H0Wpn90i9GFdD
+	 f7VEBdo1ZuSDg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -49,12 +49,12 @@ Cc: Michael Ellerman <mpe@ellerman.id.au>,
 	Sasha Levin <sashal@kernel.org>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 2/5] KVM: PPC: Book3S HV: Prevent UAF in kvm_spapr_tce_attach_iommu_group()
-Date: Sun, 30 Jun 2024 20:14:30 -0400
-Message-ID: <20240701001438.2921324-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 2/4] KVM: PPC: Book3S HV: Prevent UAF in kvm_spapr_tce_attach_iommu_group()
+Date: Sun, 30 Jun 2024 20:14:50 -0400
+Message-ID: <20240701001457.2921445-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240701001438.2921324-1-sashal@kernel.org>
-References: <20240701001438.2921324-1-sashal@kernel.org>
+In-Reply-To: <20240701001457.2921445-1-sashal@kernel.org>
+References: <20240701001457.2921445-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.15.161
+X-stable-base: Linux 5.10.220
 Content-Transfer-Encoding: 8bit
 
 From: Michael Ellerman <mpe@ellerman.id.au>
@@ -137,7 +137,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 13 insertions(+), 5 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-index 3cb2e05a7ee83..a8e5eefee794f 100644
+index c640053ab03f2..2686ba59873dd 100644
 --- a/arch/powerpc/kvm/book3s_64_vio.c
 +++ b/arch/powerpc/kvm/book3s_64_vio.c
 @@ -117,14 +117,16 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
