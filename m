@@ -1,55 +1,82 @@
-Return-Path: <kvm+bounces-20756-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20757-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E79B91D7F3
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 08:15:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A4C991D8D9
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 09:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFC17B242DB
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 06:15:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09C741F21C55
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 07:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A449F57CB6;
-	Mon,  1 Jul 2024 06:15:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7ED74079;
+	Mon,  1 Jul 2024 07:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="RP6AD1v+"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="plL+kVb4"
 X-Original-To: kvm@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F4452231C;
-	Mon,  1 Jul 2024 06:15:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5CB21B809;
+	Mon,  1 Jul 2024 07:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719814535; cv=none; b=BgtsCZ93vqLd0hAvZ4LslF2FS/p1jQ+WBFyG3nBFyUw2fzx7JjgQi5gw58BTkrs5702sDssOQcT/NWUIbEL4ej9tZ1TUNDrHfjLVxiPaii3kkn07n+4u+KNcXAYgvDeu9TsF9xE9tls09Adw1vWHOOUCNcV03XKv1/Q3MYq90uo=
+	t=1719818524; cv=none; b=E+aymePdkqA3u4T6JQ8ywrDsU8bTGaocO5gTaBheuFJnTLx6n8wajqvwvTk+YVKDjbuBRl8uGgyv4CJbI7JTGUK8u8iqNZF5rh2Jng0/b1EEAsyttAg6d7Zr2A/SD9CtScX93PoRNkkvAa+r9Mp11iDtk+TDn2ZRUkyLSZLcInM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719814535; c=relaxed/simple;
-	bh=WmI09JaExLOgwIiAfkIPKvdePbKWzCZg6yL6VDCaUN4=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=izu1CEz78RJoT4Rvy4JoVmrEvOCnpIW3YKKPEzFMDXlQV9OpLejtaMNMWSYFWh1cBXWaOJ3p54RUDJhje45ylFtYhUtNdq4x/EV51VjlV7oJuTi1CY480QZx+hSuhHarSrt/+JgS36nRbk9MjhOChojmhSVDDRSblcY/JYAo/No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=RP6AD1v+; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1719814532;
-	bh=WmI09JaExLOgwIiAfkIPKvdePbKWzCZg6yL6VDCaUN4=;
-	h=Date:Cc:Subject:To:References:From:In-Reply-To:From;
-	b=RP6AD1v+j6bPzkD4Qfi/D0Q58GhtnnMPgGqhmQ9YGJX9Jc/5j84eJ7xUBdHZJRzFx
-	 aXPXn39mJWbIX+hF2Rx6HPtqgMK4vfUXHqti+IbFCO5Q8bGEOYciAZVbAvxI1kGzeR
-	 g0TD5c0QDnRR5cYZ0bk02V6Iz6eS/b5EgMh95woV6SkktOdHJgXgDkEDcqIbeyMewD
-	 TfpEAsVSV82X6VPFFcT0pA4AfIytfyCqe6TFWaYlNmT4kY7j1t72YZQc6kzGiHWxze
-	 VlPaDaj3j6O+JFwu31mdPgmr5u8MzDcUXIrceg69E0CyvjyMCcC0aTq021O4QEtL3Z
-	 exwCDx8GCLtyg==
-Received: from [100.113.15.66] (ec2-34-240-57-77.eu-west-1.compute.amazonaws.com [34.240.57.77])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: usama.anjum)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id AA10E3782065;
-	Mon,  1 Jul 2024 06:15:00 +0000 (UTC)
-Message-ID: <221495d5-1be2-4c71-ab2f-eb145257737a@collabora.com>
-Date: Mon, 1 Jul 2024 11:14:54 +0500
+	s=arc-20240116; t=1719818524; c=relaxed/simple;
+	bh=7PmwLoX3lTJ5mfJI+9S+V2MSG4mK6jGtpAJh3Z/Rdsc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BIdn4X0uqwbkfIJ4ebvQY561sa4Vcj+vG0yqsTuQNt0ZqNTx2M/gvA1xCieEW9Y9+V4EtQreiqCQjFNcgQLQxTdb+03A8tt8sDHDnJaPfUObJNCokOF3IkV0gMvoxCGWgtg0ob+4YG1EZJgu88xkRS0EbDCC3hK1cM0fFdsZ6SY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=plL+kVb4; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4616wtsG031947;
+	Mon, 1 Jul 2024 07:22:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=4
+	3x2lOSIXtX8OZHmyjnW4zfOByYCa8icz/74cOEfpME=; b=plL+kVb4dZJPr02dR
+	EnoYzSZ6qDfMCKyiIfIU6O+qCZmMDwiw5Bdg6uWKLw1QlmqMK4rbRhgCTd96k+3d
+	kdptu/9JCVH2+s/rWQ0YvWKVp720gFxs79FXD/C108yextj6L0F+FlfGEQypQ0/O
+	dsNskMh3WLwBaNJaI2QL9AFw/Yg4xsYtP6iH/4KOigebymDizfLmoyz5C5jzHk97
+	Z3xml/9JHTor+aLfstF/OKscl1wOcGLZJPpPktFxl2epVXb4bT/oFFjjWSkS4Wrc
+	goYEpaFqImQ7XO3DMBWTwJxNqYAQW8OUdtOIoCb8KE1+IgIi3WeGGH/7A02k1tYJ
+	h7VxA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 403qne82ax-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Jul 2024 07:22:00 +0000 (GMT)
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4617Lxgf006251;
+	Mon, 1 Jul 2024 07:21:59 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 403qne82at-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Jul 2024 07:21:59 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4614kFRH029195;
+	Mon, 1 Jul 2024 07:21:58 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 402x3mnuqm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 01 Jul 2024 07:21:58 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4617Lqw952166954
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 1 Jul 2024 07:21:54 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5820B2005A;
+	Mon,  1 Jul 2024 07:21:52 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2AF6E2004E;
+	Mon,  1 Jul 2024 07:21:52 +0000 (GMT)
+Received: from [9.152.224.222] (unknown [9.152.224.222])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon,  1 Jul 2024 07:21:52 +0000 (GMT)
+Message-ID: <0d870c8d-2be8-485c-9320-4f779bccf552@linux.ibm.com>
+Date: Mon, 1 Jul 2024 09:21:52 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -57,261 +84,101 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Cc: Muhammad Usama Anjum <usama.anjum@collabora.com>,
- linux-kernel@vger.kernel.org, seanjc@google.com, kernel-team@android.com,
- linux-mm@kvack.org, iommu@lists.linux.dev, kvm@vger.kernel.org,
- netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-sgx@vger.kernel.org,
- John Hubbard <jhubbard@nvidia.com>
-Subject: Re: [PATCH v7 1/1] selftests: Centralize -D_GNU_SOURCE= to CFLAGS in
- lib.mk
-To: Edward Liaw <edliaw@google.com>, linux-kselftest@vger.kernel.org,
- Eric Biederman <ebiederm@xmission.com>, Kees Cook <kees@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>,
- Darren Hart <dvhart@infradead.org>, Davidlohr Bueso <dave@stgolabs.net>,
- =?UTF-8?Q?Andr=C3=A9_Almeida?= <andrealmeid@igalia.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian <kevin.tian@intel.com>,
- Paolo Bonzini <pbonzini@redhat.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Fenghua Yu <fenghua.yu@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Jarkko Sakkinen <jarkko@kernel.org>,
- Dave Hansen <dave.hansen@linux.intel.com>
-References: <20240625223454.1586259-1-edliaw@google.com>
- <20240625223454.1586259-2-edliaw@google.com>
+Subject: Re: [PATCH v2] KVM: s390: fix LPSWEY handling
+To: Sven Schnelle <svens@linux.ibm.com>
+Cc: KVM <kvm@vger.kernel.org>, Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        linux-s390
+ <linux-s390@vger.kernel.org>,
+        Thomas Huth <thuth@redhat.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Marc Hartmayer <mhartmay@linux.ibm.com>
+References: <20240628163547.2314-1-borntraeger@linux.ibm.com>
+ <yt9do77h7ige.fsf@linux.ibm.com>
 Content-Language: en-US
-From: Muhammad Usama Anjum <usama.anjum@collabora.com>
-In-Reply-To: <20240625223454.1586259-2-edliaw@google.com>
-Content-Type: text/plain; charset=UTF-8
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <yt9do77h7ige.fsf@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: jK1VS_eBplReeiHf_G-9reGXVDMood2W
+X-Proofpoint-ORIG-GUID: 33jxr0cUpD5d0cZkdKUjSHEnPK5pqHOn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-01_05,2024-06-28_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 spamscore=0
+ bulkscore=0 phishscore=0 adultscore=0 impostorscore=0 suspectscore=0
+ priorityscore=1501 mlxscore=0 mlxlogscore=999 lowpriorityscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407010051
 
-On 6/26/24 3:34 AM, Edward Liaw wrote:
-> Centralize the _GNU_SOURCE definition to CFLAGS in lib.mk.  Remove
-> redundant defines from Makefiles that import lib.mk.  Convert any usage
-> of "#define _GNU_SOURCE 1" to "#define _GNU_SOURCE".
-> 
-> This uses the form "-D_GNU_SOURCE=", which is equivalent to
-> "#define _GNU_SOURCE".
-> 
-> Otherwise using "-D_GNU_SOURCE" is equivalent to "-D_GNU_SOURCE=1" and
-> "#define _GNU_SOURCE 1", which is less commonly seen in source code and
-> would require many changes in selftests to avoid redefinition warnings.
-> 
-> Suggested-by: John Hubbard <jhubbard@nvidia.com>
-> Signed-off-by: Edward Liaw <edliaw@google.com>
-Reviewed-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
 
-> ---
->  tools/testing/selftests/exec/Makefile             | 1 -
->  tools/testing/selftests/futex/functional/Makefile | 2 +-
->  tools/testing/selftests/intel_pstate/Makefile     | 2 +-
->  tools/testing/selftests/iommu/Makefile            | 2 --
->  tools/testing/selftests/kvm/Makefile              | 2 +-
->  tools/testing/selftests/lib.mk                    | 3 +++
->  tools/testing/selftests/mm/thuge-gen.c            | 2 +-
->  tools/testing/selftests/net/Makefile              | 2 +-
->  tools/testing/selftests/net/tcp_ao/Makefile       | 2 +-
->  tools/testing/selftests/proc/Makefile             | 1 -
->  tools/testing/selftests/resctrl/Makefile          | 2 +-
->  tools/testing/selftests/ring-buffer/Makefile      | 1 -
->  tools/testing/selftests/riscv/mm/Makefile         | 2 +-
->  tools/testing/selftests/sgx/Makefile              | 2 +-
->  tools/testing/selftests/tmpfs/Makefile            | 1 -
->  15 files changed, 12 insertions(+), 15 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/exec/Makefile b/tools/testing/selftests/exec/Makefile
-> index ab67d58cfab7..ba012bc5aab9 100644
-> --- a/tools/testing/selftests/exec/Makefile
-> +++ b/tools/testing/selftests/exec/Makefile
-> @@ -1,7 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  CFLAGS = -Wall
->  CFLAGS += -Wno-nonnull
-> -CFLAGS += -D_GNU_SOURCE
->  
->  ALIGNS := 0x1000 0x200000 0x1000000
->  ALIGN_PIES        := $(patsubst %,load_address.%,$(ALIGNS))
-> diff --git a/tools/testing/selftests/futex/functional/Makefile b/tools/testing/selftests/futex/functional/Makefile
-> index 994fa3468f17..f79f9bac7918 100644
-> --- a/tools/testing/selftests/futex/functional/Makefile
-> +++ b/tools/testing/selftests/futex/functional/Makefile
-> @@ -1,6 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  INCLUDES := -I../include -I../../ $(KHDR_INCLUDES)
-> -CFLAGS := $(CFLAGS) -g -O2 -Wall -D_GNU_SOURCE= -pthread $(INCLUDES) $(KHDR_INCLUDES)
-> +CFLAGS := $(CFLAGS) -g -O2 -Wall -pthread $(INCLUDES) $(KHDR_INCLUDES)
->  LDLIBS := -lpthread -lrt
->  
->  LOCAL_HDRS := \
-> diff --git a/tools/testing/selftests/intel_pstate/Makefile b/tools/testing/selftests/intel_pstate/Makefile
-> index 05d66ef50c97..f45372cb00fe 100644
-> --- a/tools/testing/selftests/intel_pstate/Makefile
-> +++ b/tools/testing/selftests/intel_pstate/Makefile
-> @@ -1,5 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0
-> -CFLAGS := $(CFLAGS) -Wall -D_GNU_SOURCE
-> +CFLAGS := $(CFLAGS) -Wall
->  LDLIBS += -lm
->  
->  ARCH ?= $(shell uname -m 2>/dev/null || echo not)
-> diff --git a/tools/testing/selftests/iommu/Makefile b/tools/testing/selftests/iommu/Makefile
-> index 32c5fdfd0eef..fd6477911f24 100644
-> --- a/tools/testing/selftests/iommu/Makefile
-> +++ b/tools/testing/selftests/iommu/Makefile
-> @@ -2,8 +2,6 @@
->  CFLAGS += -Wall -O2 -Wno-unused-function
->  CFLAGS += $(KHDR_INCLUDES)
->  
-> -CFLAGS += -D_GNU_SOURCE
-> -
->  TEST_GEN_PROGS :=
->  TEST_GEN_PROGS += iommufd
->  TEST_GEN_PROGS += iommufd_fail_nth
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index ac280dcba996..4ee37abf70ff 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -231,7 +231,7 @@ LINUX_TOOL_ARCH_INCLUDE = $(top_srcdir)/tools/arch/$(ARCH)/include
->  endif
->  CFLAGS += -Wall -Wstrict-prototypes -Wuninitialized -O2 -g -std=gnu99 \
->  	-Wno-gnu-variable-sized-type-not-at-end -MD -MP -DCONFIG_64BIT \
-> -	-D_GNU_SOURCE -fno-builtin-memcmp -fno-builtin-memcpy \
-> +	-fno-builtin-memcmp -fno-builtin-memcpy \
->  	-fno-builtin-memset -fno-builtin-strnlen \
->  	-fno-stack-protector -fno-PIE -I$(LINUX_TOOL_INCLUDE) \
->  	-I$(LINUX_TOOL_ARCH_INCLUDE) -I$(LINUX_HDR_PATH) -Iinclude \
-> diff --git a/tools/testing/selftests/lib.mk b/tools/testing/selftests/lib.mk
-> index 7b299ed5ff45..d6edcfcb5be8 100644
-> --- a/tools/testing/selftests/lib.mk
-> +++ b/tools/testing/selftests/lib.mk
-> @@ -196,6 +196,9 @@ endef
->  clean: $(if $(TEST_GEN_MODS_DIR),clean_mods_dir)
->  	$(CLEAN)
->  
-> +# Build with _GNU_SOURCE by default
-> +CFLAGS += -D_GNU_SOURCE=
-> +
->  # Enables to extend CFLAGS and LDFLAGS from command line, e.g.
->  # make USERCFLAGS=-Werror USERLDFLAGS=-static
->  CFLAGS += $(USERCFLAGS)
-> diff --git a/tools/testing/selftests/mm/thuge-gen.c b/tools/testing/selftests/mm/thuge-gen.c
-> index d50dc71cac32..e4370b79b62f 100644
-> --- a/tools/testing/selftests/mm/thuge-gen.c
-> +++ b/tools/testing/selftests/mm/thuge-gen.c
-> @@ -13,7 +13,7 @@
->     sudo ipcs | awk '$1 == "0x00000000" {print $2}' | xargs -n1 sudo ipcrm -m
->     (warning this will remove all if someone else uses them) */
->  
-> -#define _GNU_SOURCE 1
-> +#define _GNU_SOURCE
->  #include <sys/mman.h>
->  #include <linux/mman.h>
->  #include <stdlib.h>
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index bc3925200637..8eaffd7a641c 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -1,7 +1,7 @@
->  # SPDX-License-Identifier: GPL-2.0
->  # Makefile for net selftests
->  
-> -CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
-> +CFLAGS +=  -Wall -Wl,--no-as-needed -O2 -g
->  CFLAGS += -I../../../../usr/include/ $(KHDR_INCLUDES)
->  # Additional include paths needed by kselftest.h
->  CFLAGS += -I../
-> diff --git a/tools/testing/selftests/net/tcp_ao/Makefile b/tools/testing/selftests/net/tcp_ao/Makefile
-> index 522d991e310e..bd88b90b902b 100644
-> --- a/tools/testing/selftests/net/tcp_ao/Makefile
-> +++ b/tools/testing/selftests/net/tcp_ao/Makefile
-> @@ -26,7 +26,7 @@ LIB	:= $(LIBDIR)/libaotst.a
->  LDLIBS	+= $(LIB) -pthread
->  LIBDEPS	:= lib/aolib.h Makefile
->  
-> -CFLAGS	:= -Wall -O2 -g -D_GNU_SOURCE -fno-strict-aliasing
-> +CFLAGS	+= -Wall -O2 -g -fno-strict-aliasing
->  CFLAGS	+= $(KHDR_INCLUDES)
->  CFLAGS	+= -iquote ./lib/ -I ../../../../include/
->  
-> diff --git a/tools/testing/selftests/proc/Makefile b/tools/testing/selftests/proc/Makefile
-> index 6066f607f758..ee424a9f075f 100644
-> --- a/tools/testing/selftests/proc/Makefile
-> +++ b/tools/testing/selftests/proc/Makefile
-> @@ -1,6 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  CFLAGS += -Wall -O2 -Wno-unused-function
-> -CFLAGS += -D_GNU_SOURCE
->  LDFLAGS += -pthread
->  
->  TEST_GEN_PROGS :=
-> diff --git a/tools/testing/selftests/resctrl/Makefile b/tools/testing/selftests/resctrl/Makefile
-> index 021863f86053..f408bd6bfc3d 100644
-> --- a/tools/testing/selftests/resctrl/Makefile
-> +++ b/tools/testing/selftests/resctrl/Makefile
-> @@ -1,6 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  
-> -CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2 -D_GNU_SOURCE
-> +CFLAGS = -g -Wall -O2 -D_FORTIFY_SOURCE=2
->  CFLAGS += $(KHDR_INCLUDES)
->  
->  TEST_GEN_PROGS := resctrl_tests
-> diff --git a/tools/testing/selftests/ring-buffer/Makefile b/tools/testing/selftests/ring-buffer/Makefile
-> index 627c5fa6d1ab..23605782639e 100644
-> --- a/tools/testing/selftests/ring-buffer/Makefile
-> +++ b/tools/testing/selftests/ring-buffer/Makefile
-> @@ -1,7 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0
->  CFLAGS += -Wl,-no-as-needed -Wall
->  CFLAGS += $(KHDR_INCLUDES)
-> -CFLAGS += -D_GNU_SOURCE
->  
->  TEST_GEN_PROGS = map_test
->  
-> diff --git a/tools/testing/selftests/riscv/mm/Makefile b/tools/testing/selftests/riscv/mm/Makefile
-> index c333263f2b27..4664ed79e20b 100644
-> --- a/tools/testing/selftests/riscv/mm/Makefile
-> +++ b/tools/testing/selftests/riscv/mm/Makefile
-> @@ -3,7 +3,7 @@
->  # Originally tools/testing/arm64/abi/Makefile
->  
->  # Additional include paths needed by kselftest.h and local headers
-> -CFLAGS += -D_GNU_SOURCE -std=gnu99 -I.
-> +CFLAGS += -std=gnu99 -I.
->  
->  TEST_GEN_FILES := mmap_default mmap_bottomup
->  
-> diff --git a/tools/testing/selftests/sgx/Makefile b/tools/testing/selftests/sgx/Makefile
-> index 867f88ce2570..03b5e13b872b 100644
-> --- a/tools/testing/selftests/sgx/Makefile
-> +++ b/tools/testing/selftests/sgx/Makefile
-> @@ -12,7 +12,7 @@ OBJCOPY := $(CROSS_COMPILE)objcopy
->  endif
->  
->  INCLUDES := -I$(top_srcdir)/tools/include
-> -HOST_CFLAGS := -Wall -Werror -g $(INCLUDES) -fPIC
-> +HOST_CFLAGS := -Wall -Werror -g $(INCLUDES) -fPIC $(CFLAGS)
->  HOST_LDFLAGS := -z noexecstack -lcrypto
->  ENCL_CFLAGS += -Wall -Werror -static-pie -nostdlib -ffreestanding -fPIE \
->  	       -fno-stack-protector -mrdrnd $(INCLUDES)
-> diff --git a/tools/testing/selftests/tmpfs/Makefile b/tools/testing/selftests/tmpfs/Makefile
-> index aa11ccc92e5b..3be931e1193f 100644
-> --- a/tools/testing/selftests/tmpfs/Makefile
-> +++ b/tools/testing/selftests/tmpfs/Makefile
-> @@ -1,6 +1,5 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  CFLAGS += -Wall -O2
-> -CFLAGS += -D_GNU_SOURCE
->  
->  TEST_GEN_PROGS :=
->  TEST_GEN_PROGS += bug-link-o-tmpfile
 
--- 
-BR,
-Muhammad Usama Anjum
+Am 01.07.24 um 08:08 schrieb Sven Schnelle:
+> Christian Borntraeger <borntraeger@linux.ibm.com> writes:
+> 
+>> in rare cases, e.g. for injecting a machine check we do intercept all
+>> load PSW instructions via ICTL_LPSW. With facility 193 a new variant
+>> LPSWEY was added. KVM needs to handle that as well.
+>>
+>> Fixes: a3efa8429266 ("KVM: s390: gen_facilities: allow facilities 165, 193, 194 and 196")
+>> Reported-by: Marc Hartmayer <mhartmay@linux.ibm.com>
+>> Signed-off-by: Christian Borntraeger <borntraeger@linux.ibm.com>
+>> ---
+>>   arch/s390/include/asm/kvm_host.h |  1 +
+>>   arch/s390/kvm/kvm-s390.c         |  1 +
+>>   arch/s390/kvm/kvm-s390.h         | 15 +++++++++++++++
+>>   arch/s390/kvm/priv.c             | 32 ++++++++++++++++++++++++++++++++
+>>   4 files changed, 49 insertions(+)
+>>
+>> diff --git a/arch/s390/kvm/priv.c b/arch/s390/kvm/priv.c
+>> index 1be19cc9d73c..1a49b89706f8 100644
+>> --- a/arch/s390/kvm/priv.c
+>> +++ b/arch/s390/kvm/priv.c
+>> @@ -797,6 +797,36 @@ static int handle_lpswe(struct kvm_vcpu *vcpu)
+>>   	return 0;
+>>   }
+>>   
+>> +static int handle_lpswey(struct kvm_vcpu *vcpu)
+>> +{
+>> +	psw_t new_psw;
+>> +	u64 addr;
+>> +	int rc;
+>> +	u8 ar;
+>> +
+>> +	vcpu->stat.instruction_lpswey++;
+>> +
+>> +	if (!test_kvm_facility(vcpu->kvm, 193))
+>> +		return kvm_s390_inject_program_int(vcpu, PGM_OPERATION);
+>> +
+>> +	if (vcpu->arch.sie_block->gpsw.mask & PSW_MASK_PSTATE)
+>> +		return kvm_s390_inject_program_int(vcpu, PGM_PRIVILEGED_OP);
+>> +
+>> +	addr = kvm_s390_get_base_disp_siy(vcpu, &ar);
+>> +	if (addr & 7)
+>> +		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+>> +
+>> +	rc = read_guest(vcpu, addr, ar, &new_psw, sizeof(new_psw));
+>> +	if (rc)
+>> +		return kvm_s390_inject_prog_cond(vcpu, rc);
+>> +
+>> +	vcpu->arch.sie_block->gpsw = new_psw;
+>> +	if (!is_valid_psw(&vcpu->arch.sie_block->gpsw))
+>> +		return kvm_s390_inject_program_int(vcpu, PGM_SPECIFICATION);
+> 
+> Shouldn't the gpsw get updated with new_psw after the check? POP says "The operation
+> is suppressed on all addressing and protection exceptions."
+
+Only for exception of the instruction but not for the target PSW.
+POP says:
+
+The other PSW fields which are to be loaded by the
+instruction are not checked for validity before they are
+loaded. However, immediately after loading, a speci-
+fication exception is recognized, and a program inter-
+ruption occurs, when any of the following is true for
+the newly loaded PSW
 
