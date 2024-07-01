@@ -1,371 +1,243 @@
-Return-Path: <kvm+bounces-20785-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20787-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063B191DBE3
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 11:59:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5419891DC76
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 12:28:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28AEF1C22B54
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 09:59:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D382D1F2190F
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 10:28:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E54156F21;
-	Mon,  1 Jul 2024 09:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5128514A098;
+	Mon,  1 Jul 2024 10:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AD5cT/W4"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7CD713E881;
-	Mon,  1 Jul 2024 09:56:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7398A145B38;
+	Mon,  1 Jul 2024 10:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719827774; cv=none; b=FjEZEEljUTqLETcM9vaBGyy4OkqC3dLGeN405odOdy8Pw/swulerOkaMKVrlf6pOEcyPhp5f38E0wfuVt3u1x2CT7q8zCgfpMb6qV2yhfU/wPzu8YZKIQhmrkmXZHAO1DljAkKi10f/IEAKerFMZ/ZUZ6nb6U4CNins1Ug7JTc0=
+	t=1719829629; cv=none; b=C3/0bLkeQGkP+E6DEVTUpa/WjJIOrKtl6WEf/8IhLYMGjE7WIL4gkfP+4cigptBVrA3hcnaPUWjaltrAek8xOTHUbkS066NtWoitRPKWqYyqZG3x/Se8YHOFak3wFYY3Npe/0aq3Tw2eezOsat55M6ZFscijDHIYi5AibexVeWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719827774; c=relaxed/simple;
-	bh=v6JZGNvu7kMnuCr2dGpEvrSScXvHkXPK36he9SfxXTA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=iVmbMvcgDPdJV5NoJZN1xPBimQVko0R9rj73KeqWPfSxooPJe9CGQ2HDnGEVekWYVz6u80u+JDFMbM+Txwf/CkMUevONHgJS1kCsURMxZGF5AKmcpSlTXsjC55hmEW5oKmqFFbCSZqbtEr66CBHfT1ExOqGxYaI4K4IyVNN0YmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 8AE81339;
-	Mon,  1 Jul 2024 02:56:37 -0700 (PDT)
-Received: from e122027.arm.com (unknown [10.57.44.170])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 935543F762;
-	Mon,  1 Jul 2024 02:56:09 -0700 (PDT)
-From: Steven Price <steven.price@arm.com>
-To: kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev
-Cc: Sami Mujawar <sami.mujawar@arm.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>,
-	Will Deacon <will@kernel.org>,
-	James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>,
-	linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>,
-	Steven Price <steven.price@arm.com>
-Subject: [PATCH v4 15/15] virt: arm-cca-guest: TSM_REPORT support for realms
-Date: Mon,  1 Jul 2024 10:55:05 +0100
-Message-Id: <20240701095505.165383-16-steven.price@arm.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240701095505.165383-1-steven.price@arm.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
+	s=arc-20240116; t=1719829629; c=relaxed/simple;
+	bh=AOtDmRNJfqQY++v4UUgbpsLJiz5duuZ3LpRF+W3BRYg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j0ueEXFrjNxhG3F60PuonYrwPjBLU23WbtSUnYFCnw8cUZq9mRbKaZYUHhRDrOwEVHQU2Hf/td8JpK6HmfroSbOXFK6Zoidg+gDaa2U2sqva5zH4U3o9A+jAw/AUqwojpof0tTqiFfVnW7BBWw3iVqGdfVBlJgvNzbR1QMKT0Oc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AD5cT/W4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1063CC4AF0D;
+	Mon,  1 Jul 2024 10:27:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1719829629;
+	bh=AOtDmRNJfqQY++v4UUgbpsLJiz5duuZ3LpRF+W3BRYg=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=AD5cT/W4h116AQNwUQkblKnYYn3Nnr494DhkhpVdtXYAkmHIwpahbfe5WL+SAK1uU
+	 sQLL+zSTuIn4KiKKdXJexLhVkbuL9ImBQNGBKYb29uOxjtmEJMtk5wf1sXyCaGKsBu
+	 U7i0ladzzbL/nYAJ0NwEwCwcq7csruoEAFfef8QIYqRsvOL+uUhOSD3CCkdmOMdL74
+	 7Cc5qy4lZaDvmn6YknzWYBz9Qq88XT+Gn/Bzsj3s11ezq9J/g/o2tMZjqDVQ70aZSB
+	 XO9M/r/pPs8LBS/k2xyU388E4PhybqjM292VcIOkjmsKR1E8fpU1Xwy999M1KDiEFt
+	 zqysGTHZtHWPA==
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-57d06101d76so47480a12.3;
+        Mon, 01 Jul 2024 03:27:08 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXjs9NWW/Feus//OVZwOlZJ/PuEvAc2sJdQBN2EbzpmSp1qotPzFFf3Lhvcv+RsZTxPzICKSv7hlGj2K1pRW2NqcCmNg0wgaGHBF6S4fqzLw24Gyu2uyRMSH1040oUphrXp
+X-Gm-Message-State: AOJu0YwyL2wltO/PUtOdhdXvAwe6U25BCrIOiWoo1mtXa5w/0g3vvA+7
+	9PEcwilcsCsYdUqeooIcjqKB334Xo83kPB0L4s8GPGRR31tIEL2LTVJIY1bIQgHBqg7w0DsX08z
+	u2D1/K48G5ZwNeCAZ1CuP6FTGcD4=
+X-Google-Smtp-Source: AGHT+IHGZZCbQwYQWDz7MHph9rhLp1XsHpW9ufuafTw/vti9tqr3X02n6kFZJcNGEpVMl2xkauTKpW7VaW5Rzdmikc8=
+X-Received: by 2002:a17:906:1246:b0:a72:7f22:5f9e with SMTP id
+ a640c23a62f3a-a751447bd08mr264808066b.57.1719829627601; Mon, 01 Jul 2024
+ 03:27:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240626063239.3722175-1-maobibo@loongson.cn> <20240626063239.3722175-3-maobibo@loongson.cn>
+ <CAAhV-H4O8QNb61xkErd9y_1tK_70=Y=LNqzy=9Ny5EQK1XZJaQ@mail.gmail.com> <79dcf093-614f-2737-bb03-698b0b3abc57@loongson.cn>
+In-Reply-To: <79dcf093-614f-2737-bb03-698b0b3abc57@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Mon, 1 Jul 2024 18:26:57 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5bQutcLcVaHn-amjF6_NDnCf2BFqqnGSRT_QQ_6q6REg@mail.gmail.com>
+Message-ID: <CAAhV-H5bQutcLcVaHn-amjF6_NDnCf2BFqqnGSRT_QQ_6q6REg@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] LoongArch: KVM: Add LBT feature detection function
+To: maobibo <maobibo@loongson.cn>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Sami Mujawar <sami.mujawar@arm.com>
+On Mon, Jul 1, 2024 at 9:27=E2=80=AFAM maobibo <maobibo@loongson.cn> wrote:
+>
+>
+> Huacai,
+>
+> On 2024/6/30 =E4=B8=8A=E5=8D=8810:07, Huacai Chen wrote:
+> > Hi, Bibo,
+> >
+> > On Wed, Jun 26, 2024 at 2:32=E2=80=AFPM Bibo Mao <maobibo@loongson.cn> =
+wrote:
+> >>
+> >> Two kinds of LBT feature detection are added here, one is VCPU
+> >> feature, the other is VM feature. VCPU feature dection can only
+> >> work with VCPU thread itself, and requires VCPU thread is created
+> >> already. So LBT feature detection for VM is added also, it can
+> >> be done even if VM is not created, and also can be done by any
+> >> thread besides VCPU threads.
+> >>
+> >> Loongson Binary Translation (LBT) feature is defined in register
+> >> cpucfg2. Here LBT capability detection for VCPU is added.
+> >>
+> >> Here ioctl command KVM_HAS_DEVICE_ATTR is added for VM, and macro
+> >> KVM_LOONGARCH_VM_FEAT_CTRL is added to check supported feature. And
+> >> three sub-features relative with LBT are added as following:
+> >>   KVM_LOONGARCH_VM_FEAT_X86BT
+> >>   KVM_LOONGARCH_VM_FEAT_ARMBT
+> >>   KVM_LOONGARCH_VM_FEAT_MIPSBT
+> >>
+> >> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> >> ---
+> >>   arch/loongarch/include/uapi/asm/kvm.h |  6 ++++
+> >>   arch/loongarch/kvm/vcpu.c             |  6 ++++
+> >>   arch/loongarch/kvm/vm.c               | 44 +++++++++++++++++++++++++=
++-
+> >>   3 files changed, 55 insertions(+), 1 deletion(-)
+> >>
+> >> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/in=
+clude/uapi/asm/kvm.h
+> >> index ddc5cab0ffd0..c40f7d9ffe13 100644
+> >> --- a/arch/loongarch/include/uapi/asm/kvm.h
+> >> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+> >> @@ -82,6 +82,12 @@ struct kvm_fpu {
+> >>   #define KVM_IOC_CSRID(REG)             LOONGARCH_REG_64(KVM_REG_LOON=
+GARCH_CSR, REG)
+> >>   #define KVM_IOC_CPUCFG(REG)            LOONGARCH_REG_64(KVM_REG_LOON=
+GARCH_CPUCFG, REG)
+> >>
+> >> +/* Device Control API on vm fd */
+> >> +#define KVM_LOONGARCH_VM_FEAT_CTRL     0
+> >> +#define  KVM_LOONGARCH_VM_FEAT_X86BT   0
+> >> +#define  KVM_LOONGARCH_VM_FEAT_ARMBT   1
+> >> +#define  KVM_LOONGARCH_VM_FEAT_MIPSBT  2
+> >> +
+> >>   /* Device Control API on vcpu fd */
+> >>   #define KVM_LOONGARCH_VCPU_CPUCFG      0
+> >>   #define KVM_LOONGARCH_VCPU_PVTIME_CTRL 1
+> > If you insist that LBT should be a vm feature, then I suggest the
+> > above two also be vm features. Though this is an UAPI change, but
+> > CPUCFG is upstream in 6.10-rc1 and 6.10-final hasn't been released. We
+> > have a chance to change it now.
+>
+> KVM_LOONGARCH_VCPU_PVTIME_CTRL need be attr percpu since every vcpu
+> has is own different gpa address.
+Then leave this as a vm feature.
 
-Introduce an arm-cca-guest driver that registers with
-the configfs-tsm module to provide user interfaces for
-retrieving an attestation token.
+>
+> For KVM_LOONGARCH_VCPU_CPUCFG attr, it will not changed. We cannot break
+> the API even if it is 6.10-rc1, VMM has already used this. Else there is
+> uapi breaking now, still will be in future if we cannot control this.
+UAPI changing before the first release is allowed, which means, we can
+change this before the 6.10-final, but cannot change it after
+6.10-final.
 
-When a new report is requested the arm-cca-guest driver
-invokes the appropriate RSI interfaces to query an
-attestation token.
+>
+> How about adding new extra features capability for VM such as?
+> +#define  KVM_LOONGARCH_VM_FEAT_LSX   3
+> +#define  KVM_LOONGARCH_VM_FEAT_LASX  4
+They should be similar as LBT, if LBT is vcpu feature, they should
+also be vcpu features; if LBT is vm feature, they should also be vm
+features.
 
-The steps to retrieve an attestation token are as follows:
-  1. Mount the configfs filesystem if not already mounted
-     mount -t configfs none /sys/kernel/config
-  2. Generate an attestation token
-     report=/sys/kernel/config/tsm/report/report0
-     mkdir $report
-     dd if=/dev/urandom bs=64 count=1 > $report/inblob
-     hexdump -C $report/outblob
-     rmdir $report
+Huacai
 
-Signed-off-by: Sami Mujawar <sami.mujawar@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Steven Price <steven.price@arm.com>
----
-v3: Minor improvements to comments and adapt to the renaming of
-GRANULE_SIZE to RSI_GRANULE_SIZE.
----
- drivers/virt/coco/Kconfig                     |   2 +
- drivers/virt/coco/Makefile                    |   1 +
- drivers/virt/coco/arm-cca-guest/Kconfig       |  11 +
- drivers/virt/coco/arm-cca-guest/Makefile      |   2 +
- .../virt/coco/arm-cca-guest/arm-cca-guest.c   | 211 ++++++++++++++++++
- 5 files changed, 227 insertions(+)
- create mode 100644 drivers/virt/coco/arm-cca-guest/Kconfig
- create mode 100644 drivers/virt/coco/arm-cca-guest/Makefile
- create mode 100644 drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
-
-diff --git a/drivers/virt/coco/Kconfig b/drivers/virt/coco/Kconfig
-index 87d142c1f932..4fb69804b622 100644
---- a/drivers/virt/coco/Kconfig
-+++ b/drivers/virt/coco/Kconfig
-@@ -12,3 +12,5 @@ source "drivers/virt/coco/efi_secret/Kconfig"
- source "drivers/virt/coco/sev-guest/Kconfig"
- 
- source "drivers/virt/coco/tdx-guest/Kconfig"
-+
-+source "drivers/virt/coco/arm-cca-guest/Kconfig"
-diff --git a/drivers/virt/coco/Makefile b/drivers/virt/coco/Makefile
-index 18c1aba5edb7..a6228a1bf992 100644
---- a/drivers/virt/coco/Makefile
-+++ b/drivers/virt/coco/Makefile
-@@ -6,3 +6,4 @@ obj-$(CONFIG_TSM_REPORTS)	+= tsm.o
- obj-$(CONFIG_EFI_SECRET)	+= efi_secret/
- obj-$(CONFIG_SEV_GUEST)		+= sev-guest/
- obj-$(CONFIG_INTEL_TDX_GUEST)	+= tdx-guest/
-+obj-$(CONFIG_ARM_CCA_GUEST)	+= arm-cca-guest/
-diff --git a/drivers/virt/coco/arm-cca-guest/Kconfig b/drivers/virt/coco/arm-cca-guest/Kconfig
-new file mode 100644
-index 000000000000..9dd27c3ee215
---- /dev/null
-+++ b/drivers/virt/coco/arm-cca-guest/Kconfig
-@@ -0,0 +1,11 @@
-+config ARM_CCA_GUEST
-+	tristate "Arm CCA Guest driver"
-+	depends on ARM64
-+	default m
-+	select TSM_REPORTS
-+	help
-+	  The driver provides userspace interface to request and
-+	  attestation report from the Realm Management Monitor(RMM).
-+
-+	  If you choose 'M' here, this module will be called
-+	  arm-cca-guest.
-diff --git a/drivers/virt/coco/arm-cca-guest/Makefile b/drivers/virt/coco/arm-cca-guest/Makefile
-new file mode 100644
-index 000000000000..69eeba08e98a
---- /dev/null
-+++ b/drivers/virt/coco/arm-cca-guest/Makefile
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+obj-$(CONFIG_ARM_CCA_GUEST) += arm-cca-guest.o
-diff --git a/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c b/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
-new file mode 100644
-index 000000000000..61172730cb90
---- /dev/null
-+++ b/drivers/virt/coco/arm-cca-guest/arm-cca-guest.c
-@@ -0,0 +1,211 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2023 ARM Ltd.
-+ */
-+
-+#include <linux/arm-smccc.h>
-+#include <linux/cc_platform.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/smp.h>
-+#include <linux/tsm.h>
-+#include <linux/types.h>
-+
-+#include <asm/rsi.h>
-+
-+/**
-+ * struct arm_cca_token_info - a descriptor for the token buffer.
-+ * @granule:	PA of the page to which the token will be written
-+ * @offset:	Offset within granule to start of buffer in bytes
-+ * @len:	Number of bytes of token data that was retrieved
-+ * @result:	result of rsi_attestation_token_continue operation
-+ */
-+struct arm_cca_token_info {
-+	phys_addr_t     granule;
-+	unsigned long   offset;
-+	int             result;
-+};
-+
-+/**
-+ * arm_cca_attestation_continue - Retrieve the attestation token data.
-+ *
-+ * @param: pointer to the arm_cca_token_info
-+ *
-+ * Attestation token generation is a long running operation and therefore
-+ * the token data may not be retrieved in a single call. Moreover, the
-+ * token retrieval operation must be requested on the same CPU on which the
-+ * attestation token generation was initialised.
-+ * This helper function is therefore scheduled on the same CPU multiple
-+ * times until the entire token data is retrieved.
-+ */
-+static void arm_cca_attestation_continue(void *param)
-+{
-+	unsigned long len;
-+	unsigned long size;
-+	struct arm_cca_token_info *info;
-+
-+	if (!param)
-+		return;
-+
-+	info = (struct arm_cca_token_info *)param;
-+
-+	size = RSI_GRANULE_SIZE - info->offset;
-+	info->result = rsi_attestation_token_continue(info->granule,
-+						      info->offset, size, &len);
-+	info->offset += len;
-+}
-+
-+/**
-+ * arm_cca_report_new - Generate a new attestation token.
-+ *
-+ * @report: pointer to the TSM report context information.
-+ * @data:  pointer to the context specific data for this module.
-+ *
-+ * Initialise the attestation token generation using the challenge data
-+ * passed in the TSM decriptor. Allocate memory for the attestation token
-+ * and schedule calls to retrieve the attestation token on the same CPU
-+ * on which the attestation token generation was initialised.
-+ *
-+ * The challenge data must be at least 32 bytes and no more than 64 bytes. If
-+ * less than 64 bytes are provided it will be zero padded to 64 bytes.
-+ *
-+ * Return:
-+ * * %0        - Attestation token generated successfully.
-+ * * %-EINVAL  - A parameter was not valid.
-+ * * %-ENOMEM  - Out of memory.
-+ * * %-EFAULT  - Failed to get IPA for memory page(s).
-+ * * A negative status code as returned by smp_call_function_single().
-+ */
-+static int arm_cca_report_new(struct tsm_report *report, void *data)
-+{
-+	int ret;
-+	int cpu;
-+	long max_size;
-+	unsigned long token_size;
-+	struct arm_cca_token_info info;
-+	void *buf;
-+	u8 *token __free(kvfree) = NULL;
-+	struct tsm_desc *desc = &report->desc;
-+
-+	if (!report)
-+		return -EINVAL;
-+
-+	if (desc->inblob_len < 32 || desc->inblob_len > 64)
-+		return -EINVAL;
-+
-+	/*
-+	 * Get a CPU on which the attestation token generation will be
-+	 * scheduled and initialise the attestation token generation.
-+	 */
-+	cpu = get_cpu();
-+	max_size = rsi_attestation_token_init(desc->inblob, desc->inblob_len);
-+	put_cpu();
-+
-+	if (max_size <= 0)
-+		return -EINVAL;
-+
-+	/* Allocate outblob */
-+	token = kvzalloc(max_size, GFP_KERNEL);
-+	if (!token)
-+		return -ENOMEM;
-+
-+	/*
-+	 * Since the outblob may not be physically contiguous, use a page
-+	 * to bounce the buffer from RMM.
-+	 */
-+	buf = alloc_pages_exact(RSI_GRANULE_SIZE, GFP_KERNEL);
-+	if (!buf)
-+		return -ENOMEM;
-+
-+	/* Get the PA of the memory page(s) that were allocated. */
-+	info.granule = (unsigned long)virt_to_phys(buf);
-+
-+	token_size = 0;
-+	/* Loop until the token is ready or there is an error. */
-+	do {
-+		/* Retrieve one RSI_GRANULE_SIZE data per loop iteration. */
-+		info.offset = 0;
-+		do {
-+			/*
-+			 * Schedule a call to retrieve a sub-granule chunk
-+			 * of data per loop iteration.
-+			 */
-+			ret = smp_call_function_single(cpu,
-+						       arm_cca_attestation_continue,
-+						       (void *)&info, true);
-+			if (ret != 0) {
-+				token_size = 0;
-+				goto exit_free_granule_page;
-+			}
-+
-+			ret = info.result;
-+		} while ((ret == RSI_INCOMPLETE) &&
-+			 (info.offset < RSI_GRANULE_SIZE));
-+
-+		/*
-+		 * Copy the retrieved token data from the granule
-+		 * to the token buffer, ensuring that the RMM doesn't
-+		 * overflow the buffer.
-+		 */
-+		if (WARN_ON(token_size + info.offset > max_size))
-+			break;
-+		memcpy(&token[token_size], buf, info.offset);
-+		token_size += info.offset;
-+	} while (ret == RSI_INCOMPLETE);
-+
-+	if (ret != RSI_SUCCESS) {
-+		ret = -ENXIO;
-+		token_size = 0;
-+		goto exit_free_granule_page;
-+	}
-+
-+	report->outblob = no_free_ptr(token);
-+exit_free_granule_page:
-+	report->outblob_len = token_size;
-+	free_pages_exact(buf, RSI_GRANULE_SIZE);
-+	return ret;
-+}
-+
-+static const struct tsm_ops arm_cca_tsm_ops = {
-+	.name = KBUILD_MODNAME,
-+	.report_new = arm_cca_report_new,
-+};
-+
-+/**
-+ * arm_cca_guest_init - Register with the Trusted Security Module (TSM)
-+ * interface.
-+ *
-+ * Return:
-+ * * %0        - Registered successfully with the TSM interface.
-+ * * %-ENODEV  - The execution context is not an Arm Realm.
-+ * * %-EINVAL  - A parameter was not valid.
-+ * * %-EBUSY   - Already registered.
-+ */
-+static int __init arm_cca_guest_init(void)
-+{
-+	int ret;
-+
-+	if (!is_realm_world())
-+		return -ENODEV;
-+
-+	ret = tsm_register(&arm_cca_tsm_ops, NULL, &tsm_report_default_type);
-+	if (ret < 0)
-+		pr_err("Failed to register with TSM.\n");
-+
-+	return ret;
-+}
-+module_init(arm_cca_guest_init);
-+
-+/**
-+ * arm_cca_guest_exit - unregister with the Trusted Security Module (TSM)
-+ * interface.
-+ */
-+static void __exit arm_cca_guest_exit(void)
-+{
-+	tsm_unregister(&arm_cca_tsm_ops);
-+}
-+module_exit(arm_cca_guest_exit);
-+
-+MODULE_AUTHOR("Sami Mujawar <sami.mujawar@arm.com>");
-+MODULE_DESCRIPTION("Arm CCA Guest TSM Driver.");
-+MODULE_LICENSE("GPL");
--- 
-2.34.1
-
+>
+> Regards
+> Bibo Mao
+> >
+> > Huacai
+> >
+> >> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+> >> index 233d28d0e928..9734b4d8db05 100644
+> >> --- a/arch/loongarch/kvm/vcpu.c
+> >> +++ b/arch/loongarch/kvm/vcpu.c
+> >> @@ -565,6 +565,12 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
+> >>                          *v |=3D CPUCFG2_LSX;
+> >>                  if (cpu_has_lasx)
+> >>                          *v |=3D CPUCFG2_LASX;
+> >> +               if (cpu_has_lbt_x86)
+> >> +                       *v |=3D CPUCFG2_X86BT;
+> >> +               if (cpu_has_lbt_arm)
+> >> +                       *v |=3D CPUCFG2_ARMBT;
+> >> +               if (cpu_has_lbt_mips)
+> >> +                       *v |=3D CPUCFG2_MIPSBT;
+> >>
+> >>                  return 0;
+> >>          case LOONGARCH_CPUCFG3:
+> >> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+> >> index 6b2e4f66ad26..09e05108c68b 100644
+> >> --- a/arch/loongarch/kvm/vm.c
+> >> +++ b/arch/loongarch/kvm/vm.c
+> >> @@ -99,7 +99,49 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
+ong ext)
+> >>          return r;
+> >>   }
+> >>
+> >> +static int kvm_vm_feature_has_attr(struct kvm *kvm, struct kvm_device=
+_attr *attr)
+> >> +{
+> >> +       switch (attr->attr) {
+> >> +       case KVM_LOONGARCH_VM_FEAT_X86BT:
+> >> +               if (cpu_has_lbt_x86)
+> >> +                       return 0;
+> >> +               return -ENXIO;
+> >> +       case KVM_LOONGARCH_VM_FEAT_ARMBT:
+> >> +               if (cpu_has_lbt_arm)
+> >> +                       return 0;
+> >> +               return -ENXIO;
+> >> +       case KVM_LOONGARCH_VM_FEAT_MIPSBT:
+> >> +               if (cpu_has_lbt_mips)
+> >> +                       return 0;
+> >> +               return -ENXIO;
+> >> +       default:
+> >> +               return -ENXIO;
+> >> +       }
+> >> +}
+> >> +
+> >> +static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *a=
+ttr)
+> >> +{
+> >> +       switch (attr->group) {
+> >> +       case KVM_LOONGARCH_VM_FEAT_CTRL:
+> >> +               return kvm_vm_feature_has_attr(kvm, attr);
+> >> +       default:
+> >> +               return -ENXIO;
+> >> +       }
+> >> +}
+> >> +
+> >>   int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigne=
+d long arg)
+> >>   {
+> >> -       return -ENOIOCTLCMD;
+> >> +       struct kvm *kvm =3D filp->private_data;
+> >> +       void __user *argp =3D (void __user *)arg;
+> >> +       struct kvm_device_attr attr;
+> >> +
+> >> +       switch (ioctl) {
+> >> +       case KVM_HAS_DEVICE_ATTR:
+> >> +               if (copy_from_user(&attr, argp, sizeof(attr)))
+> >> +                       return -EFAULT;
+> >> +
+> >> +               return kvm_vm_has_attr(kvm, &attr);
+> >> +       default:
+> >> +               return -EINVAL;
+> >> +       }
+> >>   }
+> >> --
+> >> 2.39.3
+> >>
+>
 
