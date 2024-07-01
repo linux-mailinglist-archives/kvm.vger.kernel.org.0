@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-20742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CE8991D544
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 02:20:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC3F91D552
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 02:21:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F4411C209E8
-	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 00:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 429ED1C209E8
+	for <lists+kvm@lfdr.de>; Mon,  1 Jul 2024 00:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92DAC155A43;
-	Mon,  1 Jul 2024 00:14:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30CDC4A3E;
+	Mon,  1 Jul 2024 00:14:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EYjfm5Vh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nL7ym+if"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64A8155332;
-	Mon,  1 Jul 2024 00:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5422B4315D;
+	Mon,  1 Jul 2024 00:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719792864; cv=none; b=gGD98B4Cjdstnv9+p3hsF5VFgAFqc1cBP8mmRrDVCOmFjTiMEwC1G4slL1l6zY09w41ZH9yT1ht2uyovzLH20oikbseSd4Stb/09vJC9sN3uygKvBOT9TRVldWCadAQyrm48f1b5ThC3afyn41hAlP4HlJxooGLdoVjZClDUzrg=
+	t=1719792883; cv=none; b=i9lRzbpNkb2ulKWlMCzrQWLczAgCSXTLPah+VE7mavLUIAwxx23KdFDRSpF3nmGkdhtCY10ekfJlGyIPnBtlmM6WcmNEvDRROV6BTZMqxKoPZSSEN1dvdi7mr0E0J/md7qdZP9MRHnjeUSYX+PrfuXjrCBWGssTfSFt7kbuamVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719792864; c=relaxed/simple;
-	bh=LURQam/qnWpT6p2MfyUdygDTH/0GvaDlwcsioaPmjY8=;
+	s=arc-20240116; t=1719792883; c=relaxed/simple;
+	bh=bTgEOnmPgOyG6B2nRHRseuUUfUXtcdGR4HmyiaqhKpY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YfFm6vbeYKAmK6UIzU7fxyimTt70oBX8lNcv7Htntw+Kc9uamV4pw0586HkVXEw1m9O409CTWioUsetmBKCnHTh6YQ8NaoGrGWbMYVwOTgWZ9fwumZdSQ4yUyLIqBi1Dh8dqd4vQlqakxPkJ/X08zWH6Hk29TrDmHFTuFqsDYk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EYjfm5Vh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 716EAC4AF0B;
-	Mon,  1 Jul 2024 00:14:23 +0000 (UTC)
+	 MIME-Version; b=kT1EuHfkHQmsUOl98jP2nY7ImIWVmCBbP+Y0fGKEHrZEirBAnmcy2R7t6+Eh9VFAYHuvov75ExOEPNzL2/qV/JIMXhAxIhSuWdluGP+gi1LH+EqObVBlHq6dkWYOMwT7oZku3Xk7S/nCbnbPqYaKgB9QxLRwx62lw95mK+2ZMVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nL7ym+if; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2B54C4AF0A;
+	Mon,  1 Jul 2024 00:14:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719792864;
-	bh=LURQam/qnWpT6p2MfyUdygDTH/0GvaDlwcsioaPmjY8=;
+	s=k20201202; t=1719792882;
+	bh=bTgEOnmPgOyG6B2nRHRseuUUfUXtcdGR4HmyiaqhKpY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EYjfm5VhFxj1v54UalLajeBv6KAeshJHtWcleg6BCbJCfSsve/zcuFYFtABO58U0p
-	 eK/ExULi0Y5tYxGN54h6K0IXhVgKczYi8/LBaWILdUY6dRJJYPJah1bWOCues6u4bs
-	 UT7LlSmnzGtBHd3vKBosocDkhisFXRJTvnbL2JdzteXwXW09+W/Xr9lHPMsnOKCvKx
-	 osB9AWJnCNCiPq0l6tSw1Nz/TQlQWWtOYaKwli8VXUs6VOAd+YSLrGHa38Zc8MiCY/
-	 S9bEFVp2ka6qpQPO3V0qhNK/kxXxXXmjCDpJK16w1RQKsKBtRidYEMRCOAcvzdAT5h
-	 f74jFqc3BR6Tg==
+	b=nL7ym+if/wWjpbH8+D4wbKdo7kesJmMBfq5inh2cUKKeO1ugsPRTHn8ZgywgLOaZi
+	 vExHCyizMXhpDOcuuh5oJHrw8F56Ap21xj6NaZnM7XGsHJnMS8WLHLobuwC9ZwREFo
+	 pnk8NTTQ+AfGJCIqRI1fVhvyiz4ZgThLJMDcQfP9kvfPGM2WlqVucP2rB8hhb9mR8y
+	 /52C/xLQ0cOtV89QnVQdcAphAX1o7foODkcZ8Wh4z/r1hXyycyVfIWCC9wCXXvpOKw
+	 pWwS2FKUL+G0yme3T67jr60HM4tcIRNvNfcatfH7sljWnjhfJ/CakUsvsVbL1bZ4Ta
+	 1O9al+fjWv0rg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -49,12 +49,12 @@ Cc: Michael Ellerman <mpe@ellerman.id.au>,
 	Sasha Levin <sashal@kernel.org>,
 	linuxppc-dev@lists.ozlabs.org,
 	kvm@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 2/5] KVM: PPC: Book3S HV: Prevent UAF in kvm_spapr_tce_attach_iommu_group()
-Date: Sun, 30 Jun 2024 20:14:12 -0400
-Message-ID: <20240701001420.2921203-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.15 2/5] KVM: PPC: Book3S HV: Prevent UAF in kvm_spapr_tce_attach_iommu_group()
+Date: Sun, 30 Jun 2024 20:14:30 -0400
+Message-ID: <20240701001438.2921324-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240701001420.2921203-1-sashal@kernel.org>
-References: <20240701001420.2921203-1-sashal@kernel.org>
+In-Reply-To: <20240701001438.2921324-1-sashal@kernel.org>
+References: <20240701001438.2921324-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.96
+X-stable-base: Linux 5.15.161
 Content-Transfer-Encoding: 8bit
 
 From: Michael Ellerman <mpe@ellerman.id.au>
@@ -137,10 +137,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 13 insertions(+), 5 deletions(-)
 
 diff --git a/arch/powerpc/kvm/book3s_64_vio.c b/arch/powerpc/kvm/book3s_64_vio.c
-index 40864373ef876..549e33d4ecd62 100644
+index 3cb2e05a7ee83..a8e5eefee794f 100644
 --- a/arch/powerpc/kvm/book3s_64_vio.c
 +++ b/arch/powerpc/kvm/book3s_64_vio.c
-@@ -129,14 +129,16 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+@@ -117,14 +117,16 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
  	}
  	rcu_read_unlock();
  
@@ -161,7 +161,7 @@ index 40864373ef876..549e33d4ecd62 100644
  
  	for (i = 0; i < IOMMU_TABLE_GROUP_MAX_TABLES; ++i) {
  		struct iommu_table *tbltmp = table_group->tables[i];
-@@ -157,8 +159,10 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+@@ -145,8 +147,10 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
  			break;
  		}
  	}
@@ -173,7 +173,7 @@ index 40864373ef876..549e33d4ecd62 100644
  
  	rcu_read_lock();
  	list_for_each_entry_rcu(stit, &stt->iommu_tables, next) {
-@@ -169,6 +173,7 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+@@ -157,6 +161,7 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
  			/* stit is being destroyed */
  			iommu_tce_table_put(tbl);
  			rcu_read_unlock();
@@ -181,7 +181,7 @@ index 40864373ef876..549e33d4ecd62 100644
  			return -ENOTTY;
  		}
  		/*
-@@ -176,6 +181,7 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+@@ -164,6 +169,7 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
  		 * its KVM reference counter and can return.
  		 */
  		rcu_read_unlock();
@@ -189,7 +189,7 @@ index 40864373ef876..549e33d4ecd62 100644
  		return 0;
  	}
  	rcu_read_unlock();
-@@ -183,6 +189,7 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+@@ -171,6 +177,7 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
  	stit = kzalloc(sizeof(*stit), GFP_KERNEL);
  	if (!stit) {
  		iommu_tce_table_put(tbl);
@@ -197,7 +197,7 @@ index 40864373ef876..549e33d4ecd62 100644
  		return -ENOMEM;
  	}
  
-@@ -191,6 +198,7 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
+@@ -179,6 +186,7 @@ extern long kvm_spapr_tce_attach_iommu_group(struct kvm *kvm, int tablefd,
  
  	list_add_rcu(&stit->next, &stt->iommu_tables);
  
