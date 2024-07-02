@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-20825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20827-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72DE792392E
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 11:10:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65875923939
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 11:11:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BC461C21224
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 09:10:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70E671C21632
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 09:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B561155A23;
-	Tue,  2 Jul 2024 09:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE3A4157A61;
+	Tue,  2 Jul 2024 09:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WdB+vVAS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZsLMwcx"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69E915098E;
-	Tue,  2 Jul 2024 09:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DBA15216E;
+	Tue,  2 Jul 2024 09:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719911404; cv=none; b=IU944rl1mktqT9IjI1CrlHpz5q3HIvDViV3knKIHfWhwLGZOW/W/XuwsxJyiKHT1/RQQeHQhTYaHzRfzQXRRf0rn1MdhdY41eQMuiDHJGKbzyn0ZHrphKHJSHJ5tk2OpJId79i+6d2J57jqWWD6/wreLZBBQqFPlaoEmjuZuJxI=
+	t=1719911412; cv=none; b=NEb8NAZ2OrkYI9Ne+2FQa8KFJIiW5uzZ0UpvTaC+M1aKj82ElzjfGkEJuTBzIsaXc1LPVRp1B1BTj1zkgXtRkVOxz+/Wnt49XULSH/9t5DDQRTbYc3vORZUfmsMPUbYfE/HBOQxpcav/OslmwbYy4T02eA28ONH9bOc42FFdnDE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719911404; c=relaxed/simple;
-	bh=PsDcRtwRrZy3xcTFmq5V+v2aFvC1FX6fMcSIsPNIgJ4=;
+	s=arc-20240116; t=1719911412; c=relaxed/simple;
+	bh=GdqxFreVifTUH7yLunaT0Kp4VH1OcNBKz7jklxCA7IE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jSM1700hKeyJbnlOYgEpF9OY0uo/XyUgWdxflTcMhDicoq9VJz+VkmsGwXdgzrwDVE7uJisaR5eM5MJRzRoUzLwaFwSTmJh9IfwL6O1JSWmgmm1JLeE1nGj5GJWDI1ebVxUwmQCf2IMJAiMVEg4nbcnG1kiY9UbqMT8uWykh1GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WdB+vVAS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97D44C116B1;
-	Tue,  2 Jul 2024 09:10:03 +0000 (UTC)
+	 MIME-Version; b=YohiMKedg5IqO9IeGx9efMcKnGkKrRHB2C7qHB5EBxb+/WTecbP/aSNLWsbBiLm+WSNN3+Cn1S/fTS0ZZG0XhvGFXmHX6xQlKuRfOP8APMiroqhinSYwT9VMGp7Y3oAfEy24kcNeZoDkbgNxMSUs9r+JrMUKTNnGRXRM5zlgHXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZsLMwcx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB762C116B1;
+	Tue,  2 Jul 2024 09:10:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719911404;
-	bh=PsDcRtwRrZy3xcTFmq5V+v2aFvC1FX6fMcSIsPNIgJ4=;
+	s=k20201202; t=1719911412;
+	bh=GdqxFreVifTUH7yLunaT0Kp4VH1OcNBKz7jklxCA7IE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WdB+vVAS8uHPdPme4myJO22f4FbGRcG1dHDJHwEW7t+ki8CzsXtGbIJKrwNZzL+oN
-	 HZhggaNWlUq2LDjYroZErlO93jF4y+zjRYe2QMVqmzz1MDxk1Rl8xeJex/5Q1jOGA8
-	 kNM7rlYFNxKQypQjyLEv1W8ppPwmxff79s/KS7zpU97+5kGBVsrGR36Z/Ui8WyxfjN
-	 +2WhW3GmeKGr7A5xpE0coC6WO/48R8aI2ccSdCQQ38AntHiLnCHjCF0ItXO1X8/fim
-	 N1g17gLjq4qvdcY6NksGgFPtVrvn0kKJnJryFF33jW+ntCtDHOmI6RkHi12DWkTu0B
-	 MTNXNHg+0HJIQ==
+	b=jZsLMwcxfIhbNdXAH7Erajavnd9zt8wZwqJVAhbFF8wuHrgj9ZFLnS0M824YeY1WI
+	 lsBBR7Huv75yN3CNdjq3wGOj6d6XRdgf43l4OFc9s6OcECQ4HjS13MEjvrsvp/qDtC
+	 V9bMyC4eCtQlzz7bAocuoWalQBZeKMuoUk0+t2JOvKUiwHjZ7NOHkhxRQ2bfGbsofJ
+	 9EiPqR5DPCSASk+2Ji+dPRehAt5lU8Xk41chq5PYN3dkl0zeRpGP7rNQIh7zxcQ/Ux
+	 TOXwMCzKrQG/bRPwo4SyChwOnWE10AWLJZqnWPQAFqWJhu2cqfYHV+DULsrE24NbAI
+	 pEN9z2lU0w7oA==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
@@ -70,9 +70,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	linux-pci@vger.kernel.org,
 	kvm@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: [RFC PATCH v1 01/18] dma-mapping: query DMA memory type
-Date: Tue,  2 Jul 2024 12:09:31 +0300
-Message-ID: <a7ec6658f74f1dfbe7bd0e96be5be2f1be945076.1719909395.git.leon@kernel.org>
+Subject: [RFC PATCH v1 02/18] dma-mapping: provide an interface to allocate IOVA
+Date: Tue,  2 Jul 2024 12:09:32 +0300
+Message-ID: <f6c74db6cec987ce6e30bfadf0f092a57a5b533f.1719909395.git.leon@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1719909395.git.leon@kernel.org>
 References: <cover.1719909395.git.leon@kernel.org>
@@ -86,113 +86,136 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Provide an option to query and set DMA memory type so callers who supply
-range of pages can perform it only once as the whole range is supposed
-to have same memory type.
+Existing .map_page() callback provides two things at the same time:
+allocates IOVA and links DMA pages. That combination works great for
+most of the callers who use it in control paths, but less effective
+in fast paths.
+
+These advanced callers already manage their data in some sort of
+database and can perform IOVA allocation in advance, leaving range
+linkage operation to be in fast path.
+
+Provide an interface to allocate/deallocate IOVA and next patch
+link/unlink DMA ranges to that specific IOVA.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- include/linux/dma-mapping.h | 20 ++++++++++++++++++++
- kernel/dma/mapping.c        | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 50 insertions(+)
+ include/linux/dma-map-ops.h |  3 +++
+ include/linux/dma-mapping.h | 20 +++++++++++++++++
+ kernel/dma/mapping.c        | 44 +++++++++++++++++++++++++++++++++++++
+ 3 files changed, 67 insertions(+)
 
+diff --git a/include/linux/dma-map-ops.h b/include/linux/dma-map-ops.h
+index 02a1c825896b..23e5e2f63a1c 100644
+--- a/include/linux/dma-map-ops.h
++++ b/include/linux/dma-map-ops.h
+@@ -86,6 +86,9 @@ struct dma_map_ops {
+ 	size_t (*max_mapping_size)(struct device *dev);
+ 	size_t (*opt_mapping_size)(void);
+ 	unsigned long (*get_merge_boundary)(struct device *dev);
++
++	dma_addr_t (*alloc_iova)(struct device *dev, size_t size);
++	void (*free_iova)(struct device *dev, dma_addr_t dma_addr, size_t size);
+ };
+ 
+ #ifdef CONFIG_DMA_OPS
 diff --git a/include/linux/dma-mapping.h b/include/linux/dma-mapping.h
-index f693aafe221f..49b99c6e7ec5 100644
+index 49b99c6e7ec5..673ddcf140ff 100644
 --- a/include/linux/dma-mapping.h
 +++ b/include/linux/dma-mapping.h
-@@ -76,6 +76,20 @@
+@@ -90,6 +90,16 @@ struct dma_memory_type {
+ 	struct dev_pagemap *p2p_pgmap;
+ };
  
- #define DMA_BIT_MASK(n)	(((n) == 64) ? ~0ULL : ((1ULL<<(n))-1))
- 
-+enum dma_memory_types {
-+	/* Normal memory without any extra properties like P2P, e.t.c */
-+	DMA_MEMORY_TYPE_NORMAL,
-+	/* Memory which is p2p capable */
-+	DMA_MEMORY_TYPE_P2P,
-+	/* Encrypted memory (TDX) */
-+	DMA_MEMORY_TYPE_ENCRYPTED,
-+};
-+
-+struct dma_memory_type {
-+	enum dma_memory_types type;
-+	struct dev_pagemap *p2p_pgmap;
++struct dma_iova_attrs {
++	/* OUT field */
++	dma_addr_t addr;
++	/* IN fields */
++	struct device *dev;
++	size_t size;
++	enum dma_data_direction dir;
++	unsigned long attrs;
 +};
 +
  #ifdef CONFIG_DMA_API_DEBUG
  void debug_dma_mapping_error(struct device *dev, dma_addr_t dma_addr);
  void debug_dma_map_single(struct device *dev, const void *addr,
-@@ -149,6 +163,8 @@ void *dma_vmap_noncontiguous(struct device *dev, size_t size,
- void dma_vunmap_noncontiguous(struct device *dev, void *vaddr);
- int dma_mmap_noncontiguous(struct device *dev, struct vm_area_struct *vma,
- 		size_t size, struct sg_table *sgt);
+@@ -115,6 +125,9 @@ static inline int dma_mapping_error(struct device *dev, dma_addr_t dma_addr)
+ 	return 0;
+ }
+ 
++int dma_alloc_iova(struct dma_iova_attrs *iova);
++void dma_free_iova(struct dma_iova_attrs *iova);
 +
-+void dma_get_memory_type(struct page *page, struct dma_memory_type *type);
+ dma_addr_t dma_map_page_attrs(struct device *dev, struct page *page,
+ 		size_t offset, size_t size, enum dma_data_direction dir,
+ 		unsigned long attrs);
+@@ -166,6 +179,13 @@ int dma_mmap_noncontiguous(struct device *dev, struct vm_area_struct *vma,
+ 
+ void dma_get_memory_type(struct page *page, struct dma_memory_type *type);
  #else /* CONFIG_HAS_DMA */
++static inline int dma_alloc_iova(struct dma_iova_attrs *iova)
++{
++	return -EOPNOTSUPP;
++}
++static inline void dma_free_iova(struct dma_iova_attrs *iova)
++{
++}
  static inline dma_addr_t dma_map_page_attrs(struct device *dev,
  		struct page *page, size_t offset, size_t size,
-@@ -279,6 +295,10 @@ static inline int dma_mmap_noncontiguous(struct device *dev,
- {
- 	return -EINVAL;
- }
-+static inline void dma_get_memory_type(struct page *page,
-+				       struct dma_memory_type *type)
-+{
-+}
- #endif /* CONFIG_HAS_DMA */
- 
- #if defined(CONFIG_HAS_DMA) && defined(CONFIG_DMA_NEED_SYNC)
+ 		enum dma_data_direction dir, unsigned long attrs)
 diff --git a/kernel/dma/mapping.c b/kernel/dma/mapping.c
-index 81de84318ccc..877e43b39c06 100644
+index 877e43b39c06..0c8f51010d08 100644
 --- a/kernel/dma/mapping.c
 +++ b/kernel/dma/mapping.c
-@@ -6,6 +6,7 @@
-  * Copyright (c) 2006  Tejun Heo <teheo@suse.de>
-  */
- #include <linux/memblock.h> /* for max_pfn */
-+#include <linux/memremap.h>
- #include <linux/acpi.h>
- #include <linux/dma-map-ops.h>
- #include <linux/export.h>
-@@ -14,6 +15,7 @@
- #include <linux/of_device.h>
- #include <linux/slab.h>
- #include <linux/vmalloc.h>
-+#include <linux/cc_platform.h>
- #include "debug.h"
- #include "direct.h"
- 
-@@ -894,3 +896,31 @@ unsigned long dma_get_merge_boundary(struct device *dev)
- 	return ops->get_merge_boundary(dev);
+@@ -924,3 +924,47 @@ void dma_get_memory_type(struct page *page, struct dma_memory_type *type)
+ 	type->type = DMA_MEMORY_TYPE_NORMAL;
  }
- EXPORT_SYMBOL_GPL(dma_get_merge_boundary);
+ EXPORT_SYMBOL_GPL(dma_get_memory_type);
 +
 +/**
-+ * dma_get_memory_type - get the DMA memory type of the page supplied
-+ * @page: page to check
-+ * @type: memory type of that page
++ * dma_alloc_iova - Allocate an IOVA space
++ * @iova: IOVA attributes
 + *
-+ * Return the DMA memory type for the struct page. Pages with the same
-+ * memory type can be combined into the same IOVA mapping. Users of the
-+ * dma_iova family of functions must seperate the memory they want to map
-+ * into same-memory type ranges.
++ * Allocate an IOVA space for the given IOVA attributes. The IOVA space
++ * is allocated to the worst case when whole range is going to be used.
 + */
-+void dma_get_memory_type(struct page *page, struct dma_memory_type *type)
++int dma_alloc_iova(struct dma_iova_attrs *iova)
 +{
-+	/* TODO: Rewrite this check to rely on specific struct page flags */
-+	if (cc_platform_has(CC_ATTR_MEM_ENCRYPT)) {
-+		type->type = DMA_MEMORY_TYPE_ENCRYPTED;
-+		return;
++	struct device *dev = iova->dev;
++	const struct dma_map_ops *ops = get_dma_ops(dev);
++
++	if (dma_map_direct(dev, ops) || !ops->alloc_iova) {
++		/* dma_map_direct(..) check is for HMM range fault callers */
++		iova->addr = 0;
++		return 0;
 +	}
 +
-+	if (is_pci_p2pdma_page(page)) {
-+		type->type = DMA_MEMORY_TYPE_P2P;
-+		type->p2p_pgmap = page->pgmap;
-+		return;
-+	}
++	iova->addr = ops->alloc_iova(dev, iova->size);
++	if (dma_mapping_error(dev, iova->addr))
++		return -ENOMEM;
 +
-+	type->type = DMA_MEMORY_TYPE_NORMAL;
++	return 0;
 +}
-+EXPORT_SYMBOL_GPL(dma_get_memory_type);
++EXPORT_SYMBOL_GPL(dma_alloc_iova);
++
++/**
++ * dma_free_iova - Free an IOVA space
++ * @iova: IOVA attributes
++ *
++ * Free an IOVA space for the given IOVA attributes.
++ */
++void dma_free_iova(struct dma_iova_attrs *iova)
++{
++	struct device *dev = iova->dev;
++	const struct dma_map_ops *ops = get_dma_ops(dev);
++
++	if (dma_map_direct(dev, ops) || !ops->free_iova || !iova->addr)
++		return;
++
++	ops->free_iova(dev, iova->addr, iova->size);
++}
++EXPORT_SYMBOL_GPL(dma_free_iova);
 -- 
 2.45.2
 
