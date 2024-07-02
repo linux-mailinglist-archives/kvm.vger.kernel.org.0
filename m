@@ -1,230 +1,266 @@
-Return-Path: <kvm+bounces-20813-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20814-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E84D91EBB8
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 02:17:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 359B191ECD5
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 03:51:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 75B71B21E21
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 00:17:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA1FE1F22CA6
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 01:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338BE3D6D;
-	Tue,  2 Jul 2024 00:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XOzI15dz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B52AEBA3F;
+	Tue,  2 Jul 2024 01:51:47 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700D763B;
-	Tue,  2 Jul 2024 00:17:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719879428; cv=fail; b=fJtCftk3owBVPRo5F4XnsYLprchaZI9b8PBGnCJPm4CIEK1o2TCgrOCkByc9Xwc5mmhg8m+9k9j2OBYJ8kr6KFk3dG6Wh2Q2Vx9lYKD6OhKNAYMNaF48gPpDSKjdHKPOFuoj2WbHcODduMeZyODNO9htkcR84lfzmrNChBqkUIU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719879428; c=relaxed/simple;
-	bh=TOz7h7orUhSGG/AlQwvm7hmAU0lQoCDUpB3gNjpwc7M=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=cOA/4hOgIgJAHACDlp7CQZ1HQtBWImLFTEaZOaAaqvsYEYK9iLt2aHgbpibDXYyzajeq1lBcyIAZXfAwWq1SToRqZr0Zh2DNm9SoYmyiFM+NWB+W3vx4+Vus1LjaBZ11Wds5KPTueqeH9+zZCp1+yinbCRs4PuRPaAcrsX70gUM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XOzI15dz; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719879426; x=1751415426;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=TOz7h7orUhSGG/AlQwvm7hmAU0lQoCDUpB3gNjpwc7M=;
-  b=XOzI15dzi6+JSYcUQHPMSaKuBfjJfinvM85kSuvxRVjaMWDEfpkys8rn
-   0AZPzGb8xG0ou4wLFhRvw2lzFic4FDPbYzbzX+B9EpuLmWiyeJpArj0TH
-   +3uEfrdyQVI+Io7d8GA5Dve8RAX+n9TPLFtqhYt9CByt9mtwcCEGiyXkH
-   X2d71jtq0KMm9ckYfrm92vcl4VMtvG20u/vV8Ty8ygMGBbDPQUZTIrknt
-   AjGDf1l+RXQW/UTq4A5sV+TeeLfKo6D+rReToCEfKlZXKE7kSN/Lnh29m
-   3+2p0+emhekMhvO80/mZ0MrJqAaMA8hd1bOBbvF+3F6NHhz6IIlQMUi/q
-   Q==;
-X-CSE-ConnectionGUID: k1rZhNLmSMunCAn7EwuHYA==
-X-CSE-MsgGUID: 8KL2TUdnTqOakwDjPsEzoQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11120"; a="28431296"
-X-IronPort-AV: E=Sophos;i="6.09,177,1716274800"; 
-   d="scan'208";a="28431296"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Jul 2024 17:17:06 -0700
-X-CSE-ConnectionGUID: nQL15VesSp+twPh38C4ACQ==
-X-CSE-MsgGUID: k+MJBGFOTB2W3r4ZjHL1cQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,177,1716274800"; 
-   d="scan'208";a="45665158"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa008.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Jul 2024 17:17:05 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 1 Jul 2024 17:17:05 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 1 Jul 2024 17:17:04 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 1 Jul 2024 17:17:04 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.48) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 1 Jul 2024 17:17:04 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EL/RvD7qI3+5tMhVYtgf1krR6izc5X71C2g09ILN+Y2GSCmrgJm/jq06X6cTiVozaV0A1C+jAueQhdXQWgYMHygpnXCG5KCcIgCsC8bz7tQAhlwvAc/0dmmgKScJTt9pJXbpzQ2N+g/BeVVJOfM8j6TGbh7UtnD9sbQbBXXUkDOzVg7xrSYlab2tLYchLCgIOeWWqnYswGcidXLrNdMhTt6THlztmVKujL372shAMEYEDxDoiVWnRxwUtJZIIYVGtN/KBKcogQh38Jbp+gCnddxtXzXCMvVZpXRVBttJodXUmO3crMbQaN39uKUZVW8OnIYTnA17qPCUqiA+LLr8KA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M6zlFYjqULphPTtbwDdlR+Uu22qS3rjxyDeiSXX6NEw=;
- b=DM3vXxE/ZAuVz+J8FU7n6mgylB7VJZ7MLwvrwnIDyrLgOR3yEfpIE0TNg309T/bXchaRf8xxmzHPNYxuU0pYp+sVl9Y0ykziCLALoZ9XtLQybSqAk0mBbcfq8gq/eM19imjVQNQNAlhPFa1GIdROIQu6lHwOYcj+IaB5/PavzaX4v6ftMK2xgFfptAg++4JkjKIi+AyOiPBXS2dYq7mpmdCfv0xOEApEBXvajHE1Vjn6P/HoxUipaZI0c3dKnPTuASTY9zIQ38xTlpuUu+LQ1iKyFEhCxtVictodjVachZOx/gOyb45aX5LHcvzcZp60/7fGYQZzcB8KUBAWEVxOtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by PH8PR11MB8108.namprd11.prod.outlook.com (2603:10b6:510:257::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.26; Tue, 2 Jul
- 2024 00:17:02 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1%5]) with mapi id 15.20.7719.029; Tue, 2 Jul 2024
- 00:17:02 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: "Zhao, Yan Y" <yan.y.zhao@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>
-Subject: RE: [PATCH] vfio: Get/put KVM only for the first/last
- vfio_df_open/close in cdev path
-Thread-Topic: [PATCH] vfio: Get/put KVM only for the first/last
- vfio_df_open/close in cdev path
-Thread-Index: AQHayW6q9Ma1HJkB/EOYHWiKOaLUf7HhiCJAgAAoR4CAABm0gIAAyxpQ
-Date: Tue, 2 Jul 2024 00:17:02 +0000
-Message-ID: <BN9PR11MB5276546B8657FB468F5BA33F8CDC2@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240628151845.22166-1-yan.y.zhao@intel.com>
- <BN9PR11MB5276059EAED001D833949DF88CD32@BN9PR11MB5276.namprd11.prod.outlook.com>
- <fddd5230-28ac-463b-8536-ee953072d973@intel.com>
- <ZoKavalggv/iXCPB@yzhao56-desk.sh.intel.com>
-In-Reply-To: <ZoKavalggv/iXCPB@yzhao56-desk.sh.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH8PR11MB8108:EE_
-x-ms-office365-filtering-correlation-id: ce0ea0cc-3678-4693-baac-08dc9a2c4c30
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?srVSY/fXQwX65Thc4kZIGlgBt5T3pFPHOeWWwhjQr/52cN+0PuhOCZlCeioH?=
- =?us-ascii?Q?bz/XHmequq7i/0RH4YK35NcyU9r9Al/fkwG4Aew94W/HraTN0ffS30fMMSXt?=
- =?us-ascii?Q?qrfqHJsQnsqqnbUhoFZ6YE40ozpP1JzENv/46IBoUjn4gKHudk9lcrMgLey8?=
- =?us-ascii?Q?nNA50NIFqquhiwTvz3Y6FDKBPPoMCCY9pDc6qxCNFwUgaJdEQzlFgVTKYZ4r?=
- =?us-ascii?Q?OpfClWi+U273iwm2QBE99LtWqybdELVdheOjqYRg8GpENbUHeGJ6lEAoqYKN?=
- =?us-ascii?Q?ZsoysJekCnZRRWHs2ExYiPC3zBX2ZIVu3VQSjKUf4SvjWgLaWq2SPQDm4/Co?=
- =?us-ascii?Q?kfI0Hipkpc51/mTrZKfJjq1aOX6mTUZjLOrGG5BpWsG39agKzfo4k2WcmGMf?=
- =?us-ascii?Q?q3cBLJPeZN9RiT5ezHQoT7Nc9FnPE+Y8W8CMFXlOAT7c8fHEOtE4RF4en2Xp?=
- =?us-ascii?Q?HhtwZkUx+tthRFTUXBzmXQjpRUqEvJVUB06BIQv06P4IOodDeBVHPfsA5pbo?=
- =?us-ascii?Q?nJrUiCjyw8UGdxuaF6KZQzi5SytCjy6Hc6Q5H3snlIWBWvBcmXdI3WdfDM7h?=
- =?us-ascii?Q?DfFBAD7vZ3DgQ8GmrrCOUUuxLYh7qzoAuues8BzR4Otd1GuVPTcZKMVzLasr?=
- =?us-ascii?Q?t0SY5owYCQ6pXDuatx46ZKybYdbbK+2lzs3g/xAigj+ZPCHIvv8RIaulKzdX?=
- =?us-ascii?Q?+0jTdz5edt8gxj/o7cflyRdLhVHe0cSAzfm0nz4pwOGheSr1NN9LUq22rqFy?=
- =?us-ascii?Q?2f+NxTHlA92KEMNuaQYD7InAVgGO8HC7V3dBIpEUMfPs5lFEqvrw22S1YXRA?=
- =?us-ascii?Q?1gew0egucO5gmix5J2LQfNxgFACv8B72NfGhLh3MMR/Q8kFQC2dg5Y/4Nil/?=
- =?us-ascii?Q?JguGh4wzr8bwlJiTOcmUAhktzIY/8uXn/PKsOxI6WzhLZ3VblQPr5KA/MWaD?=
- =?us-ascii?Q?V0atAfgcoOw4srERKhBgRh+7c/GhUiNIWwB1j0Dwzw71/3WAKDBwwgWX9nJP?=
- =?us-ascii?Q?2shwjJrpZ0uTndUA/WADv/gHY+dfdx4mb67LIx/Xe1g/jqMDyGWB1RF1oYve?=
- =?us-ascii?Q?+4JdMytTsmovAW/ihTQ/GAfct0G50ZhH9MyZ27d5J7NEvdIf8OgPAWUeyJ4u?=
- =?us-ascii?Q?GvRSR2MAGpv9G/HW2C90JV0Oz7JVL6w84xZWDU6+HjCgwB3h5QRg9fZdJ0N0?=
- =?us-ascii?Q?HSf32DJMCt+zMeO4T2jwFyZs9nIso//+ZtquWt3PP8To+7rFRehhpQ+b05AN?=
- =?us-ascii?Q?auX6eoJ2I9miFggWOT9BmwSD5RcVeVxhMcScFHZXnvHsagsKD+qTiZRnOjch?=
- =?us-ascii?Q?n2SDoN1svyLE+8yPKzy1x92pZPFP17zLilQwNttrkz7zks51ay+0XlVziAZ4?=
- =?us-ascii?Q?9XcoUuDsZHiCAHYualpHVBw2vIcdo3/Vv7jaah5c/CdhjJtXLw=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?VTV6IS74YdgzFZftFz6cVcfbDGmbGi18GjcIuwsuYlCgY3xcSBPqhK39v3Ot?=
- =?us-ascii?Q?0aukV0Ndlx5lxRybasCFQFMQTpH3smABxVTRuk1aaWpAlm9F00kBNtz3iyRf?=
- =?us-ascii?Q?p6tDoVphcCAvD5qPyHEm276vE92kkAU6FurlOSY//vAqLmAcKaYAxHFuyzqL?=
- =?us-ascii?Q?Nuw/sZSucAkfzqyAEzpSxzho78co9qfv+wSUGDn/zNvybDlzqqrvqOuIqHdD?=
- =?us-ascii?Q?YzkzgSO0Q/AWAUXjhvs3mV6kfPfNDDmGmG9WR90zRfN6TJV/NPAjil0rSlrM?=
- =?us-ascii?Q?CWZEPOAKh+4Nu5oQT3Na1Az0TellKnj+cDAjuMmU5+LJ+BotP+9XPxNWgFWc?=
- =?us-ascii?Q?er0SU0wCRxf1Zte3jvZgpucfCExmdtZtK5D8qV6LwssbWAgpGuWCW6ZW6mRb?=
- =?us-ascii?Q?Qq0e/woyq6sc5y79ZNdX/EQAWMGb/R6ArW0jxM+KUrPJnMIqP8vQXE5aJ3h4?=
- =?us-ascii?Q?ezYr+jT4qzlj+qsOglRgEMehONQmECKuR719Vrh9fY/3w82lhRUhXnHtqqTL?=
- =?us-ascii?Q?CNjM8n+jU3vTsubAPkWT8ldmITreGV+AdqawXn2V+EOoOCuju/AG16nL3PAI?=
- =?us-ascii?Q?z1TKSl4eCH+puxIvJCCd+eghatRLGa0NMJcoKDOusYUVHkjGR+75oXoYogUN?=
- =?us-ascii?Q?LG1EwQctfCex+MTaLK+u9QrtAvrYgRbBprfOAY8Sh9Qr+gJqt8dRRNM1ua+J?=
- =?us-ascii?Q?zIkb5crD6zUD4rOLqGdpbc0K15gKRWhZqAdt6R97EFL4tJSHrZst6l4+agEp?=
- =?us-ascii?Q?y72tzunYwZdbjmSzdl8pHxcdHwIykzL6gZ0KLGq0/bjh3gUIRRj14Vz1en54?=
- =?us-ascii?Q?14hUMpt/3/TDulsU5qCWyKolaw0+pVNXAlomlwVrwAp/vUm1sHlHgTI3YznY?=
- =?us-ascii?Q?K337CHhnRUOy1QY8Tal22yqoOeS/jbIKNR1nEwGWDNtKHSE4P/tWlF58l4eN?=
- =?us-ascii?Q?Xz3avzRY8+uUAyFUW1y4Q+MamPrAhU2XTjto78j1YaKPyE2xTff0AhEWkT/u?=
- =?us-ascii?Q?O9tY2bW+BSkY+yPqxAXHGdFF9IOrm9lWTnD7ABjB1TJv7Dmkubc8+ICn8cyx?=
- =?us-ascii?Q?kiqh1ErJHyUDSNqoIsxFt5v6u0LT1nXwDgagzR6n1MEWDaEQ3Y80blKtRc3e?=
- =?us-ascii?Q?KuIuyXHH4IjgTLtoGfl0+9SF0gCpLhW9yeCnbe3tk5UbuePFBOz9PhIO5wsW?=
- =?us-ascii?Q?sHV4Zps0qkk6IC4L8SuMz8GZ1G2B4LN18T4VK1I3tczSHl345mvbB/kNQpdw?=
- =?us-ascii?Q?ijNB8RqWo1A8Eao/GxGS0LyjvnzOA71GhNMwI3l9NcmftN/QaEJ3rpthsCg4?=
- =?us-ascii?Q?59+fG3Xgrz4myYhO8QLtKVGt9/hISPXMDO7RshttdPk0D1DYT2jQe8XWC9Mn?=
- =?us-ascii?Q?5BzR2rpZvDOfmPpBunx8mblgrX4b0HLzxqYoJN+93AG850DNXG0Y5mvPkV/p?=
- =?us-ascii?Q?2wCCSzO9zSfbqsVR2oXxG1ra/ZgN1AzWjn10VR11tmq0Fa/GNI+GrbxSJzi9?=
- =?us-ascii?Q?x14wGaWoGsz06kASaZv6p4ANI0oAHdyT5jzR56Ms03xthJY+VHcr730MogtJ?=
- =?us-ascii?Q?8crLKE5LP7XIv7w3N0XaJnxsnn+dwKKpgJd2gH5J?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362A6B646;
+	Tue,  2 Jul 2024 01:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1719885107; cv=none; b=WOAWzDb9AFVsFP3FYG0QhBlCP7rx11+qIq8dl9pe3bVShk2JFipqU8ldke+8IKoyYF5uJZ9J+o0IrVBT7f0X2f+5Mc1VhEU/wnmE6KVK60H9SN5U1BBgD91uMbiws2AP/NYC9B1tpjoswKGkRWGFDs4jlZJikn3e+GROcio2oeM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1719885107; c=relaxed/simple;
+	bh=hbK9CwDV//L0rU10M97gdI94Q47Ft3mZzIiwu97dl9I=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=DW2ZVPWKhTUMetk1YsqCW7Nrf7LtssYBLFzrLlZBs+4iil9HsHbIoYL92KIiEJUqlE078kJiVvyv9dmVWSopXFCCgQBvtlzG5R4//YsilZJ0jhtTsmmPPLXMaq5Pyrsn7JCytbyry//lG8oj4KOdeQmyhFKJJhllUyk3rP1gZHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Cx8PEmXYNmXAAAAA--.36S3;
+	Tue, 02 Jul 2024 09:51:34 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxfcckXYNmyho4AA--.269S3;
+	Tue, 02 Jul 2024 09:51:34 +0800 (CST)
+Subject: Re: [PATCH v4 2/3] LoongArch: KVM: Add LBT feature detection function
+To: Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240626063239.3722175-1-maobibo@loongson.cn>
+ <20240626063239.3722175-3-maobibo@loongson.cn>
+ <CAAhV-H4O8QNb61xkErd9y_1tK_70=Y=LNqzy=9Ny5EQK1XZJaQ@mail.gmail.com>
+ <79dcf093-614f-2737-bb03-698b0b3abc57@loongson.cn>
+ <CAAhV-H5bQutcLcVaHn-amjF6_NDnCf2BFqqnGSRT_QQ_6q6REg@mail.gmail.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <9c7d242e-660b-8d39-b69e-201fd0a4bfbf@loongson.cn>
+Date: Tue, 2 Jul 2024 09:51:32 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ce0ea0cc-3678-4693-baac-08dc9a2c4c30
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Jul 2024 00:17:02.7009
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: H5EaNMw8eyAUykQX2i6fU82G2LmUMXWRZtFHb/B2q6lT6m1scjwkxxp1ObR6Bg9rW2yh7KfNV8QiPuC2NAaRBg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB8108
-X-OriginatorOrg: intel.com
+In-Reply-To: <CAAhV-H5bQutcLcVaHn-amjF6_NDnCf2BFqqnGSRT_QQ_6q6REg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxfcckXYNmyho4AA--.269S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW3AFW7CF4UGw4fKr15Xw1rXwc_yoWxCryxpr
+	WUAF4DCrW8Gr1xC3ZYqws0grsIvF1xCF4xWFyxK3yUAFn8tF1xJry0yrZ8CFyrX3y8Wa4I
+	9F1vyw43uF4Yy3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWUJVW8JwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
+	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
+	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
+	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
+	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8czVUUU
+	UUU==
 
-> From: Zhao, Yan Y <yan.y.zhao@intel.com>
-> Sent: Monday, July 1, 2024 8:02 PM
->=20
-> On Mon, Jul 01, 2024 at 06:30:05PM +0800, Yi Liu wrote:
-> > On 2024/7/1 16:43, Tian, Kevin wrote:
-> > >
-> > > what about extending vfio_df_open() to unify the get/put_kvm()
-> > > and open_count trick in one place?
-> > >
-> > > int vfio_df_open(struct vfio_device_file *df, struct kvm *kvm,
-> > > 	spinlock_t *kvm_ref_lock)
-> > > {
-> >
-> > this should work. But need a comment to note why need pass in both kvm
-> > and kvm_ref_lock given df has both of them. :)
-> So why to pass them?
+Huacai,
 
-hmm actually passing them is wrong especially for the group path.
-We have to get kvm upon the first reference to the pointer otherwise
-it is prone to use-after-free issue.
+On 2024/7/1 下午6:26, Huacai Chen wrote:
+> On Mon, Jul 1, 2024 at 9:27 AM maobibo <maobibo@loongson.cn> wrote:
+>>
+>>
+>> Huacai,
+>>
+>> On 2024/6/30 上午10:07, Huacai Chen wrote:
+>>> Hi, Bibo,
+>>>
+>>> On Wed, Jun 26, 2024 at 2:32 PM Bibo Mao <maobibo@loongson.cn> wrote:
+>>>>
+>>>> Two kinds of LBT feature detection are added here, one is VCPU
+>>>> feature, the other is VM feature. VCPU feature dection can only
+>>>> work with VCPU thread itself, and requires VCPU thread is created
+>>>> already. So LBT feature detection for VM is added also, it can
+>>>> be done even if VM is not created, and also can be done by any
+>>>> thread besides VCPU threads.
+>>>>
+>>>> Loongson Binary Translation (LBT) feature is defined in register
+>>>> cpucfg2. Here LBT capability detection for VCPU is added.
+>>>>
+>>>> Here ioctl command KVM_HAS_DEVICE_ATTR is added for VM, and macro
+>>>> KVM_LOONGARCH_VM_FEAT_CTRL is added to check supported feature. And
+>>>> three sub-features relative with LBT are added as following:
+>>>>    KVM_LOONGARCH_VM_FEAT_X86BT
+>>>>    KVM_LOONGARCH_VM_FEAT_ARMBT
+>>>>    KVM_LOONGARCH_VM_FEAT_MIPSBT
+>>>>
+>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+>>>> ---
+>>>>    arch/loongarch/include/uapi/asm/kvm.h |  6 ++++
+>>>>    arch/loongarch/kvm/vcpu.c             |  6 ++++
+>>>>    arch/loongarch/kvm/vm.c               | 44 ++++++++++++++++++++++++++-
+>>>>    3 files changed, 55 insertions(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
+>>>> index ddc5cab0ffd0..c40f7d9ffe13 100644
+>>>> --- a/arch/loongarch/include/uapi/asm/kvm.h
+>>>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+>>>> @@ -82,6 +82,12 @@ struct kvm_fpu {
+>>>>    #define KVM_IOC_CSRID(REG)             LOONGARCH_REG_64(KVM_REG_LOONGARCH_CSR, REG)
+>>>>    #define KVM_IOC_CPUCFG(REG)            LOONGARCH_REG_64(KVM_REG_LOONGARCH_CPUCFG, REG)
+>>>>
+>>>> +/* Device Control API on vm fd */
+>>>> +#define KVM_LOONGARCH_VM_FEAT_CTRL     0
+>>>> +#define  KVM_LOONGARCH_VM_FEAT_X86BT   0
+>>>> +#define  KVM_LOONGARCH_VM_FEAT_ARMBT   1
+>>>> +#define  KVM_LOONGARCH_VM_FEAT_MIPSBT  2
+>>>> +
+>>>>    /* Device Control API on vcpu fd */
+>>>>    #define KVM_LOONGARCH_VCPU_CPUCFG      0
+>>>>    #define KVM_LOONGARCH_VCPU_PVTIME_CTRL 1
+>>> If you insist that LBT should be a vm feature, then I suggest the
+>>> above two also be vm features. Though this is an UAPI change, but
+>>> CPUCFG is upstream in 6.10-rc1 and 6.10-final hasn't been released. We
+>>> have a chance to change it now.
+>>
+>> KVM_LOONGARCH_VCPU_PVTIME_CTRL need be attr percpu since every vcpu
+>> has is own different gpa address.
+> Then leave this as a vm feature.
+> 
+>>
+>> For KVM_LOONGARCH_VCPU_CPUCFG attr, it will not changed. We cannot break
+>> the API even if it is 6.10-rc1, VMM has already used this. Else there is
+>> uapi breaking now, still will be in future if we cannot control this.
+> UAPI changing before the first release is allowed, which means, we can
+> change this before the 6.10-final, but cannot change it after
+> 6.10-final.
+Now QEMU has already synced uapi to its own directory, also I never hear 
+about this, with my experience with uapi change, there is only newly 
+added or removed deprecated years ago.
 
->=20
-> What about making vfio_device_group_get_kvm_safe() or
-> vfio_df_get_kvm_safe()
-> not static and calling one of them in vfio_df_open() according to the df-
-> >group
-> ?
->=20
+Is there any documentation about UAPI change rules?
+> 
+>>
+>> How about adding new extra features capability for VM such as?
+>> +#define  KVM_LOONGARCH_VM_FEAT_LSX   3
+>> +#define  KVM_LOONGARCH_VM_FEAT_LASX  4
+> They should be similar as LBT, if LBT is vcpu feature, they should
+> also be vcpu features; if LBT is vm feature, they should also be vm
+> features.
+On other architectures, with function kvm_vm_ioctl_check_extension()
+    KVM_CAP_XSAVE2/KVM_CAP_PMU_CAPABILITY on x86
+    KVM_CAP_ARM_PMU_V3/KVM_CAP_ARM_SVE on arm64
+These features are all cpu features, at the same time they are VM features.
 
-yeah, this sounds better.
+If they are cpu features, how does VMM detect validity of these features 
+passing from command line? After all VCPUs are created and send bootup 
+command to these VCPUs? That is too late, VMM main thread is easy to 
+detect feature validity if they are VM features also.
+
+To be honest, I am not familiar with KVM still, only get further 
+understanding after actual problems solving. Welcome to give comments, 
+however please read more backgroud if you insist on, else there will be 
+endless argument again.
+
+Regards
+Bibo, Mao
+> 
+> Huacai
+> 
+>>
+>> Regards
+>> Bibo Mao
+>>>
+>>> Huacai
+>>>
+>>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
+>>>> index 233d28d0e928..9734b4d8db05 100644
+>>>> --- a/arch/loongarch/kvm/vcpu.c
+>>>> +++ b/arch/loongarch/kvm/vcpu.c
+>>>> @@ -565,6 +565,12 @@ static int _kvm_get_cpucfg_mask(int id, u64 *v)
+>>>>                           *v |= CPUCFG2_LSX;
+>>>>                   if (cpu_has_lasx)
+>>>>                           *v |= CPUCFG2_LASX;
+>>>> +               if (cpu_has_lbt_x86)
+>>>> +                       *v |= CPUCFG2_X86BT;
+>>>> +               if (cpu_has_lbt_arm)
+>>>> +                       *v |= CPUCFG2_ARMBT;
+>>>> +               if (cpu_has_lbt_mips)
+>>>> +                       *v |= CPUCFG2_MIPSBT;
+>>>>
+>>>>                   return 0;
+>>>>           case LOONGARCH_CPUCFG3:
+>>>> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
+>>>> index 6b2e4f66ad26..09e05108c68b 100644
+>>>> --- a/arch/loongarch/kvm/vm.c
+>>>> +++ b/arch/loongarch/kvm/vm.c
+>>>> @@ -99,7 +99,49 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
+>>>>           return r;
+>>>>    }
+>>>>
+>>>> +static int kvm_vm_feature_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>>>> +{
+>>>> +       switch (attr->attr) {
+>>>> +       case KVM_LOONGARCH_VM_FEAT_X86BT:
+>>>> +               if (cpu_has_lbt_x86)
+>>>> +                       return 0;
+>>>> +               return -ENXIO;
+>>>> +       case KVM_LOONGARCH_VM_FEAT_ARMBT:
+>>>> +               if (cpu_has_lbt_arm)
+>>>> +                       return 0;
+>>>> +               return -ENXIO;
+>>>> +       case KVM_LOONGARCH_VM_FEAT_MIPSBT:
+>>>> +               if (cpu_has_lbt_mips)
+>>>> +                       return 0;
+>>>> +               return -ENXIO;
+>>>> +       default:
+>>>> +               return -ENXIO;
+>>>> +       }
+>>>> +}
+>>>> +
+>>>> +static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_device_attr *attr)
+>>>> +{
+>>>> +       switch (attr->group) {
+>>>> +       case KVM_LOONGARCH_VM_FEAT_CTRL:
+>>>> +               return kvm_vm_feature_has_attr(kvm, attr);
+>>>> +       default:
+>>>> +               return -ENXIO;
+>>>> +       }
+>>>> +}
+>>>> +
+>>>>    int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
+>>>>    {
+>>>> -       return -ENOIOCTLCMD;
+>>>> +       struct kvm *kvm = filp->private_data;
+>>>> +       void __user *argp = (void __user *)arg;
+>>>> +       struct kvm_device_attr attr;
+>>>> +
+>>>> +       switch (ioctl) {
+>>>> +       case KVM_HAS_DEVICE_ATTR:
+>>>> +               if (copy_from_user(&attr, argp, sizeof(attr)))
+>>>> +                       return -EFAULT;
+>>>> +
+>>>> +               return kvm_vm_has_attr(kvm, &attr);
+>>>> +       default:
+>>>> +               return -EINVAL;
+>>>> +       }
+>>>>    }
+>>>> --
+>>>> 2.39.3
+>>>>
+>>
 
 
