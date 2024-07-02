@@ -1,206 +1,329 @@
-Return-Path: <kvm+bounces-20850-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20849-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0342923FFD
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 16:11:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACDFC923FF6
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 16:10:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A2CF1F22E0D
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 14:11:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69717283DB4
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 14:10:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A217F1BA060;
-	Tue,  2 Jul 2024 14:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865521B5833;
+	Tue,  2 Jul 2024 14:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="YxCVCEV3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FsH6Xrwj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881641DDD6;
-	Tue,  2 Jul 2024 14:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F97D1DDD6
+	for <kvm@vger.kernel.org>; Tue,  2 Jul 2024 14:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719929460; cv=none; b=WujGegQVCqUGD6wmCsnaE0Ixq3TjlXIOp6kkaeXZG+dF0ucSPVECFkRPkxn8zyx10yXdEh97abZTj9W4ShiVkBgDJ2kBGwbCuBae6rkvOifbnFdsKuX0DWjIMRc6RvX77g9No/ZuOXJhWp2uzTvD3QpYs6HM5dvtHEVsmo5yssg=
+	t=1719929415; cv=none; b=WK4o6JGf9PRFsGIYh7xZtXTgB1G/AuaEx2BzPfbXsgdl44YkROpoBbCbwYCN0DpS9aEZd30wHzkZC7xH6g4yXUFqXbb6iCLonotkVS2bW3FDThBQgQ7iVHgtXvLrgdJ7ZSQTdDBUSQHLGmHRM0YDJHlt0DYudNS1SQ6DO488ejA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719929460; c=relaxed/simple;
-	bh=jB7e0BWJUYy8pnYPEEOc3nSFaGq1u1krnDozmi3jQjM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J+Iopty+QZYF2qTmEqqQGhEcD/Cystd5cr0Nlz263uruqWfRp+mDZD84X7eUG3XVuZkJGMt60SX8a8XLYqwPEraiQq4kQylJ0WhcSlu9jDdLkKXZgYop2JVJi2ekTE5IpylY7CFeC4w0u9tyQLj5UxAo3n02SnsSTZkkLD4X/Rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=YxCVCEV3; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 462DwE8l027175;
-	Tue, 2 Jul 2024 14:10:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=d
-	DTSHAKS0Syv4Qne1bjB6vcqNRJn3LQKmhsFFS/Xv2k=; b=YxCVCEV36K5XqJKql
-	BBR0a3hGZW6GKYPUpzCG+NsP1wRfGQWYXVNtpEFWxp828rN5xZPGqxQrLAwahztL
-	RLGRkquw4gp/dn8iaxFgokebNU0fV8QzEvUVd6VJfnJUzKCnpXj2VdmuQ3MT6p3S
-	tAQNl3bNcujBxRw22ImHCgSeTBtvGk+Q6rrSHKqFHtcJqg6vfVNOvBQ2tRvLJrX5
-	axxs7WpQx0BiEnjjXiylWFTwlHy/KTxCS8vwfLTZqro88+BmaO35No6riat/Lkgw
-	E6rXsYRdxAoXYMj+1ZYwPWjRPZPaCyBI+gJsI+B80+7Q15nRZ0/EeGdlQ+NioPvD
-	DFX3g==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 404jw9r1a9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 14:10:10 +0000 (GMT)
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 462EAAj5013168;
-	Tue, 2 Jul 2024 14:10:10 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 404jw9r1a1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 14:10:10 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 462CAdDe024071;
-	Tue, 2 Jul 2024 14:10:09 GMT
-Received: from smtprelay07.wdc07v.mail.ibm.com ([172.16.1.74])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 402ya3cttf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 14:10:09 +0000
-Received: from smtpav02.dal12v.mail.ibm.com (smtpav02.dal12v.mail.ibm.com [10.241.53.101])
-	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 462EA5mm62128520
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 2 Jul 2024 14:10:08 GMT
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id AC03C58086;
-	Tue,  2 Jul 2024 14:10:01 +0000 (GMT)
-Received: from smtpav02.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4EFE258051;
-	Tue,  2 Jul 2024 14:09:54 +0000 (GMT)
-Received: from [9.195.35.111] (unknown [9.195.35.111])
-	by smtpav02.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  2 Jul 2024 14:09:54 +0000 (GMT)
-Message-ID: <d9625965-6742-4d48-ab8a-60a5a8b6be30@linux.ibm.com>
-Date: Tue, 2 Jul 2024 19:39:52 +0530
+	s=arc-20240116; t=1719929415; c=relaxed/simple;
+	bh=Q5HTHg4l0lyeIK57KtJvz52bz3EZ1B8PEVx0fx2ZI6I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LyHrHsD5SMB2FOS6N2Tzo2wW/tcPZobPD/EdUrRbD6ympReNpZK3ceYe1/RkPaOf7ox2fphegDsZzoCuLWjsC2vAVlcuQ8QCPjoMXSg+RvK8J0TGGD5cYP5teNPoeuuUfXoqTR6f5uVg4IY52eDJpXbClqdc54zLY13uY4z383M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FsH6Xrwj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719929412;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SNwFHLByhZ9Qs1kayFDYHhFkt3XkniLJLO/2kGyAGIU=;
+	b=FsH6Xrwjl3ogsTQwsD+30IiMslt+UTdgdtF8tCLyssEYDZRvs0wlNgJK5iZC7Jt1XPPiXW
+	VSrjSuJIsGx2M+oZZReeVl62NqzfTTDCVNP1tJxI+pHqILrHIzn0qmRDKwUjBUsL+1sBf9
+	oaSsS6pHM0lAtA/jXYOBU3wEQCq7HJA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-563-YKdvKsnhNPKrvXsEQZOKGA-1; Tue, 02 Jul 2024 10:10:11 -0400
+X-MC-Unique: YKdvKsnhNPKrvXsEQZOKGA-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4256718144dso39185545e9.1
+        for <kvm@vger.kernel.org>; Tue, 02 Jul 2024 07:10:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719929410; x=1720534210;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SNwFHLByhZ9Qs1kayFDYHhFkt3XkniLJLO/2kGyAGIU=;
+        b=ALJQ5ZsQ7whpysBJROsDQvQ0Xtz6GVZXlDfjX6iFPu9z14CUntrRSvGtpSgJRLEbbf
+         BTegFWkjOPDNJmFlzdUkyntQxW6NfQwF/s7xBdftoWbRwIqqwjY9xFBrQ9JcuEaetEWT
+         YllHtx3X8C8dCuP3MBv2k6XtHftDwqaslQgLk+INl9Q91qShL0lyMSWTnFSkGfAnNAMi
+         qlfpjl4/NgQVoiLwEtK47h2WQde23x8SgSttbUfAsfI0WxGAzdnHeiXNrhgdHhKmbVBb
+         tqbhCY/fLa6md2uD7/CW072fieSGuAQIzMu1NHFAwiQBpKBAwWI0vX73X+NT1J+wTds8
+         SDFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWblK69AEAMGaqurEYOhJ1EkrZVJpKNC2R5XfAltWHmP9g2xsV6HrylsmSrIXzQMPokIa6GnNB5P42WS9UP6uD5uMDd
+X-Gm-Message-State: AOJu0Yy+MlbrK31Y07nfGV/yxkDC0+iP63Sq7zX/ApUUpPgnW3NCrg84
+	3Cdc6aqtpiDT27sUdKZahBaF5x/oS/BrjtAPC9nwqcFPjacPag54JMK1FgT+gG//kB7KwxtPeTG
+	B65JuQsyMFyUbXIKQHZSaSDrCkCh+xMpGsnE50xo/ak3agHir6A==
+X-Received: by 2002:a05:600c:3b8b:b0:425:8bf0:7659 with SMTP id 5b1f17b1804b1-4258bf0785amr14105905e9.9.1719929410492;
+        Tue, 02 Jul 2024 07:10:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF2nHoCqso+sjxxE5A3Y3qgpPSKkOlJEY00W5Xrb62L9JbgqvkjIDIE4xy37xJnoLisJB7HHA==
+X-Received: by 2002:a05:600c:3b8b:b0:425:8bf0:7659 with SMTP id 5b1f17b1804b1-4258bf0785amr14105585e9.9.1719929409862;
+        Tue, 02 Jul 2024 07:10:09 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1f5:eadd:8c31:db01:9d01:7604])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4257cdf4982sm120640705e9.47.2024.07.02.07.10.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 07:10:09 -0700 (PDT)
+Date: Tue, 2 Jul 2024 10:10:06 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	David Woodhouse <dwmw2@infradead.org>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Sergio Lopez <slp@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>, Paul Durrant <paul@xen.org>,
+	kvm@vger.kernel.org
+Subject: [PULL 61/91] hw/i386/fw_cfg: Add etc/e820 to fw_cfg late
+Message-ID: <36574004704d6c4704aba27f3b3f0f37d6d00d00.1719929191.git.mst@redhat.com>
+References: <cover.1719929191.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v3 21/21] sched/cputime: Cope with steal time going
- backwards or negative
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
-        Sean Christopherson <seanjc@google.com>,
-        Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-        "H. Peter Anvin" <hpa@zytor.com>, Paul Durrant
- <paul@xen.org>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Juri Lelli <juri.lelli@redhat.com>,
-        Vincent Guittot <vincent.guittot@linaro.org>,
-        Dietmar Eggemann <dietmar.eggemann@arm.com>,
-        Steven Rostedt <rostedt@goodmis.org>, Ben Segall <bsegall@google.com>,
-        Mel Gorman <mgorman@suse.de>,
-        Daniel Bristot de Oliveira
- <bristot@redhat.com>,
-        Valentin Schneider <vschneid@redhat.com>,
-        Shuah Khan <shuah@kernel.org>, linux-doc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, jalliste@amazon.co.uk, sveith@amazon.de,
-        zide.chen@intel.com, Dongli Zhang <dongli.zhang@oracle.com>,
-        Chenyi Qiang <chenyi.qiang@intel.com>, kvm@vger.kernel.org
-References: <20240522001817.619072-1-dwmw2@infradead.org>
- <20240522001817.619072-22-dwmw2@infradead.org>
-From: Shrikanth Hegde <sshegde@linux.ibm.com>
-Content-Language: en-US
-In-Reply-To: <20240522001817.619072-22-dwmw2@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 8Kkr1ADykf2YsmO5WnLXu5WZuSB9XAYW
-X-Proofpoint-ORIG-GUID: T3nKIhJIKBS1A199aUafYu2FD1DdVyo8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-02_09,2024-07-02_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxscore=0
- malwarescore=0 lowpriorityscore=0 mlxlogscore=999 clxscore=1011
- impostorscore=0 suspectscore=0 spamscore=0 phishscore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407020103
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1719929191.git.mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
+From: David Woodhouse <dwmw2@infradead.org>
 
+In e820_add_entry() the e820_table is reallocated with g_renew() to make
+space for a new entry. However, fw_cfg_arch_create() just uses the
+existing e820_table pointer. This leads to a use-after-free if anything
+adds a new entry after fw_cfg is set up.
 
-On 5/22/24 5:47 AM, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> In steal_account_process_time(), a delta is calculated between the value
-> returned by paravirt_steal_clock(), and this_rq()->prev_steal_time which
-> is assumed to be the *previous* value returned by paravirt_steal_clock().
-> 
-> However, instead of just assigning the newly-read value directly into
-> ->prev_steal_time for use in the next iteration, ->prev_steal_time is
-> *incremented* by the calculated delta.
+Shift the addition of the etc/e820 file to the machine done notifier, via
+a new fw_cfg_add_e820() function.
 
+Also make e820_table private and use an e820_get_table() accessor function
+for it, which sets a flag that will trigger an assert() for any *later*
+attempts to add to the table.
 
-Does this happen because ULONG_MAX and u64 aren't of same size? If so, 
-would using the u64 variant of MAX would be a simpler fix?
+Make e820_add_entry() return void, as most callers don't check for error
+anyway.
 
-> 
-> This used to be roughly the same, modulo conversion to jiffies and back,
-> until commit 807e5b80687c0 ("sched/cputime: Add steal time support to
-> full dynticks CPU time accounting") started clamping that delta to a
-> maximum of the actual time elapsed. So now, if the value returned by
-> paravirt_steal_clock() jumps by a large amount, instead of a *single*
-> period of reporting 100% steal time, the system will report 100% steal
-> time for as long as it takes to "catch up" with the reported value.
-> Which is up to 584 years.
-> 
-> But there is a benefit to advancing ->prev_steal_time only by the time
-> which was *accounted* as having been stolen. It means that any extra
-> time truncated by the clamping will be accounted in the next sample
-> period rather than lost. Given the stochastic nature of the sampling,
-> that is more accurate overall.
-> 
-> So, continue to advance ->prev_steal_time by the accounted value as
-> long as the delta isn't egregiously large (for which, use maxtime * 2).
-> If the delta is more than that, just set ->prev_steal_time directly to
-> the value returned by paravirt_steal_clock().
-> 
-> Fixes: 807e5b80687c0 ("sched/cputime: Add steal time support to full dynticks CPU time accounting")
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  kernel/sched/cputime.c | 20 ++++++++++++++------
->  1 file changed, 14 insertions(+), 6 deletions(-)
-> 
-> diff --git a/kernel/sched/cputime.c b/kernel/sched/cputime.c
-> index af7952f12e6c..3a8a8b38966d 100644
-> --- a/kernel/sched/cputime.c
-> +++ b/kernel/sched/cputime.c
-> @@ -254,13 +254,21 @@ static __always_inline u64 steal_account_process_time(u64 maxtime)
->  {
->  #ifdef CONFIG_PARAVIRT
->  	if (static_key_false(&paravirt_steal_enabled)) {
-> -		u64 steal;
-> -
-> -		steal = paravirt_steal_clock(smp_processor_id());
-> -		steal -= this_rq()->prev_steal_time;
-> -		steal = min(steal, maxtime);
-> +		u64 steal, abs_steal;
-> +
-> +		abs_steal = paravirt_steal_clock(smp_processor_id());
-> +		steal = abs_steal - this_rq()->prev_steal_time;
-> +		if (unlikely(steal > maxtime)) {
-> +			/*
-> +			 * If the delta isn't egregious, it can be counted
-> +			 * in the next time period. Only advance by maxtime.
-> +			 */
-> +			if (steal < maxtime * 2)
-> +				abs_steal = this_rq()->prev_steal_time + maxtime;
-> +			steal = maxtime;
-> +		}
->  		account_steal_time(steal);
-> -		this_rq()->prev_steal_time += steal;
-> +		this_rq()->prev_steal_time = abs_steal;
->  
->  		return steal;
->  	}
+Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+Message-Id: <a2708734f004b224f33d3b4824e9a5a262431568.camel@infradead.org>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ hw/i386/e820_memory_layout.h |  8 ++------
+ hw/i386/fw_cfg.h             |  1 +
+ hw/i386/e820_memory_layout.c | 16 +++++++++++-----
+ hw/i386/fw_cfg.c             | 18 +++++++++++++-----
+ hw/i386/microvm.c            |  4 ++--
+ hw/i386/pc.c                 |  1 +
+ target/i386/kvm/kvm.c        |  6 +-----
+ target/i386/kvm/xen-emu.c    |  7 +------
+ 8 files changed, 32 insertions(+), 29 deletions(-)
+
+diff --git a/hw/i386/e820_memory_layout.h b/hw/i386/e820_memory_layout.h
+index 7c239aa033..b50acfa201 100644
+--- a/hw/i386/e820_memory_layout.h
++++ b/hw/i386/e820_memory_layout.h
+@@ -22,13 +22,9 @@ struct e820_entry {
+     uint32_t type;
+ } QEMU_PACKED __attribute((__aligned__(4)));
+ 
+-extern struct e820_entry *e820_table;
+-
+-int e820_add_entry(uint64_t address, uint64_t length, uint32_t type);
+-int e820_get_num_entries(void);
++void e820_add_entry(uint64_t address, uint64_t length, uint32_t type);
+ bool e820_get_entry(int index, uint32_t type,
+                     uint64_t *address, uint64_t *length);
+-
+-
++int e820_get_table(struct e820_entry **table);
+ 
+ #endif
+diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
+index 92e310f5fd..e560fd7be8 100644
+--- a/hw/i386/fw_cfg.h
++++ b/hw/i386/fw_cfg.h
+@@ -27,5 +27,6 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
+                          SmbiosEntryPointType ep_type);
+ void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
+ void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
++void fw_cfg_add_e820(FWCfgState *fw_cfg);
+ 
+ #endif
+diff --git a/hw/i386/e820_memory_layout.c b/hw/i386/e820_memory_layout.c
+index 06970ac44a..0d549accbf 100644
+--- a/hw/i386/e820_memory_layout.c
++++ b/hw/i386/e820_memory_layout.c
+@@ -11,22 +11,28 @@
+ #include "e820_memory_layout.h"
+ 
+ static size_t e820_entries;
+-struct e820_entry *e820_table;
++static struct e820_entry *e820_table;
++static gboolean e820_done;
+ 
+-int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
++void e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
+ {
++    assert(!e820_done);
++
+     /* new "etc/e820" file -- include ram and reserved entries */
+     e820_table = g_renew(struct e820_entry, e820_table, e820_entries + 1);
+     e820_table[e820_entries].address = cpu_to_le64(address);
+     e820_table[e820_entries].length = cpu_to_le64(length);
+     e820_table[e820_entries].type = cpu_to_le32(type);
+     e820_entries++;
+-
+-    return e820_entries;
+ }
+ 
+-int e820_get_num_entries(void)
++int e820_get_table(struct e820_entry **table)
+ {
++    e820_done = true;
++
++    if (table)
++        *table = e820_table;
++
+     return e820_entries;
+ }
+ 
+diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
+index 7c43c325ef..0e4494627c 100644
+--- a/hw/i386/fw_cfg.c
++++ b/hw/i386/fw_cfg.c
+@@ -48,6 +48,15 @@ const char *fw_cfg_arch_key_name(uint16_t key)
+     return NULL;
+ }
+ 
++/* Add etc/e820 late, once all regions should be present */
++void fw_cfg_add_e820(FWCfgState *fw_cfg)
++{
++    struct e820_entry *table;
++    int nr_e820 = e820_get_table(&table);
++
++    fw_cfg_add_file(fw_cfg, "etc/e820", table, nr_e820 * sizeof(*table));
++}
++
+ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
+                          SmbiosEntryPointType ep_type)
+ {
+@@ -60,6 +69,7 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
+     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
+     MachineClass *mc = MACHINE_GET_CLASS(pcms);
+     X86CPU *cpu = X86_CPU(ms->possible_cpus->cpus[0].cpu);
++    int nr_e820;
+ 
+     if (pcmc->smbios_defaults) {
+         /* These values are guest ABI, do not change */
+@@ -78,8 +88,9 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
+     }
+ 
+     /* build the array of physical mem area from e820 table */
+-    mem_array = g_malloc0(sizeof(*mem_array) * e820_get_num_entries());
+-    for (i = 0, array_count = 0; i < e820_get_num_entries(); i++) {
++    nr_e820 = e820_get_table(NULL);
++    mem_array = g_malloc0(sizeof(*mem_array) * nr_e820);
++    for (i = 0, array_count = 0; i < nr_e820; i++) {
+         uint64_t addr, len;
+ 
+         if (e820_get_entry(i, E820_RAM, &addr, &len)) {
+@@ -138,9 +149,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
+ #endif
+     fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, 1);
+ 
+-    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
+-                    sizeof(struct e820_entry) * e820_get_num_entries());
+-
+     fw_cfg_add_bytes(fw_cfg, FW_CFG_HPET, &hpet_cfg, sizeof(hpet_cfg));
+     /* allocate memory for the NUMA channel: one (64bit) word for the number
+      * of nodes, one word for each VCPU->node and one word for each node to
+diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
+index fec63cacfa..40edcee7af 100644
+--- a/hw/i386/microvm.c
++++ b/hw/i386/microvm.c
+@@ -324,8 +324,6 @@ static void microvm_memory_init(MicrovmMachineState *mms)
+     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, machine->smp.max_cpus);
+     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size);
+     fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, 1);
+-    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
+-                    sizeof(struct e820_entry) * e820_get_num_entries());
+ 
+     rom_set_fw(fw_cfg);
+ 
+@@ -586,9 +584,11 @@ static void microvm_machine_done(Notifier *notifier, void *data)
+ {
+     MicrovmMachineState *mms = container_of(notifier, MicrovmMachineState,
+                                             machine_done);
++    X86MachineState *x86ms = X86_MACHINE(mms);
+ 
+     acpi_setup_microvm(mms);
+     dt_setup_microvm(mms);
++    fw_cfg_add_e820(x86ms->fw_cfg);
+ }
+ 
+ static void microvm_powerdown_req(Notifier *notifier, void *data)
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 77415064c6..d2c29fbfcb 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -625,6 +625,7 @@ void pc_machine_done(Notifier *notifier, void *data)
+     acpi_setup();
+     if (x86ms->fw_cfg) {
+         fw_cfg_build_smbios(pcms, x86ms->fw_cfg, pcms->smbios_entry_point_type);
++        fw_cfg_add_e820(x86ms->fw_cfg);
+         fw_cfg_build_feature_control(MACHINE(pcms), x86ms->fw_cfg);
+         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
+         fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index dd8b0f3313..bf182570fe 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -2706,11 +2706,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
+     }
+ 
+     /* Tell fw_cfg to notify the BIOS to reserve the range. */
+-    ret = e820_add_entry(identity_base, 0x4000, E820_RESERVED);
+-    if (ret < 0) {
+-        fprintf(stderr, "e820_add_entry() table is full\n");
+-        return ret;
+-    }
++    e820_add_entry(identity_base, 0x4000, E820_RESERVED);
+ 
+     shadow_mem = object_property_get_int(OBJECT(s), "kvm-shadow-mem", &error_abort);
+     if (shadow_mem != -1) {
+diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
+index fc2c2321ac..2f89dc628e 100644
+--- a/target/i386/kvm/xen-emu.c
++++ b/target/i386/kvm/xen-emu.c
+@@ -176,12 +176,7 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
+     s->xen_caps = xen_caps;
+ 
+     /* Tell fw_cfg to notify the BIOS to reserve the range. */
+-    ret = e820_add_entry(XEN_SPECIAL_AREA_ADDR, XEN_SPECIAL_AREA_SIZE,
+-                         E820_RESERVED);
+-    if (ret < 0) {
+-        fprintf(stderr, "e820_add_entry() table is full\n");
+-        return ret;
+-    }
++    e820_add_entry(XEN_SPECIAL_AREA_ADDR, XEN_SPECIAL_AREA_SIZE, E820_RESERVED);
+ 
+     /* The pages couldn't be overlaid until KVM was initialized */
+     xen_primary_console_reset();
+-- 
+MST
+
 
