@@ -1,71 +1,73 @@
-Return-Path: <kvm+bounces-20855-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20854-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13F889243AA
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 18:35:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E485B9243A9
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 18:35:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C533428271C
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 16:35:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55FC2B20D12
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 16:35:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A09E1BD510;
-	Tue,  2 Jul 2024 16:35:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9F011BD505;
+	Tue,  2 Jul 2024 16:35:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J7XzfRmw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="VwWv5awd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94FF1BD039
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657C01BC094
 	for <kvm@vger.kernel.org>; Tue,  2 Jul 2024 16:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719938121; cv=none; b=QCoNZTpNY6bFglKQrQSNn5ZhKwvKs9TWM/vrOgeOtnromQ86PPEnSGwuxW8GzDJyuhaslQ7IpfKwm9rvkLWUs0UWdxwbhEji8dXqoucIosB5oO+DTk6qdMsrgac1i/uw0MtzJhiv7CsgSW0njVsGeI5cReHnjDoKFs31VurIGGo=
+	t=1719938121; cv=none; b=Z8fLiakXwLgvQKrYk+C4uscOUn9rrhci/QuyX8AkirmiZYSidBrsLmwAxZYEMlTIPlj5NxArI9ncRC+T9yEZ8M1Q8kpVIQO1CVAt4ZiH8FL5Mxwydz9xZASBPzmVWIBsQ9HcJjtZ7AWmMrGLJkEDFQ1GIqPa/DWI+oobdnkqs+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1719938121; c=relaxed/simple;
-	bh=CUKWW0o9Dr0Un5n5H44DW5lIXnY/PtrZCZss2/OnwG4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=P2vaSzupf/fSSTE/1te26RBWf5/8xcpRIQFRDqLYGv22udI74CaZxihVcdc0vJSN5ykU211nnul7c6nhZyFOqr3xfWwsVFDwXBHMwRMrFR1EQGZwM7g2ElDpC4WDnVk6K+5XoC4CN/lmX+34fEp4kTezFcoh7J7MTv5sjrcom+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J7XzfRmw; arc=none smtp.client-ip=209.85.208.52
+	bh=lygSVGqEW/V5wPZ/noOw52DNAd5cGOkDdbbjhHZVY1E=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YVh2VX4/D81UC2w0MQUaQt27fwz2ZgiyRMok/XZq/BJH6BslCBXKrpmsVfwz3h/sPm6hmbMTPjfOxi8/QsfCdUM0+XCRS3M2bJKM1cdA4DGCJC1Fa2pR9k8wbqsPTGWLML1jFiAAAQHq9fGyyGJbrmJaaGXIba0Y/pvFJeUd9Xs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=VwWv5awd; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-584ee8da49aso2969627a12.0
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-58b5f7bf3edso676631a12.0
         for <kvm@vger.kernel.org>; Tue, 02 Jul 2024 09:35:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google; t=1719938118; x=1720542918; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=xACPF8qTitC4C85q3Uzl6H9P/C7FAYrxs6IESUhBvq0=;
-        b=J7XzfRmwufRX4VJjFzZIFp+kbhkU8eUW/Ij5xjRzyBzegrNPP46YtBWGJfd+nGi2AZ
-         KqrdhPHv8hyJCQcijGnCwV0T9Ex6PSB3OrOEOA04xQpiK/uEXLHXai3iYh2aBYN3DB9a
-         T2gXDDsmsd5x+Wo6h3f6hQPZ0hkJaPsJ1FhVQbu+zpY+vuXCOTZ3XJzDlyqVIeHvtGp8
-         heFHUuq/PViWp6UCiQgrXlooU8R1O0qFMwptCS05FI3QAf6PjQ95IX7hCV4LTbZiZWvF
-         H5/+ldQaxtzPfg7PUEfOni++CpTU2tklU3hScCHWGr8lpTwyt0nkRthOtzP3zDIS86dG
-         xk1Q==
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=26ibk6G5TBJ3+G8dW2FBwDssd+gYK6j25tet2PWM190=;
+        b=VwWv5awdijIG7LqOR/4YbaOmAdclOYoGRnz1ZLcctqUzOG7nPPZKHDW8nRL4+PTITm
+         Nfd+g95x+jKS61YJwc7EibIdbfvP/+YiXlaaUDx1dkuBxTiUg/f4CnOBqYMBPmKkIpO5
+         QV6/JpL0H7X7oGlwO6J9jPGFEyZA/fuIeCRP6OpJFpogK5ALuVIZXAw1hVK+lNPmrZKy
+         C4EQJopILqz2H/GVLUcCBdhRbqeU+SGcLJXQwoNsaEOaJ080x+RQo9WQ+4/ar4UpGWp7
+         KozV6soaYMxOB56Aq2Df8E0Vul7gO/mrEg3YLvv7mjgd0lF3Q03q9+8QZe8rojekalMs
+         I8Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1719938118; x=1720542918;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xACPF8qTitC4C85q3Uzl6H9P/C7FAYrxs6IESUhBvq0=;
-        b=oF76OsybRVkd89TAgPQOXf6iFU0g/Ii0DFrDhpmar0KGUKaSBc1dB8ypmPRUX0ooCA
-         lj0OqlLJGigFuDBJkmvAh4eKpwgZbbOPyzJeUOJkZK+mPofFBkl1wognoUVzTLTDBpxH
-         EAsOwwWzDl2YbVp7EPkWiPVqnj5QLgtZN5Ax+CSQA1DAveMxpbCvoc/8MWDufptM5TVe
-         Z2KJVVDc7KCpc8KWHsMYuXJyMYPHTv0RO35UjyIOKPjuWfdjIfUjAcQreVz/U0HhcZpc
-         4cdT+PfYcxTKBo9sdQqmVXcqskd2CEjl1RpKZgOSOJJwwqsd1AFAIGC1b8jT3YSbJyF1
-         9W+A==
-X-Gm-Message-State: AOJu0YwQNsrLB4s84WqoXtzCPuIlbnb5uOij+Lwo7wgC46YxXQTNxxkX
-	V8bIDBsiDK4U89VgzxHpzo8X7JWozIQSxghhWVM1lIeEL64rgAUQr7BtI3ionro=
-X-Google-Smtp-Source: AGHT+IFn+KAnLT7OQQYFhCtyRn1CjpvcLN6nIOZfDstHnU2Uiz2RCBWdS7oCkVfmV4i1lqUv2u3LZg==
-X-Received: by 2002:a05:6402:26c8:b0:584:21eb:7688 with SMTP id 4fb4d7f45d1cf-5865d47375fmr11121050a12.14.1719938116959;
-        Tue, 02 Jul 2024 09:35:16 -0700 (PDT)
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=26ibk6G5TBJ3+G8dW2FBwDssd+gYK6j25tet2PWM190=;
+        b=a7fE9H+7sovDCxBiqxUE+fhwJIxA7Bhwxq4si9Dj3xTzQSkB41hP5mEV0/UVOCTFpg
+         ThxdewNiMWTznTjU+A7XT8vGQH2VxcpDWJWj7rDOjKFvDihtnO9BJx4pYrryDzpo/YBo
+         GV2Xh9Va3R6NLtdu2L+lHYTfcmbwoWuY6rwCndcDs1ryUJIXnvGQqZULjWOhcjztBR8y
+         WlRSGiDQDybgfI8qlYyAD2S3r/icSENPIFFfhSQulSYM0bEP+9wNUmxK8RXjAagVNi9L
+         iWD1w0x5oDfvsDRQSXUmTx5N2ESWz5GBFJ93rKzD8uZpAdH1m2XLzRZrdKRmMpJdWDZP
+         IFsg==
+X-Gm-Message-State: AOJu0YwCBgym2b8f2vFAlY0tGTRJUtaEKlAm/zLkzD1JErNubrcnMW2r
+	jm9lIET0hGEMczlN5+DLOquQkV2H/TiR7t63EhMGiOSU9z5KbJmNKeGie1JOYz4=
+X-Google-Smtp-Source: AGHT+IHBhfNB7jsgIlUoHE4OPYBRUkv0au3wXdb9DmRC6/b+bjRYvNJ2M/3/OHm9YVxoyt5+KFsgIg==
+X-Received: by 2002:a05:6402:5203:b0:57d:1696:fd14 with SMTP id 4fb4d7f45d1cf-5879ede2704mr8832949a12.8.1719938117526;
+        Tue, 02 Jul 2024 09:35:17 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5861324f08esm5839957a12.27.2024.07.02.09.35.16
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-58614f3d3f1sm5874972a12.94.2024.07.02.09.35.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 02 Jul 2024 09:35:16 -0700 (PDT)
 Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 9E1C35F790;
+	by draig.lan (Postfix) with ESMTP id B60F55F8D1;
 	Tue,  2 Jul 2024 17:35:15 +0100 (BST)
 From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: pbonzini@redhat.com,
@@ -77,11 +79,18 @@ Cc: kvm@vger.kernel.org,
 	kvmarm@lists.cs.columbia.edu,
 	christoffer.dall@arm.com,
 	maz@kernel.org,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-Subject: [kvm-unit-tests PATCH v1 0/2] Some fixes for running under -cpu max on QEMU
-Date: Tue,  2 Jul 2024 17:35:13 +0100
-Message-Id: <20240702163515.1964784-1-alex.bennee@linaro.org>
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Anders Roxell <anders.roxell@linaro.org>,
+	Andrew Jones <andrew.jones@linux.dev>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Eric Auger <eric.auger@redhat.com>,
+	kvmarm@lists.linux.dev (open list:ARM)
+Subject: [kvm-unit-tests PATCH v1 1/2] arm/pmu: skip the PMU introspection test if missing
+Date: Tue,  2 Jul 2024 17:35:14 +0100
+Message-Id: <20240702163515.1964784-2-alex.bennee@linaro.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240702163515.1964784-1-alex.bennee@linaro.org>
+References: <20240702163515.1964784-1-alex.bennee@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -91,27 +100,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi,
+The test for number of events is not a substitute for properly
+checking the feature register. Fix the define and skip if PMUv3 is not
+available on the system. This includes emulator such as QEMU which
+don't implement PMU counters as a matter of policy.
 
-The following fixes try and make the experience of QEMU -cpu max a bit
-smoother by actually checking the PMU versions supported. You can also
-set -cpu max,pmu=off to fully hide PMU functionality from the
-processor.
+Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+Cc: Anders Roxell <anders.roxell@linaro.org>
+---
+ arm/pmu.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
-As max includes all the features we also need to take into account the
-additional TGran values you can have with 52 bit addressing.
-
-Please review,
-
-
-Alex Bennée (2):
-  arm/pmu: skip the PMU introspection test if missing
-  arm/mmu: widen the page size check to account for LPA2
-
- lib/arm64/asm/processor.h | 29 ++++++++++++++---------------
- arm/pmu.c                 |  7 ++++++-
- 2 files changed, 20 insertions(+), 16 deletions(-)
-
+diff --git a/arm/pmu.c b/arm/pmu.c
+index 9ff7a301..66163a40 100644
+--- a/arm/pmu.c
++++ b/arm/pmu.c
+@@ -200,7 +200,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
+ #define ID_AA64DFR0_PERFMON_MASK  0xf
+ 
+ #define ID_DFR0_PMU_NOTIMPL	0b0000
+-#define ID_DFR0_PMU_V3		0b0001
++#define ID_DFR0_PMU_V3		0b0011
+ #define ID_DFR0_PMU_V3_8_1	0b0100
+ #define ID_DFR0_PMU_V3_8_4	0b0101
+ #define ID_DFR0_PMU_V3_8_5	0b0110
+@@ -286,6 +286,11 @@ static void test_event_introspection(void)
+ 		return;
+ 	}
+ 
++	if (pmu.version < ID_DFR0_PMU_V3) {
++		report_skip("PMUv3 extensions not supported, skip ...");
++		return;
++	}
++
+ 	/* PMUv3 requires an implementation includes some common events */
+ 	required_events = is_event_supported(SW_INCR, true) &&
+ 			  is_event_supported(CPU_CYCLES, true) &&
 -- 
 2.39.2
 
