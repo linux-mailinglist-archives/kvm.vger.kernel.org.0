@@ -1,46 +1,46 @@
-Return-Path: <kvm+bounces-20834-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20835-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D507D92395D
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 11:14:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB2FD923963
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 11:15:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 689F81F23F6A
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 09:14:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9641A1F238F0
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 09:15:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA711553B1;
-	Tue,  2 Jul 2024 09:10:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14FEC155A23;
+	Tue,  2 Jul 2024 09:10:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VczNJJsV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KTz8NtUc"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D1716B384;
-	Tue,  2 Jul 2024 09:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2189B15574C;
+	Tue,  2 Jul 2024 09:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719911441; cv=none; b=W5sw2OTyQzD/nLrr1gLrhBDhJTNNto2zsJt6yT3EpSucTi+w0+POkaSG7scXpa0EfykdwwqWwpTucAlhf3hvtvqdd6D66FmKEeotDM7C8w2X5cP2i5Aq2mmd4OPU9CxXqxxFT+aFO5xsX3hy9TtvH1e3trasVg8ko4VODgKf9pM=
+	t=1719911446; cv=none; b=FOyAjPHCyMdFvv2SOrQPrF9am/Pj6AQ6Nc9sil4iahw1JIWQx6KLQtkSIIxaQlauGN8DeQRNWcFETD9Yxad3yygP3pHXBnaUzMAs3fROxCJg7b0JD6kBSd89IcDKX/ZXR2Q+tBpvQXRA9ShrOfkW8jD+3CVTH3H+k64f1lU2zrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719911441; c=relaxed/simple;
-	bh=iroMohzT1Q8AWRK2+Thbq89BnX39U8SKlcdoPnAxJYY=;
+	s=arc-20240116; t=1719911446; c=relaxed/simple;
+	bh=pdK7V9xHdNBFoHCz59AGR5WOTx5xl2Vj8twOHvengYk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WHu6vY3rkmppcXLPO7ErFMHyyN17Owyz48x2z7GvS5IND0Xfae6vzZT7bT+qAA04cmmjnBMdTvDytOInlSZLAetU4d8/egoJn5Lkya8WQ+M1pkKtJWrZtPl1Wxy1jfgfgJtZO5ahNrN4TQMJUMLc0y5FCFtVtRPM+TDGb0G4ESY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VczNJJsV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD16CC116B1;
-	Tue,  2 Jul 2024 09:10:40 +0000 (UTC)
+	 MIME-Version; b=TTdreByZ+XQlCsYIvdOuU+FizXCcoaCsSUsuEtqqZHDOTuTa8EyymRCTxooNxE7L/qu04NSbzJ97d2oBk9p17iE9VXJdDwUs9OzipIU7Kg8nSfTTxrJjmXEkxoDHg4XveIAuuciFsd1gpSs1bPeoIff3DBjiO3mlJmjN14kklGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KTz8NtUc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB9F3C4AF0A;
+	Tue,  2 Jul 2024 09:10:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1719911441;
-	bh=iroMohzT1Q8AWRK2+Thbq89BnX39U8SKlcdoPnAxJYY=;
+	s=k20201202; t=1719911445;
+	bh=pdK7V9xHdNBFoHCz59AGR5WOTx5xl2Vj8twOHvengYk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VczNJJsVneBG8U1/XVDb6geZHvZySIGG4DY2l4QAi9gXw0LZ4UZx7I111sTW/pzG+
-	 4gFYx4HiuOTIS7ymyC1ZaLERA/X33A5BIU5kAJM/SZyFgB5GRFBxOi0L/j9m8A/bcs
-	 lgRBq3rNRiPVGh9h5iFW+4ma1ZmCVnY4jodvAce1csOdqMDIlLFM1gpYm0fdzdf3dc
-	 DXGkry+mEYxh70j6i+/ZAGXhXHz4SK5EzMJ4XXxg16NwaKkpXS/s2cAIDA+bNQUsB3
-	 T6fOcXLArV3UrnEVTuSxL9/A8so/gdTs+kjzN4UkmqpH6Ew92iDJu+Z7ECGV8U0SDk
-	 gTnjyBi/EKyDQ==
+	b=KTz8NtUcFIGsDCeQDH+Db9PamT6/nlViuegQcsznIc+DF9srj7x240NEr4il//Xc/
+	 8i6luwPgO0yiJWdOnRcYYR5NL7yfawxlEKbv7drJYa8B4a339djv3OvkkqYT8c8H3F
+	 2fawWfN+3TdW5300DYyGBMMir31FVKME3Mb0rFDkEafNNmyz4K9325deM1XSwCqvmZ
+	 j68Pmkr7YplRS9KcdrYMe4vUV3x2d5CnPCIdbVmN1wj2l59g8sgHeEOk1PKw3gUGEO
+	 sLuttA9bzZDdVviGMe/UOzCvZZ/jZMpHBqkeBTmM9HISPNn+o452NCrh1hoAqBSCYz
+	 dRKD1bcV6Pa7w==
 From: Leon Romanovsky <leon@kernel.org>
 To: Jens Axboe <axboe@kernel.dk>,
 	Jason Gunthorpe <jgg@ziepe.ca>,
@@ -70,9 +70,9 @@ Cc: Leon Romanovsky <leonro@nvidia.com>,
 	linux-pci@vger.kernel.org,
 	kvm@vger.kernel.org,
 	linux-mm@kvack.org
-Subject: [RFC PATCH v1 11/18] RDMA/core: Separate DMA mapping to caching IOVA and page linkage
-Date: Tue,  2 Jul 2024 12:09:41 +0300
-Message-ID: <e1139a79303864fec5c72d8ecd495be17337a160.1719909395.git.leon@kernel.org>
+Subject: [RFC PATCH v1 12/18] RDMA/umem: Prevent UMEM ODP creation with SWIOTLB
+Date: Tue,  2 Jul 2024 12:09:42 +0300
+Message-ID: <d18c454636bf3cfdba9b66b7cc794d713eadc4a5.1719909395.git.leon@kernel.org>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <cover.1719909395.git.leon@kernel.org>
 References: <cover.1719909395.git.leon@kernel.org>
@@ -86,202 +86,122 @@ Content-Transfer-Encoding: 8bit
 
 From: Leon Romanovsky <leonro@nvidia.com>
 
-Reuse newly added DMA API to cache IOVA and only link/unlink pages
-in fast path.
+RDMA UMEM never supported DMA addresses returned from SWIOTLB, as these
+addresses should be programmed to the hardware which is not aware that
+it is bounce buffers and not real ones.
+
+Instead of silently leave broken system for the users who didn't
+know it, let's be explicit and return an error to them.
 
 Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
 ---
- drivers/infiniband/core/umem_odp.c | 61 +++---------------------------
- drivers/infiniband/hw/mlx5/odp.c   |  7 +++-
- include/rdma/ib_umem_odp.h         |  8 +---
- 3 files changed, 12 insertions(+), 64 deletions(-)
+ drivers/infiniband/core/umem_odp.c | 81 +++++++++++++++---------------
+ 1 file changed, 41 insertions(+), 40 deletions(-)
 
 diff --git a/drivers/infiniband/core/umem_odp.c b/drivers/infiniband/core/umem_odp.c
-index c628a98c41b7..6e170cb5110c 100644
+index 6e170cb5110c..12186717a892 100644
 --- a/drivers/infiniband/core/umem_odp.c
 +++ b/drivers/infiniband/core/umem_odp.c
-@@ -81,20 +81,13 @@ static inline int ib_init_umem_odp(struct ib_umem_odp *umem_odp,
- 		if (!umem_odp->pfn_list)
- 			return -ENOMEM;
- 
--		umem_odp->dma_list = kvcalloc(
--			ndmas, sizeof(*umem_odp->dma_list), GFP_KERNEL);
--		if (!umem_odp->dma_list) {
--			ret = -ENOMEM;
--			goto out_pfn_list;
--		}
- 
- 		umem_odp->iova.dev = dev->dma_device;
- 		umem_odp->iova.size = end - start;
- 		umem_odp->iova.dir = DMA_BIDIRECTIONAL;
- 		ret = dma_alloc_iova(&umem_odp->iova);
- 		if (ret)
--			goto out_dma_list;
+@@ -42,7 +42,8 @@
+ #include <linux/interval_tree.h>
+ #include <linux/hmm.h>
+ #include <linux/pagemap.h>
 -
-+			goto out_pfn_list;
++#include <linux/dma-map-ops.h>
++#include <linux/swiotlb.h>
+ #include <rdma/ib_umem_odp.h>
  
- 		ret = mmu_interval_notifier_insert(&umem_odp->notifier,
- 						   umem_odp->umem.owning_mm,
-@@ -107,8 +100,6 @@ static inline int ib_init_umem_odp(struct ib_umem_odp *umem_odp,
- 
- out_free_iova:
- 	dma_free_iova(&umem_odp->iova);
--out_dma_list:
--	kvfree(umem_odp->dma_list);
- out_pfn_list:
- 	kvfree(umem_odp->pfn_list);
- 	return ret;
-@@ -286,7 +277,6 @@ void ib_umem_odp_release(struct ib_umem_odp *umem_odp)
- 		mutex_unlock(&umem_odp->umem_mutex);
- 		mmu_interval_notifier_remove(&umem_odp->notifier);
- 		dma_free_iova(&umem_odp->iova);
--		kvfree(umem_odp->dma_list);
- 		kvfree(umem_odp->pfn_list);
- 	}
- 	put_pid(umem_odp->tgid);
-@@ -294,40 +284,10 @@ void ib_umem_odp_release(struct ib_umem_odp *umem_odp)
- }
- EXPORT_SYMBOL(ib_umem_odp_release);
- 
--/*
-- * Map for DMA and insert a single page into the on-demand paging page tables.
-- *
-- * @umem: the umem to insert the page to.
-- * @dma_index: index in the umem to add the dma to.
-- * @page: the page struct to map and add.
-- * @access_mask: access permissions needed for this page.
-- *
-- * The function returns -EFAULT if the DMA mapping operation fails.
-- *
-- */
--static int ib_umem_odp_map_dma_single_page(
--		struct ib_umem_odp *umem_odp,
--		unsigned int dma_index,
--		struct page *page)
--{
--	struct ib_device *dev = umem_odp->umem.ibdev;
--	dma_addr_t *dma_addr = &umem_odp->dma_list[dma_index];
--
--	*dma_addr = ib_dma_map_page(dev, page, 0, 1 << umem_odp->page_shift,
--				    DMA_BIDIRECTIONAL);
--	if (ib_dma_mapping_error(dev, *dma_addr)) {
--		*dma_addr = 0;
--		return -EFAULT;
--	}
--	umem_odp->npages++;
--	return 0;
--}
--
- /**
-  * ib_umem_odp_map_dma_and_lock - DMA map userspace memory in an ODP MR and lock it.
-  *
-  * Maps the range passed in the argument to DMA addresses.
-- * The DMA addresses of the mapped pages is updated in umem_odp->dma_list.
-  * Upon success the ODP MR will be locked to let caller complete its device
-  * page table update.
-  *
-@@ -435,15 +395,6 @@ int ib_umem_odp_map_dma_and_lock(struct ib_umem_odp *umem_odp, u64 user_virt,
- 				  __func__, hmm_order, page_shift);
- 			break;
- 		}
--
--		ret = ib_umem_odp_map_dma_single_page(
--				umem_odp, dma_index, hmm_pfn_to_page(range.hmm_pfns[pfn_index]));
--		if (ret < 0) {
--			ibdev_dbg(umem_odp->umem.ibdev,
--				  "ib_umem_odp_map_dma_single_page failed with error %d\n", ret);
--			break;
--		}
--		range.hmm_pfns[pfn_index] |= HMM_PFN_DMA_MAPPED;
- 	}
- 	/* upon success lock should stay on hold for the callee */
- 	if (!ret)
-@@ -463,10 +414,8 @@ EXPORT_SYMBOL(ib_umem_odp_map_dma_and_lock);
- void ib_umem_odp_unmap_dma_pages(struct ib_umem_odp *umem_odp, u64 virt,
- 				 u64 bound)
+ #include "uverbs.h"
+@@ -51,50 +52,50 @@ static inline int ib_init_umem_odp(struct ib_umem_odp *umem_odp,
+ 				   const struct mmu_interval_notifier_ops *ops)
  {
--	dma_addr_t dma;
- 	int idx;
- 	u64 addr;
--	struct ib_device *dev = umem_odp->umem.ibdev;
+ 	struct ib_device *dev = umem_odp->umem.ibdev;
++	size_t page_size = 1UL << umem_odp->page_shift;
++	unsigned long start, end;
++	size_t ndmas, npfns;
+ 	int ret;
  
- 	lockdep_assert_held(&umem_odp->umem_mutex);
- 
-@@ -474,19 +423,19 @@ void ib_umem_odp_unmap_dma_pages(struct ib_umem_odp *umem_odp, u64 virt,
- 	bound = min_t(u64, bound, ib_umem_end(umem_odp));
- 	for (addr = virt; addr < bound; addr += BIT(umem_odp->page_shift)) {
- 		unsigned long pfn_idx = (addr - ib_umem_start(umem_odp)) >> PAGE_SHIFT;
--		struct page *page = hmm_pfn_to_page(umem_odp->pfn_list[pfn_idx]);
- 
- 		idx = (addr - ib_umem_start(umem_odp)) >> umem_odp->page_shift;
--		dma = umem_odp->dma_list[idx];
- 
- 		if (!(umem_odp->pfn_list[pfn_idx] & HMM_PFN_VALID))
- 			continue;
- 		if (!(umem_odp->pfn_list[pfn_idx] & HMM_PFN_DMA_MAPPED))
- 			continue;
- 
--		ib_dma_unmap_page(dev, dma, BIT(umem_odp->page_shift),
--				  DMA_BIDIRECTIONAL);
-+		dma_hmm_unlink_page(&umem_odp->pfn_list[pfn_idx],
-+				    &umem_odp->iova,
-+				    idx * (1 << umem_odp->page_shift));
- 		if (umem_odp->pfn_list[pfn_idx] & HMM_PFN_WRITE) {
-+			struct page *page = hmm_pfn_to_page(umem_odp->pfn_list[pfn_idx]);
- 			struct page *head_page = compound_head(page);
- 			/*
- 			 * set_page_dirty prefers being called with
-diff --git a/drivers/infiniband/hw/mlx5/odp.c b/drivers/infiniband/hw/mlx5/odp.c
-index 5713fe25f4de..b2aeaef9d0e1 100644
---- a/drivers/infiniband/hw/mlx5/odp.c
-+++ b/drivers/infiniband/hw/mlx5/odp.c
-@@ -149,6 +149,7 @@ static void populate_mtt(__be64 *pas, size_t idx, size_t nentries,
- {
- 	struct ib_umem_odp *odp = to_ib_umem_odp(mr->umem);
- 	bool downgrade = flags & MLX5_IB_UPD_XLT_DOWNGRADE;
-+	struct ib_device *dev = odp->umem.ibdev;
- 	unsigned long pfn;
- 	dma_addr_t pa;
- 	size_t i;
-@@ -162,12 +163,16 @@ static void populate_mtt(__be64 *pas, size_t idx, size_t nentries,
- 			/* Initial ODP init */
- 			continue;
- 
--		pa = odp->dma_list[idx + i];
-+		pa = dma_hmm_link_page(&odp->pfn_list[idx + i], &odp->iova,
-+				       (idx + i) * (1 << odp->page_shift));
-+		WARN_ON_ONCE(ib_dma_mapping_error(dev, pa));
+ 	umem_odp->umem.is_odp = 1;
+ 	mutex_init(&umem_odp->umem_mutex);
++	if (umem_odp->is_implicit_odp)
++		return 0;
 +
- 		pa |= MLX5_IB_MTT_READ;
- 		if ((pfn & HMM_PFN_WRITE) && !downgrade)
- 			pa |= MLX5_IB_MTT_WRITE;
++	if (dev_use_swiotlb(dev->dma_device, page_size, DMA_BIDIRECTIONAL) ||
++	    is_swiotlb_force_bounce(dev->dma_device))
++		return -EOPNOTSUPP;
++
++	start = ALIGN_DOWN(umem_odp->umem.address, page_size);
++	if (check_add_overflow(umem_odp->umem.address,
++			       (unsigned long)umem_odp->umem.length, &end))
++		return -EOVERFLOW;
++	end = ALIGN(end, page_size);
++	if (unlikely(end < page_size))
++		return -EOVERFLOW;
++
++	ndmas = (end - start) >> umem_odp->page_shift;
++	if (!ndmas)
++		return -EINVAL;
++
++	npfns = (end - start) >> PAGE_SHIFT;
++	umem_odp->pfn_list =
++		kvcalloc(npfns, sizeof(*umem_odp->pfn_list), GFP_KERNEL);
++	if (!umem_odp->pfn_list)
++		return -ENOMEM;
++
++	umem_odp->iova.dev = dev->dma_device;
++	umem_odp->iova.size = end - start;
++	umem_odp->iova.dir = DMA_BIDIRECTIONAL;
++	ret = dma_alloc_iova(&umem_odp->iova);
++	if (ret)
++		goto out_pfn_list;
  
- 		pas[i] = cpu_to_be64(pa);
-+		odp->npages++;
- 	}
- }
+-	if (!umem_odp->is_implicit_odp) {
+-		size_t page_size = 1UL << umem_odp->page_shift;
+-		unsigned long start;
+-		unsigned long end;
+-		size_t ndmas, npfns;
+-
+-		start = ALIGN_DOWN(umem_odp->umem.address, page_size);
+-		if (check_add_overflow(umem_odp->umem.address,
+-				       (unsigned long)umem_odp->umem.length,
+-				       &end))
+-			return -EOVERFLOW;
+-		end = ALIGN(end, page_size);
+-		if (unlikely(end < page_size))
+-			return -EOVERFLOW;
+-
+-		ndmas = (end - start) >> umem_odp->page_shift;
+-		if (!ndmas)
+-			return -EINVAL;
+-
+-		npfns = (end - start) >> PAGE_SHIFT;
+-		umem_odp->pfn_list = kvcalloc(
+-			npfns, sizeof(*umem_odp->pfn_list), GFP_KERNEL);
+-		if (!umem_odp->pfn_list)
+-			return -ENOMEM;
+-
+-
+-		umem_odp->iova.dev = dev->dma_device;
+-		umem_odp->iova.size = end - start;
+-		umem_odp->iova.dir = DMA_BIDIRECTIONAL;
+-		ret = dma_alloc_iova(&umem_odp->iova);
+-		if (ret)
+-			goto out_pfn_list;
+-
+-		ret = mmu_interval_notifier_insert(&umem_odp->notifier,
+-						   umem_odp->umem.owning_mm,
+-						   start, end - start, ops);
+-		if (ret)
+-			goto out_free_iova;
+-	}
++	ret = mmu_interval_notifier_insert(&umem_odp->notifier,
++					   umem_odp->umem.owning_mm, start,
++					   end - start, ops);
++	if (ret)
++		goto out_free_iova;
  
-diff --git a/include/rdma/ib_umem_odp.h b/include/rdma/ib_umem_odp.h
-index a3f4a5c03bf8..653fc076b6ee 100644
---- a/include/rdma/ib_umem_odp.h
-+++ b/include/rdma/ib_umem_odp.h
-@@ -18,15 +18,9 @@ struct ib_umem_odp {
- 	/* An array of the pfns included in the on-demand paging umem. */
- 	unsigned long *pfn_list;
+ 	return 0;
  
--	/*
--	 * An array with DMA addresses mapped for pfns in pfn_list.
--	 * The lower two bits designate access permissions.
--	 * See ODP_READ_ALLOWED_BIT and ODP_WRITE_ALLOWED_BIT.
--	 */
--	dma_addr_t		*dma_list;
- 	struct dma_iova_attrs iova;
- 	/*
--	 * The umem_mutex protects the page_list and dma_list fields of an ODP
-+	 * The umem_mutex protects the page_list field of an ODP
- 	 * umem, allowing only a single thread to map/unmap pages. The mutex
- 	 * also protects access to the mmu notifier counters.
- 	 */
 -- 
 2.45.2
 
