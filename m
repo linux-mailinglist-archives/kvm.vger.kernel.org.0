@@ -1,135 +1,118 @@
-Return-Path: <kvm+bounces-20853-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20855-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27D049242F6
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 17:56:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13F889243AA
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 18:35:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E08A828BCBA
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 15:56:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C533428271C
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 16:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A448F1BD002;
-	Tue,  2 Jul 2024 15:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A09E1BD510;
+	Tue,  2 Jul 2024 16:35:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="i43a3zt0"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J7XzfRmw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C014326AE4;
-	Tue,  2 Jul 2024 15:56:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E94FF1BD039
+	for <kvm@vger.kernel.org>; Tue,  2 Jul 2024 16:35:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719935779; cv=none; b=Xw7okwRUCsB8FAlVjqShw38UrZx8oVpvhBU5Y5JUoa32sIUdeVUGcMj0lUX07i9XOwCt2ZvaDn+mM+DaX5q6POju3+QaO2o4d3DyfYxJ1zV57xJVH5cFB66WB+npg1p2LLMa92TvvTEEZ6sawN/WDym9x/FgVjJFpdHiWtJ2vUM=
+	t=1719938121; cv=none; b=QCoNZTpNY6bFglKQrQSNn5ZhKwvKs9TWM/vrOgeOtnromQ86PPEnSGwuxW8GzDJyuhaslQ7IpfKwm9rvkLWUs0UWdxwbhEji8dXqoucIosB5oO+DTk6qdMsrgac1i/uw0MtzJhiv7CsgSW0njVsGeI5cReHnjDoKFs31VurIGGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719935779; c=relaxed/simple;
-	bh=1+gzNbPlpcRYJgNGJGSRAyloxA2ydKZJokzw9VBOuMc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sL5iH8t2UmVuimDizsjn0mkAXLjOn711DXM/guPnIxpqCnmJzu2Qjgi1z2pwsA7z5Fi+55KYiMErxOwNjWal+8siDHo2qykiAfdp9WXVjtDoUd41lPD4PTPqr3gBZ6qRi3kywEBOBeMjtd5b2N4bSHUC+fXFT6bE5K/HZsHdnE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=i43a3zt0; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 462FSOsa020096;
-	Tue, 2 Jul 2024 15:56:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=pp1; bh=0MCtPccUAv/HyOA5SIGH355/4W
-	OzGzAz1a93r83mZlE=; b=i43a3zt0wFoSxGEF8NS1wzom4JXP7Lq/BTcNdayNfN
-	fpXRfZ4KEh3xt0r3jonp3RDD6h69ZWFp1my9UAH+8kH1xfPv5KMzX5t9HvzL9UJw
-	Lsf4c6Tm2txz7dUFk8qmpkm7dpvF1HTJbNHFBPVS2LpC8S5MCYTbq2d//pcBMqFp
-	zUPocpRcx2wzC3nBW5y/ma9CUXDolcdvgiVXlXiI8VmWhsN7dfXymtGUb6Magmq2
-	Iae457+YkkrB1lAVDQkbf/uX/UEkxO38ITNgRRv2PPYS6eYpBdtDSjc+gk6fcSLL
-	TRRTIQ+N1u5quPDVGKLkZdaSxaVqXGTrev4Lbk6SQUaw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 404m7j82tu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 15:56:15 +0000 (GMT)
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 462FuFbf032583;
-	Tue, 2 Jul 2024 15:56:15 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 404m7j82tk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 15:56:15 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 462D8enu005942;
-	Tue, 2 Jul 2024 15:56:14 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 402vku5w0k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 02 Jul 2024 15:56:14 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 462Fu6K156164852
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 2 Jul 2024 15:56:08 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9A5B22004E;
-	Tue,  2 Jul 2024 15:56:06 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6C40920043;
-	Tue,  2 Jul 2024 15:56:06 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  2 Jul 2024 15:56:06 +0000 (GMT)
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, seiden@linux.ibm.com, david@redhat.com
-Subject: [PATCH v1 1/1] KVM: s390: remove useless include
-Date: Tue,  2 Jul 2024 17:56:06 +0200
-Message-ID: <20240702155606.71398-1-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1719938121; c=relaxed/simple;
+	bh=CUKWW0o9Dr0Un5n5H44DW5lIXnY/PtrZCZss2/OnwG4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=P2vaSzupf/fSSTE/1te26RBWf5/8xcpRIQFRDqLYGv22udI74CaZxihVcdc0vJSN5ykU211nnul7c6nhZyFOqr3xfWwsVFDwXBHMwRMrFR1EQGZwM7g2ElDpC4WDnVk6K+5XoC4CN/lmX+34fEp4kTezFcoh7J7MTv5sjrcom+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J7XzfRmw; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-584ee8da49aso2969627a12.0
+        for <kvm@vger.kernel.org>; Tue, 02 Jul 2024 09:35:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1719938118; x=1720542918; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xACPF8qTitC4C85q3Uzl6H9P/C7FAYrxs6IESUhBvq0=;
+        b=J7XzfRmwufRX4VJjFzZIFp+kbhkU8eUW/Ij5xjRzyBzegrNPP46YtBWGJfd+nGi2AZ
+         KqrdhPHv8hyJCQcijGnCwV0T9Ex6PSB3OrOEOA04xQpiK/uEXLHXai3iYh2aBYN3DB9a
+         T2gXDDsmsd5x+Wo6h3f6hQPZ0hkJaPsJ1FhVQbu+zpY+vuXCOTZ3XJzDlyqVIeHvtGp8
+         heFHUuq/PViWp6UCiQgrXlooU8R1O0qFMwptCS05FI3QAf6PjQ95IX7hCV4LTbZiZWvF
+         H5/+ldQaxtzPfg7PUEfOni++CpTU2tklU3hScCHWGr8lpTwyt0nkRthOtzP3zDIS86dG
+         xk1Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719938118; x=1720542918;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xACPF8qTitC4C85q3Uzl6H9P/C7FAYrxs6IESUhBvq0=;
+        b=oF76OsybRVkd89TAgPQOXf6iFU0g/Ii0DFrDhpmar0KGUKaSBc1dB8ypmPRUX0ooCA
+         lj0OqlLJGigFuDBJkmvAh4eKpwgZbbOPyzJeUOJkZK+mPofFBkl1wognoUVzTLTDBpxH
+         EAsOwwWzDl2YbVp7EPkWiPVqnj5QLgtZN5Ax+CSQA1DAveMxpbCvoc/8MWDufptM5TVe
+         Z2KJVVDc7KCpc8KWHsMYuXJyMYPHTv0RO35UjyIOKPjuWfdjIfUjAcQreVz/U0HhcZpc
+         4cdT+PfYcxTKBo9sdQqmVXcqskd2CEjl1RpKZgOSOJJwwqsd1AFAIGC1b8jT3YSbJyF1
+         9W+A==
+X-Gm-Message-State: AOJu0YwQNsrLB4s84WqoXtzCPuIlbnb5uOij+Lwo7wgC46YxXQTNxxkX
+	V8bIDBsiDK4U89VgzxHpzo8X7JWozIQSxghhWVM1lIeEL64rgAUQr7BtI3ionro=
+X-Google-Smtp-Source: AGHT+IFn+KAnLT7OQQYFhCtyRn1CjpvcLN6nIOZfDstHnU2Uiz2RCBWdS7oCkVfmV4i1lqUv2u3LZg==
+X-Received: by 2002:a05:6402:26c8:b0:584:21eb:7688 with SMTP id 4fb4d7f45d1cf-5865d47375fmr11121050a12.14.1719938116959;
+        Tue, 02 Jul 2024 09:35:16 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5861324f08esm5839957a12.27.2024.07.02.09.35.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Jul 2024 09:35:16 -0700 (PDT)
+Received: from draig.lan (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 9E1C35F790;
+	Tue,  2 Jul 2024 17:35:15 +0100 (BST)
+From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: pbonzini@redhat.com,
+	drjones@redhat.com,
+	thuth@redhat.com
+Cc: kvm@vger.kernel.org,
+	qemu-arm@nongnu.org,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.cs.columbia.edu,
+	christoffer.dall@arm.com,
+	maz@kernel.org,
+	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
+Subject: [kvm-unit-tests PATCH v1 0/2] Some fixes for running under -cpu max on QEMU
+Date: Tue,  2 Jul 2024 17:35:13 +0100
+Message-Id: <20240702163515.1964784-1-alex.bennee@linaro.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 0hwgbO1KruNFT2MfLeSYV6--RUqPwABr
-X-Proofpoint-ORIG-GUID: CrUXzvGo2326g7e36vx9EoHdMCaJf3V2
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-02_11,2024-07-02_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=1 priorityscore=1501
- impostorscore=0 phishscore=0 spamscore=1 mlxlogscore=198 adultscore=0
- suspectscore=0 mlxscore=1 malwarescore=0 clxscore=1015 lowpriorityscore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407020117
 
-arch/s390/include/asm/kvm_host.h includes linux/kvm_host.h, but
-linux/kvm_host.h includes asm/kvm_host.h .
+Hi,
 
-It turns out that arch/s390/include/asm/kvm_host.h only needs
-linux/kvm_types.h, which it already includes.
+The following fixes try and make the experience of QEMU -cpu max a bit
+smoother by actually checking the PMU versions supported. You can also
+set -cpu max,pmu=off to fully hide PMU functionality from the
+processor.
 
-Stop including linux/kvm_host.h from arch/s390/include/asm/kvm_host.h .
+As max includes all the features we also need to take into account the
+additional TGran values you can have with 52 bit addressing.
 
-Due to the #ifdef guards, the code works as it is today, but it's ugly
-and it will get in the way of future patches.
+Please review,
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/include/asm/kvm_host.h | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/arch/s390/include/asm/kvm_host.h b/arch/s390/include/asm/kvm_host.h
-index 95990461888f..736cc88f497d 100644
---- a/arch/s390/include/asm/kvm_host.h
-+++ b/arch/s390/include/asm/kvm_host.h
-@@ -15,7 +15,6 @@
- #include <linux/hrtimer.h>
- #include <linux/interrupt.h>
- #include <linux/kvm_types.h>
--#include <linux/kvm_host.h>
- #include <linux/kvm.h>
- #include <linux/seqlock.h>
- #include <linux/module.h>
+Alex Bennée (2):
+  arm/pmu: skip the PMU introspection test if missing
+  arm/mmu: widen the page size check to account for LPA2
+
+ lib/arm64/asm/processor.h | 29 ++++++++++++++---------------
+ arm/pmu.c                 |  7 ++++++-
+ 2 files changed, 20 insertions(+), 16 deletions(-)
+
 -- 
-2.45.2
+2.39.2
 
 
