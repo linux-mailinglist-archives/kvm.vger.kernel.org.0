@@ -1,329 +1,367 @@
-Return-Path: <kvm+bounces-20849-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20851-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ACDFC923FF6
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 16:10:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0303F9240C8
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 16:27:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69717283DB4
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 14:10:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACDE7285DAE
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 14:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865521B5833;
-	Tue,  2 Jul 2024 14:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CD3F1BA86E;
+	Tue,  2 Jul 2024 14:26:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FsH6Xrwj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mJLsGSZw"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F97D1DDD6
-	for <kvm@vger.kernel.org>; Tue,  2 Jul 2024 14:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F17D1BA098;
+	Tue,  2 Jul 2024 14:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719929415; cv=none; b=WK4o6JGf9PRFsGIYh7xZtXTgB1G/AuaEx2BzPfbXsgdl44YkROpoBbCbwYCN0DpS9aEZd30wHzkZC7xH6g4yXUFqXbb6iCLonotkVS2bW3FDThBQgQ7iVHgtXvLrgdJ7ZSQTdDBUSQHLGmHRM0YDJHlt0DYudNS1SQ6DO488ejA=
+	t=1719930377; cv=none; b=jyCEpK+6CAao9gkRgLK8by84dzkvJfTCvKtFq19BAGUMUvtOyHudeh4ikLoG8sfLzeDA0v5TvSSrOMGg2WU8O8Lsf9Ja0RmmJKkLo/Y/WMOJ0ybwGtkm3r9gyBdF9v9Ojz7gmDtB01cjOF+1BWBwCKjES3IEVv8rz/iPBTMBOZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719929415; c=relaxed/simple;
-	bh=Q5HTHg4l0lyeIK57KtJvz52bz3EZ1B8PEVx0fx2ZI6I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LyHrHsD5SMB2FOS6N2Tzo2wW/tcPZobPD/EdUrRbD6ympReNpZK3ceYe1/RkPaOf7ox2fphegDsZzoCuLWjsC2vAVlcuQ8QCPjoMXSg+RvK8J0TGGD5cYP5teNPoeuuUfXoqTR6f5uVg4IY52eDJpXbClqdc54zLY13uY4z383M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FsH6Xrwj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1719929412;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SNwFHLByhZ9Qs1kayFDYHhFkt3XkniLJLO/2kGyAGIU=;
-	b=FsH6Xrwjl3ogsTQwsD+30IiMslt+UTdgdtF8tCLyssEYDZRvs0wlNgJK5iZC7Jt1XPPiXW
-	VSrjSuJIsGx2M+oZZReeVl62NqzfTTDCVNP1tJxI+pHqILrHIzn0qmRDKwUjBUsL+1sBf9
-	oaSsS6pHM0lAtA/jXYOBU3wEQCq7HJA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-YKdvKsnhNPKrvXsEQZOKGA-1; Tue, 02 Jul 2024 10:10:11 -0400
-X-MC-Unique: YKdvKsnhNPKrvXsEQZOKGA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4256718144dso39185545e9.1
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2024 07:10:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719929410; x=1720534210;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1719930377; c=relaxed/simple;
+	bh=bUymbfat9/kKGL16cSlsngxtShh0v8QfDzVYq4FBt7U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b2Bqa7DPzqEoTrCyw1epkA15GPjX4ltqoBD6W7kyrb24RwkXiRb3f811xQMxIoa8Da9kc/LLHsB0EVyA47vRXgIdSwIYkF3eOwHF8rp/TwYQu5eFUOt1jYBk2HK8KdgLWBPEbThvSvZdjqOFISAaAI7E69fQ5M0A15jrIQPSHZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mJLsGSZw; arc=none smtp.client-ip=209.85.208.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2ee794ebffbso7893651fa.1;
+        Tue, 02 Jul 2024 07:26:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1719930373; x=1720535173; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SNwFHLByhZ9Qs1kayFDYHhFkt3XkniLJLO/2kGyAGIU=;
-        b=ALJQ5ZsQ7whpysBJROsDQvQ0Xtz6GVZXlDfjX6iFPu9z14CUntrRSvGtpSgJRLEbbf
-         BTegFWkjOPDNJmFlzdUkyntQxW6NfQwF/s7xBdftoWbRwIqqwjY9xFBrQ9JcuEaetEWT
-         YllHtx3X8C8dCuP3MBv2k6XtHftDwqaslQgLk+INl9Q91qShL0lyMSWTnFSkGfAnNAMi
-         qlfpjl4/NgQVoiLwEtK47h2WQde23x8SgSttbUfAsfI0WxGAzdnHeiXNrhgdHhKmbVBb
-         tqbhCY/fLa6md2uD7/CW072fieSGuAQIzMu1NHFAwiQBpKBAwWI0vX73X+NT1J+wTds8
-         SDFQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWblK69AEAMGaqurEYOhJ1EkrZVJpKNC2R5XfAltWHmP9g2xsV6HrylsmSrIXzQMPokIa6GnNB5P42WS9UP6uD5uMDd
-X-Gm-Message-State: AOJu0Yy+MlbrK31Y07nfGV/yxkDC0+iP63Sq7zX/ApUUpPgnW3NCrg84
-	3Cdc6aqtpiDT27sUdKZahBaF5x/oS/BrjtAPC9nwqcFPjacPag54JMK1FgT+gG//kB7KwxtPeTG
-	B65JuQsyMFyUbXIKQHZSaSDrCkCh+xMpGsnE50xo/ak3agHir6A==
-X-Received: by 2002:a05:600c:3b8b:b0:425:8bf0:7659 with SMTP id 5b1f17b1804b1-4258bf0785amr14105905e9.9.1719929410492;
-        Tue, 02 Jul 2024 07:10:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF2nHoCqso+sjxxE5A3Y3qgpPSKkOlJEY00W5Xrb62L9JbgqvkjIDIE4xy37xJnoLisJB7HHA==
-X-Received: by 2002:a05:600c:3b8b:b0:425:8bf0:7659 with SMTP id 5b1f17b1804b1-4258bf0785amr14105585e9.9.1719929409862;
-        Tue, 02 Jul 2024 07:10:09 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f5:eadd:8c31:db01:9d01:7604])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4257cdf4982sm120640705e9.47.2024.07.02.07.10.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 07:10:09 -0700 (PDT)
-Date: Tue, 2 Jul 2024 10:10:06 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>,
-	David Woodhouse <dwmw2@infradead.org>,
-	David Woodhouse <dwmw@amazon.co.uk>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Sergio Lopez <slp@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>, Paul Durrant <paul@xen.org>,
-	kvm@vger.kernel.org
-Subject: [PULL 61/91] hw/i386/fw_cfg: Add etc/e820 to fw_cfg late
-Message-ID: <36574004704d6c4704aba27f3b3f0f37d6d00d00.1719929191.git.mst@redhat.com>
-References: <cover.1719929191.git.mst@redhat.com>
+        bh=Pw30YIDggayqbF1wkD4nfxJujJesCWLfn+Ka0ECvf+4=;
+        b=mJLsGSZwSYh2Akhz0B0wvjAYtSJ699lStTtmLVJtJYcnaja7z+jy55Q6S1hpraYrw2
+         4YvWEN2i7Fy3EkvB/Q44oRJB303QXOc5wvpX2ceyKdANrUkNmWsuio23rxCpYl0U8tKH
+         tQ7eehvcmx4V9cWLmv76auSBIKPPHXW3jmrWWnwNySF+NsfPs2+90baaOhB3N9fIQAqr
+         SJho3jc8s/RVjmqZOtqdut1HO00jTU/fMHzoD0DmFnA5UcpyBRjLBafhpQPcbPI2WeSI
+         ioZLW5LRAWTpMcPgTtZwDRwkEfR989+uvGkik9AscpKCIeorqhh5WyfuZxN7H5RbTWv4
+         QcAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1719930373; x=1720535173;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Pw30YIDggayqbF1wkD4nfxJujJesCWLfn+Ka0ECvf+4=;
+        b=KfYaD20fiDLHRvZWCIOcVXHr64vUslWjECowiZW0hmVM0iysb/CZGVQoLDJ8RFNSbb
+         I5rBXbTwBymF3qJgNm4Fb31z2RvJXBYwLnRSCmf3m6CSc3Exr1jBOwHE5b7dSr5spthM
+         Ipn2M2svSq0C+zV1I/d/GCp+r3cR75j97aZA+1Pn6jnEfs9xnl1vT4gl6hAG5w6m/Z+z
+         +NacIsXTW0PMn56C6+EeZsHjBcZgaC4BMACYeh7aTnAH7puUSZXPLkaSCTY4j4b7dCsh
+         3lXgvT6Q60t9Erl3cN0cs8ygPV3V/nzKzJzssAiE1Zqy10ixxzPspz1S4C86OmuxJkwv
+         Et+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXL+JqmuTmYUpX2WdWnnkgwWR0NKdV02iH5mIgugo2AfwjxfBDE/qJu0160fakSKdepiHFQA5k6hGGyXvQpxr6bguOQ0LKuHVjS27aBJufcqdgRlSxyap+d4AB/
+X-Gm-Message-State: AOJu0YyI+sUkMOXNSAae3Tof/m47jbIRz7Pk3aNlrumdewyTaHGWx3NR
+	ZD+jlpIBhp61QDDYuvb2CTH8yyiCH1LlvOPIxRDDbhX4R04syTVNgVDhnmS8palb8SRzF3UXw+P
+	21gUq0H9ptm/OGtbBUbEZ4wok0C0=
+X-Google-Smtp-Source: AGHT+IGlwyUD7FgXcpFkZUJ5txKIx1y1yxyaFuk4mRU29WjJ0cD7wtdhamLHdykOw9gJBsDV9Lhw/n5+KG8Elz6hQqo=
+X-Received: by 2002:a2e:3018:0:b0:2ec:5f85:61c0 with SMTP id
+ 38308e7fff4ca-2ee5e707c21mr70672801fa.48.1719930372912; Tue, 02 Jul 2024
+ 07:26:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1719929191.git.mst@redhat.com>
-X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
-X-Mutt-Fcc: =sent
+References: <CABgObfasyA7U5Fg5r0gGoFAw73nwGJnWBYmG8vqf0hC2E8SPFw@mail.gmail.com>
+ <sejux5gvpakaopre6mk3fyudi2f56hiuxuevfzay3oohg773kd@5odm3x3fryuq>
+ <CABgObfb-KrmJzr4YBtuN3+_HLm3S1hmjO7uEy0+AxSDeWE3uWg@mail.gmail.com>
+ <l5oxnxkg7owmwuadknttnnl2an37wt3u5kgfjb5563f7llbgwj@bvwfv5d7wrq4>
+ <3b6a1f23-bf0e-416d-8880-4556b87b5137@amazon.com> <hyrgztjkjmftnpra2o2skonfs6bwf2sqrncwtec3e4ckupe5ea@76whtcp3zapf>
+ <CAFfO_h5_uAwdNJB=fjrxb_pPiwRDQxaZn=OvR3yrYd+c18tUdQ@mail.gmail.com>
+ <xw2rhgn2s677t6cufp2ndpvvgpdlovej44o6ieo7nz2p6msvnw@zza7jzylpw76>
+ <CAFfO_h4WnSkinX1faduAD68h=nQCWhPgpYKTPV+xfSqyfMmxEA@mail.gmail.com>
+ <CAFfO_h55DdTPWEjeR-ARnWZ0tMWNdJZnUauXsxm5eL+TzhAFLA@mail.gmail.com> <nojtsdora7chbhnblvygozoa4qui3ghivndvg5ixbsgebos4hg@e2jldxpf7sum>
+In-Reply-To: <nojtsdora7chbhnblvygozoa4qui3ghivndvg5ixbsgebos4hg@e2jldxpf7sum>
+From: Dorjoy Chowdhury <dorjoychy111@gmail.com>
+Date: Tue, 2 Jul 2024 20:26:02 +0600
+Message-ID: <CAFfO_h4Ke-zfO+UAcCFxfwQOZsSKbOw2M-gErBE3wOnXj_eZKQ@mail.gmail.com>
+Subject: Re: How to implement message forwarding from one CID to another in
+ vhost driver
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Alexander Graf <graf@amazon.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Alexander Graf <agraf@csgraf.de>, virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	netdev@vger.kernel.org, stefanha@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: David Woodhouse <dwmw2@infradead.org>
+Hey Stefano,
+Thanks a lot for all the details. I guess my next step is to try to
+implement the forwarding logic in vhost-device-vsock and take it from
+there.
 
-In e820_add_entry() the e820_table is reallocated with g_renew() to make
-space for a new entry. However, fw_cfg_arch_create() just uses the
-existing e820_table pointer. This leads to a use-after-free if anything
-adds a new entry after fw_cfg is set up.
+Regards,
+Dorjoy
 
-Shift the addition of the etc/e820 file to the machine done notifier, via
-a new fw_cfg_add_e820() function.
-
-Also make e820_table private and use an e820_get_table() accessor function
-for it, which sets a flag that will trigger an assert() for any *later*
-attempts to add to the table.
-
-Make e820_add_entry() return void, as most callers don't check for error
-anyway.
-
-Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-Message-Id: <a2708734f004b224f33d3b4824e9a5a262431568.camel@infradead.org>
-Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
----
- hw/i386/e820_memory_layout.h |  8 ++------
- hw/i386/fw_cfg.h             |  1 +
- hw/i386/e820_memory_layout.c | 16 +++++++++++-----
- hw/i386/fw_cfg.c             | 18 +++++++++++++-----
- hw/i386/microvm.c            |  4 ++--
- hw/i386/pc.c                 |  1 +
- target/i386/kvm/kvm.c        |  6 +-----
- target/i386/kvm/xen-emu.c    |  7 +------
- 8 files changed, 32 insertions(+), 29 deletions(-)
-
-diff --git a/hw/i386/e820_memory_layout.h b/hw/i386/e820_memory_layout.h
-index 7c239aa033..b50acfa201 100644
---- a/hw/i386/e820_memory_layout.h
-+++ b/hw/i386/e820_memory_layout.h
-@@ -22,13 +22,9 @@ struct e820_entry {
-     uint32_t type;
- } QEMU_PACKED __attribute((__aligned__(4)));
- 
--extern struct e820_entry *e820_table;
--
--int e820_add_entry(uint64_t address, uint64_t length, uint32_t type);
--int e820_get_num_entries(void);
-+void e820_add_entry(uint64_t address, uint64_t length, uint32_t type);
- bool e820_get_entry(int index, uint32_t type,
-                     uint64_t *address, uint64_t *length);
--
--
-+int e820_get_table(struct e820_entry **table);
- 
- #endif
-diff --git a/hw/i386/fw_cfg.h b/hw/i386/fw_cfg.h
-index 92e310f5fd..e560fd7be8 100644
---- a/hw/i386/fw_cfg.h
-+++ b/hw/i386/fw_cfg.h
-@@ -27,5 +27,6 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
-                          SmbiosEntryPointType ep_type);
- void fw_cfg_build_feature_control(MachineState *ms, FWCfgState *fw_cfg);
- void fw_cfg_add_acpi_dsdt(Aml *scope, FWCfgState *fw_cfg);
-+void fw_cfg_add_e820(FWCfgState *fw_cfg);
- 
- #endif
-diff --git a/hw/i386/e820_memory_layout.c b/hw/i386/e820_memory_layout.c
-index 06970ac44a..0d549accbf 100644
---- a/hw/i386/e820_memory_layout.c
-+++ b/hw/i386/e820_memory_layout.c
-@@ -11,22 +11,28 @@
- #include "e820_memory_layout.h"
- 
- static size_t e820_entries;
--struct e820_entry *e820_table;
-+static struct e820_entry *e820_table;
-+static gboolean e820_done;
- 
--int e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
-+void e820_add_entry(uint64_t address, uint64_t length, uint32_t type)
- {
-+    assert(!e820_done);
-+
-     /* new "etc/e820" file -- include ram and reserved entries */
-     e820_table = g_renew(struct e820_entry, e820_table, e820_entries + 1);
-     e820_table[e820_entries].address = cpu_to_le64(address);
-     e820_table[e820_entries].length = cpu_to_le64(length);
-     e820_table[e820_entries].type = cpu_to_le32(type);
-     e820_entries++;
--
--    return e820_entries;
- }
- 
--int e820_get_num_entries(void)
-+int e820_get_table(struct e820_entry **table)
- {
-+    e820_done = true;
-+
-+    if (table)
-+        *table = e820_table;
-+
-     return e820_entries;
- }
- 
-diff --git a/hw/i386/fw_cfg.c b/hw/i386/fw_cfg.c
-index 7c43c325ef..0e4494627c 100644
---- a/hw/i386/fw_cfg.c
-+++ b/hw/i386/fw_cfg.c
-@@ -48,6 +48,15 @@ const char *fw_cfg_arch_key_name(uint16_t key)
-     return NULL;
- }
- 
-+/* Add etc/e820 late, once all regions should be present */
-+void fw_cfg_add_e820(FWCfgState *fw_cfg)
-+{
-+    struct e820_entry *table;
-+    int nr_e820 = e820_get_table(&table);
-+
-+    fw_cfg_add_file(fw_cfg, "etc/e820", table, nr_e820 * sizeof(*table));
-+}
-+
- void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
-                          SmbiosEntryPointType ep_type)
- {
-@@ -60,6 +69,7 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
-     PCMachineClass *pcmc = PC_MACHINE_GET_CLASS(pcms);
-     MachineClass *mc = MACHINE_GET_CLASS(pcms);
-     X86CPU *cpu = X86_CPU(ms->possible_cpus->cpus[0].cpu);
-+    int nr_e820;
- 
-     if (pcmc->smbios_defaults) {
-         /* These values are guest ABI, do not change */
-@@ -78,8 +88,9 @@ void fw_cfg_build_smbios(PCMachineState *pcms, FWCfgState *fw_cfg,
-     }
- 
-     /* build the array of physical mem area from e820 table */
--    mem_array = g_malloc0(sizeof(*mem_array) * e820_get_num_entries());
--    for (i = 0, array_count = 0; i < e820_get_num_entries(); i++) {
-+    nr_e820 = e820_get_table(NULL);
-+    mem_array = g_malloc0(sizeof(*mem_array) * nr_e820);
-+    for (i = 0, array_count = 0; i < nr_e820; i++) {
-         uint64_t addr, len;
- 
-         if (e820_get_entry(i, E820_RAM, &addr, &len)) {
-@@ -138,9 +149,6 @@ FWCfgState *fw_cfg_arch_create(MachineState *ms,
- #endif
-     fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, 1);
- 
--    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
--                    sizeof(struct e820_entry) * e820_get_num_entries());
--
-     fw_cfg_add_bytes(fw_cfg, FW_CFG_HPET, &hpet_cfg, sizeof(hpet_cfg));
-     /* allocate memory for the NUMA channel: one (64bit) word for the number
-      * of nodes, one word for each VCPU->node and one word for each node to
-diff --git a/hw/i386/microvm.c b/hw/i386/microvm.c
-index fec63cacfa..40edcee7af 100644
---- a/hw/i386/microvm.c
-+++ b/hw/i386/microvm.c
-@@ -324,8 +324,6 @@ static void microvm_memory_init(MicrovmMachineState *mms)
-     fw_cfg_add_i16(fw_cfg, FW_CFG_MAX_CPUS, machine->smp.max_cpus);
-     fw_cfg_add_i64(fw_cfg, FW_CFG_RAM_SIZE, (uint64_t)machine->ram_size);
-     fw_cfg_add_i32(fw_cfg, FW_CFG_IRQ0_OVERRIDE, 1);
--    fw_cfg_add_file(fw_cfg, "etc/e820", e820_table,
--                    sizeof(struct e820_entry) * e820_get_num_entries());
- 
-     rom_set_fw(fw_cfg);
- 
-@@ -586,9 +584,11 @@ static void microvm_machine_done(Notifier *notifier, void *data)
- {
-     MicrovmMachineState *mms = container_of(notifier, MicrovmMachineState,
-                                             machine_done);
-+    X86MachineState *x86ms = X86_MACHINE(mms);
- 
-     acpi_setup_microvm(mms);
-     dt_setup_microvm(mms);
-+    fw_cfg_add_e820(x86ms->fw_cfg);
- }
- 
- static void microvm_powerdown_req(Notifier *notifier, void *data)
-diff --git a/hw/i386/pc.c b/hw/i386/pc.c
-index 77415064c6..d2c29fbfcb 100644
---- a/hw/i386/pc.c
-+++ b/hw/i386/pc.c
-@@ -625,6 +625,7 @@ void pc_machine_done(Notifier *notifier, void *data)
-     acpi_setup();
-     if (x86ms->fw_cfg) {
-         fw_cfg_build_smbios(pcms, x86ms->fw_cfg, pcms->smbios_entry_point_type);
-+        fw_cfg_add_e820(x86ms->fw_cfg);
-         fw_cfg_build_feature_control(MACHINE(pcms), x86ms->fw_cfg);
-         /* update FW_CFG_NB_CPUS to account for -device added CPUs */
-         fw_cfg_modify_i16(x86ms->fw_cfg, FW_CFG_NB_CPUS, x86ms->boot_cpus);
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index dd8b0f3313..bf182570fe 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -2706,11 +2706,7 @@ int kvm_arch_init(MachineState *ms, KVMState *s)
-     }
- 
-     /* Tell fw_cfg to notify the BIOS to reserve the range. */
--    ret = e820_add_entry(identity_base, 0x4000, E820_RESERVED);
--    if (ret < 0) {
--        fprintf(stderr, "e820_add_entry() table is full\n");
--        return ret;
--    }
-+    e820_add_entry(identity_base, 0x4000, E820_RESERVED);
- 
-     shadow_mem = object_property_get_int(OBJECT(s), "kvm-shadow-mem", &error_abort);
-     if (shadow_mem != -1) {
-diff --git a/target/i386/kvm/xen-emu.c b/target/i386/kvm/xen-emu.c
-index fc2c2321ac..2f89dc628e 100644
---- a/target/i386/kvm/xen-emu.c
-+++ b/target/i386/kvm/xen-emu.c
-@@ -176,12 +176,7 @@ int kvm_xen_init(KVMState *s, uint32_t hypercall_msr)
-     s->xen_caps = xen_caps;
- 
-     /* Tell fw_cfg to notify the BIOS to reserve the range. */
--    ret = e820_add_entry(XEN_SPECIAL_AREA_ADDR, XEN_SPECIAL_AREA_SIZE,
--                         E820_RESERVED);
--    if (ret < 0) {
--        fprintf(stderr, "e820_add_entry() table is full\n");
--        return ret;
--    }
-+    e820_add_entry(XEN_SPECIAL_AREA_ADDR, XEN_SPECIAL_AREA_SIZE, E820_RESERVED);
- 
-     /* The pages couldn't be overlaid until KVM was initialized */
-     xen_primary_console_reset();
--- 
-MST
-
+On Tue, Jul 2, 2024 at 6:05=E2=80=AFPM Stefano Garzarella <sgarzare@redhat.=
+com> wrote:
+>
+> On Sun, Jun 30, 2024 at 04:54:18PM GMT, Dorjoy Chowdhury wrote:
+> >Hey Stefano,
+> >Apart from my questions in my previous email, I have some others as well=
+.
+> >
+> >If the vhost-device-vsock modification to forward packets to
+> >VMADDR_CID_LOCAL is implemented, does the VMADDR_FLAG_TO_HOST need to
+> >be set by any application in the guest? I understand that the flag is
+> >set automatically in the listen path by the driver (ref:
+> >https://patchwork.ozlabs.org/project/netdev/patch/20201204170235.84387-4=
+-andraprs@amazon.com/#2594117
+> >), but from the comments in the referenced patch, I am guessing the
+> >applications in the guest that will "connect" (as opposed to listen)
+> >will need to set the flag in the application code? So does the
+> >VMADDR_FLAG_TO_HOST flag need to be set by the applications in the
+> >guest that will "connect" or should it work without it? I am asking
+> >because the nitro-enclave VMs have an "init" which tries to connect to
+> >CID 3 to send a "hello" on boot to let the parent VM know that it
+> >booted expecting a "hello" reply but the init doesn't seem to set the
+> >flag https://github.com/aws/aws-nitro-enclaves-sdk-bootstrap/blob/main/i=
+nit/init.c#L356C1-L361C7
+>
+> Looking at af_vsock.c code, it looks like that if we don't have any
+> H2G transports (e.g. vhost-vsock) loaded in the VM (this is loaded for
+> nested VMs, so I guess for nitro-enclave VM this should not be the
+> case), the packets are forwarded to the host in any case.
+>
+> See
+> https://elixir.bootlin.com/linux/latest/source/net/vmw_vsock/af_vsock.c#L=
+469
+>
+> >.
+> >
+> >I was following
+> >https://github.com/rust-vmm/vhost-device/tree/main/vhost-device-vsock#si=
+bling-vm-communication
+> >to test if sibling communication works and it seems like I didn't need
+> >to modify the "socat" to set the "VMADDR_FLAG_TO_HOST". I am wondering
+> >why it works without any modification. Here is what I do:
+> >
+> >shell1: ./vhost-device-vsock --vm
+> >guest-cid=3D3,uds-path=3D/tmp/vm3.vsock,socket=3D/tmp/vhost3.socket --vm
+> >guest-cid=3D4,uds-path=3D/tmp/vm4.vsock,socket=3D/tmp/vhost4.socket
+> >
+> >shell2: ./qemu-system-x86_64 -machine q35,memory-backend=3Dmem0
+> >-enable-kvm -m 8G -nic user,model=3Dvirtio -drive
+> >file=3D/home/dorjoy/Forks/test_vm/fedora2.qcow2,media=3Ddisk,if=3Dvirtio
+> >--display sdl -object memory-backend-memfd,id=3Dmem0,size=3D8G -chardev
+> >socket,id=3Dchar0,reconnect=3D0,path=3D/tmp/vhost3.socket -device
+> >vhost-user-vsock-pci,chardev=3Dchar0
+> >    inside this guest I run: socat - VSOCK-LISTEN:9000
+> >
+> >shell3: ./qemu-system-x86_64 -machine q35,memory-backend=3Dmem0
+> >-enable-kvm -m 8G -nic user,model=3Dvirtio -drive
+> >file=3D/home/dorjoy/Forks/test_vm/fedora40.qcow2,media=3Ddisk,if=3Dvirti=
+o
+> >--display sdl -object memory-backend-memfd,id=3Dmem0,size=3D8G -chardev
+> >socket,id=3Dchar0,reconnect=3D0,path=3D/tmp/vhost4.socket -device
+> >vhost-user-vsock-pci,chardev=3Dchar0
+> >    inside this guest I run: socat - VSOCK-CONNECT:3:9000
+> >
+> >Then when I type something in the socat terminal of one VM and hit
+> >'enter', they pop up in the socat terminal of the other VM. From the
+> >documentation of the vhost-device-vsock, I thought I would need to
+> >patch socat to set the "VMADDR_FLAG_TO_HOST" but I did not do anything
+> >with socat. I simply did "sudo dnf install socat" in both VMs. I also
+> >looked into the socat source code and I didn't see any reference to
+> >"VMADDR_FLAG_TO_HOST". I am running "Fedora 40" on both VMs. Do you
+> >know why it works without the flag?
+>
+> Yep, so the driver will forward them if the H2G transport is not loaded,
+> like in your case. So if you set VMADDR_FLAG_TO_HOST you are sure that
+> it is always forwarded to the host, if you don't set it, it is forwarded
+> only if you don't have a nested VM using vhost-vsock. In that case we
+> don't know how to differentiate the case of communication with a nested
+> guest or a sibling guest, for this reason we added the flag.
+>
+> If the host uses vhost-vsock, that packets are discarded, but for
+> vhost-device-vsock, we are handling them.
+>
+> Hope this clarify.
+>
+> Stefano
+>
+> >
+> >On Wed, Jun 26, 2024 at 11:43=E2=80=AFPM Dorjoy Chowdhury
+> ><dorjoychy111@gmail.com> wrote:
+> >>
+> >> Hey Stefano,
+> >> Thanks a lot for all the details. I will look into them and reach out
+> >> if I need further input. Thanks! I have tried to summarize my
+> >> understanding below. Let me know if that sounds correct.
+> >>
+> >> On Wed, Jun 26, 2024 at 2:37=E2=80=AFPM Stefano Garzarella <sgarzare@r=
+edhat.com> wrote:
+> >> >
+> >> > Hi Dorjoy,
+> >> >
+> >> > On Tue, Jun 25, 2024 at 11:44:30PM GMT, Dorjoy Chowdhury wrote:
+> >> > >Hey Stefano,
+> >> >
+> >> > [...]
+> >> >
+> >> > >> >
+> >> > >> >So the immediate plan would be to:
+> >> > >> >
+> >> > >> >  1) Build a new vhost-vsock-forward object model that connects =
+to
+> >> > >> >vhost as CID 3 and then forwards every packet from CID 1 to the
+> >> > >> >Enclave-CID and every packet that arrives on to CID 3 to CID 2.
+> >> > >>
+> >> > >> This though requires writing completely from scratch the virtio-v=
+sock
+> >> > >> emulation in QEMU. If you have time that would be great, otherwis=
+e if
+> >> > >> you want to do a PoC, my advice is to start with vhost-user-vsock=
+ which
+> >> > >> is already there.
+> >> > >>
+> >> > >
+> >> > >Can you give me some more details about how I can implement the
+> >> > >daemon?
+> >> >
+> >> > We already have a demon written in Rust, so I don't recommend you
+> >> > rewrite one from scratch, just start with that. You can find the dae=
+mon
+> >> > and instructions on how to use it with QEMU here [1].
+> >> >
+> >> > >I would appreciate some pointers to code too.
+> >> >
+> >> > I sent the pointer to it in my first reply [2].
+> >> >
+> >> > >
+> >> > >Right now, the "nitro-enclave" machine type (wip) in QEMU
+> >> > >automatically spawns a VHOST_VSOCK device with the CID equal to the
+> >> > >"guest-cid" machine option. I think this is equivalent to using the
+> >> > >"-device vhost-vsock-device,guest-cid=3DN" option explicitly. Does =
+that
+> >> > >need any change? I guess instead of "vhost-vsock-device", the
+> >> > >vhost-vsock device needs to be equivalent to "-device
+> >> > >vhost-user-vsock-device,guest-cid=3DN"?
+> >> >
+> >> > Nope, the vhost-user-vsock device requires just a `chardev` option.
+> >> > The chardev points to the Unix socket used by QEMU to talk with the
+> >> > daemon. The daemon has a parameter to set the CID. See [1] for the
+> >> > examples.
+> >> >
+> >> > >
+> >> > >The applications inside the nitro-enclave VM will still connect and
+> >> > >talk to CID 3. So on the daemon side, do we need to spawn a device
+> >> > >that has CID 3 and then forward everything this device receives to =
+CID
+> >> > >1 (VMADDR_CID_LOCAL) same port and everything it receives from CID =
+1
+> >> > >to the "guest-cid"?
+> >> >
+> >> > Yep, I think this is right.
+> >> > Note: to use VMADDR_CID_LOCAL, the host needs to load `vsock_loopbac=
+k`
+> >> > kernel module.
+> >> >
+> >> > Before modifying the code, if you want to do some testing, perhaps y=
+ou
+> >> > can use socat (which supports both UNIX-* and VSOCK-*). The daemon f=
+or
+> >> > now exposes two unix sockets, one is used to communicate with QEMU v=
+ia
+> >> > the vhost-user protocol, and the other is to be used by the applicat=
+ion
+> >> > to communicate with vsock sockets in the guest using the hybrid prot=
+ocol
+> >> > defined by firecracker. So you could initiate a socat between the la=
+tter
+> >> > and VMADDR_CID_LOCAL, the only problem I see is that you have to sen=
+d
+> >> > the first string provided by the hybrid protocol (CONNECT 1234), but=
+ for
+> >> > a PoC it should be ok.
+> >> >
+> >> > I just tried the following and it works without touching any code:
+> >> >
+> >> > shell1$ ./target/debug/vhost-device-vsock \
+> >> >      --vm guest-cid=3D3,socket=3D/tmp/vhost3.socket,uds-path=3D/tmp/=
+vm3.vsock
+> >> >
+> >> > shell2$ sudo modprobe vsock_loopback
+> >> > shell2$ socat VSOCK-LISTEN:1234 UNIX-CONNECT:/tmp/vm3.vsock
+> >> >
+> >> > shell3$ qemu-system-x86_64 -smp 2 -M q35,accel=3Dkvm,memory-backend=
+=3Dmem \
+> >> >      -drive file=3Dfedora40.qcow2,format=3Dqcow2,if=3Dvirtio\
+> >> >      -chardev socket,id=3Dchar0,path=3D/tmp/vhost3.socket \
+> >> >      -device vhost-user-vsock-pci,chardev=3Dchar0 \
+> >> >      -object memory-backend-memfd,id=3Dmem,size=3D512M \
+> >> >      -nographic
+> >> >
+> >> >      guest$ nc --vsock -l 1234
+> >> >
+> >> > shell4$ nc --vsock 1 1234
+> >> > CONNECT 1234
+> >> >
+> >> >      Note: the `CONNECT 1234` is required by the hybrid vsock protoc=
+ol
+> >> >      defined by firecracker, so if we extend the vhost-device-vsock
+> >> >      daemon to forward packet to VMADDR_CID_LOCAL, that would not be
+> >> >      needed (including running socat).
+> >> >
+> >>
+> >> Understood. Just trying to think out loud what the final UX will be
+> >> from the user perspective to successfully run a nitro VM before I try
+> >> to modify vhost-device-vsock to support forwarding to
+> >> VMADDR_CID_LOCAL.
+> >> I guess because the "vhost-user-vsock" device needs to be spawned
+> >> implicitly (without any explicit option) inside nitro-enclave in QEMU,
+> >> we now need to provide the "chardev" as a machine option, so the
+> >> nitro-enclave command would look something like below:
+> >> "./qemu-system-x86_64 -M nitro-enclave,chardev=3Dchar0 -kernel
+> >> /path/to/eif -chardev socket,id=3Dchar0,path=3D/tmp/vhost5.socket -m 4=
+G
+> >> --enable-kvm -cpu host"
+> >> and then set the chardev id to the vhost-user-vsock device in the code
+> >> from the machine option.
+> >>
+> >> The modified "vhost-device-vsock" would need to be run with the new
+> >> option that will forward everything to VMADDR_CID_LOCAL (below by the
+> >> "-z" I mean the new option)
+> >> "./target/debug/vhost-device-vsock -z --vm
+> >> guest-cid=3D5,socket=3D/tmp/vhost5.socket,uds-path=3D/tmp/vm5.vsock"
+> >> this means the guest-cid of the nitro VM is CID 5, right?
+> >>
+> >> And the applications in the host would need to use VMADDR_CID_LOCAL
+> >> for communication instead of "guest-cid" (5) (assuming vsock_loopback
+> >> is modprobed). Let's say there are 2 applications inside the nitro VM
+> >> that connect to CID 3 on port 9000 and 9001. And the applications on
+> >> the host listen on 9000 and 9001 using VMADDR_CID_LOCAL. So, after the
+> >> commands above (qemu VM and vhost-device-vsock) are run, the
+> >> communication between the applications in the host and the
+> >> applications in the nitro VM on port 9000 and 9001 should just work,
+> >> right, without needing to run any extra socat commands or such? or
+> >> will the user still need to run some socat commands for all the
+> >> relevant ports (e.g.,9000 and 9001)?
+> >>
+> >> I am just wondering what kind of changes are needed in
+> >> vhost-device-vsock for forwarding packets to VMADDR_CID_LOCAL? Will
+> >> that be something like this: the codepath that handles
+> >> "/tmp/vm5.vsock", upon receiving a "connect" (from inside the nitro
+> >> VM) for any port to "/tmp/vm5.vsock", vhost-device-vsock will just
+> >> connect to the same port using AF_VSOCK using the socket system calls
+> >> and messages received on that port in "/tmp/vm5.vsock" will be "send"
+> >> to the AF_VSOCK socket? or am I not thinking right and the
+> >> implementation would be something different entirely (change the CID
+> >> from 3 to 2 (or 1?) on the packets before they are handled then socat
+> >> will be needed probably)? Will this work if the applications in the
+> >> host want to connect to applications inside the nitro VM (as opposed
+> >> to applications inside the nitro VM connecting to CID 3)?
+> >>
+> >> Thanks and Regards,
+> >> Dorjoy
+> >
+>
 
