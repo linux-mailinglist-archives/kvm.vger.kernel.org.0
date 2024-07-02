@@ -1,170 +1,589 @@
-Return-Path: <kvm+bounces-20856-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20857-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07A099243AB
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 18:35:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 131029248EA
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 22:17:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA53D282A33
-	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 16:35:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8108281A82
+	for <lists+kvm@lfdr.de>; Tue,  2 Jul 2024 20:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A2D1BD51C;
-	Tue,  2 Jul 2024 16:35:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A0E31CE0B0;
+	Tue,  2 Jul 2024 20:17:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="bo+c9r9U"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DowoeWYF"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED7B81BD4F1
-	for <kvm@vger.kernel.org>; Tue,  2 Jul 2024 16:35:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E203282E1
+	for <kvm@vger.kernel.org>; Tue,  2 Jul 2024 20:17:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719938122; cv=none; b=Iy99zJqTnYulNqcJsGVxDLLOefVLjYcpZ1EEikZwssNsUBH2ygHL/62wAKVIOfzV2a4xH7U3lbUgwt9xhbABzh4jGHB+OB1t3liroC1U4CI4VGLc52QvtZVNbslMu8Ygb/XaUrQ1g0LYSggZifEOOi3V67lI94VGWXR+DAiy4rs=
+	t=1719951432; cv=none; b=FuYoFjfkzMzIc8uI5OQCeqI4lW4f73gjucPw0pKSb+0oAzSgt8ZgwRNO8d4XjBNdS4TNwxYDs5dPEGT1wej0/PEbotzBzwRabDlYYm90J1lt0pqv8aBzvEidgnlrmqauC7clDpjCf2O+awUo0Zq3vMeRxbzQhOOwjioY7Wz5zR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719938122; c=relaxed/simple;
-	bh=pY8x0+IL41Sv5h0liBJxf5jrHXv+KWn3gxNFTzEI2gA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=O4m/8I4ztEhH9JDPQwA0mnF4GmAWU5Dp7q6qasHOLhqDQp+3uzY+m2QClN97yFeN+SVisWQdrJYnhDhNhSSEKP585QB9IJsGeuIJKaNETudtvbbiM4cbzNP502ZcQtdp7T5NVr2rqOswdvLkEV0DBOhh2/Yh0UR0WJURk/DYpXw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=bo+c9r9U; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5854ac817afso2255123a12.2
-        for <kvm@vger.kernel.org>; Tue, 02 Jul 2024 09:35:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1719938119; x=1720542919; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=d2PdP7fwhovm4zuFbTsGS+kYSr4P/6sfjgnZ9Yiz/Fk=;
-        b=bo+c9r9UW/nxbwK+6byfLZmrvZMnDsqurx/F2oUlN1DT2sBJSNsFJ2eKUtro0tVSTj
-         Rig3Z6fSB4yZFceEjrxGPV2feZGDS38XA5e5MIpAVxaPocGtK64s3G0L1yV34F3eZIO8
-         MwiNIbiqlc23tEMse+DnilFJsf05C/mJyS64T4wTB2ng5zrjfsUU3mXk/iOS5Kc/Of4U
-         vTgP57PA5OtxC8M8qDOc/NXQLUj1qJlv0sQdnkCGWVHOLBNgzohdlT32g0STojU4FYxH
-         LMa5Wge988jz+XPERsWkIwQwHtYyIcP7VJFgR6ivMckqYF7NfJK37vY+FfQtnqnLSyxD
-         p0Kw==
+	s=arc-20240116; t=1719951432; c=relaxed/simple;
+	bh=lUCEVcmBer70B5oPtuWxYrEYSGZ6922zre3Xx9nh29U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QB/wdB0cmwGo/42YBYwpT+51417NqpDBojfofGyL5v/Oe42PnL4JM+4/VRH/8WQODz9sxkMEz8lqZ7XSj7eSa4KbURQH85GOTDAQ8mQVPnuP8TWsW/b9dF4eFB315loE5H2SqqaBnVG3PXof4z/LULM75rP/OQzV+Wz9gpsRjkM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DowoeWYF; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1719951429;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6YLYsco4l6cXmk5+8G0baLpqo+8dcgJ41Mj5z/Hl5Ws=;
+	b=DowoeWYF+rsYjPYaC3eOPEN4z20L4rYVwvbSivG0EyPFfvDDYSo2h6PGFjf5WJrB87Ss3v
+	upd0cZ1GsO3HMTTcyEgzOjU0vt68jKthzQv5YR7TYsGFXZ7Dc48HXvJQ+xmeJPQgUySYne
+	kNloF3EgG7Q2QQc1hJAE0U3bb64kwqI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-412-hHljylE9NpGJMYr6nVzn4A-1; Tue, 02 Jul 2024 16:17:08 -0400
+X-MC-Unique: hHljylE9NpGJMYr6nVzn4A-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4258675a4f9so16136105e9.2
+        for <kvm@vger.kernel.org>; Tue, 02 Jul 2024 13:17:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1719938119; x=1720542919;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=d2PdP7fwhovm4zuFbTsGS+kYSr4P/6sfjgnZ9Yiz/Fk=;
-        b=AxdKalc6JsN2rlIM7ODLpP9szrOQG3TBAilMv7lMSRjBBxAdeyz/Pq1SlWPdLjqnlr
-         tQ+iTZf1Aad0PQ33xA3YgGKIaZrTyBKQeBcb8Oa6IlygSDh9uw3V03DtnbZ95Jugw1/N
-         AycZrI95Y6FB5nm/vEYfySkgiksmsYfp5DPGem0Cn6ny1DfoxnOvIo1o39zm715Oq2Gq
-         zd5elXUiwvgvMX/CwXgffknuH1uO9jtPwNliqSLsJ7yzvkHVgIbIpXxwzQ3LIqdbqlHQ
-         ssCZd4NcgDDiiAySEtZ+vbs1WQ8wArBQ4bogeFw7A4h6qnUV5schrBy8OAmHbgwukE6m
-         bHbg==
-X-Gm-Message-State: AOJu0Yxfqy+4hto033I6tbdbGihQW50H+GWNs6jQHepmXtG4IhYMOmAJ
-	mrZnu8VW6flBCjVZZ69XQZH4TB3dc94g2TyxzS/khkzpsJef8K6m2eUL3JXZ4s4=
-X-Google-Smtp-Source: AGHT+IFxmrxAj1VktUMByj7Xw6HSUJJNLn+Inx9C8W4+xXXqlzwq/OMRxn8bbZoKs8uozwXqJXHXKA==
-X-Received: by 2002:a17:906:db01:b0:a6f:4bf2:daa2 with SMTP id a640c23a62f3a-a751443c744mr799316366b.15.1719938117250;
-        Tue, 02 Jul 2024 09:35:17 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a72ab08cfccsm435948166b.148.2024.07.02.09.35.16
+        d=1e100.net; s=20230601; t=1719951427; x=1720556227;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6YLYsco4l6cXmk5+8G0baLpqo+8dcgJ41Mj5z/Hl5Ws=;
+        b=XJYrqGoVyRF4LdDd+V3bsvrV+IN2ZtF4WOeVfAUfDUG+BaOJJDtuXW/IXk9U4nrbgh
+         Sf0q1EvYfXZOA7xaMANSOXSkFqmvfkW3Em5oWId1UZ4Ovu4aTphFxbB75egov6lehc7A
+         LgsjBpPQMZp2CtPB+QhsEcqm3HjbY2CgpFsXuQfcypDxcLQ1qcO+vKuhsnyZv/aUFcu9
+         5MCrgyUlIZxCA/XGI71PcooE1oR/ovlMYGuR+EHd7/dEtFoYrGTUx4HcXhb/4dIA1KFX
+         TMfraqDElvNxhi4pU5nhj7M0yKUDwAJ4DJe1mlX5KLH5fwZZqg7MJTmDlzGx0daAL3jP
+         b8/g==
+X-Forwarded-Encrypted: i=1; AJvYcCU/44CGKWLY6CRUwgSU//9hVHqPGAqQ/5OOYBMJn96JdZWM4qHg+qNvbzH6lA343nXo1gqYsfp97MJxHVGOngCYoBRy
+X-Gm-Message-State: AOJu0Yw54RsTWpugUQqaxfacXa2UNFRvkyf0xLBqHkHldKICQhpfs4zN
+	GYbZ9WDnWlj8ekf6OU+XLT3v8hIavRpUWNsX6cZIFBLmSdLJAzrfOEB7eJkzXyk8PT43G2HXvUG
+	k3ww6rBWpWOLhLSKlV/Vi+EO9PLDBIu35U/KHM0BwAQdN6nM5cA==
+X-Received: by 2002:a05:600c:4588:b0:425:5e8b:af9a with SMTP id 5b1f17b1804b1-4257a0280a9mr69688655e9.36.1719951426812;
+        Tue, 02 Jul 2024 13:17:06 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE135qEh6xXfZAN4Fn8DQOIfsO/1YsQU4lRguQiQd7pQJbPb2dJfij3peOTF1hmn0gIIWXBwQ==
+X-Received: by 2002:a05:600c:4588:b0:425:5e8b:af9a with SMTP id 5b1f17b1804b1-4257a0280a9mr69688525e9.36.1719951426268;
+        Tue, 02 Jul 2024 13:17:06 -0700 (PDT)
+Received: from redhat.com ([2a02:14f:1f5:eadd:8c31:db01:9d01:7604])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3675a0d90casm13952763f8f.32.2024.07.02.13.17.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Jul 2024 09:35:16 -0700 (PDT)
-Received: from draig.lan (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id CC8685F93D;
-	Tue,  2 Jul 2024 17:35:15 +0100 (BST)
-From: =?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: pbonzini@redhat.com,
-	drjones@redhat.com,
-	thuth@redhat.com
-Cc: kvm@vger.kernel.org,
-	qemu-arm@nongnu.org,
-	linux-arm-kernel@lists.infradead.org,
-	kvmarm@lists.cs.columbia.edu,
-	christoffer.dall@arm.com,
-	maz@kernel.org,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Eric Auger <eric.auger@redhat.com>,
-	kvmarm@lists.linux.dev (open list:ARM)
-Subject: [kvm-unit-tests PATCH v1 2/2] arm/mmu: widen the page size check to account for LPA2
-Date: Tue,  2 Jul 2024 17:35:15 +0100
-Message-Id: <20240702163515.1964784-3-alex.bennee@linaro.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240702163515.1964784-1-alex.bennee@linaro.org>
-References: <20240702163515.1964784-1-alex.bennee@linaro.org>
+        Tue, 02 Jul 2024 13:17:05 -0700 (PDT)
+Date: Tue, 2 Jul 2024 16:17:02 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: [PULL v2 30/88] linux-headers: update to 6.10-rc1
+Message-ID: <c5614ee3f2775534871914c02be4b5a61b71ed40.1719951168.git.mst@redhat.com>
+References: <cover.1719951168.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1719951168.git.mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
-If FEAT_LPA2 is enabled there are different valid TGran values
-possible to indicate the granule is supported for 52 bit addressing.
-This will cause most tests to abort on QEMU's -cpu max with the error:
+From: Thomas Weißschuh <thomas@t-8ch.de>
 
-  lib/arm/mmu.c:216: assert failed: system_supports_granule(PAGE_SIZE): Unsupported translation granule 4096
-
-Expand the test to tale this into account.
-
-Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-Cc: Anders Roxell <anders.roxell@linaro.org>
+Signed-off-by: Thomas Weißschuh <thomas@t-8ch.de>
+Message-Id: <20240527-pvpanic-shutdown-v8-2-5a28ec02558b@t-8ch.de>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 ---
- lib/arm64/asm/processor.h | 29 ++++++++++++++---------------
- 1 file changed, 14 insertions(+), 15 deletions(-)
+ include/standard-headers/linux/ethtool.h    |  55 ++++++++
+ include/standard-headers/linux/pci_regs.h   |   6 +
+ include/standard-headers/linux/virtio_bt.h  |   1 -
+ include/standard-headers/linux/virtio_mem.h |   2 +
+ include/standard-headers/linux/virtio_net.h | 143 ++++++++++++++++++++
+ include/standard-headers/misc/pvpanic.h     |   7 +-
+ linux-headers/asm-generic/unistd.h          |   5 +-
+ linux-headers/asm-mips/unistd_n32.h         |   1 +
+ linux-headers/asm-mips/unistd_n64.h         |   1 +
+ linux-headers/asm-mips/unistd_o32.h         |   1 +
+ linux-headers/asm-powerpc/unistd_32.h       |   1 +
+ linux-headers/asm-powerpc/unistd_64.h       |   1 +
+ linux-headers/asm-s390/unistd_32.h          |   1 +
+ linux-headers/asm-s390/unistd_64.h          |   1 +
+ linux-headers/asm-x86/unistd_32.h           |   1 +
+ linux-headers/asm-x86/unistd_64.h           |   1 +
+ linux-headers/asm-x86/unistd_x32.h          |   2 +
+ linux-headers/linux/kvm.h                   |   4 +-
+ linux-headers/linux/stddef.h                |   8 ++
+ 19 files changed, 236 insertions(+), 6 deletions(-)
 
-diff --git a/lib/arm64/asm/processor.h b/lib/arm64/asm/processor.h
-index 1c73ba32..4a213aec 100644
---- a/lib/arm64/asm/processor.h
-+++ b/lib/arm64/asm/processor.h
-@@ -110,31 +110,30 @@ static inline unsigned long get_id_aa64mmfr0_el1(void)
- #define ID_AA64MMFR0_TGRAN64_SHIFT	24
- #define ID_AA64MMFR0_TGRAN16_SHIFT	20
+diff --git a/include/standard-headers/linux/ethtool.h b/include/standard-headers/linux/ethtool.h
+index 01503784d2..b0b4b68410 100644
+--- a/include/standard-headers/linux/ethtool.h
++++ b/include/standard-headers/linux/ethtool.h
+@@ -752,6 +752,61 @@ enum ethtool_module_power_mode {
+ 	ETHTOOL_MODULE_POWER_MODE_HIGH,
+ };
  
--#define ID_AA64MMFR0_TGRAN4_SUPPORTED	0x0
--#define ID_AA64MMFR0_TGRAN64_SUPPORTED	0x0
--#define ID_AA64MMFR0_TGRAN16_SUPPORTED	0x1
-+#define ID_AA64MMFR0_TGRAN4_OK	        0x0
-+#define ID_AA64MMFR0_TGRAN4_52_OK       0x1
-+#define ID_AA64MMFR0_TGRAN64_OK	0x0
-+#define ID_AA64MMFR0_TGRAN16_OK	        0x1
-+#define ID_AA64MMFR0_TGRAN16_52_OK      0x2
++/**
++ * enum ethtool_pse_types - Types of PSE controller.
++ * @ETHTOOL_PSE_UNKNOWN: Type of PSE controller is unknown
++ * @ETHTOOL_PSE_PODL: PSE controller which support PoDL
++ * @ETHTOOL_PSE_C33: PSE controller which support Clause 33 (PoE)
++ */
++enum ethtool_pse_types {
++	ETHTOOL_PSE_UNKNOWN =	1 << 0,
++	ETHTOOL_PSE_PODL =	1 << 1,
++	ETHTOOL_PSE_C33 =	1 << 2,
++};
++
++/**
++ * enum ethtool_c33_pse_admin_state - operational state of the PoDL PSE
++ *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN: state of PSE functions is unknown
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED: PSE functions are disabled
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED: PSE functions are enabled
++ */
++enum ethtool_c33_pse_admin_state {
++	ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN = 1,
++	ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED,
++	ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED,
++};
++
++/**
++ * enum ethtool_c33_pse_pw_d_status - power detection status of the PSE.
++ *	IEEE 802.3-2022 30.9.1.1.3 aPoDLPSEPowerDetectionStatus:
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN: PSE status is unknown
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED: The enumeration "disabled"
++ *	indicates that the PSE State diagram is in the state DISABLED.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING: The enumeration "searching"
++ *	indicates the PSE State diagram is in a state other than those
++ *	listed.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING: The enumeration
++ *	"deliveringPower" indicates that the PSE State diagram is in the
++ *	state POWER_ON.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_TEST: The enumeration "test" indicates that
++ *	the PSE State diagram is in the state TEST_MODE.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_FAULT: The enumeration "fault" indicates that
++ *	the PSE State diagram is in the state TEST_ERROR.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT: The enumeration "otherFault"
++ *	indicates that the PSE State diagram is in the state IDLE due to
++ *	the variable error_condition = true.
++ */
++enum ethtool_c33_pse_pw_d_status {
++	ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN = 1,
++	ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED,
++	ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING,
++	ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING,
++	ETHTOOL_C33_PSE_PW_D_STATUS_TEST,
++	ETHTOOL_C33_PSE_PW_D_STATUS_FAULT,
++	ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT,
++};
++
+ /**
+  * enum ethtool_podl_pse_admin_state - operational state of the PoDL PSE
+  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
+diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+index a39193213f..94c00996e6 100644
+--- a/include/standard-headers/linux/pci_regs.h
++++ b/include/standard-headers/linux/pci_regs.h
+@@ -1144,8 +1144,14 @@
+ #define PCI_DOE_DATA_OBJECT_HEADER_2_LENGTH		0x0003ffff
  
- static inline bool system_supports_granule(size_t granule)
- {
--	u32 shift;
- 	u32 val;
--	u64 mmfr0;
-+	u64 mmfr0 = get_id_aa64mmfr0_el1();
+ #define PCI_DOE_DATA_OBJECT_DISC_REQ_3_INDEX		0x000000ff
++#define PCI_DOE_DATA_OBJECT_DISC_REQ_3_VER		0x0000ff00
+ #define PCI_DOE_DATA_OBJECT_DISC_RSP_3_VID		0x0000ffff
+ #define PCI_DOE_DATA_OBJECT_DISC_RSP_3_PROTOCOL		0x00ff0000
+ #define PCI_DOE_DATA_OBJECT_DISC_RSP_3_NEXT_INDEX	0xff000000
  
- 	if (granule == SZ_4K) {
--		shift = ID_AA64MMFR0_TGRAN4_SHIFT;
--		val = ID_AA64MMFR0_TGRAN4_SUPPORTED;
-+		val = ((mmfr0 >> ID_AA64MMFR0_TGRAN4_SHIFT) & 0xf);
-+		return (val == ID_AA64MMFR0_TGRAN4_OK) ||
-+		       (val == ID_AA64MMFR0_TGRAN4_52_OK);
- 	} else if (granule == SZ_16K) {
--		shift = ID_AA64MMFR0_TGRAN16_SHIFT;
--		val = ID_AA64MMFR0_TGRAN16_SUPPORTED;
-+		val = ((mmfr0 >> ID_AA64MMFR0_TGRAN16_SHIFT) & 0xf);
-+		return val == ID_AA64MMFR0_TGRAN16_OK;
- 	} else {
- 		assert(granule == SZ_64K);
--		shift = ID_AA64MMFR0_TGRAN64_SHIFT;
--		val = ID_AA64MMFR0_TGRAN64_SUPPORTED;
-+		val = ((mmfr0 >> ID_AA64MMFR0_TGRAN64_SHIFT) & 0xf);
-+		return (val == ID_AA64MMFR0_TGRAN64_OK) ||
-+		       (val == ID_AA64MMFR0_TGRAN4_52_OK);
- 	}
--
--	mmfr0 = get_id_aa64mmfr0_el1();
--
--	return ((mmfr0 >> shift) & 0xf) == val;
- }
++/* Compute Express Link (CXL r3.1, sec 8.1.5) */
++#define PCI_DVSEC_CXL_PORT				3
++#define PCI_DVSEC_CXL_PORT_CTL				0x0c
++#define PCI_DVSEC_CXL_PORT_CTL_UNMASK_SBR		0x00000001
++
+ #endif /* LINUX_PCI_REGS_H */
+diff --git a/include/standard-headers/linux/virtio_bt.h b/include/standard-headers/linux/virtio_bt.h
+index a11ecc3f92..6f0dee7e32 100644
+--- a/include/standard-headers/linux/virtio_bt.h
++++ b/include/standard-headers/linux/virtio_bt.h
+@@ -13,7 +13,6 @@
  
- #endif /* !__ASSEMBLY__ */
+ enum virtio_bt_config_type {
+ 	VIRTIO_BT_CONFIG_TYPE_PRIMARY	= 0,
+-	VIRTIO_BT_CONFIG_TYPE_AMP	= 1,
+ };
+ 
+ enum virtio_bt_config_vendor {
+diff --git a/include/standard-headers/linux/virtio_mem.h b/include/standard-headers/linux/virtio_mem.h
+index 18c74c527c..6bfa41bd8b 100644
+--- a/include/standard-headers/linux/virtio_mem.h
++++ b/include/standard-headers/linux/virtio_mem.h
+@@ -90,6 +90,8 @@
+ #define VIRTIO_MEM_F_ACPI_PXM		0
+ /* unplugged memory must not be accessed */
+ #define VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE	1
++/* plugged memory will remain plugged when suspending+resuming */
++#define VIRTIO_MEM_F_PERSISTENT_SUSPEND		2
+ 
+ 
+ /* --- virtio-mem: guest -> host requests --- */
+diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
+index 0f88417742..fc594fe5fc 100644
+--- a/include/standard-headers/linux/virtio_net.h
++++ b/include/standard-headers/linux/virtio_net.h
+@@ -56,6 +56,7 @@
+ #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
+ 					 * Steering */
+ #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
++#define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-level statistics. */
+ #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
+ #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
+ #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
+@@ -406,4 +407,146 @@ struct  virtio_net_ctrl_coal_vq {
+ 	struct virtio_net_ctrl_coal coal;
+ };
+ 
++/*
++ * Device Statistics
++ */
++#define VIRTIO_NET_CTRL_STATS         8
++#define VIRTIO_NET_CTRL_STATS_QUERY   0
++#define VIRTIO_NET_CTRL_STATS_GET     1
++
++struct virtio_net_stats_capabilities {
++
++#define VIRTIO_NET_STATS_TYPE_CVQ       (1ULL << 32)
++
++#define VIRTIO_NET_STATS_TYPE_RX_BASIC  (1ULL << 0)
++#define VIRTIO_NET_STATS_TYPE_RX_CSUM   (1ULL << 1)
++#define VIRTIO_NET_STATS_TYPE_RX_GSO    (1ULL << 2)
++#define VIRTIO_NET_STATS_TYPE_RX_SPEED  (1ULL << 3)
++
++#define VIRTIO_NET_STATS_TYPE_TX_BASIC  (1ULL << 16)
++#define VIRTIO_NET_STATS_TYPE_TX_CSUM   (1ULL << 17)
++#define VIRTIO_NET_STATS_TYPE_TX_GSO    (1ULL << 18)
++#define VIRTIO_NET_STATS_TYPE_TX_SPEED  (1ULL << 19)
++
++	uint64_t supported_stats_types[1];
++};
++
++struct virtio_net_ctrl_queue_stats {
++	struct {
++		uint16_t vq_index;
++		uint16_t reserved[3];
++		uint64_t types_bitmap[1];
++	} stats[1];
++};
++
++struct virtio_net_stats_reply_hdr {
++#define VIRTIO_NET_STATS_TYPE_REPLY_CVQ       32
++
++#define VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC  0
++#define VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM   1
++#define VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO    2
++#define VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED  3
++
++#define VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC  16
++#define VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM   17
++#define VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO    18
++#define VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED  19
++	uint8_t type;
++	uint8_t reserved;
++	uint16_t vq_index;
++	uint16_t reserved1;
++	uint16_t size;
++};
++
++struct virtio_net_stats_cvq {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t command_num;
++	uint64_t ok_num;
++};
++
++struct virtio_net_stats_rx_basic {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t rx_notifications;
++
++	uint64_t rx_packets;
++	uint64_t rx_bytes;
++
++	uint64_t rx_interrupts;
++
++	uint64_t rx_drops;
++	uint64_t rx_drop_overruns;
++};
++
++struct virtio_net_stats_tx_basic {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t tx_notifications;
++
++	uint64_t tx_packets;
++	uint64_t tx_bytes;
++
++	uint64_t tx_interrupts;
++
++	uint64_t tx_drops;
++	uint64_t tx_drop_malformed;
++};
++
++struct virtio_net_stats_rx_csum {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t rx_csum_valid;
++	uint64_t rx_needs_csum;
++	uint64_t rx_csum_none;
++	uint64_t rx_csum_bad;
++};
++
++struct virtio_net_stats_tx_csum {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t tx_csum_none;
++	uint64_t tx_needs_csum;
++};
++
++struct virtio_net_stats_rx_gso {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t rx_gso_packets;
++	uint64_t rx_gso_bytes;
++	uint64_t rx_gso_packets_coalesced;
++	uint64_t rx_gso_bytes_coalesced;
++};
++
++struct virtio_net_stats_tx_gso {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t tx_gso_packets;
++	uint64_t tx_gso_bytes;
++	uint64_t tx_gso_segments;
++	uint64_t tx_gso_segments_bytes;
++	uint64_t tx_gso_packets_noseg;
++	uint64_t tx_gso_bytes_noseg;
++};
++
++struct virtio_net_stats_rx_speed {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	/* rx_{packets,bytes}_allowance_exceeded are too long. So rename to
++	 * short name.
++	 */
++	uint64_t rx_ratelimit_packets;
++	uint64_t rx_ratelimit_bytes;
++};
++
++struct virtio_net_stats_tx_speed {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	/* tx_{packets,bytes}_allowance_exceeded are too long. So rename to
++	 * short name.
++	 */
++	uint64_t tx_ratelimit_packets;
++	uint64_t tx_ratelimit_bytes;
++};
++
+ #endif /* _LINUX_VIRTIO_NET_H */
+diff --git a/include/standard-headers/misc/pvpanic.h b/include/standard-headers/misc/pvpanic.h
+index 54b7485390..b115094431 100644
+--- a/include/standard-headers/misc/pvpanic.h
++++ b/include/standard-headers/misc/pvpanic.h
+@@ -3,7 +3,10 @@
+ #ifndef __PVPANIC_H__
+ #define __PVPANIC_H__
+ 
+-#define PVPANIC_PANICKED	(1 << 0)
+-#define PVPANIC_CRASH_LOADED	(1 << 1)
++#include "standard-headers/linux/const.h"
++
++#define PVPANIC_PANICKED	_BITUL(0)
++#define PVPANIC_CRASH_LOADED	_BITUL(1)
++#define PVPANIC_SHUTDOWN	_BITUL(2)
+ 
+ #endif /* __PVPANIC_H__ */
+diff --git a/linux-headers/asm-generic/unistd.h b/linux-headers/asm-generic/unistd.h
+index 75f00965ab..d983c48a3b 100644
+--- a/linux-headers/asm-generic/unistd.h
++++ b/linux-headers/asm-generic/unistd.h
+@@ -842,8 +842,11 @@ __SYSCALL(__NR_lsm_set_self_attr, sys_lsm_set_self_attr)
+ #define __NR_lsm_list_modules 461
+ __SYSCALL(__NR_lsm_list_modules, sys_lsm_list_modules)
+ 
++#define __NR_mseal 462
++__SYSCALL(__NR_mseal, sys_mseal)
++
+ #undef __NR_syscalls
+-#define __NR_syscalls 462
++#define __NR_syscalls 463
+ 
+ /*
+  * 32 bit systems traditionally used different
+diff --git a/linux-headers/asm-mips/unistd_n32.h b/linux-headers/asm-mips/unistd_n32.h
+index ce2e050a9b..fc93b3be30 100644
+--- a/linux-headers/asm-mips/unistd_n32.h
++++ b/linux-headers/asm-mips/unistd_n32.h
+@@ -390,5 +390,6 @@
+ #define __NR_lsm_get_self_attr (__NR_Linux + 459)
+ #define __NR_lsm_set_self_attr (__NR_Linux + 460)
+ #define __NR_lsm_list_modules (__NR_Linux + 461)
++#define __NR_mseal (__NR_Linux + 462)
+ 
+ #endif /* _ASM_UNISTD_N32_H */
+diff --git a/linux-headers/asm-mips/unistd_n64.h b/linux-headers/asm-mips/unistd_n64.h
+index 5bfb3733ff..e72a3eb2c9 100644
+--- a/linux-headers/asm-mips/unistd_n64.h
++++ b/linux-headers/asm-mips/unistd_n64.h
+@@ -366,5 +366,6 @@
+ #define __NR_lsm_get_self_attr (__NR_Linux + 459)
+ #define __NR_lsm_set_self_attr (__NR_Linux + 460)
+ #define __NR_lsm_list_modules (__NR_Linux + 461)
++#define __NR_mseal (__NR_Linux + 462)
+ 
+ #endif /* _ASM_UNISTD_N64_H */
+diff --git a/linux-headers/asm-mips/unistd_o32.h b/linux-headers/asm-mips/unistd_o32.h
+index 02eaecd020..b86eb0786c 100644
+--- a/linux-headers/asm-mips/unistd_o32.h
++++ b/linux-headers/asm-mips/unistd_o32.h
+@@ -436,5 +436,6 @@
+ #define __NR_lsm_get_self_attr (__NR_Linux + 459)
+ #define __NR_lsm_set_self_attr (__NR_Linux + 460)
+ #define __NR_lsm_list_modules (__NR_Linux + 461)
++#define __NR_mseal (__NR_Linux + 462)
+ 
+ #endif /* _ASM_UNISTD_O32_H */
+diff --git a/linux-headers/asm-powerpc/unistd_32.h b/linux-headers/asm-powerpc/unistd_32.h
+index bbab08d6ec..28627b6546 100644
+--- a/linux-headers/asm-powerpc/unistd_32.h
++++ b/linux-headers/asm-powerpc/unistd_32.h
+@@ -443,6 +443,7 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ 
+ #endif /* _ASM_UNISTD_32_H */
+diff --git a/linux-headers/asm-powerpc/unistd_64.h b/linux-headers/asm-powerpc/unistd_64.h
+index af34cde70f..1fc42a8300 100644
+--- a/linux-headers/asm-powerpc/unistd_64.h
++++ b/linux-headers/asm-powerpc/unistd_64.h
+@@ -415,6 +415,7 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ 
+ #endif /* _ASM_UNISTD_64_H */
+diff --git a/linux-headers/asm-s390/unistd_32.h b/linux-headers/asm-s390/unistd_32.h
+index a3ece69d82..7706c21b87 100644
+--- a/linux-headers/asm-s390/unistd_32.h
++++ b/linux-headers/asm-s390/unistd_32.h
+@@ -434,5 +434,6 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ #endif /* _ASM_S390_UNISTD_32_H */
+diff --git a/linux-headers/asm-s390/unistd_64.h b/linux-headers/asm-s390/unistd_64.h
+index 8c5fd93495..62082d592d 100644
+--- a/linux-headers/asm-s390/unistd_64.h
++++ b/linux-headers/asm-s390/unistd_64.h
+@@ -382,5 +382,6 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ #endif /* _ASM_S390_UNISTD_64_H */
+diff --git a/linux-headers/asm-x86/unistd_32.h b/linux-headers/asm-x86/unistd_32.h
+index 5c9c329e93..fb7b8b169b 100644
+--- a/linux-headers/asm-x86/unistd_32.h
++++ b/linux-headers/asm-x86/unistd_32.h
+@@ -452,6 +452,7 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ 
+ #endif /* _ASM_UNISTD_32_H */
+diff --git a/linux-headers/asm-x86/unistd_64.h b/linux-headers/asm-x86/unistd_64.h
+index d9aab7ae87..da439afee1 100644
+--- a/linux-headers/asm-x86/unistd_64.h
++++ b/linux-headers/asm-x86/unistd_64.h
+@@ -374,6 +374,7 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ 
+ #endif /* _ASM_UNISTD_64_H */
+diff --git a/linux-headers/asm-x86/unistd_x32.h b/linux-headers/asm-x86/unistd_x32.h
+index 63cdd1ee43..4fcb607c72 100644
+--- a/linux-headers/asm-x86/unistd_x32.h
++++ b/linux-headers/asm-x86/unistd_x32.h
+@@ -318,6 +318,7 @@
+ #define __NR_set_mempolicy_home_node (__X32_SYSCALL_BIT + 450)
+ #define __NR_cachestat (__X32_SYSCALL_BIT + 451)
+ #define __NR_fchmodat2 (__X32_SYSCALL_BIT + 452)
++#define __NR_map_shadow_stack (__X32_SYSCALL_BIT + 453)
+ #define __NR_futex_wake (__X32_SYSCALL_BIT + 454)
+ #define __NR_futex_wait (__X32_SYSCALL_BIT + 455)
+ #define __NR_futex_requeue (__X32_SYSCALL_BIT + 456)
+@@ -326,6 +327,7 @@
+ #define __NR_lsm_get_self_attr (__X32_SYSCALL_BIT + 459)
+ #define __NR_lsm_set_self_attr (__X32_SYSCALL_BIT + 460)
+ #define __NR_lsm_list_modules (__X32_SYSCALL_BIT + 461)
++#define __NR_mseal (__X32_SYSCALL_BIT + 462)
+ #define __NR_rt_sigaction (__X32_SYSCALL_BIT + 512)
+ #define __NR_rt_sigreturn (__X32_SYSCALL_BIT + 513)
+ #define __NR_ioctl (__X32_SYSCALL_BIT + 514)
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 038731cdef..c93876ca0b 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -1217,9 +1217,9 @@ struct kvm_vfio_spapr_tce {
+ /* Available with KVM_CAP_SPAPR_RESIZE_HPT */
+ #define KVM_PPC_RESIZE_HPT_PREPARE _IOR(KVMIO, 0xad, struct kvm_ppc_resize_hpt)
+ #define KVM_PPC_RESIZE_HPT_COMMIT  _IOR(KVMIO, 0xae, struct kvm_ppc_resize_hpt)
+-/* Available with KVM_CAP_PPC_RADIX_MMU or KVM_CAP_PPC_HASH_MMU_V3 */
++/* Available with KVM_CAP_PPC_MMU_RADIX or KVM_CAP_PPC_MMU_HASH_V3 */
+ #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
+-/* Available with KVM_CAP_PPC_RADIX_MMU */
++/* Available with KVM_CAP_PPC_MMU_RADIX */
+ #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
+ /* Available with KVM_CAP_PPC_GET_CPU_CHAR */
+ #define KVM_PPC_GET_CPU_CHAR	  _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
+diff --git a/linux-headers/linux/stddef.h b/linux-headers/linux/stddef.h
+index bf9749dd14..96aa341942 100644
+--- a/linux-headers/linux/stddef.h
++++ b/linux-headers/linux/stddef.h
+@@ -55,4 +55,12 @@
+ #define __counted_by(m)
+ #endif
+ 
++#ifndef __counted_by_le
++#define __counted_by_le(m)
++#endif
++
++#ifndef __counted_by_be
++#define __counted_by_be(m)
++#endif
++
+ #endif /* _LINUX_STDDEF_H */
 -- 
-2.39.2
+MST
 
 
