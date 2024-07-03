@@ -1,109 +1,122 @@
-Return-Path: <kvm+bounces-20896-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20897-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192509261A9
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 15:19:18 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BA159261E9
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 15:34:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF780284ED1
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 13:19:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CAEBB22256
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 13:34:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59FFA17A5A3;
-	Wed,  3 Jul 2024 13:19:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D38B176FBD;
+	Wed,  3 Jul 2024 13:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="h10xqMoj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kXOm1Kdc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64007175555;
-	Wed,  3 Jul 2024 13:19:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E431C136648
+	for <kvm@vger.kernel.org>; Wed,  3 Jul 2024 13:34:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720012743; cv=none; b=uPE/ZdaI9lBRQRRa1KxKjVqF8n03p5a+DlplQ9P8q/c7TmJCafs+5hZK6CdXCrGG+h91Jli+rI9mqBnAZwOk7A1XppRB3+aXj2BfuT1AaPHokX56ZNgDSYpKBwSH4vLrcZ4TER2BPvhXQvsbA1UNpcJJ9HGwmEuYcoTnW5d46Z8=
+	t=1720013678; cv=none; b=aRa0FwEuQ6krJF1lJlbvS3SDFpOZZeU3V2VDQSAWNyzdX76IKVWOfbldoSBcvXWLPyXNW4TReY6DXdL8/d2Vv6+IpHEvZ0WPX20GSkBSjkNfajmgzu3MCnm0DKj5o3XtyJfG49DtKlVpyBH8dj70LtaI5h8JdDEbDg4Hk0xhxKQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720012743; c=relaxed/simple;
-	bh=zUu2F1hV+miT5I8Gkjrxe7EVSNhBDwp44fj2E7hlYsg=;
-	h=Subject:MIME-Version:Content-Type:Date:Message-ID:From:To:CC:
-	 References:In-Reply-To; b=KTj/oKm/gJBi3UXE1D37oPapzdIYILnXosbFLyGgUnhx2a26JSYWFABRvOVQm3N9svGU3WQeve3NWz6+guGbTpcyCOVZs0KaRkmaXMJhikCaDyybylUapou2QN8NBlmvjoeUlGW1CuBZiFxzSsvnucAWxfQbfPp3SbAiDHtBs14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=h10xqMoj; arc=none smtp.client-ip=52.95.49.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1720012742; x=1751548742;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   from:to:cc:references:in-reply-to:subject;
-  bh=zUu2F1hV+miT5I8Gkjrxe7EVSNhBDwp44fj2E7hlYsg=;
-  b=h10xqMojGvcnQ9vfl7ywtrgPImF73FdjFAK9o4Xgkl5eMqIDKEeupLrt
-   9dGOok6wCF8fVcjiL7Ep6bQ0hEN9RijbSI8V4z7CQJ5DQjOClb3gVxXj6
-   fO32zvVMbsehWh4krmsxZ/9qIPOvqdrpz7qx3R7zmJARcShegY9NAdpUU
-   w=;
-X-IronPort-AV: E=Sophos;i="6.09,182,1716249600"; 
-   d="scan'208";a="417489642"
-Subject: Re: [PATCH 00/18] Introducing Core Building Blocks for Hyper-V VSM Emulation
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 13:18:59 +0000
-Received: from EX19MTAEUC002.ant.amazon.com [10.0.43.254:59500]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.20.30:2525] with esmtp (Farcaster)
- id 4b69d89c-843b-442a-9219-fefd3322b1f3; Wed, 3 Jul 2024 13:18:58 +0000 (UTC)
-X-Farcaster-Flow-ID: 4b69d89c-843b-442a-9219-fefd3322b1f3
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUC002.ant.amazon.com (10.252.51.181) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 3 Jul 2024 13:18:57 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Wed, 3 Jul 2024
- 13:18:51 +0000
+	s=arc-20240116; t=1720013678; c=relaxed/simple;
+	bh=SKoc1LSqvq1gRLT5j4Z9rzcwc5E+BErt9c5EOhhnE+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c/JTlu4uw+qA5z+H47PI/cSjgGG3ojHCtqwsSQXRgp1jdV2Vgyqy/jOsRQvZxcNLU2yq3FKX+fNGbRhSHvuoy0wGqKf163jb8LFln4yLEWhf7H9uX/VxTmDXtlFLYDp/b9fYLZqjatedPEe//ik0DWCwGM8WZh5bxeGSzg8RAGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kXOm1Kdc; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: yuzenghui@huawei.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1720013672;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mfZjrBnjQAc2g3737Msklio3dXfCX7+a7lHHtBciKYY=;
+	b=kXOm1Kdck0wb6gfJ1SjCEZ99lovuT69IkQG6pCczWL/ENrNSQ21LTZhSou5Uq+5XxmqCPY
+	haa/1oM3ox334IEZe67f7Azug9Bg9i0pEFqIxcTIdplzTrl800C/p9bZrI7EOTNS+KgFCj
+	+YokTjQm0wIG/0vkpcSzuZ6llQwIg64=
+X-Envelope-To: alex.bennee@linaro.org
+X-Envelope-To: pbonzini@redhat.com
+X-Envelope-To: drjones@redhat.com
+X-Envelope-To: thuth@redhat.com
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: qemu-arm@nongnu.org
+X-Envelope-To: linux-arm-kernel@lists.infradead.org
+X-Envelope-To: christoffer.dall@arm.com
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: anders.roxell@linaro.org
+X-Envelope-To: alexandru.elisei@arm.com
+X-Envelope-To: eric.auger@redhat.com
+X-Envelope-To: kvmarm@lists.linux.dev
+Date: Wed, 3 Jul 2024 08:34:27 -0500
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Zenghui Yu <yuzenghui@huawei.com>
+Cc: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>, 
+	pbonzini@redhat.com, drjones@redhat.com, thuth@redhat.com, kvm@vger.kernel.org, 
+	qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org, christoffer.dall@arm.com, 
+	maz@kernel.org, Anders Roxell <anders.roxell@linaro.org>, 
+	Alexandru Elisei <alexandru.elisei@arm.com>, Eric Auger <eric.auger@redhat.com>, 
+	"open list:ARM" <kvmarm@lists.linux.dev>
+Subject: Re: [kvm-unit-tests PATCH v1 2/2] arm/mmu: widen the page size check
+ to account for LPA2
+Message-ID: <20240703-09f98f39f0aa78a0beb48696@orel>
+References: <20240702163515.1964784-1-alex.bennee@linaro.org>
+ <20240702163515.1964784-3-alex.bennee@linaro.org>
+ <28936f0c-5745-14b3-1ecf-ae1e01c5b28f@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 3 Jul 2024 13:18:48 +0000
-Message-ID: <D2FXMJ39HOWV.MEBKDIO1F1TM@amazon.com>
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, <seanjc@google.com>
-CC: <pbonzini@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-hyperv@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <graf@amazon.de>,
-	<dwmw2@infradead.org>, <pdurrant@amazon.co.uk>, <mlevitsk@redhat.com>,
-	<jgowans@amazon.com>, <corbet@lwn.net>, <decui@microsoft.com>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <amoorthy@google.com>
-X-Mailer: aerc 0.17.0-152-g73bcb4661460-dirty
-References: <20240609154945.55332-1-nsaenz@amazon.com>
- <D2FTASL4CXLN.32GYJ8QZH4OCR@amazon.com> <87ikxm63px.fsf@redhat.com>
-In-Reply-To: <87ikxm63px.fsf@redhat.com>
-X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <28936f0c-5745-14b3-1ecf-ae1e01c5b28f@huawei.com>
+X-Migadu-Flow: FLOW_OUT
 
-Hi Vitaly,
+On Wed, Jul 03, 2024 at 11:52:05AM GMT, Zenghui Yu wrote:
+> Hi Alex,
+> 
+> [ Please don't send patches to the old kvmarm@lists.cs.columbia.edu as
+> it had been dropped since early 2023. [1] ]
+> 
+> On 2024/7/3 0:35, Alex Bennée wrote:
+> > If FEAT_LPA2 is enabled there are different valid TGran values
+> > possible to indicate the granule is supported for 52 bit addressing.
+> > This will cause most tests to abort on QEMU's -cpu max with the error:
+> > 
+> >   lib/arm/mmu.c:216: assert failed: system_supports_granule(PAGE_SIZE): Unsupported translation granule 4096
+> > 
+> > Expand the test to tale this into account.
+> > 
+> > Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+> > Cc: Anders Roxell <anders.roxell@linaro.org>
+> 
+> There's a similar patch on the list [2], haven't been merged in master
+> though.
 
-On Wed Jul 3, 2024 at 12:48 PM UTC, Vitaly Kuznetsov wrote:
-> Nicolas Saenz Julienne <nsaenz@amazon.com> writes:
->
-> > Hi Sean,
-> >
-> > On Sun Jun 9, 2024 at 3:49 PM UTC, Nicolas Saenz Julienne wrote:
-> >> This series introduces core KVM functionality necessary to emulate Hyp=
-er-V's
-> >> Virtual Secure Mode in a Virtual Machine Monitor (VMM).
-> >
-> > Just wanted to make sure the series is in your radar.
-> >
->
-> Not Sean here but I was planning to take a look at least at Hyper-V
-> parts of it next week.
+Drat, I queued that, and several other patches, and then, for whatever
+reason, I delayed the merge (I was probably just waiting for the gitlab
+pipeline to finish...) and then forgot to actually merge... I've merged
+now.
 
-Thanks for the update.
+Please don't hesitate to ping me on patches that linger too long. I
+sometimes need that interrupt to trigger my context switch!
 
-Nicolas
+Thanks,
+drew
+
+> 
+> [1] https://git.kernel.org/torvalds/c/960c3028a1d5
+> [2]
+> https://lore.kernel.org/all/20240402132739.201939-6-andrew.jones@linux.dev
 
