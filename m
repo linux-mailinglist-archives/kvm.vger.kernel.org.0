@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-20861-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20862-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE62924D85
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 04:12:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BEC0924D87
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 04:13:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECF71282E07
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 02:12:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8D4B1F23CAE
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 02:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2518C4C6C;
-	Wed,  3 Jul 2024 02:12:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4037C153;
+	Wed,  3 Jul 2024 02:12:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fQfq+fd/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jIFIDyPh"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF957945A;
-	Wed,  3 Jul 2024 02:12:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A21523A;
+	Wed,  3 Jul 2024 02:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719972751; cv=none; b=NCps/F1p/TDPYcdYKJmj0PG5uq8oS/f2+VXzEcXcwzVrmx2x99hUrVaZCAufqjoevnKKx2SJCt3TaJp+347QbtI/MZkcdfFSEDp8Wtpk/Yc5Q5GPodpUoSYfJVGYRQcrFU65i5mbmMQhMa3zKgXXQp6HnR35FcrfaX3/z5RwP9A=
+	t=1719972754; cv=none; b=eqr+FeXedqotXeEerrpKvqT23dQ1Z54sG5/U6+m/ko47WMIs+3x+lXpitxHn/6tDX9PlplPCWlHRrz5wXuRIF9fwE9hfFmfTFf93RMZdf2aFnFp+7o5XK3zhVxE041DjfbYQKUANnckt1YIBUFkFVx/GCwDo/X1j7uBD/r8MLZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719972751; c=relaxed/simple;
-	bh=LTohYiMBP5iJF+QbwlLQmGYpTkoiDfecodLSJghM2KU=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YPOQHBELfcLC26RtkfTq2JFeRoy2a46L9PpmC2af3oji5h/HzBUpd/d2mVsNUV3uOtcyCrpRHL7uL8IbxR44KyKWpfcqMM204QZ9cAiOAj6aupjbaFEGSnIN9seLruA3zpequ6saas7FGqmPNM+LHxAeq8ZH/2GFiqp81NHmNKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fQfq+fd/; arc=none smtp.client-ip=192.198.163.15
+	s=arc-20240116; t=1719972754; c=relaxed/simple;
+	bh=+M4vonICc0ZyeTSp/xqG/2je7Rme8lCHPlZ6Y/9HccU=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=d+Y386IjFyeJw1AwiDUnCt+66wrOJzEEGMAFMWBhy2mEaXqaEVbITQ+aD7XV5vyoWNCrou0Xx7nLc4mweTeTzf3WpTtL2YF6BvflO4gVS9C3nnomM7t2rCUsBhm+2y9dUWE3ON7Tp8nUeb6G0welLgNEwbpODiQskArbELN+bOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jIFIDyPh; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719972750; x=1751508750;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=LTohYiMBP5iJF+QbwlLQmGYpTkoiDfecodLSJghM2KU=;
-  b=fQfq+fd/55fhT2/716X73bRoZB6MS4zfyTm9zg6Wh+W2/7sd8BOoRg7u
-   jWtD4Ifka3konbS849hqVppHhFVKwhSxHODvsfQQnbUaX5PbhpFUXNf/I
-   YSeVJs8kFk9E+yii5cUWF+zKr8qtkt6PJKymqfIaz5xz4YhO4jAfz7soX
-   zmeiBoA4Ss+gf/N4jOfKV/gCdUiEcm6E5gYPxa5fwh5AYb4luQHCeZS4k
-   fGdjcXKAakdtBhPs7pG9Ij09eE9kmvrslSx43HGzrDw7gSe73jQdcBojV
-   vfO43JbX/0POjxj4ETOMETZwX94psNP4bRKbW8OTyLm0oeKzWIZSam3no
-   w==;
-X-CSE-ConnectionGUID: /QZA28qqThOiYjTPfdOqRA==
-X-CSE-MsgGUID: Z8OGrD6YQSKpY2JsmSzXgA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="17310933"
+  t=1719972752; x=1751508752;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+M4vonICc0ZyeTSp/xqG/2je7Rme8lCHPlZ6Y/9HccU=;
+  b=jIFIDyPhzEbHcuYYNEJl0T3ifIJ63j+cJEV/HgP3G5gtM61nkdcbsaRQ
+   OvYEFNLi5HMSujDUYmRmdmPm9+gpvzei2xCeTujZ9DhaBTOGMdiz7AXw1
+   3sCz+TTKBiJ+SN0tLWqngesd35kwQ/YjyKMjEhgF4i04WequRlTFcfqpi
+   5ln9gLzraBQTEZU2fGmg8qqbiaGiynmBgJ1r1n8ya7MNISQbLxinUUiSn
+   xmWBc1yx/O1fJhy14OHIdqhwMlSMzs1mwZpsRjKJWuMsFTHmwF7/FiM4X
+   bzLEGo2amTRejYwHH3dtUZUc+K2xcMHY+/B/ggCoBbkUlU1H9tsVT5FjA
+   A==;
+X-CSE-ConnectionGUID: 3XX55UmdS9C6eVxRSyBYrg==
+X-CSE-MsgGUID: X7xPt3hrRAukM/oi5wNYDQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="17310938"
 X-IronPort-AV: E=Sophos;i="6.09,180,1716274800"; 
-   d="scan'208";a="17310933"
+   d="scan'208";a="17310938"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2024 19:12:29 -0700
-X-CSE-ConnectionGUID: mUX2nWezTBG+bbySqyfYzA==
-X-CSE-MsgGUID: fbsEOSVeSGSmB+MPk0AD6A==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2024 19:12:32 -0700
+X-CSE-ConnectionGUID: D3TLjYn4Trit92MbBgXieA==
+X-CSE-MsgGUID: oYgzusVBQM65mVobeEPraQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,180,1716274800"; 
-   d="scan'208";a="46148496"
+   d="scan'208";a="46148510"
 Received: from emr.sh.intel.com ([10.112.229.56])
-  by fmviesa010.fm.intel.com with ESMTP; 02 Jul 2024 19:12:26 -0700
+  by fmviesa010.fm.intel.com with ESMTP; 02 Jul 2024 19:12:29 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -70,10 +71,12 @@ Cc: kvm@vger.kernel.org,
 	Jinrong Liang <cloudliang@tencent.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [Patch v5 00/18] pmu test bugs fix and improvements
-Date: Wed,  3 Jul 2024 09:56:54 +0000
-Message-Id: <20240703095712.64202-1-dapeng1.mi@linux.intel.com>
+Subject: [Patch v5 01/18] x86: pmu: Remove duplicate code in pmu_init()
+Date: Wed,  3 Jul 2024 09:56:55 +0000
+Message-Id: <20240703095712.64202-2-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.40.1
+In-Reply-To: <20240703095712.64202-1-dapeng1.mi@linux.intel.com>
+References: <20240703095712.64202-1-dapeng1.mi@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,54 +85,34 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Changes:
-v4 -> v5:
-  * Fix the building errors with configuration options "--arch=i386" or
-    "--enable-efi' introduced by v4 patch "Add IBPB indirect jump asm 
-    blob" (Patch 15/18)
-  * Add patch 18/18 to print count details if test case fails
+From: Xiong Zhang <xiong.y.zhang@intel.com>
 
+There are totally same code in pmu_init() helper, remove the duplicate
+code.
 
-All changes pass validation on Intel Sapphire Rapids and Emerald Rapids
-platforms against latest kvm-x86/next code (0ce958282e66). No tests on
-AMD platforms since no AMD platform on hand. Any tests on AMD platform
-are appreciated.
+Reviewed-by: Jim Mattson <jmattson@google.com>
+Signed-off-by: Xiong Zhang <xiong.y.zhang@intel.com>
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+---
+ lib/x86/pmu.c | 5 -----
+ 1 file changed, 5 deletions(-)
 
-History:
-  v4: https://lore.kernel.org/all/20240419035233.3837621-1-dapeng1.mi@linux.intel.com/
-  v3: https://lore.kernel.org/lkml/20240103031409.2504051-1-dapeng1.mi@linux.intel.com/ 
-  v2: https://lore.kernel.org/lkml/20231031092921.2885109-1-dapeng1.mi@linux.intel.com/
-  v1: https://lore.kernel.org/lkml/20231024075748.1675382-1-dapeng1.mi@linux.intel.com/
-
-Dapeng Mi (17):
-  x86: pmu: Remove blank line and redundant space
-  x86: pmu: Refine fixed_events[] names
-  x86: pmu: Fix the issue that pmu_counter_t.config crosses cache line
-  x86: pmu: Enlarge cnt[] length to 48 in check_counters_many()
-  x86: pmu: Add asserts to warn inconsistent fixed events and counters
-  x86: pmu: Fix cycles event validation failure
-  x86: pmu: Use macro to replace hard-coded branches event index
-  x86: pmu: Use macro to replace hard-coded ref-cycles event index
-  x86: pmu: Use macro to replace hard-coded instructions event index
-  x86: pmu: Enable and disable PMCs in loop() asm blob
-  x86: pmu: Improve instruction and branches events verification
-  x86: pmu: Improve LLC misses event verification
-  x86: pmu: Adjust lower boundary of llc-misses event to 0 for legacy
-    CPUs
-  x86: pmu: Add IBPB indirect jump asm blob
-  x86: pmu: Adjust lower boundary of branch-misses event
-  x86: pmu: Optimize emulated instruction validation
-  x86: pmu: Print measured event count if test fails
-
-Xiong Zhang (1):
-  x86: pmu: Remove duplicate code in pmu_init()
-
- lib/x86/pmu.c |   5 -
- x86/pmu.c     | 406 ++++++++++++++++++++++++++++++++++++++++----------
- 2 files changed, 328 insertions(+), 83 deletions(-)
-
-
-base-commit: d301d0187f5db09531a1c2c7608997cc3b0a5c7d
+diff --git a/lib/x86/pmu.c b/lib/x86/pmu.c
+index 0f2afd65..d06e9455 100644
+--- a/lib/x86/pmu.c
++++ b/lib/x86/pmu.c
+@@ -16,11 +16,6 @@ void pmu_init(void)
+ 			pmu.fixed_counter_width = (cpuid_10.d >> 5) & 0xff;
+ 		}
+ 
+-		if (pmu.version > 1) {
+-			pmu.nr_fixed_counters = cpuid_10.d & 0x1f;
+-			pmu.fixed_counter_width = (cpuid_10.d >> 5) & 0xff;
+-		}
+-
+ 		pmu.nr_gp_counters = (cpuid_10.a >> 8) & 0xff;
+ 		pmu.gp_counter_width = (cpuid_10.a >> 16) & 0xff;
+ 		pmu.gp_counter_mask_length = (cpuid_10.a >> 24) & 0xff;
 -- 
 2.40.1
 
