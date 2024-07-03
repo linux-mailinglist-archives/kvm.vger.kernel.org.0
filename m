@@ -1,62 +1,81 @@
-Return-Path: <kvm+bounces-20890-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20891-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C323992577F
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 11:56:30 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8829925869
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 12:24:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8483828956B
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 09:56:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 454A9B21D8C
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 10:24:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023AE1411E3;
-	Wed,  3 Jul 2024 09:55:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E5A16DEAC;
+	Wed,  3 Jul 2024 10:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VF3Uyut2"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rlGk763x"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C616143758;
-	Wed,  3 Jul 2024 09:55:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 964B5158853;
+	Wed,  3 Jul 2024 10:24:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720000539; cv=none; b=QoLLjhyhcNzH5UWlepdZH4KJPWZq9Hp06HVP9K6S21UIkZlyT8PNM/PZMzqOkEIu/k7swPvzQbqLlrV0KCHIDk4u/1NlB5f3+oNI+h83i5hTDY19WY+NTsxMiygH1OSsgJkfTGV9Ar5PYKonIw8LTDsQOuRKlCvsgHHZtrMNitI=
+	t=1720002256; cv=none; b=Qn3eQ8tsvhTG+OH/ZiXgtbO2uRxHLkRocOkIs2c+G59TpKTDcddiYJNAZ3dPW7j+iDhWq3t2zI8uKIz9iYLgoYUlEODk5QxvipjiZ40HqDV/Oz/WFTOgi+vCqi9VCdqcILo2AVx1w3UD0OTkx5a3wLlFcjGv1nJiqGFNcAoo268=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720000539; c=relaxed/simple;
-	bh=VAztpCOR1tH3GwIz0d5tqw3J6dkGZ3sS7qwDIFUKl/U=;
-	h=MIME-Version:Content-Type:Date:Message-ID:To:CC:Subject:From:
-	 References:In-Reply-To; b=jNF7IC0nhC0LyVtYCWFXX1J70++MEvNiw2GfDHFm7Hu1cvqn59QDyk4px3IKxa+N+9n2Y30MxNJc4LqqcvHM9yXgaGgudG5/YR93zl28z3r5BFIMOv/OsG2tUZclKGwy6XmleNYkUXLe8273YI8QV9OcADq0lk9FgHit21VN39c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VF3Uyut2; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1720000538; x=1751536538;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   to:cc:subject:from:references:in-reply-to;
-  bh=VAztpCOR1tH3GwIz0d5tqw3J6dkGZ3sS7qwDIFUKl/U=;
-  b=VF3Uyut2JB5TiKqzMmDJ71r78jkF5eqbmYhcisPNoGEP1s7swEEmQsIr
-   FGtjXE5EK1+O4E7C2grr0XnHuKkYFg4MleaM1yvm3rp0VaWPY4cefExOP
-   5sVNDs+f/jkH4omBB99/mQ3Rr6rkkPjmReFWa74uVeESsxllNw0gHnGgd
-   o=;
-X-IronPort-AV: E=Sophos;i="6.09,181,1716249600"; 
-   d="scan'208";a="643328494"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 09:55:35 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:41563]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.31.218:2525] with esmtp (Farcaster)
- id 4054678a-94ee-40f8-a85c-6afac11b8361; Wed, 3 Jul 2024 09:55:34 +0000 (UTC)
-X-Farcaster-Flow-ID: 4054678a-94ee-40f8-a85c-6afac11b8361
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 3 Jul 2024 09:55:34 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Wed, 3 Jul 2024
- 09:55:27 +0000
+	s=arc-20240116; t=1720002256; c=relaxed/simple;
+	bh=BzRK3DQo9rDWkV+bHSK9IhSz5Nn4nBN70yT9zUh0vjk=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:To:From:
+	 Cc:Message-ID:Date; b=NzlnoIdLr0AlINgmCRM2SG9WJQccywjuX4qGwy0qssSWyjfM+xVaXzQmAOiy9bD8by/+oV6wfN0Fc7SYR2BQWUgAx6gd44VQV8OBVdTjCohp5kNGSFxqV2QIHuaE/WG/LVdjVHYYiEpMZa7XiSdRaMWtgyQddfsML677Ug1uxGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rlGk763x; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4639wBtq011290;
+	Wed, 3 Jul 2024 10:24:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-type:mime-version:content-transfer-encoding:in-reply-to
+	:references:subject:to:from:cc:message-id:date; s=pp1; bh=BzRK3D
+	Qo9rDWkV+bHSK9IhSz5Nn4nBN70yT9zUh0vjk=; b=rlGk763xUIOP5H5YK8u9Py
+	IPRcxXtc38ScLKRSZXpqdGCX+7TXe7SdC+AfTxufnUF25TEfyTNGP74yKtTQcB7M
+	y/g6pPTdTTHKBp5kGnq6fO55DAk78dihrT7nH4NUGsp1qx09cqc5Yj+8HmQisay4
+	kLUYar4RRU/+wxY4ZyJ5HF2VRWJwV/ITp3ZNQytKNm/QP27Lx90Hphp6MVcUZras
+	EAhTQQ8Evx89v6enw+PD1W3Hsj6FCKnU5c9okJQzxAKtuZ8eKR72LXCrXAADpJdR
+	UQHj4Nj7WlOEmRjq03dWBnZNq5l2LlVvrJGwLiXKjeegePJxDwAw+ssWV6VM2U7w
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40535mg9a1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Jul 2024 10:24:12 +0000 (GMT)
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 463AOBRn019919;
+	Wed, 3 Jul 2024 10:24:11 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40535mg99s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Jul 2024 10:24:11 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4638AiNd009121;
+	Wed, 3 Jul 2024 10:24:11 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 402w00t775-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 03 Jul 2024 10:24:11 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 463AO3RY53149992
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 3 Jul 2024 10:24:05 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 12A4C20049;
+	Wed,  3 Jul 2024 10:24:03 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id E3FCC20040;
+	Wed,  3 Jul 2024 10:24:02 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.66.26])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  3 Jul 2024 10:24:02 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -64,37 +83,42 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Wed, 3 Jul 2024 09:55:24 +0000
-Message-ID: <D2FTASL4CXLN.32GYJ8QZH4OCR@amazon.com>
-To: <seanjc@google.com>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>,
-	<linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <vkuznets@redhat.com>,
-	<linux-doc@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
-	<linux-arch@vger.kernel.org>, <nsaenz@amazon.com>,
-	<linux-trace-kernel@vger.kernel.org>, <graf@amazon.de>,
-	<dwmw2@infradead.org>, <pdurrant@amazon.co.uk>, <mlevitsk@redhat.com>,
-	<jgowans@amazon.com>, <corbet@lwn.net>, <decui@microsoft.com>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <amoorthy@google.com>
-Subject: Re: [PATCH 00/18] Introducing Core Building Blocks for Hyper-V VSM
- Emulation
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-X-Mailer: aerc 0.17.0-152-g73bcb4661460-dirty
-References: <20240609154945.55332-1-nsaenz@amazon.com>
-In-Reply-To: <20240609154945.55332-1-nsaenz@amazon.com>
-X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+In-Reply-To: <20240702155606.71398-1-imbrenda@linux.ibm.com>
+References: <20240702155606.71398-1-imbrenda@linux.ibm.com>
+Subject: Re: [PATCH v1 1/1] KVM: s390: remove useless include
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org
+From: Nico Boehr <nrb@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+        frankja@linux.ibm.com, borntraeger@de.ibm.com, nsg@linux.ibm.com,
+        seiden@linux.ibm.com, david@redhat.com
+Message-ID: <172000224247.95833.192495937410933992@t14-nrb>
+User-Agent: alot/0.8.1
+Date: Wed, 03 Jul 2024 12:24:02 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: w6BLjPKQY3jcHRzB0w8QZuT9ddkL-9lm
+X-Proofpoint-ORIG-GUID: VJ-Uzz8DFIE_DfKOYbqyIVyt1NXX7Vaq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-03_06,2024-07-02_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ phishscore=0 adultscore=0 impostorscore=0 bulkscore=0 lowpriorityscore=0
+ suspectscore=0 spamscore=0 malwarescore=0 clxscore=1011 mlxlogscore=303
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407030077
 
-Hi Sean,
+Quoting Claudio Imbrenda (2024-07-02 17:56:06)
+> arch/s390/include/asm/kvm_host.h includes linux/kvm_host.h, but
+> linux/kvm_host.h includes asm/kvm_host.h .
+>=20
+> It turns out that arch/s390/include/asm/kvm_host.h only needs
+> linux/kvm_types.h, which it already includes.
+>=20
+> Stop including linux/kvm_host.h from arch/s390/include/asm/kvm_host.h .
+>=20
+> Due to the #ifdef guards, the code works as it is today, but it's ugly
+> and it will get in the way of future patches.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-On Sun Jun 9, 2024 at 3:49 PM UTC, Nicolas Saenz Julienne wrote:
-> This series introduces core KVM functionality necessary to emulate Hyper-=
-V's
-> Virtual Secure Mode in a Virtual Machine Monitor (VMM).
-
-Just wanted to make sure the series is in your radar.
-
-Thanks,
-Nicolas
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
