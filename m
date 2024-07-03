@@ -1,252 +1,589 @@
-Return-Path: <kvm+bounces-20915-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20916-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C68926A69
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 23:38:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD82C926BC4
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 00:47:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3606C1F230E4
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 21:38:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40DC71F22824
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 22:47:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7643149636;
-	Wed,  3 Jul 2024 21:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D201946AC;
+	Wed,  3 Jul 2024 22:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cJU7PCgD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GrtMcCg4"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 177EA2BD19;
-	Wed,  3 Jul 2024 21:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720042685; cv=fail; b=IQZgEGCl1dYV0CccMv0NVqLw1Yzpc6N4oWSgvOkalvq8NdtMF9QUWve4zD0jEuz9qWax3VdBHR8vwUMnTL2nHQqwCFpiZAoMpDY9KLN0cC7WWZr6QUZ/LInpcZYp0ntVMdtiSty3NDH713ybcbspH7HMhfKqp4XmCfoo2i1pD+c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720042685; c=relaxed/simple;
-	bh=ygCFcCgOFxTeCsRHpsoPJJckcu19QoNQfnc+c38IfGY=;
-	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=u0N7GAn5wH/ndhWwVWvB0LA8gkNGtdkW11WPK6Y/1x4Fh5iTe1F1tAuCgG7i9r9s3McuoQbq79kNwYEdkjWpGn5lYyIBc3IxoJlZB2gOdRIn8zO+lvFOz6pS0RDAJiuyI0T+EtpPp9UW7zDBwuEH51/c8cOWVd3DvUvq85U42Wk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cJU7PCgD; arc=fail smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720042684; x=1751578684;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ygCFcCgOFxTeCsRHpsoPJJckcu19QoNQfnc+c38IfGY=;
-  b=cJU7PCgD0RG1W0i05hUB40gh4RWz7jIUB7ZBTLrL8iUnWf6BuRMdXfRH
-   dGG+CAfz9PWr0r2GCyRVhuFOjtpzkuh+kAdYnNExHFVB7nhDkQWn3AZgF
-   uK1lXGT4ZsVDtY5AkYnJDAhhY+8JZV1lxtgz0Vk0WBjvi3gZcVAHNgyKJ
-   0Jtka9++epDyOdvhsneAJ9wO74gd62Vd0J+H9VreHtlr8lBfgS0O3XTVo
-   JaUSlDbxJLYzLAG96LEBarsPG7ShrxSv3C46j7cli7SnQBQXOlLaixpVI
-   Dt3mCXzE6B3YSIcaH2pEktcuijYANQlVFya9Mhre16QaqpDmJs6FSs1Nq
-   w==;
-X-CSE-ConnectionGUID: B/xmXGiZTJaJ1G9piYFteQ==
-X-CSE-MsgGUID: W6W95T12RXSGDvBzIm4ZSg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11122"; a="20202510"
-X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
-   d="scan'208";a="20202510"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 14:38:03 -0700
-X-CSE-ConnectionGUID: w/byZf30QQaWuZGdeKyCnA==
-X-CSE-MsgGUID: C5uFQ54lSxmiMQWfzkVU1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
-   d="scan'208";a="50836347"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 03 Jul 2024 14:37:44 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 3 Jul 2024 14:37:44 -0700
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 3 Jul 2024 14:37:43 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 3 Jul 2024 14:37:43 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 3 Jul 2024 14:37:43 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=f+IFoT+yuBgrI/HXoOBdeI6b0QDVY3LphOxL9ZuR1Fjnj5LW1SQxne1cXE/DLSlIMpbLekP2ucc3oY+CjFPiIHcDE3hL5Vm60myd4up/CCcYvQ8kwzHoTTT/efXf8arz1ODTZXGB/mV/+ulZ51hHcwRGkrhvgLCujhOAK28n6t0lmmRP5MHke/9YatAzTdITNEkC1TgnUPVNUY8ZLdlRI2pf+oiTKWmEjKTa9ECc1aCBLOmjn1sto+Wk69Q3VzNSo8f5YWa5VyWxVlXSW3bEE0ZNKqQR/uCNQSyj47583rRm95vkzeom6TcUGoYqSS1tgwzL3tFgYZy6U1I1HA2tdQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aAcBdTQTieWS14AH77vpV0aGeTu7NvrEKr5+MRy6DaI=;
- b=QjslywrjTuN0VML81LWUcj75MzcXmYqe7qIpNjCKFIIKxv0K0LO5FO2uMlfwWuS+hSQsrG7GJRSvkfY2ZZrGvgzWUHVulGePh7VBxbJDTF56rCj+nD6FEuAjWaNn1Za+Qs16gkX/grrQHQ3QZWq8qcQjq+aparnxpzC0P/WvocTDBgjqosfxbr37bt9ZqpxiQm6aEGVqY38tftpq9jW5oPDWWjzJGtpeGDEEF7E87VTyNB1LCMQXXKFn279WX6BXdwaqRfxcyXnYVgmxNGtCu6g89fVCGREfjijXEhW287Uyjvt4d98r8kPfL6hpzKZXgelgikPlIfVkx/OPhoRTLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SJ2PR11MB7573.namprd11.prod.outlook.com (2603:10b6:a03:4d2::10)
- by IA0PR11MB7934.namprd11.prod.outlook.com (2603:10b6:208:40d::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7719.36; Wed, 3 Jul
- 2024 21:37:40 +0000
-Received: from SJ2PR11MB7573.namprd11.prod.outlook.com
- ([fe80::61a:aa57:1d81:a9cf]) by SJ2PR11MB7573.namprd11.prod.outlook.com
- ([fe80::61a:aa57:1d81:a9cf%3]) with mapi id 15.20.7719.029; Wed, 3 Jul 2024
- 21:37:40 +0000
-Message-ID: <9b19f440-ee78-4a4f-ab87-e9fff26ea6a4@intel.com>
-Date: Wed, 3 Jul 2024 14:37:37 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: VMX Preemption Timer appears to be buggy on SKX, CLX, and ICX
-From: Reinette Chatre <reinette.chatre@intel.com>
-To: Sean Christopherson <seanjc@google.com>
-CC: <isaku.yamahata@intel.com>, <pbonzini@redhat.com>,
-	<erdemaktas@google.com>, <vkuznets@redhat.com>, <vannapurve@google.com>,
-	<jmattson@google.com>, <mlevitsk@redhat.com>, <xiaoyao.li@intel.com>,
-	<chao.gao@intel.com>, <rick.p.edgecombe@intel.com>, <yuan.yao@intel.com>,
-	<kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Hao, Xudong"
-	<xudong.hao@intel.com>
-References: <cover.1718214999.git.reinette.chatre@intel.com>
- <2fccf35715b5ba8aec5e5708d86ad7015b8d74e6.1718214999.git.reinette.chatre@intel.com>
- <Zn9X0yFxZi_Mrlnt@google.com>
- <8a34f1d4-9f43-4fa7-9566-144b5eeda4d9@intel.com>
-Content-Language: en-US
-In-Reply-To: <8a34f1d4-9f43-4fa7-9566-144b5eeda4d9@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: MW3PR06CA0027.namprd06.prod.outlook.com
- (2603:10b6:303:2a::32) To SJ2PR11MB7573.namprd11.prod.outlook.com
- (2603:10b6:a03:4d2::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EE9194136
+	for <kvm@vger.kernel.org>; Wed,  3 Jul 2024 22:46:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720046808; cv=none; b=J+wXZ9VKkHLUswBdKjoTAb79bU56cttappJZuF6jGMcGvatNtww3BD4TgVZS4qa2DHQDdsgBemOhTC6lhFo+E+fxdnG+u38pvnkmSn5wuXK/AVLNZQpmvi8VzQC3oTkZCgz5IWObV7d/RrlwBPb3Pu4lkY96tNotCXx6p9SSpqc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720046808; c=relaxed/simple;
+	bh=lUCEVcmBer70B5oPtuWxYrEYSGZ6922zre3Xx9nh29U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VPDcTCscARmThuSMu2D4XvNP2nV7er0m6tGotlNLwhjgDkxC9QdtM6nGAEIKOZr5tAOPvJHCZXi5A2DDmEe4huLGzeiWL941S4BdXeBJfgNMIfcpZ6ujCWIErqFP1xuVXxjH2wo1BYq1aonwx/Y+tvmdlOkiUix7lktaZqpDdXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GrtMcCg4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720046804;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6YLYsco4l6cXmk5+8G0baLpqo+8dcgJ41Mj5z/Hl5Ws=;
+	b=GrtMcCg4k7VJe9AypLoXhZb3HbXDRPX7nYXdNfrBe+KugBWnvjDEg7mtcejeytzyvzZDHU
+	FrgCoKIiEx3WKI15lZOxGJGACyLxdoGK7NGKdB3SUvSzizf/9WFjIsCom2YvkcEyVKJPd9
+	gF59XIcjltwanDWYUshGy5+O9ZpFDAc=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-365-vikXxSJrNQ2rqzVFBN7X7w-1; Wed, 03 Jul 2024 18:46:42 -0400
+X-MC-Unique: vikXxSJrNQ2rqzVFBN7X7w-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52e969d34a9so1912064e87.2
+        for <kvm@vger.kernel.org>; Wed, 03 Jul 2024 15:46:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720046800; x=1720651600;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6YLYsco4l6cXmk5+8G0baLpqo+8dcgJ41Mj5z/Hl5Ws=;
+        b=j8WmGMthWRRRkF5qb+7eFYyuVOy4vYQLQsJYSLlIL5hRunZS6jkiA1UQVrOa2iHQl1
+         pOD4gUoeR64FT1PrtcbW2sTYE341YYX2jaOE/Y7v7MvzI/q7dBwW3VDbfGvvsh5Pvszd
+         61Hgg+lbD+GMJ1Hfu+JBF95mFkz27I3QjV/tB45L9nblGgnBxMipjG273YLCxSF6ZJiJ
+         2KyKLnGQirYqexnLcGR6GVK2i3lrDqQ+fXLL/RCL9rRjERvIQL9Yjpy3AIFoNepDWmBS
+         3dlpxGk1dGyvs33nOyLibbzwLAYTe3GzaauQPU6vQwhJBbWAyAUHGXAMl9luBsz44/uh
+         0KDA==
+X-Forwarded-Encrypted: i=1; AJvYcCVFUTLSGf7vtDVk5SZ8UjHxW45aT32SzV75QU5HCeqaih22iOtElhmNY8ATswJZoycwU0Ct1EHvhLTrGh4nGxXyNuTL
+X-Gm-Message-State: AOJu0YzMbS9nuhT80vXySmEbz/NmmcCmCITvWMAGbKfPnq6Ubk9zKuXF
+	nb26DCEBchtDHqS1wQNR2CRGRFQ7WRDHkNvqmXWEvcyqLe2AUO4PaP8yUjNrg6KbESYaKbbT7ab
+	o5G/r2ivLht36NlwlqvDVwBqdnLRXZ5OGyCfD/4HsppYJn7DUjw==
+X-Received: by 2002:a05:6512:2814:b0:52c:db0e:6c4a with SMTP id 2adb3069b0e04-52e8264bc06mr12021663e87.2.1720046800458;
+        Wed, 03 Jul 2024 15:46:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGffBAqru7HAWThABBLCiVEackwaX68SSbQ6Bj1MIZGcQU3SsdNumOUghLVym2RP0mw8CZ6Gw==
+X-Received: by 2002:a05:6512:2814:b0:52c:db0e:6c4a with SMTP id 2adb3069b0e04-52e8264bc06mr12021637e87.2.1720046799474;
+        Wed, 03 Jul 2024 15:46:39 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:441:91a8:a47d:5a9:c02f:92f2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a752d528ee5sm270137266b.212.2024.07.03.15.46.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jul 2024 15:46:38 -0700 (PDT)
+Date: Wed, 3 Jul 2024 18:46:34 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>,
+	Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas@t-8ch.de>,
+	Cornelia Huck <cohuck@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+Subject: [PULL v3 30/85] linux-headers: update to 6.10-rc1
+Message-ID: <c5614ee3f2775534871914c02be4b5a61b71ed40.1720046570.git.mst@redhat.com>
+References: <cover.1720046570.git.mst@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ2PR11MB7573:EE_|IA0PR11MB7934:EE_
-X-MS-Office365-Filtering-Correlation-Id: 49f5154b-ae15-4dfe-0256-08dc9ba85d5f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?T3E0SHdNaExpOGE0MVRiRFRlOVAwSHJreDZnTlM3QVUvaWh5aXIwSGUrc0pP?=
- =?utf-8?B?SnFMTFVmZS9pY3hMTDZTRVpiclFVTzU4ei9tblhkd2kvTFVXQlkvS0pzbXcz?=
- =?utf-8?B?Ym5oSEhmS3VEYy9NTnhiL0o2YTIzY3czSGRheGhBT0ZVaTRFMncvYTh6aGJ0?=
- =?utf-8?B?c2hwYmQ0VTAwekd3eUJVUlNObi8rOGJyVFB0enVsdUZWSTFqblQycjJtaHJK?=
- =?utf-8?B?MFBOUWswWFZXOTJSeDl1UjdpaWxzeDhUSGFiWW9seU10djMvT2NDeEpia1Ri?=
- =?utf-8?B?KzhxSjcrYXY0UitlTm5Kc3dmMmFqODFpQ2NIb21WOWF2dWZBd3VySks1VmxW?=
- =?utf-8?B?QUpnV0dBNWh4ZkVKRkZpUUdlRU5MbHptNmhTeWdsYXlhV2NTUTJOd3ZnYmlP?=
- =?utf-8?B?djZ4ZlpXWm9OOVJvS2xBbEJtZGgrNkV4eGw0d0hQOXJYSUtpQlZLTWtmTkc3?=
- =?utf-8?B?VzRxZ0NWZURzTUFIOW0yZm41bjc0MlJpOHA0ekowVUd2WUJETndOTUZhQklF?=
- =?utf-8?B?U0NYVUxrdkdQRm1RUkplaS9DcHRSOFBMNlo5MG9WWERmQklCRm5JVmZjaDhE?=
- =?utf-8?B?UTZkY2ZaUEFrNlRhZys5aEpQUDRVaGgxVnZ3TEVZZHdiUG50Z2FaQzlySzIz?=
- =?utf-8?B?TWNEWlpwVzUvQUhvK3dTZGo2cERIQ2ZQd1BJemlZeTlleEd4QVByR2RFUm03?=
- =?utf-8?B?bDVkRVZZN1hpOFU0VWFFK1owak9iSXp0MzBHVm13UzlBT0IrVnUwSDEycUtZ?=
- =?utf-8?B?UjlQRGo0RCtjVDFkZVk0NkNRb2VON1p5U1h3QWJiakVXc3hVSGoyRlRwdzJF?=
- =?utf-8?B?TFpoOHNVV0hyMUoydVl5STlPTW5KejZobU5Nak1hSUUrWGkzUmpxMm56T04z?=
- =?utf-8?B?VldYRVlkamJRUEtldCtEVmE3RWxteUVtWmJmZGI2T3Z3Y1loQlE3N3h3Z2ND?=
- =?utf-8?B?NTVQcm1OTEZIMTN3ZHhDUWphVnRhdFFXdEg5dDJuSmF1SkdqVFhLeGlIa3ZR?=
- =?utf-8?B?UC8zeUYzOGtNd2NQSHR0dkxxMksxeDgyRWNNVmxEb0JVUFk0RjRwcWZSeVBC?=
- =?utf-8?B?WVpEZmppUVUyUE1kcENMYU5WOCtpdVdkU0Z6R3cwSitnT29MdUt1VHIyYlRk?=
- =?utf-8?B?aTM1UzJRRmpJTFFOL2JtUjVMMnpac01HR2RVT2JPZ0JrVUtjQXVJcm1vZlRj?=
- =?utf-8?B?VnNsSFk1V3NyRXhRenc4aHZJdWpPOHN2VzRTa2dqMG1oSElOQ2NFRXM4eExi?=
- =?utf-8?B?dC83RTkzci9CVm85eGo4Z2lFRTlIb0hEK2NqMkdsZzRKQ2ZxVmRsemRmOW5W?=
- =?utf-8?B?dU5vVFJRT0xhMVg0K2RzOHpCcVVaYy9SODd6SW00dG1raWs2eVpuemgvcG9z?=
- =?utf-8?B?NXB0bEN5SWJnOUhxM09LMXBMVFQ2azhUd3BmQU80dHA1cG5Yd1FTaXdra2ZN?=
- =?utf-8?B?SUd3RUZTVDhGS3Y2aXZSUWNHL09KTlZRbkNPNHBqZkhaeW5mQ3ZOWnV1S096?=
- =?utf-8?B?U0dMN2lqOVNkRXYzcm92T21Jc3JwbDhlZnVLMmdpWmV4bWhLejhaT0VrZHVW?=
- =?utf-8?B?c2tvVmlOWTFGU3JsV25NTUxCVHdjVEF2T3Z6R3NyQnJPYkw4aElqN1BVMnZ4?=
- =?utf-8?B?WWIwUEJhS1U2UmROSWpCOGpqNUJ1a2w2S213SHJzK2JsNWVoODV3T2pobnRm?=
- =?utf-8?B?bGZ6R1dLRFV3UmdZRFVzRlJMaXhOVUl4NGdhZ2lMQkRUMkxoZjM3SkhxRXY2?=
- =?utf-8?B?MkRkaXp0SlQ0WDZvMTNvQStWNXlja1pBQm55UlJUbmtQZE0rdW95dVdCUCtw?=
- =?utf-8?Q?ppnIzdoL7dkv1g2M8cTL5XsSL24w7g/ANi7rI=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR11MB7573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?aFBxMGZSMzNxSm4vR3BGTndJUGxKaVBvQ0VIYktHWTdMNFl4Tkk1Wkk1cHRE?=
- =?utf-8?B?Q05IcmM4b2xKUVJGaGM3emdOS1ZWT2tkV2drcXhSZXU3K2pNM1BrNXpDaEV3?=
- =?utf-8?B?NHdUT3p1TW1WK2V6VEtsQlF5azBDUVo3SmtHdWlsSXV0dXhEN05BK01NcGJP?=
- =?utf-8?B?bVBXWk4rRG9wbjJmcUZqTHhjaUxXa2I0L3JoSnQycVNyeXZoaFpRdWNWK2ho?=
- =?utf-8?B?enZWZE5PRkJoNm4vYUJvUWFjL0pGMyszL1RMVXRrbE9UYmtkcXZ0TmRJcmFs?=
- =?utf-8?B?Z3VRcmYzZFVlZUJ4SEtsTFJHRy9yK0pFK0QyOXhIU1A5dDJ0eVNQK2RlSW50?=
- =?utf-8?B?d0NHVkc0S3FoYjUzNnRNbmtISXJBRTRMUW1ubW04NE1mdXpyZzRjdHpTRkN2?=
- =?utf-8?B?Z0c4WTBzcTF5MHhiOEN2STJuUXJzanM0dzZ2R3RRaHZ5dVJNUTI5cVpDWUFK?=
- =?utf-8?B?ZTNrWTQ3RVFVWnhGeFZ6a2x5MEFFb3poZEZHZ3pYQWFzMm4vdGk0U1NSVEQy?=
- =?utf-8?B?WGUyRUpvMnlENVd1SWlSNERxc2Z5djZTTDM5bE0ySDJ5dlQvQ0F2aU9zYVky?=
- =?utf-8?B?RGtuc3JrWEdqdU5keEJKRjBkWUhjcjY4dWt6ejRNWVdhbjlPTkZXS3JnQTAw?=
- =?utf-8?B?WFNzT0w1UXBTOWZqakhBcGQrMHJ5OGZwaVBSRE5kampobTMrRkpCcE4rL0RO?=
- =?utf-8?B?dS9ndGxEUlVvaVZGOHNUZlBnL1pVUXZtbUx6Sk4wZW9tNWptM1pXbitHbnZO?=
- =?utf-8?B?Yy8wV1l3RVMxQmJwOW42bmt5cm5seXl4YzY0Z2tHQUc4SVZDdUxIY1hKcGtN?=
- =?utf-8?B?V1BMZ0RKZGJpL0MrdXVqS3JycklxSHlDNnRpZ3c3Y0cwK0pBZGhWemppdW9z?=
- =?utf-8?B?SEx2YkhMYlRlVUlUYzR1eEtjcmpudFNUc1lpZ2hhZmtYNEpTZ01RSC9ZUlhh?=
- =?utf-8?B?N2Z2dlBwNTV3Zkg3S3NQcEcybWsyMTRTcmVCeDM1Nlk3TXdZOVB5TWZYUklC?=
- =?utf-8?B?aUU2R2RPNndhNTB5bU9adFpKLzNUUmh1ZDM1SEVaaG5aNWtRb1o2eWpZQ3Ez?=
- =?utf-8?B?MXN5K1FFdUFOdHl6a1BIQlo0aEZtZWtNaFV4K3Y5NGJ0REJUNGErcklqWnE1?=
- =?utf-8?B?ZmlJKzZsWUxqenI0MS94d2RxbmYvZXJFTGs2ZEc3bW00RlhPdFRqdHpFY09W?=
- =?utf-8?B?WmNnUTdrVm42NzZlR0RQTHFGdlAvTzU2V1JTZzRmTitZUlc1VmFEdG40RXJJ?=
- =?utf-8?B?a0puQzIzQmVUMktheU1HcXVDbldSbEJaUUNVOFphUUtmbWZZK1hCTGhQSi9o?=
- =?utf-8?B?VVU5RkpIY1p5d2JzTERxZXdjK0RFaUFoQ3RXWER6ZDV0V3l1NFdrdlM2NXFq?=
- =?utf-8?B?S1ZHdXpLL3RlM2lWdGRkd0RuYU51SERNV2Y2UzZ3QTF0TkQzN0xaSkZpT3Np?=
- =?utf-8?B?WklFTlRodWkvQUNQeHloaGNvdFVGRVZhMmRBcGJNblJjR0JreUxIWitiOUJ6?=
- =?utf-8?B?VEdDS01ERDJVUk9aWGZkNnhwNGZjck9kWlBNRFZKazdqUWxBYWhvakp3a09v?=
- =?utf-8?B?ZkoreHJpd0JJVDB5TkpQbVU5V3FZRENIc09LNng2VzJnYnFUWnVEdjZRVjNE?=
- =?utf-8?B?dmhnQkZLU0VxU3htMDBmR1p6bjlycEpibjJCNDJOd1BCUllpMWRzaVFyRGRJ?=
- =?utf-8?B?TWdyYkEwV0RlOEhPenVMcGh4amR3TDU5WEczYnhsNmdaNGhCQmxhbTFBaDM5?=
- =?utf-8?B?MGJrOXNPOVc4ek56RFIzcmJXd0tXSnFvZ2pJLzNOcDhTL25WT25SMGM0ZitX?=
- =?utf-8?B?SGpoa0NHcnVRTjArUzQwWHRWSHgrQjJnenhXcnYvVzZiZFZGbjJ3S3RuVk1s?=
- =?utf-8?B?YkRnNzF2UjBXbTNaMjY4VHh1cExVWXk4TWU1aWJZVklRdDBpSEFFNCtoNFE3?=
- =?utf-8?B?OFNWWDBHa0MwOWFKVXRHUGMwV1J2WElCYXZnak1BMndjM3RhaE9ETWFBMjNB?=
- =?utf-8?B?S3dmbkQ5cTJ3Ym9LQ0FLYWVrd0N5RjYyU1FxT2pnSHZDZkpUVVo2MTlIVUhL?=
- =?utf-8?B?QWNjYU1UTW1wV0pQSCtZZk9PUDUwUFhtWS8yM3BWbEwxNVNrREwyM01VcFUr?=
- =?utf-8?B?dkp4bU5nWGs4NzI5VVlHK0h5ZkNPN0JzZHV4MGRicHBDRitESDAwSkJhbTN5?=
- =?utf-8?B?U1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 49f5154b-ae15-4dfe-0256-08dc9ba85d5f
-X-MS-Exchange-CrossTenant-AuthSource: SJ2PR11MB7573.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2024 21:37:40.4101
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0d5Y3Y+mu+IUd5L/hp/a0lueZiEO0QWFVWKBHNquI0WYHGr1fIsmHydFRBP9KHv9VVo0AljBFltC7nVnyII1OHYY9yAg0FLTY+iedi65N5Q=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7934
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cover.1720046570.git.mst@redhat.com>
+X-Mailer: git-send-email 2.27.0.106.g8ac3dc51b1
+X-Mutt-Fcc: =sent
 
+From: Thomas Weißschuh <thomas@t-8ch.de>
 
-(a short update ...)
+Signed-off-by: Thomas Weißschuh <thomas@t-8ch.de>
+Message-Id: <20240527-pvpanic-shutdown-v8-2-5a28ec02558b@t-8ch.de>
+Reviewed-by: Michael S. Tsirkin <mst@redhat.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+---
+ include/standard-headers/linux/ethtool.h    |  55 ++++++++
+ include/standard-headers/linux/pci_regs.h   |   6 +
+ include/standard-headers/linux/virtio_bt.h  |   1 -
+ include/standard-headers/linux/virtio_mem.h |   2 +
+ include/standard-headers/linux/virtio_net.h | 143 ++++++++++++++++++++
+ include/standard-headers/misc/pvpanic.h     |   7 +-
+ linux-headers/asm-generic/unistd.h          |   5 +-
+ linux-headers/asm-mips/unistd_n32.h         |   1 +
+ linux-headers/asm-mips/unistd_n64.h         |   1 +
+ linux-headers/asm-mips/unistd_o32.h         |   1 +
+ linux-headers/asm-powerpc/unistd_32.h       |   1 +
+ linux-headers/asm-powerpc/unistd_64.h       |   1 +
+ linux-headers/asm-s390/unistd_32.h          |   1 +
+ linux-headers/asm-s390/unistd_64.h          |   1 +
+ linux-headers/asm-x86/unistd_32.h           |   1 +
+ linux-headers/asm-x86/unistd_64.h           |   1 +
+ linux-headers/asm-x86/unistd_x32.h          |   2 +
+ linux-headers/linux/kvm.h                   |   4 +-
+ linux-headers/linux/stddef.h                |   8 ++
+ 19 files changed, 236 insertions(+), 6 deletions(-)
 
-On 7/3/24 1:14 PM, Reinette Chatre wrote:
-> On 6/28/24 5:39 PM, Sean Christopherson wrote:
->> Forking this off to try and avoid confusion...
->>
->> On Wed, Jun 12, 2024, Reinette Chatre wrote:
-> 
-> ...
-> 
->>> +
->>> +        freq = (tmict - tmcct) * tdcrs[i].divide_count * tsc_hz / (tsc1 - tsc0);
->>> +        /* Check if measured frequency is within 1% of configured frequency. */
->>> +        GUEST_ASSERT(freq < apic_hz * 101 / 100);
->>> +        GUEST_ASSERT(freq > apic_hz * 99 / 100);
->>> +    }
->>
->> This test fails on our SKX, CLX, and ICX systems due to what appears to be a CPU
->> bug.  It looks like something APICv related is clobbering internal VMX timer state?
->> Or maybe there's a tearing or truncation issue?
-> 
-> It has been a few days. Just a note to let you know that we are investigating this.
-> On my side I have not yet been able to reproduce this issue. I tested
-> kvm-x86-next-2024.06.28 on an ICX and an CLX system by running 100 iterations of
-> apic_bus_clock_test and they all passed. Since I have lack of experience here there are
-> some Intel virtualization experts helping out with this investigation and I hope that
-> they will be some insights from the analysis and testing that you already provided.
+diff --git a/include/standard-headers/linux/ethtool.h b/include/standard-headers/linux/ethtool.h
+index 01503784d2..b0b4b68410 100644
+--- a/include/standard-headers/linux/ethtool.h
++++ b/include/standard-headers/linux/ethtool.h
+@@ -752,6 +752,61 @@ enum ethtool_module_power_mode {
+ 	ETHTOOL_MODULE_POWER_MODE_HIGH,
+ };
+ 
++/**
++ * enum ethtool_pse_types - Types of PSE controller.
++ * @ETHTOOL_PSE_UNKNOWN: Type of PSE controller is unknown
++ * @ETHTOOL_PSE_PODL: PSE controller which support PoDL
++ * @ETHTOOL_PSE_C33: PSE controller which support Clause 33 (PoE)
++ */
++enum ethtool_pse_types {
++	ETHTOOL_PSE_UNKNOWN =	1 << 0,
++	ETHTOOL_PSE_PODL =	1 << 1,
++	ETHTOOL_PSE_C33 =	1 << 2,
++};
++
++/**
++ * enum ethtool_c33_pse_admin_state - operational state of the PoDL PSE
++ *	functions. IEEE 802.3-2022 30.9.1.1.2 aPSEAdminState
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN: state of PSE functions is unknown
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED: PSE functions are disabled
++ * @ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED: PSE functions are enabled
++ */
++enum ethtool_c33_pse_admin_state {
++	ETHTOOL_C33_PSE_ADMIN_STATE_UNKNOWN = 1,
++	ETHTOOL_C33_PSE_ADMIN_STATE_DISABLED,
++	ETHTOOL_C33_PSE_ADMIN_STATE_ENABLED,
++};
++
++/**
++ * enum ethtool_c33_pse_pw_d_status - power detection status of the PSE.
++ *	IEEE 802.3-2022 30.9.1.1.3 aPoDLPSEPowerDetectionStatus:
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN: PSE status is unknown
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED: The enumeration "disabled"
++ *	indicates that the PSE State diagram is in the state DISABLED.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING: The enumeration "searching"
++ *	indicates the PSE State diagram is in a state other than those
++ *	listed.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING: The enumeration
++ *	"deliveringPower" indicates that the PSE State diagram is in the
++ *	state POWER_ON.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_TEST: The enumeration "test" indicates that
++ *	the PSE State diagram is in the state TEST_MODE.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_FAULT: The enumeration "fault" indicates that
++ *	the PSE State diagram is in the state TEST_ERROR.
++ * @ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT: The enumeration "otherFault"
++ *	indicates that the PSE State diagram is in the state IDLE due to
++ *	the variable error_condition = true.
++ */
++enum ethtool_c33_pse_pw_d_status {
++	ETHTOOL_C33_PSE_PW_D_STATUS_UNKNOWN = 1,
++	ETHTOOL_C33_PSE_PW_D_STATUS_DISABLED,
++	ETHTOOL_C33_PSE_PW_D_STATUS_SEARCHING,
++	ETHTOOL_C33_PSE_PW_D_STATUS_DELIVERING,
++	ETHTOOL_C33_PSE_PW_D_STATUS_TEST,
++	ETHTOOL_C33_PSE_PW_D_STATUS_FAULT,
++	ETHTOOL_C33_PSE_PW_D_STATUS_OTHERFAULT,
++};
++
+ /**
+  * enum ethtool_podl_pse_admin_state - operational state of the PoDL PSE
+  *	functions. IEEE 802.3-2018 30.15.1.1.2 aPoDLPSEAdminState
+diff --git a/include/standard-headers/linux/pci_regs.h b/include/standard-headers/linux/pci_regs.h
+index a39193213f..94c00996e6 100644
+--- a/include/standard-headers/linux/pci_regs.h
++++ b/include/standard-headers/linux/pci_regs.h
+@@ -1144,8 +1144,14 @@
+ #define PCI_DOE_DATA_OBJECT_HEADER_2_LENGTH		0x0003ffff
+ 
+ #define PCI_DOE_DATA_OBJECT_DISC_REQ_3_INDEX		0x000000ff
++#define PCI_DOE_DATA_OBJECT_DISC_REQ_3_VER		0x0000ff00
+ #define PCI_DOE_DATA_OBJECT_DISC_RSP_3_VID		0x0000ffff
+ #define PCI_DOE_DATA_OBJECT_DISC_RSP_3_PROTOCOL		0x00ff0000
+ #define PCI_DOE_DATA_OBJECT_DISC_RSP_3_NEXT_INDEX	0xff000000
+ 
++/* Compute Express Link (CXL r3.1, sec 8.1.5) */
++#define PCI_DVSEC_CXL_PORT				3
++#define PCI_DVSEC_CXL_PORT_CTL				0x0c
++#define PCI_DVSEC_CXL_PORT_CTL_UNMASK_SBR		0x00000001
++
+ #endif /* LINUX_PCI_REGS_H */
+diff --git a/include/standard-headers/linux/virtio_bt.h b/include/standard-headers/linux/virtio_bt.h
+index a11ecc3f92..6f0dee7e32 100644
+--- a/include/standard-headers/linux/virtio_bt.h
++++ b/include/standard-headers/linux/virtio_bt.h
+@@ -13,7 +13,6 @@
+ 
+ enum virtio_bt_config_type {
+ 	VIRTIO_BT_CONFIG_TYPE_PRIMARY	= 0,
+-	VIRTIO_BT_CONFIG_TYPE_AMP	= 1,
+ };
+ 
+ enum virtio_bt_config_vendor {
+diff --git a/include/standard-headers/linux/virtio_mem.h b/include/standard-headers/linux/virtio_mem.h
+index 18c74c527c..6bfa41bd8b 100644
+--- a/include/standard-headers/linux/virtio_mem.h
++++ b/include/standard-headers/linux/virtio_mem.h
+@@ -90,6 +90,8 @@
+ #define VIRTIO_MEM_F_ACPI_PXM		0
+ /* unplugged memory must not be accessed */
+ #define VIRTIO_MEM_F_UNPLUGGED_INACCESSIBLE	1
++/* plugged memory will remain plugged when suspending+resuming */
++#define VIRTIO_MEM_F_PERSISTENT_SUSPEND		2
+ 
+ 
+ /* --- virtio-mem: guest -> host requests --- */
+diff --git a/include/standard-headers/linux/virtio_net.h b/include/standard-headers/linux/virtio_net.h
+index 0f88417742..fc594fe5fc 100644
+--- a/include/standard-headers/linux/virtio_net.h
++++ b/include/standard-headers/linux/virtio_net.h
+@@ -56,6 +56,7 @@
+ #define VIRTIO_NET_F_MQ	22	/* Device supports Receive Flow
+ 					 * Steering */
+ #define VIRTIO_NET_F_CTRL_MAC_ADDR 23	/* Set MAC address */
++#define VIRTIO_NET_F_DEVICE_STATS 50	/* Device can provide device-level statistics. */
+ #define VIRTIO_NET_F_VQ_NOTF_COAL 52	/* Device supports virtqueue notification coalescing */
+ #define VIRTIO_NET_F_NOTF_COAL	53	/* Device supports notifications coalescing */
+ #define VIRTIO_NET_F_GUEST_USO4	54	/* Guest can handle USOv4 in. */
+@@ -406,4 +407,146 @@ struct  virtio_net_ctrl_coal_vq {
+ 	struct virtio_net_ctrl_coal coal;
+ };
+ 
++/*
++ * Device Statistics
++ */
++#define VIRTIO_NET_CTRL_STATS         8
++#define VIRTIO_NET_CTRL_STATS_QUERY   0
++#define VIRTIO_NET_CTRL_STATS_GET     1
++
++struct virtio_net_stats_capabilities {
++
++#define VIRTIO_NET_STATS_TYPE_CVQ       (1ULL << 32)
++
++#define VIRTIO_NET_STATS_TYPE_RX_BASIC  (1ULL << 0)
++#define VIRTIO_NET_STATS_TYPE_RX_CSUM   (1ULL << 1)
++#define VIRTIO_NET_STATS_TYPE_RX_GSO    (1ULL << 2)
++#define VIRTIO_NET_STATS_TYPE_RX_SPEED  (1ULL << 3)
++
++#define VIRTIO_NET_STATS_TYPE_TX_BASIC  (1ULL << 16)
++#define VIRTIO_NET_STATS_TYPE_TX_CSUM   (1ULL << 17)
++#define VIRTIO_NET_STATS_TYPE_TX_GSO    (1ULL << 18)
++#define VIRTIO_NET_STATS_TYPE_TX_SPEED  (1ULL << 19)
++
++	uint64_t supported_stats_types[1];
++};
++
++struct virtio_net_ctrl_queue_stats {
++	struct {
++		uint16_t vq_index;
++		uint16_t reserved[3];
++		uint64_t types_bitmap[1];
++	} stats[1];
++};
++
++struct virtio_net_stats_reply_hdr {
++#define VIRTIO_NET_STATS_TYPE_REPLY_CVQ       32
++
++#define VIRTIO_NET_STATS_TYPE_REPLY_RX_BASIC  0
++#define VIRTIO_NET_STATS_TYPE_REPLY_RX_CSUM   1
++#define VIRTIO_NET_STATS_TYPE_REPLY_RX_GSO    2
++#define VIRTIO_NET_STATS_TYPE_REPLY_RX_SPEED  3
++
++#define VIRTIO_NET_STATS_TYPE_REPLY_TX_BASIC  16
++#define VIRTIO_NET_STATS_TYPE_REPLY_TX_CSUM   17
++#define VIRTIO_NET_STATS_TYPE_REPLY_TX_GSO    18
++#define VIRTIO_NET_STATS_TYPE_REPLY_TX_SPEED  19
++	uint8_t type;
++	uint8_t reserved;
++	uint16_t vq_index;
++	uint16_t reserved1;
++	uint16_t size;
++};
++
++struct virtio_net_stats_cvq {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t command_num;
++	uint64_t ok_num;
++};
++
++struct virtio_net_stats_rx_basic {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t rx_notifications;
++
++	uint64_t rx_packets;
++	uint64_t rx_bytes;
++
++	uint64_t rx_interrupts;
++
++	uint64_t rx_drops;
++	uint64_t rx_drop_overruns;
++};
++
++struct virtio_net_stats_tx_basic {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t tx_notifications;
++
++	uint64_t tx_packets;
++	uint64_t tx_bytes;
++
++	uint64_t tx_interrupts;
++
++	uint64_t tx_drops;
++	uint64_t tx_drop_malformed;
++};
++
++struct virtio_net_stats_rx_csum {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t rx_csum_valid;
++	uint64_t rx_needs_csum;
++	uint64_t rx_csum_none;
++	uint64_t rx_csum_bad;
++};
++
++struct virtio_net_stats_tx_csum {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t tx_csum_none;
++	uint64_t tx_needs_csum;
++};
++
++struct virtio_net_stats_rx_gso {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t rx_gso_packets;
++	uint64_t rx_gso_bytes;
++	uint64_t rx_gso_packets_coalesced;
++	uint64_t rx_gso_bytes_coalesced;
++};
++
++struct virtio_net_stats_tx_gso {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	uint64_t tx_gso_packets;
++	uint64_t tx_gso_bytes;
++	uint64_t tx_gso_segments;
++	uint64_t tx_gso_segments_bytes;
++	uint64_t tx_gso_packets_noseg;
++	uint64_t tx_gso_bytes_noseg;
++};
++
++struct virtio_net_stats_rx_speed {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	/* rx_{packets,bytes}_allowance_exceeded are too long. So rename to
++	 * short name.
++	 */
++	uint64_t rx_ratelimit_packets;
++	uint64_t rx_ratelimit_bytes;
++};
++
++struct virtio_net_stats_tx_speed {
++	struct virtio_net_stats_reply_hdr hdr;
++
++	/* tx_{packets,bytes}_allowance_exceeded are too long. So rename to
++	 * short name.
++	 */
++	uint64_t tx_ratelimit_packets;
++	uint64_t tx_ratelimit_bytes;
++};
++
+ #endif /* _LINUX_VIRTIO_NET_H */
+diff --git a/include/standard-headers/misc/pvpanic.h b/include/standard-headers/misc/pvpanic.h
+index 54b7485390..b115094431 100644
+--- a/include/standard-headers/misc/pvpanic.h
++++ b/include/standard-headers/misc/pvpanic.h
+@@ -3,7 +3,10 @@
+ #ifndef __PVPANIC_H__
+ #define __PVPANIC_H__
+ 
+-#define PVPANIC_PANICKED	(1 << 0)
+-#define PVPANIC_CRASH_LOADED	(1 << 1)
++#include "standard-headers/linux/const.h"
++
++#define PVPANIC_PANICKED	_BITUL(0)
++#define PVPANIC_CRASH_LOADED	_BITUL(1)
++#define PVPANIC_SHUTDOWN	_BITUL(2)
+ 
+ #endif /* __PVPANIC_H__ */
+diff --git a/linux-headers/asm-generic/unistd.h b/linux-headers/asm-generic/unistd.h
+index 75f00965ab..d983c48a3b 100644
+--- a/linux-headers/asm-generic/unistd.h
++++ b/linux-headers/asm-generic/unistd.h
+@@ -842,8 +842,11 @@ __SYSCALL(__NR_lsm_set_self_attr, sys_lsm_set_self_attr)
+ #define __NR_lsm_list_modules 461
+ __SYSCALL(__NR_lsm_list_modules, sys_lsm_list_modules)
+ 
++#define __NR_mseal 462
++__SYSCALL(__NR_mseal, sys_mseal)
++
+ #undef __NR_syscalls
+-#define __NR_syscalls 462
++#define __NR_syscalls 463
+ 
+ /*
+  * 32 bit systems traditionally used different
+diff --git a/linux-headers/asm-mips/unistd_n32.h b/linux-headers/asm-mips/unistd_n32.h
+index ce2e050a9b..fc93b3be30 100644
+--- a/linux-headers/asm-mips/unistd_n32.h
++++ b/linux-headers/asm-mips/unistd_n32.h
+@@ -390,5 +390,6 @@
+ #define __NR_lsm_get_self_attr (__NR_Linux + 459)
+ #define __NR_lsm_set_self_attr (__NR_Linux + 460)
+ #define __NR_lsm_list_modules (__NR_Linux + 461)
++#define __NR_mseal (__NR_Linux + 462)
+ 
+ #endif /* _ASM_UNISTD_N32_H */
+diff --git a/linux-headers/asm-mips/unistd_n64.h b/linux-headers/asm-mips/unistd_n64.h
+index 5bfb3733ff..e72a3eb2c9 100644
+--- a/linux-headers/asm-mips/unistd_n64.h
++++ b/linux-headers/asm-mips/unistd_n64.h
+@@ -366,5 +366,6 @@
+ #define __NR_lsm_get_self_attr (__NR_Linux + 459)
+ #define __NR_lsm_set_self_attr (__NR_Linux + 460)
+ #define __NR_lsm_list_modules (__NR_Linux + 461)
++#define __NR_mseal (__NR_Linux + 462)
+ 
+ #endif /* _ASM_UNISTD_N64_H */
+diff --git a/linux-headers/asm-mips/unistd_o32.h b/linux-headers/asm-mips/unistd_o32.h
+index 02eaecd020..b86eb0786c 100644
+--- a/linux-headers/asm-mips/unistd_o32.h
++++ b/linux-headers/asm-mips/unistd_o32.h
+@@ -436,5 +436,6 @@
+ #define __NR_lsm_get_self_attr (__NR_Linux + 459)
+ #define __NR_lsm_set_self_attr (__NR_Linux + 460)
+ #define __NR_lsm_list_modules (__NR_Linux + 461)
++#define __NR_mseal (__NR_Linux + 462)
+ 
+ #endif /* _ASM_UNISTD_O32_H */
+diff --git a/linux-headers/asm-powerpc/unistd_32.h b/linux-headers/asm-powerpc/unistd_32.h
+index bbab08d6ec..28627b6546 100644
+--- a/linux-headers/asm-powerpc/unistd_32.h
++++ b/linux-headers/asm-powerpc/unistd_32.h
+@@ -443,6 +443,7 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ 
+ #endif /* _ASM_UNISTD_32_H */
+diff --git a/linux-headers/asm-powerpc/unistd_64.h b/linux-headers/asm-powerpc/unistd_64.h
+index af34cde70f..1fc42a8300 100644
+--- a/linux-headers/asm-powerpc/unistd_64.h
++++ b/linux-headers/asm-powerpc/unistd_64.h
+@@ -415,6 +415,7 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ 
+ #endif /* _ASM_UNISTD_64_H */
+diff --git a/linux-headers/asm-s390/unistd_32.h b/linux-headers/asm-s390/unistd_32.h
+index a3ece69d82..7706c21b87 100644
+--- a/linux-headers/asm-s390/unistd_32.h
++++ b/linux-headers/asm-s390/unistd_32.h
+@@ -434,5 +434,6 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ #endif /* _ASM_S390_UNISTD_32_H */
+diff --git a/linux-headers/asm-s390/unistd_64.h b/linux-headers/asm-s390/unistd_64.h
+index 8c5fd93495..62082d592d 100644
+--- a/linux-headers/asm-s390/unistd_64.h
++++ b/linux-headers/asm-s390/unistd_64.h
+@@ -382,5 +382,6 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ #endif /* _ASM_S390_UNISTD_64_H */
+diff --git a/linux-headers/asm-x86/unistd_32.h b/linux-headers/asm-x86/unistd_32.h
+index 5c9c329e93..fb7b8b169b 100644
+--- a/linux-headers/asm-x86/unistd_32.h
++++ b/linux-headers/asm-x86/unistd_32.h
+@@ -452,6 +452,7 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ 
+ #endif /* _ASM_UNISTD_32_H */
+diff --git a/linux-headers/asm-x86/unistd_64.h b/linux-headers/asm-x86/unistd_64.h
+index d9aab7ae87..da439afee1 100644
+--- a/linux-headers/asm-x86/unistd_64.h
++++ b/linux-headers/asm-x86/unistd_64.h
+@@ -374,6 +374,7 @@
+ #define __NR_lsm_get_self_attr 459
+ #define __NR_lsm_set_self_attr 460
+ #define __NR_lsm_list_modules 461
++#define __NR_mseal 462
+ 
+ 
+ #endif /* _ASM_UNISTD_64_H */
+diff --git a/linux-headers/asm-x86/unistd_x32.h b/linux-headers/asm-x86/unistd_x32.h
+index 63cdd1ee43..4fcb607c72 100644
+--- a/linux-headers/asm-x86/unistd_x32.h
++++ b/linux-headers/asm-x86/unistd_x32.h
+@@ -318,6 +318,7 @@
+ #define __NR_set_mempolicy_home_node (__X32_SYSCALL_BIT + 450)
+ #define __NR_cachestat (__X32_SYSCALL_BIT + 451)
+ #define __NR_fchmodat2 (__X32_SYSCALL_BIT + 452)
++#define __NR_map_shadow_stack (__X32_SYSCALL_BIT + 453)
+ #define __NR_futex_wake (__X32_SYSCALL_BIT + 454)
+ #define __NR_futex_wait (__X32_SYSCALL_BIT + 455)
+ #define __NR_futex_requeue (__X32_SYSCALL_BIT + 456)
+@@ -326,6 +327,7 @@
+ #define __NR_lsm_get_self_attr (__X32_SYSCALL_BIT + 459)
+ #define __NR_lsm_set_self_attr (__X32_SYSCALL_BIT + 460)
+ #define __NR_lsm_list_modules (__X32_SYSCALL_BIT + 461)
++#define __NR_mseal (__X32_SYSCALL_BIT + 462)
+ #define __NR_rt_sigaction (__X32_SYSCALL_BIT + 512)
+ #define __NR_rt_sigreturn (__X32_SYSCALL_BIT + 513)
+ #define __NR_ioctl (__X32_SYSCALL_BIT + 514)
+diff --git a/linux-headers/linux/kvm.h b/linux-headers/linux/kvm.h
+index 038731cdef..c93876ca0b 100644
+--- a/linux-headers/linux/kvm.h
++++ b/linux-headers/linux/kvm.h
+@@ -1217,9 +1217,9 @@ struct kvm_vfio_spapr_tce {
+ /* Available with KVM_CAP_SPAPR_RESIZE_HPT */
+ #define KVM_PPC_RESIZE_HPT_PREPARE _IOR(KVMIO, 0xad, struct kvm_ppc_resize_hpt)
+ #define KVM_PPC_RESIZE_HPT_COMMIT  _IOR(KVMIO, 0xae, struct kvm_ppc_resize_hpt)
+-/* Available with KVM_CAP_PPC_RADIX_MMU or KVM_CAP_PPC_HASH_MMU_V3 */
++/* Available with KVM_CAP_PPC_MMU_RADIX or KVM_CAP_PPC_MMU_HASH_V3 */
+ #define KVM_PPC_CONFIGURE_V3_MMU  _IOW(KVMIO,  0xaf, struct kvm_ppc_mmuv3_cfg)
+-/* Available with KVM_CAP_PPC_RADIX_MMU */
++/* Available with KVM_CAP_PPC_MMU_RADIX */
+ #define KVM_PPC_GET_RMMU_INFO	  _IOW(KVMIO,  0xb0, struct kvm_ppc_rmmu_info)
+ /* Available with KVM_CAP_PPC_GET_CPU_CHAR */
+ #define KVM_PPC_GET_CPU_CHAR	  _IOR(KVMIO,  0xb1, struct kvm_ppc_cpu_char)
+diff --git a/linux-headers/linux/stddef.h b/linux-headers/linux/stddef.h
+index bf9749dd14..96aa341942 100644
+--- a/linux-headers/linux/stddef.h
++++ b/linux-headers/linux/stddef.h
+@@ -55,4 +55,12 @@
+ #define __counted_by(m)
+ #endif
+ 
++#ifndef __counted_by_le
++#define __counted_by_le(m)
++#endif
++
++#ifndef __counted_by_be
++#define __counted_by_be(m)
++#endif
++
+ #endif /* _LINUX_STDDEF_H */
+-- 
+MST
 
-I have now been able to test on SKX also and I am not yet able to reproduce. For
-reference, the systems I tested on are:
-SKX: https://ark.intel.com/content/www/us/en/ark/products/120507/intel-xeon-platinum-8170m-processor-35-75m-cache-2-10-ghz.html
-ICX: https://ark.intel.com/content/www/us/en/ark/products/212459/intel-xeon-platinum-8360y-processor-54m-cache-2-40-ghz.html
-CLX: https://ark.intel.com/content/www/us/en/ark/products/192476/intel-xeon-platinum-8260l-processor-35-75m-cache-2-40-ghz.html
-
-Reinette
 
