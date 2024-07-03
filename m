@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-20869-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20870-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95FBC924D9C
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 04:15:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1281B924D9E
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 04:15:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E40E28720D
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 02:15:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCC94288665
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 02:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB6A92D7A8;
-	Wed,  3 Jul 2024 02:12:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8EA39AD6;
+	Wed,  3 Jul 2024 02:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cCROZzbT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F7U8Y1E4"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928AA28370;
-	Wed,  3 Jul 2024 02:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6078F8F49;
+	Wed,  3 Jul 2024 02:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1719972770; cv=none; b=Otek2RQ/KYSYEj+ljbcFuJmg7tfu0uic2SErPK+olpg8iU4ZgGMRqJEFq13qmV07amhiuGST+CjJBCgEIK7osz4T05JhMF/fbhtuMF74d5Y495+Z/GRlHekD23JbyduOfUmx3mNYnwAhYuGv4I/vI/LBiILZ2lt/sOsbqXwpow0=
+	t=1719972772; cv=none; b=pACiiorrhXMVEBKvIwm3H4R1+98c9bMZRkoNswoa1mUELIhiovWlO+bmBPn2Ha9VF7a2dyZ0yCKwRir1/3DQ9zcP8BPu5bqfKXGqxlOqEshfPjyoyCYv3Nsoq1IajYod+8qqBVckPNvpYLb3/bEsFlrqWVbeGCQMiI4b8cTaOJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1719972770; c=relaxed/simple;
-	bh=NOKncSb0XiiYQO6c+6ANmKchgy105hDTLQorIKO0dWY=;
+	s=arc-20240116; t=1719972772; c=relaxed/simple;
+	bh=9J4gTUwUn2cWSw1SNih0bGr/MeYBF/9jYecIo0DiWaY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZozGjgDa4ukhVlGaXQq78aUY9LVHF4CuSUNShDZ4iThkWtLOZ81/taGz+HN2UxRI2ld+nKvgikeUPxB9xCw12rML252Ebu5nJK0exZabNd3/AqzXrKUCDnuA6/f0kbtR6dlnVfndQnI1mOYvdl0m5CCbaDU6YNdq/nKz/4EGpv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cCROZzbT; arc=none smtp.client-ip=192.198.163.15
+	 MIME-Version; b=WwF+nCKczeX+zkzCbLr3JY5aeDvtwth3rpQq2gCZuxapGry3JY4Sfu8R52yugxFQZu9dzG8GrEb8d9VErtzVwi1hQNIPdug7+DDQvnq03jvhO9ju5e3kRUWv/w0COaSEOltX2Gtd+CC2mevJundPo/hYa765WsWWuRSYo36n/AY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F7U8Y1E4; arc=none smtp.client-ip=192.198.163.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1719972768; x=1751508768;
+  t=1719972771; x=1751508771;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NOKncSb0XiiYQO6c+6ANmKchgy105hDTLQorIKO0dWY=;
-  b=cCROZzbT6C+7WvwBnpqSSxuU7ckURwTJpHAMXXJH3vOkEFaaiCp/ektB
-   qMOk6RXMjdkNRyfm0AtJj3NDbqnD5wRVIzzTD9Gx0J3w8ySP2eznG6c91
-   cs7DkaQcPbbEgXXqJA6BHRfLEiK9Fbp0TPLYqM0WfLdtV8lzMtnn4guCq
-   bB9gvjGVw90uxib63dkS2iT081qEAasaX/f1zoTYSazxnE0F9qxaswewA
-   bmn+e9eDC83IVHR8qYnHnBGA3qPY+0LsfxAzNyJapZPS0Vr9veDMQKYi6
-   LUgFoPGLerhy520uBMTk1u0kTWEox0NsL30tUqFj/+Eu46RowB+jyV9jn
-   A==;
-X-CSE-ConnectionGUID: rYOWfXKyS2m4q9tEcWiMow==
-X-CSE-MsgGUID: IKifbUKtRdCUQc8W1xnvYw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="17311009"
+  bh=9J4gTUwUn2cWSw1SNih0bGr/MeYBF/9jYecIo0DiWaY=;
+  b=F7U8Y1E4HwC9XUr5PUETD0VsNR9tVFRz87OYzSEuUKQA1qnYXR+Jecnt
+   TfIxiuh6tWfUkDqfjPd1VLPa/khWC3X1xubHbJjTgaeOglQxWh2/d8liF
+   Tjqis1sTIMNGJBg5fLzz9f+Ud4UijnGKgzdYpd/XMyvHL3Fwj+kJZ6TlM
+   jRT7dieJVuUZsNLdqd5g8NDNR29hgN7z2RFMD/4tQf54jdWpf/EPaH51J
+   8xBgQvFdzPfoMilvLouM6Ym4GP9f0h2jN9Jk3zOlmf97oWtxdDbqGWzeq
+   +3H7kkQ1kpptKU+kqEKXSYAVipCUp3czuSnbRpT194Y6iNXe9R647psk+
+   g==;
+X-CSE-ConnectionGUID: ZWvP1r+jTjC3oMwimzFz3w==
+X-CSE-MsgGUID: jRW6TcOtR2qqF/8yvCJHqA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11121"; a="17311022"
 X-IronPort-AV: E=Sophos;i="6.09,180,1716274800"; 
-   d="scan'208";a="17311009"
+   d="scan'208";a="17311022"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2024 19:12:48 -0700
-X-CSE-ConnectionGUID: hdp2MQQdTSiQXUV4CzPQjA==
-X-CSE-MsgGUID: Wkx7HKwMQkW8nfIR6ygDLA==
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2024 19:12:51 -0700
+X-CSE-ConnectionGUID: jfwGEheERveVJfdaAz3uwA==
+X-CSE-MsgGUID: 4M45Krs0S8uOe9oKdNXYrA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,180,1716274800"; 
-   d="scan'208";a="46148587"
+   d="scan'208";a="46148597"
 Received: from emr.sh.intel.com ([10.112.229.56])
-  by fmviesa010.fm.intel.com with ESMTP; 02 Jul 2024 19:12:46 -0700
+  by fmviesa010.fm.intel.com with ESMTP; 02 Jul 2024 19:12:48 -0700
 From: Dapeng Mi <dapeng1.mi@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>
@@ -71,9 +71,9 @@ Cc: kvm@vger.kernel.org,
 	Jinrong Liang <cloudliang@tencent.com>,
 	Dapeng Mi <dapeng1.mi@intel.com>,
 	Dapeng Mi <dapeng1.mi@linux.intel.com>
-Subject: [Patch v5 07/18] x86: pmu: Fix cycles event validation failure
-Date: Wed,  3 Jul 2024 09:57:01 +0000
-Message-Id: <20240703095712.64202-8-dapeng1.mi@linux.intel.com>
+Subject: [Patch v5 08/18] x86: pmu: Use macro to replace hard-coded branches event index
+Date: Wed,  3 Jul 2024 09:57:02 +0000
+Message-Id: <20240703095712.64202-9-dapeng1.mi@linux.intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240703095712.64202-1-dapeng1.mi@linux.intel.com>
 References: <20240703095712.64202-1-dapeng1.mi@linux.intel.com>
@@ -85,84 +85,55 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When running pmu test on SPR, sometimes the following failure is
-reported.
+Currently the branches event index is a hard-coded number. User could
+add new events and cause the branches event index changes in the future,
+but don't notice the hard-coded event index and forget to update the
+event index synchronously, then the issue comes.
 
-PMU version:         2
-GP counters:         8
-GP counter width:    48
-Mask length:         8
-Fixed counters:      3
-Fixed counter width: 48
-1000000 <= 55109398 <= 50000000
-FAIL: Intel: core cycles-0
-1000000 <= 18279571 <= 50000000
-PASS: Intel: core cycles-1
-1000000 <= 12238092 <= 50000000
-PASS: Intel: core cycles-2
-1000000 <= 7981727 <= 50000000
-PASS: Intel: core cycles-3
-1000000 <= 6984711 <= 50000000
-PASS: Intel: core cycles-4
-1000000 <= 6773673 <= 50000000
-PASS: Intel: core cycles-5
-1000000 <= 6697842 <= 50000000
-PASS: Intel: core cycles-6
-1000000 <= 6747947 <= 50000000
-PASS: Intel: core cycles-7
-
-The count of the "core cycles" on first counter would exceed the upper
-boundary and leads to a failure, and then the "core cycles" count would
-drop gradually and reach a stable state.
-
-That looks reasonable. The "core cycles" event is defined as the 1st
-event in xxx_gp_events[] array and it is always verified at first.
-when the program loop() is executed at the first time it needs to warm
-up the pipeline and cache, such as it has to wait for cache is filled.
-All these warm-up work leads to a quite large core cycles count which
-may exceeds the verification range.
-
-To avoid the false positive of cycles event caused by warm-up,
-explicitly introduce a warm-up state before really starting
-verification.
+Thus, replace the hard-coded index to a macro.
 
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- x86/pmu.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ x86/pmu.c | 19 ++++++++++++++++++-
+ 1 file changed, 18 insertions(+), 1 deletion(-)
 
 diff --git a/x86/pmu.c b/x86/pmu.c
-index 3e0bf3a2..1e028579 100644
+index 1e028579..d2138567 100644
 --- a/x86/pmu.c
 +++ b/x86/pmu.c
-@@ -593,11 +593,27 @@ static void check_tsx_cycles(void)
- 	report_prefix_pop();
- }
+@@ -50,6 +50,22 @@ struct pmu_event {
+ 	{"fixed 2", MSR_CORE_PERF_FIXED_CTR0 + 2, 0.1*N, 30*N}
+ };
  
-+static void warm_up(void)
-+{
-+	int i = 8;
++/*
++ * Events index in intel_gp_events[], ensure consistent with
++ * intel_gp_events[].
++ */
++enum {
++	INTEL_BRANCHES_IDX	= 5,
++};
 +
-+	/*
-+	 * Since cycles event is always run as the first event, there would be
-+	 * a warm-up state to warm up the cache, it leads to the measured cycles
-+	 * value may exceed the pre-defined cycles upper boundary and cause
-+	 * false positive. To avoid this, introduce an warm-up state before
-+	 * the real verification.
-+	 */
-+	while (i--)
-+		loop();
-+}
++/*
++ * Events index in amd_gp_events[], ensure consistent with
++ * amd_gp_events[].
++ */
++enum {
++	AMD_BRANCHES_IDX	= 2,
++};
 +
- static void check_counters(void)
+ char *buf;
+ 
+ static struct pmu_event *gp_events;
+@@ -483,7 +499,8 @@ static void check_emulated_instr(void)
  {
- 	if (is_fep_available())
- 		check_emulated_instr();
- 
-+	warm_up();
- 	check_gp_counters();
- 	check_fixed_counters();
- 	check_rdpmc();
+ 	uint64_t status, instr_start, brnch_start;
+ 	uint64_t gp_counter_width = (1ull << pmu.gp_counter_width) - 1;
+-	unsigned int branch_idx = pmu.is_intel ? 5 : 2;
++	unsigned int branch_idx = pmu.is_intel ?
++				  INTEL_BRANCHES_IDX : AMD_BRANCHES_IDX;
+ 	pmu_counter_t brnch_cnt = {
+ 		.ctr = MSR_GP_COUNTERx(0),
+ 		/* branch instructions */
 -- 
 2.40.1
 
