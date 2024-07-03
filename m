@@ -1,493 +1,133 @@
-Return-Path: <kvm+bounces-20904-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20906-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D90D3926571
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 17:59:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EDC2926741
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 19:35:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C97128549E
-	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 15:59:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A13C2832A2
+	for <lists+kvm@lfdr.de>; Wed,  3 Jul 2024 17:35:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6299C1822F8;
-	Wed,  3 Jul 2024 15:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 328321849EB;
+	Wed,  3 Jul 2024 17:35:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Ne4Gzgyx"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="bUtwtLOZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DF9181BAE;
-	Wed,  3 Jul 2024 15:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E302183086
+	for <kvm@vger.kernel.org>; Wed,  3 Jul 2024 17:35:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720022353; cv=none; b=oJKQSeQKMCGf0f7WDSfEtZIw+RF77beVX95694N7MOdTblLlUbYz314xndhKG9PNEZGTIujuNu305d7MXLB9wnf8u/HUqAWtnzVv+DEwFBRtynKhZOXE+yZULwxQjA9x71XoSvf6HUOvKJmvkS0ZcHuJcSJY2NUsUYUyEJ422pE=
+	t=1720028106; cv=none; b=iz4fG7ycTxZDWJSZu7TQIJFgKkOK3Fi1q0qh49oDfyJk1NBMmEUmB5EeQZfrVZkMshSzn1lZcr4zi08juc+gho8GQEe03331tAcHs54+8Q454SIWBkhklo6F6LY/uPI2orNhHtOonApl0hM8fnK0OxfLUJ/tvSqtsnzwcCJcjWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720022353; c=relaxed/simple;
-	bh=1gaTZoEwc8nfrThroo5Iic7JGh8gAdKysw5GCZuszbk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c4pNPjNAjHPpvjNxaKF6K15GWFaxIT1FonUvPZlWeyqhrmvhAmaqL1NPK7v5YvNk4WgYpKz3HNgcvAb0+XU33DZWfkCfPBYmIGJIaUW9MvCYvO551EJXatTTk6U9rEzczbYf665Ez27pStFq9ex53J+v/oD3NM4bEhU9O9yH1ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Ne4Gzgyx; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 463Fw610004002;
-	Wed, 3 Jul 2024 15:59:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=HXNq30fBPXeaY
-	s2acHuhMbKO04/CkU04mqc/i+awCZI=; b=Ne4GzgyxcG8j1a938/4ZKczG60ABA
-	JovbZR2f/DSdTvSTS00U8I8gtiUQQWem3RiBtXjnoCYdB7O5PY3LytvyMuRvVtmh
-	51mse5YvQWPSg7vd0srXkjcYwN96Mmzmxg+wveY6JQrV9JzYZ1/UZ67PcYrlHaTB
-	KtvFCgVjcVmpCVyyPa+PMg7bEfMqr6Zcw0Wj/P4b+25KPvejxoykEFQoJw/7IOmF
-	DXNbBjEVlZaCKvLWToPbIXWva6EowPk/E/I5lcIVGwlwmVuewVDbQO+Vn80TQTIa
-	xvXMgeqzQJ9Fz/vWqUAlm9KhDI2rG9PcXTZmWnmxAbxbx3leF9VK2vsZQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4056pbgm05-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jul 2024 15:59:09 +0000 (GMT)
-Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 463Fx8oI005399;
-	Wed, 3 Jul 2024 15:59:08 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4056pbgm03-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jul 2024 15:59:08 +0000 (GMT)
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 463CwYun009502;
-	Wed, 3 Jul 2024 15:59:07 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 402xtmu4b1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 03 Jul 2024 15:59:07 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 463Fx2O454854004
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 3 Jul 2024 15:59:04 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EB3192004E;
-	Wed,  3 Jul 2024 15:59:01 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 938052004B;
-	Wed,  3 Jul 2024 15:59:01 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  3 Jul 2024 15:59:01 +0000 (GMT)
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: linux-kernel@vger.kernel.org
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, hca@linux.ibm.com,
-        svens@linux.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
-        nrb@linux.ibm.com, nsg@linux.ibm.com, seiden@linux.ibm.com,
-        frankja@linux.ibm.com, borntraeger@de.ibm.com,
-        gerald.schaefer@linux.ibm.com, david@redhat.com
-Subject: [PATCH v1 2/2] s390/kvm: Move bitfields for dat tables
-Date: Wed,  3 Jul 2024 17:59:00 +0200
-Message-ID: <20240703155900.103783-3-imbrenda@linux.ibm.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240703155900.103783-1-imbrenda@linux.ibm.com>
-References: <20240703155900.103783-1-imbrenda@linux.ibm.com>
+	s=arc-20240116; t=1720028106; c=relaxed/simple;
+	bh=l06SvAx10y5w/WW2XMiTPjF51PJgC3s5dbBuT2H9W1U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=B8aKNGxuf2iIs8U31AzmbgEjRHwq7zklO31nN6PXLdfIAK2RIPwfzrcLiWqNF/Q4us8RRTIY8+6PqWaFYjiGhZIICRD1Yj71TD4TFzV6KKc09dmvQOr2eQrl9fFnZfX1FzZvIo0e2Ll1TUUmhkjmXdgjGh3V4VkOyfmThppmBFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=bUtwtLOZ; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1720028105; x=1751564105;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=b9HAF+WS9MkSfOWQwYRmuQh0tn+3sT67Es33DhKyTRg=;
+  b=bUtwtLOZsnMbs7XPx6/zsTXyui/G1xhE0+EbsRSsZy17vKekQN9Am9mF
+   qwiS0TmUOy6+bqrXHYyW0le+91U+cjIU2sfIPlUbYo9ClSyKKsG4XziBe
+   r5v8CyJWTDSMuvABG1x9aKQ6w+7OnGleh38Rv7PJ+//YM3tk42ErNOQ6d
+   I=;
+X-IronPort-AV: E=Sophos;i="6.09,182,1716249600"; 
+   d="scan'208";a="643425421"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 17:35:02 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:28952]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.19.28:2525] with esmtp (Farcaster)
+ id c1c9f286-5528-40e7-9d33-3101ee09a74d; Wed, 3 Jul 2024 17:35:00 +0000 (UTC)
+X-Farcaster-Flow-ID: c1c9f286-5528-40e7-9d33-3101ee09a74d
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 3 Jul 2024 17:35:00 +0000
+Received: from [192.168.6.66] (10.106.82.27) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Wed, 3 Jul 2024
+ 17:34:59 +0000
+Message-ID: <923126dd-5f23-4f99-8327-9e8738540efb@amazon.com>
+Date: Wed, 3 Jul 2024 18:34:58 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [PATCH v7 06/14] KVM: Add memslot flag to let userspace force an
+ exit on missing hva mappings
+To: David Matlack <dmatlack@google.com>
+CC: Sean Christopherson <seanjc@google.com>, Anish Moorthy
+	<amoorthy@google.com>, <maz@kernel.org>, <kvm@vger.kernel.org>,
+	<kvmarm@lists.linux.dev>, <robert.hoo.linux@gmail.com>,
+	<jthoughton@google.com>, <axelrasmussen@google.com>, <peterx@redhat.com>,
+	<nadav.amit@gmail.com>, <isaku.yamahata@gmail.com>,
+	<kconsul@linux.vnet.ibm.com>, Oliver Upton <oliver.upton@linux.dev>,
+	<roypat@amazon.co.uk>, <kalyazin@amazon.com>
+References: <20240215235405.368539-1-amoorthy@google.com>
+ <20240215235405.368539-7-amoorthy@google.com> <ZeuMEdQTFADDSFkX@google.com>
+ <ZeuxaHlZzI4qnnFq@google.com> <Ze6Md/RF8Lbg38Rf@thinky-boi>
+ <CALzav=cMrt8jhCKZSJL+76L=PUZLBH7D=Uo-5Cd1vBOoEja0Nw@mail.gmail.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <CALzav=cMrt8jhCKZSJL+76L=PUZLBH7D=Uo-5Cd1vBOoEja0Nw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: tigs0NhGoMl88ggsFQIvj_BOpb-Xth9_
-X-Proofpoint-ORIG-GUID: 1boCPr46mv0kH5ZOQXbYtWtA4Kp0bW6q
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-03_11,2024-07-03_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=465 bulkscore=0
- clxscore=1011 suspectscore=0 lowpriorityscore=0 mlxscore=0
- priorityscore=1501 adultscore=0 impostorscore=0 spamscore=0 phishscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407030118
+X-ClientProxiedBy: EX19D009EUA002.ant.amazon.com (10.252.50.88) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-Move and improve the struct definitions for DAT tables from gaccess.c
-to a new header.
+Hi David,
 
-Once in a separate header, the structs become available everywhere. One
-possible usecase is to merge them in the s390 pte_t and p?d_t
-definitions, which is left as an exercise for the reader.
+On 11/03/2024 16:20, David Matlack wrote:
+> On Sun, Mar 10, 2024 at 9:46 PM Oliver Upton <oliver.upton@linux.dev> wrote:
+>>>>
+>>>>    2. What is your best guess as to when KVM userfault patches will be available,
+>>>>       even if only in RFC form?
+>>>
+>>> We're aiming for the end of April for RFC with KVM/ARM support.
+>>
+>> Just to make sure everyone is read in on what this entails -- is this
+>> the implementation that only worries about vCPUs touching non-present
+>> memory, leaving the question of other UAPIs that consume guest memory
+>> (e.g. GIC/ITS table save/restore) up for further discussion?
+> 
+> Yes. The initial version will only support returning to userspace on
+> invalid vCPU accesses with KVM_EXIT_MEMORY_FAULT. Non-vCPU accesses to
+> invalid pages (e.g. GIC/ITS table save/restore) will trigger an error
+> return from __gfn_to_hva_many() (which will cause the corresponding
+> ioctl to fail). It will be userspace's responsibility to clear the
+> invalid attribute before invoking those ioctls.
+> 
+> For x86 we may need an blocking kernel-to-userspace notification
+> mechanism for code paths in the emulator, but we'd like to investigate
+> and discuss if there are any other cleaner alternatives before going
+> too far down that route.
 
-Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
----
- arch/s390/include/asm/dat-bits.h | 170 +++++++++++++++++++++++++++++++
- arch/s390/kvm/gaccess.c          | 163 +----------------------------
- 2 files changed, 173 insertions(+), 160 deletions(-)
- create mode 100644 arch/s390/include/asm/dat-bits.h
+I wasn't able to locate any follow-ups on the LKML about this topic.
+May I know if you are still working on or planning to work on this?
 
-diff --git a/arch/s390/include/asm/dat-bits.h b/arch/s390/include/asm/dat-bits.h
-new file mode 100644
-index 000000000000..d8afd13be48c
---- /dev/null
-+++ b/arch/s390/include/asm/dat-bits.h
-@@ -0,0 +1,170 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * DAT table and related structures
-+ *
-+ * Copyright IBM Corp. 2024
-+ *
-+ */
-+
-+#ifndef _S390_DAT_BITS_H
-+#define _S390_DAT_BITS_H
-+
-+union asce {
-+	unsigned long val;
-+	struct {
-+		 unsigned long rsto: 52;/* Region- or Segment-Table Origin */
-+		 unsigned long     : 2;
-+		 unsigned long g   : 1; /* Subspace Group control */
-+		 unsigned long p   : 1; /* Private Space control */
-+		 unsigned long s   : 1; /* Storage-Alteration-Event control */
-+		 unsigned long x   : 1; /* Space-Switch-Event control */
-+		 unsigned long r   : 1; /* Real-Space control */
-+		 unsigned long     : 1;
-+		 unsigned long dt  : 2; /* Designation-Type control */
-+		 unsigned long tl  : 2; /* Region- or Segment-Table Length */
-+	};
-+};
-+
-+enum {
-+	ASCE_TYPE_SEGMENT = 0,
-+	ASCE_TYPE_REGION3 = 1,
-+	ASCE_TYPE_REGION2 = 2,
-+	ASCE_TYPE_REGION1 = 3
-+};
-+
-+union region1_table_entry {
-+	unsigned long val;
-+	struct {
-+		unsigned long rto: 52;/* Region-Table Origin */
-+		unsigned long    : 2;
-+		unsigned long p  : 1; /* DAT-Protection Bit */
-+		unsigned long    : 1;
-+		unsigned long tf : 2; /* Region-Second-Table Offset */
-+		unsigned long i  : 1; /* Region-Invalid Bit */
-+		unsigned long    : 1;
-+		unsigned long tt : 2; /* Table-Type Bits */
-+		unsigned long tl : 2; /* Region-Second-Table Length */
-+	};
-+};
-+
-+union region2_table_entry {
-+	unsigned long val;
-+	struct {
-+		unsigned long rto: 52;/* Region-Table Origin */
-+		unsigned long    : 2;
-+		unsigned long p  : 1; /* DAT-Protection Bit */
-+		unsigned long    : 1;
-+		unsigned long tf : 2; /* Region-Third-Table Offset */
-+		unsigned long i  : 1; /* Region-Invalid Bit */
-+		unsigned long    : 1;
-+		unsigned long tt : 2; /* Table-Type Bits */
-+		unsigned long tl : 2; /* Region-Third-Table Length */
-+	};
-+};
-+
-+struct region3_table_entry_fc0 {
-+	unsigned long sto: 52;/* Segment-Table Origin */
-+	unsigned long    : 1;
-+	unsigned long fc : 1; /* Format-Control */
-+	unsigned long p  : 1; /* DAT-Protection Bit */
-+	unsigned long    : 1;
-+	unsigned long tf : 2; /* Segment-Table Offset */
-+	unsigned long i  : 1; /* Region-Invalid Bit */
-+	unsigned long cr : 1; /* Common-Region Bit */
-+	unsigned long tt : 2; /* Table-Type Bits */
-+	unsigned long tl : 2; /* Segment-Table Length */
-+};
-+
-+struct region3_table_entry_fc1 {
-+	unsigned long rfaa: 33;/* Region-Frame Absolute Address */
-+	unsigned long     : 14;
-+	unsigned long av  : 1; /* ACCF-Validity Control */
-+	unsigned long acc : 4; /* Access-Control Bits */
-+	unsigned long f   : 1; /* Fetch-Protection Bit */
-+	unsigned long fc  : 1; /* Format-Control */
-+	unsigned long p   : 1; /* DAT-Protection Bit */
-+	unsigned long iep : 1; /* Instruction-Execution-Protection */
-+	unsigned long     : 2;
-+	unsigned long i   : 1; /* Region-Invalid Bit */
-+	unsigned long cr  : 1; /* Common-Region Bit */
-+	unsigned long tt  : 2; /* Table-Type Bits */
-+	unsigned long     : 2;
-+};
-+
-+union region3_table_entry {
-+	unsigned long val;
-+	struct region3_table_entry_fc0 fc0;
-+	struct region3_table_entry_fc1 fc1;
-+	struct {
-+		unsigned long   : 53;
-+		unsigned long fc: 1; /* Format-Control */
-+		unsigned long   : 4;
-+		unsigned long i : 1; /* Region-Invalid Bit */
-+		unsigned long cr: 1; /* Common-Region Bit */
-+		unsigned long tt: 2; /* Table-Type Bits */
-+		unsigned long   : 2;
-+	};
-+};
-+
-+struct segment_table_entry_fc0 {
-+	unsigned long pto: 53;/* Page-Table Origin */
-+	unsigned long fc : 1; /* Format-Control */
-+	unsigned long p  : 1; /* DAT-Protection Bit */
-+	unsigned long    : 3;
-+	unsigned long i  : 1; /* Segment-Invalid Bit */
-+	unsigned long cs : 1; /* Common-Segment Bit */
-+	unsigned long tt : 2; /* Table-Type Bits */
-+	unsigned long    : 2;
-+};
-+
-+struct segment_table_entry_fc1 {
-+	unsigned long sfaa: 44;/* Segment-Frame Absolute Address */
-+	unsigned long     : 3;
-+	unsigned long av  : 1; /* ACCF-Validity Control */
-+	unsigned long acc : 4; /* Access-Control Bits */
-+	unsigned long f   : 1; /* Fetch-Protection Bit */
-+	unsigned long fc  : 1; /* Format-Control */
-+	unsigned long p   : 1; /* DAT-Protection Bit */
-+	unsigned long iep : 1; /* Instruction-Execution-Protection */
-+	unsigned long     : 2;
-+	unsigned long i   : 1; /* Segment-Invalid Bit */
-+	unsigned long cs  : 1; /* Common-Segment Bit */
-+	unsigned long tt  : 2; /* Table-Type Bits */
-+	unsigned long     : 2;
-+};
-+
-+union segment_table_entry {
-+	unsigned long val;
-+	struct segment_table_entry_fc0 fc0;
-+	struct segment_table_entry_fc1 fc1;
-+	struct {
-+		unsigned long   : 53;
-+		unsigned long fc: 1; /* Format-Control */
-+		unsigned long   : 4;
-+		unsigned long i : 1; /* Segment-Invalid Bit */
-+		unsigned long cs: 1; /* Common-Segment Bit */
-+		unsigned long tt: 2; /* Table-Type Bits */
-+		unsigned long   : 2;
-+	};
-+};
-+
-+union page_table_entry {
-+	unsigned long val;
-+	struct {
-+		unsigned long pfra: 52;/* Page-Frame Real Address */
-+		unsigned long z   : 1; /* Zero Bit */
-+		unsigned long i   : 1; /* Page-Invalid Bit */
-+		unsigned long p   : 1; /* DAT-Protection Bit */
-+		unsigned long iep : 1; /* Instruction-Execution-Protection */
-+		unsigned long     : 8;
-+	};
-+};
-+
-+enum {
-+	TABLE_TYPE_SEGMENT = 0,
-+	TABLE_TYPE_REGION3 = 1,
-+	TABLE_TYPE_REGION2 = 2,
-+	TABLE_TYPE_REGION1 = 3
-+};
-+
-+#endif /* _S390_DAT_BITS_H */
-diff --git a/arch/s390/kvm/gaccess.c b/arch/s390/kvm/gaccess.c
-index 5bf3d94e9dda..e65f597e3044 100644
---- a/arch/s390/kvm/gaccess.c
-+++ b/arch/s390/kvm/gaccess.c
-@@ -14,167 +14,10 @@
- #include <asm/access-regs.h>
- #include <asm/fault.h>
- #include <asm/gmap.h>
-+#include <asm/dat-bits.h>
- #include "kvm-s390.h"
- #include "gaccess.h"
- 
--union asce {
--	unsigned long val;
--	struct {
--		unsigned long origin : 52; /* Region- or Segment-Table Origin */
--		unsigned long	 : 2;
--		unsigned long g  : 1; /* Subspace Group Control */
--		unsigned long p  : 1; /* Private Space Control */
--		unsigned long s  : 1; /* Storage-Alteration-Event Control */
--		unsigned long x  : 1; /* Space-Switch-Event Control */
--		unsigned long r  : 1; /* Real-Space Control */
--		unsigned long	 : 1;
--		unsigned long dt : 2; /* Designation-Type Control */
--		unsigned long tl : 2; /* Region- or Segment-Table Length */
--	};
--};
--
--enum {
--	ASCE_TYPE_SEGMENT = 0,
--	ASCE_TYPE_REGION3 = 1,
--	ASCE_TYPE_REGION2 = 2,
--	ASCE_TYPE_REGION1 = 3
--};
--
--union region1_table_entry {
--	unsigned long val;
--	struct {
--		unsigned long rto: 52;/* Region-Table Origin */
--		unsigned long	 : 2;
--		unsigned long p  : 1; /* DAT-Protection Bit */
--		unsigned long	 : 1;
--		unsigned long tf : 2; /* Region-Second-Table Offset */
--		unsigned long i  : 1; /* Region-Invalid Bit */
--		unsigned long	 : 1;
--		unsigned long tt : 2; /* Table-Type Bits */
--		unsigned long tl : 2; /* Region-Second-Table Length */
--	};
--};
--
--union region2_table_entry {
--	unsigned long val;
--	struct {
--		unsigned long rto: 52;/* Region-Table Origin */
--		unsigned long	 : 2;
--		unsigned long p  : 1; /* DAT-Protection Bit */
--		unsigned long	 : 1;
--		unsigned long tf : 2; /* Region-Third-Table Offset */
--		unsigned long i  : 1; /* Region-Invalid Bit */
--		unsigned long	 : 1;
--		unsigned long tt : 2; /* Table-Type Bits */
--		unsigned long tl : 2; /* Region-Third-Table Length */
--	};
--};
--
--struct region3_table_entry_fc0 {
--	unsigned long sto: 52;/* Segment-Table Origin */
--	unsigned long	 : 1;
--	unsigned long fc : 1; /* Format-Control */
--	unsigned long p  : 1; /* DAT-Protection Bit */
--	unsigned long	 : 1;
--	unsigned long tf : 2; /* Segment-Table Offset */
--	unsigned long i  : 1; /* Region-Invalid Bit */
--	unsigned long cr : 1; /* Common-Region Bit */
--	unsigned long tt : 2; /* Table-Type Bits */
--	unsigned long tl : 2; /* Segment-Table Length */
--};
--
--struct region3_table_entry_fc1 {
--	unsigned long rfaa : 33; /* Region-Frame Absolute Address */
--	unsigned long	 : 14;
--	unsigned long av : 1; /* ACCF-Validity Control */
--	unsigned long acc: 4; /* Access-Control Bits */
--	unsigned long f  : 1; /* Fetch-Protection Bit */
--	unsigned long fc : 1; /* Format-Control */
--	unsigned long p  : 1; /* DAT-Protection Bit */
--	unsigned long iep: 1; /* Instruction-Execution-Protection */
--	unsigned long	 : 2;
--	unsigned long i  : 1; /* Region-Invalid Bit */
--	unsigned long cr : 1; /* Common-Region Bit */
--	unsigned long tt : 2; /* Table-Type Bits */
--	unsigned long	 : 2;
--};
--
--union region3_table_entry {
--	unsigned long val;
--	struct region3_table_entry_fc0 fc0;
--	struct region3_table_entry_fc1 fc1;
--	struct {
--		unsigned long	 : 53;
--		unsigned long fc : 1; /* Format-Control */
--		unsigned long	 : 4;
--		unsigned long i  : 1; /* Region-Invalid Bit */
--		unsigned long cr : 1; /* Common-Region Bit */
--		unsigned long tt : 2; /* Table-Type Bits */
--		unsigned long	 : 2;
--	};
--};
--
--struct segment_entry_fc0 {
--	unsigned long pto: 53;/* Page-Table Origin */
--	unsigned long fc : 1; /* Format-Control */
--	unsigned long p  : 1; /* DAT-Protection Bit */
--	unsigned long	 : 3;
--	unsigned long i  : 1; /* Segment-Invalid Bit */
--	unsigned long cs : 1; /* Common-Segment Bit */
--	unsigned long tt : 2; /* Table-Type Bits */
--	unsigned long	 : 2;
--};
--
--struct segment_entry_fc1 {
--	unsigned long sfaa : 44; /* Segment-Frame Absolute Address */
--	unsigned long	 : 3;
--	unsigned long av : 1; /* ACCF-Validity Control */
--	unsigned long acc: 4; /* Access-Control Bits */
--	unsigned long f  : 1; /* Fetch-Protection Bit */
--	unsigned long fc : 1; /* Format-Control */
--	unsigned long p  : 1; /* DAT-Protection Bit */
--	unsigned long iep: 1; /* Instruction-Execution-Protection */
--	unsigned long	 : 2;
--	unsigned long i  : 1; /* Segment-Invalid Bit */
--	unsigned long cs : 1; /* Common-Segment Bit */
--	unsigned long tt : 2; /* Table-Type Bits */
--	unsigned long	 : 2;
--};
--
--union segment_table_entry {
--	unsigned long val;
--	struct segment_entry_fc0 fc0;
--	struct segment_entry_fc1 fc1;
--	struct {
--		unsigned long	 : 53;
--		unsigned long fc : 1; /* Format-Control */
--		unsigned long	 : 4;
--		unsigned long i  : 1; /* Segment-Invalid Bit */
--		unsigned long cs : 1; /* Common-Segment Bit */
--		unsigned long tt : 2; /* Table-Type Bits */
--		unsigned long	 : 2;
--	};
--};
--
--enum {
--	TABLE_TYPE_SEGMENT = 0,
--	TABLE_TYPE_REGION3 = 1,
--	TABLE_TYPE_REGION2 = 2,
--	TABLE_TYPE_REGION1 = 3
--};
--
--union page_table_entry {
--	unsigned long val;
--	struct {
--		unsigned long pfra : 52; /* Page-Frame Real Address */
--		unsigned long z  : 1; /* Zero Bit */
--		unsigned long i  : 1; /* Page-Invalid Bit */
--		unsigned long p  : 1; /* DAT-Protection Bit */
--		unsigned long iep: 1; /* Instruction-Execution-Protection */
--		unsigned long	 : 8;
--	};
--};
--
- /*
-  * vaddress union in order to easily decode a virtual address into its
-  * region first index, region second index etc. parts.
-@@ -632,7 +475,7 @@ static unsigned long guest_translate(struct kvm_vcpu *vcpu, unsigned long gva,
- 	iep = ctlreg0.iep && test_kvm_facility(vcpu->kvm, 130);
- 	if (asce.r)
- 		goto real_address;
--	ptr = asce.origin * PAGE_SIZE;
-+	ptr = asce.rsto * PAGE_SIZE;
- 	switch (asce.dt) {
- 	case ASCE_TYPE_REGION1:
- 		if (vaddr.rfx01 > asce.tl)
-@@ -1379,7 +1222,7 @@ static int kvm_s390_shadow_tables(struct gmap *sg, unsigned long saddr,
- 	parent = sg->parent;
- 	vaddr.addr = saddr;
- 	asce.val = sg->orig_asce;
--	ptr = asce.origin * PAGE_SIZE;
-+	ptr = asce.rsto * PAGE_SIZE;
- 	if (asce.r) {
- 		*fake = 1;
- 		ptr = 0;
--- 
-2.45.2
-
+Thanks,
+Nikita
 
