@@ -1,190 +1,227 @@
-Return-Path: <kvm+bounces-20933-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20934-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552ED926DC4
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 05:01:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 252C2926E27
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 05:44:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9E8F1F24F48
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 03:01:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9886B1F22F35
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 03:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D6E1B59A;
-	Thu,  4 Jul 2024 03:01:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18241B7E4;
+	Thu,  4 Jul 2024 03:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XT7DiQri"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DD+TxMuV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896B417C67
-	for <kvm@vger.kernel.org>; Thu,  4 Jul 2024 03:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 690BE1DA32D
+	for <kvm@vger.kernel.org>; Thu,  4 Jul 2024 03:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720062075; cv=none; b=CvKGIuR7a28FBiM92LZ5KHgHtngyAWP69xz7fl1TcUR55mpMUu7H9nrRJ29Rrm9cO8aj0b3hPXJUPRMqFPaYMo/8GnahLpJg51yr6j/nZFzq7UI2RGuZx3e5VTwXA55seORZuR7XxinB4QBsG4shw1GmOcWJBeszhVw3yx/9ggE=
+	t=1720064644; cv=none; b=SIsx6s5po+pJ6II+UK7MCLvBv4+ePtzGsGqgrGFdNhoKmcUiogLv6O8EcjpVRCqzkWYTNqIc0dNWUNPM8T4idWk51Db/mStPcgTKiGyUQvptUI4JQ4n2U+vCU/vicNnWv7flcYRc654zcIvDr+ImCu/887AEn+vRe9IuOqsR5l0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720062075; c=relaxed/simple;
-	bh=7xazZwz0EnajiB5Y3BpYOkdjmqrqDIqJeO1R5Tf6FMU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L3u0ZC92G+/4T8AE4m+NIjayaY9qnYcTT3h858DWcn/ga7ZOQNgiCwNtQctdQ+SJ/xLSGt8VHcz2mUPwYy3RCSoB10zjRFd934ubTau5AwhD3+4iaKwlFPUHgqKrc+VhWDl2rCcqY8qo4eS4EZ8hCqDMEHH0JzpkFVxECF03l60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XT7DiQri; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720062074; x=1751598074;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7xazZwz0EnajiB5Y3BpYOkdjmqrqDIqJeO1R5Tf6FMU=;
-  b=XT7DiQriR2FX6Z4mUcy61QZJ/jd8kO22Q/qIfYbyyK2X/9iP+7hdVhb8
-   hhmDhkhKlwIR4cYQPLF0B3LibxRx6ZGw1+BEyx3HZqwGENm5QLq4xPKpy
-   GkOrcXp2/e4/mC4vdBmNDNbTWvsekMm2p0mdJPO6v9TAT20qXHAu2khRy
-   YF17kPJ1lPUDHrmOcGpDVKPd8cd2m99g4fYqeRc3S5766/Vcqka4BFwOH
-   hdxVGW8TOuZ8bVZDxvtRE9BV+9yIGd0QTCbMkTzLzDHJITjAOkZ3mV4ij
-   e0w7JG1xyOFP7JVYM0PcJohUqdznOw1jJH1S3X3zBtLf7w7uM4Ts/8/QA
-   Q==;
-X-CSE-ConnectionGUID: fzAqoshPSfuFUoawlLI2TQ==
-X-CSE-MsgGUID: syT9+eg/Ts2x6/vnjZpHbg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11122"; a="39838163"
-X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
-   d="scan'208";a="39838163"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2024 20:01:13 -0700
-X-CSE-ConnectionGUID: uK+DmRjmRO6RTIeeRo8L0Q==
-X-CSE-MsgGUID: PAO0ufSFQueLjRECY+D3Cg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
-   d="scan'208";a="51052503"
-Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
-  by fmviesa004.fm.intel.com with ESMTP; 03 Jul 2024 20:01:08 -0700
-From: Zhao Liu <zhao1.liu@intel.com>
-To: =?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	=?UTF-8?q?Philippe=20Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Markus Armbruster <armbru@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	qemu-riscv@nongnu.org,
-	qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>
-Subject: [PATCH 8/8] qemu-options: Add the description of smp-cache object
-Date: Thu,  4 Jul 2024 11:16:03 +0800
-Message-Id: <20240704031603.1744546-9-zhao1.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240704031603.1744546-1-zhao1.liu@intel.com>
-References: <20240704031603.1744546-1-zhao1.liu@intel.com>
+	s=arc-20240116; t=1720064644; c=relaxed/simple;
+	bh=bD+tG1AsVgTOubpjRmKNnAX+WyMxODx30lrUZaJcuH0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lz3GSSf8rgsVZeBSWnowRPaa8Ff2dYhWqCFawz6fQmsgg8RGFIaMSp8qy1bErOJI7AZKhPjKwJooGKet92ODwd+wuecc9T9ODbreqUmjtgC2Cr9XWHMEEBt0wlaE6AWI7Qnuur/fBrsqCqFIplNpssuzDtTxy3pbjkfolAB8mO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DD+TxMuV; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1fa9ecfb321so1054915ad.0
+        for <kvm@vger.kernel.org>; Wed, 03 Jul 2024 20:44:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720064643; x=1720669443; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PyH1BQxw6yoYa6pWHs5e8Qa50ra95yjF0ZzBqONB0/Y=;
+        b=DD+TxMuVOfC/vaXbJx3jfxhf2kmUfTMqKdGO1cXG9jzBbQXyTA7JJLqxSmOJ1OS5bP
+         iY5gYefaRT1XHme2TN8SwIOTQypMzFKIJRbW4USGpgx6vaMLMYKpDZh854OTqVPYvWZX
+         ZyoED2pPc3vakCC5OtNcb8hlLzrz2zQXf3A1aWUC66gzUND7ZB8+7DUPMhcIpj5m9eJS
+         yTlgWjq9mzRhUmKw1kKsxBQmqPtKlMb1pJzzVynMv58UnLYz7A1mW7H0ZuR+aHemo1hR
+         rn4knh0q3VaQ9c0GXg5OmXlj+65O8bz6OoweH0/pjBcLW7LybqFzjb6+YefA7EiDLzS3
+         5iGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720064643; x=1720669443;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PyH1BQxw6yoYa6pWHs5e8Qa50ra95yjF0ZzBqONB0/Y=;
+        b=VIkroC76n+dYQkxVG5GueiCnu7bCaZB4+TeIysCERkgchB9NWPrt8N2t0R16az8Oh1
+         I3PVvOZSr/OOZd6nUs0cw3Zd7cTYTR516vZMSCCp+87rIJ3yKjNRBwtIG+hF/t9ENIQx
+         edJqT9E6g/zLTXr5y1NjtBxjA6a/Bv4TxR87u44eI9kgWD2odqrHEUDFqBYVX9F8oU9q
+         g+QzVrjbI6hD/EOkbkxDPCnYCOABzD3gXHXYp/puxjgiJeywgDgnCDjV3becZRvlwmw2
+         73HOgnhy71YfQUG9CJ/lp1+5c4yBAmn6b8pBZiET0X1mh47OvZvrcjecbVI54syeq0D0
+         kxow==
+X-Gm-Message-State: AOJu0YwtKltM6aF+GIjGSbZ3h/i6RNDhK/+z2k/+oWnW3FXffkfD7Zgo
+	48ROOUMNklcLRZ/sNJRt3YgCrdJWOn0Kgur617FtuThOXHsU0eiB
+X-Google-Smtp-Source: AGHT+IF2Xf1lfjVq58Gt/9W+fhqA7SmsG2av+7pGQvcP2CNF/UxW+n4NTxQgyewBD9fRGUtUE0eFgQ==
+X-Received: by 2002:a17:902:e549:b0:1fa:a4ec:5010 with SMTP id d9443c01a7336-1fb33edfd30mr5112625ad.49.1720064642433;
+        Wed, 03 Jul 2024 20:44:02 -0700 (PDT)
+Received: from [127.0.1.1] (135-180-162-235.fiber.dynamic.sonic.net. [135.180.162.235])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fac11d9685sm111473265ad.111.2024.07.03.20.44.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 03 Jul 2024 20:44:02 -0700 (PDT)
+From: Cade Richard <cade.richard@gmail.com>
+X-Google-Original-From: Cade Richard <cade.richard@berkeley.edu>
+Date: Wed, 03 Jul 2024 20:43:44 -0700
+Subject: [PATCH kvm-unit-tests] This patch adds a unit test for the debug
+ console write() and write_byte() functions. It also fixes the
+ virt_to_phys() function to return the offset address, not the PTE aligned
+ address.
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240703-sbi-dbcn-write-v1-1-13f08380d768@berkeley.edu>
+X-B4-Tracking: v=1; b=H4sIAG8ahmYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDcwNj3eKkTN2UpOQ83fKizJJUXQtLE2NjE0NTszSzNCWgpoKi1LTMCrC
+ B0bG1tQAbm6BWYAAAAA==
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Cc: andrew.jones@linux.dev, atishp@rivosinc.com, cade.richard@berkeley.edu, 
+ jamestiotio@gmail.com
+X-Mailer: b4 0.13.0
 
-Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+
+
 ---
-Changes since RFC v2:
- * Rewrote the document of smp-cache object.
-
-Changes since RFC v1:
- * Use "*_cache=topo_level" as -smp example as the original "level"
-   term for a cache has a totally different meaning. (Jonathan)
+Signed-off-by: Cade Richard <cade.richard@berkeley.edu>
 ---
- qemu-options.hx | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 58 insertions(+)
+ riscv/run           |  1 +
+ lib/riscv/asm/sbi.h |  5 ++++
+ riscv/sbi.c         | 71 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 77 insertions(+)
 
-diff --git a/qemu-options.hx b/qemu-options.hx
-index 8ca7f34ef0c8..4b84f4508a6e 100644
---- a/qemu-options.hx
-+++ b/qemu-options.hx
-@@ -159,6 +159,15 @@ SRST
-         ::
+diff --git a/riscv/run b/riscv/run
+index 73f2bf54..e4e39d74 100755
+--- a/riscv/run
++++ b/riscv/run
+@@ -30,6 +30,7 @@ fi
+ mach='-machine virt'
  
-             -machine cxl-fmw.0.targets.0=cxl.0,cxl-fmw.0.targets.1=cxl.1,cxl-fmw.0.size=128G,cxl-fmw.0.interleave-granularity=512
+ command="$qemu -nodefaults -nographic -serial mon:stdio"
 +
-+    ``smp-cache='id'``
-+        Allows to configure cache property (now only the cache topology level).
-+
-+        For example:
-+        ::
-+
-+            -object '{"qom-type":"smp-cache","id":"cache","caches":[{"name":"l1d","topo":"core"},{"name":"l1i","topo":"core"},{"name":"l2","topo":"module"},{"name":"l3","topo":"die"}]}'
-+            -machine smp-cache=cache
- ERST
+ command+=" $mach $acc $firmware -cpu $processor "
+ command="$(migration_cmd) $(timeout_cmd) $command"
  
- DEF("M", HAS_ARG, QEMU_OPTION_M,
-@@ -5871,6 +5880,55 @@ SRST
-         ::
+diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+index d82a384d..4ae15879 100644
+--- a/lib/riscv/asm/sbi.h
++++ b/lib/riscv/asm/sbi.h
+@@ -12,6 +12,11 @@
+ #define SBI_ERR_ALREADY_STARTED		-7
+ #define SBI_ERR_ALREADY_STOPPED		-8
  
-             (qemu) qom-set /objects/iothread1 poll-max-ns 100000
++#define DBCN_WRITE_TEST_STRING "DBCN_WRITE_TEST_STRING\n"
++#define DBCN_READ_TEST_STRING "DBCN_READ_TEST_STRING\n"
++#define DBCN_WRITE_BYTE_TEST_BYTE 'a'
++#define DBCN_WRITE_TEST_BYTE_FLAG "DBCN_WRITE_TEST_CHAR: "
 +
-+    ``-object '{"qom-type":"smp-cache","id":id,"caches":[{"name":cache_name,"topo":cache_topo}]}'``
-+        Create an smp-cache object that configures machine's cache
-+        property. Currently, cache property only include cache topology
-+        level.
-+
-+        This option must be written in JSON format to support JSON list.
-+
-+        The ``caches`` parameter accepts a list of cache property in JSON
-+        format.
-+
-+        A list element requires the cache name to be specified in the
-+        ``name`` parameter (currently ``l1d``, ``l1i``, ``l2`` and ``l3``
-+        are supported). ``topo`` parameter accepts CPU topology levels
-+        including ``thread``, ``core``, ``module``, ``cluster``, ``die``,
-+        ``socket``, ``book``, ``drawer`` and ``default``. The ``topo``
-+        parameter indicates CPUs winthin the same CPU topology container
-+        are sharing the same cache.
-+
-+        Some machines may have their own cache topology model, and this
-+        object may override the machine-specific cache topology setting
-+        by specifying smp-cache object in the -machine. When specifying
-+        the cache topology level of ``default``, it will honor the default
-+        machine-specific cache topology setting. For other topology levels,
-+        they will override the default setting.
-+
-+        An example list of caches to configure the cache model (l1d cache
-+        per core, l1i cache per core, l2 cache per module and l3 cache per
-+        socket) supported by PC machine might look like:
-+
-+        ::
-+
-+              {
-+                "caches": [
-+                   { "name": "l1d", "topo": "core" },
-+                   { "name": "l1i", "topo": "core" },
-+                   { "name": "l2", "topo": "module" },
-+                   { "name": "l3", "topo": "socket" },
-+                ]
-+              }
-+
-+        An example smp-cache object would look like:()
-+
-+        .. parsed-literal::
-+
-+             # |qemu_system| \\
-+                 ... \\
-+                 -object '{"qom-type":"smp-cache","id":id,"caches":[{"name":cache_name,"topo":cache_topo}]}' \\
-+                 ...
- ERST
+ #ifndef __ASSEMBLY__
  
+ enum sbi_ext_id {
+diff --git a/riscv/sbi.c b/riscv/sbi.c
+index 762e9711..0fb7a300 100644
+--- a/riscv/sbi.c
++++ b/riscv/sbi.c
+@@ -7,6 +7,11 @@
+ #include <libcflat.h>
+ #include <stdlib.h>
+ #include <asm/sbi.h>
++#include <asm/csr.h>
++#include <asm/io.h>
++#include <asm/sbi.h>
++
++#define INVALID_RW_ADDR 0x0000000002000000;
  
+ static void help(void)
+ {
+@@ -112,6 +117,72 @@ static void check_base(void)
+ 	report_prefix_pop();
+ }
+ 
++static void check_dbcn(void)
++{
++	
++	struct sbiret ret;
++	unsigned long num_bytes, base_addr_lo, base_addr_hi;
++
++	report_prefix_push("dbcn");
++	
++	ret = __base_sbi_ecall(SBI_EXT_BASE_PROBE_EXT, SBI_EXT_DBCN);
++	if (!ret.value) {
++		report_skip("DBCN extension unavailable");
++		report_prefix_pop();
++		return;
++	}
++
++	report_prefix_pop();
++
++	report_prefix_push("write");
++	
++	num_bytes = strlen(DBCN_WRITE_TEST_STRING);
++	base_addr_hi = 0x0;
++	base_addr_lo = virt_to_phys((void *) &DBCN_WRITE_TEST_STRING);
++
++	do {
++		ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE, num_bytes, base_addr_lo, base_addr_hi);
++	} while (ret.value != num_bytes || ret.error != SBI_SUCCESS) ;
++	report(SBI_SUCCESS == ret.error, "write success");
++    report(ret.value == num_bytes, "correct number of bytes written");
++
++	base_addr_lo = INVALID_RW_ADDR;
++	ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE, num_bytes, base_addr_lo, base_addr_hi);
++    report(SBI_ERR_INVALID_PARAM == ret.error, "invalid parameter: address");
++
++	report_prefix_pop();
++	
++	report_prefix_push("read");
++
++/*	num_bytes = strlen(DBCN_READ_TEST_STRING);
++	char *actual = malloc(num_bytes);
++	base_addr_hi = 0x0;
++	base_addr_lo = virt_to_phys(( void *) actual);
++
++	do {
++		ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_READ, num_bytes, base_addr_lo, base_addr_hi);
++	} while (ret.value != num_bytes || ret.error != SBI_SUCCESS) ;
++	report(SBI_SUCCESS == ret.error, "read success");
++    report(ret.value == num_bytes, "correct number of bytes read");
++	report(strcmp(actual,DBCN_READ_TEST_STRING) == 0, "correct bytes read");
++*/
++	base_addr_lo = INVALID_RW_ADDR;
++    ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_READ, num_bytes, base_addr_lo, base_addr_hi);
++    report(SBI_ERR_INVALID_PARAM == ret.error, "invalid parameter: address");
++
++	report_prefix_pop();
++	
++	report_prefix_push("write_byte");
++
++	puts(DBCN_WRITE_TEST_BYTE_FLAG);
++	ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE_BYTE, (u8) DBCN_WRITE_BYTE_TEST_BYTE, 0, 0);
++	puts("\n");
++    report(SBI_SUCCESS == ret.error, "write success");
++    report(0 == ret.value, "expected ret.value");
++
++	report_prefix_pop();
++}
++
+ int main(int argc, char **argv)
+ {
+ 
+
+---
+base-commit: a68956b3fb6f5f308822b20ce0ff8e02db1f7375
+change-id: 20240703-sbi-dbcn-write-894334156f6f
+
+Best regards,
 -- 
-2.34.1
+Cade Richard <cade.richard@berkeley.edu>
 
 
