@@ -1,144 +1,145 @@
-Return-Path: <kvm+bounces-20947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD738927223
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 10:53:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3498E927315
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 11:31:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8849428993E
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 08:53:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64FFF1C2114E
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 09:31:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2631A4F24;
-	Thu,  4 Jul 2024 08:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CCF194C81;
+	Thu,  4 Jul 2024 09:31:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lpa8J0z8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VoQLTDuG"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CA4E18FC7F
-	for <kvm@vger.kernel.org>; Thu,  4 Jul 2024 08:53:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D5C171A7
+	for <kvm@vger.kernel.org>; Thu,  4 Jul 2024 09:31:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720083211; cv=none; b=kTFlluJrMk8yFQCCeuZyRT4Eal1UWhFqcubC/Rrd3xSU9W7RJNLAnNYIjPY43tsOT7iei9uwAlB9t2dAdKNyf89/KQFa0ZSSKDdW2uC/AJMkyQ2vxcee4Uuf/mYVl+jnNAmy4vJvy071OewbsZE1W/13DSZmS6mS/atV2kI3d+Q=
+	t=1720085494; cv=none; b=eVM+begpkx8qSR2Qu+LO/OsrFBsZ/H6jZDN0EDH5rPHsYcPfHi8460ddNbYKSVOeEzhwXoR5Gy1YFfE6dixMs3Qdq7+pZuOSFY8ReH1wlodoJ0ljd+P+XLn02djAeCYb0XumD07QWYTRHTs1dzi4nepo+a50PmGv19Inl5GhW+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720083211; c=relaxed/simple;
-	bh=+lF34JGBkAdyt9HCQOqpXFiCvpqwRAf+cHBgPF+ZnVU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ofVgW64xO87immDTmHQz/mfYBodeLQhaKU3b9CvTIAZ4kL1c2h2BzV7InX3U9lBqFwoRHLlFlRhgznCzRfMc/dN+pW0atNacilFjsNbC6yBh17XWLqgQq2ZPhyu7gsHshH+/tkq0ErmvRWWxkSOcO0llnFM+GfaM9Deo+Sy15OE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lpa8J0z8; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720083210; x=1751619210;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=+lF34JGBkAdyt9HCQOqpXFiCvpqwRAf+cHBgPF+ZnVU=;
-  b=lpa8J0z81QB0EoiYxXNFC4o2ytTmLmxDI7OfSna7nf80xex94RQbp+CD
-   AAVTwZhCVm8rySh4ZwiiKLCx5TeTa0hX3E1iXJj+O3sWOWTIRTSwMt1Jf
-   kLKqVlj4CCnXCs3Yv7Y0w6hYPan2majx1fHO/NlnIsTsZlqA1czO5iMBr
-   WCxk9spVTg9dfddJxq9IB7dQxMh9T90mdBOmMgH9pAOV93g0RQuuEzO8L
-   NtUVMutxr2lzgDROpN7qtEPAUZLmAhNxN4+HsGF4t85ECeXAtPOl9HCSD
-   kzWl41zMz8qGd4Q18LszdVaAW+OPmurFPFHHu4wmIaIOJz8pZS67/tHbp
-   Q==;
-X-CSE-ConnectionGUID: /Fb8QFtUQGeVUeNNU4yRSA==
-X-CSE-MsgGUID: oYyVJQjvTC2vS+jkzHH3rw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11122"; a="12390394"
-X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
-   d="scan'208";a="12390394"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 01:53:29 -0700
-X-CSE-ConnectionGUID: /KZ/JQjzTZymZwam7D3/NQ==
-X-CSE-MsgGUID: 1IoHEw6XTUS8aKcV3xujdw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
-   d="scan'208";a="46486287"
-Received: from chungegx-mobl1.ccr.corp.intel.com (HELO [10.238.1.52]) ([10.238.1.52])
-  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 01:53:26 -0700
-Message-ID: <d25cc62c-0f56-4be2-968a-63c8b1d63b5a@linux.intel.com>
-Date: Thu, 4 Jul 2024 16:53:24 +0800
+	s=arc-20240116; t=1720085494; c=relaxed/simple;
+	bh=M3Q/C/0aBv+/QAM0vww824JYxIHbIM9Lr0w5wE5qIrs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WhdRGD0+FYq4788fQt9z7bQNjv4+0OI0bqTMGrwo9d/06jZSJ+dD2YoeeuPDlvM/7Rf5tNSfKhgLjHraF0NxuebZeqZphKE6J7JcV2G1afFyhWNLhaZ9SGMUmkHwjzOSfIfcR8WMK5tVjLe7iH2JsoJO3TQ7nI/51wzUOKUZ9uM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VoQLTDuG; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720085491;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kxNojJQhevmJiR5jUJTMNLDBmomzLCrmfrhYNJxWwrk=;
+	b=VoQLTDuGpdVpckTCqfoBcQ5XzfF3DmkQNA5AksaZQcw5ZTS149tNsjrlM8dnS5vYJetQfm
+	HrrVx1tEtLCJEa/LHxr6IbtbkCf9gTA6daQM9RPh34OspbKfMQvIBJNrGGRUjaj67jyP7X
+	hS7QzAWtCIvq1JeGp2CLW7NtoD63xrs=
+Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
+ [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-526-sgEKSlCuNE2vdyjq77JhoA-1; Thu, 04 Jul 2024 05:31:29 -0400
+X-MC-Unique: sgEKSlCuNE2vdyjq77JhoA-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2ee87e69b53so5314201fa.0
+        for <kvm@vger.kernel.org>; Thu, 04 Jul 2024 02:31:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720085488; x=1720690288;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kxNojJQhevmJiR5jUJTMNLDBmomzLCrmfrhYNJxWwrk=;
+        b=O/2/OXleOHkGmkwC3/DXQ+D+w9H3YGoxdsTItClmXBDU57FZJkrJEU9w09yqAe9m8b
+         dJCSV8EmPzHf6J2/0QRer506hCyhhlcdzmArwKaSkEoC8tqwRVoteSB3pg6/RHzsIA0u
+         GC0eJ5H+L7iUFjwrJ5Y75gHv8pjBM0XxFuH0roYM2iJYDoHhep2T6eXumHhc3kXM/qtO
+         B2QW1pDXADQ1QFRxHGOth1hvOyLeRiOwbejOII0q0FnsG5jsJcIJv0IpAi77Vg7ams56
+         l+Aj36DYB75YTNPJ8h53SOyUOt1itUt4eLkobTBFraiMurV0PQs5Zh1RZlGyvwlm4Q/r
+         avzA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVzK5B+HX4wF8HakiDncrK0o9eAmwCjqVykNGQd8JnPhW0xeKZmdXGvgDglHPQZfA8+UFmC4ay+GNh8481bAgy2kxZ
+X-Gm-Message-State: AOJu0Yyu+Tiretkqrqos6tH9neUC97Nhm8pRqYhH8OLErRl2KpRSqcsm
+	s5rX4lDOpPx/d7xL0p9TlMVSPZW3EIb7PuneNJwRXpsTSA65gSKYeqnhD6UYi/O/bMHBWu8ocJ1
+	3VT7fLXXetqnh3x3oUO5X+h8Y99pIJhuodLM+QtiOdnCVEYvfG0ziXGTcPMCdSSNGsTeEAcQ7Ma
+	HwVD9v5yXHK23uhCAQT3qMOgOe
+X-Received: by 2002:a2e:9ad4:0:b0:2ee:8566:32cb with SMTP id 38308e7fff4ca-2ee8ed91179mr8615441fa.16.1720085488334;
+        Thu, 04 Jul 2024 02:31:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGVbVO4d+JOSmyjsLo6p8Y4Usmvfss8knt2bViouPT6u4HSsDLVbHbNmD8TcEEVPjVTziY4gUfUv0aH0IDagiM=
+X-Received: by 2002:a2e:9ad4:0:b0:2ee:8566:32cb with SMTP id
+ 38308e7fff4ca-2ee8ed91179mr8615341fa.16.1720085487933; Thu, 04 Jul 2024
+ 02:31:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 30/31] i386/kvm: Add KVM_EXIT_HYPERCALL handling for
- KVM_HC_MAP_GPA_RANGE
-To: Pankaj Gupta <pankaj.gupta@amd.com>, qemu-devel@nongnu.org
-Cc: brijesh.singh@amd.com, dovmurik@linux.ibm.com, armbru@redhat.com,
- michael.roth@amd.com, xiaoyao.li@intel.com, pbonzini@redhat.com,
- thomas.lendacky@amd.com, isaku.yamahata@intel.com, berrange@redhat.com,
- kvm@vger.kernel.org, anisinha@redhat.com
-References: <20240530111643.1091816-1-pankaj.gupta@amd.com>
- <20240530111643.1091816-31-pankaj.gupta@amd.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240530111643.1091816-31-pankaj.gupta@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240704000019.3928862-1-michael.roth@amd.com>
+ <CABgObfYX+nDnQSW5xyT3SjYbQ72--EW5buCkUuG_Z_JPFqfQNA@mail.gmail.com> <ZoZge_2UT_yRJE56@redhat.com>
+In-Reply-To: <ZoZge_2UT_yRJE56@redhat.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 4 Jul 2024 11:31:16 +0200
+Message-ID: <CABgObfbf1u_RvRTcoZFepFWdavFnkqNwUCwHm1nE4tNKmM8+pA@mail.gmail.com>
+Subject: Re: [PATCH] i386/sev: Don't allow automatic fallback to legacy KVM_SEV*_INIT
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: Michael Roth <michael.roth@amd.com>, qemu-devel@nongnu.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 5/30/2024 7:16 PM, Pankaj Gupta wrote:
-
-[...]
-> +/*
-> + * Currently the handling here only supports use of KVM_HC_MAP_GPA_RANGE
-> + * to service guest-initiated memory attribute update requests so that
-> + * KVM_SET_MEMORY_ATTRIBUTES can update whether or not a page should be
-> + * backed by the private memory pool provided by guest_memfd, and as such
-> + * is only applicable to guest_memfd-backed guests (e.g. SNP/TDX).
-> + *
-> + * Other other use-cases for KVM_HC_MAP_GPA_RANGE, such as for SEV live
-            ^
-            extra "other"?
-> + * migration, are not implemented here currently.
-> + *
-> + * For the guest_memfd use-case, these exits will generally be synthesized
-> + * by KVM based on platform-specific hypercalls, like GHCB requests in the
-> + * case of SEV-SNP, and not issued directly within the guest though the
-> + * KVM_HC_MAP_GPA_RANGE hypercall. So in this case, KVM_HC_MAP_GPA_RANGE is
-> + * not actually advertised to guests via the KVM CPUID feature bit, as
-> + * opposed to SEV live migration where it would be. Since it is unlikely the
-> + * SEV live migration use-case would be useful for guest-memfd backed guests,
-> + * because private/shared page tracking is already provided through other
-> + * means, these 2 use-cases should be treated as being mutually-exclusive.
-> + */
-> +static int kvm_handle_hc_map_gpa_range(struct kvm_run *run)
-> +{
-> +    uint64_t gpa, size, attributes;
-> +
-> +    if (!machine_require_guest_memfd(current_machine))
-> +        return -EINVAL;
-> +
-> +    gpa = run->hypercall.args[0];
-> +    size = run->hypercall.args[1] * TARGET_PAGE_SIZE;
-> +    attributes = run->hypercall.args[2];
-> +
-> +    trace_kvm_hc_map_gpa_range(gpa, size, attributes, run->hypercall.flags);
-> +
-> +    return kvm_convert_memory(gpa, size, attributes & KVM_MAP_GPA_RANGE_ENCRYPTED);
-
-run->hypercall.ret should be updated accordingly.
-At least for successful case.
-For failure case, QEMU will shutdown the VM, is it the expected behavior?
-
-
-> +}
-> +
-> +static int kvm_handle_hypercall(struct kvm_run *run)
-> +{
-> +    if (run->hypercall.nr == KVM_HC_MAP_GPA_RANGE)
-> +        return kvm_handle_hc_map_gpa_range(run);
-> +
-> +    return -EINVAL;
-> +}
-> +
+On Thu, Jul 4, 2024 at 10:42=E2=80=AFAM Daniel P. Berrang=C3=A9 <berrange@r=
+edhat.com> wrote:
 >
-[...]
+> On Thu, Jul 04, 2024 at 08:51:05AM +0200, Paolo Bonzini wrote:
+> > On Thu, Jul 4, 2024 at 2:01=E2=80=AFAM Michael Roth <michael.roth@amd.c=
+om> wrote:
+> > > Currently if the 'legacy-vm-type' property of the sev-guest object is
+> > > left unset, QEMU will attempt to use the newer KVM_SEV_INIT2 kernel
+> > > interface in conjunction with the newer KVM_X86_SEV_VM and
+> > > KVM_X86_SEV_ES_VM KVM VM types.
+> > >
+> > > This can lead to measurement changes if, for instance, an SEV guest w=
+as
+> > > created on a host that originally had an older kernel that didn't
+> > > support KVM_SEV_INIT2, but is booted on the same host later on after =
+the
+> > > host kernel was upgraded.
+> >
+> > I think this is the right thing to do for SEV-ES. I agree that it's
+> > bad to require a very new kernel (6.10 will be released only a month
+> > before QEMU 9.1), on the other hand the KVM_SEV_ES_INIT API is broken
+> > in several ways. As long as there is a way to go back to it, and it's
+> > not changed by old machine types, not using it for SEV-ES is the
+> > better choice for upstream.
+>
+> Broken how ?   I know there was the regression with the 'debug_swap'
+> parameter, but was something that should just be fixed in the kernel,
+> rather than breaking userspace. What else is a problem ?
+
+The debug_swap parameter simply could not be enabled in the old API
+without breaking measurements. The new API *is the fix* to allow using
+it (though QEMU doesn't have the option plumbed in yet). There is no
+extensibility.
+
+Enabling debug_swap by default is also a thorny problem; it cannot be
+enabled by default because not all CPUs support it, and also we'd have
+the same problem that we cannot enable debug_swap on new machine types
+without requiring a new kernel. Tying the default to the -cpu model
+would work but it is confusing.
+
+But I guess we can add support for debug_swap, disabled by default and
+switch to the new API if debug_swap is enabled.
+
+> I don't think its reasonable for QEMU to require a brand new kernel
+> for new machine types, given SEV & SEV-ES have been deployed for
+> many years already.
+
+I think it's reasonable if the fix is displayed right into the error
+message. It's only needed for SEV-ES though, SEV can use the old and
+new APIs interchangeably.
+
+Paolo
+
 
