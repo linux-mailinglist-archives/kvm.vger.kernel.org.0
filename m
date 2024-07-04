@@ -1,100 +1,134 @@
-Return-Path: <kvm+bounces-20958-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20959-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A21F49276E9
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 15:11:21 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CEF7927706
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 15:19:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 567F928206C
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 13:11:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4011B235DD
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 13:19:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA101AED53;
-	Thu,  4 Jul 2024 13:10:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5511F1AED37;
+	Thu,  4 Jul 2024 13:18:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYcypi+6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/KR/8A6"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1963B1A0AE5;
-	Thu,  4 Jul 2024 13:10:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC377E9;
+	Thu,  4 Jul 2024 13:18:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720098657; cv=none; b=OLqirINuO2Owrt/Up4LZw7m3DotNwcXn9t1pZe/oJQwHFepNwTOoK2xOTEkeh/bzd8JN/e7NYP+aTHLpnk6x1kNmLX2ZW/F6D0lkgRwXPjpqyU+UhrhCjGUTiq8vLJGbRfmnm/6Tb4gViToPdvgWnNmQQ9LM+KOq97Nbx1uoK00=
+	t=1720099125; cv=none; b=Cd3Oq5FROlN2cmWhNuf6CWLbi+G/3Yqp9irgCUD27yC2o+JDLUMzi99Lw5Sa7FFT6ABbO4J1dAgIDWA/o+rj6dx6pdyWHV9QUmAjNC9v3xs5MtIWSwWzVcPrWDhsdE7WGaZua8F5SQyP8AfhtwUoBzlehEfVRk7NosE7gVNkX28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720098657; c=relaxed/simple;
-	bh=5Z/JhMWlZOiA4gMPtEvpcd72gMvcEm+EciKo2a/8g/0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ovmca77DqbNzszTPyc8afsoBHFW60Ned404vvxieX3d7htXQ4aP1/USlG2ZUXqWc9CF4dBjNMMLj/3FPEWNmon+uHqVE2Mr8G61eqR9w1+i8LWkjpASdXkAyBSRyBoSXmn1gfGU8g/o3K6ZaWY5nmth411lbIEHy51WCXO0rt6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYcypi+6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B8979C4AF07;
-	Thu,  4 Jul 2024 13:10:56 +0000 (UTC)
+	s=arc-20240116; t=1720099125; c=relaxed/simple;
+	bh=nkzC1R2Sn6KADvFNDPp0hrnIwln3xVG+eb9R42IPSdQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VsSMcTzcsbyiGYoOpFqQH4/YM3fyL9SB7SHhF+aWCkS//437E/E9pPZWigixewpzn/P9N462CeAWLWNHpMXpz0Ti7r1V0dh3O9RBJYqMJuZ6382D0UR20xjJ6DPlYJaihfpiojqnqMvBV78Qk556H7FT+OIvxjUVFS78lQ8jDZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/KR/8A6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0368AC3277B;
+	Thu,  4 Jul 2024 13:18:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720098656;
-	bh=5Z/JhMWlZOiA4gMPtEvpcd72gMvcEm+EciKo2a/8g/0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TYcypi+6JnHBpY4lZ+cKwjZQXSNSWSdg1CMGaYgL6jNS/VWlfNA5H0c8BOxNzmE/u
-	 Ken1JVEeKRQvpC6ysrZ/awEHnBd0sHH0w0KO0ZrLT4GH1l8K8HXt9ALEiY0w8sSGpe
-	 bKNzYA+Bp+c+CmYrH/zsEsTx2bliYMnRwl/9AkaasfTTlfQ7KQ3kBCpaigfLMdi9WC
-	 6MyCwml9mDKAv0Y8HSG8UgLHEtCm86vI4CstzqwIP61t18YHjL9iKipLL4ReikrbOg
-	 TwXkGINP5tVXCLqEGHJ8QdsI6OgD9V9T/J3Wy/fHQlz4gh+U+GPISJKRe/o9aAjuVb
-	 troCPvtdDExzg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A5FACC43332;
-	Thu,  4 Jul 2024 13:10:56 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1720099124;
+	bh=nkzC1R2Sn6KADvFNDPp0hrnIwln3xVG+eb9R42IPSdQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=D/KR/8A6xd5D4R/wyMmVXVBhTLC00uoxpBMQxG4XlqhIi5KAQVaC2WfSC/JKuTQBK
+	 kEFxwYczrrp8jHD/rU7Io7O7FanCrAZSqBu/PdOnbPEDswb3D7N14ui//u++auZfNR
+	 SUqz2Rl1HBcmgvgZwCQlOkR19edRQbzDh6tI/mypTJD/RTH4hYtagEvYh76WNN1/VY
+	 UCe/SDCeqqwlLAKAvWNk+uJtnN8vjygt8Gaomlc3u7lhSQZuSImjGamtHE5l/qm9H/
+	 l7cdU0pdx3G3PZZgD6CMT+HJGLLMzzhXBkWp2c6sJY4t+AJp3EHJFmV84AgiTky6jN
+	 DmhQgo4POHvOw==
+Date: Thu, 4 Jul 2024 16:18:39 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Jens Axboe <axboe@kernel.dk>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240704131839.GD95824@unreal>
+References: <cover.1719909395.git.leon@kernel.org>
+ <20240703054238.GA25366@lst.de>
+ <20240703105253.GA95824@unreal>
+ <20240703143530.GA30857@lst.de>
+ <20240703155114.GB95824@unreal>
+ <20240704074855.GA26913@lst.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 0/3] Assorted fixes in RISC-V PMU driver
-From: patchwork-bot+linux-riscv@kernel.org
-Message-Id: 
- <172009865667.17306.8198164921917389320.git-patchwork-notify@kernel.org>
-Date: Thu, 04 Jul 2024 13:10:56 +0000
-References: <20240628-misc_perf_fixes-v4-0-e01cfddcf035@rivosinc.com>
-In-Reply-To: <20240628-misc_perf_fixes-v4-0-e01cfddcf035@rivosinc.com>
-To: Atish Patra <atishp@rivosinc.com>
-Cc: linux-riscv@lists.infradead.org, kvm-riscv@lists.infradead.org,
- atishp@atishpatra.org, anup@brainfault.org, will@kernel.org,
- mark.rutland@arm.com, paul.walmsley@sifive.com, palmer@dabbelt.com,
- ajones@ventanamicro.com, conor.dooley@microchip.com,
- samuel.holland@sifive.com, palmer@rivosinc.com, alexghiti@rivosinc.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, garthlei@pku.edu.cn
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240704074855.GA26913@lst.de>
 
-Hello:
-
-This series was applied to riscv/linux.git (fixes)
-by Palmer Dabbelt <palmer@rivosinc.com>:
-
-On Fri, 28 Jun 2024 00:51:40 -0700 you wrote:
-> This series contains 3 fixes out of which the first one is a new fix
-> for invalid event data reported in lkml[2]. The last two are v3 of Samuel's
-> patch[1]. I added the RB/TB/Fixes tag and moved 1 unrelated change
-> to its own patch. I also changed an error message in kvm vcpu_pmu from
-> pr_err to pr_debug to avoid redundant failure error messages generated
-> due to the boot time quering of events implemented in the patch[1]
+On Thu, Jul 04, 2024 at 09:48:56AM +0200, Christoph Hellwig wrote:
+> On Wed, Jul 03, 2024 at 06:51:14PM +0300, Leon Romanovsky wrote:
+> > If we put aside this issue, do you think that the proposed API is the right one?
 > 
-> [...]
+> I haven't look at it in detail yet, but from a quick look there is a
+> few things to note:
+> 
+> 
+> 1) The amount of code needed in nvme worries me a bit.  Now NVMe a messy
+> driver due to the stupid PRPs vs just using SGLs, but needing a fair
+> amount of extra boilerplate code in drivers is a bit of a warning sign.
+> I plan to look into this to see if I can help on improving it, but for
+> that I need a working version first.
 
-Here is the summary with links:
-  - [v4,1/3] drivers/perf: riscv: Do not update the event data if uptodate
-    https://git.kernel.org/riscv/c/a3f24e83d11d
-  - [v4,2/3] drivers/perf: riscv: Reset the counter to hpmevent mapping while starting cpus
-    https://git.kernel.org/riscv/c/7dd646cf745c
-  - [v4,3/3] perf: RISC-V: Check standard event availability
-    https://git.kernel.org/riscv/c/16d3b1af0944
+Chaitanya is working on this and I'll join him to help on next Sunday,
+after I'll return to the office from my sick leave/
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> 
+> 
+> 2) The amount of seemingly unrelated global headers pulled into other
+> global headers.  Some of this might just be sloppiness, e.g. I can't
+> see why dma-mapping.h would actually need iommu.h to start with,
+> but pci.h in dma-map-ops.h is a no-go.
 
+pci.h was pulled because I needed to call to pci_p2pdma_map_type()
+in dma_can_use_iova().
 
+> 
+> 3) which brings me to real layering violations.  dev_is_untrusted and
+> dev_use_swiotlb are DMA API internals, no way I'd ever want to expose
+> them. dma-map-ops.h is a semi-internal header only for implementations
+> of the dma ops (as very clearly documented at the top of that file),
+> it must not be included by drivers.  Same for swiotlb.h.
+
+These item shouldn't worry you and will be changed in the final version.
+They are outcome of patch "RDMA/umem: Prevent UMEM ODP creation with SWIOTLB".
+https://lore.kernel.org/all/d18c454636bf3cfdba9b66b7cc794d713eadc4a5.1719909395.git.leon@kernel.org/
+
+All HMM users need such "prevention" so it will be moved to a common place.
+
+> 
+> Not quite as concerning, but doing an indirect call for each map
+> through dma_map_ops in addition to the iommu ops is not every efficient.
+> We've through for a while to allow direct calls to dma-iommu similar
+> how we do direct calls to dma-direct from the core mapping.c code.
+> This might be a good time to do that as a prep step for this work.
+
+Sure, no problem, will start in parallel to work on this.
+
+> 
 
