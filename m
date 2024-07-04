@@ -1,237 +1,197 @@
-Return-Path: <kvm+bounces-20954-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20955-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1E519275BA
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 14:10:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FB519275D7
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 14:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E659B2174E
-	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 12:10:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFD83281C8A
+	for <lists+kvm@lfdr.de>; Thu,  4 Jul 2024 12:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329631AE0B5;
-	Thu,  4 Jul 2024 12:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4171AE866;
+	Thu,  4 Jul 2024 12:21:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cSXBitAk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h3JHz1DA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F213D17995;
-	Thu,  4 Jul 2024 12:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DEBE1AE842;
+	Thu,  4 Jul 2024 12:21:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720095014; cv=none; b=Rdx82D0KZ7TT0O1Bp7y4XETWUtF7REYU3g+mwT5yr1ysVpKb9XMcUriHw5TvE+JSRs9kaAqX6cVpfiGNxW0XGSL/YSXUIEy5v125Pk3yVse3osO485e82i7bfBnLu+uL2n2GWPCUYvuUx5KbfvOUGjpsgNYrHOUTh0pz7mEqsqA=
+	t=1720095684; cv=none; b=itTpTZ25CEQIfhd0Yz1rFuxK7CHl09Ib8AGJan9x1H8sB6xBWVLyX7A+BwgxlWvBG2yKNwRtb01EoDK7nhnF8VHkCfgCQQcCdHuZqDMJu2968rYsiKR/BVpbM82KKT2Bxf+ocKuKBx/YWutlIAUH3JLyXoG5LdjiqZiexlJtO/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720095014; c=relaxed/simple;
-	bh=QO7Jb1iEQ+V6p6XmkF0p47Xfs1xtuglwyapZXD8gCe4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=aKknIKOWZAZgh4AqmstcSEqKmaCpAPFmBKvqO3Iwn6igQ5D7GEosSyZQi45rOJ22mHPXpVHXUz74hyk1WYugEfJ8MQpLOaz2MV5NgF5Nj4mlC9aO49lOwk+YSWTvzuMHEFfemzmY0WgfUSuFNoIYanYnEpEKNsUPK091Pe+85Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cSXBitAk; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-726d9b3bcf8so446969a12.0;
-        Thu, 04 Jul 2024 05:10:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720095012; x=1720699812; darn=vger.kernel.org;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KS8912iTY0xW9afn3Y1NFj6von6GR2I+TxZx9FsjCOo=;
-        b=cSXBitAkxTs6QXyp9Tna8aIAiuOhSUn1iTycqhBl7X+K1ZEHx518rZ7xnjmKc07GPn
-         IjtHI9AZKmm7wCtOBL7CbLsO3tuoRxIp5lTo10q3gMTvHAAYCUxPy8NbTYt3x1uw1G+o
-         IamKfqEFRcHxPdZvyIdfAw8yLCExY1YtXhp2WLJ2YUh196/yy7SMDwa5ggWs3IXCgCeS
-         PEpJsHPzLykiNmif5p0zHnmrawdMiSzL2NI+u8wxvT7KdmXs9Tdh3c7VLbLnt9bu5szv
-         p/Yxp5J/nIOjim6shWbFrWoSNlI8oKHsRXIiv4X0v/HR0WXjyUZD0lN1ia0Usw6RLXm1
-         YIIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720095012; x=1720699812;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KS8912iTY0xW9afn3Y1NFj6von6GR2I+TxZx9FsjCOo=;
-        b=CQgOTIVtiLyeXfEHMGPmXDu2RvrLFSP1F6v5b9SGSuwHI2LRVwi024pyk9JelXAixe
-         bVbyuzkMKya94+AVahoTfld2wCMD56p7bqUbgEq6T8i9iR36+ZdrncNZb0yArpPrXV+F
-         Y/UKBOH3N3aYXC43Z/9Tascz+H/GRHrrGYnph3+ryt4O3EEBVJsYRJ5hQizie4rFVShD
-         M9qgFRVg0TlvdTILE907NxTsMGadF0YsADaxQzqeaLdLNGgnRgUGjDp1HQPVM76CJcZe
-         PA6yiCs+8GnpXa5Me49AhRb84/uShwuUE/dLjHTwzypVg/jlVLSa92hCOzIIbe/szsZs
-         D0pw==
-X-Forwarded-Encrypted: i=1; AJvYcCXp8d5VSEfRjVvZOjGv3ClTgQyhUI2aX3zvsFpq1naXU5xKHk8efoaTzOAMCj6jqM8/4BWooClug6Zl0fbY+lGr/kitqG2zzt7nnA/OLHRMljPfSEAgntrSMQGrMeE4lrOk
-X-Gm-Message-State: AOJu0YwZT9XlzXn0QSixOpMdxHSyTGlRsBkLIlU7nCPHZBkgVNJ+f5Q3
-	QuYWckaZFyCtJSuo8LZmZCxSwru/zaAV0antwQYimepiDvGo8QME
-X-Google-Smtp-Source: AGHT+IGcWrJqtZ43V+s8BIoH/VOJWFVfMjaAJrAMjYxsFFcshcsaLm5j7uSV+h6i+eHEuIvhwXgutA==
-X-Received: by 2002:a05:6a20:6a11:b0:1be:cbe9:f765 with SMTP id adf61e73a8af0-1c0cc73ea5dmr1319914637.18.1720095012149;
-        Thu, 04 Jul 2024 05:10:12 -0700 (PDT)
-Received: from localhost (118-211-5-80.tpgi.com.au. [118.211.5.80])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2c999e13eedsm758458a91.1.2024.07.04.05.10.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 04 Jul 2024 05:10:11 -0700 (PDT)
+	s=arc-20240116; t=1720095684; c=relaxed/simple;
+	bh=XtcAzSjR7cd/L8cGrfT98oaBS5Sbc/RdMZNnzv7jvnY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BsRZOerwy5Ln8l90tjR7IGAsbJon4GGoDadK1bQxImJCV9UoFm1mgZ1+bW5odePiAwf053jpdjrlWSID2GFLuqAlkZi1UKY+pgtPoF7qVMTaxwOgkTRJ2hLh8j+qywgWeo7hWMCi2Kah9LtfVUaGixanWJqN9xrydIsPMfr+v04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h3JHz1DA; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720095683; x=1751631683;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=XtcAzSjR7cd/L8cGrfT98oaBS5Sbc/RdMZNnzv7jvnY=;
+  b=h3JHz1DAm2zU6EIVl20+jt+xdrjqbUEtjazWQp09JT7egEbAEdQ94mx/
+   zKTELhjaoP+vT1E4L/KnDmkqNSk0MrVG4dF+Vm1H+eQ07QrdTrCfNsUu7
+   8wH/lI/D21+6/afg1DBRHFBcroKcq2Xfn/C9eNTM3bPb0mcLn4YeeWvnB
+   +FP5m8lC9hxz0fIaXlJ0Ah+avdV2CnV/8YxGHO6gGNWKjpUdPX3endSAG
+   zalYgNGI6ZaDiMVfvIZUCeGWL37jxKos9PRR/2xEB4L+Ify7k2zwIoPK7
+   Qp+BQtOIVtJFBctk8BpQrj8qiRfMU4NelY4rUJFy4r3rBq6YNc2oWDOEY
+   A==;
+X-CSE-ConnectionGUID: ZPK/4WSDTB6BF20p7IOBGw==
+X-CSE-MsgGUID: dapSDcGbRCmP7UNkqnPmQg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11122"; a="17208566"
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="17208566"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 05:21:22 -0700
+X-CSE-ConnectionGUID: d5d2AiCISYqk15aa3/AURw==
+X-CSE-MsgGUID: k2s/5gstQf6paHkwtZ7jXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,183,1716274800"; 
+   d="scan'208";a="51022379"
+Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.1]) ([10.124.225.1])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2024 05:21:18 -0700
+Message-ID: <a00be0fa-1dbc-4873-85f9-958f5ea0ad7a@linux.intel.com>
+Date: Thu, 4 Jul 2024 20:21:15 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Patch v5 12/18] x86: pmu: Improve instruction and branches
+ events verification
+To: Sandipan Das <sandipan.das@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>,
+ Xiong Zhang <xiong.y.zhang@intel.com>, Zhenyu Wang
+ <zhenyuw@linux.intel.com>, Like Xu <like.xu.linux@gmail.com>,
+ Jinrong Liang <cloudliang@tencent.com>, Dapeng Mi <dapeng1.mi@intel.com>,
+ ravi.bangoria@amd.com, manali.shukla@amd.com,
+ Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+References: <20240703095712.64202-1-dapeng1.mi@linux.intel.com>
+ <20240703095712.64202-13-dapeng1.mi@linux.intel.com>
+ <6d512a14-ace1-41a3-801e-0beb41425734@amd.com>
+Content-Language: en-US
+From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
+In-Reply-To: <6d512a14-ace1-41a3-801e-0beb41425734@amd.com>
 Content-Type: text/plain; charset=UTF-8
-Date: Thu, 04 Jul 2024 22:10:05 +1000
-Message-Id: <D2GQSGNWNGX4.2R8TH3M64POGJ@gmail.com>
-Cc: <linuxppc-dev@lists.ozlabs.org>, <kvm@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC PATCH 2/2] arch/powerpc/kvm: Fix doorbells for nested KVM
- guests on PowerNV
-From: "Nicholas Piggin" <npiggin@gmail.com>
-To: "Gautam Menghani" <gautam@linux.ibm.com>, <mpe@ellerman.id.au>,
- <christophe.leroy@csgroup.eu>, <naveen.n.rao@linux.ibm.com>
-X-Mailer: aerc 0.17.0
-References: <20240627180342.110238-1-gautam@linux.ibm.com>
- <20240627180342.110238-3-gautam@linux.ibm.com>
-In-Reply-To: <20240627180342.110238-3-gautam@linux.ibm.com>
+Content-Transfer-Encoding: 7bit
 
-On Fri Jun 28, 2024 at 4:03 AM AEST, Gautam Menghani wrote:
-> commit 6398326b9ba1("KVM: PPC: Book3S HV P9: Stop using vc->dpdes")
-> introduced an optimization to use only vcpu->doorbell_request for SMT
-> emulation for Power9 and above guests, but the code for nested guests=20
-> still relies on the old way of handling doorbells, due to which an L2
-> guest cannot be booted with XICS with SMT>1. The command to repro
-> this issue is:
+
+On 7/4/2024 4:02 PM, Sandipan Das wrote:
+> On 7/3/2024 3:27 PM, Dapeng Mi wrote:
+>> If HW supports GLOBAL_CTRL MSR, enabling and disabling PMCs are moved in
+>> __precise_count_loop(). Thus, instructions and branches events can be
+>> verified against a precise count instead of a rough range.
+>>
+>> Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
+>> ---
+>>  x86/pmu.c | 31 +++++++++++++++++++++++++++++++
+>>  1 file changed, 31 insertions(+)
+>>
+>> diff --git a/x86/pmu.c b/x86/pmu.c
+>> index d005e376..ffb7b4a4 100644
+>> --- a/x86/pmu.c
+>> +++ b/x86/pmu.c
+>> @@ -19,6 +19,11 @@
+>>  #define EXPECTED_INSTR 17
+>>  #define EXPECTED_BRNCH 5
+>>  
+>> +
+>> +/* Enable GLOBAL_CTRL + disable GLOBAL_CTRL instructions */
+>> +#define EXTRA_INSTRNS  (3 + 3)
+>> +#define LOOP_INSTRNS   (N * 10 + EXTRA_INSTRNS)
+>> +#define LOOP_BRANCHES  (N)
+>>  #define LOOP_ASM(_wrmsr)						\
+>>  	_wrmsr "\n\t"							\
+>>  	"mov %%ecx, %%edi; mov %%ebx, %%ecx;\n\t"			\
+>> @@ -122,6 +127,24 @@ static inline void loop(u64 cntrs)
+>>  		__precise_loop(cntrs);
+>>  }
+>>  
+>> +static void adjust_events_range(struct pmu_event *gp_events,
+>> +				int instruction_idx, int branch_idx)
+>> +{
+>> +	/*
+>> +	 * If HW supports GLOBAL_CTRL MSR, enabling and disabling PMCs are
+>> +	 * moved in __precise_loop(). Thus, instructions and branches events
+>> +	 * can be verified against a precise count instead of a rough range.
+>> +	 */
+>> +	if (this_cpu_has_perf_global_ctrl()) {
+> This causes some intermittent failures on AMD processors using PerfMonV2
+> due to variance in counts. This probably has to do with the way instructions
+> leading to a VM-Entry or VM-Exit are accounted when counting retired
+> instructions and branches. Adding the following change makes all the tests
+> pass again.
+
+Thanks to verify on AMD platforms. Would add it in next version.
+
+
 >
-> qemu-system-ppc64 \
-> 	-drive file=3Drhel.qcow2,format=3Dqcow2 \
-> 	-m 20G \
-> 	-smp 8,cores=3D1,threads=3D8 \
-> 	-cpu  host \
-> 	-nographic \
-> 	-machine pseries,ic-mode=3Dxics -accel kvm
+> diff --git a/x86/pmu.c b/x86/pmu.c
+> index 0658a1c1..09a34a3f 100644
+> --- a/x86/pmu.c
+> +++ b/x86/pmu.c
+> @@ -222,7 +222,7 @@ static void adjust_events_range(struct pmu_event *gp_events,
+>          * moved in __precise_loop(). Thus, instructions and branches events
+>          * can be verified against a precise count instead of a rough range.
+>          */
+> -       if (this_cpu_has_perf_global_ctrl()) {
+> +       if (pmu.is_intel && this_cpu_has_perf_global_ctrl()) {
+>                 /* instructions event */
+>                 gp_events[instruction_idx].min = LOOP_INSTRNS;
+>                 gp_events[instruction_idx].max = LOOP_INSTRNS;
 >
-> Fix the plumbing to utilize vcpu->doorbell_request instead of vcore->dpde=
-s=20
-> on P9 and above.
 >
-> Fixes: 6398326b9ba1 ("KVM: PPC: Book3S HV P9: Stop using vc->dpdes")
-> Signed-off-by: Gautam Menghani <gautam@linux.ibm.com>
-> ---
->  arch/powerpc/kvm/book3s_hv.c        |  9 ++++++++-
->  arch/powerpc/kvm/book3s_hv_nested.c | 20 ++++++++++++++++----
->  2 files changed, 24 insertions(+), 5 deletions(-)
+>> +		/* instructions event */
+>> +		gp_events[instruction_idx].min = LOOP_INSTRNS;
+>> +		gp_events[instruction_idx].max = LOOP_INSTRNS;
+>> +		/* branches event */
+>> +		gp_events[branch_idx].min = LOOP_BRANCHES;
+>> +		gp_events[branch_idx].max = LOOP_BRANCHES;
+>> +	}
+>> +}
+>> +
+>>  volatile uint64_t irq_received;
+>>  
+>>  static void cnt_overflow(isr_regs_t *regs)
+>> @@ -823,6 +846,9 @@ static void check_invalid_rdpmc_gp(void)
+>>  
+>>  int main(int ac, char **av)
+>>  {
+>> +	int instruction_idx;
+>> +	int branch_idx;
+>> +
+>>  	setup_vm();
+>>  	handle_irq(PMI_VECTOR, cnt_overflow);
+>>  	buf = malloc(N*64);
+>> @@ -836,13 +862,18 @@ int main(int ac, char **av)
+>>  		}
+>>  		gp_events = (struct pmu_event *)intel_gp_events;
+>>  		gp_events_size = sizeof(intel_gp_events)/sizeof(intel_gp_events[0]);
+>> +		instruction_idx = INTEL_INSTRUCTIONS_IDX;
+>> +		branch_idx = INTEL_BRANCHES_IDX;
+>>  		report_prefix_push("Intel");
+>>  		set_ref_cycle_expectations();
+>>  	} else {
+>>  		gp_events_size = sizeof(amd_gp_events)/sizeof(amd_gp_events[0]);
+>>  		gp_events = (struct pmu_event *)amd_gp_events;
+>> +		instruction_idx = AMD_INSTRUCTIONS_IDX;
+>> +		branch_idx = AMD_BRANCHES_IDX;
+>>  		report_prefix_push("AMD");
+>>  	}
+>> +	adjust_events_range(gp_events, instruction_idx, branch_idx);
+>>  
+>>  	printf("PMU version:         %d\n", pmu.version);
+>>  	printf("GP counters:         %d\n", pmu.nr_gp_counters);
 >
-> diff --git a/arch/powerpc/kvm/book3s_hv.c b/arch/powerpc/kvm/book3s_hv.c
-> index cea28ac05923..0586fa636707 100644
-> --- a/arch/powerpc/kvm/book3s_hv.c
-> +++ b/arch/powerpc/kvm/book3s_hv.c
-> @@ -4178,6 +4178,9 @@ static int kvmhv_vcpu_entry_p9_nested(struct kvm_vc=
-pu *vcpu, u64 time_limit, uns
->  	}
->  	hvregs.hdec_expiry =3D time_limit;
-> =20
-> +	// clear doorbell bit as hvregs already has the info
-> +	vcpu->arch.doorbell_request =3D 0;
-> +
->  	/*
->  	 * When setting DEC, we must always deal with irq_work_raise
->  	 * via NMI vs setting DEC. The problem occurs right as we
-> @@ -4694,6 +4697,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u6=
-4 time_limit,
->  	struct kvm_nested_guest *nested =3D vcpu->arch.nested;
->  	unsigned long flags;
->  	u64 tb;
-> +	bool doorbell_pending;
-> =20
->  	trace_kvmppc_run_vcpu_enter(vcpu);
-> =20
-> @@ -4752,6 +4756,9 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u6=
-4 time_limit,
->  	 */
->  	smp_mb();
-> =20
-> +	doorbell_pending =3D !cpu_has_feature(CPU_FTR_ARCH_300) &&
-> +				vcpu->arch.doorbell_request;
-
-Hmm... is the feature test flipped here?
-
-> +
->  	if (!nested) {
->  		kvmppc_core_prepare_to_enter(vcpu);
->  		if (test_bit(BOOK3S_IRQPRIO_EXTERNAL,
-> @@ -4769,7 +4776,7 @@ int kvmhv_run_single_vcpu(struct kvm_vcpu *vcpu, u6=
-4 time_limit,
->  				lpcr |=3D LPCR_MER;
->  		}
->  	} else if (vcpu->arch.pending_exceptions ||
-> -		   vcpu->arch.doorbell_request ||
-> +		   doorbell_pending ||
->  		   xive_interrupt_pending(vcpu)) {
->  		vcpu->arch.ret =3D RESUME_HOST;
->  		goto out;
-> diff --git a/arch/powerpc/kvm/book3s_hv_nested.c b/arch/powerpc/kvm/book3=
-s_hv_nested.c
-> index 05f5220960c6..b34eefa6b268 100644
-> --- a/arch/powerpc/kvm/book3s_hv_nested.c
-> +++ b/arch/powerpc/kvm/book3s_hv_nested.c
-> @@ -32,7 +32,10 @@ void kvmhv_save_hv_regs(struct kvm_vcpu *vcpu, struct =
-hv_guest_state *hr)
->  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
-> =20
->  	hr->pcr =3D vc->pcr | PCR_MASK;
-> -	hr->dpdes =3D vc->dpdes;
-> +	if (cpu_has_feature(CPU_FTR_ARCH_300))
-> +		hr->dpdes =3D vcpu->arch.doorbell_request;
-> +	else
-> +		hr->dpdes =3D vc->dpdes;
->  	hr->hfscr =3D vcpu->arch.hfscr;
->  	hr->tb_offset =3D vc->tb_offset;
->  	hr->dawr0 =3D vcpu->arch.dawr0;
-
-Great find.
-
-Nested is all POWER9 and later only, so I think you can just
-change to using doorbell_request always.
-
-And probably don't have to do anything for book3s_hv.c unless
-I'm mistaken about the feature test.
-
-Thanks,
-Nick
-
-> @@ -105,7 +108,10 @@ static void save_hv_return_state(struct kvm_vcpu *vc=
-pu,
->  {
->  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
-> =20
-> -	hr->dpdes =3D vc->dpdes;
-> +	if (cpu_has_feature(CPU_FTR_ARCH_300))
-> +		hr->dpdes =3D vcpu->arch.doorbell_request;
-> +	else
-> +		hr->dpdes =3D vc->dpdes;
->  	hr->purr =3D vcpu->arch.purr;
->  	hr->spurr =3D vcpu->arch.spurr;
->  	hr->ic =3D vcpu->arch.ic;
-> @@ -143,7 +149,10 @@ static void restore_hv_regs(struct kvm_vcpu *vcpu, c=
-onst struct hv_guest_state *
->  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
-> =20
->  	vc->pcr =3D hr->pcr | PCR_MASK;
-> -	vc->dpdes =3D hr->dpdes;
-> +	if (cpu_has_feature(CPU_FTR_ARCH_300))
-> +		vcpu->arch.doorbell_request =3D hr->dpdes;
-> +	else
-> +		vc->dpdes =3D hr->dpdes;
->  	vcpu->arch.hfscr =3D hr->hfscr;
->  	vcpu->arch.dawr0 =3D hr->dawr0;
->  	vcpu->arch.dawrx0 =3D hr->dawrx0;
-> @@ -170,7 +179,10 @@ void kvmhv_restore_hv_return_state(struct kvm_vcpu *=
-vcpu,
->  {
->  	struct kvmppc_vcore *vc =3D vcpu->arch.vcore;
-> =20
-> -	vc->dpdes =3D hr->dpdes;
-> +	if (cpu_has_feature(CPU_FTR_ARCH_300) && !vcpu->arch.doorbell_request)
-> +		vcpu->arch.doorbell_request =3D hr->dpdes;
-> +	else
-> +		vc->dpdes =3D hr->dpdes;
->  	vcpu->arch.hfscr =3D hr->hfscr;
->  	vcpu->arch.purr =3D hr->purr;
->  	vcpu->arch.spurr =3D hr->spurr;
-
 
