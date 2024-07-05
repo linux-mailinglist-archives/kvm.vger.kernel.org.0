@@ -1,172 +1,160 @@
-Return-Path: <kvm+bounces-20984-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5BB4927FAC
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 03:19:32 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DC79927FB5
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 03:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04A8E1C216EA
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 01:19:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAFA61F22897
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 01:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C53E1D53F;
-	Fri,  5 Jul 2024 01:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6U3xTnm"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADE0D101CE;
+	Fri,  5 Jul 2024 01:21:26 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EB37F505
-	for <kvm@vger.kernel.org>; Fri,  5 Jul 2024 01:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9119D3FEC;
+	Fri,  5 Jul 2024 01:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720142285; cv=none; b=ZXRzPVdZIkVwqzc7PLSBYtoUP0TJLRM0aFNhJ/2TrcXcbgV5lWJfgM4x/5FvRJAZCesYGRVwRqdz0ZMgFOuSjy3G/A35aiJ+VG01mlDv1UO4hf/dr6SZ1XaBIQy96ccUZS6X5yoEvFDZbPqn0BYrGPS8rg/IMwbsMZEmJhs+ZXE=
+	t=1720142486; cv=none; b=W3tXOOXUzT7gCDT56XMSg6LgBubJ/z8tn12hruoalpJKm2aU8y7n5siLUDiOQ6ke3FBEnU/om/BFtw7hLHWeS67twHi91VLFkJ/D2JHKZAZ30+B50tXj6kPUellQPnVh1FQaAa50n5IAT05j2SbnlJ/63azZCDgnH1s0JG/togA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720142285; c=relaxed/simple;
-	bh=EXG0vdXn9rII3D+KCAP3vDlEC4rngHU/vCdatspHQu4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GWeXUxyXAUO0nI6h83yhardCyx0fscAG35iUB/9G0sc/JKQJMdEse0lZOgFZjIhEyWanDv1zXQl7rjHuMggzQIMR1HXtvdVfYhNgLXZWHu1W4b3mwxml4JtQsbp+0vPaZXcsuERkJqMs/NOjm9Mt/CilXY84A5miizvVxxfKOhI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f6U3xTnm; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720142283;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o1GmW0SxxDLUHNaUVBUQTGEySUGPhjAywrfZJc9ozqE=;
-	b=f6U3xTnmR/LudmNTpO20doMawotucNeiRGHCM7FgSZi6VuSPTV9M9x7d/alJdZSMk8Yc1N
-	nLb7HyKxUNnwzRL9LHpFReOZrOXY+e5DSaUNAN7A4wwap6NMPw9GhSVP43f3zSGTnvb2w6
-	pLA9QYBe+mFBAqr/0sjIoVAoSxM2Ews=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-631-R5AZnfqmNb6JXmPjLWJHYg-1; Thu, 04 Jul 2024 21:18:01 -0400
-X-MC-Unique: R5AZnfqmNb6JXmPjLWJHYg-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-79ee31dfec8so154896685a.2
-        for <kvm@vger.kernel.org>; Thu, 04 Jul 2024 18:18:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720142281; x=1720747081;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=o1GmW0SxxDLUHNaUVBUQTGEySUGPhjAywrfZJc9ozqE=;
-        b=xBoStkTev4XzNrKS/8mdVD3zkcHAPxJFkzgSekauYvzFKnsH4xPKZZDP92AlfA9B2N
-         p9auvyMiZscclqGrQCyldNgN939SJXsrbbltYxQc1LCkUIUvmUe9oYUErHgx2pw6xYTd
-         B3hpHh1Eg+r1GrFopDTwV8Ctp8mSg2FMcgoktuNrGK86j6K+U+9qmAb2/GAKzu7bFTHb
-         nWAzTdGSiEONKGxhyiVVx4m9khCPewAvhT3CZYNKmCjdskFT6jgdWI2A/AjghHEf4rZ8
-         wp66NpWIHdIdLDbFBzf++wwEz2zwAXV0maKBWx48fkp7UO7W2Nb1w4X65CMMrvDj8nuM
-         VmaA==
-X-Gm-Message-State: AOJu0Yz5HLLaO/fWvF4QUWEq7B7Aahe6vu4dCbxu+Nw9tgDmVQ6eOa9O
-	r4g2Vga6r6gWGuGgehhzDXeblZvp2dzlvilmVysesbadA6DY5+T25A042J5WSwS0UpW7P3XM4ZZ
-	5fM2X6HWvfZHk7uKQJlA8laErsiBKxSC15tQFXt0sKso3EcD7Sw==
-X-Received: by 2002:a05:620a:468e:b0:79d:7793:ee3a with SMTP id af79cd13be357-79eee1de29bmr432421085a.15.1720142280864;
-        Thu, 04 Jul 2024 18:18:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEK+3SG/MyXuNkvivY7dc3fj4eTvFPVjp1qSbuGQ9/Sojl5UK7crDBNQQMI0cZq9lKR5ID9Xw==
-X-Received: by 2002:a05:620a:468e:b0:79d:7793:ee3a with SMTP id af79cd13be357-79eee1de29bmr432418785a.15.1720142280544;
-        Thu, 04 Jul 2024 18:18:00 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79ef26f843dsm65413685a.136.2024.07.04.18.17.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 18:18:00 -0700 (PDT)
-Message-ID: <5c7025e6558d9344e10cda6ccc3614e1cdc1b43b.camel@redhat.com>
-Subject: Re: [PATCH v2 18/49] KVM: x86: Account for max supported CPUID leaf
- when getting raw host CPUID
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>,  Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Hou Wenlong
- <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>, Oliver Upton
- <oliver.upton@linux.dev>, Binbin Wu <binbin.wu@linux.intel.com>, Yang
- Weijiang <weijiang.yang@intel.com>, Robert Hoo <robert.hoo.linux@gmail.com>
-Date: Thu, 04 Jul 2024 21:17:59 -0400
-In-Reply-To: <20240517173926.965351-19-seanjc@google.com>
-References: <20240517173926.965351-1-seanjc@google.com>
-	 <20240517173926.965351-19-seanjc@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+	s=arc-20240116; t=1720142486; c=relaxed/simple;
+	bh=5X/6jbJu4QtfpBJLnuys4Wu3vTFIuA7T4od907taK24=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=F3ESlz9Ga2gu0D80nIRBrn605ozIPCKTgUzoC/Bxhw4hDtvscWsyA6zY5MiJuAe9uXaxyIW0MMdxdtxXEVX1RJlSK56uAfamV4HvrFgEk05wltKPTZGE7LdivUQ9DiK3xqR/PwBZOADxGtvrdPXUzOIt7wm1KyQ/FjFk66YQmdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8Cx7+uRSodm2x8BAA--.3399S3;
+	Fri, 05 Jul 2024 09:21:21 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxJMWOSodmQbw7AA--.62450S3;
+	Fri, 05 Jul 2024 09:21:20 +0800 (CST)
+Subject: Re: [PATCH v4 2/3] LoongArch: KVM: Add LBT feature detection function
+To: Jiaxun Yang <jiaxun.yang@flygoat.com>, Huacai Chen <chenhuacai@kernel.org>
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>,
+ kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240626063239.3722175-1-maobibo@loongson.cn>
+ <20240626063239.3722175-3-maobibo@loongson.cn>
+ <CAAhV-H4O8QNb61xkErd9y_1tK_70=Y=LNqzy=9Ny5EQK1XZJaQ@mail.gmail.com>
+ <79dcf093-614f-2737-bb03-698b0b3abc57@loongson.cn>
+ <CAAhV-H5bQutcLcVaHn-amjF6_NDnCf2BFqqnGSRT_QQ_6q6REg@mail.gmail.com>
+ <9c7d242e-660b-8d39-b69e-201fd0a4bfbf@loongson.cn>
+ <CAAhV-H4wwrYyMYpL1u5Z3sFp6EeW4eWhGbBv0Jn9XYJGXgwLfg@mail.gmail.com>
+ <059d66e4-dd5d-0091-01d9-11aaba9297bd@loongson.cn>
+ <CAAhV-H41B3_dLgTQGwT-DRDbb=qt44A_M08-RcKfJuxOTfm3nw@mail.gmail.com>
+ <7e6a1dbc-779a-4669-4541-c5952c9bdf24@loongson.cn>
+ <CAAhV-H7jY8p8eY4rVLcMvVky9ZQTyZkA+0UsW2JkbKYtWvjmZg@mail.gmail.com>
+ <81dded06-ad03-9aed-3f07-cf19c5538723@loongson.cn>
+ <CAAhV-H520i-2N0DUPO=RJxtU8Sn+eofQAy7_e+rRsnNdgv8DTQ@mail.gmail.com>
+ <0e28596c-3fe9-b716-b193-200b9b1d5516@loongson.cn>
+ <CAAhV-H6vgb1D53zHoe=BJD1crB9jcdZy7RM-G0YY0UD+ubDi4g@mail.gmail.com>
+ <bdcc9ec4-31a8-1438-25c0-be8ba7f49ed0@loongson.cn>
+ <ecb6df72-543c-4458-ba27-0ef8340c1eb3@flygoat.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <554b10e8-a7ab-424a-f987-ea679859a220@loongson.cn>
+Date: Fri, 5 Jul 2024 09:21:18 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <ecb6df72-543c-4458-ba27-0ef8340c1eb3@flygoat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxJMWOSodmQbw7AA--.62450S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoW7Kry8ZF4rWFy8Ww1UZw1xtFc_yoW8KFy3pa
+	yFka1S9F4DAr48AwnrAw4xWw4Skw4rta13Jrn8GryDJ398Xry2vr92kayruF9rCr1Sg34j
+	vF42y3sakFZ8ZagCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
+	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
+	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_JF0_Jw1lIx
+	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
+	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
+	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8zwZ7UU
+	UUU==
 
-On Fri, 2024-05-17 at 10:38 -0700, Sean Christopherson wrote:
-> Explicitly zero out the feature word in kvm_cpu_caps if the word's
-> associated CPUID function is greater than the max leaf supported by the
-> CPU.  For such unsupported functions, Intel CPUs return the output from
-> the last supported leaf, not all zeros.
-> 
-> Practically speaking, this is likely a benign bug, as KVM uses the raw
-> host CPUID to mask the kernel's computed capabilities, and the kernel does
-> perform max leaf checks when populating boot_cpu_data.  The only way KVM's
-> goof could be problematic is if the kernel force-set a feature in a leaf
-> that is completely unsupported, _and_ the max supported leaf happened to
-> return a value with '1' the same bit position.  Which is theoretically
-> possible, but extremely unlikely.  And even if that did happen, it's
-> entirely possible that KVM would still provide the correct functionality;
-> the kernel did set the capability after all.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/x86/kvm/cpuid.c | 29 ++++++++++++++++++++++++-----
->  1 file changed, 24 insertions(+), 5 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index a51e48663f53..77625a5477b1 100644
-> --- a/arch/x86/kvm/cpuid.c
-> +++ b/arch/x86/kvm/cpuid.c
-> @@ -571,18 +571,37 @@ int kvm_vcpu_ioctl_get_cpuid2(struct kvm_vcpu *vcpu,
->  	return 0;
->  }
->  
-> +static __always_inline u32 raw_cpuid_get(struct cpuid_reg cpuid)
-> +{
-> +	struct kvm_cpuid_entry2 entry;
-> +	u32 base;
-> +
-> +	/*
-> +	 * KVM only supports features defined by Intel (0x0), AMD (0x80000000),
-> +	 * and Centaur (0xc0000000).  WARN if a feature for new vendor base is
-> +	 * defined, as this and other code would need to be updated.
-> +	 */
-> +	base = cpuid.function & 0xffff0000;
-> +	if (WARN_ON_ONCE(base && base != 0x80000000 && base != 0xc0000000))
-> +		return 0;
-> +
-> +	if (cpuid_eax(base) < cpuid.function)
-> +		return 0;
-> +
-> +	cpuid_count(cpuid.function, cpuid.index,
-> +		    &entry.eax, &entry.ebx, &entry.ecx, &entry.edx);
-> +
-> +	return *__cpuid_entry_get_reg(&entry, cpuid.reg);
-> +}
-> +
->  /* Mask kvm_cpu_caps for @leaf with the raw CPUID capabilities of this CPU. */
->  static __always_inline void __kvm_cpu_cap_mask(unsigned int leaf)
->  {
->  	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);
-> -	struct kvm_cpuid_entry2 entry;
->  
->  	reverse_cpuid_check(leaf);
->  
-> -	cpuid_count(cpuid.function, cpuid.index,
-> -		    &entry.eax, &entry.ebx, &entry.ecx, &entry.edx);
-> -
-> -	kvm_cpu_caps[leaf] &= *__cpuid_entry_get_reg(&entry, cpuid.reg);
-> +	kvm_cpu_caps[leaf] &= raw_cpuid_get(cpuid);
->  }
->  
->  static __always_inline
 
-Reviewed-by: Maxim Levitsky <mlevitsk@redhat.com>
-Best regards,
-	Maxim Levitsky
+
+On 2024/7/5 上午3:44, Jiaxun Yang wrote:
+> 
+> 
+> On 2024/7/4 09:35, maobibo wrote:
+>> In another thread I found that Jiaxun said he has a solution to make
+>>> LBT be a vcpu feature and still works well. However, that may take
+>>> some time and is too late for 6.11.
+>>>
+>>> But we have another choice now: just remove the UAPI and vm.c parts in
+>>> this series, let the LBT main parts be upstream in 6.11, and then
+>>> solve other problems after 6.11. Even if Jiaxun's solution isn't
+>>> usable, we can still use this old vm feature solution then.
+> 
+> IMO this is the best approach to make some progress.
+> 
+>>
+>> I am sure it is best if it is VM feature for LBT feature detection, 
+>> LSX/LASX feature detection uses CPU feature, we can improve it later.
+> 
+> Please justify the reason, we should always be serious on UAPI design 
+> choices.
+> I don't really understand why the approach worked so well on Arm & 
+> RISC-V is not working
+> for you.
+On the other hand, can you list benefits or disadvantage of approaches 
+on different architecture?
+
+Or you post patch about host cpu support, I list its disadvantage. Or I 
+post patch about host cpu support with scheduled time, then we talk 
+about it. Is that fair for you?
+
+It is unfair that you list some approaches and let others spend time to 
+do, else you are my top boss :)
+> 
+> I understand you may have some plans in your mind, please elaborate so 
+> we can smash
+> them together. That's how community work.
+> 
+>>
+>> For host cpu type or migration feature detection, I have no idea now, 
+>> also I do not think it will be big issue for me, I will do it with 
+>> scheduled time. Of source, welcome Jiaxun and you to implement host 
+>> cpu type or migration feature detection.
+> 
+> My concern is if you allow CPU features to have "auto" property you are 
+> risking create
+> inconsistency among migration. Once you've done that it's pretty hard to 
+> get rid of it.
+> 
+> Please check how RISC-V dealing with CPU features at QMP side.
+> 
+> I'm not meant to hinder your development work, but we should always 
+> think ahead.
+Yes, it is potential issue and we will solve it. Another potential issue 
+is that PV features may different on host, you cannot disable PV 
+features directly.  The best way is that you post patch about it, then 
+we can talk about together, else it may be kindly reminder, also may be 
+waste of time, everyone is busy working for boss :)
+
+Regards
+Bibo Mao
+> 
+> Thanks
+> - Jiaxun
+>>
 
 
