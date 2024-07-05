@@ -1,305 +1,243 @@
-Return-Path: <kvm+bounces-21028-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B58B9280B9
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 04:59:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39C3292808D
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 04:44:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D50091F24BF9
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 02:59:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 556861C22A73
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 02:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 023AE145B18;
-	Fri,  5 Jul 2024 02:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E271CFBD;
+	Fri,  5 Jul 2024 02:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fu3ceKBT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15173139D04;
-	Fri,  5 Jul 2024 02:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419351B950
+	for <kvm@vger.kernel.org>; Fri,  5 Jul 2024 02:43:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720148191; cv=none; b=STdj1GpcZ+uzs8mmXb27CP2eFHhQa0du9IGq7S2/6RKvTa1+4eNVbTbKBq68Gloz9jF6DhPpgOU+kTBZ1YEAykqeUJ3b/XuPFSVZzlcOFVGyeBV9ObuTY0RC4fF3oCd5u7ejy6vmWhKE4cVMM6YeFrtO7xDGI52HsiQV75a77jI=
+	t=1720147436; cv=none; b=lgzVvtL5gDJU4mLfidbWLBGNiBVlSjYgtnaymq48Izj036Kv0qeVbL+UX2l46OyYH84WXEloCkOomCA7nr9cipr7b0H9ZUTLWXVypWhIvJWcDdVrS3ySUJ/6QDpiKV7k4AcU0AhXhPMZXess/B3lrnU/NjdNmV3II930yoWuzgA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720148191; c=relaxed/simple;
-	bh=YylNxF37f0DRD5NJH36i/MtOFN8oFQ9OiCy97hBX+h0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=L1gR7j0A3AVcAxBvfn29Bmrc+o4k5tRneIHVHdFcZCuLC+GSX3/b/dDyXxmVxcynM/EmVFhXlJg/kDgl84HhWWZT2AguukYGHFcfx4tKVw0sT05FNRCEtOcRuQkUsHe6kX3cGIDzCrOFS851oHdSj7gvBSU+qvkIBoz1tfylwxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.2.5.185])
-	by gateway (Coremail) with SMTP id _____8BxXevbYIdmDyUBAA--.3484S3;
-	Fri, 05 Jul 2024 10:56:27 +0800 (CST)
-Received: from localhost.localdomain (unknown [10.2.5.185])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxWcbRYIdm3tE7AA--.7292S13;
-	Fri, 05 Jul 2024 10:56:25 +0800 (CST)
-From: Xianglai Li <lixianglai@loongson.cn>
-To: linux-kernel@vger.kernel.org
-Cc: Bibo Mao <maobibo@loongson.cn>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	Min Zhou <zhoumin@loongson.cn>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	WANG Xuerui <kernel@xen0n.name>,
-	Xianglai li <lixianglai@loongson.cn>
-Subject: [PATCH 11/11] LoongArch: KVM: Add irqfd support
-Date: Fri,  5 Jul 2024 10:38:54 +0800
-Message-Id: <20240705023854.1005258-12-lixianglai@loongson.cn>
-X-Mailer: git-send-email 2.39.1
-In-Reply-To: <20240705023854.1005258-1-lixianglai@loongson.cn>
-References: <20240705023854.1005258-1-lixianglai@loongson.cn>
+	s=arc-20240116; t=1720147436; c=relaxed/simple;
+	bh=8MGFKcZ2Pb4lFttSMmZpH0a5HBiG2JsOZCRf3Wi6Moo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hurSTKkEewSg6pNcnmVW/1iDYynj+9Gw43XQyZuczg1Yz9N29d7QV0mgLAL3gTkeOAQxtgrxEnfSk3W5cjPQGqZLZolMjIJYHQKq/mZtbJyQAoiimVUtgqG1P2ccNXV3K1Grjq2BE6SzWEA/ymk+BQ9naa4xMsXSLY64dGdfF+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fu3ceKBT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720147434;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fiIV52P1D3oTXD+BJX66re1vrwR0GUT0MIJ0IzN93Ps=;
+	b=Fu3ceKBTR+iMbLEF78khfOZq2Mr1kLPj67rD0LFZKRYZ5GjTe+x3ywcMelqDe2VarvlcVY
+	KkROU+DUpNXETK6HsJwPlRLAZjNhqxgmqHJ6DQihiIU8W5z/FWgj+Dd2loZYCieM9RCKNF
+	hiG2qLT8kRnaKK8L52SbyIZJkBOJmeE=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-47--KDqnj83MF6wBiRc8Nybjw-1; Thu, 04 Jul 2024 22:43:52 -0400
+X-MC-Unique: -KDqnj83MF6wBiRc8Nybjw-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-64b70c4a269so19545367b3.1
+        for <kvm@vger.kernel.org>; Thu, 04 Jul 2024 19:43:52 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720147431; x=1720752231;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fiIV52P1D3oTXD+BJX66re1vrwR0GUT0MIJ0IzN93Ps=;
+        b=BJ7Ed6xlkWWQx5/0aPP3KLjBTTVzUGhJmy+wte92q688ifF0JtE6RAXHetCKC0pQ+j
+         FWsB6SXY6JBsEXpR91spIz6RXoRwzQrzqu/vr18MCeV5PgyF2Yn+3foogatrR7F8B87B
+         MuZwwevw9UsSpfTg4dN/aLaGKWNpz/MmB4kIqDqfY+X7+tp5St4sdMGAiuTX1nGhW9g7
+         QoPD+RsTMsDquavHv2OC2Yse7hORNVef1kFzARYFOmG+aiA5V+wD9/IJPRqdU0k64InC
+         ZgJfJptftgw5u0vMnxhVDRDH1wFNtxn7LQoS6qdB3TzpvwRGJj3pN910g8acleyDMFlT
+         6+kg==
+X-Gm-Message-State: AOJu0YwqN0LDWgRGgkjjErb4OQKSFEyG+m0CbEQX7+WFdtrG/XfL8u55
+	zfGE/UoOvJS9/FXJTp2Oj6prkvpFWZ/64Mh8BKNri0Z0tLHJkhMs+ByzWhLdhm7szZ9GBAh9UYi
+	B+KF8edQopMQk+dRtJ7XLvK0qRIOO/JbTqH0l/pVJRBhqP2lpkA==
+X-Received: by 2002:a05:690c:74c5:b0:615:2ed7:59c with SMTP id 00721157ae682-652d8536615mr38031947b3.47.1720147431625;
+        Thu, 04 Jul 2024 19:43:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF8ZHyYG9kGanBhGzs0UE6fXvMoL92JVnkqylPWvraJrBMpEdWdertJUGpk38GCqR0vItX/9A==
+X-Received: by 2002:a05:690c:74c5:b0:615:2ed7:59c with SMTP id 00721157ae682-652d8536615mr38031797b3.47.1720147431304;
+        Thu, 04 Jul 2024 19:43:51 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79d69260004sm731430685a.27.2024.07.04.19.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Jul 2024 19:43:51 -0700 (PDT)
+Message-ID: <16658367af25852e4bb6abb0caf7c3bc58538db0.camel@redhat.com>
+Subject: Re: [PATCH v2 48/49] KVM: x86: Add a macro for features that are
+ synthesized into boot_cpu_data
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
+ <pbonzini@redhat.com>,  Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Hou Wenlong
+ <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>, Oliver Upton
+ <oliver.upton@linux.dev>, Binbin Wu <binbin.wu@linux.intel.com>, Yang
+ Weijiang <weijiang.yang@intel.com>, Robert Hoo <robert.hoo.linux@gmail.com>
+Date: Thu, 04 Jul 2024 22:43:49 -0400
+In-Reply-To: <20240517173926.965351-49-seanjc@google.com>
+References: <20240517173926.965351-1-seanjc@google.com>
+	 <20240517173926.965351-49-seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxWcbRYIdm3tE7AA--.7292S13
-X-CM-SenderInfo: 5ol0xt5qjotxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
-	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
-	nUUI43ZEXa7xR_UUUUUUUUU==
+Content-Transfer-Encoding: 7bit
 
-Enable the KVM_IRQ_ROUTING KVM_IRQCHIP KVM_MSI configuration item,
-increase the KVM_CAP_IRQCHIP capability, and implement the query
-interface of the kernel irqchip.
+On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
+> Add yet another CPUID macro, this time for features that the host kernel
+> synthesizes into boot_cpu_data, i.e. that the kernel force sets even in
+> situations where the feature isn't reported by CPUID.  Thanks to the
+> macro shenanigans of kvm_cpu_cap_init(), such features can now be handled
+> in the core CPUID framework, i.e. don't need to be handled out-of-band and
+> thus without as many guardrails.
+> 
+> Adding a dedicated macro also helps document what's going on, e.g. the
+> calls to kvm_cpu_cap_check_and_set() are very confusing unless the reader
+> knows exactly how kvm_cpu_cap_init() generates kvm_cpu_caps (and even
+> then, it's far from obvious).
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/x86/kvm/cpuid.c | 22 ++++++++++++++++------
+>  1 file changed, 16 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 0130e0677387..0e64a6332052 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -106,6 +106,17 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
+>  	F(name);						\
+>  })
+>  
+> +/*
+> + * Synthesized Feature - For features that are synthesized into boot_cpu_data,
+> + * i.e. may not be present in the raw CPUID, but can still be advertised to
+> + * userspace.  Primarily used for mitigation related feature flags.
+> + */
+> +#define SYN_F(name)						\
+> +({								\
+> +	kvm_cpu_cap_synthesized |= F(name);			\
+> +	F(name);						\
+> +})
+> +
+>  /*
+>   * Aliased Features - For features in 0x8000_0001.EDX that are duplicates of
+>   * identical 0x1.EDX features, and thus are aliased from 0x1 to 0x8000_0001.
+> @@ -727,13 +738,15 @@ do {									\
+>  	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);	\
+>  	const u32 __maybe_unused kvm_cpu_cap_init_in_progress = leaf;	\
+>  	u32 kvm_cpu_cap_emulated = 0;					\
+> +	u32 kvm_cpu_cap_synthesized = 0;				\
+>  									\
+>  	if (leaf < NCAPINTS)						\
+>  		kvm_cpu_caps[leaf] &= (mask);				\
+>  	else								\
+>  		kvm_cpu_caps[leaf] = (mask);				\
+>  									\
+> -	kvm_cpu_caps[leaf] &= raw_cpuid_get(cpuid);			\
+> +	kvm_cpu_caps[leaf] &= (raw_cpuid_get(cpuid) |			\
+> +			       kvm_cpu_cap_synthesized);		\
+>  	kvm_cpu_caps[leaf] |= kvm_cpu_cap_emulated;			\
+>  } while (0)
+>  
+> @@ -913,13 +926,10 @@ void kvm_set_cpu_caps(void)
+>  	kvm_cpu_cap_init(CPUID_8000_0021_EAX,
+>  		F(NO_NESTED_DATA_BP) | F(LFENCE_RDTSC) | 0 /* SmmPgCfgLock */ |
+>  		F(NULL_SEL_CLR_BASE) | F(AUTOIBRS) | 0 /* PrefetchCtlMsr */ |
+> -		F(WRMSR_XX_BASE_NS)
+> +		F(WRMSR_XX_BASE_NS) | SYN_F(SBPB) | SYN_F(IBPB_BRTYPE) |
+> +		SYN_F(SRSO_NO)
+>  	);
+>  
+> -	kvm_cpu_cap_check_and_set(X86_FEATURE_SBPB);
+> -	kvm_cpu_cap_check_and_set(X86_FEATURE_IBPB_BRTYPE);
+> -	kvm_cpu_cap_check_and_set(X86_FEATURE_SRSO_NO);
+> -
+>  	kvm_cpu_cap_init(CPUID_8000_0022_EAX,
+>  		F(PERFMON_V2)
+>  	);
 
-Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
----
-Cc: Bibo Mao <maobibo@loongson.cn> 
-Cc: Huacai Chen <chenhuacai@kernel.org> 
-Cc: kvm@vger.kernel.org 
-Cc: loongarch@lists.linux.dev 
-Cc: Min Zhou <zhoumin@loongson.cn> 
-Cc: Paolo Bonzini <pbonzini@redhat.com> 
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn> 
-Cc: WANG Xuerui <kernel@xen0n.name> 
-Cc: Xianglai li <lixianglai@loongson.cn> 
 
- arch/loongarch/kvm/Kconfig        |  3 ++
- arch/loongarch/kvm/Makefile       |  1 +
- arch/loongarch/kvm/intc/pch_pic.c | 28 ++++++++++
- arch/loongarch/kvm/irqfd.c        | 87 +++++++++++++++++++++++++++++++
- arch/loongarch/kvm/vm.c           | 19 ++++++-
- 5 files changed, 137 insertions(+), 1 deletion(-)
- create mode 100644 arch/loongarch/kvm/irqfd.c
+Hi,
 
-diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-index c4ef2b4d9797..c2ef17055995 100644
---- a/arch/loongarch/kvm/Kconfig
-+++ b/arch/loongarch/kvm/Kconfig
-@@ -29,6 +29,9 @@ config KVM
- 	select KVM_MMIO
- 	select HAVE_KVM_READONLY_MEM
- 	select KVM_XFER_TO_GUEST_WORK
-+	select HAVE_KVM_IRQ_ROUTING
-+	select HAVE_KVM_IRQCHIP
-+	select HAVE_KVM_MSI
- 	help
- 	  Support hosting virtualized guest machines using
- 	  hardware virtualization extensions. You will need
-diff --git a/arch/loongarch/kvm/Makefile b/arch/loongarch/kvm/Makefile
-index 165ecb4d408f..619ab4969458 100644
---- a/arch/loongarch/kvm/Makefile
-+++ b/arch/loongarch/kvm/Makefile
-@@ -21,5 +21,6 @@ kvm-y += vm.o
- kvm-y += intc/ipi.o
- kvm-y += intc/extioi.o
- kvm-y += intc/pch_pic.o
-+kvm-y += irqfd.o
- 
- CFLAGS_exit.o	+= $(call cc-option,-Wno-override-init,)
-diff --git a/arch/loongarch/kvm/intc/pch_pic.c b/arch/loongarch/kvm/intc/pch_pic.c
-index abb7bab84f2d..e18e27992978 100644
---- a/arch/loongarch/kvm/intc/pch_pic.c
-+++ b/arch/loongarch/kvm/intc/pch_pic.c
-@@ -449,6 +449,29 @@ static int kvm_loongarch_pch_pic_set_attr(struct kvm_device *dev,
- 	return ret;
- }
- 
-+static int kvm_setup_default_irq_routing(struct kvm *kvm)
-+{
-+	struct kvm_irq_routing_entry *entries;
-+
-+	u32 nr = KVM_IRQCHIP_NUM_PINS;
-+	int i, ret;
-+
-+	entries = kcalloc(nr, sizeof(*entries), GFP_KERNEL);
-+	if (!entries)
-+		return -ENOMEM;
-+
-+	for (i = 0; i < nr; i++) {
-+		entries[i].gsi = i;
-+		entries[i].type = KVM_IRQ_ROUTING_IRQCHIP;
-+		entries[i].u.irqchip.irqchip = 0;
-+		entries[i].u.irqchip.pin = i;
-+	}
-+	ret = kvm_set_irq_routing(kvm, entries, nr, 0);
-+	kfree(entries);
-+
-+	return 0;
-+}
-+
- static void kvm_loongarch_pch_pic_destroy(struct kvm_device *dev)
- {
- 	struct kvm *kvm;
-@@ -474,6 +497,7 @@ static void kvm_loongarch_pch_pic_destroy(struct kvm_device *dev)
- 
- static int kvm_loongarch_pch_pic_create(struct kvm_device *dev, u32 type)
- {
-+	int ret;
- 	struct loongarch_pch_pic *s;
- 	struct kvm *kvm = dev->kvm;
- 
-@@ -481,6 +505,10 @@ static int kvm_loongarch_pch_pic_create(struct kvm_device *dev, u32 type)
- 	if (kvm->arch.pch_pic)
- 		return -EINVAL;
- 
-+	ret = kvm_setup_default_irq_routing(kvm);
-+	if (ret)
-+		return -ENOMEM;
-+
- 	s = kzalloc(sizeof(struct loongarch_pch_pic), GFP_KERNEL);
- 	if (!s)
- 		return -ENOMEM;
-diff --git a/arch/loongarch/kvm/irqfd.c b/arch/loongarch/kvm/irqfd.c
-new file mode 100644
-index 000000000000..bf67f329ebc9
---- /dev/null
-+++ b/arch/loongarch/kvm/irqfd.c
-@@ -0,0 +1,87 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2024 Loongson Technology Corporation Limited
-+ */
-+
-+#include <linux/kvm_host.h>
-+#include <trace/events/kvm.h>
-+#include <asm/kvm_pch_pic.h>
-+
-+static int kvm_set_ioapic_irq(struct kvm_kernel_irq_routing_entry *e,
-+					struct kvm *kvm, int irq_source_id,
-+					int level, bool line_status)
-+{
-+	/* ioapic pin (0 ~ 64) <---> gsi(0 ~ 64) */
-+	pch_pic_set_irq(kvm->arch.pch_pic, e->irqchip.pin, level);
-+
-+	return 0;
-+}
-+
-+/*
-+ * kvm_set_routing_entry: populate a kvm routing entry
-+ * from a user routing entry
-+ *
-+ * @kvm: the VM this entry is applied to
-+ * @e: kvm kernel routing entry handle
-+ * @ue: user api routing entry handle
-+ * return 0 on success, -EINVAL on errors.
-+ */
-+int kvm_set_routing_entry(struct kvm *kvm,
-+			struct kvm_kernel_irq_routing_entry *e,
-+			const struct kvm_irq_routing_entry *ue)
-+{
-+	int r = -EINVAL;
-+
-+	switch (ue->type) {
-+	case KVM_IRQ_ROUTING_IRQCHIP:
-+		e->set = kvm_set_ioapic_irq;
-+
-+		e->irqchip.irqchip = ue->u.irqchip.irqchip;
-+		e->irqchip.pin = ue->u.irqchip.pin;
-+
-+		if (e->irqchip.pin >= KVM_IRQCHIP_NUM_PINS)
-+			goto out;
-+		break;
-+	case KVM_IRQ_ROUTING_MSI:
-+		e->set = kvm_set_msi;
-+		e->msi.address_lo = ue->u.msi.address_lo;
-+		e->msi.address_hi = ue->u.msi.address_hi;
-+		e->msi.data = ue->u.msi.data;
-+		break;
-+	default:
-+		goto out;
-+	}
-+	r = 0;
-+out:
-+	return r;
-+}
-+
-+int kvm_arch_set_irq_inatomic(struct kvm_kernel_irq_routing_entry *e,
-+		struct kvm *kvm, int irq_source_id,
-+		int level, bool line_status)
-+{
-+	if (e->type == KVM_IRQ_ROUTING_MSI) {
-+		pch_msi_set_irq(kvm, e->msi.data, 1);
-+		return 0;
-+	}
-+
-+	return -EWOULDBLOCK;
-+}
-+
-+/**
-+ * kvm_set_msi: inject the MSI corresponding to the
-+ * MSI routing entry
-+ *
-+ * This is the entry point for irqfd MSI injection
-+ * and userspace MSI injection.
-+ */
-+int kvm_set_msi(struct kvm_kernel_irq_routing_entry *e,
-+		struct kvm *kvm, int irq_source_id,
-+		int level, bool line_status)
-+{
-+	if (!level)
-+		return -1;
-+
-+	pch_msi_set_irq(kvm, e->msi.data, level);
-+	return 0;
-+}
-diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/vm.c
-index decfe11be46b..72ea4bb9f912 100644
---- a/arch/loongarch/kvm/vm.c
-+++ b/arch/loongarch/kvm/vm.c
-@@ -71,6 +71,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 	int r;
- 
- 	switch (ext) {
-+	case KVM_CAP_IRQCHIP:
- 	case KVM_CAP_ONE_REG:
- 	case KVM_CAP_ENABLE_CAP:
- 	case KVM_CAP_READONLY_MEM:
-@@ -103,7 +104,18 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
- 
- int kvm_arch_vm_ioctl(struct file *filp, unsigned int ioctl, unsigned long arg)
- {
--	return -ENOIOCTLCMD;
-+	int r;
-+
-+	switch (ioctl) {
-+	case KVM_CREATE_IRQCHIP: {
-+		r = 1;
-+		break;
-+	}
-+	default:
-+		r = -ENOIOCTLCMD;
-+	}
-+
-+	return r;
- }
- 
- int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *data,
-@@ -137,3 +149,8 @@ int kvm_vm_ioctl_irq_line(struct kvm *kvm, struct kvm_irq_level *data,
- 
- 	return ret;
- }
-+
-+bool kvm_arch_irqchip_in_kernel(struct kvm *kvm)
-+{
-+	return (bool)((!!kvm->arch.extioi) && (!!kvm->arch.pch_pic));
-+}
--- 
-2.39.1
+Now that you added the final F_* macro, let's list all of them:
+
+
+#define F(name)							\
+
+/* Scattered Flag - For features that are scattered by cpufeatures.h. */
+#define SF(name)						\
+
+
+
+/* Features that KVM supports only on 64-bit kernels. */
+#define X86_64_F(name)						\
+
+/*
+ * Raw Feature - For features that KVM supports based purely on raw host CPUID,
+ * i.e. that KVM virtualizes even if the host kernel doesn't use the feature.
+ * Simply force set the feature in KVM's capabilities, raw CPUID support will
+ * be factored in by __kvm_cpu_cap_mask().
+ */
+#define RAW_F(name)						\
+
+/*
+ * Emulated Feature - For features that KVM emulates in software irrespective
+ * of host CPU/kernel support.
+ */
+#define EMUL_F(name)						\
+
+/*
+ * Synthesized Feature - For features that are synthesized into boot_cpu_data,
+ * i.e. may not be present in the raw CPUID, but can still be advertised to
+ * userspace.  Primarily used for mitigation related feature flags.
+ */
+#define SYN_F(name)						\
+
+/*
+ * Aliased Features - For features in 0x8000_0001.EDX that are duplicates of
+ * identical 0x1.EDX features, and thus are aliased from 0x1 to 0x8000_0001.
+ */
+#define AF(name)								\
+
+/*
+ * VMM Features - For features that KVM "supports" in some capacity, i.e. that
+ * KVM may query, but that are never advertised to userspace.  E.g. KVM allows
+ * userspace to enumerate MONITOR+MWAIT support to the guest, but the MWAIT
+ * feature flag is never advertised to userspace because MONITOR+MWAIT aren't
+ * virtualized by hardware, can't be faithfully emulated in software (KVM
+ * emulates them as NOPs), and allowing the guest to execute them natively
+ * requires enabling a per-VM capability.
+ */
+#define VMM_F(name)								\
+
+
+Honestly, I already somewhat lost in what each of those macros means even when reading
+the comments, which might indicate that a future reader might also have a 
+hard time understanding those.
+
+I now support even more the case of setting each feature bit in a separate statement
+as I explained in an earlier patch.
+
+What do you think?
+
+
+Best regards,
+	Maxim Levitsky
+
+
 
 
