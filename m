@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-20967-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-20968-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F72D927F71
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 02:48:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF77E927F75
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 02:51:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC28E28332D
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 00:48:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39795283146
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 00:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB406125;
-	Fri,  5 Jul 2024 00:48:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4FA79CE;
+	Fri,  5 Jul 2024 00:51:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BNLusUNL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g4QJUXIm"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8436610B
-	for <kvm@vger.kernel.org>; Fri,  5 Jul 2024 00:48:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 102B3610C
+	for <kvm@vger.kernel.org>; Fri,  5 Jul 2024 00:51:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720140496; cv=none; b=L0CBBffmucwKZj3KMwgKIHI6hPTIbjP/TujKRJv/LDXDIxhf7qglFoh2Zcrtgcko0NRBN0UAR+S9bRsmu4P1rCkpSkPmKyLKfuy2zHpBYHJJQN1AXvnMg4mcDLmdiGesYt8DZDSvhLgCJmvEYA6n9dqAOihw7WXZENNuvoz3UeA=
+	t=1720140707; cv=none; b=HF3FQY+sBDGw5Kbp3uo3xeXJgRx30zDhcVBGfBLYLrznnUhwoklE88GvzbfXULaAgSehYBMzGXcZcX7tsXqugnVsWtfgmsTSgskrOAzX4njCoPxGroGh5bZd764mFjtp1NwCpDwnJWt8MfdeYgvlOmMKbb2PnqoUCYMfOox6uPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720140496; c=relaxed/simple;
-	bh=UCYavsOYlDJtoPoG3lzm2cK4S3yoWAf+mGlSkpNPZC8=;
+	s=arc-20240116; t=1720140707; c=relaxed/simple;
+	bh=afrW9DNgM3EaqVCX8MW5BiJs/xmbnPbSNDsym4RG/hg=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=uuZFDESNvlTn35EGmj1yov2cELZsD/G6YU+wVqnykV5iEPRzeDhhaOMPGnpThtuyzdwkKbT8dDaLpetoh8ZalwTX9U6wrRKH5F02bH+2y4CVDyJnlZjsL4uIoQP41l95SBV3BQ2kh8ba8Zckq5qR/wyG4j3vEwpIucq3b0bwmx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BNLusUNL; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=Tv/9W0AfQW3UkwSiWzTa+D9fwnornyUVuyflbRsaCQSVPd3p8vNpkT6Jhl+vOD5Bd+sLLmlVY638YysMQBVU2q9mOTZXO/VR7YSJE7JJPm0WPcFaSoczHjImPnQgIYEfZqFeWW9TRtD3AqpAxUDKh8tPkOUuqUrWJ7RWUtgpReg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g4QJUXIm; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720140493;
+	s=mimecast20190719; t=1720140705;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1taNz8T2VLQRBGglDYc9q5xdZlahhRSOV1YwKJ4I0vQ=;
-	b=BNLusUNLuAzV7fC0WM6dQSn5bmZUr00MgCHObiFGPsh9M8QL70zbegiEpvjXhkdrncIFAF
-	BdiKZXfEnIBPRr4ltouIS8lIToWlGBIdbsZds1xo6lY9IueDDVRtt6dR701NvMffonNYhM
-	1lQsopV2AAW1lqz/WlxbIc3ifbjfe0U=
-Received: from mail-yb1-f200.google.com (mail-yb1-f200.google.com
- [209.85.219.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=HsBEw6FKBeGQNgPPBBJpxIWhokMM/LE7Q5WTk7PgH8o=;
+	b=g4QJUXImENfouXZ6B9FUE7lMV0XH3telgasFge/Z4tzJNRhdIgCYAWHUKMFyXJa7XVQEmZ
+	btQPDG4J7HQpg3C/yMrmeJTJsGi1DlbuMWYnJp4kE1UivM2Zd3Er8iln/sG6SZysERkNMe
+	InYgMwTFXBLDmVW4/nwenbj7K61+b1k=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-88-HVhXsNTFPQKXNDQ3fuhPlg-1; Thu, 04 Jul 2024 20:48:12 -0400
-X-MC-Unique: HVhXsNTFPQKXNDQ3fuhPlg-1
-Received: by mail-yb1-f200.google.com with SMTP id 3f1490d57ef6-e03a434e33cso1944523276.3
-        for <kvm@vger.kernel.org>; Thu, 04 Jul 2024 17:48:12 -0700 (PDT)
+ us-mta-591-1ZvU6F21M0StnGcgttJ6EA-1; Thu, 04 Jul 2024 20:51:43 -0400
+X-MC-Unique: 1ZvU6F21M0StnGcgttJ6EA-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-6b5f559b8c8so3769866d6.0
+        for <kvm@vger.kernel.org>; Thu, 04 Jul 2024 17:51:43 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720140491; x=1720745291;
+        d=1e100.net; s=20230601; t=1720140703; x=1720745503;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=1taNz8T2VLQRBGglDYc9q5xdZlahhRSOV1YwKJ4I0vQ=;
-        b=VVGhhGLGrnOm01uOpZQkOWCgsykHL0Kj1hegYKH2Q6VQkcX3CS77w61i5CnTZrm1+L
-         ry+FX386konyyY/uhxSPIqmm3x9FTTuAzq4SkGgvBd9m2Sa/5Jy4PYQCNlWK4GS63HLA
-         rVHA8FsgdjVWObbBGKw+rVVvZP6lS0cNE/vQcivImrtVkLMt+8MPWF8JVdyswfRCBRL/
-         4EtDmbjxLwQqIVYIEh1pyVRU099Y06ogb5FiKqVs+16LdRJj65CAr2O6zBasZonnq19C
-         7LHEqybsOZP2n0iUQDzTjQ/EzXS1P41E4zcTLgLpDpv07FWDdIFKw0ffz/cC3A6rAb+U
-         dlBw==
-X-Gm-Message-State: AOJu0Yx4Zu5fz5rFN8agNMhygJEOFHV20KYovJgbhzpqy5x172KbPTwc
-	U2FuHKugMXJ8ua4BHR2aHcRCgCobAcWN7Ci+5A6VZfcefb0NAIPY5zEBFzCrvdaR3/4xaBK7BTN
-	irxMWasiKk+6DBBGPJ07lidvlh2fmKqMKT7OechO94uPS7QZNSKBWdh+vMw==
-X-Received: by 2002:a25:ade8:0:b0:e03:a248:7dd3 with SMTP id 3f1490d57ef6-e03c196966fmr3345507276.23.1720140491692;
-        Thu, 04 Jul 2024 17:48:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHLtTb8qCSDdsaN2DhQVTPgfPMllt0+iLg2fNvdycLvwNeGaSGnRSg7IVAaPsOWTpmD0ep1qg==
-X-Received: by 2002:a25:ade8:0:b0:e03:a248:7dd3 with SMTP id 3f1490d57ef6-e03c196966fmr3345486276.23.1720140491395;
-        Thu, 04 Jul 2024 17:48:11 -0700 (PDT)
+        bh=HsBEw6FKBeGQNgPPBBJpxIWhokMM/LE7Q5WTk7PgH8o=;
+        b=Fi1Z7BzBok2BSzeEh+9cRbRKam6dm/hitJMGdXRd0bcbTUF4bIhITFTzmrUcFNCAJV
+         1VCRAwf2WoJkARcR3KXE8ZKwbSTRVBrMVEDJ9VoyxBIFKmFB3tfeGsy6y+CVIWBdhaRs
+         lJ6xFc54bIaxyktv7cpjxNh6wtNwsxPZw5w8dy3VVng/r9ZzPEkqroCJSHZGru1SqZ2q
+         AZqmyaMNf2noH8DXqKIbjOo6q9DslND1juen5bEXoAL9BczbQNqhHa8btokzi4HJTYkd
+         VBivcmnYk4i95e+7uA9KACjv77JLqXbAkmW5jNSXiWEv0c5uO8J/WWyF5XaDHzxcqrFq
+         VjNQ==
+X-Gm-Message-State: AOJu0YyWHWWfsYDYlOX2jTqPZ2bxj91c+c19twK6hZNZhZrY39Xv/LFB
+	fXRLK6Yb1r7jYL5rm/YXVVJbr0kHbZ7yLy5KPR0sNrWFlBm0m+TefleKC5q0FeLakb0T+y8nL91
+	HMqcWpnTcBstASwUuLumt7lKD6yMAQj42e/9cLpxnlG1M/XJjaw==
+X-Received: by 2002:a05:6214:5293:b0:6b5:7e74:185 with SMTP id 6a1803df08f44-6b5ee6837abmr39100696d6.30.1720140703182;
+        Thu, 04 Jul 2024 17:51:43 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEIUwM4axfCThXu9OzftOXpsneL9Y24QxF+iGnsgL0MTKtlxyiUip4Ff1wcVsJNZFm1zSu5IA==
+X-Received: by 2002:a05:6214:5293:b0:6b5:7e74:185 with SMTP id 6a1803df08f44-6b5ee6837abmr39100586d6.30.1720140702806;
+        Thu, 04 Jul 2024 17:51:42 -0700 (PDT)
 Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5f7e1esm68415876d6.98.2024.07.04.17.48.10
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b59e5f1a6dsm68247046d6.83.2024.07.04.17.51.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Jul 2024 17:48:11 -0700 (PDT)
-Message-ID: <62cbd606f6d636445fd1352ae196a0973c362170.camel@redhat.com>
-Subject: Re: [PATCH v2 01/49] KVM: x86: Do all post-set CPUID processing
- during vCPU creation
+        Thu, 04 Jul 2024 17:51:42 -0700 (PDT)
+Message-ID: <d5ef3d7082f28fcad58b3f55a99c9cae17c4de5a.camel@redhat.com>
+Subject: Re: [PATCH v2 02/49] KVM: x86: Explicitly do runtime CPUID updates
+ "after" initial setup
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
  <pbonzini@redhat.com>,  Vitaly Kuznetsov <vkuznets@redhat.com>
@@ -82,10 +82,10 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Hou Wenlong
  <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>, Oliver Upton
  <oliver.upton@linux.dev>, Binbin Wu <binbin.wu@linux.intel.com>, Yang
  Weijiang <weijiang.yang@intel.com>, Robert Hoo <robert.hoo.linux@gmail.com>
-Date: Thu, 04 Jul 2024 20:48:10 -0400
-In-Reply-To: <20240517173926.965351-2-seanjc@google.com>
+Date: Thu, 04 Jul 2024 20:51:41 -0400
+In-Reply-To: <20240517173926.965351-3-seanjc@google.com>
 References: <20240517173926.965351-1-seanjc@google.com>
-	 <20240517173926.965351-2-seanjc@google.com>
+	 <20240517173926.965351-3-seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -97,80 +97,109 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
 On Fri, 2024-05-17 at 10:38 -0700, Sean Christopherson wrote:
-> During vCPU creation, process KVM's default, empty CPUID as if userspace
-> set an empty CPUID to ensure consistent and correct behavior with respect
-> to guest CPUID.  E.g. if userspace never sets guest CPUID, KVM will never
-> configure cr4_guest_rsvd_bits, and thus create divergent, incorrect, guest-
-> visible behavior due to letting the guest set any KVM-supported CR4 bits
-> despite the features not being allowed per guest CPUID.
+> Explicitly perform runtime CPUID adjustments as part of the "after set
+> CPUID" flow to guard against bugs where KVM consumes stale vCPU/CPUID
+> state during kvm_update_cpuid_runtime().  E.g. see commit 4736d85f0d18
+> ("KVM: x86: Use actual kvm_cpuid.base for clearing KVM_FEATURE_PV_UNHALT").
 > 
-> Note!  This changes KVM's ABI, as lack of full CPUID processing allowed
-> userspace to stuff garbage vCPU state, e.g. userspace could set CR4 to a
-> guest-unsupported value via KVM_SET_SREGS.  But it's extremely unlikely
-> that this is a breaking change, as KVM already has many flows that require
-> userspace to set guest CPUID before loading vCPU state.  E.g. multiple MSR
-> flows consult guest CPUID on host writes, and KVM_SET_SREGS itself already
-> relies on guest CPUID being up-to-date, as KVM's validity check on CR3
-> consumes CPUID.0x7.1 (for LAM) and CPUID.0x80000008 (for MAXPHYADDR).
+> Whacking each mole individually is not sustainable or robust, e.g. while
+> the aforemention commit fixed KVM's PV features, the same issue lurks for
+> Xen and Hyper-V features, Xen and Hyper-V simply don't have any runtime
+> features (though spoiler alert, neither should KVM).
+
 > 
-> Furthermore, the plan is to commit to enforcing guest CPUID for userspace
-> writes to MSRs, at which point bypassing sregs CPUID checks is even more
-> nonsensical.
+> Updating runtime features in the "full" path will also simplify adding a
+> snapshot of the guest's capabilities, i.e. of caching the intersection of
+> guest CPUID and kvm_cpu_caps (modulo a few edge cases).
 > 
 > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  arch/x86/kvm/cpuid.c | 2 +-
->  arch/x86/kvm/cpuid.h | 1 +
->  arch/x86/kvm/x86.c   | 1 +
->  3 files changed, 3 insertions(+), 1 deletion(-)
+>  arch/x86/kvm/cpuid.c | 13 +++++++++++--
+>  1 file changed, 11 insertions(+), 2 deletions(-)
 > 
 > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> index f2f2be5d1141..2b19ff991ceb 100644
+> index 2b19ff991ceb..e60ffb421e4b 100644
 > --- a/arch/x86/kvm/cpuid.c
 > +++ b/arch/x86/kvm/cpuid.c
-> @@ -335,7 +335,7 @@ static bool kvm_cpuid_has_hyperv(struct kvm_cpuid_entry2 *entries, int nent)
->  #endif
->  }
+> @@ -345,6 +345,8 @@ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+>  	bitmap_zero(vcpu->arch.governed_features.enabled,
+>  		    KVM_MAX_NR_GOVERNED_FEATURES);
 >  
-> -static void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> +void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> +	kvm_update_cpuid_runtime(vcpu);
+> +
+>  	/*
+>  	 * If TDP is enabled, let the guest use GBPAGES if they're supported in
+>  	 * hardware.  The hardware page walker doesn't let KVM disable GBPAGES,
+> @@ -426,8 +428,6 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
 >  {
->  	struct kvm_lapic *apic = vcpu->arch.apic;
->  	struct kvm_cpuid_entry2 *best;
-> diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-> index 23dbb9eb277c..0a8b561b5434 100644
-> --- a/arch/x86/kvm/cpuid.h
-> +++ b/arch/x86/kvm/cpuid.h
-> @@ -11,6 +11,7 @@
->  extern u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
->  void kvm_set_cpu_caps(void);
+>  	int r;
 >  
-> +void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu);
->  void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu);
->  void kvm_update_pv_runtime(struct kvm_vcpu *vcpu);
->  struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index d750546ec934..7adcf56bd45d 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -12234,6 +12234,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
->  	kvm_xen_init_vcpu(vcpu);
->  	kvm_vcpu_mtrr_init(vcpu);
->  	vcpu_load(vcpu);
-> +	kvm_vcpu_after_set_cpuid(vcpu);
+> -	__kvm_update_cpuid_runtime(vcpu, e2, nent);
+> -
+>  	/*
+>  	 * KVM does not correctly handle changing guest CPUID after KVM_RUN, as
+>  	 * MAXPHYADDR, GBPAGES support, AMD reserved bit behavior, etc.. aren't
+> @@ -440,6 +440,15 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
+>  	 * whether the supplied CPUID data is equal to what's already set.
+>  	 */
+>  	if (kvm_vcpu_has_run(vcpu)) {
+> +		/*
+> +		 * Note, runtime CPUID updates may consume other CPUID-driven
+> +		 * vCPU state, e.g. KVM or Xen CPUID bases.  Updating runtime
+> +		 * state before full CPUID processing is functionally correct
+> +		 * only because any change in CPUID is disallowed, i.e. using
+> +		 * stale data is ok because KVM will reject the change.
+> +		 */
 
-This makes me a bit nervous. At this point the vcpu->arch.cpuid_entries is NULL,
-but so is vcpu->arch.cpuid_nent so it sort of works but is one mistake away from crash.
+If I understand correctly the sole reason for the below __kvm_update_cpuid_runtime
+is to ensure that kvm_cpuid_check_equal doesn't fail because current cpuid also
+was post-processed with runtime updates.
 
-Maybe we should add some protection to this, e.g empty zero cpuid or something like that.
+Can we have a comment stating this? Or even better how about moving the
+call to __kvm_update_cpuid_runtime into the kvm_cpuid_check_equal,
+to emphasize this?
+
+
+> +		__kvm_update_cpuid_runtime(vcpu, e2, nent);
+> +
+>  		r = kvm_cpuid_check_equal(vcpu, e2, nent);
+>  		if (r)
+>  			return r;
+
+
+
+Overall I am not 100% sure what is better:
+
+Before the patch it was roughly like this:
+
+1. Post process the user given cpuid with bits of KVM runtime state (like xcr0)
+At that point the vcpu->arch.cpuid_entries is stale but consistent, it is just old CPUID.
+
+2. kvm_hv_vcpu_init call (IMHO this call can be moved to kvm_vcpu_after_set_cpuid)
+
+3. kvm_check_cpuid on the user provided cpuid
+
+4. Update the vcpu->arch.cpuid_entries with new and post processed cpuid
+
+5. kvm_get_hypervisor_cpuid - I think this also can be cosmetically moved to kvm_vcpu_after_set_cpuid
+
+6. kvm_vcpu_after_set_cpuid itself.
+
+
+After this change it works like that:
+
+1. kvm_hv_vcpu_init (again this belongs more to kvm_vcpu_after_set_cpuid)
+2. kvm_check_cpuid on the user cpuid without post processing - in theory this can cause bugs
+3. Update the vcpu->arch.cpuid_entries with new cpuid but without post-processing
+4. kvm_get_hypervisor_cpuid
+5. kvm_update_cpuid_runtime
+6. The old kvm_vcpu_after_set_cpuid
+
+I'm honestly not sure what is better but IMHO moving the kvm_hv_vcpu_init and kvm_get_hypervisor_cpuid into
+kvm_vcpu_after_set_cpuid would clean up this mess a bit regardless of this patch.
 
 Best regards,
 	Maxim Levitsky
-
-
->  	kvm_set_tsc_khz(vcpu, vcpu->kvm->arch.default_tsc_khz);
->  	kvm_vcpu_reset(vcpu, false);
->  	kvm_init_mmu(vcpu);
 
 
 
