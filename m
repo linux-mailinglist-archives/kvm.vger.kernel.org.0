@@ -1,102 +1,79 @@
-Return-Path: <kvm+bounces-21049-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214A8928D9F
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 20:49:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7943F928DD7
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 21:38:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C181D1F221D9
-	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 18:49:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D3F61F23669
+	for <lists+kvm@lfdr.de>; Fri,  5 Jul 2024 19:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0684E16EB52;
-	Fri,  5 Jul 2024 18:48:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41BEA176228;
+	Fri,  5 Jul 2024 19:37:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ht2Sg2t2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VbXHBXOL"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B73A955;
-	Fri,  5 Jul 2024 18:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2F81741DD;
+	Fri,  5 Jul 2024 19:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720205332; cv=none; b=mxo4bqYlqGV3arZLnd3h5xdSarTRP7IHhkMRbKaEJbLUJoX1hSoBFjW1PZi8BXgWuUQztUZRr6p1j430aiF+C2QnJpRmJGXQszztHesRGRiKi47ICR09SMDyTgokvzEMrHgxyW/N4/ZmMbK3jZlTXp8paRhfVLUIwe+vjX7Awx0=
+	t=1720208278; cv=none; b=gCMpPb2onHtMTc6uul/6o6TqNl493qNSIx+QUC6n1TS4AJp0b1o7j5DjgQkrxQEZ1FlkfOu+wo70EZkIzrpZNK37jKaJa20izjZq4GL+nl2huuFoUYpKWwqNyCIiTmry+0pGKF2Me2SAcM/OpysQ78vnEoeoVlGVgSmBytu21UY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720205332; c=relaxed/simple;
-	bh=3gQdxm9rrq4HH+3IgyK33e5U18PihTEsMAv3ZFMKGl4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n7cJcpkzqsPw1YsYGmiGRJ7dhq9Cl+rI7cU1j6SertII/9DAuQYBCk01jiO03k3oHaL47F25qx6e8onWv1ta1yDMRGuczxAOZEtFtb2XWBVt2nzdxQJO5kx2tdxiBSc205vUmbRyO9rgoFkcmIWP5DXLtn4AGX7guIsBHBZn/ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ht2Sg2t2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D17E5C116B1;
-	Fri,  5 Jul 2024 18:48:50 +0000 (UTC)
+	s=arc-20240116; t=1720208278; c=relaxed/simple;
+	bh=Um9yAaBxyq1RdNsvWsdMSKXcQ8uJpx1Yfm2LH+FxV54=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=qOxQO0nlSFvMMA4jLxxahxKSiDysi8nHnRQ7SqRIK4hcHNn1+gaNSnixmIxh4XWXF+KsnAjYOintuLbZjWPX8qZtJ1LAE9gUZMEzrO+Se+oiIRc/sj5PyFUyKeoAyi5ZxxjcECPC63UJFkADyqmaR8wuvb3UKOezSqf14a6Lse4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VbXHBXOL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5248BC4AF0F;
+	Fri,  5 Jul 2024 19:37:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720205331;
-	bh=3gQdxm9rrq4HH+3IgyK33e5U18PihTEsMAv3ZFMKGl4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ht2Sg2t2ndCjMGA6QKO2lqpTrzx5fDYVZJW7Ovgfr1eplx4adbkUHrvVY0Fu92JLt
-	 mU5W84MEOLzWeruLzCzFJBMcezP+9RWb4w2qbxVzYCrWWzfG7s4lg/Gv7+t1mLvgfO
-	 2fdSWrA5Q1UyDcQM7GTChwnkpqlcbSPsNUt/V748Qr4OW0E18YwIXE9gUZ8xqbm3Pa
-	 QZ5HR5+kS74PefChnaUbAqlutm/0zUWk4Ir6koict+0o/SIMktXHfmKvALkPRAwy7e
-	 60A1hFUaIMAvaXkUU5Xx3C78C3VfTgwAozfACG4DXiep2AGvT26MouaYytY3hJ3pYn
-	 tSYLgRXYv+5hA==
-Date: Fri, 5 Jul 2024 21:48:46 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Christoph Hellwig <hch@lst.de>
-Cc: Robin Murphy <robin.murphy@arm.com>, Jens Axboe <axboe@kernel.dk>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
-	"Zeng, Oak" <oak.zeng@intel.com>,
-	Chaitanya Kulkarni <kch@nvidia.com>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Logan Gunthorpe <logang@deltatee.com>,
-	Yishai Hadas <yishaih@nvidia.com>,
-	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
-	Kevin Tian <kevin.tian@intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	=?iso-8859-1?B?Suly9G1l?= Glisse <jglisse@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
-	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
-	kvm@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [RFC PATCH v1 18/18] nvme-pci: use new dma API
-Message-ID: <20240705184846.GF95824@unreal>
-References: <cover.1719909395.git.leon@kernel.org>
- <47eb0510b0a6aa52d9f5665d75fa7093dd6af53f.1719909395.git.leon@kernel.org>
- <249ec228-4ffd-4121-bd51-f4a19275fee1@arm.com>
- <20240704171602.GE95824@unreal>
- <20240705055806.GA11885@lst.de>
+	s=k20201202; t=1720208278;
+	bh=Um9yAaBxyq1RdNsvWsdMSKXcQ8uJpx1Yfm2LH+FxV54=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=VbXHBXOLBC6GbgUQ3ixfdlK3+NTfJbPBAyBavrtY3rzxwlJgImF2aCv0oFVGt3G3N
+	 6TTdhqXCh5wlawHsNq0st1eeNp/rb2wboz5RoPWnd0Xw5wnriCd5wgoydPFC7563o1
+	 osDpi+FpYBJqUDliCsu7Cq5DCGCh8mJ8aCeCic6WMZQosNIgtGTGid19escEzWsxhn
+	 pPy2Dd12klWJEWoY2wtooR7906noWbZmYdnGtlC/XX07hn8f6NXqxeGj5Xt78AEWHr
+	 GZ8881ok1yztUd2pXb5zkXX0akgIzG+1K8Ik9dIdlCW+TIbMwkp84QOM/r6/NXNDX7
+	 7ZwoVpFPTKIoA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 44A72C433A2;
+	Fri,  5 Jul 2024 19:37:58 +0000 (UTC)
+Subject: Re: [GIT PULL] KVM changes for Linux 6.10-rc7
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240705085120.659090-1-pbonzini@redhat.com>
+References: <20240705085120.659090-1-pbonzini@redhat.com>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240705085120.659090-1-pbonzini@redhat.com>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
+X-PR-Tracked-Commit-Id: 8ad209fc6448e1d7fff7525a8d40d2fb549f72d1
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 75aa87ca486b95ffae678300722022f01d33b7ca
+Message-Id: <172020827826.9250.15215158713497708064.pr-tracker-bot@kernel.org>
+Date: Fri, 05 Jul 2024 19:37:58 +0000
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240705055806.GA11885@lst.de>
 
-On Fri, Jul 05, 2024 at 07:58:06AM +0200, Christoph Hellwig wrote:
-> > This is exactly how dma_map_sg() works.
-> 
-> Which dma_map_sg?  swiotlb handling is implemented in the underlying
-> ops, dma-direct and dma-iommu specifically.
-> 
-> dma-direct just iterates over the entries and calls dma_direct_map_page,
-> which does a per-entry decision to bounce based on
-> is_swiotlb_force_bounce, dma_capable and dma_kmalloc_needs_bounce.
+The pull request you sent on Fri,  5 Jul 2024 04:51:20 -0400:
 
-dma-direct is not going to have "use_iova" flag. Robin pointed to
-dma-iommu path.
+> https://git.kernel.org/pub/scm/virt/kvm/kvm.git tags/for-linus
 
-In that case the flow is dma_map_sg()->iommu_dma_map_sg()->dev_use_sg_swiotlb().
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/75aa87ca486b95ffae678300722022f01d33b7ca
 
-Thanks
+Thank you!
 
-> 
-> 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
