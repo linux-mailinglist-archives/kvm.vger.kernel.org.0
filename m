@@ -1,73 +1,48 @@
-Return-Path: <kvm+bounces-21062-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21063-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75F559295C6
-	for <lists+kvm@lfdr.de>; Sun,  7 Jul 2024 01:09:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 228339295D1
+	for <lists+kvm@lfdr.de>; Sun,  7 Jul 2024 01:14:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DEC91C20F7C
-	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2024 23:09:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FB071F21A1F
+	for <lists+kvm@lfdr.de>; Sat,  6 Jul 2024 23:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F9441C63;
-	Sat,  6 Jul 2024 23:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SG3pRaDP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E50113D888;
+	Sat,  6 Jul 2024 23:13:10 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oa1-f51.google.com (mail-oa1-f51.google.com [209.85.160.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40D03200B7
-	for <kvm@vger.kernel.org>; Sat,  6 Jul 2024 23:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7478013790B;
+	Sat,  6 Jul 2024 23:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720307388; cv=none; b=nvMRbTz99hCJIjfXvv0K/0wYe6EK64jN8QvScTUaAi0y9x079MXdGD5+o9PtxG9CC+dhtBMoZ6poIgJgAYnlldxLAn1FB5mzt2Biq84YAcTWwvc81qmeasPnrpjV7rSm/E+CcYFQlwACvBo5ihGm88vUZ70gzpqVWA+PBAkkOps=
+	t=1720307589; cv=none; b=BOSOseEATi/NEXEKePNKkUw8tpY3D3BhPZ4JCTxadrjf6wsCVT2ieF1AseRFYeY54aiEF2PtbNVhRODbOGGiyiTWytcGkC7I/Cjm6VGbsne7aZRCfG2FYJ/ZrtUJz+igVIy8ZCuKnBGCWJoVYMDiGY9vMOb7wei61sAH8ySKK18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720307388; c=relaxed/simple;
-	bh=2n8+TgqvjCKyFBaqxI6biZt0BF3PVNWoErLFSou1NjQ=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=YJxJEsBgJHVOSRYX1ab9p9P3FCLMhRv3hFs9iYSR1mhyOeyhLbzrzQAFp9apwuGj8gwdg26NeGGPTkriwtCuPHKapg6vV2LMYvLYAFHEGu+yjMz4P7EB8Q216GuQNF2f04nG5cBMA0EGvs9kusfXOlv+m/XqR6fsYEMX0qoyNgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SG3pRaDP; arc=none smtp.client-ip=209.85.160.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-25dfb580d1fso1392236fac.2
-        for <kvm@vger.kernel.org>; Sat, 06 Jul 2024 16:09:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720307386; x=1720912186; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wB803YkDqRx4XmZe4PWS19Pv3OtpO0g7MWwyOSWFGp8=;
-        b=SG3pRaDPdnOPhgDwRFAjEIpj7+MCHCzo3DQ5wxqiATLFiFRXAZS2WDe80PvamvCxYA
-         pqvnHsviAqHzq/mrpLptmlHZ735F9MSKWgDePUQzNKOwbxGHGEJezCibab15ddOQ97Rg
-         NXLpKF/r9yoXUcd9dVA+T+m0+J+ezBc+c5I4UDlvdBYAG83Xt7VW0vLQmnefnTt4HumF
-         tGk/gK5A6aTFbb8V+qpw4rqzpQ1ZXUwFVBltEbNdeA4CeqoYYEs5xvN/jKrqur2ccxRu
-         VGI9kBvKcHl8UzKaph5zw3LbVKx7/12Shq9tpRc2qqy/xx38etKNsO9MOF28mKORpEOp
-         fo2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720307386; x=1720912186;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wB803YkDqRx4XmZe4PWS19Pv3OtpO0g7MWwyOSWFGp8=;
-        b=CHdFLkY5RzG5PMuSrYt4iHsMT5Ul+xrglO4SQqteQixqK9twTO1Fpd2UDUT/Q614Yf
-         CVUyHZGqwjnqCSY3E1sKjApPgIAPL77K+GLyD+G29wA9kA5C4Cjwnpl20IJtfS1MQnWW
-         oKIZCbcVpzX3zwYN1WkRSQNM4GuFsNbE3GJsxDOoJTRhVOdw2zoITJBtjDdoDrSKLFTi
-         i1J8kF1iQKX8Bf9Yyj9K+lrAVr7u7zJjBL0P6i2nJrbaOnZsn9xwGMQNxweOYhu+cB00
-         2wwqympXEsibhLmXUT4HllBjOn17DRfUROWBGkt7i7ZGTS0PdBXitOp/dK+p787JoElp
-         sbeA==
-X-Gm-Message-State: AOJu0Yw+ac8zu/dfF0NMpKEQSWKrnKOJ+4DHc3FTiggB7qc39fWXCWDK
-	8vIRVACM+1Y5NCDbrOfdjRJhVKJe+sXv9bV64mKQFwz+sUMAGVlxgctUo3YQxpU=
-X-Google-Smtp-Source: AGHT+IE2k8hXCJX/bj9om1UweOjA25Pz4jUU6lss7nk52A61GIxcZcxIn04hwz+n1bH8ozX47cenoQ==
-X-Received: by 2002:a05:6870:1d1:b0:25e:c7b:ca8f with SMTP id 586e51a60fabf-25e2bea6a78mr7691995fac.46.1720307386324;
-        Sat, 06 Jul 2024 16:09:46 -0700 (PDT)
-Received: from [127.0.1.1] (23-93-181-73.fiber.dynamic.sonic.net. [23.93.181.73])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b10abeb23sm3362934b3a.72.2024.07.06.16.09.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 06 Jul 2024 16:09:45 -0700 (PDT)
-From: Cade Richard <cade.richard@gmail.com>
-X-Google-Original-From: Cade Richard <cade.richard@berkeley.edu>
-Date: Sat, 06 Jul 2024 16:09:44 -0700
-Subject: [PATCH kvm-unit-tests] riscv: Fix virt_to_phys()
+	s=arc-20240116; t=1720307589; c=relaxed/simple;
+	bh=+7Q38uJHrNsOYRaVMVxrspaOTQyWNxvjndN9JnzkfWg=;
+	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
+	 MIME-Version:Content-Type; b=nz5M2a1psRk/3xdqG/E6mA5dEZUbq4FXLm/T4mKpxgUACG8EZIbinHN7MGCT3LUDtU52NbG31klYizKXpdKw7yxRhHYVhUAXUHVnB2uLzx0elw5Q06bYaAKJMo//jIF/YL87x+OIAiDNJJWdlqXfTlJjzqQj2VRHLABrSisRqiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WGmQ74gwWz4xQM;
+	Sun,  7 Jul 2024 09:13:03 +1000 (AEST)
+From: Michael Ellerman <patch-notifications@ellerman.id.au>
+To: mpe@ellerman.id.au, tpearson@raptorengineering.com, alex.williamson@redhat.com, linuxppc-dev@lists.ozlabs.org, aik@amd.com, Shivaprasad G Bhat <sbhat@linux.ibm.com>
+Cc: npiggin@gmail.com, christophe.leroy@csgroup.eu, aneesh.kumar@kernel.org, naveen.n.rao@linux.ibm.com, gbatra@linux.ibm.com, brking@linux.ibm.com, aik@ozlabs.ru, jgg@ziepe.ca, ruscur@russell.cc, robh@kernel.org, sanastasio@raptorengineering.com, linux-kernel@vger.kernel.org, joel@jms.id.au, kvm@vger.kernel.org, msuchanek@suse.de, oohall@gmail.com, mahesh@linux.ibm.com, jroedel@suse.de, vaibhav@linux.ibm.com, svaidy@linux.ibm.com
+In-Reply-To: <171923268781.1397.8871195514893204050.stgit@linux.ibm.com>
+References: <171923268781.1397.8871195514893204050.stgit@linux.ibm.com>
+Subject: Re: [PATCH v4 0/6] powerpc: pSeries: vfio: iommu: Re-enable support for SPAPR TCE VFIO
+Message-Id: <172030740409.964765.9717587564748516161.b4-ty@ellerman.id.au>
+Date: Sun, 07 Jul 2024 09:10:04 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,43 +51,34 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240706-virt-to-phys-v1-1-7a4dc11f542c@berkeley.edu>
-X-B4-Tracking: v=1; b=H4sIALfOiWYC/x3MMQqAMAxA0atIZgM1iKJXEYegUbO0JRVRpHe3O
- L7h/xeSmEqCsXrB5NKkwRc0dQXLwX4X1LUYyFHretfhpXbiGTAeT0Ji6nmgVjZiKEk02fT+d9O
- c8wdsGzirXgAAAA==
-To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Cc: andrew.jones@linux.dev, atishp@rivosinc.com, cade.richard@berkeley.edu, 
- jamestiotio@gmail.com
-X-Mailer: b4 0.13.0
 
+On Mon, 24 Jun 2024 12:38:07 +0000, Shivaprasad G Bhat wrote:
+> The patches reimplement the iommu table_group_ops for pSeries
+> for VFIO SPAPR TCE sub-driver thereby bringing consistency with
+> PowerNV implementation and getting rid of limitations/bugs which
+> were emanating from these differences on the earlier approach on
+> pSeries.
+> 
+> Structure of the patchset:
+> -------------------------
+> The first and fifth patches just code movements.
+> 
+> [...]
 
+Applied to powerpc/next.
 
----
-Signed-off-by: Cade Richard <cade.richard@berkeley.edu>
----
- lib/riscv/mmu.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+[1/6] powerpc/iommu: Move pSeries specific functions to pseries/iommu.c
+      https://git.kernel.org/powerpc/c/b09c031d9433dda3186190e5845ba0d720212567
+[2/6] powerpc/pseries/iommu: Fix the VFIO_IOMMU_SPAPR_TCE_GET_INFO ioctl output
+      https://git.kernel.org/powerpc/c/6af67f2ddfcbbca551d786415beda14c48fb6ddf
+[3/6] powerpc/pseries/iommu: Use the iommu table[0] for IOV VF's DDW
+      https://git.kernel.org/powerpc/c/aed6e4946ed9654fc965482b045b84f9b9572bb8
+[4/6] vfio/spapr: Always clear TCEs before unsetting the window
+      https://git.kernel.org/powerpc/c/4ba2fdff2eb174114786784926d0efb6903c88a6
+[5/6] powerpc/iommu: Move dev_has_iommu_table() to iommu.c
+      https://git.kernel.org/powerpc/c/35146eadcb81d72153a1621f3cc0d5588cae19d3
+[6/6] powerpc/iommu: Reimplement the iommu_table_group_ops for pSeries
+      https://git.kernel.org/powerpc/c/f431a8cde7f102fce412546db6e62fdbde1131a7
 
-diff --git a/lib/riscv/mmu.c b/lib/riscv/mmu.c
-index bd006881..c4770552 100644
---- a/lib/riscv/mmu.c
-+++ b/lib/riscv/mmu.c
-@@ -194,7 +194,7 @@ unsigned long virt_to_phys(volatile void *address)
- 	paddr = virt_to_pte_phys(pgtable, (void *)address);
- 	assert(sizeof(long) == 8 || !(paddr >> 32));
- 
--	return (unsigned long)paddr;
-+	return (unsigned long)paddr | ((unsigned long) address & 0x00000FFF);
- }
- 
- void *phys_to_virt(unsigned long address)
-
----
-base-commit: a68956b3fb6f5f308822b20ce0ff8e02db1f7375
-change-id: 20240706-virt-to-phys-2a27a924ef2a
-
-Best regards,
--- 
-Cade Richard <cade.richard@berkeley.edu>
-
+cheers
 
