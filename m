@@ -1,103 +1,152 @@
-Return-Path: <kvm+bounces-21118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D38C692A85B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:45:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33D5192A861
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:48:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C73B281C54
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:45:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0FB11F21D62
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:48:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A64AF146A85;
-	Mon,  8 Jul 2024 17:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDD8149C7B;
+	Mon,  8 Jul 2024 17:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d88WXj4l"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b+eQaGuC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974853C30
-	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 17:45:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54062148FFC;
+	Mon,  8 Jul 2024 17:47:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720460732; cv=none; b=pHGJMJOGZuqZmo4rg6n2RrF/vmZo9dvysJfDP/263yY5kM1VRDKk+59VZrF1AeZNyIutvhQThShewYIEPq0Vxm32PFf1EP3J290owytVrwtvp2jP3NdFIQy6AGFrssBYx34Tyyc9y9khwYo5c4+qgWeZeuPeMlRdVvnelGsINKE=
+	t=1720460869; cv=none; b=WQSNpjDCksl791F8xeWxs88NCgtL7eXgKqER8a/hRU3rzQ5fm99gxM5u1/aiS/MrfWcAseLW6Ns2HWvFE4I4zMCSzb3zCMOcJOW4ZvNYD5RJ0Y3msn5pa1Eczv/FMM5C0ARi/NrvzmzhG6ZYuvMY6ku2FOtBJMl7UXS/KbDRWRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720460732; c=relaxed/simple;
-	bh=k4wAD/+adruccyHwOaQoHNi9Q0llBGyjMSQxq5Sy4/s=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=W/1afI4tPvrlUXcSGnEJOO1fOrL7Gcj9evojGYVWoxcQddvqpQhZhKmNcB0KrVVww0+bq3AyXEdSSHx9G+hEKFeVdatKXcLKRvzM4M0l6tYcGVC5BOsisjRtHNEynIkEntkrIHn7uJfEWRj8DyNhCjLklGtLVOiXm5/I7h8m19k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d88WXj4l; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70aff5bc227so3616123b3a.0
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 10:45:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720460731; x=1721065531; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=af/2NixPGXqQu2+711IVVm33vpo8e62X5Nl0616t+N0=;
-        b=d88WXj4loHbNEWB3QlKWiRexwbgILqvTFv4NuQjUczvEjuJQMOnkTaTo/ISorAPdf9
-         gfNGbPvzkX7kX1ZpgLSV4VBQ+0GktItVpTAO3jFU+eIhVcyJNc1AlyVYNbXTFIre7ybk
-         Qta4RoN6I0HC6GzhE/0rr+Ilw7FhpFEclAzCUO6NEyKJTxYpddoBA0LLzgfbbDz3ieU1
-         88JbX22MZYmhENBmNX+tDpUj5D22D81gKQvwe07imC8LOJZYt2GCFPxFqgEsVjg+C0IU
-         Sd2Gtel6n97Ag8WhIaDT/W5xMlXWGuw0+FLXAxm+o1twhnQc+MI/bN94FBABE7CiDnsH
-         yUWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720460731; x=1721065531;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=af/2NixPGXqQu2+711IVVm33vpo8e62X5Nl0616t+N0=;
-        b=QVLiViYQX83jgK/LEJvE1aoMVGx40nlBPnQXi16+UxasQmAIxb79rkXPoWEqErQPRw
-         iYgHWEL/B6lCRtf4m2gqE3YJQG7Iv5KLbXATMwcytzOTz1MHielasZ8ubz9grnPnFL7W
-         y+f7gRc1dQ4Xh28WMIhZIx9S73vvwIQl+wJgUsRJ5pbAf/oNgypsnGzmm4wJnXyCs081
-         tmlm+kkeqiNmBMh5gKsxLt7Upov7x2ZN4H0WIU2JHKIuN0oCdDOqxmetoPhYgsQ3XKP0
-         SVX2UtQMEElo00nntsWVy/8Owj/yZRggBMUbLvtoXcHzOIu7ZDLDprOCvdWOH59xdYfZ
-         ZEqA==
-X-Gm-Message-State: AOJu0YwG7NW2dg7flxh2zLtKzd6XZ1MuF2Wen8+4/EAx0Aih7RZVPLV3
-	DoUIyOVwqXUzQYtlAsevHuziXQ7IiIWJFmYxUVONB17L3VonVDm+i3ZSbhGhdM3/AweD63aPArJ
-	Czw==
-X-Google-Smtp-Source: AGHT+IEkDQewAMyTGQZnBwj+vLYaiD+nM341MvQJQawdDBWcOwt55girCekpnrdk+t/KIANSAN2uswD5ZNk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:3e27:b0:706:3421:7414 with SMTP id
- d2e1a72fcca58-70b434ea4f6mr14943b3a.1.1720460730712; Mon, 08 Jul 2024
- 10:45:30 -0700 (PDT)
-Date: Mon, 8 Jul 2024 10:45:29 -0700
-In-Reply-To: <c461682ef5aa422faf1ce13aab447b09@amazon.de>
+	s=arc-20240116; t=1720460869; c=relaxed/simple;
+	bh=rz6gpkZZk5f87HGbtga8gJ/ZUKYUBareB9Dtgdpw6Qk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SIOfssYgj+dgxKwR9ty7L+CgbdxQPPMY443aFzmFB101QFC4IdRuaPuCbhQev9WQseMm+u0mAiSZMTot7U+RYSX8H7bDnCRaTPsvzaVV6BoOSWK49s45CG0ME+T+kNVZAXt0dH1/MV/ctkJZo8AcYMJU8DINE2FweXHt/zKDm+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b+eQaGuC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFB3AC116B1;
+	Mon,  8 Jul 2024 17:47:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720460868;
+	bh=rz6gpkZZk5f87HGbtga8gJ/ZUKYUBareB9Dtgdpw6Qk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=b+eQaGuC2DsYz2VEJFVt1swL/pbsa/uJ+bvrcnAM5U/0V2fDtCU8L8eaB6q6gtvpa
+	 JmaCsMBjWaCFIqwPK8pqShS1c1XyarYtnjcWWtynS1ndRfZESv0kSvYbKGYHVQPgz5
+	 2J8BpcLxx4NLqwFNvoXv4oVED/tnPmI2jJMTLrlnZQdJf2A+XQQFjHA1JgYtJUU/Wt
+	 0LR0aaCjv7CURpK0C9QUS4hgXQ9sksWRtHcPjHO5zbkEXohhiSd3lJ35g71AjU9L04
+	 n9a1F+vtlfVmBGRwvd1dLrBWx1vt/BT0s8njlGI2jfluHy0kn3+uw//fWrX4I/yORt
+	 X2B0h+gM/bkIA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sQsSo-00AgBG-S9;
+	Mon, 08 Jul 2024 18:47:46 +0100
+Date: Mon, 08 Jul 2024 18:47:45 +0100
+Message-ID: <864j8z4vy6.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 3/7] KVM: arm64: Add save/restore support for FPMR
+In-Reply-To: <b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
+References: <20240708154438.1218186-1-maz@kernel.org>
+	<20240708154438.1218186-4-maz@kernel.org>
+	<b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <c461682ef5aa422faf1ce13aab447b09@amazon.de>
-Message-ID: <ZowluXkwYJjPR2mL@google.com>
-Subject: Re: [5.10.x Backport CVE-2021-47094] KVM: x86/mmu: Don't advance
- iterator after restart due to yielding
-From: Sean Christopherson <seanjc@google.com>
-To: Stanislav Uschakow <suschako@amazon.de>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Sun, Jun 30, 2024, Stanislav Uschakow wrote:
-> This is a request for comment backport of
+On Mon, 08 Jul 2024 18:34:36 +0100,
+Mark Brown <broonie@kernel.org> wrote:
 > 
-> <https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=3a0f64de479cae75effb630a2e0a237ca0d0623c>
+> [1  <text/plain; us-ascii (7bit)>]
+> On Mon, Jul 08, 2024 at 04:44:34PM +0100, Marc Zyngier wrote:
+> > Just like the rest of the FP/SIMD state, FPMR needs to be context
+> > switched.
 > 
-> - https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=b601c3bc9d5053065acdaa1481c
+> > The only interesting thing here is that we need to treat the pKVM
+> > part a bit differently, as the host FP state is never written back
+> > to the vcpu thread, but instead stored locally and eagerly restored.
 > 
-> - https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=d884eefd75cc54887bc2e9e724207443525dfb2c
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_host.h  | 10 ++++++++++
+> >  arch/arm64/kvm/fpsimd.c            |  1 +
+> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 ++++
+> >  arch/arm64/kvm/hyp/nvhe/switch.c   | 10 ++++++++++
+> >  arch/arm64/kvm/hyp/vhe/switch.c    |  4 ++++
+> >  5 files changed, 29 insertions(+)
 > 
-> for 5.10.x. I ran the kvm-unit-tests on patched and unpatched kernel without introducing regressions.
+> I'm possibly missing something here but I'm not seeing where we load the
+> state for the guest, especially in the VHE case.  I would expect to see
+> a change in kvm_hyp_handle_fpsimd() to load FPMR for guests with the
+> feature (it needs to be in there to keep in sync with the ownership
+> tracking for the rest of the FP state, and to avoid loading needlessly
+> in cases where the guest never touches FP).
 > 
-> I'm not quite sure if that backport is sufficient since the d884eefd75cc
-> targets v5.15 and the codebase differs quite between v5.10 and v5.15.
+> Saving for the guest was handled in the previous patch.
+> 
+> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > index 77010b76c150f..a307c1d5ac874 100644
+> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > @@ -312,6 +312,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+> >  {
+> >  	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+> > +
+> > +	if (system_supports_fpmr() &&
+> > +	    kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, FPMR, IMP))
+> > +		**host_data_ptr(fpmr_ptr) = read_sysreg_s(SYS_FPMR);
+> >  }
+> 
+> That's only saving the host state, it doesn't load the guest state.
 
-Why?  The 5.10 implementation isn't suitable for anything remotely resembling a
-production environment.  The TDP MMU wasn't enabled by default until 5.15 for
-very good reasons.
+Ah, I forgot to cherry-pick the fixes. Fsck knows what else I forgot.
+Thanks for reminding me.
 
-And even in 5.15, using the TDP MMU dicey.  See commit 7e546bd08943 ("Revert "KVM:
-x86: enable TDP MMU by default"") from the 5.15.y stable tree.
+	M.
+
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index f59ccfe11ab9a..52c7dc8446f16 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -404,6 +404,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	else
+ 		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
+ 
++	if (system_supports_fpmr() &&
++	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
++		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
++
+ 	/* Skip restoring fpexc32 for AArch64 guests */
+ 	if (!(read_sysreg(hcr_el2) & HCR_RW))
+ 		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
+
+-- 
+Without deviation from the norm, progress is not possible.
 
