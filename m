@@ -1,162 +1,107 @@
-Return-Path: <kvm+bounces-21120-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21121-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 168DB92A87D
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:54:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E8C292A87F
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:54:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6CC21F21E1B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:54:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEE92B20E00
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F35145344;
-	Mon,  8 Jul 2024 17:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A6614A0A5;
+	Mon,  8 Jul 2024 17:53:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YL7n9MvZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XeMH0por"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEA51482F5;
-	Mon,  8 Jul 2024 17:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A53314A08D;
+	Mon,  8 Jul 2024 17:53:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720461222; cv=none; b=cNR9ci0mcnItMMXQ8Blc+yUUkHsPh8TNKJUi1BOdKBZB0q3wpTKoJL8oWdqpqQO2ekPiFVyRkdIOPQRSxK/gZv9LPf9XK3foA8dWhzVGWVAOKCInFU6lkUFcu9ICiJWMWbfmRE4lX91UPYZ4MWhvimBYuB3Z1TA4D3I3LRuQCAs=
+	t=1720461224; cv=none; b=EnOG30PRZyVjjUnnm3y620xQD5+wZxNPC9bpeZvYNrG/drSo3yY2GYwjX8VMwIOPWu+BDsAw5lozqfVWLSRnjpd4d6CUrgaLLF3Jbz0/ZOXj/fcIcghmkvqUxy/fbY0m8i+GWWVCYpB28xDb5XEHigP02gLvs9EwvIbmz/L/qFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720461222; c=relaxed/simple;
-	bh=dLMjjZFXvk4TV7oN+/f5Ke6QToQU5488NgstOod12WY=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qrGxwHZqrTQsImUy+P+a4BhpjA20pB2QA4Wg9exvTIFxGQDVhaOanvRj1x8aN4D5Ao540eDGl2lVwwih+Hr91SId+Ti2CA7uXHkRMZZoLzW3lWEtZ9nGZWQCg7+B7UnFTITNEGOQy9g8TKH6h105Qu+w/I/fzP4kGOxf5EZMSvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YL7n9MvZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F14EC116B1;
-	Mon,  8 Jul 2024 17:53:42 +0000 (UTC)
+	s=arc-20240116; t=1720461224; c=relaxed/simple;
+	bh=C3GwnTURDmi547NFIqqGEDrXp5T993LZq/8bfiulStw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cjJQrTu3R4VkHYqjS3v7FkFMVPv/NFHdWhqJEmzcKpPxp4UkTR7yLLXyf5KpXW4ApcP3JntCsm/vzLTnPZteluEI4GJrvEc0RyY0tMMpnIDq2lAE5tLuymEbk2DPuL3D9KcVIeQ7x3SEvUY4x13vVA3iZKEA5kPPTWea+lhbUds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XeMH0por; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17FFAC4AF0A;
+	Mon,  8 Jul 2024 17:53:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720461222;
-	bh=dLMjjZFXvk4TV7oN+/f5Ke6QToQU5488NgstOod12WY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YL7n9MvZxrgUEOp7rcf0Tb3iEPrTfsRroAsivqkdJfnX1oItfGMByW+0Ym8IBbuMU
-	 uERyLcLMz4pyb3ROJJSg7Abnh5hWrsXqy2DrCtfEZ4Udtp6r12qM0iLdDvkmfMPd2y
-	 cjkWsHSB3p+SXqJHhUySB9OAbjo4Cqo7tACTT38sxF5ZOTaB34FR2I8y1FRc5cOmOx
-	 Z2QzSaj/6IUaExySKt2aoGGM/xCuOiopnPJQ58Cd547AwCQOVKlgSkuKM4sfCm1t0A
-	 q8odnyL3ofF2eYX7W3uCv4ueYFo9S+Ad+8y514rCuPat9ObnM699AZNG0X0rIgz+4u
-	 VuqWAw8NPkqPw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sQsYW-00AgF9-5M;
-	Mon, 08 Jul 2024 18:53:40 +0100
-Date: Mon, 08 Jul 2024 18:53:39 +0100
-Message-ID: <8634oj4voc.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
+	s=k20201202; t=1720461224;
+	bh=C3GwnTURDmi547NFIqqGEDrXp5T993LZq/8bfiulStw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XeMH0porEqwTosisdHpt+a6GgOqsNJbNdTV5WaP/bDuPnR3WolMrfTvbgWZ17LLmW
+	 0yYp7EWKEQasUav6JRKRCC5lJZvovErHA23Oke3J8fXcI6xzime0l9rB6B5D2uw90P
+	 E586WU+GI4iL587/d9aB4LhhyDMY8Ssosl70iPKEZNFxfFxPIdQdxDSTWyniPFhWiz
+	 KsBD0W5XRQn5+feorxlKTu55uJBximr4VBr04fV7Kselsd9Sl7suOkeO5sNNecR9wV
+	 5QiADd5uDza0H3N5ZWKhUdpUkiT/qvHH49SsPYWsq7G+pLXso7TABshk0aQA4Nev8I
+	 d+zcmv41zSI4Q==
+Date: Mon, 8 Jul 2024 18:53:39 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 3/7] KVM: arm64: Add save/restore support for FPMR
-In-Reply-To: <864j8z4vy6.wl-maz@kernel.org>
+Subject: Re: [PATCH 0/7] KVM: arm64: Add support for FP8
+Message-ID: <68d26d8a-f2fb-4652-ad89-d959e5fedcc8@sirena.org.uk>
 References: <20240708154438.1218186-1-maz@kernel.org>
-	<20240708154438.1218186-4-maz@kernel.org>
-	<b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
-	<864j8z4vy6.wl-maz@kernel.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="ddky+SsFRvKacQta"
+Content-Disposition: inline
+In-Reply-To: <20240708154438.1218186-1-maz@kernel.org>
+X-Cookie: Many are cold, but few are frozen.
 
-On Mon, 08 Jul 2024 18:47:45 +0100,
-Marc Zyngier <maz@kernel.org> wrote:
-> 
-> On Mon, 08 Jul 2024 18:34:36 +0100,
-> Mark Brown <broonie@kernel.org> wrote:
-> > 
-> > [1  <text/plain; us-ascii (7bit)>]
-> > On Mon, Jul 08, 2024 at 04:44:34PM +0100, Marc Zyngier wrote:
-> > > Just like the rest of the FP/SIMD state, FPMR needs to be context
-> > > switched.
-> > 
-> > > The only interesting thing here is that we need to treat the pKVM
-> > > part a bit differently, as the host FP state is never written back
-> > > to the vcpu thread, but instead stored locally and eagerly restored.
-> > 
-> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > ---
-> > >  arch/arm64/include/asm/kvm_host.h  | 10 ++++++++++
-> > >  arch/arm64/kvm/fpsimd.c            |  1 +
-> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 ++++
-> > >  arch/arm64/kvm/hyp/nvhe/switch.c   | 10 ++++++++++
-> > >  arch/arm64/kvm/hyp/vhe/switch.c    |  4 ++++
-> > >  5 files changed, 29 insertions(+)
-> > 
-> > I'm possibly missing something here but I'm not seeing where we load the
-> > state for the guest, especially in the VHE case.  I would expect to see
-> > a change in kvm_hyp_handle_fpsimd() to load FPMR for guests with the
-> > feature (it needs to be in there to keep in sync with the ownership
-> > tracking for the rest of the FP state, and to avoid loading needlessly
-> > in cases where the guest never touches FP).
-> > 
-> > Saving for the guest was handled in the previous patch.
-> > 
-> > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > index 77010b76c150f..a307c1d5ac874 100644
-> > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > > @@ -312,6 +312,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> > >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
-> > >  {
-> > >  	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
-> > > +
-> > > +	if (system_supports_fpmr() &&
-> > > +	    kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, FPMR, IMP))
-> > > +		**host_data_ptr(fpmr_ptr) = read_sysreg_s(SYS_FPMR);
-> > >  }
-> > 
-> > That's only saving the host state, it doesn't load the guest state.
-> 
-> Ah, I forgot to cherry-pick the fixes. Fsck knows what else I forgot.
-> Thanks for reminding me.
-> 
-> 	M.
-> 
-> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> index f59ccfe11ab9a..52c7dc8446f16 100644
-> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-> @@ -404,6 +404,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
->  	else
->  		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
->  
-> +	if (system_supports_fpmr() &&
-> +	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
-> +		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
-> +
->  	/* Skip restoring fpexc32 for AArch64 guests */
->  	if (!(read_sysreg(hcr_el2) & HCR_RW))
->  		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
-> 
 
-And thinking of it, that's not enough. I'm missing the pKVM angle that
-needs to be special cased. Drat.
+--ddky+SsFRvKacQta
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-	M.
+On Mon, Jul 08, 2024 at 04:44:31PM +0100, Marc Zyngier wrote:
 
--- 
-Without deviation from the norm, progress is not possible.
+> Although FP8 support was merged in 6.9, the KVM side was dropped, with
+> no sign of it being picked up again. Given that its absence is getting
+> in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
+> small series addressing it.
+
+Thanks, I've been prioritising SME since this was going to conflict with
+it and some of your comments on the prior version sounded like you would
+block things on a bigger refectoring of the interface with the host
+kernel which definitely needs to wait for after SME (I do want to redo
+the whole way the host stores FP data for threads which would be a good
+time for such a refactoring).  Hopefully there'll be a version of the
+SME patches suitable for ABI review this week.
+
+Other than the issue with restoring FPMR for the guest these look good
+to inspection.
+
+--ddky+SsFRvKacQta
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaMJ6IACgkQJNaLcl1U
+h9BXTgf/W38hTFwCYiS00hP4UdElxP4GotpS01nxhulGVSE8VDggFzcY+8XGNRNG
+CcgWIkU8GyXZpMTq55Rr2yJ47IZByJQJqSsImqeiPKLwi5/+F9x4XcoxVj7XAE9V
+BzG0k9JWH3M2FfIxcYvmyqV4d3AFid2AlF6xX4VAHWA2gbf92PjxO+q6bnAOtYpe
+xoY1puZdXY+wLotVnQIZz3yI0/5ptqCp1fSJWErTr3nMC5igyIFbE5+MKWxaqT3L
+s9POfUHR3wBK224G2gzf0fPTRaKZsrEtx8zgTHJ0ociPmO71imF9+TIwjIWCEH+c
+MDONfXaEUFz4Hy/LoFsqi4nuwzF1Pg==
+=38GM
+-----END PGP SIGNATURE-----
+
+--ddky+SsFRvKacQta--
 
