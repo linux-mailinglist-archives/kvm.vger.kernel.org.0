@@ -1,151 +1,173 @@
-Return-Path: <kvm+bounces-21095-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21096-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345EA92A123
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 13:27:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0DDD92A3F9
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 15:46:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6601B1C2174B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 11:27:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 207CA1C21A1D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 13:46:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FAF27F7D3;
-	Mon,  8 Jul 2024 11:26:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LQ2uiRb4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127CD13A407;
+	Mon,  8 Jul 2024 13:46:30 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144F57D06E
-	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 11:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F252746D
+	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 13:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720437985; cv=none; b=Kafamwvqh0w9TGw5p0FCPGkEvLFdrq+8jFrcKx6hmOX5QC+LOcoHk43/j6gwcWIebmD2DIrrI7Grm32nd7YbH8LLbd+7A8oc0Ek1UpSnq0RmhIZPbsrK2vGlcylK4yDKPbDBdqdBxH0SPHM6Atf245gXPvrdtq5zlfV6BmrJOTk=
+	t=1720446389; cv=none; b=FBjyse5ppp/jeOC5cWgAxt9Mn7KfHiQ4IQ3rGmeY/NOqIHZwiBV79K3VGj4htn25mwvKlZB1OHb5hyYZaorfiWsibwS7KpX01K98uCcjuoZd50+jnCtsjCzlhVhKljON7Oq14pOxABeoyG+piSWBlWe0jZFw8beTl53b7aO+9fA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720437985; c=relaxed/simple;
-	bh=BiZcXjD0MF9+4zB3dvLvvXJajt6y3TabHLQgZnFuMWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ybf6KSZqW7rHA0QJRv1WRfZ2q8kbAjoBodyBGZJgzbf/0oz/D/GQ2L2kgJGFyiZzgbOl6h5Nw1hd2Fotcloya0BmPOJDmjGgWIxWb0bceFT+OeJdCq7KMwq5RHdKrELHFwugdhjLueX+yIeXEyhunYHCkw124aWCWlyJapUnSzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LQ2uiRb4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720437983;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H+1JhCgg1e3xAL9ukropoVjm3oRaKeBDSlDAr3D/8Qw=;
-	b=LQ2uiRb4y0F2J7JPP2jAPWoWTFUClBHHxp2E+Qbd89I8uOrZAy+inh3DFb+Y0T01VSpxfT
-	7kRMCTXTJgz1y0YPpDMDv0BZun1XsEXlSKFRrtJ0nARZ75C9GkJMGehmCOOj0I860W6vYt
-	sA3AjlHCyyCschv7y8MIsnJ2OAY1kCQ=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-479-jclKonOFOoy04XDPSB7sRQ-1; Mon, 08 Jul 2024 07:26:22 -0400
-X-MC-Unique: jclKonOFOoy04XDPSB7sRQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42490ae735dso40117625e9.0
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 04:26:21 -0700 (PDT)
+	s=arc-20240116; t=1720446389; c=relaxed/simple;
+	bh=+XGCrrE8am2COw2YeeRVhtWkcA5sL9oO5Smao7EHkhQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=otkXXGjLPQc6ZvRKr4j2yvI5FwWQsVxup3yDb9QJh1Ih+Qyc7c8L8pNDXihFSGmm5SgLZxzypZn5O1W0a+mY2yl33wV9Z3pkEGMQwOgx5mzTJyX5bpExwoqNEWGvIQHp0kALob/7yfOfrWPqHRJv3QXU2wDAnQodHWp6smj5evU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7f639551768so499990639f.3
+        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 06:46:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720437981; x=1721042781;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H+1JhCgg1e3xAL9ukropoVjm3oRaKeBDSlDAr3D/8Qw=;
-        b=YKTls5rqTe4vcTpiW9ZmZQ5iDuU4qCftyHIr9/LdyESDnvUNEWnrFbYPhvqaYFP2Na
-         h1N6+L7BiyQshO3K4m9lL+gwKXLx1CGB/IUUvh8Pe+ZdmeVOkXDVgxvPjf0FGWmpSEzl
-         36CtJqLUz7xaHEZDXQtoenTuzMoFPeASB52IUefFSb/JoxoMybrtzvjZeRLSwY68Y+bt
-         xbhZx+HRGqWsipMzlHLZ/f3ne33yOkRoggp9fZV5WLKMmxza/Ct+x8kPT9X3j8iFBGSg
-         KVLQi7mAEcHDep79ufHXEnOi8Ddojs7OarZ6pgZe9yCWIAjc9bkn9I6WNY+UXG6g3hML
-         JEQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXF5MVD4YwXsfRVt7aXcBv4dDNTfld/yE4lWhY3TPndqGBi3kZ+BHaJlnTuQghFDiy57uf3N56T0xXEnsE+s9W/9mfA
-X-Gm-Message-State: AOJu0Yww3UkcbygBhET9196cI8xBqAyLKKj2EUKZS8rtU+b3sBueC4Mm
-	KcytXJ+QtLM/YpxzvACSH+pLjLBKGXeXQwyOprU7DRBI0Cl8SmEcfN40hw41c4BdBBKyB80Fn7n
-	9AvcR6d5OdF6PspnuIzdo/2Q2l0cDIS2psQGShx6eE2QW9dIK2w==
-X-Received: by 2002:a05:600c:1d11:b0:426:6e9a:7a1e with SMTP id 5b1f17b1804b1-4266e9a7b2cmr4958745e9.35.1720437980864;
-        Mon, 08 Jul 2024 04:26:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGGpA7ji/rZ+8HL55hEF/BG5Syq+7fVBtOtgJNBvAR3h2aS4f0cQ39/TmwMykXfwdCiYI7Sog==
-X-Received: by 2002:a05:600c:1d11:b0:426:6e9a:7a1e with SMTP id 5b1f17b1804b1-4266e9a7b2cmr4958475e9.35.1720437980375;
-        Mon, 08 Jul 2024 04:26:20 -0700 (PDT)
-Received: from redhat.com ([2.52.29.103])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4265c2a99c7sm59914285e9.1.2024.07.08.04.26.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Jul 2024 04:26:19 -0700 (PDT)
-Date: Mon, 8 Jul 2024 07:26:15 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: dtatulea@nvidia.com, jasowang@redhat.com, parav@nvidia.com,
-	sgarzare@redhat.com, netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vdpa/mlx5: Add the support of set mac address
-Message-ID: <20240708072603-mutt-send-email-mst@kernel.org>
-References: <20240708065549.89422-1-lulu@redhat.com>
+        d=1e100.net; s=20230601; t=1720446387; x=1721051187;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vtvs1Mko5LsRU3Lb/N5jUYmX0w85N4zKIwVYsZktNRk=;
+        b=wwdQ45w7CCaKdTLX6CRGP8Ly7bGOVYenYMxl51a6lPZMkxYAbpJXOSfHjtwSYv+I8Y
+         kwohNgQKUK4J7hlhk0P05pZwwEpoWz3INgEAp4p/WpmrjEcz/X5J1JRSOoiOoNu6xALx
+         3mtt6ZIo9d65DYkOkLktg/6u3wLgTN1G2clH5ibhySDLBuB9CekmtBpkTTGdjJYa+t05
+         hfzvCrdbNRi+m1pwgjvreJF/dW8hEVtCn8ai+Ke9rkXFhfTbSXdauh/eOu7oJuQ3xmIN
+         HalkG/X0rQij4iDmQzF8UympM0tYB4I5cJJFPH2Sp1nuV3gYFctIPQINlc42toMG9lCh
+         lnJA==
+X-Forwarded-Encrypted: i=1; AJvYcCUeOyciLo+GFbC1tX6onFrDY1/7C11L30zazLoCcqXh/Q63tv02GCJXtG0CpoDh99aCut2o1MqEOSpkVTC+rlToyLTK
+X-Gm-Message-State: AOJu0YxYCBYnQlYwETdrcfnWxoiBOBm1qV0kwMWiAjmWyIhPNkxOlphE
+	jtMDZH01WfigkkW6PcOutYZZjDhCfaeK24dv0hx5aPHS8rAYBI6T+gEDvmBlo6spegoxIBkKj9o
+	TIdIp+VGHBV0mEUhdVKzbFiyUdpjEx33rRw0I+KbkIvUnw2+gHxcOsCM=
+X-Google-Smtp-Source: AGHT+IEC1VWIswqFr0N8S6lXGHwqadgtjbzIcS/xTHB2cbva9SKYWhBdb+32fegttWHjH6IHlGJhovKdHEUYHr7hN7N9hkRPB6pq
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240708065549.89422-1-lulu@redhat.com>
+X-Received: by 2002:a05:6638:1650:b0:4c0:8165:c391 with SMTP id
+ 8926c6da1cb9f-4c08165c540mr657027173.4.1720446387130; Mon, 08 Jul 2024
+ 06:46:27 -0700 (PDT)
+Date: Mon, 08 Jul 2024 06:46:27 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c2a6b9061cbca3c3@google.com>
+Subject: [syzbot] [kvm?] WARNING in kvm_recalculate_apic_map
+From: syzbot <syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
+	mlevitsk@redhat.com, pbonzini@redhat.com, seanjc@google.com, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jul 08, 2024 at 02:55:49PM +0800, Cindy Lu wrote:
-> Add the function to support setting the MAC address.
-> For vdpa/mlx5, the function will use mlx5_mpfs_add_mac
-> to set the mac address
-> 
-> Tested in ConnectX-6 Dx device
-> 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
+Hello,
 
-Is this on top of your other patchset?
+syzbot found the following issue on:
 
-> ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index 26ba7da6b410..f78701386690 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -3616,10 +3616,33 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
->  	destroy_workqueue(wq);
->  	mgtdev->ndev = NULL;
->  }
-> +static int mlx5_vdpa_set_attr_mac(struct vdpa_mgmt_dev *v_mdev,
-> +				  struct vdpa_device *dev,
-> +				  const struct vdpa_dev_set_config *add_config)
-> +{
-> +	struct mlx5_vdpa_dev *mvdev = to_mvdev(dev);
-> +	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-> +	struct mlx5_core_dev *mdev = mvdev->mdev;
-> +	struct virtio_net_config *config = &ndev->config;
-> +	int err;
-> +	struct mlx5_core_dev *pfmdev;
-> +
-> +	if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-> +		if (!is_zero_ether_addr(add_config->net.mac)) {
-> +			memcpy(config->mac, add_config->net.mac, ETH_ALEN);
-> +			pfmdev = pci_get_drvdata(pci_physfn(mdev->pdev));
-> +			err = mlx5_mpfs_add_mac(pfmdev, config->mac);
-> +			if (err)
-> +				return -1;
-> +		}
-> +	}
-> +	return 0;
-> +}
->  
->  static const struct vdpa_mgmtdev_ops mdev_ops = {
->  	.dev_add = mlx5_vdpa_dev_add,
->  	.dev_del = mlx5_vdpa_dev_del,
-> +	.dev_set_attr = mlx5_vdpa_set_attr_mac,
->  };
->  
->  static struct virtio_device_id id_table[] = {
-> -- 
-> 2.45.0
+HEAD commit:    f3a2439f20d9 Merge tag 'rproc-v6.3' of git://git.kernel.or..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=12e2d518c80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=81f5afa0c201c8de
+dashboard link: https://syzkaller.appspot.com/bug?extid=545f1326f405db4e1c3e
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16b7be60c80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11a380a8c80000
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0719d575f3ac/disk-f3a2439f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4176aabb67b5/vmlinux-f3a2439f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2b0e3c0ab205/bzImage-f3a2439f.xz
+
+The issue was bisected to:
+
+commit 76e527509d37a15ff1714ddd003384f5f25fd3fc
+Author: Sean Christopherson <seanjc@google.com>
+Date:   Fri Jan 6 01:12:52 2023 +0000
+
+    KVM: x86: Skip redundant x2APIC logical mode optimized cluster setup
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=124fbe60c80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=114fbe60c80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=164fbe60c80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
+Fixes: 76e527509d37 ("KVM: x86: Skip redundant x2APIC logical mode optimized cluster setup")
+
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5078 at arch/x86/kvm/lapic.c:330 kvm_recalculate_logical_map arch/x86/kvm/lapic.c:330 [inline]
+WARNING: CPU: 0 PID: 5078 at arch/x86/kvm/lapic.c:330 kvm_recalculate_apic_map+0x1267/0x14e0 arch/x86/kvm/lapic.c:413
+Modules linked in:
+CPU: 0 PID: 5078 Comm: syz-executor294 Not tainted 6.2.0-syzkaller-12485-gf3a2439f20d9 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/16/2023
+RIP: 0010:kvm_recalculate_logical_map arch/x86/kvm/lapic.c:330 [inline]
+RIP: 0010:kvm_recalculate_apic_map+0x1267/0x14e0 arch/x86/kvm/lapic.c:413
+Code: 8f ae a2 00 48 8b 3c 24 ba 01 00 00 00 be 04 00 00 00 e8 ac 83 fb ff 48 c7 44 24 08 00 00 00 00 e9 9b f7 ff ff e8 49 f9 6c 00 <0f> 0b e9 d2 f6 ff ff e8 3d f9 6c 00 4c 89 23 e9 c5 f6 ff ff 48 8b
+RSP: 0018:ffffc900034af800 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: ffff8880776f41c0 RSI: ffffffff811729b7 RDI: 0000000000000004
+RBP: 0000000000000400 R08: 0000000000000004 R09: 0000000000000001
+R10: 0000000000082000 R11: 0000000000000000 R12: ffff8880299f2000
+R13: ffff88807d13c040 R14: dffffc0000000000 R15: 0000000000082000
+FS:  0000555556467300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000002004d008 CR3: 00000000760bd000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ kvm_apic_set_state+0x468/0xeb0 arch/x86/kvm/lapic.c:2951
+ kvm_vcpu_ioctl_set_lapic arch/x86/kvm/x86.c:4858 [inline]
+ kvm_arch_vcpu_ioctl+0x2862/0x3f90 arch/x86/kvm/x86.c:5593
+ kvm_vcpu_ioctl+0x9ad/0xfe0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4255
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f5e46a52109
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcdc080378 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f5e46a52109
+RDX: 0000000020000880 RSI: 000000004400ae8f RDI: 0000000000000005
+RBP: 00007f5e46a15b60 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f5e46a15bf0
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
