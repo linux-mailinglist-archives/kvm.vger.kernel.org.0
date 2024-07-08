@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-21104-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21103-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3997A92A5FC
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:45:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D1D092A5FE
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:45:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B79ECB21C31
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 15:45:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFD3BB21C4D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 15:45:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D010146A71;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D095146A77;
 	Mon,  8 Jul 2024 15:44:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EU7PGTxV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bu/8PvUP"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99B2144D25;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99F6144D29;
 	Mon,  8 Jul 2024 15:44:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720453495; cv=none; b=c6P5SRPZLUlK0qbucPn5HJGbRhLwH9/VaPGrML7R1V/BbatGpgRpExTywSOEo+pB8JhcRsd7cy82PvFjWRCn6wJWzF1VH8RI5iQa+QjrvR5VYBzkc9YPuOK5Gdnx7zlrl6xCfWOLw+FtxQh5lXBPQRUbXBhcUOn8GrS8Bsz1OlE=
+	t=1720453495; cv=none; b=M2bbT4D694OSIGVKo8FYhmCCLXhtSfP5B62ccccBiZO6+u2LXOBFNuM6ugtnu27aRLCuwyqeqnyfEIke3LaeY55ZnpglVeJKL0ll59MQdW2b7w5IsUQ6PkJW6epJehn5F3EhsqeCcu0/IxrRELBm+1NSAeJWYFSHuPpGrxE6e68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720453495; c=relaxed/simple;
-	bh=TgBIaQlXHfAb7OU3eNgvMSbHhAj0/iNzDpujav5PLFM=;
+	bh=JsX6GaTs7Vi33NMLLUOYXeMXmeUqBGTgNLnsPE11cdk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=W8JKJzDFeW4x43HrWgfUDjtrfv8OwN+LPAC4+vRXkjB3kf8Av2w4A+6Quj6bYIFf6GX/hK3rOBrHRjaxWCC5pCCxcezPBvrU0/XWV6n/ipvmPW/Stox0IUUXTzlrKeJA6WPvWsoBAcbN7CfQEXx/jtiZhuRJeG5b0Eam2nRkX8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EU7PGTxV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C793C4AF10;
+	 MIME-Version; b=T7xWtJ5adeoaE+3tUWW9j0B3YILxLWbS+EG3yRRLoH+Z2NSrlzzXB0G4M0vuEFIBAAS3qNBsopMC+vpnwa9rGEScTbMTDzcIBH9oKWWh+6RuXHIEmnPuCR1gSORk4Br/PRakt8XO5jXbbymaQQJvds/z626SabKm99rLV/qsxpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bu/8PvUP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 784E2C4AF0C;
 	Mon,  8 Jul 2024 15:44:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1720453495;
-	bh=TgBIaQlXHfAb7OU3eNgvMSbHhAj0/iNzDpujav5PLFM=;
+	bh=JsX6GaTs7Vi33NMLLUOYXeMXmeUqBGTgNLnsPE11cdk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=EU7PGTxV4EvkB6ybPZ4lWM71Lfk3cDNCFW/ciUREVCufJGnkCIcEabcbnZSAGOf6w
-	 28eXcF8ALvNLlLtdP7YeCEBkPXVKPbg6sX/MMPPLv21UBRLfMAJXLTSC9+SMQ0zZlh
-	 QoeMiLkm4DI6Cx/I4kNRHkiwBW+6Tmt0uiSCrYxQDClfPBOVapia7wVtWrKB061A2i
-	 B9ItxYKN9Pn5hFMhIaaYuoqlAbgu3WwC97Tr+3fHH1jXV0AxKt/elo+GET/a+/Z6xD
-	 2/SpW8FZ3/khoPjsd0D9TqUnHVFwdRqpuks0U0Jy9s8YjJKlGi3Tq7OxdBoW6RyJSv
-	 KksgZZzbaRLDQ==
+	b=bu/8PvUPlZ22Q8ni+39V+88hKotMKO8bpsopdo9VWOJ6cRSEWTu+Ek8TaMlSlgKoL
+	 bBcm6a43DAmETjnZ7lRXve8My8WCE1d2vXG7tvcGoaCM2RVTBCYgYQjO+q1vYnADJB
+	 JRdcrqSWO5dBPE7F3/7VlrZ/Vr5wrGLb/tIHs3zYMfSVnFbjgW3+GktLzC/LWPW5p7
+	 aCxmqiCEokHMD8U1+b9HPKwyyivQyEHfsnsXuQYMFo9eJDx7NcbJe3gk6SDL3EB6Xw
+	 adRzC3XDdmzef+8v81ZDEPhN5/bzaSJ9c9n3UHA3IGgRhSQ+LUw7ABklA58Bblqns8
+	 789UgnzLOYMEw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sQqXt-00Ae1P-Fk;
+	id 1sQqXt-00Ae1P-NS;
 	Mon, 08 Jul 2024 16:44:53 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -58,9 +58,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 5/7] KVM: arm64: Expose ID_AA64FPFR0_EL1 as a writable ID reg
-Date: Mon,  8 Jul 2024 16:44:36 +0100
-Message-Id: <20240708154438.1218186-6-maz@kernel.org>
+Subject: [PATCH 6/7] KVM: arm64: Enable FP8 support when available and configured
+Date: Mon,  8 Jul 2024 16:44:37 +0100
+Message-Id: <20240708154438.1218186-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240708154438.1218186-1-maz@kernel.org>
 References: <20240708154438.1218186-1-maz@kernel.org>
@@ -76,30 +76,28 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-ID_AA64FPFR0_EL1 contains all sort of bits that contain a description
-of which FP8 subfeatures are implemented.
-
-We don't really care about them, so let's just expose that register
-and allow userspace to disable subfeatures at will.
+If userspace has enabled FP8 support (by setting ID_AA64PFR2_EL1.FPMR
+to 1), let's enable the feature by setting HCRX_EL2.EnFPM for the vcpu.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/sys_regs.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 326262abc2ff4..1157c38568e22 100644
+index 1157c38568e22..8b5caad651512 100644
 --- a/arch/arm64/kvm/sys_regs.c
 +++ b/arch/arm64/kvm/sys_regs.c
-@@ -2386,7 +2386,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
- 	ID_HIDDEN(ID_AA64SMFR0_EL1),
- 	ID_UNALLOCATED(4,6),
--	ID_UNALLOCATED(4,7),
-+	ID_WRITABLE(ID_AA64FPFR0_EL1, ~ID_AA64FPFR0_EL1_RES0),
+@@ -4579,6 +4579,9 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
  
- 	/* CRm=5 */
- 	{ SYS_DESC(SYS_ID_AA64DFR0_EL1),
+ 		if (kvm_has_feat(kvm, ID_AA64MMFR3_EL1, TCRX, IMP))
+ 			vcpu->arch.hcrx_el2 |= HCRX_EL2_TCR2En;
++
++		if (kvm_has_feat(kvm, ID_AA64PFR2_EL1, FPMR, IMP))
++			vcpu->arch.hcrx_el2 |= HCRX_EL2_EnFPM;
+ 	}
+ 
+ 	if (test_bit(KVM_ARCH_FLAG_FGU_INITIALIZED, &kvm->arch.flags))
 -- 
 2.39.2
 
