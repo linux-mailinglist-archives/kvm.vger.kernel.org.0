@@ -1,128 +1,98 @@
-Return-Path: <kvm+bounces-21105-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21106-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1AA792A5FD
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:45:45 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8F7F92A642
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:55:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49BA9B21C10
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 15:45:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 835051F22472
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 15:55:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D057146A76;
-	Mon,  8 Jul 2024 15:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C241442FB;
+	Mon,  8 Jul 2024 15:53:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vRyoxTCQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OyZq0sxe"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB26A14532B;
-	Mon,  8 Jul 2024 15:44:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D5AD1487ED;
+	Mon,  8 Jul 2024 15:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720453495; cv=none; b=Eg69t7uzSnI5XJ0pT2kAhubdaTx1+32SOLWzX4Fwx8s0cAEoQiFkBq/Mosfi4iaMr91PDUqjxHv5r95WY8xqXhUFUcm+BMCOUSb+DPEGjoU6AhXoRoWA7k0x4LJsIGUwVfF44dm9rD71BlROHXGx6eAXLTZHLkBu2doQQfg9sHY=
+	t=1720454030; cv=none; b=NAEtwfbmrxeGtVaDA5KK7L8qUSBmJsGlD6Prvh7PSA+8RUe0yaGsc3Fygx2meUB7Tf6+/qvhG1K62q5RlCeGRkWjWEPIlyOdK30Slbd10ovmoITONDM71tPChH+4lGCtgtL8aLHr6nxH7iikoU7Zpgnv44nCVd7k7/ueCGB2eGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720453495; c=relaxed/simple;
-	bh=Uv0z9ntISDWqUONsGZqFUTjAheaQ1E1mlpLqi6+ng6M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BynuGTs8iSUiU+RVD8htGxnuC2HzJT2Y+u+/921qAJ0E0b3lVUAbDGfHx3tsBmoflWGXHI+mkEtSW3uVZTKgSQSs8pKututBY5XueK8h5JYSQvpF71sO6NEGjuLadG8Qn6KRO/BGTvQWKbyKpQpXzCzrOAvf9BCey9LfPC65QDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vRyoxTCQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B358FC4AF11;
-	Mon,  8 Jul 2024 15:44:55 +0000 (UTC)
+	s=arc-20240116; t=1720454030; c=relaxed/simple;
+	bh=2HMIO4K+SHCTIb+8BDQJABedFYsONFuY0Xzr83IVt/0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o0jkCnDD7TnbQyxJQSkO2U6IPNi+2kL4tGqdGQTpGD4UPywHPd+uqyx8/HN/Hare+5V3eP0DnI+i2a3sjveiqwj/v3Sd5+blMbdUWQ35MUuWFkkSuKwfSqNwDmouofsz3PQxeXMgzQ0IoIjgCagRF8JT1iewdl6oaBT3oiRzq8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OyZq0sxe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 268CAC4AF13;
+	Mon,  8 Jul 2024 15:53:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720453495;
-	bh=Uv0z9ntISDWqUONsGZqFUTjAheaQ1E1mlpLqi6+ng6M=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=vRyoxTCQSNWbyMYEHSAdVp0bBfgm63kTrCTK4sKrZ7D1jt0sYg0AieQ968QNw9AyI
-	 J+/A4sLDMwriiaD/2MtU2sRGwj3uwSoGx25+4XdiihXQ8evspg2dOCf6ymS6PFi6bu
-	 k4/4p6OgE1KwtIVLCZpBg6WEXnoZ7bzi43aGf0aV1LTRtyIRdpWKVr5ZJqnXCGBiSm
-	 gyNtclQmEtfCPchp6aAw5Ydlpt1KOIGfPl5m4kgyEM2eCfvtbTNf/E2uz3gL7U6Xmr
-	 0kKBejlDN8pZpvqW1Jbtu3WdI0r+HpZJcTOuNjYYn8zsf85U30ohPXjLAzfBLuZbSm
-	 nvPaGr0BT/CSw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sQqXt-00Ae1P-Ua;
-	Mon, 08 Jul 2024 16:44:54 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
+	s=k20201202; t=1720454030;
+	bh=2HMIO4K+SHCTIb+8BDQJABedFYsONFuY0Xzr83IVt/0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OyZq0sxeCjd23VqAcSKqkzWSZBU2jvnB3LLGPSkU+A+Gfbh8u7awVrFlKJ9O07SwG
+	 tvFcyQqEE0jjEZ08X2aWWrQr8b5D2CxMe/YRrUHKpV+7022bI9CFxz5v+msH4J96Sw
+	 d1er2JX6TTfLmvBG+rEkpTOg0plbcj/9E9hiBbQ9kpl5vSn0zH2VOMmP/Bsa5pjuNT
+	 khFlkWKLlkIFhx+IOfyg8jlXH22uKJcjD9M8wuQuzEpbqrWbpiPscq7KqB/cMdcZZl
+	 8AF8vzBfz3oQdYPyz20LMjOdx3jHWyl+NPrINFzWRt5rA7Vl3GqARAhoS0BDywev+9
+	 ek1KTBfiI+IyQ==
+Date: Mon, 8 Jul 2024 16:53:45 +0100
+From: Mark Brown <broonie@kernel.org>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH 7/7] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
-Date: Mon,  8 Jul 2024 16:44:38 +0100
-Message-Id: <20240708154438.1218186-8-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240708154438.1218186-1-maz@kernel.org>
+	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 1/7] KVM: arm64: Move SVCR into the sysreg array
+Message-ID: <0b3d7e18-e024-466f-b79d-859eb320ac09@sirena.org.uk>
 References: <20240708154438.1218186-1-maz@kernel.org>
+ <20240708154438.1218186-2-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="1GRwR6KARsg8Xwf1"
+Content-Disposition: inline
+In-Reply-To: <20240708154438.1218186-2-maz@kernel.org>
+X-Cookie: Many are cold, but few are frozen.
 
-Everything is now in place for a guest to "enjoy" FP8 support.
-Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
-explicit restriction of only being able to clear FPMR.
 
-All other features (MTE* at the time of writing) are hidden
-and not writable.
+--1GRwR6KARsg8Xwf1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+On Mon, Jul 08, 2024 at 04:44:32PM +0100, Marc Zyngier wrote:
+> SVCR is just a system register, and has no purpose being outside
+> of the sysreg array. If anything, it only makes it more difficult
+> to eventually support SME one day. If ever.
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 8b5caad651512..e6f9e380283ea 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1722,6 +1722,15 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	return val;
- }
- 
-+static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
-+					  const struct sys_reg_desc *rd)
-+{
-+	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
-+
-+	/* We only expose FPMR */
-+	return val & ID_AA64PFR2_EL1_FPMR;
-+}
-+
- #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
- ({									       \
- 	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
-@@ -2381,7 +2390,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 		   ID_AA64PFR0_EL1_AdvSIMD |
- 		   ID_AA64PFR0_EL1_FP), },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
--	ID_UNALLOCATED(4,2),
-+	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
-+	  .access	= access_id_reg,
-+	  .get_user	= get_id_reg,
-+	  .set_user	= set_id_reg,
-+	  .reset	= read_sanitised_id_aa64pfr2_el1,
-+	  .val		= ID_AA64PFR2_EL1_FPMR, },
- 	ID_UNALLOCATED(4,3),
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
- 	ID_HIDDEN(ID_AA64SMFR0_EL1),
--- 
-2.39.2
+Right, that's why the SME serie has a patch adding it to sysreg -
+it was kept out due to feature detection.
 
+--1GRwR6KARsg8Xwf1
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaMC4gACgkQJNaLcl1U
+h9BG0gf/eTLbiBcaHtBeq57BjW5GLQip7iOqbODqi+y/tufP3QVFijfRRaDwkO3y
+UZtX4869WIMH2FmYnqVial/xX1Wg7GSWImYc9Nx6GjfvsilqwamGEq5JMbZVSnll
+bxE21iEmFf81+lZ77lqFiZpMERd65kAQ9gIm3yCtw3oVpEuPu0wxc4l9jwKGSX1G
+FzDaulJU+oaJ7gtGyUojVVKiizTeckcOG+eGsutFxNZqi+wEqx1n14CIeFgBPxt3
+lfw8QDy6DQPU5GXUn0bf0MdSdN24YnG1dzHG2bswnAmAtMNEklEosYkW7F+lJUZd
+r+lyTcUXMygCkv9k3rCXoxOnBm4wqw==
+=vC0S
+-----END PGP SIGNATURE-----
+
+--1GRwR6KARsg8Xwf1--
 
