@@ -1,173 +1,357 @@
-Return-Path: <kvm+bounces-21096-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21097-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DDD92A3F9
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 15:46:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E78F392A543
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 16:59:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 207CA1C21A1D
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 13:46:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 648271F218AA
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 14:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127CD13A407;
-	Mon,  8 Jul 2024 13:46:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA5E1420DF;
+	Mon,  8 Jul 2024 14:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSzlONXc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F252746D
-	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 13:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F231419B5
+	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 14:59:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720446389; cv=none; b=FBjyse5ppp/jeOC5cWgAxt9Mn7KfHiQ4IQ3rGmeY/NOqIHZwiBV79K3VGj4htn25mwvKlZB1OHb5hyYZaorfiWsibwS7KpX01K98uCcjuoZd50+jnCtsjCzlhVhKljON7Oq14pOxABeoyG+piSWBlWe0jZFw8beTl53b7aO+9fA=
+	t=1720450764; cv=none; b=E+msEj7TeWyYmRV8RyIDKntpEIDQLk2OjgRowPXdBOLf9ODTuXToDH3pTczqFDwwr5W3I3bsPOqE/9JfF4wpI6TtDr4Xirax2viNsVbTscxQdxbN1d5KvH76CBDc2x3Zsv5PNz2aslfqrEOUWpgdyaIBRAyUzrQrlXQAyGQsmGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720446389; c=relaxed/simple;
-	bh=+XGCrrE8am2COw2YeeRVhtWkcA5sL9oO5Smao7EHkhQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=otkXXGjLPQc6ZvRKr4j2yvI5FwWQsVxup3yDb9QJh1Ih+Qyc7c8L8pNDXihFSGmm5SgLZxzypZn5O1W0a+mY2yl33wV9Z3pkEGMQwOgx5mzTJyX5bpExwoqNEWGvIQHp0kALob/7yfOfrWPqHRJv3QXU2wDAnQodHWp6smj5evU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7f639551768so499990639f.3
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 06:46:27 -0700 (PDT)
+	s=arc-20240116; t=1720450764; c=relaxed/simple;
+	bh=jUDFW65Hw+qVUyZ1BNKiCte8ar7aYmWWU6Qto9MJt+0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=q1isY0YA4FfELsOiTaLWtlkXp7w0aIxvGJnubVPaT7OR143BaJ9I5GQ4VFRO1nRLB6UFuBBm666DpvFgjFb95CkwBJBj3cYop234afw2+lWxvnS4sdFOqPF/kCpha6Z+0WdLTyVILR8CA/2Eerk7KCLnkheH52aZgZT59FMj2IE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PSzlONXc; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720450762;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vg9DjfCwdbJDNgmS6lMmq1sY0xpLSifks2hUMYnkge4=;
+	b=PSzlONXcR1SoSSgzRASTziNH53jvCn/7j1q95+sbt+yr1cJ4Zn8yIAwZ8Y7grY3BvfTMUx
+	IqxulXWRDnxkLdvWbZKyTIoSWqJ4iN6tMbVP0AB9BhRDS8j4Qp33LDfC9kZ+m9N1ixB1Ae
+	nV4n+FQIUTis5Csx8Gnw7dcJa52vylU=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-629-dKh4kPR-P9e8xUC7rHSDSQ-1; Mon, 08 Jul 2024 10:59:19 -0400
+X-MC-Unique: dKh4kPR-P9e8xUC7rHSDSQ-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-426620721c2so14908805e9.2
+        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 07:59:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720446387; x=1721051187;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Vtvs1Mko5LsRU3Lb/N5jUYmX0w85N4zKIwVYsZktNRk=;
-        b=wwdQ45w7CCaKdTLX6CRGP8Ly7bGOVYenYMxl51a6lPZMkxYAbpJXOSfHjtwSYv+I8Y
-         kwohNgQKUK4J7hlhk0P05pZwwEpoWz3INgEAp4p/WpmrjEcz/X5J1JRSOoiOoNu6xALx
-         3mtt6ZIo9d65DYkOkLktg/6u3wLgTN1G2clH5ibhySDLBuB9CekmtBpkTTGdjJYa+t05
-         hfzvCrdbNRi+m1pwgjvreJF/dW8hEVtCn8ai+Ke9rkXFhfTbSXdauh/eOu7oJuQ3xmIN
-         HalkG/X0rQij4iDmQzF8UympM0tYB4I5cJJFPH2Sp1nuV3gYFctIPQINlc42toMG9lCh
-         lnJA==
-X-Forwarded-Encrypted: i=1; AJvYcCUeOyciLo+GFbC1tX6onFrDY1/7C11L30zazLoCcqXh/Q63tv02GCJXtG0CpoDh99aCut2o1MqEOSpkVTC+rlToyLTK
-X-Gm-Message-State: AOJu0YxYCBYnQlYwETdrcfnWxoiBOBm1qV0kwMWiAjmWyIhPNkxOlphE
-	jtMDZH01WfigkkW6PcOutYZZjDhCfaeK24dv0hx5aPHS8rAYBI6T+gEDvmBlo6spegoxIBkKj9o
-	TIdIp+VGHBV0mEUhdVKzbFiyUdpjEx33rRw0I+KbkIvUnw2+gHxcOsCM=
-X-Google-Smtp-Source: AGHT+IEC1VWIswqFr0N8S6lXGHwqadgtjbzIcS/xTHB2cbva9SKYWhBdb+32fegttWHjH6IHlGJhovKdHEUYHr7hN7N9hkRPB6pq
+        d=1e100.net; s=20230601; t=1720450759; x=1721055559;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Vg9DjfCwdbJDNgmS6lMmq1sY0xpLSifks2hUMYnkge4=;
+        b=pV9DPaH0/KaLIyzb8RNMaasMmYB6v2wNTkVrew5wWctpmjl4p0jg/ODB2dZzm5jq6H
+         hlVQGs1LbhnL/haQGKtXxmcI6j0RYHIUCJIRSL7Hf/seSVGVwFjs2hJFzcd2yfKNSH52
+         5tjNRb6PkQ/I5MhnOY/IKE1ykqI8Tp0pFHquGcV67TMhrJ6p42mPQSVAqvawam3yklED
+         QjJdMsF23SK7QDskqobfNYOVcU34d32h2lMRCWyLVXjo9ti2hdwpnFoYOVpLc2GEUZdq
+         9i5E68QvqG1WHJkcuQm5jbYLrkz9OVODfLrcac/m9oP0fP3kWmfR78iMlMvU9i1UK5Mq
+         Is9w==
+X-Forwarded-Encrypted: i=1; AJvYcCXiQTOsW36JTqM/IJOynIsSAClzoCkMA4/l8t9EWqH1SWiaeUCZjVsowgIbvULSeA6SwvkyRal7fB+KmJTnGr1pUO9L
+X-Gm-Message-State: AOJu0Yyz6HYwxeoxi0h9pVm4cPF1rPQBRtAnDdhWtcYSH+uIWPyfayTB
+	oArpajJSLYgCeqhDQTYP1qSny29vG643BQuKtZjphhB9FxDBQeOOc2qgmflflmDggCVxGYV3XZG
+	NPAH+AellTcpEFLjHlPgEpL2V2LC6/E0PCURKdkoMCPHybfyBpA==
+X-Received: by 2002:a05:600c:4a2a:b0:426:6618:146a with SMTP id 5b1f17b1804b1-426661815cdmr28054765e9.2.1720450758772;
+        Mon, 08 Jul 2024 07:59:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGp5lzobkSaZTj0R3xkan3t7S9lWQ61nLaBDlag/pBn1hy1FMw3L4m04fxYvWWxkJ0eLo5r2Q==
+X-Received: by 2002:a05:600c:4a2a:b0:426:6618:146a with SMTP id 5b1f17b1804b1-426661815cdmr28054585e9.2.1720450758298;
+        Mon, 08 Jul 2024 07:59:18 -0700 (PDT)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42666680fa5sm61659735e9.22.2024.07.08.07.59.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Jul 2024 07:59:17 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Nicolas Saenz Julienne <nsaenz@amazon.com>,
+ linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: pbonzini@redhat.com, seanjc@google.com, linux-doc@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, linux-arch@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, graf@amazon.de, dwmw2@infradead.org,
+ paul@amazon.com, nsaenz@amazon.com, mlevitsk@redhat.com,
+ jgowans@amazon.com, corbet@lwn.net, decui@microsoft.com,
+ tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, amoorthy@google.com
+Subject: Re: [PATCH 01/18] KVM: x86: hyper-v: Introduce XMM output support
+In-Reply-To: <20240609154945.55332-2-nsaenz@amazon.com>
+References: <20240609154945.55332-1-nsaenz@amazon.com>
+ <20240609154945.55332-2-nsaenz@amazon.com>
+Date: Mon, 08 Jul 2024 16:59:16 +0200
+Message-ID: <87tth0rku3.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:1650:b0:4c0:8165:c391 with SMTP id
- 8926c6da1cb9f-4c08165c540mr657027173.4.1720446387130; Mon, 08 Jul 2024
- 06:46:27 -0700 (PDT)
-Date: Mon, 08 Jul 2024 06:46:27 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c2a6b9061cbca3c3@google.com>
-Subject: [syzbot] [kvm?] WARNING in kvm_recalculate_apic_map
-From: syzbot <syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com>
-To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
-	mlevitsk@redhat.com, pbonzini@redhat.com, seanjc@google.com, 
-	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hello,
+Nicolas Saenz Julienne <nsaenz@amazon.com> writes:
 
-syzbot found the following issue on:
+> Prepare infrastructure to be able to return data through the XMM
+> registers when Hyper-V hypercalls are issues in fast mode. The XMM
+> registers are exposed to user-space through KVM_EXIT_HYPERV_HCALL and
+> restored on successful hypercall completion.
+>
+> Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
+>
+> ---
+>
+> There was some discussion in the RFC about whether growing 'struct
+> kvm_hyperv_exit' is ABI breakage. IMO it isn't:
+> - There is padding in 'struct kvm_run' that ensures that a bigger
+>   'struct kvm_hyperv_exit' doesn't alter the offsets within that struct.
+> - Adding a new field at the bottom of the 'hcall' field within the
+>   'struct kvm_hyperv_exit' should be fine as well, as it doesn't alter
+>   the offsets within that struct either.
+> - Ultimately, previous updates to 'struct kvm_hyperv_exit's hint that
+>   its size isn't part of the uABI. It already grew when syndbg was
+>   introduced.
 
-HEAD commit:    f3a2439f20d9 Merge tag 'rproc-v6.3' of git://git.kernel.or..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=12e2d518c80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=81f5afa0c201c8de
-dashboard link: https://syzkaller.appspot.com/bug?extid=545f1326f405db4e1c3e
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16b7be60c80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11a380a8c80000
+Yes but SYNDBG exit comes with KVM_EXIT_HYPERV_SYNDBG. While I don't see
+any immediate issues with the current approach, we may want to introduce
+something like KVM_EXIT_HYPERV_HCALL_XMM: the userspace must be prepared
+to handle this new information anyway and it is better to make
+unprepared userspace fail with 'unknown exit' then to mishandle a
+hypercall by ignoring XMM portion of the data.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0719d575f3ac/disk-f3a2439f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4176aabb67b5/vmlinux-f3a2439f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2b0e3c0ab205/bzImage-f3a2439f.xz
+>
+>  Documentation/virt/kvm/api.rst     | 19 ++++++++++
+>  arch/x86/include/asm/hyperv-tlfs.h |  2 +-
+>  arch/x86/kvm/hyperv.c              | 56 +++++++++++++++++++++++++++++-
+>  include/uapi/linux/kvm.h           |  6 ++++
+>  4 files changed, 81 insertions(+), 2 deletions(-)
+>
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index a71d91978d9ef..17893b330b76f 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -8893,3 +8893,22 @@ Ordering of KVM_GET_*/KVM_SET_* ioctls
+>  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+>  
+>  TBD
+> +
+> +10. Hyper-V CPUIDs
+> +==================
+> +
+> +This section only applies to x86.
 
-The issue was bisected to:
+We can probably use 
 
-commit 76e527509d37a15ff1714ddd003384f5f25fd3fc
-Author: Sean Christopherson <seanjc@google.com>
-Date:   Fri Jan 6 01:12:52 2023 +0000
+:Architectures: x86
 
-    KVM: x86: Skip redundant x2APIC logical mode optimized cluster setup
+which we already use.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=124fbe60c80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=114fbe60c80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=164fbe60c80000
+> +
+> +New Hyper-V feature support is no longer being tracked through KVM
+> +capabilities.  Userspace can check if a particular version of KVM supports a
+> +feature using KMV_GET_SUPPORTED_HV_CPUID.  This section documents how Hyper-V
+> +CPUIDs map to KVM functionality.
+> +
+> +10.1 HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE
+> +------------------------------------------
+> +
+> +:Location: CPUID.40000003H:EDX[bit 15]
+> +
+> +This CPUID indicates that KVM supports retuning data to the guest in response
+> +to a hypercall using the XMM registers. It also extends ``struct
+> +kvm_hyperv_exit`` to allow passing the XMM data from userspace.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
-Fixes: 76e527509d37 ("KVM: x86: Skip redundant x2APIC logical mode optimized cluster setup")
+It's always good to document things, thanks! I'm, however, wondering
+what should we document as part of KVM API. In the file, we already
+have:
+- "4.118 KVM_GET_SUPPORTED_HV_CPUID"
+- "struct kvm_hyperv_exit" description in "5. The kvm_run structure"
 
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5078 at arch/x86/kvm/lapic.c:330 kvm_recalculate_logical_map arch/x86/kvm/lapic.c:330 [inline]
-WARNING: CPU: 0 PID: 5078 at arch/x86/kvm/lapic.c:330 kvm_recalculate_apic_map+0x1267/0x14e0 arch/x86/kvm/lapic.c:413
-Modules linked in:
-CPU: 0 PID: 5078 Comm: syz-executor294 Not tainted 6.2.0-syzkaller-12485-gf3a2439f20d9 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/16/2023
-RIP: 0010:kvm_recalculate_logical_map arch/x86/kvm/lapic.c:330 [inline]
-RIP: 0010:kvm_recalculate_apic_map+0x1267/0x14e0 arch/x86/kvm/lapic.c:413
-Code: 8f ae a2 00 48 8b 3c 24 ba 01 00 00 00 be 04 00 00 00 e8 ac 83 fb ff 48 c7 44 24 08 00 00 00 00 e9 9b f7 ff ff e8 49 f9 6c 00 <0f> 0b e9 d2 f6 ff ff e8 3d f9 6c 00 4c 89 23 e9 c5 f6 ff ff 48 8b
-RSP: 0018:ffffc900034af800 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
-RDX: ffff8880776f41c0 RSI: ffffffff811729b7 RDI: 0000000000000004
-RBP: 0000000000000400 R08: 0000000000000004 R09: 0000000000000001
-R10: 0000000000082000 R11: 0000000000000000 R12: ffff8880299f2000
-R13: ffff88807d13c040 R14: dffffc0000000000 R15: 0000000000082000
-FS:  0000555556467300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000002004d008 CR3: 00000000760bd000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- kvm_apic_set_state+0x468/0xeb0 arch/x86/kvm/lapic.c:2951
- kvm_vcpu_ioctl_set_lapic arch/x86/kvm/x86.c:4858 [inline]
- kvm_arch_vcpu_ioctl+0x2862/0x3f90 arch/x86/kvm/x86.c:5593
- kvm_vcpu_ioctl+0x9ad/0xfe0 arch/x86/kvm/../../../virt/kvm/kvm_main.c:4255
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f5e46a52109
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcdc080378 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f5e46a52109
-RDX: 0000000020000880 RSI: 000000004400ae8f RDI: 0000000000000005
-RBP: 00007f5e46a15b60 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f5e46a15bf0
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
+The later should definitely get extended to cover XMM and I guess the
+former can accomodate the 'no longer being tracked' comment. With that,
+maybe there's no need for a new section? 
 
+> diff --git a/arch/x86/include/asm/hyperv-tlfs.h b/arch/x86/include/asm/hyperv-tlfs.h
+> index 3787d26810c1c..6a18c9f77d5fe 100644
+> --- a/arch/x86/include/asm/hyperv-tlfs.h
+> +++ b/arch/x86/include/asm/hyperv-tlfs.h
+> @@ -49,7 +49,7 @@
+>  /* Support for physical CPU dynamic partitioning events is available*/
+>  #define HV_X64_CPU_DYNAMIC_PARTITIONING_AVAILABLE	BIT(3)
+>  /*
+> - * Support for passing hypercall input parameter block via XMM
+> + * Support for passing hypercall input and output parameter block via XMM
+>   * registers is available
+>   */
+>  #define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE		BIT(4)
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+This change of the comment is weird (or I may have forgotten something
+important), could you please elaborate?. Currently, we have:
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+/*
+ * Support for passing hypercall input parameter block via XMM
+ * registers is available
+ */
+#define HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE         BIT(4)
+...
+/*
+ * Support for returning hypercall output block via XMM
+ * registers is available
+ */
+#define HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE                BIT(15)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+which seems to be correct. TLFS also defines
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+Bit 4: XmmRegistersForFastHypercallAvailable
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+in CPUID 0x40000009.EDX (Nested Hypervisor Feature Identification) which
+probably covers both but we don't set this leaf in KVM currently ...
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
+> diff --git a/arch/x86/kvm/hyperv.c b/arch/x86/kvm/hyperv.c
+> index 8a47f8541eab7..42f44546fe79c 100644
+> --- a/arch/x86/kvm/hyperv.c
+> +++ b/arch/x86/kvm/hyperv.c
+> @@ -1865,6 +1865,7 @@ struct kvm_hv_hcall {
+>  	u16 rep_idx;
+>  	bool fast;
+>  	bool rep;
+> +	bool xmm_dirty;
+>  	sse128_t xmm[HV_HYPERCALL_MAX_XMM_REGISTERS];
+>  
+>  	/*
+> @@ -2396,9 +2397,49 @@ static int kvm_hv_hypercall_complete(struct kvm_vcpu *vcpu, u64 result)
+>  	return ret;
+>  }
+>  
+> +static void kvm_hv_write_xmm(struct kvm_hyperv_xmm_reg *xmm)
+> +{
+> +	int reg;
+> +
+> +	kvm_fpu_get();
+> +	for (reg = 0; reg < HV_HYPERCALL_MAX_XMM_REGISTERS; reg++) {
+> +		const sse128_t data = sse128(xmm[reg].low, xmm[reg].high);
+> +		_kvm_write_sse_reg(reg, &data);
+> +	}
+> +	kvm_fpu_put();
+> +}
+> +
+> +static bool kvm_hv_is_xmm_output_hcall(u16 code)
+> +{
+> +	return false;
+> +}
+> +
+> +static bool kvm_hv_xmm_output_allowed(struct kvm_vcpu *vcpu)
+> +{
+> +	struct kvm_vcpu_hv *hv_vcpu = to_hv_vcpu(vcpu);
+> +
+> +	return !hv_vcpu->enforce_cpuid ||
+> +	       hv_vcpu->cpuid_cache.features_edx &
+> +		       HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE;
+> +}
+> +
+>  static int kvm_hv_hypercall_complete_userspace(struct kvm_vcpu *vcpu)
+>  {
+> -	return kvm_hv_hypercall_complete(vcpu, vcpu->run->hyperv.u.hcall.result);
+> +	bool fast = !!(vcpu->run->hyperv.u.hcall.input & HV_HYPERCALL_FAST_BIT);
+> +	u16 code = vcpu->run->hyperv.u.hcall.input & 0xffff;
+> +	u64 result = vcpu->run->hyperv.u.hcall.result;
+> +
+> +	if (hv_result_success(result) && fast &&
+> +	    kvm_hv_is_xmm_output_hcall(code)) {
 
-If you want to undo deduplication, reply with:
-#syz undup
+Assuming hypercalls with XMM output are always 'fast', should we include
+'fast' check in kvm_hv_is_xmm_output_hcall()?
+
+> +		if (unlikely(!kvm_hv_xmm_output_allowed(vcpu))) {
+> +			kvm_queue_exception(vcpu, UD_VECTOR);
+> +			return 1;
+> +		}
+> +
+> +		kvm_hv_write_xmm(vcpu->run->hyperv.u.hcall.xmm);
+> +	}
+> +
+> +	return kvm_hv_hypercall_complete(vcpu, result);
+>  }
+>  
+>  static u16 kvm_hvcall_signal_event(struct kvm_vcpu *vcpu, struct kvm_hv_hcall *hc)
+> @@ -2553,6 +2594,7 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  	hc.rep_cnt = (hc.param >> HV_HYPERCALL_REP_COMP_OFFSET) & 0xfff;
+>  	hc.rep_idx = (hc.param >> HV_HYPERCALL_REP_START_OFFSET) & 0xfff;
+>  	hc.rep = !!(hc.rep_cnt || hc.rep_idx);
+> +	hc.xmm_dirty = false;
+>  
+>  	trace_kvm_hv_hypercall(hc.code, hc.fast, hc.var_cnt, hc.rep_cnt,
+>  			       hc.rep_idx, hc.ingpa, hc.outgpa);
+> @@ -2673,6 +2715,15 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  		break;
+>  	}
+>  
+> +	if (hv_result_success(ret) && hc.xmm_dirty) {
+> +		if (unlikely(!kvm_hv_xmm_output_allowed(vcpu))) {
+> +			kvm_queue_exception(vcpu, UD_VECTOR);
+> +			return 1;
+> +		}
+> +
+> +		kvm_hv_write_xmm((struct kvm_hyperv_xmm_reg *)hc.xmm);
+> +	}
+> +
+>  hypercall_complete:
+>  	return kvm_hv_hypercall_complete(vcpu, ret);
+>  
+> @@ -2682,6 +2733,8 @@ int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  	vcpu->run->hyperv.u.hcall.input = hc.param;
+>  	vcpu->run->hyperv.u.hcall.params[0] = hc.ingpa;
+>  	vcpu->run->hyperv.u.hcall.params[1] = hc.outgpa;
+> +	if (hc.fast)
+> +		memcpy(vcpu->run->hyperv.u.hcall.xmm, hc.xmm, sizeof(hc.xmm));
+>  	vcpu->arch.complete_userspace_io = kvm_hv_hypercall_complete_userspace;
+>  	return 0;
+>  }
+> @@ -2830,6 +2883,7 @@ int kvm_get_hv_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid2 *cpuid,
+>  			ent->ebx |= HV_ENABLE_EXTENDED_HYPERCALLS;
+>  
+>  			ent->edx |= HV_X64_HYPERCALL_XMM_INPUT_AVAILABLE;
+> +			ent->edx |= HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE;
+>  			ent->edx |= HV_FEATURE_FREQUENCY_MSRS_AVAILABLE;
+>  			ent->edx |= HV_FEATURE_GUEST_CRASH_MSR_AVAILABLE;
+>  
+> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+> index d03842abae578..fbdee8d754595 100644
+> --- a/include/uapi/linux/kvm.h
+> +++ b/include/uapi/linux/kvm.h
+> @@ -90,6 +90,11 @@ struct kvm_pit_config {
+>  
+>  #define KVM_PIT_SPEAKER_DUMMY     1
+>  
+> +struct kvm_hyperv_xmm_reg {
+> +	__u64 low;
+> +	__u64 high;
+> +};
+> +
+>  struct kvm_hyperv_exit {
+>  #define KVM_EXIT_HYPERV_SYNIC          1
+>  #define KVM_EXIT_HYPERV_HCALL          2
+> @@ -108,6 +113,7 @@ struct kvm_hyperv_exit {
+>  			__u64 input;
+>  			__u64 result;
+>  			__u64 params[2];
+> +			struct kvm_hyperv_xmm_reg xmm[6];
+
+In theory, we have HV_HYPERCALL_MAX_XMM_REGISTERS in TLFS (which you
+already use in the code). While I'm not sure it makes sense to make KVM
+ABI dependent on TLFS changes (probably not), we may want to leave a
+short comment explaining where '6' comes from.
+
+>  		} hcall;
+>  		struct {
+>  			__u32 msr;
+
+-- 
+Vitaly
+
 
