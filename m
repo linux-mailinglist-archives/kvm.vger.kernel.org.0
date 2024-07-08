@@ -1,115 +1,79 @@
-Return-Path: <kvm+bounces-21134-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E50A92AB5C
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 23:38:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EAAA92AB87
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 23:56:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 085B9B21F6B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 21:37:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D025B1C2158E
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 21:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648E214F131;
-	Mon,  8 Jul 2024 21:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC0AA14F9EC;
+	Mon,  8 Jul 2024 21:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gHIXglAE"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="I9zY5Q/C"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74A71145B06
-	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 21:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5AF14D28A;
+	Mon,  8 Jul 2024 21:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720474664; cv=none; b=Raka1Ac7v8Gdk12hsd2EsMDR/ZgAgCNIDqOL4IYzL400WrslXzejJg68ZyoMmrvPrGPOAhhQaQ44i7BPsWGt2zXz79VhMHbzmfVQScfS96YqIPGONmIhSliZil9Pq1LAXea0brdbTnsPpbHu1jCYeoZbmk+EJ/vNVGygw46stHQ=
+	t=1720475774; cv=none; b=BlUSDwA9xDbBN6WoMzp8eFEMLs/qv1jxxYfcXA58pTTJpvpUu4TECK8BDc0Asc0/UA2TDK4o24LwS+LKZO1VyvYbrL31fEggmlZjQRvC+slEN/NCF7fstxm7I3UCsT2BnsoEs9RY/DqYXU2bGbrLxb6WE8uWIQiFvmF8UE6g+II=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720474664; c=relaxed/simple;
-	bh=rnKDQudiRYboIXIxW3KZilr/F8Ck6nastO1izzGWj/A=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=F6AG3HBrjYlJ/sJd7Hhjopa+A4I3CvFAw6mgv/uEQxLuq6+gP7Y0Gijt/siG6MRqBVEPHlDMVENH3WyGlWduVFiH+i0XmJjOCVIVBF4NyE8tkPW1R2g5lKEhJJFIdUqHCAjSifDOWFbdX2RgBCn1a97RVs9/fns/8Fs9L5msg70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gHIXglAE; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e03a3aafc6eso7083966276.3
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 14:37:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720474661; x=1721079461; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LJZVptd3IywbKFK+zEIhadT/eRgCc6sBTUUHcoA5IF8=;
-        b=gHIXglAE0PyjP2VCsUOxxnr4yTeYLTzy6xZ9S6jAITr32vArbNeHHLciO9f4D767jZ
-         PVkvoDHHjB5QiSRqmz7kKtGAHNL4zIdi7o/sf9iwj5gRriib5TE6iNsnCfJeJM300/g+
-         FAEV+gGEMsEt+zzIGyFmtaKCelOQBqgSkE+XcjTdaJDr67tZQTaMWw3mw7v2x2NX2S8F
-         hzNcqxTtvcJAc8ZHcjait6ji5+y2Z8PIFU4xt/m06Y4vAIYgm4cDA+1mQtfO38v9CewQ
-         qia7l8bqB+xPKxb8tJon6Jc0HidrX16iIUel6s05PYcEq9b8if5R3qoBawp20eS0xw/m
-         e8ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720474661; x=1721079461;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LJZVptd3IywbKFK+zEIhadT/eRgCc6sBTUUHcoA5IF8=;
-        b=YhXJqRN+Tp0I1xxua0RGbW7jGSlZ/FT+Q2JtMcD1+J6qHQ7guNx3JbTyX6plXW23nX
-         eQxrBc2DsKGSPmd/nH6TsZ+AdiLozpF7sxaBrnb44AD81ZpkDWyws14OEweOF90XBgZ9
-         XhVSwZKva2AdVRNDYjOY1cLJjmy8iSCYIEoFwO6r4HbVVsihjLtzM5SrNKe/7SMK4Xrd
-         Y/A2vD2R6eEbhVQ2CVy1JKngT9HI3JAGpRsfyry6sPZMxPWrMIDoWv4yf2NzCNj8cLXe
-         iM4E5Q+Am5z5YHGRn21qnVYmcBbPuKuSqUD3UpY8fJ4bGVpBUASXOuerwqYQxFaGfExk
-         fqHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWauGWjm4yx3AMYYQvqgrGwqkw7AWs8nE58WIpy0DG3SwGIh6/23t6hpT0NKwaXQJLiKdOk4PqyY3OZMN4j18ZUgSqV
-X-Gm-Message-State: AOJu0YzelotaxKtfMoYgOJkZ+ryFbrN3QXtYLWUYHD4JbZ8GIqsGW46H
-	cgVQ6EIKjBOK8GZ6fAapUFW71qTIZzvQddb0Iagjxdh27usQMGRmzj0sTgTmEJeGGqJSR/KbFbr
-	xeg==
-X-Google-Smtp-Source: AGHT+IHpHAbji4+XsjpJzrAKQm1/NN0P8TYfGMGYe8qxwfqywzn3eDHBR7+4BIezFnN3h8T5PCxdcbjKowM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1706:b0:e03:a875:f827 with SMTP id
- 3f1490d57ef6-e041b143389mr2036276.13.1720474661535; Mon, 08 Jul 2024 14:37:41
- -0700 (PDT)
-Date: Mon, 8 Jul 2024 14:37:40 -0700
-In-Reply-To: <376d0c37d0cf4d578fe13be6f2b3599a694040af.camel@redhat.com>
+	s=arc-20240116; t=1720475774; c=relaxed/simple;
+	bh=1QzH7g1WSDOqhhrq9zntalcA82I0Sb3L1MfQnJw6QxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=t/U5vORvhpoCCUarM5hS8l05yZggAALHURIGoywtMOw/LqiXqUiuaorPnxchqdVj4x7MoTnaPWmpC8YUfsIdMRC254GH6esML+xZW9L/8iPI1i+LGGxEyh3TVt+IMG0m4W/MZ41TW4bQ2zxTcqcvFfPKJ1t/X21UMcCSXyAE5yU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=I9zY5Q/C; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=WVdQYIbU5xrJg1EpR8Xx1KJhAgJ0SPfnuQLS9S9gRVA=; b=I9zY5Q/CqRSm03vJE1+Aduz81/
+	lnVXZ9N30ysmzqxO9RLB+9mnwm1xI5xIYV++BceVBBb0L00DRdb2XTnGUCAZrHxZQ1bQImUehF39/
+	Iqw5YqdySdB1L7U6xWKPnA6xKnhcg6c8JqHbTHHWgaEliJh5+/zYfnNF5Z9+EUdtNGyCpdXmij/rQ
+	3rlIBqIG6ANm6cmnvm0MVmy/dzHumKmjtY3lBh/oDfX/hxTlpt3qsGAbMCOy0SGS7XZAHw3IRVUnJ
+	g4ly5a39HJ5TPdm6Epyyn1bNVfAk89KNEd899qFeuEOF8rFIvbvArFnalBv3sbjcuxM9gg1lCckly
+	T0KEE6PA==;
+Received: from mcgrof by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1sQwLC-00000005950-1KsD;
+	Mon, 08 Jul 2024 21:56:10 +0000
+Date: Mon, 8 Jul 2024 14:56:10 -0700
+From: Luis Chamberlain <mcgrof@kernel.org>
+To: bugzilla-daemon@kernel.org
+Cc: kvm@vger.kernel.org, kdevops@lists.linux.dev,
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Subject: Re: [Bug 218980] New: [VM boot] Guest Kernel hit BUG: kernel NULL
+ pointer dereference, address: 0000000000000010 and WARNING: CPU: 0 PID: 218
+ at arch/x86/kernel/fpu/core.c:57 x86_task_fpu+0x17/0x20
+Message-ID: <ZoxgeulJHh-4i-Kh@bombadil.infradead.org>
+References: <bug-218980-28872@https.bugzilla.kernel.org/>
+ <ZoHaVmNbFGcejSjK@bombadil.infradead.org>
+ <ZoHgnfJpBekFoCkF@bombadil.infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-28-seanjc@google.com>
- <376d0c37d0cf4d578fe13be6f2b3599a694040af.camel@redhat.com>
-Message-ID: <ZoxcJP6AA5sUZBjs@google.com>
-Subject: Re: [PATCH v2 27/49] KVM: x86: Swap incoming guest CPUID into vCPU
- before massaging in KVM_SET_CPUID2
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
-	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
-	Robert Hoo <robert.hoo.linux@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZoHgnfJpBekFoCkF@bombadil.infradead.org>
+Sender: Luis Chamberlain <mcgrof@infradead.org>
 
-On Thu, Jul 04, 2024, Maxim Levitsky wrote:
-> On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
-> > @@ -529,7 +533,14 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
-> >  #endif
-> >  	kvm_vcpu_after_set_cpuid(vcpu);
-> >  
-> > +success:
-> > +	kvfree(e2);
-> >  	return 0;
-> > +
-> > +err:
-> > +	swap(vcpu->arch.cpuid_entries, e2);
-> > +	swap(vcpu->arch.cpuid_nent, nent);
-> > +	return r;
-> >  }
-> >  
-> >  /* when an old userspace process fills a new kernel module */
+On Sun, Jun 30, 2024 at 03:47:57PM -0700, Luis Chamberlain wrote:
+> On Sun, Jun 30, 2024 at 03:21:10PM -0700, Luis Chamberlain wrote:
+> >   [   16.785424]  ? fpstate_free+0x5/0x30
 > 
-> Hi,
-> 
-> This IMHO is a good idea. You might consider moving this patch to the
-> beginning of the patch series though, it will make more sense with the rest
-> of the patches there.
+> Bisecting leads so far to next-20240619 as good and next-20240624 as bad.
 
-I'll double check, but IIRC, there were dependencies that prevented moving this
-patch earlier.
+Either way, this is now fixed on next-20240703.
+
+  Luis
 
