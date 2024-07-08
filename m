@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-21119-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21120-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33D5192A861
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:48:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 168DB92A87D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:54:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0FB11F21D62
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:48:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6CC21F21E1B
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EDD8149C7B;
-	Mon,  8 Jul 2024 17:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F35145344;
+	Mon,  8 Jul 2024 17:53:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b+eQaGuC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YL7n9MvZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54062148FFC;
-	Mon,  8 Jul 2024 17:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BEA51482F5;
+	Mon,  8 Jul 2024 17:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720460869; cv=none; b=WQSNpjDCksl791F8xeWxs88NCgtL7eXgKqER8a/hRU3rzQ5fm99gxM5u1/aiS/MrfWcAseLW6Ns2HWvFE4I4zMCSzb3zCMOcJOW4ZvNYD5RJ0Y3msn5pa1Eczv/FMM5C0ARi/NrvzmzhG6ZYuvMY6ku2FOtBJMl7UXS/KbDRWRU=
+	t=1720461222; cv=none; b=cNR9ci0mcnItMMXQ8Blc+yUUkHsPh8TNKJUi1BOdKBZB0q3wpTKoJL8oWdqpqQO2ekPiFVyRkdIOPQRSxK/gZv9LPf9XK3foA8dWhzVGWVAOKCInFU6lkUFcu9ICiJWMWbfmRE4lX91UPYZ4MWhvimBYuB3Z1TA4D3I3LRuQCAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720460869; c=relaxed/simple;
-	bh=rz6gpkZZk5f87HGbtga8gJ/ZUKYUBareB9Dtgdpw6Qk=;
+	s=arc-20240116; t=1720461222; c=relaxed/simple;
+	bh=dLMjjZFXvk4TV7oN+/f5Ke6QToQU5488NgstOod12WY=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SIOfssYgj+dgxKwR9ty7L+CgbdxQPPMY443aFzmFB101QFC4IdRuaPuCbhQev9WQseMm+u0mAiSZMTot7U+RYSX8H7bDnCRaTPsvzaVV6BoOSWK49s45CG0ME+T+kNVZAXt0dH1/MV/ctkJZo8AcYMJU8DINE2FweXHt/zKDm+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b+eQaGuC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFB3AC116B1;
-	Mon,  8 Jul 2024 17:47:48 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qrGxwHZqrTQsImUy+P+a4BhpjA20pB2QA4Wg9exvTIFxGQDVhaOanvRj1x8aN4D5Ao540eDGl2lVwwih+Hr91SId+Ti2CA7uXHkRMZZoLzW3lWEtZ9nGZWQCg7+B7UnFTITNEGOQy9g8TKH6h105Qu+w/I/fzP4kGOxf5EZMSvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YL7n9MvZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F14EC116B1;
+	Mon,  8 Jul 2024 17:53:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720460868;
-	bh=rz6gpkZZk5f87HGbtga8gJ/ZUKYUBareB9Dtgdpw6Qk=;
+	s=k20201202; t=1720461222;
+	bh=dLMjjZFXvk4TV7oN+/f5Ke6QToQU5488NgstOod12WY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=b+eQaGuC2DsYz2VEJFVt1swL/pbsa/uJ+bvrcnAM5U/0V2fDtCU8L8eaB6q6gtvpa
-	 JmaCsMBjWaCFIqwPK8pqShS1c1XyarYtnjcWWtynS1ndRfZESv0kSvYbKGYHVQPgz5
-	 2J8BpcLxx4NLqwFNvoXv4oVED/tnPmI2jJMTLrlnZQdJf2A+XQQFjHA1JgYtJUU/Wt
-	 0LR0aaCjv7CURpK0C9QUS4hgXQ9sksWRtHcPjHO5zbkEXohhiSd3lJ35g71AjU9L04
-	 n9a1F+vtlfVmBGRwvd1dLrBWx1vt/BT0s8njlGI2jfluHy0kn3+uw//fWrX4I/yORt
-	 X2B0h+gM/bkIA==
+	b=YL7n9MvZxrgUEOp7rcf0Tb3iEPrTfsRroAsivqkdJfnX1oItfGMByW+0Ym8IBbuMU
+	 uERyLcLMz4pyb3ROJJSg7Abnh5hWrsXqy2DrCtfEZ4Udtp6r12qM0iLdDvkmfMPd2y
+	 cjkWsHSB3p+SXqJHhUySB9OAbjo4Cqo7tACTT38sxF5ZOTaB34FR2I8y1FRc5cOmOx
+	 Z2QzSaj/6IUaExySKt2aoGGM/xCuOiopnPJQ58Cd547AwCQOVKlgSkuKM4sfCm1t0A
+	 q8odnyL3ofF2eYX7W3uCv4ueYFo9S+Ad+8y514rCuPat9ObnM699AZNG0X0rIgz+4u
+	 VuqWAw8NPkqPw==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sQsSo-00AgBG-S9;
-	Mon, 08 Jul 2024 18:47:46 +0100
-Date: Mon, 08 Jul 2024 18:47:45 +0100
-Message-ID: <864j8z4vy6.wl-maz@kernel.org>
+	id 1sQsYW-00AgF9-5M;
+	Mon, 08 Jul 2024 18:53:40 +0100
+Date: Mon, 08 Jul 2024 18:53:39 +0100
+Message-ID: <8634oj4voc.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Mark Brown <broonie@kernel.org>
 Cc: kvmarm@lists.linux.dev,
@@ -61,10 +61,11 @@ Cc: kvmarm@lists.linux.dev,
 	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>
 Subject: Re: [PATCH 3/7] KVM: arm64: Add save/restore support for FPMR
-In-Reply-To: <b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
+In-Reply-To: <864j8z4vy6.wl-maz@kernel.org>
 References: <20240708154438.1218186-1-maz@kernel.org>
 	<20240708154438.1218186-4-maz@kernel.org>
 	<b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
+	<864j8z4vy6.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -80,72 +81,81 @@ X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Mon, 08 Jul 2024 18:34:36 +0100,
-Mark Brown <broonie@kernel.org> wrote:
+On Mon, 08 Jul 2024 18:47:45 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> [1  <text/plain; us-ascii (7bit)>]
-> On Mon, Jul 08, 2024 at 04:44:34PM +0100, Marc Zyngier wrote:
-> > Just like the rest of the FP/SIMD state, FPMR needs to be context
-> > switched.
+> On Mon, 08 Jul 2024 18:34:36 +0100,
+> Mark Brown <broonie@kernel.org> wrote:
+> > 
+> > [1  <text/plain; us-ascii (7bit)>]
+> > On Mon, Jul 08, 2024 at 04:44:34PM +0100, Marc Zyngier wrote:
+> > > Just like the rest of the FP/SIMD state, FPMR needs to be context
+> > > switched.
+> > 
+> > > The only interesting thing here is that we need to treat the pKVM
+> > > part a bit differently, as the host FP state is never written back
+> > > to the vcpu thread, but instead stored locally and eagerly restored.
+> > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/include/asm/kvm_host.h  | 10 ++++++++++
+> > >  arch/arm64/kvm/fpsimd.c            |  1 +
+> > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 ++++
+> > >  arch/arm64/kvm/hyp/nvhe/switch.c   | 10 ++++++++++
+> > >  arch/arm64/kvm/hyp/vhe/switch.c    |  4 ++++
+> > >  5 files changed, 29 insertions(+)
+> > 
+> > I'm possibly missing something here but I'm not seeing where we load the
+> > state for the guest, especially in the VHE case.  I would expect to see
+> > a change in kvm_hyp_handle_fpsimd() to load FPMR for guests with the
+> > feature (it needs to be in there to keep in sync with the ownership
+> > tracking for the rest of the FP state, and to avoid loading needlessly
+> > in cases where the guest never touches FP).
+> > 
+> > Saving for the guest was handled in the previous patch.
+> > 
+> > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > index 77010b76c150f..a307c1d5ac874 100644
+> > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > @@ -312,6 +312,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+> > >  {
+> > >  	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+> > > +
+> > > +	if (system_supports_fpmr() &&
+> > > +	    kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, FPMR, IMP))
+> > > +		**host_data_ptr(fpmr_ptr) = read_sysreg_s(SYS_FPMR);
+> > >  }
+> > 
+> > That's only saving the host state, it doesn't load the guest state.
 > 
-> > The only interesting thing here is that we need to treat the pKVM
-> > part a bit differently, as the host FP state is never written back
-> > to the vcpu thread, but instead stored locally and eagerly restored.
+> Ah, I forgot to cherry-pick the fixes. Fsck knows what else I forgot.
+> Thanks for reminding me.
 > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_host.h  | 10 ++++++++++
-> >  arch/arm64/kvm/fpsimd.c            |  1 +
-> >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 ++++
-> >  arch/arm64/kvm/hyp/nvhe/switch.c   | 10 ++++++++++
-> >  arch/arm64/kvm/hyp/vhe/switch.c    |  4 ++++
-> >  5 files changed, 29 insertions(+)
+> 	M.
 > 
-> I'm possibly missing something here but I'm not seeing where we load the
-> state for the guest, especially in the VHE case.  I would expect to see
-> a change in kvm_hyp_handle_fpsimd() to load FPMR for guests with the
-> feature (it needs to be in there to keep in sync with the ownership
-> tracking for the rest of the FP state, and to avoid loading needlessly
-> in cases where the guest never touches FP).
+> diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> index f59ccfe11ab9a..52c7dc8446f16 100644
+> --- a/arch/arm64/kvm/hyp/include/hyp/switch.h
+> +++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+> @@ -404,6 +404,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+>  	else
+>  		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
+>  
+> +	if (system_supports_fpmr() &&
+> +	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
+> +		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
+> +
+>  	/* Skip restoring fpexc32 for AArch64 guests */
+>  	if (!(read_sysreg(hcr_el2) & HCR_RW))
+>  		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
 > 
-> Saving for the guest was handled in the previous patch.
-> 
-> > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
-> > index 77010b76c150f..a307c1d5ac874 100644
-> > --- a/arch/arm64/kvm/hyp/vhe/switch.c
-> > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
-> > @@ -312,6 +312,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
-> >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
-> >  {
-> >  	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
-> > +
-> > +	if (system_supports_fpmr() &&
-> > +	    kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, FPMR, IMP))
-> > +		**host_data_ptr(fpmr_ptr) = read_sysreg_s(SYS_FPMR);
-> >  }
-> 
-> That's only saving the host state, it doesn't load the guest state.
 
-Ah, I forgot to cherry-pick the fixes. Fsck knows what else I forgot.
-Thanks for reminding me.
+And thinking of it, that's not enough. I'm missing the pKVM angle that
+needs to be special cased. Drat.
 
 	M.
-
-diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
-index f59ccfe11ab9a..52c7dc8446f16 100644
---- a/arch/arm64/kvm/hyp/include/hyp/switch.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
-@@ -404,6 +404,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
- 	else
- 		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
- 
-+	if (system_supports_fpmr() &&
-+	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
-+		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
-+
- 	/* Skip restoring fpexc32 for AArch64 guests */
- 	if (!(read_sysreg(hcr_el2) & HCR_RW))
- 		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
 
 -- 
 Without deviation from the norm, progress is not possible.
