@@ -1,551 +1,476 @@
-Return-Path: <kvm+bounces-21093-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21094-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6197929F7D
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 11:47:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD989929F90
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 11:51:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D0A0288BBB
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 09:47:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48B581F21747
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 09:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28DDB762D2;
-	Mon,  8 Jul 2024 09:47:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183F07345B;
+	Mon,  8 Jul 2024 09:51:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mPnjHn4k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uc/sem5X"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F43E48CCD;
-	Mon,  8 Jul 2024 09:47:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E56077F0B;
+	Mon,  8 Jul 2024 09:51:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720432052; cv=none; b=P/2xfpRBZzvgs8QKFgvm+oS7yPxKCv5vH/FBzmKtvpzeFWsZCDEmU9+gXTEiAhYxEkRwFuvBXYTItg9CU5NbkokNKH8bAoSL5F/z6XAIhFLmuges2vyuQEN/V/rDMu2V0f/CPXgYVj1YSFnp0f8sbJwJ4Pvcy8HQ5SyU9zwh+7A=
+	t=1720432304; cv=none; b=Z4h43qYqOrunsz49W259ltmwRWTQ57LZmulADfwYR1iSX6U2VBvkk9kXf3NiWxeYWCDrmaszenEdheA2Gc8vxOQCEmwHQFvS1GokPusTITFbRX3HrlzM6jFN74TdFDperFUCsu9mAPue1faX32+2BnR2yuaHV5RSjA2Dmk6XJJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720432052; c=relaxed/simple;
-	bh=6ZQTAiQVbQo9uYcXEBcFrxIQPxojeGwZ9owxOifNEfw=;
+	s=arc-20240116; t=1720432304; c=relaxed/simple;
+	bh=aF5h1IXbYlhT2JKmsHLe4KKrp9Hsu7Hlo7FByZ+0aRw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sJNUChu1JOLWFiLFFB/JnD7FPpQudoXfuoZYvS+E1Ktwrnk5LURX8QYUupy0xK4AlxeeCFT4tCzNYdPitqTF8W4NQMR6Zq2trRHSnSm3aIA7rrOGOG3J/tA47tMUt3bAgmbvywHCqVTJIG3Ox3x3VlwY2VyDTlTAuHPQIhsE3sM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mPnjHn4k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0DF7C4AF0D;
-	Mon,  8 Jul 2024 09:47:31 +0000 (UTC)
+	 To:Cc:Content-Type; b=ISJq+gvq2sDSl37rm7q/Cn+rcf9mqm7oHX5W7DWOuCX0WTO+fMLCHjUXFzGzMvmGjDsM0bOoBNz+YcYKn/kOYlLx1QlUipU9182zsAmgK+HIGVGzYu6B+aHUsEGTVpKYqlB7snxytxC2ivB3+KrLdN2RaVnCMNEnBrYZXQhj0NU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uc/sem5X; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8731C4AF0B;
+	Mon,  8 Jul 2024 09:51:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720432052;
-	bh=6ZQTAiQVbQo9uYcXEBcFrxIQPxojeGwZ9owxOifNEfw=;
+	s=k20201202; t=1720432304;
+	bh=aF5h1IXbYlhT2JKmsHLe4KKrp9Hsu7Hlo7FByZ+0aRw=;
 	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=mPnjHn4krM2syVwybaGnTF5CDuHuUV7OIDsB4/SD0yV2/ZuD5JOEBlt7+W7QceF4O
-	 ezpArvKBPCYN8DvExkhVlIwRj271gWD0dOxdAGxdHmGfoTuoLeZUjmwWSBdxANgi6v
-	 jX3Arzy+pJATi+puf1J6/wd0o8GIYWPfjj1ezbrRCrOq0MW7cZVXtCpJCjCEq04f2I
-	 xPCI6/93vVV+Jb5pOjRTzl0rW47YmSBftmb6XtWapztDWZWh3rmslx6pit8QGyRubW
-	 b21ohGibTtymkWHUt8cLThQeWCMJC54NmDBgHv1P4yVYvUfJTS4uQQm7IUC0blSIxx
-	 vQhZmS1Q0Hb0g==
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-57ccd1111aeso4739244a12.0;
-        Mon, 08 Jul 2024 02:47:31 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCW5rb+jFG+fiBDyFa0qLFGt82epOp2/X2ZXCJ7Z6RWuZg6NCHjO6So40PxsMT49rdVABMrDqLleouC/omlzqGbSmD0G1/zlHmzsLZ+wnQyMpVvR2uRbMrH5q01wnSRagaH+
-X-Gm-Message-State: AOJu0YzyWlCIiJVYwQuUY3904IACtRSqYaONi9Uzl+RBz2db5dfXRlqi
-	NgJpoF5tZCnzawCYVvzbLWsopRJx5OhCDZbTINNAudvzvM0j3OfffyxhdH9bFQRUxbOxV7kjaV7
-	s1OsZoG+xH9rAWcQLPpj41mHxK2U=
-X-Google-Smtp-Source: AGHT+IHT7P4R9Gj2HJxbgNAzMvzU8XXQI2iU6qxaLmu63ghvfY2DhAYH0v7X1A/WX9w1E/RHXEXCEzqRX2Tl6sw4ncI=
-X-Received: by 2002:a17:906:4686:b0:a72:5a8c:87c6 with SMTP id
- a640c23a62f3a-a77ba454c31mr780998566b.10.1720432050300; Mon, 08 Jul 2024
- 02:47:30 -0700 (PDT)
+	b=Uc/sem5X09ApcG6DKSXpofr6WUuQl5F2oIUxBW6kCWku6UPBsPzxQyge+WDXPoIv+
+	 heumxOnxA1FLSHFtKnUvshcaPs89IN7v2TzvgLHlhsiGnXUIiCEzykIgEdxmvG2baX
+	 VuRLRsI28ipYEqApxB2jsksMroQ8LtCvxUc/GOfhayWqpMpcK1jiA4N6LepZK/oEo1
+	 x4v/XW++OyEGYB+FgF7ASnME9eHWF/y2eSAJ1tP4ywVyTuAUMlbUgpzC19y6fgg5WH
+	 oJoAtuL2D7zCe4IJZqKFCFazFBokS5a2TF6oBSiSBmJwWbEBkw//tn7SbwhYWkSMbA
+	 4FQh8lZr1Erbg==
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a77e2f51496so200896366b.0;
+        Mon, 08 Jul 2024 02:51:43 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCXI/jkUWiSfqfwuzNSJpSG1FpNGIlavfna58NyWaZJkMWG+QTR/WhBHAmHwO93EWts5Fq4k032G5jdLZvnCNHFwg4dpLac6mn6M+Aktzxvjr18VM1esIJ1uHLQW0KDOEs6m
+X-Gm-Message-State: AOJu0Yw0BHz7Hpwf/mg6BqMnWR4J19hS4T+762r6YcvrNolhthHMx86L
+	2RMT/vzuByMH5eOlRrXmD+heoBV5fZmd2YIDFsSg0M0yBvMzq3lmdN8smQm8S8qNZPrd5/AUgh1
+	uATFsGCqR8GkzULswYl5dqIFhQi0=
+X-Google-Smtp-Source: AGHT+IEfTHH6m1cAOk+7KHobDNGbFu5dAC9Na0+gfKk757fy9VEX/2qBfWHZAG7HegQ0snBiNfCd5YxRKzIGOGtZ0ko=
+X-Received: by 2002:a17:906:3652:b0:a77:c6c4:2bb7 with SMTP id
+ a640c23a62f3a-a77c6c42d80mr561150166b.1.1720432302388; Mon, 08 Jul 2024
+ 02:51:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240524073812.731032-1-maobibo@loongson.cn> <20240524073812.731032-2-maobibo@loongson.cn>
- <CAAhV-H5G7O7tbwzyaoO4iEXuN+_xbVFJDEyv1HH7GqOH24639Q@mail.gmail.com>
- <1aa110a8-28b9-d1d0-4b39-bc894b31f26c@loongson.cn> <CAAhV-H5oS+KrcGH+1wJCGKCjs2VKHkWyZ5QnorPjFMuE_eBb3g@mail.gmail.com>
- <ae21f9ef-e043-0f8c-b088-6645fc1f3c30@loongson.cn>
-In-Reply-To: <ae21f9ef-e043-0f8c-b088-6645fc1f3c30@loongson.cn>
+References: <20240626063239.3722175-1-maobibo@loongson.cn> <20240626063239.3722175-3-maobibo@loongson.cn>
+ <CAAhV-H4O8QNb61xkErd9y_1tK_70=Y=LNqzy=9Ny5EQK1XZJaQ@mail.gmail.com>
+ <79dcf093-614f-2737-bb03-698b0b3abc57@loongson.cn> <CAAhV-H5bQutcLcVaHn-amjF6_NDnCf2BFqqnGSRT_QQ_6q6REg@mail.gmail.com>
+ <9c7d242e-660b-8d39-b69e-201fd0a4bfbf@loongson.cn> <CAAhV-H4wwrYyMYpL1u5Z3sFp6EeW4eWhGbBv0Jn9XYJGXgwLfg@mail.gmail.com>
+ <059d66e4-dd5d-0091-01d9-11aaba9297bd@loongson.cn> <CAAhV-H41B3_dLgTQGwT-DRDbb=qt44A_M08-RcKfJuxOTfm3nw@mail.gmail.com>
+ <7e6a1dbc-779a-4669-4541-c5952c9bdf24@loongson.cn> <CAAhV-H7jY8p8eY4rVLcMvVky9ZQTyZkA+0UsW2JkbKYtWvjmZg@mail.gmail.com>
+ <81dded06-ad03-9aed-3f07-cf19c5538723@loongson.cn> <CAAhV-H520i-2N0DUPO=RJxtU8Sn+eofQAy7_e+rRsnNdgv8DTQ@mail.gmail.com>
+ <0e28596c-3fe9-b716-b193-200b9b1d5516@loongson.cn> <CAAhV-H6vgb1D53zHoe=BJD1crB9jcdZy7RM-G0YY0UD+ubDi4g@mail.gmail.com>
+ <aac97476-0a3a-657d-9340-c129bc710791@loongson.cn>
+In-Reply-To: <aac97476-0a3a-657d-9340-c129bc710791@loongson.cn>
 From: Huacai Chen <chenhuacai@kernel.org>
-Date: Mon, 8 Jul 2024 17:47:16 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H7QKqOX0fSyN=wnf_Y_5=CDE2ysP2O3Shj2zex8ce1ZMA@mail.gmail.com>
-Message-ID: <CAAhV-H7QKqOX0fSyN=wnf_Y_5=CDE2ysP2O3Shj2zex8ce1ZMA@mail.gmail.com>
-Subject: Re: [PATCH v4 1/2] LoongArch: KVM: Add steal time support in kvm side
+Date: Mon, 8 Jul 2024 17:51:29 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7Pqf6_MLwhe8eC0XvspMnUvxB=HdLvPsAT6U=m5SozCg@mail.gmail.com>
+Message-ID: <CAAhV-H7Pqf6_MLwhe8eC0XvspMnUvxB=HdLvPsAT6U=m5SozCg@mail.gmail.com>
+Subject: Re: [PATCH v4 2/3] LoongArch: KVM: Add LBT feature detection function
 To: maobibo <maobibo@loongson.cn>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>, kvm@vger.kernel.org, 
-	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	virtualization@lists.linux.dev
+Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org, 
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 8, 2024 at 9:16=E2=80=AFAM maobibo <maobibo@loongson.cn> wrote:
+On Thu, Jul 4, 2024 at 9:24=E2=80=AFAM maobibo <maobibo@loongson.cn> wrote:
 >
 >
 >
-> On 2024/7/6 =E4=B8=8B=E5=8D=885:41, Huacai Chen wrote:
-> > On Sat, Jul 6, 2024 at 2:59=E2=80=AFPM maobibo <maobibo@loongson.cn> wr=
-ote:
+> On 2024/7/3 =E4=B8=8B=E5=8D=8811:35, Huacai Chen wrote:
+> > On Wed, Jul 3, 2024 at 11:15=E2=80=AFAM maobibo <maobibo@loongson.cn> w=
+rote:
 > >>
-> >> Huacai,
 > >>
-> >> On 2024/7/6 =E4=B8=8A=E5=8D=8811:00, Huacai Chen wrote:
-> >>> Hi, Bibo,
+> >>
+> >> On 2024/7/2 =E4=B8=8B=E5=8D=8811:43, Huacai Chen wrote:
+> >>> On Tue, Jul 2, 2024 at 4:42=E2=80=AFPM maobibo <maobibo@loongson.cn> =
+wrote:
+> >>>>
+> >>>>
+> >>>>
+> >>>> On 2024/7/2 =E4=B8=8B=E5=8D=883:28, Huacai Chen wrote:
+> >>>>> On Tue, Jul 2, 2024 at 12:13=E2=80=AFPM maobibo <maobibo@loongson.c=
+n> wrote:
+> >>>>>>
+> >>>>>>
+> >>>>>>
+> >>>>>> On 2024/7/2 =E4=B8=8A=E5=8D=8810:34, Huacai Chen wrote:
+> >>>>>>> On Tue, Jul 2, 2024 at 10:25=E2=80=AFAM maobibo <maobibo@loongson=
+.cn> wrote:
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>>
+> >>>>>>>> On 2024/7/2 =E4=B8=8A=E5=8D=889:59, Huacai Chen wrote:
+> >>>>>>>>> On Tue, Jul 2, 2024 at 9:51=E2=80=AFAM maobibo <maobibo@loongso=
+n.cn> wrote:
+> >>>>>>>>>>
+> >>>>>>>>>> Huacai,
+> >>>>>>>>>>
+> >>>>>>>>>> On 2024/7/1 =E4=B8=8B=E5=8D=886:26, Huacai Chen wrote:
+> >>>>>>>>>>> On Mon, Jul 1, 2024 at 9:27=E2=80=AFAM maobibo <maobibo@loong=
+son.cn> wrote:
+> >>>>>>>>>>>>
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Huacai,
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> On 2024/6/30 =E4=B8=8A=E5=8D=8810:07, Huacai Chen wrote:
+> >>>>>>>>>>>>> Hi, Bibo,
+> >>>>>>>>>>>>>
+> >>>>>>>>>>>>> On Wed, Jun 26, 2024 at 2:32=E2=80=AFPM Bibo Mao <maobibo@l=
+oongson.cn> wrote:
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> Two kinds of LBT feature detection are added here, one is =
+VCPU
+> >>>>>>>>>>>>>> feature, the other is VM feature. VCPU feature dection can=
+ only
+> >>>>>>>>>>>>>> work with VCPU thread itself, and requires VCPU thread is =
+created
+> >>>>>>>>>>>>>> already. So LBT feature detection for VM is added also, it=
+ can
+> >>>>>>>>>>>>>> be done even if VM is not created, and also can be done by=
+ any
+> >>>>>>>>>>>>>> thread besides VCPU threads.
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> Loongson Binary Translation (LBT) feature is defined in re=
+gister
+> >>>>>>>>>>>>>> cpucfg2. Here LBT capability detection for VCPU is added.
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> Here ioctl command KVM_HAS_DEVICE_ATTR is added for VM, an=
+d macro
+> >>>>>>>>>>>>>> KVM_LOONGARCH_VM_FEAT_CTRL is added to check supported fea=
+ture. And
+> >>>>>>>>>>>>>> three sub-features relative with LBT are added as followin=
+g:
+> >>>>>>>>>>>>>>         KVM_LOONGARCH_VM_FEAT_X86BT
+> >>>>>>>>>>>>>>         KVM_LOONGARCH_VM_FEAT_ARMBT
+> >>>>>>>>>>>>>>         KVM_LOONGARCH_VM_FEAT_MIPSBT
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
+> >>>>>>>>>>>>>> ---
+> >>>>>>>>>>>>>>         arch/loongarch/include/uapi/asm/kvm.h |  6 ++++
+> >>>>>>>>>>>>>>         arch/loongarch/kvm/vcpu.c             |  6 ++++
+> >>>>>>>>>>>>>>         arch/loongarch/kvm/vm.c               | 44 +++++++=
++++++++++++++++++++-
+> >>>>>>>>>>>>>>         3 files changed, 55 insertions(+), 1 deletion(-)
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/=
+loongarch/include/uapi/asm/kvm.h
+> >>>>>>>>>>>>>> index ddc5cab0ffd0..c40f7d9ffe13 100644
+> >>>>>>>>>>>>>> --- a/arch/loongarch/include/uapi/asm/kvm.h
+> >>>>>>>>>>>>>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
+> >>>>>>>>>>>>>> @@ -82,6 +82,12 @@ struct kvm_fpu {
+> >>>>>>>>>>>>>>         #define KVM_IOC_CSRID(REG)             LOONGARCH_R=
+EG_64(KVM_REG_LOONGARCH_CSR, REG)
+> >>>>>>>>>>>>>>         #define KVM_IOC_CPUCFG(REG)            LOONGARCH_R=
+EG_64(KVM_REG_LOONGARCH_CPUCFG, REG)
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> +/* Device Control API on vm fd */
+> >>>>>>>>>>>>>> +#define KVM_LOONGARCH_VM_FEAT_CTRL     0
+> >>>>>>>>>>>>>> +#define  KVM_LOONGARCH_VM_FEAT_X86BT   0
+> >>>>>>>>>>>>>> +#define  KVM_LOONGARCH_VM_FEAT_ARMBT   1
+> >>>>>>>>>>>>>> +#define  KVM_LOONGARCH_VM_FEAT_MIPSBT  2
+> >>>>>>>>>>>>>> +
+> >>>>>>>>>>>>>>         /* Device Control API on vcpu fd */
+> >>>>>>>>>>>>>>         #define KVM_LOONGARCH_VCPU_CPUCFG      0
+> >>>>>>>>>>>>>>         #define KVM_LOONGARCH_VCPU_PVTIME_CTRL 1
+> >>>>>>>>>>>>> If you insist that LBT should be a vm feature, then I sugge=
+st the
+> >>>>>>>>>>>>> above two also be vm features. Though this is an UAPI chang=
+e, but
+> >>>>>>>>>>>>> CPUCFG is upstream in 6.10-rc1 and 6.10-final hasn't been r=
+eleased. We
+> >>>>>>>>>>>>> have a chance to change it now.
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> KVM_LOONGARCH_VCPU_PVTIME_CTRL need be attr percpu since eve=
+ry vcpu
+> >>>>>>>>>>>> has is own different gpa address.
+> >>>>>>>>>>> Then leave this as a vm feature.
+> >>>>>>>>>>>
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> For KVM_LOONGARCH_VCPU_CPUCFG attr, it will not changed. We =
+cannot break
+> >>>>>>>>>>>> the API even if it is 6.10-rc1, VMM has already used this. E=
+lse there is
+> >>>>>>>>>>>> uapi breaking now, still will be in future if we cannot cont=
+rol this.
+> >>>>>>>>>>> UAPI changing before the first release is allowed, which mean=
+s, we can
+> >>>>>>>>>>> change this before the 6.10-final, but cannot change it after
+> >>>>>>>>>>> 6.10-final.
+> >>>>>>>>>> Now QEMU has already synced uapi to its own directory, also I =
+never hear
+> >>>>>>>>>> about this, with my experience with uapi change, there is only=
+ newly
+> >>>>>>>>>> added or removed deprecated years ago.
+> >>>>>>>>>>
+> >>>>>>>>>> Is there any documentation about UAPI change rules?
+> >>>>>>>>> No document, but learn from my more than 10 years upstream expe=
+rience.
+> >>>>>>>> Can you show me an example about with your rich upstream experie=
+nce?
+> >>>>>>> A simple example,
+> >>>>>>> e877d705704d7c8fe17b6b5ebdfdb14b84c revert
+> >>>>>>> 1dccdba084897443d116508a8ed71e0ac8a0 and it changes UAPI.
+> >>>>>>> 1dccdba084897443d116508a8ed71e0ac8a0 is upstream in 6.9-rc1, and
+> >>>>>>> e877d705704d7c8fe17b6b5ebdfdb14b84c can revert the behavior befor=
+e
+> >>>>>>> 6.9-final, but not after that.
+> >>>>>>>
+> >>>>>>> Before the first release, the code status is treated as "unstable=
+", so
+> >>>>>>> revert, modify is allowed. But after the first release, even if a=
+n
+> >>>>>>> "error" should also be treated as a "bad feature".
+> >>>>>> Huacai,
+> >>>>>>
+> >>>>>> Thanks for showing the example.
+> >>>>>>
+> >>>>>> For this issue, Can we adding new uapi and mark the old as depreca=
+ted?
+> >>>>>> so that it can be removed after years.
+> >>>>> Unnecessary, just remove the old one. Deprecation is for the usage
+> >>>>> after the first release.
+> >>>>>
+> >>>>>>
+> >>>>>> For me, it is too frequent to revert the old uapi, it is not bug a=
+nd
+> >>>>>> only that we have better method now. Also QEMU has synchronized th=
+e uapi
+> >>>>>> to its directory already.
+> >>>>> QEMU also hasn't been released after synchronizing the uapi, so it =
+is
+> >>>>> OK to remove the old api now.
+> >>>> No, I will not do such thing. It is just a joke to revert the uapi.
+> >>>>
+> >>>> So just create new world and old world on Loongarch system again?
+> >>> Again, code status before the first release is *unstable*, that statu=
+s
+> >>> is not enough to be a "world".
 > >>>
-> >>> On Fri, May 24, 2024 at 3:38=E2=80=AFPM Bibo Mao <maobibo@loongson.cn=
-> wrote:
-> >>>>
-> >>>> Steal time feature is added here in kvm side, VM can search supporte=
-d
-> >>>> features provided by KVM hypervisor, feature KVM_FEATURE_STEAL_TIME
-> >>>> is added here. Like x86, steal time structure is saved in guest memo=
-ry,
-> >>>> one hypercall function KVM_HCALL_FUNC_NOTIFY is added to notify KVM =
-to
-> >>>> enable the feature.
-> >>>>
-> >>>> One cpu attr ioctl command KVM_LOONGARCH_VCPU_PVTIME_CTRL is added t=
-o
-> >>>> save and restore base address of steal time structure when VM is mig=
-rated.
-> >>>>
-> >>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
-> >>>> ---
-> >>>>    arch/loongarch/include/asm/kvm_host.h  |   7 ++
-> >>>>    arch/loongarch/include/asm/kvm_para.h  |  10 ++
-> >>>>    arch/loongarch/include/asm/kvm_vcpu.h  |   4 +
-> >>>>    arch/loongarch/include/asm/loongarch.h |   1 +
-> >>>>    arch/loongarch/include/uapi/asm/kvm.h  |   4 +
-> >>>>    arch/loongarch/kvm/Kconfig             |   1 +
-> >>>>    arch/loongarch/kvm/exit.c              |  38 +++++++-
-> >>>>    arch/loongarch/kvm/vcpu.c              | 124 ++++++++++++++++++++=
-+++++
-> >>>>    8 files changed, 187 insertions(+), 2 deletions(-)
-> >>>>
-> >>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/=
-include/asm/kvm_host.h
-> >>>> index c87b6ea0ec47..2eb2f7572023 100644
-> >>>> --- a/arch/loongarch/include/asm/kvm_host.h
-> >>>> +++ b/arch/loongarch/include/asm/kvm_host.h
-> >>>> @@ -30,6 +30,7 @@
-> >>>>    #define KVM_PRIVATE_MEM_SLOTS          0
-> >>>>
-> >>>>    #define KVM_HALT_POLL_NS_DEFAULT       500000
-> >>>> +#define KVM_REQ_STEAL_UPDATE           KVM_ARCH_REQ(1)
-> >>>>
-> >>>>    #define KVM_GUESTDBG_SW_BP_MASK                \
-> >>>>           (KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)
-> >>>> @@ -201,6 +202,12 @@ struct kvm_vcpu_arch {
-> >>>>           struct kvm_mp_state mp_state;
-> >>>>           /* cpucfg */
-> >>>>           u32 cpucfg[KVM_MAX_CPUCFG_REGS];
-> >>>> +       /* paravirt steal time */
-> >>>> +       struct {
-> >>>> +               u64 guest_addr;
-> >>>> +               u64 last_steal;
-> >>>> +               struct gfn_to_hva_cache cache;
-> >>>> +       } st;
-> >>>>    };
-> >>>>
-> >>>>    static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *=
-csr, int reg)
-> >>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/=
-include/asm/kvm_para.h
-> >>>> index 4ba2312e5f8c..a9ba8185d4af 100644
-> >>>> --- a/arch/loongarch/include/asm/kvm_para.h
-> >>>> +++ b/arch/loongarch/include/asm/kvm_para.h
-> >>>> @@ -14,6 +14,7 @@
-> >>>>
-> >>>>    #define KVM_HCALL_SERVICE              HYPERCALL_ENCODE(HYPERVISO=
-R_KVM, KVM_HCALL_CODE_SERVICE)
-> >>>>    #define  KVM_HCALL_FUNC_IPI            1
-> >>>> +#define  KVM_HCALL_FUNC_NOTIFY         2
-> >>>>
-> >>>>    #define KVM_HCALL_SWDBG                        HYPERCALL_ENCODE(H=
-YPERVISOR_KVM, KVM_HCALL_CODE_SWDBG)
-> >>>>
-> >>>> @@ -24,6 +25,15 @@
-> >>>>    #define KVM_HCALL_INVALID_CODE         -1UL
-> >>>>    #define KVM_HCALL_INVALID_PARAMETER    -2UL
-> >>>>
-> >>>> +#define KVM_STEAL_PHYS_VALID           BIT_ULL(0)
-> >>>> +#define KVM_STEAL_PHYS_MASK            GENMASK_ULL(63, 6)
-> >>>> +struct kvm_steal_time {
-> >>>> +       __u64 steal;
-> >>>> +       __u32 version;
-> >>>> +       __u32 flags;
-> >>> I found that x86 has a preempted field here, in our internal repo the
-> >>> LoongArch version also has this field. Moreover,
-> >>> kvm_steal_time_set_preempted() and kvm_steal_time_clear_preempted()
-> >>> seems needed.
-> >> By my understanding, macro vcpu_is_preempted() is used together with p=
-v
-> >> spinlock, and pv spinlock depends on pv stealtime. So I think preempte=
-d
-> >> flag is not part of pv stealtime, it is part of pv spinlock.
+> >>> It's your responsibility to make a good design at the beginning, but
+> >>> you fail to do that. Fortunately we are before the first release;
+> >>> unfortunately you don't want to do that.
+> >> Yes, this is flaw at the beginning, however it can works and new abi c=
+an
+> >> be added.
 > >>
-> >> We are going to add preempted field if pv spinlock is added.
-> >>>
-> >>>> +       __u32 pad[12];
-> >>>> +};
-> >>>> +
-> >>>>    /*
-> >>>>     * Hypercall interface for KVM hypervisor
-> >>>>     *
-> >>>> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/=
-include/asm/kvm_vcpu.h
-> >>>> index 590a92cb5416..d7e51300a89f 100644
-> >>>> --- a/arch/loongarch/include/asm/kvm_vcpu.h
-> >>>> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
-> >>>> @@ -120,4 +120,8 @@ static inline void kvm_write_reg(struct kvm_vcpu=
- *vcpu, int num, unsigned long v
-> >>>>           vcpu->arch.gprs[num] =3D val;
-> >>>>    }
-> >>>>
-> >>>> +static inline bool kvm_pvtime_supported(void)
-> >>>> +{
-> >>>> +       return !!sched_info_on();
-> >>>> +}
-> >>>>    #endif /* __ASM_LOONGARCH_KVM_VCPU_H__ */
-> >>>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch=
-/include/asm/loongarch.h
-> >>>> index eb09adda54b7..7a4633ef284b 100644
-> >>>> --- a/arch/loongarch/include/asm/loongarch.h
-> >>>> +++ b/arch/loongarch/include/asm/loongarch.h
-> >>>> @@ -169,6 +169,7 @@
-> >>>>    #define  KVM_SIGNATURE                 "KVM\0"
-> >>>>    #define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
-> >>>>    #define  KVM_FEATURE_IPI               BIT(1)
-> >>>> +#define  KVM_FEATURE_STEAL_TIME                BIT(2)
-> >>>>
-> >>>>    #ifndef __ASSEMBLY__
-> >>>>
-> >>>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/=
-include/uapi/asm/kvm.h
-> >>>> index f9abef382317..ddc5cab0ffd0 100644
-> >>>> --- a/arch/loongarch/include/uapi/asm/kvm.h
-> >>>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> >>>> @@ -81,7 +81,11 @@ struct kvm_fpu {
-> >>>>    #define LOONGARCH_REG_64(TYPE, REG)    (TYPE | KVM_REG_SIZE_U64 |=
- (REG << LOONGARCH_REG_SHIFT))
-> >>>>    #define KVM_IOC_CSRID(REG)             LOONGARCH_REG_64(KVM_REG_L=
-OONGARCH_CSR, REG)
-> >>>>    #define KVM_IOC_CPUCFG(REG)            LOONGARCH_REG_64(KVM_REG_L=
-OONGARCH_CPUCFG, REG)
-> >>>> +
-> >>>> +/* Device Control API on vcpu fd */
-> >>>>    #define KVM_LOONGARCH_VCPU_CPUCFG      0
-> >>>> +#define KVM_LOONGARCH_VCPU_PVTIME_CTRL 1
-> >>>> +#define  KVM_LOONGARCH_VCPU_PVTIME_GPA 0
-> >>>>
-> >>>>    struct kvm_debug_exit_arch {
-> >>>>    };
-> >>>> diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
-> >>>> index c4ef2b4d9797..248744b4d086 100644
-> >>>> --- a/arch/loongarch/kvm/Kconfig
-> >>>> +++ b/arch/loongarch/kvm/Kconfig
-> >>>> @@ -29,6 +29,7 @@ config KVM
-> >>>>           select KVM_MMIO
-> >>>>           select HAVE_KVM_READONLY_MEM
-> >>>>           select KVM_XFER_TO_GUEST_WORK
-> >>>> +       select SCHED_INFO
-> >>>>           help
-> >>>>             Support hosting virtualized guest machines using
-> >>>>             hardware virtualization extensions. You will need
-> >>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
-> >>>> index c86e099af5ca..e2abd97fb13f 100644
-> >>>> --- a/arch/loongarch/kvm/exit.c
-> >>>> +++ b/arch/loongarch/kvm/exit.c
-> >>>> @@ -24,7 +24,7 @@
-> >>>>    static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst inst)
-> >>>>    {
-> >>>>           int rd, rj;
-> >>>> -       unsigned int index;
-> >>>> +       unsigned int index, ret;
-> >>>>
-> >>>>           if (inst.reg2_format.opcode !=3D cpucfg_op)
-> >>>>                   return EMULATE_FAIL;
-> >>>> @@ -50,7 +50,10 @@ static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, =
-larch_inst inst)
-> >>>>                   vcpu->arch.gprs[rd] =3D *(unsigned int *)KVM_SIGNA=
-TURE;
-> >>>>                   break;
-> >>>>           case CPUCFG_KVM_FEATURE:
-> >>>> -               vcpu->arch.gprs[rd] =3D KVM_FEATURE_IPI;
-> >>>> +               ret =3D KVM_FEATURE_IPI;
-> >>>> +               if (sched_info_on())
-> >>> What about replacing it with your helper function kvm_pvtime_supporte=
-d()?
-> >> Sure, will replace it with helper function kvm_pvtime_supported().
-> > If you are sure this is the only issue, then needn't submit a new versi=
-on.
-> OK, thanks.
+> >> If there is no serious bug and it is synced to QEMU already, I am not
+> >> willing to revert uabi. Different projects have its own schedule plan,
+> >> that is one reason. The most important reason may be that different
+> >> peoples have different ways handling these issues.
+> > In another thread I found that Jiaxun said he has a solution to make
+> > LBT be a vcpu feature and still works well. However, that may take
+> > some time and is too late for 6.11.
 >
-> By searching orginal submit of vcpu_is_preempt(), it can be located at
-> https://lore.kernel.org/lkml/1477642287-24104-1-git-send-email-xinhui.pan=
-@linux.vnet.ibm.com/
+> It is welcome if Jiaxun provide patch for host machine type, I have no
+> time give any feedback with suggestion of Jianxun now.
 >
-> It is separated one, only that is depends on pv-spinlock and
-> pv-stealtime. And there is no capability indicator for guest kernel, it
-> is enabled by default.
-Series applied with some modifications here, you can double-check the
-correctness.
-https://git.kernel.org/pub/scm/linux/kernel/git/chenhuacai/linux-loongson.g=
-it/log/?h=3Dloongarch-kvm
+> >
+> > But we have another choice now: just remove the UAPI and vm.c parts in
+> > this series, let the LBT main parts be upstream in 6.11, and then
+> > solve other problems after 6.11. Even if Jiaxun's solution isn't
+> > usable, we can still use this old vm feature solution then.
+>
+> There is not useul if only LBT main part goes upstream. VMM cannot use
+> LBT if control part is not merged.
+There is no control part UAPI for LSX/LASX, but it works.
+If you insist that all should be merged together, there is probably
+not enough time for the 6.11 merge window.
 
 Huacai
+
+>
+>  From another side, what do you like to do? Reviewing patch of others
+> and give comments whatever grammar spelling or useful suggestions, or
+> Writing patch which needs much efforts rather than somethings like
+> feature configuration, BSP drivers.
 >
 > Regards
 > Bibo Mao
 >
 > >
-> > Huacai
 > >
+> > Huacai
 > >>
 > >> Regards
-> >> Bibo Mao
+> >> Bibo, Mao
+> >>>
 > >>>
 > >>> Huacai
 > >>>
-> >>>> +                       ret |=3D KVM_FEATURE_STEAL_TIME;
-> >>>> +               vcpu->arch.gprs[rd] =3D ret;
-> >>>>                   break;
-> >>>>           default:
-> >>>>                   vcpu->arch.gprs[rd] =3D 0;
-> >>>> @@ -687,6 +690,34 @@ static int kvm_handle_fpu_disabled(struct kvm_v=
-cpu *vcpu)
-> >>>>           return RESUME_GUEST;
-> >>>>    }
 > >>>>
-> >>>> +static long kvm_save_notify(struct kvm_vcpu *vcpu)
-> >>>> +{
-> >>>> +       unsigned long id, data;
-> >>>> +
-> >>>> +       id   =3D kvm_read_reg(vcpu, LOONGARCH_GPR_A1);
-> >>>> +       data =3D kvm_read_reg(vcpu, LOONGARCH_GPR_A2);
-> >>>> +       switch (id) {
-> >>>> +       case KVM_FEATURE_STEAL_TIME:
-> >>>> +               if (!kvm_pvtime_supported())
-> >>>> +                       return KVM_HCALL_INVALID_CODE;
-> >>>> +
-> >>>> +               if (data & ~(KVM_STEAL_PHYS_MASK | KVM_STEAL_PHYS_VA=
-LID))
-> >>>> +                       return KVM_HCALL_INVALID_PARAMETER;
-> >>>> +
-> >>>> +               vcpu->arch.st.guest_addr =3D data;
-> >>>> +               if (!(data & KVM_STEAL_PHYS_VALID))
-> >>>> +                       break;
-> >>>> +
-> >>>> +               vcpu->arch.st.last_steal =3D current->sched_info.run=
-_delay;
-> >>>> +               kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-> >>>> +               break;
-> >>>> +       default:
-> >>>> +               break;
-> >>>> +       };
-> >>>> +
-> >>>> +       return 0;
-> >>>> +};
-> >>>> +
-> >>>>    /*
-> >>>>     * kvm_handle_lsx_disabled() - Guest used LSX while disabled in r=
-oot.
-> >>>>     * @vcpu:      Virtual CPU context.
-> >>>> @@ -758,6 +789,9 @@ static void kvm_handle_service(struct kvm_vcpu *=
-vcpu)
-> >>>>                   kvm_send_pv_ipi(vcpu);
-> >>>>                   ret =3D KVM_HCALL_SUCCESS;
-> >>>>                   break;
-> >>>> +       case KVM_HCALL_FUNC_NOTIFY:
-> >>>> +               ret =3D kvm_save_notify(vcpu);
-> >>>> +               break;
-> >>>>           default:
-> >>>>                   ret =3D KVM_HCALL_INVALID_CODE;
-> >>>>                   break;
-> >>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
-> >>>> index 9e8030d45129..382796f1d3e6 100644
-> >>>> --- a/arch/loongarch/kvm/vcpu.c
-> >>>> +++ b/arch/loongarch/kvm/vcpu.c
-> >>>> @@ -31,6 +31,117 @@ const struct kvm_stats_header kvm_vcpu_stats_hea=
-der =3D {
-> >>>>                          sizeof(kvm_vcpu_stats_desc),
-> >>>>    };
+> >>>> Regards
+> >>>> Bibo, Mao
 > >>>>
-> >>>> +static void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
-> >>>> +{
-> >>>> +       struct kvm_steal_time __user *st;
-> >>>> +       struct gfn_to_hva_cache *ghc;
-> >>>> +       struct kvm_memslots *slots;
-> >>>> +       gpa_t gpa;
-> >>>> +       u64 steal;
-> >>>> +       u32 version;
-> >>>> +
-> >>>> +       ghc =3D &vcpu->arch.st.cache;
-> >>>> +       gpa =3D vcpu->arch.st.guest_addr;
-> >>>> +       if (!(gpa & KVM_STEAL_PHYS_VALID))
-> >>>> +               return;
-> >>>> +
-> >>>> +       gpa &=3D KVM_STEAL_PHYS_MASK;
-> >>>> +       slots =3D kvm_memslots(vcpu->kvm);
-> >>>> +       if (slots->generation !=3D ghc->generation || gpa !=3D ghc->=
-gpa) {
-> >>>> +               if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gpa,
-> >>>> +                                       sizeof(*st))) {
-> >>>> +                       ghc->gpa =3D INVALID_GPA;
-> >>>> +                       return;
-> >>>> +               }
-> >>>> +       }
-> >>>> +
-> >>>> +       st =3D (struct kvm_steal_time __user *)ghc->hva;
-> >>>> +       unsafe_get_user(version, &st->version, out);
-> >>>> +       if (version & 1)
-> >>>> +               version +=3D 1;
-> >>>> +       version +=3D 1;
-> >>>> +       unsafe_put_user(version, &st->version, out);
-> >>>> +       smp_wmb();
-> >>>> +
-> >>>> +       unsafe_get_user(steal, &st->steal, out);
-> >>>> +       steal +=3D current->sched_info.run_delay -
-> >>>> +               vcpu->arch.st.last_steal;
-> >>>> +       vcpu->arch.st.last_steal =3D current->sched_info.run_delay;
-> >>>> +       unsafe_put_user(steal, &st->steal, out);
-> >>>> +
-> >>>> +       smp_wmb();
-> >>>> +       version +=3D 1;
-> >>>> +       unsafe_put_user(version, &st->version, out);
-> >>>> +out:
-> >>>> +       mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(=
-ghc->gpa));
-> >>>> +}
-> >>>> +
-> >>>> +static int kvm_loongarch_pvtime_has_attr(struct kvm_vcpu *vcpu,
-> >>>> +                                       struct kvm_device_attr *attr=
-)
-> >>>> +{
-> >>>> +       if (!kvm_pvtime_supported() ||
-> >>>> +                       attr->attr !=3D KVM_LOONGARCH_VCPU_PVTIME_GP=
-A)
-> >>>> +               return -ENXIO;
-> >>>> +
-> >>>> +       return 0;
-> >>>> +}
-> >>>> +
-> >>>> +static int kvm_loongarch_pvtime_get_attr(struct kvm_vcpu *vcpu,
-> >>>> +                                       struct kvm_device_attr *attr=
-)
-> >>>> +{
-> >>>> +       u64 __user *user =3D (u64 __user *)attr->addr;
-> >>>> +       u64 gpa;
-> >>>> +
-> >>>> +       if (!kvm_pvtime_supported() ||
-> >>>> +                       attr->attr !=3D KVM_LOONGARCH_VCPU_PVTIME_GP=
-A)
-> >>>> +               return -ENXIO;
-> >>>> +
-> >>>> +       gpa =3D vcpu->arch.st.guest_addr;
-> >>>> +       if (put_user(gpa, user))
-> >>>> +               return -EFAULT;
-> >>>> +
-> >>>> +       return 0;
-> >>>> +}
-> >>>> +
-> >>>> +static int kvm_loongarch_pvtime_set_attr(struct kvm_vcpu *vcpu,
-> >>>> +                                       struct kvm_device_attr *attr=
-)
-> >>>> +{
-> >>>> +       u64 __user *user =3D (u64 __user *)attr->addr;
-> >>>> +       struct kvm *kvm =3D vcpu->kvm;
-> >>>> +       u64 gpa;
-> >>>> +       int ret =3D 0;
-> >>>> +       int idx;
-> >>>> +
-> >>>> +       if (!kvm_pvtime_supported() ||
-> >>>> +                       attr->attr !=3D KVM_LOONGARCH_VCPU_PVTIME_GP=
-A)
-> >>>> +               return -ENXIO;
-> >>>> +
-> >>>> +       if (get_user(gpa, user))
-> >>>> +               return -EFAULT;
-> >>>> +
-> >>>> +       if (gpa & ~(KVM_STEAL_PHYS_MASK | KVM_STEAL_PHYS_VALID))
-> >>>> +               return -EINVAL;
-> >>>> +
-> >>>> +       if (!(gpa & KVM_STEAL_PHYS_VALID)) {
-> >>>> +               vcpu->arch.st.guest_addr =3D gpa;
-> >>>> +               return 0;
-> >>>> +       }
-> >>>> +
-> >>>> +       /* Check the address is in a valid memslot */
-> >>>> +       idx =3D srcu_read_lock(&kvm->srcu);
-> >>>> +       if (kvm_is_error_hva(gfn_to_hva(kvm, gpa >> PAGE_SHIFT)))
-> >>>> +               ret =3D -EINVAL;
-> >>>> +       srcu_read_unlock(&kvm->srcu, idx);
-> >>>> +
-> >>>> +       if (!ret) {
-> >>>> +               vcpu->arch.st.guest_addr =3D gpa;
-> >>>> +               vcpu->arch.st.last_steal =3D current->sched_info.run=
-_delay;
-> >>>> +               kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-> >>>> +       }
-> >>>> +
-> >>>> +       return ret;
-> >>>> +}
-> >>>> +
-> >>>>    /*
-> >>>>     * kvm_check_requests - check and handle pending vCPU requests
-> >>>>     *
-> >>>> @@ -48,6 +159,9 @@ static int kvm_check_requests(struct kvm_vcpu *vc=
-pu)
-> >>>>           if (kvm_dirty_ring_check_request(vcpu))
-> >>>>                   return RESUME_HOST;
+> >>>>>
+> >>>>> Huacai
+> >>>>>
+> >>>>>>
+> >>>>>> Regards
+> >>>>>> Bibo, Mao
+> >>>>>>>
+> >>>>>>> Huacai
+> >>>>>>>
+> >>>>>>>
+> >>>>>>>>>
+> >>>>>>>>>>>
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> How about adding new extra features capability for VM such a=
+s?
+> >>>>>>>>>>>> +#define  KVM_LOONGARCH_VM_FEAT_LSX   3
+> >>>>>>>>>>>> +#define  KVM_LOONGARCH_VM_FEAT_LASX  4
+> >>>>>>>>>>> They should be similar as LBT, if LBT is vcpu feature, they s=
+hould
+> >>>>>>>>>>> also be vcpu features; if LBT is vm feature, they should also=
+ be vm
+> >>>>>>>>>>> features.
+> >>>>>>>>>> On other architectures, with function kvm_vm_ioctl_check_exten=
+sion()
+> >>>>>>>>>>          KVM_CAP_XSAVE2/KVM_CAP_PMU_CAPABILITY on x86
+> >>>>>>>>>>          KVM_CAP_ARM_PMU_V3/KVM_CAP_ARM_SVE on arm64
+> >>>>>>>>>> These features are all cpu features, at the same time they are=
+ VM features.
+> >>>>>>>>>>
+> >>>>>>>>>> If they are cpu features, how does VMM detect validity of thes=
+e features
+> >>>>>>>>>> passing from command line? After all VCPUs are created and sen=
+d bootup
+> >>>>>>>>>> command to these VCPUs? That is too late, VMM main thread is e=
+asy to
+> >>>>>>>>>> detect feature validity if they are VM features also.
+> >>>>>>>>>>
+> >>>>>>>>>> To be honest, I am not familiar with KVM still, only get furth=
+er
+> >>>>>>>>>> understanding after actual problems solving. Welcome to give c=
+omments,
+> >>>>>>>>>> however please read more backgroud if you insist on, else ther=
+e will be
+> >>>>>>>>>> endless argument again.
+> >>>>>>>>> I just say CPUCFG/LSX/LASX and LBT should be in the same class,=
+ I
+> >>>>>>>>> haven't insisted on whether they should be vcpu features or vm
+> >>>>>>>>> features.
+> >>>>>>>> It is reasonable if LSX/LASX/LBT should be in the same class, si=
+nce
+> >>>>>>>> there is feature options such as lsx=3Don/off,lasx=3Don/off,lbt=
+=3Don/off.
+> >>>>>>>>
+> >>>>>>>> What is the usage about CPUCFG capability used for VM feature? I=
+t is not
+> >>>>>>>> a detailed feature, it is only feature-set indicator like cpuid.
+> >>>>>>>>
+> >>>>>>>> Regards
+> >>>>>>>> Bibo Mao
+> >>>>>>>>>
+> >>>>>>>>> Huacai
+> >>>>>>>>>
+> >>>>>>>>>>
+> >>>>>>>>>> Regards
+> >>>>>>>>>> Bibo, Mao
+> >>>>>>>>>>>
+> >>>>>>>>>>> Huacai
+> >>>>>>>>>>>
+> >>>>>>>>>>>>
+> >>>>>>>>>>>> Regards
+> >>>>>>>>>>>> Bibo Mao
+> >>>>>>>>>>>>>
+> >>>>>>>>>>>>> Huacai
+> >>>>>>>>>>>>>
+> >>>>>>>>>>>>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kv=
+m/vcpu.c
+> >>>>>>>>>>>>>> index 233d28d0e928..9734b4d8db05 100644
+> >>>>>>>>>>>>>> --- a/arch/loongarch/kvm/vcpu.c
+> >>>>>>>>>>>>>> +++ b/arch/loongarch/kvm/vcpu.c
+> >>>>>>>>>>>>>> @@ -565,6 +565,12 @@ static int _kvm_get_cpucfg_mask(int i=
+d, u64 *v)
+> >>>>>>>>>>>>>>                                *v |=3D CPUCFG2_LSX;
+> >>>>>>>>>>>>>>                        if (cpu_has_lasx)
+> >>>>>>>>>>>>>>                                *v |=3D CPUCFG2_LASX;
+> >>>>>>>>>>>>>> +               if (cpu_has_lbt_x86)
+> >>>>>>>>>>>>>> +                       *v |=3D CPUCFG2_X86BT;
+> >>>>>>>>>>>>>> +               if (cpu_has_lbt_arm)
+> >>>>>>>>>>>>>> +                       *v |=3D CPUCFG2_ARMBT;
+> >>>>>>>>>>>>>> +               if (cpu_has_lbt_mips)
+> >>>>>>>>>>>>>> +                       *v |=3D CPUCFG2_MIPSBT;
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>>                        return 0;
+> >>>>>>>>>>>>>>                case LOONGARCH_CPUCFG3:
+> >>>>>>>>>>>>>> diff --git a/arch/loongarch/kvm/vm.c b/arch/loongarch/kvm/=
+vm.c
+> >>>>>>>>>>>>>> index 6b2e4f66ad26..09e05108c68b 100644
+> >>>>>>>>>>>>>> --- a/arch/loongarch/kvm/vm.c
+> >>>>>>>>>>>>>> +++ b/arch/loongarch/kvm/vm.c
+> >>>>>>>>>>>>>> @@ -99,7 +99,49 @@ int kvm_vm_ioctl_check_extension(struct=
+ kvm *kvm, long ext)
+> >>>>>>>>>>>>>>                return r;
+> >>>>>>>>>>>>>>         }
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>>> +static int kvm_vm_feature_has_attr(struct kvm *kvm, struc=
+t kvm_device_attr *attr)
+> >>>>>>>>>>>>>> +{
+> >>>>>>>>>>>>>> +       switch (attr->attr) {
+> >>>>>>>>>>>>>> +       case KVM_LOONGARCH_VM_FEAT_X86BT:
+> >>>>>>>>>>>>>> +               if (cpu_has_lbt_x86)
+> >>>>>>>>>>>>>> +                       return 0;
+> >>>>>>>>>>>>>> +               return -ENXIO;
+> >>>>>>>>>>>>>> +       case KVM_LOONGARCH_VM_FEAT_ARMBT:
+> >>>>>>>>>>>>>> +               if (cpu_has_lbt_arm)
+> >>>>>>>>>>>>>> +                       return 0;
+> >>>>>>>>>>>>>> +               return -ENXIO;
+> >>>>>>>>>>>>>> +       case KVM_LOONGARCH_VM_FEAT_MIPSBT:
+> >>>>>>>>>>>>>> +               if (cpu_has_lbt_mips)
+> >>>>>>>>>>>>>> +                       return 0;
+> >>>>>>>>>>>>>> +               return -ENXIO;
+> >>>>>>>>>>>>>> +       default:
+> >>>>>>>>>>>>>> +               return -ENXIO;
+> >>>>>>>>>>>>>> +       }
+> >>>>>>>>>>>>>> +}
+> >>>>>>>>>>>>>> +
+> >>>>>>>>>>>>>> +static int kvm_vm_has_attr(struct kvm *kvm, struct kvm_de=
+vice_attr *attr)
+> >>>>>>>>>>>>>> +{
+> >>>>>>>>>>>>>> +       switch (attr->group) {
+> >>>>>>>>>>>>>> +       case KVM_LOONGARCH_VM_FEAT_CTRL:
+> >>>>>>>>>>>>>> +               return kvm_vm_feature_has_attr(kvm, attr);
+> >>>>>>>>>>>>>> +       default:
+> >>>>>>>>>>>>>> +               return -ENXIO;
+> >>>>>>>>>>>>>> +       }
+> >>>>>>>>>>>>>> +}
+> >>>>>>>>>>>>>> +
+> >>>>>>>>>>>>>>         int kvm_arch_vm_ioctl(struct file *filp, unsigned =
+int ioctl, unsigned long arg)
+> >>>>>>>>>>>>>>         {
+> >>>>>>>>>>>>>> -       return -ENOIOCTLCMD;
+> >>>>>>>>>>>>>> +       struct kvm *kvm =3D filp->private_data;
+> >>>>>>>>>>>>>> +       void __user *argp =3D (void __user *)arg;
+> >>>>>>>>>>>>>> +       struct kvm_device_attr attr;
+> >>>>>>>>>>>>>> +
+> >>>>>>>>>>>>>> +       switch (ioctl) {
+> >>>>>>>>>>>>>> +       case KVM_HAS_DEVICE_ATTR:
+> >>>>>>>>>>>>>> +               if (copy_from_user(&attr, argp, sizeof(att=
+r)))
+> >>>>>>>>>>>>>> +                       return -EFAULT;
+> >>>>>>>>>>>>>> +
+> >>>>>>>>>>>>>> +               return kvm_vm_has_attr(kvm, &attr);
+> >>>>>>>>>>>>>> +       default:
+> >>>>>>>>>>>>>> +               return -EINVAL;
+> >>>>>>>>>>>>>> +       }
+> >>>>>>>>>>>>>>         }
+> >>>>>>>>>>>>>> --
+> >>>>>>>>>>>>>> 2.39.3
+> >>>>>>>>>>>>>>
+> >>>>>>>>>>>>
+> >>>>>>>>>>
+> >>>>>>>>
+> >>>>>>
 > >>>>
-> >>>> +       if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu))
-> >>>> +               kvm_update_stolen_time(vcpu);
-> >>>> +
-> >>>>           return RESUME_GUEST;
-> >>>>    }
-> >>>>
-> >>>> @@ -671,6 +785,9 @@ static int kvm_loongarch_vcpu_has_attr(struct kv=
-m_vcpu *vcpu,
-> >>>>           case KVM_LOONGARCH_VCPU_CPUCFG:
-> >>>>                   ret =3D kvm_loongarch_cpucfg_has_attr(vcpu, attr);
-> >>>>                   break;
-> >>>> +       case KVM_LOONGARCH_VCPU_PVTIME_CTRL:
-> >>>> +               ret =3D kvm_loongarch_pvtime_has_attr(vcpu, attr);
-> >>>> +               break;
-> >>>>           default:
-> >>>>                   break;
-> >>>>           }
-> >>>> @@ -703,6 +820,9 @@ static int kvm_loongarch_vcpu_get_attr(struct kv=
-m_vcpu *vcpu,
-> >>>>           case KVM_LOONGARCH_VCPU_CPUCFG:
-> >>>>                   ret =3D kvm_loongarch_get_cpucfg_attr(vcpu, attr);
-> >>>>                   break;
-> >>>> +       case KVM_LOONGARCH_VCPU_PVTIME_CTRL:
-> >>>> +               ret =3D kvm_loongarch_pvtime_get_attr(vcpu, attr);
-> >>>> +               break;
-> >>>>           default:
-> >>>>                   break;
-> >>>>           }
-> >>>> @@ -725,6 +845,9 @@ static int kvm_loongarch_vcpu_set_attr(struct kv=
-m_vcpu *vcpu,
-> >>>>           case KVM_LOONGARCH_VCPU_CPUCFG:
-> >>>>                   ret =3D kvm_loongarch_cpucfg_set_attr(vcpu, attr);
-> >>>>                   break;
-> >>>> +       case KVM_LOONGARCH_VCPU_PVTIME_CTRL:
-> >>>> +               ret =3D kvm_loongarch_pvtime_set_attr(vcpu, attr);
-> >>>> +               break;
-> >>>>           default:
-> >>>>                   break;
-> >>>>           }
-> >>>> @@ -1084,6 +1207,7 @@ static int _kvm_vcpu_load(struct kvm_vcpu *vcp=
-u, int cpu)
-> >>>>
-> >>>>           /* Control guest page CCA attribute */
-> >>>>           change_csr_gcfg(CSR_GCFG_MATC_MASK, CSR_GCFG_MATC_ROOT);
-> >>>> +       kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
-> >>>>
-> >>>>           /* Don't bother restoring registers multiple times unless =
-necessary */
-> >>>>           if (vcpu->arch.aux_inuse & KVM_LARCH_HWCSR_USABLE)
-> >>>> --
-> >>>> 2.39.3
-> >>>>
+> >>
 > >>
 >
 >
