@@ -1,107 +1,120 @@
-Return-Path: <kvm+bounces-21121-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21122-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E8C292A87F
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:54:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17BDF92A8F7
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 20:31:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEE92B20E00
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 17:54:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C21CD1F2188D
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 18:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A6614A0A5;
-	Mon,  8 Jul 2024 17:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90084149DF7;
+	Mon,  8 Jul 2024 18:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XeMH0por"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SUlJ9uUi"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A53314A08D;
-	Mon,  8 Jul 2024 17:53:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74C0F15A8
+	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 18:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720461224; cv=none; b=EnOG30PRZyVjjUnnm3y620xQD5+wZxNPC9bpeZvYNrG/drSo3yY2GYwjX8VMwIOPWu+BDsAw5lozqfVWLSRnjpd4d6CUrgaLLF3Jbz0/ZOXj/fcIcghmkvqUxy/fbY0m8i+GWWVCYpB28xDb5XEHigP02gLvs9EwvIbmz/L/qFs=
+	t=1720463480; cv=none; b=SVb21CU5ILe6KDl8BkOvzk50Lf3gk0OWd4arLqhca2wgzSHJn0WMgU/uNIuJvrJCwZ26kFuPBElXIiC3JjNKA49ZNPhFleROjEgk5iKpsfeJwifN5t3SeAYqP/aczntq4mR5QN9bmI+lEqvj6ZtsJJCBRvKEiyklw7MHxmJ1m7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720461224; c=relaxed/simple;
-	bh=C3GwnTURDmi547NFIqqGEDrXp5T993LZq/8bfiulStw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cjJQrTu3R4VkHYqjS3v7FkFMVPv/NFHdWhqJEmzcKpPxp4UkTR7yLLXyf5KpXW4ApcP3JntCsm/vzLTnPZteluEI4GJrvEc0RyY0tMMpnIDq2lAE5tLuymEbk2DPuL3D9KcVIeQ7x3SEvUY4x13vVA3iZKEA5kPPTWea+lhbUds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XeMH0por; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17FFAC4AF0A;
-	Mon,  8 Jul 2024 17:53:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720461224;
-	bh=C3GwnTURDmi547NFIqqGEDrXp5T993LZq/8bfiulStw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XeMH0porEqwTosisdHpt+a6GgOqsNJbNdTV5WaP/bDuPnR3WolMrfTvbgWZ17LLmW
-	 0yYp7EWKEQasUav6JRKRCC5lJZvovErHA23Oke3J8fXcI6xzime0l9rB6B5D2uw90P
-	 E586WU+GI4iL587/d9aB4LhhyDMY8Ssosl70iPKEZNFxfFxPIdQdxDSTWyniPFhWiz
-	 KsBD0W5XRQn5+feorxlKTu55uJBximr4VBr04fV7Kselsd9Sl7suOkeO5sNNecR9wV
-	 5QiADd5uDza0H3N5ZWKhUdpUkiT/qvHH49SsPYWsq7G+pLXso7TABshk0aQA4Nev8I
-	 d+zcmv41zSI4Q==
-Date: Mon, 8 Jul 2024 18:53:39 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 0/7] KVM: arm64: Add support for FP8
-Message-ID: <68d26d8a-f2fb-4652-ad89-d959e5fedcc8@sirena.org.uk>
-References: <20240708154438.1218186-1-maz@kernel.org>
+	s=arc-20240116; t=1720463480; c=relaxed/simple;
+	bh=SxTT+PkShAX+YjFzkWGn+ka0iFCwAlN5snOqK2dNfws=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=eXV1jSDHkWfMQadNGmRIw/nXM4CUxgqBH0hep/wzvY29KLsLRrAPAcVz6ac3Pg9yQnSOKIkHMPFZOXp8795UqieelJ5trEnHODS8wa6ucqgpvmbqbRRVUdQ6kCPoy22MGGNOAjADG0SHEQwSMRCYm0hS+SVbVGOHX3pdek/8ie8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SUlJ9uUi; arc=none smtp.client-ip=209.85.166.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3815ad8adc9so23555ab.0
+        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 11:31:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720463478; x=1721068278; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sSRwWyccRMvOk9YUpPQqsmlSez4V4xshL0fxbbrNfYE=;
+        b=SUlJ9uUi9F6DQmgsEjVViqyw20QwwsN4bkHat68uInf2vbK/DYSwGPAISRq84SsLHt
+         8W2X/r7pYvmmBxNezHEt9ou5ndxyRIEFbUQ2FoRVSCTbFCD8HuAgvifkt3kcKnj0422r
+         n9sas3ehdTToKVttddJKSeIyhg7ftFWiwjMt/gE6c3uf4sRmL66+nyCAipHbcu/tvMn6
+         KaUYghoRiKCPxep73jw1MROBrRswOkHolu4+gnL/xFjIP6oVyydAJqfqgxZka50CICA9
+         HNQCMP/u6Gu0jXuebvSzUYe2VgpxlN+5rsP+eayziN39bS4RoEsON0uA6YL8f5Vq9gtn
+         kxjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720463478; x=1721068278;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sSRwWyccRMvOk9YUpPQqsmlSez4V4xshL0fxbbrNfYE=;
+        b=OnNKRi/np1KfJjZSc/YyDEWdbGTXFH/KEcZEQ7qvl/ZCIBGVBfOUULHVK9YSXb8QUl
+         ZBSWwfDPm+WHrPlXRW7OMu/2VC0CUN0p7yUleJCGpRM50Z9VH3SdNR3aVjB2KJvSDBvH
+         vLQ0SlVbqAXoWQysVoebDT2uUo4OqVLam2CJohlrOCUi8vD0QoDrtKA3UigZzCkNu7hG
+         JDSf9q5rEY5/lZwJvh7kpBncn22tMPXBGrJtPmhfn4cFZNknNZWnNeFNbe4c4nDmXrls
+         Q+HfrIy3yUcAqJJTvV1n3/oGPgsWW3cMUiJnqVuY6BJ+MHpB8lRiTInM7zGwlJh7gFFe
+         HENQ==
+X-Gm-Message-State: AOJu0Yygij8evYROCQjoqSfkbPAg6EdiaoJNwic0gSS4AK64IRxvLPC5
+	j+M9C/TgDid4oil+vN64lMQk3r7vNPv4dNDF92D2S49ie33db6CprKV2R5ndrzYygQ4uS7bSkez
+	X9UMztfcKKbFB+Z3EPhLuWQPKyZmv7KsRjpg3
+X-Google-Smtp-Source: AGHT+IFZAKlcSpUQrpigxu4uxuCUaGd67TezuAcvC2uL8vue3EfrLNM7Af4JGypKEGrD87xgWG2GKqbD0v1Ub26/BDI=
+X-Received: by 2002:a92:ca4f:0:b0:374:a294:58bf with SMTP id
+ e9e14a558f8ab-38a682c8364mr324195ab.10.1720463478450; Mon, 08 Jul 2024
+ 11:31:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="ddky+SsFRvKacQta"
-Content-Disposition: inline
-In-Reply-To: <20240708154438.1218186-1-maz@kernel.org>
-X-Cookie: Many are cold, but few are frozen.
+References: <20240701211445.2870218-2-aaronlewis@google.com> <ZowZzUTVNhp6gpL5@google.com>
+In-Reply-To: <ZowZzUTVNhp6gpL5@google.com>
+From: Aaron Lewis <aaronlewis@google.com>
+Date: Mon, 8 Jul 2024 11:31:07 -0700
+Message-ID: <CAAAPnDHDXTKE7U7hguKUUb08y6QdocmMobPaEmU-hotuACpRwg@mail.gmail.com>
+Subject: Re: [kvm-unit-tests PATCH] x86: Increase the timeout for the test "vmx_apicv_test"
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, jmattson@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Jul 8, 2024 at 9:54=E2=80=AFAM Sean Christopherson <seanjc@google.c=
+om> wrote:
+>
+> On Mon, Jul 01, 2024, Aaron Lewis wrote:
+> > This test can take over 10 seconds to run on IvyBridge in debug.
+> > Increase the timeout to give this test the time it needs to complete.
+>
+> Heh, there's a pretty big gap between 10 seconds and 100 seconds.  Can we=
+ tighten
+> the timeout, e.g. to 30 seconds, without risking false failures on IVB?
 
---ddky+SsFRvKacQta
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Yeah, 30 seconds should work.
 
-On Mon, Jul 08, 2024 at 04:44:31PM +0100, Marc Zyngier wrote:
-
-> Although FP8 support was merged in 6.9, the KVM side was dropped, with
-> no sign of it being picked up again. Given that its absence is getting
-> in the way of NV upstreaming (HCRX_EL2 needs fleshing out), here's a
-> small series addressing it.
-
-Thanks, I've been prioritising SME since this was going to conflict with
-it and some of your comments on the prior version sounded like you would
-block things on a bigger refectoring of the interface with the host
-kernel which definitely needs to wait for after SME (I do want to redo
-the whole way the host stores FP data for threads which would be a good
-time for such a refactoring).  Hopefully there'll be a version of the
-SME patches suitable for ABI review this week.
-
-Other than the issue with restoring FPMR for the guest these look good
-to inspection.
-
---ddky+SsFRvKacQta
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaMJ6IACgkQJNaLcl1U
-h9BXTgf/W38hTFwCYiS00hP4UdElxP4GotpS01nxhulGVSE8VDggFzcY+8XGNRNG
-CcgWIkU8GyXZpMTq55Rr2yJ47IZByJQJqSsImqeiPKLwi5/+F9x4XcoxVj7XAE9V
-BzG0k9JWH3M2FfIxcYvmyqV4d3AFid2AlF6xX4VAHWA2gbf92PjxO+q6bnAOtYpe
-xoY1puZdXY+wLotVnQIZz3yI0/5ptqCp1fSJWErTr3nMC5igyIFbE5+MKWxaqT3L
-s9POfUHR3wBK224G2gzf0fPTRaKZsrEtx8zgTHJ0ociPmO71imF9+TIwjIWCEH+c
-MDONfXaEUFz4Hy/LoFsqi4nuwzF1Pg==
-=38GM
------END PGP SIGNATURE-----
-
---ddky+SsFRvKacQta--
+>
+> > Signed-off-by: Aaron Lewis <aaronlewis@google.com>
+> > ---
+> >  x86/unittests.cfg | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/x86/unittests.cfg b/x86/unittests.cfg
+> > index 7c1691a988621..51c063d248e19 100644
+> > --- a/x86/unittests.cfg
+> > +++ b/x86/unittests.cfg
+> > @@ -349,7 +349,7 @@ file =3D vmx.flat
+> >  extra_params =3D -cpu max,+vmx -append "apic_reg_virt_test virt_x2apic=
+_mode_test vmx_basic_vid_test vmx_eoi_virt_test"
+> >  arch =3D x86_64
+> >  groups =3D vmx
+> > -timeout =3D 10
+> > +timeout =3D 100
+> >
+> >  [vmx_posted_intr_test]
+> >  file =3D vmx.flat
+> > --
+> > 2.45.2.803.g4e1b14247a-goog
+> >
 
