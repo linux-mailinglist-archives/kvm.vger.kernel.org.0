@@ -1,108 +1,124 @@
-Return-Path: <kvm+bounces-21125-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21126-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8083592A97B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 21:01:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBEAC92A9E0
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 21:33:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADD2D1C21929
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:01:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96E0C283097
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:33:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CBB14C5BE;
-	Mon,  8 Jul 2024 19:01:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E46414D443;
+	Mon,  8 Jul 2024 19:33:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IzjJXRwx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nxoW+xBl"
 X-Original-To: kvm@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5552214901C;
-	Mon,  8 Jul 2024 19:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA271DA5F
+	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 19:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720465269; cv=none; b=Wq0y+pAAwwSOCOYhzJ/KUgx0ltky4G781gYT4VSBTHxAcvtpI5J6ySTW6AevnqmlQgOyfX5LOPsfmnE/8BF7ZsGeItMLGa6bDWj1PeGVHA72InRBi8N48f2aPZMfQw8NapzKdWSFzDK/+gHTvpIwl73oM93MIKm7hUlDhZ4kzhc=
+	t=1720467211; cv=none; b=N6h+U5U5m1PyFVMuqXPa+R6bSXKNtd2Xy39aiKf9nWK04JhNBZ7J94QpGhCLBjczfikGUTx9BKELF2dL9yPO53f+RFKgVHZ3E26cu9KLckxCnBsT0po0S5dE+06fc0gcMgAP1fP8V0q59SUfbY/0V+yG686GlieLMdJShEnUmfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720465269; c=relaxed/simple;
-	bh=ZYwHIigIhSCIMsMfoGRMJkJk1tF8c24wZcbHSusq7ao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G+MBhMeFVohcAZpHoaSWWk9tRjMVdXzOJtEEyL6P/gAiZkt7DN6JbG3P8ZG/NAUiTSn+5KfsMfgKFEbYWC/y+coI6kfoAeoPPfBLskMH9YXysCZhjkaz9VDBa75hS+tv1yu/QsBu5q8N05wX7HQFJEgSZuO3wsGkoZjeZng5mdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IzjJXRwx; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XGGpiGEn99M1OyeTkZzsgnB6kBfceyDYhXGtdp6H+LU=; b=IzjJXRwxcCU8iVPQpEtfBZ9ZSL
-	UZB/QcbD4oWaRg9SaqqBXc7UsGT8dZTU4Nd9/SVUYmkhw1gOiXPC+WeKskETHk906vqsclC0AlP2v
-	I6+2pQvOThD6jUArmHxfmbGacwlH8SdLYQxI3cIlRgD9xtvQV5u/N4U2ZkjWrsNa+/Uc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1sQtba-0024I0-IB; Mon, 08 Jul 2024 21:00:54 +0200
-Date: Mon, 8 Jul 2024 21:00:54 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Cindy Lu <lulu@redhat.com>
-Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com,
-	parav@nvidia.com, sgarzare@redhat.com, netdev@vger.kernel.org,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vdpa/mlx5: Add the support of set mac address
-Message-ID: <b680300d-d18d-45b8-848f-85824332c7ca@lunn.ch>
-References: <20240708065549.89422-1-lulu@redhat.com>
+	s=arc-20240116; t=1720467211; c=relaxed/simple;
+	bh=Lkct58u03qKX24GL/17oS13ObQaBn0gV67+onEUoBa0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=HrfHqFjwnvUw85RBz6T1IvN2zYvUAqmd3wJFsMjm26+BFemc4W/6jlc5cT5vahXUrHdkYcOUAaxY8zN6i+RqH18s/Pzs4umJadvJzRRNYyANni+UVBMn+QymFZFK+tUtmWhWIn0CB95L0YPRHB5fGuQ65SMsaUl0rmpaH8N0uYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nxoW+xBl; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e039b77a040so7098943276.2
+        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 12:33:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720467208; x=1721072008; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0SsfUEhdZE3jvwQ557rvrdiT1mwqMCwVY9Pd8h40l2A=;
+        b=nxoW+xBlNrd834SNYp2ya1Ktrhqw6FbKFdYgDCOYuxx6IY0k5rTe69cU1SGqG4fLP6
+         h3WnxSkK81mQRzNqZpFHzsn8UUMf7HgnaY5oj7RG71/2NbMfkXtmiWMcImdl1/9GcC1u
+         kdwUTpHLM+uQaCyFtow7zKdBYXHAHVcrcmTRj8E7MUzqIfHAujG8+yHDkjEId22vvzRS
+         mYyeCfByyUV0jN5nNPnC8PxJPZIGRKq0Wxpj10PXU4TuQA9KqdY9rL2jMvRKDrpBx7Mg
+         OSBQeVlwBuGL2WLo3cFyb+unxhtgky4Z3FYqYTo7J8baKpBl2DZI9xuSwdsEilDTVrja
+         cbDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720467208; x=1721072008;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0SsfUEhdZE3jvwQ557rvrdiT1mwqMCwVY9Pd8h40l2A=;
+        b=onLrijNY4SBc7CNhMhA/GKZGJKM8yeV76tZF2KgZWOgOI0rWU8lxRNXCGGxEHyHLeL
+         eHJnLYGs8UR8IaS18XXHHleuFjVL0QLv5wRVg57qC0LCpZy44Val4gJIkei/uB3CRpQI
+         atS1/Li6e5YDLMysPy1ggs9rRxBbWYT/a/cJF0ViNTOAAjMeXpfhvteSdunzMQ+WlGr4
+         ndISrwzzpwoUQY0pBWmDmI6s6epOoblPpzyX4ZFGV1/UQP2eC/uj1B5wvKaBGd1l9U28
+         nsiHAfenJqaPmdXJJYt6tPhZNzModhuBUSRe/KHdreNxViB9a7JgfXAqXmZn6ThZf1u2
+         GN7A==
+X-Forwarded-Encrypted: i=1; AJvYcCU9lmam9bx5FSbOvgcAtAvCFvQdas+xSWJC9iy895djdDBnHDC6+bdsXToFt3a/B9myoY/fDdrdS42kPhqDA/ehELkU
+X-Gm-Message-State: AOJu0YzDTBomXNYS6fFZsANMRk8iGqE8Oox7CG2TuUOcvd7RqKolT0Ep
+	wJrVqVu1ymJAo0RQcNkWR6xedPiY+wwKY888h1YZRhZIOGRfOa6g7ZUCvV/yuV85Htw4q9Z5o9H
+	5Bg==
+X-Google-Smtp-Source: AGHT+IFPQJJnHnF4cf4wxaeu/SR+dAHcuEg/KlRGY3vjBwuULSNbvnJdgljw2/q9IZ9gwxv615Wjeh5M4cg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1ac1:b0:e03:62dc:63de with SMTP id
+ 3f1490d57ef6-e041b0593efmr47626276.6.1720467207949; Mon, 08 Jul 2024 12:33:27
+ -0700 (PDT)
+Date: Mon, 8 Jul 2024 19:33:26 +0000
+In-Reply-To: <6a8aee9425a47290c7401d4926041c0611d69ff6.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240708065549.89422-1-lulu@redhat.com>
+Mime-Version: 1.0
+References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-6-seanjc@google.com>
+ <6a8aee9425a47290c7401d4926041c0611d69ff6.camel@redhat.com>
+Message-ID: <Zow_BmpOGwQJ9Yoi@google.com>
+Subject: Re: [PATCH v2 05/49] KVM: selftests: Assert that the @cpuid passed to
+ get_cpuid_entry() is non-NULL
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
+	Robert Hoo <robert.hoo.linux@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jul 08, 2024 at 02:55:49PM +0800, Cindy Lu wrote:
-> Add the function to support setting the MAC address.
-> For vdpa/mlx5, the function will use mlx5_mpfs_add_mac
-> to set the mac address
+On Thu, Jul 04, 2024, Maxim Levitsky wrote:
+> On Fri, 2024-05-17 at 10:38 -0700, Sean Christopherson wrote:
+> > Add a sanity check in get_cpuid_entry() to provide a friendlier error than
+> > a segfault when a test developer tries to use a vCPU CPUID helper on a
+> > barebones vCPU.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > index c664e446136b..f0f3434d767e 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > @@ -1141,6 +1141,8 @@ const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
+> >  {
+> >  	int i;
+> >  
+> > +	TEST_ASSERT(cpuid, "Must do vcpu_init_cpuid() first (or equivalent)");
+> > +
+> >  	for (i = 0; i < cpuid->nent; i++) {
+> >  		if (cpuid->entries[i].function == function &&
+> >  		    cpuid->entries[i].index == index)
 > 
-> Tested in ConnectX-6 Dx device
+> Hi,
 > 
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  drivers/vdpa/mlx5/net/mlx5_vnet.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
-> 
-> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> index 26ba7da6b410..f78701386690 100644
-> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
-> @@ -3616,10 +3616,33 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
->  	destroy_workqueue(wq);
->  	mgtdev->ndev = NULL;
->  }
-> +static int mlx5_vdpa_set_attr_mac(struct vdpa_mgmt_dev *v_mdev,
-> +				  struct vdpa_device *dev,
-> +				  const struct vdpa_dev_set_config *add_config)
-> +{
-> +	struct mlx5_vdpa_dev *mvdev = to_mvdev(dev);
-> +	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-> +	struct mlx5_core_dev *mdev = mvdev->mdev;
-> +	struct virtio_net_config *config = &ndev->config;
-> +	int err;
-> +	struct mlx5_core_dev *pfmdev;
-> +
-> +	if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-> +		if (!is_zero_ether_addr(add_config->net.mac)) {
+> Maybe it is better to do this assert in __vcpu_get_cpuid_entry() because the
+> assert might confuse the reader, since it just tests for NULL but when it
+> fails, it complains that you need to call some function.
 
-Is the core happy to call into the driver without validating the MAC
-address? Will the core pass the broadcast address? That is not
-zero. Or a multicast address? Should every driver repeat the same
-validation, and probably get it just as wrong?
-
-    Andrew
-
----
-pw-bot: cr
+IIRC, I originally added the assert in __vcpu_get_cpuid_entry(), but I didn't
+like leaving get_cpuid_entry() unprotected.  What if I add an assert in both?
+E.g. have __vcpu_get_cpuid_entry() assert with the (hopefully) hepful message,
+and have get_cpuid_entry() do a simple TEST_ASSERT_NE()?
 
