@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-21126-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21127-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBEAC92A9E0
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 21:33:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE4692A9EB
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 21:39:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96E0C283097
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:33:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6390928422C
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E46414D443;
-	Mon,  8 Jul 2024 19:33:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D136D14BFB4;
+	Mon,  8 Jul 2024 19:39:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nxoW+xBl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mUOg49ro"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA271DA5F
-	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 19:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7DE11BC39
+	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 19:39:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720467211; cv=none; b=N6h+U5U5m1PyFVMuqXPa+R6bSXKNtd2Xy39aiKf9nWK04JhNBZ7J94QpGhCLBjczfikGUTx9BKELF2dL9yPO53f+RFKgVHZ3E26cu9KLckxCnBsT0po0S5dE+06fc0gcMgAP1fP8V0q59SUfbY/0V+yG686GlieLMdJShEnUmfQ=
+	t=1720467572; cv=none; b=lRKMLcQC9rC7O5+6oNSGmFHr7iELqJBqOMeJ79cdioLwutreLJUz8GlraL+EmXo8QWH/Poj/l/9vwwQcpymXXd5Gdjq8fF/a71etsy6wL5u9FxakrU46lspLUdJkriV+Eg4GLB1KH/mJ6ySWHRa9DZS2mp2vEDBvdtif9xep7Kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720467211; c=relaxed/simple;
-	bh=Lkct58u03qKX24GL/17oS13ObQaBn0gV67+onEUoBa0=;
+	s=arc-20240116; t=1720467572; c=relaxed/simple;
+	bh=cxpipDCot5CodKWnbdDOqEFP+CdadDnmsWzB2vBNKro=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HrfHqFjwnvUw85RBz6T1IvN2zYvUAqmd3wJFsMjm26+BFemc4W/6jlc5cT5vahXUrHdkYcOUAaxY8zN6i+RqH18s/Pzs4umJadvJzRRNYyANni+UVBMn+QymFZFK+tUtmWhWIn0CB95L0YPRHB5fGuQ65SMsaUl0rmpaH8N0uYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nxoW+xBl; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=onKJt2X5QvMXGll9QzEwkAJhQqEcfeWgWEJi5bWjkTnbuQhnLcXsgc6bDnUlwmBf4shDj9cFkRJaC9ocC8RPZH8OUqA+RElPfEwyOug7eK8UN/I7m47RgyZeJxXjN4qmGyVMup0fOeTbUyUexPqIvFZhSeB6k/7hpoS7GeqT3PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mUOg49ro; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e039b77a040so7098943276.2
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 12:33:28 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-70af548db1eso3179911b3a.0
+        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 12:39:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720467208; x=1721072008; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720467570; x=1721072370; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0SsfUEhdZE3jvwQ557rvrdiT1mwqMCwVY9Pd8h40l2A=;
-        b=nxoW+xBlNrd834SNYp2ya1Ktrhqw6FbKFdYgDCOYuxx6IY0k5rTe69cU1SGqG4fLP6
-         h3WnxSkK81mQRzNqZpFHzsn8UUMf7HgnaY5oj7RG71/2NbMfkXtmiWMcImdl1/9GcC1u
-         kdwUTpHLM+uQaCyFtow7zKdBYXHAHVcrcmTRj8E7MUzqIfHAujG8+yHDkjEId22vvzRS
-         mYyeCfByyUV0jN5nNPnC8PxJPZIGRKq0Wxpj10PXU4TuQA9KqdY9rL2jMvRKDrpBx7Mg
-         OSBQeVlwBuGL2WLo3cFyb+unxhtgky4Z3FYqYTo7J8baKpBl2DZI9xuSwdsEilDTVrja
-         cbDA==
+        bh=GQ6CfDaikAMxahVxSARsyKtBQOzwazQX2aRjXkmicSQ=;
+        b=mUOg49ro1nhb8kdKTVlDoUmzexJoot02gLNdDQZR7ENm170IPa44LOscF62dzsgPhW
+         eaIc7zUxtjfPx6QFa1k6C1SZDNEPBzbayYIRWozN92sLw8XWOKWbnVsUggbO+ejKsJDM
+         rl6femweZ3jDGlFSo2M07fa2xzXPXitjSnzAa+wJtbwve3ruEOUWwc7F9iMM3vnNuWtM
+         7HkJVN1nB0idELu4DtX97Jpp7XMQxsjyHzXgprTJ3s/En6FngbdUUhZI72hyArZ7FDRH
+         x8pAonG9HGvGi3Th+l+YO0PQlHdVeCKU+eqeZ1V3tMf4lQa51sY0uAQw6Qbfb9lcGI1k
+         2EMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720467208; x=1721072008;
+        d=1e100.net; s=20230601; t=1720467570; x=1721072370;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0SsfUEhdZE3jvwQ557rvrdiT1mwqMCwVY9Pd8h40l2A=;
-        b=onLrijNY4SBc7CNhMhA/GKZGJKM8yeV76tZF2KgZWOgOI0rWU8lxRNXCGGxEHyHLeL
-         eHJnLYGs8UR8IaS18XXHHleuFjVL0QLv5wRVg57qC0LCpZy44Val4gJIkei/uB3CRpQI
-         atS1/Li6e5YDLMysPy1ggs9rRxBbWYT/a/cJF0ViNTOAAjMeXpfhvteSdunzMQ+WlGr4
-         ndISrwzzpwoUQY0pBWmDmI6s6epOoblPpzyX4ZFGV1/UQP2eC/uj1B5wvKaBGd1l9U28
-         nsiHAfenJqaPmdXJJYt6tPhZNzModhuBUSRe/KHdreNxViB9a7JgfXAqXmZn6ThZf1u2
-         GN7A==
-X-Forwarded-Encrypted: i=1; AJvYcCU9lmam9bx5FSbOvgcAtAvCFvQdas+xSWJC9iy895djdDBnHDC6+bdsXToFt3a/B9myoY/fDdrdS42kPhqDA/ehELkU
-X-Gm-Message-State: AOJu0YzDTBomXNYS6fFZsANMRk8iGqE8Oox7CG2TuUOcvd7RqKolT0Ep
-	wJrVqVu1ymJAo0RQcNkWR6xedPiY+wwKY888h1YZRhZIOGRfOa6g7ZUCvV/yuV85Htw4q9Z5o9H
-	5Bg==
-X-Google-Smtp-Source: AGHT+IFPQJJnHnF4cf4wxaeu/SR+dAHcuEg/KlRGY3vjBwuULSNbvnJdgljw2/q9IZ9gwxv615Wjeh5M4cg=
+        bh=GQ6CfDaikAMxahVxSARsyKtBQOzwazQX2aRjXkmicSQ=;
+        b=YnEIIA3k+WShtaPF/aHp6YtwUcsa/Y4lHRFoeo/UCeNu5ewgSVGBFRGHis+StvPVEc
+         ujgHDvaOpkBd8fyflBW2Dh0viVCSUCP7y7waZoKxFHqoCocCHrBrOKJiDsEk4WVbl86j
+         iYKiOYFfdpj/Fn0qXqZI8d6aD1SYTAuKswSlL8h1xk4PyrlUqXk0/0s+VCT2EtN9n1Wb
+         iEN71aZt+k+msSaJoQLIKWFNZ0DXaqgw+ASe/H1/DJQcnv7OdVJnWyu+NMFjk+pKlXzq
+         ILlDTMXobJjBJVHGW0CJDIPha9sHFrlOQylWEI5wcLG6I9tAGmFZ46IMq4RhxNoY6nqI
+         HyIw==
+X-Forwarded-Encrypted: i=1; AJvYcCX0og+kmj6mchjXGqoNsHLOa3xqTTcmnDP/KpCKji3L3yNfvyqK5WCfD7ronMt0dvGDEPswQXpgFr+Q1Ce52lDIGk98
+X-Gm-Message-State: AOJu0YwnL6WXl6BdK/J7yHQGSWYgwWd1aoxbbij+rW6vV+cni8rLtjcw
+	eZdu0A3WHLo/UXLW7ZwaGvsD4hB5YvjAYHxLRb2SdydP3LcQ8OyQQBPumQjBujzQgJqOYIxSjR1
+	bXA==
+X-Google-Smtp-Source: AGHT+IGlwAWjUeVVgf9eQ8gqL/6OnWSsJrxgloyvowuT/xANarRlzc6X2EXeOzRPkXsCcqffmwX898/lqbg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1ac1:b0:e03:62dc:63de with SMTP id
- 3f1490d57ef6-e041b0593efmr47626276.6.1720467207949; Mon, 08 Jul 2024 12:33:27
+ (user=seanjc job=sendgmr) by 2002:aa7:9a51:0:b0:6ec:f400:95a7 with SMTP id
+ d2e1a72fcca58-70b44d8f2f1mr1635b3a.3.1720467569828; Mon, 08 Jul 2024 12:39:29
  -0700 (PDT)
-Date: Mon, 8 Jul 2024 19:33:26 +0000
-In-Reply-To: <6a8aee9425a47290c7401d4926041c0611d69ff6.camel@redhat.com>
+Date: Mon, 8 Jul 2024 19:39:28 +0000
+In-Reply-To: <480aa33ffa8f4fcc1e85d36206447b19719e9e3f.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-6-seanjc@google.com>
- <6a8aee9425a47290c7401d4926041c0611d69ff6.camel@redhat.com>
-Message-ID: <Zow_BmpOGwQJ9Yoi@google.com>
-Subject: Re: [PATCH v2 05/49] KVM: selftests: Assert that the @cpuid passed to
- get_cpuid_entry() is non-NULL
+References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-8-seanjc@google.com>
+ <480aa33ffa8f4fcc1e85d36206447b19719e9e3f.camel@redhat.com>
+Message-ID: <ZoxAcAOVZ6I6Sidc@google.com>
+Subject: Re: [PATCH v2 07/49] KVM: selftests: Verify KVM stuffs runtime CPUID
+ OS bits on CR4 writes
 From: Sean Christopherson <seanjc@google.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
@@ -88,37 +88,41 @@ Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Jul 04, 2024, Maxim Levitsky wrote:
 > On Fri, 2024-05-17 at 10:38 -0700, Sean Christopherson wrote:
-> > Add a sanity check in get_cpuid_entry() to provide a friendlier error than
-> > a segfault when a test developer tries to use a vCPU CPUID helper on a
-> > barebones vCPU.
+> > Extend x86's set sregs test to verify that KVM sets/clears OSXSAVE and
+> > OSKPKE according to CR4.XSAVE and CR4.PKE respectively.  For performance
+> > reasons, KVM is responsible for emulating the architectural behavior of
+> > the OS CPUID bits tracking CR4.
 > > 
 > > Signed-off-by: Sean Christopherson <seanjc@google.com>
 > > ---
-> >  tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 ++
-> >  1 file changed, 2 insertions(+)
+> >  tools/testing/selftests/kvm/x86_64/set_sregs_test.c | 10 ++++++++++
+> >  1 file changed, 10 insertions(+)
 > > 
-> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > index c664e446136b..f0f3434d767e 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > @@ -1141,6 +1141,8 @@ const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
-> >  {
-> >  	int i;
+> > diff --git a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+> > index 96fd690d479a..f4095a3d1278 100644
+> > --- a/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+> > +++ b/tools/testing/selftests/kvm/x86_64/set_sregs_test.c
+> > @@ -85,6 +85,16 @@ static void test_cr_bits(struct kvm_vcpu *vcpu, uint64_t cr4)
+> >  	rc = _vcpu_sregs_set(vcpu, &sregs);
+> >  	TEST_ASSERT(!rc, "Failed to set supported CR4 bits (0x%lx)", cr4);
 > >  
-> > +	TEST_ASSERT(cpuid, "Must do vcpu_init_cpuid() first (or equivalent)");
+> > +	TEST_ASSERT(!!(sregs.cr4 & X86_CR4_OSXSAVE) ==
+> > +		    (vcpu->cpuid && vcpu_cpuid_has(vcpu, X86_FEATURE_OSXSAVE)),
+> > +		    "KVM didn't %s OSXSAVE in CPUID as expected",
+> > +		    (sregs.cr4 & X86_CR4_OSXSAVE) ? "set" : "clear");
 > > +
-> >  	for (i = 0; i < cpuid->nent; i++) {
-> >  		if (cpuid->entries[i].function == function &&
-> >  		    cpuid->entries[i].index == index)
+> > +	TEST_ASSERT(!!(sregs.cr4 & X86_CR4_PKE) ==
+> > +		    (vcpu->cpuid && vcpu_cpuid_has(vcpu, X86_FEATURE_OSPKE)),
+> > +		    "KVM didn't %s OSPKE in CPUID as expected",
+> > +		    (sregs.cr4 & X86_CR4_PKE) ? "set" : "clear");
+> > +
 > 
 > Hi,
 > 
-> Maybe it is better to do this assert in __vcpu_get_cpuid_entry() because the
-> assert might confuse the reader, since it just tests for NULL but when it
-> fails, it complains that you need to call some function.
+> Just for fun, why not to have a test function that toggles a CR4 bit and then
+> checks the corresponding CPUID bit toggles as well? This is both better
+> coverage wise and will remove the above code duplication.
 
-IIRC, I originally added the assert in __vcpu_get_cpuid_entry(), but I didn't
-like leaving get_cpuid_entry() unprotected.  What if I add an assert in both?
-E.g. have __vcpu_get_cpuid_entry() assert with the (hopefully) hepful message,
-and have get_cpuid_entry() do a simple TEST_ASSERT_NE()?
+Huh, I don't know.  I distinctly remember trying and failing to dedup this code,
+but I don't think I ever tried actively toggling each bit.  I'll give that a shot.
 
