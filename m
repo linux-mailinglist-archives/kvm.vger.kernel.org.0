@@ -1,138 +1,108 @@
-Return-Path: <kvm+bounces-21124-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21125-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D6CF92A964
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 20:59:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8083592A97B
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 21:01:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC9C7281CD1
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 18:59:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADD2D1C21929
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 19:01:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001AD14C584;
-	Mon,  8 Jul 2024 18:59:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2CBB14C5BE;
+	Mon,  8 Jul 2024 19:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2Hr0sAXD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="IzjJXRwx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D023814B967
-	for <kvm@vger.kernel.org>; Mon,  8 Jul 2024 18:59:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5552214901C;
+	Mon,  8 Jul 2024 19:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720465189; cv=none; b=jW5DbyYdQaomgN5YA4nR1Tkck6N5EzkxSDebOw55+bQe9ZtCgHqWiJggKd1xjWzsBc+eo/l+dE5n4DqLjxRR1MByWnhOKHNkhspZ6yKfcva2SHrzOSonDQf5Ulai3GSRagtyAh8d/xiclFaSk8Ei94GrLlyfOdZwo+DBZkWID+M=
+	t=1720465269; cv=none; b=Wq0y+pAAwwSOCOYhzJ/KUgx0ltky4G781gYT4VSBTHxAcvtpI5J6ySTW6AevnqmlQgOyfX5LOPsfmnE/8BF7ZsGeItMLGa6bDWj1PeGVHA72InRBi8N48f2aPZMfQw8NapzKdWSFzDK/+gHTvpIwl73oM93MIKm7hUlDhZ4kzhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720465189; c=relaxed/simple;
-	bh=Lf76HX7zNzWzxMJIHc/54hT1puH2WYdX7xtsOWXyEbc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=CFLgSSbRxaprZpG2F70fArkP5wJqrbzRdcjKRY8VjD4Fpjas3J1SZ8rV6HYo/0pgR4AhQdlbA19nd7kr7EcelCbO4H+I7QP8QebT0BvNR2YjOIp3MAjiJpIpJPSy2tRC7/ueiKCrDEK951UcYSTu0iA+T0Q0B9C1B8ftXfjguhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2Hr0sAXD; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-71cdcb122e8so3729389a12.2
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 11:59:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720465187; x=1721069987; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vf2NY6EWfiw7dDAJ0gi5MeJq2TdsJcdWnkBzZ7gEIG0=;
-        b=2Hr0sAXDLa1rEkOY2/1nTGvp4lB8FPnpuZXjtaTVM+jptSBkltnUjlxZgIE2OpWnr7
-         L+dY2XOPFpEc2m8Hlw9L4CMu0kjLeyUJyjOXozSxsc15No+ju7br1qfh61Pe42MmlYDz
-         Csq3Ka1qpfNQjTtc8TQEbFBI2lKWa/KvPfAk/rINZGQ9axhHdtOQC9O/n2Jz3SbwdcP8
-         ctVJbx/o0fJ/U3IrXyQkqi99F0Q/Iu65zxp5hi+JLpZy1o7SiNIbo5afOwc2YKuk6uBl
-         wo1d8twN5+aahCwy0iFLF6qKUOc0AA7L+ltgZaYIpDqU1FpdF1rI2EHnoPaq09+w27qj
-         4slg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720465187; x=1721069987;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vf2NY6EWfiw7dDAJ0gi5MeJq2TdsJcdWnkBzZ7gEIG0=;
-        b=r1J62bZgb+eREMisQ1lJ1lQwp0gnPbWZWVQ8kOKM7D9QSHWGxJmjpfdXSaQZAcX2hH
-         ig2/ULnehyH2VawoW2dR56qW0Sejwo8YZGjZJNwwSADpmenIFhbr8ZvJomPPbwg9x/hH
-         wLsvzfuueJ/jCW/iciYj0k+pgv+Z43RWxdvh4is2ZSGMyXm3ONBvvBsPAbkMg7dy/jdl
-         LWf+mp5eJuMjfEaz7l6pNAIx2VDn63MqEYi6yYDDXCi1xr8sYWDUTDyfUL7DBLv5PcaP
-         7DJJHdacN1yECVpcnhx6VXK2Mhda/ReL1B7IKGKCOofFLjE1LLsVEkh2uGGH6qnuWt8w
-         0StQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDhN4yYcIAWrFHhuqiYrAvwETHoXNOk7kin1BMfVatZ0Gdy7v7eLLkts+boAGO973YoOqQsnes9TFsL71Hp+uhukvb
-X-Gm-Message-State: AOJu0YzPE41d7+8e27acjd+/gZMzy5mqO5jpFk3bOHqDYxxxZsUh5lk8
-	pl6GD4SOb3MnhwCan4GM0M9ws3yVmsJ3diDjQea+e62jmwGGrOUIqSghtW+23epvv8E52OtR3IE
-	VUg==
-X-Google-Smtp-Source: AGHT+IFy7VBZpllFczGeS7Y5SrEIWga1z74oQWwOWI/dmQSRdFd6yYJv4SglQCCFGVWWOkPpvAmxoF+Z0C0=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:713:b0:6e4:e7a1:d18 with SMTP id
- 41be03b00d2f7-77db6c05b45mr600a12.6.1720465186914; Mon, 08 Jul 2024 11:59:46
- -0700 (PDT)
-Date: Mon, 8 Jul 2024 11:59:45 -0700
-In-Reply-To: <DS7PR12MB57665C3E8A7F0AF59E034B3C94D32@DS7PR12MB5766.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1720465269; c=relaxed/simple;
+	bh=ZYwHIigIhSCIMsMfoGRMJkJk1tF8c24wZcbHSusq7ao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G+MBhMeFVohcAZpHoaSWWk9tRjMVdXzOJtEEyL6P/gAiZkt7DN6JbG3P8ZG/NAUiTSn+5KfsMfgKFEbYWC/y+coI6kfoAeoPPfBLskMH9YXysCZhjkaz9VDBa75hS+tv1yu/QsBu5q8N05wX7HQFJEgSZuO3wsGkoZjeZng5mdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=IzjJXRwx; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=XGGpiGEn99M1OyeTkZzsgnB6kBfceyDYhXGtdp6H+LU=; b=IzjJXRwxcCU8iVPQpEtfBZ9ZSL
+	UZB/QcbD4oWaRg9SaqqBXc7UsGT8dZTU4Nd9/SVUYmkhw1gOiXPC+WeKskETHk906vqsclC0AlP2v
+	I6+2pQvOThD6jUArmHxfmbGacwlH8SdLYQxI3cIlRgD9xtvQV5u/N4U2ZkjWrsNa+/Uc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1sQtba-0024I0-IB; Mon, 08 Jul 2024 21:00:54 +0200
+Date: Mon, 8 Jul 2024 21:00:54 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Cindy Lu <lulu@redhat.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com,
+	parav@nvidia.com, sgarzare@redhat.com, netdev@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] vdpa/mlx5: Add the support of set mac address
+Message-ID: <b680300d-d18d-45b8-848f-85824332c7ca@lunn.ch>
+References: <20240708065549.89422-1-lulu@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240626073719.5246-1-amit@kernel.org> <Zn7gK9KZKxBwgVc_@google.com>
- <CALMp9eSfZsGTngMSaWbFrdvMoWHyVK_SWf9W1Ps4BFdwAzae_g@mail.gmail.com>
- <52d965101127167388565ed1520e1f06d8492d3b.camel@kernel.org> <DS7PR12MB57665C3E8A7F0AF59E034B3C94D32@DS7PR12MB5766.namprd12.prod.outlook.com>
-Message-ID: <Zow3IddrQoCTgzVS@google.com>
-Subject: Re: [PATCH v2] KVM: SVM: let alternatives handle the cases when RSB
- filling is required
-From: Sean Christopherson <seanjc@google.com>
-To: David Kaplan <David.Kaplan@amd.com>
-Cc: Amit Shah <amit@kernel.org>, Jim Mattson <jmattson@google.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "hpa@zytor.com" <hpa@zytor.com>, 
-	Kim Phillips <kim.phillips@amd.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240708065549.89422-1-lulu@redhat.com>
 
-On Mon, Jul 01, 2024, David Kaplan wrote:
-> > > >        /*
-> > > >         * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the
-> > > > Intel feature
-> > > >         * flag and protect from vendor-specific bugs via the
-> > > > whitelist.
-> > > >         *
-> > > >         * Don't use AutoIBRS when SNP is enabled because it degrades
-> > > > host
-> > > >         * userspace indirect branch performance.
-> > > >         */
-> > > >        if ((x86_arch_cap_msr & ARCH_CAP_IBRS_ALL) ||
-> > > >            (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
-> > > >             !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
-> > > >                setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
-> > > >                if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB)
-> > > > &&
-> > > >                    !(x86_arch_cap_msr & ARCH_CAP_PBRSB_NO))
-> > > >                        setup_force_cpu_bug(X86_BUG_EIBRS_PBRSB);
-> > > >        }
-> > >
-> > > Families 0FH through 12H don't have EIBRS or AutoIBRS, so there's no
-> > > cpu_vuln_whitelist[] lookup. Hence, no need to set the NO_EIBRS_PBRSB
-> > > bit, even if it is accurate.
-> >
-> > The commit that adds the RSB_VMEXIT_LITE feature flag does describe the
-> > bug in a good amount of detail:
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?i
-> > d=2b1299322016731d56807aa49254a5ea3080b6b3
-> >
-> > I've not seen any indication this is required for AMD CPUs.
-> >
-> > David, do you agree we don't need this?
-> >
+On Mon, Jul 08, 2024 at 02:55:49PM +0800, Cindy Lu wrote:
+> Add the function to support setting the MAC address.
+> For vdpa/mlx5, the function will use mlx5_mpfs_add_mac
+> to set the mac address
 > 
-> It's not required, as AMD CPUs don't have the PBRSB issue with AutoIBRS.
-> Although I think Sean was talking about being extra paranoid
+> Tested in ConnectX-6 Dx device
+> 
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  drivers/vdpa/mlx5/net/mlx5_vnet.c | 23 +++++++++++++++++++++++
+>  1 file changed, 23 insertions(+)
+> 
+> diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> index 26ba7da6b410..f78701386690 100644
+> --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> @@ -3616,10 +3616,33 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_dev *v_mdev, struct vdpa_device *
+>  	destroy_workqueue(wq);
+>  	mgtdev->ndev = NULL;
+>  }
+> +static int mlx5_vdpa_set_attr_mac(struct vdpa_mgmt_dev *v_mdev,
+> +				  struct vdpa_device *dev,
+> +				  const struct vdpa_dev_set_config *add_config)
+> +{
+> +	struct mlx5_vdpa_dev *mvdev = to_mvdev(dev);
+> +	struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
+> +	struct mlx5_core_dev *mdev = mvdev->mdev;
+> +	struct virtio_net_config *config = &ndev->config;
+> +	int err;
+> +	struct mlx5_core_dev *pfmdev;
+> +
+> +	if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
+> +		if (!is_zero_ether_addr(add_config->net.mac)) {
 
-Ya.  I'm asking if there's a reason not to tack on X86_FEATURE_RSB_VMEXIT_LITE,
-beyond it effectively being dead code.  There's no runtime cost, and so assuming
-it doesn't get spuriously enabled, I don't see a downside.
+Is the core happy to call into the driver without validating the MAC
+address? Will the core pass the broadcast address? That is not
+zero. Or a multicast address? Should every driver repeat the same
+validation, and probably get it just as wrong?
 
-On the upside, if some SVM-capable CPU comes along that needs the lite version,
-then fixing things for that CPU won't need a corresponding KVM change, just a
-bugs/caps update.
+    Andrew
+
+---
+pw-bot: cr
 
