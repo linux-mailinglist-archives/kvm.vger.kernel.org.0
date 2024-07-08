@@ -1,499 +1,582 @@
-Return-Path: <kvm+bounces-21076-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21077-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E627929A7B
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 03:16:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B96C929BD6
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 07:56:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81E9D1C20B57
-	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 01:16:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F31D7281482
+	for <lists+kvm@lfdr.de>; Mon,  8 Jul 2024 05:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AB411879;
-	Mon,  8 Jul 2024 01:16:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C23711720;
+	Mon,  8 Jul 2024 05:56:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZC3Q3kjA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EC9D386;
-	Mon,  8 Jul 2024 01:16:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAA5171C2;
+	Mon,  8 Jul 2024 05:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720401380; cv=none; b=AhR8BUuJJ1QH+d/aqnyKJ2fWPYtxEvxU3jrw331I6hykf3UmqAW4CyVws3sMDrFiMBka5Ph8kCGoAxW9CigiA6xVaskpiVxP+GR9E91bPedLVfNT0NFSCYxUx8HYnulSFhYOSbFfWKj/1y65VBw9xXJJhs8lT1EpzuyuKnMoeFw=
+	t=1720418167; cv=none; b=pkZ2ueirAiQRCzn4cjhwTRXbYcuut1I6NjSuco+c0Dce5un+D+l+XDXBBOQpOrEhqIgWg0SBxYZmd2f0o9L71VYAnRAKcip+GB9eAlTe7rzEFwps8r4VoYwULYtukkUwcMHi0sqnMGhKlKYT133soglVB5IqzZoCuy/NKY+0X5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720401380; c=relaxed/simple;
-	bh=YxGKNOt+bYKwtB8aSr+XryXqvFkmAo8egk8yltaeaJ4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=TImvPcDALg13WAvhWVUN/9t1sYHJSXoJUuF/cfg8ydiKg+ksTOc/IWESaW5InH0XvDkvLw7G051c2LURiKZv73PdDQZ8tw8lv54ZSOpmPz4MebphRiimeeE02GC2irY2vE6dKd4U0gBrWATA4UT3llDNCBCTPz3D88FMb/45tgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Cx7+vYPYtm1d8BAA--.5578S3;
-	Mon, 08 Jul 2024 09:16:08 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxqsbUPYtm7wk_AA--.13719S3;
-	Mon, 08 Jul 2024 09:16:06 +0800 (CST)
-Subject: Re: [PATCH v4 1/2] LoongArch: KVM: Add steal time support in kvm side
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>, Juergen Gross <jgross@suse.com>,
- kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, x86@kernel.org, virtualization@lists.linux.dev
-References: <20240524073812.731032-1-maobibo@loongson.cn>
- <20240524073812.731032-2-maobibo@loongson.cn>
- <CAAhV-H5G7O7tbwzyaoO4iEXuN+_xbVFJDEyv1HH7GqOH24639Q@mail.gmail.com>
- <1aa110a8-28b9-d1d0-4b39-bc894b31f26c@loongson.cn>
- <CAAhV-H5oS+KrcGH+1wJCGKCjs2VKHkWyZ5QnorPjFMuE_eBb3g@mail.gmail.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <ae21f9ef-e043-0f8c-b088-6645fc1f3c30@loongson.cn>
-Date: Mon, 8 Jul 2024 09:16:04 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1720418167; c=relaxed/simple;
+	bh=fVnw4Bj8q0usrFxXHnjxvc9swJLTMEqCRv0t650qfiw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YMdip8OB71U9hjEdshwPeIlfU8gSpcA65DDKVZaW0JBzzOJ+02U4IC6SuLq0kELCFvNdPDUx2Yx2GATa0/8P27vLroGpbP6QXOPkgyK7r8PtOqFosQri6LXaGmiUWItXLTgQq24L++Qc5tfRxYR+OxJhhEg6XKJwqvNJwSZ6TSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZC3Q3kjA; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1720418165; x=1751954165;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=fVnw4Bj8q0usrFxXHnjxvc9swJLTMEqCRv0t650qfiw=;
+  b=ZC3Q3kjA7mbff9gaCliTNmTtoTxGgjIHV8zorpoA6PReahQ6Mzr46Msj
+   VHF7Z7/cfdmTIrahUOLuTswsG4WxAjYaqoRqW6mBN2xqIl6qLBl9iNoxC
+   jS89dua0ZhmxwyHtcFVWOXnb74cxmokq2MVsIOuphvAbdghuYBhS7Qic0
+   KfdgrJI/qpf94gvgFpg+be5WPXzriFY+J/jG+1/7eT8cJAHJDpM2A7JZd
+   6QIlLybJ9E92uVeqkR5pj8MrH4UIefqFh0s8C3WmKjCHebbwbCUGxm31N
+   lw8aYkt/wlvOF10IprbGTXUWVzMPZ2jLJLvwAIHstYJ1ysZq9dw7AWUbF
+   Q==;
+X-CSE-ConnectionGUID: 3Az+pAFeSU2UYVUrgZifaA==
+X-CSE-MsgGUID: 0KzjAmtQTUO92CHfoxeqwg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11126"; a="35135580"
+X-IronPort-AV: E=Sophos;i="6.09,191,1716274800"; 
+   d="scan'208";a="35135580"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2024 22:56:04 -0700
+X-CSE-ConnectionGUID: mtRzB10PS36VYDIwUipRag==
+X-CSE-MsgGUID: b0LvFIxhTCG+EF5zYWO9LA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,191,1716274800"; 
+   d="scan'208";a="47455805"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmviesa010.fm.intel.com with ESMTP; 07 Jul 2024 22:56:00 -0700
+Date: Mon, 8 Jul 2024 13:55:59 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: Reinette Chatre <reinette.chatre@intel.com>
+Cc: Sean Christopherson <seanjc@google.com>, isaku.yamahata@intel.com,
+	pbonzini@redhat.com, erdemaktas@google.com, vkuznets@redhat.com,
+	vannapurve@google.com, jmattson@google.com, mlevitsk@redhat.com,
+	xiaoyao.li@intel.com, chao.gao@intel.com,
+	rick.p.edgecombe@intel.com, yuan.yao@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, "Hao, Xudong" <xudong.hao@intel.com>
+Subject: Re: VMX Preemption Timer appears to be buggy on SKX, CLX, and ICX
+Message-ID: <20240708055559.rl4w5xfhj3uru6j2@yy-desk-7060>
+References: <cover.1718214999.git.reinette.chatre@intel.com>
+ <2fccf35715b5ba8aec5e5708d86ad7015b8d74e6.1718214999.git.reinette.chatre@intel.com>
+ <Zn9X0yFxZi_Mrlnt@google.com>
+ <8a34f1d4-9f43-4fa7-9566-144b5eeda4d9@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H5oS+KrcGH+1wJCGKCjs2VKHkWyZ5QnorPjFMuE_eBb3g@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8CxqsbUPYtm7wk_AA--.13719S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj9fXoW3KFy7WF43Kr18GFWfXFWrWFX_yoW8Xr4fZo
-	W5AF1xtw48Gr45uF1DJ3s0q3yjv34Fkw4UA3y3Ars3XF4Uta47Ar15Gw4YqF43Wr1kGr13
-	Ca42gw40vFWfXwn5l-sFpf9Il3svdjkaLaAFLSUrUUUUbb8apTn2vfkv8UJUUUU8wcxFpf
-	9Il3svdxBIdaVrn0xqx4xG64xvF2IEw4CE5I8CrVC2j2Jv73VFW2AGmfu7bjvjm3AaLaJ3
-	UjIYCTnIWjp_UUUY27kC6x804xWl14x267AKxVWUJVW8JwAFc2x0x2IEx4CE42xK8VAvwI
-	8IcIk0rVWrJVCq3wAFIxvE14AKwVWUGVWUXwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xG
-	Y2AK021l84ACjcxK6xIIjxv20xvE14v26r1j6r1xM28EF7xvwVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UM28EF7xvwVC2z280aVAFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAF
-	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4
-	CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j1YL9U
-	UUUU=
+In-Reply-To: <8a34f1d4-9f43-4fa7-9566-144b5eeda4d9@intel.com>
+User-Agent: NeoMutt/20171215
 
+On Wed, Jul 03, 2024 at 01:14:09PM -0700, Reinette Chatre wrote:
+> Hi Sean,
+>
+> On 6/28/24 5:39 PM, Sean Christopherson wrote:
+> > Forking this off to try and avoid confusion...
+> >
+> > On Wed, Jun 12, 2024, Reinette Chatre wrote:
+>
+> ...
+>
+> > > +
+> > > +		freq = (tmict - tmcct) * tdcrs[i].divide_count * tsc_hz / (tsc1 - tsc0);
+> > > +		/* Check if measured frequency is within 1% of configured frequency. */
+> > > +		GUEST_ASSERT(freq < apic_hz * 101 / 100);
+> > > +		GUEST_ASSERT(freq > apic_hz * 99 / 100);
+> > > +	}
+> >
+> > This test fails on our SKX, CLX, and ICX systems due to what appears to be a CPU
+> > bug.  It looks like something APICv related is clobbering internal VMX timer state?
+> > Or maybe there's a tearing or truncation issue?
+>
+> It has been a few days. Just a note to let you know that we are investigating this.
+> On my side I have not yet been able to reproduce this issue. I tested
+> kvm-x86-next-2024.06.28 on an ICX and an CLX system by running 100 iterations of
+> apic_bus_clock_test and they all passed. Since I have lack of experience here there are
+> some Intel virtualization experts helping out with this investigation and I hope that
+> they will be some insights from the analysis and testing that you already provided.
+>
+> Reinette
+>
 
+I can reproduce this on my side, even with apicv disabled by
+'insmod $kernel_path/arch/x86/kvm/kvm-intel.ko enable_apicv=N'.
+@Sean I think we're observing same issue, please see the details
+below:
 
-On 2024/7/6 下午5:41, Huacai Chen wrote:
-> On Sat, Jul 6, 2024 at 2:59 PM maobibo <maobibo@loongson.cn> wrote:
->>
->> Huacai,
->>
->> On 2024/7/6 上午11:00, Huacai Chen wrote:
->>> Hi, Bibo,
->>>
->>> On Fri, May 24, 2024 at 3:38 PM Bibo Mao <maobibo@loongson.cn> wrote:
->>>>
->>>> Steal time feature is added here in kvm side, VM can search supported
->>>> features provided by KVM hypervisor, feature KVM_FEATURE_STEAL_TIME
->>>> is added here. Like x86, steal time structure is saved in guest memory,
->>>> one hypercall function KVM_HCALL_FUNC_NOTIFY is added to notify KVM to
->>>> enable the feature.
->>>>
->>>> One cpu attr ioctl command KVM_LOONGARCH_VCPU_PVTIME_CTRL is added to
->>>> save and restore base address of steal time structure when VM is migrated.
->>>>
->>>> Signed-off-by: Bibo Mao <maobibo@loongson.cn>
->>>> ---
->>>>    arch/loongarch/include/asm/kvm_host.h  |   7 ++
->>>>    arch/loongarch/include/asm/kvm_para.h  |  10 ++
->>>>    arch/loongarch/include/asm/kvm_vcpu.h  |   4 +
->>>>    arch/loongarch/include/asm/loongarch.h |   1 +
->>>>    arch/loongarch/include/uapi/asm/kvm.h  |   4 +
->>>>    arch/loongarch/kvm/Kconfig             |   1 +
->>>>    arch/loongarch/kvm/exit.c              |  38 +++++++-
->>>>    arch/loongarch/kvm/vcpu.c              | 124 +++++++++++++++++++++++++
->>>>    8 files changed, 187 insertions(+), 2 deletions(-)
->>>>
->>>> diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
->>>> index c87b6ea0ec47..2eb2f7572023 100644
->>>> --- a/arch/loongarch/include/asm/kvm_host.h
->>>> +++ b/arch/loongarch/include/asm/kvm_host.h
->>>> @@ -30,6 +30,7 @@
->>>>    #define KVM_PRIVATE_MEM_SLOTS          0
->>>>
->>>>    #define KVM_HALT_POLL_NS_DEFAULT       500000
->>>> +#define KVM_REQ_STEAL_UPDATE           KVM_ARCH_REQ(1)
->>>>
->>>>    #define KVM_GUESTDBG_SW_BP_MASK                \
->>>>           (KVM_GUESTDBG_ENABLE | KVM_GUESTDBG_USE_SW_BP)
->>>> @@ -201,6 +202,12 @@ struct kvm_vcpu_arch {
->>>>           struct kvm_mp_state mp_state;
->>>>           /* cpucfg */
->>>>           u32 cpucfg[KVM_MAX_CPUCFG_REGS];
->>>> +       /* paravirt steal time */
->>>> +       struct {
->>>> +               u64 guest_addr;
->>>> +               u64 last_steal;
->>>> +               struct gfn_to_hva_cache cache;
->>>> +       } st;
->>>>    };
->>>>
->>>>    static inline unsigned long readl_sw_gcsr(struct loongarch_csrs *csr, int reg)
->>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/include/asm/kvm_para.h
->>>> index 4ba2312e5f8c..a9ba8185d4af 100644
->>>> --- a/arch/loongarch/include/asm/kvm_para.h
->>>> +++ b/arch/loongarch/include/asm/kvm_para.h
->>>> @@ -14,6 +14,7 @@
->>>>
->>>>    #define KVM_HCALL_SERVICE              HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_SERVICE)
->>>>    #define  KVM_HCALL_FUNC_IPI            1
->>>> +#define  KVM_HCALL_FUNC_NOTIFY         2
->>>>
->>>>    #define KVM_HCALL_SWDBG                        HYPERCALL_ENCODE(HYPERVISOR_KVM, KVM_HCALL_CODE_SWDBG)
->>>>
->>>> @@ -24,6 +25,15 @@
->>>>    #define KVM_HCALL_INVALID_CODE         -1UL
->>>>    #define KVM_HCALL_INVALID_PARAMETER    -2UL
->>>>
->>>> +#define KVM_STEAL_PHYS_VALID           BIT_ULL(0)
->>>> +#define KVM_STEAL_PHYS_MASK            GENMASK_ULL(63, 6)
->>>> +struct kvm_steal_time {
->>>> +       __u64 steal;
->>>> +       __u32 version;
->>>> +       __u32 flags;
->>> I found that x86 has a preempted field here, in our internal repo the
->>> LoongArch version also has this field. Moreover,
->>> kvm_steal_time_set_preempted() and kvm_steal_time_clear_preempted()
->>> seems needed.
->> By my understanding, macro vcpu_is_preempted() is used together with pv
->> spinlock, and pv spinlock depends on pv stealtime. So I think preempted
->> flag is not part of pv stealtime, it is part of pv spinlock.
->>
->> We are going to add preempted field if pv spinlock is added.
->>>
->>>> +       __u32 pad[12];
->>>> +};
->>>> +
->>>>    /*
->>>>     * Hypercall interface for KVM hypervisor
->>>>     *
->>>> diff --git a/arch/loongarch/include/asm/kvm_vcpu.h b/arch/loongarch/include/asm/kvm_vcpu.h
->>>> index 590a92cb5416..d7e51300a89f 100644
->>>> --- a/arch/loongarch/include/asm/kvm_vcpu.h
->>>> +++ b/arch/loongarch/include/asm/kvm_vcpu.h
->>>> @@ -120,4 +120,8 @@ static inline void kvm_write_reg(struct kvm_vcpu *vcpu, int num, unsigned long v
->>>>           vcpu->arch.gprs[num] = val;
->>>>    }
->>>>
->>>> +static inline bool kvm_pvtime_supported(void)
->>>> +{
->>>> +       return !!sched_info_on();
->>>> +}
->>>>    #endif /* __ASM_LOONGARCH_KVM_VCPU_H__ */
->>>> diff --git a/arch/loongarch/include/asm/loongarch.h b/arch/loongarch/include/asm/loongarch.h
->>>> index eb09adda54b7..7a4633ef284b 100644
->>>> --- a/arch/loongarch/include/asm/loongarch.h
->>>> +++ b/arch/loongarch/include/asm/loongarch.h
->>>> @@ -169,6 +169,7 @@
->>>>    #define  KVM_SIGNATURE                 "KVM\0"
->>>>    #define CPUCFG_KVM_FEATURE             (CPUCFG_KVM_BASE + 4)
->>>>    #define  KVM_FEATURE_IPI               BIT(1)
->>>> +#define  KVM_FEATURE_STEAL_TIME                BIT(2)
->>>>
->>>>    #ifndef __ASSEMBLY__
->>>>
->>>> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
->>>> index f9abef382317..ddc5cab0ffd0 100644
->>>> --- a/arch/loongarch/include/uapi/asm/kvm.h
->>>> +++ b/arch/loongarch/include/uapi/asm/kvm.h
->>>> @@ -81,7 +81,11 @@ struct kvm_fpu {
->>>>    #define LOONGARCH_REG_64(TYPE, REG)    (TYPE | KVM_REG_SIZE_U64 | (REG << LOONGARCH_REG_SHIFT))
->>>>    #define KVM_IOC_CSRID(REG)             LOONGARCH_REG_64(KVM_REG_LOONGARCH_CSR, REG)
->>>>    #define KVM_IOC_CPUCFG(REG)            LOONGARCH_REG_64(KVM_REG_LOONGARCH_CPUCFG, REG)
->>>> +
->>>> +/* Device Control API on vcpu fd */
->>>>    #define KVM_LOONGARCH_VCPU_CPUCFG      0
->>>> +#define KVM_LOONGARCH_VCPU_PVTIME_CTRL 1
->>>> +#define  KVM_LOONGARCH_VCPU_PVTIME_GPA 0
->>>>
->>>>    struct kvm_debug_exit_arch {
->>>>    };
->>>> diff --git a/arch/loongarch/kvm/Kconfig b/arch/loongarch/kvm/Kconfig
->>>> index c4ef2b4d9797..248744b4d086 100644
->>>> --- a/arch/loongarch/kvm/Kconfig
->>>> +++ b/arch/loongarch/kvm/Kconfig
->>>> @@ -29,6 +29,7 @@ config KVM
->>>>           select KVM_MMIO
->>>>           select HAVE_KVM_READONLY_MEM
->>>>           select KVM_XFER_TO_GUEST_WORK
->>>> +       select SCHED_INFO
->>>>           help
->>>>             Support hosting virtualized guest machines using
->>>>             hardware virtualization extensions. You will need
->>>> diff --git a/arch/loongarch/kvm/exit.c b/arch/loongarch/kvm/exit.c
->>>> index c86e099af5ca..e2abd97fb13f 100644
->>>> --- a/arch/loongarch/kvm/exit.c
->>>> +++ b/arch/loongarch/kvm/exit.c
->>>> @@ -24,7 +24,7 @@
->>>>    static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst inst)
->>>>    {
->>>>           int rd, rj;
->>>> -       unsigned int index;
->>>> +       unsigned int index, ret;
->>>>
->>>>           if (inst.reg2_format.opcode != cpucfg_op)
->>>>                   return EMULATE_FAIL;
->>>> @@ -50,7 +50,10 @@ static int kvm_emu_cpucfg(struct kvm_vcpu *vcpu, larch_inst inst)
->>>>                   vcpu->arch.gprs[rd] = *(unsigned int *)KVM_SIGNATURE;
->>>>                   break;
->>>>           case CPUCFG_KVM_FEATURE:
->>>> -               vcpu->arch.gprs[rd] = KVM_FEATURE_IPI;
->>>> +               ret = KVM_FEATURE_IPI;
->>>> +               if (sched_info_on())
->>> What about replacing it with your helper function kvm_pvtime_supported()?
->> Sure, will replace it with helper function kvm_pvtime_supported().
-> If you are sure this is the only issue, then needn't submit a new version.
-OK, thanks.
+apic_bus_clock_test can't reproduce this may because the
+preemption timer value calculation relies on apic bus
+frequency/TMICT/Divide count/host TSC frequency and ratio
+between preemption timer and host TSC frequency, too many
+factors to generate the 'magic' value there. So I changed
+KVM and added a small KVM kselftest tool to set the
+preemption timer value directly from guest, this makes the
+reproducing easily. The changes are attached at end of this
+comment.
 
-By searching orginal submit of vcpu_is_preempt(), it can be located at
-https://lore.kernel.org/lkml/1477642287-24104-1-git-send-email-xinhui.pan@linux.vnet.ibm.com/
+The trace I captured below came form host with 1.7GHz TSC,
+the VM_EXIT_SAVE_VMX_PREEMPTION_TIMER is enabled to get the
+cpu saved vmcs.VMX_PREEMPTION_TIMER_VALUE after VMEXIT. I
+set the vmcs.VMX_PREEMPTION_TIMER_VALUE to 0x880042ad which
+is the 'magic' number on this 1.7Ghz TSC machine:
 
-It is separated one, only that is depends on pv-spinlock and 
-pv-stealtime. And there is no capability indicator for guest kernel, it 
-is enabled by default.
+preempt_test  20677.199521: kvm:kvm_vmx_debug: kvm_vmx_debug: 3, a0:0x77fd5554 a1:0x880042ad a2:0x880042ad a3:0x20462e98d9b9
+  a0: The previous vmcs.VMX_PREEMPTION_TIMER_VALUE value
+      saved by CPU when VMEXIT.
+  a1: The new preemption timer value wrote to
+      vmcs.VMX_PREEMPTION_TIMER_VALUE.
+  a2: The value read back from
+      vmcs.VMX_PREEMPTION_TIMER_VALUE, for double confirmation.
+  a3: The host tsc at the time point, debug only.
 
-Regards
-Bibo Mao
+preempt_test  20677.199579:      kvm:kvm_exit: reason PREEMPTION_TIMER rip 0x40274d info 0 0 intr 0
 
-> 
-> Huacai
-> 
->>
->> Regards
->> Bibo Mao
->>>
->>> Huacai
->>>
->>>> +                       ret |= KVM_FEATURE_STEAL_TIME;
->>>> +               vcpu->arch.gprs[rd] = ret;
->>>>                   break;
->>>>           default:
->>>>                   vcpu->arch.gprs[rd] = 0;
->>>> @@ -687,6 +690,34 @@ static int kvm_handle_fpu_disabled(struct kvm_vcpu *vcpu)
->>>>           return RESUME_GUEST;
->>>>    }
->>>>
->>>> +static long kvm_save_notify(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +       unsigned long id, data;
->>>> +
->>>> +       id   = kvm_read_reg(vcpu, LOONGARCH_GPR_A1);
->>>> +       data = kvm_read_reg(vcpu, LOONGARCH_GPR_A2);
->>>> +       switch (id) {
->>>> +       case KVM_FEATURE_STEAL_TIME:
->>>> +               if (!kvm_pvtime_supported())
->>>> +                       return KVM_HCALL_INVALID_CODE;
->>>> +
->>>> +               if (data & ~(KVM_STEAL_PHYS_MASK | KVM_STEAL_PHYS_VALID))
->>>> +                       return KVM_HCALL_INVALID_PARAMETER;
->>>> +
->>>> +               vcpu->arch.st.guest_addr = data;
->>>> +               if (!(data & KVM_STEAL_PHYS_VALID))
->>>> +                       break;
->>>> +
->>>> +               vcpu->arch.st.last_steal = current->sched_info.run_delay;
->>>> +               kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
->>>> +               break;
->>>> +       default:
->>>> +               break;
->>>> +       };
->>>> +
->>>> +       return 0;
->>>> +};
->>>> +
->>>>    /*
->>>>     * kvm_handle_lsx_disabled() - Guest used LSX while disabled in root.
->>>>     * @vcpu:      Virtual CPU context.
->>>> @@ -758,6 +789,9 @@ static void kvm_handle_service(struct kvm_vcpu *vcpu)
->>>>                   kvm_send_pv_ipi(vcpu);
->>>>                   ret = KVM_HCALL_SUCCESS;
->>>>                   break;
->>>> +       case KVM_HCALL_FUNC_NOTIFY:
->>>> +               ret = kvm_save_notify(vcpu);
->>>> +               break;
->>>>           default:
->>>>                   ret = KVM_HCALL_INVALID_CODE;
->>>>                   break;
->>>> diff --git a/arch/loongarch/kvm/vcpu.c b/arch/loongarch/kvm/vcpu.c
->>>> index 9e8030d45129..382796f1d3e6 100644
->>>> --- a/arch/loongarch/kvm/vcpu.c
->>>> +++ b/arch/loongarch/kvm/vcpu.c
->>>> @@ -31,6 +31,117 @@ const struct kvm_stats_header kvm_vcpu_stats_header = {
->>>>                          sizeof(kvm_vcpu_stats_desc),
->>>>    };
->>>>
->>>> +static void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
->>>> +{
->>>> +       struct kvm_steal_time __user *st;
->>>> +       struct gfn_to_hva_cache *ghc;
->>>> +       struct kvm_memslots *slots;
->>>> +       gpa_t gpa;
->>>> +       u64 steal;
->>>> +       u32 version;
->>>> +
->>>> +       ghc = &vcpu->arch.st.cache;
->>>> +       gpa = vcpu->arch.st.guest_addr;
->>>> +       if (!(gpa & KVM_STEAL_PHYS_VALID))
->>>> +               return;
->>>> +
->>>> +       gpa &= KVM_STEAL_PHYS_MASK;
->>>> +       slots = kvm_memslots(vcpu->kvm);
->>>> +       if (slots->generation != ghc->generation || gpa != ghc->gpa) {
->>>> +               if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gpa,
->>>> +                                       sizeof(*st))) {
->>>> +                       ghc->gpa = INVALID_GPA;
->>>> +                       return;
->>>> +               }
->>>> +       }
->>>> +
->>>> +       st = (struct kvm_steal_time __user *)ghc->hva;
->>>> +       unsafe_get_user(version, &st->version, out);
->>>> +       if (version & 1)
->>>> +               version += 1;
->>>> +       version += 1;
->>>> +       unsafe_put_user(version, &st->version, out);
->>>> +       smp_wmb();
->>>> +
->>>> +       unsafe_get_user(steal, &st->steal, out);
->>>> +       steal += current->sched_info.run_delay -
->>>> +               vcpu->arch.st.last_steal;
->>>> +       vcpu->arch.st.last_steal = current->sched_info.run_delay;
->>>> +       unsafe_put_user(steal, &st->steal, out);
->>>> +
->>>> +       smp_wmb();
->>>> +       version += 1;
->>>> +       unsafe_put_user(version, &st->version, out);
->>>> +out:
->>>> +       mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
->>>> +}
->>>> +
->>>> +static int kvm_loongarch_pvtime_has_attr(struct kvm_vcpu *vcpu,
->>>> +                                       struct kvm_device_attr *attr)
->>>> +{
->>>> +       if (!kvm_pvtime_supported() ||
->>>> +                       attr->attr != KVM_LOONGARCH_VCPU_PVTIME_GPA)
->>>> +               return -ENXIO;
->>>> +
->>>> +       return 0;
->>>> +}
->>>> +
->>>> +static int kvm_loongarch_pvtime_get_attr(struct kvm_vcpu *vcpu,
->>>> +                                       struct kvm_device_attr *attr)
->>>> +{
->>>> +       u64 __user *user = (u64 __user *)attr->addr;
->>>> +       u64 gpa;
->>>> +
->>>> +       if (!kvm_pvtime_supported() ||
->>>> +                       attr->attr != KVM_LOONGARCH_VCPU_PVTIME_GPA)
->>>> +               return -ENXIO;
->>>> +
->>>> +       gpa = vcpu->arch.st.guest_addr;
->>>> +       if (put_user(gpa, user))
->>>> +               return -EFAULT;
->>>> +
->>>> +       return 0;
->>>> +}
->>>> +
->>>> +static int kvm_loongarch_pvtime_set_attr(struct kvm_vcpu *vcpu,
->>>> +                                       struct kvm_device_attr *attr)
->>>> +{
->>>> +       u64 __user *user = (u64 __user *)attr->addr;
->>>> +       struct kvm *kvm = vcpu->kvm;
->>>> +       u64 gpa;
->>>> +       int ret = 0;
->>>> +       int idx;
->>>> +
->>>> +       if (!kvm_pvtime_supported() ||
->>>> +                       attr->attr != KVM_LOONGARCH_VCPU_PVTIME_GPA)
->>>> +               return -ENXIO;
->>>> +
->>>> +       if (get_user(gpa, user))
->>>> +               return -EFAULT;
->>>> +
->>>> +       if (gpa & ~(KVM_STEAL_PHYS_MASK | KVM_STEAL_PHYS_VALID))
->>>> +               return -EINVAL;
->>>> +
->>>> +       if (!(gpa & KVM_STEAL_PHYS_VALID)) {
->>>> +               vcpu->arch.st.guest_addr = gpa;
->>>> +               return 0;
->>>> +       }
->>>> +
->>>> +       /* Check the address is in a valid memslot */
->>>> +       idx = srcu_read_lock(&kvm->srcu);
->>>> +       if (kvm_is_error_hva(gfn_to_hva(kvm, gpa >> PAGE_SHIFT)))
->>>> +               ret = -EINVAL;
->>>> +       srcu_read_unlock(&kvm->srcu, idx);
->>>> +
->>>> +       if (!ret) {
->>>> +               vcpu->arch.st.guest_addr = gpa;
->>>> +               vcpu->arch.st.last_steal = current->sched_info.run_delay;
->>>> +               kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
->>>> +       }
->>>> +
->>>> +       return ret;
->>>> +}
->>>> +
->>>>    /*
->>>>     * kvm_check_requests - check and handle pending vCPU requests
->>>>     *
->>>> @@ -48,6 +159,9 @@ static int kvm_check_requests(struct kvm_vcpu *vcpu)
->>>>           if (kvm_dirty_ring_check_request(vcpu))
->>>>                   return RESUME_HOST;
->>>>
->>>> +       if (kvm_check_request(KVM_REQ_STEAL_UPDATE, vcpu))
->>>> +               kvm_update_stolen_time(vcpu);
->>>> +
->>>>           return RESUME_GUEST;
->>>>    }
->>>>
->>>> @@ -671,6 +785,9 @@ static int kvm_loongarch_vcpu_has_attr(struct kvm_vcpu *vcpu,
->>>>           case KVM_LOONGARCH_VCPU_CPUCFG:
->>>>                   ret = kvm_loongarch_cpucfg_has_attr(vcpu, attr);
->>>>                   break;
->>>> +       case KVM_LOONGARCH_VCPU_PVTIME_CTRL:
->>>> +               ret = kvm_loongarch_pvtime_has_attr(vcpu, attr);
->>>> +               break;
->>>>           default:
->>>>                   break;
->>>>           }
->>>> @@ -703,6 +820,9 @@ static int kvm_loongarch_vcpu_get_attr(struct kvm_vcpu *vcpu,
->>>>           case KVM_LOONGARCH_VCPU_CPUCFG:
->>>>                   ret = kvm_loongarch_get_cpucfg_attr(vcpu, attr);
->>>>                   break;
->>>> +       case KVM_LOONGARCH_VCPU_PVTIME_CTRL:
->>>> +               ret = kvm_loongarch_pvtime_get_attr(vcpu, attr);
->>>> +               break;
->>>>           default:
->>>>                   break;
->>>>           }
->>>> @@ -725,6 +845,9 @@ static int kvm_loongarch_vcpu_set_attr(struct kvm_vcpu *vcpu,
->>>>           case KVM_LOONGARCH_VCPU_CPUCFG:
->>>>                   ret = kvm_loongarch_cpucfg_set_attr(vcpu, attr);
->>>>                   break;
->>>> +       case KVM_LOONGARCH_VCPU_PVTIME_CTRL:
->>>> +               ret = kvm_loongarch_pvtime_set_attr(vcpu, attr);
->>>> +               break;
->>>>           default:
->>>>                   break;
->>>>           }
->>>> @@ -1084,6 +1207,7 @@ static int _kvm_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
->>>>
->>>>           /* Control guest page CCA attribute */
->>>>           change_csr_gcfg(CSR_GCFG_MATC_MASK, CSR_GCFG_MATC_ROOT);
->>>> +       kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
->>>>
->>>>           /* Don't bother restoring registers multiple times unless necessary */
->>>>           if (vcpu->arch.aux_inuse & KVM_LARCH_HWCSR_USABLE)
->>>> --
->>>> 2.39.3
->>>>
->>
+preempt_test  20677.199579: kvm:kvm_vmx_debug: kvm_vmx_debug: 2, a0:0x34 a1:0x0 a2:0x87fea9b0 a3:0x20462e9a5749
+  a0: The VMEXIT reason, 0x34 is preemption timer VMEXIT.
+  a1: The read back vmcs.VMX_PREEMPTION_TIMER_VALUE value, here 0.
+  a2: The next preemption timer value should be written to
+      vmcs, calculates from the (target tsc - current tsc) >>
+      7. Now the preemption timer vmexit happend only after
+      ~58 microseconds elapsed, it should happen after
+      ~171.79 seconds but not such soon, the issue is
+      reproduced.
 
+Another more easy way to observe this symptom w/o care the
+'magic' preemption timer vlaue is use the maximum preemption
+timer value 0xffffffff, below log w/ 0xffffffff is captured
+from same machine:
+
+preempt_test 20530.456589: kvm:kvm_vmx_debug: kvm_vmx_debug: 3, a0:0x77fd5551 a1:0xffffffff a2:0xffffffff a3:0x200c1971ca5d
+
+  a0: The previous vmcs.VMX_PREEMPTION_TIMER_VALUE value
+      saved by CPU when VMEXIT.
+  a1: The new preemption timer value wrote to
+      vmcs.VMX_PREEMPTION_TIMER_VALUE.
+  a2: The read back value from
+      vmcs.VMX_PREEMPTION_TIMER_VALUE, double confirmation.
+  a3: the host tsc at the time point, debug only.
+
+preempt_test 20530.456690:      kvm:kvm_exit: reason VMCALL rip 0x4131a0 info 0 0 intr 0
+  The preempt_test checks preemption timer state every
+  100us, this VMEXIT is expected behavior.
+
+preempt_test 20530.456691:     kvm:kvm_entry: vcpu 0, rip 0x4131a3
+
+preempt_test 20530.456691: kvm:kvm_vmx_debug: kvm_vmx_debug: 3, a0:0x77ff82cc a1:0xfffe900b a2:0xfffe900b a3:0x200c19746d45
+  a0: The previous vmcs.VMX_PREEMPTION_TIMER_VALUE value
+      saved by CPU when VMEXIT. The difference value
+      shouldn't be such huge number 0xffffffff - 0x77ff82cc
+      = 0x88007D33 when just ~100us elapsed from previous
+      VMENTRY, the issue is reproduced.
+
+Use 0x88000000 as preemption timer value to verify this
+preempt_test tool, the preemption timer VMEXIT happend after
+~171.45 seconds which is expected behavior on the host
+1.7Ghz TSC system:
+
+The preemption timer VMEXIT should happen after:
+2281701376 × 128 / 1700000000 = 171.79 seconds.
+
+Attached my changes in KVM and kselftest tool for
+reproducing here, based on:
+https://github.com/kvm-x86/linux.git
+tag:kvm-x86-next-2024.06.28
+
+Patch 01:
+
+From a977bf12a8cd1bbe401e68d3702c0b5aa3bf66e4 Mon Sep 17 00:00:00 2001
+From: Yao Yuan <yuan.yao@intel.com>
+Date: Thu, 4 Jul 2024 09:59:55 +0800
+Subject: [PATCH 1/2] KVM: x86: Introudce trace_kvm_vmx_debug()
+
+debug only common trace.
+
+Signed-off-by: Yao Yuan <yuan.yao@intel.com>
+---
+ arch/x86/kvm/trace.h | 28 ++++++++++++++++++++++++++++
+ arch/x86/kvm/x86.c   |  1 +
+ 2 files changed, 29 insertions(+)
+
+diff --git a/arch/x86/kvm/trace.h b/arch/x86/kvm/trace.h
+index d3aeffd6ae75..7b9eb23d71d3 100644
+--- a/arch/x86/kvm/trace.h
++++ b/arch/x86/kvm/trace.h
+@@ -34,6 +34,34 @@ TRACE_EVENT(kvm_entry,
+ 		  __entry->immediate_exit ? "[immediate exit]" : "")
+ );
+
++TRACE_EVENT(kvm_vmx_debug,
++	    TP_PROTO(unsigned long n, unsigned long a0,
++		     unsigned long a1,
++		     unsigned long a2,
++		     unsigned long a3),
++	    TP_ARGS(n, a0, a1, a2, a3),
++
++	TP_STRUCT__entry(
++		 __field(	unsigned long,	n		)
++		__field(	unsigned long,	a0		)
++		__field(	unsigned long,	a1		)
++		__field(	unsigned long,	a2		)
++		__field(	unsigned long,	a3		)
++	),
++
++	TP_fast_assign(
++		__entry->n      = n;
++		__entry->a0		= a0;
++		__entry->a1		= a1;
++		__entry->a2		= a2;
++		__entry->a3		= a3;
++	),
++
++	TP_printk("kvm_vmx_debug: %ld, a0:0x%lx a1:0x%lx a2:0x%lx a3:0x%lx",
++		  __entry->n, __entry->a0, __entry->a1, __entry->a2, __entry->a3)
++);
++
++
+ /*
+  * Tracepoint for hypercall.
+  */
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 994743266480..6d1972d6c988 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -14036,6 +14036,7 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_exit);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_enter);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmgexit_msr_protocol_exit);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_rmp_fault);
++EXPORT_TRACEPOINT_SYMBOL_GPL(kvm_vmx_debug);
+
+ static int __init kvm_x86_init(void)
+ {
+--
+2.27.0
+
+Patch 02:
+
+From a3bdce4f2f93810372f6068396776ac702946d16 Mon Sep 17 00:00:00 2001
+From: Yao Yuan <yuan.yao@intel.com>
+Date: Wed, 3 Jul 2024 14:08:02 +0800
+Subject: [PATCH 2/2] [DEBUG] preempt timer debug test
+
+A specific kselftesting based program to allow set the VMX
+preempt timer value from VM directly.
+
+Introduce 2 hypercall 0x56780001/2, 01 to set the preempt
+timer value, 02 to wait for the preemption time expired.
+
+Usage:
+Reload kvm applied this change, then:
+$KRNEL_SRC_ROOT/tools/testing/selftests/kvm/x86_64/preempt_test -p 'preempt_timer_vale'
+
+'preempt_timer_vale' is the preempt timer value in DEC format, HEX is not supported.
+
+For example:
+
+perf record -e "kvm:*" tools/testing/selftests/kvm/x86_64/preempt_test -p 2281718445
+
+Above set the preempt value to 2281718445(0x880042AD) and
+capture the trace, then check the kvm_vmx_debug in the trace
+to know the preempt timer behavior.
+
+Signed-off-by: Yao Yuan <yuan.yao@intel.com>
+---
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ arch/x86/kvm/vmx/vmx.h                        |   5 +
+ arch/x86/kvm/vmx/vmx.c                        | 113 +++++++++++++++++-
+ .../selftests/kvm/x86_64/preempt_test.c       |  82 +++++++++++++
+ 4 files changed, 198 insertions(+), 3 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/preempt_test.c
+
+diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+index ad8b5d15f2bd..957509957f80 100644
+--- a/tools/testing/selftests/kvm/Makefile
++++ b/tools/testing/selftests/kvm/Makefile
+@@ -129,6 +129,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/amx_test
+ TEST_GEN_PROGS_x86_64 += x86_64/max_vcpuid_cap_test
+ TEST_GEN_PROGS_x86_64 += x86_64/triple_fault_event_test
+ TEST_GEN_PROGS_x86_64 += x86_64/recalc_apic_map_test
++TEST_GEN_PROGS_x86_64 += x86_64/preempt_test
+ TEST_GEN_PROGS_x86_64 += access_tracking_perf_test
+ TEST_GEN_PROGS_x86_64 += demand_paging_test
+ TEST_GEN_PROGS_x86_64 += dirty_log_test
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 42498fa63abb..82ea0ccc7a63 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -368,6 +368,11 @@ struct vcpu_vmx {
+
+ 	/* ve_info must be page aligned. */
+ 	struct vmx_ve_information *ve_info;
++
++	volatile bool debug_timer;
++	bool debug_timer_set_to_hardware;
++	u32 debug_timer_val;
++	u64 debug_timer_deadline_tsc;
+ };
+
+ struct kvm_vmx {
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index f18c2d8c7476..73f084c29f9a 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -4431,8 +4431,9 @@ static u32 vmx_vmexit_ctrl(void)
+ 	 * Not used by KVM and never set in vmcs01 or vmcs02, but emulated for
+ 	 * nested virtualization and thus allowed to be set in vmcs12.
+ 	 */
+-	vmexit_ctrl &= ~(VM_EXIT_SAVE_IA32_PAT | VM_EXIT_SAVE_IA32_EFER |
+-			 VM_EXIT_SAVE_VMX_PREEMPTION_TIMER);
++	vmexit_ctrl &= ~(VM_EXIT_SAVE_IA32_PAT | VM_EXIT_SAVE_IA32_EFER);
++	pr_info("Set VM_EXIT_SAVE_VMX_PREEMPTION_TIMER forcedly for preempt timer debug\n");
++
+
+ 	if (vmx_pt_mode_is_system())
+ 		vmexit_ctrl &= ~(VM_EXIT_PT_CONCEAL_PIP |
+@@ -5993,11 +5994,41 @@ static int handle_pml_full(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+
++static fastpath_t handle_fastpath_debug_timer(struct kvm_vcpu *vcpu,
++					      bool force_immediate_exit)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++	u64 tscl;
++	u32 delta;
++
++	tscl = rdtsc();
++
++	if (vmx->debug_timer_deadline_tsc > tscl)
++		delta = (u32)((vmx->debug_timer_deadline_tsc - tscl) >>
++			      cpu_preemption_timer_multi);
++	else
++		delta = 0;
++
++	trace_kvm_vmx_debug(2UL,
++			    (unsigned long)vmcs_read32(VM_EXIT_REASON),
++			    (unsigned long)vmcs_read32(VMX_PREEMPTION_TIMER_VALUE),
++			    (unsigned long)delta, tscl);
++
++	vmx->debug_timer = false;
++
++	return EXIT_FASTPATH_REENTER_GUEST;
++}
++
+ static fastpath_t handle_fastpath_preemption_timer(struct kvm_vcpu *vcpu,
+ 						   bool force_immediate_exit)
+ {
+ 	struct vcpu_vmx *vmx = to_vmx(vcpu);
+
++	WARN_ON(vmx->debug_timer && force_immediate_exit);
++	if (vmx->debug_timer)
++		return handle_fastpath_debug_timer(vcpu,
++						   force_immediate_exit);
++
+ 	/*
+ 	 * In the *extremely* unlikely scenario that this is a spurious VM-Exit
+ 	 * due to the timer expiring while it was "soft" disabled, just eat the
+@@ -6096,6 +6127,60 @@ static int handle_notify(struct kvm_vcpu *vcpu)
+ 	return 1;
+ }
+
++static unsigned long vmx_debug_set_preempt_timer(struct kvm_vcpu *vcpu,
++						 unsigned long a0,
++						 unsigned long a1,
++						 unsigned long a2,
++						 unsigned long a3)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++	vmx->debug_timer = true;
++	vmx->debug_timer_set_to_hardware = false;
++	vmx->debug_timer_val = a0;
++	vmx->debug_timer_deadline_tsc = rdtsc() + (a0 << cpu_preemption_timer_multi);
++	pr_info("debug_timer = %u\n", (u32)a0);
++
++	return 0;
++}
++
++
++static unsigned long vmx_debug_get_preempt_timer_result(struct kvm_vcpu *vcpu,
++							unsigned long a0,
++							unsigned long a1,
++							unsigned long a2,
++							unsigned long a3)
++{
++	struct vcpu_vmx *vmx = to_vmx(vcpu);
++
++	if (vmx->debug_timer)
++		return 1;
++	return 0;
++}
++
++static int vmx_emulate_hypercall(struct kvm_vcpu *vcpu)
++{
++	unsigned long nr, a0, a1, a2, a3;
++	unsigned long ret;
++
++	nr = kvm_rax_read(vcpu);
++	if (nr != 0x87650001 && nr != 0x87650002)
++		return kvm_emulate_hypercall(vcpu);
++
++	a0 = kvm_rbx_read(vcpu);
++	a1 = kvm_rcx_read(vcpu);
++	a2 = kvm_rdx_read(vcpu);
++	a3 = kvm_rsi_read(vcpu);
++
++	if (nr == 0x87650001)
++		ret = vmx_debug_set_preempt_timer(vcpu, a0, a1, a2, a3);
++	else
++		ret = vmx_debug_get_preempt_timer_result(vcpu, a0, a1, a2, a3);
++
++	kvm_rax_write(vcpu, ret);
++	return kvm_skip_emulated_instruction(vcpu);
++}
++
+ /*
+  * The exit handlers return 1 if the exit was handled fully and guest execution
+  * may resume.  Otherwise they set the kvm_run parameter to indicate what needs
+@@ -6117,7 +6202,7 @@ static int (*kvm_vmx_exit_handlers[])(struct kvm_vcpu *vcpu) = {
+ 	[EXIT_REASON_INVD]		      = kvm_emulate_invd,
+ 	[EXIT_REASON_INVLPG]		      = handle_invlpg,
+ 	[EXIT_REASON_RDPMC]                   = kvm_emulate_rdpmc,
+-	[EXIT_REASON_VMCALL]                  = kvm_emulate_hypercall,
++	[EXIT_REASON_VMCALL]                  = vmx_emulate_hypercall,
+ 	[EXIT_REASON_VMCLEAR]		      = handle_vmx_instruction,
+ 	[EXIT_REASON_VMLAUNCH]		      = handle_vmx_instruction,
+ 	[EXIT_REASON_VMPTRLD]		      = handle_vmx_instruction,
+@@ -7199,6 +7284,28 @@ static void vmx_update_hv_timer(struct kvm_vcpu *vcpu, bool force_immediate_exit
+ 	if (force_immediate_exit) {
+ 		vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, 0);
+ 		vmx->loaded_vmcs->hv_timer_soft_disabled = false;
++	} else if (vmx->debug_timer) {
++		u32 old;
++
++		tscl = rdtsc();
++
++		if (!vmx->debug_timer_set_to_hardware) {
++			delta_tsc = vmx->debug_timer_val;
++			vmx->debug_timer_set_to_hardware = true;
++		} else {
++			if (vmx->debug_timer_deadline_tsc > tscl)
++				delta_tsc = (u32)((vmx->debug_timer_deadline_tsc - tscl)
++						  >> cpu_preemption_timer_multi);
++			else
++				delta_tsc = 0;
++		}
++
++		old = vmcs_read32(VMX_PREEMPTION_TIMER_VALUE);
++		vmcs_write32(VMX_PREEMPTION_TIMER_VALUE, delta_tsc);
++		trace_kvm_vmx_debug(3UL, old,
++				    vmcs_read32(VMX_PREEMPTION_TIMER_VALUE),
++				    delta_tsc, tscl);
++		vmx->loaded_vmcs->hv_timer_soft_disabled = false;
+ 	} else if (vmx->hv_deadline_tsc != -1) {
+ 		tscl = rdtsc();
+ 		if (vmx->hv_deadline_tsc > tscl)
+diff --git a/tools/testing/selftests/kvm/x86_64/preempt_test.c b/tools/testing/selftests/kvm/x86_64/preempt_test.c
+new file mode 100644
+index 000000000000..2e58cfee61d0
+--- /dev/null
++++ b/tools/testing/selftests/kvm/x86_64/preempt_test.c
+@@ -0,0 +1,82 @@
++// SPDX-License-Identifier: GPL-2.0-only
++/*
++ * Copyright (c) 2024 Intel Corporation
++ *
++ * Debug the preemption timer behavior
++ */
++
++#include "test_util.h"
++#include "processor.h"
++#include "ucall_common.h"
++
++uint32_t preempt_timer_val = 0x1000000;
++static void guest_code(uint64_t apic_hz, uint64_t delay_ms)
++{
++	volatile unsigned long r;
++
++	kvm_hypercall(0x87650001, preempt_timer_val, 0, 0, 0);
++	do {
++		udelay(100);
++		r = kvm_hypercall(0x87650002, 0, 0, 0, 0);
++	} while(r != 0);
++
++	GUEST_DONE();
++}
++
++static void do_test(struct kvm_vcpu *vcpu)
++{
++	bool done = false;
++	struct ucall uc;
++
++	while (!done) {
++		vcpu_run(vcpu);
++
++		switch (get_ucall(vcpu, &uc)) {
++		case UCALL_DONE:
++			done = true;
++			break;
++		case UCALL_ABORT:
++			REPORT_GUEST_ASSERT(uc);
++			break;
++		default:
++			break;
++		}
++	}
++}
++
++static void run_test(void)
++{
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++
++	vm = vm_create(1);
++
++	sync_global_to_guest(vm, preempt_timer_val);
++
++	vcpu = vm_vcpu_add(vm, 0, guest_code);
++
++	do_test(vcpu);
++
++	kvm_vm_free(vm);
++}
++
++
++int main(int argc, char *argv[])
++{
++	int opt;
++
++	while ((opt = getopt(argc, argv, "p:h")) != -1) {
++		switch (opt) {
++		case 'p':
++			preempt_timer_val = atoi(optarg);
++			break;
++		default:
++			exit(KSFT_SKIP);
++		}
++	}
++
++	printf("preempt timer value:%u(0x%x)\n",
++	       preempt_timer_val, preempt_timer_val);
++
++	run_test();
++}
+--
+2.27.0
 
