@@ -1,239 +1,235 @@
-Return-Path: <kvm+bounces-21217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D7C192C229
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 19:16:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13B0892C237
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 19:18:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F025E1F271F1
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 17:16:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36D441C228F1
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 17:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD8B18F2CA;
-	Tue,  9 Jul 2024 17:08:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95B9717B047;
+	Tue,  9 Jul 2024 17:18:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c+mQv0QI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bzGYXzu3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B9118EA94;
-	Tue,  9 Jul 2024 17:08:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121C91B86CA
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 17:18:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720544882; cv=none; b=Di4dL2AQc7FNda5jj4+90KjmewMGIY9oMjt5qQ+n+wmLpn11GbT3zgWbzQvq73Xxxabvyb0f6YnjTegV4JiyCJ5xi4JMnl2arw+4+lZZNCXXfCZfLAYXswqCRPQw66UaXVp8+rS4XNdbhLuyZWf23FdJYkPlPaDX6HYtptlHK4g=
+	t=1720545509; cv=none; b=Q0s9Tyu7jX6/YnsPeZjATzr1bbz76H2iksPMrXpy7HjKO3FNuyPjkS4sJjaw0PZTf7Ehesr2GYsAU6EfLZh/VKF8scImR4ocGDATNOSGhyVwDNFbnFmkvqoTSjvmGjH8VoSL5m4x1+KfQwwj+LDZGyPmubClpD6ghutwEO07VxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720544882; c=relaxed/simple;
-	bh=mVHS/6XvxZ61MfkteEqw4BZY27jcNj7bWLsiIN94eiQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iAhbiNiFtTCqUnci7l025jpa7YB9EE84jft2nbJUsAW4XIs9G/0cQh6ZRIj3MyiCC0uohyFRJYDJMnV6uUnN5uQjbCm7Hnn+DrhsygWWr1/nkz2rse9vD8/XUlyi8aUWuRqmzgUtHCXAiIW9V+J3lCGuvxLsG3bNaoe3G+DQpCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=c+mQv0QI; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 469EwdQu014417;
-	Tue, 9 Jul 2024 17:07:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	RdsGP7UACiE9zTAk10DJzqD1XSghPWJsyDhucLEHexI=; b=c+mQv0QIgkZMeu6i
-	8Jz+ot5cFIntuwwat3oDZ5/G/a7Kht1j5TlySpaeysM6eTS2ESu6s+riCdDisd+H
-	GLmtlJh+sJ2/wnnkxntyGKIAcUL3kfPzhxUQASqGlIyljJyoMuQIR5JgVYmLiBB5
-	w60jfXBp0LB5eRlW6+5mmAMeaDKRsN27u7H7BtEVcSxBvakQa4pOWi/Johz9NXYK
-	nekhnxhbrPViuRoG3DRuMouwuyi1LZPRH6zRpba2TGwjQhyKckNCTi4DJKzeTMJ1
-	Lpw1ZXRfulRR7zoQd4xdJvAMRBKl4KrBfhqsqj5DITg9NLXyxkmrs4rPt+TvvO2q
-	fojGnA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4097efgbfa-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jul 2024 17:07:51 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 469H7pDw018161;
-	Tue, 9 Jul 2024 17:07:51 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4097efgbf8-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jul 2024 17:07:51 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 469ExWOg014043;
-	Tue, 9 Jul 2024 17:07:50 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 407gn0nv36-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jul 2024 17:07:50 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 469H7ix728771048
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Jul 2024 17:07:47 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C869120043;
-	Tue,  9 Jul 2024 17:07:44 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9B7F620040;
-	Tue,  9 Jul 2024 17:07:44 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  9 Jul 2024 17:07:44 +0000 (GMT)
-Date: Tue, 9 Jul 2024 19:06:58 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah
- Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        David Hildenbrand
- <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Subject: Re: [PATCH v1 8/9] selftests: kvm: s390: Add uc_skey VM test case
-Message-ID: <20240709190658.5cffc1ba@p-imbrenda.boeblingen.de.ibm.com>
-In-Reply-To: <20240709125704.61312-9-schlameuss@linux.ibm.com>
-References: <20240709125704.61312-1-schlameuss@linux.ibm.com>
-	<20240709125704.61312-9-schlameuss@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1720545509; c=relaxed/simple;
+	bh=ZtMn0LRwFtGxyVO7PDTRcOf9LNpyjB1lVBEmum938wY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d1J93WFO5X1YeejtLMriAYkyeIw4QHdrJ3Ccn8DN2+KbLAhYvM3EZCGXW7egdmzUfPAwyq521qC0UAxSQBAzOiyjhbCzIdF3/xV288Qpqb85OCQkgryv1B/InL7Yo6YehZ1/wsZaPuW3v8i7GSlee86tAHMEyJ844exK4a/4sP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bzGYXzu3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720545507;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=txWFpwGnvOu9QFzJiCC8zu5uRGQCIBjC/kvWz1kKaQA=;
+	b=bzGYXzu37bT0sr5xQXnMzPttdQbpQewsvmv9f0YTQVT0Pa3W8HJzUeMMM0eiuFsUsSSRfg
+	9MgLNnrJVBLu1POR525uL7hfLtwMi71bOO0uA382UxY6R2+apn3+tpBWoRnP/DqXz5jRZp
+	uJkZTO6ua7NO59oyR/HPEIrwHemgaHI=
+Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
+ [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-203-_J_E8AR4NkaoGC42BekAug-1; Tue, 09 Jul 2024 13:18:25 -0400
+X-MC-Unique: _J_E8AR4NkaoGC42BekAug-1
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3d923b2fe51so3634196b6e.2
+        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 10:18:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720545505; x=1721150305;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=txWFpwGnvOu9QFzJiCC8zu5uRGQCIBjC/kvWz1kKaQA=;
+        b=AwS3dw7tEdBqAC41sHs5GjDlI7EIViH4uRoG6sgxdlNmErcJwxuW5qFoEe/I7RMy7P
+         MaToQOzFuobjT4xYzbz3OMlJ6gDxTCt46hWuI5cKblr61eqqmH9CDPqThy2Es9M55Bbm
+         XDd1Y/lFTPG5i43Yud7blTBPwoC5jGBTh3tk/I/TOg4uwhlJkPmoh+F21ivyKw/GU9er
+         0ktzWYV1eXWWqRlXlEJZ9yR+2MndaEUXzYPdjIFTPAUit16dS+6UD9a30YnxFkx7BPKH
+         nCK2zyRNK8ckKgE0T8IQ7K0rGtfWXXWspv+GRU1JFrBxPeLKhFm35475QmL1648mqVac
+         ScRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQN4Ew1UH8ba6KEj0EX15PLAJXcDAeY8VHfIVUxR/o5StpVzMcVOPNjwJwc3snPENF7UZkCEsmIMP0+RiywJI1W3Py
+X-Gm-Message-State: AOJu0Yzed+Ms3U5QLok8jDAsuEHPZ6U6dZq6sfKdH2wt+KUCvyKAgYVs
+	ajhTEl+pCb4EEOoeM/tQPDVEoXBIxUd7QoZBsLDgg2sohH4hwiIa7vctdNYt+KiOs34ALtHKv5b
+	a6vt/9dGdJV8KphYiJUAoqrCBTX5ZyYD8bHQxnFGoTJSE+okyUg==
+X-Received: by 2002:a05:6808:140c:b0:3d9:2d9c:8aff with SMTP id 5614622812f47-3d93c085d8cmr3345133b6e.45.1720545504675;
+        Tue, 09 Jul 2024 10:18:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGCg8hXYGmEjThxs8qicr/EaSUtmrtO5gek2UVhqCZuwkZ1767RBJduAkyXwsp1LLvcYZ+Ylg==
+X-Received: by 2002:a05:6808:140c:b0:3d9:2d9c:8aff with SMTP id 5614622812f47-3d93c085d8cmr3345103b6e.45.1720545504247;
+        Tue, 09 Jul 2024 10:18:24 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:59e:9d80:527b:9dff:feef:3874? ([2a01:e0a:59e:9d80:527b:9dff:feef:3874])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f1902909asm114532285a.58.2024.07.09.10.18.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 09 Jul 2024 10:18:23 -0700 (PDT)
+Message-ID: <f36223a9-3db4-41be-81ef-b472cd34b607@redhat.com>
+Date: Tue, 9 Jul 2024 19:18:19 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: rtu21Bldng3Sz-OpeoS2N4C3efs6UlVI
-X-Proofpoint-ORIG-GUID: VmW_xcZphCb_3pnr6ozloTl3ufvpi6qE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-09_06,2024-07-09_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
- mlxscore=0 priorityscore=1501 mlxlogscore=966 lowpriorityscore=0
- malwarescore=0 clxscore=1015 spamscore=0 bulkscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407090112
+User-Agent: Mozilla Thunderbird
+Reply-To: eric.auger@redhat.com
+Subject: Re: [kvm-unit-tests PATCH v1 1/2] arm/pmu: skip the PMU introspection
+ test if missing
+Content-Language: en-US
+To: Alexandru Elisei <alexandru.elisei@arm.com>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+Cc: Peter Maydell <peter.maydell@linaro.org>, pbonzini@redhat.com,
+ drjones@redhat.com, thuth@redhat.com, kvm@vger.kernel.org,
+ qemu-arm@nongnu.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.cs.columbia.edu, christoffer.dall@arm.com, maz@kernel.org,
+ Anders Roxell <anders.roxell@linaro.org>,
+ Andrew Jones <andrew.jones@linux.dev>, "open list:ARM"
+ <kvmarm@lists.linux.dev>
+References: <20240702163515.1964784-1-alex.bennee@linaro.org>
+ <20240702163515.1964784-2-alex.bennee@linaro.org> <Zoz7sQNoC9ePXH7w@arm.com>
+ <CAFEAcA-LFtAi0DkFGc0Q3TYR_+X3TUWQru8crhbKun4EHctcdQ@mail.gmail.com>
+ <87ed82slt8.fsf@draig.linaro.org> <Zo1RvCdNDhaZHKMb@arm.com>
+From: Eric Auger <eric.auger@redhat.com>
+In-Reply-To: <Zo1RvCdNDhaZHKMb@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue,  9 Jul 2024 14:57:03 +0200
-Christoph Schlameuss <schlameuss@linux.ibm.com> wrote:
+Hi,
 
-> Add a test case manipulating s390 storage keys from within the ucontrol
-> VM.
-> 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> ---
->  .../selftests/kvm/s390x/ucontrol_test.c       | 83 +++++++++++++++++++
->  1 file changed, 83 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> index 4438cfc8bf53..64ad31f667e3 100644
-> --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> @@ -81,6 +81,32 @@ asm("test_mem_pgm:\n"
->  	"	j	0b\n"
->  );
->  
-> +/* Test program manipulating storage keys */
-> +extern char test_skey_pgm[];
-> +asm("test_skey_pgm:\n"
-> +	"xgr	%r0, %r0\n"
-> +
-> +	"0:\n"
-> +	"	ahi	%r0,1\n"
-> +	"	st	%r1,0(%r5,%r6)\n"
-> +
-> +	"	iske	%r1,%r6\n"
-> +	"	ahi	%r0,1\n"
-> +	"	diag	0,0,0x44\n"
-> +
-> +	"	sske	%r1,%r6\n"
-> +	"	iske	%r1,%r6\n"
-> +	"	ahi	%r0,1\n"
-> +	"	diag	0,0,0x44\n"
-> +
-> +	"	rrbe	%r1,%r6\n"
-> +	"	iske	%r1,%r6\n"
-> +	"	ahi	%r0,1\n"
-> +	"	diag	0,0,0x44\n"
-> +
-> +	"	j	0b\n"
-> +);
-> +
->  FIXTURE(uc_kvm)
->  {
->  	struct kvm_s390_sie_block *sie_block;
-> @@ -389,6 +415,63 @@ static void uc_assert_diag44(FIXTURE_DATA(uc_kvm) * self)
->  	TEST_ASSERT_EQ(0x440000, sie_block->ipb);
->  }
->  
-> +TEST_F(uc_kvm, uc_skey)
-> +{
-> +	u64 test_vaddr = self->base_gpa + VM_MEM_SIZE - (SZ_1M / 2);
-> +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
-> +	struct kvm_s390_sie_block *sie_block = self->sie_block;
-> +	struct kvm_run *run = self->run;
-> +	u8 skeyvalue = 0x34;
-> +
-> +	init_st_pt(self);
-> +
-> +	/* copy test_skey_pgm to code_hva / code_gpa */
-> +	TH_LOG("copy code %p to vm mapped memory %p / %p",
-> +	       &test_skey_pgm, (void *)self->code_hva, (void *)self->code_gpa);
-> +	memcpy((void *)self->code_hva, &test_skey_pgm, PAGE_SIZE);
-> +
-> +	/* set register content for test_skey_pgm to access not mapped memory*/
+On 7/9/24 17:05, Alexandru Elisei wrote:
+> Hi,
+>
+> On Tue, Jul 09, 2024 at 03:05:07PM +0100, Alex Bennée wrote:
+>> Peter Maydell <peter.maydell@linaro.org> writes:
+>>
+>>> On Tue, 9 Jul 2024 at 09:58, Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+>>>> Hi,
+>>>>
+>>>> On Tue, Jul 02, 2024 at 05:35:14PM +0100, Alex Bennée wrote:
+>>>>> The test for number of events is not a substitute for properly
+>>>>> checking the feature register. Fix the define and skip if PMUv3 is not
+>>>>> available on the system. This includes emulator such as QEMU which
+>>>>> don't implement PMU counters as a matter of policy.
+>>>>>
+>>>>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>>>> Cc: Anders Roxell <anders.roxell@linaro.org>
+>>>>> ---
+>>>>>  arm/pmu.c | 7 ++++++-
+>>>>>  1 file changed, 6 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/arm/pmu.c b/arm/pmu.c
+>>>>> index 9ff7a301..66163a40 100644
+>>>>> --- a/arm/pmu.c
+>>>>> +++ b/arm/pmu.c
+>>>>> @@ -200,7 +200,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
+>>>>>  #define ID_AA64DFR0_PERFMON_MASK  0xf
+>>>>>
+>>>>>  #define ID_DFR0_PMU_NOTIMPL  0b0000
+>>>>> -#define ID_DFR0_PMU_V3               0b0001
+>>>>> +#define ID_DFR0_PMU_V3               0b0011
+>>>>>  #define ID_DFR0_PMU_V3_8_1   0b0100
+>>>>>  #define ID_DFR0_PMU_V3_8_4   0b0101
+>>>>>  #define ID_DFR0_PMU_V3_8_5   0b0110
+>>>>> @@ -286,6 +286,11 @@ static void test_event_introspection(void)
+>>>>>               return;
+>>>>>       }
+>>>>>
+>>>>> +     if (pmu.version < ID_DFR0_PMU_V3) {
+>>>>> +             report_skip("PMUv3 extensions not supported, skip ...");
+>>>>> +             return;
+>>>>> +     }
+>>>>> +
+>>>> I don't get this patch - test_event_introspection() is only run on 64bit. On
+>>>> arm64, if there is a PMU present, that PMU is a PMUv3.  A prerequisite to
+>>>> running any PMU tests is for pmu_probe() to succeed, and pmu_probe() fails if
+>>>> there is no PMU implemented (PMUVer is either 0, or 0b1111). As a result, if
+>>>> test_event_introspection() is executed, then a PMUv3 is present.
+>>>>
+>>>> When does QEMU advertise FEAT_PMUv3*, but no event counters (other than the cycle
+>>>> counter)?
+>> The other option I have is this:
+>>
+>> --8<---------------cut here---------------start------------->8---
+>> arm/pmu: event-introspection needs icount for TCG
+>>
+>> The TCG accelerator will report a PMU (unless explicitly disabled with
+>> -cpu foo,pmu=off) however not all events are available unless you run
+>> under icount. Fix this by splitting the test into a kvm and tcg
+>> version.
+> As far as I can tell, if test_event_introspection() fails under TCG without
+> icount then there are two possible explanations for that:
+>
+> 1. Not all the events whose presence is checked by test_event_introspection()
+> are actually required by the architecture.
+>
+> 2. TCG without icount is not implementing all the events required by the
+> architecture.
+>
+> If 1, then test_event_introspection() should be fixed. I had a look and the
+> function looked correct to me (except that the event name is not INST_PREC,
+> it's INST_SPEC in the Arm DDI0487J.A and K.a, but that's not relevant for
+> correctness).
+>
+> From what I can tell from what Peter and you have said, explanation 2 is the
+> correct one, because TCG cannot implement all the required events when icount is
+> not specified. As far as test_event_introspection() is concerned, I consider
+> this to be the expected behaviour: it fails because the required events are not
+> implemented. I don't think the function should be changed to work around how
+> QEMU was invoked. Do you agree?
+>
+> If you know that the test will fail without special command line parameters when
+> accel is TCG, then I think what you are suggesting looks correct to me: the
+> original test is skipped if KVM is not present, and when run under TCG, the
+> correct parameters are passed to QEMU.
+This looks sensible to me too
 
-missing space before */
-
-> +	sync_regs->gprs[1] = skeyvalue;
-> +	sync_regs->gprs[5] = self->base_gpa;
-> +	sync_regs->gprs[6] = test_vaddr;
-> +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
-> +
-> +	run->kvm_dirty_regs |= KVM_SYNC_CRS;
-> +	TH_LOG("set CR0 to 0x%llx", sync_regs->crs[0]);
-> +
-> +	self->sie_block->ictl |= ICTL_OPEREXC | ICTL_PINT;
-> +	self->sie_block->cpuflags &= ~CPUSTAT_KSS;
-> +	run->psw_mask = 0x0400000180000000ULL;  /* DAT enabled + 64 bit mode */
-> +	run->psw_addr = self->code_gpa;
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(true, uc_handle_exit(self));
-> +	ASSERT_EQ(0, sync_regs->gprs[0]);
-> +	ASSERT_EQ(13, run->exit_reason);
-
-can you use macros here instead of magic values?
-
-> +	ASSERT_EQ(40, sie_block->icptcode);
-
-same here
-
-> +
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(false, uc_handle_exit(self));
-> +	ASSERT_EQ(2, sync_regs->gprs[0]);
-> +	ASSERT_EQ(0x06, sync_regs->gprs[1]);
-> +	uc_assert_diag44(self);
-> +
-> +	sync_regs->gprs[1] = skeyvalue;
-> +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(false, uc_handle_exit(self));
-> +	ASSERT_EQ(3, sync_regs->gprs[0]);
-> +	ASSERT_EQ(skeyvalue, sync_regs->gprs[1]);
-> +	uc_assert_diag44(self);
-> +
-> +	sync_regs->gprs[1] = skeyvalue;
-> +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(false, uc_handle_exit(self));
-> +	ASSERT_EQ(4, sync_regs->gprs[0]);
-> +	ASSERT_EQ(skeyvalue & 0xfb, sync_regs->gprs[1]);
-> +	uc_assert_diag44(self);
-> +}
-> +
->  TEST_F(uc_kvm, uc_map_unmap)
->  {
->  	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+Eric
+>
+> Thanks,
+> Alex
+>
+>> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
+>>
+>> 1 file changed, 8 insertions(+)
+>> arm/unittests.cfg | 8 ++++++++
+>>
+>> modified   arm/unittests.cfg
+>> @@ -52,8 +52,16 @@ extra_params = -append 'cycle-counter 0'
+>>  file = pmu.flat
+>>  groups = pmu
+>>  arch = arm64
+>> +accel = kvm
+>>  extra_params = -append 'pmu-event-introspection'
+>>  
+>> +[pmu-event-introspection-icount]
+>> +file = pmu.flat
+>> +groups = pmu
+>> +arch = arm64
+>> +accel = tcg
+>> +extra_params = -icount shift=1 -append 'pmu-event-introspection'
+>> +
+>>  [pmu-event-counter-config]
+>>  file = pmu.flat
+>>  groups = pmu
+>> --8<---------------cut here---------------end--------------->8---
+>>
+>> which just punts icount on TCG to its own test (note there are commented
+>> out versions further down the unitests.cfg file)
+>>
+>> -- 
+>> Alex Bennée
+>> Virtualisation Tech Lead @ Linaro
 
 
