@@ -1,221 +1,132 @@
-Return-Path: <kvm+bounces-21200-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21202-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D3A892BB4F
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 15:32:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC13792BBA3
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 15:44:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03A0E2844EE
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 13:32:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC1161C22715
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 13:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AC8916DEA4;
-	Tue,  9 Jul 2024 13:31:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903AA15F3F3;
+	Tue,  9 Jul 2024 13:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eIK91qaa"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60FC15EFC0;
-	Tue,  9 Jul 2024 13:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF5015CD58
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 13:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720531874; cv=none; b=VFWuR+LA+Q6YL7D8rRgT+VbGP2VOQxnBS5N65z1KeuulN2l19ZSHDWYZLjcunpuSZFEcb2AaKim0awQSXbP5G4YE5XRBRa0OQjaSFx7A8f+9dijtNRvaqd9ic6jmLODXp+ux0hhf4/sUIXiuUtNz8A3VNLNqapQXjjaREY71X+I=
+	t=1720532683; cv=none; b=WW32sFsjbnyLyZqt/7TQ+QQmbLrNIVr3G1P2rhne/iavQ9KdjpwnliPn0Cf9GWnHKMVLXjiO+MdiGPdMkFY7wWv9TwiWbBdxgSin+W7jC3+uB4WWTRVwMzjL1+Biwsyajca0byaKS5AtdYw94ubPEK9h6RaqYCE2b0USHOyM5Is=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720531874; c=relaxed/simple;
-	bh=dAafrZMcmjS/brpthhtfQuYZamYHc//+YMCv+SUls0k=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LjmaY1mjHQdVGgaF6+dR0ySqEnootpq60M6WCSesALpibdLrjWft1RUeQxGvQi3fKPi3ySl8zTBSV906nMSdg65tgawVA1LyqfGgqae7YKV/9o5COgpKIhjf2t2gCoB6wOXQvlIFh6aPBYYpfnH9i+plf7ztRIj5IMD0b7xgB+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WJMGp5BKwzQl5Q;
-	Tue,  9 Jul 2024 21:27:14 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 8CF08180064;
-	Tue,  9 Jul 2024 21:31:09 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Tue, 9 Jul 2024 21:31:09 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, David
- Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Trond
- Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck Lever
-	<chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>,
-	<linux-afs@lists.infradead.org>, <linux-nfs@vger.kernel.org>
-Subject: [PATCH net-next v10 05/15] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Tue, 9 Jul 2024 21:27:30 +0800
-Message-ID: <20240709132741.47751-6-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240709132741.47751-1-linyunsheng@huawei.com>
-References: <20240709132741.47751-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1720532683; c=relaxed/simple;
+	bh=zJyC8jjyKh52L2UitwncaBm3/kHKZYf+3tVJpfUc8QU=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mpwK61d9QtekOnAvq8VSjrpE1UYO3MWPDx9FXBYANQKm41ojIzOJActhUfhLsQt/iI1I6q3agM0KpFMYvboH+VYzusHaHZVu0JXVtKZNvhcLPEhZXi/4iS0dW2TUT0XwpXoWdkEfXkNZrrH5UMuAKDe4T/rLX8+khZzoIEZDXmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eIK91qaa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 494D2C4AF0D
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 13:44:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720532683;
+	bh=zJyC8jjyKh52L2UitwncaBm3/kHKZYf+3tVJpfUc8QU=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=eIK91qaa2Ius1hgytiwj+STceTTHxYyab/JLiIBDuIS7ax6+YFxTUEgYH4ucUiiCx
+	 TtljnSAUBR3DpJ+GxLqIbLQ0XUQksne7aLQdTDyOVd30piZb1Kmgz5wXH1ZTzzUezx
+	 gE+DHR3hgbUOIAi90xV/IxWNqvaCBQlJELWxVWTeioolul9HIRO6tKp1iJj8eetwHn
+	 rrocWFKQc1TRxkr4pPjajFiY5qYxYJSoNAvm5ActHLR4OoW7YZtkFA0eifhktqKCdm
+	 rNjzkJGvApEvNjxnuVxADy9mIdfpb8mIwzUb4DIsyYHK0yDZDGgw9drnYdWUateGjV
+	 YI8wsBD8rna5w==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 43BD9C53B73; Tue,  9 Jul 2024 13:44:43 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219010] [REGRESSION][VFIO] kernel 6.9.7 causing qemu crash
+ because of "Collect hot-reset devices to local buffer"
+Date: Tue, 09 Jul 2024 13:44:42 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: yi.l.liu@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219010-28872-m9NOJSSMHm@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219010-28872@https.bugzilla.kernel.org/>
+References: <bug-219010-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219010
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+--- Comment #3 from Liu, Yi L (yi.l.liu@intel.com) ---
+On 2024/7/7 01:19, bugzilla-daemon@kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D219010
+>=20
+> --- Comment #1 from =C5=BDilvinas =C5=BDaltiena (zaltys@natrix.lt) ---
+> Additional information: passing NVIDIA GPU, Samsung NVMEs works, passing
+> Fresco
+>   FL1100 based USB card does not work. Fresco card is single VF device, b=
+ut
+>   like
+> that sound card it does not report FLR. Reverting "vfio/pci: Collect
+> hot-reset
+> devices to local buffer" allows to pass every mentioned device.
+>=20
+
+It appears that the count is used without init.. And it does not happen
+with other devices as they have FLR, hence does not trigger the hotreset
+info path. Please try below patch to see if it works.
+
+
+ From 93618efe933c4fa5ec453bddacdf1ca2ccbf3751 Mon Sep 17 00:00:00 2001
+From: Yi Liu <yi.l.liu@intel.com>
+Date: Tue, 9 Jul 2024 06:41:02 -0700
+Subject: [PATCH] vfio/pci: Fix a regresssion
+
+Signed-off-by: Yi Liu <yi.l.liu@intel.com>
 ---
- drivers/vhost/net.c             |  2 +-
- include/linux/page_frag_cache.h | 10 ++++++++++
- mm/page_frag_test.c             |  2 +-
- net/core/skbuff.c               |  6 +++---
- net/rxrpc/conn_object.c         |  4 +---
- net/rxrpc/local_object.c        |  4 +---
- net/sunrpc/svcsock.c            |  6 ++----
- 7 files changed, 19 insertions(+), 15 deletions(-)
+  drivers/vfio/pci/vfio_pci_core.c | 2 +-
+  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 6691fac01e0d..b2737dc0dc50 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index 185d875e3e6b..0ba96b7b64ad 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -26,6 +26,16 @@ struct page_frag_cache {
- 	bool pfmemalloc;
- };
- 
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
-diff --git a/mm/page_frag_test.c b/mm/page_frag_test.c
-index 50166a059c7d..0d47235b5cf2 100644
---- a/mm/page_frag_test.c
-+++ b/mm/page_frag_test.c
-@@ -340,7 +340,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_frag.va = NULL;
-+	page_frag_cache_init(&test_frag);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 4b8acd967793..76a473b1072d 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -749,14 +749,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 
- 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 		local_bh_enable();
-@@ -846,7 +846,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc_va(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 42d20412c1c3..4b1e87187614 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
- }
--- 
-2.33.0
+diff --git a/drivers/vfio/pci/vfio_pci_core.c=20
+b/drivers/vfio/pci/vfio_pci_core.c
+index 59af22f6f826..0a7bfdd08bc7 100644
+--- a/drivers/vfio/pci/vfio_pci_core.c
++++ b/drivers/vfio/pci/vfio_pci_core.c
+@@ -1260,7 +1260,7 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
+        struct vfio_pci_hot_reset_info hdr;
+        struct vfio_pci_fill_info fill =3D {};
+        bool slot =3D false;
+-       int ret, count;
++       int ret, count =3D 0;
 
+        if (copy_from_user(&hdr, arg, minsz))
+                return -EFAULT;
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
