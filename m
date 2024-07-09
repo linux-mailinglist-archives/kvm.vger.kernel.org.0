@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-21142-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21143-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E39E92AD02
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 02:13:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 96A2492AD16
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 02:24:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28B391F21FF4
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 00:13:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4022D1F2219B
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 00:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30EA41FA1;
-	Tue,  9 Jul 2024 00:13:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E20F2837B;
+	Tue,  9 Jul 2024 00:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XkOl4DHU"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="prgNSuxX"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17914631
-	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 00:13:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337F4139F
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 00:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720483990; cv=none; b=bEQKSPXBy/dE0/nekQEn5hYBoW0kTASf/ThnnQ9+GGgIlHKoPCjELZ/DHZK1BzETUl8IipBL97FDh8Jm1yJY/oWI8sR+ezjJpRctGklXTmV6E/1fYuKobGXSSvkakAIVPNvVDJ1fmCmd9RcSUvObcLrYrNKJe5cnJerPXuK8lRQ=
+	t=1720484687; cv=none; b=N7UWM39DZymiGQDz5nlMmtRUn1mNP14NoFxkVx2tIoW5dw7UkHUzFkLoX9sW7yCQGxxOosmnDqba4Siu+ViQinDNXA5AHxdYAZXMcLKvu7TkB/R9bSwU+3Mbtm/k4bsZB6V/JiusSCufXj279HQal8ScS7QJf3DaUZgdabxNGNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720483990; c=relaxed/simple;
-	bh=o7s7kP3xWOe9f8MorpJlnvVKDIDiP9CLOJFSGGX5mMY=;
+	s=arc-20240116; t=1720484687; c=relaxed/simple;
+	bh=ikX1ysqZqoOXa5cAnw2HENW09LRgovdR8HIOFlmOUy4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SXVk6qOWXooYJUzUZmqt0j30T5PKK/NaSscwtDmhC+Cl5WzSGD7Zo2YsHD9jP3mkTvr070bFZISzKGfspOL9mUhYg5yEAZ6HznEc+HsqoptnDnOoYnQxa9YqdcK0fuf1gBi5N+ko/Du8F10MMuZ3zB0mVDT0pMh1EymB/cOkOlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XkOl4DHU; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=SEwCDvkho51Jbsl77DpLnXzzQ2CfolN/s6G09zo6AGn4XxLkZ+HbJhRGYOudOtLmgo0xVM88wM1+Cva1mfzQZvXAEOcpeLXxnUtJUDbZXHe8v942vX20MSREgU+5ev0Vd6wF0II2jb0fCxXtzdBm96Vfg+m17YjVGHh8W2CftzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=prgNSuxX; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso3566419a12.0
-        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 17:13:08 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7278c31e2acso2937805a12.1
+        for <kvm@vger.kernel.org>; Mon, 08 Jul 2024 17:24:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720483988; x=1721088788; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720484685; x=1721089485; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zG6ZMKR2ER5CEkjEXyhneSznu6s7Jkh317FrChhPZ4A=;
-        b=XkOl4DHUff0GorZQR3rR+qQ5ufi+8p6DIducAJJnGqltxaF07fG7pbyqyfQbOkAtTO
-         XRo4sYj+J0u93tjzlBTvrGskpFiE8yaBFJaKQoEmbJbN4da4e9nAjO0+9MqYLJOqf+nW
-         n7/AeR1XhsD05TdhirWCggu8dAsRnlDrnSKqa9w+UCag8DYkLX+EUm3grJGCozS/TiTu
-         6JbCxxcoRGTtkxTyaoYPh6mGdji/9X32cP2wXTRWraIipPBH2MI6WzAhNBYmvJYqa/vP
-         7cb8orZwvewTmSB0yeRiGn9gFko+X8F/pRIUFnVgYukxJWnKexSob36Ow0GL8zTVvngF
-         y0Mg==
+        bh=1pBGGRes1mrWQeMbELTNS4P0PcSj+YnzufefkUsBhwY=;
+        b=prgNSuxX+fDiA0nm/oPLk3RBE/Iu2X5SQLOfcK2YXMB30FRq/A9CpGAYYCzVV6+c8w
+         s4XXb2qgehEtQ+Mf9S1DepoAhGgM3702yRySLZxGbWGzgeRxCeGVtW15oqQny1gZKp77
+         j1TCDVJKAYNp/zRBatOZe18KHUwvPiqcUxm+MGRR7KOuwvmuLqe9sncmLzyGv5cqdjwp
+         5J92Z7zEycXrieSMSoMXM3cZu/y6iSnb0xh5eiL9UUdEgemOVcrucCts7M1D+JZg53O4
+         8vgPXvARvFEMIam5Yoc4J8nf6Gs9eKCT2woLlQanT3UhnFeYolG5VpVBsVcTirlbxm7p
+         4tdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720483988; x=1721088788;
+        d=1e100.net; s=20230601; t=1720484685; x=1721089485;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zG6ZMKR2ER5CEkjEXyhneSznu6s7Jkh317FrChhPZ4A=;
-        b=ioiQgdhH5OhxiUlptyX7BuJeU+5rFwsZKVoIYnq9qZVwXUrQXbZFyg7bCy9Q8XJQpQ
-         3FGUB2Z4TZqzR4L00D9MSLHsyzWRaxg8oBCn43LNKbM/N7wa34jDRXY8Bm6EnoI3CCgA
-         fXVCvfzoa8XvcAGuXKXZW0FGU5yoqWBstqaPbOPED5nZ1vXnbHIV89AS9qHDTVNutnMq
-         4GIIjbkrPpjQGRUpqxKvaW93++ZjfXfLUv+PlUQgmfQiRXykAj7vqy750S1FZE+Ujolj
-         RPJvBoBvdx1sedPqnDwiTtf1QY5GCDlnXFmKsiyW3UiS8Gr9kjERwM7rqvNPn/tgzUxL
-         /VGA==
-X-Forwarded-Encrypted: i=1; AJvYcCU28PEzCopscLEXWbO+M5jxAMcaHFJb8infx9/feCjhTRUMG5YR8WueVZGt2GZf65NBPfrQcLvHKWdPvP+wdObA5WTk
-X-Gm-Message-State: AOJu0Yw4Z3+GkIU5jyyUJkdR9JxLaZRi3L3kXebVfYgo6lQTqzuXqvK+
-	iIGD88eNXcx1R2E82tsGRC+j+8iFlhJjEmZF7mSj4X7wGLm/reNpSaMWIKHS09cd+r5JKJebY3W
-	rEw==
-X-Google-Smtp-Source: AGHT+IEFGzOwGtA+dJ46COa5sR263gqpyt4UCMdQAj79zHoXHLuF9ZNvWfUjxPfnnXwwjfAp9CjrFIzSkCo=
+        bh=1pBGGRes1mrWQeMbELTNS4P0PcSj+YnzufefkUsBhwY=;
+        b=tPqY2E5Sfb2yd24HwI9l7e3XA403DMC5MMfVaJT2VTTjbF1frRXW0Ivj3ED3m84LCD
+         LGnL82mW2tIqAOZ1XuNcWVLvOZ1Tuo/0sFoyqJSk/6IgsEHS4qu35wwFnG9dj+k9zLuI
+         lIen+l3enjZZaQBC4G1wCcB+OyeOm87L9XP2GB9/KQpwXKeWQLBv04op0c2jZ4o/NJeE
+         9jhO6ggYUZ/ReLJsIs66lji5m8T5qbVGCx41a2qln9Z5NKmmsLwKw5jLdsxETBGtVcnE
+         WqtvJJV4bTB/tLxdHuH/8TVsyupAdtZvlxktJf99o4mksLIZ3zgNlP4aV3Ip8RFYa3Kf
+         QOsA==
+X-Forwarded-Encrypted: i=1; AJvYcCU89SFGA5AK16Ags25eRPK+O2kPfbRz5/Navtatr1xC5ZKyBZq38Wr7WK12ICE0JG/Q5n1q+1ahu3DanLNnTjI8LAnk
+X-Gm-Message-State: AOJu0Ywk2sG9n4sEJzEfxMDBQrdsFXhzmvSi9AE8RAwPGfYP40ud+SIV
+	FMq8MAmGA5/FEGn6EYWTpvnv8xh7cBjp2Y7eoYyf3+ZWoArtWwrnB8/ik6z1Y1EUYp57frUjsI3
+	cEA==
+X-Google-Smtp-Source: AGHT+IG+bGGkXKt/uhQFrXoIpC76RCFXg0XPeUZS5sLfx0YBtAuW/9UGDeUxjHBA2PYP+j+znBiRzqsiqU8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:502:b0:6f6:1f2c:e339 with SMTP id
- 41be03b00d2f7-77e004223b2mr2128a12.2.1720483988282; Mon, 08 Jul 2024 17:13:08
- -0700 (PDT)
-Date: Mon, 8 Jul 2024 17:13:06 -0700
-In-Reply-To: <960ef7f670c264824fe43b87b8177a84640b8b5d.camel@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a65:68c2:0:b0:680:1416:e803 with SMTP id
+ 41be03b00d2f7-77dbe51498dmr2241a12.10.1720484685505; Mon, 08 Jul 2024
+ 17:24:45 -0700 (PDT)
+Date: Mon, 8 Jul 2024 17:24:44 -0700
+In-Reply-To: <2d554577722d30605ecd0f920f4777129fff3951.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-40-seanjc@google.com>
- <960ef7f670c264824fe43b87b8177a84640b8b5d.camel@redhat.com>
-Message-ID: <ZoyAkkZjnGmwlVCS@google.com>
-Subject: Re: [PATCH v2 39/49] KVM: x86: Extract code for generating per-entry
- emulated CPUID information
+References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-45-seanjc@google.com>
+ <2d554577722d30605ecd0f920f4777129fff3951.camel@redhat.com>
+Message-ID: <ZoyDTJ3nb_MQ38nW@google.com>
+Subject: Re: [PATCH v2 44/49] KVM: x86: Update guest cpu_caps at runtime for
+ dynamic CPUID-based features
 From: Sean Christopherson <seanjc@google.com>
 To: Maxim Levitsky <mlevitsk@redhat.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
@@ -88,38 +88,37 @@ Content-Type: text/plain; charset="us-ascii"
 
 On Thu, Jul 04, 2024, Maxim Levitsky wrote:
 > On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
-> PS: I spoke with Paolo about the meaning of KVM_GET_EMULATED_CPUID, because
-> it is not clear from the documentation what it does, or what it supposed to
-> do because qemu doesn't use this IOCTL.
-> 
-> So this ioctl is meant to return a static list of CPU features which *can* be
-> emulated by KVM, if the cpu doesn't support them, but there is a cost to it,
-> so they should not be enabled by default.
-> 
-> This means that if you run 'qemu -cpu host', these features (like rdpid) will
-> only be enabled if supported by the host cpu, however if you explicitly ask
-> qemu for such a feature, like 'qemu -cpu host,+rdpid', qemu should not warn
-> if the feature is not supported on host cpu but can be emulated (because kvm
-> can emulate the feature, which is stated by KVM_GET_EMULATED_CPUID ioctl).
-> 
-> Qemu currently doesn't support this but the support can be added.
-> 
-> So I think that the two ioctls should be redefined as such:
-> 
-> KVM_GET_SUPPORTED_CPUID - returns all CPU features that are supported by KVM,
-> supported by host hardware, or that KVM can efficiently emulate.
+> > -		cpuid_entry_change(best, X86_FEATURE_OSPKE,
+> > -				   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
+> > +		kvm_update_feature_runtime(vcpu, best, X86_FEATURE_OSPKE,
+> > +					   kvm_is_cr4_bit_set(vcpu, X86_CR4_PKE));
+> > +
+> >  
+> >  	best = kvm_find_cpuid_entry_index(vcpu, 0xD, 0);
+> >  	if (best)
 > 
 > 
-> KVM_GET_EMULATED_CPUID - returns all CPU features that KVM *can* emulate if
-> the host cpu lacks support, but emulation is not efficient and thus these
-> features should be used with care when not supported by the host (e.g only
-> when the user explicitly asks for them).
+> I am not 100% sure that we need to do this.
+> 
+> Runtime cpuid changes are a hack that Intel did back then, due to various
+> reasons, These changes don't really change the feature set that CPU supports,
+> but merly as you like to say 'massage' the output of the CPUID instruction to
+> make the unmodified OS happy usually.
+> 
+> Thus it feels to me that CPU caps should not include the dynamic features,
+> and neither KVM should use the value of these as a source for truth, but
+> rather the underlying source of the truth (e.g CR4).
+> 
+> But if you insist, I don't really have a very strong reason to object this.
 
-Yep, that aligns with how I view the ioctls (I haven't read the documentaion,
-mainly because I have a terrible habit of never reading docs).
+FWIW, I think I agree that CR4 should be the source of truth, but it's largely a
+moot point because KVM doesn't actually check OSXSAVE or OSPKE, as KVM never
+emulates the relevant instructions.  So for those, it's indeed not strictly
+necessary.
 
-> I can post a patch to fix this or you can add something like that to your
-> patch series if you prefer.
-
-Go ahead and post a patch, assuming it's just a documentation update.
+Unfortunately, KVM has established ABI for checking X86_FEATURE_MWAIT when
+"emulating" MONITOR and MWAIT, i.e. KVM can't use vcpu->arch.ia32_misc_enable_msr
+as the source of truth.  So for MWAIT, KVM does need to update CPU caps (or carry
+even more awful MWAIT code), at which point extending the behavior to the CR4
+features (and to X86_FEATURE_APIC) is practically free.
 
