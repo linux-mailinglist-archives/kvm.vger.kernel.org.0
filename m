@@ -1,205 +1,195 @@
-Return-Path: <kvm+bounces-21238-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21239-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F191992C527
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 23:09:48 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 806E692C531
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 23:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7B7D28242C
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 21:09:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0265B21B99
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 21:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3DCA185623;
-	Tue,  9 Jul 2024 21:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7B518562A;
+	Tue,  9 Jul 2024 21:13:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ml6QHzGu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uyn00xCn"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E75218004E
-	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 21:09:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A243E185619
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 21:13:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720559380; cv=none; b=hu8mmLtr6mP588G3rIhM9GcpwlsI4LzXLVlHQm2/vzr+2q/y/hy8QJ1nEJJh2y23/WOHmGUcwS45WUd25rzpn02K2E/mjjA3/Jgu7nJyD4ymDQsvwKypM7BnNqQ49H/wWw9GQEiUTMOFOnmIAeW/ADXC9RBSCVlUuKG+Q9JfGp0=
+	t=1720559609; cv=none; b=ArzM1TuIAUZJ4R3ceVqg59twpX4Sp0kE5GGotK08ktMw9EhBl/u/HuttPBI+u0ZkkanzI3KqE1XRHC9ZBpr1utEbVaJ8I56/IklHlZE8Fn0tOwsPCigu2YQABvhn4xE5Hp5gpVwM0HLWAEoKFYZWQc8f+P459lcUtQwnuf1/iEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720559380; c=relaxed/simple;
-	bh=G4sqLN36Av0Aipun0m/BkomGGwch1eUTwiy2tZMAgLM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gdjVr8eHeJkx67qn0lF0t5Jvrk2IvCJSSsAa20YAkCBV9AFxHw+46PpF/aFBBTqzcbVljGUiVIfNRt3tHTvapRTN//aY27SmbO4b2VDiyk06HRi4f99YkzwWariQr/P/Z9LoSK7zW9ZAiHbJzk2y71GbK0J7z/bjW6e7CtPO5t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ml6QHzGu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720559377;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=odS83l0DT88K5KKMun5tLUrS9pX9A9r4YSGjmmOE4KY=;
-	b=Ml6QHzGuYkQGT6EXdwgsVzsvMsi0neyJft2+507DEfbM58jwsq+AlfP2haMk8xV5eJKP7L
-	VGKE43JOg1w0QACEWn3Hg4/9e1JZZpLYCSQxH6Any5G9hMyLSUVZMC3f0TZ58IeXUdKdBe
-	q6+gicAr0AQAwf33mPVbek0BItfqrrA=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-572-cJfCahRwPp-JwMsgvvkmYw-1; Tue, 09 Jul 2024 17:09:36 -0400
-X-MC-Unique: cJfCahRwPp-JwMsgvvkmYw-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-7623e193d89so4233664a12.0
-        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 14:09:36 -0700 (PDT)
+	s=arc-20240116; t=1720559609; c=relaxed/simple;
+	bh=98IxAdYgPX6Jr7PqsYEbwqKCv63rJ4BlitWPOe1SC+I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=h1BtRDSUtJHo5ObvROMwsmmi4WFkLjQfDdNwKws0JRDCoBhcvUqMNOhfzuwdZRrV/sabKL1W1jD3i79eO9ZVQdntnFBr77TNA86zOYWLh4dQrVzh3EeqEaQKgF84PoIf8lT8+TkchuNWKKhWqg3dbHn7t38WKcIeB4Kp8sNA3Do=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Uyn00xCn; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1faf6103680so26328215ad.1
+        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 14:13:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720559607; x=1721164407; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=OCxN1kpEpfZBxXrWADMXs6tBNh2vmqe3cjWxxQw4q0s=;
+        b=Uyn00xCnBc5tFPYF4Eq/dhRasknkx+J+ZesjrqVSj3x2SamgDLTpqYYKUR4+NjEWU6
+         9pJIuhowhPF2CenRuZgPlJ4qhQB8YSrlmPIW3nBjk96QVydeyXw4wg+fnBHIgqk5pdAx
+         HkMVTChDYfDfMFSyzYO4Y0ZMJx5u7LQ7kQKcjz2tHsRE/UCzuuEmIzj+q68fEoUD2kAr
+         QbXpL+O/KoopoBuTj493V6Yhejj2BksQ8dvq/VO3FIQLmu8VB7vO5HOVAwsjZWgdWoEO
+         z0CS7gRw8UtCc1pMCAFex1uU9sywuIboLGd5IBXWrOYMaGdPllzxPPeHSheinXpO43kN
+         kjGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720559375; x=1721164175;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=odS83l0DT88K5KKMun5tLUrS9pX9A9r4YSGjmmOE4KY=;
-        b=cUqwgOiSyYHKCo5UvkkYNBhWEBrPL/cxghGPtbJSavHT99p/fVKjzM6BRDQ05OlKDz
-         toTLqwWvTCF3jWhYrFBPPlWDZkhmvTikSL8ol9gabKk2Pj9nIFskzKaASna0kZhqsWZ4
-         vv+K5D/P8E77a3kWOYH5PzoCIIKCLM+wWH7ol8FkYl0gqrzsiN2C3Paj9np2Ch853ry1
-         bEasekgR2bpRSI4UHmCzIa7G2XxudmYoDubLXReYaMn6JdfIZVToutWRLiDKRnQ0OSxt
-         7nVGQcZGihZekKI7LGpsQuw2i78Yg5HOZ+cNGMkLMIoy+TDf3uHvk/f1348eU06yW7zv
-         C1xg==
-X-Forwarded-Encrypted: i=1; AJvYcCXtpNPccoUpnr1cFLXnUPT70VhCaNdtbM5CLNX1XFORYOekQe3vEPea4VM9iq+O4kK5j2ppxYnyVMkqakPIlYTK+qqk
-X-Gm-Message-State: AOJu0YzuricxNLEkKgzYIy2Cs2TDot/ca4FcN4jHw1/j/DvEiEJ81+h6
-	2yk3Cu+o5xTgt8Lg9p8em7goWc+54ZDY5pO5574nq9igkmouj2zM3MhimS4mazNqiShJlGEyVjV
-	7YoL72rqhpYiMTTDGxGLTsVfEPY01TZUCaHaaOx1O/6iVoSAKDw==
-X-Received: by 2002:a05:6a20:a111:b0:1c0:e925:f3e1 with SMTP id adf61e73a8af0-1c2984c9de7mr4305581637.50.1720559375113;
-        Tue, 09 Jul 2024 14:09:35 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFUIpwg0q5tX/615i6NZ/zZJubSifIfLGh41ui/wVdDDxeaKO6CBzN2Bumt/d0xd4q/gI7xDw==
-X-Received: by 2002:a05:6a20:a111:b0:1c0:e925:f3e1 with SMTP id adf61e73a8af0-1c2984c9de7mr4305537637.50.1720559374128;
-        Tue, 09 Jul 2024 14:09:34 -0700 (PDT)
-Received: from [172.31.79.51] ([216.9.110.4])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b438c70a4sm2290324b3a.83.2024.07.09.14.09.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 09 Jul 2024 14:09:33 -0700 (PDT)
-Message-ID: <0dc45181-de7e-4d97-9178-573c6f683f55@redhat.com>
-Date: Tue, 9 Jul 2024 23:09:29 +0200
+        d=1e100.net; s=20230601; t=1720559607; x=1721164407;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OCxN1kpEpfZBxXrWADMXs6tBNh2vmqe3cjWxxQw4q0s=;
+        b=ZVHUyI9vbKQiFo0RpF9w3x2DSJMRiGn8X3/Ig08zOJE3oKhaMFHvKXt46vkQFexDzp
+         gvhFcWI3ineccbYT2A0B8XkH5dXDqO1APlD9Z5OcRa5mYz7f1QnFnVnLwWewaU6lHRUa
+         ED5f0ODVl7xHeOT5Nde7mEyxAOLojhIOWpapzXwFfb3iE0qTV57oGZxU1/amIla82APU
+         xiTMTP/Br/6Mu5aF2wY2iHRXY47U/vV6uo93hMgPVfrXH54Q/XNh8Ch5jwj49OClMkS6
+         sN2KPMcN91Ha3a4WHGzNg7PoN7bgCaqx/GsdZ8jQg51CIuSwcNBPPHrptUjxhovn05nM
+         MhJg==
+X-Forwarded-Encrypted: i=1; AJvYcCXAMieqKs+OFy9/EiBCtAvUeiUhqo1l/qCafvaWQAq8h/dv7Scpa+xJsvjdiBvHH3NfUDq95RWyh0hrerWY0Vr1Bxdz
+X-Gm-Message-State: AOJu0YxPWAaOlvM2vHCxGbf3ukASNk5s99NHW8tPuvj3mGuJi15dZGfb
+	c6TQ61EzrL/HWZsHbbtgxV3+X5PlOaTZszgjohtEndvwm4wAs2AkRstPZmlLAkxqh04NKVf2A/W
+	SMA==
+X-Google-Smtp-Source: AGHT+IFdpjpN1wc3n2M16K74/2OQji70yWBUTcMFGct039d5tw8NoKCuSyI82ExR1eT0aXZIgG4bWhKW/n0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ec8b:b0:1f9:8f8d:cc58 with SMTP id
+ d9443c01a7336-1fbb6d8a001mr1469105ad.12.1720559606905; Tue, 09 Jul 2024
+ 14:13:26 -0700 (PDT)
+Date: Tue, 9 Jul 2024 14:13:25 -0700
+In-Reply-To: <16658367af25852e4bb6abb0caf7c3bc58538db0.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 7/8] mm: secretmem: use AS_INACCESSIBLE to prohibit
- GUP
-To: Patrick Roy <roypat@amazon.co.uk>, seanjc@google.com,
- pbonzini@redhat.com, akpm@linux-foundation.org, dwmw@amazon.co.uk,
- rppt@kernel.org
-Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- willy@infradead.org, graf@amazon.com, derekmn@amazon.com,
- kalyazin@amazon.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, dmatlack@google.com, tabba@google.com,
- chao.p.peng@linux.intel.com, xmarcalx@amazon.co.uk
-References: <20240709132041.3625501-1-roypat@amazon.co.uk>
- <20240709132041.3625501-8-roypat@amazon.co.uk>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240709132041.3625501-8-roypat@amazon.co.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-49-seanjc@google.com>
+ <16658367af25852e4bb6abb0caf7c3bc58538db0.camel@redhat.com>
+Message-ID: <Zo2n9VQ3nBuf1d3F@google.com>
+Subject: Re: [PATCH v2 48/49] KVM: x86: Add a macro for features that are
+ synthesized into boot_cpu_data
+From: Sean Christopherson <seanjc@google.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
+	Robert Hoo <robert.hoo.linux@gmail.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On 09.07.24 15:20, Patrick Roy wrote:
-> Inside of vma_is_secretmem and secretmem_mapping, instead of checking
-> whether a vm_area_struct/address_space has the secretmem ops structure
-> attached to it, check whether the address_space has the AS_INACCESSIBLE
-> bit set. Then set the AS_INACCESSIBLE flag for secretmem's
-> address_space.
+On Thu, Jul 04, 2024, Maxim Levitsky wrote:
+> On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
+> > Add yet another CPUID macro, this time for features that the host kernel
+> > synthesizes into boot_cpu_data, i.e. that the kernel force sets even in
+> > situations where the feature isn't reported by CPUID.  Thanks to the
+> > macro shenanigans of kvm_cpu_cap_init(), such features can now be handled
+> > in the core CPUID framework, i.e. don't need to be handled out-of-band and
+> > thus without as many guardrails.
+> > 
+> > Adding a dedicated macro also helps document what's going on, e.g. the
+> > calls to kvm_cpu_cap_check_and_set() are very confusing unless the reader
+> > knows exactly how kvm_cpu_cap_init() generates kvm_cpu_caps (and even
+> > then, it's far from obvious).
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+
+...
+
+> Now that you added the final F_* macro, let's list all of them:
 > 
-> This means that get_user_pages and friends are disables for all
-> adress_spaces that set AS_INACCESIBLE. The AS_INACCESSIBLE flag was
-> introduced in commit c72ceafbd12c ("mm: Introduce AS_INACCESSIBLE for
-> encrypted/confidential memory") specifically for guest_memfd to indicate
-> that no reads and writes should ever be done to guest_memfd
-> address_spaces. Disallowing gup seems like a reasonable semantic
-> extension, and means that potential future mmaps of guest_memfd cannot
-> be GUP'd.
+> #define F(name)							\
 > 
-> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
-> ---
->   include/linux/secretmem.h | 13 +++++++++++--
->   mm/secretmem.c            |  6 +-----
->   2 files changed, 12 insertions(+), 7 deletions(-)
+> /* Scattered Flag - For features that are scattered by cpufeatures.h. */
+> #define SF(name)						\
 > 
-> diff --git a/include/linux/secretmem.h b/include/linux/secretmem.h
-> index e918f96881f5..886c8f7eb63e 100644
-> --- a/include/linux/secretmem.h
-> +++ b/include/linux/secretmem.h
-> @@ -8,10 +8,19 @@ extern const struct address_space_operations secretmem_aops;
->   
->   static inline bool secretmem_mapping(struct address_space *mapping)
->   {
-> -	return mapping->a_ops == &secretmem_aops;
-> +	return mapping->flags & AS_INACCESSIBLE;
-> +}
-> +
-> +static inline bool vma_is_secretmem(struct vm_area_struct *vma)
-> +{
-> +	struct file *file = vma->vm_file;
-> +
-> +	if (!file)
-> +		return false;
-> +
-> +	return secretmem_mapping(file->f_inode->i_mapping);
->   }
+> /* Features that KVM supports only on 64-bit kernels. */
+> #define X86_64_F(name)						\
+> 
+> /*
+>  * Raw Feature - For features that KVM supports based purely on raw host CPUID,
+>  * i.e. that KVM virtualizes even if the host kernel doesn't use the feature.
+>  * Simply force set the feature in KVM's capabilities, raw CPUID support will
+>  * be factored in by __kvm_cpu_cap_mask().
+>  */
+> #define RAW_F(name)						\
+> 
+> /*
+>  * Emulated Feature - For features that KVM emulates in software irrespective
+>  * of host CPU/kernel support.
+>  */
+> #define EMUL_F(name)						\
+> 
+> /*
+>  * Synthesized Feature - For features that are synthesized into boot_cpu_data,
+>  * i.e. may not be present in the raw CPUID, but can still be advertised to
+>  * userspace.  Primarily used for mitigation related feature flags.
+>  */
+> #define SYN_F(name)						\
+> 
+> /*
+>  * Aliased Features - For features in 0x8000_0001.EDX that are duplicates of
+>  * identical 0x1.EDX features, and thus are aliased from 0x1 to 0x8000_0001.
+>  */
+> #define AF(name)								\
+> 
+> /*
+>  * VMM Features - For features that KVM "supports" in some capacity, i.e. that
+>  * KVM may query, but that are never advertised to userspace.  E.g. KVM allows
+>  * userspace to enumerate MONITOR+MWAIT support to the guest, but the MWAIT
+>  * feature flag is never advertised to userspace because MONITOR+MWAIT aren't
+>  * virtualized by hardware, can't be faithfully emulated in software (KVM
+>  * emulates them as NOPs), and allowing the guest to execute them natively
+>  * requires enabling a per-VM capability.
+>  */
+> #define VMM_F(name)								\
+> 
+> 
+> Honestly, I already somewhat lost in what each of those macros means even
+> when reading the comments, which might indicate that a future reader might
+> also have a hard time understanding those.
+> 
+> I now support even more the case of setting each feature bit in a separate
+> statement as I explained in an earlier patch.
+> 
+> What do you think?
 
-That sounds wrong. You should leave *secretmem alone and instead have 
-something like inaccessible_mapping that is used where appropriate.
+I completely agree that there are an absurd number of flavors of features, but
+I don't see how using separate statement eliminates any of that complexity.  The
+complexity comes from the fact that KVM actually has that many different ways and
+combinations for advertising and enumerating CPUID-based features.
 
-vma_is_secretmem() should not suddenly succeed on something that is not 
-mm/secretmem.c
+Ignoring for the moment that "vmm" and "aliased" could be avoided for any approach,
+if we go with statements, we'll still have
 
--- 
-Cheers,
+  kvm_cpu_cap_init{,passthrough,emulated,synthesized,aliased,vmm,only64}()
 
-David / dhildenb
+or if the flavor is an input/enum,
 
+  enum kvm_cpuid_feature_type {
+  	NORMAL,
+	PASSTHROUGH,
+	EMULATED,
+	SYNTHESIZED,
+	ALIASED,
+	VMM,
+	ONLY_64,
+  }
+
+I.e. we'll still need the same functionality and comments, it would simply be
+dressed up differently.
+
+If the underlying concern is that the macro names are too terse, and/or getting
+one feature per line is desirable, then I'm definitely open to exploring alternative
+formatting options.  But that's largely orthogonal to using macros instead of
+individual function calls.
 
