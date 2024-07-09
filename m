@@ -1,66 +1,66 @@
-Return-Path: <kvm+bounces-21195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21196-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07CA492BAEA
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 15:23:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8837292BAF2
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 15:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16DDCB28841
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 13:23:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4923FB295D6
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 13:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AC21684B9;
-	Tue,  9 Jul 2024 13:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BFF816C842;
+	Tue,  9 Jul 2024 13:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="SJ4rfNYq"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="R7+fxuFK"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 399F016B381;
-	Tue,  9 Jul 2024 13:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35A215ECCD;
+	Tue,  9 Jul 2024 13:21:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720531283; cv=none; b=Lw/IERPqyn2VdZUFBNlC1ugBGQbTr2reTp0eFZBlObYWm6SAMaOfM+V2yiTf5IiP029+2Ojg33gH+dKXBMBKMoYcTckOgfNLJbzJ8vkMiTuuffnB114Eg1ugsbaF6FtG6EL3CGuRiimbiEQbTnigjo+eGeM9YUi6n/PSTj953I4=
+	t=1720531285; cv=none; b=u8gyp1kQm0zTSTpk+Xxq8Z9M/k+kwiExpM1GTSLSMZ0KtEnmzchDZlI0LhyLAMCJXi9kt3Ehl+ildbtMFj0jokX1My/KOSVzeCfX3Q+vZ62Q7SLAM4egg9qKETzrknWpizkU3pmkSK1mwOP7zmEHymCc5422Xor8vinDZpy3D2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720531283; c=relaxed/simple;
-	bh=I23lBRGUQaayc5ffZ+uZ4QKT658elNyo5piW8m0re7U=;
+	s=arc-20240116; t=1720531285; c=relaxed/simple;
+	bh=rTxQSgURDcpl3BzGNJ8JiwifVeB4Xnp57taZkMVuTnc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=by55RGRrzxTHknCRz0m7NlOofkzf6DPMEW3OR6jQ14ncwc1rR2YQtzomNphtgmUj+C4876PD5OV5kjtKGo3cwudjJwBwmgy9RFvW3bj2iWUUgf/k/glHV7CRXpl1vZE6gZu2Liu+Li5LsCnOaKObYECdGLzO7luIfEn1nQWOZjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=SJ4rfNYq; arc=none smtp.client-ip=207.171.188.204
+	 MIME-Version:Content-Type; b=FoMkwEld2wWvAcoHWetbrOyaWmUcGrIsc1g+EWlF64uaRwmjWSBo4v71zxMJ0N2QCTbZ9sF4C+4/VBsX0q+mZqGXe41Orm719ZJ6xQlV869jnhwexLKseWk8c8ikYfdprBDx6Sy9JUfU1IoDpuD0GIU9SnxKPYYB/TOplO3IKH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=R7+fxuFK; arc=none smtp.client-ip=207.171.188.204
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1720531283; x=1752067283;
+  s=amazon201209; t=1720531284; x=1752067284;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=+mzO007algvViExHdnpknhkipITD3cHhlfbBcPgvLYk=;
-  b=SJ4rfNYqkGBW89jP4cSGSgwSqCGGFeraGPQGashE8UVRJol6I0HjpRPE
-   ZKIvfahZlC7ki/iojpPdOr4CVcPyZSJniPUKUatv1wdSmvy3ikqrp2QOY
-   0BBbE0rdpBQt+luO4kYI/0djHT7jlSBT/xH8wAyC//2eFVhNLxPzgEnTI
+  bh=mg7XA6znVd/yr9yTmGtkTxgi1xD8jDw5CHJVcz9oSG8=;
+  b=R7+fxuFKMCvUVaJbOHGUaP5+qo6Lkyn0xTP2vgyjB2xh+mZYh8e6woHM
+   2hrN8zJ62WjREEsesMOpme6iHOJ0CEMGeILOCSxk4mVLvL75XX/ke97i/
+   lzWT7qkMu0ThKp19nES/VBsXj/AdvaKjTiVtJhl0ywfSxupHKmQ2BwRSf
    Q=;
 X-IronPort-AV: E=Sophos;i="6.09,195,1716249600"; 
-   d="scan'208";a="739970201"
+   d="scan'208";a="739970210"
 Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 13:21:15 +0000
-Received: from EX19MTAUEC001.ant.amazon.com [10.0.0.204:50152]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.92.61:2525] with esmtp (Farcaster)
- id 1a418e6e-d33b-4bef-8883-26ade4dd88c5; Tue, 9 Jul 2024 13:21:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 1a418e6e-d33b-4bef-8883-26ade4dd88c5
-Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
- EX19MTAUEC001.ant.amazon.com (10.252.135.222) with Microsoft SMTP Server
+  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 13:21:17 +0000
+Received: from EX19MTAUEA002.ant.amazon.com [10.0.0.204:6203]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.50.89:2525] with esmtp (Farcaster)
+ id 2ee5a019-f3c3-4312-aa43-5ccfe349ee40; Tue, 9 Jul 2024 13:21:15 +0000 (UTC)
+X-Farcaster-Flow-ID: 2ee5a019-f3c3-4312-aa43-5ccfe349ee40
+Received: from EX19D008UEA002.ant.amazon.com (10.252.134.125) by
+ EX19MTAUEA002.ant.amazon.com (10.252.134.9) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 9 Jul 2024 13:21:10 +0000
+ Tue, 9 Jul 2024 13:21:13 +0000
 Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
+ EX19D008UEA002.ant.amazon.com (10.252.134.125) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 9 Jul 2024 13:21:10 +0000
+ Tue, 9 Jul 2024 13:21:13 +0000
 Received: from ua2d7e1a6107c5b.ant.amazon.com (172.19.88.180) by
  mail-relay.amazon.com (10.252.135.200) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34
- via Frontend Transport; Tue, 9 Jul 2024 13:21:07 +0000
+ via Frontend Transport; Tue, 9 Jul 2024 13:21:11 +0000
 From: Patrick Roy <roypat@amazon.co.uk>
 To: <seanjc@google.com>, <pbonzini@redhat.com>, <akpm@linux-foundation.org>,
 	<dwmw@amazon.co.uk>, <rppt@kernel.org>, <david@redhat.com>
@@ -70,9 +70,9 @@ CC: Patrick Roy <roypat@amazon.co.uk>, <tglx@linutronix.de>,
 	<derekmn@amazon.com>, <kalyazin@amazon.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <dmatlack@google.com>,
 	<tabba@google.com>, <chao.p.peng@linux.intel.com>, <xmarcalx@amazon.co.uk>
-Subject: [RFC PATCH 5/8] kvm: gmem: add option to remove guest private memory from direct map
-Date: Tue, 9 Jul 2024 14:20:33 +0100
-Message-ID: <20240709132041.3625501-6-roypat@amazon.co.uk>
+Subject: [RFC PATCH 6/8] kvm: gmem: Temporarily restore direct map entries when needed
+Date: Tue, 9 Jul 2024 14:20:34 +0100
+Message-ID: <20240709132041.3625501-7-roypat@amazon.co.uk>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240709132041.3625501-1-roypat@amazon.co.uk>
 References: <20240709132041.3625501-1-roypat@amazon.co.uk>
@@ -85,179 +85,304 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 Content-Type: text/plain
 
-While guest_memfd is not available to be mapped by userspace, it is
-still accessible through the kernel's direct map. This means that in
-scenarios where guest-private memory is not hardware protected, it can
-be speculatively read and its contents potentially leaked through
-hardware side-channels. Removing guest-private memory from the direct
-map, thus mitigates a large class of speculative execution issues
-[1, Table 1].
+If KVM_GMEM_NO_DIRECT_MAP is set, and KVM tries to internally access
+guest-private memory inside kvm_{read,write}_guest, or via a
+gfn_to_pfn_cache, temporarily restore the direct map entry.
 
-This patch adds a flag to the `KVM_CREATE_GUEST_MEMFD` which, if set, removes the
-struct pages backing guest-private memory from the direct map. Should
-`CONFIG_HAVE_KVM_GMEM_{INVALIDATE, PREPARE}` be set, pages are removed
-after preparation and before invalidation, so that the
-prepare/invalidate routines do not have to worry about potentially
-absent direct map entries.
+To avoid race conditions between two threads restoring or zapping direct
+map entries for the same page and potentially interfering with each
+other (e.g. unfortune interweavings of map->read->unmap in the form of
+map(A)->map(B)->read(A)->unmap(A)->read(B) [BOOM]), the following
+invariant is upheld in this patch:
 
-Direct map removal do not reuse the `KVM_GMEM_PREPARE` machinery, since `prepare` can be
-called multiple time, and it is the responsibility of the preparation
-routine to not "prepare" the same folio twice [2]. Thus, instead
-explicitly check if `filemap_grab_folio` allocated a new folio, and
-remove the returned folio from the direct map only if this was the case.
+- Only a single gfn_to_pfn_cache can exist for any given pfn, and
+- All non-gfn_to_pfn_cache code paths that temporarily restore direct
+  map entries complete the entire map->access->unmap critical section
+while holding the folio lock.
 
-The patch uses release_folio instead of free_folio to reinsert pages
-back into the direct map as by the time free_folio is called,
-folio->mapping can already be NULL. This means that a call to
-folio_inode inside free_folio might deference a NULL pointer, leaving no
-way to access the inode which stores the flags that allow determining
-whether the page was removed from the direct map in the first place.
+To remember whether a given folio currently has a direct map entry, use
+the PG_private flag. If this flag is set, then the folio is removed from
+the direct map, otherwise it is present in the direct map.
+Modifications of this flag, together with the corresponding direct map
+manipulations, must happen while holding the folio's lock.
 
-Lastly, the patch uses set_direct_map_{invalid,default}_noflush instead
-of `set_memory_[n]p` to avoid expensive flushes of TLBs and the L*-cache
-hierarchy. This is especially important once KVM restores direct map
-entries on-demand in later patches, where simple FIO benchmarks of a
-virtio-blk device have shown that TLB flushes on a Intel(R) Xeon(R)
-Platinum 8375C CPU @ 2.90GHz resulted in 80% degradation in throughput
-compared to a non-flushing solution.
+A gfn_to_pfn_cache cannot hold the folio lock for its entire lifetime,
+so it operates as follows: In gpc_map, under folio lock, restore the
+direct map entry and set PG_private to 0. In gpc_unmap, zap the direct
+map entry again and set PG_private back to 1.
 
-Not flushing the TLB means that until TLB entries for temporarily
-restored direct map entries get naturally evicted, they can be used
-during speculative execution, and effectively "unhide" the memory for
-longer than intended. We consider this acceptable, as the only pages
-that are temporarily reinserted into the direct map like this will
-either hold PV data structures (kvm-clock, asyncpf, etc), or pages
-containing privileged instructions inside the guest kernel image (in the
-MMIO emulation case).
+If inside gpc_map the cache finds a folio that has PG_private set to 0,
+it knows that another gfn_to_pfn_cache is currently active for the given
+pfn (as this is the only scenario in which PG_private can be 0 without
+the folio lock being held), and so it returns -EINVAL.
 
-[1]: https://download.vusec.net/papers/quarantine_raid23.pdf
+The only other interesting scenario is then if kvm_{read,write}_guest is
+called for a gfn whose translation is currently cached inside a
+gfn_to_pfn_cache. In this case, kvm_{read,write}_guest notices that
+PG_private is 0 and skips all direct map manipulations. Since it is
+holding the folio lock, it can be sure that gpc_unmap cannot
+concurrently zap the direct map entries while kvm_{read,write}_guest
+still needs them.
+
+Note that this implementation is slightly too restrictive, as sometimes
+multiple gfn_to_pfn_caches need to be active for the same gfn (for
+example, each vCPU has its own kvm-clock structure, which they all try
+to put into the same gfn).
 
 Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
 ---
- include/uapi/linux/kvm.h |  2 ++
- virt/kvm/guest_memfd.c   | 52 ++++++++++++++++++++++++++++++++++------
- 2 files changed, 47 insertions(+), 7 deletions(-)
+ virt/kvm/kvm_main.c | 59 +++++++++++++++++++++---------
+ virt/kvm/pfncache.c | 89 +++++++++++++++++++++++++++++++++++++++++----
+ 2 files changed, 123 insertions(+), 25 deletions(-)
 
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index e065d9fe7ab2..409116aa23c9 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -1563,4 +1563,6 @@ struct kvm_create_guest_memfd {
- 	__u64 reserved[6];
- };
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index 4357f7cdf040..f968f1f3d7f7 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -52,6 +52,7 @@
  
-+#define KVM_GMEM_NO_DIRECT_MAP                 (1ULL << 0)
+ #include <asm/processor.h>
+ #include <asm/ioctl.h>
++#include <asm/set_memory.h>
+ #include <linux/uaccess.h>
+ 
+ #include "coalesced_mmio.h"
+@@ -3291,8 +3292,8 @@ static int __kvm_read_guest_private_page(struct kvm *kvm,
+ 					 void *data, int offset, int len)
+ {
+ 	kvm_pfn_t pfn;
+-	int r;
+-	struct page *page;
++	int r = 0;
++	struct folio *folio;
+ 	void *kaddr;
+ 
+ 	if (!kvm_can_access_gmem(kvm))
+@@ -3303,13 +3304,24 @@ static int __kvm_read_guest_private_page(struct kvm *kvm,
+ 	if (r < 0)
+ 		return -EFAULT;
+ 
+-	page = pfn_to_page(pfn);
+-	lock_page(page);
+-	kaddr = page_address(page) + offset;
+-	memcpy(data, kaddr, len);
+-	unlock_page(page);
+-	put_page(page);
+-	return 0;
++	folio = pfn_folio(pfn);
++	folio_lock(folio);
++	kaddr = folio_address(folio);
++	if (folio_test_private(folio)) {
++		r = set_direct_map_default_noflush(&folio->page);
++		if (r)
++			goto out_unlock;
++	}
++	memcpy(data, kaddr + offset, len);
++	if (folio_test_private(folio)) {
++		r = set_direct_map_invalid_noflush(&folio->page);
++		if (r)
++			goto out_unlock;
++	}
++out_unlock:
++	folio_unlock(folio);
++	folio_put(folio);
++	return r;
+ }
+ 
+ static int __kvm_vcpu_read_guest_private_page(struct kvm_vcpu *vcpu,
+@@ -3437,8 +3449,8 @@ static int __kvm_write_guest_private_page(struct kvm *kvm,
+ 					  const void *data, int offset, int len)
+ {
+ 	kvm_pfn_t pfn;
+-	int r;
+-	struct page *page;
++	int r = 0;
++	struct folio *folio;
+ 	void *kaddr;
+ 
+ 	if (!kvm_can_access_gmem(kvm))
+@@ -3449,14 +3461,25 @@ static int __kvm_write_guest_private_page(struct kvm *kvm,
+ 	if (r < 0)
+ 		return -EFAULT;
+ 
+-	page = pfn_to_page(pfn);
+-	lock_page(page);
+-	kaddr = page_address(page) + offset;
+-	memcpy(kaddr, data, len);
+-	unlock_page(page);
+-	put_page(page);
++	folio = pfn_folio(pfn);
++	folio_lock(folio);
++	kaddr = folio_address(folio);
++	if (folio_test_private(folio)) {
++		r = set_direct_map_default_noflush(&folio->page);
++		if (r)
++			goto out_unlock;
++	}
++	memcpy(kaddr + offset, data, len);
++	if (folio_test_private(folio)) {
++		r = set_direct_map_invalid_noflush(&folio->page);
++		if (r)
++			goto out_unlock;
++	}
+ 
+-	return 0;
++out_unlock:
++	folio_unlock(folio);
++	folio_put(folio);
++	return r;
+ }
+ 
+ static int __kvm_vcpu_write_guest_private_page(struct kvm_vcpu *vcpu,
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index 6430e0a49558..95d2d5cdaa12 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -16,6 +16,9 @@
+ #include <linux/highmem.h>
+ #include <linux/module.h>
+ #include <linux/errno.h>
++#include <linux/pagemap.h>
 +
- #endif /* __LINUX_KVM_H */
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 9148b9679bb1..dc9b0c2d0b0e 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -4,6 +4,7 @@
- #include <linux/kvm_host.h>
- #include <linux/pagemap.h>
- #include <linux/anon_inodes.h>
-+#include <linux/set_memory.h>
++#include <asm/set_memory.h>
  
  #include "kvm_mm.h"
  
-@@ -49,9 +50,16 @@ static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct fol
- 	return 0;
+@@ -99,10 +102,68 @@ bool kvm_gpc_check(struct gfn_to_pfn_cache *gpc, unsigned long len)
+ 	return true;
  }
  
-+static bool kvm_gmem_not_present(struct inode *inode)
-+{
-+	return ((unsigned long)inode->i_private & KVM_GMEM_NO_DIRECT_MAP) != 0;
-+}
-+
- static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, bool prepare)
+-static void *gpc_map(kvm_pfn_t pfn)
++static int gpc_map_gmem(kvm_pfn_t pfn)
  {
- 	struct folio *folio;
-+	bool zap_direct_map = false;
-+	int r;
- 
- 	/* TODO: Support huge pages. */
- 	folio = filemap_grab_folio(inode->i_mapping, index);
-@@ -74,16 +82,30 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, bool
- 		for (i = 0; i < nr_pages; i++)
- 			clear_highpage(folio_page(folio, i));
- 
-+		// We need to clear the folio before calling kvm_gmem_prepare_folio,
-+		// but can only remove it from the direct map _after_ preparation is done.
-+		zap_direct_map = kvm_gmem_not_present(inode);
+-	if (pfn_valid(pfn))
++	int r = 0;
++	struct folio *folio = pfn_folio(pfn);
++	struct inode *inode = folio_inode(folio);
 +
- 		folio_mark_uptodate(folio);
- 	}
- 
- 	if (prepare) {
--		int r =	kvm_gmem_prepare_folio(inode, index, folio);
--		if (r < 0) {
--			folio_unlock(folio);
--			folio_put(folio);
--			return ERR_PTR(r);
--		}
-+		r = kvm_gmem_prepare_folio(inode, index, folio);
-+		if (r < 0)
-+			goto out_err;
-+	}
++	if (((unsigned long)inode->i_private & KVM_GMEM_NO_DIRECT_MAP) == 0)
++		goto out;
 +
-+	if (zap_direct_map) {
-+		r = set_direct_map_invalid_noflush(&folio->page);
-+		if (r < 0)
-+			goto out_err;
-+
-+		// We use the private flag to track whether the folio has been removed
-+		// from the direct map. This is because inside of ->free_folio,
-+		// we do not have access to the address_space anymore, meaning we
-+		// cannot check folio_inode(folio)->i_private to determine whether
-+		// KVM_GMEM_NO_DIRECT_MAP was set.
-+		folio_set_private(folio);
- 	}
- 
- 	/*
-@@ -91,6 +113,10 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, bool
- 	 * unevictable and there is no storage to write back to.
- 	 */
- 	return folio;
-+out_err:
-+	folio_unlock(folio);
-+	folio_put(folio);
-+	return ERR_PTR(r);
- }
- 
- static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
-@@ -354,10 +380,22 @@ static void kvm_gmem_free_folio(struct folio *folio)
- }
- #endif
- 
-+static void kvm_gmem_invalidate_folio(struct folio *folio, size_t start, size_t end)
-+{
-+	if (start == 0 && end == PAGE_SIZE) {
-+		// We only get here if PG_private is set, which only happens if kvm_gmem_not_present
-+		// returned true in kvm_gmem_get_folio. Thus no need to do that check again.
-+		BUG_ON(set_direct_map_default_noflush(&folio->page));
++	/* We need to avoid race conditions where set_memory_np is called for
++	 * pages that other parts of KVM still try to access.  We use the
++	 * PG_private bit for this. If it is set, then the page is removed from
++	 * the direct map. If it is cleared, the page is present in the direct
++	 * map. All changes to this bit, and all modifications of the direct
++	 * map entries for the page happen under the page lock. The _only_
++	 * place where a page will be in the direct map while the page lock is
++	 * _not_ held is if it is inside a gpc. All other parts of KVM that
++	 * temporarily re-insert gmem pages into the direct map (currently only
++	 * guest_{read,write}_page) take the page lock before the direct map
++	 * entry is restored, and hold it until it is zapped again. This means
++	 * - If we reach gpc_map while, say, guest_read_page is operating on
++	 *   this page, we block on acquiring the page lock until
++	 *   guest_read_page is done.
++	 * - If we reach gpc_map while another gpc is already caching this
++	 *   page, the page is present in the direct map and the PG_private
++	 *   flag is cleared. Int his case, we return -EINVAL below to avoid
++	 *   two gpcs caching the same page (since we do not ref-count
++	 *   insertions back into the direct map, when the first cache gets
++	 *   invalidated it would "break" the second cache that assumes the
++	 *   page is present in the direct map until the second cache itself
++	 *   gets invalidated).
++	 * - Lastly, if guest_read_page is called for a page inside of a gpc,
++	 *   it will see that the PG_private flag is cleared, and thus assume
++	 *   it is present in the direct map (and leave the direct map entry
++	 *   untouched). Since it will be holding the page lock, it cannot race
++	 *   with gpc_unmap.
++	 */
++	folio_lock(folio);
++	if (folio_test_private(folio)) {
++		r = set_direct_map_default_noflush(&folio->page);
++		if (r)
++			goto out_unlock;
 +
 +		folio_clear_private(folio);
++	} else {
++		r = -EINVAL;
 +	}
++out_unlock:
++	folio_unlock(folio);
++out:
++	return r;
 +}
 +
- static const struct address_space_operations kvm_gmem_aops = {
- 	.dirty_folio = noop_dirty_folio,
- 	.migrate_folio	= kvm_gmem_migrate_folio,
- 	.error_remove_folio = kvm_gmem_error_folio,
-+	.invalidate_folio = kvm_gmem_invalidate_folio,
- #ifdef CONFIG_HAVE_KVM_GMEM_INVALIDATE
- 	.free_folio = kvm_gmem_free_folio,
- #endif
-@@ -443,7 +481,7 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
- {
- 	loff_t size = args->size;
- 	u64 flags = args->flags;
--	u64 valid_flags = 0;
-+	u64 valid_flags = KVM_GMEM_NO_DIRECT_MAP;
++static void *gpc_map(kvm_pfn_t pfn, bool private)
++{
++	if (pfn_valid(pfn)) {
++		if (private) {
++			if (gpc_map_gmem(pfn))
++				return NULL;
++		}
+ 		return kmap(pfn_to_page(pfn));
++	}
  
- 	if (flags & ~valid_flags)
- 		return -EINVAL;
+ #ifdef CONFIG_HAS_IOMEM
+ 	return memremap(pfn_to_hpa(pfn), PAGE_SIZE, MEMREMAP_WB);
+@@ -111,13 +172,27 @@ static void *gpc_map(kvm_pfn_t pfn)
+ #endif
+ }
+ 
+-static void gpc_unmap(kvm_pfn_t pfn, void *khva)
++static void gpc_unmap(kvm_pfn_t pfn, void *khva, bool private)
+ {
+ 	/* Unmap the old pfn/page if it was mapped before. */
+ 	if (is_error_noslot_pfn(pfn) || !khva)
+ 		return;
+ 
+ 	if (pfn_valid(pfn)) {
++		if (private) {
++			struct folio *folio = pfn_folio(pfn);
++			struct inode *inode = folio_inode(folio);
++
++			if ((unsigned long)inode->i_private &
++			    KVM_GMEM_NO_DIRECT_MAP) {
++				folio_lock(folio);
++				BUG_ON(folio_test_private(folio));
++				BUG_ON(set_direct_map_invalid_noflush(
++					&folio->page));
++				folio_set_private(folio);
++				folio_unlock(folio);
++			}
++		}
+ 		kunmap(pfn_to_page(pfn));
+ 		return;
+ 	}
+@@ -195,7 +270,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+ 			 * the existing mapping and didn't create a new one.
+ 			 */
+ 			if (new_khva != old_khva)
+-				gpc_unmap(new_pfn, new_khva);
++				gpc_unmap(new_pfn, new_khva, gpc->is_private);
+ 
+ 			kvm_release_pfn_clean(new_pfn);
+ 
+@@ -224,7 +299,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+ 		if (new_pfn == gpc->pfn)
+ 			new_khva = old_khva;
+ 		else
+-			new_khva = gpc_map(new_pfn);
++			new_khva = gpc_map(new_pfn, gpc->is_private);
+ 
+ 		if (!new_khva) {
+ 			kvm_release_pfn_clean(new_pfn);
+@@ -379,7 +454,7 @@ static int __kvm_gpc_refresh(struct gfn_to_pfn_cache *gpc, gpa_t gpa, unsigned l
+ 	write_unlock_irq(&gpc->lock);
+ 
+ 	if (unmap_old)
+-		gpc_unmap(old_pfn, old_khva);
++		gpc_unmap(old_pfn, old_khva, old_private);
+ 
+ 	return ret;
+ }
+@@ -500,6 +575,6 @@ void kvm_gpc_deactivate(struct gfn_to_pfn_cache *gpc)
+ 		list_del(&gpc->list);
+ 		spin_unlock(&kvm->gpc_lock);
+ 
+-		gpc_unmap(old_pfn, old_khva);
++		gpc_unmap(old_pfn, old_khva, gpc->is_private);
+ 	}
+ }
 -- 
 2.45.2
 
