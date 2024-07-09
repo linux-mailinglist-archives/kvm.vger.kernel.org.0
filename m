@@ -1,98 +1,122 @@
-Return-Path: <kvm+bounces-21160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21161-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 020FD92B26D
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 10:44:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A22F92B278
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 10:45:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 82ED9B231CB
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 08:44:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1064D1F21CA0
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 08:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA82215383F;
-	Tue,  9 Jul 2024 08:44:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DCB9153BC3;
+	Tue,  9 Jul 2024 08:45:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/DLK0ZA"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="GBGYso/q"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC49153812
-	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 08:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A482C14F13A;
+	Tue,  9 Jul 2024 08:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720514658; cv=none; b=tPP6/NXQINMyE3yAM5JK1Ks/kRT1IFxa2L0uH0BGYTdT3sxoycdVmlyObj2vznGa7PMktX6JADM5i7aOmdNBfB7x7ZsxWRNBmaM/xiuKzGTqEXuqX8tVYpn6e5ky2RtkKbKBiKfzcN1yykhqDnjmSg4GHuy8FXTEAI0hqhBe1yw=
+	t=1720514713; cv=none; b=jHWieiMmV8oTmUSxn6MXgXnelpMMpP0SV7v5wfsesro5XOKYhIyoZYM8XmffqTyaoouNA/mjGPaQ/A9KDTIFTJAkK8RIymqiVom67JFZhqmNBpDKAKWgrOc6eaWGMDmDJpzJPdNp8BGLnSuPM8IDCe6ltvUu4iG+n9H8104ge+c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720514658; c=relaxed/simple;
-	bh=9ZCUa81VavM1MlstSf+OFzGIBH8zkNKOuup3w95DW3A=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pZ/85HKHKofWDVlLuUl3grpJ23KwQvuQyocuavMEmrkSlmI+1H9DKVVxZQmL1l4GOsAFXh2AAGPfrsxPk7EfX9WPz2ApAW2tCzFASdfn3cB21b5MuBD9rhK1HjoakszUVh8z7WwJt6xTW9sTdsJRuy6mF5A4+KPiBLU1BUuyCWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/DLK0ZA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 98F1CC4AF0F
-	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 08:44:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720514657;
-	bh=9ZCUa81VavM1MlstSf+OFzGIBH8zkNKOuup3w95DW3A=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=M/DLK0ZAtbRhz/2rywTo0deFAP3VeOJbIFMaQgCWi3g+mA7VKekR16i/6QKN2P/42
-	 h74e9EtIaBvkKOE/vu8qIS6XUv09lfNz59bRHTkOQLUYy/jmAcobCBwTusFl/Y53rA
-	 B3S/E8dbbSEE7IudTDwGlPfLgE84suu2EykxsdUzLQCKZ3WOIBnBAOmowbU/32SXtL
-	 yW7dEnvoZe1dMg0Lh5ZTQji0I1dq4YzILLZSOBXLka0nyyS24P9W3lR9I+qHrzXHE0
-	 +63c1uSwjhfbMn1ZzthbEelfACfPP7fuQW0eatjw802ivMIOVDJC0eYWA5NckliU5d
-	 0pjXxCI2MrG7g==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 91D11C433E5; Tue,  9 Jul 2024 08:44:17 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219010] [REGRESSION][VFIO] kernel 6.9.7 causing qemu crash
- because of "Collect hot-reset devices to local buffer"
-Date: Tue, 09 Jul 2024 08:44:17 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: regressions@leemhuis.info
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-219010-28872-EwoVwsZhaJ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219010-28872@https.bugzilla.kernel.org/>
-References: <bug-219010-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1720514713; c=relaxed/simple;
+	bh=KyH5U1pumNojFcQuwTq/G7SisPQVkZOVM9mntQbyaQ8=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Cc:From:To:
+	 Subject:Message-ID:Date; b=YbbbCINUZ1YjMqSfqeEkvMcCANzEvimH+zn3I4V/ibGGRX4AKG97IEd4FpqyiSsX2OTJjk1Ny0mZTiANvqqA3jk9PS82efBQ/ni8B62b/s5FvF+vep11S6Yv+VpuluFtjEBx3cVME4rsIWPEmPuU1q54F0h/rA+T8sBqSsOtFPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=GBGYso/q; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4695TG1R023707;
+	Tue, 9 Jul 2024 08:45:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-type:mime-version:content-transfer-encoding:in-reply-to
+	:references:cc:from:to:subject:message-id:date; s=pp1; bh=KyH5U1
+	pumNojFcQuwTq/G7SisPQVkZOVM9mntQbyaQ8=; b=GBGYso/qu4N2A7ys2EcTfj
+	CehZ7UdGkMFAjIuHUfLh7zD42ryCu7YasJW9/fMI0x5/1nH2KifBtV7mgLNudp3J
+	jONBRcjJi488Q1uoO/egg0WQUmlACLhuMsdtfnEkVJ53KNBTaFqMPPCcNBAR4j+/
+	Le06ThBTYMsEd7I8yK0J2VasVvfakJsxhS2PuiYDEDlS+Xrtnafdu1IIAG3uIraG
+	h6nVX+TadmhhGTeuFUC3pF4iAYWqjZDZWShz65SxH+RIXnBEUhvax9OKLV5RMPQB
+	eVztSD32xGNKU3DnAfprr+GJUWbLV0iFsP0I9+m+o+i1alzv8xV6Cz50VJ0rBilw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 408y380ejv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Jul 2024 08:45:09 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4698j97H026968;
+	Tue, 9 Jul 2024 08:45:09 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 408y380ejr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Jul 2024 08:45:09 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4697kum9024680;
+	Tue, 9 Jul 2024 08:45:08 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 407g8u3sap-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 09 Jul 2024 08:45:08 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4698j24w53805474
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 9 Jul 2024 08:45:05 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D23AA20043;
+	Tue,  9 Jul 2024 08:45:02 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B41322004D;
+	Tue,  9 Jul 2024 08:45:02 +0000 (GMT)
+Received: from t14-nrb (unknown [9.171.72.32])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  9 Jul 2024 08:45:02 +0000 (GMT)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240703155900.103783-3-imbrenda@linux.ibm.com>
+References: <20240703155900.103783-1-imbrenda@linux.ibm.com> <20240703155900.103783-3-imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, hca@linux.ibm.com,
+        svens@linux.ibm.com, agordeev@linux.ibm.com, gor@linux.ibm.com,
+        nsg@linux.ibm.com, seiden@linux.ibm.com, frankja@linux.ibm.com,
+        borntraeger@de.ibm.com, gerald.schaefer@linux.ibm.com,
+        david@redhat.com
+From: Nico Boehr <nrb@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1 2/2] s390/kvm: Move bitfields for dat tables
+Message-ID: <172051470220.243722.11724961453286234156@t14-nrb>
+User-Agent: alot/0.8.1
+Date: Tue, 09 Jul 2024 10:45:02 +0200
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: FyT6R0dpv90eMsaW6KTbr7YQu1veB98A
+X-Proofpoint-GUID: E65jeJ3xYUP11FkG8PiCNu9M_C8J6kwr
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-08_15,2024-07-08_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ spamscore=0 mlxscore=0 bulkscore=0 priorityscore=1501 clxscore=1015
+ suspectscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0
+ mlxlogscore=655 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407090055
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219010
+Quoting Claudio Imbrenda (2024-07-03 17:59:00)
+> Move and improve the struct definitions for DAT tables from gaccess.c
+> to a new header.
+>=20
+> Once in a separate header, the structs become available everywhere. One
+> possible usecase is to merge them in the s390 pte_t and p?d_t
+> definitions, which is left as an exercise for the reader.
+>=20
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
 
-The Linux kernel's regression tracker (Thorsten Leemhuis) (regressions@leem=
-huis.info) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |regressions@leemhuis.info
-
---- Comment #2 from The Linux kernel's regression tracker (Thorsten Leemhui=
-s) (regressions@leemhuis.info) ---
-Does the problem happen with 6.10-rc6 or newer as well?
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+Reviewed-by: Nico Boehr <nrb@linux.ibm.com>
 
