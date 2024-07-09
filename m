@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-21170-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B68992B876
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 13:39:41 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CCCF92B8B6
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 13:45:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 650D61C227B8
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 11:39:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 774811C211FF
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 11:45:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA585158851;
-	Tue,  9 Jul 2024 11:39:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2524158A08;
+	Tue,  9 Jul 2024 11:43:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kWTgVx3s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfiQXz0H"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E367C149C79;
-	Tue,  9 Jul 2024 11:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0BF158202;
+	Tue,  9 Jul 2024 11:43:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720525172; cv=none; b=WzNZXCuBbVxjlW+Shy1I5PN0MNseO+w6WviVcSdgjvFASqYCiCDivKgYce8yY8e3bkl61atQP/uU8qVCYak40tTuMNts+A20MSCcCo0CjeLqTdxrxYpRkxsMjdfPDPEU2V40dtfIr/q/+zVV7V+wZUZSWi+1h0jDQpY5S2Fc4sY=
+	t=1720525424; cv=none; b=c4u019JqlZEoxbNxaH/WGVMXWrFKQ++EojKUBkttzO2+MQ7kwQxK+K8bVrbkH5mYZZrkYQYLv2YaXhQmr05HpP+6fNPwM1XvL37+XXMas0O2sRS90hOERHoCo+QR7yfr0Pr7K+h+Dw0yihYhjY+aup9Y9bLrzqFVy0wmNbxejmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720525172; c=relaxed/simple;
-	bh=/gbNQhUzu5NCtcl067Z+7CcqqB4xMXkO1NA71N39dMw=;
+	s=arc-20240116; t=1720525424; c=relaxed/simple;
+	bh=ZxDFrvOXfuTsNU7JuLaaGFFmPfePvQEPeXe9Hb2BLpw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=T1Wm5J1uKRR4K5t0H4GO93pJzqZgD0BbqZE7hiU6jhiwS4+4VpGdubEISBupNas/s30keOVOIFqhxZ9yji2I6rPI79nQ4oKPFxSOmjbtojZQTQDhSqwxqbugX456KYmrheqqKBmd8PfyTiKKXZt6Yw8oiUfhCgVoPtZ57QbUTGc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kWTgVx3s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77EFFC3277B;
-	Tue,  9 Jul 2024 11:39:28 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=OmKXbRniSm2W6a62dh0NsHcKODA/ulv1gznrFtfEltCQfICkOYeZOaymHzFezPYORDWmRB/KjdJu95N4r64iFS2e/ucvNiUGUr+EoZN2cDnrWWGLt0I/2UsYOKEG1ONU8AOxdYC4UkGtmHEyE4ZW06hzV4zQwTXlrxQWlR2Vrx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfiQXz0H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B6AC3277B;
+	Tue,  9 Jul 2024 11:43:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720525171;
-	bh=/gbNQhUzu5NCtcl067Z+7CcqqB4xMXkO1NA71N39dMw=;
+	s=k20201202; t=1720525424;
+	bh=ZxDFrvOXfuTsNU7JuLaaGFFmPfePvQEPeXe9Hb2BLpw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kWTgVx3svUaQuIYLcUm2926OaFhtxUS/LuZ8p8OO0fR5TB06GkTblfwngWYAFHuo4
-	 /QExltCfzLf6Z9T9rrlvXq5QmMI1YWK+b/5sndtrEbnW8pyuH1ln/56/99Zsj7ZcsF
-	 WVxeeT01940fssv5ebJSukJqg2HVjsMQ4qSJTh2GueuZyu4A5Qx+nRQUF20NmGfkwx
-	 +wBYZuPqlfb0f1lfvz+ejGM+uZJEQnYh8T51ep9iQTxO/0cDK+0EwhA3Qw3IGlHfZy
-	 1xuqhQgg01sdOMTulvsa6hwnC8BpGNwruPPIlVolyHS61XVn/G2pCZVqTZi+HnDp+W
-	 YYfi5FeCJi+rA==
-Date: Tue, 9 Jul 2024 12:39:25 +0100
+	b=pfiQXz0HFMM9t00fsyyKZHGaMb0ABmeWo1Y+pnEGEWD6IPKk9GYURbBtRZHZ7iA5Y
+	 TFb+w0EeWTqNUX/JtuOKew9N6CWub0ExXvj3k3kAvbgS5E+irplYxueRIjyzWjdX2Q
+	 9NyVdbgodDmzh9uhuBNs7zLEQCZyXR7OXdNBKxtstQXjOMWpE//Zm0DTCQ4LQ21eEO
+	 djApqAZFnVdxXz7gS5A4S/qokGiu8LGSiC9rnwIBqt6CWxlEDXu7tMVO2dQeDmFYP1
+	 N9UjuFKHdl4vBUcOR0PdwwKGklSzQeGivvZLza1SesMljrzWi1rYZ5XqYkr7GqW5Q5
+	 HygwMTdFZBGKA==
+Date: Tue, 9 Jul 2024 12:43:37 +0100
 From: Will Deacon <will@kernel.org>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -56,10 +56,10 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v4 05/15] arm64: Mark all I/O as non-secure shared
-Message-ID: <20240709113925.GA13242@willie-the-truck>
+Subject: Re: [PATCH v4 06/15] arm64: Make the PHYS_MASK_SHIFT dynamic
+Message-ID: <20240709114337.GB13242@willie-the-truck>
 References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-6-steven.price@arm.com>
+ <20240701095505.165383-7-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,71 +68,74 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240701095505.165383-6-steven.price@arm.com>
+In-Reply-To: <20240701095505.165383-7-steven.price@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, Jul 01, 2024 at 10:54:55AM +0100, Steven Price wrote:
-> All I/O is by default considered non-secure for realms. As such
-> mark them as shared with the host.
+On Mon, Jul 01, 2024 at 10:54:56AM +0100, Steven Price wrote:
+> Make the PHYS_MASK_SHIFT dynamic for Realms. This is only is required
+> for masking the PFN from a pte entry. For a realm phys_mask_shift is
+> reduced if the RMM reports a smaller configured size for the guest.
+> 
+> The realm configuration splits the address space into two with the top
+> half being memory shared with the host, and the bottom half being
+> protected memory. We treat the bit which controls this split as an
+> attribute bit and hence exclude it (and any higher bits) from the mask.
 > 
 > Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
-> Changes since v3:
->  * Add PROT_NS_SHARED to FIXMAP_PAGE_IO rather than overriding
->    set_fixmap_io() with a custom function.
->  * Modify ioreamp_cache() to specify PROT_NS_SHARED too.
-> ---
->  arch/arm64/include/asm/fixmap.h | 2 +-
->  arch/arm64/include/asm/io.h     | 8 ++++----
->  2 files changed, 5 insertions(+), 5 deletions(-)
 > 
-> diff --git a/arch/arm64/include/asm/fixmap.h b/arch/arm64/include/asm/fixmap.h
-> index 87e307804b99..f2c5e653562e 100644
-> --- a/arch/arm64/include/asm/fixmap.h
-> +++ b/arch/arm64/include/asm/fixmap.h
-> @@ -98,7 +98,7 @@ enum fixed_addresses {
->  #define FIXADDR_TOT_SIZE	(__end_of_fixed_addresses << PAGE_SHIFT)
->  #define FIXADDR_TOT_START	(FIXADDR_TOP - FIXADDR_TOT_SIZE)
+> ---
+> v3: Drop the MAX_PHYS_MASK{,_SHIFT} definitions as they are no longer
+> needed.
+> ---
+>  arch/arm64/include/asm/pgtable-hwdef.h | 6 ------
+>  arch/arm64/include/asm/pgtable.h       | 5 +++++
+>  arch/arm64/kernel/rsi.c                | 5 +++++
+>  3 files changed, 10 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> index 9943ff0af4c9..2e3af0693bd8 100644
+> --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> @@ -203,12 +203,6 @@
+>   */
+>  #define PTE_S2_MEMATTR(t)	(_AT(pteval_t, (t)) << 2)
 >  
-> -#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE)
-> +#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE | PROT_NS_SHARED)
+> -/*
+> - * Highest possible physical address supported.
+> - */
+> -#define PHYS_MASK_SHIFT		(CONFIG_ARM64_PA_BITS)
+> -#define PHYS_MASK		((UL(1) << PHYS_MASK_SHIFT) - 1)
+> -
+>  #define TTBR_CNP_BIT		(UL(1) << 0)
 >  
->  void __init early_fixmap_init(void);
+>  /*
+> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
+> index f8efbc128446..11d614d83317 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -39,6 +39,11 @@
+>  #include <linux/sched.h>
+>  #include <linux/page_table_check.h>
 >  
-> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
-> index 4ff0ae3f6d66..07fc1801c6ad 100644
-> --- a/arch/arm64/include/asm/io.h
-> +++ b/arch/arm64/include/asm/io.h
-> @@ -277,12 +277,12 @@ static inline void __const_iowrite64_copy(void __iomem *to, const void *from,
->  
->  #define ioremap_prot ioremap_prot
->  
-> -#define _PAGE_IOREMAP PROT_DEVICE_nGnRE
-> +#define _PAGE_IOREMAP (PROT_DEVICE_nGnRE | PROT_NS_SHARED)
->  
->  #define ioremap_wc(addr, size)	\
-> -	ioremap_prot((addr), (size), PROT_NORMAL_NC)
-> +	ioremap_prot((addr), (size), (PROT_NORMAL_NC | PROT_NS_SHARED))
->  #define ioremap_np(addr, size)	\
-> -	ioremap_prot((addr), (size), PROT_DEVICE_nGnRnE)
-> +	ioremap_prot((addr), (size), (PROT_DEVICE_nGnRnE | PROT_NS_SHARED))
+> +extern unsigned int phys_mask_shift;
+> +
+> +#define PHYS_MASK_SHIFT		(phys_mask_shift)
+> +#define PHYS_MASK		((1UL << PHYS_MASK_SHIFT) - 1)
 
-Hmm. I do wonder whether you've pushed the PROT_NS_SHARED too far here.
+I tried to figure out where this is actually used so I could understand
+your comment in the commit message:
 
-There's nothing _architecturally_ special about the top address bit.
-Even if the RSI divides the IPA space in half, the CPU doesn't give two
-hoots about it in the hardware. In which case, it feels wrong to bake
-PROT_NS_SHARED into ioremap_prot -- it feels much better to me if the
-ioremap() code OR'd that into the physical address when passing it down
+ > This is only is required for masking the PFN from a pte entry
 
-There's a selfish side of that argument, in that we need to hook
-ioremap() for pKVM protected guests, but I do genuinely feel that
-treating address bits as protection bits is arbitrary and doesn't belong
-in these low-level definitions. In a similar vein, AMD has its
-sme_{set,clr}() macros that operate on the PA (e.g. via dma_to_phys()),
-which feels like a more accurate abstraction to me.
+The closest thing I could find is in arch/arm64/mm/mmap.c, where the
+mask is used as part of valid_mmap_phys_addr_range() which exists purely
+to filter accesses to /dev/mem. That's pretty niche, so why not just
+inline the RSI-specific stuff in there behind a static key instead of
+changing these definitions?
+
+Or did I miss a subtle user somewhere else?
 
 Will
 
