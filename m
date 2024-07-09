@@ -1,201 +1,176 @@
-Return-Path: <kvm+bounces-21228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83C9292C376
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 20:46:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BEEB92C3A0
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 21:03:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6D221C228B7
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 18:46:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF4421C22894
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 19:03:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E60E180054;
-	Tue,  9 Jul 2024 18:45:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E415182A61;
+	Tue,  9 Jul 2024 19:03:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AZASUvHM"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="A6g2pnoa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5F21B86C2
-	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 18:45:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D0C81B86D8
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 19:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720550757; cv=none; b=NEzR1JQMVvcMQonqrwdV3S8GzcVa8QeQYDjIc8udcGCFxHonpLrbgE+kQCx9pdvZcnMbUjlPJGytznIvuFkcwTjO6UvsZdXLaXBhpYkVv/WR+yMolofy74vx3eBmXbxYlmrg31pjnAEekPdIpgVvtAJCA8LIfBdEahuvZxh+SwU=
+	t=1720551798; cv=none; b=KifyI0hHKuh++McMC5WI3NYH1bHTw1t1QBR1tjOH2bUtQ6G3rL2I9E+jESlNMTx1oNqTo5C0NHg8l/Bs/WxoQUa276dEh3sIm5G+iJq+A3NqGkAK8G58ktX3oa6+WaNvy8nrFLn5YbtvjDWFNx5zuYlLt+Pm15R3iz1hT6MmqEQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720550757; c=relaxed/simple;
-	bh=DZ9+8t+WkPgSQ8znv0DJ8bDk1A7MLccr3mMfUhEicCo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TKgylgE4YfPbXtDwcYGwnnj9Et1DCojH50dIW0Z6IHJip0M5dYxlVtmbgJMfevtdxMAqyyh/+m9fsYGk0+SC/E5kKUWRfkC4xJ0RzAcm/wkOHteRSVxzBeki4g4Ne8J87Blbg9j750EdmplGspw4mcdSJdTapGKTJUsT8B10Dc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AZASUvHM; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6818fa37eecso4385928a12.1
-        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 11:45:56 -0700 (PDT)
+	s=arc-20240116; t=1720551798; c=relaxed/simple;
+	bh=UmMx48wnc0FnxjTp1WjNlbVccTNxzM4x83j7igXR7TU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3Y0xZF6bX7oc5oAvCJ9VRPB8tdoO62T1D/uywbCBldHgMrAN5HjbqBcZGIxCKn2nKGqrzKr5JZimtpnrZWTdvAdzqLYNeP+CgXZ6HSu2n+LiOOaLXcZ95PrJcrPEzsVqNcTjfSFWak/vtmXuCIJ6ppQFe5US7xvs/eiYoMrySE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=A6g2pnoa; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6b5eb69e04cso33242466d6.1
+        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 12:03:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720550756; x=1721155556; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0oFkXIsaf/TPw78YVNz4BT3QVX826pe30lG1vGzhC0Y=;
-        b=AZASUvHMyxDKA3/yb0oFGU4eScFyTosHEYUrHH6izLqVW5SS9x3sM/ifd20xysurZ9
-         oUv7r49pXJ/dbAThYMgzxvhT5MixuMrauplkCtLjKp5eSGCN8gaRcOj3DKdr8zupzbMe
-         vvCD3IuFVyEDUv0ftDJsuWJJV28nYqaimvI3QU7nxuPDWF9RLsGg4c1qMoH8tVztL/eG
-         gSLOvYObfNvNAlY3ePApvSUXDB8BwhcOTluSAaRCF2inctk2895nTwueQa7RnscWF1q0
-         KMmRpR0GOXBwcZ//MJtyxAPqUzBf/aTSmWqCc5sStStnuqJwvsV4LFucUW6/3gfveKBL
-         9u1w==
+        d=ziepe.ca; s=google; t=1720551796; x=1721156596; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tz4SKanGT0p7B5kijsG/hyAEtWawoOPO2+O2oyG1KXg=;
+        b=A6g2pnoaWkIIc0CimeecaG6mN13v3n+vMZWH1a2eisPl7oElZ5j8RpC7cpUSns7z7E
+         SaXhh3hjwvo58JADJ4Lw0s/jnqxlC0BzTQIPpK7tnTw3bVo/e3D+fRbRqyUbjlLnjChe
+         VcL/iF5vlClZpPkk1kOVxFIVZXTJH4WsBu1HbMB3pT8UgIlpcPiRTcjlKhpPxR7637Fk
+         DRUQkMUNORI+3EPdhjl+QzUQN9nItiNZ6HEzDLm0u+TDbYIPjlW+C8lfjk3FVZ8v7AWW
+         V8oJikbmctWxcgEg3nIGGAnSdH/wLtsUGiM83M8YX4/0gceq+z/kwqBSB9Rw6gHC0ZcK
+         NqLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720550756; x=1721155556;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0oFkXIsaf/TPw78YVNz4BT3QVX826pe30lG1vGzhC0Y=;
-        b=bp16Rj6fWqjP21Ij92kUZD47PLlTTrEbPUP/TjmvUDLdltBxhLL3cw+fQmYXst4CI5
-         aeIwtPNbxsL36dNRhJ3/BsTliaDrPWK8ZVopbqq7F9MlXk91Xs1c1zE+fTKEMjYMqzIt
-         Kz5Qd7RyxiS9XtjbbHDuAzKZxMDQ5ZdVPqedY3AXcuVwpKeLN94mLRZQGeZ44jET8T4Q
-         wgCJSkFDTHIanNJICprrijj2Mb+q2qeYD+DwrJHfPHn+UR4YB1qEZRP+Ic3EI/bs94Il
-         nWWAVBax6SQOzF+ymQx7anofiMCSakgRATdDjrsYgm93Yk+NcpdYpwLb2Qy71z42DSh9
-         yVRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUakqmS6VfzF1od4je4DEhAFtzixZi4ZryaVSjbURdMqAPzZC89xHT+843AeNAhQit0VqKyVXmeIW3nnE5k6sTPSJZg
-X-Gm-Message-State: AOJu0YzAi0n9KHGAMKvqhuDJGO6YNFvnbGSPdgxSjy+HS7yh+ihfbumG
-	ppa2OIPUYY/g47heqnnvbf3vPQ1ftU0ML8DZCmDAAtoL4TIKJc7wnw65QVYof67NBPF3LRI75dT
-	knw==
-X-Google-Smtp-Source: AGHT+IEPP63rp5Trd9LeU9KzPvbSQUt5QZCeMWb97H+bNFEinDz3XkMbBMJ6H8xw67oHq0cXDafxJbsHJI4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:2503:0:b0:771:88d7:c111 with SMTP id
- 41be03b00d2f7-77db71c639bmr6791a12.4.1720550755584; Tue, 09 Jul 2024 11:45:55
- -0700 (PDT)
-Date: Tue, 9 Jul 2024 11:45:54 -0700
-In-Reply-To: <20240709145500.45547-1-dapeng1.mi@linux.intel.com>
+        d=1e100.net; s=20230601; t=1720551796; x=1721156596;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tz4SKanGT0p7B5kijsG/hyAEtWawoOPO2+O2oyG1KXg=;
+        b=KaX0lhBMlMENIH2oS0JKGfjESHQ+9nU67K+vlPFsO9WEZU/m1d09lv+EiQEcGbwJDd
+         juTU+NuisBp4N5DA/pgMV4KbScQL1jPHrY/fSJAdFYGIIMpAyT0ZUSa5B09PZcimaLHA
+         OknDSBSVcgiq6l+X/KVqDMlu58+lZcrBclhCECxVIwn3vEFfyga3dvoMOhvxdsvy2Grc
+         wwbkam3wYEgspJWqxaqPIR21JGswcuhUJd120RsZxCu/eLjIRpTqtGdh1rGmemIj3fGd
+         68kCMc5M4fPlWONmn1gqkAZrh8wiUmb/KUAo9S/oTMpZVqzVJHvfdEkGhYxBx0UTP5Bn
+         emeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVg7XB62LSf3WmjXKJ2VO3IeLEeI5eqfFp9g3AV3VJrlwwbZuNYyK76Xjvv5C6V85hNhyXCojSrtFSbO12ocnGPO6eO
+X-Gm-Message-State: AOJu0YxL6uWBOIk4xzVzOuPM68SinU3Mf+r4/zs1eFBrl4FKioBkVWfW
+	kvblgr/SgW2wNdBpaTts8lUF48faW08Fdtn94Mu8Eq6C7LpHZGznSllzqE0BInc=
+X-Google-Smtp-Source: AGHT+IFhetxp9iNMwbY2wmkBlgDvT9+MA6GFJVeq9xE0noHusNzmV7TqInccd4H71Z7ysufi1Iri/Q==
+X-Received: by 2002:a05:6214:1cc2:b0:6b5:52da:46f2 with SMTP id 6a1803df08f44-6b61bc80504mr38822486d6.6.1720551795800;
+        Tue, 09 Jul 2024 12:03:15 -0700 (PDT)
+Received: from ziepe.ca ([128.77.69.90])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b61ba797c0sm11232896d6.91.2024.07.09.12.03.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jul 2024 12:03:15 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sRFxj-002sHI-8S;
+	Tue, 09 Jul 2024 15:53:15 -0300
+Date: Tue, 9 Jul 2024 15:53:15 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Christoph Hellwig <hch@lst.de>
+Cc: Leon Romanovsky <leon@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>, Keith Busch <kbusch@kernel.org>,
+	"Zeng, Oak" <oak.zeng@intel.com>,
+	Chaitanya Kulkarni <kch@nvidia.com>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Logan Gunthorpe <logang@deltatee.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	Shameer Kolothum <shameerali.kolothum.thodi@huawei.com>,
+	Kevin Tian <kevin.tian@intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-block@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, iommu@lists.linux.dev,
+	linux-nvme@lists.infradead.org, linux-pci@vger.kernel.org,
+	kvm@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [RFC PATCH v1 00/18] Provide a new two step DMA API mapping API
+Message-ID: <20240709185315.GM14050@ziepe.ca>
+References: <cover.1719909395.git.leon@kernel.org>
+ <20240703054238.GA25366@lst.de>
+ <20240703105253.GA95824@unreal>
+ <20240703143530.GA30857@lst.de>
+ <20240703155114.GB95824@unreal>
+ <20240704074855.GA26913@lst.de>
+ <20240708165238.GE14050@ziepe.ca>
+ <20240709061721.GA16180@lst.de>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240709145500.45547-1-dapeng1.mi@linux.intel.com>
-Message-ID: <Zo2FYieeerQzUGOa@google.com>
-Subject: Re: [PATCH] KVM: x86/pmu: Return KVM_MSR_RET_INVALID for invalid PMU
- MSR access
-From: Sean Christopherson <seanjc@google.com>
-To: Dapeng Mi <dapeng1.mi@linux.intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Jim Mattson <jmattson@google.com>, Mingwei Zhang <mizhang@google.com>, 
-	Xiong Zhang <xiong.y.zhang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
-	Like Xu <like.xu.linux@gmail.com>, Jinrong Liang <cloudliang@tencent.com>, 
-	Yongwei Ma <yongwei.ma@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>, 
-	Gleb Natapov <gleb@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240709061721.GA16180@lst.de>
 
-On Tue, Jul 09, 2024, Dapeng Mi wrote:
-> Return KVM_MSR_RET_INVALID instead of 0 to inject #GP to guest for all
-> invalid PMU MSRs access
+On Tue, Jul 09, 2024 at 08:17:21AM +0200, Christoph Hellwig wrote:
+> On Mon, Jul 08, 2024 at 01:52:38PM -0300, Jason Gunthorpe wrote:
+> > Ideally we'd have some template code that consolidates these loops to
+> > common code with driver provided hooks - there are a few ways to get
+> > that efficiently in C.
+> > 
+> > I think it will be clearer when we get to RDMA and there we have the
+> > same SGL/PRP kind of split up and we can see what is sharable.
 > 
-> Currently KVM silently drops the access and doesn't inject #GP for some
-> invalid PMU MSRs like MSR_P6_PERFCTR0/MSR_P6_PERFCTR1,
-> MSR_P6_EVNTSEL0/MSR_P6_EVNTSEL1, but KVM still injects #GP for all other
-> invalid PMU MSRs. This leads to guest see different behavior on invalid
-> PMU access and may confuse guest.
+> I really would not want to build common code for PRPs - this is a concept
+> very specific to RDMA and NVMe.  
 
-This is by design.  I'm not saying it's _good_ design, but it is very much
-intended.  More importantly, it's established behavior, i.e. having KVM inject
-#GP could break existing setups.
+I think DRM has it too. If you are populating a GPU page table then it
+is basically a convoluted PRP. Probably requires different splitting
+logic than what RDMA does, but I've never looked.
 
-> This behavior is introduced by the
-> 'commit 5753785fa977 ("KVM: do not #GP on perf MSR writes when vPMU is disabled")'
-> in 2012. This commit seems to want to keep back compatible with weird
-> behavior of some guests in vPMU disabled case,
+> OTOH more common code SGLs would be nice.  If you look at e.g. SCSI
+> drivers most of them have a simpe loop of mapping the SG table and
+> then copying the fields into the hardware SGL.  This would be a very
+> common case for a helper.
 
-Ya, because at the time, guest kernels hadn't been taught to play nice with
-unexpected virtualization setups, i.e. VMs without PMUs.
+Yes, I belive this is very common.
 
-> but strongly suspect if it's still available nowadays.
+> That whole thing of course opens the question if we want a pure
+> in-memory version of the dma_addr_t/len tuple.  IMHO that is the best
+> way to migrate and allows to share code easily.  We can look into ways
+> to avoiding that more for drivers that care, but most drivers are
+> probably best serve with it to keep the code simple and make the
+> conversion easier.
 
-I don't follow this comment.
+My feeling has been that this RFC is the low level interface and we
+can bring our own data structure on top.
 
-> Since Perfmon v6 starts, the GP counters could become discontinuous on
-> HW, It's possible that HW doesn't support GP counters 0 and 1.
-> Considering this situation KVM should inject #GP for all invalid PMU MSRs
-> access.
+It would probably make sense to build a scatterlist v2 on top of this
+that has an in-memory dma_addr_t/len list close to today. Yes it costs
+a memory allocation, or a larger initial allocation, but many places
+may not really care. Block drivers have always allocated a SGL, for
+instance.
 
-IIUC, the behavior you want is inject a #GP if the vCPU has a PMU and the MSR is
-not valid.  We can do that and still maintain backwards compatibility, hopefully
-without too much ugliness (maybe even an improvement!).
+Then the verbosity of this API is less important as we may only use it
+in a few places.
 
-This? (completely untested)
+My main take away was that we should make the dma_ops interface
+simpler and more general so we can have this choice instead of welding
+a single datastructure through everything.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 5aa7581802f7..b5e95e5f1f32 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -4063,9 +4063,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-        case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
-        case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
-        case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
--               if (kvm_pmu_is_valid_msr(vcpu, msr))
--                       return kvm_pmu_set_msr(vcpu, msr_info);
--
-+               if (vcpu_to_pmu(vcpu)->version)
-+                       goto default_handler;
-                if (data)
-                        kvm_pr_unimpl_wrmsr(vcpu, msr, data);
-                break;
-@@ -4146,6 +4145,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-                break;
- #endif
-        default:
-+default_handler:
-                if (kvm_pmu_is_valid_msr(vcpu, msr))
-                        return kvm_pmu_set_msr(vcpu, msr_info);
- 
-@@ -4251,8 +4251,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-        case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
-        case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
-        case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
--               if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
--                       return kvm_pmu_get_msr(vcpu, msr_info);
-+               if (vcpu_to_pmu(vcpu)->version)
-+                       goto default_handler;
-                msr_info->data = 0;
-                break;
-        case MSR_IA32_UCODE_REV:
-@@ -4505,6 +4505,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
-                break;
- #endif
-        default:
-+default_handler:
-                if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
-                        return kvm_pmu_get_msr(vcpu, msr_info);
- 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index 96446134c00b..0de606b542ac 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -344,7 +344,8 @@ static void guest_test_rdpmc(uint32_t rdpmc_idx, bool expect_success,
- static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters,
-                                 uint8_t nr_counters, uint32_t or_mask)
- {
--       const bool pmu_has_fast_mode = !guest_get_pmu_version();
-+       const u8 pmu_version = guest_get_pmu_version();
-+       const bool pmu_has_fast_mode = !pmu_version;
-        uint8_t i;
- 
-        for (i = 0; i < nr_possible_counters; i++) {
-@@ -363,12 +364,13 @@ static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters
-                const bool expect_success = i < nr_counters || (or_mask & BIT(i));
- 
-                /*
--                * KVM drops writes to MSR_P6_PERFCTR[0|1] if the counters are
--                * unsupported, i.e. doesn't #GP and reads back '0'.
-+                * KVM drops writes to MSR_P6_PERFCTR[0|1] if the vCPU doesn't
-+                * have a PMU, i.e. doesn't #GP and reads back '0'.
-                 */
-                const uint64_t expected_val = expect_success ? test_val : 0;
--               const bool expect_gp = !expect_success && msr != MSR_P6_PERFCTR0 &&
--                                      msr != MSR_P6_PERFCTR1;
-+               const bool expect_gp = !expect_success &&
-+                                      (pmu_version ||
-+                                       (msr != MSR_P6_PERFCTR0 && msr != MSR_P6_PERFCTR1));
-                uint32_t rdpmc_idx;
-                uint8_t vector;
-                uint64_t val;
+> > I'm also cooking something that should let us build a way to iommu map
+> > a bio_vec very efficiently, which should transform this into a single
+> > indirect call into the iommu driver per bio_vec, and a single radix
+> > walk/etc.
+>
+> I assume you mean array of bio_vecs here.  That would indeed nice.
+> We'd still potentially need a few calls for block drivers as
+> requests can have multiple bios and thus bio_vec arrays, but it would
+> still be a nice reduction of calls.
+
+Yes. iommufd has performance needs here, not sure what it will turn
+into but bio_vec[] direct to optimized radix manipuilation is
+something I'd be keen to see.
+
+Jason
 
