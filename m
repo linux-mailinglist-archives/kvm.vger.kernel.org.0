@@ -1,213 +1,174 @@
-Return-Path: <kvm+bounces-21154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F51B92B00E
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 08:26:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4937B92B129
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 09:34:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D11511F229B3
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 06:26:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6CAC281BDC
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 07:34:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B7613A27D;
-	Tue,  9 Jul 2024 06:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349F4143C4D;
+	Tue,  9 Jul 2024 07:34:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="caeLTwQC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WXpRiFTd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E24F7D07F;
-	Tue,  9 Jul 2024 06:26:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3FAB1422BC
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 07:34:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720506404; cv=none; b=mkTDqLMRRs1lm87yi/9wSwq0hP6H06m2UfxTVCCnjBiZqZvt6nvNLDK1pNzyR/wFaKzEi74v6iENPn+4RHSjwg0NXSGh70Od7+Zoug/A3KWBRMDPJcMyTqUKFjzOl2PnTmM19LJNx8aPnXdicTMl1cvWdhJNNZnwbAu2/Q2QtfE=
+	t=1720510447; cv=none; b=Z862GvHWvY+fcUdzvpbKJKLIvGibml480tgv6lue34zmQLM4Pk4DZVYI474/cf/Rr3/3V0dXY2rsyZktgm4gJkW3TazZPquJHo+oIW2kkQkTRMY8UU+RqexIHaVmROXRnjByXN2ItHjsHJNDrbShZME8pmV1XpjE6Z9R7WoEuHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720506404; c=relaxed/simple;
-	bh=7rhoCvATLjh7YDmR6VilaOYZi0txZK/lFS5HJUdBrGo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=USx25xQ3oUE9cd616y3qfqVtnmAbtGpDrHqO+Ajf7MXTejN7eQt15BMelLE97T1wAzb3uqxYZM7W602b6jyllDeZCC9CW83UFGTIsnpIXSQdQ8gEibXQBPEoLhOqpaihLrVAjWQTZJL5tlFR960NokBWFrdHM/195BaHphfWZ2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=caeLTwQC; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720506403; x=1752042403;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7rhoCvATLjh7YDmR6VilaOYZi0txZK/lFS5HJUdBrGo=;
-  b=caeLTwQC3s1li4y0rWsFH+8XJrq3UNJA74sAfwbF9A9oTew/FVrlGVpv
-   l+/veVTbHodVv3Rz8tT1XBzYnO9r+/gT6JgSIjYc+YFkEHOwGYSTDpqUv
-   uhxD+xNko+a6qMHpU+kqQWM8V/QO0Waw6oUpXtbsGrhW4uyFRpqpyVKtg
-   /wu2Qv8Or+/eG/2NBxicp0lhRW+iZN37TJS27YH3Qz/ReMKzYWKkgGssy
-   ZcUU0K3ZFABTZIVTUUs4Bn3KIvRGl3fWkqy3zVgB5jsrT5g2w7K9D183F
-   Sd5QOlE+pcbEDXBMTu6F1ZxjJE8/MxkRV/BwxJ1Fm1l1SMtoTSYb9AP99
-   Q==;
-X-CSE-ConnectionGUID: O/rn2BV7R0W+zEmoNlsuzw==
-X-CSE-MsgGUID: TxS99ZrTRGqt185awUlryQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11127"; a="35174053"
-X-IronPort-AV: E=Sophos;i="6.09,194,1716274800"; 
-   d="scan'208";a="35174053"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2024 23:26:43 -0700
-X-CSE-ConnectionGUID: vweDiCz2Rpq5DpUmPEbT0w==
-X-CSE-MsgGUID: 4kbflCVUTY2eYStYo00XPA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,194,1716274800"; 
-   d="scan'208";a="48407438"
-Received: from taofen1x-mobl1.ccr.corp.intel.com (HELO [10.238.11.85]) ([10.238.11.85])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2024 23:26:38 -0700
-Message-ID: <e7233d96-2ab1-4684-8ce4-0189a78339ca@linux.intel.com>
-Date: Tue, 9 Jul 2024 14:26:35 +0800
+	s=arc-20240116; t=1720510447; c=relaxed/simple;
+	bh=LvqwmV+mNj/O+PlzBMrEoMU+zBOGk4FC9h2Eald0y+c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P+6zOE+q7t6AOPVtJWmwN3XCxYCSsSVf+zTzMrjdIAtqo3V+rBMXXhahYVk7vSbGX9q0PVPuItbxUoc3MCd8PElMx5GmZ91+zQpx/zI/SeK8cewWaa7Munxo6tKa23my/pzYbMHD+h9mn9TeCRhrC2qsFDj7DOqYqYk1es7eFek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WXpRiFTd; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720510444;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gyffXFQ4XqEgnJu8KLX3RdgOxyAi68j9TS2gHHyn3kA=;
+	b=WXpRiFTdl4p1XPdvphLTmy9y+3Fq3OWE0WbRh8Wed1WghrMnmaU25AcMdfxhNRQegQtzV6
+	cKs4zA/ZV0Bc6JVeI3LFRVZ2+4I+FHdOmwT4zqwidqCMcBi+FxhAH/N3TN/i8uO2JlHeRu
+	UBT8JCkOzTOFptCVd561Z7S/KODePZQ=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-280-GVJSOU8ZMjSYr-b7vUt09g-1; Tue, 09 Jul 2024 03:34:03 -0400
+X-MC-Unique: GVJSOU8ZMjSYr-b7vUt09g-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-58e847f01f7so4030891a12.1
+        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 00:34:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720510442; x=1721115242;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gyffXFQ4XqEgnJu8KLX3RdgOxyAi68j9TS2gHHyn3kA=;
+        b=Ky0azpUd3oxFlhBNRI3tMS1mXTQdQsYgML0xrGgbeffmqfDVMxH4glSm0j7SE+UA1p
+         Xt5CrkZiU3Kud/fMeesRaQ3bIrJ2gDd1wNC4PzmN5JqyHhRd+0iF8I6ZLqKd7t0zqycy
+         eHhYOrooxPSFM/lpavdRPxli7EAjlrB8HqaAitNyYH1gIHcp41/Q/wAAyUzgWlSKTfAe
+         Aek9W8neWszA3CZ89dLOVyQbiprLUOpntUaaSrD8+FiBunaTZOZzmzoVUiTlSKZPwFgg
+         l6xP7H+TotQ2yjhPy7AGIKKszkVN6t+/z17xJ/b9h14lLbRXfkUvTi0+eQrv65yoSsp0
+         z2Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCV+sUVqQF+IMLCVeMV6YR3tLy0UgJ75V+MpMDllvXEXhihIy4lVpJ4NgXfTQwpUqynxXeD5Cf76rX7Nd/7ANkCJzmRi
+X-Gm-Message-State: AOJu0Ywzo9nDN4G87QxFQr8eXuve2BFD1ZRU5i/wgCYkcHi6FA9HvM/M
+	txt1hl+JKcMxsuz3oQQHdNSLLV7AsG/ZWbVQWjRsxIYk++67AhdoaD+5U8sW+B8UnOZcdTusw+b
+	VIWCuAKktJG45tkYbD5EYZOkTCsnLGjsTVu/HoTIHZnvAD+/mr3GGHaZJWkFyzGAx5LDJiVmWKM
+	FSLDYEb2bmyJj6n6Kr/ctyiExI
+X-Received: by 2002:a05:6402:651:b0:585:4048:129a with SMTP id 4fb4d7f45d1cf-594bc7c81camr942127a12.31.1720510442201;
+        Tue, 09 Jul 2024 00:34:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEjoc+fuN4z3jm6ivmOtDkLQnowZY0KxQCfvPi77uB0E9RhW33K2f9f+5Byd3P6tUmj0kBE7NSAeCnMjiI2G34=
+X-Received: by 2002:a05:6402:651:b0:585:4048:129a with SMTP id
+ 4fb4d7f45d1cf-594bc7c81camr942110a12.31.1720510441792; Tue, 09 Jul 2024
+ 00:34:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v19 109/130] KVM: TDX: Handle TDX PV port io hypercall
-To: Isaku Yamahata <isaku.yamahata@intel.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
- erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
- Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
- chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
- isaku.yamahata@linux.intel.com, Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <4f4aaf292008608a8717e9553c3315ee02f66b20.1708933498.git.isaku.yamahata@intel.com>
- <00bb2871-8020-4d60-bdb6-d2cebe79d543@linux.intel.com>
- <20240417201058.GL3039520@ls.amr.corp.intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240417201058.GL3039520@ls.amr.corp.intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240708065549.89422-1-lulu@redhat.com> <CACGkMEtOP_Hz=SO+r5WQfWow3Pb-Sz552xnt0BqTgyGSuvJz_A@mail.gmail.com>
+In-Reply-To: <CACGkMEtOP_Hz=SO+r5WQfWow3Pb-Sz552xnt0BqTgyGSuvJz_A@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Tue, 9 Jul 2024 15:33:23 +0800
+Message-ID: <CACLfguWqut4mf1=ad58Eb=HZCMnbgxzDk5DbFge-JU0beB1aFg@mail.gmail.com>
+Subject: Re: [PATCH] vdpa/mlx5: Add the support of set mac address
+To: Jason Wang <jasowang@redhat.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, parav@nvidia.com, sgarzare@redhat.com, 
+	netdev@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-On 4/18/2024 4:10 AM, Isaku Yamahata wrote:
-> On Wed, Apr 17, 2024 at 08:51:39PM +0800,
-> Binbin Wu <binbin.wu@linux.intel.com> wrote:
+On Mon, 8 Jul 2024 at 15:03, Jason Wang <jasowang@redhat.com> wrote:
 >
->>
->> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
->>> From: Isaku Yamahata <isaku.yamahata@intel.com>
->>>
->>> Wire up TDX PV port IO hypercall to the KVM backend function.
->>>
->>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
->>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
->>> ---
->>> v18:
->>> - Fix out case to set R10 and R11 correctly when user space handled port
->>>     out.
->>> ---
->>>    arch/x86/kvm/vmx/tdx.c | 67 ++++++++++++++++++++++++++++++++++++++++++
->>>    1 file changed, 67 insertions(+)
->>>
->>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
->>> index a2caf2ae838c..55fc6cc6c816 100644
->>> --- a/arch/x86/kvm/vmx/tdx.c
->>> +++ b/arch/x86/kvm/vmx/tdx.c
->>> @@ -1152,6 +1152,71 @@ static int tdx_emulate_hlt(struct kvm_vcpu *vcpu)
->>>    	return kvm_emulate_halt_noskip(vcpu);
->>>    }
->>> +static int tdx_complete_pio_out(struct kvm_vcpu *vcpu)
->>> +{
->>> +	tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS);
->>> +	tdvmcall_set_return_val(vcpu, 0);
->>> +	return 1;
->>> +}
->>> +
->>> +static int tdx_complete_pio_in(struct kvm_vcpu *vcpu)
->>> +{
->>> +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
->>> +	unsigned long val = 0;
->>> +	int ret;
->>> +
->>> +	WARN_ON_ONCE(vcpu->arch.pio.count != 1);
->>> +
->>> +	ret = ctxt->ops->pio_in_emulated(ctxt, vcpu->arch.pio.size,
->>> +					 vcpu->arch.pio.port, &val, 1);
->>> +	WARN_ON_ONCE(!ret);
->>> +
->>> +	tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS);
->>> +	tdvmcall_set_return_val(vcpu, val);
->>> +
->>> +	return 1;
->>> +}
->>> +
->>> +static int tdx_emulate_io(struct kvm_vcpu *vcpu)
->>> +{
->>> +	struct x86_emulate_ctxt *ctxt = vcpu->arch.emulate_ctxt;
->>> +	unsigned long val = 0;
->>> +	unsigned int port;
->>> +	int size, ret;
->>> +	bool write;
->>> +
->>> +	++vcpu->stat.io_exits;
->>> +
->>> +	size = tdvmcall_a0_read(vcpu);
->>> +	write = tdvmcall_a1_read(vcpu);
->>> +	port = tdvmcall_a2_read(vcpu);
->>> +
->>> +	if (size != 1 && size != 2 && size != 4) {
->>> +		tdvmcall_set_return_code(vcpu, TDVMCALL_INVALID_OPERAND);
->>> +		return 1;
->>> +	}
->>> +
->>> +	if (write) {
->>> +		val = tdvmcall_a3_read(vcpu);
->>> +		ret = ctxt->ops->pio_out_emulated(ctxt, size, port, &val, 1);
->>> +
->>> +		/* No need for a complete_userspace_io callback. */
->> I am confused about the comment.
->>
->> The code below sets the complete_userspace_io callback for write case,
->> i.e. tdx_complete_pio_out().
-> You're correct. This comment is stale and should be removed it.
-Also, since the tdx_complete_pio_out() is installed as 
-complete_userspace_io callback for write, it's more reasonable to move 
-the reset of pio.count into tdx_complete_pio_out().
-How about the following fixup:
-
-diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-index 9ead46cb75ab..b43bb8ccddb9 100644
---- a/arch/x86/kvm/vmx/tdx.c
-+++ b/arch/x86/kvm/vmx/tdx.c
-@@ -1115,6 +1115,7 @@ static int tdx_emulate_hlt(struct kvm_vcpu *vcpu)
-
-  static int tdx_complete_pio_out(struct kvm_vcpu *vcpu)
-  {
-+       vcpu->arch.pio.count = 0;
-         tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS);
-         tdvmcall_set_return_val(vcpu, 0);
-         return 1;
-@@ -1159,15 +1160,13 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
-         if (write) {
-                 val = tdvmcall_a3_read(vcpu);
-                 ret = ctxt->ops->pio_out_emulated(ctxt, size, port, 
-&val, 1);
--
--               /* No need for a complete_userspace_io callback. */
--               vcpu->arch.pio.count = 0;
--       } else
-+       } else {
-                 ret = ctxt->ops->pio_in_emulated(ctxt, size, port, 
-&val, 1);
-+       }
-
--       if (ret)
-+       if (ret) {
-                 tdvmcall_set_return_val(vcpu, val);
--       else {
-+       } else {
-                 if (write)
-                         vcpu->arch.complete_userspace_io = 
-tdx_complete_pio_out;
-                 else
+> On Mon, Jul 8, 2024 at 2:56=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+> >
+> > Add the function to support setting the MAC address.
+> > For vdpa/mlx5, the function will use mlx5_mpfs_add_mac
+> > to set the mac address
+> >
+> > Tested in ConnectX-6 Dx device
+>
+> Great.
+>
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+>
+> I guess this should be part of the series "vdpa: support set mac
+> address from vdpa tool" ?
+>
+yes, Will add this in next version
+Thanks
+cindy
+> > ---
+> >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 23 +++++++++++++++++++++++
+> >  1 file changed, 23 insertions(+)
+> >
+> > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/=
+mlx5_vnet.c
+> > index 26ba7da6b410..f78701386690 100644
+> > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > @@ -3616,10 +3616,33 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_=
+dev *v_mdev, struct vdpa_device *
+> >         destroy_workqueue(wq);
+> >         mgtdev->ndev =3D NULL;
+> >  }
+> > +static int mlx5_vdpa_set_attr_mac(struct vdpa_mgmt_dev *v_mdev,
+> > +                                 struct vdpa_device *dev,
+> > +                                 const struct vdpa_dev_set_config *add=
+_config)
+> > +{
+> > +       struct mlx5_vdpa_dev *mvdev =3D to_mvdev(dev);
+> > +       struct mlx5_vdpa_net *ndev =3D to_mlx5_vdpa_ndev(mvdev);
+> > +       struct mlx5_core_dev *mdev =3D mvdev->mdev;
+> > +       struct virtio_net_config *config =3D &ndev->config;
+> > +       int err;
+> > +       struct mlx5_core_dev *pfmdev;
+> > +
+> > +       if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
+> > +               if (!is_zero_ether_addr(add_config->net.mac)) {
+> > +                       memcpy(config->mac, add_config->net.mac, ETH_AL=
+EN);
+> > +                       pfmdev =3D pci_get_drvdata(pci_physfn(mdev->pde=
+v));
+> > +                       err =3D mlx5_mpfs_add_mac(pfmdev, config->mac);
+> > +                       if (err)
+> > +                               return -1;
+> > +               }
+> > +       }
+> > +       return 0;
+> > +}
+> >
+> >  static const struct vdpa_mgmtdev_ops mdev_ops =3D {
+> >         .dev_add =3D mlx5_vdpa_dev_add,
+> >         .dev_del =3D mlx5_vdpa_dev_del,
+> > +       .dev_set_attr =3D mlx5_vdpa_set_attr_mac,
+>
+> Let's rename this as we will add the support for mtu as well or not?
+>
+sure ,will change this
+Thanks
+cindy
+> Thanks
+>
+> >  };
+> >
+> >  static struct virtio_device_id id_table[] =3D {
+> > --
+> > 2.45.0
+> >
+>
 
 
