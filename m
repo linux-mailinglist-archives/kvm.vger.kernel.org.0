@@ -1,113 +1,167 @@
-Return-Path: <kvm+bounces-21157-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21158-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6445092B141
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 09:36:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 512E192B150
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 09:38:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE14C2822C0
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 07:36:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C30FF1F22992
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 07:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A988114831C;
-	Tue,  9 Jul 2024 07:35:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EEE61514DD;
+	Tue,  9 Jul 2024 07:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f6FVDQG4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fKyqaQzW"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FEB13211E
-	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 07:35:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E039014A615
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 07:37:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720510556; cv=none; b=fSVzAK+zZ7MU3I5xofLKj5hXVk2BGuzQbvmg0d6W4bdTGeyA9rhFVK8ME04qdYC+F5Mi1r2kq3RBuLxnkE5OtjFmFY6UebbmPqqIjwZy+Egn15mVMkoHtewnlXS9TpGg06D3/5oPwZrxnz3Sm1SBecZnA1cnDfx6ooNsNCvGS+c=
+	t=1720510653; cv=none; b=p4EIbHdc/vKLOuFFqcKSJM4UYaysf1su5a0iPgkdEYTppGz06xNo8zW5u3St7wbmUjxjsR5Rk4Hj41u0wtekaDEwUC48GmPoTqp03+z3jMzLNB+6S84/jjkBR+8UUkLxuJC+GxZfbwz28+53UymsW2rgfAcbGs4gWn40JXWBxcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720510556; c=relaxed/simple;
-	bh=bk6TipIY+YZoexVbFgevxA604DBUzZ7+Qxg6gsX5klE=;
+	s=arc-20240116; t=1720510653; c=relaxed/simple;
+	bh=R6uhElAMm4FTpUU4vkd99nDcZrma70iZDg9k9g3ocDQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OviNUw/JfRzWIzcjEn3vpPTyH1b8XRnqDMrLRcG2m38Ms3T2hf9WlsQt0L2fKioYERZnL7kYTMLX6mBAdsbfAmVAEQjGuHIK15au1dVp43qCFa501C8RIft0Z/BGh7W1LGfSS9KDylvWMKsDYyyW73X6G3CInTUGC6XVnvSk0us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f6FVDQG4; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=jY4es1jBNHdJFYKquTeeUJTb3lmDH3iIhczObIzOj/YI3U6eN3Zavw9BdVfwjLnUeaCmQHmAbyjqelgEhhoSZqgek5lHE3Z49A0IVDpwmLnagtbRDiXXSGwBlcupAXrgP27k8HOu4jpZYE5e750wfNx1Q1FPn8P+ElldMNuXWQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fKyqaQzW; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720510554;
+	s=mimecast20190719; t=1720510650;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=M/aFi9ih4y79YK2CY+Ehp2n7r5MFyUbmdEljfkFAxlY=;
-	b=f6FVDQG4Tdmw3yxc3qENg+kLWXw5VkHRBO9O1prYG6NPOBB+q23N2AjUhV8fJtLDUAwD0h
-	6RiRXU2RrdvnJMsWIuG+KzIj5ZG/9NFfGzEac/jN8P/EanI7hTM9Dmk3vLoGJQNuE0YVmW
-	j/kbdaWC3wYb5L4R5tDPFlgfTlYW7jk=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=A49qXoXkEsMzgDh5I6lFSA4XYzFZMk+NCFiOV4UimaA=;
+	b=fKyqaQzW21EAsASSVBdhHZfGPwZH0BGQ/EBrclnEHSawjjVob5+w6x7xaC4CEfEeIyUMa3
+	M9NJgGVrnsPhQxO8xFhx/RnmRCEzjkmuSqpc/T0n3ch1dGbQ3LuVyMnKEnFqyQOdXbb8c/
+	O/8d4e1NhxT4s8LHzgNYaJXvcRIRz24=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-590-4JjIfIUFNHe7lbiuvh2wDA-1; Tue, 09 Jul 2024 03:35:52 -0400
-X-MC-Unique: 4JjIfIUFNHe7lbiuvh2wDA-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-58c859c5d96so3784367a12.3
-        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 00:35:52 -0700 (PDT)
+ us-mta-459-4lQEtU2KMCOO7ZM4vxPkcA-1; Tue, 09 Jul 2024 03:37:27 -0400
+X-MC-Unique: 4lQEtU2KMCOO7ZM4vxPkcA-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a77baa2fc0dso205959266b.3
+        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 00:37:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720510551; x=1721115351;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M/aFi9ih4y79YK2CY+Ehp2n7r5MFyUbmdEljfkFAxlY=;
-        b=hHnDK+Gi442Muyshs10lTrwISCrEIjlGVeVjLfwBpVbc8S1EUA78dgPE7qxMQdycHA
-         mpLus8QxAjYwBogUl3CjW+n/tdO/1OLtnipww8X3mbAbIPg4inLTSS3CQ7W4UyRsT/be
-         0tZZ9myVsSRTuuRlbvqqVv2P4ws4FmTAayuve3sS8SAhLOItL2JS4V7quDNfhiZeVx/f
-         WceSzjOPIq51hQ6Nenn8wAE4dEUb8RM4crINFqSNSOCYmSurSbJxQu4IDSgAHNWMdUwX
-         95Aww7z8BUm/qB/ezZiIKM6DottH5tWrC9x0vVMv8xJmCj8IfUe2Xtr0UtOCg9xBx5dB
-         c+0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCX4I+a2kaeDC27250igELowLKS5MnfEXv0CUUhLRSxIhiDVWsviTvPtDKpTqPBybEldFmQrWqyxjaIOyf3v9jPXTyIq
-X-Gm-Message-State: AOJu0Ywf2irgSkeCJdWmXTVauKmLrp8kvez2laOrpIVKorsIbveMef0a
-	D8T0TR57Ddh9cpcD3anSQijGIdDpOgoKWEg9JM9MkOWt0ZJrIeKogMtN4rNRGnhrXue3Cc6u8/7
-	bzXEnzY42Hc2omBl9vVbwIwRq4Fb6ew6xrYJaDURfutY1H5+RrVRggxbbv5FySCpPB0W4aJ9r7X
-	YfRVyj1DytaV4FzRAMb0sX0Z4j
-X-Received: by 2002:aa7:d98f:0:b0:57d:105c:c40c with SMTP id 4fb4d7f45d1cf-594bb67e9e9mr997098a12.24.1720510551379;
-        Tue, 09 Jul 2024 00:35:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEiWni+LJU+6yVhYpIE9XYIpyjrSEJCag4tVtoxMKRcXeymx8yfK8l7rFpFU9jUUkq9Rln8XyB6tiM44nsNR3c=
-X-Received: by 2002:aa7:d98f:0:b0:57d:105c:c40c with SMTP id
- 4fb4d7f45d1cf-594bb67e9e9mr997083a12.24.1720510551112; Tue, 09 Jul 2024
- 00:35:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1720510646; x=1721115446;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A49qXoXkEsMzgDh5I6lFSA4XYzFZMk+NCFiOV4UimaA=;
+        b=WPFYtB5qkqY9PUfWqngqZwJ4VO20c/d6Y2OVBGtEgis1ta7sm9fvLZFSPR5pN7AAmZ
+         31EH9f0r+THLpm2/t2/0fiN8UbOph0zqwLCBlXj4qk0gR3JEbE8aoKTn3KQxoeaV7TKs
+         b4iHIjNWf9Taktw3WkzSRcK32Q64yR95aGUi8+7jICTXAxLckHzC9H5eMkuTsNx/pVI7
+         Me7lxcIhbcUckEA124k23+om876NkLpCR4Fu6HFVJENGajGlo+T/V1zTWnAn/3nQyvFQ
+         QkXH0mvxDG6IYizNr3nboUNhHuFPIhZFMuclc2ELiJDKPZARsJguWJc6L8LK2EmZwCEZ
+         blTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWez6S/t1+qJjJKPLAZd2PtoefTvGS3fvbXBw/4xS1hyptImsiSCGFmfnEiHG2cyj6tNN8Z8zFFfwWSKWGu3fbWWzb+
+X-Gm-Message-State: AOJu0YwCgMpJS3fxI3eyWJpIfwTzI4IipwNO9QoIpS4LaAeRqFn3ATm7
+	ozAOd3k5ZdpGlGFzPKfyMaMrHxnQL97xRCJqxn6PxjbTgTB4IwsptEGL2UTkA1QCBHOPEhcx+ZT
+	B7fP6iu5l5cIToOCASs+tWpRj60nEIZgN/unhdVnoeLjluwO2wUCspVHezDiysHVzEcz6bXdq97
+	zC6VbPHaC6gPayNK6ye05UUzjW
+X-Received: by 2002:a05:6402:430b:b0:58c:3252:3ab8 with SMTP id 4fb4d7f45d1cf-594bcba83fcmr1671352a12.37.1720510645972;
+        Tue, 09 Jul 2024 00:37:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHvA5gcFgFWqNy3DfNk26q33q8PtgffuDdwkGspZQpCkB6LI+Z1lBCXYRy9/d//O/OXiMfXxo5/urdnIEt4WlE=
+X-Received: by 2002:a05:6402:430b:b0:58c:3252:3ab8 with SMTP id
+ 4fb4d7f45d1cf-594bcba83fcmr1671317a12.37.1720510645548; Tue, 09 Jul 2024
+ 00:37:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240709045609.GA3082655@maili.marvell.com>
-In-Reply-To: <20240709045609.GA3082655@maili.marvell.com>
+References: <20240708065549.89422-1-lulu@redhat.com> <34818d378285d011d0e7d73d497ef8d710861adc.camel@nvidia.com>
+In-Reply-To: <34818d378285d011d0e7d73d497ef8d710861adc.camel@nvidia.com>
 From: Cindy Lu <lulu@redhat.com>
-Date: Tue, 9 Jul 2024 15:35:13 +0800
-Message-ID: <CACLfguUYny6-1cYABsGS+qtdzO+MKp3O09t_gt-bMM4JgdpZqA@mail.gmail.com>
+Date: Tue, 9 Jul 2024 15:36:48 +0800
+Message-ID: <CACLfguV5CXMs9AdWrN9a=st5PjUnT4B1bt2Uua=AYjuC0NwfNg@mail.gmail.com>
 Subject: Re: [PATCH] vdpa/mlx5: Add the support of set mac address
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com, parav@nvidia.com, 
-	sgarzare@redhat.com, netdev@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: Parav Pandit <parav@nvidia.com>, "sgarzare@redhat.com" <sgarzare@redhat.com>, 
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mst@redhat.com" <mst@redhat.com>, 
+	"jasowang@redhat.com" <jasowang@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 9 Jul 2024 at 12:56, Ratheesh Kannoth <rkannoth@marvell.com> wrote:
+On Mon, 8 Jul 2024 at 15:27, Dragos Tatulea <dtatulea@nvidia.com> wrote:
 >
-> On 2024-07-08 at 12:25:49, Cindy Lu (lulu@redhat.com) wrote:
+> On Mon, 2024-07-08 at 14:55 +0800, Cindy Lu wrote:
+> > Add the function to support setting the MAC address.
+> > For vdpa/mlx5, the function will use mlx5_mpfs_add_mac
+> > to set the mac address
+> >
+> > Tested in ConnectX-6 Dx device
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  drivers/vdpa/mlx5/net/mlx5_vnet.c | 23 +++++++++++++++++++++++
+> >  1 file changed, 23 insertions(+)
+> >
+> > diff --git a/drivers/vdpa/mlx5/net/mlx5_vnet.c b/drivers/vdpa/mlx5/net/=
+mlx5_vnet.c
+> > index 26ba7da6b410..f78701386690 100644
+> > --- a/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > +++ b/drivers/vdpa/mlx5/net/mlx5_vnet.c
+> > @@ -3616,10 +3616,33 @@ static void mlx5_vdpa_dev_del(struct vdpa_mgmt_=
+dev *v_mdev, struct vdpa_device *
+> >       destroy_workqueue(wq);
+> >       mgtdev->ndev =3D NULL;
+> >  }
 > > +static int mlx5_vdpa_set_attr_mac(struct vdpa_mgmt_dev *v_mdev,
 > > +                               struct vdpa_device *dev,
-> > +                               const struct vdpa_dev_set_config *add_config)
+> > +                               const struct vdpa_dev_set_config *add_c=
+onfig)
 > > +{
-> > +     struct mlx5_vdpa_dev *mvdev = to_mvdev(dev);
-> > +     struct mlx5_vdpa_net *ndev = to_mlx5_vdpa_ndev(mvdev);
-> > +     struct mlx5_core_dev *mdev = mvdev->mdev;
-> > +     struct virtio_net_config *config = &ndev->config;
+> > +     struct mlx5_vdpa_dev *mvdev =3D to_mvdev(dev);
+> > +     struct mlx5_vdpa_net *ndev =3D to_mlx5_vdpa_ndev(mvdev);
+> > +     struct mlx5_core_dev *mdev =3D mvdev->mdev;
+> > +     struct virtio_net_config *config =3D &ndev->config;
 > > +     int err;
 > > +     struct mlx5_core_dev *pfmdev;
-> nit: reverse xmas tree; may be, split assigment and definition.
+> > +
+> You need to take the ndev->reslock.
 >
-Thanks, Will change this
-Thanks
+thanks will change this
+> > +     if (add_config->mask & (1 << VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
+> > +             if (!is_zero_ether_addr(add_config->net.mac)) {
+> > +                     memcpy(config->mac, add_config->net.mac, ETH_ALEN=
+);
+> I would do the memcpy after mlx5_mpfs_add_mac() was called successfully. =
+This
+> way the config gets changed only on success.
+>
+thanks Dragos=EF=BC=8C Will fix this
+thanks
 cindy
+> > +                     pfmdev =3D pci_get_drvdata(pci_physfn(mdev->pdev)=
+);
+> > +                     err =3D mlx5_mpfs_add_mac(pfmdev, config->mac);
+> > +                     if (err)
+> > +                             return -1;
+> > +             }
+> > +     }
+> > +     return 0;
+> > +}
 > >
+> >  static const struct vdpa_mgmtdev_ops mdev_ops =3D {
+> >       .dev_add =3D mlx5_vdpa_dev_add,
+> >       .dev_del =3D mlx5_vdpa_dev_del,
+> > +     .dev_set_attr =3D mlx5_vdpa_set_attr_mac,
+> >  };
+> >
+> >  static struct virtio_device_id id_table[] =3D {
+>
+> Thanks,
+> Dragos
 >
 
 
