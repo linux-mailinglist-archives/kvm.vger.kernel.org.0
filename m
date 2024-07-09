@@ -1,47 +1,47 @@
-Return-Path: <kvm+bounces-21171-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21172-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CCCF92B8B6
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 13:45:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2EE992B8E4
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 13:57:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 774811C211FF
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 11:45:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DB0F284EC8
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 11:57:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2524158A08;
-	Tue,  9 Jul 2024 11:43:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A2B1581F3;
+	Tue,  9 Jul 2024 11:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfiQXz0H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tIuUXdIE"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC0BF158202;
-	Tue,  9 Jul 2024 11:43:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82C041EA74;
+	Tue,  9 Jul 2024 11:56:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720525424; cv=none; b=c4u019JqlZEoxbNxaH/WGVMXWrFKQ++EojKUBkttzO2+MQ7kwQxK+K8bVrbkH5mYZZrkYQYLv2YaXhQmr05HpP+6fNPwM1XvL37+XXMas0O2sRS90hOERHoCo+QR7yfr0Pr7K+h+Dw0yihYhjY+aup9Y9bLrzqFVy0wmNbxejmQ=
+	t=1720526216; cv=none; b=BB0cKEBCdxrfMYYyRpYSLHSS244GPLjxrZSJ3KKCewk0T0ujrEZS8ZlFp4e3RAIuXxnZLr019Xa0PaJI4hW4Mg89eUiLyiH7qdAqJi+EBpLK5P5z9qsVbom07agKBHFBQTzJggJpiue/0Wor6GTv+HgzCj4+di9QasW8WFLrOyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720525424; c=relaxed/simple;
-	bh=ZxDFrvOXfuTsNU7JuLaaGFFmPfePvQEPeXe9Hb2BLpw=;
+	s=arc-20240116; t=1720526216; c=relaxed/simple;
+	bh=5OKUcERZ+OB7w2fsg5OZfeoNeBp6M5cEsUpFjM1iasI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OmKXbRniSm2W6a62dh0NsHcKODA/ulv1gznrFtfEltCQfICkOYeZOaymHzFezPYORDWmRB/KjdJu95N4r64iFS2e/ucvNiUGUr+EoZN2cDnrWWGLt0I/2UsYOKEG1ONU8AOxdYC4UkGtmHEyE4ZW06hzV4zQwTXlrxQWlR2Vrx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfiQXz0H; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46B6AC3277B;
-	Tue,  9 Jul 2024 11:43:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=MKTcZ6RWR27bUQH6wACZcp5OljvE0YAZnJUVIaQVM/Lx1yJsURrEDnsr92/xXNx1hFuQdRuaRoiK72S0Bz1aUEHiXqVfL29hgWmGJGV+hHvbL0/QI8RWJVTuJmqOPVfsisHNxjZHkI5WgBsd/kFpDvIFvdHwG7wT2wpydX7JkLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tIuUXdIE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17BE5C3277B;
+	Tue,  9 Jul 2024 11:56:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720525424;
-	bh=ZxDFrvOXfuTsNU7JuLaaGFFmPfePvQEPeXe9Hb2BLpw=;
+	s=k20201202; t=1720526216;
+	bh=5OKUcERZ+OB7w2fsg5OZfeoNeBp6M5cEsUpFjM1iasI=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pfiQXz0HFMM9t00fsyyKZHGaMb0ABmeWo1Y+pnEGEWD6IPKk9GYURbBtRZHZ7iA5Y
-	 TFb+w0EeWTqNUX/JtuOKew9N6CWub0ExXvj3k3kAvbgS5E+irplYxueRIjyzWjdX2Q
-	 9NyVdbgodDmzh9uhuBNs7zLEQCZyXR7OXdNBKxtstQXjOMWpE//Zm0DTCQ4LQ21eEO
-	 djApqAZFnVdxXz7gS5A4S/qokGiu8LGSiC9rnwIBqt6CWxlEDXu7tMVO2dQeDmFYP1
-	 N9UjuFKHdl4vBUcOR0PdwwKGklSzQeGivvZLza1SesMljrzWi1rYZ5XqYkr7GqW5Q5
-	 HygwMTdFZBGKA==
-Date: Tue, 9 Jul 2024 12:43:37 +0100
+	b=tIuUXdIENMxaroq3m2mVDb7neMRWANWVEV0bFst05qT4IhLcy4CTageQJ45gpvtkO
+	 tP1ojeUACfySZrJvOEiSItR40CHekwZc0QLkM3bkGBM2hP6BjGFidEoT/16HhuKxAi
+	 Tr7NuVsDA4FwpHRq85M3AbA8cIFKOJw5oR3jVsxyUeAlEZBPhjCTnt8nwbFJ1srT1D
+	 IWBWywSnuoFPco6Men0OXv/5t8nHTW6khJV7nr6zz0B1VMG8O9LSsnmiqFy8TF6qhG
+	 lt6G1RdsI0iCvyAFNHr+cHbT30FUG6MdHtw2+nkE9HnOAYdMojX2I+Y3bSZthHLn27
+	 iT4nipBF+7Nvw==
+Date: Tue, 9 Jul 2024 12:56:49 +0100
 From: Will Deacon <will@kernel.org>
 To: Steven Price <steven.price@arm.com>
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
@@ -56,10 +56,10 @@ Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
 	Christoffer Dall <christoffer.dall@arm.com>,
 	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
 	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v4 06/15] arm64: Make the PHYS_MASK_SHIFT dynamic
-Message-ID: <20240709114337.GB13242@willie-the-truck>
+Subject: Re: [PATCH v4 07/15] arm64: Enforce bounce buffers for realm DMA
+Message-ID: <20240709115649.GC13242@willie-the-truck>
 References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-7-steven.price@arm.com>
+ <20240701095505.165383-8-steven.price@arm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -68,74 +68,85 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240701095505.165383-7-steven.price@arm.com>
+In-Reply-To: <20240701095505.165383-8-steven.price@arm.com>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Mon, Jul 01, 2024 at 10:54:56AM +0100, Steven Price wrote:
-> Make the PHYS_MASK_SHIFT dynamic for Realms. This is only is required
-> for masking the PFN from a pte entry. For a realm phys_mask_shift is
-> reduced if the RMM reports a smaller configured size for the guest.
+On Mon, Jul 01, 2024 at 10:54:57AM +0100, Steven Price wrote:
+> Within a realm guest it's not possible for a device emulated by the VMM
+> to access arbitrary guest memory. So force the use of bounce buffers to
+> ensure that the memory the emulated devices are accessing is in memory
+> which is explicitly shared with the host.
 > 
-> The realm configuration splits the address space into two with the top
-> half being memory shared with the host, and the bottom half being
-> protected memory. We treat the bit which controls this split as an
-> attribute bit and hence exclude it (and any higher bits) from the mask.
+> This adds a call to swiotlb_update_mem_attributes() which calls
+> set_memory_decrypted() to ensure the bounce buffer memory is shared with
+> the host. For non-realm guests or hosts this is a no-op.
 > 
 > Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 > Signed-off-by: Steven Price <steven.price@arm.com>
-> 
 > ---
-> v3: Drop the MAX_PHYS_MASK{,_SHIFT} definitions as they are no longer
-> needed.
+> v3: Simplify mem_init() by using a 'flags' variable.
 > ---
->  arch/arm64/include/asm/pgtable-hwdef.h | 6 ------
->  arch/arm64/include/asm/pgtable.h       | 5 +++++
->  arch/arm64/kernel/rsi.c                | 5 +++++
->  3 files changed, 10 insertions(+), 6 deletions(-)
+>  arch/arm64/kernel/rsi.c |  2 ++
+>  arch/arm64/mm/init.c    | 10 +++++++++-
+>  2 files changed, 11 insertions(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> index 9943ff0af4c9..2e3af0693bd8 100644
-> --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> @@ -203,12 +203,6 @@
->   */
->  #define PTE_S2_MEMATTR(t)	(_AT(pteval_t, (t)) << 2)
->  
-> -/*
-> - * Highest possible physical address supported.
-> - */
-> -#define PHYS_MASK_SHIFT		(CONFIG_ARM64_PA_BITS)
-> -#define PHYS_MASK		((UL(1) << PHYS_MASK_SHIFT) - 1)
-> -
->  #define TTBR_CNP_BIT		(UL(1) << 0)
->  
->  /*
-> diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> index f8efbc128446..11d614d83317 100644
-> --- a/arch/arm64/include/asm/pgtable.h
-> +++ b/arch/arm64/include/asm/pgtable.h
-> @@ -39,6 +39,11 @@
->  #include <linux/sched.h>
->  #include <linux/page_table_check.h>
->  
-> +extern unsigned int phys_mask_shift;
+> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+> index 7ac5fc4a27d0..918db258cd4a 100644
+> --- a/arch/arm64/kernel/rsi.c
+> +++ b/arch/arm64/kernel/rsi.c
+> @@ -6,6 +6,8 @@
+>  #include <linux/jump_label.h>
+>  #include <linux/memblock.h>
+>  #include <linux/psci.h>
+> +#include <linux/swiotlb.h>
 > +
-> +#define PHYS_MASK_SHIFT		(phys_mask_shift)
-> +#define PHYS_MASK		((1UL << PHYS_MASK_SHIFT) - 1)
+>  #include <asm/rsi.h>
+>  
+>  struct realm_config config;
+> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+> index 9b5ab6818f7f..1d595b63da71 100644
+> --- a/arch/arm64/mm/init.c
+> +++ b/arch/arm64/mm/init.c
+> @@ -41,6 +41,7 @@
+>  #include <asm/kvm_host.h>
+>  #include <asm/memory.h>
+>  #include <asm/numa.h>
+> +#include <asm/rsi.h>
+>  #include <asm/sections.h>
+>  #include <asm/setup.h>
+>  #include <linux/sizes.h>
+> @@ -369,8 +370,14 @@ void __init bootmem_init(void)
+>   */
+>  void __init mem_init(void)
+>  {
+> +	unsigned int flags = SWIOTLB_VERBOSE;
+>  	bool swiotlb = max_pfn > PFN_DOWN(arm64_dma_phys_limit);
+>  
+> +	if (is_realm_world()) {
+> +		swiotlb = true;
+> +		flags |= SWIOTLB_FORCE;
+> +	}
+> +
+>  	if (IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) && !swiotlb) {
+>  		/*
+>  		 * If no bouncing needed for ZONE_DMA, reduce the swiotlb
+> @@ -382,7 +389,8 @@ void __init mem_init(void)
+>  		swiotlb = true;
+>  	}
+>  
+> -	swiotlb_init(swiotlb, SWIOTLB_VERBOSE);
+> +	swiotlb_init(swiotlb, flags);
+> +	swiotlb_update_mem_attributes();
 
-I tried to figure out where this is actually used so I could understand
-your comment in the commit message:
+Why do we have to call this so early? Certainly, we won't have probed
+the hypercalls under pKVM yet and I think it would be a lot cleaner if
+you could defer your RSI discovery too.
 
- > This is only is required for masking the PFN from a pte entry
-
-The closest thing I could find is in arch/arm64/mm/mmap.c, where the
-mask is used as part of valid_mmap_phys_addr_range() which exists purely
-to filter accesses to /dev/mem. That's pretty niche, so why not just
-inline the RSI-specific stuff in there behind a static key instead of
-changing these definitions?
-
-Or did I miss a subtle user somewhere else?
+Looking forward to the possibility of device assignment in future, how
+do you see DMA_BOUNCE_UNALIGNED_KMALLOC interacting with a decrypted
+SWIOTLB buffer? I'm struggling to wrap my head around how to fix that
+properly.
 
 Will
 
