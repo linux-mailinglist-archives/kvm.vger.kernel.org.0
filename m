@@ -1,91 +1,92 @@
-Return-Path: <kvm+bounces-21176-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21177-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C2D792B960
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 14:25:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ADF492B9B7
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 14:42:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB837281768
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 12:25:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE5191C21EB7
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 12:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C175B158D78;
-	Tue,  9 Jul 2024 12:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E331598EE;
+	Tue,  9 Jul 2024 12:42:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WJPu+V8j"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Gp6SrgNN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB690155A25;
-	Tue,  9 Jul 2024 12:25:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F2515AD83
+	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 12:42:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720527940; cv=none; b=HSrW15xOT1oUZtGDu262awf0u2ySuJkujfdmy63h9I9VgE9CO90pQrUKZt+SfSiWSk7N9J+lvrWhjjIvH26eCSWMHPshTgCfjApzvovohCzs7+03hX4pBG+vc85BfsgaFsMJL9mZTTQCbpuGp+ad31c367BgpAHRmcJsiiOgwt0=
+	t=1720528926; cv=none; b=S2rjyD4btiSNS55U0UGz//cFytpKSiR7GvAYrm+6dsUG1E9jlOuR9CIzve0rLs1Io/sJX7lZsuwogXuAo135oDUEdosedqZuZqBRVQQ66Qo5lbJ7I8DLyTsYfvBS2MxE0nlL5blbGUQPHMKw9aLc4bV0TWczahq6bRQowle3zY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720527940; c=relaxed/simple;
-	bh=gUKj+NjshzelXaKZ1J+KcA7wp9Ubf12um0LnUEOCHHI=;
+	s=arc-20240116; t=1720528926; c=relaxed/simple;
+	bh=WMRXeklNAFCXPxZX0QKDYEufIJKcpHVBpPvLr8GdPXs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Iha9+n2HrxfZm1X3uvo6AJDyHDoaNvuTgs+6KCY7wjiZplG+PsEETD/zOqiV9YilWyjNej6XSYe8RYqAfrzFFzk3LtT3jwF2idFRIrsT8Ai+I0sVMkhoQMVmjWRZa7NQndbc0DVm98RqlGBlZBVzOpnywip+GjZkCaAqOEE6Xjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WJPu+V8j; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 469CDvi2011166;
-	Tue, 9 Jul 2024 12:25:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pp1; bh=C5bcJNbIOQWgGnln63ilWf7JC8l
-	xchQCYjIzUrQmc5Y=; b=WJPu+V8josYQs6NsSBKCwB2TWLdDwwIzdoMYBbaTF7T
-	tHpaLbooAKOB+aFUsRuELkRLd17JgDEX3/v0RCzzEIVD5gsUlovzpnaEHICYnSmf
-	i36dYQeEpvDepMcuItfNtk2oB5E/Ru3035AM5VaDkAkbbPYrDSmUjUVwKqQ004tM
-	a2zvA3buEQr01M1WPw1RkRqL7YJuxcEkn8CPrtS7qBw/M6ycg1lNDD9KolPyxaI/
-	i2tDLgWBY3bAGbyY/J6gODHP2O5elLRgu561dJLWMG62hKV3nLE0kZ88ErGO+8If
-	COiJ2IQAZlJ7kAYoPfTfWNMLbp99QeBBfTlWVGaSpHg==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4093x9079p-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jul 2024 12:25:35 +0000 (GMT)
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 469CPZ6o030113;
-	Tue, 9 Jul 2024 12:25:35 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4093x9079m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jul 2024 12:25:35 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 469BgtUV014020;
-	Tue, 9 Jul 2024 12:25:34 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 407h8pme0t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 09 Jul 2024 12:25:33 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 469CPS3d50921856
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 9 Jul 2024 12:25:30 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 36BA320043;
-	Tue,  9 Jul 2024 12:25:28 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EF2C020040;
-	Tue,  9 Jul 2024 12:25:27 +0000 (GMT)
-Received: from osiris (unknown [9.152.212.60])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Tue,  9 Jul 2024 12:25:27 +0000 (GMT)
-Date: Tue, 9 Jul 2024 14:25:26 +0200
-From: Heiko Carstens <hca@linux.ibm.com>
-To: Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, svens@linux.ibm.com,
-        agordeev@linux.ibm.com, gor@linux.ibm.com, nrb@linux.ibm.com,
-        nsg@linux.ibm.com, seiden@linux.ibm.com, frankja@linux.ibm.com,
-        borntraeger@de.ibm.com, gerald.schaefer@linux.ibm.com,
-        david@redhat.com
-Subject: Re: [PATCH v1 0/2] s390: Two small fixes and improvements
-Message-ID: <20240709122526.7263-B-hca@linux.ibm.com>
-References: <20240703155900.103783-1-imbrenda@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=riJDcQ/bDhKMm98HV5wy+FXXr9Zsjlmg1zs5Ixhh05LTtE/46YQZEyfxnsLgql7IeH9pIgC6LZDNsJG5nPaCIu6USSI2cVzLcKbrUVgif1EJTF/hVXWnVWjDe8/FkC6mm9srves8k6Li9wX/cphN7/emsvbywzSsbZCi5vAOpqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Gp6SrgNN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720528924;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dtU0JGN0EJmcocAYFfRCYWD9D/xkCDMAfPhd/SDuPwo=;
+	b=Gp6SrgNNgqweNWynXuvwKbR7mn+f/JQrVRI/PEwz0WX9xsQXNV/LKyYCCNEnkty4kuG1hq
+	BnmpwIhk9YJGgQ58GsTckFqaNuCZHez5YPS7/Q0PeZP6Y2LPM1frINSbGfscOu/NVNto4V
+	0zRUQyTH0x5ftumkUuMcfI1i/gYYTx8=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-j58x4qZSOMyUU3OmdSULBg-1; Tue, 09 Jul 2024 08:42:02 -0400
+X-MC-Unique: j58x4qZSOMyUU3OmdSULBg-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ee90339092so60404941fa.1
+        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 05:42:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720528921; x=1721133721;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dtU0JGN0EJmcocAYFfRCYWD9D/xkCDMAfPhd/SDuPwo=;
+        b=kZBsAXwOR7NXVOnzlNBEHW2WJUxu1EWUCkBotmFF2KySWcMTVvN8vis3bDYg+Q9Qlj
+         wdYuWocykxGxoQ4P7ErP/j0Gg73wyMK1gbvUyyRZwjCcNxZJXsr2lQbDQI+DTN36VQZM
+         g6U1Tvw41ZFxpyZGTSGsVF3WCqdiQ84AxhvjWnDZSsE9tffkLwByd3dXTL7boJxZqS+3
+         z7sq8wxf1U+qfaSWmZTwtlnszdECc9l3/io7nUBSAzMKvTgv671BVwW3ElYWXqUIMLNp
+         KJFKP8ieH5vL2NxXGonqLBV4qtGYvdonhPNUMdPeEV4XtHD/X05TyypNzu+55/4hR1nM
+         gv3A==
+X-Forwarded-Encrypted: i=1; AJvYcCXriibyQurcOP29Qcn4SMwXxNuExgF5ZktQUSwoFSJiGA1phJCrjCOWsN2YeuM1iDk/Sr73EIGkoDRaR+5BzjJdIhXd
+X-Gm-Message-State: AOJu0YwMrxgFIROCuAZtiLs6GsCv2gxSqs6IF3pa0TUF6YbO12Z9LeMU
+	WegwPdPkbXd19woSVmyaObnTjwB2Gexnu/7QDaGfF07kVfGRAI8uP3UbgvBUYYBqien38ZL/RSs
+	QimWrU9XPpvRUUhzrwSvvePR8MbHZdJmcf+TRzj+1gfVcbMr0jA==
+X-Received: by 2002:a2e:8952:0:b0:2ec:5547:c59e with SMTP id 38308e7fff4ca-2eeb3198ac3mr15823981fa.50.1720528921181;
+        Tue, 09 Jul 2024 05:42:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEJQ/3+1cvJIxlRdKB/u4MEHHTb/Kxc0reqE+YePLpyvQDvI/rkVgTUeLmn/vgIWjxO/a5kxQ==
+X-Received: by 2002:a2e:8952:0:b0:2ec:5547:c59e with SMTP id 38308e7fff4ca-2eeb3198ac3mr15823541fa.50.1720528918592;
+        Tue, 09 Jul 2024 05:41:58 -0700 (PDT)
+Received: from redhat.com ([2.52.29.103])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cdfa06b6sm2454398f8f.86.2024.07.09.05.41.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Jul 2024 05:41:58 -0700 (PDT)
+Date: Tue, 9 Jul 2024 08:41:53 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Cindy Lu <lulu@redhat.com>
+Cc: Parav Pandit <parav@nvidia.com>, Dragos Tatulea <dtatulea@nvidia.com>,
+	"jasowang@redhat.com" <jasowang@redhat.com>,
+	"sgarzare@redhat.com" <sgarzare@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Subject: Re: [PATCH v3 0/2] vdpa: support set mac address from vdpa tool
+Message-ID: <20240709084109-mutt-send-email-mst@kernel.org>
+References: <20240708064820.88955-1-lulu@redhat.com>
+ <PH0PR12MB5481AE2FD52AEE1C10411F3DDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
+ <CACLfguXk4qiw4efRGK4Gw8OZQ_PKw6j+GVQJCVtbyJ+hxOoE0Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -94,40 +95,72 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240703155900.103783-1-imbrenda@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: wsd8-mZpTnnbG9AT6HS-y50vBHOSlmFg
-X-Proofpoint-ORIG-GUID: ebFbWw6DuboRLUMCw1eA8k78Ehn7ED5E
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-09_02,2024-07-09_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 malwarescore=0
- clxscore=1011 phishscore=0 spamscore=0 mlxlogscore=390 lowpriorityscore=0
- priorityscore=1501 adultscore=0 impostorscore=0 suspectscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
- definitions=main-2407090080
+In-Reply-To: <CACLfguXk4qiw4efRGK4Gw8OZQ_PKw6j+GVQJCVtbyJ+hxOoE0Q@mail.gmail.com>
 
-On Wed, Jul 03, 2024 at 05:58:58PM +0200, Claudio Imbrenda wrote:
-> The main goal of this small series is to do some clean-up and remove some
-> paper cuts (or at least clear the way for papercuts to be removed in the
-> future).
-> 
-> Heiko: this can go through the s390 tree, as agreed.
-> 
-> Claudio Imbrenda (2):
->   s390/entry: Pass the asce as parameter to sie64a()
->   s390/kvm: Move bitfields for dat tables
-> 
->  arch/s390/include/asm/dat-bits.h   | 170 +++++++++++++++++++++++++++++
->  arch/s390/include/asm/kvm_host.h   |   7 +-
->  arch/s390/include/asm/stacktrace.h |   1 +
->  arch/s390/kernel/asm-offsets.c     |   1 +
->  arch/s390/kernel/entry.S           |   8 +-
->  arch/s390/kvm/gaccess.c            | 163 +--------------------------
->  arch/s390/kvm/kvm-s390.c           |   3 +-
->  arch/s390/kvm/vsie.c               |   2 +-
->  8 files changed, 185 insertions(+), 170 deletions(-)
->  create mode 100644 arch/s390/include/asm/dat-bits.h
+On Tue, Jul 09, 2024 at 02:19:19PM +0800, Cindy Lu wrote:
+> On Tue, 9 Jul 2024 at 11:59, Parav Pandit <parav@nvidia.com> wrote:
+> >
+> > Hi Cindy,
+> >
+> > > From: Cindy Lu <lulu@redhat.com>
+> > > Sent: Monday, July 8, 2024 12:17 PM
+> > >
+> > > Add support for setting the MAC address using the VDPA tool.
+> > > This feature will allow setting the MAC address using the VDPA tool.
+> > > For example, in vdpa_sim_net, the implementation sets the MAC address to
+> > > the config space. However, for other drivers, they can implement their own
+> > > function, not limited to the config space.
+> > >
+> > > Changelog v2
+> > >  - Changed the function name to prevent misunderstanding
+> > >  - Added check for blk device
+> > >  - Addressed the comments
+> > > Changelog v3
+> > >  - Split the function of the net device from vdpa_nl_cmd_dev_attr_set_doit
+> > >  - Add a lock for the network device's dev_set_attr operation
+> > >  - Address the comments
+> > >
+> > > Cindy Lu (2):
+> > >   vdpa: support set mac address from vdpa tool
+> > >   vdpa_sim_net: Add the support of set mac address
+> > >
+> > >  drivers/vdpa/vdpa.c                  | 81 ++++++++++++++++++++++++++++
+> > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++-
+> > >  include/linux/vdpa.h                 |  9 ++++
+> > >  include/uapi/linux/vdpa.h            |  1 +
+> > >  4 files changed, 109 insertions(+), 1 deletion(-)
+> > >
+> > > --
+> > > 2.45.0
+> >
+> > Mlx5 device already allows setting the mac and mtu during the vdpa device creation time.
+> > Once the vdpa device is created, it binds to vdpa bus and other driver vhost_vdpa etc bind to it.
+> > So there was no good reason in the past to support explicit config after device add complicate the flow for synchronizing this.
+> >
+> > The user who wants a device with new attributes, as well destroy and recreate the vdpa device with new desired attributes.
+> >
+> > vdpa_sim_net can also be extended for similar way when adding the vdpa device.
+> >
+> > Have you considered using the existing tool and kernel in place since 2021?
+> > Such as commit d8ca2fa5be1.
+> >
+> > An example of it is,
+> > $ vdpa dev add name bar mgmtdev vdpasim_net mac 00:11:22:33:44:55 mtu 9000
+> >
+> Hi Parav
+> Really thanks for your comments. The reason for adding this function
+> is to support Kubevirt.
+> the problem we meet is that kubevirt chooses one random vdpa device
+> from the pool and we don't know which one it going to pick. That means
+> we can't get to know the Mac address before it is created. So we plan
+> to have this function to change the mac address after it is created
+> Thanks
+> cindy
 
-Applied, thanks!
+Well you will need to change kubevirt to teach it to set
+mac address, right?
+
+-- 
+MST
+
 
