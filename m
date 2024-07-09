@@ -1,130 +1,197 @@
-Return-Path: <kvm+bounces-21162-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21163-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C007792B2DB
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 10:58:52 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52FE992B336
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 11:07:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68A3F1F22D4E
-	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 08:58:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE28EB212A2
+	for <lists+kvm@lfdr.de>; Tue,  9 Jul 2024 09:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B4D153512;
-	Tue,  9 Jul 2024 08:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D8AD155305;
+	Tue,  9 Jul 2024 09:06:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hcXi39/9"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFC97153804
-	for <kvm@vger.kernel.org>; Tue,  9 Jul 2024 08:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1253153503;
+	Tue,  9 Jul 2024 09:06:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720515514; cv=none; b=XJUhj4XDyesO/nhH/Ios3ltZOWPKo4qm8lhdaTjuBIw7ux8qcJvcnjXPd9pAa4sEmLHqCPrvFQ8UbFoJp21UVr6aLREtWUYAwKhKUuHKM3YTDx/CyUptSZplfMFhnIgVi/aXkS5JRWghbIjU1kZ30bxuNegmxZezQG3NE96RyX4=
+	t=1720515969; cv=none; b=XQMlIijM7F2vJiA1AfpAATdILbTzl4xnfB4oMWwYjFDG5KamYsxfULGk9ag3JaZyYwmqMTjx9RylsklYUvAvuSXXl8XTtpwhCUtJ7SdmIYYsG+fsIrALzWRiCts+wy6nygNPG8BUVGNvaA75Hp3kmfT94hHxEvPN+5Ir3/XPBWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720515514; c=relaxed/simple;
-	bh=VE/eHrIXRvnnLJ3EmmPCTMSBPXant7mTwn1kdBGxg8o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ce13yE35ydBZIIHrOw7S68iqf8DBz4N4gKI9YumJIJ6oo3sal2+8BWbudh+UkKQ2J/nFt6Q1mw1YquzuNm3ZTFc90EhLjHn5tnPyML8DIBVOqdM2QOoDj6N/M5LSJTpoLSLHOPQjNd/KJ2wN7P3U9sw+/7evctZlWTRWm6Zj3vY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 415581042;
-	Tue,  9 Jul 2024 01:58:56 -0700 (PDT)
-Received: from arm.com (e121798.manchester.arm.com [10.32.101.22])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 982653F766;
-	Tue,  9 Jul 2024 01:58:28 -0700 (PDT)
-Date: Tue, 9 Jul 2024 09:58:25 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>
-Cc: pbonzini@redhat.com, drjones@redhat.com, thuth@redhat.com,
-	kvm@vger.kernel.org, qemu-arm@nongnu.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.cs.columbia.edu,
-	christoffer.dall@arm.com, maz@kernel.org,
-	Anders Roxell <anders.roxell@linaro.org>,
-	Andrew Jones <andrew.jones@linux.dev>,
-	Eric Auger <eric.auger@redhat.com>,
-	"open list:ARM" <kvmarm@lists.linux.dev>
-Subject: Re: [kvm-unit-tests PATCH v1 1/2] arm/pmu: skip the PMU
- introspection test if missing
-Message-ID: <Zoz7sQNoC9ePXH7w@arm.com>
-References: <20240702163515.1964784-1-alex.bennee@linaro.org>
- <20240702163515.1964784-2-alex.bennee@linaro.org>
+	s=arc-20240116; t=1720515969; c=relaxed/simple;
+	bh=fP0OEw/ZFO/81qUtm8MyMZigpasdzFqbY3cL/G2T5zQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tgo8vEdYsU14DS1LEjDYqnzkD9YLyQTKMLkFfSpTUmVxa2iHXkvizFUEwNmqeshj1nhgFVrC15coi1W1ShT9fs5y3nxOJoE9Fa29Hk1kfBeUzwVzxmJxu2D6LfMzt+R5kBSbshBmQPWHbXOOLvvCrLpZ+DN+layn2KG40McddIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hcXi39/9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98C62C3277B;
+	Tue,  9 Jul 2024 09:06:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720515969;
+	bh=fP0OEw/ZFO/81qUtm8MyMZigpasdzFqbY3cL/G2T5zQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hcXi39/9tMDMiA1U1AT1FSO3EwOqRCDWNMOdl48N+6EIgCNfRmctdfaH0tKprLtW/
+	 OKNKEhgMFJyOYDVTv+FUzCLw5TA4gjyMLqDWo9QIvF0ZL7P2XASyrUBSuYHMGakgfn
+	 Qz0nCffNe/qX1qcWS0VMLPhxdBtUWzgWIRS8u0JRWLeXO5cQ+v1RZflY/9PFPx08kE
+	 xkaASi1H0dzPpcLxw5YfxBRqfmcqRJl15nYBVKn0b3+bNlnyr8kjVDgp5V2N/BbYZJ
+	 zjc3wpeoyzIJYx2juhtLv3D1glzxCk3N08uEt0ZR9MhB8lPZ9q5e9aY4fd1vn0ZJA0
+	 oFXD6mbJTkUxw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sR6nX-00AqR3-9m;
+	Tue, 09 Jul 2024 10:06:07 +0100
+Date: Tue, 09 Jul 2024 10:06:06 +0100
+Message-ID: <861q433pfl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 3/7] KVM: arm64: Add save/restore support for FPMR
+In-Reply-To: <8634oj4voc.wl-maz@kernel.org>
+References: <20240708154438.1218186-1-maz@kernel.org>
+	<20240708154438.1218186-4-maz@kernel.org>
+	<b44b29f0-b4c5-43a2-a5f6-b4fd84f77192@sirena.org.uk>
+	<864j8z4vy6.wl-maz@kernel.org>
+	<8634oj4voc.wl-maz@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240702163515.1964784-2-alex.bennee@linaro.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
-
-On Tue, Jul 02, 2024 at 05:35:14PM +0100, Alex Bennée wrote:
-> The test for number of events is not a substitute for properly
-> checking the feature register. Fix the define and skip if PMUv3 is not
-> available on the system. This includes emulator such as QEMU which
-> don't implement PMU counters as a matter of policy.
+On Mon, 08 Jul 2024 18:53:39 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Signed-off-by: Alex Bennée <alex.bennee@linaro.org>
-> Cc: Anders Roxell <anders.roxell@linaro.org>
-> ---
->  arm/pmu.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arm/pmu.c b/arm/pmu.c
-> index 9ff7a301..66163a40 100644
-> --- a/arm/pmu.c
-> +++ b/arm/pmu.c
-> @@ -200,7 +200,7 @@ static void test_overflow_interrupt(bool overflow_at_64bits) {}
->  #define ID_AA64DFR0_PERFMON_MASK  0xf
->  
->  #define ID_DFR0_PMU_NOTIMPL	0b0000
-> -#define ID_DFR0_PMU_V3		0b0001
-> +#define ID_DFR0_PMU_V3		0b0011
->  #define ID_DFR0_PMU_V3_8_1	0b0100
->  #define ID_DFR0_PMU_V3_8_4	0b0101
->  #define ID_DFR0_PMU_V3_8_5	0b0110
-> @@ -286,6 +286,11 @@ static void test_event_introspection(void)
->  		return;
->  	}
->  
-> +	if (pmu.version < ID_DFR0_PMU_V3) {
-> +		report_skip("PMUv3 extensions not supported, skip ...");
-> +		return;
-> +	}
-> +
+> On Mon, 08 Jul 2024 18:47:45 +0100,
+> Marc Zyngier <maz@kernel.org> wrote:
+> > 
+> > On Mon, 08 Jul 2024 18:34:36 +0100,
+> > Mark Brown <broonie@kernel.org> wrote:
+> > > 
+> > > [1  <text/plain; us-ascii (7bit)>]
+> > > On Mon, Jul 08, 2024 at 04:44:34PM +0100, Marc Zyngier wrote:
+> > > > Just like the rest of the FP/SIMD state, FPMR needs to be context
+> > > > switched.
+> > > 
+> > > > The only interesting thing here is that we need to treat the pKVM
+> > > > part a bit differently, as the host FP state is never written back
+> > > > to the vcpu thread, but instead stored locally and eagerly restored.
+> > > 
+> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > > ---
+> > > >  arch/arm64/include/asm/kvm_host.h  | 10 ++++++++++
+> > > >  arch/arm64/kvm/fpsimd.c            |  1 +
+> > > >  arch/arm64/kvm/hyp/nvhe/hyp-main.c |  4 ++++
+> > > >  arch/arm64/kvm/hyp/nvhe/switch.c   | 10 ++++++++++
+> > > >  arch/arm64/kvm/hyp/vhe/switch.c    |  4 ++++
+> > > >  5 files changed, 29 insertions(+)
+> > > 
+> > > I'm possibly missing something here but I'm not seeing where we load the
+> > > state for the guest, especially in the VHE case.  I would expect to see
+> > > a change in kvm_hyp_handle_fpsimd() to load FPMR for guests with the
+> > > feature (it needs to be in there to keep in sync with the ownership
+> > > tracking for the rest of the FP state, and to avoid loading needlessly
+> > > in cases where the guest never touches FP).
+> > > 
+> > > Saving for the guest was handled in the previous patch.
+> > > 
+> > > > diff --git a/arch/arm64/kvm/hyp/vhe/switch.c b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > > index 77010b76c150f..a307c1d5ac874 100644
+> > > > --- a/arch/arm64/kvm/hyp/vhe/switch.c
+> > > > +++ b/arch/arm64/kvm/hyp/vhe/switch.c
+> > > > @@ -312,6 +312,10 @@ static bool kvm_hyp_handle_eret(struct kvm_vcpu *vcpu, u64 *exit_code)
+> > > >  static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+> > > >  {
+> > > >  	__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+> > > > +
+> > > > +	if (system_supports_fpmr() &&
+> > > > +	    kvm_has_feat(vcpu->kvm, ID_AA64PFR2_EL1, FPMR, IMP))
+> > > > +		**host_data_ptr(fpmr_ptr) = read_sysreg_s(SYS_FPMR);
+> > > >  }
+> > > 
+> > > That's only saving the host state, it doesn't load the guest
+> > > state.
 
-I don't get this patch - test_event_introspection() is only run on 64bit. On
-arm64, if there is a PMU present, that PMU is a PMUv3.  A prerequisite to
-running any PMU tests is for pmu_probe() to succeed, and pmu_probe() fails if
-there is no PMU implemented (PMUVer is either 0, or 0b1111). As a result, if
-test_event_introspection() is executed, then a PMUv3 is present.
+So after cherry-picking my own fixes and realising that I had left
+pKVM in the lurch, this is what I have added to this patch, which
+hopefully does the right thing.
 
-When does QEMU advertise FEAT_PMUv3*, but no event counters (other than the cycle
-counter)?
+diff --git a/arch/arm64/kvm/hyp/include/hyp/switch.h b/arch/arm64/kvm/hyp/include/hyp/switch.h
+index f59ccfe11ab9a..52c7dc8446f16 100644
+--- a/arch/arm64/kvm/hyp/include/hyp/switch.h
++++ b/arch/arm64/kvm/hyp/include/hyp/switch.h
+@@ -404,6 +404,10 @@ static bool kvm_hyp_handle_fpsimd(struct kvm_vcpu *vcpu, u64 *exit_code)
+ 	else
+ 		__fpsimd_restore_state(&vcpu->arch.ctxt.fp_regs);
+ 
++	if (system_supports_fpmr() &&
++	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
++		write_sysreg_s(__vcpu_sys_reg(vcpu, FPMR), SYS_FPMR);
++
+ 	/* Skip restoring fpexc32 for AArch64 guests */
+ 	if (!(read_sysreg(hcr_el2) & HCR_RW))
+ 		write_sysreg(__vcpu_sys_reg(vcpu, FPEXC32_EL2), fpexc32_el2);
+diff --git a/arch/arm64/kvm/hyp/nvhe/hyp-main.c b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+index 6b14a2c13e287..97fc6ae123a03 100644
+--- a/arch/arm64/kvm/hyp/nvhe/hyp-main.c
++++ b/arch/arm64/kvm/hyp/nvhe/hyp-main.c
+@@ -62,6 +62,8 @@ static void fpsimd_sve_flush(void)
+ 
+ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
+ {
++	bool has_fpmr;
++
+ 	if (!guest_owns_fp_regs())
+ 		return;
+ 
+@@ -73,13 +75,17 @@ static void fpsimd_sve_sync(struct kvm_vcpu *vcpu)
+ 	else
+ 		__fpsimd_save_state(&vcpu->arch.ctxt.fp_regs);
+ 
++	has_fpmr = (system_supports_fpmr() &&
++		    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP));
++	if (has_fpmr)
++		__vcpu_sys_reg(vcpu, FPMR) = read_sysreg_s(SYS_FPMR);
++
+ 	if (system_supports_sve())
+ 		__hyp_sve_restore_host();
+ 	else
+ 		__fpsimd_restore_state(*host_data_ptr(fpsimd_state));
+ 
+-	if (system_supports_fpmr() &&
+-	    kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64PFR2_EL1, FPMR, IMP))
++	if (has_fpmr)
+ 		write_sysreg_s(*host_data_ptr(fpmr), SYS_FPMR);
+ 
+ 	*host_data_ptr(fp_owner) = FP_STATE_HOST_OWNED;
 
-If you want to be extra correct, you can add the above check to pmu_probe() for
-32bit, since I doubt that the PMU tests were designed or tested on anything
-other than a PMUv3 (and probably not much interest to maintain the tests for
-PMUv1 or v2 either). If do do this, may I suggest:
+I'll repost the series after -rc1.
 
-#if defined(__arm__)
-	if (pmu.version == ID_DFR0_PMU_V1 || pmu.version == ID_DFR0_PMU_V2)
-		return false;
-#endif
+	M.
 
-That way the check is self documenting.
-
-Thanks,
-Alex
-
->  	/* PMUv3 requires an implementation includes some common events */
->  	required_events = is_event_supported(SW_INCR, true) &&
->  			  is_event_supported(CPU_CYCLES, true) &&
-> -- 
-> 2.39.2
-> 
+-- 
+Without deviation from the norm, progress is not possible.
 
