@@ -1,62 +1,64 @@
-Return-Path: <kvm+bounces-21274-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21275-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FDE492CBF7
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 09:34:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D8892CBFD
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 09:35:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93CFC1C224FA
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 07:34:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03A491C22FA2
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 07:35:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BF284A3E;
-	Wed, 10 Jul 2024 07:34:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5052B84A27;
+	Wed, 10 Jul 2024 07:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LRVvovir"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gaDdLIb2"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFA183A19;
-	Wed, 10 Jul 2024 07:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76E9383A0D;
+	Wed, 10 Jul 2024 07:35:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720596861; cv=none; b=L02f1Sm7lcIq7D9MW4q30dkBSASvQ9PUu27oq8dO8HyCcjHD+k8TRtdSTfaefNNHrfVU3W8Yn8iJfWKyOAKQ9XShm4gqBfbWyKct5/Yb2Xed3XtPBjxdRF3Wo/TW2917n7M8b3B5OO8y8+30rKcT4z4j+aRYtCN6aAQVwOQtk0w=
+	t=1720596911; cv=none; b=TMs67JhWLWEczaTrn2ZaU6N0rXIDppc1sXx6hzET6zMk+3SGW/DahdBG7D+H2esDEO7RerkMfojAvKB8TH5qSIH5iEOS72suH5M/mYQK+1q6xjQ/sfw7fV097xiJ4tFpqxsynOOoWveCs0pzSwyCqzAFI3O/PNIbzkcmGWgHhvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720596861; c=relaxed/simple;
-	bh=dvoKNXwrD28MkkI8y466iNL0VlvuCYSk/fPFFvZKz3w=;
+	s=arc-20240116; t=1720596911; c=relaxed/simple;
+	bh=6Bqq4Ewk7zpTLugZf5KjwcAghC3qqCdO74iRTV/2vys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RgofaytIANv1dpFUhg9C2F0muyg/DoeLlHQpS2sfeM8j3VzWOLz8X5Y7Oem96EYL05BNJjyCGN90k6cUmOPBrRghgW4WE6O4k9w3OlTdwXPcocSVgRxHvl2ezKkO0aFy07Xu89Nxqvx9lYwhGSYldVPqSGu1kkw5m4ibvFYM/gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LRVvovir; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75F9CC32782;
-	Wed, 10 Jul 2024 07:34:14 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=n+HPTDLi2khw72jqSRp6DoCy8fMwpZeHawZK5w/LBkSVENX700UudlpsT7rj8mBTjiesL1dwlaongaCm6RWI6bLh/COQzsl+sjOYVoIzV5O04YKETmq0gsOHF/UWkqtBI1Rn/lxDB4O3sdEYC12NQoGKyDY0W36Xz6jLQMmVdpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gaDdLIb2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53BF2C32781;
+	Wed, 10 Jul 2024 07:35:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720596861;
-	bh=dvoKNXwrD28MkkI8y466iNL0VlvuCYSk/fPFFvZKz3w=;
+	s=k20201202; t=1720596911;
+	bh=6Bqq4Ewk7zpTLugZf5KjwcAghC3qqCdO74iRTV/2vys=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LRVvovireNfQcRKQxb/uK2FuFMyJjw3TkEkJ22O/546QnRRV2zF7JWMfct3nzE+pd
-	 iu4WoPH27IVKO9aIdF5W6mx5AJgNXnQlImXYZ2/2vRBRfs4R71WfQU2nzevFuhPqnF
-	 TKKqwdfacz/bphBPOxDi0xD/k65vyQB0f+56uxW7A98Sq9jbnHoo6YuLaNO73gcuSH
-	 cbsB4K96xVc+RBmY0Qjj4u//FkFW1Z6G9r0XLNEMXUUOAvfE13MLwkgQW5HMcJq7S7
-	 3jJDBzQoeHsLcy2+VZ/lfvQA6qTD4yc6Cx9Fi3rjJMFD58cOk7fuwpyVec1qQT8rQp
-	 3/UutjGYb5zSg==
-Date: Wed, 10 Jul 2024 10:31:35 +0300
+	b=gaDdLIb2asilEsYwMYfxjQiXe/jKOTfX6mA6XGwmSm/Trndrk8Y/Zr+WauUC+xHYl
+	 zlodR4URQHujRikilL9PJWpYh20D8Z5dtvNEtfyJCO+NGPA9SZoZjVt/ICFnY38znP
+	 7rGQVVjjx98NLb9jVEPakhrFX0pk/iYwnJm3opeXZ2MM2vbUCiFdZtpcNxgh5QKIs+
+	 EmRap+tWsjTRiV433a8Go5joeXBkKeDnUR3LtH1WQMHWf1TSemnF862L1poQ/dhE5K
+	 n7w4E4JgfP7Iqbcqb21fEaTSzp6M6XM7c19v8Q2qX4s5T2BRiewwq+zWTeHG3llGfR
+	 eq7jxdjWOwP4w==
+Date: Wed, 10 Jul 2024 10:32:25 +0300
 From: Mike Rapoport <rppt@kernel.org>
-To: Patrick Roy <roypat@amazon.co.uk>
-Cc: seanjc@google.com, pbonzini@redhat.com, akpm@linux-foundation.org,
-	dwmw@amazon.co.uk, david@redhat.com, tglx@linutronix.de,
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com,
-	x86@kernel.org, hpa@zytor.com, willy@infradead.org, graf@amazon.com,
-	derekmn@amazon.com, kalyazin@amazon.com, kvm@vger.kernel.org,
+To: David Hildenbrand <david@redhat.com>
+Cc: Patrick Roy <roypat@amazon.co.uk>, seanjc@google.com,
+	pbonzini@redhat.com, akpm@linux-foundation.org, dwmw@amazon.co.uk,
+	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+	dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+	willy@infradead.org, graf@amazon.com, derekmn@amazon.com,
+	kalyazin@amazon.com, kvm@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	dmatlack@google.com, tabba@google.com, chao.p.peng@linux.intel.com,
 	xmarcalx@amazon.co.uk
-Subject: Re: [RFC PATCH 5/8] kvm: gmem: add option to remove guest private
- memory from direct map
-Message-ID: <Zo441yz7Yw2JZcPs@kernel.org>
+Subject: Re: [RFC PATCH 7/8] mm: secretmem: use AS_INACCESSIBLE to prohibit
+ GUP
+Message-ID: <Zo45CQGe_UDUnXXu@kernel.org>
 References: <20240709132041.3625501-1-roypat@amazon.co.uk>
- <20240709132041.3625501-6-roypat@amazon.co.uk>
+ <20240709132041.3625501-8-roypat@amazon.co.uk>
+ <0dc45181-de7e-4d97-9178-573c6f683f55@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -65,194 +67,64 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240709132041.3625501-6-roypat@amazon.co.uk>
+In-Reply-To: <0dc45181-de7e-4d97-9178-573c6f683f55@redhat.com>
 
-On Tue, Jul 09, 2024 at 02:20:33PM +0100, Patrick Roy wrote:
-> While guest_memfd is not available to be mapped by userspace, it is
-> still accessible through the kernel's direct map. This means that in
-> scenarios where guest-private memory is not hardware protected, it can
-> be speculatively read and its contents potentially leaked through
-> hardware side-channels. Removing guest-private memory from the direct
-> map, thus mitigates a large class of speculative execution issues
-> [1, Table 1].
+On Tue, Jul 09, 2024 at 11:09:29PM +0200, David Hildenbrand wrote:
+> On 09.07.24 15:20, Patrick Roy wrote:
+> > Inside of vma_is_secretmem and secretmem_mapping, instead of checking
+> > whether a vm_area_struct/address_space has the secretmem ops structure
+> > attached to it, check whether the address_space has the AS_INACCESSIBLE
+> > bit set. Then set the AS_INACCESSIBLE flag for secretmem's
+> > address_space.
+> > 
+> > This means that get_user_pages and friends are disables for all
+> > adress_spaces that set AS_INACCESIBLE. The AS_INACCESSIBLE flag was
+> > introduced in commit c72ceafbd12c ("mm: Introduce AS_INACCESSIBLE for
+> > encrypted/confidential memory") specifically for guest_memfd to indicate
+> > that no reads and writes should ever be done to guest_memfd
+> > address_spaces. Disallowing gup seems like a reasonable semantic
+> > extension, and means that potential future mmaps of guest_memfd cannot
+> > be GUP'd.
+> > 
+> > Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
+> > ---
+> >   include/linux/secretmem.h | 13 +++++++++++--
+> >   mm/secretmem.c            |  6 +-----
+> >   2 files changed, 12 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/include/linux/secretmem.h b/include/linux/secretmem.h
+> > index e918f96881f5..886c8f7eb63e 100644
+> > --- a/include/linux/secretmem.h
+> > +++ b/include/linux/secretmem.h
+> > @@ -8,10 +8,19 @@ extern const struct address_space_operations secretmem_aops;
+> >   static inline bool secretmem_mapping(struct address_space *mapping)
+> >   {
+> > -	return mapping->a_ops == &secretmem_aops;
+> > +	return mapping->flags & AS_INACCESSIBLE;
+> > +}
+> > +
+> > +static inline bool vma_is_secretmem(struct vm_area_struct *vma)
+> > +{
+> > +	struct file *file = vma->vm_file;
+> > +
+> > +	if (!file)
+> > +		return false;
+> > +
+> > +	return secretmem_mapping(file->f_inode->i_mapping);
+> >   }
 > 
-> This patch adds a flag to the `KVM_CREATE_GUEST_MEMFD` which, if set, removes the
-> struct pages backing guest-private memory from the direct map. Should
-> `CONFIG_HAVE_KVM_GMEM_{INVALIDATE, PREPARE}` be set, pages are removed
-> after preparation and before invalidation, so that the
-> prepare/invalidate routines do not have to worry about potentially
-> absent direct map entries.
+> That sounds wrong. You should leave *secretmem alone and instead have
+> something like inaccessible_mapping that is used where appropriate.
 > 
-> Direct map removal do not reuse the `KVM_GMEM_PREPARE` machinery, since `prepare` can be
-> called multiple time, and it is the responsibility of the preparation
-> routine to not "prepare" the same folio twice [2]. Thus, instead
-> explicitly check if `filemap_grab_folio` allocated a new folio, and
-> remove the returned folio from the direct map only if this was the case.
-> 
-> The patch uses release_folio instead of free_folio to reinsert pages
-> back into the direct map as by the time free_folio is called,
-> folio->mapping can already be NULL. This means that a call to
-> folio_inode inside free_folio might deference a NULL pointer, leaving no
-> way to access the inode which stores the flags that allow determining
-> whether the page was removed from the direct map in the first place.
-> 
-> Lastly, the patch uses set_direct_map_{invalid,default}_noflush instead
-> of `set_memory_[n]p` to avoid expensive flushes of TLBs and the L*-cache
-> hierarchy. This is especially important once KVM restores direct map
-> entries on-demand in later patches, where simple FIO benchmarks of a
-> virtio-blk device have shown that TLB flushes on a Intel(R) Xeon(R)
-> Platinum 8375C CPU @ 2.90GHz resulted in 80% degradation in throughput
-> compared to a non-flushing solution.
-> 
-> Not flushing the TLB means that until TLB entries for temporarily
-> restored direct map entries get naturally evicted, they can be used
-> during speculative execution, and effectively "unhide" the memory for
-> longer than intended. We consider this acceptable, as the only pages
-> that are temporarily reinserted into the direct map like this will
-> either hold PV data structures (kvm-clock, asyncpf, etc), or pages
-> containing privileged instructions inside the guest kernel image (in the
-> MMIO emulation case).
-> 
-> [1]: https://download.vusec.net/papers/quarantine_raid23.pdf
-> 
-> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
-> ---
->  include/uapi/linux/kvm.h |  2 ++
->  virt/kvm/guest_memfd.c   | 52 ++++++++++++++++++++++++++++++++++------
->  2 files changed, 47 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-> index e065d9fe7ab2..409116aa23c9 100644
-> --- a/include/uapi/linux/kvm.h
-> +++ b/include/uapi/linux/kvm.h
-> @@ -1563,4 +1563,6 @@ struct kvm_create_guest_memfd {
->  	__u64 reserved[6];
->  };
->  
-> +#define KVM_GMEM_NO_DIRECT_MAP                 (1ULL << 0)
-> +
->  #endif /* __LINUX_KVM_H */
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index 9148b9679bb1..dc9b0c2d0b0e 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -4,6 +4,7 @@
->  #include <linux/kvm_host.h>
->  #include <linux/pagemap.h>
->  #include <linux/anon_inodes.h>
-> +#include <linux/set_memory.h>
->  
->  #include "kvm_mm.h"
->  
-> @@ -49,9 +50,16 @@ static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct fol
->  	return 0;
->  }
->  
-> +static bool kvm_gmem_not_present(struct inode *inode)
-> +{
-> +	return ((unsigned long)inode->i_private & KVM_GMEM_NO_DIRECT_MAP) != 0;
-> +}
-> +
->  static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, bool prepare)
->  {
->  	struct folio *folio;
-> +	bool zap_direct_map = false;
-> +	int r;
->  
->  	/* TODO: Support huge pages. */
->  	folio = filemap_grab_folio(inode->i_mapping, index);
-> @@ -74,16 +82,30 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, bool
->  		for (i = 0; i < nr_pages; i++)
->  			clear_highpage(folio_page(folio, i));
->  
-> +		// We need to clear the folio before calling kvm_gmem_prepare_folio,
-> +		// but can only remove it from the direct map _after_ preparation is done.
+> vma_is_secretmem() should not suddenly succeed on something that is not
+> mm/secretmem.c
 
-No C++ comments please
-
-> +		zap_direct_map = kvm_gmem_not_present(inode);
-> +
->  		folio_mark_uptodate(folio);
->  	}
->  
->  	if (prepare) {
-> -		int r =	kvm_gmem_prepare_folio(inode, index, folio);
-> -		if (r < 0) {
-> -			folio_unlock(folio);
-> -			folio_put(folio);
-> -			return ERR_PTR(r);
-> -		}
-> +		r = kvm_gmem_prepare_folio(inode, index, folio);
-> +		if (r < 0)
-> +			goto out_err;
-> +	}
-> +
-> +	if (zap_direct_map) {
-> +		r = set_direct_map_invalid_noflush(&folio->page);
-
-It's not future proof to presume that folio is a single page here.
-You should loop over folio pages and add a TLB flush after the loop.
-
-> +		if (r < 0)
-> +			goto out_err;
-> +
-> +		// We use the private flag to track whether the folio has been removed
-> +		// from the direct map. This is because inside of ->free_folio,
-> +		// we do not have access to the address_space anymore, meaning we
-> +		// cannot check folio_inode(folio)->i_private to determine whether
-> +		// KVM_GMEM_NO_DIRECT_MAP was set.
-> +		folio_set_private(folio);
->  	}
->  
->  	/*
-> @@ -91,6 +113,10 @@ static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, bool
->  	 * unevictable and there is no storage to write back to.
->  	 */
->  	return folio;
-> +out_err:
-> +	folio_unlock(folio);
-> +	folio_put(folio);
-> +	return ERR_PTR(r);
->  }
->  
->  static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
-> @@ -354,10 +380,22 @@ static void kvm_gmem_free_folio(struct folio *folio)
->  }
->  #endif
->  
-> +static void kvm_gmem_invalidate_folio(struct folio *folio, size_t start, size_t end)
-> +{
-> +	if (start == 0 && end == PAGE_SIZE) {
-> +		// We only get here if PG_private is set, which only happens if kvm_gmem_not_present
-> +		// returned true in kvm_gmem_get_folio. Thus no need to do that check again.
-> +		BUG_ON(set_direct_map_default_noflush(&folio->page));
-
-Ditto.
-
-> +
-> +		folio_clear_private(folio);
-> +	}
-> +}
-> +
->  static const struct address_space_operations kvm_gmem_aops = {
->  	.dirty_folio = noop_dirty_folio,
->  	.migrate_folio	= kvm_gmem_migrate_folio,
->  	.error_remove_folio = kvm_gmem_error_folio,
-> +	.invalidate_folio = kvm_gmem_invalidate_folio,
->  #ifdef CONFIG_HAVE_KVM_GMEM_INVALIDATE
->  	.free_folio = kvm_gmem_free_folio,
->  #endif
-> @@ -443,7 +481,7 @@ int kvm_gmem_create(struct kvm *kvm, struct kvm_create_guest_memfd *args)
->  {
->  	loff_t size = args->size;
->  	u64 flags = args->flags;
-> -	u64 valid_flags = 0;
-> +	u64 valid_flags = KVM_GMEM_NO_DIRECT_MAP;
->  
->  	if (flags & ~valid_flags)
->  		return -EINVAL;
+I'm with David here.
+ 
 > -- 
-> 2.45.2
+> Cheers,
+> 
+> David / dhildenb
 > 
 
 -- 
