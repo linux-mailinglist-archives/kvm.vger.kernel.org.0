@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-21385-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21386-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC68292DCF0
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 01:45:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CA5A92DCF3
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 01:45:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60232B23E0E
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:45:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 914771F22B7F
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172D816C69D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B233E16C84C;
 	Wed, 10 Jul 2024 23:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1Kxcusgv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NraxoE88"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088631662FD
-	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 23:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A304F167D98
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 23:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720654971; cv=none; b=V02syxOfbvr5OernZ7MnrapPHrQfVKgsuYPNBzF13Nx+Hk4Du3ThNYtsmSsaFdsHH2MyDJYBgO0mgjWnUEtBLVEaGfdo4+8XDnk28rBR8T4zAM6rB1Pw1PHU+P4jkOWYcVQza6Wmzd+SUnmY8yY3PLP7b7Eb0a4GR2ARkQS5dAM=
+	t=1720654972; cv=none; b=Rgl8IcmnF+EI1WMRwRAKIdoecV1iDMlpE5WMWm1pWZj4d/kAqKhucg/zSxHB3HEmOPYH+wJ/YCDKF7sdKtA0AuqL+rJpVfOYHtwxjP5Cg4IPHOBXapt+cNLqPzx0Evk1OmHvv40AVDulHuH3Y1RD+ZOMjmMaQKuK/xZnMRjnjBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720654971; c=relaxed/simple;
-	bh=IjXnmRFVjtDWx5DdntFXxWYNolKMFz9eFCdi9O/NlGk=;
+	s=arc-20240116; t=1720654972; c=relaxed/simple;
+	bh=bFngUTjVBtg5CbyG25RDmTc6wZ0g8Z4dE05PWolnMuA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Pt6HzSa9bJDuLt4NMK1nJ86aoSCTeoXAE4Dkm7RcgztFbfQ1S4+FBCVGeZWb4dmNE85+bTIgiO5NucSf/SBHltAjTMEscCSdNHyz/Bpxx/2FWOYVnPiBNITFq/p11L3MnVaoV+nv+R4Auu6VYJoPAwg1GFP/gd7MG/qvZNfkQ1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1Kxcusgv; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=u9PudOaAUbYBdzXwYwrRnMvFM7nE/6CBTa1je5BjbKzaOGL2O5eGSTRa4Tk66cOKMPp5ZJK2Xtk80ElqrUX/KLsMoagwGRIrusjNyN8pVvWmoM1hgy/g5t5OtSZWvigbOu2IEzicx8LoWZZyqrA4LPHsB1xVuojx5WdvSTbp1bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NraxoE88; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03b3f48c65so455157276.0
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 16:42:49 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e056d640abbso495589276.0
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 16:42:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720654969; x=1721259769; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720654970; x=1721259770; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0Yr0VzVLlHnBy7TTzGiqxJ6wuwWaRwmTmvFlX0dIWg=;
-        b=1KxcusgvBBHitV4s1u7TQQ7LVMI2G0L8r5abXPHb8fs/1gW78CwYAl/ZbKiX/DWkRE
-         S3LDZ62juwvgbxFm3VWxRQLQ7bmsah08T7z9aVVz7siJtESBEU0YU+tEuFp/EsRKp+I/
-         3OUnUK2VbacifgaEuqWKWxPV6VaXSLQu/Ry+LeBoeGskfucFtHQqKepS+9vQ+P82fK03
-         24qF6bZ+HdXGZ0tKQ5hLSeYFiIvG555CzZkmhJWIIpN9zhyPA0rI8DmXgD902LZnbEo6
-         V/FumXQm2R+oAqqNKNTyUW9QOomG2shlLqFypw0TNsn1mT+wrQEpYZb+feMpe3Okxvxf
-         Df8Q==
+        bh=wAPg+uoGyE7jrnqbrfnqp+qBfKQe/ElheERXpCs/y30=;
+        b=NraxoE884i5UGeFLgyX6LV7967m3VShM5RJlHCzHa1BM3Ym/+8c83CzC7IvyEpbJez
+         7udLHgCXg3ao8cBo31uGB2qPMrJE1WjFX7XI5FibKYcJ61K8Sa9qMuDgouX0kvZnFQmD
+         qMCdCCLZciixrn7zTiTTNIfSjaKVjL8imwQEF0h1iJPrjxkJybpE+Q7yzSWS5ixF9UmG
+         MZtuaM8JLBvfieo1nWP5Wzf2eVf9dWGUAtDEIQQSbHOUUOurd5cuj84uR2FPDCzOVo1Q
+         nuwy7CbjpJhIkMuTCUo0jTlUUFiDE6gAcJRoM4GftShi3884dKF9Jz1RC63GHwKVSfaM
+         9dDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720654969; x=1721259769;
+        d=1e100.net; s=20230601; t=1720654970; x=1721259770;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=M0Yr0VzVLlHnBy7TTzGiqxJ6wuwWaRwmTmvFlX0dIWg=;
-        b=xG9WraY/xgxiiwsA/LoN+hcsWyDvZ0t1F0V2lr1SaT3RGtb9Rcd4Zkm0R7af701FWH
-         eR1tatlkBz2VWcFr/YD3OLsc5MSHfT0JcZAziWbo1O3gj2jnq0A95CkO1+un/ZUsGLDk
-         5ON4eoWS8vKAKWThxlwR4f9Aqv+JOf2dxzRIWMPw7BsDEoSdZEIRKMKO5pFHxSBZ/Htx
-         PEiUrhtEuuSprWjYi7RLXOwLRnHR69aXC8u0FKTzaZpkVLwMfqdGpE+NKAK5j1jm9+x1
-         /mzfUzRv/ww/NDgqgSX6gxOpyk/ACcwoyRCOTzFYtWm6O5fkgnlKHu+W9hwmk/QY1ijY
-         QpZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWTLp9gaEjuPkXPY50IF/BpH8xzF+oqauFSyXxXIHFzCqk5euw7MLwYoXde5qJYTg/hXtCNZTGipGajC99jUU8g0VLi
-X-Gm-Message-State: AOJu0YzmXqW4T3lIqmp/CBJTSbD+5muyzhHsRMi14dYg9OjdkGH8EId3
-	UXPh93mA21oOomMTZ+ZgNAHdm7PMubLY6PCtZRgtiJ/Y2QyeqVajREmVoar4OSpnQXJU9F9soBb
-	mmwYBZctx/ti6vn1jvw==
-X-Google-Smtp-Source: AGHT+IEnfc9JNyCNV09EBc2D+TZxXa8AOYJGFkqDSB6HeXipR+uC/GqUScItBcKVfj4YhKzC1lFukBy8dAilrvDh
+        bh=wAPg+uoGyE7jrnqbrfnqp+qBfKQe/ElheERXpCs/y30=;
+        b=SaWtUd4/EtPekwjVIHC8IHSLOZqSW2xXvaqykp3HZzWZg+POdSQcMt/uMOH3wgj2tB
+         h+dcRfGqH5STO8ixWGz4cg/X2T36OG/sF+zG+Nx8fTM15zlOnv5uMGTnWMHuemHq5tRb
+         Vz8AGsQVp9R/WcRKur29DvS7TTSI6CCs8+RGg6pS00eRWOYs02dwbEp+b2BIVifS3VWW
+         N7ahrBPixymhaGDYnd+BrLOxYDWlswbN5pgkxAs9+glpSYue9WWUnhTSM9m0KkHaowP9
+         J8VotXxB3CxQ7NOcg6fHMgZPd+mJHCmWqslFPPosxQ2Pmd1XPXwUK4CqR/FKudKcEbYW
+         bSxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUxymrKO1u3EiuYVbcxJbhnsZA4evs6UpS+yto3wSSLJRV7Dom2NT/AYeJLDnrnVji4ieYx2HEidSs0U/2fI32vmbv4
+X-Gm-Message-State: AOJu0Yx516hO0JKZ4/cGMaXNKyB/s14pSZmQqO4XNNxvXQvuF0uH2mQD
+	KgQGiMpn4fo3VkrOSBlIsxy6HLeEUUS6tGvRQS++wwD3b8hjJ/SPemrILzVRKJoAeak6yFBcVQm
+	+SBVnYiunaTxUk8+AXA==
+X-Google-Smtp-Source: AGHT+IEUTEcOd07Ngb0BqkggJw4ozgt7Za8itkm1dvA0VYqtERMoRdOJmQ0AmWvr6/7REaf9c4XX0hx8Il26mfc6
 X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
- (user=jthoughton job=sendgmr) by 2002:a05:6902:154c:b0:de5:2694:45ba with
- SMTP id 3f1490d57ef6-e041af3e29emr358942276.0.1720654968877; Wed, 10 Jul 2024
- 16:42:48 -0700 (PDT)
-Date: Wed, 10 Jul 2024 23:42:15 +0000
+ (user=jthoughton job=sendgmr) by 2002:a05:6902:2101:b0:e03:31ec:8a24 with
+ SMTP id 3f1490d57ef6-e041b17dfb5mr382800276.8.1720654969766; Wed, 10 Jul 2024
+ 16:42:49 -0700 (PDT)
+Date: Wed, 10 Jul 2024 23:42:16 +0000
 In-Reply-To: <20240710234222.2333120-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240710234222.2333120-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240710234222.2333120-12-jthoughton@google.com>
-Subject: [RFC PATCH 11/18] KVM: arm64: Add vCPU memory fault fast-path for Userfault
+Message-ID: <20240710234222.2333120-13-jthoughton@google.com>
+Subject: [RFC PATCH 12/18] KVM: arm64: Add userfault support for steal-time
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -87,36 +87,90 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-Make this optimization for the same reason we make it for x86: because
-it necessary for sufficient post-copy performance when scaling up to
-hundreds of cores (even though KVM Userfault today doesn't scale very
-well).
+As part of KVM_RUN, we may need to write steal-time information to guest
+memory. In the case that the gfn we are writing to is userfault-enabled,
+we should return to userspace with fault information.
+
+With asynchronous userfaults, this change is not necessary and merely
+acts as an optimization.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- arch/arm64/kvm/mmu.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ arch/arm64/include/asm/kvm_host.h |  2 +-
+ arch/arm64/kvm/arm.c              |  8 ++++++--
+ arch/arm64/kvm/pvtime.c           | 11 +++++++++--
+ 3 files changed, 16 insertions(+), 5 deletions(-)
 
-diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-index ac283e606516..c84633c9ab98 100644
---- a/arch/arm64/kvm/mmu.c
-+++ b/arch/arm64/kvm/mmu.c
-@@ -1488,6 +1488,15 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
- 	mmu_seq = vcpu->kvm->mmu_invalidate_seq;
- 	mmap_read_unlock(current->mm);
+diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+index 36b8e97bf49e..4c7bd72ba9e8 100644
+--- a/arch/arm64/include/asm/kvm_host.h
++++ b/arch/arm64/include/asm/kvm_host.h
+@@ -1166,7 +1166,7 @@ static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
  
-+	if (gfn_has_userfault(memslot->kvm, gfn)) {
-+		kvm_prepare_memory_fault_exit(vcpu, gfn << PAGE_SHIFT,
-+					      PAGE_SIZE, write_fault,
-+					      /*exec=*/false,
-+					      /*private=*/false,
-+					      /*userfault=*/true);
+ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu);
+ gpa_t kvm_init_stolen_time(struct kvm_vcpu *vcpu);
+-void kvm_update_stolen_time(struct kvm_vcpu *vcpu);
++int kvm_update_stolen_time(struct kvm_vcpu *vcpu);
+ 
+ bool kvm_arm_pvtime_supported(void);
+ int kvm_arm_pvtime_set_attr(struct kvm_vcpu *vcpu,
+diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+index 59716789fe0f..4c7994e44217 100644
+--- a/arch/arm64/kvm/arm.c
++++ b/arch/arm64/kvm/arm.c
+@@ -974,8 +974,12 @@ static int check_vcpu_requests(struct kvm_vcpu *vcpu)
+ 		 */
+ 		kvm_check_request(KVM_REQ_IRQ_PENDING, vcpu);
+ 
+-		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu))
+-			kvm_update_stolen_time(vcpu);
++		if (kvm_check_request(KVM_REQ_RECORD_STEAL, vcpu)) {
++			int ret = kvm_update_stolen_time(vcpu);
++
++			if (ret <= 0)
++				return ret;
++		}
+ 
+ 		if (kvm_check_request(KVM_REQ_RELOAD_GICv4, vcpu)) {
+ 			/* The distributor enable bits were changed */
+diff --git a/arch/arm64/kvm/pvtime.c b/arch/arm64/kvm/pvtime.c
+index 4ceabaa4c30b..ba0164726310 100644
+--- a/arch/arm64/kvm/pvtime.c
++++ b/arch/arm64/kvm/pvtime.c
+@@ -10,7 +10,7 @@
+ 
+ #include <kvm/arm_hypercalls.h>
+ 
+-void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
++int kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm *kvm = vcpu->kvm;
+ 	u64 base = vcpu->arch.steal.base;
+@@ -20,9 +20,14 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+ 	int idx;
+ 
+ 	if (base == INVALID_GPA)
+-		return;
++		return 1;
+ 
+ 	idx = srcu_read_lock(&kvm->srcu);
++	if (gfn_to_hva(kvm, base + offset) == KVM_HVA_ERR_USERFAULT) {
++		kvm_prepare_memory_fault_exit(vcpu, base + offset, PAGE_SIZE,
++					      true, false, false, true);
 +		return -EFAULT;
 +	}
+ 	if (!kvm_get_guest(kvm, base + offset, steal)) {
+ 		steal = le64_to_cpu(steal);
+ 		vcpu->arch.steal.last_steal = READ_ONCE(current->sched_info.run_delay);
+@@ -30,6 +35,8 @@ void kvm_update_stolen_time(struct kvm_vcpu *vcpu)
+ 		kvm_put_guest(kvm, base + offset, cpu_to_le64(steal));
+ 	}
+ 	srcu_read_unlock(&kvm->srcu, idx);
 +
- 	pfn = __gfn_to_pfn_memslot(memslot, gfn, false, false, NULL,
- 				   write_fault, &writable, NULL);
- 	if (pfn == KVM_PFN_ERR_HWPOISON) {
++	return 1;
+ }
+ 
+ long kvm_hypercall_pv_features(struct kvm_vcpu *vcpu)
 -- 
 2.45.2.993.g49e7a77208-goog
 
