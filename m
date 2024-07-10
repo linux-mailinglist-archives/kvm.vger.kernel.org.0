@@ -1,122 +1,165 @@
-Return-Path: <kvm+bounces-21319-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21320-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D8C92D530
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 17:42:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B20692D541
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 17:44:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1E90B231A8
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 15:42:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFE3C1F21D17
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 15:44:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA55B1946CA;
-	Wed, 10 Jul 2024 15:42:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="etqYWTrI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2226E194AF0;
+	Wed, 10 Jul 2024 15:44:00 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC291EB2A
-	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 15:42:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D612C189F26;
+	Wed, 10 Jul 2024 15:43:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720626146; cv=none; b=HR3/y+z2zDAT7kBSk0SthO3mwwglP43dSWk0H8K7SvTwt2sGs24IEaQ+FQ5GtW6HIrQ7vsg+ra7w3c7m3ri68U7NEKOHc4XGJE83VQ+/S0dDkvQEU6fQJq2Njg0OBLDCA4viXW3kYjFeWMg29hDDGtRUhZHcIOC+iq7qcfPCp4k=
+	t=1720626239; cv=none; b=Ts+UBnwZxpNqjbCtVltSP3IzMBEizwBDl7PtrCyvckv9aaCF0LUkUwGqBXjS+cdaE2RSujizk+6y17Z5MZ6niXbJ19q5GHM0AkbkwdV1X+Qgw8TJJQXe8o50zAVIQBG6yfq3ELiwQRkV2+nfvKJVc+I9wJRdYti/2RwOXKdr23k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720626146; c=relaxed/simple;
-	bh=C5gY+uljMJ/TRBVbOsR/U+KA7yyl6SUm21CDlJJs9PA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WlZQdsEU2SPgYIWeaqZ+0CU+uF4pFX8b0dwWlIl3MxQJmgPdbjWgIdFoQ/T8W9WaBh989/Z8nijYBO5l6FooOUGOH03bSuPrO0nlt1mjWfkb48g8sNRkE2Epqg9LPJknW//Emx34sLQuvaF43c/spi/Eu6kIfn4HnqZSIFkqZHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=etqYWTrI; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2c98105058fso4424311a91.1
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 08:42:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720626144; x=1721230944; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vr1BiQBEp9CDY456xclZlBCD5OqWtOAN5xfFP72uoHk=;
-        b=etqYWTrIVfLDQODIy3T1a3X0m1dxtnn2r3ccGn92e2eIwab5Hite794/6HLJt+4Ieq
-         +e5h2VRDMhBRQbJnAH3hZcj82JalX8xFB63c0rKdKbvJHyHaIlGuxc0F8dwF7OJ4GAB5
-         HAYXnkj6JVES2ogGf4rK/6QjeprpDJcj6wQ/OhN8V/bPlSS46PRuhPZM+FgvlWhx/k+b
-         Xxxy8TbRNl9ITs1NdqiJiDha4NtzcgQLXEa69kcWSBjfyMw1eNUU3PodFSwcnchIaxxO
-         BJwMyLcXgCNrxGtT/Zbq7QDjmcw/Lk72k1KHRbI/M/CgLNbLCm4zQOZn5tL+GlvqOzMJ
-         Nguw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720626144; x=1721230944;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Vr1BiQBEp9CDY456xclZlBCD5OqWtOAN5xfFP72uoHk=;
-        b=NvgAgTcL7on6xeinbjwIAmDdLLmJm3Y+T6RNt6gxf8HzIvG1lNN2/JldzGCDIPtZ+G
-         D/6rtKZO5qjmcrDMSdO+6+6zuaBziHoTpny+D/6TDdZWQKs9fzuDtdUHhJpLYubToEPN
-         DA9/5paQDlkfmro/DsEe8sQEhAxFBSP760XyhLnJeSnYDtMQH42MlABKBcLY90HRVvTR
-         6EHnR2wfmzjrn30WqrkozkI2+aoH8nZTMHFmdWeK3AqTRehGqKFf9iLzFuincEytDv+E
-         Acm0Q8XA1LLCvtd6XyjfNq9k9Z2haUzOq4a44oKLPbrDFX1kptGE0lo0nv89FwQkUnjx
-         0MWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWzcsBSiYuJzwoHEdhn3K2HFkvfTgCdupFwz73wItUQAfwVFpYcy2pk+YJGrHDg28M4Qs8+I7QAkpRG6AelhifSaO8P
-X-Gm-Message-State: AOJu0YxkwKn7LUmpLi4iBccO1r7hM7AKlDQw6SluwWcehksbKGNn9WDa
-	MVYedsl4Fc+Az72gzuno8yE9XaI589BRXRc77VVMujZnp7oYClUOmyUYWPTeh0zt5Zbhl3q3ksi
-	GvQ==
-X-Google-Smtp-Source: AGHT+IHIj7Frqqn9vAIzHqtf502PiSXlpH0diSrPuQbhr/RJ6vdXrfi41gkE/7i/gmNkhPd0gOtvr19TZbE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:a412:b0:2c9:6abb:ee40 with SMTP id
- 98e67ed59e1d1-2ca35d524b8mr13373a91.6.1720626144135; Wed, 10 Jul 2024
- 08:42:24 -0700 (PDT)
-Date: Wed, 10 Jul 2024 08:42:22 -0700
-In-Reply-To: <5354a7ae-ca32-42fe-9231-a0d955bc8675@intel.com>
+	s=arc-20240116; t=1720626239; c=relaxed/simple;
+	bh=X1cJ+eZmDv+Rl3CvevwZlNKQLOFIR9YDfRr56MK5cfU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Wv/fo+r0V2idSE5uxbxaF8w1ztyoDkqC6yG4BdsZXseM21VUXPO/JOgKZ7/Q+40Yu/xxSRRmwi0XZpU2dhOE1rE6Hghw4R6BXA55m+Yrk4rTZD9ZvNCGGBHR6gafaiS/0OKZfF+uUoJKe8iG8a3DW3Rz13yCO4FOaZXz5fWxYC0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6EDAD106F;
+	Wed, 10 Jul 2024 08:44:22 -0700 (PDT)
+Received: from [10.57.8.115] (unknown [10.57.8.115])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DECA63F766;
+	Wed, 10 Jul 2024 08:43:53 -0700 (PDT)
+Message-ID: <46d29283-af38-4eed-a69f-f7e4555f1a39@arm.com>
+Date: Wed, 10 Jul 2024 16:43:52 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <cover.1718214999.git.reinette.chatre@intel.com>
- <171961507216.241377.3829798983563243860.b4-ty@google.com> <5354a7ae-ca32-42fe-9231-a0d955bc8675@intel.com>
-Message-ID: <Zo6r3if6rTERxnwl@google.com>
-Subject: Re: [PATCH V9 0/2] KVM: x86: Make bus clock frequency for vAPIC timer configurable
-From: Sean Christopherson <seanjc@google.com>
-To: Reinette Chatre <reinette.chatre@intel.com>
-Cc: isaku.yamahata@intel.com, pbonzini@redhat.com, erdemaktas@google.com, 
-	vkuznets@redhat.com, vannapurve@google.com, jmattson@google.com, 
-	mlevitsk@redhat.com, xiaoyao.li@intel.com, chao.gao@intel.com, 
-	rick.p.edgecombe@intel.com, yuan.yao@intel.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 07/15] arm64: Enforce bounce buffers for realm DMA
+To: Will Deacon <will@kernel.org>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ James Morse <james.morse@arm.com>, Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <20240701095505.165383-8-steven.price@arm.com>
+ <20240709115649.GC13242@willie-the-truck>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20240709115649.GC13242@willie-the-truck>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jun 28, 2024, Reinette Chatre wrote:
-> Hi Sean,
+On 09/07/2024 12:56, Will Deacon wrote:
+> On Mon, Jul 01, 2024 at 10:54:57AM +0100, Steven Price wrote:
+>> Within a realm guest it's not possible for a device emulated by the VMM
+>> to access arbitrary guest memory. So force the use of bounce buffers to
+>> ensure that the memory the emulated devices are accessing is in memory
+>> which is explicitly shared with the host.
+>>
+>> This adds a call to swiotlb_update_mem_attributes() which calls
+>> set_memory_decrypted() to ensure the bounce buffer memory is shared with
+>> the host. For non-realm guests or hosts this is a no-op.
+>>
+>> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+>> ---
+>> v3: Simplify mem_init() by using a 'flags' variable.
+>> ---
+>>  arch/arm64/kernel/rsi.c |  2 ++
+>>  arch/arm64/mm/init.c    | 10 +++++++++-
+>>  2 files changed, 11 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
+>> index 7ac5fc4a27d0..918db258cd4a 100644
+>> --- a/arch/arm64/kernel/rsi.c
+>> +++ b/arch/arm64/kernel/rsi.c
+>> @@ -6,6 +6,8 @@
+>>  #include <linux/jump_label.h>
+>>  #include <linux/memblock.h>
+>>  #include <linux/psci.h>
+>> +#include <linux/swiotlb.h>
+>> +
+>>  #include <asm/rsi.h>
+>>  
+>>  struct realm_config config;
+>> diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
+>> index 9b5ab6818f7f..1d595b63da71 100644
+>> --- a/arch/arm64/mm/init.c
+>> +++ b/arch/arm64/mm/init.c
+>> @@ -41,6 +41,7 @@
+>>  #include <asm/kvm_host.h>
+>>  #include <asm/memory.h>
+>>  #include <asm/numa.h>
+>> +#include <asm/rsi.h>
+>>  #include <asm/sections.h>
+>>  #include <asm/setup.h>
+>>  #include <linux/sizes.h>
+>> @@ -369,8 +370,14 @@ void __init bootmem_init(void)
+>>   */
+>>  void __init mem_init(void)
+>>  {
+>> +	unsigned int flags = SWIOTLB_VERBOSE;
+>>  	bool swiotlb = max_pfn > PFN_DOWN(arm64_dma_phys_limit);
+>>  
+>> +	if (is_realm_world()) {
+>> +		swiotlb = true;
+>> +		flags |= SWIOTLB_FORCE;
+>> +	}
+>> +
+>>  	if (IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) && !swiotlb) {
+>>  		/*
+>>  		 * If no bouncing needed for ZONE_DMA, reduce the swiotlb
+>> @@ -382,7 +389,8 @@ void __init mem_init(void)
+>>  		swiotlb = true;
+>>  	}
+>>  
+>> -	swiotlb_init(swiotlb, SWIOTLB_VERBOSE);
+>> +	swiotlb_init(swiotlb, flags);
+>> +	swiotlb_update_mem_attributes();
 > 
-> On 6/28/24 3:55 PM, Sean Christopherson wrote:
-> > On Wed, 12 Jun 2024 11:16:10 -0700, Reinette Chatre wrote:
-> > > Changes from v8:
-> > > - v8: https://lore.kernel.org/lkml/cover.1718043121.git.reinette.chatre@intel.com/
-> > > - Many changes to new udelay() utility patch as well as the APIC bus
-> > >    frequency test aimed to make it more robust (additional ASSERTs,
-> > >    consistent types, eliminate duplicate code, etc.) and useful with
-> > >    support for more user configuration. Please refer to individual patches for
-> > >    detailed changes.
-> > > - Series applies cleanly to next branch of kvm-x86 with HEAD
-> > >    e4e9e1067138e5620cf0500c3e5f6ebfb9d322c8.
-> > > 
-> > > [...]
-> > 
-> > Applied to kvm-x86 misc, with all the changes mentioned in my earlier replies.
-> > I'm out next week, and don't want to merge the KVM changes without these tests,
-> > hence the rushed application.
-> > 
-> > Please holler if you disagree with anything (or if I broke something).  I won't
-> > respond until July 8th at the earliest, but worst case scenario we can do fixup
-> > patches after 6.11-rc1.
-> 
-> Thank you very much for taking the time to make the changes and apply the patches.
-> All the changes look good to me and passes my testing.
-> 
-> Now that the x86 udelay() utility no longer use cpu_relax(), should ARM
-> and RISC-V's udelay() be modified to match in this regard? I can prepare
-> (unable to test) changes for you to consider on your return.
+> Why do we have to call this so early? Certainly, we won't have probed
+> the hypercalls under pKVM yet and I think it would be a lot cleaner if
+> you could defer your RSI discovery too.
 
-I don't think so?  IIUC, arm64's "yield", used by cpu_relax() doesn't trigger the
-"on spin" exists.  Such exist are only triggered by "wfet" and friends.
+I don't think we *need* the swiotlb up so early, it was more of a case
+of this seemed a convenient place. We can probably move this later if
+pKVM has a requirement for this.
+
+In terms of RSI discovery then see my reply on patch 2.
+
+> Looking forward to the possibility of device assignment in future, how
+> do you see DMA_BOUNCE_UNALIGNED_KMALLOC interacting with a decrypted
+> SWIOTLB buffer? I'm struggling to wrap my head around how to fix that
+> properly.
+
+Device assignment generally causes problems with bounce buffers. The
+assumption has mostly been that any device which is clever enough to
+deal with device assignment (which in our case means enlightened enough
+to understand the extra bit on the bus) wouldn't need bounce buffers.
+
+Suzuki: Do you know if DMA_BOUNCE_UNALIGNED_KMALLOC has been thought
+about? Can we make the assumption that an assigned device will be coherent?
+
+I have to admit to being a bit worried about current assumption that we
+don't need two sets of bounce buffers - one decrypted for talking to the
+host, and one encrypted for "old fashioned" talking to hardware which
+has hardware limitations.
+
+Steve
+
 
