@@ -1,250 +1,262 @@
-Return-Path: <kvm+bounces-21344-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21345-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B421B92DA99
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:14:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B55A92DAB0
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:26:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A110282B98
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 21:14:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 828F31F23B5A
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 21:26:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3B3F12BEBB;
-	Wed, 10 Jul 2024 21:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B78F813C908;
+	Wed, 10 Jul 2024 21:25:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TuxM9/LV"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WeXW9fOL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF78D2B9DD
-	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 21:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 416094206C;
+	Wed, 10 Jul 2024 21:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720646051; cv=none; b=bj7wrSbDPlV8fxaexTYAEjjBlfvQXKApvzA3paG9Yv999ayg01hKJTitr04HNgSg7a2YBKxRMw1KgMB0hhlizgtLUUE9sxcGPKWDIEnJpo/1oa9Hvu1OyISGcxQkDL5RT0O1ELSCdEtKGFjuT02TfWaI0QGl6IJv2EjxTcWobq8=
+	t=1720646758; cv=none; b=ojRsSx+4XWRqBUSwJf3viBi6l3uE8qPB8N97+4WTVgsF11yilnV7ZPhThC7JkQrZAwMlaECLO5WktpnRBvor/oSSIX0vPT2yZaorzXA9kH6uKqi9gj405gsc1bgxk6Jslv7u0TqUoEzoLHmXCGvT8HCkkFjVwtJUAXMFp1UWADI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720646051; c=relaxed/simple;
-	bh=LxJp3MpjlW3XhQhZ/broXQZIzle4N+yhALuMK83M/+U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MeAtqIf2TT8FdlBtO/CNV1LB062Y+P5ykvM/KCxwO20Nqcpz+f3tZD8Ila+mDHs4f7Z1DcsRwVFpo/jYl0OU6FXEaYrS7Qfkhvkpf/t3y0E9v9SsPwKM95EXQu1LdVGXle0jmXtTXyX7E063r8RewKkiAOsyYj5zcPTqG7woODM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TuxM9/LV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720646049;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=UelbpIUr40UAVvqSX5FfP2oj9LzgIV56BaNyb4HIROM=;
-	b=TuxM9/LV4TmYAEylcR2JdsPepJX7e3T3A9HwbbgVsCAKsXcNC5lpO3BzL9TIONnTz00vJs
-	YG+aMWJsSX9CI+PFqGet73yOoAIWiViaPelh8DA4kHH0F744hBXIZijtcX8jHH5PIAVX1q
-	UNWyegrA0DyRGOy9ryRoLne54Mn6k8Y=
-Received: from mail-pf1-f198.google.com (mail-pf1-f198.google.com
- [209.85.210.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-328-7EQIavpEPY2e-lib6ytxBQ-1; Wed, 10 Jul 2024 17:14:07 -0400
-X-MC-Unique: 7EQIavpEPY2e-lib6ytxBQ-1
-Received: by mail-pf1-f198.google.com with SMTP id d2e1a72fcca58-70b59d7b5e9so235552b3a.1
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 14:14:07 -0700 (PDT)
+	s=arc-20240116; t=1720646758; c=relaxed/simple;
+	bh=IRtZNpuJNMmXPtNDOFUO3vtkI4/OVSZb2YHRY1Upuy4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IDTfXJMzc5em7kq2BquCthtQVZhGtedaKIPG8sC3bAlNX3+OZK04wcAof5JbOo1F2fUQGjWYgmeReQaszlFKld73F8pOzFuEUWzI4mLM4ZuN+MP3t6oP6NURt6kROQDc+c9dtivl3KKqeL/GUcMSg9vBp6swXEOj6xau2ifLPG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WeXW9fOL; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-79f15e7c879so15792085a.1;
+        Wed, 10 Jul 2024 14:25:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1720646756; x=1721251556; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QbggaOSaHuCesi2CRg2wXU+q+eIk0OlAl3CaZ0eNZU8=;
+        b=WeXW9fOLNarLuuBjZtX9MBBk6hIIXzviPv0H5Fjxf4aZNiOI0wZYCi1v1SwqW0p1S7
+         PzbHP3Xni/WrsbAm5GEX1qTY27OKTnXYqk1wL0vV0yrgfDOSNlQH5sGMJvZrETDzzzDc
+         2hb9lEVx0+nUveHDZCBepezBvvf5R3Zyj6R2zUB61lX/zKjQ1+ff8aErUm+UBZky0uSM
+         6hI4x0VJXCxU49kToiivbLawfd8lPVYy+sLi5m8IMbXgwP2UxVLjcYeJWHABGfEthCrU
+         yKOyblLK5QZbBcXcY0j01kfqq0MHVB/xb5PbLqni7LKTRERHe5tfbIF3UcA2P+8LFSLq
+         RTow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720646047; x=1721250847;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UelbpIUr40UAVvqSX5FfP2oj9LzgIV56BaNyb4HIROM=;
-        b=S/6JInGcc4Cvn4FCOj5Z19wULl3t9kfkqYMeTVgpfq5O7vV9xPhzuA120WsgVxvTZj
-         y5iU+/+HUZbSHL/V6A6vk5tokcFLwaxLlI+35w9bPebF7Q4iTpqE//RCrMbs4TTpcC2G
-         tKKm0SiXMnSmHIr55cUW9eazxzQiNIp7k7FvjDEAPOZg1fDitp9cvDFIj0yryZXITlBR
-         TMQrV2WYNK/U7Qz/kWVezcnJqy1VJ0kx1BNj66v9ZVXV3xcUllc2E79o4hQzhFuZ4BZQ
-         RizEAOTAQMuO9d9rK29dHfQASCzivdPk6xjFJDpVQjiw6MXF8MzFHl3tejlg2lfqSqYB
-         kKmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVq1VkdsdyhzwGkxPKkq7awR5EkjBH5A6zoUgJ9IM/jEQXfBLVc6plrOeJw9pKGdOc6oBCdZf9bnTMxbYKTqw5sfAlr
-X-Gm-Message-State: AOJu0YyZwT7RDsyDaWOWquNihDixzM15hZSrE2OoqfYWoYW5iLcSG8R3
-	tr0S8w/sToNN1zYwUveta7Oeeleuz4WhYfr7iDkVmo7M3hSnw6vPfeN0dIKRMpa468kRupLazIJ
-	iGJ9YZv12EeGXJ3gwYpoCVJ3UCLlsblRR/JoWpDksDZgbCy2dqA==
-X-Received: by 2002:a05:6a00:1d83:b0:70b:17a9:e98a with SMTP id d2e1a72fcca58-70b43626d6amr7509465b3a.33.1720646046748;
-        Wed, 10 Jul 2024 14:14:06 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGIL5NZakoeWxrceiZO5dPOGtHYUbvR+7u663g+7/eUG7NXVlKeuTVAdylslhMzFr1TdO1NJw==
-X-Received: by 2002:a05:6a00:1d83:b0:70b:17a9:e98a with SMTP id d2e1a72fcca58-70b43626d6amr7509431b3a.33.1720646046328;
-        Wed, 10 Jul 2024 14:14:06 -0700 (PDT)
-Received: from [10.35.209.243] ([208.115.86.71])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70b4397c02fsm4390228b3a.143.2024.07.10.14.14.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 10 Jul 2024 14:14:06 -0700 (PDT)
-Message-ID: <c87a4ba0-b9c4-4044-b0c3-c1112601494f@redhat.com>
-Date: Wed, 10 Jul 2024 23:14:04 +0200
+        d=1e100.net; s=20230601; t=1720646756; x=1721251556;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QbggaOSaHuCesi2CRg2wXU+q+eIk0OlAl3CaZ0eNZU8=;
+        b=nsSRpM/FmJCX0f/QEbghApz+Rr5mQFQ+ChnXJwsYkRh0YpXPFJ3LdLPgrfGEg4tz9/
+         kQXwdKCDYKIYRTZgFVgvfJTZfEij+yXPIYoRC4BwvsOxAAoggs8sxt+IQ1bBgyMPHBhI
+         4szDtRWv2bHgviDjqAhxEwQdH9M/s212yP3m0tCVrpc9LSnnK+kY2bY3nkC3z5H03e9m
+         16ytQJ2Cy2wDLlGN7wn7CUmdosd0nbP0a2SZVaswdqqPPMZPf+NH3H0cwY7FNjEMHU5g
+         0KYsEktYKyaIii0doocfnZRPVXctLluqkjqFq9uP9sZx2c9BwgbadwOVs+BrTxoRkhNu
+         lTrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmQ2Pj4aNfeEVzZnOVRsl906efEod7gggTeHC9yrjp0NWs5FVJ9e1UrWdSdQ6KlS+NjvN05FlqXiI7Uf/OmDMofd6liPTI1fi8e6hPMV2wgNg/ly6hXtaOv13QyYibxF7FoNWRyDcx63BA1ALhWThjnOTFNw//K79QRhQYUqJaF28dDDnAq7MuG05OegCZmJYP+AjNthiTh3pfob9VJRxtEeehETs0ISKc4MzG
+X-Gm-Message-State: AOJu0Yzwq2tZv31UrBaFScpyIukx2xPmHOfTZ3FqsgCdUz+CbOCXrTOD
+	yZ1bU+ANx10kmu2za261S8UYBn5i5yTcWswQtRIq/0QFwYmpo/po
+X-Google-Smtp-Source: AGHT+IFe0i7wU8rrpD+HqlfKPUEgBWA6vsqjfMceJ75v21AkhfrEYglh+zMZJB1mRaN1tBQCuxzMAw==
+X-Received: by 2002:a05:620a:44d4:b0:7a1:41df:cca6 with SMTP id af79cd13be357-7a141dfcf26mr277624185a.23.1720646756076;
+        Wed, 10 Jul 2024 14:25:56 -0700 (PDT)
+Received: from n36-183-057.byted.org ([130.44.215.118])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f190b0af1sm228791885a.122.2024.07.10.14.25.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 10 Jul 2024 14:25:55 -0700 (PDT)
+From: Amery Hung <ameryhung@gmail.com>
+X-Google-Original-From: Amery Hung <amery.hung@bytedance.com>
+To: stefanha@redhat.com,
+	sgarzare@redhat.com,
+	mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	bryantan@vmware.com,
+	vdasa@vmware.com,
+	pv-drivers@vmware.com
+Cc: dan.carpenter@linaro.org,
+	simon.horman@corigine.com,
+	oxffffaa@gmail.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	bpf@vger.kernel.org,
+	bobby.eshleman@bytedance.com,
+	jiang.wang@bytedance.com,
+	amery.hung@bytedance.com,
+	ameryhung@gmail.com,
+	xiyou.wangcong@gmail.com
+Subject: [RFC PATCH net-next v6 00/14] virtio/vsock: support datagrams
+Date: Wed, 10 Jul 2024 21:25:41 +0000
+Message-Id: <20240710212555.1617795-1-amery.hung@bytedance.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 7/8] mm: secretmem: use AS_INACCESSIBLE to prohibit
- GUP
-To: Patrick Roy <roypat@amazon.co.uk>, Mike Rapoport <rppt@kernel.org>
-Cc: seanjc@google.com, pbonzini@redhat.com, akpm@linux-foundation.org,
- dwmw@amazon.co.uk, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- willy@infradead.org, graf@amazon.com, derekmn@amazon.com,
- kalyazin@amazon.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, dmatlack@google.com, tabba@google.com,
- chao.p.peng@linux.intel.com, xmarcalx@amazon.co.uk,
- James Gowans <jgowans@amazon.com>
-References: <20240709132041.3625501-1-roypat@amazon.co.uk>
- <20240709132041.3625501-8-roypat@amazon.co.uk>
- <0dc45181-de7e-4d97-9178-573c6f683f55@redhat.com>
- <Zo45CQGe_UDUnXXu@kernel.org>
- <258b3b76-cf87-4dfc-bcfa-b2af94aba811@amazon.co.uk>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <258b3b76-cf87-4dfc-bcfa-b2af94aba811@amazon.co.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10.07.24 11:50, Patrick Roy wrote:
-> 
-> 
-> On 7/10/24 08:32, Mike Rapoport wrote:
->> CAUTION: This email originated from outside of the organization. Do not click links or open attachments unless you can confirm the sender and know the content is safe.
->>
->>
->>
->> On Tue, Jul 09, 2024 at 11:09:29PM +0200, David Hildenbrand wrote:
->>> On 09.07.24 15:20, Patrick Roy wrote:
->>>> Inside of vma_is_secretmem and secretmem_mapping, instead of checking
->>>> whether a vm_area_struct/address_space has the secretmem ops structure
->>>> attached to it, check whether the address_space has the AS_INACCESSIBLE
->>>> bit set. Then set the AS_INACCESSIBLE flag for secretmem's
->>>> address_space.
->>>>
->>>> This means that get_user_pages and friends are disables for all
->>>> adress_spaces that set AS_INACCESIBLE. The AS_INACCESSIBLE flag was
->>>> introduced in commit c72ceafbd12c ("mm: Introduce AS_INACCESSIBLE for
->>>> encrypted/confidential memory") specifically for guest_memfd to indicate
->>>> that no reads and writes should ever be done to guest_memfd
->>>> address_spaces. Disallowing gup seems like a reasonable semantic
->>>> extension, and means that potential future mmaps of guest_memfd cannot
->>>> be GUP'd.
->>>>
->>>> Signed-off-by: Patrick Roy <roypat@amazon.co.uk>
->>>> ---
->>>>    include/linux/secretmem.h | 13 +++++++++++--
->>>>    mm/secretmem.c            |  6 +-----
->>>>    2 files changed, 12 insertions(+), 7 deletions(-)
->>>>
->>>> diff --git a/include/linux/secretmem.h b/include/linux/secretmem.h
->>>> index e918f96881f5..886c8f7eb63e 100644
->>>> --- a/include/linux/secretmem.h
->>>> +++ b/include/linux/secretmem.h
->>>> @@ -8,10 +8,19 @@ extern const struct address_space_operations secretmem_aops;
->>>>    static inline bool secretmem_mapping(struct address_space *mapping)
->>>>    {
->>>> -   return mapping->a_ops == &secretmem_aops;
->>>> +   return mapping->flags & AS_INACCESSIBLE;
->>>> +}
->>>> +
->>>> +static inline bool vma_is_secretmem(struct vm_area_struct *vma)
->>>> +{
->>>> +   struct file *file = vma->vm_file;
->>>> +
->>>> +   if (!file)
->>>> +           return false;
->>>> +
->>>> +   return secretmem_mapping(file->f_inode->i_mapping);
->>>>    }
->>>
->>> That sounds wrong. You should leave *secretmem alone and instead have
->>> something like inaccessible_mapping that is used where appropriate.
->>>
->>> vma_is_secretmem() should not suddenly succeed on something that is not
->>> mm/secretmem.c
->>
->> I'm with David here.
->>
-> 
-> Right, that makes sense. My thinking here was that if memfd_secret and
-> potential mappings of guest_memfd have the same behavior wrt GUP, then
-> it makes sense to just have them rely on the same checks. But I guess I
-> didn't follow that thought to its logical conclusion of renaming the
-> "secretmem" checks into "inaccessible" checks and moving them out of
-> secretmem.h.
-> 
-> Or do you mean to just leave secretmem untouched and add separate
-> "inaccessible" checks? But then we'd have two different ways of
-> disabling GUP for specific VMAs that both rely on checks in exactly the
-> same places :/
+Hey all!
 
-You can just replace the vma_is_secretmem in relevant places by checks 
-if inaccessible address spaces. No need for the additional 
-vma_is_secretmem check then.
+This series introduces support for datagrams to virtio/vsock.
 
-BUT, as raised in my other reply, I wonder if adding support for 
-secretmem in KVM (I assume) would be simpler+cleaner.
+It is a spin-off (and smaller version) of this series from the summer:
+  https://lore.kernel.org/all/cover.1660362668.git.bobby.eshleman@bytedance.com/
 
-> 
->>> --
->>> Cheers,
->>>
->>> David / dhildenb
->>>
->>
->> --
->> Sincerely yours,
->> Mike.
-> 
+Please note that this is an RFC and should not be merged until
+associated changes are made to the virtio specification, which will
+follow after discussion from this series.
+
+Another aside, the v4 of the series has only been mildly tested with a
+run of tools/testing/vsock/vsock_test. Some code likely needs cleaning
+up, but I'm hoping to get some of the design choices agreed upon before
+spending too much time making it pretty.
+
+This series first supports datagrams in a basic form for virtio, and
+then optimizes the sendpath for all datagram transports.
+
+The result is a very fast datagram communication protocol that
+outperforms even UDP on multi-queue virtio-net w/ vhost on a variety
+of multi-threaded workload samples.
+
+For those that are curious, some summary data comparing UDP and VSOCK
+DGRAM (N=5):
+
+	vCPUS: 16
+	virtio-net queues: 16
+	payload size: 4KB
+	Setup: bare metal + vm (non-nested)
+
+	UDP: 287.59 MB/s
+	VSOCK DGRAM: 509.2 MB/s
+
+Some notes about the implementation...
+
+This datagram implementation forces datagrams to self-throttle according
+to the threshold set by sk_sndbuf. It behaves similar to the credits
+used by streams in its effect on throughput and memory consumption, but
+it is not influenced by the receiving socket as credits are.
+
+The device drops packets silently.
+
+As discussed previously, this series introduces datagrams and defers
+fairness to future work. See discussion in v2 for more context around
+datagrams, fairness, and this implementation.
+
+Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+---
+Changes in v6:
+- allow empty transport in datagram vsock
+- add empty transport checks in various paths
+- transport layer now saves source cid and port to control buffer of skb
+  to remove the dependency of transport in recvmsg()
+- fix virtio dgram_enqueue() by looking up the transport to be used when
+  using sendto(2)
+- fix skb memory leaks in two places
+- add dgram auto-bind test
+- Link to v5: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v5-0-581bd37fdb26@bytedance.com
+
+Changes in v5:
+- teach vhost to drop dgram when a datagram exceeds the receive buffer
+  - now uses MSG_ERRQUEUE and depends on Arseniy's zerocopy patch:
+	"vsock: read from socket's error queue"
+- replace multiple ->dgram_* callbacks with single ->dgram_addr_init()
+  callback
+- refactor virtio dgram skb allocator to reduce conflicts w/ zerocopy series
+- add _fallback/_FALLBACK suffix to dgram transport variables/macros
+- add WARN_ONCE() for table_size / VSOCK_HASH issue
+- add static to vsock_find_bound_socket_common
+- dedupe code in vsock_dgram_sendmsg() using module_got var
+- drop concurrent sendmsg() for dgram and defer to future series
+- Add more tests
+  - test EHOSTUNREACH in errqueue
+  - test stream + dgram address collision
+- improve clarity of dgram msg bounds test code
+- Link to v4: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com
+
+Changes in v4:
+- style changes
+  - vsock: use sk_vsock(vsk) in vsock_dgram_recvmsg instead of
+    &sk->vsk
+  - vsock: fix xmas tree declaration
+  - vsock: fix spacing issues
+  - virtio/vsock: virtio_transport_recv_dgram returns void because err
+    unused
+- sparse analysis warnings/errors
+  - virtio/vsock: fix unitialized skerr on destroy
+  - virtio/vsock: fix uninitialized err var on goto out
+  - vsock: fix declarations that need static
+  - vsock: fix __rcu annotation order
+- bugs
+  - vsock: fix null ptr in remote_info code
+  - vsock/dgram: make transport_dgram a fallback instead of first
+    priority
+  - vsock: remove redundant rcu read lock acquire in getname()
+- tests
+  - add more tests (message bounds and more)
+  - add vsock_dgram_bind() helper
+  - add vsock_dgram_connect() helper
+
+Changes in v3:
+- Support multi-transport dgram, changing logic in connect/bind
+  to support VMCI case
+- Support per-pkt transport lookup for sendto() case
+- Fix dgram_allow() implementation
+- Fix dgram feature bit number (now it is 3)
+- Fix binding so dgram and connectible (cid,port) spaces are
+  non-overlapping
+- RCU protect transport ptr so connect() calls never leave
+  a lockless read of the transport and remote_addr are always
+  in sync
+- Link to v2: https://lore.kernel.org/r/20230413-b4-vsock-dgram-v2-0-079cc7cee62e@bytedance.com
+
+
+Bobby Eshleman (14):
+  af_vsock: generalize vsock_dgram_recvmsg() to all transports
+  af_vsock: refactor transport lookup code
+  af_vsock: support multi-transport datagrams
+  af_vsock: generalize bind table functions
+  af_vsock: use a separate dgram bind table
+  virtio/vsock: add VIRTIO_VSOCK_TYPE_DGRAM
+  virtio/vsock: add common datagram send path
+  af_vsock: add vsock_find_bound_dgram_socket()
+  virtio/vsock: add common datagram recv path
+  virtio/vsock: add VIRTIO_VSOCK_F_DGRAM feature bit
+  vhost/vsock: implement datagram support
+  vsock/loopback: implement datagram support
+  virtio/vsock: implement datagram support
+  test/vsock: add vsock dgram tests
+
+ drivers/vhost/vsock.c                   |   62 +-
+ include/linux/virtio_vsock.h            |    9 +-
+ include/net/af_vsock.h                  |   24 +-
+ include/uapi/linux/virtio_vsock.h       |    2 +
+ net/vmw_vsock/af_vsock.c                |  343 ++++++--
+ net/vmw_vsock/hyperv_transport.c        |   13 -
+ net/vmw_vsock/virtio_transport.c        |   24 +-
+ net/vmw_vsock/virtio_transport_common.c |  188 ++++-
+ net/vmw_vsock/vmci_transport.c          |   61 +-
+ net/vmw_vsock/vsock_loopback.c          |    9 +-
+ tools/testing/vsock/util.c              |  177 +++-
+ tools/testing/vsock/util.h              |   10 +
+ tools/testing/vsock/vsock_test.c        | 1032 ++++++++++++++++++++---
+ 13 files changed, 1638 insertions(+), 316 deletions(-)
 
 -- 
-Cheers,
-
-David / dhildenb
+2.20.1
 
 
