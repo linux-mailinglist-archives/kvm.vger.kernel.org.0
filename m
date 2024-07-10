@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-21357-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21358-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BED692DAF8
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:30:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C84E892DAFD
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:31:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B65CF1F21F49
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 21:30:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83E5B285485
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 21:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 578A216B72E;
-	Wed, 10 Jul 2024 21:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E67016C86D;
+	Wed, 10 Jul 2024 21:26:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mKP5bwZ5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KHRWoSok"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80BDC15EFC1;
-	Wed, 10 Jul 2024 21:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56A8C1607B6;
+	Wed, 10 Jul 2024 21:26:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720646768; cv=none; b=REo0LuoDnYbPfwRaT68QzMBrZ4jsgQq6jct+OD8U2fSi7/3KEwKmLYFcB9Mee6rydEZy7g0Um6YSQA1M3x0rSjNTV7bJpCg+8NtyIWTPxT3YA1n2yTaPaySUybC3G7ET8qNURbVPvID+81gphRxaTTaMJ1GfECh89xeCj/ofqFQ=
+	t=1720646769; cv=none; b=GCCLrvq2+Th/hhgDlXIMtHtmpByT+RTrLn1VgKptG0E38WBU1KIVCj0mMJu4sekdiYzxZCrwVZxeiSwvFURwjBH67r1wy0mwhyfGW4G4ZQzooJjV8byIFDg//lMsBoEyy95iiJP7Tvd/WccuN2T8B6XlgXPMPKoXruSKOSU8v9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720646768; c=relaxed/simple;
-	bh=aa9fCTbYzE+aisD6RqXIAVWYsXTP3Jh37dzQFu2SwWI=;
+	s=arc-20240116; t=1720646769; c=relaxed/simple;
+	bh=gGDd9b+eIPhJKP6IsUlyGBx9zga4xIilMlUsKve5RCs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=rw8GqsWBxRODVmpHk2DhJr8B8cI0pXe6H0SvsN4e9W441oRC7pfJWkzlg6R/7vIbK0B2vke3iZm2x/Z5VITr8x20hLb6SsOIQEz1WxWsSOLh5nnk0zGfu/1wqtQU0VygvEgcutMlzN6xHOVKz1HDu9lIdc9dk5m3V+/AmsYtF6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mKP5bwZ5; arc=none smtp.client-ip=209.85.219.181
+	 MIME-Version; b=Bk0+/1KWcMHBIDBAVYixwS+03+Nf688VYnN5gY4ifgJNdAN7pMehzW+4sZFVnezfFXwBnwzlAR3cKTkMIn1slhhNeIdpA+vJOHGl0/Z/CSKuJG02kTY6d0iRX4cEeUvIM3lXfJBfafmKDZJRgJyyK7bR6rUQqIqtLkDLn3y2NT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KHRWoSok; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-e04f1bcbf84so226886276.0;
-        Wed, 10 Jul 2024 14:26:06 -0700 (PDT)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-79f06c9c929so114618185a.0;
+        Wed, 10 Jul 2024 14:26:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720646765; x=1721251565; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720646766; x=1721251566; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mNa2JyqzSfsQHlae80C+dAnyTQSrxK9qhyOYTj2h2/o=;
-        b=mKP5bwZ5gbs29Qb1c82tMG5nFdVzqPhVaBmk5LsIY6TE8lpQ6UIKoPXpfWGzST9XSI
-         zljfuLsUj9phOSv8h+tH1yAhlbXxEKF9SJCqFGSjVqQAcq+nxknaH3UPV0GkU7dPRogw
-         sP2wKtJ53o5MyGqqYnpjtCOFUDN/lUDf7KUqXKFuXgO3aO11fs/Kj8YV0VvwrgD0P4q/
-         Btcxa2/IUfiQDfC4WpCXxKVtv1LsPMXvk/Gk4uMizoU1Ocoo9PmMCsE5ysLRmt4DMLDd
-         DshXPAfbxWPs8ZxO7ART/G9lYwVMYoT6bOQNGoIikHBe/4X+AsSuoEUolpF9tYmFgqgr
-         TWqQ==
+        bh=pVIqbNrhEav3W0++Ik3CGMaAVVSiaEFKng5Yf5v/RzU=;
+        b=KHRWoSokpNQF/LrwUQhUBpeFAgqmYde6tEO/BlNtw8dXui/rmG2qpuOC1QZnQ4g3Xh
+         72CvDP+7K2fd8SvM9VXlbZEf+QzvY7cluI1w6+mzY8H7KeLWkl96rz3oTI+ZeOgkfNMz
+         XBLJGqBvDzPvcHkRGOVCJlherkY+xT8qHPviWrotq/tiPiqeJ1/yj/Yx5ovKtH6f857E
+         9GOSLIID7ogUKpjdrFnUeQOnNy2y41FBcRcnEZZAv5qRyaj+8IWWwfywYLRk7MP3ZndH
+         oI7lRkbFQoE8TWjFVaLDX7Rbj5+twQQiWs0Gfte3cp3w2RAswHUoveRPpkefWekuBZN6
+         8vMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720646765; x=1721251565;
+        d=1e100.net; s=20230601; t=1720646766; x=1721251566;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mNa2JyqzSfsQHlae80C+dAnyTQSrxK9qhyOYTj2h2/o=;
-        b=IysT0atNuH+SG/HX2d8mP/65FMMFd72PSN/gp2GxiYJ2x81Muej5qOz1J+xxX/z39H
-         b+1N183vHfJ5A/oI5PDjZXcwuXGcloDG97XWv1nebYjQg5qeullyXXD2NTJCPYvh7Xr/
-         WS9TsaP+mBpgvjxFF9HVQp0mo03GNt1JkCxoTk0/eypbScM80EKDOsjH+QHredTYe99N
-         2emoWf2I5fr24Q/2CKsKT+INErWRGe76hozXjTS6kkuFkura5lOhKlQVe3dwFyJCp7Nj
-         g1a/cVa7TzzFyz1bjy5e1hCEuTq8TzqfAv0gVt2o+qKsJd2Y+VV0N+H8/N1eFnQigPvG
-         v0oA==
-X-Forwarded-Encrypted: i=1; AJvYcCUPSN/4rDurSas2hhr2JMZu5oYWRl1Q2C+r9/NwdX97fBarIr6n60phccyvY0/4NS1LfV+7D6r7CbMMJqMA/uKrPlKcadLEDzYS837GCJfEWfJ9AkxlGlbYuGK+t/T6OQNGSJeONrBwgD7iwyrKDZ58nLC5RMxWmYKmcVJA8IDA9xjHikW4II0mT0Q76Dh81dDCq15K98hocqvoI+7PEoTKnCSax0fXXexvEbGc
-X-Gm-Message-State: AOJu0YxQnYxRCtvUMFp3UlU0vwQT43c9SZbK+oNZQ2BVYPNKMWt4iiyd
-	3rOsQhWXZnM62tE5BVEVu8xJbqlFPe9Mt8PsiQcfrVFriprSbZ2U
-X-Google-Smtp-Source: AGHT+IF5ioq7BkP55ZrDd65MHpqGoaQfutI36NHEnLXbX07dGmO7XnmHfZ+Wg65ipK41BqyPE67tdw==
-X-Received: by 2002:a25:7416:0:b0:e03:adcb:f8e8 with SMTP id 3f1490d57ef6-e041b078c55mr7655917276.30.1720646765536;
-        Wed, 10 Jul 2024 14:26:05 -0700 (PDT)
+        bh=pVIqbNrhEav3W0++Ik3CGMaAVVSiaEFKng5Yf5v/RzU=;
+        b=YgX3vFH/GXfXRxESxZL9R8WpD752N5LAGAok1fAZGWnUue4CoWWFTLnzWqUaJ1dvVN
+         Pe9TfWMpkym7yn3B0+mHEufS/jMhyjcD+QMfn5yE1hREDKmrV3Pz6UKpsIwlGA8JMMv3
+         5gG4RH3HL8AgOgiswrvmIibDKXVRczLaAxhAiOEO4uJH7yYnQG2OqvRdSxMwLf9OGpHm
+         Yw2SHWEV73WmnSK8ePekF8ySqd6EhOMZV0lihRWLf+gVY3soroomRFtUtX5XZmTXuJDN
+         l7t4gb7Lrpq9zTu6Wjq6RNSGSzlie6CcNOu9vCfPa0B2sEn+NXDBQ45mofkbbCJegD2h
+         qO6A==
+X-Forwarded-Encrypted: i=1; AJvYcCUU5rREEte7+MwFYzXJjuxhlZiaB62IdWx9mNIQksII0ZxNFLD8Q+1uDm6d/Z9nFVQAeunj0XLVJXGt0puvzIHVAz8epGBGbHXNvOsGdSFGnMfGzRxRS9ece0655JluQFlzgkBdXFgT0trgsgWgyzFro34oJsLIZT3TxysgbhtCbuqvS3kzuqVOVccqyAKdJDoGNQ2gDn4blhOdRQbEAi4WpHRiLCMd6r6uLuoj
+X-Gm-Message-State: AOJu0Yy7ZwWePLcvSdgGobSZ0iN0+4syCaImWPSlCOatxhKbJS10tn8A
+	U8LeMdYSBwm8Aao22oc85Jlb+rwk+vRO98SQCFOPe2WD6S5pxqj+
+X-Google-Smtp-Source: AGHT+IFI320bP+IbIdMehUjmnO755tB0kWKy6r95fV4jib7ke50hwNQJtvQqfOpqotKxyY96hgBfNw==
+X-Received: by 2002:a05:620a:4011:b0:79e:fb4c:2fb7 with SMTP id af79cd13be357-7a1469bce83mr198013985a.12.1720646766248;
+        Wed, 10 Jul 2024 14:26:06 -0700 (PDT)
 Received: from n36-183-057.byted.org ([130.44.215.118])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f190b0af1sm228791885a.122.2024.07.10.14.26.04
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f190b0af1sm228791885a.122.2024.07.10.14.26.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 14:26:05 -0700 (PDT)
+        Wed, 10 Jul 2024 14:26:06 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 X-Google-Original-From: Amery Hung <amery.hung@bytedance.com>
 To: stefanha@redhat.com,
@@ -99,9 +99,9 @@ Cc: dan.carpenter@linaro.org,
 	amery.hung@bytedance.com,
 	ameryhung@gmail.com,
 	xiyou.wangcong@gmail.com
-Subject: [RFC PATCH net-next v6 12/14] vsock/loopback: implement datagram support
-Date: Wed, 10 Jul 2024 21:25:53 +0000
-Message-Id: <20240710212555.1617795-13-amery.hung@bytedance.com>
+Subject: [RFC PATCH net-next v6 13/14] virtio/vsock: implement datagram support
+Date: Wed, 10 Jul 2024 21:25:54 +0000
+Message-Id: <20240710212555.1617795-14-amery.hung@bytedance.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20240710212555.1617795-1-amery.hung@bytedance.com>
 References: <20240710212555.1617795-1-amery.hung@bytedance.com>
@@ -115,42 +115,103 @@ Content-Transfer-Encoding: 8bit
 
 From: Bobby Eshleman <bobby.eshleman@bytedance.com>
 
-This commit implements datagram support for vsock loopback.
+This commit implements datagram support with a new version of
+->dgram_allow().
 
-Not much more than simply toggling on "dgram_allow" and continuing to
-use the common virtio functions.
+Additionally, it drops virtio_transport_dgram_allow() as an exported
+symbol because it is no longer used in other transports.
 
 Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
 Signed-off-by: Amery Hung <amery.hung@bytedance.com>
 ---
- net/vmw_vsock/vsock_loopback.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ include/linux/virtio_vsock.h            |  1 -
+ net/vmw_vsock/virtio_transport.c        | 22 +++++++++++++++++++++-
+ net/vmw_vsock/virtio_transport_common.c |  6 ------
+ 3 files changed, 21 insertions(+), 8 deletions(-)
 
-diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
-index 4dd4886f29d1..0de4e2c8573c 100644
---- a/net/vmw_vsock/vsock_loopback.c
-+++ b/net/vmw_vsock/vsock_loopback.c
-@@ -46,6 +46,11 @@ static int vsock_loopback_cancel_pkt(struct vsock_sock *vsk)
- 	return 0;
+diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+index 4408749febd2..fe8fa0a9669d 100644
+--- a/include/linux/virtio_vsock.h
++++ b/include/linux/virtio_vsock.h
+@@ -222,7 +222,6 @@ void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val);
+ u64 virtio_transport_stream_rcvhiwat(struct vsock_sock *vsk);
+ bool virtio_transport_stream_is_active(struct vsock_sock *vsk);
+ bool virtio_transport_stream_allow(u32 cid, u32 port);
+-bool virtio_transport_dgram_allow(u32 cid, u32 port);
+ 
+ int virtio_transport_connect(struct vsock_sock *vsk);
+ 
+diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+index 4891b845fcde..4e1ed3b11e26 100644
+--- a/net/vmw_vsock/virtio_transport.c
++++ b/net/vmw_vsock/virtio_transport.c
+@@ -63,6 +63,7 @@ struct virtio_vsock {
+ 
+ 	u32 guest_cid;
+ 	bool seqpacket_allow;
++	bool dgram_allow;
+ 
+ 	/* These fields are used only in tx path in function
+ 	 * 'virtio_transport_send_pkt_work()', so to save
+@@ -492,6 +493,21 @@ static bool virtio_transport_msgzerocopy_allow(void)
+ 	return true;
  }
  
-+static bool vsock_loopback_dgram_allow(u32 cid, u32 port)
++static bool virtio_transport_dgram_allow(u32 cid, u32 port)
 +{
-+	return true;
++	struct virtio_vsock *vsock;
++	bool dgram_allow;
++
++	dgram_allow = false;
++	rcu_read_lock();
++	vsock = rcu_dereference(the_virtio_vsock);
++	if (vsock)
++		dgram_allow = vsock->dgram_allow;
++	rcu_read_unlock();
++
++	return dgram_allow;
 +}
 +
- static bool vsock_loopback_seqpacket_allow(u32 remote_cid);
- static bool vsock_loopback_msgzerocopy_allow(void)
+ static bool virtio_transport_seqpacket_allow(u32 remote_cid);
+ 
+ static struct virtio_transport virtio_transport = {
+@@ -753,6 +769,9 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+ 	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_SEQPACKET))
+ 		vsock->seqpacket_allow = true;
+ 
++	if (virtio_has_feature(vdev, VIRTIO_VSOCK_F_DGRAM))
++		vsock->dgram_allow = true;
++
+ 	vdev->priv = vsock;
+ 
+ 	ret = virtio_vsock_vqs_init(vsock);
+@@ -850,7 +869,8 @@ static struct virtio_device_id id_table[] = {
+ };
+ 
+ static unsigned int features[] = {
+-	VIRTIO_VSOCK_F_SEQPACKET
++	VIRTIO_VSOCK_F_SEQPACKET,
++	VIRTIO_VSOCK_F_DGRAM
+ };
+ 
+ static struct virtio_driver virtio_vsock_driver = {
+diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+index a571b575fde9..52f671287fe3 100644
+--- a/net/vmw_vsock/virtio_transport_common.c
++++ b/net/vmw_vsock/virtio_transport_common.c
+@@ -1010,12 +1010,6 @@ bool virtio_transport_stream_allow(u32 cid, u32 port)
+ }
+ EXPORT_SYMBOL_GPL(virtio_transport_stream_allow);
+ 
+-bool virtio_transport_dgram_allow(u32 cid, u32 port)
+-{
+-	return false;
+-}
+-EXPORT_SYMBOL_GPL(virtio_transport_dgram_allow);
+-
+ int virtio_transport_connect(struct vsock_sock *vsk)
  {
-@@ -66,7 +71,7 @@ static struct virtio_transport loopback_transport = {
- 		.cancel_pkt               = vsock_loopback_cancel_pkt,
- 
- 		.dgram_enqueue            = virtio_transport_dgram_enqueue,
--		.dgram_allow              = virtio_transport_dgram_allow,
-+		.dgram_allow              = vsock_loopback_dgram_allow,
- 
- 		.stream_dequeue           = virtio_transport_stream_dequeue,
- 		.stream_enqueue           = virtio_transport_stream_enqueue,
+ 	struct virtio_vsock_pkt_info info = {
 -- 
 2.20.1
 
