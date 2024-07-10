@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-21389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21390-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D4EA892DD04
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 01:47:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CCD292DD06
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 01:47:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AEAF1F22B3F
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:47:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 095311F22E60
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:47:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67C016D4E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF6AC16D4EE;
 	Wed, 10 Jul 2024 23:42:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gDXVRsCx"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Xxpa8ncT"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-ua1-f73.google.com (mail-ua1-f73.google.com [209.85.222.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1784B16C866
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6B8616CD0E
 	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 23:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720654976; cv=none; b=L99c3/H+E2yf/ep0MuW2jT8tKcZ0uhJDYe64DlSEzIkKPlPgf/hiUkFWERUYEKfCLILsFkbaGBMMmK14ls0M9rF4fTgdVmhso+o7BQraEnNbs2WdvPdqaCk7rKAVu3t5mGMoswFlV/RYJ9+yPskDuEwAg/j+rMCi7oNV8ltxnxg=
+	t=1720654976; cv=none; b=ZU7ekY8lR95V92sfNGksBRuHAuYm1Ku4pEWXRHaCAT5CldZgMZxotmIuw1piOUjHyDNuwq7lmg0kSRtEcJhAcAvYXIhnE+YSaNjJlU3NECq+A6NUAs3EOll1Ge2AKyLN86+KrGlcsWz6P46fcC9+L0I8zOLeT6z8+DmO31LaIYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720654976; c=relaxed/simple;
-	bh=9nGVvjTtRrzXeDKQT/PGApCposmumXI12BdKtg64Aj8=;
+	bh=8593VQW+qY6IG/jYYpHCncdh+HTnZZx/ZSFesd4ewL0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sr0MBajdDkIvG7PwjziK7ZMJZz5b7PbNJe8Uib896oF+5WF32ycObu9mTUFboxSxXOHgzuAM4eFggLn9/lxg68HkkKG4NzSEEsRD4Br35hmCqp40DUD+aXC9mWDSUIiOYVb444Gs3novJ5BBfb6FKoTVeIUaIFHl2dJgv+QuGSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gDXVRsCx; arc=none smtp.client-ip=209.85.222.73
+	 To:Cc:Content-Type; b=cJ1QfJ5QVvqtBZT6FJgj/WV+UmHq53XvN+zNoIOsBXB4NYMNpgPXIwt+hLIhUtBekgYCgI9CcmMG1n19vV7wRKl3qINBiSIcZe4OGde33wy4cfaaRIgstcYDLmtP0kEvFXqrM1aKSxpgtSXYhc629nREwmOQnShm7HFN4od64/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Xxpa8ncT; arc=none smtp.client-ip=209.85.222.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-ua1-f73.google.com with SMTP id a1e0cc1a2514c-8107b03e1ccso56384241.1
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 16:42:53 -0700 (PDT)
+Received: by mail-ua1-f73.google.com with SMTP id a1e0cc1a2514c-810549fde5fso65814241.2
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 16:42:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720654973; x=1721259773; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720654974; x=1721259774; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=86wUnUhZHhvP2m3KtD2mzNoNsfKZM3y2BVe++0uTyFA=;
-        b=gDXVRsCx4zAb+aXQVU500pfuxdZC1fBEA1iLF/nd/5kaJzmrZvl9SDY2pHegNlDieX
-         hd8gLixD2Jl+++LLsALferKZDuhbA1PzIJmVwFM8Wxmp/scWJlgpfU4AOkD3t3ObKRst
-         OenkqnPb3tJdCOiWX2bVSr6jwWzDTB9i8nH3LgleIWgOGXl/Rttrre+zbPV0eS4/jV7t
-         GxzpanKaknmyn08V6EwDg4rLCLeQnOEpfQJwuOgWAkBzMg1JhsnWXn8AFPs44QJP8Z5X
-         4VhbUFc2EcLF1yjqiDWBwv3TuwVIiYFgdsjHaSSKoewzwiQlIBfCLxwee5mFwULOgDOb
-         40LA==
+        bh=KrWHeRDFVlfzCLm2guf0VTYM9h/W1rUjUnfwvHRBaDY=;
+        b=Xxpa8ncTdgyuNQ996Gw0ta5/yYEut2AJIhDg3+yQwm/UPIA274rODqe0+bAvn++daV
+         z7pi3hj55R3y+anqcc1egnqgM1VMRqWyqqUXTzM8b04EKorwb2qPzLgmC2S0VOer6rEM
+         uvewnx3ThRcFoOhqtBy9P74tgDmnyIlu+hRI9NiGwBP3hx2dD1l2Kf4MkfoiA9nkMdmy
+         b2EUeR3mUD+MdNVZ5jpEZ4S4W/XYdjha7U1FQuxb1YxTdERolyRmzr5+yCz8Y+9tXEO+
+         jYEPOhQ6Xq/JHeaih7VRmfmZJsmkJdH122A6LrAUVw5ULn81szmZKaXUkiwNmeAhOaJH
+         r09w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720654973; x=1721259773;
+        d=1e100.net; s=20230601; t=1720654974; x=1721259774;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=86wUnUhZHhvP2m3KtD2mzNoNsfKZM3y2BVe++0uTyFA=;
-        b=Xu2CQoI/gxei/CoNrq73ZRARbaDwTv6+bgw5SWE+XwvrFPOlxBApVKj9/s4R2DGZlS
-         l6PMWlMG+gDQM7TE/A4UAC96MzOVqWjKIV7iuMsA0c5ibEfjWxCtEJ/MGAzWdYr5PyeX
-         vtFMgYSk5REFTByO67yW8vrz9OmQX3yCdFFjo833z4tGvNY9WYFhRA50zq3HXfS8RBi0
-         khGiQMr7Ba4Fekl1L9Eq61LnWLBSrB06KrFpYdWoicidKxpztlVDJGmVCknDCdjckb1M
-         y4DjYDs21FcBRIQpR+HwbpumiLrgteeJeSSEgCZPLq1bYsnq9HTP67O0Thpk4AN5BRMr
-         S0ug==
-X-Forwarded-Encrypted: i=1; AJvYcCVH6IIg5R/qlihv/qZ9Y2yEhfFInuUWyJR+6fBZb9nyhsecZNdmC+waZ/1cdjiHEILOH92gFPzMSEq4x0MUwDTCR2Kk
-X-Gm-Message-State: AOJu0Yzt49jcbP/tpoBPG+Dkz43CUyxQwIFxfe4h2Ixprvn46VAFngp1
-	z9c8czZlpK0G9IrGmy1++mjAimPNhThv3FA2PQSxsDaen9tlZp/F+005ToP+EUJkBiGiHR2Drgo
-	Oj8UqKAB30luDvx031w==
-X-Google-Smtp-Source: AGHT+IFuuD8TX5cMTXqfbBITU1Rk5gbgp8/gjNqtfzjUDzjMtEhdHehLKT0HBMd1mO2mStlwTdwfc0NYjYZ51/Zs
+        bh=KrWHeRDFVlfzCLm2guf0VTYM9h/W1rUjUnfwvHRBaDY=;
+        b=ABmF5w5pV2bcZsKlUTtFZHi6OcEQhG/1JQIzMM4MogR+c6L2n7+efaAS46Yhv3jCCG
+         iIeov+OfLa6zLtuB6Kq0fWgRkHqyiB2B6Q4IvmisSLGPra5VmIOwn8Nw4iZyIUFLwDdF
+         Mj6VnX23od0QAMx+IxLEEAXGbFMdPrXB8cvS4dgy+6tRJQQvYa9CUvd3M+Ojv5Kl4rk2
+         o8SIKwY7F0GpCdy4SFXiCrm+7yWwWdrMHPD6Wy4fi1bH0enY0T2rHhuK/dDQDrTBLpAf
+         ZHL9o6kaz/3iTMDRYYZWIpGD2TgTJxtXTFAxqOjlCwGdq4gZzTZbzIQAkYrjrjgSseIh
+         X9rQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVVcMczCm0wj7LaxwzYN++3TMUl1pgPUJlcJ6QGQ5msN5M1uPJUYN30zoCchg4RmKEug8cVo2FrCslOxvlIvN7FWTy9
+X-Gm-Message-State: AOJu0Yztu/6Pee5dxT6P3sifx5WLNW6CnZ5I4FRB/Nu5IhZ52zuL01cL
+	0Z9Rv63Db72ot6/O2MPtwN7v8qCm/ul89au9lnnfUCR/XLOoA9C2AK6mXN7b/ts3ykfrwQOixUn
+	xSdQJvMEzNQDQsOuz4A==
+X-Google-Smtp-Source: AGHT+IEk1FL65vqiK6UE5KirHXI/3mEOw3BUqoQ0HFsCZaEXrmaSc1CqWM95u18pik8VbBJeKyVeyhW9FRI1OD+8
 X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
- (user=jthoughton job=sendgmr) by 2002:a05:6130:2c07:b0:80f:e89a:dc21 with
- SMTP id a1e0cc1a2514c-81076f04ee0mr30519241.2.1720654972976; Wed, 10 Jul 2024
- 16:42:52 -0700 (PDT)
-Date: Wed, 10 Jul 2024 23:42:19 +0000
+ (user=jthoughton job=sendgmr) by 2002:a05:6102:5490:b0:48d:89b6:85d2 with
+ SMTP id ada2fe7eead31-49031dbea2dmr435474137.0.1720654973979; Wed, 10 Jul
+ 2024 16:42:53 -0700 (PDT)
+Date: Wed, 10 Jul 2024 23:42:20 +0000
 In-Reply-To: <20240710234222.2333120-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240710234222.2333120-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240710234222.2333120-16-jthoughton@google.com>
-Subject: [RFC PATCH 15/18] KVM: guest_memfd: Add KVM Userfault support
+Message-ID: <20240710234222.2333120-17-jthoughton@google.com>
+Subject: [RFC PATCH 16/18] KVM: Advertise KVM_CAP_USERFAULT in KVM_CHECK_EXTENSION
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -87,77 +87,29 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-We now have to pass our struct kvm into __kvm_gmem_get_pfn to know if a
-gfn is userfault-enabled or not.
-
-For faults on userfault-enabled gfns, indicate this to the caller by
-setting *pfn to KVM_PFN_ERR_USERFAULT. Architectures may use this to
-know to return a userfault to userspace, though they should be careful
-to set a value for *pfn before calling (e.g. KVM_PFN_ERR_FAULT).
-
-While we're at it, set *pfn to KVM_PFN_ERR_HWPOISON for accesses to
-poisoned gfns.
+Advertise support for KVM_CAP_USERFAULT when CONFIG_KVM_USERFAULT is
+enabled.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- virt/kvm/guest_memfd.c | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+ virt/kvm/kvm_main.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 9148b9679bb1..ba7a981e3396 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -542,8 +542,9 @@ void kvm_gmem_unbind(struct kvm_memory_slot *slot)
- 	fput(file);
- }
- 
--static int __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
--		       gfn_t gfn, kvm_pfn_t *pfn, int *max_order, bool prepare)
-+static int __kvm_gmem_get_pfn(struct kvm *kvm, struct file *file,
-+		       struct kvm_memory_slot *slot, gfn_t gfn, kvm_pfn_t *pfn,
-+		       int *max_order, bool prepare)
- {
- 	pgoff_t index = gfn - slot->base_gfn + slot->gmem.pgoff;
- 	struct kvm_gmem *gmem = file->private_data;
-@@ -551,6 +552,11 @@ static int __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
- 	struct page *page;
- 	int r;
- 
-+	if (gfn_has_userfault(kvm, gfn)) {
-+		*pfn = KVM_PFN_ERR_USERFAULT;
-+		return -EFAULT;
-+	}
-+
- 	if (file != slot->gmem.file) {
- 		WARN_ON_ONCE(slot->gmem.file);
- 		return -EFAULT;
-@@ -567,6 +573,7 @@ static int __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
- 		return PTR_ERR(folio);
- 
- 	if (folio_test_hwpoison(folio)) {
-+		*pfn = KVM_PFN_ERR_HWPOISON;
- 		folio_unlock(folio);
- 		folio_put(folio);
- 		return -EHWPOISON;
-@@ -594,7 +601,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- 	if (!file)
- 		return -EFAULT;
- 
--	r = __kvm_gmem_get_pfn(file, slot, gfn, pfn, max_order, true);
-+	r = __kvm_gmem_get_pfn(kvm, file, slot, gfn, pfn, max_order, true);
- 	fput(file);
- 	return r;
- }
-@@ -634,7 +641,8 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
- 			break;
- 		}
- 
--		ret = __kvm_gmem_get_pfn(file, slot, gfn, &pfn, &max_order, false);
-+		ret = __kvm_gmem_get_pfn(kvm, file, slot, gfn, &pfn,
-+					 &max_order, false);
- 		if (ret)
- 			break;
- 
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d2ca16ddcaa1..90ce6b8ff0ab 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4916,6 +4916,10 @@ static int kvm_vm_ioctl_check_extension_generic(struct kvm *kvm, long arg)
+ #ifdef CONFIG_KVM_PRIVATE_MEM
+ 	case KVM_CAP_GUEST_MEMFD:
+ 		return !kvm || kvm_arch_has_private_mem(kvm);
++#endif
++#ifdef CONFIG_KVM_USERFAULT
++	case KVM_CAP_USERFAULT:
++		return 1;
+ #endif
+ 	default:
+ 		break;
 -- 
 2.45.2.993.g49e7a77208-goog
 
