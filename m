@@ -1,113 +1,184 @@
-Return-Path: <kvm+bounces-21309-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21310-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10ACA92D296
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 15:18:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5240192D366
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 15:52:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93956B24E5D
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 13:18:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E51E283413
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 13:52:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20307193074;
-	Wed, 10 Jul 2024 13:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC11193470;
+	Wed, 10 Jul 2024 13:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rxR7FxJ4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dRpNqBuA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A4B192B91;
-	Wed, 10 Jul 2024 13:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75A13192B8F
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 13:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720617480; cv=none; b=Y1+FVUBAikBOvKtL5GP6V+sQ9xmGtf1JbNk9pcllf7uihHFRBpcPm5S+56jO2GgPajOhPuMWIAjILQkLcdza3pf6mv1T1WZ6KOQZlbOrpj9k+QelJeOuYkMDsCTC/8Z+TkT7iVZx7m/UmfeLq0Qw1+ZKo6hn+RFkNHWoXOVEgX0=
+	t=1720619543; cv=none; b=BTQVp2dseuBGYCWuMReKuBWe6RmarvWljhdRKmoFQJIf6zPg05p3JNR1nFjn4zg5VIM2lTfeefUPHa+LnCKp7YenaO+P5jktbB7gHVxFsvglW7jqxRJkoakY8AFMHoDpavnH34Qp0B/tTIEWyFPkibFi+aD6oFzMgItmTphp63I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720617480; c=relaxed/simple;
-	bh=FmLG9ussU5FRxdr7oifUla5ahQxpdvQPzA+Zr6jz3LQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=id1j8TScQJHMWwxvbpHl4BF21ICoyQc2Bytr09ADuvgqYArJ4VilQk1roIh7bHcEm7KO894M2Al436bP3cW+OQFJD33sr7tqx9LOuVU85b1Q3Pkr7e3czqOTB4FlTnf5UlWlA9m9lxoYjlsoXPkU87WJlTHJRbiWGNwrNe6aYyQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rxR7FxJ4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC2C5C32782;
-	Wed, 10 Jul 2024 13:17:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720617479;
-	bh=FmLG9ussU5FRxdr7oifUla5ahQxpdvQPzA+Zr6jz3LQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rxR7FxJ4+AfkpLq1LVVuoYWlhWG4o7wcc2UQJnuNUo5vwhv0h/K3Jn6F2Fy7eYxS2
-	 vXxSDi+qYjizmB1AXmGqNnuzjoAEmuOaGmagE1d6vcEjlEamQVCKTsPHjJaO6y3zyd
-	 DMNSXyAUaYnfYIvoCMS1YJ3MGjYA2GtT3c4DZr+CeW7haLWFQe3y5XfKPyFmOXD3zT
-	 gOSs38ytTD+K5hODyj2QOwREYLZWHmGL0lGs7YHEB/nyGKhZY5sknBVu4nag/wGnSb
-	 TKJ2WGrFoakqcVV+5mmSCVO92d3Kv6tf5Cd6UQTV/wLqGdiEd72sr5dxnMNXeAi8W8
-	 G5VMdvNM1QnZA==
-Date: Wed, 10 Jul 2024 14:17:53 +0100
-From: Will Deacon <will@kernel.org>
-To: Steven Price <steven.price@arm.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Marc Zyngier <maz@kernel.org>, James Morse <james.morse@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	Joey Gouly <joey.gouly@arm.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>,
-	Christoffer Dall <christoffer.dall@arm.com>,
-	Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
-	Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-Subject: Re: [PATCH v4 13/15] irqchip/gic-v3-its: Rely on genpool alignment
-Message-ID: <20240710131753.GB14582@willie-the-truck>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-14-steven.price@arm.com>
+	s=arc-20240116; t=1720619543; c=relaxed/simple;
+	bh=K+zPsZi+srywBZDuKcnUQzrg2Z14hU1r6iCS86pvCkk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=aQtDxGMUDpDFLNIuqzzV7CLAm4nZUgousP+8IoiCRzx9WcIPOOyKUH6WU4w3wDLesecqZ4PKkN7cGGXRjyLZ9Q/KPpp8rZ06ISvTm54J2Ggr6XVX8Ni+JM0FVRHkdkez6bh2QxoWSoCPpjudKvBJ4tTGeP9hA07ooMkRhYteyr0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dRpNqBuA; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0360f8d773so10844079276.3
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 06:52:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720619540; x=1721224340; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=8rUr00jWkE2y0/1opy/I3K41SPy3FE0JTaHuvcV+2TE=;
+        b=dRpNqBuAQuO1J6v6hO4DnGr3Gqqbi8Wc66iOsMBaTG5iU1gVzFVBixfskCP7gQA0lK
+         YESOiDro4mGFxd2IbCvPMwmL4XOBed6DqWXBvQnWbXKalR7fzeQR4fCvyWbXu0Q8JjOo
+         hnMmJr4GGstSWg6r/GOXUBvPqylcfgM4EhlpmIVez7/iDDEsk+TqKr2+5vMutO2pDOoV
+         aVSYVoVqhvoOa/9LZa4QOYG6+v28P1QrNI2RPxb4KUmKL1pEyLjsiJHMhSVlqVIJQCEn
+         NAtAEfUZA3DC01UBWKhIO40c/wzVcjydwLPYGnvzsoGyfRUWWZU5CddvEV1Uyf+8GowZ
+         YS3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720619540; x=1721224340;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=8rUr00jWkE2y0/1opy/I3K41SPy3FE0JTaHuvcV+2TE=;
+        b=wNVdRR9NlLe5bSL1YACgt01f9/Cj+7lQlcnnvTN6MA/bOUD33oDtw/AJ7xBbPP5Igu
+         JVZI8BzC6O2HR3hsLjbUoGCiBhVtw2hMbNSlu+am3wGh3BkhSe++EaVtJD9ezS6HGrU+
+         X9SAO95MReYu3MxLkQDEA+YnewvN5Z+M6/X0Dc1nMAh5sbWRB/mmL1jdHutcDzMmQlj1
+         2T+R1ruzVRLEsKiiP/0XTdloGcK4EjBkMtAIkU00qXQc9g03CBbtNVijqPJNhz0lSpgl
+         YFwsHtdKtzGlwrFnHfrF5ExpUFxa8k242M5EWkV58LZj+ScQQ8+Gf/jxKET520b7UOnz
+         fU6A==
+X-Forwarded-Encrypted: i=1; AJvYcCXtbY+NGygHujc3PINOuRqA5zJOEDVNGKS9K9RJ2klhW87kj30upbPgFfScHwfvLfgwGGRrOkkZXea9B+RAYHEVDfdx
+X-Gm-Message-State: AOJu0YwkLZfiGdK6CjYKw9RpR2/PC77/MR64ygS/CHHSn7E+L/65Xv5o
+	3ohJqWQruZuyBR8tkIoRWbG4YAgRElYcLlkynx27Js1LP+yZbudQHBK4XBNSX8FAhXIDchDEpbR
+	g/Q==
+X-Google-Smtp-Source: AGHT+IF5FKCCSgKayU+3HxtAmEuD2r8g64i5mfbrkGAq2HRAzkjanq7IuF/cbMLIHkKt50yZooyzb0oBz6E=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2005:b0:e03:c033:1ce3 with SMTP id
+ 3f1490d57ef6-e041b04e66emr273986276.4.1720619540454; Wed, 10 Jul 2024
+ 06:52:20 -0700 (PDT)
+Date: Wed, 10 Jul 2024 06:52:18 -0700
+In-Reply-To: <CALMp9eRet6+v8Y1Q-i6mqPm4hUow_kJNhmVHfOV8tMfuSS=tVg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240701095505.165383-14-steven.price@arm.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Mime-Version: 1.0
+References: <20240429060643.211-1-ravi.bangoria@amd.com> <20240429060643.211-4-ravi.bangoria@amd.com>
+ <Zl5jqwWO4FyawPHG@google.com> <e1c29dd4-2eb9-44fe-abf2-f5ca0e84e2a6@amd.com>
+ <ZmB_hl7coZ_8KA8Q@google.com> <59381f4f-94de-4933-9dbd-f0fbdc5d5e4a@amd.com>
+ <Zmj88z40oVlqKh7r@google.com> <0b74d069-51ed-4e5e-9d76-6b1a60e689df@amd.com> <CALMp9eRet6+v8Y1Q-i6mqPm4hUow_kJNhmVHfOV8tMfuSS=tVg@mail.gmail.com>
+Message-ID: <Zo6RxnGJrxh9mi7g@google.com>
+Subject: Re: [PATCH 3/3] KVM SVM: Add Bus Lock Detect support
+From: Sean Christopherson <seanjc@google.com>
+To: Jim Mattson <jmattson@google.com>
+Cc: Ravi Bangoria <ravi.bangoria@amd.com>, tglx@linutronix.de, mingo@redhat.com, 
+	bp@alien8.de, dave.hansen@linux.intel.com, pbonzini@redhat.com, 
+	thomas.lendacky@amd.com, hpa@zytor.com, rmk+kernel@armlinux.org.uk, 
+	peterz@infradead.org, james.morse@arm.com, lukas.bulwahn@gmail.com, 
+	arjan@linux.intel.com, j.granados@samsung.com, sibs@chinatelecom.cn, 
+	nik.borisov@suse.com, michael.roth@amd.com, nikunj.dadhania@amd.com, 
+	babu.moger@amd.com, x86@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, santosh.shukla@amd.com, ananth.narayan@amd.com, 
+	sandipan.das@amd.com, manali.shukla@amd.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 01, 2024 at 10:55:03AM +0100, Steven Price wrote:
-> its_create_device() over-allocated by ITS_ITT_ALIGN - 1 bytes to ensure
-> that an aligned area was available within the allocation. The new
-> genpool allocator has its min_alloc_order set to
-> get_order(ITS_ITT_ALIGN) so all allocations from it should be
-> appropriately aligned.
-> 
-> Remove the over-allocation from its_create_device() and alignment from
-> its_build_mapd_cmd().
-> 
-> Signed-off-by: Steven Price <steven.price@arm.com>
-> ---
->  drivers/irqchip/irq-gic-v3-its.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
-> 
-> diff --git a/drivers/irqchip/irq-gic-v3-its.c b/drivers/irqchip/irq-gic-v3-its.c
-> index 7d12556bc498..ab697e4004b9 100644
-> --- a/drivers/irqchip/irq-gic-v3-its.c
-> +++ b/drivers/irqchip/irq-gic-v3-its.c
-> @@ -699,7 +699,6 @@ static struct its_collection *its_build_mapd_cmd(struct its_node *its,
->  	u8 size = ilog2(desc->its_mapd_cmd.dev->nr_ites);
->  
->  	itt_addr = virt_to_phys(desc->its_mapd_cmd.dev->itt);
-> -	itt_addr = ALIGN(itt_addr, ITS_ITT_ALIGN);
->  
->  	its_encode_cmd(cmd, GITS_CMD_MAPD);
->  	its_encode_devid(cmd, desc->its_mapd_cmd.dev->device_id);
-> @@ -3520,7 +3519,7 @@ static struct its_device *its_create_device(struct its_node *its, u32 dev_id,
->  	 */
->  	nr_ites = max(2, nvecs);
->  	sz = nr_ites * (FIELD_GET(GITS_TYPER_ITT_ENTRY_SIZE, its->typer) + 1);
-> -	sz = max(sz, ITS_ITT_ALIGN) + ITS_ITT_ALIGN - 1;
-> +	sz = max(sz, ITS_ITT_ALIGN);
->  
->  	itt = itt_alloc_pool(its->numa_node, sz);
+On Tue, Jul 09, 2024, Jim Mattson wrote:
+> On Tue, Jul 9, 2024 at 7:25=E2=80=AFPM Ravi Bangoria <ravi.bangoria@amd.c=
+om> wrote:
+> >
+> > Sean,
+> >
+> > Apologies for the delay. I was waiting for Bus Lock Threshold patches t=
+o be
+> > posted upstream:
+> >
+> >   https://lore.kernel.org/r/20240709175145.9986-1-manali.shukla@amd.com
+> >
+> > On 12-Jun-24 7:12 AM, Sean Christopherson wrote:
+> > > On Wed, Jun 05, 2024, Ravi Bangoria wrote:
+> > >> On 6/5/2024 8:38 PM, Sean Christopherson wrote:
+> > >>> Some of the problems on Intel were due to the awful FMS-based featu=
+re detection,
+> > >>> but those weren't the only hiccups.  E.g. IIRC, we never sorted out=
+ what should
+> > >>> happen if both the host and guest want bus-lock #DBs.
+> > >>
+> > >> I've to check about vcpu->guest_debug part, but keeping that aside, =
+host and
+> > >> guest can use Bus Lock Detect in parallel because, DEBUG_CTL MSR and=
+ DR6
+> > >> register are save/restored in VMCB, hardware cause a VMEXIT_EXCEPTIO=
+N_1 for
+> > >> guest #DB(when intercepted) and hardware raises #DB on host when it'=
+s for the
+> > >> host.
+> > >
+> > > I'm talking about the case where the host wants to do something in re=
+sponse to
+> > > bus locks that occurred in the guest.  E.g. if the host is taking pun=
+itive action,
+> > > say by stalling the vCPU, then the guest kernel could bypass that beh=
+avior by
+> > > enabling bus lock detect itself.
+> > >
+> > > Maybe it's moot point in practice, since it sounds like Bus Lock Thre=
+shold will
+> > > be available at the same time.
+> > >
+> > > Ugh, and if we wanted to let the host handle guest-induced #DBs, we'd=
+ need code
+> > > to keep Bus Lock Detect enabled in the guest since it resides in DEBU=
+G_CTL.  Bah.
+> > >
+> > > So I guess if the vcpu->guest_debug part is fairly straightforward, i=
+t probably
+> > > makes to virtualize Bus Lock Detect because the only reason not to vi=
+rtualize it
+> > > would actually require more work/code in KVM.
+> >
+> > KVM forwards #DB to Qemu when vcpu->guest_debug is set and it's Qemu's
+> > responsibility to re-inject exception when Bus Lock Trap is enabled
+> > inside the guest. I realized that it is broken so I've prepared a
+> > Qemu patch, embedding it at the end.
+> >
+> > > I'd still love to see Bus Lock Threshold support sooner than later th=
+ough :-)
+> >
+> > With Bus Lock Threshold enabled, I assume the changes introduced by thi=
+s
+> > patch plus Qemu fix are sufficient to support Bus Lock Trap inside the
+> > guest?
+>=20
+> In any case, it seems that commit 76ea438b4afc ("KVM: X86: Expose bus
+> lock debug exception to guest") prematurely advertised the presence of
+> X86_FEATURE_BUS_LOCK to userspace on non-Intel platforms. We should
+> probably either accept these changes or fix up that commit. Either
+> way, something should be done for all active branches back to v5.15.
 
-Tested-by: Will Deacon <will@kernel.org>
+Drat.  Yeah, we need a patch to clear BUS_LOCK_DETECT in svm_set_cpu_caps()=
+, marked
+for stable@.  Then this series can remove that clearing.
 
-Will
+At least I caught it for CET[*]!  It'd be nice to not have to rely on human=
+s to
+detect potential issues like this, but I can't think of a way to programmat=
+ically
+handle this situation without incurring an annoying amount of overhead and/=
+or
+duplicate code between VMX and SVM.
+
+[*] https://lore.kernel.org/all/ZjLRnisdUgeYgg8i@google.com
+
 
