@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-21337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 282D092D85A
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 20:39:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F5892D862
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 20:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D0F2B21717
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 18:39:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15E091C20E21
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 18:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10617197543;
-	Wed, 10 Jul 2024 18:39:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEDA19755A;
+	Wed, 10 Jul 2024 18:40:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FlNJV09o"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DDmpwweK"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B31BB194C9A
-	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 18:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B503195FFC
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 18:40:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720636778; cv=none; b=A+ecgUqCV6iWROiP8TR+YyYHYmb538jV2FOTrhSpjjn13iO4m02HRSAzcwCRo2dK/rGoB4uHmIOc2ZKsLnZaI2ulX70L3su2laKTj+jOud7pl9dG1vorUPom8ipoeVh9jeh5t1hM64hzupFCp0+aGeq+y/q0VCSntfPDHdcid0s=
+	t=1720636836; cv=none; b=qNfmeXuCwGSAYfJOIJ9FJ2xa2uHVPALbU5m3l27xxTD9VHhmnRmRHjPBZkXAMuL5LmqNmmfHG536MN8S1pi9AiH+7BTtP5wosVrS8Ikqx/doR57ddwz2Esi2Gp8a2RwpBmUwWxVTtPdx0PyOALm1zrdUaYkk3q2ftuB6NpJ+wu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720636778; c=relaxed/simple;
-	bh=jl/G74jU3/LJKTndyg9Ir8ZK6ZCpRMd0UXIwTJV5u7k=;
+	s=arc-20240116; t=1720636836; c=relaxed/simple;
+	bh=cpmhhhVhRKvhrC/g+4t7qnyh17qX5WLx6FJHCFwK3Ho=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rU/C8foB/TdQIratv6/4fFfWsfr5GV8qHCnUlNf8P5wUARCmYysyw42B+WXzJS/HTbYMqYUvAseqeO7JdaNUSBQn0DZggHDGbWOfQT8PB5w9DR9UVg1SQ3RlHS8bezBTrtf1jbpVPOIGzCibt6IO/hsjxi7f2dyX4QMt7YaZ/sA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FlNJV09o; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=V62SgmFgZDZ9y4f20oKo56YzVnnY+ysZD1AVhdjjVgv0MKs9RUr5qHR4KxCmgtk1CvVJ+kPvmmkegsMgK1Wm5XPZEPklTX9TykVTcS4f7rLUzBd1+70twkSPmbZg2kErM+Iyq8Y17s7/SLHIrWfSqkGIbK+oUk0MytsTCiVSRhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DDmpwweK; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720636775;
+	s=mimecast20190719; t=1720636832;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4Wa91XRdvflqoUl4ERsLfqpwV8EWmy2Wo2L5wqHiP4U=;
-	b=FlNJV09o7oEB3u2chwRYHwojVqIaoUy3LhTKPo61VCgLt9tGEMM3HgtwLg2o4jIxQU4YJ7
-	fc+G3JEap7m7KRJ0zW2z68Ms1RTPkGEd7B+m9/giAgERJ7XeBqL7RJaWGN4NP3Y/EnoWFJ
-	9Z64TXYZuSvJDZdfya3Co0cI4wXjy94=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=nOMGW3S5XfF0umS0MhtMBuBfpR4wOzwlUDWp6i5Agkc=;
+	b=DDmpwweKGQL+A3ESHK7Butp6geN7A8u4OMHGMquJPZxmExeQHwbPmrT+q9PZuFdwY7G5pG
+	2ElJ71KfEHLYtBMFfMxLlcdl6wCUjdUPkclYSrf6tNt+hvlcObCflCfv/HYrVDxXB5bUAz
+	ejhYxozgOfDaDHMcRZc8+bWjggtN14U=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-477-lur7OVGSM_mdyNK_OE6oDA-1; Wed, 10 Jul 2024 14:39:34 -0400
-X-MC-Unique: lur7OVGSM_mdyNK_OE6oDA-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4266fbae4c6so537805e9.0
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 11:39:33 -0700 (PDT)
+ us-mta-647-d2t4PpyYN3uIUF97RObrnw-1; Wed, 10 Jul 2024 14:40:31 -0400
+X-MC-Unique: d2t4PpyYN3uIUF97RObrnw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42725ec6d8dso607605e9.2
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 11:40:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720636773; x=1721241573;
+        d=1e100.net; s=20230601; t=1720636830; x=1721241630;
         h=in-reply-to:content-transfer-encoding:content-disposition
          :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Wa91XRdvflqoUl4ERsLfqpwV8EWmy2Wo2L5wqHiP4U=;
-        b=sL2PI0ySj/lbKVLxR74lfqsWdZGpF6auV+XZyZ5am2FvJ2bTvwognAnW5cyS3r8JuE
-         zNQTMtK7J4rfAEL7IOjV+eVZY9zUgd7O5JlHaHwhzYDV5VAm0RstV2KIOwLW97pToCGf
-         4nNOo9OxNj4qEGV9hrSqzVIX6fqzvaJLa6ABL5k6p0TkUP7lGJSMBuUzFbPcgqaQPZXz
-         6MQLgA0hf6/Ohef5TY3ducqZIq309cxTALUVVe4WXf/lKN6sd2kFlrabcQjw2tw8EVZ2
-         OSCzb8vSN2PnKUriCcxw2rJKfnq9pwaTZuuqBfvq/CvCr/FpNvnKHn1IO9zP4f6NCJYA
-         Z0fQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXifMVIvWOYtMJejUer7wXqeVU77C819zapoQf+EVTJ29Ji2icMepzuw0nG1DHep0iwFAPm2yAJe567JAPQkmis9aGW
-X-Gm-Message-State: AOJu0Yyd2eXv4fbRoPOxX5xSevRaFFCBQBBpH24BTJMMr2IIQrmeHiJt
-	Jf+oGyqsMSAPSyWF/iRlrFee6PEMnG33snKbc/g28o76WykvyjYY8bo3VD1mfMs/sxFmdyiHPV+
-	BviSFig2VUm3XZoei7ZBYMze/c7sg/ZfSHXOLsy6puzgncT4h9Q==
-X-Received: by 2002:a7b:c458:0:b0:426:64f5:b10d with SMTP id 5b1f17b1804b1-426707db59bmr38554185e9.14.1720636773021;
-        Wed, 10 Jul 2024 11:39:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG74ZhHPUOEWOdKZQANHlo67lTxvcQgP6YunxBETGdCT6l5hx3iAl/9nDeoE0ZV+lKH4kLIVQ==
-X-Received: by 2002:a7b:c458:0:b0:426:64f5:b10d with SMTP id 5b1f17b1804b1-426707db59bmr38553905e9.14.1720636772416;
-        Wed, 10 Jul 2024 11:39:32 -0700 (PDT)
+        bh=nOMGW3S5XfF0umS0MhtMBuBfpR4wOzwlUDWp6i5Agkc=;
+        b=Gy+Nj2xGyoAeBA6rO32TXqqygNQYgQp4RDHyIp9SlYRqxjYWbaJqD37iAjhfKiSxu4
+         ng1zChuJ2TacqtLKHIS7xe8O5cw6Jao6sccWTxjwJKv9qB0IDo4M9hP1clttquO7c1I3
+         wmr5eWW5JUnqdb/Ey/92EoOO2pIxs7i4VVsc8u3SPLYf79iVY6+qa/NKL8pf9s49wdgj
+         zGd8KG0KWFqDC2iQUCQXRWy+e1TaITKAWRhEtR4hmf3N06BO8CdD4N/lubM9ohljv7rB
+         ucrcp1mNkvYMqddOlkUYpsfR05/dcN0DAvPhSa7mPKSs01ss1eBU7iapTi8VYwd40+zp
+         n89A==
+X-Forwarded-Encrypted: i=1; AJvYcCUGf8n5bXQ7YnE6Jj8RPnsEX24cMIhMCQcHVC6KGJdDutAdMPczcaBNjCXkiJ8PhnGMF9l7BGxKH81sqHm3xLwxCf58
+X-Gm-Message-State: AOJu0Yx1CNVuTC4ZuiL/0Dr+5cEp1u0tWxXX1waewfRPkE81K+2r2inz
+	UB3pR8P+Ww3V2YAfTHYwE1Gv6GaYq+IC1RNt6p7PQUcK64MKRNS4EEkRqA34g3DPryhHRl/mO/Y
+	CmsDsTX8FLmJ2rBNpfsTRS1OEc/P07lq5aYx+14ue9yJq7giraQ==
+X-Received: by 2002:a1c:4b0e:0:b0:426:5b76:13bd with SMTP id 5b1f17b1804b1-426708f2127mr51924375e9.38.1720636830437;
+        Wed, 10 Jul 2024 11:40:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHW6BXHt7TvysChZRc5l+/HKuwpL6Ky9xwFKNWqpa0ClAMfEvn97X0Cu0s4c3ufKnu0Y+84KA==
+X-Received: by 2002:a1c:4b0e:0:b0:426:5b76:13bd with SMTP id 5b1f17b1804b1-426708f2127mr51924105e9.38.1720636829731;
+        Wed, 10 Jul 2024 11:40:29 -0700 (PDT)
 Received: from redhat.com ([2a02:14f:174:f6ae:a6e3:8cbc:2cbd:b8ff])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427270238a6sm57772915e9.20.2024.07.10.11.39.28
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-367cde7e039sm5973934f8f.2.2024.07.10.11.40.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 11:39:31 -0700 (PDT)
-Date: Wed, 10 Jul 2024 14:39:26 -0400
+        Wed, 10 Jul 2024 11:40:29 -0700 (PDT)
+Date: Wed, 10 Jul 2024 14:40:24 -0400
 From: "Michael S. Tsirkin" <mst@redhat.com>
 To: Daniel Verkamp <dverkamp@chromium.org>
 Cc: linux-kernel@vger.kernel.org,
@@ -100,7 +100,7 @@ Cc: linux-kernel@vger.kernel.org,
 	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
 	kvm@vger.kernel.org
 Subject: Re: [PATCH v2 2/2] virtio: fix vq # for balloon
-Message-ID: <20240710142239-mutt-send-email-mst@kernel.org>
+Message-ID: <20240710144012-mutt-send-email-mst@kernel.org>
 References: <cover.1720611677.git.mst@redhat.com>
  <3d655be73ce220f176b2c163839d83699f8faf43.1720611677.git.mst@redhat.com>
  <CABVzXAnjAdQqVNtir_8SYc+2dPC-weFRxXNMBLRcmFsY8NxBhQ@mail.gmail.com>
@@ -144,22 +144,7 @@ On Wed, Jul 10, 2024 at 11:12:34AM -0700, Daniel Verkamp wrote:
 > current Linux driver would mismatch; what the driver considers to be
 > the first request queue (index 1) would be ignored by the device since
 > queue index 1 has no function if F_NOTIFICATION isn't negotiated.
-
-
-Oh, thanks a lot for pointing this out!
-
-I see so this patch is no good as is, we need to add a workaround for
-virtio-fs first.
-
-QEMU workaround is simple - just add an extra queue. But I did not
-reasearch how this would interact with vhost-user.
-
-From driver POV, I guess we could just ignore queue # 1 - would that be
-ok or does it have performance implications?
-Or do what I did for balloon here: try with spec compliant #s first,
-if that fails then assume it's the spec issue and shift by 1.
-
-
+> 
 > [...]
 > > diff --git a/drivers/virtio/virtio_pci_common.c b/drivers/virtio/virtio_pci_common.c
 > > index 7d82facafd75..fa606e7321ad 100644
@@ -208,5 +193,7 @@ if that fails then assume it's the spec issue and shift by 1.
 > 
 > Thanks,
 > -- Daniel
+
+ouch forgot to commit ;)
 
 
