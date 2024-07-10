@@ -1,117 +1,125 @@
-Return-Path: <kvm+bounces-21283-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21284-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C52192CD83
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 10:51:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5FA892CD99
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 10:57:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5D13B20BDB
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 08:51:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A58211F229FA
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 08:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A71178CC5;
-	Wed, 10 Jul 2024 08:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D4D17CA0D;
+	Wed, 10 Jul 2024 08:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="llpc7gc1"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="M/CDYaGF"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA47B176FCE;
-	Wed, 10 Jul 2024 08:51:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15EE1662FB
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 08:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720601487; cv=none; b=s2Y+K4oBj6A11nVBSNQsdl0XFZfwZ83DeJn68Azt5DuyLYkJk5eZbqt0PokGulp9iH9nb2+ZS6iQmnhF0dv9zP5lpBIl0/zBv+7BBExccT2m9phj7mTbUrVU0/lIPJChw0C07aZSDE7GGVoNYgPksYWdjfmoZyFJT3jG9hZeFC0=
+	t=1720601650; cv=none; b=c4yT4/zQlISprRGG2d3JJLAbU5z16NuOx8m/goLQO9YzZPPQafDCayvgdFGNvpXyzxhGhxknPrKwfsZ6bbFTomIwrER/im6KEhbpHKHRelrEN3++tkZBLadGCxWQxP9sVe4z/tPiZRTsLEdgTDz4+rJWDsjgxuV2ReL8pDzsggY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720601487; c=relaxed/simple;
-	bh=dnAQkPxYtxbaIwh+/jYCb8bb1Ou4HEWUt8N3rsbRkVI=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C/IWcxME47XY3ko4Mgi7IhpWH7yhT9b0VNJSrGBM/jR5IQbOAUFGoMxHBDjR1PcM6MdOjIZfGRhyO8pejpnRkkxifwyse8DYZNuvSby5lc6iTeJr56+Ci14VCdzXMLNZEK4ROhxTTpQs+6SN7iOvFLt9RsJC7PMJKN4JuFa6q+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=llpc7gc1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45D82C32781;
-	Wed, 10 Jul 2024 08:51:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720601487;
-	bh=dnAQkPxYtxbaIwh+/jYCb8bb1Ou4HEWUt8N3rsbRkVI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=llpc7gc1DVf6Ls9Mp8WWZKfbbl4lDFsoGRMl8ruvGncvzGLFdXsVl7bj404rPtlbF
-	 3fUzoHX/fdmFy0ZkeER+uxGNItYekQpT2s0flHwrode59lobwdq4vrEqcUsa3FN57k
-	 mEFOz1pr5wQ8+n7WAO8rF/LfRIFbWmaOfP7HTJgezQlvkHVpLlfaPLD7AqUg/MtgEc
-	 Ocy7fuK5R1DA8z1G6EIe5YFVVy3HFbtCPZoK72fi1XxwzQ+5utbV0gBfDnf3IFEvDi
-	 Qz1DjryY9hls1Txh6KMER80o/NvwWA8CwrJpdO39opqnsbwePaiQPRDg4qFzckc+1+
-	 ONxFn5h+z0JUg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sRT2q-00BA9w-S0;
-	Wed, 10 Jul 2024 09:51:24 +0100
-Date: Wed, 10 Jul 2024 09:51:24 +0100
-Message-ID: <86zfqp3a0j.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Tangnianyao <tangnianyao@huawei.com>
-Cc: <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>,
-	<linux-arm-kernel@lists.infradead.org>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose
-	<suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu
-	<yuzenghui@huawei.com>,
-	Quentin Perret <qperret@google.com>,
-	Will Deacon
-	<will@kernel.org>,
-	Fuad Tabba <tabba@google.com>,
-	"guoyang (C)"
-	<guoyang2@huawei.com>
-Subject: Re: [PATCH v3 00/17] KVM: arm64: Allow using VHE in the nVHE hypervisor
-In-Reply-To: <5ab07210-ad44-616c-cd15-0ac954453fcf@huawei.com>
-References: <20230609162200.2024064-1-maz@kernel.org>
-	<5ab07210-ad44-616c-cd15-0ac954453fcf@huawei.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1720601650; c=relaxed/simple;
+	bh=/qXVF6bqk4LEnOmIQ0fuJ2V4+lmTYdwhVvs16aQn98I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=oJzPSAdjzVN4R4EWnk6zLTWRTY8lndq3sLFinZ7bsSo2ALrx478Ka1082gd9dPY5/QnhlANZ9bs0OBgTMLH+KWf7pjOouSg1NRtKsW4T30BmVlLarjzfjR+jZePdQ/SZS+91rJ30lqecWdeJp9yu5Soot5/UnaFjcO+0UHT/BXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=M/CDYaGF; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1720601649; x=1752137649;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QwCfjXS/kYsMjXws7vKBnjfkXQjfPeTGtCOlVsJ8OLk=;
+  b=M/CDYaGFsXsEL4yrX6Af7a7MlwxB9RjyZ4rMUbSY6wZyHkeSjIOma3zM
+   XIIhCEwDd1PkWDPEIJ8kHoc9wKdJYefMrVI5TnkPMwgd/0GVb124zCMCD
+   iQqA9mn1rVd46dtxlivpSUZPy6nzpiZ4gDHOke28ULRp9nf+niOtR4+45
+   M=;
+X-IronPort-AV: E=Sophos;i="6.09,197,1716249600"; 
+   d="scan'208";a="419071250"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Jul 2024 08:54:05 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.43.254:23180]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.5.92:2525] with esmtp (Farcaster)
+ id fba6259c-daf2-4ac2-b11c-1ba7b3658e66; Wed, 10 Jul 2024 08:53:56 +0000 (UTC)
+X-Farcaster-Flow-ID: fba6259c-daf2-4ac2-b11c-1ba7b3658e66
+Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 10 Jul 2024 08:53:53 +0000
+Received: from u94b036d6357a55.ant.amazon.com (10.106.83.14) by
+ EX19D018EUA002.ant.amazon.com (10.252.50.146) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 10 Jul 2024 08:53:49 +0000
+From: Ilias Stamatis <ilstam@amazon.com>
+To: <kvm@vger.kernel.org>, <pbonzini@redhat.com>
+CC: <pdurrant@amazon.co.uk>, <dwmw@amazon.co.uk>, <Laurent.Vivier@bull.net>,
+	<ghaskins@novell.com>, <avi@redhat.com>, <mst@redhat.com>,
+	<levinsasha928@gmail.com>, <peng.hao2@zte.com.cn>,
+	<nh-open-source@amazon.com>
+Subject: [PATCH 0/6] KVM: Improve MMIO Coalescing API
+Date: Wed, 10 Jul 2024 09:52:53 +0100
+Message-ID: <20240710085259.2125131-1-ilstam@amazon.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: tangnianyao@huawei.com, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, qperret@google.com, will@kernel.org, tabba@google.com, guoyang2@huawei.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB001.ant.amazon.com (10.13.139.187) To
+ EX19D018EUA002.ant.amazon.com (10.252.50.146)
 
-On Wed, 10 Jul 2024 07:45:52 +0100,
-Tangnianyao <tangnianyao@huawei.com> wrote:
-> 
-> Hi Marz,
-> 
-> I'm trying to learn pKVM and have a question.
-> 
-> Why pKVM developed on E2H=0 firstly? It tried to avoid host access
-> guest memory with stage2 translation, and it seems not necessarily
-> rely on HCR_EL2.E2H=0.
+The current MMIO coalescing design has a few drawbacks which limit its
+usefulness. Currently all coalesced MMIO zones use the same ring buffer.
+That means that upon a userspace exit we have to handle potentially
+unrelated MMIO writes synchronously. And a VM-wide lock needs to be
+taken in the kernel when an MMIO exit occurs.
 
-Because we don't want to leave ARMv8.0 systems behind. They are still
-a large portion of the arm64 HW running Linux.
+Additionally, there is no direct way for userspace to be notified about
+coalesced MMIO writes. If the next MMIO exit to userspace is when the
+ring buffer has filled then a substantial (and unbounded) amount of time
+may have passed since the first coalesced MMIO.
 
-> Is hVHE an alternative plan of pKVM ? To allow pKVM run on E2H res1 system ?
+This series adds new ioctls to KVM that allow for greater control by
+making it possible to associate different MMIO zones with different ring
+buffers. It also allows userspace to use poll() to check for coalesced
+writes in order to avoid userspace exits in vCPU threads (see patch 3
+for why this can be useful).
 
-Supporting E2H RES1 implementations is indeed one of the motivations.
-But there is a lot more to it, such as being able to use the two TTBRs
-to perform address space isolation inside the hypervisor.
+The idea of improving the API in this way originally came from Paul
+Durrant (pdurrant@amazon.co.uk) but the implementation is mine.
 
-I presented this[1] at KVM Forum two years ago, which explains what we
-could do (some of which is already in progress).
+The first patch in the series is a bug in the existing code that I
+discovered while writing a selftest and can be merged independently.
 
-	M.
+Ilias Stamatis (6):
+  KVM: Fix coalesced_mmio_has_room()
+  KVM: Add KVM_CREATE_COALESCED_MMIO_BUFFER ioctl
+  KVM: Support poll() on coalesced mmio buffer fds
+  KVM: Add KVM_(UN)REGISTER_COALESCED_MMIO2 ioctls
+  KVM: Documentation: Document v2 of coalesced MMIO API
+  KVM: selftests: Add coalesced_mmio_test
 
-[1] https://static.sched.com/hosted_files/kvmforum2022/b4/NYSM-NYD-KVM-2022.pdf
+ Documentation/virt/kvm/api.rst                |  91 +++++
+ include/linux/kvm_host.h                      |   1 +
+ include/uapi/linux/kvm.h                      |  18 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/coalesced_mmio_test.c       | 310 ++++++++++++++++++
+ virt/kvm/coalesced_mmio.c                     | 202 +++++++++++-
+ virt/kvm/coalesced_mmio.h                     |  17 +-
+ virt/kvm/kvm_main.c                           |  40 ++-
+ 8 files changed, 659 insertions(+), 21 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/coalesced_mmio_test.c
 
 -- 
-Without deviation from the norm, progress is not possible.
+2.34.1
+
 
