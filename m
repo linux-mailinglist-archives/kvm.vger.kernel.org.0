@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-21379-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21380-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79D3392DCDC
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 01:44:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B289492DCE0
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 01:44:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35D9128351C
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:44:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E488C1C22268
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:44:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D184315A863;
-	Wed, 10 Jul 2024 23:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF4E115FCED;
+	Wed, 10 Jul 2024 23:42:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eEvDKZC0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cQ37ehsA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0B5C158A35
-	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 23:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0695815ECC0
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 23:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720654965; cv=none; b=WuunuAYyGwP6jsdJdvpffyvpmxTeO6m1oP4NrypU2IJI3pRViTkbiS8dd2/UF8QaGNkmgXNFT9Srf9knatkMIxstY4cZHjFjy4Wjr0L3n7+ESi+e0i7qkQjB6QOpk0PEPdLPuOYifSAouNkcq2p/9X/2qj6QwAuw8J8pmxasgTM=
+	t=1720654966; cv=none; b=Hshv5KyQ/cA2BrEzcOPbejnAUBcbiWAGe+WaE9MNZw+SyoSydns0r3rnuuA+AuWwgSvUOjLr1fydumStWzBV9X4HDzgT1Le8dpVqNseK8aj/ZRs+WydSHtTbAsDv+zS3Em4KCxL9Ly5jhJtzIsK6W5xxT43fETGyEg1EbrRD6BA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720654965; c=relaxed/simple;
-	bh=9qd4I5Nt4ZpEq1/DgTQG1WlNzpdV6maR7Ymqr0dBes4=;
+	s=arc-20240116; t=1720654966; c=relaxed/simple;
+	bh=oWnYdn0BgDHSxRNKslgfesdd9yEejwT/yhYAWEJx0EU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qx7+S6qPTbeVPOUpsX0I5lfNuAoaEwyKoZYiG7hcB1LRLTxa4l4heSrLikXJYSXk6BzMsSyKmk6hsKCA+8V3zC72cZ4XJPelY/UPiBH+wnymB4YbEckCOn7LRoblcwbM8VY+e3nom5TMhaG0iI4vUWl56ruyWLqkrzlSRGppUEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eEvDKZC0; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=nNPMy21RBqXvtMUU4yRCYOv9Elixnw2KaiSoozSfkd6glTLTgJjJAJLT0jIuNBc+aDhRSmUucDI9NCD0Y0ruyeE5Et93BXyyOzCWlI1RQkTVt6OkPXwl+pDe21zmLcBzhM07R+1IBsYOj9xRM9H87Q5jViQHtuDwQybV0lPXqNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cQ37ehsA; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e032d4cf26aso518572276.3
-        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 16:42:43 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-62d054b1ceeso4632767b3.2
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 16:42:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720654963; x=1721259763; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720654964; x=1721259764; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=d8Rmzp/FnvTnt3i+tgLuvGyYDZdc9771iECvmROSKp8=;
-        b=eEvDKZC0qcAwFW44NHp9Ty3319OenqXh6hjnUhLIDiyiwOJH8lphTbC+E1LPBwmDom
-         46LBH4m3KC8SMAX1CKZOsUWQiJb0q8OJWZJ1Jk6Ez+RJW5DeoVTY1M2EtUOQZ6x/871M
-         9/mTORt4Z78JiWwyLY3T8LWQW1UMFKLfSP9iKUD4JLiEeOBJbB+C42y4s5CPhQQSUfck
-         ZzdpNELz7exs9jZ/y4Gr+B8R3V6mWIzPXgoN5eIgH2KEHCPsfUcZiEy+aWLE8EebuCu2
-         629ewLBI/nvpxdjEkS7UATUHmt8Yh6K1/qqbPGpSZ+3tvKn+z0oBYn11CZtUbCfk/eE6
-         /lzw==
+        bh=W1e4HHE4z+5Knov3l2/RvFGqy44M6oXcmkh1U5rufQM=;
+        b=cQ37ehsAZHZ/fS5YDkSexvaRxXJno5PLOWbF8zdHMICrqwfOM6TRgcGsE89x2vuS72
+         qTVVdk4N0P//WDrPT0pDJTlOK+RrwdLAGNlO552d0ONRNWj/YLYAS18nI8inrML6kk1R
+         hgYgHZmesf7EtVfrnnZhNCURHJlggTCyyvHELrCfOKc8W7GX1ToTkM3HAoKtfcFQKtRe
+         uwoA01PReifS6nRjBcQqOLDYh81N1ussNCyn7BidgbzR3Pdg3TJ87VPyVb35DSw0E5Bp
+         uOmuVaKQayhqV+LX2NXp0cof9ZefM2SSQLQNeCQC9y/++tmRAcMQukN5VYYJkCXOcrzR
+         /AHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720654963; x=1721259763;
+        d=1e100.net; s=20230601; t=1720654964; x=1721259764;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=d8Rmzp/FnvTnt3i+tgLuvGyYDZdc9771iECvmROSKp8=;
-        b=fuFqxODsux8uzvvgoPmfs8fOq0W+0Vy9bvIYu76Y5I0Jkn7OP/dtUhJwqaiif8IDcQ
-         iThaq5VX/zvrQIul4wMQhZ/mIEKT/RDOvdLVtGxAUFYqJidWBTXUr+6bWUIBONC2k0bv
-         P8Ks6vbrfq19YxQvYC4Q7MpUWI+nzSj9A4KCTGQvkzMrys5QvH2RG9uEvUFFacE/5O4B
-         v2CzIz7lHU4Xhh1C9lOKHO2YZU7822lvxWuIn/w4ymP2rbTPHYeIihoYbZRLrOl+dEeX
-         Qgb3GOCwbh9vgXe4AeNOJRZP5Qvpg7a4iOJL3cftMXjtdtOAl/t+SsuSHRSF4LipIc86
-         XiRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWKYhSOS07rjGmyEnqWtQwOIyNNKJkNkjIMhqw1fMHj65rqrMNsail7OvVgdjL4amnE7S7evMaKXc0MqyJdB4hPLKUF
-X-Gm-Message-State: AOJu0YysOoaS3/3pv8advBbHJh9RPdOOtl4Zq0w2PMLjrSvtL16WkDPn
-	awCfCKbq4qthr4RNJx6+sAoAFHpcuEGHUJ/ckmRhcDbcyV8TB5TYRgfxOQ0panpQ4/wFCBTf++m
-	tBHOTF7yoO0YCylpKRA==
-X-Google-Smtp-Source: AGHT+IGzfu/is15/zbZN55ThZYoCmQ5oYPE0p+29NB0c/bvGkmqxURl5E0ogcz1hwkdaxZ/C24+OiRdX8VZRICmx
+        bh=W1e4HHE4z+5Knov3l2/RvFGqy44M6oXcmkh1U5rufQM=;
+        b=NEMQq9f2+jMmPaWFEhVx5hcvpFSwrfNFYAFW31LR12qnwqw77QEoXsJT+/ZSZHA1h9
+         BdEkmVOcVVWkaoQtDdI0hZRvg+OMKK/D2HpNoNmOXJ0y9MZNAYtDroH0fNt10+wHovVJ
+         +QD0synHi4bHsOtY8IrjBOfEs3dU05sy3xlWuVm91UuOlL8M4ZkB+Kz5rprK0n9sfsCl
+         zUryvdjBNm+WZEAGXBqaWGKDjFxH1nlrzkcaC+nfpiZH2ijJP6gObCLmBBfRtIfaJ0nw
+         Qv5DjdL5LPMYSU5yHbEu/L6EZ8yuNSkv/EkeioRGcMZLZHP7/v8xeIGZIHdc9Q9AeScg
+         ZQKg==
+X-Forwarded-Encrypted: i=1; AJvYcCXKN2PO3SEpek4fMgt48U2PIve4UREAAVpulXydgdVJucTcB5LxdrcDJy44xcSFWJQZvrWjDehAaOQF5m9dD+qfmBrA
+X-Gm-Message-State: AOJu0Yxk+x/xKO1MJQkygExWrWeFnRizIed/k05yJSuGLuxSQhmRZWx3
+	PInmHnPP4fsZTC+tXYM30XKETstFhebocQTKMGTGfFSQH7ALgj634HlGrc0nXW36+Netza8vZoZ
+	YWpWozmihXAqEzibhxQ==
+X-Google-Smtp-Source: AGHT+IH5NTISR7DBZbSKRJUHRXFWyLuVrVBePrqFfNwytKF1BLIU+MNslDD3lgHeZpjWWwkTnE/TGMGwZ5jaEHpH
 X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
- (user=jthoughton job=sendgmr) by 2002:a05:6902:2101:b0:e03:31ec:8a24 with
- SMTP id 3f1490d57ef6-e041b17dfb5mr382792276.8.1720654962919; Wed, 10 Jul 2024
- 16:42:42 -0700 (PDT)
-Date: Wed, 10 Jul 2024 23:42:09 +0000
+ (user=jthoughton job=sendgmr) by 2002:a05:690c:7244:b0:62f:22cd:7082 with
+ SMTP id 00721157ae682-658f01f530bmr1591717b3.5.1720654963909; Wed, 10 Jul
+ 2024 16:42:43 -0700 (PDT)
+Date: Wed, 10 Jul 2024 23:42:10 +0000
 In-Reply-To: <20240710234222.2333120-1-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240710234222.2333120-1-jthoughton@google.com>
 X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240710234222.2333120-6-jthoughton@google.com>
-Subject: [RFC PATCH 05/18] KVM: Add KVM_PFN_ERR_USERFAULT
+Message-ID: <20240710234222.2333120-7-jthoughton@google.com>
+Subject: [RFC PATCH 06/18] KVM: Add KVM_MEMORY_EXIT_FLAG_USERFAULT
 From: James Houghton <jthoughton@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
@@ -87,50 +87,26 @@ Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
 	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-When a GFN -> HVA translation (__gfn_to_hva_many()) fails with
-KVM_HVA_ERR_USERFAULT as part of a GFN -> PFN conversion
-(__gfn_to_pfn_memslot()), we need to return some kind of KVM_PFN_ERR.
-
-Introduce a new KVM_PFN_ERR_USERFAULT so that callers know that it is a
-userfault.
+This is needed to support returning to userspace when a vCPU attempts to
+access a userfault gfn.
 
 Signed-off-by: James Houghton <jthoughton@google.com>
 ---
- include/linux/kvm_host.h | 1 +
- virt/kvm/kvm_main.c      | 8 +++++---
- 2 files changed, 6 insertions(+), 3 deletions(-)
+ include/uapi/linux/kvm.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index 4cca896fb44a..2005906c78c8 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -97,6 +97,7 @@
- #define KVM_PFN_ERR_HWPOISON	(KVM_PFN_ERR_MASK + 1)
- #define KVM_PFN_ERR_RO_FAULT	(KVM_PFN_ERR_MASK + 2)
- #define KVM_PFN_ERR_SIGPENDING	(KVM_PFN_ERR_MASK + 3)
-+#define KVM_PFN_ERR_USERFAULT	(KVM_PFN_ERR_MASK + 4)
- 
- /*
-  * error pfns indicate that the gfn is in slot but faild to
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index 758deb90a050..840e02c75fe3 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3009,9 +3009,11 @@ kvm_pfn_t __gfn_to_pfn_memslot(const struct kvm_memory_slot *slot, gfn_t gfn,
- 	if (kvm_is_error_hva(addr)) {
- 		if (writable)
- 			*writable = false;
--
--		return addr == KVM_HVA_ERR_RO_BAD ? KVM_PFN_ERR_RO_FAULT :
--						    KVM_PFN_NOSLOT;
-+		if (addr == KVM_HVA_ERR_RO_BAD)
-+			return KVM_PFN_ERR_RO_FAULT;
-+		if (addr == KVM_HVA_ERR_USERFAULT)
-+			return KVM_PFN_ERR_USERFAULT;
-+		return KVM_PFN_NOSLOT;
- 	}
- 
- 	/* Do not map writable pfn in the readonly memslot. */
+diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
+index c84c24a9678e..6aa99b4587c6 100644
+--- a/include/uapi/linux/kvm.h
++++ b/include/uapi/linux/kvm.h
+@@ -429,6 +429,7 @@ struct kvm_run {
+ 		/* KVM_EXIT_MEMORY_FAULT */
+ 		struct {
+ #define KVM_MEMORY_EXIT_FLAG_PRIVATE	(1ULL << 3)
++#define KVM_MEMORY_EXIT_FLAG_USERFAULT	(1ULL << 4)
+ 			__u64 flags;
+ 			__u64 gpa;
+ 			__u64 size;
 -- 
 2.45.2.993.g49e7a77208-goog
 
