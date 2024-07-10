@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-21350-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21351-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4486092DAD0
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:28:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D97EF92DAD1
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 23:28:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0A841F22C03
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 21:28:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16A061C21496
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 21:28:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADD7158DB2;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FCC15A858;
 	Wed, 10 Jul 2024 21:26:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hnfiiuMR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hREZIi62"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34CDD14A4C8;
-	Wed, 10 Jul 2024 21:26:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D17F814B943;
+	Wed, 10 Jul 2024 21:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720646763; cv=none; b=sRinwG6RigwcbuNQqQsWYp+rgl4y7+LhfvMMgnn5CkfO2upwpahmJUSzKWCW3ppOfPS+33kZT0/46HJTZZH5oozwRcF2143kfrhe2s80MtPeREwvKMsvpokLoZ3wn7HaMShExZTNEcDVmyIM9ZLZKeEmjaVMyAP0Rvo3zSuVGgM=
+	t=1720646763; cv=none; b=N2IEf7ZwvAOOcYr4Q1h61hxdVsKB0eXcLnnqbFRFWPz1F+U237WmYtS/m/1KbYtitoxCHuljvXRBA7ClpeqaR3wrPDb2kdA1qXFR/RNEwBoDCKCitdck+3+BvYeUoXKHc+R5wbBBtq+W33nLfVM5U9pmcq+ZdTww3fDNaw+Nx2Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1720646763; c=relaxed/simple;
-	bh=LyJH2hBBhnOgPmwJMZXReqHovO0qHkbDTNVOj1OTcAE=;
+	bh=UfwlPBtk149XzS/tcMuqUXOpP079VnWFi28qU26z4ck=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=q1Q10HIlEGQwaNgXfpHJ74WTCwadtG0jUyyxBpa6czSbX2EskRF5NN99EIqXbIJ4X8dhrx5+ZaOPtOoWyvArCe5Q24fX1olA2dSShya0EpwBD5UP+JwEakZUeFLf9Hhbigjr5VMPmA1qY1fbObRn3s5hjuPnKvrT5Gk+Hr5Wtgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hnfiiuMR; arc=none smtp.client-ip=209.85.222.169
+	 MIME-Version; b=jcdLL/TOaz7o6XYgK5lHEh4oF8YlApVmC/PTjacrgkTWs9AGvSoOfLU4oaf9VDHvE0T4q61j81SvJO3+5NAgThEhbqDQmXAhc2zcDRoDQWSZI5lBnC9z+ab6nsIChjEvNdGxJpvjFk/6vP+FPTmfmKnm0/oKXO/yJnZutMpNoqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hREZIi62; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-79f1be45ca8so14204685a.3;
-        Wed, 10 Jul 2024 14:26:00 -0700 (PDT)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7a05b7c8e38so15094085a.0;
+        Wed, 10 Jul 2024 14:26:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720646760; x=1721251560; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1720646761; x=1721251561; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KxKcfYe0aTkG2Qtc9qYf7tn4S8PrvFN6AZU5pXvNhSU=;
-        b=hnfiiuMR82fMXGM8xKw7K4Y1iR7LSqiGSRrHd3FW8keGIhyFU87+6b7TbLPN9b5OTS
-         9LUbR/5Gf6Ovw1HR39y+hDeddIH2Rtb4igELUunZmtml8Fn77t3z8pM5UA4ShgSzNz5d
-         25+La4cHsoweeJd1bVhx/CfBr0+MAaP7Y40xlc2JsWlMH/VgEaO2FAWYm29l71uLJE11
-         EvSfxSYGpXZMjLfY4c0CwLW7YdZ8ticyCfzWmwI4d7JjMEHHGaTwEQJlCQtVi6QhhItS
-         n4kM0Hg8p8SIuw52+EterK7e+tk5oE0dmnYSsQ20v6naCj4Sx8mP0F4CqisdTn05DjtU
-         pRmw==
+        bh=BJWi8Leq2jo3M3Yc8XcwnzkcrKsxdOFNGRCXzkErj3E=;
+        b=hREZIi62+exxFbPdFihwK7zhI1JD35yBcnGfImJNcyYmsDZCZxWBu00lxjr4WTkEbM
+         X//gdNVT4JBmwrww60uspbZkVYl1fXkbbWsSzt1c3aYj1D2OBobFxu7suadKXXq1WlY0
+         AjXBKLq7LjSnxeDfZrDoTjvhOEOBglUQAh6aagoxaYDec2YRFULy+K/7qLaA6VtqNxn3
+         VMpBKaMyWtdcRkAsF3VMXcglgkgQygS2GNjJAoPa+pg+PWXZjWSPgpogVFvawq+39Y3r
+         vMyz6xXzGOEn1PvnmpZCsOnZZe+i1onYiBegZtuLEcBB9cs0vb6ZCjXd09rP186sZp23
+         mBGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720646760; x=1721251560;
+        d=1e100.net; s=20230601; t=1720646761; x=1721251561;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KxKcfYe0aTkG2Qtc9qYf7tn4S8PrvFN6AZU5pXvNhSU=;
-        b=H6sDc6TRrrQYRvOYiI+EaBw1roUZTbaOGg8zmgSBSTRkUpTF6zYGpTUUQVF1M4SQ3A
-         84DOBwLziJ7rUNNxOqy+QuNP73MgxAKsMn5kbJcnTXEb9GoJWL16NjjEt1O3TGfc+rIA
-         OA4WGjZQdAWgsRtsjLp1NUCs2FXUmPDfu7NvvKOUIhDYnrY4PYsKgUB4rHE3OF+03vzp
-         mdCeKRZ1oqfl+alIkDqzCAi3CmcFuy8svpd6cbXHNf2zuaF8x/b767RYNKmZs3a6uT0P
-         Co8kt3u9JPAcj7E47UweDtReGOch+3vjWSSgBHGRq/xFkUd/V7W5BqKPc32fhtSwsbyE
-         6cjg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5ggMShb91EwO5HOIbfYE+he1N6sAv2sCIdzHwnmuSen1yyo3KRO3im86ycmzL6grSd1JIWgxWT+yfnsJZKh92SPHTuZWIVZag+qqIld0jFBXyENh+5LIC131K4uHpsELgJOgNswa5XlYQgRJgWkBvJZqQHvAgkH97wRnHcTSQaS8H/T4DILlnfiu4m9woEKaEkQD6FdpBA+mxUTyqC5Fl8+Wf1dzqn57XJh8z
-X-Gm-Message-State: AOJu0Yz3ZFnA2BDXVi+1/h97D3f24f6eZ4rZ60nD0TjkdDnAQIcfzvjY
-	Bt8yMujz0+wx7bvf4u9lOI53R+ucB4OWNvtn2G8V7PO0zN5xkNiO
-X-Google-Smtp-Source: AGHT+IF6x1tIBL/6HRZ76/k84A0vB251Ob+fzT6he8zcBfDrLo9SHcbTtQSiMBBYeiAZryPfmYl48A==
-X-Received: by 2002:a05:620a:2186:b0:79c:119e:2b44 with SMTP id af79cd13be357-79f19a51d7fmr733109885a.3.1720646759964;
-        Wed, 10 Jul 2024 14:25:59 -0700 (PDT)
+        bh=BJWi8Leq2jo3M3Yc8XcwnzkcrKsxdOFNGRCXzkErj3E=;
+        b=sTMG2yFjSp1NnrTwriIGk2LWCPWY2EPnEczBZCYnevFVYcssV55OluAn9raMrhrBrX
+         Ds8A2eHw8WbAwgg40cyNmUyUmY+eGdR4uIaUeYs+65zHmouTUgFrPtqS0uJd00H2Ouyr
+         TQLn2JtrU3pd+PK7c1ytGu/c827pxHe1trdiaV1OzBgeTtJbAD3L+7FENi3vSW5GAuLY
+         4gAkaICj3ZCzxJEMSXwbDX+uU7rU46ClaXZFVbqKW3DX9qTJaVNcQYuw1jW5cboROQjI
+         MuyVenW/EOkTAkQsszawsQK5743j1cOt5KdxA9Wtu9YpqnOysm855KikJD123RXyxIby
+         rnNg==
+X-Forwarded-Encrypted: i=1; AJvYcCUk2XCuOWQUhEQ9TXuVAd/KyXRpuTiESGMq1f/GADsgO4xM853gtCx8bcxO8MxT4LwK2s1VsO8ow0K0llKDE2egLvLGVi+NGuZfpg1NgZVHoJxXDNg8fHFUr6Odw5LUHGGpLkSExzTSpAJbEZ2rHb2P7g15dACC3V4j+yHsLdakrZtaFEj5/T8GfyuH2Eo/eyoB4NFisVY51I8pL/ydxcFPwf7f5MuUp2S7QzMs
+X-Gm-Message-State: AOJu0Ywg5jRlGeU49WOPw66yDbnHbVfbSVYI65BgLFzmAtRAWzwqgy9K
+	TAcPI5TzmWifM0/rmNX1hzNUyn+4tg/Vtzkh6LIzR8gdSuXld1cG
+X-Google-Smtp-Source: AGHT+IEeRGnHtiCEw+KM2q98xiDSRuWiiJOOgf2jpC5OHvHQB6LFE7ca10rhiE0Y5d3kMoOxfyhvtw==
+X-Received: by 2002:a05:620a:2186:b0:79c:119e:2b44 with SMTP id af79cd13be357-79f19a51d7fmr733112885a.3.1720646760834;
+        Wed, 10 Jul 2024 14:26:00 -0700 (PDT)
 Received: from n36-183-057.byted.org ([130.44.215.118])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f190b0af1sm228791885a.122.2024.07.10.14.25.59
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f190b0af1sm228791885a.122.2024.07.10.14.26.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Jul 2024 14:25:59 -0700 (PDT)
+        Wed, 10 Jul 2024 14:26:00 -0700 (PDT)
 From: Amery Hung <ameryhung@gmail.com>
 X-Google-Original-From: Amery Hung <amery.hung@bytedance.com>
 To: stefanha@redhat.com,
@@ -99,9 +99,9 @@ Cc: dan.carpenter@linaro.org,
 	amery.hung@bytedance.com,
 	ameryhung@gmail.com,
 	xiyou.wangcong@gmail.com
-Subject: [RFC PATCH net-next v6 05/14] af_vsock: use a separate dgram bind table
-Date: Wed, 10 Jul 2024 21:25:46 +0000
-Message-Id: <20240710212555.1617795-6-amery.hung@bytedance.com>
+Subject: [RFC PATCH net-next v6 06/14] virtio/vsock: add VIRTIO_VSOCK_TYPE_DGRAM
+Date: Wed, 10 Jul 2024 21:25:47 +0000
+Message-Id: <20240710212555.1617795-7-amery.hung@bytedance.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20240710212555.1617795-1-amery.hung@bytedance.com>
 References: <20240710212555.1617795-1-amery.hung@bytedance.com>
@@ -115,207 +115,27 @@ Content-Transfer-Encoding: 8bit
 
 From: Bobby Eshleman <bobby.eshleman@bytedance.com>
 
-This commit adds support for bound dgram sockets to be tracked in a
-separate bind table from connectible sockets in order to avoid address
-collisions. With this commit, users can simultaneously bind a dgram
-socket and connectible socket to the same CID and port.
+This commit adds the datagram packet type for inclusion in virtio vsock
+packet headers. It is included here as a standalone commit because
+multiple future but distinct commits depend on it.
 
 Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
 ---
- net/vmw_vsock/af_vsock.c | 103 +++++++++++++++++++++++++++++----------
- 1 file changed, 76 insertions(+), 27 deletions(-)
+ include/uapi/linux/virtio_vsock.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index d571be9cdbf0..ab08cd81720e 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -10,18 +10,23 @@
-  * - There are two kinds of sockets: those created by user action (such as
-  * calling socket(2)) and those created by incoming connection request packets.
-  *
-- * - There are two "global" tables, one for bound sockets (sockets that have
-- * specified an address that they are responsible for) and one for connected
-- * sockets (sockets that have established a connection with another socket).
-- * These tables are "global" in that all sockets on the system are placed
-- * within them. - Note, though, that the bound table contains an extra entry
-- * for a list of unbound sockets and SOCK_DGRAM sockets will always remain in
-- * that list. The bound table is used solely for lookup of sockets when packets
-- * are received and that's not necessary for SOCK_DGRAM sockets since we create
-- * a datagram handle for each and need not perform a lookup.  Keeping SOCK_DGRAM
-- * sockets out of the bound hash buckets will reduce the chance of collisions
-- * when looking for SOCK_STREAM sockets and prevents us from having to check the
-- * socket type in the hash table lookups.
-+ * - There are three "global" tables, one for bound connectible (stream /
-+ * seqpacket) sockets, one for bound datagram sockets, and one for connected
-+ * sockets. Bound sockets are sockets that have specified an address that
-+ * they are responsible for. Connected sockets are sockets that have
-+ * established a connection with another socket. These tables are "global" in
-+ * that all sockets on the system are placed within them. - Note, though,
-+ * that the bound tables contain an extra entry for a list of unbound
-+ * sockets. The bound tables are used solely for lookup of sockets when packets
-+ * are received.
-+ *
-+ * - There are separate bind tables for connectible and datagram sockets to avoid
-+ * address collisions between stream/seqpacket sockets and datagram sockets.
-+ *
-+ * - Transports may elect to NOT use the global datagram bind table by
-+ * implementing the ->dgram_bind() callback. If that callback is implemented,
-+ * the global bind table is not used and the responsibility of bound datagram
-+ * socket tracking is deferred to the transport.
-  *
-  * - Sockets created by user action will either be "client" sockets that
-  * initiate a connection or "server" sockets that listen for connections; we do
-@@ -116,6 +121,7 @@
- static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
- static void vsock_sk_destruct(struct sock *sk);
- static int vsock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb);
-+static bool sock_type_connectible(u16 type);
+diff --git a/include/uapi/linux/virtio_vsock.h b/include/uapi/linux/virtio_vsock.h
+index 64738838bee5..331be28b1d30 100644
+--- a/include/uapi/linux/virtio_vsock.h
++++ b/include/uapi/linux/virtio_vsock.h
+@@ -69,6 +69,7 @@ struct virtio_vsock_hdr {
+ enum virtio_vsock_type {
+ 	VIRTIO_VSOCK_TYPE_STREAM = 1,
+ 	VIRTIO_VSOCK_TYPE_SEQPACKET = 2,
++	VIRTIO_VSOCK_TYPE_DGRAM = 3,
+ };
  
- /* Protocol family. */
- struct proto vsock_proto = {
-@@ -152,21 +158,25 @@ static DEFINE_MUTEX(vsock_register_mutex);
-  * VSocket is stored in the connected hash table.
-  *
-  * Unbound sockets are all put on the same list attached to the end of the hash
-- * table (vsock_unbound_sockets).  Bound sockets are added to the hash table in
-- * the bucket that their local address hashes to (vsock_bound_sockets(addr)
-- * represents the list that addr hashes to).
-+ * tables (vsock_unbound_sockets/vsock_unbound_dgram_sockets).  Bound sockets
-+ * are added to the hash table in the bucket that their local address hashes to
-+ * (vsock_bound_sockets(addr) and vsock_bound_dgram_sockets(addr) represents
-+ * the list that addr hashes to).
-  *
-- * Specifically, we initialize the vsock_bind_table array to a size of
-- * VSOCK_HASH_SIZE + 1 so that vsock_bind_table[0] through
-- * vsock_bind_table[VSOCK_HASH_SIZE - 1] are for bound sockets and
-- * vsock_bind_table[VSOCK_HASH_SIZE] is for unbound sockets.  The hash function
-- * mods with VSOCK_HASH_SIZE to ensure this.
-+ * Specifically, taking connectible sockets as an example we initialize the
-+ * vsock_bind_table array to a size of VSOCK_HASH_SIZE + 1 so that
-+ * vsock_bind_table[0] through vsock_bind_table[VSOCK_HASH_SIZE - 1] are for
-+ * bound sockets and vsock_bind_table[VSOCK_HASH_SIZE] is for unbound sockets.
-+ * The hash function mods with VSOCK_HASH_SIZE to ensure this.
-+ * Datagrams and vsock_dgram_bind_table operate in the same way.
-  */
- #define MAX_PORT_RETRIES        24
- 
- #define VSOCK_HASH(addr)        ((addr)->svm_port % VSOCK_HASH_SIZE)
- #define vsock_bound_sockets(addr) (&vsock_bind_table[VSOCK_HASH(addr)])
-+#define vsock_bound_dgram_sockets(addr) (&vsock_dgram_bind_table[VSOCK_HASH(addr)])
- #define vsock_unbound_sockets     (&vsock_bind_table[VSOCK_HASH_SIZE])
-+#define vsock_unbound_dgram_sockets     (&vsock_dgram_bind_table[VSOCK_HASH_SIZE])
- 
- /* XXX This can probably be implemented in a better way. */
- #define VSOCK_CONN_HASH(src, dst)				\
-@@ -182,6 +192,8 @@ struct list_head vsock_connected_table[VSOCK_HASH_SIZE];
- EXPORT_SYMBOL_GPL(vsock_connected_table);
- DEFINE_SPINLOCK(vsock_table_lock);
- EXPORT_SYMBOL_GPL(vsock_table_lock);
-+static struct list_head vsock_dgram_bind_table[VSOCK_HASH_SIZE + 1];
-+static DEFINE_SPINLOCK(vsock_dgram_table_lock);
- 
- /* Autobind this socket to the local address if necessary. */
- static int vsock_auto_bind(struct vsock_sock *vsk)
-@@ -204,6 +216,9 @@ static void vsock_init_tables(void)
- 
- 	for (i = 0; i < ARRAY_SIZE(vsock_connected_table); i++)
- 		INIT_LIST_HEAD(&vsock_connected_table[i]);
-+
-+	for (i = 0; i < ARRAY_SIZE(vsock_dgram_bind_table); i++)
-+		INIT_LIST_HEAD(&vsock_dgram_bind_table[i]);
- }
- 
- static void __vsock_insert_bound(struct list_head *list,
-@@ -271,13 +286,28 @@ static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
- 	return NULL;
- }
- 
--static void vsock_insert_unbound(struct vsock_sock *vsk)
-+static void __vsock_insert_dgram_unbound(struct vsock_sock *vsk)
-+{
-+	spin_lock_bh(&vsock_dgram_table_lock);
-+	__vsock_insert_bound(vsock_unbound_dgram_sockets, vsk);
-+	spin_unlock_bh(&vsock_dgram_table_lock);
-+}
-+
-+static void __vsock_insert_connectible_unbound(struct vsock_sock *vsk)
- {
- 	spin_lock_bh(&vsock_table_lock);
- 	__vsock_insert_bound(vsock_unbound_sockets, vsk);
- 	spin_unlock_bh(&vsock_table_lock);
- }
- 
-+static void vsock_insert_unbound(struct vsock_sock *vsk)
-+{
-+	if (sock_type_connectible(sk_vsock(vsk)->sk_type))
-+		__vsock_insert_connectible_unbound(vsk);
-+	else
-+		__vsock_insert_dgram_unbound(vsk);
-+}
-+
- void vsock_insert_connected(struct vsock_sock *vsk)
- {
- 	struct list_head *list = vsock_connected_sockets(
-@@ -289,6 +319,14 @@ void vsock_insert_connected(struct vsock_sock *vsk)
- }
- EXPORT_SYMBOL_GPL(vsock_insert_connected);
- 
-+static void vsock_remove_dgram_bound(struct vsock_sock *vsk)
-+{
-+	spin_lock_bh(&vsock_dgram_table_lock);
-+	if (__vsock_in_bound_table(vsk))
-+		__vsock_remove_bound(vsk);
-+	spin_unlock_bh(&vsock_dgram_table_lock);
-+}
-+
- void vsock_remove_bound(struct vsock_sock *vsk)
- {
- 	spin_lock_bh(&vsock_table_lock);
-@@ -340,7 +378,10 @@ EXPORT_SYMBOL_GPL(vsock_find_connected_socket);
- 
- void vsock_remove_sock(struct vsock_sock *vsk)
- {
--	vsock_remove_bound(vsk);
-+	if (sock_type_connectible(sk_vsock(vsk)->sk_type))
-+		vsock_remove_bound(vsk);
-+	else
-+		vsock_remove_dgram_bound(vsk);
- 	vsock_remove_connected(vsk);
- }
- EXPORT_SYMBOL_GPL(vsock_remove_sock);
-@@ -746,11 +787,19 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
- 	return vsock_bind_common(vsk, addr, vsock_bind_table, VSOCK_HASH_SIZE + 1);
- }
- 
--static int __vsock_bind_dgram(struct vsock_sock *vsk,
--			      struct sockaddr_vm *addr)
-+static int vsock_bind_dgram(struct vsock_sock *vsk,
-+			    struct sockaddr_vm *addr)
- {
--	if (!vsk->transport || !vsk->transport->dgram_bind)
--		return -EINVAL;
-+	if (!vsk->transport || !vsk->transport->dgram_bind) {
-+		int retval;
-+
-+		spin_lock_bh(&vsock_dgram_table_lock);
-+		retval = vsock_bind_common(vsk, addr, vsock_dgram_bind_table,
-+					   VSOCK_HASH_SIZE);
-+		spin_unlock_bh(&vsock_dgram_table_lock);
-+
-+		return retval;
-+	}
- 
- 	return vsk->transport->dgram_bind(vsk, addr);
- }
-@@ -781,7 +830,7 @@ static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr)
- 		break;
- 
- 	case SOCK_DGRAM:
--		retval = __vsock_bind_dgram(vsk, addr);
-+		retval = vsock_bind_dgram(vsk, addr);
- 		break;
- 
- 	default:
+ enum virtio_vsock_op {
 -- 
 2.20.1
 
