@@ -1,180 +1,141 @@
-Return-Path: <kvm+bounces-21270-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21271-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD1BC92CB4C
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 08:46:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1433292CBBE
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 09:15:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D53A2848AA
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 06:46:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FBDE1C2277D
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 07:15:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C2E871747;
-	Wed, 10 Jul 2024 06:46:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CDE37D095;
+	Wed, 10 Jul 2024 07:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KOp9rJI4"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2BB024A08
-	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 06:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55CE53BB24
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 07:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720593963; cv=none; b=ezEp1Olb8h57Bo6alKKJypZgwnJZoqZqS1ggpHDIP6zzCm3LnVuq1kTPAadeKcxfyRyLRY6kyyPzRvdRTCCH9NHupvzrshJl2YFHFdj/k3ZyWjE/DCtKIgPZQS3UOJP25ggxpSmKQwhztLKU0Tnnl4G3ntpJ14r6q1M6yrUFH+A=
+	t=1720595724; cv=none; b=Ag7HWjDRUU+op9NuK3sSmrZ1huSAkXi73TtR73bTyQje9t2/UiDJNSbZx4nHfA6dgG9CB9O/cEkRfPF+hwFA44GO/eGX5kG5DZCaJGZWJDE83jdHfNl1j/dKZlxRTEjg/ADy9oQJCym1yOFe5fQHLI2Zv5Jbk6A3ZYJXom4UK5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720593963; c=relaxed/simple;
-	bh=rjxdIKcaUXlPXDV1eujiA5N1EnyN7T2oOR3DLcoxbvY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=BSGN9rV5kOP4IZGZQgN/vsUUBHhjXaj9D2c12arE/HavEn5wRA7Jc7sm/a1jlSwd4ylAFWqbbkMwFX7S7RaqvYPSA9r/rzx7Jq+So5laxZ4+hr+H6pBcxgOsXgiPYR/Jlyy+T1MXB6O5xGRXc0g0ZlvZcNHS4k9PcB6vRr9heeI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4WJpDp58XXzQkM5;
-	Wed, 10 Jul 2024 14:42:02 +0800 (CST)
-Received: from kwepemd500014.china.huawei.com (unknown [7.221.188.63])
-	by mail.maildlp.com (Postfix) with ESMTPS id 578CF140416;
-	Wed, 10 Jul 2024 14:45:58 +0800 (CST)
-Received: from [10.67.146.137] (10.67.146.137) by
- kwepemd500014.china.huawei.com (7.221.188.63) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 10 Jul 2024 14:45:52 +0800
-Subject: Re: [PATCH v3 00/17] KVM: arm64: Allow using VHE in the nVHE
- hypervisor
-To: Marc Zyngier <maz@kernel.org>, <kvmarm@lists.linux.dev>,
-	<kvm@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
-CC: James Morse <james.morse@arm.com>, Suzuki K Poulose
-	<suzuki.poulose@arm.com>, Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu
-	<yuzenghui@huawei.com>, Quentin Perret <qperret@google.com>, Will Deacon
-	<will@kernel.org>, Fuad Tabba <tabba@google.com>, "guoyang (C)"
-	<guoyang2@huawei.com>
-References: <20230609162200.2024064-1-maz@kernel.org>
-From: Tangnianyao <tangnianyao@huawei.com>
-Message-ID: <5ab07210-ad44-616c-cd15-0ac954453fcf@huawei.com>
-Date: Wed, 10 Jul 2024 14:45:52 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.1
+	s=arc-20240116; t=1720595724; c=relaxed/simple;
+	bh=AnJb7O8b/znRdfwu40rOZE7kXkU+ieaNdv4lccuKtJc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A0hfwHQgjx8IRP8eAYQIJmW7fzl1TQt2DbV2MPJhJV5W2mWdbVxNM8k+8q8+g+gMDinIZCNiS3r6AqqRTfBe2K8dsueLU9mCa/7VXX9qiqGedfbM46Jg4F0hKQ9sE3MQmonlLvlFxJR/VuLH0os3JXX8Z/YEXOom0izlpnUboVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KOp9rJI4; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720595721;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=UMU3qVQQd5gCJgegoVmffWhIQ56IyxVkzgTRd1PnKFg=;
+	b=KOp9rJI4fAthjDXUVa39FOnFI77n41GB6YR9RQRoni9MRC1pOnqy93Whzi96WutLJuIhZi
+	/dGwIWp3p5gFNikN8Fg+UpCAVe9k2EmZ6x/p2Huo37xhUVJOL9tWWvj0no+4qHCaWo8+5t
+	M2sr2hHq8YYBU2fIS3n6wR6ctrOVZgE=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-29-yA7hdqIgMt63u7YsDBHEqw-1; Wed,
+ 10 Jul 2024 03:15:17 -0400
+X-MC-Unique: yA7hdqIgMt63u7YsDBHEqw-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 544C81955BCE;
+	Wed, 10 Jul 2024 07:15:16 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.46])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A724E19560AE;
+	Wed, 10 Jul 2024 07:15:14 +0000 (UTC)
+Date: Wed, 10 Jul 2024 08:15:11 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, Paolo Bonzini <pbonzini@redhat.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH v2] i386/sev: Don't allow automatic fallback to legacy
+ KVM_SEV*_INIT
+Message-ID: <Zo40_2e1I4gXdNxx@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240710041005.83720-1-michael.roth@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230609162200.2024064-1-maz@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemd500014.china.huawei.com (7.221.188.63)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240710041005.83720-1-michael.roth@amd.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Hi Marz,
+On Tue, Jul 09, 2024 at 11:10:05PM -0500, Michael Roth wrote:
+> Currently if the 'legacy-vm-type' property of the sev-guest object is
+> 'on', QEMU will attempt to use the newer KVM_SEV_INIT2 kernel
+> interface in conjunction with the newer KVM_X86_SEV_VM and
+> KVM_X86_SEV_ES_VM KVM VM types.
+> 
+> This can lead to measurement changes if, for instance, an SEV guest was
+> created on a host that originally had an older kernel that didn't
+> support KVM_SEV_INIT2, but is booted on the same host later on after the
+> host kernel was upgraded.
+> 
+> Instead, if legacy-vm-type is 'off', QEMU should fail if the
+> KVM_SEV_INIT2 interface is not provided by the current host kernel.
+> Modify the fallback handling accordingly.
+> 
+> In the future, VMSA features and other flags might be added to QEMU
+> which will require legacy-vm-type to be 'off' because they will rely
+> on the newer KVM_SEV_INIT2 interface. It may be difficult to convey to
+> users what values of legacy-vm-type are compatible with which
+> features/options, so as part of this rework, switch legacy-vm-type to a
+> tri-state OnOffAuto option. 'auto' in this case will automatically
+> switch to using the newer KVM_SEV_INIT2, but only if it is required to
+> make use of new VMSA features or other options only available via
+> KVM_SEV_INIT2.
+> 
+> Defining 'auto' in this way would avoid inadvertantly breaking
+> compatibility with older kernels since it would only be used in cases
+> where users opt into newer features that are only available via
+> KVM_SEV_INIT2 and newer kernels, and provide better default behavior
+> than the legacy-vm-type=off behavior that was previously in place, so
+> make it the default for 9.1+ machine types.
+> 
+> Cc: Daniel P. Berrangé <berrange@redhat.com>
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> cc: kvm@vger.kernel.org
+> Signed-off-by: Michael Roth <michael.roth@amd.com>
+> ---
+> v2:
+>   - switch to OnOffAuto for legacy-vm-type 'property'
+>   - make 'auto' the default for 9.1+, which will automatically use
+>     KVM_SEV_INIT2 when strictly required by a particular set of options,
+>     but will otherwise keep using the legacy interface.
+> 
+>  hw/i386/pc.c      |  2 +-
+>  qapi/qom.json     | 18 ++++++----
+>  target/i386/sev.c | 85 +++++++++++++++++++++++++++++++++++++++--------
+>  3 files changed, 83 insertions(+), 22 deletions(-)
 
-I'm trying to learn pKVM and have a question.
-
-Why pKVM developed on E2H=0 firstly? It tried to avoid host access guest memory
-
-with stage2 translation, and it seems not necessarily rely on HCR_EL2.E2H=0.
-
-Is hVHE an alternative plan of pKVM ? To allow pKVM run on E2H res1 system ?
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
 
 
-Thanks for your help.
-
-Nianyao Tang.
-
-
-On 6/10/2023 0:21, Marc Zyngier wrote:
-> KVM (on ARMv8.0) and pKVM (on all revisions of the architecture) use
-> the split hypervisor model that makes the EL2 code more or less
-> standalone. In the later case, we totally ignore the VHE mode and
-> stick with the good old v8.0 EL2 setup.
->
-> This is all good, but means that the EL2 code is limited in what it
-> can do with its own address space. This series proposes to remove this
-> limitation and to allow VHE to be used even with the split hypervisor
-> model. This has some potential isolation benefits[1], and eventually
-> allow systems that do not support HCR_EL2.E2H==0 to run pKVM.
->
-> We introduce a new "mode" for KVM called hVHE, in reference to the
-> nVHE mode, and indicating that only the hypervisor is using VHE. Note
-> that this is all this series does. No effort is made to improve the VA
-> space management, which will be the subject of another series if this
-> one ever makes it.
->
-> This has been tested on a M1 box (bare metal) as well as as a nested
-> guest on M2, both with the standard nVHE and protected modes, with no
-> measurable change in performance.
->
-> Note: the last patch of this series is not a merge candidate.
->
-> Thanks,
->
->         M.
->
-> [1] https://www.youtube.com/watch?v=1F_Mf2j9eIo&list=PLbzoR-pLrL6qWL3v2KOcvwZ54-w0z5uXV&index=11
->
-> * From v2:
->   - Use BUILD_BUG_ON() to prevent the use of is_kernel_in_hyp_mode()
->     form hypervisor context
->   - Validate that all CPUs are VHE-capable before flipping the
->     capability
->
-> * From v1:
->   - Fixed CNTHCTL_EL2 setup when switching from E2H=0 to E2H=1
->     Amusingly, this was found on NV...
->   - Rebased on 6.4-rc2
->
-> Marc Zyngier (17):
->   KVM: arm64: Drop is_kernel_in_hyp_mode() from
->     __invalidate_icache_guest_page()
->   arm64: Prevent the use of is_kernel_in_hyp_mode() in hypervisor code
->   arm64: Turn kaslr_feature_override into a generic SW feature override
->   arm64: Add KVM_HVHE capability and has_hvhe() predicate
->   arm64: Don't enable VHE for the kernel if OVERRIDE_HVHE is set
->   arm64: Allow EL1 physical timer access when running VHE
->   arm64: Use CPACR_EL1 format to set CPTR_EL2 when E2H is set
->   KVM: arm64: Remove alternatives from sysreg accessors in VHE
->     hypervisor context
->   KVM: arm64: Key use of VHE instructions in nVHE code off
->     ARM64_KVM_HVHE
->   KVM: arm64: Force HCR_EL2.E2H when ARM64_KVM_HVHE is set
->   KVM: arm64: Disable TTBR1_EL2 when using ARM64_KVM_HVHE
->   KVM: arm64: Adjust EL2 stage-1 leaf AP bits when ARM64_KVM_HVHE is set
->   KVM: arm64: Rework CPTR_EL2 programming for HVHE configuration
->   KVM: arm64: Program the timer traps with VHE layout in hVHE mode
->   KVM: arm64: Force HCR_E2H in guest context when ARM64_KVM_HVHE is set
->   arm64: Allow arm64_sw.hvhe on command line
->   KVM: arm64: Terrible timer hack for M1 with hVHE
->
->  arch/arm64/include/asm/arch_timer.h     |  8 ++++
->  arch/arm64/include/asm/cpufeature.h     |  5 +++
->  arch/arm64/include/asm/el2_setup.h      | 26 ++++++++++++-
->  arch/arm64/include/asm/kvm_arm.h        |  4 +-
->  arch/arm64/include/asm/kvm_asm.h        |  1 +
->  arch/arm64/include/asm/kvm_emulate.h    | 33 +++++++++++++++-
->  arch/arm64/include/asm/kvm_hyp.h        | 37 +++++++++++++-----
->  arch/arm64/include/asm/kvm_mmu.h        |  3 +-
->  arch/arm64/include/asm/virt.h           | 12 +++++-
->  arch/arm64/kernel/cpufeature.c          | 21 +++++++++++
->  arch/arm64/kernel/hyp-stub.S            | 10 ++++-
->  arch/arm64/kernel/idreg-override.c      | 25 ++++++++-----
->  arch/arm64/kernel/image-vars.h          |  3 ++
->  arch/arm64/kernel/kaslr.c               |  6 +--
->  arch/arm64/kvm/arch_timer.c             |  5 +++
->  arch/arm64/kvm/arm.c                    | 12 +++++-
->  arch/arm64/kvm/fpsimd.c                 |  4 +-
->  arch/arm64/kvm/hyp/include/hyp/switch.h |  2 +-
->  arch/arm64/kvm/hyp/nvhe/hyp-init.S      |  9 +++++
->  arch/arm64/kvm/hyp/nvhe/hyp-main.c      | 17 ++++++++-
->  arch/arm64/kvm/hyp/nvhe/pkvm.c          | 27 ++++++++++---
->  arch/arm64/kvm/hyp/nvhe/switch.c        | 28 ++++++++------
->  arch/arm64/kvm/hyp/nvhe/timer-sr.c      | 25 +++++++++++--
->  arch/arm64/kvm/hyp/pgtable.c            |  6 ++-
->  arch/arm64/kvm/hyp/vhe/switch.c         |  2 +-
->  arch/arm64/kvm/sys_regs.c               |  2 +-
->  arch/arm64/tools/cpucaps                |  1 +
->  drivers/irqchip/irq-apple-aic.c         | 50 ++++++++++++++++++++++++-
->  28 files changed, 320 insertions(+), 64 deletions(-)
->
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
