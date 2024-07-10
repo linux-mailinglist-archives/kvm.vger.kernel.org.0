@@ -1,199 +1,241 @@
-Return-Path: <kvm+bounces-21369-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21370-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD89492DB9D
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 00:08:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F2B92DC1E
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 00:55:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F38BB24331
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 22:08:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1895C28263B
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 22:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3D1515573B;
-	Wed, 10 Jul 2024 22:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEDFE14BF8F;
+	Wed, 10 Jul 2024 22:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5sSJaeGI"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dJ5Mrysh"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2058.outbound.protection.outlook.com [40.107.244.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99FF61487C1;
-	Wed, 10 Jul 2024 22:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720649213; cv=fail; b=tHLDUGGKwGdPQpvW4tnhOIaFc5TXqTwCm2oXLShMrkU0IdijN3dXdUf9LLQZYSWg2HEKQgEA490I4Mj0/Ep4xheYcV4o//oYrP/qvNA/I0B2vVjP31Dp47QiMVYe2UgJVhoWBAxAntEMKqAG9dn7acmlk9wvPV1o5ff7j4WQY20=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720649213; c=relaxed/simple;
-	bh=gtU3qBaKPv6wF4qhoj2ugfNotsBVcQOyA6Q12B94lb4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fiENKdHpSmbELqZsaaq1bQejRJNQMe4pXAQvmQsuXeNY+S3k25T35kxMEleNPQw6Kee22IMRwQRAdKCA0IYbwtdU8T+D+Vua6vgBMVs+joTKgj0Y3HYTrwvcOxw2gbpORX1gEOH6x+pFGyw+FGx/TgPLh3nGfQrBJZrQi12oYzA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5sSJaeGI; arc=fail smtp.client-ip=40.107.244.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B073m3GaT45BVrvqJyJ4i5BrNxCbjq0x/0ax9BwQ06n9Pn8XNnlAMxPByZrRe7s0WP0onkEIk/JOW3GqA58qObsaWYwXXIoTQeVNLoKiJ5348zPyTM5cxSpofcVvjMRY42Tss9UOkfDTgSramUQ8E5U2Q1afILzEk88lgRo/k8zU7tHFpj04nQDBv0Q4g0XTXc+EVpc1tYFr9PVg8rEPfWoL/NUDyNRXXk7/lpu/Q+lgI2bBG4NDsgEgylQ67CGyV6PXrcn/vydZHJZgaqo1lJmusjaayZm8UlcZGM12UDjU3d67pq6E5/oHmBJY5R8khVK7LPSIbsgJ5jamakHJvQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZDImZNTo8FDvD6FNJzBeJ6/QJZ0FGLwssETrXbipEDY=;
- b=mUH+Q4cHqp13ssyMkANYPwRwRma8A0zTM55X080m3+cZ6GngP4OM1L6ZmySLPK6vKzpQK4aD3pmj2smnYgPCeJPKYAWPjdmkJX9X/ycKYfIfu077l3oXxrvN0Wo6y7bh4Kdiv5C8cxSuIH1wkDcl3kQpx9T+f15OA/pTzFmi9+Uy//xq8IFvi7HH9DjP6cu6bJd3LyliR6d4adM7rl1/6tU97ntrwS4+/FHgoTSxT2PCr5Xql9bYq3MMSR5iXNyW+rshPnAGYahpXCZzryXoipn8Iy1/ROLE07wZsLObVwmCWqKzF9rF6KMdxPufaVmwMVASYTYyAQaO0f3DSEXuig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZDImZNTo8FDvD6FNJzBeJ6/QJZ0FGLwssETrXbipEDY=;
- b=5sSJaeGIheyk2NkGNtlBeVM+MkvrMC0l+JIES3k1mCCFe9SHWsSayBGc9XrUZdglTlP7dbxPiPep7LLLIgi6IGmJHwoTu0L6yd5vNWRSLgf3jWLc+CSf5Xs0ecy348e/feZUE2r6oUAPF7AYE4MgltpVaHN726NMJNM9CfgWYNc=
-Received: from MN2PR05CA0021.namprd05.prod.outlook.com (2603:10b6:208:c0::34)
- by SN7PR12MB7935.namprd12.prod.outlook.com (2603:10b6:806:349::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Wed, 10 Jul
- 2024 22:06:49 +0000
-Received: from BL6PEPF0001AB4A.namprd04.prod.outlook.com
- (2603:10b6:208:c0:cafe::b0) by MN2PR05CA0021.outlook.office365.com
- (2603:10b6:208:c0::34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.20 via Frontend
- Transport; Wed, 10 Jul 2024 22:06:48 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL6PEPF0001AB4A.mail.protection.outlook.com (10.167.242.68) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7762.17 via Frontend Transport; Wed, 10 Jul 2024 22:06:48 +0000
-Received: from AUSPRSAMPAT.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 10 Jul
- 2024 17:06:46 -0500
-From: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>
-To: <kvm@vger.kernel.org>
-CC: <shuah@kernel.org>, <thomas.lendacky@amd.com>, <michael.roth@amd.com>,
-	<seanjc@google.com>, <pbonzini@redhat.com>, <pgonda@google.com>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [RFC 5/5] selftests: KVM: SEV-SNP test for KVM_SEV_INIT2
-Date: Wed, 10 Jul 2024 17:05:40 -0500
-Message-ID: <20240710220540.188239-6-pratikrajesh.sampat@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240710220540.188239-1-pratikrajesh.sampat@amd.com>
-References: <20240710220540.188239-1-pratikrajesh.sampat@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2492C143740
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 22:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720652117; cv=none; b=IAzN5yChGZnRwJm5VEqDG+aIxoA22YFurqm7g4J02scFsPyIEK4MUbLS4+iWcZCubRTGCzra8otJY8YqqzqBTCAeglHAT1xSEf8+blefPs0cRAhsyWGFQ+xLK7pSGfmv3D9MO4Djb9bJ32SrrxkT3OGKqXy6wHNyGIDYqAEF0as=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720652117; c=relaxed/simple;
+	bh=cDOzi+ZXwS5C7Idx4dnKQ0UYYVdAQXQ23kbJX7qsTSo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vCU34lxvdrISyxwXTNd50mKVSNW++BjZctC8i/wAOjRRVx07X5iioBXivfGMBkVWPPTVzySTe3u9XtEgn29ALO1YPRh40BQRb2yogtGnqMKqTU0l6vmvpHXOLlhG1EiLZIBBhjyoKaCOKc9tnR6HYOKpQy5Hhe4039hSY8I2DoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dJ5Mrysh; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ebed33cb65so2867481fa.2
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 15:55:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1720652113; x=1721256913; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8XJJfsxcbaqihoVxsU56HYN19zV6cTHgOtHzTxAFpq0=;
+        b=dJ5Mrysh9u1Xc0BjguVESqA6odUcvX4WgnPoMv+QNxSwtPCCaqKHPQXARECwAUyHHH
+         HXvT0XuYMD0Y4ueiS7MenNNOhcyV9cdvwmpLDj/mahi3/68by1Lh14NMVcvyDDiISoFx
+         6bjC6nEQ+lDxjHvAhyTDlyi/EknH8iE9i2KYM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720652113; x=1721256913;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8XJJfsxcbaqihoVxsU56HYN19zV6cTHgOtHzTxAFpq0=;
+        b=t3OlkF+2s/aFIy1zbvD07N+Krol0GXVlCsnh9g6wMtVSFdsnjmaOQXXHAVC/Hfw1O2
+         oW+WSUmdJzbo1XLa8MEtIfyscopv9JUlJ6eejgQfCufP9PlqvAaD7fWDka+Wkd/94ze8
+         PDcIzqbScoGJLeFKvshQsBhEsophbgWqgI636YvFNkx2OQ7N3CIP7DPg7ZKdi3xwO6PS
+         ISzrKWIzzq5eo2YDfowmjgcGlv66IDbfl22N0Kmn96+UpAHXTjHplD3qpOgZftjI9X+f
+         jf8S+xOn2wsvTQmwcNAP5uubgazg3AajMH9BnA4ZvWwsjS/gfx1WPjmKfZjrCgoMkbiA
+         /YTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5aj4iiXKmVXJ9euhCINp0Cv0mqd6Ox1nPKqLzji7DDHQ0CWakEdQh70PlgrYI8eO5WEW6SPbQOSAunLGCZdWFplL5
+X-Gm-Message-State: AOJu0Yw+FoxFKECv/P56m6GIfcyaE0kwXe8Gv2Y6mHyxzot06VbiovhG
+	cw8OQlpyoN47IX+PGBk38zm1YetqXopam8DJzRmOajIu7p6rDB6w8ie7PhRP+1Lxhhpczgp96LW
+	/pW4p4fc=
+X-Google-Smtp-Source: AGHT+IFwjCsBM5nfTWawI7znOutxXHHsxZvO/RNkeh9ARvhMSq4VCBB0c6wrNQXyJX/ePAvUFdKLhQ==
+X-Received: by 2002:a2e:9693:0:b0:2ee:4c2e:3d3b with SMTP id 38308e7fff4ca-2eeb30b4c53mr45057771fa.4.1720652112942;
+        Wed, 10 Jul 2024 15:55:12 -0700 (PDT)
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com. [209.85.218.47])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-594bba548bcsm2685523a12.17.2024.07.10.15.55.09
+        for <kvm@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 10 Jul 2024 15:55:10 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a77c4309fc8so50733566b.3
+        for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 15:55:09 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCW4RcWE74gqzbk3N3aN62W0Obak4Cx4zWdc5VZxWQAksj4tzlfaRE8tdQYeo4IIaaIrxMbET9/G5HuEyK3Wz21IR/s8
+X-Received: by 2002:a17:907:7f12:b0:a77:db34:42ca with SMTP id
+ a640c23a62f3a-a780b88347amr588125666b.49.1720652088624; Wed, 10 Jul 2024
+ 15:54:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB4A:EE_|SN7PR12MB7935:EE_
-X-MS-Office365-Filtering-Correlation-Id: 86c4b485-eb53-4f86-a22a-08dca12c9872
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?r4hWDWniwoGwCec+oA8VHNSwx4zjmNXud34RXMmpp1rqwVbeJ6eCKjxmhwR4?=
- =?us-ascii?Q?tKyIC27YQD8N4+NnDA+267qkqkv80dlw6yI22l/AdXiZor8yfKAd3v0Ds/90?=
- =?us-ascii?Q?MYe5lGqNxNSRcJ+KfJjbMXC6aOYUsydlOiDURR6APYdiSZj6ylC6CVa7MT8l?=
- =?us-ascii?Q?Eq4AoPrRGMGLRpZaRFQz1bS+V0/LN90SLDOsQYY9cyW58FNj5ENWtXLtU4iT?=
- =?us-ascii?Q?IFPQ0dgNtS7y2t6zyVzV+VhfEoDJhyUMnXZHdX0DSsAWNPCkIHg4QOrktAkx?=
- =?us-ascii?Q?EKm8BAHnpiNujFSiQPH5fMXHKuwedFa9X9dhHiq88spp5q2t8RWz766Os03r?=
- =?us-ascii?Q?SEa+/w25GI51Im9XP6fTmo5QRjK4G6IZtuD4Rx1gtP33mWRW49c69yoUCFDH?=
- =?us-ascii?Q?cnkKGYOsNKbypCeshKU3KJi48+/xwCVBiG19b3iWRaKjiLrzxFNNYW3TdiC4?=
- =?us-ascii?Q?DkDfGVTiNu4+A7BxmHOnPDAQukZaAM7i8TpdMW9thrTy9XOMQdXny1CghKlw?=
- =?us-ascii?Q?dv/yTAaQKn4kHplDaRMz5xFQdsPdI7hpRxlFATsq4PU0myZsYJOaGCb+e1mM?=
- =?us-ascii?Q?aCsxdIn+BwzCfaMkx0sXWI/svl9z+WU90iP+mqjcRs/uKPgX/CUzQMB59GY8?=
- =?us-ascii?Q?wLHwvh5BNJYHTBjKG37PMrvOsLoxp8KH/nHQ5FuNUO13NQfk2SX2OHA0akpD?=
- =?us-ascii?Q?i17YCakCDwTRFTZgv5qogU6ouUUdm8fSFE+4JUjJkI8te2thq/UEicctlx0v?=
- =?us-ascii?Q?CINqBaKhZMOo5ZL/BziEjcZLb+g1cdItMJ2YtBuv4HFVMlt3DWE9hW7ZgPmn?=
- =?us-ascii?Q?6YRAwK1VQaA+k4k4mqu9HxNitRFcpiZdptEvj7GOMouc0P3t7j55rxHaQMDi?=
- =?us-ascii?Q?1OojSZ6coOQH/3ouW8FLZ+DmqJCt3JLdeBrCAQsifhnJNzZk3m9iAQtasWKC?=
- =?us-ascii?Q?aiuYTrmdpeyhH5OlFI1o4tqSUYCi5/EW9C+irRmBVcfk4ChgDiYoUKi9bLBF?=
- =?us-ascii?Q?9rgu3LbCPFZhyfxXCV5XeUDLdGhdml+FWItSma9d5AtYdEvTrQPVRRlmSZMl?=
- =?us-ascii?Q?59agTpj7Z+ewO8FG0MIjJbBdD64+mGbQAprhBPbOE4lt44lKuFM6iN/XKPkZ?=
- =?us-ascii?Q?p01gxTu/puY00xukGSpMqcyvaW1qizo1Rh/EYPTAqEHFwtDTEN7YEJuSqSxB?=
- =?us-ascii?Q?4Q64Nj+TrkHqtjlPGnRunpA+QhpLukiS2imxxmOLtsDmQhIBOvZdCOQEf/oO?=
- =?us-ascii?Q?RG1h9hg7EP7T20nVRwidCKqzofwThTiChAF1baJRFJUoFjOrCeVBS0LXu2b0?=
- =?us-ascii?Q?NAdBpVLg8u77vR8WXAMgxhkUCOLycFmjSmrjx1+762tPWwi95RTGJeoLQr6V?=
- =?us-ascii?Q?HjOHhqP3QKrbZTLcKaSokML+SatjHb50+SKT7h9EG2M6UhcnNrYcA0KsV8Yk?=
- =?us-ascii?Q?72FScAwRayavnEbUeklfSlfnOycXmIFa?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(82310400026)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Jul 2024 22:06:48.4456
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86c4b485-eb53-4f86-a22a-08dca12c9872
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB4A.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7935
+References: <cover.1720611677.git.mst@redhat.com> <3d655be73ce220f176b2c163839d83699f8faf43.1720611677.git.mst@redhat.com>
+ <CABVzXAnjAdQqVNtir_8SYc+2dPC-weFRxXNMBLRcmFsY8NxBhQ@mail.gmail.com>
+ <20240710142239-mutt-send-email-mst@kernel.org> <CABVzXAmp_exefHygEGvznGS4gcPg47awyOpOchLPBsZgkAUznw@mail.gmail.com>
+ <20240710162640-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240710162640-mutt-send-email-mst@kernel.org>
+From: Daniel Verkamp <dverkamp@chromium.org>
+Date: Wed, 10 Jul 2024 15:54:22 -0700
+X-Gmail-Original-Message-ID: <CABVzXA=W0C6NNNSYnjop67B=B3nA2MwAetkxM1vY3VggbBVsMg@mail.gmail.com>
+Message-ID: <CABVzXA=W0C6NNNSYnjop67B=B3nA2MwAetkxM1vY3VggbBVsMg@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] virtio: fix vq # for balloon
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, 
+	Alexander Duyck <alexander.h.duyck@linux.intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
+	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, Cornelia Huck <cohuck@redhat.com>, 
+	Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, Jason Wang <jasowang@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	linux-um@lists.infradead.org, linux-remoteproc@vger.kernel.org, 
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add SEV-SNP VM type to exercise the KVM_SEV_INIT2 call.
+On Wed, Jul 10, 2024 at 1:39=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Wed, Jul 10, 2024 at 12:58:11PM -0700, Daniel Verkamp wrote:
+> > On Wed, Jul 10, 2024 at 11:39=E2=80=AFAM Michael S. Tsirkin <mst@redhat=
+.com> wrote:
+> > >
+> > > On Wed, Jul 10, 2024 at 11:12:34AM -0700, Daniel Verkamp wrote:
+> > > > On Wed, Jul 10, 2024 at 4:43=E2=80=AFAM Michael S. Tsirkin <mst@red=
+hat.com> wrote:
+> > > > >
+> > > > > virtio balloon communicates to the core that in some
+> > > > > configurations vq #s are non-contiguous by setting name
+> > > > > pointer to NULL.
+> > > > >
+> > > > > Unfortunately, core then turned around and just made them
+> > > > > contiguous again. Result is that driver is out of spec.
+> > > >
+> > > > Thanks for fixing this - I think the overall approach of the patch =
+looks good.
+> > > >
+> > > > > Implement what the API was supposed to do
+> > > > > in the 1st place. Compatibility with buggy hypervisors
+> > > > > is handled inside virtio-balloon, which is the only driver
+> > > > > making use of this facility, so far.
+> > > >
+> > > > In addition to virtio-balloon, I believe the same problem also affe=
+cts
+> > > > the virtio-fs device, since queue 1 is only supposed to be present =
+if
+> > > > VIRTIO_FS_F_NOTIFICATION is negotiated, and the request queues are
+> > > > meant to be queue indexes 2 and up. From a look at the Linux driver
+> > > > (virtio_fs.c), it appears like it never acks VIRTIO_FS_F_NOTIFICATI=
+ON
+> > > > and assumes that request queues start at index 1 rather than 2, whi=
+ch
+> > > > looks out of spec to me, but the current device implementations (th=
+at
+> > > > I am aware of, anyway) are also broken in the same way, so it ends =
+up
+> > > > working today. Queue numbering in a spec-compliant device and the
+> > > > current Linux driver would mismatch; what the driver considers to b=
+e
+> > > > the first request queue (index 1) would be ignored by the device si=
+nce
+> > > > queue index 1 has no function if F_NOTIFICATION isn't negotiated.
+> > >
+> > >
+> > > Oh, thanks a lot for pointing this out!
+> > >
+> > > I see so this patch is no good as is, we need to add a workaround for
+> > > virtio-fs first.
+> > >
+> > > QEMU workaround is simple - just add an extra queue. But I did not
+> > > reasearch how this would interact with vhost-user.
+> > >
+> > > From driver POV, I guess we could just ignore queue # 1 - would that =
+be
+> > > ok or does it have performance implications?
+> >
+> > As a driver workaround for non-compliant devices, I think ignoring the
+> > first request queue would be a reasonable approach if the device's
+> > config advertises num_request_queues > 1. Unfortunately, both
+> > virtiofsd and crosvm's virtio-fs device have hard-coded
+> > num_request_queues =3D1, so this won't help with those existing devices=
+.
+>
+> Do they care what the vq # is though?
+> We could do some magic to translate VQ #s in qemu.
+>
+>
+> > Maybe there are other devices that we would need to consider as well;
+> > commit 529395d2ae64 ("virtio-fs: add multi-queue support") quotes
+> > benchmarks that seem to be from a different virtio-fs implementation
+> > that does support multiple request queues, so the workaround could
+> > possibly be used there.
+> >
+> > > Or do what I did for balloon here: try with spec compliant #s first,
+> > > if that fails then assume it's the spec issue and shift by 1.
+> >
+> > If there is a way to "guess and check" without breaking spec-compliant
+> > devices, that sounds reasonable too; however, I'm not sure how this
+> > would work out in practice: an existing non-compliant device may fail
+> > to start if the driver tries to enable queue index 2 when it only
+> > supports one request queue,
+>
+> You don't try to enable queue - driver starts by checking queue size.
+> The way my patch works is that it assumes a non existing queue has
+> size 0 if not available.
+>
+> This was actually a documented way to check for PCI and MMIO:
+>         Read the virtqueue size from queue_size. This controls how big th=
+e virtqueue is (see 2.6 Virtqueues).
+>         If this field is 0, the virtqueue does not exist.
+> MMIO:
+>         If the returned value is zero (0x0) the queue is not available.
+>
+> unfortunately not for CCW, but I guess CCW implementations outside
+> of QEMU are uncommon enough that we can assume it's the same?
+>
+>
+> To me the above is also a big hint that drivers are allowed to
+> query size for queues that do not exist.
 
-Signed-off-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
----
- .../testing/selftests/kvm/x86_64/sev_init2_tests.c  | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+Ah, that makes total sense - detecting queue presence by non-zero
+queue size sounds good to me, and it should work in the normal virtio
+device case.
 
-diff --git a/tools/testing/selftests/kvm/x86_64/sev_init2_tests.c b/tools/testing/selftests/kvm/x86_64/sev_init2_tests.c
-index 7a4a61be119b..68f7edaa5526 100644
---- a/tools/testing/selftests/kvm/x86_64/sev_init2_tests.c
-+++ b/tools/testing/selftests/kvm/x86_64/sev_init2_tests.c
-@@ -28,6 +28,7 @@
- int kvm_fd;
- u64 supported_vmsa_features;
- bool have_sev_es;
-+bool have_snp;
- 
- static int __sev_ioctl(int vm_fd, int cmd_id, void *data)
- {
-@@ -83,6 +84,9 @@ void test_vm_types(void)
- 	if (have_sev_es)
- 		test_init2(KVM_X86_SEV_ES_VM, &(struct kvm_sev_init){});
- 
-+	if (have_snp)
-+		test_init2(KVM_X86_SNP_VM, &(struct kvm_sev_init){});
-+
- 	test_init2_invalid(0, &(struct kvm_sev_init){},
- 			   "VM type is KVM_X86_DEFAULT_VM");
- 	if (kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SW_PROTECTED_VM))
-@@ -138,15 +142,24 @@ int main(int argc, char *argv[])
- 		    "sev-es: KVM_CAP_VM_TYPES (%x) does not match cpuid (checking %x)",
- 		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SEV_ES_VM);
- 
-+	have_snp = kvm_cpu_has(X86_FEATURE_SNP);
-+	TEST_ASSERT(have_snp == !!(kvm_check_cap(KVM_CAP_VM_TYPES) & BIT(KVM_X86_SNP_VM)),
-+		    "sev-snp: KVM_CAP_VM_TYPES (%x) does not match cpuid (checking %x)",
-+		    kvm_check_cap(KVM_CAP_VM_TYPES), 1 << KVM_X86_SNP_VM);
-+
- 	test_vm_types();
- 
- 	test_flags(KVM_X86_SEV_VM);
- 	if (have_sev_es)
- 		test_flags(KVM_X86_SEV_ES_VM);
-+	if (have_snp)
-+		test_flags(KVM_X86_SNP_VM);
- 
- 	test_features(KVM_X86_SEV_VM, 0);
- 	if (have_sev_es)
- 		test_features(KVM_X86_SEV_ES_VM, supported_vmsa_features);
-+	if (have_snp)
-+		test_features(KVM_X86_SNP_VM, supported_vmsa_features);
- 
- 	return 0;
- }
--- 
-2.34.1
+I am not sure about vhost-user, since there is no way for the
+front-end to ask the back-end for a queue's size; the confusingly
+named VHOST_USER_SET_VRING_NUM allows the front-end to configure the
+size of a queue, but there's no corresponding GET message.
 
+> > and a spec-compliant device would probably
+> > balk if the driver tries to enable queue 1 but does not negotiate
+> > VIRTIO_FS_F_NOTIFICATION. If there's a way to reset and retry the
+> > whole virtio device initialization process if a device fails like
+> > this, then maybe it's feasible. (Or can the driver tweak the virtqueue
+> > configuration and try to set DRIVER_OK repeatedly until it works? It's
+> > not clear to me if this is allowed by the spec, or what device
+> > implementations actually do in practice in this scenario.)
+> >
+> > Thanks,
+> > -- Daniel
+>
+> My patch starts with a spec compliant behaviour. If that fails,
+> try non-compliant one as a fallback.
+
+Got it, that sounds reasonable to me given the explanation above.
+
+Thanks,
+-- Daniel
 
