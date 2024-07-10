@@ -1,110 +1,104 @@
-Return-Path: <kvm+bounces-21245-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21247-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7070692C7AD
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 02:42:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 643CF92C7AF
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 02:45:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A49B31C2261C
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 00:41:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 957891C2290F
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 00:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C42B2CA5;
-	Wed, 10 Jul 2024 00:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F9853AC;
+	Wed, 10 Jul 2024 00:44:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XBhVcxXB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="phRzbQTu"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247F4A32
-	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 00:41:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B72974A0F
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 00:44:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720572113; cv=none; b=BZlFOnTNBrQQwojHAUU1PM6cWAjhG4KxH7vNlKsp8ib7itiGE7gFx+DYII5QY0SME+F5Jq0UBWITMK5ey/3sLV5w/Iqq+fkJKezP22K72Q/dT2ka4GzsIqKn7ImnP4A+1btdQMBWWlk3r8sp/ftCELOzBHw5Eu+Mbt+S21LJF/A=
+	t=1720572295; cv=none; b=i0hl1MDF5uMEHtB6nxMGRMMYYHcNOgiQwC35V7lPdqdqO/mXyIFM9junlagtZKt5Hdj/HYknCB7RRnpuh9gnaM75LjWfu0UIqO4/qXU+dViiN3EcUIcYd8fipXm44xXkKeM8JLxk7XqPRnAZgUpFjNV+2/OJkbCNzX5Zo27OKZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720572113; c=relaxed/simple;
-	bh=X5vJ6cYBVsVDUqsfpOgb+vi+Oh8FkmuKhzRarlqoKyE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=pyt09Apo7ou6rV5t4rYBgapBwHYjrkqKsyvx24ya1Z/7ZH1NSP40KC1kOjx2B/IFA6lSVISR7TzUCiAjyEK9ItcjIT+YpSqzw/HTAN3wuGa4z/8DSpGom0BhC3rVbejYNMOsswN+DnbRtZp9Y7ICHdnpYrggOJxJDBtRhPY6cEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XBhVcxXB; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720572112; x=1752108112;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=X5vJ6cYBVsVDUqsfpOgb+vi+Oh8FkmuKhzRarlqoKyE=;
-  b=XBhVcxXB7+LiBmqa+aRXFJRAxfrQP8jQ7RHHOdifu08Lf56IEnX099pF
-   dIrHEAAAWKHAqLDnn4R2gkox9F3hanw0SOgS6q2KQ/S2roZIR3WXsVhz7
-   bStZfZhoySEoYFGx9/CmLzEnXw63cT89LVs3e8wrCLdUXSJhd0Yx66nz3
-   /Yiy60WAPEQmvFZOa7Swif/Dau2F56fwU5dmJ5NvBkXuS4LmQjsvovTIT
-   i8EvI/VxGUqqnjMB6jkcuCPjSem3zGiVMpFF4l0cUaR4Bs7vzDU/QrHXE
-   Xyw5L89RmTy/Iso/ywpnDifLJU3vCbba5d+CjWmoJKZzQn0/ck0Cy3lsU
-   A==;
-X-CSE-ConnectionGUID: 7CE9dUCiSIOn3XacINvoMg==
-X-CSE-MsgGUID: F/9AgpxQTHiJStoFdYjv9A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11128"; a="17496058"
-X-IronPort-AV: E=Sophos;i="6.09,196,1716274800"; 
-   d="scan'208";a="17496058"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 17:41:51 -0700
-X-CSE-ConnectionGUID: +eL9Ml5tSTmMY36fbX7ZPw==
-X-CSE-MsgGUID: B6iQKgtPR822xb20hIdAeA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,196,1716274800"; 
-   d="scan'208";a="48705118"
-Received: from 984fee00a4c6.jf.intel.com ([10.165.58.231])
-  by orviesa007.jf.intel.com with ESMTP; 09 Jul 2024 17:41:51 -0700
-From: Yi Liu <yi.l.liu@intel.com>
-To: alex.williamson@redhat.com,
-	jgg@nvidia.com,
-	kevin.tian@intel.com
-Cc: kvm@vger.kernel.org,
-	yi.l.liu@intel.com,
-	=?UTF-8?q?=C5=BDilvinas=20=C5=BDaltiena?= <zaltys@natrix.lt>,
-	Beld Zhang <beldzhang@gmail.com>
-Subject: [PATCH] vfio/pci: Init the count variable in collecting hot-reset devices
-Date: Tue,  9 Jul 2024 17:41:50 -0700
-Message-Id: <20240710004150.319105-1-yi.l.liu@intel.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1720572295; c=relaxed/simple;
+	bh=TSDrcGiCr57XrhRhLbZyiBS2mSNgOWnH8SPDAjSjUCs=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BV1Hj7EEszPKeRYwqjJyI5mYd3nAWBcZnRIoI6yff+HqTLRJiTspR9K1CRm698nYlrADd8LbgZ6f+q0fcwT9p+Jw5tIbAFxTPgBe1qHNrQHub9bBPpCBrIlAvO7FTmxp1N5tHoV4j6dOk3zENz/wlxHdUsQ1SOZnCdmPQOfbr5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=phRzbQTu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 41301C4AF0E
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 00:44:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720572295;
+	bh=TSDrcGiCr57XrhRhLbZyiBS2mSNgOWnH8SPDAjSjUCs=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=phRzbQTuYRmYi8tvjAvx9nUyxuRZx70Kllk9ETcQW7J9Ci+xM4vZHkRxFioozfWPj
+	 zNbnLyw6huLrM2WZ4TY2CXuDMKN9p/E5bKLwCnhfYYPJ0/PxMRUhSLMqpDePOQMu7a
+	 6JBHczuP1/muAu5idP9DpEgqCtmc7P3fn+Vin1IXEcqG4Yaq2rfdfHYdr1kOmL9scr
+	 LdZO5OliFYBNNYwK68RwS7FIfRt9DXkmQ0yFnZBX4Xuc0uVQwn6bRMWykw5pzCvDpC
+	 TFpdpxkGq86gKe39GJZYH0QY8TnOx3Sb9PtHGXP0oVWWCCrL9BYfyd6s3Bth63flnB
+	 N47HXwlvpJsFA==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 3901CC53BB8; Wed, 10 Jul 2024 00:44:55 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219010] [REGRESSION][VFIO] kernel 6.9.7 causing qemu crash
+ because of "Collect hot-reset devices to local buffer"
+Date: Wed, 10 Jul 2024 00:44:54 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: yi.l.liu@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219010-28872-gYnU4foqdY@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219010-28872@https.bugzilla.kernel.org/>
+References: <bug-219010-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-The count variable is used without initialization, it results in mistakes
-in the device counting and crashes the userspace if the get hot reset info
-path is triggered.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219010
 
-Fixes: f6944d4a0b87 ("vfio/pci: Collect hot-reset devices to local buffer")
-Link: https://bugzilla.kernel.org/show_bug.cgi?id=219010
-Reported-by: Žilvinas Žaltiena <zaltys@natrix.lt>
-Cc: Beld Zhang <beldzhang@gmail.com>
-Signed-off-by: Yi Liu <yi.l.liu@intel.com>
----
- drivers/vfio/pci/vfio_pci_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+--- Comment #6 from Liu, Yi L (yi.l.liu@intel.com) ---
+On 2024/7/10 04:49, bugzilla-daemon@kernel.org wrote:
+> https://bugzilla.kernel.org/show_bug.cgi?id=3D219010
+>=20
+> --- Comment #5 from =C5=BDilvinas =C5=BDaltiena (zaltys@natrix.lt) ---
+> (In reply to Liu, Yi L from comment #3)
+>> It appears that the count is used without init.. And it does not happen
+>> with other devices as they have FLR, hence does not trigger the hotreset
+>> info path. Please try below patch to see if it works.
+>>
+>=20
+> Patch fixes the problem on my system.
+>=20
 
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci_core.c
-index 59af22f6f826..0a7bfdd08bc7 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1260,7 +1260,7 @@ static int vfio_pci_ioctl_get_pci_hot_reset_info(
- 	struct vfio_pci_hot_reset_info hdr;
- 	struct vfio_pci_fill_info fill = {};
- 	bool slot = false;
--	int ret, count;
-+	int ret, count = 0;
- 
- 	if (copy_from_user(&hdr, arg, minsz))
- 		return -EFAULT;
--- 
-2.34.1
+patch submitted to mailing list. Thanks, and feel free to let me know if
+it is proper to add your reported-by, and add your tested-by.
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
