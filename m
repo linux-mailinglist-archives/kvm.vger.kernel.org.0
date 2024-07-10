@@ -1,201 +1,124 @@
-Return-Path: <kvm+bounces-21255-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21256-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8699C92C903
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 05:13:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140F992C915
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 05:25:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A96C31C22A9F
-	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 03:13:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 101521C226A4
+	for <lists+kvm@lfdr.de>; Wed, 10 Jul 2024 03:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CC92D613;
-	Wed, 10 Jul 2024 03:13:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41A3534545;
+	Wed, 10 Jul 2024 03:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lSzw3ify"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZLUgi+PN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8401A28D;
-	Wed, 10 Jul 2024 03:13:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2E3282F7
+	for <kvm@vger.kernel.org>; Wed, 10 Jul 2024 03:25:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720581221; cv=none; b=JWBkzmvI5O0sSpLNyb5KelnWqw6DjM1ehz/RLAxsiQEvFTgY9APq8A7Sh1QgPTOHTGhh9nMdTKf13fC4wtoBe+BIwI+Rex5EENUvsyM5pX4ob6Gcrl4nVzV0GAgVRjyGlix28TkfqM4fOrWBkQaXSNLg1zfaVzYX9vHFsH1VD44=
+	t=1720581929; cv=none; b=CbHrDwEDX42K0Co13mwmF5DgEnJ/EI5w8BGJObtjFQiD7OIqGRQQFb8qsd0RYVEuJLJksqXJaS5Ih6hmY0pFmeHdB768ra49CP/5j8RDPn5/2fdtyzfPlv0xgmfho3dQDxjAdclfjFJZXEKAH6f8OHbXf/i04FaIIot5qxGPC0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720581221; c=relaxed/simple;
-	bh=v/nfEaNXjXNsO3ehsKPHgPZKItGJIUJlqHLAqRYlVzY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NmZ5h4NjHneF0OfrgkiXhdpc6Qu7ARqoZYCVp7SnFvg3njDChGUIkqL7dQTnrvTHkzUILQYJJ7kZH5rzsm6iJYL8WQIy4FwG2aXPEIp5ur9fvfiDLqAaMSH/RKAH9KcwKbYrJiQeEt/Q5vDduu96mKX2igw+K5gZMKEDeO1ofcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lSzw3ify; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720581219; x=1752117219;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=v/nfEaNXjXNsO3ehsKPHgPZKItGJIUJlqHLAqRYlVzY=;
-  b=lSzw3ify9QRH70cuUn+ZFTURVJiKku9XjgUfnTgAFwuI4pEPicBIqg1P
-   /4ftJrCej92+o/UcPfLg17SGUqnsNtQvJLemiUZP1cRLThP+9xEtge0+I
-   pW1ZYFIVQc8nEIV0t9dV0KYgtIYt1Yd6laNzX4YeJQdhXcaitG8gbprfy
-   B7M0DRjc7cdGwmERFQaltt9tIE7ehoUlObT90ao1yGKm6Kfo7JoAHb0Dp
-   tmAF/cQnSz+z1egUwzhhAgElKKk0Nzj/2mKgecO7zi+fM3xsjHh4KenHc
-   thZCuUs9yTw72meZ6jNc6qiGZKy932uyw95baNLNrHJltiulKoVQJliPt
-   A==;
-X-CSE-ConnectionGUID: dXcMoL1HSM66EKvP0vrDMQ==
-X-CSE-MsgGUID: UxQV+9ifS5u5+8OSHMIuUg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11128"; a="21643381"
-X-IronPort-AV: E=Sophos;i="6.09,196,1716274800"; 
-   d="scan'208";a="21643381"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 20:13:38 -0700
-X-CSE-ConnectionGUID: zJftN6F/RMyQ1ectPGeWeA==
-X-CSE-MsgGUID: 6FqYafGlQj+Y+hysS3LVrA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,196,1716274800"; 
-   d="scan'208";a="48146385"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.1]) ([10.124.225.1])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Jul 2024 20:13:36 -0700
-Message-ID: <2205c1fc-e7c5-48aa-ac06-345227cc9bbb@linux.intel.com>
-Date: Wed, 10 Jul 2024 11:13:32 +0800
+	s=arc-20240116; t=1720581929; c=relaxed/simple;
+	bh=9sbwGihOLkbKRAKocXOlId4hhNDwPbs0zE0X3aDWblY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MMb3bB3u4qVB7NXjGqLxNaMOJYn9XhBkKlidEZZshAe/SP9yY4hscrM2cvkTqauYGh/clzkjw5ON49qZKAWmIJaA8r0Ef+vcpHh/6+YKmxbGb5qHv3hqXGjyEB/Ji0BMoHM7AmOSbYF7iIm5ND1El6st199ZSXpC6QPjhuuRPwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZLUgi+PN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720581927;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=9sbwGihOLkbKRAKocXOlId4hhNDwPbs0zE0X3aDWblY=;
+	b=ZLUgi+PNNFgQ2nB5KNCTuOMH7KMrtG8vL4VQ6wIFV/NxMGHEbOrFOWTCFpjnh25roiw9k1
+	llpId9ZbIjPF/YF0QBJPmhWx+0VnfrpI6l03h7zi/mYTAn4Qxudh+MPk+BV3E0IDjSFCgn
+	N68n17Ji/NL6k0s2w89FrEmD9utvSM4=
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com
+ [209.85.166.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-443-qjE3zMmKOA6xRtwPYBr8JQ-1; Tue, 09 Jul 2024 23:25:25 -0400
+X-MC-Unique: qjE3zMmKOA6xRtwPYBr8JQ-1
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-381c11633e9so63875095ab.0
+        for <kvm@vger.kernel.org>; Tue, 09 Jul 2024 20:25:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720581924; x=1721186724;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9sbwGihOLkbKRAKocXOlId4hhNDwPbs0zE0X3aDWblY=;
+        b=gTevvY4WXVC7AXEYGOm6kUBklZj46Lvp04pu7zOfgMLZibW2AHlrjxzVCAfFR1oGSI
+         ZeZX3irog0fnikPtiSmwH94Mbea4ekILQKjis+L/q0iY/dmsmRaMGiXXyy3ikz4O32Ir
+         PXnHfRGpJDU3D6/TXFRSGGbDh3ynMbPdsl2eU4FI0bbX3upZopHLXjXp5d1sHscKMmot
+         07nHk3V9Kd43c5i5iea8atQfQGMy4kuRYePqZMVrOvvQP9tGa2EehBFR60gy9TCTw1ZP
+         VN0LspL/wLXO2nOjPCi5HZQYmXdfEIFvAQ9MPEX8Qzl8enF4g8kT3iGr4eFBFUe/Qb2d
+         xEfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVyCc6rTgy8RK1gp59gVTmGzMh9Alb4/MU4fBWnUUKuY5cAmmFF25wdyqR85oyCkAHaOsHbjNVV6nowlEAjmSbDNQCs
+X-Gm-Message-State: AOJu0Ywszykxsz75WAChd5sivPmEgLrfXJULV0yEXV8A9GR7SbZbUfTQ
+	uUVMP3X73B/lweL91S5rHRyPJ1oksn04Q6NT6ZQzZ8wZhIGQCYNYfMj6ZcCH9HPOK0KlGoO/C4o
+	Ll3TG5u45ztRswcEbWjl29s5aLJvqjQPmuKtSeU5ynjemqVicIV0KbLNG5Yfloq5M5U/gM/1b4W
+	4me7ruU6ScVeUfS8CVsGt/mCkq93FNLWU2
+X-Received: by 2002:a05:6e02:170b:b0:382:b436:ecbb with SMTP id e9e14a558f8ab-38a57bcd755mr44254665ab.11.1720581923962;
+        Tue, 09 Jul 2024 20:25:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEW8tp760Eusr7cpOewOOzt8KywljVE5imblpi4EA9nOMhtnhRxpdbKT5KwR6ZV/XXWj53jrT/VMHmkMmslXtc=
+X-Received: by 2002:a05:6e02:170b:b0:382:b436:ecbb with SMTP id
+ e9e14a558f8ab-38a57bcd755mr44254435ab.11.1720581923592; Tue, 09 Jul 2024
+ 20:25:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] KVM: x86/pmu: Return KVM_MSR_RET_INVALID for invalid PMU
- MSR access
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>,
- Mingwei Zhang <mizhang@google.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Zhenyu Wang <zhenyuw@linux.intel.com>, Like Xu <like.xu.linux@gmail.com>,
- Jinrong Liang <cloudliang@tencent.com>, Yongwei Ma <yongwei.ma@intel.com>,
- Dapeng Mi <dapeng1.mi@intel.com>, Gleb Natapov <gleb@redhat.com>
-References: <20240709145500.45547-1-dapeng1.mi@linux.intel.com>
- <Zo2FYieeerQzUGOa@google.com>
-Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <Zo2FYieeerQzUGOa@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1720173841.git.mst@redhat.com> <1a5d7456542bcd1df8e397c93c48deacd244add5.1720173841.git.mst@redhat.com>
+In-Reply-To: <1a5d7456542bcd1df8e397c93c48deacd244add5.1720173841.git.mst@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 10 Jul 2024 11:25:10 +0800
+Message-ID: <CACGkMEsg0+vpav1Fo8JF1isq4Ef8t4_CFN1scyztDO8bXzRLBQ@mail.gmail.com>
+Subject: Re: [PATCH 2/2] virtio: fix vq # when vq skipped
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: linux-kernel@vger.kernel.org, 
+	Alexander Duyck <alexander.h.duyck@linux.intel.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, David Hildenbrand <david@redhat.com>, 
+	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Bjorn Andersson <andersson@kernel.org>, 
+	Mathieu Poirier <mathieu.poirier@linaro.org>, Cornelia Huck <cohuck@redhat.com>, 
+	Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
+	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	linux-um@lists.infradead.org, linux-remoteproc@vger.kernel.org, 
+	linux-s390@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Jul 5, 2024 at 6:09=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> virtio balloon communicates to the core that in some
+> configurations vq #s are non-contiguous by setting name
+> pointer to NULL.
+>
+> Unfortunately, core then turned around and just made them
+> contiguous again. Result is that driver is out of spec.
+>
+> Implement what the API was supposed to do
+> in the 1st place. Compatibility with buggy hypervisors
+> is handled inside virtio-balloon, which is the only driver
+> making use of this facility, so far.
+>
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 
-On 7/10/2024 2:45 AM, Sean Christopherson wrote:
-> On Tue, Jul 09, 2024, Dapeng Mi wrote:
->> Return KVM_MSR_RET_INVALID instead of 0 to inject #GP to guest for all
->> invalid PMU MSRs access
->>
->> Currently KVM silently drops the access and doesn't inject #GP for some
->> invalid PMU MSRs like MSR_P6_PERFCTR0/MSR_P6_PERFCTR1,
->> MSR_P6_EVNTSEL0/MSR_P6_EVNTSEL1, but KVM still injects #GP for all other
->> invalid PMU MSRs. This leads to guest see different behavior on invalid
->> PMU access and may confuse guest.
-> This is by design.  I'm not saying it's _good_ design, but it is very much
-> intended.  More importantly, it's established behavior, i.e. having KVM inject
-> #GP could break existing setups.
->
->> This behavior is introduced by the
->> 'commit 5753785fa977 ("KVM: do not #GP on perf MSR writes when vPMU is disabled")'
->> in 2012. This commit seems to want to keep back compatible with weird
->> behavior of some guests in vPMU disabled case,
-> Ya, because at the time, guest kernels hadn't been taught to play nice with
-> unexpected virtualization setups, i.e. VMs without PMUs.
->
->> but strongly suspect if it's still available nowadays.
-> I don't follow this comment.
->
->> Since Perfmon v6 starts, the GP counters could become discontinuous on
->> HW, It's possible that HW doesn't support GP counters 0 and 1.
->> Considering this situation KVM should inject #GP for all invalid PMU MSRs
->> access.
-> IIUC, the behavior you want is inject a #GP if the vCPU has a PMU and the MSR is
-> not valid.  We can do that and still maintain backwards compatibility, hopefully
-> without too much ugliness (maybe even an improvement!).
->
-> This? (completely untested)
+Acked-by: Jason Wang <jasowang@redhat.com>
 
-Seems no better method. Would adopt this. Thanks.
+Thanks
 
->
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 5aa7581802f7..b5e95e5f1f32 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -4063,9 +4063,8 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->         case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
->         case MSR_K7_EVNTSEL0 ... MSR_K7_EVNTSEL3:
->         case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
-> -               if (kvm_pmu_is_valid_msr(vcpu, msr))
-> -                       return kvm_pmu_set_msr(vcpu, msr_info);
-> -
-> +               if (vcpu_to_pmu(vcpu)->version)
-> +                       goto default_handler;
->                 if (data)
->                         kvm_pr_unimpl_wrmsr(vcpu, msr, data);
->                 break;
-> @@ -4146,6 +4145,7 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                 break;
->  #endif
->         default:
-> +default_handler:
->                 if (kvm_pmu_is_valid_msr(vcpu, msr))
->                         return kvm_pmu_set_msr(vcpu, msr_info);
->  
-> @@ -4251,8 +4251,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->         case MSR_K7_PERFCTR0 ... MSR_K7_PERFCTR3:
->         case MSR_P6_PERFCTR0 ... MSR_P6_PERFCTR1:
->         case MSR_P6_EVNTSEL0 ... MSR_P6_EVNTSEL1:
-> -               if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
-> -                       return kvm_pmu_get_msr(vcpu, msr_info);
-> +               if (vcpu_to_pmu(vcpu)->version)
-> +                       goto default_handler;
->                 msr_info->data = 0;
->                 break;
->         case MSR_IA32_UCODE_REV:
-> @@ -4505,6 +4505,7 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->                 break;
->  #endif
->         default:
-> +default_handler:
->                 if (kvm_pmu_is_valid_msr(vcpu, msr_info->index))
->                         return kvm_pmu_get_msr(vcpu, msr_info);
->  
-> diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> index 96446134c00b..0de606b542ac 100644
-> --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-> @@ -344,7 +344,8 @@ static void guest_test_rdpmc(uint32_t rdpmc_idx, bool expect_success,
->  static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters,
->                                  uint8_t nr_counters, uint32_t or_mask)
->  {
-> -       const bool pmu_has_fast_mode = !guest_get_pmu_version();
-> +       const u8 pmu_version = guest_get_pmu_version();
-> +       const bool pmu_has_fast_mode = !pmu_version;
->         uint8_t i;
->  
->         for (i = 0; i < nr_possible_counters; i++) {
-> @@ -363,12 +364,13 @@ static void guest_rd_wr_counters(uint32_t base_msr, uint8_t nr_possible_counters
->                 const bool expect_success = i < nr_counters || (or_mask & BIT(i));
->  
->                 /*
-> -                * KVM drops writes to MSR_P6_PERFCTR[0|1] if the counters are
-> -                * unsupported, i.e. doesn't #GP and reads back '0'.
-> +                * KVM drops writes to MSR_P6_PERFCTR[0|1] if the vCPU doesn't
-> +                * have a PMU, i.e. doesn't #GP and reads back '0'.
->                  */
->                 const uint64_t expected_val = expect_success ? test_val : 0;
-> -               const bool expect_gp = !expect_success && msr != MSR_P6_PERFCTR0 &&
-> -                                      msr != MSR_P6_PERFCTR1;
-> +               const bool expect_gp = !expect_success &&
-> +                                      (pmu_version ||
-> +                                       (msr != MSR_P6_PERFCTR0 && msr != MSR_P6_PERFCTR1));
->                 uint32_t rdpmc_idx;
->                 uint8_t vector;
->                 uint64_t val;
->
 
