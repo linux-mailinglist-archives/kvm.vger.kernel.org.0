@@ -1,203 +1,166 @@
-Return-Path: <kvm+bounces-21426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21429-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2020392EC9C
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 18:24:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 720FF92ECB3
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 18:28:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBE2C284D11
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 16:24:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93DBE1C21B51
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 16:28:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F1316D4E3;
-	Thu, 11 Jul 2024 16:23:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3586316D4D4;
+	Thu, 11 Jul 2024 16:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TUIwDaFa"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="VXTvs2Fe"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2042.outbound.protection.outlook.com [40.107.93.42])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F21E16CD1A;
-	Thu, 11 Jul 2024 16:23:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720715021; cv=fail; b=KhE9zFXZ4VN3cJiD74GcJC1Ut+sxUWih6WZpzbHs+4PHe9i8CcfkAUrqAtp2x01a7XQPxFWvRmQOc0leqf0XZGJvkZV622IVAqRBjn2cdR2kFXspYZkPSod9YMKIdDkASYW5hh1w8bK9q55gd14nXOVg3qwGZNdxZXNcx9rpTW0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720715021; c=relaxed/simple;
-	bh=LS8ZeQLtWtgtDzSaZw3TE8C83VAj/v8ptkzbWVAm8tM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hKY6dPaihuAVVFL1Eo36BZPeLex7zctwTuprKlEqTqntszl9M55OBbbZZZfbirURA/CRe6y7KC7Tukhr0dAc9p+O3NFK938M0ja6mEJRelN9VpAD6f2Sjo+1OBmaOJ7vYbUgQR0UwNWrJKwaJvOHocIAgLicBj/1EfhyFsx04sY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TUIwDaFa; arc=fail smtp.client-ip=40.107.93.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fB9L4zUOCOEMhOQApG6u++CevjcXpxWLPlVKsCXbt/9awnzjNwnQmsj654owUAivI+kDHg0oIOWmCpZpmtm7Ob3JTzVvswdCHYBEDDmYX/jj2dIICzZnrpod+Epb5J3Yp17YU5jkoHGLrnIwF8yEwx9hIQwuyPzover35Zd3UQr91HceiEDjTjmsku459QOeZI5PCe7NveiXVTpssR1h0ZVm+LKEKgLn0y4AfOlcKjQ7vWBoHznaXvrO1aQFLSsiKhMjTto2Zn+DzoqO8uh0N9ERLHjpuU+QhLwsinQUOBGG2KhmBU0hMf9J1CUaZ0Qw1T19rjbL2lVk5dNLjAod7Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=LdZf9I8B2q4T1E2mHs9h0oMhxTn+2MLv3kjlaa+u2p4=;
- b=GkML/AuG6b8zkLBoEC5PlWLvzx+qaYEnHycugrm1dPPDgvWSylZFj7EUUnnwAcicGLfJcJzW3AIlqBLX9MJKZ229YJrRrlXxqdk/sIgDyIjOhYvy/E/r2rXyD/oU2+Q/hPtxjeCQQKdPABjt948OqSY3BJWtXfNa+35+IU6L7t+dYKoYjnA5lQ93fHKEnG7bMzynqSvfWGWAJ/MqMD6n3jI+tkgijtmMMbWKmUMBIWpRedbGiiThEpF+pMeY2lmW2G4UDqdbsasg6eB4ZZVgjGS5+jA3N3r1F9twECJN1mc4C9E+es1QLJCesWAdK8ol97CAmJxv74ZuIN8FOIptgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=LdZf9I8B2q4T1E2mHs9h0oMhxTn+2MLv3kjlaa+u2p4=;
- b=TUIwDaFa4mBxfEXg4f5kby0T8kynZuZa292UDC4aUd1msDIDyzWzmQ8QNMFVCt7gJEUVY/1dBMhdUVk9Y2GrkQ+fboThbiGUnoxUNbHEEaMahST7ejgXhA7BW99xZqGkvlE7ldSC+z+oY3gQyeTiJajUX+TnTOSZDDrJRY4htT4=
-Received: from SA9PR13CA0069.namprd13.prod.outlook.com (2603:10b6:806:23::14)
- by BL1PR12MB5971.namprd12.prod.outlook.com (2603:10b6:208:39a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7741.35; Thu, 11 Jul
- 2024 16:23:37 +0000
-Received: from SN1PEPF00036F43.namprd05.prod.outlook.com
- (2603:10b6:806:23:cafe::fd) by SA9PR13CA0069.outlook.office365.com
- (2603:10b6:806:23::14) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23 via Frontend
- Transport; Thu, 11 Jul 2024 16:23:36 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF00036F43.mail.protection.outlook.com (10.167.248.27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7762.17 via Frontend Transport; Thu, 11 Jul 2024 16:23:35 +0000
-Received: from [10.236.30.66] (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 11 Jul
- 2024 11:23:33 -0500
-Message-ID: <b41f3149-1020-4996-911f-7f357db81376@amd.com>
-Date: Thu, 11 Jul 2024 11:23:32 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5666F16CD12;
+	Thu, 11 Jul 2024 16:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720715292; cv=none; b=VUoTCLSSfcEFMHkyObhmjr2JxQ1qmFgfZZiQwUIFSzWX7VAnKbamSqk+KNiS3aFSVAqM0diNXbOFB8Zm9l3n9NdEA++yn1Y+CeqBZkxBxrrts+ymHG9BA0hdxBa29U06zOMVak7kx8Odk6KFkuanDIQAaXdDsrkqfkYJD2llMCc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720715292; c=relaxed/simple;
+	bh=yU45aZilw8uuoyyBEqzLvjn+ubl8VV3DgDQLNw3YG28=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Zs2r+6GOWKNCM3KEGItf9e1P2jmYTcUxZCpE4Cfm30kdGCYacVgBWKPlLXMgi8wbFq1xJV1M6MU6M23FoZo5/Gss54+HOS78e+8ZKG+udY51zBV9Xfz/+aQK+BNVg4puhwRvVaZGvoYWNFnz9cLJJFzPM9whUWTameZgUb5Qbf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=VXTvs2Fe; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46BEwJEf020574;
+	Thu, 11 Jul 2024 16:28:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	ufQoE7Ty/3mWJ+0Zwk5edHESJga+H590Q3CcBxzoQ2Q=; b=VXTvs2FeKrP8/zPj
+	CCyb+hYFA5e4n9zJcqE829cYrdOBRGo3JOIuEGIyskkBXB8RW90rpvLK4B+ToSKs
+	Th5YlLShCPDVA3T8NyyU1/SzyRDBLqw8xQ6eTo+T3fZPlB8BQvsYOdPWqBCWdIMZ
+	FT9DYMYDW3VruHqBYwqgre40jTlqPpf8s6VkHdO0Z0yMl1IfExXk8v0A5C9F7WJi
+	hlHx78J3Muz1Caq9n0oPTRAIJCBsaPyUVke+FYOowizoU31+075Siy2Lw42uTWaU
+	gXy9FXaduOtMmrBH/8H5ZZaB+5PEC5S/VPWaC/y/U0iZkQfp2WJOFNIhkpCNYV+T
+	sqBZdA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40ahmg090h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 16:28:08 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46BGS81Q000348;
+	Thu, 11 Jul 2024 16:28:08 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40ahmg08ue-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 16:28:08 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46BG1LV5014101;
+	Thu, 11 Jul 2024 16:23:56 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 407h8q1s30-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 16:23:56 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46BGNotf58655138
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Jul 2024 16:23:52 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 979332004D;
+	Thu, 11 Jul 2024 16:23:50 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 55BD620040;
+	Thu, 11 Jul 2024 16:23:50 +0000 (GMT)
+Received: from p-imbrenda (unknown [9.152.224.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 11 Jul 2024 16:23:50 +0000 (GMT)
+Date: Thu, 11 Jul 2024 18:23:48 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, hca@linux.ibm.com, svens@linux.ibm.com,
+        gor@linux.ibm.com, nrb@linux.ibm.com, nsg@linux.ibm.com,
+        seiden@linux.ibm.com, frankja@linux.ibm.com, borntraeger@de.ibm.com,
+        gerald.schaefer@linux.ibm.com, david@redhat.com
+Subject: Re: [PATCH v1 2/2] s390/kvm: Move bitfields for dat tables
+Message-ID: <20240711182348.21ca02b2@p-imbrenda>
+In-Reply-To: <Zo/3RzpS2WNssMIi@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+References: <20240703155900.103783-1-imbrenda@linux.ibm.com>
+	<20240703155900.103783-3-imbrenda@linux.ibm.com>
+	<Zo/3RzpS2WNssMIi@li-008a6a4c-3549-11b2-a85c-c5cc2836eea2.ibm.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 1/5] selftests: KVM: Add a basic SNP smoke test
-To: Tom Lendacky <thomas.lendacky@amd.com>, <kvm@vger.kernel.org>
-CC: <shuah@kernel.org>, <michael.roth@amd.com>, <seanjc@google.com>,
-	<pbonzini@redhat.com>, <pgonda@google.com>,
-	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240710220540.188239-1-pratikrajesh.sampat@amd.com>
- <20240710220540.188239-2-pratikrajesh.sampat@amd.com>
- <b7c4316a-1b00-521c-991a-57e1d105952f@amd.com>
-Content-Language: en-US
-From: "Sampat, Pratik Rajesh" <pratikrajesh.sampat@amd.com>
-In-Reply-To: <b7c4316a-1b00-521c-991a-57e1d105952f@amd.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00036F43:EE_|BL1PR12MB5971:EE_
-X-MS-Office365-Filtering-Correlation-Id: 46d08b9f-433c-48bc-5c8e-08dca1c5d07f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?SkcrdXBHODhMQmtiV09JSUYzVFdUMHdrR0NZUVphYkZxYW5PTVIwclZLMG9t?=
- =?utf-8?B?NDhueGFRaHZDTEhhaVVnNExOZHRBdHNLak91ZkozUWI5cUJxWFFSekNnbVdO?=
- =?utf-8?B?eHVpSXBRNlRqY2hZYnBvcVI2WlplSWk5bDVYMmRTU0pESkNWV1hzZ2wrR29r?=
- =?utf-8?B?eGk5Zlk5cDZWUmNnamFwTHR2ZUpDMVBsNXNyaVZkRVhudm1nVm9SS29ubWw5?=
- =?utf-8?B?bUVGWWorQTZOOTE1SkNMdDY0VkdvTHlOQ0p3dTA0a00yK3FQUGc2RVNvYXR4?=
- =?utf-8?B?c3ZjMjFJVmc1WFVUVUtYNzgydTkrcFN1ODJPVTVTL0syZjd2Q2dFY0dMS3ht?=
- =?utf-8?B?dDJWUURXc3JYSVVNaFdianA5djI5OG8vOGYrQXhBY1FhTnhjQmo1WU5Oemcz?=
- =?utf-8?B?NlQ0R1VPS3VVaStOTGVTOEc1dUVFRWJNUHhFa1MvMlZQVG13a0ZidElFb3RO?=
- =?utf-8?B?Q1c5R2d1TFVBYzR3MVRyOWU2bVRWR25HSjhxK1RIb25ERENRMTlQYWRRdFJo?=
- =?utf-8?B?dUV4cUsreFRBeWRxL1Y5N1hRcUZzOTRnSWcxbU5rbkpma2hwS1ZkSXBES2xK?=
- =?utf-8?B?OStaeHlmWnphRUJjaUhidElkdU83M2I4SW9oY0x3RFMrUXh1UmRnL1pEWXNz?=
- =?utf-8?B?b2tpUUJMZnhMWmxDUjEyb2dQdmhIM0hHQ0pKQlRQYUt6anBOdVVJOVJOWTl2?=
- =?utf-8?B?NHJNVFlBT3FORitwNFRCVElTQ1BheWJpOFFzdVhBNjZVMHZidERxbEEwMngv?=
- =?utf-8?B?K3cyb0lTKzJudmoxYXZhVUk1OHdRcFJJZkh2NWIweUVKSFpRbndxeHB0dVRM?=
- =?utf-8?B?a2tkRWhLOE1OT2ZnenRiVjNaZ1B3WHZSNzd6d0cwbDk5WVM0RStMRmF6blBk?=
- =?utf-8?B?eG9jak14WEVyc2dKaFl5UFE3RVUyK1lVOTIzZEpiYXZsdU5Rb1pnZUFCbG55?=
- =?utf-8?B?Q3NoYVFTdTJISUtMVUFnSXB3NlZZZjBBV2p0SUp0M1JoTmxnTjZ3K3c3M0Rm?=
- =?utf-8?B?ZEpEWGlzWUhmbWRYNjREMTZNYmFWQVJiMUlTL2xIV3czejNMcUNjN0JwNXdn?=
- =?utf-8?B?ZVdCd0xJYXo1ei96bnQ5bG9HUUJ0VWVWWWIyaDhES2g4SVh5L1kvNVV6T0R0?=
- =?utf-8?B?VnYwaGgzTHJiT3BPWVF1VjB3ekpteis3d1NxUFA1Z243Y3pENkZBTXlSc1Nl?=
- =?utf-8?B?Q2hKK2lhWUlpeXFxUms4bDRDcm1PUS93Z3ljdHZMK2o0aGQ0YndUT0c1TzM4?=
- =?utf-8?B?ck0vcEdmU2JMS2IxdWIyeXd4S3JDb0JYaFI3Q29kMWI5QnB6dUtFY1NUTVBZ?=
- =?utf-8?B?NVVDWTIrYWNab3pHOWJjL3VlSTlUemRZMlVGSGRXUjI0aTVaR1JTbzNPdUVE?=
- =?utf-8?B?em42c29RNTFwWkppU29rZGVndmJtU1plYzNZL1hpVVNsQjJDU2JjclNlU0I3?=
- =?utf-8?B?c2R1dmtuM3pNSEhZazNOR1VPT2V6d0dyTXp4Y0hNSkVGZ1ZCUmgwRTl5Nm1j?=
- =?utf-8?B?VnJNK3N6ZlJLRytKYnNHYVN4YzJlUXRCNGtxQkZNdTlENllmYUxObjNNNVhL?=
- =?utf-8?B?ckxNczNyblZzYmtpcnlCd2xpNm84TFdCckd2cjJzeUptVkp3MUFBNGpWak1S?=
- =?utf-8?B?MSt1bTNzTnhTQjNzOUZmSEhKSllMQWV4cDEyUElHK01TVmpjR1YzbmNoWTFp?=
- =?utf-8?B?MTZDOU11Y01UOUJHUllEcitLK0xTNHFsaG1WU2FMRktNNjliVld3NktkYWhi?=
- =?utf-8?B?dGhYSUtpdElhUWtaRlMvYnFLajhGZ0dFVzM3bXRSOElHTlNBdGRNWjlibHdm?=
- =?utf-8?B?NnhJYjk0OC9jLzlHQkg1UVk3aDVmNUFLQXpXSERsMEozd2d4bHA4bUN6S1lx?=
- =?utf-8?B?am5FN1hWYzZLOGExU0h6Tk0xVUthUWFBNmtrNGdKekhyc1BEYmt2VFBHVm9P?=
- =?utf-8?Q?rcFcJwoMNnjQbEJ4uyqAddUCCnmJU79Y?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jul 2024 16:23:35.5748
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 46d08b9f-433c-48bc-5c8e-08dca1c5d07f
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00036F43.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5971
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: bJ05gT0dL5CUBYGVd-UwsmMf1XGmGaM1
+X-Proofpoint-ORIG-GUID: ydhzCz_K1SRAxstt5eY2sc-YxVkf_ovY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-11_12,2024-07-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 clxscore=1015
+ suspectscore=0 lowpriorityscore=0 mlxlogscore=875 priorityscore=1501
+ mlxscore=0 bulkscore=0 malwarescore=0 impostorscore=0 spamscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407110114
 
-Hi Tom,
+On Thu, 11 Jul 2024 17:16:23 +0200
+Alexander Gordeev <agordeev@linux.ibm.com> wrote:
 
-On 7/11/2024 10:56 AM, Tom Lendacky wrote:
-> On 7/10/24 17:05, Pratik R. Sampat wrote:
->> Extend sev_smoke_test to also run a minimal SEV-SNP smoke test that
->> initializes and sets up private memory regions required to run a simple
->> SEV-SNP guest.
->>
->> Similar to it's SEV-ES smoke test counterpart, this also does not support
->> GHCB and ucall yet and uses the GHCB MSR protocol to trigger an exit of
->> the type KVM_EXIT_SYSTEM_EVENT.
->>
->> Also, decouple policy and type and require functions to provide both
->> such that there is no assumption regarding the type using policy.
->>
->> Signed-off-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
->> ---
->>  .../selftests/kvm/include/x86_64/processor.h  |  1 +
->>  .../selftests/kvm/include/x86_64/sev.h        | 29 ++++++++
->>  tools/testing/selftests/kvm/lib/kvm_util.c    |  7 +-
->>  .../selftests/kvm/lib/x86_64/processor.c      |  6 +-
->>  tools/testing/selftests/kvm/lib/x86_64/sev.c  | 70 ++++++++++++++++++-
->>  .../selftests/kvm/x86_64/sev_smoke_test.c     | 51 ++++++++++----
->>  6 files changed, 146 insertions(+), 18 deletions(-)
->>
->> diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
->> index 8eb57de0b587..5683fc9794e4 100644
->> --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
->> +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> On Wed, Jul 03, 2024 at 05:59:00PM +0200, Claudio Imbrenda wrote:
 > 
->> +
->> +	if (kvm_cpu_has(X86_FEATURE_SNP) && is_kvm_snp_supported()) {
->> +		test_sev(guest_snp_code, KVM_X86_SNP_VM, SNP_POLICY_SMT | SNP_POLICY_RSVD_MBO);
->> +		/* Test minimum firmware level */
->> +		test_sev(guest_snp_code, KVM_X86_SNP_VM,
->> +			 SNP_POLICY_SMT | SNP_POLICY_RSVD_MBO |
->> +			 (SNP_FW_REQ_VER_MAJOR * SNP_POLICY_ABI_MAJOR) |
->> +			 (SNP_FW_REQ_VER_MINOR * SNP_POLICY_ABI_MINOR));
+> Hi Claudio,
 > 
-> This seems an odd way of setting these fields. Maybe, instead, use a
-> couple of macros that take the values and shift appropriately and ensure
-> that they don't exceed the 8-bits each field occupies.
+> > Once in a separate header, the structs become available everywhere. One
+> > possible usecase is to merge them in the s390 
+> > definitions, which is left as an exercise for the reader.  
 > 
+> Is my understanding correct that you potentially see page_table_entry::val /
+> region?_table_entry.*::val / segment_table_entry.* merged with pte_t::pte /
+> p?d_t::p?d?
+> 
+> Thanks!
 
-Sure, I will clean this up and ensure the flags are set up more elegantly.
+that depends on how you want to do the merge
 
-> Thanks,
-> Tom
-> 
->>  
+you could do:
+
+typedef union {
+	unsigned long pte;
+	union page_table_entry hw;
+	union page_table_entry_softbits sw;
+} pte_t;
+
+then you would have pte_t::pte and pte_t::hw::val; unfortunately it's
+not possible to anonymously merge a named type.. 
+
+this would be great but can't be done*:
+
+typedef union {
+	unsigned long pte;
+	union page_table_entry;
+} pte_t;
+
+[*] gcc actually supports it with an additional feature switch, but
+it's not standard C and I seriously doubt we should even think about
+doing it
+
+another possibility is a plain
+
+typedef union page_table_entry pte_t;
+
+and then fix pte_val() and similar, but then you won't have the
+softbits.
+
+
+in the end, it's up to you how you want to merge them. I will
+have my own unions that I will use only inside KVM, that's enough for
+me.
 
