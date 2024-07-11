@@ -1,214 +1,162 @@
-Return-Path: <kvm+bounces-21460-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21461-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D06592F2AB
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 01:38:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF45C92F2B2
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 01:41:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CD93B21A19
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 23:38:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7691E1F2340C
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 23:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64E31A08BE;
-	Thu, 11 Jul 2024 23:37:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10FD816D9AC;
+	Thu, 11 Jul 2024 23:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ey5B82r0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IB6uPHY9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65B7E13D8A7
-	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 23:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF6615A4B7
+	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 23:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720741064; cv=none; b=cI0VIW/z8N4aFmFkI4+8Z6DSaugMlUeFCkHkK0x9cRaj/rdA7HWEm6w4Py9h1pHdmR1yvxcGfBAo3nbvq8zm2BLZzIh+XhFDfwbDbMLfQXcVpt2Detmix1sYYf1oieyUNI5yCy44+/Pbig492RmUCc48nT0hpQFodoNeVcrS1nk=
+	t=1720741286; cv=none; b=Ni7revEJwZ6U+tr7N6nkkgtGhIXiy68ul6czQt3UyYbGfokV17dGKblyOtfQsyN5b0CSqwEX+KvBTwHrLHaePaWzr9AHMgrH8L9qwwcNGfUsWhca/huJJtLPMGUoh0FqYt1jdGLipWh03HAf9r5rP8VwtvvOrnZw+QLaCN4qWqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720741064; c=relaxed/simple;
-	bh=dgq8E7YvbNGNJS8c4nZ2r/r1ZEL9B3HdAw4noW885qg=;
+	s=arc-20240116; t=1720741286; c=relaxed/simple;
+	bh=ZdwiAaNOEcsQ1iawVne670iRqDXG2wC8RCl2vG0f8s4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XIzNuV8ic2+RdHbBIjsPCFnrZhrrkgO67TR3K8jYB8bRoehrp4cNX0p7579lAAdr4Uv7DC32COojvOvx5TsIEW3+p0AFamW2MlYtu5xeji2NaFf49hsQGXrYLMxV24DNfe+5EdBvdW7ojmAc5Z9q479ifv+tjP5CP+OzuUm8hKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ey5B82r0; arc=none smtp.client-ip=209.85.128.42
+	 To:Cc:Content-Type; b=eqK2HzdtjgESvHoqeG9ucX86D4sF6r2MUAsb0phNdc2iKG2vviu+6z3zS9cYbQA6axtI+CQHpCuf4oyiLd9o9eupo+pcAfm3b9hIW/I5s6jBUl8Ys+AP+ey4ThIxs4LlDmIPBfs74EDbZcjw+ybOb86+elrmzOilrj3tDsqrsxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IB6uPHY9; arc=none smtp.client-ip=209.85.218.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4266fd39527so10515045e9.1
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 16:37:42 -0700 (PDT)
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a77b550128dso184940966b.0
+        for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 16:41:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720741061; x=1721345861; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720741283; x=1721346083; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dgq8E7YvbNGNJS8c4nZ2r/r1ZEL9B3HdAw4noW885qg=;
-        b=ey5B82r0D74quYWEYwM6a2ob0pf8hMBkPLSKo7tRh/NWBGFwMaYKdI0USqR/oMTkIc
-         M3dDo809aTpfOtkdNkFNq/ns/cjz6dmXeSPYAacYUOwGQNdcSd1okrwHY/8+co77Y3rn
-         Df/ZZXK7KsaSUUL7rPs7pcgp9KDinzj+ppwLQcxpXDCyT7jT0KPu5VLkKdqXKrLIBb6m
-         2qyhSQ8zoej6Bu7/lJp9MdbBlvjLSss+D9qeJnbdpCceGhToY+fNueHQ+jHGO0YYZJka
-         2lgYff1C83Z1+8LNBl3FTYGzgdL82F3OTsQkbxoS3tAzwYw8CzeYm7wOy1iv0Xsg1WaV
-         Bc1Q==
+        bh=pfuHNi5R9KMj0UxFnDquGekhSFTlViomrJL3yZ6eHpI=;
+        b=IB6uPHY9b3oD5sCw2UHcPFkbTlKmi4/7xOElYQ8683WO3DaPYW2eSl7j0xLwm7Rt8V
+         MQxnsZXhMYO0X42+P9zjHyFXVBvCNlFybjPHGijzQb3dpwPqx1/fISZQyeT9ROE1t7DN
+         cly7UhAEE2irDxu9+vEfzlhFvQHt8euTxRCKE/VS1MDcieh35mL9ph5m1rHp4O3uyaIg
+         UdQ33LbDBZZQg4GosPxXYQ9s2WTZgj2myGFFEqBvA7PTpF8tpT2fLyZQq+3yl/CcSUOK
+         64jzmYVsKdcFyxYm83i54rUY2z2NjLeOsGbEW8ZHhhq8Ufnm+F1gcy3s41I1andsrITP
+         Ja7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720741061; x=1721345861;
+        d=1e100.net; s=20230601; t=1720741283; x=1721346083;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dgq8E7YvbNGNJS8c4nZ2r/r1ZEL9B3HdAw4noW885qg=;
-        b=S4/FSW+HLrHmvx/1sPGEWKB8ks01W4WX8NX0cP2k+QIs9uvGp02Sr+D+ZpUx0TqxEs
-         mxyPCoacv9TZYWGBhO5MtFB5Q6rwiTCJ9btipD4dtASbyNTA7wc0b1T3JFq+s5qTpER8
-         k1xW0hfx7HqMbPqQwcu9DYz6FDrWpByKVRBn33mkhbuV7obarx9BiLyTjId+Rxydtg8T
-         BZEN6YRLtdfr+p3QukVTHFyMhzsXcxgNxNWgXN/d0ku/t11QAqXu7i3jerYl9gMbiZjN
-         i6+N10VrVrUQjDaU7R2hi66CKws/CEO4qQ6yxCkz3SUNinqLE9X8ffcj3aW6NDCOhJmV
-         Z+yg==
-X-Forwarded-Encrypted: i=1; AJvYcCWMh5tP+wuVpsQIDWFoh039aGV1Faqv+kUCkM7HsiJpDm+UKYOMmX0pRFvuzNtvOKcCGAEi6qPIOaRvMd4/v93xrbMb
-X-Gm-Message-State: AOJu0YwnJ6OUN055YxKT39nGvXYyUhKRMvDnyeFuhYEJLUad1zoE6Zvh
-	lYETOT18O1PmoN4tGOcI7uammYaCxd+EuRVH3S0ujifFeCxcc6MLxaG7jT6tI68who1PNkOAtX3
-	mbxhNfIHAC3UUbETTCsOBpiG1agMDNjQ0i/Cb
-X-Google-Smtp-Source: AGHT+IEj9ZGC5V2+20cQS5OtDDoP2eEqjjPsDXclNG0/fAcvhnVa6UmpiVn1brtJfh3dg3jBIokctcxiU0ucW5/AJo8=
-X-Received: by 2002:a5d:6d01:0:b0:367:91cf:e890 with SMTP id
- ffacd0b85a97d-367cea46185mr8420151f8f.6.1720741060650; Thu, 11 Jul 2024
- 16:37:40 -0700 (PDT)
+        bh=pfuHNi5R9KMj0UxFnDquGekhSFTlViomrJL3yZ6eHpI=;
+        b=ccfQCpSyzAOB20w2EBdx9K6/cldrpaJ9BoOJMaqtnlsiof6A/jW8Xu+gsWVWZIz6OY
+         24CfXXDzyMAJ2tH5zFkdPJWRKtugPt7y5ufWJp7XhxQE7tupI1CbJpLwPgOurvqUkpZz
+         k5lTzO+XhuZJR79ocHsQU4Ub5HL7kDEmGvF+61Tapfk5QIkTgQAgqWKTxQPP6R3ywJZ4
+         /w+bZ6YQ8w7TDIwVnhpPWyCtwDfRhSzZH52avN3y81LVwi7eEpYLHFX/ThYEiUNbsdvK
+         afqJIz2rijFYgDG+KKvF2S0JQVikxJMtvwLnZ2vstDGo/OWJ3m92778MPet3UrsqmoHq
+         Hq3g==
+X-Forwarded-Encrypted: i=1; AJvYcCX/xxMaXUA+urWYurLvQN7mI8VJQ/NS8yJITa8av2x01HJlnTRtfgHypQ3qHjAcT+c0OE4W4a3AK86CcL0ioVmkTahL
+X-Gm-Message-State: AOJu0Yz4Ja0KaBbdr4WH5/mqpDbs2bd/sgijZBKt51S0AOnG4tdAruXD
+	KoWKgKOpgZ7+teEDbgJZVFeSfkC1lEC/93IHy3W/oNrmUlRqw+3XizLpMUN1biT49uWgdOR/qDv
+	jb+oY7+PhMVR4zgGa1cReKdLVnoM1xa0IQThp
+X-Google-Smtp-Source: AGHT+IFND8OJ4Hc6Luty4DujmFBUJFFOnOhkbf4bXVfGHjmUWdjIMHEqzQfgESAoCPprxuNTe9hiEGwJ28pFonfz9vc=
+X-Received: by 2002:a17:907:d93:b0:a75:20f7:2c71 with SMTP id
+ a640c23a62f3a-a780b6ff667mr1002583166b.38.1720741282837; Thu, 11 Jul 2024
+ 16:41:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710234222.2333120-1-jthoughton@google.com>
-In-Reply-To: <20240710234222.2333120-1-jthoughton@google.com>
+References: <20240710234222.2333120-1-jthoughton@google.com> <20240710234222.2333120-5-jthoughton@google.com>
+In-Reply-To: <20240710234222.2333120-5-jthoughton@google.com>
 From: David Matlack <dmatlack@google.com>
-Date: Thu, 11 Jul 2024 16:37:13 -0700
-Message-ID: <CALzav=d+eALgV5UKnwHh67XYba53tkWwDNPWrThcmCP++sCiLg@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/18] KVM: Post-copy live migration for guest_memfd
+Date: Thu, 11 Jul 2024 16:40:54 -0700
+Message-ID: <CALzav=dfpy=BSZD4hOVMFSrfxgc5OhDjZHek7CzMDYRqTBALwg@mail.gmail.com>
+Subject: Re: [RFC PATCH 04/18] KVM: Fail __gfn_to_hva_many for userfault gfns.
 To: James Houghton <jthoughton@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
 	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.org>, 
 	Axel Rasmussen <axelrasmussen@google.com>, kvm@vger.kernel.org, linux-doc@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, Peter Xu <peterx@redhat.com>
+	kvmarm@lists.linux.dev
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Wed, Jul 10, 2024 at 4:42=E2=80=AFPM James Houghton <jthoughton@google.c=
 om> wrote:
 >
-> --- Preventing access: KVM_MEMORY_ATTRIBUTE_USERFAULT ---
+> Add gfn_has_userfault() that (1) checks that KVM Userfault is enabled,
+> and (2) that our particular gfn is a userfault gfn.
 >
-> The most straightforward way to inform KVM of userfault-enabled pages is
-> to use a new memory attribute, say KVM_MEMORY_ATTRIBUTE_USERFAULT.
+> Check gfn_has_userfault() as part of __gfn_to_hva_many to prevent
+> gfn->hva translations for userfault gfns.
 >
-> There is already infrastructure in place for modifying and checking
-> memory attributes. Using this interface is slightly challenging, as there
-> is no UAPI for setting/clearing particular attributes; we must set the
-> exact attributes we want.
-
-The thing we'll want to optimize specifically is clearing
-ATTRIBUTE_USERFAULT. During post-copy migration, there will be
-potentially hundreds of vCPUs in a single VM concurrently
-demand-fetching memory. Clearing ATTRIBUTE_USERFAULT for each page
-fetched is on the critical path of getting the vCPU back into
-guest-mode.
-
-Clearing ATTRIBUTE_USERFAULT just needs to clear the attribute. It
-doesn't need to modify page tables or update any data structures other
-than the attribute itself. But the existing UAPI takes both mmu_lock
-and slots_lock IIRC.
-
-I'm also concerned that the existing UAPI could lead to userspace
-accidentally clearing ATTRIBUTE_USERFAULT when it goes to set
-ATTRIBUTE_PRIVATE (or any other potential future attribute). Sure that
-could be solved but that means centrally tracking attributes in
-userspace and issuing one ioctl per contiguous region of guest memory
-with matching attributes. Imagine a scenario where ~every other page
-of guest memory as ATTRIBUTE_USERFAULT and then userspace wants to set
-a differient attribute on a large region of memory. That's going to
-take a _lot_ of ioctls.
-
-Having a UAPI to set (attributes |=3D delta) and clear (attributes &=3D
-~delta) attributes on a range of GFNs would solve both these problems.
-
+> Signed-off-by: James Houghton <jthoughton@google.com>
+> ---
+>  include/linux/kvm_host.h | 12 ++++++++++++
+>  virt/kvm/kvm_main.c      |  3 +++
+>  2 files changed, 15 insertions(+)
 >
-> The synchronization that is in place for updating memory attributes is
-> not suitable for post-copy live migration either, which will require
-> updating memory attributes (from userfault to no-userfault) very
-> frequently.
-
-There is also the xarray. I imagine that will trigger a lot of dynamic
-memory allocations during post-copy which will slow increase the total
-time a vCPU is paused due to a USERFAULT page.
-
-Is it feasible to convert attributes to a bitmap?
-
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index c1eb59a3141b..4cca896fb44a 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -140,6 +140,7 @@ static inline bool is_noslot_pfn(kvm_pfn_t pfn)
 >
-> Another potential interface could be to use something akin to a dirty
-> bitmap, where a bitmap describes which pages within a memslot (or VM)
-> should trigger userfaults. This way, it is straightforward to make
-> updates to the userfault status of a page cheap.
+>  #define KVM_HVA_ERR_BAD                (PAGE_OFFSET)
+>  #define KVM_HVA_ERR_RO_BAD     (PAGE_OFFSET + PAGE_SIZE)
+> +#define KVM_HVA_ERR_USERFAULT  (PAGE_OFFSET + 2 * PAGE_SIZE)
+>
+>  static inline bool kvm_is_error_hva(unsigned long addr)
+>  {
+> @@ -2493,4 +2494,15 @@ static inline bool kvm_userfault_enabled(struct kv=
+m *kvm)
+>  #endif
+>  }
+>
+> +static inline bool gfn_has_userfault(struct kvm *kvm, gfn_t gfn)
+> +{
+> +#ifdef CONFIG_KVM_USERFAULT
+> +       return kvm_userfault_enabled(kvm) &&
+> +               (kvm_get_memory_attributes(kvm, gfn) &
+> +                KVM_MEMORY_ATTRIBUTE_USERFAULT);
+> +#else
+> +       return false;
+> +#endif
+> +}
+> +
+>  #endif
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index ffa452a13672..758deb90a050 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2686,6 +2686,9 @@ static unsigned long __gfn_to_hva_many(const struct=
+ kvm_memory_slot *slot, gfn_t
+>         if (memslot_is_readonly(slot) && write)
+>                 return KVM_HVA_ERR_RO_BAD;
+>
+> +       if (gfn_has_userfault(slot->kvm, gfn))
+> +               return KVM_HVA_ERR_USERFAULT;
 
-Taking a similar approach to dirty logging is attractive for several reason=
-s.
+You missed the "many" part :)
 
-1. The infrastructure to manage per-memslot bitmaps already exists for
-dirty logging.
-2. It avoids the performance problems with xarrays by using a bitmap.
-3. It avoids the performance problems with setting all attributes at once.
+Speaking of, to do this you'll need to convert all callers that pass
+in nr_pages to actually set the number of pages they need. Today KVM
+just checks from gfn to the end of the slot and returns the total
+number of pages via nr_pages. i.e. We could end up checking (and async
+fetching) the entire slot!
 
-However it will require new specific UAPIs to set/clear. And it's
-probably possible to optimize attributes to meet our needs, and those
-changes will benefit all attributes.
-
+> +
+>         if (nr_pages)
+>                 *nr_pages =3D slot->npages - (gfn - slot->base_gfn);
 >
-> When KVM Userfault is enabled, we need to be careful not to map a
-> userfault page in response to a fault on a non-userfault page. In this
-> RFC, I've taken the simplest approach: force new PTEs to be PAGE_SIZE.
+> --
+> 2.45.2.993.g49e7a77208-goog
 >
-> --- Page fault notifications ---
->
-> For page faults generated by vCPUs running in guest mode, if the page
-> the vCPU is trying to access is a userfault-enabled page, we use
-> KVM_EXIT_MEMORY_FAULT with a new flag: KVM_MEMORY_EXIT_FLAG_USERFAULT.
->
-> For arm64, I believe this is actually all we need, provided we handle
-> steal_time properly.
-
-There's steal time, and also the GIC pages. Steal time can use
-KVM_EXIT_MEMORY_FAULT, but that requires special casing in the ARM
-code. Alternatively, both can use the async mechanism and to avoid
-special handling in the ARM code.
-
->
-> For x86, where returning from deep within the instruction emulator (or
-> other non-trivial execution paths) is infeasible, being able to pause
-> execution while userspace fetches the page, just as userfaultfd would
-> do, is necessary. Let's call these "asynchronous userfaults."
->
-> A new ioctl, KVM_READ_USERFAULT, has been added to read asynchronous
-> userfaults, and an eventfd is used to signal that new faults are
-> available for reading.
->
-> Today, we busy-wait for a gfn to have userfault disabled. This will
-> change in the future.
->
-> --- Fault resolution ---
->
-> Resolving userfaults today is as simple as removing the USERFAULT memory
-> attribute on the faulting gfn. This will change if we do not end up
-> using memory attributes for KVM Userfault. Having a range-based wake-up
-> like userfaultfd (see UFFDIO_WAKE) might also be helpful for
-> performance.
->
-> Problems with this series
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> - This cannot be named KVM Userfault! Perhaps "KVM missing pages"?
-> - Memory attribute modification doesn't scale well.
-> - We busy-wait for pages to not be userfault-enabled.
-
-Async faults are a slow path so I think a wait queue would suffice.
-
-> - gfn_to_hva and gfn_to_pfn caches are not invalidated.
-> - Page tables are not collapsed when KVM Userfault is disabled.
-> - There is no self-test for asynchronous userfaults.
-> - Asynchronous page faults can be dropped if KVM_READ_USERFAULT fails.
-
-Userspace would probably treat this as fatal anyway right?
 
