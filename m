@@ -1,237 +1,165 @@
-Return-Path: <kvm+bounces-21432-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21433-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5810692EE5D
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 20:08:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B652292EEE6
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 20:30:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11721282B00
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 18:08:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB4221C21192
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 18:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6BE16EB63;
-	Thu, 11 Jul 2024 18:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707DF16E875;
+	Thu, 11 Jul 2024 18:30:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fw/sPpjR"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Jsqf1XrO"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0029416D9B3
-	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 18:03:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04CB38DD9;
+	Thu, 11 Jul 2024 18:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720720993; cv=none; b=C3pBXH7AeLjfw/xSm5ArmJufHPV1LTvteXSeNYFwaOLJY1JaCcRcCKd7eKR+BHl7N4I4zrkYgMc1/ikAN6HtWQYphYa8RH8HjEpI08W8pj1dxJrzAlhpqByW3UenQWmexjgr4dY1XzvthH99pX6At+Ar8uHWU6HgDtKwQAurFCA=
+	t=1720722643; cv=none; b=XMRKr/KBbXM2FeIiCj3ukTBtdSrJqbSZ2Qvu9knbA0XnD9LTc6sSfvbHLJe6xmu5l95ECY5nGxvzCR0JO8Sl5ncxV2D5UiJF6AsdhOR7ZnQ60VqBNKgv0Z+xSGk+EqvgAaw55sTdFQkdBR5viAswMrV+3iO0qrI0vST3BX9ja98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720720993; c=relaxed/simple;
-	bh=ul6wGmGvayvF7Q/3RVvFFs/ZrscnpCnqpBv/fiyLAp0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T2TNpeNopHDc+CIlkPXVepGWmMeudg3Dy057pHTsa0RuCC9dyUH+hjlSsomQTl23tzBlTJD8JNphP0Q4opzzgewCuAk2mk7KdusTovOgW/4FAMA3Xp2JxRM8tTfpaY3DxtIEAntDV9wzRFT+Zmr3OMPOOYC3p/G5LUGIrrKwwjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fw/sPpjR; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720720990;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6Na0W+nnqCLAJBaL4aydebl5apHkb67BzyZZfMsvY/s=;
-	b=fw/sPpjRum0Sfl2aRvJxJ5FPoCJAL0yJIpDsXFm1kXp1FZ8G/09F84qts7v2okovdKgxEi
-	nVaBIT6hLhodE7oLn7vUBIxhkv2qxrK+ZLrwSELM9on7vD5/LJT7XN4lDrm3ImVJvY0MWf
-	gV4NZ9muDDH/FAeBRRjakPiuhR94fqI=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-629-emnnUYtQMXm4Ny4efZh3iw-1; Thu,
- 11 Jul 2024 14:03:09 -0400
-X-MC-Unique: emnnUYtQMXm4Ny4efZh3iw-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D0A631954B31;
-	Thu, 11 Jul 2024 18:03:07 +0000 (UTC)
-Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 8132E1955E89;
-	Thu, 11 Jul 2024 18:03:06 +0000 (UTC)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	kvm@vger.kernel.org
-Cc: vbabka@suse.cz,
-	david@redhat.com,
-	seanjc@google.com,
-	michael.roth@amd.com,
-	linux-mm@kvack.org
-Subject: [PATCH] mm, virt: merge AS_UNMOVABLE and AS_INACCESSIBLE
-Date: Thu, 11 Jul 2024 14:03:05 -0400
-Message-ID: <20240711180305.15626-1-pbonzini@redhat.com>
+	s=arc-20240116; t=1720722643; c=relaxed/simple;
+	bh=9sn8nM1twsWp4Q/iSpfYVppqiMuBH9x3yfcpgvicbbE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=TVCLaz4qJ4ftxZd9j3YPHD2WbhnHE2Wve/ZRYgci3wf97VaVVufRZKcB2pHmV2fr5P5nO0wfKS0vVZoEUWPJ29xVOcmY6f9ah3YB9nVNSkAEt8ubsP41x7fCWMGkX83/FSCz6NtCzyaZJ5GzaSJrXyzKXCt5CLg3OLBE7h9TNSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Jsqf1XrO; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46BDd6If012659;
+	Thu, 11 Jul 2024 18:30:38 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	CHu8EhmZTPioa8VNwURbLi9DcxTX1wc4x2b8oUW5ApE=; b=Jsqf1XrOQA8ktcnC
+	wMTQwrSYIL30KoQZQjmLrxsy+l0dvSdRpUfxaEHhquJ+rITSJnBoCLJ4GD0h2BnL
+	Y+dGJE2lP41q9f2Z6a3X1vxkezKqr7GvrXRcRkp23Sq17yvnLYYCxWAGiUXj51Qi
+	JmmX6Nos+zm+HpnCck/FqiIV9xaa7jon13OrWLuCLNabmmM7jhMm+AKjn0GYpdwW
+	POs774dWK1J3jilTQjAcutQcny16b/sYIw7LaLrsp9vaE7gycl9Tdh/0Pr8H/gQS
+	2yk189Ocdi5z9MnXW/WjhVShaGNI2QfbfXjK1TM5r8n2+Rh44gCfJO0zonpGeqZq
+	5ky6Ig==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 409vydug4k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 18:30:38 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46BIUbtH000739
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 18:30:37 GMT
+Received: from [10.81.24.74] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Thu, 11 Jul
+ 2024 11:30:37 -0700
+Message-ID: <a94604eb-7ea6-4813-aa78-6c73f7d4253a@quicinc.com>
+Date: Thu, 11 Jul 2024 11:30:36 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] vfio-mdev: add MODULE_DESCRIPTION() macros
+To: Kirti Wankhede <kwankhede@nvidia.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+References: <20240523-md-vfio-mdev-v1-1-4676cd532b10@quicinc.com>
+Content-Language: en-US
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+In-Reply-To: <20240523-md-vfio-mdev-v1-1-4676cd532b10@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: GgrMCBYmpWDWhAljSmRKHHmfMhE4GSTI
+X-Proofpoint-ORIG-GUID: GgrMCBYmpWDWhAljSmRKHHmfMhE4GSTI
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-11_13,2024-07-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 bulkscore=0
+ priorityscore=1501 clxscore=1011 mlxlogscore=999 impostorscore=0
+ suspectscore=0 spamscore=0 adultscore=0 malwarescore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407110128
 
-The flags AS_UNMOVABLE and AS_INACCESSIBLE were both added just for guest_memfd;
-AS_UNMOVABLE is already in existing versions of Linux, while AS_INACCESSIBLE was
-acked for inclusion in 6.11.
+On 5/23/24 17:12, Jeff Johnson wrote:
+> Fix the 'make W=1' warnings:
+> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mtty.o
+> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mdpy.o
+> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mdpy-fb.o
+> WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mbochs.o
+> 
+> Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+> ---
+>   samples/vfio-mdev/mbochs.c  | 1 +
+>   samples/vfio-mdev/mdpy-fb.c | 1 +
+>   samples/vfio-mdev/mdpy.c    | 1 +
+>   samples/vfio-mdev/mtty.c    | 1 +
+>   4 files changed, 4 insertions(+)
+> 
+> diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+> index 9062598ea03d..836456837997 100644
+> --- a/samples/vfio-mdev/mbochs.c
+> +++ b/samples/vfio-mdev/mbochs.c
+> @@ -88,6 +88,7 @@
+>   #define STORE_LE32(addr, val)	(*(u32 *)addr = val)
+>   
+>   
+> +MODULE_DESCRIPTION("Mediated virtual PCI display host device driver");
+>   MODULE_LICENSE("GPL v2");
+>   
+>   static int max_mbytes = 256;
+> diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
+> index 4598bc28acd9..149af7f598f8 100644
+> --- a/samples/vfio-mdev/mdpy-fb.c
+> +++ b/samples/vfio-mdev/mdpy-fb.c
+> @@ -229,4 +229,5 @@ static int __init mdpy_fb_init(void)
+>   module_init(mdpy_fb_init);
+>   
+>   MODULE_DEVICE_TABLE(pci, mdpy_fb_pci_table);
+> +MODULE_DESCRIPTION("Framebuffer driver for mdpy (mediated virtual pci display device)");
+>   MODULE_LICENSE("GPL v2");
+> diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+> index 27795501de6e..8104831ae125 100644
+> --- a/samples/vfio-mdev/mdpy.c
+> +++ b/samples/vfio-mdev/mdpy.c
+> @@ -40,6 +40,7 @@
+>   #define STORE_LE32(addr, val)	(*(u32 *)addr = val)
+>   
+>   
+> +MODULE_DESCRIPTION("Mediated virtual PCI display host device driver");
+>   MODULE_LICENSE("GPL v2");
+>   
+>   #define MDPY_TYPE_1 "vga"
+> diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+> index 2284b3751240..40e7d154455e 100644
+> --- a/samples/vfio-mdev/mtty.c
+> +++ b/samples/vfio-mdev/mtty.c
+> @@ -2059,5 +2059,6 @@ module_exit(mtty_dev_exit)
+>   
+>   MODULE_LICENSE("GPL v2");
+>   MODULE_INFO(supported, "Test driver that simulate serial port over PCI");
+> +MODULE_DESCRIPTION("Test driver that simulate serial port over PCI");
+>   MODULE_VERSION(VERSION_STRING);
+>   MODULE_AUTHOR(DRIVER_AUTHOR);
+> 
+> ---
+> base-commit: 5c4069234f68372e80e4edfcce260e81fd9da007
+> change-id: 20240523-md-vfio-mdev-381f74bf87f1
+> 
 
-But really, they are the same thing: only guest_memfd uses them, at least for
-now, and guest_memfd pages are unmovable because they should not be
-accessed by the CPU.
+I don't see this in linux-next yet so following up to see if anything 
+else is needed to get this merged.
 
-So merge them into one; use the AS_INACCESSIBLE name which is more comprehensive.
-At the same time, this fixes an embarrassing bug where AS_INACCESSIBLE was used
-as a bit mask, despite it being just a bit index.
+I hope to have these warnings fixed tree-wide in 6.11.
 
-The bug was mostly benign, becaus AS_INACCESSIBLE's bit representation (1010)
-corresponded to setting AS_UNEVICTABLE (which is already set) and AS_ENOSPC
-(except no async writes can happen on the guest_memfd).  So the AS_INACCESSIBLE
-flag simply had no effect.
-
-Fixes: 1d23040caa8b ("KVM: guest_memfd: Use AS_INACCESSIBLE when creating guest_memfd inode")
-Fixes: c72ceafbd12c ("mm: Introduce AS_INACCESSIBLE for encrypted/confidential memory")
-Cc: linux-mm@kvack.org
-Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
----
- include/linux/pagemap.h | 14 +++++++-------
- mm/compaction.c         | 12 ++++++------
- mm/migrate.c            |  2 +-
- mm/truncate.c           |  2 +-
- virt/kvm/guest_memfd.c  |  3 +--
- 5 files changed, 16 insertions(+), 17 deletions(-)
-
-diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
-index ce7bac8f81da..e05585eda771 100644
---- a/include/linux/pagemap.h
-+++ b/include/linux/pagemap.h
-@@ -208,8 +208,8 @@ enum mapping_flags {
- 	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
- 	AS_STABLE_WRITES,	/* must wait for writeback before modifying
- 				   folio contents */
--	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
--	AS_INACCESSIBLE,	/* Do not attempt direct R/W access to the mapping */
-+	AS_INACCESSIBLE,	/* Do not attempt direct R/W access to the mapping,
-+				   including to move the mapping */
- };
- 
- /**
-@@ -310,20 +310,20 @@ static inline void mapping_clear_stable_writes(struct address_space *mapping)
- 	clear_bit(AS_STABLE_WRITES, &mapping->flags);
- }
- 
--static inline void mapping_set_unmovable(struct address_space *mapping)
-+static inline void mapping_set_inaccessible(struct address_space *mapping)
- {
- 	/*
--	 * It's expected unmovable mappings are also unevictable. Compaction
-+	 * It's expected inaccessible mappings are also unevictable. Compaction
- 	 * migrate scanner (isolate_migratepages_block()) relies on this to
- 	 * reduce page locking.
- 	 */
- 	set_bit(AS_UNEVICTABLE, &mapping->flags);
--	set_bit(AS_UNMOVABLE, &mapping->flags);
-+	set_bit(AS_INACCESSIBLE, &mapping->flags);
- }
- 
--static inline bool mapping_unmovable(struct address_space *mapping)
-+static inline bool mapping_inaccessible(struct address_space *mapping)
- {
--	return test_bit(AS_UNMOVABLE, &mapping->flags);
-+	return test_bit(AS_INACCESSIBLE, &mapping->flags);
- }
- 
- static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
-diff --git a/mm/compaction.c b/mm/compaction.c
-index e731d45befc7..714afd9c6df6 100644
---- a/mm/compaction.c
-+++ b/mm/compaction.c
-@@ -1172,22 +1172,22 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
- 		if (((mode & ISOLATE_ASYNC_MIGRATE) && is_dirty) ||
- 		    (mapping && is_unevictable)) {
- 			bool migrate_dirty = true;
--			bool is_unmovable;
-+			bool is_inaccessible;
- 
- 			/*
- 			 * Only folios without mappings or that have
- 			 * a ->migrate_folio callback are possible to migrate
- 			 * without blocking.
- 			 *
--			 * Folios from unmovable mappings are not migratable.
-+			 * Folios from inaccessible mappings are not migratable.
- 			 *
- 			 * However, we can be racing with truncation, which can
- 			 * free the mapping that we need to check. Truncation
- 			 * holds the folio lock until after the folio is removed
- 			 * from the page so holding it ourselves is sufficient.
- 			 *
--			 * To avoid locking the folio just to check unmovable,
--			 * assume every unmovable folio is also unevictable,
-+			 * To avoid locking the folio just to check inaccessible,
-+			 * assume every inaccessible folio is also unevictable,
- 			 * which is a cheaper test.  If our assumption goes
- 			 * wrong, it's not a correctness bug, just potentially
- 			 * wasted cycles.
-@@ -1200,9 +1200,9 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
- 				migrate_dirty = !mapping ||
- 						mapping->a_ops->migrate_folio;
- 			}
--			is_unmovable = mapping && mapping_unmovable(mapping);
-+			is_inaccessible = mapping && mapping_inaccessible(mapping);
- 			folio_unlock(folio);
--			if (!migrate_dirty || is_unmovable)
-+			if (!migrate_dirty || is_inaccessible)
- 				goto isolate_fail_put;
- 		}
- 
-diff --git a/mm/migrate.c b/mm/migrate.c
-index dd04f578c19c..50b60fb414e9 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -965,7 +965,7 @@ static int move_to_new_folio(struct folio *dst, struct folio *src,
- 
- 		if (!mapping)
- 			rc = migrate_folio(mapping, dst, src, mode);
--		else if (mapping_unmovable(mapping))
-+		else if (mapping_inaccessible(mapping))
- 			rc = -EOPNOTSUPP;
- 		else if (mapping->a_ops->migrate_folio)
- 			/*
-diff --git a/mm/truncate.c b/mm/truncate.c
-index 60388935086d..581977d2356f 100644
---- a/mm/truncate.c
-+++ b/mm/truncate.c
-@@ -233,7 +233,7 @@ bool truncate_inode_partial_folio(struct folio *folio, loff_t start, loff_t end)
- 	 * doing a complex calculation here, and then doing the zeroing
- 	 * anyway if the page split fails.
- 	 */
--	if (!(folio->mapping->flags & AS_INACCESSIBLE))
-+	if (!mapping_inaccessible(folio->mapping))
- 		folio_zero_range(folio, offset, length);
- 
- 	if (folio_has_private(folio))
-diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 9148b9679bb1..1c509c351261 100644
---- a/virt/kvm/guest_memfd.c
-+++ b/virt/kvm/guest_memfd.c
-@@ -416,11 +416,10 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
- 	inode->i_private = (void *)(unsigned long)flags;
- 	inode->i_op = &kvm_gmem_iops;
- 	inode->i_mapping->a_ops = &kvm_gmem_aops;
--	inode->i_mapping->flags |= AS_INACCESSIBLE;
- 	inode->i_mode |= S_IFREG;
- 	inode->i_size = size;
- 	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
--	mapping_set_unmovable(inode->i_mapping);
-+	mapping_set_inaccessible(inode->i_mapping);
- 	/* Unmovable mappings are supposed to be marked unevictable as well. */
- 	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
- 
--- 
-2.43.0
-
+/jeff
 
