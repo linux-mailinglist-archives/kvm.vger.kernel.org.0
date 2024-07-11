@@ -1,224 +1,151 @@
-Return-Path: <kvm+bounces-21408-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21409-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E32092E813
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 14:16:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62D8992E847
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 14:29:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEAFD2845A7
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 12:16:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C5701F256E3
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 12:29:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA78F15B132;
-	Thu, 11 Jul 2024 12:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AA71156F3C;
+	Thu, 11 Jul 2024 12:29:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfhtIdM4"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MWZZNqYw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C40A1B809;
-	Thu, 11 Jul 2024 12:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1916815B14C;
+	Thu, 11 Jul 2024 12:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720700209; cv=none; b=nHOq9TNM/ETvjrlogbjLKHtJQGRtFZal4nIDkiLHyQ0MeoGbMnOYmrzbUFQ2yXRI2usbEweRE6gzEPdi/AVXX/4NpPdJIJWnSrCGb2HxtU86XpjuvbxeExWVyj/oSnSaRnGu3p4qz6wSkteoot3RwbvccgcVS+ZHsG3WfVQTsA8=
+	t=1720700941; cv=none; b=Kuko1hawSEFVFMbSdkiNLltY5kpwjLltTD5GRVQYQrCekOGNVLJNV4AA8tP9rqvwCF9Mj1buPAbIHRhRM2Frg6GJxzB978Nq6Bw/mfgcj8fTYTwRKQarOqgaUj2wkKjkeAgWAwqB8bgwWzJUzxwg+J7Sd1HjVwQnvqilwlrwbjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720700209; c=relaxed/simple;
-	bh=GB4T7FOIIOTbjv1qOuDM1/CMDCe80el9SuVOKkULX+E=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T2xbMsB0OzbYyXGwQJdR1MA9BYskLWseR7QWYNAxl602ZQ7hMHqe+KEbesFx4M2KkaSwRikIGf7Ajxpec0DAgYQC/nt/XuoUT5dAnemIOxqWT+IBxFtPFYTrLJnil+q6uSNj+i8/M0ZQdiq5B6Mgp740VydwO9zkaOyS8npFcAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfhtIdM4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98D0FC116B1;
-	Thu, 11 Jul 2024 12:16:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720700208;
-	bh=GB4T7FOIIOTbjv1qOuDM1/CMDCe80el9SuVOKkULX+E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hfhtIdM4XWdU67JnzcjXBWj2UgktY0iXuIKhQ0qQfMW1cEd7Q5I/ZVk7jAob+6yCN
-	 l5TN97Rtz39EvjE1oZziE02fok8okg2ClhSvo8LXV2jh953g2ymG3/tq+pcdFnBbdJ
-	 HHqzpZkkxcwVIyZvQQEOGwvqeP919udEADMGbuxKKfehVp4boI4dNlrp78QFI6aE5I
-	 Mald2KbTfHjLDE8L1AalvrX5f4N4kPMDE9uFVGOcBHM/tzTpaEYbpivzML07SAU3db
-	 477ThI0rz6+eYUe+PY2kSRqD8QmhQ88oet5EcIMz4/ibscUdZohx+AhdETIu985/ge
-	 Zju9YM+3jxivQ==
-Received: from [185.201.63.253] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sRsj7-00BWSd-RY;
-	Thu, 11 Jul 2024 13:16:46 +0100
-Date: Thu, 11 Jul 2024 13:16:42 +0100
-Message-ID: <874j8wp1hx.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <Zo+6TYIP3FNssR/b@arm.com>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<Zo+6TYIP3FNssR/b@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1720700941; c=relaxed/simple;
+	bh=+/83SP1PbOGLKjMgg581I0Zhh8oWyOJtMUN6msfz2S0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ssTsDEdFRZpbObFRlAHW2mz6FITD/ZL2U4RpAZVwsq00MQUY+kHR4JUbgHhLN+oc2+w7Mx/ZgCC4Hk/Tv/D5F12/S+fRXmUR/DNVU1az/DFGR/gerXWiMQyPOj5UjgL9dmo1v9EZIQZIYXfou+5PD5fZUWBF4D9VWs5X5I8q23w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MWZZNqYw; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46BCDoFx022113;
+	Thu, 11 Jul 2024 12:28:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	NNTPpaPvfiqoFF/AO9rb5Ffgjn7p7njpLbJAIiC6yXM=; b=MWZZNqYwNIpmxSDW
+	skQFVwJ8sKmGcZQSzmm4zpxcHAcOatB9L83hk1o5sFOawhnBdII3nC1yr8rFyQqE
+	Rz9S4XwVa5Ltwce6MuzPaNGcCaSmvU+UZevfnPTp3092lrBBpx7xoEopPxtdsR/r
+	4aq2AVrRwXn5brzV1WHzAu61ksyM2EnKCkVEU2bRB/AUHYr2A0RHa0fGBvrHk/1P
+	6CEPeDVE+00gqVTFtTxaDSPD4jSMrIloA1aJJInwkNJe4l7cghwOObAcss7QR6VX
+	04hBSJd799ovhmvmxuK4tdN5MQ8xyrbuKoTI/N8P5CXS6D2eacye9ZMQGTFGzsMZ
+	p207Mg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40aakegt5b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 12:28:55 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46BCPmOS011732;
+	Thu, 11 Jul 2024 12:28:55 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40aakegt58-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 12:28:55 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46BBmFvm024664;
+	Thu, 11 Jul 2024 12:28:54 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 407g8ugyaw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 12:28:54 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46BCSm7d59113956
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Jul 2024 12:28:50 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C02FF20043;
+	Thu, 11 Jul 2024 12:28:48 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1807320040;
+	Thu, 11 Jul 2024 12:28:48 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.19.34])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 11 Jul 2024 12:28:48 +0000 (GMT)
+Date: Thu, 11 Jul 2024 14:28:45 +0200
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah
+ Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        David Hildenbrand
+ <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: Re: [PATCH v1 5/9] selftests: kvm: s390: Add debug print functions
+Message-ID: <20240711142845.7507f86f.schlameuss@linux.ibm.com>
+In-Reply-To: <20240709183154.45770bdb@p-imbrenda.boeblingen.de.ibm.com>
+References: <20240709125704.61312-1-schlameuss@linux.ibm.com>
+	<20240709125704.61312-6-schlameuss@linux.ibm.com>
+	<20240709183154.45770bdb@p-imbrenda.boeblingen.de.ibm.com>
+Organization: IBM
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.201.63.253
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: A6j2fkSE_TEyTJnXsVurYNZ3pFArkOmJ
+X-Proofpoint-GUID: 3ytxCF2kMbboUvQuFbmbFWOZTZdmdASx
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-11_08,2024-07-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ phishscore=0 mlxscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0
+ mlxlogscore=813 adultscore=0 spamscore=0 suspectscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2406140001
+ definitions=main-2407110088
 
-On Thu, 11 Jul 2024 11:56:13 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi,
-> 
-> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > In order to plug the brokenness of our current AT implementation,
-> > we need a SW walker that is going to... err.. walk the S1 tables
-> > and tell us what it finds.
-> > 
-> > Of course, it builds on top of our S2 walker, and share similar
-> > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > it is able to bring back pages that have been otherwise evicted.
-> > 
-> > This is then plugged in the two AT S1 emulation functions as
-> > a "slow path" fallback. I'm not sure it is that slow, but hey.
-> > [..]
-> >  	switch (op) {
-> >  	case OP_AT_S1E1RP:
-> >  	case OP_AT_S1E1WP:
-> > +		retry_slow = false;
-> >  		fail = check_at_pan(vcpu, vaddr, &par);
-> >  		break;
-> >  	default:
-> >  		goto nopan;
-> >  	}
-> 
-> For context, this is what check_at_pan() does:
-> 
-> static int check_at_pan(struct kvm_vcpu *vcpu, u64 vaddr, u64 *res)
-> {
->         u64 par_e0;
->         int error;
-> 
->         /*
->          * For PAN-involved AT operations, perform the same translation,
->          * using EL0 this time. Twice. Much fun.
->          */
->         error = __kvm_at(OP_AT_S1E0R, vaddr);
->         if (error)
->                 return error;
-> 
->         par_e0 = read_sysreg_par();
->         if (!(par_e0 & SYS_PAR_EL1_F))
->                 goto out;
-> 
->         error = __kvm_at(OP_AT_S1E0W, vaddr);
->         if (error)
->                 return error;
-> 
->         par_e0 = read_sysreg_par();
-> out:
->         *res = par_e0;
->         return 0;
-> }
-> 
-> I'm having a hard time understanding why KVM is doing both AT S1E0R and AT S1E0W
-> regardless of the type of the access (read/write) in the PAN-aware AT
-> instruction. Would you mind elaborating on that?
+On Tue, 9 Jul 2024 18:31:54 +0200
+Claudio Imbrenda <imbrenda@linux.ibm.com> wrote:
 
-Because that's the very definition of an AT S1E1{W,R}P instruction
-when PAN is set. If *any* EL0 permission is set, then the translation
-must equally fail. Just like a load or a store from EL1 would fail if
-any EL0 permission is set when PSTATE.PAN is set.
-
-Since we cannot check for both permissions at once, we do it twice.
-It is worth noting that we don't quite handle the PAN3 case correctly
-(because we can't retrieve the *execution* property using AT). I'll
-add that to the list of stuff to fix.
-
+> On Tue,  9 Jul 2024 14:57:00 +0200
+> Christoph Schlameuss <schlameuss@linux.ibm.com> wrote:
 > 
-> > +	if (fail) {
-> > +		vcpu_write_sys_reg(vcpu, SYS_PAR_EL1_F, PAR_EL1);
-> > +		goto nopan;
-> > +	}
-> > [..]
-> > +	if (par & SYS_PAR_EL1_F) {
-> > +		u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> > +
-> > +		/*
-> > +		 * If we get something other than a permission fault, we
-> > +		 * need to retry, as we're likely to have missed in the PTs.
-> > +		 */
-> > +		if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
-> > +			retry_slow = true;
-> > +	} else {
-> > +		/*
-> > +		 * The EL0 access succeded, but we don't have the full
-> > +		 * syndrom information to synthetize the failure. Go slow.
-> > +		 */
-> > +		retry_slow = true;
-> > +	}
+
+[...]
+
+> > +static inline void print_hex_bytes(const char *name, u64 page, size_t len)  
 > 
-> This is what PSTATE.PAN controls:
+> "page" is not an appropriate name, it's just an address, right? "addr"
+> seems a more appropriate name
 > 
-> If the Effective value of PSTATE.PAN is 1, then a privileged data access from
-> any of the following Exception levels to a virtual memory address that is
-> accessible to data accesses at EL0 generates a stage 1 Permission fault:
+
+Yes, this is a address. I guess I just carried the name forward from
+when I really printed out a whole page...
+Will change this to addr.
+
+> > +{
+> > +	pr_debug("%s (%p)\t\t8-0x08  12-0x0c  16-0x10  20-0x14  24-0x18  28-0x1c",
+> > +		 name, (void *)page);
+> > +	for (u8 pp_row = 0; pp_row < (len / 32); pp_row++) {
+> > +		pr_debug("\n %3d 0x%.3x ", pp_row * 32, pp_row * 32);
+> > +		for (u8 pp_block = 0; pp_block < 8; pp_block++)
+> > +			pr_debug(" %8x", *(((u32 *)page) + 8 * pp_row + pp_block));  
 > 
-> - A privileged data access from EL1.
-> - If HCR_EL2.E2H is 1, then a privileged data access from EL2.
+> why not printing in blocks of 64 bits? 
 > 
-> With that in mind, I am really struggling to understand the logic.
 
-I don't quite see what you don't understand, you'll have to be more
-precise. Are you worried about the page tables we're looking at, the
-value of PSTATE.PAN, the permission fault, or something else?
+Nothing against 64 bit blocks. Adjusting that for the next version and
+also optimizing the functions to allow more reuse.
 
-It also doesn't help that you're looking at the patch that contains
-the integration with the slow-path, which is pretty hard to read (I
-have a reworked version that's a bit better). You probably want to
-look at the "fast" path alone.
-
-> 
-> If AT S1E0{R,W} (from check_at_pan()) failed, doesn't that mean that the virtual
-> memory address is not accessible to EL0? Add that to the fact that the AT
-> S1E1{R,W} (from the beginning of __kvm_at_s1e01()) succeeded, doesn't that mean
-> that AT S1E1{R,W}P should succeed, and furthermore the PAR_EL1 value should be
-> the one KVM got from AT S1E1{R,W}?
-
-There are plenty of ways for AT S1E0 to fail when AT S1E1 succeeded:
-
-- no EL0 permission: that's the best case, and the PAR_EL1 obtained
-  from the AT S1E1 is the correct one. That's what we return.
-
-- The EL0 access failed, but for another reason than a permission
-  fault. This contradicts the EL1 walk, and is a sure sign that
-  someone is playing behind our back. We fail.
-
-- exception from AT S1E0: something went wrong (again the guest
-  playing with the PTs behind our back). We fail as well.
-
-Do you at least agree with these as goals? If you do, what in
-the implementation does not satisfy these goals? If you don't, what in
-these goals seem improper to you?
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+[...]
 
