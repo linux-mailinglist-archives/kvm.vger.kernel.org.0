@@ -1,252 +1,221 @@
-Return-Path: <kvm+bounces-21399-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21400-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2B7C92E325
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 11:08:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5D1292E467
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 12:22:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9DB5B2765E
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 09:08:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEB081C20FD4
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 10:22:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1031415535A;
-	Thu, 11 Jul 2024 09:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E97715B155;
+	Thu, 11 Jul 2024 10:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="edW1QDUI"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="acXlhVV6"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEA015531B
-	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 09:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34AED158DCA;
+	Thu, 11 Jul 2024 10:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720688916; cv=none; b=Tw9mgGq5y6VU1KHg5iytb29Gawk9El/qZNkAUZZkS6EyRi70ql8fwRSDbdRLOSzJiwTZm50/ESeyovCoE+TZqgiLFf8tPIfHdG1sh4YhsgX8WEQ6WIpJUy2BndAWxvvQWyV6noPQEFpu2ITeCOm5fnlnP8BvFTSs6sK4SvA8vkc=
+	t=1720693238; cv=none; b=dgJQfQG+bmN4Bo9xoYcv00Fch9zvUgEFDWoklgz860F7En1aeg7OK2GYCWkR3dPtdSUnJ2uTWTmMFoM7bM38yeBo+6hMGOuc+XGCFOYfPkTSpIuE5ol/RYA/m8exf6SHsiEJuZ5Q8UqXy9vjWrk7b9eFr4HmaWBO4AY5pNMARU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720688916; c=relaxed/simple;
-	bh=ljxzkssEHs7PsymbyswJfU5Htuhh01H9EMxCQUsejwQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=e6HDGQgTHwz6M5LfazkYfPL9m+nz2/4LcWMRu+d6qpN5d/6awT5eoQ77gtZNZpMhCsF29HeZ7k7A+trB4MVO8sHoJA1wPpmhqjQ7CYXLIZRT+jnah/Kq42opLkMG5owV3EYon+T+W7xhUmAH1enoeDfZqz6UletLHfEQ0e9S3zI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=edW1QDUI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720688913;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z/tGGgMXZufug5VbuEhcEzd7l9HFMjvswmFUFEeaDBA=;
-	b=edW1QDUIcFUJRRiQIL4gj9GFObjD3jZy+F3DsmgKfER3VyfFmSEKXoc3KEfuYa2J/oYf11
-	0d6AhK02uXdZaL0GSHo/kDiCKk5hXo+BSw0p1YIeDadpmUDuaSnKF9gtdTGEdp3zTi6xdw
-	WTKgHNJPQ7V2i22VCrUtbpCRHrKLAyI=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-YhmN2xhDMaWzoUUkmNjcSw-1; Thu, 11 Jul 2024 05:08:31 -0400
-X-MC-Unique: YhmN2xhDMaWzoUUkmNjcSw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ee49ce152eso5407531fa.3
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 02:08:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720688910; x=1721293710;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Z/tGGgMXZufug5VbuEhcEzd7l9HFMjvswmFUFEeaDBA=;
-        b=Y0y6clNYHTAEoWDB7TCPgO8dxrLpfeQkF9T1BlVU0v12NOhiKaCXBcFWJwVbubhaet
-         3QIFAheE0tsIWyNtmiK1vTfvy4arMbBJrSobDvZJOlfM7WUYWTUOO14mmFXWTDENw+wI
-         ZXOcMbuzmt4YAFQIqXzYkG81izQ45iyFpVtoifkkOeI13pDerAaEcGkbutw+QvfKAauO
-         UuvAsJsMBKlFq+NtsGI0R+UDRt0dFdyHvtZFPf0xR+GivEPT4BVAfItPtF2aTST1xLbE
-         3iaHLWIPIkojniqSISYY8p9jYsiq/1UhvDesM8LDMm2aGrhNVF1K/h+uCD8lF+RgcFqM
-         4SSA==
-X-Forwarded-Encrypted: i=1; AJvYcCVl8VL4WwMVq6dS2Oedzh3MQTp6t82W38q0H5lRFUs8mUdo+U46dMvOeiJgqkwdzIfYRVG6A9+MKwjp5IN4S8kryndg
-X-Gm-Message-State: AOJu0YzGQ5Fclkq2memMEEUtnbgHBdA5cHJh9mkMBqGVyiV9R+V1gkS4
-	o3U+3FmM2XCJseR6Q8YL68hlAk745sY7l6wpZRNZC5RtwD4xV+OESm0rflq1TG7jHj9eYFJkAM8
-	pIvS7+BPEE9gahkDBrfuAtoZyMkqmFJWplw+h/5fOKyv4klAXE9m3lWoPm8ZqD2Gg5q+F7ltfZE
-	paQFBwNwOUGTUIuQr1q+yK5N5/
-X-Received: by 2002:a2e:a7c7:0:b0:2ee:5b64:b471 with SMTP id 38308e7fff4ca-2eeb30fefcdmr62447881fa.30.1720688910142;
-        Thu, 11 Jul 2024 02:08:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6W3hcev+Z5OBlMg/D7fGaW0A5j3JIOurKm0/vCYKBrpnwOMpohSuAs0Uf+VCxUXTyOZqrGR6A60J2YxKWLD0=
-X-Received: by 2002:a2e:a7c7:0:b0:2ee:5b64:b471 with SMTP id
- 38308e7fff4ca-2eeb30fefcdmr62447591fa.30.1720688909618; Thu, 11 Jul 2024
- 02:08:29 -0700 (PDT)
+	s=arc-20240116; t=1720693238; c=relaxed/simple;
+	bh=F3aR+zAqkDzpqd0PuT4ZrnZAaFGIhSJ4jLLyQ3QU5fk=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=t4fFpY1AIh8Ps5mhuxchVAJb2fILLJo2EmfhV1ZEGIE9PRq8tMF1xsVOVI+/x181RPwmN+EK1i2YWfwIhliTqnzUCg+Y95h7zWZQWoiXLsEScY0IA/KZkeEdLSc/9Ls5kizH1hBjgKfOG+Q9MZo8pn75EMixexNLr2XrkrWXDqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=acXlhVV6; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46B9RZE5032683;
+	Thu, 11 Jul 2024 10:20:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:subject:from:to:cc:date:in-reply-to:references
+	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
+	ljsrRvLatKM95w3PYrLldquJa+uyFCjvypOSO4Y79F0=; b=acXlhVV6KoAEHbAg
+	zfRZYtu7B8wR5XaSXUZyYhE5bdnUryVviauVXDRKA05OaasjahNv0a/OwsBxwBnk
+	iee+sB6VvqYHqIw9PwaNf4hCNsD1pY0PB/Al5lbXfM9aR8RCeM1oOhwdDNKm3Etl
+	ZRIwqyurbQB4B4S22U+yy3qlV+3/IIUL+rh/n/OtAZF8JjC/TJgx3KnSqz/5mA4J
+	BeeJOI0YPXlHvFuUqrMnIavtAQqORddnBkWwEsfN0xq0mJRUWYz3kcvTarJ9xDBn
+	nfqWAZf3jX7J0vyzTVhEb2CVkaRsvD4D2PYKWJeg9jLpOkVSTwiB2mYyZ/Qx0g3r
+	Hw4i4w==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40abwm874f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 10:20:22 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46BAKM7N016189;
+	Thu, 11 Jul 2024 10:20:22 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40abwm874a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 10:20:22 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46B72ZsP013920;
+	Thu, 11 Jul 2024 10:20:21 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 407gn10dvw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 11 Jul 2024 10:20:21 +0000
+Received: from smtpav06.dal12v.mail.ibm.com (smtpav06.dal12v.mail.ibm.com [10.241.53.105])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46BAKHgT48234996
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 11 Jul 2024 10:20:19 GMT
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8261A5805D;
+	Thu, 11 Jul 2024 10:20:17 +0000 (GMT)
+Received: from smtpav06.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 15E8658059;
+	Thu, 11 Jul 2024 10:20:15 +0000 (GMT)
+Received: from [9.61.80.103] (unknown [9.61.80.103])
+	by smtpav06.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 11 Jul 2024 10:20:14 +0000 (GMT)
+Message-ID: <15f117b4a9e0481aaa6fd5848a58d16900a65679.camel@linux.ibm.com>
+Subject: Re: [PATCH v4 4/4] vfio/pci: Enable PCI resource mmap() on s390 and
+ remove VFIO_PCI_MMAP
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Bjorn Helgaas <helgaas@kernel.org>, Christoph Hellwig <hch@lst.de>,
+        Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+        Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Gerd
+ Bayer <gbayer@linux.ibm.com>,
+        Matthew Rosato <mjrosato@linux.ibm.com>,
+        Jason Gunthorpe <jgg@ziepe.ca>, linux-s390@vger.kernel.org,
+        linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Date: Thu, 11 Jul 2024 12:20:14 +0200
+In-Reply-To: <20240704101634.30b542a2.alex.williamson@redhat.com>
+References: <20240626-vfio_pci_mmap-v4-0-7f038870f022@linux.ibm.com>
+	 <20240626-vfio_pci_mmap-v4-4-7f038870f022@linux.ibm.com>
+	 <20240704101634.30b542a2.alex.williamson@redhat.com>
+Autocrypt: addr=schnelle@linux.ibm.com; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: F6K5K9XJKonzOU57YGDueo5RsrojuhvP
+X-Proofpoint-ORIG-GUID: X4V1Si7hLJSvVjAY9lor1y1Utv51v5Ak
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240708064820.88955-1-lulu@redhat.com> <PH0PR12MB5481AE2FD52AEE1C10411F3DDCDB2@PH0PR12MB5481.namprd12.prod.outlook.com>
- <CACLfguXk4qiw4efRGK4Gw8OZQ_PKw6j+GVQJCVtbyJ+hxOoE0Q@mail.gmail.com>
- <20240709084109-mutt-send-email-mst@kernel.org> <CACGkMEtdFgbgrjNDoYfW1B+4BwG8=i9CP5ePiULm2n3837n29w@mail.gmail.com>
- <20240710020852-mutt-send-email-mst@kernel.org> <CACLfguW0HxPy7ZF7gg7hNzMqFcf5x87asQKBUqZMOJC_S8kSbw@mail.gmail.com>
-In-Reply-To: <CACLfguW0HxPy7ZF7gg7hNzMqFcf5x87asQKBUqZMOJC_S8kSbw@mail.gmail.com>
-From: Leonardo Milleri <lmilleri@redhat.com>
-Date: Thu, 11 Jul 2024 10:08:18 +0100
-Message-ID: <CAD2tU16x1aeZLcQrESroqz-5n=S0nkgh8QTQO31-yYF_7hqB=Q@mail.gmail.com>
-Subject: Re: [PATCH v3 0/2] vdpa: support set mac address from vdpa tool
-To: Cindy Lu <lulu@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Parav Pandit <parav@nvidia.com>
-Cc: Jason Wang <jasowang@redhat.com>, Dragos Tatulea <dtatulea@nvidia.com>, 
-	"sgarzare@redhat.com" <sgarzare@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"virtualization@lists.linux-foundation.org" <virtualization@lists.linux-foundation.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-11_06,2024-07-10_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 mlxlogscore=676
+ lowpriorityscore=0 adultscore=0 malwarescore=0 mlxscore=0
+ priorityscore=1501 phishscore=0 impostorscore=0 clxscore=1011
+ suspectscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407110069
 
-Sorry for the noise, resending the email in text format
+On Thu, 2024-07-04 at 10:16 -0600, Alex Williamson wrote:
+> On Wed, 26 Jun 2024 13:15:51 +0200
+> Niklas Schnelle <schnelle@linux.ibm.com> wrote:
+>=20
+> > With the introduction of memory I/O (MIO) instructions enbaled in commit
+> > 71ba41c9b1d9 ("s390/pci: provide support for MIO instructions") s390
+> > gained support for direct user-space access to mapped PCI resources.
+> > Even without those however user-space can access mapped PCI resources
+> > via the s390 specific MMIO syscalls. Thus mmap() can and should be
+> > supported on all s390 systems with native PCI. Since VFIO_PCI_MMAP
+> > enablement for s390 would make it unconditionally true and thus
+> > pointless just remove it entirely.
+> >=20
+> > Link: https://lore.kernel.org/all/c5ba134a1d4f4465b5956027e6a4ea6f6beff=
+969.camel@linux.ibm.com/
+> > Suggested-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com>
+> > Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
+> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> > ---
+> >  drivers/vfio/pci/Kconfig         | 4 ----
+> >  drivers/vfio/pci/vfio_pci_core.c | 3 ---
+> >  2 files changed, 7 deletions(-)
+>=20
+> I think you're planning a v5 which drops patch 3/ of this series and
+> finesses the commit log of patch 2/ a bit.  This has become much less a
+> vfio series, so if you want to commit through s390,
+>=20
+> Acked-by: Alex Williamson <alex.williamson@redhat.com>
+>=20
+> Thanks,
+> Alex
+>=20
 
-Hi All,
+Thank you! Yes I will send a v5. I actually already pushed a changed
+version to my git.kernel.org branch but we're still discussing
+internally because pdev->non_compliant_bars respectively the resulting
+removal of the resources is interfering with future work on user-space
+vfio-pci use of the ISM device with a vfio-pci-ism variant driver.
 
-My answers inline below
-
->> Any specific reason to pre-create those large number of vdpa devices of =
-the pool?
->> I was hoping to create vdpa device with needed attributes, when spawning=
- a kubevirt instance.
->> K8s DRA infrastructure [1] can be used to create the needed vdpa device.=
- Have you considered using the DRA of [1]?
-
-The vhost-vdpa devices are created in the host before spawning the
-kubevirt VM. This is achieved by using:
-- sriov-network-operator: load kernel drivers, create vdpa devices
-(with MAC address), etc
-- sriov-device-plugin: create pool of resources (vdpa devices in this
-case), advertise devices to k8s, allocate devices during pod creation
-(by the way, isn't this mechanism very similar to DRA?)
-
-Then we create the kubevirt VM by defining an interface with the
-following attributes:
-- type:vdpa
-- mac
-- source: vhost-vdpa path
-
-So the issue is, how to make sure the mac in the VM is the same mac of vdpa=
-?
-Two options:
-- ensure kubevirt interface mac is equal to vdpa mac: this is not
-possible because of the device plugin resource pool. You can have a
-few devices in the pool and the device plugin picks one randomly.
-- change vdpa mac address at a later stage, to make sure it is aligned
-with kubevirt interface mac. I don't know if there is already specific
-code in kubevirt to do that or need to be implemented.
-
-Hope this helps to clarify
-
-Thanks
-Leonardo
-
-
-On Wed, Jul 10, 2024 at 10:46=E2=80=AFAM Cindy Lu <lulu@redhat.com> wrote:
->
-> On Wed, 10 Jul 2024 at 14:10, Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Wed, Jul 10, 2024 at 11:05:48AM +0800, Jason Wang wrote:
-> > > On Tue, Jul 9, 2024 at 8:42=E2=80=AFPM Michael S. Tsirkin <mst@redhat=
-.com> wrote:
-> > > >
-> > > > On Tue, Jul 09, 2024 at 02:19:19PM +0800, Cindy Lu wrote:
-> > > > > On Tue, 9 Jul 2024 at 11:59, Parav Pandit <parav@nvidia.com> wrot=
-e:
-> > > > > >
-> > > > > > Hi Cindy,
-> > > > > >
-> > > > > > > From: Cindy Lu <lulu@redhat.com>
-> > > > > > > Sent: Monday, July 8, 2024 12:17 PM
-> > > > > > >
-> > > > > > > Add support for setting the MAC address using the VDPA tool.
-> > > > > > > This feature will allow setting the MAC address using the VDP=
-A tool.
-> > > > > > > For example, in vdpa_sim_net, the implementation sets the MAC=
- address to
-> > > > > > > the config space. However, for other drivers, they can implem=
-ent their own
-> > > > > > > function, not limited to the config space.
-> > > > > > >
-> > > > > > > Changelog v2
-> > > > > > >  - Changed the function name to prevent misunderstanding
-> > > > > > >  - Added check for blk device
-> > > > > > >  - Addressed the comments
-> > > > > > > Changelog v3
-> > > > > > >  - Split the function of the net device from vdpa_nl_cmd_dev_=
-attr_set_doit
-> > > > > > >  - Add a lock for the network device's dev_set_attr operation
-> > > > > > >  - Address the comments
-> > > > > > >
-> > > > > > > Cindy Lu (2):
-> > > > > > >   vdpa: support set mac address from vdpa tool
-> > > > > > >   vdpa_sim_net: Add the support of set mac address
-> > > > > > >
-> > > > > > >  drivers/vdpa/vdpa.c                  | 81 ++++++++++++++++++=
-++++++++++
-> > > > > > >  drivers/vdpa/vdpa_sim/vdpa_sim_net.c | 19 ++++++-
-> > > > > > >  include/linux/vdpa.h                 |  9 ++++
-> > > > > > >  include/uapi/linux/vdpa.h            |  1 +
-> > > > > > >  4 files changed, 109 insertions(+), 1 deletion(-)
-> > > > > > >
-> > > > > > > --
-> > > > > > > 2.45.0
-> > > > > >
-> > > > > > Mlx5 device already allows setting the mac and mtu during the v=
-dpa device creation time.
-> > > > > > Once the vdpa device is created, it binds to vdpa bus and other=
- driver vhost_vdpa etc bind to it.
-> > > > > > So there was no good reason in the past to support explicit con=
-fig after device add complicate the flow for synchronizing this.
-> > > > > >
-> > > > > > The user who wants a device with new attributes, as well destro=
-y and recreate the vdpa device with new desired attributes.
-> > > > > >
-> > > > > > vdpa_sim_net can also be extended for similar way when adding t=
-he vdpa device.
-> > > > > >
-> > > > > > Have you considered using the existing tool and kernel in place=
- since 2021?
-> > > > > > Such as commit d8ca2fa5be1.
-> > > > > >
-> > > > > > An example of it is,
-> > > > > > $ vdpa dev add name bar mgmtdev vdpasim_net mac 00:11:22:33:44:=
-55 mtu 9000
-> > > > > >
-> > > > > Hi Parav
-> > > > > Really thanks for your comments. The reason for adding this funct=
-ion
-> > > > > is to support Kubevirt.
-> > > > > the problem we meet is that kubevirt chooses one random vdpa devi=
-ce
-> > > > > from the pool and we don't know which one it going to pick. That =
-means
-> > > > > we can't get to know the Mac address before it is created. So we =
-plan
-> > > > > to have this function to change the mac address after it is creat=
-ed
-> > > > > Thanks
-> > > > > cindy
-> > > >
-> > > > Well you will need to change kubevirt to teach it to set
-> > > > mac address, right?
-> > >
-> > > That's the plan. Adding Leonardo.
-> > >
-> > > Thanks
-> >
-> > So given you are going to change kubevirt, can we
-> > change it to create devices as needed with the
-> > existing API?
-> >
-> Hi Micheal and Parav,
-> I'm really not familiar with kubevirt, hope Leonardo can help answer
-> these questions
-> Hi @Leonardo Milleri
-> would you help answer these questions?
->
-> Thanks
-> Cindy
-> > > >
-> > > > --
-> > > > MST
-> > > >
-> >
->
-
+Thanks,
+Niklas
 
