@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-21447-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21451-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C75B292F1E8
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 00:29:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 661B492F1EF
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 00:30:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B4241F24B52
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 22:29:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97A031C2225D
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 22:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BD151A38C0;
-	Thu, 11 Jul 2024 22:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8434A1A652B;
+	Thu, 11 Jul 2024 22:28:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L3IjuD66"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GYaXMaz1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B75681A2561
-	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 22:28:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 774221A2C03
+	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 22:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720736888; cv=none; b=TaLkjuMzAJK4tDjCmzTgSsLBozoK7DyibWwUSj85/X3UlsF2a9VEHyfyMMDAaLRVRV0CE18J6ds/s024Eg5mvAjItfki16QYBkDhXl7sEjIYGnjSwWzsjATteMutTJIYFEih05LRNTCjnV9hSP6R0TwEb47R8gSZOn6l9vWgGaI=
+	t=1720736890; cv=none; b=XR17dYu3yRRKMAZFWvGigG5p4etJZLytcYovFZJsGMMzGJNyLvH0KlIZTKa+KqkkpFLvSGtefLuJ4gr6EZmovoYoGNZhlIeNXFBLc8sR1Wj/TyU/ymno3T3K8FVeUSfIBGOfAF79r5VJKOzDRtowRXlTvEOaquZ2pYQwO1R+d0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720736888; c=relaxed/simple;
-	bh=3noS2xZdvGZRQ9VyWRjCizvA5eaHGFfmtjrTH/fev5M=;
+	s=arc-20240116; t=1720736890; c=relaxed/simple;
+	bh=Ve367pixorBRdOPefjPXUuwrWqmI9xjXUI0HpZqTyLI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZHvNYkBafEA4Jsqg5j/Gx0y/kwq7vhTNGHMgXaEF91zDueu6zDarqWz7IKO5AmzhbmMLSZOSAxicd+Q+gWygHsPIqVS9BuA4P35sQEamTsPT/tVgPHgG0q8QPIlQgBvqe11k3TaF/EYg9enwPOjecW813NG9+7ixZYR83QiUyF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L3IjuD66; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=WfS6nWQVIVaDhRSgx2NR5JBEIoS4vE2aG0A+TPW5vsfXi6zI5ZzMHMmAYzhuJhzata1ZiGzQ2IR/nNTIFI0ZuDteBFfx5mFOz4fmEZwlCUyPJkcFvgIcPAQx4QutK+e44yEgqGGWKFuV1gCCxDXS+dcGskqZO3rpbePrXFSwafE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GYaXMaz1; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720736885;
+	s=mimecast20190719; t=1720736886;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=OQJsIM33olpQsryznT5Y6g1VAopkpCW9wLp5voPKMSU=;
-	b=L3IjuD66L1BZn/xETZqK7rPpd4qkmODmHVoEvwz2BJxnpuNhWKN2DGa7mP6thzVGroMRQu
-	oVwrSXL9DElx2JOD0PT2hzN+QmLjaeDcOo8LrS0RZ0Ktu8ACyTEXBcWDFwQVgEXv9icth8
-	28sUewe1EnxL34ND1vr5nH51+HinMU8=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+	bh=GZEoVsxg65CVVTTTaTfnB0vLKsXzsAVAh8awqP2v8tc=;
+	b=GYaXMaz17vtAZkfIrUUYnlPa7nYfW8OWkMBAlv1n7Xp9tfJVjdzkVUKtj/U+kTLwwcrrI+
+	21iSkYYijOyyY46AL3ptewBYA+PmeMxxvw99ZPYto/LqEauVoDjdfvROgJcLmtASqPvQKQ
+	20jnivVT2bstgTjeXIoStcoJ8+MyPEU=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-441-dEaEXPHTNnKqsrwDWLyxJg-1; Thu,
- 11 Jul 2024 18:28:02 -0400
-X-MC-Unique: dEaEXPHTNnKqsrwDWLyxJg-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-678-arPgLaZTNY2jfzuIKPN2uQ-1; Thu,
+ 11 Jul 2024 18:28:03 -0400
+X-MC-Unique: arPgLaZTNY2jfzuIKPN2uQ-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5A633195609F;
-	Thu, 11 Jul 2024 22:28:01 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 35BB21955D66;
+	Thu, 11 Jul 2024 22:28:02 +0000 (UTC)
 Received: from virtlab1023.lab.eng.rdu2.redhat.com (virtlab1023.lab.eng.rdu2.redhat.com [10.8.1.187])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A57D819560AE;
-	Thu, 11 Jul 2024 22:28:00 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 71E0919560AE;
+	Thu, 11 Jul 2024 22:28:01 +0000 (UTC)
 From: Paolo Bonzini <pbonzini@redhat.com>
 To: linux-kernel@vger.kernel.org,
 	kvm@vger.kernel.org
 Cc: seanjc@google.com,
 	michael.roth@amd.com
-Subject: [PATCH 06/12] KVM: guest_memfd: delay kvm_gmem_prepare_folio() until the memory is passed to the guest
-Date: Thu, 11 Jul 2024 18:27:49 -0400
-Message-ID: <20240711222755.57476-7-pbonzini@redhat.com>
+Subject: [PATCH 07/12] KVM: guest_memfd: make kvm_gmem_prepare_folio() operate on a single struct kvm
+Date: Thu, 11 Jul 2024 18:27:50 -0400
+Message-ID: <20240711222755.57476-8-pbonzini@redhat.com>
 In-Reply-To: <20240711222755.57476-1-pbonzini@redhat.com>
 References: <20240711222755.57476-1-pbonzini@redhat.com>
 Precedence: bulk
@@ -76,214 +76,107 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Initializing the contents of the folio on fallocate() is unnecessarily
-restrictive.  It means that the page is registered with the firmware and
-then it cannot be touched anymore.  In particular, this loses the
-possibility of using fallocate() to pre-allocate the page for SEV-SNP
-guests, because kvm_arch_gmem_prepare() then fails.
+This is now possible because preparation is done by kvm_gmem_get_pfn()
+instead of fallocate().  In practice this is not a limitation, because
+even though guest_memfd can be bound to multiple struct kvm, for
+hardware implementations of confidential computing only one guest
+(identified by an ASID on SEV-SNP, or an HKID on TDX) will be able
+to access it.
 
-It's only when the guest actually accesses the page (and therefore
-kvm_gmem_get_pfn() is called) that the page must be cleared from any
-stale host data and registered with the firmware.  The up-to-date flag
-is clear if this has to be done (i.e. it is the first access and
-kvm_gmem_populate() has not been called).
+In the case of intra-host migration (not implemented yet for SEV-SNP,
+but we can use SEV-ES as an idea of how it will work), the new struct
+kvm inherits the same ASID and preparation need not be repeated.
 
-All in all, there are enough differences between kvm_gmem_get_pfn() and
-kvm_gmem_populate(), that it's better to separate the two flows completely.
-Extract the bulk of kvm_gmem_get_folio(), which take a folio and end up
-setting its up-to-date flag, to a new function kvm_gmem_prepare_folio();
-these are now done only by the non-__-prefixed kvm_gmem_get_pfn().
-As a bonus, __kvm_gmem_get_pfn() loses its ugly "bool prepare" argument.
-
-The previous semantics, where fallocate() could be used to prepare
-the pages in advance of running the guest, can be accessed with
-KVM_PRE_FAULT_MEMORY.
-
-For now, accessing a page in one VM will attempt to call
-kvm_arch_gmem_prepare() in all of those that have bound the guest_memfd.
-Cleaning this up is left to a separate patch.
-
-Suggested-by: Sean Christopherson <seanjc@google.com>
 Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 ---
- virt/kvm/guest_memfd.c | 107 ++++++++++++++++++++++++-----------------
- 1 file changed, 63 insertions(+), 44 deletions(-)
+ virt/kvm/guest_memfd.c | 47 ++++++++++++++++--------------------------
+ 1 file changed, 18 insertions(+), 29 deletions(-)
 
 diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-index 9271aba9b7b3..f637327ad8e1 100644
+index f637327ad8e1..f4d82719ec19 100644
 --- a/virt/kvm/guest_memfd.c
 +++ b/virt/kvm/guest_memfd.c
-@@ -25,7 +25,7 @@ static inline kvm_pfn_t folio_file_pfn(struct folio *folio, pgoff_t index)
+@@ -25,37 +25,27 @@ static inline kvm_pfn_t folio_file_pfn(struct folio *folio, pgoff_t index)
  	return folio_pfn(folio) + (index & (folio_nr_pages(folio) - 1));
  }
  
--static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
-+static int __kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
+-static int __kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct folio *folio)
++static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
++				    pgoff_t index, struct folio *folio)
  {
  #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_PREPARE
- 	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
-@@ -59,49 +59,60 @@ static int kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct fol
+-	struct list_head *gmem_list = &inode->i_mapping->i_private_list;
+-	struct kvm_gmem *gmem;
++	kvm_pfn_t pfn;
++	gfn_t gfn;
++	int rc;
+ 
+-	list_for_each_entry(gmem, gmem_list, entry) {
+-		struct kvm_memory_slot *slot;
+-		struct kvm *kvm = gmem->kvm;
+-		kvm_pfn_t pfn;
+-		gfn_t gfn;
+-		int rc;
++	if (!kvm_arch_gmem_prepare_needed(kvm))
++		return 0;
+ 
+-		if (!kvm_arch_gmem_prepare_needed(kvm))
+-			continue;
+-
+-		slot = xa_load(&gmem->bindings, index);
+-		if (!slot)
+-			continue;
+-
+-		pfn = folio_file_pfn(folio, index);
+-		gfn = slot->base_gfn + index - slot->gmem.pgoff;
+-		rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, folio_order(folio));
+-		if (rc) {
+-			pr_warn_ratelimited("gmem: Failed to prepare folio for GFN %llx PFN %llx error %d.\n",
+-					    gfn, pfn, rc);
+-			return rc;
+-		}
++	pfn = folio_file_pfn(folio, index);
++	gfn = slot->base_gfn + index - slot->gmem.pgoff;
++	rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, folio_order(folio));
++	if (rc) {
++		pr_warn_ratelimited("gmem: Failed to prepare folio for index %lx GFN %llx PFN %llx error %d.\n",
++				    index, gfn, pfn, rc);
++		return rc;
+ 	}
+-
+ #endif
++
  	return 0;
  }
  
--/* Returns a locked folio on success.  */
--static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index, bool prepare)
-+/* Process @folio, which contains @gfn (which in turn is contained in @slot),
-+ * so that the guest can use it.  On successful return the guest sees a zero
-+ * page so as to avoid leaking host data and the up-to-date flag is set.
-+ */
-+static int kvm_gmem_prepare_folio(struct file *file, struct kvm_memory_slot *slot,
-+				  gfn_t gfn, struct folio *folio)
+@@ -63,7 +53,7 @@ static int __kvm_gmem_prepare_folio(struct inode *inode, pgoff_t index, struct f
+  * so that the guest can use it.  On successful return the guest sees a zero
+  * page so as to avoid leaking host data and the up-to-date flag is set.
+  */
+-static int kvm_gmem_prepare_folio(struct file *file, struct kvm_memory_slot *slot,
++static int kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 				  gfn_t gfn, struct folio *folio)
  {
--	struct folio *folio;
-+	unsigned long nr_pages, i;
-+	pgoff_t index;
-+	int r;
- 
--	/* TODO: Support huge pages. */
--	folio = filemap_grab_folio(inode->i_mapping, index);
--	if (IS_ERR(folio))
--		return folio;
-+	if (folio_test_uptodate(folio))
-+		return 0;
-+
-+	nr_pages = folio_nr_pages(folio);
-+	for (i = 0; i < nr_pages; i++)
-+		clear_highpage(folio_page(folio, i));
- 
- 	/*
--	 * Use the up-to-date flag to track whether or not the memory has been
--	 * zeroed before being handed off to the guest.  There is no backing
--	 * storage for the memory, so the folio will remain up-to-date until
--	 * it's removed.
-+	 * Right now the folio order is always going to be zero,
-+	 * but the code is ready for huge folios, the only
-+	 * assumption being that the base pgoff of memslots is
-+	 * naturally aligned according to the folio's order.
-+	 * The desired order will be passed when creating the
-+	 * guest_memfd and checked when creating memslots.
- 	 *
--	 * TODO: Skip clearing pages when trusted firmware will do it when
--	 * assigning memory to the guest.
-+	 * By making the base pgoff of the memslot naturally aligned
-+	 * to the folio's order, huge folios are safe to prepare, no
-+	 * matter what page size is used to map memory into the guest.
- 	 */
--	if (!folio_test_uptodate(folio)) {
--		unsigned long nr_pages = folio_nr_pages(folio);
--		unsigned long i;
+ 	unsigned long nr_pages, i;
+@@ -92,8 +82,7 @@ static int kvm_gmem_prepare_folio(struct file *file, struct kvm_memory_slot *slo
+ 	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
+ 	index = gfn - slot->base_gfn + slot->gmem.pgoff;
+ 	index = ALIGN_DOWN(index, 1 << folio_order(folio));
 -
--		for (i = 0; i < nr_pages; i++)
--			clear_highpage(folio_page(folio, i));
--	}
--
--	if (prepare) {
--		int r =	kvm_gmem_prepare_folio(inode, index, folio);
--		if (r < 0) {
--			folio_unlock(folio);
--			folio_put(folio);
--			return ERR_PTR(r);
--		}
-+	WARN_ON(!IS_ALIGNED(slot->gmem.pgoff, 1 << folio_order(folio)));
-+	index = gfn - slot->base_gfn + slot->gmem.pgoff;
-+	index = ALIGN_DOWN(index, 1 << folio_order(folio));
- 
-+	r = __kvm_gmem_prepare_folio(file_inode(file), index, folio);
-+	if (!r)
+-	r = __kvm_gmem_prepare_folio(file_inode(file), index, folio);
++	r = __kvm_gmem_prepare_folio(kvm, slot, index, folio);
+ 	if (!r)
  		folio_mark_uptodate(folio);
--	}
  
--	/*
--	 * Ignore accessed, referenced, and dirty flags.  The memory is
--	 * unevictable and there is no storage to write back to.
--	 */
--	return folio;
-+	return r;
-+}
-+
-+/*
-+ * Returns a locked folio on success.  The caller is responsible for
-+ * setting the up-to-date flag before the memory is mapped into the guest.
-+ * There is no backing storage for the memory, so the folio will remain
-+ * up-to-date until it's removed.
-+ *
-+ * Ignore accessed, referenced, and dirty flags.  The memory is
-+ * unevictable and there is no storage to write back to.
-+ */
-+static struct folio *kvm_gmem_get_folio(struct inode *inode, pgoff_t index)
-+{
-+	/* TODO: Support huge pages. */
-+	return filemap_grab_folio(inode->i_mapping, index);
- }
- 
- static void kvm_gmem_invalidate_begin(struct kvm_gmem *gmem, pgoff_t start,
-@@ -201,7 +212,7 @@ static long kvm_gmem_allocate(struct inode *inode, loff_t offset, loff_t len)
- 			break;
- 		}
- 
--		folio = kvm_gmem_get_folio(inode, index, true);
-+		folio = kvm_gmem_get_folio(inode, index);
- 		if (IS_ERR(folio)) {
- 			r = PTR_ERR(folio);
- 			break;
-@@ -555,7 +566,7 @@ void kvm_gmem_unbind(struct kvm_memory_slot *slot)
- /* Returns a locked folio on success.  */
- static struct folio *
- __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
--		   gfn_t gfn, kvm_pfn_t *pfn, int *max_order, bool prepare)
-+		   gfn_t gfn, kvm_pfn_t *pfn, int *max_order)
- {
- 	pgoff_t index = gfn - slot->base_gfn + slot->gmem.pgoff;
- 	struct kvm_gmem *gmem = file->private_data;
-@@ -572,7 +583,7 @@ __kvm_gmem_get_pfn(struct file *file, struct kvm_memory_slot *slot,
- 		return ERR_PTR(-EIO);
+@@ -616,7 +605,7 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
+ 		goto out;
  	}
  
--	folio = kvm_gmem_get_folio(file_inode(file), index, prepare);
-+	folio = kvm_gmem_get_folio(file_inode(file), index);
- 	if (IS_ERR(folio))
- 		return folio;
- 
-@@ -594,17 +605,25 @@ int kvm_gmem_get_pfn(struct kvm *kvm, struct kvm_memory_slot *slot,
- {
- 	struct file *file = kvm_gmem_get_file(slot);
- 	struct folio *folio;
-+	int r = 0;
- 
- 	if (!file)
- 		return -EFAULT;
- 
--	folio = __kvm_gmem_get_pfn(file, slot, gfn, pfn, max_order, true);
--	fput(file);
--	if (IS_ERR(folio))
--		return PTR_ERR(folio);
-+	folio = __kvm_gmem_get_pfn(file, slot, gfn, pfn, max_order);
-+	if (IS_ERR(folio)) {
-+		r = PTR_ERR(folio);
-+		goto out;
-+	}
- 
-+	r = kvm_gmem_prepare_folio(file, slot, gfn, folio);
+-	r = kvm_gmem_prepare_folio(file, slot, gfn, folio);
++	r = kvm_gmem_prepare_folio(kvm, slot, gfn, folio);
  	folio_unlock(folio);
--	return 0;
-+	if (r < 0)
-+		folio_put(folio);
-+
-+out:
-+	fput(file);
-+	return r;
- }
- EXPORT_SYMBOL_GPL(kvm_gmem_get_pfn);
- 
-@@ -643,7 +662,7 @@ long kvm_gmem_populate(struct kvm *kvm, gfn_t start_gfn, void __user *src, long
- 			break;
- 		}
- 
--		folio = __kvm_gmem_get_pfn(file, slot, gfn, &pfn, &max_order, false);
-+		folio = __kvm_gmem_get_pfn(file, slot, gfn, &pfn, &max_order);
- 		if (IS_ERR(folio)) {
- 			ret = PTR_ERR(folio);
- 			break;
+ 	if (r < 0)
+ 		folio_put(folio);
 -- 
 2.43.0
 
