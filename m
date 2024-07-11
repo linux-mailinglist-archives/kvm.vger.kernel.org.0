@@ -1,191 +1,146 @@
-Return-Path: <kvm+bounces-21411-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21412-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08E1792E968
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 15:24:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA9F392EB26
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 16:59:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3D8C280F1A
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 13:24:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24A9BB21846
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 14:59:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4459B15FCEA;
-	Thu, 11 Jul 2024 13:24:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B8C16C852;
+	Thu, 11 Jul 2024 14:58:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fnKlRyzT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EQt3hj46"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D55E315EFAE;
-	Thu, 11 Jul 2024 13:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C347516A934;
+	Thu, 11 Jul 2024 14:58:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720704275; cv=none; b=DcrtpGiFgQxfmVanrZV55YdZJZwbAjUaKizax53D199ElkrD1tJTdf1nJPMcAYU8BX1JZk/ROISac/EDJhON1/6+hnayk++4cNj6XTnW8kIa1Ga8InSFUVBc45cS0Fm88iaJWtL68DlhZwx+PgNOVCR6avSKOuGGoIyeHOCpJiQ=
+	t=1720709937; cv=none; b=q7juwat867hdMb2oM0VQHE7pGmPrCt3LtCRPccRjEZvrbVS+fyalPfOZKenDp0iWUVLxyzomsBVwI69yIXGaNG3+/bX6/WyhxuAAiNgEGg7PMNMfM6PhD+mgkMBT+xXGZSZ3mRuPfVGPeSZtuPVK0NEnwr8zSggDDNphmg+QFAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720704275; c=relaxed/simple;
-	bh=w1u81luxRSKXuuP8bL2ZtVySjx/0jxSrRzrfaS7TWpk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HqsHFzUONatg617mG+Jvr+lsFMhL3wcqPgYCg7oDffTzAhvD7BEMSW4upEKgQ66nsgg8lXqWqWMUXFrMm9ambFuwaiHEoPAJPuF5bqYFPJs+KQPuuvUSZFhHvuYuWkrdIcoUlm3TvHcv/vy7YZ7ARohRVn2IXSKOA9n/7NCwDmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fnKlRyzT; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720704274; x=1752240274;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=w1u81luxRSKXuuP8bL2ZtVySjx/0jxSrRzrfaS7TWpk=;
-  b=fnKlRyzTMusmSQxIr//bTdOI1F6boLgTfbRyVQUJnNsQyZPOY7wrhGDR
-   OVJhlorejfnUVWxDwHVLbCP2luSVg9K5/RGzYx5QYH2mknkAeEc2MKoZy
-   0iAzz6Q/jZPGk3T0DsDCqKdPbPiWnLEAJd2GEROsNHJj6UgdPqTFj1lwI
-   /yHfD7OGTnXPVQ20SqJx4tCKwPNWJuKRX0zg5SyK+U8Acf1A12nqA/Jt0
-   fB2EOBEy4pxASqpJsvqgbMp95mmV2QpM3NypwPYC6hxJTAUcGWnq2lwvQ
-   N/wylCQ9rNKZKOkFztasjAYZm2hYXjsckhqre+yEd1YAn+2Ll5+7/I8fS
-   w==;
-X-CSE-ConnectionGUID: 8hmpUz8XR5+VWRgfZtNGig==
-X-CSE-MsgGUID: +ZeZT5nYSlK2yJu456jxQA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11130"; a="28676502"
-X-IronPort-AV: E=Sophos;i="6.09,200,1716274800"; 
-   d="scan'208";a="28676502"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2024 06:24:33 -0700
-X-CSE-ConnectionGUID: w68rnNGyTX+raf3+ra/vZQ==
-X-CSE-MsgGUID: xfhpknJGQvakxEtM1SwOLA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,200,1716274800"; 
-   d="scan'208";a="53376105"
-Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 11 Jul 2024 06:24:27 -0700
-Received: from kbuild by 68891e0c336b with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1sRtmZ-000ZJz-2y;
-	Thu, 11 Jul 2024 13:24:23 +0000
-Date: Thu, 11 Jul 2024 21:23:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>, linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Alexander Duyck <alexander.h.duyck@linux.intel.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	David Hildenbrand <david@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Mathieu Poirier <mathieu.poirier@linaro.org>,
-	Cornelia Huck <cohuck@redhat.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Eric Farman <farman@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	linux-um@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-	linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] virtio: fix vq # for balloon
-Message-ID: <202407112113.SzSpdDLK-lkp@intel.com>
-References: <3d655be73ce220f176b2c163839d83699f8faf43.1720611677.git.mst@redhat.com>
+	s=arc-20240116; t=1720709937; c=relaxed/simple;
+	bh=4GyMZnbR7RiPhK1S6uAJ8PduAHpuNhc35bIXtjWWqbQ=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=jA/sdPRoKZcvnSHI1EpU+741+peBOqfhOf92BP1RzKvAuHCZOtZpbAsZxxrSbjipyGW2/nYyBgkPCwE0/1slNTJh0oK3iOFjZCSNqXPSZ/hrjtsgal+91223SYKXs96eQ2+89jWNMoO3lSBnLsApoeraECsqi7HbAZwnmGQZ7dA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EQt3hj46; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F79CC116B1;
+	Thu, 11 Jul 2024 14:58:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720709937;
+	bh=4GyMZnbR7RiPhK1S6uAJ8PduAHpuNhc35bIXtjWWqbQ=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=EQt3hj462HVtv8t7gwaJVzRsId2xhPA5K1Iq4x6shc7r70N+2E0N4CUI8kpgcRPfY
+	 Xw54ltVGnoOTRawhBxtsPlusVHUBxMGJgSZqb47+3c/n6sdDmBl7jLGlwViklznptw
+	 YXpL8gqEaJ6gAbBpGAnveiXiWVuVfmDXFBGZwTPUKLCr42rI6boEFit0PjEU+VP7DH
+	 V0sFYEvfGqL3SDQVIkqb5z8Z5BmF34QB0383GnF+9JfIZAsYPGt8d6VqoppvUJ0jWS
+	 0Wb4oEOq05KxLPtDjLLDsER/G2ojB4ZP4DAO0t6zhQLo2UePctiOgeo5gEVzokMEms
+	 MOnE0PPonKoDA==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44310C3DA49;
+	Thu, 11 Jul 2024 14:58:57 +0000 (UTC)
+From: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>
+Subject: [PATCH net-next v3 0/2] vsock: avoid queuing on workqueue if
+ possible
+Date: Thu, 11 Jul 2024 16:58:45 +0200
+Message-Id: <20240711-pinna-v3-0-697d4164fe80@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3d655be73ce220f176b2c163839d83699f8faf43.1720611677.git.mst@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIACXzj2YC/x3MQQqAIBBA0avErBPGEsKuEi20xprNJBoRiHdPW
+ j74/AKZElOGuSuQ6OHMlzSMfQfb6eQgxXszDDgYnLRWkUWcMtYHdB6tRQutjYkCv/9nAaFbCb0
+ 3rLV+RekMaGEAAAA=
+To: Stefan Hajnoczi <stefanha@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luigi Leonardi <luigi.leonardi@outlook.com>, 
+ Marco Pinna <marco.pinn95@gmail.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1720709936; l=2312;
+ i=luigi.leonardi@outlook.com; s=20240626; h=from:subject:message-id;
+ bh=4GyMZnbR7RiPhK1S6uAJ8PduAHpuNhc35bIXtjWWqbQ=;
+ b=OKe8ArgWw5s3u221y8cYuzl/lSRKwV/KLQr+zKG2+UoJkwwYco3/h7ze8TQ2g7Tou2mH9sYna
+ ymMojPaSHiSBhA1oKQ0WLMtDg4CnXUz90W6JcWVVr7GBamNlm0wr8C3
+X-Developer-Key: i=luigi.leonardi@outlook.com; a=ed25519;
+ pk=RYXD8JyCxGnx/izNc/6b3g3pgpohJMAI0LJ7ynxXzi8=
+X-Endpoint-Received: by B4 Relay for luigi.leonardi@outlook.com/20240626
+ with auth_id=177
+X-Original-From: Luigi Leonardi <luigi.leonardi@outlook.com>
+Reply-To: luigi.leonardi@outlook.com
 
-Hi Michael,
+This series introduces an optimization for vsock/virtio to reduce latency
+and increase the throughput: When the guest sends a packet to the host, 
+and the workqueue is empty, if there is enough space, the packet is put
+directly in the virtqueue.
 
-kernel test robot noticed the following build errors:
+v2->v3
+- Performed more experiments using iperf3 using multiple streams
+- Handling of reply packets removed from virtio_transport_send_skb,
+  as is needed just by the worker. 
+- Removed atomic_inc/atomic_sub when queuing directly to the vq.
+- Introduced virtio_transport_send_skb_fast_path that handles the
+  steps for sending on the vq. 
+- Fixed a missing mutex_unlock in error path.
+- Changed authorship of the second commit
+- Rebased on latest net-next
 
-[auto build test ERROR on next-20240710]
-[cannot apply to uml/next remoteproc/rproc-next s390/features linus/master uml/fixes v6.10-rc7 v6.10-rc6 v6.10-rc5 v6.10-rc7]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+v1->v2
+In this v2 I replaced a mutex_lock with a mutex_trylock because it was
+insidea RCU critical section. I also added a check on tx_run, so if the
+module is being removed the packet is not queued. I'd like to thank Stefano
+for reporting the tx_run issue.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Michael-S-Tsirkin/virtio_balloon-add-work-around-for-out-of-spec-QEMU/20240711-004346
-base:   next-20240710
-patch link:    https://lore.kernel.org/r/3d655be73ce220f176b2c163839d83699f8faf43.1720611677.git.mst%40redhat.com
-patch subject: [PATCH v2 2/2] virtio: fix vq # for balloon
-config: i386-randconfig-014-20240711 (https://download.01.org/0day-ci/archive/20240711/202407112113.SzSpdDLK-lkp@intel.com/config)
-compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240711/202407112113.SzSpdDLK-lkp@intel.com/reproduce)
+Applied all Stefano's suggestions:
+    - Minor code style changes
+    - Minor commit text rewrite
+Performed more experiments:
+     - Check if all the packets go directly to the vq (Matias' suggestion)
+     - Used iperf3 to see if there is any improvement in overall throughput
+      from guest to host
+     - Pinned the vhost process to a pCPU.
+     - Run fio using 512B payload
+Rebased on latest net-next
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407112113.SzSpdDLK-lkp@intel.com/
+To: Stefan Hajnoczi <stefanha@redhat.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+To: David S. Miller <davem@davemloft.net>
+To: Eric Dumazet <edumazet@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: kvm@vger.kernel.org
+Cc: virtualization@lists.linux.dev
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
 
-All errors (new ones prefixed by >>):
+Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
+---
+Luigi Leonardi (1):
+      vsock/virtio: avoid queuing packets when work queue is empty
 
->> drivers/virtio/virtio_pci_common.c:391:1: error: version control conflict marker in file
-     391 | <<<<<<< HEAD
-         | ^
->> drivers/virtio/virtio_pci_common.c:392:30: error: use of undeclared identifier 'queue_idx'
-     392 |                 vqs[i] = vp_setup_vq(vdev, queue_idx++, vqi->callback,
-         |                                            ^
-   2 errors generated.
+Marco Pinna (1):
+      vsock/virtio: refactor virtio_transport_send_pkt_work
 
+ net/vmw_vsock/virtio_transport.c | 143 +++++++++++++++++++++++++--------------
+ 1 file changed, 93 insertions(+), 50 deletions(-)
+---
+base-commit: 58f9416d413aa2c20b2515233ce450a1607ef843
+change-id: 20240711-pinna-49bf0ab09909
 
-vim +391 drivers/virtio/virtio_pci_common.c
-
-   365	
-   366	static int vp_find_vqs_intx(struct virtio_device *vdev, unsigned int nvqs,
-   367				    struct virtqueue *vqs[],
-   368				    struct virtqueue_info vqs_info[])
-   369	{
-   370		struct virtio_pci_device *vp_dev = to_vp_device(vdev);
-   371		int i, err;
-   372	
-   373		vp_dev->vqs = kcalloc(nvqs, sizeof(*vp_dev->vqs), GFP_KERNEL);
-   374		if (!vp_dev->vqs)
-   375			return -ENOMEM;
-   376	
-   377		err = request_irq(vp_dev->pci_dev->irq, vp_interrupt, IRQF_SHARED,
-   378				dev_name(&vdev->dev), vp_dev);
-   379		if (err)
-   380			goto out_del_vqs;
-   381	
-   382		vp_dev->intx_enabled = 1;
-   383		vp_dev->per_vq_vectors = false;
-   384		for (i = 0; i < nvqs; ++i) {
-   385			struct virtqueue_info *vqi = &vqs_info[i];
-   386	
-   387			if (!vqi->name) {
-   388				vqs[i] = NULL;
-   389				continue;
-   390			}
- > 391	<<<<<<< HEAD
- > 392			vqs[i] = vp_setup_vq(vdev, queue_idx++, vqi->callback,
-   393					     vqi->name, vqi->ctx,
-   394	=======
-   395			vqs[i] = vp_setup_vq(vdev, i, callbacks[i], names[i],
-   396					     ctx ? ctx[i] : false,
-   397	>>>>>>> f814759f80b7... virtio: fix vq # for balloon
-   398					     VIRTIO_MSI_NO_VECTOR);
-   399			if (IS_ERR(vqs[i])) {
-   400				err = PTR_ERR(vqs[i]);
-   401				goto out_del_vqs;
-   402			}
-   403		}
-   404	
-   405		return 0;
-   406	out_del_vqs:
-   407		vp_del_vqs(vdev);
-   408		return err;
-   409	}
-   410	
-
+Best regards,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Luigi Leonardi <luigi.leonardi@outlook.com>
+
+
 
