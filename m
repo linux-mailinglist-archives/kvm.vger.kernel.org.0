@@ -1,117 +1,224 @@
-Return-Path: <kvm+bounces-21407-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3415592E804
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 14:11:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E32092E813
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 14:16:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3E7F282B98
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 12:11:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEAFD2845A7
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 12:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E440A15B12C;
-	Thu, 11 Jul 2024 12:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA78F15B132;
+	Thu, 11 Jul 2024 12:16:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hfhtIdM4"
 X-Original-To: kvm@vger.kernel.org
-Received: from njjs-sys-mailin01.njjs.baidu.com (mx314.baidu.com [180.101.52.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A4C9155332
-	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 12:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=180.101.52.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C40A1B809;
+	Thu, 11 Jul 2024 12:16:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720699909; cv=none; b=XzMPMGCmQeAQihF51ShNAMZqSrv0T2LQmUfUXxyr+2uqidq8urwQz53DPAgGaiQlPyUPYwAZCBJGWiF0DM9qLyjFOqe+7907MQz4On7JffhhOpbjC1BvOvrWqxb8tml5mS0hjG8iUyBjFTV1gRqhQhseRNhfcOkPEw0ANd21DXo=
+	t=1720700209; cv=none; b=nHOq9TNM/ETvjrlogbjLKHtJQGRtFZal4nIDkiLHyQ0MeoGbMnOYmrzbUFQ2yXRI2usbEweRE6gzEPdi/AVXX/4NpPdJIJWnSrCGb2HxtU86XpjuvbxeExWVyj/oSnSaRnGu3p4qz6wSkteoot3RwbvccgcVS+ZHsG3WfVQTsA8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720699909; c=relaxed/simple;
-	bh=KayHDYb7PquBzsiI+AffVl397WNFlaPAleKft7uPLjY=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=CzWxaqNpR5Adz7v3JVlCdF4WwhiQ8kbMUvcQbeHoHYxbJQM+6JmLC6tymDY8sHzowJufH/+kc278nHQ/tQhF9RgDj69mC2Lp3x9+xLvifEuKKNhpBZE8jyGpfc/dwyvCCfecvvjCu3kta8J8cEXONZRDnSZyqekri1k8drCZ/kE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com; spf=pass smtp.mailfrom=baidu.com; arc=none smtp.client-ip=180.101.52.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=baidu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baidu.com
-Received: from localhost (bjhw-sys-rpm015653cc5.bjhw.baidu.com [10.227.53.39])
-	by njjs-sys-mailin01.njjs.baidu.com (Postfix) with ESMTP id 4DBC37F00045;
-	Thu, 11 Jul 2024 20:11:35 +0800 (CST)
-From: Li RongQing <lirongqing@baidu.com>
-To: kvm@vger.kernel.org
-Cc: Li RongQing <lirongqing@baidu.com>
-Subject: [PATCH] KVM: eventfd: Use synchronize_srcu_expedited()
-Date: Thu, 11 Jul 2024 20:11:30 +0800
-Message-Id: <20240711121130.38917-1-lirongqing@baidu.com>
-X-Mailer: git-send-email 2.9.4
+	s=arc-20240116; t=1720700209; c=relaxed/simple;
+	bh=GB4T7FOIIOTbjv1qOuDM1/CMDCe80el9SuVOKkULX+E=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T2xbMsB0OzbYyXGwQJdR1MA9BYskLWseR7QWYNAxl602ZQ7hMHqe+KEbesFx4M2KkaSwRikIGf7Ajxpec0DAgYQC/nt/XuoUT5dAnemIOxqWT+IBxFtPFYTrLJnil+q6uSNj+i8/M0ZQdiq5B6Mgp740VydwO9zkaOyS8npFcAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hfhtIdM4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98D0FC116B1;
+	Thu, 11 Jul 2024 12:16:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720700208;
+	bh=GB4T7FOIIOTbjv1qOuDM1/CMDCe80el9SuVOKkULX+E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hfhtIdM4XWdU67JnzcjXBWj2UgktY0iXuIKhQ0qQfMW1cEd7Q5I/ZVk7jAob+6yCN
+	 l5TN97Rtz39EvjE1oZziE02fok8okg2ClhSvo8LXV2jh953g2ymG3/tq+pcdFnBbdJ
+	 HHqzpZkkxcwVIyZvQQEOGwvqeP919udEADMGbuxKKfehVp4boI4dNlrp78QFI6aE5I
+	 Mald2KbTfHjLDE8L1AalvrX5f4N4kPMDE9uFVGOcBHM/tzTpaEYbpivzML07SAU3db
+	 477ThI0rz6+eYUe+PY2kSRqD8QmhQ88oet5EcIMz4/ibscUdZohx+AhdETIu985/ge
+	 Zju9YM+3jxivQ==
+Received: from [185.201.63.253] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sRsj7-00BWSd-RY;
+	Thu, 11 Jul 2024 13:16:46 +0100
+Date: Thu, 11 Jul 2024 13:16:42 +0100
+Message-ID: <874j8wp1hx.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <Zo+6TYIP3FNssR/b@arm.com>
+References: <20240625133508.259829-1-maz@kernel.org>
+	<20240708165800.1220065-1-maz@kernel.org>
+	<Zo+6TYIP3FNssR/b@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.201.63.253
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-When hot-unplug a device which has many queues, and guest CPU will has
-huge jitter, and unplugging is very slow.
+On Thu, 11 Jul 2024 11:56:13 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi,
+> 
+> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> > In order to plug the brokenness of our current AT implementation,
+> > we need a SW walker that is going to... err.. walk the S1 tables
+> > and tell us what it finds.
+> > 
+> > Of course, it builds on top of our S2 walker, and share similar
+> > concepts. The beauty of it is that since it uses kvm_read_guest(),
+> > it is able to bring back pages that have been otherwise evicted.
+> > 
+> > This is then plugged in the two AT S1 emulation functions as
+> > a "slow path" fallback. I'm not sure it is that slow, but hey.
+> > [..]
+> >  	switch (op) {
+> >  	case OP_AT_S1E1RP:
+> >  	case OP_AT_S1E1WP:
+> > +		retry_slow = false;
+> >  		fail = check_at_pan(vcpu, vaddr, &par);
+> >  		break;
+> >  	default:
+> >  		goto nopan;
+> >  	}
+> 
+> For context, this is what check_at_pan() does:
+> 
+> static int check_at_pan(struct kvm_vcpu *vcpu, u64 vaddr, u64 *res)
+> {
+>         u64 par_e0;
+>         int error;
+> 
+>         /*
+>          * For PAN-involved AT operations, perform the same translation,
+>          * using EL0 this time. Twice. Much fun.
+>          */
+>         error = __kvm_at(OP_AT_S1E0R, vaddr);
+>         if (error)
+>                 return error;
+> 
+>         par_e0 = read_sysreg_par();
+>         if (!(par_e0 & SYS_PAR_EL1_F))
+>                 goto out;
+> 
+>         error = __kvm_at(OP_AT_S1E0W, vaddr);
+>         if (error)
+>                 return error;
+> 
+>         par_e0 = read_sysreg_par();
+> out:
+>         *res = par_e0;
+>         return 0;
+> }
+> 
+> I'm having a hard time understanding why KVM is doing both AT S1E0R and AT S1E0W
+> regardless of the type of the access (read/write) in the PAN-aware AT
+> instruction. Would you mind elaborating on that?
 
-It turns out synchronize_srcu() in irqfd_shutdown() caused the guest
-jitter and unplugging latency, so replace synchronize_srcu() with
-synchronize_srcu_expedited(), to accelerate the unplugging, and reduce
-the guest OS jitter, this accelerates the VM reboot too.
+Because that's the very definition of an AT S1E1{W,R}P instruction
+when PAN is set. If *any* EL0 permission is set, then the translation
+must equally fail. Just like a load or a store from EL1 would fail if
+any EL0 permission is set when PSTATE.PAN is set.
 
-Signed-off-by: Li RongQing <lirongqing@baidu.com>
----
- virt/kvm/eventfd.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Since we cannot check for both permissions at once, we do it twice.
+It is worth noting that we don't quite handle the PAN3 case correctly
+(because we can't retrieve the *execution* property using AT). I'll
+add that to the list of stuff to fix.
 
-diff --git a/virt/kvm/eventfd.c b/virt/kvm/eventfd.c
-index 2295700..e9e1fa2 100644
---- a/virt/kvm/eventfd.c
-+++ b/virt/kvm/eventfd.c
-@@ -97,13 +97,13 @@ irqfd_resampler_shutdown(struct kvm_kernel_irqfd *irqfd)
- 	mutex_lock(&kvm->irqfds.resampler_lock);
- 
- 	list_del_rcu(&irqfd->resampler_link);
--	synchronize_srcu(&kvm->irq_srcu);
-+	synchronize_srcu_expedited(&kvm->irq_srcu);
- 
- 	if (list_empty(&resampler->list)) {
- 		list_del_rcu(&resampler->link);
- 		kvm_unregister_irq_ack_notifier(kvm, &resampler->notifier);
- 		/*
--		 * synchronize_srcu(&kvm->irq_srcu) already called
-+		 * synchronize_srcu_expedited(&kvm->irq_srcu) already called
- 		 * in kvm_unregister_irq_ack_notifier().
- 		 */
- 		kvm_set_irq(kvm, KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
-@@ -126,7 +126,7 @@ irqfd_shutdown(struct work_struct *work)
- 	u64 cnt;
- 
- 	/* Make sure irqfd has been initialized in assign path. */
--	synchronize_srcu(&kvm->irq_srcu);
-+	synchronize_srcu_expedited(&kvm->irq_srcu);
- 
- 	/*
- 	 * Synchronize with the wait-queue and unhook ourselves to prevent
-@@ -384,7 +384,7 @@ kvm_irqfd_assign(struct kvm *kvm, struct kvm_irqfd *args)
- 		}
- 
- 		list_add_rcu(&irqfd->resampler_link, &irqfd->resampler->list);
--		synchronize_srcu(&kvm->irq_srcu);
-+		synchronize_srcu_expedited(&kvm->irq_srcu);
- 
- 		mutex_unlock(&kvm->irqfds.resampler_lock);
- 	}
-@@ -523,7 +523,7 @@ void kvm_unregister_irq_ack_notifier(struct kvm *kvm,
- 	mutex_lock(&kvm->irq_lock);
- 	hlist_del_init_rcu(&kian->link);
- 	mutex_unlock(&kvm->irq_lock);
--	synchronize_srcu(&kvm->irq_srcu);
-+	synchronize_srcu_expedited(&kvm->irq_srcu);
- 	kvm_arch_post_irq_ack_notifier_list_update(kvm);
- }
- 
-@@ -608,7 +608,7 @@ kvm_irqfd_release(struct kvm *kvm)
- 
- /*
-  * Take note of a change in irq routing.
-- * Caller must invoke synchronize_srcu(&kvm->irq_srcu) afterwards.
-+ * Caller must invoke synchronize_srcu_expedited(&kvm->irq_srcu) afterwards.
-  */
- void kvm_irq_routing_update(struct kvm *kvm)
- {
+> 
+> > +	if (fail) {
+> > +		vcpu_write_sys_reg(vcpu, SYS_PAR_EL1_F, PAR_EL1);
+> > +		goto nopan;
+> > +	}
+> > [..]
+> > +	if (par & SYS_PAR_EL1_F) {
+> > +		u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
+> > +
+> > +		/*
+> > +		 * If we get something other than a permission fault, we
+> > +		 * need to retry, as we're likely to have missed in the PTs.
+> > +		 */
+> > +		if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
+> > +			retry_slow = true;
+> > +	} else {
+> > +		/*
+> > +		 * The EL0 access succeded, but we don't have the full
+> > +		 * syndrom information to synthetize the failure. Go slow.
+> > +		 */
+> > +		retry_slow = true;
+> > +	}
+> 
+> This is what PSTATE.PAN controls:
+> 
+> If the Effective value of PSTATE.PAN is 1, then a privileged data access from
+> any of the following Exception levels to a virtual memory address that is
+> accessible to data accesses at EL0 generates a stage 1 Permission fault:
+> 
+> - A privileged data access from EL1.
+> - If HCR_EL2.E2H is 1, then a privileged data access from EL2.
+> 
+> With that in mind, I am really struggling to understand the logic.
+
+I don't quite see what you don't understand, you'll have to be more
+precise. Are you worried about the page tables we're looking at, the
+value of PSTATE.PAN, the permission fault, or something else?
+
+It also doesn't help that you're looking at the patch that contains
+the integration with the slow-path, which is pretty hard to read (I
+have a reworked version that's a bit better). You probably want to
+look at the "fast" path alone.
+
+> 
+> If AT S1E0{R,W} (from check_at_pan()) failed, doesn't that mean that the virtual
+> memory address is not accessible to EL0? Add that to the fact that the AT
+> S1E1{R,W} (from the beginning of __kvm_at_s1e01()) succeeded, doesn't that mean
+> that AT S1E1{R,W}P should succeed, and furthermore the PAR_EL1 value should be
+> the one KVM got from AT S1E1{R,W}?
+
+There are plenty of ways for AT S1E0 to fail when AT S1E1 succeeded:
+
+- no EL0 permission: that's the best case, and the PAR_EL1 obtained
+  from the AT S1E1 is the correct one. That's what we return.
+
+- The EL0 access failed, but for another reason than a permission
+  fault. This contradicts the EL1 walk, and is a sure sign that
+  someone is playing behind our back. We fail.
+
+- exception from AT S1E0: something went wrong (again the guest
+  playing with the PTs behind our back). We fail as well.
+
+Do you at least agree with these as goals? If you do, what in
+the implementation does not satisfy these goals? If you don't, what in
+these goals seem improper to you?
+
+Thanks,
+
+	M.
+
 -- 
-2.9.4
-
+Without deviation from the norm, progress is not possible.
 
