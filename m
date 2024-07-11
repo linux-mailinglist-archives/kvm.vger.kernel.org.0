@@ -1,172 +1,194 @@
-Return-Path: <kvm+bounces-21401-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21402-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF89E92E4E2
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 12:35:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6014E92E53B
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 12:56:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E374A1C213AE
-	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 10:35:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 214D5285272
+	for <lists+kvm@lfdr.de>; Thu, 11 Jul 2024 10:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13B76158DA8;
-	Thu, 11 Jul 2024 10:35:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="LGsxiFLG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8271B159217;
+	Thu, 11 Jul 2024 10:56:21 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96437158D96
-	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 10:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B74B158A1E
+	for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 10:56:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720694102; cv=none; b=H5/clOU557tQG0mox+SRmlrYxeF8JmaBaZAPRwlyFZG/QTYbLYdZ9d2pcAGATvsL51dFuY7jHAMFqHGU1ENYq46C7CFM5dGIwfZfKEbFs2cqW+0N2ZqUs/kCJslSIB3MN9vLu7SF8q0h8EmeNRmxX9d++NMcM8LI0mENbEMDJAk=
+	t=1720695381; cv=none; b=UTMIWMdqdYVFFGQ2lNzzmz+3fwj3SdodZ+YwV5X2sJxzg12eoUkXEYj4SM3eQB6uxn8yk5XujjFLITZWk5QD/ohLDR7/CHEVDnxSi07r96LczZyvlJbrgKrJi32HkobBb3Jx0B+JroX6Dy5jHIlg5YUdNkuiWy1thjpM+7Ftzhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720694102; c=relaxed/simple;
-	bh=azTey6Mbe5LDqWSTEruz0j0tEwPtlNQpE18cgLltbe0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X3OGwys3hW7JC9Nnl9AXiwzOQIWd07vTnbF1+IabQ732oJaoJlofwdDvfSc6XRSLvYBJxMZwqChZvpXNoeDyAOqJy/Wx4AZkZLPMKSLVy5RWKgnKDj64r79a0DPrZykH7fC7Tn8fealss+0qynIjoh0QBt5SkwWZpltNCVtKrq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=LGsxiFLG; arc=none smtp.client-ip=209.85.167.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3d91e390601so431496b6e.1
-        for <kvm@vger.kernel.org>; Thu, 11 Jul 2024 03:35:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1720694099; x=1721298899; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=81XIkWS3ndQ7+PCCdHsExXmF1eARnUo6Gh7sCw+xD4Y=;
-        b=LGsxiFLGgctkcNa4uIYDdYdHDygJkyF6j1TZqjgI4gHz06/fyoJSAZoPB6ZlFFx0kd
-         VjZSnUt9cKEfBSxvYZyGVnP96WTtU8NA7imxRcwnGO9jiRK+pg0wP6+t1YPsxMbi++OE
-         m0zL7q5JwMCBT2ZNh5gR3p+JgQZayfjAJ+mRj2YRucc5/adO6bmsfn8wDwsQOyBx0LuC
-         hfXQW5rdiyj6lV/rIo0ynjHLlITt/YZ9GpW3QsmRm1n6d2BMql6V4YBNuh6MJyOtoe59
-         o6HSNbABbAId8FajB06EVDjhs5H7SBhsyFiGgtF733/qMTRkoaGwo+5v7snEu3mG1fPc
-         a2mQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720694099; x=1721298899;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=81XIkWS3ndQ7+PCCdHsExXmF1eARnUo6Gh7sCw+xD4Y=;
-        b=sMnQ+m36g2n6KEKA3mP0D/5yh9EsbazUZieHQfvLPaoJvcoGAl4LcAV4+C2bEk40Oa
-         t2rB7WS645jSa3Tk1VZw+Gh7msb+zolgjQUrb8QYLCUatKSTnalJqR16J8s3IaO+I4JO
-         cpStZdzt2XQYDphFV+B7mIJeoiY6XJ8HgRClS4ph5S/uUZUpD7Fc6rEVvrWKlJ1r1Kum
-         uXiyD9zbnsBmNT13S5C0cIz15K607onDS60v5LmqBp3A4w4XGGbwJHq82e4nVbnl99cd
-         gG1iUTrNUm4j99nrJavhzTHOO9VMwyRpF4lvksKk3b4SrIofhy1l5VGL4ZVW7CbZCu0G
-         mrvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUi2kNtR9sY083/5cNtayjF/UoqZMvaPofNVJj8Y7Df2L32p77vHf9bXCqSOSdHNTZtwjzivR8uzJn9+tVpWxyvAIM0
-X-Gm-Message-State: AOJu0Yx4hNdc0yPDlUQ2Jzo1pTpfmOF+aToAwO0Y5GKApe58nvepnsY3
-	V4IUCaztAyM8aick4lc1QWWQWAogGV3Sxn+tTvBZupvwsvyAbxEjw/AihMlR09n7c6G9R+tHxOG
-	cVOg6k07XN3Xis/EUdiaVnonzelnRgetQhpyHrA==
-X-Google-Smtp-Source: AGHT+IFJB5x3pYSD0y4Q5r4wWK4Y3rLRAWXELD1JUSAm8Ow50OC5okYZ99DPR11L57LtC71EXPAYdgoDHtJYINBxm0g=
-X-Received: by 2002:a05:6808:308d:b0:3d9:2415:da77 with SMTP id
- 5614622812f47-3d93c073d69mr9586482b6e.25.1720694099522; Thu, 11 Jul 2024
- 03:34:59 -0700 (PDT)
+	s=arc-20240116; t=1720695381; c=relaxed/simple;
+	bh=DIBuYb4gqtVfXndiTDycUcqF9WPL156MVLpoUiXj0VI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Z7b7UpQyAJEjNntMY+ojFPeL9krZXRTiAMl9jLuafkEeMdD7IUndJIs5VvjCbUBFmFXwmScX96hiHgwUjxXvWinj764c5Wx6ui5qnmyxY91mmIPIUnkU/4FfHyLnCi083ZMDSkaTGXvAXEKF1ItBxRJIvKSw+ZWfwJRQ+vD213o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D2A7C1007;
+	Thu, 11 Jul 2024 03:56:42 -0700 (PDT)
+Received: from arm.com (e121798.manchester.arm.com [10.32.101.22])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 350073F762;
+	Thu, 11 Jul 2024 03:56:16 -0700 (PDT)
+Date: Thu, 11 Jul 2024 11:56:13 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+Message-ID: <Zo+6TYIP3FNssR/b@arm.com>
+References: <20240625133508.259829-1-maz@kernel.org>
+ <20240708165800.1220065-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240628093711.11716-1-yongxuan.wang@sifive.com>
- <20240628093711.11716-3-yongxuan.wang@sifive.com> <20240628-clamp-vineyard-c7cdd40a6d50@spud>
- <402C3422-0248-4C0F-991E-C0C4BBB0FA72@jrtc27.com> <20240630-caboose-diameter-7e73bf86da49@spud>
-In-Reply-To: <20240630-caboose-diameter-7e73bf86da49@spud>
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Date: Thu, 11 Jul 2024 18:34:49 +0800
-Message-ID: <CAMWQL2gpg-xN5xjshTaZT5844kKoZHDmLUQb8nXYYzw1RGbykQ@mail.gmail.com>
-Subject: Re: [PATCH v6 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
-To: Conor Dooley <conor@kernel.org>
-Cc: Jessica Clarke <jrtc27@jrtc27.com>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, kvm-riscv@lists.infradead.org, 
-	kvm@vger.kernel.org, Greentime Hu <greentime.hu@sifive.com>, 
-	Vincent Chen <vincent.chen@sifive.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	"open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" <devicetree@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240708165800.1220065-1-maz@kernel.org>
 
-Hi Conor and Jessica,
+Hi,
 
-On Sun, Jun 30, 2024 at 10:09=E2=80=AFPM Conor Dooley <conor@kernel.org> wr=
-ote:
->
-> On Sat, Jun 29, 2024 at 02:09:34PM +0100, Jessica Clarke wrote:
-> > On 28 Jun 2024, at 17:19, Conor Dooley <conor@kernel.org> wrote:
-> > >
-> > > On Fri, Jun 28, 2024 at 05:37:06PM +0800, Yong-Xuan Wang wrote:
-> > >> Add entries for the Svade and Svadu extensions to the riscv,isa-exte=
-nsions
-> > >> property.
-> > >>
-> > >> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> > >> ---
-> > >> .../devicetree/bindings/riscv/extensions.yaml | 28 +++++++++++++++++=
-++
-> > >> 1 file changed, 28 insertions(+)
-> > >>
-> > >> diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml=
- b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> > >> index 468c646247aa..c3d053ce7783 100644
-> > >> --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
-> > >> +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
-> > >> @@ -153,6 +153,34 @@ properties:
-> > >>             ratified at commit 3f9ed34 ("Add ability to manually tri=
-gger
-> > >>             workflow. (#2)") of riscv-time-compare.
-> > >>
-> > >> +        - const: svade
-> > >> +          description: |
-> > >> +            The standard Svade supervisor-level extension for SW-ma=
-naged PTE A/D
-> > >> +            bit updates as ratified in the 20240213 version of the =
-privileged
-> > >> +            ISA specification.
-> > >> +
-> > >> +            Both Svade and Svadu extensions control the hardware be=
-havior when
-> > >> +            the PTE A/D bits need to be set. The default behavior f=
-or the four
-> > >> +            possible combinations of these extensions in the device=
- tree are:
-> > >> +            1) Neither Svade nor Svadu present in DT =3D>
-> > >
-> > >>                It is technically
-> > >> +               unknown whether the platform uses Svade or Svadu. Su=
-pervisor may
-> > >> +               assume Svade to be present and enabled or it can dis=
-cover based
-> > >> +               on mvendorid, marchid, and mimpid.
-> > >
-> > > I would just write "for backwards compatibility, if neither Svade nor
-> > > Svadu appear in the devicetree the supervisor may assume Svade to be
-> > > present and enabled". If there are systems that this behaviour causes
-> > > problems for, we can deal with them iff they appear. I don't think
-> > > looking at m*id would be sufficient here anyway, since the firmware c=
-an
-> > > have an impact. I'd just drop that part entirely.
-> >
-> > Older QEMU falls into that category, as do Bluespec=E2=80=99s soft-core=
-s (which
-> > ours are derived from at Cambridge). I feel that, in reality, one
-> > should be prepared to handle both trapping and atomic updates if
-> > writing an OS that aims to support case 1.
->
-> I guess that is actually what we should put in then, to use an
-> approximation of your wording, something like
->         Neither Svade nor Svadu present in DT =3D> Supervisor software sh=
-ould be
->         prepared to handle either hardware updating of the PTE A/D bits o=
-r page
->         faults when they need updated
-> ?
+On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> In order to plug the brokenness of our current AT implementation,
+> we need a SW walker that is going to... err.. walk the S1 tables
+> and tell us what it finds.
+> 
+> Of course, it builds on top of our S2 walker, and share similar
+> concepts. The beauty of it is that since it uses kvm_read_guest(),
+> it is able to bring back pages that have been otherwise evicted.
+> 
+> This is then plugged in the two AT S1 emulation functions as
+> a "slow path" fallback. I'm not sure it is that slow, but hey.
+> [..]
+>  	switch (op) {
+>  	case OP_AT_S1E1RP:
+>  	case OP_AT_S1E1WP:
+> +		retry_slow = false;
+>  		fail = check_at_pan(vcpu, vaddr, &par);
+>  		break;
+>  	default:
+>  		goto nopan;
+>  	}
 
-Thank you! I will update in the next version.
+For context, this is what check_at_pan() does:
 
-Regards,
-Yong-Xuan
+static int check_at_pan(struct kvm_vcpu *vcpu, u64 vaddr, u64 *res)
+{
+        u64 par_e0;
+        int error;
+
+        /*
+         * For PAN-involved AT operations, perform the same translation,
+         * using EL0 this time. Twice. Much fun.
+         */
+        error = __kvm_at(OP_AT_S1E0R, vaddr);
+        if (error)
+                return error;
+
+        par_e0 = read_sysreg_par();
+        if (!(par_e0 & SYS_PAR_EL1_F))
+                goto out;
+
+        error = __kvm_at(OP_AT_S1E0W, vaddr);
+        if (error)
+                return error;
+
+        par_e0 = read_sysreg_par();
+out:
+        *res = par_e0;
+        return 0;
+}
+
+I'm having a hard time understanding why KVM is doing both AT S1E0R and AT S1E0W
+regardless of the type of the access (read/write) in the PAN-aware AT
+instruction. Would you mind elaborating on that?
+
+> +	if (fail) {
+> +		vcpu_write_sys_reg(vcpu, SYS_PAR_EL1_F, PAR_EL1);
+> +		goto nopan;
+> +	}
+> [..]
+> +	if (par & SYS_PAR_EL1_F) {
+> +		u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
+> +
+> +		/*
+> +		 * If we get something other than a permission fault, we
+> +		 * need to retry, as we're likely to have missed in the PTs.
+> +		 */
+> +		if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
+> +			retry_slow = true;
+> +	} else {
+> +		/*
+> +		 * The EL0 access succeded, but we don't have the full
+> +		 * syndrom information to synthetize the failure. Go slow.
+> +		 */
+> +		retry_slow = true;
+> +	}
+
+This is what PSTATE.PAN controls:
+
+If the Effective value of PSTATE.PAN is 1, then a privileged data access from
+any of the following Exception levels to a virtual memory address that is
+accessible to data accesses at EL0 generates a stage 1 Permission fault:
+
+- A privileged data access from EL1.
+- If HCR_EL2.E2H is 1, then a privileged data access from EL2.
+
+With that in mind, I am really struggling to understand the logic.
+
+If AT S1E0{R,W} (from check_at_pan()) failed, doesn't that mean that the virtual
+memory address is not accessible to EL0? Add that to the fact that the AT
+S1E1{R,W} (from the beginning of __kvm_at_s1e01()) succeeded, doesn't that mean
+that AT S1E1{R,W}P should succeed, and furthermore the PAR_EL1 value should be
+the one KVM got from AT S1E1{R,W}?
+
+Thanks,
+Alex
+
+>  nopan:
+>  	__mmu_config_restore(&config);
+>  out:
+>  	local_irq_restore(flags);
+>  
+>  	write_unlock(&vcpu->kvm->mmu_lock);
+> +
+> +	/*
+> +	 * If retry_slow is true, then we either are missing shadow S2
+> +	 * entries, have paged out guest S1, or something is inconsistent.
+> +	 *
+> +	 * Either way, we need to walk the PTs by hand so that we can either
+> +	 * fault things back, in or record accurate fault information along
+> +	 * the way.
+> +	 */
+> +	if (retry_slow) {
+> +		par = handle_at_slow(vcpu, op, vaddr);
+> +		vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+> +	}
+>  }
+>  
+>  void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> @@ -433,6 +931,10 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  
+>  	write_unlock(&vcpu->kvm->mmu_lock);
+>  
+> +	/* We failed the translation, let's replay it in slow motion */
+> +	if (!fail && (par & SYS_PAR_EL1_F))
+> +		par = handle_at_slow(vcpu, op, vaddr);
+> +
+>  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+>  }
+>  
+> -- 
+> 2.39.2
+> 
+> 
 
