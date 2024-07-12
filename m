@@ -1,203 +1,183 @@
-Return-Path: <kvm+bounces-21575-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21576-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B016930226
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 00:36:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BA4293025F
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 01:29:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41970283182
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 22:36:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68F5AB22564
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 23:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C076A347;
-	Fri, 12 Jul 2024 22:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29EBD130E44;
+	Fri, 12 Jul 2024 23:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g0RzIS5j"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IPfM0js4"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0325D1BC59
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 22:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A711BDC8
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 23:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720823788; cv=none; b=bfAJ3f8+w0BSZQf2b7n5NJmlicrAHgEfa4ajMNYxsT+SSaAWm3zKbyEbj8RZhABCMDFlC1vLfrM+dIAXjRUeo/DcGdSdJMscVKYN3imhmAlA0gKJAVCSRQ+dWm4gYVfKqL+GaNPp5yD5m3Km/hO1N1ztODvhbWPovwJmcBiuuW4=
+	t=1720826981; cv=none; b=ba5sRLBl8ZyahNzVKreWHbuLDiprxi+wmZS9HVeG+CAb6cUQgQwC9+KLBRkGSZRDlw7MSp6qC3MMnB258Yczgxe1oLSzuOv9Vxoh37rDu6wBcDGh5v4VDFBpV8seM7PAxPWo6FphPu+iuwyb53c1v9UY6dllNfSPdfKMpkVQ1RI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720823788; c=relaxed/simple;
-	bh=TNXcGKx0oO0INQoUwhNKp6sd7FDNWObHlJOZyFifFs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XfdR6SHyLiLB3LX/xKD/MidQmj5PfHkqiJRRK6H1xfhEfzBdx5V5VIl/JXebEWVoR/glrH5v48Q8UvyPoggVkaaJbML0EP7EWvXhIaQPtH3s6Jjjdl9e7F0WyFn+a/UqxQowYJ9XjW+qZBkbwLC16g0Kon/etfVAETGBA1RJLVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g0RzIS5j; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1720823785;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UD+jsIB9utwUuMD5D9RKKWQHJKFtMYpx4nMjcv9KoxQ=;
-	b=g0RzIS5jZ0pVFs4XJGtFxt+wj/GxJVWlW+v/GTSPSPH0yrOMZqU9FR1EgyxAVdXtlh6BUa
-	rsPYi+5013FlI2YcstNLVJXLWn/zaYHgUvHY1MSNi6ZY4ViPCP8RvBGIufGef1MBXIgYVz
-	/PYztBb8KxyuZj76YXft+8pyVsvpdx8=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-635-_xGgCGyvObO7qCb1a_v3Sw-1; Fri, 12 Jul 2024 18:36:24 -0400
-X-MC-Unique: _xGgCGyvObO7qCb1a_v3Sw-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-806199616d0so258601539f.2
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 15:36:24 -0700 (PDT)
+	s=arc-20240116; t=1720826981; c=relaxed/simple;
+	bh=HKSa+I+v6n4xxFPIipr5CjiQVuzATXIb8SNaZMvPPFw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qXe0my0L1a+hwv2ZaIVZ+N82c98C4r+XgRQJtRT0ERYAzs+Q9k++Jz5VAI4AYEs+UIToa/yTWlf6AsxyvzgQm9ksIv8so8n+f2N0FzJ1bxfeD3hQIYJlXl4qD4ARZMMpB1JTKu+n9of+YnC7ZtAVmvxa5ZWlGXKrR9gfKWbqUBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IPfM0js4; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fb1c206242so19581725ad.3
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 16:29:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720826979; x=1721431779; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3ZzMQzTcLNpWOotcGFmeiz3+1hsAd4h/kpmJZcUSiZY=;
+        b=IPfM0js4s7fPTGbccQn11d5v9vxOECC6K+AtHve/uWYw25RlCGdCfsAK2ksc2uAD/c
+         G/6RkUAYXNlJruSSgXGxJQs/bIPzhEkHqzuZtTxLGTv4v86dHOCdaLwCpB2vTIzaQyl2
+         SauMlRXU0FLmVgFt/IEmzVmTEKVUs0hjTF8NBrBdsWDFLrWcRof1RCJYhZc9D0TVEYk+
+         Xp+gv1CyR+8k7Eq8n4vWjoNp/T7K4HgWw1C7sOaTJTC+BMCKXNArS1bVTFUpKhJVbB+A
+         bbVS07YuEPiaSW0Rk/eFpDDE9YYOvYYinxhbYZl4izNcgHacHt/mnuf9PcJLkMRgMhyb
+         6ORw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720823784; x=1721428584;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UD+jsIB9utwUuMD5D9RKKWQHJKFtMYpx4nMjcv9KoxQ=;
-        b=xVmGIEaBGxblP+ekp9mMGLbOFScRa+4/4GWCizAF8aqMp9aiuqHyyjmQ2wr6C3oyMN
-         QSud3esDoWE18HnudGaDE/adVaNygrp7jrNItuf5lF9OXzXV2UnSMTKv1Y9tuvPODTMq
-         rlG4RPxUWdTqXu1eYT4LlUi/LCENxn6c4ZhpFw5RnuTJTRSx79lDSm/Poimbrj/zxOZy
-         tfRgd6QAZ2ULuaRqN4TiObglStjB+ZlNMCRZqz72jLLU8HzolQV2WUmkulPT/wR/UXsD
-         Ekswy2RYjOhAYEkC8WZHO0rArJ8cVO8enblok12i+IvNqllhGFSuDxusrQXNl0eZ13Y7
-         9nDA==
-X-Gm-Message-State: AOJu0Yzmw0/vDL3Th9Jfj8IGJaLK/IFA7k5SOkl0184H9Y3YzeM8P4OI
-	6GlZX2Sk+RbsRc5Xfz/BMpn1WorTDsXXosSWmFG2cSvZMUbRv1BVTCWeQevmAeGZ10Ui85UYVEO
-	k0hzGEHSheBaKzt7UnM0RXJFfGiSlNsPfAagfRQLxHYlCAe6mMA==
-X-Received: by 2002:a05:6602:1615:b0:7f6:f93d:e6a0 with SMTP id ca18e2360f4ac-800034fd528mr1822795439f.15.1720823783807;
-        Fri, 12 Jul 2024 15:36:23 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGSyar8qW8JkxVFrshE2XwMjaVLy7kugEr4dBZXEvrYReUj5BJaoGKYAE5t07ynIbmqrbCK4g==
-X-Received: by 2002:a05:6602:1615:b0:7f6:f93d:e6a0 with SMTP id ca18e2360f4ac-800034fd528mr1822794539f.15.1720823783398;
-        Fri, 12 Jul 2024 15:36:23 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4c0b1af8108sm2710939173.14.2024.07.12.15.36.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Jul 2024 15:36:22 -0700 (PDT)
-Date: Fri, 12 Jul 2024 16:36:21 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Kirti Wankhede <kwankhede@nvidia.com>, Jeff Johnson
- <quic_jjohnson@quicinc.com>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "kernel-janitors@vger.kernel.org" <kernel-janitors@vger.kernel.org>
-Subject: Re: [PATCH] vfio-mdev: add MODULE_DESCRIPTION() macros
-Message-ID: <20240712163621.6f34ae98.alex.williamson@redhat.com>
-In-Reply-To: <MN2PR12MB420688C51B3F2CC8BF8CA3A8DCA62@MN2PR12MB4206.namprd12.prod.outlook.com>
-References: <20240523-md-vfio-mdev-v1-1-4676cd532b10@quicinc.com>
-	<a94604eb-7ea6-4813-aa78-6c73f7d4253a@quicinc.com>
-	<MN2PR12MB420688C51B3F2CC8BF8CA3A8DCA62@MN2PR12MB4206.namprd12.prod.outlook.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1720826979; x=1721431779;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3ZzMQzTcLNpWOotcGFmeiz3+1hsAd4h/kpmJZcUSiZY=;
+        b=E5+NoF21SOxEjKiyrhVtP634jAYbW1CUfsZXSGam0Hem3u7IVYFaKxVjtyixP8LAvp
+         1uRzSUclse6ATlaKLDE0b7x4eSPi3509n2d9lfWcZGSel++zmba4jeuKyrTPr6BIi2mE
+         3bPoQmPRPD3lMXGqx3UOUQ4mkWa7NoWi8wdo8qefQAMSx/Qvo+c7lxMVvB/crNqyWlJR
+         rwgW+RnxnhezPq4gxqgqRMbP8vMWibFLXGB2uWT9AT0rgCdWuGwyhFwd/Hr0uEJdXLbR
+         E7OmmnbkmIjRRX1knMJQlQjwdVE+djKcNus4FaI/XQ3YirwasIhtOSJXBZ848zSZJOEG
+         3p8A==
+X-Forwarded-Encrypted: i=1; AJvYcCVMuWeIFE9QA4ELAr0N6rz5qRyw+meSjcTB0yxeQpcBUPz6m5LzE/g4CenCAkOsHrYA2jm6Htn/hnolqXQGnKjo8dzD
+X-Gm-Message-State: AOJu0Yyn1Hsjuj4MUhkhbvp7uDX0YPrF8GWNoQMPkG+Bbw+mS/21E5Yq
+	+SQLVWuHFPW6rWVfbUlpqrR2+Gij62y5blZeRT2Wy+u0goNPjlA1SeNJJKd4XYO6lGAZoDSt5rk
+	6Yw4IEXWcfZuLN8PKMPK3wQ==
+X-Google-Smtp-Source: AGHT+IFQY3bFW+Ec1W/jbxkBChGtxIDhrDnXJSKahhJ1TSz9fMywWTZ933D5uxR+un98Rl9u18eV+KxVPn9D87FWqw==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a17:902:c405:b0:1f7:3763:5ff0 with
+ SMTP id d9443c01a7336-1fbb6cd4279mr6343705ad.1.1720826979113; Fri, 12 Jul
+ 2024 16:29:39 -0700 (PDT)
+Date: Fri, 12 Jul 2024 23:29:37 +0000
+In-Reply-To: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
+X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
+Message-ID: <20240712232937.2861788-1-ackerleytng@google.com>
+Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
+From: Ackerley Tng <ackerleytng@google.com>
+To: quic_eberman@quicinc.com
+Cc: akpm@linux-foundation.org, david@redhat.com, kvm@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, maz@kernel.org, 
+	pbonzini@redhat.com, shuah@kernel.org, tabba@google.com, willy@infradead.org, 
+	vannapurve@google.com, hch@infradead.org, jgg@nvidia.com, rientjes@google.com, 
+	seanjc@google.com, jhubbard@nvidia.com, qperret@google.com, 
+	smostafa@google.com, fvdl@google.com, hughd@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 12 Jul 2024 07:27:33 +0000
-Kirti Wankhede <kwankhede@nvidia.com> wrote:
+Here=E2=80=99s an update from the Linux MM Alignment Session on July 10 202=
+4, 9-10am
+PDT:
 
-> + Alex.
-> 
-> Reviewed by : Kirti Wankhede <kwankhede@nvidia.com>
+The current direction is:
 
-Mind the syntax, Reviewed-by:
++ Allow mmap() of ranges that cover both shared and private memory, but dis=
+allow
+  faulting in of private pages
+  + On access to private pages, userspace will get some error, perhaps SIGB=
+US
+  + On shared to private conversions, unmap the page and decrease refcounts
 
-Also a comment below...
++ To support huge pages, guest_memfd will take ownership of the hugepages, =
+and
+  provide interested parties (userspace, KVM, iommu) with pages to be used.
+  + guest_memfd will track usage of (sub)pages, for both private and shared
+    memory
+  + Pages will be broken into smaller (probably 4K) chunks at creation time=
+ to
+    simplify implementation (as opposed to splitting at runtime when privat=
+e to
+    shared conversion is requested by the guest)
+    + Core MM infrastructure will still be used to track page table mapping=
+s in
+      mapcounts and other references (refcounts) per subpage
+    + HugeTLB vmemmap Optimization (HVO) is lost when pages are broken up -=
+ to
+      be optimized later. Suggestions:
+      + Use a tracking data structure other than struct page
+      + Remove the memory for struct pages backing private memory from the
+        vmemmap, and re-populate the vmemmap on conversion from private to
+        shared
+  + Implementation pointers for huge page support
+    + Consensus was that getting core MM to do tracking seems wrong
+    + Maintaining special page refcounts for guest_memfd pages is difficult=
+ to
+      get working and requires weird special casing in many places. This wa=
+s
+      tried for FS DAX pages and did not work out: [1]
 
-> > -----Original Message-----
-> > From: Jeff Johnson <quic_jjohnson@quicinc.com>
-> > Sent: Friday, July 12, 2024 12:01 AM
-> > To: Kirti Wankhede <kwankhede@nvidia.com>
-> > Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org; kernel-
-> > janitors@vger.kernel.org
-> > Subject: Re: [PATCH] vfio-mdev: add MODULE_DESCRIPTION() macros
-> > 
-> > On 5/23/24 17:12, Jeff Johnson wrote:  
-> > > Fix the 'make W=1' warnings:
-> > > WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-  
-> > mdev/mtty.o  
-> > > WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-  
-> > mdev/mdpy.o  
-> > > WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-  
-> > mdev/mdpy-fb.o  
-> > > WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-  
-> > mdev/mbochs.o  
-> > >
-> > > Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
-> > > ---
-> > >   samples/vfio-mdev/mbochs.c  | 1 +
-> > >   samples/vfio-mdev/mdpy-fb.c | 1 +
-> > >   samples/vfio-mdev/mdpy.c    | 1 +
-> > >   samples/vfio-mdev/mtty.c    | 1 +
-> > >   4 files changed, 4 insertions(+)
-> > >
-> > > diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-> > > index 9062598ea03d..836456837997 100644
-> > > --- a/samples/vfio-mdev/mbochs.c
-> > > +++ b/samples/vfio-mdev/mbochs.c
-> > > @@ -88,6 +88,7 @@
-> > >   #define STORE_LE32(addr, val)	(*(u32 *)addr = val)
-> > >
-> > >
-> > > +MODULE_DESCRIPTION("Mediated virtual PCI display host device driver");
-> > >   MODULE_LICENSE("GPL v2");
-> > >
-> > >   static int max_mbytes = 256;
-> > > diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
-> > > index 4598bc28acd9..149af7f598f8 100644
-> > > --- a/samples/vfio-mdev/mdpy-fb.c
-> > > +++ b/samples/vfio-mdev/mdpy-fb.c
-> > > @@ -229,4 +229,5 @@ static int __init mdpy_fb_init(void)
-> > >   module_init(mdpy_fb_init);
-> > >
-> > >   MODULE_DEVICE_TABLE(pci, mdpy_fb_pci_table);
-> > > +MODULE_DESCRIPTION("Framebuffer driver for mdpy (mediated virtual pci  
-> > display device)");  
-> > >   MODULE_LICENSE("GPL v2");
-> > > diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-> > > index 27795501de6e..8104831ae125 100644
-> > > --- a/samples/vfio-mdev/mdpy.c
-> > > +++ b/samples/vfio-mdev/mdpy.c
-> > > @@ -40,6 +40,7 @@
-> > >   #define STORE_LE32(addr, val)	(*(u32 *)addr = val)
-> > >
-> > >
-> > > +MODULE_DESCRIPTION("Mediated virtual PCI display host device driver");
-> > >   MODULE_LICENSE("GPL v2");
-> > >
-> > >   #define MDPY_TYPE_1 "vga"
-> > > diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-> > > index 2284b3751240..40e7d154455e 100644
-> > > --- a/samples/vfio-mdev/mtty.c
-> > > +++ b/samples/vfio-mdev/mtty.c
-> > > @@ -2059,5 +2059,6 @@ module_exit(mtty_dev_exit)
-> > >
-> > >   MODULE_LICENSE("GPL v2");
-> > >   MODULE_INFO(supported, "Test driver that simulate serial port over PCI");
-> > > +MODULE_DESCRIPTION("Test driver that simulate serial port over PCI");
++ Implementation suggestion: use infrastructure similar to what ZONE_DEVICE
+  uses, to provide the huge page to interested parties
+  + TBD: how to actually get huge pages into guest_memfd
+  + TBD: how to provide/convert the huge pages to ZONE_DEVICE
+    + Perhaps reserve them at boot time like in HugeTLB
 
-Seems the preceding MODULE_INFO needs to be removed here.  At best the
-added MODULE_DESCRIPTION is redundant, but "supported" is not a
-standard tag, so it's not clear what the purpose of that tag was meant
-to be anyway.  Thanks,
++ Line of sight to compaction/migration:
+  + Compaction here means making memory contiguous
+  + Compaction/migration scope:
+    + In scope for 4K pages
+    + Out of scope for 1G pages and anything managed through ZONE_DEVICE
+    + Out of scope for an initial implementation
+  + Ideas for future implementations
+    + Reuse the non-LRU page migration framework as used by memory ballonin=
+g
+    + Have userspace drive compaction/migration via ioctls
+      + Having line of sight to optimizing lost HVO means avoiding being lo=
+cked
+        in to any implementation requiring struct pages
+        + Without struct pages, it is hard to reuse core MM=E2=80=99s
+          compaction/migration infrastructure
 
-Alex
++ Discuss more details at LPC in Sep 2024, such as how to use huge pages,
+  shared/private conversion, huge page splitting
 
-> > >   MODULE_VERSION(VERSION_STRING);
-> > >   MODULE_AUTHOR(DRIVER_AUTHOR);
-> > >
-> > > ---
-> > > base-commit: 5c4069234f68372e80e4edfcce260e81fd9da007
-> > > change-id: 20240523-md-vfio-mdev-381f74bf87f1
-> > >  
-> > 
-> > I don't see this in linux-next yet so following up to see if anything
-> > else is needed to get this merged.
-> > 
-> > I hope to have these warnings fixed tree-wide in 6.11.
-> > 
-> > /jeff  
+This addresses the prerequisites set out by Fuad and Elliott at the beginni=
+ng of
+the session, which were:
 
+1. Non-destructive shared/private conversion
+  + Through having guest_memfd manage and track both shared/private memory
+2. Huge page support with the option of converting individual subpages
+  + Splitting of pages will be managed by guest_memfd
+3. Line of sight to compaction/migration of private memory
+  + Possibly driven by userspace using guest_memfd ioctls
+4. Loading binaries into guest (private) memory before VM starts
+  + This was identified as a special case of (1.) above
+5. Non-protected guests in pKVM
+  + Not discussed during session, but this is a goal of guest_memfd, for al=
+l VM
+    types [2]
+
+David Hildenbrand summarized this during the meeting at t=3D47m25s [3].
+
+[1]: https://lore.kernel.org/linux-mm/cover.66009f59a7fe77320d413011386c3ae=
+5c2ee82eb.1719386613.git-series.apopple@nvidia.com/
+[2]: https://lore.kernel.org/lkml/ZnRMn1ObU8TFrms3@google.com/
+[3]: https://drive.google.com/file/d/17lruFrde2XWs6B1jaTrAy9gjv08FnJ45/view=
+?t=3D47m25s&resourcekey=3D0-LiteoxLd5f4fKoPRMjMTOw
 
