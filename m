@@ -1,263 +1,311 @@
-Return-Path: <kvm+bounces-21465-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21466-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 441C092F472
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 05:40:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A4192F47F
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 05:51:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7C3E1F22BBA
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 03:40:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05E172832CF
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 03:51:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B245A10940;
-	Fri, 12 Jul 2024 03:40:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 207D711CAF;
+	Fri, 12 Jul 2024 03:51:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JuxNj8Td"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ATqS7REA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2087.outbound.protection.outlook.com [40.107.223.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A248BE5
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 03:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720755648; cv=none; b=Q+oLNqk0FUaKfLpBpT51it1QZjlpn4le9pS9P+xQGIpcE/Pj0BVq8rPviaf3mDp1DtgxjfA10Y8KyjA66qCemikwNoIwGQ/S5a9WU/l4IpVTH9Fcoppu5G+QGIml/btI7Ebhu62/MI7+UuTboFrMbDdHT/uZun/38PCC6W+/UPk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720755648; c=relaxed/simple;
-	bh=4PqC2xrGneS5uUg5jAM1GbyFeOLj+F0bdgszfrHShBU=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=SSpg0vSC8WSxd+z2RnpR5+plIgNq4J2GTnLzloE73/w0JeYEImf7tQ/ZLS75l3zOY8JA7IIOWOKbi3zlKNZD+vrzo+0aSHN5Lc59in4/kLHnjwfR1rmPqm/olK3jj3Jp1aJcRz9mQECWxmqGXFANkPjb6KRttDirME2KlXGdjIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JuxNj8Td; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 67993C4AF07
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 03:40:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720755648;
-	bh=4PqC2xrGneS5uUg5jAM1GbyFeOLj+F0bdgszfrHShBU=;
-	h=From:To:Subject:Date:From;
-	b=JuxNj8TdcJ6U/v7wg8a1+t/zvo12v19sBOEI9AHqDQdVAMaGVsw8xuX4meNrL3QEz
-	 41ovAj4nhl4HQgpIwZFL0KO3xHqcXiwGZNpG84FDy2bFH68VSEp9D66OMCsttEulVn
-	 oIwSREVsilY1O5jQcvKzn5z8BtC259uEZp+Az9fzyB40Q0uWd9Vj5JvkoJ+ewQPD5f
-	 G+7wRZXU2aQJzTEPbC2e0Pw3IVblF2fl/asL81y66nWleb/v2GUxRCdliWWNKbAVkW
-	 NfQw0h4DRfM/rQfehHqBNhxJSTgNm+EPcTVFc8ROa2AEJgh9PWpKDAds5BEmpTq/iu
-	 nvXijlga0JZIw==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 54880C53B73; Fri, 12 Jul 2024 03:40:48 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219034] New: [linux-next][tag next-20240709] kernel BUG at
- lib/dynamic_queue_limits.c:99! and Oops: invalid opcode: 0000 [#1] PREEMPT
- SMP NOPTI
-Date: Fri, 12 Jul 2024 03:40:47 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: hongyu.ning@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
- op_sys bug_status bug_severity priority component assigned_to reporter
- cf_regression
-Message-ID: <bug-219034-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E714101C5;
+	Fri, 12 Jul 2024 03:51:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720756286; cv=fail; b=TfBimODUcdG9JLcBB+jFtP4Ohyp7bo0o5EwVIhDlouiRCrrRVYWj06H0PtQgLr8jNnmP3GVh8GknFKC4EAvBb8HN5yJaivCZicBgZCwCTYGZjrqlJ/BOsMa8iSnQWJSkQmd0MT/T5vAvMxFT5NOtM/p7FQq9LvI5IhBkQZuLfXk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720756286; c=relaxed/simple;
+	bh=Xu+gnozfrdV7mjqKui39dTOlNTUKJkPjYXW+WrTQUvI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ac+b1KPe5ge+6qetDYLCNahSvw1QHZpFLE1V60iIF4ZhsxnKwEeUjEm5RIgA3JW6JGCey5A1XWaLqHU8lSQw32TmPOSvZ2hWk/O4pBOAhbdCyX+Sf16UlJTNb+R6WCM2jc/2Q7kStOYGpISq5yAFG9r0pMbwKvm7heggkXj7Dkk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ATqS7REA; arc=fail smtp.client-ip=40.107.223.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iizTXMgrYurhxN5nGfE0Wfp167MJDou1ARq9qLfNP4aTDwoIeQhFz5b72rDfYEmiZ2D3QdqRaAnYJVaR7JonPFt3cwMV4ylcAM+qYQ1qNbfBBCGJgmsBL7TIK9uHruxdxMJa+fenjX1WWO/3wdWvp4G1uENjaCLY3SDyNwVHDxcUvDdEP9HItNkuzRmhLyRM0RRihEOxdQiSIpAU9eMayrzP8/v1CpPpEQPVzTZmtizLFtL5+V9AFEmq5Z9Kyi44fiud7lAYkYEqXBjYPpEls6qz8iCTAUH7hWtnf14LbY0uZVZlv+pFQ5z97Jyspig5pfO0FImmBllgZK3YN554JQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=SDGANwTbpgKrfggEZLCeMtNnmvMKXTwbJ79Y8cQQRIw=;
+ b=FYI6XP+Ye92xJ6im9/r4fEJjTiwLWv9tnVbyfGfLFe08+nvwCCjgVzs142pGpuEWZm139GTQLkWB2fIXCMwGASM7eck7WOHSUUyiyWXqfqyEGXw+UutAYEoAJg7C/SWs3thArAUa8+usovyJkcjLWB0GBjqNCiRfBQbUlvEs6C2hl5FCPqquY4fndPb2M8zGvkquH05haNlBL6KdwEqA7qLawGZUy6WnbvGEh0E/vlnPgXWCA09i7JofeQxp6p8WZJwxWTkCwy9dOUtchujRQoLDvnz+ohmtpZJ6UI/oSb1bmm9/nVBdpTCoib+lGQ0JVCLJd+F0HdSpKEY5lie4lg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=SDGANwTbpgKrfggEZLCeMtNnmvMKXTwbJ79Y8cQQRIw=;
+ b=ATqS7REAfHNoagH+ZTQv+2we8fGJEEqO0MM/hsuJaUHG4GItxUX0QxfYwlKn+r9AjUkQbphYYgqiPqTrA0ISg+uwvHbaz2HReRqw07W+im6r+ySZuryFljMerMEcFHfBq60cDnrB0lNzuJvkI1m+qleeUd03ZjJPOEchb00SQ1g=
+Received: from CH5P222CA0018.NAMP222.PROD.OUTLOOK.COM (2603:10b6:610:1ee::29)
+ by IA0PR12MB8087.namprd12.prod.outlook.com (2603:10b6:208:401::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23; Fri, 12 Jul
+ 2024 03:51:21 +0000
+Received: from CH2PEPF00000142.namprd02.prod.outlook.com
+ (2603:10b6:610:1ee:cafe::96) by CH5P222CA0018.outlook.office365.com
+ (2603:10b6:610:1ee::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23 via Frontend
+ Transport; Fri, 12 Jul 2024 03:51:21 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH2PEPF00000142.mail.protection.outlook.com (10.167.244.75) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7762.17 via Frontend Transport; Fri, 12 Jul 2024 03:51:20 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 11 Jul
+ 2024 22:51:19 -0500
+Date: Thu, 11 Jul 2024 22:51:02 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <vbabka@suse.cz>,
+	<david@redhat.com>, <seanjc@google.com>, <linux-mm@kvack.org>
+Subject: Re: [PATCH] mm, virt: merge AS_UNMOVABLE and AS_INACCESSIBLE
+Message-ID: <lbnfhvqkofcbpneoduic3bfitbpzkh275zuajvlzkewp26e5to@b3gt4k6ekklr>
+References: <20240711180305.15626-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240711180305.15626-1-pbonzini@redhat.com>
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000142:EE_|IA0PR12MB8087:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4aba0a19-898e-4d47-9142-08dca225e478
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?3aUFEemkj5Br9ADlRpAClsGycX1DlV7okJ3cN3QWB46jETvRnQSqwGDXUS1d?=
+ =?us-ascii?Q?FP9eMSDBx+b1Of7CPpSAhBfL+I9UUvqN7Po/w5/L3Pt5UuFFH2aprVExdBeJ?=
+ =?us-ascii?Q?hg6S13IWfD+L4I2WK2quN8G22CYg0zJI+r2RQm25vL3fuUD73NGiNwbTxgCp?=
+ =?us-ascii?Q?8589lRet/iPfKjLBFsRvvtWfct5hTeBhro+Aoan0vCoFmQyOoBeqPFVOXt0z?=
+ =?us-ascii?Q?5jVEN91u0vHRlikZZh0lVpeiPPkLqTFUie3iuj4/ReQ3q+TG10ndeDdl74/r?=
+ =?us-ascii?Q?eMPoKdzgsPffEW9yAE09SCC+3StRmH2UzcMr9lpQwU+rwrf6bzkIzzqNw8NY?=
+ =?us-ascii?Q?r56jHvhSugSLVfORMvBl91uPed7467cK9T7pIFzFmRtyH2Na4x3jOL+QpMCb?=
+ =?us-ascii?Q?V8kFDLI+1syw9qsgmZts69v0jLUrI90auveD0YzXGXL/sTPM1qMK3pyK5e3C?=
+ =?us-ascii?Q?34riHWslcX/k4HH31PH3QsAWfNCUmiMthfeK25QT13qwvUO5erg6/awYlCED?=
+ =?us-ascii?Q?Y4iwlciVNW24aCUS9B+f8ogQCgyXU+d0lMozm09DPHCfUlpmL5KJiaod6FZ+?=
+ =?us-ascii?Q?eXH72pKBj/JgfImQ6EnkNWS11JJmHhoag/A6d9UCHGDIkyQlioekjO60Cd/r?=
+ =?us-ascii?Q?Ji5jNYJFbHJ9JV8dGAGqti5i0y95TUKeBkmwgt6g52ugQWKAyYWj6N3znmRL?=
+ =?us-ascii?Q?iYIQv0SUq8fHoXKd7m/+ATGBMlDya8jA80yU4muiyuxEawnf/WFMGVH+I1CT?=
+ =?us-ascii?Q?VDLKo//DVA51SsC1emxswWK2tZiJWDXlEDF4dLVGpQEFWfUAZ74NZNJzdrQ7?=
+ =?us-ascii?Q?1EBVmufcEDL4miHyot29NE+rDm3tdayZMPoaOg2ICtxiOouXjUANQ/NzqA7+?=
+ =?us-ascii?Q?342s7nlPg3HTx7681gg9duic0C84KiX7zG3BSFp1VIVX9/FJkO9Y29EkVVki?=
+ =?us-ascii?Q?Gyqhs4vbEozYtVHK34oyM9mpm7CbxPIhkWcExcyVCcHMTyHBYKlAxD6N5r5q?=
+ =?us-ascii?Q?ssmictpK4CMnJk+9auYZ1GfqZ/cDIAmBPiKbaAjfUDvc+uMOordhjbvW8ipY?=
+ =?us-ascii?Q?g7UGnc3fkyhLvQ31GV3vdpfydpI/cHdmTOyjtfh4Xt88j7rB7MjShMjm1SZJ?=
+ =?us-ascii?Q?en75fpeq9R+1VtYafQ79GnB82bORsldgU2mipTzARESBjSnGEHeNRpq5cCgs?=
+ =?us-ascii?Q?xeb1cajuoXH6K1uvIQUgRzhL87ED1aT1FjYo4tkuPyE7YM2b6rM5WVcfcE8z?=
+ =?us-ascii?Q?9HSaOrzRf1w46dbVA4+2rdftbUmvXvGXFuxa8VRhtrOYABFp07n1gCOv61gE?=
+ =?us-ascii?Q?nVfRnYmqv5C5seI511gd5NvC6QcMzzTXzP9JFzrhBG0c07atXkKy20xHbU2U?=
+ =?us-ascii?Q?8WoHkK1asQLXGG/3/kUfdWpMA3E9JeERN3dGhqrdF/orDtJHZCwrQjzvsARd?=
+ =?us-ascii?Q?FgTUemwDPWgtRZg+5FsSm4JMZDBpgiPw?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2024 03:51:20.9582
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4aba0a19-898e-4d47-9142-08dca225e478
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000142.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8087
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219034
+On Thu, Jul 11, 2024 at 02:03:05PM -0400, Paolo Bonzini wrote:
+> The flags AS_UNMOVABLE and AS_INACCESSIBLE were both added just for guest_memfd;
+> AS_UNMOVABLE is already in existing versions of Linux, while AS_INACCESSIBLE was
+> acked for inclusion in 6.11.
+> 
+> But really, they are the same thing: only guest_memfd uses them, at least for
+> now, and guest_memfd pages are unmovable because they should not be
+> accessed by the CPU.
+> 
+> So merge them into one; use the AS_INACCESSIBLE name which is more comprehensive.
+> At the same time, this fixes an embarrassing bug where AS_INACCESSIBLE was used
+> as a bit mask, despite it being just a bit index.
+> 
+> The bug was mostly benign, becaus AS_INACCESSIBLE's bit representation (1010)
+> corresponded to setting AS_UNEVICTABLE (which is already set) and AS_ENOSPC
+> (except no async writes can happen on the guest_memfd).  So the AS_INACCESSIBLE
+> flag simply had no effect.
 
-            Bug ID: 219034
-           Summary: [linux-next][tag next-20240709] kernel BUG at
-                    lib/dynamic_queue_limits.c:99! and Oops: invalid
-                    opcode: 0000 [#1] PREEMPT SMP NOPTI
-           Product: Virtualization
-           Version: unspecified
-          Hardware: All
-                OS: Linux
-            Status: NEW
-          Severity: normal
-          Priority: P3
-         Component: kvm
-          Assignee: virtualization_kvm@kernel-bugs.osdl.org
-          Reporter: hongyu.ning@intel.com
-        Regression: No
+*facepalm*. Thank you for catching this.
 
-Hi,
+> 
+> Fixes: 1d23040caa8b ("KVM: guest_memfd: Use AS_INACCESSIBLE when creating guest_memfd inode")
+> Fixes: c72ceafbd12c ("mm: Introduce AS_INACCESSIBLE for encrypted/confidential memory")
+> Cc: linux-mm@kvack.org
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-based on regular regression check on linux-next tree as KVM/QEMU based gues=
-t VM
-kernel, there are following error observed since next-20240709.
+I re-tested the AS_INACCESSIBLE handling with SNP. I also tested with
+Sean's patch that enables THP support in gmem to test it since that was
+the more problematic case.
 
-it's 100% reproduced on my local setup.
+Tested-by: Michael Roth <michael.roth@amd.com>
+Reviewed-by: Michael Roth <michael.roth@amd.com>
 
-based on bisect, it points to linux-next merge commit:
-first bad commit: [28ab424895157dfea418c12418c5d0fc9263e850] Merge branch
-'linux-next' of git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
-
-while no further check for vhost.git repo possible on my side,
-can somebody help to take a look?
-
-[    1.770041] ------------[ cut here ]------------
-[    1.770088] kernel BUG at lib/dynamic_queue_limits.c:99!
-[    1.770132] Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-[    1.770135] CPU: 0 UID: 0 PID: 218 Comm: NetworkManager Not tainted
-6.10.0-rc7-next-20240709-next-20240709 #97
-[    1.770137] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unk=
-nown
-2/2/2022
-[    1.770138] RIP: 0010:dql_completed+0x155/0x170
-[    1.770153] Code: 51 cb 03 02 48 89 57 58 e9 35 ff ff ff 85 ed 41 0f 95 =
-c0
-39 d9 0f 95 c1 41 84 c8 74 05 45 85 e4 78 0a 44 89 d9 e9 18 ff ff ff <0f> 0=
-b 01
-d2 44 89 d9 29 d1 ba 00 00 00 00 0f 48 ca eb 88 0f 1f 84
-[    1.770154] RSP: 0018:ffa0000000003d98 EFLAGS: 00010283
-[    1.770156] RAX: 0000000000000000 RBX: 0000000000000000 RCX:
-0000000000000000
-[    1.770157] RDX: 0000000000000000 RSI: 000000000739aa20 RDI:
-ff1100000702c6c0
-[    1.770158] RBP: ffa0000000003de8 R08: 0000000000000000 R09:
-0000000000000000
-[    1.770159] R10: 0000000000000000 R11: ffa0000000003ff8 R12:
-ff1100000770a800
-[    1.770160] R13: ff1100000702c600 R14: 0000000000000001 R15:
-ff1100000770a800
-[    1.770161] FS:  00007f6420576500(0000) GS:ff1100003d400000(0000)
-knlGS:0000000000000000
-[    1.770164] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.770164] CR2: 0000564d582a9048 CR3: 000000000e2ce003 CR4:
-0000000000771ef0
-[    1.770165] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-0000000000000000
-[    1.770166] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7:
-0000000000000400
-[    1.770166] PKRU: 55555554
-[    1.770167] Call Trace:
-[    1.770169]  <IRQ>
-[    1.770171]  ? die+0x33/0x90
-[    1.770174]  ? do_trap+0xda/0x100
-[    1.770180]  ? do_error_trap+0x65/0x80
-[    1.770181]  ? dql_completed+0x155/0x170
-[    1.770183]  ? exc_invalid_op+0x4e/0x70
-[    1.770186]  ? dql_completed+0x155/0x170
-[    1.770188]  ? asm_exc_invalid_op+0x16/0x20
-[    1.770194]  ? dql_completed+0x155/0x170
-[    1.770195]  __free_old_xmit+0xe4/0x160
-[    1.770199]  free_old_xmit+0x28/0x80
-[    1.770200]  virtnet_poll+0xdb/0x350
-[    1.770204]  ? update_load_avg+0x7e/0x7a0
-[    1.770209]  __napi_poll+0x29/0x1b0
-[    1.770214]  net_rx_action+0x2fe/0x3d0
-[    1.770216]  ? wakeup_preempt+0x5a/0x70
-[    1.770219]  ? ttwu_do_activate+0x6f/0x210
-[    1.770221]  ? _raw_spin_unlock_irqrestore+0x1e/0x40
-[    1.770224]  ? kvm_sched_clock_read+0xd/0x20
-[    1.770227]  ? sched_clock+0xc/0x30
-[    1.770232]  ? kvm_sched_clock_read+0xd/0x20
-[    1.770233]  ? sched_clock+0xc/0x30
-[    1.770235]  ? sched_clock_cpu+0xb/0x190
-[    1.770239]  handle_softirqs+0xfa/0x2f0
-[    1.770242]  do_softirq+0x71/0x90
-[    1.770243]  </IRQ>
-[    1.770243]  <TASK>
-[    1.770244]  __local_bh_enable_ip+0x65/0x80
-[    1.770245]  virtnet_open+0xa6/0x2d0
-[    1.770248]  __dev_open+0xea/0x1b0
-[    1.770250]  __dev_change_flags+0x1e0/0x250
-[    1.770253]  dev_change_flags+0x21/0x60
-[    1.770255]  do_setlink+0x283/0xbc0
-[    1.770260]  ? __nla_validate_parse+0x47/0x1d0
-[    1.770262]  __rtnl_newlink+0x502/0x640
-[    1.770264]  ? __kmalloc_cache_noprof+0x27e/0x2f0
-[    1.770268]  rtnl_newlink+0x44/0x70
-[    1.770269]  rtnetlink_rcv_msg+0x159/0x420
-[    1.770271]  ? netlink_unicast+0x31c/0x360
-[    1.770275]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
-[    1.770277]  netlink_rcv_skb+0x54/0x100
-[    1.770280]  netlink_unicast+0x23e/0x360
-[    1.770282]  netlink_sendmsg+0x1e4/0x420
-[    1.770284]  ____sys_sendmsg+0x310/0x340
-[    1.770289]  ? copy_msghdr_from_user+0x6d/0xa0
-[    1.770291]  ___sys_sendmsg+0x88/0xd0
-[    1.770293]  ? kfree+0x13b/0x2a0
-[    1.770298]  ? preempt_count_add+0x69/0xa0
-[    1.770299]  ? _raw_spin_unlock+0x14/0x30
-[    1.770300]  ? proc_sys_call_handler+0xe7/0x280
-[    1.770304]  ? mod_objcg_state+0xbe/0x2e0
-[    1.770307]  ? __fdget+0xc7/0x100
-[    1.770311]  __sys_sendmsg+0x59/0xa0
-[    1.770313]  ? syscall_trace_enter+0xfb/0x190
-[    1.770317]  do_syscall_64+0x47/0x110
-[    1.770321]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
-[    1.770323] RIP: 0033:0x7f642154fa9d
-[    1.770324] Code: 28 89 54 24 1c 48 89 74 24 10 89 7c 24 08 e8 aa c1 f4 =
-ff
-8b 54 24 1c 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 2e 00 00 00 0f 05 <48> 3=
-d 00
-f0 ff ff 77 33 44 89 c7 48 89 44 24 08 e8 fe c1 f4 ff 48
-[    1.770325] RSP: 002b:00007ffe1fcbd3c0 EFLAGS: 00000293 ORIG_RAX:
-000000000000002e
-[    1.770326] RAX: ffffffffffffffda RBX: 0000000000000000 RCX:
-00007f642154fa9d
-[    1.770327] RDX: 0000000000000000 RSI: 00007ffe1fcbd400 RDI:
-000000000000000d
-[    1.770328] RBP: 0000000000000001 R08: 0000000000000000 R09:
-0000000000000000
-[    1.770328] R10: 0000000000000000 R11: 0000000000000293 R12:
-000000000000000a
-[    1.770328] R13: 00007ffe1fcbd56c R14: 0000564d58220040 R15:
-00007ffe1fcbd570
-[    1.770330]  </TASK>
-[    1.770330] Modules linked in:
-[    1.770331] ---[ end trace 0000000000000000 ]---
-[    1.778118] RIP: 0010:dql_completed+0x155/0x170
-[    1.778158] Code: 51 cb 03 02 48 89 57 58 e9 35 ff ff ff 85 ed 41 0f 95 =
-c0
-39 d9 0f 95 c1 41 84 c8 74 05 45 85 e4 78 0a 44 89 d9 e9 18 ff ff ff <0f> 0=
-b 01
-d2 44 89 d9 29 d1 ba 00 00 00 00 0f 48 ca eb 88 0f 1f 84
-[    1.778271] RSP: 0018:ffa0000000003d98 EFLAGS: 00010283
-[    1.778308] RAX: 0000000000000000 RBX: 0000000000000000 RCX:
-0000000000000000
-[    1.778363] RDX: 0000000000000000 RSI: 000000000739aa20 RDI:
-ff1100000702c6c0
-[    1.778422] RBP: ffa0000000003de8 R08: 0000000000000000 R09:
-0000000000000000
-[    1.778474] R10: 0000000000000000 R11: ffa0000000003ff8 R12:
-ff1100000770a800
-[    1.778528] R13: ff1100000702c600 R14: 0000000000000001 R15:
-ff1100000770a800
-[    1.778581] FS:  00007f6420576500(0000) GS:ff1100003d400000(0000)
-knlGS:0000000000000000
-[    1.778636] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[    1.778680] CR2: 0000564d582a9048 CR3: 000000000e2ce003 CR4:
-0000000000771ef0
-[    1.778736] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-0000000000000000
-[    1.778788] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7:
-0000000000000400
-[    1.778843] PKRU: 55555554
-[    1.778863] Kernel panic - not syncing: Fatal exception in interrupt
-[    1.778929] Kernel Offset: disabled
-[    1.783606] ---[ end Kernel panic - not syncing: Fatal exception in
-interrupt ]---
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+> ---
+>  include/linux/pagemap.h | 14 +++++++-------
+>  mm/compaction.c         | 12 ++++++------
+>  mm/migrate.c            |  2 +-
+>  mm/truncate.c           |  2 +-
+>  virt/kvm/guest_memfd.c  |  3 +--
+>  5 files changed, 16 insertions(+), 17 deletions(-)
+> 
+> diff --git a/include/linux/pagemap.h b/include/linux/pagemap.h
+> index ce7bac8f81da..e05585eda771 100644
+> --- a/include/linux/pagemap.h
+> +++ b/include/linux/pagemap.h
+> @@ -208,8 +208,8 @@ enum mapping_flags {
+>  	AS_RELEASE_ALWAYS,	/* Call ->release_folio(), even if no private data */
+>  	AS_STABLE_WRITES,	/* must wait for writeback before modifying
+>  				   folio contents */
+> -	AS_UNMOVABLE,		/* The mapping cannot be moved, ever */
+> -	AS_INACCESSIBLE,	/* Do not attempt direct R/W access to the mapping */
+> +	AS_INACCESSIBLE,	/* Do not attempt direct R/W access to the mapping,
+> +				   including to move the mapping */
+>  };
+>  
+>  /**
+> @@ -310,20 +310,20 @@ static inline void mapping_clear_stable_writes(struct address_space *mapping)
+>  	clear_bit(AS_STABLE_WRITES, &mapping->flags);
+>  }
+>  
+> -static inline void mapping_set_unmovable(struct address_space *mapping)
+> +static inline void mapping_set_inaccessible(struct address_space *mapping)
+>  {
+>  	/*
+> -	 * It's expected unmovable mappings are also unevictable. Compaction
+> +	 * It's expected inaccessible mappings are also unevictable. Compaction
+>  	 * migrate scanner (isolate_migratepages_block()) relies on this to
+>  	 * reduce page locking.
+>  	 */
+>  	set_bit(AS_UNEVICTABLE, &mapping->flags);
+> -	set_bit(AS_UNMOVABLE, &mapping->flags);
+> +	set_bit(AS_INACCESSIBLE, &mapping->flags);
+>  }
+>  
+> -static inline bool mapping_unmovable(struct address_space *mapping)
+> +static inline bool mapping_inaccessible(struct address_space *mapping)
+>  {
+> -	return test_bit(AS_UNMOVABLE, &mapping->flags);
+> +	return test_bit(AS_INACCESSIBLE, &mapping->flags);
+>  }
+>  
+>  static inline gfp_t mapping_gfp_mask(struct address_space * mapping)
+> diff --git a/mm/compaction.c b/mm/compaction.c
+> index e731d45befc7..714afd9c6df6 100644
+> --- a/mm/compaction.c
+> +++ b/mm/compaction.c
+> @@ -1172,22 +1172,22 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+>  		if (((mode & ISOLATE_ASYNC_MIGRATE) && is_dirty) ||
+>  		    (mapping && is_unevictable)) {
+>  			bool migrate_dirty = true;
+> -			bool is_unmovable;
+> +			bool is_inaccessible;
+>  
+>  			/*
+>  			 * Only folios without mappings or that have
+>  			 * a ->migrate_folio callback are possible to migrate
+>  			 * without blocking.
+>  			 *
+> -			 * Folios from unmovable mappings are not migratable.
+> +			 * Folios from inaccessible mappings are not migratable.
+>  			 *
+>  			 * However, we can be racing with truncation, which can
+>  			 * free the mapping that we need to check. Truncation
+>  			 * holds the folio lock until after the folio is removed
+>  			 * from the page so holding it ourselves is sufficient.
+>  			 *
+> -			 * To avoid locking the folio just to check unmovable,
+> -			 * assume every unmovable folio is also unevictable,
+> +			 * To avoid locking the folio just to check inaccessible,
+> +			 * assume every inaccessible folio is also unevictable,
+>  			 * which is a cheaper test.  If our assumption goes
+>  			 * wrong, it's not a correctness bug, just potentially
+>  			 * wasted cycles.
+> @@ -1200,9 +1200,9 @@ isolate_migratepages_block(struct compact_control *cc, unsigned long low_pfn,
+>  				migrate_dirty = !mapping ||
+>  						mapping->a_ops->migrate_folio;
+>  			}
+> -			is_unmovable = mapping && mapping_unmovable(mapping);
+> +			is_inaccessible = mapping && mapping_inaccessible(mapping);
+>  			folio_unlock(folio);
+> -			if (!migrate_dirty || is_unmovable)
+> +			if (!migrate_dirty || is_inaccessible)
+>  				goto isolate_fail_put;
+>  		}
+>  
+> diff --git a/mm/migrate.c b/mm/migrate.c
+> index dd04f578c19c..50b60fb414e9 100644
+> --- a/mm/migrate.c
+> +++ b/mm/migrate.c
+> @@ -965,7 +965,7 @@ static int move_to_new_folio(struct folio *dst, struct folio *src,
+>  
+>  		if (!mapping)
+>  			rc = migrate_folio(mapping, dst, src, mode);
+> -		else if (mapping_unmovable(mapping))
+> +		else if (mapping_inaccessible(mapping))
+>  			rc = -EOPNOTSUPP;
+>  		else if (mapping->a_ops->migrate_folio)
+>  			/*
+> diff --git a/mm/truncate.c b/mm/truncate.c
+> index 60388935086d..581977d2356f 100644
+> --- a/mm/truncate.c
+> +++ b/mm/truncate.c
+> @@ -233,7 +233,7 @@ bool truncate_inode_partial_folio(struct folio *folio, loff_t start, loff_t end)
+>  	 * doing a complex calculation here, and then doing the zeroing
+>  	 * anyway if the page split fails.
+>  	 */
+> -	if (!(folio->mapping->flags & AS_INACCESSIBLE))
+> +	if (!mapping_inaccessible(folio->mapping))
+>  		folio_zero_range(folio, offset, length);
+>  
+>  	if (folio_has_private(folio))
+> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
+> index 9148b9679bb1..1c509c351261 100644
+> --- a/virt/kvm/guest_memfd.c
+> +++ b/virt/kvm/guest_memfd.c
+> @@ -416,11 +416,10 @@ static int __kvm_gmem_create(struct kvm *kvm, loff_t size, u64 flags)
+>  	inode->i_private = (void *)(unsigned long)flags;
+>  	inode->i_op = &kvm_gmem_iops;
+>  	inode->i_mapping->a_ops = &kvm_gmem_aops;
+> -	inode->i_mapping->flags |= AS_INACCESSIBLE;
+>  	inode->i_mode |= S_IFREG;
+>  	inode->i_size = size;
+>  	mapping_set_gfp_mask(inode->i_mapping, GFP_HIGHUSER);
+> -	mapping_set_unmovable(inode->i_mapping);
+> +	mapping_set_inaccessible(inode->i_mapping);
+>  	/* Unmovable mappings are supposed to be marked unevictable as well. */
+>  	WARN_ON_ONCE(!mapping_unevictable(inode->i_mapping));
+>  
+> -- 
+> 2.43.0
+> 
 
