@@ -1,212 +1,263 @@
-Return-Path: <kvm+bounces-21464-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21465-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F74492F3A1
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 03:44:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441C092F472
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 05:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA9311C22129
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 01:44:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7C3E1F22BBA
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 03:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B0679DE;
-	Fri, 12 Jul 2024 01:43:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B245A10940;
+	Fri, 12 Jul 2024 03:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NayDDShJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JuxNj8Td"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805C91373;
-	Fri, 12 Jul 2024 01:43:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720748636; cv=fail; b=PkE7f+tW7VeT2GdBMKL6EcQ/npvRFRWFfEh6Jol9UcdkZcZaUkWZfSOQupdNNYISxBYpXIUV5H54da0winDJEOnGGW0l5gySSo30v3o5095Ri3eSdoM9qYAbt9lfxlMsRG8gSW+3kQPE59I1NED+JZMXWA0xChhMmml/sJwQ1Yc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720748636; c=relaxed/simple;
-	bh=3N5OV6Kxbco5cpDJ2yWlLCyPmhrJYxxe3oZR9q4BQ30=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=AdVqwr3QA1AT8OJGjzKmwesTVdchDp550e6bCPWN5HkGBQ2WLnp28UmwVwzLhw+9rQ+8EvuXb1s+/ufz+zGHzf+pAjAdfmmm4ZKYMO1G+zS8DvlyaXU2ismHSZ4eymjkcAOlRaEZXZthvwqqbPs8hifRM9N6Oslx9Iod65Soxp0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NayDDShJ; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720748636; x=1752284636;
-  h=date:from:to:cc:subject:message-id:reply-to:references:
-   in-reply-to:mime-version;
-  bh=3N5OV6Kxbco5cpDJ2yWlLCyPmhrJYxxe3oZR9q4BQ30=;
-  b=NayDDShJ54JEirrUIppDzWrDt6i9/iSdmjCcr4dFN9RvimdlH0YSwK3j
-   Ao7gwy26Ow85dooYXTgBEeWPO4DcqYziepamB5IFy3cDajtdrqQNssqJv
-   Q2xp2hk6urh6PVBaGNvdrUL6TrcP9LzjdFk67GP/u0GQRmM43MBuwLiAk
-   Fb/iKIjw2KJnaXgLuX/jzMETvIrL56Bv87340qe4XPtqw5rE65nibJrbA
-   StzVs1oodXy4ApnsidZmVZ4GY1hFdUKQEViOPy8AHcckrL9WY+ciwkqyf
-   FLNAuNDKhDDJQVpf39tt5qo1hQ1H6K/rLL+rAF+KF3UKK3LEocEjZkW9y
-   Q==;
-X-CSE-ConnectionGUID: jV9fF/ESR8mTFx5L67eZTw==
-X-CSE-MsgGUID: 5230AeNDTxG19rCgkRw4Og==
-X-IronPort-AV: E=McAfee;i="6700,10204,11130"; a="18311598"
-X-IronPort-AV: E=Sophos;i="6.09,201,1716274800"; 
-   d="scan'208";a="18311598"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Jul 2024 18:43:55 -0700
-X-CSE-ConnectionGUID: hIYKMTV4QyOwL1G516S1nA==
-X-CSE-MsgGUID: JPhs97rJSoiVu0C5Tn0Dsw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,201,1716274800"; 
-   d="scan'208";a="53141219"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Jul 2024 18:43:53 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 11 Jul 2024 18:43:53 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 11 Jul 2024 18:43:53 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.49) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 11 Jul 2024 18:43:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=c8M3t/NMmEoR4FZ/L4ilkis/NUCdsola6ye6hsVGPo+srlsY7YvFTbV1mDmrZ4AD37lCbbf45+hHjwGkG16MBqoLRnUK5iFOx4BZ55YF6FXKmATFpm66e6GQL4auFhKt89er9fMFi5P5Mi813Myuben88t2JooxaNLMea30ioHxLOQNboF6V131Vmp1d1RzFwpbe4zffLZsVMnL3fOG4DfmPGw9+CtUv611NxfTD7IdDw+3c9Le8ywp9Yepg3sel1gw8CHKYvC2j2xf0pqRUPG9KUdskPGeNgilW4Y3glzAoCPy3Z/8ZYpKT9Ty8TSaaqiN4Z/SWQTgWTdKw0Vb9vw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r7VWYNVGlSpMCUu+0/sGfpJ0Zu5CiRJ1OzMtabi7NW0=;
- b=L6oPk9V7nseVHvmuZ8AE60HnlQxmSRm9nkJ0XFujG7ht7MOeqs/DLGZN5RptOhe02qg0WVENJjbRv6m/IuEFJnoj6ikqJleKcU0akFQoDVeWSkJ9/yjum0IOy4KuvucV+oAYh0BKaS0zRRgXxOufP5H2AFEX6vMH4ly9cwuBFNKIRUtlbKORAGcKHD5JfUqDTCXUa9rjOvLFU8PTLfAXh4mYZlq0n3pw6NkO1IWTFElLNfO4zt8GKPM22tzsMFejfQvvbXyVKeue5KQE9XjJGuVpilmnM757fKDIA1Qyx9PE2y1U8LtDnH2BDKyq72Z9P2vGb0jnvcQyZX5c6mz0JA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com (2603:10b6:8:71::6) by
- SA1PR11MB6757.namprd11.prod.outlook.com (2603:10b6:806:25c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23; Fri, 12 Jul
- 2024 01:43:50 +0000
-Received: from DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca]) by DS7PR11MB5966.namprd11.prod.outlook.com
- ([fe80::e971:d8f4:66c4:12ca%2]) with mapi id 15.20.7741.033; Fri, 12 Jul 2024
- 01:43:50 +0000
-Date: Fri, 12 Jul 2024 09:42:29 +0800
-From: Yan Zhao <yan.y.zhao@intel.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-CC: "seanjc@google.com" <seanjc@google.com>, "Huang, Kai"
-	<kai.huang@intel.com>, "sagis@google.com" <sagis@google.com>,
-	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "Aktas, Erdem"
-	<erdemaktas@google.com>, "dmatlack@google.com" <dmatlack@google.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Yamahata, Isaku"
-	<isaku.yamahata@intel.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-Subject: Re: [PATCH v3 13/17] KVM: x86/tdp_mmu: Support mirror root for TDP
- MMU
-Message-ID: <ZpCKBSS6fB9s30Wp@yzhao56-desk>
-Reply-To: Yan Zhao <yan.y.zhao@intel.com>
-References: <20240619223614.290657-1-rick.p.edgecombe@intel.com>
- <20240619223614.290657-14-rick.p.edgecombe@intel.com>
- <ZoZiopPQIkoZ0V4T@yzhao56-desk.sh.intel.com>
- <81b3bfa46a457ba19ce32e7a34b793867ebeebbe.camel@intel.com>
- <03eccdf96e917e178acbc3cc53a965328a5690b6.camel@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <03eccdf96e917e178acbc3cc53a965328a5690b6.camel@intel.com>
-X-ClientProxiedBy: SI2PR01CA0007.apcprd01.prod.exchangelabs.com
- (2603:1096:4:191::11) To DS7PR11MB5966.namprd11.prod.outlook.com
- (2603:10b6:8:71::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A248BE5
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 03:40:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720755648; cv=none; b=Q+oLNqk0FUaKfLpBpT51it1QZjlpn4le9pS9P+xQGIpcE/Pj0BVq8rPviaf3mDp1DtgxjfA10Y8KyjA66qCemikwNoIwGQ/S5a9WU/l4IpVTH9Fcoppu5G+QGIml/btI7Ebhu62/MI7+UuTboFrMbDdHT/uZun/38PCC6W+/UPk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720755648; c=relaxed/simple;
+	bh=4PqC2xrGneS5uUg5jAM1GbyFeOLj+F0bdgszfrHShBU=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=SSpg0vSC8WSxd+z2RnpR5+plIgNq4J2GTnLzloE73/w0JeYEImf7tQ/ZLS75l3zOY8JA7IIOWOKbi3zlKNZD+vrzo+0aSHN5Lc59in4/kLHnjwfR1rmPqm/olK3jj3Jp1aJcRz9mQECWxmqGXFANkPjb6KRttDirME2KlXGdjIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JuxNj8Td; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 67993C4AF07
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 03:40:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720755648;
+	bh=4PqC2xrGneS5uUg5jAM1GbyFeOLj+F0bdgszfrHShBU=;
+	h=From:To:Subject:Date:From;
+	b=JuxNj8TdcJ6U/v7wg8a1+t/zvo12v19sBOEI9AHqDQdVAMaGVsw8xuX4meNrL3QEz
+	 41ovAj4nhl4HQgpIwZFL0KO3xHqcXiwGZNpG84FDy2bFH68VSEp9D66OMCsttEulVn
+	 oIwSREVsilY1O5jQcvKzn5z8BtC259uEZp+Az9fzyB40Q0uWd9Vj5JvkoJ+ewQPD5f
+	 G+7wRZXU2aQJzTEPbC2e0Pw3IVblF2fl/asL81y66nWleb/v2GUxRCdliWWNKbAVkW
+	 NfQw0h4DRfM/rQfehHqBNhxJSTgNm+EPcTVFc8ROa2AEJgh9PWpKDAds5BEmpTq/iu
+	 nvXijlga0JZIw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 54880C53B73; Fri, 12 Jul 2024 03:40:48 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219034] New: [linux-next][tag next-20240709] kernel BUG at
+ lib/dynamic_queue_limits.c:99! and Oops: invalid opcode: 0000 [#1] PREEMPT
+ SMP NOPTI
+Date: Fri, 12 Jul 2024 03:40:47 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: hongyu.ning@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-219034-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR11MB5966:EE_|SA1PR11MB6757:EE_
-X-MS-Office365-Filtering-Correlation-Id: d5c5c458-2f67-48b3-3e18-08dca214147f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?nK/ncV2lBYxWVQIvRhmEARmjBd8QXN7wvovDsWrm9fbHhgPMA5gsfIp9LozW?=
- =?us-ascii?Q?NvkUXxlgZIA2v3fczG0BLiAvNGA7Wqlw9WhMCY5lkpvQaeqh3keeoa6Et12O?=
- =?us-ascii?Q?/0rcxXWAnQW2XQAtB+metarg2H9fQlmk/xQ9LbjJiCCV1Jl+El8btHUVo4gQ?=
- =?us-ascii?Q?OjRqpwUgzEbnHkU6qVXAPy6lIwpO0RjFnbSbLYdCmqH18vITcBnm2RFDva7a?=
- =?us-ascii?Q?fNxInngU08dMbh+cWHk0VIS9m7ChBAvJtnxAIN+9j2LPVTuiRlJJpUt378kZ?=
- =?us-ascii?Q?sm0O0+ImbXaz3l1+JdnsTiwaGM03OJ/37Sx69nD5zTHygMzsesPKat8WkJXY?=
- =?us-ascii?Q?92V4+hbqbcXzds4MJLkW5GPFNXWpyrJbjRN9iDwOw/Ctz8ERGVUCalT6iSJY?=
- =?us-ascii?Q?jqTqbe/RDqkIPChGLXQo8brUKjpsBJ0XGPYCgHuyM1kFIXoak+Px6cu/H49m?=
- =?us-ascii?Q?4WEJQWKGxkBjTYcKzbmgAb/9q0T891udFG+ssRAX7BOZSC9u98hrLXRU6mKs?=
- =?us-ascii?Q?nZuQMKzpfs3Awv+HYJdqfr+cDh0uEoWtVGU10Baq/8JPkhPtaax/RrLFBCKj?=
- =?us-ascii?Q?S3LSDY2q1qAgZaWjhEAOO4+Gw0Ewx7UVdXU2G2Y/3hHXalYF7m3oHV53LhUz?=
- =?us-ascii?Q?+tQjAd3CG7GgA/MR08jPbn8se3FhaXjKkz6LzKBP3SQyTtLcmpMsuHYhYFHR?=
- =?us-ascii?Q?EizmjU/Dbx7OrSy0dLwBToFa15zfuMjFJNMeLRgFW9hPFFA0WcZ3wQRx0obP?=
- =?us-ascii?Q?vWmDIfDqPmKpANXmKpAVqeMCP4G0BQ+aRHuclLxARIzLyGfTpajxZbMIIy6p?=
- =?us-ascii?Q?NtAt125Z6q7wUpr/h990MtidRhC5mQxyngE3I8JXLXT92SbAdYd8Q9minpmT?=
- =?us-ascii?Q?wri7gmF4/wTGTYjAkL70FtOp8Y+IXSDEdobTL4pFLWCIVtI+SbqmyPw1tT9A?=
- =?us-ascii?Q?LdZe/mYS5sryQKt6Nr0ksHTlW14pPs1LJGRzxE9UJfreOvdBKdAhPwjDg4hC?=
- =?us-ascii?Q?HKefdFEgwUnHQWr/KauztJXOOmTx2okdRbId6iwZwzxFmf3BWag3rNc51+Ge?=
- =?us-ascii?Q?xea/ja3q4jN/9PSWOre+7lm6sBrjj9QMES3edIEfEVsql9MC4HIkJVpT/HT0?=
- =?us-ascii?Q?dpaS1o3MGFqg94w/Vt9kZdEvn1PR52mv2HmMS63AKLLivYFAx02T1GfwFSPT?=
- =?us-ascii?Q?Fd/YaRLQZMiQ+w6KikE+wcEuN6MiC0wJbHSy6NYMUUyA3O9rsn/3M6Rjk+zU?=
- =?us-ascii?Q?p4RUzXKX7oAEnA4auSIa0u2hKBI3DkfNF15gUVa1l10GF5zrIp9wubR/NxLM?=
- =?us-ascii?Q?2dVe/E1uUYtTRBlVCSJMpQpWHSxyhagt/pVw3ltk1qxfzQ=3D=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR11MB5966.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LTCWmRIv4WlPkhLCpqmHfaE9NpJdbFVSJE7lE03fDZpFoZYRK1xUNQCIq/gP?=
- =?us-ascii?Q?6NPT9h7Js7SnwLAGHVI1TL/xNNKeEdPIRQ2pkA+ViaMCX5e7m4mzoHNeTxp+?=
- =?us-ascii?Q?sxWPKrB4o2K96xF6A7FiT3DIZ1sxGuIPzcQs4xxG8EZbLFxuZnp/qsa6Byy8?=
- =?us-ascii?Q?AX7+pxYxkNLFK5gdIIu2982kdvPg7bbBoPgaoy+PKhR7gRx6/fLX4tbgSeNV?=
- =?us-ascii?Q?HPMFN5VGSKLl9Iz7refyrVuxgpE2krbvlul0K+pXKivDsA7gtc+OdPQdpX7K?=
- =?us-ascii?Q?C7EKdw/cGi4cvwAIDPu0O4NNSjrGUyZD7h/xbCEOsmaBlwb+lWcDpfRF9VdZ?=
- =?us-ascii?Q?4/wy+aTrbax6Kt9Q6uplX+9WtnNKpsE+nToTKJrobUd0Eg+ViBIAhZC+vKiR?=
- =?us-ascii?Q?7k0I9bxwm6X/0GswviOs70OaI+uH5AkGwj0p2DAQ0FG5sKjWFVR2PleUXaxU?=
- =?us-ascii?Q?KkBRF13+ndOztSuKlvD4X8Xbsu5ETH0K8qHUdE+oL0okD6PYuuHONmcRi7hb?=
- =?us-ascii?Q?x5a3MP/MniKtEOoLGdxxRWiJ+FoFcrjMAXQV0akoxAcBMqeCsRM+MLsJDmMT?=
- =?us-ascii?Q?US8w5KCKx7jZb2e1AHmL6r0k4N9yp+w348HES17b0Pe2nLiciKWk0PvM2m5K?=
- =?us-ascii?Q?ShgkXoTV1IUtpnHpHchXCdS6n37lF89pNn++Fdjmhv0WUpsdKn2gZb9eHL8G?=
- =?us-ascii?Q?hQbneISZ2pA8CYofsSvv9kR8emBTMLr9PLv2Wvw1mEl3oUJLyBAmfIDOis16?=
- =?us-ascii?Q?vT1cLAVJkO++kqKNwb5JpcAR8HrZL6rZTnqAvOsN0R6y7jF0NLi7IwE/AEjh?=
- =?us-ascii?Q?U3mm7RI2v5TT7yaJlHrG+8Owc7bueuvTMmZsZnLFMWNDw4M2c/eQp9YQ3dem?=
- =?us-ascii?Q?W9VV4Ub1rifk5qs16QPP6cuuxiVBsbaTd+MU96fm/73ALC2kDJoP0uBRWNp1?=
- =?us-ascii?Q?IeCXpj6mh/BZJj0ADvSOZ6gQsqIj5EqM3kCyU41A/SxHG9BQnHGwQbAWZHGx?=
- =?us-ascii?Q?tCC5gzgUSB7iqA0katAYfXIrftji3oowvc3G8WkiIdKoUperb9XkvinlPhzM?=
- =?us-ascii?Q?RqcgvWaz6zPlc1oMNLrEKeQAXHPvbBiaFQ+uD6fPV/itsrL1A2t227VDht8G?=
- =?us-ascii?Q?TyNkt1lIoJWfLhDVM+rlJXHazs789tfg/MsWh4EbXZrqaKrjRs9NBA4ctgxo?=
- =?us-ascii?Q?KKt4JBpOKdz4hgcxlx6DaAIAZuG+FkZRL3TP+aZVKB+m7SWOqE38gxtjPDTj?=
- =?us-ascii?Q?01D60i8xc0agiGq/xGhv37oZHBRjem9cZtFIKAtGwuee4Ct/2QM6wao5+SNR?=
- =?us-ascii?Q?wj8NWeoacfy8jSDWlSjVyhRdjMMN8Usxor7/WbSfa1c3aEd70Mxstwm1BPSu?=
- =?us-ascii?Q?Bf4fpFZqDHzjocOSeN6aNKd7QGRX0XSrPgjocAHrGa5EWsaZwSuSZjAJlZEr?=
- =?us-ascii?Q?bBYJ0N8ts8iNcgZUQtuNe64G6eYOmmjdtNxpWeIUWBxxgSqoANS+08CPW/8Q?=
- =?us-ascii?Q?Xmxxtr/KDLeWF5aUGvR4lPMFlU71gfahsiQVdEkLfv6esWsX+yU8KFxoRygf?=
- =?us-ascii?Q?05UzeD7m5Ct3crR7lAYGct2gkPzcGGorCzIYVht3?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5c5c458-2f67-48b3-3e18-08dca214147f
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR11MB5966.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jul 2024 01:43:50.7539
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ft+PPcTlE0IB2GzbbgUvJnq7IUPrtPYuf/uw7EkVS5RPuWXc/B1BY1pD/YBfwjaQPRpyb9iCkGLDMxVwNZtt3g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB6757
-X-OriginatorOrg: intel.com
 
-On Fri, Jul 12, 2024 at 07:54:50AM +0800, Edgecombe, Rick P wrote:
-> On Tue, 2024-07-09 at 15:38 -0700, Rick Edgecombe wrote:
-> > > Could we move them to tdp_mmu.c and rename them to something like
-> > > tdp_mmu_type_to_root() and tdp_mmu_fault_to_root() ?
-> > 
-> > tdp_mmu_get_root_for_fault() was proposed by Paolo, and tdp_mmu_get_root() was
-> > discussed without comment. Not to say there is anything wrong with the names
-> > proposed, but I think this is wading into bikeshedding territory at this
-> > stage.
-> 
-> I kept thinking about this comment. On more consideration tdp_mmu_get_root() is
-> a problematically terrible name since "get" usually means take a reference to
-> something which is something you can do to roots and (and what
-> kvm_tdp_mmu_get_root() is doing). So people might think tdp_mmu_get_root() is
-> taking a reference.
-Right, I have exactly the same feeling to "get".
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219034
+
+            Bug ID: 219034
+           Summary: [linux-next][tag next-20240709] kernel BUG at
+                    lib/dynamic_queue_limits.c:99! and Oops: invalid
+                    opcode: 0000 [#1] PREEMPT SMP NOPTI
+           Product: Virtualization
+           Version: unspecified
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: hongyu.ning@intel.com
+        Regression: No
+
+Hi,
+
+based on regular regression check on linux-next tree as KVM/QEMU based gues=
+t VM
+kernel, there are following error observed since next-20240709.
+
+it's 100% reproduced on my local setup.
+
+based on bisect, it points to linux-next merge commit:
+first bad commit: [28ab424895157dfea418c12418c5d0fc9263e850] Merge branch
+'linux-next' of git://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git
+
+while no further check for vhost.git repo possible on my side,
+can somebody help to take a look?
+
+[    1.770041] ------------[ cut here ]------------
+[    1.770088] kernel BUG at lib/dynamic_queue_limits.c:99!
+[    1.770132] Oops: invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+[    1.770135] CPU: 0 UID: 0 PID: 218 Comm: NetworkManager Not tainted
+6.10.0-rc7-next-20240709-next-20240709 #97
+[    1.770137] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS unk=
+nown
+2/2/2022
+[    1.770138] RIP: 0010:dql_completed+0x155/0x170
+[    1.770153] Code: 51 cb 03 02 48 89 57 58 e9 35 ff ff ff 85 ed 41 0f 95 =
+c0
+39 d9 0f 95 c1 41 84 c8 74 05 45 85 e4 78 0a 44 89 d9 e9 18 ff ff ff <0f> 0=
+b 01
+d2 44 89 d9 29 d1 ba 00 00 00 00 0f 48 ca eb 88 0f 1f 84
+[    1.770154] RSP: 0018:ffa0000000003d98 EFLAGS: 00010283
+[    1.770156] RAX: 0000000000000000 RBX: 0000000000000000 RCX:
+0000000000000000
+[    1.770157] RDX: 0000000000000000 RSI: 000000000739aa20 RDI:
+ff1100000702c6c0
+[    1.770158] RBP: ffa0000000003de8 R08: 0000000000000000 R09:
+0000000000000000
+[    1.770159] R10: 0000000000000000 R11: ffa0000000003ff8 R12:
+ff1100000770a800
+[    1.770160] R13: ff1100000702c600 R14: 0000000000000001 R15:
+ff1100000770a800
+[    1.770161] FS:  00007f6420576500(0000) GS:ff1100003d400000(0000)
+knlGS:0000000000000000
+[    1.770164] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.770164] CR2: 0000564d582a9048 CR3: 000000000e2ce003 CR4:
+0000000000771ef0
+[    1.770165] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
+0000000000000000
+[    1.770166] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7:
+0000000000000400
+[    1.770166] PKRU: 55555554
+[    1.770167] Call Trace:
+[    1.770169]  <IRQ>
+[    1.770171]  ? die+0x33/0x90
+[    1.770174]  ? do_trap+0xda/0x100
+[    1.770180]  ? do_error_trap+0x65/0x80
+[    1.770181]  ? dql_completed+0x155/0x170
+[    1.770183]  ? exc_invalid_op+0x4e/0x70
+[    1.770186]  ? dql_completed+0x155/0x170
+[    1.770188]  ? asm_exc_invalid_op+0x16/0x20
+[    1.770194]  ? dql_completed+0x155/0x170
+[    1.770195]  __free_old_xmit+0xe4/0x160
+[    1.770199]  free_old_xmit+0x28/0x80
+[    1.770200]  virtnet_poll+0xdb/0x350
+[    1.770204]  ? update_load_avg+0x7e/0x7a0
+[    1.770209]  __napi_poll+0x29/0x1b0
+[    1.770214]  net_rx_action+0x2fe/0x3d0
+[    1.770216]  ? wakeup_preempt+0x5a/0x70
+[    1.770219]  ? ttwu_do_activate+0x6f/0x210
+[    1.770221]  ? _raw_spin_unlock_irqrestore+0x1e/0x40
+[    1.770224]  ? kvm_sched_clock_read+0xd/0x20
+[    1.770227]  ? sched_clock+0xc/0x30
+[    1.770232]  ? kvm_sched_clock_read+0xd/0x20
+[    1.770233]  ? sched_clock+0xc/0x30
+[    1.770235]  ? sched_clock_cpu+0xb/0x190
+[    1.770239]  handle_softirqs+0xfa/0x2f0
+[    1.770242]  do_softirq+0x71/0x90
+[    1.770243]  </IRQ>
+[    1.770243]  <TASK>
+[    1.770244]  __local_bh_enable_ip+0x65/0x80
+[    1.770245]  virtnet_open+0xa6/0x2d0
+[    1.770248]  __dev_open+0xea/0x1b0
+[    1.770250]  __dev_change_flags+0x1e0/0x250
+[    1.770253]  dev_change_flags+0x21/0x60
+[    1.770255]  do_setlink+0x283/0xbc0
+[    1.770260]  ? __nla_validate_parse+0x47/0x1d0
+[    1.770262]  __rtnl_newlink+0x502/0x640
+[    1.770264]  ? __kmalloc_cache_noprof+0x27e/0x2f0
+[    1.770268]  rtnl_newlink+0x44/0x70
+[    1.770269]  rtnetlink_rcv_msg+0x159/0x420
+[    1.770271]  ? netlink_unicast+0x31c/0x360
+[    1.770275]  ? __pfx_rtnetlink_rcv_msg+0x10/0x10
+[    1.770277]  netlink_rcv_skb+0x54/0x100
+[    1.770280]  netlink_unicast+0x23e/0x360
+[    1.770282]  netlink_sendmsg+0x1e4/0x420
+[    1.770284]  ____sys_sendmsg+0x310/0x340
+[    1.770289]  ? copy_msghdr_from_user+0x6d/0xa0
+[    1.770291]  ___sys_sendmsg+0x88/0xd0
+[    1.770293]  ? kfree+0x13b/0x2a0
+[    1.770298]  ? preempt_count_add+0x69/0xa0
+[    1.770299]  ? _raw_spin_unlock+0x14/0x30
+[    1.770300]  ? proc_sys_call_handler+0xe7/0x280
+[    1.770304]  ? mod_objcg_state+0xbe/0x2e0
+[    1.770307]  ? __fdget+0xc7/0x100
+[    1.770311]  __sys_sendmsg+0x59/0xa0
+[    1.770313]  ? syscall_trace_enter+0xfb/0x190
+[    1.770317]  do_syscall_64+0x47/0x110
+[    1.770321]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+[    1.770323] RIP: 0033:0x7f642154fa9d
+[    1.770324] Code: 28 89 54 24 1c 48 89 74 24 10 89 7c 24 08 e8 aa c1 f4 =
+ff
+8b 54 24 1c 48 8b 74 24 10 41 89 c0 8b 7c 24 08 b8 2e 00 00 00 0f 05 <48> 3=
+d 00
+f0 ff ff 77 33 44 89 c7 48 89 44 24 08 e8 fe c1 f4 ff 48
+[    1.770325] RSP: 002b:00007ffe1fcbd3c0 EFLAGS: 00000293 ORIG_RAX:
+000000000000002e
+[    1.770326] RAX: ffffffffffffffda RBX: 0000000000000000 RCX:
+00007f642154fa9d
+[    1.770327] RDX: 0000000000000000 RSI: 00007ffe1fcbd400 RDI:
+000000000000000d
+[    1.770328] RBP: 0000000000000001 R08: 0000000000000000 R09:
+0000000000000000
+[    1.770328] R10: 0000000000000000 R11: 0000000000000293 R12:
+000000000000000a
+[    1.770328] R13: 00007ffe1fcbd56c R14: 0000564d58220040 R15:
+00007ffe1fcbd570
+[    1.770330]  </TASK>
+[    1.770330] Modules linked in:
+[    1.770331] ---[ end trace 0000000000000000 ]---
+[    1.778118] RIP: 0010:dql_completed+0x155/0x170
+[    1.778158] Code: 51 cb 03 02 48 89 57 58 e9 35 ff ff ff 85 ed 41 0f 95 =
+c0
+39 d9 0f 95 c1 41 84 c8 74 05 45 85 e4 78 0a 44 89 d9 e9 18 ff ff ff <0f> 0=
+b 01
+d2 44 89 d9 29 d1 ba 00 00 00 00 0f 48 ca eb 88 0f 1f 84
+[    1.778271] RSP: 0018:ffa0000000003d98 EFLAGS: 00010283
+[    1.778308] RAX: 0000000000000000 RBX: 0000000000000000 RCX:
+0000000000000000
+[    1.778363] RDX: 0000000000000000 RSI: 000000000739aa20 RDI:
+ff1100000702c6c0
+[    1.778422] RBP: ffa0000000003de8 R08: 0000000000000000 R09:
+0000000000000000
+[    1.778474] R10: 0000000000000000 R11: ffa0000000003ff8 R12:
+ff1100000770a800
+[    1.778528] R13: ff1100000702c600 R14: 0000000000000001 R15:
+ff1100000770a800
+[    1.778581] FS:  00007f6420576500(0000) GS:ff1100003d400000(0000)
+knlGS:0000000000000000
+[    1.778636] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[    1.778680] CR2: 0000564d582a9048 CR3: 000000000e2ce003 CR4:
+0000000000771ef0
+[    1.778736] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
+0000000000000000
+[    1.778788] DR3: 0000000000000000 DR6: 00000000fffe07f0 DR7:
+0000000000000400
+[    1.778843] PKRU: 55555554
+[    1.778863] Kernel panic - not syncing: Fatal exception in interrupt
+[    1.778929] Kernel Offset: disabled
+[    1.783606] ---[ end Kernel panic - not syncing: Fatal exception in
+interrupt ]---
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
