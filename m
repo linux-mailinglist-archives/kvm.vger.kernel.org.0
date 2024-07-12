@@ -1,85 +1,115 @@
-Return-Path: <kvm+bounces-21579-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21580-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25C13930287
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 01:57:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90471930289
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 01:57:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F738B22043
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 23:57:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B28B91C21102
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 23:57:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1456213328E;
-	Fri, 12 Jul 2024 23:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4B5136986;
+	Fri, 12 Jul 2024 23:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Okj4PtaD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gyqAPOKt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1408413048F
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 23:57:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18EF4133291
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 23:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720828626; cv=none; b=rydxxb2M66qvjYinXB328QNVQhfNXqfnvTOzAP347ChfhkXt0tAoWQ2uZ8aEuUZNVBCkGM9DHq0xDZaELp2a+bfEKdHKXjPGyT+a4NyOumZNfP+I9SDpa7V+I3oF25EUZkfIrRtKfFPnSB7r18JHluqwoU+leb+TKEyinOhYFY8=
+	t=1720828628; cv=none; b=enDEjYa1nvrd4+OEx2LnZEsytndUtTHxfYZtYcK6zlyXbdVJZbiZTx0HpxPuvF129sRn6MlojgR65TYgIIBQHazkDAKeIJ/DFxgDiQpdUKUfrZEbE2D0PpFLqlzY4I4iFwwrstbX/K9xF6hnRe87CiYQBLrbBNnl0BK3ajD7Jkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720828626; c=relaxed/simple;
-	bh=v5MFUcY2KTqANwH586uLxyoUInEK6dGefZwvJWBcGP8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=eiDVwOJodG3mH7pjkBZomA6cG15Am8zwjtHzDwBIRav3Or0lsZNSr404PVhdmCZT3KarsBYxT+Stz+QEdvUmDm6ADYq61X8YoO+GtGCoiQAML3bsdLBLKCb9file2Xiz50X4wGi8uajhrt6C+kHfm/dGD0v7L8+KH8XA/HrEJP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Okj4PtaD; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1720828628; c=relaxed/simple;
+	bh=PPbs85Xr93LPkWh/ukScSpYJTvw+/60F8PPXDJV6wTk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=W0FiWW4SByhh2UJ9BEOlXLAN8Mh/UWEhvWb6T6sZlqi/5qZq88GDcYDBGvnfgcmuwPlmWl3ZTuxBXtV70FQeMx0ABzpenHTj6c3dkZKwF3WJvW35x2mKrYl2kxLuXoJ/Dt0YvvKC07kxwHYLGJ+hWz9Dzr6N8Wc3r2c7wSn3chY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gyqAPOKt; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c974ec599cso1947506a91.1
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 16:57:04 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fb168d630cso16364385ad.0
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 16:57:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720828624; x=1721433424; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ze3wACVXpWLgwdUW1sUj3dn7jbqIRwBSX0Q8OyWjcao=;
-        b=Okj4PtaDidIX0lqRxSfffJ8TOvJOL0ZOp6pO2kXH+3UyXqxOjhHInqaSlIAqUlc6Ny
-         ZH+3h9Q5hdceOYUEBB0sM4pt0Grhdbx4KeOGZOORu9vVdc3I49Th8ienoWtcQy+VxkZB
-         Lv0WNcj/n9i8JUJCXs4pElXcI8YSB2bd53hqqYBFUkY6kQYM65mbXBFm4siuxwf3FRjw
-         Y8b0ShaXZHV4ZsImSusUnAxvVPKZrdi037BajjxgOyYnnyk6sKEfcjD1VS7vhSoPEWo2
-         VoRFLllQTF5GMwl3/VTWSFWYZKZuFbYq4Wk80eXOMVx97j67yAyZOXoLtCDtWW+xQBBx
-         r7Mw==
+        d=google.com; s=20230601; t=1720828626; x=1721433426; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=iyA9y22et3aPVofN6lk67YcTJqeYEQiTdMNcp/wmhvw=;
+        b=gyqAPOKtSPxy21aWvNUdf1hGdMIqvSoEzJjVeljuLyE7mkxZZd2Ds3Ry57r0O66mVO
+         9wzKdUlwPC3dcYRZeApui5PzcoHAQQ+EscsNkKDJjgaHeXE02let6hIWz6KFuPjOr74r
+         xupIkz+x/NpMEJKUg2e4CKKmKKVw7fZ55QMORlc5FxO+PaSK3pMj96PW9YD9OJwQpSXd
+         kLZCzPQHFKxocEoSN3UY/UNg0HfGSlqpDMyPw5pxVAK056ZvcTIMNKyLytkEkqsOgFjO
+         ZuipoJYrdeDd0QFuk9hKgOE9IuPqTZoxCeel1iEtzcni1T5UEzdhk0uhmW5NXyRZg5CC
+         RDlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720828624; x=1721433424;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ze3wACVXpWLgwdUW1sUj3dn7jbqIRwBSX0Q8OyWjcao=;
-        b=UtwgsklRJ43ru1l4Sqzwbu0Vo6X1Nx2qfXk4fVFlb4u0QAjw1fpP1YLOy458UUjEWS
-         YUOS2c/q45/z/IMDvAmGqN8YX3z8x8NETSXmuQDqKTLiHaUbFbSVral+3/+zNFF/qsio
-         np0J835RtNiBVV9L04hMfsjx7zR4MEGPLFrZ5DLMAVvc0dDgSrVv/TfDvK/Qn8btjg3E
-         U3Zyz8w1VaaUm+3sqKDpW+w+Amgn12e7uU2dIG0wTtRJ8xwwSfzIwz7NmlbbecZBolBx
-         t7/niBJjeGb8b/aw9tuKZZGrYtiyl9sIjSVt6wzdSV3k6nwjhYTqfZnK0cPWLREMCg5T
-         lUWg==
-X-Gm-Message-State: AOJu0YyvGLzpvMi/L6ucWwGb+1UgBX03DOTBW57ziRdIBvp1Mpr+Fhrt
-	lFXnt6ykxh6nf5pGQKmq2UI3mz8669NIwBnk3velYY/gZbY48r//H0wsLlBDp2Pe065sPzUErDB
-	MPg==
-X-Google-Smtp-Source: AGHT+IGuOjZyfAICM5hPYltKwK8MUxEufx6QRd2bStK4KRbVp9LndHSZuW7wfQXLiJscub/n62KMNN+4NeU=
+        d=1e100.net; s=20230601; t=1720828626; x=1721433426;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iyA9y22et3aPVofN6lk67YcTJqeYEQiTdMNcp/wmhvw=;
+        b=rC9FpE1yqRpMYNmRgaR0J3t5ygv97hUHw+vqT8q7XvGX8qv1DgzP5amUbkaX+b1dU1
+         ooxLhYro1tt7MCIJPCwvG9JCwwqNlxy7FO0gqU3yqEl9/eU/tfCAcAHa318OHUy426Bg
+         eIpkfWx3CukTuKi0dSWgIcHtI+qtMS/zRu+Jiaj6Xg1ZJsEotPd0EtFvIpPShZIumAgp
+         p8FbOPjnSExFRblW1k/cKV3Iic7GmpQlUHGDHfzehNMTrLTzIeQj0nP6ounlfXF7f0IZ
+         pxd2WB+qqLxsj5FcddPih6ASj6gEzsxlGBGX/pZwnf8XYK1jeyIdyR0BctiVp41qBMXT
+         yw5g==
+X-Gm-Message-State: AOJu0YzRuw8XAiFZvfr//1ff7+m7KB/eN7HY/Cy9lO3oFX+Q1XpiAD90
+	+7qQ804s1WAUwByvosfPU32/wonvyFAl4IZMHHKWmPpKLoRROI+U95Gl5zNlOqs2SN1WNaTvoOr
+	8ig==
+X-Google-Smtp-Source: AGHT+IF+0/8XomBseSBMK9G+u6kE65Tl8v0FbPTZLVI1QaezRaJexDr9SlJqqLHb0tJvQTQ9+A9QFXADn/w=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:5215:b0:2c8:632:7efe with SMTP id
- 98e67ed59e1d1-2cac53aceddmr45484a91.4.1720828624214; Fri, 12 Jul 2024
- 16:57:04 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:da89:b0:1fb:90d7:a35a with SMTP id
+ d9443c01a7336-1fbb6d66842mr8187915ad.11.1720828626343; Fri, 12 Jul 2024
+ 16:57:06 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 12 Jul 2024 16:56:50 -0700
+Date: Fri, 12 Jul 2024 16:56:51 -0700
+In-Reply-To: <20240712235701.1458888-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240712235701.1458888-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240712235701.1458888-1-seanjc@google.com>
-Subject: [GIT PULL] KVM: x86 pull requests for 6.11
+Message-ID: <20240712235701.1458888-2-seanjc@google.com>
+Subject: [GIT PULL] KVM: x86: Single Xen fix for 6.10 or 6.11
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-There's a trivial conflict between "misc" and "vmx" in kvm-x86-ops.h, they
-both delete ops that happen to be _right_ next to each other.  Otherwise, should
-apply cleanly.
+A one-off fix for KVM Xen.  This pull request is built on kvm/master, and
+tagged somewhat ambiguously in case you deem it worthy of 6.10.
+
+The following changes since commit dee67a94d4c6cbd05b8f6e1181498e94caa33334:
+
+  Merge tag 'kvm-x86-fixes-6.10-rcN' of https://github.com/kvm-x86/linux into HEAD (2024-06-21 08:03:55 -0400)
+
+are available in the Git repository at:
+
+  https://github.com/kvm-x86/linux.git tags/kvm-x86-fixes-6.10-11
+
+for you to fetch changes up to ebbdf37ce9abb597015fa85df6630ebfa7d0a97f:
+
+  KVM: Validate hva in kvm_gpc_activate_hva() to fix __kvm_gpc_refresh() WARN (2024-06-28 08:31:46 -0700)
+
+----------------------------------------------------------------
+KVM Xen:
+
+Fix a bug where KVM fails to check the validity of an incoming userspace
+virtual address and tries to activate a gfn_to_pfn_cache with a kernel address.
+
+----------------------------------------------------------------
+Pei Li (1):
+      KVM: Validate hva in kvm_gpc_activate_hva() to fix __kvm_gpc_refresh() WARN
+
+ arch/x86/kvm/xen.c  | 2 +-
+ virt/kvm/pfncache.c | 3 +++
+ 2 files changed, 4 insertions(+), 1 deletion(-)
+
 
