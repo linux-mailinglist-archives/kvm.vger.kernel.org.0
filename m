@@ -1,141 +1,165 @@
-Return-Path: <kvm+bounces-21533-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21534-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 800F692FE7A
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 18:28:02 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D91A92FE98
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 18:30:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1B3EB21EE6
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 16:27:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBE0A1F23BC1
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 16:30:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B57A17623A;
-	Fri, 12 Jul 2024 16:27:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0762GMVx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D733C17624C;
+	Fri, 12 Jul 2024 16:30:25 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A98D175545
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 16:27:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BDE086AFA;
+	Fri, 12 Jul 2024 16:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720801672; cv=none; b=BJfxNqYofb7e8mAqzTRk6WihH8KFZjeOj48hO7Ww4Pd7iQLCn70cfTjdZLaFKTo6Y75rhtul+OPS0rnMzXLXjnNoaR+MrbcXHaS1OCaNINfJkgjOwLIuk8cPrc4oj0s5OedhZd8jWPCOaKl8fPXfR+PEWD2A3JCl0I4ddKe52Kk=
+	t=1720801825; cv=none; b=AWZGevE329kaZyX8BMrfYYDMo6OzCCdQk4gznDnmSRxHPIzuI7V7qnSDeXtZnHZbFkn7PblLzRVvA7ywTbGvzqy/whR5bIO9vM5HlW8txTiS4IrHjv6k8gYHOfAJVI9u8VPEVZoMKWY8EwtIoZ2FIvB5AKY5JsQ/BR7w5TxfW08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720801672; c=relaxed/simple;
-	bh=qwr8oCZNV/KmUE+KTkQdbZ4A96F4ooAb3w3bj6Z7kBU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=scwJF7wnqMrbFXQqFWFA382BjG+PFxFKFpgzQF1qcdiGhP2YBAa4oAEMvlIDUtRGgRWU5GKx3SjuZUOVA6yFvRY3IBriq67VFEmffXxsSBwdjiTsbaBAuW0MfesKrIpx2wLz3qCfOg6b6DF8uheEULQzwSRTc4EUmPsLP4rpDCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0762GMVx; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2c9fca572adso1937903a91.0
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 09:27:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720801669; x=1721406469; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wEYr9JA8qEfnEiiFVxdx0TK1LeJE+9gMywwztiTkPVc=;
-        b=0762GMVx/dDBDmRsp4aAYeGY/VnLjuoMlkFevxfmJS+HX2N6PUR9Qdh1voUJzjR3Mk
-         BQOIb+KUSFci8ZR1cmeYYJ8mWjGChj4DWGx5PvEPxAOKHBc1bFVeSaGqHKcIhvdO3Q6E
-         wi+T9Mnz5jSO7YpcX9/1yKQzZMAiotJ4zDsfEmIxV/2/3MNG8+RRsOBExNmcyX1TjPw5
-         MUr5rom2OJVi2PaSAcnDyOwSMVkLYNuf5UU+a5nGO98qw5SaGkZDFr5wlG31VR14qBBJ
-         xrG6oH+Ykt3zpvqnkJjvIo0dZrknYhSdjAJEpegQVWwb86WQZsC+Qevt6q98JWXprX3M
-         6LZg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720801669; x=1721406469;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wEYr9JA8qEfnEiiFVxdx0TK1LeJE+9gMywwztiTkPVc=;
-        b=JrxkyVNFy2RwKoEzWNkhxNGuYy6e6a+uGxU0+A9L/RgHyp3ICR9L3O5ZUlbLRhEmXq
-         XcNYIkgQ4T7EJwgnpH3jhmVWYs4VvzI8F4BoezPS702X9nMi3wFCSrTr7x04bNV6ER8D
-         /m+pqYLBZWzqFKCN219lxPHH+iWlrudxoxGeUMGHPrvlyEoxs1FuPU1NJ8PxuCbeAHqu
-         QAyz94hz9L7qcMWgRnzopLJPvsh4j0pdrJ5/ho3d7GFRQQgPIpurzkHafqWByLLx4Ewd
-         b39cUg/HaaxmDxXhDjTVEC/Rwds45p+VMiyem8srwGmR40Hu8Ri61Fx+SBaQ2Hc/vPxR
-         rghQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWbyplW4ez1CjBUNmshqAnYO900th/vKDvOfWOz9poLjiT6ylBQGTK/XmSpRVVTCCHlZ7+p82SK2GW24l1C+AhZKxbb
-X-Gm-Message-State: AOJu0YyokBqcSR9jRAfNqoJ9p/CXyy9EyzHg1+TuR0hnMX8pIqjqc4lD
-	X7LjMg2vH6aYBcTSO5rHtYiC4V+iFTMr1iFg+FM9RTEGbttTY6QiuuXZ+CYU0gQ6fKZUnkpuR2K
-	IjA==
-X-Google-Smtp-Source: AGHT+IExMjSzRoFzJZULA3iZrj2G4RD4SsmatrlRYdXUdzDN8jkO4bSuFKvy2f442Y3Vs24dL56BOimEEwQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:257:b0:2c9:a168:9719 with SMTP id
- 98e67ed59e1d1-2ca35d4ea2bmr27995a91.6.1720801669355; Fri, 12 Jul 2024
- 09:27:49 -0700 (PDT)
-Date: Fri, 12 Jul 2024 09:27:47 -0700
-In-Reply-To: <SA1PR11MB67341A4D3E4D11DAE8AF6D2EA8A62@SA1PR11MB6734.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1720801825; c=relaxed/simple;
+	bh=XxX1D7RCSdsNOTUhnzm3yP6ZokstYTzafBYtIMm5PbM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JRhF5QHfrK/OQcfqz6SRu9nJEG3Xo6NC1ecuLsW983UP+U5fEiXSUFgxUV9r3JObawFa+y9ncvb/AA7mw7XGpPOTMhppXS460XRSFvtVmM4m88rCooSfKTjU0/mlL+KwLeCdfoTxSC1krRj769wZUvJ0S6bbUcFiZft8Da/DIAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03285C32782;
+	Fri, 12 Jul 2024 16:30:20 +0000 (UTC)
+Date: Fri, 12 Jul 2024 12:30:19 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Sean Christopherson <seanjc@google.com>, Joel Fernandes
+ <joel@joelfernandes.org>, Vineeth Remanan Pillai <vineeth@bitbyteword.org>,
+ Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, Daniel
+ Bristot de Oliveira <bristot@redhat.com>, Dave Hansen
+ <dave.hansen@linux.intel.com>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
+ "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Juri
+ Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, Paolo Bonzini
+ <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra
+ <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Valentin
+ Schneider <vschneid@redhat.com>, Vincent Guittot
+ <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>,
+ Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>,
+ Masami Hiramatsu <mhiramat@kernel.org>, himadrics@inria.fr,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+ graf@amazon.com, drjunior.org@gmail.com
+Subject: Re: [RFC PATCH v2 0/5] Paravirt Scheduling (Dynamic vcpu priority
+ management)
+Message-ID: <20240712123019.7e18c67a@rorschach.local.home>
+In-Reply-To: <01c3e7de-0c1a-45e0-aed6-c11e9fa763df@efficios.com>
+References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
+	<ZjJf27yn-vkdB32X@google.com>
+	<CAO7JXPgbtFJO6fMdGv3jf=DfiCNzcfi4Hgfn3hfotWH=FuD3zQ@mail.gmail.com>
+	<CAO7JXPhMfibNsX6Nx902PRo7_A2b4Rnc3UP=bpKYeOuQnHvtrw@mail.gmail.com>
+	<66912820.050a0220.15d64.10f5@mx.google.com>
+	<19ecf8c8-d5ac-4cfb-a650-cf072ced81ce@efficios.com>
+	<ZpFCKrRKluacu58x@google.com>
+	<01c3e7de-0c1a-45e0-aed6-c11e9fa763df@efficios.com>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240207172646.3981-1-xin3.li@intel.com> <20240207172646.3981-10-xin3.li@intel.com>
- <ZmoYvcbFBPJ5ARma@google.com> <SA1PR11MB67348BD07CCCF8D52FCAC8FEA8A42@SA1PR11MB6734.namprd11.prod.outlook.com>
- <ZpFH86n_YY5ModwK@google.com> <SA1PR11MB67341A4D3E4D11DAE8AF6D2EA8A62@SA1PR11MB6734.namprd11.prod.outlook.com>
-Message-ID: <ZpFZg-9MTveHfn_4@google.com>
-Subject: Re: [PATCH v2 09/25] KVM: VMX: Switch FRED RSP0 between host and guest
-From: Sean Christopherson <seanjc@google.com>
-To: Xin3 Li <xin3.li@intel.com>
-Cc: "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, 
-	"tglx@linutronix.de" <tglx@linutronix.de>, "mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"hpa@zytor.com" <hpa@zytor.com>, "shuah@kernel.org" <shuah@kernel.org>, 
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "peterz@infradead.org" <peterz@infradead.org>, 
-	Ravi V Shankar <ravi.v.shankar@intel.com>, "xin@zytor.com" <xin@zytor.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 12, 2024, Xin3 Li wrote:
-> > > > > Switch MSR_IA32_FRED_RSP0 between host and guest in
-> > Alternatively, is the desired RSP0 value tracked anywhere other than the MSR?
-> 
-> Yes, It's simply "(unsigned long)task_stack_page(task) + THREAD_SIZE".
-> 
-> > E.g. if it's somewhere in task_struct, then kvm_on_user_return() would restore
-> > the current task's desired RSP0.
-> 
-> So you're suggesting to extend the framework to allow per task constants?
+On Fri, 12 Jul 2024 11:32:30 -0400
+Mathieu Desnoyers <mathieu.desnoyers@efficios.com> wrote:
 
-Yeah, or more likely, special case MSR_IA32_FRED_RSP0.  If KVM didn't already
-have the user return framework, I wouldn't suggest this as I doubt avoiding WRMSR
-when switching between vCPU tasks will be very meaningful, but it's easy to handle
-FRED_RSP0, so why not.
+> >>> I was looking at the rseq on request from the KVM call, however it does not
+> >>> make sense to me yet how to expose the rseq area via the Guest VA to the host
+> >>> kernel.  rseq is for userspace to kernel, not VM to kernel.  
+> > 
+> > Any memory that is exposed to host userspace can be exposed to the guest.  Things
+> > like this are implemented via "overlay" pages, where the guest asks host userspace
+> > to map the magic page (rseq in this case) at GPA 'x'.  Userspace then creates a
+> > memslot that overlays guest RAM to map GPA 'x' to host VA 'y', where 'y' is the
+> > address of the page containing the rseq structure associated with the vCPU (in
+> > pretty much every modern VMM, each vCPU has a dedicated task/thread).
+> > 
+> > A that point, the vCPU can read/write the rseq structure directly.  
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 1783986d8626..ebecb205e5de 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -352,6 +352,7 @@ static void kvm_on_user_return(struct user_return_notifier *urn)
-                = container_of(urn, struct kvm_user_return_msrs, urn);
-        struct kvm_user_return_msr_values *values;
-        unsigned long flags;
-+       u64 host_val;
- 
-        /*
-         * Disabling irqs at this point since the following code could be
-@@ -365,9 +366,15 @@ static void kvm_on_user_return(struct user_return_notifier *urn)
-        local_irq_restore(flags);
-        for (slot = 0; slot < kvm_nr_uret_msrs; ++slot) {
-                values = &msrs->values[slot];
--               if (values->host != values->curr) {
--                       wrmsrl(kvm_uret_msrs_list[slot], values->host);
--                       values->curr = values->host;
-+
-+               if (kvm_uret_msrs_list[slot] == MSR_IA32_FRED_RSP0)
-+                       host_val = get_current_fred_rsp0();
-+               else
-+                       host_val = values->host;
-+
-+               if (host_val != values->curr) {
-+                       wrmsrl(kvm_uret_msrs_list[slot], host_val);
-+                       values->curr = host_val;
-                }
-        }
- }
+So basically, the vCPU thread can just create a virtio device that
+exposes the rseq memory to the guest kernel?
+
+One other issue we need to worry about is that IIUC rseq memory is
+allocated by the guest/user, not the host kernel. This means it can be
+swapped out. The code that handles this needs to be able to handle user
+page faults.
+
+> 
+> This helps me understand what you are trying to achieve. I disagree with
+> some aspects of the design you present above: mainly the lack of
+> isolation between the guest kernel and the host task doing the KVM_RUN.
+> We do not want to let the guest kernel store to rseq fields that would
+> result in getting the host task killed (e.g. a bogus rseq_cs pointer).
+> But this is something we can improve upon once we understand what we
+> are trying to achieve.
+> 
+> > 
+> > The reason us KVM folks are pushing y'all towards something like rseq is that
+> > (again, in any modern VMM) vCPUs are just tasks, i.e. priority boosting a vCPU
+> > is actually just priority boosting a task.  So rather than invent something
+> > virtualization specific, invent a mechanism for priority boosting from userspace
+> > without a syscall, and then extend it to the virtualization use case.
+> >   
+> [...]
+> 
+> OK, so how about we expose "offsets" tuning the base values ?
+> 
+> - The task doing KVM_RUN, just like any other task, has its "priority"
+>    value as set by setpriority(2).
+> 
+> - We introduce two new fields in the per-thread struct rseq, which is
+>    mapped in the host task doing KVM_RUN and readable from the scheduler:
+> 
+>    - __s32 prio_offset; /* Priority offset to apply on the current task priority. */
+> 
+>    - __u64 vcpu_sched;  /* Pointer to a struct vcpu_sched in user-space */
+> 
+>      vcpu_sched would be a userspace pointer to a new vcpu_sched structure,
+>      which would be typically NULL except for tasks doing KVM_RUN. This would
+>      sit in its own pages per vcpu, which takes care of isolation between guest
+>      kernel and host process. Those would be RW by the guest kernel as
+>      well and contain e.g.:
+
+Hmm, maybe not make this only vcpu specific, but perhaps this can be
+useful for user space tasks that want to dynamically change their
+priority without a system call. It could do the same thing. Yeah, yeah,
+I may be coming up with a solution in search of a problem ;-)
+
+-- Steve
+
+> 
+>      struct vcpu_sched {
+>          __u32 len;  /* Length of active fields. */
+> 
+>          __s32 prio_offset;
+>          __s32 cpu_capacity_offset;
+>          [...]
+>      };
+> 
+> So when the host kernel try to calculate the effective priority of a task
+> doing KVM_RUN, it would basically start from its current priority, and offset
+> by (rseq->prio_offset + rseq->vcpu_sched->prio_offset).
+> 
+> The cpu_capacity_offset would be populated by the host kernel and read by the
+> guest kernel scheduler for scheduling/migration decisions.
+> 
+> I'm certainly missing details about how priority offsets should be bounded for
+> given tasks. This could be an extension to setrlimit(2).
+> 
+> Thoughts ?
+> 
+> Thanks,
+> 
+> Mathieu
+> 
+
 
