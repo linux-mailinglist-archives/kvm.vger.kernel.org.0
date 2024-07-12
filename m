@@ -1,125 +1,174 @@
-Return-Path: <kvm+bounces-21520-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21521-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EBDE92FD51
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 17:14:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15FBC92FD6A
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 17:22:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACDB91F20F9C
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 15:14:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4E92286DBD
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 15:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB18E175563;
-	Fri, 12 Jul 2024 15:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA471172BDC;
+	Fri, 12 Jul 2024 15:22:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VAaIEFTp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MTnhrjw7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D3221741FA
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 15:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6063B171E47
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 15:22:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720797223; cv=none; b=fg6ySMxQsBESNO1HXJSAOGX6ymkZojjaWUA7StmaJ+EjDZJRejR1KufT2DxT1VEhiNFYoEGQgDJ0zpdf4xEOMmIkI0LvhQIAnUZUzak7eoXEjegEMidzBmF5587eJb32z8uotaM+T/ZgpwOAQl63xUh0MG+MJqHdwWok4WgrlPI=
+	t=1720797757; cv=none; b=g2ENliiAx8CzR5TeBdBmc9RyeNJCR3tqrX+KWxhIYZAiUtwKHYHl8KjPLeCoNtBOAZF/7bs1344AOMDoXuUZCIfEUhLUUk9Y4K47O4lm8qmT/jZasy7qM/moXI6qWwlbHKI3+2Mzyiz0oFhPuPvq7l/c0x4thjok1cQ1LQb9dII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720797223; c=relaxed/simple;
-	bh=BUzUp5RWHqaySVY5+BeOJD2jf/JigFe4Y+aXQC4Sk6g=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=M+ZvFKryl4pIlnCSiS1YWy++RET0J7ospyi15IAjmBX+HneorNfmBafgYdhRvFBhAOJc5+RjIqtuGcFWH935yytclyqb7uPPfgpkrUwdN3y0TUt12bD6YtOsnesXEDWVd7oY78FC8uO8Qm5aTT2/n8KjjB2aEzTSHCiFC64i2to=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VAaIEFTp; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-78006198b43so1589086a12.0
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 08:13:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720797222; x=1721402022; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=xhil9fMKdOmNNY/hw6eHjeaj/nT3knlY7TdVcvRm4IE=;
-        b=VAaIEFTp18j1yt0awEGjyi3hVxwnrmekeh8nwZ33E41yTegnnGTu5Is9jw3CT3TkEy
-         hhiZSqog1H4YvrNTFi95rXfxmkgPOvMS+urUpMd4/DUOFh6NGMORvO2ZpBlsdkdc7hDQ
-         xsdAzng7vU5ON1R1APCiraC2kcf2JKc/vF/0NO+UwIGtnRMEghjy7s06zD81J84qva9F
-         6+8SSl93aa2TIMQR4Lic9S69I/uP+upeyTWmVfPHc0iGNATNdd/yys5PyfoOoNAMHp2n
-         2y1lIDd8ILA8OGh9HaSEBibPmL176bHlG4Q4waBr8YZsHsXB4HmjjBO1wjZaF+kBA+C4
-         0JvQ==
+	s=arc-20240116; t=1720797757; c=relaxed/simple;
+	bh=ETNnLtEOODBfQi8H3tfRE0vrvS4f585oWdtbY7yixEo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UbA2No6KlT+2rmBEMWnRnn5b/VGHez0BlsOy0dcqqTcLpAHkH8I1WF764Gxnkx0wwbjZNP8N5N+hdfcVJfxaVort0wNPWyF9zkGyoOgclKdjjnyVIiib220dEUs2dl710agYiNczbkVwM49xkQg3jViGg1a1T4mwm9W6eoilcwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MTnhrjw7; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720797754;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5iNEWViGWsJ0HgvGvNf4C7dCvswRTS9KzeI2onLQu7Q=;
+	b=MTnhrjw7mdkO0iDxtIhPM5OgSyPQvxxT5KwBrmQY7il1BlIkIKqu1UcfXXMYhSyhFDksfP
+	ZtT9A9vXaz1oRvuElQ2Q5sbT16rNBMRWcowGD+Q0n6MenO5sde4p3vnd7JWzBMx39rzw15
+	fRNro0+FiUGZ/5ayGmBpC3dRV8zO2EY=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-100-uk-ZJ1-NPoKWF5Tl0i9E4A-1; Fri, 12 Jul 2024 11:22:32 -0400
+X-MC-Unique: uk-ZJ1-NPoKWF5Tl0i9E4A-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ee92048377so23554711fa.2
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 08:22:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720797222; x=1721402022;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xhil9fMKdOmNNY/hw6eHjeaj/nT3knlY7TdVcvRm4IE=;
-        b=P0UR9q1NBXtklkeU5PmpU2N5P+R0FDIDpbREgavMhcR2aalMlxsEzFELj9IHmsyT/O
-         dopbc/pwK+UVrnjjoWx4MQT0FxaB6wZyFTK9mXDK3u7yG6g68b6zhYcHfgtKBO7Cv1pe
-         TVWIgSrR7Ne45s0XRnfdr8w9DrGJq3+m3MNuOv0udQ08RP9qx7r7WMyoN+vXrVkVc4XV
-         vJDv1edW9acU09hRUJvaiZ2Fnh/QEWPoRsBgkg+5AV2Fw+inIgFD40mWj+Gr9NAlTVL2
-         9QHLiYSXoZLDSpOFOgD1naDg8Rdu5+C2iV6WWBQYJPoGV0vZEuG/GK5fTIGnV6qXKviU
-         Fg1g==
-X-Gm-Message-State: AOJu0YxHmqslJ5BkhWlRXxpjfnikgPEdDl/fzYLJPwxUCKHUlz8IlGcV
-	FMRDbWwn8iTC1V+Wsw3aAius7frf1st7ywAouOYsAN42DrhJmjcXXRSUzBcjbFweFKv9IaOa22W
-	omQ==
-X-Google-Smtp-Source: AGHT+IHuT8K9rOPRCiT1msZ0/9yu35XkKU/imCLWZDOybsPwvXfpkO4uEj7EHjAiqcRPow2eblVNuQyIq1c=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:3759:0:b0:6e7:95d3:b35c with SMTP id
- 41be03b00d2f7-77db673944fmr23291a12.5.1720797221803; Fri, 12 Jul 2024
- 08:13:41 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 12 Jul 2024 08:13:35 -0700
-In-Reply-To: <20240712151335.1242633-1-seanjc@google.com>
+        d=1e100.net; s=20230601; t=1720797751; x=1721402551;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5iNEWViGWsJ0HgvGvNf4C7dCvswRTS9KzeI2onLQu7Q=;
+        b=AojzCvDLV5Fgyp5mMmUigA4qnQYa3SZdLhR8Lj91MbXMGHntzFeYqkPS2VgUOoaFZ1
+         Uc+ICbL78UintjPHt4gTwnUY24qC4tQ4tZXjjdE/8+ErWlF1zBnX2gHvqUT+iCmM+p0b
+         EYlUXlH0EuuHT2mMeNOxK2axFGwcu6DD18UX6Mkf4tSxshO23SMIDBL/XQADBNKCam4o
+         mFhOWav9dW8NmZlJH4q+5NrExIRd0bGicFj5BskF505L+MWvhq1KijSLz8AeoLBgAbam
+         E87gZBsWrKwaHDoIUBnmftaw0ceR4QXgjZK6KEPBrgUQ7xCWrzLYtqWSrADQfHrhX4Ra
+         L9gg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVQkZmO3HNE9bpUD75BVjhKqXPQB7Cz50JhaaKFtAYU9Lw+C1N9reTW/U4THumZqgzVUmByES9y9UNw6ejdL7GusAn
+X-Gm-Message-State: AOJu0YxClhY5EEerj2Bqi/YQniK+uEDplXZ/fZWlt5Vs4+wItrfiwIpW
+	K0gauv4NjIn14ZMT+v2Tj7Y+Il/8fZdgUrcuiueTvqbqjyq5wLZx46pyXKHTEKh71JUXkT3NSeB
+	T7giGDa5BeS0eu9GzkbjFE3GqaSwAymi0xOa40upFb4JAmxP0OylOC4Wlt3tuDPZRzgBznPG7QL
+	a+xMtE8YHfXg+SMbqhjm/4EyYj
+X-Received: by 2002:a2e:a792:0:b0:2ec:63f:fe91 with SMTP id 38308e7fff4ca-2eeb3181609mr109326921fa.38.1720797751187;
+        Fri, 12 Jul 2024 08:22:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE17i70tdv+6mHF9kfzcljP7n2Fvj9afzaPSj88QABadl8SkXkPXm+TirlUDF8NciOpXb1JeKQtL1dVIL8Q2ow=
+X-Received: by 2002:a2e:a792:0:b0:2ec:63f:fe91 with SMTP id
+ 38308e7fff4ca-2eeb3181609mr109326681fa.38.1720797750787; Fri, 12 Jul 2024
+ 08:22:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240712151335.1242633-1-seanjc@google.com>
-X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240712151335.1242633-3-seanjc@google.com>
-Subject: [PATCH 2/2] KVM: x86/mmu: Clean up make_huge_page_split_spte()
- definition and intro
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>
+MIME-Version: 1.0
+References: <CAAhSdy0jae8TYcbChockXDJ9qL+HnA1p3YJQi32NHQsLUtCGDA@mail.gmail.com>
+In-Reply-To: <CAAhSdy0jae8TYcbChockXDJ9qL+HnA1p3YJQi32NHQsLUtCGDA@mail.gmail.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 12 Jul 2024 17:22:18 +0200
+Message-ID: <CABgObfZJJHg41KH8=a9Sw7F8A8vthKTmx+w-hH-JP-+8BU3Wug@mail.gmail.com>
+Subject: Re: [GIT PULL] KVM/riscv changes for 6.11
+To: Anup Patel <anup@brainfault.org>
+Cc: Palmer Dabbelt <palmer@rivosinc.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Andrew Jones <ajones@ventanamicro.com>, Atish Patra <atishp@atishpatra.org>, 
+	Atish Patra <atishp@rivosinc.com>, KVM General <kvm@vger.kernel.org>, 
+	"open list:KERNEL VIRTUAL MACHINE FOR RISC-V (KVM/riscv)" <kvm-riscv@lists.infradead.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tweak the definition of make_huge_page_split_spte() to eliminate an
-unnecessarily long line, and opportunistically initialize child_spte to
-make it more obvious that the child is directly derived from the huge
-parent.
+Pulled, thanks.
 
-No functional change intended.
+Paolo
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/spte.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/spte.c b/arch/x86/kvm/mmu/spte.c
-index bc55e3b26045..10390eecd85d 100644
---- a/arch/x86/kvm/mmu/spte.c
-+++ b/arch/x86/kvm/mmu/spte.c
-@@ -291,15 +291,13 @@ static u64 make_spte_executable(u64 spte)
-  * This is used during huge page splitting to build the SPTEs that make up the
-  * new page table.
-  */
--u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte, union kvm_mmu_page_role role,
--			      int index)
-+u64 make_huge_page_split_spte(struct kvm *kvm, u64 huge_spte,
-+			      union kvm_mmu_page_role role, int index)
- {
--	u64 child_spte;
-+	u64 child_spte = huge_spte;
- 
- 	KVM_BUG_ON(!is_shadow_present_pte(huge_spte) || !is_large_pte(huge_spte), kvm);
- 
--	child_spte = huge_spte;
--
- 	/*
- 	 * The child_spte already has the base address of the huge page being
- 	 * split. So we just have to OR in the offset to the page at the next
--- 
-2.45.2.993.g49e7a77208-goog
+On Fri, Jul 12, 2024 at 2:11=E2=80=AFPM Anup Patel <anup@brainfault.org> wr=
+ote:
+>
+> Hi Paolo,
+>
+> We have the following KVM RISC-V changes for 6.11:
+> 1) Redirect AMO load/store access fault traps to guest
+> 2) Perf kvm stat support for RISC-V
+> 3) Use HW IMSIC guest files when available
+>
+> In addition to above, ONE_REG support for Zimop,
+> Zcmop, Zca, Zcf, Zcd, Zcb and Zawrs ISA extensions
+> is going through the RISC-V tree.
+>
+> Please pull.
+>
+> Regards,
+> Anup
+>
+> The following changes since commit 0fc670d07d5de36a54f061f457743c9cde1d8b=
+46:
+>
+>   KVM: selftests: Fix RISC-V compilation (2024-06-06 15:53:16 +0530)
+>
+> are available in the Git repository at:
+>
+>   https://github.com/kvm-riscv/linux.git tags/kvm-riscv-6.11-1
+>
+> for you to fetch changes up to e325618349cdc1fbbe63574080249730e7cff9ea:
+>
+>   RISC-V: KVM: Redirect AMO load/store access fault traps to guest
+> (2024-06-26 18:37:41 +0530)
+>
+> ----------------------------------------------------------------
+> KVM/riscv changes for 6.11
+>
+> - Redirect AMO load/store access fault traps to guest
+> - Perf kvm stat support for RISC-V
+> - Use HW IMSIC guest files when available
+>
+> ----------------------------------------------------------------
+> Anup Patel (2):
+>       RISC-V: KVM: Share APLIC and IMSIC defines with irqchip drivers
+>       RISC-V: KVM: Use IMSIC guest files when available
+>
+> Shenlin Liang (2):
+>       RISCV: KVM: add tracepoints for entry and exit events
+>       perf kvm/riscv: Port perf kvm stat to RISC-V
+>
+> Yu-Wei Hsu (1):
+>       RISC-V: KVM: Redirect AMO load/store access fault traps to guest
+>
+>  arch/riscv/include/asm/kvm_aia_aplic.h             | 58 ----------------
+>  arch/riscv/include/asm/kvm_aia_imsic.h             | 38 -----------
+>  arch/riscv/kvm/aia.c                               | 35 ++++++----
+>  arch/riscv/kvm/aia_aplic.c                         |  2 +-
+>  arch/riscv/kvm/aia_device.c                        |  2 +-
+>  arch/riscv/kvm/aia_imsic.c                         |  2 +-
+>  arch/riscv/kvm/trace.h                             | 67 ++++++++++++++++=
++++
+>  arch/riscv/kvm/vcpu.c                              |  7 ++
+>  arch/riscv/kvm/vcpu_exit.c                         |  2 +
+>  tools/perf/arch/riscv/Makefile                     |  1 +
+>  tools/perf/arch/riscv/util/Build                   |  1 +
+>  tools/perf/arch/riscv/util/kvm-stat.c              | 78 ++++++++++++++++=
+++++++
+>  tools/perf/arch/riscv/util/riscv_exception_types.h | 35 ++++++++++
+>  13 files changed, 215 insertions(+), 113 deletions(-)
+>  delete mode 100644 arch/riscv/include/asm/kvm_aia_aplic.h
+>  delete mode 100644 arch/riscv/include/asm/kvm_aia_imsic.h
+>  create mode 100644 arch/riscv/kvm/trace.h
+>  create mode 100644 tools/perf/arch/riscv/util/kvm-stat.c
+>  create mode 100644 tools/perf/arch/riscv/util/riscv_exception_types.h
+>
 
 
