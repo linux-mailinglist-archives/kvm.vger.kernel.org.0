@@ -1,124 +1,147 @@
-Return-Path: <kvm+bounces-21536-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21537-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EDA192FEBA
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 18:44:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0612A92FED0
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 18:51:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A08E1C22A4F
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 16:44:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 260521C21E4D
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 16:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60292176AA5;
-	Fri, 12 Jul 2024 16:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E025176AB3;
+	Fri, 12 Jul 2024 16:51:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QHC8gYrl"
+	dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b="HNsotdYJ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A1941DFD2
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 16:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E05614EC5E
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 16:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720802660; cv=none; b=f+E8D3xzuKDJFHdWedWM9hXijh5xU4igk7e+8CnSoOEey6PI8I4BHTRXsDg6ZnugDeyNIGEEnSarkgeCPBHdmQZMp9WyZIH0RuZBQop+WSVW47V9famE3BXR5E5ZnwbhysPs8cYRrE6SuMOEOb5jd2qQFmSOxfnYOlOIsBqsHhk=
+	t=1720803062; cv=none; b=WG0zPNultlcsK24UUqimxCBKM8/ib+vIJ4n5rFt2ueVQLrTDLIUjEB2qVe9l4HZO/82YN3a1COCKXgbtVOAdWXV4LfG2iNw+7+tDKlMeP7VIeVoTGzgSX6NJUTyiAUDlkJeZaWyk8nSH8FlNX2eZZ9Nm3apTEA6MM57GepFP7WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720802660; c=relaxed/simple;
-	bh=R/VQL6TZWIMbWV7Oz6zjIUUzEa4X1DiUdsIcFW8Fp1w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qsRk9przj2MLi75WlKBZT2lbA4eiJYoPkiIgmRyXVQZ0ESZS44TSNeA8rMTKGUU/ILsiUFCewbhaAD/Z4aw74fFaI1LjvnSG3xsD1+GXVhQsrDNLxqjkX2oGJ0V00VAhrLMPIY5H73lIlRsA4Tj+uumcnWHybrDxFXyzRTdfYco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QHC8gYrl; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e035949cc4eso4180708276.1
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 09:44:19 -0700 (PDT)
+	s=arc-20240116; t=1720803062; c=relaxed/simple;
+	bh=GIxv7kyr1fOYOTFD8h5UlkXFpaIz/l2mkymV2jG4dIE=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eTnAWkKUNQkVv1w6OA6qPMKlea26D1XhRDU5ItStwyEWfbLMCpvgYm/IF1zFXRCvOeGI3TvJ3mZbaDkYOqLSTatYMXrG9sYPquei99SpNL0A0x9kpsn/nHW66N1gs/juRrMpz3tGP3RZeIT2wiW4c6xM0S53CJdzv5MVUAc62Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org; spf=pass smtp.mailfrom=joelfernandes.org; dkim=pass (1024-bit key) header.d=joelfernandes.org header.i=@joelfernandes.org header.b=HNsotdYJ; arc=none smtp.client-ip=209.85.222.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=joelfernandes.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=joelfernandes.org
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-79f0c08aa45so155127785a.0
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 09:51:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720802658; x=1721407458; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e2/8S8obzkiJSotbtrvsa+xr/94yI9iIKCvWVMV27e0=;
-        b=QHC8gYrlS3+gE0K3dMytxBL3oeQhSDnznrj3T9WHNaGqHy/0CdIU6wWfCOKhl2c2BX
-         Z/D0bZ5A1GbaZVsxb+wsgCfGolZR4OEa4bce/xeGqpygknXarZmEZDj9tDtJn7vKRfoL
-         l4V3yUywB0f54xbF+1BqM9veHkPyT9A8Z6/LF/U6QstuOSegffmopcQt/A+f7UIxss4h
-         ipvjch3MAYTWYPt6Bf5kEX5dmBv7v3q1aeS53upZLY69PdhNzU1HsGSdWYyQSeQIzsta
-         JgTX+Ebt93mIdkefreHiCj3Yif9oFVb1ow18S6ABxW/4YmyKk1bfupunefgQ6mjHVkt4
-         vqMQ==
+        d=joelfernandes.org; s=google; t=1720803060; x=1721407860; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7TgW3Fxolq5hWIfDVfOFTW8e1mACsU8DTpdpP/Urrsw=;
+        b=HNsotdYJlvsa9HEb6tYdil5Z7eEehGhUnob80gYft2Our5dMqzzZtJPNFl3zYxlGH4
+         b3WAwaq6JR/2ErF8f0Ro9qOPeY+BGTSV9iFWVCY2l04o1E2kWtesgS1Tbq4yEhRJHyQ7
+         G9SoCTuBNlGVZsdUXpRZl3vdU8s6/Ay/lOZeg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720802658; x=1721407458;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=e2/8S8obzkiJSotbtrvsa+xr/94yI9iIKCvWVMV27e0=;
-        b=gghMky9Tndt9tgGg4CN07VkeoA2Fjb6WWhm/SsoPucbWrfo48/Egzk0CdxpDRDDYY7
-         svOgjahEeWoU54GhqPXa8o2cGQ1iq0dsBMS2fKjgmnllFfCQ8c8Xm886DzDypHkLTCLG
-         8j+pKGCNSMxtRx3xtO9/Lm11MxBjdxSm16D4GqW4LqqdJIHjiQYGG2kZDjQ8YcN2rQJm
-         YPyurUdxRNRDshCj2xACqsDyGPURAvuk/lxHTAmyYushebBVGuSZTZpY1SL5MFfBB7vu
-         QVHMO0mlreLEi7cSypuNz+4JiUYb9vYgoqX/4oQULR7PrTmS5PSrYw8/zX069TDjy05h
-         +DPg==
-X-Forwarded-Encrypted: i=1; AJvYcCWdcnER1Fv73SfpaO0a0ZWEY6DyAe7R3UorzStVtWw2NUZCVaXT1QdsgHab0IbEqcdttFoZTrqbUUfRC2sg3yMwiSXw
-X-Gm-Message-State: AOJu0YzdlwsvG7d1g8w5dhbA3EvTLaa//TM8o7GQdA/S53yk/w3pUE+T
-	FSWa68Q7HkglvGG8MdXNd7DI+w9n4SQHnPnpSBj8oHBd5Z4g8MLFAySOuQ6sTMW/1Ss23RTg0VV
-	aMw==
-X-Google-Smtp-Source: AGHT+IF/KOJ6Gpolu2Ub9nHa1DDJ0KD5nKpBN5oi+4bnQG+a/r7jBG5lYmOuxqEj5AFxHhdkEOevPVEs1hM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:a07:b0:e03:5dfe:45bb with SMTP id
- 3f1490d57ef6-e041b14c6a3mr810243276.12.1720802658285; Fri, 12 Jul 2024
- 09:44:18 -0700 (PDT)
-Date: Fri, 12 Jul 2024 09:44:16 -0700
-In-Reply-To: <20240712122408.3f434cc5@rorschach.local.home>
+        d=1e100.net; s=20230601; t=1720803060; x=1721407860;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7TgW3Fxolq5hWIfDVfOFTW8e1mACsU8DTpdpP/Urrsw=;
+        b=dloag3D+bZfaJnmbDZimkcLTrPKJCjVFQZ7ph5223c2EBbRZ98/OiW7h5jStBPi0bi
+         dpgCbsGxCnWCoAJv6adz5QkJ0YCcb3IGxkTzH53awE0XfDSBmxuv7vZP+JytG3ppStUw
+         RjrBFgCgKD602b4rhrH2+xbDWZSs0vvNOvyRZ0aJm0VOqRKd0WjODSZDG88fjaq5da1O
+         NbavzTyNcVz7Gw3zq16aga4ZEjlqFD3OOMhXLxE4JgOwf/KLvPRqTEbkyD5ZkkbKC5ib
+         3QJRfDWXVf+nkseZn4HuDZxxBeYK72ahGKFv7QNLxraXJ71inVOx7uZFyDDSRXmHWLi9
+         WkQA==
+X-Forwarded-Encrypted: i=1; AJvYcCWsizs4Udm6kmXQw4I358hasfKDWgEaBipfYLzqkR5YC4FKb/nZPuONnlwZL4/s+8wb3F0nGP9nMJwmMIKgRZPHNZr8
+X-Gm-Message-State: AOJu0YxMDSobROIeu4oR4h5M7ZbIAxeim8EIHco3O+NkXg8OpbT4u9IT
+	gt8SzLj35rsGzSYFM5YFukT75wbSTZjJ5HqJ4c4LkOCGxNoHjs03YZWrv3nAD3A=
+X-Google-Smtp-Source: AGHT+IGDZbjK2vfzdGQ04zfdQtcFDzbhW00kvjY2XCWo4lK+eLrLbVcitvWMacaFEGabuMdumAuMzw==
+X-Received: by 2002:a05:620a:28c8:b0:79e:fca5:c312 with SMTP id af79cd13be357-79f19a78d1emr1572957785a.38.1720803059944;
+        Fri, 12 Jul 2024 09:50:59 -0700 (PDT)
+Received: from localhost ([73.134.137.40])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-79f190b2f93sm417696685a.125.2024.07.12.09.50.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 12 Jul 2024 09:50:59 -0700 (PDT)
+Message-ID: <66915ef3.050a0220.72f83.316b@mx.google.com>
+X-Google-Original-Message-ID: <20240712165057.GA57824@JoelBox.>
+Date: Fri, 12 Jul 2024 12:50:57 -0400
+From: Joel Fernandes <joel@joelfernandes.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Vineeth Remanan Pillai <vineeth@bitbyteword.org>,
+	Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>,
+	Daniel Bristot de Oliveira <bristot@redhat.com>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Dietmar Eggemann <dietmar.eggemann@arm.com>,
+	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
+	Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Andy Lutomirski <luto@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Valentin Schneider <vschneid@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	Vitaly Kuznetsov <vkuznets@redhat.com>,
+	Wanpeng Li <wanpengli@tencent.com>,
+	Suleiman Souhlal <suleiman@google.com>,
+	Masami Hiramatsu <mhiramat@kernel.org>, himadrics@inria.fr,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
+	graf@amazon.com, drjunior.org@gmail.com
+Subject: Re: [RFC PATCH v2 0/5] Paravirt Scheduling (Dynamic vcpu priority
+ management)
+References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
+ <ZjJf27yn-vkdB32X@google.com>
+ <CAO7JXPgbtFJO6fMdGv3jf=DfiCNzcfi4Hgfn3hfotWH=FuD3zQ@mail.gmail.com>
+ <CAO7JXPhMfibNsX6Nx902PRo7_A2b4Rnc3UP=bpKYeOuQnHvtrw@mail.gmail.com>
+ <66912820.050a0220.15d64.10f5@mx.google.com>
+ <19ecf8c8-d5ac-4cfb-a650-cf072ced81ce@efficios.com>
+ <20240712122408.3f434cc5@rorschach.local.home>
+ <ZpFdYFNfWcnq5yJM@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
- <ZjJf27yn-vkdB32X@google.com> <CAO7JXPgbtFJO6fMdGv3jf=DfiCNzcfi4Hgfn3hfotWH=FuD3zQ@mail.gmail.com>
- <CAO7JXPhMfibNsX6Nx902PRo7_A2b4Rnc3UP=bpKYeOuQnHvtrw@mail.gmail.com>
- <66912820.050a0220.15d64.10f5@mx.google.com> <19ecf8c8-d5ac-4cfb-a650-cf072ced81ce@efficios.com>
- <20240712122408.3f434cc5@rorschach.local.home>
-Message-ID: <ZpFdYFNfWcnq5yJM@google.com>
-Subject: Re: [RFC PATCH v2 0/5] Paravirt Scheduling (Dynamic vcpu priority management)
-From: Sean Christopherson <seanjc@google.com>
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Joel Fernandes <joel@joelfernandes.org>, 
-	Vineeth Remanan Pillai <vineeth@bitbyteword.org>, Ben Segall <bsegall@google.com>, 
-	Borislav Petkov <bp@alien8.de>, Daniel Bristot de Oliveira <bristot@redhat.com>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
-	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
-	Mel Gorman <mgorman@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
-	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, 
-	Valentin Schneider <vschneid@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
-	Suleiman Souhlal <suleiman@google.com>, Masami Hiramatsu <mhiramat@kernel.org>, himadrics@inria.fr, 
-	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
-	graf@amazon.com, drjunior.org@gmail.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZpFdYFNfWcnq5yJM@google.com>
 
-On Fri, Jul 12, 2024, Steven Rostedt wrote:
-> On Fri, 12 Jul 2024 10:09:03 -0400
-> Mathieu Desnoyers <mathieu.desnoyers@efficios.com> wrote:
-> 
-> > > 
-> > > Steven Rostedt told me, what we instead need is a tracepoint callback in a
-> > > driver, that does the boosting.  
+On Fri, Jul 12, 2024 at 09:44:16AM -0700, Sean Christopherson wrote:
+> On Fri, Jul 12, 2024, Steven Rostedt wrote:
+> > On Fri, 12 Jul 2024 10:09:03 -0400
+> > Mathieu Desnoyers <mathieu.desnoyers@efficios.com> wrote:
 > > 
-> > I utterly dislike changing the system behavior through tracepoints. They were
-> > designed to observe the system, not modify its behavior. If people start abusing
-> > them, then subsystem maintainers will stop adding them. Please don't do that.
-> > Add a notifier or think about integrating what you are planning to add into the
-> > driver instead.
+> > > > 
+> > > > Steven Rostedt told me, what we instead need is a tracepoint callback in a
+> > > > driver, that does the boosting.  
+> > > 
+> > > I utterly dislike changing the system behavior through tracepoints. They were
+> > > designed to observe the system, not modify its behavior. If people start abusing
+> > > them, then subsystem maintainers will stop adding them. Please don't do that.
+> > > Add a notifier or think about integrating what you are planning to add into the
+> > > driver instead.
+> > 
+> > I tend to agree that a notifier would be much better than using
+> > tracepoints, but then I also think eBPF has already let that cat out of
+> > the bag. :-p
+> > 
+> > All we need is a notifier that gets called at every VMEXIT.
 > 
-> I tend to agree that a notifier would be much better than using
-> tracepoints, but then I also think eBPF has already let that cat out of
-> the bag. :-p
-> 
-> All we need is a notifier that gets called at every VMEXIT.
+> Why?  The only argument I've seen for needing to hook VM-Exit is so that the
+> host can speculatively boost the priority of the vCPU when deliverying an IRQ,
+> but (a) I'm unconvinced that is necessary, i.e. that the vCPU needs to be boosted
+> _before_ the guest IRQ handler is invoked and (b) it has almost no benefit on
+> modern hardware that supports posted interrupts and IPI virtualization, i.e. for
+> which there will be no VM-Exit.
 
-Why?  The only argument I've seen for needing to hook VM-Exit is so that the
-host can speculatively boost the priority of the vCPU when deliverying an IRQ,
-but (a) I'm unconvinced that is necessary, i.e. that the vCPU needs to be boosted
-_before_ the guest IRQ handler is invoked and (b) it has almost no benefit on
-modern hardware that supports posted interrupts and IPI virtualization, i.e. for
-which there will be no VM-Exit.
+I am a bit confused by your statement Sean, because if a higher prio HOST
+thread wakes up on the vCPU thread's phyiscal CPU, then a VM-Exit should
+happen. That has nothing to do with IRQ delivery.  What am I missing?
+
+thanks,
+
+ - Joel
 
