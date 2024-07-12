@@ -1,90 +1,96 @@
-Return-Path: <kvm+bounces-21490-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21491-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4BDF92F71C
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 10:40:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57C7992F71D
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 10:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 661252828BB
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 08:40:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 116C9282759
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 08:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 703421422D2;
-	Fri, 12 Jul 2024 08:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726D81422C9;
+	Fri, 12 Jul 2024 08:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MxL2AI0N"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6DFA13D891
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 08:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CCA13D891
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 08:40:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720773642; cv=none; b=mMj3kGwoUxV6gEQ2Px1xcj3ck8K0VGuNvkD4mL8dQ9ihi1DXFemqRe394OnCPUbV0RhjCWfl3vg3jqtFvRqol3MCShxiXq6vQlpkebFDNW8CMSMZ463Q35UQdK9VubH78gjZfm++Gc4CMtRkhPRUED97RrpRul3U0pkFhyLmUfE=
+	t=1720773654; cv=none; b=TlA0nVe2LD4imc+t2X03C7fXC+ydNgLl1KDG99ILVoS/Q28LkeHw/eny7BbxZudocmrYBQqfjtTCYE2NAsEFnkI7Sa0eSvUvC6PpXdPJYnaLzHzjSUBo1DjkMcgZVrIF2VnlUOdzLiisvrw830EoNBJF4Trd90t0K5frTEki+tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720773642; c=relaxed/simple;
-	bh=ltLjDfKdWvKKz9H6nMh77gNr8vD1HxpJwvrK6q/HV6s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n2kgIGsN0klwx+Z5KjCmsktCplZGvq3ly3yUeGOsFxM7IMeK6V1IMmGzu4lI7NX4rTqt5mTGqMJCD6qclVF8sDXVkoYyffYq8LpX/7OXsrIxbSEvwvoMT3CQbTPndV4tvdZdyXRw8eriypMPX3Ya2QX/rr1uodn6hFDeg3nS9Oo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7CB931007;
-	Fri, 12 Jul 2024 01:41:03 -0700 (PDT)
-Received: from [10.162.16.42] (a077893.blr.arm.com [10.162.16.42])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 8634B3F762;
-	Fri, 12 Jul 2024 01:40:35 -0700 (PDT)
-Message-ID: <e298568d-7b9a-4e01-95c1-ef98e1f50c82@arm.com>
-Date: Fri, 12 Jul 2024 14:10:32 +0530
+	s=arc-20240116; t=1720773654; c=relaxed/simple;
+	bh=uXIBaGGiV0VYe15WVe5IR64Hy2xVdRl+xA4ImIh4aT0=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WyGoouq+Mvw6MrZZWG9S48/I3SmE5xACVPW8DhSxxlyxAvGW+xV/XOgkMr/zEhB04GYl4tI/2+KXg6nyEWIdEyVQTDhPRfC/SIxs7KYN6/aVkV2h/Q+41DNNrshpPuAobtJ+NkWV9/Jmxfokhw/CYrVDOxVUQR0pa3udVeaYEeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MxL2AI0N; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C45AC4AF0B
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 08:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720773654;
+	bh=uXIBaGGiV0VYe15WVe5IR64Hy2xVdRl+xA4ImIh4aT0=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=MxL2AI0N5jNydIT2SQqSVhY9xD67CZymtZyUiYuPPr61X/m1aGK4waYLZL2afeXpX
+	 OKMTkss4VykBvj0AqxfALdkWvLY/Mq8FyvaYvzqONNK3Cogm+WstqeKuBqkSEGaXKe
+	 yRHQ21WxRj8WZ6Csj4IAxx0CXiEvrn0nCMej1HJt7xN3D8dPOGA12918LUiwLN44AH
+	 ob45SJIoNDHBObm6TOis9gS+6UtDJaMC1gtrsm4EBL+Uz0pPcd5PAcwos1X1m0P09c
+	 DDhrEF5G4ornSe+gtscsu5oTsyBUl6bMOSuW+VA6dnWvCcH13eXQ3pUp31y16vzyr9
+	 /QyMG1M0bwa7Q==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 25654C53B73; Fri, 12 Jul 2024 08:40:54 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218792] Guest call trace with mwait enabled
+Date: Fri, 12 Jul 2024 08:40:53 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: xiangfeix.ma@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-218792-28872-XmuOsBYZgk@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218792-28872@https.bugzilla.kernel.org/>
+References: <bug-218792-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 04/12] KVM: arm64: nv: Honor absence of FEAT_PAN2
-To: Marc Zyngier <maz@kernel.org>, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- Joey Gouly <joey.gouly@arm.com>
-References: <20240625133508.259829-1-maz@kernel.org>
- <20240625133508.259829-5-maz@kernel.org>
-Content-Language: en-US
-From: Anshuman Khandual <anshuman.khandual@arm.com>
-In-Reply-To: <20240625133508.259829-5-maz@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 6/25/24 19:05, Marc Zyngier wrote:
-> If our guest has been configured without PAN2, make sure that
-> AT S1E1{R,W}P will generate an UNDEF.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 4 ++++
->  1 file changed, 4 insertions(+)
-> 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 832c6733db307..06c39f191b5ec 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -4585,6 +4585,10 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
->  						HFGITR_EL2_TLBIRVAAE1OS	|
->  						HFGITR_EL2_TLBIRVAE1OS);
->  
-> +	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN2))
-> +		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_ATS1E1RP |
-> +						HFGITR_EL2_ATS1E1WP);
-> +
->  	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
->  		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
->  						HFGxTR_EL2_nPIR_EL1);
-As you had explained earlier about FGT UNDEF implementation, the above
-code change makes sense.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218792
 
-FWIW
+--- Comment #4 from Ma Xiangfei (xiangfeix.ma@intel.com) ---
+(In reply to Ma Xiangfei from comment #3)
+> I have tried this patch, but it can still be reproduced.
+> Host/Guest OS: CentOS 9
+> Host kernel: 6.10.0-rc2
+> Guest kernel: 6.10.0-rc7+ (Using Sean patch)
+> Host commit: 02b0d3b9 (https://git.kernel.org/pub/scm/virt/kvm/kvm.git)
+> Guest commit: 43db1e03c086ed20cc75808d3f45e780ec4ca26e
+> QEMU commit: b9ee1387
 
-Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
