@@ -1,124 +1,126 @@
-Return-Path: <kvm+bounces-21571-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21572-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A369892FFCA
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 19:28:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C386F9300A8
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 21:03:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4814A1F23655
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 17:28:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5DD81C211F9
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 19:03:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9183176AB1;
-	Fri, 12 Jul 2024 17:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A928A225D9;
+	Fri, 12 Jul 2024 19:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=efficios.com header.i=@efficios.com header.b="VVdKgrqv"
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="BTyVHX/y"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpout.efficios.com (smtpout.efficios.com [167.114.26.122])
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6456C176226;
-	Fri, 12 Jul 2024 17:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.114.26.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC0422315
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 19:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720805320; cv=none; b=DO49leCgrpfecVbV6i0PPAXOSeoS5Z3OWcy77ZNusHSyU3QPVPF2u/Ee4vfX+OVIgv4PVAyov6Gp+Z0EBSN61MadJiXS1YpeRxbzDkok+nEeSkD3QrxAHiJD43Dn4CL2elG37wfKTDJlwe4f3C8Te+nzskoCIeW/Rg6zRRV69pE=
+	t=1720811021; cv=none; b=Rd1noOsBf7k4Gi6RYdiqZGbVSW/RzTfbphRPJifION0ty3UeZTRgn7xz9B5AXv8mIdy74bCovILTsuLkk21RSMcN2u/dZnfksA/fJEfY3zZer+CUkPS4qqQhzcVSyn6gUuYrK6eOmRn17GBOjegR8MgYNL28Bzi971nndFbC7AM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720805320; c=relaxed/simple;
-	bh=UcTTM2UQHQ4zFDkXWD/5VaZUWSmGXcw8UKCyFji3gw4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=huX6ZZjWdjS1I2w16jv3Cbakyj9ki37VHakyfXY70NWZwrodo5OX/ACnL9Oitbi7IeiGDQuQZpsmVcplJhBEq7XQadjb1w7HCRwpolvlixhZpb6kcdKcmMKnf709dBmP5E6dTZCgD68sGn8lA6TpfTjAQIrtWHGHYLi05Hgc/OU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=efficios.com; spf=pass smtp.mailfrom=efficios.com; dkim=pass (2048-bit key) header.d=efficios.com header.i=@efficios.com header.b=VVdKgrqv; arc=none smtp.client-ip=167.114.26.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=efficios.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=efficios.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=efficios.com;
-	s=smtpout1; t=1720805317;
-	bh=UcTTM2UQHQ4zFDkXWD/5VaZUWSmGXcw8UKCyFji3gw4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VVdKgrqv2/7mtNAtMHYbV+pTsERp820wzE8AzVmkI2K4N2/FO4PiX+LiH3G3FpWue
-	 kwJoHLOAuTkklI7hgXT4meBpczcWMj56EfNx80Eqn70ZiWNGv5FNTVyYtRmmVm9R4j
-	 WQG+UnpJpuf0tLj2/4xs4QUvWictu9/2uWHIlOLGl22M8Wh32eRyLnw0XWXFd2MeJH
-	 dog55HB+cvS5hr5H8US9N3bKVYPeXWuIYOsMkSg4GhYAiyNK435qWZ1r0qlbvLjzws
-	 iscLT8G3Fzuf7DrTZimonW7InojSSjaz7u2LZFV7FVQp9xwMwFuMYVNQsFIK3/S8xU
-	 gUuc61XpjiGUA==
-Received: from [172.16.0.134] (192-222-143-198.qc.cable.ebox.net [192.222.143.198])
-	by smtpout.efficios.com (Postfix) with ESMTPSA id 4WLJTw4Jnfz19Px;
-	Fri, 12 Jul 2024 13:28:36 -0400 (EDT)
-Message-ID: <b624819b-aa56-45db-b140-c830e300ab85@efficios.com>
-Date: Fri, 12 Jul 2024 13:28:36 -0400
+	s=arc-20240116; t=1720811021; c=relaxed/simple;
+	bh=bLgjDfReROPHVtWwqm6hLAlmucB93HGmSm268RIKh/A=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=anAV7nLg49+ojIg94QQ36FvoT04GcQ6iVfMWvBSupDbENBScxB02IYwxTYijrpGYVYrtDDWBunUV0ZHI0haGPoJtWl4Ak01W4s6KqWmkv7Y5bWGMc0jkNkPBaBp98Qb3w9TjZIvfN9MAvv2wHJ+5YdGaeU43na+bPJc1gS4QGko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=BTyVHX/y; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1720811020; x=1752347020;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=bLgjDfReROPHVtWwqm6hLAlmucB93HGmSm268RIKh/A=;
+  b=BTyVHX/y3O99wTr1/Z9aeNmwe7WAHFhae5+iTvQbiDuOQ9GBofZ5gK8u
+   rMfKKQNq1Gb+f+b5zTpEC0iPUPrRDjQjKRUcP01XsILSQXodPnGUbcMBu
+   dA5RtY0WgdmrWLP+fSeH5SHGajkc59YPwVSemnbpWjPhMYesW0Asdh39U
+   c=;
+X-IronPort-AV: E=Sophos;i="6.09,203,1716249600"; 
+   d="scan'208";a="434313253"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2024 19:03:34 +0000
+Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:53733]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.43.109:2525] with esmtp (Farcaster)
+ id 8cb4a223-da34-457e-8ff9-8bcc9a66d7ef; Fri, 12 Jul 2024 19:03:32 +0000 (UTC)
+X-Farcaster-Flow-ID: 8cb4a223-da34-457e-8ff9-8bcc9a66d7ef
+Received: from EX19D018EUA003.ant.amazon.com (10.252.50.163) by
+ EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 12 Jul 2024 19:03:32 +0000
+Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
+ EX19D018EUA003.ant.amazon.com (10.252.50.163) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 12 Jul 2024 19:03:32 +0000
+Received: from EX19D018EUA002.ant.amazon.com ([fe80::7a11:7dbb:2190:e2c1]) by
+ EX19D018EUA002.ant.amazon.com ([fe80::7a11:7dbb:2190:e2c1%3]) with mapi id
+ 15.02.1258.034; Fri, 12 Jul 2024 19:03:32 +0000
+From: "Stamatis, Ilias" <ilstam@amazon.co.uk>
+To: "Stamatis, Ilias" <ilstam@amazon.co.uk>, "Kagan, Roman" <rkagan@amazon.de>
+CC: "Durrant, Paul" <pdurrant@amazon.co.uk>, "levinsasha928@gmail.com"
+	<levinsasha928@gmail.com>, "avi@redhat.com" <avi@redhat.com>,
+	"mst@redhat.com" <mst@redhat.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "nh-open-source@amazon.com"
+	<nh-open-source@amazon.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>,
+	"Woodhouse, David" <dwmw@amazon.co.uk>
+Subject: Re: [PATCH 1/6] KVM: Fix coalesced_mmio_has_room()
+Thread-Topic: [PATCH 1/6] KVM: Fix coalesced_mmio_has_room()
+Thread-Index: AQHa0qbUgU1Cf7ZX1kuueDwP9wRW37HzQp2AgAA0OIA=
+Date: Fri, 12 Jul 2024 19:03:32 +0000
+Message-ID: <125da420a114efe4ea1a8f8b5f98bbf5fc7f91ae.camel@amazon.co.uk>
+References: <20240710085259.2125131-1-ilstam@amazon.com>
+	 <20240710085259.2125131-2-ilstam@amazon.com>
+	 <ZpFSA4CA1FaS4iWV@u40bc5e070a0153.ant.amazon.com>
+In-Reply-To: <ZpFSA4CA1FaS4iWV@u40bc5e070a0153.ant.amazon.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <82EC2966163F8F41899829E7C8B6DA13@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 0/5] Paravirt Scheduling (Dynamic vcpu priority
- management)
-To: Joel Fernandes <joel@joelfernandes.org>
-Cc: Vineeth Remanan Pillai <vineeth@bitbyteword.org>,
- Sean Christopherson <seanjc@google.com>, Ben Segall <bsegall@google.com>,
- Borislav Petkov <bp@alien8.de>,
- Daniel Bristot de Oliveira <bristot@redhat.com>,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Dietmar Eggemann <dietmar.eggemann@arm.com>, "H . Peter Anvin"
- <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>,
- Juri Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>,
- Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>,
- Valentin Schneider <vschneid@redhat.com>,
- Vincent Guittot <vincent.guittot@linaro.org>,
- Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>,
- Steven Rostedt <rostedt@goodmis.org>, Suleiman Souhlal
- <suleiman@google.com>, Masami Hiramatsu <mhiramat@kernel.org>,
- himadrics@inria.fr, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- x86@kernel.org, graf@amazon.com, drjunior.org@gmail.com
-References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
- <ZjJf27yn-vkdB32X@google.com>
- <CAO7JXPgbtFJO6fMdGv3jf=DfiCNzcfi4Hgfn3hfotWH=FuD3zQ@mail.gmail.com>
- <CAO7JXPhMfibNsX6Nx902PRo7_A2b4Rnc3UP=bpKYeOuQnHvtrw@mail.gmail.com>
- <66912820.050a0220.15d64.10f5@mx.google.com>
- <19ecf8c8-d5ac-4cfb-a650-cf072ced81ce@efficios.com>
- <CAEXW_YRBNs30ZC1e+U3mco22=XxaCfhPO_5wEHe+wFJjAbbSvA@mail.gmail.com>
-From: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
-Content-Language: en-US
-In-Reply-To: <CAEXW_YRBNs30ZC1e+U3mco22=XxaCfhPO_5wEHe+wFJjAbbSvA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-On 2024-07-12 12:24, Joel Fernandes wrote:
-> On Fri, Jul 12, 2024 at 10:09 AM Mathieu Desnoyers
-> <mathieu.desnoyers@efficios.com> wrote:
-[...]
->>>
->>> Steven Rostedt told me, what we instead need is a tracepoint callback in a
->>> driver, that does the boosting.
->>
->> I utterly dislike changing the system behavior through tracepoints. They were
->> designed to observe the system, not modify its behavior. If people start abusing
->> them, then subsystem maintainers will stop adding them. Please don't do that.
->> Add a notifier or think about integrating what you are planning to add into the
->> driver instead.
-> 
-> Well, we do have "raw" tracepoints not accessible from userspace, so
-> you're saying even those are off limits for adding callbacks?
-
-Yes. Even the "raw" tracepoints were designed as an "observation only"
-API. Using them in lieu of notifiers is really repurposing them for
-something they were not meant to do.
-
-Just in terms of maintainability at the caller site, we should be
-allowed to consider _all_ tracepoints as mostly exempt from side-effects
-outside of the data structures within the attached tracers. This is not
-true anymore if they are repurposed as notifiers.
-
-Thanks,
-
-Mathieu
-
--- 
-Mathieu Desnoyers
-EfficiOS Inc.
-https://www.efficios.com
-
+T24gRnJpLCAyMDI0LTA3LTEyIGF0IDE3OjU1ICswMjAwLCBSb21hbiBLYWdhbiB3cm90ZToNCj4g
+T24gV2VkLCBKdWwgMTAsIDIwMjQgYXQgMDk6NTI6NTRBTSArMDEwMCwgSWxpYXMgU3RhbWF0aXMg
+d3JvdGU6DQo+ID4gVGhlIGZvbGxvd2luZyBjYWxjdWxhdGlvbiB1c2VkIGluIGNvYWxlc2NlZF9t
+bWlvX2hhc19yb29tKCkgdG8gY2hlY2sNCj4gPiB3aGV0aGVyIHRoZSByaW5nIGJ1ZmZlciBpcyBm
+dWxsIGlzIHdyb25nIGFuZCBvbmx5IGFsbG93cyBoYWxmIHRoZSBidWZmZXINCj4gPiB0byBiZSB1
+c2VkLg0KPiA+IA0KPiA+IGF2YWlsID0gKHJpbmctPmZpcnN0IC0gbGFzdCAtIDEpICUgS1ZNX0NP
+QUxFU0NFRF9NTUlPX01BWDsNCj4gPiBpZiAoYXZhaWwgPT0gMCkNCj4gPiAJLyogZnVsbCAqLw0K
+PiA+IA0KPiA+IFRoZSAlIG9wZXJhdG9yIGluIEMgaXMgbm90IHRoZSBtb2R1bG8gb3BlcmF0b3Ig
+YnV0IHRoZSByZW1haW5kZXINCj4gPiBvcGVyYXRvci4gTW9kdWxvIGFuZCByZW1haW5kZXIgb3Bl
+cmF0b3JzIGRpZmZlciB3aXRoIHJlc3BlY3QgdG8gbmVnYXRpdmUNCj4gPiB2YWx1ZXMuIEJ1dCBh
+bGwgdmFsdWVzIGFyZSB1bnNpZ25lZCBpbiB0aGlzIGNhc2UgYW55d2F5Lg0KPiA+IA0KPiA+IFRo
+ZSBhYm92ZSBtaWdodCBoYXZlIHdvcmtlZCBhcyBleHBlY3RlZCBpbiBweXRob24gZm9yIGV4YW1w
+bGU6DQo+ID4gPiA+ID4gKC04NikgJSAxNzANCj4gPiA4NA0KPiA+IA0KPiA+IEhvd2V2ZXIgaXQg
+ZG9lc24ndCB3b3JrIHRoZSBzYW1lIHdheSBpbiBDLg0KPiA+IA0KPiA+IHByaW50ZigiYXZhaWw6
+ICVkXG4iLCAoLTg2KSAlIDE3MCk7DQo+ID4gcHJpbnRmKCJhdmFpbDogJXVcbiIsICgtODYpICUg
+MTcwKTsNCj4gPiBwcmludGYoImF2YWlsOiAldVxuIiwgKC04NnUpICUgMTcwdSk7DQo+ID4gDQo+
+ID4gVXNpbmcgZ2NjLTExIHRoZXNlIHByaW50Og0KPiA+IA0KPiA+IGF2YWlsOiAtODYNCj4gPiBh
+dmFpbDogNDI5NDk2NzIxMA0KPiA+IGF2YWlsOiAwDQo+IA0KPiBXaGVyZSBleGFjdGx5IGRvIHlv
+dSBzZWUgYSBwcm9ibGVtPyAgQXMgeW91IGNvcnJlY3RseSBwb2ludCBvdXQsIGFsbA0KPiB2YWx1
+ZXMgYXJlIHVuc2lnbmVkLCBzbyB1bnNpZ25lZCBhcml0aG1ldGljcyB3aXRoIHdyYXBhcm91bmQg
+YXBwbGllcywNCj4gYW5kIHRoZW4gJSBvcGVyYXRvciBpcyBhcHBsaWVkIHRvIHRoZSByZXN1bHRp
+bmcgdW5zaWduZWQgdmFsdWUuICBPdXQNCj4geW91ciB0aHJlZSBleGFtcGxlcywgb25seSB0aGUg
+bGFzdCBvbmUgaXMgcmVsZXZhbnQsIGFuZCBpdCdzIHBlcmZlY3RseQ0KPiB0aGUgaW50ZW5kZWQg
+YmVoYXZpb3IuDQo+IA0KPiBUaGFua3MsDQo+IFJvbWFuLg0KDQpLVk1fQ09BTEVTQ0VEX01NSU9f
+TUFYIG9uIHg4NiBpcyAxNzAsIHdoaWNoIG1lYW5zIHRoZSByaW5nIGJ1ZmZlciBoYXMNCjE3MCBl
+bnRyaWVzICgxNjkgb2Ygd2hpY2ggc2hvdWxkIGJlIHVzYWJsZSkuIA0KDQpJZiBmaXJzdCA9IDAg
+YW5kIGxhc3QgPSA4NSB0aGVuIHRoZSBjYWxjdWxhdGlvbiBnaXZlcyAwIGF2YWlsYWJsZQ0KZW50
+cmllcyBpbiB3aGljaCBjYXNlIHdlIGNvbnNpZGVyIHRoZSBidWZmZXIgdG8gYmUgZnVsbCBhbmQg
+d2UgZXhpdCB0bw0KdXNlcnNwYWNlLiBCdXQgd2Ugc2hvdWxkbid0IGFzIHRoZXJlIGFyZSBzdGls
+bCA4NCB1bnVzZWQgZW50cmllcy4NCg0KU28gSSBkb24ndCBzZWUgaG93IHRoaXMgY291bGQgaGF2
+ZSBiZWVuIHRoZSBpbnRlbmRlZCBiZWhhdmlvdXIuIA0KDQpJbGlhcw0K
 
