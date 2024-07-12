@@ -1,128 +1,122 @@
-Return-Path: <kvm+bounces-21513-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21514-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E83B92FCDC
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 16:48:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C27B492FCEB
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 16:52:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB9B81F23DB4
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 14:48:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AEAC284556
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 14:52:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3999C172BB1;
-	Fri, 12 Jul 2024 14:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513DE1741F4;
+	Fri, 12 Jul 2024 14:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nc75KCV1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="17cE/U8l"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FAAE171647
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 14:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1956B172BC9
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 14:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720795726; cv=none; b=Ku2ds848lvO/nTOWeKGdpeJuAGvyXWgwLGMs1PcGFdvQ/XRl2J5gNbzuzVjlcamvS90gSuiaO9MwjgDoNQMyBTFbq40T0794hTZVIwaDSKFBz12Lam7i7U6LrnPPZ8ETNakfBmGMxPamwVTZ55s+L2jv2rYrSoS8Eu2X1VD03iM=
+	t=1720795897; cv=none; b=dwxHRO+9RlhFONDVcCDix6xe248ptUvNLSkiimADYH0msjaOeMZ9l7KJ9qSV6/jA8OjLqMsvgC6G1BtMkQW5pTlruKgt5g1CZGKO7enoCOqqntkHI2hLJAEX8428ObBtXnAPttM91M/V1gMIarZXOu2jreYhy7EbEkI6UvNb6dM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720795726; c=relaxed/simple;
-	bh=sBKA5wOw/8saolKPMgpYoFqxWMdR+xT7lkIyZhUM21k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=W6WkVNNd4swPPpcYUs521/6oppW+bLcYS1jHD2QxqEOPHGqTlhNkKvKpYAwVJJsM7qHj1E3KVMjvIPpJVg13C6BuHt0Y6En2W+2THq0cHrWd/t7I6VlvrJX9x1r7UzsKP3iRZAVAHNdQ/bSka1q4utOWzgNQEjuOawQSpMzVego=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nc75KCV1; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1720795897; c=relaxed/simple;
+	bh=JKBHNcGmp0QwZ0rhgoF+eHPuXWJI/+gx9RGechJ17gc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=C4rLZXJDTDy146wzelP0uyuOnCFbaGdZ/msNIGmUTieCWU55Q+qP1nVNUdrpbm0vIIZM2wCwqD3uP59Vnq08YwG1HHrvqmgMXT+IQV2ibkBIcpgss4yVdp84lasL6ehxObsv+qSGpgBYE/rw2FD5i5+ZVjD0SR0xNea4PiqyCqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=17cE/U8l; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1faf6103680so13312545ad.1
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 07:48:44 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e036440617fso3938403276.1
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 07:51:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720795724; x=1721400524; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Csfae5IaHZ5irxSaRzc6R9nWOwPBAYNbr4c2pq1OV6o=;
-        b=nc75KCV12kq06iCbspQcK78Ftb+LDGMgWYufirajxwey3MK3kmO4NHwd3zZxGVntOj
-         ID0r0oyr5l5FMv2RvH33yMUyryEttQobC9wmKAtnbs5j/guPn2JeYfKGgsBKH0I1cjYW
-         TRluBYIO2OiQ5FMKaE19Ai1+lHcQCHkAkgw75qMv1V7JQFDagsThB78aETJQFxBU9rVn
-         5kVn3wVqnNfWfYAZHahw1v+fAli4sChHLOsLtXMeJeVRC3nTMgn1mtMRUpN0/gWz5YI0
-         wKjVKrcqvrHdTh5dPrPqYreVF6xhuwXWzhoDV3tci+zx9JKAZmiiot6d5EDqquCeteXY
-         xHtg==
+        d=google.com; s=20230601; t=1720795895; x=1721400695; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=u0HrA2oBJYdeTPlzzSEveTT2iaGeIebcrdS2ZlqIhh0=;
+        b=17cE/U8lXt7lmUD1+JcJvSyYyqoVg7bTxQlcBmd9C2FezQW35oCGbynofueuefZWgy
+         O2pSDrcn0nJKy4m0qtjZVpwRnvNZQKkiwA+zKcDrpgJwPobKhGSsSMJQZiFL95WCq1d0
+         b2hxXvmecBS1oqeOEGiFIEUEXd8GjJXDycVhoSFZ7R2pK9gelNEdj1N5U+KgnbncbukG
+         nf4MP51B+Xqdh49ysynQ1X4Evbv4moArgcMFmW5ZpQT7Q2FF/R97Mo1PkgahtiKqX8qC
+         Wzc7PR9nPP4vMjCxFT7m6+PshOk8Hv5LdjipbWAJATfKvHp6eMx0Ty0dxGDRuzl4NENw
+         ikVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720795724; x=1721400524;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Csfae5IaHZ5irxSaRzc6R9nWOwPBAYNbr4c2pq1OV6o=;
-        b=Y1fyDIDWx11C92Fp2aU+Z8ozCO0wKXrSfz7boBsZJon3L98nTAvNFnoUtDM4l/bLY8
-         +DYVZHJspkTzu6vu/A96J/r0pasmF2/zvnIgA2DOQ42xhcVmMl+z5GWaPLvcCDoMT1X5
-         bdY0wDCkKFCbuuTtGhpll2Mv7fFGrvLhKw3p9gnS2DP/gbe8IRcnUpx7rj20+BULUhtc
-         d6HnVjjxPT4fQa5UlZP/DjoGb135W3rk4QsgXpndjityWp4GpRs/ScJbkayrkWIbvdQ8
-         G9JKxnqgjORtmoT4lLhPGVIiTzof7Uw3Jms8Sn6g5Pj657DpRAfq605hCMs4Y9iJNmXA
-         n+Gg==
-X-Gm-Message-State: AOJu0Yzapc9Yg9iGcjR9Bb+8kvvLr8rZemF/QpY7QBb1j7/ODON3BdZ/
-	m8HwFWUgnZmFA0XBMbnT57ifODEVty1YGEJ3WPB/5aYtP8qOQL5OmP2sSg7Yz8wcefsOg6rSvqG
-	INQ==
-X-Google-Smtp-Source: AGHT+IGvE7hgPp4Cir+q8LOh2zwHROYE/mdrf2LLP/Npae94bB6VdUWcyzYzH//G6efie7ReQDu/31WzW6E=
+        d=1e100.net; s=20230601; t=1720795895; x=1721400695;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=u0HrA2oBJYdeTPlzzSEveTT2iaGeIebcrdS2ZlqIhh0=;
+        b=tn/+8e4x5Sr+rbCm56Gc7qc8RNyopupU0RASZRC/d2xsoEPgN+8GQmuaHBJ3WVfB0t
+         8Pk+ivAMwXCLFQdQvTA9BZbrIePGPWv3FH7+ZNaxSr1PPDYCAnlL4VpT74nE2uLstpWS
+         lbbBnzOdFbTtDlDBCEysyrLLg3Sagct5Nb2wVDEj+dE1rPCBKDfDnRLPm6EasDs3TO7+
+         iqWbQERvnG3FiBE69PWNFIHbxZ1m0Lri8w7WVIlTGdYtriuIDjeqM34ttgPDih2TdS0X
+         CjaRihrLwaN4GMOup/JTKXqhNbLlziQbONRBp54JA4bT3ZIDhWCskEqKuTM6nSpWKvfV
+         568Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXFLCANUVMuJ96145BPOW6jkMDGAWXV6Ok49UjhTksS6g5iktfBDY7hdzLwJCIg4DYtYrlWg0I7Q1AczDOsBgddFnXc
+X-Gm-Message-State: AOJu0Yyhr301qVfM/QM2FcXLdFZPsxWUmnzDdpo3Il3BaduZwDDOZReg
+	BpBOU2VLpGrZvYg+zysMkc8m4aNaT2PH/NHezEgit81NSk8LuO4zEMY33hmqYthUH18DJT6baPz
+	iCw==
+X-Google-Smtp-Source: AGHT+IHs3WxROK8B3MEoajMFN2LkNLJRwhW9tOF7pTAf7Ssn5e1+uILjWrs/+upZBAn3zXJ5dKbg12DuyII=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:f691:b0:1fb:57f4:9057 with SMTP id
- d9443c01a7336-1fbb6c15adcmr7214375ad.0.1720795724256; Fri, 12 Jul 2024
- 07:48:44 -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 12 Jul 2024 07:48:41 -0700
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2586:b0:e02:c619:73d with SMTP id
+ 3f1490d57ef6-e041b070201mr523017276.5.1720795895128; Fri, 12 Jul 2024
+ 07:51:35 -0700 (PDT)
+Date: Fri, 12 Jul 2024 07:51:33 -0700
+In-Reply-To: <20240712075022.48276-1-flyingpeng@tencent.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.993.g49e7a77208-goog
-Message-ID: <20240712144841.1230591-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Suppress MMIO that is triggered during task switch emulation
+References: <20240712075022.48276-1-flyingpeng@tencent.com>
+Message-ID: <ZpFC9Q6Sccy6mjRN@google.com>
+Subject: Re: [PATCH v2]   KVM/x86: make function emulator_do_task_switch as noinline_for_stack
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot+2fb9f8ed752c01bc9a3f@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+To: flyingpenghao@gmail.com
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, 
+	Peng Hao <flyingpeng@tencent.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Explicitly suppress userspace emulated MMIO exits that are triggered when
-emulating a task switch as KVM doesn't support userspace MMIO during
-complex (multi-step) emulation.  Silently ignoring the exit request can
-result in the WARN_ON_ONCE(vcpu->mmio_needed) firing if KVM exits to
-userspace for some other reason prior to purging mmio_needed.
+On Fri, Jul 12, 2024, flyingpenghao@gmail.com wrote:
+> From: Peng Hao <flyingpeng@tencent.com>
+> 
+> When KASAN is enabled and built with clang:
+> clang report
+> arch/x86/kvm/emulate.c:3022:5: error: stack frame size (2488) exceeds limit (2048) in 'emulator_task_switch' [-Werror,-Wframe-larger-than]
+> int emulator_task_switch(struct x86_emulate_ctxt *ctxt,
+>     ^
+> 
+> since emulator_do_task_switch() consumes a lot of stack space, mark it as
+> noinline_for_stack to prevent it from blowing up emulator_task_switch()'s
+> stack size.
 
-See commit 0dc902267cb3 ("KVM: x86: Suppress pending MMIO write exits if
-emulator detects exception") for more details on KVM's limitations with
-respect to emulated MMIO during complex emulator flows.
+No, sprinkling noinline to combat KASAN stack frame sizes is not a maintainable
+approach.  Practically speaking, KASAN + -Werror + FRAME_WARN=2048 is not a sane
+config.
 
-Reported-by: syzbot+2fb9f8ed752c01bc9a3f@syzkaller.appspotmail.com
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
-
-This is from a syzkaller report on a Google-internal kernel, but it repros
-on upstream (obviously).  There are unfortunately an absurd number of upstream
-reports with "WARNING in kvm_arch_vcpu_ioctl_run" as the title, so I haven't
-been able to hunt down an upstream report.
-
- arch/x86/kvm/x86.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 994743266480..47bd8a9fdb21 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -11803,7 +11803,13 @@ int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
- 
- 	ret = emulator_task_switch(ctxt, tss_selector, idt_index, reason,
- 				   has_error_code, error_code);
--	if (ret) {
-+
-+	/*
-+	 * Report an error userspace if MMIO is needed, as KVM doesn't support
-+	 * MMIO during a task switch (or any other complex operation).
-+	 */
-+	if (ret || vcpu->mmio_needed) {
-+		vcpu->mmio_needed = false;
- 		vcpu->run->exit_reason = KVM_EXIT_INTERNAL_ERROR;
- 		vcpu->run->internal.suberror = KVM_INTERNAL_ERROR_EMULATION;
- 		vcpu->run->internal.ndata = 0;
-
-base-commit: 771df9ffadb8204e61d3e98f36c5067102aab78f
--- 
-2.45.2.993.g49e7a77208-goog
-
+> Signed-off-by: Peng Hao <flyingpeng@tencent.com>
+> ---
+>  arch/x86/kvm/emulate.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index 5d4c86133453..bbc185b9725d 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -2918,7 +2918,7 @@ static int task_switch_32(struct x86_emulate_ctxt *ctxt, u16 old_tss_sel,
+>  	return load_state_from_tss32(ctxt, &tss_seg);
+>  }
+>  
+> -static int emulator_do_task_switch(struct x86_emulate_ctxt *ctxt,
+> +static noinline_for_stack int emulator_do_task_switch(struct x86_emulate_ctxt *ctxt,
+>  				   u16 tss_selector, int idt_index, int reason,
+>  				   bool has_error_code, u32 error_code)
+>  {
+> -- 
+> 2.27.0
+> 
 
