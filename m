@@ -1,56 +1,56 @@
-Return-Path: <kvm+bounces-21568-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21569-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1824A92FF47
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 19:14:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D53F992FF4E
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 19:14:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 474ED1C22C80
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 17:14:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96A01286AF2
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 17:14:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4F6178CD6;
-	Fri, 12 Jul 2024 17:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BDC176AD0;
+	Fri, 12 Jul 2024 17:14:22 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56032176ABE;
-	Fri, 12 Jul 2024 17:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEC9517C6B;
+	Fri, 12 Jul 2024 17:14:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720804357; cv=none; b=fUi41yPlwvZ+NxbqxjPs3AgCbgM72YTfWRjaoYLC6akWoYjIBcr+OWAYNXw6AHFh3Ecus0YZr03Arvqn37RQexuT+5foOkReHqkacsR0mi2x0e8M3Mc/SE9vI79zoV73u6tS3rC2eWt0qScaWtv0UxE0JZtlsvv/qXbk0ur9Zv4=
+	t=1720804461; cv=none; b=gL48TlqY18tbd9Z9Cy99Ks1egSE+MHiiOm3Zoweogyoan2TSGSsy/QnvIDKcO7Vfy3pWX4x/Vo0XVKygbVJny8kvwjw+aOx3ZjtZ+gU8+rR5+jHEqOUQLQF6ajMzVKcYZlY1PFQxQjeamQBuRg8IxZAHso4ACrhtQqnjwq2gPeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720804357; c=relaxed/simple;
-	bh=2NzRlsDEUq3xDdPCYo9Tq+ccMaGcZ0cnDb0kuJ9hwY8=;
+	s=arc-20240116; t=1720804461; c=relaxed/simple;
+	bh=fBPOV7zfczv29qyKM3eLeKNoHsGD5ay/fTO1h4n5yuk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HGot2Y/mIZSvy6Jm3KsCPUoYK/MXNiKPzaPn+TAq7ByEOLfq6yUgpt/WZ4YL9l0w6bAyw8jIeDSvd2kk+LxCHR4tXJgoj6oJr99phChT04bcgci/VgCEr83hPcB1tjD3kGn7HP3OfmvKRxeln9trWvmpg6CUyLEMWSO07iFnYDI=
+	 MIME-Version:Content-Type; b=s3Upr92oVVOBYWOh5IzFUoJ3ysz+Zr1TfE6fAsU1vneuhOtLEl1k89P9ZLFgzWIZseoal/ZCH9omCHKioi1QvkPMIBOLpbLwqGhTadKVp1eC76PtRi+7w3vuTGYLeHGZTYfl+rqQkPSi45zKX0JfuGvBzuUqVP4h5o1pwxiq7DY=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D69B0C32782;
-	Fri, 12 Jul 2024 17:12:33 +0000 (UTC)
-Date: Fri, 12 Jul 2024 13:12:32 -0400
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ECCDC32782;
+	Fri, 12 Jul 2024 17:14:18 +0000 (UTC)
+Date: Fri, 12 Jul 2024 13:14:16 -0400
 From: Steven Rostedt <rostedt@goodmis.org>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Joel Fernandes
- <joel@joelfernandes.org>, Vineeth Remanan Pillai <vineeth@bitbyteword.org>,
- Ben Segall <bsegall@google.com>, Borislav Petkov <bp@alien8.de>, Daniel
- Bristot de Oliveira <bristot@redhat.com>, Dave Hansen
- <dave.hansen@linux.intel.com>, Dietmar Eggemann <dietmar.eggemann@arm.com>,
- "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Juri
- Lelli <juri.lelli@redhat.com>, Mel Gorman <mgorman@suse.de>, Paolo Bonzini
- <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, Peter Zijlstra
- <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, Valentin
- Schneider <vschneid@redhat.com>, Vincent Guittot
- <vincent.guittot@linaro.org>, Vitaly Kuznetsov <vkuznets@redhat.com>,
- Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal <suleiman@google.com>,
- Masami Hiramatsu <mhiramat@kernel.org>, himadrics@inria.fr,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org,
- graf@amazon.com, drjunior.org@gmail.com
+Cc: Joel Fernandes <joel@joelfernandes.org>, Mathieu Desnoyers
+ <mathieu.desnoyers@efficios.com>, Vineeth Remanan Pillai
+ <vineeth@bitbyteword.org>, Ben Segall <bsegall@google.com>, Borislav Petkov
+ <bp@alien8.de>, Daniel Bristot de Oliveira <bristot@redhat.com>, Dave
+ Hansen <dave.hansen@linux.intel.com>, Dietmar Eggemann
+ <dietmar.eggemann@arm.com>, "H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar
+ <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, Mel Gorman
+ <mgorman@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski
+ <luto@kernel.org>, Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Valentin Schneider <vschneid@redhat.com>, Vincent
+ Guittot <vincent.guittot@linaro.org>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, Suleiman Souhlal
+ <suleiman@google.com>, Masami Hiramatsu <mhiramat@kernel.org>,
+ himadrics@inria.fr, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ x86@kernel.org, graf@amazon.com, drjunior.org@gmail.com
 Subject: Re: [RFC PATCH v2 0/5] Paravirt Scheduling (Dynamic vcpu priority
  management)
-Message-ID: <20240712131232.6d77947b@rorschach.local.home>
-In-Reply-To: <ZpFdYFNfWcnq5yJM@google.com>
+Message-ID: <20240712131416.78648a6e@rorschach.local.home>
+In-Reply-To: <ZpFjG-seBN33uTP2@google.com>
 References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
 	<ZjJf27yn-vkdB32X@google.com>
 	<CAO7JXPgbtFJO6fMdGv3jf=DfiCNzcfi4Hgfn3hfotWH=FuD3zQ@mail.gmail.com>
@@ -59,6 +59,8 @@ References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
 	<19ecf8c8-d5ac-4cfb-a650-cf072ced81ce@efficios.com>
 	<20240712122408.3f434cc5@rorschach.local.home>
 	<ZpFdYFNfWcnq5yJM@google.com>
+	<66915ef3.050a0220.72f83.316b@mx.google.com>
+	<ZpFjG-seBN33uTP2@google.com>
 X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -69,46 +71,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 12 Jul 2024 09:44:16 -0700
+On Fri, 12 Jul 2024 10:08:43 -0700
 Sean Christopherson <seanjc@google.com> wrote:
 
-> > All we need is a notifier that gets called at every VMEXIT.  
+> > I am a bit confused by your statement Sean, because if a higher prio HOST
+> > thread wakes up on the vCPU thread's phyiscal CPU, then a VM-Exit should
+> > happen. That has nothing to do with IRQ delivery.  What am I missing?  
 > 
-> Why?  The only argument I've seen for needing to hook VM-Exit is so that the
-> host can speculatively boost the priority of the vCPU when deliverying an IRQ,
-> but (a) I'm unconvinced that is necessary, i.e. that the vCPU needs to be boosted
-> _before_ the guest IRQ handler is invoked and (b) it has almost no benefit on
-> modern hardware that supports posted interrupts and IPI virtualization, i.e. for
-> which there will be no VM-Exit.
+> Why does that require hooking VM-Exit?
 
-No. The speculatively boost was for something else, but slightly
-related. I guess the ideal there was to have the interrupt coming in
-boost the vCPU because the interrupt could be waking an RT task. It may
-still be something needed, but that's not what I'm talking about here.
-
-The idea here is when an RT task is scheduled in on the guest, we want
-to lazily boost it. As long as the vCPU is running on the CPU, we do
-not need to do anything. If the RT task is scheduled for a very short
-time, it should not need to call any hypercall. It would set the shared
-memory to the new priority when the RT task is scheduled, and then put
-back the lower priority when it is scheduled out and a SCHED_OTHER task
-is scheduled in.
-
-Now if the vCPU gets preempted, it is this moment that we need the host
-kernel to look at the current priority of the task thread running on
-the vCPU. If it is an RT task, we need to boost the vCPU to that
-priority, so that a lower priority host thread does not interrupt it.
-
-The host should also set a bit in the shared memory to tell the guest
-that it was boosted. Then when the vCPU schedules a lower priority task
-than what is in shared memory, and the bit is set that tells the guest
-the host boosted the vCPU, it needs to make a hypercall to tell the
-host that it can lower its priority again.
-
-The incoming irq is to handle the race between the event that wakes the
-RT task, and the RT task getting a chance to run. If the preemption
-happens there, the vCPU may never have a chance to notify the host that
-it wants to run an RT task.
+To do the lazy boosting. That's the time that the host can see the
+priority of the currently running task.
 
 -- Steve
 
