@@ -1,158 +1,193 @@
-Return-Path: <kvm+bounces-21511-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21512-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C022B92FCB2
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 16:36:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6E9492FCD8
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 16:48:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D56471C20F99
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 14:36:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C833B2286F
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 14:48:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52233172773;
-	Fri, 12 Jul 2024 14:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B5A172798;
+	Fri, 12 Jul 2024 14:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G3K88sd6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4sJBUnPP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DFB116F903;
-	Fri, 12 Jul 2024 14:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD7479E1
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 14:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720795004; cv=none; b=Mcjk+9Y15i+Ng4XCNUIHq1gA0MwUifk1VuyMSmgUZG7as7OUONLRbrKn7jDFIw5N6Giclmi7EUOnkbG5mxmxqmotzrcspewUyJ7LpZLhnjnF/Ylolds8bzjpS2CQZUaxaTGx42km8FBj4y3qLqeKrmDFmgLDTSN8nFROMAuEvmY=
+	t=1720795694; cv=none; b=PnC2nZBE+7u4lraJey/rzU3EqK1DyyU5D5MUcfd0I1DFtyZ2vNmQ8elEW5+HzvXFzSJRWdYLBGp0Ev/kB3gBALVwreSlosanmXkwQo0RPRKo2XE8tZDMPUQ3GvZ1oHPMzMtKmWLdFPkMN2tasxKxFmTY+rDgopDE99uNdckzDoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720795004; c=relaxed/simple;
-	bh=aaZg96dC3KIYXbXJLkxxQTgBn7k5W41mVrwAOW2OCc4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rnfIlYtkVU7EZghXv58blCuigI2R2HDelv26+/Psmg93MsUrYFWM63p0Jfl1/AcM2puXFgDPUeegpWxEgw3lL2Fn5bzqq80MY2p9MKbbFMcEe2ajwPDbKisHA2WBuhlyJ18EbXW21/VmjDigGkVdTyBWWiUKBRT2u8XP3FXzap0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G3K88sd6; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1720795002; x=1752331002;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=aaZg96dC3KIYXbXJLkxxQTgBn7k5W41mVrwAOW2OCc4=;
-  b=G3K88sd6KGjRSExUYSpElFO7zcUh7RPbVmFI57/qxPW3Fa8HmCItP7eX
-   j7rEGPRobUU+gjADS+jXTcb09yoJm8JKVo2MuQiSU95oe7xq3dFUwA5bI
-   GDdu9pNxdOuC9PFZozTWA5vAlV/ZAVf4WmNfUcUvbR15dqsDP8aRFZ518
-   eV9MEEXSgI+7r1fjhswNw6t71YDWSSP1WQoJgTILyJ8xRdbEDYjQi1szB
-   MaoZl2WOeI0GmbcJBlcR6Hpvj2rIcFqIV+G6QMstvV53UMKPPVtOTmNsH
-   gZxpC9UZaJ4U0ohHgNSebwYbEZWrzWzJeuRR525WIjU4UA/A5LJTWI8KB
-   g==;
-X-CSE-ConnectionGUID: yKjS6m0bQdymDCYIHcSwZg==
-X-CSE-MsgGUID: GxnYsegYT6ur+2N1sneaDw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11131"; a="35780731"
-X-IronPort-AV: E=Sophos;i="6.09,203,1716274800"; 
-   d="scan'208";a="35780731"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2024 07:36:41 -0700
-X-CSE-ConnectionGUID: F25DSkW3TvWdWXeYQ2BWNg==
-X-CSE-MsgGUID: uYbjV3h8QpeFLQ5/xssOPw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,203,1716274800"; 
-   d="scan'208";a="53878871"
-Received: from dnelso2-mobl.amr.corp.intel.com (HELO [10.125.110.139]) ([10.125.110.139])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Jul 2024 07:36:42 -0700
-Message-ID: <73802bff-833c-4233-9a5b-88af0d062c82@intel.com>
-Date: Fri, 12 Jul 2024 07:36:39 -0700
+	s=arc-20240116; t=1720795694; c=relaxed/simple;
+	bh=80rcJMfWh81tg4yYUsIxsrVss197EKgxznoWXn6nA2U=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qQgrQeUCRRs9DViBfEI38M0AJJITI5838YqJMds5cWSNZdfUzvzpSH1NsUFzUwMuU03uQb1AAOan0bwW4JL0gEw6teIZnRui6CVzWrRZeSleF/ngG1THwXGYPdDzZuHxcpRsmHWPUh74QNh9XAUCWRie8T/Ev2mpJxZ+3HhFYi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4sJBUnPP; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2c97ff21741so1844154a91.1
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 07:48:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1720795692; x=1721400492; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=uZsqMw09jqxGLOzroUJQUOORh6B+OaGFknZXtQVFLK8=;
+        b=4sJBUnPPoSaY6Ra/RxEiyr1lmlwh0yEx7Tbjzzw7Ze+8kPBn2M6Ou/MnQa+4h1gIEM
+         pGgF9ZnNgtIGf6pbD8ww+BnsqZF+S9H9pgvqVB+MTrVGwBMEcwHS28MlhiXe16i0K4MY
+         Ia2rv9HKAf/iwZCzNkNjsoU7OWCxm3BktBTF7c8SNpXdHXurgdaNuyAYxjTyOUCqII5S
+         MzQkdtvIFLmV2CtYSdsy5mJTj/VMNQ18EWtP5MSf+xOTXIMYF14Q47t5mFAVRBe1m4Bs
+         d/2p6SPlOhE4bFywcXILDc7D3ARKcpzSLJk1MzjeDwWXtKlqg5geNT3xstj/DXMLZS/Y
+         /2lA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720795692; x=1721400492;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uZsqMw09jqxGLOzroUJQUOORh6B+OaGFknZXtQVFLK8=;
+        b=RBfY7W/xCaZB0lYfWJGA/cucYukd1S0XWm4AP/6dh7hLpOHhhQW6vLM9GufQMf0Mbd
+         Y8mO3V9essxRWwNad6NTbRclyxDy8M+uUKabQAoKCrusv3JlZQcsMTL6XfqsC4PW7iv7
+         567exyIaECpfxV7sj4m+A3HCgiaD/WmytsG/Erx+8etnKB2oxWEcdsJyrW6zWGvlfsaM
+         tQVRaV9WJjj4NqkUh9R6PotN/KwtcHk+XfsDKiY4TaN8pRkC0irJZHhvQ4IPTHqeEv9Z
+         Bcq5uE0PJiVRFeEVlBL0ynys3QTRdC9AJI1UfNhYskoCRUQVrC5PR6/l5qmEE2rNywE2
+         0x9A==
+X-Forwarded-Encrypted: i=1; AJvYcCWW/mXCFu0v1OriwLHKjeNx2sWz79i3SgOa8xGp1dh09xagC6zOaGoIKIC2pwP0PT6rqv4x3YI0+/c/VpeEDF+CpTSW
+X-Gm-Message-State: AOJu0Yw7caYot0A/ghtoyy3iUmzYeEtZntvzNkXEl11ziwYMdE9iiF3H
+	sw2MKYTN0NsSQ/UO8HTeyFEVW/rsT9+gIMqbwPqi/ChknghX3sTb+FXsX1nGOMGKnzAAjFx1rSF
+	dxg==
+X-Google-Smtp-Source: AGHT+IFluPogLhVxKc6h87CEUfyEI/dFcQcRiTFW+Xaf4GzF5S7AOO2yuhtcbygmcEwqy4s9eyQS8X+SVQ0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:90a:cc0d:b0:2c9:9232:75e3 with SMTP id
+ 98e67ed59e1d1-2ca35d38532mr25446a91.4.1720795691618; Fri, 12 Jul 2024
+ 07:48:11 -0700 (PDT)
+Date: Fri, 12 Jul 2024 07:48:10 -0700
+In-Reply-To: <19ecf8c8-d5ac-4cfb-a650-cf072ced81ce@efficios.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/6] Introduce CET supervisor state support
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>,
- "Yang, Weijiang" <weijiang.yang@intel.com>,
- "seanjc@google.com" <seanjc@google.com>, "x86@kernel.org" <x86@kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>
-Cc: "peterz@infradead.org" <peterz@infradead.org>,
- "john.allen@amd.com" <john.allen@amd.com>, "Gao, Chao" <chao.gao@intel.com>,
- "mlevitsk@redhat.com" <mlevitsk@redhat.com>
-References: <20240531090331.13713-1-weijiang.yang@intel.com>
- <67c5a358-0e40-4b2f-b679-33dd0dfe73fb@intel.com>
- <1c2fd06e-2e97-4724-80ab-8695aa4334e7@intel.com>
- <7df3637c85517f5bc4e3583249f919c1b809f370.camel@intel.com>
- <4bba0c20-0cd0-4c1a-abf0-511ba6940a57@intel.com>
- <90a70461d15b9053e0507beda20b448194ba5eb4.camel@intel.com>
-From: Dave Hansen <dave.hansen@intel.com>
-Content-Language: en-US
-Autocrypt: addr=dave.hansen@intel.com; keydata=
- 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
-In-Reply-To: <90a70461d15b9053e0507beda20b448194ba5eb4.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240403140116.3002809-1-vineeth@bitbyteword.org>
+ <ZjJf27yn-vkdB32X@google.com> <CAO7JXPgbtFJO6fMdGv3jf=DfiCNzcfi4Hgfn3hfotWH=FuD3zQ@mail.gmail.com>
+ <CAO7JXPhMfibNsX6Nx902PRo7_A2b4Rnc3UP=bpKYeOuQnHvtrw@mail.gmail.com>
+ <66912820.050a0220.15d64.10f5@mx.google.com> <19ecf8c8-d5ac-4cfb-a650-cf072ced81ce@efficios.com>
+Message-ID: <ZpFCKrRKluacu58x@google.com>
+Subject: Re: [RFC PATCH v2 0/5] Paravirt Scheduling (Dynamic vcpu priority management)
+From: Sean Christopherson <seanjc@google.com>
+To: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Cc: Joel Fernandes <joel@joelfernandes.org>, 
+	Vineeth Remanan Pillai <vineeth@bitbyteword.org>, Ben Segall <bsegall@google.com>, 
+	Borislav Petkov <bp@alien8.de>, Daniel Bristot de Oliveira <bristot@redhat.com>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Dietmar Eggemann <dietmar.eggemann@arm.com>, 
+	"H . Peter Anvin" <hpa@zytor.com>, Ingo Molnar <mingo@redhat.com>, Juri Lelli <juri.lelli@redhat.com>, 
+	Mel Gorman <mgorman@suse.de>, Paolo Bonzini <pbonzini@redhat.com>, Andy Lutomirski <luto@kernel.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Thomas Gleixner <tglx@linutronix.de>, 
+	Valentin Schneider <vschneid@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
+	Steven Rostedt <rostedt@goodmis.org>, Suleiman Souhlal <suleiman@google.com>, 
+	Masami Hiramatsu <mhiramat@kernel.org>, himadrics@inria.fr, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, x86@kernel.org, graf@amazon.com, 
+	drjunior.org@gmail.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 7/11/24 15:55, Edgecombe, Rick P wrote:
->> Where current is a 'task_struct' which is in /proc/slabinfo and 'struct
->> thread_struct thread' and 'struct fpu' are embedded in 'task_struct',
->> not allocated on their own:
-> I think thread_struct is always a slab, but the current->thread.fpu.fpstate
-> pointer can be reallocated to point to a vmalloc in fpstate_realloc(), in the
-> case of XFD features.
+On Fri, Jul 12, 2024, Mathieu Desnoyers wrote:
+> On 2024-07-12 08:57, Joel Fernandes wrote:
+> > On Mon, Jun 24, 2024 at 07:01:19AM -0400, Vineeth Remanan Pillai wrote:
+> [...]
+> > > Existing use cases
+> > > -------------------------
+> > > 
+> > > - A latency sensitive workload on the guest might need more than one
+> > > time slice to complete, but should not block any higher priority task
+> > > in the host. In our design, the latency sensitive workload shares its
+> > > priority requirements to host(RT priority, cfs nice value etc). Host
+> > > implementation of the protocol sets the priority of the vcpu task
+> > > accordingly so that the host scheduler can make an educated decision
+> > > on the next task to run. This makes sure that host processes and vcpu
+> > > tasks compete fairly for the cpu resource.
+> 
+> AFAIU, the information you need to convey to achieve this is the priority
+> of the task within the guest. This information need to reach the host
+> scheduler to make informed decision.
+> 
+> One thing that is unclear about this is what is the acceptable
+> overhead/latency to push this information from guest to host ?
+> Is an hypercall OK or does it need to be exchanged over a memory
+> mapping shared between guest and host ?
+> 
+> Hypercalls provide simple ABIs across guest/host, and they allow
+> the guest to immediately notify the host (similar to an interrupt).
 
-Good point. I was ignoring XFD and AMX.  They're super rare and
-(conditionally) add another 8k. -- Well, closer to 11k since we
-duplicate some of the XSAVE area. --  But honestly, even if the AMX
-'struct fpu' fit perfectly into 4k*3 pages and CET-S made it take 4k*4
-pages,  I'm not sure I'd even care.  It would only affect AMX-using apps
-on AMX-capable hardware.  So a small minority of tasks on a small
-minority of one x86 vendor's CPUs.
+Hypercalls have myriad problems.  They require a VM-Exit, which largely defeats
+the purpose of boosting the vCPU priority for performance reasons.  They don't
+allow for delegation as there's no way for the hypervisor to know if a hypercall
+from guest userspace should be allowed, versus anything memory based where the
+ability for guest userspace to access the memory demonstrates permission (else
+the guest kernel wouldn't have mapped the memory into userspace).
 
-The (potential) space consumption from the inline task_struct fpu will
-matter a lot more across all Linux users than AMX ever will.  It would
-affect all tasks on all CPUs that have CET-S which will hopefully be the
-majority of x86 CPUs running Linux some day.
+> > > Ideas brought up during offlist discussion
+> > > -------------------------------------------------------
+> > > 
+> > > 1. rseq based timeslice extension mechanism[1]
+> > > 
+> > > While the rseq based mechanism helps in giving the vcpu task one more
+> > > time slice, it will not help in the other use cases. We had a chat
+> > > with Steve and the rseq mechanism was mainly for improving lock
+> > > contention and would not work best with vcpu boosting considering all
+> > > the use cases above. RT or high priority tasks in the VM would often
+> > > need more than one time slice to complete its work and at the same,
+> > > should not be hurting the host workloads. The goal for the above use
+> > > cases is not requesting an extra slice, but to modify the priority in
+> > > such a way that host processes and guest processes get a fair way to
+> > > compete for cpu resources. This also means that vcpu task can request
+> > > a lower priority when it is running lower priority tasks in the VM.
 
+Then figure out a way to let userspace boot a task's priority without needing a
+syscall.  vCPUs are not directly schedulable entities, the task doing KVM_RUN
+on the vCPU fd is what the scheduler sees.  Any scheduling enhancement that
+benefits vCPUs by definition can benefit userspace tasks.
 
+> > I was looking at the rseq on request from the KVM call, however it does not
+> > make sense to me yet how to expose the rseq area via the Guest VA to the host
+> > kernel.  rseq is for userspace to kernel, not VM to kernel.
+
+Any memory that is exposed to host userspace can be exposed to the guest.  Things
+like this are implemented via "overlay" pages, where the guest asks host userspace
+to map the magic page (rseq in this case) at GPA 'x'.  Userspace then creates a
+memslot that overlays guest RAM to map GPA 'x' to host VA 'y', where 'y' is the
+address of the page containing the rseq structure associated with the vCPU (in
+pretty much every modern VMM, each vCPU has a dedicated task/thread).
+
+A that point, the vCPU can read/write the rseq structure directly.
+
+The reason us KVM folks are pushing y'all towards something like rseq is that
+(again, in any modern VMM) vCPUs are just tasks, i.e. priority boosting a vCPU
+is actually just priority boosting a task.  So rather than invent something
+virtualization specific, invent a mechanism for priority boosting from userspace
+without a syscall, and then extend it to the virtualization use case.
+
+> > Steven Rostedt said as much as well, thoughts? Add Mathieu as well.
+> 
+> I'm not sure that rseq would help at all here, but I think we may want to
+> borrow concepts of data sitting in shared memory across privilege levels
+> and apply them to VMs.
+> 
+> If some of the ideas end up being useful *outside* of the context of VMs,
+
+Modulo the assertion above that this is is about boosting priority instead of
+requesting an extended time slice, this is essentially the same thing as the
+"delay resched" discussion[*].  The only difference is that the vCPU is in a
+critical section, e.q. IRQ handler, versus the userspace task being in a critical
+section.
+
+[*] https://lore.kernel.org/all/20231025054219.1acaa3dd@gandalf.local.home
+
+> then I'd be willing to consider adding fields to rseq. But as long as it is
+> VM-specific, I suspect you'd be better with dedicated per-vcpu pages which
+> you can safely share across host/guest kernels.
 
