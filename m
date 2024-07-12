@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-21548-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21549-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB13892FEF2
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 19:04:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 948FC92FEF4
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 19:04:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DE9E1F213C4
-	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 17:04:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 470B328286A
+	for <lists+kvm@lfdr.de>; Fri, 12 Jul 2024 17:04:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 632CA17B43D;
-	Fri, 12 Jul 2024 17:01:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A198717B4FD;
+	Fri, 12 Jul 2024 17:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FZbsFT+f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="n5/MBrQ8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f74.google.com (mail-wr1-f74.google.com [209.85.221.74])
+Received: from mail-wm1-f73.google.com (mail-wm1-f73.google.com [209.85.128.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2E017B420
-	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 17:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2966817B420
+	for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 17:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720803683; cv=none; b=VeynBTOGs6c0ESCdSJ/cadcal3GQdSLe8DoQ8g4Wh5cTDRE5LSOQ+V2ed4g98gxG8yb/54BfIxlfVbJftoyxwg3sFyhoQ65FRz1464RnsQ/DpT05aXZaIKze3IzhCjA9/MqouDStkpqoCcwdstfBoubR4GG/MdycqAi/IDZeR0Y=
+	t=1720803686; cv=none; b=VX68bq4Iaxh5NgVY3YlaMFXIhVlmOoeyauGmHN03TwY5UP6a7f1UvebClw4RiCFE4yvuXGslwberJtGmDrxuxmakNfLp82BLrJjk9tqE1TshRNO9or3grgCp4ILls9tC0wR1ifwhz1VVneGNztq15WzYFGylOLvN185++DORanI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720803683; c=relaxed/simple;
-	bh=JV+LctEmZ8RVScnNvPDQmSmCQdrPRydUorU75kWraZk=;
+	s=arc-20240116; t=1720803686; c=relaxed/simple;
+	bh=tmQea9Di7/WAZR/rcHWCtTHIP3bmxSVvEz9ipvVMY+I=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=p9wXEem6RUzMsTgdvPtf3jaUrm/+tCjy3tkE8t743AFAqnrepWsL/xE7ak4rRAWRLKbzpj9VNd1f+BfSHJ4Tvs2jO/kHa1XjbXMR0oAKyc06fEFR7o7a1Ji6PR37OymWsO24hZSGuWIMJQKe2URQFYF8xeCsiqKeNF0ZRdz00qE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FZbsFT+f; arc=none smtp.client-ip=209.85.221.74
+	 To:Cc:Content-Type; b=aUUoI3Nvs7f4nbTGH1ozeEcTVD7Rk4vVufKE/azvDP6na4udGvKzWmqnWlo7kd3v3lTAyYCGw63CcTIbJqnVpXieXcifHA9CsneQ1yYkSUe+5AiqD3b46MM3vpvoNjBr8k2UIo7zE2KXcqyfLkqLkTdfbK7wnfAkVZcDsZ16mEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=n5/MBrQ8; arc=none smtp.client-ip=209.85.128.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jackmanb.bounces.google.com
-Received: by mail-wr1-f74.google.com with SMTP id ffacd0b85a97d-367960f4673so1771430f8f.1
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 10:01:21 -0700 (PDT)
+Received: by mail-wm1-f73.google.com with SMTP id 5b1f17b1804b1-426620721c2so15369225e9.2
+        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 10:01:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1720803680; x=1721408480; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1720803684; x=1721408484; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jms+qnUoGWR3Ok8D5PSRh1HvZeNFLLNfdQwhqdA9AN8=;
-        b=FZbsFT+fMDAuUgio48QK61G8Yxlx/8W5pbGp04kifviTcGbOfXubWv+6lPj7XuuRIm
-         JoGdvNbW7IXh54dcdDR+0Gx8G0PABCk6RdhxkKcKyNzcLq2s+baZ67N6sT0u07UaefZt
-         i8A//X66F5F9HiH7RkFxhKM4y3gnO8h99dP5blKtBPczwkXB2gd9BvgY7x955J44ueCF
-         nz/W+DYg3rXxwQAvJPPCdh3QEIefThWUbVRRRJr7fN5vwjmNG5+9ayeZPc08Tc4i/tr6
-         /+Q8LnNcd9K7msMIe1kBVfg9P/U3Lg6zC00FNdq9vuRHaAGGhvnuedXt8QX29oWTTNB5
-         Cz+w==
+        bh=tzyFc6toxGAQrtxbLGqZIE4RB+JOOXOhclq2H8+llZE=;
+        b=n5/MBrQ8NNpA/RaOk0E8Oj95aR2bIk/2lc6ePuHi4uBrmx9SsgkDSLIq8MvPJ4b0sH
+         +Fp1RwJBKnHWVT2mV9je+DuWL9TG3iLs6FWkK+3pg4Rln5ornjYd+6qF6XDfAnLzWXH+
+         +zw1ppScMVdlk2c595Rw/41aLLLsz5J29I8jGYzRoQoKpWaF22rZYC97dsF/nBMlP0zp
+         VZYd4wF/4/muZhGrl16FbkT8yExRvhyaHRfxbbxjkfaZ0SseLb+VRzXwSThg0MxXLKkI
+         J2bBMeuCo/vJ0NdP2k6E94LGA9EKNUJTTwzJVtTMMMhnuEg1Ir+aGZG0QdPJXmb82583
+         AkEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720803680; x=1721408480;
+        d=1e100.net; s=20230601; t=1720803684; x=1721408484;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jms+qnUoGWR3Ok8D5PSRh1HvZeNFLLNfdQwhqdA9AN8=;
-        b=GBT6k5nLKMbHKhrd7AL9a8sNzIxSOZ1wTho0hzG/alJX/Z5lCZ2+0/bXVAXXClixQJ
-         bEYWBkab+5fYUaCPzIdbrt0AL2hFCcLVtHa1yhPD/ei82dPzrC5coKsKa4KqmaxwQaq4
-         JyKYjCPkRnTmFusq/IcKaYOwzeQe4rpvEzw5aQ5LxagfcTuqdrzmomje8EPRU2RQ6rq1
-         aOk7NOXOxnI4QdiNSXnin6R9dCQThtdJd/FfNIIupocLO5PPSFEaBPeES97+hBCn24YX
-         rJe6fOWIT8Nsk2a2KB8FymMSG3IKF3Il+jYOTYhRzv08MSN5I0mVUmCZeFe/YQuMB5hp
-         VXYA==
-X-Forwarded-Encrypted: i=1; AJvYcCWp53pFDk9eHyoKQGzL0wzPDCdJF1uigAYR6CNPodRli9vK7z24mwikK2m/cjHuhY+0FdNm496FiaQ+wzfLNaLSByZW
-X-Gm-Message-State: AOJu0YykH+tSDDZtxvvtKKADJEoG6mM0eYcXYuGv6vh0fC4M4nKY8mXz
-	5O4KlZR5O2cjMyYNeddzEPleKaJN+VflEtoikzbrpvmed6AmoNwnlgnGdIOvrg1xD2hUubWkCNy
-	Q4MXY84p7Ag==
-X-Google-Smtp-Source: AGHT+IGisRm/zH5xPuc3vZntkMct9zRaY/l9dILlFDVOJcrKy+wGrjnqUwhX4l9eAthBD2p9mDlo+nx2x2+a6A==
+        bh=tzyFc6toxGAQrtxbLGqZIE4RB+JOOXOhclq2H8+llZE=;
+        b=dsdqXSuE1g2tUL6LDvFFoh0Yv1KddtwP+1LZeIBy5FWc3pQxaWL8WJNXD+zTq0jxqG
+         wNHAWi/g/uLGxBoUH+EOtFc1DPz8XjsD6ZXNEfuV/YnQGJximfI0yen5jXZgbXxRonp1
+         MZbgey8hq+kLffKyyinZlPgtUaJFkl0uqhdg9hvHyx0awM0mlO37rmAZjk4o2xotZPsH
+         Cj/HIYWul7titDwN4j3s6OvIVaC/e56xhNViX7UEu8B3Byx0VNVQnihbEhO7J58UnIN2
+         a34fCiihKT0QlOj3BUJVYEA4EUMN8QbkPWc5sbEYoyk4F5ANV7PofIRCiMy5yIOY+8GX
+         m1MQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVMb9E5nuaVoAg94h24cn6u83ritpmSMFIpkm+qnFVlM0e/cOgcSTfaaNHqioYpE4JOEH8AtZXteG6pIjjwsPgsV9M+
+X-Gm-Message-State: AOJu0YziKb+oN+z7tBsdmKtw2k8e5P/y9BvXvwg4ad5Sf2KdjrHvGCyE
+	880YewsY2lJs4l6OCGFINqEJdwKoUa8bYNZj+l+FhbI790Crr0eEH3e9l5GopNNAEyRz3GuVqfI
+	t+sxSJtg87g==
+X-Google-Smtp-Source: AGHT+IEU6XhUTfh8cq6gCvMggnXLFkSt7XlYIzIUi6HAiuQhdPaLLmoiwQpzZ2rTTEjQ37T3mDQb8/UfRpK6jw==
 X-Received: from beeg.c.googlers.com ([fda3:e722:ac3:cc00:28:9cb1:c0a8:11db])
- (user=jackmanb job=sendgmr) by 2002:a7b:cb11:0:b0:426:670b:20bf with SMTP id
- 5b1f17b1804b1-427a0a24cb6mr168765e9.0.1720803680269; Fri, 12 Jul 2024
- 10:01:20 -0700 (PDT)
-Date: Fri, 12 Jul 2024 17:00:28 +0000
+ (user=jackmanb job=sendgmr) by 2002:a05:600c:4f0e:b0:426:6a73:fb5f with SMTP
+ id 5b1f17b1804b1-426708f9ab5mr1904875e9.7.1720803683507; Fri, 12 Jul 2024
+ 10:01:23 -0700 (PDT)
+Date: Fri, 12 Jul 2024 17:00:29 +0000
 In-Reply-To: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,9 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240712-asi-rfc-24-v1-0-144b319a40d8@google.com>
 X-Mailer: b4 0.14-dev
-Message-ID: <20240712-asi-rfc-24-v1-10-144b319a40d8@google.com>
-Subject: [PATCH 10/26] mm: asi: Avoid warning from NMI userspace accesses in
- ASI context
+Message-ID: <20240712-asi-rfc-24-v1-11-144b319a40d8@google.com>
+Subject: [PATCH 11/26] mm: asi: ASI page table allocation functions
 From: Brendan Jackman <jackmanb@google.com>
 To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, "H. Peter Anvin" <hpa@zytor.com>, 
@@ -99,68 +98,92 @@ Cc: x86@kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org,
 	kvm@vger.kernel.org, Brendan Jackman <jackmanb@google.com>
 Content-Type: text/plain; charset="utf-8"
 
-nmi_uaccess_okay() emits a warning if current CR3 != mm->pgd.
-Limit the warning to only when ASI is not active.
+From: Junaid Shahid <junaids@google.com>
 
-Co-developed-by: Junaid Shahid <junaids@google.com>
+This adds custom allocation and free functions for ASI page tables.
+
+The alloc functions support allocating memory using different GFP
+reclaim flags, in order to be able to support non-sensitive allocations
+from both standard and atomic contexts. They also install the page
+tables locklessly, which makes it slightly simpler to handle
+non-sensitive allocations from interrupts/exceptions.
+
+Signed-off-by: Junaid Shahid <junaids@google.com>
 Signed-off-by: Brendan Jackman <jackmanb@google.com>
 ---
- arch/x86/mm/tlb.c | 28 +++++++++++++++++++++++-----
- 1 file changed, 23 insertions(+), 5 deletions(-)
+ arch/x86/mm/asi.c | 59 +++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
 
-diff --git a/arch/x86/mm/tlb.c b/arch/x86/mm/tlb.c
-index 02f73a71d4ea..e80cd67a5239 100644
---- a/arch/x86/mm/tlb.c
-+++ b/arch/x86/mm/tlb.c
-@@ -1326,6 +1326,24 @@ void arch_tlbbatch_flush(struct arch_tlbflush_unmap_batch *batch)
- 	put_cpu();
+diff --git a/arch/x86/mm/asi.c b/arch/x86/mm/asi.c
+index 0ba156f879d3..8798aab66748 100644
+--- a/arch/x86/mm/asi.c
++++ b/arch/x86/mm/asi.c
+@@ -71,6 +71,65 @@ void asi_unregister_class(int index)
  }
+ EXPORT_SYMBOL_GPL(asi_unregister_class);
  
-+static inline bool cr3_matches_current_mm(void)
-+{
-+	struct asi *asi = asi_get_current();
-+	pgd_t *cr3_pgd;
++#ifndef mm_inc_nr_p4ds
++#define mm_inc_nr_p4ds(mm)	do {} while (false)
++#endif
 +
-+	/*
-+	 * Prevent read_cr3_pa -> [NMI, asi_exit] -> asi_get_current,
-+	 * otherwise we might find CR3 pointing to the ASI PGD but not
-+	 * find a current ASI domain.
-+	 */
-+	barrier();
-+	cr3_pgd = __va(read_cr3_pa());
++#ifndef mm_dec_nr_p4ds
++#define mm_dec_nr_p4ds(mm)	do {} while (false)
++#endif
 +
-+	if (cr3_pgd == current->mm->pgd)
-+		return true;
-+	return asi && (cr3_pgd == asi_pgd(asi));
++#define pte_offset		pte_offset_kernel
++
++/*
++ * asi_p4d_alloc, asi_pud_alloc, asi_pmd_alloc, asi_pte_alloc.
++ *
++ * These are like the normal xxx_alloc functions, but:
++ *
++ *  - They use atomic operations instead of taking a spinlock; this allows them
++ *    to be used from interrupts. This is necessary because we use the page
++ *    allocator from interrupts and the page allocator ultimately calls this
++ *    code.
++ *  - They support customizing the allocation flags.
++ *
++ * On the other hand, they do not use the normal page allocation infrastructure,
++ * that means that PTE pages do not have the PageTable type nor the PagePgtable
++ * flag and we don't increment the meminfo stat (NR_PAGETABLE) as they do.
++ */
++static_assert(!IS_ENABLED(CONFIG_PARAVIRT));
++#define DEFINE_ASI_PGTBL_ALLOC(base, level)				\
++__maybe_unused								\
++static level##_t * asi_##level##_alloc(struct asi *asi,			\
++				       base##_t *base, ulong addr,	\
++				       gfp_t flags)			\
++{									\
++	if (unlikely(base##_none(*base))) {				\
++		ulong pgtbl = get_zeroed_page(flags);			\
++		phys_addr_t pgtbl_pa;					\
++									\
++		if (!pgtbl)						\
++			return NULL;					\
++									\
++		pgtbl_pa = __pa(pgtbl);					\
++									\
++		if (cmpxchg((ulong *)base, 0,				\
++			    pgtbl_pa | _PAGE_TABLE) != 0) {		\
++			free_page(pgtbl);				\
++			goto out;					\
++		}							\
++									\
++		mm_inc_nr_##level##s(asi->mm);				\
++	}								\
++out:									\
++	VM_BUG_ON(base##_leaf(*base));					\
++	return level##_offset(base, addr);				\
 +}
 +
- /*
-  * Blindly accessing user memory from NMI context can be dangerous
-  * if we're in the middle of switching the current user task or
-@@ -1341,10 +1359,10 @@ bool nmi_uaccess_okay(void)
- 	VM_WARN_ON_ONCE(!loaded_mm);
- 
- 	/*
--	 * The condition we want to check is
--	 * current_mm->pgd == __va(read_cr3_pa()).  This may be slow, though,
--	 * if we're running in a VM with shadow paging, and nmi_uaccess_okay()
--	 * is supposed to be reasonably fast.
-+	 * The condition we want to check that CR3 points to either
-+	 * current_mm->pgd or an appropriate ASI PGD. Reading CR3 may be slow,
-+	 * though, if we're running in a VM with shadow paging, and
-+	 * nmi_uaccess_okay() is supposed to be reasonably fast.
- 	 *
- 	 * Instead, we check the almost equivalent but somewhat conservative
- 	 * condition below, and we rely on the fact that switch_mm_irqs_off()
-@@ -1353,7 +1371,7 @@ bool nmi_uaccess_okay(void)
- 	if (loaded_mm != current_mm)
- 		return false;
- 
--	VM_WARN_ON_ONCE(current_mm->pgd != __va(read_cr3_pa()));
-+	VM_WARN_ON_ONCE(!cr3_matches_current_mm());
- 
- 	return true;
- }
++DEFINE_ASI_PGTBL_ALLOC(pgd, p4d)
++DEFINE_ASI_PGTBL_ALLOC(p4d, pud)
++DEFINE_ASI_PGTBL_ALLOC(pud, pmd)
++DEFINE_ASI_PGTBL_ALLOC(pmd, pte)
++
+ void __init asi_check_boottime_disable(void)
+ {
+ 	bool enabled = IS_ENABLED(CONFIG_MITIGATION_ADDRESS_SPACE_ISOLATION_DEFAULT_ON);
 
 -- 
 2.45.2.993.g49e7a77208-goog
