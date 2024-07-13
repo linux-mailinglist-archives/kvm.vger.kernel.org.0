@@ -1,158 +1,133 @@
-Return-Path: <kvm+bounces-21599-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21598-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35BDE93046C
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 10:04:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBCD793046B
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 10:00:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CDD91F24331
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 08:04:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08C161C23128
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 08:00:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DAFC2940D;
-	Sat, 13 Jul 2024 08:04:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OX0Jmdnk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E603B3FBA7;
+	Sat, 13 Jul 2024 08:00:37 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF8F1FB4;
-	Sat, 13 Jul 2024 08:04:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from cmccmta2.chinamobile.com (cmccmta4.chinamobile.com [111.22.67.137])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5CDE1DFE3;
+	Sat, 13 Jul 2024 08:00:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=111.22.67.137
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720857874; cv=none; b=akn3rQlT+nw0hSwWwoi43u52x+Vvs29wIkmvNzEeaG6zv6yWAo6hgL0vRGiXxh9D2ef/xyF1ochSsPz5vkSBIDykHdsFTxRZ7+orZOK05aXjaR/Ewr+qqrI1p1cfEScSEjat9wPRpjPqgS5BihWtKpCobtQZYMJWExA428LVXkY=
+	t=1720857637; cv=none; b=tMpOvwMujun9u/bxSrCvXygiuXhWUYenVfodnlvEVvADS8PUN+p7OTCscZiWRajbefdYjQSV0+ZVVrUlczPjXBq6B5J/SJcQijycjUAeqAebAvH7liNJaAfO6Q+2a/Mr0tRyboPckBqpEPE8kQdfyD8ZuudmVk/J6nTZKwjt6ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720857874; c=relaxed/simple;
-	bh=nE2mhPrr3YyGaYn+mzlgQmFx15z5pUfHCBByh86gxOk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Mz0TvpnNVHbHUwzo7sC0obA0CKDLxY6KOSaasWBQHvM2B9a5F625KvIhIuYuaALFwOAPeUvooXXjJvEbZZfmC5q4ooV3hERvyb4E7p+W/vbvU9fTmQwWTegkhKf1kU7Ewun1AuRsukozQbhDOwdbXcT+841tLnVFZLX85rOPJLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OX0Jmdnk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DAB3C32781;
-	Sat, 13 Jul 2024 08:04:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720857874;
-	bh=nE2mhPrr3YyGaYn+mzlgQmFx15z5pUfHCBByh86gxOk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OX0JmdnkJFAa+BQKjT0NqWPU5cIoM74Fgg+QN1RahO5zV6AaScHeun3TJiJJQ0gyP
-	 4HLq145Jy6oGUBX3rqnW4SUWX8J5KlU8KKLxVGpWUNvtgvz2EixtVyq2YqrFnbzLgZ
-	 B5Cb+g5sudZyXrHw2NRKN1sr65Im9VWBWO9fOV9OLptz9dr9UxHFtNH6To2bfkI5F4
-	 QLG39dwikya+iJqSFcBkSnLzdgQlGMiy+kUg3dCS9cH4QL8mWiSRT24uYwH6MMGncl
-	 Fdx8OQG3nxWwFYBfCVKCe3TLCp4AbBObkvBgbK1yYMwR5Ie/EqyDb+cwk7KUP8gmiQ
-	 TliyR2l+YFrAA==
-Received: from [213.208.208.122] (helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sSXk7-00C3ly-SZ;
-	Sat, 13 Jul 2024 09:04:32 +0100
-Date: Sat, 13 Jul 2024 09:04:31 +0100
-Message-ID: <87zfqlogz4.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Anshuman Khandual <anshuman.khandual@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 01/12] arm64: Add missing APTable and TCR_ELx.HPD masks
-In-Reply-To: <3fc8eccd-21a7-40d8-9851-24941c8414da@arm.com>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240625133508.259829-2-maz@kernel.org>
-	<3fc8eccd-21a7-40d8-9851-24941c8414da@arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1720857637; c=relaxed/simple;
+	bh=hfYPjA00LDasRjY3/gpjinYkFcjZGczV5jqxpJ8QJ1w=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=qbDodX7ZwWF/0bNsC0/WLwMzyRij/3Z/lAWUC8EnCwnvfeR+uHr1f2hlEIBuuzyQLkbxjJbJsK0e6co22LH/zRPbndTM9SZRfImabfZNS71S7piBzqffkfkGdc+Ibu4meU7qzUl2lX1vLCyOGvT5bcowufsEai1mGQExXylB7no=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com; spf=pass smtp.mailfrom=cmss.chinamobile.com; arc=none smtp.client-ip=111.22.67.137
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cmss.chinamobile.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cmss.chinamobile.com
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from spf.mail.chinamobile.com (unknown[10.188.0.87])
+	by rmmx-syy-dmz-app08-12008 (RichMail) with SMTP id 2ee866923415806-7e832;
+	Sat, 13 Jul 2024 16:00:21 +0800 (CST)
+X-RM-TRANSID:2ee866923415806-7e832
+X-RM-TagInfo: emlType=0                                       
+X-RM-SPAM-FLAG:00000000
+Received:from localhost.localdomain.localdomain (unknown[223.108.79.100])
+	by rmsmtp-syy-appsvr01-12001 (RichMail) with SMTP id 2ee16692340ccff-6eea7;
+	Sat, 13 Jul 2024 16:00:21 +0800 (CST)
+X-RM-TRANSID:2ee16692340ccff-6eea7
+From: tangbin <tangbin@cmss.chinamobile.com>
+To: zhaotianrui@loongson.cn,
+	maobibo@loongson.cn,
+	chenhuacai@kernel.org,
+	kernel@xen0n.name
+Cc: kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	tangbin <tangbin@cmss.chinamobile.com>
+Subject: [PATCH] LoongArch: KVM: Remove redundant assignment in kvm_map_page_fast
+Date: Sat, 13 Jul 2024 11:59:37 -0400
+Message-Id: <20240713155937.45261-1-tangbin@cmss.chinamobile.com>
+X-Mailer: git-send-email 2.18.4
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 213.208.208.122
-X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Jul 2024 09:32:12 +0100,
-Anshuman Khandual <anshuman.khandual@arm.com> wrote:
-> 
-> 
-> 
-> On 6/25/24 19:05, Marc Zyngier wrote:
-> > Although Linux doesn't make use of hierarchical permissions (TFFT!),
-> > KVM needs to know where the various bits related to this feature
-> > live in the TCR_ELx registers as well as in the page tables.
-> > 
-> > Add the missing bits.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/include/asm/kvm_arm.h       | 1 +
-> >  arch/arm64/include/asm/pgtable-hwdef.h | 7 +++++++
-> >  2 files changed, 8 insertions(+)
-> > 
-> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
-> > index b2adc2c6c82a5..c93ee1036cb09 100644
-> > --- a/arch/arm64/include/asm/kvm_arm.h
-> > +++ b/arch/arm64/include/asm/kvm_arm.h
-> > @@ -108,6 +108,7 @@
-> >  /* TCR_EL2 Registers bits */
-> >  #define TCR_EL2_DS		(1UL << 32)
-> >  #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
-> > +#define TCR_EL2_HPD		(1 << 24)
-> >  #define TCR_EL2_TBI		(1 << 20)
-> >  #define TCR_EL2_PS_SHIFT	16
-> >  #define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
-> > diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
-> > index 9943ff0af4c96..f75c9a7e6bd68 100644
-> > --- a/arch/arm64/include/asm/pgtable-hwdef.h
-> > +++ b/arch/arm64/include/asm/pgtable-hwdef.h
-> > @@ -146,6 +146,7 @@
-> >  #define PMD_SECT_UXN		(_AT(pmdval_t, 1) << 54)
-> >  #define PMD_TABLE_PXN		(_AT(pmdval_t, 1) << 59)
-> >  #define PMD_TABLE_UXN		(_AT(pmdval_t, 1) << 60)
-> > +#define PMD_TABLE_AP		(_AT(pmdval_t, 3) << 61)
-> 
-> APTable bits are also present in all table descriptors at each non-L3
-> level. Should not corresponding corresponding macros i.e PUD_TABLE_AP,
-> P4D_TABLE_AP, and PGD_TABLE_AP be added as well ?
+In the function kvm_map_page_fast, the assignment of 'ret' is
+redundant, so remove it.
 
-My problem with that is that it doesn't make much sense from an
-architecture perspective. It doesn't define any of these, because
-these names make no sense.
+Signed-off-by: tangbin <tangbin@cmss.chinamobile.com>
+---
+ arch/loongarch/kvm/mmu.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-Maybe I should just drop the PMD prefix and write it as S1_TABLE_AP,
-so that it can be reused if we ever need the P*D names.
-
-> 
-> >  
-> >  /*
-> >   * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
-> > @@ -307,6 +308,12 @@
-> >  #define TCR_TCMA1		(UL(1) << 58)
-> >  #define TCR_DS			(UL(1) << 59)
-> >  
-> > +#define TCR_HPD0_SHIFT		41
-> > +#define TCR_HPD0		BIT(TCR_HPD0_SHIFT)
-> > +
-> > +#define TCR_HPD1_SHIFT		42
-> > +#define TCR_HPD1		BIT(TCR_HPD1_SHIFT)
-> 
-> Should not these new register fields follow the current ascending bit
-> order in the listing i.e get added after TCR_HD (bit 40).
-
-Yup, I'll move them up.
-
-Thanks,
-
-	M.
-
+diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+index 2634a9e8d..d6c922a4a 100644
+--- a/arch/loongarch/kvm/mmu.c
++++ b/arch/loongarch/kvm/mmu.c
+@@ -551,7 +551,6 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
+  */
+ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+ {
+-	int ret = 0;
+ 	kvm_pfn_t pfn = 0;
+ 	kvm_pte_t *ptep, changed, new;
+ 	gfn_t gfn = gpa >> PAGE_SHIFT;
+@@ -563,20 +562,16 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+ 
+ 	/* Fast path - just check GPA page table for an existing entry */
+ 	ptep = kvm_populate_gpa(kvm, NULL, gpa, 0);
+-	if (!ptep || !kvm_pte_present(NULL, ptep)) {
+-		ret = -EFAULT;
++	if (!ptep || !kvm_pte_present(NULL, ptep))
+ 		goto out;
+-	}
+ 
+ 	/* Track access to pages marked old */
+ 	new = kvm_pte_mkyoung(*ptep);
+ 	/* call kvm_set_pfn_accessed() after unlock */
+ 
+ 	if (write && !kvm_pte_dirty(new)) {
+-		if (!kvm_pte_write(new)) {
+-			ret = -EFAULT;
++		if (!kvm_pte_write(new))
+ 			goto out;
+-		}
+ 
+ 		if (kvm_pte_huge(new)) {
+ 			/*
+@@ -584,10 +579,8 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+ 			 * enabled for HugePages
+ 			 */
+ 			slot = gfn_to_memslot(kvm, gfn);
+-			if (kvm_slot_dirty_track_enabled(slot)) {
+-				ret = -EFAULT;
++			if (kvm_slot_dirty_track_enabled(slot))
+ 				goto out;
+-			}
+ 		}
+ 
+ 		/* Track dirtying of writeable pages */
+@@ -615,10 +608,10 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+ 		if (page)
+ 			put_page(page);
+ 	}
+-	return ret;
++	return 0;
+ out:
+ 	spin_unlock(&kvm->mmu_lock);
+-	return ret;
++	return -EFAULT;
+ }
+ 
+ static bool fault_supports_huge_mapping(struct kvm_memory_slot *memslot,
 -- 
-Without deviation from the norm, progress is not possible.
+2.18.4
+
+
+
 
