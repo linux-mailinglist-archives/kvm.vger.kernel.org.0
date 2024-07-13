@@ -1,109 +1,143 @@
-Return-Path: <kvm+bounces-21596-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21597-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDFFF930419
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 08:20:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 021AD930460
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 09:56:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B61C1C22225
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 06:20:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DD801F2366E
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 07:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410471DFEA;
-	Sat, 13 Jul 2024 06:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C06741C75;
+	Sat, 13 Jul 2024 07:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iKz36vE0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TE8BzzH9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB971B960
-	for <kvm@vger.kernel.org>; Sat, 13 Jul 2024 06:20:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23891BDD3;
+	Sat, 13 Jul 2024 07:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720851606; cv=none; b=UiWqfwt8pJWHHvlgnuUd0WBKhpjJ6c+NwZ60hpRqBtXcOIH/e4A21hQohRej+FKhl0/rtCAWtnGMpLclRFpAu2794Xm054/9hdtDuGAW3dtIZ55wyIq6jhrfPPJo5tmHnaA5yfdIBnnB9sSEECcSDEJysnvvSYhCdz9emS3UA98=
+	t=1720857406; cv=none; b=I0DLnf12xzE2p4mxZj/XX6vMwNigf8xWjtK9pzkm3ciiZRYsD+svqYw/dzUpAGgnUwfBRLhsF7U2dopVD6o7plMmKReRugYjOno30W6rtPzURdD/X8vzIycOcE91kgPqr/9ietEHBnJzNbEPHxDN9TMxI85iyOV65vL/Px60CTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720851606; c=relaxed/simple;
-	bh=okrl4WgmUPIOJBtqpb5AbjaOtQyQNQE2oG8Fhm5BE+A=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=qnenBzceiH9ORmcByPlhkPZXT0h39BdtDEU0QHmjsF6h9G+XToHCkdAKRFAthQLC9nQdMulmgB9my0NBduW1HJUwF2GauB9fcLTsPTW6Ouj2AgpN1DBGUCCfeYvURbIN77XUJAU/iM10K02X8s6UZH4rzeD+zwxY4aLR+0TcEMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iKz36vE0; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-52e9c6b5a62so2875885e87.0
-        for <kvm@vger.kernel.org>; Fri, 12 Jul 2024 23:20:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1720851603; x=1721456403; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:reply-to
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3lV1qdhSigsYBVlEbZ3lJ64qYaWNwuyswUrONuumPRs=;
-        b=iKz36vE0ibPHtuukdB4FGq3DAes/eH+XKzq0H9wlB20fGabfDu54NLhu/Q6ppt0iGU
-         TRSXDnTeGPxmy/X8ozlR0Y3u4j4+gs0pBMoEhC+FdMyreWXzF340Z/y3A3uKCYvkahnK
-         dYb/kQ9BNp6XArwXimGUt0OKtXwKMBH89AMUvhr9Ql0Ea0jC1Ko0zI0THHoWogXpRK/V
-         XP/7LaNUiQnCRPMa8rEtWRdySdbOQ0tiCqMpSmol5B0Z1wDWMPV/b+tN/HsDegsvq2Vq
-         1/V458oaD9pDgtf8KTYrYuZTtuw8AFG4DEBVwIR49cZ8Fn2tP8/iIxv/LWVAAXc35D/L
-         aTpw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1720851603; x=1721456403;
-        h=content-transfer-encoding:in-reply-to:organization:reply-to
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3lV1qdhSigsYBVlEbZ3lJ64qYaWNwuyswUrONuumPRs=;
-        b=NCDTROnWOTATtQrlPNaJqibH4XWJwStV1Mz0e7mMxM1NIvc68J24UFduadTm7WKiop
-         qkQPIP/SFgQaXuCbT1ajYt0XI7qf9ti/N4+o81QR51NtlGbyt7SvYCnxo8ht5kZoKGy9
-         /AahJlOrZRdmGJ6CL72ZIs97eTYsEZDbTB8MDlhC4HeIWhw1Or3j5zyWMOjAYEXu//sn
-         G2aABsSjT8suXqhelv7Y+QyDeULU+bxeelJ49KKcUEok2jxSZNzEumWK7EV1ypCCupfw
-         +0eFaDdWdu3UcgeFwGO7l7pEHZNj3krOKi3HkOT1bkjuu16gNh5FipDA6RpI81fqWLqW
-         qweA==
-X-Forwarded-Encrypted: i=1; AJvYcCWYpPHX95XJJNmNcsqyKq22PQwK79r/qFUZPn+Zlo4zAaQREQCUuey/kHDTpnL18CqQq6B2swX911CHNueCfVGxjUb8
-X-Gm-Message-State: AOJu0YypdTwV8y0JTomnJGg4R0xudJC6HuaSmIs4mL0h4zoA1vyM6j8E
-	uk/eawA9zmwgoGJB6f7qwv2rihWzWivs7AAm9pDyg5WftjpLwQ5k
-X-Google-Smtp-Source: AGHT+IEly0aDCMpmPVzaCRyArD7sIAxwXLI0PFeeWTZ46AhbJP6Fr/Zc09NQKjaFA6Z5HTjVxoQelA==
-X-Received: by 2002:a05:6512:2254:b0:52b:8ef7:bf1f with SMTP id 2adb3069b0e04-52eb999a67cmr10047694e87.17.1720851602609;
-        Fri, 12 Jul 2024 23:20:02 -0700 (PDT)
-Received: from [172.16.6.209] (i68975BB6.versanet.de. [104.151.91.182])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a79bc5a3554sm22530866b.26.2024.07.12.23.20.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 12 Jul 2024 23:20:02 -0700 (PDT)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <a6f481d1-5618-42a3-938b-44668fa000ee@xen.org>
-Date: Sat, 13 Jul 2024 08:19:59 +0200
+	s=arc-20240116; t=1720857406; c=relaxed/simple;
+	bh=A/PyRr7IsD9YlgrQVbFDHE8HJAaoidtlMiLz27gfT3w=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k07ayLjZtfNFiiqXpw8OvN1DYExvnLTqdCxqJtqCBbNKKIM0XORU+mV9kThu3p6qYgo1C6CQbWovKDVrtKEwSsOO00fmIQqOLWZdmGztTMZZySo4GGDz/9YU8Yq0S+ImZWOQIKu4bN0MwB1RRjILIVTbJwMjdwVY3WN7YCjCNXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TE8BzzH9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5F4C32781;
+	Sat, 13 Jul 2024 07:56:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1720857405;
+	bh=A/PyRr7IsD9YlgrQVbFDHE8HJAaoidtlMiLz27gfT3w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TE8BzzH98yOf23UKI3yK1WsDIDrepjSUtLADIviQpm0eZkaddnr26ZEgHtyQsX/Cu
+	 9SRCDkeLtCs0Vp8kKnkI+bYhL07mdbI9jHIl65AwoVomnO95Bm5wKECZbhTgiG05uM
+	 L5ZqSGYiXGY/CWzf4BfrIFUvOQi8fKPCU10nZm6WTY4H+If7QW5M9Nl9T81dnbmlFi
+	 WQnaWJ/gq+XWKL9H6+84hVjS/pxGBRatOzvgr3x/gGl4dvodcN1jtVVo7ZuKIS/4gk
+	 QaB2Bp2AZMET0LC/hM85idH28uSHFGYS2zQDM+e7DjSmUxmM6rOkA1NTtepbuOXAFG
+	 yzn/DIX/UCieg==
+Received: from [213.208.208.122] (helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sSXcZ-00C3go-AU;
+	Sat, 13 Jul 2024 08:56:43 +0100
+Date: Sat, 13 Jul 2024 08:56:42 +0100
+Message-ID: <871q3xpvwl.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Anshuman Khandual <anshuman.khandual@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 02/12] arm64: Add PAR_EL1 field description
+In-Reply-To: <b9b8775f-8dc1-4a9d-a884-7103f18d68f1@arm.com>
+References: <20240625133508.259829-1-maz@kernel.org>
+	<20240625133508.259829-3-maz@kernel.org>
+	<b9b8775f-8dc1-4a9d-a884-7103f18d68f1@arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 5/6] KVM: Documentation: Document v2 of coalesced MMIO API
-To: Ilias Stamatis <ilstam@amazon.com>, kvm@vger.kernel.org,
- pbonzini@redhat.com
-Cc: pdurrant@amazon.co.uk, dwmw@amazon.co.uk, Laurent.Vivier@bull.net,
- ghaskins@novell.com, avi@redhat.com, mst@redhat.com,
- levinsasha928@gmail.com, peng.hao2@zte.com.cn, nh-open-source@amazon.com
-References: <20240710085259.2125131-1-ilstam@amazon.com>
- <20240710085259.2125131-6-ilstam@amazon.com>
-Content-Language: en-US
-Reply-To: paul@xen.org
-Organization: Xen Project
-In-Reply-To: <20240710085259.2125131-6-ilstam@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 213.208.208.122
+X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 10/07/2024 10:52, Ilias Stamatis wrote:
-> Document the KVM_CREATE_COALESCED_MMIO_BUFFER and
-> KVM_REGISTER_COALESCED_MMIO2 ioctls.
+On Fri, 12 Jul 2024 08:06:31 +0100,
+Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
-> Signed-off-by: Ilias Stamatis <ilstam@amazon.com>
-> ---
->   Documentation/virt/kvm/api.rst | 91 ++++++++++++++++++++++++++++++++++
->   1 file changed, 91 insertions(+)
 > 
+> 
+> On 6/25/24 19:05, Marc Zyngier wrote:
+> > As KVM is about to grow a full emulation for the AT instructions,
+> > add the layout of the PAR_EL1 register in its non-D128 configuration.
+> 
+> Right, there are two variants for PAR_EL1 i.e D128 and non-D128. Probably it makes
+> sense to define all these PAR_EL1 fields in arch/arm64/include/asm/sysreg.h, until
+> arch/arm64/tools/sysreg evolves to accommodate different bit field layouts for the
+> same register.
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+This is really sorely needed, because we can't describe any of the
+registers that changes layout depending on another control bit. Take
+for example any of the EL2 registers affected by HCR_EL2.E2H.
 
+However, I have no interest in defining *any* D128 format. I take it
+that whoever will eventually add D128 support to the kernel (and KVM)
+will take care of that.
+
+> 
+> > 
+> > Note that the constants are a bit ugly, as the register has two
+> > layouts, based on the state of the F bit.
+> 
+> Just wondering if it would be better to append 'VALID/INVALID' suffix
+> for the fields to differentiate between when F = 0 and when F = 1 ?
+> 
+> s/SYS_PAR_EL1_FST/SYS_PAR_INVALID_FST_EL1
+> s/SYS_PAR_EL1_SH/SYS_PAR_VALID_SH_EL1
+> 
+> Or something similar.
+
+I find it pretty horrible.
+
+If anything, because "VALID/INVALID" doesn't say anything of *what* is
+invalid. Also, there is no "VALID" definition in the register, and an
+aborted translation does not make the register invalid, quite the
+opposite -- it is full of crucial information.
+
+Which is why I used the F0/F1 prefixes, making it clear (at least in
+my view) that the description is tied to a particular value of the
+PAR_EL1.F bit.
+
+Finally, most of the bit layouts are unambiguous: a field of any given
+name only exists in a given layout of the register. This means we can
+safely have names that match the ARM ARM description without any
+visual pollution.
+
+The only ambiguities are with generic names such as RES0 and IMPDEF.
+Given that we almost never use these bits for anything, I don't think
+the use of a F-specific prefix is a problem.
+
+But yeah, naming is hard.
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
