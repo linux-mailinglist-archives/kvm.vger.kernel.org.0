@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-21597-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21599-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 021AD930460
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 09:56:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35BDE93046C
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 10:04:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7DD801F2366E
-	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 07:56:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4CDD91F24331
+	for <lists+kvm@lfdr.de>; Sat, 13 Jul 2024 08:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C06741C75;
-	Sat, 13 Jul 2024 07:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DAFC2940D;
+	Sat, 13 Jul 2024 08:04:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TE8BzzH9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OX0Jmdnk"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B23891BDD3;
-	Sat, 13 Jul 2024 07:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EF8F1FB4;
+	Sat, 13 Jul 2024 08:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720857406; cv=none; b=I0DLnf12xzE2p4mxZj/XX6vMwNigf8xWjtK9pzkm3ciiZRYsD+svqYw/dzUpAGgnUwfBRLhsF7U2dopVD6o7plMmKReRugYjOno30W6rtPzURdD/X8vzIycOcE91kgPqr/9ietEHBnJzNbEPHxDN9TMxI85iyOV65vL/Px60CTY=
+	t=1720857874; cv=none; b=akn3rQlT+nw0hSwWwoi43u52x+Vvs29wIkmvNzEeaG6zv6yWAo6hgL0vRGiXxh9D2ef/xyF1ochSsPz5vkSBIDykHdsFTxRZ7+orZOK05aXjaR/Ewr+qqrI1p1cfEScSEjat9wPRpjPqgS5BihWtKpCobtQZYMJWExA428LVXkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720857406; c=relaxed/simple;
-	bh=A/PyRr7IsD9YlgrQVbFDHE8HJAaoidtlMiLz27gfT3w=;
+	s=arc-20240116; t=1720857874; c=relaxed/simple;
+	bh=nE2mhPrr3YyGaYn+mzlgQmFx15z5pUfHCBByh86gxOk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k07ayLjZtfNFiiqXpw8OvN1DYExvnLTqdCxqJtqCBbNKKIM0XORU+mV9kThu3p6qYgo1C6CQbWovKDVrtKEwSsOO00fmIQqOLWZdmGztTMZZySo4GGDz/9YU8Yq0S+ImZWOQIKu4bN0MwB1RRjILIVTbJwMjdwVY3WN7YCjCNXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TE8BzzH9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5F4C32781;
-	Sat, 13 Jul 2024 07:56:45 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Mz0TvpnNVHbHUwzo7sC0obA0CKDLxY6KOSaasWBQHvM2B9a5F625KvIhIuYuaALFwOAPeUvooXXjJvEbZZfmC5q4ooV3hERvyb4E7p+W/vbvU9fTmQwWTegkhKf1kU7Ewun1AuRsukozQbhDOwdbXcT+841tLnVFZLX85rOPJLc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OX0Jmdnk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DAB3C32781;
+	Sat, 13 Jul 2024 08:04:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1720857405;
-	bh=A/PyRr7IsD9YlgrQVbFDHE8HJAaoidtlMiLz27gfT3w=;
+	s=k20201202; t=1720857874;
+	bh=nE2mhPrr3YyGaYn+mzlgQmFx15z5pUfHCBByh86gxOk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TE8BzzH98yOf23UKI3yK1WsDIDrepjSUtLADIviQpm0eZkaddnr26ZEgHtyQsX/Cu
-	 9SRCDkeLtCs0Vp8kKnkI+bYhL07mdbI9jHIl65AwoVomnO95Bm5wKECZbhTgiG05uM
-	 L5ZqSGYiXGY/CWzf4BfrIFUvOQi8fKPCU10nZm6WTY4H+If7QW5M9Nl9T81dnbmlFi
-	 WQnaWJ/gq+XWKL9H6+84hVjS/pxGBRatOzvgr3x/gGl4dvodcN1jtVVo7ZuKIS/4gk
-	 QaB2Bp2AZMET0LC/hM85idH28uSHFGYS2zQDM+e7DjSmUxmM6rOkA1NTtepbuOXAFG
-	 yzn/DIX/UCieg==
+	b=OX0JmdnkJFAa+BQKjT0NqWPU5cIoM74Fgg+QN1RahO5zV6AaScHeun3TJiJJQ0gyP
+	 4HLq145Jy6oGUBX3rqnW4SUWX8J5KlU8KKLxVGpWUNvtgvz2EixtVyq2YqrFnbzLgZ
+	 B5Cb+g5sudZyXrHw2NRKN1sr65Im9VWBWO9fOV9OLptz9dr9UxHFtNH6To2bfkI5F4
+	 QLG39dwikya+iJqSFcBkSnLzdgQlGMiy+kUg3dCS9cH4QL8mWiSRT24uYwH6MMGncl
+	 Fdx8OQG3nxWwFYBfCVKCe3TLCp4AbBObkvBgbK1yYMwR5Ie/EqyDb+cwk7KUP8gmiQ
+	 TliyR2l+YFrAA==
 Received: from [213.208.208.122] (helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sSXcZ-00C3go-AU;
-	Sat, 13 Jul 2024 08:56:43 +0100
-Date: Sat, 13 Jul 2024 08:56:42 +0100
-Message-ID: <871q3xpvwl.wl-maz@kernel.org>
+	id 1sSXk7-00C3ly-SZ;
+	Sat, 13 Jul 2024 09:04:32 +0100
+Date: Sat, 13 Jul 2024 09:04:31 +0100
+Message-ID: <87zfqlogz4.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Anshuman Khandual <anshuman.khandual@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -59,11 +59,11 @@ Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 02/12] arm64: Add PAR_EL1 field description
-In-Reply-To: <b9b8775f-8dc1-4a9d-a884-7103f18d68f1@arm.com>
+Subject: Re: [PATCH 01/12] arm64: Add missing APTable and TCR_ELx.HPD masks
+In-Reply-To: <3fc8eccd-21a7-40d8-9851-24941c8414da@arm.com>
 References: <20240625133508.259829-1-maz@kernel.org>
-	<20240625133508.259829-3-maz@kernel.org>
-	<b9b8775f-8dc1-4a9d-a884-7103f18d68f1@arm.com>
+	<20240625133508.259829-2-maz@kernel.org>
+	<3fc8eccd-21a7-40d8-9851-24941c8414da@arm.com>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,62 +79,77 @@ X-SA-Exim-Rcpt-To: anshuman.khandual@arm.com, kvmarm@lists.linux.dev, linux-arm-
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, 12 Jul 2024 08:06:31 +0100,
+On Fri, 12 Jul 2024 09:32:12 +0100,
 Anshuman Khandual <anshuman.khandual@arm.com> wrote:
 > 
 > 
 > 
 > On 6/25/24 19:05, Marc Zyngier wrote:
-> > As KVM is about to grow a full emulation for the AT instructions,
-> > add the layout of the PAR_EL1 register in its non-D128 configuration.
-> 
-> Right, there are two variants for PAR_EL1 i.e D128 and non-D128. Probably it makes
-> sense to define all these PAR_EL1 fields in arch/arm64/include/asm/sysreg.h, until
-> arch/arm64/tools/sysreg evolves to accommodate different bit field layouts for the
-> same register.
-
-This is really sorely needed, because we can't describe any of the
-registers that changes layout depending on another control bit. Take
-for example any of the EL2 registers affected by HCR_EL2.E2H.
-
-However, I have no interest in defining *any* D128 format. I take it
-that whoever will eventually add D128 support to the kernel (and KVM)
-will take care of that.
-
-> 
+> > Although Linux doesn't make use of hierarchical permissions (TFFT!),
+> > KVM needs to know where the various bits related to this feature
+> > live in the TCR_ELx registers as well as in the page tables.
 > > 
-> > Note that the constants are a bit ugly, as the register has two
-> > layouts, based on the state of the F bit.
+> > Add the missing bits.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/include/asm/kvm_arm.h       | 1 +
+> >  arch/arm64/include/asm/pgtable-hwdef.h | 7 +++++++
+> >  2 files changed, 8 insertions(+)
+> > 
+> > diff --git a/arch/arm64/include/asm/kvm_arm.h b/arch/arm64/include/asm/kvm_arm.h
+> > index b2adc2c6c82a5..c93ee1036cb09 100644
+> > --- a/arch/arm64/include/asm/kvm_arm.h
+> > +++ b/arch/arm64/include/asm/kvm_arm.h
+> > @@ -108,6 +108,7 @@
+> >  /* TCR_EL2 Registers bits */
+> >  #define TCR_EL2_DS		(1UL << 32)
+> >  #define TCR_EL2_RES1		((1U << 31) | (1 << 23))
+> > +#define TCR_EL2_HPD		(1 << 24)
+> >  #define TCR_EL2_TBI		(1 << 20)
+> >  #define TCR_EL2_PS_SHIFT	16
+> >  #define TCR_EL2_PS_MASK		(7 << TCR_EL2_PS_SHIFT)
+> > diff --git a/arch/arm64/include/asm/pgtable-hwdef.h b/arch/arm64/include/asm/pgtable-hwdef.h
+> > index 9943ff0af4c96..f75c9a7e6bd68 100644
+> > --- a/arch/arm64/include/asm/pgtable-hwdef.h
+> > +++ b/arch/arm64/include/asm/pgtable-hwdef.h
+> > @@ -146,6 +146,7 @@
+> >  #define PMD_SECT_UXN		(_AT(pmdval_t, 1) << 54)
+> >  #define PMD_TABLE_PXN		(_AT(pmdval_t, 1) << 59)
+> >  #define PMD_TABLE_UXN		(_AT(pmdval_t, 1) << 60)
+> > +#define PMD_TABLE_AP		(_AT(pmdval_t, 3) << 61)
 > 
-> Just wondering if it would be better to append 'VALID/INVALID' suffix
-> for the fields to differentiate between when F = 0 and when F = 1 ?
+> APTable bits are also present in all table descriptors at each non-L3
+> level. Should not corresponding corresponding macros i.e PUD_TABLE_AP,
+> P4D_TABLE_AP, and PGD_TABLE_AP be added as well ?
+
+My problem with that is that it doesn't make much sense from an
+architecture perspective. It doesn't define any of these, because
+these names make no sense.
+
+Maybe I should just drop the PMD prefix and write it as S1_TABLE_AP,
+so that it can be reused if we ever need the P*D names.
+
 > 
-> s/SYS_PAR_EL1_FST/SYS_PAR_INVALID_FST_EL1
-> s/SYS_PAR_EL1_SH/SYS_PAR_VALID_SH_EL1
+> >  
+> >  /*
+> >   * AttrIndx[2:0] encoding (mapping attributes defined in the MAIR* registers).
+> > @@ -307,6 +308,12 @@
+> >  #define TCR_TCMA1		(UL(1) << 58)
+> >  #define TCR_DS			(UL(1) << 59)
+> >  
+> > +#define TCR_HPD0_SHIFT		41
+> > +#define TCR_HPD0		BIT(TCR_HPD0_SHIFT)
+> > +
+> > +#define TCR_HPD1_SHIFT		42
+> > +#define TCR_HPD1		BIT(TCR_HPD1_SHIFT)
 > 
-> Or something similar.
+> Should not these new register fields follow the current ascending bit
+> order in the listing i.e get added after TCR_HD (bit 40).
 
-I find it pretty horrible.
+Yup, I'll move them up.
 
-If anything, because "VALID/INVALID" doesn't say anything of *what* is
-invalid. Also, there is no "VALID" definition in the register, and an
-aborted translation does not make the register invalid, quite the
-opposite -- it is full of crucial information.
-
-Which is why I used the F0/F1 prefixes, making it clear (at least in
-my view) that the description is tied to a particular value of the
-PAR_EL1.F bit.
-
-Finally, most of the bit layouts are unambiguous: a field of any given
-name only exists in a given layout of the register. This means we can
-safely have names that match the ARM ARM description without any
-visual pollution.
-
-The only ambiguities are with generic names such as RES0 and IMPDEF.
-Given that we almost never use these bits for anything, I don't think
-the use of a F-specific prefix is a problem.
-
-But yeah, naming is hard.
+Thanks,
 
 	M.
 
