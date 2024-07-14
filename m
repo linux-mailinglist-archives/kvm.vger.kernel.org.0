@@ -1,253 +1,348 @@
-Return-Path: <kvm+bounces-21608-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21609-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7F4E930897
-	for <lists+kvm@lfdr.de>; Sun, 14 Jul 2024 07:33:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 90F2593099E
+	for <lists+kvm@lfdr.de>; Sun, 14 Jul 2024 13:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96E59281B3C
-	for <lists+kvm@lfdr.de>; Sun, 14 Jul 2024 05:33:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E005281934
+	for <lists+kvm@lfdr.de>; Sun, 14 Jul 2024 11:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72121172C;
-	Sun, 14 Jul 2024 05:33:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6DE53389;
+	Sun, 14 Jul 2024 11:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="5uvYd/Ck"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VkM4r8lS"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2068.outbound.protection.outlook.com [40.107.237.68])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F981F51B;
-	Sun, 14 Jul 2024 05:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.68
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1720935192; cv=fail; b=jfkuHoO4frkFxLYJl9Bbamgn/vudAd2S/bfLvC7JZ5JhZ4jL/m37ZVtnd3iOJZnRJPYj7OMX2NCaGTQaTdHIKDYJYlKbFFNrPogUb1AmYyBFMc+gUPo+xipIcunf8sJKIyFAaPVfzL7Hzy5BUkYH2A3fxCRAQ4IVhDBMPARynkA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1720935192; c=relaxed/simple;
-	bh=OSG7zC0aWpNI7S/BUhF8htxi3uhoJb0a1PS2niMbSGQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WlLe+JClTNW16iaOEwpLOZi3US/ilLyISfa2sIWSIOTylts2T1qlfdpsCKiLsOMoASclmPAJDmoDYX2bcHtSAMjCxZhHlbI/MGXqlRGQ8V2iiRbMoEsksFg9Y2JQ1um77fiPeMIJ+H8NbsA5FvH4F8FN8MAqZRl2aqqCs/0SVuw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=5uvYd/Ck; arc=fail smtp.client-ip=40.107.237.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KtyadiD4RmdX9Lpe1CASDPKIq/D+Cm5R1piqrdmKJvHt6QiwlalLdwb7F0eBV69N4pgpAg+FnHjshnxjn3bMBr5VC33X+LHK47wfkmL45Y/NacT2M27Va5SuRlQsChzPTwKBj/gtNkMpYuxrTW5rgX2lxtT9/zhXwMaE8BZHyMnN0a8ck7S+/S1ugghAz9fRFpwklcvPWE3VA7ikV8mPp0qiYBDH2FxU93DTStyl66wC9tQY73wFawxH4mxHyYpdXA2De6eLVasg5ICgwUVve7T4ND+4qVDAKLExwncaCK0yWrbD7SCJRaWJ91TnORZ5pnzxES5DQlhyriIWwRhUWw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qfoRZMQFyqKFwCsYXTwrY6QAA+r2ecA2RWu6azHrScc=;
- b=p7NanIuctjoxu0pIjJfOX2yywIWeAYj2PpFgkqcB7KUHAPRelLXAUADJKxOMaIgeSSfHvncr5MyZe9hCYMzVlfloCJiBSpw42Ulbu9UOutjLoWwbpQVzj4HmOAgcbzHGYwJlaXtd54GO0/Cmc2t3lGZkc+dETPcit4OrLnZZq887Z6wJrQ3zMXOVvynW//bTyacT4XyXZhpQ/lcwD9UXos1/ghegeiziLm8YgkrKPo8NTc8iI7lyMdmNxM5RJ9wkypiX6mTQEFYyrb+Si07DyM1Yf7fgPljAUX67aPGhT/Y8ZoUOKdxVCndwwlf0uTAvtU7DLOsRUtKwqFjnmpTqPw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=intel.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qfoRZMQFyqKFwCsYXTwrY6QAA+r2ecA2RWu6azHrScc=;
- b=5uvYd/CkcAJDOOI9Umimzj3ZgCaFFAX2sDGcL4pqe0ISkbWd7EKIWWJTljsEwRu+b0ui+8KPuj++fj9GBLuLI2Owxt0Vdoq4w1roAcNHd9/xh+xvZPYEZCPSNzzXPjFcDSEJCn2LapGEI6h+Z+yCTurrPUI3UgkPi+25wdeRuQs=
-Received: from PH1PEPF000132ED.NAMP220.PROD.OUTLOOK.COM (2603:10b6:518:1::32)
- by DM6PR12MB4235.namprd12.prod.outlook.com (2603:10b6:5:220::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.24; Sun, 14 Jul
- 2024 05:33:06 +0000
-Received: from MWH0EPF000A6734.namprd04.prod.outlook.com
- (2a01:111:f403:c91d::) by PH1PEPF000132ED.outlook.office365.com
- (2603:1036:903:47::3) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23 via Frontend
- Transport; Sun, 14 Jul 2024 05:33:06 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- MWH0EPF000A6734.mail.protection.outlook.com (10.167.249.26) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7762.17 via Frontend Transport; Sun, 14 Jul 2024 05:33:05 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Sun, 14 Jul
- 2024 00:33:04 -0500
-Date: Sun, 14 Jul 2024 00:32:49 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>
-CC: "pbonzini@redhat.com" <pbonzini@redhat.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>
-Subject: Re: [PATCH 09/12] KVM: guest_memfd: move check for already-populated
- page to common code
-Message-ID: <n2nmszmuok75wzylgcqy2dz4lbrvfavewuxas56angjrkp3sl3@k4pj5k7uosfe>
-References: <20240711222755.57476-1-pbonzini@redhat.com>
- <20240711222755.57476-10-pbonzini@redhat.com>
- <73c62e76d83fe4e5990b640582da933ff3862cb1.camel@intel.com>
- <CABgObfbhTYDcVWwB5G=aYpFhAW1FZ5i665VFbbGC0UC=4GgEqQ@mail.gmail.com>
- <97796c0b86db5d98e03c119032f5b173f0f5de14.camel@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709612B9AA
+	for <kvm@vger.kernel.org>; Sun, 14 Jul 2024 11:11:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1720955487; cv=none; b=ENrj9AiqvOzMXk2mskxPVGaYPVrJ7tRTsj9qhMX4dlC4FBarAqWk+YiFCADMrqyMvpkps23HBfYZ5e0lQxUg8E5sUppP2rEcMl8YJYfqHtxq/FC7a8DuCN5FC9UVvy94GQPfbx8P+B07r72Sfsag6+3sddv50co4CveQJ0mfKJo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1720955487; c=relaxed/simple;
+	bh=NHsbG+3i1ilrBkLPo8A4bK9Cr7DuiY2Nq135xD3maok=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type:Content-Type; b=eJ+Ut4rmscANTuuuTf+EGf4uMFapymTSmyL3PqGGAZ1/fry77vwYGv80TcXUEn66362B+8Vv8HxYq63MHkJTxSZHdTXaQw4yAeZRTVQOOONcgsPezeCbIkthCWx6t3+qlvSpTjI/dmL1Y192MeSqh3ASh17uTx/hdbjwb/dyi28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VkM4r8lS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1720955483;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:  content-type:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xvBboM0gBLgPXgc0OfI2YETwpo6vg79+rDTOsfSo04k=;
+	b=VkM4r8lS5q/jYAcg1HrBjrpHaKrwyj3lXLTTiPPgkBUs8MEsWFKo/IUep1emO9UMGfiJrA
+	4H+vIY2Ii1OvBcr2578Wlu7ar6XflmKc4JSRhezfJ1LQMST8B95njvihMdrIKSDTLwpCqq
+	jfGmrZB/PSiF/IDRgGyc28w9DpFxjLc=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-487-9GCe7zvjMaOW9k4ubaTMeg-1; Sun, 14 Jul 2024 07:11:21 -0400
+X-MC-Unique: 9GCe7zvjMaOW9k4ubaTMeg-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-52ea965188eso4726154e87.1
+        for <kvm@vger.kernel.org>; Sun, 14 Jul 2024 04:11:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1720955479; x=1721560279;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xvBboM0gBLgPXgc0OfI2YETwpo6vg79+rDTOsfSo04k=;
+        b=E1pxhNvaa4nINLCXAxYzGk2lrImQw1MRbFAlfb6frtyNYaxm/zV9HyaofxynAB3xwz
+         YPzlNahV+D+Pi1HD30q9ok6hA7R+pv8A6swPqZ5vkWuQj6mxv/R4yEOvyKO/DHJFLkhC
+         Ol2sFaxlZpnabJ94Rv9UkTNpsOgS9QEkV2ybWW0WXr61L3jflY3rJ5uVwrnAK+O6wN42
+         MghxXnuLt4mwVhlxXktpKCS24r3fPhwK3unTEMmN04nuwoHvLjrhB2gs6q9yN7Z2kjLi
+         re/yiVLZO6goSTzC2cmqrXEXIajZxTCk5w20IHeCoIVr7eFQgMv7rUMArtMYmLAHqq0c
+         49lw==
+X-Forwarded-Encrypted: i=1; AJvYcCW6QXIxLrVQEftpWyZESoBM9IB3oRmgKBjxSVrZUwOdavirmd8Nisj8agkKFTgqxylFtt3YkfbOQG54YmQ1FfQ4L++5
+X-Gm-Message-State: AOJu0YxbztHnjmC4FSOyfm50XTAyshunJ1Q0fEw6lMxh0fuvHVXXU6aK
+	d8/9JT6CTdeGvEP1Jgi1h7uSavaZDmZ4xh1dtnLdcrYE7D6Ez7PgycYABuW+4Fq4kbncxbb7QzJ
+	CSDdbJ8SsMUqG2lfeLJbAKnKLZUzuOgo2IhSsaBBEVZ+THJae8w==
+X-Received: by 2002:a05:6512:ad2:b0:52e:bdfc:1d05 with SMTP id 2adb3069b0e04-52ebdfc1ffcmr10321434e87.44.1720955479643;
+        Sun, 14 Jul 2024 04:11:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG/0YOQVR0yqj4226D+TkFKAQsMIz1Xsv7xLq/slMcsDTBh/wvGCUrcxMJjoWM5RzGPbNJLsQ==
+X-Received: by 2002:a05:6512:ad2:b0:52e:bdfc:1d05 with SMTP id 2adb3069b0e04-52ebdfc1ffcmr10321421e87.44.1720955479295;
+        Sun, 14 Jul 2024 04:11:19 -0700 (PDT)
+Received: from avogadro.local ([151.95.101.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-427a5edb41asm47985225e9.36.2024.07.14.04.11.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 14 Jul 2024 04:11:18 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: qemu-devel@nongnu.org
+Cc: Michael Roth <michael.roth@amd.com>,
+	=?UTF-8?q?Daniel=20P=20=2E=20Berrang=C3=A9?= <berrange@redhat.com>,
+	kvm@vger.kernel.org
+Subject: [PULL 12/13] i386/sev: Don't allow automatic fallback to legacy KVM_SEV*_INIT
+Date: Sun, 14 Jul 2024 13:10:42 +0200
+Message-ID: <20240714111043.14132-13-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240714111043.14132-1-pbonzini@redhat.com>
+References: <20240714111043.14132-1-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <97796c0b86db5d98e03c119032f5b173f0f5de14.camel@intel.com>
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MWH0EPF000A6734:EE_|DM6PR12MB4235:EE_
-X-MS-Office365-Filtering-Correlation-Id: e139beab-3d2f-48ec-19d4-08dca3c67007
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?L/BQ63vs93U+R6m+U/y4gEJNv9V3QxuZi7ruAASuUqV9UakvT22b8v+IQldn?=
- =?us-ascii?Q?H9VubsU97CCdGyhqxL/aLlzyX++1TDcYWh9IKPTIeegS20kp/u3egizAHBz3?=
- =?us-ascii?Q?HTW/Nx1Y/rr1pNDaHPbN1jqrgELI1X8sIj14XDDjneaM2FW98J0GX+SJNQEo?=
- =?us-ascii?Q?5A2ywFg3YOTG0pTtJy7SGrR5LzvTk/iPuW+cMQJRkvS7P5cx0jSSBywED2h7?=
- =?us-ascii?Q?PAKDJIQzg6GmZDNbkwe5BewENETGcyDwxKILKpuzpLYMUrUfLiG4ivJaqmie?=
- =?us-ascii?Q?pjzQXcU75F7LrvFYYAaoS67zaUYb2hFT7nZQOZUE6CMmJ3txdctftsFsGXby?=
- =?us-ascii?Q?6I77tizPeAXyxCXCL3vKFT1HZesy0Lt1sf2otKv70UMxfyPjzElFb02vg7oI?=
- =?us-ascii?Q?3TIyAxH2b1fqhnxs5gP/c9OtjicXraYtfR7Ck61DF0dwF/pGMcx48xvwWrMz?=
- =?us-ascii?Q?6R1zSSIbA7SkLuwcx6ervtZ9+karVEZWlfeMx8mme0wRBpQHaIKsbWP/0Mrh?=
- =?us-ascii?Q?bngGiZ9zLBhRBJY4ZiDKfn4CBgwN+VuKjysA4Q3h1302CseB3sLvj5VtOIen?=
- =?us-ascii?Q?XJErvY9P3BV4OCaY61hYLDEqZo9X4CxS2y9DcpVwTEp5TB979f70NO17Ay7L?=
- =?us-ascii?Q?r0bXXu+b+VMpj5jf2Q4tod3eLUpEvGrLa5JAoKahJkAZpJ+s1JDslYTFzKjt?=
- =?us-ascii?Q?CxiA8UpwWth8g7uRRwbNABf6blVGbq+4bRxwSQ39y2K3Y7MQVTEx0e1rHDkJ?=
- =?us-ascii?Q?sJmbRIzMxJRzi7qSoYsBRXGP9u62btmjUKOSsfZhw+HXXpTUz/orFcAiNOEA?=
- =?us-ascii?Q?4hkzdWUt8W8tjwI/K93Td+OBpiongU/TG5nn2Bi0bNSmQ6JXp1ZYwUp744g9?=
- =?us-ascii?Q?gs0EzReNeCrPTuM+vx2zeG15QSPiGZmDtmVUhMhyz8JkZ1KGaYhJWBmlWJhI?=
- =?us-ascii?Q?WO2mFZ8l2boGfgW2ugXjZsfn98TwMz82TRc1tZM7IFVzJY2apWkcMvPs51nv?=
- =?us-ascii?Q?jiREzVw585+ZFwucE2lFEDYCQZo7ox9pPfJaSh8HapgRA+VcytY6SUhvttKv?=
- =?us-ascii?Q?3el7ZE/OP2eDOmqid9UhKRpx09Dt/nQNkEP1d/2teKpdWJU6FW4d9HJVhC9X?=
- =?us-ascii?Q?GMDSt+BJ5mwvUQz+H/2ZykJW7ZSlRlb3puZnuhuyCskzniDFWSA0ACJ/F4p4?=
- =?us-ascii?Q?w73x9zJYO/MZBHfMsbPRpapqX7xxASaiRNCEGI7ITWAWgrJnkI0WWfL6+FJO?=
- =?us-ascii?Q?WHybrtJ+1+/+XEzkuVo+BvQDoemrBEiS/Ke9wAqNL5O2Q/FD7lYVhButNfKH?=
- =?us-ascii?Q?hpSZLjJ22CpoSvfqmrDQjiEnKIAm6VRQUqx0LQ4TzzhPt70s0KbpmuHPJgqR?=
- =?us-ascii?Q?bMD8RFrH1GVAZwtCSrqELq3u3/KpPAWOfd36Ft6fmsz3GwnXpw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Jul 2024 05:33:05.6258
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e139beab-3d2f-48ec-19d4-08dca3c67007
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	MWH0EPF000A6734.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4235
+Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jul 13, 2024 at 08:25:42PM +0000, Edgecombe, Rick P wrote:
-> On Sat, 2024-07-13 at 12:10 +0200, Paolo Bonzini wrote:
-> > > 
-> > > This patch breaks our rebased TDX development tree. First
-> > > kvm_gmem_prepare_folio() is called during the KVM_PRE_FAULT_MEMORY
-> > > operation,
-> > > then next kvm_gmem_populate() is called during the KVM_TDX_INIT_MEM_REGION
-> > > ioctl
-> > > to actually populate the memory, which hits the new -EEXIST error path.
-> > 
-> > It's not a problem to only keep patches 1-8 for 6.11, and move the
-> > rest to 6.12 (except for the bit that returns -EEXIST in sev.c).
-> > 
-> > Could you push a branch for me to take a look?
-> 
-> Sure, here it is.
-> 
-> KVM:
-> https://github.com/rpedgeco/linux/tree/tdx_kvm_dev-2024-07-12-mark_uptodate_issue
-> Matching QEMU:
-> https://github.com/intel-staging/qemu-tdx/releases/tag/tdx-qemu-wip-2024.06.19-v9.0.0
-> 
-> It is not fully based on kvm-coco-queue because it has the latest v2 of the
-> zapping quirk swapped in.
-> 
-> >  I've never liked that
-> > you have to do the explicit prefault before the VM setup is finished;
-> > it's a TDX-specific detail that is transpiring into the API.
-> 
-> Well, it's not too late to change direction again. I remember you and Sean were
-> not fully of one mind on the tradeoffs.
-> 
-> I guess this series is trying to help userspace not mess up the order of things
-> for SEV, where as TDX's design was to let userspace hold the pieces from the
-> beginning. As in, needing to match up the KVM_PRE_FAULT_MEMORY and
-> KVM_TDX_INIT_MEM_REGION calls, mysteriously return errors in later IOCTLs if
-> something was missed, etc.
+From: Michael Roth <michael.roth@amd.com>
 
-If SNP were to try to call KVM_PRE_FAULT_MEMORY before SNP_LAUNCH_UPDATE
-(rough equivalent to KVM_TDX_INIT_MEM_REGION), I think the same issue
-would arise, and in that case the uptodate flag you prototyped would
-wouldn't be enough to address it because SNP_LAUNCH_UPDATE would end up
-failing because the gmem_prepare hook previously triggered by
-KVM_PRE_FAULT_MEMORY would have put the corresponding RMP entries into
-an unexpected state (guest-owned/private).
+Currently if the 'legacy-vm-type' property of the sev-guest object is
+'on', QEMU will attempt to use the newer KVM_SEV_INIT2 kernel
+interface in conjunction with the newer KVM_X86_SEV_VM and
+KVM_X86_SEV_ES_VM KVM VM types.
 
-So for SNP, KVM_PRE_FAULT_MEMORY/SNP_LAUNCH_UPDATE are mutually
-exclusive on what GPA ranges they can prep before finalizing launch state.
+This can lead to measurement changes if, for instance, an SEV guest was
+created on a host that originally had an older kernel that didn't
+support KVM_SEV_INIT2, but is booted on the same host later on after the
+host kernel was upgraded.
 
-*After* finalizing launch state however, KVM_PRE_FAULT_MEMORY can be
-called for whatever range it likes. If gmem_prepare/gmem_populate was
-already called for a GPA, the uptodate flag will be set and KVM only
-needs to deal with the mapping.
+Instead, if legacy-vm-type is 'off', QEMU should fail if the
+KVM_SEV_INIT2 interface is not provided by the current host kernel.
+Modify the fallback handling accordingly.
 
-So I wonder if it would be possible to enforce that KVM_PRE_FAULT_MEMORY
-only be used after finalizing the VM in the CoCo case?
+In the future, VMSA features and other flags might be added to QEMU
+which will require legacy-vm-type to be 'off' because they will rely
+on the newer KVM_SEV_INIT2 interface. It may be difficult to convey to
+users what values of legacy-vm-type are compatible with which
+features/options, so as part of this rework, switch legacy-vm-type to a
+tri-state OnOffAuto option. 'auto' in this case will automatically
+switch to using the newer KVM_SEV_INIT2, but only if it is required to
+make use of new VMSA features or other options only available via
+KVM_SEV_INIT2.
 
-I realize that is awkward for TDX, where the KVM_PRE_FAULT_MEMORY is
-required to create the sEPT mapping before encrypting, but maybe it
-would be possible for TDX to just do that implicitly within
-KVM_TDX_INIT_MEM_REGION?
+Defining 'auto' in this way would avoid inadvertantly breaking
+compatibility with older kernels since it would only be used in cases
+where users opt into newer features that are only available via
+KVM_SEV_INIT2 and newer kernels, and provide better default behavior
+than the legacy-vm-type=off behavior that was previously in place, so
+make it the default for 9.1+ machine types.
 
-That would free up KVM_PRE_FAULT_MEMORY to be called on any range
-post-finalization, and all the edge cases prior to finalization could be
-avoided if we have some way to enforce that finalization has already
-been done.
+Cc: Daniel P. Berrangé <berrange@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>
+cc: kvm@vger.kernel.org
+Signed-off-by: Michael Roth <michael.roth@amd.com>
+Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Link: https://lore.kernel.org/r/20240710041005.83720-1-michael.roth@amd.com
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ qapi/qom.json     | 18 ++++++----
+ hw/i386/pc.c      |  2 +-
+ target/i386/sev.c | 87 +++++++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 84 insertions(+), 23 deletions(-)
 
-One thing I'm not sure of is if KVM_TDX_INIT_MEM_REGION for a 4K page could
-maybe lead to a 2M sEPT mapping that overlaps with a GPA range passed to
-KVM_PRE_FAULT_MEMORY, which I think could lead to unexpected 'left' return
-values unless we can make sure to only map exactly the GPA ranges populated
-by KVM_TDX_INIT_MEM_REGION and nothing more.
+diff --git a/qapi/qom.json b/qapi/qom.json
+index 8e75a419c30..7eccd2e14e2 100644
+--- a/qapi/qom.json
++++ b/qapi/qom.json
+@@ -924,12 +924,16 @@
+ # @handle: SEV firmware handle (default: 0)
+ #
+ # @legacy-vm-type: Use legacy KVM_SEV_INIT KVM interface for creating the VM.
+-#                  The newer KVM_SEV_INIT2 interface syncs additional vCPU
+-#                  state when initializing the VMSA structures, which will
+-#                  result in a different guest measurement. Set this to
+-#                  maintain compatibility with older QEMU or kernel versions
+-#                  that rely on legacy KVM_SEV_INIT behavior.
+-#                  (default: false) (since 9.1)
++#                  The newer KVM_SEV_INIT2 interface, from Linux >= 6.10, syncs
++#                  additional vCPU state when initializing the VMSA structures,
++#                  which will result in a different guest measurement. Set
++#                  this to 'on' to force compatibility with older QEMU or kernel
++#                  versions that rely on legacy KVM_SEV_INIT behavior. 'auto'
++#                  will behave identically to 'on', but will automatically
++#                  switch to using KVM_SEV_INIT2 if the user specifies any
++#                  additional options that require it. If set to 'off', QEMU
++#                  will require KVM_SEV_INIT2 unconditionally.
++#                  (default: off) (since 9.1)
+ #
+ # Since: 2.12
+ ##
+@@ -939,7 +943,7 @@
+             '*session-file': 'str',
+             '*policy': 'uint32',
+             '*handle': 'uint32',
+-            '*legacy-vm-type': 'bool' } }
++            '*legacy-vm-type': 'OnOffAuto' } }
+ 
+ ##
+ # @SevSnpGuestProperties:
+diff --git a/hw/i386/pc.c b/hw/i386/pc.c
+index 4fbc5774708..c74931d577a 100644
+--- a/hw/i386/pc.c
++++ b/hw/i386/pc.c
+@@ -83,7 +83,7 @@ GlobalProperty pc_compat_9_0[] = {
+     { TYPE_X86_CPU, "x-amd-topoext-features-only", "false" },
+     { TYPE_X86_CPU, "x-l1-cache-per-thread", "false" },
+     { TYPE_X86_CPU, "guest-phys-bits", "0" },
+-    { "sev-guest", "legacy-vm-type", "true" },
++    { "sev-guest", "legacy-vm-type", "on" },
+     { TYPE_X86_CPU, "legacy-multi-node", "on" },
+ };
+ const size_t pc_compat_9_0_len = G_N_ELEMENTS(pc_compat_9_0);
+diff --git a/target/i386/sev.c b/target/i386/sev.c
+index 2ba5f517228..a1157c0ede6 100644
+--- a/target/i386/sev.c
++++ b/target/i386/sev.c
+@@ -144,7 +144,7 @@ struct SevGuestState {
+     uint32_t policy;
+     char *dh_cert_file;
+     char *session_file;
+-    bool legacy_vm_type;
++    OnOffAuto legacy_vm_type;
+ };
+ 
+ struct SevSnpGuestState {
+@@ -1369,6 +1369,17 @@ sev_vm_state_change(void *opaque, bool running, RunState state)
+     }
+ }
+ 
++/*
++ * This helper is to examine sev-guest properties and determine if any options
++ * have been set which rely on the newer KVM_SEV_INIT2 interface and associated
++ * KVM VM types.
++ */
++static bool sev_init2_required(SevGuestState *sev_guest)
++{
++    /* Currently no KVM_SEV_INIT2-specific options are exposed via QEMU */
++    return false;
++}
++
+ static int sev_kvm_type(X86ConfidentialGuest *cg)
+ {
+     SevCommonState *sev_common = SEV_COMMON(cg);
+@@ -1379,14 +1390,39 @@ static int sev_kvm_type(X86ConfidentialGuest *cg)
+         goto out;
+     }
+ 
+-    kvm_type = (sev_guest->policy & SEV_POLICY_ES) ?
+-                KVM_X86_SEV_ES_VM : KVM_X86_SEV_VM;
+-    if (kvm_is_vm_type_supported(kvm_type) && !sev_guest->legacy_vm_type) {
+-        sev_common->kvm_type = kvm_type;
+-    } else {
++    /* These are the only cases where legacy VM types can be used. */
++    if (sev_guest->legacy_vm_type == ON_OFF_AUTO_ON ||
++        (sev_guest->legacy_vm_type == ON_OFF_AUTO_AUTO &&
++         !sev_init2_required(sev_guest))) {
+         sev_common->kvm_type = KVM_X86_DEFAULT_VM;
++        goto out;
+     }
+ 
++    /*
++     * Newer VM types are required, either explicitly via legacy-vm-type=on, or
++     * implicitly via legacy-vm-type=auto along with additional sev-guest
++     * properties that require the newer VM types.
++     */
++    kvm_type = (sev_guest->policy & SEV_POLICY_ES) ?
++                KVM_X86_SEV_ES_VM : KVM_X86_SEV_VM;
++    if (!kvm_is_vm_type_supported(kvm_type)) {
++        if (sev_guest->legacy_vm_type == ON_OFF_AUTO_AUTO) {
++            error_report("SEV: host kernel does not support requested %s VM type, which is required "
++                         "for the set of options specified. To allow use of the legacy "
++                         "KVM_X86_DEFAULT_VM VM type, please disable any options that are not "
++                         "compatible with the legacy VM type, or upgrade your kernel.",
++                         kvm_type == KVM_X86_SEV_VM ? "KVM_X86_SEV_VM" : "KVM_X86_SEV_ES_VM");
++        } else {
++            error_report("SEV: host kernel does not support requested %s VM type. To allow use of "
++                         "the legacy KVM_X86_DEFAULT_VM VM type, the 'legacy-vm-type' argument "
++                         "must be set to 'on' or 'auto' for the sev-guest object.",
++                         kvm_type == KVM_X86_SEV_VM ? "KVM_X86_SEV_VM" : "KVM_X86_SEV_ES_VM");
++        }
++
++        return -1;
++    }
++
++    sev_common->kvm_type = kvm_type;
+ out:
+     return sev_common->kvm_type;
+ }
+@@ -1477,14 +1513,24 @@ static int sev_common_kvm_init(ConfidentialGuestSupport *cgs, Error **errp)
+     }
+ 
+     trace_kvm_sev_init();
+-    if (x86_klass->kvm_type(X86_CONFIDENTIAL_GUEST(sev_common)) == KVM_X86_DEFAULT_VM) {
++    switch (x86_klass->kvm_type(X86_CONFIDENTIAL_GUEST(sev_common))) {
++    case KVM_X86_DEFAULT_VM:
+         cmd = sev_es_enabled() ? KVM_SEV_ES_INIT : KVM_SEV_INIT;
+ 
+         ret = sev_ioctl(sev_common->sev_fd, cmd, NULL, &fw_error);
+-    } else {
++        break;
++    case KVM_X86_SEV_VM:
++    case KVM_X86_SEV_ES_VM:
++    case KVM_X86_SNP_VM: {
+         struct kvm_sev_init args = { 0 };
+ 
+         ret = sev_ioctl(sev_common->sev_fd, KVM_SEV_INIT2, &args, &fw_error);
++        break;
++    }
++    default:
++        error_setg(errp, "%s: host kernel does not support the requested SEV configuration.",
++                   __func__);
++        return -1;
+     }
+ 
+     if (ret) {
+@@ -2074,14 +2120,23 @@ sev_guest_set_session_file(Object *obj, const char *value, Error **errp)
+     SEV_GUEST(obj)->session_file = g_strdup(value);
+ }
+ 
+-static bool sev_guest_get_legacy_vm_type(Object *obj, Error **errp)
++static void sev_guest_get_legacy_vm_type(Object *obj, Visitor *v,
++                                         const char *name, void *opaque,
++                                         Error **errp)
+ {
+-    return SEV_GUEST(obj)->legacy_vm_type;
++    SevGuestState *sev_guest = SEV_GUEST(obj);
++    OnOffAuto legacy_vm_type = sev_guest->legacy_vm_type;
++
++    visit_type_OnOffAuto(v, name, &legacy_vm_type, errp);
+ }
+ 
+-static void sev_guest_set_legacy_vm_type(Object *obj, bool value, Error **errp)
++static void sev_guest_set_legacy_vm_type(Object *obj, Visitor *v,
++                                         const char *name, void *opaque,
++                                         Error **errp)
+ {
+-    SEV_GUEST(obj)->legacy_vm_type = value;
++    SevGuestState *sev_guest = SEV_GUEST(obj);
++
++    visit_type_OnOffAuto(v, name, &sev_guest->legacy_vm_type, errp);
+ }
+ 
+ static void
+@@ -2107,9 +2162,9 @@ sev_guest_class_init(ObjectClass *oc, void *data)
+                                   sev_guest_set_session_file);
+     object_class_property_set_description(oc, "session-file",
+             "guest owners session parameters (encoded with base64)");
+-    object_class_property_add_bool(oc, "legacy-vm-type",
+-                                   sev_guest_get_legacy_vm_type,
+-                                   sev_guest_set_legacy_vm_type);
++    object_class_property_add(oc, "legacy-vm-type", "OnOffAuto",
++                              sev_guest_get_legacy_vm_type,
++                              sev_guest_set_legacy_vm_type, NULL, NULL);
+     object_class_property_set_description(oc, "legacy-vm-type",
+             "use legacy VM type to maintain measurement compatibility with older QEMU or kernel versions.");
+ }
+@@ -2125,6 +2180,8 @@ sev_guest_instance_init(Object *obj)
+     object_property_add_uint32_ptr(obj, "policy", &sev_guest->policy,
+                                    OBJ_PROP_FLAG_READWRITE);
+     object_apply_compat_props(obj);
++
++    sev_guest->legacy_vm_type = ON_OFF_AUTO_AUTO;
+ }
+ 
+ /* guest info specific sev/sev-es */
+-- 
+2.45.2
 
--Mike
-
-> 
-> Still, I might lean towards staying the course just because we have gone down
-> this path for a while and we don't currently have any fundamental issues.
-> Probably we *really* need to get the next TDX MMU stuff posted so we can start
-> to add a bit more certainty to that statement.
-> 
-> > 
-> > > Given we are not actually populating during KVM_PRE_FAULT_MEMORY and try to
-> > > avoid booting a TD until we've done so, maybe setting folio_mark_uptodate()
-> > > in
-> > > kvm_gmem_prepare_folio() is not appropriate in that case? But it may not be
-> > > easy
-> > > to separate.
-> > 
-> > It would be easy (just return a boolean value from
-> > kvm_arch_gmem_prepare() to skip folio_mark_uptodate() before the VM is
-> > ready, and implement it for TDX) but it's ugly. You're also clearing
-> > the memory unnecessarily before overwriting it.
-> 
-> Hmm, right. Since kvm_gmem_populate() does folio_mark_uptodate() again despite
-> testing for it earlier, we can skip folio_mark_uptodate() in
-> kvm_gmem_prepare_folio() for TDX during the pre-finalization stage and it will
-> get marked there.
-> 
-> I put a little POC of this suggestion at the end of the branch. Just revert it
-> to reproduce the issue.
-> 
-> I think in the context of the work to launch a TD, extra clearing of pages is
-> not too bad. I'm more bothered by how it highlights the general pitfalls of
-> TDX's special clever behavior for KVM_PRE_FAULT_MEMORY before TD initialization.
-> 
-> If/when we want to skip it, I wonder if we could move the clearing into the
-> gmem_prepare callbacks.
 
