@@ -1,278 +1,270 @@
-Return-Path: <kvm+bounces-21624-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21625-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4628C930DE4
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 08:22:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF282930E60
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 08:57:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA149281510
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 06:21:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3C31F21651
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 06:57:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D501836CD;
-	Mon, 15 Jul 2024 06:21:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44C11836DE;
+	Mon, 15 Jul 2024 06:57:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VvXVNYYa"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25701E89C;
-	Mon, 15 Jul 2024 06:21:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534721836CF
+	for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 06:57:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721024508; cv=none; b=gjEG2+AdPsGpHW7OdCq6gcuyUnPpkZOtddEPnQfcs4PGdegIx/Eh/xSUQqDMBO0MYk/qVUN0zhyYYvcN/ZwTHLZ+3HLYp5rhAJXLeosKLen3zDGE3OcKrXv+d27TLyjqXKzRSvfVdMX9GoRSHonGOfvH+s0aJbxz3YZrWlDNrqY=
+	t=1721026669; cv=none; b=svBxsABpUdmGYDLhWrajg0yF+lpQEoLleNo1TmPxgqG0fXn3BZE1zsHiFOyJ/CIlGyTUSSvQ92cM/Fc81N0L0aLvTUuR7A/e5cz1UkD38g4JMnUp5pozrXEcp6l58dU6SGCCOai/7GdSFtViUC9NJ20rAH+utweOUGayAMzqm70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721024508; c=relaxed/simple;
-	bh=GUCN0HnevjduCOtHf4PXly+F9rjU0JV2kimt48vjMto=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=lMgQntHIOVSIMtPGABzF8f5Prxibn/dcNUAn0qCmEJjfmP2BAK5OGxpSDaBQ2lz3OrRP5563LtmxaQHQCoart2/GuV5Uop26OWu1HoV8vItC+jAHAgl1X6kwlrwO34CzG7sNG0igq6+tKTTy+cDykxBJFJgQvv50ZszOUWBM/t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Dxdur2v5RmZoEEAA--.2892S3;
-	Mon, 15 Jul 2024 14:21:42 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8Bx08Tzv5Rma2JJAA--.24215S3;
-	Mon, 15 Jul 2024 14:21:41 +0800 (CST)
-Subject: Re: [PATCH 10/11] LoongArch: KVM: Add PCHPIC user mode read and write
- functions
-To: Xianglai Li <lixianglai@loongson.cn>, linux-kernel@vger.kernel.org
-Cc: Tianrui Zhao <zhaotianrui@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, Min Zhou <zhoumin@loongson.cn>,
- Paolo Bonzini <pbonzini@redhat.com>, WANG Xuerui <kernel@xen0n.name>
-References: <20240705023854.1005258-1-lixianglai@loongson.cn>
- <20240705023854.1005258-11-lixianglai@loongson.cn>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <25ff4e20-158d-d09b-14a4-7cbbabadf7c9@loongson.cn>
-Date: Mon, 15 Jul 2024 14:21:39 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1721026669; c=relaxed/simple;
+	bh=qyqKKupY9E0y841tj2VpyAitxQfjQX8p7N6ZTPi2nfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=YQB5k4S/HzSpqwGUVk/UhyEBM2QyTIVsR53lctsYKGBnn7mCWOmctAcBgNBW8w1RSfRHaUgMKfyDFFWU60MhfDC9eaq92zoXxcCZnDlfjUgHn3Prs31c9NoB5CBHjA5oZDm4TOwfpKLXbchnL/fBp5p7UMQXWOiMJUQNS0hA/tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VvXVNYYa; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: pbonzini@redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1721026664;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=0PtvZMxfAKvLK0Mt+7cMdpr/W/nx3zmCRU8SuscmP3Q=;
+	b=VvXVNYYal8ZcAyemIgJOD6SceR91tOfTgfXkHu4LdKJSJwoEQCFFSlvgOBWDDRN0Nnl9Uo
+	SrLG8FvbPgfqxkNAFkzj9UJLybkz+4Dxq2ssGakH6K1Z4puPGIbFgSqQAWhc7uRQgPfwqa
+	xigT5aCPRlbfieVUvYdNqM53+aBERjM=
+X-Envelope-To: maz@kernel.org
+X-Envelope-To: ptosi@google.com
+X-Envelope-To: sebott@redhat.com
+X-Envelope-To: sebastianene@google.com
+X-Envelope-To: changyuanl@google.com
+X-Envelope-To: coltonlewis@google.com
+X-Envelope-To: jintack.lim@linaro.org
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: kvmarm@lists.linux.dev
+X-Envelope-To: james.morse@arm.com
+X-Envelope-To: suzuki.poulose@arm.com
+X-Envelope-To: yuzenghui@huawei.com
+Date: Sun, 14 Jul 2024 23:57:36 -0700
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>,
+	=?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>,
+	Sebastian Ott <sebott@redhat.com>,
+	Sebastian Ene <sebastianene@google.com>,
+	Changyuan Lyu <changyuanl@google.com>,
+	Colton Lewis <coltonlewis@google.com>,
+	Jintack Lim <jintack.lim@linaro.org>, kvm@vger.kernel.org,
+	kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [GIT PULL] KVM/arm64 updates for 6.11
+Message-ID: <ZpTIYCFIgvKogfE4@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240705023854.1005258-11-lixianglai@loongson.cn>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8Bx08Tzv5Rma2JJAA--.24215S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Wr4fJF47CFyrWFyDGw4DGFX_yoW7ZrWkpF
-	WUAa93Ar4kGryxurn7X3WDu34xXws7uw1S9asxXayFkr4qvr95JF1ktrsFvFy5t3ykJF1I
-	qanYkF1Y9a1qy3XCm3ZEXasCq-sJn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2xF0cIa020Ex4CE44I27w
-	Aqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE
-	14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwCYjI0SjxkI62AI1c
-	AE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8C
-	rVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8Zw
-	CIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x02
-	67AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr
-	0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8I3
-	8UUUUUU==
+X-Migadu-Flow: FLOW_OUT
 
+Hi Paolo,
 
+Apologies for sending this later than usual, I took some vacation at the
+end of last week and didn't have the time to send out before.
 
-On 2024/7/5 上午10:38, Xianglai Li wrote:
-> Implements the communication interface between the user mode
-> program and the kernel in PCHPIC interrupt control simulation,
-> which is used to obtain or send the simulation data of the
-> interrupt controller in the user mode process, and is used
-> in VM migration or VM saving and restoration.
-> 
-> Signed-off-by: Tianrui Zhao <zhaotianrui@loongson.cn>
-> Signed-off-by: Xianglai Li <lixianglai@loongson.cn>
-> ---
-> Cc: Bibo Mao <maobibo@loongson.cn>
-> Cc: Huacai Chen <chenhuacai@kernel.org>
-> Cc: kvm@vger.kernel.org
-> Cc: loongarch@lists.linux.dev
-> Cc: Min Zhou <zhoumin@loongson.cn>
-> Cc: Paolo Bonzini <pbonzini@redhat.com>
-> Cc: Tianrui Zhao <zhaotianrui@loongson.cn>
-> Cc: WANG Xuerui <kernel@xen0n.name>
-> Cc: Xianglai li <lixianglai@loongson.cn>
-> 
->   arch/loongarch/include/uapi/asm/kvm.h |   4 +
->   arch/loongarch/kvm/intc/pch_pic.c     | 128 +++++++++++++++++++++++++-
->   2 files changed, 130 insertions(+), 2 deletions(-)
-> 
-> diff --git a/arch/loongarch/include/uapi/asm/kvm.h b/arch/loongarch/include/uapi/asm/kvm.h
-> index 6d5ad95fcb75..ba7f473bc8b6 100644
-> --- a/arch/loongarch/include/uapi/asm/kvm.h
-> +++ b/arch/loongarch/include/uapi/asm/kvm.h
-> @@ -113,4 +113,8 @@ struct kvm_iocsr_entry {
->   
->   #define KVM_DEV_LOONGARCH_EXTIOI_GRP_REGS	1
->   
-> +#define KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL	0
-> +#define KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT	0
-> +#define KVM_DEV_LOONGARCH_PCH_PIC_GRP_REGS	1
-> +
->   #endif /* __UAPI_ASM_LOONGARCH_KVM_H */
-> diff --git a/arch/loongarch/kvm/intc/pch_pic.c b/arch/loongarch/kvm/intc/pch_pic.c
-> index 4ad85277fced..abb7bab84f2d 100644
-> --- a/arch/loongarch/kvm/intc/pch_pic.c
-> +++ b/arch/loongarch/kvm/intc/pch_pic.c
-> @@ -313,16 +313,140 @@ static const struct kvm_io_device_ops kvm_loongarch_pch_pic_ops = {
->   	.write	= kvm_loongarch_pch_pic_write,
->   };
->   
-> +static int kvm_loongarch_pch_pic_init(struct kvm_device *dev, u64 addr)
-> +{
-> +	int ret;
-> +	struct loongarch_pch_pic *s = dev->kvm->arch.pch_pic;
-> +	struct kvm_io_device *device;
-> +	struct kvm *kvm = dev->kvm;
-> +
-> +	s->pch_pic_base = addr;
-> +	device = &s->device;
-> +	/* init device by pch pic writing and reading ops */
-> +	kvm_iodevice_init(device, &kvm_loongarch_pch_pic_ops);
-> +	mutex_lock(&kvm->slots_lock);
-> +	/* register pch pic device */
-> +	ret = kvm_io_bus_register_dev(kvm, KVM_MMIO_BUS, addr, PCH_PIC_SIZE, device);
-> +	mutex_unlock(&kvm->slots_lock);
-> +	if (ret < 0)
-> +		return -EFAULT;
-> +
-> +	return 0;
-> +}
-> +
-> +/* used by user space to get or set pch pic registers */
-> +static int kvm_loongarch_pch_pic_regs_access(struct kvm_device *dev,
-> +					struct kvm_device_attr *attr,
-> +					bool is_write)
-> +{
-> +	int addr, len = 8, ret = 0;
-> +	void __user *data;
-> +	void *p = NULL;
-> +	struct loongarch_pch_pic *s;
-> +
-> +	s = dev->kvm->arch.pch_pic;
-> +	addr = attr->attr;
-> +	data = (void __user *)attr->addr;
-> +
-> +	spin_lock(&s->lock);
-> +	/* get pointer to pch pic register by addr */
-> +	switch (addr) {
-> +	case PCH_PIC_MASK_START:
-> +		p = &s->mask;
-> +		break;
-> +	case PCH_PIC_HTMSI_EN_START:
-> +		p = &s->htmsi_en;
-> +		break;
-> +	case PCH_PIC_EDGE_START:
-> +		p = &s->edge;
-> +		break;
-> +	case PCH_PIC_AUTO_CTRL0_START:
-> +		p = &s->auto_ctrl0;
-> +		break;
-> +	case PCH_PIC_AUTO_CTRL1_START:
-> +		p = &s->auto_ctrl1;
-> +		break;
-> +	case PCH_PIC_ROUTE_ENTRY_START:
-> +		p = s->route_entry;
-> +		len = 64;
-Can we use macro rather than hard-coded 64 here?
+Details can be found in the tag. Nothing significant to note, though
+Catalin reports a trivial conflict in arch/arm64/include/asm/esr.h
+between our trees [*].
 
-> +		break;
-> +	case PCH_PIC_HTMSI_VEC_START:
-> +		p = s->htmsi_vector;
-> +		len = 64;
-Ditto
+Please pull.
 
-> +		break;
-> +	case PCH_PIC_INT_IRR_START:
-> +		p = &s->irr;
-> +		break;
-> +	case PCH_PIC_INT_ISR_START:
-> +		p = &s->isr;
-> +		break;
-> +	case PCH_PIC_POLARITY_START:
-> +		p = &s->polarity;
-> +		break;
-> +	default:
-> +		ret = -EINVAL;
-> +	}
-> +
-Do we need check default path and return directly here?
+Thanks,
+Oliver
 
-> +	/* write or read value according to is_write */
-> +	if (is_write) {
-> +		if (copy_from_user(p, data, len))
-> +			ret = -EFAULT;
-> +	} else {
-> +		if (copy_to_user(data, p, len))
-> +			ret = -EFAULT;
-> +	}
-> +
-> +	spin_unlock(&s->lock);
-Please put spin_unlock() ahead of copy_from_user/copy_to_user
+[*] https://lore.kernel.org/linux-arm-kernel/20240711190353.3248426-1-catalin.marinas@arm.com/
 
-Regards
-Bibo Mao
-> +	return ret;
-> +}
-> +
->   static int kvm_loongarch_pch_pic_get_attr(struct kvm_device *dev,
->   				struct kvm_device_attr *attr)
->   {
-> -	return 0;
-> +	/* only support pch pic group registers */
-> +	if (attr->group == KVM_DEV_LOONGARCH_PCH_PIC_GRP_REGS)
-> +		return kvm_loongarch_pch_pic_regs_access(dev, attr, false);
-> +
-> +	return -EINVAL;
->   }
->   
->   static int kvm_loongarch_pch_pic_set_attr(struct kvm_device *dev,
->   				struct kvm_device_attr *attr)
->   {
-> -	return 0;
-> +	int ret = -EINVAL;
-> +	u64 addr;
-> +	void __user *uaddr = (void __user *)(long)attr->addr;
-> +
-> +	switch (attr->group) {
-> +	case KVM_DEV_LOONGARCH_PCH_PIC_GRP_CTRL:
-> +		switch (attr->attr) {
-> +		case KVM_DEV_LOONGARCH_PCH_PIC_CTRL_INIT:
-> +			if (copy_from_user(&addr, uaddr, sizeof(addr)))
-> +				return -EFAULT;
-> +
-> +			if (!dev->kvm->arch.pch_pic) {
-> +				kvm_err("%s: please create pch_pic irqchip first!\n", __func__);
-> +				ret = -EFAULT;
-> +				break;
-> +			}
-> +
-> +			ret = kvm_loongarch_pch_pic_init(dev, addr);
-> +			break;
-> +		default:
-> +			kvm_err("%s: unknown group (%d) attr (%lld)\n", __func__, attr->group,
-> +					attr->attr);
-> +			ret = -EINVAL;
-> +			break;
-> +		}
-> +		break;
-> +	case KVM_DEV_LOONGARCH_PCH_PIC_GRP_REGS:
-> +		ret = kvm_loongarch_pch_pic_regs_access(dev, attr, true);
-> +		break;
-> +	default:
-> +			break;
-> +	}
-> +
-> +	return ret;
->   }
->   
->   static void kvm_loongarch_pch_pic_destroy(struct kvm_device *dev)
-> 
+The following changes since commit 83a7eefedc9b56fe7bfeff13b6c7356688ffa670:
 
+  Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.11
+
+for you to fetch changes up to bb032b2352c33be374136889789103d724f1b613:
+
+  Merge branch kvm-arm64/docs into kvmarm/next (2024-07-14 00:28:57 +0000)
+
+----------------------------------------------------------------
+KVM/arm64 changes for 6.11
+
+ - Initial infrastructure for shadow stage-2 MMUs, as part of nested
+   virtualization enablement
+
+ - Support for userspace changes to the guest CTR_EL0 value, enabling
+   (in part) migration of VMs between heterogenous hardware
+
+ - Fixes + improvements to pKVM's FF-A proxy, adding support for v1.1 of
+   the protocol
+
+ - FPSIMD/SVE support for nested, including merged trap configuration
+   and exception routing
+
+ - New command-line parameter to control the WFx trap behavior under KVM
+
+ - Introduce kCFI hardening in the EL2 hypervisor
+
+ - Fixes + cleanups for handling presence/absence of FEAT_TCRX
+
+ - Miscellaneous fixes + documentation updates
+
+----------------------------------------------------------------
+Changyuan Lyu (3):
+      KVM: Documentation: Fix typo `BFD`
+      KVM: Documentation: Enumerate allowed value macros of `irq_type`
+      KVM: Documentation: Correct the VGIC V2 CPU interface addr space size
+
+Christoffer Dall (2):
+      KVM: arm64: nv: Implement nested Stage-2 page table walk logic
+      KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
+
+Colton Lewis (1):
+      KVM: arm64: Add early_param to control WFx trapping
+
+Jintack Lim (1):
+      KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
+
+Marc Zyngier (25):
+      KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity
+      KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
+      KVM: arm64: nv: Handle shadow stage 2 page faults
+      KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
+      KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
+      KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
+      KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
+      KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
+      KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
+      KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
+      KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
+      KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
+      KVM: arm64: nv: Add handling of outer-shareable TLBI operations
+      KVM: arm64: nv: Add handling of range-based TLBI operations
+      KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
+      KVM: arm64: nv: Handle CPACR_EL1 traps
+      KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
+      KVM: arm64: nv: Add trap description for CPTR_EL2
+      KVM: arm64: nv: Add additional trap setup for CPTR_EL2
+      KVM: arm64: Correctly honor the presence of FEAT_TCRX
+      KVM: arm64: Get rid of HCRX_GUEST_FLAGS
+      KVM: arm64: Make TCR2_EL1 save/restore dependent on the VM features
+      KVM: arm64: Make PIR{,E0}_EL1 save/restore conditional on FEAT_TCRX
+      KVM: arm64: Honor trap routing for TCR2_EL1
+      KVM: arm64: nv: Truely enable nXS TLBI operations
+
+Oliver Upton (28):
+      KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
+      KVM: arm64: Get sys_reg encoding from descriptor in idregs_debug_show()
+      KVM: arm64: Make idregs debugfs iterator search sysreg table directly
+      KVM: arm64: Use read-only helper for reading VM ID registers
+      KVM: arm64: Add helper for writing ID regs
+      KVM: arm64: nv: Use accessors for modifying ID registers
+      KVM: arm64: nv: Forward SVE traps to guest hypervisor
+      KVM: arm64: nv: Handle ZCR_EL2 traps
+      KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
+      KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
+      KVM: arm64: nv: Use guest hypervisor's max VL when running nested guest
+      KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
+      KVM: arm64: Spin off helper for programming CPTR traps
+      KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
+      KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
+      KVM: arm64: Allow the use of SVE+NV
+      KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
+      KVM: selftests: Assert that MPIDR_EL1 is unchanged across vCPU reset
+      MAINTAINERS: Include documentation in KVM/arm64 entry
+      Revert "KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity"
+      Merge branch kvm-arm64/misc into kvmarm/next
+      Merge branch kvm-arm64/ffa-1p1 into kvmarm/next
+      Merge branch kvm-arm64/shadow-mmu into kvmarm/next
+      Merge branch kvm-arm64/ctr-el0 into kvmarm/next
+      Merge branch kvm-arm64/el2-kcfi into kvmarm/next
+      Merge branch kvm-arm64/nv-sve into kvmarm/next
+      Merge branch kvm-arm64/nv-tcr2 into kvmarm/next
+      Merge branch kvm-arm64/docs into kvmarm/next
+
+Pierre-Cl�ment Tosi (8):
+      KVM: arm64: Fix clobbered ELR in sync abort/SError
+      KVM: arm64: Fix __pkvm_init_switch_pgd call ABI
+      KVM: arm64: nVHE: Simplify invalid_host_el2_vect
+      KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
+      KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
+      arm64: Introduce esr_brk_comment, esr_is_cfi_brk
+      KVM: arm64: Introduce print_nvhe_hyp_panic helper
+      KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
+
+Sebastian Ene (4):
+      KVM: arm64: Trap FFA_VERSION host call in pKVM
+      KVM: arm64: Add support for FFA_PARTITION_INFO_GET
+      KVM: arm64: Update the identification range for the FF-A smcs
+      KVM: arm64: Use FF-A 1.1 with pKVM
+
+Sebastian Ott (5):
+      KVM: arm64: unify code to prepare traps
+      KVM: arm64: Treat CTR_EL0 as a VM feature ID register
+      KVM: arm64: show writable masks for feature registers
+      KVM: arm64: rename functions for invariant sys regs
+      KVM: selftests: arm64: Test writes to CTR_EL0
+
+ Documentation/admin-guide/kernel-parameters.txt   |   18 +
+ Documentation/virt/kvm/api.rst                    |   10 +-
+ Documentation/virt/kvm/devices/arm-vgic.rst       |    2 +-
+ MAINTAINERS                                       |    2 +
+ arch/arm64/include/asm/esr.h                      |   12 +
+ arch/arm64/include/asm/kvm_arm.h                  |    1 -
+ arch/arm64/include/asm/kvm_asm.h                  |    2 +
+ arch/arm64/include/asm/kvm_emulate.h              |   95 +-
+ arch/arm64/include/asm/kvm_host.h                 |   68 +-
+ arch/arm64/include/asm/kvm_hyp.h                  |    4 +-
+ arch/arm64/include/asm/kvm_mmu.h                  |   26 +
+ arch/arm64/include/asm/kvm_nested.h               |  131 ++-
+ arch/arm64/include/asm/sysreg.h                   |   17 +
+ arch/arm64/kernel/asm-offsets.c                   |    1 +
+ arch/arm64/kernel/debug-monitors.c                |    4 +-
+ arch/arm64/kernel/traps.c                         |    8 +-
+ arch/arm64/kvm/arm.c                              |   86 +-
+ arch/arm64/kvm/emulate-nested.c                   |  104 +++
+ arch/arm64/kvm/fpsimd.c                           |   19 +-
+ arch/arm64/kvm/handle_exit.c                      |   43 +-
+ arch/arm64/kvm/hyp/entry.S                        |    8 +
+ arch/arm64/kvm/hyp/include/hyp/switch.h           |   29 +-
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h        |   35 +-
+ arch/arm64/kvm/hyp/include/nvhe/ffa.h             |    2 +-
+ arch/arm64/kvm/hyp/nvhe/Makefile                  |    6 +-
+ arch/arm64/kvm/hyp/nvhe/ffa.c                     |  180 +++-
+ arch/arm64/kvm/hyp/nvhe/gen-hyprel.c              |    6 +
+ arch/arm64/kvm/hyp/nvhe/host.S                    |    6 -
+ arch/arm64/kvm/hyp/nvhe/hyp-init.S                |   30 +-
+ arch/arm64/kvm/hyp/nvhe/setup.c                   |    4 +-
+ arch/arm64/kvm/hyp/vhe/switch.c                   |  202 ++++-
+ arch/arm64/kvm/hyp/vhe/tlb.c                      |  147 +++
+ arch/arm64/kvm/mmu.c                              |  213 ++++-
+ arch/arm64/kvm/nested.c                           | 1002 ++++++++++++++++++---
+ arch/arm64/kvm/pmu-emul.c                         |    2 +-
+ arch/arm64/kvm/reset.c                            |    6 +
+ arch/arm64/kvm/sys_regs.c                         |  593 +++++++++++-
+ include/linux/arm_ffa.h                           |    3 +
+ tools/testing/selftests/kvm/aarch64/set_id_regs.c |   17 +
+ 39 files changed, 2764 insertions(+), 380 deletions(-)
 
