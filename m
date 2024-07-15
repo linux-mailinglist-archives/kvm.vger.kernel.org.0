@@ -1,270 +1,233 @@
-Return-Path: <kvm+bounces-21625-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21626-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF282930E60
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 08:57:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D73C930F26
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 09:53:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3C31F21651
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 06:57:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDDF2281751
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 07:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D44C11836DE;
-	Mon, 15 Jul 2024 06:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8851836E7;
+	Mon, 15 Jul 2024 07:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="VvXVNYYa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="W0qMRERh"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 534721836CF
-	for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 06:57:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721026669; cv=none; b=svBxsABpUdmGYDLhWrajg0yF+lpQEoLleNo1TmPxgqG0fXn3BZE1zsHiFOyJ/CIlGyTUSSvQ92cM/Fc81N0L0aLvTUuR7A/e5cz1UkD38g4JMnUp5pozrXEcp6l58dU6SGCCOai/7GdSFtViUC9NJ20rAH+utweOUGayAMzqm70=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721026669; c=relaxed/simple;
-	bh=qyqKKupY9E0y841tj2VpyAitxQfjQX8p7N6ZTPi2nfA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=YQB5k4S/HzSpqwGUVk/UhyEBM2QyTIVsR53lctsYKGBnn7mCWOmctAcBgNBW8w1RSfRHaUgMKfyDFFWU60MhfDC9eaq92zoXxcCZnDlfjUgHn3Prs31c9NoB5CBHjA5oZDm4TOwfpKLXbchnL/fBp5p7UMQXWOiMJUQNS0hA/tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=VvXVNYYa; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Envelope-To: pbonzini@redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1721026664;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=0PtvZMxfAKvLK0Mt+7cMdpr/W/nx3zmCRU8SuscmP3Q=;
-	b=VvXVNYYal8ZcAyemIgJOD6SceR91tOfTgfXkHu4LdKJSJwoEQCFFSlvgOBWDDRN0Nnl9Uo
-	SrLG8FvbPgfqxkNAFkzj9UJLybkz+4Dxq2ssGakH6K1Z4puPGIbFgSqQAWhc7uRQgPfwqa
-	xigT5aCPRlbfieVUvYdNqM53+aBERjM=
-X-Envelope-To: maz@kernel.org
-X-Envelope-To: ptosi@google.com
-X-Envelope-To: sebott@redhat.com
-X-Envelope-To: sebastianene@google.com
-X-Envelope-To: changyuanl@google.com
-X-Envelope-To: coltonlewis@google.com
-X-Envelope-To: jintack.lim@linaro.org
-X-Envelope-To: kvm@vger.kernel.org
-X-Envelope-To: kvmarm@lists.linux.dev
-X-Envelope-To: james.morse@arm.com
-X-Envelope-To: suzuki.poulose@arm.com
-X-Envelope-To: yuzenghui@huawei.com
-Date: Sun, 14 Jul 2024 23:57:36 -0700
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Marc Zyngier <maz@kernel.org>,
-	=?iso-8859-1?Q?Pierre-Cl=E9ment?= Tosi <ptosi@google.com>,
-	Sebastian Ott <sebott@redhat.com>,
-	Sebastian Ene <sebastianene@google.com>,
-	Changyuan Lyu <changyuanl@google.com>,
-	Colton Lewis <coltonlewis@google.com>,
-	Jintack Lim <jintack.lim@linaro.org>, kvm@vger.kernel.org,
-	kvmarm@lists.linux.dev, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [GIT PULL] KVM/arm64 updates for 6.11
-Message-ID: <ZpTIYCFIgvKogfE4@linux.dev>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5F3B23A9
+	for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 07:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721030029; cv=fail; b=WMiWj6O15hTWlPxCyCty+YzsrD1Oc7to9YlSJknvLdgRE5PWR21b+Lxp5laegwrFiISMs8+3gm3M+EG2kjMMG+NMnmhpbDEmFKkdvfscYjsTAlT7I/ygr90EEhAFU6ek7pb1pzuOSPcBcYBam1zKppG7NP1jJ8inkOM1BaBZ22Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721030029; c=relaxed/simple;
+	bh=YGUznZlgNASatqOgmD0WhFf4g1c2Ml4InyNgFdm0w1w=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=L1VITHVOa439wjv5VVAwFeyZKfPb3+XMSQuZhK97woHemctp6+IOFEDiaOrtnwlSlqE/fdIMFda8hfPxEDjp00vynmmeslJSr229rHmdvU7YgoI6Tup353C/Cbz3ODjh+N0+rY8jy4jSRYUpw1y9LMqbR11+QQYThKUFKEA2f/0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=W0qMRERh; arc=fail smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721030027; x=1752566027;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=YGUznZlgNASatqOgmD0WhFf4g1c2Ml4InyNgFdm0w1w=;
+  b=W0qMRERhXxyvIfOE1iww9io7vcM0BDF2YrlTGEM6vNOw1VuioIzqf545
+   U/Z+Qt4ue3Y3ZD8PFntoV6fsHf6nA0KRtC8C1yoHZKRPWfHr3OsbXJghI
+   nB3WWmPpaqcAcjXLW95hwuZX5rZk/k4tdlBMIihOg2KrNSblsTz0Uz1jd
+   Mwt0uzQ1pLfLmK8iSGR7p6wNZJlmt3qFnqYA+POZkXEUyfVqdw1wp5Xvj
+   IpgvLlzVFucRBB1785wG3IFYuRzE5AiMBKtsUpU3i38X1Ux1Zt0s97ToW
+   HyypPRR3l/glQyauwiO+mavyV9zY84PAfJIjFzfNdqo27TgLeHdNjT51A
+   g==;
+X-CSE-ConnectionGUID: f55vjvDrQuuRCMCDfpP1ww==
+X-CSE-MsgGUID: pf/R1TjfS4WK1Ay7kA/6lQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11133"; a="18508716"
+X-IronPort-AV: E=Sophos;i="6.09,209,1716274800"; 
+   d="scan'208";a="18508716"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 00:53:18 -0700
+X-CSE-ConnectionGUID: +v7ARkupS324kvlu4kffpQ==
+X-CSE-MsgGUID: 4A+png2bQk69cdpnSr5Qyw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,209,1716274800"; 
+   d="scan'208";a="50174147"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 15 Jul 2024 00:53:18 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 15 Jul 2024 00:53:17 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 15 Jul 2024 00:53:17 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.174)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 15 Jul 2024 00:53:16 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gjiB2buYT132s+G5xwTfZMlpmYi5bI25vfX6LK5eh4RTHakSbVsG89HhJt75PC0xi8IurzJKYPSLrL1zp2mVjDfb4zXGzFC9H+ifwU7lz7XDDzlZmIm8OucbtOkOr4M3eD64CHUTRNPBIK3ZAlc+8t/EkYO1K1kFU1gMQDVb13RkMw2QR/gupAomEMbQ4nBlyrfUwJEyRhldj8e5HJK9VcmPMNRm0HYlfeCrvhu9oDem34HFZfx9PndbRk3inDWed8M9+uprz44Ah1jn4xW3hQo4g1WjwulRyavbnOLN1zXuU8Ca/IVrz1ZZmEE0UnU0uct7lrXU5KJwsUY8rszsjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9QoUP2SM5KSxwI3xBAC1hLrQxU1fXJkiLpZVp/FzVwc=;
+ b=VbkzreBVIkCl7b1Y9weqw1r6Y9xkyMy62e5yXPGa1MIZCiRoHNjwuczjEIv3h7TYizvl6Oop39hdenjobc9+T6lDv4bVsNVbISlAkMklFzQLL09OCLkEHRrss4ea/LRJt/oESZeDu3jsv/Agjzy5fwn3MMPhapNlnXc/NaZLXQocAG0li8XKhJSI8mRqlCNMoirKItqoxhsJYsPbYVhjHRrSiARvS1I4aHuApR5vSaWL1gbjUHEt9/DqxNk2kvoBq5w5ASMSzyjUXvRdSL1Z8HKynmFr+Lp95yXnc+84S42Jqtfcl/4AvpacOt5G+aCyw2FPLgx3EWx3ZDG26vdLfg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by SA2PR11MB5209.namprd11.prod.outlook.com (2603:10b6:806:110::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Mon, 15 Jul
+ 2024 07:53:08 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::b576:d3bd:c8e0:4bc1%3]) with mapi id 15.20.7762.027; Mon, 15 Jul 2024
+ 07:53:08 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: "Liu, Yi L" <yi.l.liu@intel.com>, "joro@8bytes.org" <joro@8bytes.org>,
+	"jgg@nvidia.com" <jgg@nvidia.com>, "baolu.lu@linux.intel.com"
+	<baolu.lu@linux.intel.com>
+CC: "alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"robin.murphy@arm.com" <robin.murphy@arm.com>, "eric.auger@redhat.com"
+	<eric.auger@redhat.com>, "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
+	<chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
+	<iommu@lists.linux.dev>
+Subject: RE: [PATCH 3/6] iommu/vt-d: Make helpers support modifying present
+ pasid entry
+Thread-Topic: [PATCH 3/6] iommu/vt-d: Make helpers support modifying present
+ pasid entry
+Thread-Index: AQHayTkBxV2CDElK10KiduKobapMPbH3hAZA
+Date: Mon, 15 Jul 2024 07:53:08 +0000
+Message-ID: <BN9PR11MB52765AC4F822E3E99FB55DD88CA12@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240628085538.47049-1-yi.l.liu@intel.com>
+ <20240628085538.47049-4-yi.l.liu@intel.com>
+In-Reply-To: <20240628085538.47049-4-yi.l.liu@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SA2PR11MB5209:EE_
+x-ms-office365-filtering-correlation-id: ea935e88-0f09-4ad9-b964-08dca4a32ad9
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|1800799024|366016|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?6m4DomIY8Qo2hoj1pG+zFMYriAZTgH/SGD+OZqjVbwbbhHlJ2ebrrX0CQXTb?=
+ =?us-ascii?Q?dt0fQfUGfHh8gtB3/sV2csI6g8eP/GKt57yXPRouxdK2ZxHZMr1jaSbaOybJ?=
+ =?us-ascii?Q?08V7TZf/L3788s6a1ZI5z0lpNwr/JKi+FtEir3Fa+1KowBahbYECgJr0xGVj?=
+ =?us-ascii?Q?wD1V4O8AJ112NlQ0rqGflVXyWQmsCq5E1PgJqhtzDiXOwjt69sgTThKc69SA?=
+ =?us-ascii?Q?lFVngXfTLL53k0nfndU+7DbRAZ0i4xST9wVuQYZ0Bzi4xkuGZEwmP9quKVnp?=
+ =?us-ascii?Q?BloHboi4AKdyDu7jj6hV/qrHl1jLJw2uFPQxPrE5j+kRnrfNj/qXNF8MJH/7?=
+ =?us-ascii?Q?zqUu+sLQz3kbpEhUMIXrwhdFYiyJZenTUSFdfPfPJ1uwEfIM2iDop2W8WqYi?=
+ =?us-ascii?Q?ZJcrfsnrylIlSZdHHsES1c3SC0hcls/FG9crYh0QX6ouieYS6wjs3/tl2RnU?=
+ =?us-ascii?Q?9EZabO8bONJHlWrcQxnpNBMSrQwm5jCs49hxoMGtVr92ft1+GthaJtdyd1IF?=
+ =?us-ascii?Q?jqdf8VAM56r8D4wWZMlzL/z46W98R5I/bqnEId28ABBsk5mkz17+d5u7wBjH?=
+ =?us-ascii?Q?Kt/MBKBahc7Bs9immDtagdaBPWiJ2w3wHY1v/dCnOp8o3odFEiBj9Muk9CRq?=
+ =?us-ascii?Q?VKPFTYWLttIQyRQZ+caGhq5F7H6+EBPpxwPlPcXmXcO8H5HITHWzZQ06nQLU?=
+ =?us-ascii?Q?ONE7XWqygWcbMT4EeTaiO3cxlmEAC+QOwXtLPmwuJ8uKNaUMbfsGQpdnZiKZ?=
+ =?us-ascii?Q?++0HHvc3XajVlEfnYWlxglcx41vOvHye9I0M00AG6v4YT8+kbCHNRLDpAOrz?=
+ =?us-ascii?Q?EZq5ZXw/KAq97XP9rYqbtv5LZQQK2Yo3YyQTRDpcNU002cFxbKjJlRgyMkta?=
+ =?us-ascii?Q?HvCcsfItjVfp3KcUtdEBI4EgZlVuHUtIccDJgckaAHhXURFghNx+i6bxpCuP?=
+ =?us-ascii?Q?Z+C167v0L16f2qRW7pYIaCphcFdkviGoqG6/qtii7iEjfiWWZwUg65osDYfL?=
+ =?us-ascii?Q?63bVA76Zv6xKJxtsqTGDlnK9hLOuFygSGcjMTBxFQx1pVhcf9v5eiFOMxwVs?=
+ =?us-ascii?Q?6K6jhWKErMt7MisRBFtCVKqEOaqamHPBsgs68lCy6R5S7d9l5FYp0+YqgIlQ?=
+ =?us-ascii?Q?gTmOYqzX4neAgtadc5s5bScMgRUq2qv7Gf7Q+ti3W670YaAyFgXyaoWwr3nb?=
+ =?us-ascii?Q?uuq47E1N1OTkNFVDgMZ5EAFF2VHB958n9zGa4HBmvQJnjN7gGuQ4xUr0SfW0?=
+ =?us-ascii?Q?Ep3wQ9iSOlxCbZ8+OBbKxkh7oMWqlMmy3EuwsvQ4VjAiW64s9KKOblMDcQ/P?=
+ =?us-ascii?Q?5UrYxz/yHJVHDPDx4RqVGULwUGMPKT59xJJE4bsx2unIww82O1uSBspUaiPB?=
+ =?us-ascii?Q?KH9B5U8hsmuSjN3ylNv05/D7ChCcvJlDUC28e396akxQWmyo6g=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?YnDgIwaYtrvrcO7afZjfrlpubufGrtCLITmkPfGu6ao5jKRf6Kbzi+DRbTef?=
+ =?us-ascii?Q?yK7GyR0Rled93/VLjQAVXewJK6tszNWB7sRFFsexHQa37W0JBjExwBTyggG8?=
+ =?us-ascii?Q?gFJE6EnAWEM9f8cW+TgsbBau4crS3I9NSDnGFrBGGgatqC8+bVRFOJDJDm7X?=
+ =?us-ascii?Q?MditrRJQEplAtzi8PWaDI8887TF4B47F1AgDgRkoHCoyFgI0a3cxtiNEHQwZ?=
+ =?us-ascii?Q?O4FEEDGUnK5/+CE9dZWfcvMJMFC7k7jjOeTRDXQPfsX/+9silgzabBwZpXRL?=
+ =?us-ascii?Q?Z55ti3mSfmQwRbH+FwbwAApj/pso7WI0zfv1FyO2+JVZ+H7LwmLHSdSSfKQH?=
+ =?us-ascii?Q?4xQCBggaACV1cB3liPz25PbWnvIiYAIm7uSZ0XBh5nW3XY8eGfz7L1rksH7/?=
+ =?us-ascii?Q?ihWIU+UgJP4Nkh+tt9lPUxl4QaR/vhJja26d4Qd+B97wPZr04WsMjTC9PqhA?=
+ =?us-ascii?Q?aD+0u4naEhDEdWgBFimKwnFrDoaIvXQkfMh5G2Q3Ou36DWIXIMd2bGybvtrp?=
+ =?us-ascii?Q?1+HU23Cn2KuQHpCA3r+YKBVdGRlIije0l7fi0CUpRLO8ENhbjVSSorYg4FOx?=
+ =?us-ascii?Q?Nr9bDzciLbil5CS23ltdfNwx84lkRkQuCA9O2PuZBVl96l/vUnYMJRmCf2D4?=
+ =?us-ascii?Q?/gdoB5s7lgHTuPwlBLprzu2VSBqkb5qfqCPXwidFltt2W1fRC1rmv4lyy0G7?=
+ =?us-ascii?Q?Glv0+pIRxMUhSWd8RQCVncjLRdObQr2yMlW0xv3sb/++s3hmDfj7/Kf4qDRT?=
+ =?us-ascii?Q?lUGC8xHmOMbgzBaBgJ1BPBB5V1a9p1zgzrA5MZhmR8JGGC78XRrIleoiNKPn?=
+ =?us-ascii?Q?b69ZwiVyABQUlEg+Yef7vzC05qreW5S0P1W8gIeayM2LQLfuMR6toqYSheqt?=
+ =?us-ascii?Q?PsK/JRDwaZ/4tdI9M5fRPaC5aWbVYZ1rbd+472uGyCJkwBn6+2jP7opt//Zu?=
+ =?us-ascii?Q?4Ii5jDV1Pu7yK03Ct5nLw0okYgBZ7Qc2KgzHmT31X8feudTgBSvLxzDRh/vW?=
+ =?us-ascii?Q?IYZvSC9Fh4CZ8A1xDB/905N+KDJK4HcVbOWQdW8UYDufO/E26ZziXyYU6N0j?=
+ =?us-ascii?Q?pR73lnf5biXgl+XULVnPHz/AZa5IKuaitZsr1jgvGX6W8iPQY9omMGfGNHbX?=
+ =?us-ascii?Q?gZGU4/YaEFuwhV7ZcBLHf6oEuvkNqHNdR+zWMdjBoEEdxi6FeCwUs4EmCJgn?=
+ =?us-ascii?Q?0U0iOiqnpwUBtujTaK0e8sMqtj9ZxMkb8BG1VKqu7pbIKkMp5pIRPzqCjZoH?=
+ =?us-ascii?Q?gzzEkameifNF1XtfOeF595jt0f1t0mSV7grMUj4Ukhgmo0Fl0L5uAj0UnwBl?=
+ =?us-ascii?Q?YGCU1XhmXnefZjY9YquTh5ARFZt8JyhDTtzK3c/kUOSsV+WyjpC/KFNY1A/s?=
+ =?us-ascii?Q?ANDa7ow6Ru35EvmFoWJF6wegrM00wrJklsfYwonGTsfg/sbUTXGM/wjZ7bXP?=
+ =?us-ascii?Q?4yEhbwi9tlxCpatn6nVa6z/IYwFFcffLEif2kTCFUXP7ahtdClRmjjsCXKim?=
+ =?us-ascii?Q?gbNN1dE9PqFDdtclmnbw4uG3NYl5vkisqPsYEpj0+uhREXiYdLXxU4YAftBX?=
+ =?us-ascii?Q?QLmGHWcUhdXc3BPvgXIXDCArzM8bnFzVd3hdHnaO?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea935e88-0f09-4ad9-b964-08dca4a32ad9
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Jul 2024 07:53:08.4737
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /03Mjcu9JljIejUzb5UQvV+IoAjWhPr/u10Ye3hrjMAfOKG/ScgJwimR6Rb9tnfKMREFWcpH9pNILgm6KiXy5g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB5209
+X-OriginatorOrg: intel.com
 
-Hi Paolo,
+> From: Liu, Yi L <yi.l.liu@intel.com>
+> Sent: Friday, June 28, 2024 4:56 PM
+>=20
+> diff --git a/drivers/iommu/intel/pasid.c b/drivers/iommu/intel/pasid.c
+> index b18eebb479de..5d3a12b081a2 100644
+> --- a/drivers/iommu/intel/pasid.c
+> +++ b/drivers/iommu/intel/pasid.c
+> @@ -314,6 +314,9 @@ int intel_pasid_setup_first_level(struct intel_iommu
+> *iommu,
+>  		return -EINVAL;
+>  	}
+>=20
+> +	/* Clear the old configuration if it already exists */
+> +	intel_pasid_tear_down_entry(iommu, dev, pasid, false, true);
+> +
+>  	spin_lock(&iommu->lock);
+>  	pte =3D intel_pasid_get_entry(dev, pasid);
+>  	if (!pte) {
 
-Apologies for sending this later than usual, I took some vacation at the
-end of last week and didn't have the time to send out before.
+with this change there will be two invocations on
+intel_pasid_tear_down_entry() in the call stack of RID attach:
 
-Details can be found in the tag. Nothing significant to note, though
-Catalin reports a trivial conflict in arch/arm64/include/asm/esr.h
-between our trees [*].
+  intel_iommu_attach_device()
+    device_block_translation()
+      intel_pasid_tear_down_entry()
+    dmar_domain_attach_device()
+      domain_setup_first_level()
+        intel_pasid_tear_down_entry()
 
-Please pull.
+it's not being a real problem as intel_pasid_tear_down_entry()
+exits early if the pasid entry is non-present, but it will likely cause
+confusion when reading the code.
 
-Thanks,
-Oliver
+What about moving it into intel_iommu_set_dev_pasid() to
+better show the purpose?
 
-[*] https://lore.kernel.org/linux-arm-kernel/20240711190353.3248426-1-catalin.marinas@arm.com/
-
-The following changes since commit 83a7eefedc9b56fe7bfeff13b6c7356688ffa670:
-
-  Linux 6.10-rc3 (2024-06-09 14:19:43 -0700)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/kvmarm/kvmarm.git tags/kvmarm-6.11
-
-for you to fetch changes up to bb032b2352c33be374136889789103d724f1b613:
-
-  Merge branch kvm-arm64/docs into kvmarm/next (2024-07-14 00:28:57 +0000)
-
-----------------------------------------------------------------
-KVM/arm64 changes for 6.11
-
- - Initial infrastructure for shadow stage-2 MMUs, as part of nested
-   virtualization enablement
-
- - Support for userspace changes to the guest CTR_EL0 value, enabling
-   (in part) migration of VMs between heterogenous hardware
-
- - Fixes + improvements to pKVM's FF-A proxy, adding support for v1.1 of
-   the protocol
-
- - FPSIMD/SVE support for nested, including merged trap configuration
-   and exception routing
-
- - New command-line parameter to control the WFx trap behavior under KVM
-
- - Introduce kCFI hardening in the EL2 hypervisor
-
- - Fixes + cleanups for handling presence/absence of FEAT_TCRX
-
- - Miscellaneous fixes + documentation updates
-
-----------------------------------------------------------------
-Changyuan Lyu (3):
-      KVM: Documentation: Fix typo `BFD`
-      KVM: Documentation: Enumerate allowed value macros of `irq_type`
-      KVM: Documentation: Correct the VGIC V2 CPU interface addr space size
-
-Christoffer Dall (2):
-      KVM: arm64: nv: Implement nested Stage-2 page table walk logic
-      KVM: arm64: nv: Unmap/flush shadow stage 2 page tables
-
-Colton Lewis (1):
-      KVM: arm64: Add early_param to control WFx trapping
-
-Jintack Lim (1):
-      KVM: arm64: nv: Forward FP/ASIMD traps to guest hypervisor
-
-Marc Zyngier (25):
-      KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity
-      KVM: arm64: nv: Support multiple nested Stage-2 mmu structures
-      KVM: arm64: nv: Handle shadow stage 2 page faults
-      KVM: arm64: nv: Add Stage-1 EL2 invalidation primitives
-      KVM: arm64: nv: Handle EL2 Stage-1 TLB invalidation
-      KVM: arm64: nv: Handle TLB invalidation targeting L2 stage-1
-      KVM: arm64: nv: Handle TLBI VMALLS12E1{,IS} operations
-      KVM: arm64: nv: Handle TLBI ALLE1{,IS} operations
-      KVM: arm64: nv: Handle TLBI IPAS2E1{,IS} operations
-      KVM: arm64: nv: Handle FEAT_TTL hinted TLB operations
-      KVM: arm64: nv: Tag shadow S2 entries with guest's leaf S2 level
-      KVM: arm64: nv: Invalidate TLBs based on shadow S2 TTL-like information
-      KVM: arm64: nv: Add handling of outer-shareable TLBI operations
-      KVM: arm64: nv: Add handling of range-based TLBI operations
-      KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations
-      KVM: arm64: nv: Handle CPACR_EL1 traps
-      KVM: arm64: nv: Add TCPAC/TTA to CPTR->CPACR conversion helper
-      KVM: arm64: nv: Add trap description for CPTR_EL2
-      KVM: arm64: nv: Add additional trap setup for CPTR_EL2
-      KVM: arm64: Correctly honor the presence of FEAT_TCRX
-      KVM: arm64: Get rid of HCRX_GUEST_FLAGS
-      KVM: arm64: Make TCR2_EL1 save/restore dependent on the VM features
-      KVM: arm64: Make PIR{,E0}_EL1 save/restore conditional on FEAT_TCRX
-      KVM: arm64: Honor trap routing for TCR2_EL1
-      KVM: arm64: nv: Truely enable nXS TLBI operations
-
-Oliver Upton (28):
-      KVM: arm64: nv: Use GFP_KERNEL_ACCOUNT for sysreg_masks allocation
-      KVM: arm64: Get sys_reg encoding from descriptor in idregs_debug_show()
-      KVM: arm64: Make idregs debugfs iterator search sysreg table directly
-      KVM: arm64: Use read-only helper for reading VM ID registers
-      KVM: arm64: Add helper for writing ID regs
-      KVM: arm64: nv: Use accessors for modifying ID registers
-      KVM: arm64: nv: Forward SVE traps to guest hypervisor
-      KVM: arm64: nv: Handle ZCR_EL2 traps
-      KVM: arm64: nv: Load guest hyp's ZCR into EL1 state
-      KVM: arm64: nv: Save guest's ZCR_EL2 when in hyp context
-      KVM: arm64: nv: Use guest hypervisor's max VL when running nested guest
-      KVM: arm64: nv: Ensure correct VL is loaded before saving SVE state
-      KVM: arm64: Spin off helper for programming CPTR traps
-      KVM: arm64: nv: Load guest FP state for ZCR_EL2 trap
-      KVM: arm64: nv: Honor guest hypervisor's FP/SVE traps in CPTR_EL2
-      KVM: arm64: Allow the use of SVE+NV
-      KVM: arm64: nv: Unfudge ID_AA64PFR0_EL1 masking
-      KVM: selftests: Assert that MPIDR_EL1 is unchanged across vCPU reset
-      MAINTAINERS: Include documentation in KVM/arm64 entry
-      Revert "KVM: arm64: nv: Fix RESx behaviour of disabled FGTs with negative polarity"
-      Merge branch kvm-arm64/misc into kvmarm/next
-      Merge branch kvm-arm64/ffa-1p1 into kvmarm/next
-      Merge branch kvm-arm64/shadow-mmu into kvmarm/next
-      Merge branch kvm-arm64/ctr-el0 into kvmarm/next
-      Merge branch kvm-arm64/el2-kcfi into kvmarm/next
-      Merge branch kvm-arm64/nv-sve into kvmarm/next
-      Merge branch kvm-arm64/nv-tcr2 into kvmarm/next
-      Merge branch kvm-arm64/docs into kvmarm/next
-
-Pierre-Clément Tosi (8):
-      KVM: arm64: Fix clobbered ELR in sync abort/SError
-      KVM: arm64: Fix __pkvm_init_switch_pgd call ABI
-      KVM: arm64: nVHE: Simplify invalid_host_el2_vect
-      KVM: arm64: nVHE: gen-hyprel: Skip R_AARCH64_ABS32
-      KVM: arm64: VHE: Mark __hyp_call_panic __noreturn
-      arm64: Introduce esr_brk_comment, esr_is_cfi_brk
-      KVM: arm64: Introduce print_nvhe_hyp_panic helper
-      KVM: arm64: nVHE: Support CONFIG_CFI_CLANG at EL2
-
-Sebastian Ene (4):
-      KVM: arm64: Trap FFA_VERSION host call in pKVM
-      KVM: arm64: Add support for FFA_PARTITION_INFO_GET
-      KVM: arm64: Update the identification range for the FF-A smcs
-      KVM: arm64: Use FF-A 1.1 with pKVM
-
-Sebastian Ott (5):
-      KVM: arm64: unify code to prepare traps
-      KVM: arm64: Treat CTR_EL0 as a VM feature ID register
-      KVM: arm64: show writable masks for feature registers
-      KVM: arm64: rename functions for invariant sys regs
-      KVM: selftests: arm64: Test writes to CTR_EL0
-
- Documentation/admin-guide/kernel-parameters.txt   |   18 +
- Documentation/virt/kvm/api.rst                    |   10 +-
- Documentation/virt/kvm/devices/arm-vgic.rst       |    2 +-
- MAINTAINERS                                       |    2 +
- arch/arm64/include/asm/esr.h                      |   12 +
- arch/arm64/include/asm/kvm_arm.h                  |    1 -
- arch/arm64/include/asm/kvm_asm.h                  |    2 +
- arch/arm64/include/asm/kvm_emulate.h              |   95 +-
- arch/arm64/include/asm/kvm_host.h                 |   68 +-
- arch/arm64/include/asm/kvm_hyp.h                  |    4 +-
- arch/arm64/include/asm/kvm_mmu.h                  |   26 +
- arch/arm64/include/asm/kvm_nested.h               |  131 ++-
- arch/arm64/include/asm/sysreg.h                   |   17 +
- arch/arm64/kernel/asm-offsets.c                   |    1 +
- arch/arm64/kernel/debug-monitors.c                |    4 +-
- arch/arm64/kernel/traps.c                         |    8 +-
- arch/arm64/kvm/arm.c                              |   86 +-
- arch/arm64/kvm/emulate-nested.c                   |  104 +++
- arch/arm64/kvm/fpsimd.c                           |   19 +-
- arch/arm64/kvm/handle_exit.c                      |   43 +-
- arch/arm64/kvm/hyp/entry.S                        |    8 +
- arch/arm64/kvm/hyp/include/hyp/switch.h           |   29 +-
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h        |   35 +-
- arch/arm64/kvm/hyp/include/nvhe/ffa.h             |    2 +-
- arch/arm64/kvm/hyp/nvhe/Makefile                  |    6 +-
- arch/arm64/kvm/hyp/nvhe/ffa.c                     |  180 +++-
- arch/arm64/kvm/hyp/nvhe/gen-hyprel.c              |    6 +
- arch/arm64/kvm/hyp/nvhe/host.S                    |    6 -
- arch/arm64/kvm/hyp/nvhe/hyp-init.S                |   30 +-
- arch/arm64/kvm/hyp/nvhe/setup.c                   |    4 +-
- arch/arm64/kvm/hyp/vhe/switch.c                   |  202 ++++-
- arch/arm64/kvm/hyp/vhe/tlb.c                      |  147 +++
- arch/arm64/kvm/mmu.c                              |  213 ++++-
- arch/arm64/kvm/nested.c                           | 1002 ++++++++++++++++++---
- arch/arm64/kvm/pmu-emul.c                         |    2 +-
- arch/arm64/kvm/reset.c                            |    6 +
- arch/arm64/kvm/sys_regs.c                         |  593 +++++++++++-
- include/linux/arm_ffa.h                           |    3 +
- tools/testing/selftests/kvm/aarch64/set_id_regs.c |   17 +
- 39 files changed, 2764 insertions(+), 380 deletions(-)
 
