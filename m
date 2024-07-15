@@ -1,131 +1,128 @@
-Return-Path: <kvm+bounces-21654-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21655-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E230931964
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 19:33:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 441C09319B8
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 19:42:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB7461F22A9A
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 17:33:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74F9E1C21D11
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 17:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9538A4D8CC;
-	Mon, 15 Jul 2024 17:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 301965589A;
+	Mon, 15 Jul 2024 17:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="ZQYuBx0c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMZaXl0d"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CFA9224EF;
-	Mon, 15 Jul 2024 17:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F74364D6;
+	Mon, 15 Jul 2024 17:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721064773; cv=none; b=YGZ4zo8quxwA2fq29YYoVQiu9buKqG6sk/Kthu+AjbuparvoV3qA9hI9xig6rbVEjOSRI+FLQV457qUM3QbKG3VlORcmcRoxPcTS4B20btx2hh40QFXixKQdQ7eonFosNZDUIM9rBSiLbeJr1TkATL+Qku02g1dBA/q3jf47bQ0=
+	t=1721065314; cv=none; b=YmlXDbNjZodKXWqrMS6/r6xkPg0shopPBlkVwNGH0OsL8lll/YfwJjeiabbKrdGbK++7YcbefaHexS89DI5d/iEA2Y2AlKi0TbnPPxSBmSppXg3wABK5a70b7S9wiDJYnYurJQlb8VzOl9X8d28PL3IVK+Ni/FCS8vae6NZVQmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721064773; c=relaxed/simple;
-	bh=UWnRcUzwi9Uqj2YWWnawaWlNMpjIv/5tEUSPXIHZMLw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=tHLWVa93ZGQwR5fMJaplCTZaRR8hHKWCDPQwJw9aCPbK2ZUP9VOc6w1cnXFGliuHrfse4wsuA1Q8IzyY5MzzRPDG6oorP9uO+YoLDpwrkjiKw8/kbUZAuZIZzGD312pOPqvXDy8aQWG+Q5vEGGNCDKik8vnlJrT6EzvdQZKZyy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=ZQYuBx0c; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46FH8i6N011845;
-	Mon, 15 Jul 2024 17:32:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	Ek+O80F6CChVrZQdWGSuGkbgld3v8A1/DkOZGpo87LU=; b=ZQYuBx0cbfa3FCkt
-	aOnaGPkj+BL6A+myEFEnly41dW9K4rrXX/xBIsM5huY4QW927TbeoeJa3hMn7yz3
-	mhssghF8DOq9oSJmbiW10tznsQgN6FPYsIypNX+pCq9V+GBwxUNKviqjeQFfEVWq
-	vAwXMrgfmJdG2QJdsoE+NCw9pAHA+Y+9V/qnhfaBmFNdI9Hm19VhJ5LhhL+qyKoI
-	MXLJgPO3V5ZvMtRv8CAdQbOpWlndC9gB3DVd42D7W/KRA0RvGvrs1sZIjp6bVpon
-	Sql/5pQU97oI8s/dPNpGMDfQFSdN+AKu3+/6O8bflMOKKUrsJ9cKzReDLuELwqGs
-	wNXkoA==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40bgwg4xh9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jul 2024 17:32:40 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46FHWd4T005496
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jul 2024 17:32:39 GMT
-Received: from [10.48.247.129] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 15 Jul
- 2024 10:32:38 -0700
-Message-ID: <ac6de49a-a130-41eb-87b5-0ecd1e05840b@quicinc.com>
-Date: Mon, 15 Jul 2024 10:32:38 -0700
+	s=arc-20240116; t=1721065314; c=relaxed/simple;
+	bh=b42JSvuywZe+7wglo+K7VO6xLJINq/9FZ8Q+hh/Syfw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rLB8xHymDizbyBYx8lqxKrLMECvDwMnzEaQvl2T6WEYiRx0fG7b9ZcSyfgQEvuF7FzEfvCxAT6Pc7CZE2OwBddulgjTLb2HdmLAqnRtjE0++Bm9sYd+2p4iUzGBD/TW8PX2ioZtx6TMzO2Glc7tEuiI30twU/bs74BJqoJ/GQhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMZaXl0d; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e04196b7603so4633048276.0;
+        Mon, 15 Jul 2024 10:41:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721065311; x=1721670111; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xEV5pedtY2Y2FeTPODdvM+/ZX+4nHrD94jMR2RlwhT4=;
+        b=YMZaXl0dP4AHdLxHhS8hluEiCfkZ/a9t9Zw6eN6kNG4YoMz/njoeJW6X6jau9yGeFj
+         ypjOOMS2OixEIFNUqqYeFFxd52KntJWDfoBSJFg7ii+6Ts9jgUo9O1guIVGvU2sT+3dD
+         jrsMwuKDdY90BowjBlltmx/CBFi3uxr76VF8RjKt7GJ1y94NCfArnv65awV27ZstDrgE
+         qfb4vF4EfeU9xu0xRpCXacSevydh7SzQn/1N82qMRROJPQVyZPUEhOskXpn3LyedMJ6d
+         /wxnd8/tiJYoLKnIGgMhy/3rWYeR1U8HxSuDlBYvRbE9JNA1NbbpHiomLSPVRJz0KAbt
+         ImFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721065311; x=1721670111;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xEV5pedtY2Y2FeTPODdvM+/ZX+4nHrD94jMR2RlwhT4=;
+        b=MPach5nFH8Ra8LlXSiafe/FHydsHLOSmBNAfaLcoavHWB6Ev+U8bTX+0Z8trE+Wcdu
+         dQ7Iceak0idJkX6YqX2rvYsP5Mh1Ae1pRbN+EkkEawFYBcVYSWgbdcQSXt4vnIdPDpTe
+         dgT6/gLKUFm+3rm1lj1Oprk77B0G9lahN65mCK0Scw7zptizd0ADKxq6Ev/ga2v3QK3a
+         4tJK6Rz9UIhstwaXu5ASMWV6Ii6Bnly7p7EwkKkSRkTINQigriNQKQZqn+/hs7Wlgqm/
+         PlDyJq/twzWVmE7IJDvVkZjyn7SFco6SyLqy4ErsuqIL3ixX3k/GCEEB4OM38HEYIpG7
+         a7bg==
+X-Forwarded-Encrypted: i=1; AJvYcCVoh8jh6pncCfudksKsVPVD5ZaylurJ67ym19B/fUN8fsja1KG2AkScx2agseP5a6VX6rXJTMzge78CFFQSBqxdpgFPbM21QX7/6ctVar+qVcb1oqhVXrlra6kMHMidkGosxIPL+1xsFRi/qgmZ6k2NOa095j+9+hc9lXa2moOmEjy6FYIw59Vj5d/N+VvnL7H3J01bFErWXJEYQK55fNgcDnaBMwUPStrQ+qZA
+X-Gm-Message-State: AOJu0YyCfVrfAfSbqAibVEnEXdg2+Cac3n7HapZcWZ+aMxmwXt4epPBj
+	242saFqI5Jh7Sr2uxoA9CE9EBN/Q0l9G91Mq/RuZS2NFOKRkJXpPeosrlN1l42uSCtexhPviiaL
+	a1c1kIGOwsmKmoRtudCAJpNmFJ5k=
+X-Google-Smtp-Source: AGHT+IHIN6/eBpniYpqerz8db8xwfOTyovfSRjDMk7JvYfmegjzpFKzgDJtBVYAnhNHbomijkTgVUKTNkbIU54dFkr4=
+X-Received: by 2002:a05:6902:702:b0:dca:c369:fac2 with SMTP id
+ 3f1490d57ef6-e05d3aae365mr381626276.3.1721065311277; Mon, 15 Jul 2024
+ 10:41:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] vfio-mdev: add MODULE_DESCRIPTION() macros
-Content-Language: en-US
-To: Alex Williamson <alex.williamson@redhat.com>
-CC: Kirti Wankhede <kwankhede@nvidia.com>,
-        "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>,
-        "kernel-janitors@vger.kernel.org"
-	<kernel-janitors@vger.kernel.org>
-References: <20240523-md-vfio-mdev-v1-1-4676cd532b10@quicinc.com>
- <a94604eb-7ea6-4813-aa78-6c73f7d4253a@quicinc.com>
- <MN2PR12MB420688C51B3F2CC8BF8CA3A8DCA62@MN2PR12MB4206.namprd12.prod.outlook.com>
- <20240712163621.6f34ae98.alex.williamson@redhat.com>
- <3717c990-ac93-4a43-a33c-bce02a066dfd@quicinc.com>
- <20240715103536.3e1370ef.alex.williamson@redhat.com>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240715103536.3e1370ef.alex.williamson@redhat.com>
+References: <20240710212555.1617795-4-amery.hung@bytedance.com> <85d64656-d8ff-1133-175f-b12f4913fccf@salutedevices.com>
+In-Reply-To: <85d64656-d8ff-1133-175f-b12f4913fccf@salutedevices.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Mon, 15 Jul 2024 10:41:40 -0700
+Message-ID: <CAMB2axN5jJ_uabb-rd=wdcbX9DQYvENxQjK_7ZWhM60+5fVLKA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v6 03/14] af_vsock: support multi-transport datagrams
+To: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Cc: stefanha@redhat.com, sgarzare@redhat.com, mst@redhat.com, 
+	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, 
+	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
+	bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
+	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-hyperv@vger.kernel.org, bpf@vger.kernel.org, 
+	bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
+	amery.hung@bytedance.com, xiyou.wangcong@gmail.com, 
+	kernel <kernel@sberdevices.ru>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 2Z5D_oFVDS7QP5aWCDCCvsPw9SZCFiz3
-X-Proofpoint-ORIG-GUID: 2Z5D_oFVDS7QP5aWCDCCvsPw9SZCFiz3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-15_11,2024-07-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- adultscore=0 spamscore=0 priorityscore=1501 mlxscore=0 suspectscore=0
- mlxlogscore=993 lowpriorityscore=0 clxscore=1015 bulkscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407150136
+Content-Transfer-Encoding: quoted-printable
 
-On 7/15/2024 9:35 AM, Alex Williamson wrote:
-> On Mon, 15 Jul 2024 09:17:41 -0700
-> Jeff Johnson <quic_jjohnson@quicinc.com> wrote:
-> 
->> On 7/12/2024 3:36 PM, Alex Williamson wrote:>>>>   MODULE_LICENSE("GPL v2");
->>>>>>   MODULE_INFO(supported, "Test driver that simulate serial port over PCI");
->>>>>> +MODULE_DESCRIPTION("Test driver that simulate serial port over PCI");  
->>>
->>> Seems the preceding MODULE_INFO needs to be removed here.  At best the
->>> added MODULE_DESCRIPTION is redundant, but "supported" is not a
->>> standard tag, so it's not clear what the purpose of that tag was meant
->>> to be anyway.  Thanks,
->>>
->>> Alex  
->>
->> My preference would be to just add the missing MODULE_DESCRIPTION() with this
->> patch since that fixes the existing warning. Removing an existing macro
->> invocation is out of scope for what I'm trying to accomplish.
-> 
-> This adds a MODULE_DESCRIPTION that's redundant to the current
-> MODULE_INFO, therefore I'd argue that it's not out of scope to replace
-> the MODULE_INFO with a MODULE_DESCRIPTION to achieve your goal.  Thanks,
-> 
-> Alex
-> 
-ok, let me post a v2
+On Mon, Jul 15, 2024 at 1:25=E2=80=AFAM Arseniy Krasnov
+<avkrasnov@salutedevices.com> wrote:
+>
+> Hi! Sorry, i was not in cc, so I'll reply in this way :)
 
-/jeff
+Ope. I will copy you in the next version.
+
+>
+> +static const struct vsock_transport *
+> +vsock_dgram_lookup_transport(unsigned int cid, __u8 flags)
+> +{
+> +       const struct vsock_transport *transport;
+> +
+> +       transport =3D vsock_connectible_lookup_transport(cid, flags);
+> +       if (transport)
+> +               return transport;
+> +
+> +       return transport_dgram_fallback;
+> +}
+> +
+> ^^^
+>
+> I guess this must be under EXPORT_SYMBOL, because it is called from
+> virtio_transport_common.c, so module build fails.
+>
+> Thanks
+
+Right. I will fix it by exporting vsock_dgram_lookup_transport() in patch 7=
+.
+
+Thanks!
+Amery
 
