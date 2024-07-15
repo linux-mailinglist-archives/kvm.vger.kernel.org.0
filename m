@@ -1,108 +1,160 @@
-Return-Path: <kvm+bounces-21639-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21640-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7659E93120B
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 12:12:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AB7493128B
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 12:45:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 201281F2355D
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 10:12:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2A3D28455F
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 10:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1BC187557;
-	Mon, 15 Jul 2024 10:12:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B58CA1891AF;
+	Mon, 15 Jul 2024 10:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AxVRM0UU"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="U05jbKfb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2013.outbound.protection.outlook.com [40.92.89.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B443C172BA6;
-	Mon, 15 Jul 2024 10:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721038356; cv=none; b=OrDIuP1DQnrOU5G8aLn7eMmQVaqL//joPc3a99DfgHYDp7Ay3gD00HFu1Q1+d/4OZtQstq/e7U2f1PRRt8QDHR9bt65awY+r3rWmMGzcYSubLAjwATKRFcSzaikyR9YQg4zino0+h9xP16mnGZrkTBLbUWaV123Zg6YyIdPqQSk=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721038356; c=relaxed/simple;
-	bh=PWqkqSvJsWDQly1er/ukGoZ+HvhC1DU8BS2SZm/Nxig=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BZq3YQ9jcaIIWjrbyQL3qh3pXKQEvWf+HQ16s/tn556fWkKIZ5hT00wBSopp3yPq+L4Z7jK+o+2JV6RH2knGNDx6RDM26x0TT0EI57wB2SWthsDkZULPOrzn+HVpHVTuemfbZTH9CVZWNcTlbnjp32hJFpuqUOAPJd3D2hSVvfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AxVRM0UU; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721038354; x=1752574354;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=PWqkqSvJsWDQly1er/ukGoZ+HvhC1DU8BS2SZm/Nxig=;
-  b=AxVRM0UUcNXXZ1imf8JYTz0SbyaT+40sHCxD2UJnJ/MBXaxpr3bKXPqc
-   EVMc9CjeRH5MAWGrqU/jpxRcRrJIEt0PnJXXBM037qvWMLWGJwvKHksDP
-   3mLe2hp0N5S4dhsIGpp8qgAl8YE5FYV4IalGAU1Z/I2cyIW/bpwuhahdE
-   2PoeItAnIr+p0/RNZIHRAEVXjQVBuaIdjrI7AzK8WRAOe4HKCUksqqxWo
-   TC9yfv1qz7ejQjtsa6clNv/WbSqSzYOdAI/fxV/5/kcQzxP8yrGGyUcKP
-   eWTtARfPLDHQdKvgKuQZWwbSp07lssvjqk/zXceWnb/mEgbWTFs1hhF12
-   A==;
-X-CSE-ConnectionGUID: elfziXLuTWGUKjzGdQDBdQ==
-X-CSE-MsgGUID: 5OoGPU23QFGZWyr4EvAmXg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11133"; a="18023569"
-X-IronPort-AV: E=Sophos;i="6.09,210,1716274800"; 
-   d="scan'208";a="18023569"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 03:12:34 -0700
-X-CSE-ConnectionGUID: UzDMctGYQKqiu+R/HyZ4jw==
-X-CSE-MsgGUID: hT6flkEcR4KJ0ix2q6EQjQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,210,1716274800"; 
-   d="scan'208";a="53946610"
-Received: from rfrazer-mobl3.amr.corp.intel.com (HELO khuang2-desk.gar.corp.intel.com) ([10.124.222.34])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Jul 2024 03:12:33 -0700
-From: Kai Huang <kai.huang@intel.com>
-To: pbonzini@redhat.com,
-	seanjc@google.com,
-	kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Kai Huang <kai.huang@intel.com>
-Subject: [PATCH] KVM: VMX: Do not account for temporary memory allocation in ECREATE emulation
-Date: Mon, 15 Jul 2024 22:12:24 +1200
-Message-ID: <20240715101224.90958-1-kai.huang@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB34171E53;
+	Mon, 15 Jul 2024 10:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.89.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721040334; cv=fail; b=BUgj4YNFnLG6qnws6ghAFWxer4JLLLnfEZlNX8turUjyo52R9girg/YQXUURb4peTrRBKyOQzknbsx+qA2Zc0P+HF8Ogvc/q5v+IVNRMYhMjDVdTyhmsFKg16W4dte1kmOXxCztGS2OKfjpAFJXCcduAr13nIYGNsLsjv+C8hjI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721040334; c=relaxed/simple;
+	bh=tbqSF1cYUhkzFmFjeNZdZFOvvXuKqkqNqT0I6ZzoyjM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=J0+3zbax3FAgje/wGkePJQg0xMBk595JzNFWBW0i2ywBnuJacHPxnWvlJyDA2vG8mBPPBBYEF12X0cgTT/D5bBDIodq9z/ukXUrhb54U2nQxoNHNIV11HBq4QOFJCq5tjRSyGaO7uWTIk0dPiIjsAhy45ly4GtWShv76qwzrhYs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=U05jbKfb; arc=fail smtp.client-ip=40.92.89.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uZmDKHOsfqe0saZlw1oifvi2wyOw65zoc8zn4sDKmxWiyxJyzVOkVuk4Lf6ZYrdjJ4fZazvHu5/uzz9BLYCGFuK087bfbzVGqioeSFqiN8eQm5heFSyH1m1Wf7i4Pnx8+N1aDitOb8x4y5ugAZe/QJKBHinM+W0eZJSNLCrDifOZNNfa6jZX5gVb2TufIkNpNq6NYruhlooAa01uMmzTbatReiCEPTRCxY7cZs3YHorQI1bJhn7Vrcit0Bc1+s0M3yz/+3ri40WizVgZvpdH+2JBGH2qB/6ZvhUESbiEss92sTOZLrAHZU8+CgKhK3ufSgRK87Icq+ag7cdDUL513g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tbqSF1cYUhkzFmFjeNZdZFOvvXuKqkqNqT0I6ZzoyjM=;
+ b=KLrUoz08ek05liRoRTGUL4jUY/pigZvKBuPgaX7BLlDSWsgDt1ixpjLy55xqvJ0vuJAQGNTfxtJEqU4ftSUtbbH254WAaN6MXxyqJBrADcdUq508FB3lVk5M7O6tQ4wS0yhN9smNaCqfGKqfqapxe8AN79z8YteSCLrgUAFm7+yVbAsyHSc3EHHjNDAhaW6G6rLhuN68L80Uy4N65lOsyNR3A3nGUz8dJKueTuI19SqQEEf69h3GYh13P6916/D84OhkajNQSIA/9XhAPzr4H8PjxwyVu/3NXFP71R2yTl+e/waHtV+Tx5TZUiCOjN1VFV+Y6B7O2nFPLXqljL6RZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tbqSF1cYUhkzFmFjeNZdZFOvvXuKqkqNqT0I6ZzoyjM=;
+ b=U05jbKfbvJYrsdOCXQ+yPBqavpV+QjEyQxlgXqOyVhx5vhWNlKZR6OKTltqjnLbOw/qofIJ+GUSWSbTVkQWphMztxGlh7PiIatoqePrYOd4n9BkXLj6QWkp+qP+4Q795JdAdovFSrYeVO45zS3QlkgDdD6XwMhbHd7mqEPjWutmY82cGHbho5FhV5wFT0U4WirSdxstnz5FFPxgRFBn91P4g6WVmx243KECYR1iGIFs9KwokIDf3sPeEntBS9bYAIgIwQ42U7mJqMQ/izwoeeKWR0qP6x94FYMzIgyBlmLcNB86O40T/EdkgmUv+FKYjT3KoK4r0YBz6SnyvaaRN4A==
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
+ by PA4P194MB1135.EURP194.PROD.OUTLOOK.COM (2603:10a6:102:c3::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Mon, 15 Jul
+ 2024 10:45:29 +0000
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7762.027; Mon, 15 Jul 2024
+ 10:45:29 +0000
+From: Luigi Leonardi <luigi.leonardi@outlook.com>
+To: sgarzare@redhat.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	luigi.leonardi@outlook.com,
+	marco.pinn95@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	stefanha@redhat.com,
+	virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v3 2/2] vsock/virtio: avoid queuing packets when work queue is empty
+Date: Mon, 15 Jul 2024 12:44:49 +0200
+Message-ID:
+ <VI1P194MB2166D217DAB34D4A774FA2129AA12@VI1P194MB2166.EURP194.PROD.OUTLOOK.COM>
 X-Mailer: git-send-email 2.45.2
+In-Reply-To: <4ou6pj632vwst652fcnfiz4hklncc6g4djel5byabdb3hpyap2@ebxpk7ovewv3>
+References: <4ou6pj632vwst652fcnfiz4hklncc6g4djel5byabdb3hpyap2@ebxpk7ovewv3>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [7I9CNCLVGfv0eEWN2jEbHUk1JDj3EcXX]
+X-ClientProxiedBy: MI2P293CA0003.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::16) To VI1P194MB2166.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:800:1c4::11)
+X-Microsoft-Original-Message-ID:
+ <20240715104449.14687-1-luigi.leonardi@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|PA4P194MB1135:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2448f90f-57ee-4c70-fd63-08dca4bb3d7b
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199028|8060799006|19110799003|440099028|3412199025|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	6UllsjvSSIsN8/WDapz9qMl7r2kBYS6uDRnfllxVO+j6CdFTg19N8ZHULkXYDH3LjG/EhjR97us21ClLCYg4+z7+QQrjO7zqDAArmFvbJoVkRo/4VrLvlBVoe+ETtZh6l9FVh37K0RcA/uMXIByIK4gwD3ZwngIAYpEkDRyZF10JBcqMPnWDj2ByPnBIpz186cezLy/f6ch00Cap6duLENOUTG+GwPLShYjP/W2DkiuQg5ghEJJaHEwwhHz19Pd+vvpxEVFP6QgbgUfxpC1F5oaH1wqkz1ijR8zRL3qQ+cER86B4uE1JRrGF3f7zRMKCb5zhBwc8E0py+O4MB2PoNo9UzWS354vPoE+Di7IfHsrIZE1AYRUjV3tBIhRWkE66nwhPsrJVGaH+uBTh7CSjmWxBMJ3l78ffr0qcmabsxbWbqFwa3BHUu3Y9HMp132BNAtTQ02WNh3CNmzSRH8/cVacrf6WvNHdcJ941i7PWt4FaOtN0VznGe9DtCtgTdaYJ7rN6n1JCaPUW+RmZmKhDX8cbbPVMv7VDrssBOEXsqRfajC/x585kWLRPVRKww6kbp3AKGw0aHgQmd6M1TS/6NJQlJOBA8Qv5PwUqO78g6BPe/frLWbuXEJgF+3o8o3fDOIpjjTSJVGH6lVTmOrxSVd9egGrUq5e3QU1zf62amVXYViPX9906EUxM30BSjMgL
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?euqBBuYain5aIP2usZS7QBbozl8wCBeqW5xZNpof9D2AoJYAv5QJFyIc/EEE?=
+ =?us-ascii?Q?ucal/FHSKJ8Ux6VYSWW9vgFw0nse2GyjvSDlHMlvhfrEZQBvCn83ueaLLrh7?=
+ =?us-ascii?Q?qOyet42XaeJU6SKqeI0eLSPMZRhxSUdk3gzqglc/wpXm2GgJfm1AHVlwUo+p?=
+ =?us-ascii?Q?Kyhxqr2wxQ5ex3GPlvOqKpe6J2DCOz3Gc0UHxy+K/cC87Vs1McwVddQ1yQol?=
+ =?us-ascii?Q?AMFN8Oxhxu6+Be3pDpUp/vKG8SfweHaKVT6gnbOmZwz8xsKZR9J/TVbAjzHh?=
+ =?us-ascii?Q?JoHN6aJIITTkhiPWAu17XFa9dWqyRcSebJhMiZWuGMobfT6ex1osfRQtZ6Va?=
+ =?us-ascii?Q?Hlwa8sT+d04zgVYL+hybrOlizYprhoScGXWon0TX6dRdz1iWWgK5UicDoW6P?=
+ =?us-ascii?Q?YiHoU3izvhPn8qkHAJbHMTDS/7gCrmIEXkPiQkfgJG9RAH1Q2vA8JIB1Vj6Z?=
+ =?us-ascii?Q?C+heTJ9NRF/l5qEFLtGr8ydHp4xAM99xWk0wbUz7AN+7bcjmyzhT689Le3cj?=
+ =?us-ascii?Q?D1w+njzzBjLuAshHA2XHI9c+behv3aUzLo0UdY+YK0yI/y7pIBb3w/1worwP?=
+ =?us-ascii?Q?76GNgBsnOrqAvj5qcSKk/Z8U3cMA9lBiQSDB+7KaISDEcVy2cuxxbcrYYwz6?=
+ =?us-ascii?Q?WsmQksTOWK5wTEL3TFQRjELtT/GamhitLtyw9cXMZiDF+Wwq1ucwl4X8TlRH?=
+ =?us-ascii?Q?xKDy/5rOj/6WmGkXTHpvTBGawKG57hM1gga58ujZMwfnGzbwAIuBTwzumHSQ?=
+ =?us-ascii?Q?RvXyckneRvy0hot9lHY+jGuDicLAtqbugPstdNJt730irGQfdcC6GUukXXAk?=
+ =?us-ascii?Q?UrLyP++SgmFWiI+q+buTMRSVDKB4utXG5ko51zt4IeNl9d4hdJnhE+6qmIfY?=
+ =?us-ascii?Q?dJ+EZy76hqCmUu6aDhd9bcR+Vd1wK/fGBNUo1BBWW0gnC5ENA6cnWLImwUV0?=
+ =?us-ascii?Q?G4Mq4sBiIE5hK/xSD5gnRhzEnezb1HOVA4NHwDR6PguixMJCnoobKptxQeeC?=
+ =?us-ascii?Q?erHM8OunmNky3gbAjGZvlV+Ixd+sJLN0AdeenmCAaOrGNt4NIUsVk7Ujxnon?=
+ =?us-ascii?Q?Tl105euVHNsw+uLhfl4Q4nQJ0zSX10CfoCEScDg5XuVtkzRPf6Awwn6ei5kS?=
+ =?us-ascii?Q?qpreqIo/xyVb9/cwNjUSPwDRKjO3mADUQOj2CO2oJy0iSOcNch5sIEG24LKf?=
+ =?us-ascii?Q?iH/po9iejyKVMFAkKdiy1Tu2JUHijscAVGWX1t8FYLj9QzKNWUZUu6xpueX8?=
+ =?us-ascii?Q?W5xaNTnGOTQX6GflTXi0?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2448f90f-57ee-4c70-fd63-08dca4bb3d7b
+X-MS-Exchange-CrossTenant-AuthSource: VI1P194MB2166.EURP194.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 15 Jul 2024 10:45:29.5369
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA4P194MB1135
 
-In handle_encls_ecreate(), a page is allocated to store a copy of SECS
-structure used by the ENCLS[ECREATE] leaf from the guest.  This page is
-only used temporarily and is freed after use in handle_encls_ecreate().
+Hi Stefano,
 
-Don't account for the memory allocation of this page per [1].
+Thanks for your review!
 
-Link: https://lore.kernel.org/kvm/b999afeb588eb75d990891855bc6d58861968f23.camel@intel.com/T/#mb81987afc3ab308bbb5861681aa9a20f2aece7fd [1]
-Signed-off-by: Kai Huang <kai.huang@intel.com>
----
- arch/x86/kvm/vmx/sgx.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> On Thu, Jul 11, 2024 at 04:58:47PM GMT, Luigi Leonardi via B4 Relay wrote:
+> >From: Luigi Leonardi <luigi.leonardi@outlook.com>
+> >
+> >Introduce an optimization in virtio_transport_send_pkt:
+> >when the work queue (send_pkt_queue) is empty the packet is
+>
+> Note: send_pkt_queue is just a queue of sk_buff, is not really a work
+> queue.
+>
+> >put directly in the virtqueue increasing the throughput.
+>
+> Why?
+My guess is that is due to the hotpath being faster, there is (potentially) one less
+step!
+>
+> I tested the patch and everything seems to be fine, all my comments are
+> minor and style, the code should be fine!
+Great, I'll send a v4 addressing all your comments :)
 
-diff --git a/arch/x86/kvm/vmx/sgx.c b/arch/x86/kvm/vmx/sgx.c
-index 6fef01e0536e..a3c3d2a51f47 100644
---- a/arch/x86/kvm/vmx/sgx.c
-+++ b/arch/x86/kvm/vmx/sgx.c
-@@ -274,7 +274,7 @@ static int handle_encls_ecreate(struct kvm_vcpu *vcpu)
- 	 * simultaneously set SGX_ATTR_PROVISIONKEY to bypass the check to
- 	 * enforce restriction of access to the PROVISIONKEY.
- 	 */
--	contents = (struct sgx_secs *)__get_free_page(GFP_KERNEL_ACCOUNT);
-+	contents = (struct sgx_secs *)__get_free_page(GFP_KERNEL);
- 	if (!contents)
- 		return -ENOMEM;
- 
-
-base-commit: c8b8b8190a80b591aa73c27c70a668799f8db547
--- 
-2.45.2
-
+Thanks,
+Luigi
 
