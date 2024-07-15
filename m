@@ -1,254 +1,180 @@
-Return-Path: <kvm+bounces-21656-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21657-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 025BD931AC4
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 21:22:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 331CA931AFA
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 21:27:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8286C1F223DB
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 19:22:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57E821C2194A
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 19:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3397C13A86E;
-	Mon, 15 Jul 2024 19:21:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC921139D0A;
+	Mon, 15 Jul 2024 19:27:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VJbB3sxw"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="m5F9/jQi"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DA613A25D
-	for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 19:21:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56905131E38;
+	Mon, 15 Jul 2024 19:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721071317; cv=none; b=NxVSH10aL6mIa0rFEHsGFq68Vph40/N+VVls9VYjOMpc49rDWjIpUlPhAgK0UeQ0srcSd/JW+2vUzs/iSsSI3Lny8TkZZcyjusxYlG2eRyMU7YNlq1ZtYHS6DWlzDSKBYozG0LxVPJM6l6kA+39IME2Z4QGUB0ThSdhSIgLZvxE=
+	t=1721071638; cv=none; b=UrSYMO17EOmlty6T+V6uyJ9yqGIxf4SBDRtVKrPs6P7GjH8/jNZyOzAqry7KPbtVdYhhCGoR3hYe/WdWfOFI6j7mM2oy1qZjle3sW09FlUeF0RKdR0YQqHqcGIR5LJNCLat1I2mTgy6VyjRPDpfk4Wj9wlfogmtoOQwCuSzUbDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721071317; c=relaxed/simple;
-	bh=YCiezBGQi5XZZC1nGB6Xk5gi7omXw4czBvCuVu44aKE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=m20yiW27/bx94TPmVz5+O3Br1zcWMBcDMN0rvazo36iGs0aK0sLQ8qHdRNPB/F/8qB995A9TtXRggU77CPS8Pmn1vh5YucHukGvnYHckR96OpskSssYGZE+REwAijCrDepY2ryurymyzOBsrQigZWHzRzQveveB9TCsxOvB5vKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VJbB3sxw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721071314;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZTG40gQ1/IqtnBedMzEchXvuwrXGVRlB32P0aAwFHGI=;
-	b=VJbB3sxwlhGGuBloRtEDjZib0FqgHWBRnV5tM3rIP1eP/60MiYmTdzDn1xrqOp471EKOmN
-	szublzGnpAE+FKeAiHCJMWKeMk+IJIqK9kk6AAaYw4w6SJAQk7t8iqvyMjq2QN1Di1HRp4
-	IkB6hAOwJx5MRmfQnzu/BEFdb/w6QDM=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-272-oFLn3j79MuqEHkHx5BkXXQ-1; Mon, 15 Jul 2024 15:21:53 -0400
-X-MC-Unique: oFLn3j79MuqEHkHx5BkXXQ-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b60afbf5d1so14885366d6.0
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 12:21:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721071313; x=1721676113;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZTG40gQ1/IqtnBedMzEchXvuwrXGVRlB32P0aAwFHGI=;
-        b=ugUoLQoRhpznGajXtMOcBV1uI69QUsBYcDjN0SwcBLLSL7OkXtoxDNJGTPDZESFYfC
-         sM5eVhP8IgihZLShpFLL8EZ1iTmrh5hVtXEAKHS0ZPWlmhMcgJm9hNejaqjsc8bkFiHw
-         pzBYayzXMtOcDeoz0Ig+lebIreA0eIUDsKQlFAGrcjUSD3fte15uij19+dSrNFPG9zzd
-         2c/0ksIveNURE45vFvDLwrs3G+TeNa0E+KyEMa5N1B2rxxubfKxxhKqFuxuWk7iMn3BD
-         XPi/QjipJ5F3jt8no0DJwt1i3eJzsXAzU62nBJl/QPQHnfjq7seg3mgPbsLH9+A59Bi5
-         d9mQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXlvMhM5FJAXq4nfshkMz47XsB0CY6amMJT23N6DgAbYQ4AUCTviCRDxHYygnSu0wsmO4mg1aJ3k/JLbXiz/jj9pzcu
-X-Gm-Message-State: AOJu0YyaopR2T/DH2k7ttaFezAviLFvWDXlZqwdxfXVVMoiNfpAuH8em
-	qOeB5ODO/mfhtCQ0Kgqhd7fVsZAPmDT5LHSj40aHlvIXpSPt2e5JVUCO7ZMeKCky0gpaUN3mMqR
-	ZWFJcIYGZ9SueU/yNfwuuiDmj2dcsMd0dK+9AVdjpBu3A8VUUpw==
-X-Received: by 2002:a05:6214:3d9c:b0:6b7:586c:6db with SMTP id 6a1803df08f44-6b77e1a9bbbmr4344276d6.9.1721071312951;
-        Mon, 15 Jul 2024 12:21:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFuaD7Bvj1JQVrhIrOGjnKODWs3APjSgAvSuKVxjGp/QvXbyCQZIOrqbPCB4cG0KJw/WyvKgQ==
-X-Received: by 2002:a05:6214:3d9c:b0:6b7:586c:6db with SMTP id 6a1803df08f44-6b77e1a9bbbmr4344156d6.9.1721071312655;
-        Mon, 15 Jul 2024 12:21:52 -0700 (PDT)
-Received: from x1n.redhat.com (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b761978d30sm24039356d6.31.2024.07.15.12.21.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jul 2024 12:21:52 -0700 (PDT)
-From: Peter Xu <peterx@redhat.com>
-To: linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org
-Cc: Dave Jiang <dave.jiang@intel.com>,
-	Rik van Riel <riel@surriel.com>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	linuxppc-dev@lists.ozlabs.org,
-	Matthew Wilcox <willy@infradead.org>,
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>,
-	peterx@redhat.com,
-	Oscar Salvador <osalvador@suse.de>,
-	Mel Gorman <mgorman@techsingularity.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Huang Ying <ying.huang@intel.com>,
-	"Kirill A . Shutemov" <kirill@shutemov.name>,
-	"Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Hugh Dickins <hughd@google.com>,
-	x86@kernel.org,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Ingo Molnar <mingo@redhat.com>,
-	kvm@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	David Rientjes <rientjes@google.com>
-Subject: [PATCH v3 3/8] mm/mprotect: Push mmu notifier to PUDs
-Date: Mon, 15 Jul 2024 15:21:37 -0400
-Message-ID: <20240715192142.3241557-4-peterx@redhat.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240715192142.3241557-1-peterx@redhat.com>
-References: <20240715192142.3241557-1-peterx@redhat.com>
+	s=arc-20240116; t=1721071638; c=relaxed/simple;
+	bh=Od/7R+7To3lklhe3axz55KltSN7STkLUfBM0lBheQFA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=aBEE11NI/vRpwPbey+dmfmEr6GiKDcwDbHBvrkmGPUlkho3Uc9JIg+TDKcs0y0aOa6W+8SBLZdg23SVwzkUKZg49AV5nCT7J5ClSKba2BhbBhhny5bXVrc9Ouk0O6q01cGTRYoXWWLV8vUMb9FKZEwRCow5755Yy/yP7Cdo+m08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=m5F9/jQi; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46FH8uNa009494;
+	Mon, 15 Jul 2024 19:27:13 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=wG9JuMtMhBj5ZcDWoeNk/P
+	F8owwW+73HInnokRoUMoc=; b=m5F9/jQiXRF8RxsAe4S5Xe4cjV5QA4+LIJIgPZ
+	mciIXnEtZjQUwZSK7XSzRoq0vmHv8N1fEX8IWRparCatrXfa/t9o8eCAMZzgp5tJ
+	FVK3vxzhVPSm8sKl7nC9RQ/2TLL2hkEsWn9SWeu5aWoun9tCtno2pGlEfJYDqWYm
+	9ibviJ1rkGWQPGh3tUMu4gMhq+Q7ghslmzp4MXBjZnWJtNkMOzKrod9XmaMx7S03
+	/gVsjiyFaYlHwP+It8IwcqMsNM0P4Hp2Y97BywVAfhnJHuS+/zqip7XCwx0BEHVi
+	/1cJt0RA+X1H8Bw/rZGna6UQn7jKZbO3QOcD6qHJGZDHREYQ==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40bexndc47-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Jul 2024 19:27:12 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46FJRB3O009629
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 15 Jul 2024 19:27:11 GMT
+Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 15 Jul
+ 2024 12:27:11 -0700
+From: Jeff Johnson <quic_jjohnson@quicinc.com>
+Date: Mon, 15 Jul 2024 12:27:09 -0700
+Subject: [PATCH v2] vfio-mdev: add missing MODULE_DESCRIPTION() macros
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-ID: <20240715-md-vfio-mdev-v2-1-59a4c5e924bc@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAAx4lWYC/3WNyw6DIBREf8Ww7m0EfKWr/kfjAvBSb1KhBSU2x
+ n8vuu9qcpI5MxuLGAgjuxUbC5gokncZxKVgZlTuiUBDZiZKUZW1kDANkCz5nJhAdty2lbZdazn
+ LyjugpfWce/SZtYoIOihnxmPkRW5ZYVJxxnDUR4qzD9/zPPFD+vOTOHComrYxQy2F5uX9s5AhZ
+ 67GT6zf9/0HHJUUyskAAAA=
+To: Kirti Wankhede <kwankhede@nvidia.com>,
+        Alex Williamson
+	<alex.williamson@redhat.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>,
+        Jeff Johnson <quic_jjohnson@quicinc.com>
+X-Mailer: b4 0.14.0
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: XAz8szs6q0CFL25pzXQQq0k63H2VYoRv
+X-Proofpoint-GUID: XAz8szs6q0CFL25pzXQQq0k63H2VYoRv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-15_13,2024-07-11_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 adultscore=0 clxscore=1015 suspectscore=0 bulkscore=0
+ spamscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0 mlxscore=0
+ malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2406140001 definitions=main-2407150150
 
-mprotect() does mmu notifiers in PMD levels.  It's there since 2014 of
-commit a5338093bfb4 ("mm: move mmu notifier call from change_protection to
-change_pmd_range").
+Since commit 1fffe7a34c89 ("script: modpost: emit a warning when the
+description is missing"), a module without a MODULE_DESCRIPTION() will
+result in a warning with make W=1. The following warnings are being
+observed in samples/vfio-mdev:
 
-At that time, the issue was that NUMA balancing can be applied on a huge
-range of VM memory, even if nothing was populated.  The notification can be
-avoided in this case if no valid pmd detected, which includes either THP or
-a PTE pgtable page.
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mtty.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mdpy.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mdpy-fb.o
+WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mbochs.o
 
-Now to pave way for PUD handling, this isn't enough.  We need to generate
-mmu notifications even on PUD entries properly.  mprotect() is currently
-broken on PUD (e.g., one can easily trigger kernel error with dax 1G
-mappings already), this is the start to fix it.
+Add the missing invocations of the MODULE_DESCRIPTION() macro to these
+modules. And in the case of mtty.c, remove the now redundant instance
+of the MODULE_INFO() macro.
 
-To fix that, this patch proposes to push such notifications to the PUD
-layers.
-
-There is risk on regressing the problem Rik wanted to resolve before, but I
-think it shouldn't really happen, and I still chose this solution because
-of a few reasons:
-
-  1) Consider a large VM that should definitely contain more than GBs of
-  memory, it's highly likely that PUDs are also none.  In this case there
-  will have no regression.
-
-  2) KVM has evolved a lot over the years to get rid of rmap walks, which
-  might be the major cause of the previous soft-lockup.  At least TDP MMU
-  already got rid of rmap as long as not nested (which should be the major
-  use case, IIUC), then the TDP MMU pgtable walker will simply see empty VM
-  pgtable (e.g. EPT on x86), the invalidation of a full empty region in
-  most cases could be pretty fast now, comparing to 2014.
-
-  3) KVM has explicit code paths now to even give way for mmu notifiers
-  just like this one, e.g. in commit d02c357e5bfa ("KVM: x86/mmu: Retry
-  fault before acquiring mmu_lock if mapping is changing").  It'll also
-  avoid contentions that may also contribute to a soft-lockup.
-
-  4) Stick with PMD layer simply don't work when PUD is there...  We need
-  one way or another to fix PUD mappings on mprotect().
-
-Pushing it to PUD should be the safest approach as of now, e.g. there's yet
-no sign of huge P4D coming on any known archs.
-
-Cc: kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: David Rientjes <rientjes@google.com>
-Cc: Rik van Riel <riel@surriel.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
+Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
 ---
- mm/mprotect.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+Of the almost 300 patches I've submitted tree-wide to fix these
+issues, this is one of the 13 remaining. Hopefully this can make it
+via your tree into the 6.11 merge window. If not, Greg KH has
+indicated he'll take this as an -rc instead of waiting for 6.12.
+---
+Changes in v2:
+- Updated the commit text to more fully describe the problem and solution.
+- Removed the MODULE_INFO() from mtty.c
+- Note I did not carry forward Kirti's Reviewed-by: due to this removal,
+  please re-review
+- Link to v1: https://lore.kernel.org/r/20240523-md-vfio-mdev-v1-1-4676cd532b10@quicinc.com
+---
+ samples/vfio-mdev/mbochs.c  | 1 +
+ samples/vfio-mdev/mdpy-fb.c | 1 +
+ samples/vfio-mdev/mdpy.c    | 1 +
+ samples/vfio-mdev/mtty.c    | 2 +-
+ 4 files changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index 21172272695e..2a81060b603d 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -363,9 +363,6 @@ static inline long change_pmd_range(struct mmu_gather *tlb,
- 	pmd_t *pmd;
- 	unsigned long next;
- 	long pages = 0;
--	struct mmu_notifier_range range;
--
--	range.start = 0;
+diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
+index 9062598ea03d..836456837997 100644
+--- a/samples/vfio-mdev/mbochs.c
++++ b/samples/vfio-mdev/mbochs.c
+@@ -88,6 +88,7 @@
+ #define STORE_LE32(addr, val)	(*(u32 *)addr = val)
  
- 	pmd = pmd_offset(pud, addr);
- 	do {
-@@ -383,14 +380,6 @@ static inline long change_pmd_range(struct mmu_gather *tlb,
- 		if (pmd_none(*pmd))
- 			goto next;
  
--		/* invoke the mmu notifier if the pmd is populated */
--		if (!range.start) {
--			mmu_notifier_range_init(&range,
--				MMU_NOTIFY_PROTECTION_VMA, 0,
--				vma->vm_mm, addr, end);
--			mmu_notifier_invalidate_range_start(&range);
--		}
--
- 		_pmd = pmdp_get_lockless(pmd);
- 		if (is_swap_pmd(_pmd) || pmd_trans_huge(_pmd) || pmd_devmap(_pmd)) {
- 			if ((next - addr != HPAGE_PMD_SIZE) ||
-@@ -428,9 +417,6 @@ static inline long change_pmd_range(struct mmu_gather *tlb,
- 		cond_resched();
- 	} while (pmd++, addr = next, addr != end);
++MODULE_DESCRIPTION("Mediated virtual PCI display host device driver");
+ MODULE_LICENSE("GPL v2");
  
--	if (range.start)
--		mmu_notifier_invalidate_range_end(&range);
--
- 	return pages;
- }
+ static int max_mbytes = 256;
+diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
+index 4598bc28acd9..149af7f598f8 100644
+--- a/samples/vfio-mdev/mdpy-fb.c
++++ b/samples/vfio-mdev/mdpy-fb.c
+@@ -229,4 +229,5 @@ static int __init mdpy_fb_init(void)
+ module_init(mdpy_fb_init);
  
-@@ -438,22 +424,36 @@ static inline long change_pud_range(struct mmu_gather *tlb,
- 		struct vm_area_struct *vma, p4d_t *p4d, unsigned long addr,
- 		unsigned long end, pgprot_t newprot, unsigned long cp_flags)
- {
-+	struct mmu_notifier_range range;
- 	pud_t *pud;
- 	unsigned long next;
- 	long pages = 0, ret;
+ MODULE_DEVICE_TABLE(pci, mdpy_fb_pci_table);
++MODULE_DESCRIPTION("Framebuffer driver for mdpy (mediated virtual pci display device)");
+ MODULE_LICENSE("GPL v2");
+diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
+index 27795501de6e..8104831ae125 100644
+--- a/samples/vfio-mdev/mdpy.c
++++ b/samples/vfio-mdev/mdpy.c
+@@ -40,6 +40,7 @@
+ #define STORE_LE32(addr, val)	(*(u32 *)addr = val)
  
-+	range.start = 0;
-+
- 	pud = pud_offset(p4d, addr);
- 	do {
- 		next = pud_addr_end(addr, end);
- 		ret = change_prepare(vma, pud, pmd, addr, cp_flags);
--		if (ret)
--			return ret;
-+		if (ret) {
-+			pages = ret;
-+			break;
-+		}
- 		if (pud_none_or_clear_bad(pud))
- 			continue;
-+		if (!range.start) {
-+			mmu_notifier_range_init(&range,
-+						MMU_NOTIFY_PROTECTION_VMA, 0,
-+						vma->vm_mm, addr, end);
-+			mmu_notifier_invalidate_range_start(&range);
-+		}
- 		pages += change_pmd_range(tlb, vma, pud, addr, next, newprot,
- 					  cp_flags);
- 	} while (pud++, addr = next, addr != end);
  
-+	if (range.start)
-+		mmu_notifier_invalidate_range_end(&range);
-+
- 	return pages;
- }
++MODULE_DESCRIPTION("Mediated virtual PCI display host device driver");
+ MODULE_LICENSE("GPL v2");
  
--- 
-2.45.0
+ #define MDPY_TYPE_1 "vga"
+diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
+index 2284b3751240..b382c696c877 100644
+--- a/samples/vfio-mdev/mtty.c
++++ b/samples/vfio-mdev/mtty.c
+@@ -2058,6 +2058,6 @@ module_init(mtty_dev_init)
+ module_exit(mtty_dev_exit)
+ 
+ MODULE_LICENSE("GPL v2");
+-MODULE_INFO(supported, "Test driver that simulate serial port over PCI");
++MODULE_DESCRIPTION("Test driver that simulate serial port over PCI");
+ MODULE_VERSION(VERSION_STRING);
+ MODULE_AUTHOR(DRIVER_AUTHOR);
+
+---
+base-commit: 0c3836482481200ead7b416ca80c68a29cfdaabd
+change-id: 20240523-md-vfio-mdev-381f74bf87f1
 
 
