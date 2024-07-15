@@ -1,180 +1,226 @@
-Return-Path: <kvm+bounces-21657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 331CA931AFA
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 21:27:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA5EA931C1A
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 22:40:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57E821C2194A
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 19:27:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4CE71C21E4E
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 20:40:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC921139D0A;
-	Mon, 15 Jul 2024 19:27:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3AA13C81C;
+	Mon, 15 Jul 2024 20:39:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="m5F9/jQi"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="orGAZVa7";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="EO6Fc55G";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="orGAZVa7";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="EO6Fc55G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56905131E38;
-	Mon, 15 Jul 2024 19:27:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2DFE2B9CD;
+	Mon, 15 Jul 2024 20:39:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721071638; cv=none; b=UrSYMO17EOmlty6T+V6uyJ9yqGIxf4SBDRtVKrPs6P7GjH8/jNZyOzAqry7KPbtVdYhhCGoR3hYe/WdWfOFI6j7mM2oy1qZjle3sW09FlUeF0RKdR0YQqHqcGIR5LJNCLat1I2mTgy6VyjRPDpfk4Wj9wlfogmtoOQwCuSzUbDY=
+	t=1721075982; cv=none; b=RJtZTVvFGI2kARy2UF0JDyYoFFNpUbJS3ClJpdLCNtsH+kaf0u+HPz+KnUUnfLqx03VO3db+1GxA73hje54QoMVAXUjUV+ea5LYJ7F9gsQtUsmr/a5CiH8ZULJPxOXsSyOnFKJgHgIOiYAWr3/yT/zHqm2gefviIR13s8WrTITM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721071638; c=relaxed/simple;
-	bh=Od/7R+7To3lklhe3axz55KltSN7STkLUfBM0lBheQFA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=aBEE11NI/vRpwPbey+dmfmEr6GiKDcwDbHBvrkmGPUlkho3Uc9JIg+TDKcs0y0aOa6W+8SBLZdg23SVwzkUKZg49AV5nCT7J5ClSKba2BhbBhhny5bXVrc9Ouk0O6q01cGTRYoXWWLV8vUMb9FKZEwRCow5755Yy/yP7Cdo+m08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=m5F9/jQi; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46FH8uNa009494;
-	Mon, 15 Jul 2024 19:27:13 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=qcppdkim1; bh=wG9JuMtMhBj5ZcDWoeNk/P
-	F8owwW+73HInnokRoUMoc=; b=m5F9/jQiXRF8RxsAe4S5Xe4cjV5QA4+LIJIgPZ
-	mciIXnEtZjQUwZSK7XSzRoq0vmHv8N1fEX8IWRparCatrXfa/t9o8eCAMZzgp5tJ
-	FVK3vxzhVPSm8sKl7nC9RQ/2TLL2hkEsWn9SWeu5aWoun9tCtno2pGlEfJYDqWYm
-	9ibviJ1rkGWQPGh3tUMu4gMhq+Q7ghslmzp4MXBjZnWJtNkMOzKrod9XmaMx7S03
-	/gVsjiyFaYlHwP+It8IwcqMsNM0P4Hp2Y97BywVAfhnJHuS+/zqip7XCwx0BEHVi
-	/1cJt0RA+X1H8Bw/rZGna6UQn7jKZbO3QOcD6qHJGZDHREYQ==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40bexndc47-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jul 2024 19:27:12 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 46FJRB3O009629
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 15 Jul 2024 19:27:11 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 15 Jul
- 2024 12:27:11 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Mon, 15 Jul 2024 12:27:09 -0700
-Subject: [PATCH v2] vfio-mdev: add missing MODULE_DESCRIPTION() macros
+	s=arc-20240116; t=1721075982; c=relaxed/simple;
+	bh=V9+/ko+zXoD5I2WF5JxJeceKIAQ9TGTSvmNI/rBGt7c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BYKpm2v5WQMp+BHJ2nN1f9SXW8bN+TFAF2+SLUr6JR/Ks1S4bJnCSKz6N9OjOLnCZN9ym+gYA9mQUAKXkb2RO+IpULgmc70FwAZrDBcRGxmSFAOhcbe2BlqLSWDx3PeqjgkG0Iz3M1JjaBKcj0DRhRDfd5D/3XnCKPR3NyGj1yM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=orGAZVa7; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=EO6Fc55G; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=orGAZVa7; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=EO6Fc55G; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id A2D1C1F833;
+	Mon, 15 Jul 2024 20:39:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1721075978; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=13l4KWTF4acx+DoFosvJJOCp5skXW9ib/ek+T6Gj1BU=;
+	b=orGAZVa7aS8dwRz7zAaSJ5DJiGvjUzgF5byRuSW/xh5bX54ACMhuDxQkfq5CvQlpDzfm/f
+	7H3aOI+fyJhVNx5bbD4Da7e9RAJfuv0ndyxHiJjpa7Ge0olMyxuQG9l3WTPXJu6+k4V3zL
+	SP5Vu2G4xvhozdFB/d1UMLGaAWWMK04=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1721075978;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=13l4KWTF4acx+DoFosvJJOCp5skXW9ib/ek+T6Gj1BU=;
+	b=EO6Fc55GxbiJuyg2W5VpBFdcwuiQvmKGGmLix2LUIJPD2ddGxBU7Wq0S9CY3ZDHFFWeWrJ
+	OXCTUbUPdgEU3SDQ==
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=orGAZVa7;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=EO6Fc55G
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1721075978; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=13l4KWTF4acx+DoFosvJJOCp5skXW9ib/ek+T6Gj1BU=;
+	b=orGAZVa7aS8dwRz7zAaSJ5DJiGvjUzgF5byRuSW/xh5bX54ACMhuDxQkfq5CvQlpDzfm/f
+	7H3aOI+fyJhVNx5bbD4Da7e9RAJfuv0ndyxHiJjpa7Ge0olMyxuQG9l3WTPXJu6+k4V3zL
+	SP5Vu2G4xvhozdFB/d1UMLGaAWWMK04=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1721075978;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=13l4KWTF4acx+DoFosvJJOCp5skXW9ib/ek+T6Gj1BU=;
+	b=EO6Fc55GxbiJuyg2W5VpBFdcwuiQvmKGGmLix2LUIJPD2ddGxBU7Wq0S9CY3ZDHFFWeWrJ
+	OXCTUbUPdgEU3SDQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6827F137EB;
+	Mon, 15 Jul 2024 20:39:38 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id xIrMGAqJlWZ9VgAAD6G6ig
+	(envelope-from <vbabka@suse.cz>); Mon, 15 Jul 2024 20:39:38 +0000
+Message-ID: <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+Date: Mon, 15 Jul 2024 22:39:38 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
+ kmem_cache_free callback
+Content-Language: en-US
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: paulmck@kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Jakub Kicinski <kuba@kernel.org>, Julia Lawall <Julia.Lawall@inria.fr>,
+ linux-block@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ bridge@lists.linux.dev, linux-trace-kernel@vger.kernel.org,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, kvm@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
+ wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
+ ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
+ Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
+ Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
+ linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ kasan-dev <kasan-dev@googlegroups.com>
+References: <e926e3c6-05ce-4ba6-9e2e-e5f3b37bcc23@suse.cz>
+ <3b6fe525-626c-41fb-8625-3925ca820d8e@paulmck-laptop>
+ <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz> <ZnCDgdg1EH6V7w5d@pc636>
+ <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz> <ZnFT1Czb8oRb0SE7@pc636>
+ <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
+ <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
+ <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
+ <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz> <ZnVInAV8BXhgAjP_@pc636>
+From: Vlastimil Babka <vbabka@suse.cz>
+Autocrypt: addr=vbabka@suse.cz; keydata=
+ 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
+ EP+ylKVEKb0Q2A==
+In-Reply-To: <ZnVInAV8BXhgAjP_@pc636>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-ID: <20240715-md-vfio-mdev-v2-1-59a4c5e924bc@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIAAx4lWYC/3WNyw6DIBREf8Ww7m0EfKWr/kfjAvBSb1KhBSU2x
- n8vuu9qcpI5MxuLGAgjuxUbC5gokncZxKVgZlTuiUBDZiZKUZW1kDANkCz5nJhAdty2lbZdazn
- LyjugpfWce/SZtYoIOihnxmPkRW5ZYVJxxnDUR4qzD9/zPPFD+vOTOHComrYxQy2F5uX9s5AhZ
- 67GT6zf9/0HHJUUyskAAAA=
-To: Kirti Wankhede <kwankhede@nvidia.com>,
-        Alex Williamson
-	<alex.williamson@redhat.com>
-CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kernel-janitors@vger.kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.14.0
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: XAz8szs6q0CFL25pzXQQq0k63H2VYoRv
-X-Proofpoint-GUID: XAz8szs6q0CFL25pzXQQq0k63H2VYoRv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-15_13,2024-07-11_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- priorityscore=1501 adultscore=0 clxscore=1015 suspectscore=0 bulkscore=0
- spamscore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407150150
+X-Spamd-Result: default: False [-4.50 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	NEURAL_HAM_SHORT(-0.20)[-1.000];
+	MIME_GOOD(-0.10)[text/plain];
+	MX_GOOD(-0.01)[];
+	XM_UA_NO_VERSION(0.01)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	FREEMAIL_TO(0.00)[gmail.com];
+	RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	RCPT_COUNT_TWELVE(0.00)[29];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	MIME_TRACE(0.00)[0:+];
+	ARC_NA(0.00)[];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FREEMAIL_CC(0.00)[kernel.org,zx2c4.com,inria.fr,vger.kernel.org,lists.linux.dev,efficios.com,lists.ozlabs.org,linux.ibm.com,csgroup.eu,gmail.com,lists.zx2c4.com,suse.de,netapp.com,oracle.com,talpey.com,netfilter.org,googlegroups.com];
+	RCVD_TLS_ALL(0.00)[];
+	RCVD_COUNT_TWO(0.00)[2];
+	FROM_EQ_ENVFROM(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	TO_DN_SOME(0.00)[];
+	MID_RHS_MATCH_FROM(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	RECEIVED_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:106:10:150:64:167:received];
+	DKIM_TRACE(0.00)[suse.cz:+];
+	R_RATELIMIT(0.00)[to_ip_from(RLujeud1qp5x6qhm7ow61zc6bu)];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns,suse.cz:dkim]
+X-Spam-Flag: NO
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Rspamd-Action: no action
+X-Spam-Score: -4.50
+X-Spam-Level: 
+X-Rspamd-Queue-Id: A2D1C1F833
 
-Since commit 1fffe7a34c89 ("script: modpost: emit a warning when the
-description is missing"), a module without a MODULE_DESCRIPTION() will
-result in a warning with make W=1. The following warnings are being
-observed in samples/vfio-mdev:
+On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
+> On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
+> One question. Maybe it is already late but it is better to ask rather than not.
+> 
+> What do you think if we have a small discussion about it on the LPC 2024 as a
+> topic? It might be it is already late or a schedule is set by now. Or we fix
+> it by a conference time.
+> 
+> Just a thought.
 
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mtty.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mdpy.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mdpy-fb.o
-WARNING: modpost: missing MODULE_DESCRIPTION() in samples/vfio-mdev/mbochs.o
+Sorry for the late reply. The MM MC turned out to be so packed I didn't even
+propose a slab topic. We could discuss in hallway track or a BOF, but
+hopefully if the current direction taken by my RFC brings no unexpected
+surprise, and the necessary RCU barrier side is also feasible, this will be
+settled by time of plumbers.
 
-Add the missing invocations of the MODULE_DESCRIPTION() macro to these
-modules. And in the case of mtty.c, remove the now redundant instance
-of the MODULE_INFO() macro.
-
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
-Of the almost 300 patches I've submitted tree-wide to fix these
-issues, this is one of the 13 remaining. Hopefully this can make it
-via your tree into the 6.11 merge window. If not, Greg KH has
-indicated he'll take this as an -rc instead of waiting for 6.12.
----
-Changes in v2:
-- Updated the commit text to more fully describe the problem and solution.
-- Removed the MODULE_INFO() from mtty.c
-- Note I did not carry forward Kirti's Reviewed-by: due to this removal,
-  please re-review
-- Link to v1: https://lore.kernel.org/r/20240523-md-vfio-mdev-v1-1-4676cd532b10@quicinc.com
----
- samples/vfio-mdev/mbochs.c  | 1 +
- samples/vfio-mdev/mdpy-fb.c | 1 +
- samples/vfio-mdev/mdpy.c    | 1 +
- samples/vfio-mdev/mtty.c    | 2 +-
- 4 files changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/samples/vfio-mdev/mbochs.c b/samples/vfio-mdev/mbochs.c
-index 9062598ea03d..836456837997 100644
---- a/samples/vfio-mdev/mbochs.c
-+++ b/samples/vfio-mdev/mbochs.c
-@@ -88,6 +88,7 @@
- #define STORE_LE32(addr, val)	(*(u32 *)addr = val)
- 
- 
-+MODULE_DESCRIPTION("Mediated virtual PCI display host device driver");
- MODULE_LICENSE("GPL v2");
- 
- static int max_mbytes = 256;
-diff --git a/samples/vfio-mdev/mdpy-fb.c b/samples/vfio-mdev/mdpy-fb.c
-index 4598bc28acd9..149af7f598f8 100644
---- a/samples/vfio-mdev/mdpy-fb.c
-+++ b/samples/vfio-mdev/mdpy-fb.c
-@@ -229,4 +229,5 @@ static int __init mdpy_fb_init(void)
- module_init(mdpy_fb_init);
- 
- MODULE_DEVICE_TABLE(pci, mdpy_fb_pci_table);
-+MODULE_DESCRIPTION("Framebuffer driver for mdpy (mediated virtual pci display device)");
- MODULE_LICENSE("GPL v2");
-diff --git a/samples/vfio-mdev/mdpy.c b/samples/vfio-mdev/mdpy.c
-index 27795501de6e..8104831ae125 100644
---- a/samples/vfio-mdev/mdpy.c
-+++ b/samples/vfio-mdev/mdpy.c
-@@ -40,6 +40,7 @@
- #define STORE_LE32(addr, val)	(*(u32 *)addr = val)
- 
- 
-+MODULE_DESCRIPTION("Mediated virtual PCI display host device driver");
- MODULE_LICENSE("GPL v2");
- 
- #define MDPY_TYPE_1 "vga"
-diff --git a/samples/vfio-mdev/mtty.c b/samples/vfio-mdev/mtty.c
-index 2284b3751240..b382c696c877 100644
---- a/samples/vfio-mdev/mtty.c
-+++ b/samples/vfio-mdev/mtty.c
-@@ -2058,6 +2058,6 @@ module_init(mtty_dev_init)
- module_exit(mtty_dev_exit)
- 
- MODULE_LICENSE("GPL v2");
--MODULE_INFO(supported, "Test driver that simulate serial port over PCI");
-+MODULE_DESCRIPTION("Test driver that simulate serial port over PCI");
- MODULE_VERSION(VERSION_STRING);
- MODULE_AUTHOR(DRIVER_AUTHOR);
-
----
-base-commit: 0c3836482481200ead7b416ca80c68a29cfdaabd
-change-id: 20240523-md-vfio-mdev-381f74bf87f1
+> --
+> Uladzislau Rezki
 
 
