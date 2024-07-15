@@ -1,278 +1,142 @@
-Return-Path: <kvm+bounces-21649-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21650-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C89B93180D
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 18:03:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48A0393182B
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 18:11:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F63E1F21E3E
-	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 16:03:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F33B2282DEB
+	for <lists+kvm@lfdr.de>; Mon, 15 Jul 2024 16:11:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB1F1A277;
-	Mon, 15 Jul 2024 16:03:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 096541CA9E;
+	Mon, 15 Jul 2024 16:09:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zgq/i6MO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WwpMhYzZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6556C1C2AD
-	for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 16:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B52FE1CAB8
+	for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 16:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721059418; cv=none; b=Xz7Bvnki7eEFZ404+zu71+L+hy3ElvQBvzUh/oHwNqp2UC26auzmWLeWdsIIEhRC6oEr18dIvL2Gp+36cTUSjFql0PbeDCl2eOIMnIZAna9v6yLJ2KoZKDPrS3XJaYAo9XNSqM4CRNMFUPEFphoEqAAJU6QEPf3dd0qF6i+zd8M=
+	t=1721059749; cv=none; b=biRtMaJCk5TPOV+iU6Nl/wwMGJXn2KhO88hbEUlP0kRs+sZ6xKd7lDVkJC+wISX5ucNhE6jaZeRsFUwbZob8nev77vWY8onSqr/mR9S74R010mp18qYM4y+vhhHg12x2J3DXTyQinuNH/rMyoeZ/Rk/VPy+7xPVzBxnNHohqI8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721059418; c=relaxed/simple;
-	bh=WwiRujX6MAUUmyIavp+bDMga5jpJYalx8NnaDKPs2nY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YL/73elZDBi0ytHS+hbOhtuHx2wJqKF1ziBmlpBJ8wUy45gvitY0k0sOGdIDSIZ1oG6Ru1RO5UBED4BiTTkCUhm2Rrxzj0LTXAtvk7GnMQ/yXMjww95COVuTGyteR1u6xx9Z/gh/6cz24rUSJqTqG0XDpgib/4Y5WQ+DLeHJghM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zgq/i6MO; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1721059749; c=relaxed/simple;
+	bh=pns6oBjdeKTxUi/oyky+qxEK+jXJ62xk1tKqw+8NpnY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YNjxRWb5NVQeA3zc2zVs6PtmHtLO9oYSHBqGlwsixaesmRxTMxN6Qhm5yRyvIoBvEFgYjN74c5qBpDpno93Bh09MPF7KGVwVOoowFMiDDFywbo0y5maMkh/gPVQ2UMjLzpPrAJHoR+NeofkjOUetBESfoAImNStim4nOxb08e8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WwpMhYzZ; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721059415;
+	s=mimecast20190719; t=1721059746;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=PQzTHcvy7rIISWd9N5iznAkcIpExB4iFhwW9JO+9a68=;
-	b=Zgq/i6MO1O0gecPUvaiNYUHCXez95KEcVXwAxd0NuedK1KJ2B/79dipCyA9VDsT86ik3C5
-	5qctf0z6SpLRDxpi/UNSmUWMp5v3X/K7ru5TbVyC5R8WcuM+aMWmSgcLMSNDNyrLOL3t76
-	WxJgP8xGE9FdPwUc8D8Z+jXob5eSubY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Abk3xY8p1XoS3Otzd65O+1Rdw5yUxySHu+Mh0abIVgI=;
+	b=WwpMhYzZUh0IIxU0/L1gyTNBxDb77SDV7HHVRf7CZxtL8aifIZULLgKYA/hnETV3HS+F4T
+	UhgZJwX9PublxmBoI9UrWj89xwoNPlkkgJeaarMgyNRDZHhSseAcSUPSh7DDgpE/uDDd0K
+	5LvnkYhjJEFqGQeAvbtDvQc+LXL3QME=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-641-7tklFdqBM8S-B8_KP3ywwQ-1; Mon, 15 Jul 2024 12:03:33 -0400
-X-MC-Unique: 7tklFdqBM8S-B8_KP3ywwQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-426703ac88dso29599665e9.0
-        for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 09:03:33 -0700 (PDT)
+ us-mta-462-B9i-hjPXMqCaz1KBPVFicA-1; Mon, 15 Jul 2024 12:09:05 -0400
+X-MC-Unique: B9i-hjPXMqCaz1KBPVFicA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-367f1dc92e3so2771898f8f.0
+        for <kvm@vger.kernel.org>; Mon, 15 Jul 2024 09:09:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721059412; x=1721664212;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PQzTHcvy7rIISWd9N5iznAkcIpExB4iFhwW9JO+9a68=;
-        b=oZN4QdwTZLhaD3gYtFAWQK9egbgE/NUcbvibjw6aTOnf1oUqlmGHcOTSEeFfeVaSxa
-         CWviXUB35DBBqu7ET5U0HnSYOvvEIkzPonYhBfMbQtsiKsKwp39DGajAi5PQVVuQpdiC
-         riL1Y3WlBPLmhsyMw8QbKRXDO4JNocGR9CY6zz98rTpymLjqG4EesT0yyX89yw99PejV
-         8rtpG2oUureoBMdjam/qxX7FsQNFMPyNNW4ugIwmTvYV+aXMgVvGwNA/99c/g4vFQo/Y
-         HZKQx0fQcyqy92EyIKKHWVhpxiJA6Qu/3vhhW4pxfaLyAGTlsKGw5Y28ZBj3L+aXlZ81
-         pimQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVZ6l2fgEfZk8gux4JnJCvTA1qPsOcy/OL9sB/xKiFv1cS64tRHdRg9eWPesfkgz9ifw5NA3xjccGwLBOHxRTQVUMHx
-X-Gm-Message-State: AOJu0YyCpqDUf9bBEk0ITvdcWiB/P/Exv+sCSDCbgTvYvpY4rNr855bl
-	jHjNUOOGroRLpOZcaax0Bnfz+HXilcuLXP9U27iwkYhQzAbVNi7O4ioe5uGdUkTIY20L2oRp4VB
-	1Hl47G3qlmx6f24Vy/zyRVaZtUpPSlfKpVuQMpkRvfP3SUmr5BA==
-X-Received: by 2002:a05:600c:310d:b0:426:629f:1556 with SMTP id 5b1f17b1804b1-427b88c2e8amr511425e9.31.1721059412652;
-        Mon, 15 Jul 2024 09:03:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IESdfYLQweNPfY1VGrdhD01jrKdhhF0qNRqfcsooulYbUS6vFKHA5l4BVKwugm9LlCeEvW1uA==
-X-Received: by 2002:a05:600c:310d:b0:426:629f:1556 with SMTP id 5b1f17b1804b1-427b88c2e8amr511205e9.31.1721059412069;
-        Mon, 15 Jul 2024 09:03:32 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-153.retail.telecomitalia.it. [82.57.51.153])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4279f276c52sm127451465e9.22.2024.07.15.09.03.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Jul 2024 09:03:31 -0700 (PDT)
-Date: Mon, 15 Jul 2024 18:03:26 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: luigi.leonardi@outlook.com
-Cc: "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kvm@vger.kernel.org
-Subject: Re: [PATCH net-next v3 3/3] test/vsock: add ioctl unsent bytes test
-Message-ID: <5wa2u2eolzxqz2gxeoccazimd4ixpycgkv27cfdmjcpsn3ew2e@drkemucyuvda>
-References: <20240626-ioctl_next-v3-0-63be5bf19a40@outlook.com>
- <20240626-ioctl_next-v3-3-63be5bf19a40@outlook.com>
+        d=1e100.net; s=20230601; t=1721059744; x=1721664544;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Abk3xY8p1XoS3Otzd65O+1Rdw5yUxySHu+Mh0abIVgI=;
+        b=oEPmZrw5PnX6loQhLy6FJxGoKeMXo/SBqqcQCvMtWZMTjltYvSPp6pRShiic15ih0W
+         g30LSXZ5C0tx0ByAm2fck9vlWCJx4h+HKsrdkqBgCmhY50671gvapM84x6j90ppykTek
+         iETtlNqog8tcKLb8EgOaFKi2r/7TLvsu695KtXmy/WvJPEmty4Dlp/SRnvrCpvjtRpW9
+         4DcwE2fBQ0TQintEciHKYYKlhoAzg9TyNna+VI6Y2nATQqPlksDUj2tBHBAnd5LIIZpJ
+         HhR6UjjrXQvtK/p3GMHcDOHqJrVlUaQ3rJ2nQby5HcOXN5iNHmnalstbM8nhxkeyAvLj
+         IysA==
+X-Forwarded-Encrypted: i=1; AJvYcCWqeaRDwjRuDjdK8OY1s8AUJRDpBftIt0e3oX1e9oz+pDaKzwURxfnD2xw99D3ChURwJKKyxcj/MWHYqQyvl9GD3Qv4
+X-Gm-Message-State: AOJu0Yycd/8XnjL1x/13OD9aHzLpi33vne8FgPwNZs6JIqRx9d9knU6u
+	863aekEQmKDy84aL9NVH6q1H+8sZPUczDVwaDheow85K47Q80OT0iYoD9sqRcYmD5Ip3wEdQ5yl
+	ii/uYZ9DfWbL2l9wrq4UpartE2ro51g5/SyniQht+MI10h7KhQFMMG5uOOU1HdXdpmp6aiQI7Jc
+	3Aw6k2/MjW+9vhxiC31Yd4L86O
+X-Received: by 2002:adf:fd05:0:b0:35f:122e:bd8c with SMTP id ffacd0b85a97d-36824088d3dmr156182f8f.17.1721059743874;
+        Mon, 15 Jul 2024 09:09:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEog5YOTIjhOUFctCGyLRn+0RvpSTee0pbP4aam/coKAqEKJDiarFwJ23vF333z/XezLnfn1KfwXp0w7OUlVPw=
+X-Received: by 2002:adf:fd05:0:b0:35f:122e:bd8c with SMTP id
+ ffacd0b85a97d-36824088d3dmr156168f8f.17.1721059743518; Mon, 15 Jul 2024
+ 09:09:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20240626-ioctl_next-v3-3-63be5bf19a40@outlook.com>
+References: <20240711222755.57476-1-pbonzini@redhat.com> <20240711222755.57476-10-pbonzini@redhat.com>
+ <73c62e76d83fe4e5990b640582da933ff3862cb1.camel@intel.com>
+ <CABgObfbhTYDcVWwB5G=aYpFhAW1FZ5i665VFbbGC0UC=4GgEqQ@mail.gmail.com>
+ <97796c0b86db5d98e03c119032f5b173f0f5de14.camel@intel.com> <n2nmszmuok75wzylgcqy2dz4lbrvfavewuxas56angjrkp3sl3@k4pj5k7uosfe>
+In-Reply-To: <n2nmszmuok75wzylgcqy2dz4lbrvfavewuxas56angjrkp3sl3@k4pj5k7uosfe>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 15 Jul 2024 18:08:51 +0200
+Message-ID: <CABgObfa=a3cKcKJHQRrCs-3Ty8ppSRou=dhi6Q+KdZnom0Zegw@mail.gmail.com>
+Subject: Re: [PATCH 09/12] KVM: guest_memfd: move check for already-populated
+ page to common code
+To: Michael Roth <michael.roth@amd.com>
+Cc: "Edgecombe, Rick P" <rick.p.edgecombe@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "seanjc@google.com" <seanjc@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 26, 2024 at 02:08:37PM GMT, Luigi Leonardi via B4 Relay wrote:
->From: Luigi Leonardi <luigi.leonardi@outlook.com>
+On Sun, Jul 14, 2024 at 7:33=E2=80=AFAM Michael Roth <michael.roth@amd.com>=
+ wrote:
+> > I guess this series is trying to help userspace not mess up the order o=
+f things
+> > for SEV, where as TDX's design was to let userspace hold the pieces fro=
+m the
+> > beginning. As in, needing to match up the KVM_PRE_FAULT_MEMORY and
+> > KVM_TDX_INIT_MEM_REGION calls, mysteriously return errors in later IOCT=
+Ls if
+> > something was missed, etc.
 >
->Introduce two tests, one for SOCK_STREAM and one for SOCK_SEQPACKET, which checks
->after a packet is delivered, that the number of unsent bytes is zero,
->using ioctl SIOCOUTQ.
->
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->---
-> tools/testing/vsock/util.c       |  6 +--
-> tools/testing/vsock/util.h       |  3 ++
-> tools/testing/vsock/vsock_test.c | 85 ++++++++++++++++++++++++++++++++++++++++
-> 3 files changed, 91 insertions(+), 3 deletions(-)
->
->diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->index 554b290fefdc..a3d448a075e3 100644
->--- a/tools/testing/vsock/util.c
->+++ b/tools/testing/vsock/util.c
->@@ -139,7 +139,7 @@ int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_po
-> }
->
-> /* Connect to <cid, port> and return the file descriptor. */
->-static int vsock_connect(unsigned int cid, unsigned int port, int type)
->+int vsock_connect(unsigned int cid, unsigned int port, int type)
-> {
-> 	union {
-> 		struct sockaddr sa;
->@@ -226,8 +226,8 @@ static int vsock_listen(unsigned int cid, unsigned int port, int type)
-> /* Listen on <cid, port> and return the first incoming connection.  The remote
->  * address is stored to clientaddrp.  clientaddrp may be NULL.
->  */
->-static int vsock_accept(unsigned int cid, unsigned int port,
->-			struct sockaddr_vm *clientaddrp, int type)
->+int vsock_accept(unsigned int cid, unsigned int port,
->+		 struct sockaddr_vm *clientaddrp, int type)
-> {
-> 	union {
-> 		struct sockaddr sa;
->diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
->index e95e62485959..fff22d4a14c0 100644
->--- a/tools/testing/vsock/util.h
->+++ b/tools/testing/vsock/util.h
->@@ -39,6 +39,9 @@ struct test_case {
-> void init_signals(void);
-> unsigned int parse_cid(const char *str);
-> unsigned int parse_port(const char *str);
->+int vsock_connect(unsigned int cid, unsigned int port, int type);
->+int vsock_accept(unsigned int cid, unsigned int port,
->+		 struct sockaddr_vm *clientaddrp, int type);
+> If SNP were to try to call KVM_PRE_FAULT_MEMORY before SNP_LAUNCH_UPDATE
+> (rough equivalent to KVM_TDX_INIT_MEM_REGION), I think the same issue
+> would arise, and in that case the uptodate flag you prototyped would
+> wouldn't be enough to address it because SNP_LAUNCH_UPDATE would end up
+> failing because the gmem_prepare hook previously triggered by
+> KVM_PRE_FAULT_MEMORY would have put the corresponding RMP entries into
+> an unexpected state (guest-owned/private).
 
-I'd mention in the commit description that you need these functions to 
-be more generic. Maybe in the future we can re-use them where we share 
-the same test for both SEQPACKET and STREAM.
+Indeed, and I'd love for that to be the case for both TDX and SNP.
 
-The rest LGTM.
+> So for SNP, KVM_PRE_FAULT_MEMORY/SNP_LAUNCH_UPDATE are mutually
+> exclusive on what GPA ranges they can prep before finalizing launch state=
+.
 
-Thanks,
-Stefano
+Not a problem; is KVM_PRE_FAULT_MEMORY before finalization the same as
+zeroing memory?
 
-> int vsock_stream_connect(unsigned int cid, unsigned int port);
-> int vsock_bind_connect(unsigned int cid, unsigned int port,
-> 		       unsigned int bind_port, int type);
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index f851f8961247..76bd17b4b291 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -20,6 +20,8 @@
-> #include <sys/mman.h>
-> #include <poll.h>
-> #include <signal.h>
->+#include <sys/ioctl.h>
->+#include <linux/sockios.h>
->
-> #include "vsock_test_zerocopy.h"
-> #include "timeout.h"
->@@ -1238,6 +1240,79 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
-> 	}
-> }
->
->+#define MSG_BUF_IOCTL_LEN 64
->+static void test_unsent_bytes_server(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int client_fd;
->+
->+	client_fd = vsock_accept(VMADDR_CID_ANY, 1234, NULL, type);
->+	if (client_fd < 0) {
->+		perror("accept");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	recv_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
->+	control_writeln("RECEIVED");
->+
->+	close(client_fd);
->+}
->+
->+static void test_unsent_bytes_client(const struct test_opts *opts, int type)
->+{
->+	unsigned char buf[MSG_BUF_IOCTL_LEN];
->+	int ret, fd, sock_bytes_unsent;
->+
->+	fd = vsock_connect(opts->peer_cid, 1234, type);
->+	if (fd < 0) {
->+		perror("connect");
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	for (int i = 0; i < sizeof(buf); i++)
->+		buf[i] = rand() & 0xFF;
->+
->+	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
->+	control_expectln("RECEIVED");
->+
->+	ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
->+	if (ret < 0) {
->+		if (errno == EOPNOTSUPP) {
->+			fprintf(stderr, "Test skipped\n");
->+		} else {
->+			perror("ioctl");
->+			exit(EXIT_FAILURE);
->+		}
->+	} else if (ret == 0 && sock_bytes_unsent != 0) {
->+		fprintf(stderr,
->+			"Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
->+			sock_bytes_unsent);
->+		exit(EXIT_FAILURE);
->+	}
->+
->+	close(fd);
->+}
->+
->+static void test_stream_unsent_bytes_client(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_client(opts, SOCK_STREAM);
->+}
->+
->+static void test_stream_unsent_bytes_server(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_server(opts, SOCK_STREAM);
->+}
->+
->+static void test_seqpacket_unsent_bytes_client(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_client(opts, SOCK_SEQPACKET);
->+}
->+
->+static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
->+{
->+	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
->+}
->+
-> #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
-> /* This define is the same as in 'include/linux/virtio_vsock.h':
->  * it is used to decide when to send credit update message during
->@@ -1523,6 +1598,16 @@ static struct test_case test_cases[] = {
-> 		.run_client = test_stream_rcvlowat_def_cred_upd_client,
-> 		.run_server = test_stream_cred_upd_on_low_rx_bytes,
-> 	},
->+	{
->+		.name = "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes",
->+		.run_client = test_stream_unsent_bytes_client,
->+		.run_server = test_stream_unsent_bytes_server,
->+	},
->+	{
->+		.name = "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes",
->+		.run_client = test_seqpacket_unsent_bytes_client,
->+		.run_server = test_seqpacket_unsent_bytes_server,
->+	},
-> 	{},
-> };
->
->
->-- 
->2.45.2
->
->
->
+> I realize that is awkward for TDX, where the KVM_PRE_FAULT_MEMORY is
+> required to create the sEPT mapping before encrypting, but maybe it
+> would be possible for TDX to just do that implicitly within
+> KVM_TDX_INIT_MEM_REGION?
+
+Yes, and it's what the TDX API used to be like a while ago.
+Locking-wise, Rick confirmed offlist that there's no problem in
+calling kvm_arch_vcpu_pre_fault_memory() from tdx_gmem_post_populate()
+(my fault that it went offlist - email from the phone is hard...).
+
+To be clear, I have no problem at all reusing the prefaulting code,
+that's better than TDX having to do its own thing.  But forcing
+userspace to do two passes is not great (it's already not great that
+it has to be TDX_INIT_MEM_REGION has to be a VCPU operation, but
+that's unfortunately unavoidable ).
+
+Paolo
 
 
