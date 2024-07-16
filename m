@@ -1,144 +1,225 @@
-Return-Path: <kvm+bounces-21739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21740-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 595DC933444
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 00:36:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47B8293345F
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 00:55:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CEC01C220AF
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 22:36:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B996A1F231B8
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 22:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC4EA14386E;
-	Tue, 16 Jul 2024 22:36:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89429143C46;
+	Tue, 16 Jul 2024 22:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mWIAAXVD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Aq8n/Fk5"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 809097581D
-	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 22:36:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D81121350;
+	Tue, 16 Jul 2024 22:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721169375; cv=none; b=IrCzbwAFrD4ge/5iw/6WIaPBYyAlB1anaA8b/yFdSfrmAq6yHpeMhvet0HmBZ4yIPDoVaX1IN4E57Fz//3kVEsMLQI3DKDXSwOSP1eLtKrjUt7FOsVyVBAlSC3r/7Lt/J1xxncA47rxC8eQZk0t0EnJ+NZTC9gOD6HH/GW2NZOg=
+	t=1721170507; cv=none; b=EAoNwFwlFke3LSTNnHg0Pd+OWL0d/0u2QuaqTG+nSaTfJBfi2t12U4V/B474Ir03TUGeUWUIGyWebogq4ir0Zq/rnsqVGu07ewczRfp5sp7MT3FcCZ2UDXMCRj/evr2tYT7orIkyjjNvqJrJ45Z624/aDd5hoHsXa18dkQZENrw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721169375; c=relaxed/simple;
-	bh=zqTZu32QXN381eF2EXvGL2ywKpU4EioF0+pMA9whoCc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oFgrzAAZ8TmUV57fFiletg41sE3yEWznngaKV2Mpy9Rpp9wN18tw+wKfdGZK0LPir9M/00tfuBcNMOkzwTBHeDVJ+TW4obC9zhZPr8kbXN2dT4yteEr6zUJ697QQC6lTwTEfQW1Fiog1iqmbd+PGagTrzohVds5zWgpYGZ/XvEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mWIAAXVD; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0335450936so11679905276.1
-        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 15:36:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721169372; x=1721774172; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6eWXs3z6b+9NSb4Ic7sSWzsLfXZane5NyKc2hSTtR2Q=;
-        b=mWIAAXVDA85+j4Y8+QlaeTU0e2sLe7tyt7w9xtVZieIxIasBKD0JFXa5qdLpHrfel7
-         EhoSgmqxrwMWqNGIbNr/gY4/18ci/552RIezKv0fKOjmTsZVnKjajr3B4ttuTVEhSqqI
-         yu7q37k4PmR7SKSt7YOqglKs8vThlq2MRBTt5UIvmjeY765JKJNlNXVtYwKtMoWVz5gt
-         ramWhk0Us3/8Fur6p/LeZwAL4h2lLBo/Nyk1hIUjIfP903yUD74FsElsoVVKlaMIc/t+
-         J5HyEo83LUnw5hYCR2bV9muTE7j7Qdec76pLcVnQQUR5KfCh94Q4siIQo20FRYH+wpnu
-         X4YQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721169372; x=1721774172;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6eWXs3z6b+9NSb4Ic7sSWzsLfXZane5NyKc2hSTtR2Q=;
-        b=QcazjUL5eUcEV0ADbJjF9kWC3fqPoWtgKRAqD83EmK1aonopKMZuHffi974EMtAf40
-         2Q6vF84HPyhZ4fgVC+rLxGyepV+rgmxwc51sFbydoOLhsH/vP3VqWxXK3XlpLzjrYYOj
-         4zQhYL4/juYHXMTGAdC6YtDgP15eHzRxp13LxR+SoZvxDf9VsREcX/A4u4OK6B5rtMhM
-         /T4f6ijHWPUyYfeTh4+Ytvjftvb4NQ53hRdgyuRGkULOkdBvLZo/cu+TBHllW7q5l9eh
-         ZUuFOUBdCxuRgzRLbaMV8iz3jFkaiecuFEZWutnzg9gK2UcvwESC8WG4RVt3yc4ykXvp
-         zQZg==
-X-Gm-Message-State: AOJu0Yx6qEyw2GJ3r3nXeCKN775se0IMFZEkxvbAoSnvDwNKnA+7Vr2W
-	cBMLdF35gov9r7ugViGqSnD/B75EabKQwQDzD/3vA+1CjbY5GxnZWwOWGavCaf5ab+Y3/P77/IR
-	TEg==
-X-Google-Smtp-Source: AGHT+IHNefrgBmTcHKeT33Kds1JOiySYeJA9EAuLooxQygT8+6NXMEow7nFCWlJVAdiiNkTRCVbt/ahSqC8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1002:b0:e03:5312:c053 with SMTP id
- 3f1490d57ef6-e05d56c7498mr6635276.7.1721169372469; Tue, 16 Jul 2024 15:36:12
- -0700 (PDT)
-Date: Tue, 16 Jul 2024 15:36:11 -0700
-In-Reply-To: <20240716022014.240960-3-mlevitsk@redhat.com>
+	s=arc-20240116; t=1721170507; c=relaxed/simple;
+	bh=g/xwm05rvbTzK1jG2tJXHLW8KGiMdROBtBgyRvzO4aQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PXIYqdSP4gZlWmCWRRyPplrGtOuT37TiTSjCZLU5oybP0AajEmrUqAxvLz7gsaisrdXylLe01NrMYra3gcX0Mb5pA7WPtgrsmiEBJzcfYBNDgqdDu5GCEqSw4O0Qk+LqFg5DYGFa9WKMLd23b7tphHWBjHlxljc4NjrOi8p7acs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Aq8n/Fk5; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721170506; x=1752706506;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=g/xwm05rvbTzK1jG2tJXHLW8KGiMdROBtBgyRvzO4aQ=;
+  b=Aq8n/Fk558sETot7f1Pf9zNrUGUiL6GJeqWTHOTSbIW5nVxRAOeM1qL3
+   w6Yo68clBNYjoF2lsFMQrtjdN3dKvE8z8X7dlVkp1kEFujlt5gc9MuEkK
+   ZyUmhzYiEM8CYBmU3opZkp+v/QEsGTNSutsu7yzlUnpYELNnehUEHHRrU
+   LGmNYT+js2D5uNUHFF/D6yoSCUh5iI/Az8JNzHHvBOA3+Umcu2hSnytNX
+   QzJL6MvgE8AoEGjmgDPJFy0R5FjtJ7otibCQMucLUxs814Nb8h6q+Muty
+   +4pDbNrXcNcrRFH3NuZu7VclXIma8WIlwM5qxfFgITouSWaBXPuWV9DcU
+   Q==;
+X-CSE-ConnectionGUID: 6JSRVvh7RmCDGI+DybcYWA==
+X-CSE-MsgGUID: oJppjU58Rq2rMKqAlMG1NQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11135"; a="29233178"
+X-IronPort-AV: E=Sophos;i="6.09,212,1716274800"; 
+   d="scan'208";a="29233178"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2024 15:55:05 -0700
+X-CSE-ConnectionGUID: rnR1z46eR3q8JcAqPn4pdg==
+X-CSE-MsgGUID: 0ovMS4lhTkazQpRKC1VNrQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,212,1716274800"; 
+   d="scan'208";a="54394068"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.54])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2024 15:55:04 -0700
+Date: Tue, 16 Jul 2024 15:55:04 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
+	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
+	Sean Christopherson <seanjc@google.com>,
+	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+	rick.p.edgecombe@intel.com
+Subject: Re: [PATCH v19 117/130] KVM: TDX: Silently ignore INIT/SIPI
+Message-ID: <20240716225504.GE1900928@ls.amr.corp.intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <4a4225de42be0f7568c5ecb5c22f2029f8e91d62.1708933498.git.isaku.yamahata@intel.com>
+ <c45a1448-09ee-4750-bf86-28295dfc6089@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240716022014.240960-1-mlevitsk@redhat.com> <20240716022014.240960-3-mlevitsk@redhat.com>
-Message-ID: <Zpb127FsRoLdlaBb@google.com>
-Subject: Re: [PATCH v2 2/2] KVM: VMX: disable preemption when touching segment fields
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org, 
-	Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Thomas Gleixner <tglx@linutronix.de>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c45a1448-09ee-4750-bf86-28295dfc6089@linux.intel.com>
 
-On Mon, Jul 15, 2024, Maxim Levitsky wrote:
-> VMX code uses segment cache to avoid reading guest segment fields.
+On Mon, Jun 17, 2024 at 09:20:36AM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
+
 > 
-> The cache is reset each time a segment's field (e.g base/access rights/etc)
-> is written, and then a new value of this field is written.
 > 
-> However if the vCPU is preempted between these two events, and this
-> segment field is read (e.g kvm reads SS's access rights to check
-> if the vCPU is in kernel mode), then old field value will get
-> cached and never updated.
+> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+> > From: Isaku Yamahata <isaku.yamahata@intel.com>
+> > 
+> > The TDX module API doesn't provide API for VMM to inject INIT IPI and SIPI.
+> > Instead it defines the different protocols to boot application processors.
+> > Ignore INIT and SIPI events for the TDX guest.
+> > 
+> > There are two options. 1) (silently) ignore INIT/SIPI request or 2) return
+> > error to guest TDs somehow.  Given that TDX guest is paravirtualized to
+> > boot AP, the option 1 is chosen for simplicity.
+> > 
+> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> > ---
+> >   arch/x86/include/asm/kvm-x86-ops.h |  1 +
+> >   arch/x86/include/asm/kvm_host.h    |  2 ++
+> >   arch/x86/kvm/lapic.c               | 19 +++++++++++-------
+> >   arch/x86/kvm/svm/svm.c             |  1 +
+> >   arch/x86/kvm/vmx/main.c            | 32 ++++++++++++++++++++++++++++--
+> >   arch/x86/kvm/vmx/tdx.c             |  4 ++--
+> >   6 files changed, 48 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
+> > index 22d93d4124c8..85c04aad6ab3 100644
+> > --- a/arch/x86/include/asm/kvm-x86-ops.h
+> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
+> > @@ -149,6 +149,7 @@ KVM_X86_OP_OPTIONAL(migrate_timers)
+> >   KVM_X86_OP(msr_filter_changed)
+> >   KVM_X86_OP(complete_emulated_msr)
+> >   KVM_X86_OP(vcpu_deliver_sipi_vector)
+> > +KVM_X86_OP(vcpu_deliver_init)
+> >   KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
+> >   KVM_X86_OP_OPTIONAL(get_untagged_addr)
+> >   KVM_X86_OP_OPTIONAL_RET0(gmem_max_level)
+> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
+> > index bb8be091f996..2686c080820b 100644
+> > --- a/arch/x86/include/asm/kvm_host.h
+> > +++ b/arch/x86/include/asm/kvm_host.h
+> > @@ -1836,6 +1836,7 @@ struct kvm_x86_ops {
+> >   	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
+> >   	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
+> > +	void (*vcpu_deliver_init)(struct kvm_vcpu *vcpu);
+> >   	/*
+> >   	 * Returns vCPU specific APICv inhibit reasons
+> > @@ -2092,6 +2093,7 @@ void kvm_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
+> >   void kvm_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
+> >   int kvm_load_segment_descriptor(struct kvm_vcpu *vcpu, u16 selector, int seg);
+> >   void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
+> > +void kvm_vcpu_deliver_init(struct kvm_vcpu *vcpu);
+> >   int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
+> >   		    int reason, bool has_error_code, u32 error_code);
+> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> > index 8025c7f614e0..431074679e83 100644
+> > --- a/arch/x86/kvm/lapic.c
+> > +++ b/arch/x86/kvm/lapic.c
+> > @@ -3268,6 +3268,16 @@ int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
+> >   	return 0;
+> >   }
+> > +void kvm_vcpu_deliver_init(struct kvm_vcpu *vcpu)
+> > +{
+> > +	kvm_vcpu_reset(vcpu, true);
+> > +	if (kvm_vcpu_is_bsp(vcpu))
+> > +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> > +	else
+> > +		vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
+> > +}
+> > +EXPORT_SYMBOL_GPL(kvm_vcpu_deliver_init);
+> > +
+> >   int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+> >   {
+> >   	struct kvm_lapic *apic = vcpu->arch.apic;
+> > @@ -3299,13 +3309,8 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
+> >   		return 0;
+> >   	}
+> > -	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events)) {
+> > -		kvm_vcpu_reset(vcpu, true);
+> > -		if (kvm_vcpu_is_bsp(apic->vcpu))
+> > -			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
+> > -		else
+> > -			vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
+> > -	}
+> > +	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events))
+> > +		static_call(kvm_x86_vcpu_deliver_init)(vcpu);
+> >   	if (test_and_clear_bit(KVM_APIC_SIPI, &apic->pending_events)) {
+> >   		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
+> >   			/* evaluate pending_events before reading the vector */
+> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > index f76dd52d29ba..27546d993809 100644
+> > --- a/arch/x86/kvm/svm/svm.c
+> > +++ b/arch/x86/kvm/svm/svm.c
+> > @@ -5037,6 +5037,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
+> >   	.complete_emulated_msr = svm_complete_emulated_msr,
+> >   	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
+> > +	.vcpu_deliver_init = kvm_vcpu_deliver_init,
+> >   	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
+> >   };
+> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
+> > index 4f3b872cd401..84d2dc818cf7 100644
+> > --- a/arch/x86/kvm/vmx/main.c
+> > +++ b/arch/x86/kvm/vmx/main.c
+> > @@ -320,6 +320,14 @@ static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
+> >   }
+> >   #endif
+> > +static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
+> > +{
+> > +	if (is_td_vcpu(vcpu))
+> > +		return true;
+> 
+> Since for TD, INIT is always blocked, then in kvm_apic_accept_events(), the
+> code path to handle INIT/SIPI delivery will not be called, i.e, the OPs
+> .vcpu_deliver_init() and .vcpu_deliver_sipi_vector() are never called for
+> TD.
+> Seems no need to add the new interface  vcpu_deliver_init or the new wrapper
+> vt_vcpu_deliver_sipi_vector().
+> 
+> And consider the INIT/SIPI for TD:
+> - Normally, for TD, INIT ans SIPI should not be set in APIC's
+> pending_events.
+>   Maybe we can call KVM_BUG_ON() in vt_apic_init_signal_blocked() for TD?
+> - If INIT and SIPI are allowed be set in APIC's pending_events for somehow,
+> the current code has a problem, it will never clear INIT bit in APIC's
+> pending_events.
+>   Then kvm_apic_accept_events() needs to execute more check code if INIT was
+> once set.
+>   INIT bit should be cleared with this assumption.
 
-It'be super helpful to include the gory details about how kvm_arch_vcpu_put()
-reads stale data.  Without that information, it's very hard to figure out how
-getting preempted is problematic.
 
-  vmx_vcpu_reset resets the segment cache bitmask and then initializes
-  the segments in the vmcs, however if the vcpus is preempted in the
-  middle of this code, the kvm_arch_vcpu_put is called which
-  reads SS's AR bytes to determine if the vCPU is in the kernel mode,
-  which caches the old value.
-
-> Usually a lock is required to avoid such race but since vCPU segments
-> are only accessed by its vCPU thread, we can avoid a lock and
-> only disable preemption, in places where the segment cache
-> is invalidated and segment fields are updated.
-
-This doesn't fully fix the problem.  It's not just kvm_sched_out() => kvm_arch_vcpu_put()
-that's problematic, it's any path that executes KVM code in interrupt context.
-And it's not just limited to segment registers, any register that is conditionally
-cached via arch.regs_avail is susceptible to races.
-
-Specifically, kvm_guest_state() and kvm_guest_get_ip() will read SS.AR_bytes and
-RIP in NMI and/or IRQ context when handling a PMI.
-
-A few possible ideas.
-
- 1. Force reads from IRQ/NMI context to skip the cache and go to the VMCS.
-
- 2. Same thing as #1, but focus it specifically on kvm_arch_vcpu_in_kernel()
-    and kvm_arch_vcpu_get_ip(), and WARN if kvm_register_is_available() or
-    vmx_segment_cache_test_set() is invoked from IRQ or NMI context.
-
- 3. Force caching of SS.AR_bytes, CS.AR_bytes, and RIP prior to kvm_after_interrupt(),
-    rename preempted_in_kernel to something like "exited_in_kernel" and snapshot
-    it before kvm_after_interrupt(), and add the same hardening as #2.
-
-    This is doable because kvm_guest_state() should never read guest state for
-    PMIs that occur between VM-Exit and kvm_after_interrupt(), nor should KVM
-    write guest state in that window.  And the intent of the "preempted in kernel"
-    check is to query vCPU state at the time of exit.
-
- 5. Do a combination of #3 and patch 02 (#3 fixes PMIs, patch 02 fixes preemption).
-
-My vote is probably for #2 or #4.  I definitely think we need WARNs in the caching
-code, and in general kvm_arch_vcpu_put() shouldn't be reading cacheable state, i.e.
-I am fairly confident we can restrict it to checking CPL.
-
-I don't hate this patch by any means, but I don't love disabling preemption in a
-bunch of flows just so that the preempted_in_kernel logic works.
+KVM_SET_MP_STATE and KVM_SET_VCPU_EVENTS can set INIT/SIPI by the user space.
+If we change those two IOCTLs to reject INIT/SIPI for TDX, we can go for the
+above "Normally" option.  Because I didn't want to touch the common functions, I
+ended in extra callbacks.  The user space shouldn't use those two IOCTLs for
+TDX, though.
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
