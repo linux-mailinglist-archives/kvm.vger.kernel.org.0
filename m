@@ -1,219 +1,138 @@
-Return-Path: <kvm+bounces-21727-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21717-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9DCB932D44
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 18:03:13 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA5EF932C6D
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 17:55:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A54832804D0
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 16:03:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7780A1F24570
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 15:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B205A19E809;
-	Tue, 16 Jul 2024 16:03:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2BD19E7C8;
+	Tue, 16 Jul 2024 15:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mX8mJtYc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RRD7lWp6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6521B19DF59
-	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 16:03:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D3A1DDCE
+	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 15:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721145783; cv=none; b=A37h8M9cmAGZ4PNy38X3qGa812Zrw+X+wlme/Y6hw/Fv+5IrbB+XTTXEcLtjjEEgrfN69j8axyideBe0UGgB81IAO6WFmlrOZTxhxRoNlDtsOkbw5XCzCPRQ9vR/XWyi4ksme6nVByAqC8fnT9Y4yKsvlDPMSKtwMSTHu8Kdepw=
+	t=1721145310; cv=none; b=kiU0RO4F77i7LtDX87NP5q8HK/49X3D27K7aEKUIxt4DLY3OSJhmmI1KtdJXtt+hCySaKlRQKAE+mmmbDJ6rZxx+zpNDrUw4lC/KJKszuZ7ZHVIy52cbBBfyFdd+um23KLUiMeDg3X+WJpzIgrueEStuTAG18uxfXDDvIdLFFMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721145783; c=relaxed/simple;
-	bh=V3XIltUZy+EAGhbi36SoKcnYH8QOpAigc2QQmc3zTsw=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HIxy/vyTIuO3mh5eqzhMmkKxR9STfObtwdCgPD63PC/zkrOlviZpj2AmzHu4qGlKf6t68LcSZLMScv60S1PMQESR8katacB/AoGruJRyG0uvNRcvg/CVSwK6JjOuIrfQ68HVL4AHCjB+lyKv4cHybcYr55iO6oslvGonfiKHJFk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mX8mJtYc; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-65eb8845bc6so96081867b3.3
-        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 09:03:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721145781; x=1721750581; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BMs2wY7Im2gJwcvsvkhutz6yojdHTU9eBYvDppSee3o=;
-        b=mX8mJtYcq9zluHtVnzREhZxbiiULi7i2I+mJi4Mt08+GskaWUHf5gWVjXt5W27r0kS
-         weqAWKColS7fzPZ/XyCf6qTaU0n4l/g7QwS3RhBGURMGs/LVEzq36zwElFVxRZhLx7lw
-         WM4Qhv+0Ncj+0SqxX5NvtCupt3zX+r1L0TUqx6Iuu9YGo1CYTh0XeX1iRlwd2+DQNEty
-         BbckODM0k85fY+vvYTBvHD9S4Fdwdn6B6PX51Nl5yJXu8bXWlahlEPRa6AKnEg7ZRT/y
-         t2h3IS26gKTSfcnSeOM5iK4Iojjn4cq2rHi+vxzF1YUGVruUttEyEf7Gx19q0X5j/I5I
-         sVbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721145781; x=1721750581;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BMs2wY7Im2gJwcvsvkhutz6yojdHTU9eBYvDppSee3o=;
-        b=Hs15hkpkN4kYHUoUd50H2H1fnPKLXefGJwyy3Ep5FwYlvkg3Sqe5o6+9W1TMVIktIj
-         wcQXYpEx6dceSJRvlQcGhURiKh6+WhGRf2R9TzW808iG6oTKjdC3xfQK+97vScD6IWWT
-         hEtI4trZnXW5Mc4yeAZ3DGgD/Y7tsL630HDwAwiY8XiZnDuC332zah2SBixVWx/BDWao
-         v4/uhrefUpTk/A+t1zCd1w2cg6HZ7Nroa4LJBX/+hqj240zej+HurJzXbl50dF7pEZZx
-         CuTqD2ckmVwfV8GHPsaG4DO1xl19BWQjMnUMle35tb/teKxp8s1cVjpUwhXeqsy2sAh2
-         yJoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUBersk9J1mjdMS/kZhdRW5yzZdgD0KtdsIdPGSK81RLWDkD2j/jj8OWsFKls2KO0lDA8H96e5nPqdE+NHxQXHmcunk
-X-Gm-Message-State: AOJu0YxfGeCP/yww38kSfMz5Hsq/q2ji6504RCbQya9QJUD81v3tDtho
-	9VcWk02Q2VgEZW+l5zeRDiL3dYj0kzUOCCcRDaZRZ906rxGj1Q/Egh+HdujDf0WdZUX1CsHVQMB
-	Kmw==
-X-Google-Smtp-Source: AGHT+IHGZLEiSniWpPk9RJXTJkROIXXHkCGmFW1fdkqpo+4QpAqRJbF6e6n8zR9oFjopeWKxjqT3PAofiHk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:fd4:b0:62d:cef:67dd with SMTP id
- 00721157ae682-6637f1c259emr1606177b3.1.1721145781339; Tue, 16 Jul 2024
- 09:03:01 -0700 (PDT)
-Date: Tue, 16 Jul 2024 09:03:00 -0700
-In-Reply-To: <20240712232937.2861788-1-ackerleytng@google.com>
+	s=arc-20240116; t=1721145310; c=relaxed/simple;
+	bh=tpsLMKJIQFAky+/kJ60UZVyG/3DdjHMTPZcVXZFK/To=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HVsTDxEl/xAwhjppXz4XLx0mhoCVo0HjD0J64dkZxHX0FfpCjMooXnFTm1n5Hbc0YXZQOHvr11O/nftLPqs+n6rukqJTvyPJPClukrG7vNQuavvJ8CLz+D9n8vSfPPKSlHBHs2G7ua3FXaCmEZ8kbGhLfdGCYmb0I8tlpnRNPmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RRD7lWp6; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721145308; x=1752681308;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tpsLMKJIQFAky+/kJ60UZVyG/3DdjHMTPZcVXZFK/To=;
+  b=RRD7lWp6moraLoXirvOKmWIpuJSKLEoLbjRKZSk6EjKgOASGIQZyXN2y
+   6GqiNnNJQWoK92mSqX4nf3rfDOLZE8tTEBtIzClRzDmMaR10gqV//MsxQ
+   tG13IDTPD738FdXXD8D2iIyqnxtE8bFt+x6WIFsN4Sd2cjP6xbbvGvABb
+   MHG9aeFtmS619Ih+74ysOoi8Q8bUzLYmbcFCw7K3CDcvw4gqh1nJTIQiG
+   3BAqtnzFH3X8YT1fKBZhRqWvIxVJKZxwOZqZ0n5QabXqxo1gxuPZDkUOa
+   je4pKihDmmjBCZmGg+0bWha8M+oqO/IUqS/0GNnIpM5nGsrvSIVewabEN
+   g==;
+X-CSE-ConnectionGUID: d+MtYt0QR/WkzBWOFldPMQ==
+X-CSE-MsgGUID: 1DlP5yJESz6DNw8oIEVkSg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11135"; a="18743674"
+X-IronPort-AV: E=Sophos;i="6.09,212,1716274800"; 
+   d="scan'208";a="18743674"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2024 08:54:46 -0700
+X-CSE-ConnectionGUID: 7RqqBhFbRve3yyEmcDLvqg==
+X-CSE-MsgGUID: qmpv3ti6TzalfhsW7l2GoQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,212,1716274800"; 
+   d="scan'208";a="50788236"
+Received: from liuzhao-optiplex-7080.sh.intel.com ([10.239.160.36])
+  by orviesa008.jf.intel.com with ESMTP; 16 Jul 2024 08:54:43 -0700
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>
+Cc: Xiaoyao Li <xiaoyao.li@intel.com>,
+	Pankaj Gupta <pankaj.gupta@amd.com>,
+	Zide Chen <zide.chen@intel.com>,
+	qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Zhao Liu <zhao1.liu@intel.com>
+Subject: [PATCH v4 0/9] target/i386: Misc cleanup on KVM PV defs, outdated comments and error handling
+Date: Wed, 17 Jul 2024 00:10:06 +0800
+Message-Id: <20240716161015.263031-1-zhao1.liu@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com> <20240712232937.2861788-1-ackerleytng@google.com>
-Message-ID: <ZpaZtPKrXolEduZH@google.com>
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-From: Sean Christopherson <seanjc@google.com>
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: quic_eberman@quicinc.com, akpm@linux-foundation.org, david@redhat.com, 
-	kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	linux-mm@kvack.org, maz@kernel.org, pbonzini@redhat.com, shuah@kernel.org, 
-	tabba@google.com, willy@infradead.org, vannapurve@google.com, 
-	hch@infradead.org, jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, 
-	qperret@google.com, smostafa@google.com, fvdl@google.com, hughd@google.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Thanks for doing the dirty work!
+Hi,
 
-On Fri, Jul 12, 2024, Ackerley Tng wrote:
-> Here=E2=80=99s an update from the Linux MM Alignment Session on July 10 2=
-024, 9-10am
-> PDT:
->=20
-> The current direction is:
->=20
-> + Allow mmap() of ranges that cover both shared and private memory, but d=
-isallow
->   faulting in of private pages
->   + On access to private pages, userspace will get some error, perhaps SI=
-GBUS
->   + On shared to private conversions, unmap the page and decrease refcoun=
-ts
+This is my v4 cleanup series. Compared with v3 [1],
+ * Returned kvm_vm_ioctl() directly in kvm_install_msr_filters().
+ * Added a patch (patch 9) to clean up ARRAY_SIZE(msr_handlers).
 
-Note, I would strike the "decrease refcounts" part, as putting references i=
-s a
-natural consequence of unmapping memory, not an explicit action guest_memfd=
- will
-take when converting from shared=3D>private.
 
-And more importantly, guest_memfd will wait for the refcount to hit zero (o=
-r
-whatever the baseline refcount is).
+Background and Introduction
+===========================
 
-> + To support huge pages, guest_memfd will take ownership of the hugepages=
-, and
->   provide interested parties (userspace, KVM, iommu) with pages to be use=
-d.
->   + guest_memfd will track usage of (sub)pages, for both private and shar=
-ed
->     memory
->   + Pages will be broken into smaller (probably 4K) chunks at creation ti=
-me to
->     simplify implementation (as opposed to splitting at runtime when priv=
-ate to
->     shared conversion is requested by the guest)
+This series picks cleanup from my previous kvmclock [2] (as other
+renaming attempts were temporarily put on hold).
 
-FWIW, I doubt we'll ever release a version with mmap()+guest_memfd support =
-that
-shatters pages at creation.  I can see it being an intermediate step, e.g. =
-to
-prove correctness and provide a bisection point, but shattering hugepages a=
-t
-creation would effectively make hugepage support useless.
+In addition, this series also include the cleanup on a historically
+workaround, recent comment of coco interface [3] and error handling
+corner cases in kvm_arch_init().
 
-I don't think we need to sort this out now though, as when the shattering (=
-and
-potential reconstituion) occurs doesn't affect the overall direction in any=
- way
-(AFAIK).  I'm chiming in purely to stave off complaints that this would bre=
-ak
-hugepage support :-)
+Avoiding the fragmentation of these misc cleanups, I consolidated them
+all in one series and was able to tackle them in one go!
 
->     + Core MM infrastructure will still be used to track page table mappi=
-ngs in
->       mapcounts and other references (refcounts) per subpage
->     + HugeTLB vmemmap Optimization (HVO) is lost when pages are broken up=
- - to
->       be optimized later. Suggestions:
->       + Use a tracking data structure other than struct page
->       + Remove the memory for struct pages backing private memory from th=
-e
->         vmemmap, and re-populate the vmemmap on conversion from private t=
-o
->         shared
->   + Implementation pointers for huge page support
->     + Consensus was that getting core MM to do tracking seems wrong
->     + Maintaining special page refcounts for guest_memfd pages is difficu=
-lt to
->       get working and requires weird special casing in many places. This =
-was
->       tried for FS DAX pages and did not work out: [1]
->=20
-> + Implementation suggestion: use infrastructure similar to what ZONE_DEVI=
-CE
->   uses, to provide the huge page to interested parties
->   + TBD: how to actually get huge pages into guest_memfd
->   + TBD: how to provide/convert the huge pages to ZONE_DEVICE
->     + Perhaps reserve them at boot time like in HugeTLB
->=20
-> + Line of sight to compaction/migration:
->   + Compaction here means making memory contiguous
->   + Compaction/migration scope:
->     + In scope for 4K pages
->     + Out of scope for 1G pages and anything managed through ZONE_DEVICE
->     + Out of scope for an initial implementation
->   + Ideas for future implementations
->     + Reuse the non-LRU page migration framework as used by memory ballon=
-ing
->     + Have userspace drive compaction/migration via ioctls
->       + Having line of sight to optimizing lost HVO means avoiding being =
-locked
->         in to any implementation requiring struct pages
->         + Without struct pages, it is hard to reuse core MM=E2=80=99s
->           compaction/migration infrastructure
->=20
-> + Discuss more details at LPC in Sep 2024, such as how to use huge pages,
->   shared/private conversion, huge page splitting
->=20
-> This addresses the prerequisites set out by Fuad and Elliott at the begin=
-ning of
-> the session, which were:
->=20
-> 1. Non-destructive shared/private conversion
->   + Through having guest_memfd manage and track both shared/private memor=
-y
-> 2. Huge page support with the option of converting individual subpages
->   + Splitting of pages will be managed by guest_memfd
-> 3. Line of sight to compaction/migration of private memory
->   + Possibly driven by userspace using guest_memfd ioctls
-> 4. Loading binaries into guest (private) memory before VM starts
->   + This was identified as a special case of (1.) above
-> 5. Non-protected guests in pKVM
->   + Not discussed during session, but this is a goal of guest_memfd, for =
-all VM
->     types [2]
->=20
-> David Hildenbrand summarized this during the meeting at t=3D47m25s [3].
->=20
-> [1]: https://lore.kernel.org/linux-mm/cover.66009f59a7fe77320d413011386c3=
-ae5c2ee82eb.1719386613.git-series.apopple@nvidia.com/
-> [2]: https://lore.kernel.org/lkml/ZnRMn1ObU8TFrms3@google.com/
-> [3]: https://drive.google.com/file/d/17lruFrde2XWs6B1jaTrAy9gjv08FnJ45/vi=
-ew?t=3D47m25s&resourcekey=3D0-LiteoxLd5f4fKoPRMjMTOw
+[1]: https://lore.kernel.org/qemu-devel/20240715044955.3954304-1-zhao1.liu@intel.com/T/
+[2]: https://lore.kernel.org/qemu-devel/20240329101954.3954987-1-zhao1.liu@linux.intel.com/
+[3]: https://lore.kernel.org/qemu-devel/2815f0f1-9e20-4985-849c-d74c6cdc94ae@intel.com/
+
+Thanks and Best Regards,
+Zhao
+---
+Zhao Liu (9):
+  target/i386/kvm: Add feature bit definitions for KVM CPUID
+  target/i386/kvm: Remove local MSR_KVM_WALL_CLOCK and
+    MSR_KVM_SYSTEM_TIME definitions
+  target/i386/kvm: Only save/load kvmclock MSRs when kvmclock enabled
+  target/i386/kvm: Save/load MSRs of kvmclock2
+    (KVM_FEATURE_CLOCKSOURCE2)
+  target/i386/kvm: Drop workaround for KVM_X86_DISABLE_EXITS_HTL typo
+  target/i386/confidential-guest: Fix comment of
+    x86_confidential_guest_kvm_type()
+  target/i386/kvm: Clean up return values of MSR filter related
+    functions
+  target/i386/kvm: Clean up error handling in kvm_arch_init()
+  target/i386/kvm: Replace ARRAY_SIZE(msr_handlers) with
+    KVM_MSR_FILTER_MAX_RANGES
+
+ hw/i386/kvm/clock.c              |   5 +-
+ target/i386/confidential-guest.h |   2 +-
+ target/i386/cpu.h                |  25 +++++++
+ target/i386/kvm/kvm.c            | 113 +++++++++++++++++--------------
+ target/i386/kvm/kvm_i386.h       |   4 +-
+ 5 files changed, 92 insertions(+), 57 deletions(-)
+
+-- 
+2.34.1
+
 
