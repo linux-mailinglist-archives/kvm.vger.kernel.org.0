@@ -1,187 +1,320 @@
-Return-Path: <kvm+bounces-21728-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21729-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E6A4932DC4
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 18:09:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E62F932EEA
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 19:11:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E74A0281B56
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 16:09:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10E5F1C222C8
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 17:11:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39ED519E83C;
-	Tue, 16 Jul 2024 16:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5206919FA94;
+	Tue, 16 Jul 2024 17:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="bgkiTmL/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0d13dRIA"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2050.outbound.protection.outlook.com [40.107.236.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8829C1DDCE;
-	Tue, 16 Jul 2024 16:08:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721146131; cv=fail; b=TNPm4Q7fc8hC/utwGrSOhKPtym3MES4Rnm+IyNJUZgTIeNx9PLDTPsqTsLZvC/qSwyhuO3O/WiFJgyW4WLdhCI26uNpZBBbCSzTwDKjiu+Dx69yKTQC8d+Kh3HYzFT0sFM5YB43va6wFgi6+qG2IbXZD8WPs3SNWS4jXvnA/YcM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721146131; c=relaxed/simple;
-	bh=ehtM24vnX5HUGlSkEVnpUQxZVqS9bibu6pdUNz1r+74=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=do8wK8nroNBVlqjBW1BhmIDh8yN2JS2cyZveU9SQWUyf1vfjbFBstRb0MxqoWWfMkTc0hwXP+Q/seKTTJiOjKDtuqpWPdXtrhh4Hob7qJPw8GXiY4EjuuexOP2y/sBjNvDUrXcEso6mh1S8qyAuro2LI/yY+kOaYdoEBpkYeyzI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=bgkiTmL/; arc=fail smtp.client-ip=40.107.236.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=TrPm/dStiPKBJun/EHCLVmpBVv9QDrb+BO92yYPywro/53hgDxb3H2gbdlpAndaI9aA2GIVUN/MWuEQacBs79HR+WZFip0NVfXUyR6qWfK+v2fxzyi4VvMwfYpjlHIGEXn8v50yvXkIG/9Ii0AKZZCD1HF8iomn+QUg7Ytw3Be0syM/DRs1HcqLJbUvUO2ClTDvCxzbEr1lW4HVJy20Bg+LBNrZMBTENZUWQB3XBKdhLEdtkgHf5oTavdh+IBaDsM4YnlbkryLABsniq63FKYfekfCN55K7FmYoAkLwhbDEeGJ9o+/nvA2bkhx1PQC1gsz1ROYIGOd8Rpsqy5OJ2MQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SL8aK2DcD27A96vmhuZI0qzMSQONWHchgTrHcD4nveI=;
- b=VLgmEYgUowSAxzZ5/emHfkXFxf2uf8xgMwkJKoD/oa+jpvf3Rib1EkOMZsA39esGUPNz0dcbYLtGc1WsP0uECyKudqsMIQB4M9SEy+NDqoQBVEPUcqQ4zPyS/bvt/GCWQ4fH6ZmnvlNLt804g0ytbCR9IjQabZefeNyNLycBYoHXh6ixr0wEzPnJyT8NWgaKi2D0zSVWHfU597MP7ZDS5RM8yqL1+rozBto4+zSFH/IjBfK6Ne/4hQl2FTeyKFOdG8MnHJPhuTwHw/fvO0D5M6N0DG7CIOYjc97OMFRhM4dNtNRMeQlBMEzuu3ucw9tPOd15tYYMsGwFhwJ2eQRHHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SL8aK2DcD27A96vmhuZI0qzMSQONWHchgTrHcD4nveI=;
- b=bgkiTmL/hJ4QD4m+o6ZuAj/xlGyXTAjz6fVwfJfi6dSk7/iGZVb4EDRq4CdXG8Q8bOuXSXGM4yCbzbO8weRlSHkgHQySOnFXg+4ztJp74gYjVeNnI0l+fEd/7+d1D9CdGZsA2EYZnGARIN6OzUMYr/pTbxpmjQ+vn6xtDM/Iz6OStiKh28oa7EkMcpAFxmh2mHf9soaMGG2ZbtLFO3WVq1grDIUVgU31Iww/mHfvhC+el/gtnWV5Jb2x10T+Kot88ICseDI9nHOFiXGAPpQXWq8kT8Xf1/+HmUgtxY7Nh5Zx8T2i9fJIEn8apO4ZG247qopj/sQw5vU7gDN5gObktQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com (2603:10b6:5:1c7::26)
- by SA1PR12MB8968.namprd12.prod.outlook.com (2603:10b6:806:388::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29; Tue, 16 Jul
- 2024 16:08:44 +0000
-Received: from DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e]) by DM6PR12MB3849.namprd12.prod.outlook.com
- ([fe80::c296:774b:a5fc:965e%4]) with mapi id 15.20.7762.027; Tue, 16 Jul 2024
- 16:08:43 +0000
-Date: Tue, 16 Jul 2024 13:08:42 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, quic_eberman@quicinc.com,
-	akpm@linux-foundation.org, david@redhat.com, kvm@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, maz@kernel.org,
-	pbonzini@redhat.com, shuah@kernel.org, tabba@google.com,
-	willy@infradead.org, vannapurve@google.com, hch@infradead.org,
-	rientjes@google.com, jhubbard@nvidia.com, qperret@google.com,
-	smostafa@google.com, fvdl@google.com, hughd@google.com
-Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-Message-ID: <20240716160842.GD1482543@nvidia.com>
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
- <20240712232937.2861788-1-ackerleytng@google.com>
- <ZpaZtPKrXolEduZH@google.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZpaZtPKrXolEduZH@google.com>
-X-ClientProxiedBy: MN2PR04CA0021.namprd04.prod.outlook.com
- (2603:10b6:208:d4::34) To DM6PR12MB3849.namprd12.prod.outlook.com
- (2603:10b6:5:1c7::26)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C120419F48C
+	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 17:11:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721149868; cv=none; b=bGXGn5v0UuMScoKwyeWNEB1DBdEXNxprwi/ALlxPm/UqXD/SgzUp+itzBftwkkHHLRT5g/41q5tAJtH8TaYGbFkiqwBWoHlfnxGxAd03gQ383ArDH1/XHxc6lSzM5ZjGdIX/WZ47LlfgbYP4vot/C4KEIBnt2IXpT8fn7k7oIiY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721149868; c=relaxed/simple;
+	bh=d9Y3PppBIVaDeA7OUV7QSIfz7XlMBytja2woDfy2rK4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=LvLzv3R07YVPFF4NP0xyRH46Lbjp0CQ+G0itiSrEmcc1sSm9GhbCvfmgk1cpY4LcHf0aNgq3ztlOhZCCxWKrVFnityIv7pnF9SKh2pwqYT1UnwdtK/jX10TEuN87fVYP5dSj73S7R9atfbWBt91EzjGkWeZcrrTbwiq8Hsj6TxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0d13dRIA; arc=none smtp.client-ip=209.85.160.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-44a8b140a1bso18841cf.0
+        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 10:11:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721149866; x=1721754666; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DV9GhdKZyJ6M+6gQqAdxuqd09DQjKmEarDGs4L0SsCI=;
+        b=0d13dRIAB5GTTXQ4R7HHUgEVpJYZdGKUMMbUtQpJgzyU8RQsXfveZc9oW75Ewq9YSL
+         IEmfRYqrGMOgwwwPltsqqValwqQu093pHuiXFfFsoaB+CyvKxw+BXcSv8vClj5xftCQ/
+         UBvcIRM31f0qCvnI+VRiD90lVs6S31HYav7cqBAqzRb/uC6nx4dY9DDraJqXMjFlHB7r
+         ZQgXDb32SxPXo2OtLoG0twic7Xnrvseeev7Xx8zDRIpZVv7PHT+2AVoaniDUyOqPPrRG
+         voOn7ts2bzDpplC8xhO+rmLZmsyLdFW+gTBoYKSkjX/It98bYqM2k7XqSQYFX25XEz09
+         xR9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721149866; x=1721754666;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DV9GhdKZyJ6M+6gQqAdxuqd09DQjKmEarDGs4L0SsCI=;
+        b=vPAvJvKAs5HhyfWRGwn9lU44voHHp5LwmfIOMmHo9a/Y1O+Gz2duOKgk7y8Va/RYfs
+         asakktDgYH0/JUnkHya9tA/giGs7ypQJa0WJljIBRJebPjFzbq43nTjGF8ff700pvXi6
+         OlFOWQn21W34xn7E2nNOWfhpZ6IeccPTtILXtQf3XpX1+wKkQ+eOyDFqpVS4ZgV0hbq9
+         Uto+dte4qVkoB2c8T7yxoufaYIdIn1m7yDe0Y4o5SMftbD6iK3D+qIbIESw5oYm+h3+9
+         EnsVN/tyU+IuLxhF8ATMRY8TF4roaCBtIQ0JumJ3kLEPD2I5dqP3htcWTm7Q2r5mqMA8
+         kwCQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX2EKWHpz1MZVlD83xuxHGZN9LkgIaTyGOyYjYQOfGTbBVRvXzX03PN/DVe+ERXSM/JPM68fBpYxknYvIZjS69MIwX0
+X-Gm-Message-State: AOJu0YzFzB99+e53xlwet8IYgriQxxNQxtBDQ06dVwqPKcN0rCUUDqqM
+	SubgX7pyJiqZ5SQ1MlI30PW3t4ovWfMGbYxJTnphzf155bt6qnhvuauBf7co3oHLvCYMMYi+yAn
+	LsI/3l7m/4qSv66BTK2Ggn77ZpxFZQaykONeq
+X-Google-Smtp-Source: AGHT+IFaV9/2Z7WSL/mHSXyBRuqYSsif3Jd7vrRf+CGU9hcp7x64cONNeb1r2bfZCOcTK8Iuat3cjGzcxnXcLyg9ASI=
+X-Received: by 2002:a05:622a:2a0f:b0:444:dc9a:8e95 with SMTP id
+ d75a77b69052e-44f7b927bc1mr3465511cf.15.1721149865452; Tue, 16 Jul 2024
+ 10:11:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB3849:EE_|SA1PR12MB8968:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3883fb2d-dd7b-4dd2-321c-08dca5b190c9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?d+jRlk9L3mOL9ATuCMWCbLJEjFvBEAn9a7j7kODPezVqpYgHLzZJ3GNaPSMC?=
- =?us-ascii?Q?+70mXMnfFQjyhv0cZTQl5QiK3XoXvf1scHs8mbXNWN3dV8TSks9bqw88e3IK?=
- =?us-ascii?Q?qD/cXDTAVVD1esuyu2gtUJr7urDfP9NrpOJk81cJdD3SwPHpj1FzYPR3mlz/?=
- =?us-ascii?Q?RoaGMc/OT5ECU/ROoEq36pqaCKWzkgRVm6uzKu5O0+fPScUMI8CXTnw2n8bN?=
- =?us-ascii?Q?Xn1LKPr/lK3c0TVpB/CWtfzsy2XoWrfk5ieq/zje+vAa4NTUD+ooVRo0AXVR?=
- =?us-ascii?Q?VyZJtA+YKJfSxMoebgTHoYr9XPC+7/BUC8SgppTg3eM0p5hgakCOtZ+4j3QW?=
- =?us-ascii?Q?YOqrIjf6WyqxgWi/FzFb0Y9OqaYs6mdRZ8ao3FL5WoSo7KARiNonUaVakp+R?=
- =?us-ascii?Q?SkDBMnkU6ZxV3z8rw4zg82ITPqgVPC20tFxW7DiNNDOPi/Ml2rAygR00CccC?=
- =?us-ascii?Q?iHL9c3NGKJDhI26ZdR2R2fPLyYGe4iAXW3eakKc4imjcJ39wlBufxMM/DYZA?=
- =?us-ascii?Q?SxRwsOh0w5ryOe2rOzoAiqi2lZDj7VoiHtup6Oo94v6FNvsJEHL73gn4CgUP?=
- =?us-ascii?Q?EyFFa/YRAHUN2HVSrk3Bbku4l8T3LPdzmW422Ka64WjXAuAdCj0QrPuhKGVC?=
- =?us-ascii?Q?pYPX7U91hsjbcx54SdArgoXTVSxAl1TnZh6N7Xy6GXsZoEemVIWKaFgd5G1y?=
- =?us-ascii?Q?zmqtU9tgX0hhOPciKQdYTgaITUN0Ud5ZkSwC7TSnkWKn++078FmL2yTOiaLz?=
- =?us-ascii?Q?SFg78/Ebx19ypHLz/O6dRsib/ywnSk3sEyXZe7weT84uCj5o4WQ592GIo1sv?=
- =?us-ascii?Q?wgcQEDWLdnMqOQRFlIdMekCBDGUf3RbASEB47+Ajm1+P430HCns3Tx6ydd+z?=
- =?us-ascii?Q?+kh1Bemii9H0gjyJ52YP1Zahp3fmwnqAoE9zmGAumbjsMUljBPuZCjT3Ypl6?=
- =?us-ascii?Q?fMRvWr7IMLIGzIuchzdqTOlIovQVHE9L+u0SrauenUVzUYUNkMD513EU3ZWv?=
- =?us-ascii?Q?dEnzFRf2Rk6elIb5SVLoO58j7y44DCqCEekSsf3h+RXqHUyPWgxzC5RH0lV8?=
- =?us-ascii?Q?OyAQ/YjaKMBf+zL2NWNzlARGaAhBcyEEEzpMjPkhBEyuXgMP5CT4T7kNX/Xy?=
- =?us-ascii?Q?lUZwXmQVNwjy+uZk/2KZ23O16w+BJQch7sfYvA7MjEmOdyNqXDegH1gI+zPJ?=
- =?us-ascii?Q?grpV3jefYkUzNzPQ1LYlNjjlDxFkyD6vmGSD6tEBS0Z9b+rpl9dibLOtHv8k?=
- =?us-ascii?Q?r8ew4XHqIZ0oOPXtL5l4MQefWqzaR4wd2kOxK2Mw2HkoYTzMbPD6sghrBKj8?=
- =?us-ascii?Q?6xwJlSXXxnKvGE8kh2kGs9KHNpqJJuu7+sD1ESeLhOmdNg=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB3849.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6uSDr3QUwuaPXNUTq1H1Jy8BnH3NIxpDaEiT8DhLlQkoIA3/OI/n+lzUQPRK?=
- =?us-ascii?Q?WjUFN+SE8lEtK7zWwtt25wfyrmb+5aydcebsLYJAjwFYZxubcgQwP7eG4WYa?=
- =?us-ascii?Q?iOc5dD826U4p3heIlcIRImf+tfIbpNua+hDlPQYXpjSCEg5JkE4LHKeazubo?=
- =?us-ascii?Q?BFTB6JFbWZvUf9fj3j5AFhhw9rGdfbdmy2ZcBuE7/zz8ViPO26uhKqhapqfd?=
- =?us-ascii?Q?C+xhipwKkMGBuiSy/vTgMJROPPdhgN96QpWlyxij+HQge9X6M99k6DlvycfY?=
- =?us-ascii?Q?lFUHXVcgUaLKe19z2Piidx+AHgmEZB1o4xjN/AqCumXRygl40/gzxxE93SjJ?=
- =?us-ascii?Q?NC3KM0r7I6jqxC6JX02gM3EGKyEInSHrhFqdZTM+xChgyxnOFZH1pafbMkNI?=
- =?us-ascii?Q?kX80JKdh53Qu3wcCFuk9moA7/JgG2lekHbavcWZxRjA+gW0Mf6PXlyVNrQX4?=
- =?us-ascii?Q?5zFHAeTZxHFbBVdIO/NzyVIoW4PlKikw9YLmZxemZ1FuSBkDr0fbmU66q5Bo?=
- =?us-ascii?Q?L+8JV5YtW493bZkLsXvH8l/I/PXFGAA/FEUcK1pHdqNrKYo3jCnod3/hm1R/?=
- =?us-ascii?Q?rhtiTYoFOBM82YS22gtdSaqxckbumLandW6NHum2+NOr+rt81Ido4zxt7Vx4?=
- =?us-ascii?Q?1hMhDC8ckJyLcIPH5IJ+UlytYmH7M4OJ0Dv70FMrzGu2p8GUHfB+ASNXWVpn?=
- =?us-ascii?Q?P66S5GxCp1nUA0mGFGtsGhULmUrYxRQ2uBpUp5ssg6Hjzn4thzDSazbI2vc3?=
- =?us-ascii?Q?ofP4E9gVX5OHffz2KKvccp5faIOuKzGkx0SCcHNUA04mzPGbB3GGIvWkR3Y9?=
- =?us-ascii?Q?8NFkUcaTtC5iGTSwUOOVFQuXej9bJ1IxZHu0S+YheRKm4ykKch0hl4EH92aB?=
- =?us-ascii?Q?qgZvYJ+RI3jqhzwZ3MvHytCHr43IT9Ko1JGeznR9L4+S5IQjCJIYXLs2a13L?=
- =?us-ascii?Q?IxN5lGR7vjjx2nfGaNIiOxVQLdCw5t1113Bz6zKuObf/wX6oTLJn0mbvnU7G?=
- =?us-ascii?Q?qv5uVOYcGBQFn93Y2FnWzf92XOX2Y8MH7p8sWDxkwqYj+BPXL4ryQqFx5R8N?=
- =?us-ascii?Q?6AZD8M0ncx1wW+LBxqfR+cx7BbjPoFsZUFhyUf3noRPKMvAaLnBmmZP71W0X?=
- =?us-ascii?Q?/JcZNyP/2+1QWfCRvN3k+8Up1fmaeCG15FLDAPLHJWcMJPVtKh7qYfQTE1fE?=
- =?us-ascii?Q?e36pFsP51cbgjxJmzaCAUZeLsGh+b3wWW5ATiDZyBcdKmDxJZ+P5WL/LTo25?=
- =?us-ascii?Q?ufHrpCs2B0PDC3DPNcWNiaV4uka1ZRBh80TZAgdbTChCVBUklQykLXPFylem?=
- =?us-ascii?Q?IS6G4DUp/vAfVc2bpj2XZTKUgmPTJinzs5yHIVS1ZIbpvS+XOHCZVh2FCxbk?=
- =?us-ascii?Q?7uRhjfcLA9NZSl55lJCWnslGXh8L2RsrcdPU2ufj3OuQfIUONLMXEAQG3kwc?=
- =?us-ascii?Q?jR4uF91Ue5PtCDv1w4qX9xjU4NaClLj9NE0aOUkGqUNeFFpGeaVFY8+Mydzr?=
- =?us-ascii?Q?Fcw4HZ33ZeDmohC1AIA4qq5VnGjJBSX8BEIKxeI08JA9Br5xHbkynDS3WwuU?=
- =?us-ascii?Q?ooz1Y4ZKZcIpZvGlWOSB5w5bWbxvtAx3t6ir8D/1?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3883fb2d-dd7b-4dd2-321c-08dca5b190c9
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB3849.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Jul 2024 16:08:43.7926
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ux6IFTh1L3AiaW+VvMWFow65imyMyiRAQL1eiPT/KjpqFlt08RVQsYOGfTbgaRoT
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB8968
+References: <20240710234222.2333120-1-jthoughton@google.com> <DS0PR11MB637397059B5DAE2AA7B819BCDCA12@DS0PR11MB6373.namprd11.prod.outlook.com>
+In-Reply-To: <DS0PR11MB637397059B5DAE2AA7B819BCDCA12@DS0PR11MB6373.namprd11.prod.outlook.com>
+From: James Houghton <jthoughton@google.com>
+Date: Tue, 16 Jul 2024 10:10:27 -0700
+Message-ID: <CADrL8HUv+RvazbOyx+NJ1oNd8FdMGd_T61Kjtia1cqJsN=WiOA@mail.gmail.com>
+Subject: Re: [RFC PATCH 00/18] KVM: Post-copy live migration for guest_memfd
+To: "Wang, Wei W" <wei.w.wang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
+	Axel Rasmussen <axelrasmussen@google.com>, David Matlack <dmatlack@google.com>, 
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
+	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, Peter Xu <peterx@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 16, 2024 at 09:03:00AM -0700, Sean Christopherson wrote:
+On Mon, Jul 15, 2024 at 8:28=E2=80=AFAM Wang, Wei W <wei.w.wang@intel.com> =
+wrote:
+>
+> On Thursday, July 11, 2024 7:42 AM, James Houghton wrote:
+> > This patch series implements the KVM-based demand paging system that wa=
+s
+> > first introduced back in November[1] by David Matlack.
+> >
+> > The working name for this new system is KVM Userfault, but that name is=
+ very
+> > confusing so it will not be the final name.
+> >
+> Hi James,
+> I had implemented a similar approach for TDX post-copy migration, there a=
+re quite
+> some differences though. Got some questions about your design below.
 
-> > + To support huge pages, guest_memfd will take ownership of the hugepages, and
-> >   provide interested parties (userspace, KVM, iommu) with pages to be used.
-> >   + guest_memfd will track usage of (sub)pages, for both private and shared
-> >     memory
-> >   + Pages will be broken into smaller (probably 4K) chunks at creation time to
-> >     simplify implementation (as opposed to splitting at runtime when private to
-> >     shared conversion is requested by the guest)
-> 
-> FWIW, I doubt we'll ever release a version with mmap()+guest_memfd support that
-> shatters pages at creation.  I can see it being an intermediate step, e.g. to
-> prove correctness and provide a bisection point, but shattering hugepages at
-> creation would effectively make hugepage support useless.
+Thanks for the feedback!!
 
-Why? If the private memory retains its contiguity seperately but the
-struct pages are removed from the vmemmap, what is the downside?
+>
+> > Problem: post-copy with guest_memfd
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > Post-copy live migration makes it possible to migrate VMs from one host=
+ to
+> > another no matter how fast they are writing to memory while keeping the=
+ VM
+> > paused for a minimal amount of time. For post-copy to work, we
+> > need:
+> >  1. to be able to prevent KVM from being able to access particular page=
+s
+> >     of guest memory until we have populated it  2. for userspace to kno=
+w when
+> > KVM is trying to access a particular
+> >     page.
+> >  3. a way to allow the access to proceed.
+> >
+> > Traditionally, post-copy live migration is implemented using userfaultf=
+d, which
+> > hooks into the main mm fault path. KVM hits this path when it is doing =
+HVA ->
+> > PFN translations (with GUP) or when it itself attempts to access guest =
+memory.
+> > Userfaultfd sends a page fault notification to userspace, and KVM goes =
+to sleep.
+> >
+> > Userfaultfd works well, as it is not specific to KVM; everyone who atte=
+mpts to
+> > access guest memory will block the same way.
+> >
+> > However, with guest_memfd, we do not use GUP to translate from GFN to H=
+PA
+> > (nor is there an intermediate HVA).
+> >
+> > So userfaultfd in its current form cannot be used to support post-copy =
+live
+> > migration with guest_memfd-backed VMs.
+> >
+> > Solution: hook into the gfn -> pfn translation
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > The only way to implement post-copy with a non-KVM-specific userfaultfd=
+-like
+> > system would be to introduce the concept of a file-userfault[2] to inte=
+rcept
+> > faults on a guest_memfd.
+> >
+> > Instead, we take the simpler approach of adding a KVM-specific API, and=
+ we
+> > hook into the GFN -> HVA or GFN -> PFN translation steps (for tradition=
+al
+> > memslots and for guest_memfd respectively).
+>
+>
+> Why taking KVM_EXIT_MEMORY_FAULT faults for the traditional shared
+> pages (i.e. GFN -> HVA)?
+> It seems simpler if we use KVM_EXIT_MEMORY_FAULT for private pages only, =
+leaving
+> shared pages to go through the existing userfaultfd mechanism:
+> - The need for =E2=80=9Casynchronous userfaults,=E2=80=9D introduced by p=
+atch 14, could be eliminated.
+> - The additional support (e.g., KVM_MEMORY_EXIT_FLAG_USERFAULT) for priva=
+te page
+>   faults exiting to userspace for postcopy might not be necessary, becaus=
+e all pages on the
+>   destination side are initially =E2=80=9Cshared,=E2=80=9D and the guest=
+=E2=80=99s first access will always cause an
+>   exit to userspace for shared->private conversion. So VMM is able to lev=
+erage the exit to
+>   fetch the page data from the source (VMM can know if a page data has be=
+en fetched
+>   from the source or not).
 
-As I understand it the point is to give a large contiguous range to
-the private world and use only 4k pages to give the hypervisor world
-access to limited amounts of the memory.
+You're right that, today, including support for guest-private memory
+*only* indeed simplifies things (no async userfaults). I think your
+strategy for implementing post-copy would work (so, shared->private
+conversion faults for vCPU accesses to private memory, and userfaultfd
+for everything else).
 
-Is there a reason that not having the shared memory elevated to higher
-contiguity a deal breaker?
+I'm not 100% sure what should happen in the case of a non-vCPU access
+to should-be-private memory; today it seems like KVM just provides the
+shared version of the page, so conventional use of userfaultfd
+shouldn't break anything.
 
-Jason
+But eventually guest_memfd itself will support "shared" memory, and
+(IIUC) it won't use VMAs, so userfaultfd won't be usable (without
+changes anyway). For a non-confidential VM, all memory will be
+"shared", so shared->private conversions can't help us there either.
+Starting everything as private almost works (so using private->shared
+conversions as a notification mechanism), but if the first time KVM
+attempts to use a page is not from a vCPU (and is from a place where
+we cannot easily return to userspace), the need for "async userfaults"
+comes back.
+
+For this use case, it seems cleaner to have a new interface. (And, as
+far as I can tell, we would at least need some kind of "async
+userfault"-like mechanism.)
+
+Another reason why, today, KVM Userfault is helpful is that
+userfaultfd has a couple drawbacks. Userfaultfd migration with
+HugeTLB-1G is basically unusable, as HugeTLB pages cannot be mapped at
+PAGE_SIZE. Some discussion here[1][2].
+
+Moving the implementation of post-copy to KVM means that, throughout
+post-copy, we can avoid changes to the main mm page tables, and we
+only need to modify the second stage page tables. This saves the
+memory needed to store the extra set of shattered page tables, and we
+save the performance overhead of the page table modifications and
+accounting that mm does.
+
+There's some more discussion about these points in David's RFC[3].
+
+[1]: https://lore.kernel.org/linux-mm/20230218002819.1486479-1-jthoughton@g=
+oogle.com/
+[2]: https://lore.kernel.org/linux-mm/ZdcKwK7CXgEsm-Co@x1n/
+[3]: https://lore.kernel.org/kvm/CALzav=3Dd23P5uE=3DoYqMpjFohvn0CASMJxXB_XE=
+OEi-jtqWcFTDA@mail.gmail.com/
+
+>
+> >
+
+> > I have intentionally added support for traditional memslots, as the com=
+plexity
+> > that it adds is minimal, and it is useful for some VMMs, as it can be u=
+sed to
+> > fully implement post-copy live migration.
+> >
+> > Implementation Details
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> > Let's break down how KVM implements each of the three core requirements
+> > for implementing post-copy as laid out above:
+> >
+> > --- Preventing access: KVM_MEMORY_ATTRIBUTE_USERFAULT ---
+> >
+> > The most straightforward way to inform KVM of userfault-enabled pages i=
+s to
+> > use a new memory attribute, say KVM_MEMORY_ATTRIBUTE_USERFAULT.
+> >
+> > There is already infrastructure in place for modifying and checking mem=
+ory
+> > attributes. Using this interface is slightly challenging, as there is n=
+o UAPI for
+> > setting/clearing particular attributes; we must set the exact attribute=
+s we want.
+> >
+> > The synchronization that is in place for updating memory attributes is =
+not
+> > suitable for post-copy live migration either, which will require updati=
+ng
+> > memory attributes (from userfault to no-userfault) very frequently.
+> >
+> > Another potential interface could be to use something akin to a dirty b=
+itmap,
+> > where a bitmap describes which pages within a memslot (or VM) should tr=
+igger
+> > userfaults. This way, it is straightforward to make updates to the user=
+fault
+> > status of a page cheap.
+> >
+> > When KVM Userfault is enabled, we need to be careful not to map a userf=
+ault
+> > page in response to a fault on a non-userfault page. In this RFC, I've =
+taken the
+> > simplest approach: force new PTEs to be PAGE_SIZE.
+> >
+> > --- Page fault notifications ---
+> >
+> > For page faults generated by vCPUs running in guest mode, if the page t=
+he
+> > vCPU is trying to access is a userfault-enabled page, we use
+>
+> Why is it necessary to add the per-page control (with uAPIs for VMM to se=
+t/clear)?
+> Any functional issues if we just have all the page faults exit to userspa=
+ce during the
+> post-copy period?
+> - As also mentioned above, userspace can easily know if a page needs to b=
+e
+>   fetched from the source or not, so upon a fault exit to userspace, VMM =
+can
+>   decide to block the faulting vcpu thread or return back to KVM immediat=
+ely.
+> - If improvement is really needed (would need profiling first) to reduce =
+number
+>   of exits to userspace, a  KVM internal status (bitmap or xarray) seems =
+sufficient.
+>   Each page only needs to exit to userspace once for the purpose of fetch=
+ing its data
+>   from the source in postcopy. It doesn't seem to need userspace to enabl=
+e the exit
+>   again for the page (via a new uAPI), right?
+
+We don't necessarily need a way to go from no-fault -> fault for a
+page, that's right[4]. But we do need a way for KVM to be able to
+allow the access to proceed (i.e., go from fault -> no-fault). IOW, if
+we get a fault and come out to userspace, we need a way to tell KVM
+not to do that again. In the case of shared->private conversions, that
+mechanism is toggling the memory attributes for a gfn. For
+conventional userfaultfd, that's using UFFDIO_COPY/CONTINUE/POISON.
+Maybe I'm misunderstanding your question.
+
+[4]: It is helpful for poison emulation for HugeTLB-backed VMs today,
+but this is not important.
 
