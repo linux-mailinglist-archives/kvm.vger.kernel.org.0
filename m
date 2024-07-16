@@ -1,162 +1,115 @@
-Return-Path: <kvm+bounces-21698-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21699-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BBFC93247E
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 12:57:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1AE793259F
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 13:29:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1610F1F240D3
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 10:57:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C82F2834F4
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 11:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82551990A5;
-	Tue, 16 Jul 2024 10:57:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BF9B1991A4;
+	Tue, 16 Jul 2024 11:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="g1MqdYC1"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="dbvOKhGk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D0913A416;
-	Tue, 16 Jul 2024 10:57:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A187CF16
+	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 11:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721127457; cv=none; b=gIaamZXbhCbUPaaQLqc9/vwhBu1euNMcUGqL8apnqaD8wPgyRpfVd4BuRpswRiA+sErWeJNB/nfMj2fjoOiMEcJl+Ug2WxnYgKcpFD3Wo+fFfRQ3sZpbuiKZ6dyNG0y00Ax6lmr0KCnU+Y4HgLZVkw37JkOwDSGC2W+KTElnOgg=
+	t=1721129347; cv=none; b=CUVSUrjTQ5cgH1BgJIIJ1IngyumlaQf1f27Y2jI2rfVuDicmmRfr39g5njpobVIP8OokH3wOIur+upJZcZ1MzZqpqDvlqC+htoud4LVSuSdX8hcOix+xALHgvAfvEAY1Pcb70zeSs7guh9jq20mrMCCvNEdumQfSbbRQVz+xotM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721127457; c=relaxed/simple;
-	bh=u3tdViBmCFTWsqM5V2S0H18K58R1pakhIEDmxZF6AJE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=H5WI6relJD1sCEc2vHZ/ptOYWLn9BNiDgOxKxMbYmCRWV9kJ8ZmgMT4Quoup977rNV37KkHHpfWiQ7fipAx0A8+AmxfMizmkKFyiAlEJTuiAZZgU3IxcWUNMRmBPYn3tcr29Y1bGEzk8BJCE24vfXSgNfQ3qh9LhORWAFeT1TyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=g1MqdYC1; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46GAlTkY013924;
-	Tue, 16 Jul 2024 10:57:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	5YpLZBFHa4u/yz0h1zDRTMe6ArvUdZ8SFwam82a19uI=; b=g1MqdYC16MSvXnSC
-	RNEUUAV6nWW70hptfnT8bMAMjyQxdsV2SFbXGn8CI13yDWySB4Ja2XsLnHD9WD+w
-	F4dCLeD19qYDE+Hanm7ADpvxXUtJ+1xh5ydIb236y6HJVCuAM4FiZ0ezaYWbFPWo
-	U7LlV9dh+yAjYN6Gb5wAk9KzmylwwBSXGUU8sHtOPAyl6dLSWYDhnfYOoOfLw2LK
-	Jjps/xcGLznmIpWBejvZ+cjh5WYclyfHesVhYvVizdkJrLT2GFOHnaw6GCqLTnF0
-	zWJAk0TggqHOX5ZKbTf8tqrhLJRIFC2PNVQcUcIwBt/7tpZF7ckkIM9OMD6GC/Vo
-	XPo38A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40dq4wr1fr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jul 2024 10:57:06 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46GAv5nb025254;
-	Tue, 16 Jul 2024 10:57:05 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40dq4wr1cv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jul 2024 10:57:05 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46G8jlL1030523;
-	Tue, 16 Jul 2024 10:52:27 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40c4a0ktt3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 16 Jul 2024 10:52:27 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46GAqMU322872322
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 16 Jul 2024 10:52:24 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EA57920043;
-	Tue, 16 Jul 2024 10:52:21 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C3D220040;
-	Tue, 16 Jul 2024 10:52:21 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.152.224.212])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 16 Jul 2024 10:52:21 +0000 (GMT)
-Date: Tue, 16 Jul 2024 12:52:20 +0200
-From: Halil Pasic <pasic@linux.ibm.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: linux-kernel@vger.kernel.org,
-        Alexander Duyck
- <alexander.h.duyck@linux.intel.com>,
-        Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>,
-        Andrew Morton <akpm@linux-foundation.org>,
-        David Hildenbrand <david@redhat.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Johannes Berg
- <johannes@sipsolutions.net>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        Cornelia Huck
- <cohuck@redhat.com>, Eric Farman <farman@linux.ibm.com>,
-        Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger
- <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Jason
- Wang <jasowang@redhat.com>,
-        Eugenio =?UTF-8?B?UMOpcmV6?=
- <eperezma@redhat.com>,
-        linux-um@lists.infradead.org, linux-remoteproc@vger.kernel.org,
-        linux-s390@vger.kernel.org, virtualization@lists.linux.dev,
-        kvm@vger.kernel.org, Halil Pasic
- <pasic@linux.ibm.com>
-Subject: Re: [PATCH v2 2/2] virtio: fix vq # for balloon
-Message-ID: <20240716125220.677dccf4.pasic@linux.ibm.com>
-In-Reply-To: <3d655be73ce220f176b2c163839d83699f8faf43.1720611677.git.mst@redhat.com>
-References: <cover.1720611677.git.mst@redhat.com>
-	<3d655be73ce220f176b2c163839d83699f8faf43.1720611677.git.mst@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1721129347; c=relaxed/simple;
+	bh=6ELtJIz8U2cGE9Shq6Kl1VnbZZ9rQ9n/Mgf45UNAHIg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QvwBHzD4jJ0FSs7TeBacvzByPkhZ/U7dqZseD0isL0pZFLY+Hcc78vPEp/9t+7SLIe/BUxQWBopzsnurwYna3ak6G2zOs/ARh/F80q+JS0Km1VPCYpQKroubVSTiXYd1Aw2/3UUAZIrB2SQlJxeoEiVnCaiOA1pDHHP1DrTgpco=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=dbvOKhGk; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-58bac81f3f9so6226759a12.2
+        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 04:29:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1721129344; x=1721734144; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=noVFkfv9hSGerHgQRa8ex8s8rIJyLdiXzsYUcNYuafY=;
+        b=dbvOKhGkQlLY0FNirOT+HntrX4KKZaBMKoPaH7ovPJzmqRq/8r6lhE43O5rjgl6m4f
+         OsVcXwv3rlqJ6gFjfgB7hg7lCjMn14UiW292D1fSUFc8gHl/ATMUoxln7Au+s50d7sVp
+         jvyTq2QycZ2HaSwr4SwCoqbZZKrDrNOzf7f4AAIXKvLOmpe8qDWMVglSdrJOrbji2juM
+         feom7fLrhtqi3A+/P72z8XoIgkiVzODF3FPRwVr1yixbjCJdhk4rtyv9LJ3p1dcMLUdN
+         tsTR5APmdCg72UeRnWwnvpLWFCz3rKsquPc3eS6Vy04WgCrY30WxA5i77y4uPfVCe6Kl
+         efPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721129344; x=1721734144;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=noVFkfv9hSGerHgQRa8ex8s8rIJyLdiXzsYUcNYuafY=;
+        b=J9RbCeSpjz/EBMcjVAUwINtKI8bYAAGvckMeCr3Bt+KCkYX/+McuDiuHJ7n7mAbVkE
+         L+4jpFWCfBF8EJiZH4PUVYafxGcQYU06SqqwzSN1A2bIdhYuTvytww/5EBnu1sn+oLJt
+         iIjhygncEqjUZ1DPsLQtWO/ogpgOkSzQ4FPo+Qmyaswqqz1igcGjJjijrFL159OqTYKT
+         KhzwMAwVIh4bZkFv8hKKV/9BBf0LBvzfBWfPOD13ISh0E5hIbkMyDo+9/fvC3VPCnUjQ
+         F25MFtt+0z3FidXwCwHCCeFtXtoyb1LdUgS8mWqmbYJ960AVUoPNNOxYOtnXGp1Ns+Hp
+         6v3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU++LC75t51NII2YSS3sLcshqjVjvLG04en/fzzJxIu388ac/FAtGLIpe26HfmODpFw4cYf4ZBW1Lk3nAqSjh+dEK9z
+X-Gm-Message-State: AOJu0YyoOG/Df6tgSUhDgoU4lI2DpfBMH7BMIb0iX9L5a7Ie4twy/P23
+	b1LYGmSz4bnU8FzTKPu16usaucejIyY1G2YWVacB1QbPfwc8LdRK56Zj+wLbCuMxsBOBMAnozBS
+	sMwdzgeODa2mNnI5e6Iu8sWNmW6n5YdrUVJ8hRg==
+X-Google-Smtp-Source: AGHT+IGPOAxJmAk5wg1MK+6VsfmkOIqu1xy7VK6Jb4SiocFk0kazzWOCso+3VlU3RwvJPqRRCse/E5nW4XauBiYPMfc=
+X-Received: by 2002:a05:6402:4316:b0:59c:2254:fcea with SMTP id
+ 4fb4d7f45d1cf-59eee14a85bmr1379462a12.1.1721129344113; Tue, 16 Jul 2024
+ 04:29:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: -ciPuNbu1ulB9x3MDH6mw0VxJdTjfl_5
-X-Proofpoint-ORIG-GUID: _zkRs-FyWlqEBV9NEtx1Xwx1HT6kmSDZ
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-15_19,2024-07-16_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 bulkscore=0 clxscore=1011 priorityscore=1501 adultscore=0
- impostorscore=0 phishscore=0 mlxlogscore=866 spamscore=0 mlxscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2406140001 definitions=main-2407160079
+References: <20240716-pmu-v2-0-f3e3e4b2d3d5@daynix.com> <20240716-pmu-v2-3-f3e3e4b2d3d5@daynix.com>
+In-Reply-To: <20240716-pmu-v2-3-f3e3e4b2d3d5@daynix.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Tue, 16 Jul 2024 12:28:52 +0100
+Message-ID: <CAFEAcA-uGXSvv1-+jjwtxEg3oD2a6umqtsNqnLvnkJ-RGnTL4Q@mail.gmail.com>
+Subject: Re: [PATCH v2 3/5] target/arm: Do not allow setting 'pmu' for hvf
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 10 Jul 2024 07:42:46 -0400
-"Michael S. Tsirkin" <mst@redhat.com> wrote:
+On Tue, 16 Jul 2024 at 09:28, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>
+> hvf currently does not support PMU.
+>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  target/arm/cpu.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
+> index 8c180c679ce2..9e1d15701468 100644
+> --- a/target/arm/cpu.c
+> +++ b/target/arm/cpu.c
+> @@ -1603,6 +1603,10 @@ static void arm_set_pmu(Object *obj, bool value, Error **errp)
+>      }
+>
+>      if (value) {
+> +        if (hvf_enabled()) {
+> +            error_setg(errp, "'pmu' feature not suported by hvf");
+> +            return;
+> +        }
+>          if (kvm_enabled() && !kvm_arm_pmu_supported()) {
+>              error_setg(errp, "'pmu' feature not supported by KVM on this host");
+>              return;
 
-> --- a/drivers/s390/virtio/virtio_ccw.c
-> +++ b/drivers/s390/virtio/virtio_ccw.c
-> @@ -694,7 +694,7 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
->  {
->  	struct virtio_ccw_device *vcdev = to_vc_device(vdev);
->  	dma64_t *indicatorp = NULL;
-> -	int ret, i, queue_idx = 0;
-> +	int ret, i;
->  	struct ccw1 *ccw;
->  	dma32_t indicatorp_dma = 0;
->  
-> @@ -710,7 +710,7 @@ static int virtio_ccw_find_vqs(struct virtio_device *vdev, unsigned nvqs,
->  			continue;
->  		}
->  
-> -		vqs[i] = virtio_ccw_setup_vq(vdev, queue_idx++, vqi->callback,
-> +		vqs[i] = virtio_ccw_setup_vq(vdev, i, vqi->callback,
->  					     vqi->name, vqi->ctx, ccw);
->  		if (IS_ERR(vqs[i])) {
->  			ret = PTR_ERR(vqs[i]);
+Typo (should be "supported") but otherwise
+Reviewed-by: Peter Maydell <peter.maydell@linaro.org>
 
-Acked-by: Halil Pasic <pasic@linux.ibm.com> #s390
+thanks
+-- PMM
 
