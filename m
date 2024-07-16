@@ -1,225 +1,210 @@
-Return-Path: <kvm+bounces-21740-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21741-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47B8293345F
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 00:55:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34D36933474
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 01:08:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B996A1F231B8
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 22:55:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E779028495C
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 23:08:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89429143C46;
-	Tue, 16 Jul 2024 22:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2506143C70;
+	Tue, 16 Jul 2024 23:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Aq8n/Fk5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EBKIP0hE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D81121350;
-	Tue, 16 Jul 2024 22:55:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A440D1422D1
+	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 23:08:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721170507; cv=none; b=EAoNwFwlFke3LSTNnHg0Pd+OWL0d/0u2QuaqTG+nSaTfJBfi2t12U4V/B474Ir03TUGeUWUIGyWebogq4ir0Zq/rnsqVGu07ewczRfp5sp7MT3FcCZ2UDXMCRj/evr2tYT7orIkyjjNvqJrJ45Z624/aDd5hoHsXa18dkQZENrw=
+	t=1721171291; cv=none; b=j6Pp+yGqmXAPiz4jvwlnW8y8geW1GvSp09KBtqxEchWAf9Q7TgVl1D7TTF4JwDqQrfHpiLpx7k+ua4Eop8TR3S36dGWVcHSuzW3GO8nkbHocbSCNUpB3EN+2eOUiQraAX6icaxP2miM/8SxeZd/Kr/7og7tIexkp7GAESHiuTqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721170507; c=relaxed/simple;
-	bh=g/xwm05rvbTzK1jG2tJXHLW8KGiMdROBtBgyRvzO4aQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PXIYqdSP4gZlWmCWRRyPplrGtOuT37TiTSjCZLU5oybP0AajEmrUqAxvLz7gsaisrdXylLe01NrMYra3gcX0Mb5pA7WPtgrsmiEBJzcfYBNDgqdDu5GCEqSw4O0Qk+LqFg5DYGFa9WKMLd23b7tphHWBjHlxljc4NjrOi8p7acs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Aq8n/Fk5; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721170506; x=1752706506;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=g/xwm05rvbTzK1jG2tJXHLW8KGiMdROBtBgyRvzO4aQ=;
-  b=Aq8n/Fk558sETot7f1Pf9zNrUGUiL6GJeqWTHOTSbIW5nVxRAOeM1qL3
-   w6Yo68clBNYjoF2lsFMQrtjdN3dKvE8z8X7dlVkp1kEFujlt5gc9MuEkK
-   ZyUmhzYiEM8CYBmU3opZkp+v/QEsGTNSutsu7yzlUnpYELNnehUEHHRrU
-   LGmNYT+js2D5uNUHFF/D6yoSCUh5iI/Az8JNzHHvBOA3+Umcu2hSnytNX
-   QzJL6MvgE8AoEGjmgDPJFy0R5FjtJ7otibCQMucLUxs814Nb8h6q+Muty
-   +4pDbNrXcNcrRFH3NuZu7VclXIma8WIlwM5qxfFgITouSWaBXPuWV9DcU
-   Q==;
-X-CSE-ConnectionGUID: 6JSRVvh7RmCDGI+DybcYWA==
-X-CSE-MsgGUID: oJppjU58Rq2rMKqAlMG1NQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11135"; a="29233178"
-X-IronPort-AV: E=Sophos;i="6.09,212,1716274800"; 
-   d="scan'208";a="29233178"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2024 15:55:05 -0700
-X-CSE-ConnectionGUID: rnR1z46eR3q8JcAqPn4pdg==
-X-CSE-MsgGUID: 0ovMS4lhTkazQpRKC1VNrQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,212,1716274800"; 
-   d="scan'208";a="54394068"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.54])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Jul 2024 15:55:04 -0700
-Date: Tue, 16 Jul 2024 15:55:04 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: isaku.yamahata@intel.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, isaku.yamahata@gmail.com,
-	Paolo Bonzini <pbonzini@redhat.com>, erdemaktas@google.com,
-	Sean Christopherson <seanjc@google.com>,
-	Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
-	chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
-	rick.p.edgecombe@intel.com
-Subject: Re: [PATCH v19 117/130] KVM: TDX: Silently ignore INIT/SIPI
-Message-ID: <20240716225504.GE1900928@ls.amr.corp.intel.com>
-References: <cover.1708933498.git.isaku.yamahata@intel.com>
- <4a4225de42be0f7568c5ecb5c22f2029f8e91d62.1708933498.git.isaku.yamahata@intel.com>
- <c45a1448-09ee-4750-bf86-28295dfc6089@linux.intel.com>
+	s=arc-20240116; t=1721171291; c=relaxed/simple;
+	bh=rOoiuML7N6qLySS+ei9Dpf8UnpznrZNuBP9vY6eYx/A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=nQeYhjQCsF51QO9ckJqEsa5OQ2usw0dmN8kQ49zLZ3PD26Ic6VVTuHFr8Y89ru70VfrDR5HjxJZqWtf1LOWK+eHTw3xwbv4A5Tf0puQCQ4u7X+7g/mwjjBaumbIcThZhkOnadMtVtFx4W0xbbChPib9yl3+38KAzCYWppZLE9SU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EBKIP0hE; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70af548db1eso235673b3a.0
+        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 16:08:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721171289; x=1721776089; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vnpo2whe8OxkxqrwKjatwsuFtnr7PRgQtu5m92egNWc=;
+        b=EBKIP0hEBasvq2evTJ3C8HeA9TM7ejyZrAvFMGnoJxO1y4ghACReB7gWhxhZCgLZzZ
+         kjXhVT9bbKsBfx6ipqIhvRbiOfYYpnMjJYAq/MBju2vLYk/iLo0XkLB5wGuR5gjSiLCg
+         ES3rB1tNpbhCLQfmHaPbV1rYyeBHvTlBenMMxLuDAo0LZbEdSmUM3xx0LJ78hPhPv/eo
+         0bw+YbnwTLuJM78KIZFYxl6jtuK2D0MX2jTdwd0/764OQVUuHFFXs7i7UifPx4LdZOPO
+         PKAwW30Ql79VX7Y2VlVtBr62+44EFrX/+dVgU8uWrYg5UkeZY57U3RPFK/HmUJkT6LNl
+         tI4Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721171289; x=1721776089;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vnpo2whe8OxkxqrwKjatwsuFtnr7PRgQtu5m92egNWc=;
+        b=GcZ2Ss/KFQMn4JQIOKn9FPegS/FQUNPv0UpW+EqRKl7ERb+4TX1xq2v9DzoPiEWu86
+         GLTJkgrSZdmM4rA4vtbiDSddFlQmVESBpB76xcWDiXHzodSNY00SBnTW6qLRY8nRsbm3
+         p7RnDiNICmgM0S+VKIchtriHHR5x9djdplWL5GKje3XC1mdmHP+0UQH2rPa86uHXVxht
+         vFKka/V6j9eoVjrvHtRNyuaa8JImcOXJ0Ysw+T/NlrLWag0pa9BF9cwjFkupBx9wKDUW
+         mIbVgQP4uT4JcuXIBOl9HViUroWNN2OFY/ePLqBx1MRDZsd93K0nyHVX+Sr+zo+0fr4c
+         EsJw==
+X-Forwarded-Encrypted: i=1; AJvYcCXFX4KmCXlrsoXF3NgR/KEqfTeD8PqRJTqF9hx9XVAXQx+gs0KB6aGGNj1MeVfX4a2viDShWThMxJ5LDpCxsPLIjRb/
+X-Gm-Message-State: AOJu0Yz8rxjYPomzhPwRXz/1dKXiro5Bw2p6A1UGdHq0mLw/FlTvsTFt
+	XXJDaPJmQAd6JgV/O1D1AcxQsMlZUKV2mtlDavQU3z9WyCdFFnrPXIj7g5JTBOqnmAaZzNa75Gf
+	NDg==
+X-Google-Smtp-Source: AGHT+IHodyyfVvBZCeBo6zYHTnPh0oez+CNhQpAKC/JZhU9iwhP65w+2Cd3FMnyDUtKJfzU6NybR4fMYCt4=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:8b98:b0:70a:ef84:7682 with SMTP id
+ d2e1a72fcca58-70cd8378e45mr18771b3a.1.1721171288672; Tue, 16 Jul 2024
+ 16:08:08 -0700 (PDT)
+Date: Tue, 16 Jul 2024 16:08:07 -0700
+In-Reply-To: <2b3e7111f6d7caffe6477a0a7da5edb5050079f7.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c45a1448-09ee-4750-bf86-28295dfc6089@linux.intel.com>
+Mime-Version: 1.0
+References: <fdddad066c88c6cd8f2090f11e32e54f7d5c6178.1721092739.git.isaku.yamahata@intel.com>
+ <ZpbKqG_ZhCWxl-Fc@google.com> <2b3e7111f6d7caffe6477a0a7da5edb5050079f7.camel@intel.com>
+Message-ID: <Zpb9Vwcmp4T-0ufJ@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Allow per VM kvm_mmu_max_gfn()
+From: Sean Christopherson <seanjc@google.com>
+To: Rick P Edgecombe <rick.p.edgecombe@intel.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
+	"isaku.yamahata@gmail.com" <isaku.yamahata@gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jun 17, 2024 at 09:20:36AM +0800,
-Binbin Wu <binbin.wu@linux.intel.com> wrote:
+On Tue, Jul 16, 2024, Rick P Edgecombe wrote:
+> On Tue, 2024-07-16 at 12:31 -0700, Sean Christopherson wrote:
+> >=20
+> > No, it most definitely is not more correct.=C2=A0 There is absolutely n=
+o issue
+> > zapping
+> > SPTEs that should never exist.=C2=A0 In fact, restricting the zapping p=
+ath is far
+> > more
+> > likely to *cause* correctness issues, e.g. see=20
+> >=20
+> > =C2=A0 524a1e4e381f ("KVM: x86/mmu: Don't leak non-leaf SPTEs when zapp=
+ing all
+> > SPTEs")
+> > =C2=A0 86931ff7207b ("KVM: x86/mmu: Do not create SPTEs for GFNs that e=
+xceed
+> > host.MAXPHYADDR")
+>=20
+> The type of correctness this was going for was around the new treatment o=
+f GFNs
+> not having the shared/alias bit. As you know it can get confusing which
+> variables have these bits and which have them stripped. Part of the recen=
+t MMU
+> work involved making sure at least GFN's didn't contain the shared bit.
 
-> 
-> 
-> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
-> > From: Isaku Yamahata <isaku.yamahata@intel.com>
-> > 
-> > The TDX module API doesn't provide API for VMM to inject INIT IPI and SIPI.
-> > Instead it defines the different protocols to boot application processors.
-> > Ignore INIT and SIPI events for the TDX guest.
-> > 
-> > There are two options. 1) (silently) ignore INIT/SIPI request or 2) return
-> > error to guest TDs somehow.  Given that TDX guest is paravirtualized to
-> > boot AP, the option 1 is chosen for simplicity.
-> > 
-> > Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> > ---
-> >   arch/x86/include/asm/kvm-x86-ops.h |  1 +
-> >   arch/x86/include/asm/kvm_host.h    |  2 ++
-> >   arch/x86/kvm/lapic.c               | 19 +++++++++++-------
-> >   arch/x86/kvm/svm/svm.c             |  1 +
-> >   arch/x86/kvm/vmx/main.c            | 32 ++++++++++++++++++++++++++++--
-> >   arch/x86/kvm/vmx/tdx.c             |  4 ++--
-> >   6 files changed, 48 insertions(+), 11 deletions(-)
-> > 
-> > diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> > index 22d93d4124c8..85c04aad6ab3 100644
-> > --- a/arch/x86/include/asm/kvm-x86-ops.h
-> > +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> > @@ -149,6 +149,7 @@ KVM_X86_OP_OPTIONAL(migrate_timers)
-> >   KVM_X86_OP(msr_filter_changed)
-> >   KVM_X86_OP(complete_emulated_msr)
-> >   KVM_X86_OP(vcpu_deliver_sipi_vector)
-> > +KVM_X86_OP(vcpu_deliver_init)
-> >   KVM_X86_OP_OPTIONAL_RET0(vcpu_get_apicv_inhibit_reasons);
-> >   KVM_X86_OP_OPTIONAL(get_untagged_addr)
-> >   KVM_X86_OP_OPTIONAL_RET0(gmem_max_level)
-> > diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> > index bb8be091f996..2686c080820b 100644
-> > --- a/arch/x86/include/asm/kvm_host.h
-> > +++ b/arch/x86/include/asm/kvm_host.h
-> > @@ -1836,6 +1836,7 @@ struct kvm_x86_ops {
-> >   	int (*complete_emulated_msr)(struct kvm_vcpu *vcpu, int err);
-> >   	void (*vcpu_deliver_sipi_vector)(struct kvm_vcpu *vcpu, u8 vector);
-> > +	void (*vcpu_deliver_init)(struct kvm_vcpu *vcpu);
-> >   	/*
-> >   	 * Returns vCPU specific APICv inhibit reasons
-> > @@ -2092,6 +2093,7 @@ void kvm_get_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
-> >   void kvm_set_segment(struct kvm_vcpu *vcpu, struct kvm_segment *var, int seg);
-> >   int kvm_load_segment_descriptor(struct kvm_vcpu *vcpu, u16 selector, int seg);
-> >   void kvm_vcpu_deliver_sipi_vector(struct kvm_vcpu *vcpu, u8 vector);
-> > +void kvm_vcpu_deliver_init(struct kvm_vcpu *vcpu);
-> >   int kvm_task_switch(struct kvm_vcpu *vcpu, u16 tss_selector, int idt_index,
-> >   		    int reason, bool has_error_code, u32 error_code);
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index 8025c7f614e0..431074679e83 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -3268,6 +3268,16 @@ int kvm_lapic_set_pv_eoi(struct kvm_vcpu *vcpu, u64 data, unsigned long len)
-> >   	return 0;
-> >   }
-> > +void kvm_vcpu_deliver_init(struct kvm_vcpu *vcpu)
-> > +{
-> > +	kvm_vcpu_reset(vcpu, true);
-> > +	if (kvm_vcpu_is_bsp(vcpu))
-> > +		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> > +	else
-> > +		vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
-> > +}
-> > +EXPORT_SYMBOL_GPL(kvm_vcpu_deliver_init);
-> > +
-> >   int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
-> >   {
-> >   	struct kvm_lapic *apic = vcpu->arch.apic;
-> > @@ -3299,13 +3309,8 @@ int kvm_apic_accept_events(struct kvm_vcpu *vcpu)
-> >   		return 0;
-> >   	}
-> > -	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events)) {
-> > -		kvm_vcpu_reset(vcpu, true);
-> > -		if (kvm_vcpu_is_bsp(apic->vcpu))
-> > -			vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> > -		else
-> > -			vcpu->arch.mp_state = KVM_MP_STATE_INIT_RECEIVED;
-> > -	}
-> > +	if (test_and_clear_bit(KVM_APIC_INIT, &apic->pending_events))
-> > +		static_call(kvm_x86_vcpu_deliver_init)(vcpu);
-> >   	if (test_and_clear_bit(KVM_APIC_SIPI, &apic->pending_events)) {
-> >   		if (vcpu->arch.mp_state == KVM_MP_STATE_INIT_RECEIVED) {
-> >   			/* evaluate pending_events before reading the vector */
-> > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-> > index f76dd52d29ba..27546d993809 100644
-> > --- a/arch/x86/kvm/svm/svm.c
-> > +++ b/arch/x86/kvm/svm/svm.c
-> > @@ -5037,6 +5037,7 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
-> >   	.complete_emulated_msr = svm_complete_emulated_msr,
-> >   	.vcpu_deliver_sipi_vector = svm_vcpu_deliver_sipi_vector,
-> > +	.vcpu_deliver_init = kvm_vcpu_deliver_init,
-> >   	.vcpu_get_apicv_inhibit_reasons = avic_vcpu_get_apicv_inhibit_reasons,
-> >   };
-> > diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-> > index 4f3b872cd401..84d2dc818cf7 100644
-> > --- a/arch/x86/kvm/vmx/main.c
-> > +++ b/arch/x86/kvm/vmx/main.c
-> > @@ -320,6 +320,14 @@ static void vt_enable_smi_window(struct kvm_vcpu *vcpu)
-> >   }
-> >   #endif
-> > +static bool vt_apic_init_signal_blocked(struct kvm_vcpu *vcpu)
-> > +{
-> > +	if (is_td_vcpu(vcpu))
-> > +		return true;
-> 
-> Since for TD, INIT is always blocked, then in kvm_apic_accept_events(), the
-> code path to handle INIT/SIPI delivery will not be called, i.e, the OPs
-> .vcpu_deliver_init() and .vcpu_deliver_sipi_vector() are never called for
-> TD.
-> Seems no need to add the new interface  vcpu_deliver_init or the new wrapper
-> vt_vcpu_deliver_sipi_vector().
-> 
-> And consider the INIT/SIPI for TD:
-> - Normally, for TD, INIT ans SIPI should not be set in APIC's
-> pending_events.
->   Maybe we can call KVM_BUG_ON() in vt_apic_init_signal_blocked() for TD?
-> - If INIT and SIPI are allowed be set in APIC's pending_events for somehow,
-> the current code has a problem, it will never clear INIT bit in APIC's
-> pending_events.
->   Then kvm_apic_accept_events() needs to execute more check code if INIT was
-> once set.
->   INIT bit should be cleared with this assumption.
+That's fine, and doesn't conflict with what I'm asserting, which is that it=
+'s
+a-ok to process SPTEs a range of GFNs that, barring KVM bugs, should never =
+have
+"valid" entries.
 
+> Then in TDP MMU where it iterates from start to end, for example:
+> static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
+> 			      gfn_t start, gfn_t end, bool can_yield, bool
+> flush)
+> {
+> 	struct tdp_iter iter;
+>=20
+> 	end =3D min(end, tdp_mmu_max_gfn_exclusive());
+>=20
+> 	lockdep_assert_held_write(&kvm->mmu_lock);
+>=20
+> 	rcu_read_lock();
+>=20
+> 	for_each_tdp_pte_min_level(iter, kvm, root, PG_LEVEL_4K, start, end) {
+> 		if (can_yield &&
+> 		    tdp_mmu_iter_cond_resched(kvm, &iter, flush, false)) {
+> 			flush =3D false;
+> 			continue;
+> 		}
+> ...
+>=20
+> The math gets a bit confused. For the private/mirror root, start will beg=
+in at
+> 0, and iterate to a range that includes the shared bit. No functional pro=
+blem
+> because we are zapping things that shouldn't be set. But it means the 'gf=
+n' has
+> the bit position of the shared bit set. Although it is not acting as the =
+shared
+> bit in this case, just an out of range bit.
+>
+> For the shared/direct root, it will iterate from (shared_bit | 0) to (sha=
+red_bit
+> | max_gfn). So where the mirror root iterates through the whole range, th=
+e
+> shared case skips it in the current code anyway.
+>=20
+> And then the fact that the code already takes care here to avoid zapping =
+over
+> ranges that exceed the max gfn.
+>=20
+> So it's a bit asymmetric, and just overall weird. We are weighing functio=
+nal
+> correctness risk with known code weirdness.
 
-KVM_SET_MP_STATE and KVM_SET_VCPU_EVENTS can set INIT/SIPI by the user space.
-If we change those two IOCTLs to reject INIT/SIPI for TDX, we can go for the
-above "Normally" option.  Because I didn't want to touch the common functions, I
-ended in extra callbacks.  The user space shouldn't use those two IOCTLs for
-TDX, though.
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+IMO, you're looking at it with too much of a TDX lens and not thinking abou=
+t all
+the people that don't care about TDX, which is the majority of KVM develope=
+rs.
+
+The unaliased GFN is definitely not the max GFN of all the VM's MMUs, since=
+ the
+shared EPT must be able to process GPAs with bits set above the "max" GFN. =
+ And
+to me, _that's_ far more weird than saying that "S-EPT MMUs never set the s=
+hared
+bit, and shared EPT MMUs never clear the shared bit".  I'm guessing the S-E=
+PT
+support ORs in the shared bit, but it's still a GFN.
+
+If you were adding a per-MMU max GFN, then I'd buy that it legitimately is =
+the max
+GFN, but why not have a full GFN range for the MMU?  E.g.
+
+  static void __tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root=
+,
+			         bool shared, int zap_level)
+  {
+	struct tdp_iter iter;
+
+	gfn_t end =3D tdp_mmu_max_gfn_exclusive(root);
+	gfn_t start =3D tdp_mmu_min_gfn_inclusive(root);
+
+and then have the helpers incorporated the S-EPT vs. EPT information.  That=
+ gets
+us optimized, precise zapping without needing to muddy the waters by tracki=
+ng a
+per-VM "max" GFN that is only kinda sorta the max if you close your eyes an=
+d don't
+think too hard about the shared MMU usage.
+
+> My inclination was to try to reduce the places where TDX MMU needs paths
+> happen to work for subtle reasons for the cost of the VM field.=20
+
+But it doesn't happen to work for subtle reasons.  It works because it has =
+to
+work.  Processing !PRESENT SPTEs should always work, regardless of why KVM =
+can
+guarantee there are no SPTEs in a given GFN range.
 
