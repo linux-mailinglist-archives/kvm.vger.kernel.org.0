@@ -1,196 +1,164 @@
-Return-Path: <kvm+bounces-21731-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21732-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F2D69331B5
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 21:12:54 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6938933203
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 21:32:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 269C2281C61
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 19:12:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5647E1F24CA3
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 19:32:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B51317B421;
-	Tue, 16 Jul 2024 19:11:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F961A01C7;
+	Tue, 16 Jul 2024 19:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2lbLjj2y"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fVNq/fUb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C5614386E
-	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 19:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3E22B9B3
+	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 19:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721157062; cv=none; b=mcs2doE4/WE35zm7QAxfiytvLpXetpqznOctobaaRFUtUlh71NqncVPng6y1ROGx++xhr9Iliaj77vG2cNctPf4lrMZhbDZ1RJ580s3tW0d6W78OZ4KzUuCFWPsrXPui4IhNNQXVwwpwMjLRsjuaD1y2fS4Waz+vqXkWRu9pYDc=
+	t=1721158316; cv=none; b=q12x9KRzPkt0JGoipulSn9biQ8WPRNIv+DkzXs4MJLo0OiMXc0SCYFd7uSbfD0DgKhTy24pbQALdColFwT9bDkJJkuvFs0brGyUOR4hZ1T+9w9otNDXUS/fz7YXmH6P+2X3Z8wrWHyFN9kd64iSkW5LaX1c1Fp017XNMAJZfS8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721157062; c=relaxed/simple;
-	bh=xMf7Ow4b4a9OO1SvUYk3WEUeFPCKBq0ZdqrtZP9RjKY=;
+	s=arc-20240116; t=1721158316; c=relaxed/simple;
+	bh=c8UzbSu94SHZlCBc7Dko7y4EM7V9wstxHkNN0vs0sHk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Sa5WWtudIyAbkj9fcYeKuRR6xg4452qfXfIQJelIswl1t23PVWcjtSu1fRdEOFQBZU81o2ylpZXXBm1XoBYw2IPwSGYWS/QFnzM34uniJNA0dQQ54P6e+jFISINcorA9jj4lpVc0O0eJxypT5jXtOTTjnPeWcwpYDtrE+RchkCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2lbLjj2y; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=ZsWBXN2XWRVlNyI3REsjGVoinjddk+JMpWdjTuqScjK5h7yJADj+ml+e6m7r+Y8s1Y0vvhel8stRAu0N9WfYygVgie9w4aD3rP6abGsZcrDP4NrOVsg2Pc+Ic7oZ2vaCVe4Vn9wSiQCBkvG3fHUXy7n6eRJFj3dVNUAvAQwa0Qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fVNq/fUb; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2c96e73c888so6222743a91.3
-        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 12:11:00 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70af524f6b9so3782941b3a.2
+        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 12:31:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721157060; x=1721761860; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1721158314; x=1721763114; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pQeWy9MtYTsUqUCd6Pp/Y8oHyCtDG2oiIHg+ZsZAyaw=;
-        b=2lbLjj2yXVf1aqzOOV2fAVE9H48UtobFU3KN0DKyOXYx5oWbCNwOfDxx9V9hyabDFl
-         O+nJ8X5RYMt20d/Ze2RE5a+2FQdk/RxaoZqbGqqUCOKW3hU0toQnq4VUfBM6ogI8i6Ci
-         AZyBos86/+JhCQjyZ/f0iitvrY+CUnTLosdBKur4e7lNAapDhCtgd3ZAuHVYKCctjv1B
-         OPrJ3j4tFBAL8TWV1ypXOF9qc45KxZUY/Mpg5qUGHRuokZphNrGhJ3TiZdQW+udt8X5H
-         QGfvLYc2rrckqOGDesmKLmR6XJItXRcb4G5VDGffaIhxDnwXiGb9chA5BeKNfjQCkYtD
-         E2tw==
+        bh=/WJoNCYn7js3hz23PZCgEw2FtBVSDvq0l3C/wykvag0=;
+        b=fVNq/fUbCqfARQX5RRKMg5ujkZJujD6Y49ym4NFhPydh+SR0RUTG5GV3XNJTyklLnN
+         EVC7LsNYPU2tOFFgKhE6bSBfqvRrADQv/4NWz9ymAJsP2If2oHmUx2fpUwGdj7zIzu1B
+         AYqc6tY3ELhn3Vdd4FCEVflbbepiBIZyvbMT2Qa5RjQ2DPYnkQLnkZTAPAR6iyJ046RM
+         a9ZbJYyI82qbrdRqXS2kL8SO9BtLepgry5835MuprMy6PC76nI2DEvOav+fN6JQfMveK
+         mLfF8l4oNvLirZqq6xcwDFRqwqRG8BRzRcZ6C6ZtkLnRrdkHwi8kmjk9vD46JFUy7ajl
+         R8Jw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721157060; x=1721761860;
+        d=1e100.net; s=20230601; t=1721158314; x=1721763114;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pQeWy9MtYTsUqUCd6Pp/Y8oHyCtDG2oiIHg+ZsZAyaw=;
-        b=ZySWWIgPNDvLv+XC9jtWgUKrGZ3D1s6Se6mFELSa/iTwBvb0Aq2imjmjFxhwHyoZjp
-         Y8NgtQD8+9tmjtJrULIM+Ayq2UkhA0zSPJQGlHaz1FqG2taiJaHxoHkUrqBu2lCD3fpN
-         45iiLFg1Uq6rG0e8dXfoHzgrbru0lCSeyhDzQHHer4npRkx3s6DNtniHXI7EBwZG22qY
-         A4fS9J+RuOARHI8Gp1V4PS4F1d7YkpXWiCiL5aN0P2XTpx90vTk7KqtlmQOw/ZZ0sgZN
-         fCTi567P7TP7NeeS0gR5rdw9iVaqklVOAwVK0R1sAgBqAWkWzWbRo/WVsVk4eRbf6Jau
-         Ls+A==
-X-Forwarded-Encrypted: i=1; AJvYcCWMKZukiC/OqpisSJOS8rywGdGJ2S85Pgn7AqXCVuQ6AC/GD9L/Q0c66vrx9JVym4Sr8J89/VPh4Oc1/hRSWR2I2YOs
-X-Gm-Message-State: AOJu0YxRwiKsgW+ofSxoygnlLSgW/+BAORjZAV6oVIwaAUZSVzrLThP0
-	Ana1hjOP53ckFQKBXuEGrUqrdu4mikdYgEz+5saTDkESA8vDPL0jtcpGOoEI0LdoCb1nCbmQtyH
-	mqw==
-X-Google-Smtp-Source: AGHT+IFq21eBmqs1pEeWhmeC44PooSMgYBWsB4/30MxU7oGk1cFolirwLLxCJE9ZW98Wx18j0FxKAD0cOns=
+        bh=/WJoNCYn7js3hz23PZCgEw2FtBVSDvq0l3C/wykvag0=;
+        b=oyLbrRF4GzV3JvwA8uxi1u5i3tJZItFQh5HW23Tle3FkQ1rZe4piPSw0Co6AgpUfOv
+         GooDkn/iHmJDknyv7tarAmPuGQgNcOW4g16hdexiKqOm1QAwJMGqvMxeRzW+U2aa6K41
+         jM94W7XtM7BmyPz5jhHj6KmWHtquMZXkELba30XDG3Bo4p52UyU+/Mid4Zuu/xYkkuTy
+         4gXBEwN4UX6bN/yoxCd+N3p0Tvjejav/CyzZlQFRuh2vi9FddsvKLb1TyUmTEbAGlqY0
+         Tep661b0GdgQwp4vQZDyHTQiOVP+ewfFoVyY5y4NYlsj1t+M0LXlZ361pGahFgbCD9Tr
+         vIOA==
+X-Gm-Message-State: AOJu0YwcHjhSiwKCG5h2C3BIBxSW1s0/5BEN9KzEB0l0m1jXoE7m6mLy
+	3GDs5PCNa+WMqb4rwBcZIDY/TQTOIyyySWaED3GnYBlE3YGr4+AJQ2XUCi1FZo47HHyNkHREI15
+	tDw==
+X-Google-Smtp-Source: AGHT+IHzKKMLIUP4x9S22RErcOWeGFNe3jUdiw80u+WvUdaciKtVUPOhD43xVzlWxPTnAmN35iApP23KZVY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:707:b0:2c9:6370:17eb with SMTP id
- 98e67ed59e1d1-2cb36cd4759mr7685a91.3.1721157060370; Tue, 16 Jul 2024 12:11:00
- -0700 (PDT)
-Date: Tue, 16 Jul 2024 12:10:53 -0700
-In-Reply-To: <ZpTeuJHgwz9u8d_k@t470s.drde.home.arpa>
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1891:b0:70b:1086:cf8c with SMTP id
+ d2e1a72fcca58-70c2ea732dcmr237619b3a.6.1721158313928; Tue, 16 Jul 2024
+ 12:31:53 -0700 (PDT)
+Date: Tue, 16 Jul 2024 12:31:52 -0700
+In-Reply-To: <fdddad066c88c6cd8f2090f11e32e54f7d5c6178.1721092739.git.isaku.yamahata@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240626073719.5246-1-amit@kernel.org> <Zn7gK9KZKxBwgVc_@google.com>
- <CALMp9eSfZsGTngMSaWbFrdvMoWHyVK_SWf9W1Ps4BFdwAzae_g@mail.gmail.com>
- <52d965101127167388565ed1520e1f06d8492d3b.camel@kernel.org>
- <DS7PR12MB57665C3E8A7F0AF59E034B3C94D32@DS7PR12MB5766.namprd12.prod.outlook.com>
- <Zow3IddrQoCTgzVS@google.com> <ZpTeuJHgwz9u8d_k@t470s.drde.home.arpa>
-Message-ID: <ZpbFvTUeB3gMIKiU@google.com>
-Subject: Re: [PATCH v2] KVM: SVM: let alternatives handle the cases when RSB
- filling is required
+References: <fdddad066c88c6cd8f2090f11e32e54f7d5c6178.1721092739.git.isaku.yamahata@intel.com>
+Message-ID: <ZpbKqG_ZhCWxl-Fc@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Allow per VM kvm_mmu_max_gfn()
 From: Sean Christopherson <seanjc@google.com>
-To: Amit Shah <amit@kernel.org>
-Cc: David Kaplan <David.Kaplan@amd.com>, Jim Mattson <jmattson@google.com>, 
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, "x86@kernel.org" <x86@kernel.org>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "tglx@linutronix.de" <tglx@linutronix.de>, 
-	"mingo@redhat.com" <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
-	"dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>, "hpa@zytor.com" <hpa@zytor.com>, 
-	Kim Phillips <kim.phillips@amd.com>
+To: isaku.yamahata@intel.com
+Cc: kvm@vger.kernel.org, isaku.yamahata@gmail.com, 
+	Paolo Bonzini <pbonzini@redhat.com>, rick.p.edgecombe@intel.com, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jul 15, 2024, Amit Shah wrote:
-> On (Mon) 08 Jul 2024 [11:59:45], Sean Christopherson wrote:
-> > On Mon, Jul 01, 2024, David Kaplan wrote:
-> > > > > >        /*
-> > > > > >         * AMD's AutoIBRS is equivalent to Intel's eIBRS - use the
-> > > > > > Intel feature
-> > > > > >         * flag and protect from vendor-specific bugs via the
-> > > > > > whitelist.
-> > > > > >         *
-> > > > > >         * Don't use AutoIBRS when SNP is enabled because it degrades
-> > > > > > host
-> > > > > >         * userspace indirect branch performance.
-> > > > > >         */
-> > > > > >        if ((x86_arch_cap_msr & ARCH_CAP_IBRS_ALL) ||
-> > > > > >            (cpu_has(c, X86_FEATURE_AUTOIBRS) &&
-> > > > > >             !cpu_feature_enabled(X86_FEATURE_SEV_SNP))) {
-> > > > > >                setup_force_cpu_cap(X86_FEATURE_IBRS_ENHANCED);
-> > > > > >                if (!cpu_matches(cpu_vuln_whitelist, NO_EIBRS_PBRSB)
-> > > > > > &&
-> > > > > >                    !(x86_arch_cap_msr & ARCH_CAP_PBRSB_NO))
-> > > > > >                        setup_force_cpu_bug(X86_BUG_EIBRS_PBRSB);
-> > > > > >        }
-> > > > >
-> > > > > Families 0FH through 12H don't have EIBRS or AutoIBRS, so there's no
-> > > > > cpu_vuln_whitelist[] lookup. Hence, no need to set the NO_EIBRS_PBRSB
-> > > > > bit, even if it is accurate.
-> > > >
-> > > > The commit that adds the RSB_VMEXIT_LITE feature flag does describe the
-> > > > bug in a good amount of detail:
-> > > >
-> > > > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?i
-> > > > d=2b1299322016731d56807aa49254a5ea3080b6b3
-> > > >
-> > > > I've not seen any indication this is required for AMD CPUs.
-> > > >
-> > > > David, do you agree we don't need this?
-> > > >
-> > > 
-> > > It's not required, as AMD CPUs don't have the PBRSB issue with AutoIBRS.
-> > > Although I think Sean was talking about being extra paranoid
-> > 
-> > Ya.  I'm asking if there's a reason not to tack on X86_FEATURE_RSB_VMEXIT_LITE,
-> > beyond it effectively being dead code.  There's no runtime cost, and so assuming
-> > it doesn't get spuriously enabled, I don't see a downside.
+On Mon, Jul 15, 2024, isaku.yamahata@intel.com wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
 > 
-> Ah - I get it now.  You want to add this code for parity with
-> vmenter.S so that a future bug like this doesn't happen.
+> Prepare for TDX support by making kvm_mmu_max_gfn() configurable.  Have
+> this preparation also be useful by non-TDX changes to improve correctness
+> associated with the combination of 4-level EPT and MAXPA > 48.  The issue
+> is analyzed at [1].
 > 
-> I disagree, though.  It's not really dead code - it does get patched
-> at runtime.
+> Like other confidential computing technologies, TDX has the concept of
+> private and shared memory.  For TDX, the private and shared mappings of the
+> same GFN are mapped at separate GPAs, with a configurable GPA bit selecting
+> between private and shared aliases of the same GFN.  This means that
+> operations working with the concept of a maximum GFN should only go up to
+> this configurable GPA bit instead of the existing behavior based on
+> shadow_phys_bits.  Other TDX changes will handle applying the operation
+> across both GFN aliases.
 
-Eh, we're splitting hairs over what's dead code where.
+This is going to be confusing.  A TDX will be all but guaranteed to generate an
+EPT violation on a gfn > kvm->mmu_max_gfn.
 
-> If a future AMD CPU has a bug that Intel doesn't, we'll have to introduce a
-> new ALTERNATIVE just for that condition - leading to more complexity than is
-> actually required.
+> Using the existing kvm_mmu_max_gfn() based on shadow_phys_bits would cause
+> functional problems for TDX.  Specifically, because the function is used to
+> restrict the range where memslots can be created.  For TDX, if a memslot is
+> created at a GFN that includes the bit that selects between private/shared,
+> it would confuse the logic that zaps both aliases.  It would end up zapping
+> only the higher alias and missing the lower one.  In this case, freed pages
+> could remain mapped in the TDX guest.
 
-If and only if the bug was mitigated by FILL_RETURN_BUFFER.  And if we needed to
-extend FILL_RETURN_BUFFER, then we'd need a new alternative regardless of whether
-or not KVM SVM honored RSB_VMEXIT_LITE.
+So why don't we simply disallow creating aliased memslots?
 
-If the hypothetical AMD bug is fixed by a single stuffed return, then the kernel
-would simply force set RSB_VMEXIT_LITE as appropriate.  If the bug requires a
-mitigation somewhere between RSB_CLEAR_LOOPS and 1, we'd need to add more code
-somewhere.
-
-> Also - reviewers of code will get confused, wondering why this code
-> for AMD exists when the CPU vuln does not.
+> Since this GPA bit is configurable per-VM, make kvm_mmu_max_gfn() per-VM by
+> having it take a struct kvm, and keep the max GFN as a member on that
+> struct.  Future TDX changes will set this member based on the configurable
+> position of the private/shared bit.
 > 
-> I get that we want to write defensive code, but this was a very
-> special condition that is unlikely to happen in this part of the code,
-> and also this was missed by the devs and the reviewers.
+> Besides functional issues, it is generally more correct and easier to
 
-Defensive code is only part of it, and a minor part at that.  The main "issue" is
-having divergent VM-Enter/VM-Exit code for Intel vs. AMD.  To those of us that
-care primarily about virtualization and are only passingly familiar with the myriad
-speculation bugs and mitigations, omitting RSB_VMEXIT_LITE _looks_ wrong.
+No, it most definitely is not more correct.  There is absolutely no issue zapping
+SPTEs that should never exist.  In fact, restricting the zapping path is far more
+likely to *cause* correctness issues, e.g. see 
 
-To know that the omission is correct, one has to suss out that it's (supposed to
-be) impossible for RSB_VMEXIT_LITE to be set on AMD.  And as a KVM person, that's
-a detail I don't want to care about.
+  524a1e4e381f ("KVM: x86/mmu: Don't leak non-leaf SPTEs when zapping all SPTEs")
+  86931ff7207b ("KVM: x86/mmu: Do not create SPTEs for GFNs that exceed host.MAXPHYADDR")
 
-FWIW, I feel the same way about all the other post-VM-Exit mitigations, they just
-don't stand out in the same way because the entire mitigation sequence is absent
-on one vendor the other, i.e. they don't look wrong at first glance.  But if KVM
-could have a mostly unified VM-Enter => VM-Exit assembly code, I would happliy eat
-a dead NOP/JMP or three.  Now that I look at it, that actually seems very doable...
+Creating SPTEs is a different matter, but unless I'm missing something, the only
+path that _needs_ to be updated is kvm_arch_prepare_memory_region(), to disallow
+aliased memslots.
 
-> The good thing here is that missing this only leads to suboptimal
-> code, not a security bug.
+I assume TDX will strip the shared bit from fault->gfn, and shove it back in when
+creating MMIO SPTEs in the shared EPT page tables.
 
-I don't think we can guarantee that.  Obviously this is all speculative (lolz),
-but AFAICT, X86_FEATURE_RSB_VMEXIT_LITE doesn't imply X86_FEATURE_RSB_VMEXIT.
+Why can't we simply do:
 
-> So given all this, I vote for the simplicity of code, rather than tacking on
-> something.
-> 
-> Sound OK?
-> 
-> 
-> 		Amit
-> -- 
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 842a3a4cdfe9..5ea428dde891 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4395,6 +4395,9 @@ static int kvm_faultin_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+        struct kvm_memory_slot *slot = fault->slot;
+        int ret;
+ 
++       if (WARN_ON_ONCE(vcpu->kvm, kvm_is_gfn_alias(fault->gfn)))
++               return -EFAULT;
++
+        /*
+         * Note that the mmu_invalidate_seq also serves to detect a concurrent
+         * change in attributes.  is_page_fault_stale() will detect an
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index 994743266480..091da7607025 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -12979,6 +12979,9 @@ int kvm_arch_prepare_memory_region(struct kvm *kvm,
+                if ((new->base_gfn + new->npages - 1) > kvm_mmu_max_gfn())
+                        return -EINVAL;
+ 
++               if (kvm_is_gfn_alias(kvm, new->base_gfn + new->npages - 1))
++                       return -EINVAL;
++
+                return kvm_alloc_memslot_metadata(kvm, new);
+        }
 
