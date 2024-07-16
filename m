@@ -1,150 +1,219 @@
-Return-Path: <kvm+bounces-21716-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21727-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8E75932BA1
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 17:47:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9DCB932D44
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 18:03:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA3BA280DA5
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 15:47:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A54832804D0
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 16:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F52919E7D0;
-	Tue, 16 Jul 2024 15:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B205A19E809;
+	Tue, 16 Jul 2024 16:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4SGebI7i"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mX8mJtYc"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F056119E7C4
-	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 15:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6521B19DF59
+	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 16:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721144823; cv=none; b=eS8+8cHvGVvDIRo1L9dYvA0hsoe6SMHDQuC037v99LQtedzM+DF6+r6gM/IS/Xo1d5pWOkYAPzT9K5pEY2wkahmFaSWoXrMtxGAUpKU/3M/bUol4ujTZl9pM6O4PJHM5I2qaR7R9leyZfyWBtTn6NlhvLXkaId6efcnXz1TqJ8I=
+	t=1721145783; cv=none; b=A37h8M9cmAGZ4PNy38X3qGa812Zrw+X+wlme/Y6hw/Fv+5IrbB+XTTXEcLtjjEEgrfN69j8axyideBe0UGgB81IAO6WFmlrOZTxhxRoNlDtsOkbw5XCzCPRQ9vR/XWyi4ksme6nVByAqC8fnT9Y4yKsvlDPMSKtwMSTHu8Kdepw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721144823; c=relaxed/simple;
-	bh=YpEF0Q6yKkYxLuQtT2PJS/GZ92XHHf4x1MDsqSuwVCk=;
+	s=arc-20240116; t=1721145783; c=relaxed/simple;
+	bh=V3XIltUZy+EAGhbi36SoKcnYH8QOpAigc2QQmc3zTsw=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=f4JxpIgsNLeEcFjABqAcBf9zdH4qTP3yKKi/c4skk2IHEFmklw6IMBivBjeSK+veUaiOHAGGxp5YSWQ5Q9vmyCPPLu5li8qnnL9MgNg5mEOOwNTbAI3UvNshOQf0K4gxJrDdV4G6gbLMsdk04xzPRfVYTGEhqjCOZQNsXjapLEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4SGebI7i; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=HIxy/vyTIuO3mh5eqzhMmkKxR9STfObtwdCgPD63PC/zkrOlviZpj2AmzHu4qGlKf6t68LcSZLMScv60S1PMQESR8katacB/AoGruJRyG0uvNRcvg/CVSwK6JjOuIrfQ68HVL4AHCjB+lyKv4cHybcYr55iO6oslvGonfiKHJFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mX8mJtYc; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70afd833ba9so3231482b3a.1
-        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 08:47:01 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-65eb8845bc6so96081867b3.3
+        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 09:03:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721144821; x=1721749621; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ETWgHgOd443GlHDheQNvvEwb46QHybHGr7wnanCFogo=;
-        b=4SGebI7iw6V6jR9glZcEtxBZ6Ur5cF7+TLS51iaw7rfy0sRRBuLLrWsDgFXrGS93Qw
-         jcep0fZPitNTZpnc+s7Qb4Y86j7W6aV2AYvOYVGpGKOBeHij7qJictFCKZt6EbbYMycs
-         nwHXnxE4GY8q9XZ5ygUBn1Z2fWCXdMnToK0V8AVETHeMufQQRDIafzPgykUvqXedZ9WG
-         VYNLCMreLZkHzHwWoJvEPw2mGILOHnmJMxeBCHLqByGsUd2AwR1OH88RWw9Ac82xm9X4
-         c5kKddXLW0H4iHPyHGQYV5Kd3AAXtUa0pZRaxkuctu2CSa+sz+Qc97W/5nuqklCFbfX+
-         oVWA==
+        d=google.com; s=20230601; t=1721145781; x=1721750581; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BMs2wY7Im2gJwcvsvkhutz6yojdHTU9eBYvDppSee3o=;
+        b=mX8mJtYcq9zluHtVnzREhZxbiiULi7i2I+mJi4Mt08+GskaWUHf5gWVjXt5W27r0kS
+         weqAWKColS7fzPZ/XyCf6qTaU0n4l/g7QwS3RhBGURMGs/LVEzq36zwElFVxRZhLx7lw
+         WM4Qhv+0Ncj+0SqxX5NvtCupt3zX+r1L0TUqx6Iuu9YGo1CYTh0XeX1iRlwd2+DQNEty
+         BbckODM0k85fY+vvYTBvHD9S4Fdwdn6B6PX51Nl5yJXu8bXWlahlEPRa6AKnEg7ZRT/y
+         t2h3IS26gKTSfcnSeOM5iK4Iojjn4cq2rHi+vxzF1YUGVruUttEyEf7Gx19q0X5j/I5I
+         sVbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721144821; x=1721749621;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ETWgHgOd443GlHDheQNvvEwb46QHybHGr7wnanCFogo=;
-        b=BZzPQarvTSpoCWqhfhs53DlLrP33OauqlpXGwOG6jNCzul3LiTN5TDqGBRYO8mveNF
-         YHdQQf7XAh4/K7pTPQOCxqjYwAQKFSHCoyDdFaK5TG2Cx+cKhF3LFlDDlzsMnKsPoW7x
-         +Q/aPiXFuxvKfnA5W6d41/r7HWh6cwwoIt+2m1hKQqfFtm6/N4rw5uM1WpcMqJ50eiRi
-         WFKvfnFMdtDFHp6xSnLOgXt/QJYUXMIaybFi3voz8+E1V/gOWC4CrDINaTv7r5aM54nq
-         Aej45zcxvdDdVw073yaZr4UZ0nVmTp8nbZeZ7LTeWLvxFo1zwqjc6n6W3DvddJQm9e+r
-         vNBw==
-X-Gm-Message-State: AOJu0YwEItmA7bB+Mhmqa2C1i50BShPQYP/VWzoppxinHxe+1xN0BJLj
-	rqZgCiXeqNdohAw0B6ZiVEy8c9HxfYF0sjiG0UUMD3P+TYu4EItfvf+tnVcQc+0JsfNsDNLFvAl
-	LZA==
-X-Google-Smtp-Source: AGHT+IGc/BULnIieuwv9+FBRnu1M5AufL70Ng4HgUceQ2bAiT7WRdGZZQ21V3+tP1L1LEbg35yWRxfFG4Ss=
+        d=1e100.net; s=20230601; t=1721145781; x=1721750581;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=BMs2wY7Im2gJwcvsvkhutz6yojdHTU9eBYvDppSee3o=;
+        b=Hs15hkpkN4kYHUoUd50H2H1fnPKLXefGJwyy3Ep5FwYlvkg3Sqe5o6+9W1TMVIktIj
+         wcQXYpEx6dceSJRvlQcGhURiKh6+WhGRf2R9TzW808iG6oTKjdC3xfQK+97vScD6IWWT
+         hEtI4trZnXW5Mc4yeAZ3DGgD/Y7tsL630HDwAwiY8XiZnDuC332zah2SBixVWx/BDWao
+         v4/uhrefUpTk/A+t1zCd1w2cg6HZ7Nroa4LJBX/+hqj240zej+HurJzXbl50dF7pEZZx
+         CuTqD2ckmVwfV8GHPsaG4DO1xl19BWQjMnUMle35tb/teKxp8s1cVjpUwhXeqsy2sAh2
+         yJoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBersk9J1mjdMS/kZhdRW5yzZdgD0KtdsIdPGSK81RLWDkD2j/jj8OWsFKls2KO0lDA8H96e5nPqdE+NHxQXHmcunk
+X-Gm-Message-State: AOJu0YxfGeCP/yww38kSfMz5Hsq/q2ji6504RCbQya9QJUD81v3tDtho
+	9VcWk02Q2VgEZW+l5zeRDiL3dYj0kzUOCCcRDaZRZ906rxGj1Q/Egh+HdujDf0WdZUX1CsHVQMB
+	Kmw==
+X-Google-Smtp-Source: AGHT+IHGZLEiSniWpPk9RJXTJkROIXXHkCGmFW1fdkqpo+4QpAqRJbF6e6n8zR9oFjopeWKxjqT3PAofiHk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:1a93:b0:706:6b52:438c with SMTP id
- d2e1a72fcca58-70c14000242mr208338b3a.0.1721144821054; Tue, 16 Jul 2024
- 08:47:01 -0700 (PDT)
-Date: Tue, 16 Jul 2024 08:46:54 -0700
-In-Reply-To: <0f60918d-bc46-4332-ad28-c155a1990e3d@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:fd4:b0:62d:cef:67dd with SMTP id
+ 00721157ae682-6637f1c259emr1606177b3.1.1721145781339; Tue, 16 Jul 2024
+ 09:03:01 -0700 (PDT)
+Date: Tue, 16 Jul 2024 09:03:00 -0700
+In-Reply-To: <20240712232937.2861788-1-ackerleytng@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240712235701.1458888-1-seanjc@google.com> <20240712235701.1458888-9-seanjc@google.com>
- <0f60918d-bc46-4332-ad28-c155a1990e3d@redhat.com>
-Message-ID: <ZpaV7kaVL1rj7MXj@google.com>
-Subject: Re: [GIT PULL (sort of)] KVM: x86: Static call changes for 6.11
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com> <20240712232937.2861788-1-ackerleytng@google.com>
+Message-ID: <ZpaZtPKrXolEduZH@google.com>
+Subject: Re: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+To: Ackerley Tng <ackerleytng@google.com>
+Cc: quic_eberman@quicinc.com, akpm@linux-foundation.org, david@redhat.com, 
+	kvm@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-mm@kvack.org, maz@kernel.org, pbonzini@redhat.com, shuah@kernel.org, 
+	tabba@google.com, willy@infradead.org, vannapurve@google.com, 
+	hch@infradead.org, jgg@nvidia.com, rientjes@google.com, jhubbard@nvidia.com, 
+	qperret@google.com, smostafa@google.com, fvdl@google.com, hughd@google.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 16, 2024, Paolo Bonzini wrote:
-> On 7/13/24 01:56, Sean Christopherson wrote:
-> > Here's a massage pull request for the static_call() changes, just in case you
-> > want to go this route instead of applying patches directly after merging
-> > everything else for 6.11 (it was easy to generate this).  If you want to go the
-> > patches route, I'll post 'em next week.
-> > 
-> > The following changes since commit c1c8a908a5f4c372f8a8dca0501b56ffc8d260fe:
-> > 
-> >    Merge branch 'vmx' (2024-06-28 22:22:53 +0000)
-> > 
-> > are available in the Git repository at:
-> > 
-> >    https://github.com/kvm-x86/linux.git  tags/kvm-x86-static_calls-6.11
-> > 
-> > for you to fetch changes up to b528de209c858f61953023b405a4abbf9a9933da:
-> > 
-> >    KVM: x86/pmu: Add kvm_pmu_call() to simplify static calls of kvm_pmu_ops (2024-06-28 15:23:49 -0700)
-> 
-> Thanks, indeed there was no straggler static_call() after applying
-> this.  However, there might be a problem: static_call_cond() is equal
-> to static_call() only if CONFIG_HAVE_STATIC_CALL_INLINE,
+Thanks for doing the dirty work!
 
-No, I think you misread the #if-#elif-#else.  It's only the !HAVE_STATIC_CALL
-case that requires use of static_call_cond().  From include/linux/static_call.h:
+On Fri, Jul 12, 2024, Ackerley Tng wrote:
+> Here=E2=80=99s an update from the Linux MM Alignment Session on July 10 2=
+024, 9-10am
+> PDT:
+>=20
+> The current direction is:
+>=20
+> + Allow mmap() of ranges that cover both shared and private memory, but d=
+isallow
+>   faulting in of private pages
+>   + On access to private pages, userspace will get some error, perhaps SI=
+GBUS
+>   + On shared to private conversions, unmap the page and decrease refcoun=
+ts
 
-  #ifdef CONFIG_HAVE_STATIC_CALL_INLINE
-  #define static_call_cond(name)	(void)__static_call(name)
+Note, I would strike the "decrease refcounts" part, as putting references i=
+s a
+natural consequence of unmapping memory, not an explicit action guest_memfd=
+ will
+take when converting from shared=3D>private.
 
-  #elif defined(CONFIG_HAVE_STATIC_CALL)
-  #define static_call_cond(name)	(void)__static_call(name)
+And more importantly, guest_memfd will wait for the refcount to hit zero (o=
+r
+whatever the baseline refcount is).
 
-  #else
-  #define static_call_cond(name)	(void)__static_call_cond(name)
+> + To support huge pages, guest_memfd will take ownership of the hugepages=
+, and
+>   provide interested parties (userspace, KVM, iommu) with pages to be use=
+d.
+>   + guest_memfd will track usage of (sub)pages, for both private and shar=
+ed
+>     memory
+>   + Pages will be broken into smaller (probably 4K) chunks at creation ti=
+me to
+>     simplify implementation (as opposed to splitting at runtime when priv=
+ate to
+>     shared conversion is requested by the guest)
 
-  #endif
+FWIW, I doubt we'll ever release a version with mmap()+guest_memfd support =
+that
+shatters pages at creation.  I can see it being an intermediate step, e.g. =
+to
+prove correctness and provide a bisection point, but shattering hugepages a=
+t
+creation would effectively make hugepage support useless.
 
-And per Josh, from an old RFC[*] to yank out static_call_cond():
+I don't think we need to sort this out now though, as when the shattering (=
+and
+potential reconstituion) occurs doesn't affect the overall direction in any=
+ way
+(AFAIK).  I'm chiming in purely to stave off complaints that this would bre=
+ak
+hugepage support :-)
 
- : Static calling a NULL pointer is a NOP, unless you're one of those poor
- : souls running on an arch (or backported x86 monstrosity) with
- : CONFIG_HAVE_STATIC_CALL=n, then it's a panic.
-
-I double checked that 32-bit KVM works on Intel (which is guaranteed to have a
-NULL guest_memory_reclaimed()).  I also verified that the generated code is
-identical for both static_call() and static_call_cond(), i.e. the READ_ONCE() of
-the func at runtime that's present in __static_call_cond() isn't showing up.
-
-Dump of assembler code for function kvm_arch_guest_memory_reclaimed:
-   0xc1042094 <+0>:	call   0xc10ce650 <__fentry__>
-   0xc1042099 <+5>:	push   %ebp
-   0xc104209a <+6>:	mov    %esp,%ebp
-   0xc104209c <+8>:	call   0xc1932d8c <__SCT__kvm_x86_guest_memory_reclaimed>
-   0xc10420a1 <+13>:	pop    %ebp
-   0xc10420a2 <+14>:	ret    
-End of assembler dump.
-
-Dump of assembler code for function __SCT__kvm_x86_guest_memory_reclaimed:
-   0xc1932d8c <+0>:	ret    
-   0xc1932d8d <+1>:	int3   
-   0xc1932d8e <+2>:	nop
-   0xc1932d8f <+3>:	nop
-   0xc1932d90 <+4>:	nop
-   0xc1932d91 <+5>:	ud1    %esp,%ecx
-End of assembler dump.
-
-[*] https://lore.kernel.org/all/cover.1678474914.git.jpoimboe@kernel.org
+>     + Core MM infrastructure will still be used to track page table mappi=
+ngs in
+>       mapcounts and other references (refcounts) per subpage
+>     + HugeTLB vmemmap Optimization (HVO) is lost when pages are broken up=
+ - to
+>       be optimized later. Suggestions:
+>       + Use a tracking data structure other than struct page
+>       + Remove the memory for struct pages backing private memory from th=
+e
+>         vmemmap, and re-populate the vmemmap on conversion from private t=
+o
+>         shared
+>   + Implementation pointers for huge page support
+>     + Consensus was that getting core MM to do tracking seems wrong
+>     + Maintaining special page refcounts for guest_memfd pages is difficu=
+lt to
+>       get working and requires weird special casing in many places. This =
+was
+>       tried for FS DAX pages and did not work out: [1]
+>=20
+> + Implementation suggestion: use infrastructure similar to what ZONE_DEVI=
+CE
+>   uses, to provide the huge page to interested parties
+>   + TBD: how to actually get huge pages into guest_memfd
+>   + TBD: how to provide/convert the huge pages to ZONE_DEVICE
+>     + Perhaps reserve them at boot time like in HugeTLB
+>=20
+> + Line of sight to compaction/migration:
+>   + Compaction here means making memory contiguous
+>   + Compaction/migration scope:
+>     + In scope for 4K pages
+>     + Out of scope for 1G pages and anything managed through ZONE_DEVICE
+>     + Out of scope for an initial implementation
+>   + Ideas for future implementations
+>     + Reuse the non-LRU page migration framework as used by memory ballon=
+ing
+>     + Have userspace drive compaction/migration via ioctls
+>       + Having line of sight to optimizing lost HVO means avoiding being =
+locked
+>         in to any implementation requiring struct pages
+>         + Without struct pages, it is hard to reuse core MM=E2=80=99s
+>           compaction/migration infrastructure
+>=20
+> + Discuss more details at LPC in Sep 2024, such as how to use huge pages,
+>   shared/private conversion, huge page splitting
+>=20
+> This addresses the prerequisites set out by Fuad and Elliott at the begin=
+ning of
+> the session, which were:
+>=20
+> 1. Non-destructive shared/private conversion
+>   + Through having guest_memfd manage and track both shared/private memor=
+y
+> 2. Huge page support with the option of converting individual subpages
+>   + Splitting of pages will be managed by guest_memfd
+> 3. Line of sight to compaction/migration of private memory
+>   + Possibly driven by userspace using guest_memfd ioctls
+> 4. Loading binaries into guest (private) memory before VM starts
+>   + This was identified as a special case of (1.) above
+> 5. Non-protected guests in pKVM
+>   + Not discussed during session, but this is a goal of guest_memfd, for =
+all VM
+>     types [2]
+>=20
+> David Hildenbrand summarized this during the meeting at t=3D47m25s [3].
+>=20
+> [1]: https://lore.kernel.org/linux-mm/cover.66009f59a7fe77320d413011386c3=
+ae5c2ee82eb.1719386613.git-series.apopple@nvidia.com/
+> [2]: https://lore.kernel.org/lkml/ZnRMn1ObU8TFrms3@google.com/
+> [3]: https://drive.google.com/file/d/17lruFrde2XWs6B1jaTrAy9gjv08FnJ45/vi=
+ew?t=3D47m25s&resourcekey=3D0-LiteoxLd5f4fKoPRMjMTOw
 
