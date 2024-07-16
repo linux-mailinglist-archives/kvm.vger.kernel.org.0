@@ -1,178 +1,150 @@
-Return-Path: <kvm+bounces-21715-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21716-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878D6932814
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 16:16:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E75932BA1
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 17:47:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13B581F232AD
-	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 14:16:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA3BA280DA5
+	for <lists+kvm@lfdr.de>; Tue, 16 Jul 2024 15:47:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C9CD19B3FB;
-	Tue, 16 Jul 2024 14:16:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F52919E7D0;
+	Tue, 16 Jul 2024 15:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AdUX1ast"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4SGebI7i"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6382E832
-	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 14:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F056119E7C4
+	for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 15:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721139397; cv=none; b=X3rU6CCnPG1saVS/R5zq1FtKKsepz9kfBsh8fxBmvd/eeHpuldEW6XkeEjEDOGiKNzwEH5/IzhjFH9+hjRDjtWhTUaIO+sf0+nfAaHw+BkwDtawwNy/xgUhVpoKQLzps+JemYTgM8TWgtG98LUz4noK4rlnZjldzv6dmwnU4IQk=
+	t=1721144823; cv=none; b=eS8+8cHvGVvDIRo1L9dYvA0hsoe6SMHDQuC037v99LQtedzM+DF6+r6gM/IS/Xo1d5pWOkYAPzT9K5pEY2wkahmFaSWoXrMtxGAUpKU/3M/bUol4ujTZl9pM6O4PJHM5I2qaR7R9leyZfyWBtTn6NlhvLXkaId6efcnXz1TqJ8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721139397; c=relaxed/simple;
-	bh=cmTfg6ksyvNPOnaQ70QjLDepYi4dEeeeX3xvqiB/9Rs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZnQ3HOlFWAnGdsQdVqv7z1nhnuPUh94et16m6AFNwNbg1yyAzcDQ3PfYlwGFoeTCCQWesmqFqWSGBDK8dA7BhwtIEgTLIswkMXm++nnI6s1k0y3N/k97I16XsR3DjstDz7Nc+epPRyNr76HdkiKAacA19lNGuYQGBgiXplaAP3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AdUX1ast; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721139394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dXwwITkzicgsGwK2r+pc5x61PP9sLBVDiPRyCoyIbNY=;
-	b=AdUX1astExnVwlGKNgdJV+U72JeMKnqZcptCv0Lt3If5nYcM0lBsXZH3HkPlg+PApScgt/
-	/hk/gYZ/okLpZoDXgXP12FRBdcRUyZOarY7G8uWJ+++OOvwGEeFOjwwLyhEBb5Wx7WVT7s
-	K3jX3j/VFVv6EkJgAkEIO3RmK2rO/DU=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-137-AnyCAZDDPzWepx4SlOVY_w-1; Tue, 16 Jul 2024 10:16:33 -0400
-X-MC-Unique: AnyCAZDDPzWepx4SlOVY_w-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3678e523e32so5462318f8f.1
-        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 07:16:32 -0700 (PDT)
+	s=arc-20240116; t=1721144823; c=relaxed/simple;
+	bh=YpEF0Q6yKkYxLuQtT2PJS/GZ92XHHf4x1MDsqSuwVCk=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=f4JxpIgsNLeEcFjABqAcBf9zdH4qTP3yKKi/c4skk2IHEFmklw6IMBivBjeSK+veUaiOHAGGxp5YSWQ5Q9vmyCPPLu5li8qnnL9MgNg5mEOOwNTbAI3UvNshOQf0K4gxJrDdV4G6gbLMsdk04xzPRfVYTGEhqjCOZQNsXjapLEw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4SGebI7i; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70afd833ba9so3231482b3a.1
+        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 08:47:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721144821; x=1721749621; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ETWgHgOd443GlHDheQNvvEwb46QHybHGr7wnanCFogo=;
+        b=4SGebI7iw6V6jR9glZcEtxBZ6Ur5cF7+TLS51iaw7rfy0sRRBuLLrWsDgFXrGS93Qw
+         jcep0fZPitNTZpnc+s7Qb4Y86j7W6aV2AYvOYVGpGKOBeHij7qJictFCKZt6EbbYMycs
+         nwHXnxE4GY8q9XZ5ygUBn1Z2fWCXdMnToK0V8AVETHeMufQQRDIafzPgykUvqXedZ9WG
+         VYNLCMreLZkHzHwWoJvEPw2mGILOHnmJMxeBCHLqByGsUd2AwR1OH88RWw9Ac82xm9X4
+         c5kKddXLW0H4iHPyHGQYV5Kd3AAXtUa0pZRaxkuctu2CSa+sz+Qc97W/5nuqklCFbfX+
+         oVWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721139392; x=1721744192;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dXwwITkzicgsGwK2r+pc5x61PP9sLBVDiPRyCoyIbNY=;
-        b=KPWM2+GWGNCyCmWjxr3rmCEi0U3/HIjMd8xE9fPg1seOB7mpv3zYM3UVcFQfOhkE1F
-         xWyEt06MSyWLptTiFPhs8gmjdzrixbhoRutZ3tCVQY95DH1Gv6o+FYfqqHfoSATUw0Sd
-         +Melz9/ewzBjbncYH++OQ8KyB419uMLXphhaWhbtIiRDa/p0jCalOC7IJ2f3/kOGOc3M
-         2yLPIlZPm2oq+gQMsdBeVDsQe9Z3TPKRWAHZArMocgf8h+AkOpsYDwPNH7R9Emqu4vCo
-         qr9vH/aRcLwlRZA1bDy/F92sv0m+iudbPDhI88iZR9SSzn9bEt6FUjNHnKXON2ZddZEo
-         6H1A==
-X-Gm-Message-State: AOJu0YxMNdP7sj0PV/Vxjcasmh2CE+T8ExO7JOYKpR6y9P7vzpOsT31o
-	4aRbB/rcjpIrBN/CN2+dH/VClIhx6R9HKhzkjXbyhsqhBiak53RXASeAVUwNS+UqdKnVRTcTpRO
-	T3k2Ocd8ZUjuHNM3n7FP/7zMrv4um8iyrONmp4hULLiR2qNeH9Q==
-X-Received: by 2002:a5d:6188:0:b0:367:4d9d:56a1 with SMTP id ffacd0b85a97d-368261e8d6amr1786317f8f.45.1721139392012;
-        Tue, 16 Jul 2024 07:16:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEGIRKGqkJxKWPcZZYkOx7oRNt0byjqQV8u0ZmiSaNwLu8DaiwZXmUIgnSb6jDCz+16oURfxw==
-X-Received: by 2002:a5d:6188:0:b0:367:4d9d:56a1 with SMTP id ffacd0b85a97d-368261e8d6amr1786300f8f.45.1721139391686;
-        Tue, 16 Jul 2024 07:16:31 -0700 (PDT)
-Received: from [192.168.10.47] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-3680db0ee46sm9147071f8f.114.2024.07.16.07.16.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jul 2024 07:16:31 -0700 (PDT)
-Message-ID: <0f60918d-bc46-4332-ad28-c155a1990e3d@redhat.com>
-Date: Tue, 16 Jul 2024 16:16:30 +0200
+        d=1e100.net; s=20230601; t=1721144821; x=1721749621;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ETWgHgOd443GlHDheQNvvEwb46QHybHGr7wnanCFogo=;
+        b=BZzPQarvTSpoCWqhfhs53DlLrP33OauqlpXGwOG6jNCzul3LiTN5TDqGBRYO8mveNF
+         YHdQQf7XAh4/K7pTPQOCxqjYwAQKFSHCoyDdFaK5TG2Cx+cKhF3LFlDDlzsMnKsPoW7x
+         +Q/aPiXFuxvKfnA5W6d41/r7HWh6cwwoIt+2m1hKQqfFtm6/N4rw5uM1WpcMqJ50eiRi
+         WFKvfnFMdtDFHp6xSnLOgXt/QJYUXMIaybFi3voz8+E1V/gOWC4CrDINaTv7r5aM54nq
+         Aej45zcxvdDdVw073yaZr4UZ0nVmTp8nbZeZ7LTeWLvxFo1zwqjc6n6W3DvddJQm9e+r
+         vNBw==
+X-Gm-Message-State: AOJu0YwEItmA7bB+Mhmqa2C1i50BShPQYP/VWzoppxinHxe+1xN0BJLj
+	rqZgCiXeqNdohAw0B6ZiVEy8c9HxfYF0sjiG0UUMD3P+TYu4EItfvf+tnVcQc+0JsfNsDNLFvAl
+	LZA==
+X-Google-Smtp-Source: AGHT+IGc/BULnIieuwv9+FBRnu1M5AufL70Ng4HgUceQ2bAiT7WRdGZZQ21V3+tP1L1LEbg35yWRxfFG4Ss=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1a93:b0:706:6b52:438c with SMTP id
+ d2e1a72fcca58-70c14000242mr208338b3a.0.1721144821054; Tue, 16 Jul 2024
+ 08:47:01 -0700 (PDT)
+Date: Tue, 16 Jul 2024 08:46:54 -0700
+In-Reply-To: <0f60918d-bc46-4332-ad28-c155a1990e3d@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
+Mime-Version: 1.0
+References: <20240712235701.1458888-1-seanjc@google.com> <20240712235701.1458888-9-seanjc@google.com>
+ <0f60918d-bc46-4332-ad28-c155a1990e3d@redhat.com>
+Message-ID: <ZpaV7kaVL1rj7MXj@google.com>
 Subject: Re: [GIT PULL (sort of)] KVM: x86: Static call changes for 6.11
-To: Sean Christopherson <seanjc@google.com>
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240712235701.1458888-1-seanjc@google.com>
- <20240712235701.1458888-9-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240712235701.1458888-9-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
 
-On 7/13/24 01:56, Sean Christopherson wrote:
-> Here's a massage pull request for the static_call() changes, just in case you
-> want to go this route instead of applying patches directly after merging
-> everything else for 6.11 (it was easy to generate this).  If you want to go the
-> patches route, I'll post 'em next week.
+On Tue, Jul 16, 2024, Paolo Bonzini wrote:
+> On 7/13/24 01:56, Sean Christopherson wrote:
+> > Here's a massage pull request for the static_call() changes, just in case you
+> > want to go this route instead of applying patches directly after merging
+> > everything else for 6.11 (it was easy to generate this).  If you want to go the
+> > patches route, I'll post 'em next week.
+> > 
+> > The following changes since commit c1c8a908a5f4c372f8a8dca0501b56ffc8d260fe:
+> > 
+> >    Merge branch 'vmx' (2024-06-28 22:22:53 +0000)
+> > 
+> > are available in the Git repository at:
+> > 
+> >    https://github.com/kvm-x86/linux.git  tags/kvm-x86-static_calls-6.11
+> > 
+> > for you to fetch changes up to b528de209c858f61953023b405a4abbf9a9933da:
+> > 
+> >    KVM: x86/pmu: Add kvm_pmu_call() to simplify static calls of kvm_pmu_ops (2024-06-28 15:23:49 -0700)
 > 
-> The following changes since commit c1c8a908a5f4c372f8a8dca0501b56ffc8d260fe:
-> 
->    Merge branch 'vmx' (2024-06-28 22:22:53 +0000)
-> 
-> are available in the Git repository at:
-> 
->    https://github.com/kvm-x86/linux.git  tags/kvm-x86-static_calls-6.11
-> 
-> for you to fetch changes up to b528de209c858f61953023b405a4abbf9a9933da:
-> 
->    KVM: x86/pmu: Add kvm_pmu_call() to simplify static calls of kvm_pmu_ops (2024-06-28 15:23:49 -0700)
+> Thanks, indeed there was no straggler static_call() after applying
+> this.  However, there might be a problem: static_call_cond() is equal
+> to static_call() only if CONFIG_HAVE_STATIC_CALL_INLINE,
 
-Thanks, indeed there was no straggler static_call() after applying
-this.  However, there might be a problem: static_call_cond() is equal
-to static_call() only if CONFIG_HAVE_STATIC_CALL_INLINE, and arch/x86
-has this:
+No, I think you misread the #if-#elif-#else.  It's only the !HAVE_STATIC_CALL
+case that requires use of static_call_cond().  From include/linux/static_call.h:
 
-         select HAVE_STATIC_CALL_INLINE          if HAVE_OBJTOOL
-         select HAVE_OBJTOOL                     if X86_64
+  #ifdef CONFIG_HAVE_STATIC_CALL_INLINE
+  #define static_call_cond(name)	(void)__static_call(name)
 
-And indeed if I apply
+  #elif defined(CONFIG_HAVE_STATIC_CALL)
+  #define static_call_cond(name)	(void)__static_call(name)
 
-diff --git a/arch/x86/kvm/Kconfig b/arch/x86/kvm/Kconfig
-index 80e5afde69f4..d20159d4a37a 100644
---- a/arch/x86/kvm/Kconfig
-+++ b/arch/x86/kvm/Kconfig
-@@ -21,6 +21,8 @@ config KVM
-  	tristate "Kernel-based Virtual Machine (KVM) support"
-  	depends on HIGH_RES_TIMERS
-  	depends on X86_LOCAL_APIC
-+	# KVM relies on static_call_cond() being the same as static_call()
-+	depends on HAVE_STATIC_CALL_INLINE
-  	select KVM_COMMON
-  	select KVM_GENERIC_MMU_NOTIFIER
-  	select HAVE_KVM_IRQCHIP
+  #else
+  #define static_call_cond(name)	(void)__static_call_cond(name)
 
-KVM disappears from 32-bit kernels. :)  So I haven't checked but I
-suspect this breaks 32-bit?
+  #endif
 
-Paolo
+And per Josh, from an old RFC[*] to yank out static_call_cond():
 
+ : Static calling a NULL pointer is a NOP, unless you're one of those poor
+ : souls running on an arch (or backported x86 monstrosity) with
+ : CONFIG_HAVE_STATIC_CALL=n, then it's a panic.
+
+I double checked that 32-bit KVM works on Intel (which is guaranteed to have a
+NULL guest_memory_reclaimed()).  I also verified that the generated code is
+identical for both static_call() and static_call_cond(), i.e. the READ_ONCE() of
+the func at runtime that's present in __static_call_cond() isn't showing up.
+
+Dump of assembler code for function kvm_arch_guest_memory_reclaimed:
+   0xc1042094 <+0>:	call   0xc10ce650 <__fentry__>
+   0xc1042099 <+5>:	push   %ebp
+   0xc104209a <+6>:	mov    %esp,%ebp
+   0xc104209c <+8>:	call   0xc1932d8c <__SCT__kvm_x86_guest_memory_reclaimed>
+   0xc10420a1 <+13>:	pop    %ebp
+   0xc10420a2 <+14>:	ret    
+End of assembler dump.
+
+Dump of assembler code for function __SCT__kvm_x86_guest_memory_reclaimed:
+   0xc1932d8c <+0>:	ret    
+   0xc1932d8d <+1>:	int3   
+   0xc1932d8e <+2>:	nop
+   0xc1932d8f <+3>:	nop
+   0xc1932d90 <+4>:	nop
+   0xc1932d91 <+5>:	ud1    %esp,%ecx
+End of assembler dump.
+
+[*] https://lore.kernel.org/all/cover.1678474914.git.jpoimboe@kernel.org
 
