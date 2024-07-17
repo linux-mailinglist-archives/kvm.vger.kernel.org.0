@@ -1,208 +1,162 @@
-Return-Path: <kvm+bounces-21772-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21773-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 549BE933A54
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 11:50:42 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C3CA933DA3
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 15:31:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 779271C2123B
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 09:50:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C056DB21733
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 13:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F4617E900;
-	Wed, 17 Jul 2024 09:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B35313AF2;
+	Wed, 17 Jul 2024 13:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J3yCzcP+"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I2pDIpxC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF0C17E8E7
-	for <kvm@vger.kernel.org>; Wed, 17 Jul 2024 09:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC28B566A;
+	Wed, 17 Jul 2024 13:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721209823; cv=none; b=NqVbhi5wGOEzbFjwAAmQN5hJrcTkPRuZHdinD+/QAIway8AlrMWms8++Fc+8baHOGKFIngx8CmL8k75MeipI2EKbxrraQ9yOylatXVSnQCeyz/utVaGK1vrYox3p5UHYP3qIG6loTMteAES8Riyzg9P5WTXr1bh/W9/lQWoWcl4=
+	t=1721223071; cv=none; b=KzGFFwogiaQunxAbFIKprnea4LxSrR4aEAVodY+vYo13edOzpRHZzjsFHPCfG314VBJj/aeE4sE5HmT5F+0p7hzqQASw48+DwTYJHVO0LpfJpUx6U8cNwKJYiEeq20b1p3DGa3ocG0lWq5cmVZ3nHWJB+F6wY6pLAGUPzrTBzyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721209823; c=relaxed/simple;
-	bh=1GWDLi+rpH5kf8UEfpUbvHAag3ZG04JK6FiCae7FEdA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RoT1ZcDhDk7AEiILBcT5l2wwAtUEk3AYmSAyJw9U5lGA9LUqB0+ipzLkSazZSvKJWyh/WeHk8vp3Mgm8bmq3S46MWNZjohYt4KTiAWLnaSwI5B7hc0S3vjVw03pMXPL5mZ4OgzjHRQ4A8jwWfns2j16Nz6XRl2CmchCqzltA87U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J3yCzcP+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721209820;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=o5c0R7RDnqopCcCZP1eZaSuKmjpWay3dHbgxoGXMIDE=;
-	b=J3yCzcP+9Qcla6nU/PYnJ/d2eSrU7ObArsONX/iKvDAQhZPzpXGhYnNICzND3Lp0HoiDwr
-	3lmB6jxlDHjtXVVYhN02HS3rTzRa4izok4wYyEWwIaUR8MkuM2LaDzyb8gCSOir5CKW/We
-	kVMd54IV8ng+Ahff4UTwiPlfWLWr+UU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-552-ofoFApfjOx6A-5pUCJX1rw-1; Wed, 17 Jul 2024 05:50:19 -0400
-X-MC-Unique: ofoFApfjOx6A-5pUCJX1rw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3679ab94cdbso4128321f8f.3
-        for <kvm@vger.kernel.org>; Wed, 17 Jul 2024 02:50:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721209818; x=1721814618;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o5c0R7RDnqopCcCZP1eZaSuKmjpWay3dHbgxoGXMIDE=;
-        b=FxkLzFnbDXG0aL9xh4m5zrFPOQo/U9V98G7Cponm/wBcViuPWT4RYDYtoiR0vK1KO4
-         ksdojbvVbzGxBnCx3hCCbwpjIyYoJ9arLJ2k0Rb7V0KGZS0NzC47U6vesPukXQUsPVrb
-         RzS9JobLQ2VAYncKUvmHSpBEPuuG2FUrfZ4EOj6RDoKjKYwtvCdQ6BIY5ZewebRnSSYK
-         Ey97xSwtaMAb+Wu/TlcreQURvHPaxcTh6nfIylTrPzbg3EXKDeiFCAnIF/LHL4Eroth9
-         xQc3LouCwG5Lihde+RueNfXv7zfIg1wTepJKgDyGEQYoeJTuDcYyg1iyAjjvsoKueUfv
-         SqIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWUCaEeUs22Lb1kn6Q5c1qz4kOIPxd9qO3HHl7I5+NDpB9ruXP79KyRldqXlAyNgDo+M87sqXGiCbyk2XS2drjS8BOg
-X-Gm-Message-State: AOJu0YwBpLr8hybSN7YQ8E4idjjeaR3JbACLQMtWxbNFqTgqAPD7eC8z
-	yt9Spwp82jjFGnqNscN2gMq0hM/nysc5Mxl9mnX90vsIOHIkhRctIjllNivjjatnwvEOtcA5ljZ
-	e3O2QtAkM0pcUAIdeniPddQtvautStG0cbrm2ChJKgAQ5YxcbXQ==
-X-Received: by 2002:a5d:5385:0:b0:362:7c2e:e9f7 with SMTP id ffacd0b85a97d-3683165b58cmr950844f8f.32.1721209818155;
-        Wed, 17 Jul 2024 02:50:18 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEnZDMUmEl0a9ZjZlUyXEG0/8IGoPV7z2kmIum/zE5asvvqWw8BO8/MquAo8rD6ksuXJmeMVQ==
-X-Received: by 2002:a5d:5385:0:b0:362:7c2e:e9f7 with SMTP id ffacd0b85a97d-3683165b58cmr950822f8f.32.1721209817548;
-        Wed, 17 Jul 2024 02:50:17 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f6:360d:da73:bbf7:ba86:37fb])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-3680dafb939sm11239854f8f.89.2024.07.17.02.50.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jul 2024 02:50:16 -0700 (PDT)
-Date: Wed, 17 Jul 2024 05:50:13 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Srujana Challa <schalla@marvell.com>
-Cc: virtualization@lists.linux.dev, kvm@vger.kernel.org,
-	jasowang@redhat.com, vattunuru@marvell.com, sthotton@marvell.com,
-	ndabilpuram@marvell.com, jerinj@marvell.com
-Subject: Re: [PATCH] vdpa: Add support for no-IOMMU mode
-Message-ID: <20240717054547-mutt-send-email-mst@kernel.org>
-References: <20240530101823.1210161-1-schalla@marvell.com>
+	s=arc-20240116; t=1721223071; c=relaxed/simple;
+	bh=9/LX+FPC7nXVipMC+1Tbxx41tWTkMEJcT3a+DLYqWq0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FOc8cu8gHfGGYGYxVdFi5TLtOEY2bhTt3T8OA8cPPcpyIioKGecpNwwYDLcDvSOVScTtfo4NyjcdjvqZ5HJOIOUnJN8xse5si+tgvl0DIpeT7gAq7AfJ5fft7tnJZxyiJhukF/mYVJvUfXmGHgjxZhi2ec3ALQd47O2fNmQqxtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I2pDIpxC; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721223070; x=1752759070;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=9/LX+FPC7nXVipMC+1Tbxx41tWTkMEJcT3a+DLYqWq0=;
+  b=I2pDIpxC+Oe3tX49f1r1dfTW7TMq7cvkeS3gkR4y5+8aanzk57DcAYsa
+   8m7uAcFwa0Mspo4sWp4wmqoa6AayfWKBQYFbZpqXWyaMlqzSwWg2hhrdn
+   mbFXAxZ0ynJokNQLaztJzKkGLEHvYsLD8IhxsnbqcaU12Jhlttg+Fm9Hw
+   +zoD0Mcn7wmI2S+H+5/RJobXj8pFWfwUDs5nFsentBpoI3IehPdBE8GI1
+   tN8qFJFk0Gbv0wtKxuG+y6sbCFqHQFdnMdqFRa8mUVw7F8zx82pK/41LQ
+   y2jfb615xJcnH/RMwFCjRmfQ4tbfr5Ug1BFfeIy7l8jTnXuiGkDm9zdVE
+   Q==;
+X-CSE-ConnectionGUID: NiQp7ZP5TFORlfpUgnV7CQ==
+X-CSE-MsgGUID: Qxx9hkrQRC61rwtriiqOEg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11136"; a="29394816"
+X-IronPort-AV: E=Sophos;i="6.09,214,1716274800"; 
+   d="scan'208";a="29394816"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 06:31:09 -0700
+X-CSE-ConnectionGUID: aeF2PvNdTgmFzVErDR5kvQ==
+X-CSE-MsgGUID: BneAubfwT9+zUrpvrlYoVA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,214,1716274800"; 
+   d="scan'208";a="50266393"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.125.247.52]) ([10.125.247.52])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 06:31:05 -0700
+Message-ID: <8c783615-1e79-471d-b853-d654696fb782@intel.com>
+Date: Wed, 17 Jul 2024 21:31:02 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240530101823.1210161-1-schalla@marvell.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 21/49] KVM: x86: Add a macro to init CPUID features
+ that are 64-bit only
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Hou Wenlong <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Maxim Levitsky <mlevitsk@redhat.com>,
+ Binbin Wu <binbin.wu@linux.intel.com>,
+ Yang Weijiang <weijiang.yang@intel.com>,
+ Robert Hoo <robert.hoo.linux@gmail.com>
+References: <20240517173926.965351-1-seanjc@google.com>
+ <20240517173926.965351-22-seanjc@google.com>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <20240517173926.965351-22-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 30, 2024 at 03:48:23PM +0530, Srujana Challa wrote:
-> This commit introduces support for an UNSAFE, no-IOMMU mode in the
-> vhost-vdpa driver. When enabled, this mode provides no device isolation,
-> no DMA translation, no host kernel protection, and cannot be used for
-> device assignment to virtual machines. It requires RAWIO permissions
-> and will taint the kernel.
-> This mode requires enabling the "enable_vhost_vdpa_unsafe_noiommu_mode"
-> option on the vhost-vdpa driver. This mode would be useful to get
-> better performance on specifice low end machines and can be leveraged
-> by embedded platforms where applications run in controlled environment.
+On 5/18/2024 1:38 AM, Sean Christopherson wrote:
+> Add a macro to mask-in feature flags that are supported only on 64-bit
+> kernels/KVM.  In addition to reducing overall #ifdeffery, using a macro
+> will allow hardening the kvm_cpu_cap initialization sequences to assert
+> that the features being advertised are indeed included in the word being
+> initialized.  And arguably using *F() macros through is more readable.
 > 
-> Signed-off-by: Srujana Challa <schalla@marvell.com>
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Thought hard about that.
-I think given vfio supports this, we can do that too, and
-the extension is small.
+Very nice patch!
 
-However, it looks like setting this parameter will automatically
-change the behaviour for existing userspace when IOMMU_DOMAIN_IDENTITY
-is set.
-
-I suggest a new domain type for use just for this purpose.  This way if
-host has an iommu, then the same kernel can run both VMs with
-isolation and unsafe embedded apps without.
+Reviewed-by: Xiaoyao Li <xiaoyao.li@intel.com>
 
 > ---
->  drivers/vhost/vdpa.c | 23 +++++++++++++++++++++++
->  1 file changed, 23 insertions(+)
+>   arch/x86/kvm/cpuid.c | 22 ++++++++++------------
+>   1 file changed, 10 insertions(+), 12 deletions(-)
 > 
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index bc4a51e4638b..d071c30125aa 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -36,6 +36,11 @@ enum {
->  
->  #define VHOST_VDPA_IOTLB_BUCKETS 16
->  
-> +bool vhost_vdpa_noiommu;
-> +module_param_named(enable_vhost_vdpa_unsafe_noiommu_mode,
-> +		   vhost_vdpa_noiommu, bool, 0644);
-> +MODULE_PARM_DESC(enable_vhost_vdpa_unsafe_noiommu_mode, "Enable UNSAFE, no-IOMMU mode.  This mode provides no device isolation, no DMA translation, no host kernel protection, cannot be used for device assignment to virtual machines, requires RAWIO permissions, and will taint the kernel.  If you do not know what this is for, step away. (default: false)");
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 5a4d6138c4f1..5e3b97d06374 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -70,6 +70,12 @@ u32 xstate_required_size(u64 xstate_bv, bool compacted)
+>   	(boot_cpu_has(X86_FEATURE_##name) ? F(name) : 0);	\
+>   })
+>   
+> +/* Features that KVM supports only on 64-bit kernels. */
+> +#define X86_64_F(name)						\
+> +({								\
+> +	(IS_ENABLED(CONFIG_X86_64) ? F(name) : 0);		\
+> +})
 > +
->  struct vhost_vdpa_as {
->  	struct hlist_node hash_link;
->  	struct vhost_iotlb iotlb;
-> @@ -60,6 +65,7 @@ struct vhost_vdpa {
->  	struct vdpa_iova_range range;
->  	u32 batch_asid;
->  	bool suspended;
-> +	bool noiommu_en;
->  };
->  
->  static DEFINE_IDA(vhost_vdpa_ida);
-> @@ -887,6 +893,10 @@ static void vhost_vdpa_general_unmap(struct vhost_vdpa *v,
->  {
->  	struct vdpa_device *vdpa = v->vdpa;
->  	const struct vdpa_config_ops *ops = vdpa->config;
-> +
-> +	if (v->noiommu_en)
-> +		return;
-> +
->  	if (ops->dma_map) {
->  		ops->dma_unmap(vdpa, asid, map->start, map->size);
->  	} else if (ops->set_map == NULL) {
-> @@ -980,6 +990,9 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->  	if (r)
->  		return r;
->  
-> +	if (v->noiommu_en)
-> +		goto skip_map;
-> +
->  	if (ops->dma_map) {
->  		r = ops->dma_map(vdpa, asid, iova, size, pa, perm, opaque);
->  	} else if (ops->set_map) {
-> @@ -995,6 +1008,7 @@ static int vhost_vdpa_map(struct vhost_vdpa *v, struct vhost_iotlb *iotlb,
->  		return r;
->  	}
->  
-> +skip_map:
->  	if (!vdpa->use_va)
->  		atomic64_add(PFN_DOWN(size), &dev->mm->pinned_vm);
->  
-> @@ -1298,6 +1312,7 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->  	struct vdpa_device *vdpa = v->vdpa;
->  	const struct vdpa_config_ops *ops = vdpa->config;
->  	struct device *dma_dev = vdpa_get_dma_dev(vdpa);
-> +	struct iommu_domain *domain;
->  	const struct bus_type *bus;
->  	int ret;
->  
-> @@ -1305,6 +1320,14 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
->  	if (ops->set_map || ops->dma_map)
->  		return 0;
->  
-> +	domain = iommu_get_domain_for_dev(dma_dev);
-> +	if ((!domain || domain->type == IOMMU_DOMAIN_IDENTITY) &&
-> +	    vhost_vdpa_noiommu && capable(CAP_SYS_RAWIO)) {
-
-So if userspace does not have CAP_SYS_RAWIO instead of failing
-with a permission error the functionality changes silently?
-That's confusing, I think.
-
-
-> +		add_taint(TAINT_USER, LOCKDEP_STILL_OK);
-> +		dev_warn(&v->dev, "Adding kernel taint for noiommu on device\n");
-> +		v->noiommu_en = true;
-> +		return 0;
-> +	}
->  	bus = dma_dev->bus;
->  	if (!bus)
->  		return -EFAULT;
-> -- 
-> 2.25.1
+>   /*
+>    * Raw Feature - For features that KVM supports based purely on raw host CPUID,
+>    * i.e. that KVM virtualizes even if the host kernel doesn't use the feature.
+> @@ -639,15 +645,6 @@ static __always_inline void kvm_cpu_cap_init(enum cpuid_leafs leaf, u32 mask)
+>   
+>   void kvm_set_cpu_caps(void)
+>   {
+> -#ifdef CONFIG_X86_64
+> -	unsigned int f_gbpages = F(GBPAGES);
+> -	unsigned int f_lm = F(LM);
+> -	unsigned int f_xfd = F(XFD);
+> -#else
+> -	unsigned int f_gbpages = 0;
+> -	unsigned int f_lm = 0;
+> -	unsigned int f_xfd = 0;
+> -#endif
+>   	memset(kvm_cpu_caps, 0, sizeof(kvm_cpu_caps));
+>   
+>   	BUILD_BUG_ON(sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)) >
+> @@ -744,7 +741,8 @@ void kvm_set_cpu_caps(void)
+>   	);
+>   
+>   	kvm_cpu_cap_init(CPUID_D_1_EAX,
+> -		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | F(XSAVES) | f_xfd
+> +		F(XSAVEOPT) | F(XSAVEC) | F(XGETBV1) | F(XSAVES) |
+> +		X86_64_F(XFD)
+>   	);
+>   
+>   	kvm_cpu_cap_init_kvm_defined(CPUID_12_EAX,
+> @@ -766,8 +764,8 @@ void kvm_set_cpu_caps(void)
+>   		F(MTRR) | F(PGE) | F(MCA) | F(CMOV) |
+>   		F(PAT) | F(PSE36) | 0 /* Reserved */ |
+>   		F(NX) | 0 /* Reserved */ | F(MMXEXT) | F(MMX) |
+> -		F(FXSR) | F(FXSR_OPT) | f_gbpages | F(RDTSCP) |
+> -		0 /* Reserved */ | f_lm | F(3DNOWEXT) | F(3DNOW)
+> +		F(FXSR) | F(FXSR_OPT) | X86_64_F(GBPAGES) | F(RDTSCP) |
+> +		0 /* Reserved */ | X86_64_F(LM) | F(3DNOWEXT) | F(3DNOW)
+>   	);
+>   
+>   	if (!tdp_enabled && IS_ENABLED(CONFIG_X86_64))
 
 
