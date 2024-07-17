@@ -1,143 +1,105 @@
-Return-Path: <kvm+bounces-21767-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CF8A933678
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 07:52:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18AB093367E
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 07:59:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 493EB1C2288C
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 05:52:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92AECB22C50
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 05:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CAF125AC;
-	Wed, 17 Jul 2024 05:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D42FD125AC;
+	Wed, 17 Jul 2024 05:59:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JFBmh2kb"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="XAGXsWLX"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F07011712
-	for <kvm@vger.kernel.org>; Wed, 17 Jul 2024 05:52:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C395FB64C;
+	Wed, 17 Jul 2024 05:59:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721195569; cv=none; b=RM26UIPw5ASdBuDYpqI+8Q2PLoNHkEuaoAin/Uew9c3BQvZT1dBObhiyS6itSg3FM7hBGUyBnhiH+gDSLdlQOoJguUuzS39ujiYJIG6Y8h1BgxxiRMRXK3VP7FGRzRhzZfrvuF7iezh5WyWqQGp3jrHYRleaBggX8EXN2ScVhLU=
+	t=1721195979; cv=none; b=AyGnSivmE9vVETjkl6ECWWHODBM+1KP3lPt8z80Ly4oaezcUarZZv4VHIHzdhj7cwkoOfSZcaPA6pW912lPn2qV0SrKblnDgE+Dbd7q1UJWtTi74AiJ5qOH+eG1QrBppghja5Ato4st0phngSz4yLeBPbGR5So59Nn6o8SfR+0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721195569; c=relaxed/simple;
-	bh=jbDv2kJBBlDkv8+4hsFO2OhPFIfc5YdqywoZKhP9VSI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hoZKECnGDgYvpEUndWEDygU1/ZykJZ9AHs/Ev/ihFAQ8qBWqTzsoAOhQFJFHm8ZDhk1O9dByVUqGiXBykZRAlIS4mE2L723RfH7y9vujoshOhI/qQaean9ZTO6IL3xPhhTGI4O+0RpwS2/JgZ8MRMgjiK+JAYBuDqSlhIaFw+oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JFBmh2kb; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721195566;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=dxOxLFm7ulboJzaGoeAChNA+Hm0+lI4yNZyxfRZrDdA=;
-	b=JFBmh2kbWbgTnzbVmLHjiRfMNXimJCqcMhMsVDlS6p1TU1xccUnOEgp2sy2a5V9aOpEfKM
-	wi1sQ/hv3VUdqhlHsm2revD026rscLnxXhemdVZ/oUfBskaUQ9cg4edWcubWa4UuYb7I1M
-	CPqqz/OJuLGW4rThmBFq7K0fUX849uE=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-564-DUMD2B0LN0eyArz2ONfqrg-1; Wed, 17 Jul 2024 01:52:43 -0400
-X-MC-Unique: DUMD2B0LN0eyArz2ONfqrg-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-36796a0687bso4353053f8f.2
-        for <kvm@vger.kernel.org>; Tue, 16 Jul 2024 22:52:43 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721195562; x=1721800362;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dxOxLFm7ulboJzaGoeAChNA+Hm0+lI4yNZyxfRZrDdA=;
-        b=CJ1sh8p7rOYMl3y+tJU06FFUnlQEah+Z7QU/Yi6P9ZsNQqksofVXu3zpGdHAOLr2Vt
-         2ArKkUj2aHtX0k2ARqftIHPffs9mWFLa1oL+hU9XvPb4OtynhEMBOekSx0wwIgI1tMvg
-         8R0feBTrdILQikoWgwaV6EI3RllcyJG7GtKDmRWjIOMn//cXCVMYSM8yNi3Ic/askTVZ
-         1BJXwedVY8ik633ov7fp0IXGYb1Rl54Zrr/ryk/1Q7zJOiY66tuw8fxthnzdFu1Hggai
-         Xg3tJH1s10ckYek7TU8t4cies3iUlL7gM25gzokoOLcnpLHGvjI6PFhgy4BjCxTBSUtS
-         LqHA==
-X-Gm-Message-State: AOJu0Yx1hJa2ClSA4o14qQqzgg90v1ut8/fe4QNmU28VknkVRRXFJSBl
-	u4R7AGoP3NIpC5ARDohNsDxaTFhV5rhc6DpaJF8S6nfdXvl+HwKr+Zwdi7SzKmZhPvdx9bkF/jy
-	kMC7tdGnl+cA4jijdEvRT7gicenM5l6FFLPfkRhXGryUG5euwlw==
-X-Received: by 2002:a5d:5f53:0:b0:366:eadc:6ca4 with SMTP id ffacd0b85a97d-3683165bb31mr577683f8f.29.1721195562763;
-        Tue, 16 Jul 2024 22:52:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6iBlbfoQeF06cdSvntS53vlXJxZI2n0mbd4kjR6c99w0ly3xLz76UWy0O1r78QMYPyY1ARA==
-X-Received: by 2002:a5d:5f53:0:b0:366:eadc:6ca4 with SMTP id ffacd0b85a97d-3683165bb31mr577674f8f.29.1721195562375;
-        Tue, 16 Jul 2024 22:52:42 -0700 (PDT)
-Received: from [192.168.10.3] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-427a5e983e7sm155132075e9.23.2024.07.16.22.52.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 16 Jul 2024 22:52:41 -0700 (PDT)
-Message-ID: <4b0fd060-7095-46f2-840b-f5d88f94eecf@redhat.com>
-Date: Wed, 17 Jul 2024 07:52:40 +0200
+	s=arc-20240116; t=1721195979; c=relaxed/simple;
+	bh=FM8EFwD2/TJ0falNpFW9BxiynwMFJ50kPUTGUJcqeU0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=ASBYmXiNCKd7YEdY6jBjFCSlWNB3m2AIkOIZWX5W5dJSoqBdinzu1fmFFVisNcy3HpGTRXBQ3TRp2/kPQPSyi61Upxt0j2E1gEsQ86drbh99Nh0NgL5nx2pZcr7on65PA1ILLbfCJFsjw9PctGP7cecXyjBlKY7/nFAKLMmuo3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=XAGXsWLX; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1721195971;
+	bh=RtnpywVCtDzY8pnLNUzM/4KaVEPjw8JEzLEZSpW7oW8=;
+	h=Date:From:To:Cc:Subject:From;
+	b=XAGXsWLXJ9l5cdx41GiYZOmBWVkJYEKG/UqjDSFrZYGnfxKuLO87WrfRDlsDF1mAN
+	 Nu26IqN6rhZdmDjUQg7X5xP5ADk/15ov+nw9WSLt3XyaB5u0jrB6dhCa9Z/6miAZl+
+	 SzzQ5kBidkrqSR890fVFr/vN0eSkkHvRaj7cmJbmldrU6ea7mp4kgiEqQ3JOr9YfEb
+	 ySoaLrAO2pkGqkUcuRKaL0SaV40XUUBidNYIbOzXZKwoqGcZ7/qYHeHcOnrp2dCYNM
+	 u3HZmQuH5y8UfPZtpOYHQd6PxodZfkGBekKpv2/ITetIjcGKUc3SqrRTaar02YOTFv
+	 5b/fsIvbIzCxQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4WP4yV53DTz4w2K;
+	Wed, 17 Jul 2024 15:59:30 +1000 (AEST)
+Date: Wed, 17 Jul 2024 15:59:30 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Isaku Yamahata <isaku.yamahata@intel.com>, KVM <kvm@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build warning after merge of the kvm tree
+Message-ID: <20240717155930.788976bc@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [GIT PULL (sort of)] KVM: x86: Static call changes for 6.11
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240712235701.1458888-1-seanjc@google.com>
- <20240712235701.1458888-9-seanjc@google.com>
- <0f60918d-bc46-4332-ad28-c155a1990e3d@redhat.com>
- <ZpaV7kaVL1rj7MXj@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <ZpaV7kaVL1rj7MXj@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="Sig_/tXAYtBfsLPGBnTnfGEmMneL";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On 7/16/24 17:46, Sean Christopherson wrote:
-> No, I think you misread the #if-#elif-#else.  It's only the !HAVE_STATIC_CALL
-> case that requires use of static_call_cond().
+--Sig_/tXAYtBfsLPGBnTnfGEmMneL
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Oh, of course - the "select HAVE_STATIC_CALL" is right above the "select 
-  HAVE_STATIC_CALL_INLINE if HAVE_OBJTOOL" line.  I was definitely 
-overthinking it.
+Hi all,
 
-Paolo
+After merging the kvm tree, today's linux-next build (htmldocs) produced
+this warning:
 
+Documentation/virt/kvm/api.rst:6371: WARNING: Title underline too short.
+
+4.143 KVM_PRE_FAULT_MEMORY
+------------------------
+
+Introduced by commit
+
+  9aed7a6c0b59 ("KVM: Document KVM_PRE_FAULT_MEMORY ioctl")
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/tXAYtBfsLPGBnTnfGEmMneL
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmaXXcIACgkQAVBC80lX
+0GwMxgf+JBWpQHW70TDlVR4KE/HVILsKqoJ99H1qvgHXNqBrnUZM5Yv3vAAWCWh2
+wAphalOEpnUh4+yLgWBD9s/1zrWms4Mn4qCaOPHe6Fwsd1rxh8fgdVM8ZNurq5xk
+muGwzL9m5kpR6YGCEQgXjC9zOchyT2fTWXmVbya/KHP6jUcn9cpryFaFiSdK1Ez8
+baZVoOpo8kHfxkF7FQmkkN3gXNTeWjz9Y/sgtsATslr7Ni5vYbnj2WXzuXDpI6Sb
+tWbWB7HmjqvNDHjA7IRgEkvRQ/jcYqvlo977y5wQwp9C2LmaunPCtUkyyEN/0t2Q
+6/j6wKdikmjKlGs90STXzzOGZvqIrw==
+=u6Ej
+-----END PGP SIGNATURE-----
+
+--Sig_/tXAYtBfsLPGBnTnfGEmMneL--
 
