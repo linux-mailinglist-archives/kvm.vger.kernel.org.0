@@ -1,219 +1,153 @@
-Return-Path: <kvm+bounces-21796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21793-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9939934449
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 23:54:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 244D7934418
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 23:45:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0531283416
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 21:54:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF5B9282F98
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 21:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49AEC188CA9;
-	Wed, 17 Jul 2024 21:54:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA31D188CC1;
+	Wed, 17 Jul 2024 21:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="ckhdnhT2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HRM06IAv"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2072.outbound.protection.outlook.com [40.107.220.72])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E40F918509D;
-	Wed, 17 Jul 2024 21:54:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.72
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721253285; cv=fail; b=F1murSh2VJ4h0lNFFDKVpGXzaBMTlwJMqei8Jl3cmoiBYLd1r4LnRu5mClYWbwKUB/H19RqAwdH9XSXOhJrkrXGaV/tJri/CVr1DAYLJWffDT7ex6j3j3mkliT7iCPdKYBRytZQhixit3Y4opWpXw6yrYHOTas8tsMXrEDDuKlo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721253285; c=relaxed/simple;
-	bh=n6yHDiKXxvzB2MgO8DV0c9zvWhHiOkgYmSXsDmvfrfQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ScsENQ6+lbVzPiDX9I94SyQxJ5OE5a0D+nU4+uWh1+8bksOiAnd53VWk9lrRpsI4REzn8Mo/J5mDalCFdXxCc0h19fcE0o2moHtaL2biYA4oaDyxN+Gm1mcEx3kwBGCCatQA56t1mcfGq3Psw9nSY+Po+uV1CCoEZVam+GBoIUk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=ckhdnhT2; arc=fail smtp.client-ip=40.107.220.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=zLN1Ofbvwc99DsWf5N++ogxUo/SltoPX9WfiWBi/ZgHWNGoBbEp7m4u/voGGx1mfUnH9eUeXQhZSBES/qQ9mPyCyVXZNxGns8y5w/R8vIQ8Fwxq9nwwCrEaf0r/Le04kAOlZPQqjHTb7ZHBU9dzvi2OqnW622bk8VhSfSNFnOADOH+pwuEECC1xFrc/lN9xNuke+VCwIEJK0/8tnMgNXJQtqryyqWA0rfDtGWZR6jGMnqmM8bj+8A8ybGq38ze+vvR8vZAOesr7LzuyINir5SQ5aVSYGTnx79QAsTgsHukmWI6ghzhhtr4lLH+DI/OCDvVQw0hnRAbMGgyWu4ClkQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PqcIOsnmRazqtlKuqlNv7RxfDQOIO5SC3viGWntFP4c=;
- b=i4kAgrDLIAf1+RMDgM8fX5Dms6ENGVQxkoufj+jfQ4YGuL8gJwZpnqrTwCXkCZ5Bpdbi+1TM564tFgdJGCDOszYTWz6YHx/QGoZeHuyZdqiU73OEqJgshgB2TDUfSgvYn+k1KT5PQGZZ8ATzLvgYzRCRNiAIc1Abu3EkRwqbAp/AiPw22Twgh5hs6pczaDjrv/RugI2VQ2IW7kbH9waiOz1I/jhDW26jyHpKedaw6ordZBr4XpkNxG21JRtevvzBZRQJ8eNyW73wjDwCYIjX2zafYs3xm5lwVygi/vfStBRb12NfdUlgncbuzfp5j/eHoQitk03vapuoufWAj8OB4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PqcIOsnmRazqtlKuqlNv7RxfDQOIO5SC3viGWntFP4c=;
- b=ckhdnhT2PS4C3elEreamySoox1djl+Nj1uJF0XZP5LsUDeWcaVdleJSA4tFUfpbnm+OMStL5Epm8FIvhl5OHr8KalqmqnLXMIzLR3mozTpbVvsZNZa0PIVQxKRT4W9uqn99R99YiwzQfMHG42h1f+QNmLGCpd2BjIphtUXBn5/8=
-Received: from CH2PR18CA0018.namprd18.prod.outlook.com (2603:10b6:610:4f::28)
- by BY5PR12MB4051.namprd12.prod.outlook.com (2603:10b6:a03:20c::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.15; Wed, 17 Jul
- 2024 21:54:39 +0000
-Received: from CH2PEPF00000148.namprd02.prod.outlook.com
- (2603:10b6:610:4f:cafe::f3) by CH2PR18CA0018.outlook.office365.com
- (2603:10b6:610:4f::28) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23 via Frontend
- Transport; Wed, 17 Jul 2024 21:54:39 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF00000148.mail.protection.outlook.com (10.167.244.105) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7784.11 via Frontend Transport; Wed, 17 Jul 2024 21:54:39 +0000
-Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 17 Jul
- 2024 16:54:38 -0500
-Date: Wed, 17 Jul 2024 16:42:38 -0500
-From: Michael Roth <michael.roth@amd.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <seanjc@google.com>
-Subject: Re: [PATCH 08/12] KVM: remove kvm_arch_gmem_prepare_needed()
-Message-ID: <20240717214238.7qsws5ppqkdwtzqp@amd.com>
-References: <20240711222755.57476-1-pbonzini@redhat.com>
- <20240711222755.57476-9-pbonzini@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FE1188CA8
+	for <kvm@vger.kernel.org>; Wed, 17 Jul 2024 21:44:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721252672; cv=none; b=mudfR4qQ1wyLJrfIovQxT+sPFlriRynwjmJf7iMiXUf2SzCiWtfukVyZFeusSditaqAVVANrEK+aUhDlAOIH1fw3liGmFSOS8B2lqv/qz9dHU3/DNxHmEyGiGJ9DlBKt/Tiw1uBoi3FAmDIIZ5UCOtf151KTLDRtD2L+SEcbb7U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721252672; c=relaxed/simple;
+	bh=nm1sn8H+UwA2gzDfCfCPgna/4ZDRkMbtFZ/jJS2k4dY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=L9wwebJ1qvpiBHqzRclS6ZUmCU/7z+zN+135N1szMgp88c491G7zNvzxMDuZQ/CybBoQUYpdF0y7NCL6/qbh9MOEtwhOR7WyjGXzoTO9m713c1A6eoGzzYj0g3mORWBcxM6K7s5s9cltgJuJGArUXeF3TsYpnOziDWKaj43Biy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HRM06IAv; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721252670;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+wjxz20iy8G2qBsoFEZ2vcnJOu/C66k+kPs/38ZB7V8=;
+	b=HRM06IAv+K4caEO/Jfu3J0KLvy1sma7fZuNJ/eiSLLdW+Z7kLdsml0JnutnNAbLXeTJUwf
+	Lv6QdRo0eO+0EJzlgJ92FLHrx+ao+YLBqmGswXFkA53vnBe2R233DmtclLRFWoHPTv5qfP
+	cn4MUS64L9vl+kavou9gA+/+Blg7630=
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com
+ [209.85.166.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-619-0ehJ_mhwOtG96-Hpbads1w-1; Wed, 17 Jul 2024 17:44:28 -0400
+X-MC-Unique: 0ehJ_mhwOtG96-Hpbads1w-1
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7fc9fc043eeso15405539f.3
+        for <kvm@vger.kernel.org>; Wed, 17 Jul 2024 14:44:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721252668; x=1721857468;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+wjxz20iy8G2qBsoFEZ2vcnJOu/C66k+kPs/38ZB7V8=;
+        b=fv3PSzED6dNK3tcti/uyPCKMmV8y7ei0WuxU8yQ2cElp4RokX5UKEKffdugW5Jg9Iq
+         yZiSRWRc5GkIeDi8u08XigKfutLyrPLzFSZRjMiq2dZFuaTBMKQ2f0/joedYWYxSzyv2
+         G7K+4rOc6DA0BbXhpPZpD9nZEIjjgp59b1is7WVPI2T57KjdVc2A42GRdqqVlkyhhXfp
+         c7IXWJgPouirgkSyjY6BXLqd/qTVP28iaTusvSotHFE9FLAmOn9NZs3KT9tHunqk2KZL
+         zd6kUjgKo4BH6nK0iB8fd12i543NRatq4xk83b7N2jiMFPvROI3gMizEiSx1Y347NMcr
+         hQSA==
+X-Forwarded-Encrypted: i=1; AJvYcCV9NYmYBaLw6uiivj8dbvLFwLTAFnb04oH0zFbhFruQ2Vdzxy43WAdRKR0h4sheBeCiAsHwve7uxfrGE9zyflZ3Q+JZ
+X-Gm-Message-State: AOJu0YwyC3O5FkFO+jSCQhCCbcy2i9N/3iCGXxawwJJonSzt9TroViXU
+	Een+6MIKrvTacuY0EUBbkFp8uugF+fJjNDG6oQEv+WgTGmfaVn9oP9JBgY+nnumZnLYLSEzHMbF
+	6zn/epdI+VLWIOhhicpxqR30Bi3tonfCERInNqgDbdUMlfVg4cA==
+X-Received: by 2002:a05:6602:2c92:b0:7f6:20d2:7a96 with SMTP id ca18e2360f4ac-81711e18b30mr344228239f.14.1721252668207;
+        Wed, 17 Jul 2024 14:44:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEg3w+Houb1Be8pF3Zf31Isom/zcA7zD4gXvl4BNJsg1iNrkpkV/hEYMiAVNuTjdPIuOyIyVA==
+X-Received: by 2002:a05:6602:2c92:b0:7f6:20d2:7a96 with SMTP id ca18e2360f4ac-81711e18b30mr344226539f.14.1721252667843;
+        Wed, 17 Jul 2024 14:44:27 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4c210ff4c3bsm961063173.171.2024.07.17.14.44.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 17 Jul 2024 14:44:27 -0700 (PDT)
+Date: Wed, 17 Jul 2024 15:44:25 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Axel Rasmussen <axelrasmussen@google.com>
+Cc: stable@vger.kernel.org, Ankit Agrawal <ankita@nvidia.com>, Eric Auger
+ <eric.auger@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian
+ <kevin.tian@intel.com>, Kunwu Chan <chentao@kylinos.cn>, Leah Rumancik
+ <leah.rumancik@gmail.com>, Miaohe Lin <linmiaohe@huawei.com>, Stefan
+ Hajnoczi <stefanha@redhat.com>, Yi Liu <yi.l.liu@intel.com>,
+ kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 6.9 0/3] Backport VFIO refactor to fix fork ordering bug
+Message-ID: <20240717154425.43437eea.alex.williamson@redhat.com>
+In-Reply-To: <20240717213339.1921530-1-axelrasmussen@google.com>
+References: <20240717213339.1921530-1-axelrasmussen@google.com>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240711222755.57476-9-pbonzini@redhat.com>
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000148:EE_|BY5PR12MB4051:EE_
-X-MS-Office365-Filtering-Correlation-Id: c090015b-bbaa-4443-76c5-08dca6ab0ea2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?v/y5mcEgvxoKq9lXgXj/bdFAcCOg+M63TpPc8T4yODMNbFVb12g07sphGzb0?=
- =?us-ascii?Q?mb04BztFKN2ovAoyZKydQzVDjJfFoZ3lCpRdj3ZRdMfQo8MlNFKaomWUQ0sN?=
- =?us-ascii?Q?9r0oVSMbjPQMRp2pXWps2Jo9ir9XLK2ZPEcM7IxpCVJdVnPkazIK1OWQWCho?=
- =?us-ascii?Q?LjDVfgq4P3OpHfDyEfTyzaGjenpnxvYv7F8g2/rZxs9/R85CZjGvOqLfh3jz?=
- =?us-ascii?Q?vTwUCjBTsEKxb3IANOBGuc/akq1ow979Ixx69MQZOb+VtI1LsQzet7jbNlww?=
- =?us-ascii?Q?dK8ORtWiv8VVI19/4w+kH16xQ7MPdJCa3ppQWGlda/sSx5yUMxSh6xMMDMeR?=
- =?us-ascii?Q?d7/LcS8Gid7/wIchsuL5oxp0jVKc3kUp2Yq7vpsxHWc0lz2ucFd9o1wKQlrD?=
- =?us-ascii?Q?IuvWoBhrYN0z5yo/kv68nxyESDynOSTW4I3/gbvEcbq8lTmngeNf3REm0RX9?=
- =?us-ascii?Q?56CK2v92IM+u5TPP9CISVJfj0ru0HCB731Y7wEpuSydBNNq4IH4i/G8uGmUT?=
- =?us-ascii?Q?IqnWSEhiPv1xUucuk7BXsWKhroeVLGv8/AsZBxw0DjvJJJgz9s+ImLkguH/s?=
- =?us-ascii?Q?MaEyqQPGHr877d1ZAtyQ/yHslt4VtvMHtv5h6LIG8mdMRPgEu/25Dyt25qZV?=
- =?us-ascii?Q?+hbArT+FsL7RQdA8XZE9Kw29ywQktNdg0ohnGkKK+c4AtlbvpSfZchGGhiYR?=
- =?us-ascii?Q?TTxYoYDdfrAi0oVUtc5U88UNgA+bY1TLB+M25KiG1duWDvAO7ToXnb9nU9/6?=
- =?us-ascii?Q?wPHoNoxUNqcRjCRTbSBYX7BAY2RTbcSfjJZItiAOSD+ttOWTlBBJCVjsgpGx?=
- =?us-ascii?Q?0qwNwvvbFM/iUiB7SBdGa2dKMvhvWq30OPq8FuV7K+DP4430KsyttR9AXkMJ?=
- =?us-ascii?Q?lc6QhFPPPj5jZ/fhoyujTczNjvxf4pbxcDNFA5D6UA1Q1twdzL+sObPjJhGj?=
- =?us-ascii?Q?KFBe1RezfLHNjLOBLNOSE+vIZD1pit05DVKlucK9NEYIRFZrrVSYt84sq8Mi?=
- =?us-ascii?Q?VEJcyELzxryJ4Fd8WsavAfS7dckCEfbYCHzXYZr0n6uqprH8USRS0nqdOmxl?=
- =?us-ascii?Q?9ItKo/deUZNp70eUr83/Ss3IembGdEbwj7KpG3T+lRTQLB5jqyVTX/emgEsw?=
- =?us-ascii?Q?Lrt2/WYzRQgKN6cpupIeIAyOy60j5wbWU5d1XbWH8zt80QSunIlL0jX9JChD?=
- =?us-ascii?Q?H4b35KjMlR3Ix6ZbxnEHDNLA2nLdaVucrVU6K/oPNVfBsiQZNOGQs9Fhz3K+?=
- =?us-ascii?Q?eyXa5wEJYm6OqKNKzUmv2TsvxuPuwIo+JA54FnaVfIfChnnuw+IQllaZ3+U4?=
- =?us-ascii?Q?rTalkbokgj8CoNjCXjq86ElBts1hbMMc/aiRppsNhxhRpF4UELPTY9f0h65U?=
- =?us-ascii?Q?fi98JEhRg7xDlBtmbLKSM4AoZU+mP1cIDpXT/zYZp79Z8wIar/yyA+iIhERp?=
- =?us-ascii?Q?CGR0nIMe7UBQ8jYmBQoCNfV56nmJfhvy?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2024 21:54:39.3976
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c090015b-bbaa-4443-76c5-08dca6ab0ea2
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000148.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4051
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jul 11, 2024 at 06:27:51PM -0400, Paolo Bonzini wrote:
-> It is enough to return 0 if a guest need not do any preparation.
-> This is in fact how sev_gmem_prepare() works for non-SNP guests,
-> and it extends naturally to Intel hosts: the x86 callback for
-> gmem_prepare is optional and returns 0 if not defined.
+On Wed, 17 Jul 2024 14:33:36 -0700
+Axel Rasmussen <axelrasmussen@google.com> wrote:
+
+> 35e351780fa9 ("fork: defer linking file vma until vma is fully initialized")
+> switched the ordering of vm_ops->open() and copy_page_range() on fork. This is a
+> bug for VFIO, because it causes two problems:
 > 
-> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
-> ---
->  arch/x86/kvm/x86.c       |  5 -----
->  include/linux/kvm_host.h |  1 -
->  virt/kvm/guest_memfd.c   | 13 +++----------
->  3 files changed, 3 insertions(+), 16 deletions(-)
+> 1. Because open() is called before copy_page_range(), the range can conceivably
+>    have unmapped 'holes' in it. This causes the code underneath untrack_pfn() to
+>    WARN.
 > 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a1c85591f92c..4f58423c6148 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -13604,11 +13604,6 @@ bool kvm_arch_no_poll(struct kvm_vcpu *vcpu)
->  EXPORT_SYMBOL_GPL(kvm_arch_no_poll);
->  
->  #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_PREPARE
-> -bool kvm_arch_gmem_prepare_needed(struct kvm *kvm)
-> -{
-> -	return kvm->arch.vm_type == KVM_X86_SNP_VM;
-> -}
-> -
->  int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order)
->  {
->  	return static_call(kvm_x86_gmem_prepare)(kvm, pfn, gfn, max_order);
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index eb8404e9aa03..f6e11991442d 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -2443,7 +2443,6 @@ static inline int kvm_gmem_get_pfn(struct kvm *kvm,
->  
->  #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_PREPARE
->  int kvm_arch_gmem_prepare(struct kvm *kvm, gfn_t gfn, kvm_pfn_t pfn, int max_order);
-> -bool kvm_arch_gmem_prepare_needed(struct kvm *kvm);
->  #endif
->  
->  /**
-> diff --git a/virt/kvm/guest_memfd.c b/virt/kvm/guest_memfd.c
-> index f4d82719ec19..509360eefea5 100644
-> --- a/virt/kvm/guest_memfd.c
-> +++ b/virt/kvm/guest_memfd.c
-> @@ -29,16 +29,9 @@ static int __kvm_gmem_prepare_folio(struct kvm *kvm, struct kvm_memory_slot *slo
->  				    pgoff_t index, struct folio *folio)
->  {
->  #ifdef CONFIG_HAVE_KVM_ARCH_GMEM_PREPARE
-> -	kvm_pfn_t pfn;
-> -	gfn_t gfn;
-> -	int rc;
-> -
-> -	if (!kvm_arch_gmem_prepare_needed(kvm))
-> -		return 0;
-> -
-> -	pfn = folio_file_pfn(folio, index);
-> -	gfn = slot->base_gfn + index - slot->gmem.pgoff;
-> -	rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, folio_order(folio));
-> +	kvm_pfn_t pfn = folio_file_pfn(folio, index);
-> +	gfn_t gfn = slot->base_gfn + index - slot->gmem.pgoff;
-> +	int rc = kvm_arch_gmem_prepare(kvm, gfn, pfn, folio_order(folio));
-
-Looks like this hunk was meant to be part of a different patch.
-
-Otherwise:
-
-Reviewed-by: Michael Roth <michael.roth@amd.com>
-
--Mike
-
->  	if (rc) {
->  		pr_warn_ratelimited("gmem: Failed to prepare folio for index %lx GFN %llx PFN %llx error %d.\n",
->  				    index, gfn, pfn, rc);
-> -- 
-> 2.43.0
+> 2. More seriously, open() is trying to guarantee that the entire range is
+>    zapped, so any future accesses in the child will result in the VFIO fault
+>    handler being called. Because we copy_page_range() *after* open() (and
+>    therefore after zapping), this guarantee is violatd.
 > 
+> We can't revert 35e351780fa9, because it fixes a real bug for hugetlbfs. The fix
+> is also not as simple as just reodering open() and copy_page_range(), as Miaohe
+> points out in [1]. So, although these patches are kind of large for stable, just
+> backport this refactoring which completely sidesteps the issue.
 > 
+> Note that patch 2 is the key one here which fixes the issue. Patch 1 is a
+> prerequisite required for patch 2 to build / work. This would almost be enough,
+> but we might see significantly regressed performance. Patch 3 fixes that up,
+> putting performance back on par with what it was before.
 > 
+> Note [1] also has a more full discussion justifying taking these backports.
+> 
+> [1]: https://lore.kernel.org/all/20240702042948.2629267-1-leah.rumancik@gmail.com/T/
+> 
+> Alex Williamson (3):
+>   vfio: Create vfio_fs_type with inode per device
+>   vfio/pci: Use unmap_mapping_range()
+>   vfio/pci: Insert full vma on mmap'd MMIO fault
+> 
+>  drivers/vfio/device_cdev.c       |   7 +
+>  drivers/vfio/group.c             |   7 +
+>  drivers/vfio/pci/vfio_pci_core.c | 271 ++++++++-----------------------
+>  drivers/vfio/vfio_main.c         |  44 +++++
+>  include/linux/vfio.h             |   1 +
+>  include/linux/vfio_pci_core.h    |   2 -
+>  6 files changed, 125 insertions(+), 207 deletions(-)
+> 
+> --
+> 2.45.2.993.g49e7a77208-goog
+> 
+
+LGTM
+
+Reviewed-by: Alex Williamson <alex.williamson@redhat.com>
+
+Thanks,
+Alex
+
 
