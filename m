@@ -1,158 +1,151 @@
-Return-Path: <kvm+bounces-21802-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF9A69344D7
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 00:32:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 078D69344EB
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 00:50:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5815DB21AA0
-	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 22:32:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3417E1C21603
+	for <lists+kvm@lfdr.de>; Wed, 17 Jul 2024 22:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965D34F218;
-	Wed, 17 Jul 2024 22:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C18558A5;
+	Wed, 17 Jul 2024 22:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E/YEt22p"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="j77I5uEC"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2046.outbound.protection.outlook.com [40.107.223.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1450D1B974
-	for <kvm@vger.kernel.org>; Wed, 17 Jul 2024 22:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721255509; cv=none; b=rLBn3K4Adc9dX/+Ux8nvrlRBFNQ5+GFEKw0mPVmj9YPy2QDeQrfhvA8AHQa+bVMJonq+zkaIBKm9qmwAVyXYKw2sELp8zG3wYQeGdpcUSGwNBkOjkDxymnihsnxi+naGN5U/P4N3iv9C4svq2o6R8qlZGcovjE0Uf46iQEfKzJ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721255509; c=relaxed/simple;
-	bh=ZeVb4NV1UtDsKj/hoB610U1gFo/rAq+Zrk+VLQva224=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fngkKY45ZG78ejqxqdljH9G92jj95TzpEVDyT2jLQME8t/mA15Pehde6BS/x7BnYQL1CvH7RawYsw0qGmlVv3ORsW59CTjnMmLFhzP1hRop65l2SYuFprX6LtG+j9AdxKa3fmhnUHtKsPRgg1OfafCe2HXkF4j47Ix8TBBYEYvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E/YEt22p; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721255507;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JBsCYjvHFqCofeJfqJ0FDpq4lR84OryByqZWEVkFAUs=;
-	b=E/YEt22prWZzu2ECYMGb9An6VXIMMSyX2/fVsZfr+goRiM+c2e95bDBxXy8nPVl9vQuOn7
-	0vIHrUoscdyULVQh8ss07TJ8JBAVGMQDrXrryTNQL4l7C4KhNl+d4XNrBtgdMhszJPYHHU
-	9Q9Fg5ECexuLyboiCnm2VdROHNZoZoc=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-490-UT06Oq6uMH-NUm_XeNRU-g-1; Wed, 17 Jul 2024 18:31:45 -0400
-X-MC-Unique: UT06Oq6uMH-NUm_XeNRU-g-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7f92912a614so22806939f.2
-        for <kvm@vger.kernel.org>; Wed, 17 Jul 2024 15:31:45 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721255505; x=1721860305;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JBsCYjvHFqCofeJfqJ0FDpq4lR84OryByqZWEVkFAUs=;
-        b=dim9k4MOPmppbPN0kjiSFq6RXWQwakBPi1l4pIlOP8AbRZAEMLuBh2o8Xn1PABgxiN
-         fBXEMvBrylO+Anu9cceLB1/euFAvad7Gm2rOEg9q6JFpaJTAs/tThmoqgmH5DtLy6lW3
-         zE9cSKh4Tfw+yM5SaiOcFVimjTgHvZE3aaUMyN5qGEpjrPqpCaghUWlTjYNNEtkNdcmn
-         DXpiV7X2zDY6V5WhHUCQpexNlI0ZHfGSmkHzv7zhfM4EOo8HfZRle49+XVmoXGPKY6n8
-         brombbVpDFYFC/L9nIa6bgiJS8kEhXzrhKFlWAffiv0PW7/YLT+2q+0BlWVmXSEs69/+
-         ITFg==
-X-Forwarded-Encrypted: i=1; AJvYcCVx0pF5C6EFRoBtwEteHN8LTC4ffnh3M7uw/KlpDncPzm1T7DSU0wAXGEqu6z82sc7dcUrooI/5F9Duddfcy7SBQslY
-X-Gm-Message-State: AOJu0Yxa57x5BWR8uQfJfUEp+fyqYLYoPXgC/Vl9mk108I6VtAPjTrrC
-	FstXtsVMn+6e6MyAq7tVq/wv6/wJG70vhZh8HxL2GeRxZlVR4+YTKDPtn9vIaTJ+fg1FibYV1Ta
-	3DAvjC5oRefdi4+TZqFljwN8nfApMWtV1kW51HpvOcjUbb3q4og==
-X-Received: by 2002:a05:6602:29c2:b0:806:2e60:d169 with SMTP id ca18e2360f4ac-817123e1c6fmr434707839f.17.1721255505090;
-        Wed, 17 Jul 2024 15:31:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGPb97hbNXON2ByzzRKRynxRHlbiYrD3yDjp2uo84hIKMI6iQ+GFeGYUQQkaZREiI+LQxB6iA==
-X-Received: by 2002:a05:6602:29c2:b0:806:2e60:d169 with SMTP id ca18e2360f4ac-817123e1c6fmr434705739f.17.1721255504742;
-        Wed, 17 Jul 2024 15:31:44 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-816c17c5044sm92133839f.19.2024.07.17.15.31.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Jul 2024 15:31:44 -0700 (PDT)
-Date: Wed, 17 Jul 2024 16:31:43 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Axel Rasmussen <axelrasmussen@google.com>
-Cc: stable@vger.kernel.org, Ankit Agrawal <ankita@nvidia.com>, Eric Auger
- <eric.auger@redhat.com>, Jason Gunthorpe <jgg@ziepe.ca>, Kevin Tian
- <kevin.tian@intel.com>, Kunwu Chan <chentao@kylinos.cn>, Leah Rumancik
- <leah.rumancik@gmail.com>, Miaohe Lin <linmiaohe@huawei.com>, Stefan
- Hajnoczi <stefanha@redhat.com>, Yi Liu <yi.l.liu@intel.com>,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 6.6 0/3] Backport VFIO refactor to fix fork ordering bug
-Message-ID: <20240717163143.49b914cb.alex.williamson@redhat.com>
-In-Reply-To: <20240717222429.2011540-1-axelrasmussen@google.com>
-References: <20240717222429.2011540-1-axelrasmussen@google.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9EA51016;
+	Wed, 17 Jul 2024 22:50:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1721256636; cv=fail; b=h1ANKI9+aTJ5JWTDAMU9msmJR9gA/cPayZNbXKPu0Xu3VNJKiX3Uk4s9YeqDvH4yzKXvs4yDUH7X1RE6uev+MOWVXLcFbUJPqjzx0JHffh79uazgmgfNKJMcsQIAlCewAU7MF61ocquKiyOTZCI9dLtE7XVfW4RyTueAUw6gpJw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1721256636; c=relaxed/simple;
+	bh=zZSlTR43/YIpSIAui7zR3HxNAJhJO8oaPjdYnYwq5kg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ULMjeOUqoom1hjt5yonaumtERm/+J/XRmjsYh+m2lAqnkCk7FUXI2tH6GfGuZKxnQsadEx47kbgks0pkAcqwNDn/Fmo840Ej4i9IYJ5skVB1N6Qi+7VLFS86xHbwpHMJGUNUFq7ZnulPZ0bJqe0KltcU7zviDPH8UhFmPIOe9A0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=j77I5uEC; arc=fail smtp.client-ip=40.107.223.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GP60237fftCBnvoTS5EJaQLX7NMlxlVwAAqad+Qyo3z2zjwfQ16/KDSQ05JyC5gjKb0T5zAMoXsbO5aCe6+7TgK/hCYaNXjs7YW1MrEEv44CCfiRjbTctgpMEDZ/Es1TqzngnhOLTBHd1QnXAF1Xz/nLH9lQU99wOEFR8Rqa2gLEathcPKTwep6LlqBiE3VdMR50BJS9Wflj2NKg707wYWHYsGlnp9baxv4D3p/M4IH7qpwnwRHttCFA1V/6jlzG5SZFfe3AtlPInVAjUXyOeOarZ4TiBIUdpNzoA7nXuqNn8/AxcJI0755b4eHAxsG0VnvfSxPHjQWDBmIsSRmHsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=18bv92qzYgjvG1XjgbGBEG0ISHZ9GXoEj2mSoF4xdoE=;
+ b=EZUS8JkH47MZpNKwnZucm7DDLBX2JGf+ld9RfrshL581Dk7sPHF314pflXmyN+2X/CQhg4rKR1iIme1I6/MzgzH3EeHI+mnXylKtOdCPJ0skUSRqQce/Q4ED/y6UtG8WUpTcMs1IWzFi/czollRwSoYKFfeuMoyqzHxXRmv3BUjl2Mlv52co+Eq4oidYmU6qCTecYrjXYQbdRuYHh8tGDi3A9nR3vc9J6i/VukkmnlRvFQtBWXLxR6zlfkOMrEF+phv3rwOHgsZnk6AWMf5w2RiY5+J65wLmmzbW+moEfhUZvCrqmr/J562tZFBuQTADRhZKLR5dbkyMpAhoo9dXaQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=18bv92qzYgjvG1XjgbGBEG0ISHZ9GXoEj2mSoF4xdoE=;
+ b=j77I5uECqKtu4KtsthphRE1e4nSYQc8NGa5O3K+V4N1NXAW6dI900qgmPoV+7h88pKhSvq/9mJm0b2qnphV/nvKPa5i5ys16+Q5WTYb2LB0tMHLAraFW0E7p4ywMYBYKeLf6lbOhi/MOmBXqVhoNPJWji7IwBs0uAexwdTHILZ0=
+Received: from SJ0PR13CA0080.namprd13.prod.outlook.com (2603:10b6:a03:2c4::25)
+ by SN7PR12MB7227.namprd12.prod.outlook.com (2603:10b6:806:2aa::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28; Wed, 17 Jul
+ 2024 22:50:32 +0000
+Received: from MWH0EPF000989E8.namprd02.prod.outlook.com
+ (2603:10b6:a03:2c4:cafe::d5) by SJ0PR13CA0080.outlook.office365.com
+ (2603:10b6:a03:2c4::25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.15 via Frontend
+ Transport; Wed, 17 Jul 2024 22:50:32 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ MWH0EPF000989E8.mail.protection.outlook.com (10.167.241.135) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7784.11 via Frontend Transport; Wed, 17 Jul 2024 22:50:31 +0000
+Received: from localhost (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 17 Jul
+ 2024 17:50:30 -0500
+Date: Wed, 17 Jul 2024 17:32:18 -0500
+From: Michael Roth <michael.roth@amd.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+CC: <linux-kernel@vger.kernel.org>, <kvm@vger.kernel.org>, <seanjc@google.com>
+Subject: Re: [PATCH 11/12] KVM: extend kvm_range_has_memory_attributes() to
+ check subset of attributes
+Message-ID: <20240717223218.nmgpx5u3asjdmqbj@amd.com>
+References: <20240711222755.57476-1-pbonzini@redhat.com>
+ <20240711222755.57476-12-pbonzini@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240711222755.57476-12-pbonzini@redhat.com>
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MWH0EPF000989E8:EE_|SN7PR12MB7227:EE_
+X-MS-Office365-Filtering-Correlation-Id: 992c1783-340f-4d4b-7fc9-08dca6b2dce2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?N1sxlpI7gLSI/jsTrJ75aXAsmBJj+4GtT2uF0grYNpaEfE+cC68eER71yU9P?=
+ =?us-ascii?Q?haTylzhom+Qe2d6WLF/BrhP5DxawVExJXgUGKmhz6nQCYvUEClqSfEdOhwLT?=
+ =?us-ascii?Q?mT7a3WKi8tpUq0i9GA18zT6z2rfZcmjhx5Gw6LcCxwbDWTnB2T7Yaxzb8jdE?=
+ =?us-ascii?Q?2EEoXt3FlkJX60KxT5Ro7N4W4FKWL5qo4Eu9jQNQ4cUx0/SBu9/CgjOJjAkj?=
+ =?us-ascii?Q?cnJ8eOwJW3hm8ClUdVcz6uvARTznyVfl9W+pwA3O4FCyd1oK9gSgnB3L8JP2?=
+ =?us-ascii?Q?6oyiAAYBUzYzTpJcKeiYkpXAHWA2SrInJyHj7QhHP3hWyvakba3+z7Q0OGAw?=
+ =?us-ascii?Q?Fq8HNRj8aZYXgwJcCUCUYOAO6c0z6CJfrFwmG1QaZbxAmRukRFbOTH7TAkUY?=
+ =?us-ascii?Q?q/cN412s1mJBR4wsT7t0DSt36667GrZ4PWwfpuP46vD+xFv+jixjqwUdqmLv?=
+ =?us-ascii?Q?7vGjK76PfLDZjHIREmx33CkykeNFWeoN+Oaf7hASpV9OoB7f98D6aLqbnzXR?=
+ =?us-ascii?Q?NYkGxcjtqHsDxGdy5dEcynRvYsDPrKA0rLQVM9BpjD+ZaCVtFCr37hYIpVPm?=
+ =?us-ascii?Q?uyjI/ZxrqGKw6TTpjlFIreuAguFvFpH4tjI5z0zVx0k+FtAqY64ok8lGGf7F?=
+ =?us-ascii?Q?OEkJlSG41DW3x6DRzYX3qG2MkBb5W7PvHftKZkjV746t+GOQ52ailecZ64db?=
+ =?us-ascii?Q?/kBBmdmQ8sGV2kyCp1hr1wwN12YBgEfSmsywTTyyoWHs9GG1YjwiRJbgCcVl?=
+ =?us-ascii?Q?0PT7haDFeizBflmO4mqCbt4GjvZlnfrnrUhw9XLYxC1KNdxfeJXwFF30nX6c?=
+ =?us-ascii?Q?9H6WdAPcg/LzW7RoGfkA3j4eppd9haepXcONyVTwFwVtNruIF9XpdcHnx7j9?=
+ =?us-ascii?Q?koZAjoUBjL+YEqpzECWL0dtxoET7ILvJo+1sXfP8BMmlCjb6KylckCBfnS2O?=
+ =?us-ascii?Q?P6PejyiBS+uZL9YdkhaXZd/Vtfyn5ezg2ze19K6X/fle2Mu9z0HwzCl/Zyg0?=
+ =?us-ascii?Q?IQDs/6or1nY2yJ7wmTLwzPImS3pyQj06LyhK3ImouqeGAcExiNAqvLpZE9or?=
+ =?us-ascii?Q?bgQ4uLjUDxkOGg7iCcpInC1qnMCkHe22RkKuqG0LBEj+eTVfXY0HdnbRh8MU?=
+ =?us-ascii?Q?fmzp6QFswD8nMljoAE+l/wNdoXPDACEPkN16cIOYPtkiaGPG7GE7gdySaRL7?=
+ =?us-ascii?Q?OojNDb7a7WSbyubfyiQ68FhKMzUhhu/c+zqpA7F6HpKD1mbc6ydwJUwVF1rD?=
+ =?us-ascii?Q?S85xIbyTgRrTfBNr6WXMIfbD3MYPvNwv7FBvHIT7rIcEFLoaBwcWeeUBS5n/?=
+ =?us-ascii?Q?Mi+d0lAs12WEQOPMlqSCnQdLx9z/NbDWM2l34sSbTbCUVcMGLnoLMchvkZtH?=
+ =?us-ascii?Q?O/ItDxCwMF5z9WScrlNV53WWA1HLI25cU4QVoEjwzjuB/TpGRkirjLptpwGm?=
+ =?us-ascii?Q?i1Jc1uRCxe8KL4g+bLJbFsnf2H0lNRGv?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 17 Jul 2024 22:50:31.8113
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 992c1783-340f-4d4b-7fc9-08dca6b2dce2
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MWH0EPF000989E8.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7227
 
-On Wed, 17 Jul 2024 15:24:26 -0700
-Axel Rasmussen <axelrasmussen@google.com> wrote:
+On Thu, Jul 11, 2024 at 06:27:54PM -0400, Paolo Bonzini wrote:
+> While currently there is no other attribute than KVM_MEMORY_ATTRIBUTE_PRIVATE,
+> KVM code such as kvm_mem_is_private() is written to expect their existence.
+> Allow using kvm_range_has_memory_attributes() as a multi-page version of
+> kvm_mem_is_private(), without it breaking later when more attributes are
+> introduced.
+> 
+> Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
 
-> 35e351780fa9 ("fork: defer linking file vma until vma is fully initialized")
-> switched the ordering of vm_ops->open() and copy_page_range() on fork. This is a
-> bug for VFIO, because it causes two problems:
-> 
-> 1. Because open() is called before copy_page_range(), the range can conceivably
->    have unmapped 'holes' in it. This causes the code underneath untrack_pfn() to
->    WARN.
-> 
-> 2. More seriously, open() is trying to guarantee that the entire range is
->    zapped, so any future accesses in the child will result in the VFIO fault
->    handler being called. Because we copy_page_range() *after* open() (and
->    therefore after zapping), this guarantee is violated.
-> 
-> We can't revert 35e351780fa9, because it fixes a real bug for hugetlbfs. The fix
-> is also not as simple as just reodering open() and copy_page_range(), as Miaohe
-> points out in [1]. So, although these patches are kind of large for stable, just
-> backport this refactoring which completely sidesteps the issue.
-> 
-> Note that patch 2 is the key one here which fixes the issue. Patch 1 is a
-> prerequisite required for patch 2 to build / work. This would almost be enough,
-> but we might see significantly regressed performance. Patch 3 fixes that up,
-> putting performance back on par with what it was before.
-> 
-> Note [1] also has a more full discussion justifying taking these backports.
-> 
-> I proposed the same backport for 6.9 [2], and now for 6.6. 6.6 is the oldest
-> kernel which needs the change: 35e351780fa9 was reverted for unrelated reasons
-> in 6.1, and was never backported to 5.15 or earlier.
-
-AFAICT 35e351780fa9 was reverted in linux-6.6.y as well, so why isn't
-this one a 4-part series concluding with a new backport of that commit?
-I think without that, we don't need these in 6.6 either.  Thanks,
-
-Alex
-
-> 
-> [1]: https://lore.kernel.org/all/20240702042948.2629267-1-leah.rumancik@gmail.com/T/
-> [2]: https://lore.kernel.org/r/20240717213339.1921530-1-axelrasmussen@google.com
-> 
-> Alex Williamson (3):
->   vfio: Create vfio_fs_type with inode per device
->   vfio/pci: Use unmap_mapping_range()
->   vfio/pci: Insert full vma on mmap'd MMIO fault
-> 
->  drivers/vfio/device_cdev.c       |   7 +
->  drivers/vfio/group.c             |   7 +
->  drivers/vfio/pci/vfio_pci_core.c | 271 ++++++++-----------------------
->  drivers/vfio/vfio_main.c         |  44 +++++
->  include/linux/vfio.h             |   1 +
->  include/linux/vfio_pci_core.h    |   2 -
->  6 files changed, 125 insertions(+), 207 deletions(-)
-> 
-> --
-> 2.45.2.993.g49e7a77208-goog
-> 
-
+Reviewed-by: Michael Roth <michael.roth@amd.com>
 
