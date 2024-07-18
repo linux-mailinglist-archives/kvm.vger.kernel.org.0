@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-21817-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21820-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552B6934BF3
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 12:52:47 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA62D934BFE
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 12:53:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBC3F1F240E4
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 10:52:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83BCEB22AD1
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 10:53:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D9E12F5A1;
-	Thu, 18 Jul 2024 10:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3D9713A272;
+	Thu, 18 Jul 2024 10:53:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="FGwxj+If"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eKxLQSsb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A77386126;
-	Thu, 18 Jul 2024 10:52:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFB5F13664E;
+	Thu, 18 Jul 2024 10:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721299958; cv=none; b=nSGUMyswwS91ecjzWmx0Puf0MQly6aj6yoXkeynCmN3wiXTQbuEWZwcHOjxa6JqPdMIweOWeqRyg2/WYY8EKjOBESzYPZNxMA0cECjjFYW5Md7ljNJJRRbbAwQCw6IlkNEu0SfsQyzkxYIpsTCnT5gOxHRdNlj0XCLV34vEKBdg=
+	t=1721299995; cv=none; b=BwpnRS7HZwHk8Oxys4orDORX3VJf9b0xILQKeFbOVPSdCZNujvouLvBOLFgI4XoSUH7lcpF0Py8e/P6kiFJCF2RDFeut3WqX+wnXEcZdq448edYD2fXlDet0wMKfS1vi5c7Mh2jP2yyDITKXjk7CC/Nuj9psrC2FQMjlKv3KgjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721299958; c=relaxed/simple;
-	bh=9gisNchJtWr2y6PH53+TRbrQRfUAgtBr4QUsnwTe5C8=;
+	s=arc-20240116; t=1721299995; c=relaxed/simple;
+	bh=60+B1/mq9deLP/oFM985bbm7amwZe/UqFNPpA3rGGPU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YuutuUwKeOicmwcriGG9YFm9unwaSFJV2QCjGtL7yrzHD5AmApauQ2c/O1CsistBkJtjUtljJ9z1LRrxIyUOLN4GqJgVUvd1/9fph5OY2QTTWEnaiy7mZVy2sZDA2UW9ARLqIfxUwKo+lQkxJw8AKdtxG6APICbWu3NR0qi2B0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=FGwxj+If; arc=none smtp.client-ip=148.163.156.1
+	 MIME-Version; b=SffowNZsM6IXb/unukv2x8ynhqMxd0QG0S5nvJTA1AnMd94l/bdfRHDxGh8pnd/+Jw2QGNSyBrx+La7PfGvTb0Nyxyff5NvLS4RJgSOAgFTyHFd3TIr/662hdTOLDtrhWg7WRrW/ZWVGRPUig8aSNCQUIWN77Vu0Il+4BVRe2pQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eKxLQSsb; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46IAKZEo006582;
-	Thu, 18 Jul 2024 10:52:32 GMT
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46I9uUHZ032742;
+	Thu, 18 Jul 2024 10:53:09 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
 	:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding; s=pp1; bh=A5ykeXyEUem3I
-	5xYnjaB0f3a3bWec1chX9yogWo4q7M=; b=FGwxj+IflEp9Q0fSMuhT7w2SW2BZ9
-	eviLROurfGkeDjLeM5pEXlxCaPnvhIOeFj+cbyT7e3OcX0R6cGWYcOagBpt4brV7
-	/CrGRKrRiuQBtEC64D9X48PddPm2e06y22GMFIdJcv1eK0cGXdFvQKRNPndAU4LR
-	3+3ZphiGtu49HQ3LN1w+lp9aozCPOQy0nmA24uEtFFlHyNAYfw3i4pe2LBpHDBWm
-	DL0MVIm9WfEOL8jP6gD+zXLCNAhgwKr+WvaT+a8F41bntGeyKHzcV+J8GiWj5UQY
-	HMBbbJDU7UeOPJGzcg2e4PFrxb4OXGIRGQKwG0V54xodeOLhze+wGRsYg==
+	:mime-version:content-transfer-encoding; s=pp1; bh=KY7PSxvyIrVJK
+	HO4JmPdTJRIMI8kXoXW4fYHWPZOhtI=; b=eKxLQSsbIWoXw8vkSV6s+Z7S49eky
+	518/I8+yytUFPh/Aha1vHHcLQdZIey3SnfZKRlE3WvexI2c0MSfFvuNn4MW/O4NP
+	qHYTldLLZycHygLRtc9X8YQm68GpdpSKzyv4PzF3TJezFo92NfXDkXLPeqOhvWVu
+	l1wiu1WS0XbGUVNX3I8z2wsdBWvHQ+qmIbL6KaC0qsx6f/u3DrvDbKJ0nGH6Tdr1
+	pyEshd/PjOUI2omDV6fvPMRZBdSU9OyqQuBPmfRCYHJvV4orCkNzWQwiBkIH2Uyf
+	u44Yb6KYX/+yzj7rEi796roLv/S60157alrPAtZlmw4y/YrmnFwwNPDjw==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40ey4k8daf-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40eyjp89tn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Jul 2024 10:52:31 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46IAqVHX017993;
-	Thu, 18 Jul 2024 10:52:31 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40ey4k8dab-1
+	Thu, 18 Jul 2024 10:53:09 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46IAr822016254;
+	Thu, 18 Jul 2024 10:53:08 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40eyjp89s0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 18 Jul 2024 10:52:31 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46I9FtJO029228;
+	Thu, 18 Jul 2024 10:53:08 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46I9Cp40009574;
 	Thu, 18 Jul 2024 10:52:30 GMT
 Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40dwkj977u-1
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40dwkms7nk-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
 	Thu, 18 Jul 2024 10:52:30 +0000
 Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46IAqOfS28115674
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46IAqOP534144856
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
 	Thu, 18 Jul 2024 10:52:26 GMT
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5429420040;
+	by IMSVA (Postfix) with ESMTP id 8E7BC2004B;
 	Thu, 18 Jul 2024 10:52:24 +0000 (GMT)
 Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 217C92004B;
+	by IMSVA (Postfix) with ESMTP id 5CDBC2004D;
 	Thu, 18 Jul 2024 10:52:24 +0000 (GMT)
 Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
 	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
@@ -78,9 +78,9 @@ From: Janosch Frank <frankja@linux.ibm.com>
 To: kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
         npiggin@gmail.com, nsg@linux.ibm.com, mhartmay@linux.ibm.com
-Subject: [kvm-unit-tests PATCH 1/4] s390x: Split snippet makefile rules into new file
-Date: Thu, 18 Jul 2024 10:50:16 +0000
-Message-ID: <20240718105104.34154-2-frankja@linux.ibm.com>
+Subject: [kvm-unit-tests PATCH 2/4] s390x/Makefile: Add more comments
+Date: Thu, 18 Jul 2024 10:50:17 +0000
+Message-ID: <20240718105104.34154-3-frankja@linux.ibm.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240718105104.34154-1-frankja@linux.ibm.com>
 References: <20240718105104.34154-1-frankja@linux.ibm.com>
@@ -92,125 +92,60 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: zSB8FmRT25e4sjO3twy7oW9gULgBUMna
-X-Proofpoint-GUID: 73IZ5oZ8nCc1krh1AHcjT_zYCxnrzN9k
+X-Proofpoint-GUID: YiyxRus8YjRnBY_3VFxuKaZhJlfRg7SB
+X-Proofpoint-ORIG-GUID: MPPs9rbONlGcKqcflq3kH4IVnwGpYv_h
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-18_06,2024-07-17_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- bulkscore=0 lowpriorityscore=0 clxscore=1015 priorityscore=1501
- adultscore=0 mlxscore=0 mlxlogscore=735 spamscore=0 impostorscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2407180068
+ definitions=2024-07-18_07,2024-07-17_02,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999 adultscore=0
+ impostorscore=0 clxscore=1015 mlxscore=0 spamscore=0 lowpriorityscore=0
+ phishscore=0 malwarescore=0 priorityscore=1501 suspectscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2407180072
 
-It's time to move the snippet related Makefile parts into a new file
-to make s390x/Makefile less busy.
+More comments in Makefiles can only make them more approachable.
 
 Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
 ---
- s390x/Makefile          | 34 ++++------------------------------
- s390x/snippets/Makefile | 30 ++++++++++++++++++++++++++++++
- 2 files changed, 34 insertions(+), 30 deletions(-)
- create mode 100644 s390x/snippets/Makefile
+ s390x/Makefile | 5 +++++
+ 1 file changed, 5 insertions(+)
 
 diff --git a/s390x/Makefile b/s390x/Makefile
-index c5c6f92c..2933b452 100644
+index 2933b452..457b8455 100644
 --- a/s390x/Makefile
 +++ b/s390x/Makefile
-@@ -120,9 +120,11 @@ asmlib = $(TEST_DIR)/cstart64.o $(TEST_DIR)/cpu.o
+@@ -50,12 +50,15 @@ pv-tests += $(TEST_DIR)/pv-icptcode.elf
+ pv-tests += $(TEST_DIR)/pv-ipl.elf
+ pv-tests += $(TEST_DIR)/pv-edat1.elf
  
- FLATLIBS = $(libcflat)
++# Add PV host tests if we're able to generate them
++# The host key document and a tool to generate SE headers are the prerequisite
+ ifneq ($(HOST_KEY_DOCUMENT),)
+ ifneq ($(GEN_SE_HEADER),)
+ tests += $(pv-tests)
+ endif
+ endif
  
-+# Snippets
- SNIPPET_DIR = $(TEST_DIR)/snippets
- snippet_asmlib = $(SNIPPET_DIR)/c/cstart.o
- snippet_lib = $(snippet_asmlib) lib/auxinfo.o
-+include $(SNIPPET_DIR)/Makefile
++# Add binary flat images for use in non-KVM hypervisors
+ tests_binary = $(patsubst %.elf,%.bin,$(tests))
+ ifneq ($(HOST_KEY_DOCUMENT),)
+ tests_pv_binary = $(patsubst %.bin,%.pv.bin,$(tests_binary))
+@@ -142,6 +145,7 @@ $(TEST_DIR)/pv-icptcode.elf: pv-snippets += $(SNIPPET_DIR)/asm/pv-icpt-vir-timin
+ $(TEST_DIR)/pv-ipl.elf: pv-snippets += $(SNIPPET_DIR)/asm/pv-diag-308.gbin
+ $(TEST_DIR)/pv-edat1.elf: pv-snippets += $(SNIPPET_DIR)/c/pv-memhog.gbin
  
- # perquisites (=guests) for the snippet hosts.
- # $(TEST_DIR)/<snippet-host>.elf: snippets = $(SNIPPET_DIR)/<c/asm>/<snippet>.gbin
-@@ -148,34 +150,6 @@ else
++# Add PV tests and snippets if GEN_SE_HEADER is set
+ ifneq ($(GEN_SE_HEADER),)
+ snippets += $(pv-snippets)
+ tests += $(pv-tests)
+@@ -150,6 +154,7 @@ else
  snippet-hdr-obj =
  endif
  
--# the asm/c snippets %.o have additional generated files as dependencies
--$(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
--	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
--
--$(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
--	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
--
--$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(SNIPPET_DIR)/asm/flat.lds
--	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/asm/flat.lds $<
--	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
--	truncate -s '%4096' $@
--
--$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SNIPPET_DIR)/c/flat.lds
--	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
--	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
--	truncate -s '%4096' $@
--
--%.hdr: %.gbin $(HOST_KEY_DOCUMENT)
--	$(GEN_SE_HEADER) -k $(HOST_KEY_DOCUMENT) -c $<,0x0,0x00000000000000420000000000000000 --psw-addr 0x4000 -o $@
--
--.SECONDARY:
--%.gobj: %.gbin
--	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $< $@
--
--.SECONDARY:
--%.hdr.obj: %.hdr
--	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $< $@
--
++# Generate loader script
  lds-autodepend-flags = -MMD -MF $(dir $*).$(notdir $*).d -MT $@
  %.lds: %.lds.S $(asm-offsets)
  	$(CPP) $(lds-autodepend-flags) $(CPPFLAGS) -P -C -o $@ $<
-@@ -229,8 +203,8 @@ $(snippet_asmlib): $$(patsubst %.o,%.S,$$@) $(asm-offsets)
- 	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
- 
- 
--arch_clean: asm_offsets_clean
--	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d $(TEST_DIR)/.*.d lib/s390x/.*.d $(comm-key)
-+arch_clean: asm_offsets_clean snippet_clean
-+	$(RM) $(TEST_DIR)/*.{o,elf,bin,lds} $(TEST_DIR)/.*.d lib/s390x/.*.d $(comm-key)
- 
- generated-files = $(asm-offsets)
- $(tests:.elf=.o) $(asmlib) $(cflatobjs): $(generated-files)
-diff --git a/s390x/snippets/Makefile b/s390x/snippets/Makefile
-new file mode 100644
-index 00000000..a1c479f6
---- /dev/null
-+++ b/s390x/snippets/Makefile
-@@ -0,0 +1,30 @@
-+# the asm/c snippets %.o have additional generated files as dependencies
-+$(SNIPPET_DIR)/asm/%.o: $(SNIPPET_DIR)/asm/%.S $(asm-offsets)
-+	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
-+
-+$(SNIPPET_DIR)/c/%.o: $(SNIPPET_DIR)/c/%.c $(asm-offsets)
-+	$(CC) $(CFLAGS) -c -nostdlib -o $@ $<
-+
-+$(SNIPPET_DIR)/asm/%.gbin: $(SNIPPET_DIR)/asm/%.o $(SNIPPET_DIR)/asm/flat.lds
-+	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/asm/flat.lds $<
-+	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
-+	truncate -s '%4096' $@
-+
-+$(SNIPPET_DIR)/c/%.gbin: $(SNIPPET_DIR)/c/%.o $(snippet_lib) $(FLATLIBS) $(SNIPPET_DIR)/c/flat.lds
-+	$(CC) $(LDFLAGS) -o $@ -T $(SNIPPET_DIR)/c/flat.lds $< $(snippet_lib) $(FLATLIBS)
-+	$(OBJCOPY) -O binary -j ".rodata" -j ".lowcore" -j ".text" -j ".data" -j ".bss" --set-section-flags .bss=alloc,load,contents $@ $@
-+	truncate -s '%4096' $@
-+
-+%.hdr: %.gbin $(HOST_KEY_DOCUMENT)
-+	$(GEN_SE_HEADER) -k $(HOST_KEY_DOCUMENT) -c $<,0x0,0x00000000000000420000000000000000 --psw-addr 0x4000 -o $@
-+
-+.SECONDARY:
-+%.gobj: %.gbin
-+	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $< $@
-+
-+.SECONDARY:
-+%.hdr.obj: %.hdr
-+	$(OBJCOPY) -I binary -O elf64-s390 -B "s390:64-bit" $< $@
-+
-+snippet_clean:
-+	$(RM) $(SNIPPET_DIR)/*/*.{o,elf,*bin,*obj,hdr,lds} $(SNIPPET_DIR)/asm/.*.d
 -- 
 2.43.0
 
