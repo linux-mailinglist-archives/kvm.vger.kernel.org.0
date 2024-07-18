@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-21844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B78934D7D
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 14:52:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8F5934D7E
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 14:52:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 775891F23B13
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 12:52:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 574541F22BF0
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 12:52:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67D4913C80F;
-	Thu, 18 Jul 2024 12:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE6B13C80B;
+	Thu, 18 Jul 2024 12:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bNkjlnxz"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Z9xWEU+N"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2069.outbound.protection.outlook.com [40.107.95.69])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2053.outbound.protection.outlook.com [40.107.93.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA6213BC30
-	for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 12:52:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6867154645
+	for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 12:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.53
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721307142; cv=fail; b=jwrA6ONOGyoyFyjMma+mP72ZjvhcjvgtBIrc0X89RYCdR4FnuSKoKtPBNwz3tEPnJRBz6+/J/yd8xeZnvQ3zyEkwtnaWyif2uizWwzs44CM/x2y563de7iDzWnKOWG0DVnTC0T2W1S096hufWRbeQpZQeXcf09fM80Wmh2sx7yk=
+	t=1721307156; cv=fail; b=SvnQdFLt+p/BW0LY9rBZiHu0gdevN2EMJZNSt/tZuADxejXwpYO3AGcx4Yt4bH03qAAeS/lUSGELnLTUPNQwf8HIkbb3z+hhRpPx0qHUJkFdy1oQ0+m7bsWkfu854TjQWahoMikTT8q1QYKJcPWUrkQAGrU3r09gQGgRzqdIhmE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721307142; c=relaxed/simple;
-	bh=AW/3ZT400K66JaMB4IpKyRjQpVy/r0TJFUIYnQQKS1I=;
+	s=arc-20240116; t=1721307156; c=relaxed/simple;
+	bh=5BPIQ6D/UY2TWYaQaQgVjoqMarXkblbW9w+HX8WOU44=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=irnKNv0UJvf9GdvqrCyuCVDK9JXkE6oqZO8xLkycw3qO99r9AAG4qOavPjESNE1Fem9akZh8DD+0KEIrpd4/gPOHmPOtSxWd0R3aEkk8xHZ+xp1L0AJUnDs4WidgIhffFU+IZkhSJyC/MIoCcKj1egEt61xYW/Y5sWMfAxb4auk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bNkjlnxz; arc=fail smtp.client-ip=40.107.95.69
+	 MIME-Version:Content-Type; b=QD8dwwc/8rTDy0hUYfJH/OetudeM93kVpKeu8ee4MmjTeB157sT4Wvzg3qIxtwukk5DDkCedK5rWluXYZ4wufoaBvsK5NEMpVSz56rRHkwDgTznbL+iqSgVedbG+CRuQAZY1ynY3zGGmuDe8dyum3io+BhIppAsO8zmLNXT8hHA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Z9xWEU+N; arc=fail smtp.client-ip=40.107.93.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B+vTbil+iHaPTq8L4Rogpxv3P5RwDFgIGO8F71Xc8ZWlS66PRy6w4jUrNb5yiLDAj/3OIwFaJWqsVoN6UuaSF84C/Pcy7rm9jn4CroqPyW7deHx1qLUU62ti1A424dIfMLKsZSNJ5WRn8ByKTKtWS3JxAPIBS1UD0sYLZW+ZodCHg4kaLvVdTy3IEX/4ldGySTwJjGHOwRrkum+H6xC3IpjqVVbrwFu+Lf4fbRo+SgEy/ahq1B+9uC67sg5JiEVDEeYoGP7Y0qWzdNJiJEgumYZu/TWUi8AxkElxlmh3ZeYQYYWYgb6y1gpJ6e436RtIFXSKQntGHKxli+SkwcCf4g==
+ b=e2Hrjl9P2iPR2+oLmQ1F7TXggEKYvbu6kPLkKv9b+XrrgeV/o2+qAZkYXrPuHZBeage6AR1W7teztG/zewY4MxfkF/qfVaCIkglyQgk6dVxIhr/7AlOX73XZ9shL7zTCLND6n5Ev+VFQWlQfxZEx2s1JkWZbxn3rFN4/y7H9yOVJ7Yc2dwHEa9fSgyquWSHcfLEsvsz6UYqIRJfQuVCYW1nubYIoEHEkM6EZd4t1HReRLhCZbC8sQoByDVnnW1ZA6UUG37LhR4sYVpPVzv2n3+rzn0g18hRgOX7zweYYGfFrOjm0RcEDbweh08wq98MtBScMkgzmw8S3HV3PMMst3A==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CCqB4wHkjK/5hqTbTwp/RnPyF0UhjgQa2pNWJQ81RpU=;
- b=sYOIGpAOTyekciHxBZBkVzXAamMqI5FNzJE5phUnm4LHWWrbfOURVEs4gwj0ebywmOhMA1z/2eESUD0AhI74MWB2v0tVQrk3+XLccyzohXTUdo1O6uxySkiGZej4NUP6l/KEBhofXc8UTmtoS4u1iHgzIlx/dPSMmWGN956j8eu2HqGPganND+KJB9snZTpLRBvgf2XE34GZyk8ifn6EUgTvr1Y49pE2aC3jL73EMsSFgge7a7YTws3VbMt+00/t855eVwVlBVObkWNq00LFamysPDwB/aTAZZivCDqskNfKb/8YnGsK5Codq8TeKxEX1qeAHdo25u5T0SzWejqxcw==
+ bh=H2pE6hnj2UM9FZbyBPKsEQah0Qp1UZ6xqYOsYpN1p7g=;
+ b=yyw1cqfaHaXVYjyHQswcTuezaA1gPd478+YdTpNCwv6nk69OzFQWl5IaEY/lmnbzV7KBnTIX1+eA53P7yRA7jhD/sbZHTpMCQe2Qbti+RrvNydvg0dzeaJJCx69T1EJ0igCO76MOerGtkXbKJBjO88nwlldYX0POhT4YPCDIIyC14awKOKfF8ffU1ErOPoSbo14cjQ8G+7PjL0LN+7b6eXSGCJaYoIO0Uzb+Lf1JyT9653sCflfu/h2HHCw0Dd7QnDLA0Qych/H+DlbDTn4w/VpKn7fXoCehEVRK/7cvgzjY2XSEG7+Fzo+ElWSm3bRFsdYh8tiD/7VFNF8yZqfFAg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CCqB4wHkjK/5hqTbTwp/RnPyF0UhjgQa2pNWJQ81RpU=;
- b=bNkjlnxzVulXVfh9BWfiXbZzZb+UPsaOOdVtnepVoU0vFdMEDSR7GqCTbK2Ty46XAilFVXp0pWUPqrh1AuE7K4EuND4yJUCrBnAKUmwM0tMc9TWpZfRFyMabJwCe/DsMyQiKotpNwK4Hw+DEcQhVA9fZ0jL4ytiZDe5Sgt4wJIo=
-Received: from DM6PR03CA0066.namprd03.prod.outlook.com (2603:10b6:5:100::43)
- by SN7PR12MB7156.namprd12.prod.outlook.com (2603:10b6:806:2a7::10) with
+ bh=H2pE6hnj2UM9FZbyBPKsEQah0Qp1UZ6xqYOsYpN1p7g=;
+ b=Z9xWEU+NI3j43u9n8+OGInx3LCpxorVpm018gSK/Jt5dIq61SSCNuL5zu9ANmSu+ikkYAQOKaUNYMEv99Zgv0PlJ8F6mNHXGGdHTB1Am196eAHfcqPfBhFoACs+bb6eB6nJUlnIaOtZjQC5y2q199/idSHnFNp7uFPLdK6R7RMI=
+Received: from DM6PR03CA0059.namprd03.prod.outlook.com (2603:10b6:5:100::36)
+ by CY5PR12MB6477.namprd12.prod.outlook.com (2603:10b6:930:36::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.17; Thu, 18 Jul
- 2024 12:52:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.14; Thu, 18 Jul
+ 2024 12:52:32 +0000
 Received: from CH3PEPF00000016.namprd21.prod.outlook.com
- (2603:10b6:5:100:cafe::92) by DM6PR03CA0066.outlook.office365.com
- (2603:10b6:5:100::43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.28 via Frontend
- Transport; Thu, 18 Jul 2024 12:52:16 +0000
+ (2603:10b6:5:100:cafe::a9) by DM6PR03CA0059.outlook.office365.com
+ (2603:10b6:5:100::36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.29 via Frontend
+ Transport; Thu, 18 Jul 2024 12:52:32 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -65,20 +65,20 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
  CH3PEPF00000016.mail.protection.outlook.com (10.167.244.121) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7784.5 via Frontend Transport; Thu, 18 Jul 2024 12:52:16 +0000
+ 15.20.7784.5 via Frontend Transport; Thu, 18 Jul 2024 12:52:32 +0000
 Received: from ethanolx16dchost.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Thu, 18 Jul
- 2024 07:52:15 -0500
+ 2024 07:52:31 -0500
 From: Pavan Kumar Paluri <papaluri@amd.com>
 To: <kvm@vger.kernel.org>
 CC: Paolo Bonzini <pbonzini@redhat.com>, Sean Christophersen
 	<seanjc@google.com>, Michael Roth <michael.roth@amd.com>, Tom Lendacky
 	<thomas.lendacky@amd.com>, Pavan Kumar Paluri <papaluri@amd.com>, "Kim
  Phillips" <kim.phillips@amd.com>, Vasant Karasulli <vkarasulli@suse.de>
-Subject: [kvm-unit-tests PATCH v2 13/16] x86 AMD SEV-SNP: Change guest pages from Intermix->Private using GHCB NAE
-Date: Thu, 18 Jul 2024 07:49:29 -0500
-Message-ID: <20240718124932.114121-14-papaluri@amd.com>
+Subject: [kvm-unit-tests PATCH v2 14/16] x86 AMD SEV-SNP: Change guest pages from Intermix->Shared using GHCB NAE
+Date: Thu, 18 Jul 2024 07:49:30 -0500
+Message-ID: <20240718124932.114121-15-papaluri@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240718124932.114121-1-papaluri@amd.com>
 References: <20240718124932.114121-1-papaluri@amd.com>
@@ -94,139 +94,125 @@ X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PEPF00000016:EE_|SN7PR12MB7156:EE_
-X-MS-Office365-Filtering-Correlation-Id: 95b775f7-9cf3-4cb4-e846-08dca728740c
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000016:EE_|CY5PR12MB6477:EE_
+X-MS-Office365-Filtering-Correlation-Id: cba40fcb-82b7-4d02-04cd-08dca7287d88
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+	BCL:0;ARA:13230040|36860700013|1800799024|82310400026|376014;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?RdpxXtD0uNBdcARqzLTcOzERoxt11rlUvF+zF8jsOpqPcunvkFrJ4ysOa7PV?=
- =?us-ascii?Q?peORImZ534zq6cV0QB4DgKc37pO0gsDbBjVfi8o3W/JlU5qvWbchdJYk7GWa?=
- =?us-ascii?Q?IGFXd10KfweNuU+iEHoZSdIJAwLslf0YLX59+S1tQ6f9LYay4xzTCjU+eRhg?=
- =?us-ascii?Q?uMBWTvz06DPnWacK0nGLJK3/B5tJ/Qtj49v/SvSS5AFMqIYQkmlwUGY9pNyM?=
- =?us-ascii?Q?fSSm4HYwLl0CeNub3uVIq5Q1hBr0GSSjPKSZtdBl5OGGnppXZOwGxpWtiZTC?=
- =?us-ascii?Q?NkoB5LboQuN396RBFG0+G0/eikuHJK3ZbbxezYBU1m0Zmm9upkmbRgHI2tIE?=
- =?us-ascii?Q?inLMjghcg4Ed3K8w4Kqtj/+a+19hX64iEpglKPQethHObAgcOMtlZntV+KET?=
- =?us-ascii?Q?NhJVycIASrWhnEvoacTEiru947Z6Uqi+BEC18DsZ1R7xgWfr8ge6lJ630QUl?=
- =?us-ascii?Q?pEUPU0tLPOCUhsZzawtY62QaxrXGDSsS68Iw1PHdNWRkK5qGg/91M5e5NV/O?=
- =?us-ascii?Q?fMgg7YblNfPVkGhkn8NKTL3DaH+mbg+cHkkRJrEZNgOOzplfhyujygBtYski?=
- =?us-ascii?Q?ODjQv+hegJBw4yMqUHfvwzJX1ra4lGQjzu5RvQr7GPnxJyGM68MVi8r5rCG6?=
- =?us-ascii?Q?M8Fxk4egEdBrcK3LTSmKJAY+duHKC6CW8lHNdTy5/ivFaAK8Z9fo1akQVAG7?=
- =?us-ascii?Q?QoCd1BxqCxH1vBMuFFdwcU6OjdnnB47/3HM81tucHUl2sprVlY2VNzrK/WGA?=
- =?us-ascii?Q?Qjl9GZOd9lbYwwcvY6Ag4EAMlafjOHrAhNzA+ugycV+rN1GH2qZZfzIgj0/k?=
- =?us-ascii?Q?KB5Hs4bmPOLNzm2683e3gKfBL5xVTzIlnPurXszueBKgjfFRpTXHqld2glH2?=
- =?us-ascii?Q?H7s4HZxX0490h8TGxB7P/BBQ6Y7WTPz6p/GVT8hENB2mF94BGO+Brme4uMSx?=
- =?us-ascii?Q?ioEDNJRQhKabUsVJmV+KmiJUGKR3HcMGynPWFleAW36EpOyoHTBD+Bun3Ss6?=
- =?us-ascii?Q?eq8rcrbJus7GGWEes5rnKBgOrAsRG5pZwKuyc/StvGf0ltZD70arQmM57jTG?=
- =?us-ascii?Q?5Fxw4poMlR1UYP+mPaMy4cVuA17h7sQHLuHAi6YzoJ2SR42Y7in3n3IuzK3m?=
- =?us-ascii?Q?fB6PDjM7iR4GlX4DHfQX7X+F2dXC26SYObfIDtS0e40z3LIvtRKal3IIO2oE?=
- =?us-ascii?Q?ja13wx7Yxa0uloLsUNWl8a5wj+RCXNWDWSyjyRaVngE8q4300dVUfOQBkbQN?=
- =?us-ascii?Q?4FKY4BQjIiQevJ6ayCOYk/hqsiM7nqNQQVMXq/pk+w/9o9P4zlMNbTF+ZdIa?=
- =?us-ascii?Q?rMN4esZ656OUMGmfZuKgpklld7x1Ay5TJZDfUO+xnMS0Q6k5zpCwI7T1llSe?=
- =?us-ascii?Q?BK+mTCuOsFwhgI4fuw3DuQwFJCpfSUL3P+zrXW1E3CcrfA94IIIsR6+9dSZz?=
- =?us-ascii?Q?NTGdCLprNLc0zhkGb1PFvSkPFM+2QzaA?=
+	=?us-ascii?Q?4ZZ4FdTyT4LBcRlJIWZeY5Un7knzvVgZexH4NjiG0f3TlQxZR/JHgdfAPwK5?=
+ =?us-ascii?Q?gmCOTe9ckNroSpyJmoDZu1t6WhZmqDhF71/I2cZkEyhPdK10MNfL2Nzfa5AB?=
+ =?us-ascii?Q?+u1oEcd/VyD5EXRwe/xsJy0KgNojz6jSTI80/lT2J4YYvkuWtPvB+werDPgY?=
+ =?us-ascii?Q?avZPlSrb/h3Uk/i0/BoxIqiayAOF86Ye4Z6XJOKuqEml64lrcmixcf980TTq?=
+ =?us-ascii?Q?eizCggKswODkHCbMQjq0uR7UB+5hJ3BBnytWtmrek5kN1jy+E0alsJePcYUV?=
+ =?us-ascii?Q?baBZ5ypoGspy0I1c+0WVzUilDmlGcSPyILhrdIpSGkWS++gYHv3qnD755tIR?=
+ =?us-ascii?Q?bwoo9TMZ1g76EXJeCx7VZq/AupFkXZ2aifZwUb2t+4qRVY1Rjb6/1GEdExDh?=
+ =?us-ascii?Q?YQGB5Ed4sbzI6CX9+/X7v+Bfpz33jllVhxvtiPa7EOBF215FbgzNY3HYsreJ?=
+ =?us-ascii?Q?YLwh+RvLqfFeoZdZfZn1kbLajILm5B1ECzWAkyVOqamvt8by7sYXqfMOz+UG?=
+ =?us-ascii?Q?idtOq/V0/WYGu8zDzk9RzSndVXBOHdgOL/CbjvQB2y4HbixF1MLA9GaBzIj/?=
+ =?us-ascii?Q?rLdHkcv1gn297YMyLtfn1JsqixlDaJbum5fZghgMHg11cRs2BM7VEqpfQ78l?=
+ =?us-ascii?Q?Uer3lgDtNRXLCwW423UPyXsdSYawSfRFmwXUaV55xc2c27wExFX3OBtydvk4?=
+ =?us-ascii?Q?Z3+2nomBQIf/JVUOk6ljXOEXAXggXhck4QZNxpsSrpukcF1Ws729fKLYy8XG?=
+ =?us-ascii?Q?uTji/dvHjYvIMxNxfLuBHYaxu89q1bJMa7rjJd6soTqCjC/Bj8oO7eyz07Ew?=
+ =?us-ascii?Q?O6Y42fL9ZQiyMrbOw2Vbn/W5Shfeywhv6Y7vu0LzBmK6teLLc3i/9lVgrpCz?=
+ =?us-ascii?Q?zj0FqDe1P8cA69Xm5k7jhZjbKTIaCeNimmlm/5IflqEvs8i+WfivY9Rklht+?=
+ =?us-ascii?Q?5gXcvs7Qj2MfcrMqMZGlTLsw5C9FlJitHow3PzdpHtuXxm50oEL0xu8B7kjB?=
+ =?us-ascii?Q?uz5ODSX4xZlhxrUHoPHOsPzYRaG+QQ32FdjfXzCUwZB2UR0OJxtzMcMIbY74?=
+ =?us-ascii?Q?rBu9f5ZT18wnnYF0a3AC6PAz085lz8kH18NPU6kHaotJYwkC44TNDFZQWI0q?=
+ =?us-ascii?Q?sRg/uwsE8kcmNSaNTWboS65Wm3RTfc9LBHcVaXLFlc+HPHVrhGp9cnF2Ku8y?=
+ =?us-ascii?Q?PjejOMarlOwxgTolaz6tY7c7D1QbWcTGBZUU4YfMEQ8Z6FvMdbDgogpP8TEc?=
+ =?us-ascii?Q?53gmVqVbikYRIHqZDLwP/ZsLJOv9pt0ideJdW340uh5QtyzcRGdvfSkaUhQE?=
+ =?us-ascii?Q?BPFJMtqHw/UzquQxJU3pNgDRolaRGLzR3yERLlilUdjmmWwaKys0lQ2Q++ft?=
+ =?us-ascii?Q?OCIO8FoA2HWAaEV7VyMvTVs5SrhTnY+rS5wNbhuw5ouGrLnRr6Nw0ElPDUb0?=
+ =?us-ascii?Q?5sfF17jhIJV28diZtHYKCPVqyc02IBYT?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(82310400026)(376014);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2024 12:52:16.6520
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Jul 2024 12:52:32.5583
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 95b775f7-9cf3-4cb4-e846-08dca728740c
+X-MS-Exchange-CrossTenant-Network-Message-Id: cba40fcb-82b7-4d02-04cd-08dca7287d88
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	CH3PEPF00000016.namprd21.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7156
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6477
 
-The tests perform the following actions:
-1. Allocates a 2M private page (512 4K entries) and converts the entire
-range to shared.
-2. Performs a write operation on these un-encrypted pages.
-3. Performs partial page state change conversions on the first 256 4K
-entries and conducts a re-validation test on one of these now-private
-entries to determine whether the current page state is private or not.
-4. Converts the whole 2M range from an intermixed state to private and
-perform a re-validation check on the now-private 2M page.
+The test performs the following actions:
+1. Allocates a 2M private page (512 4K entries) and performs 2M private
+to shared conversion.
+2. Performs partial page state changes (shared->private) on first 256 4K
+entries and conducts a re-validation ('pvalidate') check on one of these
+entries to ensure its state has been changed to private.
+3. Performs PSC from intermixed state to shared state on the 2M large
+page.
+4. Conducts a write test on the shared pages to ensure page state change
+has been successful.
 
-The goal of this test is to ensure 2M page state changes are handled
-properly even if 2M range contains a mix of private/shared pages.
+The main goal of this test is to ensure 2M page state changes are
+handled properly even if 2M range contains a mix of private/shared
+pages.
 
 Signed-off-by: Pavan Kumar Paluri <papaluri@amd.com>
 ---
- x86/amd_sev.c | 54 +++++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 54 insertions(+)
+ x86/amd_sev.c | 24 ++++++++++++++++++++++++
+ 1 file changed, 24 insertions(+)
 
 diff --git a/x86/amd_sev.c b/x86/amd_sev.c
-index 12fe25dcdd0a..fc385613b993 100644
+index fc385613b993..ae19f8ad6cc8 100644
 --- a/x86/amd_sev.c
 +++ b/x86/amd_sev.c
-@@ -290,6 +290,59 @@ static void test_sev_psc_ghcb_nae(void)
- 	snp_free_pages(SEV_ALLOC_ORDER, SEV_ALLOC_PAGE_COUNT, vaddr, ghcb, true);
+@@ -303,6 +303,21 @@ static void __test_sev_psc_private(unsigned long vaddr, struct ghcb *ghcb,
+ 	       "Expected page state: Private");
  }
  
-+static void __test_sev_psc_private(unsigned long vaddr, struct ghcb *ghcb,
-+				   int npages, bool allow_noupdate)
++static void __test_sev_psc_shared(unsigned long vaddr, struct ghcb *ghcb,
++				  int npages, bool allow_noupdate)
 +{
-+	set_pte_encrypted(vaddr, npages);
-+
-+	/* Convert the whole 2M range back to private */
-+	sev_set_pages_state(vaddr, npages, SNP_PAGE_STATE_PRIVATE, ghcb,
++	/* Convert the whole 2M range to shared */
++	sev_set_pages_state(vaddr, npages, SNP_PAGE_STATE_SHARED, ghcb,
 +			    allow_noupdate);
 +
-+	report(is_validated_private_page(vaddr, RMP_PG_SIZE_2M),
-+	       "Expected page state: Private");
++	set_pte_decrypted(vaddr, npages);
++
++	/* Conduct a write test to ensure pages are in expected state */
++	report(!test_write(vaddr, npages),
++	       "Write to %d unencrypted 2M pages after private->shared conversion",
++	       npages / (1 << ORDER_2M));
 +}
 +
-+static void test_sev_psc_intermix(bool to_private)
+ static void test_sev_psc_intermix(bool to_private)
+ {
+ 	unsigned long vaddr;
+@@ -331,6 +346,8 @@ static void test_sev_psc_intermix(bool to_private)
+ 	/* Now convert all the pages back to private */
+ 	if (to_private)
+ 		__test_sev_psc_private(vaddr, ghcb, (SEV_ALLOC_PAGE_COUNT) / 2, true);
++	else
++		__test_sev_psc_shared(vaddr, ghcb, (SEV_ALLOC_PAGE_COUNT) / 2, true);
+ 
+ 	/* Free up all the used pages */
+ 	snp_free_pages(SEV_ALLOC_ORDER - 1, (SEV_ALLOC_PAGE_COUNT) / 2,
+@@ -343,6 +360,12 @@ static void test_sev_psc_intermix_to_private(void)
+ 	test_sev_psc_intermix(true);
+ }
+ 
++static void test_sev_psc_intermix_to_shared(void)
 +{
-+	unsigned long vaddr;
-+	struct ghcb *ghcb = (struct ghcb *)(rdmsr(SEV_ES_GHCB_MSR_INDEX));
-+
-+	/* Allocate a 2M private page */
-+	vaddr = (unsigned long)vmalloc_pages((SEV_ALLOC_PAGE_COUNT) / 2,
-+					     SEV_ALLOC_ORDER - 1, RMP_PG_SIZE_2M);
-+
-+	/* Ensure pages are in private state by checking the page is private */
-+	report(is_validated_private_page(vaddr, RMP_PG_SIZE_2M),
-+	       "Expected page state: Private");
-+
-+	sev_set_pages_state(vaddr, (SEV_ALLOC_PAGE_COUNT) / 2,
-+			    SNP_PAGE_STATE_SHARED, ghcb, false);
-+
-+	set_pte_decrypted(vaddr, (SEV_ALLOC_PAGE_COUNT) / 2);
-+
-+	set_pte_encrypted(vaddr, (SEV_ALLOC_PAGE_COUNT) / 2);
-+	/* Convert a bunch of sub-pages (256) to private and leave the rest shared */
-+	sev_set_pages_state(vaddr, 256, SNP_PAGE_STATE_PRIVATE, ghcb, false);
-+
-+	report(is_validated_private_page(vaddr, RMP_PG_SIZE_4K),
-+	       "Expected page state: Private");
-+
-+	/* Now convert all the pages back to private */
-+	if (to_private)
-+		__test_sev_psc_private(vaddr, ghcb, (SEV_ALLOC_PAGE_COUNT) / 2, true);
-+
-+	/* Free up all the used pages */
-+	snp_free_pages(SEV_ALLOC_ORDER - 1, (SEV_ALLOC_PAGE_COUNT) / 2,
-+		       vaddr, ghcb, true);
-+}
-+
-+static void test_sev_psc_intermix_to_private(void)
-+{
-+	report_info("TEST: 2M Intermixed to Private PSC test");
-+	test_sev_psc_intermix(true);
++	report_info("TEST: 2M Intermixed to Shared PSC test");
++	test_sev_psc_intermix(false);
 +}
 +
  int main(void)
  {
  	int rtn;
-@@ -309,6 +362,7 @@ int main(void)
- 		init_vpages();
+@@ -363,6 +386,7 @@ int main(void)
  		test_sev_psc_ghcb_msr();
  		test_sev_psc_ghcb_nae();
-+		test_sev_psc_intermix_to_private();
+ 		test_sev_psc_intermix_to_private();
++		test_sev_psc_intermix_to_shared();
  	}
  
  	return report_summary();
