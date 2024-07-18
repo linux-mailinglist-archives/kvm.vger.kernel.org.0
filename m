@@ -1,151 +1,204 @@
-Return-Path: <kvm+bounces-21858-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21859-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95348935115
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 19:09:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E03935118
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 19:10:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3E98283061
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 17:09:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B9249B2176B
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 17:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C965C14535D;
-	Thu, 18 Jul 2024 17:09:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5354714535D;
+	Thu, 18 Jul 2024 17:09:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LmOsclIT"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="b8DnsO6s"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7459F144D10
-	for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 17:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BAE13DBA2
+	for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 17:09:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721322553; cv=none; b=XuxQuaQoZKkYR4lckAG1+HUh3cP7oW8ZP/HMbAQdOgs21k7QBCEbNyS71veDf7ZK4BmLl3HAJ1lmk1lMzR4DSLA+I9QPfFt3VmCRk4jTUOU4dfBGgrbIppogA83UMrPM5AEWf9kWwREND9ylwxJW6EWS/PvUMAjvR/Sez8VukhU=
+	t=1721322598; cv=none; b=SdYczqun6U575KZgqIJHkVg4ok9m7GDJotyjTbHEcUIXqIouJ5q89WY4tgz0gCRE2LwOnxMaCuzG1HpIilMWuKyteb6pGLDUrjanePlYrJA91o9ScoYO0FP2Qpa4FLjpj+YErqRHZ+jM9N/47fdQxiTD+xNnC//cJsca9kZZCf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721322553; c=relaxed/simple;
-	bh=hfptMg5b01LvLxc2SG4Uz4PY1885pejHBHnSI3jHNo4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AttpQti12X5uXlsm4ZYVTAZqsZwUj3LvRSj06pv5wNxZ+dEmRM6bm/EIn0O+zsWucPdJX+12PhpNlFYIwrct5rR03ijpwNcwAogGC2GhAdDQusXXB3ghy7x2IkNPK0kZl9Oo1qyh/4ju4qazJ2xvhvFspjOZ++Cqxg+jAeL2hYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LmOsclIT; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1fb67f59805so6505ad.1
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 10:09:11 -0700 (PDT)
+	s=arc-20240116; t=1721322598; c=relaxed/simple;
+	bh=xL3m9hbmkMooZERsOAU/7eovW/Lp3XPyHCnVNSGGhiQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jL6baA4pqpD9vPJx2Z5boPY184Q+YFHCSGiDf9Bz4ZJRvKwMmNweVpSdlWj7fJ5xJFy6dI4ucpTpKutRjYjxYxvaBsKKE3y+tRd8Eb5axgZYgOBJvMubg8iKVDAJXpzf4+ijEdJT+vcCwjhfbn9hhREhhJ03nfB2iCCSzDyn/6I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=b8DnsO6s; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-447f0d20592so3102851cf.3
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 10:09:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721322551; x=1721927351; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hfptMg5b01LvLxc2SG4Uz4PY1885pejHBHnSI3jHNo4=;
-        b=LmOsclITNClWJfccpQJt2d2iHpl/UCf69BGG/qXacLLcSjuk07wmb42ijg/DHol4Wu
-         zzaRt3nYlqxI32p6P3fknA9c1Jnu/XObYxmdhrhY+cnHyFFJz8qWMKvrgTMYmwvSPLuE
-         7MDiShHq/qqCzvOHCZY+Tb7HyCB0yk+1whAA60XKsDW47S0cCQ3Q3T/7DXV6FBI/DQRf
-         +PF+YmJLrKj0iFvY6MQNv8MLcwJEViYdCZ4QPYVB9536ExbIn4vAiqZy4ntmZD6RFhfi
-         DAWXSSyCB4AJwuH/TkY1UKengFCJrD3kW9BupQa17aMPlprq0yK/DC7p8FFd91bO3KPe
-         yyEg==
+        d=ventanamicro.com; s=google; t=1721322595; x=1721927395; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=0oZIFGo3b+JV9w2PKJcAfLvpOGjnV19xdselgMBeOOw=;
+        b=b8DnsO6s7Xwknj2xSx+IT8/Q9ORRWX6ha7xcIvBYCDUo640EY019VWFzh+177NINLb
+         eBZqV4sBt8NKqg28Y9fLmHE1KYTudSmNk1sHHd3qZn1NeCFgXzarGeEh3vr+QgUMT7Fl
+         TlMmRT7/qzKuNPqp3b4LWa5DopTYXZ7FxWmUcf+u4NhVWkSjl2W7tKCNyosfDmEysfHW
+         70wEyKoGgONqj1nfJZbOROkZBe5/6pcOGQiiCPnU0Y9cOSANuOTE3R0VjYD4VGAKdQ1a
+         v1i0L+suiBHsU+WflGgoY5BSfZ+onMOJ8r4aBbb01JJbddjpsaJ6nTbGBBbuJfadDKPh
+         vy/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721322551; x=1721927351;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hfptMg5b01LvLxc2SG4Uz4PY1885pejHBHnSI3jHNo4=;
-        b=E959RfxnryFb6JiBcblzc7lGz5yA4dK+uCMWba+3y0Eir5CUh8WrQjbL0REn07136k
-         4OCsRmPSKIOj8dMS48qRezNvBW/6zEvb+EUBWVte4PUyRYz9TXKg7vdDIruy83H1hvnX
-         BIWSxEiflHzG91AhxxhNz3A3n9vL/ZvG59fGnieIy9hveA2tSu/hIlqxPPFNAR3JQGwA
-         9liY87iGtfZU+D3QgTWBYGYfJFEbgndMqU0UtnoWpG5ssXrO7yn/u6mStohw4d+60XHe
-         1lhU2rZ3PgfFns69JHRseYaxwRuYrmnetisr6HIyMx1/YWXDLOlx1jfKZgNbmlBrPW6V
-         UT/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWKEEwdppltaspFqfd2CwJoW5nfJ0IAN0xCCujhrXSSEcceT4nhzkRheqhQRmdY5Iq7DUIrrKsouS6wz8cxyuR1IlPB
-X-Gm-Message-State: AOJu0YyRYeZk73g7aKKEXa66ZMhe5SAoIbv897ZVVrui3gATPEnHcdla
-	Oa5KclTlkPSCu4Je4b/Hzl4dnjQigEK1k3C+lohf9bkLMdgOZoz/eaXmWWMpPCCsyHeZbiBIXtU
-	pF4QXPELMVb8BT2+poDqu0PLb1+Iby7ZiO2GK
-X-Google-Smtp-Source: AGHT+IFyQOwgVWytrps02GnyGzCKWAzKQb9jdGG6O5HjYS2fonQnaQCgjBSaqq+ZRXTyamSyDlrVjFSIa0H9hip10Ho=
-X-Received: by 2002:a17:903:183:b0:1f7:1c96:d2e8 with SMTP id
- d9443c01a7336-1fc5f58803emr2989145ad.10.1721322550399; Thu, 18 Jul 2024
- 10:09:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721322595; x=1721927395;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0oZIFGo3b+JV9w2PKJcAfLvpOGjnV19xdselgMBeOOw=;
+        b=L/fUfUBplsYXXWdppMmU1olX3DdqM7XlFJwGyd8sgrt4tbSIj0B8Qf+zhyAo2GfrkW
+         ayW+HMzkIHW6y5qF9zcrbLsE7j5CCKeIDHOGp5wSJEfRvJ1fwNwW8WbHkfYIze09kQXA
+         GtO3ju40mmO5nsJoRMBIj8BU+yK1uPHtFC+7duV2gJJs7Xj9LzhxHME4PoXUonwBmaP1
+         ClHRpWhkN3LfB6dmAFgaoS9OfrjGWwK1c2JMaAtQ15pDBxBrIMSlOFr/Ls7lUC1D/WYj
+         M0t9MsVCTXOBz5c3zXRd+18aQgaBKxYbf4EivOBZpgcDXjie2TAdH5IMJwcpr51DIcUB
+         tV5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUz+GNOW6CNg6eWA/Byj1up6WaPWQQVrgvJLAk7iL54hw0Vz79sCJtYibqiu5TMoZ6gXiPr3tMeczNBoy3O57EOuzeR
+X-Gm-Message-State: AOJu0Yxf8nWeBbwfmixl+FtPZrRakBh9UcEKMRelILG5LiukCLApV6oM
+	J0RkXTUihXm3/5Auf2e00Q825xv5ZJLl9XJTSfzzLXZyZ7ocoKjvsud9oisQWXE=
+X-Google-Smtp-Source: AGHT+IHrzZA/m6pVbTgjevfoe8nzNI8qw8J1MyZZNmpIu3/V95B0K8fx3QqerirmL3TlDD78U4x6Ww==
+X-Received: by 2002:a05:622a:103:b0:447:e692:8b31 with SMTP id d75a77b69052e-44f969b9a3emr16945791cf.37.1721322595207;
+        Thu, 18 Jul 2024 10:09:55 -0700 (PDT)
+Received: from localhost ([140.82.166.162])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44f96a02d2csm4369571cf.43.2024.07.18.10.09.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 10:09:54 -0700 (PDT)
+Date: Thu, 18 Jul 2024 12:09:53 -0500
+From: Andrew Jones <ajones@ventanamicro.com>
+To: zhouquan@iscas.ac.cn
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, linux-perf-users@vger.kernel.org, 
+	anup@brainfault.org, atishp@atishpatra.org, paul.walmsley@sifive.com, 
+	palmer@dabbelt.com, aou@eecs.berkeley.edu, mark.rutland@arm.com, 
+	alexander.shishkin@linux.intel.com, jolsa@kernel.org
+Subject: Re: [PATCH 2/2] riscv: KVM: add basic support for host vs guest
+ profiling
+Message-ID: <20240718-f39bdec648fc285ffe46cc3e@orel>
+References: <cover.1721271251.git.zhouquan@iscas.ac.cn>
+ <fbf8a9fcca05a1b554ac0d01b0c46fbb6263c435.1721271251.git.zhouquan@iscas.ac.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710234222.2333120-1-jthoughton@google.com>
- <20240710234222.2333120-9-jthoughton@google.com> <DS0PR11MB6373C1BE8CF5E1BCC9F2365BDCA32@DS0PR11MB6373.namprd11.prod.outlook.com>
-In-Reply-To: <DS0PR11MB6373C1BE8CF5E1BCC9F2365BDCA32@DS0PR11MB6373.namprd11.prod.outlook.com>
-From: James Houghton <jthoughton@google.com>
-Date: Thu, 18 Jul 2024 10:08:33 -0700
-Message-ID: <CADrL8HVDUG7OSN2ERmmiXeg8eT8D6edoSiqYKsnjAnVbhGAX9Q@mail.gmail.com>
-Subject: Re: [RFC PATCH 08/18] KVM: x86: Add KVM Userfault support
-To: "Wang, Wei W" <wei.w.wang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	Sean Christopherson <seanjc@google.com>, Shuah Khan <shuah@kernel.org>, 
-	Axel Rasmussen <axelrasmussen@google.com>, David Matlack <dmatlack@google.com>, 
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"kvmarm@lists.linux.dev" <kvmarm@lists.linux.dev>, Peter Xu <peterx@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fbf8a9fcca05a1b554ac0d01b0c46fbb6263c435.1721271251.git.zhouquan@iscas.ac.cn>
 
-On Wed, Jul 17, 2024 at 8:34=E2=80=AFAM Wang, Wei W <wei.w.wang@intel.com> =
-wrote:
+On Thu, Jul 18, 2024 at 07:23:51PM GMT, zhouquan@iscas.ac.cn wrote:
+> From: Quan Zhou <zhouquan@iscas.ac.cn>
+> 
+> For the information collected on the host side, we need to
+> identify which data originates from the guest and record
+> these events separately. This can be achieved by having
+> KVM register perf callbacks.
+> 
+> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
+> ---
+>  arch/riscv/include/asm/kvm_host.h |  6 ++++++
+>  arch/riscv/kvm/Kconfig            |  1 +
+>  arch/riscv/kvm/main.c             | 12 ++++++++++--
+>  arch/riscv/kvm/vcpu.c             |  7 +++++++
+>  4 files changed, 24 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/riscv/include/asm/kvm_host.h b/arch/riscv/include/asm/kvm_host.h
+> index d96281278586..b7bbe1c0c5dd 100644
+> --- a/arch/riscv/include/asm/kvm_host.h
+> +++ b/arch/riscv/include/asm/kvm_host.h
+> @@ -285,6 +285,12 @@ struct kvm_vcpu_arch {
+>  	} sta;
+>  };
+>  
+> +/* TODO: A more explicit approach might be needed here than this simple one */
+
+Can you elaborate on this concern?
+
+> +static inline bool kvm_arch_pmi_in_guest(struct kvm_vcpu *vcpu)
+> +{
+> +	return IS_ENABLED(CONFIG_GUEST_PERF_EVENTS) && !!vcpu;
+> +}
+> +
+>  static inline void kvm_arch_sync_events(struct kvm *kvm) {}
+>  static inline void kvm_arch_sched_in(struct kvm_vcpu *vcpu, int cpu) {}
+>  
+> diff --git a/arch/riscv/kvm/Kconfig b/arch/riscv/kvm/Kconfig
+> index 26d1727f0550..0c3cbb0915ff 100644
+> --- a/arch/riscv/kvm/Kconfig
+> +++ b/arch/riscv/kvm/Kconfig
+> @@ -32,6 +32,7 @@ config KVM
+>  	select KVM_XFER_TO_GUEST_WORK
+>  	select KVM_GENERIC_MMU_NOTIFIER
+>  	select SCHED_INFO
+> +	select GUEST_PERF_EVENTS if PERF_EVENTS
+>  	help
+>  	  Support hosting virtualized guest machines.
+>  
+> diff --git a/arch/riscv/kvm/main.c b/arch/riscv/kvm/main.c
+> index bab2ec34cd87..734b48d8f6dd 100644
+> --- a/arch/riscv/kvm/main.c
+> +++ b/arch/riscv/kvm/main.c
+> @@ -51,6 +51,12 @@ void kvm_arch_hardware_disable(void)
+>  	csr_write(CSR_HIDELEG, 0);
+>  }
+>  
+> +static void kvm_riscv_teardown(void)
+> +{
+> +	kvm_riscv_aia_exit();
+> +	kvm_unregister_perf_callbacks();
+> +}
+> +
+>  static int __init riscv_kvm_init(void)
+>  {
+>  	int rc;
+> @@ -105,9 +111,11 @@ static int __init riscv_kvm_init(void)
+>  		kvm_info("AIA available with %d guest external interrupts\n",
+>  			 kvm_riscv_aia_nr_hgei);
+>  
+> +	kvm_register_perf_callbacks(NULL);
+> +
+>  	rc = kvm_init(sizeof(struct kvm_vcpu), 0, THIS_MODULE);
+>  	if (rc) {
+> -		kvm_riscv_aia_exit();
+> +		kvm_riscv_teardown();
+>  		return rc;
+>  	}
+>  
+> @@ -117,7 +125,7 @@ module_init(riscv_kvm_init);
+>  
+>  static void __exit riscv_kvm_exit(void)
+>  {
+> -	kvm_riscv_aia_exit();
+> +	kvm_riscv_teardown();
+>  
+>  	kvm_exit();
+>  }
+> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
+> index 17e21df36cc1..c9d291865141 100644
+> --- a/arch/riscv/kvm/vcpu.c
+> +++ b/arch/riscv/kvm/vcpu.c
+> @@ -222,6 +222,13 @@ bool kvm_arch_vcpu_in_kernel(struct kvm_vcpu *vcpu)
+>  	return (vcpu->arch.guest_context.sstatus & SR_SPP) ? true : false;
+>  }
+>  
+> +#ifdef CONFIG_GUEST_PERF_EVENTS
+> +unsigned long kvm_arch_vcpu_get_ip(struct kvm_vcpu *vcpu)
+> +{
+> +	return vcpu->arch.guest_context.sepc;
+> +}
+> +#endif
+> +
+>  vm_fault_t kvm_arch_vcpu_fault(struct kvm_vcpu *vcpu, struct vm_fault *vmf)
+>  {
+>  	return VM_FAULT_SIGBUS;
+> -- 
+> 2.34.1
 >
-> On Thursday, July 11, 2024 7:42 AM, James Houghton wrote:
-> > The first prong for enabling KVM Userfault support for x86 is to be abl=
-e to
-> > inform userspace of userfaults. We know when userfaults occurs when
-> > fault->pfn comes back as KVM_PFN_ERR_FAULT, so in
-> > kvm_mmu_prepare_memory_fault_exit(), simply check if fault->pfn is inde=
-ed
-> > KVM_PFN_ERR_FAULT. This means always setting fault->pfn to a known valu=
-e (I
-> > have chosen KVM_PFN_ERR_FAULT) before calling
-> > kvm_mmu_prepare_memory_fault_exit().
-> >
-> > The next prong is to unmap pages that are newly userfault-enabled. Do t=
-his in
-> > kvm_arch_pre_set_memory_attributes().
->
-> Why is there a need to unmap it?
-> I think a userfault is triggered on a page during postcopy when its data =
-has not yet
-> been fetched from the source, that is, the page is never accessed by gues=
-t on the
-> destination and the page table leaf entry is empty.
->
 
-You're right that it's not strictly necessary for implementing
-post-copy. This just comes down to the UAPI we want: does
-ATTRIBUTE_USERFAULT mean "KVM will be unable to access this memory;
-any attempt to access it will generate a userfault" or does it mean
-"accesses to never-accessed, non-prefaulted memory will generate a
-userfault."
+Otherwise,
 
-I think the former (i.e., the one implemented in this RFC) is slightly
-clearer and slightly more useful.
-
-Userfaultfd does the latter:
-1. MAP_PRIVATE|MAP_ANONYMOUS + UFFDIO_REGISTER_MODE_MISSING: if
-nothing is mapped (i.e., major page fault)
-2. non-anonymous VMA + UFFDIO_REGISTER_MODE_MISSING: if the page cache
-does not contain a page
-3. MAP_SHARED + UFFDIO_REGISTER_MODE_MINOR: if the page cache
-*contains* a page, but we got a fault anyway
-
-But in all of these cases, we have a way to start getting userfaults
-for already-accessed memory: for (1) and (3), MADV_DONTNEED, and for
-(2), fallocate(FALLOC_FL_PUNCH_HOLE).
-
-Even if we didn't have MADV_DONTNEED (as used to be the case with
-HugeTLB), we can use PROT_NONE to prevent anyone from mapping anything
-in between an mmap() and a UFFDIO_REGISTER. This has been useful for
-me.
-
-With KVM, we have neither of these tools (unless we include them here), AFA=
-IA.
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
