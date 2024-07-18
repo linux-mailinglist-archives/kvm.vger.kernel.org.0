@@ -1,65 +1,65 @@
-Return-Path: <kvm+bounces-21814-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21815-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB72F93479B
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 07:28:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 347739348F0
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 09:34:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C313282419
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 05:28:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 574351C2191E
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 07:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0E7A46426;
-	Thu, 18 Jul 2024 05:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C47DD78C71;
+	Thu, 18 Jul 2024 07:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UEzxCeEd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="J8b8RAPY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1106542078
-	for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 05:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147FE7D3F1;
+	Thu, 18 Jul 2024 07:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721280516; cv=none; b=prjdvH6VyFphX+bNS0RuOKr2POojyZ76J5SYBJaQAH4xmp9GdbEmyfqwpeQZmxejHy6/24fDKfWOLZOSVzli9CThxAh9AHucaOrHgkjV+osPjM2zWqHkjOHL+f3zEB+OPVsK4axs9YLiOmIYH9IjPRN3IuFOaDOuldoj33PkbDU=
+	t=1721288014; cv=none; b=mgavwKTRDKWObDDeiyTfQi7+k1qKqvQh4X+Dw0UqyLUoDoQcnrcVoo1QD2ptJ6wCKgNRRbMEc8b+EZdzcA47FVYcajiorxQy32QAKyzI+nZnwozu1LHTunWsXPsPaRo5dEqcgdI2SjHAMEnF64iClE1iPmCccCoe7ud94TCeDPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721280516; c=relaxed/simple;
-	bh=/n30pXRSaPg6/RNVS5KqTJU65apInj9L15dc5ZlOJWI=;
+	s=arc-20240116; t=1721288014; c=relaxed/simple;
+	bh=zVJAdWQ/IwEk/Sy+Dh2nXxrFJn/m57IRKW+sOy81ZwQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GvCN+c8gexONKRiKN4Nlx1IyfEmklPz3hF0cKHP9lvDeK5xvI7cV6+CYQ7Q7touXq4wPPVVqVj+Aqy2YhrFK5357S06I5j1InJfGgP2ykUxBUbL3JhLPRE+D2CTRhHdgZtNgFcIStuD8mX4HhiZxCF32ihNb80tE7iyL+xJ03Bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UEzxCeEd; arc=none smtp.client-ip=198.175.65.19
+	 In-Reply-To:Content-Type; b=NPt3d7TeBCNG+Qw7PoqbqvW0zkUz5nFpnz1ZbRwRXXkWTGT1TQjcRcqeTa5I6DGPpXdGBLlrrw/wzjX6Vh1apeUoc35F5697Pri55M/LkXBvppV76P0E9GWpvJjC3irCA44VQw+NLE1SJOHwhkxb0d3awrIhqPlQ9uJYH4aB9YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=J8b8RAPY; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721280514; x=1752816514;
+  t=1721288013; x=1752824013;
   h=message-id:date:mime-version:subject:to:cc:references:
    from:in-reply-to:content-transfer-encoding;
-  bh=/n30pXRSaPg6/RNVS5KqTJU65apInj9L15dc5ZlOJWI=;
-  b=UEzxCeEdwk+zMoftk7ryKROOaslFnyjFKaHgyxafUxDdSaB0JIoOtTZS
-   pFLm31ERGKqkpZFVE5xqOOV1o/Um45GZTSmeU3QFjAdwsj5FwaOAR+1PU
-   nNOj9AT7Mwx0pvl2Kzb3E9259YXsvEgxHlKbyiI8zRMg9kHdmlIAlKTqI
-   B+Dm96zFPfK1OL1M5Z/11RgPD8KMVUwGxhdae/Ta4MWvlkt3WJ6h6nbyb
-   swjldpX8cFGIDfjXUWvTOTRpxaVk2WTbtaOkrWv/H8ZAJfqBuDfxnsBwt
-   HgO3J99+rsxp7Bua4FVUh8ulUf/tCiYzKyT0TI6UnPr2P+Cbj4q6JszT7
-   g==;
-X-CSE-ConnectionGUID: nO6n9GuAQwqEMsUajcjIBQ==
-X-CSE-MsgGUID: 2zuQRXPbST+Jqn4cG+7i2A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11136"; a="18671312"
-X-IronPort-AV: E=Sophos;i="6.09,216,1716274800"; 
-   d="scan'208";a="18671312"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 22:28:33 -0700
-X-CSE-ConnectionGUID: 1d43GwztQwePSZ+OmH1dMg==
-X-CSE-MsgGUID: 3F6yikizQVyqX8j1PyIE4g==
+  bh=zVJAdWQ/IwEk/Sy+Dh2nXxrFJn/m57IRKW+sOy81ZwQ=;
+  b=J8b8RAPYS2vlkytKo9jhcGTgJfZL/OTrxfELx/hlaXhycRuWwe7fgEtP
+   Aijj3bG/1Y9LyZ8nrSELNQ50PNSA9SF8qaEkJHNBnshHJWp6XOvulIVhe
+   lgGYMkHfHZY/eYhSDtv3rb0/pHio2tAMrRSGoTIoGHi1zgjgcMp/KXmHA
+   4tA1BpgMsXAg/KKIWuo5zwALx+ZMjL1hUg4P1eupwLHR38qdYS9s8aZMY
+   JO8HRPs46tWl2GDLgA6Q+kwLAepXZAbW44Sr9pMJ7WAMYULoorCgASYBu
+   gSl4WycVMJlBBVkELJGKBHm2xKK1HlylFKXOsTmRtgS5ykFvnrjVmnQRP
+   Q==;
+X-CSE-ConnectionGUID: MQyc43qCSbymRK5Yt2V21w==
+X-CSE-MsgGUID: oJqIJm/XQbmGYUbgMD/Ynw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11136"; a="22693872"
+X-IronPort-AV: E=Sophos;i="6.09,217,1716274800"; 
+   d="scan'208";a="22693872"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2024 00:33:32 -0700
+X-CSE-ConnectionGUID: CCVrYolsQm6cirAvmE3Dxg==
+X-CSE-MsgGUID: LiZ4Yn0xTK2NwS2i0g7pMA==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,216,1716274800"; 
-   d="scan'208";a="55777879"
-Received: from dapengmi-mobl1.ccr.corp.intel.com (HELO [10.124.225.1]) ([10.124.225.1])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Jul 2024 22:28:29 -0700
-Message-ID: <f18ab76c-abbe-4599-9631-603853bcfa0b@linux.intel.com>
-Date: Thu, 18 Jul 2024 13:28:25 +0800
+X-IronPort-AV: E=Sophos;i="6.09,217,1716274800"; 
+   d="scan'208";a="50972881"
+Received: from ysheng4-mobl.ccr.corp.intel.com (HELO [10.238.2.30]) ([10.238.2.30])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Jul 2024 00:33:28 -0700
+Message-ID: <457184ed-dcda-4363-a0c9-95b43b80a6a4@linux.intel.com>
+Date: Thu, 18 Jul 2024 15:33:25 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,270 +67,208 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC 3/5] i386/kvm: Support event with select&umask format in KVM
- PMU filter
-To: Zhao Liu <zhao1.liu@intel.com>, Paolo Bonzini <pbonzini@redhat.com>,
- Eric Blake <eblake@redhat.com>, Markus Armbruster <armbru@redhat.com>,
- Michael Roth <michael.roth@amd.com>,
- =?UTF-8?Q?Daniel_P_=2E_Berrang=C3=A9?= <berrange@redhat.com>,
- Eduardo Habkost <eduardo@habkost.net>, Marcelo Tosatti
- <mtosatti@redhat.com>, Shaoqin Huang <shahuang@redhat.com>,
- Eric Auger <eauger@redhat.com>, Peter Maydell <peter.maydell@linaro.org>,
- Laurent Vivier <lvivier@redhat.com>, Thomas Huth <thuth@redhat.com>,
- Sebastian Ott <sebott@redhat.com>, Gavin Shan <gshan@redhat.com>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, qemu-arm@nongnu.org,
- Zhenyu Wang <zhenyu.z.wang@intel.com>, Dapeng Mi <dapeng1.mi@intel.com>,
- Yuan Yao <yuan.yao@intel.com>, Xiong Zhang <xiong.y.zhang@intel.com>,
- Mingwei Zhang <mizhang@google.com>, Jim Mattson <jmattson@google.com>
-References: <20240710045117.3164577-1-zhao1.liu@intel.com>
- <20240710045117.3164577-4-zhao1.liu@intel.com>
+Subject: Re: [PATCH v19 110/130] KVM: TDX: Handle TDX PV MMIO hypercall
+To: Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ isaku.yamahata@gmail.com, Paolo Bonzini <pbonzini@redhat.com>,
+ erdemaktas@google.com, Sean Christopherson <seanjc@google.com>,
+ Sagi Shahar <sagis@google.com>, Kai Huang <kai.huang@intel.com>,
+ chen.bo@intel.com, hang.yuan@intel.com, tina.zhang@intel.com,
+ Sean Christopherson <sean.j.christopherson@intel.com>,
+ Rick Edgecombe <rick.p.edgecombe@intel.com>,
+ Reinette Chatre <reinette.chatre@intel.com>
+References: <cover.1708933498.git.isaku.yamahata@intel.com>
+ <a4421e0f2eafc17b4703c920936e32489d2382a3.1708933498.git.isaku.yamahata@intel.com>
+ <560f3796-5a41-49fb-be6e-558bbe582996@linux.intel.com>
+ <20240716222514.GD1900928@ls.amr.corp.intel.com>
 Content-Language: en-US
-From: "Mi, Dapeng" <dapeng1.mi@linux.intel.com>
-In-Reply-To: <20240710045117.3164577-4-zhao1.liu@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240716222514.GD1900928@ls.amr.corp.intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-On 7/10/2024 12:51 PM, Zhao Liu wrote:
-> The select&umask is the common way for x86 to identify the PMU event,
-> so support this way as the "x86-default" format in kvm-pmu-filter
-> object.
+
+On 7/17/2024 6:25 AM, Isaku Yamahata wrote:
+> On Tue, Jun 25, 2024 at 02:54:09PM +0800,
+> Binbin Wu <binbin.wu@linux.intel.com> wrote:
 >
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> ---
->  accel/kvm/kvm-pmu.c      | 62 ++++++++++++++++++++++++++++++++++++++++
->  include/sysemu/kvm-pmu.h | 13 +++++++++
->  qapi/kvm.json            | 46 +++++++++++++++++++++++++++--
->  target/i386/kvm/kvm.c    |  5 ++++
->  4 files changed, 123 insertions(+), 3 deletions(-)
+>>
+>> On 2/26/2024 4:26 PM, isaku.yamahata@intel.com wrote:
+>>> From: Sean Christopherson <sean.j.christopherson@intel.com>
+>>>
+>>> Export kvm_io_bus_read and kvm_mmio tracepoint and wire up TDX PV MMIO
+>>> hypercall to the KVM backend functions.
+>>>
+>>> kvm_io_bus_read/write() searches KVM device emulated in kernel of the given
+>>> MMIO address and emulates the MMIO.  As TDX PV MMIO also needs it, export
+>>> kvm_io_bus_read().  kvm_io_bus_write() is already exported.  TDX PV MMIO
+>>> emulates some of MMIO itself.  To add trace point consistently with x86
+>>> kvm, export kvm_mmio tracepoint.
+>>>
+>>> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+>>> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+>>> Reviewed-by: Paolo Bonzini <pbonzini@redhat.com>
+>>> ---
+>>>    arch/x86/kvm/vmx/tdx.c | 114 +++++++++++++++++++++++++++++++++++++++++
+>>>    arch/x86/kvm/x86.c     |   1 +
+>>>    virt/kvm/kvm_main.c    |   2 +
+>>>    3 files changed, 117 insertions(+)
+>>>
+>>> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+>>> index 55fc6cc6c816..389bb95d2af0 100644
+>>> --- a/arch/x86/kvm/vmx/tdx.c
+>>> +++ b/arch/x86/kvm/vmx/tdx.c
+>>> @@ -1217,6 +1217,118 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
+>>>    	return ret;
+>>>    }
+>>> +static int tdx_complete_mmio(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	unsigned long val = 0;
+>>> +	gpa_t gpa;
+>>> +	int size;
+>>> +
+>>> +	KVM_BUG_ON(vcpu->mmio_needed != 1, vcpu->kvm);
+>>> +	vcpu->mmio_needed = 0;
+>> mmio_needed is used by instruction emulator to setup the complete callback.
+>> Since TDX handle MMIO in a PV way, mmio_needed is not needed here.
+> Ok, we don't need to update mmio_needed.
 >
-> diff --git a/accel/kvm/kvm-pmu.c b/accel/kvm/kvm-pmu.c
-> index 483d1bdf4807..51d3fba5a72a 100644
-> --- a/accel/kvm/kvm-pmu.c
-> +++ b/accel/kvm/kvm-pmu.c
-> @@ -17,6 +17,8 @@
->  #include "qom/object_interfaces.h"
->  #include "sysemu/kvm-pmu.h"
->  
-> +#define UINT12_MAX (4095)
-> +
->  static void kvm_pmu_filter_get_event(Object *obj, Visitor *v, const char *name,
->                                       void *opaque, Error **errp)
->  {
-> @@ -38,6 +40,12 @@ static void kvm_pmu_filter_get_event(Object *obj, Visitor *v, const char *name,
->              str_event->u.raw.code = g_strdup_printf("0x%lx",
->                                                      event->u.raw.code);
->              break;
-> +        case KVM_PMU_EVENT_FMT_X86_DEFAULT:
-> +            str_event->u.x86_default.select =
-> +                g_strdup_printf("0x%x", event->u.x86_default.select);
-> +            str_event->u.x86_default.umask =
-> +                g_strdup_printf("0x%x", event->u.x86_default.umask);
-> +            break;
->          default:
->              g_assert_not_reached();
->          }
-> @@ -83,6 +91,60 @@ static void kvm_pmu_filter_set_event(Object *obj, Visitor *v, const char *name,
->                  goto fail;
->              }
->              break;
-> +        case KVM_PMU_EVENT_FMT_X86_DEFAULT: {
-> +            uint64_t select, umask;
-> +
-> +            ret = qemu_strtou64(str_event->u.x86_default.select, NULL,
-> +                                0, &select);
-> +            if (ret < 0) {
-> +                error_setg(errp,
-> +                           "Invalid %s PMU event (select: %s): %s. "
-> +                           "The select must be a "
-> +                           "12-bit unsigned number string.",
-> +                           KVMPMUEventEncodeFmt_str(str_event->format),
-> +                           str_event->u.x86_default.select,
-> +                           strerror(-ret));
-> +                g_free(event);
-> +                goto fail;
-> +            }
-> +            if (select > UINT12_MAX) {
-> +                error_setg(errp,
-> +                           "Invalid %s PMU event (select: %s): "
-> +                           "Numerical result out of range. "
-> +                           "The select must be a "
-> +                           "12-bit unsigned number string.",
-> +                           KVMPMUEventEncodeFmt_str(str_event->format),
-> +                           str_event->u.x86_default.select);
-> +                g_free(event);
-> +                goto fail;
-> +            }
-> +            event->u.x86_default.select = select;
-> +
-> +            ret = qemu_strtou64(str_event->u.x86_default.umask, NULL,
-> +                                0, &umask);
-> +            if (ret < 0) {
-> +                error_setg(errp,
-> +                           "Invalid %s PMU event (umask: %s): %s. "
-> +                           "The umask must be a uint8 string.",
-> +                           KVMPMUEventEncodeFmt_str(str_event->format),
-> +                           str_event->u.x86_default.umask,
-> +                           strerror(-ret));
-> +                g_free(event);
-> +                goto fail;
-> +            }
-> +            if (umask > UINT8_MAX) {
+>
+>>> +
+>>> +	if (!vcpu->mmio_is_write) {
+>> It's also needed by instruction emulator, we can use
+>> vcpu->run->mmio.is_write instead.
+> No because vcpu->run->mmio is shared with user space.  KVM need to stash
+> it independently.
+>
+>
+>>> +		gpa = vcpu->mmio_fragments[0].gpa;
+>>> +		size = vcpu->mmio_fragments[0].len;
+>> Since MMIO cross page boundary is not allowed according to the input checks
+>> from TDVMCALL, these mmio_fragments[] is not needed.
+>> Just use vcpu->run->mmio.phys_addr and vcpu->run->mmio.len?
+> ditto.
+>
+>
+>>> +
+>>> +		memcpy(&val, vcpu->run->mmio.data, size);
+>>> +		tdvmcall_set_return_val(vcpu, val);
+>>> +		trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
+>>> +	}
+>> Tracepoint for KVM_TRACE_MMIO_WRITE is missing when it is handled in
+>> userspace.
+> tdx_mmio_write() has it before existing to the user space.  It matches with
+> how write_mmio() behaves in x86.c.
+>
+> Hmm, to match with other code, we should remove
+> trace_kvm_mmio(KVM_TRACE_MMIO_READ) and keep KVM_TRACE_MMIO_READ_UNSATISFIED
+> in tdx_emulate_mmio().  That's how read_prepare() and read_exit_mmio() behaves.
+>
+> For MMIO read
+> - When kernel can handle the MMIO, KVM_TRACE_MMIO_READ with data.
+> - When exiting to the user space, KVM_TRACE_MMIO_READ_UNSATISFIED before
+>    the exit.  No trace after the user space handled the MMIO.
 
-umask is extended to 16 bits from Perfmon v6+. Please notice we need to
-upgrade this to 16 bits in the future. More details can be found here.
-[PATCH V3 00/13] Support Lunar Lake and Arrow Lake core PMU - kan.liang
-(kernel.org)
-<https://lore.kernel.org/all/20240626143545.480761-1-kan.liang@linux.intel.com/>
+For MMIO read, in the emulator, there is still a trace after the 
+userspace handled the MMIO.
+In complete_emulated_mmio(), if all fragments have been handled, it will
+set vcpu->mmio_read_completed to 1 and call complete_emulated_io().
+complete_emulated_io
+     kvm_emulate_instruction(vcpu, EMULTYPE_NO_DECODE)
+         x86_emulate_instruction
+             x86_emulate_insn
+                 emulator_read_write
+                     read_prepare
+                         At this point, vcpu->mmio_read_completed is 1,
+                         it traces KVM_TRACE_MMIO_READ with data
+                         and then clear vcpu->mmio_read_completed
+
+So to align with emulator, we should keep the trace for KVM_TRACE_MMIO_READ.
 
 
-> +                error_setg(errp,
-> +                           "Invalid %s PMU event (umask: %s): "
-> +                           "Numerical result out of range. "
-> +                           "The umask must be a uint8 string.",
-> +                           KVMPMUEventEncodeFmt_str(str_event->format),
-> +                           str_event->u.x86_default.umask);
-> +                g_free(event);
-> +                goto fail;
-> +            }
-> +            event->u.x86_default.umask = umask;
-> +            break;
-> +        }
->          default:
->              g_assert_not_reached();
->          }
-> diff --git a/include/sysemu/kvm-pmu.h b/include/sysemu/kvm-pmu.h
-> index 4707759761f1..707f33d604fd 100644
-> --- a/include/sysemu/kvm-pmu.h
-> +++ b/include/sysemu/kvm-pmu.h
-> @@ -26,4 +26,17 @@ struct KVMPMUFilter {
->      KVMPMUFilterEventList *events;
->  };
->  
-> +/*
-> + * Stolen from Linux kernel (RAW_EVENT at tools/testing/selftests/kvm/include/
-> + * x86_64/pmu.h).
-> + *
-> + * Encode an eventsel+umask pair into event-select MSR format.  Note, this is
-> + * technically AMD's format, as Intel's format only supports 8 bits for the
-> + * event selector, i.e. doesn't use bits 24:16 for the selector.  But, OR-ing
-> + * in '0' is a nop and won't clobber the CMASK.
-> + */
-> +#define X86_PMU_RAW_EVENT(eventsel, umask) (((eventsel & 0xf00UL) << 24) | \
-> +                                            ((eventsel) & 0xff) | \
-> +                                            ((umask) & 0xff) << 8)
-> +
->  #endif /* KVM_PMU_H */
-> diff --git a/qapi/kvm.json b/qapi/kvm.json
-> index 0619da83c123..0d759884c229 100644
-> --- a/qapi/kvm.json
-> +++ b/qapi/kvm.json
-> @@ -27,11 +27,13 @@
->  #
->  # @raw: the encoded event code that KVM can directly consume.
->  #
-> +# @x86-default: standard x86 encoding format with select and umask.
-> +#
->  # Since 9.1
->  ##
->  { 'enum': 'KVMPMUEventEncodeFmt',
->    'prefix': 'KVM_PMU_EVENT_FMT',
-> -  'data': ['raw'] }
-> +  'data': ['raw', 'x86-default'] }
->  
->  ##
->  # @KVMPMURawEvent:
-> @@ -46,6 +48,25 @@
->  { 'struct': 'KVMPMURawEvent',
->    'data': { 'code': 'uint64' } }
->  
-> +##
-> +# @KVMPMUX86DefalutEvent:
-> +#
-> +# x86 PMU event encoding with select and umask.
-> +# raw_event = ((select & 0xf00UL) << 24) | \
-> +#              (select) & 0xff) | \
-> +#              ((umask) & 0xff) << 8)
-> +#
-> +# @select: x86 PMU event select field, which is a 12-bit unsigned
-> +#     number.
-> +#
-> +# @umask: x86 PMU event umask field.
-> +#
-> +# Since 9.1
-> +##
-> +{ 'struct': 'KVMPMUX86DefalutEvent',
-> +  'data': { 'select': 'uint16',
-> +            'umask': 'uint8' } }
-> +
->  ##
->  # @KVMPMUFilterEvent:
->  #
-> @@ -61,7 +82,8 @@
->    'base': { 'action': 'KVMPMUFilterAction',
->              'format': 'KVMPMUEventEncodeFmt' },
->    'discriminator': 'format',
-> -  'data': { 'raw': 'KVMPMURawEvent' } }
-> +  'data': { 'raw': 'KVMPMURawEvent',
-> +            'x86-default': 'KVMPMUX86DefalutEvent' } }
->  
->  ##
->  # @KVMPMUFilterProperty:
-> @@ -89,6 +111,23 @@
->  { 'struct': 'KVMPMURawEventVariant',
->    'data': { 'code': 'str' } }
->  
-> +##
-> +# @KVMPMUX86DefalutEventVariant:
-> +#
-> +# The variant of KVMPMUX86DefalutEvent with the string, rather than
-> +# the numeric value.
-> +#
-> +# @select: x86 PMU event select field.  This field is a 12-bit
-> +#     unsigned number string.
-> +#
-> +# @umask: x86 PMU event umask field. This field is a uint8 string.
-> +#
-> +# Since 9.1
-> +##
-> +{ 'struct': 'KVMPMUX86DefalutEventVariant',
-> +  'data': { 'select': 'str',
-> +            'umask': 'str' } }
-> +
->  ##
->  # @KVMPMUFilterEventVariant:
->  #
-> @@ -104,7 +143,8 @@
->    'base': { 'action': 'KVMPMUFilterAction',
->              'format': 'KVMPMUEventEncodeFmt' },
->    'discriminator': 'format',
-> -  'data': { 'raw': 'KVMPMURawEventVariant' } }
-> +  'data': { 'raw': 'KVMPMURawEventVariant',
-> +            'x86-default': 'KVMPMUX86DefalutEventVariant' } }
->  
->  ##
->  # @KVMPMUFilterPropertyVariant:
-> diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-> index e9bf79782316..391531c036a6 100644
-> --- a/target/i386/kvm/kvm.c
-> +++ b/target/i386/kvm/kvm.c
-> @@ -5393,6 +5393,10 @@ kvm_config_pmu_event(KVMPMUFilter *filter,
->          case KVM_PMU_EVENT_FMT_RAW:
->              code = event->u.raw.code;
->              break;
-> +        case KVM_PMU_EVENT_FMT_X86_DEFAULT:
-> +            code = X86_PMU_RAW_EVENT(event->u.x86_default.select,
-> +                                     event->u.x86_default.umask);
-> +            break;
->          default:
->              g_assert_not_reached();
->          }
-> @@ -6073,6 +6077,7 @@ static void kvm_arch_check_pmu_filter(const Object *obj, const char *name,
->  
->          switch (event->format) {
->          case KVM_PMU_EVENT_FMT_RAW:
-> +        case KVM_PMU_EVENT_FMT_X86_DEFAULT:
->              break;
->          default:
->              error_setg(errp,
+>
+> For MMIO write
+> - KVM_TRACE_MMIO_WRITE before handling it.
+>
+>
+>> Also, the return code is only set when the emulation is done in kernel, but
+>> not set when it's handled in userspace.
+>>
+>>> +	return 1;
+>>> +}
+>> How about the fixup as following:
+>>
+>> @@ -1173,19 +1173,18 @@ static int tdx_emulate_io(struct kvm_vcpu *vcpu)
+>> static int tdx_complete_mmio(struct kvm_vcpu *vcpu) { unsigned long val = 0;
+>> - gpa_t gpa; - int size; - - vcpu->mmio_needed = 0; - - if
+>> (!vcpu->mmio_is_write) { - gpa = vcpu->mmio_fragments[0].gpa; - size =
+>> vcpu->mmio_fragments[0].len; + gpa_t gpa = vcpu->run->mmio.phys_addr; + int
+>> size = vcpu->run->mmio.len; + if (vcpu->run->mmio.is_write) { +
+>> trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val); + } else {
+>> memcpy(&val, vcpu->run->mmio.data, size); tdvmcall_set_return_val(vcpu,
+>> val); trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val); } + +
+>> tdvmcall_set_return_code(vcpu, TDVMCALL_SUCCESS); return 1; }
+>>
+>>
+>>
+>>> +
+>>> +static inline int tdx_mmio_write(struct kvm_vcpu *vcpu, gpa_t gpa, int size,
+>>> +				 unsigned long val)
+>>> +{
+>>> +	if (kvm_iodevice_write(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
+>>> +	    kvm_io_bus_write(vcpu, KVM_MMIO_BUS, gpa, size, &val))
+>>> +		return -EOPNOTSUPP;
+>>> +
+>>> +	trace_kvm_mmio(KVM_TRACE_MMIO_WRITE, size, gpa, &val);
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static inline int tdx_mmio_read(struct kvm_vcpu *vcpu, gpa_t gpa, int size)
+>>> +{
+>>> +	unsigned long val;
+>>> +
+>>> +	if (kvm_iodevice_read(vcpu, &vcpu->arch.apic->dev, gpa, size, &val) &&
+>>> +	    kvm_io_bus_read(vcpu, KVM_MMIO_BUS, gpa, size, &val))
+>>> +		return -EOPNOTSUPP;
+>>> +
+>>> +	tdvmcall_set_return_val(vcpu, val);
+>>> +	trace_kvm_mmio(KVM_TRACE_MMIO_READ, size, gpa, &val);
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static int tdx_emulate_mmio(struct kvm_vcpu *vcpu)
+>>> +{
+>>> +	struct kvm_memory_slot *slot;
+>>> +	int size, write, r;
+>>> +	unsigned long val;
+>>> +	gpa_t gpa;
+>>> +
+>>> +	KVM_BUG_ON(vcpu->mmio_needed, vcpu->kvm);
+>>> +
+>> [...]
+>>> +
+>>> +	/* Request the device emulation to userspace device model. */
+>>> +	vcpu->mmio_needed = 1;
+>>> +	vcpu->mmio_is_write = write;
+>> Then they can be dropped.
+> We may drop mmio_needed. mmio_is_write is needed as above.
+>
+>
+>
+>>> +	vcpu->arch.complete_userspace_io = tdx_complete_mmio;
+>>> +
+>>> +	vcpu->run->mmio.phys_addr = gpa;
+>>> +	vcpu->run->mmio.len = size;
+>>> +	vcpu->run->mmio.is_write = write;
+>>> +	vcpu->run->exit_reason = KVM_EXIT_MMIO;
+>>> +
+>>> +	if (write) {
+>>> +		memcpy(vcpu->run->mmio.data, &val, size);
+>>> +	} else {
+>>> +		vcpu->mmio_fragments[0].gpa = gpa;
+>>> +		vcpu->mmio_fragments[0].len = size;
+>> These two lines can be dropped as well.
+> ditto.
+
 
