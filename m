@@ -1,138 +1,147 @@
-Return-Path: <kvm+bounces-21825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8100F934CA9
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 13:38:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4855934CEC
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 14:08:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5001F227DE
-	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 11:38:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5F92DB21442
+	for <lists+kvm@lfdr.de>; Thu, 18 Jul 2024 12:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC79139CE5;
-	Thu, 18 Jul 2024 11:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E798913C3F6;
+	Thu, 18 Jul 2024 12:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AMFa9J87"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nfeaXroR"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FA17839E4;
-	Thu, 18 Jul 2024 11:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3321113C699
+	for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 12:07:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721302672; cv=none; b=fgtUeOLsxzhdn3W12/mz79un4mmxye9TmA54KSbuoNI3vhcIt8VDPgkVAdmfsJ/eZOjrDuxZwK952941bPhB858N9/9M5Z0mZk+ZzHipckFr5WuqejG+gVYkkSLIwunOEpUZP9f1V3lgpsc4NjeX5w3B+Rl87oOb8Yx+BLkRt/0=
+	t=1721304470; cv=none; b=hVpzlzdRDVxv9X6lUrGt+kwFsUMCC+vuEFA2hEQr6zxjImsacqgcm2LPchc9J7GzaNT0TUdCGklVu0dI/MWtf5e/tKwta6hT3S2jqGDCSsCkN/NoR4GMrRkCPY7EGbZNT+aQZCBH3wN047z4D9MaIICORW5hdtzKWHXMr5p5REI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721302672; c=relaxed/simple;
-	bh=JTdVhHa8K8Oj9vWfltL+Kcl+giEACbBSmFqRmJsRqik=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KZm9RAoiyL0ySziJSa9mHskTgDEKXZ3Aqi3uTGtbKk9oMCl1oubbOefv3uX0CCb8OQM839Bo4GQbyj+MY9pU50Thz5PttOdm5mgyxf1Ewp89oS5nM12gghDqZKXVzDCuoXUomQBl9p/bkLn7ppHYP/y5C+58pUMVhnupCk9Vkl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AMFa9J87; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAE5FC116B1;
-	Thu, 18 Jul 2024 11:37:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721302671;
-	bh=JTdVhHa8K8Oj9vWfltL+Kcl+giEACbBSmFqRmJsRqik=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AMFa9J87Gi8RHYPHz8GZpa+zIVfUwtnGKw4QWBgJ7eRG5RKdN3XIbqEgB3dAA69xL
-	 zAv51c3H8tRE1RfsQ7dwymm89G7WduNX+zh8T+Neh+mwwP9FMaWUgswa5CfQwP+X1E
-	 jRmvn9zURoLeatMiMgUOoieJpdql7x83Qpx/P4CVQgOa2KAeEIILNBG2u0frCQYn+h
-	 z0Q8RbeqT/Z4aNxOBlIuGE7WW37vXehPRJJCyY9x1O8Vp5ny3F+63WHjM1ZtP01UnF
-	 /o9Fpv7OubkkzA5sCyApkELgrYVAxQdTnv9/l8vFdgrBxUUhSpGy8HuBd5IkVKQSBl
-	 66HXHp4bcUkhA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sUPSH-00DQvm-Gy;
-	Thu, 18 Jul 2024 12:37:49 +0100
-Date: Thu, 18 Jul 2024 12:37:49 +0100
-Message-ID: <87a5if53si.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <ZpVAi3dqOOysMMnE@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<Zo+6TYIP3FNssR/b@arm.com>
-	<874j8wp1hx.wl-maz@kernel.org>
-	<ZpVAi3dqOOysMMnE@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1721304470; c=relaxed/simple;
+	bh=IcJ23Q0iCS8Sr1ehH+Hu805RN/zyQlg1n2id4d8A0Ec=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Cdok6nzlLNtQ3cSHmT8pVBijbiZaNbzhxhKpDudfSP9w6vqnqQYbOEhKFoebBBKuYu2Glq+Sgj0r0AbenxBTijmnW92KPlIgZhbAJWQvl6EvYBDIb2aLJGNbn1SvQGWt4T0bwsmNyhAiUv6HDlkpswu0ChSNpySgBV6LBM9PX5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nfeaXroR; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-59559ea9cfdso789923a12.0
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 05:07:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1721304466; x=1721909266; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=QS+i/qWgg92JCDQnNoCb860uCH44CrJEZk7eK6ps8uI=;
+        b=nfeaXroR/c2TQ+ih735CalMoJhDNDQzNbcFUNFQWhe4uYv6HHGCsGOUWVeekGaofdi
+         OIv+eL5E5VYCHvk8MFcjhC7NZSyqOL/OT1wE0Upjj4WXbr9tEkiSe1WkuzWUKZuGH+iE
+         e2ozwcSqiA2m/ZFPHFekB4fy1mDaLYZRSeLXNqGCK3LCh7V01hE7jAhzEGSMaqIf+sHq
+         6JOO2ilacRJPaoiBPgFKN+Bs0nh3USjL8S9gAozx2wX0AyisyhpSVfiZ7Ye6IgikXp62
+         waObEv/rJc0Y6+KOVSJ2Tm/ppBjtQnXl+ad+YhlrbCzShuPPpj/bOtn3Z9mW/e2V/HOC
+         pe8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721304466; x=1721909266;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QS+i/qWgg92JCDQnNoCb860uCH44CrJEZk7eK6ps8uI=;
+        b=t3VLboQT5D+E06lhEto5HwruZ6f346xhIYGK8eFzcxz4QrPcfbVNnnOlgDOTQwTtsP
+         Hq4l0Mswcl4kGvap5Vg9JA5Vz0SciHgWgslEnBBuIuXECwIuHZDzA//X5Y+zhT3nSizb
+         9n8tvDiuh6bOCZjI6mRw6UYTmHso0x6f/s0T6N9MsPI6WsVghyWWu3wGMsEcOupfoLS4
+         jf7Kv+z1MpfI7dDIK4+XH/rr1wIwfGp5w2Nl5C/TRdYcQa0w5/+FjbolsCUYJxPBbez0
+         UcyRRqghOei55EV5ru7H4KHf4yfciJGN6+5ZnwHs30ZPkv6t9bDuVSCh84qZJu1NPHY5
+         Qv0g==
+X-Forwarded-Encrypted: i=1; AJvYcCXlqxyBM5H6D0kRulE9Ql3N9irc2w5RkuOTwctUW3T+Giof3upfAhX0Kjf+tv9Qyr0AH5viGmQcy8oAMK9yCpLCX4FP
+X-Gm-Message-State: AOJu0Yw1HjqVC54GI9DoR/KXRce4MYHJqOe6ge+ztjYGMH8bdN3bRB7R
+	Wkd4mYJDvNKT/jSWamjEsEXZFRnwOqO6y+bLLmOvT0FJAvrY3eiE/ZLZwh4rQJKdr7Fh8SA68zt
+	C5lrSWE2XNxobJbm0csqNaXnlY4cbKGHYFKf5ug==
+X-Google-Smtp-Source: AGHT+IHFGt0xHYBCKTNuSvjJPRvjtTalXNDkcWMmH3r0U3DrU1aS/tKuOudUHiM1VD3JpXP+axxgH3tmtyttyMWxLkQ=
+X-Received: by 2002:a05:6402:430a:b0:57c:a77d:a61e with SMTP id
+ 4fb4d7f45d1cf-5a05b22a336mr4519482a12.7.1721304466515; Thu, 18 Jul 2024
+ 05:07:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+References: <20240716-pmu-v3-0-8c7c1858a227@daynix.com> <20240716-pmu-v3-2-8c7c1858a227@daynix.com>
+In-Reply-To: <20240716-pmu-v3-2-8c7c1858a227@daynix.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 18 Jul 2024 13:07:35 +0100
+Message-ID: <CAFEAcA8tFtdpCQobU9ytzxvf3_y3DiA1TwNq8fWgFUtCUYT4hQ@mail.gmail.com>
+Subject: Re: [PATCH v3 2/5] target/arm/kvm: Fix PMU feature bit early
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org, qemu-devel@nongnu.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Alex,
+On Tue, 16 Jul 2024 at 13:50, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>
+> kvm_arm_get_host_cpu_features() used to add the PMU feature
+> unconditionally, and kvm_arch_init_vcpu() removed it when it is actually
+> not available. Conditionally add the PMU feature in
+> kvm_arm_get_host_cpu_features() to save code.
+>
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+> ---
+>  target/arm/kvm.c | 7 +------
+>  1 file changed, 1 insertion(+), 6 deletions(-)
+>
+> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+> index 70f79eda33cd..849e2e21b304 100644
+> --- a/target/arm/kvm.c
+> +++ b/target/arm/kvm.c
+> @@ -280,6 +280,7 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>      if (kvm_arm_pmu_supported()) {
+>          init.features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
+>          pmu_supported = true;
+> +        features |= 1ULL << ARM_FEATURE_PMU;
+>      }
+>
+>      if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+> @@ -448,7 +449,6 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>      features |= 1ULL << ARM_FEATURE_V8;
+>      features |= 1ULL << ARM_FEATURE_NEON;
+>      features |= 1ULL << ARM_FEATURE_AARCH64;
+> -    features |= 1ULL << ARM_FEATURE_PMU;
+>      features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
+>
+>      ahcf->features = features;
+> @@ -1888,13 +1888,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>      if (!arm_feature(env, ARM_FEATURE_AARCH64)) {
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_EL1_32BIT;
+>      }
+> -    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
+> -        cpu->has_pmu = false;
+> -    }
+>      if (cpu->has_pmu) {
+>          cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
+> -    } else {
+> -        env->features &= ~(1ULL << ARM_FEATURE_PMU);
+>      }
+>      if (cpu_isar_feature(aa64_sve, cpu)) {
+>          assert(kvm_arm_sve_supported());
 
-On Mon, 15 Jul 2024 16:30:19 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> In this patch, if I'm reading the code right (and I'm starting to doubt myself)
-> if PAR_EL1.F is set and PAR_EL1 doesn't indicate a permissions fault, then KVM
-> falls back to walking the S1 tables:
-> 
->         if (par & SYS_PAR_EL1_F) {
->                 u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> 
->                 /*
->                  * If we get something other than a permission fault, we
->                  * need to retry, as we're likely to have missed in the PTs.
->                  */
->                 if ((fst & ESR_ELx_FSC_TYPE) != ESR_ELx_FSC_PERM)
->                         retry_slow = true;
-> 	}
-> 
-> I suppose that's because KVM cannot distinguish between two very different
-> reasons for AT failing: 1, because of something being wrong with the stage 1
-> tables when the AT S1E0* instruction was executed and 2, because of missing
-> entries at stage 2, as per the comment. Is that correct?
+Not every KVM CPU is necessarily the "host" CPU type.
+The "cortex-a57" and "cortex-a53" CPU types will work if you
+happen to be on a host of that CPU type, and they don't go
+through kvm_arm_get_host_cpu_features().
 
-Exactly. It doesn't help that I'm using 3 AT instructions to implement
-a single one, and that makes the window of opportunity for things to
-go wrong rather large.
+(Also, at some point in the future we're probably going to
+want to support "tell the guest it has CPU type X via the
+ID registers even when the host is CPU type Y". It seems
+plausible that in that case also we'll end up wanting this
+there too. But I don't put much weight on this because there's
+probably a bunch of things we'll need to fix up if and when
+we eventually try to implement this.)
 
-Now, I've been thinking about this some more, and I came to the
-conclusion that we can actually implement the FEAT_PAN2 instructions
-using the PAN2 instructions themselves, which would greatly simplify
-the code. We just need to switch PSTATE.PAN so that it reflects the
-guest's state around the AT instruction.
-
-With that scheme, the process becomes slightly clearer (and applies to
-all AT instructions except for FEAT_ATS1A):
-
-- either we have a successful translation and all is good
-
-- or we have a failure for permission fault: all is good as well, as
-  this is simply a "normal" failure
-
-- or we have a failure for any other reason, and we must fall back to
-  a SW walk to work things out properly.
-
-I'll try to capture this reasoning as a comment in the next version.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+thanks
+-- PMM
 
