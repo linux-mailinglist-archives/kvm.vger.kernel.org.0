@@ -1,178 +1,401 @@
-Return-Path: <kvm+bounces-21953-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21954-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D7E8937AFF
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 18:29:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2403B937B11
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 18:32:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B870B23993
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 16:29:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46FD11C21CD6
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 16:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB741448F6;
-	Fri, 19 Jul 2024 16:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41C30145FE1;
+	Fri, 19 Jul 2024 16:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="iK/xf+kD"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZNCEgmJt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B378128812
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C0BB2F30
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721406575; cv=none; b=LyPKWVhrFeJMxDwCLFfbw97llhIjHwM0YQVJ0eAFVr9q+Am8ggTuSonLn3aMpMIDYkTAWwMDG15rGqSjZ5rtQ6lI72MZDNFHkdQ3fjjVGaOGtwI/dLNFkJsXl41QU1o08UYaj2+sRwZaVgeZDRtmOVUBThF1+uj0erGhPApnGio=
+	t=1721406714; cv=none; b=mGzPbZpxdYQuQBVjKGjFMi+/EGPzqB9VilIdVZYYQ+3gJ9oyGhquWzr6/OdxlurA0ywgH+MiRIOTRXOxlgi+Y/W3fDdfAQqCwdXli/lPrubzWRO6sY0nInYXmCxg5+jM7F6xZg4wTLuuG7je0a4SXx52IYFiDIb5d846uv6zqCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721406575; c=relaxed/simple;
-	bh=Azpz80wMRlP8lCt8CC0IfRe1hJrR9eEvn43osrhUevI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P3HTiw+V43UNRj1jdOH4Czo3e1mk/EZF+whxfdc1sILz7dpPmx/fnfo9HkEJXq7wH47jlzHEyPQy4bptC1KdwH/url9eIFdvjxn1Iu95zA9YH/gkOGWdjAIrVvKj0Udiei0csJQ8KsCjazkgcpGPG9w94KDUZ0u5Zk6OKkyYvR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=iK/xf+kD; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-70b12572bd8so813032b3a.2
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 09:29:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1721406573; x=1722011373; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TWuFYjkE1q20mT6m9Gz+SjZGLVtg8tkx2StoOgf/mng=;
-        b=iK/xf+kD1mlXCI1PD1APNrkuWqGtj5izxrdxlAwrEwsZ4VokmzPm6Wj9ZM3CCxmWJr
-         pPOmfBPmnoxlXCI6TS69Gmw4r8Y02plcc1CdCbg1R4wt+c3AUGCV6hy7ELcyA9lenKkR
-         lruzQj6PMhYG6cLL9bN+2UqPgUFhygAkjxJW2mhnUW9nb8fx+QsdMYmhktvZi0Q/gdvg
-         ugZTTVmHvjZqiaL1INngQYBJJPl9vQoLR2WOxIntDFSpF3IGQgPbwQ4QjIuMu65bphsB
-         NpGW1zU/US0Ioi0RVA59knQtS0Cm8tpD+YF5A7dhD1/GpwxUZTJg++Aenq2pXvLnTApB
-         D8kg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721406573; x=1722011373;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TWuFYjkE1q20mT6m9Gz+SjZGLVtg8tkx2StoOgf/mng=;
-        b=tvfCxwAbW5y/keTgM/zu3ZZUUDl++vAge4suYLGlPlRZ3zB8DcYrCKvhc14vKyhHXl
-         7NXCHJ0LqeGMxFtunbLPE7rK3OW6OQf3LdPIVuj7HPr1XG57kHRvcfxod67qXLeq6izM
-         eodOg7IAT0fsgFZ+ctUHHqkz6y5s6SSr2FzgqYbdJmLk4TQVglKrgNEpSiJrc3WCgQ95
-         sQKKi6PmnRFLC9pSiyOMngAkYXmmyCF0K+oTTr8Xw7XKESDho9cmC31bZrrYeh6urFfR
-         Tlk3yIv/1Kt7DRFYviqXvf84wlRm5Yhd/cwHGbFqbaOmKNYBAgOeScSQgo2Z2EfnUp9D
-         S0uw==
-X-Forwarded-Encrypted: i=1; AJvYcCVlr4jxMca99bRqDCDULIajz2/cAvjDaEC4uxC2NSkS3mlRLhglCRDdnM8MqvNzR6UV7yGpqxRB837UghRJSEDdvVep
-X-Gm-Message-State: AOJu0Ywsf7uPBRZuiSP4RmpOEcq14O+zUlgYTf8dFF28KITfu7GipbIe
-	8dm6cfsm2bl7iLZgsMp2iZjIGDnpmDuDyuyTC169fgwprdKzzmIOna1YAJpaou0=
-X-Google-Smtp-Source: AGHT+IEKT4AGXtfvIyGaqgqG/ujci4q9QMV+Yb5g27ubDgaaGctBNWqX4OR++3iFt+dPhMFsXZWTiQ==
-X-Received: by 2002:a05:6a00:2353:b0:70b:8190:d555 with SMTP id d2e1a72fcca58-70ce4f43908mr10405084b3a.32.1721406572554;
-        Fri, 19 Jul 2024 09:29:32 -0700 (PDT)
-Received: from ?IPV6:2400:4050:a840:1e00:9ac7:6d57:2b16:6932? ([2400:4050:a840:1e00:9ac7:6d57:2b16:6932])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70cff5587e4sm1371596b3a.135.2024.07.19.09.29.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 19 Jul 2024 09:29:32 -0700 (PDT)
-Message-ID: <414c64cb-7d01-4e63-83ea-90eca0de0942@daynix.com>
-Date: Sat, 20 Jul 2024 01:29:29 +0900
+	s=arc-20240116; t=1721406714; c=relaxed/simple;
+	bh=bHMZVAIJXUtaXZ+25zRYaSwKIgB80QDUGwaZfd8lpqs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QieccVCYesZWvF2fyYw36WuY57NkC4y4xYZkH6UsGxokAqhJlPyDhnqlxFxkFgzzUfDs90Oe5mB8bJmPgmH6jZNuFlkcYFFr5RWVGOAGoXS3qWfKoCV2zBqInVJgqPLHNFg80aCG7a36lKvxow32J+eVphh0EUUqawG9hfRRkoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZNCEgmJt; arc=none smtp.client-ip=95.215.58.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Envelope-To: jamestiotio@gmail.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1721406709;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mxDBTviArTpV5r8VkQvuDFRHuBXZEohQF5CKTD2GYJY=;
+	b=ZNCEgmJtjN4UsqdlRUrEJKTokwfmkjJewhdYMG03bn93QRxdbWESGiXAc9dms96vfZnaOr
+	itxXhSGf/PRr2oh86EvRDIjmgw9sm7wWx6BezO3VMGCAb5t5evxTKCRmf+2nhQdFMBGq7f
+	Igw+218vAaO0qSqXrkPmegD3vXNcxC8=
+X-Envelope-To: kvm@vger.kernel.org
+X-Envelope-To: kvm-riscv@lists.infradead.org
+X-Envelope-To: atishp@rivosinc.com
+X-Envelope-To: cade.richard@berkeley.edu
+Date: Fri, 19 Jul 2024 11:31:41 -0500
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu
+Subject: Re: [kvm-unit-tests PATCH v3 5/5] riscv: sbi: Add test for timer
+ extension
+Message-ID: <20240719-fe2a61d5b67ed6ba35e25eca@orel>
+References: <20240719023947.112609-1-jamestiotio@gmail.com>
+ <20240719023947.112609-6-jamestiotio@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/5] target/arm/kvm: Fix PMU feature bit early
-To: Cornelia Huck <cohuck@redhat.com>,
- Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20240716-pmu-v3-0-8c7c1858a227@daynix.com>
- <20240716-pmu-v3-2-8c7c1858a227@daynix.com>
- <CAFEAcA8tFtdpCQobU9ytzxvf3_y3DiA1TwNq8fWgFUtCUYT4hQ@mail.gmail.com>
- <f9cf0616-34df-42c3-a753-4dec8e2d25b5@daynix.com> <87cyn9a7yn.fsf@redhat.com>
-Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <87cyn9a7yn.fsf@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240719023947.112609-6-jamestiotio@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-On 2024/07/19 21:21, Cornelia Huck wrote:
-> On Fri, Jul 19 2024, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+On Fri, Jul 19, 2024 at 10:39:47AM GMT, James Raphael Tiovalen wrote:
+> Add a test for the set_timer function of the time extension. The test
+> checks that:
+> - The time extension is available
+> - The time counter monotonically increases
+> - The installed timer interrupt handler is called
+> - The timer interrupt is received within a reasonable time interval
+> - The timer interrupt pending bit is cleared after the set_timer SBI
+>   call is made
+> - The timer interrupt can be cleared either by requesting a timer
+>   interrupt infinitely far into the future or by masking the timer
+>   interrupt
 > 
->> On 2024/07/18 21:07, Peter Maydell wrote:
->>> On Tue, 16 Jul 2024 at 13:50, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>>
->>>> kvm_arm_get_host_cpu_features() used to add the PMU feature
->>>> unconditionally, and kvm_arch_init_vcpu() removed it when it is actually
->>>> not available. Conditionally add the PMU feature in
->>>> kvm_arm_get_host_cpu_features() to save code.
->>>>
->>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>>> ---
->>>>    target/arm/kvm.c | 7 +------
->>>>    1 file changed, 1 insertion(+), 6 deletions(-)
->>>>
->>>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->>>> index 70f79eda33cd..849e2e21b304 100644
->>>> --- a/target/arm/kvm.c
->>>> +++ b/target/arm/kvm.c
->>>> @@ -280,6 +280,7 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->>>>        if (kvm_arm_pmu_supported()) {
->>>>            init.features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
->>>>            pmu_supported = true;
->>>> +        features |= 1ULL << ARM_FEATURE_PMU;
->>>>        }
->>>>
->>>>        if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
->>>> @@ -448,7 +449,6 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->>>>        features |= 1ULL << ARM_FEATURE_V8;
->>>>        features |= 1ULL << ARM_FEATURE_NEON;
->>>>        features |= 1ULL << ARM_FEATURE_AARCH64;
->>>> -    features |= 1ULL << ARM_FEATURE_PMU;
->>>>        features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
->>>>
->>>>        ahcf->features = features;
->>>> @@ -1888,13 +1888,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>>        if (!arm_feature(env, ARM_FEATURE_AARCH64)) {
->>>>            cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_EL1_32BIT;
->>>>        }
->>>> -    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
->>>> -        cpu->has_pmu = false;
->>>> -    }
->>>>        if (cpu->has_pmu) {
->>>>            cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
->>>> -    } else {
->>>> -        env->features &= ~(1ULL << ARM_FEATURE_PMU);
->>>>        }
->>>>        if (cpu_isar_feature(aa64_sve, cpu)) {
->>>>            assert(kvm_arm_sve_supported());
->>>
->>> Not every KVM CPU is necessarily the "host" CPU type.
->>> The "cortex-a57" and "cortex-a53" CPU types will work if you
->>> happen to be on a host of that CPU type, and they don't go
->>> through kvm_arm_get_host_cpu_features().
->>
->> kvm_arm_vcpu_init() will emit an error in such a situation and I think
->> it's better than silently removing a feature that the requested CPU type
->> has. A user can still disable the feature if desired.
+> The timer interrupt delay can be set using the TIMER_DELAY environment
+> variable in microseconds. The default delay value is 1 second. Since the
+
+Do we need a whole second? I'd reduce the default delay for the interrupt
+in order to ensure speedy test execution. I think this can be 200 ms as
+well.
+
+> interrupt can arrive a little later than the specified delay, allow some
+> margin of error. This margin of error can be specified via the
+> TIMER_MARGIN environment variable in microseconds. The default margin of
+> error is 200 milliseconds.
 > 
-> OTOH, if we fail for the named cpu models if the kernel does not provide
-> the cap, but silently disable for the host cpu model in that case, that
-> also seems inconsistent. I'd rather keep it as it is now.
+> This test has been verified on RV32 and RV64 with OpenSBI using QEMU.
 
-There are two perspectives of consistency:
-1) The initial value of pmu
-2) The behavior with the pmu value
+Sentences like these belong in the cover letter or under the --- below
+your signoff as they don't belong in the commit (particularly because
+it doesn't include opensbi and qemu versions so it's not that useful
+of information and because all patches should be tested on rv32 and
+rv64, both with and without EFI, before they're merged :-)
 
-This change introduces inconsistency for 1); the host cpu model will 
-have pmu=off by default and the other cpu models will keep default 
-pmu=on value on a system that does not support PMU. It still keeps 
-consistency for 2); it fails if the user sets pmu=on for any cpu model 
-on such a system.
+> 
+> Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
+> ---
+>  lib/riscv/asm/csr.h   |   8 +++
+>  lib/riscv/asm/sbi.h   |   5 ++
+>  lib/riscv/asm/timer.h |  10 ++++
+>  riscv/sbi.c           | 136 ++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 159 insertions(+)
+> 
+> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+> index a9b1bd42..052c0412 100644
+> --- a/lib/riscv/asm/csr.h
+> +++ b/lib/riscv/asm/csr.h
+> @@ -4,13 +4,17 @@
+>  #include <linux/const.h>
+>  
+>  #define CSR_SSTATUS		0x100
+> +#define CSR_SIE			0x104
+>  #define CSR_STVEC		0x105
+>  #define CSR_SSCRATCH		0x140
+>  #define CSR_SEPC		0x141
+>  #define CSR_SCAUSE		0x142
+>  #define CSR_STVAL		0x143
+> +#define CSR_SIP			0x144
+>  #define CSR_SATP		0x180
+>  #define CSR_TIME		0xc01
+> +#define CSR_STIMECMP		0x14d
+> +#define CSR_STIMECMPH		0x15d
 
-We should align 1) for better consistency, but I don't think such a 
-change would be useful. It is likely that something is wrong with the 
-system when the system reports a cpu model but it doesn't support its 
-feature. I think that is the reason why we assert 
-kvm_arm_sve_supported() for SVE; however I don't think such an assertion 
-would help either because kvm_arm_vcpu_init() will fail anyway.
+Please put these CSRs in numeric order, below CSR_SIP.
 
-Regards,
-Akihiko Odaki
+>  
+>  #define SR_SIE			_AC(0x00000002, UL)
+>  
+> @@ -47,6 +51,10 @@
+>  #define IRQ_S_GEXT		12
+>  #define IRQ_PMU_OVF		13
+>  
+> +#define IE_TIE			(_AC(0x1, UL) << IRQ_S_TIMER)
+> +
+> +#define IP_TIP			IE_TIE
+> +
+>  #ifndef __ASSEMBLY__
+>  
+>  #define csr_swap(csr, val)					\
+> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> index 5e1a674a..73ab5438 100644
+> --- a/lib/riscv/asm/sbi.h
+> +++ b/lib/riscv/asm/sbi.h
+> @@ -16,6 +16,7 @@
+>  
+>  enum sbi_ext_id {
+>  	SBI_EXT_BASE = 0x10,
+> +	SBI_EXT_TIME = 0x54494d45,
+>  	SBI_EXT_HSM = 0x48534d,
+>  	SBI_EXT_SRST = 0x53525354,
+>  };
+> @@ -37,6 +38,10 @@ enum sbi_ext_hsm_fid {
+>  	SBI_EXT_HSM_HART_SUSPEND,
+>  };
+>  
+> +enum sbi_ext_time_fid {
+> +	SBI_EXT_TIME_SET_TIMER = 0,
+> +};
+> +
+>  struct sbiret {
+>  	long error;
+>  	long value;
+> diff --git a/lib/riscv/asm/timer.h b/lib/riscv/asm/timer.h
+> index 2e319391..cd20262f 100644
+> --- a/lib/riscv/asm/timer.h
+> +++ b/lib/riscv/asm/timer.h
+> @@ -11,4 +11,14 @@ static inline uint64_t timer_get_cycles(void)
+>  	return csr_read(CSR_TIME);
+>  }
+>  
+> +static inline void timer_irq_enable(void)
+> +{
+> +	csr_set(CSR_SIE, IE_TIE);
+> +}
+> +
+> +static inline void timer_irq_disable(void)
+> +{
+> +	csr_clear(CSR_SIE, IE_TIE);
+> +}
+> +
+>  #endif /* _ASMRISCV_TIMER_H_ */
+> diff --git a/riscv/sbi.c b/riscv/sbi.c
+> index 762e9711..9798b989 100644
+> --- a/riscv/sbi.c
+> +++ b/riscv/sbi.c
+> @@ -6,7 +6,21 @@
+>   */
+>  #include <libcflat.h>
+>  #include <stdlib.h>
+> +#include <limits.h>
+> +#include <asm/barrier.h>
+> +#include <asm/csr.h>
+> +#include <asm/delay.h>
+> +#include <asm/isa.h>
+> +#include <asm/processor.h>
+>  #include <asm/sbi.h>
+> +#include <asm/smp.h>
+> +#include <asm/timer.h>
+> +
+> +static bool timer_works;
+> +static bool mask_timer_irq;
+> +static bool timer_irq_set;
+> +static bool timer_irq_cleared;
+> +static unsigned long timer_irq_count;
+>  
+>  static void help(void)
+>  {
+> @@ -19,6 +33,33 @@ static struct sbiret __base_sbi_ecall(int fid, unsigned long arg0)
+>  	return sbi_ecall(SBI_EXT_BASE, fid, arg0, 0, 0, 0, 0, 0);
+>  }
+>  
+> +static struct sbiret __time_sbi_ecall(unsigned long stime_value)
+> +{
+> +	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
+> +}
+> +
+> +static inline bool timer_irq_pending(void)
+> +{
+> +	return csr_read(CSR_SIP) & IP_TIP;
+> +}
+> +
+> +static void timer_irq_handler(struct pt_regs *regs)
+> +{
+> +	timer_irq_count = (timer_irq_count == ULONG_MAX) ? ULONG_MAX : timer_irq_count + 1;
+
+Unnecessary () and it might read better as
+
+  if (timer_irq_count < ULONG_MAX)
+      ++timer_irq_count;
+
+> +
+> +	timer_works = true;
+> +	if (timer_irq_pending())
+> +		timer_irq_set = true;
+> +
+> +	if (mask_timer_irq)
+> +		timer_irq_disable();
+
+If we use {} on one arm of an if-else then we should use them on both,
+even if one arm is only a single statement.
+
+> +	else {
+> +		__time_sbi_ecall(ULONG_MAX);
+> +		if (!timer_irq_pending())
+> +			timer_irq_cleared = true;
+> +	}
+> +}
+> +
+>  static bool env_or_skip(const char *env)
+>  {
+>  	if (!getenv(env)) {
+> @@ -112,6 +153,100 @@ static void check_base(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void check_time(void)
+> +{
+> +	struct sbiret ret;
+> +	unsigned long begin, end, duration;
+> +	unsigned long d = getenv("TIMER_DELAY") ? strtol(getenv("TIMER_DELAY"), NULL, 0)
+> +						: 1000000;
+> +	unsigned long margin = getenv("TIMER_MARGIN") ? strtol(getenv("TIMER_MARGIN"), NULL, 0)
+> +						      : 200000;
+> +
+> +	d = usec_to_cycles(d);
+> +	margin = usec_to_cycles(margin);
+
+You can also add udelay() to delay.c to provide a convenience
+to users, i.e. we could use udelay(d) below without first
+converting d from usec to cycles. See lib/arm/delay.c for some
+inspiration.
+
+> +
+> +	report_prefix_push("time");
+> +
+> +	if (!sbi_probe(SBI_EXT_TIME)) {
+> +		report_skip("time extension not available");
+> +		report_prefix_pop();
+> +		return;
+> +	}
+> +
+> +	begin = timer_get_cycles();
+> +	delay(d);
+> +	end = timer_get_cycles();
+> +	assert(begin + d <= end);
+
+I don't think we need this begin/end capture and assert because it's only
+testing our delay function. We should test our delay function before we
+merge it to lib/riscv and then unit tests should be able to trust it
+since it's in the lib.
+
+> +
+> +	report_prefix_push("set_timer");
+> +
+> +	install_irq_handler(IRQ_S_TIMER, timer_irq_handler);
+> +	local_irq_enable();
+> +	if (cpu_has_extension(smp_processor_id(), ISA_SSTC))
+> +#if __riscv_xlen == 64
+> +		csr_write(CSR_STIMECMP, ULONG_MAX);
+> +#else
+> +		csr_write(CSR_STIMECMPH, ULONG_MAX);
+> +#endif
+
+This should be
+
+	if (cpu_has_extension(smp_processor_id(), ISA_SSTC)) {
+		csr_write(CSR_STIMECMP, ULONG_MAX);
+ #if __riscv_xlen == 32
+		csr_write(CSR_STIMECMPH, ULONG_MAX);
+ #endif
+        }
+
+since rv32 needs to write both registers.
+
+> +	timer_irq_enable();
+> +
+> +	begin = timer_get_cycles();
+> +	ret = __time_sbi_ecall(begin + d);
+> +
+> +	report(!ret.error, "set timer");
+> +	if (ret.error)
+> +		report_info("set timer failed with %ld\n", ret.error);
+> +
+> +	report(!timer_irq_pending(), "pending timer interrupt bit cleared");
+> +
+> +	while ((end = timer_get_cycles()) <= (begin + d + margin) && !timer_works)
+> +		cpu_relax();
+> +
+> +	report(timer_works, "timer interrupt received");
+> +	report(timer_irq_set, "pending timer interrupt bit set in irq handler");
+> +	report(timer_irq_cleared, "pending timer interrupt bit cleared by setting timer to -1");
+> +
+> +	if (timer_works) {
+> +		duration = end - begin;
+> +		report(duration >= d && duration <= (d + margin), "timer delay honored");
+> +	}
+> +
+> +	if (timer_irq_count > 1)
+> +		report_fail("timer interrupt received multiple times");
+> +
+> +	timer_works = false;
+> +	timer_irq_set = false;
+> +	timer_irq_count = 0;
+> +	mask_timer_irq = true;
+> +	begin = timer_get_cycles();
+> +	ret = __time_sbi_ecall(begin + d);
+> +
+> +	report(!ret.error, "set timer for mask irq test");
+> +	if (ret.error)
+> +		report_info("set timer for mask irq test failed with %ld\n", ret.error);
+> +
+> +	while ((end = timer_get_cycles()) <= (begin + d + margin) && !timer_works)
+> +		cpu_relax();
+> +
+> +	report(timer_works, "timer interrupt received for mask irq test");
+> +	report(timer_irq_set, "pending timer interrupt bit set in irq handler for mask irq test");
+> +
+> +	if (timer_works) {
+> +		duration = end - begin;
+> +		report(duration >= d && duration <= (d + margin),
+> +		       "timer delay honored for mask irq test");
+> +	}
+> +
+> +	if (timer_irq_count > 1)
+> +		report_fail("timer interrupt received multiple times for mask irq test");
+> +
+> +	local_irq_disable();
+> +	install_irq_handler(IRQ_S_TIMER, NULL);
+> +
+> +	report_prefix_pop();
+> +	report_prefix_pop();
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>  
+> @@ -122,6 +257,7 @@ int main(int argc, char **argv)
+>  
+>  	report_prefix_push("sbi");
+>  	check_base();
+> +	check_time();
+>  
+>  	return report_summary();
+>  }
+> -- 
+> 2.43.0
+>
+
+Looks great! Only a couple tweaks remaining and it'll be ready for merge.
+
+Thanks,
+drew
 
