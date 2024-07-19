@@ -1,173 +1,133 @@
-Return-Path: <kvm+bounces-21907-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21908-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C459371B7
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 03:02:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EE1B937289
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 04:40:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 396F21C20E72
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 01:02:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 722971C20E8E
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 02:40:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E6D4A3F;
-	Fri, 19 Jul 2024 01:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2ECB667;
+	Fri, 19 Jul 2024 02:39:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TCCITDoZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cf4hOQUq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4445680
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 01:02:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B7FC13B
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 02:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721350936; cv=none; b=owe/tlZCzGRtFY1AZOPg4/Q6EIjvuCNqvsp4SyBTiFP8xae85e1xwi/hFE4gPWJ8gYyzhrAxXtsobFKFtjdxzQ0EUXLpuefHId2k0+9uq92wfkl0t/CKt9N8W75M14TYCeHAiO9Wmbc2ii55JFiP8jllCB1jqpU8RtIWCYuorNI=
+	t=1721356798; cv=none; b=IjjZRSTXbDNxRHqozQTQNL3vXyRaHOJMXS+eMoM313mLSi3EMUlWaeUHLsNC2W8LHWUekkNRlwsthRny/+nWgFbIdn4liJhILfksOnA2whPlHEmFh4D1ZGVpRe+yrfZXoTLwXzexybNOVLTPXb38FGfnAwpJ2Lbc7k8yLTKBMZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721350936; c=relaxed/simple;
-	bh=egPWD6SvkPUOxMbhJVXX/ZmlFwvqOXO8b8h7S1FD3o8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ndjDfe4zFOobUYsclLZL9NpL1+ukEE/D7ZYntormOwVGe6pFkHmjXJ9LobZ81mH92O5GkBT/thXMtVF3xKiMaoHfA/LEwi6jcDcc+c1RtLYygkpr6EJb3jEUt00JaKrQZ9KVFY9CXRJJQ0Io8+W95FAw+OSv6iNQTlQBbv3YQfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TCCITDoZ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721350932;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Juhk1rxXqcv0LvjBmmBek/yRx3F0GQ+A2PArt9J+ciU=;
-	b=TCCITDoZZAxLWUR9fMipuChb0Whecd3AzOb5ksAB4z2aEZdkvNPK3oOGxKl/a0TL0TVMww
-	85x6BJ95FH6VpeqcXptRj1r12hUE5IDkulXiUwT099V/HZjgqkXCUNSGur+IBwjwtjruag
-	Bm7rqN9LXQYRSwiUCStLRc2QZTeRnDE=
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
- [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-642-GJvo7p2nP7ihXt_BfHB_gQ-1; Thu, 18 Jul 2024 21:02:11 -0400
-X-MC-Unique: GJvo7p2nP7ihXt_BfHB_gQ-1
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-70b09456066so367641b3a.0
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 18:02:11 -0700 (PDT)
+	s=arc-20240116; t=1721356798; c=relaxed/simple;
+	bh=FrqunzruvZqfCQ4DbX787556o7hPjSmdvMczfvumNPI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HAbxqkV8UyP5nJwz8QpYkZAsRO8ikwh2Nl7mOZR1UqqirZkulppMhDKcffBZNw5KRoILybqY3YZcy6PsSJ6LG/sYljEYbwj8mZ9mg0jgWJHFSbHGSzgX6ILO7n2BXyUHm9KyhZ7AO/USOjmk2WyT4RpGxap8v8O/6kuaZn+0/RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cf4hOQUq; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-38257b4283dso7133005ab.2
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 19:39:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721356796; x=1721961596; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hmnGkOnWNz6hEvAEoNe9AfIun1EcbTOw7442bXW+lsA=;
+        b=Cf4hOQUqrHpIuQdvZDram0lYQaPVs0AmRhkI5Ox2z9bA+pKfVRfrM50PXTOeb9fCF+
+         nAS0aPT9TceSIDiJXlATCRezZmcheaj24DVOTWq9g9r1c0lyM/2mn5fbwz8k+fJPlAVc
+         9GtPxQQPxcp5nazfFmwKEGN4OlrkADpzZL1oZ3r/MiZCn87t4+RBlgS0u+U7aWfTiHJi
+         x9YRGoRKy2AMCtpUlWVC4im9y0PmaKgongJjykHAZQecZFUdUIkrix3GbNMd8hG7BngS
+         +NsQyPZsLPtnsVqN9Ym0F2P+yK881nft9ebZBZM/jrtH1LVOulXZ4RRy3Mq6NV1GA2Im
+         dCJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721350930; x=1721955730;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Juhk1rxXqcv0LvjBmmBek/yRx3F0GQ+A2PArt9J+ciU=;
-        b=jfpNzNOKiXZC70mxmoV9QyqxXB/GmXQqem1qqy0+aQHutsV2mZCNSeQYyQ9KwJG1Qs
-         FK3aF4QwDYcwOeIzFALcWkWH2YGSYcFSOu2pTzqae1/1PWhz7dMet+w4L9+lUzA7JUbd
-         5zfaMvqnVOoLxw7wN6u7z0ReP2uecJJljpn0pc3K2p7cZe077ixhjrIEpt91RbEs0x32
-         gRrugmgZFH0JSLTfdP1jBfhW+M52D7FuMW+rWHmHLqy/z1hswjJmFnRsOGYNVPCGBXkb
-         avCrBwc3omV8Z0koJiJSDkV4xHiXpiYq/GABWBjXS/3IzvOlIcFqgPvasB7AzOanlp2u
-         1BRw==
-X-Forwarded-Encrypted: i=1; AJvYcCVMFP7pNNPHbkW0EV537csa1hMUXaYErDKl7thFHcLfMH1+UOS5G60FgU8865BFf3hSMMC5vP51fsgi2aVH7L+bweHt
-X-Gm-Message-State: AOJu0YzuY31Rp2J0TQvxCg99eAyOCh6d4844o2riuJnbi+RjY1kSTS3/
-	Q9kNRnLLkkFEYFcDf6liSErZyVMRFEM9BuguPF8bo3L1l7NnYiSSxSgu0L07fy0Ib7ety2AfFf4
-	0UL8aNqYzk0MR0mBpMJwTKCYrGSiIBCPcRBPbJGHQbdhdWLvAMgEG+T2GNN6f5h6S1n5xNqZ9VN
-	YOSW1h9KBj6AbYc1rWt1a8THdA
-X-Received: by 2002:a05:6a21:39a:b0:1c0:f529:af05 with SMTP id adf61e73a8af0-1c3fdd4d914mr6793183637.43.1721350930338;
-        Thu, 18 Jul 2024 18:02:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEIRWijrC51r9BOXUiE6Aug7hDC6Lr0jyTkTo6KMrQRu/t6/fcr6+L8+BQ4wl7rzCezfYFnYOWyCyo72nnIjgU=
-X-Received: by 2002:a05:6a21:39a:b0:1c0:f529:af05 with SMTP id
- adf61e73a8af0-1c3fdd4d914mr6793160637.43.1721350929827; Thu, 18 Jul 2024
- 18:02:09 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721356796; x=1721961596;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hmnGkOnWNz6hEvAEoNe9AfIun1EcbTOw7442bXW+lsA=;
+        b=iEWB695E6H7quxKZq7opyHbspxjB1CmZdInLjzDCk20T7l/MD692QoI+0rMp6CiWDh
+         yB4GPLpBw5985oZt3A3IJryAcDrROyPYfDc7uwv8ITJCI0zLw06st8k2QHP9uBe+/YjK
+         Ks1SLZdDUiWpFgKh+DrvJIzK8eCUN9HuKcNqAyQDFccLZhmWlCL+fsOiTyQ+3ieDfRmj
+         8Vf2ayTkxYvx2XPq10E7Xy/6mIzLRyYbS8/FcztPOyZISAdyMQ2+BnHfM6gnIUCXHzwN
+         GprpJmJpZd/ZdN0W4eS1DSxk+jcTyn9bMlpPmohFBW+Q8/BGM+qb7NBwgtCSno88aaq3
+         FisQ==
+X-Gm-Message-State: AOJu0Yw7THqmVIUOwQ6rCX9NOoOYFbykhN0PKDPCeYTw6FIZnw4wGgcJ
+	be4lOKIVMbM/vc1nsvx9lAZIxud21lQ2BTnRRy/nE4Cxo8MqomPmvYfmS6vw
+X-Google-Smtp-Source: AGHT+IHkpraSB2pRQsKp1jnXMkpNygom827ppkHXIyJBu6UGKrY9zD8D4ZD70RWFWWjArZH80/Z8Og==
+X-Received: by 2002:a05:6e02:13a9:b0:36c:4688:85aa with SMTP id e9e14a558f8ab-395558006aemr89087275ab.10.1721356796174;
+        Thu, 18 Jul 2024 19:39:56 -0700 (PDT)
+Received: from JRT-PC.. ([202.166.44.78])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70cff491231sm234930b3a.31.2024.07.18.19.39.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Jul 2024 19:39:55 -0700 (PDT)
+From: James Raphael Tiovalen <jamestiotio@gmail.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org
+Cc: andrew.jones@linux.dev,
+	atishp@rivosinc.com,
+	cade.richard@berkeley.edu,
+	James Raphael Tiovalen <jamestiotio@gmail.com>
+Subject: [kvm-unit-tests PATCH v3 0/5] riscv: sbi: Add support to test timer extension
+Date: Fri, 19 Jul 2024 10:39:42 +0800
+Message-ID: <20240719023947.112609-1-jamestiotio@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240717053034-mutt-send-email-mst@kernel.org>
- <CACGkMEura9v43QtBmWSd1+E_jpEUeXf+u5UmUzP1HT5vZOw3NA@mail.gmail.com> <20240718152712-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240718152712-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 19 Jul 2024 09:01:58 +0800
-Message-ID: <CACGkMEtTVmKYMdvjzE753+czmEcts4caG859_jW7nHQt7ATgkw@mail.gmail.com>
-Subject: Re: [GIT PULL] virtio: features, fixes, cleanups
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, aha310510@gmail.com, arefev@swemel.ru, 
-	arseny.krasnov@kaspersky.com, davem@davemloft.net, dtatulea@nvidia.com, 
-	eperezma@redhat.com, glider@google.com, iii@linux.ibm.com, jiri@nvidia.com, 
-	jiri@resnulli.us, kuba@kernel.org, lingshan.zhu@intel.com, 
-	ndabilpuram@marvell.com, pgootzen@nvidia.com, pizhenwei@bytedance.com, 
-	quic_jjohnson@quicinc.com, schalla@marvell.com, stefanha@redhat.com, 
-	sthotton@marvell.com, syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com, 
-	vattunuru@marvell.com, will@kernel.org, xuanzhuo@linux.alibaba.com, 
-	yskelg@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jul 19, 2024 at 3:28=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
- wrote:
->
-> On Thu, Jul 18, 2024 at 08:52:28AM +0800, Jason Wang wrote:
-> > On Wed, Jul 17, 2024 at 5:30=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
-com> wrote:
-> > >
-> > > This is relatively small.
-> > > I had to drop a buggy commit in the middle so some hashes
-> > > changed from what was in linux-next.
-> > > Deferred admin vq scalability fix to after rc2 as a minor issue was
-> > > found with it recently, but the infrastructure for it
-> > > is there now.
-> > >
-> > > The following changes since commit e9d22f7a6655941fc8b2b942ed354ec780=
-936b3e:
-> > >
-> > >   Merge tag 'linux_kselftest-fixes-6.10-rc7' of git://git.kernel.org/=
-pub/scm/linux/kernel/git/shuah/linux-kselftest (2024-07-02 13:53:24 -0700)
-> > >
-> > > are available in the Git repository at:
-> > >
-> > >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/=
-for_linus
-> > >
-> > > for you to fetch changes up to 6c85d6b653caeba2ef982925703cbb4f2b3b31=
-63:
-> > >
-> > >   virtio: rename virtio_find_vqs_info() to virtio_find_vqs() (2024-07=
--17 05:20:58 -0400)
-> > >
-> > > ----------------------------------------------------------------
-> > > virtio: features, fixes, cleanups
-> > >
-> > > Several new features here:
-> > >
-> > > - Virtio find vqs API has been reworked
-> > >   (required to fix the scalability issue we have with
-> > >    adminq, which I hope to merge later in the cycle)
-> > >
-> > > - vDPA driver for Marvell OCTEON
-> > >
-> > > - virtio fs performance improvement
-> > >
-> > > - mlx5 migration speedups
-> > >
-> > > Fixes, cleanups all over the place.
-> > >
-> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> > >
-> >
-> > It looks like this one is missing?
-> >
-> > https://lore.kernel.org/kvm/20240701033159.18133-1-jasowang@redhat.com/=
-T/
-> >
-> > Thanks
->
-> It's not included in the full but it's a bugfix and it's subtel enough
-> that I decided it's best to merge later, in particular when I'm not on
-> vacation ;)
+This patch series adds support for testing the timer extension as
+defined in the RISC-V SBI specification. The first 2 patches add
+infrastructural support for handling interrupts, the next 2 patches add
+some helper routines that can be used by SBI extension tests, while the
+last patch adds the actual test for the timer extension.
 
-Understood.
+v3:
+- Addressed all of Andrew's comments on v2.
+- Added 2 new patches to add sbi_probe and the delay and timer routines.
 
-Thanks
+v2:
+- Addressed all of the previous comments from Andrew.
+- Updated the test to get the timer frequency value from the device tree
+  and allow the test parameters to be specified in microseconds instead of
+  cycles.
 
->
-> --
-> MST
->
+Andrew Jones (1):
+  riscv: Extend exception handling support for interrupts
+
+James Raphael Tiovalen (4):
+  riscv: Update exception cause list
+  riscv: Add method to probe for SBI extensions
+  riscv: Add some delay and timer routines
+  riscv: sbi: Add test for timer extension
+
+ riscv/Makefile            |   2 +
+ lib/riscv/asm/csr.h       |  21 ++++++
+ lib/riscv/asm/delay.h     |  15 +++++
+ lib/riscv/asm/processor.h |  15 ++++-
+ lib/riscv/asm/sbi.h       |   6 ++
+ lib/riscv/asm/setup.h     |   1 +
+ lib/riscv/asm/timer.h     |  24 +++++++
+ lib/riscv/delay.c         |  16 +++++
+ lib/riscv/processor.c     |  27 ++++++--
+ lib/riscv/sbi.c           |  10 +++
+ lib/riscv/setup.c         |   4 ++
+ lib/riscv/timer.c         |  26 ++++++++
+ riscv/sbi.c               | 135 ++++++++++++++++++++++++++++++++++++++
+ 13 files changed, 297 insertions(+), 5 deletions(-)
+ create mode 100644 lib/riscv/asm/delay.h
+ create mode 100644 lib/riscv/asm/timer.h
+ create mode 100644 lib/riscv/delay.c
+ create mode 100644 lib/riscv/timer.c
+
+--
+2.43.0
 
 
