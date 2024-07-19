@@ -1,222 +1,200 @@
-Return-Path: <kvm+bounces-21924-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21925-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B5829375D3
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 11:38:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FD6E937624
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 11:51:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 634A7B23359
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 09:38:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CAA4283E37
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 09:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 913B213B593;
-	Fri, 19 Jul 2024 09:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA52884052;
+	Fri, 19 Jul 2024 09:51:37 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp21.cstnet.cn [159.226.251.21])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC4EF12C81D;
-	Fri, 19 Jul 2024 09:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1139942076;
+	Fri, 19 Jul 2024 09:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721381833; cv=none; b=K7MBWzAhSASxTRiFt3SCppTLuL3585E1TiScAH/BdaeEpUpNTco4sq6OzK6is7YhIcFxQEpgcH7l2mMBn6YrO2qZw3sSvd+kUcDYYA3uGCYloO/yHGf9A6VrPkHmzVURv1zL3Q3C/8WxwyI+ek93oV7+J5w3DDF24DPaaETG/Q8=
+	t=1721382697; cv=none; b=dX8VzqSXtRPYD/3lQVYRY2/ymhS3g07XA10XF4qJxGrVxAx5bxNnEUvgW8DmXqiuSCBEDzggZaKNugX59Rn4RoVp3R7icLMP6og7Rz9TsCQ6eEebAlJQSJwQTj+1wioRw25hbS+hrBwPE9QeqHsUvdZCtHmo+heWro9i0b0ZMc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721381833; c=relaxed/simple;
-	bh=IUtfUVGcz5sYVgR9uxDSmWZHk9bCuute1hPDM6mqKEc=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GFxl4eTvZzcTPRXmTxnD/C3FYUFjDsBaK/PSnGxdCu4WVCTSfiSyo8mcrTvqH/pRaBjbIzHWSC1efo7moRmT6PugTRCA6NiZL/wwBRlHCrbK0NNxVJ5qfw1zfx7KQIRyWIi710Wv5uzQKPpPRRorpOV3Vnqg5blXTmI2Kr9Ryjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WQPbC3QF3zyN8H;
-	Fri, 19 Jul 2024 17:32:23 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7C2C818007C;
-	Fri, 19 Jul 2024 17:37:08 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 19 Jul 2024 17:37:08 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, David
- Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Chuck
- Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, Trond Myklebust
-	<trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>
-Subject: [RFC v11 05/14] mm: page_frag: avoid caller accessing 'page_frag_cache' directly
-Date: Fri, 19 Jul 2024 17:33:29 +0800
-Message-ID: <20240719093338.55117-6-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240719093338.55117-1-linyunsheng@huawei.com>
-References: <20240719093338.55117-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1721382697; c=relaxed/simple;
+	bh=OML8S7YO0nIRZYJ0aGixURY0bk9lAxc0GK7RcbQodYc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lTeVKj2C5YK13LnfM05+Fqr6NEQm7KPoihrMs4RQHcQ35BBm/h5z7T/MAwvI7UVxz74VyvpQnagj3P1ay/M+NHAEpHYI3RoIDNTsQQZaeuOwr1SgiKxbN7Z1zPiQHDLu0b6Ncoeo3RDM0UICCm962+R6UURK6GT32jfDo6PoPhY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from [192.168.12.218] (unknown [121.237.44.107])
+	by APP-01 (Coremail) with SMTP id qwCowACXeU7aNppm0N1LBA--.722S2;
+	Fri, 19 Jul 2024 17:50:20 +0800 (CST)
+Message-ID: <a78bb55e-ae7d-47ad-a3fc-f4662f42625f@iscas.ac.cn>
+Date: Fri, 19 Jul 2024 17:50:18 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] riscv: perf: add guest vs host distinction
+To: Andrew Jones <ajones@ventanamicro.com>
+Cc: linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+ kvm@vger.kernel.org, kvm-riscv@lists.infradead.org,
+ linux-perf-users@vger.kernel.org, anup@brainfault.org,
+ atishp@atishpatra.org, paul.walmsley@sifive.com, palmer@dabbelt.com,
+ aou@eecs.berkeley.edu, mark.rutland@arm.com,
+ alexander.shishkin@linux.intel.com, jolsa@kernel.org
+References: <cover.1721271251.git.zhouquan@iscas.ac.cn>
+ <8e2d2f60fc30d64b6c69b38184a1b640c7b30003.1721271251.git.zhouquan@iscas.ac.cn>
+ <20240718-e689be134be5b958b1eec65a@orel>
+Content-Language: en-US
+From: Quan Zhou <zhouquan@iscas.ac.cn>
+In-Reply-To: <20240718-e689be134be5b958b1eec65a@orel>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:qwCowACXeU7aNppm0N1LBA--.722S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxArWfZF18ZFWkKw1UKFy3Arb_yoW5Kry8pr
+	4DCFnxKFWUXryIg34SqFs8WF1Yqr1rXay29rW2k345Cr9FvF98J3WDKwn8CryrArykXFy0
+	yF1qqFsxuws8ta7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkqb7Iv0xC_Zr1lb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I2
+	0VC2zVCF04k26cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rw
+	A2F7IY1VAKz4vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xII
+	jxv20xvEc7CjxVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwV
+	C2z280aVCY1x0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC
+	0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr
+	1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7
+	MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr
+	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
+	wIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JV
+	WxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAI
+	cVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8fwIDUUUUU==
+X-CM-SenderInfo: 52kr31xxdqqxpvfd2hldfou0/1tbiBgoDBmaZ7vP5RgABsV
 
-Use appropriate frag_page API instead of caller accessing
-'page_frag_cache' directly.
 
-CC: Alexander Duyck <alexander.duyck@gmail.com>
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- drivers/vhost/net.c             |  2 +-
- include/linux/page_frag_cache.h | 10 ++++++++++
- mm/page_frag_test.c             |  2 +-
- net/core/skbuff.c               |  6 +++---
- net/rxrpc/conn_object.c         |  4 +---
- net/rxrpc/local_object.c        |  4 +---
- net/sunrpc/svcsock.c            |  6 ++----
- 7 files changed, 19 insertions(+), 15 deletions(-)
 
-diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
-index 6691fac01e0d..b2737dc0dc50 100644
---- a/drivers/vhost/net.c
-+++ b/drivers/vhost/net.c
-@@ -1325,7 +1325,7 @@ static int vhost_net_open(struct inode *inode, struct file *f)
- 			vqs[VHOST_NET_VQ_RX]);
- 
- 	f->private_data = n;
--	n->pf_cache.va = NULL;
-+	page_frag_cache_init(&n->pf_cache);
- 
- 	return 0;
- }
-diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_cache.h
-index 4c5079f232b5..ef1572f11248 100644
---- a/include/linux/page_frag_cache.h
-+++ b/include/linux/page_frag_cache.h
-@@ -8,6 +8,16 @@
- #include <linux/mm_types_task.h>
- #include <asm/page.h>
- 
-+static inline void page_frag_cache_init(struct page_frag_cache *nc)
-+{
-+	nc->va = NULL;
-+}
-+
-+static inline bool page_frag_cache_is_pfmemalloc(struct page_frag_cache *nc)
-+{
-+	return !!nc->pfmemalloc;
-+}
-+
- void page_frag_cache_drain(struct page_frag_cache *nc);
- void __page_frag_cache_drain(struct page *page, unsigned int count);
- void *__page_frag_alloc_va_align(struct page_frag_cache *nc,
-diff --git a/mm/page_frag_test.c b/mm/page_frag_test.c
-index 9eaa3ab74b29..6df8d8865afe 100644
---- a/mm/page_frag_test.c
-+++ b/mm/page_frag_test.c
-@@ -344,7 +344,7 @@ static int __init page_frag_test_init(void)
- 	u64 duration;
- 	int ret;
- 
--	test_frag.va = NULL;
-+	page_frag_cache_init(&test_frag);
- 	atomic_set(&nthreads, 2);
- 	init_completion(&wait);
- 
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index 4b8acd967793..76a473b1072d 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -749,14 +749,14 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
- 	if (in_hardirq() || irqs_disabled()) {
- 		nc = this_cpu_ptr(&netdev_alloc_cache);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 	} else {
- 		local_bh_disable();
- 		local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 		nc = this_cpu_ptr(&napi_alloc_cache.page);
- 		data = page_frag_alloc_va(nc, len, gfp_mask);
--		pfmemalloc = nc->pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(nc);
- 
- 		local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 		local_bh_enable();
-@@ -846,7 +846,7 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		len = SKB_HEAD_ALIGN(len);
- 
- 		data = page_frag_alloc_va(&nc->page, len, gfp_mask);
--		pfmemalloc = nc->page.pfmemalloc;
-+		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	}
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
-diff --git a/net/rxrpc/conn_object.c b/net/rxrpc/conn_object.c
-index 1539d315afe7..694c4df7a1a3 100644
---- a/net/rxrpc/conn_object.c
-+++ b/net/rxrpc/conn_object.c
-@@ -337,9 +337,7 @@ static void rxrpc_clean_up_connection(struct work_struct *work)
- 	 */
- 	rxrpc_purge_queue(&conn->rx_queue);
- 
--	if (conn->tx_data_alloc.va)
--		__page_frag_cache_drain(virt_to_page(conn->tx_data_alloc.va),
--					conn->tx_data_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&conn->tx_data_alloc);
- 	call_rcu(&conn->rcu, rxrpc_rcu_free_connection);
- }
- 
-diff --git a/net/rxrpc/local_object.c b/net/rxrpc/local_object.c
-index 504453c688d7..a8cffe47cf01 100644
---- a/net/rxrpc/local_object.c
-+++ b/net/rxrpc/local_object.c
-@@ -452,9 +452,7 @@ void rxrpc_destroy_local(struct rxrpc_local *local)
- #endif
- 	rxrpc_purge_queue(&local->rx_queue);
- 	rxrpc_purge_client_connections(local);
--	if (local->tx_alloc.va)
--		__page_frag_cache_drain(virt_to_page(local->tx_alloc.va),
--					local->tx_alloc.pagecnt_bias);
-+	page_frag_cache_drain(&local->tx_alloc);
- }
- 
- /*
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 42d20412c1c3..4b1e87187614 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1609,7 +1609,6 @@ static void svc_tcp_sock_detach(struct svc_xprt *xprt)
- static void svc_sock_free(struct svc_xprt *xprt)
- {
- 	struct svc_sock *svsk = container_of(xprt, struct svc_sock, sk_xprt);
--	struct page_frag_cache *pfc = &svsk->sk_frag_cache;
- 	struct socket *sock = svsk->sk_sock;
- 
- 	trace_svcsock_free(svsk, sock);
-@@ -1619,8 +1618,7 @@ static void svc_sock_free(struct svc_xprt *xprt)
- 		sockfd_put(sock);
- 	else
- 		sock_release(sock);
--	if (pfc->va)
--		__page_frag_cache_drain(virt_to_head_page(pfc->va),
--					pfc->pagecnt_bias);
-+
-+	page_frag_cache_drain(&svsk->sk_frag_cache);
- 	kfree(svsk);
- }
--- 
-2.33.0
+On 2024/7/19 00:53, Andrew Jones wrote:
+> On Thu, Jul 18, 2024 at 07:23:41PM GMT, zhouquan@iscas.ac.cn wrote:
+>> From: Quan Zhou <zhouquan@iscas.ac.cn>
+>>
+>> Introduce basic guest support in perf, enabling it to distinguish
+>> between PMU interrupts in the host or guest, and collect
+>> fundamental information.
+>>
+>> Signed-off-by: Quan Zhou <zhouquan@iscas.ac.cn>
+>> ---
+>>   arch/riscv/include/asm/perf_event.h |  7 ++++++
+>>   arch/riscv/kernel/perf_callchain.c  | 38 +++++++++++++++++++++++++++++
+>>   2 files changed, 45 insertions(+)
+>>
+>> diff --git a/arch/riscv/include/asm/perf_event.h b/arch/riscv/include/asm/perf_event.h
+>> index 665bbc9b2f84..5866d028aee5 100644
+>> --- a/arch/riscv/include/asm/perf_event.h
+>> +++ b/arch/riscv/include/asm/perf_event.h
+>> @@ -8,13 +8,20 @@
+>>   #ifndef _ASM_RISCV_PERF_EVENT_H
+>>   #define _ASM_RISCV_PERF_EVENT_H
+>>   
+>> +#ifdef CONFIG_PERF_EVENTS
+>>   #include <linux/perf_event.h>
+>>   #define perf_arch_bpf_user_pt_regs(regs) (struct user_regs_struct *)regs
+>>   
+>> +extern unsigned long perf_instruction_pointer(struct pt_regs *regs);
+>> +extern unsigned long perf_misc_flags(struct pt_regs *regs);
+>> +#define perf_misc_flags(regs) perf_misc_flags(regs)
+>> +
+>>   #define perf_arch_fetch_caller_regs(regs, __ip) { \
+> 
+> Arm has this outside the #ifdef CONFIG_PERF_EVENTS, but it doesn't
+> look like it should be.
+> 
+
+Yes, Arm makes perf_arch_fetch_caller_regs independent of 
+CONFIG_PERF_EVENTS. What is the rationale behind this? I'm
+not clear on this point. It's reasonable to have them inside
+for riscv, right?
+
+>>   	(regs)->epc = (__ip); \
+>>   	(regs)->s0 = (unsigned long) __builtin_frame_address(0); \
+>>   	(regs)->sp = current_stack_pointer; \
+>>   	(regs)->status = SR_PP; \
+>>   }
+>> +#endif
+>> +
+>>   #endif /* _ASM_RISCV_PERF_EVENT_H */
+>> diff --git a/arch/riscv/kernel/perf_callchain.c b/arch/riscv/kernel/perf_callchain.c
+>> index 3348a61de7d9..c673dc6d9bd2 100644
+>> --- a/arch/riscv/kernel/perf_callchain.c
+>> +++ b/arch/riscv/kernel/perf_callchain.c
+>> @@ -58,6 +58,11 @@ void perf_callchain_user(struct perf_callchain_entry_ctx *entry,
+>>   {
+>>   	unsigned long fp = 0;
+>>   
+>> +	if (perf_guest_state()) {
+>> +		/* TODO: We don't support guest os callchain now */
+>> +		return;
+>> +	}
+>> +
+>>   	fp = regs->s0;
+>>   	perf_callchain_store(entry, regs->epc);
+>>   
+>> @@ -74,5 +79,38 @@ static bool fill_callchain(void *entry, unsigned long pc)
+>>   void perf_callchain_kernel(struct perf_callchain_entry_ctx *entry,
+>>   			   struct pt_regs *regs)
+>>   {
+>> +	if (perf_guest_state()) {
+>> +		/* TODO: We don't support guest os callchain now */
+>> +		return;
+>> +	}
+>> +
+>>   	walk_stackframe(NULL, regs, fill_callchain, entry);
+>>   }
+>> +
+>> +unsigned long perf_instruction_pointer(struct pt_regs *regs)
+>> +{
+>> +	if (perf_guest_state())
+>> +		return perf_guest_get_ip();
+>> +
+>> +	return instruction_pointer(regs);
+>> +}
+>> +
+>> +unsigned long perf_misc_flags(struct pt_regs *regs)
+>> +{
+>> +	unsigned int guest_state = perf_guest_state();
+>> +	int misc = 0;
+> 
+> Should use unsigned long for misc.
+> 
+
+Okay, I'll fix it.
+
+Thanks,
+Quan
+
+>> +
+>> +	if (guest_state) {
+>> +		if (guest_state & PERF_GUEST_USER)
+>> +			misc |= PERF_RECORD_MISC_GUEST_USER;
+>> +		else
+>> +			misc |= PERF_RECORD_MISC_GUEST_KERNEL;
+>> +	} else {
+>> +		if (user_mode(regs))
+>> +			misc |= PERF_RECORD_MISC_USER;
+>> +		else
+>> +			misc |= PERF_RECORD_MISC_KERNEL;
+>> +	}
+>> +
+>> +	return misc;
+>> +}
+>> -- 
+>> 2.34.1
+>>
+> 
+> Thanks,
+> drew
 
 
