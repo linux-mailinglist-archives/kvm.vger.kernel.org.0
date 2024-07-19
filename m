@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-21910-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21911-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC0293728B
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 04:40:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB29993728C
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 04:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 352FC1C20893
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 02:40:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED18E1C209EE
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 02:40:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2151863E;
-	Fri, 19 Jul 2024 02:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C45848E;
+	Fri, 19 Jul 2024 02:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IsNd6IX+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jvb6irOB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CECC17BD9
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 02:40:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7A617C61
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 02:40:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721356804; cv=none; b=E3wbDYS3O+L5I0MJKkEv/DiaJWfjmic7rD8rOLfKVsiVIKle8dIBj8fD0HDRTVVJM8QX7zRDsZyWq/UOM36U8fNUrM3iBj52e2MIvmYMxtfBK7GZcqa3U7+tmrnuTW13iMa4pf95x/yScykjWuIK/WAK9tgZQfLysj7/dJvthlg=
+	t=1721356805; cv=none; b=qb7y3Wke0IAJTOMrbtThfM9Zymjs3Fphbnm2RTgWB4uf6F43B0o9CJyT+Xz3rNX/6Rq754dp0KuNHNIeDm7/LT5+zuLFGnQ/Khqe43QV/+s4Oh3+dxHPFqZdFl1SWkyG8JumS8sxMVGHbXAyxW1QE3cwrxkfVd9BnnHwjowJ61c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721356804; c=relaxed/simple;
-	bh=+n3qbfDTrboEdcvpcY3rZAfV/jBQ7snQ9EH7EftH8lQ=;
+	s=arc-20240116; t=1721356805; c=relaxed/simple;
+	bh=2ojPZa4h2oYAX55qtj8WvJCbwq5yeV93EXeRORL+gpU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kMvePzzfxM72mYZgsIRPOcOJrq6YwLC+vx9ejxzOKeo8lEGf5OksWCCvLhAL1Mkw3pqmQaWFLqb/D2/1NACbFhPtljfzH9HqGvQRjnuP8Ow1P5HvidAPeNGWDVPvLviRzV9c0+PuXLVWygjmbU4jUgIiFUy52iMVQJmQShgUHII=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IsNd6IX+; arc=none smtp.client-ip=209.85.167.180
+	 MIME-Version; b=Oy1ZRNxZgxlfFqosYdGBaysz6MOgZnAogV/xJb/Y9KCFJqRrQKoys6D710TAFrrNsuGKT3VJbhK4JI5ZSjTkGg57ykL7lmItz3O88lt4F1BUD0wlEc78wrCIjce0gujXXc7Jo6Gfdl/m7lqd1ZuogpatMXjj4k9urmnj1cXVoT8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jvb6irOB; arc=none smtp.client-ip=209.85.210.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3d92d1a5222so845518b6e.1
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 19:40:02 -0700 (PDT)
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-70b0e7f6f8bso391214b3a.3
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 19:40:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721356801; x=1721961601; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1721356803; x=1721961603; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=YOqEXJYpkIexGhOwSJXzU52SvIkIRl2QtZdZCBi6Nm8=;
-        b=IsNd6IX+g2bA8nDJD2ax4ZEHyInvy+2UXYlwPoKxOPMs94AmmWbkuaoQzeELs+VK6M
-         ZGOQ5NoJf64rKdWoF5K2bztqRfZWBUK2yME/Rp9Z/ZuFRh6ynfwfcDz1EhjCvPv5Lv+8
-         qLzJuMLGqCVZK5G9AY091bluraA5K5SDK6o/JUOSKfhSEIDzHbq/B7TOKngTUPLsIpHN
-         rOeuN3aiojdYPls5zNp1Hun43m4WMy41AGZaZ+DzwAhyvVsAzlvCfpI8AYqRpN7ZRVjS
-         flzfUGcgPPe+1jUBslfaT5+hQSI1sOUTEKlgWttQoYAjUlQ3u9W0lCjC38/spdwlPFuy
-         G4fw==
+        bh=OLU7dzQvfkJ9Ef0blGKudWZ8SLP+KA1hEm/nsUl2wGw=;
+        b=jvb6irOBvMZUFVnHi+RmkMdlxg/oN+0jIOR7O3xzilU/inX83eMmUsGlmYWGVjuqwD
+         vhMsNilbwF8Q7SXt+LV9ksVmO4QhtOTZr5MbAShgCMLRt9QwAX2HRxszOlsqvUImKxMc
+         SjC3cAm+6FX3nBiFs5QUU6Gsd8gXYs/FhHaupiHPbuAkhCsyKa/HayeObvMEnDMMAUgS
+         r9+zwmfQ3Bu8WC6LAXBiAgNN2KcfrbdltqajPTXQsfBPJfTeyNoHb4YCp4XT/oVrUi2o
+         PeU+mi5pbbd7Y5m3+sip4XIndWGeMzCrJYGID1YNGSTS9gquKG4CwRlZzSISsU+W3684
+         iPAA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721356801; x=1721961601;
+        d=1e100.net; s=20230601; t=1721356803; x=1721961603;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YOqEXJYpkIexGhOwSJXzU52SvIkIRl2QtZdZCBi6Nm8=;
-        b=Q4RkTw1yMDAD+/9+tAcCw1dRaPhqws+G0G9EkvnHMeQ/tCpDul0Axyr6M2a/sirqnm
-         HlbbkCR+PQFAK2WbEDtz6NlM5U9QcbC0Q6Ps5sqhVU+vwdKfsOlEtCelh1W5HuXRGgA6
-         G/UN6oguwzDGfGjRxdiVe4LQCxvTnKFgjOkN/JYcIyX0mo5fvFUBF66cSbmc44GVdeTe
-         Qgq1Di1+PpTd06OhA64ccjFPt6M+DqYLQymx+LZ3yjaVGWVXoXSebFnV0efpU3zcZYVA
-         0Ggm7a/BcgGj/TuIQE4AnE5yPmiUgBB1ZavlS5rIERoHisZL2SknfLm8tZTlCkQZYUPM
-         h2Yg==
-X-Gm-Message-State: AOJu0YxElTyFlSE8sLP0QBtYCetI6SaUjb6DtVMgNz81ItmfFU7A6Lp4
-	d2gYMKMx0wOUYYkoxW6v7cm2SaS5ddZPan+C5/X/DB2GSjbIirnYUpSgGAKw
-X-Google-Smtp-Source: AGHT+IEgSdUOdRVWVRUT3GsQg5RO6N/d5Cu5ZrjCn7Ff/U+19qpx6zxyOovgaJBR5b8ea7A23+A4+Q==
-X-Received: by 2002:a05:6808:1395:b0:3d6:2e85:5c34 with SMTP id 5614622812f47-3dad9a2d485mr4024788b6e.38.1721356800727;
-        Thu, 18 Jul 2024 19:40:00 -0700 (PDT)
+        bh=OLU7dzQvfkJ9Ef0blGKudWZ8SLP+KA1hEm/nsUl2wGw=;
+        b=TS4nFXLEIr0Ug15GhmpJVaJKl6/opf/TeY7t7r57yw39AjYDTP0+XRo3G+WxwXeGno
+         BdXQ3pn8dVlb1bey91fLcBFNhv3Tq7wI80/P0z24hcsVyAKq/eF0kpIGz9bCHBaODzst
+         8G9M+ZhEwBpnnEA8xtp8THw7dk/YIZUr+E3RRt56EVrpcwOxcwEQA30IhfMsZ5tRRAiz
+         8Kdp5EvM7dFPlsdSACnNURcvdipqAJrpRxWew9g+GzrkyuaNvExxvnvV4SK0YQqh+a8m
+         LsIgJ0cVlqm7e3Y9iEdwWRdbsgaWOie6gKPcLMdKpiSAfg5F/QvLZ5djp9rTBNWB7eXU
+         G5xA==
+X-Gm-Message-State: AOJu0YysLK5JdQvxiZZr5ncEGCL5YOtDyM4Fvse8YBz3uIwtQ6npdJox
+	xHlvtVvVa/qHkkQMd+J329CuVT3z+MAcmzMMt+mA/+ooVd4Y5AmKvlgtUp90
+X-Google-Smtp-Source: AGHT+IE7JpMmfmafXElRljUIBX5nNaC28/MohzaDsxFle4aKtRo45YlHaoMlFZzgUMTdcxt2s61H3A==
+X-Received: by 2002:a05:6a00:4fc5:b0:706:6b0b:9573 with SMTP id d2e1a72fcca58-70ce4fb5f42mr8187623b3a.19.1721356803260;
+        Thu, 18 Jul 2024 19:40:03 -0700 (PDT)
 Received: from JRT-PC.. ([202.166.44.78])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70cff491231sm234930b3a.31.2024.07.18.19.39.58
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70cff491231sm234930b3a.31.2024.07.18.19.40.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Jul 2024 19:40:00 -0700 (PDT)
+        Thu, 18 Jul 2024 19:40:02 -0700 (PDT)
 From: James Raphael Tiovalen <jamestiotio@gmail.com>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
@@ -73,9 +73,9 @@ Cc: andrew.jones@linux.dev,
 	atishp@rivosinc.com,
 	cade.richard@berkeley.edu,
 	James Raphael Tiovalen <jamestiotio@gmail.com>
-Subject: [kvm-unit-tests PATCH v3 2/5] riscv: Update exception cause list
-Date: Fri, 19 Jul 2024 10:39:44 +0800
-Message-ID: <20240719023947.112609-3-jamestiotio@gmail.com>
+Subject: [kvm-unit-tests PATCH v3 3/5] riscv: Add method to probe for SBI extensions
+Date: Fri, 19 Jul 2024 10:39:45 +0800
+Message-ID: <20240719023947.112609-4-jamestiotio@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240719023947.112609-1-jamestiotio@gmail.com>
 References: <20240719023947.112609-1-jamestiotio@gmail.com>
@@ -87,50 +87,45 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Update the list of exception and interrupt causes to follow the latest
-RISC-V privileged ISA specification (version 20240411 section 18.6.1).
+Add a `sbi_probe` helper method that can be used by SBI extension tests
+to check if a given extension is available.
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
 Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
 ---
- lib/riscv/asm/csr.h       | 10 ++++++++++
- lib/riscv/asm/processor.h |  2 +-
- 2 files changed, 11 insertions(+), 1 deletion(-)
+ lib/riscv/asm/sbi.h |  1 +
+ lib/riscv/sbi.c     | 10 ++++++++++
+ 2 files changed, 11 insertions(+)
 
-diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-index d6909d93..ba810c9f 100644
---- a/lib/riscv/asm/csr.h
-+++ b/lib/riscv/asm/csr.h
-@@ -36,6 +36,16 @@
- #define EXC_VIRTUAL_INST_FAULT		22
- #define EXC_STORE_GUEST_PAGE_FAULT	23
+diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+index d82a384d..5e1a674a 100644
+--- a/lib/riscv/asm/sbi.h
++++ b/lib/riscv/asm/sbi.h
+@@ -49,6 +49,7 @@ struct sbiret sbi_ecall(int ext, int fid, unsigned long arg0,
  
-+/* Interrupt causes */
-+#define IRQ_S_SOFT		1
-+#define IRQ_VS_SOFT		2
-+#define IRQ_S_TIMER		5
-+#define IRQ_VS_TIMER		6
-+#define IRQ_S_EXT		9
-+#define IRQ_VS_EXT		10
-+#define IRQ_S_GEXT		12
-+#define IRQ_PMU_OVF		13
+ void sbi_shutdown(void);
+ struct sbiret sbi_hart_start(unsigned long hartid, unsigned long entry, unsigned long sp);
++long sbi_probe(int ext);
+ 
+ #endif /* !__ASSEMBLY__ */
+ #endif /* _ASMRISCV_SBI_H_ */
+diff --git a/lib/riscv/sbi.c b/lib/riscv/sbi.c
+index f39134c4..7d7d09c3 100644
+--- a/lib/riscv/sbi.c
++++ b/lib/riscv/sbi.c
+@@ -38,3 +38,13 @@ struct sbiret sbi_hart_start(unsigned long hartid, unsigned long entry, unsigned
+ {
+ 	return sbi_ecall(SBI_EXT_HSM, SBI_EXT_HSM_HART_START, hartid, entry, sp, 0, 0, 0);
+ }
 +
- #ifndef __ASSEMBLY__
- 
- #define csr_swap(csr, val)					\
-diff --git a/lib/riscv/asm/processor.h b/lib/riscv/asm/processor.h
-index 6451adb5..4c9ad968 100644
---- a/lib/riscv/asm/processor.h
-+++ b/lib/riscv/asm/processor.h
-@@ -4,7 +4,7 @@
- #include <asm/csr.h>
- #include <asm/ptrace.h>
- 
--#define EXCEPTION_CAUSE_MAX	16
-+#define EXCEPTION_CAUSE_MAX	24
- #define INTERRUPT_CAUSE_MAX	16
- 
- typedef void (*exception_fn)(struct pt_regs *);
++long sbi_probe(int ext)
++{
++	struct sbiret ret;
++
++	ret = sbi_ecall(SBI_EXT_BASE, SBI_EXT_BASE_PROBE_EXT, ext, 0, 0, 0, 0, 0);
++	assert(!ret.error);
++
++	return ret.value;
++}
 -- 
 2.43.0
 
