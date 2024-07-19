@@ -1,151 +1,175 @@
-Return-Path: <kvm+bounces-21927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21928-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03A259377A8
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 14:21:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C60B993783A
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 15:17:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DE131C21119
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 12:21:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02FB81C21154
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 13:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E655812D1EA;
-	Fri, 19 Jul 2024 12:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A35C213DDCC;
+	Fri, 19 Jul 2024 13:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSFage9+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BX2Ysd7H"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CE91E871
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 12:21:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFB229CE6;
+	Fri, 19 Jul 2024 13:17:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721391674; cv=none; b=F7zQCY/+EnGacv3l+CCdE9HThuHjarreQuZq3mPbcNOzLDuTVocmqgZnVe5A1HvXVh/VU1SbePrwu/wy6l86i3A2VRwfHVisaAr4p8IpeHcCWPQhTPU/jlyZdz1mAWfGMUkcRCbZzidNX9Gorj8i0gfeuays8E1/ZLxHd18x6dg=
+	t=1721395037; cv=none; b=O9yHBhffb9UJw+dfot70TKGStpONdALFX/2m/eJHEoADEadxfozaJamYMuupq5gc/xdxVIxq1JwzkdD7AlfmEm374OY0D8StHMHn01EZmuYX/FXfvWRg6CAbVIwS7Eaqw5n0q7K7JR9A1plk5aiwXuUgyKDeV6KnA9ZtFoMLHeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721391674; c=relaxed/simple;
-	bh=+XqGlAhsuO4SAFGl1WKnrwD4H8hw+mVijkTaMpel1LA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=D4jecZQNAaIJm+9pCNnMM4V92LBmuzRZPL2E+Pr1FdvgzPQSJbQK74b2FQYGRS5Qn3QKNcbnHhdgLA/YR8Ei08HFI3W6lf78NPzo8A4IcXcaPUl50L1ascy8Sj3PszkgzM+PKJLDQXrfOHoKcZ+llEwMy1qbbDfNSm8RyTrV4Bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HSFage9+; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721391671;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8wdb8H9B7dXAjwpES2ljjfqGjFTVH3+0R9NofJlGwv4=;
-	b=HSFage9+7Z4Mv0Qz7de7+cLknTp7y9mxT7FOAUfPq3P9qoZq+7QFGTpR/X7Awky7+u5zDB
-	WBw2dlL4pk4EqZCAw07RYOtSYGpmKF5Fl33lzkYOnkB4iVZEmOiIVBJmS1lGdLvOb7/MmK
-	4/vssKKanlgNW6OyM8Vxy23mvaMVdgg=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-284-jEakaNN7NLKDTBuLuijVgA-1; Fri,
- 19 Jul 2024 08:21:10 -0400
-X-MC-Unique: jEakaNN7NLKDTBuLuijVgA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E4DAE1955F66;
-	Fri, 19 Jul 2024 12:21:07 +0000 (UTC)
-Received: from localhost (unknown [10.22.8.77])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BDDBE1955D4D;
-	Fri, 19 Jul 2024 12:21:06 +0000 (UTC)
-From: Cornelia Huck <cohuck@redhat.com>
-To: Akihiko Odaki <akihiko.odaki@daynix.com>, Peter Maydell
- <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
- qemu-devel@nongnu.org, kvm@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] target/arm/kvm: Fix PMU feature bit early
-In-Reply-To: <f9cf0616-34df-42c3-a753-4dec8e2d25b5@daynix.com>
-Organization: "Red Hat GmbH, Sitz: Werner-von-Siemens-Ring 12, D-85630
- Grasbrunn, Handelsregister: Amtsgericht =?utf-8?Q?M=C3=BCnchen=2C?= HRB
- 153243,
- =?utf-8?Q?Gesch=C3=A4ftsf=C3=BChrer=3A?= Ryan Barnhart, Charles Cachera,
- Michael O'Neill, Amy
- Ross"
-References: <20240716-pmu-v3-0-8c7c1858a227@daynix.com>
- <20240716-pmu-v3-2-8c7c1858a227@daynix.com>
- <CAFEAcA8tFtdpCQobU9ytzxvf3_y3DiA1TwNq8fWgFUtCUYT4hQ@mail.gmail.com>
- <f9cf0616-34df-42c3-a753-4dec8e2d25b5@daynix.com>
-User-Agent: Notmuch/0.38.3 (https://notmuchmail.org)
-Date: Fri, 19 Jul 2024 14:21:04 +0200
-Message-ID: <87cyn9a7yn.fsf@redhat.com>
+	s=arc-20240116; t=1721395037; c=relaxed/simple;
+	bh=qtLPFOhjqFSQYLpvCLe3qCCW4Py65LMqZdG1qvlJQ00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y/MpN1RkVrxuOhm2UYW1vYo9//HFgfno9Mz4gDfOvDRxxAqR5AmzXfsLw/vKx1YNYGg2OgqiY7KRZJAeSJte/zIaaTAD4M4ieuldQsHEjmRO/snP7VIgOTHyJkMXuccUW1FlGO8TfEdl1ZR5sORhT0MYQA8t9adrROXm4+gRlqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BX2Ysd7H; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA35AC32782;
+	Fri, 19 Jul 2024 13:17:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721395037;
+	bh=qtLPFOhjqFSQYLpvCLe3qCCW4Py65LMqZdG1qvlJQ00=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BX2Ysd7HikpMDPOtr1h9L5jSD24rg6Ar4jIpudeOW75Ly61bPrVuFM8vH1CYKX6Li
+	 2uJyxkwcqs9OnDeFrBkpahew6+Mie/ztcLEfSa4Dv3EXLvfUHnkEFajzNh5uKBqBni
+	 iJFP0EkMY77o821Fwfkh2xlFsyatrgxuX+Qv/MRRMLJwOBcES5LFBoRG/gCNB6QJq8
+	 WcIutfAiNxcpZU75Qf7cfS1j8EeyoLjrbPDUfxDsW+4vwPGMFldfln9TKqaFiX9Dye
+	 OuLHSRI8uIWoEPoStzlx6ROavXVt9xom8g3hmKL8Ldp0XaXaaXNFlZBOivtfEMyR/s
+	 4lJIYzCFCmJEw==
+Date: Fri, 19 Jul 2024 14:17:12 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Cc: Samuel Holland <samuel.holland@sifive.com>, greentime.hu@sifive.com,
+	vincent.chen@sifive.com, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
+Subject: Re: [PATCH v7 2/4] dt-bindings: riscv: Add Svade and Svadu Entries
+Message-ID: <20240719-flatten-elixir-d4476977ab95@spud>
+References: <20240712083850.4242-1-yongxuan.wang@sifive.com>
+ <20240712083850.4242-3-yongxuan.wang@sifive.com>
+ <727b966a-a8c4-4021-acf6-3c031ccd843a@sifive.com>
+ <CAMWQL2g-peSYJQaxeJtyOzGdEmDQ6cnkRBdFQvLr2NQA1+mv2g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="FVYN+Rx9CKi55/SI"
+Content-Disposition: inline
+In-Reply-To: <CAMWQL2g-peSYJQaxeJtyOzGdEmDQ6cnkRBdFQvLr2NQA1+mv2g@mail.gmail.com>
 
-On Fri, Jul 19 2024, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
 
-> On 2024/07/18 21:07, Peter Maydell wrote:
->> On Tue, 16 Jul 2024 at 13:50, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>>
->>> kvm_arm_get_host_cpu_features() used to add the PMU feature
->>> unconditionally, and kvm_arch_init_vcpu() removed it when it is actually
->>> not available. Conditionally add the PMU feature in
->>> kvm_arm_get_host_cpu_features() to save code.
->>>
->>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->>> ---
->>>   target/arm/kvm.c | 7 +------
->>>   1 file changed, 1 insertion(+), 6 deletions(-)
->>>
->>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
->>> index 70f79eda33cd..849e2e21b304 100644
->>> --- a/target/arm/kvm.c
->>> +++ b/target/arm/kvm.c
->>> @@ -280,6 +280,7 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->>>       if (kvm_arm_pmu_supported()) {
->>>           init.features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
->>>           pmu_supported = true;
->>> +        features |= 1ULL << ARM_FEATURE_PMU;
->>>       }
->>>
->>>       if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
->>> @@ -448,7 +449,6 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
->>>       features |= 1ULL << ARM_FEATURE_V8;
->>>       features |= 1ULL << ARM_FEATURE_NEON;
->>>       features |= 1ULL << ARM_FEATURE_AARCH64;
->>> -    features |= 1ULL << ARM_FEATURE_PMU;
->>>       features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
->>>
->>>       ahcf->features = features;
->>> @@ -1888,13 +1888,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
->>>       if (!arm_feature(env, ARM_FEATURE_AARCH64)) {
->>>           cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_EL1_32BIT;
->>>       }
->>> -    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
->>> -        cpu->has_pmu = false;
->>> -    }
->>>       if (cpu->has_pmu) {
->>>           cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
->>> -    } else {
->>> -        env->features &= ~(1ULL << ARM_FEATURE_PMU);
->>>       }
->>>       if (cpu_isar_feature(aa64_sve, cpu)) {
->>>           assert(kvm_arm_sve_supported());
->> 
->> Not every KVM CPU is necessarily the "host" CPU type.
->> The "cortex-a57" and "cortex-a53" CPU types will work if you
->> happen to be on a host of that CPU type, and they don't go
->> through kvm_arm_get_host_cpu_features().
->
-> kvm_arm_vcpu_init() will emit an error in such a situation and I think 
-> it's better than silently removing a feature that the requested CPU type 
-> has. A user can still disable the feature if desired.
+--FVYN+Rx9CKi55/SI
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-OTOH, if we fail for the named cpu models if the kernel does not provide
-the cap, but silently disable for the host cpu model in that case, that
-also seems inconsistent. I'd rather keep it as it is now.
+On Fri, Jul 19, 2024 at 02:58:59PM +0800, Yong-Xuan Wang wrote:
+> Hi Samuel,
+>=20
+> On Fri, Jul 19, 2024 at 7:38=E2=80=AFAM Samuel Holland
+> <samuel.holland@sifive.com> wrote:
+> >
+> > On 2024-07-12 3:38 AM, Yong-Xuan Wang wrote:
+> > > Add entries for the Svade and Svadu extensions to the riscv,isa-exten=
+sions
+> > > property.
+> > >
+> > > Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+> > > ---
+> > >  .../devicetree/bindings/riscv/extensions.yaml | 28 +++++++++++++++++=
+++
+> > >  1 file changed, 28 insertions(+)
+> > >
+> > > diff --git a/Documentation/devicetree/bindings/riscv/extensions.yaml =
+b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > index 468c646247aa..e91a6f4ede38 100644
+> > > --- a/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > +++ b/Documentation/devicetree/bindings/riscv/extensions.yaml
+> > > @@ -153,6 +153,34 @@ properties:
+> > >              ratified at commit 3f9ed34 ("Add ability to manually tri=
+gger
+> > >              workflow. (#2)") of riscv-time-compare.
+> > >
+> > > +        - const: svade
+> > > +          description: |
+> > > +            The standard Svade supervisor-level extension for SW-man=
+aged PTE A/D
+> > > +            bit updates as ratified in the 20240213 version of the p=
+rivileged
+> > > +            ISA specification.
+> > > +
+> > > +            Both Svade and Svadu extensions control the hardware beh=
+avior when
+> > > +            the PTE A/D bits need to be set. The default behavior fo=
+r the four
+> > > +            possible combinations of these extensions in the device =
+tree are:
+> > > +            1) Neither Svade nor Svadu present in DT =3D> It is tech=
+nically
+> > > +               unknown whether the platform uses Svade or Svadu. Sup=
+ervisor
+> > > +               software should be prepared to handle either hardware=
+ updating
+> > > +               of the PTE A/D bits or page faults when they need upd=
+ated.
+> > > +            2) Only Svade present in DT =3D> Supervisor must assume =
+Svade to be
+> > > +               always enabled.
+> > > +            3) Only Svadu present in DT =3D> Supervisor must assume =
+Svadu to be
+> > > +               always enabled.
+> > > +            4) Both Svade and Svadu present in DT =3D> Supervisor mu=
+st assume
+> > > +               Svadu turned-off at boot time. To use Svadu, supervis=
+or must
+> > > +               explicitly enable it using the SBI FWFT extension.
+> > > +
+> > > +        - const: svadu
+> > > +          description: |
+> > > +            The standard Svadu supervisor-level extension for hardwa=
+re updating
+> > > +            of PTE A/D bits as ratified at commit c1abccf ("Merge pu=
+ll request
+> > > +            #25 from ved-rivos/ratified") of riscv-svadu. Please ref=
+er to Svade
+> >
+> > Should we be referencing the archived riscv-svadu repository now that S=
+vadu has
+> > been merged to the main privileged ISA manual? Either way:
+> >
+> > Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
+> >
+>=20
+> Yes, this commit is from the archived riscv-svadu repo. Or should I updat=
+e it to
+> "commit c1abccf ("Merge pull request  #25 from ved-rivos/ratified") of
+> riscvarchive/riscv-svadu."?
 
+I think Samuel was saying that we should use the commit where it was
+merged into riscv-isa-manual instead.
+
+--FVYN+Rx9CKi55/SI
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZppnRwAKCRB4tDGHoIJi
+0qmzAPwPCohsOIh0JMJTv+r89hx01GSGvJwwS4SEQyLjNq8GTwD/bTyQl6+PLCAD
+n+bWqAgty3EMTJXCctxru5eDIOrN3wU=
+=IM8G
+-----END PGP SIGNATURE-----
+
+--FVYN+Rx9CKi55/SI--
 
