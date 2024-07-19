@@ -1,130 +1,128 @@
-Return-Path: <kvm+bounces-21962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F542937CC0
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 20:53:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CACC937CCB
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 21:01:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7F961F21FAC
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 18:53:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 483B4281983
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 19:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429BF14830C;
-	Fri, 19 Jul 2024 18:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C7514831C;
+	Fri, 19 Jul 2024 19:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yDYLUd0p"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GOu0Xztr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FFB1474AF
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 18:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9B2145B25
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 19:01:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721415218; cv=none; b=U7MAQjxsD4/i6tJravkEPCkUYqW/XicocsxxUJfEcEmK0LcXkdXkXDJSxX43i4ga0iB9lLcpgzr6zB5gMhVN2DDszfY3KmzlJqwMowSfi0+8L6Sc3tEPJcFV9bPuy0uCmtolSoUWmxz7zMPm9NcVtFkM9X2xnW2qX343j18YRCs=
+	t=1721415691; cv=none; b=tgTlkNqy2Um/Dz2ffl3gOGGr6dRl0mYk1wwm9nlSjVHoO1EFmGFm/nFs+HW303cbwcxlEwEcid2GM9awcc6yi9IlZ4wolrdaBQ8729jfXcIInjLmc6Ff/P0hPnMGQWvMl127vxjWKUpNtjBUq7hdgqPct63Ry6+5Ah+H6nyypHw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721415218; c=relaxed/simple;
-	bh=+kLJ84rOPDfadAIu/tPqOjfvEHdaowyp5cRy2Wb9NJM=;
+	s=arc-20240116; t=1721415691; c=relaxed/simple;
+	bh=Gg6INx0MEXAjT2LzKZUyPAqI1dMbmA4J0mTophETl7Y=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=obhr7B/+VkeWGC1f7Ga1Zc9wRWrCY6OF4XTBdGu0iVpeD7zQeUnuRDI1W5lWFCqTrCV/2hoofV+XgekkZKRt/GDX5LsWI2Tx31jnDJ//Q8tLknU5iCWG9wffiaq0yZaD4eop0map1R3o7FqdyMOw7P2tLXuraUydNAd1WUryw7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yDYLUd0p; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=s+dMxaxNqb4H82P0mrfEJMUulL31tAFCvGdvBUsRlxeIPVTRLwhMtGZ8WCy9We1BuVt6Dp0AaSLHGeTZMgXSgD0vPRp6/DD7CUEgSOgfIX2idj3qpFAFdqVPahDNEFMpcD5pqUYJx2j8Da7G9A84J1LL+X2Vzd+S5462HkggG1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GOu0Xztr; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6688b5b40faso53249697b3.2
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 11:53:36 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fc4fcaa2e8so21590765ad.1
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 12:01:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721415216; x=1722020016; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1721415689; x=1722020489; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/YfiZYPFH3Xc3TdmGdnSOvHRo3erOgTPXdxqXA3ySl0=;
-        b=yDYLUd0pmCS0b8xW2unoongoql/ETAdtFzXazCmoklyadgMOXqXn/QnU17DWVodKlP
-         3VaQ/+pcyaQCysaAhWY8Np8oLDBoIQSpJhrpFwlSBJppS2PUvOVYn8DHYlKzIXQvLQ2F
-         rDRA25BBvBgNNO3+kFzbZ0HvYclm0e7Q8xfNbb/z9mFMkCK7kyIhrUlc6ZBNW5IxFwVG
-         QegTpVHP1YmKS9ev3mXEG7KXQbJrWiwXHeE3ro1GaXRCCyKTrbj95nClzlROKoCxS5Yf
-         xLIO8mojKVOvkAAkpPYO5FD75bsraKkHK072BSUgICQWkmuJjFXNxbsTCspPB8SUcz06
-         NL0A==
+        bh=OM4td61TX/rzKbok6j5iyLHkRN3YiQLaYhOn9MCeYqE=;
+        b=GOu0XztrVhZQfIKd4Wp89Z5B1Ym5SYzLu90AfIvFhjXo2xQEQD4PXNMjJN+Zgf/Euk
+         h0frsCLBpXzOTs4DmCLn1XPl2OoHE4CksBTlqiLNlp7JbXWkoB4eyRQr3T11XJm0Niu0
+         Aa3ux/xUpcCR25clV9ors0kQ5ozYgmV9cSTJrsl8Fj5qGHnopjWoiSzrv/8HIT+XAzsp
+         TJIv5Gk+COzuyllkkkH8IxHyyzJ10i8+FEB5O8D5b3CKtACHmYhdOtQBuwshjNROaGAg
+         XahXiKJitbW+dJnvvHrMozzKurw5tlWHcWaIWzOlv7PsFk/1Az8/Aws9FD2pTVDxks2o
+         IDyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721415216; x=1722020016;
+        d=1e100.net; s=20230601; t=1721415689; x=1722020489;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/YfiZYPFH3Xc3TdmGdnSOvHRo3erOgTPXdxqXA3ySl0=;
-        b=dVw9LnbkBOTnTE38IvC/2i3m0lpLGdWQyU7+RruiDo6i263HHN0G60VBGAgGxRWnkp
-         /u1LLYUjz/yH5bBFbhWhLhAk5Bh/Cg0IDDF1G65Ed72SnqIzcapX2DMO3sBNe0OVUiBN
-         FxsJnTeDwEzDKDF96njI+w7eRTXWLUEiF4f8SX0lc8klzwHLoSMWOWDK2m3p2VeYeByA
-         B4C+z+jfEFd/7Bni+NjSMxG59mnzLZfJzjvIs4uWgvjd7VbCoOVRLmzqfwlhul6exDqx
-         EIASRrpbyr44Y2O2hwYeSPqsy3dGwaBYW74h9A5jzg6HyVLTMObBfcR3S/6GoTMM4N2x
-         33ww==
-X-Gm-Message-State: AOJu0YyBsKxEFVLQXD7Np/sYqdmyjNA5u5tEnzf30wYpZO9266t2WX24
-	dmNBTlPLJmrt9rhRIQN54ssBnOIa1IjPoYPwFfK6Ub/+6sxd4u/kZ/utr5umOLV1c04jmBinqqa
-	a3Q==
-X-Google-Smtp-Source: AGHT+IFF/pVsJU+8/j16/MKkG1plwBz2/9GAQe2lj6JtMKqZQMhQL6o1VVB1Jy4v/044+B+FL3kjuTOTck4=
+        bh=OM4td61TX/rzKbok6j5iyLHkRN3YiQLaYhOn9MCeYqE=;
+        b=eaBxZhlyv3ucPeGDCApYfamXEWcVoJ3114H9Fpxeiiod68EXIqrIKfxawF8M7FuwQe
+         PfEJ/zf1KBuDk9xoE5RAxiatJ9bLrjwE4BdbgAQbb3w883PwO4m9SNb/OhKL4kvg28+m
+         rrvaNg7qx7bfpdwGdLt0MF8YySOH6hXrFF7I3XF5e/PbAPoof5eSlJnPZWOu/teY/4J4
+         AyqvjPEPjXKawen6A3PlTgHQX7PrPV0uRdut+E4UZBE4SuQnsN4t/1c0gMI/Bj1gYbIT
+         g+xim60WvPWzVc+8e0n1J7EKkEoQM0RXDqpg4lRBG+QS66GmbibmGnJ7v+xFmvSEALOi
+         QduA==
+X-Gm-Message-State: AOJu0YxMYkWep84X6NQ6j2jyPiW3FWze58dAg/CI7aBG/Uw6m/LyDR5o
+	uV9b3cSmqX/CgVqurQ96fz0FkMiDvtydMEiE2lqcYGUlu+HvXxIFUPV4UN3GbDYANa3EmJNHA/c
+	6HQ==
+X-Google-Smtp-Source: AGHT+IGOpDdfnJiDu/5vSzdBdD/CewLyKCGvGPYzKJDAh6d1yeR+iW+Lm8Gcv2AaajmD9LK3arNE+M59oao=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:298:b0:64a:d8f6:b9ed with SMTP id
- 00721157ae682-66a66e0debbmr143307b3.9.1721415215999; Fri, 19 Jul 2024
- 11:53:35 -0700 (PDT)
-Date: Fri, 19 Jul 2024 11:53:34 -0700
-In-Reply-To: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e885:b0:1fb:67cb:809f with SMTP id
+ d9443c01a7336-1fd74607f99mr622305ad.12.1721415688856; Fri, 19 Jul 2024
+ 12:01:28 -0700 (PDT)
+Date: Fri, 19 Jul 2024 12:01:27 -0700
+In-Reply-To: <1eb96f85-edee-45fc-930f-a192cecbf54c@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
-Message-ID: <Zpq2Lqd5nFnA0VO-@google.com>
-Subject: Re: [BUG] =?utf-8?Q?arch=2Fx86=2Fkvm=2Fvmx?= =?utf-8?Q?=2Fvmx=5Fonhyperv=2Eh=3A109=3A36=3A_error=3A_dereference_of_NUL?=
- =?utf-8?B?TCDigJgw4oCZ?=
+References: <1eb96f85-edee-45fc-930f-a192cecbf54c@gmail.com>
+Message-ID: <Zpq4B2I1xcMLmuox@google.com>
+Subject: Re: [BUG] arch/x86/kvm/x86.c: =?utf-8?Q?In?= =?utf-8?Q?_function_=E2=80=98prepare=5Femulation=5Ffailure=5Fexit?=
+ =?utf-8?B?4oCZOiBlcnJvcjogdXNlIG9mIE5VTEwg4oCYZGF0YQ==?= =?utf-8?B?4oCZ?=
+ where non-null expected
 From: Sean Christopherson <seanjc@google.com>
 To: Mirsad Todorovac <mtodorovac69@gmail.com>
 Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
 	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, 
-	Vitaly Kuznetsov <vkuznets@redhat.com>
+	David Edmondson <david.edmondson@oracle.com>
 Content-Type: text/plain; charset="us-ascii"
 
 On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
 > Hi, all!
 > 
-> Here is another potential NULL pointer dereference in kvm subsystem of linux
-> stable vanilla 6.10, as GCC 12.3.0 complains.
+> On linux-stable 6.10 vanilla tree, another NULL pointer is passed, which was detected
+> by the fortify-string.h mechanism.
 > 
-> (Please don't throw stuff at me, I think this is the last one for today :-)
+> arch/x86/kvm/x86.c
+> ==================
 > 
-> arch/x86/include/asm/mshyperv.h
-> -------------------------------
->   242 static inline struct hv_vp_assist_page *hv_get_vp_assist_page(unsigned int cpu)
->   243 {
->   244         if (!hv_vp_assist_page)
->   245                 return NULL;
->   246 
->   247         return hv_vp_assist_page[cpu];
->   248 }
+> 13667 kvm_prepare_emulation_failure_exit(vcpu);
 > 
-> arch/x86/kvm/vmx/vmx_onhyperv.h
-> -------------------------------
->   102 static inline void evmcs_load(u64 phys_addr)
->   103 {
->   104         struct hv_vp_assist_page *vp_ap =
->   105                 hv_get_vp_assist_page(smp_processor_id());
->   106 
->   107         if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
->   108                 vp_ap->nested_control.features.directhypercall = 1;
->   109         vp_ap->current_nested_vmcs = phys_addr;
->   110         vp_ap->enlighten_vmentry = 1;
->   111 }
+> calls
 > 
-> Now, this one is simple:
+> 8796 __kvm_prepare_emulation_failure_exit(vcpu, NULL, 0);
+> 
+> which calls
+> 
+> 8790 prepare_emulation_failure_exit(vcpu, data, ndata, NULL, 0);
+> 
+> Note here that data == NULL and ndata = 0.
+> 
+> again data == NULL and ndata == 0, which passes unchanged all until
+> 
+> 8773 memcpy(&run->internal.data[info_start + ARRAY_SIZE(info)], data, ndata * sizeof(data[0]));
 
-Nope :-)
+My reading of the C99 is that KVM's behavior is fine.
 
-> hv_vp_assist_page(cpu) can return NULL, and in line 104 it is assigned to
-> wp_ap, which is dereferenced in lines 108, 109, and 110, which is not checked
-> against returning NULL by hv_vp_assist_page().
+  Where an argument declared as size_t n specifies the length of the array for a
+  function, n can have the value zero on a call to that function. Unless explicitly stated
+  otherwise in the description of a particular function in this subclause, pointer arguments
+  on such a call shall still have valid values, as described in 7.1.4. On such a call, a
+  function that locates a character finds no occurrence, a function that compares two
+  character sequences returns zero, and a function that copies characters copies zero
+  characters.
 
-When enabling eVMCS, and when onlining a CPU with eVMCS enabled, KVM verifies
-that every CPU has a valid hv_vp_assist_page() and either aborts enabling eVMCS
-or rejects CPU onlining.  So very subtly, it's impossible for hv_vp_assist_page()
-to be NULL at evmcs_load().
+If the function copies zero characters, then there can't be a store to the NULL
+pointer, and if there's no store, there's no NULL pointer explosion.
+
+I suppose arguably one could argue the builtin memcpy() could deliberately fail
+on an invalid pointer, but that'd be rather ridiculous.
 
