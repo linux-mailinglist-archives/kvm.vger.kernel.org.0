@@ -1,212 +1,178 @@
-Return-Path: <kvm+bounces-21952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88C0D937A82
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 18:14:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D7E8937AFF
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 18:29:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F6EA2853CA
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 16:14:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B870B23993
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 16:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9D514A0B6;
-	Fri, 19 Jul 2024 16:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB741448F6;
+	Fri, 19 Jul 2024 16:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="PnYQIHlL"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="iK/xf+kD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F385914A09C
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B378128812
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:29:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721405412; cv=none; b=qeWByTFvz+9qPK7DczCcSvZcjy4zOP/E+d5t41DlQjZzpDykvoRFqIbMIQW564iSS7Zc+uM1JQwTAMS42plDYqVa+QsWsOOj5yEERj9eEUJYk3v/nhBEvQm5s9wfpuiniBD7jIiePznzhYEYE6i9IU7Elpg/b3zvxWn0yNk1IGk=
+	t=1721406575; cv=none; b=LyPKWVhrFeJMxDwCLFfbw97llhIjHwM0YQVJ0eAFVr9q+Am8ggTuSonLn3aMpMIDYkTAWwMDG15rGqSjZ5rtQ6lI72MZDNFHkdQ3fjjVGaOGtwI/dLNFkJsXl41QU1o08UYaj2+sRwZaVgeZDRtmOVUBThF1+uj0erGhPApnGio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721405412; c=relaxed/simple;
-	bh=B+1xZ9fR6tSoT6mL74KtYbAEPB8W5QhktsEz3iQNGNQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lKNypDEywW4hKp0OIQf93wwrIv6X2X8OQYA7tyXEUP/CcRuFxW+zDnbstAVG3JBsYwttUhHe5xEtES+QgPcZtUP4c7bzb8Bw/qrgg4tVTMIKE7WaTVMne6+Xp/4rPS8VxV9+G25eJYqoqB4iO8hSYkXbuSQlGl8R4kqSDxXOZtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=PnYQIHlL; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1fc5296e214so17589345ad.0
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 09:10:10 -0700 (PDT)
+	s=arc-20240116; t=1721406575; c=relaxed/simple;
+	bh=Azpz80wMRlP8lCt8CC0IfRe1hJrR9eEvn43osrhUevI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=P3HTiw+V43UNRj1jdOH4Czo3e1mk/EZF+whxfdc1sILz7dpPmx/fnfo9HkEJXq7wH47jlzHEyPQy4bptC1KdwH/url9eIFdvjxn1Iu95zA9YH/gkOGWdjAIrVvKj0Udiei0csJQ8KsCjazkgcpGPG9w94KDUZ0u5Zk6OKkyYvR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=iK/xf+kD; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-70b12572bd8so813032b3a.2
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 09:29:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1721405410; x=1722010210; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qyi9hrGfVRmOD1WpD5vxj3JpORinviXBA5VC8Qc3Jso=;
-        b=PnYQIHlLcEXdgivrQevf6GbVBv4/LmkgKzC+4tOQ0qO8qQ4XdhJZ32iQSmBvrmwpLq
-         5v0q8yu30aS6nGXRFutEQnQKHExmsl7E6fBrhWw5ctrRFdGq/hY2JOlw3KxL6U63Hy8W
-         URi4vc4tA8oEfzfq5PXzBtobGUv4SBrD0FYqZrKw6gCuNsorOwELfyt7KFZHs9do7eS4
-         /qobMZ8Lkl/kvnteYPugdpeVQTLutalfRZRyM+/+VNkGF8EL2MXQriYKaq9szk4pHSBp
-         p07aPww3Nx92eGHm8s85RtF9OGiZ4u/bznWGJbw4k8J8WtBDJMYSR9okhbzfUgJ6fh6H
-         /tMg==
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1721406573; x=1722011373; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TWuFYjkE1q20mT6m9Gz+SjZGLVtg8tkx2StoOgf/mng=;
+        b=iK/xf+kD1mlXCI1PD1APNrkuWqGtj5izxrdxlAwrEwsZ4VokmzPm6Wj9ZM3CCxmWJr
+         pPOmfBPmnoxlXCI6TS69Gmw4r8Y02plcc1CdCbg1R4wt+c3AUGCV6hy7ELcyA9lenKkR
+         lruzQj6PMhYG6cLL9bN+2UqPgUFhygAkjxJW2mhnUW9nb8fx+QsdMYmhktvZi0Q/gdvg
+         ugZTTVmHvjZqiaL1INngQYBJJPl9vQoLR2WOxIntDFSpF3IGQgPbwQ4QjIuMu65bphsB
+         NpGW1zU/US0Ioi0RVA59knQtS0Cm8tpD+YF5A7dhD1/GpwxUZTJg++Aenq2pXvLnTApB
+         D8kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721405410; x=1722010210;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Qyi9hrGfVRmOD1WpD5vxj3JpORinviXBA5VC8Qc3Jso=;
-        b=CryPdr4iV5s749Ziqoswge6fz0dTgCvDn2D0d9Tyco9a602frDZglVaf3Kn4Jifr65
-         OyDk1k/POs0wXymdtAyPKqHMbDVtUQsB7nC16FT8s+El6YZu4dJjOozoiS/P+mMniZAI
-         ftHbxyRWaKH+FpQXmG0wnpMfIW+hJqBdnmUghmolgcqelkmLUJ2KIRIKBEe/8q7nJh5/
-         lTziu+ifV/35EOMuCPbyLu+9zl0BCWAyRiqnnzxXyLadAtPaTp8lk2yXBGzhEB0d1v8f
-         KJSTx/kEhmWWCadt/B7djaM3F1LXKslMBdMKybLjLUyeyi4q1PDRu73A7xiHpsvosq0g
-         g9TQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUvxHm0VhkILmd590TuuSW+hCrdAeGeD8aG+mEMXUK+xqUb0Wi7MnoK4RtuVvhQHT31FyqLb3FuBkG2nAZzjGoUYZmQ
-X-Gm-Message-State: AOJu0YzxFgP9l80OMuZqiz2CsgpvcuWznJsNXqh2tXuuoPmYlvYC1nI4
-	XQkLrqo+YK8Akhc18R3XeGK65qL3jtidJf1uWkhBIm6pR8KRArwg9fbgzVH6Q3nKOVTd6b81v0v
-	5
-X-Google-Smtp-Source: AGHT+IFxxJQJMT1yPV9iBgyfcleth8inhyBwlA3lhunIDQ81CpWWGH98IspVcY6bKB19yLGgqpEUJg==
-X-Received: by 2002:a17:902:ecc5:b0:1fb:7978:6b1 with SMTP id d9443c01a7336-1fd74578fb2mr4074945ad.31.1721405410214;
-        Fri, 19 Jul 2024 09:10:10 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([223.185.135.236])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fd6f28f518sm6632615ad.69.2024.07.19.09.10.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Jul 2024 09:10:09 -0700 (PDT)
-From: Anup Patel <apatel@ventanamicro.com>
-To: Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>
-Cc: Atish Patra <atishp@atishpatra.org>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH 13/13] RISC-V: KVM: Use NACL HFENCEs for KVM request based HFENCEs
-Date: Fri, 19 Jul 2024 21:39:13 +0530
-Message-Id: <20240719160913.342027-14-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240719160913.342027-1-apatel@ventanamicro.com>
-References: <20240719160913.342027-1-apatel@ventanamicro.com>
+        d=1e100.net; s=20230601; t=1721406573; x=1722011373;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=TWuFYjkE1q20mT6m9Gz+SjZGLVtg8tkx2StoOgf/mng=;
+        b=tvfCxwAbW5y/keTgM/zu3ZZUUDl++vAge4suYLGlPlRZ3zB8DcYrCKvhc14vKyhHXl
+         7NXCHJ0LqeGMxFtunbLPE7rK3OW6OQf3LdPIVuj7HPr1XG57kHRvcfxod67qXLeq6izM
+         eodOg7IAT0fsgFZ+ctUHHqkz6y5s6SSr2FzgqYbdJmLk4TQVglKrgNEpSiJrc3WCgQ95
+         sQKKi6PmnRFLC9pSiyOMngAkYXmmyCF0K+oTTr8Xw7XKESDho9cmC31bZrrYeh6urFfR
+         Tlk3yIv/1Kt7DRFYviqXvf84wlRm5Yhd/cwHGbFqbaOmKNYBAgOeScSQgo2Z2EfnUp9D
+         S0uw==
+X-Forwarded-Encrypted: i=1; AJvYcCVlr4jxMca99bRqDCDULIajz2/cAvjDaEC4uxC2NSkS3mlRLhglCRDdnM8MqvNzR6UV7yGpqxRB837UghRJSEDdvVep
+X-Gm-Message-State: AOJu0Ywsf7uPBRZuiSP4RmpOEcq14O+zUlgYTf8dFF28KITfu7GipbIe
+	8dm6cfsm2bl7iLZgsMp2iZjIGDnpmDuDyuyTC169fgwprdKzzmIOna1YAJpaou0=
+X-Google-Smtp-Source: AGHT+IEKT4AGXtfvIyGaqgqG/ujci4q9QMV+Yb5g27ubDgaaGctBNWqX4OR++3iFt+dPhMFsXZWTiQ==
+X-Received: by 2002:a05:6a00:2353:b0:70b:8190:d555 with SMTP id d2e1a72fcca58-70ce4f43908mr10405084b3a.32.1721406572554;
+        Fri, 19 Jul 2024 09:29:32 -0700 (PDT)
+Received: from ?IPV6:2400:4050:a840:1e00:9ac7:6d57:2b16:6932? ([2400:4050:a840:1e00:9ac7:6d57:2b16:6932])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70cff5587e4sm1371596b3a.135.2024.07.19.09.29.30
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 19 Jul 2024 09:29:32 -0700 (PDT)
+Message-ID: <414c64cb-7d01-4e63-83ea-90eca0de0942@daynix.com>
+Date: Sat, 20 Jul 2024 01:29:29 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/5] target/arm/kvm: Fix PMU feature bit early
+To: Cornelia Huck <cohuck@redhat.com>,
+ Peter Maydell <peter.maydell@linaro.org>
+Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, qemu-arm@nongnu.org,
+ qemu-devel@nongnu.org, kvm@vger.kernel.org
+References: <20240716-pmu-v3-0-8c7c1858a227@daynix.com>
+ <20240716-pmu-v3-2-8c7c1858a227@daynix.com>
+ <CAFEAcA8tFtdpCQobU9ytzxvf3_y3DiA1TwNq8fWgFUtCUYT4hQ@mail.gmail.com>
+ <f9cf0616-34df-42c3-a753-4dec8e2d25b5@daynix.com> <87cyn9a7yn.fsf@redhat.com>
+Content-Language: en-US
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <87cyn9a7yn.fsf@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-When running under some other hypervisor, use SBI NACL based HFENCEs
-for TLB shoot-down via KVM requests. This makes HFENCEs faster whenever
-SBI nested acceleration is available.
+On 2024/07/19 21:21, Cornelia Huck wrote:
+> On Fri, Jul 19 2024, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+> 
+>> On 2024/07/18 21:07, Peter Maydell wrote:
+>>> On Tue, 16 Jul 2024 at 13:50, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
+>>>>
+>>>> kvm_arm_get_host_cpu_features() used to add the PMU feature
+>>>> unconditionally, and kvm_arch_init_vcpu() removed it when it is actually
+>>>> not available. Conditionally add the PMU feature in
+>>>> kvm_arm_get_host_cpu_features() to save code.
+>>>>
+>>>> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
+>>>> ---
+>>>>    target/arm/kvm.c | 7 +------
+>>>>    1 file changed, 1 insertion(+), 6 deletions(-)
+>>>>
+>>>> diff --git a/target/arm/kvm.c b/target/arm/kvm.c
+>>>> index 70f79eda33cd..849e2e21b304 100644
+>>>> --- a/target/arm/kvm.c
+>>>> +++ b/target/arm/kvm.c
+>>>> @@ -280,6 +280,7 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>>>>        if (kvm_arm_pmu_supported()) {
+>>>>            init.features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
+>>>>            pmu_supported = true;
+>>>> +        features |= 1ULL << ARM_FEATURE_PMU;
+>>>>        }
+>>>>
+>>>>        if (!kvm_arm_create_scratch_host_vcpu(cpus_to_try, fdarray, &init)) {
+>>>> @@ -448,7 +449,6 @@ static bool kvm_arm_get_host_cpu_features(ARMHostCPUFeatures *ahcf)
+>>>>        features |= 1ULL << ARM_FEATURE_V8;
+>>>>        features |= 1ULL << ARM_FEATURE_NEON;
+>>>>        features |= 1ULL << ARM_FEATURE_AARCH64;
+>>>> -    features |= 1ULL << ARM_FEATURE_PMU;
+>>>>        features |= 1ULL << ARM_FEATURE_GENERIC_TIMER;
+>>>>
+>>>>        ahcf->features = features;
+>>>> @@ -1888,13 +1888,8 @@ int kvm_arch_init_vcpu(CPUState *cs)
+>>>>        if (!arm_feature(env, ARM_FEATURE_AARCH64)) {
+>>>>            cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_EL1_32BIT;
+>>>>        }
+>>>> -    if (!kvm_check_extension(cs->kvm_state, KVM_CAP_ARM_PMU_V3)) {
+>>>> -        cpu->has_pmu = false;
+>>>> -    }
+>>>>        if (cpu->has_pmu) {
+>>>>            cpu->kvm_init_features[0] |= 1 << KVM_ARM_VCPU_PMU_V3;
+>>>> -    } else {
+>>>> -        env->features &= ~(1ULL << ARM_FEATURE_PMU);
+>>>>        }
+>>>>        if (cpu_isar_feature(aa64_sve, cpu)) {
+>>>>            assert(kvm_arm_sve_supported());
+>>>
+>>> Not every KVM CPU is necessarily the "host" CPU type.
+>>> The "cortex-a57" and "cortex-a53" CPU types will work if you
+>>> happen to be on a host of that CPU type, and they don't go
+>>> through kvm_arm_get_host_cpu_features().
+>>
+>> kvm_arm_vcpu_init() will emit an error in such a situation and I think
+>> it's better than silently removing a feature that the requested CPU type
+>> has. A user can still disable the feature if desired.
+> 
+> OTOH, if we fail for the named cpu models if the kernel does not provide
+> the cap, but silently disable for the host cpu model in that case, that
+> also seems inconsistent. I'd rather keep it as it is now.
 
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- arch/riscv/kvm/tlb.c | 57 +++++++++++++++++++++++++++++++-------------
- 1 file changed, 40 insertions(+), 17 deletions(-)
+There are two perspectives of consistency:
+1) The initial value of pmu
+2) The behavior with the pmu value
 
-diff --git a/arch/riscv/kvm/tlb.c b/arch/riscv/kvm/tlb.c
-index 23c0e82b5103..2f91ea5f8493 100644
---- a/arch/riscv/kvm/tlb.c
-+++ b/arch/riscv/kvm/tlb.c
-@@ -14,6 +14,7 @@
- #include <asm/csr.h>
- #include <asm/cpufeature.h>
- #include <asm/insn-def.h>
-+#include <asm/kvm_nacl.h>
- 
- #define has_svinval()	riscv_has_extension_unlikely(RISCV_ISA_EXT_SVINVAL)
- 
-@@ -186,18 +187,24 @@ void kvm_riscv_fence_i_process(struct kvm_vcpu *vcpu)
- 
- void kvm_riscv_hfence_gvma_vmid_all_process(struct kvm_vcpu *vcpu)
- {
--	struct kvm_vmid *vmid;
-+	struct kvm_vmid *v = &vcpu->kvm->arch.vmid;
-+	unsigned long vmid = READ_ONCE(v->vmid);
- 
--	vmid = &vcpu->kvm->arch.vmid;
--	kvm_riscv_local_hfence_gvma_vmid_all(READ_ONCE(vmid->vmid));
-+	if (kvm_riscv_nacl_available())
-+		nacl_hfence_gvma_vmid_all(nacl_shmem(), vmid);
-+	else
-+		kvm_riscv_local_hfence_gvma_vmid_all(vmid);
- }
- 
- void kvm_riscv_hfence_vvma_all_process(struct kvm_vcpu *vcpu)
- {
--	struct kvm_vmid *vmid;
-+	struct kvm_vmid *v = &vcpu->kvm->arch.vmid;
-+	unsigned long vmid = READ_ONCE(v->vmid);
- 
--	vmid = &vcpu->kvm->arch.vmid;
--	kvm_riscv_local_hfence_vvma_all(READ_ONCE(vmid->vmid));
-+	if (kvm_riscv_nacl_available())
-+		nacl_hfence_vvma_all(nacl_shmem(), vmid);
-+	else
-+		kvm_riscv_local_hfence_vvma_all(vmid);
- }
- 
- static bool vcpu_hfence_dequeue(struct kvm_vcpu *vcpu,
-@@ -251,6 +258,7 @@ static bool vcpu_hfence_enqueue(struct kvm_vcpu *vcpu,
- 
- void kvm_riscv_hfence_process(struct kvm_vcpu *vcpu)
- {
-+	unsigned long vmid;
- 	struct kvm_riscv_hfence d = { 0 };
- 	struct kvm_vmid *v = &vcpu->kvm->arch.vmid;
- 
-@@ -259,26 +267,41 @@ void kvm_riscv_hfence_process(struct kvm_vcpu *vcpu)
- 		case KVM_RISCV_HFENCE_UNKNOWN:
- 			break;
- 		case KVM_RISCV_HFENCE_GVMA_VMID_GPA:
--			kvm_riscv_local_hfence_gvma_vmid_gpa(
--						READ_ONCE(v->vmid),
--						d.addr, d.size, d.order);
-+			vmid = READ_ONCE(v->vmid);
-+			if (kvm_riscv_nacl_available())
-+				nacl_hfence_gvma_vmid(nacl_shmem(), vmid,
-+						      d.addr, d.size, d.order);
-+			else
-+				kvm_riscv_local_hfence_gvma_vmid_gpa(vmid, d.addr,
-+								     d.size, d.order);
- 			break;
- 		case KVM_RISCV_HFENCE_VVMA_ASID_GVA:
- 			kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_HFENCE_VVMA_ASID_RCVD);
--			kvm_riscv_local_hfence_vvma_asid_gva(
--						READ_ONCE(v->vmid), d.asid,
--						d.addr, d.size, d.order);
-+			vmid = READ_ONCE(v->vmid);
-+			if (kvm_riscv_nacl_available())
-+				nacl_hfence_vvma_asid(nacl_shmem(), vmid, d.asid,
-+						      d.addr, d.size, d.order);
-+			else
-+				kvm_riscv_local_hfence_vvma_asid_gva(vmid, d.asid, d.addr,
-+								     d.size, d.order);
- 			break;
- 		case KVM_RISCV_HFENCE_VVMA_ASID_ALL:
- 			kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_HFENCE_VVMA_ASID_RCVD);
--			kvm_riscv_local_hfence_vvma_asid_all(
--						READ_ONCE(v->vmid), d.asid);
-+			vmid = READ_ONCE(v->vmid);
-+			if (kvm_riscv_nacl_available())
-+				nacl_hfence_vvma_asid_all(nacl_shmem(), vmid, d.asid);
-+			else
-+				kvm_riscv_local_hfence_vvma_asid_all(vmid, d.asid);
- 			break;
- 		case KVM_RISCV_HFENCE_VVMA_GVA:
- 			kvm_riscv_vcpu_pmu_incr_fw(vcpu, SBI_PMU_FW_HFENCE_VVMA_RCVD);
--			kvm_riscv_local_hfence_vvma_gva(
--						READ_ONCE(v->vmid),
--						d.addr, d.size, d.order);
-+			vmid = READ_ONCE(v->vmid);
-+			if (kvm_riscv_nacl_available())
-+				nacl_hfence_vvma(nacl_shmem(), vmid,
-+						 d.addr, d.size, d.order);
-+			else
-+				kvm_riscv_local_hfence_vvma_gva(vmid, d.addr,
-+								d.size, d.order);
- 			break;
- 		default:
- 			break;
--- 
-2.34.1
+This change introduces inconsistency for 1); the host cpu model will 
+have pmu=off by default and the other cpu models will keep default 
+pmu=on value on a system that does not support PMU. It still keeps 
+consistency for 2); it fails if the user sets pmu=on for any cpu model 
+on such a system.
 
+We should align 1) for better consistency, but I don't think such a 
+change would be useful. It is likely that something is wrong with the 
+system when the system reports a cpu model but it doesn't support its 
+feature. I think that is the reason why we assert 
+kvm_arm_sve_supported() for SVE; however I don't think such an assertion 
+would help either because kvm_arm_vcpu_init() will fail anyway.
+
+Regards,
+Akihiko Odaki
 
