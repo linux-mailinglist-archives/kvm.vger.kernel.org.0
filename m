@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-21986-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21987-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BCA4937E28
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 01:52:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE3A6937E2A
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 01:52:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B88A31F21D29
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 23:52:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77A631F21FEC
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 23:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7F1814A089;
-	Fri, 19 Jul 2024 23:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014BF14A0AA;
+	Fri, 19 Jul 2024 23:51:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="I10gYsw1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="flYsAvdj"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66AC149DFB
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 23:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B37DC14A086
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 23:51:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721433078; cv=none; b=opTVoXew4EFyM07rCVAwb3u9Dqv37N/SW4H32YzYHaB2hTRxy9KxeBIg8k44wqYEbwT4K+o99YmO3fBL2sVuRXwTzopxe0/ORjTYlR+GBFe/4g5WMNO2b2EuSXRrR5xMyA2gRVT9et5CZNWWnMUaOST1XdYQgzLywDlgSM55p/g=
+	t=1721433080; cv=none; b=tavHpfvjbh08eHit9gOjoTEOj8E3VfMdpJJKyGwChC8ZAA7BNnkjPBieWXXNOB1ckEWQxJsStJgk/f2H2k3r8uVpD6FSy1s2P0sQpDygxwxqODKBJhUMfJboAu/320MkBtiovlyifevLiVe1lOtQviuMPj8UwDAg01WJoVF5xZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721433078; c=relaxed/simple;
-	bh=r48XGddCN80zIaPaynZ1yaj/hfmpfp63eVWhm7RV+0o=;
+	s=arc-20240116; t=1721433080; c=relaxed/simple;
+	bh=L5K4LhEvErOvub+DyS3BuApRHh5XgLwLfLGmErCpdIg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=K8eD9VrwsTVFsIoHmIw6K8W07kwuxQDyXmWrjSK9gjvSCqmIyNutsjxsMp6EwgFs2XbbM148S/vpAz9ZKH8RUD7oh3ZFQB3H14adDLWPALjhVtxRFofVTIweKDVm1O3iTt8jdNhGjk59LzvhkLI2fBLtVAmOVIUmgZkP+gr6Wyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=I10gYsw1; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=eJlR9rsipOTh52R/DIIcKS/JdNBHCQEB3PlecKLrDKGjE29uGODdFxDVFOjALOQIso5Cqj/sgbeTP9NbJ75HhOhlyNACHZ4QEO82hSe4vsdLcoiaapTtQjc8KaeSbiFEMXevUt1E8XE6W0Q9CR3Zg/0i4IwZ94i+rtsknq/UgQ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=flYsAvdj; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70af58f79d1so1291378b3a.0
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:51:16 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e035949cc4eso5682483276.1
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:51:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721433076; x=1722037876; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1721433077; x=1722037877; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=x8igdTZgEeKKRURdE5Y+BIgiNYRFx6FmETZmL9mL1H0=;
-        b=I10gYsw1OmJ9G238f2AVOjK2USeLiu+ugqXft5kU5azCEZLPqD5hd2R3IqeOG+BryS
-         16ZCWx7wWr3hBpNP2EW1FDWNBA+NCIO/A5edf1wL/xHO/XhdWaX0s9nk0yM4KcRzYymc
-         NJgHsWu1uYYLoXGFWvpjIs9H8QkPpuornuMVI9Su2ZQh5p79vaCXbG05nn9LtJ7teg3t
-         H6UNDRnMICUw6Ez7+LHhQ01JkLeEZW2OL6IyPUHGruYDZ2oJvSm8BhFz2qBhTxo7sXS7
-         8sHrU3tbiPhX8wXbIClkpHyaDb6mZ0Rnt07iG26qmBoTSWZ0L/BwQQ5DLdWkw44nk4bu
-         M0wQ==
+        bh=szsmqea3Ly+/pHf0iLcDxQ8R3kri7Zn2BloJwbPXzbQ=;
+        b=flYsAvdjZTwuhmxBu59ntx1ZwFjQitc6jnnLtYYl+YyKVEqYqB7IX1H7eqjJ5SgaGS
+         fJ38h7aamBCwQEOys03wXDBoIdmsJwVuxi/u1MSo9CgNxsxkmwxrNENtVLJHQx04GbiJ
+         uvG0DgV7LByW+/KRKru68mSKbDjFqbrkJMzeaNJVTJ4IruAh7UF4t7AVy3doqVsDA3WI
+         QxXGKXW0tMQiYdMzqHh0Q0vJVtomrfktf7eIUwYbp5VogoZKQ+kirvWg+vRqmcyOde/p
+         2cQxvVrelQce2ivSrSmId0v+TReJng20MFK6M7JYaNtBOnCgFnZg4sqMcqAhzQcsAwL4
+         nEQA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721433076; x=1722037876;
+        d=1e100.net; s=20230601; t=1721433077; x=1722037877;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=x8igdTZgEeKKRURdE5Y+BIgiNYRFx6FmETZmL9mL1H0=;
-        b=Jnlrr8djDWZZAKTBGe5Z99DIREj9upy8Adnlt7k/cQB2PCL5gT09Iw9TUoZfyO9nd9
-         n8akbbN4kDY+kti3avwon4LbI2oofUUjE/TuZCP//Xx0UqWnCMPBkDIpVL+7njbISIS/
-         km/sC447P7+e1sqyNGIaUlUX/sBGoer2UNcS7bdzTzpyfQ1ok/U4Nu1qFfhevXgDw92L
-         dVf2s389HzTUSFXRnfTBJc2MHTqkQOgJHBNp20EapmPlHxgipUBs0rL+yaMnXiIWjSI9
-         ZXrx32GFcZ9pQEKIxSydCkxbZiLT/lK9GL1XYaMefGAsq/o9VknpwK/i2HaJymSqQdO5
-         fhLQ==
-X-Gm-Message-State: AOJu0Yw/XSeBAyLdINAMo1aAoRCJyjkrua9NX0Ou8DSyKxm4WrKJxyil
-	o+uSgCw2TQORD+DSGaRUzD3T5f/rVHUvxvyLPgChqtTithM2leitqXCrYQgVXE7Ord/ACpx6Wyi
-	ruA==
-X-Google-Smtp-Source: AGHT+IHWQ1VfgKKF9QhnVw9NXQr2LiRycoIc4Mz1Fp2W/2qX1ARZMwFUoNwjZVmTkeG0fqWDWFmjmP+JY1U=
+        bh=szsmqea3Ly+/pHf0iLcDxQ8R3kri7Zn2BloJwbPXzbQ=;
+        b=kfOSAk6f2zvjAGEaPTg67ma/nch6sol2UwRqO8VFK/TSBAqY48YxqawOWQcD19baQ1
+         j1O89mvrVyhhmXVrMyd4BmjRsaesfIfGNL9ikeRPMiE5VuQ8mFj06HCPq16ephKFvRFW
+         fLIIIt1ya7nyu7ik4xhlEBZMVN8kqjWRik+oiXvOebSIt50A+VyJagitJMIkJjTrMKA7
+         BPoxDUofDwC24SfcCHfLyJ0yZh1wSiSWzApBIcPsf4zTgFhaPh0mIrRh3cFOZz30AgbQ
+         +IyTsNXadMPviwYMWvKeQVxnrgzBgIr7zl0sT1veeg7cBtCxGWUNfBsBFmbO+0PEyDsM
+         V2Eg==
+X-Gm-Message-State: AOJu0Yy75cGhbFEal7gDSaq6HYAGu/Dk6tN6/CQaYfccXUJX4yF1FbQ4
+	8YRa1Qt27nP/On36pw2DoV6T62NhXxGQl9tNSP1DKXGv0fPxMJOt+5mZ1+HSlVlNbdhHGiuUOqb
+	Z6w==
+X-Google-Smtp-Source: AGHT+IG+Kf34xxLKIMRA93LE8zHki7PaXFwYp13mgJqswzo6PchKoevDMqejbvrPRDDVtschS9qg6QN+O5I=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:6706:b0:70b:1086:cf8c with SMTP id
- d2e1a72fcca58-70d087cfaf8mr3891b3a.6.1721433074602; Fri, 19 Jul 2024 16:51:14
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1509:b0:e03:5a51:382f with SMTP id
+ 3f1490d57ef6-e087042262bmr9466276.8.1721433077656; Fri, 19 Jul 2024 16:51:17
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 19 Jul 2024 16:51:00 -0700
+Date: Fri, 19 Jul 2024 16:51:01 -0700
 In-Reply-To: <20240719235107.3023592-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,160 +75,72 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240719235107.3023592-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
-Message-ID: <20240719235107.3023592-4-seanjc@google.com>
-Subject: [PATCH v2 03/10] KVM: x86: Re-split x2APIC ICR into ICR+ICR2 for AMD (x2AVIC)
+Message-ID: <20240719235107.3023592-5-seanjc@google.com>
+Subject: [PATCH v2 04/10] KVM: selftests: Open code vcpu_run() equivalent in
+ guest_printf test
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Maxim Levitsky <mlevitsk@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Re-introduce the "split" x2APIC ICR storage that KVM used prior to Intel's
-IPI virtualization support, but only for AMD.  While not stated anywhere
-in the APM, despite stating the ICR is a single 64-bit register, AMD CPUs
-store the 64-bit ICR as two separate 32-bit values in ICR and ICR2.  When
-IPI virtualization (IPIv on Intel, all AVIC flavors on AMD) is enabled,
-KVM needs to match CPU behavior as some ICR ICR writes will be handled by
-the CPU, not by KVM.
+Open code a version of vcpu_run() in the guest_printf test in anticipation
+of adding UCALL_ABORT handling to _vcpu_run().  The guest_printf test
+intentionally generates asserts to verify the output, and thus needs to
+bypass common assert handling.
 
-Add a kvm_x86_ops knob to control the underlying format used by the CPU to
-store the x2APIC ICR, and tune it to AMD vs. Intel regardless of whether
-or not x2AVIC is enabled.  If KVM is handling all ICR writes, the storage
-format for x2APIC mode doesn't matter, and having the behavior follow AMD
-versus Intel will provide better test coverage and ease debugging.
+Open code a helper in the guest_printf test, as it's not expected that any
+other test would want to skip _only_ the UCALL_ABORT handling.
 
-Fixes: 4d1d7942e36a ("KVM: SVM: Introduce logic to (de)activate x2AVIC mode")
-Cc: stable@vger.kernel.org
-Cc: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/lapic.c            | 42 +++++++++++++++++++++++----------
- arch/x86/kvm/svm/svm.c          |  2 ++
- arch/x86/kvm/vmx/main.c         |  2 ++
- 4 files changed, 36 insertions(+), 12 deletions(-)
+ .../testing/selftests/kvm/guest_print_test.c  | 19 +++++++++++++++++--
+ 1 file changed, 17 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 950a03e0181e..edc235521434 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -1726,6 +1726,8 @@ struct kvm_x86_ops {
- 	void (*enable_nmi_window)(struct kvm_vcpu *vcpu);
- 	void (*enable_irq_window)(struct kvm_vcpu *vcpu);
- 	void (*update_cr8_intercept)(struct kvm_vcpu *vcpu, int tpr, int irr);
-+
-+	const bool x2apic_icr_is_split;
- 	const unsigned long required_apicv_inhibits;
- 	bool allow_apicv_in_x2apic_without_x2apic_virtualization;
- 	void (*refresh_apicv_exec_ctrl)(struct kvm_vcpu *vcpu);
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index d14ef485b0bd..cc0a1008fae4 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2473,11 +2473,25 @@ int kvm_x2apic_icr_write(struct kvm_lapic *apic, u64 data)
- 	data &= ~APIC_ICR_BUSY;
- 
- 	kvm_apic_send_ipi(apic, (u32)data, (u32)(data >> 32));
--	kvm_lapic_set_reg64(apic, APIC_ICR, data);
-+	if (kvm_x86_ops.x2apic_icr_is_split) {
-+		kvm_lapic_set_reg(apic, APIC_ICR, data);
-+		kvm_lapic_set_reg(apic, APIC_ICR2, data >> 32);
-+	} else {
-+		kvm_lapic_set_reg64(apic, APIC_ICR, data);
-+	}
- 	trace_kvm_apic_write(APIC_ICR, data);
- 	return 0;
+diff --git a/tools/testing/selftests/kvm/guest_print_test.c b/tools/testing/selftests/kvm/guest_print_test.c
+index 8092c2d0f5d6..bcf582852db9 100644
+--- a/tools/testing/selftests/kvm/guest_print_test.c
++++ b/tools/testing/selftests/kvm/guest_print_test.c
+@@ -107,6 +107,21 @@ static void ucall_abort(const char *assert_msg, const char *expected_assert_msg)
+ 		    expected_assert_msg, &assert_msg[offset]);
  }
  
-+static u64 kvm_x2apic_icr_read(struct kvm_lapic *apic)
++/*
++ * Open code vcpu_run(), sans the UCALL_ABORT handling, so that intentional
++ * guest asserts guest can be verified instead of being reported as failures.
++ */
++static void do_vcpu_run(struct kvm_vcpu *vcpu)
 +{
-+	if (kvm_x86_ops.x2apic_icr_is_split)
-+		return (u64)kvm_lapic_get_reg(apic, APIC_ICR) |
-+		       (u64)kvm_lapic_get_reg(apic, APIC_ICR2) << 32;
++	int r;
 +
-+	return kvm_lapic_get_reg64(apic, APIC_ICR);
++	do {
++		r = __vcpu_run(vcpu);
++	} while (r == -1 && errno == EINTR);
++
++	TEST_ASSERT(!r, KVM_IOCTL_ERROR(KVM_RUN, r));
 +}
 +
- /* emulate APIC access in a trap manner */
- void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
+ static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
+ 		     const char *expected_assert)
  {
-@@ -2495,7 +2509,7 @@ void kvm_apic_write_nodecode(struct kvm_vcpu *vcpu, u32 offset)
- 	 * maybe-unecessary write, and both are in the noise anyways.
- 	 */
- 	if (apic_x2apic_mode(apic) && offset == APIC_ICR)
--		WARN_ON_ONCE(kvm_x2apic_icr_write(apic, kvm_lapic_get_reg64(apic, APIC_ICR)));
-+		WARN_ON_ONCE(kvm_x2apic_icr_write(apic, kvm_x2apic_icr_read(apic)));
- 	else
- 		kvm_lapic_reg_write(apic, offset, kvm_lapic_get_reg(apic, offset));
- }
-@@ -3005,18 +3019,22 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+@@ -114,7 +129,7 @@ static void run_test(struct kvm_vcpu *vcpu, const char *expected_printf,
+ 	struct ucall uc;
  
- 		/*
- 		 * In x2APIC mode, the LDR is fixed and based on the id.  And
--		 * ICR is internally a single 64-bit register, but needs to be
--		 * split to ICR+ICR2 in userspace for backwards compatibility.
-+		 * if the ICR is _not_ split, ICR is internally a single 64-bit
-+		 * register, but needs to be split to ICR+ICR2 in userspace for
-+		 * backwards compatibility.
- 		 */
--		if (set) {
-+		if (set)
- 			*ldr = kvm_apic_calc_x2apic_ldr(*id);
+ 	while (1) {
+-		vcpu_run(vcpu);
++		do_vcpu_run(vcpu);
  
--			icr = __kvm_lapic_get_reg(s->regs, APIC_ICR) |
--			      (u64)__kvm_lapic_get_reg(s->regs, APIC_ICR2) << 32;
--			__kvm_lapic_set_reg64(s->regs, APIC_ICR, icr);
--		} else {
--			icr = __kvm_lapic_get_reg64(s->regs, APIC_ICR);
--			__kvm_lapic_set_reg(s->regs, APIC_ICR2, icr >> 32);
-+		if (!kvm_x86_ops.x2apic_icr_is_split) {
-+			if (set) {
-+				icr = __kvm_lapic_get_reg(s->regs, APIC_ICR) |
-+				      (u64)__kvm_lapic_get_reg(s->regs, APIC_ICR2) << 32;
-+				__kvm_lapic_set_reg64(s->regs, APIC_ICR, icr);
-+			} else {
-+				icr = __kvm_lapic_get_reg64(s->regs, APIC_ICR);
-+				__kvm_lapic_set_reg(s->regs, APIC_ICR2, icr >> 32);
-+			}
- 		}
- 	}
+ 		TEST_ASSERT(run->exit_reason == UCALL_EXIT_REASON,
+ 			    "Unexpected exit reason: %u (%s),",
+@@ -159,7 +174,7 @@ static void test_limits(void)
  
-@@ -3214,7 +3232,7 @@ static int kvm_lapic_msr_read(struct kvm_lapic *apic, u32 reg, u64 *data)
- 	u32 low;
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code_limits);
+ 	run = vcpu->run;
+-	vcpu_run(vcpu);
++	do_vcpu_run(vcpu);
  
- 	if (reg == APIC_ICR) {
--		*data = kvm_lapic_get_reg64(apic, APIC_ICR);
-+		*data = kvm_x2apic_icr_read(apic);
- 		return 0;
- 	}
- 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c115d26844f7..04c113386de6 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -5049,6 +5049,8 @@ static struct kvm_x86_ops svm_x86_ops __initdata = {
- 	.enable_nmi_window = svm_enable_nmi_window,
- 	.enable_irq_window = svm_enable_irq_window,
- 	.update_cr8_intercept = svm_update_cr8_intercept,
-+
-+	.x2apic_icr_is_split = true,
- 	.set_virtual_apic_mode = avic_refresh_virtual_apic_mode,
- 	.refresh_apicv_exec_ctrl = avic_refresh_apicv_exec_ctrl,
- 	.apicv_post_state_restore = avic_apicv_post_state_restore,
-diff --git a/arch/x86/kvm/vmx/main.c b/arch/x86/kvm/vmx/main.c
-index 0bf35ebe8a1b..a70699665e11 100644
---- a/arch/x86/kvm/vmx/main.c
-+++ b/arch/x86/kvm/vmx/main.c
-@@ -89,6 +89,8 @@ struct kvm_x86_ops vt_x86_ops __initdata = {
- 	.enable_nmi_window = vmx_enable_nmi_window,
- 	.enable_irq_window = vmx_enable_irq_window,
- 	.update_cr8_intercept = vmx_update_cr8_intercept,
-+
-+	.x2apic_icr_is_split = false,
- 	.set_virtual_apic_mode = vmx_set_virtual_apic_mode,
- 	.set_apic_access_page_addr = vmx_set_apic_access_page_addr,
- 	.refresh_apicv_exec_ctrl = vmx_refresh_apicv_exec_ctrl,
+ 	TEST_ASSERT(run->exit_reason == UCALL_EXIT_REASON,
+ 		    "Unexpected exit reason: %u (%s),",
 -- 
 2.45.2.1089.g2a221341d9-goog
 
