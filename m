@@ -1,206 +1,126 @@
-Return-Path: <kvm+bounces-21972-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21973-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E372937D2F
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 22:15:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB33E937E0D
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 01:44:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1A541F21D35
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 20:15:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D199F1C21217
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 23:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BB4148FE5;
-	Fri, 19 Jul 2024 20:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53DEA149019;
+	Fri, 19 Jul 2024 23:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yAmp35b/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FFGL7t+9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A71B814883B
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 20:15:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6378563E
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 23:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721420104; cv=none; b=dR2pVe6vRjTOAkcB1UQLKqphhKKIbv3UinLebMOWZg/FZw4dKRuBbQb2eBXnYp9Ph92Vbttwc2zMiMpZOtD5W5h7Ev6ZqDV+9rD+UT4DKM1MEVoSgk7ihTSz8Er3A5yZGYUibjJgyNivVGaii04g73YQ0hy8DodCXTCHmiYKpxM=
+	t=1721432630; cv=none; b=Q8n9+Dp/AZJHJDeyPXp0nH5Foz0zYB/w/xjzd29KKI+BD59TlbtxUJjkvIZlGNSPjEkOBKos9QCLlLScsLkwjjZz8Js20gVyZKs5uI5AeqJR/vC8JK6CdDSGGMicfzz18zkJI4RWg8o6HzJ6/D5WrsiTG/OL3yLjbRraLnGfuA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721420104; c=relaxed/simple;
-	bh=hrVOSBAPxCjK3O4kjJZDIYEe2p6huW8SI+6E7CjOWL8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rvPnXK0BXaDuMjHvjwA6uqyTZuGT3H3szV2Aj29RdrNTCRVYdTP2HMI/Z2VDOIREBoFCFfwM36faC/LWIK+nVz/TnRvNthbBC0sbl4MZ39Uc6Fp9lnqt2/m2/ewvxSiFcvgJpJOfS9X80C3dhlSb6gLsC6gxprVYm52GCK345eM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yAmp35b/; arc=none smtp.client-ip=209.85.214.178
+	s=arc-20240116; t=1721432630; c=relaxed/simple;
+	bh=BnwkD7JlA3wmXN5BrEBBPWjBLeMDRCGHGyt5jyb1mnk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=M9pyu1wzhDYVAk4uU3EyfG8ZGPO95EIuyjCSqpXb33pbjzBjL6u2Fs2y7VHDehdW0qiVvfJQJO7B6y+JO4jwYeNXEGPFdGRSq5I/LrxplUySUIA71/Ty2/h72kkAv9Xvykfe3rQ+dSWR4kC1/MV8XX35qrNImNKx0hzioQtc1Rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FFGL7t+9; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1fd7509397bso72175ad.0
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 13:15:02 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fc4abd4afdso23482355ad.2
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:43:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721420102; x=1722024902; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zWJCFjgtMNgtozAYiAr2A+KBfeO3km1iv1DnIaZsGgQ=;
-        b=yAmp35b/rML78mnEthxIJE/0E237s/daf0h0N3q4wVDIj3IBf+tl3+9gvr8UHJtoFW
-         jQU3rI4ZIpQ8sCMU4zvZxwH5SJuKn3gVAQGcJEF3OxOWMf/xs1ox4q+bM0LtQom1AUws
-         Edd4meie33u1fcJhpkUVvTb12AvvSg3XMeLNEkinVpDmHlA1s5UzxJCs93CwIL+f0Lfo
-         jLNVSTCclNjiUZ8RgyS+kAci2jNO0CDKNcYq+QcqqR5pFHkhyAeyHOs3OI7PlzBdgcB/
-         1+6Go1+RYdGmhPfpx3v/XskVZj7pEiFTcRuRmHU/weDM6umbjhBMghTA7xOoEw+rfxCe
-         zrbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721420102; x=1722024902;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20230601; t=1721432628; x=1722037428; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=zWJCFjgtMNgtozAYiAr2A+KBfeO3km1iv1DnIaZsGgQ=;
-        b=GnMtBi6EbFP4ZnielIKH0aEK0JhXxk5YhjSZq66wlZGCVhdcq9zOkO19IMnj6+snQk
-         smiqSFwo4EkvUQf72eYl2ujImL4dSsPmf0bQYHmD3cpv9x0Q2JOccUmwDDXiuIVhM8+4
-         s+AULxy81dhASSoLcvj3Q7AeQFWibWSjmvO3ALtzqzuhsbJMysmTicyVHRYMP7+DDPsb
-         LtlPbbVM3ktdndEbZ1Io5jhfhfFDjCtbXqSrgAEejqsAsv0TX8/++m04cxQ/lwGV0Dsh
-         qkQ5XUqgMxZzVyTB3yIKMV2XY3igt1fOXkTDfcfaSJEWwZ7BPu0L0JyNVrMMtvdjSxRI
-         j0dQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW2TF9GKmJlJosRLrurXLmVkTL5lVRu1KbEIEXHZi+NLHDjIZ9Hv1GyZB2EXDuYXr0wRPPE1DbNlAUT5sCmFhg0A9b9
-X-Gm-Message-State: AOJu0YzqAl+fdCQIoRzNYxGfdxwVypxYh7eNbflIS4oandj7oNI/6Gka
-	T6vodWMPt+djG4F6QaZ4gO7C0CrtsobiEkhXE/FYpERPlVvt/cFVuMlXpwM9RwqQaExI9+8wiby
-	/EazUpAQhrjYJry5w/78o1/j/GkxkTHcit8Jv
-X-Google-Smtp-Source: AGHT+IHIbP8sgONKGNJNBiPGGkEdodEy9wXP050Dq8z3mdpSj/m//1k3YPuQ9qvpkgcfyQA3sY6joJjCnk+Lc7L7jWY=
-X-Received: by 2002:a17:902:dac8:b0:1fd:7664:d875 with SMTP id
- d9443c01a7336-1fd7664dc73mr593255ad.22.1721420101515; Fri, 19 Jul 2024
- 13:15:01 -0700 (PDT)
+        bh=GQ8RivBIo75BrN+Ijd6URWso23XciyBNatHrUyqY5Ac=;
+        b=FFGL7t+9VHuGwz60vM9cvkmt8iT2/0KHplM4nn3QMRKn1iRi3l6s4YNxErRYvHGTHe
+         i0WUcCrazE+q9CyUxstr4eGkUgD7Ljg4NRrpd2VWSspmxfjWuqhxtbD9LgGZWCkAijaa
+         xcQwKJ+q4kW1uicf5PIBs2jweWsLQ79xfSlzzGh+MabaUOc3hAE3zaiu6dZtYr8Y3FJj
+         A3HDlOVsVtxT6V1JjANhaGjqMRf+Jx9768hDMHRwh8YWb1wRlLSu5VGSWFXmF+AtvykC
+         ZjfckFjsXtQ5HIKDqNggIQe3j2eMduKHdlP+ajAAf7THTvpxxuxfHkefw9+2ZKusUE8A
+         r8eQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721432628; x=1722037428;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GQ8RivBIo75BrN+Ijd6URWso23XciyBNatHrUyqY5Ac=;
+        b=cbyAE2UQh6qclL0o6tSk8J4YvjzBM9rR+UO7sLmda8vwoRROVdAB0akjRmI5HT5fjL
+         J4N6emzEqfnSpTRnbDQzt91aF26k83gqqR7WEVTAliQJtX1cvaWmbcpOkMmNrp3a2qMi
+         6QJmcMNsFKkgz3KsHreczVv8rNhn2ftJyF0u7QXLmMJjt/xBciRgjooFZETRCiiH2/NH
+         aSLImsuAwvXQa8pSa6DNhkh6EyO1uNhkvBCqLiQu4MzMFLxjBCp3lov0d73yJ+GBsuZb
+         BtidewNv5gEJQ0nQ78Ckx9nWN6HdeXvlIJqqGzZHjWjfuPZGp9exQcZSVIQ/HyG9XLa0
+         4UiQ==
+X-Gm-Message-State: AOJu0YzEeMMhU4Qj+VKJxcHHiz+WKUfRvAXL2EoMGmeGHhX11ExdftG2
+	R+ueQ9tDZSKRRCR6Nk0K6hY4098LG8e1Un/L5ARoLgs2Am849Uw9anG1sL3cIoyy8vUbn2r/R48
+	gxQ==
+X-Google-Smtp-Source: AGHT+IFMH72YYuQamYsgopMC2DbqPeBfYDYeUR+OeGPgfIewS1lgEjCIJMOHMg0iIcOIVdwR5UAqnDPkHPg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e885:b0:1fb:7f2c:5642 with SMTP id
+ d9443c01a7336-1fd7454ba9emr958365ad.4.1721432628263; Fri, 19 Jul 2024
+ 16:43:48 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 19 Jul 2024 16:43:37 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <c42bff52-1058-4bff-be90-5bab45ed57be@gmail.com>
- <ZpqgfETiBXfBfFqU@google.com> <70137930-fea1-4d45-b453-e6ae984c4b2b@gmail.com>
- <Zpq9Bp7T_AdbVhmP@google.com> <824a0819-a09d-40ac-820c-f7975aee1dae@gmail.com>
-In-Reply-To: <824a0819-a09d-40ac-820c-f7975aee1dae@gmail.com>
-From: Jim Mattson <jmattson@google.com>
-Date: Fri, 19 Jul 2024 13:14:50 -0700
-Message-ID: <CALMp9eStzLK7kQY41b37zvZuR7UVzOD+W7vDPhyKXYPDhUww0g@mail.gmail.com>
-Subject: =?UTF-8?B?UmU6IFtCVUddIGFyY2gveDg2L2t2bS92bXgvcG11X2ludGVsLmM6NTQ6IGVycm9yOiBkZQ==?=
-	=?UTF-8?B?cmVmZXJlbmNlIG9mIE5VTEwg4oCYcG1j4oCZIFtDV0UtNDc2XQ==?=
-To: Mirsad Todorovac <mtodorovac69@gmail.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org, Like Xu <likexu@tencent.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
+Message-ID: <20240719234346.3020464-1-seanjc@google.com>
+Subject: [PATCH 0/8] KVM: x86: Fix ICR handling when x2AVIC is active
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Maxim Levitsky <mlevitsk@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 19, 2024 at 12:41=E2=80=AFPM Mirsad Todorovac
-<mtodorovac69@gmail.com> wrote:
->
->
->
-> On 7/19/24 21:22, Sean Christopherson wrote:
-> > On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
-> >> On 7/19/24 19:21, Sean Christopherson wrote:
-> >>> On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
-> >>>> Hi,
-> >>>>
-> >>>> In the build of 6.10.0 from stable tree, the following error was det=
-ected.
-> >>>>
-> >>>> You see that the function get_fixed_pmc() can return NULL pointer as=
- a result
-> >>>> if msr is outside of [base, base + pmu->nr_arch_fixed_counters) inte=
-rval.
-> >>>>
-> >>>> kvm_pmu_request_counter_reprogram(pmc) is then called with that NULL=
- pointer
-> >>>> as the argument, which expands to .../pmu.h
-> >>>>
-> >>>> #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
-> >>>>
-> >>>> which is a NULL pointer dereference in that speculative case.
-> >>>
-> >>> I'm somewhat confused.  Did you actually hit a BUG() due to a NULL-po=
-inter
-> >>> dereference, are you speculating that there's a bug, or did you find =
-some speculation
-> >>> issue with the CPU?
-> >>>
-> >>> It should be impossible for get_fixed_pmc() to return NULL in this ca=
-se.  The
-> >>> loop iteration is fully controlled by KVM, i.e. 'i' is guaranteed to =
-be in the
-> >>> ranage [0..pmu->nr_arch_fixed_counters).
-> >>>
-> >>> And the input @msr is "MSR_CORE_PERF_FIXED_CTR0 +i", so the if-statem=
-ent expands to:
-> >>>
-> >>>     if (MSR_CORE_PERF_FIXED_CTR0 + [0..pmu->nr_arch_fixed_counters) >=
-=3D MSR_CORE_PERF_FIXED_CTR0 &&
-> >>>         MSR_CORE_PERF_FIXED_CTR0 + [0..pmu->nr_arch_fixed_counters) <=
- MSR_CORE_PERF_FIXED_CTR0 + pmu->nr_arch_fixed_counters)
-> >>>
-> >>> i.e. is guaranteed to evaluate true.
-> >>>
-> >>> Am I missing something?
-> >>
-> >> Hi Sean,
-> >>
-> >> Thank you for replying promptly.
-> >>
-> >> Perhaps I should have provided the GCC error report in the first place=
-.
-> >
-> > Yes, though the report itself is somewhat secondary, what matters the m=
-ost is how
-> > you found the bug and how to reproduce the failure.  Critically, IIUC, =
-this requires
-> > analyzer-null-dereference, which AFAIK isn't even enabled by W=3D1, let=
- alone a base
-> > build.
-> >
-> > Please see the 0-day bot's reports[*] for a fantastic example of how to=
- report
-> > things that are found by non-standard (by kernel standards) means.
-> >
-> > In general, I suspect that analyzer-null-dereference will generate a _l=
-ot_ of
-> > false positives, and is probably not worth reporting unless you are abs=
-olutely
-> > 100% certain there's a real bug.  I (and most maintainers) am happy to =
-deal with
-> > false positives here and there _if_ the signal to noise ratio is high. =
- But if
-> > most reports are false positives, they'll likely all end up getting ign=
-ored.
-> >
-> > [*] https://lore.kernel.org/all/202406111250.d8XtA9SC-lkp@intel.com
->
-> I think I understood the meaning between the lines.
->
-> However, to repeat the obvious, reducing the global dependencies simplifi=
-es the readability
-> and the logical proof of the code. :-/
+I made the mistake of expanding my testing to run with and without AVIC
+enabled, and to my surprise (wow, sarcasm), x2AVIC failed hard on the
+xapic_state_test due to ICR issues.
 
-Comments would also help. :)
+AFAICT, the issue is that AMD splits the 64-bit ICR into the legacy ICR
+and ICR2 fields when storing the ICR in the vAPIC (apparently "it's a
+single 64-bit register" is open to intepretation).  Aside from causing
+the selftest failure and potential live migration issues, botching the
+format is quite bad, as KVM will mishandle incomplete virtualized IPIs,
+e.g. generate IRQs to the wrong vCPU, drop IRQs, etc.
 
-> Needless to say, dividing into pure functions and const functions reduces=
- the number of
-> dependencies, as it is N =C3=97 (N - 1), sqr (N).
->
-> For example, if a condition is always true, but the compiler cannot deduc=
-e it from code,
-> there is something odd.
->
-> CONCLUSION: If this generated 5 out of 5 false positives, then I might be=
- giving up on this
-> as a waste of your time.
->
-> However, it was great fun analysing x86 KVM code. :-)
+Patch 1 fixes are rather annoying wart where the xapic_state *deliberately*
+skips reserved bit tests to work around a KVM bug.  *sigh*
 
-I assure you that there are plenty of actual bugs in KVM. This tool
-just isn't finding them.
+I couldn't find anything definitive in the APM, my findings are based on
+testing on Genoa.
+ 
+Sean Christopherson (8):
+  KVM: x86: Enforce x2APIC's must-be-zero reserved ICR bits
+  KVM: x86: Move x2APIC ICR helper above kvm_apic_write_nodecode()
+  KVM: x86: Re-split x2APIC ICR into ICR+ICR2 for AMD (x2AVIC)
+  KVM: selftests: Open code vcpu_run() equivalent in guest_printf test
+  KVM: selftests: Report unhandled exceptions on x86 as regular guest
+    asserts
+  KVM: selftests: Add x86 helpers to play nice with x2APIC MSR #GPs
+  KVM: selftests: Skip ICR.BUSY test in xapic_state_test if x2APIC is
+    enabled
+  KVM: selftests: Test x2APIC ICR reserved bits
 
-> Sort of cool that you guys on Google consider bug report from nobody admi=
-ns from the
-> universities ;-)
->
-> Best regards,
-> Mirsad Todorovac
->
+ arch/x86/include/asm/kvm_host.h               |  2 +
+ arch/x86/kvm/lapic.c                          | 73 +++++++++++++------
+ arch/x86/kvm/svm/svm.c                        |  2 +
+ arch/x86/kvm/vmx/main.c                       |  2 +
+ .../testing/selftests/kvm/guest_print_test.c  | 19 ++++-
+ .../selftests/kvm/include/x86_64/apic.h       | 21 +++++-
+ .../selftests/kvm/lib/x86_64/processor.c      |  8 +-
+ .../selftests/kvm/x86_64/xapic_state_test.c   | 39 +++++-----
+ 8 files changed, 119 insertions(+), 47 deletions(-)
+
+
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+-- 
+2.45.2.1089.g2a221341d9-goog
+
 
