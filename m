@@ -1,199 +1,173 @@
-Return-Path: <kvm+bounces-21906-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21907-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE3ED937176
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 02:22:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21C459371B7
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 03:02:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64618282186
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 00:22:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 396F21C20E72
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 01:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AA0323A0;
-	Fri, 19 Jul 2024 00:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79E6D4A3F;
+	Fri, 19 Jul 2024 01:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="D4AgumoR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TCCITDoZ"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A06BECC
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 00:22:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4445680
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 01:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721348527; cv=none; b=i/vxYrvRUbW2WuSRYwzeM0DM61Y6QD8x6GxV6JnGDL0v611G6q7AmriQcYrt/jCO5pB5DafbigYyLj76mXXfgbEnlUwZyvhM5nsuv2Xd3EPiYiqI+kZ5Nlo0gpubOJUzqYEZx5cm+klSof5f+Vjab7YdP6G5v1pYit5lhiu37U0=
+	t=1721350936; cv=none; b=owe/tlZCzGRtFY1AZOPg4/Q6EIjvuCNqvsp4SyBTiFP8xae85e1xwi/hFE4gPWJ8gYyzhrAxXtsobFKFtjdxzQ0EUXLpuefHId2k0+9uq92wfkl0t/CKt9N8W75M14TYCeHAiO9Wmbc2ii55JFiP8jllCB1jqpU8RtIWCYuorNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721348527; c=relaxed/simple;
-	bh=pHgqTGtSnIHhc3JWuBlkLRK3QVusWeqEshmxIbO03Qc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m/skElb3jSdPX3VANfJR+vSgVBB+m/iOGqGPGgtzgTCLKvMmr5yDGER6Ewuha7miucJsUCP3JpRW5suJJrUYJcQ0S3X5caoAeA2A0XYE6bFh7ie5HxmtnH63ICz2qBGYa/UK3cCOOkJD72sqxCmwZ4kZL1vtZoFYUg0Bv5gd948=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=D4AgumoR; arc=none smtp.client-ip=209.85.166.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-7fd3dbc01deso58837039f.0
-        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 17:22:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1721348524; x=1721953324; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+uKIGXWYWIXloeHuuBuqBxGxPLL0P2YhrQYu7M9WpbQ=;
-        b=D4AgumoREx5sQVOlIbnc/SqADcjb5zcwpuLHZiyStv4TyCI7e+ijeWK36/4xlkNmE3
-         0N0FhksBkQDPOp66UTXsDAhyjM7zFcRMiZnMoq2t0hnzz44Iuo3hTLTpJDiGLsdmzozA
-         p9yyZIyMyxcEo43qDTTFs538XCnfA/z8FPBcSBtRJt1tS3T5wEc0xsdf0vq8ODRMvHR7
-         6sNxAXZfpdFfr6RIRW6Uv9JB6+XzNM61zrW1hS62KejZpL86D2rn1YlLRLFm8Z0fOj/s
-         tRYdRC61hR7v+qJDJjdJuvbIm48HhfhVlxT2UgqOK906iwpCNgDwiJG9zOWjmgLQ2gEv
-         qRJw==
+	s=arc-20240116; t=1721350936; c=relaxed/simple;
+	bh=egPWD6SvkPUOxMbhJVXX/ZmlFwvqOXO8b8h7S1FD3o8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ndjDfe4zFOobUYsclLZL9NpL1+ukEE/D7ZYntormOwVGe6pFkHmjXJ9LobZ81mH92O5GkBT/thXMtVF3xKiMaoHfA/LEwi6jcDcc+c1RtLYygkpr6EJb3jEUt00JaKrQZ9KVFY9CXRJJQ0Io8+W95FAw+OSv6iNQTlQBbv3YQfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TCCITDoZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721350932;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Juhk1rxXqcv0LvjBmmBek/yRx3F0GQ+A2PArt9J+ciU=;
+	b=TCCITDoZZAxLWUR9fMipuChb0Whecd3AzOb5ksAB4z2aEZdkvNPK3oOGxKl/a0TL0TVMww
+	85x6BJ95FH6VpeqcXptRj1r12hUE5IDkulXiUwT099V/HZjgqkXCUNSGur+IBwjwtjruag
+	Bm7rqN9LXQYRSwiUCStLRc2QZTeRnDE=
+Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com
+ [209.85.210.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-GJvo7p2nP7ihXt_BfHB_gQ-1; Thu, 18 Jul 2024 21:02:11 -0400
+X-MC-Unique: GJvo7p2nP7ihXt_BfHB_gQ-1
+Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-70b09456066so367641b3a.0
+        for <kvm@vger.kernel.org>; Thu, 18 Jul 2024 18:02:11 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721348524; x=1721953324;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+uKIGXWYWIXloeHuuBuqBxGxPLL0P2YhrQYu7M9WpbQ=;
-        b=tz0DDaEjljdBq+Fc/x4W1PNdlrTY4R/U6nd9WlN91viJ5kvdVLpPeIHR46I1FNcHBw
-         VyqiG4PEPesfde7DbpnnxI3MlqTnhwMr6UTd/4g58r5Umm7D7rpJ5L9hc6/CjG52XPvy
-         67/dwLfkUAiwLBonB7qySAyatnKvSHZAXxhX2W45ijiY8kZZ79VNOGhwEO6n068BIsvG
-         aEfNE3Ymp1Hg1imBPMLXCM6fOm5ibChWEC2+66G8u15SLczVakLaG/4ErIxQNJS1wi2g
-         aCFk5QjDq5Gu3Haupcf2qSOz7TwMf6wLZykyzxpioxpADASTv3cyJLjwM0tonkSjuZfI
-         natQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVTGvhdn+8pIpePloPL6IYkjv0sGuVDjuRZNrVVpPX8xXHuv/fjPb2AmmkuZgE8K0yTRGEcJi3kNXsTKCG98x0Tb9NU
-X-Gm-Message-State: AOJu0Yx6vpbZX425l749hebXcRKH1IPTbJf/PivNNln8WwNcUF4tV2e+
-	TpSzklQc3vsd+SXRmJLyd0GYBxQMNu4Cv792vYF8lpmf3E/uxJTv85y60gJMw7k=
-X-Google-Smtp-Source: AGHT+IGZOYKaYajrW+wJeRqu8lvZxt7wFW370je39V0cIuR/Fg8Tkc/xud3IhBJspqPatG5aLX9hUg==
-X-Received: by 2002:a05:6602:3fd2:b0:806:31ee:132 with SMTP id ca18e2360f4ac-81710137c5emr919977239f.4.1721348524401;
-        Thu, 18 Jul 2024 17:22:04 -0700 (PDT)
-Received: from [100.64.0.1] ([147.124.94.167])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4c2343d2e8esm92265173.129.2024.07.18.17.22.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 18 Jul 2024 17:22:03 -0700 (PDT)
-Message-ID: <60555952-7307-41ed-bd6f-17a179089596@sifive.com>
-Date: Thu, 18 Jul 2024 19:22:02 -0500
+        d=1e100.net; s=20230601; t=1721350930; x=1721955730;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Juhk1rxXqcv0LvjBmmBek/yRx3F0GQ+A2PArt9J+ciU=;
+        b=jfpNzNOKiXZC70mxmoV9QyqxXB/GmXQqem1qqy0+aQHutsV2mZCNSeQYyQ9KwJG1Qs
+         FK3aF4QwDYcwOeIzFALcWkWH2YGSYcFSOu2pTzqae1/1PWhz7dMet+w4L9+lUzA7JUbd
+         5zfaMvqnVOoLxw7wN6u7z0ReP2uecJJljpn0pc3K2p7cZe077ixhjrIEpt91RbEs0x32
+         gRrugmgZFH0JSLTfdP1jBfhW+M52D7FuMW+rWHmHLqy/z1hswjJmFnRsOGYNVPCGBXkb
+         avCrBwc3omV8Z0koJiJSDkV4xHiXpiYq/GABWBjXS/3IzvOlIcFqgPvasB7AzOanlp2u
+         1BRw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMFP7pNNPHbkW0EV537csa1hMUXaYErDKl7thFHcLfMH1+UOS5G60FgU8865BFf3hSMMC5vP51fsgi2aVH7L+bweHt
+X-Gm-Message-State: AOJu0YzuY31Rp2J0TQvxCg99eAyOCh6d4844o2riuJnbi+RjY1kSTS3/
+	Q9kNRnLLkkFEYFcDf6liSErZyVMRFEM9BuguPF8bo3L1l7NnYiSSxSgu0L07fy0Ib7ety2AfFf4
+	0UL8aNqYzk0MR0mBpMJwTKCYrGSiIBCPcRBPbJGHQbdhdWLvAMgEG+T2GNN6f5h6S1n5xNqZ9VN
+	YOSW1h9KBj6AbYc1rWt1a8THdA
+X-Received: by 2002:a05:6a21:39a:b0:1c0:f529:af05 with SMTP id adf61e73a8af0-1c3fdd4d914mr6793183637.43.1721350930338;
+        Thu, 18 Jul 2024 18:02:10 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEIRWijrC51r9BOXUiE6Aug7hDC6Lr0jyTkTo6KMrQRu/t6/fcr6+L8+BQ4wl7rzCezfYFnYOWyCyo72nnIjgU=
+X-Received: by 2002:a05:6a21:39a:b0:1c0:f529:af05 with SMTP id
+ adf61e73a8af0-1c3fdd4d914mr6793160637.43.1721350929827; Thu, 18 Jul 2024
+ 18:02:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 3/4] RISC-V: KVM: Add Svade and Svadu Extensions
- Support for Guest/VM
-To: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Cc: greentime.hu@sifive.com, vincent.chen@sifive.com,
- Anup Patel <anup@brainfault.org>, Atish Patra <atishp@atishpatra.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org,
- kvm-riscv@lists.infradead.org, kvm@vger.kernel.org
-References: <20240712083850.4242-1-yongxuan.wang@sifive.com>
- <20240712083850.4242-4-yongxuan.wang@sifive.com>
-Content-Language: en-US
-From: Samuel Holland <samuel.holland@sifive.com>
-In-Reply-To: <20240712083850.4242-4-yongxuan.wang@sifive.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240717053034-mutt-send-email-mst@kernel.org>
+ <CACGkMEura9v43QtBmWSd1+E_jpEUeXf+u5UmUzP1HT5vZOw3NA@mail.gmail.com> <20240718152712-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240718152712-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 19 Jul 2024 09:01:58 +0800
+Message-ID: <CACGkMEtTVmKYMdvjzE753+czmEcts4caG859_jW7nHQt7ATgkw@mail.gmail.com>
+Subject: Re: [GIT PULL] virtio: features, fixes, cleanups
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, aha310510@gmail.com, arefev@swemel.ru, 
+	arseny.krasnov@kaspersky.com, davem@davemloft.net, dtatulea@nvidia.com, 
+	eperezma@redhat.com, glider@google.com, iii@linux.ibm.com, jiri@nvidia.com, 
+	jiri@resnulli.us, kuba@kernel.org, lingshan.zhu@intel.com, 
+	ndabilpuram@marvell.com, pgootzen@nvidia.com, pizhenwei@bytedance.com, 
+	quic_jjohnson@quicinc.com, schalla@marvell.com, stefanha@redhat.com, 
+	sthotton@marvell.com, syzbot+6c21aeb59d0e82eb2782@syzkaller.appspotmail.com, 
+	vattunuru@marvell.com, will@kernel.org, xuanzhuo@linux.alibaba.com, 
+	yskelg@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Yong-Xuan,
+On Fri, Jul 19, 2024 at 3:28=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Thu, Jul 18, 2024 at 08:52:28AM +0800, Jason Wang wrote:
+> > On Wed, Jul 17, 2024 at 5:30=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com> wrote:
+> > >
+> > > This is relatively small.
+> > > I had to drop a buggy commit in the middle so some hashes
+> > > changed from what was in linux-next.
+> > > Deferred admin vq scalability fix to after rc2 as a minor issue was
+> > > found with it recently, but the infrastructure for it
+> > > is there now.
+> > >
+> > > The following changes since commit e9d22f7a6655941fc8b2b942ed354ec780=
+936b3e:
+> > >
+> > >   Merge tag 'linux_kselftest-fixes-6.10-rc7' of git://git.kernel.org/=
+pub/scm/linux/kernel/git/shuah/linux-kselftest (2024-07-02 13:53:24 -0700)
+> > >
+> > > are available in the Git repository at:
+> > >
+> > >   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/=
+for_linus
+> > >
+> > > for you to fetch changes up to 6c85d6b653caeba2ef982925703cbb4f2b3b31=
+63:
+> > >
+> > >   virtio: rename virtio_find_vqs_info() to virtio_find_vqs() (2024-07=
+-17 05:20:58 -0400)
+> > >
+> > > ----------------------------------------------------------------
+> > > virtio: features, fixes, cleanups
+> > >
+> > > Several new features here:
+> > >
+> > > - Virtio find vqs API has been reworked
+> > >   (required to fix the scalability issue we have with
+> > >    adminq, which I hope to merge later in the cycle)
+> > >
+> > > - vDPA driver for Marvell OCTEON
+> > >
+> > > - virtio fs performance improvement
+> > >
+> > > - mlx5 migration speedups
+> > >
+> > > Fixes, cleanups all over the place.
+> > >
+> > > Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> > >
+> >
+> > It looks like this one is missing?
+> >
+> > https://lore.kernel.org/kvm/20240701033159.18133-1-jasowang@redhat.com/=
+T/
+> >
+> > Thanks
+>
+> It's not included in the full but it's a bugfix and it's subtel enough
+> that I decided it's best to merge later, in particular when I'm not on
+> vacation ;)
 
-On 2024-07-12 3:38 AM, Yong-Xuan Wang wrote:
-> We extend the KVM ISA extension ONE_REG interface to allow VMM tools to
-> detect and enable Svade and Svadu extensions for Guest/VM. Since the
-> henvcfg.ADUE is read-only zero if the menvcfg.ADUE is zero, the Svadu
-> extension is available for Guest/VM and the Svade extension is allowed
-> to disabledonly when arch_has_hw_pte_young() is true.
-> 
-> Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-> Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
-> ---
->  arch/riscv/include/uapi/asm/kvm.h |  2 ++
->  arch/riscv/kvm/vcpu.c             |  3 +++
->  arch/riscv/kvm/vcpu_onereg.c      | 15 +++++++++++++++
->  3 files changed, 20 insertions(+)
-> 
-> diff --git a/arch/riscv/include/uapi/asm/kvm.h b/arch/riscv/include/uapi/asm/kvm.h
-> index e878e7cc3978..a5e0c35d7e9a 100644
-> --- a/arch/riscv/include/uapi/asm/kvm.h
-> +++ b/arch/riscv/include/uapi/asm/kvm.h
-> @@ -168,6 +168,8 @@ enum KVM_RISCV_ISA_EXT_ID {
->  	KVM_RISCV_ISA_EXT_ZTSO,
->  	KVM_RISCV_ISA_EXT_ZACAS,
->  	KVM_RISCV_ISA_EXT_SSCOFPMF,
-> +	KVM_RISCV_ISA_EXT_SVADE,
-> +	KVM_RISCV_ISA_EXT_SVADU,
->  	KVM_RISCV_ISA_EXT_MAX,
->  };
->  
-> diff --git a/arch/riscv/kvm/vcpu.c b/arch/riscv/kvm/vcpu.c
-> index 17e21df36cc1..64a15af459e0 100644
-> --- a/arch/riscv/kvm/vcpu.c
-> +++ b/arch/riscv/kvm/vcpu.c
-> @@ -540,6 +540,9 @@ static void kvm_riscv_vcpu_setup_config(struct kvm_vcpu *vcpu)
->  	if (riscv_isa_extension_available(isa, ZICBOZ))
->  		cfg->henvcfg |= ENVCFG_CBZE;
->  
-> +	if (riscv_isa_extension_available(isa, SVADU))
-> +		cfg->henvcfg |= ENVCFG_ADUE;
+Understood.
 
-This is correct for now because patch 1 ensures the host (and therefore also the
-guest) never has both Svade and Svadu available. When that changes, this check
-will need to add an "&& !riscv_isa_extension_available(isa, SVADE)" condition so
-it matches the behavior described in the DT binding. There's no need to resend
-to make this addition, but if you do, it wouldn't hurt to include it so it's not
-forgotten later. (It looks maybe like v6 only partially implemented Andrew's
-suggestion?)
+Thanks
 
-Reviewed-by: Samuel Holland <samuel.holland@sifive.com>
-
-> +
->  	if (riscv_has_extension_unlikely(RISCV_ISA_EXT_SMSTATEEN)) {
->  		cfg->hstateen0 |= SMSTATEEN0_HSENVCFG;
->  		if (riscv_isa_extension_available(isa, SSAIA))
-> diff --git a/arch/riscv/kvm/vcpu_onereg.c b/arch/riscv/kvm/vcpu_onereg.c
-> index 62874fbca29f..474fdeafe9fe 100644
-> --- a/arch/riscv/kvm/vcpu_onereg.c
-> +++ b/arch/riscv/kvm/vcpu_onereg.c
-> @@ -15,6 +15,7 @@
->  #include <asm/cacheflush.h>
->  #include <asm/cpufeature.h>
->  #include <asm/kvm_vcpu_vector.h>
-> +#include <asm/pgtable.h>
->  #include <asm/vector.h>
->  
->  #define KVM_RISCV_BASE_ISA_MASK		GENMASK(25, 0)
-> @@ -38,6 +39,8 @@ static const unsigned long kvm_isa_ext_arr[] = {
->  	KVM_ISA_EXT_ARR(SSAIA),
->  	KVM_ISA_EXT_ARR(SSCOFPMF),
->  	KVM_ISA_EXT_ARR(SSTC),
-> +	KVM_ISA_EXT_ARR(SVADE),
-> +	KVM_ISA_EXT_ARR(SVADU),
->  	KVM_ISA_EXT_ARR(SVINVAL),
->  	KVM_ISA_EXT_ARR(SVNAPOT),
->  	KVM_ISA_EXT_ARR(SVPBMT),
-> @@ -105,6 +108,12 @@ static bool kvm_riscv_vcpu_isa_enable_allowed(unsigned long ext)
->  		return __riscv_isa_extension_available(NULL, RISCV_ISA_EXT_SSAIA);
->  	case KVM_RISCV_ISA_EXT_V:
->  		return riscv_v_vstate_ctrl_user_allowed();
-> +	case KVM_RISCV_ISA_EXT_SVADU:
-> +		/*
-> +		 * The henvcfg.ADUE is read-only zero if menvcfg.ADUE is zero.
-> +		 * Guest OS can use Svadu only when host os enable Svadu.
-> +		 */
-> +		return arch_has_hw_pte_young();
->  	default:
->  		break;
->  	}
-> @@ -167,6 +176,12 @@ static bool kvm_riscv_vcpu_isa_disable_allowed(unsigned long ext)
->  	/* Extensions which can be disabled using Smstateen */
->  	case KVM_RISCV_ISA_EXT_SSAIA:
->  		return riscv_has_extension_unlikely(RISCV_ISA_EXT_SMSTATEEN);
-> +	case KVM_RISCV_ISA_EXT_SVADE:
-> +		/*
-> +		 * The henvcfg.ADUE is read-only zero if menvcfg.ADUE is zero.
-> +		 * Svade is not allowed to disable when the platform use Svade.
-> +		 */
-> +		return arch_has_hw_pte_young();
->  	default:
->  		break;
->  	}
+>
+> --
+> MST
+>
 
 
