@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-21989-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-21990-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CA7E937E2F
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 01:53:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9314F937E32
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 01:53:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E335F1F22813
-	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 23:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6BA01C21456
+	for <lists+kvm@lfdr.de>; Fri, 19 Jul 2024 23:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8A0A14AD02;
-	Fri, 19 Jul 2024 23:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C88A14B091;
+	Fri, 19 Jul 2024 23:51:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eOAWMULj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sT9zKYe2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613E914A4D2
-	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 23:51:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F398914A60D
+	for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 23:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721433084; cv=none; b=FV4B2upnZ2gjN3W2I7U6VvLeT8EePRvok1fanATCDBw8cS+dAIwtdwLCaMYTasQr6bdQtz8Z3oaBwUiaLlaKz9265WnTs594rwZeqMuBxkdCg7mgAGYxXwlIL2DHgsxmYDsL60L5GxkEi0TXrN0DEOOYOKtGuOveitaBA34wnDA=
+	t=1721433085; cv=none; b=IYnQmJIyO5ZDiN/+ucGQFRtO9E6ZDY6NGWejUcwn2k4SX72vHVhldwR0IF8gdfrRzuwhNLOgmUSP6WGLY9d5XS8ekYlKPKnSF2oaKQdzP8zzHeKAsLPmYeG6H7Xb5XCDy4QKdbl64GTOlqURHF3SeLVYqCwgQQjXudkgrhSVSY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721433084; c=relaxed/simple;
-	bh=avuIVrOvbdJuGswu1VBc5QXgq1mmaRUWopHFZ+/wLdQ=;
+	s=arc-20240116; t=1721433085; c=relaxed/simple;
+	bh=vGX+QjydJu3zU32DeuD0uDs+BGgsKqP86RvQO+BJ6uk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=RgFVUIO6cG1Srww0BqsrBlYP2s7U1nNxAdxJ9eftlYpyVHaUT0RldLOXuQef+PV4gYfmmgiZ8dzlLHhAaWxTDxBL6Ja/tJ3tB4ku4Oc9xS0oUTPB0/U+TdK6mIk3BiAB0UyF+kTv0dFen71yBcDKX9Ph2i7BrUuHPyFUrXchKW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eOAWMULj; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=PzyugtlHWi2B2GjShXctAFPngizTTzElYyXoVZQbduLenaiofpNwpJ5c3vpQd5HG0ANOsUO/ax8Dp335y2KTWJvP0xV/bPM0Xiga8OIMMaWztT7WUcvBelmTaB8Iv0YFOoHUrqQ5SHuQsG1B3bQPhl5atUf3hac5z+xD+2Ks3oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sT9zKYe2; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-66890dbb7b8so50143357b3.0
-        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:51:22 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2cb4c2276b6so1991107a91.1
+        for <kvm@vger.kernel.org>; Fri, 19 Jul 2024 16:51:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721433081; x=1722037881; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1721433083; x=1722037883; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=vV3aMaVHf7C/0akufsxFVZJRmuCa+4Ea2SM/3XMiVaU=;
-        b=eOAWMULjI0sxK5+DAGTf7g9lHPawrWWDsxm1ws1SCXQnGgMmZlrpwdvAKK7GIiqYM/
-         86KTwrWcZOkwk7sU/2lG9+C+pPS+aOu3skk+15ZSsWbZXh357kpP52cV6LIaXA9WXY6h
-         XZacye6vD82sbm6lh+YBso2VPAnffT8ty12duHvIQ10PyaYDF8jrzeH1NYR+TzbOcrls
-         CLRqv2lUm6tC0DqTkqJeCf1A8mOAz/aX2lzGpAs2KwolKFs9IAeD1hyKRhE2EuBPVrnA
-         hpDs8Nr+nLZVF9W7EJ7QHudRi4WsIGGTcEgbl2OpPSsOCGvuSqXa/kkwlkZi41i08PHI
-         DiDw==
+        bh=ZUvOecK3sLTMz6qm67Q0shiPwc10UQD2irey1Qg3WXo=;
+        b=sT9zKYe2AnbCTWsxr2d+fvVP4mKJUgIgXJYnlFGwbN2u1npFeDMpIcc3z3jjWOTQSY
+         H1zxBQ0kXPJL+zhopTFnpLjeoU1Kl0GDPM4hL3UNX+dkgZZShZDl5USm+o4L29nKeCz5
+         KOyMqlnUxXNiuvLojxG9ZSbEkI0yQZwTZ4NQM5uN0iH78cf1KErmABawHv1CbQbMpsZ4
+         ZO+VAeLMLsd+Dz8+YMBUWGUXDhplT+ByCmoTGiGSRBjG7eS9Bx2Ve6yGPE2FxApaAvWO
+         IwFBp4Ekb2SBl6EH+fX3jyvtCcgLUNcdVeoOILasvKyMw+NMnMOlyaUrazK60oGQzR5x
+         hlnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721433081; x=1722037881;
+        d=1e100.net; s=20230601; t=1721433083; x=1722037883;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=vV3aMaVHf7C/0akufsxFVZJRmuCa+4Ea2SM/3XMiVaU=;
-        b=G8gpzsWTqwx2xqTZUGC/ZMoHyVqEzZYVWAuqGUm/W5Dm+aEdbrlIaCWQi9ZQbxBxhl
-         Og7DjEbV7p6Gved3qfgoJfSdxxcbyeCrgLkB6oPMp3khWTzfwmYS5HQwCDTcDhAPwRnE
-         MRbuCO2HJOVd8/F98fEUToAKSJGrhcC3OV7V/IYRUSgl6HKwf5xmJ7qKipUlSAKSFO9u
-         w7dU3w8tL4ySVBe27y1d4z3gclUW5zBvPBs0sGPTPKDS1chq5xxixk71xrewa6jZ0Bz7
-         xZCn91O7JPECSlVw/y1UfOJgjvft6EycEgyWrBzJhOBIYx+9KC0cLXnww31iS0m7owOk
-         ubZg==
-X-Gm-Message-State: AOJu0YxznguP4MzUYkxUSrLR8HpTlpki7U7gg57CogiZ1W+zbrhxgZ1v
-	HY56B8A5CT3/Z/GuM3Pi7C5ddU8RpRu84w9QuKMkRudLK5fPA/fR/5fAY4inUneF2U1i4XBPLr5
-	tGg==
-X-Google-Smtp-Source: AGHT+IFx9+7vK2ERpoBYVxnQ2HTxUS6m7HbUD6i5XHwtnqVPJXqKCxVy91eJGzC7dRUx4lbD788BVlCbsAI=
+        bh=ZUvOecK3sLTMz6qm67Q0shiPwc10UQD2irey1Qg3WXo=;
+        b=gyJtixgOH8Pv5sXBeOz4MnA4mB1Hco3SnMSMv9oHQtJ7XbJgVJfEarEZEGxg9BGPAJ
+         4C4F+6Njes2dq99PXqqLOn5eX2PquqIJoZa8R/sBiw08s04WRaDxpTUK01uudOPfILK9
+         A892N5RMpqyYopuBfWuanL0olwgbELjuVNlfxS/nF87PUtiLrj+mjDXnJVednZDtVinE
+         mHDdBH3kY7tN7WNqdfaEIffXGQWG3pTQ5J60pQRFiCx/Ac3s1tUNsIvkoqpj7tBflHfM
+         0ccRYJ5Vi1uPMrDMFXs/mZJ2k1UimGQEfK0kSc6qL1z8UQzVBgWlgDpaMX+1I9ocIcD0
+         sd9Q==
+X-Gm-Message-State: AOJu0YwBiMr8QLWvewZ1RMQl0Fg2SdPc3dTvDDmTw10+bc0P+894Kfyb
+	pjsyomQIib+0GIcq/8NgUKeShHsRmubwduBfGwgConXla4MINPaGiqLOFo1SPpohxXxht0iIkDK
+	KJg==
+X-Google-Smtp-Source: AGHT+IH4xR/BOfWKOPUMASMusbY5ub+urdfsnucw/9o+x1nLQ9TwhoA/c/J2omSZr9UBr+XODY5GuQ6L3iI=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:100c:b0:e03:b3e8:f9a1 with SMTP id
- 3f1490d57ef6-e086fe45084mr25809276.2.1721433081278; Fri, 19 Jul 2024 16:51:21
+ (user=seanjc job=sendgmr) by 2002:a17:90a:fe8f:b0:2c9:ba2b:42ac with SMTP id
+ 98e67ed59e1d1-2cd1618bd8amr3900a91.4.1721433083102; Fri, 19 Jul 2024 16:51:23
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 19 Jul 2024 16:51:03 -0700
+Date: Fri, 19 Jul 2024 16:51:04 -0700
 In-Reply-To: <20240719235107.3023592-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,65 +75,62 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240719235107.3023592-1-seanjc@google.com>
 X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
-Message-ID: <20240719235107.3023592-7-seanjc@google.com>
-Subject: [PATCH v2 06/10] KVM: selftests: Add x86 helpers to play nice with
- x2APIC MSR #GPs
+Message-ID: <20240719235107.3023592-8-seanjc@google.com>
+Subject: [PATCH v2 07/10] KVM: selftests: Skip ICR.BUSY test in
+ xapic_state_test if x2APIC is enabled
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Maxim Levitsky <mlevitsk@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add helpers to allow and expect #GP on x2APIC MSRs, and opportunistically
-have the existing helper spit out a more useful error message if an
-unexpected exception occurs.
+Don't test the ICR BUSY bit when x2APIC is enabled as AMD and Intel have
+different behavior (AMD #GPs, Intel ignores), and the fact that the CPU
+performs the reserved bit checks when IPI virtualization is enabled makes
+it impossible for KVM to precisely emulate one or the other.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- .../selftests/kvm/include/x86_64/apic.h       | 21 ++++++++++++++++++-
- 1 file changed, 20 insertions(+), 1 deletion(-)
+ .../selftests/kvm/x86_64/xapic_state_test.c    | 18 ++++++++++++------
+ 1 file changed, 12 insertions(+), 6 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/include/x86_64/apic.h b/tools/testing/selftests/kvm/include/x86_64/apic.h
-index 0f268b55fa06..51990094effd 100644
---- a/tools/testing/selftests/kvm/include/x86_64/apic.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/apic.h
-@@ -11,6 +11,7 @@
- #include <stdint.h>
- 
- #include "processor.h"
-+#include "ucall_common.h"
- 
- #define APIC_DEFAULT_GPA		0xfee00000ULL
- 
-@@ -93,9 +94,27 @@ static inline uint64_t x2apic_read_reg(unsigned int reg)
- 	return rdmsr(APIC_BASE_MSR + (reg >> 4));
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+index 69849acd95b0..928d65948c48 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+@@ -70,12 +70,10 @@ static void ____test_icr(struct xapic_vcpu *x, uint64_t val)
+ 	vcpu_ioctl(vcpu, KVM_GET_LAPIC, &xapic);
+ 	icr = (u64)(*((u32 *)&xapic.regs[APIC_ICR])) |
+ 	      (u64)(*((u32 *)&xapic.regs[APIC_ICR2])) << 32;
+-	if (!x->is_x2apic) {
++	if (!x->is_x2apic)
+ 		val &= (-1u | (0xffull << (32 + 24)));
+-		TEST_ASSERT_EQ(icr, val & ~APIC_ICR_BUSY);
+-	} else {
+-		TEST_ASSERT_EQ(icr & ~APIC_ICR_BUSY, val & ~APIC_ICR_BUSY);
+-	}
++
++	TEST_ASSERT_EQ(icr, val & ~APIC_ICR_BUSY);
  }
  
-+static inline uint8_t x2apic_write_reg_safe(unsigned int reg, uint64_t value)
-+{
-+	return wrmsr_safe(APIC_BASE_MSR + (reg >> 4), value);
-+}
+ #define X2APIC_RSVED_BITS_MASK  (GENMASK_ULL(31,20) | \
+@@ -91,7 +89,15 @@ static void __test_icr(struct xapic_vcpu *x, uint64_t val)
+ 		 */
+ 		val &= ~X2APIC_RSVED_BITS_MASK;
+ 	}
+-	____test_icr(x, val | APIC_ICR_BUSY);
 +
- static inline void x2apic_write_reg(unsigned int reg, uint64_t value)
- {
--	wrmsr(APIC_BASE_MSR + (reg >> 4), value);
-+	uint8_t fault = x2apic_write_reg_safe(reg, value);
++	/*
++	 * The BUSY bit is reserved on both AMD and Intel, but only AMD treats
++	 * it is as _must_ be zero.  Intel simply ignores the bit.  Don't test
++	 * the BUSY bit for x2APIC, as there is no single correct behavior.
++	 */
++	if (!x->is_x2apic)
++		____test_icr(x, val | APIC_ICR_BUSY);
 +
-+	__GUEST_ASSERT(!fault, "Unexpected fault 0x%x on WRMSR(%x) = %lx\n",
-+		       fault, APIC_BASE_MSR + (reg >> 4), value);
+ 	____test_icr(x, val & ~(u64)APIC_ICR_BUSY);
  }
  
-+static inline void x2apic_write_reg_fault(unsigned int reg, uint64_t value)
-+{
-+	uint8_t fault = x2apic_write_reg_safe(reg, value);
-+
-+	__GUEST_ASSERT(fault == GP_VECTOR,
-+		       "Wanted #GP on WRMSR(%x) = %lx, got 0x%x\n",
-+		       APIC_BASE_MSR + (reg >> 4), value, fault);
-+}
-+
-+
- #endif /* SELFTEST_KVM_APIC_H */
 -- 
 2.45.2.1089.g2a221341d9-goog
 
