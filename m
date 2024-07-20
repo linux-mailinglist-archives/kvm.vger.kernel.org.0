@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-22012-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22013-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F85B938089
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 11:49:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2EBD3938190
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 15:50:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 419C62824A2
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 09:49:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DA451C210B6
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 13:49:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4CE7829C;
-	Sat, 20 Jul 2024 09:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C81312F596;
+	Sat, 20 Jul 2024 13:49:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nr4cr50O"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GO32KXRH"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4036E29A2;
-	Sat, 20 Jul 2024 09:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFEC127E18;
+	Sat, 20 Jul 2024 13:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721468973; cv=none; b=e9wJGS+wmPvvDMMDXh6EXNYr2xmcXH68hzdo7y77hpcf9BcGaHgNMFm7jMHvNIa6aE+Z/97uFv/4+KB9G9L/RIRYTqNNngo+0LGy2Hh3V0Zkg3tWf3E/Cc2ajihhNYzNMNvnNOF8DJCAHTlTMlJktRsqmPwh62R+NuZPeOyPnBQ=
+	t=1721483390; cv=none; b=keHTD8EbKdAno7n7a2bkwDcrAvq9AS1/voDzx4vdhD2KhatSo2JA3ZCTfXgt84drLNM9oFnVWpOkKCnaOuYyuK+vxDJBktgqLFWoep4CYf+kO6VzzK7PHeUjGgFbq84SXJCULSYW6OZ8+bZfwcPumTzdCTF3n4EFJxwyXTa86Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721468973; c=relaxed/simple;
-	bh=Fabkemm15d9bvyMMdzbPwEmfBhmRHwNU94q62xcaQfs=;
+	s=arc-20240116; t=1721483390; c=relaxed/simple;
+	bh=91DC/EtwjRl7oVRofbtUs856yyJFHCsoIoLqgzrr6hk=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JtqHswOlydg2T6HNW5cVfrBgqVKjak0xhj1SOWIR1DJd+7/utcf/AxlafgnW8bfA97k+9wH6Fl4qvDXaRb+suAvmnxP0oU2BWvFVLPbESR+gb4mkcaa1sXdb2tJwR4HkpcqfafpKxo6K2ICxBr8RrFeDgWokbA9m4uIH3iOrnKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nr4cr50O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD29C2BD10;
-	Sat, 20 Jul 2024 09:49:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=S+VElag0gBvEcdlwbsXc8jxPha8kyBXe8oeYiXCVxN5FkTKN/PBPHzF3svAqWpREMvDIWEzj5G9eMacvI+a7YhbKMnmFkKJxIRVizL4aaZSA5O2O3jmB6mT9QwJhldXIM5m8hpeG5gqzMbevcYILKDeXd0OnWFyZErnFc6/PaLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GO32KXRH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAEFCC2BD10;
+	Sat, 20 Jul 2024 13:49:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721468972;
-	bh=Fabkemm15d9bvyMMdzbPwEmfBhmRHwNU94q62xcaQfs=;
+	s=k20201202; t=1721483390;
+	bh=91DC/EtwjRl7oVRofbtUs856yyJFHCsoIoLqgzrr6hk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nr4cr50ORl9NgCybFuvIypLJ61NrnhHyoeI4ZNI0ykz7OP1wiOaYHimSIUbWbOfEM
-	 SpQmSnu65Pd7ADtJevbNw3EflKszAOViU2dwcOrHWXqEEyg4QdKvC4ztm1cnfn2psR
-	 7rV78Qaj2vDMA8jmE5samKyVNQWFWJpyG/+M36JACNKb/KOYLrxfrXKs2xLKDgGLcP
-	 LYB/2Ml7I+fuJbU7u/ZxJhoX/7a1pndggvsMSKx2Pjhs9n1oYziy9/S35/aMLjugcg
-	 UbGuu8ZcvNsM9Ffln5FPpXSsr6nQpHXDaVQD9yOUHtTpdHRMuCbJadDvtGRAU1RxsI
-	 syVLgH3dgNbPg==
+	b=GO32KXRHreSkFTtcKUt4sqNDHnnEESeasUj35i6lLsJC48oPovKamzs65alVZwXnN
+	 I2uh5kqb+4vCiOLd1ZjhD34oRt51G+Q9jbIKvYxIAbHT+frx3PAbV/AqlRwPztAhGw
+	 YY2agCDaxt7Ve0Pl8Q+LFF8nKucS2N/V2cf3zPoHn2GnFV+/WeAR5SfU2PHQ325BOK
+	 ozXMDhf8i4l47UFhhYXZYaCGN/6h3vM+L0u5+ffrZC1hKla9oMAVw85592pzdlQ2f7
+	 Xe9H14Leu2FWGIT0xi+BAeL6Up6dZNQfwYR1+uxQLv4IfRO1hILYgGYJraUBIbaA3q
+	 gM4zNjLetMxew==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sV6iY-00DuaU-HH;
-	Sat, 20 Jul 2024 10:49:30 +0100
-Date: Sat, 20 Jul 2024 10:49:29 +0100
-Message-ID: <878qxw5r6e.wl-maz@kernel.org>
+	id 1sVAT5-00DwmZ-EH;
+	Sat, 20 Jul 2024 14:49:47 +0100
+Date: Sat, 20 Jul 2024 14:49:46 +0100
+Message-ID: <877cdg5g1x.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -59,11 +59,11 @@ Cc: kvmarm@lists.linux.dev,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 08/12] KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
-In-Reply-To: <ZpkwXFrhcFB1x0nD@raptor>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <Zpkxw8pW2Mm4wMAm@raptor>
 References: <20240625133508.259829-1-maz@kernel.org>
-	<20240625133508.259829-9-maz@kernel.org>
-	<ZpkwXFrhcFB1x0nD@raptor>
+	<20240708165800.1220065-1-maz@kernel.org>
+	<Zpkxw8pW2Mm4wMAm@raptor>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
  (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -79,101 +79,600 @@ X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-k
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Thu, 18 Jul 2024 16:10:20 +0100,
+On Thu, 18 Jul 2024 16:16:19 +0100,
 Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
 > Hi,
 > 
-> On Tue, Jun 25, 2024 at 02:35:07PM +0100, Marc Zyngier wrote:
-> > On the face of it, AT S12E{0,1}{R,W} is pretty simple. It is the
-> > combination of AT S1E{0,1}{R,W}, followed by an extra S2 walk.
-> > 
-> > However, there is a great deal of complexity coming from combining
-> > the S1 and S2 attributes to report something consistent in PAR_EL1.
-> > 
-> > This is an absolute mine field, and I have a splitting headache.
-> > 
-> > [..]
-> > +static u8 compute_sh(u8 attr, u64 desc)
-> > +{
-> > +	/* Any form of device, as well as NC has SH[1:0]=0b10 */
-> > +	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
-> > +		return 0b10;
-> > +
-> > +	return FIELD_GET(PTE_SHARED, desc) == 0b11 ? 0b11 : 0b10;
+> Managed to have a look at AT handling for stage 1, I've been comparing it with
+> AArch64.AT().
 > 
-> If shareability is 0b00 (non-shareable), the PAR_EL1.SH field will be 0b10
-> (outer-shareable), which seems to be contradicting PAREncodeShareability().
+> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> > In order to plug the brokenness of our current AT implementation,
+> > we need a SW walker that is going to... err.. walk the S1 tables
+> > and tell us what it finds.
+> > 
+> > Of course, it builds on top of our S2 walker, and share similar
+> > concepts. The beauty of it is that since it uses kvm_read_guest(),
+> > it is able to bring back pages that have been otherwise evicted.
+> > 
+> > This is then plugged in the two AT S1 emulation functions as
+> > a "slow path" fallback. I'm not sure it is that slow, but hey.
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 520 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index 71e3390b43b4c..8452273cbff6d 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -4,9 +4,305 @@
+> >   * Author: Jintack Lim <jintack.lim@linaro.org>
+> >   */
+> >  
+> > +#include <linux/kvm_host.h>
+> > +
+> > +#include <asm/esr.h>
+> >  #include <asm/kvm_hyp.h>
+> >  #include <asm/kvm_mmu.h>
+> >  
+> > +struct s1_walk_info {
+> > +	u64	     baddr;
+> > +	unsigned int max_oa_bits;
+> > +	unsigned int pgshift;
+> > +	unsigned int txsz;
+> > +	int 	     sl;
+> > +	bool	     hpd;
+> > +	bool	     be;
+> > +	bool	     nvhe;
+> > +	bool	     s2;
+> > +};
+> > +
+> > +struct s1_walk_result {
+> > +	union {
+> > +		struct {
+> > +			u64	desc;
+> > +			u64	pa;
+> > +			s8	level;
+> > +			u8	APTable;
+> > +			bool	UXNTable;
+> > +			bool	PXNTable;
+> > +		};
+> > +		struct {
+> > +			u8	fst;
+> > +			bool	ptw;
+> > +			bool	s2;
+> > +		};
+> > +	};
+> > +	bool	failed;
+> > +};
+> > +
+> > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+> > +{
+> > +	wr->fst		= fst;
+> > +	wr->ptw		= ptw;
+> > +	wr->s2		= s2;
+> > +	wr->failed	= true;
+> > +}
+> > +
+> > +#define S1_MMU_DISABLED		(-127)
+> > +
+> > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> > +			 struct s1_walk_result *wr, const u64 va, const int el)
+> > +{
+> > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> > +	unsigned int stride, x;
+> > +	bool va55, tbi;
+> > +
+> > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
+> > +
+> > +	va55 = va & BIT(55);
+> > +
+> > +	if (wi->nvhe && va55)
+> > +		goto addrsz;
+> > +
+> > +	wi->s2 = el < 2 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
+> > +
+> > +	switch (el) {
+> > +	case 1:
+> > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
+> > +		ttbr	= (va55 ?
+> > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
+> > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
+> > +		break;
+> > +	case 2:
+> > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
+> > +		ttbr	= (va55 ?
+> > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
+> > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
+> > +		break;
+> > +	default:
+> > +		BUG();
+> > +	}
+> > +
+> > +	/* Let's put the MMU disabled case aside immediately */
+> > +	if (!(sctlr & SCTLR_ELx_M) ||
+> > +	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > +		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
+> > +			goto addrsz;
+> > +
+> > +		wr->level = S1_MMU_DISABLED;
+> > +		wr->desc = va;
+> > +		return 0;
+> > +	}
+> > +
+> > +	wi->be = sctlr & SCTLR_ELx_EE;
+> > +
+> > +	wi->hpd  = kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HPDS, IMP);
+> > +	wi->hpd &= (wi->nvhe ?
+> > +		    FIELD_GET(TCR_EL2_HPD, tcr) :
+> > +		    (va55 ?
+> > +		     FIELD_GET(TCR_HPD1, tcr) :
+> > +		     FIELD_GET(TCR_HPD0, tcr)));
+> > +
+> > +	tbi = (wi->nvhe ?
+> > +	       FIELD_GET(TCR_EL2_TBI, tcr) :
+> > +	       (va55 ?
+> > +		FIELD_GET(TCR_TBI1, tcr) :
+> > +		FIELD_GET(TCR_TBI0, tcr)));
+> > +
+> > +	if (!tbi && sign_extend64(va, 55) != (s64)va)
+> > +		goto addrsz;
+> > +
+> > +	/* Someone was silly enough to encode TG0/TG1 differently */
+> > +	if (va55) {
+> > +		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
+> > +		tg = FIELD_GET(TCR_TG1_MASK, tcr);
+> > +
+> > +		switch (tg << TCR_TG1_SHIFT) {
+> > +		case TCR_TG1_4K:
+> > +			wi->pgshift = 12;	 break;
+> > +		case TCR_TG1_16K:
+> > +			wi->pgshift = 14;	 break;
+> > +		case TCR_TG1_64K:
+> > +		default:	    /* IMPDEF: treat any other value as 64k */
+> > +			wi->pgshift = 16;	 break;
+> > +		}
+> > +	} else {
+> > +		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
+> > +		tg = FIELD_GET(TCR_TG0_MASK, tcr);
+> > +
+> > +		switch (tg << TCR_TG0_SHIFT) {
+> > +		case TCR_TG0_4K:
+> > +			wi->pgshift = 12;	 break;
+> > +		case TCR_TG0_16K:
+> > +			wi->pgshift = 14;	 break;
+> > +		case TCR_TG0_64K:
+> > +		default:	    /* IMPDEF: treat any other value as 64k */
+> > +			wi->pgshift = 16;	 break;
+> > +		}
+> > +	}
+> > +
+> > +	ia_bits = 64 - wi->txsz;
+> 
+> get_ia_size()?
 
-Yup, well caught.
+yeah, fair enough. I wasn't sold on using any helper while the
+walk_info struct is incomplete, but that doesn't change much.
 
-> > +	par |= FIELD_PREP(SYS_PAR_EL1_SH,
-> > +			  compute_sh(final_attr, tr->desc));
+> 
+> > +
+> > +	/* AArch64.S1StartLevel() */
+> > +	stride = wi->pgshift - 3;
+> > +	wi->sl = 3 - (((ia_bits - 1) - wi->pgshift) / stride);
+> > +
+> > +	/* Check for SL mandating LPA2 (which we don't support yet) */
+> > +	switch (BIT(wi->pgshift)) {
+> > +	case SZ_4K:
+> > +		if (wi->sl == -1 &&
+> > +		    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT))
+> > +			goto addrsz;
+> > +		break;
+> > +	case SZ_16K:
+> > +		if (wi->sl == 0 &&
+> > +		    !kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT))
+> > +			goto addrsz;
+> > +		break;
+> > +	}
+> > +
+> > +	ps = (wi->nvhe ?
+> > +	      FIELD_GET(TCR_EL2_PS_MASK, tcr) : FIELD_GET(TCR_IPS_MASK, tcr));
+> > +
+> > +	wi->max_oa_bits = min(get_kvm_ipa_limit(), ps_to_output_size(ps));
+> > +
+> > +	/* Compute minimal alignment */
+> > +	x = 3 + ia_bits - ((3 - wi->sl) * stride + wi->pgshift);
+> > +
+> > +	wi->baddr = ttbr & TTBRx_EL1_BADDR;
+> > +	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
+> > +
+> > +	return 0;
+> > +
+> > +addrsz:	/* Address Size Fault level 0 */
+> > +	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ, false, false);
+> > +
+> > +	return -EFAULT;
+> > +}
+> 
+> The function seems to be missing checks for:
+> 
+> - valid TxSZ
+> - VA is not larger than the maximum input size, as defined by TxSZ
+> - EPD{0,1}
+
+Yup, all fixed now, with E0PD{0,1} as an added bonus. The number of
+ways a translation can fail is amazing.
+
+> 
+> > +
+> > +static int get_ia_size(struct s1_walk_info *wi)
+> > +{
+> > +	return 64 - wi->txsz;
+> > +}
+> 
+> This looks a lot like get_ia_size() from nested.c.
+
+Indeed. Except that the *type* is different. And I really like the
+fact that they are separate for now. I may end-up merging some of the
+attributes at some point though.
+
+> 
+> > +
+> > +static int walk_s1(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> > +		   struct s1_walk_result *wr, u64 va)
+> > +{
+> > +	u64 va_top, va_bottom, baddr, desc;
+> > +	int level, stride, ret;
+> > +
+> > +	level = wi->sl;
+> > +	stride = wi->pgshift - 3;
+> > +	baddr = wi->baddr;
+> 
+> AArch64.S1Walk() also checks that baddr is not larger than the OA size.
+> check_output_size() from nested.c looks almost like what you want
+> here.
+
+At this stage, it is too late, as wi->baddr has already been sanitised
+by the setup phase. I'll add a check over there.
+
+> 
+> > +
+> > +	va_top = get_ia_size(wi) - 1;
+> > +
+> > +	while (1) {
+> > +		u64 index, ipa;
+> > +
+> > +		va_bottom = (3 - level) * stride + wi->pgshift;
+> > +		index = (va & GENMASK_ULL(va_top, va_bottom)) >> (va_bottom - 3);
+> > +
+> > +		ipa = baddr | index;
+> > +
+> > +		if (wi->s2) {
+> > +			struct kvm_s2_trans s2_trans = {};
+> > +
+> > +			ret = kvm_walk_nested_s2(vcpu, ipa, &s2_trans);
+> > +			if (ret) {
+> > +				fail_s1_walk(wr,
+> > +					     (s2_trans.esr & ~ESR_ELx_FSC_LEVEL) | level,
+> > +					     true, true);
+> > +				return ret;
+> > +			}
+> > +
+> > +			if (!kvm_s2_trans_readable(&s2_trans)) {
+> > +				fail_s1_walk(wr, ESR_ELx_FSC_PERM | level,
+> > +					     true, true);
+> > +
+> > +				return -EPERM;
+> > +			}
+> > +
+> > +			ipa = kvm_s2_trans_output(&s2_trans);
+> > +		}
+> > +
+> > +		ret = kvm_read_guest(vcpu->kvm, ipa, &desc, sizeof(desc));
+> > +		if (ret) {
+> > +			fail_s1_walk(wr, ESR_ELx_FSC_SEA_TTW(level),
+> > +				     true, false);
+> > +			return ret;
+> > +		}
+> > +
+> > +		if (wi->be)
+> > +			desc = be64_to_cpu((__force __be64)desc);
+> > +		else
+> > +			desc = le64_to_cpu((__force __le64)desc);
+> > +
+> > +		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
+> > +			fail_s1_walk(wr, ESR_ELx_FSC_FAULT | level,
+> > +				     true, false);
+> > +			return -ENOENT;
+> > +		}
+> > +
+> > +		/* We found a leaf, handle that */
+> > +		if ((desc & 3) == 1 || level == 3)
+> > +			break;
+> > +
+> > +		if (!wi->hpd) {
+> > +			wr->APTable  |= FIELD_GET(PMD_TABLE_AP, desc);
+> > +			wr->UXNTable |= FIELD_GET(PMD_TABLE_UXN, desc);
+> > +			wr->PXNTable |= FIELD_GET(PMD_TABLE_PXN, desc);
+> > +		}
+> > +
+> > +		baddr = GENMASK_ULL(47, wi->pgshift);
+> 
+> Where is baddr updated with the value read from the descriptor? Am I missing
+> something obvious here?
+
+Huh. Something has gone very wrong, and I have no idea how.
+This should read:
+
+		baddr = desc & GENMASK_ULL(47, wi->pgshift);
+
+because otherwise nothing makes sense. I must have done a last minute
+cleanup and somehow broken it. Time to retest everything!
+
+> 
+> > +
+> > +		/* Check for out-of-range OA */
+> > +		if (wi->max_oa_bits < 48 &&
+> > +		    (baddr & GENMASK_ULL(47, wi->max_oa_bits))) {
+> > +			fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ | level,
+> > +				     true, false);
+> > +			return -EINVAL;
+> > +		}
+> 
+> This looks very much like check_output_size() from nested.c.
+
+Yup. I'll fold that into a helper -- still separate from the S2
+version though.
+
+> 
+> > +
+> > +		/* Prepare for next round */
+> > +		va_top = va_bottom - 1;
+> > +		level++;
+> > +	}
+> > +
+> > +	/* Block mapping, check the validity of the level */
+> > +	if (!(desc & BIT(1))) {
+> > +		bool valid_block = false;
+> > +
+> > +		switch (BIT(wi->pgshift)) {
+> > +		case SZ_4K:
+> > +			valid_block = level == 1 || level == 2;
+> > +			break;
+> > +		case SZ_16K:
+> > +		case SZ_64K:
+> > +			valid_block = level == 2;
+> > +			break;
+> > +		}
+> > +
+> > +		if (!valid_block) {
+> > +			fail_s1_walk(wr, ESR_ELx_FSC_FAULT | level,
+> > +				     true, false);
+> > +			return -EINVAL;
+> > +		}
+> > +	}
+> 
+> Matches AArch64.BlockDescSupported(), with the caveat that the walker currently
+> doesn't support 52 bit PAs.
+> 
+> > +
+> > +	wr->failed = false;
+> > +	wr->level = level;
+> > +	wr->desc = desc;
+> > +	wr->pa = desc & GENMASK(47, va_bottom);
+> 
+> No output size check for final PA.
+
+Now fixed.
+
+> 
+> > +	if (va_bottom > 12)
+> > +		wr->pa |= va & GENMASK_ULL(va_bottom - 1, 12);
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  struct mmu_config {
+> >  	u64	ttbr0;
+> >  	u64	ttbr1;
+> > @@ -234,6 +530,177 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+> >  	return par;
+> >  }
+> >  
+> > +static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr)
+> > +{
+> > +	u64 par;
+> > +
+> > +	if (wr->failed) {
+> > +		par = SYS_PAR_EL1_RES1;
+> > +		par |= SYS_PAR_EL1_F;
+> > +		par |= FIELD_PREP(SYS_PAR_EL1_FST, wr->fst);
+> > +		par |= wr->ptw ? SYS_PAR_EL1_PTW : 0;
+> > +		par |= wr->s2 ? SYS_PAR_EL1_S : 0;
+> > +	} else if (wr->level == S1_MMU_DISABLED) {
+> > +		/* MMU off or HCR_EL2.DC == 1 */
+> > +		par = wr->pa & GENMASK_ULL(47, 12);
+> 
+> That's interesting, setup_s1_walk() sets wr->desc = va and leaves wr->pa
+> unchanged (it's 0 from initialization in handle_at_slow()).
+
+If by "interesting" you mean broken, then I agree!
+
+> 
+> > +
+> > +		if (!(__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > +			par |= FIELD_PREP(SYS_PAR_EL1_ATTR, 0); /* nGnRnE */
+> > +			par |= FIELD_PREP(SYS_PAR_EL1_SH, 0b10); /* OS */
+> > +		} else {
+> > +			par |= FIELD_PREP(SYS_PAR_EL1_ATTR,
+> > +					  MEMATTR(WbRaWa, WbRaWa));
+> > +			par |= FIELD_PREP(SYS_PAR_EL1_SH, 0b00); /* NS */
+> > +		}
+> 
+> This matches AArch64.S1DisabledOutput().
+> 
+> > +	} else {
+> > +		u64 mair, sctlr;
+> > +		int el;
+> > +		u8 sh;
+> > +
+> > +		el = (vcpu_el2_e2h_is_set(vcpu) &&
+> > +		      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
+> > +
+> > +		mair = ((el == 2) ?
+> > +			vcpu_read_sys_reg(vcpu, MAIR_EL2) :
+> > +			vcpu_read_sys_reg(vcpu, MAIR_EL1));
+> > +
+> > +		mair >>= FIELD_GET(PTE_ATTRINDX_MASK, wr->desc) * 8;
+> > +		mair &= 0xff;
+> > +
+> > +		sctlr = ((el == 2) ?
+> > +			vcpu_read_sys_reg(vcpu, SCTLR_EL2) :
+> > +			vcpu_read_sys_reg(vcpu, SCTLR_EL1));
+> > +
+> > +		/* Force NC for memory if SCTLR_ELx.C is clear */
+> > +		if (!(sctlr & SCTLR_EL1_C) && !MEMATTR_IS_DEVICE(mair))
+> > +			mair = MEMATTR(NC, NC);
+> 
+> This matches the compute memory attributes part of AArch64.S1Translate().
+> 
+> > +
+> > +		par  = FIELD_PREP(SYS_PAR_EL1_ATTR, mair);
+> > +		par |= wr->pa & GENMASK_ULL(47, 12);
+> > +
+> > +		sh = compute_sh(mair, wr->desc);
+> > +		par |= FIELD_PREP(SYS_PAR_EL1_SH, sh);
+> > +	}
 > > +
 > > +	return par;
-> >
+> > +}
+> > +
+> > +static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> > +{
+> > +	bool perm_fail, ur, uw, ux, pr, pw, pan;
+> > +	struct s1_walk_result wr = {};
+> > +	struct s1_walk_info wi = {};
+> > +	int ret, idx, el;
+> > +
+> > +	/*
+> > +	 * We only get here from guest EL2, so the translation regime
+> > +	 * AT applies to is solely defined by {E2H,TGE}.
+> > +	 */
+> > +	el = (vcpu_el2_e2h_is_set(vcpu) &&
+> > +	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
+> > +
+> > +	ret = setup_s1_walk(vcpu, &wi, &wr, vaddr, el);
+> > +	if (ret)
+> > +		goto compute_par;
+> > +
+> > +	if (wr.level == S1_MMU_DISABLED)
+> > +		goto compute_par;
+> > +
+> > +	idx = srcu_read_lock(&vcpu->kvm->srcu);
+> > +
+> > +	ret = walk_s1(vcpu, &wi, &wr, vaddr);
+> > +
+> > +	srcu_read_unlock(&vcpu->kvm->srcu, idx);
+> > +
+> > +	if (ret)
+> > +		goto compute_par;
+> > +
+> > +	/* FIXME: revisit when adding indirect permission support */
+> > +	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3) &&
+> > +	    !wi.nvhe) {
 > 
-> It seems that the code doesn't combine shareability attributes, as per rule
-> RGDTNP and S2CombineS1MemAttrs() or S2ApplyFWBMemAttrs(), which both end up
-> calling S2CombineS1Shareability().
+> Just FYI, the 'if' statement fits on one line without going over the old 80
+> character limit.
 
-That as well. See below what I'm stashing on top.
+All that code has now been reworked.
 
-Thanks,
+> 
+> > +		u64 sctlr;
+> > +
+> > +		if (el == 1)
+> > +			sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> > +		else
+> > +			sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> > +
+> > +		ux = (sctlr & SCTLR_EL1_EPAN) && !(wr.desc & PTE_UXN);
+> 
+> I don't understand this. UnprivExecute is true for the memory location if and
+> only if **SCTLR_ELx.EPAN** && !UXN?
+
+Well, it is the only case we actually care about. And from what i read
+below, you *have* understood it.
+
+> 
+> > +	} else {
+> > +		ux = false;
+> > +	}
+> > +
+> > +	pw = !(wr.desc & PTE_RDONLY);
+> > +
+> > +	if (wi.nvhe) {
+> > +		ur = uw = false;
+> > +		pr = true;
+> > +	} else {
+> > +		if (wr.desc & PTE_USER) {
+> > +			ur = pr = true;
+> > +			uw = pw;
+> > +		} else {
+> > +			ur = uw = false;
+> > +			pr = true;
+> > +		}
+> > +	}
+> > +
+> > +	/* Apply the Hierarchical Permission madness */
+> > +	if (wi.nvhe) {
+> > +		wr.APTable &= BIT(1);
+> > +		wr.PXNTable = wr.UXNTable;
+> > +	}
+> > +
+> > +	ur &= !(wr.APTable & BIT(0));
+> > +	uw &= !(wr.APTable != 0);
+> > +	ux &= !wr.UXNTable;
+> > +
+> > +	pw &= !(wr.APTable & BIT(1));
+> 
+> Would it make sense here to compute the resulting permisisons like in
+> AArch64.S1DirectBasePermissions()? I.e, look at the AP bits first, have
+> a switch statement for all 4 values (also makes it very easy to cross-reference
+> with Table D8-60), then apply hierarchical permissions/pan/epan. I do admit
+> that I have a very selfish reason to propose this - it makes reviewing easier.
+>
+
+Fair enough. I usually try to distance myself from the pseudocode and
+implement what I understand, but I appreciate this is just hard to
+read. It definitely results in something larger, but it probably
+doesn't matter much.
+
+> > +
+> > +	pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
+> > +
+> > +	perm_fail = false;
+> > +
+> > +	switch (op) {
+> > +	case OP_AT_S1E1RP:
+> > +		perm_fail |= pan && (ur || uw || ux);
+> 
+> I had a very hard time understanding what the code is trying to do here.  How
+> about rewriting it to something like the pseudocode below:
+> 
+>   // ux = !(desc and UXN) and !UXNTable
+>   perm_fail |= pan && (ur || uw || ((sctlr & SCTLR_EL1_EPAN) && ux));
+> 
+> ... which maps more closely to AArch64.S1DirectBasePermissions().
+
+Yup, I got there by virtue of adopting the same flow as the
+pseudocode.
+
+Thanks a lot for the thorough review, much appreciated.
 
 	M.
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index e66c97fc1fd3..28c4344d1c34 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -459,13 +459,34 @@ static u8 combine_s1_s2_attr(u8 s1, u8 s2)
- 	return final;
- }
- 
-+#define ATTR_NSH	0b00
-+#define ATTR_RSV	0b01
-+#define ATTR_OSH	0b10
-+#define ATTR_ISH	0b11
-+
- static u8 compute_sh(u8 attr, u64 desc)
- {
-+	u8 sh;
-+
- 	/* Any form of device, as well as NC has SH[1:0]=0b10 */
- 	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
--		return 0b10;
-+		return ATTR_OSH;
-+
-+	sh = FIELD_GET(PTE_SHARED, desc);
-+	if (sh == ATTR_RSV)		/* Reserved, mapped to NSH */
-+		sh = ATTR_NSH;
-+
-+	return sh;
-+}
-+
-+static u8 combine_sh(u8 s1_sh, u8 s2_sh)
-+{
-+	if (s1_sh == ATTR_OSH || s2_sh == ATTR_OSH)
-+		return ATTR_OSH;
-+	if (s1_sh == ATTR_ISH || s2_sh == ATTR_ISH)
-+		return ATTR_ISH;
- 
--	return FIELD_GET(PTE_SHARED, desc) == 0b11 ? 0b11 : 0b10;
-+	return ATTR_NSH;
- }
- 
- static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
-@@ -540,7 +561,8 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
- 	par  = FIELD_PREP(SYS_PAR_EL1_ATTR, final_attr);
- 	par |= tr->output & GENMASK(47, 12);
- 	par |= FIELD_PREP(SYS_PAR_EL1_SH,
--			  compute_sh(final_attr, tr->desc));
-+			  combine_sh(FIELD_GET(SYS_PAR_EL1_SH, s1_par),
-+				     compute_sh(final_attr, tr->desc)));
- 
- 	return par;
- }
 
 -- 
 Without deviation from the norm, progress is not possible.
