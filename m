@@ -1,123 +1,180 @@
-Return-Path: <kvm+bounces-22011-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7444938078
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 11:32:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F85B938089
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 11:49:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E920F1C20B75
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 09:32:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 419C62824A2
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 09:49:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A45584D0D;
-	Sat, 20 Jul 2024 09:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4CE7829C;
+	Sat, 20 Jul 2024 09:49:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="TTbgd7+1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nr4cr50O"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D961347C2
-	for <kvm@vger.kernel.org>; Sat, 20 Jul 2024 09:31:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4036E29A2;
+	Sat, 20 Jul 2024 09:49:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721467896; cv=none; b=W8IeMX8vZioNp2QpLPcVVjLRHMW/SxC0rewfCb7BdJEw56opSH9n4UO7BKcYVttnUcM82WXDjAg4ZE9Q2psHUCUGGJ9kRteRwfqoFdsagOrrkGBapyN8PLVBsxJE0yCD6ZjnA6E2x6OM3r25wZkvVzYSH8TJT84TsFJXxJOA6sk=
+	t=1721468973; cv=none; b=e9wJGS+wmPvvDMMDXh6EXNYr2xmcXH68hzdo7y77hpcf9BcGaHgNMFm7jMHvNIa6aE+Z/97uFv/4+KB9G9L/RIRYTqNNngo+0LGy2Hh3V0Zkg3tWf3E/Cc2ajihhNYzNMNvnNOF8DJCAHTlTMlJktRsqmPwh62R+NuZPeOyPnBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721467896; c=relaxed/simple;
-	bh=DYnqaWjAQ5Swa7SOrX13jfrs0jdvTL9wDFwzo29zQ9U=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=MqINVxP3+VMDfcvKBs0aHOMEmSsg4Ze08pSv+yQNY6hXtV85e17DyvJoCQkU5d9tS8IhwbzBLFqLippLgQReayLfu+TiwIGT9wtAAcaT56KL2etYL7FaTQWEkM3kRPHk8an1hPM79ej7Rknpwm4AaIg1soeP4moB4BZaq1Jr6g0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=TTbgd7+1; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-70d01e4f7fcso829442b3a.1
-        for <kvm@vger.kernel.org>; Sat, 20 Jul 2024 02:31:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1721467894; x=1722072694; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wrhfxyQiCKIug187Kcca0q3LwAZ1kZXZGPDwQT1UwgA=;
-        b=TTbgd7+1e9cfH7smSr5Qsu0a1xhcQcKYwvP8XwTyK4EaLHNi/G5K/V9UZIGj0WU8rg
-         Kw6zyp2HXSj1+rUVMcE/NsqeOodlDmGe5A9EyfI2O7cNpXOdaRA7aQGT4c+Dj3Zkc5hj
-         zYKbxP+WjhcN1OB6Mr2W7nGvTUSEHEfhcUOtrk1Sgm6NyrOC1dwnsZQXLSPMg0zoyYH5
-         kuw+MFBIpdJnnuopQjF0c+7fAcJcfS4jhrVDmqSn/uxHfRLvBnfutieSg5IO5g10iPwz
-         m3lq5HaKbJU1ZANUGfcnEPQux1WU57tUMWIHY0Z9pJUGFkoYxlwizkrpEsh5yAEftxjx
-         G5ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721467894; x=1722072694;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wrhfxyQiCKIug187Kcca0q3LwAZ1kZXZGPDwQT1UwgA=;
-        b=VLwcGhns+VplRfxML3pZ+GP+/ofRDZVTofmYMxmMRWMIaIzQ963EA6NS0YURpj0BPM
-         rMxU4nAZ3Xdc2T79ekjVRWhV4LqvOv6cyIJVD4YiFFX9PP3TJxLwVk9inVgv8EsJj3Z4
-         yHV0KepFDMC5OWuOueoFGxWYnW77NtfXUpARm0tVpqQaMZz0bFtZDgo+RIfWvspfo/CC
-         EiTfTN9h+yq6c7g5rIDIpybckIBP08qioAw+Z+5IRcTlQt/rTPZ7IoKKFsBEOSukOK50
-         +B+xQh3MnDpWpd6SJlYDXzQEadbfnbAGLhXA7B5RIwS6O6fmxB1lurPtVGQXsNj1yKdj
-         gDpA==
-X-Forwarded-Encrypted: i=1; AJvYcCVlVMPO6LSXiG2WdcjQDQSBpyiLY3t8FFZMmS5HVTBbq9c4MDRyEC2MqMXX95174gZaOCb0VwZ3xT0FFwJAr8VGVgGe
-X-Gm-Message-State: AOJu0YwGRNcBFY+ort0qgfJUlnf1oZrxTsXLhd/CtbUqHCQ61vCSRj5Q
-	BoYJcHWGYaBZZtwzXWhdP4HgV2jDRKU16in+s/LB3IlqV0E2Ronr/5TvfyoJpxM=
-X-Google-Smtp-Source: AGHT+IEXOqSyEy2UA66P9jRHggHMp/WMJoRJ7yRzlzsXWfBfVUa9ITQgOCdoVMCmOnpVU5hdmZPN4A==
-X-Received: by 2002:a05:6a00:1887:b0:70a:fa5d:ad97 with SMTP id d2e1a72fcca58-70d0ef82323mr719873b3a.1.1721467894392;
-        Sat, 20 Jul 2024 02:31:34 -0700 (PDT)
-Received: from localhost ([157.82.204.122])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-70cff552c39sm2341661b3a.136.2024.07.20.02.31.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Jul 2024 02:31:34 -0700 (PDT)
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-Date: Sat, 20 Jul 2024 18:30:54 +0900
-Subject: [PATCH v4 6/6] hvf: arm: Do not advance PC when raising an
- exception
+	s=arc-20240116; t=1721468973; c=relaxed/simple;
+	bh=Fabkemm15d9bvyMMdzbPwEmfBhmRHwNU94q62xcaQfs=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JtqHswOlydg2T6HNW5cVfrBgqVKjak0xhj1SOWIR1DJd+7/utcf/AxlafgnW8bfA97k+9wH6Fl4qvDXaRb+suAvmnxP0oU2BWvFVLPbESR+gb4mkcaa1sXdb2tJwR4HkpcqfafpKxo6K2ICxBr8RrFeDgWokbA9m4uIH3iOrnKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nr4cr50O; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFD29C2BD10;
+	Sat, 20 Jul 2024 09:49:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721468972;
+	bh=Fabkemm15d9bvyMMdzbPwEmfBhmRHwNU94q62xcaQfs=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nr4cr50ORl9NgCybFuvIypLJ61NrnhHyoeI4ZNI0ykz7OP1wiOaYHimSIUbWbOfEM
+	 SpQmSnu65Pd7ADtJevbNw3EflKszAOViU2dwcOrHWXqEEyg4QdKvC4ztm1cnfn2psR
+	 7rV78Qaj2vDMA8jmE5samKyVNQWFWJpyG/+M36JACNKb/KOYLrxfrXKs2xLKDgGLcP
+	 LYB/2Ml7I+fuJbU7u/ZxJhoX/7a1pndggvsMSKx2Pjhs9n1oYziy9/S35/aMLjugcg
+	 UbGuu8ZcvNsM9Ffln5FPpXSsr6nQpHXDaVQD9yOUHtTpdHRMuCbJadDvtGRAU1RxsI
+	 syVLgH3dgNbPg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sV6iY-00DuaU-HH;
+	Sat, 20 Jul 2024 10:49:30 +0100
+Date: Sat, 20 Jul 2024 10:49:29 +0100
+Message-ID: <878qxw5r6e.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 08/12] KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+In-Reply-To: <ZpkwXFrhcFB1x0nD@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+	<20240625133508.259829-9-maz@kernel.org>
+	<ZpkwXFrhcFB1x0nD@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240720-pmu-v4-6-2a2b28f6b08f@daynix.com>
-References: <20240720-pmu-v4-0-2a2b28f6b08f@daynix.com>
-In-Reply-To: <20240720-pmu-v4-0-2a2b28f6b08f@daynix.com>
-To: Peter Maydell <peter.maydell@linaro.org>, 
- Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>
-Cc: qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org, 
- Akihiko Odaki <akihiko.odaki@daynix.com>
-X-Mailer: b4 0.14-dev-fd6e3
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This is identical with commit 30a1690f2402 ("hvf: arm: Do not advance
-PC when raising an exception") but for writes instead of reads.
+On Thu, 18 Jul 2024 16:10:20 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> 
+> Hi,
+> 
+> On Tue, Jun 25, 2024 at 02:35:07PM +0100, Marc Zyngier wrote:
+> > On the face of it, AT S12E{0,1}{R,W} is pretty simple. It is the
+> > combination of AT S1E{0,1}{R,W}, followed by an extra S2 walk.
+> > 
+> > However, there is a great deal of complexity coming from combining
+> > the S1 and S2 attributes to report something consistent in PAR_EL1.
+> > 
+> > This is an absolute mine field, and I have a splitting headache.
+> > 
+> > [..]
+> > +static u8 compute_sh(u8 attr, u64 desc)
+> > +{
+> > +	/* Any form of device, as well as NC has SH[1:0]=0b10 */
+> > +	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
+> > +		return 0b10;
+> > +
+> > +	return FIELD_GET(PTE_SHARED, desc) == 0b11 ? 0b11 : 0b10;
+> 
+> If shareability is 0b00 (non-shareable), the PAR_EL1.SH field will be 0b10
+> (outer-shareable), which seems to be contradicting PAREncodeShareability().
 
-Fixes: a2260983c655 ("hvf: arm: Add support for GICv3")
-Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
----
- target/arm/hvf/hvf.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Yup, well caught.
 
-diff --git a/target/arm/hvf/hvf.c b/target/arm/hvf/hvf.c
-index adcdfae0b17f..c1496ad5be9b 100644
---- a/target/arm/hvf/hvf.c
-+++ b/target/arm/hvf/hvf.c
-@@ -1586,10 +1586,10 @@ static int hvf_sysreg_write(CPUState *cpu, uint32_t reg, uint64_t val)
-     case SYSREG_ICC_SGI1R_EL1:
-     case SYSREG_ICC_SRE_EL1:
-         /* Call the TCG sysreg handler. This is only safe for GICv3 regs. */
--        if (!hvf_sysreg_write_cp(cpu, reg, val)) {
--            hvf_raise_exception(cpu, EXCP_UDEF, syn_uncategorized());
-+        if (hvf_sysreg_write_cp(cpu, reg, val)) {
-+            return 0;
-         }
--        return 0;
-+        break;
-     case SYSREG_MDSCR_EL1:
-         env->cp15.mdscr_el1 = val;
-         return 0;
+> > +	par |= FIELD_PREP(SYS_PAR_EL1_SH,
+> > +			  compute_sh(final_attr, tr->desc));
+> > +
+> > +	return par;
+> >
+> 
+> It seems that the code doesn't combine shareability attributes, as per rule
+> RGDTNP and S2CombineS1MemAttrs() or S2ApplyFWBMemAttrs(), which both end up
+> calling S2CombineS1Shareability().
+
+That as well. See below what I'm stashing on top.
+
+Thanks,
+
+	M.
+
+diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+index e66c97fc1fd3..28c4344d1c34 100644
+--- a/arch/arm64/kvm/at.c
++++ b/arch/arm64/kvm/at.c
+@@ -459,13 +459,34 @@ static u8 combine_s1_s2_attr(u8 s1, u8 s2)
+ 	return final;
+ }
+ 
++#define ATTR_NSH	0b00
++#define ATTR_RSV	0b01
++#define ATTR_OSH	0b10
++#define ATTR_ISH	0b11
++
+ static u8 compute_sh(u8 attr, u64 desc)
+ {
++	u8 sh;
++
+ 	/* Any form of device, as well as NC has SH[1:0]=0b10 */
+ 	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
+-		return 0b10;
++		return ATTR_OSH;
++
++	sh = FIELD_GET(PTE_SHARED, desc);
++	if (sh == ATTR_RSV)		/* Reserved, mapped to NSH */
++		sh = ATTR_NSH;
++
++	return sh;
++}
++
++static u8 combine_sh(u8 s1_sh, u8 s2_sh)
++{
++	if (s1_sh == ATTR_OSH || s2_sh == ATTR_OSH)
++		return ATTR_OSH;
++	if (s1_sh == ATTR_ISH || s2_sh == ATTR_ISH)
++		return ATTR_ISH;
+ 
+-	return FIELD_GET(PTE_SHARED, desc) == 0b11 ? 0b11 : 0b10;
++	return ATTR_NSH;
+ }
+ 
+ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+@@ -540,7 +561,8 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+ 	par  = FIELD_PREP(SYS_PAR_EL1_ATTR, final_attr);
+ 	par |= tr->output & GENMASK(47, 12);
+ 	par |= FIELD_PREP(SYS_PAR_EL1_SH,
+-			  compute_sh(final_attr, tr->desc));
++			  combine_sh(FIELD_GET(SYS_PAR_EL1_SH, s1_par),
++				     compute_sh(final_attr, tr->desc)));
+ 
+ 	return par;
+ }
 
 -- 
-2.45.2
-
+Without deviation from the norm, progress is not possible.
 
