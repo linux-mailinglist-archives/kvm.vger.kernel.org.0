@@ -1,76 +1,76 @@
-Return-Path: <kvm+bounces-22003-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 84048937E8D
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 02:42:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B144F937E9E
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 03:36:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3922A1F21979
-	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 00:42:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 084E52824ED
+	for <lists+kvm@lfdr.de>; Sat, 20 Jul 2024 01:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C13E23FE4;
-	Sat, 20 Jul 2024 00:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE516883D;
+	Sat, 20 Jul 2024 01:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i9U2/AsR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CsNw4QFw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8B331C27
-	for <kvm@vger.kernel.org>; Sat, 20 Jul 2024 00:41:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 837743201
+	for <kvm@vger.kernel.org>; Sat, 20 Jul 2024 01:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721436116; cv=none; b=Zflu4KUfFv/+qI/T7gXZs0L+POksddp9KL0yu9bnfITxnB8XtKVZFxiGfhgS2oVvrU7GLS8m7GiCisM/wJdq/PYSHosiAyP34faot0tHiyVc3x/tEA2bITsg4kzkY3U62ZJzODgCypfGcbjD/ZCrPBB+83mh5DS25zdDfenld74=
+	t=1721439358; cv=none; b=rOpPcxRFlwfqL8SAcOfvXO3g8ws3K+F1oxEXoNX68X4a0MSobjkox2fqBpmWDj2RXwwHEVi+1NwOpQFJ0SEyQhQ59hRYFK/aiGs/RPYocTiIhBJqo06jg2i9PYZg4usgtWJ2lunfNMkiqYO/oTlWF+0K7wFBrivhbfNSOL4TDBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721436116; c=relaxed/simple;
-	bh=99IlsR+4uA3hohBzyAVPboEZsi/F4jHWieDcLK+ZmzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=s9+RHfSLPI6nweg3PSPkmOCG1B7CRuu43JVZV04Tqe+OsmNJq49zn48d7Kn2SmWo3AKyry70pq4kmZh9qm0pxK0TaBfD5YUBgMg7Kk3z5UJLZRK8R5Y4nNsniFrsNCLpttGfP5lelIKWpKYavgqwvXHsCK/6sW+6u9tkMKNk/Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i9U2/AsR; arc=none smtp.client-ip=192.198.163.9
+	s=arc-20240116; t=1721439358; c=relaxed/simple;
+	bh=m+0mmqV7O3rlLYP/uVKegSLNgXXmjx3rL0kDYsxdiGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HAg8hw87NH8m/NsAk1g7UTn6KFQs82xFo44c1TViTsKvS09ezLdym3bRpOe/29BwZKbTdnt2YM4oCSYvfuO74iWQ3un0tH00+8zx2bx1jgMl+0v2FvIn+Fp+rfUgAjMlCe9Tx1zyxU7GikjZCw7tBgH/ibPHvJ3xbf+j10KaBi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CsNw4QFw; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721436115; x=1752972115;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=99IlsR+4uA3hohBzyAVPboEZsi/F4jHWieDcLK+ZmzM=;
-  b=i9U2/AsRN8cCvEbfbzqBkmQvAbsagwTXDgn+F/K/3g/Q3gyHxrONlF+B
-   n9h8NqZzRF6X6wsjRXEgOmJZaHEUY/1iFQgInvIehsUo8C1ewgEvy+Bzd
-   RvswSgbQNUIFbtuNe1kp+fF7R5UAhkP4viGWvk3gMYnx8q8QTs+RJAlj9
-   Pp7TURD9XK3xkndHOcZjGTdefGfgXt7S2DGQWBufP+Qu9rIIzeA5kOuOq
-   QpfmMtnk5c2qnI3kyUrfl4TF5tc/paZPvOcD2BWF53Pmy37fcSn77BsIH
-   h7+50286Y+v2QLnp/RimeWA7vafhWCIgPKZHNdtL3WsGYyK7T9boQ9Wll
-   Q==;
-X-CSE-ConnectionGUID: XvfsMl9ARBii2MuxLYGL9w==
-X-CSE-MsgGUID: qMEchMdsReyFqam9WqrFjw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11138"; a="29733830"
+  t=1721439357; x=1752975357;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=m+0mmqV7O3rlLYP/uVKegSLNgXXmjx3rL0kDYsxdiGo=;
+  b=CsNw4QFwRGRikBMP80B3uGJamTnmyGC8n7loVYlBcDxLUyYrgimawqEU
+   RAn1WUD4irW2IBBOxfNVH+RebDRV0BwFdW6pWuNZw1rxXas6EUJvYtOx3
+   MN3JFL/Tw0sGT0c5nEfjNJy6KPkwosZTNfU+9owSHdigsVs7Ehjg2bANS
+   WwcRLOj1D9MViGSRhmjtCv2uE1UqnWuyYTRVANlfU8s8qy5Vbc6vIu8FM
+   AmmNcrWRJXatx5Y6q5/vbMWnXfoJbkW/pkU7SudI93CJT+towci8pzpBP
+   9CDgkxfNqIE/v2xr9+62ZDtorXOvGrfWUCWWaS3sRRtdoRhuphEo9OcFi
+   g==;
+X-CSE-ConnectionGUID: A7DhAaTiTE+x3yCM06x9VQ==
+X-CSE-MsgGUID: CoE3f3JdSaGTB/m6SxYsEg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11138"; a="29697000"
 X-IronPort-AV: E=Sophos;i="6.09,222,1716274800"; 
-   d="scan'208";a="29733830"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2024 17:41:54 -0700
-X-CSE-ConnectionGUID: WHKwovA4Q9aJ2rHv5NPeUQ==
-X-CSE-MsgGUID: 8MjYem7XQrqSqiJ8JNLiSw==
+   d="scan'208";a="29697000"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Jul 2024 18:35:56 -0700
+X-CSE-ConnectionGUID: NVekY47nT8q5kT9T0N6oUQ==
+X-CSE-MsgGUID: YU0j4Y4qSH+E4iXHDS3uAA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,222,1716274800"; 
-   d="scan'208";a="51997217"
+   d="scan'208";a="56129313"
 Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
-  by orviesa008.jf.intel.com with ESMTP; 19 Jul 2024 17:41:52 -0700
+  by orviesa005.jf.intel.com with ESMTP; 19 Jul 2024 18:35:54 -0700
 Received: from kbuild by 68891e0c336b with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1sUyAX-000iiA-2l;
-	Sat, 20 Jul 2024 00:41:49 +0000
-Date: Sat, 20 Jul 2024 08:41:27 +0800
+	id 1sUz0o-000ikE-33;
+	Sat, 20 Jul 2024 01:35:50 +0000
+Date: Sat, 20 Jul 2024 09:35:16 +0800
 From: kernel test robot <lkp@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: oe-kbuild-all@lists.linux.dev, kvm@vger.kernel.org,
-	Robert Hu <robert.hu@intel.com>,
-	Farrah Chen <farrah.chen@intel.com>,
-	Danmei Wei <danmei.wei@intel.com>
-Subject: [kvm:queue 22/34] arch/x86/kvm/x86.c:12650:12: error: no member
- named 'pre_fault_allowed' in 'struct kvm_arch'
-Message-ID: <202407200826.iiOlgVtf-lkp@intel.com>
+To: Ilias Stamatis <ilstam@amazon.com>, kvm@vger.kernel.org,
+	pbonzini@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, pdurrant@amazon.co.uk, dwmw@amazon.co.uk,
+	nh-open-source@amazon.com, Ilias Stamatis <ilstam@amazon.com>
+Subject: Re: [PATCH v2 3/6] KVM: Support poll() on coalesced mmio buffer fds
+Message-ID: <202407200922.pJAJMVRk-lkp@intel.com>
+References: <20240718193543.624039-4-ilstam@amazon.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -79,89 +79,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <20240718193543.624039-4-ilstam@amazon.com>
 
-tree:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
-head:   90433378a1bea709c362a855c99b4662c92e49be
-commit: ca9ddf0b7d74a71b6d71ea5355825922b89f5fd7 [22/34] KVM: x86: disallow pre-fault for SNP VMs before initialization
-config: i386-randconfig-141-20240720 (https://download.01.org/0day-ci/archive/20240720/202407200826.iiOlgVtf-lkp@intel.com/config)
+Hi Ilias,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on kvm/queue]
+[also build test WARNING on next-20240719]
+[cannot apply to mst-vhost/linux-next linus/master kvm/linux-next v6.10]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Ilias-Stamatis/KVM-Fix-coalesced_mmio_has_room/20240719-034316
+base:   https://git.kernel.org/pub/scm/virt/kvm/kvm.git queue
+patch link:    https://lore.kernel.org/r/20240718193543.624039-4-ilstam%40amazon.com
+patch subject: [PATCH v2 3/6] KVM: Support poll() on coalesced mmio buffer fds
+config: x86_64-randconfig-122-20240719 (https://download.01.org/0day-ci/archive/20240720/202407200922.pJAJMVRk-lkp@intel.com/config)
 compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240720/202407200826.iiOlgVtf-lkp@intel.com/reproduce)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240720/202407200922.pJAJMVRk-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202407200826.iiOlgVtf-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407200922.pJAJMVRk-lkp@intel.com/
 
-All errors (new ones prefixed by >>):
+sparse warnings: (new ones prefixed by >>)
+>> arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:241:22: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __poll_t [usertype] mask @@     got int @@
+   arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:241:22: sparse:     expected restricted __poll_t [usertype] mask
+   arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c:241:22: sparse:     got int
+   arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c: note: in included file (through include/linux/mmzone.h, include/linux/gfp.h, include/linux/mm.h, ...):
+   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
+   include/linux/page-flags.h:240:46: sparse: sparse: self-comparison always evaluates to false
 
->> arch/x86/kvm/x86.c:12650:12: error: no member named 'pre_fault_allowed' in 'struct kvm_arch'
-    12650 |         kvm->arch.pre_fault_allowed =
-          |         ~~~~~~~~~ ^
-   1 error generated.
---
->> arch/x86/kvm/mmu/mmu.c:4746:23: error: no member named 'pre_fault_allowed' in 'struct kvm_arch'
-    4746 |         if (!vcpu->kvm->arch.pre_fault_allowed)
-         |              ~~~~~~~~~~~~~~~ ^
-   1 error generated.
---
->> arch/x86/kvm/svm/svm.c:4952:13: error: no member named 'pre_fault_allowed' in 'struct kvm_arch'
-    4952 |                 kvm->arch.pre_fault_allowed = !kvm->arch.has_private_mem;
-         |                 ~~~~~~~~~ ^
-   1 error generated.
+vim +241 arch/x86/kvm/../../../virt/kvm/coalesced_mmio.c
 
-
-vim +12650 arch/x86/kvm/x86.c
-
- 12636	
- 12637	
- 12638	int kvm_arch_init_vm(struct kvm *kvm, unsigned long type)
- 12639	{
- 12640		int ret;
- 12641		unsigned long flags;
- 12642	
- 12643		if (!kvm_is_vm_type_supported(type))
- 12644			return -EINVAL;
- 12645	
- 12646		kvm->arch.vm_type = type;
- 12647		kvm->arch.has_private_mem =
- 12648			(type == KVM_X86_SW_PROTECTED_VM);
- 12649		/* Decided by the vendor code for other VM types.  */
- 12650		kvm->arch.pre_fault_allowed =
- 12651			type == KVM_X86_DEFAULT_VM || type == KVM_X86_SW_PROTECTED_VM;
- 12652	
- 12653		ret = kvm_page_track_init(kvm);
- 12654		if (ret)
- 12655			goto out;
- 12656	
- 12657		kvm_mmu_init_vm(kvm);
- 12658	
- 12659		ret = kvm_x86_call(vm_init)(kvm);
- 12660		if (ret)
- 12661			goto out_uninit_mmu;
- 12662	
- 12663		INIT_HLIST_HEAD(&kvm->arch.mask_notifier_list);
- 12664		atomic_set(&kvm->arch.noncoherent_dma_count, 0);
- 12665	
- 12666		/* Reserve bit 0 of irq_sources_bitmap for userspace irq source */
- 12667		set_bit(KVM_USERSPACE_IRQ_SOURCE_ID, &kvm->arch.irq_sources_bitmap);
- 12668		/* Reserve bit 1 of irq_sources_bitmap for irqfd-resampler */
- 12669		set_bit(KVM_IRQFD_RESAMPLE_IRQ_SOURCE_ID,
- 12670			&kvm->arch.irq_sources_bitmap);
- 12671	
- 12672		raw_spin_lock_init(&kvm->arch.tsc_write_lock);
- 12673		mutex_init(&kvm->arch.apic_map_lock);
- 12674		seqcount_raw_spinlock_init(&kvm->arch.pvclock_sc, &kvm->arch.tsc_write_lock);
- 12675		kvm->arch.kvmclock_offset = -get_kvmclock_base_ns();
- 12676	
- 12677		raw_spin_lock_irqsave(&kvm->arch.tsc_write_lock, flags);
- 12678		pvclock_update_vm_gtod_copy(kvm);
- 12679		raw_spin_unlock_irqrestore(&kvm->arch.tsc_write_lock, flags);
- 12680	
- 12681		kvm->arch.default_tsc_khz = max_tsc_khz ? : tsc_khz;
- 12682		kvm->arch.apic_bus_cycle_ns = APIC_BUS_CYCLE_NS_DEFAULT;
- 12683		kvm->arch.guest_can_read_msr_platform_info = true;
- 12684		kvm->arch.enable_pmu = enable_pmu;
- 12685	
+   231	
+   232	static __poll_t coalesced_mmio_buffer_poll(struct file *file, struct poll_table_struct *wait)
+   233	{
+   234		struct kvm_coalesced_mmio_buffer_dev *dev = file->private_data;
+   235		__poll_t mask = 0;
+   236	
+   237		poll_wait(file, &dev->wait_queue, wait);
+   238	
+   239		spin_lock(&dev->ring_lock);
+   240		if (dev->ring && (READ_ONCE(dev->ring->first) != READ_ONCE(dev->ring->last)))
+ > 241			mask = POLLIN | POLLRDNORM;
+   242		spin_unlock(&dev->ring_lock);
+   243	
+   244		return mask;
+   245	}
+   246	
 
 -- 
 0-DAY CI Kernel Test Service
