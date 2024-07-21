@@ -1,144 +1,122 @@
-Return-Path: <kvm+bounces-22027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEC7993861C
-	for <lists+kvm@lfdr.de>; Sun, 21 Jul 2024 22:42:55 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC95D93869E
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 01:01:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4EE428100F
-	for <lists+kvm@lfdr.de>; Sun, 21 Jul 2024 20:42:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 646E41F21388
+	for <lists+kvm@lfdr.de>; Sun, 21 Jul 2024 23:01:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B2C16B73E;
-	Sun, 21 Jul 2024 20:42:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B272168C4;
+	Sun, 21 Jul 2024 23:01:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bL2VJESt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EfJEUXyX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BDFE2FB2;
-	Sun, 21 Jul 2024 20:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6983F9463;
+	Sun, 21 Jul 2024 23:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721594557; cv=none; b=gYQ2M9p5XxxyyajiDjb9HF/1qa5VxAm1/Z27aa5s9jrzgSgQMfE6FQzYCYIU89zBNOV5Zd94zHs5pyJXtYk01xRGiO4CBiVR/BN5iUqzu/bpTK2IqH0a98hYdmpTVQP5BxsGe2HF7X+8XMzPdThYkyL4wt8gmLcAkQ2F8Uzpsk0=
+	t=1721602884; cv=none; b=ipemP2xvcvJT9kbxv2EMjI2AXctzUTr7Mz+cLBtmIZSHk22Z+v0wcUXpyswPuyEw2bwnl04Z7g5qkaHnetjWRHMc6Ftq4vZY7+SAIOtkihlFdF/wfmsZpjZlBPgRU1LJyKK/u5PwjTPtb+Yn8ppPMvsE8fOv9vm4+r3zS1cVLlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721594557; c=relaxed/simple;
-	bh=Y2Prf/IbMk4LMsyq34wH1row2ki7pR91wfPtg73kQoQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=b8ifo0FRHrAYsDkqDdDXzqArkWCcOEDzx/TrzZPHK+254Ze+ffDOZ5yHT3GQ4YU35TbTEZCtmXBbXuWad0Iq6dGK/g6k7r+7bJlL+Cr/egr+m4T6/t8jmjq/6MjHSg1EoERfuz4U77QGpbjlPZ6qC3h174TWn5I0/sb/nSW/L7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bL2VJESt; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1721602884; c=relaxed/simple;
+	bh=qHiXy97WqrqdWDaxvMhPKIxEqFyPM5RjKT0hDBluGeo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ByMMf85nd6igTw0rVtpq3zzBA+frTaNgSmD9SJo5dbXbcZHj+8Lp4oqg70tswG07HM0SPrM6X8QhHj4QlD65odcrkd+JO4QDEuGD2wWMazhImigT43r1jiusqDkNtJhKR0eY6bXCXiHfLibk3ePVzdL0jfUXjgnH0B81yQgvMJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EfJEUXyX; arc=none smtp.client-ip=209.85.160.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3686b554cfcso1568602f8f.1;
-        Sun, 21 Jul 2024 13:42:34 -0700 (PDT)
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-260e5b2dfb5so2157138fac.3;
+        Sun, 21 Jul 2024 16:01:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721594553; x=1722199353; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y2Prf/IbMk4LMsyq34wH1row2ki7pR91wfPtg73kQoQ=;
-        b=bL2VJEStDzeIZVqJMCBd6V/dPkfYG1CMJv4rz3zTYXp8irUh2UeYvwCr54n9eT59L9
-         NJzG5lE4uiTkj9JgoPeD0LJ++puwNqn6WWiJy55O72OUoXnVNiLl9y9oxVqftcDuhp88
-         jkaR/AdwPdUN23mofGCZayNW4Z/3U9qRpf06Jy9roejdXKLYk/8GC3m2M78WfsnXFf7o
-         AA0JHNm89+jo72PZs32Tg5YgiKsLBv39oljWppiHUzcO7DuMzGLgZCDGnohSixT6WFNO
-         AK92sVVJxiksakOoFvvuHAvTC2ok3wcn2rw3XzMWS5F7wdqIN5ADPxrBTtYehlzCJnRo
-         fJLg==
+        d=gmail.com; s=20230601; t=1721602882; x=1722207682; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PIk+tn4TdOmmwm70v6l/KFa/IUuNmPetDUKr3HxFV9c=;
+        b=EfJEUXyXRQ6EGmSY2NTX8C74Qcjs7TwYS3Zhs4GnYUGF2BdU7+iRwgi1RgRRQqk6Hz
+         r+80sqYdaE4Nw1xbjhlCadKpFnOXsw30xwwC0xIFJZ/Udsm13VtzO3i8LiLq5eA1sLzO
+         61RIRoQFAmYUT6jRLdRpK2ekuIk6Tg8ya4H/i2SJdu5FrCBMt77YxAAzMhYql6AWdczb
+         UcAoXMdFp/klyCMxMbIzoCpk5RQCEaB8pRO567PkHJHGec++4pXSd+Mw76KhjeJRkcAd
+         QAYgk3LUxRZAzGuJc8Rz60OrDsE2YgIC/Dau52wovX0w7Bnobu41yX7oz/fJl1G/gNpW
+         Kneg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721594553; x=1722199353;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y2Prf/IbMk4LMsyq34wH1row2ki7pR91wfPtg73kQoQ=;
-        b=n5UQ4CRW0WCXQuaTtdmi5iSkbg3BNFZvns7ZoLZ+EJJjM0fDkw/cJstgJRLT8witdO
-         qkXf0a/ftmAj0Nr8scIYGWKQ3twKEJSoFfh0S2AxtD8EU5kEIJPo4tzWgIsUJaLEydw0
-         xKwQZ3PLbgHDWmqh37+JBkJ2FgoafWi00hTwzxwDXo7dVhFPDjGp561UpJGUvbs21mm/
-         ZEWV/GJIAfLX5qfeF0W8gXlA9Tk2ZkTZMP9fVAAfQYFtC+Wo5N1Ia1avxkD1mDTcGi0z
-         ZKNasuMxUqVIF8156PM8TCa+db31INz35h4k2VlH+q9B1PenbDM5brI7H/fGCZ8W5hix
-         AgUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3/CQRxd9PhjKN8X7w12sTE3nD5psLckXN9qqee4mCcxiaKPYVtOzo7AKBlBPRrZSjZCI40W3Yv0TgpGc9NzfZFnMWjoSeT1Veu8PESUbc0e0ZcPIDMjW9MHBPHCLYqbpuwMncEfosp2PNREGPMz0I08W9z2VbHpJWzYYtSZ4KJt/+HcvG+PEEfwNSBa7NtitSCF0KtIknC3uIdGrKpTOiWxkueIlEkttF
-X-Gm-Message-State: AOJu0YxEE+p4skg09aqRAHNRa1+6qBUoraQZuHZCdvJqc+XWqVaLQG6R
-	MsY6h+/fPWp70ZnbIqX5BhxH42AekJCCGD0gM/yHlXelyPrhcijnLcEoo/wGM+B3FcXNKwF6RTL
-	o+GWr4Mihkpn/UiwLyrN8vQD+7Ok=
-X-Google-Smtp-Source: AGHT+IHzyJqN1Q0WaIfDKyj2SqhKg2oxhBaiBXCVTaoG5f0KmwGrOsY8JwrfF4zCan/VnZBfTxjvlG6f3HfT9iOc4L4=
-X-Received: by 2002:a5d:59a4:0:b0:366:e838:f5d4 with SMTP id
- ffacd0b85a97d-369bbbb4b95mr3333434f8f.3.1721594552579; Sun, 21 Jul 2024
- 13:42:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1721602882; x=1722207682;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PIk+tn4TdOmmwm70v6l/KFa/IUuNmPetDUKr3HxFV9c=;
+        b=fIgjOaGEEnz1AUDVi7mSBxGZR4gitjKMt+80pE9fqzI3C4T0+dsmDxEVM41LEest5E
+         1z2I1YlYmPUIurJUS09MEfdfpIDnPi1XQJAVy1darnsRjAgNw08itZPwMRD4iFRnxnz/
+         RWy3iDG/tt8r4zGCswSYZ8HxBklSN0eGzknimOYdBL7ZjY5h/UVGkOCbOPADN6lxUzcv
+         KlhBZR4qzeRpFYEtG14jbZ87ughUCOuc7HX+BYneGCbDb1Wv11ktwEZFA8P7aT54A5V8
+         XahkjlByj/qXqE3LVoZ7Mtc/t1qWmcAv1oq3Z10f1G01lSR2pwleR5uKpiZPB+m038XN
+         fkcg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3dZVAwh59wNSgXkwERLUeHYTzs6LdYua3faZtlRKuRe7v9gbjl3+fVA29aat48Ah0I/IPcZ+kG40Lreu7CPqedV474UYSmv8hHRxkUC+GAbnMHg6x52AdfIxVPGOlJarnVRCqhxYCCsoa/3b+xnhv80zRa6v5t1FKR0gW
+X-Gm-Message-State: AOJu0YxVMjfHVBKyo4t2hjVwUJ5AfabF7M8sn+BgRGtxCJ50UQnEAfRz
+	iqWnI3hdv3PdcstWEnaC/By3QV+fvv5Gih/oOUBVknMmCs1now/P
+X-Google-Smtp-Source: AGHT+IGwNeV9M4R4X6CjHDisDYMRllDiei577vEHLgFOqRN1d1Ou2AFcOHtsoQsriEmw3ad0i5Bs+Q==
+X-Received: by 2002:a05:6871:e419:b0:261:236c:2bb8 with SMTP id 586e51a60fabf-2638de9db8fmr5167480fac.12.1721602882260;
+        Sun, 21 Jul 2024 16:01:22 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-70cff4b5cd7sm4270341b3a.69.2024.07.21.16.01.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 21 Jul 2024 16:01:21 -0700 (PDT)
+Message-ID: <8ea3f19a274c58cb7cf2ffa98fb41ee530f5a614.camel@gmail.com>
+Subject: Re: [RFC v11 05/14] mm: page_frag: avoid caller accessing
+ 'page_frag_cache' directly
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, "Michael S.
+ Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Eugenio
+ =?ISO-8859-1?Q?P=E9rez?= <eperezma@redhat.com>, Andrew Morton
+ <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, David
+ Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
+ Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
+ Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
+ <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,  Trond Myklebust
+ <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>,
+ kvm@vger.kernel.org,  virtualization@lists.linux.dev, linux-mm@kvack.org, 
+ linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org
+Date: Sun, 21 Jul 2024 16:01:19 -0700
+In-Reply-To: <20240719093338.55117-6-linyunsheng@huawei.com>
+References: <20240719093338.55117-1-linyunsheng@huawei.com>
+	 <20240719093338.55117-6-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240719093338.55117-1-linyunsheng@huawei.com> <20240719093338.55117-5-linyunsheng@huawei.com>
-In-Reply-To: <20240719093338.55117-5-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Sun, 21 Jul 2024 13:41:55 -0700
-Message-ID: <CAKgT0UcqELiXntRA_uD8eJGjt-OCLO64ax=YFXrCHNnaj9kD8g@mail.gmail.com>
-Subject: Re: [RFC v11 04/14] mm: page_frag: add '_va' suffix to page_frag API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Subbaraya Sundeep <sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org, 
-	bpf@vger.kernel.org, linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jul 19, 2024 at 2:37=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> Currently the page_frag API is returning 'virtual address'
-> or 'va' when allocing and expecting 'virtual address' or
-> 'va' as input when freeing.
->
-> As we are about to support new use cases that the caller
-> need to deal with 'struct page' or need to deal with both
-> 'va' and 'struct page'. In order to differentiate the API
-> handling between 'va' and 'struct page', add '_va' suffix
-> to the corresponding API mirroring the page_pool_alloc_va()
-> API of the page_pool. So that callers expecting to deal with
-> va, page or both va and page may call page_frag_alloc_va*,
-> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
->
+On Fri, 2024-07-19 at 17:33 +0800, Yunsheng Lin wrote:
+> Use appropriate frag_page API instead of caller accessing
+> 'page_frag_cache' directly.
+>=20
 > CC: Alexander Duyck <alexander.duyck@gmail.com>
 > Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> ---
+>  drivers/vhost/net.c             |  2 +-
+>  include/linux/page_frag_cache.h | 10 ++++++++++
+>  mm/page_frag_test.c             |  2 +-
+>  net/core/skbuff.c               |  6 +++---
+>  net/rxrpc/conn_object.c         |  4 +---
+>  net/rxrpc/local_object.c        |  4 +---
+>  net/sunrpc/svcsock.c            |  6 ++----
+>  7 files changed, 19 insertions(+), 15 deletions(-)
+>=20
 
-Rather than renaming the existing API I would rather see this follow
-the same approach as we use with the other memory subsystem functions.
-A specific example being that with free_page it is essentially passed
-a virtual address, while the double underscore version is passed a
-page. I would be more okay with us renaming the double underscore
-version of any functions we might have to address that rather than
-renaming all the functions with "va".
+Looks fine to me.
 
-In general I would say this patch is adding no value as what it is
-doing is essentially pushing the primary users of this API to change
-to support use cases that won't impact most of them. It is just
-creating a ton of noise in terms of changes with no added value so we
-can reuse the function names.
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+
 
