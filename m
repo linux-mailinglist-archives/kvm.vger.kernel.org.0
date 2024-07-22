@@ -1,140 +1,130 @@
-Return-Path: <kvm+bounces-22043-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22044-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289E7938E86
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 13:56:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67AF8938E87
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 13:56:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 599B01C21114
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 11:56:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 163DC1F21D4F
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 11:56:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BEF516D337;
-	Mon, 22 Jul 2024 11:55:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1300E16D326;
+	Mon, 22 Jul 2024 11:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JO8Kt4ES"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUkq69JQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CECB16CD3B;
-	Mon, 22 Jul 2024 11:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFD71EB56
+	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 11:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721649355; cv=none; b=euBWtocYV6a2oiyvzqOcbPaQ38VmYiMe6L8wZsZZzMHpNC26+dX0KFcR63Wpj8h6LfdzxFf/Jiuv8AauW5njM7yCApHGizCBpOCyzHgfyPzOF9o2P/bLT9SEyn0h7LxSy7VLgFXR5PHA4z52SxuputqiAeozF60quJsRuyOZBzo=
+	t=1721649385; cv=none; b=aa3WlLcDRqsVV/cyRvG4c+28datcTSY8uesDAbuEpj+Mhd59KXIuJ1u75AR7+6dW+ThzXDl8iSRPCTioJ/GX/4aCwnaHc1Vw5BMr3DbgFKjORX30cAn2HBsqNCYWegWHz0OgIEIDQxZweWsfc4NP5jG5ePeDDYYxtXU3LcT8Bfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721649355; c=relaxed/simple;
-	bh=jdZOd+1x/UUwORwUz2YLmGgfUG/GAuQjIIUf2/RLMD8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iarpYOb0BnY8++Xo5uDcys2fuc5YhfTCRNbSyub13ABnQIqE6FEIopAFBVPQGwId1A9qao8HPoTTAAVwxakAJ8O9dJ+AbfqWZJc+0u3r40ScbDl1IK+3A8M3Wp/wUP4BkWnA7dYtGyHe89khco+BON+epKhNdI/f86i/O4oULYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JO8Kt4ES; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6701C116B1;
-	Mon, 22 Jul 2024 11:55:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721649354;
-	bh=jdZOd+1x/UUwORwUz2YLmGgfUG/GAuQjIIUf2/RLMD8=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=JO8Kt4ESCie2QzLgfzTe+N+WlH/PTKW+HGMPmphWK6eRrsqvSp9v43TyCR3ri+dFB
-	 1gGTcwpV9XATI4RVtCuapHxp+o6R0wExoj1M+gY1eHytMfw8vKE03Km8oq/c193cN2
-	 3Qz5tdHCQ9pQrOfoLa7bPa2JNFdauo7pmEwIuEnNdqwy4MmwP9j2U54hJ4xrkt3w7E
-	 qRH+zodkwDXs6azmgWSO+6hzQZtdvK7K8/VSfeL3Ju44purrQ9W7GyWoMBkGbxKvVl
-	 5i+w9pPvUOfLKNhYekwgco7ZVGIiSXl19KAOG/LXWOI2kAZOM9ABY9XZT+HyVIFSuL
-	 rYjmN3iQ+9I4g==
-Message-ID: <1cd7516391a4c51890c5b0c60a6f149b00cae3af.camel@kernel.org>
-Subject: Re: [PATCH v2] KVM: SVM: let alternatives handle the cases when RSB
- filling is required
-From: Amit Shah <amit@kernel.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: David Kaplan <David.Kaplan@amd.com>, Jim Mattson <jmattson@google.com>, 
- "pbonzini@redhat.com" <pbonzini@redhat.com>, "x86@kernel.org"
- <x86@kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "tglx@linutronix.de" <tglx@linutronix.de>,  "mingo@redhat.com"
- <mingo@redhat.com>, "bp@alien8.de" <bp@alien8.de>, 
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "hpa@zytor.com" <hpa@zytor.com>, Kim Phillips <kim.phillips@amd.com>
-Date: Mon, 22 Jul 2024 13:55:49 +0200
-In-Reply-To: <ZpbFvTUeB3gMIKiU@google.com>
-References: <20240626073719.5246-1-amit@kernel.org>
-	 <Zn7gK9KZKxBwgVc_@google.com>
-	 <CALMp9eSfZsGTngMSaWbFrdvMoWHyVK_SWf9W1Ps4BFdwAzae_g@mail.gmail.com>
-	 <52d965101127167388565ed1520e1f06d8492d3b.camel@kernel.org>
-	 <DS7PR12MB57665C3E8A7F0AF59E034B3C94D32@DS7PR12MB5766.namprd12.prod.outlook.com>
-	 <Zow3IddrQoCTgzVS@google.com> <ZpTeuJHgwz9u8d_k@t470s.drde.home.arpa>
-	 <ZpbFvTUeB3gMIKiU@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.3 (3.52.3-1.fc40) 
+	s=arc-20240116; t=1721649385; c=relaxed/simple;
+	bh=evCGxNNKtGdd7+zzHvIPxEQwKZ1xpY5z3XB/p5lEbz0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jXwe/OeaKAYr/vxttuiiditXjvlg3IqL9T4C9b19Ah7gJZ1gZmKTdTf3aH5UBchLPxuEr8KeL9rn+Wz/+RhIHRK6OMsRgNPqc0Irp7Imyym7gNuSucKBxF6nHFOiTICl6/70CjL2r8V9FzFKcRlxaYvWlACOCH/lOX1NPYMS49c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KUkq69JQ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721649382;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lYDl5sIhPvDgTfoHlN8PA/tdUOLQIuS/j96hYp8nn7w=;
+	b=KUkq69JQU2szA9aAAiHzzVLSc4iR0hkNeJGHXyt5RD2m2JSJDarSGFEmZMlcFJEBqNlRrb
+	/ScGNDXLRSCF74IqyWb8yfFYzHIqA8ZOqsIJGj161pfwLoNM27MILtx7TQpO9XE1RDI5eB
+	59UWnYNmi6J8Wtbca8oLFDoKsUtahXg=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-665-aZ5uOBE9M22_s-WhrSY-7w-1; Mon,
+ 22 Jul 2024 07:56:15 -0400
+X-MC-Unique: aZ5uOBE9M22_s-WhrSY-7w-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1ECAE1944B29;
+	Mon, 22 Jul 2024 11:56:12 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.192.65])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 669573000188;
+	Mon, 22 Jul 2024 11:56:10 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 67E0E21E668F; Mon, 22 Jul 2024 13:56:08 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: Daniel P . =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>,  Eduardo
+ Habkost
+ <eduardo@habkost.net>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Yanan Wang
+ <wangyanan55@huawei.com>,  "Michael S . Tsirkin" <mst@redhat.com>,  Paolo
+ Bonzini <pbonzini@redhat.com>,  Richard Henderson
+ <richard.henderson@linaro.org>,  Eric Blake <eblake@redhat.com>,  Marcelo
+ Tosatti <mtosatti@redhat.com>,  Alex =?utf-8?Q?Benn=C3=A9e?=
+ <alex.bennee@linaro.org>,
+  Peter Maydell <peter.maydell@linaro.org>,  Jonathan Cameron
+ <Jonathan.Cameron@huawei.com>,  Sia Jee Heng
+ <jeeheng.sia@starfivetech.com>,  qemu-devel@nongnu.org,
+  kvm@vger.kernel.org,  qemu-riscv@nongnu.org,  qemu-arm@nongnu.org,
+  Zhenyu Wang <zhenyu.z.wang@intel.com>,  Dapeng Mi
+ <dapeng1.mi@linux.intel.com>,  Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH 1/8] hw/core: Make CPU topology enumeration arch-agnostic
+In-Reply-To: <20240704031603.1744546-2-zhao1.liu@intel.com> (Zhao Liu's
+	message of "Thu, 4 Jul 2024 11:15:56 +0800")
+References: <20240704031603.1744546-1-zhao1.liu@intel.com>
+	<20240704031603.1744546-2-zhao1.liu@intel.com>
+Date: Mon, 22 Jul 2024 13:56:08 +0200
+Message-ID: <87wmld4p47.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Tue, 2024-07-16 at 12:10 -0700, Sean Christopherson wrote:
-> On Mon, Jul 15, 2024, Amit Shah wrote:
-> > On (Mon) 08 Jul 2024 [11:59:45], Sean Christopherson wrote:
-> > > On Mon, Jul 01, 2024, David Kaplan wrote:
-> > > > > >=20
+Zhao Liu <zhao1.liu@intel.com> writes:
 
-(snipped to what is now emerging as the core of the discussion)
+> Cache topology needs to be defined based on CPU topology levels. Thus,
+> define CPU topology enumeration in qapi/machine.json to make it generic
+> for all architectures.
+>
+> To match the general topology naming style, rename CPU_TOPO_LEVEL_SMT
+> and CPU_TOPO_LEVEL_PACKAGE to CPU_TOPO_LEVEL_THREAD and
+> CPU_TOPO_LEVEL_SOCKET.
+>
+> Also, enumerate additional topology levels for non-i386 arches, and add
+> a CPU_TOPO_LEVEL_DEFAULT to help future smp-cache object de-compatibilize
+> arch-specific cache topology settings.
+>
+> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 
+QAPI schema
+Acked-by: Markus Armbruster <armbru@redhat.com>
 
-> > Also - reviewers of code will get confused, wondering why this code
-> > for AMD exists when the CPU vuln does not.
-> >=20
-> > I get that we want to write defensive code, but this was a very
-> > special condition that is unlikely to happen in this part of the
-> > code,
-> > and also this was missed by the devs and the reviewers.
->=20
-> Defensive code is only part of it, and a minor part at that.=C2=A0 The
-> main "issue" is
-> having divergent VM-Enter/VM-Exit code for Intel vs. AMD.=C2=A0 To those
-> of us that
-> care primarily about virtualization and are only passingly familiar
-> with the myriad
-> speculation bugs and mitigations, omitting RSB_VMEXIT_LITE _looks_
-> wrong.
->=20
-> To know that the omission is correct, one has to suss out that it's
-> (supposed to
-> be) impossible for RSB_VMEXIT_LITE to be set on AMD.=C2=A0 And as a KVM
-> person, that's
-> a detail I don't want to care about.
+> ---
+> Changes since RFC v2:
+>  * Dropped cpu-topology.h and cpu-topology.c since QAPI has the helper
+>    (CpuTopologyLevel_str) to convert enum to string. (Markus)
+>  * Fixed text format in machine.json (CpuTopologyLevel naming, 2 spaces
+>    between sentences). (Markus)
+>  * Added a new level "default" to de-compatibilize some arch-specific
+>    topo settings. (Daniel)
+>  * Moved CpuTopologyLevel to qapi/machine-common.json, at where the
+>    cache enumeration and smp-cache object would be added.
+>    - If smp-cache object is defined in qapi/machine.json, storage-daemon
+>      will complain about the qmp cmds in qapi/machine.json during
+>      compiling.
 
-OK - I get that.  Cognitive overload is a real thing, and the less of
-it the better.
+At some point, we may have to rethink the split between machine.json,
+machine-target.json, and machine-common.json.  Not this patch's problem.
 
-Since this isn't a discussion about any AMD bug or implementation
-detail, but rather a uniformity in KVM code across different CPU
-implementations from different vendors, I prefer someone else code up
-the patch to add that uniformity.  I don't have an objection to that.
-
-I can of course offer a comment in this hunk, though, that says AMD
-does not have the bug that necessitates VMEXIT_LITE, and that should
-help in the meantime.  You've not queued this patch yet, right?  Do you
-think it's better I do a v3 with this comment update?
-
-> FWIW, I feel the same way about all the other post-VM-Exit
-> mitigations, they just
-> don't stand out in the same way because the entire mitigation
-> sequence is absent
-> on one vendor the other, i.e. they don't look wrong at first glance.=C2=
-=A0
-> But if KVM
-> could have a mostly unified VM-Enter =3D> VM-Exit assembly code, I
-> would happliy eat
-> a dead NOP/JMP or three.=C2=A0 Now that I look at it, that actually seems
-> very doable...
-
-Sure.  I think some of the fallacy there is also to treat VMX and SVM
-as similar (while not treating the Arm side as similar).  They are
-different implementations, with several overlapping details - but it's
-perilous to think everything maps the same across vendors.
-
-
-		Amit
 
