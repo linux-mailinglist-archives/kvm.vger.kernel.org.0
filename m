@@ -1,108 +1,102 @@
-Return-Path: <kvm+bounces-22071-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22072-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 421FA9396FE
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 01:30:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC432939736
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 01:58:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9C1C2827C6
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 23:30:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8860F2822F0
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 23:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE20F5027F;
-	Mon, 22 Jul 2024 23:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC2F7345F;
+	Mon, 22 Jul 2024 23:58:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MMAuQLJG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gbeTtmJT"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED6A4D584
-	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 23:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E9AA6E5ED
+	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 23:58:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721691009; cv=none; b=ZmP+9vMPzp1qjK0aNr7Y7evh4khfgDroMsXl+YVr4/N0pcGxgsWyd3BUI0Hgr7YS0c65B7dfdu6ckXRMKmPrY+UG1lW5xyXVUDjvz3yfiDyYu/r85IBEo7TkWp/hQdeFHXuKdQBbZzEATbFVJvbVb7kPujJu3uJOd9GVZg6PETM=
+	t=1721692690; cv=none; b=RRPk1gECyoBrrjWgxTCjmHRZ2w48ivU7rWhk8kqfEYPY4LjrLshK7stlOU5O2yDN2WSFzFz9tMNtMduaJRpFx3soSo4cEWqSNza3oyhxTZHrRtNMPC+trGtBP/UlqI2GoPTvbInICXgSdid+Vr9IODdGxejhwM/awALKVAWJU8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721691009; c=relaxed/simple;
-	bh=50W+8mOf5oT2ZgPwKo57Acc+wlJOIgj2xhu/ig30r7Y=;
+	s=arc-20240116; t=1721692690; c=relaxed/simple;
+	bh=DkseDYfGNcDzvbqyqU0DKg6iWql0jky4zKQP/8CT7IQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SKoYvgT7ar30PaoKBEj3ALxSe9M5zw3ctrKa1Cz4/fPFmkviyYaOeqMVnxtLidC+OC2dnEwqHxx/6qIkFZd6j/Yox+3keobqj+6UlU+5iqJRApQDCVKaE5rq/esv2wJXs9e6gJPsbkwDxecLhhEDH6IgtGiJAI5gIRaB4XcUu3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MMAuQLJG; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=oXTmxk48L+8j7u3cNudjTyUSuttyaBHi6rcI/EAGNFQgT8N2At794RHSCvCJHTqem89L0ZBQRHa2XvlNPwuVD5wGgUAXYrVzw+KP0THq6TjQPl8Yw7nQRRdcMsE2wCEYerIKakZq3G/9iGtDFDHqJG4qLmrh2MuTNaioIzWx4qE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gbeTtmJT; arc=none smtp.client-ip=209.85.214.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e033e353528so9290283276.0
-        for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 16:30:07 -0700 (PDT)
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fca868b53cso883955ad.1
+        for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 16:58:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721691006; x=1722295806; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1721692688; x=1722297488; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CT52fA42ULSwMbS28vOqpAMMtaxYXvYs5fxzjIhSTH0=;
-        b=MMAuQLJGWZOZSJGQ9IImKhL+IB/c2A4tp2kN5srAAtMWQLkEr6Wv8kkcSHqANpNaVv
-         bynFUDxpia5Hu339SjYh+W7VvpCbV5lMRl2hM3EUUZlJhkr86BLGIFBsLW/y/dXhOohb
-         4WYIYhyKRKEm4JCLaaHunjeTNGP6t5ECGPtLw7mIZ6ZSCZGQpcMTuJKmOuaIXxR4RQKr
-         igsTit9h5fyd3CR8/U4tXcHbxAFdMpZH3lbsp5qYZ73VZ6S00s+wO9Bnx09He/y89hwg
-         pSdnMlz1c292qmO/NVsqqeNr/hT+XEN2eIhJ+c4im5ymJexRoOjfWbYP4EZ8BFp9KXFP
-         cgNA==
+        bh=NiszAb6OEqq/qypn9MCSLFVFctQpfQJGPfYT/lahHTw=;
+        b=gbeTtmJTKeWPlkVg5mJMEotFpEDrEIaK5+/qOiljBBUXFd0ByApQBtBohLGwDuED5t
+         te+4SmnXdrQyh7iGL47rZhvxcpZqyNe307EllKUcPWn2kLOAFXlj1WWIDtarMI2gJoiR
+         X8Fyr9qIN+jin5fxyDeAbiNVEZKzMB1vdn35frvMfZ/BIwLJHr85PamnBa/0Dk31Hy/l
+         kzEfG+O5EVH2UCp/7fb8hhwm9jffCKS3l9T0j/VWZ7SNmjsQCkSSlXzo9ItkQNugATUt
+         FqaW5eqYtW++IsvXnChWfELHHaKSaw3PAF+C4DO7R5FqkCWkAelgefIJgmcbxEvn7saj
+         KT3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721691006; x=1722295806;
+        d=1e100.net; s=20230601; t=1721692688; x=1722297488;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CT52fA42ULSwMbS28vOqpAMMtaxYXvYs5fxzjIhSTH0=;
-        b=JpiHPD/wqpnbVWSBzZAgNjbLW5FaqgNNpAVTg3Bljn7si1Ab7EJldIWDQycJBic5yE
-         C27oOm+YW1StCWXUH0GRmlqrz6IDjj0NJNKxWL3InZK2Z1xd6m/SqQCXq0wcbKeGFVCm
-         7FOr/iDPG0yA1x1jfP6ftoYxMP8ugSAdRF3+kGhU8aKZvjMRJh4WoNex5Dgf8y3L2n4S
-         7toSK2k3Dezh0TWSLIZcalz+yasN1gBbpaWyZlDKoYKoXgIvHhl1IIUqKRdKmmHhOJ0b
-         jXDfWQY4fg46qSoscfIUgYDiiC5MTZewc7kphkmO/SBMDGz4/yDz2JkDy0ZId20fvpRe
-         2wlQ==
-X-Gm-Message-State: AOJu0Yy7mHXp1cdvu6jZBSWUVNThKHPFOBi+NIBZvGu7IUsBEQoRjq9P
-	o9WZKwRL0WdR5VD1HIiOgi1Pl0kiHI7LSqHLtjXJ/IJqe+MR3QI819LOFacKSDvRLLYt/n4/zGv
-	fsA==
-X-Google-Smtp-Source: AGHT+IFNs+/2hSgf+AJ9Cyab0VhWImUSXPEIK5yU9cpGk8LLruW2Bue6yMQkA0A2x7nFhg7otqvD7YHGAr0=
+        bh=NiszAb6OEqq/qypn9MCSLFVFctQpfQJGPfYT/lahHTw=;
+        b=iHz220GsLxjwZH0lrfTS+AM0mWGcU6kp+RTAB617bmI4IuckmM2GsgFDdHEkNUk9rx
+         53AoXNIMYBKBRujd3WuKxgeuIfWzJXp6xFN1Yj4jD+JdZ9XkkhLu7VxL5I+t+AOS7k6A
+         FSE+uHmf96NjUYMkhcrLVXcOXlvq16JqDdbi1608juXQWNaYbG7kgV/QWHn8DYZeF6ce
+         Wnq4ZyjDxkoIIKsq1WORIKass0p8DXytPylBp7wJkg9R9tL7pmnl/tnllx04UKPNaC57
+         ncUC//UAL2WFasrZj8xBzxRUXbp2rKRHLPhwzR0hEjJIEhiJiQRPbiiT5eOJPu/OL+iO
+         HZ/g==
+X-Forwarded-Encrypted: i=1; AJvYcCVADUV5cR0Tw9JE1rZ6cx9K3J7F5RxYgda3sUkqBlw462oHydauFxVahcTvJoRHMd5sg2pocNhLzDnqZbKOHRVp3TWH
+X-Gm-Message-State: AOJu0YyGxTCh8/8SLqoe4QanZyRpSMARuvTzU67a3icgqnfRCwpuhidr
+	JBdnJj3SO9VelyTvHTFf7p1/1f1flxG/FQDcUzBZ3SV4yeu3wMnxoc/dR5mFBO2jj4r0wdj6awW
+	D4g==
+X-Google-Smtp-Source: AGHT+IGMCIJ7k/wO1EtyoCI8S2HbGG8sVrIvZRS9cKnBzdCHGWdrefCpopFvU1Qotp33npJMX/2I7gM4+Os=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1006:b0:e05:6e45:84b6 with SMTP id
- 3f1490d57ef6-e0870422791mr29610276.8.1721691006328; Mon, 22 Jul 2024 16:30:06
- -0700 (PDT)
-Date: Mon, 22 Jul 2024 16:30:05 -0700
-In-Reply-To: <23f30de150579d4893a493a6385f69f6@cock.li>
+ (user=seanjc job=sendgmr) by 2002:a17:902:e887:b0:1fb:1ae6:6aab with SMTP id
+ d9443c01a7336-1fd74513c53mr8074635ad.2.1721692688226; Mon, 22 Jul 2024
+ 16:58:08 -0700 (PDT)
+Date: Mon, 22 Jul 2024 16:58:06 -0700
+In-Reply-To: <Zp5Wq1h40JMSYL5a@chao-email>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <23f30de150579d4893a493a6385f69f6@cock.li>
-Message-ID: <Zp7rfbJpNDyhaZQO@google.com>
-Subject: Re: [USB Isolation] USB virt drivers access between guests instead of
- host -> guest?
+References: <20240720000138.3027780-1-seanjc@google.com> <Zp5Wq1h40JMSYL5a@chao-email>
+Message-ID: <Zp7yDvcwfPtgED0j@google.com>
+Subject: Re: [PATCH 0/6] KVM: nVMX: Fix IPIv vs. nested posted interrupts
 From: Sean Christopherson <seanjc@google.com>
-To: privacymiscoccasion@cock.li
-Cc: kvm@vger.kernel.org
+To: Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zeng Guang <guang.zeng@intel.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Jul 22, 2024, privacymiscoccasion@cock.li wrote:
-> Hi everyone,
+On Mon, Jul 22, 2024, Chao Gao wrote:
+> On Fri, Jul 19, 2024 at 05:01:32PM -0700, Sean Christopherson wrote:
+> >Fix a bug where KVM injects L2's nested posted interrupt into L1 as a
+> >nested VM-Exit instead of triggering PI processing.  The actual bug is
+> >technically a generic nested posted interrupts problem, but due to the
+> >way that KVM handles interrupt delivery, I'm 99.9% certain the issue is
+> >limited to IPI virtualization being enabled.
 > 
-> I'm coming over from reading about Qubes OS, which uses the Xen hypervisor.
-> In Qubes, the way that untrusted devices like USBs are handled is that they
-> are pass through to a VM, which then (I presume) allows other guests to
-> access them using virtual drivers.
-> 
-> I'm looking for a theoretical explanation on how this would be possible with
-> KVM. I am not a developer and thus am having difficulty understanding how
-> one would let a guest access virtual drivers connecting to hardware devices
-> like USB and PCIe from another guest.
-> 
-> Any help/practical examples of this would be greatly appreciated. This seems
-> to be a hard topic to find and so far I haven't come across anything like
-> this.
+> Theoretically VT-d posted interrupt can also trigger this issue.
 
-In Linux, this would be done via VFIO[1].  VFIO allows assigning devices to host
-userspace, and thus to KVM guests.  Very rougly speaking, most assets that get
-exposed to KVM guests are proxied through host userspace.  I haven't actually
-read the DPDK docs[2], but if you get stuck with VFIO in particular, my guess is
-that they're a good starting point (beyond any VFIO+KVM tutorials).
+Hmm, yeah, I think you're right.  L1 could program an assigned device to _post_
+an interrupt to L2's vector, via L1's PID.PIR.  Which would let the interrupt
+into vIRR without KVM checking vmcs12's NV.  It seems unlikely L1 would do that,
+but it definitely seems possible.
 
-[1] https://docs.kernel.org/driver-api/vfio.html
-[2] https://doc.dpdk.org/guides/linux_gsg/linux_drivers.html
+Unless I'm missing something (else), I'll update the changelog and Fixes: to make
+it clear that IPI virtualization just makes the bug easier to hit, but that the
+issue exists with nested assigned devices, too.
 
