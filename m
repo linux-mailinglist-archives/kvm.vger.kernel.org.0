@@ -1,191 +1,198 @@
-Return-Path: <kvm+bounces-22052-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22053-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09060938FFB
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 15:38:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8F50939013
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 15:45:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E3331F21BD5
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 13:38:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB3481C20FF6
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 13:45:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EC116D9C0;
-	Mon, 22 Jul 2024 13:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA73D16D4D1;
+	Mon, 22 Jul 2024 13:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bMk9Um/S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a+BLWLaN"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21B8F1D696
-	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 13:38:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D39716D4D7;
+	Mon, 22 Jul 2024 13:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721655495; cv=none; b=ajl7vs8J8R206QFDGVqR7m2MYbrbYd8FxwvdIZpHySsLbPSsq+NUhqHPQUeuKOrbBQDZs98uq0HELoY9dovbd/Mhy3spE5husgxqY8+W8S017PoQeZow0lpnmIbYuG9xtMhwpQYL38fcbWzWqBqdWEEPzW5SHGZf6gvq0GXQyx0=
+	t=1721655907; cv=none; b=PvO5HyDqKGroJGJUBF3sqYSVUFzaLJC/hFnaM1FIEadt7wP4mvJS8BTbJACI42cBy0709oD1jDfaFazEznxnXhmRtXimG2zftaREliwrzxnGcGNHkbyQ+X+NZTN/paGI04aFmc1OWZ9jFFixcVcuTdr3aYuYiiGKq9Ry++WsyXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721655495; c=relaxed/simple;
-	bh=Q2A4hgSQ72LrxyROvWQyeoldy5+bPyMK3I5rPE2mhzc=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=C1DXDhTaMbmatxNf34tfVhWmQO7pPhya1o5/vDLUNpjKJiv6k1+rnD8DsS07Du/pOwtrIHQ3pX/0w+ZEExYdBKiLn/ATq9A1NSwAqFqWOSXTboX1doAAVUM235gy+7b3JplHgGIxsH5ugYRCKoAuEmNoUkb22MGXebwjh8tYDx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bMk9Um/S; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721655492;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9EiBCLqkK09Y1BVxrLWcGqAzYTQfgigTA0WYXbrnHsM=;
-	b=bMk9Um/S4ylAO6LhuVaEaSRWbYkIsTH9ozr1l8qZelJ3uxPHZnWmBXwq4f5Np4Y4idxoRN
-	mzgbVljuB3DZyIPHR1vYqQ1qWTAseTuPnRVG2NZoRgmS7O9zcWLMPQ2fQ2eyHjGth2H51w
-	xvHg5V0MDwrbPCyUJZjDWkO6ff0hPqI=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-217-YUk80kGdPXGEVKtTCjXqAQ-1; Mon,
- 22 Jul 2024 09:38:06 -0400
-X-MC-Unique: YUk80kGdPXGEVKtTCjXqAQ-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 5BF23196E0A0;
-	Mon, 22 Jul 2024 13:37:55 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.65])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id D52391944AA4;
-	Mon, 22 Jul 2024 13:37:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id AB0FB21E669B; Mon, 22 Jul 2024 15:37:43 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Daniel P . =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>,  Eduardo
- Habkost
- <eduardo@habkost.net>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Yanan Wang
- <wangyanan55@huawei.com>,  "Michael S . Tsirkin" <mst@redhat.com>,  Paolo
- Bonzini <pbonzini@redhat.com>,  Richard Henderson
- <richard.henderson@linaro.org>,  Eric Blake <eblake@redhat.com>,  Marcelo
- Tosatti <mtosatti@redhat.com>,  Alex =?utf-8?Q?Benn=C3=A9e?=
- <alex.bennee@linaro.org>,
-  Peter Maydell <peter.maydell@linaro.org>,  Jonathan Cameron
- <Jonathan.Cameron@huawei.com>,  Sia Jee Heng
- <jeeheng.sia@starfivetech.com>,  qemu-devel@nongnu.org,
-  kvm@vger.kernel.org,  qemu-riscv@nongnu.org,  qemu-arm@nongnu.org,
-  Zhenyu Wang <zhenyu.z.wang@intel.com>,  Dapeng Mi
- <dapeng1.mi@linux.intel.com>,  Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache object
-In-Reply-To: <20240704031603.1744546-9-zhao1.liu@intel.com> (Zhao Liu's
-	message of "Thu, 4 Jul 2024 11:16:03 +0800")
-References: <20240704031603.1744546-1-zhao1.liu@intel.com>
-	<20240704031603.1744546-9-zhao1.liu@intel.com>
-Date: Mon, 22 Jul 2024 15:37:43 +0200
-Message-ID: <87r0bl35ug.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1721655907; c=relaxed/simple;
+	bh=EtYS+d6x6zLgneJBI6SyZHqmcURZgGiQbSt+k/yrGsI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KAQEcswFEl5a8CyHJpik2q5eQVYn0f6CXW1/vpVM+S4ZybtgAynniY25Hiab1xPFrLELBZMpAkFya85EoBkioAuBoEnM5ZV7ovnurTWYeNpSBYPvfcg66jw7vw1nguo1+6OUbwl0rJqcRUfcpn2o89C823ouXlWMWBO1oZcyCKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a+BLWLaN; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-58f9874aeb4so3222317a12.0;
+        Mon, 22 Jul 2024 06:45:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1721655904; x=1722260704; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8XGZ/9NOo05JXkZW6LQJzWemV3G3cXpXy4U7z9X0yZE=;
+        b=a+BLWLaNNphKvkqSwBNjk8ECnePtAAS1h1J3K/GC3dRUmOSA3Q5Xr2IKE1QxvNVrT+
+         z0UWc7Lep4Y4Vfz4nRnNWCQ8IJ3nQnJbj8AD4UrJIAXf/PvnMjJRdXRjwSTdHYU9mt31
+         ajV7QkS+XomRRwvWljFfDYruohgPkgj9k2HyB0cAwmGcmdHqa5A41MSPNmcMBdHqKy3R
+         tMZu/g03cy0ckqUWHD1IFytb4WDGX0hpnsyGc4W+1ioAdCmcnCYNiYJBcMtFQ7L+nzn7
+         WflqGAQUOLWijs3sVBS/hkkZmw/ITSdEsMEa/DRalwbvIc2RustT2yui5Bk+8I8hDLMM
+         ddqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721655904; x=1722260704;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8XGZ/9NOo05JXkZW6LQJzWemV3G3cXpXy4U7z9X0yZE=;
+        b=X5UbvseOoB/oxBqe+YNEjOvaijEPi2DSI6iUweix+hIIHW8qP3sGYe4hCiGUItHVDM
+         aJ9ESH5nUK7e8vNcCTaGCBTr4/uSfoprT2IrimQxbGh5V9hJ8ZPqyUMiByxskyrE4dBJ
+         GsSXsRx1LQEi8EDJ6dYKx7UifaAKVc9sdfUY4Yn2NAaHzf5/Civ9O/DHOHrPLMcxYWvk
+         J7EUYX/MwaMJW2eFW4wgheHaqjsOooFDsu3u/oIJFhP8vI+LcI44QV2HgCoGHCnmJ1an
+         zpv6kX/ckOJ41Fil27W91StlGdILKlxr3+t6j8g8WH/edG1QmJr7QOAIdC1ED8VPrlAr
+         hhSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWD4D/xYg75kOppEQF4gmPQz8YOc1P4Hp0iKdOQLWLhl1mirKu1YLZ7h2+iuCywJsPC7iZk0A49CPfThDB3fi2su5S+LUjHVvWd8st7B3ik4FY0Jqs0VQnbIpVW+n6CftcR
+X-Gm-Message-State: AOJu0YwBc28ImzKV40e818yeeim1+LG375ZJX2MkVBK8/886W3Eo6clb
+	dGNaEnxVje56sKfF8DXTwc+mjyWdMwdR4hWYBN2EeRuQPHA7I776
+X-Google-Smtp-Source: AGHT+IGUpWLi5KINnrnH7j9LvFAUyxJ8tqxAzN0mqU6WDSVaJ2/vZq9nKb36lvhw4w/P1SfhYGpj2w==
+X-Received: by 2002:a05:6402:3553:b0:5a3:55a5:39f1 with SMTP id 4fb4d7f45d1cf-5a3eee825afmr5637335a12.13.1721655903441;
+        Mon, 22 Jul 2024 06:45:03 -0700 (PDT)
+Received: from [192.168.178.20] (dh207-42-168.xnet.hr. [88.207.42.168])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5a436f0eac2sm4639266a12.52.2024.07.22.06.45.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jul 2024 06:45:02 -0700 (PDT)
+Message-ID: <d8ad6d4a-148b-4ca4-9e9c-8dcce0274b3f@gmail.com>
+Date: Mon, 22 Jul 2024 15:44:56 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+User-Agent: Mozilla Thunderbird
+Subject: =?UTF-8?Q?Re=3A_=5BBUG=5D_arch/x86/kvm/vmx/pmu=5Fintel=2Ec=3A54=3A_?=
+ =?UTF-8?Q?error=3A_dereference_of_NULL_=E2=80=98pmc=E2=80=99_=5BCWE-476=5D?=
+To: Jim Mattson <jmattson@google.com>
+Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
+ Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
+ Like Xu <likexu@tencent.com>
+References: <c42bff52-1058-4bff-be90-5bab45ed57be@gmail.com>
+ <ZpqgfETiBXfBfFqU@google.com>
+ <70137930-fea1-4d45-b453-e6ae984c4b2b@gmail.com>
+ <Zpq9Bp7T_AdbVhmP@google.com>
+ <824a0819-a09d-40ac-820c-f7975aee1dae@gmail.com>
+ <CALMp9eStzLK7kQY41b37zvZuR7UVzOD+W7vDPhyKXYPDhUww0g@mail.gmail.com>
+Content-Language: en-US
+From: Mirsad Todorovac <mtodorovac69@gmail.com>
+In-Reply-To: <CALMp9eStzLK7kQY41b37zvZuR7UVzOD+W7vDPhyKXYPDhUww0g@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Zhao Liu <zhao1.liu@intel.com> writes:
 
-> Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
 
-This patch is just documentation.  The code got added in some previous
-patch.  Would it make sense to squash this patch into that previous
-patch?
+On 7/19/24 22:14, Jim Mattson wrote:
+> On Fri, Jul 19, 2024 at 12:41 PM Mirsad Todorovac
+> <mtodorovac69@gmail.com> wrote:
+>>
+>>
+>>
+>> On 7/19/24 21:22, Sean Christopherson wrote:
+>>> On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
+>>>> On 7/19/24 19:21, Sean Christopherson wrote:
+>>>>> On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
+>>>>>> Hi,
+>>>>>>
+>>>>>> In the build of 6.10.0 from stable tree, the following error was detected.
+>>>>>>
+>>>>>> You see that the function get_fixed_pmc() can return NULL pointer as a result
+>>>>>> if msr is outside of [base, base + pmu->nr_arch_fixed_counters) interval.
+>>>>>>
+>>>>>> kvm_pmu_request_counter_reprogram(pmc) is then called with that NULL pointer
+>>>>>> as the argument, which expands to .../pmu.h
+>>>>>>
+>>>>>> #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
+>>>>>>
+>>>>>> which is a NULL pointer dereference in that speculative case.
+>>>>>
+>>>>> I'm somewhat confused.  Did you actually hit a BUG() due to a NULL-pointer
+>>>>> dereference, are you speculating that there's a bug, or did you find some speculation
+>>>>> issue with the CPU?
+>>>>>
+>>>>> It should be impossible for get_fixed_pmc() to return NULL in this case.  The
+>>>>> loop iteration is fully controlled by KVM, i.e. 'i' is guaranteed to be in the
+>>>>> ranage [0..pmu->nr_arch_fixed_counters).
+>>>>>
+>>>>> And the input @msr is "MSR_CORE_PERF_FIXED_CTR0 +i", so the if-statement expands to:
+>>>>>
+>>>>>     if (MSR_CORE_PERF_FIXED_CTR0 + [0..pmu->nr_arch_fixed_counters) >= MSR_CORE_PERF_FIXED_CTR0 &&
+>>>>>         MSR_CORE_PERF_FIXED_CTR0 + [0..pmu->nr_arch_fixed_counters) < MSR_CORE_PERF_FIXED_CTR0 + pmu->nr_arch_fixed_counters)
+>>>>>
+>>>>> i.e. is guaranteed to evaluate true.
+>>>>>
+>>>>> Am I missing something?
+>>>>
+>>>> Hi Sean,
+>>>>
+>>>> Thank you for replying promptly.
+>>>>
+>>>> Perhaps I should have provided the GCC error report in the first place.
+>>>
+>>> Yes, though the report itself is somewhat secondary, what matters the most is how
+>>> you found the bug and how to reproduce the failure.  Critically, IIUC, this requires
+>>> analyzer-null-dereference, which AFAIK isn't even enabled by W=1, let alone a base
+>>> build.
+>>>
+>>> Please see the 0-day bot's reports[*] for a fantastic example of how to report
+>>> things that are found by non-standard (by kernel standards) means.
+>>>
+>>> In general, I suspect that analyzer-null-dereference will generate a _lot_ of
+>>> false positives, and is probably not worth reporting unless you are absolutely
+>>> 100% certain there's a real bug.  I (and most maintainers) am happy to deal with
+>>> false positives here and there _if_ the signal to noise ratio is high.  But if
+>>> most reports are false positives, they'll likely all end up getting ignored.
+>>>
+>>> [*] https://lore.kernel.org/all/202406111250.d8XtA9SC-lkp@intel.com
+>>
+>> I think I understood the meaning between the lines.
+>>
+>> However, to repeat the obvious, reducing the global dependencies simplifies the readability
+>> and the logical proof of the code. :-/
+> 
+> Comments would also help. :)
+> 
+>> Needless to say, dividing into pure functions and const functions reduces the number of
+>> dependencies, as it is N × (N - 1), sqr (N).
+>>
+>> For example, if a condition is always true, but the compiler cannot deduce it from code,
+>> there is something odd.
+>>
+>> CONCLUSION: If this generated 5 out of 5 false positives, then I might be giving up on this
+>> as a waste of your time.
+>>
+>> However, it was great fun analysing x86 KVM code. :-)
+> 
+> I assure you that there are plenty of actual bugs in KVM. This tool
+> just isn't finding them.
 
-> ---
-> Changes since RFC v2:
->  * Rewrote the document of smp-cache object.
->
-> Changes since RFC v1:
->  * Use "*_cache=topo_level" as -smp example as the original "level"
->    term for a cache has a totally different meaning. (Jonathan)
-> ---
->  qemu-options.hx | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 58 insertions(+)
->
-> diff --git a/qemu-options.hx b/qemu-options.hx
-> index 8ca7f34ef0c8..4b84f4508a6e 100644
-> --- a/qemu-options.hx
-> +++ b/qemu-options.hx
-> @@ -159,6 +159,15 @@ SRST
->          ::
->  
->              -machine cxl-fmw.0.targets.0=cxl.0,cxl-fmw.0.targets.1=cxl.1,cxl-fmw.0.size=128G,cxl-fmw.0.interleave-granularity=512
-> +
-> +    ``smp-cache='id'``
-> +        Allows to configure cache property (now only the cache topology level).
-> +
-> +        For example:
-> +        ::
-> +
-> +            -object '{"qom-type":"smp-cache","id":"cache","caches":[{"name":"l1d","topo":"core"},{"name":"l1i","topo":"core"},{"name":"l2","topo":"module"},{"name":"l3","topo":"die"}]}'
-> +            -machine smp-cache=cache
->  ERST
->  
->  DEF("M", HAS_ARG, QEMU_OPTION_M,
-> @@ -5871,6 +5880,55 @@ SRST
->          ::
->  
->              (qemu) qom-set /objects/iothread1 poll-max-ns 100000
-> +
-> +    ``-object '{"qom-type":"smp-cache","id":id,"caches":[{"name":cache_name,"topo":cache_topo}]}'``
-> +        Create an smp-cache object that configures machine's cache
-> +        property. Currently, cache property only include cache topology
-> +        level.
-> +
-> +        This option must be written in JSON format to support JSON list.
+Well, this series of reports did not target KVM. It was accidental that GCC static analyser
+reported those dubious false positives first.
 
-Why?
-
-> +
-> +        The ``caches`` parameter accepts a list of cache property in JSON
-> +        format.
-> +
-> +        A list element requires the cache name to be specified in the
-> +        ``name`` parameter (currently ``l1d``, ``l1i``, ``l2`` and ``l3``
-> +        are supported). ``topo`` parameter accepts CPU topology levels
-> +        including ``thread``, ``core``, ``module``, ``cluster``, ``die``,
-> +        ``socket``, ``book``, ``drawer`` and ``default``. The ``topo``
-> +        parameter indicates CPUs winthin the same CPU topology container
-> +        are sharing the same cache.
-> +
-> +        Some machines may have their own cache topology model, and this
-> +        object may override the machine-specific cache topology setting
-> +        by specifying smp-cache object in the -machine. When specifying
-> +        the cache topology level of ``default``, it will honor the default
-> +        machine-specific cache topology setting. For other topology levels,
-> +        they will override the default setting.
-> +
-> +        An example list of caches to configure the cache model (l1d cache
-> +        per core, l1i cache per core, l2 cache per module and l3 cache per
-> +        socket) supported by PC machine might look like:
-> +
-> +        ::
-> +
-> +              {
-> +                "caches": [
-> +                   { "name": "l1d", "topo": "core" },
-> +                   { "name": "l1i", "topo": "core" },
-> +                   { "name": "l2", "topo": "module" },
-> +                   { "name": "l3", "topo": "socket" },
-> +                ]
-> +              }
-> +
-> +        An example smp-cache object would look like:()
-> +
-> +        .. parsed-literal::
-> +
-> +             # |qemu_system| \\
-> +                 ... \\
-> +                 -object '{"qom-type":"smp-cache","id":id,"caches":[{"name":cache_name,"topo":cache_topo}]}' \\
-> +                 ...
->  ERST
-
+Best regards,
+Mirsad Todorovac
+ 
+>> Sort of cool that you guys on Google consider bug report from nobody admins from the
+>> universities ;-)
+>>
+>> Best regards,
+>> Mirsad Todorovac
+>>
 
