@@ -1,94 +1,176 @@
-Return-Path: <kvm+bounces-22040-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22041-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA813938D82
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 12:30:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2BB2938D8E
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 12:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E88F1F21A62
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 10:30:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00B9E1C212F1
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 10:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EC416B3B4;
-	Mon, 22 Jul 2024 10:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0DAD20328;
+	Mon, 22 Jul 2024 10:33:55 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C890149DF4;
-	Mon, 22 Jul 2024 10:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF7A3234
+	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 10:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721644200; cv=none; b=uvHQYtLajGEED4syPyMaZmKSvEanPaatOwudqUmy2q8krSEGqjagrVKGEA8oZEOh8yj6FQVd/PFMT9vxS/hdMlOpE9Vr03Nd0ahK8dj59Qo5Kh+j8qWtpZWPgX907DhgkgDc8lHfh8woPkfCbEBo+tf4k/PGGDrHFr65TQGC1qk=
+	t=1721644435; cv=none; b=bzVmKhOn6kX4TT+w6MkyQ9MsHZMwHPbUd/JEOnqSxx4qU4Afehdw/NFt0m5lvlote9ddl0SrYz/SI3g18HUROk1fG6RDdsxYlkFCfe15gIK1jkLywmmiutvs2gkCgh/qdlBh+X4GONq4Rne9+kSFkLUGc0fKXWOISHTAUPCQI94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721644200; c=relaxed/simple;
-	bh=1FRGGeU+wym2xELmubxiqoYTkV0hARifRn2Z6nZoCfU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GUGhY1KN1SResAO76ixKob2YBQero6T03U41tTMACCngoT60xh7yUIsufF2qNh9WCwKv6B3B6nHssDp2a4Oq3LnCSUVQwi8smyddi+fLfHu4iN1FTr84cS01U0W+pW2DmMYLraPXWC6zZxlOy1Eye67i/qC3jzhLxYisvvX8xwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=18.169.211.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
-X-QQ-mid: bizesmtpsz1t1721643990twg6sco
-X-QQ-Originating-IP: ZQWrQ315tVoU0wN0faBAvkhf0b2ujopfRfQI60mXTkc=
-Received: from localhost.localdomain ( [113.57.152.160])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Ò», 22 7ÔÂ 2024 18:26:28 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 6738067066252403474
-From: WangYuli <wangyuli@uniontech.com>
-To: zhaotianrui@loongson.cn,
-	maobibo@loongson.cn,
-	chenhuacai@kernel.org,
-	kernel@xen0n.name
-Cc: kvm@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	linux-kernel@vger.kernel.org,
-	pbonzini@redhat.com,
-	chao.p.peng@linux.intel.com,
-	WangYuli <wangyuli@uniontech.com>,
-	Wentao Guan <guanwentao@uniontech.com>
-Subject: [PATCH] KVM: Loongarch: remove unnecessary definition of KVM_PRIVATE_MEM_SLOTS
-Date: Mon, 22 Jul 2024 18:26:24 +0800
-Message-ID: <09A6BAA84F3EF573+20240722102624.293359-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.43.4
+	s=arc-20240116; t=1721644435; c=relaxed/simple;
+	bh=YHxUCRUsk85K0ieiDXFCb61wvJ4brkmrpbD4amGp3JY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n0nla+ksp1ytQD1XmQQ5LQtEuMvBRYEwXtAiLJkrbs+bprWFZkWL78HERl/MwqaBrNWpG3sfobaHl3iz5k+2eaDMEne1P4A0pYSnZhHYBTNZCcFyE8SD5tldBtEOc1yXUo70w/R0oYxUwpk7cW+rZmJfjE4RQdtxqY3I/XCZIwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E5658FEC;
+	Mon, 22 Jul 2024 03:34:17 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id DF3B43F73F;
+	Mon, 22 Jul 2024 03:33:50 -0700 (PDT)
+Date: Mon, 22 Jul 2024 11:33:47 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 08/12] KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+Message-ID: <Zp41i__E3X_cFRqp@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+ <20240625133508.259829-9-maz@kernel.org>
+ <ZpkwXFrhcFB1x0nD@raptor>
+ <878qxw5r6e.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878qxw5r6e.wl-maz@kernel.org>
 
-"KVM_PRIVATE_MEM_SLOTS" is renamed as "KVM_INTERNAL_MEM_SLOTS".
+Hi,
 
-KVM_PRIVATE_MEM_SLOTS defaults to zero, so it is not necessary to
-define it in Loongarch's asm/kvm_host.h.
+On Sat, Jul 20, 2024 at 10:49:29AM +0100, Marc Zyngier wrote:
+> On Thu, 18 Jul 2024 16:10:20 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi,
+> > 
+> > On Tue, Jun 25, 2024 at 02:35:07PM +0100, Marc Zyngier wrote:
+> > > On the face of it, AT S12E{0,1}{R,W} is pretty simple. It is the
+> > > combination of AT S1E{0,1}{R,W}, followed by an extra S2 walk.
+> > > 
+> > > However, there is a great deal of complexity coming from combining
+> > > the S1 and S2 attributes to report something consistent in PAR_EL1.
+> > > 
+> > > This is an absolute mine field, and I have a splitting headache.
+> > > 
+> > > [..]
+> > > +static u8 compute_sh(u8 attr, u64 desc)
+> > > +{
+> > > +	/* Any form of device, as well as NC has SH[1:0]=0b10 */
+> > > +	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
+> > > +		return 0b10;
+> > > +
+> > > +	return FIELD_GET(PTE_SHARED, desc) == 0b11 ? 0b11 : 0b10;
+> > 
+> > If shareability is 0b00 (non-shareable), the PAR_EL1.SH field will be 0b10
+> > (outer-shareable), which seems to be contradicting PAREncodeShareability().
+> 
+> Yup, well caught.
+> 
+> > > +	par |= FIELD_PREP(SYS_PAR_EL1_SH,
+> > > +			  compute_sh(final_attr, tr->desc));
+> > > +
+> > > +	return par;
+> > >
+> > 
+> > It seems that the code doesn't combine shareability attributes, as per rule
+> > RGDTNP and S2CombineS1MemAttrs() or S2ApplyFWBMemAttrs(), which both end up
+> > calling S2CombineS1Shareability().
+> 
+> That as well. See below what I'm stashing on top.
+> 
+> Thanks,
+> 
+> 	M.
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index e66c97fc1fd3..28c4344d1c34 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -459,13 +459,34 @@ static u8 combine_s1_s2_attr(u8 s1, u8 s2)
+>  	return final;
+>  }
+>  
+> +#define ATTR_NSH	0b00
+> +#define ATTR_RSV	0b01
+> +#define ATTR_OSH	0b10
+> +#define ATTR_ISH	0b11
 
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=bdd1c37a315bc50ab14066c4852bc8dcf070451e
-Link: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?id=b075450868dbc0950f0942617f222eeb989cad10
-Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
- arch/loongarch/include/asm/kvm_host.h | 2 --
- 1 file changed, 2 deletions(-)
+Matches Table D8-89 from DDI 0487K.a.
 
-diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/include/asm/kvm_host.h
-index fe38f98eeff8..ce3d36a890aa 100644
---- a/arch/loongarch/include/asm/kvm_host.h
-+++ b/arch/loongarch/include/asm/kvm_host.h
-@@ -26,8 +26,6 @@
- 
- #define KVM_MAX_VCPUS			256
- #define KVM_MAX_CPUCFG_REGS		21
--/* memory slots that does not exposed to userspace */
--#define KVM_PRIVATE_MEM_SLOTS		0
- 
- #define KVM_HALT_POLL_NS_DEFAULT	500000
- #define KVM_REQ_TLB_FLUSH_GPA		KVM_ARCH_REQ(0)
--- 
-2.43.4
+> +
+>  static u8 compute_sh(u8 attr, u64 desc)
+>  {
+> +	u8 sh;
+> +
+>  	/* Any form of device, as well as NC has SH[1:0]=0b10 */
+>  	if (MEMATTR_IS_DEVICE(attr) || attr == MEMATTR(NC, NC))
+> -		return 0b10;
+> +		return ATTR_OSH;
+> +
+> +	sh = FIELD_GET(PTE_SHARED, desc);
+> +	if (sh == ATTR_RSV)		/* Reserved, mapped to NSH */
+> +		sh = ATTR_NSH;
+> +
+> +	return sh;
+> +}
 
+Matches PAREncodeShareability().
+
+> +
+> +static u8 combine_sh(u8 s1_sh, u8 s2_sh)
+> +{
+> +	if (s1_sh == ATTR_OSH || s2_sh == ATTR_OSH)
+> +		return ATTR_OSH;
+> +	if (s1_sh == ATTR_ISH || s2_sh == ATTR_ISH)
+> +		return ATTR_ISH;
+>  
+> -	return FIELD_GET(PTE_SHARED, desc) == 0b11 ? 0b11 : 0b10;
+> +	return ATTR_NSH;
+>  }
+
+Matches S2CombineS1Shareability().
+
+>  
+>  static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+> @@ -540,7 +561,8 @@ static u64 compute_par_s12(struct kvm_vcpu *vcpu, u64 s1_par,
+>  	par  = FIELD_PREP(SYS_PAR_EL1_ATTR, final_attr);
+>  	par |= tr->output & GENMASK(47, 12);
+>  	par |= FIELD_PREP(SYS_PAR_EL1_SH,
+> -			  compute_sh(final_attr, tr->desc));
+> +			  combine_sh(FIELD_GET(SYS_PAR_EL1_SH, s1_par),
+> +				     compute_sh(final_attr, tr->desc)));
+
+Looks good.
+
+Thanks,
+Alex
+
+>  
+>  	return par;
+>  }
+> 
+> -- 
+> Without deviation from the norm, progress is not possible.
 
