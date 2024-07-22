@@ -1,146 +1,304 @@
-Return-Path: <kvm+bounces-22057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22056-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D384793909B
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 16:26:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58369939068
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 16:15:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01D981C212EE
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 14:26:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA3DC1F221F8
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 14:15:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD63016DC12;
-	Mon, 22 Jul 2024 14:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87453DF44;
+	Mon, 22 Jul 2024 14:15:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="gC7vVOEk"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M0ML6lS1"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 748EA16D4DF
-	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 14:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CABD816DC0D
+	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 14:15:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721658390; cv=none; b=QOuyqB9VlxMFkY2TPNNc/5a4j1BpJKHnx/05tY2IM6edu2s51cgEvtr5QDGpuh3aTcqzvA1YdUR+d/F8K055pQmm0JjGCHo1Ewi/+pEA2mdKnQuiTaeC7XyWcBKiEoOXoDL8c9ece/ZrqVqOeDe0ZEzHuW3M9v4++P/VIIpRmlI=
+	t=1721657704; cv=none; b=BQBVX4DxIE19Ff0w48dxRhKtTmUJQ9cp3HoEzI9Lv543wdQ+zTJJNM68Mo2wBNQ9XZQfziQ1LCUzOj8mFg3uq0fwQYNwnZBFKoQWZXbUzf/gIsZWlXMdzK/xZ4AR32yqpBFXIpShNKGNX2A1Se7iSWxhR32RHWfcZvV26ocdL6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721658390; c=relaxed/simple;
-	bh=L3vELbQaQH/HN6PrbWYQaK02xoL5wSf1Hk2fk0NM1NE=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=nzDG/eYoLjzXGS7N9h4mR480QgWY+gaOAoEikuh8DkTf5/inv8UbtNHxoDjt/1rbo8Dv5HeWm4k/OAbRGr8XDy63adEQYi6S+VXbHUNwy2+Ega7KdkMUQJ/0IRvhvtefl1dab2gYPbJhRHlAYeKLTd3oWn0ExxqqOUPKpjX7Sxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=gC7vVOEk; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1721658388; x=1753194388;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-id:content-transfer-encoding:mime-version:subject;
-  bh=L3vELbQaQH/HN6PrbWYQaK02xoL5wSf1Hk2fk0NM1NE=;
-  b=gC7vVOEkqS8PPcZs7uXowIIxV/rjjiforMamyM0aWHYgqxZ6QAk8iyWT
-   uEFJw21l3m02kbt9tTwFqaBzYjVEnT5zf13ATTFmCulnJDbSi9M55RHmd
-   +TVKGBWYAxM0nPeMGKJdETNT/xZzhwNEc23yG1kEvJgc/VLOPibq/X9pW
-   c=;
-X-IronPort-AV: E=Sophos;i="6.09,228,1716249600"; 
-   d="scan'208";a="108448111"
-Subject: Re: [PATCH v2 3/6] KVM: Support poll() on coalesced mmio buffer fds
-Thread-Topic: [PATCH v2 3/6] KVM: Support poll() on coalesced mmio buffer fds
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2024 14:26:26 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:28322]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.42.47:2525] with esmtp (Farcaster)
- id 544f6169-c6ef-4194-932d-26e4e6dacd1d; Mon, 22 Jul 2024 14:26:25 +0000 (UTC)
-X-Farcaster-Flow-ID: 544f6169-c6ef-4194-932d-26e4e6dacd1d
-Received: from EX19D018EUA003.ant.amazon.com (10.252.50.163) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 22 Jul 2024 14:26:25 +0000
-Received: from EX19D018EUA002.ant.amazon.com (10.252.50.146) by
- EX19D018EUA003.ant.amazon.com (10.252.50.163) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 22 Jul 2024 14:26:25 +0000
-Received: from EX19D018EUA002.ant.amazon.com ([fe80::7a11:7dbb:2190:e2c1]) by
- EX19D018EUA002.ant.amazon.com ([fe80::7a11:7dbb:2190:e2c1%3]) with mapi id
- 15.02.1258.034; Mon, 22 Jul 2024 14:26:25 +0000
-From: "Stamatis, Ilias" <ilstam@amazon.co.uk>
-To: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "Stamatis, Ilias"
-	<ilstam@amazon.co.uk>, "pbonzini@redhat.com" <pbonzini@redhat.com>
-CC: "nh-open-source@amazon.com" <nh-open-source@amazon.com>, "Durrant, Paul"
-	<pdurrant@amazon.co.uk>, "Woodhouse, David" <dwmw@amazon.co.uk>,
-	"oe-kbuild-all@lists.linux.dev" <oe-kbuild-all@lists.linux.dev>
-Thread-Index: AQHa2Un8G7tMctJJKkOA8APVVxEyWrH+15EAgAP8AwA=
-Date: Mon, 22 Jul 2024 14:26:25 +0000
-Message-ID: <4133f5277315b22fad4bc96b782ba9b431df5102.camel@amazon.co.uk>
-References: <20240718193543.624039-4-ilstam@amazon.com>
-	 <202407200922.pJAJMVRk-lkp@intel.com>
-In-Reply-To: <202407200922.pJAJMVRk-lkp@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <683CD94C1E406B4C96249FEA7E658765@amazon.com>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1721657704; c=relaxed/simple;
+	bh=6ZzsOV0SsccAhlyGxokRhWmGrLOJAiEG1PQ1JxrnUMc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WlBMtkl9BCB/s4iaJk8sSh6GRS2FgnYM5bPCSkfrA2UYhsyhMDoSiIbFtDXWbD2PK64K75emlFvJkDTnbcfvqd5fHyLUhY4JNqavv+k/PB2deXvLx/NMLz43U6iLiHGB1s/IPYHkGAg0cv9+SUjC+fqafBWfrCDt37L2j4RUAEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M0ML6lS1; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721657703; x=1753193703;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=6ZzsOV0SsccAhlyGxokRhWmGrLOJAiEG1PQ1JxrnUMc=;
+  b=M0ML6lS1y6HIVpq1caIgiMC4kr4zsEEoaMP9qoJROjKmOm5vqL/eUgqg
+   FAJ4lih/kGSj+XIGtF3SoZXY+ueZhXoQqc9Qu4itzvaVNCQDiJuSCZTYP
+   sKHzAevJsTI0wrzYf3QP/jqmzMC9XxGVnxSYiqx+wQpgv0oKVNLqTu+Pz
+   72oVKeKNJhE6yyNbMSUJj815Sf+eRQqb1f0kA1PaJruw0RIMVKtNjyqUN
+   3CcfgpqGxUVAhHo9oe8FLTtzPu0/qHb1MZ8ikRR96UK+dKBsGpKIaTL9e
+   vV0jDQ3OIHsySmMWRvX6rGe6GaIyVHavlA+Ft1Nn4bOtJUi7Hha+UE0+W
+   w==;
+X-CSE-ConnectionGUID: cu9ejgKBR+Sv6vwnYlzUJg==
+X-CSE-MsgGUID: p52TgDSTQkqLNBQpZpxF9Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11141"; a="41755202"
+X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
+   d="scan'208";a="41755202"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2024 07:14:50 -0700
+X-CSE-ConnectionGUID: wDAU7JD6TwyVWg1E/NElIg==
+X-CSE-MsgGUID: GZ6yDPBXRMe5vcfqwQRJXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
+   d="scan'208";a="89346284"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa001.jf.intel.com with ESMTP; 22 Jul 2024 07:14:44 -0700
+Date: Mon, 22 Jul 2024 22:30:28 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
+Message-ID: <Zp5tBHBoeXZy44ys@intel.com>
+References: <20240704031603.1744546-1-zhao1.liu@intel.com>
+ <20240704031603.1744546-3-zhao1.liu@intel.com>
+ <87wmld361y.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87wmld361y.fsf@pond.sub.org>
 
-T24gU2F0LCAyMDI0LTA3LTIwIGF0IDA5OjM1ICswODAwLCBrZXJuZWwgdGVzdCByb2JvdCB3cm90
-ZToNCj4gSGkgSWxpYXMsDQo+IA0KPiBrZXJuZWwgdGVzdCByb2JvdCBub3RpY2VkIHRoZSBmb2xs
-b3dpbmcgYnVpbGQgd2FybmluZ3M6DQo+IA0KPiBbYXV0byBidWlsZCB0ZXN0IFdBUk5JTkcgb24g
-a3ZtL3F1ZXVlXQ0KPiBbYWxzbyBidWlsZCB0ZXN0IFdBUk5JTkcgb24gbmV4dC0yMDI0MDcxOV0N
-Cj4gW2Nhbm5vdCBhcHBseSB0byBtc3Qtdmhvc3QvbGludXgtbmV4dCBsaW51cy9tYXN0ZXIga3Zt
-L2xpbnV4LW5leHQgdjYuMTBdDQo+IFtJZiB5b3VyIHBhdGNoIGlzIGFwcGxpZWQgdG8gdGhlIHdy
-b25nIGdpdCB0cmVlLCBraW5kbHkgZHJvcCB1cyBhIG5vdGUuDQo+IEFuZCB3aGVuIHN1Ym1pdHRp
-bmcgcGF0Y2gsIHdlIHN1Z2dlc3QgdG8gdXNlICctLWJhc2UnIGFzIGRvY3VtZW50ZWQgaW4NCj4g
-aHR0cHM6Ly9naXQtc2NtLmNvbS9kb2NzL2dpdC1mb3JtYXQtcGF0Y2gjX2Jhc2VfdHJlZV9pbmZv
-cm1hdGlvbl0NCj4gDQo+IHVybDogICAgaHR0cHM6Ly9naXRodWIuY29tL2ludGVsLWxhYi1sa3Av
-bGludXgvY29tbWl0cy9JbGlhcy1TdGFtYXRpcy9LVk0tRml4LWNvYWxlc2NlZF9tbWlvX2hhc19y
-b29tLzIwMjQwNzE5LTAzNDMxNg0KPiBiYXNlOiAgIGh0dHBzOi8vZ2l0Lmtlcm5lbC5vcmcvcHVi
-L3NjbS92aXJ0L2t2bS9rdm0uZ2l0IHF1ZXVlDQo+IHBhdGNoIGxpbms6ICAgIGh0dHBzOi8vbG9y
-ZS5rZXJuZWwub3JnL3IvMjAyNDA3MTgxOTM1NDMuNjI0MDM5LTQtaWxzdGFtJTQwYW1hem9uLmNv
-bQ0KPiBwYXRjaCBzdWJqZWN0OiBbUEFUQ0ggdjIgMy82XSBLVk06IFN1cHBvcnQgcG9sbCgpIG9u
-IGNvYWxlc2NlZCBtbWlvIGJ1ZmZlciBmZHMNCj4gY29uZmlnOiB4ODZfNjQtcmFuZGNvbmZpZy0x
-MjItMjAyNDA3MTkgKGh0dHBzOi8vZG93bmxvYWQuMDEub3JnLzBkYXktY2kvYXJjaGl2ZS8yMDI0
-MDcyMC8yMDI0MDcyMDA5MjIucEpBSk1WUmstbGtwQGludGVsLmNvbS9jb25maWcpDQo+IGNvbXBp
-bGVyOiBjbGFuZyB2ZXJzaW9uIDE4LjEuNSAoaHR0cHM6Ly9naXRodWIuY29tL2xsdm0vbGx2bS1w
-cm9qZWN0IDYxN2ExNWE5ZWFjOTYwODhhZTVlOTEzNDI0OGQ4MjM2ZTM0YjkxYjEpDQo+IHJlcHJv
-ZHVjZSAodGhpcyBpcyBhIFc9MSBidWlsZCk6IChodHRwczovL2Rvd25sb2FkLjAxLm9yZy8wZGF5
-LWNpL2FyY2hpdmUvMjAyNDA3MjAvMjAyNDA3MjAwOTIyLnBKQUpNVlJrLWxrcEBpbnRlbC5jb20v
-cmVwcm9kdWNlKQ0KPiANCj4gSWYgeW91IGZpeCB0aGUgaXNzdWUgaW4gYSBzZXBhcmF0ZSBwYXRj
-aC9jb21taXQgKGkuZS4gbm90IGp1c3QgYSBuZXcgdmVyc2lvbiBvZg0KPiB0aGUgc2FtZSBwYXRj
-aC9jb21taXQpLCBraW5kbHkgYWRkIGZvbGxvd2luZyB0YWdzDQo+ID4gUmVwb3J0ZWQtYnk6IGtl
-cm5lbCB0ZXN0IHJvYm90IDxsa3BAaW50ZWwuY29tPg0KPiA+IENsb3NlczogaHR0cHM6Ly9sb3Jl
-Lmtlcm5lbC5vcmcvb2Uta2J1aWxkLWFsbC8yMDI0MDcyMDA5MjIucEpBSk1WUmstbGtwQGludGVs
-LmNvbS8NCj4gDQo+IHNwYXJzZSB3YXJuaW5nczogKG5ldyBvbmVzIHByZWZpeGVkIGJ5ID4+KQ0K
-PiA+ID4gYXJjaC94ODYva3ZtLy4uLy4uLy4uL3ZpcnQva3ZtL2NvYWxlc2NlZF9tbWlvLmM6MjQx
-OjIyOiBzcGFyc2U6IHNwYXJzZTogaW5jb3JyZWN0IHR5cGUgaW4gYXNzaWdubWVudCAoZGlmZmVy
-ZW50IGJhc2UgdHlwZXMpIEBAICAgICBleHBlY3RlZCByZXN0cmljdGVkIF9fcG9sbF90IFt1c2Vy
-dHlwZV0gbWFzayBAQCAgICAgZ290IGludCBAQA0KPiAgICBhcmNoL3g4Ni9rdm0vLi4vLi4vLi4v
-dmlydC9rdm0vY29hbGVzY2VkX21taW8uYzoyNDE6MjI6IHNwYXJzZTogICAgIGV4cGVjdGVkIHJl
-c3RyaWN0ZWQgX19wb2xsX3QgW3VzZXJ0eXBlXSBtYXNrDQo+ICAgIGFyY2gveDg2L2t2bS8uLi8u
-Li8uLi92aXJ0L2t2bS9jb2FsZXNjZWRfbW1pby5jOjI0MToyMjogc3BhcnNlOiAgICAgZ290IGlu
-dA0KPiAgICBhcmNoL3g4Ni9rdm0vLi4vLi4vLi4vdmlydC9rdm0vY29hbGVzY2VkX21taW8uYzog
-bm90ZTogaW4gaW5jbHVkZWQgZmlsZSAodGhyb3VnaCBpbmNsdWRlL2xpbnV4L21tem9uZS5oLCBp
-bmNsdWRlL2xpbnV4L2dmcC5oLCBpbmNsdWRlL2xpbnV4L21tLmgsIC4uLik6DQo+ICAgIGluY2x1
-ZGUvbGludXgvcGFnZS1mbGFncy5oOjI0MDo0Njogc3BhcnNlOiBzcGFyc2U6IHNlbGYtY29tcGFy
-aXNvbiBhbHdheXMgZXZhbHVhdGVzIHRvIGZhbHNlDQo+ICAgIGluY2x1ZGUvbGludXgvcGFnZS1m
-bGFncy5oOjI0MDo0Njogc3BhcnNlOiBzcGFyc2U6IHNlbGYtY29tcGFyaXNvbiBhbHdheXMgZXZh
-bHVhdGVzIHRvIGZhbHNlDQo+IA0KPiB2aW0gKzI0MSBhcmNoL3g4Ni9rdm0vLi4vLi4vLi4vdmly
-dC9rdm0vY29hbGVzY2VkX21taW8uYw0KPiANCj4gICAgMjMxDQo+ICAgIDIzMiAgc3RhdGljIF9f
-cG9sbF90IGNvYWxlc2NlZF9tbWlvX2J1ZmZlcl9wb2xsKHN0cnVjdCBmaWxlICpmaWxlLCBzdHJ1
-Y3QgcG9sbF90YWJsZV9zdHJ1Y3QgKndhaXQpDQo+ICAgIDIzMyAgew0KPiAgICAyMzQgICAgICAg
-ICAgc3RydWN0IGt2bV9jb2FsZXNjZWRfbW1pb19idWZmZXJfZGV2ICpkZXYgPSBmaWxlLT5wcml2
-YXRlX2RhdGE7DQo+ICAgIDIzNSAgICAgICAgICBfX3BvbGxfdCBtYXNrID0gMDsNCj4gICAgMjM2
-DQo+ICAgIDIzNyAgICAgICAgICBwb2xsX3dhaXQoZmlsZSwgJmRldi0+d2FpdF9xdWV1ZSwgd2Fp
-dCk7DQo+ICAgIDIzOA0KPiAgICAyMzkgICAgICAgICAgc3Bpbl9sb2NrKCZkZXYtPnJpbmdfbG9j
-ayk7DQo+ICAgIDI0MCAgICAgICAgICBpZiAoZGV2LT5yaW5nICYmIChSRUFEX09OQ0UoZGV2LT5y
-aW5nLT5maXJzdCkgIT0gUkVBRF9PTkNFKGRldi0+cmluZy0+bGFzdCkpKQ0KPiAgPiAyNDEgICAg
-ICAgICAgICAgICAgICBtYXNrID0gUE9MTElOIHwgUE9MTFJETk9STTsNCg0KDQpUaGlzIG11c3Qg
-YmUgRVBPTExJTiB8IEVQT0xMUkROT1JNLCBidXQgSSB3aWxsIHdhaXQgZm9yIG1vcmUgZmVlZGJh
-Y2sgLw0KcmV2aWV3cyBiZWZvcmUgc2VuZGluZyBhbm90aGVyIHZlcnNpb24uDQoNCg0KSWxpYXMN
-Cg==
+Hi Markus,
+
+On Mon, Jul 22, 2024 at 03:33:13PM +0200, Markus Armbruster wrote:
+> Date: Mon, 22 Jul 2024 15:33:13 +0200
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
+> 
+> Zhao Liu <zhao1.liu@intel.com> writes:
+> 
+> > Introduce smp-cache object so that user could define cache properties.
+> >
+> > In smp-cache object, define cache topology based on CPU topology level
+> > with two reasons:
+> >
+> > 1. In practice, a cache will always be bound to the CPU container
+> >    (either private in the CPU container or shared among multiple
+> >    containers), and CPU container is often expressed in terms of CPU
+> >    topology level.
+> > 2. The x86's cache-related CPUIDs encode cache topology based on APIC
+> >    ID's CPU topology layout. And the ACPI PPTT table that ARM/RISCV
+> >    relies on also requires CPU containers to help indicate the private
+> >    shared hierarchy of the cache. Therefore, for SMP systems, it is
+> >    natural to use the CPU topology hierarchy directly in QEMU to define
+> >    the cache topology.
+> >
+> > Currently, separated L1 cache (L1 data cache and L1 instruction cache)
+> > with unified higher-level cache (e.g., unified L2 and L3 caches), is the
+> > most common cache architectures.
+> >
+> > Therefore, enumerate the L1 D-cache, L1 I-cache, L2 cache and L3 cache
+> > with smp-cache object to add the basic cache topology support.
+> >
+> > Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> 
+> [...]
+> 
+> > diff --git a/qapi/machine-common.json b/qapi/machine-common.json
+> > index 82413c668bdb..8b8c0e9eeb86 100644
+> > --- a/qapi/machine-common.json
+> > +++ b/qapi/machine-common.json
+> > @@ -64,3 +64,53 @@
+> >    'prefix': 'CPU_TOPO_LEVEL',
+> >    'data': [ 'invalid', 'thread', 'core', 'module', 'cluster',
+> >              'die', 'socket', 'book', 'drawer', 'default' ] }
+> > +
+> > +##
+> > +# @SMPCacheName:
+> 
+> Why the SMP in this name?  Because it's currently only used by SMP
+> stuff?  Or is there another reason I'm missing?
+
+Yes, I suppose it can only be used in SMP case.
+
+Because Intel's heterogeneous CPUs have different topologies for cache,
+for example, Alderlake's L2, for P core, L2 is per P-core, but for E
+core, L2 is per module (4 E cores per module). Thus I would like to keep
+the topology semantics of this object and -smp as consistent as possible.
+
+Do you agree?
+
+> The more idiomatic QAPI name would be SmpCacheName.  Likewise for the
+> other type names below.
+
+I hesitated here as well, but considering that SMPConfiguration is "SMP"
+and not "Smp", it has that name. I'll change to SmpCacheName for strict
+initial capitalization.
+
+> > +#
+> > +# An enumeration of cache for SMP systems.  The cache name here is
+> > +# a combination of cache level and cache type.
+> 
+> The first sentence feels awkward.  Maybe
+> 
+>    # Caches an SMP system may have.
+> 
+> > +#
+> > +# @l1d: L1 data cache.
+> > +#
+> > +# @l1i: L1 instruction cache.
+> > +#
+> > +# @l2: L2 (unified) cache.
+> > +#
+> > +# @l3: L3 (unified) cache
+> > +#
+> > +# Since: 9.1
+> > +##
+> 
+> This assumes the L1 cache is split, and L2 and L3 are unified.
+> 
+> If we model a system with say a unified L1 cache, we'd simply extend
+> this enum.  No real difference to extending it for additional levels.
+> Correct?
+
+Yes. For unified L1, we just need add a "l1" which is opposed to l1i/l1d.
+
+> > +{ 'enum': 'SMPCacheName',
+> > +  'prefix': 'SMP_CACHE',
+> 
+> Why not call it SmpCache, and ditch 'prefix'?
+
+Because the SMPCache structure in smp_cache.h uses the similar name:
+
++#define TYPE_SMP_CACHE "smp-cache"
++OBJECT_DECLARE_SIMPLE_TYPE(SMPCache, SMP_CACHE)
++
++struct SMPCache {
++    Object parent_obj;
++
++    SMPCacheProperty props[SMP_CACHE__MAX];
++};
+
+Naming is always difficult, so I would use Smpcache here if you feel that
+SmpCache is sufficient to distinguish it from SMPCache, or I would also
+rename the SMPCache structure to SMPCacheState in smp_cache.h.
+
+Which way do you prefer?
+
+> > +  'data': [ 'l1d', 'l1i', 'l2', 'l3' ] }
+> 
+> > +
+> > +##
+> > +# @SMPCacheProperty:
+> 
+> Sure we want to call this "property" (singular) and not "properties"?
+> What if we add members to this type?
+> 
+> > +#
+> > +# Cache information for SMP systems.
+> > +#
+> > +# @name: Cache name.
+> > +#
+> > +# @topo: Cache topology level.  It accepts the CPU topology
+> > +#     enumeration as the parameter, i.e., CPUs in the same
+> > +#     topology container share the same cache.
+> > +#
+> > +# Since: 9.1
+> > +##
+> > +{ 'struct': 'SMPCacheProperty',
+> > +  'data': {
+> > +  'name': 'SMPCacheName',
+> > +  'topo': 'CpuTopologyLevel' } }
+> 
+> We tend to avoid abbreviations in the QAPI schema.  Please consider
+> naming this 'topology'.
+
+Sure!
+
+> > +
+> > +##
+> > +# @SMPCacheProperties:
+> > +#
+> > +# List wrapper of SMPCacheProperty.
+> > +#
+> > +# @caches: the SMPCacheProperty list.
+> > +#
+> > +# Since 9.1
+> > +##
+> > +{ 'struct': 'SMPCacheProperties',
+> > +  'data': { 'caches': ['SMPCacheProperty'] } }
+> 
+> Ah, now I see why you used the singular above!
+> 
+> However, this type holds the properties of call caches.  It is a list
+> where each element holds the properties of a single cache.  Calling the
+> former "cache property" and the latter "cache properties" is confusing.
+
+Yes...
+
+> SmpCachesProperties and SmpCacheProperties would put the singular
+> vs. plural where it belongs.  Sounds a bit awkward to me, though.
+> Naming is hard.
+
+For SmpCachesProperties, it's easy to overlook the first "s".
+
+> Other ideas, anybody?
+
+Maybe SmpCacheOptions or SmpCachesPropertyWrapper?
+
+> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+> > index b1581988e4eb..25394f2cda50 100644
+> > --- a/qapi/qapi-schema.json
+> > +++ b/qapi/qapi-schema.json
+> > @@ -64,11 +64,11 @@
+> >  { 'include': 'compat.json' }
+> >  { 'include': 'control.json' }
+> >  { 'include': 'introspect.json' }
+> > -{ 'include': 'qom.json' }
+> > -{ 'include': 'qdev.json' }
+> >  { 'include': 'machine-common.json' }
+> >  { 'include': 'machine.json' }
+> >  { 'include': 'machine-target.json' }
+> > +{ 'include': 'qom.json' }
+> > +{ 'include': 'qdev.json' }
+> >  { 'include': 'replay.json' }
+> >  { 'include': 'yank.json' }
+> >  { 'include': 'misc.json' }
+> 
+> Worth explaining in the commit message, I think.
+
+Because of the include relationship between the json files, I need to
+change the order. I had a "crazy" proposal to clean up this:
+https://lore.kernel.org/qemu-devel/20240517062748.782366-1-zhao1.liu@intel.com/
+
+Thanks,
+Zhao
+
 
