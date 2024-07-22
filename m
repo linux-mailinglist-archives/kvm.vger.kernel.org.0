@@ -1,201 +1,77 @@
-Return-Path: <kvm+bounces-22054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22055-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9C13939016
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 15:46:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F287793905E
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 16:12:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E092819C2
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 13:46:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DCE91C215CF
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 14:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E2F16CD33;
-	Mon, 22 Jul 2024 13:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EC7E16D9D7;
+	Mon, 22 Jul 2024 14:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YMwQ0Whr"
+	dkim=pass (2048-bit key) header.d=cock.li header.i=@cock.li header.b="wNFXM39V"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from mail.cock.li (mail.cock.li [37.120.193.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7AC322E
-	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 13:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAC7D8F5E
+	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 14:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.120.193.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721655969; cv=none; b=AFiUciOmf4Re9A1aA9Z4bRVQqAszGUT9wjpk+uLQJF/bssKxkZbfpcXBMLmq2/O6MLS79uz9QKzJLb3dKc1b+AsjiGQ/XrQOXLoKFn+Hvsz5YE25K6CRsBVCNtoY11C2ygr0nAdZen8wagFM2wTBooSKXHz5J7kIrgB1nNXvg30=
+	t=1721657518; cv=none; b=A2e8LtSftJdsyllk26Drckx7PkM6IppfvS5QZQ60O2djATp4aClYixvY65xveQjW/hgEv30OtiXhbVxZ/mYDp4fq+i9df17ngBDQ/9axY34QIuA6g4bpd7sr6qByhTzsfg0ulQJhouSZrAamdZrtyI+QKYHCjh7f+lgROu+P6UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721655969; c=relaxed/simple;
-	bh=0VBpJCAF/a++txWiiz/0DTFqCVwBxK6I/Uf6ZwYzsFM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OcHu9OennSTQPe32G8pNRNZG8UUoHaQPWZH7mMFgvj74UoHJAWNgVcZnD/v1kzMXhbaYs/C0ir37ZIwSSV2kkcPcrbMQFr1KK1BkGMP2gmVo9IQScwMqzNX2i6/WlVpvREnuVgRrdKSGBUokREI1Fft81NGqmER2vBKZOmO/dqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YMwQ0Whr; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721655964; x=1753191964;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=0VBpJCAF/a++txWiiz/0DTFqCVwBxK6I/Uf6ZwYzsFM=;
-  b=YMwQ0Whr3MnAs0BYnhP9VXcVLtMKJ1FCDcE/B9aYYk2hx8/ykYYR6acQ
-   OIzo0qRZV/Yk0de4VUIz3cBan/NJOKyH7esMZSMpyFbarXJjjOTPivuMN
-   ElypYDX+98Aj0KKq1Q/G0umGNEnmRIWXuik49Kk6Vr6XV+O8tKf0GnyyR
-   eW13Pn7+SHjsCaRGg95wv3bjFNcl667OGHOyv6Xso9u1uqYXzwkfWV0HZ
-   o+PJBouYuM6FQ5ZOpTPwAl0j8r3BIWHkidwVBJI45uXClo70g+dDi5Dc4
-   tHLP10NPNFQfkh1+rfJXm/rFx2ah/zPXRQq2K/cvIF5ROoGp3OhTaazX/
-   Q==;
-X-CSE-ConnectionGUID: 5EV1JxJwRYiuOIBFW/tD+g==
-X-CSE-MsgGUID: yaQK3KQ6RNSBtHt2wXq1fQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11140"; a="19353451"
-X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
-   d="scan'208";a="19353451"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2024 06:46:04 -0700
-X-CSE-ConnectionGUID: KKANULJsSICbrZipe8omdg==
-X-CSE-MsgGUID: A6QV4KAqQ76bUFCb7lKS1Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
-   d="scan'208";a="51954848"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by fmviesa010.fm.intel.com with ESMTP; 22 Jul 2024 06:45:59 -0700
-Date: Mon, 22 Jul 2024 22:01:42 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [PATCH 1/8] hw/core: Make CPU topology enumeration arch-agnostic
-Message-ID: <Zp5mRrjuZWnE+9gz@intel.com>
-References: <20240704031603.1744546-1-zhao1.liu@intel.com>
- <20240704031603.1744546-2-zhao1.liu@intel.com>
- <875xsx4l13.fsf@pond.sub.org>
+	s=arc-20240116; t=1721657518; c=relaxed/simple;
+	bh=i1M8XGGbLmwXL8Jr7ZS2ULdyGUDyFOJ5ruEMLXoNAiA=;
+	h=MIME-Version:Content-Type:Date:From:To:Subject:Message-ID; b=TesjLUSxrWMvmrXKi3jBqv8VE6btqYWzGoIvm0vH+Lfp+oaXuO2n4sv+CJHofBugBVxFLIx1juaUFJ2EzFKnXsVnWrruK8gX3kSzld76DJy5ytEBfCAdmockA8tEaYjxcA/uq52Q0ZzaSCC8ntEXFDCWzhVhtBNKUvcCBQWMUR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cock.li; spf=pass smtp.mailfrom=cock.li; dkim=pass (2048-bit key) header.d=cock.li header.i=@cock.li header.b=wNFXM39V; arc=none smtp.client-ip=37.120.193.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cock.li
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cock.li
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <875xsx4l13.fsf@pond.sub.org>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=cock.li; s=mail;
+	t=1721657502; bh=i1M8XGGbLmwXL8Jr7ZS2ULdyGUDyFOJ5ruEMLXoNAiA=;
+	h=Date:From:To:Subject:From;
+	b=wNFXM39VP2fdXWJdRFhtydE6R+2fbhEgsm18TOnvLi12+wRcObC05BrECG+Y8Bm6s
+	 EZeo0Op92px1nErs5vDTPqASnsWjksry1SjFaQriilRyVl6fOz9mwHBw45ae8fZlkx
+	 kUSZQRKN8zDD2BFIPonyC0g886FuJegH2yh+Wyl4HB/mic9LnBEciCozM7K1vAIfFa
+	 1ATI/ooFLcHnYNmrPmgdtBfJOARTzROzNRNfeJqq6ZZn5/+FHP9sWm+WhRe7Z7Wu0q
+	 ukITXCBSRVyZFU45zhvinH3QGYDoo900kyb6WqWSd7z8lRGbIYa6Ils8nhA58o+MqL
+	 0h4VxIzRwevwg==
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date: Mon, 22 Jul 2024 10:11:33 -0400
+From: privacymiscoccasion@cock.li
+To: kvm@vger.kernel.org
+Subject: [USB Isolation] USB virt drivers access between guests instead of
+ host -> guest?
+User-Agent: Roundcube Webmail/1.4.15
+Message-ID: <23f30de150579d4893a493a6385f69f6@cock.li>
+X-Sender: privacymiscoccasion@cock.li
 
-Hi Markus,
+Hi everyone,
 
-On Mon, Jul 22, 2024 at 03:24:24PM +0200, Markus Armbruster wrote:
-> Date: Mon, 22 Jul 2024 15:24:24 +0200
-> From: Markus Armbruster <armbru@redhat.com>
-> Subject: Re: [PATCH 1/8] hw/core: Make CPU topology enumeration
->  arch-agnostic
-> 
-> One little thing...
-> 
-> Zhao Liu <zhao1.liu@intel.com> writes:
-> 
-> > Cache topology needs to be defined based on CPU topology levels. Thus,
-> > define CPU topology enumeration in qapi/machine.json to make it generic
-> > for all architectures.
-> >
-> > To match the general topology naming style, rename CPU_TOPO_LEVEL_SMT
-> > and CPU_TOPO_LEVEL_PACKAGE to CPU_TOPO_LEVEL_THREAD and
-> > CPU_TOPO_LEVEL_SOCKET.
-> >
-> > Also, enumerate additional topology levels for non-i386 arches, and add
-> > a CPU_TOPO_LEVEL_DEFAULT to help future smp-cache object de-compatibilize
-> > arch-specific cache topology settings.
-> >
-> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> 
-> [...]
-> 
-> > diff --git a/qapi/machine-common.json b/qapi/machine-common.json
-> > index fa6bd71d1280..82413c668bdb 100644
-> > --- a/qapi/machine-common.json
-> > +++ b/qapi/machine-common.json
-> > @@ -5,7 +5,7 @@
-> >  # See the COPYING file in the top-level directory.
-> >  
-> >  ##
-> > -# = Machines S390 data types
-> > +# = Common machine types
-> >  ##
-> >  
-> >  ##
-> > @@ -19,3 +19,48 @@
-> >  { 'enum': 'CpuS390Entitlement',
-> >    'prefix': 'S390_CPU_ENTITLEMENT',
-> >    'data': [ 'auto', 'low', 'medium', 'high' ] }
-> > +
-> > +##
-> > +# @CpuTopologyLevel:
-> > +#
-> > +# An enumeration of CPU topology levels.
-> > +#
-> > +# @invalid: Invalid topology level.
-> > +#
-> > +# @thread: thread level, which would also be called SMT level or
-> > +#     logical processor level.  The @threads option in
-> > +#     SMPConfiguration is used to configure the topology of this
-> > +#     level.
-> > +#
-> > +# @core: core level.  The @cores option in SMPConfiguration is used
-> > +#     to configure the topology of this level.
-> > +#
-> > +# @module: module level.  The @modules option in SMPConfiguration is
-> > +#     used to configure the topology of this level.
-> > +#
-> > +# @cluster: cluster level.  The @clusters option in SMPConfiguration
-> > +#     is used to configure the topology of this level.
-> > +#
-> > +# @die: die level.  The @dies option in SMPConfiguration is used to
-> > +#     configure the topology of this level.
-> > +#
-> > +# @socket: socket level, which would also be called package level.
-> > +#     The @sockets option in SMPConfiguration is used to configure
-> > +#     the topology of this level.
-> > +#
-> > +# @book: book level.  The @books option in SMPConfiguration is used
-> > +#     to configure the topology of this level.
-> > +#
-> > +# @drawer: drawer level.  The @drawers option in SMPConfiguration is
-> > +#     used to configure the topology of this level.
-> > +#
-> > +# @default: default level.  Some architectures will have default
-> > +#     topology settings (e.g., cache topology), and this special
-> > +#     level means following the architecture-specific settings.
-> > +#
-> > +# Since: 9.1
-> > +##
-> > +{ 'enum': 'CpuTopologyLevel',
-> > +  'prefix': 'CPU_TOPO_LEVEL',
-> 
-> Why set a 'prefix'?
-> 
+I'm coming over from reading about Qubes OS, which uses the Xen 
+hypervisor. In Qubes, the way that untrusted devices like USBs are 
+handled is that they are pass through to a VM, which then (I presume) 
+allows other guests to access them using virtual drivers.
 
-Because my previous i386 commit 6ddeb0ec8c29 ("i386/cpu: Introduce bitmap
-to cache available CPU topology levels") introduced the level
-enumeration with such prefix. For naming consistency, and to shorten the
-length of the name, I've used the same prefix here as well.
+I'm looking for a theoretical explanation on how this would be possible 
+with KVM. I am not a developer and thus am having difficulty 
+understanding how one would let a guest access virtual drivers 
+connecting to hardware devices like USB and PCIe from another guest.
 
-I've sensed that you don't like the TOPO abbreviation and I'll remove the
-prefix :-).
+Any help/practical examples of this would be greatly appreciated. This 
+seems to be a hard topic to find and so far I haven't come across 
+anything like this.
 
-Thanks,
-Zhao
-
-
+Thanks!
 
