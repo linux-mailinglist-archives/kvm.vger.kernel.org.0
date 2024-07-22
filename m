@@ -1,198 +1,201 @@
-Return-Path: <kvm+bounces-22053-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22054-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8F50939013
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 15:45:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9C13939016
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 15:46:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB3481C20FF6
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 13:45:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E092819C2
+	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 13:46:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA73D16D4D1;
-	Mon, 22 Jul 2024 13:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2E2F16CD33;
+	Mon, 22 Jul 2024 13:46:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a+BLWLaN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YMwQ0Whr"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D39716D4D7;
-	Mon, 22 Jul 2024 13:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B7AC322E
+	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 13:46:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721655907; cv=none; b=PvO5HyDqKGroJGJUBF3sqYSVUFzaLJC/hFnaM1FIEadt7wP4mvJS8BTbJACI42cBy0709oD1jDfaFazEznxnXhmRtXimG2zftaREliwrzxnGcGNHkbyQ+X+NZTN/paGI04aFmc1OWZ9jFFixcVcuTdr3aYuYiiGKq9Ry++WsyXU=
+	t=1721655969; cv=none; b=AFiUciOmf4Re9A1aA9Z4bRVQqAszGUT9wjpk+uLQJF/bssKxkZbfpcXBMLmq2/O6MLS79uz9QKzJLb3dKc1b+AsjiGQ/XrQOXLoKFn+Hvsz5YE25K6CRsBVCNtoY11C2ygr0nAdZen8wagFM2wTBooSKXHz5J7kIrgB1nNXvg30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721655907; c=relaxed/simple;
-	bh=EtYS+d6x6zLgneJBI6SyZHqmcURZgGiQbSt+k/yrGsI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KAQEcswFEl5a8CyHJpik2q5eQVYn0f6CXW1/vpVM+S4ZybtgAynniY25Hiab1xPFrLELBZMpAkFya85EoBkioAuBoEnM5ZV7ovnurTWYeNpSBYPvfcg66jw7vw1nguo1+6OUbwl0rJqcRUfcpn2o89C823ouXlWMWBO1oZcyCKo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a+BLWLaN; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-58f9874aeb4so3222317a12.0;
-        Mon, 22 Jul 2024 06:45:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1721655904; x=1722260704; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8XGZ/9NOo05JXkZW6LQJzWemV3G3cXpXy4U7z9X0yZE=;
-        b=a+BLWLaNNphKvkqSwBNjk8ECnePtAAS1h1J3K/GC3dRUmOSA3Q5Xr2IKE1QxvNVrT+
-         z0UWc7Lep4Y4Vfz4nRnNWCQ8IJ3nQnJbj8AD4UrJIAXf/PvnMjJRdXRjwSTdHYU9mt31
-         ajV7QkS+XomRRwvWljFfDYruohgPkgj9k2HyB0cAwmGcmdHqa5A41MSPNmcMBdHqKy3R
-         tMZu/g03cy0ckqUWHD1IFytb4WDGX0hpnsyGc4W+1ioAdCmcnCYNiYJBcMtFQ7L+nzn7
-         WflqGAQUOLWijs3sVBS/hkkZmw/ITSdEsMEa/DRalwbvIc2RustT2yui5Bk+8I8hDLMM
-         ddqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721655904; x=1722260704;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8XGZ/9NOo05JXkZW6LQJzWemV3G3cXpXy4U7z9X0yZE=;
-        b=X5UbvseOoB/oxBqe+YNEjOvaijEPi2DSI6iUweix+hIIHW8qP3sGYe4hCiGUItHVDM
-         aJ9ESH5nUK7e8vNcCTaGCBTr4/uSfoprT2IrimQxbGh5V9hJ8ZPqyUMiByxskyrE4dBJ
-         GsSXsRx1LQEi8EDJ6dYKx7UifaAKVc9sdfUY4Yn2NAaHzf5/Civ9O/DHOHrPLMcxYWvk
-         J7EUYX/MwaMJW2eFW4wgheHaqjsOooFDsu3u/oIJFhP8vI+LcI44QV2HgCoGHCnmJ1an
-         zpv6kX/ckOJ41Fil27W91StlGdILKlxr3+t6j8g8WH/edG1QmJr7QOAIdC1ED8VPrlAr
-         hhSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWD4D/xYg75kOppEQF4gmPQz8YOc1P4Hp0iKdOQLWLhl1mirKu1YLZ7h2+iuCywJsPC7iZk0A49CPfThDB3fi2su5S+LUjHVvWd8st7B3ik4FY0Jqs0VQnbIpVW+n6CftcR
-X-Gm-Message-State: AOJu0YwBc28ImzKV40e818yeeim1+LG375ZJX2MkVBK8/886W3Eo6clb
-	dGNaEnxVje56sKfF8DXTwc+mjyWdMwdR4hWYBN2EeRuQPHA7I776
-X-Google-Smtp-Source: AGHT+IGUpWLi5KINnrnH7j9LvFAUyxJ8tqxAzN0mqU6WDSVaJ2/vZq9nKb36lvhw4w/P1SfhYGpj2w==
-X-Received: by 2002:a05:6402:3553:b0:5a3:55a5:39f1 with SMTP id 4fb4d7f45d1cf-5a3eee825afmr5637335a12.13.1721655903441;
-        Mon, 22 Jul 2024 06:45:03 -0700 (PDT)
-Received: from [192.168.178.20] (dh207-42-168.xnet.hr. [88.207.42.168])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5a436f0eac2sm4639266a12.52.2024.07.22.06.45.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 22 Jul 2024 06:45:02 -0700 (PDT)
-Message-ID: <d8ad6d4a-148b-4ca4-9e9c-8dcce0274b3f@gmail.com>
-Date: Mon, 22 Jul 2024 15:44:56 +0200
+	s=arc-20240116; t=1721655969; c=relaxed/simple;
+	bh=0VBpJCAF/a++txWiiz/0DTFqCVwBxK6I/Uf6ZwYzsFM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OcHu9OennSTQPe32G8pNRNZG8UUoHaQPWZH7mMFgvj74UoHJAWNgVcZnD/v1kzMXhbaYs/C0ir37ZIwSSV2kkcPcrbMQFr1KK1BkGMP2gmVo9IQScwMqzNX2i6/WlVpvREnuVgRrdKSGBUokREI1Fft81NGqmER2vBKZOmO/dqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YMwQ0Whr; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721655964; x=1753191964;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0VBpJCAF/a++txWiiz/0DTFqCVwBxK6I/Uf6ZwYzsFM=;
+  b=YMwQ0Whr3MnAs0BYnhP9VXcVLtMKJ1FCDcE/B9aYYk2hx8/ykYYR6acQ
+   OIzo0qRZV/Yk0de4VUIz3cBan/NJOKyH7esMZSMpyFbarXJjjOTPivuMN
+   ElypYDX+98Aj0KKq1Q/G0umGNEnmRIWXuik49Kk6Vr6XV+O8tKf0GnyyR
+   eW13Pn7+SHjsCaRGg95wv3bjFNcl667OGHOyv6Xso9u1uqYXzwkfWV0HZ
+   o+PJBouYuM6FQ5ZOpTPwAl0j8r3BIWHkidwVBJI45uXClo70g+dDi5Dc4
+   tHLP10NPNFQfkh1+rfJXm/rFx2ah/zPXRQq2K/cvIF5ROoGp3OhTaazX/
+   Q==;
+X-CSE-ConnectionGUID: 5EV1JxJwRYiuOIBFW/tD+g==
+X-CSE-MsgGUID: yaQK3KQ6RNSBtHt2wXq1fQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11140"; a="19353451"
+X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
+   d="scan'208";a="19353451"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jul 2024 06:46:04 -0700
+X-CSE-ConnectionGUID: KKANULJsSICbrZipe8omdg==
+X-CSE-MsgGUID: A6QV4KAqQ76bUFCb7lKS1Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,228,1716274800"; 
+   d="scan'208";a="51954848"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa010.fm.intel.com with ESMTP; 22 Jul 2024 06:45:59 -0700
+Date: Mon, 22 Jul 2024 22:01:42 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH 1/8] hw/core: Make CPU topology enumeration arch-agnostic
+Message-ID: <Zp5mRrjuZWnE+9gz@intel.com>
+References: <20240704031603.1744546-1-zhao1.liu@intel.com>
+ <20240704031603.1744546-2-zhao1.liu@intel.com>
+ <875xsx4l13.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: =?UTF-8?Q?Re=3A_=5BBUG=5D_arch/x86/kvm/vmx/pmu=5Fintel=2Ec=3A54=3A_?=
- =?UTF-8?Q?error=3A_dereference_of_NULL_=E2=80=98pmc=E2=80=99_=5BCWE-476=5D?=
-To: Jim Mattson <jmattson@google.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org,
- Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org,
- Like Xu <likexu@tencent.com>
-References: <c42bff52-1058-4bff-be90-5bab45ed57be@gmail.com>
- <ZpqgfETiBXfBfFqU@google.com>
- <70137930-fea1-4d45-b453-e6ae984c4b2b@gmail.com>
- <Zpq9Bp7T_AdbVhmP@google.com>
- <824a0819-a09d-40ac-820c-f7975aee1dae@gmail.com>
- <CALMp9eStzLK7kQY41b37zvZuR7UVzOD+W7vDPhyKXYPDhUww0g@mail.gmail.com>
-Content-Language: en-US
-From: Mirsad Todorovac <mtodorovac69@gmail.com>
-In-Reply-To: <CALMp9eStzLK7kQY41b37zvZuR7UVzOD+W7vDPhyKXYPDhUww0g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <875xsx4l13.fsf@pond.sub.org>
 
+Hi Markus,
 
-
-On 7/19/24 22:14, Jim Mattson wrote:
-> On Fri, Jul 19, 2024 at 12:41 PM Mirsad Todorovac
-> <mtodorovac69@gmail.com> wrote:
->>
->>
->>
->> On 7/19/24 21:22, Sean Christopherson wrote:
->>> On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
->>>> On 7/19/24 19:21, Sean Christopherson wrote:
->>>>> On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
->>>>>> Hi,
->>>>>>
->>>>>> In the build of 6.10.0 from stable tree, the following error was detected.
->>>>>>
->>>>>> You see that the function get_fixed_pmc() can return NULL pointer as a result
->>>>>> if msr is outside of [base, base + pmu->nr_arch_fixed_counters) interval.
->>>>>>
->>>>>> kvm_pmu_request_counter_reprogram(pmc) is then called with that NULL pointer
->>>>>> as the argument, which expands to .../pmu.h
->>>>>>
->>>>>> #define pmc_to_pmu(pmc)   (&(pmc)->vcpu->arch.pmu)
->>>>>>
->>>>>> which is a NULL pointer dereference in that speculative case.
->>>>>
->>>>> I'm somewhat confused.  Did you actually hit a BUG() due to a NULL-pointer
->>>>> dereference, are you speculating that there's a bug, or did you find some speculation
->>>>> issue with the CPU?
->>>>>
->>>>> It should be impossible for get_fixed_pmc() to return NULL in this case.  The
->>>>> loop iteration is fully controlled by KVM, i.e. 'i' is guaranteed to be in the
->>>>> ranage [0..pmu->nr_arch_fixed_counters).
->>>>>
->>>>> And the input @msr is "MSR_CORE_PERF_FIXED_CTR0 +i", so the if-statement expands to:
->>>>>
->>>>>     if (MSR_CORE_PERF_FIXED_CTR0 + [0..pmu->nr_arch_fixed_counters) >= MSR_CORE_PERF_FIXED_CTR0 &&
->>>>>         MSR_CORE_PERF_FIXED_CTR0 + [0..pmu->nr_arch_fixed_counters) < MSR_CORE_PERF_FIXED_CTR0 + pmu->nr_arch_fixed_counters)
->>>>>
->>>>> i.e. is guaranteed to evaluate true.
->>>>>
->>>>> Am I missing something?
->>>>
->>>> Hi Sean,
->>>>
->>>> Thank you for replying promptly.
->>>>
->>>> Perhaps I should have provided the GCC error report in the first place.
->>>
->>> Yes, though the report itself is somewhat secondary, what matters the most is how
->>> you found the bug and how to reproduce the failure.  Critically, IIUC, this requires
->>> analyzer-null-dereference, which AFAIK isn't even enabled by W=1, let alone a base
->>> build.
->>>
->>> Please see the 0-day bot's reports[*] for a fantastic example of how to report
->>> things that are found by non-standard (by kernel standards) means.
->>>
->>> In general, I suspect that analyzer-null-dereference will generate a _lot_ of
->>> false positives, and is probably not worth reporting unless you are absolutely
->>> 100% certain there's a real bug.  I (and most maintainers) am happy to deal with
->>> false positives here and there _if_ the signal to noise ratio is high.  But if
->>> most reports are false positives, they'll likely all end up getting ignored.
->>>
->>> [*] https://lore.kernel.org/all/202406111250.d8XtA9SC-lkp@intel.com
->>
->> I think I understood the meaning between the lines.
->>
->> However, to repeat the obvious, reducing the global dependencies simplifies the readability
->> and the logical proof of the code. :-/
+On Mon, Jul 22, 2024 at 03:24:24PM +0200, Markus Armbruster wrote:
+> Date: Mon, 22 Jul 2024 15:24:24 +0200
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [PATCH 1/8] hw/core: Make CPU topology enumeration
+>  arch-agnostic
 > 
-> Comments would also help. :)
+> One little thing...
 > 
->> Needless to say, dividing into pure functions and const functions reduces the number of
->> dependencies, as it is N × (N - 1), sqr (N).
->>
->> For example, if a condition is always true, but the compiler cannot deduce it from code,
->> there is something odd.
->>
->> CONCLUSION: If this generated 5 out of 5 false positives, then I might be giving up on this
->> as a waste of your time.
->>
->> However, it was great fun analysing x86 KVM code. :-)
+> Zhao Liu <zhao1.liu@intel.com> writes:
 > 
-> I assure you that there are plenty of actual bugs in KVM. This tool
-> just isn't finding them.
+> > Cache topology needs to be defined based on CPU topology levels. Thus,
+> > define CPU topology enumeration in qapi/machine.json to make it generic
+> > for all architectures.
+> >
+> > To match the general topology naming style, rename CPU_TOPO_LEVEL_SMT
+> > and CPU_TOPO_LEVEL_PACKAGE to CPU_TOPO_LEVEL_THREAD and
+> > CPU_TOPO_LEVEL_SOCKET.
+> >
+> > Also, enumerate additional topology levels for non-i386 arches, and add
+> > a CPU_TOPO_LEVEL_DEFAULT to help future smp-cache object de-compatibilize
+> > arch-specific cache topology settings.
+> >
+> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> 
+> [...]
+> 
+> > diff --git a/qapi/machine-common.json b/qapi/machine-common.json
+> > index fa6bd71d1280..82413c668bdb 100644
+> > --- a/qapi/machine-common.json
+> > +++ b/qapi/machine-common.json
+> > @@ -5,7 +5,7 @@
+> >  # See the COPYING file in the top-level directory.
+> >  
+> >  ##
+> > -# = Machines S390 data types
+> > +# = Common machine types
+> >  ##
+> >  
+> >  ##
+> > @@ -19,3 +19,48 @@
+> >  { 'enum': 'CpuS390Entitlement',
+> >    'prefix': 'S390_CPU_ENTITLEMENT',
+> >    'data': [ 'auto', 'low', 'medium', 'high' ] }
+> > +
+> > +##
+> > +# @CpuTopologyLevel:
+> > +#
+> > +# An enumeration of CPU topology levels.
+> > +#
+> > +# @invalid: Invalid topology level.
+> > +#
+> > +# @thread: thread level, which would also be called SMT level or
+> > +#     logical processor level.  The @threads option in
+> > +#     SMPConfiguration is used to configure the topology of this
+> > +#     level.
+> > +#
+> > +# @core: core level.  The @cores option in SMPConfiguration is used
+> > +#     to configure the topology of this level.
+> > +#
+> > +# @module: module level.  The @modules option in SMPConfiguration is
+> > +#     used to configure the topology of this level.
+> > +#
+> > +# @cluster: cluster level.  The @clusters option in SMPConfiguration
+> > +#     is used to configure the topology of this level.
+> > +#
+> > +# @die: die level.  The @dies option in SMPConfiguration is used to
+> > +#     configure the topology of this level.
+> > +#
+> > +# @socket: socket level, which would also be called package level.
+> > +#     The @sockets option in SMPConfiguration is used to configure
+> > +#     the topology of this level.
+> > +#
+> > +# @book: book level.  The @books option in SMPConfiguration is used
+> > +#     to configure the topology of this level.
+> > +#
+> > +# @drawer: drawer level.  The @drawers option in SMPConfiguration is
+> > +#     used to configure the topology of this level.
+> > +#
+> > +# @default: default level.  Some architectures will have default
+> > +#     topology settings (e.g., cache topology), and this special
+> > +#     level means following the architecture-specific settings.
+> > +#
+> > +# Since: 9.1
+> > +##
+> > +{ 'enum': 'CpuTopologyLevel',
+> > +  'prefix': 'CPU_TOPO_LEVEL',
+> 
+> Why set a 'prefix'?
+> 
 
-Well, this series of reports did not target KVM. It was accidental that GCC static analyser
-reported those dubious false positives first.
+Because my previous i386 commit 6ddeb0ec8c29 ("i386/cpu: Introduce bitmap
+to cache available CPU topology levels") introduced the level
+enumeration with such prefix. For naming consistency, and to shorten the
+length of the name, I've used the same prefix here as well.
 
-Best regards,
-Mirsad Todorovac
- 
->> Sort of cool that you guys on Google consider bug report from nobody admins from the
->> universities ;-)
->>
->> Best regards,
->> Mirsad Todorovac
->>
+I've sensed that you don't like the TOPO abbreviation and I'll remove the
+prefix :-).
+
+Thanks,
+Zhao
+
+
 
