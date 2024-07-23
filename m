@@ -1,152 +1,190 @@
-Return-Path: <kvm+bounces-22085-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22086-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91AAB9398FA
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 06:51:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0E4B939935
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 07:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48E2D1F21F06
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 04:51:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FDAC1F228E6
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 05:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36E313C677;
-	Tue, 23 Jul 2024 04:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5854213C3D5;
+	Tue, 23 Jul 2024 05:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cock.li header.i=@cock.li header.b="dEqzU1sq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RcRbySwS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.cock.li (mail.cock.li [37.120.193.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B8D28E8
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 04:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.120.193.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E521313BC0B
+	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 05:35:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721710270; cv=none; b=tT2+AICKt+ebogfzMV9AUe5rWb5GO8tvojXiWzdeyPpFKYC6IjlnRe62iWH494WO+K0S8HWseAaZekisX2+kZFrhvkmNAw9r4TNmKwIsQfRj3Pd/QE0bsZGULW2Xx2FLn3zXi4EWm0J1MQ29eydaWZUJLlb9uXHaaZOtiqeXG5I=
+	t=1721712949; cv=none; b=FHYCEER9WVolwTN6SfTfU4bfStk3dLjgIYq6OEkH0zzmKMNkEjtI/gojrGYdfriPh9M+h6feFtGuttHsI1AnDw4umVbXjaDEAvvyRk7wcV8uyX60RW6efd1e5ArKIhYujeQwiQuarhH940bn19bl/pWUs8bltC8qIplMYV5Y8A8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721710270; c=relaxed/simple;
-	bh=hv+3L5bobthEw+1uL4XN1T59O7s9qRsBWiFwJpl0x6c=;
-	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
-	 References:Message-ID; b=M7Tkz99Z7fRonpvQOHTv69fGgVzq3DU8KINN71bc0NjryKt9F3IFA9NblmnxEbf7w7Td8Kyb/VRFV2NcchtLlDT8p5A05cmrlbyYiIjTR8Dez2e8GWU2Pu9AxNrWHh5WvJb10QGbqQM8JIRpr9UXgYy99yFOzviH4YnzJTLKJB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cock.li; spf=pass smtp.mailfrom=cock.li; dkim=pass (2048-bit key) header.d=cock.li header.i=@cock.li header.b=dEqzU1sq; arc=none smtp.client-ip=37.120.193.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=cock.li
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cock.li
+	s=arc-20240116; t=1721712949; c=relaxed/simple;
+	bh=VtdTtInp8xltP7woCl3ZLIkQdg2goHxfX1mvCYp/CEE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mofK9Wo1THRlVhZe2L32lCo3W1n1mWxVYa5/Eol1y5QMDvix2b9XgpOGN/0fq3rKw/cKq0Yryj2mkpE7Tsa1i5mFW7jLWBL3uo3DXNUj1aC5AGRPrGhUWdLJNvB4HFZHNtcQCsu/fioyX45ST5ygW1vuKP+ic6zC+lcunO4FXME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RcRbySwS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721712947;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aW1THt75DeB8IkjnkNQ5OOu8ISWACnD4UYq7Ars9y+U=;
+	b=RcRbySwSlozET+EXv+piXKcb12kDS6f6ED/2Fr0tPy4FzxVo0Ze1KldNT42VaGoW1YaZZI
+	MY1m1Cws7y2I4vO5b21gRp91vNJ2tmaCYgejtswVsQ8UuIw9xtjrcNd4+LWwhUsJMQ7jhq
+	H0vT50uq8gNtgnsHK4a/6L8z6CqHh5Q=
+Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
+ [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-682-kCqIx7wrOyeKFm9IyobqAQ-1; Tue, 23 Jul 2024 01:35:43 -0400
+X-MC-Unique: kCqIx7wrOyeKFm9IyobqAQ-1
+Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-70d1cc32058so1643006b3a.2
+        for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 22:35:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721712942; x=1722317742;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aW1THt75DeB8IkjnkNQ5OOu8ISWACnD4UYq7Ars9y+U=;
+        b=i5UUVGFRt6eI5U2XErVawSIluj9LGrrc5dK9EzNcLsF3cQizi5d1kRWeEDUa9mXy1/
+         uby55/soVBLpS7XyYezKho6vj3Nwl907G4cz2wpWPkdNRW4ggzqPnbkrWnSoue4Ust4+
+         fDsSfy61wNjLAX3V4lZBeq7BW9reUEqUDy/3GNR+sqbMqYHfApbIVSiAm4FUd16bf6dY
+         i1365zxpW7QUCuIVrgSQW9GHzDXriVpNQYqLDhCmLU9zgfJeVTPnPXVldTOdPt1koVyj
+         NOtFjzNuw5Kw98D6wHS9SkiubbSWCuBWQNStitpDT9T4hbzITdpfnoDf/GpBo1PqQohs
+         b3UQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlEbWVz4hiV+fCDC6tb354os+54pNotXbYUFA7ghxM6c9FsW4J+NE6VdotbQyoxoyWds0qrBtF/Oau1cTrbaYS3hpn
+X-Gm-Message-State: AOJu0YxyIwUE+pvOMKt86Y5/6S7G2KPS0mjvedDm4qOhKtd377IgGGDc
+	BGD/oaG4zuZlLmqffMxxjWvV93ZjjMJ2CmgS0vUZZlIIiE+MgFUgxUfZR5uKsmHtftPBTtSYw11
+	iyVvC12uMOVyFxTV4UKl9ioewVnNCnXpOZwFGXHQkQH9cn/s+Xw==
+X-Received: by 2002:a05:6a20:841c:b0:1c2:9cbf:cc3e with SMTP id adf61e73a8af0-1c4285dfbb7mr8095010637.45.1721712942169;
+        Mon, 22 Jul 2024 22:35:42 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFUfgk+Po+fWXzUtaVQDwmY3IatFJXFV7UxMV0i7PuLgsZH5vwiyfgOw2C73FeYVdG6yKkjMw==
+X-Received: by 2002:a05:6a20:841c:b0:1c2:9cbf:cc3e with SMTP id adf61e73a8af0-1c4285dfbb7mr8094992637.45.1721712941776;
+        Mon, 22 Jul 2024 22:35:41 -0700 (PDT)
+Received: from [192.168.68.54] ([43.252.112.134])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-79f0ba12970sm4760247a12.50.2024.07.22.22.35.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 22 Jul 2024 22:35:40 -0700 (PDT)
+Message-ID: <682d62b8-6cca-4782-b4e4-ffd2a706fadf@redhat.com>
+Date: Tue, 23 Jul 2024 15:35:33 +1000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=cock.li; s=mail;
-	t=1721710264; bh=hv+3L5bobthEw+1uL4XN1T59O7s9qRsBWiFwJpl0x6c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=dEqzU1sqf7QYxhmhxhvg5CGKKOneW74qUT67adFZcrIQ4tFs/Rv0yLwCCNjF38djT
-	 v9Qn1dIPgvREObeXHNcWb3HIjDvrLaPGvv+V2PX3srpF408Ao31hB9BROuCTcrFn2n
-	 Qb9JtGy1wzLB+6Sv5Xvo92q1XIhajM5OnRP2jRbjaK9+XbBbEHfru+e9ygACfjOxln
-	 D9bdKEjcI96bBVzhb11aH536snbOtTaKFutNXhXOwl8tEtKe9fXK97QC7qa6P+B1vv
-	 qxFCvEP/y7x46ucJBiK5feYXxiDUHMiu09JxdQc0MELhvUJ4+T9/ToCTCD5kLY0QDj
-	 oqO/SeAcIQ5Ag==
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date: Tue, 23 Jul 2024 00:51:03 -0400
-From: privacymiscoccasion@cock.li
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org
-Subject: Re: [USB Isolation] USB virt drivers access between guests instead of
- host -> guest?
-In-Reply-To: <93ca9700dfce8ea0812e345bcbbf45cd@cock.li>
-References: <23f30de150579d4893a493a6385f69f6@cock.li>
- <Zp7rfbJpNDyhaZQO@google.com> <93ca9700dfce8ea0812e345bcbbf45cd@cock.li>
-User-Agent: Roundcube Webmail/1.4.15
-Message-ID: <22caf4df8c982e41ac26275a7a7eba79@cock.li>
-X-Sender: privacymiscoccasion@cock.li
-Return-Receipt-To: privacymiscoccasion@cock.li
-Disposition-Notification-To: privacymiscoccasion@cock.li
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/15] arm64: rsi: Add RSI definitions
+To: Steven Price <steven.price@arm.com>, kvm@vger.kernel.org,
+ kvmarm@lists.linux.dev
+Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <20240701095505.165383-2-steven.price@arm.com>
+ <3b1c8387-f40f-4841-b2b3-9e4dc1e35efc@redhat.com>
+ <3b2ddd79-c7f0-4d41-8795-13d1305e3d08@arm.com>
+Content-Language: en-US
+From: Gavin Shan <gshan@redhat.com>
+In-Reply-To: <3b2ddd79-c7f0-4d41-8795-13d1305e3d08@arm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2024-07-22 22:39, privacymiscoccasion@cock.li wrote:
-> On 2024-07-22 19:30, Sean Christopherson wrote:
->> On Mon, Jul 22, 2024, privacymiscoccasion@cock.li wrote:
->>> Hi everyone,
->>> 
->>> I'm coming over from reading about Qubes OS, which uses the Xen 
->>> hypervisor.
->>> In Qubes, the way that untrusted devices like USBs are handled is 
->>> that they
->>> are pass through to a VM, which then (I presume) allows other guests 
->>> to
->>> access them using virtual drivers.
->>> 
->>> I'm looking for a theoretical explanation on how this would be 
->>> possible with
->>> KVM. I am not a developer and thus am having difficulty understanding 
->>> how
->>> one would let a guest access virtual drivers connecting to hardware 
->>> devices
->>> like USB and PCIe from another guest.
->>> 
->>> Any help/practical examples of this would be greatly appreciated. 
->>> This seems
->>> to be a hard topic to find and so far I haven't come across anything 
->>> like
->>> this.
->> 
->> In Linux, this would be done via VFIO[1].  VFIO allows assigning 
->> devices to host
->> userspace, and thus to KVM guests.  Very rougly speaking, most assets 
->> that get
->> exposed to KVM guests are proxied through host userspace.  I haven't 
->> actually
->> read the DPDK docs[2], but if you get stuck with VFIO in particular, 
->> my guess is
->> that they're a good starting point (beyond any VFIO+KVM tutorials).
->> 
->> [1] https://docs.kernel.org/driver-api/vfio.html
->> [2] https://doc.dpdk.org/guides/linux_gsg/linux_drivers.html
+On 7/11/24 1:34 AM, Steven Price wrote:
+> On 09/07/2024 06:19, Gavin Shan wrote:
+>> On 7/1/24 7:54 PM, Steven Price wrote:
+>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>>
+>>> The RMM (Realm Management Monitor) provides functionality that can be
+>>> accessed by a realm guest through SMC (Realm Services Interface) calls.
+>>>
+>>> The SMC definitions are based on DEN0137[1] version A-eac5.
+>>>
+>>> [1] https://developer.arm.com/documentation/den0137/latest
+>>>
+>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
+>>> Signed-off-by: Steven Price <steven.price@arm.com>
+>>> ---
+>>> Changes since v3:
+>>>    * Drop invoke_rsi_fn_smc_with_res() function and call arm_smccc_smc()
+>>>      directly instead.
+>>>    * Rename header guard in rsi_smc.h to be consistent.
+>>> Changes since v2:
+>>>    * Rename rsi_get_version() to rsi_request_version()
+>>>    * Fix size/alignment of struct realm_config
+>>> ---
+>>>    arch/arm64/include/asm/rsi_cmds.h |  38 ++++++++
+>>>    arch/arm64/include/asm/rsi_smc.h  | 142 ++++++++++++++++++++++++++++++
+>>>    2 files changed, 180 insertions(+)
+>>>    create mode 100644 arch/arm64/include/asm/rsi_cmds.h
+>>>    create mode 100644 arch/arm64/include/asm/rsi_smc.h
+>>>
+>>
+>> [...]
+>>
+>>> --- /dev/null
+>>> +++ b/arch/arm64/include/asm/rsi_smc.h
+>>> @@ -0,0 +1,142 @@
+>>> +/* SPDX-License-Identifier: GPL-2.0-only */
+>>> +/*
+>>> + * Copyright (C) 2023 ARM Ltd.
+>>> + */
+>>> +
+>>> +#ifndef __ASM_RSI_SMC_H_
+>>> +#define __ASM_RSI_SMC_H_
+>>> +
+>>> +/*
+>>> + * This file describes the Realm Services Interface (RSI) Application
+>>> Binary
+>>> + * Interface (ABI) for SMC calls made from within the Realm to the
+>>> RMM and
+>>> + * serviced by the RMM.
+>>> + */
+>>> +
+>>> +#define SMC_RSI_CALL_BASE        0xC4000000
+>>> +
+>>
+>> These fields have been defined in include/linux/arm-smccc.h. Those definitions
+>> can be reused. Otherwise, it's not obvious to reader what does 0xC4000000 represent.
+>>
+>> #define SMC_RSI_CALL_BASE    ((ARM_SMCCC_FAST_CALL << ARM_SMCCC_TYPE_SHIFT)   | \
+>>                                   (ARM_SMCCC_SMC_64 << ARM_SMCCC_CALL_CONV_SHIFT) | \
+>>                                   (ARM_SMCCC_OWNER_STANDARD << ARM_SMCCC_OWNER_SHIFT))
+>>
+>> or
+>>
+>> #define SMC_RSI_CALL_BASE       ARM_SMCCC_CALL_VAL(ARM_SMCCC_FAST_CALL,            \
+>>                                                     ARM_SMCCC_SMC_64,               \
+>>                                                     ARM_SMCCC_OWNER_STANDARD,       \
+>>                                                     0)
 > 
-> Hello,
+> Good point, even better is actually to just drop SMC_RSI_CALL_BASE and
+> just redefine SMC_RSI_FID() in terms of ARM_SMCCC_CALL_VAL().
 > 
-> Thank you for your response. Indeed, I have been looking at VFIO since
-> it's the first step to achieving such a configuration. However, from
-> what I understand, VFIO assists in "passing through" the hardware
-> controller/device(s) to a VM.
-> 
-> I do not follow how this fulfills the second part of my desired
-> configuration, i.e. allowing other guests to access USB
-> functionality/attached devices through a secure API with access
-> control mechanisms. I want the guest to be able to assign devices to
-> other guests, while maintaining the necessary security posture (since
-> this can become an attack vector). I might have missed something
-> though, so I'll go back and read again.
-> 
-> Thank you for your time.
 
-Hi,
+Agreed, it's going to be more clear. The point is to reuse the existing definitions
+in include/linux/arm-smccc.h.
 
-As I was reading more about the second part, I came across a few 
-interesting projects around this space.
+Sorry for slow response. I spent some time going through tf-a/tf-rmm implementation
+to understand how GPT and stage-2 page-table are managed in order to review this
+series. I realized it's complicated to manage GPT and stage-2 page-table and lots
+of details still need more time to be figured out.
 
-Relevant to USB:
-- [Linux Kernel supports 
-USB/IP](https://www.kernel.org/doc/html/latest/usb/usbip_protocol.html)
-- [Arch wiki tutorial on 
-USB/IP](https://wiki.archlinux.org/title/USB/IP)
+Thanks,
+Gavin
 
-Relevant to PCIe slicing:
-- [vhost-user with DPDK](https://wiki.qemu.org/Features/VirtioVhostUser) 
-in QEMU.
-- [Redhat guide on Vhost User with 
-dpdk](https://www.redhat.com/en/blog/hands-vhost-user-warm-welcome-dpdk)
-
-Relevant to PCIe over IP:
-- [A virtio-net EP function to share PCIe devices over 
-IP](https://lwn.net/Articles/922124/) - this has the list of relevant 
-patches for this feature in the Kernel.
-
-My goal is to have 2 guests, one in charge of distributing access to 
-USBs, and the other for access to GPU resources. I will have to read 
-more about the support each one has and their usability but this is 
-certainly wonderful news.
-
-Thanks!
 
