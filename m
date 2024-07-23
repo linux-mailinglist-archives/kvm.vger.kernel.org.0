@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-22073-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22074-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505C0939737
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 01:59:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB564939744
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 02:02:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB92CB21862
-	for <lists+kvm@lfdr.de>; Mon, 22 Jul 2024 23:59:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C66F1F222EA
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 00:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70416A342;
-	Mon, 22 Jul 2024 23:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D3D1113;
+	Tue, 23 Jul 2024 00:02:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h7aE2jfC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0wPq+SMh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380BC17BCD
-	for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 23:59:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2C717E
+	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 00:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721692767; cv=none; b=sPxRUK5vdi+LGVw2Ffb1zYTSuQVaomEHMlo6OJeWo6dtaUJOKFdImmaG+ULQZD2UUowfgU8KOrX7spzy638pp0Q4Ocw40elu+/33OCbY517VNBBbrkhB2iuv7iPhJEw/Wqg8vUCiigymyqteLsw4gXMfzsx18WdIrXp6br1KXsQ=
+	t=1721692936; cv=none; b=gE2CbDog5YbxnXqNTd381j0uFG/W8YoknXcMHnu0uggbBfC9sL+SkhnYg1QHLDsa2aaESEnio8ZnQht6AIXH0Qct4WxbDrlbUjGqc9Jo5ykDkn6KddpkqGUD0NhXke7kCXVmoU3rjtXoQKGIdx4syx1d3tBV2qxMq4lMAVqyNs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721692767; c=relaxed/simple;
-	bh=7DJkcqfbiIJw8y8meEfqCDF4uloJkbR/JLCUcj9GkK0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IkFp2qzXXRkDGzMIktqX3fjiKT22qpuHjdsaH4y8C59gFDM7hb39rwA2LUhLevZpad0Z+HbxYCYtMbFveGlTzbM4PmPHgAb4mLNfeodDhxIIMc70TvfHSekjkIxWwR2yM4K4BYDeYykhScQk4vktRE9guxGAnA1oZQglhCZBHzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h7aE2jfC; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1721692936; c=relaxed/simple;
+	bh=8GApfVvvJ3/nw5gofMjUIY3tJ2yoqcTmgUdEIC+GvVU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=hJZ+fcC9FXu9HBT0WtQB7e86boQxngBkkRDfflleTtWsuglW9fFzAIs5EuHuuXkNP733bGt1f2O8PZs2az2E+c09lRui7j307DhVvHoMhMW1sY84EmBZpW6SiFy/krQENyV+opcLcwtDPaAR1YCMxy7xBxUEMZa2xfGmI4BCQLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0wPq+SMh; arc=none smtp.client-ip=209.85.210.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e02b7adfb95so10538650276.2
-        for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 16:59:25 -0700 (PDT)
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-70d1df50db2so2113383b3a.0
+        for <kvm@vger.kernel.org>; Mon, 22 Jul 2024 17:02:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721692765; x=1722297565; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1721692934; x=1722297734; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jIZbpEZ5rQHg2l2abLN3jpiDoDaWQbvMPk1rX68w1Ng=;
-        b=h7aE2jfCZuewT76lJibcOTnbBYle+Lze8hmYy7Ra1gB56cr8siaH6dM2ccCvfvhp69
-         RnSRVfNSmo43F8mOf9kOquuUY+v4QVFyvW7U1TS1Yd4RDzxLMHhO73WR3DoqoDamzCyq
-         xb9D08F59JBwAXnuqv/cihg5sz/KFCiTQA/RTNCb1mO5VvTQoC2NxJrNIAd1/Qv2Tqqe
-         kk/9sXHBZeghHbA1ic+gLn1DdlpZpwUeI2q9eiIdmx7rCKmzkcFJv6ELGiyA7ssqMZAW
-         mt8+LRqU/r22uQVWFHSjB0H9XCobqDZGE5wh14ntd7H7UYmNe8uTde3B7sCjm4u4JqPf
-         OTVA==
+        bh=Ui8JCYGft3E+0bmp18/t8KVooNOlV9PuIVC4X7jewq8=;
+        b=0wPq+SMheeIJoTqcDKcx2ILWHXcjIvB7s5ez1aJ3nj+TUDtXi/H/TGmd6dEKTlzdu0
+         Wr282/MoAgzbHK06nBHp0n+6uhjHKmZqyStQGjHvdno85k9E4EmzRCYKJXfxkH6ZinXZ
+         NGr+zJKA0RnH4LAONV8DL/w0p6GsG05S62eIm5hJVRP1iBKSZErGky7iK06c4NWiJjkK
+         tKcBY6spobSXoKsJ4B2tqfhmgVytd+xuxo9+zb+6auBCMxS9dDEMUqD5KEv6rcLRDzvQ
+         EegsjpQWqLFTbGFS/lOpYq5Ts5Q6Wabl0EDUd1VC0wh8iKhMj7X4QatF0y/eEzWWc5MX
+         yxng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721692765; x=1722297565;
+        d=1e100.net; s=20230601; t=1721692934; x=1722297734;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jIZbpEZ5rQHg2l2abLN3jpiDoDaWQbvMPk1rX68w1Ng=;
-        b=NtD5lIdjagTmsWkVoUdZQthKhdebyTLtJA7POWksyDxSP/UmFoMC7jI9d6dk12Vuqi
-         ZQ+mS76yGz6pTs4ZTpp2FCxq9r/0ec0v/lPZK5SxPkF4JvxIu4qhleAx6hGot4QXTi2g
-         CSR/RGNqHHoM1jKZ91atMwkjqwm6980+6mOL5B+N7WI9DEDOXVEcZpXKF8BPGGE2Bqvd
-         LPxdoKsd4Ec2A5oqRobJmkCfQ2wuOhSSIt4tAjmuZIqQvQskAZBAR4AUfPBLA9cfqfMx
-         Kr+WrsQ5HL7a7rJBF8UfIqJ6bObxwfWdwOj36rlJNzB9UBhzC33Kl84tq9kWSMJRkQuA
-         188A==
-X-Gm-Message-State: AOJu0YzCKOx5OOXLf7q0/u6kTPyX60zGLSL3xvOYqcDzchyuxOy0jKig
-	eRYBimBYwaXbITfr38dN3JhD0cmwdlWe16cfVz9XU3Hunv9OMtS93XSSOfAi+saQkEVEFE8pj2U
-	vTQ==
-X-Google-Smtp-Source: AGHT+IFcimbsqyOG/qvbE60GZOEvk25xTTC2e43d8+QS/h1am29TATI9J8tkk0GYefunh8u/rNyHUKceoAs=
+        bh=Ui8JCYGft3E+0bmp18/t8KVooNOlV9PuIVC4X7jewq8=;
+        b=Hd4TTqqtNvQG60aCENaa/+j/9Z8Odytjt2BR7VFQKz0wU4sm2oONVZ7vidT3XIbqNX
+         yILDQNp+mkNQ6ZeZFwlZuN3AHQTRivrmv6a5t2nkQcsGBImABmkJMtaH+zdCc/oyssNI
+         bULWx6yGqUOC8xbe4oNXf0oycG9DAXhbGaooGfijMhD6Z6ma3Z5d6gTlOs4ifaMhVB/z
+         mFn4rv34qEaQUnojPb+lB8aiumn70I5+EKOfVxJIu0ptAlHaWQTANmiFLZQplidMtP4m
+         ZZpgiB3NzItyHI1L6hXFyvpFXZV4Ejk+6vJXzN6ob+DAyF2I6WscMoF2ZQdX/xF4U7g4
+         R78Q==
+X-Gm-Message-State: AOJu0YwEIcECpcWtoUH3Kkzn/wcU0DMY6YtwS7tryNBw3Pw8jGPbCIzS
+	VM0j8bCFa+k6/rven/2Qzjt3bLw0dd7NtxhYBZwDjDW7YOjHyPwwbIzSa+PZe7gbYwtpygf7Vkw
+	FbQ==
+X-Google-Smtp-Source: AGHT+IG06ai+CJZgYM7nR6yvSg6EG9IDAIxvb/Uc8iPXgThYwx727h+r7bFvrI4V0oTra9DTVFb81NGzEhY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:804e:0:b0:e03:53a4:1a7 with SMTP id
- 3f1490d57ef6-e087046cademr40372276.10.1721692765078; Mon, 22 Jul 2024
- 16:59:25 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:8806:b0:70d:138a:bee8 with SMTP id
+ d2e1a72fcca58-70e806142d7mr2107b3a.0.1721692934100; Mon, 22 Jul 2024 17:02:14
+ -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Mon, 22 Jul 2024 16:59:22 -0700
+Date: Mon, 22 Jul 2024 17:02:11 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,172 +71,81 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
-Message-ID: <20240722235922.3351122-1-seanjc@google.com>
-Subject: [PATCH] KVM: nVMX: Honor userspace MSR filter lists for nested VM-Enter/VM-Exit
+Message-ID: <20240723000211.3352304-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86/mmu: Check that root is valid/loaded when
+ pre-faulting SPTEs
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Hou Wenlong <houwenlong.hwl@antgroup.com>, Jim Mattson <jmattson@google.com>
+	syzbot+23786faffb695f17edaa@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Synthesize a consistency check VM-Exit (VM-Enter) or VM-Abort (VM-Exit) if
-L1 attempts to load/store an MSR via the VMCS MSR lists that userspace has
-disallowed access to via an MSR filter.  Intel already disallows including
-a handful of "special" MSRs in the VMCS lists, so denying access isn't
-completely without precedent.
+Error out if kvm_mmu_reload() fails when pre-faulting memory, as trying to
+fault-in SPTEs will fail miserably due to root.hpa pointing at garbage.
 
-More importantly, the behavior is well-defined _and_ can be communicated
-the end user, e.g. to the customer that owns a VM running as L1 on top of
-KVM.  On the other hand, ignoring userspace MSR filters is all but
-guaranteed to result in unexpected behavior as the access will hit KVM's
-internal state, which is likely not up-to-date.
+Note, kvm_mmu_reload() can return -EIO and thus trigger the WARN on -EIO
+in kvm_vcpu_pre_fault_memory(), but all such paths also WARN, i.e. the
+WARN isn't user-triggerable and won't run afoul of warn-on-panic because
+the kernel would already be panicking.
 
-Unlike KVM-internal accesses, instruction emulation, and dedicated VMCS
-fields, the MSRs in the VMCS load/store lists are 100% guest controlled,
-thus making it all but impossible to reason about the correctness of
-ignoring the MSR filter.  And if userspace *really* wants to deny access
-to MSRs via the aforementioned scenarios, userspace can hide the
-associated feature from the guest, e.g. by disabling the PMU to prevent
-accessing PERF_GLOBAL_CTRL via its VMCS field.  But for the MSR lists, KVM
-is blindly processing MSRs; the  MSR filters are the _only_ way for
-userspace to deny access.
+  BUG: unable to handle page fault for address: 000029ffffffffe8
+  #PF: supervisor read access in kernel mode
+  #PF: error_code(0x0000) - not-present page
+  PGD 0 P4D 0
+  Oops: Oops: 0000 [#1] PREEMPT SMP
+  CPU: 22 PID: 1069 Comm: pre_fault_memor Not tainted 6.10.0-rc7-332d2c1d713e-next-vm #548
+  Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+  RIP: 0010:is_page_fault_stale+0x3e/0xe0 [kvm]
+  RSP: 0018:ffffc9000114bd48 EFLAGS: 00010206
+  RAX: 00003fffffffffc0 RBX: ffff88810a07c080 RCX: ffffc9000114bd78
+  RDX: ffff88810a07c080 RSI: ffffea0000000000 RDI: ffff88810a07c080
+  RBP: ffffc9000114bd78 R08: 00007fa3c8c00000 R09: 8000000000000225
+  R10: ffffea00043d7d80 R11: 0000000000000000 R12: ffff88810a07c080
+  R13: 0000000100000000 R14: ffffc9000114be58 R15: 0000000000000000
+  FS:  00007fa3c9da0740(0000) GS:ffff888277d80000(0000) knlGS:0000000000000000
+  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+  CR2: 000029ffffffffe8 CR3: 000000011d698000 CR4: 0000000000352eb0
+  Call Trace:
+   <TASK>
+   kvm_tdp_page_fault+0xcc/0x160 [kvm]
+   kvm_mmu_do_page_fault+0xfb/0x1f0 [kvm]
+   kvm_arch_vcpu_pre_fault_memory+0xd0/0x1a0 [kvm]
+   kvm_vcpu_ioctl+0x761/0x8c0 [kvm]
+   __x64_sys_ioctl+0x82/0xb0
+   do_syscall_64+0x5b/0x160
+   entry_SYSCALL_64_after_hwframe+0x4b/0x53
+   </TASK>
+  Modules linked in: kvm_intel kvm
+  CR2: 000029ffffffffe8
+  ---[ end trace 0000000000000000 ]---
 
-This partially reverts commit ac8d6cad3c7b ("KVM: x86: Only do MSR
-filtering when access MSR by rdmsr/wrmsr").
-
-Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>
-Cc: Jim Mattson <jmattson@google.com>
+Fixes: 6e01b7601dfe ("KVM: x86: Implement kvm_arch_vcpu_pre_fault_memory()")
+Reported-by: syzbot+23786faffb695f17edaa@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/0000000000002b84dc061dd73544@google.com
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
 
-I found this by inspection when backporting Hou's change to an internal kernel.
-I don't love piggybacking Intel's "you can't touch these special MSRs" behavior,
-but ignoring the userspace MSR filters is far worse IMO.  E.g. if userspace is
-denying access to an MSR in order to reduce KVM's attack surface, letting L1
-sneak in reads/writes through VM-Enter/VM-Exit completely circumvents the
-filters.
+Haven't seen a reproducer from syzbot, but I verified by forcing the same
+root allocation failure (to generate the above splat).
 
- Documentation/virt/kvm/api.rst  | 19 ++++++++++++++++---
- arch/x86/include/asm/kvm_host.h |  2 ++
- arch/x86/kvm/vmx/nested.c       | 12 ++++++------
- arch/x86/kvm/x86.c              |  6 ++++--
- 4 files changed, 28 insertions(+), 11 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-index 8e5dad80b337..e6b1e42186f3 100644
---- a/Documentation/virt/kvm/api.rst
-+++ b/Documentation/virt/kvm/api.rst
-@@ -4226,9 +4226,22 @@ filtering. In that mode, ``KVM_MSR_FILTER_DEFAULT_DENY`` is invalid and causes
- an error.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 901be9e420a4..ee516baf3a31 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4747,7 +4747,9 @@ long kvm_arch_vcpu_pre_fault_memory(struct kvm_vcpu *vcpu,
+ 	 * reload is efficient when called repeatedly, so we can do it on
+ 	 * every iteration.
+ 	 */
+-	kvm_mmu_reload(vcpu);
++	r = kvm_mmu_reload(vcpu);
++	if (r)
++		return r;
  
- .. warning::
--   MSR accesses as part of nested VM-Enter/VM-Exit are not filtered.
--   This includes both writes to individual VMCS fields and reads/writes
--   through the MSR lists pointed to by the VMCS.
-+   MSR accesses that are side effects of instruction execution (emulated or
-+   native) are not filtered as hardware does not honor MSR bitmaps outside of
-+   RDMSR and WRMSR, and KVM mimics that behavior when emulating instructions
-+   to avoid pointless divergence from hardware.  E.g. RDPID reads MSR_TSC_AUX,
-+   SYSENTER reads the SYSENTER MSRs, etc.
-+
-+   MSRs that are loaded/stored via dedicated VMCS fields are not filtered as
-+   part of VM-Enter/VM-Exit emulation.
-+
-+   MSRs that are loaded/store via VMX's load/store lists _are_ filtered as part
-+   of VM-Enter/VM-Exit emulation.  If an MSR access is denied on VM-Enter, KVM
-+   synthesizes a consistency check VM-Exit(EXIT_REASON_MSR_LOAD_FAIL).  If an
-+   MSR access is denied on VM-Exit, KVM synthesizes a VM-Abort.  In short, KVM
-+   extends Intel's architectural list of MSRs that cannot be loaded/saved via
-+   the VM-Enter/VM-Exit MSR list.  It is platform owner's responsibility to
-+   to communicate any such restrictions to their end users.
- 
-    x2APIC MSR accesses cannot be filtered (KVM silently ignores filters that
-    cover any x2APIC MSRs).
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 950a03e0181e..94d0bedc42ee 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2059,6 +2059,8 @@ void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu);
- 
- void kvm_enable_efer_bits(u64);
- bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
-+int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-+int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data);
- int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data, bool host_initiated);
- int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data);
- int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data);
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 2392a7ef254d..674f7089cc44 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -981,7 +981,7 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
- 				__func__, i, e.index, e.reserved);
- 			goto fail;
- 		}
--		if (kvm_set_msr(vcpu, e.index, e.value)) {
-+		if (kvm_set_msr_with_filter(vcpu, e.index, e.value)) {
- 			pr_debug_ratelimited(
- 				"%s cannot write MSR (%u, 0x%x, 0x%llx)\n",
- 				__func__, i, e.index, e.value);
-@@ -1017,7 +1017,7 @@ static bool nested_vmx_get_vmexit_msr_value(struct kvm_vcpu *vcpu,
- 		}
- 	}
- 
--	if (kvm_get_msr(vcpu, msr_index, data)) {
-+	if (kvm_get_msr_with_filter(vcpu, msr_index, data)) {
- 		pr_debug_ratelimited("%s cannot read MSR (0x%x)\n", __func__,
- 			msr_index);
- 		return false;
-@@ -1112,9 +1112,9 @@ static void prepare_vmx_msr_autostore_list(struct kvm_vcpu *vcpu,
- 			/*
- 			 * Emulated VMEntry does not fail here.  Instead a less
- 			 * accurate value will be returned by
--			 * nested_vmx_get_vmexit_msr_value() using kvm_get_msr()
--			 * instead of reading the value from the vmcs02 VMExit
--			 * MSR-store area.
-+			 * nested_vmx_get_vmexit_msr_value() by reading KVM's
-+			 * internal MSR state instead of reading the value from
-+			 * the vmcs02 VMExit MSR-store area.
- 			 */
- 			pr_warn_ratelimited(
- 				"Not enough msr entries in msr_autostore.  Can't add msr %x\n",
-@@ -4806,7 +4806,7 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
- 				goto vmabort;
- 			}
- 
--			if (kvm_set_msr(vcpu, h.index, h.value)) {
-+			if (kvm_set_msr_with_filter(vcpu, h.index, h.value)) {
- 				pr_debug_ratelimited(
- 					"%s WRMSR failed (%u, 0x%x, 0x%llx)\n",
- 					__func__, j, h.index, h.value);
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index af6c8cf6a37a..7b3659a05c27 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -1942,19 +1942,21 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
- 	return ret;
- }
- 
--static int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data)
-+int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data)
- {
- 	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_READ))
- 		return KVM_MSR_RET_FILTERED;
- 	return kvm_get_msr_ignored_check(vcpu, index, data, false);
- }
-+EXPORT_SYMBOL_GPL(kvm_get_msr_with_filter);
- 
--static int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data)
-+int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data)
- {
- 	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_WRITE))
- 		return KVM_MSR_RET_FILTERED;
- 	return kvm_set_msr_ignored_check(vcpu, index, data, false);
- }
-+EXPORT_SYMBOL_GPL(kvm_set_msr_with_filter);
- 
- int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data)
- {
+ 	if (kvm_arch_has_private_mem(vcpu->kvm) &&
+ 	    kvm_mem_is_private(vcpu->kvm, gpa_to_gfn(range->gpa)))
 
 base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 -- 
