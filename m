@@ -1,112 +1,202 @@
-Return-Path: <kvm+bounces-22096-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22101-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C18F8939D06
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 10:57:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC629939DEC
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 11:33:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BFC3282A30
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 08:57:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AA4F1F220C7
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 09:33:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A0D714C5B0;
-	Tue, 23 Jul 2024 08:57:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F0EC14EC47;
+	Tue, 23 Jul 2024 09:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="pG2Ql5Of"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68E38DDDC
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 08:57:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD1F14D432;
+	Tue, 23 Jul 2024 09:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721725049; cv=none; b=PcMy8meOueMQtVjrpS0FAmBBlZcAGBJzmxhKsnz+quEanhBjG/Vd/SHpCqepsC4bhjOvztZnlIstDttKbiSF0Ap/dkHoLldTGalpgrYGb4cRAc6UW4uYkQej8Z9tQGkEq2SZVjbhqTUbtMmQSGuDBYQy6QK0DlfOt9ISvcodwkc=
+	t=1721727132; cv=none; b=BXagHfniaSXkxODJrrYyIKNsUtsyrjBbep7SXGPAsSbWE54wqt4a7HxtXaHL5hOtDL+lPXjb1REW4e21Dderse2qfXRrvWRDzZH46IlqJnueVANqsU3ndloLo++uw1DA0z9maEiaoQaSlr3VzwL6jVR/BIZMLfRKNsLKbN7IdVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721725049; c=relaxed/simple;
-	bh=gvpFIsIWSjCkgJeJVwYZD0Ypa7vJ5HnFOsuayUaovc0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O9BU3RL+eIFat5OfAvaM/vZtN11x9Fzfm+Ze+vwr2EAImbhbwZ1F9MGSaObJAJ5DTRScS9H1eG8hJ2NFwGDDwR+HvH+H8Glqgxyrv8fp9SWk5tncSYcDr2zekgLMrde3Vxfik6e7dR1lSfLCyr/eT4Terx6uOWapzGAAxoij4tI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49D87139F;
-	Tue, 23 Jul 2024 01:57:53 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2F0673F766;
-	Tue, 23 Jul 2024 01:57:26 -0700 (PDT)
-Date: Tue, 23 Jul 2024 09:57:23 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-Message-ID: <Zp9wc6PS9m6TMrHA@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
- <20240708165800.1220065-1-maz@kernel.org>
- <Zp46GUJJ9xBWsJsQ@raptor>
- <874j8h5u0j.wl-maz@kernel.org>
+	s=arc-20240116; t=1721727132; c=relaxed/simple;
+	bh=f5smg5nLrkQWVYhKiY3CHFpG9kgHIiwO0tc7vK1+Gog=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EXLw/j0QvgBK96DChqkuBpclsBOZrVrXl/oaLn8SM3mGpgE4wBSuVDqz0gJ0iNmA4PxShz8JbjjLvBhzSf9qe6nNCjqlTQKuR92ti02WpO2vBe6FPoHyCxr05ovghL7FtlrTL27mTxS2Xo4DjDPnQkWnC9MG8+Ak2rtel1iaXto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=pG2Ql5Of; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46N8QHjJ027710;
+	Tue, 23 Jul 2024 09:32:01 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=mTiORae4fO3QnxSZi64LA/mdHe
+	QAXFMdnrahKk2VS0E=; b=pG2Ql5Of8BOtlVwbgfig/5P21w6N0nt0kfMkDVrVQX
+	O1JJe8Vt4sJlsxJq2GMWR8Fvu0EhA0hdGQ4nKLBQyQwvscRO6hf/GkXKRJbMA2Nu
+	EnLjdo2ZrYGKxLagJ0F4nk7uyISPYA4Rui8rTKuk+5BDxsDXfQQskVVqbxymF6xF
+	KBRSGDVfgPHECuYLrCjGoYtqvclK1dZ5aXvQ6bwWKoMGwFqOFjLsudWhdws5+lSn
+	jLXe7IayaCsB/YjMpxj0CXOjGMqOMjrX8Kf9oXo/SFxTfRVcHWxQD+MLWZ4q3DpN
+	8sJHs1eqwHmtW5xfzOk8YNd5i+M/jiMGIZicw4OE0JPw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40hwma1dyh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jul 2024 09:32:01 +0000 (GMT)
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46N9TNi6021421;
+	Tue, 23 Jul 2024 09:32:00 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40hwma1dye-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jul 2024 09:32:00 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46N5kdYQ005776;
+	Tue, 23 Jul 2024 09:31:59 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40gy2p9ntt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 23 Jul 2024 09:31:59 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46N9VsWf56230254
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 23 Jul 2024 09:31:56 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1359D2004E;
+	Tue, 23 Jul 2024 09:31:54 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 740CE20049;
+	Tue, 23 Jul 2024 09:31:53 +0000 (GMT)
+Received: from darkmoore.ibmuc.com (unknown [9.171.28.84])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 23 Jul 2024 09:31:53 +0000 (GMT)
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: [PATCH v2 00/10] selftests: kvm: s390: Add s390x ucontrol selftests
+Date: Tue, 23 Jul 2024 11:31:16 +0200
+Message-ID: <20240723093126.285319-1-schlameuss@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <874j8h5u0j.wl-maz@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4b9AZbJQh6fag_PntW3vvL9hySAgwnHZ
+X-Proofpoint-GUID: ESRV06PVpZHFbXE2WyLtIsuFsuxHdQAv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-22_18,2024-07-23_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxscore=0
+ bulkscore=0 spamscore=0 phishscore=0 suspectscore=0 lowpriorityscore=0
+ mlxlogscore=623 adultscore=0 priorityscore=1501 malwarescore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407230065
 
-Hi Marc,
+This patch series adds a selftest suite to validate the s390x
+architecture specific ucontrol KVM interface.
 
-On Mon, Jul 22, 2024 at 04:25:00PM +0100, Marc Zyngier wrote:
-> Hi Alex,
-> 
-> On Mon, 22 Jul 2024 11:53:13 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > I would like to use the S1 walker for KVM SPE, and I was planning to move it to
-> > a separate file, where it would be shared between nested KVM and SPE. I think
-> > this is also good for NV, since the walker would get more testing.
-> > 
-> > Do you think moving it to a shared location is a good approach? Or do you have
-> > something else in mind?
-> 
-> I'm definitely open to moving it somewhere else if that helps, though
-> the location doesn't matter much, TBH, and it is the boundary of the
-> interface I'm more interested in. It may need some work though, as the
-> current design is solely written with AT in mind.
+When creating a VM on s390x it is possible to create it as userspace
+controlled VM or in short ucontrol VM.
+These VMs delegates the management of the VM to userspace instead
+of handling most events within the kernel. Consequently the userspace
+has to manage interrupts, memory allocation etc.
 
-Looks that way to me too.
+Before this patch set this functionality lacks any public test cases.
+It is desirable to add test cases for this interface to be able to
+reduce the risk of breaking changes in the future.
 
-> 
-> > Also, do you know where you'll be able to send an updated version of this
-> > series? I'm asking because I want to decide between using this code (with fixes
-> > on top) or wait for the next iteration. Please don't feel that you need to send
-> > the next iteration too soon.
-> 
-> The current state of the branch is at [1], which I plan to send once
-> -rc1 is out. Note that this isn't a stable branch, so things can
-> change without any warning!
-> 
-> > And please CC me on the series, so I don't miss it by mistake :)
-> 
-> Of course!
+In order to provision a ucontrol VM the kernel needs to be compiled with
+the CONFIG_KVM_S390_UCONTROL enabled. The users with sys_admin capability
+can then create a new ucontrol VM providing the KVM_VM_S390_UCONTROL
+parameter to the KVM_CREATE_VM ioctl.
 
-Sounds great, thanks!
+The kernels existing selftest helper functions can only be partially be
+reused for these tests.
 
-Alex
+The test cases cover existing special handling of ucontrol VMs within the
+implementation and basic VM creation and handling cases:
+* Reject setting HPAGE when VM is ucontrol
+* Assert KVM_GET_DIRTY_LOG is rejected
+* Assert KVM_S390_VM_MEM_LIMIT_SIZE is rejected
+* Assert state of initial SIE flags setup by the kernel
+* Run simple program in VM with and without DAT
+* Assert KVM_EXIT_S390_UCONTROL exit on not mapped memory access
+* Assert functionality of storage keys in ucontrol VM
 
-> 
-> Thanks,
-> 
-> 	M.
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/maz/arm-platforms.git/log/?h=kvm-arm64/nv-at-pan-WIP
-> 
-> -- 
-> Without deviation from the norm, progress is not possible.
-> 
+Running the test cases requires sys_admin capabilities to start the
+ucontrol VM.
+This can be achieved by running as root or with a command like:
+
+    sudo setpriv --reuid nobody --inh-caps -all,+sys_admin \
+      --ambient-caps -all,+sys_admin --bounding-set -all,+sys_admin \
+      ./ucontrol_test
+
+The patch set does also contain some code cleanup / consolidation of
+architecture specific defines that are now used in multiple test cases.
+
+---
+
+V1 -> V2:
+- add ucontrol to s390 debug config (new patch)
+- PATCH 2: changed atomic_t to __u32 (thanks Claudio)
+- PATCH 4: reformatted comment in FIXTURE_SETUP(uc_kvm)
+- PATCH 5: refactored to display 8 byte blocks + more internal reuse
+           (thanks Claudio)
+- PATCH 7: make use of more declarative defines instead of magic values
+- PATCH 8: make use of more declarative defines instead of magic values
+           (thanks Claudio)
+- PATCH 9: add reference to fix verified by the test case
+
+
+Christoph Schlameuss (10):
+  selftests: kvm: s390: Define page sizes in shared header
+  selftests: kvm: s390: Add kvm_s390_sie_block definition for userspace
+    tests
+  selftests: kvm: s390: Add s390x ucontrol test suite with hpage test
+  selftests: kvm: s390: Add test fixture and simple VM setup tests
+  selftests: kvm: s390: Add debug print functions
+  selftests: kvm: s390: Add VM run test case
+  selftests: kvm: s390: Add uc_map_unmap VM test case
+  selftests: kvm: s390: Add uc_skey VM test case
+  selftests: kvm: s390: Verify reject memory region operations for
+    ucontrol VMs
+  s390: Enable KVM_S390_UCONTROL config in debug_defconfig
+
+ arch/s390/Kconfig.debug                       |   3 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/s390x/debug_print.h |  69 ++
+ .../selftests/kvm/include/s390x/processor.h   |   5 +
+ .../testing/selftests/kvm/include/s390x/sie.h | 240 +++++++
+ .../selftests/kvm/lib/s390x/processor.c       |  10 +-
+ tools/testing/selftests/kvm/s390x/cmma_test.c |   7 +-
+ tools/testing/selftests/kvm/s390x/config      |   2 +
+ .../testing/selftests/kvm/s390x/debug_test.c  |   4 +-
+ tools/testing/selftests/kvm/s390x/memop.c     |   4 +-
+ tools/testing/selftests/kvm/s390x/tprot.c     |   5 +-
+ .../selftests/kvm/s390x/ucontrol_test.c       | 614 ++++++++++++++++++
+ 13 files changed, 949 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/debug_print.h
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/sie.h
+ create mode 100644 tools/testing/selftests/kvm/s390x/config
+ create mode 100644 tools/testing/selftests/kvm/s390x/ucontrol_test.c
+
+
+base-commit: 66ebbdfdeb093e097399b1883390079cd4c3022b
+-- 
+2.45.2
+
 
