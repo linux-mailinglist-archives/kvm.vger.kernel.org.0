@@ -1,194 +1,157 @@
-Return-Path: <kvm+bounces-22133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C59693A8A6
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 23:25:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3065293A9C7
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 01:21:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF2261C224D5
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 21:25:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6441284BF0
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 23:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B591145A0E;
-	Tue, 23 Jul 2024 21:25:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498D31494C5;
+	Tue, 23 Jul 2024 23:21:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LfX0m8xM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WMj1p28n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC20143C4E
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 21:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F2514884B
+	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 23:20:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721769929; cv=none; b=g+rqtHhUayk/I6Nib6QYCdyzYFI1yxYYt7C8GXJAfSuHK9Y/9gdzkPbwN9pDQqIrJhq8WJFvWXI5OhfPHsbPnBvG/Qrfrg/TVCuYx5JXDpzGvMqw3zSLevUWwWXw6uSzir/YdHq40PkS1YRyOzHKAqWOCwTyASGT86lkEczW9VA=
+	t=1721776861; cv=none; b=CP/ipxw7dp8ehHF6DW2nG6f+1dSed9hDIJ0XmBEHukvjPsdelp6vHQUMwFuMtF+9BPmla97dQE6W+aB4VhQUYZpFhVBrsKhNO5M4jLhJ6S+XZSRE0dPa2NO2nkO1JUkETYvjNUW5kZw+z8Mm9jxk9UKT2SXoUO1skTqImbldKe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721769929; c=relaxed/simple;
-	bh=VRfWXStbqUNoMu/qD3trby7LOEO2dpGIApXJ5HarMVs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cALr8G6IEbYWo82e91HuKvQtpTaFnE6ktW+tOEKJ1vAbAmet16EH+0h6oOP7dtU4p8t/rc3ozsp1h7EMS44x3EgzlSck6OQ7aEigU8WaeIqYw+D2TLMLqiq16GkOel5PaXa4AV7d1Yh5j+b2Ukx4DKA4SRvM2mza5hDWVO4GWGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LfX0m8xM; arc=none smtp.client-ip=209.85.219.182
+	s=arc-20240116; t=1721776861; c=relaxed/simple;
+	bh=8Y+iYHayY2JJwgeVzz2tqt/MVZXDqspYUC9TRMwsdlw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=k2rQMawZyQJ92NL/wLwWtza3xsaoc+jD7cWiaM4ElroIoQ+B7EIyIhJCQyf4FWDX7tjnNol70wJkVHExeJrFQkWvT2FVJGM2ai0hor69SkrxakQrPXl0wklXLP5yGN1lHG3VWdTWnYZqHX7wuae+45aKjo2bi3qMCWEySp0Sza4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WMj1p28n; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e05f913e382so5412247276.2
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 14:25:28 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6818fa37eecso1171465a12.1
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 16:20:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721769927; x=1722374727; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rZJgCArp64eiMbqCXaN875D3c6qRuqIaB/kMh068BtM=;
-        b=LfX0m8xMLkEj1yINcb5P1rwv6YW32GoBO5u4XzMGNA24Tg4JUg2b80LpS0J+fcooG1
-         FWVzOXri+p6gWK1lrduigjqT+86GFi+1wtXOQgSiDsAtjQGya9KG4VevOoOB6LdMR2ve
-         NNhwhb+a1y5vSvE59qmzTJUlDmqplZzRiu/YLx96afeu//m65GWvcghQNibm4kvfj133
-         lUXI/zUYK3WsdwJhJrmF0ezaxGmKw5gXfcaU7XXYj1Xp32J5A4lcpssv//NdM5RogGOu
-         54e7oaBOKAhjcwvvm7wJy4cc6zLC4sTyCRznYAihyW7x6gPNDQRxIEio4VOR1lFkVw8A
-         noZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721769927; x=1722374727;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20230601; t=1721776859; x=1722381659; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rZJgCArp64eiMbqCXaN875D3c6qRuqIaB/kMh068BtM=;
-        b=QaM2p7PjvpMl5JnNBA47wq0mfX3pseRdPwszbav9Lqb/ZPXOxwMxTKB+W8tpqeOBAS
-         Euetqqn/d1j5wxR20Y8wnJfRD2lCZvu2HE67HG5TT2DqbFlhQtpje1dOcw4hgfmFIlMV
-         GMh8Zac/F9o6x6Pr31Y/QyX5MU9PglxTZtYv3bO0AOjkWuWiLSd3rdS8b+2n0lCPTSNj
-         AElMqDeeAoKMKfzGOLiuDFWSl+IdbkzxApI/kdYvDH+atXl+myGsC+SZs5dfT4+cArJp
-         JCiDZrMvtq0lbeZIod4rV2rfPR3x+plQ0MqO0Vhd/dP+aHSAprD/X85Ryu9VD8GMcWKM
-         jrwg==
-X-Forwarded-Encrypted: i=1; AJvYcCULuNAj1//61OIIDqzRoK2LVDsoYPbhQmddZP8cuU7YQcRvlgjCKwJ+gUukNCsRtxKaVImKimCC5apvjEivLmm/cgdp
-X-Gm-Message-State: AOJu0Yxez/90Ui99kP0hSOAYO1zKygXefm4hBCWP5ahqhRg/E74+7Nd9
-	8oAc2Q9xFiGs8Y6E+LJ8J7AEdP+UDCl6WhjCEbfEEP+utNxPweTVcLSapsd7xXKUnb20CaXH6/8
-	zisRD4F/anCAsx3ILZY9rum52LMxSB0E7fChN
-X-Google-Smtp-Source: AGHT+IGCV768j+YrEEm95b1T/ToEhs2+KD4YZsH39PZjohbKCe4xW674YxKBoDDwcCaLP5X/JLfj7nNNUwK9WrlPfmo=
-X-Received: by 2002:a05:6902:274a:b0:e03:629f:5c41 with SMTP id
- 3f1490d57ef6-e087b9e7ab9mr8610694276.55.1721769926984; Tue, 23 Jul 2024
- 14:25:26 -0700 (PDT)
+        bh=ZhkUKgGKAmtJvBC69563aw4qrws1Qh7sTPRPKMZcT4I=;
+        b=WMj1p28nLokCNYDM13AMw9xiLwqoQnA5mw5pcosXr+/804cQzFcSNAAcSId4mkS8CR
+         fRpxgMEtmeIY7+0nxPsZeX1CzSs3DkwJCZ19VvlAUH2sZ+PxG+jufTNqdFMBOg6KVNFF
+         OioRvAs4YEb2yndIl1Yi07WbNSZNHBlSw4QiG63tAo7t8J6rz4ykN4OeFWQQOLJ1RRVj
+         q3I571FYlVZ0c6G1IcxROo3mJQcBqYnj4tjxm+wzVJwiZtgT90jz7w5cG8HO5vaDaJzp
+         VP50wgF/DGzUwvOCTqsR/B0m5gDEhPz6UMtyMyf46HFY80mliX5ic3RCDB6KI4KDoHo3
+         1HqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721776859; x=1722381659;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZhkUKgGKAmtJvBC69563aw4qrws1Qh7sTPRPKMZcT4I=;
+        b=M+k6mAF7p6Rc26Pz5AI1xPdalVA5HuwyZ4XjDewy7iz8ROwFEj7ad7ro8dbn2xERyw
+         IvIP8HQHikplbuUtDlgreAYJLPT6wzkc8/P/FGEebydjEkrLClMkA/bpmkHir5FaKcOo
+         Tg7vP/Gp1Euhd/IofXEq//dUACcPpABTlfl+wOyrgH0vZCWdeZu0gVLaVOvLSUWvVOTB
+         LpCrBgpfd8daVBPaJMVbkpbX5w6fVDnEmkAJQ9ZUQjNnyHO8X4MncVQPVUVuOWd569tm
+         mMp1yMOakH1jyUFYJ9963XutwUFy7xxW5W/jjrE5KNbYUAc45LXZNvzo6QLNn3NGLCDd
+         u46Q==
+X-Gm-Message-State: AOJu0Yx9UM6TUssGCUka1NPt/qrIsxj5k0DaICLZcl+wG3U4bqDJ8+Ad
+	UvF6Zf3+eX+UBLqxvkX6rBCoB5ulh5xeeEofPqAx4fEzkHvhOLaP2Srf2cmzBKg0/rrgbW82GDP
+	YdQ==
+X-Google-Smtp-Source: AGHT+IHW/3mXbfu5Pg9dVenRcl8JGJI1fc7+S8jmzEbKrBTiWqrOQZhFB+0q7F3ISVuCk3mxT07+/UreqNg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:58c:b0:6f3:b24:6c27 with SMTP id
+ 41be03b00d2f7-7a87dcb0297mr1138a12.5.1721776859071; Tue, 23 Jul 2024 16:20:59
+ -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Tue, 23 Jul 2024 16:20:55 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20231212204647.2170650-1-sagis@google.com> <20231212204647.2170650-5-sagis@google.com>
- <5749ff16-ca81-440d-85f0-62a1c3a572d0@linux.intel.com>
-In-Reply-To: <5749ff16-ca81-440d-85f0-62a1c3a572d0@linux.intel.com>
-From: Sagi Shahar <sagis@google.com>
-Date: Tue, 23 Jul 2024 16:25:14 -0500
-Message-ID: <CAAhR5DFtHDirPJy+ZWXGAALiRJiZD2NyW=bDTjyxoPLqkm9+Kg@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 04/29] KVM: selftests: Refactor steps in vCPU
- descriptor table initialization
-To: Binbin Wu <binbin.wu@linux.intel.com>
-Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>, 
-	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Peter Gonda <pgonda@google.com>, 
-	Haibo Xu <haibo1.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>, 
-	Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
+Message-ID: <20240723232055.3643811-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Acquire kvm->srcu when handling KVM_SET_VCPU_EVENTS
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 20, 2024 at 11:43=E2=80=AFPM Binbin Wu <binbin.wu@linux.intel.c=
-om> wrote:
->
->
->
-> On 12/13/2023 4:46 AM, Sagi Shahar wrote:
-> > From: Ackerley Tng <ackerleytng@google.com>
-> >
-> > Split the vCPU descriptor table initialization process into a few
-> > steps and expose them:
-> >
-> > + Setting up the IDT
-> > + Syncing exception handlers into the guest
-> >
-> > In kvm_setup_idt(), we conditionally allocate guest memory for vm->idt
-> > to avoid double allocation when kvm_setup_idt() is used after
-> > vm_init_descriptor_tables().
-> >
-> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> > Signed-off-by: Ryan Afranji <afranji@google.com>
-> > Signed-off-by: Sagi Shahar <sagis@google.com>
-> > ---
-> >   .../selftests/kvm/include/x86_64/processor.h  |  2 ++
-> >   .../selftests/kvm/lib/x86_64/processor.c      | 19 ++++++++++++++++--=
--
-> >   2 files changed, 18 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/t=
-ools/testing/selftests/kvm/include/x86_64/processor.h
-> > index 0b8855d68744..5c4e9a27d9e2 100644
-> > --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-> > +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-> > @@ -1089,6 +1089,8 @@ struct idt_entry {
-> >       uint32_t offset2; uint32_t reserved;
-> >   };
-> >
-> > +void kvm_setup_idt(struct kvm_vm *vm, struct kvm_dtable *dt);
-> > +void sync_exception_handlers_to_guest(struct kvm_vm *vm);
-> >   void vm_init_descriptor_tables(struct kvm_vm *vm);
-> >   void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu);
-> >   void vm_install_exception_handler(struct kvm_vm *vm, int vector,
-> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools=
-/testing/selftests/kvm/lib/x86_64/processor.c
-> > index b6b9438e0a33..566d82829da4 100644
-> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > @@ -1155,19 +1155,32 @@ void vm_init_descriptor_tables(struct kvm_vm *v=
-m)
-> >                       DEFAULT_CODE_SELECTOR);
-> >   }
-> >
-> > +void kvm_setup_idt(struct kvm_vm *vm, struct kvm_dtable *dt)
-> > +{
-> > +     if (!vm->idt)
-> > +             vm->idt =3D vm_vaddr_alloc_page(vm);
->
-> IDT is allocated in DATA memslot in current code, but here, when using
-> vm_vaddr_alloc_page(), it will be allocated in TEST_DATA memslot.
->
-> Do we need to follow the current code to use
-> __vm_vaddr_alloc_page(vm, MEM_REGION_DATA) instead?
+Grab kvm->srcu when processing KVM_SET_VCPU_EVENTS, as KVM will forcibly
+leave nested VMX/SVM if SMM mode is being toggled, and leaving nested VMX
+reads guest memory.
 
-This code is no longer needed after Sean's refactor in
-"[PATCH 00/18] KVM: selftests: Clean up x86's DT initialization"
-https://lore.kernel.org/lkml/20240314232637.2538648-1-seanjc@google.com/
+Note, kvm_vcpu_ioctl_x86_set_vcpu_events() can also be called from KVM_RUN
+via sync_regs(), which already holds SRCU.  I.e. trying to precisely use
+kvm_vcpu_srcu_read_lock() around the problematic SMM code would cause
+problems.  Acquiring SRCU isn't all that expensive, so for simplicity,
+grab it unconditionally for KVM_SET_VCPU_EVENTS.
 
->
-> > +
-> > +     dt->base =3D vm->idt;
-> > +     dt->limit =3D NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
-> > +}
-> > +
-> > +void sync_exception_handlers_to_guest(struct kvm_vm *vm)
-> > +{
-> > +     *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)=
-) =3D vm->handlers;
-> > +}
-> > +
-> >   void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
-> >   {
-> >       struct kvm_vm *vm =3D vcpu->vm;
-> >       struct kvm_sregs sregs;
-> >
-> >       vcpu_sregs_get(vcpu, &sregs);
-> > -     sregs.idt.base =3D vm->idt;
-> > -     sregs.idt.limit =3D NUM_INTERRUPTS * sizeof(struct idt_entry) - 1=
-;
-> > +     kvm_setup_idt(vcpu->vm, &sregs.idt);
-> >       sregs.gdt.base =3D vm->gdt;
-> >       sregs.gdt.limit =3D getpagesize() - 1;
-> >       kvm_seg_set_kernel_data_64bit(NULL, DEFAULT_DATA_SELECTOR, &sregs=
-.gs);
-> >       vcpu_sregs_set(vcpu, &sregs);
-> > -     *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)=
-) =3D vm->handlers;
-> > +     sync_exception_handlers_to_guest(vm);
-> >   }
-> >
-> >   void vm_install_exception_handler(struct kvm_vm *vm, int vector,
->
+ =============================
+ WARNING: suspicious RCU usage
+ 6.10.0-rc7-332d2c1d713e-next-vm #552 Not tainted
+ -----------------------------
+ include/linux/kvm_host.h:1027 suspicious rcu_dereference_check() usage!
+
+ other info that might help us debug this:
+
+ rcu_scheduler_active = 2, debug_locks = 1
+ 1 lock held by repro/1071:
+  #0: ffff88811e424430 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x7d/0x970 [kvm]
+
+ stack backtrace:
+ CPU: 15 PID: 1071 Comm: repro Not tainted 6.10.0-rc7-332d2c1d713e-next-vm #552
+ Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
+ Call Trace:
+  <TASK>
+  dump_stack_lvl+0x7f/0x90
+  lockdep_rcu_suspicious+0x13f/0x1a0
+  kvm_vcpu_gfn_to_memslot+0x168/0x190 [kvm]
+  kvm_vcpu_read_guest+0x3e/0x90 [kvm]
+  nested_vmx_load_msr+0x6b/0x1d0 [kvm_intel]
+  load_vmcs12_host_state+0x432/0xb40 [kvm_intel]
+  vmx_leave_nested+0x30/0x40 [kvm_intel]
+  kvm_vcpu_ioctl_x86_set_vcpu_events+0x15d/0x2b0 [kvm]
+  kvm_arch_vcpu_ioctl+0x1107/0x1750 [kvm]
+  ? mark_held_locks+0x49/0x70
+  ? kvm_vcpu_ioctl+0x7d/0x970 [kvm]
+  ? kvm_vcpu_ioctl+0x497/0x970 [kvm]
+  kvm_vcpu_ioctl+0x497/0x970 [kvm]
+  ? lock_acquire+0xba/0x2d0
+  ? find_held_lock+0x2b/0x80
+  ? do_user_addr_fault+0x40c/0x6f0
+  ? lock_release+0xb7/0x270
+  __x64_sys_ioctl+0x82/0xb0
+  do_syscall_64+0x6c/0x170
+  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+ RIP: 0033:0x7ff11eb1b539
+  </TASK>
+
+Fixes: f7e570780efc ("KVM: x86: Forcibly leave nested virt when SMM state is toggled")
+Cc: stable@vger.kernel.org
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index af6c8cf6a37a..d3a4333807c6 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -6042,7 +6042,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
+ 		if (copy_from_user(&events, argp, sizeof(struct kvm_vcpu_events)))
+ 			break;
+ 
++		kvm_vcpu_srcu_read_lock(vcpu);
+ 		r = kvm_vcpu_ioctl_x86_set_vcpu_events(vcpu, &events);
++		kvm_vcpu_srcu_read_unlock(vcpu);
+ 		break;
+ 	}
+ 	case KVM_GET_DEBUGREGS: {
+
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+-- 
+2.45.2.1089.g2a221341d9-goog
+
 
