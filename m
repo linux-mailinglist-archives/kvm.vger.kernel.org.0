@@ -1,236 +1,144 @@
-Return-Path: <kvm+bounces-22113-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22114-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C052493A1F3
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 15:51:29 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C012393A2A1
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 16:23:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C62941C22541
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 13:51:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07C8AB233AE
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 14:23:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B757153575;
-	Tue, 23 Jul 2024 13:51:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD909154BE4;
+	Tue, 23 Jul 2024 14:23:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="AzEZm7Ae"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cOtdMqEb"
 X-Original-To: kvm@vger.kernel.org
-Received: from out187-20.us.a.mail.aliyun.com (out187-20.us.a.mail.aliyun.com [47.90.187.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F378F70;
-	Tue, 23 Jul 2024 13:51:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.187.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C4315252E
+	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 14:23:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721742678; cv=none; b=MYZvAWNqM0LWSIswx3+FUoXvX9BeGJq4gPGbvELqGt0pKv6cBtLRuhVj2qnJGb2FF5GQt1dA4rTs87Wk4d3zuHPO7+fYZhHYMmtUpZT7lA24xaL//7v2rsZKN1A9ZUrh8eWw5kbKt3MlSjadxxWDfXHEkQ/PSPwMUdvli2Gt4RM=
+	t=1721744623; cv=none; b=GOJq0MDiKwWSfP/pGdKvAGL1y7GCN6OwjUyp1VSujWuiQBsy2IzmCPl2zRgI55NrLhoboggLo0IwUM9ddwUX7Bnnx9kz04xOlvT3KtWdxdODc5xTFNzvj0s0Rsd6K6FBKqWBL3D+toUvUTDDt57p+k9A4rZ4CeHFCUDGwuwqjiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721742678; c=relaxed/simple;
-	bh=Ky2Zko+wHRdleQq8zIUXC9P800ciLsF5ZoFhcO3nu2I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PUO+dJj04TbYgSkXhHHEqD+pYrpQ+zmR3ltS81CP3dQ5SLCq26l/yw5nS6H3OhMXQrbMuRbqVmX6vkzxpaIkVx9xTcY7aVu0QRAx1Uo1AXAxPQWnYC1qyLOGkbWkFoRBfkWAOEA6KZOpNuAYYOt8P5KaUfH0kYH7IPqx8ViVYRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=AzEZm7Ae; arc=none smtp.client-ip=47.90.187.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=antgroup.com; s=default;
-	t=1721742660; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=vCE01r08TqBO/rkkhma9XyaLno6uRIgtUtNxelheW40=;
-	b=AzEZm7Ae/omvA26wBxYIo08NU7bw4bomIPu2PtaaKVa4bx/umvjvaLPEvWdzRT/fr8Mn4P2Qd3Ra1QDJMhNGCVzVgzz9y276yQu7gpf6Ng7u8S4aui1YwWH6ff2VmmppScR+UtU4lch6gg04N2ddcfzVgXROjwGq0UlJTFC81aI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R331e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033070021168;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---.YXQIh60_1721740804;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.YXQIh60_1721740804)
-          by smtp.aliyun-inc.com;
-          Tue, 23 Jul 2024 21:20:05 +0800
-Date: Tue, 23 Jul 2024 21:20:04 +0800
-From: "Hou Wenlong" <houwenlong.hwl@antgroup.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH] KVM: nVMX: Honor userspace MSR filter lists for nested
- VM-Enter/VM-Exit
-Message-ID: <20240723132004.GA67088@k08j02272.eu95sqa>
-References: <20240722235922.3351122-1-seanjc@google.com>
+	s=arc-20240116; t=1721744623; c=relaxed/simple;
+	bh=djcUsIGzq+dZRGlkFaozwQrZI1bz9S4yJXrBzSwBEIw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=Fv+qKBNHOFBKIsD5x4YeACt0pVAvELBDv6qFm7B3a3e1sGlpt28nWlQTmYFYDz9zf5slI6u6Sec24azL8EV2+XNFVLCyXuQgZg+wMSukbroz2N3zMRtNWqenv2Lm6xdCrhigBLbXMxUrS9ZY/fVTcCgQ7B1wHHc7njslAO7Mx58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cOtdMqEb; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-66480c1a6b5so184633827b3.1
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 07:23:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721744619; x=1722349419; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=V7uZHlnsW4OL40RtP/2lvo/AGXl6SnWpK7+UcdL6+Lw=;
+        b=cOtdMqEbUjc4hxcAPm+5pma9qvIB9VWnfTby/q6Dv4rQzD2WsMrUJAMyxeI168jV11
+         xt0EpT3Cpuf4mhYQ/Yj7BxHBcmKkytGUXxkNA3FGVc/uFAuUDTN88zPbJunuQip/BfO0
+         /zu0sIwT6aGalco1F0orcrE5GqxbrXUSDJdKcbqKe1BcePny16juM3++vyTRnqiUcEkb
+         RW9udQi0ZEJ4O6QkaSuHFADvxgQX5gtNXe8//l6drhMMAc6tx04QcRmSjrKCWRkkocox
+         4eSueXwYl61BRlkBG8jllho/k+w2ERwNuwPssWcN4J/XQNta9SSiQ2OY811AvRbLLTQe
+         3RgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721744619; x=1722349419;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V7uZHlnsW4OL40RtP/2lvo/AGXl6SnWpK7+UcdL6+Lw=;
+        b=LQByB6jTvs12wPwhG8VQ521YR4ZKM5/QC5TdyQsdNhr5fCTLWF/wzZ2q8dfpQQqckA
+         REDzy8/O4O4tVt4mLD81Qxww5EB7nriOeXxnSF5eLu4oWs1usE7bojyflW2yBAzNc0H0
+         6fF2QnzaXQF7O3Q1cD3GfiIrVJaeZbA6DzD+3QTViWXorlvnMkfzqKuiT6gTCJ5WL4K7
+         whbHdWsps6OJlFfl2K3TQNzQ+vtLI+6owcB/kFMSCzoShmg1xD3ZeinkLCh7lo8mJcSG
+         I7Wfc37CuLlfEHChLmSnCYvGiM6CvA6aTGhBWpUV7cpBHzVDr2QP1oRP8oq2rjXj5pyP
+         Px/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWxX71oN6BJ53HuT0ilJlS45WKYo1jtOCoDzmu+I8anVlOvSAhNBBG5TC0TKk3OVv/CQ58pKxBuHkbBmq1NiDVIIYe6
+X-Gm-Message-State: AOJu0YyBOnGwPg6Jeqgd/ku2aq/ja4cUQjlxjaiTvO0rUPl29zL7Aa58
+	RIfc3n7fmHbqHyMdgSN7LWMw1FgUb6G5OXbEi8HAu2F6t3P2Xn1eVXXF0R7/U6qWnJVhNX+rJBF
+	JvA==
+X-Google-Smtp-Source: AGHT+IGvPQnH0U/tpIR1t3mRe7duPwj4S4iYv3/ML/p+jwqS35TYyJTs5i6KeHPlHAo4yj88wS0IHavwHDA=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:d84:b0:62f:f535:f41 with SMTP id
+ 00721157ae682-66a65d6ed69mr5250417b3.9.1721744619279; Tue, 23 Jul 2024
+ 07:23:39 -0700 (PDT)
+Date: Tue, 23 Jul 2024 07:23:37 -0700
+In-Reply-To: <20240723132004.GA67088@k08j02272.eu95sqa>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240722235922.3351122-1-seanjc@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Mime-Version: 1.0
+References: <20240722235922.3351122-1-seanjc@google.com> <20240723132004.GA67088@k08j02272.eu95sqa>
+Message-ID: <Zp-8o7dGivU_ek86@google.com>
+Subject: Re: [PATCH] KVM: nVMX: Honor userspace MSR filter lists for nested VM-Enter/VM-Exit
+From: Sean Christopherson <seanjc@google.com>
+To: Hou Wenlong <houwenlong.hwl@antgroup.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jim Mattson <jmattson@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 23, 2024 at 07:59:22AM +0800, Sean Christopherson wrote:
-> Synthesize a consistency check VM-Exit (VM-Enter) or VM-Abort (VM-Exit) if
-> L1 attempts to load/store an MSR via the VMCS MSR lists that userspace has
-> disallowed access to via an MSR filter.  Intel already disallows including
-> a handful of "special" MSRs in the VMCS lists, so denying access isn't
-> completely without precedent.
-> 
-> More importantly, the behavior is well-defined _and_ can be communicated
-> the end user, e.g. to the customer that owns a VM running as L1 on top of
-> KVM.  On the other hand, ignoring userspace MSR filters is all but
-> guaranteed to result in unexpected behavior as the access will hit KVM's
-> internal state, which is likely not up-to-date.
-> 
-> Unlike KVM-internal accesses, instruction emulation, and dedicated VMCS
-> fields, the MSRs in the VMCS load/store lists are 100% guest controlled,
-> thus making it all but impossible to reason about the correctness of
-> ignoring the MSR filter.  And if userspace *really* wants to deny access
-> to MSRs via the aforementioned scenarios, userspace can hide the
-> associated feature from the guest, e.g. by disabling the PMU to prevent
-> accessing PERF_GLOBAL_CTRL via its VMCS field.  But for the MSR lists, KVM
-> is blindly processing MSRs; the  MSR filters are the _only_ way for
-> userspace to deny access.
-> 
-> This partially reverts commit ac8d6cad3c7b ("KVM: x86: Only do MSR
-> filtering when access MSR by rdmsr/wrmsr").
-> 
-> Cc: Hou Wenlong <houwenlong.hwl@antgroup.com>
-> Cc: Jim Mattson <jmattson@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
-> 
-> I found this by inspection when backporting Hou's change to an internal kernel.
-> I don't love piggybacking Intel's "you can't touch these special MSRs" behavior,
-> but ignoring the userspace MSR filters is far worse IMO.  E.g. if userspace is
-> denying access to an MSR in order to reduce KVM's attack surface, letting L1
-> sneak in reads/writes through VM-Enter/VM-Exit completely circumvents the
-> filters.
-> 
->  Documentation/virt/kvm/api.rst  | 19 ++++++++++++++++---
->  arch/x86/include/asm/kvm_host.h |  2 ++
->  arch/x86/kvm/vmx/nested.c       | 12 ++++++------
->  arch/x86/kvm/x86.c              |  6 ++++--
->  4 files changed, 28 insertions(+), 11 deletions(-)
-> 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 8e5dad80b337..e6b1e42186f3 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -4226,9 +4226,22 @@ filtering. In that mode, ``KVM_MSR_FILTER_DEFAULT_DENY`` is invalid and causes
->  an error.
->  
->  .. warning::
-> -   MSR accesses as part of nested VM-Enter/VM-Exit are not filtered.
-> -   This includes both writes to individual VMCS fields and reads/writes
-> -   through the MSR lists pointed to by the VMCS.
-> +   MSR accesses that are side effects of instruction execution (emulated or
-> +   native) are not filtered as hardware does not honor MSR bitmaps outside of
-> +   RDMSR and WRMSR, and KVM mimics that behavior when emulating instructions
-> +   to avoid pointless divergence from hardware.  E.g. RDPID reads MSR_TSC_AUX,
-> +   SYSENTER reads the SYSENTER MSRs, etc.
-> +
-> +   MSRs that are loaded/stored via dedicated VMCS fields are not filtered as
-> +   part of VM-Enter/VM-Exit emulation.
-> +
-> +   MSRs that are loaded/store via VMX's load/store lists _are_ filtered as part
-> +   of VM-Enter/VM-Exit emulation.  If an MSR access is denied on VM-Enter, KVM
-> +   synthesizes a consistency check VM-Exit(EXIT_REASON_MSR_LOAD_FAIL).  If an
-> +   MSR access is denied on VM-Exit, KVM synthesizes a VM-Abort.  In short, KVM
-> +   extends Intel's architectural list of MSRs that cannot be loaded/saved via
-> +   the VM-Enter/VM-Exit MSR list.  It is platform owner's responsibility to
-> +   to communicate any such restrictions to their end users.
->
-Do we also need to modify the statement before this warning? Since
-the behaviour is different from RDMSR/WRMSR emulation case.
+On Tue, Jul 23, 2024, Hou Wenlong wrote:
+> On Tue, Jul 23, 2024 at 07:59:22AM +0800, Sean Christopherson wrote:
+> > ---
+> > 
+> > I found this by inspection when backporting Hou's change to an internal kernel.
+> > I don't love piggybacking Intel's "you can't touch these special MSRs" behavior,
+> > but ignoring the userspace MSR filters is far worse IMO.  E.g. if userspace is
+> > denying access to an MSR in order to reduce KVM's attack surface, letting L1
+> > sneak in reads/writes through VM-Enter/VM-Exit completely circumvents the
+> > filters.
+> > 
+> >  Documentation/virt/kvm/api.rst  | 19 ++++++++++++++++---
+> >  arch/x86/include/asm/kvm_host.h |  2 ++
+> >  arch/x86/kvm/vmx/nested.c       | 12 ++++++------
+> >  arch/x86/kvm/x86.c              |  6 ++++--
+> >  4 files changed, 28 insertions(+), 11 deletions(-)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index 8e5dad80b337..e6b1e42186f3 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -4226,9 +4226,22 @@ filtering. In that mode, ``KVM_MSR_FILTER_DEFAULT_DENY`` is invalid and causes
+> >  an error.
+> >  
+> >  .. warning::
+> > -   MSR accesses as part of nested VM-Enter/VM-Exit are not filtered.
+> > -   This includes both writes to individual VMCS fields and reads/writes
+> > -   through the MSR lists pointed to by the VMCS.
+> > +   MSR accesses that are side effects of instruction execution (emulated or
+> > +   native) are not filtered as hardware does not honor MSR bitmaps outside of
+> > +   RDMSR and WRMSR, and KVM mimics that behavior when emulating instructions
+> > +   to avoid pointless divergence from hardware.  E.g. RDPID reads MSR_TSC_AUX,
+> > +   SYSENTER reads the SYSENTER MSRs, etc.
+> > +
+> > +   MSRs that are loaded/stored via dedicated VMCS fields are not filtered as
+> > +   part of VM-Enter/VM-Exit emulation.
+> > +
+> > +   MSRs that are loaded/store via VMX's load/store lists _are_ filtered as part
+> > +   of VM-Enter/VM-Exit emulation.  If an MSR access is denied on VM-Enter, KVM
+> > +   synthesizes a consistency check VM-Exit(EXIT_REASON_MSR_LOAD_FAIL).  If an
+> > +   MSR access is denied on VM-Exit, KVM synthesizes a VM-Abort.  In short, KVM
+> > +   extends Intel's architectural list of MSRs that cannot be loaded/saved via
+> > +   the VM-Enter/VM-Exit MSR list.  It is platform owner's responsibility to
+> > +   to communicate any such restrictions to their end users.
+> >
+> Do we also need to modify the statement before this warning?
 
-```
-if an MSR access is denied by userspace the resulting KVM behavior depends on
-whether or not KVM_CAP_X86_USER_SPACE_MSR's KVM_MSR_EXIT_REASON_FILTER is
-enabled.  If KVM_MSR_EXIT_REASON_FILTER is enabled, KVM will exit to userspace
-on denied accesses, i.e. userspace effectively intercepts the MSR access.
-```
+Yeah, that's a good idea.
 
->     x2APIC MSR accesses cannot be filtered (KVM silently ignores filters that
->     cover any x2APIC MSRs).
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 950a03e0181e..94d0bedc42ee 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -2059,6 +2059,8 @@ void kvm_prepare_emulation_failure_exit(struct kvm_vcpu *vcpu);
->  
->  void kvm_enable_efer_bits(u64);
->  bool kvm_valid_efer(struct kvm_vcpu *vcpu, u64 efer);
-> +int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data);
-> +int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data);
->  int __kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data, bool host_initiated);
->  int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data);
->  int kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data);
-> diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-> index 2392a7ef254d..674f7089cc44 100644
-> --- a/arch/x86/kvm/vmx/nested.c
-> +++ b/arch/x86/kvm/vmx/nested.c
-> @@ -981,7 +981,7 @@ static u32 nested_vmx_load_msr(struct kvm_vcpu *vcpu, u64 gpa, u32 count)
->  				__func__, i, e.index, e.reserved);
->  			goto fail;
->  		}
-> -		if (kvm_set_msr(vcpu, e.index, e.value)) {
-> +		if (kvm_set_msr_with_filter(vcpu, e.index, e.value)) {
->  			pr_debug_ratelimited(
->  				"%s cannot write MSR (%u, 0x%x, 0x%llx)\n",
->  				__func__, i, e.index, e.value);
-> @@ -1017,7 +1017,7 @@ static bool nested_vmx_get_vmexit_msr_value(struct kvm_vcpu *vcpu,
->  		}
->  	}
->  
-> -	if (kvm_get_msr(vcpu, msr_index, data)) {
-> +	if (kvm_get_msr_with_filter(vcpu, msr_index, data)) {
->  		pr_debug_ratelimited("%s cannot read MSR (0x%x)\n", __func__,
->  			msr_index);
->  		return false;
-> @@ -1112,9 +1112,9 @@ static void prepare_vmx_msr_autostore_list(struct kvm_vcpu *vcpu,
->  			/*
->  			 * Emulated VMEntry does not fail here.  Instead a less
->  			 * accurate value will be returned by
-> -			 * nested_vmx_get_vmexit_msr_value() using kvm_get_msr()
-> -			 * instead of reading the value from the vmcs02 VMExit
-> -			 * MSR-store area.
-> +			 * nested_vmx_get_vmexit_msr_value() by reading KVM's
-> +			 * internal MSR state instead of reading the value from
-> +			 * the vmcs02 VMExit MSR-store area.
->  			 */
->  			pr_warn_ratelimited(
->  				"Not enough msr entries in msr_autostore.  Can't add msr %x\n",
-> @@ -4806,7 +4806,7 @@ static void nested_vmx_restore_host_state(struct kvm_vcpu *vcpu)
->  				goto vmabort;
->  			}
->  
-> -			if (kvm_set_msr(vcpu, h.index, h.value)) {
-> +			if (kvm_set_msr_with_filter(vcpu, h.index, h.value)) {
->  				pr_debug_ratelimited(
->  					"%s WRMSR failed (%u, 0x%x, 0x%llx)\n",
->  					__func__, j, h.index, h.value);
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index af6c8cf6a37a..7b3659a05c27 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1942,19 +1942,21 @@ static int kvm_get_msr_ignored_check(struct kvm_vcpu *vcpu,
->  	return ret;
->  }
->  
-> -static int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data)
-> +int kvm_get_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 *data)
->  {
->  	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_READ))
->  		return KVM_MSR_RET_FILTERED;
->  	return kvm_get_msr_ignored_check(vcpu, index, data, false);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_get_msr_with_filter);
->  
-> -static int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data)
-> +int kvm_set_msr_with_filter(struct kvm_vcpu *vcpu, u32 index, u64 data)
->  {
->  	if (!kvm_msr_allowed(vcpu, index, KVM_MSR_FILTER_WRITE))
->  		return KVM_MSR_RET_FILTERED;
->  	return kvm_set_msr_ignored_check(vcpu, index, data, false);
->  }
-> +EXPORT_SYMBOL_GPL(kvm_set_msr_with_filter);
->  
->  int kvm_get_msr(struct kvm_vcpu *vcpu, u32 index, u64 *data)
->  {
+While you're here, did you have a use case that is/was affected by the current
+VM-Enter/VM-Exit vs. MSR filtering behavior?
+
+> Since the behaviour is different from RDMSR/WRMSR emulation case.
 > 
-> base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
-> -- 
-> 2.45.2.1089.g2a221341d9-goog
+> ```
+> if an MSR access is denied by userspace the resulting KVM behavior depends on
+> whether or not KVM_CAP_X86_USER_SPACE_MSR's KVM_MSR_EXIT_REASON_FILTER is
+> enabled.  If KVM_MSR_EXIT_REASON_FILTER is enabled, KVM will exit to userspace
+> on denied accesses, i.e. userspace effectively intercepts the MSR access.
+> ```
 
