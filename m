@@ -1,271 +1,149 @@
-Return-Path: <kvm+bounces-22130-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22131-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA3F93A7EC
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 21:58:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D31A93A7F2
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 21:59:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A29CF1C22FC6
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 19:58:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25D271F23A57
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 19:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB4C1482EE;
-	Tue, 23 Jul 2024 19:56:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0616D14885C;
+	Tue, 23 Jul 2024 19:57:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nRUA/eY5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O4vCf/Yp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5131482E8
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 19:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9740E14264A;
+	Tue, 23 Jul 2024 19:57:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721764613; cv=none; b=avRMJ51P0mDE3AcgCpaseC+xu+gMeEOZSm7c1ROUbd+Q2H+GEK5yNeHFzZyd6oKho1rg0dWA/EAvYJ/z7gtHWrLGf5/8Mry6kVdR/3x9xpCgM+JbX6Ka7Gmou147Du6sHCqbJzIe150YgghKBoXyZJGpoKULObLYmKsSgkO7Hmk=
+	t=1721764676; cv=none; b=hUSOIdZgddwgBNSVCArdx5bHi+byofjJezEPVNCjZbemLGhVt2aqgKmdgzrRWDYmfh21z7QT3YQLqVfWLOHwfQfgQoJ8qpOBqoeGRiawc391Pa4xFXlPgFJdL9MJwnh2rbiOFzk6Z7McLa/FUs6h4gvL4sr5vcwjC69TWkO/354=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721764613; c=relaxed/simple;
-	bh=w1yiFjHCdqLJJArQszIJSGLgVCFAk20EVpIzc9McI/w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=S3I8kqUqcJWXK0PQNnOcouKlwE0fTdek/h1pa59vKE4ppEYLd0RPXK7rT2xN4hJCbGw7OuefHQDr5ijjrDsjVXgGZtgwjwHHlq6AlupjDXsYg9fqv2SJoq9Q7/JdkTcIJFStezWiOXsfC00C6ylEx5CjtpwPzfUwJEOe2GZCx4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nRUA/eY5; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e04196b7603so5443845276.0
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 12:56:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721764610; x=1722369410; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DQ8gVf5B0wPtEoet4zm24rxnx8GgSxUPU5gw6kjX2ns=;
-        b=nRUA/eY5cbBr+AFy7FQKi6I/p1dSmogE6vI3BGtScaD5NgwrM/XSmfx0yWoufZiKZj
-         SXUteZeuuB8ZsnUuyw6c6Hhll4i1C0ehrcmtl9k5wQVIYdAadNZm4w0AVDIl2NoMItB9
-         XjZrCuJ703/hKr4MhJsrm8mT1D84VVUuZKrOGoMxk0Ue7WmhAgpViiR2S4bW0yO3YcQ+
-         f/Vm1+BmRr4ubacCXDb0rNTTyKnh8znMKAmQs5GFsR0VsWKXkx7aWBhp6mZLu9U/8fGg
-         jwJKQItzxKEoof5GuZRGQkQ+oEulHZPeYjsZ6oNRc8fkt+P5XvcoBNixpQBlew8i2ixy
-         UWiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721764610; x=1722369410;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DQ8gVf5B0wPtEoet4zm24rxnx8GgSxUPU5gw6kjX2ns=;
-        b=Vt8MP9aOuRaeCS3i54MWI2jHvbRkOsadOwlDXFJ+OBlUzPs87VZPEj3VujTeQ7vjGh
-         1y08wob8iDato1RIMSIhYcRq0404zGPHARGnW/wSXJipR9ZfKRL1mw2dK1/Vj6/k4gj7
-         94FIykQsr6lrjOyhULNbNoa2KR1C7x9IeaPGcvsaHcid79DERYFl55EpMHmu9N0zJciB
-         M/6Jf9lRO7ScHVoDzHKbPsSESTGCdQ/XDZ44vXBBCACNuFP7SIdbuCieeSJVPpvQZBbz
-         ovAvNQHJ2/TO7/kI6kDb3tFMvktfP+lC9Duj0/2BALdeqi8Px+bt0d/jPYYPh7Z83mCl
-         t1VA==
-X-Forwarded-Encrypted: i=1; AJvYcCX4iWiM7hH1rcla0J4w7Bu2omdSxaBnLq93GH3RexbM0o0xe286mth3wjxs37Ll3m114Uu5CuBSaoTAO6rC2P6aOtSz
-X-Gm-Message-State: AOJu0YwJJKRtHNPk6thSUNpnqS7SFNqpHM+Z3cDYtlbDl+F0PnTxB2fb
-	6gBT3elLGr4ffVFqESt5OvsNXaeuzULsRFM2g15Bv8gXJZHJpn7/FLOySD6S5hWtLRnPJGqb4g1
-	Ip3OytCmY7zT1D+cjtWb1wsK1BjHfYUTcriqs
-X-Google-Smtp-Source: AGHT+IGDERizmWaRZSYrEeosGY/RVvaTx8fAfVuWpYPQS52G6odr3z9alx6euwKiIoGuRdU+jKSkuTTpA0Br5WZBQTo=
-X-Received: by 2002:a05:6902:a07:b0:e05:ae3f:7ae8 with SMTP id
- 3f1490d57ef6-e087b9e574emr13923095276.52.1721764610048; Tue, 23 Jul 2024
- 12:56:50 -0700 (PDT)
+	s=arc-20240116; t=1721764676; c=relaxed/simple;
+	bh=F7oV1U3Aj4pE+kbk85/bZihDwGPL4aFznra86IAEkRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YEef5lOjQY9FXugOEuluOGpoXx9MpBgden42RMqO5S3LQSilO9jjzQV69pXCMKlIf6YpMTJtxyV4SlHHn31Ayd6TqwYQTBZtSKBlLvlEZ7OO+lwr3cZIB1dellvsxwxLt4/eIh1vE/dbqxTP6xlY7CgshfTxvnNVcyk1+T4Fve8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O4vCf/Yp; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721764673; x=1753300673;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=F7oV1U3Aj4pE+kbk85/bZihDwGPL4aFznra86IAEkRc=;
+  b=O4vCf/YppWqKGW9GYiONKpbI/AzyqnFGQTOBIQZ9NF6734XCGkFHNfn2
+   X55rnnlsJiVXzhUDkb0bSiRKCE5Yjg7NQ7yqF0BvrRFzjtuzIUjDY/TCQ
+   rXXfuWexb87FQKrEMD1UiRUOnwUnU/mpIhpZ5je9cgu2cYIb3OZoATBqC
+   8+O9QXgkiuMZnCvglIj2zk33R6/6OIttz/GYhxiuZ2bsQ9CTbwnP/mjvy
+   RYli3NS2Fc05NTVaDavb87nV1f7mzrzHqHGX3YOxInwVIqgrlkvFrvLyT
+   02xOc933B2aRSNsL3IohxHN/cdpvfx48Pq3I0bjGelFPCbkanI0hTiTeO
+   w==;
+X-CSE-ConnectionGUID: FcokTKuOThWRtZXi7uKVuA==
+X-CSE-MsgGUID: +P637xSCTI6/Is25I0EW/A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11142"; a="19597408"
+X-IronPort-AV: E=Sophos;i="6.09,231,1716274800"; 
+   d="scan'208";a="19597408"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 12:57:53 -0700
+X-CSE-ConnectionGUID: BtbfYRwFQ0SaLgP0xDjQUw==
+X-CSE-MsgGUID: P6YDV3w2TPi6cmQybAH2pw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,231,1716274800"; 
+   d="scan'208";a="52065548"
+Received: from lkp-server01.sh.intel.com (HELO 68891e0c336b) ([10.239.97.150])
+  by fmviesa007.fm.intel.com with ESMTP; 23 Jul 2024 12:57:50 -0700
+Received: from kbuild by 68891e0c336b with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sWLds-000mJc-1L;
+	Tue, 23 Jul 2024 19:57:48 +0000
+Date: Wed, 24 Jul 2024 03:57:35 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Waiman Long <longman@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, WANG Xuerui <kernel@xen0n.name>,
+	loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev
+Subject: Re: [PATCH 2/2] LoongArch: KVM: Add paravirt qspinlock in guest side
+Message-ID: <202407240320.qqd1uWiE-lkp@intel.com>
+References: <20240723073825.1811600-3-maobibo@loongson.cn>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231212204647.2170650-1-sagis@google.com> <20231212204647.2170650-2-sagis@google.com>
- <797bfae3-6419-4a7a-991a-1d203691d2cb@intel.com>
-In-Reply-To: <797bfae3-6419-4a7a-991a-1d203691d2cb@intel.com>
-From: Sagi Shahar <sagis@google.com>
-Date: Tue, 23 Jul 2024 14:56:39 -0500
-Message-ID: <CAAhR5DGQDWdzizHHmG9yEQej0i5Ovn=RaXF_QkpdFT6Vragnww@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 01/29] KVM: selftests: Add function to allow
- one-to-one GVA to GPA mappings
-To: "Zhang, Dongsheng X" <dongsheng.x.zhang@intel.com>
-Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>, 
-	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Peter Gonda <pgonda@google.com>, 
-	Haibo Xu <haibo1.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
-	Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>, 
-	Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240723073825.1811600-3-maobibo@loongson.cn>
 
-On Thu, Mar 21, 2024 at 5:29=E2=80=AFPM Zhang, Dongsheng X
-<dongsheng.x.zhang@intel.com> wrote:
->
->
->
-> On 12/12/2023 12:46 PM, Sagi Shahar wrote:
-> > From: Ackerley Tng <ackerleytng@google.com>
-> >
-> > One-to-one GVA to GPA mappings can be used in the guest to set up boot
-> > sequences during which paging is enabled, hence requiring a transition
-> > from using physical to virtual addresses in consecutive instructions.
-> >
-> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> > Signed-off-by: Ryan Afranji <afranji@google.com>
-> > Signed-off-by: Sagi Shahar <sagis@google.com>
-> > ---
-> >  .../selftests/kvm/include/kvm_util_base.h     |  2 +
-> >  tools/testing/selftests/kvm/lib/kvm_util.c    | 63 ++++++++++++++++---
-> >  2 files changed, 55 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/kvm/include/kvm_util_base.h b/tool=
-s/testing/selftests/kvm/include/kvm_util_base.h
-> > index 1426e88ebdc7..c2e5c5f25dfc 100644
-> > --- a/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > +++ b/tools/testing/selftests/kvm/include/kvm_util_base.h
-> > @@ -564,6 +564,8 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, size_t=
- sz, vm_vaddr_t vaddr_min);
-> >  vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t v=
-addr_min,
-> >                           enum kvm_mem_region_type type);
-> >  vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz, vm_vadd=
-r_t vaddr_min);
-> > +vm_vaddr_t vm_vaddr_alloc_1to1(struct kvm_vm *vm, size_t sz,
-> > +                            vm_vaddr_t vaddr_min, uint32_t data_memslo=
-t);
-> >  vm_vaddr_t vm_vaddr_alloc_pages(struct kvm_vm *vm, int nr_pages);
-> >  vm_vaddr_t __vm_vaddr_alloc_page(struct kvm_vm *vm,
-> >                                enum kvm_mem_region_type type);
-> > diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing=
-/selftests/kvm/lib/kvm_util.c
-> > index febc63d7a46b..4f1ae0f1eef0 100644
-> > --- a/tools/testing/selftests/kvm/lib/kvm_util.c
-> > +++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-> > @@ -1388,17 +1388,37 @@ vm_vaddr_t vm_vaddr_unused_gap(struct kvm_vm *v=
-m, size_t sz,
-> >       return pgidx_start * vm->page_size;
-> >  }
-> >
-> > +/*
-> > + * VM Virtual Address Allocate Shared/Encrypted
-> > + *
-> > + * Input Args:
-> > + *   vm - Virtual Machine
-> > + *   sz - Size in bytes
-> > + *   vaddr_min - Minimum starting virtual address
-> > + *   paddr_min - Minimum starting physical address
-> > + *   data_memslot - memslot number to allocate in
-> > + *   encrypt - Whether the region should be handled as encrypted
-> > + *
-> > + * Output Args: None
-> > + *
-> > + * Return:
-> > + *   Starting guest virtual address
-> > + *
-> > + * Allocates at least sz bytes within the virtual address space of the=
- vm
-> > + * given by vm.  The allocated bytes are mapped to a virtual address >=
-=3D
-> > + * the address given by vaddr_min.  Note that each allocation uses a
-> > + * a unique set of pages, with the minimum real allocation being at le=
-ast
-> > + * a page.
-> > + */
-> >  static vm_vaddr_t ____vm_vaddr_alloc(struct kvm_vm *vm, size_t sz,
-> > -                                  vm_vaddr_t vaddr_min,
-> > -                                  enum kvm_mem_region_type type,
-> > -                                  bool encrypt)
-> > +                                  vm_vaddr_t vaddr_min, vm_paddr_t pad=
-dr_min,
-> > +                                  uint32_t data_memslot, bool encrypt)
-> >  {
-> >       uint64_t pages =3D (sz >> vm->page_shift) + ((sz % vm->page_size)=
- !=3D 0);
-> >
-> >       virt_pgd_alloc(vm);
-> > -     vm_paddr_t paddr =3D _vm_phy_pages_alloc(vm, pages,
-> > -                                           KVM_UTIL_MIN_PFN * vm->page=
-_size,
-> > -                                           vm->memslots[type], encrypt=
-);
-> > +     vm_paddr_t paddr =3D _vm_phy_pages_alloc(vm, pages, paddr_min,
-> > +                                            data_memslot, encrypt);
-> >
-> >       /*
-> >        * Find an unused range of virtual page addresses of at least
-> > @@ -1408,8 +1428,7 @@ static vm_vaddr_t ____vm_vaddr_alloc(struct kvm_v=
-m *vm, size_t sz,
-> >
-> >       /* Map the virtual pages. */
-> >       for (vm_vaddr_t vaddr =3D vaddr_start; pages > 0;
-> > -             pages--, vaddr +=3D vm->page_size, paddr +=3D vm->page_si=
-ze) {
-> > -
-> > +          pages--, vaddr +=3D vm->page_size, paddr +=3D vm->page_size)=
- {
-> >               virt_pg_map(vm, vaddr, paddr);
-> >
-> >               sparsebit_set(vm->vpages_mapped, vaddr >> vm->page_shift)=
-;
-> > @@ -1421,12 +1440,16 @@ static vm_vaddr_t ____vm_vaddr_alloc(struct kvm=
-_vm *vm, size_t sz,
-> >  vm_vaddr_t __vm_vaddr_alloc(struct kvm_vm *vm, size_t sz, vm_vaddr_t v=
-addr_min,
-> >                           enum kvm_mem_region_type type)
-> >  {
-> > -     return ____vm_vaddr_alloc(vm, sz, vaddr_min, type, vm->protected)=
-;
-> > +     return ____vm_vaddr_alloc(vm, sz, vaddr_min,
-> > +                               KVM_UTIL_MIN_PFN * vm->page_size,
-> > +                               vm->memslots[type], vm->protected);
-> >  }
-> >
-> >  vm_vaddr_t vm_vaddr_alloc_shared(struct kvm_vm *vm, size_t sz, vm_vadd=
-r_t vaddr_min)
-> >  {
-> > -     return ____vm_vaddr_alloc(vm, sz, vaddr_min, MEM_REGION_TEST_DATA=
-, false);
-> > +     return ____vm_vaddr_alloc(vm, sz, vaddr_min,
-> > +                               KVM_UTIL_MIN_PFN * vm->page_size,
-> > +                               vm->memslots[MEM_REGION_TEST_DATA], fal=
-se);
-> >  }
-> >
-> >  /*
-> > @@ -1453,6 +1476,26 @@ vm_vaddr_t vm_vaddr_alloc(struct kvm_vm *vm, siz=
-e_t sz, vm_vaddr_t vaddr_min)
-> >       return __vm_vaddr_alloc(vm, sz, vaddr_min, MEM_REGION_TEST_DATA);
-> >  }
-> >
-> > +/**
-> > + * Allocate memory in @vm of size @sz in memslot with id @data_memslot=
-,
-> > + * beginning with the desired address of @vaddr_min.
-> > + *
-> > + * If there isn't enough memory at @vaddr_min, find the next possible =
-address
-> > + * that can meet the requested size in the given memslot.
-> > + *
-> > + * Return the address where the memory is allocated.
-> > + */
-> > +vm_vaddr_t vm_vaddr_alloc_1to1(struct kvm_vm *vm, size_t sz,
-> > +                            vm_vaddr_t vaddr_min, uint32_t data_memslo=
-t)
-> > +{
-> > +     vm_vaddr_t gva =3D ____vm_vaddr_alloc(vm, sz, vaddr_min,
-> > +                                         (vm_paddr_t)vaddr_min, data_m=
-emslot,
-> > +                                         vm->protected);
-> > +     TEST_ASSERT_EQ(gva, addr_gva2gpa(vm, gva));
->
-> By 1to1, do you mean virtual address=3Dphysical address?, community tends=
- to call this identity mapping.
-> Examples (function name):
-> create_identity_mapping_pagetables()
-> hellcreek_setup_tc_identity_mapping()
-> identity_mapping_add()
+Hi Bibo,
 
-Thanks for the input. Will switch to vm_vaddr_identity_alloc()
->
-> > +
-> > +     return gva;
-> > +}
-> > +
-> >  /*
-> >   * VM Virtual Address Allocate Pages
-> >   *
->
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on 7846b618e0a4c3e08888099d1d4512722b39ca99]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Bibo-Mao/LoongArch-KVM-Add-paravirt-qspinlock-in-kvm-side/20240723-160536
+base:   7846b618e0a4c3e08888099d1d4512722b39ca99
+patch link:    https://lore.kernel.org/r/20240723073825.1811600-3-maobibo%40loongson.cn
+patch subject: [PATCH 2/2] LoongArch: KVM: Add paravirt qspinlock in guest side
+config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20240724/202407240320.qqd1uWiE-lkp@intel.com/config)
+compiler: loongarch64-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240724/202407240320.qqd1uWiE-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202407240320.qqd1uWiE-lkp@intel.com/
+
+All error/warnings (new ones prefixed by >>):
+
+>> arch/loongarch/kernel/paravirt.c:309: warning: expecting prototype for queued_spin_unlock(). Prototype was for native_queued_spin_unlock() instead
+--
+   In file included from include/linux/atomic.h:80,
+                    from include/asm-generic/bitops/atomic.h:5,
+                    from arch/loongarch/include/asm/bitops.h:27,
+                    from include/linux/bitops.h:63,
+                    from include/linux/kernel.h:23,
+                    from include/linux/cpumask.h:11,
+                    from include/linux/smp.h:13,
+                    from kernel/locking/qspinlock.c:16:
+   kernel/locking/qspinlock_paravirt.h: In function 'pv_kick_node':
+>> include/linux/atomic/atomic-arch-fallback.h:242:34: error: initialization of 'u8 *' {aka 'unsigned char *'} from incompatible pointer type 'enum vcpu_state *' [-Wincompatible-pointer-types]
+     242 |         typeof(*(_ptr)) *___op = (_oldp), ___o = *___op, ___r; \
+         |                                  ^
+   include/linux/atomic/atomic-instrumented.h:4908:9: note: in expansion of macro 'raw_try_cmpxchg_relaxed'
+    4908 |         raw_try_cmpxchg_relaxed(__ai_ptr, __ai_oldp, __VA_ARGS__); \
+         |         ^~~~~~~~~~~~~~~~~~~~~~~
+   kernel/locking/qspinlock_paravirt.h:377:14: note: in expansion of macro 'try_cmpxchg_relaxed'
+     377 |         if (!try_cmpxchg_relaxed(&pn->state, &old, vcpu_hashed))
+         |              ^~~~~~~~~~~~~~~~~~~
+
+
+vim +309 arch/loongarch/kernel/paravirt.c
+
+   303	
+   304	/**
+   305	 * queued_spin_unlock - release a queued spinlock
+   306	 * @lock : Pointer to queued spinlock structure
+   307	 */
+   308	static void native_queued_spin_unlock(struct qspinlock *lock)
+ > 309	{
+   310		/*
+   311		 * unlock() needs release semantics:
+   312		 */
+   313		smp_store_release(&lock->locked, 0);
+   314	}
+   315	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
