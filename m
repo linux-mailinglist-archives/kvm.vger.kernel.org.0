@@ -1,132 +1,194 @@
-Return-Path: <kvm+bounces-22132-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22133-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFCDF93A868
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 22:57:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C59693A8A6
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 23:25:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 970661F248DA
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 20:57:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF2261C224D5
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 21:25:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A157D145358;
-	Tue, 23 Jul 2024 20:57:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B591145A0E;
+	Tue, 23 Jul 2024 21:25:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tmVQCXjI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LfX0m8xM"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f45.google.com (mail-ot1-f45.google.com [209.85.210.45])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FCC4144309
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 20:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DC20143C4E
+	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 21:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721768238; cv=none; b=ZeJBVDuwdGI83bzXIVvsvqkpyAHvOMyDxbUOCgHtOQz6xvKpqHA3j7m14QjKDZAUdUMrAGvCkq8KF+xCKxsfAMzOSGLN9NrxH12OzzWo8wrx2Jy8dyMMm83syKC2eSCfwJR19TBiFY5mBpoa7I4kcUjnmqUVghdPlrKtZdjJS+o=
+	t=1721769929; cv=none; b=g+rqtHhUayk/I6Nib6QYCdyzYFI1yxYYt7C8GXJAfSuHK9Y/9gdzkPbwN9pDQqIrJhq8WJFvWXI5OhfPHsbPnBvG/Qrfrg/TVCuYx5JXDpzGvMqw3zSLevUWwWXw6uSzir/YdHq40PkS1YRyOzHKAqWOCwTyASGT86lkEczW9VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721768238; c=relaxed/simple;
-	bh=4T4Y/ahuIFxvN3hIa12yx4/KmF8PSrzOgG04njrmpD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=X8lV/PKxSCzVg0px41MYyGTHGv6E7ZnaouZ43Ou9l9ZazrG/MMuWZv44HH7mGjItKIkveIWLIxT0EKmgm3OiBqXj3eyMJusVrXQ0vNJ4m/3QaKcF5pKjoGAWLTSXFNGRQGWnjvfjtK7RYuskb2OC2+JeoL+MxLIwdE6w5vIxCmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tmVQCXjI; arc=none smtp.client-ip=209.85.210.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ot1-f45.google.com with SMTP id 46e09a7af769-708b273b437so3233832a34.0
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 13:57:16 -0700 (PDT)
+	s=arc-20240116; t=1721769929; c=relaxed/simple;
+	bh=VRfWXStbqUNoMu/qD3trby7LOEO2dpGIApXJ5HarMVs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cALr8G6IEbYWo82e91HuKvQtpTaFnE6ktW+tOEKJ1vAbAmet16EH+0h6oOP7dtU4p8t/rc3ozsp1h7EMS44x3EgzlSck6OQ7aEigU8WaeIqYw+D2TLMLqiq16GkOel5PaXa4AV7d1Yh5j+b2Ukx4DKA4SRvM2mza5hDWVO4GWGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LfX0m8xM; arc=none smtp.client-ip=209.85.219.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-e05f913e382so5412247276.2
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 14:25:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1721768236; x=1722373036; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r44QZ8+w1nidH1ujLT4M3R1mzBATcx+GmQkqk92Ndxw=;
-        b=tmVQCXjIDhWMgNbgPx02Cgb+4Yg5RZZqii4wA3b4c9mZ9xac1V9ODYCuQJ1R5PF5ms
-         JVHxlMHyUANpYXNrnKTMAz/n8bP1ikxwN2eewPwsUFUUXHzMjMzVrmVbsHsnZt+qd8FW
-         ynqL5qJu0WrYKFYInc3V0vvnn7s5zYxeUrgKfe2oWmutjNkOTI6v9ytVANJ9MXyqF1sd
-         na5l66jzfsrxnOIbib1zWVrU/SQGhMFMEB8DPlzLdYgrqclWSIOpUumVAJL5vH7802oo
-         UN1jmwk+0Av8fHcakA7y5h9xcc2/P2vyh84vmPNCQ5Ca/+aLyzbKKKsZf3+ojhvnfe0j
-         7XPQ==
+        d=google.com; s=20230601; t=1721769927; x=1722374727; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rZJgCArp64eiMbqCXaN875D3c6qRuqIaB/kMh068BtM=;
+        b=LfX0m8xMLkEj1yINcb5P1rwv6YW32GoBO5u4XzMGNA24Tg4JUg2b80LpS0J+fcooG1
+         FWVzOXri+p6gWK1lrduigjqT+86GFi+1wtXOQgSiDsAtjQGya9KG4VevOoOB6LdMR2ve
+         NNhwhb+a1y5vSvE59qmzTJUlDmqplZzRiu/YLx96afeu//m65GWvcghQNibm4kvfj133
+         lUXI/zUYK3WsdwJhJrmF0ezaxGmKw5gXfcaU7XXYj1Xp32J5A4lcpssv//NdM5RogGOu
+         54e7oaBOKAhjcwvvm7wJy4cc6zLC4sTyCRznYAihyW7x6gPNDQRxIEio4VOR1lFkVw8A
+         noZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721768236; x=1722373036;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=r44QZ8+w1nidH1ujLT4M3R1mzBATcx+GmQkqk92Ndxw=;
-        b=v2Q6a759nttb9BEb8DKTstjGsdlaoYrynihCalM7sSeqVuDgRLO2aH/MdSxM7KDXan
-         smyQE03NTZZmn5H1pgcXNrkpcmYEONrP4zhvQyxVq4qY7Zs5BFDSwbG1rFly12TBA5yE
-         PsMj3D7ylyv224rtB9F0KUA/9Yo2XYgBap0u0pIJB0tWsPiGO1wVRkLXn5WHfTdhkeQa
-         9XO4zQET8RbiYmHNnyeErDgf8PMBWVws5I9QiK3OdnON1/p9IEmD/8DZdgGUT6L+C3M3
-         hvgQ0DQOaRpeKtDKWXceoY3KN2WAQWy3YDSwRz5cBEwuDUpEq2yeflYgHQic+X4yKbl7
-         sObg==
-X-Gm-Message-State: AOJu0Ywxvd5d27fvh56M38Gax2IUpJ7A6kc5E23wItN/a7RTz7YpjxCR
-	w5UpNY2kakWnrWXSEKgKP9+1urPH6+0iVNBiWkOOnNKSNxABd59DiKEgS+//ebTb/s43hjKRuys
-	OSgE=
-X-Google-Smtp-Source: AGHT+IGCn67cdA1Y2MGWGroqT84iL/PwfGTeoxloI7R+jnJo4tClnrSCdqC6cwEniEEjDmCCFocKhg==
-X-Received: by 2002:a05:6830:2a15:b0:703:6a50:9091 with SMTP id 46e09a7af769-709252b8a6bmr164521a34.8.1721768236174;
-        Tue, 23 Jul 2024 13:57:16 -0700 (PDT)
-Received: from localhost ([2603:8080:b800:f700:bbf0:72d7:a27a:93ce])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-708f60cafccsm2187683a34.29.2024.07.23.13.57.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jul 2024 13:57:15 -0700 (PDT)
-Date: Tue, 23 Jul 2024 15:57:13 -0500
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Brijesh Singh <brijesh.singh@amd.com>
-Cc: kvm@vger.kernel.org
-Subject: [bug report] KVM: SEV: Provide support for SNP_GUEST_REQUEST NAE
- event
-Message-ID: <11d9ba37-42cf-432b-81df-380b4605b15f@stanley.mountain>
+        d=1e100.net; s=20230601; t=1721769927; x=1722374727;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=rZJgCArp64eiMbqCXaN875D3c6qRuqIaB/kMh068BtM=;
+        b=QaM2p7PjvpMl5JnNBA47wq0mfX3pseRdPwszbav9Lqb/ZPXOxwMxTKB+W8tpqeOBAS
+         Euetqqn/d1j5wxR20Y8wnJfRD2lCZvu2HE67HG5TT2DqbFlhQtpje1dOcw4hgfmFIlMV
+         GMh8Zac/F9o6x6Pr31Y/QyX5MU9PglxTZtYv3bO0AOjkWuWiLSd3rdS8b+2n0lCPTSNj
+         AElMqDeeAoKMKfzGOLiuDFWSl+IdbkzxApI/kdYvDH+atXl+myGsC+SZs5dfT4+cArJp
+         JCiDZrMvtq0lbeZIod4rV2rfPR3x+plQ0MqO0Vhd/dP+aHSAprD/X85Ryu9VD8GMcWKM
+         jrwg==
+X-Forwarded-Encrypted: i=1; AJvYcCULuNAj1//61OIIDqzRoK2LVDsoYPbhQmddZP8cuU7YQcRvlgjCKwJ+gUukNCsRtxKaVImKimCC5apvjEivLmm/cgdp
+X-Gm-Message-State: AOJu0Yxez/90Ui99kP0hSOAYO1zKygXefm4hBCWP5ahqhRg/E74+7Nd9
+	8oAc2Q9xFiGs8Y6E+LJ8J7AEdP+UDCl6WhjCEbfEEP+utNxPweTVcLSapsd7xXKUnb20CaXH6/8
+	zisRD4F/anCAsx3ILZY9rum52LMxSB0E7fChN
+X-Google-Smtp-Source: AGHT+IGCV768j+YrEEm95b1T/ToEhs2+KD4YZsH39PZjohbKCe4xW674YxKBoDDwcCaLP5X/JLfj7nNNUwK9WrlPfmo=
+X-Received: by 2002:a05:6902:274a:b0:e03:629f:5c41 with SMTP id
+ 3f1490d57ef6-e087b9e7ab9mr8610694276.55.1721769926984; Tue, 23 Jul 2024
+ 14:25:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20231212204647.2170650-1-sagis@google.com> <20231212204647.2170650-5-sagis@google.com>
+ <5749ff16-ca81-440d-85f0-62a1c3a572d0@linux.intel.com>
+In-Reply-To: <5749ff16-ca81-440d-85f0-62a1c3a572d0@linux.intel.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Tue, 23 Jul 2024 16:25:14 -0500
+Message-ID: <CAAhR5DFtHDirPJy+ZWXGAALiRJiZD2NyW=bDTjyxoPLqkm9+Kg@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 04/29] KVM: selftests: Refactor steps in vCPU
+ descriptor table initialization
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>, 
+	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Peter Gonda <pgonda@google.com>, 
+	Haibo Xu <haibo1.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>, 
+	Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello Brijesh Singh,
+On Tue, Feb 20, 2024 at 11:43=E2=80=AFPM Binbin Wu <binbin.wu@linux.intel.c=
+om> wrote:
+>
+>
+>
+> On 12/13/2023 4:46 AM, Sagi Shahar wrote:
+> > From: Ackerley Tng <ackerleytng@google.com>
+> >
+> > Split the vCPU descriptor table initialization process into a few
+> > steps and expose them:
+> >
+> > + Setting up the IDT
+> > + Syncing exception handlers into the guest
+> >
+> > In kvm_setup_idt(), we conditionally allocate guest memory for vm->idt
+> > to avoid double allocation when kvm_setup_idt() is used after
+> > vm_init_descriptor_tables().
+> >
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Ryan Afranji <afranji@google.com>
+> > Signed-off-by: Sagi Shahar <sagis@google.com>
+> > ---
+> >   .../selftests/kvm/include/x86_64/processor.h  |  2 ++
+> >   .../selftests/kvm/lib/x86_64/processor.c      | 19 ++++++++++++++++--=
+-
+> >   2 files changed, 18 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/t=
+ools/testing/selftests/kvm/include/x86_64/processor.h
+> > index 0b8855d68744..5c4e9a27d9e2 100644
+> > --- a/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+> > @@ -1089,6 +1089,8 @@ struct idt_entry {
+> >       uint32_t offset2; uint32_t reserved;
+> >   };
+> >
+> > +void kvm_setup_idt(struct kvm_vm *vm, struct kvm_dtable *dt);
+> > +void sync_exception_handlers_to_guest(struct kvm_vm *vm);
+> >   void vm_init_descriptor_tables(struct kvm_vm *vm);
+> >   void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu);
+> >   void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools=
+/testing/selftests/kvm/lib/x86_64/processor.c
+> > index b6b9438e0a33..566d82829da4 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
+> > @@ -1155,19 +1155,32 @@ void vm_init_descriptor_tables(struct kvm_vm *v=
+m)
+> >                       DEFAULT_CODE_SELECTOR);
+> >   }
+> >
+> > +void kvm_setup_idt(struct kvm_vm *vm, struct kvm_dtable *dt)
+> > +{
+> > +     if (!vm->idt)
+> > +             vm->idt =3D vm_vaddr_alloc_page(vm);
+>
+> IDT is allocated in DATA memslot in current code, but here, when using
+> vm_vaddr_alloc_page(), it will be allocated in TEST_DATA memslot.
+>
+> Do we need to follow the current code to use
+> __vm_vaddr_alloc_page(vm, MEM_REGION_DATA) instead?
 
-Commit 88caf544c930 ("KVM: SEV: Provide support for SNP_GUEST_REQUEST
-NAE event") from Jul 1, 2024 (linux-next), leads to the following
-Smatch static checker warning:
+This code is no longer needed after Sean's refactor in
+"[PATCH 00/18] KVM: selftests: Clean up x86's DT initialization"
+https://lore.kernel.org/lkml/20240314232637.2538648-1-seanjc@google.com/
 
-	arch/x86/kvm/svm/sev.c:454 __sev_guest_init()
-	warn: missing error code here? 'snp_guest_req_init()' failed.
-
-arch/x86/kvm/svm/sev.c
-    443         ret = sev_asid_new(sev);
-    444         if (ret)
-    445                 goto e_no_asid;
-    446 
-    447         init_args.probe = false;
-    448         ret = sev_platform_init(&init_args);
-    449         if (ret)
-    450                 goto e_free;
-    451 
-    452         /* This needs to happen after SEV/SNP firmware initialization. */
-    453         if (vm_type == KVM_X86_SNP_VM && snp_guest_req_init(kvm))
---> 454                 goto e_free;
-
-This feels like we should propogate the error code from snp_guest_req_init()
-instead of returning success.
-
-    455 
-    456         INIT_LIST_HEAD(&sev->regions_list);
-    457         INIT_LIST_HEAD(&sev->mirror_vms);
-    458         sev->need_init = false;
-    459 
-    460         kvm_set_apicv_inhibit(kvm, APICV_INHIBIT_REASON_SEV);
-    461 
-    462         return 0;
-    463 
-    464 e_free:
-    465         argp->error = init_args.error;
-    466         sev_asid_free(sev);
-    467         sev->asid = 0;
-    468 e_no_asid:
-    469         sev->vmsa_features = 0;
-    470         sev->es_active = false;
-    471         sev->active = false;
-    472         return ret;
-    473 }
-
-regards,
-dan carpenter
+>
+> > +
+> > +     dt->base =3D vm->idt;
+> > +     dt->limit =3D NUM_INTERRUPTS * sizeof(struct idt_entry) - 1;
+> > +}
+> > +
+> > +void sync_exception_handlers_to_guest(struct kvm_vm *vm)
+> > +{
+> > +     *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)=
+) =3D vm->handlers;
+> > +}
+> > +
+> >   void vcpu_init_descriptor_tables(struct kvm_vcpu *vcpu)
+> >   {
+> >       struct kvm_vm *vm =3D vcpu->vm;
+> >       struct kvm_sregs sregs;
+> >
+> >       vcpu_sregs_get(vcpu, &sregs);
+> > -     sregs.idt.base =3D vm->idt;
+> > -     sregs.idt.limit =3D NUM_INTERRUPTS * sizeof(struct idt_entry) - 1=
+;
+> > +     kvm_setup_idt(vcpu->vm, &sregs.idt);
+> >       sregs.gdt.base =3D vm->gdt;
+> >       sregs.gdt.limit =3D getpagesize() - 1;
+> >       kvm_seg_set_kernel_data_64bit(NULL, DEFAULT_DATA_SELECTOR, &sregs=
+.gs);
+> >       vcpu_sregs_set(vcpu, &sregs);
+> > -     *(vm_vaddr_t *)addr_gva2hva(vm, (vm_vaddr_t)(&exception_handlers)=
+) =3D vm->handlers;
+> > +     sync_exception_handlers_to_guest(vm);
+> >   }
+> >
+> >   void vm_install_exception_handler(struct kvm_vm *vm, int vector,
+>
 
