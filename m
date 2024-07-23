@@ -1,99 +1,115 @@
-Return-Path: <kvm+bounces-22080-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22081-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12281939870
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 04:54:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A11B939872
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 04:55:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F95AB21ABA
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 02:54:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 538B8282AE9
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 02:55:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A7F13B5B4;
-	Tue, 23 Jul 2024 02:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C6D13B7A6;
+	Tue, 23 Jul 2024 02:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JSgralrg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ow9kfqcZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF2C2F32
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 02:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 383C72F32;
+	Tue, 23 Jul 2024 02:55:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721703242; cv=none; b=Mb/YPpQ0GLbK3ODjKfxyXuYRDO38/qrZEp7k7xM0uq7/tuvyHL/dKdkuUoLUeiSkWuCBxDVboxSIwOdo7dsu/1njQPmBC+U63TsptHUDAcxH5r9737ZyDw9ZSXbPl/XRE8FTq7XoxIJLb7gZS/XEzJpMq5Pln+f2hiQ09aifyEM=
+	t=1721703314; cv=none; b=K9y5IvDl0NLmOPzQN+qYdwndyo0O4Z7qlZ36twj3SOL1ZSTyyEK7arcPiU5dVek5W013BvULvmwHTfl4zs0ZJ9CkpoXrIdXHFNZu8FN7H+/9CCInBjWAJPHFRVGYVhLCjAvQWLJbi9XXmUvH8jL/Xi7SF46E+aVwkmplzXes+5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721703242; c=relaxed/simple;
-	bh=M7sbiQWjQhZD+vmF+DF2rNGZXIqIPGoFf8kUacpCYjY=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SKxYozbcdbihOEGyVXd+15A2vPzXDL48DYYCumd/FhpWgQIkO6n2mdqPqmCIhVaOVPa75HxXNyoAsnzX1WlF5jN4GFO/S27Od+GK4eSs4cu7y2LMbq+opOdf8HXBnkOhrYxjSD8gbuVW6DGONCDOQLIc6QbRZ9n7ToQL26uvun0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JSgralrg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 53262C4AF0D
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 02:54:02 +0000 (UTC)
+	s=arc-20240116; t=1721703314; c=relaxed/simple;
+	bh=r5Lkl9j3yYg2QYkDT2TRuuo/egzDRxDmqxTZO5LurjE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ql/leSrvYPPyT+qAWXVxVuRQ+xGn4khEFo4aoco//uv2EwKqRtafgGGKWTNMFRVdVJIY8x7/uL3ink5E/IzIrd8elymwp99FdlJ+EkeBoKwPcTCFVuiXJMGXNxSJdp78Tp6UDRuCZhfkB3a/cEGiF0IMxAvldAYX0NsA8Xk+MuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ow9kfqcZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CEA8EC4AF0F;
+	Tue, 23 Jul 2024 02:55:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721703242;
-	bh=M7sbiQWjQhZD+vmF+DF2rNGZXIqIPGoFf8kUacpCYjY=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=JSgralrgK2ONqRITN39J5MQK4yQtw056KtuX7XY5UOhEdYodOtQzqFtLq9Z4i+ZHB
-	 uFiYD8vbCK/DYwhrnc5XG0NpCS1nm5zECYdrEh41u5HAY1RNmUgiWFqEfa7WTGBc2s
-	 1Vbbzn48ocgyPcQaOut9RZHmKh6MlHcyyAq3WCMyn88p/q8oenpiIV4fneHdTvYG7I
-	 vNkTQsOBP5NDGh4EC6wI40vp+FN0fEiQWh74CBj7tyQmNtc2iuDc1gILFhaZaOIIzl
-	 6+8CbVFrZ9TFbxpbqKUsmZ+sQkMYRUc1dpdfBYGLRUIXxK0N5gXACUtd421RTi558p
-	 cbuaGCaa8/h+A==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 470ABC53BBF; Tue, 23 Jul 2024 02:54:02 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219034] [linux-next][tag next-20240709] kernel BUG at
- lib/dynamic_queue_limits.c:99! and Oops: invalid opcode: 0000 [#1] PREEMPT
- SMP NOPTI
-Date: Tue, 23 Jul 2024 02:54:01 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: hongyu.ning@intel.com
-X-Bugzilla-Status: RESOLVED
-X-Bugzilla-Resolution: UNREPRODUCIBLE
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_status resolution
-Message-ID: <bug-219034-28872-ajRG9TCzYd@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219034-28872@https.bugzilla.kernel.org/>
-References: <bug-219034-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=k20201202; t=1721703313;
+	bh=r5Lkl9j3yYg2QYkDT2TRuuo/egzDRxDmqxTZO5LurjE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Ow9kfqcZmSumYdrLkrtcndoTHZUPe2tajWdsSU+1mNaXPXi1Pzp+HoFHpxJ1UmrFk
+	 JoUN6O5ZqX+LYvqxVCB/7Qu8ScLdHTXwTl6eXuFsSNqOiVmPvuV64Qikw9sq6K2Z1Y
+	 V3FoV2P96jGKziDmyVF08fdsUPjAJjcA8OOb5GUXaPLN+0X5u0sAPcDbmUNU6Cyxb7
+	 7XAAsXxy1L5ksKYVn+2svSb5ETa6lXAjx37nJOVAmuASpu4SquKr7hrIt/nn8xjsya
+	 dwP+YRSR7qWe5zcttyAFdDPpKKUXpI1JXl1UTeO8H5pJTgJiFkSiHLD+29aViW/fLZ
+	 c1H8C7Pe7Um0Q==
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5a2ffc34722so1150986a12.0;
+        Mon, 22 Jul 2024 19:55:13 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVIeVPEewRjFRctsJsnBCaBKW4tETlydvvm1GDtJ2ECFW96RaVdVRrkJRtZfU+wI5up1xcxAQrEadprXVQegJh/AOqKQm3oGlP1G6FM3b6Qt8jQHJfMD6uxFLHi+mbg3c9k
+X-Gm-Message-State: AOJu0Yz4b8sPXXz/9CTX7PSYcaDKv1xgSLWbOhuj/vVXW5mah/zm4ctd
+	DPsoaPasqO5yeElcPApg1AAdTYfzSXGJoM6Nwe7hG+HwDwM/s7LwuyD+oQszwsJpOld1ARd0qiu
+	WwM6438b4rzm095eBRYaLJsrP/ak=
+X-Google-Smtp-Source: AGHT+IGqqU2ONkKWwep0vC+pn7i7fB0FIRv7XrVoM2pXjMr3n2EucMyLpYljZbVnu1O8EX67qlWSob5H9bd4zyAKpxA=
+X-Received: by 2002:a50:8706:0:b0:57d:3df:ba2d with SMTP id
+ 4fb4d7f45d1cf-5a99ca4d46cmr713090a12.2.1721703312488; Mon, 22 Jul 2024
+ 19:55:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <09A6BAA84F3EF573+20240722102624.293359-1-wangyuli@uniontech.com> <3bf88ffb-c57b-a881-5a7a-78567e048ae2@loongson.cn>
+In-Reply-To: <3bf88ffb-c57b-a881-5a7a-78567e048ae2@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Tue, 23 Jul 2024 10:55:00 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H7N8J-F4FRLZmSY4=uHo2DhG_pB-zMHCeGuSpx22_SGCQ@mail.gmail.com>
+Message-ID: <CAAhV-H7N8J-F4FRLZmSY4=uHo2DhG_pB-zMHCeGuSpx22_SGCQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Loongarch: remove unnecessary definition of KVM_PRIVATE_MEM_SLOTS
+To: maobibo <maobibo@loongson.cn>
+Cc: WangYuli <wangyuli@uniontech.com>, zhaotianrui@loongson.cn, kernel@xen0n.name, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	pbonzini@redhat.com, chao.p.peng@linux.intel.com, 
+	Wentao Guan <guanwentao@uniontech.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219034
+Queued, thanks.
 
-hongyuni (hongyu.ning@intel.com) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-             Status|NEW                         |RESOLVED
-         Resolution|---                         |UNREPRODUCIBLE
-
---- Comment #1 from hongyuni (hongyu.ning@intel.com) ---
-issue no longer reproduced on next-20240722 linux-next tree, close accordin=
-gly.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+On Tue, Jul 23, 2024 at 9:30=E2=80=AFAM maobibo <maobibo@loongson.cn> wrote=
+:
+>
+>
+>
+> On 2024/7/22 =E4=B8=8B=E5=8D=886:26, WangYuli wrote:
+> > "KVM_PRIVATE_MEM_SLOTS" is renamed as "KVM_INTERNAL_MEM_SLOTS".
+> >
+> > KVM_PRIVATE_MEM_SLOTS defaults to zero, so it is not necessary to
+> > define it in Loongarch's asm/kvm_host.h.
+> >
+> > Link: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/=
+commit/?id=3Dbdd1c37a315bc50ab14066c4852bc8dcf070451e
+> > Link: https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/=
+commit/?id=3Db075450868dbc0950f0942617f222eeb989cad10
+> > Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+> > Signed-off-by: WangYuli <wangyuli@uniontech.com>
+> > ---
+> >   arch/loongarch/include/asm/kvm_host.h | 2 --
+> >   1 file changed, 2 deletions(-)
+> >
+> > diff --git a/arch/loongarch/include/asm/kvm_host.h b/arch/loongarch/inc=
+lude/asm/kvm_host.h
+> > index fe38f98eeff8..ce3d36a890aa 100644
+> > --- a/arch/loongarch/include/asm/kvm_host.h
+> > +++ b/arch/loongarch/include/asm/kvm_host.h
+> > @@ -26,8 +26,6 @@
+> >
+> >   #define KVM_MAX_VCPUS                       256
+> >   #define KVM_MAX_CPUCFG_REGS         21
+> > -/* memory slots that does not exposed to userspace */
+> > -#define KVM_PRIVATE_MEM_SLOTS                0
+> >
+> >   #define KVM_HALT_POLL_NS_DEFAULT    500000
+> >   #define KVM_REQ_TLB_FLUSH_GPA               KVM_ARCH_REQ(0)
+> >
+> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+>
 
