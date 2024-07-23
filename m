@@ -1,94 +1,91 @@
-Return-Path: <kvm+bounces-22117-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22115-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D042493A2EC
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 16:40:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B80193A2A5
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 16:24:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C44B1F21C55
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 14:40:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDF881F23897
+	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 14:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA75214F122;
-	Tue, 23 Jul 2024 14:40:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 726EB154445;
+	Tue, 23 Jul 2024 14:24:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a5nF5DiY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ip0hVT8K"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E61B153800
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 14:40:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA9C15252E
+	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 14:24:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721745605; cv=none; b=KOBvqWW/1sBmp99AM2XRuShs0oTsKelyTybhPwhFJ84VwncXjXK4xXlJB+fZVBDQeRMCQRV7oPysuZTQ7UcKAhDLTbGt2ZkXwl+2dpraRtDGSwEQK0lRk8O4+rxLuto6tnoYX2YZgHCgkh6Fm6re6Phi5jZH05HvYnhnTNBRB3w=
+	t=1721744688; cv=none; b=M1tzBtp3qjKRtZ3kzKWlIr7nA+bVyswP6P0b/FVCJ3daY2G3aYRQHnN9JixMqyQA+Uqw0LLrvl36sAGiMmiKwd+roPENw7WIU7PbzbzHHPlksSZo3JFYQDlctkbeTE7zVVRObOqGm0H/ousTyGwFfxvvGS1FmtKtaH38VuS6rjU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721745605; c=relaxed/simple;
-	bh=Vx994ZBr7B2D6O1BQBny1VeJblQKimuyws1bzs1/KJ0=;
+	s=arc-20240116; t=1721744688; c=relaxed/simple;
+	bh=596BeOYL/C3YYG4gWapj0nT35ULqFklo7XcRsaU+a60=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOpDKpsUjd8FaJPJr2LP59nGcI/R0FhcGibtR5tyByZUyC6EuDDtVWjHQY1A3VhmtWvPippkX0V0gQX0l08QZt8+TD90DjmmKy/dDWH2uSpH1fJ+LRi5s2hBlOfHcQ0SYapMt8LrkYWNWNvJ1DPLhpk70+zx9BegD4ziJWK09yY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a5nF5DiY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721745602;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uNxU/3bNa0j4H+fhGmWX47X5Nrds4z8nYGKNg8PjixM=;
-	b=a5nF5DiYFKMSQRYRbL/gDz3lgoio1HwBV9iZIQPPgMQllplnisNZ6DlcjNhj5R/6DbcMjx
-	kON0dI3JD4sAl8FnvrVKrH2UPj/1daVtloytfVfnSMxY9MbSpDOTtYZ2sRbvqoCJ1ioWDQ
-	LOkG20tilhKljRwxI1UlR98+vEI3K5U=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-25-EEIjv0UVOfaGdwptSoaifw-1; Tue, 23 Jul 2024 10:40:01 -0400
-X-MC-Unique: EEIjv0UVOfaGdwptSoaifw-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-44f76198e97so95035601cf.0
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 07:40:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721745600; x=1722350400;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uNxU/3bNa0j4H+fhGmWX47X5Nrds4z8nYGKNg8PjixM=;
-        b=MRNJSTxsrOHFN08/8wxl4SRnGdkuLK9hWHknGYSC09VCAlqOWYoEf0+A/mrkeAI2LK
-         r1icU6u+0Sz5YPVGJBhIxDIqY8Gv/TA7ZtB7LQTPUqa7Bza7285BHgZViLHZTuitCP8Y
-         IVG51Q6LUvPBdiNIWJg7DYy4VA/hIo2BoohTYvzj/XPFUMlcsHw+XYgCRW1UGAh9nUwD
-         w7TCnGQmBqhPJmutDKL0wYKGhskGLQr7ce3SzW+l6KSP0q7Qhw8ZGZdmPR12LnEO6rhl
-         N7Be2prIo/ps0bJxiZmbAFGLkv+Dk9+q0NI8PFdKwpxCdpMC9SadTcXyN5imXhcB0IRV
-         hZUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVzjKUE6esOjW98oMlhrxJZW/ojCeo6rhJovIM9Ixue2uteyzoZBJ2ICoCsY6XQn5TI5CGInDKqpZUY/ZCRKVEdrVJ2
-X-Gm-Message-State: AOJu0YxZQso33eQIaq29J1XOzoQyY/xwhy/oRmeMPamLtwbIGqi3JHWI
-	eGQLEGtoaV5R967aaO+KqzKolSHEusQWp5vWyaQy8OCLxHZ+6dSe+3RAC2H3KXjsVmXknQcs7qL
-	0mXg2AoeCRKhBCOFcfvyR5nNUMS/xtt3Qy+ovrWsDtUTKEcU9SQ==
-X-Received: by 2002:ac8:5907:0:b0:447:e1ea:ef7 with SMTP id d75a77b69052e-44fc7f5fdd3mr32125611cf.9.1721745600400;
-        Tue, 23 Jul 2024 07:40:00 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFiMZj0dsaL52oy96COzOxwC33HyqPV0AzPadJvk/DwDmZBHiZG8Nq4+kUIoA7ql1zFm7LEkw==
-X-Received: by 2002:ac8:5907:0:b0:447:e1ea:ef7 with SMTP id d75a77b69052e-44fc7f5fdd3mr32125021cf.9.1721745599845;
-        Tue, 23 Jul 2024 07:39:59 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-79.retail.telecomitalia.it. [82.57.51.79])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44f9cd04062sm45383271cf.40.2024.07.23.07.39.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Jul 2024 07:39:59 -0700 (PDT)
-Date: Tue, 23 Jul 2024 16:39:51 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Amery Hung <ameryhung@gmail.com>
-Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
-	decui@microsoft.com, bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
-	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
-	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
-Subject: Re: [RFC PATCH net-next v6 04/14] af_vsock: generalize bind table
- functions
-Message-ID: <CAGxU2F7wCUR-KhDRBopK+0gv=bM0PCKeWM87j1vEYmbvhO8WHQ@mail.gmail.com>
-References: <20240710212555.1617795-1-amery.hung@bytedance.com>
- <20240710212555.1617795-5-amery.hung@bytedance.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=h/zuzbhZ3POR/RPRGiE/OBAyVANGapQI0xizeIXEFwQZs/ObojSnduqoq/XQC0DfXDOH7+lcdnoMrDvIdGFLMoG0S7gBM0UTFy7slqTtAzD98Bq6MM8NWDw8k107jYzt/on+/QnCETY8CBIdZ6JkYsvqHa8S4JFGP/hWMSy0zPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ip0hVT8K; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721744687; x=1753280687;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=596BeOYL/C3YYG4gWapj0nT35ULqFklo7XcRsaU+a60=;
+  b=Ip0hVT8KboKNeM1+ONPD6TlGC/FqQh9ot5b+cV+gWWtqueO9vINjJLhv
+   JkMjopENQZh4kZq4jINErLQ+clu3Unn5E7zCDEsV3qjo4nynVwUxwGjzz
+   3hDBD7iU0rVS1Cdoe/jgs5wnt0MdruOMqTd9cF3Z7a1rpTpnFHEiFIy39
+   4/WaaJQBh+fuQp7al7TmYonFq5pBs6PQrOJ8Pbo5hEE53MUeDBPIF0p/Q
+   AQ4zAUxzgUK34BgVxWGP48y/88wg1Ye6xTKL0N/Wx76ykGXfOlsJONp70
+   dLo+Anbxdq0Lg22pKPGghn1Et97PGupEUZOCPSok1eLOwmKnlvvhfIXFC
+   g==;
+X-CSE-ConnectionGUID: n3yfzvPkQmSSa5L4lBRUFA==
+X-CSE-MsgGUID: h4dQp9l0QUeYOv/zDDVLXw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11142"; a="41900224"
+X-IronPort-AV: E=Sophos;i="6.09,230,1716274800"; 
+   d="scan'208";a="41900224"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2024 07:24:47 -0700
+X-CSE-ConnectionGUID: hXBJ3rbPRQalpxStCGyFjw==
+X-CSE-MsgGUID: 4ge7qOlyTr2QSQ3s+KE7WA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,230,1716274800"; 
+   d="scan'208";a="52188455"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa009.fm.intel.com with ESMTP; 23 Jul 2024 07:24:41 -0700
+Date: Tue, 23 Jul 2024 22:40:25 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH 1/8] hw/core: Make CPU topology enumeration arch-agnostic
+Message-ID: <Zp/A2W5A0BqjRjR2@intel.com>
+References: <20240704031603.1744546-1-zhao1.liu@intel.com>
+ <20240704031603.1744546-2-zhao1.liu@intel.com>
+ <875xsx4l13.fsf@pond.sub.org>
+ <Zp5mRrjuZWnE+9gz@intel.com>
+ <87ed7kwh2x.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -97,132 +94,129 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240710212555.1617795-5-amery.hung@bytedance.com>
+In-Reply-To: <87ed7kwh2x.fsf@pond.sub.org>
 
-On Wed, Jul 10, 2024 at 09:25:45PM GMT, Amery Hung wrote:
->From: Bobby Eshleman <bobby.eshleman@bytedance.com>
->
->This commit makes the bind table management functions in vsock usable
->for different bind tables. Future work will introduce a new table for
->datagrams to avoid address collisions, and these functions will be used
->there.
->
->Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->---
-> net/vmw_vsock/af_vsock.c | 34 +++++++++++++++++++++++++++-------
-> 1 file changed, 27 insertions(+), 7 deletions(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index acc15e11700c..d571be9cdbf0 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -232,11 +232,12 @@ static void __vsock_remove_connected(struct vsock_sock *vsk)
->       sock_put(&vsk->sk);
-> }
->
->-static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->+static struct sock *vsock_find_bound_socket_common(struct sockaddr_vm *addr,
->+                                                 struct list_head *bind_table)
-> {
->       struct vsock_sock *vsk;
->
->-      list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
->+      list_for_each_entry(vsk, bind_table, bound_table) {
->               if (vsock_addr_equals_addr(addr, &vsk->local_addr))
->                       return sk_vsock(vsk);
->
->@@ -249,6 +250,11 @@ static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->       return NULL;
-> }
->
->+static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->+{
->+      return vsock_find_bound_socket_common(addr, vsock_bound_sockets(addr));
->+}
->+
-> static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
->                                                 struct sockaddr_vm *dst)
-> {
->@@ -671,12 +677,18 @@ static void vsock_pending_work(struct work_struct *work)
->
-> /**** SOCKET OPERATIONS ****/
->
->-static int __vsock_bind_connectible(struct vsock_sock *vsk,
->-                                  struct sockaddr_vm *addr)
->+static int vsock_bind_common(struct vsock_sock *vsk,
->+                           struct sockaddr_vm *addr,
->+                           struct list_head *bind_table,
->+                           size_t table_size)
-> {
->       static u32 port;
->       struct sockaddr_vm new_addr;
->
->+      if (WARN_ONCE(table_size < VSOCK_HASH_SIZE,
->+                    "table size too small, may cause overflow"))
->+              return -EINVAL;
->+
+On Tue, Jul 23, 2024 at 12:14:30PM +0200, Markus Armbruster wrote:
+> Date: Tue, 23 Jul 2024 12:14:30 +0200
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [PATCH 1/8] hw/core: Make CPU topology enumeration
+>  arch-agnostic
+> 
+> Zhao Liu <zhao1.liu@intel.com> writes:
+> 
+> > Hi Markus,
+> >
+> > On Mon, Jul 22, 2024 at 03:24:24PM +0200, Markus Armbruster wrote:
+> >> Date: Mon, 22 Jul 2024 15:24:24 +0200
+> >> From: Markus Armbruster <armbru@redhat.com>
+> >> Subject: Re: [PATCH 1/8] hw/core: Make CPU topology enumeration
+> >>  arch-agnostic
+> >> 
+> >> One little thing...
+> >> 
+> >> Zhao Liu <zhao1.liu@intel.com> writes:
+> >> 
+> >> > Cache topology needs to be defined based on CPU topology levels. Thus,
+> >> > define CPU topology enumeration in qapi/machine.json to make it generic
+> >> > for all architectures.
+> >> >
+> >> > To match the general topology naming style, rename CPU_TOPO_LEVEL_SMT
+> >> > and CPU_TOPO_LEVEL_PACKAGE to CPU_TOPO_LEVEL_THREAD and
+> >> > CPU_TOPO_LEVEL_SOCKET.
+> >> >
+> >> > Also, enumerate additional topology levels for non-i386 arches, and add
+> >> > a CPU_TOPO_LEVEL_DEFAULT to help future smp-cache object de-compatibilize
+> >> > arch-specific cache topology settings.
+> >> >
+> >> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> >> 
+> >> [...]
+> >> 
+> >> > diff --git a/qapi/machine-common.json b/qapi/machine-common.json
+> >> > index fa6bd71d1280..82413c668bdb 100644
+> >> > --- a/qapi/machine-common.json
+> >> > +++ b/qapi/machine-common.json
+> >> > @@ -5,7 +5,7 @@
+> >> >  # See the COPYING file in the top-level directory.
+> >> >  
+> >> >  ##
+> >> > -# = Machines S390 data types
+> >> > +# = Common machine types
+> >> >  ##
+> >> >  
+> >> >  ##
+> >> > @@ -19,3 +19,48 @@
+> >> >  { 'enum': 'CpuS390Entitlement',
+> >> >    'prefix': 'S390_CPU_ENTITLEMENT',
+> >> >    'data': [ 'auto', 'low', 'medium', 'high' ] }
+> >> > +
+> >> > +##
+> >> > +# @CpuTopologyLevel:
+> >> > +#
+> >> > +# An enumeration of CPU topology levels.
+> >> > +#
+> >> > +# @invalid: Invalid topology level.
+> >> > +#
+> >> > +# @thread: thread level, which would also be called SMT level or
+> >> > +#     logical processor level.  The @threads option in
+> >> > +#     SMPConfiguration is used to configure the topology of this
+> >> > +#     level.
+> >> > +#
+> >> > +# @core: core level.  The @cores option in SMPConfiguration is used
+> >> > +#     to configure the topology of this level.
+> >> > +#
+> >> > +# @module: module level.  The @modules option in SMPConfiguration is
+> >> > +#     used to configure the topology of this level.
+> >> > +#
+> >> > +# @cluster: cluster level.  The @clusters option in SMPConfiguration
+> >> > +#     is used to configure the topology of this level.
+> >> > +#
+> >> > +# @die: die level.  The @dies option in SMPConfiguration is used to
+> >> > +#     configure the topology of this level.
+> >> > +#
+> >> > +# @socket: socket level, which would also be called package level.
+> >> > +#     The @sockets option in SMPConfiguration is used to configure
+> >> > +#     the topology of this level.
+> >> > +#
+> >> > +# @book: book level.  The @books option in SMPConfiguration is used
+> >> > +#     to configure the topology of this level.
+> >> > +#
+> >> > +# @drawer: drawer level.  The @drawers option in SMPConfiguration is
+> >> > +#     used to configure the topology of this level.
+> >> > +#
+> >> > +# @default: default level.  Some architectures will have default
+> >> > +#     topology settings (e.g., cache topology), and this special
+> >> > +#     level means following the architecture-specific settings.
+> >> > +#
+> >> > +# Since: 9.1
+> >> > +##
+> >> > +{ 'enum': 'CpuTopologyLevel',
+> >> > +  'prefix': 'CPU_TOPO_LEVEL',
+> >> 
+> >> Why set a 'prefix'?
+> >> 
+> >
+> > Because my previous i386 commit 6ddeb0ec8c29 ("i386/cpu: Introduce bitmap
+> > to cache available CPU topology levels") introduced the level
+> > enumeration with such prefix. For naming consistency, and to shorten the
+> > length of the name, I've used the same prefix here as well.
+> >
+> > I've sensed that you don't like the TOPO abbreviation and I'll remove the
+> > prefix :-).
+> 
+> Consistency is good, but I'd rather achieve it by consistently using
+> "topology".
+> 
+> I never liked the 'prefix' feature much.  We have it because the mapping
+> from camel case to upper case with underscores is heuristical, and can
+> result in something undesirable.  See commit 351d36e454c (qapi: allow
+> override of default enum prefix naming).  Using it just to shorten
+> generated identifiers is a bad idea.
 
-I'd add this in another commit.
+Thanks for your clarification! I see, I will drop the prefix.
 
->       if (!port)
->               port = get_random_u32_above(LAST_RESERVED_PORT);
->
->@@ -692,7 +704,8 @@ static int __vsock_bind_connectible(struct
->vsock_sock *vsk,
->
->                       new_addr.svm_port = port++;
->
->-                      if (!__vsock_find_bound_socket(&new_addr)) {
->+                      if (!vsock_find_bound_socket_common(&new_addr,
->+                                                          &bind_table[VSOCK_HASH(addr)])) {
+Regards,
+Zhao
 
-Can we add a macro for `&bind_table[VSOCK_HASH(addr)])` ?
-
->                               found = true;
->                               break;
->                       }
->@@ -709,7 +722,8 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
->                       return -EACCES;
->               }
->
->-              if (__vsock_find_bound_socket(&new_addr))
->+              if (vsock_find_bound_socket_common(&new_addr,
->+                                                 &bind_table[VSOCK_HASH(addr)]))
->                       return -EADDRINUSE;
->       }
->
->@@ -721,11 +735,17 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
->        * by AF_UNIX.
->        */
->       __vsock_remove_bound(vsk);
->-      __vsock_insert_bound(vsock_bound_sockets(&vsk->local_addr), vsk);
->+      __vsock_insert_bound(&bind_table[VSOCK_HASH(&vsk->local_addr)], vsk);
->
->       return 0;
-> }
->
->+static int __vsock_bind_connectible(struct vsock_sock *vsk,
->+                                  struct sockaddr_vm *addr)
->+{
->+      return vsock_bind_common(vsk, addr, vsock_bind_table, VSOCK_HASH_SIZE + 1);
-
-What about using ARRAY_SIZE(x) ?
-
-BTW we are using that size just to check it, but all the arrays we use
-are statically allocated, so what about a compile time check like
-BUILD_BUG_ON()?
-
-Thanks,
-Stefano
-
-
->+}
->+
-> static int __vsock_bind_dgram(struct vsock_sock *vsk,
->                             struct sockaddr_vm *addr)
-> {
->--
->2.20.1
->
 
 
