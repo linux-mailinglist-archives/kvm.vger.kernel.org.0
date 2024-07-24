@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-22193-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22194-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1221593B663
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 20:02:20 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C346593B666
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 20:02:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFE1C28594C
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:02:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 494AF1F22EBB
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:02:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860C016A956;
-	Wed, 24 Jul 2024 18:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70ADF16A956;
+	Wed, 24 Jul 2024 18:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JGeTzIgD"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M6NkwtKo"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E81155A24
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 18:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DBF81662FA
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 18:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721844122; cv=none; b=ioFS6+ahh4hbILEDrsqGMEAkiXLXF8xMfztvksQD6j5AIodjjf76nhbS6DhO2T2om2FRNWTRMG4Eg24ZdIk6ysZpNwm6Nw0kHhBVxOzo/DgWNmcAy4L5tZHDFvLQC0cn0aOsbqfgOrYwiAGwCr0yfyoVDW5pFbYHHjgwF70517g=
+	t=1721844162; cv=none; b=bLEZwmGjyb6BAFSZZBX1vjB7alD28iUL2OZm8fPRJT7HhdjMDjurucY/3EuGgs/9kKJMy9AzjKKvsNDrjiacfEQOhhXbEt433ZUtiMQ3c1nGFpWFGEmZnvkPQbJVZDFJTySkx13Gd6YQswaDZVzyarsXb3bkBv2zuLo1Me59ESE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721844122; c=relaxed/simple;
-	bh=NGZo+fA/ilRIlCycVHkaKrLjDlQSUOcSWWgG3kvb9Mo=;
+	s=arc-20240116; t=1721844162; c=relaxed/simple;
+	bh=AYIYTumRgWLmfehVipaKKNpdHBH2wrIJFfmiUrFHqOU=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=XJUXviGVndEa8A+mxo6UJeBzrNcYl1pV7EiYVUWKB+nJuHL9uMO+L3BXGmvVJmzdEfH5lZ1rbwrjoOm2pjRo6MJv125IeEi5pGs+FuDEEdtSPFy7yrbtrqczP1WPxU7LoeoBEHfcU5Y2jCshv7oPjyYkVjNFq3HFe7h4Q6jHEUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JGeTzIgD; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=lKhURbdR2H05+ZIalvpRhQRfnSWtPcq6q91klcKtRYQkxYGt8LUFoyCpy5C13qD++sFX/h1maapKHDu/OtE6G0NlrEM+hj3fA+lrT9ERUVdRYIc5aZEc6NRKfXtcwPPxwKgHM03pkwL2koBdXevyi9l0vLSWeskPqtKFYqRsTSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M6NkwtKo; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721844120;
+	s=mimecast20190719; t=1721844159;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=jzcC9strTDkqEpjO7pYUjkzMIvlRQNGVM4oVnCebrR0=;
-	b=JGeTzIgDmhmlCyiEtZJwcuKPoMc0t32Ws3M481uYFKwTtLRHxndSwvo1FQLwazDBOwcuih
-	+RIxhFq3i1xekc2w1iifnqKCXRU76KbB67fSGfLHWBlFVCpfFKsU9M/qLPBURlvYYtEE4n
-	MaP/0OMlhC8snT5JaGCyiOLz3VBXsgE=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=E4xHXpZqg+KRUI+QCOaM8qkzmkaxjhHYo1elyOFQ6Dw=;
+	b=M6NkwtKo+kMj/tUTKgpMbCsbOEwqNa0WPKnyKLEK0MEC1oh0h/XXErU3FmBJqNAl31aG9g
+	Dp3/oCGJpMfRFE/CFj4dU/MK4+m/Q9jQz0o/7evORd7hd1/Q/ZcjrY1Bs4GnTqpNttqRTH
+	CHLUjgEDeSKtrEHLTZJmFqIOalPUbmc=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-643-V5vKLSJRNEiSR8FiLKQLqg-1; Wed, 24 Jul 2024 14:01:58 -0400
-X-MC-Unique: V5vKLSJRNEiSR8FiLKQLqg-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6b7a5ab3971so1277716d6.2
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 11:01:58 -0700 (PDT)
+ us-mta-478-MJpsDl3XP6CLklXEUmqWTg-1; Wed, 24 Jul 2024 14:02:37 -0400
+X-MC-Unique: MJpsDl3XP6CLklXEUmqWTg-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-44f2e97d2c7so633641cf.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 11:02:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721844118; x=1722448918;
+        d=1e100.net; s=20230601; t=1721844157; x=1722448957;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=jzcC9strTDkqEpjO7pYUjkzMIvlRQNGVM4oVnCebrR0=;
-        b=TbyiMtuFOUj2I4cABk8HIgajmXANsg8S2kKy6HwLvHKs2Mv6yh6E9zbiSYzgZyIeki
-         puUGolvn4OPpS08IJevs7H9Z3xBfDcOxLljDBqW5+vUWsK6tOVemA0+0W3koEVjZsvQd
-         f3b0aIY7Dxm3IglLLIIhPWS4VV4JUiHi1BwT2RsO4kl79SIiqg45wm/1oK9fNr4bD+x6
-         hiJ8e4Ow1AcGUTxE0ZJVE543bpDGbJtRaDVNBOHrW8HuUARyzE2RdCR4feaBiFb4W8ET
-         uBKEi0vucrxO1XeL+fkEpXsHxQ3Uy5DcIu+Yi+ofhs0sf+sSPayxEHJnLXFg4C7hhLHg
-         z7lA==
-X-Forwarded-Encrypted: i=1; AJvYcCUj5YQjer8PvadSRuE4ZbuBmEbAD1bwOXll9lkm3YTHEr0Ai8r7zfm8eAm3x0ubyJXyCOAkqa87OamgRvRn+o2rj0Wl
-X-Gm-Message-State: AOJu0YwTXNELaqPLmAKo6z9a28MKMkrSy086Jl7fgfb5zH2D9BiHOW0s
-	1aQVlxUuBNCz3S4SssjKGtupH3847oBQ4KFsm10inb/JBEFF3ZJ2bljzl+nql1uNJTicy1qbe7Q
-	iY5IrNAcUmO8dwK1/8WJiiw8C+0vZb7+4mkDIIdXNexeihdEQaA==
-X-Received: by 2002:a05:6214:2263:b0:6b5:ab8:3c67 with SMTP id 6a1803df08f44-6bb3ca4a18amr5253546d6.12.1721844118125;
-        Wed, 24 Jul 2024 11:01:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHZEhac2G3eS9qVXLObbJ6dYQUXvi7/B/WoD7rOb25+o96829TGkskMEd5EHjlduvB/RI+kKg==
-X-Received: by 2002:a05:6214:2263:b0:6b5:ab8:3c67 with SMTP id 6a1803df08f44-6bb3ca4a18amr5253056d6.12.1721844117592;
-        Wed, 24 Jul 2024 11:01:57 -0700 (PDT)
+        bh=E4xHXpZqg+KRUI+QCOaM8qkzmkaxjhHYo1elyOFQ6Dw=;
+        b=gKynGRaZW8hqdEm+cg0bwee4H7hYiA+0boV0Ke+742Uj6CUsksKlqNikrHIMJKfGiT
+         +nCl6t98BMsXfNq6mWJgc1QD+AFzvQ6kdKfwksME3ElqPimNtD8b3nxHWMZSGgtSUwdY
+         HzGdg4+SMf9jnA6rNhR5XTeWacqINpb6uucE5c5ki1C8vx0AyaemFpFL0MZwGLTG12z0
+         OwG2n+If0wWlfunGbcJgltOMRRNsBQYx6AY+3+ffkizUYBU+Y5P+jQlyq7/MAX18A5gn
+         r0lUDIJ2FvWmmICcOFtuTs/XMXdbsKEWQ+Ab3y0t80nc0HXr3MAl/vKtNQm0mZUj1VhR
+         1wLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZTiqGS2iBxSkhxxgO96LqDUANIidZ+mRNNOMtgZ7EcVvaRMu1UHSVJcS8/TWcz5hBJ7z5oP5pGEX8RwmmoVY9MzSy
+X-Gm-Message-State: AOJu0Yx/1UVyvzSfL3MONYZXi48hS7Uqdm3M8plFAD5tYHEhwdw/m0Yg
+	uv5kmlMSAvixcnBQQNukC9o+kRHq52R531T9p0/JO4fT4KR63EHYa4LBOKiSrGoQTqG+KPFLxbs
+	Q38UZciOSRKA4GeKALBytLxlbOGdWDqycFygw12hjQDCFjLirRw==
+X-Received: by 2002:ac8:5dd2:0:b0:446:5cb4:aee5 with SMTP id d75a77b69052e-44fe49a127fmr4497071cf.57.1721844156929;
+        Wed, 24 Jul 2024 11:02:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEKRx780BtkMoyyEhwyfSEZ1W7uSWCxxpMjm9sbfka5uYrMs7cLZnvUpd1z16M1yZtjJUWpGA==
+X-Received: by 2002:ac8:5dd2:0:b0:446:5cb4:aee5 with SMTP id d75a77b69052e-44fe49a127fmr4496531cf.57.1721844156307;
+        Wed, 24 Jul 2024 11:02:36 -0700 (PDT)
 Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7ac9c3b58sm60232466d6.93.2024.07.24.11.01.56
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44fdd2a9390sm4086761cf.23.2024.07.24.11.02.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 11:01:56 -0700 (PDT)
-Message-ID: <421ab8ab3aba859e57518922fe1976ac077423cc.camel@redhat.com>
-Subject: Re: [PATCH v2 46/49] KVM: x86: Replace (almost) all guest CPUID
- feature queries with cpu_caps
+        Wed, 24 Jul 2024 11:02:35 -0700 (PDT)
+Message-ID: <13e34c1654b47ba5ee5e1de8fa09aabd45dbe159.camel@redhat.com>
+Subject: Re: [PATCH v2 47/49] KVM: x86: Drop superfluous host XSAVE check
+ when adjusting guest XSAVES caps
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
@@ -84,12 +84,12 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
  Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
  <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
  Robert Hoo <robert.hoo.linux@gmail.com>
-Date: Wed, 24 Jul 2024 14:01:55 -0400
-In-Reply-To: <Zo2Nb653OcdDge9N@google.com>
+Date: Wed, 24 Jul 2024 14:02:34 -0400
+In-Reply-To: <Zo2MPSccg3AEz4qM@google.com>
 References: <20240517173926.965351-1-seanjc@google.com>
-	 <20240517173926.965351-47-seanjc@google.com>
-	 <928f893e5069712a6f93c05a167cf43fa166777c.camel@redhat.com>
-	 <Zo2Nb653OcdDge9N@google.com>
+	 <20240517173926.965351-48-seanjc@google.com>
+	 <46361f0c834a25ad0a45ca2f1813ade603d29201.camel@redhat.com>
+	 <Zo2MPSccg3AEz4qM@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -100,60 +100,83 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Tue, 2024-07-09 at 12:20 -0700, Sean Christopherson wrote:
+On Tue, 2024-07-09 at 12:15 -0700, Sean Christopherson wrote:
 > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
 > > On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
-> > > +static __always_inline bool guest_cpuid_has(struct kvm_vcpu *vcpu,
-> > > +					    unsigned int x86_feature)
-> > >  {
-> > >  	const struct cpuid_reg cpuid = x86_feature_cpuid(x86_feature);
-> > >  	struct kvm_cpuid_entry2 *entry;
-> > > +	u32 *reg;
-> > > +
-> > > +	/*
-> > > +	 * XSAVES is a special snowflake.  Due to lack of a dedicated intercept
-> > > +	 * on SVM, KVM must assume that XSAVES (and thus XRSTORS) is usable by
-> > > +	 * the guest if the host supports XSAVES and *XSAVE* is exposed to the
-> > > +	 * guest.  Although the guest can read/write XSS via XSAVES/XRSTORS, to
-> > > +	 * minimize the virtualization hole, KVM rejects attempts to read/write
-> > > +	 * XSS via RDMSR/WRMSR.  To make that work, KVM needs to check the raw
-> > > +	 * guest CPUID, not KVM's view of guest capabilities.
+> > > Drop the manual boot_cpu_has() checks on XSAVE when adjusting the guest's
+> > > XSAVES capabilities now that guest cpu_caps incorporates KVM's support.
+> > > The guest's cpu_caps are initialized from kvm_cpu_caps, which are in turn
+> > > initialized from boot_cpu_data, i.e. checking guest_cpu_cap_has() also
+> > > checks host/KVM capabilities (which is the entire point of cpu_caps).
+> > > 
+> > > Cc: Maxim Levitsky <mlevitsk@redhat.com>
+> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > ---
+> > >  arch/x86/kvm/svm/svm.c | 1 -
+> > >  arch/x86/kvm/vmx/vmx.c | 3 +--
+> > >  2 files changed, 1 insertion(+), 3 deletions(-)
+> > > 
+> > > diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> > > index 06770b60c0ba..4aaffbf22531 100644
+> > > --- a/arch/x86/kvm/svm/svm.c
+> > > +++ b/arch/x86/kvm/svm/svm.c
+> > > @@ -4340,7 +4340,6 @@ static void svm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> > >  	 * the guest read/write access to the host's XSS.
+> > >  	 */
+> > >  	guest_cpu_cap_change(vcpu, X86_FEATURE_XSAVES,
+> > > -			     boot_cpu_has(X86_FEATURE_XSAVE) &&
+> > >  			     boot_cpu_has(X86_FEATURE_XSAVES) &&
+> > >  			     guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVE));
+> > >  
+> > > diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+> > > index 741961a1edcc..6fbdf520c58b 100644
+> > > --- a/arch/x86/kvm/vmx/vmx.c
+> > > +++ b/arch/x86/kvm/vmx/vmx.c
+> > > @@ -7833,8 +7833,7 @@ void vmx_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
+> > >  	 * to the guest.  XSAVES depends on CR4.OSXSAVE, and CR4.OSXSAVE can be
+> > >  	 * set if and only if XSAVE is supported.
+> > >  	 */
+> > > -	if (!boot_cpu_has(X86_FEATURE_XSAVE) ||
+> > > -	    !guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVE))
+> > > +	if (!guest_cpu_cap_has(vcpu, X86_FEATURE_XSAVE))
+> > >  		guest_cpu_cap_clear(vcpu, X86_FEATURE_XSAVES);
 > > 
 > > Hi,
 > > 
-> > I think that this comment is wrong:
+> > I have a question about this code, even before the patch was applied:
 > > 
-> > The guest can't read/write XSS via XSAVES/XRSTORS. It can only use XSAVES/XRSTORS
-> > to save/restore features that are enabled in XSS, and thus if there are none enabled,
-> > the XSAVES/XRSTORS acts as more or less XSAVEOPTC/XRSTOR except working only when CPL=0)
-> 
-> Doh, right you are.
-> 
-> > So I don't think that there is a virtualization hole except the fact that VMM can't
-> > really disable XSAVES if it chooses to.
-> 
-> There is still a hole.  If XSAVES is not supported, KVM runs the guest with the
-> host XSS.  See the conditional switching in kvm_load_{guest,host}_xsave_state().
-> Not treating XSAVES as being available to the guest would allow the guest to read
-> and write host supervisor state.
-Makes sense. The remaining virtualization hole is indeed that we can't disable XSAVES,
-even if userspace chooses to, we still can't.
-
-
-> 
-> I'll rewrite the comment to call that.
-> 
-> > Another "half virtualization hole" is that since we have chosen to not
-> > intercept XSAVES at all, (AMD can't do this at all, and it's slow anyway) we
-> > instead opted to never support some XSS bits (so far all of them, only
-> > upcoming CET will add a few supported bits).
+> > While it is obviously correct to disable XSAVES when XSAVE not supported, I
+> > wonder: There are a lot more cases like that and KVM explicitly doesn't
+> > bother checking them, e.g all of the AVX family also depends on XSAVE due to
+> > XCR0.
 > > 
-> > This creates an unexpected situation for the guest - enabled feature (e.g PT)
-> > but no XSS bit supported to context switch it. x86 arch does allow this
-> > though.
+> > What makes XSAVES/XSAVE dependency special here? Maybe we can remove this
+> > code to be consistent?
+> 
+> Because that would result in VMX and SVM behavior diverging with respect to
+> whether guest_cpu_cap_has(X86_FEATURE_XSAVES).  E.g. for AMD it would be 100%
+> accurate, but for Intel it would be accurate if and only if XSAVE is supported.
+This is a good justification, and IMHO it is worth a comment in the VMX code,
+so that this question I had won't be raised again.
 
+
+> In practice that isn't truly problematic, because checks on XSAVES from common
+> code are gated on guest CR4.OSXSAVE=1, i.e. implicitly check XSAVE support.  But
+> the potential danger of sublty divergent behavior between VMX and SVM isn't worth
+> making AVX vs. XSAVES consistent within VMX, especially since VMX vs. SVM would
+> still be inconsistent.
+> 
+> > AMD portion of this patch, on the other hand does makes sense, due to a lack
+> > of a separate XSAVES intercept.
+> 
+> FWIW, AMD also needs precise tracking in order to passthrough XSS for SEV-ES.
+Makes sense too.
+
+> 
 
 Best regards,
 	Maxim Levitsky
+
+
 
 
