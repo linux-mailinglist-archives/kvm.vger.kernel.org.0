@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-22188-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22189-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 735C493B659
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 19:59:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95FD193B65B
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 20:00:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBB4A1F22E91
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 17:59:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16B361F22C90
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF8C01662E7;
-	Wed, 24 Jul 2024 17:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A3116B386;
+	Wed, 24 Jul 2024 18:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MrJoRWyH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g0n6qxhy"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7317215FA74
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 17:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BF5A1662FA
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 18:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721843971; cv=none; b=J/rh5zqkgMmJKr/klYhTi5vA2UPnvIcTSuYZ2BG5XWdofaINQbeLprQcbhW/F4LUJkMczwYDCn5TEQ22N2fGUO5DIfrT17gByEB+a5DHUPoCyrx3biomKCTmWaUhS2Es36W2mEJ/3Lmz630B3ATyKbBMFFr55oh7lcTNDTBYwak=
+	t=1721844007; cv=none; b=FaVWy2EXLjT2HmCoHASQHudX3twFfrgqg/Z0iQOhKcwFawE/zE7Eu2tuKY57ep5CFC7c+zVjo4gng100ogZ/8P3/lk24y4EYx76u3s/rsAvEhtvJeGDVFZE0q6mhcXXPspjeHzns826HgNpB2tsT8oSxjM6EtGG0w9F5XZ/xkNI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721843971; c=relaxed/simple;
-	bh=vToUSFfuBxFDwHHbmDpLt129lVI02pWGZoeP06wz/Ts=;
+	s=arc-20240116; t=1721844007; c=relaxed/simple;
+	bh=wi4PVMj/RylII+kfp9JvNJ0g3isAzxZ36/+o7Gw4c2s=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=H57EVLGTV+HDH526/5d6CYTwINZOaWMMujE29IxnAOwz7L39esKoWmRymyT+tyRhh+87g7GGBPvpjBHIm1mmuJNXOozFh33yb97HXsThQtBljbacnf/zJqDF7DbqBZBmPPGR7w5OsZshn16/svFmio6uJGNU9Zot6XtRieEsDEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MrJoRWyH; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=mluaEtOzH93NaIMpmBapbNxAsrIYyfs0UKERV/bjD+KF7nR1tmXyC4Sk4gu+ro9mMEYzxLpnrDbG/mnj6wmMgQSQLBDRG7XevZ4tYmUfl9feWFDSmct7/3bH6wUkkYfKjzy4V+cpipEnpsug/65C91Zjo1JLjzZLtVqhmVscVC8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g0n6qxhy; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721843968;
+	s=mimecast20190719; t=1721844005;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UrO4J8+RYRKw88kJ7TpCWAFl9RA8wwB8eC8PuzRLyzw=;
-	b=MrJoRWyHyUTw/+oSwimCqMPU1iZGu9ftlwmt31+F4YIQCKL8QAlrt3HsJEtG/NIYYL5umA
-	/yo+DTOU3z2N0HAlrGPAt1Shb4GQ0mJKCjw1wiRbtdLmuVMm8BmK2wWnfLE4ZfbvV09d9n
-	VMtR8LiRBCvI8dWOKTxRU/u7mBNVuxA=
-Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
- [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=OUhs1zi8/K2uHCURlex7Z0IBPujaiiqC2g0oUiZ4EtY=;
+	b=g0n6qxhyYLJ4msc7DEs2/2z++V4ksCtohyCI7QmLczr3wHb1B4GVI2PrOToq1ynFXLtMkR
+	F3R2gOa64flF0V0U1fQG1yE5pa2q8Xbp9V9nrTX/80cDdFxcGsnu3Z8tR/TwEiuDR8EXTo
+	mRX52jV5VpcUIcT4EFTeoA7tBSmpjGo=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-508-wAJSdmRrNtOFy3SwCdP6NQ-1; Wed, 24 Jul 2024 13:59:27 -0400
-X-MC-Unique: wAJSdmRrNtOFy3SwCdP6NQ-1
-Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-822abeb17dfso14271241.0
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 10:59:27 -0700 (PDT)
+ us-mta-580-h0nuLGIlO76m1rLowUwKEg-1; Wed, 24 Jul 2024 14:00:03 -0400
+X-MC-Unique: h0nuLGIlO76m1rLowUwKEg-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6b7b3ed86ccso1148186d6.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 11:00:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721843966; x=1722448766;
+        d=1e100.net; s=20230601; t=1721844003; x=1722448803;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=UrO4J8+RYRKw88kJ7TpCWAFl9RA8wwB8eC8PuzRLyzw=;
-        b=Ua55+q5aKVb4Dp49sAGlLidCJ/PKfhlvAa31p0Ca3m00QVXyaBrli21WztILY5/DJs
-         rL7JBc0pOSARukGDDDyydULarkkUgD/qrFNxM5grDHdrgckZFJI7ZdozMaCQ8uvClgkg
-         zxOH4R6GvJXvXw2GUAJtGae3N18SbZi3O9+5W1WDoXdsarpzNsuMxXDeNjjoFCGUjuna
-         zQpv8zrPzb4ShVRFbTBHCmJBBnCdfyc3Wxmywl4Uh+VGoy96/ZbzUtjFcQjIIFt9PrNG
-         mWUt/ZuF2N9eh5a8YKwu0aTkhCgD/1dF0YExdCbzR7z2H5mK+jnvVDxoRG5ruRKx3+jz
-         UQ2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVn5rpfzGlCnWYa5pRbN5tBi5LYF7GmQWx4aWCl01so7E1OhI3FuViC8shY1taOUfY4cL3oGSMpsF22GVbzrvBiwntb
-X-Gm-Message-State: AOJu0YwGnj4ckXV6sMYe4/iIeuUiY1B/RtiCBYsWFU0AYuFdJQLJAsrX
-	rb9WReNxbjm5ZHemG6QfMwR073EbezgIeBI43ZM76pYHnNrRVpLtoJ4wQi14iAtlvLQ7lGBI9y4
-	nD/h8stGHpboWMfoUkD3rULOcHTbFj0kgk1RBOwM48O8I6DFTwQ==
-X-Received: by 2002:a05:6122:2a13:b0:4ef:65b6:f3b5 with SMTP id 71dfb90a1353d-4f6c5c56b42mr709135e0c.10.1721843966591;
-        Wed, 24 Jul 2024 10:59:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEv2KFdtV00Z6o3UF9MC26wgwcqFFNRmS00b7jyX/7uEhsN3NmY4g0QuJUpa0SgnKPSCmbH1Q==
-X-Received: by 2002:a05:6122:2a13:b0:4ef:65b6:f3b5 with SMTP id 71dfb90a1353d-4f6c5c56b42mr708069e0c.10.1721843943219;
-        Wed, 24 Jul 2024 10:59:03 -0700 (PDT)
+        bh=OUhs1zi8/K2uHCURlex7Z0IBPujaiiqC2g0oUiZ4EtY=;
+        b=Egx4G8934pL/xfQKXlEW6+qN3Y++uqc0RCLC8JOjijA96IY8w6ovJU1oHo7nE/iXbt
+         mmKh+dsob6euqxqqWUzjZyCphlC5zCARjuc6igYTOxO5pvpgUjNmggPmy0jbELPpc16x
+         Fz3UIykCPWiSPX4VcCy8xdtJi0BcuiBar3vNySqLvcabva+sskeLLPrFLn+4r1d6ToKa
+         rbAOJcj/5MNqlTSb723XU+9GZKEOMqdS8RM1L5C3dR//qWB9A0n8UNOMvD/0rzMm9ACx
+         TMF+JdIyxib2XAykBz/lYm9BwwMXFB+TdqxZrEMiR+wJVxAqZIsHcxS3c+eqO0fcPq2R
+         vIWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW6EuG9JOVVxz4X7UGRaoCAYDWe01WqVweaSZ/TnB/7OvEL2Zarv5IgtKY9ozI5ZenAHlUYBgqa+RXzklhpokZm/lGS
+X-Gm-Message-State: AOJu0YwjbYPlQpsraYLf1Cg8lQW3pvMF1dRgezvjv54pGy3+vaqKffwj
+	50ChudlBjbBG+I+rABZ0XG3BieR+ABOkhOH73mS7cSir8lkIzdfvP/5/TM1+FgQZDhhd6kw5B4K
+	PK8BFyyOHql169NLyVxSeyPYzx3UVwZv0SywpN7hr8dwjhW31jg==
+X-Received: by 2002:ad4:5f4e:0:b0:6b0:7f0c:d30e with SMTP id 6a1803df08f44-6bb3c9cf607mr5057126d6.10.1721844002959;
+        Wed, 24 Jul 2024 11:00:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFV5ZeOzeO98y/PIGai+ELZySp2k2TXNjwAGQ61vgRr5QwqvMpKKDJO87IqdHpG0qrm2UACvQ==
+X-Received: by 2002:ad4:5f4e:0:b0:6b0:7f0c:d30e with SMTP id 6a1803df08f44-6bb3c9cf607mr5056596d6.10.1721844002640;
+        Wed, 24 Jul 2024 11:00:02 -0700 (PDT)
 Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-44f9cdd4a6bsm55296631cf.97.2024.07.24.10.59.02
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7ac7dc47esm60141676d6.43.2024.07.24.11.00.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 10:59:02 -0700 (PDT)
-Message-ID: <f04b682df8f424184fc3b43ce7c8c319924b50d5.camel@redhat.com>
-Subject: Re: [PATCH v2 29/49] KVM: x86: Remove unnecessary caching of KVM's
- PV CPUID base
+        Wed, 24 Jul 2024 11:00:02 -0700 (PDT)
+Message-ID: <f6e5e836b356c4f852e9191d4eea283ff9534b09.camel@redhat.com>
+Subject: Re: [PATCH v2 33/49] KVM: x86: Advertise TSC_DEADLINE_TIMER in
+ KVM_GET_SUPPORTED_CPUID
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
@@ -84,12 +84,12 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
  Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
  <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
  Robert Hoo <robert.hoo.linux@gmail.com>
-Date: Wed, 24 Jul 2024 13:59:01 -0400
-In-Reply-To: <Zo2I3FChU58bX7qH@google.com>
+Date: Wed, 24 Jul 2024 14:00:01 -0400
+In-Reply-To: <Zo2PRdv1KMf_Mgwj@google.com>
 References: <20240517173926.965351-1-seanjc@google.com>
-	 <20240517173926.965351-30-seanjc@google.com>
-	 <5b747a9dacb0ead3d16c71192df8a61e8545d0e6.camel@redhat.com>
-	 <Zo2I3FChU58bX7qH@google.com>
+	 <20240517173926.965351-34-seanjc@google.com>
+	 <924352564a5ab003b85bf7e2ee422907f9951e26.camel@redhat.com>
+	 <Zo2PRdv1KMf_Mgwj@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -100,58 +100,58 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Tue, 2024-07-09 at 12:00 -0700, Sean Christopherson wrote:
+On Tue, 2024-07-09 at 12:28 -0700, Sean Christopherson wrote:
 > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
 > > On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
-> > > Now that KVM only searches for KVM's PV CPUID base when userspace sets
-> > > guest CPUID, drop the cache and simply do the search every time.
-> > > 
-> > > Practically speaking, this is a nop except for situations where userspace
-> > > sets CPUID _after_ running the vCPU, which is anything but a hot path,
-> > > e.g. QEMU does so only when hotplugging a vCPU.  And on the flip side,
-> > > caching guest CPUID information, especially information that is used to
-> > > query/modify _other_ CPUID state, is inherently dangerous as it's all too
-> > > easy to use stale information, i.e. KVM should only cache CPUID state when
-> > > the performance and/or programming benefits justify it.
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> 
-> ...
-> 
-> > > @@ -491,13 +479,6 @@ static int kvm_set_cpuid(struct kvm_vcpu *vcpu, struct kvm_cpuid_entry2 *e2,
-> > >  	 * whether the supplied CPUID data is equal to what's already set.
-> > >  	 */
-> > >  	if (kvm_vcpu_has_run(vcpu)) {
-> > > -		/*
-> > > -		 * Note, runtime CPUID updates may consume other CPUID-driven
-> > > -		 * vCPU state, e.g. KVM or Xen CPUID bases.  Updating runtime
-> > > -		 * state before full CPUID processing is functionally correct
-> > > -		 * only because any change in CPUID is disallowed, i.e. using
-> > > -		 * stale data is ok because KVM will reject the change.
-> > > -		 */
+> > >  4.47 KVM_PPC_GET_PVINFO
+> > >  -----------------------
+> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> > > index 699ce4261e9c..d1f427284ccc 100644
+> > > --- a/arch/x86/kvm/cpuid.c
+> > > +++ b/arch/x86/kvm/cpuid.c
+> > > @@ -680,8 +680,8 @@ void kvm_set_cpu_caps(void)
+> > >  		F(FMA) | F(CX16) | 0 /* xTPR Update */ | F(PDCM) |
+> > >  		F(PCID) | 0 /* Reserved, DCA */ | F(XMM4_1) |
+> > >  		F(XMM4_2) | EMUL_F(X2APIC) | F(MOVBE) | F(POPCNT) |
+> > > -		0 /* Reserved*/ | F(AES) | F(XSAVE) | 0 /* OSXSAVE */ | F(AVX) |
+> > > -		F(F16C) | F(RDRAND)
+> > > +		EMUL_F(TSC_DEADLINE_TIMER) | F(AES) | F(XSAVE) |
+> > > +		0 /* OSXSAVE */ | F(AVX) | F(F16C) | F(RDRAND)
+> > >  	);
+> > >  
+> > >  	kvm_cpu_cap_init(CPUID_1_EDX,
+> > 
 > > Hi,
 > > 
-> > Any reason why this comment was removed?
+> > I have a mixed feeling about this.
+> > 
+> > First of all KVM_GET_SUPPORTED_CPUID documentation explicitly states that it
+> > returns bits that are supported in *default* configuration TSC_DEADLINE_TIMER
+> > and arguably X2APIC are only supported after enabling various caps, e.g not
+> > default configuration.
 > 
-> Because after this patch, runtime CPUID updates no longer consume other vCPU
-> state that is derived from guest CPUID.
-> 
-> > As I said earlier in the review.  It might make sense to replace this comment
-> > with a comment reflecting on why we need to call kvm_update_cpuid_runtime,
-> > that is solely to allow old == new compare to succeed.
-> 
-> Ya, I'll figure out a location and patch to document why KVM applies runtime
-> and quirks to the CPUID before checking.
-> 
-> > >  		kvm_update_cpuid_runtime(vcpu);
-> > >  		kvm_apply_cpuid_pv_features_quirk(vcpu);
+> Another side topic, in the near future, I think we should push to make an in-kernel
+> local APIC a hard requirement. 
 
+I vote yes, with my both hands for this, but I am sure that this will for sure break at least some
+userspace and/or some misconfigured qemu instances.
 
-Makes sense, thanks!
+>  AFAIK, userspace local APIC gets no meaningful
+> test coverage, and IIRC we have known bugs where a userspace APIC doesn't work
+> as it should, e.g. commit 6550c4df7e50 ("KVM: nVMX: Fix interrupt window request
+> with "Acknowledge interrupt on exit"").
+> 
+> > However, since X2APIC also in KVM_GET_SUPPORTED_CPUID (also wrongly IMHO),
+> > for consistency it does make sense to add TSC_DEADLINE_TIMER as well.
+> > 
+> > I do think that we need at least to update the documentation of KVM_GET_SUPPORTED_CPUID
+> > and KVM_GET_EMULATED_CPUID, as I state in a review of a later patch.
+> 
+> +1
+> 
+
 
 Best regards,
 	Maxim Levitsky
-
 
 
