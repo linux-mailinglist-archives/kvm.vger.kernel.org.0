@@ -1,221 +1,422 @@
-Return-Path: <kvm+bounces-22169-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22166-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A19093B338
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 16:55:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36FF093B2D4
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 16:40:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D50012822C6
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 14:55:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0F2E2821DF
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 14:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E02421598E9;
-	Wed, 24 Jul 2024 14:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9ABC15ADA0;
+	Wed, 24 Jul 2024 14:40:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="MsVhf013"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ChXOKpf3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C6F1CAA1;
-	Wed, 24 Jul 2024 14:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C783415884F
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 14:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721832923; cv=none; b=XLCB6VOObDWI4z5gX7Xs0FUh9qSvnrBre/fRY8ZlOEPU9clu0r0ciLBT7LEXhzbyqwSxH/CBK2OjhgnnnLi4EiKv0+k4dNEBGzHr9g8mQpal3pDkmvwVblvqfHkbCYfDKIFW11YXHeXEQ0U5voZH4tCI+/JwL7XEslp7xGMjIcQ=
+	t=1721832009; cv=none; b=VcgEv7GZaJVoLZr9kOZBWELy5bUqEd9fuK/o/NJdCKRmTFva2E0scncpGHac3SoEhqn8MS93qoM7/dKW+xmf7Zh7EEsaoTjR6vpyUoYPGf7MJ72dSIeRTnP1FtyTE/XqVMD0HEDf1cC47boE1gAUsyAoa+QLp9LeBKhPsDL9G2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721832923; c=relaxed/simple;
-	bh=cs9cls9tQrQ00VCl4Lpjvxyqe8yAZ9Qm6Y5HlsldcE0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i1NeSo4verJTRbswfeWv9eMe0QFZIcv7X06pzzALlWZk7UfHG7SAeOfwrA6ESJlABcS1BMYtVT9/PTjLB0jxJWN1KhRKQRjz2DbNR5LWGE63LEsCcLK9yNDmNNC4A0ih6CjDe9fL3t9ghx+lT7DjUtrsO3LMaTHf+I5symE4JR0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=MsVhf013; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46ODRSlE007577;
-	Wed, 24 Jul 2024 14:55:17 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=9
-	5TIKt7TasxA3v52rGwj6zhzRqVvzyY/z1QC8VPqdZc=; b=MsVhf013giO+/Mecf
-	kaYOisWzkMGg0UXzd6nO/yNXu4R6izE1p2cHjVYuzvVvbwzVWyAsLAEU7B5S5jj2
-	Q+oIo6SjYLeeXPC7ycJqe8Wk2g+bmeVtksKAZPKPou8AHYYK9ZZ6B3WEIjxwwI4j
-	73cqsmRx82PA2od3En7oWrUCs08o9iG4ODw7CAeuDyVRoeeZwBT2bruoUIHvqwF9
-	hCTlVEH3bAj922GyOyQgPwOnrpmUmE4EsP2gGhaXeo3dcYfF6BGHQl2ctGsE4nVI
-	BuQuS7xPNPAc+MiU66ejE1mVeyBs5wEw1y+LTjUTRCJfbk1v5RAcQCE9rk17q3gk
-	3qzbA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40jxjr0shr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Jul 2024 14:55:17 +0000 (GMT)
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46OEtGBn023973;
-	Wed, 24 Jul 2024 14:55:16 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40jxjr0sej-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Jul 2024 14:55:16 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46ODprn0006625;
-	Wed, 24 Jul 2024 14:52:06 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40gxn7g4dg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 24 Jul 2024 14:52:06 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46OEq00r52691266
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 24 Jul 2024 14:52:02 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BD10420065;
-	Wed, 24 Jul 2024 14:52:00 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5976D2004E;
-	Wed, 24 Jul 2024 14:52:00 +0000 (GMT)
-Received: from [9.179.14.90] (unknown [9.179.14.90])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 24 Jul 2024 14:52:00 +0000 (GMT)
-Message-ID: <5df2d680-6d6c-43c8-8b69-e6ad7e4ac35a@linux.ibm.com>
-Date: Wed, 24 Jul 2024 16:52:00 +0200
+	s=arc-20240116; t=1721832009; c=relaxed/simple;
+	bh=wA5+ox4GtwSVQ1m25C8rgzKbI2kA9MhB8gChFIdvyzA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=T0FQ+Y7N/53I6FTGXNJcfA+M+94fpDilztnhI8t4HjAGWxuZiOWp10ybv5Av25XtLvPHNr0ebK6plzG8tDjLgIiCnNfd9OJFYqrUxD1T+4Sy+qgGv+t0AFWnVbAydXRtv8jTKoK2vwnmtX4l++AvqhgIAHGXUQK+W7KF2xoYG7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ChXOKpf3; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721832008; x=1753368008;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=wA5+ox4GtwSVQ1m25C8rgzKbI2kA9MhB8gChFIdvyzA=;
+  b=ChXOKpf3P+VESTfKTaxJT1SyafvkSGZBJLvK3GQbDnb7PJ3O9VVRf74n
+   uj88apADeVcsfUtHsWGu1kjPt9yhFtXcSVSxor2zqSFrpe1qBJNEpL3Zd
+   e3hQZg6uBxm8EhtYNlWTvFLFPJuVEEXxcLDje5erfeuhUh6Tq2zcBZGe4
+   BaxoYdhfwNSIcnkz55MXPCKtqpvXIjZMfijXGfpnN2CvM4bP0GYdc9lZ6
+   VMROoB0dlF9LRUD9dqYMaAhQJ9d++MvrgjvxqUtufkdvaM0d/UgShleHP
+   8Z9P9Al2JiJYoEN4p4nWeFiU2zpzt3IdCPYWzSHECJcgQdazNdIgAWJZU
+   A==;
+X-CSE-ConnectionGUID: xz8d8kKSSYOYlM0AoT6ReA==
+X-CSE-MsgGUID: XaghIOzWT5SIV7RfPRxk0A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="12692007"
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="12692007"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 07:40:07 -0700
+X-CSE-ConnectionGUID: jrk1Qh8tTY2wMt8QdoK3wA==
+X-CSE-MsgGUID: U8qNAMugQUyKShDiIekrEw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="52298777"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by fmviesa007.fm.intel.com with ESMTP; 24 Jul 2024 07:40:02 -0700
+Date: Wed, 24 Jul 2024 22:55:46 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
+Message-ID: <ZqEV8uErCn+QkOw8@intel.com>
+References: <20240704031603.1744546-1-zhao1.liu@intel.com>
+ <20240704031603.1744546-3-zhao1.liu@intel.com>
+ <87wmld361y.fsf@pond.sub.org>
+ <Zp5tBHBoeXZy44ys@intel.com>
+ <87h6cfowei.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 03/10] selftests: kvm: s390: Add s390x ucontrol test
- suite with hpage test
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-References: <20240723093126.285319-1-schlameuss@linux.ibm.com>
- <20240723093126.285319-4-schlameuss@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240723093126.285319-4-schlameuss@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: sUJ1ulwxFIqpv8-UucT-ugZ_0aH0P06n
-X-Proofpoint-GUID: K5RP1WTGLiJyU0f6RvAsaakTZUuoK__s
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-24_13,2024-07-24_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- impostorscore=0 suspectscore=0 mlxscore=0 bulkscore=0 priorityscore=1501
- malwarescore=0 phishscore=0 mlxlogscore=999 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2407240109
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87h6cfowei.fsf@pond.sub.org>
 
-On 7/23/24 11:31, Christoph Schlameuss wrote:
-> Add test suite to validate the s390x architecture specific ucontrol KVM
-> interface.
+Hi Markus,
+
+I realized I should reply this mail first...
+
+On Wed, Jul 24, 2024 at 01:35:17PM +0200, Markus Armbruster wrote:
+> Date: Wed, 24 Jul 2024 13:35:17 +0200
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
 > 
-> Make use of the selftest test harness.
+> Zhao Liu <zhao1.liu@intel.com> writes:
 > 
-> * uc_cap_hpage testcase verifies that a ucontrol VM cannot be run with
->    hugepages.
+> > Hi Markus,
+> >
+> > On Mon, Jul 22, 2024 at 03:33:13PM +0200, Markus Armbruster wrote:
+> >> Date: Mon, 22 Jul 2024 15:33:13 +0200
+> >> From: Markus Armbruster <armbru@redhat.com>
+> >> Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
+> >> 
+> >> Zhao Liu <zhao1.liu@intel.com> writes:
+> >> 
+> >> > Introduce smp-cache object so that user could define cache properties.
+> >> >
+> >> > In smp-cache object, define cache topology based on CPU topology level
+> >> > with two reasons:
+> >> >
+> >> > 1. In practice, a cache will always be bound to the CPU container
+> >> >    (either private in the CPU container or shared among multiple
+> >> >    containers), and CPU container is often expressed in terms of CPU
+> >> >    topology level.
+> >> > 2. The x86's cache-related CPUIDs encode cache topology based on APIC
+> >> >    ID's CPU topology layout. And the ACPI PPTT table that ARM/RISCV
+> >> >    relies on also requires CPU containers to help indicate the private
+> >> >    shared hierarchy of the cache. Therefore, for SMP systems, it is
+> >> >    natural to use the CPU topology hierarchy directly in QEMU to define
+> >> >    the cache topology.
+> >> >
+> >> > Currently, separated L1 cache (L1 data cache and L1 instruction cache)
+> >> > with unified higher-level cache (e.g., unified L2 and L3 caches), is the
+> >> > most common cache architectures.
+> >> >
+> >> > Therefore, enumerate the L1 D-cache, L1 I-cache, L2 cache and L3 cache
+> >> > with smp-cache object to add the basic cache topology support.
+> >> >
+> >> > Suggested-by: Daniel P. Berrange <berrange@redhat.com>
+> >> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> >> 
+> >> [...]
+> >> 
+> >> > diff --git a/qapi/machine-common.json b/qapi/machine-common.json
+> >> > index 82413c668bdb..8b8c0e9eeb86 100644
+> >> > --- a/qapi/machine-common.json
+> >> > +++ b/qapi/machine-common.json
+> >> > @@ -64,3 +64,53 @@
+> >> >    'prefix': 'CPU_TOPO_LEVEL',
+> >> >    'data': [ 'invalid', 'thread', 'core', 'module', 'cluster',
+> >> >              'die', 'socket', 'book', 'drawer', 'default' ] }
+> >> > +
+> >> > +##
+> >> > +# @SMPCacheName:
+> >> 
+> >> Why the SMP in this name?  Because it's currently only used by SMP
+> >> stuff?  Or is there another reason I'm missing?
+> >
+> > Yes, I suppose it can only be used in SMP case.
+> >
+> > Because Intel's heterogeneous CPUs have different topologies for cache,
+> > for example, Alderlake's L2, for P core, L2 is per P-core, but for E
+> > core, L2 is per module (4 E cores per module). Thus I would like to keep
+> > the topology semantics of this object and -smp as consistent as possible.
+> >
+> > Do you agree?
 > 
-> To allow testing of the ucontrol interface the kernel needs a
-> non-default config containing CONFIG_KVM_S390_UCONTROL.
-> This config needs to be set to built-in (y) as this cannot be built as
-> module.
+> I don't know enough to meaningfully agree or disagree.  I know just
+> enough to annoy you with questions :)
+
+Welcome and no problem!
+
+> This series adds a way to configure caches.
 > 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
-> ---
+> Structure of the configuration data: a list
+> 
+>     [{"name": N, "topo": T}, ...]
+> 
+> where N can be "l1d", "l1i", "l2", or "l3",
+>   and T can be "invalid", "thread", "core", "module", "cluster",
+>                "die", "socket", "book", "drawer", or "default".
+> 
+> What's the use case?  The commit messages don't tell.
 
-[...]
+i386 has the default cache topology model: l1 per core/l2 per core/l3
+per die.
 
-> +#include "kselftest_harness.h"
-> +#include "kvm_util.h"
-> +
-> +#include <linux/capability.h>
-> +#include <linux/sizes.h>
-> +
-> +#define SYS_ADMIN_CAP 0x200000
+Cache topology affects scheduler performance, e.g., kernel's cluster
+scheduling.
 
-This looked suspicious to me.
-Surely this would be available in some form in capability.h since 
-CAP_SYS_ADMIN is something that's regularly checked.
+Of course I can hardcode some cache topology model in the specific cpu
+model that corresponds to the actual hardware, but for -cpu host/max,
+the default i386 cache topology model has no flexibility, and the
+host-cpu-cache option doesn't have enough fine-grained control over the
+cache topology.
 
-[...]
+So I want to provide a way to allow user create more fleasible cache
+topology. Just like cpu topology.
 
-> +
-> +/* so directly declare capget to check caps without libcap */
-> +int capget(cap_user_header_t header, cap_user_data_t data);
-> +
-> +/**
-> + * In order to create user controlled virtual machines on S390,
-> + * check KVM_CAP_S390_UCONTROL and use the flag KVM_VM_S390_UCONTROL
-> + * as privileged user (SYS_ADMIN).
-> + */
-> +void require_ucontrol_admin(void)
-> +{
-> +	struct __user_cap_data_struct data[_LINUX_CAPABILITY_U32S_3];
-> +	struct __user_cap_header_struct hdr = {
-> +		.version = _LINUX_CAPABILITY_VERSION_3,
-> +	};
-> +	int rc;
-> +
-> +	rc = capget(&hdr, data);
-> +	TEST_ASSERT_EQ(0, rc);
-> +	TEST_REQUIRE((data->effective & SYS_ADMIN_CAP) > 0);
+> Why does that use case make no sense without SMP?
 
-And in fact capability.h does have defines which hide the magic constant:
-data->effective & CAP_TO_MASK(CAP_SYS_ADMIN)
+As the example I mentioned, for Intel hyrbid architecture, P cores has
+l2 per core and E cores has l2 per module. Then either setting the l2
+topology level as core nor module, can emulate the real case.
 
+Even considering the more extreme case of Intel 14th MTL CPU, where
+some E cores have L3 and some don't even have L3. As well as the last
+time you and Daniel mentioned that in the future we could consider
+covering more cache properties such as cache size. But the l3 size can
+be different in the same system, like AMD's x3D technology. So
+generally configuring properties for @name in a list can't take into
+account the differences of heterogeneous caches with the same @name.
 
-> +
-> +	TEST_REQUIRE(kvm_has_cap(KVM_CAP_S390_UCONTROL));
-> +}
-> +
+Hope my poor english explains the problem well. :-)
 
+> Can the same @name occur multiple times?  Documentation doesn't tell.
+> If yes, what does that mean?
+
+Yes, this means the later one will override the previous one with the same
+name.
+
+> Say we later add value "l1" for unified level 1 cache.  Would "l1" then
+> conflict with "l1d" and "l1u"?
+
+Yes, we should check in smp/machine code and ban l1 and l1i/l1d at the
+same time. This check I suppose is easy to add.
+
+> May @topo be "invalid"?  Documentation doesn't tell.  If yes, what does
+> that mean?
+
+Yes, just follow the intel's spec, invalid means the current topology
+information is invalid, which is used to encode x86 CPUIDs. So when I
+move this level to qapi, I just keeped this. Otherwise, I need to
+re-implement the i386 specific invalid level.
+
+> >> The more idiomatic QAPI name would be SmpCacheName.  Likewise for the
+> >> other type names below.
+> >
+> > I hesitated here as well, but considering that SMPConfiguration is "SMP"
+> > and not "Smp", it has that name. I'll change to SmpCacheName for strict
+> > initial capitalization.
+> >
+> >> > +#
+> >> > +# An enumeration of cache for SMP systems.  The cache name here is
+> >> > +# a combination of cache level and cache type.
+> >> 
+> >> The first sentence feels awkward.  Maybe
+> >> 
+> >>    # Caches an SMP system may have.
+> >> 
+> >> > +#
+> >> > +# @l1d: L1 data cache.
+> >> > +#
+> >> > +# @l1i: L1 instruction cache.
+> >> > +#
+> >> > +# @l2: L2 (unified) cache.
+> >> > +#
+> >> > +# @l3: L3 (unified) cache
+> >> > +#
+> >> > +# Since: 9.1
+> >> > +##
+> >> 
+> >> This assumes the L1 cache is split, and L2 and L3 are unified.
+> >> 
+> >> If we model a system with say a unified L1 cache, we'd simply extend
+> >> this enum.  No real difference to extending it for additional levels.
+> >> Correct?
+> >
+> > Yes. For unified L1, we just need add a "l1" which is opposed to l1i/l1d.
+> >
+> >> > +{ 'enum': 'SMPCacheName',
+> >> > +  'prefix': 'SMP_CACHE',
+> >> 
+> >> Why not call it SmpCache, and ditch 'prefix'?
+> >
+> > Because the SMPCache structure in smp_cache.h uses the similar name:
+> >
+> > +#define TYPE_SMP_CACHE "smp-cache"
+> > +OBJECT_DECLARE_SIMPLE_TYPE(SMPCache, SMP_CACHE)
+> > +
+> > +struct SMPCache {
+> > +    Object parent_obj;
+> > +
+> > +    SMPCacheProperty props[SMP_CACHE__MAX];
+> > +};
+> >
+> > Naming is always difficult,
+> 
+> Oh yes.
+> 
+> >                             so I would use Smpcache here if you feel that
+> > SmpCache is sufficient to distinguish it from SMPCache, or I would also
+> > rename the SMPCache structure to SMPCacheState in smp_cache.h.
+> >
+> > Which way do you prefer?
+> 
+> Having both QAPI enum SmpCache and handwritten type SMPCache is clearly
+> undesirable.
+> 
+> I retract my suggestion to name the enum SmpCache.  The thing clearly is
+> not a cache.  SmpCacheName is better.
+> 
+> If you drop 'prefix', the generated C enum values look like
+> SMP_CACHE_NAME_FOO.  Would that work for you?
+
+I think the SmpCacheName is ok, since there's no other better names.
+
+> The "name" part bothers me a bit.  A name doesn't define what something
+> is.  A type does.  SmpCacheType?
+
+Ah, I also considerred this. I didn't use "type" because people usually
+uses cache type to indicate INSTRUCTION/DATA/UNIFIED and cache level to
+indicate LEVEL 1/LEVEL 2/LEVEL 3. The enumeration here is a combination of
+type+level. So I think it's better to avoid the type term.
+
+> >> > +  'data': [ 'l1d', 'l1i', 'l2', 'l3' ] }
+> >> 
+> >> > +
+> >> > +##
+> >> > +# @SMPCacheProperty:
+> >> 
+> >> Sure we want to call this "property" (singular) and not "properties"?
+> >> What if we add members to this type?
+> >> 
+> >> > +#
+> >> > +# Cache information for SMP systems.
+> >> > +#
+> >> > +# @name: Cache name.
+> >> > +#
+> >> > +# @topo: Cache topology level.  It accepts the CPU topology
+> >> > +#     enumeration as the parameter, i.e., CPUs in the same
+> >> > +#     topology container share the same cache.
+> >> > +#
+> >> > +# Since: 9.1
+> >> > +##
+> >> > +{ 'struct': 'SMPCacheProperty',
+> >> > +  'data': {
+> >> > +  'name': 'SMPCacheName',
+> >> > +  'topo': 'CpuTopologyLevel' } }
+> >> 
+> >> We tend to avoid abbreviations in the QAPI schema.  Please consider
+> >> naming this 'topology'.
+> >
+> > Sure!
+> >
+> >> > +
+> >> > +##
+> >> > +# @SMPCacheProperties:
+> >> > +#
+> >> > +# List wrapper of SMPCacheProperty.
+> >> > +#
+> >> > +# @caches: the SMPCacheProperty list.
+> >> > +#
+> >> > +# Since 9.1
+> >> > +##
+> >> > +{ 'struct': 'SMPCacheProperties',
+> >> > +  'data': { 'caches': ['SMPCacheProperty'] } }
+> >> 
+> >> Ah, now I see why you used the singular above!
+> >> 
+> >> However, this type holds the properties of call caches.  It is a list
+> 
+> "of all caches" (can't type).
+
+Sorry I didn't get your point?
+
+> >> where each element holds the properties of a single cache.  Calling the
+> >> former "cache property" and the latter "cache properties" is confusing.
+> >
+> > Yes...
+> >
+> >> SmpCachesProperties and SmpCacheProperties would put the singular
+> >> vs. plural where it belongs.  Sounds a bit awkward to me, though.
+> >> Naming is hard.
+> >
+> > For SmpCachesProperties, it's easy to overlook the first "s".
+> >
+> >> Other ideas, anybody?
+> >
+> > Maybe SmpCacheOptions or SmpCachesPropertyWrapper?
+> 
+> I wonder why we have a single QOM object to configure all caches, and
+> not one QOM object per cache.
+
+I have the thoughts and questions here:
+
+https://lore.kernel.org/qemu-devel/20240704031603.1744546-1-zhao1.liu@intel.com/T/#m8adba8ba14ebac0c9935fbf45983cc71e53ccf45
+
+We could discuss this issue in that thread :-).
+
+> >> > diff --git a/qapi/qapi-schema.json b/qapi/qapi-schema.json
+> >> > index b1581988e4eb..25394f2cda50 100644
+> >> > --- a/qapi/qapi-schema.json
+> >> > +++ b/qapi/qapi-schema.json
+> >> > @@ -64,11 +64,11 @@
+> >> >  { 'include': 'compat.json' }
+> >> >  { 'include': 'control.json' }
+> >> >  { 'include': 'introspect.json' }
+> >> > -{ 'include': 'qom.json' }
+> >> > -{ 'include': 'qdev.json' }
+> >> >  { 'include': 'machine-common.json' }
+> >> >  { 'include': 'machine.json' }
+> >> >  { 'include': 'machine-target.json' }
+> >> > +{ 'include': 'qom.json' }
+> >> > +{ 'include': 'qdev.json' }
+> >> >  { 'include': 'replay.json' }
+> >> >  { 'include': 'yank.json' }
+> >> >  { 'include': 'misc.json' }
+> >> 
+> >> Worth explaining in the commit message, I think.
+> >
+> > Because of the include relationship between the json files, I need to
+> > change the order. I had a "crazy" proposal to clean up this:
+> > https://lore.kernel.org/qemu-devel/20240517062748.782366-1-zhao1.liu@intel.com/
+> >
+> > Thanks,
+> > Zhao
+> 
 
