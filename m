@@ -1,151 +1,149 @@
-Return-Path: <kvm+bounces-22168-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22171-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8862993B332
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 16:54:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1B3093B3C2
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 17:34:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4259A282A24
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 14:54:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D96D28158C
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 15:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83293158D80;
-	Wed, 24 Jul 2024 14:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735FE15B14E;
+	Wed, 24 Jul 2024 15:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aNdj92qp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KMkS8yO7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5138383A9
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 14:54:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EDC54759
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 15:33:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721832887; cv=none; b=qHRZ/01cRpPEEKSuKppx5w7z5Aa+xiinxrKHbwkqzLle5Ny7aMs4fU5Ogfo0G3Z9vYPXAHNwQpxJRw4C0KrVg4STTqZxi/PF9VasJiQie2T+QcJHRP0lUM3aqMWdt6rQFEPSJ9t1L2Wk/WfFXH0LAgmi1yWajfQazvRP7MtJVPk=
+	t=1721835232; cv=none; b=NuaCxUMFB3lbYtJC/CjOqCutPx6TlunpTypyg1hs6aK+vIOEPwQbRGh33o6Kc6HaUYOVmYPBP9btS5TQRoF6DKaTUq2fwkS+b1bqP9XrZNyYhtue1QDmMyqbELBUVp/Cum8GNtjzwfmfAMyyuLgnh8JiMBGVKj/aOoNdoIlpJSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721832887; c=relaxed/simple;
-	bh=nhEKDuTNwPMDwruusMMbK1Dm5j0cygvuqJe3rM266dI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s5H0j7Z6pFo7oA3Pl7/J0cyBF1iNXrt0aZzvBJYVuiUF5+//aqZ0cxmmjhcqz4chcu2Zawq4Livfk8yI4wNHbrn0PjvelBR6yAVeteYTB9gM9z6E0Bs/aLO6VGg02+rAAG6PnQP7XOkjheVAo56ZwC2aVYi8/3z9EvldRpnejQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aNdj92qp; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721832886; x=1753368886;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=nhEKDuTNwPMDwruusMMbK1Dm5j0cygvuqJe3rM266dI=;
-  b=aNdj92qpAupv3/YBg05ZNqjb7gUaw7Bt2wT0a04oaYsxvLnbxUoh7bq9
-   jKvAzxBgkKvFybaNhWjot72C5P66dUcUWyNc2oFPFUrPNYJZguNxRR+VW
-   +N6jjff3Xyy2AcH2dQTD7IqKHfzDavpA3ZC1Xbz3mrlDLGneOq/6mwdpa
-   ANOWMvsaTvrv9q7BdSzTVQSIm1kLxpzuSUf5dmiLVjdeW3SqrBMg6t8rK
-   b65mJzPEw2FOEsi+aP6cLYLYpwPDC/T6pIPugnr3VbBAanPFft4rtQUqv
-   0+PaJWcpPD6K38m921bOtANi7njmNpGSfh135fLrhkS/iDT2klt6Kuj5w
-   Q==;
-X-CSE-ConnectionGUID: 2rPOvTDjTsuNQsRxiV7hZA==
-X-CSE-MsgGUID: LKIKVICzR5itj4Yy51bXYw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="44941947"
-X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
-   d="scan'208";a="44941947"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 07:54:45 -0700
-X-CSE-ConnectionGUID: SQlBHtnfSNazf+k8B1Ve8g==
-X-CSE-MsgGUID: gsHTaE3GT0aVEU/MKedVwA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
-   d="scan'208";a="57749094"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orviesa004.jf.intel.com with ESMTP; 24 Jul 2024 07:54:40 -0700
-Date: Wed, 24 Jul 2024 23:10:24 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Daniel =?utf-8?B?UC4gQmVycmFuZ++/vQ==?= <berrange@redhat.com>
-Cc: Markus Armbruster <armbru@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?utf-8?B?TWF0aGlldS1EYXVk77+9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Alex =?utf-8?B?QmVubu+/vWU=?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
-Message-ID: <ZqEZYEAkMhqBRtbx@intel.com>
-References: <20240704031603.1744546-1-zhao1.liu@intel.com>
- <20240704031603.1744546-3-zhao1.liu@intel.com>
- <87wmld361y.fsf@pond.sub.org>
- <Zp5tBHBoeXZy44ys@intel.com>
- <87h6cfowei.fsf@pond.sub.org>
- <ZqD31Oj5P0uDMs-I@redhat.com>
- <ZqEJlmR3U6g8zq0z@intel.com>
+	s=arc-20240116; t=1721835232; c=relaxed/simple;
+	bh=xhOdgAqvk5uhhER6kBCJpBnfwQCOjsRK4KYXS9TeMME=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=dAfkCcVmUh+/taCSPReVvWgmTQqBP2bBfToJkJiS5ydRQh1BO8fgOz4Wl2c/St5HsrhbBtLdYbHBSJ/x1J14ECnGCak5jTjVGGwfL/x4SK/xwu0b1MNLe3TZiIVkJ6RSj8bYZ0F+JbbtTlm6CFb/xjJTT9l5b0ml53X/wolXHkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KMkS8yO7; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fd8a1a75e7so16359005ad.3
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 08:33:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721835230; x=1722440030; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=t5d22O2U1HZXGOIITw2LqK05yPy/MHAa8i4PSfFe0l0=;
+        b=KMkS8yO76NCcGASjZ4h22H/HSPOS3vQY+v/OJIy/FXcvFs1GkWx3frI7UYl56jSrLy
+         9nSkbBjFxIdgLMXWjOPPIpFxz6hBBFbl4Lr+s7CUtPSHwk8YXgN8PcLHy9AITh1zNUo8
+         okB7LG3pJqBjWmdJPIgj2QMg9B9o3NnsHTNXCrpihRpK8kLZ6/IUAq+8tWDD9xNZjQjG
+         gAoYtSznVOCMGfPH4K5X5Dd6LUOa3bvU4p6BbZ2mICVopkgKOCtKwWDDitWRQdDuvXhL
+         B2BUKmiIrvrO1CsCTOBAB8HmQ4x5vIieGxbo7xhYFz6JvmbwNLGCvmnIYsNSOy5KzNuO
+         2m2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721835230; x=1722440030;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=t5d22O2U1HZXGOIITw2LqK05yPy/MHAa8i4PSfFe0l0=;
+        b=TglmktjjhYhSUbV5RRG/5/A4DEV66VD3JCrtx6lZxQgx6IKYo7xo5BG1YMBzOSTQkK
+         DyqJCA7s42S7VjONownRRJ7zhaGxaQGd6gyJ3eiVNuan8u1iMLi5abxmkkCmjAFLFeUQ
+         SeEO4NxQU1DMhaWYG5rSO8sNMNfw4E0zRhFpi891RzAkxhHIcTaBCV+WmFRJaOdCFiS2
+         dmTnVGhM2ypvP4BcvvtZzGFpNgiVFh+K7XgdKsE8KxTYUFauuDdJZOOJi2UcHO81Hhll
+         uV64OA009jYFLCt7i6QDuv2ti1NfQfj0N0pQLFnYJeo9CeIOQtZjil9UOuVnE5/tA9Mn
+         dALA==
+X-Gm-Message-State: AOJu0Yxn79TCCAhazG2DG6lA+MOLOzZEhj2YBzzmel00jotbhbvbAqvZ
+	yIIDt1geXDW3n5Gq5S+AGAjt4K2cKCk73Ppkaau2W4/h8BdZjPLvizX39lTYS27fumQT9/VSETk
+	fbg==
+X-Google-Smtp-Source: AGHT+IFp8AI6gbmRyLzTJee5VbDdw2EnFi+qwFiv0O7eEIxkRJjpimCPtbFrYNlngAgcIlHr4t2Bc5XovWg=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:903:22cd:b0:1fb:78ce:cefa with SMTP id
+ d9443c01a7336-1fdd220c647mr67955ad.12.1721835230388; Wed, 24 Jul 2024
+ 08:33:50 -0700 (PDT)
+Date: Wed, 24 Jul 2024 08:33:48 -0700
+In-Reply-To: <20240724044529.3837492-1-tao1.su@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZqEJlmR3U6g8zq0z@intel.com>
+Mime-Version: 1.0
+References: <20240724044529.3837492-1-tao1.su@linux.intel.com>
+Message-ID: <ZqEPrE429UQi9duo@google.com>
+Subject: Re: [PATCH] KVM: x86: Reset RSP before exiting to userspace when
+ emulating POPA
+From: Sean Christopherson <seanjc@google.com>
+To: Tao Su <tao1.su@linux.intel.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com, 
+	xiaoyao.li@intel.com
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Daniel,
-
-On Wed, Jul 24, 2024 at 10:03:02PM +0800, Zhao Liu wrote:
-> Date: Wed, 24 Jul 2024 22:03:02 +0800
-> From: Zhao Liu <zhao1.liu@intel.com>
-> Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
+On Wed, Jul 24, 2024, Tao Su wrote:
+> When emulating POPA and exiting to userspace for MMIO, reset modified RSP
+> as emulation context may not be reset. POPA may generate more multiple
+> reads, i.e. multiple POPs from the stack, but if stack points to MMIO,
+> KVM needs to emulate multiple MMIO reads.
 > 
-> On Wed, Jul 24, 2024 at 01:47:16PM +0100, Daniel P. Berrang? wrote:
-> > Date: Wed, 24 Jul 2024 13:47:16 +0100
-> > From: "Daniel P. Berrang?" <berrange@redhat.com>
-> > Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
-> > 
-> > On Wed, Jul 24, 2024 at 01:35:17PM +0200, Markus Armbruster wrote:
-> > > Zhao Liu <zhao1.liu@intel.com> writes:
-> > > 
-> > > > Hi Markus,
-> > > >> SmpCachesProperties and SmpCacheProperties would put the singular
-> > > >> vs. plural where it belongs.  Sounds a bit awkward to me, though.
-> > > >> Naming is hard.
-> > > >
-> > > > For SmpCachesProperties, it's easy to overlook the first "s".
-> > > >
-> > > >> Other ideas, anybody?
-> > > >
-> > > > Maybe SmpCacheOptions or SmpCachesPropertyWrapper?
-> > > 
-> > > I wonder why we have a single QOM object to configure all caches, and
-> > > not one QOM object per cache.
-> > 
-> > Previous versions of this series were augmenting the existing
-> > -smp command line.
+> When one MMIO done, POPA may be re-emulated with EMULTYPE_NO_DECODE set,
+> i.e. ctxt will not be reset, but RSP is modified by previous emulation of
+> current POPA instruction, which eventually leads to emulation error.
 > 
-> Ah, yes, since -smp, as a sugar option of -machine, doesn't support
-> JSON. In -smp, we need to use keyval's style to configure as:
+> The commit 0dc902267cb3 ("KVM: x86: Suppress pending MMIO write exits if
+> emulator detects exception") provides a detailed analysis of how KVM
+> emulates multiple MMIO reads, and its correctness can be verified in the
+> POPA instruction with this patch.
+
+I don't see how this can work.  If POPA is reading from MMIO, it will need to
+do 8 distinct emulated MMIO accesses.  Unwinding to the original RSP will allow
+the first MMIO (store to EDI) to succeed, but then the second MMIO (store to ESI)
+will exit back to userspace.  And the second restart will load EDI with the
+result of the MMIO, not ESI.  It will also re-trigger the second MMIO indefinitely.
+
+To make this work, KVM would need to allow precisely resuming execution where
+it left off.  We can't use MMIO fragments, because unlike MMIO accesses that
+split pages, each memory load is an individual access.
+
+I don't see any reason to try to make this work.  It's a ridiculously convoluted
+scenario that, AFAIK, has no real world application.
+
+> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
+> ---
+> For testing, we can add POPA to the emulator case in kvm-unit-test.
+> ---
+>  arch/x86/kvm/emulate.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
 > 
-> -smp caches.0.name=l1i,caches.0.topo=core
+> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
+> index e72aed25d721..3746fef6ca60 100644
+> --- a/arch/x86/kvm/emulate.c
+> +++ b/arch/x86/kvm/emulate.c
+> @@ -1999,6 +1999,7 @@ static int em_pushf(struct x86_emulate_ctxt *ctxt)
+>  
+>  static int em_popa(struct x86_emulate_ctxt *ctxt)
+>  {
+> +	unsigned long old_esp = reg_read(ctxt, VCPU_REGS_RSP);
+>  	int rc = X86EMUL_CONTINUE;
+>  	int reg = VCPU_REGS_RDI;
+>  	u32 val = 0;
+> @@ -2010,8 +2011,11 @@ static int em_popa(struct x86_emulate_ctxt *ctxt)
+>  		}
+>  
+>  		rc = emulate_pop(ctxt, &val, ctxt->op_bytes);
+> -		if (rc != X86EMUL_CONTINUE)
+> +		if (rc != X86EMUL_CONTINUE) {
+> +			assign_register(reg_rmw(ctxt, VCPU_REGS_RSP),
+> +					old_esp, ctxt->op_bytes);
+>  			break;
+> +		}
+>  		assign_register(reg_rmw(ctxt, reg), val, ctxt->op_bytes);
+>  		--reg;
+>  	}
 > 
-> I think JSON is the more elegant way to go, so I chose -object.
-
-I may have to retract this assertion considering more issues, I could
-fall back to -smp and support it in keyval format, I think it's also ok
-for me if you also like keyval format, sorry for my repetition, we can
-discuss this in this thread:
-
-https://lore.kernel.org/qemu-devel/20240704031603.1744546-1-zhao1.liu@intel.com/T/#m8adba8ba14ebac0c9935fbf45983cc71e53ccf45
-
-Thanks,
-Zhao
-
-
+> base-commit: 786c8248dbd33a5a7a07f7c6e55a7bfc68d2ca48
+> -- 
+> 2.34.1
+> 
 
