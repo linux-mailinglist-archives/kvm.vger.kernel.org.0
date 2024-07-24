@@ -1,157 +1,241 @@
-Return-Path: <kvm+bounces-22134-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22135-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3065293A9C7
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 01:21:07 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD54193AA54
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 03:11:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6441284BF0
-	for <lists+kvm@lfdr.de>; Tue, 23 Jul 2024 23:21:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D03E1F23C91
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 01:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498D31494C5;
-	Tue, 23 Jul 2024 23:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C344FA93D;
+	Wed, 24 Jul 2024 01:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WMj1p28n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ST7bC6PX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F2514884B
-	for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 23:20:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 303A82595
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 01:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721776861; cv=none; b=CP/ipxw7dp8ehHF6DW2nG6f+1dSed9hDIJ0XmBEHukvjPsdelp6vHQUMwFuMtF+9BPmla97dQE6W+aB4VhQUYZpFhVBrsKhNO5M4jLhJ6S+XZSRE0dPa2NO2nkO1JUkETYvjNUW5kZw+z8Mm9jxk9UKT2SXoUO1skTqImbldKe4=
+	t=1721783475; cv=none; b=nN/UbuhVbi+SsHhGj85f4z+KfyUKO+DegCIXmtuv8hYzBn0p6qbPEv8N8lm0niOMVzpRMKuivd6NyB520aVrKHGaZuca/y6D9pC2THSF3wl3J1MeQUFkFIXN/gdOGP2hb/6vnpqUYBLCS3CnfyxBVdUOcwpAJro3yxclVvDisxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721776861; c=relaxed/simple;
-	bh=8Y+iYHayY2JJwgeVzz2tqt/MVZXDqspYUC9TRMwsdlw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=k2rQMawZyQJ92NL/wLwWtza3xsaoc+jD7cWiaM4ElroIoQ+B7EIyIhJCQyf4FWDX7tjnNol70wJkVHExeJrFQkWvT2FVJGM2ai0hor69SkrxakQrPXl0wklXLP5yGN1lHG3VWdTWnYZqHX7wuae+45aKjo2bi3qMCWEySp0Sza4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WMj1p28n; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1721783475; c=relaxed/simple;
+	bh=xB/HZWznHKcMWgXIB+wI31jSoGcHZFlKoHxpW+3YZZ4=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=IDo/maK/1yr0USKExHWfj/8oe4hSwlXdkNCZNmR8XtRKG/JcJ7tDB/ciGQJY+keUbW6Am5Ytmk8Y4ECFMBvpN4WHKAFl0YUaac6TMUdqN6uRTxOkbb0wmBbLeCI8mE9oWrYjbjw5uQ/uuqmfWi3T6RBI3+hVcesr81tzd6GcTPw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ST7bC6PX; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6818fa37eecso1171465a12.1
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 16:20:59 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-664aa55c690so177273107b3.2
+        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 18:11:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721776859; x=1722381659; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZhkUKgGKAmtJvBC69563aw4qrws1Qh7sTPRPKMZcT4I=;
-        b=WMj1p28nLokCNYDM13AMw9xiLwqoQnA5mw5pcosXr+/804cQzFcSNAAcSId4mkS8CR
-         fRpxgMEtmeIY7+0nxPsZeX1CzSs3DkwJCZ19VvlAUH2sZ+PxG+jufTNqdFMBOg6KVNFF
-         OioRvAs4YEb2yndIl1Yi07WbNSZNHBlSw4QiG63tAo7t8J6rz4ykN4OeFWQQOLJ1RRVj
-         q3I571FYlVZ0c6G1IcxROo3mJQcBqYnj4tjxm+wzVJwiZtgT90jz7w5cG8HO5vaDaJzp
-         VP50wgF/DGzUwvOCTqsR/B0m5gDEhPz6UMtyMyf46HFY80mliX5ic3RCDB6KI4KDoHo3
-         1HqA==
+        d=google.com; s=20230601; t=1721783473; x=1722388273; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=4cSOuBWS+C1ycbtiGXOUNR2uU8fUZDxisEhVyZ4yNKI=;
+        b=ST7bC6PXAKw5k66q3GDQy7G2hwyROXVvlJwIjyXzd/dhUZQoY7ccpsvcUq8omrXQqK
+         hJS20WOrX9cNY3U74zA4dvubkPoZKIa/2d85jZ22AiyCCEgoxEzVn990dA5LToxy+GKU
+         hF0N9dt/tO9ZIfr6UEJVYDLjc/R8QY2ObSWT7Aj5IP0V6FLPpqbk5HM7gDhJ3ZGFi6lV
+         AHBkPB8/we7xA9vNTt4u/LUqphGhMj5eVdQ6ZK/fRV6jbZMC2SpbPLfuNq5+Iq2DriWH
+         wIxSJv6kZp8YRzSGbbZH9ZdhvE2E2khpUV5l+5YW1kKPHlSSnsCd6/DOgKK/SX3NzJnq
+         C8mw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721776859; x=1722381659;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZhkUKgGKAmtJvBC69563aw4qrws1Qh7sTPRPKMZcT4I=;
-        b=M+k6mAF7p6Rc26Pz5AI1xPdalVA5HuwyZ4XjDewy7iz8ROwFEj7ad7ro8dbn2xERyw
-         IvIP8HQHikplbuUtDlgreAYJLPT6wzkc8/P/FGEebydjEkrLClMkA/bpmkHir5FaKcOo
-         Tg7vP/Gp1Euhd/IofXEq//dUACcPpABTlfl+wOyrgH0vZCWdeZu0gVLaVOvLSUWvVOTB
-         LpCrBgpfd8daVBPaJMVbkpbX5w6fVDnEmkAJQ9ZUQjNnyHO8X4MncVQPVUVuOWd569tm
-         mMp1yMOakH1jyUFYJ9963XutwUFy7xxW5W/jjrE5KNbYUAc45LXZNvzo6QLNn3NGLCDd
-         u46Q==
-X-Gm-Message-State: AOJu0Yx9UM6TUssGCUka1NPt/qrIsxj5k0DaICLZcl+wG3U4bqDJ8+Ad
-	UvF6Zf3+eX+UBLqxvkX6rBCoB5ulh5xeeEofPqAx4fEzkHvhOLaP2Srf2cmzBKg0/rrgbW82GDP
-	YdQ==
-X-Google-Smtp-Source: AGHT+IHW/3mXbfu5Pg9dVenRcl8JGJI1fc7+S8jmzEbKrBTiWqrOQZhFB+0q7F3ISVuCk3mxT07+/UreqNg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:58c:b0:6f3:b24:6c27 with SMTP id
- 41be03b00d2f7-7a87dcb0297mr1138a12.5.1721776859071; Tue, 23 Jul 2024 16:20:59
- -0700 (PDT)
-Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Tue, 23 Jul 2024 16:20:55 -0700
+        d=1e100.net; s=20230601; t=1721783473; x=1722388273;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4cSOuBWS+C1ycbtiGXOUNR2uU8fUZDxisEhVyZ4yNKI=;
+        b=tPPrqJ3u4s3u/AzlnGRfmNFuNq01sn6V3CBPvfEjqFhWvH4K0bv/GKk5YwyHgWt90x
+         sEaLEUapK/DBpK12pQVcDYmn5cy4CYJExr3yOMwlITV0LdPWY2mFVQ3wMarUr22JsKkq
+         /nfYrz1htbxnp+rExB+2+CW6sqxP5ZGL/NK0/1E6e59YMdZ+sAG1m5SLKUEiVbY3Dh+h
+         3I9QBHBBpwGkGWqWZPUiwhiVEAhIcOZjxSsWITeaCmaoZF3Dd/yeZ5q7M9cH8xXGUMl7
+         8UGj+2F2IuWHnw1CZ0bStfQzfIwbLImT20wONRhKAUP/VWIV2L0IURycH0oUtINYvCRL
+         j7xQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUHhlHt1XRLAtz1gXFX1oaVPCbQeI6VvQnRR7AVu0vCNzrVGbHUTka1PL5MomQeLjYXjtVmKVFOP6JxhJYp2eGOCcrF
+X-Gm-Message-State: AOJu0YyDi9rgO75qVbrIDIv6FHPzadxbOrtDyWomtV3OrGFxrDTJZ2/I
+	jVjn/DxNHyGQ0xCg2Yl/z87am33k2eoXgPkoRSopY87DZgRajW6z2CBPtc2AqITI63Q4patHQtL
+	BZ4KWWkyjofiUiHXT1A==
+X-Google-Smtp-Source: AGHT+IHTWsfjxkFhlZ/efjqoG2otoOld5wqzU0dS4uuWsUR/MGeJLDWGi8tLphMhuDEGJQs1xgmW73pGbIUMunRM
+X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
+ (user=jthoughton job=sendgmr) by 2002:a05:690c:289:b0:627:a787:abf4 with SMTP
+ id 00721157ae682-671f0bcbd75mr236647b3.3.1721783473255; Tue, 23 Jul 2024
+ 18:11:13 -0700 (PDT)
+Date: Wed, 24 Jul 2024 01:10:25 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-X-Mailer: git-send-email 2.45.2.1089.g2a221341d9-goog
-Message-ID: <20240723232055.3643811-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Acquire kvm->srcu when handling KVM_SET_VCPU_EVENTS
-From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
+Message-ID: <20240724011037.3671523-1-jthoughton@google.com>
+Subject: [PATCH v6 00/11] mm: multi-gen LRU: Walk secondary MMU page tables
+ while aging
+From: James Houghton <jthoughton@google.com>
+To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
+	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
+	David Rientjes <rientjes@google.com>, James Houghton <jthoughton@google.com>, 
+	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Sean Christopherson <seanjc@google.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
+	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
 Content-Type: text/plain; charset="UTF-8"
 
-Grab kvm->srcu when processing KVM_SET_VCPU_EVENTS, as KVM will forcibly
-leave nested VMX/SVM if SMM mode is being toggled, and leaving nested VMX
-reads guest memory.
+This patchset makes it possible for MGLRU to consult secondary MMUs
+while doing aging, not just during eviction. This allows for more
+accurate reclaim decisions, which is especially important for proactive
+reclaim.
 
-Note, kvm_vcpu_ioctl_x86_set_vcpu_events() can also be called from KVM_RUN
-via sync_regs(), which already holds SRCU.  I.e. trying to precisely use
-kvm_vcpu_srcu_read_lock() around the problematic SMM code would cause
-problems.  Acquiring SRCU isn't all that expensive, so for simplicity,
-grab it unconditionally for KVM_SET_VCPU_EVENTS.
+This series does the following:
+ 1. Improve locking for the existing test/clear_young notifiers for x86
+    and arm64.
+ 2. Add a fast_only parameter into test_young() and clear_young(), and
+    add helper functions for using the new parameter (e.g.
+    mmu_notifier_clear_young_fast_only(). Non-trivially implement the
+    fast-only test_young() and clear_young() for x86_64.
+ 3. Incorporate mmu_notifier_clear_young_fast_only() into MGLRU aging.
+ 4. Add an MGLRU mode (-l) to access_tracking_perf_test to show that
+    aging is working properly.
 
- =============================
- WARNING: suspicious RCU usage
- 6.10.0-rc7-332d2c1d713e-next-vm #552 Not tainted
- -----------------------------
- include/linux/kvm_host.h:1027 suspicious rcu_dereference_check() usage!
+Please note that mmu_notifier_test_young_fast_only() is added but not
+used in this series. I am happy to remove it if that would be
+appropriate.
 
- other info that might help us debug this:
+The fast-only notifiers serve a particular purpose: for aging, we
+neither want to delay other operations (e.g. unmapping for eviction)
+nor do we want to be delayed by these other operations ourselves. By
+default, the implementations of test_young() and clear_young() are meant
+to be *accurate*, not fast. The fast-only notifiers will only give age
+information that can be gathered fast.
 
- rcu_scheduler_active = 2, debug_locks = 1
- 1 lock held by repro/1071:
-  #0: ffff88811e424430 (&vcpu->mutex){+.+.}-{3:3}, at: kvm_vcpu_ioctl+0x7d/0x970 [kvm]
+The fast-only notifiers are non-trivially implemented for only x86_64
+right now (as the KVM/x86 TDP MMU is the only secondary MMU that
+supports lockless Accessed bit harvesting).
 
- stack backtrace:
- CPU: 15 PID: 1071 Comm: repro Not tainted 6.10.0-rc7-332d2c1d713e-next-vm #552
- Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 0.0.0 02/06/2015
- Call Trace:
-  <TASK>
-  dump_stack_lvl+0x7f/0x90
-  lockdep_rcu_suspicious+0x13f/0x1a0
-  kvm_vcpu_gfn_to_memslot+0x168/0x190 [kvm]
-  kvm_vcpu_read_guest+0x3e/0x90 [kvm]
-  nested_vmx_load_msr+0x6b/0x1d0 [kvm_intel]
-  load_vmcs12_host_state+0x432/0xb40 [kvm_intel]
-  vmx_leave_nested+0x30/0x40 [kvm_intel]
-  kvm_vcpu_ioctl_x86_set_vcpu_events+0x15d/0x2b0 [kvm]
-  kvm_arch_vcpu_ioctl+0x1107/0x1750 [kvm]
-  ? mark_held_locks+0x49/0x70
-  ? kvm_vcpu_ioctl+0x7d/0x970 [kvm]
-  ? kvm_vcpu_ioctl+0x497/0x970 [kvm]
-  kvm_vcpu_ioctl+0x497/0x970 [kvm]
-  ? lock_acquire+0xba/0x2d0
-  ? find_held_lock+0x2b/0x80
-  ? do_user_addr_fault+0x40c/0x6f0
-  ? lock_release+0xb7/0x270
-  __x64_sys_ioctl+0x82/0xb0
-  do_syscall_64+0x6c/0x170
-  entry_SYSCALL_64_after_hwframe+0x4b/0x53
- RIP: 0033:0x7ff11eb1b539
-  </TASK>
+To make aging work for more than just x86, the fast-only clear_young()
+notifier must be non-trivially implemented by those other architectures
+and HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST_ONLY needs to be set.
 
-Fixes: f7e570780efc ("KVM: x86: Forcibly leave nested virt when SMM state is toggled")
-Cc: stable@vger.kernel.org
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/x86.c | 2 ++
- 1 file changed, 2 insertions(+)
+access_tracking_perf_test now has a mode (-p) to check performance of
+MGLRU aging while the VM is faulting memory in. See the v4 cover
+letter[2] for performance data collected with this test.
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index af6c8cf6a37a..d3a4333807c6 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -6042,7 +6042,9 @@ long kvm_arch_vcpu_ioctl(struct file *filp,
- 		if (copy_from_user(&events, argp, sizeof(struct kvm_vcpu_events)))
- 			break;
- 
-+		kvm_vcpu_srcu_read_lock(vcpu);
- 		r = kvm_vcpu_ioctl_x86_set_vcpu_events(vcpu, &events);
-+		kvm_vcpu_srcu_read_unlock(vcpu);
- 		break;
- 	}
- 	case KVM_GET_DEBUGREGS: {
+Previous versions of this series included logic in MGLRU and KVM to
+support batching the updates to secondary page tables. This version
+removes this logic, as it was complex and not necessary to enable
+proactive reclaim. This optimization, as well as enabling aging for
+arm64 and powerpc, can be done in a later series.
+
+=== Previous Versions ===
+
+Since v5[1]:
+ - Reworked test_clear_young_fast_only() into a new parameter for the
+   existing notifiers (thanks Sean).
+ - Added mmu_notifier.has_fast_aging to tell mm if calling fast-only
+   notifiers should be done.
+ - Added mm_has_fast_young_notifiers() to inform users if calling
+   fast-only notifier helpers is worthwhile (for look-around to use).
+ - Changed MGLRU to invoke a single notifier instead of two when
+   aging and doing look-around (thanks Yu).
+ - For KVM/x86, check indirect_shadow_pages > 0 instead of
+   kvm_memslots_have_rmaps() when collecting age information
+   (thanks Sean).
+ - For KVM/arm, some fixes from Oliver.
+ - Small fixes to access_tracking_perf_test.
+ - Added missing !MMU_NOTIFIER version of mmu_notifier_clear_young().
+
+Since v4[2]:
+ - Removed Kconfig that controlled when aging was enabled. Aging will
+   be done whenever the architecture supports it (thanks Yu).
+ - Added a new MMU notifier, test_clear_young_fast_only(), specifically
+   for MGLRU to use.
+ - Add kvm_fast_{test_,}age_gfn, implemented by x86.
+ - Fix locking for clear_flush_young().
+ - Added KVM_MMU_NOTIFIER_YOUNG_LOCKLESS to clean up locking changes
+   (thanks Sean).
+ - Fix WARN_ON and other cleanup for the arm64 locking changes
+   (thanks Oliver).
+
+Since v3[3]:
+ - Vastly simplified the series (thanks David). Removed mmu notifier
+   batching logic entirely.
+ - Cleaned up how locking is done for mmu_notifier_test/clear_young
+   (thanks David).
+ - Look-around is now only done when there are no secondary MMUs
+   subscribed to MMU notifiers.
+ - CONFIG_LRU_GEN_WALKS_SECONDARY_MMU has been added.
+ - Fixed the lockless implementation of kvm_{test,}age_gfn for x86
+   (thanks David).
+ - Added MGLRU functional and performance tests to
+   access_tracking_perf_test (thanks Axel).
+ - In v3, an mm would be completely ignored (for aging) if there was a
+   secondary MMU but support for secondary MMU walking was missing. Now,
+   missing secondary MMU walking support simply skips the notifier
+   calls (except for eviction).
+ - Added a sanity check for that range->lockless and range->on_lock are
+   never both provided for the memslot walk.
+
+For the changes since v2[4], see v3.
+
+Based on latest kvm/next.
+
+[1]: https://lore.kernel.org/linux-mm/20240611002145.2078921-1-jthoughton@google.com/
+[2]: https://lore.kernel.org/linux-mm/20240529180510.2295118-1-jthoughton@google.com/
+[3]: https://lore.kernel.org/linux-mm/20240401232946.1837665-1-jthoughton@google.com/
+[4]: https://lore.kernel.org/kvmarm/20230526234435.662652-1-yuzhao@google.com/
+
+James Houghton (11):
+  KVM: Add lockless memslot walk to KVM
+  KVM: x86: Relax locking for kvm_test_age_gfn and kvm_age_gfn
+  KVM: arm64: Relax locking for kvm_test_age_gfn and kvm_age_gfn
+  mm: Add missing mmu_notifier_clear_young for !MMU_NOTIFIER
+  mm: Add fast_only bool to test_young and clear_young MMU notifiers
+  mm: Add has_fast_aging to struct mmu_notifier
+  KVM: Pass fast_only to kvm_{test_,}age_gfn
+  KVM: x86: Optimize kvm_{test_,}age_gfn a little bit
+  KVM: x86: Implement fast_only versions of kvm_{test_,}age_gfn
+  mm: multi-gen LRU: Have secondary MMUs participate in aging
+  KVM: selftests: Add multi-gen LRU aging to access_tracking_perf_test
+
+ Documentation/admin-guide/mm/multigen_lru.rst |   6 +-
+ arch/arm64/kvm/Kconfig                        |   1 +
+ arch/arm64/kvm/hyp/pgtable.c                  |  15 +-
+ arch/arm64/kvm/mmu.c                          |  30 +-
+ arch/x86/include/asm/kvm_host.h               |   1 +
+ arch/x86/kvm/Kconfig                          |   2 +
+ arch/x86/kvm/mmu/mmu.c                        |  23 +-
+ arch/x86/kvm/mmu/tdp_iter.h                   |  27 +-
+ arch/x86/kvm/mmu/tdp_mmu.c                    |  67 ++-
+ include/linux/kvm_host.h                      |   2 +
+ include/linux/mmu_notifier.h                  |  67 ++-
+ include/linux/mmzone.h                        |   6 +-
+ include/trace/events/kvm.h                    |  19 +-
+ mm/damon/vaddr.c                              |   2 -
+ mm/mmu_notifier.c                             |  38 +-
+ mm/rmap.c                                     |   9 +-
+ mm/vmscan.c                                   | 148 +++++--
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/access_tracking_perf_test.c | 369 +++++++++++++++--
+ .../selftests/kvm/include/lru_gen_util.h      |  55 +++
+ .../testing/selftests/kvm/lib/lru_gen_util.c  | 391 ++++++++++++++++++
+ virt/kvm/Kconfig                              |   7 +
+ virt/kvm/kvm_main.c                           |  73 ++--
+ 23 files changed, 1194 insertions(+), 165 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/lru_gen_util.h
+ create mode 100644 tools/testing/selftests/kvm/lib/lru_gen_util.c
+
 
 base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 -- 
-2.45.2.1089.g2a221341d9-goog
+2.46.0.rc1.232.g9752f9e123-goog
 
 
