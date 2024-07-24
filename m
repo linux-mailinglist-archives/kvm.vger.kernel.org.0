@@ -1,250 +1,128 @@
-Return-Path: <kvm+bounces-22195-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22196-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDEE393B66A
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 20:05:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0668793B674
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 20:07:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D2C11C20D25
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:05:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAA64280E9C
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7872A16A396;
-	Wed, 24 Jul 2024 18:05:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76541662FA;
+	Wed, 24 Jul 2024 18:05:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TBepTpeO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="z9xsy4WY"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED349155A24
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 18:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B72F15F3E2
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 18:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721844304; cv=none; b=V/xyGpM76Gdw8hpucVc7X90QnDy82d6TcNgcxTbuhOhtrwZ0GboW9T64TotSubR0BvvZ1YjOaiWB1wnp7FPuhLQ1EFRRQuH3yjaHtgMmIyxKeo3WMa0oViJJeSHYAO+a1pKst5iWzwvqiYQmY6LxVo0tPTq6T3fLygj6WbWrEEs=
+	t=1721844338; cv=none; b=MzjvT4QgPnLTBscKhRVMikJ3EUs69CkuCnd3KxbFRc5Rju5mx1NxmS3uCYA6RiLwsvpO3UAA9niuJsbAzwpztt8VgL41Ju3LMtpSbBg3nzMrNMe5x9qRL1X4I3GMlLi7nU/IdKrAlB95iVBZZ4AWovXIbZ0TEsi9PymC1gOdE0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721844304; c=relaxed/simple;
-	bh=2BLgOA35mk7k8IszDMOe6673pqC+RwrYD4ldwJUPDA4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pxIVtIPEGR/vhN5o1Q5Qkgh6L/YiJJG1sC5ucDmH2ZzijgKm8Niu9PeiechZ09y36BjlhsYJDDQCQ+HnZ/Nxj6VArZaJCPeO5Wy4mMpGXhDiSepDzhqb41TnVx93L09uVHbZV223bv88aFrL866pbjCVohPf0fOkRoMe0Itq49c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TBepTpeO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721844301;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O/S0o4/FexsmiUpHS5rZUegymR3Z4ylp/4grcZIweTk=;
-	b=TBepTpeOuN6tj5bk6c+Syc5hC7WH++UlKjyQNzNzg3uYonTanvwwYgihqT2HB8vOD5KEDr
-	iYFgj3nVg8pgfuczPU0HDdSFonWK0cWXBqQX4MwifFaQI2Uh9I17o7UL6GKbdh5yBioCij
-	yafIVTYgecu97dvgghiR+UHb2fVSaEI=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-448-BxPLhnl6O7ix0Tdn8o5LNA-1; Wed, 24 Jul 2024 14:04:59 -0400
-X-MC-Unique: BxPLhnl6O7ix0Tdn8o5LNA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-79f08294f35so164085a.2
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 11:04:59 -0700 (PDT)
+	s=arc-20240116; t=1721844338; c=relaxed/simple;
+	bh=XAS5FnfAyxRaqxP1LwIbsNSwrPYIUbrGJ3DtESBNdRg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=O2Fjo/nytlAsetLt+a+DQQSggc1lG/2M6b+BuZOr+DUBY42e3qj+qrsIgBjfJYjuarSldK6rNiyxpgM7Wq5r+idxJvCWB4uyrNQ5TDlqhzGlPoKOlx5SiAyJwT9qpsPqOZiXIHMUuy2l9O3QUWB2wx0MRA+Mqwx5lD78wxHK3CM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=z9xsy4WY; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-44e534a1fbeso21211cf.1
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 11:05:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1721844335; x=1722449135; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RuGtKkPyK7vctEAZt4J3ZfJs6fEwB7j37nm/HIcPuxs=;
+        b=z9xsy4WY/zFit8SBHmWx2EbYiMlzwVXLkXuyvS7bTjB8lACMgkyPxLLC7zUCTz+Zxp
+         /9U6dgaBiI3631SnDwxiZ0Vq50E1de61844oeFpTg3r8lHYp9mPyVRJOIynPAak20CiK
+         fkFWUTEFg/WExMDOyzIXl4DhS2BjjGqCPb3eQymts/Ozx4/g1jAy0Ex5XQpNkfGUxgWe
+         XplgT+4EiaSYUpb4PtXNAoIDkwfv1O5B1VXxvhTv1+YABJIqnBeCn/Wk63kQA1R19rx6
+         XCP6xaJCbyGYzPYPJhP+DmD6Dh+XiJ+eWCWvEg2ZIJRTpnyzB0kLsYjVDm3OlhTyVwJe
+         ZyHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721844299; x=1722449099;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=O/S0o4/FexsmiUpHS5rZUegymR3Z4ylp/4grcZIweTk=;
-        b=if1iF7gVmB/mBwr9kdF8QkxjJ7WXUevuSjhyuOBz+LftAmHDRUO3MKozJwAvVDyQHp
-         EzWek3gAe37PydNFfnPpq2SDopULLobSJCE4tHtRCcXIW4tv7s9o5AeFtfsOCV1pKVC0
-         xJtngnkL8onl5FUWl4nsQkS860xz93ry/69QkxbRXBR0ckrK3/LxuzjHdnrk7cW4Mtaj
-         dT8rXPJUfXv1tLyP7JuGgkJaikT1fA0HW027PWMJoNdZr4d2sK0QUBvzOlXrNXJz/3LU
-         YgCYWZQT1edXrpJNM7sBp/d7mOsDMbyWuqWJAA0deDHE3UGPIPwqsi1lhVQF681hcW1U
-         kxLg==
-X-Forwarded-Encrypted: i=1; AJvYcCWmtU07ef4jEC/BftbNcCv/xROYYk3LiUQyw5a2/t9ylstIMWMqmwRYJscia6IsFcZPKxp9SP+QwHkh+gNvTnXWzhU9
-X-Gm-Message-State: AOJu0YyvQ1E8WBNrPUGFg36SVyBmPfvpsJgzwFWjezrkhSHOZVnuzAJF
-	KcYB6YJA4Qeki/xoWQgVyUDgX2ju0AjUseiqTzP/LIn+vSkX+QlG17ULvNFOHHVdPdYNpuKM4h1
-	/yuGm7vwHyIt4XerdfIMztGs0R6Ri1FUof5L5XzymSLwfb+coig==
-X-Received: by 2002:a05:620a:1a89:b0:79f:1860:563b with SMTP id af79cd13be357-7a1d4535d64mr69106185a.60.1721844298831;
-        Wed, 24 Jul 2024 11:04:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IECfaCybkI9n3E9HnNmuEOg1q57NCdiYj+xpYMmUUXFmfBxM5u+SsEm33ENnkgKp/Hxyvs+7A==
-X-Received: by 2002:a05:620a:1a89:b0:79f:1860:563b with SMTP id af79cd13be357-7a1d4535d64mr69102085a.60.1721844298337;
-        Wed, 24 Jul 2024 11:04:58 -0700 (PDT)
-Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a199078855sm598315085a.104.2024.07.24.11.04.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 11:04:57 -0700 (PDT)
-Message-ID: <5d4d3eb81170ccf31f41a672121670ae4194b80a.camel@redhat.com>
-Subject: Re: [PATCH v2 48/49] KVM: x86: Add a macro for features that are
- synthesized into boot_cpu_data
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
- <vkuznets@redhat.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Hou Wenlong <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>,
- Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
- <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
- Robert Hoo <robert.hoo.linux@gmail.com>
-Date: Wed, 24 Jul 2024 14:04:56 -0400
-In-Reply-To: <Zo2n9VQ3nBuf1d3F@google.com>
-References: <20240517173926.965351-1-seanjc@google.com>
-	 <20240517173926.965351-49-seanjc@google.com>
-	 <16658367af25852e4bb6abb0caf7c3bc58538db0.camel@redhat.com>
-	 <Zo2n9VQ3nBuf1d3F@google.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+        d=1e100.net; s=20230601; t=1721844335; x=1722449135;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RuGtKkPyK7vctEAZt4J3ZfJs6fEwB7j37nm/HIcPuxs=;
+        b=ZcA6yYOMsGn0gk1mYp58qG9W02Sa8ri9qAGElctAgsnyJ5FjbiY1w6JVSugyYDDoJm
+         HYrDJRvHyllGosThPTvLqzUGijV/I3ewsdeThaMhsFfEwl8o0nCgJEYZkIIVawJViSgl
+         qohr6dodlQPNVLnzYxJA4JR2ysun4U+4EzuYGUp93/8RFaQ+V9fYKiO/T0MKJBrQJXtS
+         w4TtQLIAiTikJH89+4GcFCuzXY0ceXcbBZJT1qQFeiMtTzJWlYbEf681xISy4QJzuC1T
+         giY3fETsIkUaKA35k3FrKDLwYAXPYCM03HLzXBCDL4/18ebzzEVXQZr/JLSgEBQ0QkeD
+         n9ww==
+X-Forwarded-Encrypted: i=1; AJvYcCUMNPNYvtEKm0jSoWF3iFwBjjLPHJxDaSHDXhVqjJpNaOhbPdYmM1a5+/i/1HEa8oAxElHFX+fzSv2k4/oT6rk2Y44X
+X-Gm-Message-State: AOJu0YyuFxyQ8xSwE0Q0meGbOp04qkyZutwygrgvSPBSRPwp8Ut5ECQP
+	rLMuSb4EtdRxd13gb4CjBk39svHJTL/QHMxB+5y6o8ZJWusy5yrEECconUlQUVIDTdP8NGgbchv
+	XQ/eGntVn4l0kkeuFkDN8077pb8zv5hS5QS0+
+X-Google-Smtp-Source: AGHT+IFUxXUQLhiVTN7INUoYEedq0Zx3w8j41oaYCqQETbUHBE0QZW/hL5WKiVjoVwY4NRe72FQxYr7vdrBqQaaCDHA=
+X-Received: by 2002:ac8:5e48:0:b0:44f:e2c1:cc75 with SMTP id
+ d75a77b69052e-44fe52f4902mr276461cf.8.1721844334945; Wed, 24 Jul 2024
+ 11:05:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+References: <20240625235554.2576349-1-jmattson@google.com>
+In-Reply-To: <20240625235554.2576349-1-jmattson@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Wed, 24 Jul 2024 11:05:23 -0700
+Message-ID: <CALMp9eSTsGaAcEKkJ+=vWD4aHC3e_iOA8nnwWhGQdfBj_nj3-A@mail.gmail.com>
+Subject: Re: [PATCH v2] KVM: x86: Complain about an attempt to change the APIC
+ base address
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2024-07-09 at 14:13 -0700, Sean Christopherson wrote:
-> On Thu, Jul 04, 2024, Maxim Levitsky wrote:
-> > On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
-> > > Add yet another CPUID macro, this time for features that the host kernel
-> > > synthesizes into boot_cpu_data, i.e. that the kernel force sets even in
-> > > situations where the feature isn't reported by CPUID.  Thanks to the
-> > > macro shenanigans of kvm_cpu_cap_init(), such features can now be handled
-> > > in the core CPUID framework, i.e. don't need to be handled out-of-band and
-> > > thus without as many guardrails.
-> > > 
-> > > Adding a dedicated macro also helps document what's going on, e.g. the
-> > > calls to kvm_cpu_cap_check_and_set() are very confusing unless the reader
-> > > knows exactly how kvm_cpu_cap_init() generates kvm_cpu_caps (and even
-> > > then, it's far from obvious).
-> > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> 
-> ...
-> 
-> > Now that you added the final F_* macro, let's list all of them:
-> > 
-> > #define F(name)							\
-> > 
-> > /* Scattered Flag - For features that are scattered by cpufeatures.h. */
-> > #define SF(name)						\
-> > 
-> > /* Features that KVM supports only on 64-bit kernels. */
-> > #define X86_64_F(name)						\
-> > 
-> > /*
-> >  * Raw Feature - For features that KVM supports based purely on raw host CPUID,
-> >  * i.e. that KVM virtualizes even if the host kernel doesn't use the feature.
-> >  * Simply force set the feature in KVM's capabilities, raw CPUID support will
-> >  * be factored in by __kvm_cpu_cap_mask().
-> >  */
-> > #define RAW_F(name)						\
-> > 
-> > /*
-> >  * Emulated Feature - For features that KVM emulates in software irrespective
-> >  * of host CPU/kernel support.
-> >  */
-> > #define EMUL_F(name)						\
-> > 
-> > /*
-> >  * Synthesized Feature - For features that are synthesized into boot_cpu_data,
-> >  * i.e. may not be present in the raw CPUID, but can still be advertised to
-> >  * userspace.  Primarily used for mitigation related feature flags.
-> >  */
-> > #define SYN_F(name)						\
-> > 
-> > /*
-> >  * Aliased Features - For features in 0x8000_0001.EDX that are duplicates of
-> >  * identical 0x1.EDX features, and thus are aliased from 0x1 to 0x8000_0001.
-> >  */
-> > #define AF(name)								\
-> > 
-> > /*
-> >  * VMM Features - For features that KVM "supports" in some capacity, i.e. that
-> >  * KVM may query, but that are never advertised to userspace.  E.g. KVM allows
-> >  * userspace to enumerate MONITOR+MWAIT support to the guest, but the MWAIT
-> >  * feature flag is never advertised to userspace because MONITOR+MWAIT aren't
-> >  * virtualized by hardware, can't be faithfully emulated in software (KVM
-> >  * emulates them as NOPs), and allowing the guest to execute them natively
-> >  * requires enabling a per-VM capability.
-> >  */
-> > #define VMM_F(name)								\
-> > 
-> > 
-> > Honestly, I already somewhat lost in what each of those macros means even
-> > when reading the comments, which might indicate that a future reader might
-> > also have a hard time understanding those.
-> > 
-> > I now support even more the case of setting each feature bit in a separate
-> > statement as I explained in an earlier patch.
-> > 
-> > What do you think?
-> 
-> I completely agree that there are an absurd number of flavors of features, but
-> I don't see how using separate statement eliminates any of that complexity.  The
-> complexity comes from the fact that KVM actually has that many different ways and
-> combinations for advertising and enumerating CPUID-based features.
-> 
-> Ignoring for the moment that "vmm" and "aliased" could be avoided for any approach,
-> if we go with statements, we'll still have
-> 
->   kvm_cpu_cap_init{,passthrough,emulated,synthesized,aliased,vmm,only64}()
-> 
-> or if the flavor is an input/enum,
-> 
->   enum kvm_cpuid_feature_type {
->   	NORMAL,
-> 	PASSTHROUGH,
-> 	EMULATED,
-> 	SYNTHESIZED,
-> 	ALIASED,
-> 	VMM,
-> 	ONLY_64,
->   }
+On Tue, Jun 25, 2024 at 4:56=E2=80=AFPM Jim Mattson <jmattson@google.com> w=
+rote:
+>
+> KVM does not support changing the APIC's base address. Prior to commit
+> 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or
+> APIC base"), it emitted a rate-limited warning about this. Now, it's
+> just silently broken.
+>
+> Use vcpu_unimpl() to complain about this unsupported operation. Even a
+> rate-limited error message is better than complete silence.
+>
+> Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID =
+or APIC base")
+> Signed-off-by: Jim Mattson <jmattson@google.com>
+> ---
+>  Changes in v2:
+>   * Changed format specifiers from "%#llx" to "%#x"
+>   * Cast apic->base_address to unsigned int for printing
+>
+>  arch/x86/kvm/lapic.c | 3 +++
+>  1 file changed, 3 insertions(+)
+>
+> diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+> index acd7d48100a1..43ac05d10b2e 100644
+> --- a/arch/x86/kvm/lapic.c
+> +++ b/arch/x86/kvm/lapic.c
+> @@ -2583,6 +2583,9 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 =
+value)
+>
+>         if ((value & MSR_IA32_APICBASE_ENABLE) &&
+>              apic->base_address !=3D APIC_DEFAULT_PHYS_BASE) {
+> +               vcpu_unimpl(vcpu, "APIC base %#x is not %#x",
+> +                           (unsigned int)apic->base_address,
+> +                           APIC_DEFAULT_PHYS_BASE);
+>                 kvm_set_apicv_inhibit(apic->vcpu->kvm,
+>                                       APICV_INHIBIT_REASON_APIC_BASE_MODI=
+FIED);
+>         }
+> --
+> 2.45.2.741.gdbec12cfda-goog
 
-It doesn't have to be like that - something more compact can be done,
-plus bitmask of various flags can be used.
-
-> 
-> I.e. we'll still need the same functionality and comments, it would simply be
-> dressed up differently.
-
-> 
-> If the underlying concern is that the macro names are too terse, and/or getting
-> one feature per line is desirable, 
-
-I indeed have these concerns and more:
-
-These are my concerns
-
-1. Macro names are indeed too terse, and hard to figure out, even after looking
-at the macro source.
-This wasn't a problem before this patch series.
-
-2. One feature per line would be very nice, it is much more readable, especially
-when features have various 'modifiers'.
-This wasn't such a problem before this patch series, because we just had features 'or'ed,
-but having one feature per line would be a good thing to have even before this patch series.
-
-3. Feature bitmap 'or'ing of macro's output after this patch series became very confusing, 
-now that macros do various side things.
-
-In fact VMM_F confuses the user even more, because it doesn't even contribute to the
-feature mask at all.
-
-It was OK before the patch series.
-
-Technically of course I am not opposed to have the 'kvm_cpu_cap_init' or whatever we name
-it, to remain a macro, it is probably even desirable to have it as a macro, but it is OK,
-as long as it is just a macro which doesn't evaluate to anything and thus looks
-like a function call.
-
-Best regards,
-	Maxim Levitsky
-
-
-> then I'm definitely open to exploring alternative
-> formatting options.  But that's largely orthogonal to using macros instead of
-> individual function calls.
-> 
-
-
+Ping.
 
