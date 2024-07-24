@@ -1,232 +1,156 @@
-Return-Path: <kvm+bounces-22174-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22175-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B89F493B532
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:42:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 088BE93B5D5
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 19:24:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 785DB283229
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 16:42:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70FC5B21BFD
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 17:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C649815EFB2;
-	Wed, 24 Jul 2024 16:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C1915FD16;
+	Wed, 24 Jul 2024 17:24:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sULpsS5d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PgxT/nOw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2F815ECCF
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 16:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9386B1BF38
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 17:24:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721839343; cv=none; b=Rxo5YZFlZpOgXhuczPKrwOC8u8wkxYHQKE6G6oPf3ooulx6pC7vQLH3HnOwzVA+Oc8eh/wLExNLGpuDkglNZD97ObVMAMJhneHsdqDTqHTPXz/h248x6XCkp3b+lO3PNmuny+WZ1QtEYBsnd2I8NqrKCqVESe3WBrJn35m8Vk3c=
+	t=1721841861; cv=none; b=i2Y79T3lDNwuAn8CrDd0nTw1eU71gtF6Z8KjiCMDEQK9kzcYyVOUBp72E9iNrgXvN96vKZHNAq+L6SFFOIEn5Dz3FVhUnL69VHjYqmdOCKS6A9yffA5wmmd8bUz6j/6SPctzgsUOhdZNWt50WnhTdr2hk16Qd0ObuwqXpmuigM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721839343; c=relaxed/simple;
-	bh=p4+Gd7BmotDv1ZX4p7C+4MPitWGe2/wQSkne2jwDM0w=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=bW7borYL+l3b0hydozrkV1QNBBVfDqc65fZAWdaTGaN59fBkiOqkIjMPnimkFXyCFDnZe0F18nHMArXybswmWKTDNC/dFwuVfETwbeZohpZIMc8AZHz0/hDSswex4xGF9FzkTG+jpW6u2q0caqVUYUZN11LccBxxH5h+B/ZqhvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sULpsS5d; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70d19a4137dso20479b3a.1
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 09:42:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721839341; x=1722444141; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=quXFMjtZMDuExn79bpSog/9LF2Y7O+Ta5z6Tp776il8=;
-        b=sULpsS5dYzyxEgy8leObpBYhk6lmCzfBbJoAFoUIE7aBeKK7hV7VNMhQGmD8/yJ+Hh
-         cnGo2ZlZfP8LzT9O1c2mbce+R+tAdA4ZQUd9ptw104HgoxH+XRMaXiCdWHfkTD+xFSzp
-         8lAe+C5qjClvf3yyfv03L9c5dIYKB3lMaVuFhSscu54V8yTspcD8Wgp2wChoE0yQaGhu
-         TVSN0KZRjCxkHZpcFHVwE1oky+MXBUZqRuCr/d54ZcFmmJ0p1yngrJLBVgircQEvKKsg
-         QaCOX2ogexZ8gxC+NrlmlqjGoc2kf5T2SvRCdd0amJF36xGndOA7pbZSKXM0MbEF1XnQ
-         /IYA==
+	s=arc-20240116; t=1721841861; c=relaxed/simple;
+	bh=vM51azXaHDNwpKJTMUM1O0vnkWBr8NPpt7jwhv8sLVw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=CoLOx6lTChkfAKbGRqsCwqmGlsCZPhBQstqhano7aa9y1gJ7UxFHOm7Rs8kiYdNOz5eqqT/fco11tPh/mm5EVuRi0ooyaJP2gVfQVIn4fbw6WN6cli3v4jdeQodVBgXIL5jQyCfAvdt4P9wyBPIdNhlpgcOWQYkRe5Tc+aAcq3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PgxT/nOw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721841858;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=N1XBGctsXc7Ftv4Y/G9exRnBNRs5AQn3Z5s5GLDiSgQ=;
+	b=PgxT/nOw+92wY3iBnSySnzvckywye13LKoG93Ox1mAl40LBukUcTtprArMzJKWLxmFaKmv
+	BsREp0UwfihNhPHWgjBFEF5NBg3MR253vmZubiYvzVPeqnO6u0zuKHqKxqdJ+MaFGSrye4
+	/TndF87Kge6Mh9JoWTCqQ7zm0HP/hFY=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-247-TcTtAGHCOk-U9HuUaF8niQ-1; Wed, 24 Jul 2024 13:24:17 -0400
+X-MC-Unique: TcTtAGHCOk-U9HuUaF8niQ-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6b5de421bc6so799866d6.0
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 10:24:16 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721839341; x=1722444141;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=quXFMjtZMDuExn79bpSog/9LF2Y7O+Ta5z6Tp776il8=;
-        b=VSq5Y8zj9oMRlB17fb3jKZpGgsLHsKxk79JltEps4Ki6js0oB0M02EAe04FxrASUhF
-         SZLhX7astO8yKc7r5IHjKKMKD6TxOJeNkui7ukm1bjXZRVZw+grTAHRB2YvwCeY2uNKQ
-         21QJtYSneSe49at9JMfMEo51+D3Nm4/djOKcnG7pOZTwTidA5BmsuXWPFll3NEwfUcGN
-         8JiJjxMIW7Mro7RPgnvsN+MXecn9tpcbnE596QpAL8OM2uouQDJrFoLDFaX46AEd68JG
-         vBlLIg19VQCKEoOOsH9Pu44RkjE6TvZ9Do7UBtDAbTMxRlIHgCyGMClNzwuPqjs+EilL
-         V+sA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzW+xKDzoH6EdeXLu4bwexy1o9Td7sQALMisrlaO9zpMIu++aZxZOMxiGMLo2fGh+KucaM1IZBMY1UMnOedsq8DrpU
-X-Gm-Message-State: AOJu0YyvrZwojOu+pU0AGLpe9W2220vZR0rCBHHD4GKM+qK3t+kIa7rQ
-	YrxlPmY2KZt/Lw1AJDuWGSXcNyUNNCeiE1xevIpmzI1Vv6T7yPNVJ0JaYhHpIzTagkLALnOm2VD
-	Hed/hDOAbd0lg8ZG+VYzPWA==
-X-Google-Smtp-Source: AGHT+IHIrwfCPJh1o0JqmPFz3FO0hLjOEEzwgQspX1GMZjdhbr2An4xmUHLxLzB+Uc/ALItH7RCqJY/Tukxlqk7Edg==
-X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a05:6a00:944d:b0:70d:10d8:d050 with
- SMTP id d2e1a72fcca58-70ea9fd40e7mr7422b3a.0.1721839340518; Wed, 24 Jul 2024
- 09:42:20 -0700 (PDT)
-Date: Wed, 24 Jul 2024 16:42:18 +0000
-In-Reply-To: <ZdcRpHB43OxY8mpX@yzhao56-desk.sh.intel.com> (message from Yan
- Zhao on Thu, 22 Feb 2024 17:19:32 +0800)
+        d=1e100.net; s=20230601; t=1721841855; x=1722446655;
+        h=content-transfer-encoding:mime-version:user-agent:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=N1XBGctsXc7Ftv4Y/G9exRnBNRs5AQn3Z5s5GLDiSgQ=;
+        b=dZb01zmxEfTf9/MlLDcseSxXzgAn/1HAIs8xJxRKyFR/sGVJky/LxlfiKFTVCcsw01
+         5ZVFy9LKZMKj9XZYFbGuuoYFw1op5fkYi/QNHQq8VbOoyz/IiGl4FBUQrCvOOXoPfeW1
+         KlcI6Cfd/cBqqtpIbrXK04N7ugYDD7OnhZUXCztUo5UoG5ZD6NcrCqaq5VQIwYuRtL2R
+         s0GNqWxQKMp/rxIV08casugieIv7xY491QYz1wqfp0tfNp7639EdSVuDA9owVyMpLcM0
+         mcYSx3BF8SNIHb8tZOnR4EPQh7C40QFQw2HduUggqq7wyBW9WKRdHFF0b6AOaBIg9RQk
+         7vig==
+X-Forwarded-Encrypted: i=1; AJvYcCU2Y7zrRwfDN6OaindacgUKmNCECOLeXH7fnUXmq2miLyArnIsaD/uvvbfDwBC47rVUy7JRXoT0VGi4Vx+KENkv0RTf
+X-Gm-Message-State: AOJu0YxHmXD0zGPBYZ5pYGTli6Aumie5zOZql6ft/P+ZW/ZA22tWZ5YS
+	Itn8uZr44rXhuMtdK/I7UWekJfhlGoeUUQgmDW3Q2f/t65SukKT1GwEr2wFJV1L/kG7Z+qnUlgZ
+	XtT58F4hm95BQg2UdekLvkmIYHoPrIp54XdjriCfm3FfyGzGqKQ==
+X-Received: by 2002:ad4:5961:0:b0:6b5:6a1:f89a with SMTP id 6a1803df08f44-6bb3c9ceafbmr3178876d6.2.1721841855495;
+        Wed, 24 Jul 2024 10:24:15 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEGmXNXlTT92t8xldGPMNOVL+0ETtI9lzy9JixqquimWa65CpXWnNSbeLyLRLbNjgjutsUsVg==
+X-Received: by 2002:ad4:5961:0:b0:6b5:6a1:f89a with SMTP id 6a1803df08f44-6bb3c9ceafbmr3178616d6.2.1721841855162;
+        Wed, 24 Jul 2024 10:24:15 -0700 (PDT)
+Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7ac7e5fdcsm60471456d6.50.2024.07.24.10.24.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Jul 2024 10:24:14 -0700 (PDT)
+Message-ID: <cf24c99cfdefda7c700a6d09e86e0bdc3e562c8d.camel@redhat.com>
+Subject: Re: [PATCH v2 01/49] KVM: x86: Do all post-set CPUID processing
+ during vCPU creation
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Hou Wenlong <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
+ <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
+ Robert Hoo <robert.hoo.linux@gmail.com>
+Date: Wed, 24 Jul 2024 13:24:13 -0400
+In-Reply-To: <Zow0DVn4CvIxzGYz@google.com>
+References: <20240517173926.965351-1-seanjc@google.com>
+	 <20240517173926.965351-2-seanjc@google.com>
+	 <62cbd606f6d636445fd1352ae196a0973c362170.camel@redhat.com>
+	 <Zow0DVn4CvIxzGYz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <diqzo76myc5x.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [RFC PATCH v5 07/29] KVM: selftests: TDX: Update
- load_td_memory_region for VM memory backed by guest memfd
-From: Ackerley Tng <ackerleytng@google.com>
-To: Yan Zhao <yan.y.zhao@intel.com>
-Cc: sagis@google.com, linux-kselftest@vger.kernel.org, afranji@google.com, 
-	erdemaktas@google.com, isaku.yamahata@intel.com, seanjc@google.com, 
-	pbonzini@redhat.com, shuah@kernel.org, pgonda@google.com, haibo1.xu@intel.com, 
-	chao.p.peng@linux.intel.com, vannapurve@google.com, runanwang@google.com, 
-	vipinsh@google.com, jmattson@google.com, dmatlack@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Yan Zhao <yan.y.zhao@intel.com> writes:
+On Mon, 2024-07-08 at 11:46 -0700, Sean Christopherson wrote:
+> On Thu, Jul 04, 2024, Maxim Levitsky wrote:
+> > On Fri, 2024-05-17 at 10:38 -0700, Sean Christopherson wrote:
+> > > diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
+> > > index 23dbb9eb277c..0a8b561b5434 100644
+> > > --- a/arch/x86/kvm/cpuid.h
+> > > +++ b/arch/x86/kvm/cpuid.h
+> > > @@ -11,6 +11,7 @@
+> > >  extern u32 kvm_cpu_caps[NR_KVM_CPU_CAPS] __read_mostly;
+> > >  void kvm_set_cpu_caps(void);
+> > >  
+> > > +void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu);
+> > >  void kvm_update_cpuid_runtime(struct kvm_vcpu *vcpu);
+> > >  void kvm_update_pv_runtime(struct kvm_vcpu *vcpu);
+> > >  struct kvm_cpuid_entry2 *kvm_find_cpuid_entry_index(struct kvm_vcpu *vcpu,
+> > > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> > > index d750546ec934..7adcf56bd45d 100644
+> > > --- a/arch/x86/kvm/x86.c
+> > > +++ b/arch/x86/kvm/x86.c
+> > > @@ -12234,6 +12234,7 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
+> > >  	kvm_xen_init_vcpu(vcpu);
+> > >  	kvm_vcpu_mtrr_init(vcpu);
+> > >  	vcpu_load(vcpu);
+> > > +	kvm_vcpu_after_set_cpuid(vcpu);
+> > 
+> > This makes me a bit nervous. At this point the vcpu->arch.cpuid_entries is
+> > NULL, but so is vcpu->arch.cpuid_nent so it sort of works but is one mistake
+> > away from crash.
+> > 
+> > Maybe we should add some protection to this, e.g empty zero cpuid or
+> > something like that.
+> 
+> Hmm, a crash is actually a good thing.  In the post-KVM_SET_CPUID2 case, if KVM
+> accessed vcpu->arch.cpuid_entries without properly consulting cpuid_nent, the
+> resulting failure would be a out-of-bounds read.  Similarly, a zeroed CPUID array
+> would effectiely mask any bugs.
+> 
+> Given that KVM heavily relies on "vcpu" to be zero-allocated, and that changing
+> cpuid_nent during kvm_arch_vcpu_create() would be an extremely egregious bug,
+> a crash due to a NULL-pointer dereference should never escape developer testing,
+> let alone full release testing.
+> 
+> KVM does the "empty" array thing for IRQ routing (though in that case the array
+> and the nr_entries are in a single struct), and IMO it's been a huge net negative
+> because it's led to increased complexity just so that arch code can omit a NULL
+> check.
+> 
 
-> On Tue, Dec 12, 2023 at 12:46:22PM -0800, Sagi Shahar wrote:
->> From: Ackerley Tng <ackerleytng@google.com>
->> 
->> If guest memory is backed by restricted memfd
->> 
->> + UPM is being used, hence encrypted memory region has to be
->>   registered
->> + Can avoid making a copy of guest memory before getting TDX to
->>   initialize the memory region
->> 
->> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
->> Signed-off-by: Ryan Afranji <afranji@google.com>
->> Signed-off-by: Sagi Shahar <sagis@google.com>
->> ---
->>  .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   | 41 +++++++++++++++----
->>  1 file changed, 32 insertions(+), 9 deletions(-)
->> 
->> diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
->> index 6b995c3f6153..063ff486fb86 100644
->> --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
->> +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
->> @@ -192,6 +192,21 @@ static void tdx_td_finalizemr(struct kvm_vm *vm)
->>  	tdx_ioctl(vm->fd, KVM_TDX_FINALIZE_VM, 0, NULL);
->>  }
->>  
->> +/*
->> + * Other ioctls
->> + */
->> +
->> +/**
->> + * Register a memory region that may contain encrypted data in KVM.
->> + */
->> +static void register_encrypted_memory_region(
->> +	struct kvm_vm *vm, struct userspace_mem_region *region)
->> +{
->> +	vm_set_memory_attributes(vm, region->region.guest_phys_addr,
->> +				 region->region.memory_size,
->> +				 KVM_MEMORY_ATTRIBUTE_PRIVATE);
->> +}
->> +
->>  /*
->>   * TD creation/setup/finalization
->>   */
->> @@ -376,30 +391,38 @@ static void load_td_memory_region(struct kvm_vm *vm,
->>  	if (!sparsebit_any_set(pages))
->>  		return;
->>  
->> +
->> +	if (region->region.guest_memfd != -1)
->> +		register_encrypted_memory_region(vm, region);
->> +
->>  	sparsebit_for_each_set_range(pages, i, j) {
->>  		const uint64_t size_to_load = (j - i + 1) * vm->page_size;
->>  		const uint64_t offset =
->>  			(i - lowest_page_in_region) * vm->page_size;
->>  		const uint64_t hva = hva_base + offset;
->>  		const uint64_t gpa = gpa_base + offset;
->> -		void *source_addr;
->> +		void *source_addr = (void *)hva;
->>  
->>  		/*
->>  		 * KVM_TDX_INIT_MEM_REGION ioctl cannot encrypt memory in place,
->>  		 * hence we have to make a copy if there's only one backing
->>  		 * memory source
->>  		 */
->> -		source_addr = mmap(NULL, size_to_load, PROT_READ | PROT_WRITE,
->> -				   MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
->> -		TEST_ASSERT(
->> -			source_addr,
->> -			"Could not allocate memory for loading memory region");
->> -
->> -		memcpy(source_addr, (void *)hva, size_to_load);
->> +		if (region->region.guest_memfd == -1) {
->> +			source_addr = mmap(NULL, size_to_load, PROT_READ | PROT_WRITE,
->> +					MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
->> +			TEST_ASSERT(
->> +				source_addr,
->> +				"Could not allocate memory for loading memory region");
->> +
->> +			memcpy(source_addr, (void *)hva, size_to_load);
->> +			memset((void *)hva, 0, size_to_load);
->> +		}
->>  
->>  		tdx_init_mem_region(vm, source_addr, gpa, size_to_load);
->>  
->> -		munmap(source_addr, size_to_load);
->> +		if (region->region.guest_memfd == -1)
->> +			munmap(source_addr, size_to_load);
->>  	}
->
-> For memslot 0, 1, 2, when guest_memfd != -1,
-> is it possible to also munmap(mmap_start, mmap_size) after finish loading?
->
+Makes sense, let it be.
 
-Thank you for your review!
+Best regards,
+	Maxim Levitsky
 
-Did you mean "possible" as in whether it is "correct" to do munmap() for
-the rest of the earlier memslots containing non-test-code?
-
-It is correct because the munmap() just deallocates memory that was
-recently allocated in mmap() in this same change. The memory set up for
-the VM is not affected.
-
-Hope that answers your question, and here's some further detail, hope
-this helps too:
-
-load_td_memory_region() loads a memory region into a TD by calling the
-KVM_TDX_INIT_MEM_REGION ioctl, which copies (and encrypts) the data in
-an existing memory region into TD private memory for the TD to use.
-
-In these selftests, we use the KVM selftest framework to set up a TD's
-memory as if it were a regular VM, and then use this function to
-copy+encrypt the memory that is already set up for the TD. This lets us
-re-use most of the code from the KVM selftest framework for TDs, which
-is extremely useful for setting up page tables, exception handlers, etc
-for the TD. These key pieces of memory setup are in the memslots with
-smaller indices, as you pointed out.
-
-KVM_TDX_INIT_MEM_REGION ioctl uses the provided gpa and struct kvm to
-look up the destination address, and uses source_addr as the source
-address for the copying. 
-
-If we are not using guest_memfd (region->region.guest_memfd == -1), then
-we need to make the source and destination address different by copying
-the contents at the source address somewhere else for the call to
-tdx_init_mem_region(). That is what the mmap() is doing. This temporary
-buffer then needs to be freed, hence the munmap(). Without this copying,
-the destination address for the ioctl's copy would be the same as the
-source address, since those very same pages are provided in the memslot
-for this memory region.
-
-If we are using guest_memfd, then the destination address for the
-ioctl's copy will be taken from the guest_memfd, which is already
-different from the source address, hence we can skip the copying.
-
->>  }
->>  
->> -- 
->> 2.43.0.472.g3155946c3a-goog
->> 
->> 
 
