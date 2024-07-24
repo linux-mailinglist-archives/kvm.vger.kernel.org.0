@@ -1,131 +1,117 @@
-Return-Path: <kvm+bounces-22155-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22156-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EAD093ADC6
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 10:09:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 181C993AFD0
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 12:25:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5581F214DD
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 08:09:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C66082846D5
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 10:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A881411C8;
-	Wed, 24 Jul 2024 08:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD36C15539D;
+	Wed, 24 Jul 2024 10:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Th3QGLml"
+	dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b="s8bgX1K0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from forwardcorp1b.mail.yandex.net (forwardcorp1b.mail.yandex.net [178.154.239.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768CF13E020
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 08:09:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F5814375C;
+	Wed, 24 Jul 2024 10:25:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721808544; cv=none; b=sGmZu60EGLFQR9yo2nKVd8AZfQC8uAyE0RqQERDb+hec3SMIRh5EO64A8HcXoE7ccg8ZQ5CzWKgxHxGZtl4iMj3pmUHYZP2WNCOp1/DJlBng4mlxZeuMTB0ewVsMc3b/kIIxmYJEmtV1nVMLdvp1mOpP3HS4WrWAPvgRlP8vM64=
+	t=1721816744; cv=none; b=B2soGzEsVPzYf7NPqcFl1T0VYMNw+/u5OazKdGHGgCW9GWxP1hfJzxjGBKwWKaHlsERYtwy3nQjum61eRz+NeEB3eTt++njSeAyTnJrGA4isP6I2eM3kZlz5HSSsCcsaAHHqPJKJJMzbQkTTeF2VFqWVwirqKYBu+rFURLQhzUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721808544; c=relaxed/simple;
-	bh=ZCHPqRkAPaaK7jIc8I0RwDlUEvdpc1r9dJXDCMFtXtw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TcHyC7fgPgPhZF7h3bU6BgjSENKZK7pw/0ajwnrEINs5JzZ4UjPNRFXYFl0iiTA/nI2dTm/2jtEszZszlx9mgbv41tX6VZHCGJF1Et8Oi7KuiR0m5NeTT2qRzMJyRMPectRBL9jedYnaTsNxSMHCsCGrPuzpr97P7Om//TpFLS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Th3QGLml; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721808543; x=1753344543;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ZCHPqRkAPaaK7jIc8I0RwDlUEvdpc1r9dJXDCMFtXtw=;
-  b=Th3QGLmlWIczqMbYfL7xoq3L9oDPBcxkdS4hKkINYEnnY5mgF9V3e5Th
-   2fZSw2UDjwRzlTWDFlhygINFKQcPRlvzuQF0nxUwleL2TLuHHvlX/5M6h
-   QF3dn3t6W8gbYUEnuoWEYAUt2RO7qy9cA60/7sDCAu8ZcTAuj4SOsUaxF
-   3UV7/ZXHXTmG+PfVTKK/bXyZmt+oeGMmL49QWhIixpvcBFDT6D7fgqyg7
-   +d6NYuPgWIhT9ASjn5WtUPw4JWHYWCRasuKa0FVeC4g2SgLgXQV0v2F34
-   d6YPx2RaCs3GseujIMe8rPyWGsyrfd0/hkQx4qiQm0fwpLCLWb8RCpuVp
-   g==;
-X-CSE-ConnectionGUID: jIfVueAwR3qdN/DkEAGVBQ==
-X-CSE-MsgGUID: 2mtHQuE9TTWbktgNf1WkPw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11142"; a="19347441"
-X-IronPort-AV: E=Sophos;i="6.09,232,1716274800"; 
-   d="scan'208";a="19347441"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 01:09:02 -0700
-X-CSE-ConnectionGUID: ziHbI3rIS9OplWmFzi0xlA==
-X-CSE-MsgGUID: E/DptciSQNKaSrRSSdnHFA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,232,1716274800"; 
-   d="scan'208";a="56820196"
-Received: from sqa-gate.sh.intel.com (HELO emr-bkc.tsp.org) ([10.239.48.212])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 01:09:00 -0700
-From: Lei Wang <lei4.wang@intel.com>
-To: Paolo Bonzini <pbonzini@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Xin Li <xin3.li@intel.com>
-Cc: qemu-devel@nongnu.org,
-	kvm@vger.kernel.org,
-	Lei Wang <lei4.wang@intel.com>
-Subject: [PATCH] target/i386: Raise the highest index value used for any VMCS encoding
-Date: Wed, 24 Jul 2024 04:08:58 -0400
-Message-Id: <20240724080858.46609-1-lei4.wang@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1721816744; c=relaxed/simple;
+	bh=IVjBVdWJcrqSz10WzYP3ysEDJe39sb453y3B4S/OD/U=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QZ2GaBGwH208FbqZJxKpHxg7xGHwq2wBjRPHTgL6hAqpX/Ptatt1Nkffd8mfCCGc1kaa/b41ut3B6n6AncCwJ8BdEE6WrFXSOkvjPkGkKW8ub+j1XDdTAxa9qppe0HKLpANXrrTuioLQP+I2Zia1ZffHJ4jt5CKJKqxGdpkYNTM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru; spf=pass smtp.mailfrom=yandex-team.ru; dkim=pass (1024-bit key) header.d=yandex-team.ru header.i=@yandex-team.ru header.b=s8bgX1K0; arc=none smtp.client-ip=178.154.239.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex-team.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex-team.ru
+Received: from mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net (mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net [IPv6:2a02:6b8:c24:25b4:0:640:ef96:0])
+	by forwardcorp1b.mail.yandex.net (Yandex) with ESMTPS id B406C60FE3;
+	Wed, 24 Jul 2024 13:23:48 +0300 (MSK)
+Received: from [IPV6:2a02:6b8:b081:b642::1:29] (unknown [2a02:6b8:b081:b642::1:29])
+	by mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net (smtpcorp/Yandex) with ESMTPSA id lNMY9V1iCqM0-C8C8MaGq;
+	Wed, 24 Jul 2024 13:23:47 +0300
+Precedence: bulk
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex-team.ru;
+	s=default; t=1721816627;
+	bh=uLe2eSdIXUPHH+Ti8xQ5MBEVFgfu1ifI92FSUfg2UF8=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=s8bgX1K0A18G0fytEtLiX6wqJxTc8HxUX4WcqKbNMVsHwWw01VTiit/vkhrbGORb3
+	 SqBnXDc1fxVPCRuqLigoEuPoqPs4uFM5tm3CQiZf2hxYG9o2XShIY5BRMzBUfTHNWC
+	 wsYg+N+nVbS5jB0HFptt952+9erbgGRaRfhIUQpQ=
+Authentication-Results: mail-nwsmtp-smtp-corp-canary-81.sas.yp-c.yandex.net; dkim=pass header.i=@yandex-team.ru
+Message-ID: <ea0d1256-1236-4102-80fd-e0c05503c2fd@yandex-team.ru>
+Date: Wed, 24 Jul 2024 13:23:47 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] kvm_host: bump KVM_MAX_IRQ_ROUTE to 128k
+To: Igor Mammedov <imammedo@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, yc-core@yandex-team.ru,
+ Sean Christopherson <seanjc@google.com>
+References: <20240321082442.195631-1-d-tatianin@yandex-team.ru>
+ <20240618142846.4138b349@imammedo.users.ipa.redhat.com>
+Content-Language: en-US
+From: Daniil Tatianin <d-tatianin@yandex-team.ru>
+In-Reply-To: <20240618142846.4138b349@imammedo.users.ipa.redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Because the index value of the VMCS field encoding of Secondary VM-exit
-controls, 0x44, is larger than any existing index value, raise the highest
-index value used for any VMCS encoding to 0x44.
+On 6/18/24 3:28 PM, Igor Mammedov wrote:
 
-Because the index value of the VMCS field encoding of FRED injected-event
-data (one of the newly added VMCS fields for FRED transitions), 0x52, is
-larger than any existing index value, raise the highest index value used
-for any VMCS encoding to 0x52.
+> On Thu, 21 Mar 2024 11:24:42 +0300
+> Daniil Tatianin <d-tatianin@yandex-team.ru> wrote:
+>
+>> We would like to be able to create large VMs (up to 224 vCPUs atm) with
+>> up to 128 virtio-net cards, where each card needs a TX+RX queue per vCPU
+>> for optimal performance (as well as config & control interrupts per
+>> card). Adding in extra virtio-blk controllers with a queue per vCPU (up
+>> to 192 disks) yields a total of about ~100k IRQ routes, rounded up to
+>> 128k for extra headroom and flexibility.
+>>
+>> The current limit of 4096 was set in 2018 and is too low for modern
+>> demands. It also seems to be there for no good reason as routes are
+>> allocated lazily by the kernel anyway (depending on the largest GSI
+>> requested by the VM).
+>>
+>> Signed-off-by: Daniil Tatianin <d-tatianin@yandex-team.ru>
+> LGTM
+>
+> Acked-by: Igor Mammedov <imammedo@redhat.com>
 
-Co-developed-by: Xin Li <xin3.li@intel.com>
-Signed-off-by: Xin Li <xin3.li@intel.com>
-Signed-off-by: Lei Wang <lei4.wang@intel.com>
----
- target/i386/cpu.h     | 1 +
- target/i386/kvm/kvm.c | 9 ++++++++-
- 2 files changed, 9 insertions(+), 1 deletion(-)
+Thank you!
 
-diff --git a/target/i386/cpu.h b/target/i386/cpu.h
-index c6cc035df3..5604cc2994 100644
---- a/target/i386/cpu.h
-+++ b/target/i386/cpu.h
-@@ -1192,6 +1192,7 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
- #define VMX_VM_EXIT_PT_CONCEAL_PIP                  0x01000000
- #define VMX_VM_EXIT_CLEAR_IA32_RTIT_CTL             0x02000000
- #define VMX_VM_EXIT_LOAD_IA32_PKRS                  0x20000000
-+#define VMX_VM_EXIT_ACTIVATE_SECONDARY_CONTROLS     0x80000000
- 
- #define VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS            0x00000004
- #define VMX_VM_ENTRY_IA32E_MODE                     0x00000200
-diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
-index b4aab9a410..7c8cb16675 100644
---- a/target/i386/kvm/kvm.c
-+++ b/target/i386/kvm/kvm.c
-@@ -3694,7 +3694,14 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
-     kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0,
-                       CR4_VMXE_MASK);
- 
--    if (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_TSC_SCALING) {
-+    if (f[FEAT_7_1_EAX] & CPUID_7_1_EAX_FRED) {
-+        /* FRED injected-event data (0x2052).  */
-+        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x52);
-+    } else if (f[FEAT_VMX_EXIT_CTLS] &
-+               VMX_VM_EXIT_ACTIVATE_SECONDARY_CONTROLS) {
-+        /* Secondary VM-exit controls (0x2044).  */
-+        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x44);
-+    } else if (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_TSC_SCALING) {
-         /* TSC multiplier (0x2032).  */
-         kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x32);
-     } else {
--- 
-2.39.3
+I want to ping everyone once again to take a look at this, I think this 
+patch is quite trivial and unlocks larger VMs for free, would really 
+appreciate a review from anyone interested!
 
+>> ---
+>>   include/linux/kvm_host.h | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+>> index 48f31dcd318a..10a141add2a8 100644
+>> --- a/include/linux/kvm_host.h
+>> +++ b/include/linux/kvm_host.h
+>> @@ -2093,7 +2093,7 @@ static inline bool mmu_invalidate_retry_gfn_unsafe(struct kvm *kvm,
+>>   
+>>   #ifdef CONFIG_HAVE_KVM_IRQ_ROUTING
+>>   
+>> -#define KVM_MAX_IRQ_ROUTES 4096 /* might need extension/rework in the future */
+>> +#define KVM_MAX_IRQ_ROUTES 131072 /* might need extension/rework in the future */
+>>   
+>>   bool kvm_arch_can_set_irq_routing(struct kvm *kvm);
+>>   int kvm_set_irq_routing(struct kvm *kvm,
 
