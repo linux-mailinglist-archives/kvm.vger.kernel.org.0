@@ -1,111 +1,143 @@
-Return-Path: <kvm+bounces-22162-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22160-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AFF093B20A
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 15:53:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B51D593B1E6
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 15:47:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C322283ACD
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 13:53:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E42282E12
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 13:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EB4159598;
-	Wed, 24 Jul 2024 13:53:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED868158DA0;
+	Wed, 24 Jul 2024 13:47:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAP2//Vl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c3zPuBB0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D456E13E020;
-	Wed, 24 Jul 2024 13:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C805D2D030
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 13:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721829216; cv=none; b=Rv0Kp+InsbzBKLBu2jjtRL8k1OcREHL4Ps0hGnqAqa8NN5Z2xdK1vWK/GbM09zJATconytTYWTr9uYL73vczPY5hh2XIGuLurfbXl9mTK1Yjhd4Nwf5YF+bSP2ndZNCn5sp1ZRe5Wc3xteO1r+V/dMDI7gxPhJAvHXN/WOiQyZ0=
+	t=1721828845; cv=none; b=qa4tdFWezc/HfBqlT74XAQE+DDtAI9bdAVMG/fvW+zCYxuNr8FoJ7udNDVO466M00t14QSDmFGIZjrUlJ5ODx8+qI4Ptr/YfnK26mhmqBzm3DekecSTAEaG4H6BcAD5E1uqihKLl/NQiRpLBXF8UTbMBzadJxAGj7dg5lDZtpqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721829216; c=relaxed/simple;
-	bh=07Vzl6re9ZHoHnUQaqXa2n0Sm3JNDNE/aQbliYyNUPE=;
+	s=arc-20240116; t=1721828845; c=relaxed/simple;
+	bh=sxKpAl9rrbQ4Xx0Hyr/S+ZMPf6W0x+OqB+PPtAp9ArA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tSSzTIBDxdv0JLtBfh0RrFv+uy+NmG1dIcNFaej0eDwcxijtjKZINehLVWPm7sCdlSNsoSfv3hCj2pbUK1/QG83S9OeroYJ032d2MMwcqucsTlIq+EnuvPJ9v+IMC71o5ZXIxlDNbvlVTWO8y48uEycbC9LvRviM0O2ZagUqHrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WAP2//Vl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B0F7C32781;
-	Wed, 24 Jul 2024 13:53:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721829215;
-	bh=07Vzl6re9ZHoHnUQaqXa2n0Sm3JNDNE/aQbliYyNUPE=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=WAP2//VlWUSM9jrjWrTnlUR5U9gfJcKWxfEehwSsgCifqJ1HhI5rmor2MgAYiE7Hj
-	 k3H3D8gUK01HrebDYiJ8EV56b+RO+InO4F1HL2zNXYqpPk0VVAstDY9HBgwUy8+jTo
-	 8Kp+cbZnfcsDTxUnkpS1wiQgO6T2KXSlCCZwyOB4EAFefvi0zRPKDPVqPNBGFqV5Kn
-	 m54HgAjJfy8we9Y9tl7LY7L4gaHz6KkuEz0NmtF8JUJfXUWPMHmL6c8XZgfCklah1Y
-	 U/SwoGTJa9N4jZ4SGcPsHczOthJTxHkGyBSbyg3+L/BrGVV8TCmbKAOKTgYYxrZSSF
-	 Ywifo4pkBnatw==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id A535FCE0A6E; Wed, 24 Jul 2024 06:53:34 -0700 (PDT)
-Date: Wed, 24 Jul 2024 06:53:34 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Vlastimil Babka <vbabka@suse.cz>
-Cc: Uladzislau Rezki <urezki@gmail.com>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Julia Lawall <Julia.Lawall@inria.fr>, linux-block@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, bridge@lists.linux.dev,
-	linux-trace-kernel@vger.kernel.org,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	kvm@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Nicholas Piggin <npiggin@gmail.com>, netdev@vger.kernel.org,
-	wireguard@lists.zx2c4.com, linux-kernel@vger.kernel.org,
-	ecryptfs@vger.kernel.org, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>, linux-nfs@vger.kernel.org,
-	linux-can@vger.kernel.org, Lai Jiangshan <jiangshanlai@gmail.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	kasan-dev <kasan-dev@googlegroups.com>
-Subject: Re: [PATCH 00/14] replace call_rcu by kfree_rcu for simple
- kmem_cache_free callback
-Message-ID: <b3d9710a-805e-4e37-8295-b5ec1133d15c@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <6711935d-20b5-41c1-8864-db3fc7d7823d@suse.cz>
- <ZnCDgdg1EH6V7w5d@pc636>
- <36c60acd-543e-48c5-8bd2-6ed509972d28@suse.cz>
- <ZnFT1Czb8oRb0SE7@pc636>
- <5c8b2883-962f-431f-b2d3-3632755de3b0@paulmck-laptop>
- <9967fdfa-e649-456d-a0cb-b4c4bf7f9d68@suse.cz>
- <6dad6e9f-e0ca-4446-be9c-1be25b2536dd@paulmck-laptop>
- <4cba4a48-902b-4fb6-895c-c8e6b64e0d5f@suse.cz>
- <ZnVInAV8BXhgAjP_@pc636>
- <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=jPmhatqnIm2qIuO3PC65gSMRms3epA93zIHUvkj7OlFf44AS7u445zxG30kB+Keb58rGYU6ZFN0eKnTga84kxQN3niwJZCY67FuqFqcwkgi3EB6W3HD8nXhdvWdnvUpJyL9DuDL9OTw4U1T8RjmyTj94qUab8OohsJNAEN+kP3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c3zPuBB0; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721828844; x=1753364844;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=sxKpAl9rrbQ4Xx0Hyr/S+ZMPf6W0x+OqB+PPtAp9ArA=;
+  b=c3zPuBB0a6R5390roseF3mJj0820ZlabczOjtlF8p9LQpLQ5zeYUyXiK
+   r0Df5mGeVHhLfCqZS70edH6AhKQiRTyLakG2xVJyPL3wMwMI5juYlpyk9
+   qjNLUkSgQrZ2njAURcYjtseE0yWWrANPsLWr2f76JAgKj9Y/XyQ9tT3r1
+   HQ41Ly8dwPfEXUHOJR5WdLgIVJz9mmUFm0PmN25HUmnI8daakZAzToxem
+   fTwb9TOh6m6IE7EwxQiLQ1RrTLn2HeflBwU/OtHH6oPRiKGIi7Do1YD2U
+   40NzFgJkgufwTcmfXVTDXvK9RMO8BIhVIlhuxa4oPV8DscgHCvPFLO2RJ
+   A==;
+X-CSE-ConnectionGUID: uBp7NMQST5e09rkzOo91vg==
+X-CSE-MsgGUID: j/pGijKuR4KWiiwIQCvqAQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="19635302"
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="19635302"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 06:47:23 -0700
+X-CSE-ConnectionGUID: KcuozMCYQ2qc1TLMylTygw==
+X-CSE-MsgGUID: SiPTLhqxQVi/C+OLS4Jj6g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,233,1716274800"; 
+   d="scan'208";a="52816196"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa006.jf.intel.com with ESMTP; 24 Jul 2024 06:47:18 -0700
+Date: Wed, 24 Jul 2024 22:03:02 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Daniel =?iso-8859-1?Q?P=2E_Berrang=E9?= <berrange@redhat.com>
+Cc: Markus Armbruster <armbru@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
+Message-ID: <ZqEJlmR3U6g8zq0z@intel.com>
+References: <20240704031603.1744546-1-zhao1.liu@intel.com>
+ <20240704031603.1744546-3-zhao1.liu@intel.com>
+ <87wmld361y.fsf@pond.sub.org>
+ <Zp5tBHBoeXZy44ys@intel.com>
+ <87h6cfowei.fsf@pond.sub.org>
+ <ZqD31Oj5P0uDMs-I@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <df0716ac-c995-498c-83ee-b8c25302f9ed@suse.cz>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZqD31Oj5P0uDMs-I@redhat.com>
 
-On Mon, Jul 15, 2024 at 10:39:38PM +0200, Vlastimil Babka wrote:
-> On 6/21/24 11:32 AM, Uladzislau Rezki wrote:
-> > On Wed, Jun 19, 2024 at 11:28:13AM +0200, Vlastimil Babka wrote:
-> > One question. Maybe it is already late but it is better to ask rather than not.
-> > 
-> > What do you think if we have a small discussion about it on the LPC 2024 as a
-> > topic? It might be it is already late or a schedule is set by now. Or we fix
-> > it by a conference time.
-> > 
-> > Just a thought.
+On Wed, Jul 24, 2024 at 01:47:16PM +0100, Daniel P. Berrangé wrote:
+> Date: Wed, 24 Jul 2024 13:47:16 +0100
+> From: "Daniel P. Berrangé" <berrange@redhat.com>
+> Subject: Re: [PATCH 2/8] qapi/qom: Introduce smp-cache object
 > 
-> Sorry for the late reply. The MM MC turned out to be so packed I didn't even
-> propose a slab topic. We could discuss in hallway track or a BOF, but
-> hopefully if the current direction taken by my RFC brings no unexpected
-> surprise, and the necessary RCU barrier side is also feasible, this will be
-> settled by time of plumbers.
+> On Wed, Jul 24, 2024 at 01:35:17PM +0200, Markus Armbruster wrote:
+> > Zhao Liu <zhao1.liu@intel.com> writes:
+> > 
+> > > Hi Markus,
+> > >> SmpCachesProperties and SmpCacheProperties would put the singular
+> > >> vs. plural where it belongs.  Sounds a bit awkward to me, though.
+> > >> Naming is hard.
+> > >
+> > > For SmpCachesProperties, it's easy to overlook the first "s".
+> > >
+> > >> Other ideas, anybody?
+> > >
+> > > Maybe SmpCacheOptions or SmpCachesPropertyWrapper?
+> > 
+> > I wonder why we have a single QOM object to configure all caches, and
+> > not one QOM object per cache.
+> 
+> Previous versions of this series were augmenting the existing
+> -smp command line.
 
-That would be even better!
+Ah, yes, since -smp, as a sugar option of -machine, doesn't support
+JSON. In -smp, we need to use keyval's style to configure as:
 
-							Thanx, Paul
+-smp caches.0.name=l1i,caches.0.topo=core
+
+I think JSON is the more elegant way to go, so I chose -object.
+
+> Now the design has switched to use -object,
+> I agree that it'd be simplest to just have one -object flag
+> added per cache level we want to defnie.
+> 
+
+OK.
+
+Thanks,
+Zhao
+
 
