@@ -1,133 +1,131 @@
-Return-Path: <kvm+bounces-22154-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22155-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E2E893AC8F
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 08:26:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EAD093ADC6
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 10:09:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FC1C1C22153
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 06:26:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5581F214DD
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 08:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D484450284;
-	Wed, 24 Jul 2024 06:25:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1A881411C8;
+	Wed, 24 Jul 2024 08:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b="0guTbQLD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Th3QGLml"
 X-Original-To: kvm@vger.kernel.org
-Received: from out187-4.us.a.mail.aliyun.com (out187-4.us.a.mail.aliyun.com [47.90.187.4])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74B74C84;
-	Wed, 24 Jul 2024 06:25:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.187.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768CF13E020
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 08:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721802353; cv=none; b=don7WDJaR5wAstoY7eWlIwd3RiFV8HWvUl76CyZpxa2A8jte427TUmDHLFraooE54oe5B+wOukFBdTIp7dolkD13yl5fyEFez9MsdB0u1ByBWINScF8IjNTHYoNuu5eswPShGBo96OZQ3SY9+oPdo0+Zd+t0TXak4gkNkbZGRAA=
+	t=1721808544; cv=none; b=sGmZu60EGLFQR9yo2nKVd8AZfQC8uAyE0RqQERDb+hec3SMIRh5EO64A8HcXoE7ccg8ZQ5CzWKgxHxGZtl4iMj3pmUHYZP2WNCOp1/DJlBng4mlxZeuMTB0ewVsMc3b/kIIxmYJEmtV1nVMLdvp1mOpP3HS4WrWAPvgRlP8vM64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721802353; c=relaxed/simple;
-	bh=hM9w8SezAnui1RmVH6Fm3NjhI5mjQfCG1KwAqH9KXjM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YHN+ByhsD4/hC2NP4BVsV3IYp9EAtj5eK6/aGcfvmWjV9mBGJrJKIaHohqXo6VOP08a5EEHp8CnxRyQlFjxfrlpy+msgCmCtZQzis+vdmgT0nbY+JZqMnIVeThgqZhSvjzOQIurkPbGGy/JcsSSpvHfynR8ZX0xWqVbL6+KYmmE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com; spf=pass smtp.mailfrom=antgroup.com; dkim=pass (1024-bit key) header.d=antgroup.com header.i=@antgroup.com header.b=0guTbQLD; arc=none smtp.client-ip=47.90.187.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=antgroup.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=antgroup.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=antgroup.com; s=default;
-	t=1721802336; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=g2XFTRo1bTmgM7OhMstauV8A4SmolnQq/s7DX8E6yec=;
-	b=0guTbQLDhT1MFWw/dJZaIBa8iZ+ayItodXs1kPysFgkWNa06O+3rgOIYQCzFGsXOK7M/O8RHMSpb63S6lA6sVpQxd/JX7ug9n0vQ/0GvSnc4t7AvOjo7nCz/R3tuzSNDAbS89EiqX4BpA7yH8zxddxE2Chb4H+5Ts/pFF4wBspo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=maildocker-contentspam033070021165;MF=houwenlong.hwl@antgroup.com;NM=1;PH=DS;RN=5;SR=0;TI=SMTPD_---.YY3arCD_1721801398;
-Received: from localhost(mailfrom:houwenlong.hwl@antgroup.com fp:SMTPD_---.YY3arCD_1721801398)
-          by smtp.aliyun-inc.com;
-          Wed, 24 Jul 2024 14:09:59 +0800
-Date: Wed, 24 Jul 2024 14:09:58 +0800
-From: "Hou Wenlong" <houwenlong.hwl@antgroup.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Jim Mattson <jmattson@google.com>
-Subject: Re: [PATCH] KVM: nVMX: Honor userspace MSR filter lists for nested
- VM-Enter/VM-Exit
-Message-ID: <20240724060958.GA109293@k08j02272.eu95sqa>
-References: <20240722235922.3351122-1-seanjc@google.com>
- <20240723132004.GA67088@k08j02272.eu95sqa>
- <Zp-8o7dGivU_ek86@google.com>
+	s=arc-20240116; t=1721808544; c=relaxed/simple;
+	bh=ZCHPqRkAPaaK7jIc8I0RwDlUEvdpc1r9dJXDCMFtXtw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TcHyC7fgPgPhZF7h3bU6BgjSENKZK7pw/0ajwnrEINs5JzZ4UjPNRFXYFl0iiTA/nI2dTm/2jtEszZszlx9mgbv41tX6VZHCGJF1Et8Oi7KuiR0m5NeTT2qRzMJyRMPectRBL9jedYnaTsNxSMHCsCGrPuzpr97P7Om//TpFLS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Th3QGLml; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1721808543; x=1753344543;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ZCHPqRkAPaaK7jIc8I0RwDlUEvdpc1r9dJXDCMFtXtw=;
+  b=Th3QGLmlWIczqMbYfL7xoq3L9oDPBcxkdS4hKkINYEnnY5mgF9V3e5Th
+   2fZSw2UDjwRzlTWDFlhygINFKQcPRlvzuQF0nxUwleL2TLuHHvlX/5M6h
+   QF3dn3t6W8gbYUEnuoWEYAUt2RO7qy9cA60/7sDCAu8ZcTAuj4SOsUaxF
+   3UV7/ZXHXTmG+PfVTKK/bXyZmt+oeGMmL49QWhIixpvcBFDT6D7fgqyg7
+   +d6NYuPgWIhT9ASjn5WtUPw4JWHYWCRasuKa0FVeC4g2SgLgXQV0v2F34
+   d6YPx2RaCs3GseujIMe8rPyWGsyrfd0/hkQx4qiQm0fwpLCLWb8RCpuVp
+   g==;
+X-CSE-ConnectionGUID: jIfVueAwR3qdN/DkEAGVBQ==
+X-CSE-MsgGUID: 2mtHQuE9TTWbktgNf1WkPw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11142"; a="19347441"
+X-IronPort-AV: E=Sophos;i="6.09,232,1716274800"; 
+   d="scan'208";a="19347441"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 01:09:02 -0700
+X-CSE-ConnectionGUID: ziHbI3rIS9OplWmFzi0xlA==
+X-CSE-MsgGUID: E/DptciSQNKaSrRSSdnHFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,232,1716274800"; 
+   d="scan'208";a="56820196"
+Received: from sqa-gate.sh.intel.com (HELO emr-bkc.tsp.org) ([10.239.48.212])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 01:09:00 -0700
+From: Lei Wang <lei4.wang@intel.com>
+To: Paolo Bonzini <pbonzini@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Xin Li <xin3.li@intel.com>
+Cc: qemu-devel@nongnu.org,
+	kvm@vger.kernel.org,
+	Lei Wang <lei4.wang@intel.com>
+Subject: [PATCH] target/i386: Raise the highest index value used for any VMCS encoding
+Date: Wed, 24 Jul 2024 04:08:58 -0400
+Message-Id: <20240724080858.46609-1-lei4.wang@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zp-8o7dGivU_ek86@google.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 23, 2024 at 10:23:37PM +0800, Sean Christopherson wrote:
-> On Tue, Jul 23, 2024, Hou Wenlong wrote:
-> > On Tue, Jul 23, 2024 at 07:59:22AM +0800, Sean Christopherson wrote:
-> > > ---
-> > > 
-> > > I found this by inspection when backporting Hou's change to an internal kernel.
-> > > I don't love piggybacking Intel's "you can't touch these special MSRs" behavior,
-> > > but ignoring the userspace MSR filters is far worse IMO.  E.g. if userspace is
-> > > denying access to an MSR in order to reduce KVM's attack surface, letting L1
-> > > sneak in reads/writes through VM-Enter/VM-Exit completely circumvents the
-> > > filters.
-> > > 
-> > >  Documentation/virt/kvm/api.rst  | 19 ++++++++++++++++---
-> > >  arch/x86/include/asm/kvm_host.h |  2 ++
-> > >  arch/x86/kvm/vmx/nested.c       | 12 ++++++------
-> > >  arch/x86/kvm/x86.c              |  6 ++++--
-> > >  4 files changed, 28 insertions(+), 11 deletions(-)
-> > > 
-> > > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> > > index 8e5dad80b337..e6b1e42186f3 100644
-> > > --- a/Documentation/virt/kvm/api.rst
-> > > +++ b/Documentation/virt/kvm/api.rst
-> > > @@ -4226,9 +4226,22 @@ filtering. In that mode, ``KVM_MSR_FILTER_DEFAULT_DENY`` is invalid and causes
-> > >  an error.
-> > >  
-> > >  .. warning::
-> > > -   MSR accesses as part of nested VM-Enter/VM-Exit are not filtered.
-> > > -   This includes both writes to individual VMCS fields and reads/writes
-> > > -   through the MSR lists pointed to by the VMCS.
-> > > +   MSR accesses that are side effects of instruction execution (emulated or
-> > > +   native) are not filtered as hardware does not honor MSR bitmaps outside of
-> > > +   RDMSR and WRMSR, and KVM mimics that behavior when emulating instructions
-> > > +   to avoid pointless divergence from hardware.  E.g. RDPID reads MSR_TSC_AUX,
-> > > +   SYSENTER reads the SYSENTER MSRs, etc.
-> > > +
-> > > +   MSRs that are loaded/stored via dedicated VMCS fields are not filtered as
-> > > +   part of VM-Enter/VM-Exit emulation.
-> > > +
-> > > +   MSRs that are loaded/store via VMX's load/store lists _are_ filtered as part
-> > > +   of VM-Enter/VM-Exit emulation.  If an MSR access is denied on VM-Enter, KVM
-> > > +   synthesizes a consistency check VM-Exit(EXIT_REASON_MSR_LOAD_FAIL).  If an
-> > > +   MSR access is denied on VM-Exit, KVM synthesizes a VM-Abort.  In short, KVM
-> > > +   extends Intel's architectural list of MSRs that cannot be loaded/saved via
-> > > +   the VM-Enter/VM-Exit MSR list.  It is platform owner's responsibility to
-> > > +   to communicate any such restrictions to their end users.
-> > >
-> > Do we also need to modify the statement before this warning?
-> 
-> Yeah, that's a good idea.
-> 
-> While you're here, did you have a use case that is/was affected by the current
-> VM-Enter/VM-Exit vs. MSR filtering behavior?
->
-Uh, nested virtualization is not usually used in our enviroment and I
-didn't test it with MSR filtering before. I found a conflict between MSR
-filtering and RDPID instruction emulation when testing the x86 emulator
-for PVM, so I sent this patch. At that time, I was thinking that the
-state transitions (including VM-Enter/VM-Exit) would also be affected by
-MSR filtering, so I mentioned it in the commit message.
+Because the index value of the VMCS field encoding of Secondary VM-exit
+controls, 0x44, is larger than any existing index value, raise the highest
+index value used for any VMCS encoding to 0x44.
 
-> > Since the behaviour is different from RDMSR/WRMSR emulation case.
-> > 
-> > ```
-> > if an MSR access is denied by userspace the resulting KVM behavior depends on
-> > whether or not KVM_CAP_X86_USER_SPACE_MSR's KVM_MSR_EXIT_REASON_FILTER is
-> > enabled.  If KVM_MSR_EXIT_REASON_FILTER is enabled, KVM will exit to userspace
-> > on denied accesses, i.e. userspace effectively intercepts the MSR access.
-> > ```
+Because the index value of the VMCS field encoding of FRED injected-event
+data (one of the newly added VMCS fields for FRED transitions), 0x52, is
+larger than any existing index value, raise the highest index value used
+for any VMCS encoding to 0x52.
+
+Co-developed-by: Xin Li <xin3.li@intel.com>
+Signed-off-by: Xin Li <xin3.li@intel.com>
+Signed-off-by: Lei Wang <lei4.wang@intel.com>
+---
+ target/i386/cpu.h     | 1 +
+ target/i386/kvm/kvm.c | 9 ++++++++-
+ 2 files changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/target/i386/cpu.h b/target/i386/cpu.h
+index c6cc035df3..5604cc2994 100644
+--- a/target/i386/cpu.h
++++ b/target/i386/cpu.h
+@@ -1192,6 +1192,7 @@ uint64_t x86_cpu_get_supported_feature_word(X86CPU *cpu, FeatureWord w);
+ #define VMX_VM_EXIT_PT_CONCEAL_PIP                  0x01000000
+ #define VMX_VM_EXIT_CLEAR_IA32_RTIT_CTL             0x02000000
+ #define VMX_VM_EXIT_LOAD_IA32_PKRS                  0x20000000
++#define VMX_VM_EXIT_ACTIVATE_SECONDARY_CONTROLS     0x80000000
+ 
+ #define VMX_VM_ENTRY_LOAD_DEBUG_CONTROLS            0x00000004
+ #define VMX_VM_ENTRY_IA32E_MODE                     0x00000200
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index b4aab9a410..7c8cb16675 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -3694,7 +3694,14 @@ static void kvm_msr_entry_add_vmx(X86CPU *cpu, FeatureWordArray f)
+     kvm_msr_entry_add(cpu, MSR_IA32_VMX_CR4_FIXED0,
+                       CR4_VMXE_MASK);
+ 
+-    if (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_TSC_SCALING) {
++    if (f[FEAT_7_1_EAX] & CPUID_7_1_EAX_FRED) {
++        /* FRED injected-event data (0x2052).  */
++        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x52);
++    } else if (f[FEAT_VMX_EXIT_CTLS] &
++               VMX_VM_EXIT_ACTIVATE_SECONDARY_CONTROLS) {
++        /* Secondary VM-exit controls (0x2044).  */
++        kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x44);
++    } else if (f[FEAT_VMX_SECONDARY_CTLS] & VMX_SECONDARY_EXEC_TSC_SCALING) {
+         /* TSC multiplier (0x2032).  */
+         kvm_msr_entry_add(cpu, MSR_IA32_VMX_VMCS_ENUM, 0x32);
+     } else {
+-- 
+2.39.3
+
 
