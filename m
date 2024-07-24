@@ -1,1101 +1,148 @@
-Return-Path: <kvm+bounces-22146-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22147-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1FD393AA76
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 03:14:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9185F93AA95
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 03:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD9A3284E25
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 01:14:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 53192282975
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 01:30:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA5B139D0A;
-	Wed, 24 Jul 2024 01:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tOIS22jB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC143BA47;
+	Wed, 24 Jul 2024 01:30:16 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD8054918
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 01:11:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26C474A19;
+	Wed, 24 Jul 2024 01:30:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721783488; cv=none; b=tTbz4WHY31UIwyUpU5v8ZeUJEJHSXDXk7YDFGAfVjFe7PvQvUD3f6bRu2iBRWW9BiGcWXs0ppkrerNyeHe0AdhHT8Zom8uYenIRwUojY18yktzi1FWr20ZdZn3F3nC4b49T6+nYGVqOJSH8tYS4XpXVQQJb1ScGZ2f5kzRhW+d4=
+	t=1721784616; cv=none; b=fozJD3N8BudPTj/8iB7iDoOAUeU/qePGILuktS42B6vhu/fTS+2EO6gRa3Ph1FcGELZ2wsOqyHNX4Q+HDGvsRIX/l6iS4+Gc7NhLHRYhguSrMfL2JlqkVOgfGqfLq8T/Rkrat8rZV+Mjsr9kQO3BEIoKwbJObOelVz40fvWLneM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721783488; c=relaxed/simple;
-	bh=PhtD3PFYdeiOutyF9HwlCWz3fYiU3k2VEEc0rNY9zLo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=oirWksPzyuUKkU/aS3zyxadOyVOvr4WE3uvb5c/fYmXKzXqC1crnDj4XckTYtaTWvZQ39daK9vwC8b7DN3kaK7q4ilROJ4g4K2IylRo1ZLUgIbSgx+XJs7ykjTpI1XIDrsLhJbA14lqK2J4z6uWguq7gTJWBzNblRNYyYzFMqGQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tOIS22jB; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jthoughton.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-66b8faa2a4aso105601447b3.0
-        for <kvm@vger.kernel.org>; Tue, 23 Jul 2024 18:11:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721783483; x=1722388283; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=lFFc/b0SZHtH5PvRwJV5gBsUXTybIUywMYm4prtgkD8=;
-        b=tOIS22jBRlfqQN5ql6udOcyqKPq2gP0S7dlSK6iaowSgnBCMCsNh9TGaZOCxo66j2H
-         c0CIandDLaQLKFfikC0KkNaBfOlGfupJ4ZPE2CAb7FOtohoEm6l8G+dbKn0pNQlPdYRo
-         Hilu86XRpV1ymiKj648vsoMgEMlILs0RiLDw/Y9MZ0wWbzowu2XUcPkglINsOymNzmMj
-         sYK1780OE4a5Xui56iAhNLjuP1inQnK24s2AloUeqq6nWHBqo4RHCyUMUtVowY+6FK6g
-         Y5JUe77q1Oz87PjXVPeVZqIYHJqbd1HmnsU41HJUBSEnvoOLil95H7/8Uzt6Swv4p1AR
-         FmOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721783483; x=1722388283;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lFFc/b0SZHtH5PvRwJV5gBsUXTybIUywMYm4prtgkD8=;
-        b=NOX3ZMqdHsj+9FzGLRYNoAy7YVi8UyLQtB8ds/xUQMF3UxipdJrveXC74eT0BTfsPU
-         ZDXowNdhy7xHc0bLkQ5yFAXXqKEOFpM9jxfYtqMbY3GBNnJWev5sWGQAeRcGs8lgI5Y/
-         CBp6YhyyaosOWJOIZlOPieiBhP8qnXEvL73mJfQcsAKqN4ce91j4s4tORnfoMHaHTVOH
-         HNo0sGe5QwLlWPjz0OwoVcd7uEnlYVxbLS4/TnvmVVWbN+nsofdFqcepoYL1vfc8m1Ru
-         JSBZp4MKmoLxaLXhclK545qu2N8lO2PI8md+gNSVV5mAJ9xkEklZLN0QyB42TvfXq+n/
-         DjLw==
-X-Forwarded-Encrypted: i=1; AJvYcCUt8IysKMrujvbOTFt/FB+uMSOwRRMOBo7lL/2glpmiACDLH3c7LRHw1eiglByf3Ft8PQyJXjEL58nPwGTZuWoVeZgV
-X-Gm-Message-State: AOJu0Yyjq9DAY2cdCTcoOEuidJoyUO0pT/fcWMh1r3LtqHqCFfFQUIxj
-	otrzJyFfTqzdIy64kVWF7jG5FbE8Oom8k51aePJtVeZujFmbSjTgYYaj/jLV4ApvXXlzFvbi5pO
-	EEY0EQTxFcO6quoOOmQ==
-X-Google-Smtp-Source: AGHT+IFEIajFgnErDuOT6uI6bOlya+mYXH6dqjGmzwZ7kR+UC01pVNZSxx8yQNnshgmFjkn15/YQFjmWZXqs5tUQ
-X-Received: from jthoughton.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:2a4f])
- (user=jthoughton job=sendgmr) by 2002:a05:690c:660d:b0:648:afcb:a7ce with
- SMTP id 00721157ae682-66a63f4a795mr4937557b3.3.1721783483291; Tue, 23 Jul
- 2024 18:11:23 -0700 (PDT)
-Date: Wed, 24 Jul 2024 01:10:36 +0000
-In-Reply-To: <20240724011037.3671523-1-jthoughton@google.com>
+	s=arc-20240116; t=1721784616; c=relaxed/simple;
+	bh=bSV/tn8rgIr3LZKicy7ygBdBwp4x2cZxxscf4ukTabw=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=jlgZO+hGpAn/1myd1ufrWNDv9wnrVyWSgO64Tq5UkZ+GNoandSl323LfRp9MivvmLKz2P5uL4cjzQbpK5gK+msHK/p5gTSy+poyYyVwKCpVwc0/Xb0c8KmxDdleMHarN+V4bjA93LXwX4NQ0GHvkryz05OKcAdSGMdZc2BJ2q5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8CxuOkeWaBm18QAAA--.3046S3;
+	Wed, 24 Jul 2024 09:30:06 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxhsUXWaBm2ZNWAA--.50225S3;
+	Wed, 24 Jul 2024 09:30:01 +0800 (CST)
+Subject: Re: [PATCH 2/2] LoongArch: KVM: Add paravirt qspinlock in guest side
+To: kernel test robot <lkp@intel.com>, Huacai Chen <chenhuacai@kernel.org>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Peter Zijlstra
+ <peterz@infradead.org>, Waiman Long <longman@redhat.com>
+Cc: oe-kbuild-all@lists.linux.dev, WANG Xuerui <kernel@xen0n.name>,
+ loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev
+References: <20240723073825.1811600-3-maobibo@loongson.cn>
+ <202407240320.qqd1uWiE-lkp@intel.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <7a145178-633c-afd7-4aba-45546a4c7a75@loongson.cn>
+Date: Wed, 24 Jul 2024 09:29:59 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240724011037.3671523-1-jthoughton@google.com>
-X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240724011037.3671523-12-jthoughton@google.com>
-Subject: [PATCH v6 11/11] KVM: selftests: Add multi-gen LRU aging to access_tracking_perf_test
-From: James Houghton <jthoughton@google.com>
-To: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Houghton <jthoughton@google.com>, 
-	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
-	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Sean Christopherson <seanjc@google.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+In-Reply-To: <202407240320.qqd1uWiE-lkp@intel.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8AxhsUXWaBm2ZNWAA--.50225S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxGFW3Zw4UZryruF17KryxXrc_yoW5CFWDpa
+	48CF1DJFW8Jr48Z3yUKw15uF1Dtan8W3sIvF9Y9ryxCFW2qFyDWws2krWa9w1jyws29Fyj
+	gry7WF1qya4UA3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWU
+	AwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l
+	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jrv_JF1lx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+	42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07jYpB-UUUUU=
 
-This test now has two modes of operation:
-1. (default) To check how much vCPU performance was affected by access
-             tracking (previously existed, now supports MGLRU aging).
-2. (-p) To also benchmark how fast MGLRU can do aging while vCPUs are
-        faulting in memory.
 
-Mode (1) also serves as a way to verify that aging is working properly
-for pages only accessed by KVM.  It will fail if one does not have the
-0x8 lru_gen feature bit.
 
-To support MGLRU, the test creates a memory cgroup, moves itself into
-it, then uses the lru_gen debugfs output to track memory in that cgroup.
-The logic to parse the lru_gen debugfs output has been put into
-selftests/kvm/lib/lru_gen_util.c.
+On 2024/7/24 上午3:57, kernel test robot wrote:
+> Hi Bibo,
+> 
+> kernel test robot noticed the following build errors:
+yes, forgot to mention, it depends on this patch
+https://lore.kernel.org/lkml/20240721164552.50175-1-ubizjak@gmail.com/
 
-Co-developed-by: Axel Rasmussen <axelrasmussen@google.com>
-Signed-off-by: Axel Rasmussen <axelrasmussen@google.com>
-Signed-off-by: James Houghton <jthoughton@google.com>
----
- tools/testing/selftests/kvm/Makefile          |   1 +
- .../selftests/kvm/access_tracking_perf_test.c | 369 +++++++++++++++--
- .../selftests/kvm/include/lru_gen_util.h      |  55 +++
- .../testing/selftests/kvm/lib/lru_gen_util.c  | 391 ++++++++++++++++++
- 4 files changed, 786 insertions(+), 30 deletions(-)
- create mode 100644 tools/testing/selftests/kvm/include/lru_gen_util.h
- create mode 100644 tools/testing/selftests/kvm/lib/lru_gen_util.c
-
-diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-index b084ba2262a0..0ab8d3f4628c 100644
---- a/tools/testing/selftests/kvm/Makefile
-+++ b/tools/testing/selftests/kvm/Makefile
-@@ -22,6 +22,7 @@ LIBKVM += lib/elf.c
- LIBKVM += lib/guest_modes.c
- LIBKVM += lib/io.c
- LIBKVM += lib/kvm_util.c
-+LIBKVM += lib/lru_gen_util.c
- LIBKVM += lib/memstress.c
- LIBKVM += lib/guest_sprintf.c
- LIBKVM += lib/rbtree.c
-diff --git a/tools/testing/selftests/kvm/access_tracking_perf_test.c b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-index 3c7defd34f56..6ff64ac349a9 100644
---- a/tools/testing/selftests/kvm/access_tracking_perf_test.c
-+++ b/tools/testing/selftests/kvm/access_tracking_perf_test.c
-@@ -38,6 +38,7 @@
- #include <inttypes.h>
- #include <limits.h>
- #include <pthread.h>
-+#include <stdio.h>
- #include <sys/mman.h>
- #include <sys/types.h>
- #include <sys/stat.h>
-@@ -47,6 +48,20 @@
- #include "memstress.h"
- #include "guest_modes.h"
- #include "processor.h"
-+#include "lru_gen_util.h"
-+
-+static const char *TEST_MEMCG_NAME = "access_tracking_perf_test";
-+static const int LRU_GEN_ENABLED = 0x1;
-+static const int LRU_GEN_MM_WALK = 0x2;
-+static const int LRU_GEN_SECONDARY_MMU_WALK = 0x8;
-+static const char *CGROUP_PROCS = "cgroup.procs";
-+/*
-+ * If using MGLRU, this test assumes a cgroup v2 or cgroup v1 memory hierarchy
-+ * is mounted at cgroup_root.
-+ *
-+ * Can be changed with -r.
-+ */
-+static const char *cgroup_root = "/sys/fs/cgroup";
- 
- /* Global variable used to synchronize all of the vCPU threads. */
- static int iteration;
-@@ -62,6 +77,9 @@ static enum {
- /* The iteration that was last completed by each vCPU. */
- static int vcpu_last_completed_iteration[KVM_MAX_VCPUS];
- 
-+/* The time at which the last iteration was completed */
-+static struct timespec vcpu_last_completed_time[KVM_MAX_VCPUS];
-+
- /* Whether to overlap the regions of memory vCPUs access. */
- static bool overlap_memory_access;
- 
-@@ -74,6 +92,12 @@ struct test_params {
- 
- 	/* The number of vCPUs to create in the VM. */
- 	int nr_vcpus;
-+
-+	/* Whether to use lru_gen aging instead of idle page tracking. */
-+	bool lru_gen;
-+
-+	/* Whether to test the performance of aging itself. */
-+	bool benchmark_lru_gen;
- };
- 
- static uint64_t pread_uint64(int fd, const char *filename, uint64_t index)
-@@ -89,6 +113,50 @@ static uint64_t pread_uint64(int fd, const char *filename, uint64_t index)
- 
- }
- 
-+static void write_file_long(const char *path, long v)
-+{
-+	FILE *f;
-+
-+	f = fopen(path, "w");
-+	TEST_ASSERT(f, "fopen(%s) failed", path);
-+	TEST_ASSERT(fprintf(f, "%ld\n", v) > 0,
-+		    "fprintf to %s failed", path);
-+	TEST_ASSERT(!fclose(f), "fclose(%s) failed", path);
-+}
-+
-+static char *path_join(const char *parent, const char *child)
-+{
-+	char *out = NULL;
-+
-+	return asprintf(&out, "%s/%s", parent, child) >= 0 ? out : NULL;
-+}
-+
-+static char *memcg_path(const char *memcg)
-+{
-+	return path_join(cgroup_root, memcg);
-+}
-+
-+static char *memcg_file_path(const char *memcg, const char *file)
-+{
-+	char *mp = memcg_path(memcg);
-+	char *fp;
-+
-+	if (!mp)
-+		return NULL;
-+	fp = path_join(mp, file);
-+	free(mp);
-+	return fp;
-+}
-+
-+static void move_to_memcg(const char *memcg, pid_t pid)
-+{
-+	char *procs = memcg_file_path(memcg, CGROUP_PROCS);
-+
-+	TEST_ASSERT(procs, "Failed to construct cgroup.procs path");
-+	write_file_long(procs, pid);
-+	free(procs);
-+}
-+
- #define PAGEMAP_PRESENT (1ULL << 63)
- #define PAGEMAP_PFN_MASK ((1ULL << 55) - 1)
- 
-@@ -242,6 +310,8 @@ static void vcpu_thread_main(struct memstress_vcpu_args *vcpu_args)
- 		};
- 
- 		vcpu_last_completed_iteration[vcpu_idx] = current_iteration;
-+		clock_gettime(CLOCK_MONOTONIC,
-+			      &vcpu_last_completed_time[vcpu_idx]);
- 	}
- }
- 
-@@ -253,38 +323,68 @@ static void spin_wait_for_vcpu(int vcpu_idx, int target_iteration)
- 	}
- }
- 
-+static bool all_vcpus_done(int target_iteration, int nr_vcpus)
-+{
-+	for (int i = 0; i < nr_vcpus; ++i)
-+		if (READ_ONCE(vcpu_last_completed_iteration[i]) !=
-+		    target_iteration)
-+			return false;
-+
-+	return true;
-+}
-+
- /* The type of memory accesses to perform in the VM. */
- enum access_type {
- 	ACCESS_READ,
- 	ACCESS_WRITE,
- };
- 
--static void run_iteration(struct kvm_vm *vm, int nr_vcpus, const char *description)
-+static void run_iteration(struct kvm_vm *vm, int nr_vcpus, const char *description,
-+			  bool wait)
- {
--	struct timespec ts_start;
--	struct timespec ts_elapsed;
- 	int next_iteration, i;
- 
- 	/* Kick off the vCPUs by incrementing iteration. */
- 	next_iteration = ++iteration;
- 
--	clock_gettime(CLOCK_MONOTONIC, &ts_start);
--
- 	/* Wait for all vCPUs to finish the iteration. */
--	for (i = 0; i < nr_vcpus; i++)
--		spin_wait_for_vcpu(i, next_iteration);
-+	if (wait) {
-+		struct timespec ts_start;
-+		struct timespec ts_elapsed;
-+
-+		clock_gettime(CLOCK_MONOTONIC, &ts_start);
- 
--	ts_elapsed = timespec_elapsed(ts_start);
--	pr_info("%-30s: %ld.%09lds\n",
--		description, ts_elapsed.tv_sec, ts_elapsed.tv_nsec);
-+		for (i = 0; i < nr_vcpus; i++)
-+			spin_wait_for_vcpu(i, next_iteration);
-+
-+		ts_elapsed = timespec_elapsed(ts_start);
-+
-+		pr_info("%-30s: %ld.%09lds\n",
-+			description, ts_elapsed.tv_sec, ts_elapsed.tv_nsec);
-+	} else
-+		pr_info("%-30s\n", description);
- }
- 
--static void access_memory(struct kvm_vm *vm, int nr_vcpus,
--			  enum access_type access, const char *description)
-+static void _access_memory(struct kvm_vm *vm, int nr_vcpus,
-+			   enum access_type access, const char *description,
-+			   bool wait)
- {
- 	memstress_set_write_percent(vm, (access == ACCESS_READ) ? 0 : 100);
- 	iteration_work = ITERATION_ACCESS_MEMORY;
--	run_iteration(vm, nr_vcpus, description);
-+	run_iteration(vm, nr_vcpus, description, wait);
-+}
-+
-+static void access_memory(struct kvm_vm *vm, int nr_vcpus,
-+			  enum access_type access, const char *description)
-+{
-+	return _access_memory(vm, nr_vcpus, access, description, true);
-+}
-+
-+static void access_memory_async(struct kvm_vm *vm, int nr_vcpus,
-+				enum access_type access,
-+				const char *description)
-+{
-+	return _access_memory(vm, nr_vcpus, access, description, false);
- }
- 
- static void mark_memory_idle(struct kvm_vm *vm, int nr_vcpus)
-@@ -297,19 +397,115 @@ static void mark_memory_idle(struct kvm_vm *vm, int nr_vcpus)
- 	 */
- 	pr_debug("Marking VM memory idle (slow)...\n");
- 	iteration_work = ITERATION_MARK_IDLE;
--	run_iteration(vm, nr_vcpus, "Mark memory idle");
-+	run_iteration(vm, nr_vcpus, "Mark memory idle", true);
- }
- 
--static void run_test(enum vm_guest_mode mode, void *arg)
-+static void create_memcg(const char *memcg)
-+{
-+	const char *full_memcg_path = memcg_path(memcg);
-+	int ret;
-+
-+	TEST_ASSERT(full_memcg_path, "Failed to construct full memcg path");
-+retry:
-+	ret = mkdir(full_memcg_path, 0755);
-+	if (ret && errno == EEXIST) {
-+		TEST_ASSERT(!rmdir(full_memcg_path),
-+			    "Found existing memcg at %s, but rmdir failed",
-+			    full_memcg_path);
-+		goto retry;
-+	}
-+	TEST_ASSERT(!ret, "Creating the memcg failed: mkdir(%s) failed",
-+		    full_memcg_path);
-+
-+	pr_info("Created memcg at %s\n", full_memcg_path);
-+}
-+
-+/*
-+ * Test lru_gen aging speed while vCPUs are faulting memory in.
-+ *
-+ * This test will run lru_gen aging until the vCPUs have finished all of
-+ * the faulting work, reporting:
-+ *  - vcpu wall time (wall time for slowest vCPU)
-+ *  - average aging pass duration
-+ *  - total number of aging passes
-+ *  - total time spent aging
-+ *
-+ * This test produces the most useful results when the vcpu wall time and the
-+ * total time spent aging are similar (i.e., we want to avoid timing aging
-+ * while the vCPUs aren't doing any work).
-+ */
-+static void run_benchmark(enum vm_guest_mode mode, struct kvm_vm *vm,
-+			  struct test_params *params)
- {
--	struct test_params *params = arg;
--	struct kvm_vm *vm;
- 	int nr_vcpus = params->nr_vcpus;
-+	struct memcg_stats stats;
-+	struct timespec ts_start, ts_max, ts_vcpus_elapsed,
-+			ts_aging_elapsed, ts_aging_elapsed_avg;
-+	int num_passes = 0;
- 
--	vm = memstress_create_vm(mode, nr_vcpus, params->vcpu_memory_bytes, 1,
--				 params->backing_src, !overlap_memory_access);
-+	printf("Running lru_gen benchmark...\n");
- 
--	memstress_start_vcpu_threads(nr_vcpus, vcpu_thread_main);
-+	clock_gettime(CLOCK_MONOTONIC, &ts_start);
-+	access_memory_async(vm, nr_vcpus, ACCESS_WRITE,
-+			    "Populating memory (async)");
-+	while (!all_vcpus_done(iteration, nr_vcpus)) {
-+		lru_gen_do_aging_quiet(&stats, TEST_MEMCG_NAME);
-+		++num_passes;
-+	}
-+
-+	ts_aging_elapsed = timespec_elapsed(ts_start);
-+	ts_aging_elapsed_avg = timespec_div(ts_aging_elapsed, num_passes);
-+
-+	/* Find out when the slowest vCPU finished. */
-+	ts_max = ts_start;
-+	for (int i = 0; i < nr_vcpus; ++i) {
-+		struct timespec *vcpu_ts = &vcpu_last_completed_time[i];
-+
-+		if (ts_max.tv_sec < vcpu_ts->tv_sec ||
-+		    (ts_max.tv_sec == vcpu_ts->tv_sec  &&
-+		     ts_max.tv_nsec < vcpu_ts->tv_nsec))
-+			ts_max = *vcpu_ts;
-+	}
-+
-+	ts_vcpus_elapsed = timespec_sub(ts_max, ts_start);
-+
-+	pr_info("%-30s: %ld.%09lds\n", "vcpu wall time",
-+		ts_vcpus_elapsed.tv_sec, ts_vcpus_elapsed.tv_nsec);
-+
-+	pr_info("%-30s: %ld.%09lds, (passes:%d, total:%ld.%09lds)\n",
-+		"lru_gen avg pass duration",
-+		ts_aging_elapsed_avg.tv_sec,
-+		ts_aging_elapsed_avg.tv_nsec,
-+		num_passes,
-+		ts_aging_elapsed.tv_sec,
-+		ts_aging_elapsed.tv_nsec);
-+}
-+
-+/*
-+ * Test how much access tracking affects vCPU performance.
-+ *
-+ * Supports two modes of access tracking:
-+ * - idle page tracking
-+ * - lru_gen aging
-+ *
-+ * When using lru_gen, this test additionally verifies that the pages are in
-+ * fact getting younger and older, otherwise the performance data would be
-+ * invalid.
-+ *
-+ * The forced lru_gen aging can race with aging that occurs naturally.
-+ */
-+static void run_test(enum vm_guest_mode mode, struct kvm_vm *vm,
-+		     struct test_params *params)
-+{
-+	int nr_vcpus = params->nr_vcpus;
-+	bool lru_gen = params->lru_gen;
-+	struct memcg_stats stats;
-+	// If guest_page_size is larger than the host's page size, the
-+	// guest (memstress) will only fault in a subset of the host's pages.
-+	long total_pages = nr_vcpus * params->vcpu_memory_bytes /
-+			   max(memstress_args.guest_page_size,
-+			       (uint64_t)getpagesize());
-+	int found_gens[5];
- 
- 	pr_info("\n");
- 	access_memory(vm, nr_vcpus, ACCESS_WRITE, "Populating memory");
-@@ -319,11 +515,78 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- 	access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from populated memory");
- 
- 	/* Repeat on memory that has been marked as idle. */
--	mark_memory_idle(vm, nr_vcpus);
-+	if (lru_gen) {
-+		/* Do an initial page table scan */
-+		lru_gen_do_aging(&stats, TEST_MEMCG_NAME);
-+		TEST_ASSERT(sum_memcg_stats(&stats) >= total_pages,
-+		  "Not all pages tracked in lru_gen stats.\n"
-+		  "Is lru_gen enabled? Did the memcg get created properly?");
-+
-+		/* Find the generation we're currently in (probably youngest) */
-+		found_gens[0] = lru_gen_find_generation(&stats, total_pages);
-+
-+		/* Do an aging pass now */
-+		lru_gen_do_aging(&stats, TEST_MEMCG_NAME);
-+
-+		/* Same generation, but a newer generation has been made */
-+		found_gens[1] = lru_gen_find_generation(&stats, total_pages);
-+		TEST_ASSERT(found_gens[1] == found_gens[0],
-+			    "unexpected gen change: %d vs. %d",
-+			    found_gens[1], found_gens[0]);
-+	} else
-+		mark_memory_idle(vm, nr_vcpus);
-+
- 	access_memory(vm, nr_vcpus, ACCESS_WRITE, "Writing to idle memory");
--	mark_memory_idle(vm, nr_vcpus);
-+
-+	if (lru_gen) {
-+		/* Scan the page tables again */
-+		lru_gen_do_aging(&stats, TEST_MEMCG_NAME);
-+
-+		/* The pages should now be young again, so in a newer generation */
-+		found_gens[2] = lru_gen_find_generation(&stats, total_pages);
-+		TEST_ASSERT(found_gens[2] > found_gens[1],
-+			    "pages did not get younger");
-+
-+		/* Do another aging pass */
-+		lru_gen_do_aging(&stats, TEST_MEMCG_NAME);
-+
-+		/* Same generation; new generation has been made */
-+		found_gens[3] = lru_gen_find_generation(&stats, total_pages);
-+		TEST_ASSERT(found_gens[3] == found_gens[2],
-+			    "unexpected gen change: %d vs. %d",
-+			    found_gens[3], found_gens[2]);
-+	} else
-+		mark_memory_idle(vm, nr_vcpus);
-+
- 	access_memory(vm, nr_vcpus, ACCESS_READ, "Reading from idle memory");
- 
-+	if (lru_gen) {
-+		/* Scan the pages tables again */
-+		lru_gen_do_aging(&stats, TEST_MEMCG_NAME);
-+
-+		/* The pages should now be young again, so in a newer generation */
-+		found_gens[4] = lru_gen_find_generation(&stats, total_pages);
-+		TEST_ASSERT(found_gens[4] > found_gens[3],
-+			    "pages did not get younger");
-+	}
-+}
-+
-+static void setup_vm_and_run(enum vm_guest_mode mode, void *arg)
-+{
-+	struct test_params *params = arg;
-+	int nr_vcpus = params->nr_vcpus;
-+	struct kvm_vm *vm;
-+
-+	vm = memstress_create_vm(mode, nr_vcpus, params->vcpu_memory_bytes, 1,
-+				 params->backing_src, !overlap_memory_access);
-+
-+	memstress_start_vcpu_threads(nr_vcpus, vcpu_thread_main);
-+
-+	if (params->benchmark_lru_gen)
-+		run_benchmark(mode, vm, params);
-+	else
-+		run_test(mode, vm, params);
-+
- 	memstress_join_vcpu_threads(nr_vcpus);
- 	memstress_destroy_vm(vm);
- }
-@@ -331,8 +594,8 @@ static void run_test(enum vm_guest_mode mode, void *arg)
- static void help(char *name)
- {
- 	puts("");
--	printf("usage: %s [-h] [-m mode] [-b vcpu_bytes] [-v vcpus] [-o]  [-s mem_type]\n",
--	       name);
-+	printf("usage: %s [-h] [-m mode] [-b vcpu_bytes] [-v vcpus] [-o]"
-+	       " [-s mem_type] [-l] [-r memcg_root]\n", name);
- 	puts("");
- 	printf(" -h: Display this help message.");
- 	guest_modes_help();
-@@ -342,6 +605,9 @@ static void help(char *name)
- 	printf(" -v: specify the number of vCPUs to run.\n");
- 	printf(" -o: Overlap guest memory accesses instead of partitioning\n"
- 	       "     them into a separate region of memory for each vCPU.\n");
-+	printf(" -l: Use MGLRU aging instead of idle page tracking\n");
-+	printf(" -p: Benchmark MGLRU aging while faulting memory in\n");
-+	printf(" -r: The memory cgroup hierarchy root to use (when -l is given)\n");
- 	backing_src_help("-s");
- 	puts("");
- 	exit(0);
-@@ -353,13 +619,15 @@ int main(int argc, char *argv[])
- 		.backing_src = DEFAULT_VM_MEM_SRC,
- 		.vcpu_memory_bytes = DEFAULT_PER_VCPU_MEM_SIZE,
- 		.nr_vcpus = 1,
-+		.lru_gen = false,
-+		.benchmark_lru_gen = false,
- 	};
- 	int page_idle_fd;
- 	int opt;
- 
- 	guest_modes_append_default();
- 
--	while ((opt = getopt(argc, argv, "hm:b:v:os:")) != -1) {
-+	while ((opt = getopt(argc, argv, "hm:b:v:os:lr:p")) != -1) {
- 		switch (opt) {
- 		case 'm':
- 			guest_modes_cmdline(optarg);
-@@ -376,6 +644,15 @@ int main(int argc, char *argv[])
- 		case 's':
- 			params.backing_src = parse_backing_src_type(optarg);
- 			break;
-+		case 'l':
-+			params.lru_gen = true;
-+			break;
-+		case 'p':
-+			params.benchmark_lru_gen = true;
-+			break;
-+		case 'r':
-+			cgroup_root = strdup(optarg);
-+			break;
- 		case 'h':
- 		default:
- 			help(argv[0]);
-@@ -383,12 +660,44 @@ int main(int argc, char *argv[])
- 		}
- 	}
- 
--	page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
--	__TEST_REQUIRE(page_idle_fd >= 0,
--		       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
--	close(page_idle_fd);
-+	if (!params.lru_gen) {
-+		page_idle_fd = open("/sys/kernel/mm/page_idle/bitmap", O_RDWR);
-+		__TEST_REQUIRE(page_idle_fd >= 0,
-+			       "CONFIG_IDLE_PAGE_TRACKING is not enabled");
-+		close(page_idle_fd);
-+	} else {
-+		int lru_gen_fd, lru_gen_debug_fd;
-+		long mglru_features;
-+		char mglru_feature_str[8] = {};
-+
-+		lru_gen_fd = open("/sys/kernel/mm/lru_gen/enabled", O_RDONLY);
-+		__TEST_REQUIRE(lru_gen_fd >= 0,
-+			       "CONFIG_LRU_GEN is not enabled");
-+		TEST_ASSERT(read(lru_gen_fd, &mglru_feature_str, 7) > 0,
-+				 "couldn't read lru_gen features");
-+		mglru_features = strtol(mglru_feature_str, NULL, 16);
-+		__TEST_REQUIRE(mglru_features & LRU_GEN_ENABLED,
-+			       "lru_gen is not enabled");
-+		__TEST_REQUIRE(mglru_features & LRU_GEN_MM_WALK,
-+			       "lru_gen does not support MM_WALK");
-+		__TEST_REQUIRE(mglru_features & LRU_GEN_SECONDARY_MMU_WALK,
-+			       "lru_gen does not support SECONDARY_MMU_WALK");
-+
-+		lru_gen_debug_fd = open(DEBUGFS_LRU_GEN, O_RDWR);
-+		__TEST_REQUIRE(lru_gen_debug_fd >= 0,
-+				"Cannot access %s", DEBUGFS_LRU_GEN);
-+		close(lru_gen_debug_fd);
-+	}
-+
-+	TEST_ASSERT(!params.benchmark_lru_gen || params.lru_gen,
-+		    "-p specified without -l");
-+
-+	if (params.lru_gen) {
-+		create_memcg(TEST_MEMCG_NAME);
-+		move_to_memcg(TEST_MEMCG_NAME, getpid());
-+	}
- 
--	for_each_guest_mode(run_test, &params);
-+	for_each_guest_mode(setup_vm_and_run, &params);
- 
- 	return 0;
- }
-diff --git a/tools/testing/selftests/kvm/include/lru_gen_util.h b/tools/testing/selftests/kvm/include/lru_gen_util.h
-new file mode 100644
-index 000000000000..4eef8085a3cb
---- /dev/null
-+++ b/tools/testing/selftests/kvm/include/lru_gen_util.h
-@@ -0,0 +1,55 @@
-+/* SPDX-License-Identifier: GPL-2.0-only */
-+/*
-+ * Tools for integrating with lru_gen, like parsing the lru_gen debugfs output.
-+ *
-+ * Copyright (C) 2024, Google LLC.
-+ */
-+#ifndef SELFTEST_KVM_LRU_GEN_UTIL_H
-+#define SELFTEST_KVM_LRU_GEN_UTIL_H
-+
-+#include <inttypes.h>
-+#include <limits.h>
-+#include <stdlib.h>
-+
-+#include "test_util.h"
-+
-+#define MAX_NR_GENS 16 /* MAX_NR_GENS in include/linux/mmzone.h */
-+#define MAX_NR_NODES 4 /* Maximum number of nodes we support */
-+
-+static const char *DEBUGFS_LRU_GEN = "/sys/kernel/debug/lru_gen";
-+
-+struct generation_stats {
-+	int gen;
-+	long age_ms;
-+	long nr_anon;
-+	long nr_file;
-+};
-+
-+struct node_stats {
-+	int node;
-+	int nr_gens; /* Number of populated gens entries. */
-+	struct generation_stats gens[MAX_NR_GENS];
-+};
-+
-+struct memcg_stats {
-+	unsigned long memcg_id;
-+	int nr_nodes; /* Number of populated nodes entries. */
-+	struct node_stats nodes[MAX_NR_NODES];
-+};
-+
-+void print_memcg_stats(const struct memcg_stats *stats, const char *name);
-+
-+void read_memcg_stats(struct memcg_stats *stats, const char *memcg);
-+
-+void read_print_memcg_stats(struct memcg_stats *stats, const char *memcg);
-+
-+long sum_memcg_stats(const struct memcg_stats *stats);
-+
-+void lru_gen_do_aging(struct memcg_stats *stats, const char *memcg);
-+
-+void lru_gen_do_aging_quiet(struct memcg_stats *stats, const char *memcg);
-+
-+int lru_gen_find_generation(const struct memcg_stats *stats,
-+			    unsigned long total_pages);
-+
-+#endif /* SELFTEST_KVM_LRU_GEN_UTIL_H */
-diff --git a/tools/testing/selftests/kvm/lib/lru_gen_util.c b/tools/testing/selftests/kvm/lib/lru_gen_util.c
-new file mode 100644
-index 000000000000..3c02a635a9f7
---- /dev/null
-+++ b/tools/testing/selftests/kvm/lib/lru_gen_util.c
-@@ -0,0 +1,391 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2024, Google LLC.
-+ */
-+
-+#include <time.h>
-+
-+#include "lru_gen_util.h"
-+
-+/*
-+ * Tracks state while we parse memcg lru_gen stats. The file we're parsing is
-+ * structured like this (some extra whitespace elided):
-+ *
-+ * memcg (id) (path)
-+ * node (id)
-+ * (gen_nr) (age_in_ms) (nr_anon_pages) (nr_file_pages)
-+ */
-+struct memcg_stats_parse_context {
-+	bool consumed; /* Whether or not this line was consumed */
-+	/* Next parse handler to invoke */
-+	void (*next_handler)(struct memcg_stats *,
-+			     struct memcg_stats_parse_context *, char *);
-+	int current_node_idx; /* Current index in nodes array */
-+	const char *name; /* The name of the memcg we're looking for */
-+};
-+
-+static void memcg_stats_handle_searching(struct memcg_stats *stats,
-+					 struct memcg_stats_parse_context *ctx,
-+					 char *line);
-+static void memcg_stats_handle_in_memcg(struct memcg_stats *stats,
-+					struct memcg_stats_parse_context *ctx,
-+					char *line);
-+static void memcg_stats_handle_in_node(struct memcg_stats *stats,
-+				       struct memcg_stats_parse_context *ctx,
-+				       char *line);
-+
-+struct split_iterator {
-+	char *str;
-+	char *save;
-+};
-+
-+static char *split_next(struct split_iterator *it)
-+{
-+	char *ret = strtok_r(it->str, " \t\n\r", &it->save);
-+
-+	it->str = NULL;
-+	return ret;
-+}
-+
-+static void memcg_stats_handle_searching(struct memcg_stats *stats,
-+					 struct memcg_stats_parse_context *ctx,
-+					 char *line)
-+{
-+	struct split_iterator it = { .str = line };
-+	char *prefix = split_next(&it);
-+	char *memcg_id = split_next(&it);
-+	char *memcg_name = split_next(&it);
-+	char *end;
-+
-+	ctx->consumed = true;
-+
-+	if (!prefix || strcmp("memcg", prefix))
-+		return; /* Not a memcg line (maybe empty), skip */
-+
-+	TEST_ASSERT(memcg_id && memcg_name,
-+		    "malformed memcg line; no memcg id or memcg_name");
-+
-+	if (strcmp(memcg_name + 1, ctx->name))
-+		return; /* Wrong memcg, skip */
-+
-+	/* Found it! */
-+
-+	stats->memcg_id = strtoul(memcg_id, &end, 10);
-+	TEST_ASSERT(*end == '\0', "malformed memcg id '%s'", memcg_id);
-+	if (!stats->memcg_id)
-+		return; /* Removed memcg? */
-+
-+	ctx->next_handler = memcg_stats_handle_in_memcg;
-+}
-+
-+static void memcg_stats_handle_in_memcg(struct memcg_stats *stats,
-+					struct memcg_stats_parse_context *ctx,
-+					char *line)
-+{
-+	struct split_iterator it = { .str = line };
-+	char *prefix = split_next(&it);
-+	char *id = split_next(&it);
-+	long found_node_id;
-+	char *end;
-+
-+	ctx->consumed = true;
-+	ctx->current_node_idx = -1;
-+
-+	if (!prefix)
-+		return; /* Skip empty lines */
-+
-+	if (!strcmp("memcg", prefix)) {
-+		/* Memcg done, found next one; stop. */
-+		ctx->next_handler = NULL;
-+		return;
-+	} else if (strcmp("node", prefix))
-+		TEST_ASSERT(false, "found malformed line after 'memcg ...',"
-+				   "token: '%s'", prefix);
-+
-+	/* At this point we know we have a node line. Parse the ID. */
-+
-+	TEST_ASSERT(id, "malformed node line; no node id");
-+
-+	found_node_id = strtol(id, &end, 10);
-+	TEST_ASSERT(*end == '\0', "malformed node id '%s'", id);
-+
-+	ctx->current_node_idx = stats->nr_nodes++;
-+	TEST_ASSERT(ctx->current_node_idx < MAX_NR_NODES,
-+		    "memcg has stats for too many nodes, max is %d",
-+		    MAX_NR_NODES);
-+	stats->nodes[ctx->current_node_idx].node = found_node_id;
-+
-+	ctx->next_handler = memcg_stats_handle_in_node;
-+}
-+
-+static void memcg_stats_handle_in_node(struct memcg_stats *stats,
-+				       struct memcg_stats_parse_context *ctx,
-+				       char *line)
-+{
-+	/* Have to copy since we might not consume */
-+	char *my_line = strdup(line);
-+	struct split_iterator it = { .str = my_line };
-+	char *gen, *age, *nr_anon, *nr_file;
-+	struct node_stats *node_stats;
-+	struct generation_stats *gen_stats;
-+	char *end;
-+
-+	TEST_ASSERT(it.str, "failed to copy input line");
-+
-+	gen = split_next(&it);
-+
-+	/* Skip empty lines */
-+	if (!gen)
-+		goto out_consume; /* Skip empty lines */
-+
-+	if (!strcmp("memcg", gen) || !strcmp("node", gen)) {
-+		/*
-+		 * Reached next memcg or node section. Don't consume, let the
-+		 * other handler deal with this.
-+		 */
-+		ctx->next_handler = memcg_stats_handle_in_memcg;
-+		goto out;
-+	}
-+
-+	node_stats = &stats->nodes[ctx->current_node_idx];
-+	TEST_ASSERT(node_stats->nr_gens < MAX_NR_GENS,
-+		    "found too many generation lines; max is %d",
-+		    MAX_NR_GENS);
-+	gen_stats = &node_stats->gens[node_stats->nr_gens++];
-+
-+	age = split_next(&it);
-+	nr_anon = split_next(&it);
-+	nr_file = split_next(&it);
-+
-+	TEST_ASSERT(age && nr_anon && nr_file,
-+		    "malformed generation line; not enough tokens");
-+
-+	gen_stats->gen = (int)strtol(gen, &end, 10);
-+	TEST_ASSERT(*end == '\0', "malformed generation number '%s'", gen);
-+
-+	gen_stats->age_ms = strtol(age, &end, 10);
-+	TEST_ASSERT(*end == '\0', "malformed generation age '%s'", age);
-+
-+	gen_stats->nr_anon = strtol(nr_anon, &end, 10);
-+	TEST_ASSERT(*end == '\0', "malformed anonymous page count '%s'",
-+		    nr_anon);
-+
-+	gen_stats->nr_file = strtol(nr_file, &end, 10);
-+	TEST_ASSERT(*end == '\0', "malformed file page count '%s'", nr_file);
-+
-+out_consume:
-+	ctx->consumed = true;
-+out:
-+	free(my_line);
-+}
-+
-+/* Pretty-print lru_gen @stats. */
-+void print_memcg_stats(const struct memcg_stats *stats, const char *name)
-+{
-+	int node, gen;
-+
-+	fprintf(stderr, "stats for memcg %s (id %lu):\n",
-+			name, stats->memcg_id);
-+	for (node = 0; node < stats->nr_nodes; ++node) {
-+		fprintf(stderr, "\tnode %d\n", stats->nodes[node].node);
-+		for (gen = 0; gen < stats->nodes[node].nr_gens; ++gen) {
-+			const struct generation_stats *gstats =
-+				&stats->nodes[node].gens[gen];
-+
-+			fprintf(stderr,
-+				"\t\tgen %d\tage_ms %ld"
-+				"\tnr_anon %ld\tnr_file %ld\n",
-+				gstats->gen, gstats->age_ms, gstats->nr_anon,
-+				gstats->nr_file);
-+		}
-+	}
-+}
-+
-+/* Re-read lru_gen debugfs information for @memcg into @stats. */
-+void read_memcg_stats(struct memcg_stats *stats, const char *memcg)
-+{
-+	FILE *f;
-+	ssize_t read = 0;
-+	char *line = NULL;
-+	size_t bufsz;
-+	struct memcg_stats_parse_context ctx = {
-+		.next_handler = memcg_stats_handle_searching,
-+		.name = memcg,
-+	};
-+
-+	memset(stats, 0, sizeof(struct memcg_stats));
-+
-+	f = fopen(DEBUGFS_LRU_GEN, "r");
-+	TEST_ASSERT(f, "fopen(%s) failed", DEBUGFS_LRU_GEN);
-+
-+	while (ctx.next_handler && (read = getline(&line, &bufsz, f)) > 0) {
-+		ctx.consumed = false;
-+
-+		do {
-+			ctx.next_handler(stats, &ctx, line);
-+			if (!ctx.next_handler)
-+				break;
-+		} while (!ctx.consumed);
-+	}
-+
-+	if (read < 0 && !feof(f))
-+		TEST_ASSERT(false, "getline(%s) failed", DEBUGFS_LRU_GEN);
-+
-+	TEST_ASSERT(stats->memcg_id > 0, "Couldn't find memcg: %s\n"
-+		    "Did the memcg get created in the proper mount?",
-+		    memcg);
-+	if (line)
-+		free(line);
-+	TEST_ASSERT(!fclose(f), "fclose(%s) failed", DEBUGFS_LRU_GEN);
-+}
-+
-+/*
-+ * Find all pages tracked by lru_gen for this memcg in generation @target_gen.
-+ *
-+ * If @target_gen is negative, look for all generations.
-+ */
-+static long sum_memcg_stats_for_gen(int target_gen,
-+				    const struct memcg_stats *stats)
-+{
-+	int node, gen;
-+	long total_nr = 0;
-+
-+	for (node = 0; node < stats->nr_nodes; ++node) {
-+		const struct node_stats *node_stats = &stats->nodes[node];
-+
-+		for (gen = 0; gen < node_stats->nr_gens; ++gen) {
-+			const struct generation_stats *gen_stats =
-+				&node_stats->gens[gen];
-+
-+			if (target_gen >= 0 && gen_stats->gen != target_gen)
-+				continue;
-+
-+			total_nr += gen_stats->nr_anon + gen_stats->nr_file;
-+		}
-+	}
-+
-+	return total_nr;
-+}
-+
-+/* Find all pages tracked by lru_gen for this memcg. */
-+long sum_memcg_stats(const struct memcg_stats *stats)
-+{
-+	return sum_memcg_stats_for_gen(-1, stats);
-+}
-+
-+/* Read the memcg stats and optionally print if this is a debug build. */
-+void read_print_memcg_stats(struct memcg_stats *stats, const char *memcg)
-+{
-+	read_memcg_stats(stats, memcg);
-+#ifdef DEBUG
-+	print_memcg_stats(stats, memcg);
-+#endif
-+}
-+
-+/*
-+ * If lru_gen aging should force page table scanning.
-+ *
-+ * If you want to set this to false, you will need to do eviction
-+ * before doing extra aging passes.
-+ */
-+static const bool force_scan = true;
-+
-+static void run_aging_impl(unsigned long memcg_id, int node_id, int max_gen)
-+{
-+	FILE *f = fopen(DEBUGFS_LRU_GEN, "w");
-+	char *command;
-+	size_t sz;
-+
-+	TEST_ASSERT(f, "fopen(%s) failed", DEBUGFS_LRU_GEN);
-+	sz = asprintf(&command, "+ %lu %d %d 1 %d\n",
-+		      memcg_id, node_id, max_gen, force_scan);
-+	TEST_ASSERT(sz > 0, "creating aging command failed");
-+
-+	pr_debug("Running aging command: %s", command);
-+	if (fwrite(command, sizeof(char), sz, f) < sz) {
-+		TEST_ASSERT(false, "writing aging command %s to %s failed",
-+			    command, DEBUGFS_LRU_GEN);
-+	}
-+
-+	TEST_ASSERT(!fclose(f), "fclose(%s) failed", DEBUGFS_LRU_GEN);
-+}
-+
-+static void _lru_gen_do_aging(struct memcg_stats *stats, const char *memcg,
-+			      bool verbose)
-+{
-+	int node, gen;
-+	struct timespec ts_start;
-+	struct timespec ts_elapsed;
-+
-+	pr_debug("lru_gen: invoking aging...\n");
-+
-+	/* Must read memcg stats to construct the proper aging command. */
-+	read_print_memcg_stats(stats, memcg);
-+
-+	if (verbose)
-+		clock_gettime(CLOCK_MONOTONIC, &ts_start);
-+
-+	for (node = 0; node < stats->nr_nodes; ++node) {
-+		int max_gen = 0;
-+
-+		for (gen = 0; gen < stats->nodes[node].nr_gens; ++gen) {
-+			int this_gen = stats->nodes[node].gens[gen].gen;
-+
-+			max_gen = max_gen > this_gen ? max_gen : this_gen;
-+		}
-+
-+		run_aging_impl(stats->memcg_id, stats->nodes[node].node,
-+			       max_gen);
-+	}
-+
-+	if (verbose) {
-+		ts_elapsed = timespec_elapsed(ts_start);
-+		pr_info("%-30s: %ld.%09lds\n", "lru_gen: Aging",
-+			ts_elapsed.tv_sec, ts_elapsed.tv_nsec);
-+	}
-+
-+	/* Re-read so callers get updated information */
-+	read_print_memcg_stats(stats, memcg);
-+}
-+
-+/* Do aging, and print how long it took. */
-+void lru_gen_do_aging(struct memcg_stats *stats, const char *memcg)
-+{
-+	return _lru_gen_do_aging(stats, memcg, true);
-+}
-+
-+/* Do aging, don't print anything. */
-+void lru_gen_do_aging_quiet(struct memcg_stats *stats, const char *memcg)
-+{
-+	return _lru_gen_do_aging(stats, memcg, false);
-+}
-+
-+/*
-+ * Find which generation contains more than half of @total_pages, assuming that
-+ * such a generation exists.
-+ */
-+int lru_gen_find_generation(const struct memcg_stats *stats,
-+			    unsigned long total_pages)
-+{
-+	int node, gen, gen_idx, min_gen = INT_MAX, max_gen = -1;
-+
-+	for (node = 0; node < stats->nr_nodes; ++node)
-+		for (gen_idx = 0; gen_idx < stats->nodes[node].nr_gens;
-+		     ++gen_idx) {
-+			gen = stats->nodes[node].gens[gen_idx].gen;
-+			max_gen = gen > max_gen ? gen : max_gen;
-+			min_gen = gen < min_gen ? gen : min_gen;
-+		}
-+
-+	for (gen = min_gen; gen < max_gen; ++gen)
-+		/* See if the most pages are in this generation. */
-+		if (sum_memcg_stats_for_gen(gen, stats) >
-+				total_pages / 2)
-+			return gen;
-+
-+	TEST_ASSERT(false, "No generation includes majority of %lu pages.",
-+		    total_pages);
-+
-+	/* unreachable, but make the compiler happy */
-+	return -1;
-+}
--- 
-2.46.0.rc1.232.g9752f9e123-goog
+Regards
+Bibo Mao
+> 
+> [auto build test ERROR on 7846b618e0a4c3e08888099d1d4512722b39ca99]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Bibo-Mao/LoongArch-KVM-Add-paravirt-qspinlock-in-kvm-side/20240723-160536
+> base:   7846b618e0a4c3e08888099d1d4512722b39ca99
+> patch link:    https://lore.kernel.org/r/20240723073825.1811600-3-maobibo%40loongson.cn
+> patch subject: [PATCH 2/2] LoongArch: KVM: Add paravirt qspinlock in guest side
+> config: loongarch-allmodconfig (https://download.01.org/0day-ci/archive/20240724/202407240320.qqd1uWiE-lkp@intel.com/config)
+> compiler: loongarch64-linux-gcc (GCC) 14.1.0
+> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240724/202407240320.qqd1uWiE-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202407240320.qqd1uWiE-lkp@intel.com/
+> 
+> All error/warnings (new ones prefixed by >>):
+> 
+>>> arch/loongarch/kernel/paravirt.c:309: warning: expecting prototype for queued_spin_unlock(). Prototype was for native_queued_spin_unlock() instead
+> --
+>     In file included from include/linux/atomic.h:80,
+>                      from include/asm-generic/bitops/atomic.h:5,
+>                      from arch/loongarch/include/asm/bitops.h:27,
+>                      from include/linux/bitops.h:63,
+>                      from include/linux/kernel.h:23,
+>                      from include/linux/cpumask.h:11,
+>                      from include/linux/smp.h:13,
+>                      from kernel/locking/qspinlock.c:16:
+>     kernel/locking/qspinlock_paravirt.h: In function 'pv_kick_node':
+>>> include/linux/atomic/atomic-arch-fallback.h:242:34: error: initialization of 'u8 *' {aka 'unsigned char *'} from incompatible pointer type 'enum vcpu_state *' [-Wincompatible-pointer-types]
+>       242 |         typeof(*(_ptr)) *___op = (_oldp), ___o = *___op, ___r; \
+>           |                                  ^
+>     include/linux/atomic/atomic-instrumented.h:4908:9: note: in expansion of macro 'raw_try_cmpxchg_relaxed'
+>      4908 |         raw_try_cmpxchg_relaxed(__ai_ptr, __ai_oldp, __VA_ARGS__); \
+>           |         ^~~~~~~~~~~~~~~~~~~~~~~
+>     kernel/locking/qspinlock_paravirt.h:377:14: note: in expansion of macro 'try_cmpxchg_relaxed'
+>       377 |         if (!try_cmpxchg_relaxed(&pn->state, &old, vcpu_hashed))
+>           |              ^~~~~~~~~~~~~~~~~~~
+> 
+> 
+> vim +309 arch/loongarch/kernel/paravirt.c
+> 
+>     303	
+>     304	/**
+>     305	 * queued_spin_unlock - release a queued spinlock
+>     306	 * @lock : Pointer to queued spinlock structure
+>     307	 */
+>     308	static void native_queued_spin_unlock(struct qspinlock *lock)
+>   > 309	{
+>     310		/*
+>     311		 * unlock() needs release semantics:
+>     312		 */
+>     313		smp_store_release(&lock->locked, 0);
+>     314	}
+>     315	
+> 
 
 
