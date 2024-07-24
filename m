@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-22178-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22179-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2181493B5F6
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 19:29:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD8593B5FD
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 19:30:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBB7B1F22758
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 17:29:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F5B41C23599
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 17:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1DA0169AD0;
-	Wed, 24 Jul 2024 17:28:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96021662FB;
+	Wed, 24 Jul 2024 17:30:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iveolgx6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H9lkMMwX"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E9115FCEA
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 17:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAB82AE6C
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 17:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721842127; cv=none; b=gjyYCujyAylcBNkZsMPP7PKcGLSH8CbWf1Dis1tXH8I9tfxpGflElUhWyMn32nEMOBVxgsFME8u18V8ruzGCU+/ZU2Yn+7xD1wTXhXIHldvs27Y6svf6zKVP6hkiMjyiqhB+QUOFLhutHLvQF9vcMy6LKz9rCi5W3a6HlVeoEwA=
+	t=1721842231; cv=none; b=uVqB5OfLRNuCBhS+8l2OeYESN1V0+ORRjH+jei5hgMud83Tz/c2Y9F88vYLFTtN5rBafLWuyAsd+RPtwHtTno1k/SiVH1pKLyveHQigCEdkzuOepYNgcQgb/bS0cyQ6yH4+lK1dShA8q8PkLooOLb+wSh+hwWofhF8DCatANVwg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721842127; c=relaxed/simple;
-	bh=Gf8NC4hNI68SCJ0Y4qE7o7qwZC2N5ZJUkUWwjBcujgU=;
+	s=arc-20240116; t=1721842231; c=relaxed/simple;
+	bh=tsPCi2L3qSxeelwjKZkBqG9a02Hi5u0iYpjphTj0ids=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=CGAgbwX3DQDEOgSsT9kXR7SQmEfiHxTE8K3zLVVrVUD27ZsMwQ54vWURZL0dkq5pCCZMnvLWtCtMwgRC1x/LCp6tOuz84ettG+xWbPjzGTrz0xcpR+h8QiEmHsXslli886p3D/sWML4g5/KPtjLPmrqreSdNBFokyM2egv7RNjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iveolgx6; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=cIWLkRladsD5W79Cn6p/MUGo3L+wYQdKQeFZ6DR37TSSJaAEw8YJ+egEblo8U9R5H5Yx9nkLV8GZLKmRezOPT5Kq4lgESETF1N9KHMTzpYHr5fP3tes/tANLHC6g8DZCgH65AeaNYj3RF7SJNZJofiKhVHHAH3eZxnKvdI3mWmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H9lkMMwX; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721842125;
+	s=mimecast20190719; t=1721842228;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6USsBwoV9M3KFY+WBK9s2N+vuzz8so6DiVIYEeyT4Kc=;
-	b=Iveolgx6Taiap7vvzygIIHEIxy31aK4x/4OP4OdPoPXdZyq7kkOXF9FKC32wO2VhV5/kZl
-	d3PnN8Qsf4uULCoARQ+MiSZYhVgWORas2dDd7XJ+vNwnmGO7I5oXJZgGfyan1rGqpfA0ah
-	F970bho5461RdDVuSMt6DH5c4AO7yuA=
-Received: from mail-ot1-f70.google.com (mail-ot1-f70.google.com
- [209.85.210.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=SMDCLFO3EloUla0zlTAIGGkjZf6G2W40HmQno6SR3TQ=;
+	b=H9lkMMwXPbRbo4mvAAgYulO2idBEpKXFJMIM1GKkLylo2HMk8Gr51aQioZiD7QCGJXzgEN
+	g4MRSxQGZFxDTH5W4qsADP36/tydKh9SNo9xBDitlLLZ7JZ/DK/tC1KHaKfpKo3t/u3osM
+	K/mW4NrNBpzQZgIfqJ3wLfX2AqYelCM=
+Received: from mail-vs1-f71.google.com (mail-vs1-f71.google.com
+ [209.85.217.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-282-UfFbXJSJNTmnMI1bfAfJIw-1; Wed, 24 Jul 2024 13:28:43 -0400
-X-MC-Unique: UfFbXJSJNTmnMI1bfAfJIw-1
-Received: by mail-ot1-f70.google.com with SMTP id 46e09a7af769-7035d3bb4d1so3244a34.0
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 10:28:43 -0700 (PDT)
+ us-mta-66-G9wFs8tbP5G7DuqDN9NapA-1; Wed, 24 Jul 2024 13:30:26 -0400
+X-MC-Unique: G9wFs8tbP5G7DuqDN9NapA-1
+Received: by mail-vs1-f71.google.com with SMTP id ada2fe7eead31-49290a496c4so6416137.2
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 10:30:24 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721842123; x=1722446923;
+        d=1e100.net; s=20230601; t=1721842224; x=1722447024;
         h=content-transfer-encoding:mime-version:user-agent:references
          :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=6USsBwoV9M3KFY+WBK9s2N+vuzz8so6DiVIYEeyT4Kc=;
-        b=Dz974FZziNsYSL4b78ugX+6TzGGvhdR7pFC3v1Yl/eLzyBQki9KIS1eoPyaErAAaUK
-         /inokeKHyPuEb63zQCJhfqAIxmY1sGrsIvo3K65gwMBqomGKgQIe4p5LEDmf9EyY+25+
-         sKymPBJG8k2A+uFN70Ts6+C43fjlS8UuQ09A7Ri6HiK9x15e/ES3KvrZIVVTE+OKctov
-         abAhS/liy5AHlJJLZhcTnuL5rS1n4+L9Q9kh0tyQT3d6fnC1GYAU/QKPyyV8+lu/EV/w
-         y1chkYED9jO3lOifjEaYW0N1zZNDFWduNWxsUbtrkYvoNx4XvmyJIrbQgkGQz7eUUmux
-         tFJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXeNuoHfuphVYLjtDbGrNfPN2vc45TltzVX4f3+Uh4cVR+9Ufqxj3JBdVMsdcMKXRlAl2Q9ZRDMFgrUSTBE1nR3ylU8
-X-Gm-Message-State: AOJu0Ywf9kCPRUbPnXIf7mxSD+9VMvYcGik0gOrfu47LTytIMzRYfgfe
-	PkNr5sdplygbngyMAjqdaueLuChXawoVxOTR2zN6YgeW/xnXUF0CIHL7FFa2zxWtVbPxK/epF8P
-	P6QyMnGqZVbGJdSI31I6Q1GND3V4UUOgEk8dcEPFr92UF7GXbAg==
-X-Received: by 2002:a05:6830:601c:b0:707:1794:6ec1 with SMTP id 46e09a7af769-7092e6ff277mr516354a34.20.1721842122850;
-        Wed, 24 Jul 2024 10:28:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEPZbqluukEE1AadcZKoCfk5TGeIyBkcAZ0s+oqYQD37sNNbHTo5lIDWZdKiIUpa/Tftdljpw==
-X-Received: by 2002:a05:6830:601c:b0:707:1794:6ec1 with SMTP id 46e09a7af769-7092e6ff277mr516336a34.20.1721842122559;
-        Wed, 24 Jul 2024 10:28:42 -0700 (PDT)
+        bh=SMDCLFO3EloUla0zlTAIGGkjZf6G2W40HmQno6SR3TQ=;
+        b=b7U3tqrosdsOLR3Dd7Uq1cN6IZk3EQNt8p+cjpU2EsKG6Ja2OGyf1GoDpbOXzaMx8C
+         7MH03pR7XiJEj3+bMmY6DoC/T2b9pr5UfPv9a+Pky2MKOdBkVFXapRwx1TfiLYK8pp+A
+         VPklvSChbRB6PfUBZZc17TIuHZLqpz+VQSzTwfRnfQ13x866Ibej6FpE7XS313oREkno
+         bpZX1HlVp5f43qkt9wBR3axZVUZp8w3/9yc3BJIofF+WqKvj3jeXvWLSZp8bP+tmcQpz
+         dHkZ+0lJMllQ2ELEMMrtG/03czaQCX80Fi25dw690kjI/GvbWvOnTtZnJpRCy7Dctb9F
+         Lk9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWBxobr/lVu7z9SLqukVvRC0Dz0wfV+NMVUWTdvhFYWbZKEBXLFV4d/ytWtoASJ2BGZ6cznfLsGZ20TnNfALUCqVGEG
+X-Gm-Message-State: AOJu0YwOYZXBRD9Pg16RONnOyacquhjojRMkiz9PtlxdEmyRgJsIQq+O
+	7EFYM4Tbbe1xZ/Al/++MNUd91DMTYo+wIw/2uBLlTf8+2J+rgnMNuS7HVvL/4VfAUqpRn6yTJ8t
+	ta9Rq9Rsts1crNYK58RbTNTC/tp6SIIIUhuQ/p09zcioxgnYzEQ==
+X-Received: by 2002:a05:6102:3c88:b0:48f:c2dd:3520 with SMTP id ada2fe7eead31-493d6461976mr446989137.11.1721842224428;
+        Wed, 24 Jul 2024 10:30:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHcmZ7mYC4SkAnQ3ys5NfQquMWHnqJRbJ/cE9fSDgz+ltmTsyGj/NjhY3A8OWt5JJj/eXONHA==
+X-Received: by 2002:a05:6102:3c88:b0:48f:c2dd:3520 with SMTP id ada2fe7eead31-493d6461976mr446907137.11.1721842224002;
+        Wed, 24 Jul 2024 10:30:24 -0700 (PDT)
 Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a19905a909sm595995285a.73.2024.07.24.10.28.41
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1d64194aasm3025485a.52.2024.07.24.10.30.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 10:28:41 -0700 (PDT)
-Message-ID: <3aeeed2f4ccca6ddd404553984f22bf1b72e45cf.camel@redhat.com>
-Subject: Re: [PATCH v2 05/49] KVM: selftests: Assert that the @cpuid passed
- to get_cpuid_entry() is non-NULL
+        Wed, 24 Jul 2024 10:30:23 -0700 (PDT)
+Message-ID: <da3c92a68d3f60942f07dcf1a63b25e6bf3d3e6e.camel@redhat.com>
+Subject: Re: [PATCH v2 10/49] KVM: x86: Drop now-redundant MAXPHYADDR and
+ GPA rsvd bits from vCPU creation
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
@@ -84,12 +84,12 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
  Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
  <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
  Robert Hoo <robert.hoo.linux@gmail.com>
-Date: Wed, 24 Jul 2024 13:28:40 -0400
-In-Reply-To: <Zow_BmpOGwQJ9Yoi@google.com>
+Date: Wed, 24 Jul 2024 13:30:22 -0400
+In-Reply-To: <ZoxDqKdh37qpm-HQ@google.com>
 References: <20240517173926.965351-1-seanjc@google.com>
-	 <20240517173926.965351-6-seanjc@google.com>
-	 <6a8aee9425a47290c7401d4926041c0611d69ff6.camel@redhat.com>
-	 <Zow_BmpOGwQJ9Yoi@google.com>
+	 <20240517173926.965351-11-seanjc@google.com>
+	 <ccbed564392478b3a5bb51b650a102ca474ba7e0.camel@redhat.com>
+	 <ZoxDqKdh37qpm-HQ@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -100,45 +100,50 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
 
-On Mon, 2024-07-08 at 19:33 +0000, Sean Christopherson wrote:
+On Mon, 2024-07-08 at 12:53 -0700, Sean Christopherson wrote:
 > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
 > > On Fri, 2024-05-17 at 10:38 -0700, Sean Christopherson wrote:
-> > > Add a sanity check in get_cpuid_entry() to provide a friendlier error than
-> > > a segfault when a test developer tries to use a vCPU CPUID helper on a
-> > > barebones vCPU.
+> > > Drop the manual initialization of maxphyaddr and reserved_gpa_bits during
+> > > vCPU creation now that kvm_arch_vcpu_create() unconditionally invokes
+> > > kvm_vcpu_after_set_cpuid(), which handles all such CPUID caching.
 > > > 
-> > > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > > ---
-> > >  tools/testing/selftests/kvm/lib/x86_64/processor.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > > 
-> > > diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > > index c664e446136b..f0f3434d767e 100644
-> > > --- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > > +++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-> > > @@ -1141,6 +1141,8 @@ const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
-> > >  {
-> > >  	int i;
-> > >  
-> > > +	TEST_ASSERT(cpuid, "Must do vcpu_init_cpuid() first (or equivalent)");
-> > > +
-> > >  	for (i = 0; i < cpuid->nent; i++) {
-> > >  		if (cpuid->entries[i].function == function &&
-> > >  		    cpuid->entries[i].index == index)
+> > > None of the helpers between the existing code in kvm_arch_vcpu_create()
+> > > and the call to kvm_vcpu_after_set_cpuid() consume maxphyaddr or
+> > > reserved_gpa_bits (though auditing vmx_vcpu_create() and svm_vcpu_create()
+> > > isn't exactly easy).  And even if that weren't the case, KVM _must_
+> > > refresh any affected state during kvm_vcpu_after_set_cpuid(), e.g. to
+> > > correctly handle KVM_SET_CPUID2.  In other words, this can't introduce a
+> > > new bug, only expose an existing bug (of which there don't appear to be
+> > > any).
 > > 
-> > Hi,
+> > IMHO the change is not as bulletproof as claimed:
 > > 
-> > Maybe it is better to do this assert in __vcpu_get_cpuid_entry() because the
-> > assert might confuse the reader, since it just tests for NULL but when it
-> > fails, it complains that you need to call some function.
+> > If some code does access the uninitialized state (e.g vcpu->arch.maxphyaddr
+> > which will be zero, I assume), in between these calls, then even though later
+> > the correct CPUID will be set and should override the incorrect state set
+> > earlier, the problem *is* that the mentioned code will have to deal with non
+> > architecturally possible value (e.g maxphyaddr == 0) which might cause a bug
+> > in it.
+> > 
+> > Of course such code currently doesn't exist, so it works but it can fail in
+> > the future.
 > 
-> IIRC, I originally added the assert in __vcpu_get_cpuid_entry(), but I didn't
-> like leaving get_cpuid_entry() unprotected.  What if I add an assert in both?
-> E.g. have __vcpu_get_cpuid_entry() assert with the (hopefully) hepful message,
-> and have get_cpuid_entry() do a simple TEST_ASSERT_NE()?
+> Similar to not consuming a null cpuid_entries, any such future bug should never
+> escape developer testing since this is a very fixed sequence.  And practically
+> speaking, completely closing these holes isn't feasible because it's impossible
+> to initialize everything simultaneously, i.e. some amount of code will always
+> need to execute with zero-initialized vCPU state.
+> 
+> > How about we move the call to kvm_vcpu_after_set_cpuid upward?
+> 
+> A drop-in replacement was my preference too, but it doesn't work.  :-/
+> kvm_vcpu_after_set_cpuid() needs to be called after vcpu_load(), e.g. VMX's
+> hook will do VMWRITE.
 > 
 
-This looks like a great idea.
+Let it be then, but let's at least drop the part of the commit message after
+'And even if that weren't the case', just not to confuse future reader,
+because as I explained, this is not 100% bulletproof.
 
 Best regards,
 	Maxim Levitsky
