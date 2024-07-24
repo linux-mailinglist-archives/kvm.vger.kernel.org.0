@@ -1,149 +1,147 @@
-Return-Path: <kvm+bounces-22171-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22172-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1B3093B3C2
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 17:34:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D2793B47F
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:07:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D96D28158C
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 15:33:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81EA31C235BD
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 16:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 735FE15B14E;
-	Wed, 24 Jul 2024 15:33:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2039E15CD55;
+	Wed, 24 Jul 2024 16:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KMkS8yO7"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UxeOLKNo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46EDC54759
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 15:33:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD99B5336B;
+	Wed, 24 Jul 2024 16:07:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721835232; cv=none; b=NuaCxUMFB3lbYtJC/CjOqCutPx6TlunpTypyg1hs6aK+vIOEPwQbRGh33o6Kc6HaUYOVmYPBP9btS5TQRoF6DKaTUq2fwkS+b1bqP9XrZNyYhtue1QDmMyqbELBUVp/Cum8GNtjzwfmfAMyyuLgnh8JiMBGVKj/aOoNdoIlpJSY=
+	t=1721837255; cv=none; b=JcYSSP1TJHcYw+i8UbK2vvYbv89vEjVJlGk+vsm6yzEeF3OCPKR8kpSq5fkOGY3LLohOVbYUeWX88hDntrRpheTKvczN8hwPWgp0qpz+Nl+OfJLHcNeuc1RyDkd9M719ztEbe0OujqHmWOHSAWkfZj70fe/MZ1RB+tyVuknQRk8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721835232; c=relaxed/simple;
-	bh=xhOdgAqvk5uhhER6kBCJpBnfwQCOjsRK4KYXS9TeMME=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=dAfkCcVmUh+/taCSPReVvWgmTQqBP2bBfToJkJiS5ydRQh1BO8fgOz4Wl2c/St5HsrhbBtLdYbHBSJ/x1J14ECnGCak5jTjVGGwfL/x4SK/xwu0b1MNLe3TZiIVkJ6RSj8bYZ0F+JbbtTlm6CFb/xjJTT9l5b0ml53X/wolXHkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KMkS8yO7; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fd8a1a75e7so16359005ad.3
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 08:33:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721835230; x=1722440030; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t5d22O2U1HZXGOIITw2LqK05yPy/MHAa8i4PSfFe0l0=;
-        b=KMkS8yO76NCcGASjZ4h22H/HSPOS3vQY+v/OJIy/FXcvFs1GkWx3frI7UYl56jSrLy
-         9nSkbBjFxIdgLMXWjOPPIpFxz6hBBFbl4Lr+s7CUtPSHwk8YXgN8PcLHy9AITh1zNUo8
-         okB7LG3pJqBjWmdJPIgj2QMg9B9o3NnsHTNXCrpihRpK8kLZ6/IUAq+8tWDD9xNZjQjG
-         gAoYtSznVOCMGfPH4K5X5Dd6LUOa3bvU4p6BbZ2mICVopkgKOCtKwWDDitWRQdDuvXhL
-         B2BUKmiIrvrO1CsCTOBAB8HmQ4x5vIieGxbo7xhYFz6JvmbwNLGCvmnIYsNSOy5KzNuO
-         2m2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721835230; x=1722440030;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t5d22O2U1HZXGOIITw2LqK05yPy/MHAa8i4PSfFe0l0=;
-        b=TglmktjjhYhSUbV5RRG/5/A4DEV66VD3JCrtx6lZxQgx6IKYo7xo5BG1YMBzOSTQkK
-         DyqJCA7s42S7VjONownRRJ7zhaGxaQGd6gyJ3eiVNuan8u1iMLi5abxmkkCmjAFLFeUQ
-         SeEO4NxQU1DMhaWYG5rSO8sNMNfw4E0zRhFpi891RzAkxhHIcTaBCV+WmFRJaOdCFiS2
-         dmTnVGhM2ypvP4BcvvtZzGFpNgiVFh+K7XgdKsE8KxTYUFauuDdJZOOJi2UcHO81Hhll
-         uV64OA009jYFLCt7i6QDuv2ti1NfQfj0N0pQLFnYJeo9CeIOQtZjil9UOuVnE5/tA9Mn
-         dALA==
-X-Gm-Message-State: AOJu0Yxn79TCCAhazG2DG6lA+MOLOzZEhj2YBzzmel00jotbhbvbAqvZ
-	yIIDt1geXDW3n5Gq5S+AGAjt4K2cKCk73Ppkaau2W4/h8BdZjPLvizX39lTYS27fumQT9/VSETk
-	fbg==
-X-Google-Smtp-Source: AGHT+IFp8AI6gbmRyLzTJee5VbDdw2EnFi+qwFiv0O7eEIxkRJjpimCPtbFrYNlngAgcIlHr4t2Bc5XovWg=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:22cd:b0:1fb:78ce:cefa with SMTP id
- d9443c01a7336-1fdd220c647mr67955ad.12.1721835230388; Wed, 24 Jul 2024
- 08:33:50 -0700 (PDT)
-Date: Wed, 24 Jul 2024 08:33:48 -0700
-In-Reply-To: <20240724044529.3837492-1-tao1.su@linux.intel.com>
+	s=arc-20240116; t=1721837255; c=relaxed/simple;
+	bh=R11c7PQtEVi66A+QE33uLi7Y93ezm0Dbp8NwV2s8FVc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tZiHfw0K9pbu3/7lgcUjyZHqxRobMwZHNs/JE8EsGulV4j+m0Cva5r5RKhFtra7VnWk7SXGOrbslP2+E5Q/1YDtosJkhaAm+PlH8fhy76AlKXM2QHuHovu91BB1EULdF0FdYnu/d4if7nImoiRSFtv9gvFqeNXXeJ1evmChYu54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UxeOLKNo; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46OFU9Ei021083;
+	Wed, 24 Jul 2024 16:07:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	4dJjK6vN2+yI9YITqzlpdMdXVVN4oNs9S20bCberJII=; b=UxeOLKNoRWbwMctw
+	cJUDCCN19/x5FeUGIOMRauEUd40Qh1V3SIHMfKmPOWfsOmfDgy5yCb0SbG1tPdWy
+	ZsmsXsswuYumtyOEb22LRoUjVfe+UGajQWpkFzTjR2vHdEVu2PqMYTcqJ0/CsosL
+	Z70HrVw4aklNBEhwidszG3oal3Xi+tluAya9WfqMw2SDlEWfXjauBi/k91JX5pQG
+	iIaxNOVBLhCifLBTee0Uet6PI9uhUvYb5vBH7Y43ZDamdVMn+xylo7njk+sHF1nK
+	yhvT/DUHpr967kvwMiJp3l8Urt+73MUxYtIPQetKaZ9qCQMziaFf5uOTZlxUH/De
+	qtZY9g==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40k49w854p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jul 2024 16:07:24 +0000 (GMT)
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46OG7NG6027664;
+	Wed, 24 Jul 2024 16:07:24 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40k49w854j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jul 2024 16:07:23 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46OF62Ud006227;
+	Wed, 24 Jul 2024 16:07:23 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40gqjuj5dv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 24 Jul 2024 16:07:22 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46OG7H8w29819560
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 24 Jul 2024 16:07:19 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5217E2004B;
+	Wed, 24 Jul 2024 16:07:17 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CE28020040;
+	Wed, 24 Jul 2024 16:07:16 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.89.145])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Wed, 24 Jul 2024 16:07:16 +0000 (GMT)
+Date: Wed, 24 Jul 2024 18:07:14 +0200
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah
+ Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand
+ <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: Re: [PATCH v2 02/10] selftests: kvm: s390: Add kvm_s390_sie_block
+ definition for userspace tests
+Message-ID: <20240724180714.13a571c1.schlameuss@linux.ibm.com>
+In-Reply-To: <8ce4cef5-1516-4e49-be2a-a185848fd639@linux.ibm.com>
+References: <20240723093126.285319-1-schlameuss@linux.ibm.com>
+	<20240723093126.285319-3-schlameuss@linux.ibm.com>
+	<8ce4cef5-1516-4e49-be2a-a185848fd639@linux.ibm.com>
+Organization: IBM
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240724044529.3837492-1-tao1.su@linux.intel.com>
-Message-ID: <ZqEPrE429UQi9duo@google.com>
-Subject: Re: [PATCH] KVM: x86: Reset RSP before exiting to userspace when
- emulating POPA
-From: Sean Christopherson <seanjc@google.com>
-To: Tao Su <tao1.su@linux.intel.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com, 
-	xiaoyao.li@intel.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: QJNTkwLYcIp9w1Ie0Rb9sPR1v-CcstSs
+X-Proofpoint-ORIG-GUID: s7dLTnH7nkChVM4Njo2xy4w_hd4GrFCc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-24_15,2024-07-24_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
+ mlxlogscore=668 mlxscore=0 adultscore=0 phishscore=0 lowpriorityscore=0
+ impostorscore=0 spamscore=0 bulkscore=0 priorityscore=1501 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407240115
 
-On Wed, Jul 24, 2024, Tao Su wrote:
-> When emulating POPA and exiting to userspace for MMIO, reset modified RSP
-> as emulation context may not be reset. POPA may generate more multiple
-> reads, i.e. multiple POPs from the stack, but if stack points to MMIO,
-> KVM needs to emulate multiple MMIO reads.
-> 
-> When one MMIO done, POPA may be re-emulated with EMULTYPE_NO_DECODE set,
-> i.e. ctxt will not be reset, but RSP is modified by previous emulation of
-> current POPA instruction, which eventually leads to emulation error.
-> 
-> The commit 0dc902267cb3 ("KVM: x86: Suppress pending MMIO write exits if
-> emulator detects exception") provides a detailed analysis of how KVM
-> emulates multiple MMIO reads, and its correctness can be verified in the
-> POPA instruction with this patch.
+On Wed, 24 Jul 2024 16:39:28 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-I don't see how this can work.  If POPA is reading from MMIO, it will need to
-do 8 distinct emulated MMIO accesses.  Unwinding to the original RSP will allow
-the first MMIO (store to EDI) to succeed, but then the second MMIO (store to ESI)
-will exit back to userspace.  And the second restart will load EDI with the
-result of the MMIO, not ESI.  It will also re-trigger the second MMIO indefinitely.
-
-To make this work, KVM would need to allow precisely resuming execution where
-it left off.  We can't use MMIO fragments, because unlike MMIO accesses that
-split pages, each memory load is an individual access.
-
-I don't see any reason to try to make this work.  It's a ridiculously convoluted
-scenario that, AFAIK, has no real world application.
-
-> Signed-off-by: Tao Su <tao1.su@linux.intel.com>
-> ---
-> For testing, we can add POPA to the emulator case in kvm-unit-test.
-> ---
->  arch/x86/kvm/emulate.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+> On 7/23/24 11:31, Christoph Schlameuss wrote:
+> > Subsequent tests do require direct manipulation of the SIE instruction.
+> > This commit introduces the SIE definition for the selftests.  
 > 
-> diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> index e72aed25d721..3746fef6ca60 100644
-> --- a/arch/x86/kvm/emulate.c
-> +++ b/arch/x86/kvm/emulate.c
-> @@ -1999,6 +1999,7 @@ static int em_pushf(struct x86_emulate_ctxt *ctxt)
->  
->  static int em_popa(struct x86_emulate_ctxt *ctxt)
->  {
-> +	unsigned long old_esp = reg_read(ctxt, VCPU_REGS_RSP);
->  	int rc = X86EMUL_CONTINUE;
->  	int reg = VCPU_REGS_RDI;
->  	u32 val = 0;
-> @@ -2010,8 +2011,11 @@ static int em_popa(struct x86_emulate_ctxt *ctxt)
->  		}
->  
->  		rc = emulate_pop(ctxt, &val, ctxt->op_bytes);
-> -		if (rc != X86EMUL_CONTINUE)
-> +		if (rc != X86EMUL_CONTINUE) {
-> +			assign_register(reg_rmw(ctxt, VCPU_REGS_RSP),
-> +					old_esp, ctxt->op_bytes);
->  			break;
-> +		}
->  		assign_register(reg_rmw(ctxt, reg), val, ctxt->op_bytes);
->  		--reg;
->  	}
+> AFAIK ucontrol doesn't allow to manipulate the instruction, it allows 
+> manipulation of the *SIE control block* that's handed over as an operand 
+> to SIE.
 > 
-> base-commit: 786c8248dbd33a5a7a07f7c6e55a7bfc68d2ca48
-> -- 
-> 2.34.1
+
+I will clarify that.
+
+Christoph
+
+> > 
+> > There are already definitions of this within the kernel.
+> > This differs in two ways.
+> > * This is the first definition of this in userspace.
+> > * This does not require atomicity for the flags.
+> > 
+> > With the userspace definition of the SIE block layout now being present
+> > we can reuse the values in other tests where applicable.
+> > 
+> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>  
 > 
+> Code looks fine though.
+
 
