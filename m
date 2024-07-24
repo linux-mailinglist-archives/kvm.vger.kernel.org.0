@@ -1,89 +1,89 @@
-Return-Path: <kvm+bounces-22197-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22198-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A5393B67A
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 20:13:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C01EC93B681
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 20:18:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA3BDB2265E
-	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:13:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88FCC284D0B
+	for <lists+kvm@lfdr.de>; Wed, 24 Jul 2024 18:18:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ABD215F3EF;
-	Wed, 24 Jul 2024 18:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B21D15FCFB;
+	Wed, 24 Jul 2024 18:18:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="R4NQ/B8f"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DqVtaagU"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D762D792
-	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 18:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADD5155735
+	for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 18:18:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721844801; cv=none; b=qVrD/0crPZgBttWqDlFtVoijirWbYyitoEDzBZN3rMvVUNSGCKtPteHktw0CuK8TtDGG+5qZs9kjxJ7TazMYtcJg2DOjjVmojNsJ1dqBTfZzltsGhx6XO968xfQfehhPk3FflRMnnMUi1pMithslsnWptD4/Qfge6qkAWaUZtO8=
+	t=1721845107; cv=none; b=T1EJgRDnyVp3GZg7aJ+XduEHaU4Lgf/lZS1Vw8BYQsGB2V8blR5IYtauL6heS7B4frMWAa/vRCOXTdvkaiB/SYAC8OPAt5kzHku0JQ/Wi1lw/74r0G1/3XrwAjjZeC75RTVUXve2G8bKcsRi5ChnzOqwCDQ+9sXCxAyrJbmS96E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721844801; c=relaxed/simple;
-	bh=9lCrRvH7bCgy1LGtSJCV7fhoGThabQ9QHHGLvYCMW6s=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=L3naSg/u3M5Az0/vKXTy/sSFFvmBov6EaUj568JKkUwaCEvNzqDjio73opyOGnIUdEM3ej1GdkleuE91LBrnqkvrMulu5vMgqjKMwCjE3rNlqe9hlsROuCwA2CSgTh31Fnpe5StI/o3Zvu0rN1ejccjbpJ2pjCcD9iG1pJvI5ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=R4NQ/B8f; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1721845107; c=relaxed/simple;
+	bh=Xlsr3+e3X6nmQKN/3OPAYPVM2WCI6I49qa/zfaddnks=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=E2poOjwZkSQFQSpfATYOpHnHhRk6sdFM612T3DyRD4Ah4K06hNFK+LTLhSpeoKgTEJhNmg4R8JQiZc6YUG3dFNIxjNklvXlcbpxAT+lZifmmvz/46bmCNMm8ixNc1G9gsspIrxNvKjB37EvFQylszdevxNxGkSoqSY2mtuGKSPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DqVtaagU; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721844798;
+	s=mimecast20190719; t=1721845104;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=l/BlWYtZiqrvhhOyFFImvY2g7dydV2xBTj36pWBJdp8=;
-	b=R4NQ/B8fVq56far1tOWyCWCe/hIBjDC6rYorQuEgaL3VIn+UlTTFSjQvb3UOYgYq3qPLwc
-	vZ8WBnoYmWxDmo642FC8Dqs+Lqhh7CA/BPCNymvYEK4lnW6jjRYwLWvE8CFSMmYV9OWz7v
-	pPsY6BhLwbLdmLrHIJkxqqPyTEixNIk=
+	bh=OG+Z0VgBK77YO3uQOGptWCjeSjYO5kEg9xaC/tvqiZc=;
+	b=DqVtaagUlQGschIezF+2yPk27tNejYq9jwTQTzN4aXnVRwov7qYlFA8QtZfcupIS+If0qN
+	yURSPUoIclz98rGUPFMLvMLHlH9sQWCAIZS8F07OtmYPgQXVkCrKFeTSCOpG08l+Bua5Ow
+	+bbmKB+mmsag/eXL2g1N+8tkfLXs+7w=
 Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
  [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-396-MyGoalAiNsi2wZyJyJtrGg-1; Wed, 24 Jul 2024 14:13:17 -0400
-X-MC-Unique: MyGoalAiNsi2wZyJyJtrGg-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6b5cec74f1dso981866d6.3
-        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 11:13:17 -0700 (PDT)
+ us-mta-641-Edxz6cSTMlmKh9H8LQaeVw-1; Wed, 24 Jul 2024 14:18:23 -0400
+X-MC-Unique: Edxz6cSTMlmKh9H8LQaeVw-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6b7a6d56e53so2166336d6.1
+        for <kvm@vger.kernel.org>; Wed, 24 Jul 2024 11:18:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721844796; x=1722449596;
+        d=1e100.net; s=20230601; t=1721845103; x=1722449903;
         h=content-transfer-encoding:mime-version:user-agent:references
-         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=l/BlWYtZiqrvhhOyFFImvY2g7dydV2xBTj36pWBJdp8=;
-        b=MHExgEAMHNsSpXri8Yjmj8avgAxszwCXX+nZNauUmpPe+csnPyekqbquHPLMyWr/0T
-         bPzDfGXYvJB3UF8ERcArzQ75RrKASmfAMAGH95RZpCs9znV4Z01QmKCfy2XdGYBSSCUQ
-         wi1qKXu68Ir1PFxVZQnTt7F2+ZiRjIyNfx8F1nBkHhO4phf9L011Z0ksGddVxPjJPNmn
-         cPay8Mc2AJy/kbsBAC8wXVdzLkvZVqnHVWoGXiIlj5n+tdBWqtRuubsIqA74hesezfAP
-         om/N4Z5hTqEtdpP/KZW/t4EiCnFSHEYdkI/LxrFwDkDebhZ6Ivp3Ovhg4ynGKbWNrUeX
-         9tuA==
-X-Forwarded-Encrypted: i=1; AJvYcCXSWeh7aU+PajTlz4ipRO+5JVS5auHaazprLWBHR5REghM1sT08pkLl+WTIlJHcpbdQKRtVTXbLsRepLvVBF46DWsSO
-X-Gm-Message-State: AOJu0Yztr6tNOK38CHnClkyNRpbFZ/sCCFm0+92qBEmRAQEa3mzsKCYg
-	DdnUKtbZAKP5f+ws9IZ30POB2AIJzdWOUym6yPneFCJx5sKo9UbW/7svCqbL3ios7WeYZPX6MGZ
-	mZqvoteTdoIyzgVXrdFrTRD6dHlNdqy3ybfttMetrfvzpIXYLqSmn3RIdWQ==
-X-Received: by 2002:ad4:5961:0:b0:6b5:6a1:f89a with SMTP id 6a1803df08f44-6bb3c9ceafbmr4715006d6.2.1721844796474;
-        Wed, 24 Jul 2024 11:13:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFKOJBgxULB0ubdx3PBhF2TMO5Pol0a/r8NgYn1osM6y0mcFawCvDW69OKO0TeR2O32MzTQ1g==
-X-Received: by 2002:ad4:5961:0:b0:6b5:6a1:f89a with SMTP id 6a1803df08f44-6bb3c9ceafbmr4714856d6.2.1721844796138;
-        Wed, 24 Jul 2024 11:13:16 -0700 (PDT)
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OG+Z0VgBK77YO3uQOGptWCjeSjYO5kEg9xaC/tvqiZc=;
+        b=QAMYJUoltgCTLF9mGo6upvsTMdqWZ+k7JIUFiIHd7vePkZioZI2ZhZ111/YrP9U4ee
+         bIuDUlQeQtkLNgGnx8VHfAtB6NbuSXMXBrPSmu7Xinc12y+OY3yASKJmYDkgnpgp0xfu
+         JuLE9CAQHtBr2N7+2o5x5UlInG2iycdTU3TE65RQCI7KThE9dGgLoFMl3NTxCtElQKbL
+         Kloj7QQ7moxibC5owKZY49+JWDLpQI/kt/M7IUOUpgpChhuBRouEvpcTonLrPOOk7zyd
+         SeHeBP/u/uV/iDiwDf+h/sVB7DJsQAeTMFKlcvhBZ783w+BT6960X6uBSdTynaAupz3A
+         oRuQ==
+X-Gm-Message-State: AOJu0Yyh8IdIWUz3S+dR0PphpR5BjT39NI1nswxiIjP+Ds4OB9+eQYWB
+	4lbGH5MaP1nvPW/2wrd2Ado8lSNHQBm4X6gD1XwSLdElTYZ8AZ1yyy5Ub9yDXyZu6DeHroMHEZ2
+	wTX2CB2sQ4TKPjX8tJMes3yj7mYVMyhOjrSH6vO2X61T4kUCWUw==
+X-Received: by 2002:a0c:facb:0:b0:6b5:2062:dd5c with SMTP id 6a1803df08f44-6b99129ed1dmr51085506d6.8.1721845102972;
+        Wed, 24 Jul 2024 11:18:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHzp5YHHhVThEiFTn5V5wo00MS1NlOYpQSfiEo0+h3Ax7L+IzEWoagCZ4NCEPDBfTTH4sRIKQ==
+X-Received: by 2002:a0c:facb:0:b0:6b5:2062:dd5c with SMTP id 6a1803df08f44-6b99129ed1dmr51085166d6.8.1721845102682;
+        Wed, 24 Jul 2024 11:18:22 -0700 (PDT)
 Received: from starship ([2607:fea8:fc01:7b7f:6adb:55ff:feaa:b156])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7ac7d995csm60534766d6.40.2024.07.24.11.13.14
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6b7acb0a768sm60563936d6.139.2024.07.24.11.18.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Jul 2024 11:13:15 -0700 (PDT)
-Message-ID: <323bf4cc39f3e4dd3b95e0e25de35a7c0c2e9d2d.camel@redhat.com>
-Subject: Re: [PATCH v2] KVM: x86: Complain about an attempt to change the
- APIC base address
+        Wed, 24 Jul 2024 11:18:22 -0700 (PDT)
+Message-ID: <ed95389522d5c2767dfa60d121dc04ee73087add.camel@redhat.com>
+Subject: Re: [PATCH v2 1/2] KVM: nVMX: use vmx_segment_cache_clear
 From: Maxim Levitsky <mlevitsk@redhat.com>
-To: Jim Mattson <jmattson@google.com>, Sean Christopherson
- <seanjc@google.com>,  Paolo Bonzini <pbonzini@redhat.com>,
- kvm@vger.kernel.org
-Date: Wed, 24 Jul 2024 14:13:14 -0400
-In-Reply-To: <CALMp9eSTsGaAcEKkJ+=vWD4aHC3e_iOA8nnwWhGQdfBj_nj3-A@mail.gmail.com>
-References: <20240625235554.2576349-1-jmattson@google.com>
-	 <CALMp9eSTsGaAcEKkJ+=vWD4aHC3e_iOA8nnwWhGQdfBj_nj3-A@mail.gmail.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Ingo Molnar
+ <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, x86@kernel.org,
+ Borislav Petkov <bp@alien8.de>, linux-kernel@vger.kernel.org, Dave Hansen
+ <dave.hansen@linux.intel.com>,  Thomas Gleixner <tglx@linutronix.de>
+Date: Wed, 24 Jul 2024 14:18:21 -0400
+In-Reply-To: <ZpbhItUq-p_emFUT@google.com>
+References: <20240716022014.240960-1-mlevitsk@redhat.com>
+	 <20240716022014.240960-2-mlevitsk@redhat.com> <ZpbhItUq-p_emFUT@google.com>
 Content-Type: text/plain; charset="UTF-8"
 User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 Precedence: bulk
@@ -92,60 +92,52 @@ List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2024-07-24 at 11:05 -0700, Jim Mattson wrote:
-> On Tue, Jun 25, 2024 at 4:56 PM Jim Mattson <jmattson@google.com> wrote:
-> > KVM does not support changing the APIC's base address. Prior to commit
-> > 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or
-> > APIC base"), it emitted a rate-limited warning about this. Now, it's
-> > just silently broken.
+On Tue, 2024-07-16 at 14:07 -0700, Sean Christopherson wrote:
+> On Mon, Jul 15, 2024, Maxim Levitsky wrote:
+> > In prepare_vmcs02_rare, call vmx_segment_cache_clear, instead
+> > of setting the segment_cache.bitmask directly.
 > > 
-> > Use vcpu_unimpl() to complain about this unsupported operation. Even a
-> > rate-limited error message is better than complete silence.
+> > No functional change intended.
 > > 
-> > Fixes: 3743c2f02517 ("KVM: x86: inhibit APICv/AVIC on changes to APIC ID or APIC base")
-> > Signed-off-by: Jim Mattson <jmattson@google.com>
+> > Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 > > ---
-> >  Changes in v2:
-> >   * Changed format specifiers from "%#llx" to "%#x"
-> >   * Cast apic->base_address to unsigned int for printing
+> >  arch/x86/kvm/vmx/nested.c | 5 +++--
+> >  arch/x86/kvm/vmx/vmx.c    | 4 ----
+> >  arch/x86/kvm/vmx/vmx.h    | 5 +++++
+> >  3 files changed, 8 insertions(+), 6 deletions(-)
 > > 
-> >  arch/x86/kvm/lapic.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> > 
-> > diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-> > index acd7d48100a1..43ac05d10b2e 100644
-> > --- a/arch/x86/kvm/lapic.c
-> > +++ b/arch/x86/kvm/lapic.c
-> > @@ -2583,6 +2583,9 @@ void kvm_lapic_set_base(struct kvm_vcpu *vcpu, u64 value)
-> > 
-> >         if ((value & MSR_IA32_APICBASE_ENABLE) &&
-> >              apic->base_address != APIC_DEFAULT_PHYS_BASE) {
-> > +               vcpu_unimpl(vcpu, "APIC base %#x is not %#x",
-> > +                           (unsigned int)apic->base_address,
-> > +                           APIC_DEFAULT_PHYS_BASE);
-> >                 kvm_set_apicv_inhibit(apic->vcpu->kvm,
-> >                                       APICV_INHIBIT_REASON_APIC_BASE_MODIFIED);
-> >         }
-> > --
-> > 2.45.2.741.gdbec12cfda-goog
+> > diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
+> > index 643935a0f70ab..d3ca1a772ae67 100644
+> > --- a/arch/x86/kvm/vmx/nested.c
+> > +++ b/arch/x86/kvm/vmx/nested.c
+> > @@ -2469,6 +2469,9 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+> >  
+> >  	if (!hv_evmcs || !(hv_evmcs->hv_clean_fields &
+> >  			   HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2)) {
+> > +
+> > +		vmx_segment_cache_clear(vmx);
+> > +
+> >  		vmcs_write16(GUEST_ES_SELECTOR, vmcs12->guest_es_selector);
+> >  		vmcs_write16(GUEST_CS_SELECTOR, vmcs12->guest_cs_selector);
+> >  		vmcs_write16(GUEST_SS_SELECTOR, vmcs12->guest_ss_selector);
+> > @@ -2505,8 +2508,6 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
+> >  		vmcs_writel(GUEST_TR_BASE, vmcs12->guest_tr_base);
+> >  		vmcs_writel(GUEST_GDTR_BASE, vmcs12->guest_gdtr_base);
+> >  		vmcs_writel(GUEST_IDTR_BASE, vmcs12->guest_idtr_base);
+> > -
+> > -		vmx->segment_cache.bitmask = 0;
 > 
-> Ping.
+> This actually exacerbates the bug that you're trying fix in patch 2.  Clearing
+> segment_cache.bitmask _after_ writing the relevant state limits the stale data
+> to only the accessor that's running in IRQ context (kvm_arch_vcpu_put()).
 > 
-I think that we talked about this once, that nobody looks at these dmesg warnings,
-its just a way for a malicious guest to fill up the host log (yes rate limit helps,
-but slowly you can still fill it up),
-but if you think that this is valuable, I am not against putting it back.
-
-I wonder....
-
-What if we introduce a new KVM capability, say CAP_DISABLE_UNSUPPORTED_FEATURES,
-and when enabled, outright crash the guest when it attempts things like changing APIC base,
-APIC IDs, and other unsupported things like that?
-
-Then we can make qemu set it by default, and if users have to use an unsupported feature,
-they could always add a qemu flag that will disable this capability.
+> Clearing segment_cache.bitmask _before_ writing the relevant statement means
+> that kvm_arch_vcpu_put() _and_ all future readers will be exposed to the stale
+> data, because the stale data cached by kvm_arch_vcpu_put() won't mark it invalid.
+> 
+I noticed that after I sent the patch series, this makes sense.
 
 Best regards,
 	Maxim Levitsky
