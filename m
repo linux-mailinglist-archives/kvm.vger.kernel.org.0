@@ -1,134 +1,168 @@
-Return-Path: <kvm+bounces-22255-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22256-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4AF93C636
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 17:13:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DA193C67E
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 17:33:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AC511C215DE
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 15:13:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B5ED280FD8
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 15:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4259D19D880;
-	Thu, 25 Jul 2024 15:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0567919D89D;
+	Thu, 25 Jul 2024 15:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NcEJB0v9"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4EB5FC18
-	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 15:13:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD1819CCF4;
+	Thu, 25 Jul 2024 15:33:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721920412; cv=none; b=UTtzcZE1aUnRgfJlEQ1zN4MA9wTxCd5B7G6mkcWY7S7XaNjGc0rvdqWG02EFdKj2mgPjqrKq9i2E7AVI/RmvhTC1/VfVhmEuu7wSzOxzljxCgt3IYHHeFpQPLMjJhERjcsUho6U2aVx2+FiPpQIccBknyZkrpEj7UEJGLQH1+kU=
+	t=1721921600; cv=none; b=eVOQJyTuLr+lWFmVw3scXePFqxI1Zxms4Rwl7/YPrQ/Og5Yrd2fME2UtrbAGCKX/uf3zKNDXKM066ZqKBRpCcoFzPn6dg8VIHnUy0ue5jnFQOe4DKsF9fKgQnB4PgHxcJ/5AZX5poAoLrq9tzupHMozeJMdHdWmHPnApbINytQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721920412; c=relaxed/simple;
-	bh=9eoCHet+IopDzEQP32DH0tK9J+v2trZiIbHDcyIR9iA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s4BayWlVKG0wDBfirn0aEpf5ja8qBuJ7+tK8iZQSW24gLduNFryPuupHL7NQNRdKfIzbPiAs8UE6G0mFVcVY/D2P+DbyXoANTj+9a5mrs3a3Nd+ZzWj3rpXZAOgQINk/84wjZ/kEkIvtsbVITaHZk/cMQ7MpOTZ5NcHVU3gazNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7FFA01007;
-	Thu, 25 Jul 2024 08:13:55 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 62D113F73F;
-	Thu, 25 Jul 2024 08:13:28 -0700 (PDT)
-Date: Thu, 25 Jul 2024 16:13:25 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	s=arc-20240116; t=1721921600; c=relaxed/simple;
+	bh=MDq1Q4saoPwdhXmKqgMKL/Ay+WsV+Wk+4g7Y7dWlJZc=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=qwsjAtT6z1f2jLjacuV/0GhQyI1CnlsykpobIrjL0vL27yisWXQQbmx3gTMNPt+GPBM2oN3u4XZbINMhJ+YHZS+O4M7llFCLJhMokO6dCB48u/50T/4t4vRmSVGLNCLxxY5DnukJqRfriWbAqw5rVW74z5NWEh5ofHe0vc7lTHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NcEJB0v9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C524BC116B1;
+	Thu, 25 Jul 2024 15:33:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721921599;
+	bh=MDq1Q4saoPwdhXmKqgMKL/Ay+WsV+Wk+4g7Y7dWlJZc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NcEJB0v9/lQuR42qN7+wQgACD3DChNNImNTi9QOMAKcYLAkCDTNSR0rM/vyyy5ZMA
+	 OoMpnkNxnttzVYIzr6vnlu5oh6MhN7Rm9U0xh0gN9kPiXfyXyXGF24jd6p0LI5l+ue
+	 EAMEcOKi0T2R9sZRKNy24uWBXKOxTqy2sOuJZTArcLVKdZbkRzZrG15+P7VSS/afxW
+	 rhkHlGilpkmSH5eKdl1TDnvWOHX5f+jU51ANkRld1GuKqiVteb/FVMEt3xfwzqNT1t
+	 77QWXyUS8aRC4KxMp/iypALlnODZx8RE5pr71w2+Tmx/01/dWvYO8r9SGt6AYtAM+K
+	 lYjvPv/RjTj6w==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sX0Sz-00FLAl-Qa;
+	Thu, 25 Jul 2024 16:33:17 +0100
+Date: Thu, 25 Jul 2024 16:33:17 +0100
+Message-ID: <8634nx32rm.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>
 Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-Message-ID: <ZqJrlcIv2_bWQk2r@raptor>
+In-Reply-To: <ZqJrlcIv2_bWQk2r@raptor>
 References: <20240625133508.259829-1-maz@kernel.org>
- <20240708165800.1220065-1-maz@kernel.org>
- <ZqJeLDGJwWEFMKD4@raptor>
- <864j8d35p3.wl-maz@kernel.org>
+	<20240708165800.1220065-1-maz@kernel.org>
+	<ZqJeLDGJwWEFMKD4@raptor>
+	<864j8d35p3.wl-maz@kernel.org>
+	<ZqJrlcIv2_bWQk2r@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <864j8d35p3.wl-maz@kernel.org>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi,
-
-On Thu, Jul 25, 2024 at 03:30:00PM +0100, Marc Zyngier wrote:
-> On Thu, 25 Jul 2024 15:16:12 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > > +	if (perm_fail) {
-> > > +		struct s1_walk_result tmp;
-> > 
-> > I was wondering if you would consider initializing 'tmp' to the empty struct
-> > here. That makes it consistent with the initialization of 'wr' in the !perm_fail
-> > case and I think it will make the code more robust wrt to changes to
-> > compute_par_s1() and what fields it accesses.
+On Thu, 25 Jul 2024 16:13:25 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> I think there is a slightly better way, with something like this:
+> Hi,
+> 
+> On Thu, Jul 25, 2024 at 03:30:00PM +0100, Marc Zyngier wrote:
+> > On Thu, 25 Jul 2024 15:16:12 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> > > > +	if (perm_fail) {
+> > > > +		struct s1_walk_result tmp;
+> > > 
+> > > I was wondering if you would consider initializing 'tmp' to the empty struct
+> > > here. That makes it consistent with the initialization of 'wr' in the !perm_fail
+> > > case and I think it will make the code more robust wrt to changes to
+> > > compute_par_s1() and what fields it accesses.
+> > 
+> > I think there is a slightly better way, with something like this:
+> > 
+> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > index b02d8dbffd209..36fa2801ab4ef 100644
+> > --- a/arch/arm64/kvm/at.c
+> > +++ b/arch/arm64/kvm/at.c
+> > @@ -803,12 +803,12 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+> >  	}
+> >  
+> >  	if (perm_fail) {
+> > -		struct s1_walk_result tmp;
+> > -
+> > -		tmp.failed = true;
+> > -		tmp.fst = ESR_ELx_FSC_PERM | wr.level;
+> > -		tmp.s2 = false;
+> > -		tmp.ptw = false;
+> > +		struct s1_walk_result tmp = (struct s1_walk_result){
+> > +			.failed	= true,
+> > +			.fst	= ESR_ELx_FSC_PERM | wr.level,
+> > +			.s2	= false,
+> > +			.ptw	= false,
+> > +		};
+> >  
+> >  		wr = tmp;
+> >  	}
+> > 
+> > Thoughts?
+> 
+> How about (diff against your kvm-arm64/nv-at-pan-WIP branch, in case something
+> looks off):
 > 
 > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index b02d8dbffd209..36fa2801ab4ef 100644
+> index b02d8dbffd20..74ebe3223a13 100644
 > --- a/arch/arm64/kvm/at.c
 > +++ b/arch/arm64/kvm/at.c
-> @@ -803,12 +803,12 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
->  	}
->  
->  	if (perm_fail) {
-> -		struct s1_walk_result tmp;
-> -
-> -		tmp.failed = true;
-> -		tmp.fst = ESR_ELx_FSC_PERM | wr.level;
-> -		tmp.s2 = false;
-> -		tmp.ptw = false;
-> +		struct s1_walk_result tmp = (struct s1_walk_result){
-> +			.failed	= true,
-> +			.fst	= ESR_ELx_FSC_PERM | wr.level,
-> +			.s2	= false,
-> +			.ptw	= false,
-> +		};
->  
->  		wr = tmp;
->  	}
+> @@ -802,16 +802,8 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>                 BUG();
+>         }
 > 
-> Thoughts?
+> -       if (perm_fail) {
+> -               struct s1_walk_result tmp;
+> -
+> -               tmp.failed = true;
+> -               tmp.fst = ESR_ELx_FSC_PERM | wr.level;
+> -               tmp.s2 = false;
+> -               tmp.ptw = false;
+> -
+> -               wr = tmp;
+> -       }
+> +       if (perm_fail)
+> +               fail_s1_walk(&wr, ESR_ELx_FSC_PERM | wr.level, false, false);
+> 
+>  compute_par:
+>         return compute_par_s1(vcpu, &wr);
+> 
 
-How about (diff against your kvm-arm64/nv-at-pan-WIP branch, in case something
-looks off):
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index b02d8dbffd20..74ebe3223a13 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -802,16 +802,8 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-                BUG();
-        }
-
--       if (perm_fail) {
--               struct s1_walk_result tmp;
--
--               tmp.failed = true;
--               tmp.fst = ESR_ELx_FSC_PERM | wr.level;
--               tmp.s2 = false;
--               tmp.ptw = false;
--
--               wr = tmp;
--       }
-+       if (perm_fail)
-+               fail_s1_walk(&wr, ESR_ELx_FSC_PERM | wr.level, false, false);
-
- compute_par:
-        return compute_par_s1(vcpu, &wr);
+Ah, much nicer indeed!
 
 Thanks,
-Alex
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
