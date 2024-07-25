@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-22260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B995A93C7D7
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 19:53:28 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C466B93C7D9
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 19:53:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7937E28291A
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 17:53:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FEAF1F23144
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 17:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3493219E82B;
-	Thu, 25 Jul 2024 17:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101C919EEB0;
+	Thu, 25 Jul 2024 17:52:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y7tufkBM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="asLLendh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF27919E7E8
-	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 17:52:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9085519DF64
+	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 17:52:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721929965; cv=none; b=ZFYTUuuI84PgexzIz0ni7k69KScLiJeofiy3i32+7TPmoIKFvWekLYnCwGbMD404d+uRJPbt/LQXmQUyy70uQSUnxZ7N5tC+zKZC6a8ebsJIIOWldotdO5ox6oY5c70xJfJI4PPyFTAGlCIjUXvHS7OtfaTBJc17lNDFXFoVO0Q=
+	t=1721929970; cv=none; b=koySg0kdQBzPWTU39F4xVeqFcw9vXjF+VXVhB5PqTtoEjzLu+X4irwhn76aw5aDlEZmfLvxbxeTeaBR2lDEo4imxOueNZkbOzxKXRT/Zr5s7TcnHLFcggn4jcxroym2Dw5QkFFyYJ+ScTrHDld0tlWlwH4QA0gLlnUugM96F5kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721929965; c=relaxed/simple;
-	bh=bF/RmDC1muiFR8b68LnasEDMNOGIh57mHfNhH/TZ9IA=;
+	s=arc-20240116; t=1721929970; c=relaxed/simple;
+	bh=kogYHPCgxN7fVrHV2V6WfLHhmvshqqvcwuBfjpINjn4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NFNyvWfvrr+gJXOXVF3I1jjyG2CbGdfiBbS8kPQZkLn/QGMN3iIbEHQ/WrpI2c9faTmtG1APny8210h9LWniBnEpPokNnixmkP6P+S04sZjznE5OFPfSsW/4dmCgPEJFzkm26oPUD2DM+2rYlKvM5cn+oKrtHYmT1oV7eCUM0+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y7tufkBM; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=JdiS7W7PROLSFUWTEefB16/NpsjmpKZmfcasA4XXAp55F/2XIrmTXKYwvvglUhgaYIgpONBSEVUU6f39Z7cZzLByuziEOTzPWuDbbz6hPHQ7Ilf8h0gDrgwaGUwKHLttVQkC3cTAFQCuHYxxsH07RX3QqrHzx3iHgP2WouSJ6cU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=asLLendh; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1721929962;
+	s=mimecast20190719; t=1721929967;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=G0JDlgx4JpEKNjMRaudEG0UhuNLw5CjvqTILvNGGv58=;
-	b=Y7tufkBM8hJb8a2+24Mb8hSh9700O8NVvaG2e0S2gMX71oaav8Kts82/8b89pLdMNOE0wv
-	mXZoe52EuVaNRGRUQ+ElCoTGYlArlL11fAEQCfjMnPPMkdSDxSyJEu5Y3R6cmbZXWXNAo3
-	jVWZGCcdZl1ET9dqEuWuLE1NYI1t0Ng=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=n4xS6yIc5oxvEfAdcJ79xBrXoA14Q486xMadqCJ+TwM=;
+	b=asLLendhE+vHsvq6WeZnovfb6XKIIktptY6qKZwqMhulyEP8wMha4aLoLiS7SRbfJ24Jvl
+	5rJmw+8Yeow+KiSAfUUSUY11Zwv6vZ4UNelJMvawN6xpXV58COUtmJMLYuMvj8UZyUYbYF
+	D3zBc8RcnbtrNaoJFeYNGwqav/TOYUo=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-Wz2a5VeHOWeFiTS8-v5N9A-1; Thu,
- 25 Jul 2024 13:52:39 -0400
-X-MC-Unique: Wz2a5VeHOWeFiTS8-v5N9A-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-217-uX3tpQZUOi2OqskcgXN3cg-1; Thu,
+ 25 Jul 2024 13:52:42 -0400
+X-MC-Unique: uX3tpQZUOi2OqskcgXN3cg-1
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 014D61944B2E;
-	Thu, 25 Jul 2024 17:52:38 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 909E91955EB3;
+	Thu, 25 Jul 2024 17:52:40 +0000 (UTC)
 Received: from starship.lan (unknown [10.22.8.132])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 927383000194;
-	Thu, 25 Jul 2024 17:52:35 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id F1C52300019A;
+	Thu, 25 Jul 2024 17:52:37 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: kvm@vger.kernel.org
 Cc: Sean Christopherson <seanjc@google.com>,
@@ -68,9 +68,9 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	x86@kernel.org,
 	Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v3 1/2] KVM: nVMX: use vmx_segment_cache_clear
-Date: Thu, 25 Jul 2024 13:52:31 -0400
-Message-Id: <20240725175232.337266-2-mlevitsk@redhat.com>
+Subject: [PATCH v3 2/2] VMX: reset the segment cache after segment initialization in vmx_vcpu_reset
+Date: Thu, 25 Jul 2024 13:52:32 -0400
+Message-Id: <20240725175232.337266-3-mlevitsk@redhat.com>
 In-Reply-To: <20240725175232.337266-1-mlevitsk@redhat.com>
 References: <20240725175232.337266-1-mlevitsk@redhat.com>
 Precedence: bulk
@@ -82,68 +82,66 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-in prepare_vmcs02_rare, call vmx_segment_cache_clear instead
-of setting segment_cache.bitmask directly.
+reset the segment cache after segment initialization in vmx_vcpu_reset
+to avoid stale uninitialized data being cached in the segment cache.
 
-No functional change intended.
+In particular the following scenario is possible when full preemption
+is enabled:
+
+- vCPU is just created, and the vCPU thread is preempted before SS.AR_BYTES
+is written in vmx_vcpu_reset.
+
+- During preemption, the kvm_arch_vcpu_in_kernel is called which
+reads SS's segment AR byte to determine if the CPU was in the kernel.
+
+That caches 0 value of SS.AR_BYTES, then eventually the vCPU thread will be
+preempted back, then set the correct SS.AR_BYTES value in the vmcs
+and the cached value will remain stale, and could be read e.g via
+KVM_GET_SREGS.
+
+Usually this is not a problem because VMX segment cache is reset on each
+vCPU run, but if the userspace (e.g KVM selftests do) reads the segment
+registers just after the vCPU was created, and modifies some of them
+but passes through other registers and in this case SS.AR_BYTES,
+the stale value of it will make it into the vmcs,
+and later lead to a VM entry failure due to incorrect SS segment type.
+
+Fix this by moving the vmx_segment_cache_clear() call to be after the
+segments are initialized.
+
+Note that this still doesn't fix the issue of kvm_arch_vcpu_in_kernel
+getting stale data during the segment setup, and that issue will
+be addressed later.
 
 Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
 ---
- arch/x86/kvm/vmx/nested.c | 3 ++-
- arch/x86/kvm/vmx/vmx.c    | 4 ----
- arch/x86/kvm/vmx/vmx.h    | 5 +++++
- 3 files changed, 7 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/vmx/nested.c b/arch/x86/kvm/vmx/nested.c
-index 643935a0f70a..b0e5d80da941 100644
---- a/arch/x86/kvm/vmx/nested.c
-+++ b/arch/x86/kvm/vmx/nested.c
-@@ -2469,6 +2469,7 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
- 
- 	if (!hv_evmcs || !(hv_evmcs->hv_clean_fields &
- 			   HV_VMX_ENLIGHTENED_CLEAN_FIELD_GUEST_GRP2)) {
-+
- 		vmcs_write16(GUEST_ES_SELECTOR, vmcs12->guest_es_selector);
- 		vmcs_write16(GUEST_CS_SELECTOR, vmcs12->guest_cs_selector);
- 		vmcs_write16(GUEST_SS_SELECTOR, vmcs12->guest_ss_selector);
-@@ -2506,7 +2507,7 @@ static void prepare_vmcs02_rare(struct vcpu_vmx *vmx, struct vmcs12 *vmcs12)
- 		vmcs_writel(GUEST_GDTR_BASE, vmcs12->guest_gdtr_base);
- 		vmcs_writel(GUEST_IDTR_BASE, vmcs12->guest_idtr_base);
- 
--		vmx->segment_cache.bitmask = 0;
-+		vmx_segment_cache_clear(vmx);
- 	}
- 
- 	if (!hv_evmcs || !(hv_evmcs->hv_clean_fields &
 diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b3c83c06f826..fa9f307d9b18 100644
+index fa9f307d9b18..d43bb755e15c 100644
 --- a/arch/x86/kvm/vmx/vmx.c
 +++ b/arch/x86/kvm/vmx/vmx.c
-@@ -524,10 +524,6 @@ static const struct kvm_vmx_segment_field {
- 	VMX_SEGMENT_FIELD(LDTR),
- };
+@@ -4870,9 +4870,6 @@ void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	vmx->hv_deadline_tsc = -1;
+ 	kvm_set_cr8(vcpu, 0);
  
--static inline void vmx_segment_cache_clear(struct vcpu_vmx *vmx)
--{
--	vmx->segment_cache.bitmask = 0;
--}
+-	vmx_segment_cache_clear(vmx);
+-	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
+-
+ 	seg_setup(VCPU_SREG_CS);
+ 	vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
+ 	vmcs_writel(GUEST_CS_BASE, 0xffff0000ul);
+@@ -4899,6 +4896,9 @@ void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+ 	vmcs_writel(GUEST_IDTR_BASE, 0);
+ 	vmcs_write32(GUEST_IDTR_LIMIT, 0xffff);
  
- static unsigned long host_idt_base;
- 
-diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
-index 7b64e271a931..1689f0d59f43 100644
---- a/arch/x86/kvm/vmx/vmx.h
-+++ b/arch/x86/kvm/vmx/vmx.h
-@@ -755,4 +755,9 @@ static inline bool vmx_can_use_ipiv(struct kvm_vcpu *vcpu)
- 	return  lapic_in_kernel(vcpu) && enable_ipiv;
- }
- 
-+static inline void vmx_segment_cache_clear(struct vcpu_vmx *vmx)
-+{
-+	vmx->segment_cache.bitmask = 0;
-+}
++	vmx_segment_cache_clear(vmx);
++	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
 +
- #endif /* __KVM_X86_VMX_H */
+ 	vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
+ 	vmcs_write32(GUEST_INTERRUPTIBILITY_INFO, 0);
+ 	vmcs_writel(GUEST_PENDING_DBG_EXCEPTIONS, 0);
 -- 
 2.26.3
 
