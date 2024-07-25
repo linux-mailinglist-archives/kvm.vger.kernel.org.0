@@ -1,174 +1,128 @@
-Return-Path: <kvm+bounces-22207-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22208-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E809893BAE3
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 04:38:04 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0947E93BB41
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 05:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 418A5282BA8
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 02:38:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AA761F22F7E
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 03:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C1BD10A2A;
-	Thu, 25 Jul 2024 02:37:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CtJymMUW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFE0318028;
+	Thu, 25 Jul 2024 03:34:18 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2D263D0
-	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 02:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7796A1C683;
+	Thu, 25 Jul 2024 03:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721875076; cv=none; b=SbfA9KcPUflKFpDXxP+wRp8KBun3JSO+RY5NwmhxUGFv1TMH2KAoZREIkFQzqkcaSvloFdRlSFKSM+uQBHHpmHQrjFc2nL0y8NLNQrk9NpRAwKxJNVeYOmgf0LiChbAlQiLIJed40aop+diACd+ju82cymGon8FBcO/ep/9ppSk=
+	t=1721878458; cv=none; b=aCR0G0NUru5HLWAecl8ZiSs7jQlOWBrE3l9uZ1ssi2bvVSCJmlKxSUx/TXVNS7nI6rAcNQ+RDXF7DiRAuoBKPZseQ87ORLlylVsYUVgQQ8tUhwwTd1yKx+VS2fC6+CkgFnE2zocVAH8boEqYb3Jw0rcj+6rAE3Dp1u6rnPaGR4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721875076; c=relaxed/simple;
-	bh=rcLlgfmpf8Ql97d7x31xNql3lDDEZ8UD+1Vkc/OSsDc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dOOC2WUdbR7x+ciV2gED9jEoQLAkS3yQdRYPWyyr3Inan0NKwbv78R9jQSHJyspp44ttRIgnDYyWRtYI2clmq1CSYIZ7bACxUW2Gwfa2WnjY5oaE3xsJ58IZqr775vXsL1JOsOVo0FHGQvgDg/NG/Q7W7a62xqoVilS7O+F30Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CtJymMUW; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721875075; x=1753411075;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=rcLlgfmpf8Ql97d7x31xNql3lDDEZ8UD+1Vkc/OSsDc=;
-  b=CtJymMUWpoL32mxHKSmodqJid4rgBoUD1PfZZrvnCIAoFrUWOLFhR0h5
-   1P2EY57LjA/J01CXqC0GaVfJphQMXR8Swry8o6co9T478jBGuEuEDcS3c
-   wHAUZoQ/g0DG2vva+moG9mK3HLTFzoA1/KVr9N7hRz8KRqYy2gVfyLCF3
-   /vNsmR9jxQuRMe6noNCUwj8nkQEbBqIM8z5sSokQVTb+F6nACHor8cEGx
-   vvQKqbiWqNLGLIqwBwdL11jTqVnjUqE4ZU4SCck+r3Gc+EFkgIWLjdQy/
-   cPOLTieVUCw8+phdOavxau74erX7B8sisMReca38AnjSlQovWtgW9Gxx8
-   w==;
-X-CSE-ConnectionGUID: BMR9wjWqSm6/qLHvkLvYlw==
-X-CSE-MsgGUID: KA1syPenRHSI40Ex/vnI1Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="19726814"
-X-IronPort-AV: E=Sophos;i="6.09,234,1716274800"; 
-   d="scan'208";a="19726814"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 19:37:54 -0700
-X-CSE-ConnectionGUID: NGnjczZSTJ+19i/ohm2OSw==
-X-CSE-MsgGUID: u/sodxa3RdG7hClKvXeq2g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,234,1716274800"; 
-   d="scan'208";a="57344874"
-Received: from linux.bj.intel.com ([10.238.157.71])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jul 2024 19:37:52 -0700
-Date: Thu, 25 Jul 2024 10:32:53 +0800
-From: Tao Su <tao1.su@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, pbonzini@redhat.com, chao.gao@intel.com,
-	xiaoyao.li@intel.com
-Subject: Re: [PATCH] KVM: x86: Reset RSP before exiting to userspace when
- emulating POPA
-Message-ID: <ZqG5VaFKdP+G3/vg@linux.bj.intel.com>
-References: <20240724044529.3837492-1-tao1.su@linux.intel.com>
- <ZqEPrE429UQi9duo@google.com>
+	s=arc-20240116; t=1721878458; c=relaxed/simple;
+	bh=/N706srqYtuJMkT+BpYGzLjZvdeXYv1h11HRHGRQDu8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rvakj91OIZeBKLlPQKqVYLLMzCa2j++XCbdLyEh5VTBa+GdwWxXo5XSytzQc1n2WjDaOnf+c+D30KLNJ9x36Z+enevEEnN72pxl4F5B6c8z0pBQgzx1hwES6E40hn7/TSbRkxTkm4nYHk5IrxbhWRjxFvWkIDs4WFmB6nhk/roI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.10.34])
+	by gateway (Coremail) with SMTP id _____8Cxd+mux6Fm5FUBAA--.3577S3;
+	Thu, 25 Jul 2024 11:34:06 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.10.34])
+	by front1 (Coremail) with SMTP id qMiowMBxicWsx6FmppEAAA--.37S2;
+	Thu, 25 Jul 2024 11:34:04 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>
+Cc: WANG Xuerui <kernel@xen0n.name>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>
+Subject: [PATCH v5 0/3] LoongArch: KVM: Add Binary Translation extension support
+Date: Thu, 25 Jul 2024 11:34:01 +0800
+Message-Id: <20240725033404.2675204-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZqEPrE429UQi9duo@google.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMBxicWsx6FmppEAAA--.37S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxJr45trWUXrW7Xry8AryrGrX_yoW8urWxpa
+	43Crn5GF18Kr43AwsIq34q9r1YgFWxCrW8WF9xJ3yYyF4DGry8Xr40kFyDWF1UCw4rXry0
+	vF1vy3y8uFs8AwcCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
+	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
+	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr41l42xK82IYc2Ij64
+	vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8G
+	jcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAKI48JMIIF0xvE2I
+	x0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK
+	8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I
+	0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07j1WlkUUUUU=
 
-On Wed, Jul 24, 2024 at 08:33:48AM -0700, Sean Christopherson wrote:
-> On Wed, Jul 24, 2024, Tao Su wrote:
-> > When emulating POPA and exiting to userspace for MMIO, reset modified RSP
-> > as emulation context may not be reset. POPA may generate more multiple
-> > reads, i.e. multiple POPs from the stack, but if stack points to MMIO,
-> > KVM needs to emulate multiple MMIO reads.
-> > 
-> > When one MMIO done, POPA may be re-emulated with EMULTYPE_NO_DECODE set,
-> > i.e. ctxt will not be reset, but RSP is modified by previous emulation of
-> > current POPA instruction, which eventually leads to emulation error.
-> > 
-> > The commit 0dc902267cb3 ("KVM: x86: Suppress pending MMIO write exits if
-> > emulator detects exception") provides a detailed analysis of how KVM
-> > emulates multiple MMIO reads, and its correctness can be verified in the
-> > POPA instruction with this patch.
-> 
-> I don't see how this can work.  If POPA is reading from MMIO, it will need to
-> do 8 distinct emulated MMIO accesses.  Unwinding to the original RSP will allow
-> the first MMIO (store to EDI) to succeed, but then the second MMIO (store to ESI)
-> will exit back to userspace.  And the second restart will load EDI with the
-> result of the MMIO, not ESI.  It will also re-trigger the second MMIO indefinitely.
-> 
+Loongson Binary Translation (LBT) is used to accelerate binary
+translation, which contains 4 scratch registers (scr0 to scr3), x86/ARM
+eflags (eflags) and x87 fpu stack pointer (ftop).
 
-This can work like commit 0dc902267cb3 description. Since there is a buffer
-(ctxt->mem_read), KVM can safely restart the instruction from the beginning.
+Like FPU extension, here lately enabling method is used for LBT. LBT
+context is saved/restored during vcpu context switch path.
 
-After the first MMIO (store to EDI) done, vcpu->mmio_read_completed is set and
-POPA is re-emulated with EMULTYPE_NO_DECODE. When re-emulating, KVM will try
-first MMIO (store to EDI) _again_, but KVM will not exit to userspace in
-emulator_read_write() because vcpu->mmio_read_completed is set and then adjust
-mc->end in read_emulated().
+Also this patch set LBT capability detection, and LBT register get/set
+interface for userspace vmm, so that vm supports migration with BT
+extension.
 
-For the second MMIO (store to ESI), it will exit to userspace and re-emulate.
-When re-emulating, KVM can directly read EDI from the buffer (mc->data) and try
-second MMIO (store to ESI) _again_, but KVM will not exit to userspace in
-emulator_read_write() because vcpu->mmio_read_completed is set and then adjust
-mc->end in read_emulated().
+---
+v4 ... v5:
+  1. Add feature detection for LSX/LASX from vm side, previously
+LSX/LASX feature is detected from vcpu ioctl command, now both methods
+are supported.
 
-For the third MMIO (store to EBP) ...
+v3 ... v4:
+  1. Merge LBT feature detection for VM and VCPU into one patch.
+  2. Move function declaration such as kvm_lose_lbt()/kvm_check_fcsr()/
+kvm_enable_lbt_fpu() from header file to c file, since it is only
+used in one c file.
 
-> To make this work, KVM would need to allow precisely resuming execution where
-> it left off.  We can't use MMIO fragments, because unlike MMIO accesses that
-> split pages, each memory load is an individual access.
-> 
+v2 ... v3:
+  1. Split KVM_LOONGARCH_VM_FEAT_LBT capability checking into three
+sub-features, KVM_LOONGARCH_VM_FEAT_X86BT/KVM_LOONGARCH_VM_FEAT_ARMBT
+and KVM_LOONGARCH_VM_FEAT_MIPSBT. Return success only if host supports
+the sub-feature.
 
-Since all MMIO reads are saved to the buffer (mc->data) and the index (mc->end)
-is adjusted by every re-emulation, KVM already supports multiple MMIO reads.
+v1 ... v2:
+  1. With LBT register read or write interface to userpace, replace
+device attr method with KVM_GET_ONE_REG method, since lbt register is
+vcpu register and can be added in kvm_reg_list in future.
+  2. Add vm device attr ctrl marcro KVM_LOONGARCH_VM_FEAT_CTRL, it is
+used to get supported LBT feature before vm or vcpu is created.
+---
 
-> I don't see any reason to try to make this work.  It's a ridiculously convoluted
-> scenario that, AFAIK, has no real world application.
-> 
+Bibo Mao (3):
+  LoongArch: KVM: Add HW Binary Translation extension support
+  LoongArch: KVM: Add LBT feature detection function
+  LoongArch: KVM: Add vm migration support for LBT registers
 
-I agree POPA+MMIO is rare but supporting it to be same as hardware is cheap. We
-can also use POPA to validate the multiple MMIO reads which has a complex flow (
-actually, that's why I tried POPA in kvm-unit-test and then find this issue).
+ arch/loongarch/include/asm/kvm_host.h |   8 ++
+ arch/loongarch/include/asm/kvm_vcpu.h |   6 ++
+ arch/loongarch/include/uapi/asm/kvm.h |  17 ++++
+ arch/loongarch/kvm/exit.c             |   9 ++
+ arch/loongarch/kvm/vcpu.c             | 126 +++++++++++++++++++++++++-
+ arch/loongarch/kvm/vm.c               |  52 ++++++++++-
+ 6 files changed, 216 insertions(+), 2 deletions(-)
 
-> > Signed-off-by: Tao Su <tao1.su@linux.intel.com>
-> > ---
-> > For testing, we can add POPA to the emulator case in kvm-unit-test.
-> > ---
-> >  arch/x86/kvm/emulate.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/x86/kvm/emulate.c b/arch/x86/kvm/emulate.c
-> > index e72aed25d721..3746fef6ca60 100644
-> > --- a/arch/x86/kvm/emulate.c
-> > +++ b/arch/x86/kvm/emulate.c
-> > @@ -1999,6 +1999,7 @@ static int em_pushf(struct x86_emulate_ctxt *ctxt)
-> >  
-> >  static int em_popa(struct x86_emulate_ctxt *ctxt)
-> >  {
-> > +	unsigned long old_esp = reg_read(ctxt, VCPU_REGS_RSP);
-> >  	int rc = X86EMUL_CONTINUE;
-> >  	int reg = VCPU_REGS_RDI;
-> >  	u32 val = 0;
-> > @@ -2010,8 +2011,11 @@ static int em_popa(struct x86_emulate_ctxt *ctxt)
-> >  		}
-> >  
-> >  		rc = emulate_pop(ctxt, &val, ctxt->op_bytes);
-> > -		if (rc != X86EMUL_CONTINUE)
-> > +		if (rc != X86EMUL_CONTINUE) {
-> > +			assign_register(reg_rmw(ctxt, VCPU_REGS_RSP),
-> > +					old_esp, ctxt->op_bytes);
-> >  			break;
-> > +		}
-> >  		assign_register(reg_rmw(ctxt, reg), val, ctxt->op_bytes);
-> >  		--reg;
-> >  	}
-> > 
-> > base-commit: 786c8248dbd33a5a7a07f7c6e55a7bfc68d2ca48
-> > -- 
-> > 2.34.1
-> > 
+
+base-commit: c33ffdb70cc6df4105160f991288e7d2567d7ffa
+-- 
+2.39.3
+
 
