@@ -1,190 +1,133 @@
-Return-Path: <kvm+bounces-22227-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22228-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 498AB93C165
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 14:03:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FA0E93C16D
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 14:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD6301F2286B
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 12:03:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0B861C217E3
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 12:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB11F19922A;
-	Thu, 25 Jul 2024 12:03:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gaNVJY2r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B67199246;
+	Thu, 25 Jul 2024 12:05:58 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC4CE22089;
-	Thu, 25 Jul 2024 12:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C70522089
+	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 12:05:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721909008; cv=none; b=ZXDP8zy5JPTCUAnEkklMfIhzOZErlRQUPEqwOgwsBBju+CdAh676js2GmJBvwlQ6XZ2kaovUFs26xdAthyQeQV2wFtWCtOVKBe3hnibA6aUwRUp4WVlJwKV47R0n1KJzGZVEscy5zX+fAg3q4+VK20Zbg5e8dgCNBLhNB3jxCLA=
+	t=1721909158; cv=none; b=kkqAyINtP+p8rqt3dD2onHhIDUu1pCClPGFdKdymQeowEgv0Ag3QHiNpUGj6G13CUZMSl4lbObzdU6lltc0UROk0vpnQjQ2beac1r5FQlilmYbTEzWE0FpThsHob2qFkW7TYP2hqBiFMoWhGvYx22+kR24ru6txjicIRTGyEdwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721909008; c=relaxed/simple;
-	bh=G3DTp0ou7Mkj/YyorFQGo2nD9+zDzguGmPpF3qaOCP0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bt3Hr4BmvmYkW0mBioHytRq9z+zlagUT1jwZJx3HVavJs52fOQvWwvqHk/2xkWww9coXgz1c7QMGRtlvlNBHux65GjXnHZSMFhmHr71o4LDeuDPoQFAnTWRYHNCWwckVrcSvAb4L7HLJPRJMr4DO938aonFz9RU24Cp9V0VzY/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gaNVJY2r; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46PC2Oqa016935;
-	Thu, 25 Jul 2024 12:03:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=p
-	ZW6QA4Vvhg8bcF0XPt6P/5v4JwFXUcHR9o4XsvPdVo=; b=gaNVJY2rkPrHUnUOQ
-	1Wwl2cjEnlAxGURC+0KfpXkwF5551+ask3P4a+bj6mFjRL0P5MG5CQSDRi97eA8U
-	7QxsYSsRGdXO1sX1EkHShwSi0MS+q4f+MuRbZIwa3BLzxwnTOtgFzR6eP6Tpv2nW
-	DAsaxC1ANDzJWez3rmvssYR48WBSw+VAeP19A4XoXv0DJ8jNNf5/FgDrwA5qarKW
-	NzYpZVreTZlu5ZjEP95Gk/7/NPgvHpCH+U4bxs3oYCCLXZO1P6LX7QgF1+45Mt+k
-	dOpwgAFvMKsI9WWskOhhqT8v0GBVUb/yZD0MSO73nZ5gusncPJcCx6buaGeqfI4z
-	iWb0w==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40km59g9h9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jul 2024 12:03:21 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46PC3KK7019865;
-	Thu, 25 Jul 2024 12:03:20 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40km59g9h5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jul 2024 12:03:20 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46PB9Hpw005776;
-	Thu, 25 Jul 2024 12:03:19 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40gy2pnf62-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 25 Jul 2024 12:03:19 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46PC3DP550200966
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 25 Jul 2024 12:03:15 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8C1832004F;
-	Thu, 25 Jul 2024 12:03:13 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EF89D20063;
-	Thu, 25 Jul 2024 12:03:12 +0000 (GMT)
-Received: from [9.171.68.98] (unknown [9.171.68.98])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 25 Jul 2024 12:03:12 +0000 (GMT)
-Message-ID: <755de81f-f6ca-48a4-84dc-ecdc93ccf049@linux.ibm.com>
-Date: Thu, 25 Jul 2024 14:03:12 +0200
+	s=arc-20240116; t=1721909158; c=relaxed/simple;
+	bh=fOdKQ9fVU8gKG8SF3F1vS3oQT2gIophfp1LdCx3e3fE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Hw5mk0Cpl7viB33ih2dtgUoSiLHH+IZ4l7xVCYQXE+1zZQLFAgIC1NI2zMh84WIS/ODBX1wprTV0QnSPRI2Y7Gzu9foAtqp/QALUjRygOg4cwgn0RonImb0sHIQVkCyO7M3M8r7T+JIwVUghnhhFXmXI/jYDfwgVt+El78+gRAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WV8gb1yYMz6K5nt;
+	Thu, 25 Jul 2024 20:04:11 +0800 (CST)
+Received: from lhrpeml100003.china.huawei.com (unknown [7.191.160.210])
+	by mail.maildlp.com (Postfix) with ESMTPS id 546D9140B2F;
+	Thu, 25 Jul 2024 20:05:52 +0800 (CST)
+Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
+ lhrpeml100003.china.huawei.com (7.191.160.210) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Thu, 25 Jul 2024 13:05:52 +0100
+Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
+ lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.039;
+ Thu, 25 Jul 2024 13:05:52 +0100
+From: Salil Mehta <salil.mehta@huawei.com>
+To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin"
+	<mst@redhat.com>
+CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Gavin Shan
+	<gshan@redhat.com>, Vishnu Pajjuri <vishnu@os.amperecomputing.com>, "Jonathan
+ Cameron" <jonathan.cameron@huawei.com>, Xianglai Li <lixianglai@loongson.cn>,
+	Miguel Luis <miguel.luis@oracle.com>, Shaoqin Huang <shahuang@redhat.com>,
+	Nicholas Piggin <npiggin@gmail.com>, Zhao Liu <zhao1.liu@intel.com>, "Harsh
+ Prateek Bora" <harshpb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>
+Subject: RE: [PULL v2 37/61] accel/kvm: Extract common KVM vCPU
+ {creation,parking} code
+Thread-Topic: [PULL v2 37/61] accel/kvm: Extract common KVM vCPU
+ {creation,parking} code
+Thread-Index: AQHa3O9RebBRo1C7H0iEcr177twQ1LIHMiGAgAApesA=
+Date: Thu, 25 Jul 2024 12:05:51 +0000
+Message-ID: <8f5fcf0c1deb4f199d86441f79298629@huawei.com>
+References: <cover.1721731723.git.mst@redhat.com>
+ <08c328682231b64878fc052a11091bea39577a6f.1721731723.git.mst@redhat.com>
+ <CAFEAcA-3_d1c7XSXWkFubD-LsW5c5i95e6xxV09r2C9yGtzcdA@mail.gmail.com>
+In-Reply-To: <CAFEAcA-3_d1c7XSXWkFubD-LsW5c5i95e6xxV09r2C9yGtzcdA@mail.gmail.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 06/10] selftests: kvm: s390: Add VM run test case
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-References: <20240723093126.285319-1-schlameuss@linux.ibm.com>
- <20240723093126.285319-7-schlameuss@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240723093126.285319-7-schlameuss@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: WHL8PnJq_PXkRo7KmnUMgwoh5b_PM42l
-X-Proofpoint-ORIG-GUID: ShT63k2uSeU6zxInlV7y98RC2ZCvih3t
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-25_11,2024-07-25_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- impostorscore=0 mlxlogscore=999 clxscore=1015 adultscore=0 mlxscore=0
- priorityscore=1501 lowpriorityscore=0 bulkscore=0 malwarescore=0
- phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2407250081
 
-On 7/23/24 11:31, Christoph Schlameuss wrote:
-> Add test case running code interacting with registers within a
-> ucontrol VM.
-> 
-> * Add uc_gprs test case
-> 
-> The test uses the same VM setup using the fixture and debug macros
-> introduced in earlier patches in this series.
-> 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> ---
->   .../selftests/kvm/s390x/ucontrol_test.c       | 132 ++++++++++++++++++
->   1 file changed, 132 insertions(+)
-> 
-> diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> index 527c431a9758..c98d5a3a315b 100644
-> --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> @@ -43,6 +43,23 @@ void require_ucontrol_admin(void)
->   	TEST_REQUIRE(kvm_has_cap(KVM_CAP_S390_UCONTROL));
->   }
->   
-> +/* Test program setting some registers and looping */
-> +extern char test_gprs_pgm[];
-> +asm("test_gprs_pgm:\n"
-> +	"xgr	%r0, %r0\n"
-> +	"lgfi	%r1,1\n"
-[...]
-
-Naming something PGM for handling anything else than Program Exceptions 
-is not recommendable. PGM has been a stable name on s390 for code 
-related to PGM exceptions
-
-When first reading this I expected to find some kind of exception code.
+SEkgUGV0ZXIsDQoNCj4gIEZyb206IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJv
+Lm9yZz4NCj4gIFNlbnQ6IFRodXJzZGF5LCBKdWx5IDI1LCAyMDI0IDExOjM2IEFNDQo+ICBUbzog
+TWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4NCj4gIA0KPiAgT24gVHVlLCAyMyBK
+dWwgMjAyNCBhdCAxMTo1OCwgTWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4gd3Jv
+dGU6DQo+ICA+DQo+ICA+IEZyb206IFNhbGlsIE1laHRhIDxzYWxpbC5tZWh0YUBodWF3ZWkuY29t
+Pg0KPiAgPg0KPiAgPiBLVk0gdkNQVSBjcmVhdGlvbiBpcyBkb25lIG9uY2UgZHVyaW5nIHRoZSB2
+Q1BVIHJlYWxpemF0aW9uIHdoZW4gUWVtdQ0KPiAgPiB2Q1BVIHRocmVhZCBpcyBzcGF3bmVkLiBU
+aGlzIGlzIGNvbW1vbiB0byBhbGwgdGhlIGFyY2hpdGVjdHVyZXMgYXMgb2Ygbm93Lg0KPiAgPg0K
+PiAgPiBIb3QtdW5wbHVnIG9mIHZDUFUgcmVzdWx0cyBpbiBkZXN0cnVjdGlvbiBvZiB0aGUgdkNQ
+VSBvYmplY3QgaW4gUU9NDQo+ICA+IGJ1dCB0aGUgY29ycmVzcG9uZGluZyBLVk0gdkNQVSBvYmpl
+Y3QgaW4gdGhlIEhvc3QgS1ZNIGlzIG5vdCBkZXN0cm95ZWQNCj4gID4gYXMgS1ZNIGRvZXNuJ3Qg
+c3VwcG9ydCB2Q1BVIHJlbW92YWwuIFRoZXJlZm9yZSwgaXRzIHJlcHJlc2VudGF0aXZlIEtWTQ0K
+PiAgPiB2Q1BVIG9iamVjdC9jb250ZXh0IGluIFFlbXUgaXMgcGFya2VkLg0KPiAgPg0KPiAgPiBS
+ZWZhY3RvciBhcmNoaXRlY3R1cmUgY29tbW9uIGxvZ2ljIHNvIHRoYXQgc29tZSBBUElzIGNvdWxk
+IGJlIHJldXNlZA0KPiAgPiBieSB2Q1BVIEhvdHBsdWcgY29kZSBvZiBzb21lIGFyY2hpdGVjdHVy
+ZXMgbGlrZXMgQVJNLCBMb29uZ3NvbiBldGMuDQo+ICA+IFVwZGF0ZSBuZXcvb2xkIEFQSXMgd2l0
+aCB0cmFjZSBldmVudHMuIE5ldyBBUElzDQo+ICA+IHFlbXVfe2NyZWF0ZSxwYXJrLHVucGFya31f
+dmNwdSgpIGNhbiBiZSBleHRlcm5hbGx5IGNhbGxlZC4gTm8gZnVuY3Rpb25hbA0KPiAgY2hhbmdl
+IGlzIGludGVuZGVkIGhlcmUuDQo+ICANCj4gIEhpOyBDb3Zlcml0eSBwb2ludHMgb3V0IGFuIGlz
+c3VlIHdpdGggdGhpcyBjb2RlIChDSUQgMTU1ODU1Mik6DQo+ICANCj4gID4gK2ludCBrdm1fdW5w
+YXJrX3ZjcHUoS1ZNU3RhdGUgKnMsIHVuc2lnbmVkIGxvbmcgdmNwdV9pZCkgew0KPiAgPiArICAg
+IHN0cnVjdCBLVk1QYXJrZWRWY3B1ICpjcHU7DQo+ICA+ICsgICAgaW50IGt2bV9mZCA9IC1FTk9F
+TlQ7DQo+ICA+ICsNCj4gID4gKyAgICBRTElTVF9GT1JFQUNIKGNwdSwgJnMtPmt2bV9wYXJrZWRf
+dmNwdXMsIG5vZGUpIHsNCj4gID4gKyAgICAgICAgaWYgKGNwdS0+dmNwdV9pZCA9PSB2Y3B1X2lk
+KSB7DQo+ICA+ICsgICAgICAgICAgICBRTElTVF9SRU1PVkUoY3B1LCBub2RlKTsNCj4gID4gKyAg
+ICAgICAgICAgIGt2bV9mZCA9IGNwdS0+a3ZtX2ZkOw0KPiAgPiArICAgICAgICAgICAgZ19mcmVl
+KGNwdSk7DQo+ICA+ICsgICAgICAgIH0NCj4gID4gKyAgICB9DQo+ICANCj4gIElmIHlvdSBhcmUg
+Z29pbmcgdG8gcmVtb3ZlIGFuIGVudHJ5IGZyb20gYSBsaXN0IGFzIHlvdSBpdGVyYXRlIG92ZXIg
+aXQsIHlvdQ0KPiAgY2FuJ3QgdXNlIFFMSVNUX0ZPUkVBQ0goKSwgYmVjYXVzZSBRTElTVF9GT1JF
+QUNIIHdpbGwgbG9vayBhdCB0aGUgbmV4dA0KPiAgcG9pbnRlciBvZiB0aGUgaXRlcmF0aW9uIHZh
+cmlhYmxlIGF0IHRoZSBlbmQgb2YgdGhlIGxvb3Agd2hlbiBpdCB3YW50cyB0bw0KPiAgYWR2YW5j
+ZSB0byB0aGUgbmV4dCBub2RlLiBJbiB0aGlzIGNhc2Ugd2UndmUgYWxyZWFkeSBmcmVlZCAnY3B1
+Jywgc28gaXQgd291bGQNCj4gIGJlIHJlYWRpbmcgZnJlZWQgbWVtb3J5Lg0KPiAgDQo+ICBTaG91
+bGQgd2UgYnJlYWsgb3V0IG9mIHRoZSBsb29wIHdoZW4gd2UgZmluZCB0aGUgZW50cnk/DQoNCg0K
+VGhhbmtzIGZvciBpZGVudGlmeWluZyB0aGlzLiBZZXMsIGEgIGJyZWFrIGlzIG1pc3NpbmcuIFNo
+b3VsZCBJIHNlbmQgYSBmaXggZm9yIHRoaXMNCm5vdyBvciB5b3UgY2FuIGluY29ycG9yYXRlIGl0
+Pw0KDQoNCkJlc3QgcmVnYXJkcw0KU2FsaWwNCg0KDQo+ICANCj4gIElmIHdlIGRvIG5lZWQgdG8g
+Y29udGludWUgaXRlcmF0aW9uIGFmdGVyIHJlbW92aW5nIHRoZSBsaXN0IG5vZGUsIHlvdSBuZWVk
+DQo+ICB0byB1c2UgUUxJU1RfRk9SRUFDSF9TQUZFKCkgdG8gZG8gdGhlIGxpc3QgaXRlcmF0aW9u
+Lg0KPiAgDQo+ICA+IC1zdGF0aWMgaW50IGt2bV9nZXRfdmNwdShLVk1TdGF0ZSAqcywgdW5zaWdu
+ZWQgbG9uZyB2Y3B1X2lkKSAtew0KPiAgPiAtICAgIHN0cnVjdCBLVk1QYXJrZWRWY3B1ICpjcHU7
+DQo+ICA+IC0NCj4gID4gLSAgICBRTElTVF9GT1JFQUNIKGNwdSwgJnMtPmt2bV9wYXJrZWRfdmNw
+dXMsIG5vZGUpIHsNCj4gID4gLSAgICAgICAgaWYgKGNwdS0+dmNwdV9pZCA9PSB2Y3B1X2lkKSB7
+DQo+ICA+IC0gICAgICAgICAgICBpbnQga3ZtX2ZkOw0KPiAgPiAtDQo+ICA+IC0gICAgICAgICAg
+ICBRTElTVF9SRU1PVkUoY3B1LCBub2RlKTsNCj4gID4gLSAgICAgICAgICAgIGt2bV9mZCA9IGNw
+dS0+a3ZtX2ZkOw0KPiAgPiAtICAgICAgICAgICAgZ19mcmVlKGNwdSk7DQo+ICA+IC0gICAgICAg
+ICAgICByZXR1cm4ga3ZtX2ZkOw0KPiAgDQo+ICBJbiB0aGlzIG9sZCBwaWVjZSBvZiBjb2RlIHdl
+IHdlcmUgT0sgdXNpbmcgUUxJU1RfRk9SRUFDSCBiZWNhdXNlIHdlDQo+ICByZXR1cm5lZCBpbW1l
+ZGlhdGVseSB3ZSB0b29rIHRoZSBub2RlIG9mZiB0aGUgbGlzdCBhbmQgZGlkbid0IGNvbnRpbnVl
+IHRoZQ0KPiAgaXRlcmF0aW9uLg0KDQpBZ3JlZWQuDQoNCj4gIA0KPiAgPiAtICAgICAgICB9DQo+
+ICA+IC0gICAgfQ0KPiAgPiAtDQo+ICA+IC0gICAgcmV0dXJuIGt2bV92bV9pb2N0bChzLCBLVk1f
+Q1JFQVRFX1ZDUFUsICh2b2lkICopdmNwdV9pZCk7DQo+ICA+IC19DQo+ICANCj4gIHRoYW5rcw0K
+PiAgLS0gUE1NDQo=
 
