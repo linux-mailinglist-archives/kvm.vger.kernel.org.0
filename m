@@ -1,133 +1,200 @@
-Return-Path: <kvm+bounces-22228-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22229-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA0E93C16D
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 14:06:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 661E793C1D6
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 14:22:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0B861C217E3
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 12:06:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A9901C21EEC
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 12:22:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B67199246;
-	Thu, 25 Jul 2024 12:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F94D19A2A3;
+	Thu, 25 Jul 2024 12:21:50 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C70522089
-	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 12:05:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9897C199397;
+	Thu, 25 Jul 2024 12:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721909158; cv=none; b=kkqAyINtP+p8rqt3dD2onHhIDUu1pCClPGFdKdymQeowEgv0Ag3QHiNpUGj6G13CUZMSl4lbObzdU6lltc0UROk0vpnQjQ2beac1r5FQlilmYbTEzWE0FpThsHob2qFkW7TYP2hqBiFMoWhGvYx22+kR24ru6txjicIRTGyEdwk=
+	t=1721910109; cv=none; b=HJUpZA5CS4YZFfoHIEaAEvjHpDdThZ0CC/Rzy1cBkedH+AmK6X4DA+wj3JJKCWNn31y/5nQ8H6MnxVarsHO7a59LJmeaMKeXNd+toUjD0kkUSXQk4XSDA62AS1Jmkuc2h971+8kHiStVHwkPhJ0Yc3CMcWADZAJWc3y8GrsITgs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721909158; c=relaxed/simple;
-	bh=fOdKQ9fVU8gKG8SF3F1vS3oQT2gIophfp1LdCx3e3fE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Hw5mk0Cpl7viB33ih2dtgUoSiLHH+IZ4l7xVCYQXE+1zZQLFAgIC1NI2zMh84WIS/ODBX1wprTV0QnSPRI2Y7Gzu9foAtqp/QALUjRygOg4cwgn0RonImb0sHIQVkCyO7M3M8r7T+JIwVUghnhhFXmXI/jYDfwgVt+El78+gRAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+	s=arc-20240116; t=1721910109; c=relaxed/simple;
+	bh=Uxjq9RUhwjCqcw4st/SYfJ6kRT6AQmYokckDdcljTK0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=B1Qz2Gk/txRRE2spetv4g7ebKkA9TCm823eX9zpuHnZ6/5q1u81ZvUcOcP2TTMoee2fNhJi494I887uV9rLzk4cgjXPFD0QZ9QJIkwuJ8IOnkMFNUuQ6PgrI7dSqW4jXaMhT+UhJIXt5McxHOiR/9SBY7JxdOtCFblXdIkEQdF0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4WV8gb1yYMz6K5nt;
-	Thu, 25 Jul 2024 20:04:11 +0800 (CST)
-Received: from lhrpeml100003.china.huawei.com (unknown [7.191.160.210])
-	by mail.maildlp.com (Postfix) with ESMTPS id 546D9140B2F;
-	Thu, 25 Jul 2024 20:05:52 +0800 (CST)
-Received: from lhrpeml500001.china.huawei.com (7.191.163.213) by
- lhrpeml100003.china.huawei.com (7.191.160.210) with Microsoft SMTP Server
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WV93n3b0KzxVFN;
+	Thu, 25 Jul 2024 20:21:41 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 406D6140121;
+	Thu, 25 Jul 2024 20:21:45 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 25 Jul 2024 13:05:52 +0100
-Received: from lhrpeml500001.china.huawei.com ([7.191.163.213]) by
- lhrpeml500001.china.huawei.com ([7.191.163.213]) with mapi id 15.01.2507.039;
- Thu, 25 Jul 2024 13:05:52 +0100
-From: Salil Mehta <salil.mehta@huawei.com>
-To: Peter Maydell <peter.maydell@linaro.org>, "Michael S. Tsirkin"
-	<mst@redhat.com>
-CC: "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Gavin Shan
-	<gshan@redhat.com>, Vishnu Pajjuri <vishnu@os.amperecomputing.com>, "Jonathan
- Cameron" <jonathan.cameron@huawei.com>, Xianglai Li <lixianglai@loongson.cn>,
-	Miguel Luis <miguel.luis@oracle.com>, Shaoqin Huang <shahuang@redhat.com>,
-	Nicholas Piggin <npiggin@gmail.com>, Zhao Liu <zhao1.liu@intel.com>, "Harsh
- Prateek Bora" <harshpb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>
-Subject: RE: [PULL v2 37/61] accel/kvm: Extract common KVM vCPU
- {creation,parking} code
-Thread-Topic: [PULL v2 37/61] accel/kvm: Extract common KVM vCPU
- {creation,parking} code
-Thread-Index: AQHa3O9RebBRo1C7H0iEcr177twQ1LIHMiGAgAApesA=
-Date: Thu, 25 Jul 2024 12:05:51 +0000
-Message-ID: <8f5fcf0c1deb4f199d86441f79298629@huawei.com>
-References: <cover.1721731723.git.mst@redhat.com>
- <08c328682231b64878fc052a11091bea39577a6f.1721731723.git.mst@redhat.com>
- <CAFEAcA-3_d1c7XSXWkFubD-LsW5c5i95e6xxV09r2C9yGtzcdA@mail.gmail.com>
-In-Reply-To: <CAFEAcA-3_d1c7XSXWkFubD-LsW5c5i95e6xxV09r2C9yGtzcdA@mail.gmail.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+ 15.2.1544.11; Thu, 25 Jul 2024 20:21:44 +0800
+Message-ID: <11187fe4-9419-4341-97b5-6dad7583b5b6@huawei.com>
+Date: Thu, 25 Jul 2024 20:21:42 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC v11 04/14] mm: page_frag: add '_va' suffix to page_frag API
+To: Alexander Duyck <alexander.duyck@gmail.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya Sundeep
+	<sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
+ Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
+	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
+	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
+	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
+ Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
+ Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
+	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
+	<kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
+	<jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Andrii
+ Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
+ Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
+	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck
+ Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
+	<neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
+	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
+	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
+	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
+	<linux-nfs@vger.kernel.org>
+References: <20240719093338.55117-1-linyunsheng@huawei.com>
+ <20240719093338.55117-5-linyunsheng@huawei.com>
+ <CAKgT0UcqELiXntRA_uD8eJGjt-OCLO64ax=YFXrCHNnaj9kD8g@mail.gmail.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <CAKgT0UcqELiXntRA_uD8eJGjt-OCLO64ax=YFXrCHNnaj9kD8g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-SEkgUGV0ZXIsDQoNCj4gIEZyb206IFBldGVyIE1heWRlbGwgPHBldGVyLm1heWRlbGxAbGluYXJv
-Lm9yZz4NCj4gIFNlbnQ6IFRodXJzZGF5LCBKdWx5IDI1LCAyMDI0IDExOjM2IEFNDQo+ICBUbzog
-TWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4NCj4gIA0KPiAgT24gVHVlLCAyMyBK
-dWwgMjAyNCBhdCAxMTo1OCwgTWljaGFlbCBTLiBUc2lya2luIDxtc3RAcmVkaGF0LmNvbT4gd3Jv
-dGU6DQo+ICA+DQo+ICA+IEZyb206IFNhbGlsIE1laHRhIDxzYWxpbC5tZWh0YUBodWF3ZWkuY29t
-Pg0KPiAgPg0KPiAgPiBLVk0gdkNQVSBjcmVhdGlvbiBpcyBkb25lIG9uY2UgZHVyaW5nIHRoZSB2
-Q1BVIHJlYWxpemF0aW9uIHdoZW4gUWVtdQ0KPiAgPiB2Q1BVIHRocmVhZCBpcyBzcGF3bmVkLiBU
-aGlzIGlzIGNvbW1vbiB0byBhbGwgdGhlIGFyY2hpdGVjdHVyZXMgYXMgb2Ygbm93Lg0KPiAgPg0K
-PiAgPiBIb3QtdW5wbHVnIG9mIHZDUFUgcmVzdWx0cyBpbiBkZXN0cnVjdGlvbiBvZiB0aGUgdkNQ
-VSBvYmplY3QgaW4gUU9NDQo+ICA+IGJ1dCB0aGUgY29ycmVzcG9uZGluZyBLVk0gdkNQVSBvYmpl
-Y3QgaW4gdGhlIEhvc3QgS1ZNIGlzIG5vdCBkZXN0cm95ZWQNCj4gID4gYXMgS1ZNIGRvZXNuJ3Qg
-c3VwcG9ydCB2Q1BVIHJlbW92YWwuIFRoZXJlZm9yZSwgaXRzIHJlcHJlc2VudGF0aXZlIEtWTQ0K
-PiAgPiB2Q1BVIG9iamVjdC9jb250ZXh0IGluIFFlbXUgaXMgcGFya2VkLg0KPiAgPg0KPiAgPiBS
-ZWZhY3RvciBhcmNoaXRlY3R1cmUgY29tbW9uIGxvZ2ljIHNvIHRoYXQgc29tZSBBUElzIGNvdWxk
-IGJlIHJldXNlZA0KPiAgPiBieSB2Q1BVIEhvdHBsdWcgY29kZSBvZiBzb21lIGFyY2hpdGVjdHVy
-ZXMgbGlrZXMgQVJNLCBMb29uZ3NvbiBldGMuDQo+ICA+IFVwZGF0ZSBuZXcvb2xkIEFQSXMgd2l0
-aCB0cmFjZSBldmVudHMuIE5ldyBBUElzDQo+ICA+IHFlbXVfe2NyZWF0ZSxwYXJrLHVucGFya31f
-dmNwdSgpIGNhbiBiZSBleHRlcm5hbGx5IGNhbGxlZC4gTm8gZnVuY3Rpb25hbA0KPiAgY2hhbmdl
-IGlzIGludGVuZGVkIGhlcmUuDQo+ICANCj4gIEhpOyBDb3Zlcml0eSBwb2ludHMgb3V0IGFuIGlz
-c3VlIHdpdGggdGhpcyBjb2RlIChDSUQgMTU1ODU1Mik6DQo+ICANCj4gID4gK2ludCBrdm1fdW5w
-YXJrX3ZjcHUoS1ZNU3RhdGUgKnMsIHVuc2lnbmVkIGxvbmcgdmNwdV9pZCkgew0KPiAgPiArICAg
-IHN0cnVjdCBLVk1QYXJrZWRWY3B1ICpjcHU7DQo+ICA+ICsgICAgaW50IGt2bV9mZCA9IC1FTk9F
-TlQ7DQo+ICA+ICsNCj4gID4gKyAgICBRTElTVF9GT1JFQUNIKGNwdSwgJnMtPmt2bV9wYXJrZWRf
-dmNwdXMsIG5vZGUpIHsNCj4gID4gKyAgICAgICAgaWYgKGNwdS0+dmNwdV9pZCA9PSB2Y3B1X2lk
-KSB7DQo+ICA+ICsgICAgICAgICAgICBRTElTVF9SRU1PVkUoY3B1LCBub2RlKTsNCj4gID4gKyAg
-ICAgICAgICAgIGt2bV9mZCA9IGNwdS0+a3ZtX2ZkOw0KPiAgPiArICAgICAgICAgICAgZ19mcmVl
-KGNwdSk7DQo+ICA+ICsgICAgICAgIH0NCj4gID4gKyAgICB9DQo+ICANCj4gIElmIHlvdSBhcmUg
-Z29pbmcgdG8gcmVtb3ZlIGFuIGVudHJ5IGZyb20gYSBsaXN0IGFzIHlvdSBpdGVyYXRlIG92ZXIg
-aXQsIHlvdQ0KPiAgY2FuJ3QgdXNlIFFMSVNUX0ZPUkVBQ0goKSwgYmVjYXVzZSBRTElTVF9GT1JF
-QUNIIHdpbGwgbG9vayBhdCB0aGUgbmV4dA0KPiAgcG9pbnRlciBvZiB0aGUgaXRlcmF0aW9uIHZh
-cmlhYmxlIGF0IHRoZSBlbmQgb2YgdGhlIGxvb3Agd2hlbiBpdCB3YW50cyB0bw0KPiAgYWR2YW5j
-ZSB0byB0aGUgbmV4dCBub2RlLiBJbiB0aGlzIGNhc2Ugd2UndmUgYWxyZWFkeSBmcmVlZCAnY3B1
-Jywgc28gaXQgd291bGQNCj4gIGJlIHJlYWRpbmcgZnJlZWQgbWVtb3J5Lg0KPiAgDQo+ICBTaG91
-bGQgd2UgYnJlYWsgb3V0IG9mIHRoZSBsb29wIHdoZW4gd2UgZmluZCB0aGUgZW50cnk/DQoNCg0K
-VGhhbmtzIGZvciBpZGVudGlmeWluZyB0aGlzLiBZZXMsIGEgIGJyZWFrIGlzIG1pc3NpbmcuIFNo
-b3VsZCBJIHNlbmQgYSBmaXggZm9yIHRoaXMNCm5vdyBvciB5b3UgY2FuIGluY29ycG9yYXRlIGl0
-Pw0KDQoNCkJlc3QgcmVnYXJkcw0KU2FsaWwNCg0KDQo+ICANCj4gIElmIHdlIGRvIG5lZWQgdG8g
-Y29udGludWUgaXRlcmF0aW9uIGFmdGVyIHJlbW92aW5nIHRoZSBsaXN0IG5vZGUsIHlvdSBuZWVk
-DQo+ICB0byB1c2UgUUxJU1RfRk9SRUFDSF9TQUZFKCkgdG8gZG8gdGhlIGxpc3QgaXRlcmF0aW9u
-Lg0KPiAgDQo+ICA+IC1zdGF0aWMgaW50IGt2bV9nZXRfdmNwdShLVk1TdGF0ZSAqcywgdW5zaWdu
-ZWQgbG9uZyB2Y3B1X2lkKSAtew0KPiAgPiAtICAgIHN0cnVjdCBLVk1QYXJrZWRWY3B1ICpjcHU7
-DQo+ICA+IC0NCj4gID4gLSAgICBRTElTVF9GT1JFQUNIKGNwdSwgJnMtPmt2bV9wYXJrZWRfdmNw
-dXMsIG5vZGUpIHsNCj4gID4gLSAgICAgICAgaWYgKGNwdS0+dmNwdV9pZCA9PSB2Y3B1X2lkKSB7
-DQo+ICA+IC0gICAgICAgICAgICBpbnQga3ZtX2ZkOw0KPiAgPiAtDQo+ICA+IC0gICAgICAgICAg
-ICBRTElTVF9SRU1PVkUoY3B1LCBub2RlKTsNCj4gID4gLSAgICAgICAgICAgIGt2bV9mZCA9IGNw
-dS0+a3ZtX2ZkOw0KPiAgPiAtICAgICAgICAgICAgZ19mcmVlKGNwdSk7DQo+ICA+IC0gICAgICAg
-ICAgICByZXR1cm4ga3ZtX2ZkOw0KPiAgDQo+ICBJbiB0aGlzIG9sZCBwaWVjZSBvZiBjb2RlIHdl
-IHdlcmUgT0sgdXNpbmcgUUxJU1RfRk9SRUFDSCBiZWNhdXNlIHdlDQo+ICByZXR1cm5lZCBpbW1l
-ZGlhdGVseSB3ZSB0b29rIHRoZSBub2RlIG9mZiB0aGUgbGlzdCBhbmQgZGlkbid0IGNvbnRpbnVl
-IHRoZQ0KPiAgaXRlcmF0aW9uLg0KDQpBZ3JlZWQuDQoNCj4gIA0KPiAgPiAtICAgICAgICB9DQo+
-ICA+IC0gICAgfQ0KPiAgPiAtDQo+ICA+IC0gICAgcmV0dXJuIGt2bV92bV9pb2N0bChzLCBLVk1f
-Q1JFQVRFX1ZDUFUsICh2b2lkICopdmNwdV9pZCk7DQo+ICA+IC19DQo+ICANCj4gIHRoYW5rcw0K
-PiAgLS0gUE1NDQo=
+On 2024/7/22 4:41, Alexander Duyck wrote:
+> On Fri, Jul 19, 2024 at 2:37 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>
+>> Currently the page_frag API is returning 'virtual address'
+>> or 'va' when allocing and expecting 'virtual address' or
+>> 'va' as input when freeing.
+>>
+>> As we are about to support new use cases that the caller
+>> need to deal with 'struct page' or need to deal with both
+>> 'va' and 'struct page'. In order to differentiate the API
+>> handling between 'va' and 'struct page', add '_va' suffix
+>> to the corresponding API mirroring the page_pool_alloc_va()
+>> API of the page_pool. So that callers expecting to deal with
+>> va, page or both va and page may call page_frag_alloc_va*,
+>> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
+>>
+>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> 
+> Rather than renaming the existing API I would rather see this follow
+> the same approach as we use with the other memory subsystem functions.
+
+I am not sure if I understand what 'the other memory subsystem functions'
+is referring to, it would be better to be more specific about that.
+
+For allocation side:
+alloc_pages*()
+extern unsigned long get_free_page*(gfp_t gfp_mask, unsigned int order);
+
+For free side, it seems we have:
+extern void __free_pages(struct page *page, unsigned int order);
+extern void free_pages(unsigned long addr, unsigned int order);
+static inline void put_page(struct page *page)
+
+So there seems to be no clear pattern that the mm APIs with double
+underscore is dealing with 'struct page' and the one without double
+underscore is dealing with virtual address, at least not from the
+allocation side.
+
+> A specific example being that with free_page it is essentially passed
+> a virtual address, while the double underscore version is passed a
+> page. I would be more okay with us renaming the double underscore
+> version of any functions we might have to address that rather than
+> renaming all the functions with "va".
+
+Before this patchset, page_frag has the below APIs as below:
+
+void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
+			      gfp_t gfp_mask, unsigned int align_mask);
+
+static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
+					  unsigned int fragsz, gfp_t gfp_mask,
+					  unsigned int align)
+
+extern void page_frag_free(void *addr);
+
+It would be better to be more specific about what renaming does the above
+APIs need in order to support the new usecases.
+
+> 
+> In general I would say this patch is adding no value as what it is
+
+As above, it would be better to give a more specific suggestion to
+back up the above somewhat abstract agrument, otherwise it is hard
+to tell if there is better option here, and why it is better than
+the one proposed in this patchset.
+
+> doing is essentially pushing the primary users of this API to change
+> to support use cases that won't impact most of them. It is just
+> creating a ton of noise in terms of changes with no added value so we
+> can reuse the function names.
+
+
+After this patchset, we have the below page_frag APIs:
+
+For allocation side, we have below APIs:
+struct page *page_frag_alloc_pg*(struct page_frag_cache *nc,
+                                unsigned int *offset, unsigned int fragsz,
+                                gfp_t gfp);
+void *page_frag_alloc_va*(struct page_frag_cache *nc,
+                                 unsigned int fragsz, gfp_t gfp_mask,
+                                 unsigned int align_mask);
+struct page *page_frag_alloc*(struct page_frag_cache *nc,
+                                     unsigned int *offset,
+                                     unsigned int fragsz,
+                                     void **va, gfp_t gfp);
+
+For allocation side, we have below APIs:
+void page_frag_free_va(void *addr);
+
+The main rules for the about naming are:
+1. The API with 'align' suffix ensure the offset or va is aligned
+2. The API with double underscore has no checking for the algin parameter.
+3. The API with 'va' suffix is dealing with virtual address.
+4. The API with 'pg' suffix is dealing with 'struct page'.
+5. The API without 'pg' and 'va' suffix is dealing with both 'struct page'
+   and virtual address.
+
+Yes, I suppose it is not perfect mainly because we reuse some existing mm
+API for page_frag free API.
+
+As mentioned before, I would be happy to change it if what you are proposing
+is indeed the better option.
 
