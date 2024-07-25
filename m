@@ -1,200 +1,148 @@
-Return-Path: <kvm+bounces-22229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 661E793C1D6
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 14:22:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CA4F93C1FC
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 14:27:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A9901C21EEC
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 12:22:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78F531C20E06
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 12:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F94D19A2A3;
-	Thu, 25 Jul 2024 12:21:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A374199E98;
+	Thu, 25 Jul 2024 12:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="aiJu5ROU"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9897C199397;
-	Thu, 25 Jul 2024 12:21:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DE7199E8A
+	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 12:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721910109; cv=none; b=HJUpZA5CS4YZFfoHIEaAEvjHpDdThZ0CC/Rzy1cBkedH+AmK6X4DA+wj3JJKCWNn31y/5nQ8H6MnxVarsHO7a59LJmeaMKeXNd+toUjD0kkUSXQk4XSDA62AS1Jmkuc2h971+8kHiStVHwkPhJ0Yc3CMcWADZAJWc3y8GrsITgs=
+	t=1721910450; cv=none; b=bxAT11bxVEdUuSHiXVYeNYKWTPvxSEOi95ga3/1+D9TYQPZFpxe4n8TDb7ocl03hxDLIbK3GLyXpic0obs5Js0l8sN4F9OiAZbqv2W8mzC+1lNjpMJktNb3ejkAmSB28NqDiqJ2YpHZgbk4GVaCrUNHG5AIVjMCizkuKsIvr6fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721910109; c=relaxed/simple;
-	bh=Uxjq9RUhwjCqcw4st/SYfJ6kRT6AQmYokckDdcljTK0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=B1Qz2Gk/txRRE2spetv4g7ebKkA9TCm823eX9zpuHnZ6/5q1u81ZvUcOcP2TTMoee2fNhJi494I887uV9rLzk4cgjXPFD0QZ9QJIkwuJ8IOnkMFNUuQ6PgrI7dSqW4jXaMhT+UhJIXt5McxHOiR/9SBY7JxdOtCFblXdIkEQdF0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WV93n3b0KzxVFN;
-	Thu, 25 Jul 2024 20:21:41 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 406D6140121;
-	Thu, 25 Jul 2024 20:21:45 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 25 Jul 2024 20:21:44 +0800
-Message-ID: <11187fe4-9419-4341-97b5-6dad7583b5b6@huawei.com>
-Date: Thu, 25 Jul 2024 20:21:42 +0800
+	s=arc-20240116; t=1721910450; c=relaxed/simple;
+	bh=gCf1amWzOCQCij+FS+XWJYW3/P98s9uMsTpIpA7xptE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YN6VSnwOi9nVBOro5rWu6WRbBj66HJdiNfKpwU2pY4tnyInosTjF9jk8HC/Hb8vrO+iG91N+01a004DfH97TxzVkrGQPCNHwnIU/jHCbq4POnWXXhSdvRbK+VFg5iuWoEnV+BKIsQF3NeMm5AgF6N4Injc3qaJQIL8E2kdM/H4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=aiJu5ROU; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a20de39cfbso1077275a12.1
+        for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 05:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1721910447; x=1722515247; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GOh6PKdCbaMoUdlPd1L+eg1JAZ26MYlPj4SLk05TsGk=;
+        b=aiJu5ROUiqEZiWoYDnVMjy0fMs/WRAQ8CtPLhAf04zywwrwvUFdLks1Q4A4MlNGwO6
+         jIpy//AJ3qtvjbltG557sBf87cVXtI+KAuAvLMAIx+zif0y5fAWzHE5LJ6z1McJH+xBP
+         7F7PAU794cNPUHzaghEGqavPCcRGgYZXEfjrb+mmNtr5u4xh+U1vJmPxHxzqOdJOErcW
+         xoPWKpbPK93v6MdTWT76p0VeEJw8B70TAdEBxbp2gDVovEnMR2hIuNJsfPztOsuT9KxZ
+         che9XiMb5BSQOelhhW7dRAtnuFHbv2yt9KDKUTrp2+RjGF6h+Sl7aOVPTOulMNlcpSH0
+         iP9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721910447; x=1722515247;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GOh6PKdCbaMoUdlPd1L+eg1JAZ26MYlPj4SLk05TsGk=;
+        b=aLf+JNur3GPzK3QFxnYBVXl8VZbmS/QgIHFqmpArERKeIeSYErdEfP14tHtR/wOIdS
+         EdM7v660cDXPGxYPiJi6xGXY7+xYnH52nMut5B31gV8JSzZbbwZnE//gFXz4kci/XtL7
+         Xcqufam1TLgEITk46jluBcKdwAL/oAPvVAAUMYj2L/WpuP2Cq4SaE6i2ZP7YyJXhUrcQ
+         wgc68DVQJI/74jh6o7R6LVwN27RWoN7K4A5c0DWORrD5GIQa3bsjSb2MgukamZyMCXOg
+         hAXEhuyPKPN5NXRUoo8WsiBeaO8XWRePyWYQiR6YKSi8en2NC0ivhoLjaZJUt7MtzzXS
+         2fpg==
+X-Forwarded-Encrypted: i=1; AJvYcCWhtnuK6osjcBq5/ZcCIolY8S3178IzlTFrz4aemJfFW575YzhmgqJp8UXyhrGbJ2eFk2yQfpHUdKaoDhjDYfqUdMk4
+X-Gm-Message-State: AOJu0YwJtz/xK7e5rc0pa3j5qur10HiiPZBjY33Ebp+uMJp7cpqu44Kg
+	CS2t2hioCPOt+W4Vd9iajQCUnKqGx/mR+tqOF8d7jqauNDfX8hTVotO1R5GPPjKZ73cPPfeGj5B
+	wW4omtHAcCLLAmdObqg4c/869J6BAn2ykmRo28Q==
+X-Google-Smtp-Source: AGHT+IEDyBxEvxBsN9vTBlpY82wdgrQiPGM2Bk6P5qhTyE3mo4k/VO1Rtgxf/JjCjs5r4jLmFPukfq3rbKZL28GZa7s=
+X-Received: by 2002:a50:ab55:0:b0:57d:456:e838 with SMTP id
+ 4fb4d7f45d1cf-5ac6519c7d8mr1304019a12.31.1721910446680; Thu, 25 Jul 2024
+ 05:27:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC v11 04/14] mm: page_frag: add '_va' suffix to page_frag API
-To: Alexander Duyck <alexander.duyck@gmail.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya Sundeep
-	<sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, Chaitanya Kulkarni
-	<kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
- Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Andrii
- Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Chuck
- Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown
-	<neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, Dai Ngo
-	<Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>
-References: <20240719093338.55117-1-linyunsheng@huawei.com>
- <20240719093338.55117-5-linyunsheng@huawei.com>
- <CAKgT0UcqELiXntRA_uD8eJGjt-OCLO64ax=YFXrCHNnaj9kD8g@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <CAKgT0UcqELiXntRA_uD8eJGjt-OCLO64ax=YFXrCHNnaj9kD8g@mail.gmail.com>
+References: <cover.1721731723.git.mst@redhat.com> <08c328682231b64878fc052a11091bea39577a6f.1721731723.git.mst@redhat.com>
+ <CAFEAcA-3_d1c7XSXWkFubD-LsW5c5i95e6xxV09r2C9yGtzcdA@mail.gmail.com> <8f5fcf0c1deb4f199d86441f79298629@huawei.com>
+In-Reply-To: <8f5fcf0c1deb4f199d86441f79298629@huawei.com>
+From: Peter Maydell <peter.maydell@linaro.org>
+Date: Thu, 25 Jul 2024 13:27:15 +0100
+Message-ID: <CAFEAcA9-gVBLAH9PaFrPmBLD5tHXMZ+-2m+pRvtjodOBaBa0GQ@mail.gmail.com>
+Subject: Re: [PULL v2 37/61] accel/kvm: Extract common KVM vCPU
+ {creation,parking} code
+To: Salil Mehta <salil.mehta@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, Gavin Shan <gshan@redhat.com>, 
+	Vishnu Pajjuri <vishnu@os.amperecomputing.com>, 
+	Jonathan Cameron <jonathan.cameron@huawei.com>, Xianglai Li <lixianglai@loongson.cn>, 
+	Miguel Luis <miguel.luis@oracle.com>, Shaoqin Huang <shahuang@redhat.com>, 
+	Nicholas Piggin <npiggin@gmail.com>, Zhao Liu <zhao1.liu@intel.com>, 
+	Harsh Prateek Bora <harshpb@linux.ibm.com>, Igor Mammedov <imammedo@redhat.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2024/7/22 4:41, Alexander Duyck wrote:
-> On Fri, Jul 19, 2024 at 2:37 AM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> Currently the page_frag API is returning 'virtual address'
->> or 'va' when allocing and expecting 'virtual address' or
->> 'va' as input when freeing.
->>
->> As we are about to support new use cases that the caller
->> need to deal with 'struct page' or need to deal with both
->> 'va' and 'struct page'. In order to differentiate the API
->> handling between 'va' and 'struct page', add '_va' suffix
->> to the corresponding API mirroring the page_pool_alloc_va()
->> API of the page_pool. So that callers expecting to deal with
->> va, page or both va and page may call page_frag_alloc_va*,
->> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
->>
->> CC: Alexander Duyck <alexander.duyck@gmail.com>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> 
-> Rather than renaming the existing API I would rather see this follow
-> the same approach as we use with the other memory subsystem functions.
+On Thu, 25 Jul 2024 at 13:05, Salil Mehta <salil.mehta@huawei.com> wrote:
+>
+> HI Peter,
+>
+> >  From: Peter Maydell <peter.maydell@linaro.org>
+> >  Sent: Thursday, July 25, 2024 11:36 AM
+> >  To: Michael S. Tsirkin <mst@redhat.com>
+> >
+> >  On Tue, 23 Jul 2024 at 11:58, Michael S. Tsirkin <mst@redhat.com> wrote:
+> >  >
+> >  > From: Salil Mehta <salil.mehta@huawei.com>
+> >  >
+> >  > KVM vCPU creation is done once during the vCPU realization when Qemu
+> >  > vCPU thread is spawned. This is common to all the architectures as of now.
+> >  >
+> >  > Hot-unplug of vCPU results in destruction of the vCPU object in QOM
+> >  > but the corresponding KVM vCPU object in the Host KVM is not destroyed
+> >  > as KVM doesn't support vCPU removal. Therefore, its representative KVM
+> >  > vCPU object/context in Qemu is parked.
+> >  >
+> >  > Refactor architecture common logic so that some APIs could be reused
+> >  > by vCPU Hotplug code of some architectures likes ARM, Loongson etc.
+> >  > Update new/old APIs with trace events. New APIs
+> >  > qemu_{create,park,unpark}_vcpu() can be externally called. No functional
+> >  change is intended here.
+> >
+> >  Hi; Coverity points out an issue with this code (CID 1558552):
+> >
+> >  > +int kvm_unpark_vcpu(KVMState *s, unsigned long vcpu_id) {
+> >  > +    struct KVMParkedVcpu *cpu;
+> >  > +    int kvm_fd = -ENOENT;
+> >  > +
+> >  > +    QLIST_FOREACH(cpu, &s->kvm_parked_vcpus, node) {
+> >  > +        if (cpu->vcpu_id == vcpu_id) {
+> >  > +            QLIST_REMOVE(cpu, node);
+> >  > +            kvm_fd = cpu->kvm_fd;
+> >  > +            g_free(cpu);
+> >  > +        }
+> >  > +    }
+> >
+> >  If you are going to remove an entry from a list as you iterate over it, you
+> >  can't use QLIST_FOREACH(), because QLIST_FOREACH will look at the next
+> >  pointer of the iteration variable at the end of the loop when it wants to
+> >  advance to the next node. In this case we've already freed 'cpu', so it would
+> >  be reading freed memory.
+> >
+> >  Should we break out of the loop when we find the entry?
+>
+>
+> Thanks for identifying this. Yes, a  break is missing. Should I send a fix for this
+> now or you can incorporate it?
 
-I am not sure if I understand what 'the other memory subsystem functions'
-is referring to, it would be better to be more specific about that.
+The code is already in upstream git, so please send a patch
+to fix the bug.
 
-For allocation side:
-alloc_pages*()
-extern unsigned long get_free_page*(gfp_t gfp_mask, unsigned int order);
-
-For free side, it seems we have:
-extern void __free_pages(struct page *page, unsigned int order);
-extern void free_pages(unsigned long addr, unsigned int order);
-static inline void put_page(struct page *page)
-
-So there seems to be no clear pattern that the mm APIs with double
-underscore is dealing with 'struct page' and the one without double
-underscore is dealing with virtual address, at least not from the
-allocation side.
-
-> A specific example being that with free_page it is essentially passed
-> a virtual address, while the double underscore version is passed a
-> page. I would be more okay with us renaming the double underscore
-> version of any functions we might have to address that rather than
-> renaming all the functions with "va".
-
-Before this patchset, page_frag has the below APIs as below:
-
-void *__page_frag_alloc_align(struct page_frag_cache *nc, unsigned int fragsz,
-			      gfp_t gfp_mask, unsigned int align_mask);
-
-static inline void *page_frag_alloc_align(struct page_frag_cache *nc,
-					  unsigned int fragsz, gfp_t gfp_mask,
-					  unsigned int align)
-
-extern void page_frag_free(void *addr);
-
-It would be better to be more specific about what renaming does the above
-APIs need in order to support the new usecases.
-
-> 
-> In general I would say this patch is adding no value as what it is
-
-As above, it would be better to give a more specific suggestion to
-back up the above somewhat abstract agrument, otherwise it is hard
-to tell if there is better option here, and why it is better than
-the one proposed in this patchset.
-
-> doing is essentially pushing the primary users of this API to change
-> to support use cases that won't impact most of them. It is just
-> creating a ton of noise in terms of changes with no added value so we
-> can reuse the function names.
-
-
-After this patchset, we have the below page_frag APIs:
-
-For allocation side, we have below APIs:
-struct page *page_frag_alloc_pg*(struct page_frag_cache *nc,
-                                unsigned int *offset, unsigned int fragsz,
-                                gfp_t gfp);
-void *page_frag_alloc_va*(struct page_frag_cache *nc,
-                                 unsigned int fragsz, gfp_t gfp_mask,
-                                 unsigned int align_mask);
-struct page *page_frag_alloc*(struct page_frag_cache *nc,
-                                     unsigned int *offset,
-                                     unsigned int fragsz,
-                                     void **va, gfp_t gfp);
-
-For allocation side, we have below APIs:
-void page_frag_free_va(void *addr);
-
-The main rules for the about naming are:
-1. The API with 'align' suffix ensure the offset or va is aligned
-2. The API with double underscore has no checking for the algin parameter.
-3. The API with 'va' suffix is dealing with virtual address.
-4. The API with 'pg' suffix is dealing with 'struct page'.
-5. The API without 'pg' and 'va' suffix is dealing with both 'struct page'
-   and virtual address.
-
-Yes, I suppose it is not perfect mainly because we reuse some existing mm
-API for page_frag free API.
-
-As mentioned before, I would be happy to change it if what you are proposing
-is indeed the better option.
+thanks
+-- PMM
 
