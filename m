@@ -1,62 +1,63 @@
-Return-Path: <kvm+bounces-22213-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22214-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D0093BD02
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 09:22:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51D4F93BD03
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 09:22:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C510B2830A7
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 07:22:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E94E1C21232
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 07:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC9F116F84F;
-	Thu, 25 Jul 2024 07:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B90417109C;
+	Thu, 25 Jul 2024 07:22:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kQMa8i/m"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FueTa9SA"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DBB84428
-	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 07:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7984428
+	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 07:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721892160; cv=none; b=f2/t/QjB68FsFb3BMOxlx9FoDm3xBB+GhJUuz9SfvEDa6ljcOMsRXeFfBD8kucBYo9F6PwkRsDV7PbXv0v5Y9Jlne5OUazmHP13QrZMwGTq8sF7DW294jh/F3ry04z1e6SuN2M3ImzfUyzKBwkd5C64+j5wY7tturCwgb7fA4nw=
+	t=1721892164; cv=none; b=mAGYV3WvKgK3AfuLbFn8kMPxp4M1yJRFdlmGh+/p3xjhad1o7hxPd29s7EtiFyIHlwoto066ppIzOvnqSoGZDwcen3TVWcM02NnubRYjuwGcCtHZp6W0CxzuO8Lnk806J/xpVrlhWpdO0vGmkpZqv/5Sq4mEsXpPP4OT2Jr96uU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721892160; c=relaxed/simple;
-	bh=fCGXuk1OlehWsXuBwZOTRT0DK5yQ8xJuS1pxLg/KV+c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=A7cDbLTob8UhoDQFdUxUvt9YtntEOKb31DzFDLG95tI1NDHjVI2QgA7iJ+X+nrcYgYdBLLYS0wY44+yebL+s/2UtYKvKFPqsU6X8vgagY1gN+M9nCuegudVXmXUEPayVtzkQbofTvhX+lcTJpbkHXeEVgPeagsOlEXy+tWCjewE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kQMa8i/m; arc=none smtp.client-ip=198.175.65.13
+	s=arc-20240116; t=1721892164; c=relaxed/simple;
+	bh=H5K123PXaJQqQxOo8ELc+HzpStV4NW+TCKC7nAh3EBY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Mx5LF+19nKPzmm4Nh5tRBNgIK2PG9iHhK725Kx9vX0u5Rmi+UxnbfuIheSAO4OmJJMJm8GUDBYGKAZwvSvFO/Uc3UHhkVZC+PEMfmrbavoc9WIykLuxRosShJ/U8Cjsdy0CobOLWMCA4BCtcg2KVPKy+CAc0Qms2TJb2rXdhAaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FueTa9SA; arc=none smtp.client-ip=198.175.65.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721892158; x=1753428158;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fCGXuk1OlehWsXuBwZOTRT0DK5yQ8xJuS1pxLg/KV+c=;
-  b=kQMa8i/m4JKYSkwl+ezoBqD/8RQvhJ0eWxbkTajfCkO/rS0zRfti/2KB
-   QdUzsYCrFe9FbRleh74kN9txg3261VIbEghm3OT6UXDCb3nBkSP0oKLjE
-   DtPFzWj4Z7WfXlWzrQpY4CeeGA2HT0Vzu8YtR61ycTZldZ2NrNDwaSLo5
-   iGcxlBBRDxia8HwWbKWFBQFA08oXwtEcCd5y9GgGITA4cb12mMvl6dqha
-   8n1OqHPF2a52jsXkWAE51IBaGXj4X1q2y8mJ12jdsDAYIFLQi3wHbEvOe
-   BAjFENYO1rQzqJJzC/ie6QZIVYiRrunyXe48VZ45VoeJrWtWrqD4EZbgr
-   A==;
-X-CSE-ConnectionGUID: +J89pn50RHCCxX8KOFNL+Q==
-X-CSE-MsgGUID: uhMoSoLIRJGR3fXafKBZYw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="30753916"
+  t=1721892162; x=1753428162;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=H5K123PXaJQqQxOo8ELc+HzpStV4NW+TCKC7nAh3EBY=;
+  b=FueTa9SAgDym6Yoz+RNkPb8DgZu3D5p/kp04E65VRAIp+9fXcqw9vOER
+   +BE5epWhxrXUk71XSI1YhD4txdRCjsXQ0qT66rVxwPN6wKtJ/P3JqsnaY
+   z/69AyzvSZrF3lN5uWBRwKNVlCuLAdmkXBHMVxMoN9TUsH9qAIJJjCqor
+   whgqHjzdHbXfoF6NAKU6693hisjpsBbiYxHAemR3SYinc2YDK7LuH4+6y
+   I6XEaur5Webr39nXhWyFDsc6XPbVlvpzSUCJUP61ALikLpXqXJC+qLM3n
+   w5g9ACJQXIKAcmf11+p9ScO3MdYE1wURDU+MQKOTH+F5BSTUEuQRN+uY1
+   Q==;
+X-CSE-ConnectionGUID: utObAXJoQWKhlmwvrRu81g==
+X-CSE-MsgGUID: q69eVkEVQyyE+QIgibbpSw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11143"; a="30753930"
 X-IronPort-AV: E=Sophos;i="6.09,235,1716274800"; 
-   d="scan'208";a="30753916"
+   d="scan'208";a="30753930"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2024 00:22:38 -0700
-X-CSE-ConnectionGUID: CUQ2TppUT7y1qyX+oSeVHw==
-X-CSE-MsgGUID: vhKsDaAtQeCfNWrdhm/Zcg==
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2024 00:22:42 -0700
+X-CSE-ConnectionGUID: 3w8sSJbVTvCY1sQAFyC/hg==
+X-CSE-MsgGUID: yyr8OVH1QCOWaxtpNbBKOw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,235,1716274800"; 
-   d="scan'208";a="52858136"
+   d="scan'208";a="52858146"
 Received: from emr-bkc.sh.intel.com ([10.112.230.82])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2024 00:22:35 -0700
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jul 2024 00:22:38 -0700
 From: Chenyi Qiang <chenyi.qiang@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	David Hildenbrand <david@redhat.com>,
@@ -73,10 +74,12 @@ Cc: Chenyi Qiang <chenyi.qiang@intel.com>,
 	Gao Chao <chao.gao@intel.com>,
 	Wu Hao <hao.wu@intel.com>,
 	Xu Yilun <yilun.xu@intel.com>
-Subject: [RFC PATCH 0/6] Enable shared device assignment
-Date: Thu, 25 Jul 2024 03:21:09 -0400
-Message-ID: <20240725072118.358923-1-chenyi.qiang@intel.com>
+Subject: [RFC PATCH 1/6] guest_memfd: Introduce an object to manage the guest-memfd with RamDiscardManager
+Date: Thu, 25 Jul 2024 03:21:10 -0400
+Message-ID: <20240725072118.358923-2-chenyi.qiang@intel.com>
 X-Mailer: git-send-email 2.43.5
+In-Reply-To: <20240725072118.358923-1-chenyi.qiang@intel.com>
+References: <20240725072118.358923-1-chenyi.qiang@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,168 +88,414 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 852f0048f3 ("RAMBlock: make guest_memfd require uncoordinated
-discard") effectively disables device assignment with guest_memfd.
-guest_memfd is required for confidential guests, so device assignment to
-confidential guests is disabled. A supporting assumption for disabling
-device-assignment was that TEE I/O (SEV-TIO, TDX Connect, COVE-IO
-etc...) solves the confidential-guest device-assignment problem [1].
-That turns out not to be the case because TEE I/O depends on being able
-to operate devices against "shared"/untrusted memory for device
-initialization and error recovery scenarios.
+As the commit 852f0048f3 ("RAMBlock: make guest_memfd require
+uncoordinated discard") highlighted, some subsystems like VFIO might
+disable ram block discard. However, guest_memfd relies on the discard
+operation to perform page conversion between private and shared memory.
+This can lead to stale IOMMU mapping issue when assigning a hardware
+device to a confidential guest via shared memory (unprotected memory
+pages). Blocking shared page discard can solve this problem, but it
+could cause guests to consume twice the memory with VFIO, which is not
+acceptable in some cases. An alternative solution is to convey other
+systems like VFIO to refresh its outdated IOMMU mappings.
 
-This series utilizes an existing framework named RamDiscardManager to
-notify VFIO of page conversions. However, there's still one concern
-related to the semantics of RamDiscardManager which is used to manage
-the memory plug/unplug state. This is a little different from the memory
-shared/private in our requirement. See the "Open" section below for more
-details.
+RamDiscardManager is an existing concept (used by virtio-mem) to adjust
+VFIO mappings in relation to VM page assignement. Effectively page
+conversion is similar to hot-removing a page in one mode and adding it
+back in the other, so the similar work that needs to happen in response
+to virtio-mem changes needs to happen for page conversion events.
+Introduce the RamDiscardManager to guest_memfd to achieve it.
 
-Background
-==========
-Confidential VMs have two classes of memory: shared and private memory.
-Shared memory is accessible from the host/VMM while private memory is
-not. Confidential VMs can decide which memory is shared/private and
-convert memory between shared/private at runtime.
+However, Implementing the RamDiscardManager interface poses a challenge
+as guest_memfd is not an object, instead, it is contained within RamBlock
+and is indicated by a RAM_GUEST_MEMFD flag upon creation.
 
-"guest_memfd" is a new kind of fd whose primary goal is to serve guest
-private memory. The key differences between guest_memfd and normal memfd
-are that guest_memfd is spawned by a KVM ioctl, bound to its owner VM and
-cannot be mapped, read or written by userspace.
+One option is to implement the interface in HostMemoryBackend. Any
+guest_memfd-backed host memory backend can register itself in the target
+MemoryRegion. However, this solution doesn't cover the scenario where a
+guest_memfd MemoryRegion doesn't belong to the HostMemoryBackend, e.g.
+the virtual BIOS MemoryRegion.
 
-In QEMU's implementation, shared memory is allocated with normal methods
-(e.g. mmap or fallocate) while private memory is allocated from
-guest_memfd. When a VM performs memory conversions, QEMU frees pages via
-madvise() or via PUNCH_HOLE on memfd or guest_memfd from one side and
-allocates new pages from the other side.
+Thus, implement the second option, which involves defining an object type
+named guest_memfd_manager with the RamDiscardManager interface. Upon
+creation of guest_memfd, a new guest_memfd_manager object can be
+instantiated and registered to the managed guest_memfd MemoryRegion to
+handle the page conversion events.
 
-Problem
-=======
-Device assignment in QEMU is implemented via VFIO system. In the normal
-VM, VM memory is pinned at the beginning of time by VFIO. In the
-confidential VM, the VM can convert memory and when that happens
-nothing currently tells VFIO that its mappings are stale. This means
-that page conversion leaks memory and leaves stale IOMMU mappings. For
-example, sequence like the following can result in stale IOMMU mappings:
+In the context of guest_memfd, the discarded state signifies that the
+page is private, while the populated state indicated that the page is
+shared. The state of the memory is tracked at the granularity of the
+host page size (i.e. block_size), as the minimum conversion size can be
+one page per request. In addition, VFIO expects the DMA mapping for a
+specific iova to be mapped and unmapped with the same granularity.
+However, there's no guarantee that the confidential guest won't
+partially convert the pages. For instance the confidential guest may
+flip a 2M page from private to shared and later flip the first 4K
+sub-range from shared to private. To prevent such invalid cases, all
+operations are performed with a 4K granularity.
 
-1. allocate shared page
-2. convert page shared->private
-3. discard shared page
-4. convert page private->shared
-5. allocate shared page
-6. issue DMA operations against that shared page
-
-After step 3, VFIO is still pinning the page. However, DMA operations in
-step 6 will hit the old mapping that was allocated in step 1, which
-causes the device to access the invalid data.
-
-Currently, the commit 852f0048f3 ("RAMBlock: make guest_memfd require
-uncoordinated discard") has blocked the device assignment with
-guest_memfd to avoid this problem.
-
-Solution
-========
-The key to enable shared device assignment is to solve the stale IOMMU
-mappings problem.
-
-Given the constraints and assumptions here is a solution that satisfied
-the use cases. RamDiscardManager, an existing interface currently
-utilized by virtio-mem, offers a means to modify IOMMU mappings in
-accordance with VM page assignment. Page conversion is similar to
-hot-removing a page in one mode and adding it back in the other.
-
-This series implements a RamDiscardManager for confidential VMs and
-utilizes its infrastructure to notify VFIO of page conversions.
-
-Another possible attempt [2] was to not discard shared pages in step 3
-above. This was an incomplete band-aid because guests would consume
-twice the memory since shared pages wouldn't be freed even after they
-were converted to private.
-
-Open
-====
-Implementing a RamDiscardManager to notify VFIO of page conversions
-causes changes in semantics: private memory is treated as discarded (or
-hot-removed) memory. This isn't aligned with the expectation of current
-RamDiscardManager users (e.g. VFIO or live migration) who really
-expect that discarded memory is hot-removed and thus can be skipped when
-the users are processing guest memory. Treating private memory as
-discarded won't work in future if VFIO or live migration needs to handle
-private memory. e.g. VFIO may need to map private memory to support
-Trusted IO and live migration for confidential VMs need to migrate
-private memory.
-
-There are two possible ways to mitigate the semantics changes.
-1. Develop a new mechanism to notify the page conversions between
-private and shared. For example, utilize the notifier_list in QEMU. VFIO
-registers its own handler and gets notified upon page conversions. This
-is a clean approach which only touches the notifier workflow. A
-challenge is that for device hotplug, existing shared memory should be
-mapped in IOMMU. This will need additional changes.
-
-2. Extend the existing RamDiscardManager interface to manage not only
-the discarded/populated status of guest memory but also the
-shared/private status. RamDiscardManager users like VFIO will be
-notified with one more argument indicating what change is happening and
-can take action accordingly. It also has challenges e.g. QEMU allows
-only one RamDiscardManager, how to support virtio-mem for confidential
-VMs would be a problem. And some APIs like .is_populated() exposed by
-RamDiscardManager are meaningless to shared/private memory. So they may
-need some adjustments.
-
-Testing
-=======
-This patch series is tested based on the internal TDX KVM/QEMU tree.
-
-To facilitate shared device assignment with the NIC, employ the legacy
-type1 VFIO with the QEMU command:
-
-qemu-system-x86_64 [...]
-    -device vfio-pci,host=XX:XX.X
-
-The parameter of dma_entry_limit needs to be adjusted. For example, a
-16GB guest needs to adjust the parameter like
-vfio_iommu_type1.dma_entry_limit=4194304.
-
-If use the iommufd-backed VFIO with the qemu command:
-
-qemu-system-x86_64 [...]
-    -object iommufd,id=iommufd0 \
-    -device vfio-pci,host=XX:XX.X,iommufd=iommufd0
-
-No additional adjustment required.
-
-Following the bootup of the TD guest, the guest's IP address becomes
-visible, and iperf is able to successfully send and receive data.
-
-Related link
-============
-[1] https://lore.kernel.org/all/d6acfbef-96a1-42bc-8866-c12a4de8c57c@redhat.com/
-[2] https://lore.kernel.org/all/20240320083945.991426-20-michael.roth@amd.com/
-
-Chenyi Qiang (6):
-  guest_memfd: Introduce an object to manage the guest-memfd with
-    RamDiscardManager
-  guest_memfd: Introduce a helper to notify the shared/private state
-    change
-  KVM: Notify the state change via RamDiscardManager helper during
-    shared/private conversion
-  memory: Register the RamDiscardManager instance upon guest_memfd
-    creation
-  guest-memfd: Default to discarded (private) in guest_memfd_manager
-  RAMBlock: make guest_memfd require coordinate discard
-
- accel/kvm/kvm-all.c                  |   7 +
- include/sysemu/guest-memfd-manager.h |  49 +++
- system/guest-memfd-manager.c         | 425 +++++++++++++++++++++++++++
+Signed-off-by: Chenyi Qiang <chenyi.qiang@intel.com>
+---
+ include/sysemu/guest-memfd-manager.h |  46 +++++
+ system/guest-memfd-manager.c         | 283 +++++++++++++++++++++++++++
  system/meson.build                   |   1 +
- system/physmem.c                     |  11 +-
- 5 files changed, 492 insertions(+), 1 deletion(-)
+ 3 files changed, 330 insertions(+)
  create mode 100644 include/sysemu/guest-memfd-manager.h
  create mode 100644 system/guest-memfd-manager.c
 
-
-base-commit: 900536d3e97aed7fdd9cb4dadd3bf7023360e819
+diff --git a/include/sysemu/guest-memfd-manager.h b/include/sysemu/guest-memfd-manager.h
+new file mode 100644
+index 0000000000..ab8c2ba362
+--- /dev/null
++++ b/include/sysemu/guest-memfd-manager.h
+@@ -0,0 +1,46 @@
++/*
++ * QEMU guest memfd manager
++ *
++ * Copyright Intel
++ *
++ * Author:
++ *      Chenyi Qiang <chenyi.qiang@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory
++ *
++ */
++
++#ifndef SYSEMU_GUEST_MEMFD_MANAGER_H
++#define SYSEMU_GUEST_MEMFD_MANAGER_H
++
++#include "sysemu/hostmem.h"
++
++#define TYPE_GUEST_MEMFD_MANAGER "guest-memfd-manager"
++
++OBJECT_DECLARE_TYPE(GuestMemfdManager, GuestMemfdManagerClass, GUEST_MEMFD_MANAGER)
++
++struct GuestMemfdManager {
++    Object parent;
++
++    /* Managed memory region. */
++    MemoryRegion *mr;
++
++    /* bitmap used to track discard (private) memory */
++    int32_t discard_bitmap_size;
++    unsigned long *discard_bitmap;
++
++    /* block size and alignment */
++    uint64_t block_size;
++
++    /* listeners to notify on populate/discard activity. */
++    QLIST_HEAD(, RamDiscardListener) rdl_list;
++};
++
++struct GuestMemfdManagerClass {
++    ObjectClass parent_class;
++
++    void (*realize)(Object *gmm, MemoryRegion *mr, uint64_t region_size);
++};
++
++#endif
+diff --git a/system/guest-memfd-manager.c b/system/guest-memfd-manager.c
+new file mode 100644
+index 0000000000..7b90f26859
+--- /dev/null
++++ b/system/guest-memfd-manager.c
+@@ -0,0 +1,283 @@
++/*
++ * QEMU guest memfd manager
++ *
++ * Copyright Intel
++ *
++ * Author:
++ *      Chenyi Qiang <chenyi.qiang@intel.com>
++ *
++ * This work is licensed under the terms of the GNU GPL, version 2 or later.
++ * See the COPYING file in the top-level directory
++ *
++ */
++
++#include "qemu/osdep.h"
++#include "qemu/error-report.h"
++#include "sysemu/guest-memfd-manager.h"
++
++OBJECT_DEFINE_SIMPLE_TYPE_WITH_INTERFACES(GuestMemfdManager,
++                                          guest_memfd_manager,
++                                          GUEST_MEMFD_MANAGER,
++                                          OBJECT,
++                                          { TYPE_RAM_DISCARD_MANAGER },
++                                          { })
++
++static bool guest_memfd_rdm_is_populated(const RamDiscardManager *rdm,
++                                         const MemoryRegionSection *section)
++{
++    const GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(rdm);
++    uint64_t first_bit = section->offset_within_region / gmm->block_size;
++    uint64_t last_bit = first_bit + int128_get64(section->size) / gmm->block_size - 1;
++    unsigned long first_discard_bit;
++
++    first_discard_bit = find_next_bit(gmm->discard_bitmap, last_bit + 1, first_bit);
++    return first_discard_bit > last_bit;
++}
++
++static bool guest_memfd_rdm_intersect_memory_section(MemoryRegionSection *section,
++                                                     uint64_t offset, uint64_t size)
++{
++    uint64_t start = MAX(section->offset_within_region, offset);
++    uint64_t end = MIN(section->offset_within_region + int128_get64(section->size),
++                       offset + size);
++    if (end <= start) {
++        return false;
++    }
++
++    section->offset_within_address_space += start - section->offset_within_region;
++    section->offset_within_region = start;
++    section->size = int128_make64(end - start);
++
++    return true;
++}
++
++typedef int (*guest_memfd_section_cb)(MemoryRegionSection *s, void *arg);
++
++static int guest_memfd_notify_populate_cb(MemoryRegionSection *section, void *arg)
++{
++    RamDiscardListener *rdl = arg;
++
++    return rdl->notify_populate(rdl, section);
++}
++
++static int guest_memfd_notify_discard_cb(MemoryRegionSection *section, void *arg)
++{
++    RamDiscardListener *rdl = arg;
++
++    rdl->notify_discard(rdl, section);
++
++    return 0;
++}
++
++static int guest_memfd_for_each_populated_range(const GuestMemfdManager *gmm,
++                                                MemoryRegionSection *section,
++                                                void *arg,
++                                                guest_memfd_section_cb cb)
++{
++    unsigned long first_zero_bit, last_zero_bit;
++    uint64_t offset, size;
++    int ret = 0;
++
++    first_zero_bit = section->offset_within_region / gmm->block_size;
++    first_zero_bit = find_next_zero_bit(gmm->discard_bitmap, gmm->discard_bitmap_size,
++                                        first_zero_bit);
++
++    while (first_zero_bit < gmm->discard_bitmap_size) {
++        MemoryRegionSection tmp = *section;
++
++        offset = first_zero_bit * gmm->block_size;
++        last_zero_bit = find_next_bit(gmm->discard_bitmap, gmm->discard_bitmap_size,
++                                      first_zero_bit + 1) - 1;
++        size = (last_zero_bit - first_zero_bit + 1) * gmm->block_size;
++
++        if (!guest_memfd_rdm_intersect_memory_section(&tmp, offset, size)) {
++            break;
++        }
++
++        ret = cb(&tmp, arg);
++        if (ret) {
++            break;
++        }
++
++        first_zero_bit = find_next_zero_bit(gmm->discard_bitmap, gmm->discard_bitmap_size,
++                                            last_zero_bit + 2);
++    }
++
++    return ret;
++}
++
++static int guest_memfd_for_each_discarded_range(const GuestMemfdManager *gmm,
++                                                MemoryRegionSection *section,
++                                                void *arg,
++                                                guest_memfd_section_cb cb)
++{
++    unsigned long first_one_bit, last_one_bit;
++    uint64_t offset, size;
++    int ret = 0;
++
++    first_one_bit = section->offset_within_region / gmm->block_size;
++    first_one_bit = find_next_bit(gmm->discard_bitmap, gmm->discard_bitmap_size,
++                                  first_one_bit);
++
++    while (first_one_bit < gmm->discard_bitmap_size) {
++        MemoryRegionSection tmp = *section;
++
++        offset = first_one_bit * gmm->block_size;
++        last_one_bit = find_next_zero_bit(gmm->discard_bitmap, gmm->discard_bitmap_size,
++                                          first_one_bit + 1) - 1;
++        size = (last_one_bit - first_one_bit + 1) * gmm->block_size;
++
++        if (!guest_memfd_rdm_intersect_memory_section(&tmp, offset, size)) {
++            break;
++        }
++
++        ret = cb(&tmp, arg);
++        if (ret) {
++            break;
++        }
++
++        first_one_bit = find_next_bit(gmm->discard_bitmap, gmm->discard_bitmap_size,
++                                      last_one_bit + 2);
++    }
++
++    return ret;
++}
++
++static uint64_t guest_memfd_rdm_get_min_granularity(const RamDiscardManager *rdm,
++                                                    const MemoryRegion *mr)
++{
++    GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(rdm);
++
++    g_assert(mr == gmm->mr);
++    return gmm->block_size;
++}
++
++static void guest_memfd_rdm_register_listener(RamDiscardManager *rdm,
++                                              RamDiscardListener *rdl,
++                                              MemoryRegionSection *section)
++{
++    GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(rdm);
++    int ret;
++
++    g_assert(section->mr == gmm->mr);
++    rdl->section = memory_region_section_new_copy(section);
++
++    QLIST_INSERT_HEAD(&gmm->rdl_list, rdl, next);
++
++    ret = guest_memfd_for_each_populated_range(gmm, section, rdl,
++                                               guest_memfd_notify_populate_cb);
++    if (ret) {
++        error_report("%s: Failed to register RAM discard listener: %s", __func__,
++                     strerror(-ret));
++    }
++}
++
++static void guest_memfd_rdm_unregister_listener(RamDiscardManager *rdm,
++                                                RamDiscardListener *rdl)
++{
++    GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(rdm);
++    int ret;
++
++    g_assert(rdl->section);
++    g_assert(rdl->section->mr == gmm->mr);
++
++    ret = guest_memfd_for_each_populated_range(gmm, rdl->section, rdl,
++                                               guest_memfd_notify_discard_cb);
++    if (ret) {
++        error_report("%s: Failed to unregister RAM discard listener: %s", __func__,
++                     strerror(-ret));
++    }
++
++    memory_region_section_free_copy(rdl->section);
++    rdl->section = NULL;
++    QLIST_REMOVE(rdl, next);
++
++}
++
++typedef struct GuestMemfdReplayData {
++    void *fn;
++    void *opaque;
++} GuestMemfdReplayData;
++
++static int guest_memfd_rdm_replay_populated_cb(MemoryRegionSection *section, void *arg)
++{
++    struct GuestMemfdReplayData *data = arg;
++    ReplayRamPopulate replay_fn = data->fn;
++
++    return replay_fn(section, data->opaque);
++}
++
++static int guest_memfd_rdm_replay_populated(const RamDiscardManager *rdm,
++                                            MemoryRegionSection *section,
++                                            ReplayRamPopulate replay_fn,
++                                            void *opaque)
++{
++    GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(rdm);
++    struct GuestMemfdReplayData data = { .fn = replay_fn, .opaque = opaque };
++
++    g_assert(section->mr == gmm->mr);
++    return guest_memfd_for_each_populated_range(gmm, section, &data,
++                                                guest_memfd_rdm_replay_populated_cb);
++}
++
++static int guest_memfd_rdm_replay_discarded_cb(MemoryRegionSection *section, void *arg)
++{
++    struct GuestMemfdReplayData *data = arg;
++    ReplayRamDiscard replay_fn = data->fn;
++
++    replay_fn(section, data->opaque);
++
++    return 0;
++}
++
++static void guest_memfd_rdm_replay_discarded(const RamDiscardManager *rdm,
++                                             MemoryRegionSection *section,
++                                             ReplayRamDiscard replay_fn,
++                                             void *opaque)
++{
++    GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(rdm);
++    struct GuestMemfdReplayData data = { .fn = replay_fn, .opaque = opaque };
++
++    g_assert(section->mr == gmm->mr);
++    guest_memfd_for_each_discarded_range(gmm, section, &data,
++                                         guest_memfd_rdm_replay_discarded_cb);
++}
++
++static void guest_memfd_manager_realize(Object *obj, MemoryRegion *mr,
++                                        uint64_t region_size)
++{
++    GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(obj);
++    uint64_t bitmap_size = ROUND_UP(region_size, gmm->block_size) / gmm->block_size;
++
++    gmm->mr = mr;
++    gmm->discard_bitmap_size = bitmap_size;
++    gmm->discard_bitmap = bitmap_new(bitmap_size);
++}
++
++static void guest_memfd_manager_init(Object *obj)
++{
++    GuestMemfdManager *gmm = GUEST_MEMFD_MANAGER(obj);
++
++    gmm->block_size = qemu_real_host_page_size();
++    QLIST_INIT(&gmm->rdl_list);
++}
++
++static void guest_memfd_manager_finalize(Object *obj)
++{
++    g_free(GUEST_MEMFD_MANAGER(obj)->discard_bitmap);
++}
++
++static void guest_memfd_manager_class_init(ObjectClass *oc, void *data)
++{
++    GuestMemfdManagerClass *gmmc = GUEST_MEMFD_MANAGER_CLASS(oc);
++    RamDiscardManagerClass *rdmc = RAM_DISCARD_MANAGER_CLASS(oc);
++
++    gmmc->realize = guest_memfd_manager_realize;
++
++    rdmc->get_min_granularity = guest_memfd_rdm_get_min_granularity;
++    rdmc->register_listener = guest_memfd_rdm_register_listener;
++    rdmc->unregister_listener = guest_memfd_rdm_unregister_listener;
++    rdmc->is_populated = guest_memfd_rdm_is_populated;
++    rdmc->replay_populated = guest_memfd_rdm_replay_populated;
++    rdmc->replay_discarded = guest_memfd_rdm_replay_discarded;
++}
+diff --git a/system/meson.build b/system/meson.build
+index a296270cb0..9b96d645ab 100644
+--- a/system/meson.build
++++ b/system/meson.build
+@@ -16,6 +16,7 @@ system_ss.add(files(
+   'dirtylimit.c',
+   'dma-helpers.c',
+   'globals.c',
++  'guest-memfd-manager.c',
+   'memory_mapping.c',
+   'qdev-monitor.c',
+   'qtest.c',
 -- 
 2.43.5
 
