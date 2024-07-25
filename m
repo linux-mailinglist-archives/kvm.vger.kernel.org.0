@@ -1,204 +1,459 @@
-Return-Path: <kvm+bounces-22268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16B9093C8A4
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 21:18:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B289293C92C
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 21:52:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 676DFB2137E
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 19:18:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FF7B1C21994
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 19:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F30D555884;
-	Thu, 25 Jul 2024 19:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D75A74063;
+	Thu, 25 Jul 2024 19:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kMbCa0Tg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rv+hE6tC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EEC32901
-	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 19:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 430561876
+	for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 19:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721935121; cv=none; b=HFk1SeEfPD9AJn6TJXXimjGSRXIwWCbVNkAjanP326Ec55TTHbPgt5bRTWU621syBHCfT9I3ejRKgswx9N2bBLZdKNlWqIQsguYp/ppc5EzlsUoeC6hCig71p7i5cbTm7ntxHwDJ0xHEk4AXYumdfO1YTj4Ja6aYceQoKPqH5QM=
+	t=1721937156; cv=none; b=hFuXsqw8VZ9MtyOuiWBbOtNzwQ+ITAVJm0xylQrSgNXARMqsquJqx0Kmc64tY8PKo7RRe0P0L7qIGosFVY9igMaJE+S0zDTn2rfpHAcu87qeq3INpUEuRpKTmSaGfjEIKxhAdlbSb89a16qcWBnGoVKqZbVb2ACOouQ/XBvA7uw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721935121; c=relaxed/simple;
-	bh=f47S07HxQhk5OOeKiB9K1NaJdEfEGg6zonQdkfbmIVU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=pVqMT64S/sjbNd4+O4cjpHQRdNsxrZ8LmJpKAjJrLTXrc8zExPgMKfac3ANa1XwMZTjv5m7kSUqOwpVB75THAddeg0e5/WyE6zl9ldoGxMbgZKZcx6SdtKx26Qwhn7Qdoc4JNwzPYrwB+nao0qrq2mH1GYX8jl5dM+ANl7kbqpE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kMbCa0Tg; arc=none smtp.client-ip=209.85.216.74
+	s=arc-20240116; t=1721937156; c=relaxed/simple;
+	bh=S6qPUYYzAfjcp57EBZoerITwEw97UgHwcuSYx0FQpGU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rDk/D7uFRFAVHRS1Xna015KdtYn2si1I3FvskxzuSLZ2l0aUyTDurt+x5lmjR8D2gW4UDv3rpGVDryg+q12l3wISyA5NCkvA8DFelgyiiahXHXYGTt3jtgkwBcC4rIJnBUArXsZ0y/86bzb8nHgcxtctgKJPcjy9iosufcQhHvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rv+hE6tC; arc=none smtp.client-ip=209.85.219.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb5ab2f274so192974a91.3
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 12:18:38 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dfe43dca3bfso1323993276.0
+        for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 12:52:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721935118; x=1722539918; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ZqGB/Cz1hoMbWM8Wtkli9j/fLw3XavIJq7H92YX62Q=;
-        b=kMbCa0TgsuCAlnbdpQEAVo/z3PbRq4Vv1jseTm+F8yup9LqmlU4Gt3V/kPyWGRUaBl
-         pPiWaQXP3rSkmKng9wy87krZvz7mgM+TK4W2A+Zzg0qhVdcr0+WDNygbQpYXd8MT909N
-         MCE0PTlaQ6iiK5pQ2cPcg/ziqi+3yLaKDTF+UcpaIhDjkG7esi+h+f0karZhT+1fMXHU
-         KTlBc83RcNLtfcTf/MbE8p5YICTIof9knDsOdTL/h4o/uBhh4E72mDAbTm6upxRW/52M
-         k1xvqdWEjFEXKPiGbnnLB2i8jDtk2YdcFhZ2wGjqNhn6iftlbH4jyFS4cXK+DOGOVpkl
-         uV7Q==
+        d=google.com; s=20230601; t=1721937152; x=1722541952; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wmvF7JSitK/Lbt+S8Ef7rsUKiM+CmvTYnpcIXireHNk=;
+        b=rv+hE6tChmMmsDLT8GS9Ivibox/cakIgBEkZ7wu0P0tW9vmgQ6fnmcAiU2iPZ57Crq
+         iGyB1Ihvvcut4khAkzQGDmPyeWXpxdQ21I1mSU7z3+xLlp1Jy21NbIT+66YoQr4akQ/X
+         rJ2xx4BuWIs9UGn1Xe7Lsjv3txrBp6p0SL9CxqejWk4kFRhE0/EEIHnxoFqznUJTVBXL
+         FqtonbOoeizp/MLy9CHMaMVSLHYz+RHuVzUMp2UyGFdpR9jdUubqISah81aQ/xxyAqQ8
+         R1qHBny64EMQSx6eA/8p8QfSvtPq2YRw3pb490FwWNy0OetKpyJAJt9pFswh6ZXtRdTb
+         xkuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721935118; x=1722539918;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6ZqGB/Cz1hoMbWM8Wtkli9j/fLw3XavIJq7H92YX62Q=;
-        b=jTX2n2i43I43UEelCCojWBFCQtlLlPaj9R/tf6SCFcC2TFOo6unnYBh99pyT8zXHaz
-         oBDrk2thuv5ZhaSE299jJgkjbULt22hsnJk/1Bc13xNOk2YoyHArUcIQX8p4oFSSsTJS
-         ecdredU3yHUQobQf/7Dq8ZYuXF1ZZ9cU3cvISbV1fk4D6yupPdBTXF8ebMuf/KYh6JMr
-         BTPz1orXdI0q3//gUYy8vX4NZQY23kVOSW8uv+pzm84XshtJbub6DNUDC6Y+mm3nrQmQ
-         oEQqIQE3Z82bsqLxg/1aSPmh8tUpwhSrNtRSrhZqqR2mIW56yf4cX/qz7v3nMDYlwwzY
-         EWqA==
-X-Forwarded-Encrypted: i=1; AJvYcCUKprlXzt/HBmkG9YNj5/0lFoZ4GZ1M0zapW5fdGlKHlqhC2Crg7H9M1/tUgx5vsnOx4xZmIy8yM1ko5Lhupd735q+c
-X-Gm-Message-State: AOJu0Yy/JEoJrh8NxrYGfLhmtOPmVr9W55qdttC/IB41hT9NJ49U2BLz
-	+GRFICECDCyX5AUPzHjgZIv6NBQnc9o0Mov7fyjRVLdiDNlmrIAi22Q17te5z7ECbXvU+9XzhgF
-	f0w==
-X-Google-Smtp-Source: AGHT+IEtgXYQkUIXD37Yz/7t6WWh99EgPL7KRqPGuvhdlSeVbC72DRGRweBbcAO2hMFFoU/E0DLF31xjEVU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:d3c5:b0:2c9:7d81:fb1f with SMTP id
- 98e67ed59e1d1-2cf2eb69b79mr65683a91.6.1721935117499; Thu, 25 Jul 2024
- 12:18:37 -0700 (PDT)
-Date: Thu, 25 Jul 2024 12:18:36 -0700
-In-Reply-To: <41bdc5a77013796fa8cb6e61c410af3e064e274b.camel@redhat.com>
+        d=1e100.net; s=20230601; t=1721937152; x=1722541952;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wmvF7JSitK/Lbt+S8Ef7rsUKiM+CmvTYnpcIXireHNk=;
+        b=l4a+e6LzNxuow7lXn2QRKc8JM/Myg5Cy0K6TnD6bpU2wsVI2LhDRvLECGktWC0f0Jd
+         RqscQrjp6pRS2hjwH6GYvscDjFE7jEFuj9tqsOGOzSzOvWhKn3U7XopjhM8toYZE8VE3
+         aZfZODQK/bAkaUXC0DNCrSsAhE/qONAmsCK1mtkyUeOlwFLvnKZooOolCc5a0R4MGnme
+         qrOKskozHVmk8GPa8l4mpVLbdQlcNA9OLkVpszMgyId1njAjxH6GOGK51HfkGLvLbeqe
+         Rx7U9/K8yBMws9L9XmtL1LeEgw5pCtnRgU39aDkNz2/MHg4UbOoUs9mzMUmCTkJ5AdcK
+         Gqwg==
+X-Forwarded-Encrypted: i=1; AJvYcCXhZf5QmfwonNLG3itsIvmVZxCdj8pdoj3Jvybol8W+FoIFGuho4J4D7/QQCTFDq6TOs0iTFGLRCfK72lBx5wjxWm1h
+X-Gm-Message-State: AOJu0YylLMW4tky29MmhDpIdpIsheo68dSE1H6NXNntxenkSYNlOd712
+	+axUeyVC1ghFCPhc7Gp+MvVw38l5W+AwijgnYAX6nq4z+qBqQTbrM/lv6g8LKb5Jw++p78IY/VW
+	vcj2TjN/feg3aSwUq+idPT23+j5TtTlpXJNT3
+X-Google-Smtp-Source: AGHT+IEj7ZX2Fld7qL9GrVfFbgPabN6TPthfiRSq2x6GsFMTL3WDmsNd2RUJFRa994qovk1XqN1M+p5ev9qqzjRDdFA=
+X-Received: by 2002:a05:6902:1401:b0:e03:645f:2099 with SMTP id
+ 3f1490d57ef6-e0b22fae743mr4849923276.8.1721937151961; Thu, 25 Jul 2024
+ 12:52:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-24-seanjc@google.com>
- <7bf9838f2df676398f7b22f793b3478addde6ff0.camel@redhat.com>
- <ZoxXur7da11tP3aO@google.com> <41bdc5a77013796fa8cb6e61c410af3e064e274b.camel@redhat.com>
-Message-ID: <ZqKlDC11gItH1uj9@google.com>
-Subject: Re: [PATCH v2 23/49] KVM: x86: Handle kernel- and KVM-defined CPUID
- words in a single helper
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
-	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
-	Robert Hoo <robert.hoo.linux@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20231212204647.2170650-1-sagis@google.com> <20231212204647.2170650-9-sagis@google.com>
+ <0b34990b-8a3f-487e-891e-64d3d4d68613@intel.com>
+In-Reply-To: <0b34990b-8a3f-487e-891e-64d3d4d68613@intel.com>
+From: Sagi Shahar <sagis@google.com>
+Date: Thu, 25 Jul 2024 14:52:20 -0500
+Message-ID: <CAAhR5DFzTUrvUSsBcXwNBfxVxTYkMLkiTD5P+nQBL==Dr5WZeA@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 08/29] KVM: selftests: TDX: Add TDX lifecycle test
+To: "Chen, Zide" <zide.chen@intel.com>
+Cc: linux-kselftest@vger.kernel.org, Ackerley Tng <ackerleytng@google.com>, 
+	Ryan Afranji <afranji@google.com>, Erdem Aktas <erdemaktas@google.com>, 
+	Isaku Yamahata <isaku.yamahata@intel.com>, Sean Christopherson <seanjc@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, Peter Gonda <pgonda@google.com>, 
+	Haibo Xu <haibo1.xu@intel.com>, Chao Peng <chao.p.peng@linux.intel.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Roger Wang <runanwang@google.com>, 
+	Vipin Sharma <vipinsh@google.com>, jmattson@google.com, dmatlack@google.com, 
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, linux-mm@kvack.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 24, 2024, Maxim Levitsky wrote:
-> On Mon, 2024-07-08 at 14:18 -0700, Sean Christopherson wrote:
-> >  And in the unlikely case that we royally screw up and fail
-> > to call kvm_cpu_cap_init() on a word, starting with 0xff would result in all
-> > features in the uninitialized word being treated as supported.
-> Yes, but IMHO the chances of this happening are very low.
-> 
-> I understand your concerns though, but then IMHO it's better to keep the
-> kvm_cpu_cap_init_kvm_defined, because this way at least the function name
-> cleanly describes the difference instead of the difference being buried in the function
-> itself (the comment helps but still it is less noticeable than a function name). 
-> 
-> I don't have a very strong opinion on this though, 
-> because IMHO the kvm_cpu_cap_init_kvm_defined is also not very user friendly, 
-> so if you really think that the new code is more readable, let it be.
+On Fri, Mar 22, 2024 at 4:33=E2=80=AFPM Chen, Zide <zide.chen@intel.com> wr=
+ote:
+>
+>
+>
+> On 12/12/2023 12:46 PM, Sagi Shahar wrote:
+> > From: Erdem Aktas <erdemaktas@google.com>
+> >
+> > Adding a test to verify TDX lifecycle by creating a TD and running a
+> > dummy TDG.VP.VMCALL <Instruction.IO> inside it.
+> >
+> > Signed-off-by: Erdem Aktas <erdemaktas@google.com>
+> > Signed-off-by: Ryan Afranji <afranji@google.com>
+> > Signed-off-by: Sagi Shahar <sagis@google.com>
+> > Co-developed-by: Ackerley Tng <ackerleytng@google.com>
+> > Signed-off-by: Ackerley Tng <ackerleytng@google.com>
+> > ---
+> >  tools/testing/selftests/kvm/Makefile          |  4 +
+> >  .../selftests/kvm/include/x86_64/tdx/tdcall.h | 35 ++++++++
+> >  .../selftests/kvm/include/x86_64/tdx/tdx.h    | 12 +++
+> >  .../kvm/include/x86_64/tdx/test_util.h        | 52 +++++++++++
+> >  .../selftests/kvm/lib/x86_64/tdx/tdcall.S     | 90 +++++++++++++++++++
+> >  .../selftests/kvm/lib/x86_64/tdx/tdx.c        | 27 ++++++
+> >  .../selftests/kvm/lib/x86_64/tdx/tdx_util.c   |  1 +
+> >  .../selftests/kvm/lib/x86_64/tdx/test_util.c  | 34 +++++++
+> >  .../selftests/kvm/x86_64/tdx_vm_tests.c       | 45 ++++++++++
+> >  9 files changed, 300 insertions(+)
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdca=
+ll.h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/tdx.=
+h
+> >  create mode 100644 tools/testing/selftests/kvm/include/x86_64/tdx/test=
+_util.h
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+> >  create mode 100644 tools/testing/selftests/kvm/lib/x86_64/tdx/test_uti=
+l.c
+> >  create mode 100644 tools/testing/selftests/kvm/x86_64/tdx_vm_tests.c
+> >
+> > diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selft=
+ests/kvm/Makefile
+> > index a35150ab855f..80d4a50eeb9f 100644
+> > --- a/tools/testing/selftests/kvm/Makefile
+> > +++ b/tools/testing/selftests/kvm/Makefile
+> > @@ -52,6 +52,9 @@ LIBKVM_x86_64 +=3D lib/x86_64/vmx.c
+> >  LIBKVM_x86_64 +=3D lib/x86_64/sev.c
+> >  LIBKVM_x86_64 +=3D lib/x86_64/tdx/tdx_util.c
+> >  LIBKVM_x86_64 +=3D lib/x86_64/tdx/td_boot.S
+> > +LIBKVM_x86_64 +=3D lib/x86_64/tdx/tdcall.S
+> > +LIBKVM_x86_64 +=3D lib/x86_64/tdx/tdx.c
+> > +LIBKVM_x86_64 +=3D lib/x86_64/tdx/test_util.c
+> >
+> >  LIBKVM_aarch64 +=3D lib/aarch64/gic.c
+> >  LIBKVM_aarch64 +=3D lib/aarch64/gic_v3.c
+> > @@ -152,6 +155,7 @@ TEST_GEN_PROGS_x86_64 +=3D set_memory_region_test
+> >  TEST_GEN_PROGS_x86_64 +=3D steal_time
+> >  TEST_GEN_PROGS_x86_64 +=3D kvm_binary_stats_test
+> >  TEST_GEN_PROGS_x86_64 +=3D system_counter_offset_test
+> > +TEST_GEN_PROGS_x86_64 +=3D x86_64/tdx_vm_tests
+> >
+> >  # Compiled outputs used by test targets
+> >  TEST_GEN_PROGS_EXTENDED_x86_64 +=3D x86_64/nx_huge_pages_test
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h b/=
+tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
+> > new file mode 100644
+> > index 000000000000..78001bfec9c8
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdcall.h
+> > @@ -0,0 +1,35 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/* Adapted from arch/x86/include/asm/shared/tdx.h */
+> > +
+> > +#ifndef SELFTESTS_TDX_TDCALL_H
+> > +#define SELFTESTS_TDX_TDCALL_H
+> > +
+> > +#include <linux/bits.h>
+> > +#include <linux/types.h>
+> > +
+> > +#define TDG_VP_VMCALL_INSTRUCTION_IO_READ 0
+> > +#define TDG_VP_VMCALL_INSTRUCTION_IO_WRITE 1
+> > +
+> > +#define TDX_HCALL_HAS_OUTPUT BIT(0)
+> > +
+> > +#define TDX_HYPERCALL_STANDARD 0
+> > +
+> > +/*
+> > + * Used in __tdx_hypercall() to pass down and get back registers' valu=
+es of
+> > + * the TDCALL instruction when requesting services from the VMM.
+> > + *
+> > + * This is a software only structure and not part of the TDX module/VM=
+M ABI.
+> > + */
+> > +struct tdx_hypercall_args {
+> > +     u64 r10;
+> > +     u64 r11;
+> > +     u64 r12;
+> > +     u64 r13;
+> > +     u64 r14;
+> > +     u64 r15;
+> > +};
+> > +
+> > +/* Used to request services from the VMM */
+> > +u64 __tdx_hypercall(struct tdx_hypercall_args *args, unsigned long fla=
+gs);
+> > +
+> > +#endif // SELFTESTS_TDX_TDCALL_H
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h b/too=
+ls/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+> > new file mode 100644
+> > index 000000000000..a7161efe4ee2
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/tdx.h
+> > @@ -0,0 +1,12 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +#ifndef SELFTEST_TDX_TDX_H
+> > +#define SELFTEST_TDX_TDX_H
+> > +
+> > +#include <stdint.h>
+> > +
+> > +#define TDG_VP_VMCALL_INSTRUCTION_IO 30
+> > +
+> > +uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+> > +                                   uint64_t write, uint64_t *data);
+> > +
+> > +#endif // SELFTEST_TDX_TDX_H
+> > diff --git a/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h=
+ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+> > new file mode 100644
+> > index 000000000000..b570b6d978ff
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/include/x86_64/tdx/test_util.h
+> > @@ -0,0 +1,52 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +#ifndef SELFTEST_TDX_TEST_UTIL_H
+> > +#define SELFTEST_TDX_TEST_UTIL_H
+> > +
+> > +#include <stdbool.h>
+> > +
+> > +#include "tdcall.h"
+> > +
+> > +#define TDX_TEST_SUCCESS_PORT 0x30
+> > +#define TDX_TEST_SUCCESS_SIZE 4
+> > +
+> > +/**
+> > + * Assert that tdx_test_success() was called in the guest.
+> > + */
+> > +#define TDX_TEST_ASSERT_SUCCESS(VCPU)                                 =
+       \
+> > +     (TEST_ASSERT(                                                   \
+> > +             ((VCPU)->run->exit_reason =3D=3D KVM_EXIT_IO) &&         =
+   \
+> > +             ((VCPU)->run->io.port =3D=3D TDX_TEST_SUCCESS_PORT) &&   =
+   \
+> > +             ((VCPU)->run->io.size =3D=3D TDX_TEST_SUCCESS_SIZE) &&   =
+   \
+> > +             ((VCPU)->run->io.direction =3D=3D                        =
+   \
+> > +                     TDG_VP_VMCALL_INSTRUCTION_IO_WRITE),            \
+> > +             "Unexpected exit values while waiting for test completion=
+: %u (%s) %d %d %d\n", \
+> > +             (VCPU)->run->exit_reason,                               \
+> > +             exit_reason_str((VCPU)->run->exit_reason),              \
+> > +             (VCPU)->run->io.port, (VCPU)->run->io.size,             \
+> > +             (VCPU)->run->io.direction))
+> > +
+> > +/**
+> > + * Run a test in a new process.
+> > + *
+> > + * There might be multiple tests we are running and if one test fails,=
+ it will
+> > + * prevent the subsequent tests to run due to how tests are failing wi=
+th
+> > + * TEST_ASSERT function. The run_in_new_process function will run a te=
+st in a
+> > + * new process context and wait for it to finish or fail to prevent TE=
+ST_ASSERT
+> > + * to kill the main testing process.
+> > + */
+> > +void run_in_new_process(void (*func)(void));
+> > +
+> > +/**
+> > + * Verify that the TDX is supported by KVM.
+> > + */
+> > +bool is_tdx_enabled(void);
+> > +
+> > +/**
+> > + * Report test success to userspace.
+> > + *
+> > + * Use TDX_TEST_ASSERT_SUCCESS() to assert that this function was call=
+ed in the
+> > + * guest.
+> > + */
+> > +void tdx_test_success(void);
+> > +
+> > +#endif // SELFTEST_TDX_TEST_UTIL_H
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S b/tool=
+s/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+> > new file mode 100644
+> > index 000000000000..df9c1ed4bb2d
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdcall.S
+> > @@ -0,0 +1,90 @@
+> > +/* SPDX-License-Identifier: GPL-2.0-only */
+> > +/* Adapted from arch/x86/coco/tdx/tdcall.S */
+> > +
+> > +#define TDX_HYPERCALL_r10 0 /* offsetof(struct tdx_hypercall_args, r10=
+) */
+> > +#define TDX_HYPERCALL_r11 8 /* offsetof(struct tdx_hypercall_args, r11=
+) */
+> > +#define TDX_HYPERCALL_r12 16 /* offsetof(struct tdx_hypercall_args, r1=
+2) */
+> > +#define TDX_HYPERCALL_r13 24 /* offsetof(struct tdx_hypercall_args, r1=
+3) */
+> > +#define TDX_HYPERCALL_r14 32 /* offsetof(struct tdx_hypercall_args, r1=
+4) */
+> > +#define TDX_HYPERCALL_r15 40 /* offsetof(struct tdx_hypercall_args, r1=
+5) */
+> > +
+> > +/*
+> > + * Bitmasks of exposed registers (with VMM).
+> > + */
+> > +#define TDX_R10 0x400
+> > +#define TDX_R11 0x800
+> > +#define TDX_R12 0x1000
+> > +#define TDX_R13 0x2000
+> > +#define TDX_R14 0x4000
+> > +#define TDX_R15 0x8000
+> > +
+> > +#define TDX_HCALL_HAS_OUTPUT 0x1
+> > +
+> > +/*
+> > + * These registers are clobbered to hold arguments for each
+> > + * TDVMCALL. They are safe to expose to the VMM.
+> > + * Each bit in this mask represents a register ID. Bit field
+> > + * details can be found in TDX GHCI specification, section
+> > + * titled "TDCALL [TDG.VP.VMCALL] leaf".
+> > + */
+> > +#define TDVMCALL_EXPOSE_REGS_MASK    ( TDX_R10 | TDX_R11 | \
+> > +                                       TDX_R12 | TDX_R13 | \
+> > +                                       TDX_R14 | TDX_R15 )
+> > +
+> > +.code64
+> > +.section .text
+> > +
+> > +.globl __tdx_hypercall
+> > +.type __tdx_hypercall, @function
+> > +__tdx_hypercall:
+> > +     /* Set up stack frame */
+> > +     push %rbp
+> > +     movq %rsp, %rbp
+> > +
+> > +     /* Save callee-saved GPRs as mandated by the x86_64 ABI */
+> > +     push %r15
+> > +     push %r14
+> > +     push %r13
+> > +     push %r12
+> > +
+> > +     /* Mangle function call ABI into TDCALL ABI: */
+> > +     /* Set TDCALL leaf ID (TDVMCALL (0)) in RAX */
+> > +     xor %eax, %eax
+> > +
+> > +     /* Copy hypercall registers from arg struct: */
+> > +     movq TDX_HYPERCALL_r10(%rdi), %r10
+> > +     movq TDX_HYPERCALL_r11(%rdi), %r11
+> > +     movq TDX_HYPERCALL_r12(%rdi), %r12
+> > +     movq TDX_HYPERCALL_r13(%rdi), %r13
+> > +     movq TDX_HYPERCALL_r14(%rdi), %r14
+> > +     movq TDX_HYPERCALL_r15(%rdi), %r15
+> > +
+> > +     movl $TDVMCALL_EXPOSE_REGS_MASK, %ecx
+> > +
+> > +     tdcall
+> > +
+> > +     /* TDVMCALL leaf return code is in R10 */
+> > +     movq %r10, %rax
+> > +
+> > +     /* Copy hypercall result registers to arg struct if needed */
+> > +     testq $TDX_HCALL_HAS_OUTPUT, %rsi
+> > +     jz .Lout
+> > +
+> > +     movq %r10, TDX_HYPERCALL_r10(%rdi)
+> > +     movq %r11, TDX_HYPERCALL_r11(%rdi)
+> > +     movq %r12, TDX_HYPERCALL_r12(%rdi)
+> > +     movq %r13, TDX_HYPERCALL_r13(%rdi)
+> > +     movq %r14, TDX_HYPERCALL_r14(%rdi)
+> > +     movq %r15, TDX_HYPERCALL_r15(%rdi)
+> > +.Lout:
+> > +     /* Restore callee-saved GPRs as mandated by the x86_64 ABI */
+> > +     pop %r12
+> > +     pop %r13
+> > +     pop %r14
+> > +     pop %r15
+> > +
+> > +     pop %rbp
+> > +     ret
+> > +
+> > +/* Disable executable stack */
+> > +.section .note.GNU-stack,"",%progbits
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c b/tools/t=
+esting/selftests/kvm/lib/x86_64/tdx/tdx.c
+> > new file mode 100644
+> > index 000000000000..c2414523487a
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx.c
+> > @@ -0,0 +1,27 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +
+> > +#include "tdx/tdcall.h"
+> > +#include "tdx/tdx.h"
+> > +
+> > +uint64_t tdg_vp_vmcall_instruction_io(uint64_t port, uint64_t size,
+> > +                                   uint64_t write, uint64_t *data)
+> > +{
+> > +     uint64_t ret;
+> > +     struct tdx_hypercall_args args =3D {
+> > +             .r10 =3D TDX_HYPERCALL_STANDARD,
+> > +             .r11 =3D TDG_VP_VMCALL_INSTRUCTION_IO,
+> > +             .r12 =3D size,
+> > +             .r13 =3D write,
+> > +             .r14 =3D port,
+> > +     };
+> > +
+> > +     if (write)
+> > +             args.r15 =3D *data;
+> > +
+> > +     ret =3D __tdx_hypercall(&args, write ? 0 : TDX_HCALL_HAS_OUTPUT);
+> > +
+> > +     if (!write)
+> > +             *data =3D args.r11;
+> > +
+> > +     return ret;
+> > +}
+> > diff --git a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c b/to=
+ols/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> > index 063ff486fb86..b302060049d5 100644
+> > --- a/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> > +++ b/tools/testing/selftests/kvm/lib/x86_64/tdx/tdx_util.c
+> > @@ -224,6 +224,7 @@ static void tdx_enable_capabilities(struct kvm_vm *=
+vm)
+> >                     KVM_X2APIC_API_USE_32BIT_IDS |
+> >                             KVM_X2APIC_API_DISABLE_BROADCAST_QUIRK);
+> >       vm_enable_cap(vm, KVM_CAP_SPLIT_IRQCHIP, 24);
+> > +     vm_enable_cap(vm, KVM_CAP_MAX_VCPUS, 512);
+>
+> Since TDX spec doesn't define max vCPUs, is it a good idea to fix it to
+> 512 in this common code?
+>
+> How about to move this line to the specific test case where you are
+> actually verifying this capability?
+>
+> For example, move it to PATCH v5 21/29] KVM: selftests: TDX: Add
+> TDG.VP.INFO test
+>
+> + vm_enable_cap(vm, KVM_CAP_MAX_VCPUS, 512);
+> ...
+>
+> TEST_ASSERT_EQ(ret_max_vcpus, 512);
+>
 
-Hmm, the main motiviation of this patch was to avoid duplicate code in later
-patches, but looking at the end result, I don't think that eliminating the
-KVM-defined variants is necessary, e.g. ending up with this should work, too.
+See Yan Zhao's comment above. This was needed in the previous
+implementation of TDX and without it the tests would fail. With the
+new fix I'm going to remove this from the common code.
 
-#define __kvm_cpu_cap_init(leaf)					\
-do {									\
-	const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);	\
-	const u32 __maybe_unused kvm_cpu_cap_init_in_progress = leaf;	\
-	u32 kvm_cpu_cap_emulated = 0;					\
-	u32 kvm_cpu_cap_synthesized = 0;				\
-									\
-	kvm_cpu_caps[leaf] &= (raw_cpuid_get(cpuid) |			\
-			       kvm_cpu_cap_synthesized);		\
-	kvm_cpu_caps[leaf] |= kvm_cpu_cap_emulated;			\
-} while (0)
-
-/* For kernel-defined leafs, mask the boot CPU's pre-populated value. */
-#define kvm_cpu_cap_init(leaf, mask)					\
-do {
-	BUILD_BUG_ON(leaf >= NCAPINTS);					\
-	kvm_cpu_caps[leaf] &= (mask);					\
-									\
-	__kvm_cpu_cap_init(leaf);					\
-} while (0)
-
-/* For KVM-defined leafs, explicitly set the leaf, KVM is the sole authority. */
-#define kvm_cpu_cap_init_kvm_defined(leaf, mask)			\
-do {									\
-	BUILD_BUG_ON(leaf < NCAPINTS);					\
-	kvm_cpu_caps[leaf] = (mask);					\
-									\
-	__kvm_cpu_cap_init(leaf);					\
-} while (0)
-
-That said, unless someone really likes kvm_cpu_cap_init_kvm_defined(), I am
-leaning toward keeping this patch (but rewriting the changelog).  IMO, whether a
-leaf is KVM-only or known to the kernel is a plumbing detail that really shouldn't
-affect anything in kvm_set_cpu_caps().  Literally the only difference is whether
-or not there are kernel capabilities to account for.  The "types" of features isn't
-restricted in any way, e.g. CPUID_12_EAX is KVM-only and contains only scattered
-features, but CPUID_7_1_EDX is KVM-only and contains only "regular" features.
-
-And if a feature changes from KVM-only to kernel-managed, we'd need to update the
-caller.  This is unlikely, but it seems like an unnecessary maintenance burden.
-
-Ooh, and thinking more on that and on the argument against initializing the KVM-
-only leafs to all ones, I think we should remove this:
-
-	memcpy(&kvm_cpu_caps, &boot_cpu_data.x86_capability,
-	       sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)));
-
-and instead explicitly mask the boot_cpu_data.x86_capability[leaf].  It's _way_
-more likely that the kernel adds a leaf without updating KVM, in which case
-copying the kernel capabilities without masking them against KVM's capabilities
-would over-report the set of supported features.  The odds of over-reproring are
-still low, as KVM limit the max leaf in __do_cpuid_func(), but unless I'm missing
-something, the memcpy() trick adds no value in the current code base.
-
-E.g. 
-
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index dbc3f6ce9203..593de2c1811b 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -730,18 +730,20 @@ do {                                                                      \
- } while (0)
- 
- /*
-- * For kernel-defined leafs, mask the boot CPU's pre-populated value.  For KVM-
-- * defined leafs, explicitly set the leaf, as KVM is the one and only authority.
-+ * For leafs that are managed by the kernel, mask the boot CPU's capabilities,
-+ * which are populated by the kernel.  For KVM-only leafs, as KVM is the one
-+ * and only authority.
-  */
- #define kvm_cpu_cap_init(leaf, mask)                                   \
- do {                                                                   \
-        const struct cpuid_reg cpuid = x86_feature_cpuid(leaf * 32);    \
-        const u32 __maybe_unused kvm_cpu_cap_init_in_progress = leaf;   \
-+       const u32 kernel_cpu_caps = boot_cpu_data.x86_capability[leaf]; \
-        u32 kvm_cpu_cap_emulated = 0;                                   \
-        u32 kvm_cpu_cap_synthesized = 0;                                \
-                                                                        \
-        if (leaf < NCAPINTS)                                            \
--               kvm_cpu_caps[leaf] &= (mask);                           \
-+               kvm_cpu_caps[leaf] = kernel_cpu_caps & (mask);          \
-        else                                                            \
-                kvm_cpu_caps[leaf] = (mask);                            \
-                                                                        \
-@@ -763,9 +765,6 @@ void kvm_set_cpu_caps(void)
-        BUILD_BUG_ON(sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)) >
-                     sizeof(boot_cpu_data.x86_capability));
- 
--       memcpy(&kvm_cpu_caps, &boot_cpu_data.x86_capability,
--              sizeof(kvm_cpu_caps) - (NKVMCAPINTS * sizeof(*kvm_cpu_caps)));
--
-        kvm_cpu_cap_init(CPUID_1_ECX,
-                /*
-                 * NOTE: MONITOR (and MWAIT) are emulated as NOP, but *not*
+>
+>
 
