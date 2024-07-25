@@ -1,128 +1,121 @@
-Return-Path: <kvm+bounces-22243-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22244-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E4E793C432
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 16:31:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3232393C437
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 16:32:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C7F211F212A3
-	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 14:31:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA4D8286EA1
+	for <lists+kvm@lfdr.de>; Thu, 25 Jul 2024 14:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BD9F19DF50;
-	Thu, 25 Jul 2024 14:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 307E819DF9E;
+	Thu, 25 Jul 2024 14:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qX77dP6j"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HPye91ux"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4408C19D8B3;
-	Thu, 25 Jul 2024 14:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C2C19D887;
+	Thu, 25 Jul 2024 14:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721917803; cv=none; b=CBJFK6Nk5oBsgx/oKJtniAwty6mRjr99Hzzt4UTrQTZN0Ed5Hi1+KnH15Yxa79LkV5I/JemxxyVYup3DqW6J9AUoITQt+a8yta5hPpkbNZa8ggWjvB2jRt7D79aDIkdf/a5p3OCXgI7SA692uIZ2Ci8gsnJtLOMcltCXJ4DAqRc=
+	t=1721917870; cv=none; b=GCRSbY/zB+6m4kCzcIlelWYabIMuks2Qu5jEMBkC6Spykvj3/4mEkmDHxXuBlVkEO40ABeAg+Za0VPoOlsVBTCL8Z88kRRm8R9eRMOncOySOvoHV5nVd8mF6x1T3KMfpdxpojIrOM3e5JR4Eqxi50eFlrWv6x4eIyTUtb+5PGRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721917803; c=relaxed/simple;
-	bh=+ZMvgiAV1/UM9/xd5fVncKC88Ok0z8C2ZSVPGSklcYk=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=J3g54zRITctGGaZq7jkurOEP8IWe+8ru2I1WDeEvs6UdtnpoxsU8WOs0GEysiTH0v1RB9hkzDtajkIatabQSLvZEUCLBk20HQrMrbvfCMl9xwoIHDnNBZzw8M++1gAQvuAYFYXaWb8GdXzDh49kiYbxizEFzTM5MVKnyv6rFUrI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qX77dP6j; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0B78C4AF11;
-	Thu, 25 Jul 2024 14:30:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1721917802;
-	bh=+ZMvgiAV1/UM9/xd5fVncKC88Ok0z8C2ZSVPGSklcYk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=qX77dP6jKSf3FBBBkWB9cpAljJZphbPY5WkZpFtst6Su66tYAk7FV49EQL5gG9kVN
-	 YFvsNhoopK+bQ7boxmaurAWqUuPhcNXKAiChvZgLl/IJ/N055ZROBJzqFrl1kUJlKa
-	 g9AMagqtZBuKDZ/wuZtlIaGYYlNxSgXSKkwotLy/lqxl2i1HAvIgxFjQHpVCpgQWcE
-	 9qtTe0v/jK9t5tJ47RoxP2YZOToGylHzu//EvgUlz86aU4vJiHntZ56fhKeT0vcXRV
-	 2gPtPXX90vLLeslBDAGeJrr5zwYYkaLYlZWs+hILVjVWYNMXfyB1ORno/qDclFPLho
-	 hdkKrTRG/CnAA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sWzTk-00FK9s-QI;
-	Thu, 25 Jul 2024 15:30:00 +0100
-Date: Thu, 25 Jul 2024 15:30:00 +0100
-Message-ID: <864j8d35p3.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <ZqJeLDGJwWEFMKD4@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<ZqJeLDGJwWEFMKD4@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1721917870; c=relaxed/simple;
+	bh=qwo34jr+Yqc1IW/n+Q5UmnskrX5+TEZUzdtQoT8D3E8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ly+6MojYftbQ92M+xzMBMUsLw3nWXt6Ctu05okmPAxsp6r0u0EmhFQeiN3IIVxOAU3ZC/wIoXrimXo1CGQ9rV3H9iEV6cbQCYlYqARbaXX6NPcgzc1xbo5bK3cGx3JQZ8CVZB5mOt7k6+u1kW2eORKkwnYkrEUehS7qboFgu72k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HPye91ux; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46PELrvp013427;
+	Thu, 25 Jul 2024 14:31:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	Opvxln9lmMuKAmMXQ0Fm0cbKqtBuGnIdwTG8fQvb/4A=; b=HPye91uxoVX4mxwx
+	73qFXzZc1OnvrioN6g9Cdr8qpsdUuM84tuUoHZc5ffNGtFqhaf3Fj2Y+FEdCRj74
+	TXRx1CoTjTH/2zZ55zc7es6QHK4m0zWdeKaDhjHIpqGYbmZd0EqDzlFCLZ0GSecy
+	aDhYbyaWtpCO9aGNULsl3386j2WbHc/Blqf65TdnfGs+bVKT/mj6shUktih0LogW
+	N7YrSDuT6DRvu6w2XuW+V6jVbSYX+CSO36lshTnMoN7hb3xmBP1s12H2tE4BBijL
+	t8P76gcc4lLLvQjm4gNiq9Ds5BSb7QQnFKFsdHhzAFNoujy/HdX7ViH0xxoHT6+i
+	uXR8vg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40kmj3rkxy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jul 2024 14:31:04 +0000 (GMT)
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46PEV3Wj029541;
+	Thu, 25 Jul 2024 14:31:03 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40kmj3rkxv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jul 2024 14:31:03 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46PATmQD009100;
+	Thu, 25 Jul 2024 14:31:02 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 40gt93pyxc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 25 Jul 2024 14:31:02 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46PEUvIF54919654
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 25 Jul 2024 14:30:59 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4395F20043;
+	Thu, 25 Jul 2024 14:30:57 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A784620040;
+	Thu, 25 Jul 2024 14:30:56 +0000 (GMT)
+Received: from darkmoore (unknown [9.179.29.251])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu, 25 Jul 2024 14:30:56 +0000 (GMT)
+Date: Thu, 25 Jul 2024 16:30:55 +0200
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, imbrenda@linux.ibm.com,
+        nrb@linux.ibm.com, npiggin@gmail.com, nsg@linux.ibm.com,
+        mhartmay@linux.ibm.com
+Subject: Re: [kvm-unit-tests PATCH 2/4] s390x/Makefile: Add more comments
+Message-ID: <20240725163055.535daadb.schlameuss@linux.ibm.com>
+In-Reply-To: <20240718105104.34154-3-frankja@linux.ibm.com>
+References: <20240718105104.34154-1-frankja@linux.ibm.com>
+	<20240718105104.34154-3-frankja@linux.ibm.com>
+Organization: IBM
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: 4lAV_9zM3pBkurys5iyvKemRWWRNRjXs
+X-Proofpoint-GUID: Nj2YqpA5-Ievt_URXIigYapKRl8_tY_2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-25_13,2024-07-25_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
+ lowpriorityscore=0 mlxlogscore=957 impostorscore=0 phishscore=0
+ adultscore=0 mlxscore=0 clxscore=1015 priorityscore=1501 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407250099
 
-On Thu, 25 Jul 2024 15:16:12 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Thu, 18 Jul 2024 10:50:17 +0000
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> More comments in Makefiles can only make them more approachable.
 > 
-> Hi Marc,
-> 
-> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > +	if (perm_fail) {
-> > +		struct s1_walk_result tmp;
-> 
-> I was wondering if you would consider initializing 'tmp' to the empty struct
-> here. That makes it consistent with the initialization of 'wr' in the !perm_fail
-> case and I think it will make the code more robust wrt to changes to
-> compute_par_s1() and what fields it accesses.
+> Signed-off-by: Janosch Frank <frankja@linux.ibm.com>
+> ---
+>  s390x/Makefile | 5 +++++
+>  1 file changed, 5 insertions(+)
 
-I think there is a slightly better way, with something like this:
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index b02d8dbffd209..36fa2801ab4ef 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -803,12 +803,12 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 	}
- 
- 	if (perm_fail) {
--		struct s1_walk_result tmp;
--
--		tmp.failed = true;
--		tmp.fst = ESR_ELx_FSC_PERM | wr.level;
--		tmp.s2 = false;
--		tmp.ptw = false;
-+		struct s1_walk_result tmp = (struct s1_walk_result){
-+			.failed	= true,
-+			.fst	= ESR_ELx_FSC_PERM | wr.level,
-+			.s2	= false,
-+			.ptw	= false,
-+		};
- 
- 		wr = tmp;
- 	}
-
-Thoughts?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+Reviewed-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 
