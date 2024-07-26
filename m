@@ -1,160 +1,124 @@
-Return-Path: <kvm+bounces-22278-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22279-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D334293CCAA
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 04:13:40 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F1193CCCD
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 04:55:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 538A21F21E7E
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 02:13:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C314B21669
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 02:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 243D51C6BE;
-	Fri, 26 Jul 2024 02:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E7D210EC;
+	Fri, 26 Jul 2024 02:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IDTyFOTm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A3A922EEF;
-	Fri, 26 Jul 2024 02:13:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED8E1B947;
+	Fri, 26 Jul 2024 02:55:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721960009; cv=none; b=ZUiMNI5zYzhUyEeUxX0NYHU9vTY+vrhzB7uxBUd+l8WCG+qRaT13Igd9jok1zTGNiNWLR3h1TqpOKAi8RbYCHjfUldtPbBZFO+NMeZchsD3TsxBIQJMlNWpq3MmfQZOKqs/QeclEucSy6kjsemi5xck1dACuGEntywYNTMyCU7o=
+	t=1721962546; cv=none; b=Ng8IY63Yj41RBJYekR0dnmpYPuxzGIWm4F9Je962ahaNM83ZYWYk4phkltFL0qhhI4aBrZdgSOmi6wmqXCgdjcsqC7JwdwY50sty9+rqfVliIrcFKApf05StRl57ufWeKnGBmFOQRPZZdfBmiEJXmNH8NVz7yHdwrqIIcX5Ld60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721960009; c=relaxed/simple;
-	bh=HqY4XQUSLvr0yzGY1uG570fMO9Gjd2nrXF8D75jC9bQ=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=bT7ZcwofIFwfE71o889TJVBtzV+PbwX1coZw32xW5y+MaILrK4MOy/QqMeJIUYl3M6aXZ9x6WIQ0IN+GNHke9aDpwGw314A4BZI341AOiLjmfBLlnAOihWEfenBAaqXvzpJE713SNe5T6PWaNHQdnkahxKIdZSaqM7Aohf6qKYM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Dxi+pDBqNmjd0BAA--.7089S3;
-	Fri, 26 Jul 2024 10:13:23 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMCx2sVABqNmTQ0CAA--.11809S3;
-	Fri, 26 Jul 2024 10:13:22 +0800 (CST)
-Subject: Re: [PATCH] LoongArch: KVM: Remove redundant assignment in
- kvm_map_page_fast
-To: tangbin <tangbin@cmss.chinamobile.com>, zhaotianrui@loongson.cn,
- chenhuacai@kernel.org, kernel@xen0n.name
-Cc: kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org
-References: <20240713155937.45261-1-tangbin@cmss.chinamobile.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <286be0a6-dac3-b2cd-e88a-e6feb5a240de@loongson.cn>
-Date: Fri, 26 Jul 2024 10:13:19 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1721962546; c=relaxed/simple;
+	bh=rG5tjABluGl5jSIlvCNi682GBmX8Z4Ux3yVbb7xs/1Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GSfyYv2v21A1zHo+5jWaSNvAZh4sD0MHHr8bmicCyYbnO3NVRysiIMoadLsJ30TZ9ZL/lQhoRS4vvur/iyQtNA50s1r2uXGnWTwPmVoMZ8nwsmviqhEbgtvIbYKiQEAKHPT8WCY5tM1BcbUKXD7jlXnpXgRro0tuxmg0qw+v9Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IDTyFOTm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49C47C116B1;
+	Fri, 26 Jul 2024 02:55:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1721962546;
+	bh=rG5tjABluGl5jSIlvCNi682GBmX8Z4Ux3yVbb7xs/1Y=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=IDTyFOTmsYAtt/A2DLVLAbZiXfCsmc6MS4ef6q2B5BO6495/+LgUAjj1o3uYs9bGK
+	 FFoVUimbtIDrO5eZ6IcbnQAqvd3yapiNt7DPbOE0l+QSor5crhRU3rPi7ElMCj5StJ
+	 +KHSPvAnpv1Q9Lw2Nxq97azt1xCNFwmidNjuO/CvbE6GETC3Mrs13XNqS1e7653Kpg
+	 W7uikWONpLSEteSQAAK7OMh6074cCkxElm06fMyuf2PQf+mZ/HVETFdpxvSp/21vEZ
+	 vtqMGX4LqoWHAAtHhuUR/Ct/j7Y9trBfHZ9W3F+i1hDZsLwO7HjVRmAvH5LLCf364X
+	 YkZtjSi0Zdu+g==
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a7ac469e4c4so211305166b.0;
+        Thu, 25 Jul 2024 19:55:46 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUpc3PvukAmLjyaBRk0xU0vUBsFCBXLx82EPvpe0S1fncRki7r19yUKjv20NJuwhfPqOUQxmXbs9LIXCEYsF6IFtM3MyRSRLvEdb2bYofc9g7yuxMRclmiwisIBi2eW2xhY
+X-Gm-Message-State: AOJu0YxpJCgbShr9BLBjb43SEV9U2E9OPPylN7l6bO9ADhkUcZ4szCaD
+	CtqhCPl7B25gj2/HsskoetbT/kY0fqI7qLapHWLz6lOocmfp2oG//jiqVXeYtC1336cpG4F3V/m
+	g7cB0VcA7blUs3VXeoTgg7yWayC8=
+X-Google-Smtp-Source: AGHT+IE4toV1Z8IEIkI9dLEtzNT/nSio8g4ih23Ay9wLdv4UiDf78cC3Ce/5CiLn8M6oYP1rZEPnyxLFAdWIfYBzpXY=
+X-Received: by 2002:a17:907:970d:b0:a77:ab9e:9202 with SMTP id
+ a640c23a62f3a-a7ab2bb46f7mr777476566b.4.1721962544864; Thu, 25 Jul 2024
+ 19:55:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240713155937.45261-1-tangbin@cmss.chinamobile.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCx2sVABqNmTQ0CAA--.11809S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7Ww1Dur4rtr17Zry3XryDXFc_yoW8Kw17pr
-	ZIkrnrCr4rtr1FkFZrta4DCFy29395KryxXa4Ig34rXwnFqr1Yq3W8X3yDZFy5J3ykZayS
-	qF4rJ3WUuan0yacCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUvFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYIkI8VC2zVCFFI0UMc
-	02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUXVWUAwAv7VC2z280aVAF
-	wI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxk0xIA0c2IEe2xFo4
-	CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG
-	67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMI
-	IYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E
-	14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJV
-	W8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU7_Ma
-	UUUUU
+References: <6D5128458C9E19E4+20240725134820.55817-1-zhangdandan@uniontech.com>
+ <c40854ac-38ef-4781-6c6b-4f74e24f265c@loongson.cn>
+In-Reply-To: <c40854ac-38ef-4781-6c6b-4f74e24f265c@loongson.cn>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Fri, 26 Jul 2024 10:55:32 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H5R_kamf=YJ62hb+iFr7Y+cvCaBBrY1rdk_wEEq4+6D_w@mail.gmail.com>
+Message-ID: <CAAhV-H5R_kamf=YJ62hb+iFr7Y+cvCaBBrY1rdk_wEEq4+6D_w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: Loongarch: Remove undefined a6 argument comment for kvm_hypercall
+To: maobibo <maobibo@loongson.cn>
+Cc: Dandan Zhang <zhangdandan@uniontech.com>, zhaotianrui@loongson.cn, kernel@xen0n.name, 
+	kvm@vger.kernel.org, loongarch@lists.linux.dev, linux-kernel@vger.kernel.org, 
+	wangyuli@uniontech.com, Wentao Guan <guanwentao@uniontech.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Tangbin,
+On Fri, Jul 26, 2024 at 9:49=E2=80=AFAM maobibo <maobibo@loongson.cn> wrote=
+:
+>
+>
+>
+> On 2024/7/25 =E4=B8=8B=E5=8D=889:48, Dandan Zhang wrote:
+> > The kvm_hypercall set for LoongArch is limited to a1-a5.
+> > The mention of a6 in the comment is undefined that needs to be rectifie=
+d.
+> >
+> > Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
+> > Signed-off-by: Dandan Zhang <zhangdandan@uniontech.com>
+> > ---
+> >   arch/loongarch/include/asm/kvm_para.h | 4 ++--
+> >   1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/inc=
+lude/asm/kvm_para.h
+> > index 335fb86778e2..43ec61589e6c 100644
+> > --- a/arch/loongarch/include/asm/kvm_para.h
+> > +++ b/arch/loongarch/include/asm/kvm_para.h
+> > @@ -39,9 +39,9 @@ struct kvm_steal_time {
+> >    * Hypercall interface for KVM hypervisor
+> >    *
+> >    * a0: function identifier
+> > - * a1-a6: args
+> > + * a1-a5: args
+> >    * Return value will be placed in a0.
+> > - * Up to 6 arguments are passed in a1, a2, a3, a4, a5, a6.
+> > + * Up to 5 arguments are passed in a1, a2, a3, a4, a5.
+> >    */
+> >   static __always_inline long kvm_hypercall0(u64 fid)
+> >   {
+> >
+>
+> Dandan,
+>
+> Nice catch. In future hypercall abi may expand such as the number of
+> input register and output register, or async hypercall function if there
+> is really such requirement.
+>
+> Anyway the modification is deserved and it is enough to use now, thanks
+> for doing it.
+>
+> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
+Maybe it is better to implement kvm_hypercall6() than remove a6 now?
 
-There is only return value with -EFAULT or 0 in function 
-kvm_map_page_fast(), if there is better error code or different error 
-for new code, the situation will be different :)
-
-I would like to keep existing code unchanged, however thanks for your patch.
-
-Regards
-Bibo Mao
-
-On 2024/7/13 下午11:59, tangbin wrote:
-> In the function kvm_map_page_fast, the assignment of 'ret' is
-> redundant, so remove it.
-> 
-> Signed-off-by: tangbin <tangbin@cmss.chinamobile.com>
-> ---
->   arch/loongarch/kvm/mmu.c | 17 +++++------------
->   1 file changed, 5 insertions(+), 12 deletions(-)
-> 
-> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> index 2634a9e8d..d6c922a4a 100644
-> --- a/arch/loongarch/kvm/mmu.c
-> +++ b/arch/loongarch/kvm/mmu.c
-> @@ -551,7 +551,6 @@ bool kvm_test_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range)
->    */
->   static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
->   {
-> -	int ret = 0;
->   	kvm_pfn_t pfn = 0;
->   	kvm_pte_t *ptep, changed, new;
->   	gfn_t gfn = gpa >> PAGE_SHIFT;
-> @@ -563,20 +562,16 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
->   
->   	/* Fast path - just check GPA page table for an existing entry */
->   	ptep = kvm_populate_gpa(kvm, NULL, gpa, 0);
-> -	if (!ptep || !kvm_pte_present(NULL, ptep)) {
-> -		ret = -EFAULT;
-> +	if (!ptep || !kvm_pte_present(NULL, ptep))
->   		goto out;
-> -	}
->   
->   	/* Track access to pages marked old */
->   	new = kvm_pte_mkyoung(*ptep);
->   	/* call kvm_set_pfn_accessed() after unlock */
->   
->   	if (write && !kvm_pte_dirty(new)) {
-> -		if (!kvm_pte_write(new)) {
-> -			ret = -EFAULT;
-> +		if (!kvm_pte_write(new))
->   			goto out;
-> -		}
->   
->   		if (kvm_pte_huge(new)) {
->   			/*
-> @@ -584,10 +579,8 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
->   			 * enabled for HugePages
->   			 */
->   			slot = gfn_to_memslot(kvm, gfn);
-> -			if (kvm_slot_dirty_track_enabled(slot)) {
-> -				ret = -EFAULT;
-> +			if (kvm_slot_dirty_track_enabled(slot))
->   				goto out;
-> -			}
->   		}
->   
->   		/* Track dirtying of writeable pages */
-> @@ -615,10 +608,10 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
->   		if (page)
->   			put_page(page);
->   	}
-> -	return ret;
-> +	return 0;
->   out:
->   	spin_unlock(&kvm->mmu_lock);
-> -	return ret;
-> +	return -EFAULT;
->   }
->   
->   static bool fault_supports_huge_mapping(struct kvm_memory_slot *memslot,
-> 
-
+Huacai
+>
 
