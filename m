@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-22371-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22372-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F1393DB55
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 01:55:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E89D93DB57
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 01:55:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D75E1F24586
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 23:55:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 468F328439C
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 23:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B8D915B0E6;
-	Fri, 26 Jul 2024 23:52:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407E7153BF7;
+	Fri, 26 Jul 2024 23:52:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KcdC67np"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZoCQUIfK"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A881598EE
-	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 23:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE46C15AAD3
+	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 23:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722037977; cv=none; b=VchtTwt6GZtx0eUsDtzHMbWcbh+0z7cWlhOnG3WmRAhqU7HLPrVlhVU5H6tWCboQSXtdSgH+Bqj43INB7IEW1kzW+oLhqlKPghwA8pS+AdPRax7TNGLCWFWE1kj7XDsvD93Qoc3PED1ZuI5r9pBrH+StiCvYO3hkiSQxf71SIrE=
+	t=1722037978; cv=none; b=ZJkkzGpoJ22xd0T9tlRZxH/SKasPPMbV/8JBG5xIZ7AmRo21hV9O6EUq8MWQ2kTWWt4rrvaiB5vIB4OGcic2OizIQOaKmaaQZrMKIDptAojIWG15/Kd5L4+S/3LlnqpWaZzUnns7i2GeYyMAjcpiDNO4oN8KfnRWApa17Sc0Vq0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722037977; c=relaxed/simple;
-	bh=BpefGVw3ai5MyZqnGpqT/DkM64xZIHhkO67jsUqUIys=;
+	s=arc-20240116; t=1722037978; c=relaxed/simple;
+	bh=P7WAicOgvpnFP/OgYcMHNilB3cYbvZdOfqdCkUi/Hw0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tyeFyJDK37NNRPPd1hN4B0xKHyteE0glFUS3eJ6Gh0rqgtiAi8ZGBCIRKStAQ160SrRFCxXPuZ5Zg0cYwQX1WcvUScHUclsM8LKZ6UfJ5zWcCqQ8Yt6K5qBrOq4CfQ+eYEPhdl6VyKoHCXbQ3S5blqz8W3GTidz2u58L7rRufHY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KcdC67np; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=l1OrTyNippORgr8+C/NHkIQvF61XYk3FXKMJGV/kYPnAppLiHQSeGt/1oYYqg6PnA/18tp3YU0TRvNe43ILtjpBrRsAzWsfCOhzHHWW0qjmY3PBFMyfFEj1ayi+iTqFcOzF22qpll3OhEp/IIGj+7eXgxU2E7ED9vshlGtH3Ysg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZoCQUIfK; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-664ccf0659cso6135777b3.1
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 16:52:54 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-66619cb2d3eso5952037b3.2
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 16:52:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722037974; x=1722642774; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722037976; x=1722642776; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=Dpyi/TQvAabfHqvBiXmrWwwqtiSCC0ukXFLvczoDhHE=;
-        b=KcdC67npj0TSKJPWMIOjBYz5BC6rRp3oSzV1GZy6lTT8BP9rI3t5P9Vy4Zs49XGVwX
-         7SU18jxLk/Ian3AK9DVvxrXW741yG/ikB2NpWee3xhPNXm0uC2A16VolFBtbFkqax2F1
-         fV2QB716kApSdes4JMFukG4zbfC+WMgqFnM9QJLp33344RyZ2sjkoTR5halQCk7+spp/
-         WcSaXPP/XO4c4mmyyoVoKD5Cz6HZfzwl5DzT2iC3dNj8TsuNkMvCsUwLGdJXk9d0EAee
-         FwFtub9t4Tg2Iqs4+RdHgufUFTYqRjzKLZGRLUn/anEJ12nl2c3Mh/Gyk5hjCsFHchDH
-         VEFg==
+        bh=fmU/HR7p0h2R7XRsIfqUXhH6E22vlxrvSMQX4VgE/mU=;
+        b=ZoCQUIfKoT5CuQK+9e2sZZYfCl+zAGIhLpWtYo0VRAfH3J3+yp/9TvzFqTSR15kTYL
+         bjEJZsnNxVoB8J2D8dPbhQPNeiYbnBJNzr7eoHuTSyp/lrVg5jRBZmPlttDbVa48B4PJ
+         W7NBRkNGcYHMxszPj1n5EZ+Jggmu+VPGjPd7Ttp/3pSJrpXJI0+mbJYIo9DA9igvKs/w
+         A++fMhrDKhRlWqiU7uv+yxjhugmcpHWv1DxwkjTkFV8rTa9J52UCIWmP4ZNFsR+z+XGa
+         rntZmjontxSN9+i5vGnBVOpYU/JvPWdjs8KVWoC6Hr8ukP8uFZy87wokVAI7RtIVs7mU
+         MBgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722037974; x=1722642774;
+        d=1e100.net; s=20230601; t=1722037976; x=1722642776;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Dpyi/TQvAabfHqvBiXmrWwwqtiSCC0ukXFLvczoDhHE=;
-        b=HhsZRiyBwhr/Yd+S4JbGdio3CY709zxujqhO45sYKSrIAt6ZU0Af0cpCBXzl4YyHFg
-         lgqFkOumJLJG7+5LXzSX4dEvsTLeuJiyh02PQQhBjWXl3aIFUWopJv5w9OGThtdcYwsE
-         49/KVFIXBWgHK7Ur7KSSeB18RRv006ZQwFm/pgrpyX2FfnXuqmDqNz8f1wVxeVz9t2B+
-         8mo6aJJaWyW4id82+4yegUWldF0iNcVfYzRU0JYx4tuX5cPHMG+Cu/mswSaVnfqPq4vt
-         vLgjVhvRfUWZkFcVW9/n+tvWXqhbXPJTV8mllpkFnEQisYccB2+BLXgHwJiPoEjVmRrK
-         eKwA==
-X-Gm-Message-State: AOJu0YyQXXNaSIInMuwhnZVK+Y1zjxzjB/+10F+ylC2oLVm3ZRcUu7C9
-	lPw4yBEgAgVHRm/LIf9fMFkEAnLmCIBKYkOGnTI8dgLpHxv02SxjlIiDAaiUkL8X31q8PS3QRxQ
-	n4Q==
-X-Google-Smtp-Source: AGHT+IEuz+UKgzDWJGr0lPjm3UdUlqhv4uVGAVLwalCQIXTZVrMJ3vp7bbZbHMGkSPe0yP2xueKpOueyV+8=
+        bh=fmU/HR7p0h2R7XRsIfqUXhH6E22vlxrvSMQX4VgE/mU=;
+        b=i2I5mqMyMOC4Xxqp854qlKMonr06srMOzQgS1rvRGIGVzYALVzTjpKJAJPvss3hBVW
+         eNWhILVGRHAWippcXVBZoOHsVAkfm3AGEiijS20YAWIo6PRV4sUTtqKQ9PbtPmuXjvmT
+         Yn3hUPklxtIHmfHeIzb6R+N4HeEztTwciEW0zeRvsEnYWRFKJNFHnWIp4Vqo/kXqftm5
+         DW0XU4hgs5OLm05Em7IMfT9MuOWLY/y52PIA/PPIUzLGv96tVXNsqupxDiQgwqxbfLee
+         08W4JUw/uhK3TCuw8PPep9W0BtXGObDx1kFA9Tb0OwRgvvKPQIDE7Gx2LaONPHan/rN5
+         lycQ==
+X-Gm-Message-State: AOJu0YzSFzd5ZLALzRerQ/XVm3NWnQzGeqOCnXgJ7HMc5GV6HXZsJ9Nt
+	xHHyjd0vUkjlE3eCkM+RC4woK6SW7lxhFaVFNUQ7NTS5lyL2qTUNNtqQ7JOP9gdlbfb3raWZWmQ
+	rGw==
+X-Google-Smtp-Source: AGHT+IEZeCODu/YeM5d/iOhxGxPVHISuly+z8I6+5BlUeuWOyJE5t2wqwhMJ9ApQGl0yAUOujG/KjtPFVv0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:f07:b0:64a:e220:bfb5 with SMTP id
- 00721157ae682-67a051e9c33mr504237b3.1.1722037973756; Fri, 26 Jul 2024
- 16:52:53 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a81:ad14:0:b0:62f:f535:f41 with SMTP id
+ 00721157ae682-67a0abd4d1fmr288247b3.9.1722037976008; Fri, 26 Jul 2024
+ 16:52:56 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Jul 2024 16:51:17 -0700
+Date: Fri, 26 Jul 2024 16:51:18 -0700
 In-Reply-To: <20240726235234.228822-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240726235234.228822-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240726235234.228822-9-seanjc@google.com>
-Subject: [PATCH v12 08/84] KVM: x86/mmu: Mark page/folio accessed only when
- zapping leaf SPTEs
+Message-ID: <20240726235234.228822-10-seanjc@google.com>
+Subject: [PATCH v12 09/84] KVM: x86/mmu: Don't force flush if SPTE update
+ clears Accessed bit
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -94,173 +94,78 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Mark folios as accessed only when zapping leaf SPTEs, which is a rough
-heuristic for "only in response to an mmu_notifier invalidation".  Page
-aging and LRUs are tolerant of false negatives, i.e. KVM doesn't need to
-be precise for correctness, and re-marking folios as accessed when zapping
-entire roots or when zapping collapsible SPTEs is expensive and adds very
-little value.
+Don't force a TLB flush if mmu_spte_update() clears Accessed bit, as
+access tracking tolerates false negatives, as evidenced by the
+mmu_notifier hooks that explicit test and age SPTEs without doing a TLB
+flush.
 
-E.g. when a VM is dying, all of its memory is being freed; marking folios
-accessed at that time provides no known value.  Similarly, because KVM
-marks folios as accessed when creating SPTEs, marking all folios as
-accessed when userspace happens to delete a memslot doesn't add value.
-The folio was marked access when the old SPTE was created, and will be
-marked accessed yet again if a vCPU accesses the pfn again after reloading
-a new root.  Zapping collapsible SPTEs is a similar story; marking folios
-accessed just because userspace disable dirty logging is a side effect of
-KVM behavior, not a deliberate goal.
+In practice, this is very nearly a nop.  spte_write_protect() and
+spte_clear_dirty() never clear the Accessed bit.  make_spte() always
+sets the Accessed bit for !prefetch scenarios.  FNAME(sync_spte) only sets
+SPTE if the protection bits are changing, i.e. if a flush will be needed
+regardless of the Accessed bits.  And FNAME(pte_prefetch) sets SPTE if and
+only if the old SPTE is !PRESENT.
 
-As an intermediate step, a.k.a. bisection point, towards *never* marking
-folios accessed when dropping SPTEs, mark folios accessed when the primary
-MMU might be invalidating mappings, as such zappings are not KVM initiated,
-i.e. might actually be related to page aging and LRU activity.
-
-Note, x86 is the only KVM architecture that "double dips"; every other
-arch marks pfns as accessed only when mapping into the guest, not when
-mapping into the guest _and_ when removing from the guest.
+That leaves kvm_arch_async_page_ready() as the one path that will generate
+a !ACCESSED SPTE *and* overwrite a PRESENT SPTE.  And that's very arguably
+a bug, as clobbering a valid SPTE in that case is nonsensical.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- Documentation/virt/kvm/locking.rst | 76 +++++++++++++++---------------
- arch/x86/kvm/mmu/mmu.c             |  4 +-
- arch/x86/kvm/mmu/tdp_mmu.c         |  7 ++-
- 3 files changed, 43 insertions(+), 44 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 31 +++++++++----------------------
+ 1 file changed, 9 insertions(+), 22 deletions(-)
 
-diff --git a/Documentation/virt/kvm/locking.rst b/Documentation/virt/kvm/locking.rst
-index 02880d5552d5..8b3bb9fe60bf 100644
---- a/Documentation/virt/kvm/locking.rst
-+++ b/Documentation/virt/kvm/locking.rst
-@@ -138,49 +138,51 @@ Then, we can ensure the dirty bitmaps is correctly set for a gfn.
- 
- 2) Dirty bit tracking
- 
--In the origin code, the spte can be fast updated (non-atomically) if the
-+In the original code, the spte can be fast updated (non-atomically) if the
- spte is read-only and the Accessed bit has already been set since the
- Accessed bit and Dirty bit can not be lost.
- 
- But it is not true after fast page fault since the spte can be marked
- writable between reading spte and updating spte. Like below case:
- 
--+------------------------------------------------------------------------+
--| At the beginning::                                                     |
--|                                                                        |
--|	spte.W = 0                                                       |
--|	spte.Accessed = 1                                                |
--+------------------------------------+-----------------------------------+
--| CPU 0:                             | CPU 1:                            |
--+------------------------------------+-----------------------------------+
--| In mmu_spte_clear_track_bits()::   |                                   |
--|                                    |                                   |
--|  old_spte = *spte;                 |                                   |
--|                                    |                                   |
--|                                    |                                   |
--|  /* 'if' condition is satisfied. */|                                   |
--|  if (old_spte.Accessed == 1 &&     |                                   |
--|       old_spte.W == 0)             |                                   |
--|     spte = 0ull;                   |                                   |
--+------------------------------------+-----------------------------------+
--|                                    | on fast page fault path::         |
--|                                    |                                   |
--|                                    |    spte.W = 1                     |
--|                                    |                                   |
--|                                    | memory write on the spte::        |
--|                                    |                                   |
--|                                    |    spte.Dirty = 1                 |
--+------------------------------------+-----------------------------------+
--|  ::                                |                                   |
--|                                    |                                   |
--|   else                             |                                   |
--|     old_spte = xchg(spte, 0ull)    |                                   |
--|   if (old_spte.Accessed == 1)      |                                   |
--|     kvm_set_pfn_accessed(spte.pfn);|                                   |
--|   if (old_spte.Dirty == 1)         |                                   |
--|     kvm_set_pfn_dirty(spte.pfn);   |                                   |
--|     OOPS!!!                        |                                   |
--+------------------------------------+-----------------------------------+
-++-------------------------------------------------------------------------+
-+| At the beginning::                                                      |
-+|                                                                         |
-+|	spte.W = 0                                                              |
-+|	spte.Accessed = 1                                                       |
-++-------------------------------------+-----------------------------------+
-+| CPU 0:                              | CPU 1:                            |
-++-------------------------------------+-----------------------------------+
-+| In mmu_spte_update()::              |                                   |
-+|                                     |                                   |
-+|  old_spte = *spte;                  |                                   |
-+|                                     |                                   |
-+|                                     |                                   |
-+|  /* 'if' condition is satisfied. */ |                                   |
-+|  if (old_spte.Accessed == 1 &&      |                                   |
-+|       old_spte.W == 0)              |                                   |
-+|     spte = new_spte;                |                                   |
-++-------------------------------------+-----------------------------------+
-+|                                     | on fast page fault path::         |
-+|                                     |                                   |
-+|                                     |    spte.W = 1                     |
-+|                                     |                                   |
-+|                                     | memory write on the spte::        |
-+|                                     |                                   |
-+|                                     |    spte.Dirty = 1                 |
-++-------------------------------------+-----------------------------------+
-+|  ::                                 |                                   |
-+|                                     |                                   |
-+|   else                              |                                   |
-+|     old_spte = xchg(spte, new_spte);|                                   |
-+|   if (old_spte.Accessed &&          |                                   |
-+|       !new_spte.Accessed)           |                                   |
-+|     flush = true;                   |                                   |
-+|   if (old_spte.Dirty &&             |                                   |
-+|       !new_spte.Dirty)              |                                   |
-+|     flush = true;                   |                                   |
-+|     OOPS!!!                         |                                   |
-++-------------------------------------+-----------------------------------+
- 
- The Dirty bit is lost in this case.
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 2e6daa6d1cc0..58b70328b20c 100644
+index 58b70328b20c..b7642f1f993f 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -542,10 +542,8 @@ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
- 	 * to guarantee consistency between TLB and page tables.
- 	 */
+@@ -518,37 +518,24 @@ static u64 mmu_spte_update_no_track(u64 *sptep, u64 new_spte)
+  * TLBs must be flushed. Otherwise rmap_write_protect will find a read-only
+  * spte, even though the writable spte might be cached on a CPU's TLB.
+  *
++ * Remote TLBs also need to be flushed if the Dirty bit is cleared, as false
++ * negatives are not acceptable, e.g. if KVM is using D-bit based PML on VMX.
++ *
++ * Don't flush if the Accessed bit is cleared, as access tracking tolerates
++ * false negatives, and the one path that does care about TLB flushes,
++ * kvm_mmu_notifier_clear_flush_young(), uses mmu_spte_update_no_track().
++ *
+  * Returns true if the TLB needs to be flushed
+  */
+ static bool mmu_spte_update(u64 *sptep, u64 new_spte)
+ {
+-	bool flush = false;
+ 	u64 old_spte = mmu_spte_update_no_track(sptep, new_spte);
  
--	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte)) {
-+	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte))
- 		flush = true;
--		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
--	}
+ 	if (!is_shadow_present_pte(old_spte))
+ 		return false;
  
- 	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte))
- 		flush = true;
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 7ac43d1ce918..d1de5f28c445 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -520,10 +520,6 @@ static void handle_changed_spte(struct kvm *kvm, int as_id, gfn_t gfn,
- 	if (was_present && !was_leaf &&
- 	    (is_leaf || !is_present || WARN_ON_ONCE(pfn_changed)))
- 		handle_removed_pt(kvm, spte_to_child_pt(old_spte, level), shared);
+-	/*
+-	 * For the spte updated out of mmu-lock is safe, since
+-	 * we always atomically update it, see the comments in
+-	 * spte_has_volatile_bits().
+-	 */
+-	if (is_mmu_writable_spte(old_spte) &&
+-	      !is_writable_pte(new_spte))
+-		flush = true;
 -
--	if (was_leaf && is_accessed_spte(old_spte) &&
--	    (!is_present || !is_accessed_spte(new_spte) || pfn_changed))
--		kvm_set_pfn_accessed(spte_to_pfn(old_spte));
+-	/*
+-	 * Flush TLB when accessed/dirty states are changed in the page tables,
+-	 * to guarantee consistency between TLB and page tables.
+-	 */
+-
+-	if (is_accessed_spte(old_spte) && !is_accessed_spte(new_spte))
+-		flush = true;
+-
+-	if (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte))
+-		flush = true;
+-
+-	return flush;
++	return (is_mmu_writable_spte(old_spte) && !is_writable_pte(new_spte)) ||
++	       (is_dirty_spte(old_spte) && !is_dirty_spte(new_spte));
  }
  
- static inline int __must_check __tdp_mmu_set_spte_atomic(struct tdp_iter *iter,
-@@ -865,6 +861,9 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
- 
- 		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
- 
-+		if (is_accessed_spte(iter.old_spte))
-+			kvm_set_pfn_accessed(spte_to_pfn(iter.old_spte));
-+
- 		/*
- 		 * Zappings SPTEs in invalid roots doesn't require a TLB flush,
- 		 * see kvm_tdp_mmu_zap_invalidated_roots() for details.
+ /*
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
