@@ -1,149 +1,332 @@
-Return-Path: <kvm+bounces-22362-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22363-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8512A93DB2B
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 01:34:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5483793DB37
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 01:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3FB78282B2A
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 23:34:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AA5D284187
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 23:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9139215350B;
-	Fri, 26 Jul 2024 23:34:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B95E6153BF0;
+	Fri, 26 Jul 2024 23:52:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="szm0+8Ox"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oh62CaBW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDD417BDC
-	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 23:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6455148848
+	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 23:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722036851; cv=none; b=VFQP4ZirHxk/CP9DuQI8gucJaUJpNqfqqdoBrPlQ965GYBocI+H4zDp3dlJ/one6EZpLtKMFaN/Yx44O5B6YCLJJGZJBH1907DY0XX7o0kg0W1c0wbRR/dKCY8IjAJ5JzeKfzWDT1C+S+8eZgoUzHX+g3pSO355e5C7yAvZh/7Q=
+	t=1722037961; cv=none; b=NsdsHm/bVbr5uL59mus/v2n0m2bwENuQTPOivFOw21+bZ8k0UASjChDtoSk3V7Dy6tLGvGuUB0+2H107CqQRl/1BAKXGcDZjP14yjv7tQ93hn2RkCOdsGoZntO9OWoEQxzGsnNHoFSGcslImF/C/9FIGS8BYpkHIgxaWq697fUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722036851; c=relaxed/simple;
-	bh=RQtMbylGuU16XFykl5/Sl5CGPbrXSVa/OeAnd9P5ZI0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gyAer713FcdLKB+H74lTuHYWSxxgHR0NXminUKN4rRuWNWSpYJqTvLpFK99yefgN/kk87DZhLhJyFZoh4HLZRyo+jMypXNPSankXaHBWjf6ikVFWpxDI/gJBmE9uTmdQ/O1HtMwCMjryc90OncGpUp/19yCk4jC8UtASUWaw9XI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=szm0+8Ox; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1722037961; c=relaxed/simple;
+	bh=avyK+sgjip8mGDKx+P8MZVPI7apOzI37V6tcFp859Fg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VGcMnRNvJFjkW+ISAj3lsNanIoHNndvZKoV+IcbFLlYS59D35ZmK6hlHE3txh2Q34CeLbBZpPr2DvyP+aJDzh4ClYt3D1QVyb/dKngKnWAqGouHktobc7GEcy4q4uDTdMIm/6NlmBG8eQ0xR/VGYID5f42MjUEf1iHegA86vQUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oh62CaBW; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-666010fb35cso4211927b3.0
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 16:34:09 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e035949cc4eso474182276.1
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 16:52:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722036848; x=1722641648; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SSdsezEIt/Fp32s2FTf13aRyq05x0uAP+V8KzHmTBR4=;
-        b=szm0+8OxmOK+2/lCPfkUlvqCMBx5esrwkkuOgfxXXM0HgMdj9F9wR0sX+lxwsH/VR8
-         RP9+53kGICxa60G20KjZ1enuhZOasNk6/K7c662N8LAa0yPzsabTNTXrm/WT6DbaDaRr
-         bWZrUBD0d813IRzSxBEMSRJ2X+V3rB5Pg8Lhsw+TmXChsng7sCq+1DhdDfdIWHPvS2XE
-         rQVFqhmKPmRO+5z0c+RIJ0diwlGCR70RnP4kVB/ubwZKWTIHt2vUh1C6av7Jd38jVJ9T
-         hnouWZh1R0A3bmCSTzt8GErOLVmnV7BRZlCEY4GdOC2V/TWuyCIiaUESCS5BMh+L/2aO
-         YjcA==
+        d=google.com; s=20230601; t=1722037958; x=1722642758; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GlsoNmguYxHdPLcIEUjx1oIy+wRnU4Jxi7Q36OcxhEA=;
+        b=oh62CaBWzR8LPMwmURBQor56FazwRpq5CGSoLr1AB2X3oO48eLboyC5/cyNmMgfaaq
+         WzrXtp3a0miTs0anW96EtZEpgX2jMQ+OBuXcv1lOMdFxy64I4brSh2gTnhj4I4qdpsfK
+         4I0gtLx/WWKcyvzfmJ9S5ibAqUVtbwPotgKpI397gH1vgdkTs0C6O9ObeRT1kJQ0pXvT
+         wpxGe2U0IIOlSWBRMJ3/8z832wKOlCIkicMs01ia4CUJfYBarsLwIwybv+boptccAnNh
+         nYL6xTEAFiGld/0irtn6IZe9s3TdHvkKZZPfi+WZZRx2S96TuhC3NY+kvL3MTTEMhdrc
+         BKZw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722036848; x=1722641648;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SSdsezEIt/Fp32s2FTf13aRyq05x0uAP+V8KzHmTBR4=;
-        b=AR8J3ufFuIccqg44aXvZumFEAa026anAi3hBogD85enBU+NIixM3InwcF0hh2rJxzw
-         e66ad0b8vc/MLhe//YYFptNuBxC2gLXY/qwWpqI+5/0fYtod02niUDpU/ndcEHrpPCF+
-         kX0NUikguz7/DaHk29yKPnxiK7iN1+7NjHwhzTiJQ+n4LKfnY+kDSm/ZuIDX2us+7FHi
-         ZTI28WRPEw2jHBN64E2hks/ycOqfnzBuseBK5b3trkUAGIfL3DGl3DM2btmMAJnWFeVE
-         UkVvG+PyYGEtoxy0EJrpfG6RwQUXVKEnbwGWWo/fnFK7ROXB4qQ2tc0WzVccQ/8ZAEIP
-         QIjw==
-X-Forwarded-Encrypted: i=1; AJvYcCWVqzAcXfJXW1Z7uNWx5t/KleFoPwjSDTvpdZMtoxO5P0YxQvpM/A0Qv6L2Erf7VCNNfRp+2ItDRdPBX1b9FP/PvK2H
-X-Gm-Message-State: AOJu0Yw8XPNuSPGd0HFgHQzPvcYFHG0TMgRMrtTl26K8JVgEncTsETGE
-	cRUYXuQamAETgqJs2JDpqTUhi4CEYbxltVspk15c4hIMEQ3iXqBCO7VNkYyIf9QxdW8JM2zF/ZW
-	mlA==
-X-Google-Smtp-Source: AGHT+IE0Qhn7yLAoE6OMcvxw1EBbEbmBeHfypxe4U8DmBzxyyUTTUeSlmFqxg+6tY/vt3w4FV2PjG/zCs7A=
+        d=1e100.net; s=20230601; t=1722037958; x=1722642758;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GlsoNmguYxHdPLcIEUjx1oIy+wRnU4Jxi7Q36OcxhEA=;
+        b=J7DsHMILaherhLa+g7Ii/zcm/H/g+Gw2tCfgGWB4C+N/CY03QRw3l282riHintnoGq
+         F6c5fyfBFQwt892UWBsL8vUkH//4mpL5mc13HF9VUY27sH5DGc2wi0hNeKIpUxL7UBqP
+         pfzaJcMwAE+oj885LVKWJKwg6QF0C35WnJImNq/G1MiGWt2vli+G6aRGnot8pWgruoyF
+         u4DRVbikIIeJ0WpduGsBC+CfrQK+5At2Ty71kobdfElxP3tf0OlMcF53DWDpi2wFJa1z
+         x+mHyQ90Wn7WaUqxYFNxyQiU2TxNGj8LyNUAFcPw00ItZ99OvF/uBaIdgEhIbU1SeISo
+         quVg==
+X-Gm-Message-State: AOJu0Yzz6U4y6js4egrLqtjko0kBAx0swS3H72KZeKahhlmi/acPe6iC
+	BcddU5eSugq4oJpqYb6DmtAn5lwQbl1TWtSWmBJijMBg+4jzEUTPv6tyG+8CNm3P9ZifIljTxtU
+	8Sw==
+X-Google-Smtp-Source: AGHT+IFCH1oh4Y8/oiPAKKZDfTSrq8OctuCbDjHGO9FWuVz/aIwZKKAQhyg1yG69wkiF5914XVtW9HUBfXk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:3411:b0:66a:a05e:9fe4 with SMTP id
- 00721157ae682-67a2cd74953mr37387b3.3.1722036848234; Fri, 26 Jul 2024 16:34:08
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1005:b0:e0b:f93:fe8c with SMTP id
+ 3f1490d57ef6-e0b5427fa67mr79730276.0.1722037957798; Fri, 26 Jul 2024 16:52:37
  -0700 (PDT)
-Date: Fri, 26 Jul 2024 16:34:06 -0700
-In-Reply-To: <31cf77d34fc49735e6dff57344a0e532e028a975.camel@redhat.com>
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri, 26 Jul 2024 16:51:09 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-25-seanjc@google.com>
- <20d3017a8dd54b345104bf2e5cb888a22a1e0a53.camel@redhat.com>
- <ZoxaOqvXzTH6O64D@google.com> <31cf77d34fc49735e6dff57344a0e532e028a975.camel@redhat.com>
-Message-ID: <ZqQybtNkhSVZDOTu@google.com>
-Subject: Re: [PATCH v2 24/49] KVM: x86: #undef SPEC_CTRL_SSBD in cpuid.c to
- avoid macro collisions
+X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
+Message-ID: <20240726235234.228822-1-seanjc@google.com>
+Subject: [PATCH v12 00/84] KVM: Stop grabbing references to PFNMAP'd pages
 From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
-	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
-	Robert Hoo <robert.hoo.linux@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, 
+	Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	kvmarm@lists.linux.dev, loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Jul 24, 2024, Maxim Levitsky wrote:
-> On Mon, 2024-07-08 at 14:29 -0700, Sean Christopherson wrote:
-> > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
-> > > Maybe we should instead rename the SPEC_CTRL_SSBD to
-> > > 'MSR_IA32_SPEC_CTRL_SSBD' and together with it, other fields of this msr.  It
-> > > seems that at least some msrs in this file do this.
-> > 
-> > Yeah, the #undef hack is quite ugly.  But I didn't (and still don't) want to
-> > introduce all the renaming churn in the middle of this already too-big series,
-> > especially since it would require touching quite a bit of code outside of KVM.
->
-> > 
-> > I'm also not sure that's the right thing to do; I kinda feel like KVM is the one
-> > that's being silly here.
-> 
-> I don't think that KVM is silly here. I think that hardware definitions like
-> MSRs, register names, register bit fields, etc, *must* come with a unique
-> prefix, it's not an issue of breaking some deeply nested macro, but rather an
-> issue of readability.
+arm64 folks, the first two patches are bug fixes, but I have very low
+confidence that they are correct and/or desirable.  If they are more or
+less correct, I can post them separately if that'd make life easier.  I
+included them here to avoid conflicts, and because I'm pretty sure how
+KVM deals with MTE tags vs. dirty logging will impact what APIs KVM needs
+to provide to arch code.
 
-For the MSR names themselves, yes, I agree 100%.  But for the bits and mask, I
-disagree.  It's simply too verbose, especially given that in the vast majority
-of cases simply looking at the surrounding code will provide enough context to
-glean an understanding of what's going on.  E.g. even for SPEC_CTRL_SSBD, where
-there's an absurd amount of magic and layering, looking at the #define makes
-it fairly obvious that it belongs to MSR_IA32_SPEC_CTRL.
+On to the series...  The TL;DR is that I would like to get input on two
+things:
 
-And for us x86 folks, who obviously look at this code far more often than non-x86
-folks, I find it valuable to know that a bit/mask is exactly that, and _not_ an
-MSR index.  E.g. VMX_BASIC_TRUE_CTLS is a good example, where renaming that to
-MSR_VMX_BASIC_TRUE_CTLS would make it look too much like MSR_IA32_VMX_TRUE_ENTRY_CTLS
-and all the other "true" VMX MSRs.
+ 1. Marking folios dirty/accessed only on the intial stage-2 page fault
+ 2. The new APIs for faulting, prefetching, and doing "lookups" on pfns
 
-> SPEC_CTRL_SSBD for example won't mean much to someone who only knows ARM, while
-> MSR_SPEC_CTRL_SSBD, or even better IA32_MSR_SPEC_CTRL_SSBD, lets you instantly know
-> that this is a MSR, and anyone with even a bit of x86 knowledge should at least have
-> heard about what a MSR is.
-> 
-> In regard to X86_FEATURE_INTEL_SSBD, I don't oppose this idea, because we have
-> X86_FEATURE_AMD_SSBD, but in general I do oppose the idea of adding 'INTEL' prefix,
+This is (spiritually) v12 of David Steven's series to play nice with pfns
+that are "valid", i.e. have a struct page, but are not refcounted.  Whereas
+David's series only (mostly) fixed things for x86, this series goes for
+broke and completely eliminates KVM's long-standing (and heinous) behavior
+of essentially guessing which pfns are refcounted pages (see
+kvm_pfn_to_refcounted_page()).
 
-Ya, those are my feelings exactly.  And in this case, since we already have an
-AMD variant, I think it's actually a net positive to add an INTEL variant so that
-it's clear that Intel and AMD ended up defining separate CPUID to enumerate the
-same basic info.
+Getting there requires "fixing" arch code that isn't obviously broken.
+Specifically, to get rid of kvm_pfn_to_refcounted_page(), KVM needs to
+stop marking pages/folios dirty/accessed based solely on the pfn that's
+stored in KVM's stage-2 page tables.  In v11, KVM x86 did this by tagging
+SPTEs with a flag (using a software-available bit).
 
-> because it sets a not that good precedent, because most of the features on x86
-> are first done by Intel, but then are also implemented by AMD, and thus an intel-only
-> feature name can stick after it becomes a general x86 feature.
-> 
-> IN case of X86_FEATURE_INTEL_SSBD, we already have sadly different CPUID bits for
-> each vendor (although I wonder if AMD also sets the X86_FEATURE_INTEL_SSBD).
-> 
-> I vote to rename 'SPEC_CTRL_SSBD', it can be done as a standalone patch, and can
-> be accepted right now, even before this patch series is accepted.
+But that isn't a viable option for some flavors of x86 (we're out of
+software-available bits), and more importantly I've convinced myself[*]
+that marking folios _dirty_ after SPTEs have been installed is completely
+unnecessary, and that marking folios accessed is likewise unnecessary for
+real world workloads (and if this is a sticking point, I have ideas on
+how to handle it more gracefully; more at the bottom).
 
-If we go that route, then we also need to rename nearly ever bit/mask definition
-in msr-index.h, otherwise SPEC_CTRL_* will be the odd ones out.  And as above, I
-don't think this is the right direction.
+So, instead of tracking which SPTEs correspond to refcounted pages, v12
+simply removes all of the code that operates on "struct page" based on
+the pfn in stage-2 PTEs.  This is the back ~40-50% of the series.  Most
+of the patches are relevatively uninteresting from a code perspective,
+it's the concept itself (of not marking folios dirty/accessed from SPTEs)
+that needs discussion.
+
+For x86 in particular, which sets accessed/dirty status when that info
+would be "lost", e.g. when SPTEs are zapped or KVM clears the dirty flag
+in a SPTE, foregoing the updates provides very measurable performance
+improvements for related operations.  E.g. when clearing dirty bits as
+part of dirty logging, and zapping SPTEs to reconstitue huge pages when
+disabling dirty logging.
+
+The other big change from v11 is that I opted to go with dedicated,
+specific, and hopefully descriptive APIs to wrap kvm_follow_pfn() instead
+of expose the "inner" helper to arch code.  In part because I still don't
+love kvm_follow_pfn(), and fewer callers means its easier to change if/when
+someone comes up with a better name.  But also because I think/hope that
+having dedicated APIs will make it easier for arch developers to understand
+what is the right/preferred way to do certain operations.  E.g. so that all
+architectures use the same core flow for handling stage-2 page faults.
+Long term, I would love to standardize that code even more, but this series
+is already waaaay too big.
+
+Along the way, I also discovered that several of the inputs to hva_to_pfn()
+(and it's myriad wrappers) could be removed.  E.g. the rather weirdly named
+@atomic flag can be removed by deduplicating x86's prefetching code.
+
+As for capturing accessed information on zapped SPTEs, e.g. to prevent
+losing accessed information because NUMA balancing mucks with things, my
+thought is that arch code can preserve the accessed information in SPTEs
+that are unmapped/zapped because protections were modified, e.g. so that
+LRU-initiated aging can still collect information.  I'm not at all
+convinced that this is necessary outside of tests that care about exact
+counts, e.g. KVM selftests, but I'll post an RFC KVM x86 series to get
+the conversation started.
+
+Note, I'm purposefully not capturing the delta from v11=>v12, because
+there is zero chance I will get everything, and while this is a spiritual
+successor to David's v11, in practice it's like 98% new code.
+
+[*] https://lore.kernel.org/all/20240320005024.3216282-1-seanjc@google.com
+
+David Stevens (3):
+  KVM: Replace "async" pointer in gfn=>pfn with "no_wait" and error code
+  KVM: Introduce kvm_follow_pfn() to eventually replace "gfn_to_pfn"
+    APIs
+  KVM: Migrate kvm_vcpu_map() to kvm_follow_pfn()
+
+Sean Christopherson (81):
+  KVM: arm64: Release pfn, i.e. put page, if copying MTE tags hits
+    ZONE_DEVICE
+  KVM: arm64: Disallow copying MTE to guest memory while KVM is dirty
+    logging
+  KVM: Drop KVM_ERR_PTR_BAD_PAGE and instead return NULL to indicate an
+    error
+  KVM: Allow calling kvm_release_page_{clean,dirty}() on a NULL page
+    pointer
+  KVM: Add kvm_release_page_unused() API to put pages that KVM never
+    consumes
+  KVM: x86/mmu: Skip the "try unsync" path iff the old SPTE was a leaf
+    SPTE
+  KVM: x86/mmu: Mark folio dirty when creating SPTE, not when
+    zapping/modifying
+  KVM: x86/mmu: Mark page/folio accessed only when zapping leaf SPTEs
+  KVM: x86/mmu: Don't force flush if SPTE update clears Accessed bit
+  KVM: x86/mmu: Use gfn_to_page_many_atomic() when prefetching indirect
+    PTEs
+  KVM: Rename gfn_to_page_many_atomic() to kvm_prefetch_pages()
+  KVM: Drop @atomic param from gfn=>pfn and hva=>pfn APIs
+  KVM: Annotate that all paths in hva_to_pfn() might sleep
+  KVM: x86/mmu: Drop kvm_page_fault.hva, i.e. don't track intermediate
+    hva
+  KVM: Drop unused "hva" pointer from __gfn_to_pfn_memslot()
+  KVM: Remove pointless sanity check on @map param to kvm_vcpu_(un)map()
+  KVM: Explicitly initialize all fields at the start of kvm_vcpu_map()
+  KVM: Use NULL for struct page pointer to indicate mremapped memory
+  KVM: nVMX: Rely on kvm_vcpu_unmap() to track validity of eVMCS mapping
+  KVM: nVMX: Drop pointless msr_bitmap_map field from struct nested_vmx
+  KVM: nVMX: Add helper to put (unmap) vmcs12 pages
+  KVM: Use plain "struct page" pointer instead of single-entry array
+  KVM: Provide refcounted page as output field in struct kvm_follow_pfn
+  KVM: Move kvm_{set,release}_page_{clean,dirty}() helpers up in
+    kvm_main.c
+  KVM: pfncache: Precisely track refcounted pages
+  KVM: Pin (as in FOLL_PIN) pages during kvm_vcpu_map()
+  KVM: nVMX: Mark vmcs12's APIC access page dirty when unmapping
+  KVM: Pass in write/dirty to kvm_vcpu_map(), not kvm_vcpu_unmap()
+  KVM: Get writable mapping for __kvm_vcpu_map() only when necessary
+  KVM: Disallow direct access (w/o mmu_notifier) to unpinned pfn by
+    default
+  KVM: Add a helper to lookup a pfn without grabbing a reference
+  KVM: x86: Use kvm_lookup_pfn() to check if retrying #PF is useful
+  KVM: x86: Use kvm_lookup_pfn() to check if APIC access page was
+    installed
+  KVM: x86/mmu: Add "mmu" prefix fault-in helpers to free up generic
+    names
+  KVM: x86/mmu: Put direct prefetched pages via kvm_release_page_clean()
+  KVM: x86/mmu: Add common helper to handle prefetching SPTEs
+  KVM: x86/mmu: Add helper to "finish" handling a guest page fault
+  KVM: x86/mmu: Mark pages/folios dirty at the origin of make_spte()
+  KVM: Move declarations of memslot accessors up in kvm_host.h
+  KVM: Add kvm_faultin_pfn() to specifically service guest page faults
+  KVM: x86/mmu: Convert page fault paths to kvm_faultin_pfn()
+  KVM: guest_memfd: Provide "struct page" as output from
+    kvm_gmem_get_pfn()
+  KVM: x86/mmu: Put refcounted pages instead of blindly releasing pfns
+  KVM: x86/mmu: Don't mark unused faultin pages as accessed
+  KVM: Move x86's API to release a faultin page to common KVM
+  KVM: VMX: Hold mmu_lock until page is released when updating APIC
+    access page
+  KVM: VMX: Use __kvm_faultin_page() to get APIC access page/pfn
+  KVM: PPC: e500: Mark "struct page" dirty in kvmppc_e500_shadow_map()
+  KVM: PPC: e500: Mark "struct page" pfn accessed before dropping
+    mmu_lock
+  KVM: PPC: e500: Use __kvm_faultin_pfn() to handle page faults
+  KVM: arm64: Mark "struct page" pfns accessed/dirty before dropping
+    mmu_lock
+  KVM: arm64: Use __kvm_faultin_pfn() to handle memory aborts
+  KVM: RISC-V: Mark "struct page" pfns dirty iff a stage-2 PTE is
+    installed
+  KVM: RISC-V: Mark "struct page" pfns accessed before dropping mmu_lock
+  KVM: RISC-V: Use kvm_faultin_pfn() when mapping pfns into the guest
+  KVM: PPC: Use __kvm_faultin_pfn() to handle page faults on Book3s HV
+  KVM: PPC: Use __kvm_faultin_pfn() to handle page faults on Book3s
+    Radix
+  KVM: PPC: Drop unused @kvm_ro param from
+    kvmppc_book3s_instantiate_page()
+  KVM: PPC: Book3S: Mark "struct page" pfns dirty/accessed after
+    installing PTE
+  KVM: PPC: Use kvm_faultin_pfn() to handle page faults on Book3s PR
+  KVM: LoongArch: Mark "struct page" pfns dirty only in "slow" page
+    fault path
+  KVM: LoongArch: Mark "struct page" pfns accessed only in "slow" page
+    fault path
+  KVM: LoongArch: Mark "struct page" pfn accessed before dropping
+    mmu_lock
+  KVM: LoongArch: Use kvm_faultin_pfn() to map pfns into the guest
+  KVM: MIPS: Mark "struct page" pfns dirty only in "slow" page fault
+    path
+  KVM: MIPS: Mark "struct page" pfns accessed only in "slow" page fault
+    path
+  KVM: MIPS: Mark "struct page" pfns accessed prior to dropping mmu_lock
+  KVM: MIPS: Use kvm_faultin_pfn() to map pfns into the guest
+  KVM: PPC: Remove extra get_page() to fix page refcount leak
+  KVM: PPC: Use kvm_vcpu_map() to map guest memory to patch dcbz
+    instructions
+  KVM: Convert gfn_to_page() to use kvm_follow_pfn()
+  KVM: Add support for read-only usage of gfn_to_page()
+  KVM: arm64: Use __gfn_to_page() when copying MTE tags to/from
+    userspace
+  KVM: PPC: Explicitly require struct page memory for Ultravisor sharing
+  KVM: Drop gfn_to_pfn() APIs now that all users are gone
+  KVM: s390: Use kvm_release_page_dirty() to unpin "struct page" memory
+  KVM: Make kvm_follow_pfn.refcounted_page a required field
+  KVM: x86/mmu: Don't mark "struct page" accessed when zapping SPTEs
+  KVM: arm64: Don't mark "struct page" accessed when making SPTE young
+  KVM: Drop APIs that manipulate "struct page" via pfns
+  KVM: Don't grab reference on VM_MIXEDMAP pfns that have a "struct
+    page"
+
+ Documentation/virt/kvm/locking.rst     |  80 ++--
+ arch/arm64/include/asm/kvm_pgtable.h   |   4 +-
+ arch/arm64/kvm/guest.c                 |  25 +-
+ arch/arm64/kvm/hyp/pgtable.c           |   7 +-
+ arch/arm64/kvm/mmu.c                   |  21 +-
+ arch/loongarch/kvm/mmu.c               |  40 +-
+ arch/mips/kvm/mmu.c                    |  26 +-
+ arch/powerpc/include/asm/kvm_book3s.h  |   4 +-
+ arch/powerpc/kvm/book3s.c              |   7 +-
+ arch/powerpc/kvm/book3s_32_mmu_host.c  |   7 +-
+ arch/powerpc/kvm/book3s_64_mmu_host.c  |  12 +-
+ arch/powerpc/kvm/book3s_64_mmu_hv.c    |  25 +-
+ arch/powerpc/kvm/book3s_64_mmu_radix.c |  35 +-
+ arch/powerpc/kvm/book3s_hv_nested.c    |   4 +-
+ arch/powerpc/kvm/book3s_hv_uvmem.c     |  25 +-
+ arch/powerpc/kvm/book3s_pr.c           |  14 +-
+ arch/powerpc/kvm/book3s_xive_native.c  |   2 +-
+ arch/powerpc/kvm/e500_mmu_host.c       |  19 +-
+ arch/riscv/kvm/mmu.c                   |   9 +-
+ arch/s390/kvm/vsie.c                   |   4 +-
+ arch/x86/kvm/lapic.c                   |  15 +-
+ arch/x86/kvm/mmu/mmu.c                 | 191 ++++----
+ arch/x86/kvm/mmu/mmu_internal.h        |   5 +-
+ arch/x86/kvm/mmu/paging_tmpl.h         |  29 +-
+ arch/x86/kvm/mmu/spte.c                |  23 +-
+ arch/x86/kvm/mmu/tdp_mmu.c             |  16 -
+ arch/x86/kvm/svm/nested.c              |   4 +-
+ arch/x86/kvm/svm/sev.c                 |  12 +-
+ arch/x86/kvm/svm/svm.c                 |   8 +-
+ arch/x86/kvm/vmx/nested.c              |  42 +-
+ arch/x86/kvm/vmx/vmx.c                 |  28 +-
+ arch/x86/kvm/vmx/vmx.h                 |   2 -
+ arch/x86/kvm/x86.c                     |  16 +-
+ include/linux/kvm_host.h               | 124 +++--
+ virt/kvm/guest_memfd.c                 |  19 +-
+ virt/kvm/kvm_main.c                    | 603 ++++++++++---------------
+ virt/kvm/kvm_mm.h                      |  36 +-
+ virt/kvm/pfncache.c                    |  20 +-
+ 38 files changed, 698 insertions(+), 865 deletions(-)
+
+
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+-- 
+2.46.0.rc1.232.g9752f9e123-goog
+
 
