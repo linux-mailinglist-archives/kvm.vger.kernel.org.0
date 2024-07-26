@@ -1,65 +1,81 @@
-Return-Path: <kvm+bounces-22298-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22299-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D07F193CEAD
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 09:15:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5C3A93CEBB
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 09:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 007801C20942
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 07:15:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C76B91C211FC
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 07:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7F9F176AD1;
-	Fri, 26 Jul 2024 07:15:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76A015666F;
+	Fri, 26 Jul 2024 07:20:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Z17srSh+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TYHnsqHS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7373176AA6;
-	Fri, 26 Jul 2024 07:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9EF7225D7
+	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 07:20:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721978111; cv=none; b=iHky6kFKGvCxc+TzkIDGM/faKho8sBEaBXZgQ2s02l8qgpnerUvfJZ16hXdAcTIV8IHiVxxK/8mtrlQRn7CCYOpFewGbqNdSXxHAZSm5ihx6eSqbsDPsFc0yEf4VAVUuQfqojawurZF9IPWsAnKtHQw6y5RJz0ppgl2/xs4bovk=
+	t=1721978421; cv=none; b=OIk1Vz1hZEScrafILdYBsLuH9rqeiuZ8I3Kn4VCPR6Tv87xCyEfIWx93fYbW01W+nA17mW2iWp+jEE63GXSvDikbf70CG4nTwwFEQ/GhdHFjUSb7Js0kdTm6JLkselq3L/lcn6zjVzkAfO295tsC4PpI9FbDadC2UAoHXVp4pCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721978111; c=relaxed/simple;
-	bh=RJP92SF2WFoPIDG2hG1+hg5Un5h0Inykr9KdpLr/vGA=;
+	s=arc-20240116; t=1721978421; c=relaxed/simple;
+	bh=BhIZBT4P5S+4MKtCGHB3bCve65Z6YMbQqgytvtkTRkY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=I9fo88zcnzQ2SijOJbGYnfdf7SSmWCMbKhh035nXL/fueHzAr5w32RCgeNaS7V8Jd2eWqeaZnkfuMalRMPQkqjSrOqSg8FBWjhYatxCqBSegJPtwJvvegws+ZzU9L1KvTcS5N+sTaHT9bVU+c3Xo+CKnn9rANSueVEBcU33qQsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Z17srSh+; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1721978109; x=1753514109;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=RJP92SF2WFoPIDG2hG1+hg5Un5h0Inykr9KdpLr/vGA=;
-  b=Z17srSh+It12XGrUvaok7S660SgPjKIw4VGS5CeT5KAjA55EtUpUpLDs
-   kg5jxwL3c5N17fOQ7rY3midZvhLcwMBHnAXI9FKq7mVL8BiEYL+mwuBQC
-   FqdK6jSu0/rHhjAFGmi3WRxwCrsYZfm/LOMPPBY4KaHbh8WVtnb2w6hNq
-   lXh3m/5g0NM/HvlovveixU9TdsutmAZwb88T2erJjcviR4hGSvfoKygpd
-   z7h0fu6AVF9r/kdQ6naGOCowfke3lO2d6NrUNw733L2jENWQ8bquuuM+S
-   G/urpR8YSs8CoQbpFhNs9BX52hJZqdrt4dMgIFNTU6CJJP74KgmTNpSgh
-   g==;
-X-CSE-ConnectionGUID: 2/M9qSj+Sq2+7GrRwjcUgQ==
-X-CSE-MsgGUID: e4f2+vqST+m6echhxdDeSA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11144"; a="45175954"
-X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
-   d="scan'208";a="45175954"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 00:15:08 -0700
-X-CSE-ConnectionGUID: VA/vNtmiRl+7516OPD9unw==
-X-CSE-MsgGUID: PVTpmcntRtu0h49j3OarXA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,238,1716274800"; 
-   d="scan'208";a="53196595"
-Received: from taofen1x-mobl1.ccr.corp.intel.com (HELO [10.238.11.85]) ([10.238.11.85])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 00:15:04 -0700
-Message-ID: <f8dfeab2-e5f2-4df6-9406-0aff36afc08a@linux.intel.com>
-Date: Fri, 26 Jul 2024 15:15:01 +0800
+	 In-Reply-To:Content-Type; b=TjADlOhDsGyvvkbmIMfWsFhCIWjWbIt/Sm1Jrt6moyoUtNpcNUqjpfKfbc8izCzam1d3KTZZUnWju8j5kwyqo9l+Phlz+z5Dy0LbQ7toYLPZk8dWT2jzz0t/cD9HiW7lLbEYhFfTfPh2I3s1mF01d8w3TdnW5QZhvDnP3TAdMWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TYHnsqHS; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1721978417;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=BEIEOLAuEweMadinLOrLjd7LgBw95vSxsGBKlxcpCXk=;
+	b=TYHnsqHS2X+QVGPSDNT0LFjuTXBaVrwWvm0SxVufgUiug1LNgsJ5FVyE+koEIz35sjHiut
+	mmXpc8TupRPXLouLKWorzSd9gQp8WRGpIdMW1mHeKqtOnFEzQvqLeLw8AxQil5UGZHUNt1
+	ULVTXohvQ4JXFQssPZVSlxRFnvqYs5w=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-318-lrioCRA1PMGiG_Xiom045Q-1; Fri, 26 Jul 2024 03:20:13 -0400
+X-MC-Unique: lrioCRA1PMGiG_Xiom045Q-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36835f6ebdcso1343319f8f.1
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 00:20:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721978412; x=1722583212;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BEIEOLAuEweMadinLOrLjd7LgBw95vSxsGBKlxcpCXk=;
+        b=INyJWBUHVJk+QEk4ZnvNiNBIWF4uQ1V83LkFHfnMJOxbfovK4w8rJrxNP8ugiHj1sc
+         MD+Ef1ojN2yPccJFXgr9hGFD3+vT+WcCFb4IWgGAjyXBE0swmaKv0rJLa6oI50+nPkai
+         jnXC5yLMaclMLpggmdzsZIeL7C3njf7n/oFu0KMtlL0cr533GKGSmcbQCm0/EhMGBATK
+         CgHcWIRLeXn4YtrZCrigPN+F9k59ZuhswG0LN/6yAFBXGK3XlusADJt845wLpw/CNj62
+         THZeRF3qvcpp7medQrD8pPOCoIKVvzDVbMzWbcKKoU+nb5KOHh0UWj0sLbAowM74yXjk
+         2blg==
+X-Forwarded-Encrypted: i=1; AJvYcCXcxXME09UYSqsmSTWDoZfOTnPnpKA1j6Ie0kI6eDinBl2oz3sCY4U9G0sMAH4DLAWU7t4eO3D8CZ+pG3w9yIFvOmeO
+X-Gm-Message-State: AOJu0YxH7iRd2ST0u7cs8tNUpTl8HQ5pHUh+8aJXY2hK/mzWa8dcJm6Y
+	+rZDkR5xEpUAoYUeu/XAAY1NzMCO/rd6H/gjKtUeZRETJBx7IkVN6hGXaF1J6wb1ahjaQcDIidH
+	HzPRfiolB9a68WNaiyIy5AgDHrklPtlhJu5OI7U3YjfwHOxaieg==
+X-Received: by 2002:a5d:6d0f:0:b0:369:f664:ff4a with SMTP id ffacd0b85a97d-36b3642184emr4189931f8f.38.1721978412514;
+        Fri, 26 Jul 2024 00:20:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGjRyLoFUKzXtxlvPy7gyYGobBtIV7zlMmdMTnYDl0erg6xc0NZgcjmiV5FPdY5DvzhjMpjGA==
+X-Received: by 2002:a5d:6d0f:0:b0:369:f664:ff4a with SMTP id ffacd0b85a97d-36b3642184emr4189904f8f.38.1721978412062;
+        Fri, 26 Jul 2024 00:20:12 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c713:a600:7ca0:23b3:d48a:97c7? (p200300cbc713a6007ca023b3d48a97c7.dip0.t-ipconnect.de. [2003:cb:c713:a600:7ca0:23b3:d48a:97c7])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367d9393sm4186108f8f.26.2024.07.26.00.20.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 26 Jul 2024 00:20:11 -0700 (PDT)
+Message-ID: <d87a5e47-3c48-4e20-b3de-e83c2ca44606@redhat.com>
+Date: Fri, 26 Jul 2024 09:20:10 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,196 +83,238 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 4/5] KVM: Introduce KVM_EXIT_COCO exit type
-To: Michael Roth <michael.roth@amd.com>,
- Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-coco@lists.linux.dev,
- linux-kernel@vger.kernel.org, x86@kernel.org, pbonzini@redhat.com,
- jroedel@suse.de, thomas.lendacky@amd.com, pgonda@google.com,
- ashish.kalra@amd.com, bp@alien8.de, pankaj.gupta@amd.com,
- liam.merwick@oracle.com, Rick Edgecombe <rick.p.edgecombe@intel.com>,
- Reinette Chatre <reinette.chatre@intel.com>,
- "Yamahata, Isaku" <isaku.yamahata@intel.com>,
- "Peng, Chao P" <chao.p.peng@intel.com>
-References: <20240621134041.3170480-1-michael.roth@amd.com>
- <20240621134041.3170480-5-michael.roth@amd.com> <ZnwkMyy1kgu0dFdv@google.com>
- <r3tffokfww4yaytdfunj5kfy2aqqcsxp7sm3ga7wdytgyb3vnz@pfmstnvtuyg2>
- <Zn8YM-s0TRUk-6T-@google.com>
- <r7wqzejwpcvmys6jx7qcio2r6wvxfiideniqmwv5tohbohnvzu@6stwuvmnrkpo>
+Subject: Re: [RFC PATCH 0/6] Enable shared device assignment
+To: Chenyi Qiang <chenyi.qiang@intel.com>, Paolo Bonzini
+ <pbonzini@redhat.com>, Peter Xu <peterx@redhat.com>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Michael Roth <michael.roth@amd.com>
+Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org,
+ Williams Dan J <dan.j.williams@intel.com>,
+ Edgecombe Rick P <rick.p.edgecombe@intel.com>,
+ Wang Wei W <wei.w.wang@intel.com>, Peng Chao P <chao.p.peng@intel.com>,
+ Gao Chao <chao.gao@intel.com>, Wu Hao <hao.wu@intel.com>,
+ Xu Yilun <yilun.xu@intel.com>
+References: <20240725072118.358923-1-chenyi.qiang@intel.com>
+ <ace9bb98-1415-460f-b8f5-e50607fbce20@redhat.com>
+ <69091ee4-f1c9-43ce-8a2a-9bb370e8115f@intel.com>
 Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <r7wqzejwpcvmys6jx7qcio2r6wvxfiideniqmwv5tohbohnvzu@6stwuvmnrkpo>
+From: David Hildenbrand <david@redhat.com>
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <69091ee4-f1c9-43ce-8a2a-9bb370e8115f@intel.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+On 26.07.24 08:20, Chenyi Qiang wrote:
+> 
+> 
+> On 7/25/2024 10:04 PM, David Hildenbrand wrote:
+>>> Open
+>>> ====
+>>> Implementing a RamDiscardManager to notify VFIO of page conversions
+>>> causes changes in semantics: private memory is treated as discarded (or
+>>> hot-removed) memory. This isn't aligned with the expectation of current
+>>> RamDiscardManager users (e.g. VFIO or live migration) who really
+>>> expect that discarded memory is hot-removed and thus can be skipped when
+>>> the users are processing guest memory. Treating private memory as
+>>> discarded won't work in future if VFIO or live migration needs to handle
+>>> private memory. e.g. VFIO may need to map private memory to support
+>>> Trusted IO and live migration for confidential VMs need to migrate
+>>> private memory.
+>>
+>> "VFIO may need to map private memory to support Trusted IO"
+>>
+>> I've been told that the way we handle shared memory won't be the way
+>> this is going to work with guest_memfd. KVM will coordinate directly
+>> with VFIO or $whatever and update the IOMMU tables itself right in the
+>> kernel; the pages are pinned/owned by guest_memfd, so that will just
+>> work. So I don't consider that currently a concern. guest_memfd private
+>> memory is not mapped into user page tables and as it currently seems it
+>> never will be.
+> 
+> That's correct. AFAIK, some TEE IO solution like TDX Connect would let
+> kernel coordinate and update private mapping in IOMMU tables. Here, It
+> mentions that VFIO "may" need map private memory. I want to make this
+> more generic to account for potential future TEE IO solutions that may
+> require such functionality. :)
 
+Careful to not over-enginner something that is not even real or 
+close-to-be-real yet, though. :) Nobody really knows who that will look 
+like, besides that we know for Intel that we won't need that.
 
-On 6/29/2024 8:36 AM, Michael Roth wrote:
-> On Fri, Jun 28, 2024 at 01:08:19PM -0700, Sean Christopherson wrote:
->> On Wed, Jun 26, 2024, Michael Roth wrote:
->>> On Wed, Jun 26, 2024 at 07:22:43AM -0700, Sean Christopherson wrote:
->>>> On Fri, Jun 21, 2024, Michael Roth wrote:
->>>>> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
->>>>> index ecfa25b505e7..2eea9828d9aa 100644
->>>>> --- a/Documentation/virt/kvm/api.rst
->>>>> +++ b/Documentation/virt/kvm/api.rst
->>>>> @@ -7122,6 +7122,97 @@ Please note that the kernel is allowed to use the kvm_run structure as the
->>>>>   primary storage for certain register types. Therefore, the kernel may use the
->>>>>   values in kvm_run even if the corresponding bit in kvm_dirty_regs is not set.
->>>>>   
->>>>> +::
->>>>> +
->>>>> +		/* KVM_EXIT_COCO */
->>>>> +		struct kvm_exit_coco {
->>>>> +		#define KVM_EXIT_COCO_REQ_CERTS			0
->>>>> +		#define KVM_EXIT_COCO_MAX			1
->>>>> +			__u8 nr;
->>>>> +			__u8 pad0[7];
->>>>> +			union {
->>>>> +				struct {
->>>>> +					__u64 gfn;
->>>>> +					__u32 npages;
->>>>> +		#define KVM_EXIT_COCO_REQ_CERTS_ERR_INVALID_LEN		1
->>>>> +		#define KVM_EXIT_COCO_REQ_CERTS_ERR_GENERIC		(1 << 31)
->>>> Unless I'm mistaken, these error codes are defined by the GHCB, which means the
->>>> values matter, i.e. aren't arbitrary KVM-defined values.
->>> They do happen to coincide with the GHCB-defined values:
+> 
+>>
+>> Similarly: live migration. We cannot simply migrate that memory the
+>> traditional way. We even have to track the dirty state differently.
+>>
+>> So IMHO, treating both memory as discarded == don't touch it the usual
+>> way might actually be a feature not a bug ;)
+> 
+> Do you mean treating the private memory in both VFIO and live migration
+> as discarded? That is what this patch series does. And as you mentioned,
+> these RDM users cannot follow the traditional RDM way. Because of this,
+> we also considered whether we should use RDM or a more generic mechanism
+> like notifier_list below.
+
+Yes, the shared memory is logically discarded. At the same time we 
+*might* get private memory effectively populated. See my reply to Kevin 
+that there might be ways of having shared vs. private populate/discard 
+in the future, if required. Just some idea, though.
+
+> 
+>>
 >>>
->>>    /*
->>>     * The GHCB spec only formally defines INVALID_LEN/BUSY VMM errors, but define
->>>     * a GENERIC error code such that it won't ever conflict with GHCB-defined
->>>     * errors if any get added in the future.
->>>     */
->>>    #define SNP_GUEST_VMM_ERR_INVALID_LEN   1
->>>    #define SNP_GUEST_VMM_ERR_BUSY          2
->>>    #define SNP_GUEST_VMM_ERR_GENERIC       BIT(31)
+>>> There are two possible ways to mitigate the semantics changes.
+>>> 1. Develop a new mechanism to notify the page conversions between
+>>> private and shared. For example, utilize the notifier_list in QEMU. VFIO
+>>> registers its own handler and gets notified upon page conversions. This
+>>> is a clean approach which only touches the notifier workflow. A
+>>> challenge is that for device hotplug, existing shared memory should be
+>>> mapped in IOMMU. This will need additional changes.
 >>>
->>> and not totally by accident. But the KVM_EXIT_COCO_REQ_CERTS_ERR_* are
->>> defined/documented without any reliance on the GHCB spec and are purely
->>> KVM-defined. I just didn't really see any reason to pick different
->>> numerical values since it seems like purposely obfuscating things for
->> For SNP.  For other vendors, the numbers look bizarre, e.g. why bit 31?  And the
->> fact that it appears to be a mask is even more odd.
-> That's fair. Values 1 and 2 made sense so just re-use, but that results
-> in a awkward value for _GENERIC that's not really necessary for the KVM
-> side.
->
->>> no real reason. But the code itself doesn't rely on them being the same
->>> as the spec defines, so we are free to define these however we'd like as
->>> far as the KVM API goes.
->>>> I forget exactly what we discussed in PUCK, but for the error codes, I think KVM
->>>> should either define it's own values that are completely disconnected from any
->>>> "harware" spec, or KVM should very explicitly #define all hardware values and have
->>> I'd gotten the impression that option 1) is what we were sort of leaning
->>> toward, and that's the approach taken here.
->>> And if we expose things selectively to keep the ABI small, it's a bit
->>> awkward too. For instance, KVM_EXIT_COCO_REQ_CERTS_ERR_* basically needs
->>> a way to indicate success/fail/ENOMEM. Which we have with
->>> (assuming 0==success):
+>>> 2. Extend the existing RamDiscardManager interface to manage not only
+>>> the discarded/populated status of guest memory but also the
+>>> shared/private status. RamDiscardManager users like VFIO will be
+>>> notified with one more argument indicating what change is happening and
+>>> can take action accordingly. It also has challenges e.g. QEMU allows
+>>> only one RamDiscardManager, how to support virtio-mem for confidential
+>>> VMs would be a problem. And some APIs like .is_populated() exposed by
+>>> RamDiscardManager are meaningless to shared/private memory. So they may
+>>> need some adjustments.
+>>
+>> Think of all of that in terms of "shared memory is populated, private
+>> memory is some inaccessible stuff that needs very special way and other
+>> means for device assignment, live migration, etc.". Then it actually
+>> quite makes sense to use of RamDiscardManager (AFAIKS :) ).
+> 
+> Yes, such notification mechanism is what we want. But for the users of
+> RDM, it would require additional change accordingly. Current users just
+> skip inaccessible stuff, but in private memory case, it can't be simply
+> skipped. Maybe renaming RamDiscardManager to RamStateManager is more
+> accurate then. :)
+
+Current users must skip it, yes. How private memory would have to be 
+handled, and who would handle it, is rather unclear.
+
+Again, maybe we'd want separate RamDiscardManager for private and shared 
+memory (after all, these are two separate memory backends).
+
+Not sure that "RamStateManager" terminology would be reasonable in that 
+approach.
+
+> 
+>>
 >>>
->>>    #define KVM_EXIT_COCO_REQ_CERTS_ERR_INVALID_LEN         1
->>>    #define KVM_EXIT_COCO_REQ_CERTS_ERR_GENERIC             (1 << 31)
+>>> Testing
+>>> =======
+>>> This patch series is tested based on the internal TDX KVM/QEMU tree.
 >>>
->>> But the GHCB also defines other values like:
+>>> To facilitate shared device assignment with the NIC, employ the legacy
+>>> type1 VFIO with the QEMU command:
 >>>
->>>    #define SNP_GUEST_VMM_ERR_BUSY          2
+>>> qemu-system-x86_64 [...]
+>>>       -device vfio-pci,host=XX:XX.X
 >>>
->>> which don't make much sense to handle on the userspace side and doesn't
->> Why not?  If userspace is waiting on a cert update for whatever reason, why can't
->> it signal "busy" to the guest?
-> My thinking was that userspace is free to take it's time and doesn't need
-> to report delays back to KVM. But it would reduce the potential for
-> soft-lockups in the guest, so it might make sense to work that into the
-> API.
->
-> But more to original point, there could be something added in the future
-> that really has nothing to do with anything involving KVM<->userspace
-> interaction and so would make no sense to expose to userspace.
-> Unfortunately I picked a bad example. :)
->
->>> really have anything to do with the KVM_EXIT_COCO_REQ_CERTS KVM event,
->>> which is a separate/self-contained thing from the general guest request
->>> protocol. So would we expose that as ABI or not? If not then we end up
->>> with this weird splitting of code. And if yes, then we have to sort of
->>> give userspace a way to discover whenever new error codes are added to
->>> the GHCB spec, because KVM needs to understand these value too and
->> Not necessarily.  So long as KVM doesn't need to manipulate guest state, e.g. to
->> set RBX (or whatever reg it is) for ERR_INVALID_LEN, then KVM doesn't need to
->> care/know about the error codes.  E.g. userspace could signal VMM_BUSY and KVM
->> would happily pass that to the guest.
-> But given we already have an exception to that where KVM does need to
-> intervene for certain errors codes like ERR_INVALID_LEN that require
-> modifying guest state, it doesn't seem like a good starting position
-> to have to hope that it doesn't happen again.
->
-> It just doesn't seem necessary to put ourselves in a situation where
-> we'd need to be concerned by that at all. If the KVM API is a separate
-> and fairly self-contained thing then these decisions are set in stone
-> until we want to change it and not dictated/modified by changes to
-> anything external without our explicit consideration.
->
-> I know the certs things is GHCB-specific atm, but when the certs used
-> to live inside the kernel the KVM_EXIT_* wasn't needed at all, so
-> that's why I see this as more of a KVM interface thing rather than
-> a GHCB one. And maybe eventually some other CoCo implementation also
-> needs some interface for fetching certificates/blobs from userspace
-> and is able to re-use it still because it's not too SNP-specific
-> and the behavior isn't dictated by the GHCB spec (e.g.
-> ERR_INVALID_LEN might result in some other state needing to be
-> modified in their case rather than what the GHCB dictates.)
+>>> The parameter of dma_entry_limit needs to be adjusted. For example, a
+>>> 16GB guest needs to adjust the parameter like
+>>> vfio_iommu_type1.dma_entry_limit=4194304.
+>>
+>> But here you note the biggest real issue I see (not related to
+>> RAMDiscardManager, but that we have to prepare for conversion of each
+>> possible private page to shared and back): we need a single IOMMU
+>> mapping for each 4 KiB page.
+>>
+>> Doesn't that mean that we limit shared memory to 4194304*4096 == 16 GiB.
+>> Does it even scale then?
+> 
+> The entry limitation needs to be increased as the guest memory size
+> increases. For this issue, are you concerned that having too many
+> entries might bring some performance issue? Maybe we could introduce
+> some PV mechanism to coordinate with guest to convert memory only in 2M
+> granularity. This may help mitigate the problem.
 
-TDX GHCI does have a similar PV interface for TDX guest to get quota, i.e.,
-TDG.VP.VMCALL<GetQuote>.  This GetQuote PV interface is designed to invoke
-a request to generate a TD-Quote signing by a service hosting TD-Quoting
-Enclave operating in the host environment for a TD Report passed as a
-parameter by the TD.
-And the request will be forwarded to userspace for handling.
+I've had this talk with Intel, because the 4K granularity is a pain. I 
+was told that ship has sailed ... and we have to cope with random 4K 
+conversions :(
 
-So like GHCB, TDX needs to pass a shared buffer to userspace, which is
-specified by GPA and size (4K aligned) and get the error code from
-userspace and forward the error code to guest.
+The many mappings will likely add both memory and runtime overheads in 
+the kernel. But we only know once we measure.
 
-But there are some differences from GHCB interface.
-1. TDG.VP.VMCALL<GetQuote> is a a doorbell-like interface used to queue a
-    request. I.e., it is an asynchronous request.  The error code represents
-    the status of request queuing, *not* the status of TD Quote generation..
-2. Besides the error code returned by userspace for GetQuote interface, the
-    GHCI spec defines a "Status Code" field in the header of the shared 
-buffer.
-    The "Status Code" field is also updated by VMM during the real 
-handling of
-    getting quote (after TDG.VP.VMCALL<GetQuote> returned to guest).
-    After the TDG.VP.VMCALL<GetQuote> returned and back to TD guest, the TD
-    guest can poll the "Status Code" field to check if the processing is
-    in-flight, succeeded or failed.
-    Since the real handling of getting quota is happening in userspace, and
-    it will interact directly with guest, for TDX, it has to expose TDX
-    specific error code to userspace to update the result of quote 
-generation.
+Key point is that even 4194304 "only" allows for 16 GiB. Imagine 1 TiB 
+of shared memory :/
 
-Currently, TDX is about to add a new TDX specific KVM exit reason, i.e.,
-KVM_EXIT_TDX_GET_QUOTE and its related data structure based on a previous
-discussion. https://lore.kernel.org/kvm/Zg18ul8Q4PGQMWam@google.com/
-For the error code returned by userspace, KVM simply forward the error code
-to guest without further translation or handling.
+> 
+>>
+>>
+>> There is the alternative of having in-place private/shared conversion
+>> when we also let guest_memfd manage some shared memory. It has plenty of
+>> downsides, but for the problem at hand it would mean that we don't
+>> discard on shared/private conversion.>
+>> But whenever we want to convert memory shared->private we would
+>> similarly have to from IOMMU page tables via VFIO. (the in-place
+>> conversion will only be allowed if any additional references on a page
+>> are gone -- when it is inaccessible by userspace/kernel).
+> 
+> I'm not clear about this in-place private/shared conversion. Can you
+> elaborate a little bit? It seems this alternative changes private and
+> shared management in current guest_memfd?
 
-I am neutral to have a common KVM exit reason to handle both GHCB for
-REQ_CERTS and GHCI for GET_QUOTE.  But for the error code, can we uses 
-vendor
-specific error codes if KVM cares about the error code returned by userspace
-in vendor specific complete_userspace_io callback?
+Yes, there have been discussions about that, also in the context of 
+supporting huge pages while allowing for the guest to still convert 
+individual 4K chunks ...
 
-BTW, here is the plan of 4 hypercalls needing to exit to userspace for
-TDX basic support series:
-TDG.VP.VMCALL<SetupEventNotifyInterrupt>
-- Add a new KVM exit reason KVM_EXIT_TDX_SETUP_EVENT_NOTIFY
-TDG.VP.VMCALL<GetQuote>
-- Add a new KVM exit reason KVM_EXIT_TDX_GET_QUOTE
-TDG.VP.VMCALL<MapGPA>
-- Reuse KVM_EXIT_HYPERCALL with KVM_HC_MAP_GPA_RANGE
-TDG.VP.VMCALL<ReportFatalError>
-- Reuse KVM_EXIT_SYSTEM_EVENT but add a new type
-   KVM_SYSTEM_EVENT_TDX_FATAL_ERROR
+A summary is here [1]. Likely more things will be covered at Linux Plumbers.
 
+
+[1] 
+https://lore.kernel.org/kvm/20240712232937.2861788-1-ackerleytng@google.com/
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
