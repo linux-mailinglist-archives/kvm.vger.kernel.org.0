@@ -1,147 +1,186 @@
-Return-Path: <kvm+bounces-22300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D700493CFA6
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 10:32:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26E2F93CFD4
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 10:49:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80F801F21A16
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 08:32:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A2921C20EFE
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 08:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5A92176ACD;
-	Fri, 26 Jul 2024 08:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BCF4176AD5;
+	Fri, 26 Jul 2024 08:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="srhshcfb"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="ezE2s6oA"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422CF433AB;
-	Fri, 26 Jul 2024 08:31:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D322E64B
+	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 08:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721982714; cv=none; b=DQb1H2K44TOWTY3Ykhs6zNqlum/6m1uuZHzFFZnmTy4tuhelsjc83FvTyHQVCbJ06bkXCmx+WDCa+fw9BNc9r9x1JtMDzIBqNT0avINWCeuIBEoqFaTOguP3XYTSjyBQ5qQAsoi0shrNGcmHA/2RqKVpHMh5U0tIBKkWzwsdw60=
+	t=1721983778; cv=none; b=eXnZ8Y4zJgk/57iYESUaJDWevVccPW5OsmOcknGs7sG24tbnOIoiIoq3w5G9H2bRiZuCYkxQ+Xja9GAw3htjYYKgiWi6ljLY9hezxnYpKptLlzHbUbnbHAqjsudKLX7uzdPtPxW7CJbf3euLid1rYctcpA1iUmwKXT8f3xcNQ6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721982714; c=relaxed/simple;
-	bh=GMnnVONRExBFih6kJMj9Wc3cfqI9J4A6HZ2pDZyWjeE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=kGpR9ITQd6K2LFYxtIPtZZk21Aptv4QHwb30xEtGis0J3AhuWGG9r3/WxgP+LuLmZustRML3ujQyBjB48JL8nW8o6va9Jqr7uQHpcl+4BZgzTPGmpI207psSQGmIOMu4cnelOn26OfPVBI5jGz/ubi27Wpu+br5Aprj6cuPm7ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=srhshcfb; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46Q7SJ2H004905;
-	Fri, 26 Jul 2024 08:31:50 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:in-reply-to:references:date:message-id
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	iENWra52OHXAvIK10QZTUvU9+u8TKBkpxMzwlLx8VB0=; b=srhshcfb4izpU9sG
-	ldTwxO1SIaHqXYx1e9fzjk6Y+y84ySPTErSAEWGYk59Yig9KJPzxXBkY88RaSeW5
-	9806naAlZ+VlzRZnF6xUPqzfq09LQQFsksM5fGOsieHryxyjfx/Wn+ShAVgskKg+
-	2YDPyUnU6pbLIPTb3RTYpumzVwn0Ei36yOTNIfSkr2cISmbBo+alUo80hkPcsxyX
-	LPD1e0cPyWkXk8tmz75JPIeQv8duHrYLgWQ9XqLK5tRgaWrdA64JGMRGJ/vvGgcF
-	rXy7NZ6CqXRPbvvMweyCi5+cdqpQMxMeX5qqFjx9bWDEDSbI2Ytt5L5FmnBgz7m7
-	LeG72Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40m3x18k50-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jul 2024 08:31:50 +0000 (GMT)
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46Q8Vnvt015918;
-	Fri, 26 Jul 2024 08:31:49 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40m3x18k4v-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jul 2024 08:31:49 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46Q6wss3006625;
-	Fri, 26 Jul 2024 08:31:48 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40gxn7swvk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 26 Jul 2024 08:31:48 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46Q8VgbF26739250
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 26 Jul 2024 08:31:44 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6D82D2004B;
-	Fri, 26 Jul 2024 08:31:42 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F102320040;
-	Fri, 26 Jul 2024 08:31:41 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.179.0.55])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Fri, 26 Jul 2024 08:31:41 +0000 (GMT)
-From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To: linux-s390@vger.kernel.org, Thomas Huth <thuth@redhat.com>,
-        Nicholas
- Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Janosch Frank <frankja@linux.ibm.com>,
-        Nico Boehr
- <nrb@linux.ibm.com>, Steffen Eiden <seiden@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 0/3] s390x: small Makefile improvements
-In-Reply-To: <20240604115932.86596-1-mhartmay@linux.ibm.com>
-References: <20240604115932.86596-1-mhartmay@linux.ibm.com>
-Date: Fri, 26 Jul 2024 10:31:40 +0200
-Message-ID: <871q3g7dw3.fsf@linux.ibm.com>
+	s=arc-20240116; t=1721983778; c=relaxed/simple;
+	bh=cggH4Zf9zWp/WsOUF+1J+LtjLbXgCppNL6AUS86c1Mg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=HkNTfNVwQ8Rmtkget1tBwXi6XySaw9pLTgvkMm0fYGW+0WP1mVZ4FW/9P0P2vFbCUqho/cgwMtnPW4sLXhP8Bi7rwK3c1cnAA3p72Kg9SRxe3uRnXZO7G5jsZjeUcIvO4/CRlViRk73BtZ67Bz8ZQW0OF2n6lDvXaFvOuZGEVu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=ezE2s6oA; arc=none smtp.client-ip=209.85.166.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-395e9f2ebc0so6629165ab.0
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 01:49:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1721983776; x=1722588576; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7XZtOcVU71qgefN2Ru/3ZszUxxOG8b1uowiT0jlNrFY=;
+        b=ezE2s6oA6wks8hvVIkdEbha3uNd+g+tuSnd7GTCZngIvznloylH8pzjYvgzvyeXehx
+         5EzZJINc9abMjH+evqcwFtUSYqRPgGWCL40N7meyavXLmVpM8+0zZUPmGF5MMDvSYL4W
+         DCBW0HkBzLr8sjzYuVGsYDx+WBfudO7QDn48qujopymE7Xtr2L457suxOV4ZGmtfNERy
+         jhVpyTewzPCte89NKWVC03hdCjr9PL4JIjbCUKNyo84m7wi5I7GIcWmr1psOYGByl/CC
+         YX0CdVlT5Zn6UvIzrMlV3huAAjjRdg2MPLU4FeGF0cmphR+i359ebEebgh+VRN7oOs2h
+         vbgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721983776; x=1722588576;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7XZtOcVU71qgefN2Ru/3ZszUxxOG8b1uowiT0jlNrFY=;
+        b=a+oanFD8znylMj/SpUYqHYmO4JeUHSXpL30YI3hLMeX9cwNZgHr1+2ZanaHiDkGVWI
+         ll/C5o+C4OD7pN+s01IGe0PV52hLUuxX0e2419Nd5X3xN46k50+2XHKI+6S6ZVHDHHp2
+         nobL+c1RDw7ZrMD2NLqPwjpMO7Xo48MswUvxoVL4NeQSf42VGA+QzdSGITsYf19eUJKy
+         mJWFiZH44q3Bisn2rqsCOOj4rqOaRD3c1fgWHga3n4cZ12YthG3/1sMyP9fDSZ29ofGf
+         QWx4ZPVtK2alxBjl4dmDPzUjML0mFMSLB19tnr/7xebUuV2b232ZX9Ngep/Or/VjcNWo
+         RhFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU72d7XCkAgAprZV7SHSjYdygdLeAQv97jI0vaCkaDNFxSbJuc6X8u1Vsr9Jp5ksJBolBQCV2e5zYN59RXqwyOJLeff
+X-Gm-Message-State: AOJu0YzFnAtHHvWnQEA3Umfn8ZFlFS43zkkqsLi/JPkghAcLl++icXtu
+	dKtVxd/Tn9TJaKjV2SOLjKKyQSlVNFXQ1e8mKHOeicnSOhN35gpwfzXTuHf3ov4=
+X-Google-Smtp-Source: AGHT+IGIIC3hug3f1RinXPtTRLJ3e0ZL1wTw+7Nz0b4GXlvTkp9mdYRpo/TwavDaXmzo1aFws3QMLA==
+X-Received: by 2002:a05:6e02:1aa1:b0:379:40e0:b0b8 with SMTP id e9e14a558f8ab-39a2185d921mr63531485ab.20.1721983775853;
+        Fri, 26 Jul 2024 01:49:35 -0700 (PDT)
+Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7a9f816db18sm2049645a12.33.2024.07.26.01.49.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Jul 2024 01:49:35 -0700 (PDT)
+From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+To: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: greentime.hu@sifive.com,
+	vincent.chen@sifive.com,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>
+Subject: [PATCH v8 0/5] Add Svade and Svadu Extensions Support
+Date: Fri, 26 Jul 2024 16:49:25 +0800
+Message-Id: <20240726084931.28924-1-yongxuan.wang@sifive.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: XkaZV6POofjgD772eJtSsTe6zflIN92V
-X-Proofpoint-GUID: jYvbfCPAnTQaR9IWGLOrz78SDfiNEjwP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-26_07,2024-07-25_03,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 malwarescore=0
- mlxlogscore=987 clxscore=1011 impostorscore=0 bulkscore=0
- priorityscore=1501 lowpriorityscore=0 spamscore=0 suspectscore=0
- mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2407260054
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jun 04, 2024 at 01:59 PM +0200, Marc Hartmayer <mhartmay@linux.ibm.=
-com> wrote:
-> The first patch is useful anyway, the third could be dropped to be consis=
-tent
-> with the other architectures.
->
-> Marc Hartmayer (2):
->   s390x/Makefile: snippets: Add separate target for the ELF snippets
->   s390x/Makefile: snippets: Avoid creation of .eh_frame and
->     .eh_frame_hdr sections
->
-> Super User (1):
->   Revert "s390x: Specify program headers with flags to avoid linker
->     warnings"
->
->  s390x/Makefile              | 16 ++++++++++------
->  s390x/snippets/c/flat.lds.S | 12 +++---------
->  2 files changed, 13 insertions(+), 15 deletions(-)
->
->
-> base-commit: 31f2cece1db4175869ca3fe4cbe229c0e15fdaf0
-> --=20
-> 2.34.1
->
->
+Svade and Svadu extensions represent two schemes for managing the PTE A/D
+bit. When the PTE A/D bits need to be set, Svade extension intdicates that
+a related page fault will be raised. In contrast, the Svadu extension
+supports hardware updating of PTE A/D bits. This series enables Svade and
+Svadu extensions for both host and guest OS.
 
-Polite ping.
+Regrading the mailing thread[1], we have 4 possible combinations of
+these extensions in the device tree, the default hardware behavior for
+these possibilities are:
+1) Neither Svade nor Svadu present in DT => It is technically
+   unknown whether the platform uses Svade or Svadu. Supervisor
+   software should be prepared to handle either hardware updating
+   of the PTE A/D bits or page faults when they need updated.
+2) Only Svade present in DT => Supervisor must assume Svade to be
+   always enabled.
+3) Only Svadu present in DT => Supervisor must assume Svadu to be
+   always enabled.
+4) Both Svade and Svadu present in DT => Supervisor must assume
+   Svadu turned-off at boot time. To use Svadu, supervisor must
+   explicitly enable it using the SBI FWFT extension.
 
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
+The Svade extension is mandatory and the Svadu extension is optional in
+RVA23 profile. Platforms want to take the advantage of Svadu can choose
+3. Those are aware of the profile can choose 4, and Linux won't get the
+benefit of svadu until the SBI FWFT extension is available.
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+[1] https://lore.kernel.org/linux-kernel/20240527-e9845c06619bca5cd285098c@orel/T/#m29644eb88e241ec282df4ccd5199514e913b06ee
+
+---
+v8:
+- fix typo in PATCH1 (Samuel)
+- use the new extension validating API in PATCH1 (Clément)
+- update the dtbinding in PATCH2 (Samuel, Conor)
+- add PATCH4 to fix compile error in get-reg-list test.
+
+v7:
+- fix alignment in PATCH1
+- update the dtbinding in PATCH2 (Conor, Jessica)
+
+v6:
+- reflect the platform's behavior by riscv_isa_extension_available() and
+  update the the arch_has_hw_pte_young() in PATCH1 (Conor, Andrew)
+- update the dtbinding in PATCH2 (Alexandre, Andrew, Anup, Conor)
+- update the henvcfg condition in PATCH3 (Andrew)
+- check if Svade is allowed to disabled based on arch_has_hw_pte_young()
+  in PATCH3
+
+v5:
+- remove all Acked-by and Reviewed-by (Conor, Andrew)
+- add Svade support
+- update the arch_has_hw_pte_young() in PATCH1
+- update the dtbinding in PATCH2 (Alexandre, Andrew)
+- check the availibility of Svadu for Guest/VM based on
+  arch_has_hw_pte_young() in PATCH3
+
+v4:
+- fix 32bit kernel build error in PATCH1 (Conor)
+- update the status of Svadu extension to ratified in PATCH2
+- add the PATCH4 to suporrt SBI_FWFT_PTE_AD_HW_UPDATING for guest OS
+- update the PATCH1 and PATCH3 to integrate with FWFT extension
+- rebase PATCH5 on the lastest get-reg-list test (Andrew)
+
+v3:
+- fix the control bit name to ADUE in PATCH1 and PATCH3
+- update get-reg-list in PATCH4
+
+v2:
+- add Co-developed-by: in PATCH1
+- use riscv_has_extension_unlikely() to runtime patch the branch in PATCH1
+- update dt-binding
+
+Yong-Xuan Wang (5):
+  RISC-V: Add Svade and Svadu Extensions Support
+  dt-bindings: riscv: Add Svade and Svadu Entries
+  RISC-V: KVM: Add Svade and Svadu Extensions Support for Guest/VM
+  KVM: riscv: selftests: Fix compile error
+  KVM: riscv: selftests: Add Svade and Svadu Extension to get-reg-list
+    test
+
+ .../devicetree/bindings/riscv/extensions.yaml | 28 +++++++++++++++++++
+ arch/riscv/Kconfig                            |  1 +
+ arch/riscv/include/asm/csr.h                  |  1 +
+ arch/riscv/include/asm/hwcap.h                |  2 ++
+ arch/riscv/include/asm/pgtable.h              | 13 ++++++++-
+ arch/riscv/include/uapi/asm/kvm.h             |  2 ++
+ arch/riscv/kernel/cpufeature.c                | 12 ++++++++
+ arch/riscv/kvm/vcpu.c                         |  4 +++
+ arch/riscv/kvm/vcpu_onereg.c                  | 15 ++++++++++
+ .../selftests/kvm/riscv/get-reg-list.c        | 16 ++++++++---
+ 10 files changed, 89 insertions(+), 5 deletions(-)
+
+-- 
+2.17.1
+
 
