@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-22406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC77093DBD5
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 02:08:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F0493DBDA
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 02:08:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D04851C21154
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 00:08:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78E4D1C20BAF
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 00:08:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2E91822EB;
-	Fri, 26 Jul 2024 23:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED0DD183080;
+	Fri, 26 Jul 2024 23:54:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ONAPJNsi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="nE3pa4YJ"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBD9B1822C9
-	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 23:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04061822FB
+	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 23:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722038049; cv=none; b=S1FPwrjVWq9DNaoWh62gO27jndlI6V2yDxIagy7mWpLDYbYkr3Chj1ZUhxxHe+kQB7/lhrZWHj5/XhfGQHW7QeIZm6WapGfrYO696jWD14PQ2g2cmTFOe8h4vNqzBd8NB7VapPDQ1JqQVfJzKb5Yex4hShWHPo+MOb4sXkVp0vo=
+	t=1722038052; cv=none; b=IqOGMqxliLV5fYvUhR3IEV/2U1uC7eZ/pBiF4WC4ptaCsi9Mr3uN4TmE/tOIKr2qHxH0eD9ATNBVyxUo5t0TWhO8xBDHOhr9SUocMHjfGm4av4vVb3VVfaLDgJC0vB0xlc+2KyVG74Ef2a/Jxu1QD1OUbuC2NBQoazApLhKq9P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722038049; c=relaxed/simple;
-	bh=ZiPrcqIShlRmgFNauo+vxtdzmRhSo46Zz79Lct/JRI0=;
+	s=arc-20240116; t=1722038052; c=relaxed/simple;
+	bh=V+LqqqAUYhUM/5n5EbZbHeZYUdQNA5yUVRCdR+GfGK4=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hAi6C7WgXyfi76o7j218OTMM6HUPXuCmUvs6VpZvrYDwwAeZ/XZwEZqKpenDGxNYqvlHX/XMK5iJ8NAuCMiT55bnahn1OK62Qe6uWRoiyNn6NIJ7dFall5ISSOHcoGJehWcGD2YyxKlFY3GAR5w1qJlUIXHf4TSlRGWg4QayZzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ONAPJNsi; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=V6qo+kCbOUQXTMQjfKxO2niITxmObLw6O5zzr6XEcZiiUhznj3Xdz95NLsstdaJEu4wyIOP9V3zTjsGUJhCghNeQPseu7YrjpS/Kt5JPPEKBHKn6LxvWrHt5wblf/v9SLMNV5MIxxfUnwWdHEUHhki+qcY+LI+ReQQVNfE8CpjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=nE3pa4YJ; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a28f78c67aso1346518a12.1
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 16:54:07 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a134fd9261so1530997a12.3
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 16:54:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722038047; x=1722642847; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722038049; x=1722642849; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=wxuzXAlWAmTLEMJkRQnxVQGU0NLqznOMJ0954FoR3Ro=;
-        b=ONAPJNsibz/4nIIt6+A+oNj8ZMye3fOT/y/O/QYFIPVcyE0UbuyYAM5P3GDyY1k7uR
-         HBkWtQTojRHo7K5CBVWtxw2HScBgTHtCbvZ/1jdNUkKAOztHFTcsWscOEu1LXoaSl00/
-         3BvVguWqh3UUZi+n4pHj7S94+CH5YAc+WoV36wl3yM/TYmEZhL4I92S80dS8jCqeVfoS
-         y17Byau6b3a+znoDrYhPM74o9kg8Kou5jX1Io5kMePc2MDu6F0V6Wi3C8MbW/zHply2a
-         B5udnDuCCA+NtvUVt/rzsR+lFE+ftibtUtC60syfc361NCNUbNqOfqeJJVZXSXvdeCTl
-         kWmg==
+        bh=kZSI1KNdqk//fOFhZYsFCszCldNWPUNapLOmZmlQ+ic=;
+        b=nE3pa4YJfXtt227FHvwjhWHwzBZF2cjYR6sav8EMzbU5TswZVIHwB1W5nij6YbAAHr
+         bYzgaDXjnIT7TBj5XMQiJoiRTlGOFuXn38jRBs6+7wXGQIrMSlIwzrUks/3ROPl5aLFk
+         JPBe81hPcy81kvN7kJA5YeT2shitB0FbgradU4O2lQyV4ksyQt2+KZiCbdPiqRQJsrmE
+         6/58JNfGUQDZ149S86zQXqNnNPPeD9IcEIQXPgfEh55JYghY12MTGgGCbd34dO3dM6R/
+         PbkHhwEW6GMI33KSKDaqSkO7MvMilYpdmiJfwlhSahl3aKAbd2AECUIZXBWP60uALBhl
+         WZzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722038047; x=1722642847;
+        d=1e100.net; s=20230601; t=1722038049; x=1722642849;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=wxuzXAlWAmTLEMJkRQnxVQGU0NLqznOMJ0954FoR3Ro=;
-        b=wpYLMhFDXG60hSNPTHUBtOZZyzM0biqPmaAj3yW0RkgBE5maLysF/noTSkq2qzxqNN
-         czAkYM0Xp9+az8hits9MXUUKXdeCqpVl1MpewbWODeISgyNu+wBbS0qlbDEBQDGJq/2z
-         1LvozKKbPkU2GLIPA66rzDjwAWRzrrJXNIrzjDPxAVYFDNPwc/CNDwaayBb7SuZ5iN0N
-         zdqBRkpLwlnW5+dM79ppQDWGgD6bprIzp/Qazvx4pI43YonbUcOikQAOMiD/ZCD3kfok
-         YijaDwvIpARg2KNX8eSSpzRgwKOLO83u588fHuiVbISTVFlp2NwYrqKKcZwl/bTxTbUW
-         +TXw==
-X-Gm-Message-State: AOJu0YwN5KS+QWtqyfSM/bST6DMkpiKHA0Q6G6227OJxuYIVVzB8T/dQ
-	H8Mc8uF/RY/Dy1gEH1nHmGlN7MNkUfCFuTNhI3gcdVAFFug6KhgfuFl4Mw33zEEUvnuO+msXVqh
-	1BA==
-X-Google-Smtp-Source: AGHT+IHHkDF9jDFipyHQqfPDWUmaQYRR7lKWyDIChzQG4y5VknOXhGJqf1L9qSRAYqKwiuxxpki7u8BCvjE=
+        bh=kZSI1KNdqk//fOFhZYsFCszCldNWPUNapLOmZmlQ+ic=;
+        b=UyCWmpHpczPYxU6ilcCIY9/y8pDr3s4n2GJRSXgwBKOHP1Vjnj/GmO1ddIlbvn8/js
+         BA+VTUVsRUBU4ACFNfWIbIy4iEPhHvWmfwodo05vkE6/ZToGIY4izeaTiGnZcr1N0xAw
+         yRsIYsM00IgDw0fsGzZtfPB5m1pggA8wwRpnTnuKQXvpcdqghqUSYhrA16TucyK9+GaJ
+         ykgOytG3FC+l2sErBfKS+G2weYilE3qD8L1DizeYcB3TlDaRfsGDtPhMs9FNRljkGnhK
+         lJbBR+iHE8HiWTUeoUzvAopw8hWvlZyYezDOKYlL6pPvZlYdfe6Pv0RleX3hpKHZXR2f
+         nBSw==
+X-Gm-Message-State: AOJu0Ywy+s40+74Ar1h519mBDo5CfLUQsRYpce4+XIRz1UPif4Bzk7Qx
+	FfYCtyBafwTj4inJrX+Cww7xa3LPW7qyb8pIbsOMNMCLztu2j8xVb5actzJwajGSuYKyuPYUdLF
+	H3A==
+X-Google-Smtp-Source: AGHT+IHwPJ/UM6h8kXfIVs09j5bz4zlDvOcU2rq/epWSbhMGMPOGMhlwxlAMNu8ktgd9HGr+mJ5fl7Shz2c=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:141f:0:b0:6e5:ef07:5922 with SMTP id
- 41be03b00d2f7-7ac8d9d818bmr4158a12.1.1722038046008; Fri, 26 Jul 2024 16:54:06
+ (user=seanjc job=sendgmr) by 2002:a63:360a:0:b0:7a1:4462:412e with SMTP id
+ 41be03b00d2f7-7ac8fd30864mr2218a12.9.1722038048851; Fri, 26 Jul 2024 16:54:08
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri, 26 Jul 2024 16:51:52 -0700
+Date: Fri, 26 Jul 2024 16:51:53 -0700
 In-Reply-To: <20240726235234.228822-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240726235234.228822-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240726235234.228822-44-seanjc@google.com>
-Subject: [PATCH v12 43/84] KVM: Add kvm_faultin_pfn() to specifically service
- guest page faults
+Message-ID: <20240726235234.228822-45-seanjc@google.com>
+Subject: [PATCH v12 44/84] KVM: x86/mmu: Convert page fault paths to kvm_faultin_pfn()
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
 	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
@@ -94,79 +93,65 @@ Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 
-Add a new dedicated API, kvm_faultin_pfn(), for servicing guest page
-faults, i.e. for getting pages/pfns that will be mapped into the guest via
-an mmu_notifier-protected KVM MMU.  Keep struct kvm_follow_pfn buried in
-internal code, as having __kvm_faultin_pfn() take "out" params is actually
-cleaner for several architectures, e.g. it allows the caller to have its
-own "page fault" structure without having to marshal data to/from
-kvm_follow_pfn.
+Convert KVM x86 to use the recently introduced __kvm_faultin_pfn().
+Opportunstically capture the refcounted_page grabbed by KVM for use in
+future changes.
 
-Long term, common KVM would ideally provide a kvm_page_fault structure, a
-la x86's struct of the same name.  But all architectures need to be
-converted to a common API before that can happen.
+No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- include/linux/kvm_host.h | 11 +++++++++++
- virt/kvm/kvm_main.c      | 22 ++++++++++++++++++++++
- 2 files changed, 33 insertions(+)
+ arch/x86/kvm/mmu/mmu.c          | 14 ++++++++++----
+ arch/x86/kvm/mmu/mmu_internal.h |  1 +
+ 2 files changed, 11 insertions(+), 4 deletions(-)
 
-diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-index ef0277b77375..e0548ae92659 100644
---- a/include/linux/kvm_host.h
-+++ b/include/linux/kvm_host.h
-@@ -1217,6 +1217,17 @@ void kvm_release_page_clean(struct page *page);
- void kvm_release_page_dirty(struct page *page);
- 
- kvm_pfn_t kvm_lookup_pfn(struct kvm *kvm, gfn_t gfn);
-+kvm_pfn_t __kvm_faultin_pfn(const struct kvm_memory_slot *slot, gfn_t gfn,
-+			    unsigned int foll, bool *writable,
-+			    struct page **refcounted_page);
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 7e7b855ce1e1..53555ea5e5bb 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -4369,11 +4369,14 @@ static int kvm_mmu_faultin_pfn_private(struct kvm_vcpu *vcpu,
+ static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
+ 				 struct kvm_page_fault *fault)
+ {
++	unsigned int foll = fault->write ? FOLL_WRITE : 0;
 +
-+static inline kvm_pfn_t kvm_faultin_pfn(struct kvm_vcpu *vcpu, gfn_t gfn,
-+					bool write, bool *writable,
-+					struct page **refcounted_page)
-+{
-+	return __kvm_faultin_pfn(kvm_vcpu_gfn_to_memslot(vcpu, gfn), gfn,
-+				 write ? FOLL_WRITE : 0, writable, refcounted_page);
-+}
+ 	if (fault->is_private)
+ 		return kvm_mmu_faultin_pfn_private(vcpu, fault);
  
- kvm_pfn_t gfn_to_pfn(struct kvm *kvm, gfn_t gfn);
- kvm_pfn_t gfn_to_pfn_prot(struct kvm *kvm, gfn_t gfn, bool write_fault,
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index ad84dab8c5dc..6dc448602751 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -3134,6 +3134,28 @@ kvm_pfn_t kvm_lookup_pfn(struct kvm *kvm, gfn_t gfn)
- 	return pfn;
+-	fault->pfn = __gfn_to_pfn_memslot(fault->slot, fault->gfn, false, true,
+-					  fault->write, &fault->map_writable);
++	foll |= FOLL_NOWAIT;
++	fault->pfn = __kvm_faultin_pfn(fault->slot, fault->gfn, foll,
++				       &fault->map_writable, &fault->refcounted_page);
+ 
+ 	/*
+ 	 * If resolving the page failed because I/O is needed to fault-in the
+@@ -4400,8 +4403,11 @@ static int __kvm_mmu_faultin_pfn(struct kvm_vcpu *vcpu,
+ 	 * to wait for IO.  Note, gup always bails if it is unable to quickly
+ 	 * get a page and a fatal signal, i.e. SIGKILL, is pending.
+ 	 */
+-	fault->pfn = __gfn_to_pfn_memslot(fault->slot, fault->gfn, true, true,
+-					  fault->write, &fault->map_writable);
++	foll |= FOLL_INTERRUPTIBLE;
++	foll &= ~FOLL_NOWAIT;
++	fault->pfn = __kvm_faultin_pfn(fault->slot, fault->gfn, foll,
++				       &fault->map_writable, &fault->refcounted_page);
++
+ 	return RET_PF_CONTINUE;
  }
  
-+kvm_pfn_t __kvm_faultin_pfn(const struct kvm_memory_slot *slot, gfn_t gfn,
-+			    unsigned int foll, bool *writable,
-+			    struct page **refcounted_page)
-+{
-+	struct kvm_follow_pfn kfp = {
-+		.slot = slot,
-+		.gfn = gfn,
-+		.flags = foll,
-+		.map_writable = writable,
-+		.refcounted_page = refcounted_page,
-+	};
-+
-+	if (WARN_ON_ONCE(!writable || !refcounted_page))
-+		return KVM_PFN_ERR_FAULT;
-+
-+	*writable = false;
-+	*refcounted_page = NULL;
-+
-+	return kvm_follow_pfn(&kfp);
-+}
-+EXPORT_SYMBOL_GPL(__kvm_faultin_pfn);
-+
- int kvm_prefetch_pages(struct kvm_memory_slot *slot, gfn_t gfn,
- 		       struct page **pages, int nr_pages)
- {
+diff --git a/arch/x86/kvm/mmu/mmu_internal.h b/arch/x86/kvm/mmu/mmu_internal.h
+index a5113347bb12..e1f8385105a5 100644
+--- a/arch/x86/kvm/mmu/mmu_internal.h
++++ b/arch/x86/kvm/mmu/mmu_internal.h
+@@ -238,6 +238,7 @@ struct kvm_page_fault {
+ 	/* Outputs of kvm_mmu_faultin_pfn().  */
+ 	unsigned long mmu_seq;
+ 	kvm_pfn_t pfn;
++	struct page *refcounted_page;
+ 	bool map_writable;
+ 
+ 	/*
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
