@@ -1,157 +1,147 @@
-Return-Path: <kvm+bounces-22288-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22289-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3729B93CE5C
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 08:55:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C178393CE6A
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 09:02:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D788F281E3F
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 06:55:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76B0C1F21E53
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 07:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34BC9176248;
-	Fri, 26 Jul 2024 06:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED25D176259;
+	Fri, 26 Jul 2024 07:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="u8msaMXU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k8fWX/fU"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37E1E57E;
-	Fri, 26 Jul 2024 06:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B5201741F4;
+	Fri, 26 Jul 2024 07:02:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721976930; cv=none; b=hC2kHLu+esLDfv7PV2xRyz2h4jXGayaZrgiVuiHf4xE/ok/YmlZNOkpXvwdQLnjFF5f9YKABa/oKPtbi6GwTENHnIz7D5b5hyaan1tz0Ceen+knLcWLN8QPiSUSqFWLwmhkvLpL7XnxGQzHEjbcvMIXJqvnlHz5kCqzwi+rXsnM=
+	t=1721977335; cv=none; b=ZQndNqWg2JZca/DmbhUVjwyLRdIp/A9hVUVLRwq2fKrykJrVhh/6JMjPXItq4ksOhwzXL5t72yok1V4goV+aubtGPRJ3XxCXT9+5N2/DJwWf8ugTzoz7QxQJk44mykAndgc1+v0Gly5B/wQDv9iOmwI88s89tkYJrxKZrgdREyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721976930; c=relaxed/simple;
-	bh=8rUJ3cyfU+5X3yR1c71yzPbyRpz4uW+z1XrTC218QOw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XVzdlNVJzppME38C8HOqe82b8Zp1syQRqTOhx66Ij2RV6DJsMTo/jBK6MJJc32Um7SvEZidVZ9JBUN2zG4hsMFOAKDOMhuWpAmnLtTVymc4wIR+MkuTRmREhAscCtTusbti/C04nkfULEp7Q0ZOapOtmglvDcltS/aBgXkP/svg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=u8msaMXU; arc=none smtp.client-ip=207.171.184.29
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1721977335; c=relaxed/simple;
+	bh=GZQrcW0Y7vey9tkNsG4QwCN75Ki6SMeJW7jE4UMjgM8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T/4WLtcQadMnkTwfy4LRiICzpChHFohnsk/Z6TIDc8olu/QvY8w4tAozMKgsSQMbAc5JT84RRrNmRiuDsjNpQPM2CXLad4ZbhG2jQevdgr1rHPGDETyixtznlqRZPUfplgHhWPsztLu4CiPNRXeBmFpoa5PQBhD58R86h1krgTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k8fWX/fU; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a7aa4ca9d72so165285666b.0;
+        Fri, 26 Jul 2024 00:02:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1721976929; x=1753512929;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=0AdTsOthjnlgfDxLIVkwDvprncxlljTjxqJjxzx5ehw=;
-  b=u8msaMXUVQMrvlKHXoBaJNDOerXdxxbvimWdbdvY/iMIN/Zrmt5MofM2
-   gpKn1XQy4DentZSlnnWIsguTFxCFtnGx8CRbj8Xp/g8Nct16OCWOubijp
-   gc4xGfRix4vdu1KPJYiGoaFpMOaNPfHIuygOVfuxx0MAvDVbm+FIeXaN2
-   k=;
-X-IronPort-AV: E=Sophos;i="6.09,238,1716249600"; 
-   d="scan'208";a="438564128"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 06:55:22 +0000
-Received: from EX19MTAUEB001.ant.amazon.com [10.0.0.204:50983]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.60.140:2525] with esmtp (Farcaster)
- id f3168678-d81e-430d-a953-37df33a02185; Fri, 26 Jul 2024 06:55:21 +0000 (UTC)
-X-Farcaster-Flow-ID: f3168678-d81e-430d-a953-37df33a02185
-Received: from EX19D008UEC004.ant.amazon.com (10.252.135.170) by
- EX19MTAUEB001.ant.amazon.com (10.252.135.108) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 26 Jul 2024 06:55:20 +0000
-Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
- EX19D008UEC004.ant.amazon.com (10.252.135.170) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 26 Jul 2024 06:55:20 +0000
-Received: from [127.0.0.1] (172.19.88.180) by mail-relay.amazon.com
- (10.252.135.200) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34 via Frontend
- Transport; Fri, 26 Jul 2024 06:55:17 +0000
-Message-ID: <7e175521-38bb-49f0-b1fb-8820f8708c9c@amazon.co.uk>
-Date: Fri, 26 Jul 2024 07:55:16 +0100
+        d=gmail.com; s=20230601; t=1721977332; x=1722582132; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TiN10QU3ln4IVzwcdee1zyYPsgPcAP0rqrhYJUQ92Xs=;
+        b=k8fWX/fUUk3IegFgAc80F9bEEdxLcPeczFTo+1+MpXD5SfFI4oqaEPWmBQOktT0VAN
+         QFklJfMg1Rks8EDOhwTZoQBGKw31xgcFbMoJvdZMVPWV6ikE3jpCQxR6Dow5CvZGvjHq
+         r79/jQXgyiuezisJ/+Qw5cCJkH1f3bzmHdA/y8x4XokBjhjjlCh/DkkDO+2A041blDMG
+         V8ENc4MLv9TKwm6SNm6dISvzmXIaR8yqufK6ZPTaj9Iu59xARDTWKUhHtUflcoRpty0q
+         +Rwo8iJU2/bptU2Gq9rtcho3S/vimfCB7pxBvN8BmKHEAPPmi3+7+OAKep7pe+YyKmZQ
+         qUeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1721977332; x=1722582132;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TiN10QU3ln4IVzwcdee1zyYPsgPcAP0rqrhYJUQ92Xs=;
+        b=ADsRstsTXXOT43pGOgkBsHqiVzaKAHfC3xarRaoYlRodCwKKblhuQXOfWSvOXDUIFx
+         hrGT3zkqtvWRxm4rbmtNTMB/hDxEQnqiGM2W07SJ9JpN4OAHBFxylSrqhk/y9rWjFKgy
+         uu8pdGHKkKwIbZjtQoXRTHeGYPic6HkU9gmn85rKO9Y3xYNx9Qnc/r51lcDlrBSw9oMG
+         NXT8wnno186IqHzL9VP3WLHuJLDklTdimNlYPvHrkhMsUO5IF32fygk8TYKpdKLiJLr5
+         oUpM6wHU0AXZRQFjSQhN0AmeyXI8nLANq72TmuNojY08aBArq2K8Yt6UGRZkvKh9SSzy
+         rjGg==
+X-Forwarded-Encrypted: i=1; AJvYcCUgrYYtdMRxelKMDhWvRbzZUdS6qPITshbw3bAkHVgDhABwFRIADmDFmvN7AY9pyEEOsx0ZVEBx211F0qSIztv+9439FgzTQW04+e6Q1nnT6XZuflbZwcUq6wyzMMYX5lw8
+X-Gm-Message-State: AOJu0YxPrRQcUtQd485KwMVxYIoAV3TnD5z9730GTG0bbws5788qFWPE
+	0SqMDYVpErjsileBhthddyS9Tb3yiIl3+LUFYInpJ0zAj1JVHEjXbdVnxLCqazw5nKM0RVAAnpb
+	of4W0CoCX7fKFOEIsZ0lwc6eh+koClnY2JUvgqw==
+X-Google-Smtp-Source: AGHT+IEH4nrJ6XjApLySHmEBDowqEzG/9wU3GxFLLvxtx37bVbVAH/Z1q9+58LoRnZaqSoCILC8QUPfzVY0WvHn3X24=
+X-Received: by 2002:a17:907:9403:b0:a7a:952b:95b1 with SMTP id
+ a640c23a62f3a-a7acb411eb7mr326822566b.24.1721977331615; Fri, 26 Jul 2024
+ 00:02:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/8] Unmapping guest_memfd from Direct Map
-To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, <seanjc@google.com>,
-	<pbonzini@redhat.com>, <akpm@linux-foundation.org>, <dwmw@amazon.co.uk>,
-	<rppt@kernel.org>, <david@redhat.com>
-CC: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-	<willy@infradead.org>, <graf@amazon.com>, <derekmn@amazon.com>,
-	<kalyazin@amazon.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <dmatlack@google.com>, <tabba@google.com>,
-	<chao.p.peng@linux.intel.com>, <xmarcalx@amazon.co.uk>
-References: <20240709132041.3625501-1-roypat@amazon.co.uk>
- <e12b91ef-ca0c-4b77-840b-dcfb2c76a984@kernel.org>
-From: Patrick Roy <roypat@amazon.co.uk>
-Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <e12b91ef-ca0c-4b77-840b-dcfb2c76a984@kernel.org>
+References: <CACZJ9cV2gv+A_2wCXowzi9M-HrySeBxNLKfK+bXRLffwR94=fA@mail.gmail.com>
+ <CABgObfYzEzZuDSKjB1SYcveTaRMaayvY8cvtPD8qGLvkDiwV5A@mail.gmail.com>
+In-Reply-To: <CABgObfYzEzZuDSKjB1SYcveTaRMaayvY8cvtPD8qGLvkDiwV5A@mail.gmail.com>
+From: Liam Ni <zhiguangni01@gmail.com>
+Date: Fri, 26 Jul 2024 15:01:59 +0800
+Message-ID: <CACZJ9cWTpWNCHucOec=inUdNXLKZyZvxO4h4vzioogcZJGtA4g@mail.gmail.com>
+Subject: Re: [PATCH] KVM:x86:Fix an interrupt injection logic error during PIC
+ interrupt simulation
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
+On Thu, 25 Jul 2024 at 22:17, Paolo Bonzini <pbonzini@redhat.com> wrote:
+>
+> On Thu, Jul 25, 2024 at 4:00=E2=80=AFPM Liam Ni <zhiguangni01@gmail.com> =
+wrote:
+> >
+> > The input parameter level to the pic_irq_request function indicates
+> > whether there are interrupts to be injected,
+> > a level value of 1 indicates that there are interrupts to be injected,
+> > and a level value of 0 indicates that there are no interrupts to be inj=
+ected.
+> > And the value of level will be assigned to s->output,
+> > so we should set s->wakeup_needed to true when s->output is true.
+> >
+> > Signed-off-by: Liam Ni <zhiguangni01@gmail.com>
+> > ---
+> >  arch/x86/kvm/i8259.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >
+> > diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
+> > index 8dec646e764b..ec9d6ee7d33d 100644
+> > --- a/arch/x86/kvm/i8259.c
+> > +++ b/arch/x86/kvm/i8259.c
+> > @@ -567,7 +567,7 @@ static void pic_irq_request(struct kvm *kvm, int le=
+vel)
+> >  {
+> >     struct kvm_pic *s =3D kvm->arch.vpic;
+> >
+> > -   if (!s->output)
+> > +   if (s->output)
+>
+> This is the old value of s->output. wakeup is needed if you have a
+> 0->1 transition, so what you're looking for is either
 
+I would like to know the reason why we monitor the 0->1 transformations?
 
-On Mon, 2024-07-22 at 13:28 +0100, "Vlastimil Babka (SUSE)" wrote:
->> === Implementation ===
->>
->> This patch series introduces a new flag to the `KVM_CREATE_GUEST_MEMFD`
->> to remove its pages from the direct map when they are allocated. When
->> trying to run a guest from such a VM, we now face the problem that
->> without either userspace or kernelspace mappings of guest_memfd, KVM
->> cannot access guest memory to, for example, do MMIO emulation of access
->> memory used to guest/host communication. We have multiple options for
->> solving this when running non-CoCo VMs: (1) implement a TDX-light
->> solution, where the guest shares memory that KVM needs to access, and
->> relies on paravirtual solutions where this is not possible (e.g. MMIO),
->> (2) have KVM use userspace mappings of guest_memfd (e.g. a
->> memfd_secret-style solution), or (3) dynamically reinsert pages into the
->> direct map whenever KVM wants to access them.
->>
->> This RFC goes for option (3). Option (1) is a lot of overhead for very
->> little gain, since we are not actually constrained by a physical
->> inability to access guest memory (e.g. we are not in a TDX context where
->> accesses to guest memory cause a #MC). Option (2) has previously been
->> rejected [1].
-> 
-> Do the pages have to have the same address when they are temporarily mapped?
-> Wouldn't it be easier to do something similar to kmap_local_page() used for
-> HIMEM? I.e. you get a temporary kernel mapping to do what's needed, but it
-> doesn't have to alter the shared directmap.
-> 
-> Maybe that was already discussed somewhere as unsuitable but didn't spot it
-> here.
+>
+> if (level)
+>   s->wakeup_needed =3D true;
+This solution seems more appropriate with level=3Dtrue,
+indicating that there is a pending interrupt in the PIC
 
-For what I had prototyped here, there's no requirement to have the pages
-mapped at the same address (I remember briefly looking at memremap to
-achieve the temporary mappings, but since that doesnt work for normal
-memory, I gave up on that path). However, I think guest_memfd is moving
-into a direction where ranges marked as "in-place shared" (e.g. those
-that are temporarily reinserted into the direct map in this RFC)  should
-be able to be GUP'd [1]. I think for that the direct map entries would
-need to be present, right?
+Thanks
+Liam Ni
 
->> In this patch series, we make sufficient parts of KVM gmem-aware to be
->> able to boot a Linux initrd from private memory on x86. These include
->> KVM's MMIO emulation (including guest page table walking) and kvm-clock.
->> For VM types which do not allow accessing gmem, we return -EFAULT and
->> attempt to prepare a KVM_EXIT_MEMORY_FAULT.
->>
->> Additionally, this patch series adds support for "restricted" userspace
->> mappings of guest_memfd, which work similar to memfd_secret (e.g.
->> disallow get_user_pages), which allows handling I/O and loading the
->> guest kernel in a simple way. Support for this is completely independent
->> of the rest of the functionality introduced in this patch series.
->> However, it is required to build a minimal hypervisor PoC that actually
->> allows booting a VM from a disk.
- 
-[1]: https://lore.kernel.org/kvm/489d1494-626c-40d9-89ec-4afc4cd0624b@redhat.com/T/#mc944a6fdcd20a35f654c2be99f9c91a117c1bed4
+>
+> or
+>
+> if (!s->output && level)
+>   s->wakeup_needed =3D true;
+>
+> but your version is incorrect because it would look for a 1->1
+> transition instead.
+>
+> Thanks,
+>
+> Paolo
+>
 
