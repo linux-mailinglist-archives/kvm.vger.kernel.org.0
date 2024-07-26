@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-22273-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22274-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 906C893CC14
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 02:29:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA6E493CC1B
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 02:35:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97AA61C20F9A
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 00:29:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2A81C215C7
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 00:35:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEC41879;
-	Fri, 26 Jul 2024 00:29:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2256C3C30;
+	Fri, 26 Jul 2024 00:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NxbFhHb1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fe7K/vzq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78060803
-	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 00:29:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FC180B
+	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 00:35:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721953775; cv=none; b=a0hKSz+oViBYeJ9XMTcnCF6ChIf6GtTgONW0l5AYYNX7cH46iMtcuHQ4oAnEBZ9l9XGJuTIhzhRuhNkLnfTExQ+FT70gUwFwzTozgl7okGUNSS7PVGjatCGG4Y45qOGMaLV3Jx7ficwr8zCc5sNTC4ADkHUUr3NQzv1qCvem7is=
+	t=1721954109; cv=none; b=gPHAzvgPhDvD58lMjtZu0cpPhT4zlwqmY+ec81fwAQNhUKYjU4EZyIO8Jk3k4/JTUwBcyhrSftn9/VxQ6v/aFT4NeuNHUd8bd4lYM7sadK+HM8F0GStkhF+RBuyh6oGH+KA3Zpc/KWm68itJlZPV4tiR1lcNkBIytGeQ/BMXVyY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721953775; c=relaxed/simple;
-	bh=kviLB+w2lXuUML0TzG8iXmFtCyiR/hwIxPgrFeBKB2w=;
+	s=arc-20240116; t=1721954109; c=relaxed/simple;
+	bh=eXsvx/oB2qbjHdSp6vi8FE0sL5fteTwRYvum4R3pSAs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QCA69Z930EMEuJ3BRa/6VAO53GlOWVN6JhNr8XGorgyFIUeHCItH8hV7rTU17wOZIW5fESbh47nKXKcmmr+h6YObJwVgjrGBQUo/UxkEHtT8CnqrGi1+GrKdff6YYJm7zNo3oH5dyD/r+6ipcVtxnqNwL+PON1ACVPtmBUuPmBs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NxbFhHb1; arc=none smtp.client-ip=209.85.160.181
+	 To:Cc:Content-Type; b=aQwUJ9qRmnYmbmDfuqKxTWdYBlSymT0Ht9+8W7GftyrNDWl9g8Vlyn4ouZ/Sk5aac8zrnkByut5qj/kkE/XVcF7Ml0wKKOAr10voGjxCGLvRB4TkvKXybRx3n11ykKXaFx52yM/oL0vPj9nLwmTbaw0NhwrUIEy9T3UZem9YO8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fe7K/vzq; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-44fdc70e695so63861cf.0
-        for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 17:29:32 -0700 (PDT)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1fd657c9199so26935ad.1
+        for <kvm@vger.kernel.org>; Thu, 25 Jul 2024 17:35:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1721953771; x=1722558571; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1721954106; x=1722558906; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=DbyJs6ojjDUY/aYBbei0H0GJsGGC+U+B84+bho9NthY=;
-        b=NxbFhHb12wnDT1rcGSIK0tAabxi1zIzCVPKIJFFlB6A0QgeHU+mAbfprCf4kmykCyw
-         9J0u6YLicl/LinKjflrsZ+Lcdv/lEvlXaGA8hE/97A4cJI1L7G7R4/XEta3CUfHnEbz3
-         JfhLdYFytj1AYSxqDmLDA+CDR+/LbrYsjZy5zAiZAvOZmfPsuPMbExrW1uk1FEahUZ3g
-         MTDEdz/VCkTlTI6vDi8bf1u39jRvy6GWzdCYHLaLVBT5Kj4vUCtFuV4FxnyBHd6WfG3S
-         n9Oar9+3MHfmtrdVogs4tnchSc+AaF7mtRl4Auh8qokljJ67aZYkAJOZ10g+gVeXf9l2
-         Yd+A==
+        bh=YXmOiT3ja7tbFfoShPzcte9+u5DgaoMfXxdrhdWg4sE=;
+        b=Fe7K/vzqIkO2XB6kGODBl/cQ+t/LtaxPaN0VuUg/G+7j0Nht2KSMN9ShODCTyNhKh4
+         H4b+QVDSbkCYKJDgb2xlztZv7NSWloe9m7yB6tpBBo6Y7rmJGjGs8GggPVbqeqUQv8aO
+         HBcERGvbQJOazTzoV0jGydKZUHmZa1CcPO98mnrstRvLUc4+vkRkVchnBWyLJ9LEGyXC
+         JjuvVrTxNtT52tHE+R6sT1dB8GOG0al1hf/zAo4tTTYc+iEHpQfsmKIO33yuKlkXBZuI
+         y8iavahxE1I2pwI7ahkdmItlZpRzG9eIJcuRJgIes7R4+ACjgtV7iUX+x1fD/B7b1575
+         uRkg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1721953771; x=1722558571;
+        d=1e100.net; s=20230601; t=1721954106; x=1722558906;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=DbyJs6ojjDUY/aYBbei0H0GJsGGC+U+B84+bho9NthY=;
-        b=SNeFxmaEJHdhhheeVCic4uSUPqg2zKWlpGn+VK+KIxSrGA5bRoqKp7ztI0YNJdaNzG
-         b6JMED5w6qYcU8M6QZ3F2C3cXc1nCwEhlrUVWerMK6nlvwHTGfOd6Y8adqhNYzdMBakX
-         utLlDCNQUSQFDEEdcG7StoQ6VCyK9AAj1NtekiYqE7cN8fOh12eq1K49ziEBXr/e3tXU
-         hoM1v3MIwXMydJqLyUj/CuodKJSnPwGfArB6C5qgEywpCunMv9oA8TRLJhTrjmV8QLSQ
-         86UsG2DtEee7lSbMXxAJKJRDUDyIOure7amiL/DtwwwPl8zkg3K301pCpZuQssxj8Dil
-         x51w==
-X-Forwarded-Encrypted: i=1; AJvYcCVUmL903karai3V9lzjfpIDsKiZDJWsUjY7jYlROD4bNWrvLtFhvG1Gy05lGyGiLdDZeTr2G2TVfjXh7QlAKB2qar0t
-X-Gm-Message-State: AOJu0YzmMZHjOFo98QODmnaWLn+ebLYUzpo/+wHC7n5AiKk0yylVNEE1
-	OuCrFGJ+vMJdCsQJzdr4N13o2Lw7xejMdGhsLZDUx8N6pGt+gJvst615votrRDAKFe89HNjkimZ
-	6xRNb4NJUWMAoqC9jrxfAaIUS0EP7zyLmdwpQ
-X-Google-Smtp-Source: AGHT+IEAKXr1ckGzIAW0Zij5lROUgzcsWDVkCYVl2RWE/gIa1eP8NSl4F+ePaiwMP4UG1WnczScB6df5XE4x/GMY03s=
-X-Received: by 2002:a05:622a:1ba6:b0:447:f5de:bd18 with SMTP id
- d75a77b69052e-44ff3e5d32amr1488861cf.9.1721953771125; Thu, 25 Jul 2024
- 17:29:31 -0700 (PDT)
+        bh=YXmOiT3ja7tbFfoShPzcte9+u5DgaoMfXxdrhdWg4sE=;
+        b=pEeXadvJMQqdF4iDRUPc93w6SDIgdjpapi+wfjUYZWExmPWwxlEkoyP5tqQd3k69jO
+         8sCYhtWk0Kxsl8dMw8wy8I7528lV6ifQsI0vBLrKIgb10pEmwgt+xZR8YaDIGtWGPI8B
+         JOaq57CapRc8IakdoT/D/cF/J+w0g8hsqh657RGSnit3bFmbFktbIBAF9fv/RWp+7c/0
+         j2DgDaqZhfM/GphKjgcSEerWmYSQBaTAEvguUOdmj6xyZVyKLiBSfYh+uHJy9xN7Jahu
+         TvlAd+fU/oqE59S/VJeZZyyQ3Xdt+cEvnUN2vfvaA9k9ZkTXp4LDKs1pxzu6wYQ4uQBq
+         8bww==
+X-Forwarded-Encrypted: i=1; AJvYcCWr69Qe6bl7d8WwxJnWUSLq7WUufjgnDKVBz9nrPFahM49jFMQ0NUbWBvW6hpFsOTVBge577RaCNTBQs6D7FFXtScNK
+X-Gm-Message-State: AOJu0YxsIdhFAKZyPknHMLnmwra4jPgjSxbjZKtqsMj1v5PsivY8COMv
+	2RHJvqTRXwjVRyAOOKJpARCUlJLyWChbO/w+6qxC9yHICSqI2VF+AIJTSo0VpAr0Nb4HHo7U9ZG
+	NA0CAoGND1AZTO9bi0ECvN4U9cRheh14Xvtdm
+X-Google-Smtp-Source: AGHT+IFnv7tfdYJpXM8klvYkuM0VxwmIgdPCwCR+A2LuBYkT8SZpSWEYLkUMwdBrr+1/n3tswklB7a7UCo/1ZzddTK8=
+X-Received: by 2002:a17:903:2988:b0:1f3:3ede:9b0 with SMTP id
+ d9443c01a7336-1feee856698mr1378625ad.10.1721954105611; Thu, 25 Jul 2024
+ 17:35:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,12 +72,12 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-2-jthoughton@google.com> <ZqJ_xANKf3bNcaHM@google.com>
-In-Reply-To: <ZqJ_xANKf3bNcaHM@google.com>
+ <20240724011037.3671523-3-jthoughton@google.com> <ZqKUefN3HgBQQkuA@google.com>
+In-Reply-To: <ZqKUefN3HgBQQkuA@google.com>
 From: James Houghton <jthoughton@google.com>
-Date: Thu, 25 Jul 2024 17:28:55 -0700
-Message-ID: <CADrL8HW2mjC=ukNBG6Tww+Y3t6poU0ZM5uQJteTk4e8kj-s2wA@mail.gmail.com>
-Subject: Re: [PATCH v6 01/11] KVM: Add lockless memslot walk to KVM
+Date: Thu, 25 Jul 2024 17:34:29 -0700
+Message-ID: <CADrL8HXoGeafwNvSyMF0=MMjkbodyYrA6+J638QXgyC_TW76XQ@mail.gmail.com>
+Subject: Re: [PATCH v6 02/11] KVM: x86: Relax locking for kvm_test_age_gfn and kvm_age_gfn
 To: David Matlack <dmatlack@google.com>
 Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
@@ -94,171 +94,92 @@ Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.co
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 25, 2024 at 9:39=E2=80=AFAM David Matlack <dmatlack@google.com>=
- wrote:
+On Thu, Jul 25, 2024 at 11:08=E2=80=AFAM David Matlack <dmatlack@google.com=
+> wrote:
 >
 > On 2024-07-24 01:10 AM, James Houghton wrote:
-> > Provide flexibility to the architecture to synchronize as optimally as
-> > they can instead of always taking the MMU lock for writing.
+> > Walk the TDP MMU in an RCU read-side critical section. This requires a
+> > way to do RCU-safe walking of the tdp_mmu_roots; do this with a new
+> > macro. The PTE modifications are now done atomically, and
+> > kvm_tdp_mmu_spte_need_atomic_write() has been updated to account for th=
+e
+> > fact that kvm_age_gfn can now lockless update the accessed bit and the
+> > R/X bits).
 > >
-> > Architectures that do their own locking must select
-> > CONFIG_KVM_MMU_NOTIFIER_YOUNG_LOCKLESS.
+> > If the cmpxchg for marking the spte for access tracking fails, we simpl=
+y
+> > retry if the spte is still a leaf PTE. If it isn't, we return false
+> > to continue the walk.
 > >
-> > The immediate application is to allow architectures to implement the
-> > test/clear_young MMU notifiers more cheaply.
+> > Harvesting age information from the shadow MMU is still done while
+> > holding the MMU write lock.
 > >
 > > Suggested-by: Yu Zhao <yuzhao@google.com>
 > > Signed-off-by: James Houghton <jthoughton@google.com>
 >
-> Aside from the cleanup suggestion (which should be in separate patches
-> anyway):
+> Aside from the comment fixes below,
 >
 > Reviewed-by: David Matlack <dmatlack@google.com>
 
-Thanks David!
+Thank you!
 
 >
 > > ---
-> >  include/linux/kvm_host.h |  1 +
-> >  virt/kvm/Kconfig         |  3 +++
-> >  virt/kvm/kvm_main.c      | 26 +++++++++++++++++++-------
-> >  3 files changed, 23 insertions(+), 7 deletions(-)
+> >  arch/x86/include/asm/kvm_host.h |  1 +
+> >  arch/x86/kvm/Kconfig            |  1 +
+> >  arch/x86/kvm/mmu/mmu.c          | 10 ++++-
+> >  arch/x86/kvm/mmu/tdp_iter.h     | 27 +++++++------
+> >  arch/x86/kvm/mmu/tdp_mmu.c      | 67 +++++++++++++++++++++++++--------
+> >  5 files changed, 77 insertions(+), 29 deletions(-)
 > >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 689e8be873a7..8cd80f969cff 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -266,6 +266,7 @@ struct kvm_gfn_range {
-> >       gfn_t end;
-> >       union kvm_mmu_notifier_arg arg;
-> >       bool may_block;
-> > +     bool lockless;
-> >  };
-> >  bool kvm_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range)=
+> [...]
+> > --- a/arch/x86/kvm/mmu/tdp_iter.h
+> > +++ b/arch/x86/kvm/mmu/tdp_iter.h
+> > @@ -25,6 +25,13 @@ static inline u64 kvm_tdp_mmu_write_spte_atomic(tdp_=
+ptep_t sptep, u64 new_spte)
+> >       return xchg(rcu_dereference(sptep), new_spte);
+> >  }
+> >
+> > +static inline u64 tdp_mmu_clear_spte_bits_atomic(tdp_ptep_t sptep, u64=
+ mask)
+> > +{
+> > +     atomic64_t *sptep_atomic =3D (atomic64_t *)rcu_dereference(sptep)=
 ;
-> >  bool kvm_age_gfn(struct kvm *kvm, struct kvm_gfn_range *range);
-> > diff --git a/virt/kvm/Kconfig b/virt/kvm/Kconfig
-> > index b14e14cdbfb9..632334861001 100644
-> > --- a/virt/kvm/Kconfig
-> > +++ b/virt/kvm/Kconfig
-> > @@ -100,6 +100,9 @@ config KVM_GENERIC_MMU_NOTIFIER
-> >         select MMU_NOTIFIER
-> >         bool
-> >
-> > +config KVM_MMU_NOTIFIER_YOUNG_LOCKLESS
-> > +       bool
 > > +
-> >  config KVM_GENERIC_MEMORY_ATTRIBUTES
-> >         depends on KVM_GENERIC_MMU_NOTIFIER
-> >         bool
-> > diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> > index d0788d0a72cc..33f8997a5c29 100644
-> > --- a/virt/kvm/kvm_main.c
-> > +++ b/virt/kvm/kvm_main.c
-> > @@ -555,6 +555,7 @@ struct kvm_mmu_notifier_range {
-> >       on_lock_fn_t on_lock;
-> >       bool flush_on_ret;
-> >       bool may_block;
-> > +     bool lockless;
-> >  };
+> > +     return (u64)atomic64_fetch_and(~mask, sptep_atomic);
+> > +}
+> > +
+> >  static inline void __kvm_tdp_mmu_write_spte(tdp_ptep_t sptep, u64 new_=
+spte)
+> >  {
+> >       KVM_MMU_WARN_ON(is_ept_ve_possible(new_spte));
+> > @@ -32,10 +39,11 @@ static inline void __kvm_tdp_mmu_write_spte(tdp_pte=
+p_t sptep, u64 new_spte)
+> >  }
 > >
 > >  /*
-> > @@ -609,6 +610,10 @@ static __always_inline kvm_mn_ret_t __kvm_handle_h=
-va_range(struct kvm *kvm,
-> >                        IS_KVM_NULL_FN(range->handler)))
-> >               return r;
-> >
-> > +     /* on_lock will never be called for lockless walks */
-> > +     if (WARN_ON_ONCE(range->lockless && !IS_KVM_NULL_FN(range->on_loc=
-k)))
-> > +             return r;
-> > +
-> >       idx =3D srcu_read_lock(&kvm->srcu);
-> >
-> >       for (i =3D 0; i < kvm_arch_nr_memslot_as_ids(kvm); i++) {
-> > @@ -640,15 +645,18 @@ static __always_inline kvm_mn_ret_t __kvm_handle_=
-hva_range(struct kvm *kvm,
-> >                       gfn_range.start =3D hva_to_gfn_memslot(hva_start,=
- slot);
-> >                       gfn_range.end =3D hva_to_gfn_memslot(hva_end + PA=
-GE_SIZE - 1, slot);
-> >                       gfn_range.slot =3D slot;
-> > +                     gfn_range.lockless =3D range->lockless;
-> >
-> >                       if (!r.found_memslot) {
-> >                               r.found_memslot =3D true;
-> > -                             KVM_MMU_LOCK(kvm);
-> > -                             if (!IS_KVM_NULL_FN(range->on_lock))
-> > -                                     range->on_lock(kvm);
-> > -
-> > -                             if (IS_KVM_NULL_FN(range->handler))
-> > -                                     goto mmu_unlock;
-> > +                             if (!range->lockless) {
-> > +                                     KVM_MMU_LOCK(kvm);
-> > +                                     if (!IS_KVM_NULL_FN(range->on_loc=
-k))
-> > +                                             range->on_lock(kvm);
-> > +
-> > +                                     if (IS_KVM_NULL_FN(range->handler=
-))
-> > +                                             goto mmu_unlock;
-> > +                             }
-> >                       }
-> >                       r.ret |=3D range->handler(kvm, &gfn_range);
-> >               }
-> > @@ -658,7 +666,7 @@ static __always_inline kvm_mn_ret_t __kvm_handle_hv=
-a_range(struct kvm *kvm,
-> >               kvm_flush_remote_tlbs(kvm);
-> >
-> >  mmu_unlock:
-> > -     if (r.found_memslot)
-> > +     if (r.found_memslot && !range->lockless)
-> >               KVM_MMU_UNLOCK(kvm);
-> >
-> >       srcu_read_unlock(&kvm->srcu, idx);
-> > @@ -679,6 +687,8 @@ static __always_inline int kvm_handle_hva_range(str=
-uct mmu_notifier *mn,
-> >               .on_lock        =3D (void *)kvm_null_fn,
-> >               .flush_on_ret   =3D true,
-> >               .may_block      =3D false,
-> > +             .lockless       =3D
-> > +                     IS_ENABLED(CONFIG_KVM_MMU_NOTIFIER_YOUNG_LOCKLESS=
-),
-> >       };
-> >
-> >       return __kvm_handle_hva_range(kvm, &range).ret;
-> > @@ -697,6 +707,8 @@ static __always_inline int kvm_handle_hva_range_no_=
-flush(struct mmu_notifier *mn
-> >               .on_lock        =3D (void *)kvm_null_fn,
-> >               .flush_on_ret   =3D false,
-> >               .may_block      =3D false,
-> > +             .lockless       =3D
-> > +                     IS_ENABLED(CONFIG_KVM_MMU_NOTIFIER_YOUNG_LOCKLESS=
-),
+> > - * SPTEs must be modified atomically if they are shadow-present, leaf
+> > - * SPTEs, and have volatile bits, i.e. has bits that can be set outsid=
+e
+> > - * of mmu_lock.  The Writable bit can be set by KVM's fast page fault
+> > - * handler, and Accessed and Dirty bits can be set by the CPU.
+> > + * SPTEs must be modified atomically if they have bits that can be set=
+ outside
+> > + * of the mmu_lock. This can happen for any shadow-present leaf SPTEs,=
+ as the
+> > + * Writable bit can be set by KVM's fast page fault handler, the Acces=
+sed and
+> > + * Dirty bits can be set by the CPU, and the Accessed and R/X bits can=
+ be
 >
-> kvm_handle_hva_range{,_no_flush}() have very generic names but
-> they're intimately tied to the "young" notifiers. Whereas
-> __kvm_handle_hva_range() is the truly generic handler function.
->
-> This is arguably a pre-existing issue, but adding
-> CONFIG_KVM_MMU_NOTIFIER_YOUNG_LOCKLESS makes these functions even more
-> intamtely tied to the "young" notifiers.
->
-> We could rename kvm_handle_hva_range{,_no_flush}() but I think the
-> cleanest thing to do might be to just drop them entirely and move their
-> contents into their callers (there are only 2 callers of these 3
-> functions). That will create a little duplication but IMO will make the
-> code easier to read.
->
-> And then we can also rename __kvm_handle_hva_range() to
-> kvm_handle_hva_range().
+> "R/X bits" should be "W/R/X bits".
 
-Thanks for the suggestion, I think this is a good idea. I'm curious
-how others feel, as this indeed does duplicate the code some. Perhaps
-it is better just to rename kvm_handle_hva_range() to
-kvm_handle_hva_range_age() or something like that, and something
-similar for _no_flush(). :/
+Thanks. Right, we are clearing all of VMX_EPT_RWX_MASK.
 
-But yeah I think it's fine to just do the manipulation you're
-suggesting. I'll include it in v7 unless others say not to.
+>
+> > + * cleared by age_gfn_range.
+>
+> nit: "age_gfn_range()"
+
+Thanks, will fix this and all the other places where I've left off the ().
 
