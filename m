@@ -1,163 +1,157 @@
-Return-Path: <kvm+bounces-22287-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22288-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9214093CE4B
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 08:50:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3729B93CE5C
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 08:55:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1D3C1C21107
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 06:50:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D788F281E3F
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 06:55:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFCC7176237;
-	Fri, 26 Jul 2024 06:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34BC9176248;
+	Fri, 26 Jul 2024 06:55:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="u8msaMXU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB97817623A;
-	Fri, 26 Jul 2024 06:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C37E1E57E;
+	Fri, 26 Jul 2024 06:55:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.184.29
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1721976620; cv=none; b=QGWoaBA/umowFV2GrF18UA4QOeuUpNe8q8yCrdur3ZBIzRaNvf7WqQJsWeJVFp082PWiOifgKIiHxDtlwE+9iQxej/idIDDUcF//tgC/AYJQjQV9xFAtKkGio1f6xJqp+Wcu9mtO6p9IXp0YcMLPuL/TWzEO334kjJYEK87F9Rk=
+	t=1721976930; cv=none; b=hC2kHLu+esLDfv7PV2xRyz2h4jXGayaZrgiVuiHf4xE/ok/YmlZNOkpXvwdQLnjFF5f9YKABa/oKPtbi6GwTENHnIz7D5b5hyaan1tz0Ceen+knLcWLN8QPiSUSqFWLwmhkvLpL7XnxGQzHEjbcvMIXJqvnlHz5kCqzwi+rXsnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1721976620; c=relaxed/simple;
-	bh=yuY8lQr4XJsFDjEBO/51xJBBFKCJZKqleGTBLoabv8k=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=O88+Pc+sdhGl+L2/lftxDzzxNirgKMMcq1/UIq2Fum9wPSpquEV9CmMPNfIDlriDIhef1c765gKuR4TMYSgcNs8QHmlFploJznupy53Xp2zCUOwnJTh0ZsKlfQXxOF1nIK19pZ+vp2lcIuT+X6iU8p1orqi7ylKXChcpFk/vUfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8AxmOkjR6NmnvcBAA--.5838S3;
-	Fri, 26 Jul 2024 14:50:11 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMDxa+UgR6NmT1oCAA--.13636S3;
-	Fri, 26 Jul 2024 14:50:11 +0800 (CST)
-Subject: Re: [PATCH] KVM: Loongarch: Remove undefined a6 argument comment for
- kvm_hypercall
-To: Huacai Chen <chenhuacai@kernel.org>
-Cc: Dandan Zhang <zhangdandan@uniontech.com>, zhaotianrui@loongson.cn,
- kernel@xen0n.name, kvm@vger.kernel.org, loongarch@lists.linux.dev,
- linux-kernel@vger.kernel.org, wangyuli@uniontech.com,
- Wentao Guan <guanwentao@uniontech.com>
-References: <6D5128458C9E19E4+20240725134820.55817-1-zhangdandan@uniontech.com>
- <c40854ac-38ef-4781-6c6b-4f74e24f265c@loongson.cn>
- <CAAhV-H5R_kamf=YJ62hb+iFr7Y+cvCaBBrY1rdk_wEEq4+6D_w@mail.gmail.com>
- <a9245b66-be6e-7211-49dd-a9a2d23ec2cf@loongson.cn>
- <CAAhV-H7Op_W0B7d4uQQVU_BEkpyQmwf9TCxQA9bYx3=JrQZ8pg@mail.gmail.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <9bad6e47-dac5-82d2-1828-57df3ec840f8@loongson.cn>
-Date: Fri, 26 Jul 2024 14:50:08 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1721976930; c=relaxed/simple;
+	bh=8rUJ3cyfU+5X3yR1c71yzPbyRpz4uW+z1XrTC218QOw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=XVzdlNVJzppME38C8HOqe82b8Zp1syQRqTOhx66Ij2RV6DJsMTo/jBK6MJJc32Um7SvEZidVZ9JBUN2zG4hsMFOAKDOMhuWpAmnLtTVymc4wIR+MkuTRmREhAscCtTusbti/C04nkfULEp7Q0ZOapOtmglvDcltS/aBgXkP/svg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=u8msaMXU; arc=none smtp.client-ip=207.171.184.29
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
+  s=amazon201209; t=1721976929; x=1753512929;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=0AdTsOthjnlgfDxLIVkwDvprncxlljTjxqJjxzx5ehw=;
+  b=u8msaMXUVQMrvlKHXoBaJNDOerXdxxbvimWdbdvY/iMIN/Zrmt5MofM2
+   gpKn1XQy4DentZSlnnWIsguTFxCFtnGx8CRbj8Xp/g8Nct16OCWOubijp
+   gc4xGfRix4vdu1KPJYiGoaFpMOaNPfHIuygOVfuxx0MAvDVbm+FIeXaN2
+   k=;
+X-IronPort-AV: E=Sophos;i="6.09,238,1716249600"; 
+   d="scan'208";a="438564128"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 06:55:22 +0000
+Received: from EX19MTAUEB001.ant.amazon.com [10.0.0.204:50983]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.60.140:2525] with esmtp (Farcaster)
+ id f3168678-d81e-430d-a953-37df33a02185; Fri, 26 Jul 2024 06:55:21 +0000 (UTC)
+X-Farcaster-Flow-ID: f3168678-d81e-430d-a953-37df33a02185
+Received: from EX19D008UEC004.ant.amazon.com (10.252.135.170) by
+ EX19MTAUEB001.ant.amazon.com (10.252.135.108) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 26 Jul 2024 06:55:20 +0000
+Received: from EX19MTAUEC001.ant.amazon.com (10.252.135.222) by
+ EX19D008UEC004.ant.amazon.com (10.252.135.170) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 26 Jul 2024 06:55:20 +0000
+Received: from [127.0.0.1] (172.19.88.180) by mail-relay.amazon.com
+ (10.252.135.200) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34 via Frontend
+ Transport; Fri, 26 Jul 2024 06:55:17 +0000
+Message-ID: <7e175521-38bb-49f0-b1fb-8820f8708c9c@amazon.co.uk>
+Date: Fri, 26 Jul 2024 07:55:16 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAAhV-H7Op_W0B7d4uQQVU_BEkpyQmwf9TCxQA9bYx3=JrQZ8pg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/8] Unmapping guest_memfd from Direct Map
+To: "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, <seanjc@google.com>,
+	<pbonzini@redhat.com>, <akpm@linux-foundation.org>, <dwmw@amazon.co.uk>,
+	<rppt@kernel.org>, <david@redhat.com>
+CC: <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
+	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
+	<willy@infradead.org>, <graf@amazon.com>, <derekmn@amazon.com>,
+	<kalyazin@amazon.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-mm@kvack.org>, <dmatlack@google.com>, <tabba@google.com>,
+	<chao.p.peng@linux.intel.com>, <xmarcalx@amazon.co.uk>
+References: <20240709132041.3625501-1-roypat@amazon.co.uk>
+ <e12b91ef-ca0c-4b77-840b-dcfb2c76a984@kernel.org>
+From: Patrick Roy <roypat@amazon.co.uk>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMDxa+UgR6NmT1oCAA--.13636S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoWxXF1Uuw4rJF4ruFy8Jr15Jrc_yoW5GFyDpF
-	ZxC3WDCF48Kr1xCw1xt3s8uryavrWkKw12gF15Wry5Arnxtr1fJr48tF4UCF1kZayrJF10
-	qFyag3WfZFyUA3gCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUU9Sb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx
-	1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv
-	67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07
-	AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwCFI7km07C2
-	67AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI
-	8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWU
-	CwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r
-	1xMIIF0xvEx4A2jsIE14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBI
-	daVFxhVjvjDU0xZFpf9x07jYSoJUUUUU=
+Autocrypt: addr=roypat@amazon.co.uk; keydata=
+ xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
+ NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
+ wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
+ CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
+ AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
+ AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
+ IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
+ 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
+ 8hlxFQM=
+In-Reply-To: <e12b91ef-ca0c-4b77-840b-dcfb2c76a984@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
 
 
 
-On 2024/7/26 下午2:32, Huacai Chen wrote:
-> On Fri, Jul 26, 2024 at 11:35 AM maobibo <maobibo@loongson.cn> wrote:
+On Mon, 2024-07-22 at 13:28 +0100, "Vlastimil Babka (SUSE)" wrote:
+>> === Implementation ===
 >>
+>> This patch series introduces a new flag to the `KVM_CREATE_GUEST_MEMFD`
+>> to remove its pages from the direct map when they are allocated. When
+>> trying to run a guest from such a VM, we now face the problem that
+>> without either userspace or kernelspace mappings of guest_memfd, KVM
+>> cannot access guest memory to, for example, do MMIO emulation of access
+>> memory used to guest/host communication. We have multiple options for
+>> solving this when running non-CoCo VMs: (1) implement a TDX-light
+>> solution, where the guest shares memory that KVM needs to access, and
+>> relies on paravirtual solutions where this is not possible (e.g. MMIO),
+>> (2) have KVM use userspace mappings of guest_memfd (e.g. a
+>> memfd_secret-style solution), or (3) dynamically reinsert pages into the
+>> direct map whenever KVM wants to access them.
 >>
->>
->> On 2024/7/26 上午10:55, Huacai Chen wrote:
->>> On Fri, Jul 26, 2024 at 9:49 AM maobibo <maobibo@loongson.cn> wrote:
->>>>
->>>>
->>>>
->>>> On 2024/7/25 下午9:48, Dandan Zhang wrote:
->>>>> The kvm_hypercall set for LoongArch is limited to a1-a5.
->>>>> The mention of a6 in the comment is undefined that needs to be rectified.
->>>>>
->>>>> Signed-off-by: Wentao Guan <guanwentao@uniontech.com>
->>>>> Signed-off-by: Dandan Zhang <zhangdandan@uniontech.com>
->>>>> ---
->>>>>     arch/loongarch/include/asm/kvm_para.h | 4 ++--
->>>>>     1 file changed, 2 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/arch/loongarch/include/asm/kvm_para.h b/arch/loongarch/include/asm/kvm_para.h
->>>>> index 335fb86778e2..43ec61589e6c 100644
->>>>> --- a/arch/loongarch/include/asm/kvm_para.h
->>>>> +++ b/arch/loongarch/include/asm/kvm_para.h
->>>>> @@ -39,9 +39,9 @@ struct kvm_steal_time {
->>>>>      * Hypercall interface for KVM hypervisor
->>>>>      *
->>>>>      * a0: function identifier
->>>>> - * a1-a6: args
->>>>> + * a1-a5: args
->>>>>      * Return value will be placed in a0.
->>>>> - * Up to 6 arguments are passed in a1, a2, a3, a4, a5, a6.
->>>>> + * Up to 5 arguments are passed in a1, a2, a3, a4, a5.
->>>>>      */
->>>>>     static __always_inline long kvm_hypercall0(u64 fid)
->>>>>     {
->>>>>
->>>>
->>>> Dandan,
->>>>
->>>> Nice catch. In future hypercall abi may expand such as the number of
->>>> input register and output register, or async hypercall function if there
->>>> is really such requirement.
->>>>
->>>> Anyway the modification is deserved and it is enough to use now, thanks
->>>> for doing it.
->>>>
->>>> Reviewed-by: Bibo Mao <maobibo@loongson.cn>
->>> Maybe it is better to implement kvm_hypercall6() than remove a6 now?
->> That is one option also. The main reason is that there is no such
->> requirement in near future :(, I prefer to removing the annotation and
->> keeping it clean.
-> I don't like removing something and then adding it back again, so if
-> kvm_hypercall6() is needed in future, it is better to add it now.
-I do not see the requirement by now.
-
-At the same time I just suggest you care about LoongArch kernel and 
-catch up the gap, just go forward rather than go around. Is it 
-responsibility of maintainer to catch future direction?
-
-Thanks for merging LoongArch KVM code at beginning, and I think I can 
-merge LoongArch kvm kernel to KVM tree directly just like KVM 
-x86/ARM64/RISCV.
-
-Regards
-Bibo
-
+>> This RFC goes for option (3). Option (1) is a lot of overhead for very
+>> little gain, since we are not actually constrained by a physical
+>> inability to access guest memory (e.g. we are not in a TDX context where
+>> accesses to guest memory cause a #MC). Option (2) has previously been
+>> rejected [1].
 > 
-> Huacai
->>
->> Regards
->> Bibo Mao
->>>
->>> Huacai
->>>>
->>
->>
+> Do the pages have to have the same address when they are temporarily mapped?
+> Wouldn't it be easier to do something similar to kmap_local_page() used for
+> HIMEM? I.e. you get a temporary kernel mapping to do what's needed, but it
+> doesn't have to alter the shared directmap.
+> 
+> Maybe that was already discussed somewhere as unsuitable but didn't spot it
+> here.
 
+For what I had prototyped here, there's no requirement to have the pages
+mapped at the same address (I remember briefly looking at memremap to
+achieve the temporary mappings, but since that doesnt work for normal
+memory, I gave up on that path). However, I think guest_memfd is moving
+into a direction where ranges marked as "in-place shared" (e.g. those
+that are temporarily reinserted into the direct map in this RFC)  should
+be able to be GUP'd [1]. I think for that the direct map entries would
+need to be present, right?
+
+>> In this patch series, we make sufficient parts of KVM gmem-aware to be
+>> able to boot a Linux initrd from private memory on x86. These include
+>> KVM's MMIO emulation (including guest page table walking) and kvm-clock.
+>> For VM types which do not allow accessing gmem, we return -EFAULT and
+>> attempt to prepare a KVM_EXIT_MEMORY_FAULT.
+>>
+>> Additionally, this patch series adds support for "restricted" userspace
+>> mappings of guest_memfd, which work similar to memfd_secret (e.g.
+>> disallow get_user_pages), which allows handling I/O and loading the
+>> guest kernel in a simple way. Support for this is completely independent
+>> of the rest of the functionality introduced in this patch series.
+>> However, it is required to build a minimal hypervisor PoC that actually
+>> allows booting a VM from a disk.
+ 
+[1]: https://lore.kernel.org/kvm/489d1494-626c-40d9-89ec-4afc4cd0624b@redhat.com/T/#mc944a6fdcd20a35f654c2be99f9c91a117c1bed4
 
