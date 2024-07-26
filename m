@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-22317-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22318-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 361BE93D474
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 15:45:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BB3F93D475
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 15:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D306A1F24533
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 13:45:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56D16286D9E
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 13:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A07E817BB26;
-	Fri, 26 Jul 2024 13:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CE8E17BB31;
+	Fri, 26 Jul 2024 13:45:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WvgRSOU7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IO57rz/L"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333871E51F
-	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 13:45:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EBF17B4FF
+	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 13:45:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722001512; cv=none; b=Eut9X5IfLQcoYsFhhv2k+kJ7YUWWhMUqEC6oglBPBOFrUiHXLWAeC5sbH6Dvf/XTmwH3vw8MWUTK7yqkNsvucknRPEwV8AhYW43XhHZ7GVOCz9AT14l8ohppk+Z5JYurXgFWMal5z32AHWeoNgyqGuvWw/o+LUmbDsWQBc0YAt8=
+	t=1722001514; cv=none; b=W9t0Od0IvyiCaMZgQFU1wyOD5icUHjPJ/NbOv7LrXLDRscpAUCuK6AHdtyQe6NogK4Ut6CVu0/Vi4udlMDWPY5t0ShHHZa2dDJCwwSwRmHDtCobBBWLD9ZCvmL63UVVObbizQsRL96FLBtcTykrB3CeSKoc6ZS3g9blVDPza7JA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722001512; c=relaxed/simple;
-	bh=jHCUIM+RYqPqB2UI6fy8qFUoDGCmOaxu61kmYgMyhsA=;
+	s=arc-20240116; t=1722001514; c=relaxed/simple;
+	bh=1zX2K2QJLCXIFYCEQbFOJq6h9l4RjEhyqg+jefGa8KA=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=HnaTfkMw3UqYJ+FlivYmnrhhnQsiUwcwG4tkjUOogYvDij7LQ7mIr8xtKa9lqB5Dz9195xoirGN1q1ZGmEf+1SXCttmOhmTMgAnLzi8VR9yAB1E/GA4I8hH12nWat3GAeiN6bdKQo/Wbhvi0MsXDd7HlWdxd4qQfuNW99H5qO7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WvgRSOU7; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=QFB2lzHCEGOlLWbpdmut56GV381gyLRO5XFyF36RL+5vnOUf90TDb4XimqQ1OaWBJzihey4NQBsudt4fTPITNbkb/uyAg+67TYBHpYt4rAYj3q8gXzWaP4Z2y++Nmm2ynxcji7FDzfTGys/wcGKQsgk6tNm4ZobhlVf+raoqKtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IO57rz/L; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722001510;
+	s=mimecast20190719; t=1722001511;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=E3IWYfQZY9Vtpyu9w1tUYKrkYYnY1w3NcI8rW4hxkqc=;
-	b=WvgRSOU7MdEBrShciCWLIbxPsFHL7yl603WQsf+BrLfj0pkzntL1Q1bjHC3z2kQ/bs4boR
-	zOgpQbMmfdX+xAuojr8R59HD+QWxx3mOr0kx1hcR0vJqZ4IxQsAAHPbEa6kMIhDX1eYjcU
-	YWwFvVegbFMv3PXOCOlqCrBzkZ/LH7s=
+	bh=osLPoiTFxmzb7yDc5D1S/zDpmyUMFotz0CS6WEgfGpM=;
+	b=IO57rz/LPyiIaP+fyI+jk0mSl9nSyGFB0nZFzvJRtEHc5WFmr0d8USwHVpBchoNU4daPlb
+	iGIhD6myvgpmVqVHn9oJ96kLRzhouPIALuOyp7EF6whu63zKtwuMx1599X98ARCcasGS+3
+	gJwi/j1qEPHrH7OwpeWxIasVBFC2dQs=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-670-PAgA_eesNUeDe2ihR7jBMg-1; Fri,
- 26 Jul 2024 09:45:05 -0400
-X-MC-Unique: PAgA_eesNUeDe2ihR7jBMg-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-149-3RQj_R13N2mlf7KIO6P6CQ-1; Fri,
+ 26 Jul 2024 09:45:10 -0400
+X-MC-Unique: 3RQj_R13N2mlf7KIO6P6CQ-1
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2D3B11955D4E;
-	Fri, 26 Jul 2024 13:45:03 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 04B251944A95;
+	Fri, 26 Jul 2024 13:45:08 +0000 (UTC)
 Received: from p1.localdomain.com (unknown [10.22.17.77])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 102E31955D42;
-	Fri, 26 Jul 2024 13:44:57 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4B9EB1955D45;
+	Fri, 26 Jul 2024 13:45:03 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Peter Maydell <peter.maydell@linaro.org>,
@@ -76,9 +76,9 @@ Cc: Peter Maydell <peter.maydell@linaro.org>,
 	Paul Durrant <paul@xen.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Akihiko Odaki <akihiko.odaki@daynix.com>
-Subject: [PATCH 03/13] tests/avocado/intel_iommu.py: increase timeout
-Date: Fri, 26 Jul 2024 09:44:28 -0400
-Message-ID: <20240726134438.14720-4-crosa@redhat.com>
+Subject: [PATCH 04/13] tests/avocado: add cdrom permission related tests
+Date: Fri, 26 Jul 2024 09:44:29 -0400
+Message-ID: <20240726134438.14720-5-crosa@redhat.com>
 In-Reply-To: <20240726134438.14720-1-crosa@redhat.com>
 References: <20240726134438.14720-1-crosa@redhat.com>
 Precedence: bulk
@@ -90,30 +90,59 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Based on many runs, the average run time for these 4 tests is around
-250 seconds, with 320 seconds being the ceiling.  In any way, the
-default 120 seconds timeout is inappropriate in my experience.
-
-Let's increase the timeout so these tests get a chance to completion.
-
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/avocado/intel_iommu.py | 2 ++
- 1 file changed, 2 insertions(+)
+ tests/avocado/cdrom.py | 41 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 41 insertions(+)
+ create mode 100644 tests/avocado/cdrom.py
 
-diff --git a/tests/avocado/intel_iommu.py b/tests/avocado/intel_iommu.py
-index 008f214397..9e7965c5df 100644
---- a/tests/avocado/intel_iommu.py
-+++ b/tests/avocado/intel_iommu.py
-@@ -25,6 +25,8 @@ class IntelIOMMU(LinuxTest):
-     :avocado: tags=flaky
-     """
- 
-+    timeout = 360
+diff --git a/tests/avocado/cdrom.py b/tests/avocado/cdrom.py
+new file mode 100644
+index 0000000000..c9aa5d69cb
+--- /dev/null
++++ b/tests/avocado/cdrom.py
+@@ -0,0 +1,41 @@
++# Simple functional tests for cdrom devices
++#
++# Copyright (c) 2023 Red Hat, Inc.
++#
++# Author:
++#  Cleber Rosa <crosa@redhat.com>
++#
++# This work is licensed under the terms of the GNU GPL, version 2 or
++# later.  See the COPYING file in the top-level directory.
 +
-     IOMMU_ADDON = ',iommu_platform=on,disable-modern=off,disable-legacy=on'
-     kernel_path = None
-     initrd_path = None
++import os
++
++from avocado.utils.iso9660 import iso9660
++from avocado_qemu import QemuSystemTest
++
++
++class Cdrom(QemuSystemTest):
++    """
++    :avocado: tags=block,cdrom,quick
++    :avocado: tags=machine:none
++    """
++    def setUp(self):
++        super().setUp()
++        self.iso_path = os.path.join(self.workdir, "cdrom.iso")
++        iso = iso9660(self.iso_path)
++        iso.create()
++        iso.close()
++
++    def test_plain_iso_rw(self):
++        self.vm.add_args('-drive', f'file={self.iso_path}')
++        self.vm.launch()
++        query_block_result = self.vm.qmp('query-block')['return']
++        self.assertEqual(len(query_block_result), 1)
++        self.assertFalse(query_block_result[0]["inserted"]["ro"])
++
++    def test_media_cdrom_ro(self):
++        self.vm.add_args('-drive', f'file={self.iso_path},media=cdrom')
++        self.vm.launch()
++        query_block_result = self.vm.qmp('query-block')['return']
++        self.assertEqual(len(query_block_result), 1)
++        self.assertTrue(query_block_result[0]["inserted"]["ro"])
 -- 
 2.45.2
 
