@@ -1,123 +1,143 @@
-Return-Path: <kvm+bounces-22329-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22330-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4EF993D72A
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 18:45:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE7DE93D735
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 18:50:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AC64284377
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 16:45:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79E9528467C
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 16:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFC317C7D3;
-	Fri, 26 Jul 2024 16:45:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C7217C7D3;
+	Fri, 26 Jul 2024 16:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KCyVcWvn"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UcE/YCsU"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A541B21364
-	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 16:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E130521364;
+	Fri, 26 Jul 2024 16:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722012320; cv=none; b=MgWrDE5OM/huitWXlWEd0zJwYYIWfZYsNv0lCF5UIS9SF40OmKmeOmg7FO/hARLfuKwaRAWsGgFnIl0bqhWmQFJ8nH4zQfsW6FEaz8yQdeUJv1+XZrojQ/5E+eiZ98BppjZqTKfoS9vma+84p8GiuMUW+3+QmvXIdLuV0VYSClU=
+	t=1722012627; cv=none; b=QaZA1Q+sXcHiIkjETmu1PFtTD0AREsRA8x1lh5bmQcZvHvD7V4z3okxcRoU42oUClB/4FzkOtMlYV/12ZEWMdr9MSoMp8XyUTJi7oqpY6yx+9Fc0558wtZS4e5Sd5GqarLqtUy2pgmf8yAEBxoZkf5U1pyS1W+zue/C4Al/NCEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722012320; c=relaxed/simple;
-	bh=XJLgZuR3KviFafgvQJVTyFT3i3vA9AL6Ik6JXASwW1o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gyjLitmBo+Z0s1HQhdFdEdr3TU9rp76Hqr6ecYdhI8ElPPFbKov55ZHP0NOmikqoNXv9SYuibvKTAiNPJqU6DdAymKeRPhk4U+PXonkBCNUiothBxgBw+QTLefx0BwGIE/vsAfTawS7uMy0BOH2/6QjrlZsIm8pZsuPDoyLCnzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KCyVcWvn; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a7aada2358fso323913566b.0
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 09:45:18 -0700 (PDT)
+	s=arc-20240116; t=1722012627; c=relaxed/simple;
+	bh=rqbgT/0iYp0SyvwyUNh8ElGIQ4w4+Dw0nQzyKcM25qM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SnOTxeirQujVoSg07E4jCHEjUzPwYknywmH3FrAGTCWBxaZM3hRq+ghL7qSeSYwh73H+D2v+07unSvRKIkIvAYH9ebRq7/6dUBiFdltEaEThl6JRLqc7rbO/u31OpeGeg1bVynky3KNlkzCoY/GEau8b6ck4T4WBGksSTQVu3ks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UcE/YCsU; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722012317; x=1722617117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XJLgZuR3KviFafgvQJVTyFT3i3vA9AL6Ik6JXASwW1o=;
-        b=KCyVcWvnVGyUSwYZnn4xUjfyQxCdBfd/87QnDHAokuzIV4Aztu+TaHAsMg2XoslXOR
-         w2EnhUFbn/dPhsNYOHCOUx8XN2jnL5weLSDllY9YJ9SOMYc4tHKBHDYijCbAuES0Zf9m
-         H4A7zxnTcjIJJu8YH/bnaoAjAqPN5vsbt5UpOhY0XecXf95N9imAB9DTP0VNu+SsC7df
-         1EyZt9vJw2QJb5w6mFfQAOU4m0mOl4+9EoXeaWA/T9WpzVIIwS2Tvr3DQr2/Moe7rU9K
-         SrE5QWTIdh/iCsOueke6yVb47KBki8wGw/SfbS8nM8NJACZzsQXMwLPrVnxhjC3AoQZt
-         hjQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722012317; x=1722617117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XJLgZuR3KviFafgvQJVTyFT3i3vA9AL6Ik6JXASwW1o=;
-        b=jWfo9tY5r+FH/0XJcI3FyRsh+t0xxOTJzQERLLfqmjknNoOaJbk4R8CwfQaXWYYav7
-         N4g4ZfXT75fU+c9WHIwmDdI3ekRSI8dVA54BsFmS9hLVrUYwMGjI22vhm8zz7TicHOww
-         vrJiDZRPznbBU9hsV1krH4oVMilxwt6abTvwcc3nfpxLaa/aFxzVrFRTYohFAlKhmKci
-         c5sZN/iqqu+wcTMACJJ2M0nkVK753mXxblJFgbXtHKZPLkouayL3NQ6uPHbyMAG4uBA4
-         rdZOoCpkvGzYb8+YQmgeIjn71PGOCoYdLPGn7Hr+w7TW8+6MMRvObWoITFqEjfqC6gMC
-         YRTw==
-X-Forwarded-Encrypted: i=1; AJvYcCWMBG3tVMG4On1vusP1haPEkWTh++PUDgI3NBwnfTEgMhadz6SqdOlY2Wj6L6bUHqMDGb1IyHo9ka5idjE+UvJat32D
-X-Gm-Message-State: AOJu0YwctrZjWQ11sXyalB2xEO1JP6nPwHdip5olB/vtmDldRo9V9ECX
-	Z3FmLRsBXNfX/3ae6PvkLHpqw3vzMewxh+Ej9sxhHhEzalAKkOI8HAufj7ppu49qk913gI9PBTR
-	KH3UWnibVSbWsUXiJUhk7+IZ5bDrcDsksZ7io
-X-Google-Smtp-Source: AGHT+IEs6xxkecDHpoDt8aXv2saqRhNdcaqmQyIQMaHfq1aVGzWAr+xECNfHIFDYKnmrMq7rARexHpPAvEgy9LjO4gE=
-X-Received: by 2002:a17:907:9705:b0:a6f:6337:1ad5 with SMTP id
- a640c23a62f3a-a7d3fa3f679mr11658966b.27.1722012316474; Fri, 26 Jul 2024
- 09:45:16 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1722012626; x=1753548626;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=LunzKZL6emWKetW1H3wwaEoDFwJcR/2MIjOK6DAsJmI=;
+  b=UcE/YCsUtQxG+zGIiJ4nVx+3okKvVaD9+wqpKFoLU4oiAeTg5N38wcMa
+   yv3F7aFbT194t+4YxNJ3/b5RxP/6MAAfXSmwQvl6tatqdRicbczDQl4cL
+   7gOqR2MavUNTEx3Bp+Pe0bfdM2GgS92jvg408XVkJkHxpmit9v5DYSomc
+   c=;
+X-IronPort-AV: E=Sophos;i="6.09,239,1716249600"; 
+   d="scan'208";a="744977504"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 16:50:19 +0000
+Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:41594]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.0.129:2525] with esmtp (Farcaster)
+ id dd7c83a3-7c90-419d-98f4-4e8089f8113d; Fri, 26 Jul 2024 16:50:18 +0000 (UTC)
+X-Farcaster-Flow-ID: dd7c83a3-7c90-419d-98f4-4e8089f8113d
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Fri, 26 Jul 2024 16:50:18 +0000
+Received: from [192.168.9.159] (10.106.83.8) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Fri, 26 Jul 2024
+ 16:50:17 +0000
+Message-ID: <4e5c2904-f628-4391-853e-37b7f0e132e8@amazon.com>
+Date: Fri, 26 Jul 2024 17:50:15 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240709132041.3625501-1-roypat@amazon.co.uk>
-In-Reply-To: <20240709132041.3625501-1-roypat@amazon.co.uk>
-From: Yosry Ahmed <yosryahmed@google.com>
-Date: Fri, 26 Jul 2024 09:44:40 -0700
-Message-ID: <CAJD7tkbeHVwABajRis0hHx9WLQ+yvnr=8gHQeEQcAi_BW9fAGQ@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/8] Unmapping guest_memfd from Direct Map
-To: Patrick Roy <roypat@amazon.co.uk>
-Cc: seanjc@google.com, pbonzini@redhat.com, akpm@linux-foundation.org, 
-	dwmw@amazon.co.uk, rppt@kernel.org, david@redhat.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, willy@infradead.org, graf@amazon.com, derekmn@amazon.com, 
-	kalyazin@amazon.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, dmatlack@google.com, tabba@google.com, 
-	chao.p.peng@linux.intel.com, xmarcalx@amazon.co.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 14/18] KVM: Add asynchronous userfaults,
+ KVM_READ_USERFAULT
+To: James Houghton <jthoughton@google.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.org>, Axel Rasmussen
+	<axelrasmussen@google.com>, David Matlack <dmatlack@google.com>,
+	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <roypat@amazon.co.uk>, <kalyazin@amazon.com>,
+	"Paolo Bonzini" <pbonzini@redhat.com>
+References: <20240710234222.2333120-1-jthoughton@google.com>
+ <20240710234222.2333120-15-jthoughton@google.com>
+Content-Language: en-US
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <20240710234222.2333120-15-jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D008EUC001.ant.amazon.com (10.252.51.165) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On Tue, Jul 9, 2024 at 6:21=E2=80=AFAM Patrick Roy <roypat@amazon.co.uk> wr=
-ote:
->
-> Hey all,
->
-> This RFC series is a rough draft adding support for running
-> non-confidential compute VMs in guest_memfd, based on prior discussions
-> with Sean [1]. Our specific usecase for this is the ability to unmap
-> guest memory from the host kernel's direct map, as a mitigation against
-> a large class of speculative execution issues.
+Hi James,
 
-Not to sound like a salesman, but did you happen to come across the RFC for=
- ASI?
-https://lore.kernel.org/lkml/20240712-asi-rfc-24-v1-0-144b319a40d8@google.c=
-om/
+On 11/07/2024 00:42, James Houghton wrote:
+> It is possible that KVM wants to access a userfault-enabled GFN in a
+> path where it is difficult to return out to userspace with the fault
+> information. For these cases, add a mechanism for KVM to wait for a GFN
+> to not be userfault-enabled.
+In this patch series, an asynchronous notification mechanism is used 
+only in cases "where it is difficult to return out to userspace with the 
+fault information". However, we (AWS) have a use case where we would 
+like to be notified asynchronously about _all_ faults. Firecracker can 
+restore a VM from a memory snapshot where the guest memory is supplied 
+via a Userfaultfd by a process separate from the VMM itself [1]. While 
+it looks technically possible for the VMM process to handle exits via 
+forwarding the faults to the other process, that would require building 
+a complex userspace protocol on top and likely introduce extra latency 
+on the critical path. This also implies that a KVM API 
+(KVM_READ_USERFAULT) is not suitable, because KVM checks that the ioctls 
+are performed specifically by the VMM process [2]:
+	if (kvm->mm != current->mm || kvm->vm_dead)
+		return -EIO;
 
-The current implementation considers userspace allocations as
-sensitive, so when a VM is running with ASI, the memory of other VMs
-is unmapped from the direct map (i.e. in the restricted address
-space). It also incorporates a mechanism to map this memory on-demand
-when needed (i.e. switch to the unrestricted address space), and
-running mitigations at this point to make sure it isn't exploited.
+ > The implementation of this mechanism is certain to change before KVM
+ > Userfault could possibly be merged.
+How do you envision resolving faults in userspace? Copying the page in 
+(provided that userspace mapping of guest_memfd is supported [3]) and 
+clearing the KVM_MEMORY_ATTRIBUTE_USERFAULT alone do not look 
+sufficient to resolve the fault because an attempt to copy the page 
+directly in userspace will trigger a fault on its own and may lead to a 
+deadlock in the case where the original fault was caused by the VMM. An 
+interface similar to UFFDIO_COPY is needed that would allocate a page, 
+copy the content in and update page tables.
 
-In theory, it should be a more generic approach because it should
-apply to VMs that do not use guest_memfd as well, and it should be
-extensible to protect other parts of memory (e.g. sensitive kernel
-allocations).
+[1] Firecracker snapshot restore via UserfaultFD: 
+https://github.com/firecracker-microvm/firecracker/blob/main/docs/snapshotting/handling-page-faults-on-snapshot-resume.md
+[2] KVM ioctl check for the address space: 
+https://elixir.bootlin.com/linux/v6.10.1/source/virt/kvm/kvm_main.c#L5083
+[3] mmap() of guest_memfd: 
+https://lore.kernel.org/kvm/489d1494-626c-40d9-89ec-4afc4cd0624b@redhat.com/T/#mc944a6fdcd20a35f654c2be99f9c91a117c1bed4
 
-I understand that unmapping guest_memfd memory from the direct map in
-general could still be favorable, and for other reasons beyond
-mitigating speculative execution attacks. Just thought you may be
-interested in looking at ASI.
+Thanks,
+Nikita
 
