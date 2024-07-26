@@ -1,143 +1,110 @@
-Return-Path: <kvm+bounces-22330-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22331-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE7DE93D735
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 18:50:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A38A93D776
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 19:17:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79E9528467C
-	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 16:50:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 073A92834FD
+	for <lists+kvm@lfdr.de>; Fri, 26 Jul 2024 17:17:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48C7217C7D3;
-	Fri, 26 Jul 2024 16:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2FF817C7D7;
+	Fri, 26 Jul 2024 17:17:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UcE/YCsU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A9hXAh1r"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E130521364;
-	Fri, 26 Jul 2024 16:50:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B018E11C83
+	for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 17:17:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722012627; cv=none; b=QaZA1Q+sXcHiIkjETmu1PFtTD0AREsRA8x1lh5bmQcZvHvD7V4z3okxcRoU42oUClB/4FzkOtMlYV/12ZEWMdr9MSoMp8XyUTJi7oqpY6yx+9Fc0558wtZS4e5Sd5GqarLqtUy2pgmf8yAEBxoZkf5U1pyS1W+zue/C4Al/NCEs=
+	t=1722014255; cv=none; b=W0XLYNNUXYpW3u8BVii25ieTDdtGbWfF1qY7+TVT7RKfGjC8yUtjYznyKR1ekTc1ybGOGhI22PIEbyFK4mnYPv36A1zgkv14r2a0Tol3Fe2mKvJ+Pq/Rw2vV2TUeb8KwmmUg/WW83yIQ8i4uZXj3Fkh43QEI3wkwCCJy/D8bz7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722012627; c=relaxed/simple;
-	bh=rqbgT/0iYp0SyvwyUNh8ElGIQ4w4+Dw0nQzyKcM25qM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=SnOTxeirQujVoSg07E4jCHEjUzPwYknywmH3FrAGTCWBxaZM3hRq+ghL7qSeSYwh73H+D2v+07unSvRKIkIvAYH9ebRq7/6dUBiFdltEaEThl6JRLqc7rbO/u31OpeGeg1bVynky3KNlkzCoY/GEau8b6ck4T4WBGksSTQVu3ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UcE/YCsU; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722012626; x=1753548626;
-  h=message-id:date:mime-version:reply-to:subject:to:cc:
-   references:from:in-reply-to:content-transfer-encoding;
-  bh=LunzKZL6emWKetW1H3wwaEoDFwJcR/2MIjOK6DAsJmI=;
-  b=UcE/YCsUtQxG+zGIiJ4nVx+3okKvVaD9+wqpKFoLU4oiAeTg5N38wcMa
-   yv3F7aFbT194t+4YxNJ3/b5RxP/6MAAfXSmwQvl6tatqdRicbczDQl4cL
-   7gOqR2MavUNTEx3Bp+Pe0bfdM2GgS92jvg408XVkJkHxpmit9v5DYSomc
-   c=;
-X-IronPort-AV: E=Sophos;i="6.09,239,1716249600"; 
-   d="scan'208";a="744977504"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jul 2024 16:50:19 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.10.100:41594]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.0.129:2525] with esmtp (Farcaster)
- id dd7c83a3-7c90-419d-98f4-4e8089f8113d; Fri, 26 Jul 2024 16:50:18 +0000 (UTC)
-X-Farcaster-Flow-ID: dd7c83a3-7c90-419d-98f4-4e8089f8113d
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.223) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 26 Jul 2024 16:50:18 +0000
-Received: from [192.168.9.159] (10.106.83.8) by EX19D022EUC002.ant.amazon.com
- (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Fri, 26 Jul 2024
- 16:50:17 +0000
-Message-ID: <4e5c2904-f628-4391-853e-37b7f0e132e8@amazon.com>
-Date: Fri, 26 Jul 2024 17:50:15 +0100
+	s=arc-20240116; t=1722014255; c=relaxed/simple;
+	bh=E/YjdKK5bjss9OX+5ucQe4BKWN/mL0wIoUPIY+Awg6A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T4UEIZUwNJgMopR+s2j887ENHn4kY72RnYJKgL9OjkPoJmekmd4Kj1I14zN4OsLZVi9bqaZvG3cN1IVne0wk7v/6CUnhDs+31NRU3MJZo/PyJLK91eEXCt8ZoJXLeoXQER3zFhmFgSc0VEOrfktPyoF0A2Nv14oRp7dXOZGTX8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A9hXAh1r; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722014252;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OApdFCzqo5jT5gQz6j/mnTgntG4SRH6PuXi40PJMctc=;
+	b=A9hXAh1rx93md+S+Spcw7CZEzwmIRIgu8g//w8YYZk8ridcjpaa7QILmVb8LRM68pMgorp
+	QnqkcW2K/El2txnsnI/GO8Vzol6otEr+wNh30CVdJDTq1Yb5CNcoYRcQaioF0522IKsNFB
+	gBN1oFwoBYsygixJwR+OVVLxp+YNIKE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-483-h9tT8wyyPG2ANBd8I3_PiQ-1; Fri, 26 Jul 2024 13:17:30 -0400
+X-MC-Unique: h9tT8wyyPG2ANBd8I3_PiQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-368442fef36so1738468f8f.0
+        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 10:17:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722014249; x=1722619049;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OApdFCzqo5jT5gQz6j/mnTgntG4SRH6PuXi40PJMctc=;
+        b=JhTDdOUQt0/Zl/cxMwdyY6u/HRY4eLazM4GmHp6tTNIUfDllsCdq5wxmgJv4HPwlGj
+         xXmd09LkkPmcnJ+VLUomSqNmHggkqvXfAP0e+y5NC0al0ox+dYVVF1OrQa9XUAJR2jER
+         EsQhqDaqt0QjZwvT8rkpo/rjfE/esHAXRdXC1YMErp39R+uYKtLCeL+O/Sn5cCpiCXNR
+         Ln1qWXG37B31P6x+YChKpa1RPnNgxMcToFA1Sxpq7ReethRfgMRXznAU2M+oEs8ghmfV
+         rcJm8Qw1pcej96flWF5mNM+wK8IwzayxmqYc73icA47kpykbWaNekOmnJPdQJCBcUzmn
+         cF4w==
+X-Forwarded-Encrypted: i=1; AJvYcCU4EnLz/0P3h2NFBBEog78jhCoOWNOsreEeYo69JmK0q+sl1CRnIukCHCgcONfypHjYALOzojHN2pejWrO1qNtUNP3V
+X-Gm-Message-State: AOJu0YxB6Gw+g1OhJFsx/eLLpVyiAX++DfcstcsXAkL4SO39ny8xHAzo
+	SWC1U9Y/ZQmPbangZmbblUOm8gyJU/tIJPSXjNSe1v8iD7y7unWOFqIugZYOXdoilaRFwMf9Y2c
+	iz39Y0HHqZ4YRo/obIa33MoDnDN6VtuIDgThjemHMcEJPORFV/Vgc6MNwLHjlk7h4s+0siInjib
+	EykOwXMGEc7eU65+gLvSWnM/8w
+X-Received: by 2002:adf:f00c:0:b0:368:7943:8b1f with SMTP id ffacd0b85a97d-36b5d0d0f9dmr299725f8f.43.1722014249598;
+        Fri, 26 Jul 2024 10:17:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFd1VNkfisws3kDZNVAAV056jx+FRvLl+xH4R2DpmtBRfzO3QhrpvL1Lk+cyt7pRxN2vcc4zzJXuPT7qynxKRI=
+X-Received: by 2002:adf:f00c:0:b0:368:7943:8b1f with SMTP id
+ ffacd0b85a97d-36b5d0d0f9dmr299705f8f.43.1722014249240; Fri, 26 Jul 2024
+ 10:17:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: <kalyazin@amazon.com>
-Subject: Re: [RFC PATCH 14/18] KVM: Add asynchronous userfaults,
- KVM_READ_USERFAULT
-To: James Houghton <jthoughton@google.com>
-CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.org>, Axel Rasmussen
-	<axelrasmussen@google.com>, David Matlack <dmatlack@google.com>,
-	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<kvmarm@lists.linux.dev>, <roypat@amazon.co.uk>, <kalyazin@amazon.com>,
-	"Paolo Bonzini" <pbonzini@redhat.com>
-References: <20240710234222.2333120-1-jthoughton@google.com>
- <20240710234222.2333120-15-jthoughton@google.com>
-Content-Language: en-US
-From: Nikita Kalyazin <kalyazin@amazon.com>
-Autocrypt: addr=kalyazin@amazon.com; keydata=
- xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
- JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
- BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
- IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
- ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
- ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
- ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
- abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
-In-Reply-To: <20240710234222.2333120-15-jthoughton@google.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EX19D008EUC001.ant.amazon.com (10.252.51.165) To
- EX19D022EUC002.ant.amazon.com (10.252.51.137)
+References: <20240724080858.46609-1-lei4.wang@intel.com> <CABgObfYHK+N68pOamxA4nT6iZUvEDeUN-AkNwEE9jgnig3AfNw@mail.gmail.com>
+ <SA1PR11MB673499AE31632832A91042E3A8B42@SA1PR11MB6734.namprd11.prod.outlook.com>
+In-Reply-To: <SA1PR11MB673499AE31632832A91042E3A8B42@SA1PR11MB6734.namprd11.prod.outlook.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Fri, 26 Jul 2024 19:17:17 +0200
+Message-ID: <CABgObfYQhnT0B+jQEBrqucSDnbrY1FBRhoRRdou-u5icNkbvMg@mail.gmail.com>
+Subject: Re: [PATCH] target/i386: Raise the highest index value used for any
+ VMCS encoding
+To: "Li, Xin3" <xin3.li@intel.com>
+Cc: "Wang, Lei4" <lei4.wang@intel.com>, Marcelo Tosatti <mtosatti@redhat.com>, 
+	"qemu-devel@nongnu.org" <qemu-devel@nongnu.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi James,
+On Fri, Jul 26, 2024 at 3:12=E2=80=AFAM Li, Xin3 <xin3.li@intel.com> wrote:
+> > Hi, can you put together a complete series that includes all that's nee=
+ded for
+> > nested FRED support?
+>
+> We can do it.
+>
+> Just to be clear, this patch is not needed to enable nested FRED, but to
+> fix the following vmx test in kvm-unit-tests, otherwise we get:
+>     FAIL: VMX_VMCS_ENUM.MAX_INDEX expected: 29, actual: 19
 
-On 11/07/2024 00:42, James Houghton wrote:
-> It is possible that KVM wants to access a userfault-enabled GFN in a
-> path where it is difficult to return out to userspace with the fault
-> information. For these cases, add a mechanism for KVM to wait for a GFN
-> to not be userfault-enabled.
-In this patch series, an asynchronous notification mechanism is used 
-only in cases "where it is difficult to return out to userspace with the 
-fault information". However, we (AWS) have a use case where we would 
-like to be notified asynchronously about _all_ faults. Firecracker can 
-restore a VM from a memory snapshot where the guest memory is supplied 
-via a Userfaultfd by a process separate from the VMM itself [1]. While 
-it looks technically possible for the VMM process to handle exits via 
-forwarding the faults to the other process, that would require building 
-a complex userspace protocol on top and likely introduce extra latency 
-on the critical path. This also implies that a KVM API 
-(KVM_READ_USERFAULT) is not suitable, because KVM checks that the ioctls 
-are performed specifically by the VMM process [2]:
-	if (kvm->mm != current->mm || kvm->vm_dead)
-		return -EIO;
+But neither bit is defined without nested FRED (and failures if you
+use -cpu host,migratable=3Dno are expected).
 
- > The implementation of this mechanism is certain to change before KVM
- > Userfault could possibly be merged.
-How do you envision resolving faults in userspace? Copying the page in 
-(provided that userspace mapping of guest_memfd is supported [3]) and 
-clearing the KVM_MEMORY_ATTRIBUTE_USERFAULT alone do not look 
-sufficient to resolve the fault because an attempt to copy the page 
-directly in userspace will trigger a fault on its own and may lead to a 
-deadlock in the case where the original fault was caused by the VMM. An 
-interface similar to UFFDIO_COPY is needed that would allocate a page, 
-copy the content in and update page tables.
+Paolo
 
-[1] Firecracker snapshot restore via UserfaultFD: 
-https://github.com/firecracker-microvm/firecracker/blob/main/docs/snapshotting/handling-page-faults-on-snapshot-resume.md
-[2] KVM ioctl check for the address space: 
-https://elixir.bootlin.com/linux/v6.10.1/source/virt/kvm/kvm_main.c#L5083
-[3] mmap() of guest_memfd: 
-https://lore.kernel.org/kvm/489d1494-626c-40d9-89ec-4afc4cd0624b@redhat.com/T/#mc944a6fdcd20a35f654c2be99f9c91a117c1bed4
-
-Thanks,
-Nikita
 
