@@ -1,57 +1,56 @@
-Return-Path: <kvm+bounces-22458-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22459-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D64B93E04B
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 19:11:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29D9E93E04C
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 19:11:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 209E31F21AD2
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 17:11:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63254B2130A
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 17:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCE74186E50;
-	Sat, 27 Jul 2024 17:11:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5579C186E5E;
+	Sat, 27 Jul 2024 17:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=j.neuschaefer@gmx.net header.b="UcecXxtU"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=j.neuschaefer@gmx.net header.b="rnTojTub"
 X-Original-To: kvm@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC46717D378
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 347361822F8
 	for <kvm@vger.kernel.org>; Sat, 27 Jul 2024 17:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722100275; cv=none; b=a7WWk4UDkCRMkmmOes3O0kJ8LEezBdyqGR3470Fy9LC2+5hH/OTS/IkO3sJHlObS6noBYQgcM7ddhs8TXCKtv3YWWLR7/n1q3cbI0TGcuhAdTbmEm7ZnQtGyBbUvkdYklokN0POfJ0Xoe85GrBEyGbHwy0NVm88eHp/qXnml+UQ=
+	t=1722100275; cv=none; b=gjcIsVysdiyHj/A9JsRqlEmUpLEhmrYSz7k1cPFqpxiUPOrsU1eiPgQKMoPxSw5dcQOMa8HZfCiZsFA/I3A8UBem5BaFfQF+CAHfU6e8OMBdI4gJf0gSUPnXP0v+bYyjhgn8wDSx1B4AaCCAanbNJOkg2UZw0JNhybJ58MSCY3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722100275; c=relaxed/simple;
-	bh=+QGizWLkG/bwzGD47n/r3cVTOgICOkcfpeC8DqQsJvw=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=gcO/IDuMLodeS2bRWAsKzy3aO6bO72V14qpyjn3Sz7PblWzB17SGdrvy/UDdwofKGY9vqQtdSLvKoAgYG+hD4N6mZbCWyQ4L1jRtjlnasojIMr1sUOXsdzodrhrXgdAnxLl24Vk3WZpFwnAcrBMKOMp0ts0mN3lUasASIcmzm2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=j.neuschaefer@gmx.net header.b=UcecXxtU; arc=none smtp.client-ip=212.227.15.18
+	bh=2k4psoqOPffmscdCWHgApM8s/rFOSeg/eybuLJR/yZs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=MtDhvGDgX4bWNjFDjbrhkrG35lyWZe98XxRLJHXUJopUezg2++8OMhVE0f1TmsrfAuFvJkHKYtNDv2gNlE45EiCa5wa5bnjT83c6nPvTXWDo99XH54ITf0bsONP2NfZa69FjQZyca4znZjtCJC0U5hX2Z1OvbkIHxzF7capQBgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=j.neuschaefer@gmx.net header.b=rnTojTub; arc=none smtp.client-ip=212.227.15.19
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
 	s=s31663417; t=1722100267; x=1722705067; i=j.neuschaefer@gmx.net;
-	bh=aM0XqP3f4aRUq0CuyRI0CgQQUhDZ0QNd8Qzog5myM94=;
-	h=X-UI-Sender-Class:From:Subject:Date:Message-Id:MIME-Version:
-	 Content-Type:Content-Transfer-Encoding:To:Cc:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
+	bh=swBoFVNFjIlFqqBEQ8QUYMA2NSSds0ph4YbtsEYzyKg=;
+	h=X-UI-Sender-Class:From:Date:Subject:MIME-Version:Content-Type:
+	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=UcecXxtUsFZI2gq9DvjhdmpQrRgF644wKxJgNz5iX6r/LDfCJqNhuc7W3913q1xz
-	 XvItcEm7N5LPk4/XlIDF1+f9P+qRiLMFlIlhCPIwLiLeIbS7LR/Ad7AMkzTkoSR3c
-	 6mOATfCSwmFfL+yRMSmrHLp+Ctt0upKPPCwgt/+0OCYEgXx1MlRHs/WUvulc+3rjr
-	 p8Xk8BU4He8f8rExO9159UDDBlMqUg3op/4Gk2xdGAGhjTpl+p4eL+k9xtM5Yk7fW
-	 saGgYyLGDfOr1s1Msby+r7ijME9bfmDHXcaX5pvXET6UGXbtxkXvFU1rw5Pm2NRGX
-	 2Q72LdQRMw0ArWTVpA==
+	b=rnTojTubB19Up4jdlc2E9NPUrgWr7HThPmAPsEpafusSIR++UTcVW7GZtOxpz8Lj
+	 RrErh9IyMwQa2FUAcdiMQv+ttWLG9mk2NvpwyphgtKPbzbUeCTpiGbCgtVeWTuGd1
+	 y2nnqy6wWMGZKWVBBZlmbSAJ4mpXYibC4lLyvpZknlnlBqGHsWKopWZ6K765lg3rO
+	 +LaUTbEOLxvrnk86BCLkOxN+s8ADa2d5JVYxaKI7jc/iCk0M0TD8WW9YYgjwEY+8D
+	 gyEShsClNCseyaAhXMqONNSFg8k54CaZAS811Obi83bA6pDrbDmk3tyPun1dK6TWA
+	 fewy9S45UTi7AHxCow==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from probook ([89.1.58.183]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MWics-1snCMM46tk-00Ned9; Sat, 27
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1M4axg-1sXCyz1Vlm-00B85O; Sat, 27
  Jul 2024 19:11:07 +0200
 From: =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
-Subject: [PATCH kvmtool v2 0/2] Fix compilation with musl-libc based
- toolchains
-Date: Sat, 27 Jul 2024 19:11:01 +0200
-Message-Id: <20240727-musl-v2-0-b106252a1cba@gmx.net>
+Date: Sat, 27 Jul 2024 19:11:02 +0200
+Subject: [PATCH kvmtool v2 1/2] Switch to POSIX version of basename()
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,63 +59,69 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-X-B4-Tracking: v=1; b=H4sIACUqpWYC/13MQQ6CMBCF4auQWVvTToWKK+9hWCAdYBIppMUGQ
- 3p3K0uX/8vLt0MgzxTgVuzgKXLg2eXAUwHd2LqBBNvcgBIv0qAR0zu8xLXUXVVZetZaQb4unnr
- eDubR5B45rLP/HGpUv/UPiEpIoUuptMW+Nq28D9N2drRCk1L6Ai+mgaqWAAAA
+Message-Id: <20240727-musl-v2-1-b106252a1cba@gmx.net>
+References: <20240727-musl-v2-0-b106252a1cba@gmx.net>
+In-Reply-To: <20240727-musl-v2-0-b106252a1cba@gmx.net>
 To: kvm@vger.kernel.org
 Cc: Alyssa Ross <hi@alyssa.is>, 
  =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
 X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1722100266; l=724;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1722100266; l=912;
  i=j.neuschaefer@gmx.net; s=20240329; h=from:subject:message-id;
- bh=1giGqHatKP2OutmLNTLEafvs7x9MpV5wdKSXJS/2nsU=;
- b=kwVfnpnFPYWLh9uk+RGF7o8a0ZpR+dShvCXwT1bdUmMjXRLD/eRKFe7NoP5Mw9Vkbl0H0d4m9
- i1RQVmtSPIuCzzkBc4Ijs5a/vXOkq4DHGMfdQQRN+A0D0b0YJQwzRX2
+ bh=2m/JDnXc4n6lAD/EHrapM+X4fY61n4spC8jbBUZkrDE=;
+ b=7soL1lPuUdAGjf5pnHbwtaSNSKzMAk+d0x/+5RLnmDM+H0JEPWz7D7rDpPjpjamqrJDZAz0Dt
+ 2NRUFb31fXhDj9B9kzCmkN6yj+XFBSbPV6TiTGscZ2+gMMDbEkTV2bi
 X-Developer-Key: i=j.neuschaefer@gmx.net; a=ed25519;
  pk=NIe0bK42wNaX/C4bi6ezm7NJK0IQE+8MKBm7igFMIS4=
-X-Provags-ID: V03:K1:/cJthvZ9h4FKVakpOEBbiIM8SM+cOFIp2PwJb0agoZNDylAi9iB
- Hk833KVD49UuOzyi41qaOJBJSP0OIdxlUEThtf/XvkcOCsz6Epl8DMSIrZQwTYQe2wO/5Dp
- FypkLMzOmmA+gpNPD6WQQptE4/GOroGHVXDg0KBVF6/HiM1B8zvKXVKcSnryyDQmR60/H9b
- uDz/JI3VRy7X11qFVT8ew==
+X-Provags-ID: V03:K1:2oafHmtkoJKAg9jDbY4+jYbc+4LOq0EJaVnqrlbQ/QF+yEjKqCw
+ KF+i12+ilpft6fygPqyq8BYsbrvwCY5MJWDMm95UvK86KN1094la7y4eixKYVCXorAf3vqa
+ Q0/0qyGo9iIUKrAwa4lsINOtzr0hc95rbNVkFp6ojr1G4mK5EiUkzMBNzM6OUvUUCm7vTXO
+ G15n5RbDicaYjP1pEeGkQ==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:o/6uAGlYDRI=;qIWh7bn47s4OJ8ydmptgbPwIdE5
- GgO9V+a4W+53rRl37YdWcvx85j/SwI51kkBCAlMODIKnNi5EHJHZ5VEb9yexlh81yj6byemwk
- +VAT5KLwXe5BFypb713IzS3cuA6qclrD8kqEc7iD+7F4//KEbKzxc5no79WBveVK+s04ekK42
- hj15xA0pw7nwZOiqxv+DcqcH88eUNuBs6FVZf97ASRblOQL9BoGsafy1jrRbSxUMkpf2eXJQZ
- H6D+5eQzKAaN4MPusZ8M6psQyYf7gTxo83XRALiro7CvKzM/Q9Zzu812sgXTqaFJ2IUIWg5DN
- kCPRswhJbUrs9sBo3KVH90pfnYgb8ZdDM2LCCHYPJnzUAQEauByIg6ZO+GsN79McPfF4DlrlX
- jLy3k34cQmMGotLN8V7gPyK43xLDLz73n/1Fmn5Q4TYqSvGr/+3XT4Eynea3mKDVs34+VNJGz
- QZeyGOLm2WJ4Q3zkELn8b3Ih7h0dSWr9XPGPyofvEQQ3EKwZJNlP/oKU2iL15cfTCiDDht6Qq
- IsUF4TGrH++rVSlFJ3ZyxTweAR01hPwJSXjWaUkFz+Mn4HEJqMLvFZwl3TmVzFlRW0p9MAhqD
- 3Vw1aNJ/WFrQyNm0vM7IlbFiHTpmU7H0s91pGagELyGZWzTGxdlJTNk61evBplYdvTwBFItUE
- evScpB351xBn4xL3rKZQ2/yJxFYnt4R8JT8xSTrmQ9hgrWlJA8NZ/IR5YU6t+UfdbjJoL/abh
- ioSCSCLQp7ZYGsErFPM+fwWJRkTQj5iSwrY/p1vi+rWqLZOQ9T4S5HQkyr5n3nv6fBczxtUuW
- Wbw1k7LlhZjotiEr732KUNCw==
+UI-OutboundReport: notjunk:1;M01:P0:nl6Nj17KOZY=;mgFxCfgGYsTwZbOuJM9ALDQcZkB
+ P/NGb2tO/GgJbMHdBe8DzmcuNP3jiCAtIHvqdS3dNMp0w8zb5zdbANUfLi3vM8p60RhMea+XK
+ ncEgqx4iA71hVPrWBqQP9hzEXA4BULF2T/FYXmcwU8Pbjcx88rvTLaXDabyOr6o2BaqMTZot7
+ NVsyCp9DuyDo75aL9Lg0FRLjsPP9eNnXDNI1dvR6w3Uv7/r018tAeVa5IdNAJmmkE0nwlEa1r
+ LaecPlj0gEBm0DGxjrFN13JaTc0RTBdwiJ3PatsqyK0AYt2MRd4asLPkj8Zm2JAbXu9x0xnOX
+ Oct8iNHSpbuU8PZuMTSBsaDRhe/CgmIDHlgOx96wn8fXv24PB7ddhukk8gphFm2yNGyA+NGkI
+ 6tU9r0woiRu9nczCc3wToVZtnUqlPdbs9OM7dM6IrHx9KBPUW8WBPBkXSMxUSY5mb9yoyAbFg
+ 68fplCgWf3kVhM4R111fmJ5d0uTexDmNxjh6AYf+k21uz3BFARC/lV0jxZspMcZR/S+O0/Av/
+ 19/g+HqACz6elKpouJbtqgWQ48CAbqTddDX4vWogekqJ6u+v6kdnelvAuH5KMuL+o43zeq9kz
+ FHBlyFAN+r7VcuyLP4KzhUDoz7s32MQKasSKVvVmDn9q0rVL32Ehexqm+FxklPFwsEO3ICO0L
+ Tc/H8c0wp0QZ/XqFX5Gp0Ak+u4inMt8liwQcjq9D9Bh2VI+Pfhldz5y8KneA3aZ67lr7QHjK2
+ DuHADgdBhEnqs0C/4gQAh64ZP6ESjU5B/DBpTog2l2eiOhRZbDpmgjvHsdmyANk6PK9IQ69cL
+ +5CiebufMx+dJoqVRq3ABRiA==
 
-This patchset enables kvmtool to build on musl-libc.
-I have also tested that it still builds on glibc.
+There are two versions of the basename function: The POSIX version is
+defined in <libgen.h>, and glibc additionally provides a GNU-specific
+version in <string.h>. musl-libc only provides the POSIX version,
+resulting in a compilation failure:
 
+vfio/core.c:538:22: error: implicit declaration of function 'basename' [-W=
+error=3Dimplicit-function-declaration]
+  538 |         group_name =3D basename(group_path);
+      |                      ^~~~~~~~
+
+Reviewed-by: Alyssa Ross <hi@alyssa.is>
 Signed-off-by: J. Neusch=C3=A4fer <j.neuschaefer@gmx.net>
 =2D--
-Changes in v2:
-- Be explicit about GNU vs. POSIX versions of basename
-- Link to v1: https://lore.kernel.org/r/20240727-musl-v1-0-35013d2f97a0@gm=
-x.net
+ vfio/core.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-=2D--
-J. Neusch=C3=A4fer (2):
-      Switch to POSIX version of basename()
-      Get __WORDSIZE from <sys/reg.h> for musl compat
+diff --git a/vfio/core.c b/vfio/core.c
+index 3ff2c0b..8f88489 100644
+=2D-- a/vfio/core.c
++++ b/vfio/core.c
+@@ -3,6 +3,7 @@
+ #include "kvm/ioport.h"
 
- include/linux/bitops.h | 2 +-
- vfio/core.c            | 1 +
- 2 files changed, 2 insertions(+), 1 deletion(-)
-=2D--
-base-commit: ca31abf5d9c3453c852b263ccb451751b29b944b
-change-id: 20240727-musl-853c66deb931
+ #include <linux/list.h>
++#include <libgen.h>
 
-Best regards,
+ #define VFIO_DEV_DIR		"/dev/vfio"
+ #define VFIO_DEV_NODE		VFIO_DEV_DIR "/vfio"
+
 =2D-
-J. Neusch=C3=A4fer <j.neuschaefer@gmx.net>
+2.43.0
 
 
