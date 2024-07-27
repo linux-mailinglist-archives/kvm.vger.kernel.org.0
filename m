@@ -1,207 +1,115 @@
-Return-Path: <kvm+bounces-22448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 442B093DC6D
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 02:21:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 172BB93DDCE
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 10:11:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8CE0FB2B021
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 00:21:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 485F81C215CC
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 08:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F5B115BB;
-	Sat, 27 Jul 2024 00:06:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E14242058;
+	Sat, 27 Jul 2024 08:11:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Me5oqkNG"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=j.neuschaefer@gmx.net header.b="p6ZE6nZm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32D67195
-	for <kvm@vger.kernel.org>; Sat, 27 Jul 2024 00:06:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAA7381BE
+	for <kvm@vger.kernel.org>; Sat, 27 Jul 2024 08:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722038801; cv=none; b=GE43yvWf9upGoZREKvPzgavwaAjnTjbbCtY7RnoZCmOWSUg69b4weThrljAJp6NpIMhCzMVq7KQhA+7rEel4n9ZUZcOAdW7TosXMJgk/39zACnvEgRDFcSX3rHaeOvy35ZZHyQMSsKAw7ljzhNPs42fGLF62uXx25EE4NoR0kV8=
+	t=1722067888; cv=none; b=oUPf87g3dA8wDTf75SGJ6fRf3sz0rq5EoTCEfEbsNurPqnUA7HamvF+q0WQZyw7ZCHYqeiT3Ay6SIk4SVJimjyHUSLBd/UzNLcI4dhuxp2vd+0tNALtRwdDeYocVLriamZLDb9Hry39xjyA3fw4t/jpK2Sma+q+1VTvq1tn9iwM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722038801; c=relaxed/simple;
-	bh=clGgwaThq7CrSz1vGebpyTV6G8p+QKZkor0wZ+7eg5w=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Ga9zGHOLDOlDS3OEQC23LXdA2A+KYznkTbmuh/1svjdD+Y2hRzkfjP5kl0edyRNYixga+0PsuP8M+BkszWEfjDiXbEpJP24WlGoEYqo7hJUqUr92PUMrlFBwncGSlXAW0mKD0vnfaE3jKv2icvO8h405ldTDd1Y2TtIOBPmSL2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Me5oqkNG; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7163489149fso1436371a12.3
-        for <kvm@vger.kernel.org>; Fri, 26 Jul 2024 17:06:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722038799; x=1722643599; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=TYFTf2gvPk70qhiNuy0y1/EVQ4Xy1vYcEPYyOPCAl+o=;
-        b=Me5oqkNGGYa9Vs0ClpJhtSk2AMed00/DPQ9gTetb5nYyyugM1++s0UUjb1i50DIdsM
-         epd62yLOTj5l9rrG9gBAD9B3aMytmu0+BaLcLJXhycjpsXILdZ8lEi5HWcqjJW0wHltV
-         WiNRWoZS1SXUvAJKy68m/+OORi8pS598c0bh5dhylviPYOjNYcjH1jld3W1lCWW910Uw
-         3lYJ2lrDrmzCdm9EdcLgdqVaQg7eg+u2t3+34wOZlQETe6UH7kBVdhHW2cqkx3nzqyhc
-         XXxuFBHCScFHA+trWY67YluywlWytaXZo3VaMxOeIcRh1Q3nVEqqAxxtAkkphmYs3kJw
-         +AhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722038799; x=1722643599;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TYFTf2gvPk70qhiNuy0y1/EVQ4Xy1vYcEPYyOPCAl+o=;
-        b=aRsG18EdHUsSBXVr68aIsFAgMULVGlq7PS6ZGZXDvYryxgJ3GgEii7tdCBdasV0ctX
-         liyInUzfYFQa4Bi/ZyZCa5el3JcxWM20lkCrUMXK8DojQZ/gmkvul6/axq0neCxoQVf/
-         CDEbBWMdlOQ3bT0Yo1TA28+dWBSCmhYnkI5uv8FXxyX8z9JmNg1DoWHc7YBa6giAzbl0
-         rT4E79qUrg5fSH1QT19DzzeoqTJG4kxRpUAydfu5l7BYdPQ6G3sXVrHhiqiq0X1IZicL
-         nTc5Lqkn3LF6tZCbzRflxRK+n7uJoHUGSWNQpDmOAAGq7R6a8FCPM7YotxXwupolkrzK
-         mVSg==
-X-Forwarded-Encrypted: i=1; AJvYcCV3Sto7gkfUt2JB6y94iw3hSDiUwZxbYCbPR2HfEETyLcNKeat55hFQ0tAyIJszEDm6BEiQxwXQY+deEQHIBwJMY2Kh
-X-Gm-Message-State: AOJu0YwCIQBSbg8sOrup09Y42CZsnhxcFQv5rW6Km4/MUGYYsVrvSJFx
-	LwRcW60WqUzNUEdogWyMujaduursW9/IQGqzDwOCHAG2+/TATgTGnioxilCbUzn1bR3izcISFVS
-	5aQ==
-X-Google-Smtp-Source: AGHT+IHRLn6X/3YQ2HHqsOw+80PDOfGcWeXsdrPLJ+UYpZu0hqZ+ortJBIDhkLrR0/WGfl3sAoAsnArH88U=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a65:6918:0:b0:75d:16f9:c075 with SMTP id
- 41be03b00d2f7-7ac8fe31243mr2147a12.9.1722038799164; Fri, 26 Jul 2024 17:06:39
- -0700 (PDT)
-Date: Fri, 26 Jul 2024 17:06:37 -0700
-In-Reply-To: <2e531204c32c05c96e852748d490424a6f69a018.camel@redhat.com>
+	s=arc-20240116; t=1722067888; c=relaxed/simple;
+	bh=NPQBan003xEKL1xN/oa3jKi0LYVVQVNrv3DgrkTuo5w=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=sOduZa2xe9bstaU1jK3v/F1WQo2ro95gSS6IHYCvAA7wXVWvEr5nY8HkFqo0T1VBybsr6eQK51wKtzxdhbL47ptlKfs/R3P11CkJjPu1XAM6MSyO7zahgTvQ/qp8s7xXvnaYY51dPUnIq3b+MqcMJGFhDooTxvpE4iJz6cHgD9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=j.neuschaefer@gmx.net header.b=p6ZE6nZm; arc=none smtp.client-ip=212.227.17.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1722067884; x=1722672684; i=j.neuschaefer@gmx.net;
+	bh=TJQRtvBzqpxrRsLfCXvDiD1Roovd0bKqxUAqdiIVHtA=;
+	h=X-UI-Sender-Class:From:Subject:Date:Message-Id:MIME-Version:
+	 Content-Type:Content-Transfer-Encoding:To:Cc:cc:
+	 content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=p6ZE6nZm8xboYK40/fTmezh+9ualnEsuWtp3Qhe6ieKhT5jNktOhn2Y875fUnOJB
+	 lArmrM/A+76GaP0UhaitMvs7+TTVaUkLPMl651ODhQhaR1cEeKycDvb/ZRxJTdUKy
+	 dV6XTRbbs40mJ3hSV8dkXrETf2agMgh4adnQYJqC9LahbAOhjtFBa2np9FfjVeKgL
+	 14QyRuZoueSkXVQshbcNhqOthw08jnsc1WZMS68WsRUlYpB2nkwcg/Smdw4plpPli
+	 v8Xi8sBGvHkVGtI0CLU+OpZrgmHsUk8qj0IbAJSnf8MsG9T2g3GuU7iGBadqC+Xbh
+	 9UR5FFduj4CUH1xpfA==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from probook ([89.1.58.183]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MA7GM-1sRWdi0P3C-006nLr; Sat, 27
+ Jul 2024 10:11:24 +0200
+From: =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
+Subject: [PATCH kvmtool 0/2] Fix compilation with musl-libc based
+ toolchains
+Date: Sat, 27 Jul 2024 10:11:13 +0200
+Message-Id: <20240727-musl-v1-0-35013d2f97a0@gmx.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-27-seanjc@google.com>
- <2e0f3fb63c810dd924907bccf9256f6f193b02ec.camel@redhat.com>
- <ZoxooTvO5vIEnS5V@google.com> <2e531204c32c05c96e852748d490424a6f69a018.camel@redhat.com>
-Message-ID: <ZqQ6DWUou8hvu0qE@google.com>
-Subject: Re: [PATCH v2 26/49] KVM: x86: Add a macro to init CPUID features
- that KVM emulates in software
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
-	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
-	Robert Hoo <robert.hoo.linux@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
+X-B4-Tracking: v=1; b=H4sIAKGrpGYC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDcyNz3dzS4hxdC1PjZDOzlNQkS2NDJaDSgqLUtMwKsDHRsbW1ABZ4wyF
+ WAAAA
+To: kvm@vger.kernel.org
+Cc: =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1722067883; l=573;
+ i=j.neuschaefer@gmx.net; s=20240329; h=from:subject:message-id;
+ bh=Bzp+grm500h9wdDVsdIBjo9qHq/I5UYNIIYBKuPkuEI=;
+ b=rXYMco6dkO9Bg5gTsVearma6EfnzJOOi5LQM5hDOnc27MmfaVOQ+6pvArMPOgIc03NVjkKIJH
+ F9EGBvMxCuEBXHbNsFuXyxBs7rFMNmR7XG0GajFqw3tT8PHgxZ3rxH+
+X-Developer-Key: i=j.neuschaefer@gmx.net; a=ed25519;
+ pk=NIe0bK42wNaX/C4bi6ezm7NJK0IQE+8MKBm7igFMIS4=
+X-Provags-ID: V03:K1:DPL1IBJweTlS+yuJC5G3ooYwJtFz4BTmstqiUyphZEN4C/mjKeF
+ AZMHVSt/Tplrb3I2XRNjF7JCDlPf0qLm9gbmsL/yvfATFvzHRZ6KQwjfT4LXtBh9F0mVxUG
+ AGIj5Dy8YmCWSJcKU1Q9opSOC73bhh6x5zJW+lp01aEAMqjmpM8tNRHIdE0wpcpFJcdYcZN
+ hcNOojqtMM+peiX94Q+CA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:OwqquDGncG8=;9VQN7OS7690bGR6nf3vyVhVPu3T
+ 46m+PrX/wWCJ4xtsiVxD4AFkxxASUBcmr9pWy5/a3ySg4IqlxIlb8d0DiwfQK9I61v9JpROnq
+ KBciFFgAOC1eMyLOtxp8OEtZaIKVVAguXITzOal15HKAATXpKwLH4jH81MBCEUgiZgjyu3HTf
+ deSgqIuLdQ5HtazOY+pb0S6TLsBzEFomJ406srG8GnZMfTH6NhZ891e6ZODD92muXQqoFhvx1
+ 8wLMWFuhpik+d8uPqky0potytUMTwHsdB5YNqS6VhzGeO6zIJ8/S/PeXfRs2YPySzdyvVrMhw
+ qtOR3Y+4+ykkmi5BbMUYmeBERfLp/D+Vqnh12WWKf6SKxy6nBVtsTgq8ADCZvgDDdRv9LbwLG
+ 0gGDGNCigAy5Cs9b/iG1fUaowRHgL8nL96gZjUviXjRhs44zWVNH8yRHD6mXll0R4eDcZfdAy
+ bjO9tQUsvzsUfN29xgukmTfKBD++E/u4gmmHyZ/tVTChQcqR3FpMRTspVzYZfhQCpBrL7OnBp
+ 8ZLVuXiuUvO+FIsqpRX71h7M2PMfRXUs2n5Q5Is3N0jELH7gMN1DTq6br5BL/BcigyKoSaJQn
+ hQ7N8NPgPWA779zK+/i8ge+zx7LPOqKGGt1kJivjon+STWmuRZYdUPGWnUkMJNduAnHz0ar+4
+ blsJ6STNgbx7c0UJYr3L5fOK9dl5u7yqrJr2dYW6FaW6YWQvCSaJKumkPOLqgBI+yGCEsgktV
+ VJWUCZXZLaxu9a6A9wXu1YFg0euVrXLCJRQ7jNw81YHoe00J8hiYuZv0YC2r5oWKQoX1cAv8F
+ lICIwWWPa2qsb923WpKkvzAw==
 
-On Wed, Jul 24, 2024, Maxim Levitsky wrote:
-> On Mon, 2024-07-08 at 15:30 -0700, Sean Christopherson wrote:
-> > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
-> > > On Fri, 2024-05-17 at 10:39 -0700, Sean Christopherson wrote:
-> > > There are several advantages to this:
-> > > 
-> > > - more readability, plus if needed each statement can be amended with a comment.
-> > > - No weird hacks in 'F*' macros, which additionally eventually evaluate into a bit,
-> > >   which is confusing.
-> > >   In fact no need to even have them at all.
-> > > - No need to verify that bitmask belongs to a feature word.
-> > 
-> > Yes, but the downside is that there is no enforcement of features in a word being
-> > bundled together.
-> 
-> As I explained earlier, this is not an issue in principle, even if the caps are not
-> grouped together, the code will still work just fine.
+This patchset enables kvmtool to build on musl-libc.
+I have also tested that it still builds on glibc.
 
-I agree that functionally it'll all be fine, but I also want the code to bunch
-things together for readers.  We can force that with functions, though it means
-passing in more state to kvm_cpu_cap_init_{begin,end}().
+Signed-off-by: J. Neusch=C3=A4fer <j.neuschaefer@gmx.net>
+=2D--
+J. Neusch=C3=A4fer (2):
+      Get basename() from <libgen.h> for musl compat
+      Get __WORDSIZE from <sys/reg.h> for musl compat
 
-> kvm_cpu_cap_init_begin(CPUID_1_ECX);
->                                 /* TMA is not passed though because: xyz*/
-> kvm_cpu_cap_init(TMA,           0);
-> kvm_cpu_cap_init(SSSE3,         CAP_PASSTHOUGH);
->                                 /* CNXT_ID is not passed though because: xyz*/
-> kvm_cpu_cap_init(CNXT_ID,       0);
-> kvm_cpu_cap_init(RESERVED,      0);
-> kvm_cpu_cap_init(FMA,           CAP_PASSTHOUGH);
-> ...
->                                 /* KVM always emulates TSC_ADJUST */
-> kvm_cpu_cap_init(TSC_ADJUST,    CAP_EMULATED | CAP_SCATTERED);
-> 
-> kvm_cpu_cap_init_end(CPUID_1_ECX);
-> 
-> ...
-> 
-> ...
-> 
-> And kvm_cpu_cap_init_begin, can set some cap_in_progress variable.
+ include/linux/bitops.h | 2 +-
+ vfio/core.c            | 1 +
+ 2 files changed, 2 insertions(+), 1 deletion(-)
+=2D--
+base-commit: ca31abf5d9c3453c852b263ccb451751b29b944b
+change-id: 20240727-musl-853c66deb931
 
-Ya, but then compile-time asserts become run-time asserts.
+Best regards,
+=2D-
+J. Neusch=C3=A4fer <j.neuschaefer@gmx.net>
 
-> > > - Merge friendly - each capability has its own line.
-> > 
-> > That's almost entirely convention though.  Other than inertia, nothing is stopping
-> > us from doing:
-> > 
-> > 	kvm_cpu_cap_init(CPUID_12_EAX,
-> > 		SF(SGX1) |
-> > 		SF(SGX2) |
-> > 		SF(SGX_EDECCSSA)
-> 
-> That trivial change is already an improvement, although it still leaves the problem
-> of thinking that this is one bit 'or', which was reasonable before this patch series,
-> because it was indeed one big 'or' but now there is lots of things going on behind
-> the scenes and that violates the principle of the least surprise.
-> 
-> My suggestion fixes this, because when the user sees a series of function calls,
-> and nobody will assume anything about these functions calls in contrast with series
-> of 'ors'. It's just how I look at it.
-
-If it's the macro styling that's misleading, we could do what we did for the
-static_call() wrappers and make them look like functions.  E.g.
-
-	kvm_cpu_cap_init(CPUID_12_EAX,
-		scattered_f(SGX1) |
-		scattered_f(SGX2) |
-		scattered_f(SGX_EDECCSSA)
-	);
-
-though that probably doesn't help much and is misleading in its own right.  Does
-it help if the names are more verbose? 
- 
-> > 	);
-> > 
-> > I don't see a clean way of avoiding the addition of " |" on the last existing
-> > line, but in practice I highly doubt that will ever be a source of meaningful pain.
-> > 
-> > Same goes for the point about adding comments.  We could do that with either
-> > approach, we just don't do so today.
-> 
-> Yes, from the syntax POV there is indeed no problem, and I do agree that putting
-> each feature on its own line, together with comments for the features that need it
-> is a win-win improvement over what we have after this patch series.
-> 
-> > 
-> > > Disadvantages:
-> > > 
-> > > - Longer list - IMHO not a problem, since it is very easy to read / search
-> > >   and can have as much comments as needed.
-> > >   For example this is how the kernel lists the CPUID features and this list IMHO
-> > >   is very manageable.
-> > 
-> > There's one big difference: KVM would need to have a line for every feature that
-> > KVM _doesn't_ support.
-> 
-> Could you elaborate on why?
-> If we zero the whole leaf and then set specific bits there, one bit per kvm_cpu_cap_init.
-
-Ah, if we move the the handling of boot_cpu_data[*] into the helpers, then yes,
-there's no need to explicitly initialize features that aren't supported by KVM.
-
-That said, I still don't like using functions instead of macros, mainly because
-a number of compile-assertions become run-time assertions.  To provide equivalent
-functionality, we also would need to pass in extra state to begin/end() (as
-mentioned earlier).  Getting compile-time assertions on usage, e.g. via
-guest_cpu_cap_has(), would also be trickier, though still doable, I think.
-Lastly, it adds an extra step (calling _end()) to each flow, i.e. adds one more
-thing for developers to mess up.  But that's a very minor concern and definitely
-not a sticking point.
-
-I agree that the macro shenanigans are aggressively clever, but for me, the
-benefits of compile-time asserts make it worth dealing with the cleverness.
-
-[*] https://lore.kernel.org/all/ZqKlDC11gItH1uj9@google.com
 
