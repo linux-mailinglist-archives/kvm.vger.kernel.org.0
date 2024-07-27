@@ -1,121 +1,79 @@
-Return-Path: <kvm+bounces-22457-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22460-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3436D93E04A
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 19:11:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FB5493E0BD
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 21:53:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D96F12810DF
-	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 17:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98F521C20D4C
+	for <lists+kvm@lfdr.de>; Sat, 27 Jul 2024 19:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B71186E4F;
-	Sat, 27 Jul 2024 17:11:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680BE28E0F;
+	Sat, 27 Jul 2024 19:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=j.neuschaefer@gmx.net header.b="f2WJCzos"
+	dkim=pass (2048-bit key) header.d=hfel.co.uk header.i=@hfel.co.uk header.b="yOAtsOhE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from imx.hfel.co.uk (imx.hfel.co.uk [185.209.160.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E29153362
-	for <kvm@vger.kernel.org>; Sat, 27 Jul 2024 17:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9900E1D69E
+	for <kvm@vger.kernel.org>; Sat, 27 Jul 2024 19:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.209.160.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722100274; cv=none; b=lDYGvYZi1GA5Ap/D4HkQO55ddjpcwCBt53xxC+cDiMZnztHrOUytpMrGrLeqUBNOwa5yqkWw5/NFsA9MJvoMBM2uFTg9icUL8LI4Fz03X75nVybO+z4xuUYyjGo/15OfSR6h9c6Vfz5H/W5EYuCsMkBm0tXm048kSv0LwFB1HCo=
+	t=1722110026; cv=none; b=kBXANTyH4p5iEDkLXlxV9x85/TcoPOiEUp/kEOzobERt7S/uqPZyJaqmTmeijGYL1xGF2ypKdgpRI7cdVpTsVNO0Cw/lugDsyXKxRjsaZTW71Fmd5pdglE08rQYnneLrl0EmwN4KcsCHneOHcmzoBQC7D/5/aU8hljEwWC4pMg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722100274; c=relaxed/simple;
-	bh=G1UG7Ym5QWsBDQqrKrtbV3yC3R4jZ+ZAMXPrVuycTlc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YTkP34szDdC48wqnoly5vzWyVK2UiG5FjiDcprinc2bw5iBpG0nWowsc37m0Qn19APDJ3+D3N3fXxlFG/31rkoaKWNoIXnblb+pGBs/xlmB/0f2mYc9RwW5r6tG6tpF8AvA+dUCOlMv5gXkOAA5rD3WDJgWhe+6pFpzS6NnFNwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=j.neuschaefer@gmx.net header.b=f2WJCzos; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1722100267; x=1722705067; i=j.neuschaefer@gmx.net;
-	bh=G1UG7Ym5QWsBDQqrKrtbV3yC3R4jZ+ZAMXPrVuycTlc=;
-	h=X-UI-Sender-Class:From:Date:Subject:MIME-Version:Content-Type:
-	 Content-Transfer-Encoding:Message-Id:References:In-Reply-To:To:Cc:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=f2WJCzosSh7HOEJhOD50wKYFkjZJhAW52HE4nsCamrOxyKcSgtEoO/TuKsdzG3Bj
-	 BfK0/5SBuLrn8wVTX7VUBPEkV4Qxit0S+2nhmSnZxUU+p32P+26X0cCEePHxTNuGU
-	 QeyHsgLxSZvaLlicKnBVBVu8SdBnhlX2wN2halN4IhhpgId54CpLwaixCSWehMK/k
-	 BrqR+eoYXb/GkI0coI4IMOSPjCUkyjIsB+YTmYuj0hyRNZXSIZ2nwR4Y5LSKSKadq
-	 rzFxKmh9gJ2XcKrWOr3ZVuHzbTGfchdveaquG3J53IRVrGT9EfeUCVYWOJcUR+6z6
-	 UKbfeLJNZtT9HKxaXQ==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from probook ([89.1.58.183]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1M72oH-1sdXi039Ch-00058L; Sat, 27
- Jul 2024 19:11:07 +0200
-From: =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
-Date: Sat, 27 Jul 2024 19:11:03 +0200
-Subject: [PATCH kvmtool v2 2/2] Get __WORDSIZE from <sys/reg.h> for musl
- compat
+	s=arc-20240116; t=1722110026; c=relaxed/simple;
+	bh=QpGUXo1p/U7TCvHhofv2wP5mWlKUkFjERkTq/aN26cY=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Zv0a9C7jFRjcG0FAwx6SsiAq2v5is/pJE0lE+DhOU///f5sywfCUv6y2BiFVWZz/9y3VPsVv1SlGLJ9pX1GReaOo4NlgrIWg3j6OZ6Hd0kViDG6uy5DGFJ8/YzsRs1GY2iBEsRPlETPna+XTtTqsJjZRUB1zg74kKSfdg45bQms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hfel.co.uk; spf=pass smtp.mailfrom=hfel.co.uk; dkim=pass (2048-bit key) header.d=hfel.co.uk header.i=@hfel.co.uk header.b=yOAtsOhE; arc=none smtp.client-ip=185.209.160.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hfel.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hfel.co.uk
+Received: from [45.145.42.199] (unknown [45.145.42.199])
+	by imx.hfel.co.uk (Postfix) with ESMTPA id E6F8099CF6
+	for <kvm@vger.kernel.org>; Sat, 27 Jul 2024 17:25:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hfel.co.uk;
+	s=default; t=1722101155;
+	bh=QpGUXo1p/U7TCvHhofv2wP5mWlKUkFjERkTq/aN26cY=; h=From:To:Subject;
+	b=yOAtsOhEAtMjssTuYWbe/AS6aO/NIioe/6hXjKfrVh/FoE5NF3St9pD1J6Oq+mj7W
+	 6n6maYau0nK1oZn/rcleoOiHtHbtEk28/y70PTPzwg3eh3UH8rw9ujj1RTr+I3mZ2E
+	 O/FIqCBso0OVYhEyAOy0DvXDLfnlt7dFFKr76nDCsMj9HBYcA1MmUUuSebAg8686kQ
+	 qF9IokTOYV2qN0eOOCuo05+pdy+cqVOv5St8MCMLko5sP13+xoc9cI9BgF7V7RpxH3
+	 3m1uax9seyUz3Sx5n3hKTBziViK8kG4KUXDg2B5HhDp3OySbgjW3YJweHCHzDGoQiP
+	 vkhNpJdTQtZ+A==
+Authentication-Results: imx.hfel.co.uk;
+	spf=pass (sender IP is 45.145.42.199) smtp.mailfrom=newman@hfel.co.uk smtp.helo=[45.145.42.199]
+Received-SPF: pass (imx.hfel.co.uk: connection is authenticated)
+Reply-To: officeinfo@capitalsforce.com
+From: Arthur Wilson<newman@hfel.co.uk>
+To: kvm@vger.kernel.org
+Subject: Collateral-Free Loan.
+Date: 27 Jul 2024 19:25:53 +0200
+Message-ID: <20240727192553.D8A4CC69C1C6D4EC@hfel.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain;
+	charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
-Message-Id: <20240727-musl-v2-2-b106252a1cba@gmx.net>
-References: <20240727-musl-v2-0-b106252a1cba@gmx.net>
-In-Reply-To: <20240727-musl-v2-0-b106252a1cba@gmx.net>
-To: kvm@vger.kernel.org
-Cc: Alyssa Ross <hi@alyssa.is>, 
- =?utf-8?q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1722100266; l=613;
- i=j.neuschaefer@gmx.net; s=20240329; h=from:subject:message-id;
- bh=tVOKWKwYU+dVSuJDiqNEpg66SUP9EyIq3cbfmNfFK8Y=;
- b=hK+P0jWNoM9nH+1tVHNZxUHQ1xDZ4rkvhuplKz6IShimJP7cFD8y6ldeERO7FLy93E1oxHRKI
- 1EAFbJISvGND0JvRyqf+eL+stDf3Eb8soaxgWFWwKpN2mGhw50UFZa3
-X-Developer-Key: i=j.neuschaefer@gmx.net; a=ed25519;
- pk=NIe0bK42wNaX/C4bi6ezm7NJK0IQE+8MKBm7igFMIS4=
-X-Provags-ID: V03:K1:cps0hYPM52FIxxZbADOopOzlR/CKTRTWsr52WuficotDgm6Ad/T
- Vd2bxvCiop3VgDFeW31gmS8OG33PUMJiRTZFPJTGO0scxH6Co9ayOa5Q334OIN5jiVY+opn
- vUF0BvUpdBLTq1N6a3kYvE9plE5UDbHJ4t0vIYmoDxZdGejSsr0uOhAnZeBofJl0hZKrIeF
- kMesFcrOjmu2wpVE50NWw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:SKoYa5LO7T4=;/QvVM+OtAjcBRgaNJv9bzP2TQsU
- W7mEoZWfDayFG6NtxPrBf8vr08j7g3N14Nl/n/JePUj40bm0P/usz3L5+peRUNcHzjUhLjY8t
- NdhQfccMVy0MbMnaerABUoHHI5tLyRprnmrM90bttUlsmTxJvd5vcpXpwtws+b9lxTk8Loudk
- KKN/ary+VKJSOKqyhZRr2RsigAGgx0Ro4oXjnCgPgrLSKiE3Jo9/i4N8Mb/PH6FwbpNBxIput
- Mq27bfRLEs75kUbjHYJRP/H/FF/cwcB/EnRzLh7+YV7+a7cblUQOLaQ5dOhGOJhpPvah4W3qS
- XAYCshVSEXUomSOArmW9wFTInNxjIT1DhSZeu+yUjtZuEaG6gLOF4Ya8PuSGQTRFI+JOrIPlE
- Ie7Hwmm+7TWN7Snqy6zlQT0+SyuVtKwz/t8r4GDrZd7/5QLZdAW91zGOIdwEXTzX26jZpCdEE
- uXNytYgj32sbQioaDuhgdihEEbAKLf1fRSMI/OyHt10O0dlKDxHBwy7Gyc5CRn3bPKJpCLBNh
- RtXubr3PVC9ti89HqedgFSp3xP0iqHay5w7cUONOj5EzB2RtX/9wTbYG7gv5A8CUPGUoAvokR
- yFtO8zz3ByL44Pg9F9Zg2vfyivcuibmK23ypNtHhXoP0KWkaSC2zXvWeJYUGcRSdgfoV+M4Yy
- 9cPid4uKeLvCc7/fhzkv9tI/lx7xJfu0RLw2w4BZW3jrWps1IgNHWlIa3ozVMlGvfYtYdhT0O
- z5dOyCGEVJgEje4vU4KtMom9wUzS2IgXt1l1PCfUDJW5l5EAW/SHJzxmFqcZE5cj9EG/kMljO
- w15zmpNy75aTYHJn0olAqscA==
 
-musl-libc doesn't provide <bits/wordsize.h>, but it defines __WORDSIZE
-in <sys/reg.h> and <sys/user.h>.
+Greetings!
 
-Signed-off-by: J. Neusch=C3=A4fer <j.neuschaefer@gmx.net>
-=2D--
- include/linux/bitops.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+We offer quick, collateral-free financing for economically viable=20
+projects and/or businesses of all sizes, including startups and=20
+existing businesses.
+If you are seeking funding for a specific shovel-ready project,=20
+you will be funded at 2% principal annual interest.
+If you would like to collaborate with us as a middleman/
+facilitator, you will earn 2% of the total project cost or loan=20
+as your commission for every successful loan or project funding=20
+deal facilitated by you.
+Please get in touch if this is of interest to you.
 
-diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-index ae33922..4f133ba 100644
-=2D-- a/include/linux/bitops.h
-+++ b/include/linux/bitops.h
-@@ -1,7 +1,7 @@
- #ifndef _KVM_LINUX_BITOPS_H_
- #define _KVM_LINUX_BITOPS_H_
-
--#include <bits/wordsize.h>
-+#include <sys/reg.h>
-
- #include <linux/kernel.h>
- #include <linux/compiler.h>
-
-=2D-
-2.43.0
-
+Regards,
+Arthur Wilson.
 
