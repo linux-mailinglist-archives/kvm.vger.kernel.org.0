@@ -1,153 +1,154 @@
-Return-Path: <kvm+bounces-22474-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22475-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0981C93E9C8
-	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 23:54:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A3D493E9E9
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 00:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3201C213DF
-	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 21:54:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B388281A83
+	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 22:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B43C87B3F3;
-	Sun, 28 Jul 2024 21:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0152F7BAEC;
+	Sun, 28 Jul 2024 22:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K0ReRI3R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m6JxWZj7"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oo1-f46.google.com (mail-oo1-f46.google.com [209.85.161.46])
+Received: from mail-oa1-f45.google.com (mail-oa1-f45.google.com [209.85.160.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED2E76F2E0;
-	Sun, 28 Jul 2024 21:54:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B7F28399;
+	Sun, 28 Jul 2024 22:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722203647; cv=none; b=R36cb9JEkNd2O7jhSGGkUjahvLBDFWuXRGi6JaSt6PtvY+Kxd5sQaq7R/8qKzKnbUv9jpqq7NsFo/g23KsvWqUAU3b0Wi/6EyPj6bENXFkqiBBDl2LVDRtgqsmWY3txV18J3KFePrXwKCMm1a7c/WntbWBcti0vQgxdOWramcag=
+	t=1722204388; cv=none; b=l3LMhxZmNsuoFohSpPwswzWCyBfh5XUD9XkCZoh9vBeNgQMoYLtPXkFV5DxaPXky1sZvcEEfdShR5kIvNaiRA7aTQffZi9s+UCNrD4O0PL04MZ7mpZ3hqMEq0vstq1lZWYxDmqJ4a2QS3QUTrGkWIXJdrLBJ+y77r1cZLLNzyWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722203647; c=relaxed/simple;
-	bh=+C/PIPaD6421joj/GWXpDjtLOsgHcGGcKsxopH953Uc=;
+	s=arc-20240116; t=1722204388; c=relaxed/simple;
+	bh=/Om46CZc4PtsVwKq9RtMi4ggxQSke4GiB3ovayUyC2U=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ISpYbn7oa39SjmdUT+jRJ4TaoNWFhsU/OYFANfTgSRQGGdQzpOROfhJJsA5WaNPya6vuYTLCzDrzmZOOCMhvUVj8cU3iaHzXkzYFp+Vg3TfZjd/FwH5LmLH5x4+C0gM0eYbT2YICyd6VQjcEXu79pDd1QxkYe+8qEJ0SFniwraQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K0ReRI3R; arc=none smtp.client-ip=209.85.161.46
+	 To:Cc:Content-Type; b=lycAHM6crCmNDi2eoDGWepqOW7mqoXVhuagHga1f4LFqVxlP9DlihwvlyUpJ8ZOVjDTG35+XBLVxhf6Fgu6h8iQ0GX2fUQG8ID8o6ZxIQxI0J5Gdrr/Xpu/EK04skLfD5ut/xQkM5nG1nIb06eaAg+dQAGnnlOVK9xq4KVLtyy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m6JxWZj7; arc=none smtp.client-ip=209.85.160.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5d5af7ae388so1304764eaf.0;
-        Sun, 28 Jul 2024 14:54:05 -0700 (PDT)
+Received: by mail-oa1-f45.google.com with SMTP id 586e51a60fabf-260e5b2dfb5so1950937fac.3;
+        Sun, 28 Jul 2024 15:06:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722203645; x=1722808445; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1722204385; x=1722809185; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Yp5X1TEr87hrQcZlApkbTdXfq9FpLIGhmw7b0AOp0ew=;
-        b=K0ReRI3Ri/Jz65GLjpBWK3BYbbXBTsENxfJWVd+fpalfM1NUSaAmQZyy4lNtt2OMtf
-         9lxYgAQSLFP4Vwt4hdD6U/htuNPVLBVMEZOSzZLTx24URpap0nhsWehGVUNJNUmBXnoC
-         A6ZQI4SeSPYdn9yvPoKLjJXrTv9boMuAqCtmmKvoonNFrDb5EjM8hiWFcowIBUAjelkM
-         UmGt/b7YotMbGID3OpVRGWggCFtBZJFZTTtZiCvP/uP2eR7QKiSYPFww0sPqvvtG3lO4
-         pQOCbt8EtS9zvZCPy2FnPYCwz7O4BjWK+8w9z782yThNWzm9BcuGQnfMqkF+NmuuqEOk
-         cz0Q==
+        bh=2PlRW1dSG2ar0Zr3x1aqaupGL6BKGnqIl5mXFxckCJI=;
+        b=m6JxWZj7uVJvNp2sqHw8D8TwrI6cvDfnsz5sHU/a1AI3x+2L7yxvI736oWjUOaQwmd
+         Lm57GmGFvEpnZiT6Ddrs9Vv4cKwhIH0ok+RM2j+/NyEcGl+Aupz12Q2TGJjcsQM6EvER
+         SKMM8M2RGOhSqli/YpAuDiJ5R9KyJEJATNeLYCSCff7BjMxeQ6vGXgUjIz5rhfc7LorR
+         OgG3UHV+bXXOpCsPVTH3tkdAqz8g0i3NLNFEqF7NndVv6fgsHgm35IjM046zNhEXpNJA
+         ztZhbnnEG86WrB/4L6NGAMTx2KaGQqpVQMg+37ELfoy6udavi+eX6Uwy9oQgoFN8L/LM
+         cLcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722203645; x=1722808445;
+        d=1e100.net; s=20230601; t=1722204385; x=1722809185;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Yp5X1TEr87hrQcZlApkbTdXfq9FpLIGhmw7b0AOp0ew=;
-        b=piG66+mCv9agbjymn9l4qSFg8XMsA7iW68kIWR95abDXNM4nKHHuNdBU5zOZz7TPC1
-         IpuCb+BmBQm4flmOMEz2TXNurjOLwTex3ZsU2+epVPHuGyO4kBZ5LDOJ+aCXmWYtSX15
-         lNsR+6nCZJWjl8JonOvm8v8iUTfrGd/8xRuuGWGVzIjf41OWdy0xHQMomMfPkCo36be3
-         wtAAFVgRZhJjI+bEgNVcHmP13AxE3vKdJmm5DpLQJXqjMP6i2vJHiiM2YAK0keopf9HS
-         +qKcZ37YCtzLLwrG07xvPQ9T6ZlJWWDOl8ChbiC2GdZpPhcwcbBN7iZUaWHlerQlG2/m
-         a8Lw==
-X-Forwarded-Encrypted: i=1; AJvYcCUn6ll9Fz7hM/Fci+X3xYceO1Bvh2UkEoACcCs7acdySPLOfvRURjENFPdKF/TegnHMNMait+Hf8wJZoo5t4xL73NZl/q8wM8dNJYFhkWxWLCO86fEGWeL82K9YKPOvc+2dAeAN/R2QRXAPRWuwi1FrsfnhptNiJHLR5tfatrgd8MIT8WrGzJLBHwVD1d2cLZbc9w/4nCIfMeznwUSGFEiyM7A0GwTDF7jOxLiF
-X-Gm-Message-State: AOJu0Yzm+oHtziCXC2bEUJHv9QuC0mZSvFEySua/ObV//7EKc3sjUGFx
-	YLvyRXirTwCHqXFp3J+RyoTlBDnohhn7Jzs8U5BhjGH00nXdkqoZ20+aOozBiiHBnDQ/mpBK/wa
-	HqmF9bR9nSo7B842is+iPCCK8dTw=
-X-Google-Smtp-Source: AGHT+IExiqE8SwBoar+SBdGvUoKTQ8aTZKE7dvIbMpV+Hz/pPT7kpLZKZhHhpV3bwaQ9cRA95CjTvrUaUpXJvozawmQ=
-X-Received: by 2002:a05:6870:8092:b0:254:ef42:f6f7 with SMTP id
- 586e51a60fabf-267d64e7210mr2447775fac.15.1722203644655; Sun, 28 Jul 2024
- 14:54:04 -0700 (PDT)
+        bh=2PlRW1dSG2ar0Zr3x1aqaupGL6BKGnqIl5mXFxckCJI=;
+        b=bnzdnI8+BamovbSqFdC3pc/f3OGNeYirqWkwEoivhc1+NeDgp1/beM6zklDpFy/daV
+         iY8LQXgqJPemhWpyoz+mumTcfz25t9apFSl702VuGtKD++udlsjnlApczfuWHHU5HSka
+         P/xiLwWIH1F/35ADRwh5KhsFs2KzaUY2L6zZ62Z3VoHd7fcblbkgHaamiNs/kPIrALxb
+         pNHhSjMYlDGyecBhKnXCVPk/gwVxm6Hc9cgyKlciDvHfCT0vmQRXayiHKBHnX477dwXg
+         etdPhxZ0L2lbNHT3Uw8VBA02X6ewqbdHU2s3LgwzCGQpImvZkhWp/02svFw1PNv02TJl
+         QFjw==
+X-Forwarded-Encrypted: i=1; AJvYcCU/NPfexldDKlP/VhBCVJSC+Zt3fG8oZYuWhwmP6n2u/4+acIr4DWlCvPGzyUzosonK+04vXTCpGHnfJXaBiHu825Rea/3Og7B41sPC5Xv7PYa3mLim+Xa4ArqNK1Y8GC7Hd+UjS3XX91MRhzldR5BpPyXMnD73OTy6bOOGW4SRGw1UsFu+3hZS+hvJ7/R3qm1wVQh25Kz7L3F8CFAUy8A11dT7Xo0ysB1w8JAh
+X-Gm-Message-State: AOJu0YwHkZ1Qk7VfdGn0nqvA8u3bl8PNxGL06iAAkytgO/LUzpwhCxF1
+	Flb8Ev3LPEB4cJu4ucenkvUJatvPWVBgpJJFzqvlvxUbNa9VLfhOamr1Xp4g2eLtgBeP9oAexqM
+	nATUu23iMBwuxXbxYGz9CbswuTeY=
+X-Google-Smtp-Source: AGHT+IF3/AMl+VL5PHR/DpM82Ipap8UKg9+sdjntJk+s+YWO/Ff8gSb9JdRn1a75fyaaDpHxZSylfC0YOgiPdWqx72U=
+X-Received: by 2002:a05:6870:e310:b0:261:858:1982 with SMTP id
+ 586e51a60fabf-267d4ef3b36mr7816424fac.36.1722204385516; Sun, 28 Jul 2024
+ 15:06:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710212555.1617795-4-amery.hung@bytedance.com> <ce580c81-36a1-8b3b-b73f-1d88c5ec72b6@salutedevices.com>
-In-Reply-To: <ce580c81-36a1-8b3b-b73f-1d88c5ec72b6@salutedevices.com>
+References: <20240710212555.1617795-1-amery.hung@bytedance.com>
+ <20240710212555.1617795-15-amery.hung@bytedance.com> <3ajts54ndduloqhl2uf7viyy7n5azu63i6waptvf3mzzwkrzr7@jebnovap7xxz>
+In-Reply-To: <3ajts54ndduloqhl2uf7viyy7n5azu63i6waptvf3mzzwkrzr7@jebnovap7xxz>
 From: Amery Hung <ameryhung@gmail.com>
-Date: Sun, 28 Jul 2024 14:53:53 -0700
-Message-ID: <CAMB2axNUbWD9=Xg8TkB8XBmjuNw9f==Njzvh4-OP8kNw40O0Lw@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 03/14] af_vsock: support multi-transport datagrams
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: stefanha@redhat.com, sgarzare@redhat.com, mst@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, 
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
-	bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
-	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, bpf@vger.kernel.org, 
-	bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
-	amery.hung@bytedance.com, xiyou.wangcong@gmail.com, kernel@sberdevices.ru
+Date: Sun, 28 Jul 2024 15:06:14 -0700
+Message-ID: <CAMB2axNS6QEBuj1vMToy80fXvtJEzo_MzTgYQ1xc7__6jXNAVA@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v6 14/14] test/vsock: add vsock dgram tests
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, 
+	wei.liu@kernel.org, decui@microsoft.com, bryantan@vmware.com, 
+	vdasa@vmware.com, pv-drivers@vmware.com, dan.carpenter@linaro.org, 
+	simon.horman@corigine.com, oxffffaa@gmail.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
+	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jul 28, 2024 at 1:40=E2=80=AFPM Arseniy Krasnov
-<avkrasnov@salutedevices.com> wrote:
+On Tue, Jul 23, 2024 at 7:43=E2=80=AFAM Stefano Garzarella <sgarzare@redhat=
+.com> wrote:
 >
-> Hi Amery
+> On Wed, Jul 10, 2024 at 09:25:55PM GMT, Amery Hung wrote:
+> >From: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> >
+> >From: Jiang Wang <jiang.wang@bytedance.com>
+> >
+> >This commit adds tests for vsock datagram.
+> >
+> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+> >Signed-off-by: Jiang Wang <jiang.wang@bytedance.com>
+> >Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> >---
+> > tools/testing/vsock/util.c       |  177 ++++-
+> > tools/testing/vsock/util.h       |   10 +
+> > tools/testing/vsock/vsock_test.c | 1032 ++++++++++++++++++++++++++----
+> > 3 files changed, 1099 insertions(+), 120 deletions(-)
+> >
+> >diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+> >index 554b290fefdc..14d6cd90ca15 100644
+> >--- a/tools/testing/vsock/util.c
+> >+++ b/tools/testing/vsock/util.c
+> >@@ -154,7 +154,8 @@ static int vsock_connect(unsigned int cid, unsigned =
+int port, int type)
+> >       int ret;
+> >       int fd;
+> >
+> >-      control_expectln("LISTENING");
+> >+      if (type !=3D SOCK_DGRAM)
+> >+              control_expectln("LISTENING");
 >
-> >  /* Transport features flags */
-> >  /* Transport provides host->guest communication */
-> > -#define VSOCK_TRANSPORT_F_H2G                0x00000001
-> > +#define VSOCK_TRANSPORT_F_H2G                        0x00000001
-> >  /* Transport provides guest->host communication */
-> > -#define VSOCK_TRANSPORT_F_G2H                0x00000002
-> > -/* Transport provides DGRAM communication */
-> > -#define VSOCK_TRANSPORT_F_DGRAM              0x00000004
-> > +#define VSOCK_TRANSPORT_F_G2H                        0x00000002
-> > +/* Transport provides fallback for DGRAM communication */
-> > +#define VSOCK_TRANSPORT_F_DGRAM_FALLBACK     0x00000004
-> >  /* Transport provides local (loopback) communication */
-> > -#define VSOCK_TRANSPORT_F_LOCAL              0x00000008
-> > +#define VSOCK_TRANSPORT_F_LOCAL                      0x00000008
->
-> ^^^ This is refactoring ?
->
-
-This part contains no functional change.
-
-Since virtio dgram uses transport_h2g/g2h instead of transport_dgram
-(renamed totransport_dgam_fallback to in this patch) of VMCI, we
-rename the flags here to describe the transport in a more accurate
-way.
-
-For a datagram vsock, during socket creation, if VMCI is present,
-transport_dgram will be registered as a fallback.
-
-During vsock_dgram_sendmsg(), we will always try to resolve the
-transport to transport_h2g/g2h/local first and then fallback on
-transport_dgram.
-
-Let me know if there is anything that is confusing here.
-
->
-> > +             /* During vsock_create(), the transport cannot be decided=
- yet if
-> > +              * using virtio. While for VMCI, it is transport_dgram_fa=
-llback.
->
->
-> I'm not English speaker, but 'decided' -> 'detected'/'resolved' ?
+> Why it is not needed?
 >
 
-Not a native English speaker either, but I think resolve is also
-pretty accurate.
+I think we actually need it. I will add control_write("LISTENING") in
+vsock_dgram_bind().
 
-Thanks,
+> BTW this patch is too big to be reviewed, please split it.
+
+Will do.
+
+Thank you,
 Amery
 
 >
+> Thanks,
+> Stefano
 >
-> Thanks, Arseniy
+> >
+> >       fd =3D socket(AF_VSOCK, type, 0);
+> >       if (fd < 0) {
+> >@@ -189,6 +190,11 @@ int vsock_seqpacket_connect(unsigned int cid, unsig=
+ned int port)
+> >       return vsock_connect(cid, port, SOCK_SEQPACKET);
+> > }
+> >
+
+[...]
 
