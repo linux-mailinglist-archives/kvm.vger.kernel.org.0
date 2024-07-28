@@ -1,65 +1,74 @@
-Return-Path: <kvm+bounces-22462-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22463-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2864B93E4B7
-	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 13:17:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1795693E5DB
+	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 17:27:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A737C1F2189C
-	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 11:17:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D8661F215A3
+	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 15:27:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E753A1BF;
-	Sun, 28 Jul 2024 11:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D8456B81;
+	Sun, 28 Jul 2024 15:27:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="boH6xZrx"
+	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="rD9C27cS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C378472;
-	Sun, 28 Jul 2024 11:16:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04D047F6B
+	for <kvm@vger.kernel.org>; Sun, 28 Jul 2024 15:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722165416; cv=none; b=g7b5DP1LNuxk2TdUuHSrN+qQC2X93e5cnDpLDHLhIn9FqB+2oyVN8d7RJZNDWRYhwJnHQtBOIVRwRrvJ/6Ll7wVLwyd2q1QcHqomy50Cg1+EPgH+rwbMk1f2L2CzWQaDC2hEed5wJb1nm+8dXSdSF8ampp1a6L8dtcWYFPLv6gY=
+	t=1722180470; cv=none; b=ZaNqLM5mUh+p+1p5M/Jr68kf5nl587lqX8OtEd0AV/gN179uEsdZ5X5Z/2fAt+yKxfy6sihNB/oTD1sZafZaPzICJpR2dh4PB7Rs9aA94FM+rUialvHgCpUVkvYZlwZ61bfa/VjTs9ZNLS/rlbYFKFwxsFwJ5wvhzszOtMYQQX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722165416; c=relaxed/simple;
-	bh=1JKGz+l/9tFKb3tLci1KBK86LYVt9Ga7B8yR/DX71fU=;
+	s=arc-20240116; t=1722180470; c=relaxed/simple;
+	bh=4ZHhvY1pzbs+Da7L0O/ii6TZaV0p/rp5WSzgkr33w8c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SOWDHCrdiv5Zwodd0uda5+uyQOnZhDbWOnKlvvzC6E4r2xOHYrU+b0j8edsqn5+c/5oqo95ycyJ5NjSHZduznHDjoZIte86PU0BAwLf0LwB7xcnKw3Du8BBIr6k8sFfFfJEtmK4S8UDxLkPehM2wFDkqJ5EMoAWAvBzIGMCSj0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=boH6xZrx; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722165414; x=1753701414;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=1JKGz+l/9tFKb3tLci1KBK86LYVt9Ga7B8yR/DX71fU=;
-  b=boH6xZrxboRbLq7VvEqB1ZdotbCgZZC5DZa6bhwxoy+XkyIZsF9etzyZ
-   XuCP5QNWaWFe3Q2WLF68gFZiW38dgARC0lT3sGXoc7jzqqpN2o2fhwO51
-   7Iv8jiWZ/33dNarxdDEQd9YwVcLiVwcusQTthOi7i2LJMut7fbXpnAbj3
-   uQthj5yCxp/J6tVDY/spdL9SBM6i7j6cog7/zGJrW3Nhc14oi1WxlJ65s
-   MpwbS7Gq1MCZmyk9b//9sjp3pT/f/hSiRDTDWbyfVAjFRX7nQ8rCF1VHW
-   A4ll1eHi8WRBu1fjGyxNiquczGC9dY1cmFC7w7tqBTJMYnhXmvopqgDZH
-   Q==;
-X-CSE-ConnectionGUID: ih42jCNUTb+7Uw2JNjLfvA==
-X-CSE-MsgGUID: pMShbKcdTOOsFyAZPrlcxg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11146"; a="37416188"
-X-IronPort-AV: E=Sophos;i="6.09,243,1716274800"; 
-   d="scan'208";a="37416188"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2024 04:16:53 -0700
-X-CSE-ConnectionGUID: oOIPNndLQUKUQA0YxAVaVQ==
-X-CSE-MsgGUID: 4O7e87TSTiqCnO1mXOsPWQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,243,1716274800"; 
-   d="scan'208";a="58476523"
-Received: from binbinwu-mobl.ccr.corp.intel.com (HELO [10.124.241.187]) ([10.124.241.187])
-  by orviesa005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jul 2024 04:16:47 -0700
-Message-ID: <18729cf6-bf3a-4a11-a9fc-a35792cd1736@linux.intel.com>
-Date: Sun, 28 Jul 2024 19:16:44 +0800
+	 In-Reply-To:Content-Type; b=f9KUXM2zuV6s7Uro7wJAROU0P2wakMErEgG2q7IWte1IylHwHGsznVNw+iVMuwcayIDcc9KHiImZo2uwrgk/GkGKrKwWjLOD+E6eMhXPetH6GSAlT+jP6n6DL9U8CINoYEzETYcgLn2VWBcn2qXeTX2Vv5vKX5xj07nWqqtOZvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=rD9C27cS; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-70aec66c936so1750498b3a.0
+        for <kvm@vger.kernel.org>; Sun, 28 Jul 2024 08:27:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1722180468; x=1722785268; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RLNZtX5NhiWjh8pTpiHyCLdAqm/MusJQss3pc8cjtvA=;
+        b=rD9C27cStL2+GyLlP9lYQF7geGII1r1AjeURzplqxbS/J/T5Z25qwdBkaqgIsnBfgV
+         TKi4xJVg57xJIXuOW65yyynZrl0Qo2I2JPfDKgJKfEBMARRWACZT6uxbVckhdRQoVrLi
+         7Kjnt4RynI5UjKpl/QnAEhGyvE/eWi0h60cshUMDj+z5Ru48O224tVdMJx9zf1Pn9RZK
+         ICsW8diiRbCpyjRRphCYFsnmNbqRqy1DwtjkbTr1unyzEZc/2SOsTMRcQk1SF6uA10k3
+         /bhT8MPOO0mlJLlNwPo/kzc4sZqyHOSiiXTbs8bCOH84vEesyq9WBzEu5Hvm5Zl74yWW
+         1uuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722180468; x=1722785268;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RLNZtX5NhiWjh8pTpiHyCLdAqm/MusJQss3pc8cjtvA=;
+        b=m2wroIC84ECKzDBT53Mq2el6sLSa2VqdWTjFEdf0xihgFMBCZNkhj18PjLia3CI+xk
+         8oS78DqpSnY2xpIS5K/wi0ZmU9u1Dvdy06feId9aWjPLUSt1cIsjTpwseuKh3BHl+d+D
+         Xeu5AIf0K1dzWc8Ha671OSbImMjL9NCmWOpW2v2FPyCZ9mPdrGWXBBLHk+XGzHZ7Ms72
+         cu26SML1OwkuyQJ13BMM2RLlHDspIxTl86fVzLWRvM38yE5j9fOo5JxiXfqEmOQ2cvJE
+         eyoic7i7F66Nxhby1CnMuYA+c34OPi9S8qtFJ4m4eZdx20jEKjjuQ8Y5xhhTRRfMReNn
+         dUVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUvLptAWChz41LOLu8+ZV/Mq87XGf4Ck2waRIKW468tW7KvJ1E5u6A/4ka68uPdXlkzZipExB5vPSgbMiw3v4ChXIFR
+X-Gm-Message-State: AOJu0YzEt7JuGkHoVP/XhWgbiWIX4Wx0Prn4GTNYCGHQEWmYnBn/AUs7
+	bAs5CQyOQaQHqcUHcL3EeJ9a7E/LB9g1rFkzObw/o6HBbrIUR48kBmUUKCXX7pU=
+X-Google-Smtp-Source: AGHT+IF3ctAx7D4BmK/J3K8ksZbvsUjXa+3JPF7azc14f59vwyWxf75VXj4f3Ql1F8QaYpsSFuIiqQ==
+X-Received: by 2002:a05:6a00:4fd2:b0:70b:3175:1f4f with SMTP id d2e1a72fcca58-70ecea40e8amr3771492b3a.16.1722180468007;
+        Sun, 28 Jul 2024 08:27:48 -0700 (PDT)
+Received: from ?IPV6:2400:4050:a840:1e00:32ed:25ae:21b1:72d6? ([2400:4050:a840:1e00:32ed:25ae:21b1:72d6])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead814233sm5419684b3a.124.2024.07.28.08.27.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 28 Jul 2024 08:27:47 -0700 (PDT)
+Message-ID: <27dda662-baef-4f09-86e0-168ab1d47a87@daynix.com>
+Date: Mon, 29 Jul 2024 00:27:43 +0900
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -67,130 +76,79 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v5 09/29] KVM: selftests: TDX: Add report_fatal_error
- test
-To: Sean Christopherson <seanjc@google.com>, Yan Zhao <yan.y.zhao@intel.com>
-Cc: Ackerley Tng <ackerleytng@google.com>, sagis@google.com,
- linux-kselftest@vger.kernel.org, afranji@google.com, erdemaktas@google.com,
- isaku.yamahata@intel.com, pbonzini@redhat.com, shuah@kernel.org,
- pgonda@google.com, haibo1.xu@intel.com, chao.p.peng@linux.intel.com,
- vannapurve@google.com, runanwang@google.com, vipinsh@google.com,
- jmattson@google.com, dmatlack@google.com, linux-kernel@vger.kernel.org,
- kvm@vger.kernel.org, linux-mm@kvack.org
-References: <ZhkhvtijbhxKKAEk@yzhao56-desk.sh.intel.com>
- <diqzr0f7jbj6.fsf@ctop-sg.c.googlers.com>
- <Zhz8xNpQoi0wCQgL@yzhao56-desk.sh.intel.com> <Zh7Iay40VQgNvsFW@google.com>
- <ZiBP/j6Ic7hGrbxN@yzhao56-desk.sh.intel.com> <ZibVbYawGJFcJqd1@google.com>
+Subject: Re: [PATCH 00/13] Bump Avocado to 103.0 LTS and update tests for
+ compatibility and new features
+To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+ David Woodhouse <dwmw2@infradead.org>,
+ =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ Leif Lindholm <quic_llindhol@quicinc.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
+ Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
+ Paolo Bonzini <pbonzini@redhat.com>
+References: <20240726134438.14720-1-crosa@redhat.com>
 Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <ZibVbYawGJFcJqd1@google.com>
+From: Akihiko Odaki <akihiko.odaki@daynix.com>
+In-Reply-To: <20240726134438.14720-1-crosa@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
+On 2024/07/26 22:44, Cleber Rosa wrote:
+> This is a *long* overdue update of the Avocado version used in QEMU.
+> It comes a time where the role of the runner and the libraries are
+> being discussed and questioned.
+> 
+> These exact commits have been staging on my side for over 30 days now,
+> and I was exceeding what I should in terms of testing before posting.
+> I apologize for the miscalculation.
+> 
+> Nevertheless, as pointed out, on the ML, these changes are needed NOW.
+> 
+> Some examples of runs in the CI can be seen below:
+> 
+> * Serial with 103.0 LTS (https://gitlab.com/cleber.gnu/qemu/-/jobs/7074346143#L220):
+>     RESULTS    : PASS 46 | ERROR 0 | FAIL 0 | SKIP 2 | WARN 0 | INTERRUPT 0 | CANCEL 0
+>     JOB TIME   : 432.63 s
+> 
+> * Parallel with 103.0 LTS (https://gitlab.com/cleber.gnu/qemu/-/jobs/7085879478#L222)
+>     RESULTS    : PASS 46 | ERROR 0 | FAIL 0 | SKIP 2 | WARN 0 | INTERRUPT 0 | CANCEL 0
+>     JOB TIME   : 148.99 s
+> 
+> Cleber Rosa (13):
+>    tests/avocado: mips: fallback to HTTP given certificate expiration
+>    tests/avocado: mips: add hint for fetchasset plugin
+>    tests/avocado/intel_iommu.py: increase timeout
+>    tests/avocado: add cdrom permission related tests
+>    tests/avocado: machine aarch64: standardize location and RO access
+>    tests/avocado: use more distinct names for assets
+>    tests/avocado/kvm_xen_guest.py: cope with asset RW requirements
+>    testa/avocado: test_arm_emcraft_sf2: handle RW requirements for asset
+>    tests/avocado/boot_xen.py: fetch kernel during test setUp()
+>    tests/avocado/tuxrun_baselines.py: use Avocado's zstd support
+>    tests/avocado/machine_aarch64_sbsaref.py: allow for rw usage of image
+>    Bump avocado to 103.0
+>    Avocado tests: allow for parallel execution of tests
+> 
+>   docs/devel/testing.rst                   | 12 +++++++
+>   pythondeps.toml                          |  2 +-
+>   tests/Makefile.include                   |  6 +++-
+>   tests/avocado/boot_linux_console.py      | 24 ++++++++------
+>   tests/avocado/boot_xen.py                | 13 ++++----
+>   tests/avocado/cdrom.py                   | 41 ++++++++++++++++++++++++
+>   tests/avocado/intel_iommu.py             |  2 ++
+>   tests/avocado/kvm_xen_guest.py           | 30 +++++++++++------
+>   tests/avocado/machine_aarch64_sbsaref.py | 11 +++++--
+>   tests/avocado/machine_aarch64_virt.py    | 14 ++++----
+>   tests/avocado/netdev-ethtool.py          |  3 +-
+>   tests/avocado/tuxrun_baselines.py        | 16 ++++-----
+>   12 files changed, 125 insertions(+), 49 deletions(-)
+>   create mode 100644 tests/avocado/cdrom.py
+> 
 
-
-On 4/23/2024 5:23 AM, Sean Christopherson wrote:
-> On Thu, Apr 18, 2024, Yan Zhao wrote:
->> On Tue, Apr 16, 2024 at 11:50:19AM -0700, Sean Christopherson wrote:
->>> On Mon, Apr 15, 2024, Yan Zhao wrote:
->>>> On Mon, Apr 15, 2024 at 08:05:49AM +0000, Ackerley Tng wrote:
->>>>>>> The Intel GHCI Spec says in R12, bit 63 is set if the GPA is valid. As a
->>>>>> But above "__LINE__" is obviously not a valid GPA.
->>>>>>
->>>>>> Do you think it's better to check "data_gpa" is with shared bit on and
->>>>>> aligned in 4K before setting bit 63?
->>>>>>
->>>>> I read "valid" in the spec to mean that the value in R13 "should be
->>>>> considered as useful" or "should be passed on to the host VMM via the
->>>>> TDX module", and not so much as in "validated".
->>>>>
->>>>> We could validate the data_gpa as you suggested to check alignment and
->>>>> shared bit, but perhaps that could be a higher-level function that calls
->>>>> tdg_vp_vmcall_report_fatal_error()?
->>>>>
->>>>> If it helps, shall we rename "data_gpa" to "data" for this lower-level,
->>>>> generic helper function and remove these two lines
->>>>>
->>>>> if (data_gpa)
->>>>> 	error_code |= 0x8000000000000000;
->>>>>
->>>>> A higher-level function could perhaps do the validation as you suggested
->>>>> and then set bit 63.
->>>> This could be all right. But I'm not sure if it would be a burden for
->>>> higher-level function to set bit 63 which is of GHCI details.
->>>>
->>>> What about adding another "data_gpa_valid" parameter and then test
->>>> "data_gpa_valid" rather than test "data_gpa" to set bit 63?
->>> Who cares what the GHCI says about validity?  The GHCI is a spec for getting
->>> random guests to play nice with random hosts.  Selftests own both, and the goal
->>> of selftests is to test that KVM (and KVM's dependencies) adhere to their relevant
->>> specs.  And more importantly, KVM is NOT inheriting the GHCI ABI verbatim[*].
->>>
->>> So except for the bits and bobs that *KVM* (or the TDX module) gets involved in,
->>> just ignore the GHCI (or even deliberately abuse it).  To put it differently, use
->>> selftests verify *KVM's* ABI and functionality.
->>>
->>> As it pertains to this thread, while I haven't looked at any of this in detail,
->>> I'm guessing that whether or not bit 63 is set is a complete "don't care", i.e.
->>> KVM and the TDX Module should pass it through as-is.
->>>
->>> [*] https://lore.kernel.org/all/Zg18ul8Q4PGQMWam@google.com
->> Ok. It makes sense to KVM_EXIT_TDX.
->> But what if the TDVMCALL is handled in TDX specific code in kernel in future?
->> (not possible?)
-> KVM will "handle" ReportFatalError, and will do so before this code lands[*], but
-> I *highly* doubt KVM will ever do anything but forward the information to userspace,
-> e.g. as KVM_SYSTEM_EVENT_CRASH with data[] filled in with the raw register information.
->
->> Should guest set bits correctly according to GHCI?
-> No.  Selftests exist first and foremost to verify KVM behavior, not to verify
-> firmware behavior.  We can and should use selftests to verify that *KVM* doesn't
-> *violate* the GHCI, but that doesn't mean that selftests themselves can't ignore
-> and/or abuse the GCHI, especially since the GHCI definition for ReportFatalError
-> is frankly awful.
->
-> E.g. the GHCI prescibes actual behavior for R13, but then doesn't say *anything*
-> about what's in the data page.  Why!?!?!  If the format in the data page is
-> completely undefined, what's the point of restricting R13 to only be allowed to
-> hold a GPA?
-
-The description of R13 in GHCI:
-   4KB-aligned GPA where additional error data is shared by the TD. The
-   VMM must validate that this GPA has the Shared bit set. In other words,
-   that a shared-mapping is used, and that this is a valid mapping for the
-   TD. This shared memory region is expected to hold a zero-terminated
-   string.
-
-IIUC, according the GHCI, R13 is a 4K aligned shared buffer provided by
-the TDX guest to pass additional error message to VMM, i.e., it needs to
-be a shared GPA.  And the content in the buffer is expected to hold a
-zero-terminated string.
-
-Do you think "a zero-terminated string" describes the format in the data
-page?
-
-
->
-> And the wording is just as awful:
->
->    The VMM must validate that this GPA has the Shared bit set. In other words,
->    that a shared-mapping is used, and that this is a valid mapping for the TD.
->
-> I'm pretty sure it's just saying that the TDX module isn't going to verify the
-> operate, i.e. that the VMM needs to protect itself, but it would be so much
-> better to simply state "The TDX Module does not verify this GPA", because saying
-> the VMM "must" do something leads to pointless discussions like this one, where
-> we're debating over whether or *our* VMM should inject an error into *our* guest.
->
-> Anyways, we should do what makes sense for selftests and ignore the stupidity of
-> the GHCI when doing so yields better code.  If that means abusing R13, go for it.
-> If it's a sticking point for anyone, just use one of the "optional" registers.
->
-> Whatever we do, bury the host and guest side of selftests behind #defines or helpers
-> so that there are at most two pieces of code that care which register holds which
-> piece of information.
->
-> [*] https://lore.kernel.org/all/20240404230247.GU2444378@ls.amr.corp.intel.com
->
-
+Reviewed-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
