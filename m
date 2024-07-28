@@ -1,135 +1,153 @@
-Return-Path: <kvm+bounces-22476-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22477-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEBBF93E9EF
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 00:10:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AAFD93EA21
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 01:20:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65CD1B216B5
-	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 22:10:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F82C1F21907
+	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 23:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BBB7BAFF;
-	Sun, 28 Jul 2024 22:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B2E79B9D;
+	Sun, 28 Jul 2024 23:20:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AA1UCaBW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqygtvB3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f179.google.com (mail-oi1-f179.google.com [209.85.167.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B5D55914C;
-	Sun, 28 Jul 2024 22:10:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729762AF18
+	for <kvm@vger.kernel.org>; Sun, 28 Jul 2024 23:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722204631; cv=none; b=nCYUbBEp/oDtr0ttX281uSqJcoimmKiy8vFyzWXblXb5YUYm9wboXdWJiCmrS0JxPql+S3cJ3yjt9Ql3NXlOKA39aq02Rg2/SRVNdm7aF7/Y05pLHaLEUMfT0vil+gJLo0/fJ5/SIp9EzqMaH3O8G7U4cHZ/GmKc3MjQRbR88iw=
+	t=1722208810; cv=none; b=CbJF42DUr+V1xAwoG1q51VzXyH9+bp7Y/x2+mtmW12tbcGkwNlRp2KCz6HYKOoF0MRA3zU8utzWKl0fRChvookt2J4vq8zuioUDzMpdMwqR+6Ylj2qudisMt9Rq+tN0GOIZp+aGjVJoWipVmy+GM1QaMyd3K07T40fJWokvF4wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722204631; c=relaxed/simple;
-	bh=C0yaa1HeosGSTqketDfd4qkVnRf7BT0xSouoh4lDdU0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qBMC9M9+QaPcXZLslZ8JKjlcaEjbwfFA+kVrRNrhhJ+SYk+gzcO44amLNJq95PxVZrKXWumXlMyJLxTTko2xlgZi1ZYlaw24xvWmyCOX0jdUmYzOKxTs+fbLG35fc6+ha0fG/28i4SP8HJkp/AF3GeYR7ESyp4Buja7zBgy0dxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AA1UCaBW; arc=none smtp.client-ip=209.85.167.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f179.google.com with SMTP id 5614622812f47-3db19caec60so2123231b6e.1;
-        Sun, 28 Jul 2024 15:10:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722204629; x=1722809429; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8WFV5A19fkh+7kPhwlaDnoT0oehdraQfB5oPegY2HlQ=;
-        b=AA1UCaBWEGFQ7PdbJM0FoNdQc2fSFryKQ+UojCPJTpPLm0YM2sMGiRrimW2385ydyy
-         q+EndZVLl4JsF7mxysEMAJk7TURmBLpH56khwUJhd6sagZf4gzGIZe5yJRbebPDA5UlZ
-         OYQGug1lpyDxJGGb906byop6Rt8aAiNKUV529hOalyhpcT9W9OMH8+c9GWkgIew9CJHw
-         FYisErZoU2p05AKr7fJsWA3tpYwy0tXYE+pDAzuSTvX0r9huUGpHrkKi3ext8PMBiiyk
-         3DYtLpHUGbwsJaXQqX2djfq+LvmZwCduyQ2UQjfoh6YlhOtaZcnONEcAHGCsWmtrU+vY
-         mBPg==
+	s=arc-20240116; t=1722208810; c=relaxed/simple;
+	bh=+dP40l89F19I3cNbdMF63OXjKsihv2/8PwPxnwj6LNc=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=dADBP9460cB5kQjB3NVei8o31lqNSSWtzcPlRDxZVlHMqBohTEkmrFBbU/x7/+L7zbKJbvM2io5XpZJGXDVEEiiZpXqk8FXhD+Avt4iYVzAhMYwoEfAXTTZDVSIfr7OMyByvsRaJ81PVz6jTS/eRq88T2TQ+6khpLS/rRKD6Nvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cqygtvB3; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722208806;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=+eRbOioU+yVUzmrkos9cLIO1XQ0vF0g/0lgz70sgOCo=;
+	b=cqygtvB3T5WwlWeiQKBqnu5uIVWep6apQRd60pb/Z3v6848NogHzWYpDaqV0RAtYAh3BqI
+	6TbA8B160LB9JPfoRCjASVqLqFQJ7h7b9h0SYuRtkeKk1UA+84cwavhKr6oJWorF8cP0iD
+	ZzSv4ZJc/WIQ2+24yYYXKXyju9Iy3WI=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-515-VCOyNU_3MeqXZWeVH1jGZA-1; Sun, 28 Jul 2024 19:20:04 -0400
+X-MC-Unique: VCOyNU_3MeqXZWeVH1jGZA-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42816096cb8so15066165e9.0
+        for <kvm@vger.kernel.org>; Sun, 28 Jul 2024 16:20:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722204629; x=1722809429;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8WFV5A19fkh+7kPhwlaDnoT0oehdraQfB5oPegY2HlQ=;
-        b=jHgA0DWvwYGOaoSSKtyXHyfSe08XK6It+iW+otZ1HqJo+oDnxf0ByM2STntGn57pyA
-         79ZUDlzxb9fO8J5LPq0YrlentFLCSQEFYavSYA0wbD/i559s/vPwp/ZpDudWs/px8MgY
-         PgHQMY9j5y7X2Q3r8jBr6nzL1s2QwN+xI8uPQhi+uQzQNagqtBHWmlMYWAh308o+bqy5
-         zIytYO6BOcsr0vAXSXwBfoHQ6ewxKnGlqnUUwP/9BhWAdOJoFS5EpGPfoX8ljk7BKH8F
-         99D4BpJb0xieUFNH5OBDCYX35y9jLfGuG0DX9jcRRI7i/ELBjWMsU2y5KkMaAENTqzz8
-         LYDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVc42BPnVFxnX4kKkut76LbgqxNbOOaUcegHeU+gaD1emzaZA6co6bt3hO9KZJ9otHhjLNMR7glwA10fGMMv64bf348r9lCXghVjPshX1hDS0d3Kuza4Y/UyXDO/LXY8n8L5ZTybmf1fCeWjRA/zOxw3l4YfKSy71EUy75Lc9lAbMg5XhAM6YhJrY82Xr0NENrNf6X0kpHAvN9FYhxzMpcaZCBrdjQ8ff2Aj50M
-X-Gm-Message-State: AOJu0YwsbNgsevqFQ/YVrhKyhAeUVxyDGGH0oQV3ZbhJYlk4GmH8/dlJ
-	dPGYSbjYSKg0Vpkbc2YoioAgrXSsmDNCIL5ExVUaj77/+45+2k57Ey5YdBHEe/c+slyFwJff8nF
-	6Y9Mvb63ITbk2hyu5zTxb4uGPQpw=
-X-Google-Smtp-Source: AGHT+IEw3+98/dkX5bsc3y2qs7kudwyMQ2dCtR9MHudb1vAPFedzvStonePBepA4fNU+r5zlDt7zwcHjsI0akqPOZ5U=
-X-Received: by 2002:a05:6870:169c:b0:261:52d:1aef with SMTP id
- 586e51a60fabf-267d4f5b2f5mr8312222fac.49.1722204629420; Sun, 28 Jul 2024
- 15:10:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722208803; x=1722813603;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+eRbOioU+yVUzmrkos9cLIO1XQ0vF0g/0lgz70sgOCo=;
+        b=qVoNMOIp6O08Mfe1EHqHa0UI2A7u3mIW218GhFSbSZPJr+jXFGX9TMEjuRlT9KjVQ/
+         18MrPBMiR2g/dhR2oNOFrQPU3z+OSG7ySQLBpOS5RH1KxWq1NSYJd3W+7REmEAg5YJdA
+         NKK0mzTFnlN/l6xCLPGEmsF1T5m2+NY93Mx4HlZxI1y4DsPHWCLrenmyX86xQqpX5vWb
+         Dm80ccipSOlkyP/lUdWSNzFxeVuswzAZDoFD0z68+GBLNWL6UPlOOiVpTd5EnaxkQYuB
+         Q3E4lFMT2xG99tkKrvF2n4kE/BPyv6nAF1DpcufGUWYvpr9lWHFyoru9s38m8DTeRLT5
+         kS8g==
+X-Gm-Message-State: AOJu0YxCd5i9D7Nz5faaeub76EfbS8xAMUoU0jUj6Ppf+AAUBussA3UM
+	vaOocWpgZTTo63YVC6jPvwqvn4qsYeVqf5ava5ImQVHyvtEUD/0JT2pvLvN09khCddiYtieGpsS
+	x57bHclOwflSjVAOoRC1+k0Y8uyitKnW6X/JnI3YFqqOB6diJqQ==
+X-Received: by 2002:a05:600c:19c8:b0:426:6fd2:e14b with SMTP id 5b1f17b1804b1-42811d8c0d7mr48465245e9.11.1722208803525;
+        Sun, 28 Jul 2024 16:20:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFJQeBFE1Ei3wW/3T05Gw1tpFuinUnNFeeMy1TSpz7EYl+J4w9ikvZ++fHV9MkZAfomQa2gNg==
+X-Received: by 2002:a05:600c:19c8:b0:426:6fd2:e14b with SMTP id 5b1f17b1804b1-42811d8c0d7mr48464915e9.11.1722208802271;
+        Sun, 28 Jul 2024 16:20:02 -0700 (PDT)
+Received: from redhat.com ([2a0d:6fc7:55d:98c4:742e:26be:b52d:dd54])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4281a26e1bcsm33145835e9.34.2024.07.28.16.19.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 28 Jul 2024 16:20:01 -0700 (PDT)
+Date: Sun, 28 Jul 2024 19:19:56 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	dan.carpenter@linaro.org, jiri@nvidia.com, jiri@resnulli.us,
+	mst@redhat.com, quic_jjohnson@quicinc.com
+Subject: [GIT PULL] virtio: fixes for rc1
+Message-ID: <20240728191956-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710212555.1617795-3-amery.hung@bytedance.com> <8d7dc8cb-0211-8e20-2391-c16d266b8be6@salutedevices.com>
-In-Reply-To: <8d7dc8cb-0211-8e20-2391-c16d266b8be6@salutedevices.com>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Sun, 28 Jul 2024 15:10:18 -0700
-Message-ID: <CAMB2axPA6hEHJ_xm-aperc3kb221kK4RpL848pgY_sL+8RBFHA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 02/14] af_vsock: refactor transport lookup code
-To: Arseniy Krasnov <avkrasnov@salutedevices.com>
-Cc: stefanha@redhat.com, sgarzare@redhat.com, mst@redhat.com, 
-	jasowang@redhat.com, xuanzhuo@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, 
-	haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com, 
-	bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
-	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
-	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, bpf@vger.kernel.org, 
-	bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
-	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
 
-On Wed, Jul 24, 2024 at 11:41=E2=80=AFPM Arseniy Krasnov
-<avkrasnov@salutedevices.com> wrote:
->
-> Hi
->
-> +static const struct vsock_transport *
-> +vsock_connectible_lookup_transport(unsigned int cid, __u8 flags)
->                                                       ^^^ may be just 'u8=
-' ?
-> +{
-> +       const struct vsock_transport *transport;
->                                        ^^^ do we really need this variabl=
-e now?
->                                        May be shorter like:
->                                        if (A)
->                                            return transport_local;
->                                        else if (B)
->                                            return transport_g2h;
->                                        else
->                                            return transport_h2g;
 
-Looks good to me. Will change it in the next version.
+The biggest thing here is the adminq change - but it looks like
+the only way to avoid headq blocking causing indefinite stalls.
 
-Thanks,
-Amery
 
-> +
-> +       if (vsock_use_local_transport(cid))
-> +               transport =3D transport_local;
-> +       else if (cid <=3D VMADDR_CID_HOST || !transport_h2g ||
-> +                (flags & VMADDR_FLAG_TO_HOST))
-> +               transport =3D transport_g2h;
-> +       else
-> +               transport =3D transport_h2g;
-> +
-> +       return transport;
-> +}
-> +
->
-> Thanks
+The following changes since commit 6c85d6b653caeba2ef982925703cbb4f2b3b3163:
+
+  virtio: rename virtio_find_vqs_info() to virtio_find_vqs() (2024-07-17 05:20:58 -0400)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to 6d834691da474ed1c648753d3d3a3ef8379fa1c1:
+
+  virtio_pci_modern: remove admin queue serialization lock (2024-07-17 05:43:21 -0400)
+
+----------------------------------------------------------------
+virtio: fixes
+
+This fixes 3 issues:
+- prevent admin commands on one VF blocking another:
+  fixes a huge scalability issue with large # of VFs
+- correctly return error on command failure on octeon
+  fixes a corruption if any commands fail
+- fix modpost warning when building virtio_dma_buf
+  harmless, but the fix is trivial
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Dan Carpenter (1):
+      vdpa/octeon_ep: Fix error code in octep_process_mbox()
+
+Jeff Johnson (1):
+      virtio: add missing MODULE_DESCRIPTION() macro
+
+Jiri Pirko (13):
+      virtio_pci: push out single vq find code to vp_find_one_vq_msix()
+      virtio_pci: simplify vp_request_msix_vectors() call a bit
+      virtio_pci: pass vector policy enum to vp_find_vqs_msix()
+      virtio_pci: pass vector policy enum to vp_find_one_vq_msix()
+      virtio_pci: introduce vector allocation fallback for slow path virtqueues
+      virtio_pci_modern: treat vp_dev->admin_vq.info.vq pointer as static
+      virtio: push out code to vp_avq_index()
+      virtio_pci: pass vq info as an argument to vp_setup_vq()
+      virtio: create admin queues alongside other virtqueues
+      virtio_pci_modern: create admin queue of queried size
+      virtio_pci_modern: pass cmd as an identification token
+      virtio_pci_modern: use completion instead of busy loop to wait on admin cmd result
+      virtio_pci_modern: remove admin queue serialization lock
+
+ drivers/vdpa/octeon_ep/octep_vdpa_hw.c |   2 +-
+ drivers/virtio/virtio.c                |  28 +----
+ drivers/virtio/virtio_dma_buf.c        |   1 +
+ drivers/virtio/virtio_pci_common.c     | 192 ++++++++++++++++++++++++++-------
+ drivers/virtio/virtio_pci_common.h     |  16 +--
+ drivers/virtio/virtio_pci_modern.c     | 161 +++++++++++++--------------
+ include/linux/virtio.h                 |   3 +
+ include/linux/virtio_config.h          |   4 -
+ 8 files changed, 243 insertions(+), 164 deletions(-)
+
 
