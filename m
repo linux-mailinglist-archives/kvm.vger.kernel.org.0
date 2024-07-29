@@ -1,168 +1,361 @@
-Return-Path: <kvm+bounces-22505-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22506-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B13393F6B4
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 15:31:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB8EB93F6B6
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 15:31:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BA6B1C21824
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 13:31:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08A531C2186C
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 13:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D238149015;
-	Mon, 29 Jul 2024 13:31:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD3E414EC47;
+	Mon, 29 Jul 2024 13:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="idDnY1Ef"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="S9Nf6PdI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CD68C06
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E999D1420D0
 	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 13:31:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722259868; cv=none; b=oQjcUPZrd+PRfDT9RziyfAJtnlHw4jk1lRyXlYy1FXoZZ5yWlqAwKJIUeRd8nP3/j8zey0O4vkd9sgJL+8Y1ICu4CtmquYZYQff1JsG1K8u6MMTRksvgGlrQkVh8CnmhDB6PcpezCw90mdkhlimhxQ1XyxLt3rfLiJ1fuZO86sg=
+	t=1722259869; cv=none; b=KhhdZEejrNO1WplQTje+99bo0RC3X0ptGQ43Mn8F590k6QbOdJsZSflLSWTkrazn9G6vioKk6xiw0ulUIKyEXmz4Og6WFYSDy0XRmcjEPGuguIvaUY2hpiTGiYoVQeLrNLrRWFihLSjRjqJWYo5/AshvbocUQRIMbjrMkhNDv5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722259868; c=relaxed/simple;
-	bh=XsHOodkGVugeYBKiy3NN35QUunVskHzFOlmmNRL11kM=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=AeFI7FuOdZxN6yekBgw4IJm4+jemwgnGPbHlDvAPC2lj3NJaZPzNcUgO+bsm2PPm1E72xJEKe3/MhGnYW7jnj62MweeWPml8PwrbehGJ3FfCcbQS070mMZJt9FqDZZRQJ5ncN/7Fp+eKFO1CrBT9njHtMOEZNvvGG8Kgsa07zck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=idDnY1Ef; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722259865;
+	s=arc-20240116; t=1722259869; c=relaxed/simple;
+	bh=CSeWyxtXGfa8Wp85zPo12PzWFDebFaaXH8/l7BQ5Hkc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QZ0y2Bz8Ukbw8hIdWzVeVPOJpQ0RXDDBlDhp+59cTbAswk3Di96yyLkdJE3E/wOmyQ/hVQ/hrRK0sHGXlYUIJijseYddpksn3neSKwgbPbLivR1LCWbe+t0Rno2UXCHLPAG7hc9wvBHBfBtSg95Yo1tf86IVlAp9Z5WY2NHWS8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=S9Nf6PdI; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 29 Jul 2024 15:31:01 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1722259865;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BlLuGikkUGKCvXsXriKTsyTsgVOTK7WyWyEUec7ttEo=;
-	b=idDnY1EfJ2WTrG8jfs3NOpr3pyECgVdao9N1oQYvMdcibpNTqcrJErY99mmV/h5PhfBphS
-	zeO0q54NKb/8uFEftmuiGY8CkkHm3dEn3UW9/9DECEfWsJJdIYh0sKQxydVZwuPxR30KJi
-	78jompMRylc49giNgN/PnioXWfgqU0s=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-575--5Vnpgh2MMOaRoM-cl4iCA-1; Mon, 29 Jul 2024 09:31:03 -0400
-X-MC-Unique: -5Vnpgh2MMOaRoM-cl4iCA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4280291f739so17868305e9.3
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 06:31:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722259862; x=1722864662;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BlLuGikkUGKCvXsXriKTsyTsgVOTK7WyWyEUec7ttEo=;
-        b=m61ph6Ac3NJtGrH1HIoR1Ni69MHCwGZiGJ+xdHp1ZI1C8zojTrHndrTS5CdAn9tMG7
-         Dznp9pnbcnHHlpgVufiGtIEmfh+OfD2sz79WLpxgb3WoHgdyXwHGiW4cXftewA2BijGT
-         tzqfVWHGrZJv1d4VNctMUKt4t7HQQfGPxlUMETL9rweK3N+gWUOnfApyGZwkhAw+KVVP
-         VXWuZfFr8bnvQSKUwwm5Za+6TuKH75T2OvhriyvhoRluqwMVaJOe5kzDy8zMP/jzkq+u
-         lmKiEZdk0d3hGHib1mgdcbOt91C8rLXgz/D5mvv3gF2FrXg+qqOHD3HCCRpnsP+ZbvzW
-         iR3w==
-X-Gm-Message-State: AOJu0YzF0/2GAYarleH5rxL2jlzdnNBUGieV7AxejsD8HTdvmbPzPp4E
-	aIs30pKPq94kluE2Y1f2BRfuKKISmRFMu9aF/nnCIYJQjBfxR+vQahgvsGnUoYbS+FeoPj0vvV0
-	CIYggj4TwznMD1zq+zwLni9uOAW1MlKtsrXWIilwxaVEZWZsyPg==
-X-Received: by 2002:a05:600c:4b1a:b0:426:64f4:7793 with SMTP id 5b1f17b1804b1-42811da7dd3mr53752745e9.22.1722259862383;
-        Mon, 29 Jul 2024 06:31:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHMndcFYOEWtmUpK603jitEUzAiFadBmIa0FTnXJv33+nbkyn2Th00kSMWmDtDaf3Zoy7ZjjQ==
-X-Received: by 2002:a05:600c:4b1a:b0:426:64f4:7793 with SMTP id 5b1f17b1804b1-42811da7dd3mr53752525e9.22.1722259861832;
-        Mon, 29 Jul 2024 06:31:01 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36858148sm12306885f8f.72.2024.07.29.06.31.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 06:31:01 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Mirsad Todorovac <mtodorovac69@gmail.com>, Sean Christopherson
- <seanjc@google.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas
- Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- linux-kernel@vger.kernel.org
-Subject: Re: [BUG] arch/x86/kvm/vmx/vmx_onhyperv.h:109:36: error:
- dereference of NULL =?utf-8?B?4oCYMOKAmQ==?=
-In-Reply-To: <207a5c75-b6ad-4bfb-b436-07d4a3353003@gmail.com>
-References: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
- <Zpq2Lqd5nFnA0VO-@google.com>
- <207a5c75-b6ad-4bfb-b436-07d4a3353003@gmail.com>
-Date: Mon, 29 Jul 2024 15:31:00 +0200
-Message-ID: <87a5i05nqj.fsf@redhat.com>
+	bh=qqEgYVCrJjJwtoysFoDZ1ZfMUOa9QD4x5M2Di+FogDY=;
+	b=S9Nf6PdIgzpZPLty4xeX+OmpaTraX+tOaePJdlhwKscAIdv1z/2CMMnaCa1n+AdfpLvEDl
+	aH0SXSISw3Hj+i0l/a7DMw/iS1k/5IzcVfYIrXif5add720KTg9LqlF6sC0Hn9YWm2hWKy
+	py+s0BfXurdw095syYcxMzKIc39DdqE=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu
+Subject: Re: [kvm-unit-tests PATCH v5 5/5] riscv: sbi: Add test for timer
+ extension
+Message-ID: <20240729-a7e67852ef18e54de184d42a@orel>
+References: <20240728165022.30075-1-jamestiotio@gmail.com>
+ <20240728165022.30075-6-jamestiotio@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240728165022.30075-6-jamestiotio@gmail.com>
+X-Migadu-Flow: FLOW_OUT
 
-Mirsad Todorovac <mtodorovac69@gmail.com> writes:
-
-> On 7/19/24 20:53, Sean Christopherson wrote:
->> On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
->>> Hi, all!
->>>
->>> Here is another potential NULL pointer dereference in kvm subsystem of linux
->>> stable vanilla 6.10, as GCC 12.3.0 complains.
->>>
->>> (Please don't throw stuff at me, I think this is the last one for today :-)
->>>
->>> arch/x86/include/asm/mshyperv.h
->>> -------------------------------
->>>   242 static inline struct hv_vp_assist_page *hv_get_vp_assist_page(unsigned int cpu)
->>>   243 {
->>>   244         if (!hv_vp_assist_page)
->>>   245                 return NULL;
->>>   246 
->>>   247         return hv_vp_assist_page[cpu];
->>>   248 }
->>>
->>> arch/x86/kvm/vmx/vmx_onhyperv.h
->>> -------------------------------
->>>   102 static inline void evmcs_load(u64 phys_addr)
->>>   103 {
->>>   104         struct hv_vp_assist_page *vp_ap =
->>>   105                 hv_get_vp_assist_page(smp_processor_id());
->>>   106 
->>>   107         if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
->>>   108                 vp_ap->nested_control.features.directhypercall = 1;
->>>   109         vp_ap->current_nested_vmcs = phys_addr;
->>>   110         vp_ap->enlighten_vmentry = 1;
->>>   111 }
->>>
-
-...
-
->
-> GCC 12.3.0 appears unaware of this fact that evmcs_load() cannot be called with hv_vp_assist_page() == NULL.
->
-> This, for example, silences the warning and also hardens the code against the "impossible" situations:
->
-> -------------------><------------------------------------------------------------------
-> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
-> index eb48153bfd73..8b0e3ffa7fc1 100644
-> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
-> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
-> @@ -104,6 +104,11 @@ static inline void evmcs_load(u64 phys_addr)
->         struct hv_vp_assist_page *vp_ap =
->                 hv_get_vp_assist_page(smp_processor_id());
+On Mon, Jul 29, 2024 at 12:50:22AM GMT, James Raphael Tiovalen wrote:
+> Add a test for the set_timer function of the time extension. The test
+> checks that:
+> - The time extension is available
+> - The installed timer interrupt handler is called
+> - The timer interrupt is received within a reasonable time interval
+> - The timer interrupt pending bit is cleared after the set_timer SBI
+>   call is made
+> - The timer interrupt can be cleared either by requesting a timer
+>   interrupt infinitely far into the future or by masking the timer
+>   interrupt
+> 
+> The timer interrupt delay can be set using the TIMER_DELAY environment
+> variable in microseconds. The default delay value is 200 milliseconds.
+> Since the interrupt can arrive a little later than the specified delay,
+> allow some margin of error. This margin of error can be specified via
+> the TIMER_MARGIN environment variable in microseconds. The default
+> margin of error is 200 milliseconds.
+> 
+> Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
+> ---
+>  lib/riscv/asm/csr.h   |   8 +++
+>  lib/riscv/asm/sbi.h   |   5 ++
+>  lib/riscv/asm/timer.h |  10 +++
+>  riscv/sbi.c           | 144 ++++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 167 insertions(+)
+> 
+> diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
+> index a9b1bd42..24b333e0 100644
+> --- a/lib/riscv/asm/csr.h
+> +++ b/lib/riscv/asm/csr.h
+> @@ -4,11 +4,15 @@
+>  #include <linux/const.h>
 >  
-> +       if (!vp_ap) {
-> +               pr_warn("BUG: hy_get_vp_assist_page(%d) returned NULL.\n", smp_processor_id());
-> +               return;
-> +       }
+>  #define CSR_SSTATUS		0x100
+> +#define CSR_SIE			0x104
+>  #define CSR_STVEC		0x105
+>  #define CSR_SSCRATCH		0x140
+>  #define CSR_SEPC		0x141
+>  #define CSR_SCAUSE		0x142
+>  #define CSR_STVAL		0x143
+> +#define CSR_SIP			0x144
+> +#define CSR_STIMECMP		0x14d
+> +#define CSR_STIMECMPH		0x15d
+>  #define CSR_SATP		0x180
+>  #define CSR_TIME		0xc01
+>  
+> @@ -47,6 +51,10 @@
+>  #define IRQ_S_GEXT		12
+>  #define IRQ_PMU_OVF		13
+>  
+> +#define IE_TIE			(_AC(0x1, UL) << IRQ_S_TIMER)
 > +
->         if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
->                 vp_ap->nested_control.features.directhypercall = 1;
->         vp_ap->current_nested_vmcs = phys_addr;
+> +#define IP_TIP			IE_TIE
+> +
+>  #ifndef __ASSEMBLY__
+>  
+>  #define csr_swap(csr, val)					\
+> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> index 5e1a674a..73ab5438 100644
+> --- a/lib/riscv/asm/sbi.h
+> +++ b/lib/riscv/asm/sbi.h
+> @@ -16,6 +16,7 @@
+>  
+>  enum sbi_ext_id {
+>  	SBI_EXT_BASE = 0x10,
+> +	SBI_EXT_TIME = 0x54494d45,
+>  	SBI_EXT_HSM = 0x48534d,
+>  	SBI_EXT_SRST = 0x53525354,
+>  };
+> @@ -37,6 +38,10 @@ enum sbi_ext_hsm_fid {
+>  	SBI_EXT_HSM_HART_SUSPEND,
+>  };
+>  
+> +enum sbi_ext_time_fid {
+> +	SBI_EXT_TIME_SET_TIMER = 0,
+> +};
+> +
+>  struct sbiret {
+>  	long error;
+>  	long value;
+> diff --git a/lib/riscv/asm/timer.h b/lib/riscv/asm/timer.h
+> index f7504f84..b3514d3f 100644
+> --- a/lib/riscv/asm/timer.h
+> +++ b/lib/riscv/asm/timer.h
+> @@ -11,4 +11,14 @@ static inline uint64_t timer_get_cycles(void)
+>  	return csr_read(CSR_TIME);
+>  }
+>  
+> +static inline void timer_irq_enable(void)
+> +{
+> +	csr_set(CSR_SIE, IE_TIE);
+> +}
+> +
+> +static inline void timer_irq_disable(void)
+> +{
+> +	csr_clear(CSR_SIE, IE_TIE);
+> +}
+> +
+>  #endif /* _ASMRISCV_TIMER_H_ */
+> diff --git a/riscv/sbi.c b/riscv/sbi.c
+> index 762e9711..044258bb 100644
+> --- a/riscv/sbi.c
+> +++ b/riscv/sbi.c
+> @@ -6,7 +6,25 @@
+>   */
+>  #include <libcflat.h>
+>  #include <stdlib.h>
+> +#include <limits.h>
+> +#include <asm/barrier.h>
+> +#include <asm/csr.h>
+> +#include <asm/delay.h>
+> +#include <asm/isa.h>
+> +#include <asm/processor.h>
+>  #include <asm/sbi.h>
+> +#include <asm/smp.h>
+> +#include <asm/timer.h>
+> +
+> +struct timer_info {
+> +	bool timer_works;
+> +	bool mask_timer_irq;
+> +	bool timer_irq_set;
+> +	bool timer_irq_cleared;
+> +	unsigned long timer_irq_count;
+> +};
+> +
+> +static struct timer_info timer_info_;
 
-As Sean said, this does not seem to be possible today but I uderstand
-why the compiler is not able to infer this. If we were to fix this, I'd
-suggest we do something like "BUG_ON(!vp_ap)" (with a comment why)
-instead of the suggested patch:
-- pr_warn() is not ratelimited
-- 'return' from evmcs_load does not propagate the error so the VM is
-going to misbehave somewhere else.
+I'd rather call this just 'timer_info' than 'timer_info_'. I usually
+prefer to use a different name than the struct for grepping purposes,
+but for a static structure of a small file it doesn't really matter.
 
--- 
-Vitaly
+>  
+>  static void help(void)
+>  {
+> @@ -19,6 +37,36 @@ static struct sbiret __base_sbi_ecall(int fid, unsigned long arg0)
+>  	return sbi_ecall(SBI_EXT_BASE, fid, arg0, 0, 0, 0, 0, 0);
+>  }
+>  
+> +static struct sbiret __time_sbi_ecall(unsigned long stime_value)
+> +{
+> +	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
+> +}
+> +
+> +static bool timer_irq_pending(void)
+> +{
+> +	return csr_read(CSR_SIP) & IP_TIP;
+> +}
+> +
+> +static void timer_irq_handler(struct pt_regs *regs)
+> +{
+> +	if (timer_info_.timer_irq_count < ULONG_MAX)
+> +		++timer_info_.timer_irq_count;
+> +
+> +	timer_info_.timer_works = true;
+> +	if (timer_irq_pending())
+> +		timer_info_.timer_irq_set = true;
+> +
+> +	if (timer_info_.mask_timer_irq) {
+> +		timer_irq_disable();
+> +		__time_sbi_ecall(0);
+> +	} else {
+> +		__time_sbi_ecall(ULONG_MAX);
+> +	}
+> +
+> +	if (!timer_irq_pending())
+> +		timer_info_.timer_irq_cleared = true;
+> +}
+> +
+>  static bool env_or_skip(const char *env)
+>  {
+>  	if (!getenv(env)) {
+> @@ -112,6 +160,101 @@ static void check_base(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void check_time(void)
+> +{
+> +	struct sbiret ret;
+> +	unsigned long begin, end, duration;
+> +	unsigned long d = getenv("TIMER_DELAY") ? strtol(getenv("TIMER_DELAY"), NULL, 0)
+> +						: 200000;
+> +	unsigned long margin = getenv("TIMER_MARGIN") ? strtol(getenv("TIMER_MARGIN"), NULL, 0)
+> +						      : 200000;
+> +
+> +	d = usec_to_cycles(d);
+> +	margin = usec_to_cycles(margin);
+> +
+> +	report_prefix_push("time");
+> +
+> +	if (!sbi_probe(SBI_EXT_TIME)) {
+> +		report_skip("time extension not available");
+> +		report_prefix_pop();
+> +		return;
+> +	}
+> +
+> +	report_prefix_push("set_timer");
+> +
+> +	install_irq_handler(IRQ_S_TIMER, timer_irq_handler);
+> +	local_irq_enable();
+> +	if (cpu_has_extension(smp_processor_id(), ISA_SSTC)) {
+> +		csr_write(CSR_STIMECMP, ULONG_MAX);
+> +#if __riscv_xlen == 32
+> +		csr_write(CSR_STIMECMPH, ULONG_MAX);
+> +#endif
+> +	}
+> +	timer_irq_enable();
+> +
+> +	begin = timer_get_cycles();
+> +	ret = __time_sbi_ecall(begin + d);
+> +
+> +	report(!ret.error, "set timer");
+> +	if (ret.error)
+> +		report_info("set timer failed with %ld\n", ret.error);
+> +
+> +	report(!timer_irq_pending(), "pending timer interrupt bit cleared");
+> +
+> +	while ((end = timer_get_cycles()) <= (begin + d + margin) && !timer_info_.timer_works)
+> +		cpu_relax();
+> +
+> +	report(timer_info_.timer_works, "timer interrupt received");
+> +	report(timer_info_.timer_irq_set, "pending timer interrupt bit set in irq handler");
+> +	report(timer_info_.timer_irq_set && timer_info_.timer_irq_cleared,
+> +	       "pending timer interrupt bit cleared by setting timer to -1");
+> +
+> +	if (timer_info_.timer_works) {
+> +		duration = end - begin;
+> +		report(duration >= d && duration <= (d + margin), "timer delay honored");
+> +	}
+> +
+> +	if (timer_info_.timer_irq_count > 1)
+> +		report_fail("timer interrupt received multiple times");
+> +
+> +	if (csr_read(CSR_SIE) & IE_TIE) {
+> +		timer_info_ = (struct timer_info){ .mask_timer_irq = true };
+> +		begin = timer_get_cycles();
+> +		ret = __time_sbi_ecall(begin + d);
+> +
+> +		report(!ret.error, "set timer for mask irq test");
+> +		if (ret.error)
+> +			report_info("set timer for mask irq test failed with %ld\n", ret.error);
+> +
+> +		while ((end = timer_get_cycles()) <= (begin + d + margin)
+> +		       && !timer_info_.timer_works)
+> +			cpu_relax();
+> +
+> +		report(timer_info_.timer_works, "timer interrupt received for mask irq test");
+> +		report(timer_info_.timer_irq_set,
+> +		       "pending timer interrupt bit set in irq handler for mask irq test");
+> +		report(timer_info_.timer_irq_set && timer_info_.timer_irq_cleared,
+> +		       "pending timer interrupt bit cleared by masking timer irq");
+> +
+> +		if (timer_info_.timer_works) {
+> +			duration = end - begin;
+> +			report(duration >= d && duration <= (d + margin),
+> +			"timer delay honored for mask irq test");
+> +		}
+> +
+> +		if (timer_info_.timer_irq_count > 1)
+> +			report_fail("timer interrupt received multiple times for mask irq test");
 
+nit: we could share all the code in the body of this if-statement with the
+code above if we just create a function which takes a const char * which
+would be NULL for the first invocation and "for mask irq test" for the
+second.
+
+> +	} else {
+> +		report_skip("timer irq enable bit is not writable, skipping mask irq test");
+> +	}
+> +
+> +	local_irq_disable();
+> +	install_irq_handler(IRQ_S_TIMER, NULL);
+> +
+> +	report_prefix_pop();
+> +	report_prefix_pop();
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>  
+> @@ -122,6 +265,7 @@ int main(int argc, char **argv)
+>  
+>  	report_prefix_push("sbi");
+>  	check_base();
+> +	check_time();
+>  
+>  	return report_summary();
+>  }
+> -- 
+> 2.43.0
+>
+
+Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
+
+Thanks,
+drew
 
