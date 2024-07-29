@@ -1,147 +1,144 @@
-Return-Path: <kvm+bounces-22497-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22496-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78C993F4A2
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 13:55:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7899A93F4A1
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 13:55:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF7CC2813FA
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 11:55:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D98F281E20
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 11:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3413F14659B;
-	Mon, 29 Jul 2024 11:55:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A82B146580;
+	Mon, 29 Jul 2024 11:54:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y71S7jnf"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iaUpb2eh"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B4C146015
-	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 11:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AE9146015
+	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 11:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722254100; cv=none; b=Z4ggTEoXRWILgdiys74n/6ILUKIGKgr336s27JZRNY5uiudVD9hJHwFaSMAtTq2lY4468BxUnqtK5U16PrRO66p1TXOeLKyrcYYGmDxIQ6PZ192XO+VGqkNQh6BnB5D9mFOzJnMEdxZncu0AsRfMsFCa+VnfFyhqyMxI7G+mkpY=
+	t=1722254091; cv=none; b=bubgFDlx+4tOZz77T/8LlBW55Ok5PS398YD6EZ1g+HufEje+qyio6xeSvgZcesKwxsgttDFfr9ecuwygM6ZZkzQwVp/9SCxr8RNgdcfdLmzfDMv+HnxdVa3yhi4XfeH2/36VXE4KsTixu+lieU66rDNCTgVKgZIEUC6yPTfynh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722254100; c=relaxed/simple;
-	bh=7eldeZkEgm0otGTT3gjl279nF2ADl7Z7G+t6q2HR/CA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d1FGmTccI3bwZ/PkBhF1pupbiIP/CMJ8hlpMC/gUDkWPXfxNYlPl9zam58+yCD/HlmQ1NlUIPLPvDhoy9Gz1FYxbeKZ1am2Qn5YuiEzSwSL/EQlNowkiDlZRdkVkkWrGt2KMg+VWGlkbjvKmnRf79u3d/sb8cBMa1/tzNDBKta0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y71S7jnf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722254097;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a4NZQE0a01E7gkys5wMB3DntjcYY2NgIlYja4WDLw5Q=;
-	b=Y71S7jnffmLdAPZhkzP5xyw6mEJXAwl0H8UjxhiKh1+Vrbh7yOl0N/VFvVJDZQJr5tNrBk
-	epH/OujWB8Vur9OfC8L+UG+/l1pLCctbH5t+SMbKAQzFjUvmbz9nwQfhcnbLP8G7ZtL4v3
-	HlDMlA4nydnkqGm1+XmpP+hqBDWBN0E=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-412-Q06iPVBDPrmEy95XXh8Nkw-1; Mon, 29 Jul 2024 07:54:56 -0400
-X-MC-Unique: Q06iPVBDPrmEy95XXh8Nkw-1
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-654d96c2bb5so47589177b3.2
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 04:54:56 -0700 (PDT)
+	s=arc-20240116; t=1722254091; c=relaxed/simple;
+	bh=gc/0V0fUm0Tkzh2r1n11XAWUxafhXD3tmuEOWcFT43s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tEOg1QmsakoS2o+Nba+RIpgDbVmJ2q8MIK3SRJZZgqJ0yxAMrhl2wWAJpIQ5V7mIKCUwLf2pDe80UXt3fumVQxIXiR371swn5Z8ih9CtDoRWmEW7Tz/7+BjQvqSyxC4HvKDn0Ecg2W4eEEfLoQAyhoimAXEJKv3h3pk1LX+1vEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iaUpb2eh; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-428101fa30aso15859045e9.3
+        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 04:54:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1722254088; x=1722858888; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+ui2GzqOyf53+BduT2bZbxvFiRlJThGLjySYkf4II08=;
+        b=iaUpb2eh/dD1XYTA0vPchqJY675om7bN1u24W7wR37OHf1+7coYIvlnaq7bDCeH0gD
+         mIwrdlpmDNHRamSQi2JrndsMDO50EW0WXakdT7Z52xiTKzBtRR0IHCiddI+eo+82cLK1
+         NXmGJPeSXluimFGciQ34ubtVcTwhZcj6QBpsNSO0HoskLhnIDzCT94Di/VULvic4j2XI
+         Hf1TZjYSpoE9OjttDksOjmFvC237mACzyVYug11WMcVyM59jxEmETUZPi2EwTnQeEtHM
+         AZ7SLwjAefLQTctIfq7I0r8Cq42YcwzHgoD8qJEXSy/tNrf6mT9sVkZEaxBDuBpma1t3
+         POBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722254095; x=1722858895;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a4NZQE0a01E7gkys5wMB3DntjcYY2NgIlYja4WDLw5Q=;
-        b=f1h1o0wA8Fj0iI6z0MW1n4UHPtciTlM6jCzrvVBUkwK2pFVX4SlEqPkaRxvUCnPpsS
-         KvV2flxCCHgE3NImoE/FTD6Rbjl0E9MwWNjUTn78DI3jYvnm/CVG2sbjFEtS98N9c7CK
-         VqR1XZfcpcWDz/FyX7oRSfJJHTl8b5/vN2jME++SkVyYREg0/pfVwS0UIHhW448OAPJp
-         hrKJumvMylXYHqQSb95/LYD6Ox+/NZnzIKIUrJ9l1VZBocoTY2ZzvOOrjyg28GzQ0szK
-         lFW8VVkgukBMQL4T2+30+F+JSrs63C4AuysdSHyeYJlliFeZzk19Vip3fSgyS5dxc2CX
-         j6/A==
-X-Forwarded-Encrypted: i=1; AJvYcCWrA5CD+zu2s+Sbr0tAxg1ISvOFsjsl+N6+3C540696FyPvMCYX1sgPiPQw9RCNT3ors4sei+U5RtQYlRZFA9DhOZLv
-X-Gm-Message-State: AOJu0YwEViIj+pZN4pYhWtq+LlwgXOE2VA5a6CnKFvYjbtP7XN2wZ13e
-	rQYRRTMac1Syi6PJV/hln2wf5qbF6ZCSLyX1CBk0B6qtQ9SeDNG49z85RX+AKY1qk7u8XZ7CAwF
-	9a/OogKvCeLNXlPYs+IamFpp1/6JMXcdJJcmN4mY2zvVUGVfUqlWfvLxKIMXnKhsHf+ZI3SKEoe
-	oquMA+V5IO9pI5LOdZvDmvX3NN
-X-Received: by 2002:a0d:cd45:0:b0:66a:843c:4c38 with SMTP id 00721157ae682-67a09b7279cmr66399297b3.37.1722254095620;
-        Mon, 29 Jul 2024 04:54:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IErfrRTDiSJvI5t7sMOIhqCoRowoqwYj4meCPwD0Afc+x3c9S/BATACl3L0a2odQpmfXnY0yF5dkB0GXDcn7Fc=
-X-Received: by 2002:a0d:cd45:0:b0:66a:843c:4c38 with SMTP id
- 00721157ae682-67a09b7279cmr66399057b3.37.1722254095312; Mon, 29 Jul 2024
- 04:54:55 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722254088; x=1722858888;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+ui2GzqOyf53+BduT2bZbxvFiRlJThGLjySYkf4II08=;
+        b=NvfNuKSpDkZiFyaZPQ58Gdq4YvP+o1T18RUsjo/dn1jSAVmvaplqqg78bYUWRtlJRW
+         DQ0laK0w1ahDSRMZyaiDEV41bsYM2n1ivNngcQNjAHo2h0Ka7Ip4HZLh5ZcWvLyLwfc0
+         w44POZyzj8lOiQao11xCHa2ZCF3ckaeAqDl5KPfa/iVtLD9jWtdWVDz7dv+SNIcC9RwD
+         +OW2YOxMkAR/X4xM/o9DKEb9EtrzlNQkJ4OUXCnNmwLqwirBW15e5NHtyBtJTV59y4pg
+         xjdHi78j/fmMfZMZ8yvcN018YDcQfHtNJbhQPAks8P2uc4FhpqFRU10FyI159pJpcu1h
+         fmkw==
+X-Forwarded-Encrypted: i=1; AJvYcCX2iAxzD36YjnNNEnJnbUS4FcpQZFUxQb63ACo7dsmFaOtFwQPDI6q86q/Rp3ld/vgnPgTGSGxy/COx/hLirpRJ/4+I
+X-Gm-Message-State: AOJu0YxCpJtz0NDZiE7CeF7kfA67STPmD6KECuz8wAKK1FmBPsqTG9ny
+	Agie/jybO5Zuir1Pqwp5zjlOyL3uTmg6HRy5tn5XcX7/yMyYBxD8D7b+j4o5T9M=
+X-Google-Smtp-Source: AGHT+IHj863gKHFZgln/0mHvZ8mw+pDVh0OE4eOA7e5u0e+MLLV5z5cTOwDpSkbnpDIjyWAJw7qzlQ==
+X-Received: by 2002:adf:ea10:0:b0:367:9c12:3e64 with SMTP id ffacd0b85a97d-36b5d073efemr5511758f8f.46.1722254087783;
+        Mon, 29 Jul 2024 04:54:47 -0700 (PDT)
+Received: from [192.168.69.100] ([176.176.173.10])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b367d98aasm12089148f8f.30.2024.07.29.04.54.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 29 Jul 2024 04:54:46 -0700 (PDT)
+Message-ID: <6dbc898d-be8a-497c-87bb-d13d956cd279@linaro.org>
+Date: Mon, 29 Jul 2024 13:54:43 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240726134438.14720-1-crosa@redhat.com> <20240726134438.14720-6-crosa@redhat.com>
- <ZqdwJRRBjj5DsWh8@redhat.com>
-In-Reply-To: <ZqdwJRRBjj5DsWh8@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Date: Mon, 29 Jul 2024 07:54:40 -0400
-Message-ID: <CA+bd_6Jj-DgpkouznuDC-ViOhi4zLu-SxnyrnyV6ceycHhEBiA@mail.gmail.com>
-Subject: Re: [PATCH 05/13] tests/avocado: machine aarch64: standardize
- location and RO access
-To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, 
-	Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>, 
-	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, David Woodhouse <dwmw2@infradead.org>, 
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Leif Lindholm <quic_llindhol@quicinc.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org, 
-	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
-	Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, 
-	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org, 
-	Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Akihiko Odaki <akihiko.odaki@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 06/13] tests/avocado: use more distinct names for assets
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+ Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+ David Woodhouse <dwmw2@infradead.org>,
+ Leif Lindholm <quic_llindhol@quicinc.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
+ Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
+References: <20240726134438.14720-1-crosa@redhat.com>
+ <20240726134438.14720-7-crosa@redhat.com> <ZqdzqnpKja7Xo-Yc@redhat.com>
+Content-Language: en-US
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <ZqdzqnpKja7Xo-Yc@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jul 29, 2024 at 6:34=E2=80=AFAM Daniel P. Berrang=C3=A9 <berrange@r=
-edhat.com> wrote:
->
-> On Fri, Jul 26, 2024 at 09:44:30AM -0400, Cleber Rosa wrote:
-> > The tests under machine_aarch64_virt.py and machine_aarch64_sbsaref.py
-> > should not be writing to the ISO files.  By adding "media=3Dcdrom" the
-> > "ro" is autmatically set.
-> >
-> > While at it, let's use a single code style and hash for the ISO url.
-> >
-> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > ---
-> >  tests/avocado/machine_aarch64_sbsaref.py |  6 +++++-
-> >  tests/avocado/machine_aarch64_virt.py    | 14 +++++++-------
-> >  2 files changed, 12 insertions(+), 8 deletions(-)
-> >
-> > diff --git a/tests/avocado/machine_aarch64_sbsaref.py b/tests/avocado/m=
-achine_aarch64_sbsaref.py
-> > index e920bbf08c..1275f24532 100644
-> > --- a/tests/avocado/machine_aarch64_sbsaref.py
-> > +++ b/tests/avocado/machine_aarch64_sbsaref.py
-> > @@ -129,7 +129,11 @@ def boot_alpine_linux(self, cpu):
-> >              "-cpu",
-> >              cpu,
-> >              "-drive",
-> > -            f"file=3D{iso_path},format=3Draw",
-> > +            f"file=3D{iso_path},media=3Dcdrom,format=3Draw",
-> > +            "-device",
-> > +            "virtio-rng-pci,rng=3Drng0",
-> > +            "-object",
-> > +            "rng-random,id=3Drng0,filename=3D/dev/urandom",
-> >          )
->
-> The commit message doesn't say anything about adding virtio-rng.
-> If that's needed for some reason, do it as a separate commit
-> with an explanation of the bug its fixing.
->
+On 29/7/24 12:49, Daniel P. Berrangé wrote:
+> On Fri, Jul 26, 2024 at 09:44:31AM -0400, Cleber Rosa wrote:
+>> Avocado's asset system will deposit files in a cache organized either
+>> by their original location (the URI) or by their names.  Because the
+>> cache (and the "by_name" sub directory) is common across tests, it's a
+>> good idea to make these names as distinct as possible.
+>>
+>> This avoid name clashes, which makes future Avocado runs to attempt to
+>> redownload the assets with the same name, but from the different
+>> locations they actually are from.  This causes cache misses, extra
+>> downloads, and possibly canceled tests.
+>>
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>   tests/avocado/kvm_xen_guest.py  | 3 ++-
+>>   tests/avocado/netdev-ethtool.py | 3 ++-
+>>   2 files changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/tests/avocado/kvm_xen_guest.py b/tests/avocado/kvm_xen_guest.py
+>> index f8cb458d5d..318fadebc3 100644
+>> --- a/tests/avocado/kvm_xen_guest.py
+>> +++ b/tests/avocado/kvm_xen_guest.py
+>> @@ -40,7 +40,8 @@ def get_asset(self, name, sha1):
+>>           url = base_url + name
+>>           # use explicit name rather than failing to neatly parse the
+>>           # URL into a unique one
+>> -        return self.fetch_asset(name=name, locations=(url), asset_hash=sha1)
+>> +        return self.fetch_asset(name=f"qemu-kvm-xen-guest-{name}",
+>> +                                locations=(url), asset_hash=sha1)
+> 
+> Why do we need to pass a name here at all ? I see the comment here
+> but it isn't very clear about what the problem is. It just feels
+> wrong to be creating ourselves uniqueness naming problems, when we
+> have a nicely unique URL, and that cached URL can be shared across
+> tests, where as the custom names added by this patch are forcing
+> no-caching of the same URL between tests.
 
-This is actually a rebase mistake.  virtio-rng was removed in 21f123f3c.
-
-I'll fix it in a v2.
-
-Thanks for spotting it,
-- Cleber.
+I thought $name was purely for debugging; the file was downloaded
+in a temporary location, and if the hash matched, it was renamed
+in the cache as $asset_hash which is unique. This was suggested
+in order to avoid dealing with URL updates for the same asset.
+Isn't it the case?
 
 
