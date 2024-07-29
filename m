@@ -1,94 +1,81 @@
-Return-Path: <kvm+bounces-22484-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22485-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07E8393EED1
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 09:45:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 177E893F2B9
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 12:31:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3899F1C21BE9
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 07:45:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9B76B23C9C
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 10:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D3D13E028;
-	Mon, 29 Jul 2024 07:42:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A72BB13D296;
+	Mon, 29 Jul 2024 10:30:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="N0vsiRi/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kx9sfTFe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D994113BAE3;
-	Mon, 29 Jul 2024 07:42:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 429632F5A
+	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 10:30:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722238931; cv=none; b=BDLdp+llbJtmtCxFP9GTw+VdGXq63RJjOumNepwcXNp8MYaEe1pZx15bLjuA0PMuZwnHgHPtQkHV3gRPNVwTxbmAV6JXan1E45IgF+Y5NY3BjMM9Z1nWPfjiZVYRfFNf+r0Dt73IPP20cTEzFBmumSjt/OTiVaeJIOoJQxgDMm8=
+	t=1722249050; cv=none; b=WZEOxgfhd9katIekDXrmLZam2abo5f5FRoJY3r00iLXsPEhoN63os+EFWjmRd4c9gD2NJ0AS3qCdL/jH+aAxKjw0GUXgJkWG3kJhdpuZKEzKmmdQjdu02oURImqNlkeWrLIKLYjcVgbOVXOrWgCF/j/XcGn0e7o4Ci+1WfDOZPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722238931; c=relaxed/simple;
-	bh=CFkUsARNX/VdUV/6OrvXxJCl8G2ULrIF/o9MLMWDVgQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=YE8he6XW6c1awPiTLq3TZJTY21QHPBRTLT9szxS55zLDbSkMdGuc/nC00Y1dbMgYCTQW+9caX+xctwI998ZvAiy2eHk4j3Ciyp5fg/4wUOCImvdmAHgAHYdKpIfyCsroiB/OpfiIIVsNdyGXmHkZHEnWUSObSlwu2WtB9HoIBiQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=N0vsiRi/; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46T6ukZO008808;
-	Mon, 29 Jul 2024 07:42:06 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
-	:to:cc:subject:in-reply-to:references:date:message-id
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	G6c3m7ROyba/8ZiFLEJb3NUolP5Qm0AiHZz4CD3VWzg=; b=N0vsiRi/960t0/s1
-	goK3W7+7NmgC1Lv7hkRDNRvN15ZFovfSesosTXO9F9gDzIqUwPS5OxarJpZ4Y1si
-	LBxGzRkbJQ7PXRbB8lMaOsM7MMDqfjOfFyWYKpSkPuQAOUAhyVaUkWIosNyzWywh
-	VfftjqSFISs001C2VQhFv/FTUCvzVJxLefJ3+79Ip5QRzszUmW0CvMRrYy5IGxSp
-	auW3+MAAlHssy8DWThiMpT8SRRoFdL1QXXqde242RtKENJkJaKL/1F2LuOn0sRuV
-	Lot8u3Up/ziqKMJPgK7jzEu5HftOOdlBBEoOd/8Sbg1/IrFw4u/M/PXKETrjaoLd
-	ytNfSA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40mputc6ee-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jul 2024 07:42:06 +0000 (GMT)
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46T7c6cm015501;
-	Mon, 29 Jul 2024 07:42:05 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40mputc6ec-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jul 2024 07:42:05 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46T6v96a018776;
-	Mon, 29 Jul 2024 07:42:05 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40nc7pdfye-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jul 2024 07:42:05 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46T7fx6s38535670
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 29 Jul 2024 07:42:01 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6B3842004B;
-	Mon, 29 Jul 2024 07:41:59 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0DC1820043;
-	Mon, 29 Jul 2024 07:41:59 +0000 (GMT)
-Received: from li-1de7cd4c-3205-11b2-a85c-d27f97db1fe1.ibm.com (unknown [9.171.68.163])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Mon, 29 Jul 2024 07:41:58 +0000 (GMT)
-From: "Marc Hartmayer" <mhartmay@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>, linux-s390@vger.kernel.org,
-        Thomas Huth <thuth@redhat.com>, Nicholas Piggin <npiggin@gmail.com>
-Cc: kvm@vger.kernel.org, Nico Boehr <nrb@linux.ibm.com>,
-        Steffen Eiden
- <seiden@linux.ibm.com>
-Subject: Re: [kvm-unit-tests PATCH v1 1/3] s390x/Makefile: snippets: Add
- separate target for the ELF snippets
-In-Reply-To: <7a7405e6-49fe-4322-a010-1b3af5c50df4@linux.ibm.com>
-References: <20240604115932.86596-1-mhartmay@linux.ibm.com>
- <20240604115932.86596-2-mhartmay@linux.ibm.com>
- <7a7405e6-49fe-4322-a010-1b3af5c50df4@linux.ibm.com>
-Date: Mon, 29 Jul 2024 09:41:57 +0200
-Message-ID: <875xsotzju.fsf@linux.ibm.com>
+	s=arc-20240116; t=1722249050; c=relaxed/simple;
+	bh=u334+T1SSdYfPfNVmFDVR0LH132wKgIjOBjUYC5VVw4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oiB+UV8p5AFYIw8lTDToZKm4by6AvDSta3BQVT4W4l0iMNU5NKixXcctGVxDRHHI+037cFzRw1UCBcv5mQLTsrhnuOTyr1fc//ffQSLwsT+5219RzyTvjnfZSkKpEbsXqcl7hpSYnIZmLNYRokUphy0bti2JoKzEScBjecXwiek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kx9sfTFe; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722249048;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:in-reply-to:in-reply-to:  references:references;
+	bh=E/v307qrJPqbG9EmIQvCRmaOD0J7mX5czZH3z26/3Oo=;
+	b=Kx9sfTFe9zVU650zaTUPdCdkGlz5aG07/AIi5n4X/M5vbqkR4Qb/3uFd9SDqbkdo923Za3
+	rFNbbaIZAy0BBZT5rEZ38LzqXhjLCvMkOyyu6adWkFLdYqgxgM/RTHbBaPsmrVkXA/eTDh
+	sMLiS1OXTHfvs0hx8hzRpdBIAXviJmE=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-70-g733LZZ5PF-0JSc1Znuxmw-1; Mon,
+ 29 Jul 2024 06:30:45 -0400
+X-MC-Unique: g733LZZ5PF-0JSc1Znuxmw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C2951955D4E;
+	Mon, 29 Jul 2024 10:30:41 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.58])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 04B55195605F;
+	Mon, 29 Jul 2024 10:30:34 +0000 (UTC)
+Date: Mon, 29 Jul 2024 11:30:31 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Cleber Rosa <crosa@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>,
+	Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>,
+	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+	Leif Lindholm <quic_llindhol@quicinc.com>,
+	Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org,
+	Alex =?utf-8?Q?Benn=C3=A9e?= <alex.bennee@linaro.org>,
+	Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+	Wainer dos Santos Moschetta <wainersm@redhat.com>,
+	qemu-arm@nongnu.org, Radoslaw Biernacki <rad@semihalf.com>,
+	Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Subject: Re: [PATCH 03/13] tests/avocado/intel_iommu.py: increase timeout
+Message-ID: <ZqdvR3UFBCAu8wiI@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240726134438.14720-1-crosa@redhat.com>
+ <20240726134438.14720-4-crosa@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -96,52 +83,61 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: FtxZQZ-CTLstnwD9kfz8_00sm09oAZJa
-X-Proofpoint-GUID: 6GsOsX-3UlHCa10rwLqF9K44-0h1BQr3
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-29_05,2024-07-26_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 mlxscore=0 adultscore=0 clxscore=1015 phishscore=0
- lowpriorityscore=0 suspectscore=0 malwarescore=0 bulkscore=0
- mlxlogscore=999 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2407290049
+Content-Disposition: inline
+In-Reply-To: <20240726134438.14720-4-crosa@redhat.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Mon, Jul 29, 2024 at 09:00 AM +0200, Janosch Frank <frankja@linux.ibm.co=
-m> wrote:
-> On 6/4/24 1:59 PM, Marc Hartmayer wrote:
->> It's unusual to create multiple files in one target rule, and it's even =
-more
->> unusual to create an ELF file with a `.gbin` file extension first, and t=
-hen
->> overwrite it in the next step. It might even lead to errors as the input=
- file
->> path is also used as the output file path - but this depends on the objc=
-opy
->> implementation. Therefore, create an extra target for the ELF files and =
-list it
->> as a prerequisite for the *.gbin targets.
->>=20
->> Signed-off-by: Marc Hartmayer <mhartmay@linux.ibm.com>
->
-> I've picked this one but it's unlikely that I'll pick the other patches=20
-> in the series. Thanks for improving the makefile and fixing my
-> mistakes :)
+On Fri, Jul 26, 2024 at 09:44:28AM -0400, Cleber Rosa wrote:
+> Based on many runs, the average run time for these 4 tests is around
+> 250 seconds, with 320 seconds being the ceiling.  In any way, the
+> default 120 seconds timeout is inappropriate in my experience.
+> Let's increase the timeout so these tests get a chance to completion.
 
-Thanks for the r-b and fine with me. The other two patches are not as
-useful and would make s390x even more different from other architectures
-with little to no real benefit.
+A high watermark of over 5 minutes is pretty long for a test.
 
->
---=20
-Kind regards / Beste Gr=C3=BC=C3=9Fe
-   Marc Hartmayer
+Looking at the test I see it runs
 
-IBM Deutschland Research & Development GmbH
-Vorsitzender des Aufsichtsrats: Wolfgang Wendt
-Gesch=C3=A4ftsf=C3=BChrung: David Faller
-Sitz der Gesellschaft: B=C3=B6blingen
-Registergericht: Amtsgericht Stuttgart, HRB 243294
+   self.ssh_command('dnf -y install numactl-devel')
+
+but then never actually uses the installed package.
+
+I expect that most of the wallclock time here is coming from having
+dnf download all the repodata, 4 times over.
+
+If the intention was to test networking, then replace this with
+something that doesn't have to download 100's of MB of data, then
+see what kind of running time we get before increasing any timeout. 
+
+
+> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> ---
+>  tests/avocado/intel_iommu.py | 2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff --git a/tests/avocado/intel_iommu.py b/tests/avocado/intel_iommu.py
+> index 008f214397..9e7965c5df 100644
+> --- a/tests/avocado/intel_iommu.py
+> +++ b/tests/avocado/intel_iommu.py
+> @@ -25,6 +25,8 @@ class IntelIOMMU(LinuxTest):
+>      :avocado: tags=flaky
+>      """
+>  
+> +    timeout = 360
+> +
+>      IOMMU_ADDON = ',iommu_platform=on,disable-modern=off,disable-legacy=on'
+>      kernel_path = None
+>      initrd_path = None
+> -- 
+> 2.45.2
+> 
+> 
+
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+
 
