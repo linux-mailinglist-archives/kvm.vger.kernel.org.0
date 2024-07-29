@@ -1,121 +1,121 @@
-Return-Path: <kvm+bounces-22515-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22516-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40F6B93F992
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 17:35:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D89C93FB39
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 18:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C1FD2B2296C
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 15:35:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED90F284101
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 16:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B24E15A849;
-	Mon, 29 Jul 2024 15:35:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="imN75jyn"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238DD188CBE;
+	Mon, 29 Jul 2024 16:24:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3866158A3C
-	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 15:34:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F48155CB3
+	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 16:24:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722267299; cv=none; b=dzYtMzGFtzwQvU7srAc8JsrC8Rh1uPVlGjsX1HaYhJyCiyMUt2yuofKsj7JqmffwuJ0FuBOyidNzwdQ3BHAnnzgBVVplFPR0CT2bhT5y2+xOR69IBy4vsFYIJUafZ6Pjtrrg7C+IEyMnwB+kAnsuD4PyQzyqkC4SUzYjIjKF8yg=
+	t=1722270270; cv=none; b=ddKaXGXGasejNtLUE+Su/WZeKSKka1Fy/ubYSaACbBp0aT4e3Eo+7tSng3MigCmq0BfNWGqdd0jUEbsmBopuN6ho8Eu/zPsmsmQx49fWJBeqDUXrj9h3jbvlyR94hRRjKHOSZyZ19vKPTuOke8Qfrq9z8cQsYRRTrzAqpG/+tKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722267299; c=relaxed/simple;
-	bh=St2oF3CEhrw25LU2LpX/lf+cvRv7TUHNtWwkHL5vmIA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=kHz81aWaXMg8R0MOhXYm5NQ6DAwBxJ3ekGuzetxapltHy7JpJ2LFhvT1pQ4Num2SZHjGA1vo/iT50jGjbADvu0Ve8fteOnAgCa097UedB76GbCLgkpCxk3A++rbmPjHdtFMOJP1dq/dS3noB7Q2b4ly75iNQYu3hSCtlH7GZ9n8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=imN75jyn; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-66c0f57549fso73828017b3.0
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 08:34:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722267297; x=1722872097; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P5BO85kKfrP3kPw9rl6zi5w//RZnq6rehhthruUWfX8=;
-        b=imN75jynXgiAfBZkddT5zvTOcnFaXG7xuErJuhRJi04wvvk0lfCB/2PYfdrcXjC6jL
-         P25sAC4CoBn/aT+HnDa1AdcEVfSuTjyMmJrB6b4TdfJwqDJXWxyk0qwYH1up3fM35Ps7
-         vJoUtxwSVvKVqKsHaCKna51H7kMsYEvUUs2FVF8kyweR3L+dfX97xAKhjPGPXBAOpq78
-         YNPg7VL8ysu2ejAUr1elmYzNPwEMXV01DQbAMeVyR15uZ04pnxOdcA8jwnBfUgpLT9M1
-         C/5eExUBi2EpWl7nxSAbiQkf5cyRM60eSq+3w09uBhsahQFIYt5Bc7TcdELyKUkF28uN
-         cgSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722267297; x=1722872097;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=P5BO85kKfrP3kPw9rl6zi5w//RZnq6rehhthruUWfX8=;
-        b=a6olc/rwdAecv6U5JsxAK0QU/0fKxyj6UA/RXOpFtsITLDj8/YiH8dJKm7SI85GV0v
-         hhCRzTyo1/FvfW3RNidymdCEe6ksybIgALvbmE5ARR0HiMO9QphAfkK9q4t4EJoTWZM0
-         jy3Ct36fBT2UZiqSnntfB/HYpK+pqdtaNQ+Ip409pgfpVP8RlueV6Jw4oMo6PZ025Kd+
-         2+RxDF9X6JNlIkH9KJUWNVjnqUg5aLsnK+/LTSvvgzSSg4y58f6H41526T+WeDn6qioN
-         oh2Rqw+McJGFp5UxcRBJ/YqNRIRblbLmkleRI4KKWsqf+vYaIvQyo0wytWuh9xgEvWCn
-         RoxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUunX9/GmV3ExOzItBFF6dnTd4mvsLqCyDHU5VONonLK1MTCNC9tefqcrK15OlJRJQti/Q8nMcx6CqCR+WQFMkzHvD9
-X-Gm-Message-State: AOJu0Ywum2Qe+3uv3zICqOeVDs+p9VOs+adNxZSEb1UNxXLAgHN5nlON
-	0BCay1CZZjb3d7UiTWILAt4L9IoQykXaYSgtG90fKK7zKFtOb/vlXsDYM0/TTsHdyUFoKYTX0Ps
-	Wfg==
-X-Google-Smtp-Source: AGHT+IGGp7Xu/kWdEKL3yO6fLEKcGo5tqaTPTzr2R/VUyXOa/WPokijfHNwntnFNTXLNUiGFfxA29lz41fc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:14:b0:622:cd7d:fec4 with SMTP id
- 00721157ae682-67a0a5185c6mr1924627b3.9.1722267297035; Mon, 29 Jul 2024
- 08:34:57 -0700 (PDT)
-Date: Mon, 29 Jul 2024 08:34:55 -0700
-In-Reply-To: <f9b2f9e949a982e07c9ea5ead316ab3809e40543.camel@redhat.com>
+	s=arc-20240116; t=1722270270; c=relaxed/simple;
+	bh=ZPl/Zmnqt2pDbqbogHkpC7W+mhG/65XSGe0MGDEQiOU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bggienfVDsMdTXj4zTkosCZEXArNQ5aKK+M9/qOVN7+557sy564T0jFuI91pG1fDTxPnjfM6ME4PRIUcd3+2BQzCDqkjSHlLoQ9KFzl1ZHNjq/qAy5rHZwOaHyxcpvR33SJ9296o7SsZ7eIRGeH4/8zVij0RwP2wqG4Yt4iv5VA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id F20531007;
+	Mon, 29 Jul 2024 09:24:53 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 4F3F33F766;
+	Mon, 29 Jul 2024 09:24:27 -0700 (PDT)
+Date: Mon, 29 Jul 2024 17:24:24 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: =?utf-8?Q?J=2E_Neusch=C3=A4fer?= <j.neuschaefer@gmx.net>
+Cc: kvm@vger.kernel.org, Alyssa Ross <hi@alyssa.is>, will@kernel.org,
+	julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH kvmtool v2 2/2] Get __WORDSIZE from <sys/reg.h> for musl
+ compat
+Message-ID: <ZqfCOOhF9dGf3G_c@raptor>
+References: <20240727-musl-v2-0-b106252a1cba@gmx.net>
+ <20240727-musl-v2-2-b106252a1cba@gmx.net>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-41-seanjc@google.com>
- <030c973172dcf3a24256ddc8ddc5e9ef57ecabcb.camel@redhat.com>
- <Zox_4OoDmGDHOaSA@google.com> <f9b2f9e949a982e07c9ea5ead316ab3809e40543.camel@redhat.com>
-Message-ID: <Zqe2n4e4HtdgUWgm@google.com>
-Subject: Re: [PATCH v2 40/49] KVM: x86: Initialize guest cpu_caps based on KVM support
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
-	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
-	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
-	Robert Hoo <robert.hoo.linux@gmail.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240727-musl-v2-2-b106252a1cba@gmx.net>
 
-On Wed, Jul 24, 2024, Maxim Levitsky wrote:
-> On Mon, 2024-07-08 at 17:10 -0700, Sean Christopherson wrote:
-> > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > index 0e64a6332052..dbc3f6ce9203 100644
-> > --- a/arch/x86/kvm/cpuid.c
-> > +++ b/arch/x86/kvm/cpuid.c
-> > @@ -448,7 +448,7 @@ void kvm_vcpu_after_set_cpuid(struct kvm_vcpu *vcpu)
-> >                 if (!entry)
-> >                         continue;
-> >  
-> > -               cpuid_func_emulated(&emulated, cpuid.function);
-> > +               cpuid_func_emulated(&emulated, cpuid.function, false);
-> >  
-> >                 /*
-> >                  * A vCPU has a feature if it's supported by KVM and is enabled
-> > @@ -1034,7 +1034,8 @@ static struct kvm_cpuid_entry2 *do_host_cpuid(struct kvm_cpuid_array *array,
-> >         return entry;
-> >  }
-> >  
-> > -static int cpuid_func_emulated(struct kvm_cpuid_entry2 *entry, u32 func)
-> > +static int cpuid_func_emulated(struct kvm_cpuid_entry2 *entry, u32 func,
-> > +                              bool only_advertised)
-> 
-> I'll say, lets call this boolean, 'include_partially_emulated', 
-> (basically features that kvm emulates but only partially,
-> and thus doesn't advertise, aka mwait)
-> 
-> and then it doesn't look that bad, assuming that comes with a comment.
+Hi,
 
-Works for me.  I was trying to figure out a way to say "emulated_on_ud", but I
-can't get the polarity right, at least not without ridiculous verbosity.  E.g.
-include_not_emulated_on_ud is awful.
+CC'ing the maintainers (can be found in README).
+
+On Sat, Jul 27, 2024 at 07:11:03PM +0200, J. Neuschäfer wrote:
+> musl-libc doesn't provide <bits/wordsize.h>, but it defines __WORDSIZE
+> in <sys/reg.h> and <sys/user.h>.
+> 
+> Signed-off-by: J. Neuschäfer <j.neuschaefer@gmx.net>
+> ---
+>  include/linux/bitops.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/bitops.h b/include/linux/bitops.h
+> index ae33922..4f133ba 100644
+> --- a/include/linux/bitops.h
+> +++ b/include/linux/bitops.h
+> @@ -1,7 +1,7 @@
+>  #ifndef _KVM_LINUX_BITOPS_H_
+>  #define _KVM_LINUX_BITOPS_H_
+> 
+> -#include <bits/wordsize.h>
+> +#include <sys/reg.h>
+
+When cross-compiling on x86 for arm64, as well as when compiling natively for
+arm64 I get this error:
+
+In file included from include/linux/bitmap.h:7,
+                 from util/find.c:4:
+include/linux/bitops.h:5:10: fatal error: sys/reg.h: No such file or directory
+    5 | #include <sys/reg.h>
+      |          ^~~~~~~~~~~
+compilation terminated.
+make: *** [Makefile:510: util/find.o] Error 1
+make: *** Waiting for unfinished jobs....
+In file included from include/linux/bitmap.h:7,
+                 from util/bitmap.c:9:
+include/linux/bitops.h:5:10: fatal error: sys/reg.h: No such file or directory
+    5 | #include <sys/reg.h>
+      |          ^~~~~~~~~~~
+compilation terminated.
+make: *** [Makefile:510: util/bitmap.o] Error 1
+
+Also, grep finds __WORDSIZE only in bits/wordsize.h on an x86 and arm64 machine:
+
+$ grep -r "define __WORDSIZE" /usr/include/
+/usr/include/bits/wordsize.h:# define __WORDSIZE			64
+/usr/include/bits/wordsize.h:# define __WORDSIZE			32
+/usr/include/bits/wordsize.h:# define __WORDSIZE32_SIZE_ULONG	1
+/usr/include/bits/wordsize.h:# define __WORDSIZE32_PTRDIFF_LONG	1
+/usr/include/bits/wordsize.h:#define __WORDSIZE_TIME64_COMPAT32	0
+
+
+Thanks,
+Alex
+
+> 
+>  #include <linux/kernel.h>
+>  #include <linux/compiler.h>
+> 
+> --
+> 2.43.0
+> 
+> 
 
