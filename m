@@ -1,153 +1,132 @@
-Return-Path: <kvm+bounces-22477-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22478-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AAFD93EA21
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 01:20:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 614AA93EBC1
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 05:04:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F82C1F21907
-	for <lists+kvm@lfdr.de>; Sun, 28 Jul 2024 23:20:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26F59281587
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 03:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B2E79B9D;
-	Sun, 28 Jul 2024 23:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cqygtvB3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CAC67F7C3;
+	Mon, 29 Jul 2024 03:04:04 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729762AF18
-	for <kvm@vger.kernel.org>; Sun, 28 Jul 2024 23:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AC22B9D2;
+	Mon, 29 Jul 2024 03:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722208810; cv=none; b=CbJF42DUr+V1xAwoG1q51VzXyH9+bp7Y/x2+mtmW12tbcGkwNlRp2KCz6HYKOoF0MRA3zU8utzWKl0fRChvookt2J4vq8zuioUDzMpdMwqR+6Ylj2qudisMt9Rq+tN0GOIZp+aGjVJoWipVmy+GM1QaMyd3K07T40fJWokvF4wE=
+	t=1722222243; cv=none; b=e2mFBIzG38A3CixMxk9MZ8jRLX7L9cX3tiztauMvtHTG7XeGOevo8ehiWTTnAffQe3YhH+S7pG29JjvZdq9Ucr9b+S/Ifr8m48zoDUlXV0z5RZ5o3SY1iCVqHRvOdcUAESchtyvXCGFitcF2z751IWpFH//Y+cOsmLEJOErj9vE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722208810; c=relaxed/simple;
-	bh=+dP40l89F19I3cNbdMF63OXjKsihv2/8PwPxnwj6LNc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=dADBP9460cB5kQjB3NVei8o31lqNSSWtzcPlRDxZVlHMqBohTEkmrFBbU/x7/+L7zbKJbvM2io5XpZJGXDVEEiiZpXqk8FXhD+Avt4iYVzAhMYwoEfAXTTZDVSIfr7OMyByvsRaJ81PVz6jTS/eRq88T2TQ+6khpLS/rRKD6Nvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cqygtvB3; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722208806;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=+eRbOioU+yVUzmrkos9cLIO1XQ0vF0g/0lgz70sgOCo=;
-	b=cqygtvB3T5WwlWeiQKBqnu5uIVWep6apQRd60pb/Z3v6848NogHzWYpDaqV0RAtYAh3BqI
-	6TbA8B160LB9JPfoRCjASVqLqFQJ7h7b9h0SYuRtkeKk1UA+84cwavhKr6oJWorF8cP0iD
-	ZzSv4ZJc/WIQ2+24yYYXKXyju9Iy3WI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-VCOyNU_3MeqXZWeVH1jGZA-1; Sun, 28 Jul 2024 19:20:04 -0400
-X-MC-Unique: VCOyNU_3MeqXZWeVH1jGZA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42816096cb8so15066165e9.0
-        for <kvm@vger.kernel.org>; Sun, 28 Jul 2024 16:20:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722208803; x=1722813603;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+eRbOioU+yVUzmrkos9cLIO1XQ0vF0g/0lgz70sgOCo=;
-        b=qVoNMOIp6O08Mfe1EHqHa0UI2A7u3mIW218GhFSbSZPJr+jXFGX9TMEjuRlT9KjVQ/
-         18MrPBMiR2g/dhR2oNOFrQPU3z+OSG7ySQLBpOS5RH1KxWq1NSYJd3W+7REmEAg5YJdA
-         NKK0mzTFnlN/l6xCLPGEmsF1T5m2+NY93Mx4HlZxI1y4DsPHWCLrenmyX86xQqpX5vWb
-         Dm80ccipSOlkyP/lUdWSNzFxeVuswzAZDoFD0z68+GBLNWL6UPlOOiVpTd5EnaxkQYuB
-         Q3E4lFMT2xG99tkKrvF2n4kE/BPyv6nAF1DpcufGUWYvpr9lWHFyoru9s38m8DTeRLT5
-         kS8g==
-X-Gm-Message-State: AOJu0YxCd5i9D7Nz5faaeub76EfbS8xAMUoU0jUj6Ppf+AAUBussA3UM
-	vaOocWpgZTTo63YVC6jPvwqvn4qsYeVqf5ava5ImQVHyvtEUD/0JT2pvLvN09khCddiYtieGpsS
-	x57bHclOwflSjVAOoRC1+k0Y8uyitKnW6X/JnI3YFqqOB6diJqQ==
-X-Received: by 2002:a05:600c:19c8:b0:426:6fd2:e14b with SMTP id 5b1f17b1804b1-42811d8c0d7mr48465245e9.11.1722208803525;
-        Sun, 28 Jul 2024 16:20:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFJQeBFE1Ei3wW/3T05Gw1tpFuinUnNFeeMy1TSpz7EYl+J4w9ikvZ++fHV9MkZAfomQa2gNg==
-X-Received: by 2002:a05:600c:19c8:b0:426:6fd2:e14b with SMTP id 5b1f17b1804b1-42811d8c0d7mr48464915e9.11.1722208802271;
-        Sun, 28 Jul 2024 16:20:02 -0700 (PDT)
-Received: from redhat.com ([2a0d:6fc7:55d:98c4:742e:26be:b52d:dd54])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4281a26e1bcsm33145835e9.34.2024.07.28.16.19.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 28 Jul 2024 16:20:01 -0700 (PDT)
-Date: Sun, 28 Jul 2024 19:19:56 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dan.carpenter@linaro.org, jiri@nvidia.com, jiri@resnulli.us,
-	mst@redhat.com, quic_jjohnson@quicinc.com
-Subject: [GIT PULL] virtio: fixes for rc1
-Message-ID: <20240728191956-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1722222243; c=relaxed/simple;
+	bh=iyTLuCU18Y/3DWAq8FeUpyOEVu74g6lZH7xKIil/U9s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z4JGwYmwbzAvG/amV50McS0nkMWYbKGLohom4MBeaCT5FiCW++MgsFctvhujkccMJNZGp1UOpsMuYVF+7NMKwUMiE04KVXn0uK7zEERoZIW0Z017xB2APohIh9UPZePOY2S4KFkl2JK8Ixr3fzH5aPyScBHfdryp/P40iQshZAM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+X-QQ-mid: bizesmtpsz13t1722222194t7q1ay
+X-QQ-Originating-IP: 1uHf6tV6CXls7qg6zV58CTomlkOggcYwzjNdHAf0UP4=
+Received: from [10.20.53.89] ( [113.57.152.160])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Mon, 29 Jul 2024 11:03:12 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 7791691834705649597
+Message-ID: <DB945E243D91EB2F+df447e7b-ddd6-459d-9951-d92fcfceb92c@uniontech.com>
+Date: Mon, 29 Jul 2024 11:03:11 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: Loongarch: Remove undefined a6 argument comment for
+ kvm_hypercall
+To: maobibo <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>
+Cc: Dandan Zhang <zhangdandan@uniontech.com>, zhaotianrui@loongson.cn,
+ kernel@xen0n.name, kvm@vger.kernel.org, loongarch@lists.linux.dev,
+ linux-kernel@vger.kernel.org, Wentao Guan <guanwentao@uniontech.com>,
+ baimingcong@uniontech.com
+References: <6D5128458C9E19E4+20240725134820.55817-1-zhangdandan@uniontech.com>
+ <c40854ac-38ef-4781-6c6b-4f74e24f265c@loongson.cn>
+ <CAAhV-H5R_kamf=YJ62hb+iFr7Y+cvCaBBrY1rdk_wEEq4+6D_w@mail.gmail.com>
+ <a9245b66-be6e-7211-49dd-a9a2d23ec2cf@loongson.cn>
+ <CAAhV-H7Op_W0B7d4uQQVU_BEkpyQmwf9TCxQA9bYx3=JrQZ8pg@mail.gmail.com>
+ <9bad6e47-dac5-82d2-1828-57df3ec840f8@loongson.cn>
+From: WangYuli <wangyuli@uniontech.com>
+Autocrypt: addr=wangyuli@uniontech.com; keydata=
+ xjMEZoEsiBYJKwYBBAHaRw8BAQdAyDPzcbPnchbIhweThfNK1tg1imM+5kgDBJSKP+nX39DN
+ IVdhbmdZdWxpIDx3YW5neXVsaUB1bmlvbnRlY2guY29tPsKJBBMWCAAxFiEEa1GMzYeuKPkg
+ qDuvxdofMEb0C+4FAmaBLIgCGwMECwkIBwUVCAkKCwUWAgMBAAAKCRDF2h8wRvQL7g0UAQCH
+ 3mrGM0HzOaARhBeA/Q3AIVfhS010a0MZmPTRGVfPbwD/SrncJwwPAL4GiLPEC4XssV6FPUAY
+ 0rA68eNNI9cJLArOOARmgSyJEgorBgEEAZdVAQUBAQdA88W4CTLDD9fKwW9PB5yurCNdWNS7
+ VTL0dvPDofBTjFYDAQgHwngEGBYIACAWIQRrUYzNh64o+SCoO6/F2h8wRvQL7gUCZoEsiQIb
+ DAAKCRDF2h8wRvQL7sKvAP4mBvm7Zn1OUjFViwkma8IGRGosXAvMUFyOHVcl1RTgFQEAuJkU
+ o9ERi7qS/hbUdUgtitI89efbY0TVetgDsyeQiwU=
+Disposition-Notification-To: WangYuli <wangyuli@uniontech.com>
+In-Reply-To: <9bad6e47-dac5-82d2-1828-57df3ec840f8@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+
+Hi Bibo and Huacai,
 
 
-The biggest thing here is the adminq change - but it looks like
-the only way to avoid headq blocking causing indefinite stalls.
+Ah... tell me you two aren't arguing, right?
 
 
-The following changes since commit 6c85d6b653caeba2ef982925703cbb4f2b3b3163:
+Both of you are working towards the same goal—making the upstream
 
-  virtio: rename virtio_find_vqs_info() to virtio_find_vqs() (2024-07-17 05:20:58 -0400)
+code for the Loongarch architecture as clean and elegant as possible.
 
-are available in the Git repository at:
+If it's just a disagreement about how to handle this small patch,
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+there's no need to make things complicated.
 
-for you to fetch changes up to 6d834691da474ed1c648753d3d3a3ef8379fa1c1:
 
-  virtio_pci_modern: remove admin queue serialization lock (2024-07-17 05:43:21 -0400)
+As a partner of yours and a community developer passionate about
 
-----------------------------------------------------------------
-virtio: fixes
+Loongson CPU, I'd much rather see you two working together
 
-This fixes 3 issues:
-- prevent admin commands on one VF blocking another:
-  fixes a huge scalability issue with large # of VFs
-- correctly return error on command failure on octeon
-  fixes a corruption if any commands fail
-- fix modpost warning when building virtio_dma_buf
-  harmless, but the fix is trivial
+harmoniously than complaining about each other's work. I have full
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+confidence in Bibo's judgment on the direction of KVM for Loongarch,
 
-----------------------------------------------------------------
-Dan Carpenter (1):
-      vdpa/octeon_ep: Fix error code in octep_process_mbox()
+and I also believe that Huacai, as the Loongarch maintainer, has always
 
-Jeff Johnson (1):
-      virtio: add missing MODULE_DESCRIPTION() macro
+been fulfilling his responsibilities.
 
-Jiri Pirko (13):
-      virtio_pci: push out single vq find code to vp_find_one_vq_msix()
-      virtio_pci: simplify vp_request_msix_vectors() call a bit
-      virtio_pci: pass vector policy enum to vp_find_vqs_msix()
-      virtio_pci: pass vector policy enum to vp_find_one_vq_msix()
-      virtio_pci: introduce vector allocation fallback for slow path virtqueues
-      virtio_pci_modern: treat vp_dev->admin_vq.info.vq pointer as static
-      virtio: push out code to vp_avq_index()
-      virtio_pci: pass vq info as an argument to vp_setup_vq()
-      virtio: create admin queues alongside other virtqueues
-      virtio_pci_modern: create admin queue of queried size
-      virtio_pci_modern: pass cmd as an identification token
-      virtio_pci_modern: use completion instead of busy loop to wait on admin cmd result
-      virtio_pci_modern: remove admin queue serialization lock
 
- drivers/vdpa/octeon_ep/octep_vdpa_hw.c |   2 +-
- drivers/virtio/virtio.c                |  28 +----
- drivers/virtio/virtio_dma_buf.c        |   1 +
- drivers/virtio/virtio_pci_common.c     | 192 ++++++++++++++++++++++++++-------
- drivers/virtio/virtio_pci_common.h     |  16 +--
- drivers/virtio/virtio_pci_modern.c     | 161 +++++++++++++--------------
- include/linux/virtio.h                 |   3 +
- include/linux/virtio_config.h          |   4 -
- 8 files changed, 243 insertions(+), 164 deletions(-)
+You are both excellent Linux developers. That's all.
+
+
+To be specific about the controversy caused by this particular commit,
+
+I think the root cause is that the KVM documentation for Loongarch
+
+hasn't been upstreamed. In my opinion, the documentation seems
+
+ready to be upstreamed. If you're all busy with more important work,
+
+I can take the time to submit them and provide a Chinese translation.
+
+
+If this is feasible, it would be better to merge this commit after that.
+
+
+Best wishes,
+
+
+--
+
+WangYuli
+
 
 
