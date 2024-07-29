@@ -1,157 +1,111 @@
-Return-Path: <kvm+bounces-22513-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22514-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB21893F952
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 17:26:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE6393F977
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 17:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 021FD28372D
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 15:26:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BF2F1C22250
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 15:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6F5156F46;
-	Mon, 29 Jul 2024 15:26:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEA1155CB8;
+	Mon, 29 Jul 2024 15:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mXlt8W1W"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3861D156875
-	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 15:26:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0FC13BC3F
+	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 15:31:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722266773; cv=none; b=XTTQQgxEefKC3QTj+6WFiEOvoqb+Lr3jfJkJUkRjGWP+gXwhXTO0pPrGPiIvhxOkhUSTDt9OsUwGV4S816QKE9VuMjqiL0klARrfmq7J/vxP6b2bfdh9rEuX8v9fFc8iUi2tnl5N7qEI7cd3VNuUZlUVos5vk5YxDvpgfmbgwdQ=
+	t=1722267067; cv=none; b=kgGbSdKXnQ8YibyKFYtbDjtn5RCh0zLVYhoNNq1JHUC1CgiZnnbe+aQ0APoEimjP2B62dEq5eddjmQl5dkaGlWAANhGwRQQu5C04F42I9WTu9xuFi3u+/b3ci9AoHk9Zwxi9Mo5d6STVPNU3VPO/6p4cYCdLXaUdP0OMPwuBe4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722266773; c=relaxed/simple;
-	bh=mLrg+0IKo6uYpSaRffHV0UgyaCigABx44CllcBktsEw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HWarMpDyVwcXsM1IMXvZkrB0u7R90cO0rf93sElZ9jabFHoKjnBsWgCVVFw3O99RtndPRYI3r2zdMKAHIxk0kZms9dUEZjjvoFkxK7iypIxTy64MXFif4IFDQbKaV71gYozDyBG5nwLHMxgRUCIcKsBlALF9rQm+wJnYfG9cQmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 182CF1007;
-	Mon, 29 Jul 2024 08:26:36 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id E61B83F64C;
-	Mon, 29 Jul 2024 08:26:08 -0700 (PDT)
-Date: Mon, 29 Jul 2024 16:26:00 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-Message-ID: <Zqe0iBtD4389Lhei@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
- <20240708165800.1220065-1-maz@kernel.org>
+	s=arc-20240116; t=1722267067; c=relaxed/simple;
+	bh=QxwcKzX7wljivpzQMsXQIorYU1Ba9o0hvcoSR6EVI8A=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LBbjc6BhgXrCNa9D3T5KEyxqbe4OWN2NqEOvup9bf3xR462Bq0jjshgQtHa5vJKDKDbqyqqggjyd7z0a40ZoxiHLXZqfew12JCPu1MJuznIXTaBF8xKEvsROjzahWMJi/GdUDr+ToBADfD29lBalyIHEajpISrQffBDKJXrv4to=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mXlt8W1W; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0b39c429a1so4011947276.0
+        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 08:31:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722267065; x=1722871865; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fnJGLb7UkCkWxw+38nu6Nu4IE9q5Mel5J5PRzG0GI80=;
+        b=mXlt8W1W6Lm81hqmr5R95NX686ZJDdzleU8K1l8ybTT8irxzsbHmLBUQHaDmTwTSSy
+         /4/MepMhENOfWhjrh/bWncIL359/THUlc0z9CB+daI5vxPJi8ycVmtQO/lZLIwkQDb0X
+         UD+E4k7AxGtrgyywGIhy6nKzG27NXLVF4ulTWARd9CyZxU3IjI/cuOPHZ3pAS3P6oXCP
+         f7beaAkWqXbuE1XvY+EpwngUz5l1aVDSebKot0qbNdVRyB/nIhZyoUZsbYL2HFqwuwbX
+         D87rTnW3Tp4ROKeCqvPZXWmOlewlPor39cMe/gcg6wjpEhorjkqIIhDgN4IIc4xzXYXE
+         VKBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722267065; x=1722871865;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fnJGLb7UkCkWxw+38nu6Nu4IE9q5Mel5J5PRzG0GI80=;
+        b=AsESOP6ncpkDycTU/NF+sQGJhD052lD4oQ5DYzKzLBVDiH7nrnsFsr31xnzolJ6TCx
+         H8kpbqArCntAXf66DxnSpiYs1Aaq5Zaj+cTKsG119fXYI2/myaeDm+OjQ8Zn+uOjNlLv
+         er9VCd32VdHafkRNQoGv8eP/HnlN/qqJQssGJm+Ng/5nT98C3HW1HcdRrxCpIM9x4+xT
+         KvG2M6WBSW97Qupu4hjr3XAOSu6A5NvOp4nJPt41aspjJQ5jEiyy6Kya/LTiPBHVXtvz
+         gfSR3/CPjh3sXC70UB/Onn9Ked/WeVSDTQHi1V2oI/oL03kjs+xz29D4q4YvHqz1jnZz
+         khMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXqfcU5ykIi8z8tdSi7AWiEP7z+Ga+X0obEENfmcMCbV93mEFUHjLz1Z5TSMZpTAZu2sj+AC8XM9IHuIXQtSvjLVaTv
+X-Gm-Message-State: AOJu0YwL5065l7wvxJZXTYfmskCwc7bZEyZ9etWpPV14ZAK4zt+Y76sp
+	M0ECq7r7MhuUh5ln78uDuK0iqZIzRrk02XSiXZVWtYK064L1nJxywvj77evXAdcd/PxfdWoycze
+	c1w==
+X-Google-Smtp-Source: AGHT+IGUv5cQAvOwm2KmbR/i5UzKfyfX7KmkVHNSC8c9t8oOjmo+yoPkIPIh+MeLHstjLauBIJTZIJS0ckE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1549:b0:e05:eccb:95dc with SMTP id
+ 3f1490d57ef6-e0b5445f558mr125287276.6.1722267064763; Mon, 29 Jul 2024
+ 08:31:04 -0700 (PDT)
+Date: Mon, 29 Jul 2024 08:31:03 -0700
+In-Reply-To: <b999afeb588eb75d990891855bc6d58861968f23.camel@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240708165800.1220065-1-maz@kernel.org>
+Mime-Version: 1.0
+References: <20240624012016.46133-1-flyingpeng@tencent.com>
+ <171961453123.238606.1528286693480959202.b4-ty@google.com> <b999afeb588eb75d990891855bc6d58861968f23.camel@intel.com>
+Message-ID: <Zqe1t_tc8LWNv39J@google.com>
+Subject: Re: [PATCH] KVM: X86: Remove unnecessary GFP_KERNEL_ACCOUNT for
+ temporary variables
+From: Sean Christopherson <seanjc@google.com>
+To: Kai Huang <kai.huang@intel.com>
+Cc: "pbonzini@redhat.com" <pbonzini@redhat.com>, 
+	"flyingpenghao@gmail.com" <flyingpenghao@gmail.com>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"flyingpeng@tencent.com" <flyingpeng@tencent.com>
+Content-Type: text/plain; charset="us-ascii"
 
-Hi Marc,
-
-On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> In order to plug the brokenness of our current AT implementation,
-> we need a SW walker that is going to... err.. walk the S1 tables
-> and tell us what it finds.
+On Sat, Jun 29, 2024, Kai Huang wrote:
+> On Fri, 2024-06-28 at 15:55 -0700, Sean Christopherson wrote:
+> > On Mon, 24 Jun 2024 09:20:16 +0800, flyingpenghao@gmail.com wrote:
+> > > Some variables allocated in kvm_arch_vcpu_ioctl are released when
+> > > the function exits, so there is no need to set GFP_KERNEL_ACCOUNT.
+> > 
+> > Applied to kvm-x86 misc, thanks!
+> > 
+> > [1/1] KVM: X86: Remove unnecessary GFP_KERNEL_ACCOUNT for temporary variables
+> >       https://github.com/kvm-x86/linux/commit/dd103407ca31
+> > 
+> > --
+> > https://github.com/kvm-x86/linux/tree/next
+> > 
 > 
-> Of course, it builds on top of our S2 walker, and share similar
-> concepts. The beauty of it is that since it uses kvm_read_guest(),
-> it is able to bring back pages that have been otherwise evicted.
-> 
-> This is then plugged in the two AT S1 emulation functions as
-> a "slow path" fallback. I'm not sure it is that slow, but hey.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 520 insertions(+), 18 deletions(-)
-> 
-> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> index 71e3390b43b4c..8452273cbff6d 100644
-> --- a/arch/arm64/kvm/at.c
-> +++ b/arch/arm64/kvm/at.c
-> @@ -4,9 +4,305 @@
->   * Author: Jintack Lim <jintack.lim@linaro.org>
->   */
->  
-> +#include <linux/kvm_host.h>
-> +
-> +#include <asm/esr.h>
->  #include <asm/kvm_hyp.h>
->  #include <asm/kvm_mmu.h>
->  
-> +struct s1_walk_info {
-> +	u64	     baddr;
-> +	unsigned int max_oa_bits;
-> +	unsigned int pgshift;
-> +	unsigned int txsz;
-> +	int 	     sl;
-> +	bool	     hpd;
-> +	bool	     be;
-> +	bool	     nvhe;
-> +	bool	     s2;
-> +};
-> +
-> +struct s1_walk_result {
-> +	union {
-> +		struct {
-> +			u64	desc;
-> +			u64	pa;
-> +			s8	level;
-> +			u8	APTable;
-> +			bool	UXNTable;
-> +			bool	PXNTable;
-> +		};
-> +		struct {
-> +			u8	fst;
-> +			bool	ptw;
-> +			bool	s2;
-> +		};
-> +	};
-> +	bool	failed;
-> +};
-> +
-> +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
-> +{
-> +	wr->fst		= fst;
-> +	wr->ptw		= ptw;
-> +	wr->s2		= s2;
-> +	wr->failed	= true;
-> +}
-> +
-> +#define S1_MMU_DISABLED		(-127)
-> +
-> +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> +			 struct s1_walk_result *wr, const u64 va, const int el)
-> +{
-> +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> +	unsigned int stride, x;
-> +	bool va55, tbi;
-> +
-> +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
+> Hi Sean,
 
-Where 'el' is computed in handle_at_slow() as:
+Sorry, lost this at the bottom of my inbox.
 
-	/*
-	 * We only get here from guest EL2, so the translation regime
-	 * AT applies to is solely defined by {E2H,TGE}.
-	 */
-	el = (vcpu_el2_e2h_is_set(vcpu) &&
-	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
+> I thought we should use _ACCOUNT even for temporary variables.
 
-I think 'nvhe' will always be false ('el' is 2 only when E2H is set).
+Heh, that's what I thought too.
 
-I'm curious about what 'el' represents. The translation regime for the AT
-instruction?
-
-Thanks,
-Alex
+[*] https://lore.kernel.org/all/c0122f66-f428-417e-a360-b25fc0f154a0@p183
 
