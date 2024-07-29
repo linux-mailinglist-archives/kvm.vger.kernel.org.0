@@ -1,148 +1,222 @@
-Return-Path: <kvm+bounces-22524-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22526-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F03493FD90
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 20:41:01 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71CB093FE68
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 21:38:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22AD2281AEA
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 18:41:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5445B232AC
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 19:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662CF187324;
-	Mon, 29 Jul 2024 18:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36921891D2;
+	Mon, 29 Jul 2024 19:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gtuLH1gu"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="qd54Sj4a"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337E9189F41
-	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 18:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C4D187875;
+	Mon, 29 Jul 2024 19:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722278370; cv=none; b=b0n3c2i1DuMAlw91u8mXh4ltJ0VaC4jGRhapWywpUCsLWXLrOJXa0TxK3H/EuF2Mwh1uzdmfvGYFgOcD1hctplryIaOSZZh6450M050SaK5mqF14EJ2vpXGPdRhtTn5mGYfUfXrET4BQ6jI+ww7KW2EdY049iVtAjygr3PPJ7/c=
+	t=1722281909; cv=none; b=AIyOThAw2jmI6jjLrtAnwiKytY4bWQqyfUkeTtMpEEha1jkrdJWT5gC4RARcfRcsxbflDRw0IN2UUbR38o8feL/84Kbp/AcXfywnfEPCsmsVK+B5SDIz5u6kUcesWZLEpzqWD0/1n33ABM2VFhMT4D1iFb/gYTI5CIgcr6BIWn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722278370; c=relaxed/simple;
-	bh=xk3+KuScjITGXiDzDjfIu4gA/sRyc3tOmEiEhe4VNEY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TxCRQX3qIE7XfggGwWNh/a074SYfR9HUk9xuxw3V/kRlFlu8OgHooxLpRDplsXGtYnhULOwJpLTDotu+WKuuX+9HHWKswg3rpL3Sjbbl+zLDbqNThcc0A9LHmEwlW59XdMxIQ8NSNOQm0982WmLX+4Op4P7+mZbCZpVec1L2d9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gtuLH1gu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722278368;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9H38+PlxDPb0B2kVTxHGHrLppqPJ/7ePtq7mF29j+5Q=;
-	b=gtuLH1guRAFD6VquF0kOvqdriPk8Wp2tnEIhxjmIBTfP3P91KqqFXMCvY6t6HJlislkDWi
-	4CYFLXVnvymHvdWAtoRtlvNH264r/zLpYmROPOM3I2UZTKDYipFKRMueOUBCTrHX4HIUFg
-	EVFvNXzUadnu5SN9PWC2amOJwj8YGm0=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-274-TyEAJ39yMBCJknv_CsRGMA-1; Mon,
- 29 Jul 2024 14:39:22 -0400
-X-MC-Unique: TyEAJ39yMBCJknv_CsRGMA-1
-Received: from mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.15])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	s=arc-20240116; t=1722281909; c=relaxed/simple;
+	bh=lHHV4zTdD1q9DpwHuQPQl8xYs1VEWH9oBF9zLkwshz0=;
+	h=Message-ID:Date:MIME-Version:In-Reply-To:To:CC:From:Subject:
+	 Content-Type; b=SAZ8Z+hfwiSS9sjUMIpfkCOUrMnjuhgKy7IVWfwJe/IbxQOruKsmSI6pN6XzSoGC1hsyoHB6PU6tgeITewJmdvfzXdEocD7SSqnfoPScfxp0qN7Eof/AvpCX3FUIFJB3Az8nSg6vfEBaJS030C6KO8pY2M80DGO+k/Qto5lTVnk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=qd54Sj4a; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 7D394120002;
+	Mon, 29 Jul 2024 22:38:15 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 7D394120002
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1722281895;
+	bh=H1PeoFKA7L/nSsyhmpS5lW2+TNHnStcFo/+/1oEAYSI=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type:From;
+	b=qd54Sj4azVTvA9atmOWvIcm56eAhS6YREDBOdAoHqZYn5jOVpe4fxCDlVFS/2dpdM
+	 bKvvRFCuTrG3H40adyR7UDD7iaCY/Yl+kkW+DVS2sYeRhBc8+TyNTchyJE4By3HCrc
+	 NzGBnt8CZL1fKBewQE20O72+CA7LVGBugYe890LQKxx4P5yuuoA8e/hgrgCpXcmawT
+	 7BEXcb4dsVwnYG4fcmgFLHbTWHScAhKsIVeaNqxMZRK/0hsf8iuHEbgVfc7D7fC75d
+	 s7FetSoG0flc2ej61nNwRv/7s92fhD9HOclXL4TudK1Ta9wAOjE2WxA9KG4ecug9BT
+	 PIOfCOmmypSJg==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8C61E19560A1;
-	Mon, 29 Jul 2024 18:39:19 +0000 (UTC)
-Received: from t14s.fritz.box (unknown [10.39.192.25])
-	by mx-prod-int-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5EF6D1955D42;
-	Mon, 29 Jul 2024 18:39:13 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	linux-s390@vger.kernel.org,
-	kvm@vger.kernel.org,
-	David Hildenbrand <david@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>
-Subject: [PATCH v1 3/3] s390/uv: drop arch_make_page_accessible()
-Date: Mon, 29 Jul 2024 20:38:44 +0200
-Message-ID: <20240729183844.388481-4-david@redhat.com>
-In-Reply-To: <20240729183844.388481-1-david@redhat.com>
-References: <20240729183844.388481-1-david@redhat.com>
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Mon, 29 Jul 2024 22:38:15 +0300 (MSK)
+Received: from [172.28.128.200] (100.64.160.123) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Mon, 29 Jul 2024 22:38:13 +0300
+Message-ID: <d1126dd8-cc6c-be20-7b55-83a0517d14d0@salutedevices.com>
+Date: Mon, 29 Jul 2024 22:25:55 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.15
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Content-Language: en-US
+In-Reply-To: <20240710212555.1617795-2-amery.hung@bytedance.com>
+To: <stefanha@redhat.com>, <sgarzare@redhat.com>, <mst@redhat.com>,
+	<jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<kys@microsoft.com>, <haiyangz@microsoft.com>, <wei.liu@kernel.org>,
+	<decui@microsoft.com>, <bryantan@vmware.com>, <vdasa@vmware.com>,
+	<pv-drivers@vmware.com>
+CC: <dan.carpenter@linaro.org>, <simon.horman@corigine.com>,
+	<oxffffaa@gmail.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <bobby.eshleman@bytedance.com>,
+	<jiang.wang@bytedance.com>, <amery.hung@bytedance.com>,
+	<ameryhung@gmail.com>, <xiyou.wangcong@gmail.com>, <kernel@sberdevices.ru>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+Subject: [RFC PATCH net-next v6 01/14] af_vsock: generalize
+ vsock_dgram_recvmsg() to all transports
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186779 [Jul 29 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 24 0.3.24 186c4d603b899ccfd4883d230c53f273b80e467f, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;100.64.160.123:7.1.2;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/07/29 16:49:00 #26175127
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-All code was converted to using arch_make_folio_accessible(), let's drop
-arch_make_page_accessible().
+> @@ -1273,11 +1273,15 @@ static int vsock_dgram_connect(struct socket *sock,
+>  int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+>  			size_t len, int flags)
+>  {
+> +	struct vsock_skb_cb *vsock_cb;
+>  #ifdef CONFIG_BPF_SYSCALL
+>  	const struct proto *prot;
+>  #endif
+>  	struct vsock_sock *vsk;
+> +	struct sk_buff *skb;
+> +	size_t payload_len;
+>  	struct sock *sk;
+> +	int err;
+>  
+>  	sk = sock->sk;
+>  	vsk = vsock_sk(sk);
+> @@ -1288,7 +1292,43 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+>  		return prot->recvmsg(sk, msg, len, flags, NULL);
+>  #endif
+>  
+> -	return vsk->transport->dgram_dequeue(vsk, msg, len, flags);
+> +	if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
+> +		return -EOPNOTSUPP;
+> +
+> +	if (unlikely(flags & MSG_ERRQUEUE))
+> +		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
+> +
+> +	/* Retrieve the head sk_buff from the socket's receive queue. */
+> +	err = 0;
+> +	skb = skb_recv_datagram(sk_vsock(vsk), flags, &err);
+> +	if (!skb)
+> +		return err;
+> +
+> +	payload_len = skb->len;
+> +
+> +	if (payload_len > len) {
+> +		payload_len = len;
+> +		msg->msg_flags |= MSG_TRUNC;
+> +	}
+> +
+> +	/* Place the datagram payload in the user's iovec. */
+> +	err = skb_copy_datagram_msg(skb, 0, msg, payload_len);
+> +	if (err)
+> +		goto out;
+> +
+> +	if (msg->msg_name) {
+> +		/* Provide the address of the sender. */
+> +		DECLARE_SOCKADDR(struct sockaddr_vm *, vm_addr, msg->msg_name);
+> +
+> +		vsock_cb = vsock_skb_cb(skb);
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- arch/s390/include/asm/page.h | 2 --
- arch/s390/kernel/uv.c        | 5 -----
- include/linux/mm.h           | 7 -------
- 3 files changed, 14 deletions(-)
+May be we can declare 'vsock_cb' here ? Reducing its scope.
 
-diff --git a/arch/s390/include/asm/page.h b/arch/s390/include/asm/page.h
-index 06416b3f94f59..515db8241eb6b 100644
---- a/arch/s390/include/asm/page.h
-+++ b/arch/s390/include/asm/page.h
-@@ -176,8 +176,6 @@ static inline int devmem_is_allowed(unsigned long pfn)
- 
- int arch_make_folio_accessible(struct folio *folio);
- #define HAVE_ARCH_MAKE_FOLIO_ACCESSIBLE
--int arch_make_page_accessible(struct page *page);
--#define HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
- 
- struct vm_layout {
- 	unsigned long kaslr_offset;
-diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
-index 36db065c7cf75..35ed2aea88918 100644
---- a/arch/s390/kernel/uv.c
-+++ b/arch/s390/kernel/uv.c
-@@ -548,11 +548,6 @@ int arch_make_folio_accessible(struct folio *folio)
- }
- EXPORT_SYMBOL_GPL(arch_make_folio_accessible);
- 
--int arch_make_page_accessible(struct page *page)
--{
--	return arch_make_folio_accessible(page_folio(page));
--}
--EXPORT_SYMBOL_GPL(arch_make_page_accessible);
- static ssize_t uv_query_facilities(struct kobject *kobj,
- 				   struct kobj_attribute *attr, char *buf)
- {
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index bab689ec77f94..07b478952bb02 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2205,13 +2205,6 @@ static inline bool folio_likely_mapped_shared(struct folio *folio)
- 	return atomic_read(&folio->_mapcount) > 0;
- }
- 
--#ifndef HAVE_ARCH_MAKE_PAGE_ACCESSIBLE
--static inline int arch_make_page_accessible(struct page *page)
--{
--	return 0;
--}
--#endif
--
- #ifndef HAVE_ARCH_MAKE_FOLIO_ACCESSIBLE
- static inline int arch_make_folio_accessible(struct folio *folio)
- {
--- 
-2.45.2
+> +		vsock_addr_init(vm_addr, vsock_cb->src_cid, vsock_cb->src_port);
+> +		msg->msg_namelen = sizeof(*vm_addr);
+> +	}
+> +	err = payload_len;
+> +
+> +out:
+> +	skb_free_datagram(&vsk->sk, skb);
+> +	return err;
+>  }
+>  EXPORT_SYMBOL_GPL(vsock_dgram_recvmsg);
+>  
+
+
+> --- a/net/vmw_vsock/vmci_transport.c
+> +++ b/net/vmw_vsock/vmci_transport.c
+> @@ -610,6 +610,7 @@ vmci_transport_datagram_create_hnd(u32 resource_id,
+>  
+>  static int vmci_transport_recv_dgram_cb(void *data, struct vmci_datagram *dg)
+>  {
+> +	struct vsock_skb_cb *vsock_cb;
+>  	struct sock *sk;
+>  	size_t size;
+>  	struct sk_buff *skb;
+> @@ -637,10 +638,14 @@ static int vmci_transport_recv_dgram_cb(void *data, struct vmci_datagram *dg)
+>  	if (!skb)
+>  		return VMCI_ERROR_NO_MEM;
+>  
+> +	vsock_cb = vsock_skb_cb(skb);
+> +	vsock_cb->src_cid = dg->src.context;
+> +	vsock_cb->src_port = dg->src.resource;
+>  	/* sk_receive_skb() will do a sock_put(), so hold here. */
+>  	sock_hold(sk);
+>  	skb_put(skb, size);
+>  	memcpy(skb->data, dg, size);
+> +	skb_pull(skb, VMCI_DG_HEADERSIZE);
+
+Small suggestion: here we do:
+
+1) skb_put(skb, size of entire datagram)
+2) memcpy(entire datagram)
+3) skb_pull(VMCI_DG_HEADERSIZE)
+
+If we provide only data to the upper layer, we can do:
+1) skb_put(dg->payload_size)
+2) memcpy(dg->payload_size)
+
+Also (I'm no expert in VMCI), i guess using dg->payload_size is safer
+to know number of data bytes, instead of using VMCI_DG_HEADERSIZE.
+
+WDYT?
+
+>  	sk_receive_skb(sk, skb, 0);
+>  
+>  	return VMCI_SUCCESS;
+> @@ -1731,59 +1736,6 @@ static int vmci_transport_dgram_enqueue(
+>  	return err - sizeof(*dg);
+>  }
+>  
+
+Thanks
+
+
 
 
