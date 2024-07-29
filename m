@@ -1,74 +1,64 @@
-Return-Path: <kvm+bounces-22517-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22518-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D965A93FB52
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 18:36:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F12A293FC3C
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 19:18:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93AA6285AA6
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 16:36:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABF832835A8
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 17:18:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C9E15FA6B;
-	Mon, 29 Jul 2024 16:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8015187856;
+	Mon, 29 Jul 2024 17:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="zRLotdyU"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Xos26ffX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0153C77119
-	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 16:32:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DE3187355;
+	Mon, 29 Jul 2024 17:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722270742; cv=none; b=WAJYy5Jqj1pdyeg7okRyoaXrFJu/XTRfH2I43Mnjk0fWRnkWreSBv7X/PYXEN313OVJ8w8r0XndVvTActdzdVqfyBRFP7w+5H0Ap4C/NlVmIHxFPtWVVTde/Vab4XBWfcGi7jTNhy/p5IfnRI7F6x7TtU2lTRf5H16WkhF2+jFw=
+	t=1722273448; cv=none; b=HxcDh9fQg2UvpKgSVjrnfKWRXVGn2oLFV1i+aifZxQKpgEm+C1GRkEPXq4JwM1sH/5lISTu7pWEp5ZlLortDTgrqAntV6uRet1AkyZky4Bp5KuC9NOTSEdubfx241Fam6EybtdMNeRVvjYFTCBP4Ylt0Od283ZUCzv5oDbTvkWU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722270742; c=relaxed/simple;
-	bh=/8SS+S02sUIo8V2/nt9h3LxGebVzHxnrgvUCpRqJ084=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bpN23l0Jtqp5wWPhFUQIOkJqglNNDwr3hAUdENyl0grPIx9kHqsgu7gHFCOqeDJvQpDGwZNrXcvsaCFl5nS1nu3Grf9dWFsvF/Hz6Yt8xUQIhAGCifcVbYrz9tmmlPhbpADx3MRSdAIF7rb1F/UBhpiuI7Sg2gMlNsSif27YpFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=none smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=zRLotdyU; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=daynix.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-70d153fec2fso2721655b3a.1
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 09:32:19 -0700 (PDT)
+	s=arc-20240116; t=1722273448; c=relaxed/simple;
+	bh=DBy9rdIyzDefoDApf3C0asqD6WUabDYzQ+Tpqh/Nqy8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Qf6khP0SeaZhzzF6xZeSbNzqIcHg2Nl2SqwGYfP0wfcBMfgWjTQVcjBMDWA4U46LLahhOgwZfmBSebtDF0X24NP75Trf8V+KWhBZOgDh0UpViDTjdbmkUEHAJoKzs7Pllz3kAvJkt29sxynLKroqTPfHz6etXeXai1A3wtgNu0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Xos26ffX; arc=none smtp.client-ip=72.21.196.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1722270739; x=1722875539; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NP0mnjphVBIb1VHUp9w1Gbv9MySDgOtzxAXgvoRoCWk=;
-        b=zRLotdyUiHnYB+9PwD58bpOOp2+j+2tMYhE836iWV3YE1Fm11hAFD8CjJi/bKPWZBY
-         VAwiXJDSx2UwNh2cEGrdz8rBQIvrL1xv9tSTb5eBbAek7a2PaE9OiyqUZOl6TKy1BvLm
-         aWJa/hwejPa65tFFNbkB8KlK8OQX70nDXrZP1PWvy1pVhDpxCBtn2DOiWMxbQCLsiv/d
-         XLvjhg7O3hkBmJCgPBJ/ruA8+uf6jWbT5GbmwKSBuEiHgQYjPvpDyFnvNUKw+4ZLL/W+
-         7zmowjxKuS5fTPLHVWpZ9OGrA7PVweRU3CFzMb2uZDcl9o8qwwO4kvmFtt4npDRWYNcb
-         mPfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722270739; x=1722875539;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NP0mnjphVBIb1VHUp9w1Gbv9MySDgOtzxAXgvoRoCWk=;
-        b=P8/GkSvLD6qq8/LmM8fnlF5eTerPV1TBkltgoD9oWMwOZuNth5+twku5UGwoHN3sf5
-         U8Jhq2l0tt/nslKqsuS1VfWWT+N3NqhG7y7R1MUUPbflkX3BW4Fojz3Fw4C/oNU2oKhk
-         fDpRxmC2mu5Rpavpgks/cA+cHEJm7cT+Pl0LEgrf6qhnyvc4KcBT1/a+Pw3GyfS+vxrD
-         p7BhmhtCggNrmvm92+/+PEcMjNSNXpqgzmZKzoeE5Q1SMwiUVX1bjPjbNcIPR0QIpOw4
-         vzBSC7/jDkoZZ7HW/PQW6FLORMTmAZD2txA7Z7uOgsuorEzZqBS9LApDKXw9YxL5jdRD
-         AOGA==
-X-Forwarded-Encrypted: i=1; AJvYcCV6an+rqnTLrUpfkKh2wgsb+FURUG2ZMO++oQOuZkAmi46FyhqAf82zEHk9QPBuGWf3KQ3yhCKtscStvrWhsq92Zgpp
-X-Gm-Message-State: AOJu0YwY48qUYWdhxZPhBiqFCej0u5sNGcp53HalkhSPA9064KN2KqGP
-	V7klemxVddjPHrtPOTnGV2e6MoBirzuuILRYogC1ZquON897GG3vvut9wm3kOSQ=
-X-Google-Smtp-Source: AGHT+IE8USeonXb4Pm9/EG3A3k5KbT5WMV9i2oo6wxOG6M5W2IsdmVYvAs1TCLj8GNJj8VLKjiJU2g==
-X-Received: by 2002:a05:6a21:3406:b0:1c3:18f9:16d8 with SMTP id adf61e73a8af0-1c4a1511038mr10516471637.52.1722270739318;
-        Mon, 29 Jul 2024 09:32:19 -0700 (PDT)
-Received: from ?IPV6:2400:4050:a840:1e00:32ed:25ae:21b1:72d6? ([2400:4050:a840:1e00:32ed:25ae:21b1:72d6])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead7120easm7010598b3a.55.2024.07.29.09.32.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jul 2024 09:32:18 -0700 (PDT)
-Message-ID: <361cec8b-cd35-416b-b3d2-9e6d87981edd@daynix.com>
-Date: Tue, 30 Jul 2024 01:32:15 +0900
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1722273447; x=1753809447;
+  h=message-id:date:mime-version:reply-to:subject:to:cc:
+   references:from:in-reply-to:content-transfer-encoding;
+  bh=+56SM1DfpyNENiuPZBBa2EGw4OmoljBk1uJ/Yf6TTK4=;
+  b=Xos26ffXQJjVpbeySzag/4kFxkiykGwamdt3nIm7Th9UNAvVu6FvAxAn
+   z/TAoJX6mC6kOGjctoH4FBCKDlcA2yrkdtu8fb7XePZZW0dxoV3Wct8xu
+   +z0Tz58HHsbrdXgdyporD2znSfQcyz5h9nhItItHVif34xmmIQ6AynL+k
+   o=;
+X-IronPort-AV: E=Sophos;i="6.09,246,1716249600"; 
+   d="scan'208";a="418030448"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jul 2024 17:17:23 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:28574]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.6.51:2525] with esmtp (Farcaster)
+ id f6cd28f4-d57e-459f-b07b-1bbc69ce8af3; Mon, 29 Jul 2024 17:17:21 +0000 (UTC)
+X-Farcaster-Flow-ID: f6cd28f4-d57e-459f-b07b-1bbc69ce8af3
+Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 29 Jul 2024 17:17:21 +0000
+Received: from [192.168.9.202] (10.106.82.26) by EX19D022EUC002.ant.amazon.com
+ (10.252.51.137) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Mon, 29 Jul 2024
+ 17:17:20 +0000
+Message-ID: <4cd16922-2373-4894-b888-83a6bb3978e7@amazon.com>
+Date: Mon, 29 Jul 2024 18:17:18 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,73 +66,116 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 3/6] target/arm: Always add pmu property for Armv7-A/R+
-To: Peter Maydell <peter.maydell@linaro.org>
-Cc: Thomas Huth <thuth@redhat.com>, Laurent Vivier <lvivier@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Cornelia Huck <cohuck@redhat.com>,
- qemu-arm@nongnu.org, qemu-devel@nongnu.org, kvm@vger.kernel.org
-References: <20240720-pmu-v4-0-2a2b28f6b08f@daynix.com>
- <20240720-pmu-v4-3-2a2b28f6b08f@daynix.com>
- <CAFEAcA_HWfCU09NfZDf6EC=rpvHn148avySCztQ8PqPBMFx4_Q@mail.gmail.com>
+Reply-To: <kalyazin@amazon.com>
+Subject: Re: [RFC PATCH 14/18] KVM: Add asynchronous userfaults,
+ KVM_READ_USERFAULT
+To: James Houghton <jthoughton@google.com>
+CC: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>, Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Zenghui Yu <yuzenghui@huawei.com>, Sean Christopherson <seanjc@google.com>,
+	Shuah Khan <shuah@kernel.org>, Peter Xu <peterx@redhat.org>, Axel Rasmussen
+	<axelrasmussen@google.com>, David Matlack <dmatlack@google.com>,
+	<kvm@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<kvmarm@lists.linux.dev>, <roypat@amazon.co.uk>, Paolo Bonzini
+	<pbonzini@redhat.com>, <kalyazin@amazon.com>
+References: <20240710234222.2333120-1-jthoughton@google.com>
+ <20240710234222.2333120-15-jthoughton@google.com>
+ <4e5c2904-f628-4391-853e-37b7f0e132e8@amazon.com>
+ <CADrL8HUn-A+k-+A8WvreKtvxW-b9zZvgAGMkkaR7gCLsPr3XPg@mail.gmail.com>
 Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <CAFEAcA_HWfCU09NfZDf6EC=rpvHn148avySCztQ8PqPBMFx4_Q@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Nikita Kalyazin <kalyazin@amazon.com>
+Autocrypt: addr=kalyazin@amazon.com; keydata=
+ xjMEY+ZIvRYJKwYBBAHaRw8BAQdA9FwYskD/5BFmiiTgktstviS9svHeszG2JfIkUqjxf+/N
+ JU5pa2l0YSBLYWx5YXppbiA8a2FseWF6aW5AYW1hem9uLmNvbT7CjwQTFggANxYhBGhhGDEy
+ BjLQwD9FsK+SyiCpmmTzBQJj5ki9BQkDwmcAAhsDBAsJCAcFFQgJCgsFFgIDAQAACgkQr5LK
+ IKmaZPOR1wD/UTcn4GbLC39QIwJuWXW0DeLoikxFBYkbhYyZ5CbtrtAA/2/rnR/zKZmyXqJ6
+ ULlSE8eWA3ywAIOH8jIETF2fCaUCzjgEY+ZIvRIKKwYBBAGXVQEFAQEHQCqd7/nb2tb36vZt
+ ubg1iBLCSDctMlKHsQTp7wCnEc4RAwEIB8J+BBgWCAAmFiEEaGEYMTIGMtDAP0Wwr5LKIKma
+ ZPMFAmPmSL0FCQPCZwACGwwACgkQr5LKIKmaZPNCxAEAxwnrmyqSC63nf6hoCFCfJYQapghC
+ abLV0+PWemntlwEA/RYx8qCWD6zOEn4eYhQAucEwtg6h1PBbeGK94khVMooF
+In-Reply-To: <CADrL8HUn-A+k-+A8WvreKtvxW-b9zZvgAGMkkaR7gCLsPr3XPg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EX19D006EUA004.ant.amazon.com (10.252.50.166) To
+ EX19D022EUC002.ant.amazon.com (10.252.51.137)
 
-On 2024/07/30 0:13, Peter Maydell wrote:
-> On Sat, 20 Jul 2024 at 10:31, Akihiko Odaki <akihiko.odaki@daynix.com> wrote:
->>
->> kvm-steal-time and sve properties are added for KVM even if the
->> corresponding features are not available. Always add pmu property for
->> Armv8. Note that the property is added only for Armv7-A/R+ as QEMU
->> currently emulates PMU only for such versions, and a different
->> version may have a different definition of PMU or may not have one at
->> all.
->>
->> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->> ---
->>   target/arm/cpu.c | 5 ++++-
->>   1 file changed, 4 insertions(+), 1 deletion(-)
->>
->> diff --git a/target/arm/cpu.c b/target/arm/cpu.c
->> index 19191c239181..c1955a82fb3c 100644
->> --- a/target/arm/cpu.c
->> +++ b/target/arm/cpu.c
->> @@ -1741,6 +1741,10 @@ void arm_cpu_post_init(Object *obj)
->>
->>       if (!arm_feature(&cpu->env, ARM_FEATURE_M)) {
->>           qdev_property_add_static(DEVICE(obj), &arm_cpu_reset_hivecs_property);
->> +
->> +        if (arm_feature(&cpu->env, ARM_FEATURE_V7)) {
->> +            object_property_add_bool(obj, "pmu", arm_get_pmu, arm_set_pmu);
->> +        }
+On 26/07/2024 19:00, James Houghton wrote:
+> If it would be useful, we could absolutely have a flag to have all
+> faults go through the asynchronous mechanism. :) It's meant to just be
+> an optimization. For me, it is a necessary optimization.
 > 
-> Not every V7 CPU has a PMU[*]. Unfortunately for PMUv1 the
-> architecture did not define an ID register field for it,
-> so there's no ID field you can look at to distinguish
-> "has PMUv1" from "has no PMU". (For PMUv2 and later you
-> can look at ID_DFR0 bits [27:24]; or for AArch64
-> ID_AA64DFR0_EL1.PMUVer.) This is why we have the
-> ARM_FEATURE_PMU feature bit. So the correct way to determine
-> "does this CPU have a PMU and so it's OK to add the 'pmu'
-> property" is to look at ARM_FEATURE_PMU. Which is what
-> we already do.
+> Userfaultfd doesn't scale particularly well: we have to grab two locks
+> to work with the wait_queues. You could create several userfaultfds,
+> but the underlying issue is still there. KVM Userfault, if it uses a
+> wait_queue for the async fault mechanism, will have the same
+> bottleneck. Anish and I worked on making userfaults more scalable for
+> KVM[1], and we ended up with a scheme very similar to what we have in
+> this KVM Userfault series.
+Yes, I see your motivation. Does this approach support async pagefaults 
+[1]? Ie would all the guest processes on the vCPU need to stall until a 
+fault is resolved or is there a way to let the vCPU run and only block 
+the faulted process?
+
+A more general question is, it looks like Userfaultfd's main purpose was 
+to support the postcopy use case [2], yet it fails to do that 
+efficiently for large VMs. Would it be ideologically better to try to 
+improve Userfaultfd's performance (similar to how it was attempted in 
+[3]) or is that something you have already looked into and reached a 
+dead end as a part of [4]?
+
+[1] https://lore.kernel.org/lkml/4AEFB823.4040607@redhat.com/T/
+[2] https://lwn.net/Articles/636226/
+[3] https://lore.kernel.org/lkml/20230905214235.320571-1-peterx@redhat.com/
+[4] 
+https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com/
+
+> My use case already requires using a reasonably complex API for
+> interacting with a separate userland process for fetching memory, and
+> it's really fast. I've never tried to hook userfaultfd into this other
+> process, but I'm quite certain that [1] + this process's interface
+> scale better than userfaultfd does. Perhaps userfaultfd, for
+> not-so-scaled-up cases, could be *slightly* faster, but I mostly care
+> about what happens when we scale to hundreds of vCPUs.
 > 
-> Alternatively, if you want to make the property always
-> present even on CPUs where it can't be set, you need
-> to have some mechanism for having the user's attempt to
-> enable it fail. But mostly for Arm at the moment we
-> have properties which are only present when they're
-> meaningful. (I'm not opposed to changing this -- it would
-> arguably be cleaner to have properties be per-class,
-> not per-object, to aid in introspection. But it's a big
-> task and probably not easy.)
+> [1]: https://lore.kernel.org/kvm/20240215235405.368539-1-amoorthy@google.com/
+Do I understand it right that in your setup, when an EPT violation occurs,
+  - VMM shares the fault information with the other process via a 
+userspace protocol
+  - the process fetches the memory, installs it (?) and notifies VMM
+  - VMM calls KVM run to resume execution
+?
+Would you be ok to share an outline of the API you mentioned?
 
-Why not disabling PMU fail for V7 then? If the guest cannot know the 
-presence or the lack of PMUv1, disabling PMUv1 for a V7 CPU that has one 
-is as wrong as enabling PMUv1 for a V7 CPU lacking PMUv1.
+>> How do you envision resolving faults in userspace? Copying the page in
+>> (provided that userspace mapping of guest_memfd is supported [3]) and
+>> clearing the KVM_MEMORY_ATTRIBUTE_USERFAULT alone do not look
+>> sufficient to resolve the fault because an attempt to copy the page
+>> directly in userspace will trigger a fault on its own
+> 
+> This is not true for KVM Userfault, at least for right now. Userspace
+> accesses to guest memory will not trigger KVM Userfaults. (I know this
+> name is terrible -- regular old userfaultfd() userfaults will indeed
+> get triggered, provided you've set things up properly.)
+> 
+> KVM Userfault is merely meant to catch KVM's own accesses to guest
+> memory (including vCPU accesses). For non-guest_memfd memslots,
+> userspace can totally just write through the VMA it has made (KVM
+> Userfault *cannot*, by virtue of being completely divorced from mm,
+> intercept this access). For guest_memfd, userspace could write to
+> guest memory through a VMA if that's where guest_memfd is headed, but
+> perhaps it will rely on exact details of how userspace is meant to
+> populate guest_memfd memory.
+True, it isn't the case right now. I think I fast-forwarded to a state 
+where notifications about VMM-triggered faults to the guest_memfd are 
+also sent asynchronously.
 
-Regards,
-Akihiko Odaki
+> In case it's interesting or useful at all, we actually use
+> UFFDIO_CONTINUE for our live migration use case. We mmap() memory
+> twice -- one of them we register with userfaultfd and also give to
+> KVM. The other one we use to install memory -- our non-faulting view
+> of guest memory!
+That is interesting. You're replacing UFFDIO_COPY (vma1) with a memcpy 
+(vma2) + UFFDIO_CONTINUE (vma1), IIUC. Are both mappings created by the 
+same process? What benefits does it bring?
 
