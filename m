@@ -1,122 +1,147 @@
-Return-Path: <kvm+bounces-22495-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22497-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E907A93F472
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 13:49:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C78C993F4A2
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 13:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D7811F224C5
-	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 11:49:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF7CC2813FA
+	for <lists+kvm@lfdr.de>; Mon, 29 Jul 2024 11:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E05C145FED;
-	Mon, 29 Jul 2024 11:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3413F14659B;
+	Mon, 29 Jul 2024 11:55:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="J0RbQRMA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y71S7jnf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0439113AA26
-	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 11:49:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3B4C146015
+	for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 11:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722253778; cv=none; b=mFMnhzUsUMg41CAWWVDHfEdjUanMQDmRdmxP1QSLAAGn9TZe/7HDgcIwdN2ccKIiVEbfKd4SpwiYErUWKqck7kkmpvl1G766QvK8hV9wimznaO2Sd7ElRc1Hn8OySfwIQR6DdSwnWFTrHsDjUcEVz/V/FX1jiuHcU2HlhOdeiFU=
+	t=1722254100; cv=none; b=Z4ggTEoXRWILgdiys74n/6ILUKIGKgr336s27JZRNY5uiudVD9hJHwFaSMAtTq2lY4468BxUnqtK5U16PrRO66p1TXOeLKyrcYYGmDxIQ6PZ192XO+VGqkNQh6BnB5D9mFOzJnMEdxZncu0AsRfMsFCa+VnfFyhqyMxI7G+mkpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722253778; c=relaxed/simple;
-	bh=tTFD6XbFx58/ww+nt7jW+sz/GDcxHciYpQO9gDlYb0M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SJN5OXe5aKc5odQhlzWDPhJuCleZdHQVbuMGc8dmi973uFFcjDA7wwc82fQSnOFHpg5+JNHbiw8A2X5iFVGuwjHZ8rG2861slTYoUH0rmrANolTZrYqWHjZ9tGZzJkc2sdWnBF3VnU8IouS6/eF8XcO3h0cKZTRB2AReSw/FyEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=J0RbQRMA; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3685afd0c56so1349927f8f.1
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 04:49:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722253775; x=1722858575; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9JnXahZi7Ry6BaSaWzwQlRdolcTPy7oGkuYP98Cp3gk=;
-        b=J0RbQRMAM37W/PPWmUfKeTEkjXCw9zleNiVu/sRKTIoOW03auFiXKcQTct7fLomAOG
-         4RvlIPfAIagIzOFaYOHrRD1ewdNtvJu4NMCwiW/PXzOXzViTvz9EKYu1JLo82g8YDmNa
-         EwHga30AYSeHDjj+Kd3pODNQhywRHNK8jyCik95J4POds896lV2OBcZvn+V3I883mWhx
-         ePUqBYcGLCsDXWtGe2GrtonV4/IxvGAjFwK0L0Eu46JQwhlLetWNAMXW3FBtQlJaELK7
-         aprIiAHd02M75zP5O+Hl4nPuNha+uWsYdDSHxdggooOHxmAs1kGixA1TGxs0GmjPZhim
-         zHfA==
+	s=arc-20240116; t=1722254100; c=relaxed/simple;
+	bh=7eldeZkEgm0otGTT3gjl279nF2ADl7Z7G+t6q2HR/CA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d1FGmTccI3bwZ/PkBhF1pupbiIP/CMJ8hlpMC/gUDkWPXfxNYlPl9zam58+yCD/HlmQ1NlUIPLPvDhoy9Gz1FYxbeKZ1am2Qn5YuiEzSwSL/EQlNowkiDlZRdkVkkWrGt2KMg+VWGlkbjvKmnRf79u3d/sb8cBMa1/tzNDBKta0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y71S7jnf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722254097;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a4NZQE0a01E7gkys5wMB3DntjcYY2NgIlYja4WDLw5Q=;
+	b=Y71S7jnffmLdAPZhkzP5xyw6mEJXAwl0H8UjxhiKh1+Vrbh7yOl0N/VFvVJDZQJr5tNrBk
+	epH/OujWB8Vur9OfC8L+UG+/l1pLCctbH5t+SMbKAQzFjUvmbz9nwQfhcnbLP8G7ZtL4v3
+	HlDMlA4nydnkqGm1+XmpP+hqBDWBN0E=
+Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
+ [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-412-Q06iPVBDPrmEy95XXh8Nkw-1; Mon, 29 Jul 2024 07:54:56 -0400
+X-MC-Unique: Q06iPVBDPrmEy95XXh8Nkw-1
+Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-654d96c2bb5so47589177b3.2
+        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 04:54:56 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722253775; x=1722858575;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9JnXahZi7Ry6BaSaWzwQlRdolcTPy7oGkuYP98Cp3gk=;
-        b=M7ICmDW/6PKAtz0umOQ97Ta/cq1f+/+VIArVp7y8N+KUx3fPh7B1c82nAtG6xQiwiP
-         IsFRR7fOpjIucP41khMYNmuyfSugIVGIoMAE2FuC7Ojyku960b1sVh7174bzuy1xay7p
-         l0g+Gn/IF0s4IrYNZQa/SRHa2ECN9Qt+YwkhgYthSZCsnIxs6KY79uAHnmpfwwdecO8d
-         J+a0xJyiS2npGZeDCu7gz6Gi2Ad1j20xbKYitRolxpRwDRroNdqUy0xZXz9hbyx6bDRT
-         eg7HofAKNp6cE8gkrmCmFfE6IbLt/hvK97UdpqFOJ112qL2sonLwmCD6lj0iOhVZmcsK
-         YwXA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQqGS1UkPo9N3PjzgrCZHDVcJ66c9neIn6tmcxnLUhwFZxxqNYx/vTBY8ZLnGB6nGmFpyUbIRVhNPxcNV0Flxsbq0B
-X-Gm-Message-State: AOJu0Yx9m8A3rdy+xXrX9n5v258R0ZyYdd7EM+/6G4zb+QW4X9DMHCHl
-	73ayvhkZY0Z4M6b8qeiQvPGOsXYQ7mDM1+Qcbmr0dosLYTvVjpj3eJ/bw/H8JEc=
-X-Google-Smtp-Source: AGHT+IFeeCiGV5thGBTiNh7gr+7QbahBgArLsgKhz9+VAJf8JWTBngqYPYwRIe5wowq9hn3JvNtDbw==
-X-Received: by 2002:a5d:4e0d:0:b0:360:79d4:b098 with SMTP id ffacd0b85a97d-36b5d03ce06mr4046832f8f.29.1722253775119;
-        Mon, 29 Jul 2024 04:49:35 -0700 (PDT)
-Received: from [192.168.69.100] ([176.176.173.10])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4281a26e1bcsm51280515e9.34.2024.07.29.04.49.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jul 2024 04:49:34 -0700 (PDT)
-Message-ID: <7ef24be1-e79c-49ce-8c73-3509a7c8d77a@linaro.org>
-Date: Mon, 29 Jul 2024 13:49:31 +0200
+        d=1e100.net; s=20230601; t=1722254095; x=1722858895;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=a4NZQE0a01E7gkys5wMB3DntjcYY2NgIlYja4WDLw5Q=;
+        b=f1h1o0wA8Fj0iI6z0MW1n4UHPtciTlM6jCzrvVBUkwK2pFVX4SlEqPkaRxvUCnPpsS
+         KvV2flxCCHgE3NImoE/FTD6Rbjl0E9MwWNjUTn78DI3jYvnm/CVG2sbjFEtS98N9c7CK
+         VqR1XZfcpcWDz/FyX7oRSfJJHTl8b5/vN2jME++SkVyYREg0/pfVwS0UIHhW448OAPJp
+         hrKJumvMylXYHqQSb95/LYD6Ox+/NZnzIKIUrJ9l1VZBocoTY2ZzvOOrjyg28GzQ0szK
+         lFW8VVkgukBMQL4T2+30+F+JSrs63C4AuysdSHyeYJlliFeZzk19Vip3fSgyS5dxc2CX
+         j6/A==
+X-Forwarded-Encrypted: i=1; AJvYcCWrA5CD+zu2s+Sbr0tAxg1ISvOFsjsl+N6+3C540696FyPvMCYX1sgPiPQw9RCNT3ors4sei+U5RtQYlRZFA9DhOZLv
+X-Gm-Message-State: AOJu0YwEViIj+pZN4pYhWtq+LlwgXOE2VA5a6CnKFvYjbtP7XN2wZ13e
+	rQYRRTMac1Syi6PJV/hln2wf5qbF6ZCSLyX1CBk0B6qtQ9SeDNG49z85RX+AKY1qk7u8XZ7CAwF
+	9a/OogKvCeLNXlPYs+IamFpp1/6JMXcdJJcmN4mY2zvVUGVfUqlWfvLxKIMXnKhsHf+ZI3SKEoe
+	oquMA+V5IO9pI5LOdZvDmvX3NN
+X-Received: by 2002:a0d:cd45:0:b0:66a:843c:4c38 with SMTP id 00721157ae682-67a09b7279cmr66399297b3.37.1722254095620;
+        Mon, 29 Jul 2024 04:54:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IErfrRTDiSJvI5t7sMOIhqCoRowoqwYj4meCPwD0Afc+x3c9S/BATACl3L0a2odQpmfXnY0yF5dkB0GXDcn7Fc=
+X-Received: by 2002:a0d:cd45:0:b0:66a:843c:4c38 with SMTP id
+ 00721157ae682-67a09b7279cmr66399057b3.37.1722254095312; Mon, 29 Jul 2024
+ 04:54:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 01/13] tests/avocado: mips: fallback to HTTP given
- certificate expiration
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Beraldo Leal <bleal@redhat.com>,
- Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
- David Woodhouse <dwmw2@infradead.org>,
- Leif Lindholm <quic_llindhol@quicinc.com>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
- Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
-References: <20240726134438.14720-1-crosa@redhat.com>
- <20240726134438.14720-2-crosa@redhat.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20240726134438.14720-2-crosa@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240726134438.14720-1-crosa@redhat.com> <20240726134438.14720-6-crosa@redhat.com>
+ <ZqdwJRRBjj5DsWh8@redhat.com>
+In-Reply-To: <ZqdwJRRBjj5DsWh8@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Date: Mon, 29 Jul 2024 07:54:40 -0400
+Message-ID: <CA+bd_6Jj-DgpkouznuDC-ViOhi4zLu-SxnyrnyV6ceycHhEBiA@mail.gmail.com>
+Subject: Re: [PATCH 05/13] tests/avocado: machine aarch64: standardize
+ location and RO access
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>, 
+	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, David Woodhouse <dwmw2@infradead.org>, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Leif Lindholm <quic_llindhol@quicinc.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org, 
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, 
+	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org, 
+	Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 26/7/24 15:44, Cleber Rosa wrote:
-> The SSL certificate installed at mipsdistros.mips.com has expired:
-> 
->   0 s:CN = mipsdistros.mips.com
->   i:C = US, O = Amazon, OU = Server CA 1B, CN = Amazon
->   a:PKEY: rsaEncryption, 2048 (bit); sigalg: RSA-SHA256
->   v:NotBefore: Dec 23 00:00:00 2019 GMT; NotAfter: Jan 23 12:00:00 2021 GMT
-> 
-> Because this project has no control over that certificate and host,
-> this falls back to plain HTTP instead.  The integrity of the
-> downloaded files can be guaranteed by the existing hashes for those
-> files (which are not modified here).
-> 
-> Reviewed-by: Alex Bennée <alex.bennee@linaro.org>
-> Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> ---
->   tests/avocado/boot_linux_console.py | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
+On Mon, Jul 29, 2024 at 6:34=E2=80=AFAM Daniel P. Berrang=C3=A9 <berrange@r=
+edhat.com> wrote:
+>
+> On Fri, Jul 26, 2024 at 09:44:30AM -0400, Cleber Rosa wrote:
+> > The tests under machine_aarch64_virt.py and machine_aarch64_sbsaref.py
+> > should not be writing to the ISO files.  By adding "media=3Dcdrom" the
+> > "ro" is autmatically set.
+> >
+> > While at it, let's use a single code style and hash for the ISO url.
+> >
+> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
+> > ---
+> >  tests/avocado/machine_aarch64_sbsaref.py |  6 +++++-
+> >  tests/avocado/machine_aarch64_virt.py    | 14 +++++++-------
+> >  2 files changed, 12 insertions(+), 8 deletions(-)
+> >
+> > diff --git a/tests/avocado/machine_aarch64_sbsaref.py b/tests/avocado/m=
+achine_aarch64_sbsaref.py
+> > index e920bbf08c..1275f24532 100644
+> > --- a/tests/avocado/machine_aarch64_sbsaref.py
+> > +++ b/tests/avocado/machine_aarch64_sbsaref.py
+> > @@ -129,7 +129,11 @@ def boot_alpine_linux(self, cpu):
+> >              "-cpu",
+> >              cpu,
+> >              "-drive",
+> > -            f"file=3D{iso_path},format=3Draw",
+> > +            f"file=3D{iso_path},media=3Dcdrom,format=3Draw",
+> > +            "-device",
+> > +            "virtio-rng-pci,rng=3Drng0",
+> > +            "-object",
+> > +            "rng-random,id=3Drng0,filename=3D/dev/urandom",
+> >          )
+>
+> The commit message doesn't say anything about adding virtio-rng.
+> If that's needed for some reason, do it as a separate commit
+> with an explanation of the bug its fixing.
+>
 
-Tested-by: Philippe Mathieu-Daudé <philmd@linaro.org>
+This is actually a rebase mistake.  virtio-rng was removed in 21f123f3c.
+
+I'll fix it in a v2.
+
+Thanks for spotting it,
+- Cleber.
 
 
