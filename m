@@ -1,122 +1,122 @@
-Return-Path: <kvm+bounces-22709-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22710-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6514794220C
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 23:12:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13B2294225E
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 23:54:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1A9281F25404
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 21:12:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B37211F242D0
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 21:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816A118E03E;
-	Tue, 30 Jul 2024 21:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8924718E04C;
+	Tue, 30 Jul 2024 21:54:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="AfLb+6tR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZBA0XnSv"
 X-Original-To: kvm@vger.kernel.org
-Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC33138B;
-	Tue, 30 Jul 2024 21:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9935D1AA3EF
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 21:54:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722373949; cv=none; b=uShFL92EgWbcegcriStpk1ONhaJglcqXLT67JBjnIGdAvexbThlbyTnOJGlO5Ms8JbLRhVNHqVshlgh9x441xGHOuq6njhUGpGGKB6x9vy8ZFgYHeVUiRhzrv+rZS4H9tJYpQ8bSx0MCGDPz8sf8NA7fZcBlpWpwL/Bigr2KESM=
+	t=1722376458; cv=none; b=AUzkWYHazduNvPij1YQiTVkuVc5El/EHtlW3jusuOIfDys7L/24dgB1YCl3F0jQAVXNjy/i1z6I/ot5jyTou/nMnCB2t8GtnE2iVfp8jPDcmy5YyTbQrtxdNxmZjC8kIyUwPDZt9HMmn7tfk89Lu7aHz75fUQrwDrFWvouOaT9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722373949; c=relaxed/simple;
-	bh=cEk83l4mWONqpD4v1BQ3vkO7xHMQ560brpMG+0bHCOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uPFVsu2wVAQVkfdZJ2uI1amAOeN8dnQuwDZPBfEEU5YJ44kOPJkGnYWvmPgoPWT/W9R8dDOC0AJoiC3oev+RiFg4zfmLnJgME54uv2ab7hSfXzsCJnHshSMBu2wwkTR5oN+daM5c4rJ7+IC8f2BDRQq1akVIuTBn+M/dVBLTKPM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=AfLb+6tR; arc=none smtp.client-ip=62.89.141.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=juLNTGfDHj50atuMhk7dbWzwjGHWgRDm70U6RaLXPeI=; b=AfLb+6tRV/VaQlwK13wMXFAbnO
-	vU63GJMLfBvuV5wJiW28+O+73IOccKalEjRgaSVawG/Z1x5KYwtMw9cis8PulfGTR5zJTk4+dwweP
-	82HSUu5kEr3nipS5EwFKI3MjT7E6np3n0g4MXRjQw4iD6Z2XXPXtJLKcae/NR9QXRN+kc4sWcQWA0
-	MIowMYuz1WqKP3J640l9+NLShXeP2fNoioj6rs1pow6c8sd7BR+oBCQaQmeYwIbcl8CWDeykeSC0h
-	wtO4zqR7tY46hCgdf2bom5NnVZAPfBcjnuOUgCLe4m4lx4cN3eNRirNgjYbX+wU9ydJEGss3NETCV
-	cbcOMWMw==;
-Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1sYu8v-00000000KBN-2OVT;
-	Tue, 30 Jul 2024 21:12:25 +0000
-Date: Tue, 30 Jul 2024 22:12:25 +0100
-From: Al Viro <viro@zeniv.linux.org.uk>
-To: Josef Bacik <josef@toxicpanda.com>
-Cc: viro@kernel.org, linux-fsdevel@vger.kernel.org, amir73il@gmail.com,
-	bpf@vger.kernel.org, brauner@kernel.org, cgroups@vger.kernel.org,
-	kvm@vger.kernel.org, netdev@vger.kernel.org,
-	torvalds@linux-foundation.org
-Subject: Re: [PATCH 08/39] experimental: convert fs/overlayfs/file.c to
- CLASS(...)
-Message-ID: <20240730211225.GH5334@ZenIV>
-References: <20240730050927.GC5334@ZenIV>
- <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-8-viro@kernel.org>
- <20240730191025.GB3830393@perftesting>
+	s=arc-20240116; t=1722376458; c=relaxed/simple;
+	bh=zVZUmfkmOLRagsFyF53cvEGwQYYKTaSDCCso/G3m670=;
+	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=hyrt9Uj1EykYQRSoMfH43qb1BbGO68CnZSXWhUERc6TrYi/AgVp6EQsGDonnn2DgGC/in4xIECsOmxa+Xq6B6DJFnfI5G5FMDg7dpCPnX8FL5VicpXREKiBm30X72eSzbwej5iETjPkyZ6aWWgbK8NGx5bJpH8blxWvV3tpx7xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZBA0XnSv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B6FDC4AF0E
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 21:54:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722376458;
+	bh=zVZUmfkmOLRagsFyF53cvEGwQYYKTaSDCCso/G3m670=;
+	h=From:To:Subject:Date:From;
+	b=ZBA0XnSvhe9cVAw0ydCWnk7/gwTqdnPKk74bDszRi2bYvTPnPjBYGAH6XxlaEc21L
+	 mZ8Dmgs2Tbi7K/8p0PgGZejkZxaPapVSpAhF0S00X5tZMbCa7DPaZHVRs7StxrdzsS
+	 Yo0vJvFIbOnYDdz303v/c6I5kKksAg0B36zJ23WxNg6J5rs0VAMgDSF2LGlA2GH31y
+	 ym5JJJL3zdFXkt8Lc5hKdrubWkPO66+AvzWQWjfIYn0pl0lzN6QdIgNAzT66iZbeVF
+	 u7FkAb6vdoalLOFAlRZtDnToGsxP/qpWhROKNDbe/+G+MnK9dNqxJTLuSXmbFdPjUl
+	 0bYWdtZN6dwWw==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 0E36CC53BB8; Tue, 30 Jul 2024 21:54:18 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219112] New: Machine will not wake from suspend if KVM VM is
+ running
+Date: Tue, 30 Jul 2024 21:54:17 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: alex.delorenzo@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version rep_platform
+ op_sys bug_status bug_severity priority component assigned_to reporter
+ cf_regression
+Message-ID: <bug-219112-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730191025.GB3830393@perftesting>
-Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Tue, Jul 30, 2024 at 03:10:25PM -0400, Josef Bacik wrote:
-> On Tue, Jul 30, 2024 at 01:15:54AM -0400, viro@kernel.org wrote:
-> > From: Al Viro <viro@zeniv.linux.org.uk>
-> > 
-> > There are four places where we end up adding an extra scope
-> > covering just the range from constructor to destructor;
-> > not sure if that's the best way to handle that.
-> > 
-> > The functions in question are ovl_write_iter(), ovl_splice_write(),
-> > ovl_fadvise() and ovl_copyfile().
-> > 
-> > This is very likely *NOT* the final form of that thing - it
-    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > needs to be discussed.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219112
 
-> Is this what we want to do from a code cleanliness standpoint?  This feels
-> pretty ugly to me, I feal like it would be better to have something like
-> 
-> scoped_class(fd_real, real) {
-> 	// code
-> }
-> 
-> rather than the {} at the same indent level as the underlying block.
-> 
-> I don't feel super strongly about this, but I do feel like we need to either
-> explicitly say "this is the way/an acceptable way to do this" from a code
-> formatting standpoint, or we need to come up with a cleaner way of representing
-> the scoped area.
+            Bug ID: 219112
+           Summary: Machine will not wake from suspend if KVM VM is
+                    running
+           Product: Virtualization
+           Version: unspecified
+          Hardware: AMD
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: kvm
+          Assignee: virtualization_kvm@kernel-bugs.osdl.org
+          Reporter: alex.delorenzo@gmail.com
+        Regression: No
 
-That's a bit painful in these cases - sure, we can do something like
-	scoped_class(fd_real, real)(file) {
-		if (fd_empty(fd_real)) {
-			ret = fd_error(real);
-			break;
-		}
-		old_cred = ovl_override_creds(file_inode(file)->i_sb);
-		ret = vfs_fallocate(fd_file(real), mode, offset, len);
-		revert_creds(old_cred);
+Steps to reproduce:
 
-		/* Update size */
-		ovl_file_modified(file);  
-	}
-but that use of break would need to be documented.  And IMO anything like
-        scoped_cond_guard (mutex_intr, return -ERESTARTNOINTR,
-			   &task->signal->cred_guard_mutex) {
-is just distasteful ;-/  Control flow should _not_ be hidden that way;
-it's hard on casual reader.
+1) Start a KVM virtual machine with QEMU. I used Quickemu to build and star=
+t a
+VM.=20
 
-The variant I'd put in there is obviously not suitable for merge - we need
-something else, the question is what that something should be...
+2) Suspend to RAM
+
+3) Wake from suspend
+
+Expected outcome: Machine should resume from suspend when a KVM VM is runni=
+ng
+
+Observed outcome: Machine will not resume from suspend
+
+I tried this on 6.6.42 LTS, 6.9.x, and 6.10-rc1 through 6.10.2, and ran into
+the same problem. Unfortunately, I can't find a kernel version where this
+problem isn't present. Nothing gets printed to the system or kernel logs.
+
+This is on an AMD Ryzen 7 5850U laptop.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
