@@ -1,251 +1,270 @@
-Return-Path: <kvm+bounces-22539-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22581-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD939406A7
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 06:52:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CA9F940796
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 07:28:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7F272824A7
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 04:52:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06151C22950
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 05:28:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69D1716132F;
-	Tue, 30 Jul 2024 04:52:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5385E1684B4;
+	Tue, 30 Jul 2024 05:21:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DQYj2X0M"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="tkJgpyGF"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2082.outbound.protection.outlook.com [40.107.93.82])
+Received: from mx1.sberdevices.ru (mx1.sberdevices.ru [37.18.73.165])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D35D913B780;
-	Tue, 30 Jul 2024 04:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.82
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722315168; cv=fail; b=lPNr+1UA2GA6BYbR/tNlrAXJo2CYDNWKlyCus9C9Eeo+8uZBHoM2lojPnG1mlQE9oCCKbsWPhz2rLt1/ggV9jMOXdCPl4hl8p7XvchJg0+juN33T7vqWYzNVPr1/wXs0OtLyehxr5KqReelgi+UrLrE1O9Ra94rcrnC8SBQUZgI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722315168; c=relaxed/simple;
-	bh=a+XFh8ZrCV2kc28ipuuHeGzpAxSGuw1gmcku/BN6TZ0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=cXfb46KA0XnJ1DAFyucPm1PKSfKEvQRJhQvUZEZJw4gWJfWtI1pJ9Qh5O29gWmTosLkPMk+6pOSM5DXHDM4sIkPTviVqNW1ZKivE3Ynyrv+gDf7xDI0mjQtKz1pvXZeO97olpWKZcewzuZq5O1K2wy8pOYwyDtQgGuR6VAtJtgs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DQYj2X0M; arc=fail smtp.client-ip=40.107.93.82
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jHhnsphCTNTTeWSH1LgaijN48runxfD47H7IdIk17iztzxBEME2XakC3rTWsBlXPb4SHzFA0DwVR95Yay9PVAxW8BnDzLqKS4I0FOetFJUSz6eEGI3tG2PXTiUDcYNNUaQeiTDcUb9g5Ie8a3TwGY9UjWmF7zdzeVxEcs69FvtDXDrqLJJYMNRdWqDKMbJxlr7GfWfRmDCkVpZ8sLUy/dNX47TVOkdcj9lJtonsCagCiz1CBsgVigwpuWETzEcMvbgSE75WqSNDXe0/mGDIYqeBWzn1WGq3eHWc2Ebnb6hC3UPmF3gvUsTRMcFOmH7PiWQdujVCrVTt1pjPglN2Tfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NgQdOndBxZSU8dqyPVgFkw5UJFL0GirdE0hDs076bwk=;
- b=S3KH8L9+ZjAP3/coOvTFu7M0now2Wno6hiUFvZtAToLpuCKuFYKapqPLxpnEUPFIfWhp2mNhJz1rsGGRsGNbpTPn8t19t9T0K6w0BT0IO+hhySdQsoGj6AA2F77BhTFmp5eNmpS486mWrGojj98KDRsLONfqo7Nb0LviViGxODHm9V0ln394w3D7aUGlCWf5QNVxd+STlG4ckI6rQNk4bAsBoMyG0mHme4KC3XEqGCE3L95RZBeTwyug7gB/HDUDd7qsVECoFbhccbctzc6hfuQed+K4tXq9/YKL3TOChH65quNd9cMVv1BiyY/aoXY6E/hdfwUIEniKzfoNEorW5w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NgQdOndBxZSU8dqyPVgFkw5UJFL0GirdE0hDs076bwk=;
- b=DQYj2X0MEhTRZDcDl50Av7lORfZKK5UjFim4Q2vpDgioUH8ch+Rw+3sCnRNpxV/0f+JZX5ta0VLn5yz9UAqNeAKHLOr/1K5FJ7+sbRUUZFyyP1p2CPd62vdKUPSNEy0+hz/QxyJXkch2Y0O5HzuVaGTWKhs3A1qU2jffaPljga4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com (2603:10b6:8:96::13) by
- CY8PR12MB7588.namprd12.prod.outlook.com (2603:10b6:930:9b::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7807.28; Tue, 30 Jul 2024 04:52:44 +0000
-Received: from DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb]) by DS7PR12MB6214.namprd12.prod.outlook.com
- ([fe80::17e6:16c7:6bc1:26fb%4]) with mapi id 15.20.7807.026; Tue, 30 Jul 2024
- 04:52:43 +0000
-Message-ID: <782a2791-b9bd-4cba-a734-eb673f8bc24d@amd.com>
-Date: Tue, 30 Jul 2024 10:22:28 +0530
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v1 0/4] Add support for the Bus Lock Threshold
-To: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org
-Cc: pbonzini@redhat.com, seanjc@google.com, shuah@kernel.org, nikunj@amd.com,
- thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de,
- babu.moger@amd.com, Manali Shukla <manali.shukla@amd.com>
-References: <20240709175145.9986-1-manali.shukla@amd.com>
-Content-Language: en-US
-From: Manali Shukla <manali.shukla@amd.com>
-In-Reply-To: <20240709175145.9986-1-manali.shukla@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MA0PR01CA0043.INDPRD01.PROD.OUTLOOK.COM
- (2603:1096:a01:81::14) To DS7PR12MB6214.namprd12.prod.outlook.com
- (2603:10b6:8:96::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D550153BF7;
+	Tue, 30 Jul 2024 05:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.18.73.165
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722316917; cv=none; b=Cmwo9W6CuwohuyjEhacRAJaTVc7ublQtQYM3E82fdgDAAJ8y3aaAIOrm8CXdoprn6XSTiB2hDTValKIg6KAexmVRBOCsEEdmtpkwBf1SRgvAfYgXTIGamr0z6OTHsIpPoMPxeiY3PGpNrTl+IS+4p5isDkqQa1CI+Wg+w+ikEQc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722316917; c=relaxed/simple;
+	bh=Kk9Q3R4jaeKgwoXtf8T50QoXGM27YdMm/UT0HVVSXvk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PYJx1cuCPsPKrOmB7XvuI3IMps1og80hyHTzQBO5zpOgrYIxIwyGlD8RAa5uwvWD1mPGuiUsEWSRxsNJatqdl6nC0UXTeuL9mxQF6zG/x9Qh+j4NLs5iYFQ+v405m5XK5TwXCPOu8GOM618GxvXGX0A6E4/a1gw5NjKaomdJuRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=tkJgpyGF; arc=none smtp.client-ip=37.18.73.165
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk01.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id D1ADB10000E;
+	Tue, 30 Jul 2024 08:21:43 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru D1ADB10000E
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1722316903;
+	bh=HltX1eHB+gX6/FvTdK5jTFQKH3MsCpYQvWl2DuJkA3Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=tkJgpyGF5AdvkBtheLV/1Gjn0MDuaK6RvazH8JrIxxpEoJCweReC3PILvSx+RLq81
+	 brNejISPFG39LPM71bNMpQUu4BZesh/aPcNb8P1dc9jlP6FNIVu3bnLf0ltlLW+XQR
+	 yV9do1oOhbYketRJVq4Y36RauYBqx1KjOjzaNq+foklJ6lX57RsdOb5zAAMd1vWBPP
+	 8MlE6YoOJUqiwpZsO+WwdUXdStuombWNhNpmvKdrGCow7gqMQI1tz1xvDUsP6dVgUv
+	 HlNd+kpk/gWN2KHG0V4Nq2L+kZExhnqEh1I3F39jCx/I68RJBFqVveyLO2px8lMchW
+	 S4WuwJRTEP7fA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue, 30 Jul 2024 08:21:43 +0300 (MSK)
+Received: from [172.28.128.200] (100.64.160.123) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 30 Jul 2024 08:21:42 +0300
+Message-ID: <41421bd7-e6e1-db2d-6a43-06d6a44cfeb8@salutedevices.com>
+Date: Tue, 30 Jul 2024 08:09:23 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6214:EE_|CY8PR12MB7588:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6729392e-f268-4350-7eb0-08dcb05372ad
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?UTVlaldFT2dvYm5HSUoyb3B3blZIVGNaUm9VLzZlTnpUZ3FGNWNZais4aGx3?=
- =?utf-8?B?TStnUTdrWXVJRkplZW5OUUk3VTAwUFZlM2ZYcW1FbExHS0Y2bTlzM3RmZmU4?=
- =?utf-8?B?ZWZjODYrMXlwUzVRSCthdlNTZGplU0FYNkR3VWpObkJvdkFjVGd0akczRFkr?=
- =?utf-8?B?ckFnelNub3dvUk5mcnRmN2lhRHhackQ4b1g5MUt0VkQ3bkNHdlhYUXRYNkhY?=
- =?utf-8?B?SFQ5UnI4emQrYllLL1YzWEV4OFhxVm01b3doUy8yTUxjWWt4aXlJNWxrTklK?=
- =?utf-8?B?eU1pOU1CV3VLQlVpV2hKNDk5WG1OZE1laVlZd1h3NVJrL1dEVVRaKzB4amdF?=
- =?utf-8?B?RTZjelI1bGdjaE1od254a0hWUlVQQ1RCc0xjMmp2L3hoK3g3RElLSDVYTnpR?=
- =?utf-8?B?SHI3UXk1eExYSzNOSzMvWjZUeEltb092MEtRV1U4OGt4b0h3ZGNxcnpTaGNo?=
- =?utf-8?B?aGRYaUZGNDhEYmNhUzBEYTN3a1piOVFOb1BJMlJHQzdxdVF6QmNtd3dSWS9O?=
- =?utf-8?B?N3YyVUNmSVJKc3MyTWxxNGgzSk5rRXZUYnk3cHYzZ1MxWjZacVBRN3dqRXln?=
- =?utf-8?B?RnJwbjk5RW1aRE1va0taQWZ5TEw1d1p2QU5NZkVWWlN1UGtLR012M2JCbktF?=
- =?utf-8?B?NVRud0VoeU56YW9HTGJoSy9zTzNOODJ4NlBZK2ZVUG41Q1dJdFRqYnFPT3lQ?=
- =?utf-8?B?VHd4VTRlVTlXcVBhcUFRNnJxYXlHUndxdVg5OU9YbGtSMHpOTUpQR25JMnJv?=
- =?utf-8?B?VzJPcEViYXNyRHQrU3VMd1ZRTW1VRGVjNXg2UU1vRnFEZGM2Smo4QjZFSkNQ?=
- =?utf-8?B?M2xkZ2VZajVnQVhucnYrclBnZnllR3p3ZGdNbFdnYVBLVnVWU3E4RjA0V3My?=
- =?utf-8?B?dTRsVmIyRmhYWGVCWDdWRFpodXJpdnpWL0hTYno3T0w1Q2NtRzFiYVVDZUlN?=
- =?utf-8?B?U1FqRzl0S3A5MjhYcThydGdPeWVheTl0dDF6RFJZeW44bGF3SXhvUGZLWm4v?=
- =?utf-8?B?bFBXTG5OU2djYVA0Tnd4Nm5TcllrVDNhWnIzNmZJUHcyb0Z6a0VNTmJhNU5D?=
- =?utf-8?B?eEhaVnBCRFkyMTFpM0lBRGJiVG11M3VOcjRGSFpRMFhKQnRpVklTcnNGT3ZG?=
- =?utf-8?B?TUFyZTVIZHdHTXFpaG52cGhyazlFVVU1cVNPdTVxSEhTaG0xbUVUaHQxSmhr?=
- =?utf-8?B?c3V0TWgvWGNFV3o3cHZUcDkzZURHTEVZNUI5Y2tHZ1hmU3lyUFpJVkpTTU9Y?=
- =?utf-8?B?L1JCMC9ieXNiVzNrclI0ZS9aSGE5QzV1N3ZPMlBkY0NiUUJLaUkwTlhsdVh3?=
- =?utf-8?B?WDcrYlgrbER0YXYxd2J5VFB0YXVBOVh2R252anJmTkV4L2NCLzRyTExlUWsw?=
- =?utf-8?B?Sjk2Z0VmWkhTSjNablNlWStibHRBZXpySHIvcUJtYkpXMjQvZ1NqTTQ4bDgr?=
- =?utf-8?B?cHh5NERseVRjOFVaMjRQUzhvR2dPVHhMT3JBajFYY0ZYZVY1SFFBcmtJY0Nh?=
- =?utf-8?B?M0FWb0hCSEFkalNWQ0RhcHNlMG9ZaVdvcTNVUWRlNE1XZnFkUUpMY05SWmUx?=
- =?utf-8?B?RWJPdXQ1NVBmQkNQK3VQdVpJNStCbWJxNUUvSDhUVnA2OCtBdnBlNFNQYkZz?=
- =?utf-8?B?dVZvWmQwRHRCRjZ0QnZiRmNjZnF2TVZKeEptKzBaRG01S1ExejY1dE5oWGxT?=
- =?utf-8?B?a3ZuYnRWUTZyd0dLSXZvc1FQTXhLei9MSFAybzFvT0xLcEZlZHBmbmFYSHdU?=
- =?utf-8?Q?BquG2xRV/Hboqhdu/0=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6214.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?VjdIaU1vYnh6Yy8yWHUvWGVUSjgwNlpJeGF1QmpLYms1WGJTRitaNGZEREQw?=
- =?utf-8?B?MndpSWhLamtCZUlyR0FKZXhXVE9NTFpoUENLVDMwM1JvUjNDWG9KWWRTNlZm?=
- =?utf-8?B?SFg2SG1zWWxEQ25Ha1lhYmJERHRpa2VNMSsyQXN3KzNweWZHSGNHK1NLbTRM?=
- =?utf-8?B?dDg2Q2p2amNoRDdna3MwcFcvWC9jNGVXZE5jOVBZcXhsa0hyOTNaL3Y3SElF?=
- =?utf-8?B?WGRTWGxxS3Q0dkQ4aSt4UittZGRqNTdSRzZtbjFTeEhGSGZ5Uk9wZ29QN1FT?=
- =?utf-8?B?MTlwMDhIaVpJOUNmYzJUZ0VseUZvNnNSTER3aXdSRkVzenRISzlYUllLaThD?=
- =?utf-8?B?V0djSkNMcGxTSDlwUkdNbjM0MVNWd0UybjlpS0VvSDg5OTdmREhjMWxyYlY4?=
- =?utf-8?B?ejU1ampZRU9weFFSWUhJTG94MEFpOW5NNkkrYWhqaHlwVHVCSlJPUmg2VGxE?=
- =?utf-8?B?czNhSnp2Qms2NFYyZ1RGblliNmlIb2FZQzV6cnR1NHlHOWVhbjhHNW0vZDBU?=
- =?utf-8?B?MFlEc3czZHFiNHc1TThmRzdKSS9kMW1ET1pmWWhtNktXT1BVaFNKNWl1dnNV?=
- =?utf-8?B?U2RiZERGQWpUalF6Q1Jrd2s4d012K0RaNkNGNWQ3Q0tTdGhNR3RYczgydTNM?=
- =?utf-8?B?WmZYTk5UMkNFMzMrT2VjcldIYXh0SldEQm1BRHIwY1d0UXRsK3ZQbFBIOTZ6?=
- =?utf-8?B?ZlBVYlg1ZWVOOUR0RExSM2FONlUzZHljeFFiR09pdzFaWnBBYmpvcThQQnE0?=
- =?utf-8?B?V01ERFVVb2l5UmhRMVQwNDhORnRMUnZaSHh2Wm9PeW5ZZjNKbW9TN3RESFZB?=
- =?utf-8?B?VjAxbGd1YjYrTE1hNGxxdCtaQmpneWN5cXhVUFpiT09VRmVxbGF5bUhUVFpk?=
- =?utf-8?B?ZFlrY1d6Z3hNT2FJelkxUWVnYk1ValFyK0l5cE4vWXJzSzlucUYyWFI1V3Z4?=
- =?utf-8?B?SWhJREdsYTNVL2ppZFZ3N2x2UmdYRXlManZvZUxnZlh3blFha3FrTHRUcUNr?=
- =?utf-8?B?ZzVlcTJmMGRuaE1SbDlUTU4vRWlNdkMvWFo4T2ZLVWRGWkZOQktlcEh0T3h5?=
- =?utf-8?B?N0Irc3Y0d0JITnhad0l5M256cDM4bnJnM3AyQUhEVk0wZFRsRnM4VXRFSkJS?=
- =?utf-8?B?SFBUNk1mMkl6d01raHhqWmxIZUJ0Rnd6MytKY0dQZWR6b0lqTWt3dmc2ZnFW?=
- =?utf-8?B?bmpIeEo5YldWTGlTQ0t6WlhtMHZDbTFFMzlBZGZaWnVpSHlZdXBJMWFOV1dT?=
- =?utf-8?B?bS9WU2s0TGM3aGhJTGNEMmpoNlJ4OEIrOG5jZlBNOThXMXFNSXk4SzVTMjRE?=
- =?utf-8?B?YUtacUNTZnd0SmZaNE00aUlyV1kwMVQ3WUNlTWRaUVptekE3d1FSME5iME5L?=
- =?utf-8?B?SXdYNWlUZ09QTXJHZWtySTJIUUhuaHp4RUcyaDlSWFFhcmJMd0lySmNBeFlT?=
- =?utf-8?B?Wk5CT2ZublgzSEJydXplN0pZY0NkajFuUjlkeEVxSVY1WThqeVhrbUE3TlhB?=
- =?utf-8?B?SmxqczJCbldpdEZSV3BXS2NCUXU0azNZR3h4OWdPTW91L3FsR3NIMkxjZWZX?=
- =?utf-8?B?Mlh0UXlQelZzMDNMZWF3cjY4TEZnSDZYTkd1UjJoSmdoekovZ1lCa0g0Uko5?=
- =?utf-8?B?b2xjKzZHdE55UEdVSzdGbjlzNFowbjRXM2lCVy9uK0pQK2ZJbllnbTBHZFhK?=
- =?utf-8?B?elhTUUx4TE52am5VeUJxK2dhc1VtN3owUCtiZ1Z4R0hacld0ZXFvK0FCeCsr?=
- =?utf-8?B?WnVKZXN5TDlOUEdvaXEwMDZpUUdUWjM4Zm50dENIOU9McEd4cjFQOXhCSG5o?=
- =?utf-8?B?T0NLb1JZUTh2Z3dWMEl0cE9pOXZSZ1Q2WnhEdlhvZmF6azNHL1pVa3JOeVFE?=
- =?utf-8?B?WklENWtMQk44cnFLaWlhUEhvdVdZbFRVQnNjNjREV0tpa0YyUFFJYTBOc0FB?=
- =?utf-8?B?YjFxN3VtLzAzUTFIOU8xNnNQTkN3TVVMWTZpMHdWMCsxRTJjQ0NSUXRWZ1hI?=
- =?utf-8?B?Tk9aaXI3eVlaZzkvUksxbHU1T0w1ZCtEM3A4NmRSNGRyaGhXeTRwajZkZ3Bk?=
- =?utf-8?B?MXdlaWQ0MWpxTVJST0NQKzNoSmJJZzhZZWkxQWRoT0Y3aFUxZE5oNzJFcjl1?=
- =?utf-8?Q?JdcCki3gQmuwAkB5geK08P53Q?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6729392e-f268-4350-7eb0-08dcb05372ad
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6214.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jul 2024 04:52:43.5909
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: +s5pcHE2tDmi9nCspDPGOeJikrVqjGkisEadUhRyJntwTaBzj2GtdqRk6465Hejh3Hl9og5SRybH+xgrLj7VXg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7588
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH net-next v6 07/14] virtio/vsock: add common datagram
+ send path
+Content-Language: en-US
+To: Amery Hung <ameryhung@gmail.com>
+CC: <stefanha@redhat.com>, <sgarzare@redhat.com>, <mst@redhat.com>,
+	<jasowang@redhat.com>, <xuanzhuo@linux.alibaba.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<kys@microsoft.com>, <haiyangz@microsoft.com>, <wei.liu@kernel.org>,
+	<decui@microsoft.com>, <bryantan@vmware.com>, <vdasa@vmware.com>,
+	<pv-drivers@vmware.com>, <dan.carpenter@linaro.org>,
+	<simon.horman@corigine.com>, <oxffffaa@gmail.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-hyperv@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <bobby.eshleman@bytedance.com>,
+	<jiang.wang@bytedance.com>, <amery.hung@bytedance.com>,
+	<xiyou.wangcong@gmail.com>, <kernel@sberdevices.ru>
+References: <20240710212555.1617795-8-amery.hung@bytedance.com>
+ <e1647f5f-5056-5cf0-e81c-5ef71fd6efd0@salutedevices.com>
+ <CAMB2axMXzcxrFr+zWV6CFJxDrKwH+U85F7dkeXfJjAO10EmSAg@mail.gmail.com>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <CAMB2axMXzcxrFr+zWV6CFJxDrKwH+U85F7dkeXfJjAO10EmSAg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186782 [Jul 29 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 24 0.3.24 186c4d603b899ccfd4883d230c53f273b80e467f, {Tracking_from_domain_doesnt_match_to}, 100.64.160.123:7.1.2;salutedevices.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:5.0.1,7.1.1;127.0.0.199:7.1.2, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/07/30 01:23:00 #26176971
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On 7/9/2024 11:21 PM, Manali Shukla wrote:
-> Malicious guests can cause bus locks to degrade the performance of a
-> system. Non-WB (write-back) and misaligned locked RMW
-> (read-modify-write) instructions are referred to as "bus locks" and
-> require system wide synchronization among all processors to guarantee
-> the atomicity. The bus locks can impose notable performance penalties
-> for all processors within the system.
-> 
-> Support for the Bus Lock Threshold is indicated by CPUID
-> Fn8000_000A_EDX[29] BusLockThreshold=1, the VMCB provides a Bus Lock
-> Threshold enable bit and an unsigned 16-bit Bus Lock Threshold count.
-> 
-> VMCB intercept bit
->     VMCB Offset     Bits    Function
->     14h             5       Intercept bus lock operations
-> 
-> Bus lock threshold count
->     VMCB Offset     Bits    Function
->     120h            15:0    Bus lock counter
-> 
-> During VMRUN, the bus lock threshold count is fetched and stored in an
-> internal count register.  Prior to executing a bus lock within the
-> guest, the processor verifies the count in the bus lock register. If
-> the count is greater than zero, the processor executes the bus lock,
-> reducing the count. However, if the count is zero, the bus lock
-> operation is not performed, and instead, a Bus Lock Threshold #VMEXIT
-> is triggered to transfer control to the Virtual Machine Monitor (VMM).
-> 
-> A Bus Lock Threshold #VMEXIT is reported to the VMM with VMEXIT code
-> 0xA5h, VMEXIT_BUSLOCK. EXITINFO1 and EXITINFO2 are set to 0 on
-> a VMEXIT_BUSLOCK.  On a #VMEXIT, the processor writes the current
-> value of the Bus Lock Threshold Counter to the VMCB.
-> 
-> More details about the Bus Lock Threshold feature can be found in AMD
-> APM [1].
-> 
-> Patches are prepared on kvm-x86/svm (704ec48fc2fb)
-> 
-> Testing done:
-> - Added a selftest for the Bus Lock Threadshold functionality.
-> - Tested the Bus Lock Threshold functionality on SEV and SEV-ES guests.
-> - Tested the Bus Lock Threshold functionality on nested guests.
-> 
-> Qemu changes can be found on:
-> Repo: https://github.com/AMDESE/qemu.git
-> Branch: buslock_threshold
-> 
-> Qemu commandline to use the bus lock threshold functionality:
-> qemu-system-x86_64 -enable-kvm -cpu EPYC-Turin,+svm -M q35,bus-lock-ratelimit=10 \ ..
-> 
-> [1]: AMD64 Architecture Programmer's Manual Pub. 24593, April 2024,
->      Vol 2, 15.14.5 Bus Lock Threshold.
->      https://bugzilla.kernel.org/attachment.cgi?id=306250
-> 
-> Manali Shukla (2):
->   x86/cpufeatures: Add CPUID feature bit for the Bus Lock Threshold
->   KVM: x86: nSVM: Implement support for nested Bus Lock Threshold
-> 
-> Nikunj A Dadhania (2):
->   KVM: SVM: Enable Bus lock threshold exit
->   KVM: selftests: Add bus lock exit test
-> 
->  arch/x86/include/asm/cpufeatures.h            |   1 +
->  arch/x86/include/asm/svm.h                    |   5 +-
->  arch/x86/include/uapi/asm/svm.h               |   2 +
->  arch/x86/kvm/governed_features.h              |   1 +
->  arch/x86/kvm/svm/nested.c                     |  25 ++++
->  arch/x86/kvm/svm/svm.c                        |  48 ++++++++
->  arch/x86/kvm/svm/svm.h                        |   1 +
->  arch/x86/kvm/x86.h                            |   1 +
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/x86_64/svm_buslock_test.c   | 114 ++++++++++++++++++
->  10 files changed, 198 insertions(+), 1 deletion(-)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_buslock_test.c
-> 
-> 
-> base-commit: 704ec48fc2fbd4e41ec982662ad5bf1eee33eeb2
 
-A gentle reminder.
 
--Manali
+On 30.07.2024 01:51, Amery Hung wrote:
+> On Mon, Jul 29, 2024 at 1:12 PM Arseniy Krasnov
+> <avkrasnov@salutedevices.com> wrote:
+>>
+>> Hi,
+>>
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index a1c76836d798..46cd1807f8e3 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -1040,13 +1040,98 @@ int virtio_transport_shutdown(struct vsock_sock *vsk, int mode)
+>>>  }
+>>>  EXPORT_SYMBOL_GPL(virtio_transport_shutdown);
+>>>
+>>> +static int virtio_transport_dgram_send_pkt_info(struct vsock_sock *vsk,
+>>> +                                             struct virtio_vsock_pkt_info *info)
+>>> +{
+>>> +     u32 src_cid, src_port, dst_cid, dst_port;
+>>> +     const struct vsock_transport *transport;
+>>> +     const struct virtio_transport *t_ops;
+>>> +     struct sock *sk = sk_vsock(vsk);
+>>> +     struct virtio_vsock_hdr *hdr;
+>>> +     struct sk_buff *skb;
+>>> +     void *payload;
+>>> +     int noblock = 0;
+>>> +     int err;
+>>> +
+>>> +     info->type = virtio_transport_get_type(sk_vsock(vsk));
+>>> +
+>>> +     if (info->pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+>>> +             return -EMSGSIZE;
+>>
+>> Small suggestion, i think we can check for packet length earlier ? Before
+>> info->type = ...
+> 
+> Certainly.
+> 
+>>
+>>> +
+>>> +     transport = vsock_dgram_lookup_transport(info->remote_cid, info->remote_flags);
+>>> +     t_ops = container_of(transport, struct virtio_transport, transport);
+>>> +     if (unlikely(!t_ops))
+>>> +             return -EFAULT;
+>>> +
+>>> +     if (info->msg)
+>>> +             noblock = info->msg->msg_flags & MSG_DONTWAIT;
+>>> +
+>>> +     /* Use sock_alloc_send_skb to throttle by sk_sndbuf. This helps avoid
+>>> +      * triggering the OOM.
+>>> +      */
+>>> +     skb = sock_alloc_send_skb(sk, info->pkt_len + VIRTIO_VSOCK_SKB_HEADROOM,
+>>> +                               noblock, &err);
+>>> +     if (!skb)
+>>> +             return err;
+>>> +
+>>> +     skb_reserve(skb, VIRTIO_VSOCK_SKB_HEADROOM);
+>>> +
+>>> +     src_cid = t_ops->transport.get_local_cid();
+>>> +     src_port = vsk->local_addr.svm_port;
+>>> +     dst_cid = info->remote_cid;
+>>> +     dst_port = info->remote_port;
+>>> +
+>>> +     hdr = virtio_vsock_hdr(skb);
+>>> +     hdr->type       = cpu_to_le16(info->type);
+>>> +     hdr->op         = cpu_to_le16(info->op);
+>>> +     hdr->src_cid    = cpu_to_le64(src_cid);
+>>> +     hdr->dst_cid    = cpu_to_le64(dst_cid);
+>>> +     hdr->src_port   = cpu_to_le32(src_port);
+>>> +     hdr->dst_port   = cpu_to_le32(dst_port);
+>>> +     hdr->flags      = cpu_to_le32(info->flags);
+>>> +     hdr->len        = cpu_to_le32(info->pkt_len);
+>>
+>> There is function 'virtio_transport_init_hdr()' in this file, may be reuse it ?
+> 
+> Will do.
+> 
+>>
+>>> +
+>>> +     if (info->msg && info->pkt_len > 0) {
+>>
+>> If pkt_len is 0, do we really need to send such packets ? Because for connectible
+>> sockets, we ignore empty OP_RW packets.
+> 
+> Thanks for pointing this out. I think virtio dgram should also follow that.
+> 
+>>
+>>> +             payload = skb_put(skb, info->pkt_len);
+>>> +             err = memcpy_from_msg(payload, info->msg, info->pkt_len);
+>>> +             if (err)
+>>> +                     goto out;
+>>> +     }
+>>> +
+>>> +     trace_virtio_transport_alloc_pkt(src_cid, src_port,
+>>> +                                      dst_cid, dst_port,
+>>> +                                      info->pkt_len,
+>>> +                                      info->type,
+>>> +                                      info->op,
+>>> +                                      info->flags,
+>>> +                                      false);
+>>
+>> ^^^ For SOCK_DGRAM, include/trace/events/vsock_virtio_transport_common.h also should
+>> be updated?
+> 
+> Can you elaborate what needs to be changed?
+
+Sure, there are:
+
+TRACE_DEFINE_ENUM(VIRTIO_VSOCK_TYPE_STREAM);
+TRACE_DEFINE_ENUM(VIRTIO_VSOCK_TYPE_SEQPACKET);
+
+#define show_type(val) \
+	__print_symbolic(val, \
+			 { VIRTIO_VSOCK_TYPE_STREAM, "STREAM" }, \
+			 { VIRTIO_VSOCK_TYPE_SEQPACKET, "SEQPACKET" })
+
+I guess SOCK_DGRAM handling should be added to print type of socket.
+
+Thanks, Arseniy
+
+> 
+> Thank you,
+> Amery
+> 
+>>
+>>> +
+>>> +     return t_ops->send_pkt(skb);
+>>> +out:
+>>> +     kfree_skb(skb);
+>>> +     return err;
+>>> +}
+>>> +
+>>>  int
+>>>  virtio_transport_dgram_enqueue(struct vsock_sock *vsk,
+>>>                              struct sockaddr_vm *remote_addr,
+>>>                              struct msghdr *msg,
+>>>                              size_t dgram_len)
+>>>  {
+>>> -     return -EOPNOTSUPP;
+>>> +     /* Here we are only using the info struct to retain style uniformity
+>>> +      * and to ease future refactoring and merging.
+>>> +      */
+>>> +     struct virtio_vsock_pkt_info info = {
+>>> +             .op = VIRTIO_VSOCK_OP_RW,
+>>> +             .remote_cid = remote_addr->svm_cid,
+>>> +             .remote_port = remote_addr->svm_port,
+>>> +             .remote_flags = remote_addr->svm_flags,
+>>> +             .msg = msg,
+>>> +             .vsk = vsk,
+>>> +             .pkt_len = dgram_len,
+>>> +     };
+>>> +
+>>> +     return virtio_transport_dgram_send_pkt_info(vsk, &info);
+>>>  }
+>>>  EXPORT_SYMBOL_GPL(virtio_transport_dgram_enqueue);
+>>>
+>>> --
+>>> 2.20.1
+>>
+>> Thanks, Arseniy
 
