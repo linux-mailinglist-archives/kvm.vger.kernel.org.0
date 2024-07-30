@@ -1,110 +1,96 @@
-Return-Path: <kvm+bounces-22676-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22677-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1104A9413D2
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 16:00:53 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9DB94140A
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 16:13:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C072D2862F0
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 14:00:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 047471F242A0
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 14:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1584B1A255C;
-	Tue, 30 Jul 2024 13:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZbiwH2Mw"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A159C1A0AF2;
+	Tue, 30 Jul 2024 14:13:24 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0ABC1A0B1E;
-	Tue, 30 Jul 2024 13:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F141465A7;
+	Tue, 30 Jul 2024 14:13:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722347996; cv=none; b=KkBmYdpUKPQWPJ/0bI8NorkD5ZR8KLaDG/2NuQsHvH5pHw/e09sPDh+OWamuGvHGnRDc3Hag2P1hs03s70kV3J5O9Rd8eD/NjQzoiEd2UNLRM2MT29cFb+nucbPXKg417Jt/L6x3o/3iwUPNYz+SMXI1rIya+k9rFuvkUSvwq2s=
+	t=1722348804; cv=none; b=hC2qnFDg6Uj649pnfa0D5TPhI3x8d0+wMVnwSzmnItHdGUHVCkw6Q17d3Tw0H4kfEFtX16JjkKSo1VSF/YEoUd9ak7yjG08Blmc6Np2hibtgBw+iM6bebJsTvavZMrUcPpRWG3FdB5lnO0TnmxBvUKxtlpe00msYE2figqh5WAA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722347996; c=relaxed/simple;
-	bh=YaM4+b6lvaZgy4LsPLegxSvo2v6TxqFJ7fyriyom+oI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=gpDVgBiVDZadadoFYnYwBcQjOf/9ly6TPzbRo5BMZv4DxIt+eWqSf+A9NEpCjJueI/a3q3lD5rPFmYb2W1waJwj6fS1sir8vK5h6VZxhJ30uzNSrCMNI210JR1cuhp05fG0JV7o+8oPXiEdw+s/p7jAET7A00uc5sAfG5jGP2jQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZbiwH2Mw; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a7abf92f57bso607556566b.2;
-        Tue, 30 Jul 2024 06:59:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722347993; x=1722952793; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5jsRHt6AbZY8NHNK61Lyc5SbdHyyw8i5AOi+bgTKUYU=;
-        b=ZbiwH2MwU7sbyXHHjqLRTZnOKc9DvAyFRLpGMprLlKdl8fOh35B+Xy7DhSBHbfVWOP
-         VLRAV3YJzkct5hsuUzKI216X84mN+80PJHecID8zZ+GeKfjtdTYdvtlTt33RH40rmfGJ
-         lCXtFKsrWNkxPBxpfh5xRSzFvwc1cj+H4Idr9/KVxoqXO1KUEqJ6KWmaFL2njitx4CzR
-         5ZWXJs5/yi+u06DryvimoMSw6X8yxT9absSmLHM+ZVRFkx4Xw1mI0NWQC7X9AAu+dnr2
-         KWZMRn/J2yRiAvi4ieqCpjaGR6lJipkOWM1N96DiQWzC3OE1JDq1bjlMRAZswX8U1vBX
-         eszw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722347993; x=1722952793;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5jsRHt6AbZY8NHNK61Lyc5SbdHyyw8i5AOi+bgTKUYU=;
-        b=ITo8a8Q0wgTMyeXt6FoFWPQkN1VA6y0cPdB89h4UTxgRUi5BqUYy25OY3ImNLHi26P
-         KWN9bW6XP0X/kxrxnUO8Xi6l3oFE/4NH9GSQ2VXD5g1EmiHkE9dJzXIHrhYw3E600K/3
-         tvtmlPwBqyyUmOs2FiXOXBo3BlEqxpcIIomalGJcqABl7yu4FyxieJMLz/aaFZSYji7d
-         /UP89zVqyTGHPUYTc4ULRVZ+qwGKwYP5kb7ppYABExLxpDq9bIWl+7p56cQEOaLi+OqI
-         jhmJSj5yFymU6y4g8iHTPYDwxPXVhnbu9KUOQJaBP2aPCwYN6wzyQ8TRc/u4hWJwK+ht
-         FwNg==
-X-Forwarded-Encrypted: i=1; AJvYcCXXcSHSg89ucLremO1CzzalbOeJ01ihM8WXuCj3PAK3F8s91DR0kdHAyoh9UR0jbMsYnbcNHIeP1Cn+XPV8JHMoct4op5ikZZDWYk+GAZq5+pQj4lQbYtIan5mtauX2ybNk
-X-Gm-Message-State: AOJu0YyAG7JfUjCxrRyW4cfGzimLLjlh25QdBU5acRQ9Au3Vgq23vxD+
-	uGmxiEqTZadmf3d1QXj4N1YfiyUKNHdLKUHrSXMLtwSVSGGJuXhFpJKvGDPsu/43kRH1KHoubzQ
-	FlLsPaPydoqPx2/v/r1xdva2bSfs=
-X-Google-Smtp-Source: AGHT+IHpVdhGWM8xlGOpb0CaWO+/25TbVir4XUN/mf86g8YrZLSmmiFcYOvx3uozoDaV9uJ/7HgJmLa5wPvtFUkXWB8=
-X-Received: by 2002:a17:906:c141:b0:a7d:30d2:28f8 with SMTP id
- a640c23a62f3a-a7d40150d76mr701927666b.68.1722347992676; Tue, 30 Jul 2024
- 06:59:52 -0700 (PDT)
+	s=arc-20240116; t=1722348804; c=relaxed/simple;
+	bh=sCLGGzDv1gWkhzhSzAWcvEKO+MPuUAl3DO50dmWHWLI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Zv45e2je0wlOCJCqEovjTR5zrQn3/HhItJAcOIq8ZjrV4RVBHDM7ffaPnpUvIn8ewKckgQRZOID/Y8cU4sPV85ZeZgeEoXB3J8DXBBF0aB0IhGegBWejHAMRm0NqPq2IuQbmjCk26mVJ20rMVY6m6IUs4pLcoUD0MlxeqDF5VtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4WYHH66FzVzncBD;
+	Tue, 30 Jul 2024 22:12:18 +0800 (CST)
+Received: from dggpemf500002.china.huawei.com (unknown [7.185.36.57])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0A71018009F;
+	Tue, 30 Jul 2024 22:13:17 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpemf500002.china.huawei.com
+ (7.185.36.57) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Tue, 30 Jul
+ 2024 22:13:16 +0800
+From: Yue Haibing <yuehaibing@huawei.com>
+To: <alex.williamson@redhat.com>
+CC: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<yuehaibing@huawei.com>
+Subject: [PATCH -next] vfio/fsl-mc: Remove unused variable 'hwirq'
+Date: Tue, 30 Jul 2024 22:11:33 +0800
+Message-ID: <20240730141133.525771-1-yuehaibing@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Liam Ni <zhiguangni01@gmail.com>
-Date: Tue, 30 Jul 2024 21:59:41 +0800
-Message-ID: <CACZJ9cX2R_=qgvLdaqbB_DUJhv08c674b67Ln_Qb9yyVwgE16w@mail.gmail.com>
-Subject: [PATCH V2] KVM:x86:Fix an interrupt injection logic error during PIC
- interrupt simulation
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>
-Cc: x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemf500002.china.huawei.com (7.185.36.57)
 
-The input parameter level to the pic_irq_request function indicates
-whether there are interrupts to be injected,
-a level value of 1 indicates that there are interrupts to be injected,
-and a level value of 0 indicates that there are no interrupts to be injected.
-And the value of level will be assigned to s->output,
-so we should set s->wakeup_needed to true when s->output is true.
+Commit 7447d911af69 ("vfio/fsl-mc: Block calling interrupt handler without trigger")
+left this variable unused, so remove it.
 
-Signed-off-by: Liam Ni <zhiguangni01@gmail.com>
+Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 ---
- arch/x86/kvm/i8259.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c | 4 +---
+ 1 file changed, 1 insertion(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/i8259.c b/arch/x86/kvm/i8259.c
-index 8dec646e764b..ec9d6ee7d33d 100644
---- a/arch/x86/kvm/i8259.c
-+++ b/arch/x86/kvm/i8259.c
-@@ -567,7 +567,7 @@ static void pic_irq_request(struct kvm *kvm, int level)
+diff --git a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+index 82b2afa9b7e3..7e7988c4258f 100644
+--- a/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
++++ b/drivers/vfio/fsl-mc/vfio_fsl_mc_intr.c
+@@ -108,10 +108,10 @@ static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
+ 				       void *data)
  {
-    struct kvm_pic *s = kvm->arch.vpic;
-
--   if (!s->output)
-+   if (!s->output && level)
-        s->wakeup_needed = true;
-    s->output = level;
- }
---
+ 	struct fsl_mc_device *mc_dev = vdev->mc_dev;
+-	int ret, hwirq;
+ 	struct vfio_fsl_mc_irq *irq;
+ 	struct device *cont_dev = fsl_mc_cont_dev(&mc_dev->dev);
+ 	struct fsl_mc_device *mc_cont = to_fsl_mc_device(cont_dev);
++	int ret;
+ 
+ 	if (!count && (flags & VFIO_IRQ_SET_DATA_NONE))
+ 		return vfio_set_trigger(vdev, index, -1);
+@@ -136,8 +136,6 @@ static int vfio_fsl_mc_set_irq_trigger(struct vfio_fsl_mc_device *vdev,
+ 		return vfio_set_trigger(vdev, index, fd);
+ 	}
+ 
+-	hwirq = vdev->mc_dev->irqs[index]->virq;
+-
+ 	irq = &vdev->mc_irqs[index];
+ 
+ 	if (flags & VFIO_IRQ_SET_DATA_NONE) {
+-- 
 2.34.1
+
 
