@@ -1,99 +1,144 @@
-Return-Path: <kvm+bounces-22678-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22679-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2F169414E8
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 16:56:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96BB994150E
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 17:02:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DF82285B50
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 14:56:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC1831C22FA3
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 15:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567781A2548;
-	Tue, 30 Jul 2024 14:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Jec0lEoY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F56F1A2C29;
+	Tue, 30 Jul 2024 15:02:12 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F995CA6B
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 14:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD0F2A1C7
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 15:02:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722351386; cv=none; b=laI+FmYmH5sf2ZKU2WihNuuC8Z4MI1MkgAlqXByQwktpDNzSqJZqyCG+xnWXdMZDsMKR0RUyRppVV8smObqBnyq8OVZabuvAo2KkGXvfrT2fjaKUxXlM7Mrj+VTDSszWTSfhh4/luKID+L5sxZAfu7/32iFul+cwf6w6rHVYV+g=
+	t=1722351732; cv=none; b=qDlZLrx0QgehvTXSeyzet17gMn6XcReCcBvEdBrCYDcLaW6oqetslbEwizqgoTRvnvi+MHa6Zlt/16++O4rv8sWeHE6xKR7NioB7lxN1PJXPhzduZuCk6KXUltFFJTubMobyTyC/vQyvQlaEbGaZDx8J3R6WIt/AmZ9biMbH0R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722351386; c=relaxed/simple;
-	bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dD7f7oriy2ccXFa7izOnSn/PeGiop5BeuTbQZAnXZM/kWFN4cJ7My3bVOtCeKkfxY7JZh+hE3xJjQZvLJ9x+XW+L9nJebvR1+4d5VmSPvfDCYrklLZvxFiXJFvv2OTiXcduvjolTuklspzzWiVt8lbIvHMs+vTEFNkflVxGdivE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Jec0lEoY; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722351383;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-	b=Jec0lEoYdwpG/Mv6kIOTBLFnevgaurGC+XZMfh6Fdb7VzvW3zQYTJr2C6BsrgzWBQl3jh4
-	Okv+TTS52pyLQ1llvTz1eirPYe42F5qEC1A4P2aVTB6xjihLDEB/sXmTtQRk1dxhjCIfkh
-	nP19md+Q6ksFqWX6nf+9cwvkLoTk5kc=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-195-wYZJgtdxPGeuxoMrzRsFkA-1; Tue, 30 Jul 2024 10:56:22 -0400
-X-MC-Unique: wYZJgtdxPGeuxoMrzRsFkA-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5a2d4fb1e73so4891517a12.2
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 07:56:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722351380; x=1722956180;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cyh9GNwkSeiWX8VVWJet6cmrStrv1Y1BhHYKMAKCy08=;
-        b=KljfzP9lIlj7omH+aa10z+iGLFWinRD8t4YlHsz892tLBz5QnqLkKW0wbZrTH6hZYk
-         C1ITMCPLN0sF7Nud+qL1ZYJh6kz/4H4EOeWa9IOl6HR9lubJrdyyKDEHKz732fw5UqbI
-         YVXJrUq1TQyITnmiNmml6XvZI+dEz8gW+xCOcusGIsF7D2z6XkrVXRGagW1sxxWZ/JPd
-         X4jsA9tMGSRceXl+7Dvw4Y2PkTqp6vkSgsWGSA1tHs/AJb/7lopgKOUyMHakqv/HAosB
-         y6ZNtL+LTNZ4i1pm07uWZaiIuNlrrEEP/6nuF0/K6S43yxAH6dEPZoc4lNljFwCmv2XC
-         YLYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXruU4k2Dzrm3Y1SP5Um6m2dtHH2AB8qoYL12KAo6Dl+Y/IDncewPFHmue/WnFUGoXEwc7a9yfZaVqRxYi8xigLCNUG
-X-Gm-Message-State: AOJu0Yxam641ouy8gahiMgfDNYHCgw19RCRjPnxByFPCf26sfThURrLX
-	qtifrE5rAjhSpmnb1qJtuVX0lVp5TjsDjMuJMUndNx4xG0bkvBiq3UUK7lHtqLs8tN1+KJeYp/O
-	rhR2mOPrYtF/tjuKWhZgVtL8N/kXkcIZuPyS2Br4n3SY0cyDUtjXsw00UOA==
-X-Received: by 2002:a50:bb45:0:b0:5a2:597:748e with SMTP id 4fb4d7f45d1cf-5b0211908bcmr7058324a12.2.1722351380190;
-        Tue, 30 Jul 2024 07:56:20 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFzzkn0CxyMA7XirdZLScOn8lScLNigW5ihTEJ84cC/RZHY/Rsy5JfAFWsr9PCl8delBc7icA==
-X-Received: by 2002:a50:bb45:0:b0:5a2:597:748e with SMTP id 4fb4d7f45d1cf-5b0211908bcmr7058307a12.2.1722351379849;
-        Tue, 30 Jul 2024 07:56:19 -0700 (PDT)
-Received: from avogadro.local ([151.95.101.29])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ac657836f9sm7188729a12.90.2024.07.30.07.56.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 07:56:18 -0700 (PDT)
-From: Paolo Bonzini <pbonzini@redhat.com>
-To: Xiong Zhang <xiong.y.zhang@linux.intel.com>
-Cc: pbonzini@redhat.com,
-	qemu-devel@nongnu.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH] target/i386: Change unavail from u32 to u64
-Date: Tue, 30 Jul 2024 16:56:12 +0200
-Message-ID: <20240730145612.62437-1-pbonzini@redhat.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20240730082927.250180-1-xiong.y.zhang@linux.intel.com>
-References: 
+	s=arc-20240116; t=1722351732; c=relaxed/simple;
+	bh=dCAjbSVHlMwkD7O7vy5fSGdy6Q04vhWwEMcL2tkVET4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=o8G+bcuJj2jEgbkd4axfEsbdGqqwCpaztbZsZ1iDGbj9k/H/6Yqn3IdXzrezxR4+/wmgElNhwIRRGXHg4LJlKmyrki8AcjNvKwSvOG6oyvZPdqEky/E31epdpMVpMq2tplkDDOcLdrwIrmObQ0jA/hPBp6hZ9dSIAF1xwpQPtS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 788E11007;
+	Tue, 30 Jul 2024 08:02:35 -0700 (PDT)
+Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A1D103F5A1;
+	Tue, 30 Jul 2024 08:02:08 -0700 (PDT)
+Date: Tue, 30 Jul 2024 16:02:00 +0100
+From: Andre Przywara <andre.przywara@arm.com>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: "J. =?UTF-8?B?TmV1c2Now6RmZXI=?=" <j.neuschaefer@gmx.net>,
+ kvm@vger.kernel.org, Alyssa Ross <hi@alyssa.is>, will@kernel.org,
+ julien.thierry.kdev@gmail.com
+Subject: Re: [PATCH kvmtool v2 2/2] Get __WORDSIZE from <sys/reg.h> for musl
+ compat
+Message-ID: <20240730160200.3e0480da@donnerap.manchester.arm.com>
+In-Reply-To: <ZqfCOOhF9dGf3G_c@raptor>
+References: <20240727-musl-v2-0-b106252a1cba@gmx.net>
+	<20240727-musl-v2-2-b106252a1cba@gmx.net>
+	<ZqfCOOhF9dGf3G_c@raptor>
+Organization: ARM
+X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Queued, thanks.
+On Mon, 29 Jul 2024 17:24:24 +0100
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 
-Paolo
+> Hi,
+>=20
+> CC'ing the maintainers (can be found in README).
+>=20
+> On Sat, Jul 27, 2024 at 07:11:03PM +0200, J. Neusch=C3=A4fer wrote:
+> > musl-libc doesn't provide <bits/wordsize.h>, but it defines __WORDSIZE
+> > in <sys/reg.h> and <sys/user.h>.
+> >=20
+> > Signed-off-by: J. Neusch=C3=A4fer <j.neuschaefer@gmx.net>
+> > ---
+> >  include/linux/bitops.h | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >=20
+> > diff --git a/include/linux/bitops.h b/include/linux/bitops.h
+> > index ae33922..4f133ba 100644
+> > --- a/include/linux/bitops.h
+> > +++ b/include/linux/bitops.h
+> > @@ -1,7 +1,7 @@
+> >  #ifndef _KVM_LINUX_BITOPS_H_
+> >  #define _KVM_LINUX_BITOPS_H_
+> >=20
+> > -#include <bits/wordsize.h>
+> > +#include <sys/reg.h> =20
+>=20
+> When cross-compiling on x86 for arm64, as well as when compiling natively=
+ for
+> arm64 I get this error:
+>=20
+> In file included from include/linux/bitmap.h:7,
+>                  from util/find.c:4:
+> include/linux/bitops.h:5:10: fatal error: sys/reg.h: No such file or dire=
+ctory
+>     5 | #include <sys/reg.h>
+>       |          ^~~~~~~~~~~
+> compilation terminated.
+> make: *** [Makefile:510: util/find.o] Error 1
+> make: *** Waiting for unfinished jobs....
+> In file included from include/linux/bitmap.h:7,
+>                  from util/bitmap.c:9:
+> include/linux/bitops.h:5:10: fatal error: sys/reg.h: No such file or dire=
+ctory
+>     5 | #include <sys/reg.h>
+>       |          ^~~~~~~~~~~
+> compilation terminated.
+> make: *** [Makefile:510: util/bitmap.o] Error 1
+>=20
+> Also, grep finds __WORDSIZE only in bits/wordsize.h on an x86 and arm64 m=
+achine:
+
+I wonder if __WORDSIZE (with two leading underscores!) is something
+portable enough to be used in userland tools in the first place. The
+kernel seems to use it, and that's where we inherited it from, I guess.
+But since we only use it in one place (to define BITS_PER_LONG), can't we
+just replace this there, with something based on "sizeof(long)"?
+Looks cleaner anyway, since "word" is an overloaded term.
+
+Cheers,
+Andre
+
+>=20
+> $ grep -r "define __WORDSIZE" /usr/include/
+> /usr/include/bits/wordsize.h:# define __WORDSIZE			64
+> /usr/include/bits/wordsize.h:# define __WORDSIZE			32
+> /usr/include/bits/wordsize.h:# define __WORDSIZE32_SIZE_ULONG	1
+> /usr/include/bits/wordsize.h:# define __WORDSIZE32_PTRDIFF_LONG	1
+> /usr/include/bits/wordsize.h:#define __WORDSIZE_TIME64_COMPAT32	0
+>=20
+>=20
+> Thanks,
+> Alex
+>=20
+> >=20
+> >  #include <linux/kernel.h>
+> >  #include <linux/compiler.h>
+> >=20
+> > --
+> > 2.43.0
+> >=20
+> >  =20
+>=20
 
 
