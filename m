@@ -1,263 +1,153 @@
-Return-Path: <kvm+bounces-22686-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22687-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED81941F18
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 19:57:16 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBC8C941F27
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 20:01:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B6C9B2542E
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 17:57:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C83E1F24A0A
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 18:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A784418A6C0;
-	Tue, 30 Jul 2024 17:57:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2D5718991A;
+	Tue, 30 Jul 2024 18:01:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mVkAudVa"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Rzp6td/y"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BA1E184547;
-	Tue, 30 Jul 2024 17:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838991A76C5
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 18:01:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722362220; cv=none; b=E4VQlCzumnSOWsOEuCxcRLPydhw/YJmmHlwWxfjVLZIU+Vbr8ournb7dR0JbHaKAElRVR0rczktChrvP/QUfixRSv0xI73UNMkwAijg9q1XOFYUces3Wd4FpDBkszhp43aDT9hL4pDpaOlTu0UCrW1Ymbunusy9KRx22hkJtIBI=
+	t=1722362462; cv=none; b=QILmPSDCzpfcopAOY03PhYQgPwJZ1P897MQqU8sfTVatV40QB8ZTPgFB9h2m9D7Z4CNTD52qDov4ul0Bp8SazQR6Pgm+xocsuE8N5p2RJua8AHw1IDd6HpTAg48pZS4ZOwRY6bIPCQfFxK06sDG4n42W6buK7/B0NLDOsklcQWs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722362220; c=relaxed/simple;
-	bh=Yq/ggOUNW+hktq+nK4p6E6tkRE5rk8sFRRmqvpaJpcc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hk4kUmZ3oUdpP9f0xJqb5KfY+cqIWEPN4J4ie2MW6EA7UM6JhD7xOEIIhuw4GPG2/5pnFySjWlnTuW7RKiaIORVqhyjvFwB/tVQoGyBcm1wP+d7z/dNA11UTALToDisW5HpqSRSuUxqk6qRv9382T19gy1LPAlQ6Hsr8ycDur5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mVkAudVa; arc=none smtp.client-ip=209.85.219.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-e087641d2a2so3753220276.0;
-        Tue, 30 Jul 2024 10:56:58 -0700 (PDT)
+	s=arc-20240116; t=1722362462; c=relaxed/simple;
+	bh=9clhoVreU2N/nXr+10v0kwlUjt4vVJ2U2EbtVOSvxOs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LucLTA8k3DmeQUj6YCLzNQc0Jpd8Hregk3fwQEDhcw2UplJZWRvyuPaQEsGzQTMhLXS/fczdMsc32nY7hA6d3DpalxVuyc2IcHwlEUykhN7tX+6Xn/nl0DsM8uPX4nmYatBOXZLZp7qL8JazEBhg/YX1jqMym+rPkZ1TaOmtImw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Rzp6td/y; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-650ab31aabdso77981437b3.3
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 11:01:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722362218; x=1722967018; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2tJ9LmFr+EeYpInIUds90yt7v1m8/2stEKp9e7T6m1w=;
-        b=mVkAudVa+U7V3BVQqZjVzNSi1MmaSQOlplVTk7tx+na8oQY5C9/nANgcxJnWWUzSQd
-         pSmhh6KYmzoUHWBpHAMcMwBDaIKa/AgNuME2BnINvxTK63P2x1EIdIvY1vAv5OGvuQ+i
-         yVBtxHNzD6CEAXrzNYk74QjvBcMtIpwQQUCJfxODo5VQKapOX28oyOqD5UptbVNQve29
-         lyc/eCQaEDPQAjZ7paoJnDixR6tWXKMSV4Bmt7DghhO1FKTtNKk89S6HSFBj1yCe0/MB
-         CF2s+wtvOpLhkdR6500Gxw+umBB37bFSANpQy/MUHrwGmnf/6jdviXzeiZwbPWElDid0
-         CILg==
+        d=google.com; s=20230601; t=1722362459; x=1722967259; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ukEjow9DcWXrb9MV8XjnrC3aUUwwEyCM45VOz1brskg=;
+        b=Rzp6td/ymKS8mJ5KJfewpd6cJL3vlpIWZZl5dBOy+CcevQiQr53PIYDjhSbIbWlCEU
+         jC3mngSPR133OrN5SlmTGJL+2l11TwbOhxHSxr+U8oZ5/nERaZJOYoGbDhhmH4cSqzkf
+         kSp7AWC20dBdRrLK//3W7CsN41YKaQXuoiJT7AOiZpWF3i3WYCMz3s7gyQ25jgXS6IHh
+         1e8E/eekjyRsehOuHmo9j04d5JBhTYp9Sz7c0SqgzoNS7mgPcGwkgJLJ7Im+VZ7si5zg
+         tl6JiW+DnFznSQFVyKfwqr4LGmXwVx8NsTT5/6SmG34D4E3Bx+shLmFCc5jBJV7AKQJw
+         qPxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722362218; x=1722967018;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2tJ9LmFr+EeYpInIUds90yt7v1m8/2stEKp9e7T6m1w=;
-        b=fyX37PNuMzLO2uc9wz7n89ePnQFcaEc9n0br4C/HEo28KNGT0cxhY2gj8DuVdI56Iq
-         s465syl770b7Yey9OWwRcRIfqFtHkQISd7k8ZLUBnsxR+jisjsXkyqGiWjnBkT4mhSV6
-         JVRR0pT9Mk1BJWses5kqTtXiZfyjVFMm8lFRb7kwaPcznPK4DWNc5ZqTqUasz3fS7Ioz
-         M0UNaorBLtaRzBpxx65gSEYWXMbPLZa1kbzSxbR5cBk3EhneUMe6xXQGPVSkIokDG48I
-         Tv+xeFKxcC4ul/Pe2cJwtPHsDI2MZlmaO85yNFOuFOLAYwOmvXnPKg7XtryX8fNVdFBg
-         Kgtw==
-X-Forwarded-Encrypted: i=1; AJvYcCXy3I8H5ZfaSBJmC/fjnSQ15yQBl2jjB62jUuhrOgoUccbXJLglYEQDQs9Sd21O6I7cAnNBha0HLzoJzJeIV4iuqiyDYQu7QH+ujgtAYvXabY8DVKy9tx2/NUupCJ1ljy//NBrgxaNvmW2LiWxP7u02tyyTFWZdo6ijgEagbIhtfI7XL951CEpoV8hsUkvWOfZZNMJKUwoaRYB23PF5DzIKId9ewSW88RTr2Jzf
-X-Gm-Message-State: AOJu0Yy1QtZGw3xmVFUKuskJ8Tq/lOxfM55WXaqN25l9H6bFICCpG6z/
-	PNK+1H4AutMReJxMfj5ywBke9b8axXo9GjG5TN8ZotOiwlWzOCc4/XiSpsQL1fjkkHoFepD4WR0
-	aM9RsqXrOlHLS6+sVUGq8kbXYmcY=
-X-Google-Smtp-Source: AGHT+IEeFCqCt/8oTNqAY4RtLq00QVkD5Ag05gXDYxk2tQVY/F4tyERpQH8H3d42Bd+DygSbMlFnsnAzg7VIuPpEhJA=
-X-Received: by 2002:a05:6902:2742:b0:e0b:b2d6:f528 with SMTP id
- 3f1490d57ef6-e0bb2d701c8mr529006276.38.1722362218035; Tue, 30 Jul 2024
- 10:56:58 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722362459; x=1722967259;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ukEjow9DcWXrb9MV8XjnrC3aUUwwEyCM45VOz1brskg=;
+        b=mzDmfOJRTQn3Jq+7FZLEgJNvIp7EuBBdQ/2sv4nH/lL9wKhwgQU2rRMkuLoZdFe0GF
+         9Cgzt7OcEXarGJkor8B/GELqw8Z5sPkpnWKFLDmG2bZAEDZf63qhV3wqGvyldiUoKPst
+         5t3l4gIvM17QY4cxb5fVicEqm3zKHNvYhx9B6+4Lk22NbxsNW/zQgDFt1ycch2ynbJyi
+         /6yIlb1ms1IU+KO3jDd7bvx2Tc/VaMrLes/hWsH+JMClXBpozI0gcG/CRSHmpB5IO+9W
+         Ne6uRxIJLiE2vP6toMrqglGLMEOmjg7VWIUSRezIQMxk91u7onTqSybQkRVu3GYwzBQc
+         FYtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXE76gJrrliHIXVkY2g0YvzvjyHFOVoim7yoQZIjSfEKdVxBDEGrx0cWMyGfX3kLixjlq2R36OBIfq3NnbaZ4WkJy/L
+X-Gm-Message-State: AOJu0YzClgKpI7oAntkKAMy/pdZEXpHgZ9hjelSSyJnAzgI/MAqpnV8i
+	7MgIgdMJKYS/cjBTlZZeY3zwbEfxgnPIoTT436335vTxise1mctoD9ZTMAr5qh9MW2RS6y9u5NC
+	tFQ==
+X-Google-Smtp-Source: AGHT+IHufTn+BQ1jTs+XXzxBmA6Be+2G2qQD2Bu1RfSBbycKZB4JjM9TkNXOpnLclwUFEbXk8QOLQe4qk50=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1549:b0:e05:eccb:95dc with SMTP id
+ 3f1490d57ef6-e0b5445f558mr154305276.6.1722362459366; Tue, 30 Jul 2024
+ 11:00:59 -0700 (PDT)
+Date: Tue, 30 Jul 2024 11:00:57 -0700
+In-Reply-To: <20240730174751.15824-1-john.allen@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240710212555.1617795-1-amery.hung@bytedance.com>
- <20240710212555.1617795-5-amery.hung@bytedance.com> <CAGxU2F7wCUR-KhDRBopK+0gv=bM0PCKeWM87j1vEYmbvhO8WHQ@mail.gmail.com>
- <CAMB2axNUZa221WKTjLt0G5KNdtkAbm20ViDZRGBh6pL9y3wosg@mail.gmail.com> <ba2hivznnjcyeftr7ch7gvrwjvkimx5u2t2anv7wv7n7yb3j36@dbagnaylvu6o>
-In-Reply-To: <ba2hivznnjcyeftr7ch7gvrwjvkimx5u2t2anv7wv7n7yb3j36@dbagnaylvu6o>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 30 Jul 2024 10:56:46 -0700
-Message-ID: <CAMB2axPfz0kOFau0tX2=87e=2EPSLxX1AXHPpsv3QyaLYaBvoA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 04/14] af_vsock: generalize bind table functions
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, 
-	wei.liu@kernel.org, decui@microsoft.com, bryantan@vmware.com, 
-	vdasa@vmware.com, pv-drivers@vmware.com, dan.carpenter@linaro.org, 
-	simon.horman@corigine.com, oxffffaa@gmail.com, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
-	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240730174751.15824-1-john.allen@amd.com>
+Message-ID: <ZqkqWTCa6GdeVykw@google.com>
+Subject: Re: [PATCH] KVM: x86: Advertise SUCCOR and OVERFLOW_RECOV cpuid bits
+From: Sean Christopherson <seanjc@google.com>
+To: John Allen <john.allen@amd.com>
+Cc: pbonzini@redhat.com, kvm@vger.kernel.org, thomas.lendacky@amd.com, 
+	bp@alien8.de, mlevitsk@redhat.com, linux-kernel@vger.kernel.org, 
+	x86@kernel.org, yazen.ghannam@amd.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 30, 2024 at 1:00=E2=80=AFAM Stefano Garzarella <sgarzare@redhat=
-.com> wrote:
->
-> On Sun, Jul 28, 2024 at 11:52:54AM GMT, Amery Hung wrote:
-> >On Tue, Jul 23, 2024 at 7:40=E2=80=AFAM Stefano Garzarella <sgarzare@red=
-hat.com> wrote:
-> >>
-> >> On Wed, Jul 10, 2024 at 09:25:45PM GMT, Amery Hung wrote:
-> >> >From: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> >> >
-> >> >This commit makes the bind table management functions in vsock usable
-> >> >for different bind tables. Future work will introduce a new table for
-> >> >datagrams to avoid address collisions, and these functions will be us=
-ed
-> >> >there.
-> >> >
-> >> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> >> >---
-> >> > net/vmw_vsock/af_vsock.c | 34 +++++++++++++++++++++++++++-------
-> >> > 1 file changed, 27 insertions(+), 7 deletions(-)
-> >> >
-> >> >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> >> >index acc15e11700c..d571be9cdbf0 100644
-> >> >--- a/net/vmw_vsock/af_vsock.c
-> >> >+++ b/net/vmw_vsock/af_vsock.c
-> >> >@@ -232,11 +232,12 @@ static void __vsock_remove_connected(struct vso=
-ck_sock *vsk)
-> >> >       sock_put(&vsk->sk);
-> >> > }
-> >> >
-> >> >-static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *ad=
-dr)
-> >> >+static struct sock *vsock_find_bound_socket_common(struct sockaddr_v=
-m *addr,
-> >> >+                                                 struct list_head *b=
-ind_table)
-> >> > {
-> >> >       struct vsock_sock *vsk;
-> >> >
-> >> >-      list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_tabl=
-e) {
-> >> >+      list_for_each_entry(vsk, bind_table, bound_table) {
-> >> >               if (vsock_addr_equals_addr(addr, &vsk->local_addr))
-> >> >                       return sk_vsock(vsk);
-> >> >
-> >> >@@ -249,6 +250,11 @@ static struct sock *__vsock_find_bound_socket(st=
-ruct sockaddr_vm *addr)
-> >> >       return NULL;
-> >> > }
-> >> >
-> >> >+static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *ad=
-dr)
-> >> >+{
-> >> >+      return vsock_find_bound_socket_common(addr, vsock_bound_socket=
-s(addr));
-> >> >+}
-> >> >+
-> >> > static struct sock *__vsock_find_connected_socket(struct sockaddr_vm=
- *src,
-> >> >                                                 struct sockaddr_vm *=
-dst)
-> >> > {
-> >> >@@ -671,12 +677,18 @@ static void vsock_pending_work(struct work_stru=
-ct *work)
-> >> >
-> >> > /**** SOCKET OPERATIONS ****/
-> >> >
-> >> >-static int __vsock_bind_connectible(struct vsock_sock *vsk,
-> >> >-                                  struct sockaddr_vm *addr)
-> >> >+static int vsock_bind_common(struct vsock_sock *vsk,
-> >> >+                           struct sockaddr_vm *addr,
-> >> >+                           struct list_head *bind_table,
-> >> >+                           size_t table_size)
-> >> > {
-> >> >       static u32 port;
-> >> >       struct sockaddr_vm new_addr;
-> >> >
-> >> >+      if (WARN_ONCE(table_size < VSOCK_HASH_SIZE,
-> >> >+                    "table size too small, may cause overflow"))
-> >> >+              return -EINVAL;
-> >> >+
-> >>
-> >> I'd add this in another commit.
-> >>
-> >> >       if (!port)
-> >> >               port =3D get_random_u32_above(LAST_RESERVED_PORT);
-> >> >
-> >> >@@ -692,7 +704,8 @@ static int __vsock_bind_connectible(struct
-> >> >vsock_sock *vsk,
-> >> >
-> >> >                       new_addr.svm_port =3D port++;
-> >> >
-> >> >-                      if (!__vsock_find_bound_socket(&new_addr)) {
-> >> >+                      if (!vsock_find_bound_socket_common(&new_addr,
-> >> >+                                                          &bind_tabl=
-e[VSOCK_HASH(addr)])) {
-> >>
-> >> Can we add a macro for `&bind_table[VSOCK_HASH(addr)])` ?
-> >>
-> >
-> >Definitely. I will add the following macro:
-> >
-> >#define vsock_bound_sockets_in_table(bind_table, addr) \
-> >        (&bind_table[VSOCK_HASH(addr)])
->
-> yeah.
->
-> >
-> >> >                               found =3D true;
-> >> >                               break;
-> >> >                       }
-> >> >@@ -709,7 +722,8 @@ static int __vsock_bind_connectible(struct vsock_=
-sock *vsk,
-> >> >                       return -EACCES;
-> >> >               }
-> >> >
-> >> >-              if (__vsock_find_bound_socket(&new_addr))
-> >> >+              if (vsock_find_bound_socket_common(&new_addr,
-> >> >+                                                 &bind_table[VSOCK_H=
-ASH(addr)]))
-> >> >                       return -EADDRINUSE;
-> >> >       }
-> >> >
-> >> >@@ -721,11 +735,17 @@ static int __vsock_bind_connectible(struct vsoc=
-k_sock *vsk,
-> >> >        * by AF_UNIX.
-> >> >        */
-> >> >       __vsock_remove_bound(vsk);
-> >> >-      __vsock_insert_bound(vsock_bound_sockets(&vsk->local_addr), vs=
-k);
-> >> >+      __vsock_insert_bound(&bind_table[VSOCK_HASH(&vsk->local_addr)]=
-, vsk);
-> >> >
-> >> >       return 0;
-> >> > }
-> >> >
-> >> >+static int __vsock_bind_connectible(struct vsock_sock *vsk,
-> >> >+                                  struct sockaddr_vm *addr)
-> >> >+{
-> >> >+      return vsock_bind_common(vsk, addr, vsock_bind_table, VSOCK_HA=
-SH_SIZE + 1);
-> >>
-> >> What about using ARRAY_SIZE(x) ?
-> >>
-> >> BTW we are using that size just to check it, but all the arrays we use
-> >> are statically allocated, so what about a compile time check like
-> >> BUILD_BUG_ON()?
-> >>
-> >
-> >I will remove the table_size check you mentioned earlier and the
-> >argument here as the arrays are allocated statically like you
-> >mentioned.
-> >
-> >If you think this check may be a good addition, I can add a
-> >BUILD_BUG_ON() in the new vsock_bound_sockets_in_table() macro.
->
-> If you want to add it, we need to do it in a separate commit. But since
-> we already have so many changes and both arrays are statically allocated
-> in the same file, IMHO we can avoid the check.
->
-> Stefano
->
+On Tue, Jul 30, 2024, John Allen wrote:
+> Handling deferred, uncorrected MCEs on AMD guests is now possible with
+> additional support in qemu. Ensure that the SUCCOR and OVERFLOW_RECOV
+> bits are advertised to the guest in KVM.
+> 
+> Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+> Signed-off-by: John Allen <john.allen@amd.com>
+> ---
+>  arch/x86/kvm/cpuid.c   | 2 +-
+>  arch/x86/kvm/svm/svm.c | 7 +++++++
+>  2 files changed, 8 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+> index 2617be544480..4745098416c3 100644
+> --- a/arch/x86/kvm/cpuid.c
+> +++ b/arch/x86/kvm/cpuid.c
+> @@ -1241,7 +1241,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+>  
+>  		/* mask against host */
+>  		entry->edx &= boot_cpu_data.x86_power;
+> -		entry->eax = entry->ebx = entry->ecx = 0;
+> +		entry->eax = entry->ecx = 0;
 
-Okay. I will not add the check.
+Needs an override to prevent reporting all of EBX to userspace.
 
-Thanks,
-Amery
+		cpuid_entry_override(entry, CPUID_8000_0007_EBX);
+
+>  		break;
+>  	case 0x80000008: {
+>  		/*
+> diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+> index c115d26844f7..a6820b0915db 100644
+> --- a/arch/x86/kvm/svm/svm.c
+> +++ b/arch/x86/kvm/svm/svm.c
+> @@ -5199,6 +5199,13 @@ static __init void svm_set_cpu_caps(void)
+>  		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
+>  	}
+>  
+> +	/* CPUID 0x80000007 */
+> +	if (boot_cpu_has(X86_FEATURE_SUCCOR))
+> +		kvm_cpu_cap_set(X86_FEATURE_SUCCOR);
+> +
+> +	if (boot_cpu_has(X86_FEATURE_OVERFLOW_RECOV))
+> +		kvm_cpu_cap_set(X86_FEATURE_OVERFLOW_RECOV);
+
+This _could_ use kvm_cpu_cap_check_and_set(), but given that this an AMD specific
+leaf and unlikely to ever be used by Intel, I'm inclined to handle this in cpuid.c,
+with an opporunustic "conversion" to one feature per line[*]:
+
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 2617be544480..ea11a7e45174 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -743,6 +743,11 @@ void kvm_set_cpu_caps(void)
+        if (!tdp_enabled && IS_ENABLED(CONFIG_X86_64))
+                kvm_cpu_cap_set(X86_FEATURE_GBPAGES);
+ 
++       kvm_cpu_cap_mask(CPUID_8000_0007_EBX,
++               F(OVERFLOW_RECOV) |
++               F(SUCCOR)
++       );
++
+        kvm_cpu_cap_init_kvm_defined(CPUID_8000_0007_EDX,
+                SF(CONSTANT_TSC)
+        );
+
+
+[*] https://lore.kernel.org/all/ZoxooTvO5vIEnS5V@google.com
 
