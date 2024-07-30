@@ -1,353 +1,138 @@
-Return-Path: <kvm+bounces-22588-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22589-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75CDA940832
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 08:19:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F0A294093B
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 09:14:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 819631C22515
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 06:19:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E6492830DF
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 07:14:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4100416728B;
-	Tue, 30 Jul 2024 06:18:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B275719066F;
+	Tue, 30 Jul 2024 07:13:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N3AwMcEX"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="ZH8TQMm3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4E518FC85
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 06:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B7A18FDB6
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 07:13:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722320321; cv=none; b=DnEa0uE0SuEcSC1YVQtudRV9p/xHv0Vgh8JSqs9v8cXIDWqCKqHudtbJ3q/3RIZxEQ7dLIxV5ql7VBoNZ13uUBqzi6Uhx9Mi5ndDpJZniqEFNAfMe8fxYYBSwtiG8tJwVUDjWb1ar18P9ZMpXP8eDHsKZdsQHinsSMVSbJxhfP4=
+	t=1722323623; cv=none; b=boljLp+6zQAasXFhljR6WxTDWMJ/rzz6HOuOqwmYLo0o87xkUTNXK2v4jKw3NtgQlxhUSeFXrQg0bYqmKAwtOMJL+h7I79m9cc+fqhh6P0YeG2NPAJX3dsK0rVkFQ5vMeQAf1VQBORrQ4q6VhZTjw/OiiYE1jAlyZ1o6KqZPuTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722320321; c=relaxed/simple;
-	bh=1i7CBN3jOe218/OcDlClAJcZNUqGkBYiPKY7XxKDLZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ctLVK0F3gyDA5mq/cRfRZ/IsXhxYVDYPLCyNaVUr8cuSnHGr0lsd/ufps4Z+bEvCy1Usw8WaWl7a+c2B838pLIz42FICJS8+f5w9h7BZBIDrFBHsEypjGajhceQKdv6RoPCIhOlDtKCj9vxFJDas+zRmIRq0eiMRE9uXJC/83oM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N3AwMcEX; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-70d18112b60so2943801b3a.1
-        for <kvm@vger.kernel.org>; Mon, 29 Jul 2024 23:18:39 -0700 (PDT)
+	s=arc-20240116; t=1722323623; c=relaxed/simple;
+	bh=nFqkhvxsyk15u9JjoPfwv2HTZugFVr1gaBeyuH/Kfs0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DwI/8e7ivwDqlfY+IVHap953v+KFkWBGFDzfrrCvyvX5gaFxJw51TZI4hzFcFG12l8mlRPAdvp4z+LPAQNBCNplUIbF1BCkk6gFwXZWRHLXsgwgdA20p13CVdFgye9Elx3tM8ciqxF0meHm8ApJ/6kr8++8Ol0jMAvaJnAPhEBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=ZH8TQMm3; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2ef2cce8be8so55258541fa.1
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 00:13:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722320319; x=1722925119; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=b9aR+63uT7v78VjbRv6DJCJHpLF+0X46I4y0U041o2c=;
-        b=N3AwMcEX/pj4M8q2J2dsvuT81ezVtP606OwGF1+e8nGdaNVDO7sWwbHfjzPlJxWofR
-         fVZ1RpXTaUFe9yfpZQle7AVxZDNaObRpuamukz/lIP19yq3YweDpH5GqPYzsNf9zOFdB
-         m1sRPTZJUuLEMPJ/FoTWnfsq9g1SVLj2fAHDqWNTL6kPFCVoGxmgzT/LWHZazzpgrQLa
-         DgkVE4eNqM2U+Jd7uJlLAJy9z13ZXtvO1CVZkbj2XUTr1UkNoe1RXGqsj8FvN84Eok0g
-         4+Sn37KoaBLxUmIanuTqr1UfjHcwo9sNxEMsTCkKgukC3mN9hafN8MLTgnuts2nGKnbG
-         x2pQ==
+        d=suse.com; s=google; t=1722323620; x=1722928420; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F8Jw306LnYMjl3oG/ZSN8RL6E+ZaAN6J5Cs3uDVTaZw=;
+        b=ZH8TQMm38JJTpLTBfgInCs/1OLKmhGk1zy1fOZIWywnS8KLWMkF3dM9/RnLOyEh114
+         ueNHWC8jBPYW+spOhuvtqLHtRvIvlSNr2jCzgoZJHmdji83sFISZRqqwBt2QQqadbuvN
+         JUWJpnllMdJTZs4nBy7rB2ZObnqaRo727T5RnOMiYBt1lpd+NQ3UUnZRGLlGO6n1lBxh
+         dXry203vDfch2zRxqQjSB6g74MZQ9OvnXvv2ly84x53X3/s9C/e0YA9geMfY2YTWjuaF
+         2TOof9jAbsx+Hhrp2CfiHlJK3LbMabE86f7UceOwNeHAzmvjZBuFdrrM6DoGweEh7xBg
+         bITQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722320319; x=1722925119;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=b9aR+63uT7v78VjbRv6DJCJHpLF+0X46I4y0U041o2c=;
-        b=k1/joeWs5sEIaPgpnXIEbwLopg5s1Bx2KkftURhqZMcfitKMYk3GOm6JSn0ukVnaVH
-         gpmjGWIISEYXUxk7WE8h95rPaF2oNSn5prZYKc4PQnea1PePnqcYR11tDiW41ojEd4hT
-         LrO5Kosdx/i6y4xUZZvsT6YwAGTa48AsDr8JgjU8Kccex22T/vMWbayjXHDpjAGEDcco
-         hQVKSSlsvqAIJL0TWzHzyfb13Ash//NGm3pdSCWUlyNMWPSltW8VZke0GK+JQA1iK5HI
-         KCRQqPGHiMnsGDKYknM9XCMUtIUDOzGF2bgoLWB+S3eTi0r6L6lAUHaSp7FXVwTLMWZA
-         VRog==
-X-Gm-Message-State: AOJu0Ywl6Wtnz8mWFFqa3YTEAP8nAMGZA+YETT6RCUqUEcfjQTkikrdw
-	RRaMZCEVcgOJbqeduQCNi6Erv4oivrtMf7SifTtLXQaQvHPUGX5Ljj5dyd3Qbxw=
-X-Google-Smtp-Source: AGHT+IEAIFl8b07iaWFTucQrr8o5u8AfL9aHdpepBAosSPFLueK4FRXeZIiIZifwd3D2tPdwPtlgDA==
-X-Received: by 2002:aa7:8257:0:b0:70e:ce95:b87 with SMTP id d2e1a72fcca58-70efe2a2430mr1637242b3a.0.1722320318624;
-        Mon, 29 Jul 2024 23:18:38 -0700 (PDT)
-Received: from JRT-PC.. ([202.166.44.78])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-70ead6e161dsm7732781b3a.42.2024.07.29.23.18.36
+        d=1e100.net; s=20230601; t=1722323620; x=1722928420;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F8Jw306LnYMjl3oG/ZSN8RL6E+ZaAN6J5Cs3uDVTaZw=;
+        b=CSr9ZkN1VJ8S6MWo3cuK/tDO1cMa2jfj9liKX8LAo6o5ww0ck2WvTirCLiQEgU3juc
+         ziXSvOq9nmbPWsewJg2AffYPQoOWdkUEfUfqfaZGidVaCV3v6NCcfYeqpzH4znf1aQid
+         BAV5GdUicyBsS/y9OBAoIkak/KgVqs0pjBVZLoLfTaMgS1zYJHJYfIQ2MVs3x0KBKN83
+         nCg7HWoqVufnJqg4hFVn1Cra1Oxtf6zRG8KGOA+Sitad7rsAE7GYGUjmY4an6316Ol/P
+         JKqFDArKWgCweDfg47pSZM4G1ajCVgqfQ+HoE0InisT0rSFhCb1PuNH2TilF3L+LOkiF
+         GYpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWwlc+1lYvs4yTsEvo2fUd4x0BMh/g410o7zTDBZ2j2qRqaBLb4xqIxEqxspZeXYL/2TNiLLMH0EgahsPQkGq6tUtAj
+X-Gm-Message-State: AOJu0YwdBf1KG58fI0RDmsLC1399lKRNVvOIMDGeKHnhZuUbor9S7MN3
+	4yhRxOf2OLlmOWdjrYR7rmv2bi9JBmhhU1Uc5UkKPV/Sb1xTX6C1eWdCwHvx8L0=
+X-Google-Smtp-Source: AGHT+IHRg0ZBYYhcWjSKQ0NvUTuyVVrQfU7hqOyM8bqKvdWQ4J0rNsKyVW4w700F67i0tZ+o+BFmxw==
+X-Received: by 2002:a2e:3009:0:b0:2ef:2c2e:598a with SMTP id 38308e7fff4ca-2f12ecd28b1mr76896251fa.11.1722323619832;
+        Tue, 30 Jul 2024 00:13:39 -0700 (PDT)
+Received: from localhost (109-81-83-231.rct.o2.cz. [109.81.83.231])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b8f51eaf5sm584855f8f.29.2024.07.30.00.13.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jul 2024 23:18:38 -0700 (PDT)
-From: James Raphael Tiovalen <jamestiotio@gmail.com>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Cc: andrew.jones@linux.dev,
-	atishp@rivosinc.com,
-	cade.richard@berkeley.edu,
-	James Raphael Tiovalen <jamestiotio@gmail.com>
-Subject: [kvm-unit-tests PATCH v6 5/5] riscv: sbi: Add test for timer extension
-Date: Tue, 30 Jul 2024 14:18:20 +0800
-Message-ID: <20240730061821.43811-6-jamestiotio@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240730061821.43811-1-jamestiotio@gmail.com>
-References: <20240730061821.43811-1-jamestiotio@gmail.com>
+        Tue, 30 Jul 2024 00:13:39 -0700 (PDT)
+Date: Tue, 30 Jul 2024 09:13:38 +0200
+From: Michal Hocko <mhocko@suse.com>
+To: viro@kernel.org
+Cc: linux-fsdevel@vger.kernel.org, amir73il@gmail.com, bpf@vger.kernel.org,
+	brauner@kernel.org, cgroups@vger.kernel.org, kvm@vger.kernel.org,
+	netdev@vger.kernel.org, torvalds@linux-foundation.org
+Subject: Re: [PATCH 01/39] memcg_write_event_control(): fix a
+ user-triggerable oops
+Message-ID: <ZqiSohxwLunBPnjT@tiehlicka>
+References: <20240730050927.GC5334@ZenIV>
+ <20240730051625.14349-1-viro@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240730051625.14349-1-viro@kernel.org>
 
-Add a test for the set_timer function of the time extension. The test
-checks that:
-- The time extension is available
-- The installed timer interrupt handler is called
-- The timer interrupt is received within a reasonable time interval
-- The timer interrupt pending bit is cleared after the set_timer SBI
-  call is made
-- The timer interrupt can be cleared either by requesting a timer
-  interrupt infinitely far into the future or by masking the timer
-  interrupt
+On Tue 30-07-24 01:15:47, viro@kernel.org wrote:
+> From: Al Viro <viro@zeniv.linux.org.uk>
+> 
+> we are *not* guaranteed that anything past the terminating NUL
+> is mapped (let alone initialized with anything sane).
+> 
+> [the sucker got moved in mainline]
+> 
 
-The timer interrupt delay can be set using the TIMER_DELAY environment
-variable in microseconds. The default delay value is 200 milliseconds.
-Since the interrupt can arrive a little later than the specified delay,
-allow some margin of error. This margin of error can be specified via
-the TIMER_MARGIN environment variable in microseconds. The default
-margin of error is 200 milliseconds.
+You could have preserved
+Fixes: 0dea116876ee ("cgroup: implement eventfd-based generic API for notifications")
+Cc: stable
 
-Reviewed-by: Andrew Jones <andrew.jones@linux.dev>
-Signed-off-by: James Raphael Tiovalen <jamestiotio@gmail.com>
----
- lib/riscv/asm/csr.h   |   8 +++
- lib/riscv/asm/sbi.h   |   5 ++
- lib/riscv/asm/timer.h |  10 ++++
- riscv/sbi.c           | 127 ++++++++++++++++++++++++++++++++++++++++++
- 4 files changed, 150 insertions(+)
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-diff --git a/lib/riscv/asm/csr.h b/lib/riscv/asm/csr.h
-index a9b1bd42..24b333e0 100644
---- a/lib/riscv/asm/csr.h
-+++ b/lib/riscv/asm/csr.h
-@@ -4,11 +4,15 @@
- #include <linux/const.h>
- 
- #define CSR_SSTATUS		0x100
-+#define CSR_SIE			0x104
- #define CSR_STVEC		0x105
- #define CSR_SSCRATCH		0x140
- #define CSR_SEPC		0x141
- #define CSR_SCAUSE		0x142
- #define CSR_STVAL		0x143
-+#define CSR_SIP			0x144
-+#define CSR_STIMECMP		0x14d
-+#define CSR_STIMECMPH		0x15d
- #define CSR_SATP		0x180
- #define CSR_TIME		0xc01
- 
-@@ -47,6 +51,10 @@
- #define IRQ_S_GEXT		12
- #define IRQ_PMU_OVF		13
- 
-+#define IE_TIE			(_AC(0x1, UL) << IRQ_S_TIMER)
-+
-+#define IP_TIP			IE_TIE
-+
- #ifndef __ASSEMBLY__
- 
- #define csr_swap(csr, val)					\
-diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-index 5e1a674a..73ab5438 100644
---- a/lib/riscv/asm/sbi.h
-+++ b/lib/riscv/asm/sbi.h
-@@ -16,6 +16,7 @@
- 
- enum sbi_ext_id {
- 	SBI_EXT_BASE = 0x10,
-+	SBI_EXT_TIME = 0x54494d45,
- 	SBI_EXT_HSM = 0x48534d,
- 	SBI_EXT_SRST = 0x53525354,
- };
-@@ -37,6 +38,10 @@ enum sbi_ext_hsm_fid {
- 	SBI_EXT_HSM_HART_SUSPEND,
- };
- 
-+enum sbi_ext_time_fid {
-+	SBI_EXT_TIME_SET_TIMER = 0,
-+};
-+
- struct sbiret {
- 	long error;
- 	long value;
-diff --git a/lib/riscv/asm/timer.h b/lib/riscv/asm/timer.h
-index f7504f84..b3514d3f 100644
---- a/lib/riscv/asm/timer.h
-+++ b/lib/riscv/asm/timer.h
-@@ -11,4 +11,14 @@ static inline uint64_t timer_get_cycles(void)
- 	return csr_read(CSR_TIME);
- }
- 
-+static inline void timer_irq_enable(void)
-+{
-+	csr_set(CSR_SIE, IE_TIE);
-+}
-+
-+static inline void timer_irq_disable(void)
-+{
-+	csr_clear(CSR_SIE, IE_TIE);
-+}
-+
- #endif /* _ASMRISCV_TIMER_H_ */
-diff --git a/riscv/sbi.c b/riscv/sbi.c
-index 762e9711..9fc099df 100644
---- a/riscv/sbi.c
-+++ b/riscv/sbi.c
-@@ -6,7 +6,25 @@
-  */
- #include <libcflat.h>
- #include <stdlib.h>
-+#include <limits.h>
-+#include <asm/barrier.h>
-+#include <asm/csr.h>
-+#include <asm/delay.h>
-+#include <asm/isa.h>
-+#include <asm/processor.h>
- #include <asm/sbi.h>
-+#include <asm/smp.h>
-+#include <asm/timer.h>
-+
-+struct timer_info {
-+	bool timer_works;
-+	bool mask_timer_irq;
-+	bool timer_irq_set;
-+	bool timer_irq_cleared;
-+	unsigned long timer_irq_count;
-+};
-+
-+static struct timer_info timer_info;
- 
- static void help(void)
- {
-@@ -19,6 +37,78 @@ static struct sbiret __base_sbi_ecall(int fid, unsigned long arg0)
- 	return sbi_ecall(SBI_EXT_BASE, fid, arg0, 0, 0, 0, 0, 0);
- }
- 
-+static struct sbiret __time_sbi_ecall(unsigned long stime_value)
-+{
-+	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
-+}
-+
-+static bool timer_irq_pending(void)
-+{
-+	return csr_read(CSR_SIP) & IP_TIP;
-+}
-+
-+static void timer_irq_handler(struct pt_regs *regs)
-+{
-+	if (timer_info.timer_irq_count < ULONG_MAX)
-+		++timer_info.timer_irq_count;
-+
-+	timer_info.timer_works = true;
-+	if (timer_irq_pending())
-+		timer_info.timer_irq_set = true;
-+
-+	if (timer_info.mask_timer_irq) {
-+		timer_irq_disable();
-+		__time_sbi_ecall(0);
-+	} else {
-+		__time_sbi_ecall(ULONG_MAX);
-+	}
-+
-+	if (!timer_irq_pending())
-+		timer_info.timer_irq_cleared = true;
-+}
-+
-+static void execute_set_timer_test(bool mask_timer_irq)
-+{
-+	struct sbiret ret;
-+	unsigned long begin, end, duration;
-+	const char *mask_test_str = mask_timer_irq ? " for mask irq test" : "";
-+	const char *clear_irq_bit_str = mask_timer_irq ? "masking timer irq"
-+						       : "setting timer to -1";
-+	unsigned long d = getenv("TIMER_DELAY") ? strtol(getenv("TIMER_DELAY"), NULL, 0)
-+						: 200000;
-+	unsigned long margin = getenv("TIMER_MARGIN") ? strtol(getenv("TIMER_MARGIN"), NULL, 0)
-+						      : 200000;
-+
-+	d = usec_to_cycles(d);
-+	margin = usec_to_cycles(margin);
-+
-+	timer_info = (struct timer_info){ .mask_timer_irq = mask_timer_irq };
-+	begin = timer_get_cycles();
-+	ret = __time_sbi_ecall(begin + d);
-+
-+	report(!ret.error, "set timer%s", mask_test_str);
-+	if (ret.error)
-+		report_info("set timer%s failed with %ld\n", mask_test_str, ret.error);
-+
-+	while ((end = timer_get_cycles()) <= (begin + d + margin) && !timer_info.timer_works)
-+		cpu_relax();
-+
-+	report(timer_info.timer_works, "timer interrupt received%s", mask_test_str);
-+	report(timer_info.timer_irq_set, "pending timer interrupt bit set in irq handler%s",
-+	       mask_test_str);
-+	report(timer_info.timer_irq_set && timer_info.timer_irq_cleared,
-+	       "pending timer interrupt bit cleared by %s", clear_irq_bit_str);
-+
-+	if (timer_info.timer_works) {
-+		duration = end - begin;
-+		report(duration >= d && duration <= (d + margin), "timer delay honored%s",
-+		       mask_test_str);
-+	}
-+
-+	if (timer_info.timer_irq_count > 1)
-+		report_fail("timer interrupt received multiple times%s", mask_test_str);
-+}
-+
- static bool env_or_skip(const char *env)
- {
- 	if (!getenv(env)) {
-@@ -112,6 +202,42 @@ static void check_base(void)
- 	report_prefix_pop();
- }
- 
-+static void check_time(void)
-+{
-+	report_prefix_push("time");
-+
-+	if (!sbi_probe(SBI_EXT_TIME)) {
-+		report_skip("time extension not available");
-+		report_prefix_pop();
-+		return;
-+	}
-+
-+	report_prefix_push("set_timer");
-+
-+	install_irq_handler(IRQ_S_TIMER, timer_irq_handler);
-+	local_irq_enable();
-+	if (cpu_has_extension(smp_processor_id(), ISA_SSTC)) {
-+		csr_write(CSR_STIMECMP, ULONG_MAX);
-+#if __riscv_xlen == 32
-+		csr_write(CSR_STIMECMPH, ULONG_MAX);
-+#endif
-+	}
-+	timer_irq_enable();
-+
-+	execute_set_timer_test(false);
-+
-+	if (csr_read(CSR_SIE) & IE_TIE)
-+		execute_set_timer_test(true);
-+	else
-+		report_skip("timer irq enable bit is not writable, skipping mask irq test");
-+
-+	local_irq_disable();
-+	install_irq_handler(IRQ_S_TIMER, NULL);
-+
-+	report_prefix_pop();
-+	report_prefix_pop();
-+}
-+
- int main(int argc, char **argv)
- {
- 
-@@ -122,6 +248,7 @@ int main(int argc, char **argv)
- 
- 	report_prefix_push("sbi");
- 	check_base();
-+	check_time();
- 
- 	return report_summary();
- }
+and
+Acked-by: Michal Hocko <mhocko@suse.com>
+
+> ---
+>  mm/memcontrol-v1.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
+> 
+> diff --git a/mm/memcontrol-v1.c b/mm/memcontrol-v1.c
+> index 2aeea4d8bf8e..417c96f2da28 100644
+> --- a/mm/memcontrol-v1.c
+> +++ b/mm/memcontrol-v1.c
+> @@ -1842,9 +1842,12 @@ static ssize_t memcg_write_event_control(struct kernfs_open_file *of,
+>  	buf = endp + 1;
+>  
+>  	cfd = simple_strtoul(buf, &endp, 10);
+> -	if ((*endp != ' ') && (*endp != '\0'))
+> +	if (*endp == '\0')
+> +		buf = endp;
+> +	else if (*endp == ' ')
+> +		buf = endp + 1;
+> +	else
+>  		return -EINVAL;
+> -	buf = endp + 1;
+>  
+>  	event = kzalloc(sizeof(*event), GFP_KERNEL);
+>  	if (!event)
+> -- 
+> 2.39.2
+> 
+
 -- 
-2.43.0
-
+Michal Hocko
+SUSE Labs
 
