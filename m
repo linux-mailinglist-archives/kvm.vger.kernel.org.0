@@ -1,325 +1,237 @@
-Return-Path: <kvm+bounces-22629-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22632-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F280940AF6
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 10:13:00 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C145940B2E
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 10:22:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D40771F22AF5
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 08:12:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4E3EB2130F
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 08:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4916D1946CC;
-	Tue, 30 Jul 2024 08:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43209192B9B;
+	Tue, 30 Jul 2024 08:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cg0skNbS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L1UL452c"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37821946AB
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 08:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BBC192B6B
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 08:22:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722327061; cv=none; b=AwVqIgX0ZZXwjqq8z/UE1ghviGIZDIaLzomkipHZm6jxfDtX6mybFWGhpD/4Sao+TXmcYGfjm6x+nqDKOYds62y3mPZ08AgBbEmC1FFgnGcq2t7YhnKKy3Hje5a7Spn+gxcsBdOevKhgdJ/HtNKCnEd+c5bJaaKuyvaZqoAO0Mk=
+	t=1722327732; cv=none; b=iP8JxBGn61Ml+dkNlasuFbL1qmjg++sHv4jGbyVhi3GVW4cniWc4yuzD8SKuhydyUUFPWaJm1aoKjHbgtpKu7i3reLQze3HUPdE91TU2rZCAjv8ntv6auerzvbCEDFsC4j9MVy2ldKV63ZKcOtbpAa9T5zrDYnJp/Anv4/yMgDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722327061; c=relaxed/simple;
-	bh=mnZZSo14mvblE3Z8bOnuqk9o3ckyCivXJXq60lfAJMc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-type; b=VRsZJcoKL47GPfjIRNdOlFEEfTd4jzNkvGjYz9NgFpKntN/18PEykFtdux8w0Biuj6W++tyEzzTWMftshE14Bmy0QBMynjjjBFrd+BkNaVBuTnilCFdvSCI/bILzG6wKziBrRsGbOj8ppTUpdvRh94yrSuk0SqblcBcJJsJnT78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cg0skNbS; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1722327732; c=relaxed/simple;
+	bh=zlLvkfB6nHfIqOkTOl9zHCG1pW4blpqkJHvz6DHFM6k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DQndUL3zyMOEEiYXi1zM/zQ3yLrGsBR589nkJCjj0iduHeU105D5oWQpye3HHq1ePuOjq3qdNIqYo2xhopBn3Ea1yWvMvv7j7eL1H1eAtlE0xboQY4E940PZ0fYavsQ3zdM14B9OQMOk40DdEk5Ks+eTqAYnCM6Ge3IVIfnKVw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L1UL452c; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722327059;
+	s=mimecast20190719; t=1722327729;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=/IcBJJUvdSdN0kBRVvjJDdC45PwUmOYNtwRnS1xygRQ=;
-	b=cg0skNbS9GnjOE+A4C0khWEzFavDE9I487nv72gkaCI4nAKc8vvtZQUOufK8FsGKQwokVP
-	RkiQb/0jrFX2UURT/TmZlsPO5Hr+fE4x/1avruo016tCziWVRB9fEeaeSawYcbJ1SmHDRM
-	aQ+ZY3CYqt+3305C8Ng5xfcYdKwPKl0=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-282-SphhJlo4OpGi7sxY1Y86NA-1; Tue,
- 30 Jul 2024 04:10:52 -0400
-X-MC-Unique: SphhJlo4OpGi7sxY1Y86NA-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 040C51955D44;
-	Tue, 30 Jul 2024 08:10:46 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.65])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 3B006300019A;
-	Tue, 30 Jul 2024 08:10:45 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 1FC2821F4BA3; Tue, 30 Jul 2024 10:10:33 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: qemu-devel@nongnu.org
-Cc: alex.williamson@redhat.com,
-	andrew@codeconstruct.com.au,
-	andrew@daynix.com,
-	arei.gonglei@huawei.com,
-	berrange@redhat.com,
-	berto@igalia.com,
-	borntraeger@linux.ibm.com,
-	clg@kaod.org,
-	david@redhat.com,
-	den@openvz.org,
-	eblake@redhat.com,
-	eduardo@habkost.net,
-	farman@linux.ibm.com,
-	farosas@suse.de,
-	hreitz@redhat.com,
-	idryomov@gmail.com,
-	iii@linux.ibm.com,
-	jamin_lin@aspeedtech.com,
-	jasowang@redhat.com,
-	joel@jms.id.au,
-	jsnow@redhat.com,
-	kwolf@redhat.com,
-	leetroy@gmail.com,
-	marcandre.lureau@redhat.com,
-	marcel.apfelbaum@gmail.com,
-	michael.roth@amd.com,
-	mst@redhat.com,
-	mtosatti@redhat.com,
-	nsg@linux.ibm.com,
-	pasic@linux.ibm.com,
-	pbonzini@redhat.com,
-	peter.maydell@linaro.org,
-	peterx@redhat.com,
-	philmd@linaro.org,
-	pizhenwei@bytedance.com,
-	pl@dlhnet.de,
-	richard.henderson@linaro.org,
-	stefanha@redhat.com,
-	steven_lee@aspeedtech.com,
-	thuth@redhat.com,
-	vsementsov@yandex-team.ru,
-	wangyanan55@huawei.com,
-	yuri.benditovich@daynix.com,
-	zhao1.liu@intel.com,
-	qemu-block@nongnu.org,
-	qemu-arm@nongnu.org,
-	qemu-s390x@nongnu.org,
-	kvm@vger.kernel.org
-Subject: [PATCH 18/18] qapi/cryptodev: Rename QCryptodevBackendAlgType to *Algo, and drop prefix
-Date: Tue, 30 Jul 2024 10:10:32 +0200
-Message-ID: <20240730081032.1246748-19-armbru@redhat.com>
-In-Reply-To: <20240730081032.1246748-1-armbru@redhat.com>
-References: <20240730081032.1246748-1-armbru@redhat.com>
+	bh=b/IhPTVrwNuelKzGXqZiTkO3FsriRH/0wyKH+Wqzb38=;
+	b=L1UL452cz+OFdNiHK+QcUR+FTTSMIiAu2lTdHPqrwrWDXGkpQ4YzdNTs0lloVwMRmsT1uw
+	NNkRwIQ3vhi6cBbwW9eos3zEodiMDu2XewpVELds8VePoHovuF2CjnniYUlnxqOYHYNZtD
+	Qip1vnlbFpQ4QDbHF/OLOzAhSxsCFe4=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-298-0_4YACKaP4mN3v7sa7i6Yg-1; Tue, 30 Jul 2024 04:22:06 -0400
+X-MC-Unique: 0_4YACKaP4mN3v7sa7i6Yg-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-42807a05413so23471875e9.2
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 01:22:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722327725; x=1722932525;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b/IhPTVrwNuelKzGXqZiTkO3FsriRH/0wyKH+Wqzb38=;
+        b=Y25i6lNWQmlTQ/a37iGdVJo183rnkj8dYdYTKK3Raa8Ow/1ns5am6VbhF0fpQjVRan
+         ZGqlkj4WApJJsJ1Mpshyh1Af0GoGSUbWYFbG94OiajwnEu5UT55hSMjo4b7MnzWp3Q2j
+         IuQgvUQFCHiwegLA9G+qC/tufzCug8MisFLe89PL5O1YTeNC7+pD5i+OKrIcFLu5JxqC
+         defDCZBSkjexiXjXvxSTzao1jeOMYf6QMbBoXVQUhnM2MUkGvWW6+9Mco3uAz4J3sXE2
+         JrsuQQdg1qn7p1xtIXSrk1VMi4nXxxHx5A19DtAC5x1i1itmmhynB7OlyFaF5sBnR9OB
+         7cuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUmHfAW7QZ/tNQ+APc08RoSBjmLX+IBLDYPPCPjUibpysAbEizZayVFzuBazLQ+39Wi5kf/H251OmyaR6Ar5MBucuDT
+X-Gm-Message-State: AOJu0YxVn3mYUBMU/sGf2U9ldk5JbR+BZhqzWIolrTciRjzoq/94j4xz
+	Zk9InTP8c5KWg4Bm5debHQwpVRaRJambfgpFn21VFYamkEVYysZHKzll3GIviMnwhAZ+gLyfDRE
+	ZyGug6FB3G08UdRgs7Gdniep3byc/y9QrrQeV4q1eHcXzpgjvwQ==
+X-Received: by 2002:a05:600c:1551:b0:426:59fe:ac2d with SMTP id 5b1f17b1804b1-42811df6feemr91230855e9.32.1722327724765;
+        Tue, 30 Jul 2024 01:22:04 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEG73W9sSA9j5TadFSq8iKvQdv6b7fO7acNXZOSHElpNXTnzHiZQyX55WqKLZtnIzVAJf9toA==
+X-Received: by 2002:a05:600c:1551:b0:426:59fe:ac2d with SMTP id 5b1f17b1804b1-42811df6feemr91230145e9.32.1722327723937;
+        Tue, 30 Jul 2024 01:22:03 -0700 (PDT)
+Received: from sgarzare-redhat ([62.205.9.89])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-42824afbe9dsm6396745e9.1.2024.07.30.01.22.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jul 2024 01:22:03 -0700 (PDT)
+Date: Tue, 30 Jul 2024 10:22:00 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Amery Hung <ameryhung@gmail.com>
+Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
+	xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org, 
+	decui@microsoft.com, bryantan@vmware.com, vdasa@vmware.com, pv-drivers@vmware.com, 
+	dan.carpenter@linaro.org, simon.horman@corigine.com, oxffffaa@gmail.com, 
+	kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	bpf@vger.kernel.org, bobby.eshleman@bytedance.com, jiang.wang@bytedance.com, 
+	amery.hung@bytedance.com, xiyou.wangcong@gmail.com
+Subject: Re: [RFC PATCH net-next v6 07/14] virtio/vsock: add common datagram
+ send path
+Message-ID: <obbppqyhstsuh3p3p4v6ipu7gl4z2ufeubvpv3dftyxubdvs5n@f7ugbp62xos7>
+References: <20240710212555.1617795-1-amery.hung@bytedance.com>
+ <20240710212555.1617795-8-amery.hung@bytedance.com>
+ <bpb36dtlbs6osr5cudvwrbagt7bls3cllg35lsusrly5pxwe7o@kjphrbuc64ix>
+ <CAMB2axPwUV9EusNPaemLVx5NN2_1wkq0ney4NazAj7P+WRo=NQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-type: text/plain
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+In-Reply-To: <CAMB2axPwUV9EusNPaemLVx5NN2_1wkq0ney4NazAj7P+WRo=NQ@mail.gmail.com>
 
-QAPI's 'prefix' feature can make the connection between enumeration
-type and its constants less than obvious.  It's best used with
-restraint.
+On Fri, Jul 26, 2024 at 04:22:16PM GMT, Amery Hung wrote:
+>On Tue, Jul 23, 2024 at 7:42 AM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Wed, Jul 10, 2024 at 09:25:48PM GMT, Amery Hung wrote:
+>> >From: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>> >
+>> >This commit implements the common function
+>> >virtio_transport_dgram_enqueue for enqueueing datagrams. It does not add
+>> >usage in either vhost or virtio yet.
+>> >
+>> >Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>> >Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+>> >---
+>> > include/linux/virtio_vsock.h            |  1 +
+>> > include/net/af_vsock.h                  |  2 +
+>> > net/vmw_vsock/af_vsock.c                |  2 +-
+>> > net/vmw_vsock/virtio_transport_common.c | 87 ++++++++++++++++++++++++-
+>> > 4 files changed, 90 insertions(+), 2 deletions(-)
+>> >
+>> >diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> >index f749a066af46..4408749febd2 100644
+>> >--- a/include/linux/virtio_vsock.h
+>> >+++ b/include/linux/virtio_vsock.h
+>> >@@ -152,6 +152,7 @@ struct virtio_vsock_pkt_info {
+>> >       u16 op;
+>> >       u32 flags;
+>> >       bool reply;
+>> >+      u8 remote_flags;
+>> > };
+>> >
+>> > struct virtio_transport {
+>> >diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>> >index 44db8f2c507d..6e97d344ac75 100644
+>> >--- a/include/net/af_vsock.h
+>> >+++ b/include/net/af_vsock.h
+>> >@@ -216,6 +216,8 @@ void vsock_for_each_connected_socket(struct vsock_transport *transport,
+>> >                                    void (*fn)(struct sock *sk));
+>> > int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk);
+>> > bool vsock_find_cid(unsigned int cid);
+>> >+const struct vsock_transport *vsock_dgram_lookup_transport(unsigned int cid,
+>> >+                                                         __u8 flags);
+>>
+>> Why __u8 and not just u8?
+>>
+>
+>Will change to u8.
+>
+>>
+>> >
+>> > struct vsock_skb_cb {
+>> >       unsigned int src_cid;
+>> >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> >index ab08cd81720e..f83b655fdbe9 100644
+>> >--- a/net/vmw_vsock/af_vsock.c
+>> >+++ b/net/vmw_vsock/af_vsock.c
+>> >@@ -487,7 +487,7 @@ vsock_connectible_lookup_transport(unsigned int cid, __u8 flags)
+>> >       return transport;
+>> > }
+>> >
+>> >-static const struct vsock_transport *
+>> >+const struct vsock_transport *
+>> > vsock_dgram_lookup_transport(unsigned int cid, __u8 flags)
+>> > {
+>> >       const struct vsock_transport *transport;
+>> >diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> >index a1c76836d798..46cd1807f8e3 100644
+>> >--- a/net/vmw_vsock/virtio_transport_common.c
+>> >+++ b/net/vmw_vsock/virtio_transport_common.c
+>> >@@ -1040,13 +1040,98 @@ int virtio_transport_shutdown(struct vsock_sock *vsk, int mode)
+>> > }
+>> > EXPORT_SYMBOL_GPL(virtio_transport_shutdown);
+>> >
+>> >+static int virtio_transport_dgram_send_pkt_info(struct vsock_sock *vsk,
+>> >+                                              struct virtio_vsock_pkt_info *info)
+>> >+{
+>> >+      u32 src_cid, src_port, dst_cid, dst_port;
+>> >+      const struct vsock_transport *transport;
+>> >+      const struct virtio_transport *t_ops;
+>> >+      struct sock *sk = sk_vsock(vsk);
+>> >+      struct virtio_vsock_hdr *hdr;
+>> >+      struct sk_buff *skb;
+>> >+      void *payload;
+>> >+      int noblock = 0;
+>> >+      int err;
+>> >+
+>> >+      info->type = virtio_transport_get_type(sk_vsock(vsk));
+>> >+
+>> >+      if (info->pkt_len > VIRTIO_VSOCK_MAX_PKT_BUF_SIZE)
+>> >+              return -EMSGSIZE;
+>> >+
+>> >+      transport = vsock_dgram_lookup_transport(info->remote_cid, info->remote_flags);
+>>
+>> Can `transport` be null?
+>>
+>> I don't understand why we are calling vsock_dgram_lookup_transport()
+>> again. Didn't we already do that in vsock_dgram_sendmsg()?
+>>
+>
+>transport should be valid here sin)e we null-checked it in
+>vsock_dgram_sendmsg(). The reason vsock_dgram_lookup_transport() is
+>called again here is we don't have the transport when we called into
+>transport->dgram_enqueue(). I can also instead add transport to the
+>argument of dgram_enqueue() to eliminate this redundant lookup.
 
-QCryptodevBackendAlgType a 'prefix' that overrides the generated
-enumeration constants' prefix to QCRYPTODEV_BACKEND_ALG.
+Yes, I would absolutely eliminate this double lookup.
 
-We could simply drop 'prefix', but I think the abbreviation "alg" is
-less than clear.
+You can add either a parameter, or define the callback in each transport 
+and internally use the statically allocated transport in each.
 
-Additionally rename the type to QCryptodevBackendAlgoType.  The prefix
-becomes QCRYPTODEV_BACKEND_ALGO_TYPE.
+For example for vhost/vsock.c:
 
-Signed-off-by: Markus Armbruster <armbru@redhat.com>
----
- qapi/cryptodev.json          |  5 ++---
- include/sysemu/cryptodev.h   |  2 +-
- backends/cryptodev-builtin.c |  6 +++---
- backends/cryptodev-lkcf.c    |  4 ++--
- backends/cryptodev.c         |  6 +++---
- hw/virtio/virtio-crypto.c    | 14 +++++++-------
- 6 files changed, 18 insertions(+), 19 deletions(-)
+static int vhost_transport_dgram_enqueue(....) {
+     return virtio_transport_dgram_enqueue(&vhost_transport.transport,
+                                           ...)
+}
 
-diff --git a/qapi/cryptodev.json b/qapi/cryptodev.json
-index 65abc16842..5e417340dc 100644
---- a/qapi/cryptodev.json
-+++ b/qapi/cryptodev.json
-@@ -9,7 +9,7 @@
- ##
- 
- ##
--# @QCryptodevBackendAlgType:
-+# @QCryptodevBackendAlgoType:
- #
- # The supported algorithm types of a crypto device.
- #
-@@ -19,8 +19,7 @@
- #
- # Since: 8.0
- ##
--{ 'enum': 'QCryptodevBackendAlgType',
--  'prefix': 'QCRYPTODEV_BACKEND_ALG',
-+{ 'enum': 'QCryptodevBackendAlgoType',
-   'data': ['sym', 'asym']}
- 
- ##
-diff --git a/include/sysemu/cryptodev.h b/include/sysemu/cryptodev.h
-index 96d3998b93..b20822df0d 100644
---- a/include/sysemu/cryptodev.h
-+++ b/include/sysemu/cryptodev.h
-@@ -178,7 +178,7 @@ typedef struct CryptoDevBackendAsymOpInfo {
- typedef void (*CryptoDevCompletionFunc) (void *opaque, int ret);
- 
- typedef struct CryptoDevBackendOpInfo {
--    QCryptodevBackendAlgType algtype;
-+    QCryptodevBackendAlgoType algtype;
-     uint32_t op_code;
-     uint32_t queue_index;
-     CryptoDevCompletionFunc cb;
-diff --git a/backends/cryptodev-builtin.c b/backends/cryptodev-builtin.c
-index 170c93a6be..b1486be630 100644
---- a/backends/cryptodev-builtin.c
-+++ b/backends/cryptodev-builtin.c
-@@ -549,7 +549,7 @@ static int cryptodev_builtin_operation(
-     CryptoDevBackendBuiltinSession *sess;
-     CryptoDevBackendSymOpInfo *sym_op_info;
-     CryptoDevBackendAsymOpInfo *asym_op_info;
--    QCryptodevBackendAlgType algtype = op_info->algtype;
-+    QCryptodevBackendAlgoType algtype = op_info->algtype;
-     int status = -VIRTIO_CRYPTO_ERR;
-     Error *local_error = NULL;
- 
-@@ -561,11 +561,11 @@ static int cryptodev_builtin_operation(
-     }
- 
-     sess = builtin->sessions[op_info->session_id];
--    if (algtype == QCRYPTODEV_BACKEND_ALG_SYM) {
-+    if (algtype == QCRYPTODEV_BACKEND_ALGO_TYPE_SYM) {
-         sym_op_info = op_info->u.sym_op_info;
-         status = cryptodev_builtin_sym_operation(sess, sym_op_info,
-                                                  &local_error);
--    } else if (algtype == QCRYPTODEV_BACKEND_ALG_ASYM) {
-+    } else if (algtype == QCRYPTODEV_BACKEND_ALGO_TYPE_ASYM) {
-         asym_op_info = op_info->u.asym_op_info;
-         status = cryptodev_builtin_asym_operation(sess, op_info->op_code,
-                                                   asym_op_info, &local_error);
-diff --git a/backends/cryptodev-lkcf.c b/backends/cryptodev-lkcf.c
-index 0dc4b067f5..38deac0717 100644
---- a/backends/cryptodev-lkcf.c
-+++ b/backends/cryptodev-lkcf.c
-@@ -474,7 +474,7 @@ static int cryptodev_lkcf_operation(
-     CryptoDevBackendLKCF *lkcf =
-         CRYPTODEV_BACKEND_LKCF(backend);
-     CryptoDevBackendLKCFSession *sess;
--    QCryptodevBackendAlgType algtype = op_info->algtype;
-+    QCryptodevBackendAlgoType algtype = op_info->algtype;
-     CryptoDevLKCFTask *task;
- 
-     if (op_info->session_id >= MAX_SESSIONS ||
-@@ -485,7 +485,7 @@ static int cryptodev_lkcf_operation(
-     }
- 
-     sess = lkcf->sess[op_info->session_id];
--    if (algtype != QCRYPTODEV_BACKEND_ALG_ASYM) {
-+    if (algtype != QCRYPTODEV_BACKEND_ALGO_TYPE_ASYM) {
-         error_report("algtype not supported: %u", algtype);
-         return -VIRTIO_CRYPTO_NOTSUPP;
-     }
-diff --git a/backends/cryptodev.c b/backends/cryptodev.c
-index 76dfe65904..d8bd2a1ae6 100644
---- a/backends/cryptodev.c
-+++ b/backends/cryptodev.c
-@@ -185,10 +185,10 @@ static int cryptodev_backend_operation(
- static int cryptodev_backend_account(CryptoDevBackend *backend,
-                  CryptoDevBackendOpInfo *op_info)
- {
--    enum QCryptodevBackendAlgType algtype = op_info->algtype;
-+    enum QCryptodevBackendAlgoType algtype = op_info->algtype;
-     int len;
- 
--    if (algtype == QCRYPTODEV_BACKEND_ALG_ASYM) {
-+    if (algtype == QCRYPTODEV_BACKEND_ALGO_TYPE_ASYM) {
-         CryptoDevBackendAsymOpInfo *asym_op_info = op_info->u.asym_op_info;
-         len = asym_op_info->src_len;
- 
-@@ -212,7 +212,7 @@ static int cryptodev_backend_account(CryptoDevBackend *backend,
-         default:
-             return -VIRTIO_CRYPTO_NOTSUPP;
-         }
--    } else if (algtype == QCRYPTODEV_BACKEND_ALG_SYM) {
-+    } else if (algtype == QCRYPTODEV_BACKEND_ALGO_TYPE_SYM) {
-         CryptoDevBackendSymOpInfo *sym_op_info = op_info->u.sym_op_info;
-         len = sym_op_info->src_len;
- 
-diff --git a/hw/virtio/virtio-crypto.c b/hw/virtio/virtio-crypto.c
-index 0ab8ae3282..6e9d8293da 100644
---- a/hw/virtio/virtio-crypto.c
-+++ b/hw/virtio/virtio-crypto.c
-@@ -461,7 +461,7 @@ static void virtio_crypto_init_request(VirtIOCrypto *vcrypto, VirtQueue *vq,
-     req->in_iov = NULL;
-     req->in_num = 0;
-     req->in_len = 0;
--    req->flags = QCRYPTODEV_BACKEND_ALG__MAX;
-+    req->flags = QCRYPTODEV_BACKEND_ALGO_TYPE__MAX;
-     memset(&req->op_info, 0x00, sizeof(req->op_info));
- }
- 
-@@ -471,7 +471,7 @@ static void virtio_crypto_free_request(VirtIOCryptoReq *req)
-         return;
-     }
- 
--    if (req->flags == QCRYPTODEV_BACKEND_ALG_SYM) {
-+    if (req->flags == QCRYPTODEV_BACKEND_ALGO_TYPE_SYM) {
-         size_t max_len;
-         CryptoDevBackendSymOpInfo *op_info = req->op_info.u.sym_op_info;
- 
-@@ -486,7 +486,7 @@ static void virtio_crypto_free_request(VirtIOCryptoReq *req)
-             memset(op_info, 0, sizeof(*op_info) + max_len);
-             g_free(op_info);
-         }
--    } else if (req->flags == QCRYPTODEV_BACKEND_ALG_ASYM) {
-+    } else if (req->flags == QCRYPTODEV_BACKEND_ALGO_TYPE_ASYM) {
-         CryptoDevBackendAsymOpInfo *op_info = req->op_info.u.asym_op_info;
-         if (op_info) {
-             g_free(op_info->src);
-@@ -571,10 +571,10 @@ static void virtio_crypto_req_complete(void *opaque, int ret)
-     VirtIODevice *vdev = VIRTIO_DEVICE(vcrypto);
-     uint8_t status = -ret;
- 
--    if (req->flags == QCRYPTODEV_BACKEND_ALG_SYM) {
-+    if (req->flags == QCRYPTODEV_BACKEND_ALGO_TYPE_SYM) {
-         virtio_crypto_sym_input_data_helper(vdev, req, status,
-                                             req->op_info.u.sym_op_info);
--    } else if (req->flags == QCRYPTODEV_BACKEND_ALG_ASYM) {
-+    } else if (req->flags == QCRYPTODEV_BACKEND_ALGO_TYPE_ASYM) {
-         virtio_crypto_akcipher_input_data_helper(vdev, req, status,
-                                              req->op_info.u.asym_op_info);
-     }
-@@ -884,7 +884,7 @@ virtio_crypto_handle_request(VirtIOCryptoReq *request)
-     switch (opcode) {
-     case VIRTIO_CRYPTO_CIPHER_ENCRYPT:
-     case VIRTIO_CRYPTO_CIPHER_DECRYPT:
--        op_info->algtype = request->flags = QCRYPTODEV_BACKEND_ALG_SYM;
-+        op_info->algtype = request->flags = QCRYPTODEV_BACKEND_ALGO_TYPE_SYM;
-         ret = virtio_crypto_handle_sym_req(vcrypto,
-                          &req.u.sym_req, op_info,
-                          out_iov, out_num);
-@@ -894,7 +894,7 @@ virtio_crypto_handle_request(VirtIOCryptoReq *request)
-     case VIRTIO_CRYPTO_AKCIPHER_DECRYPT:
-     case VIRTIO_CRYPTO_AKCIPHER_SIGN:
-     case VIRTIO_CRYPTO_AKCIPHER_VERIFY:
--        op_info->algtype = request->flags = QCRYPTODEV_BACKEND_ALG_ASYM;
-+        op_info->algtype = request->flags = QCRYPTODEV_BACKEND_ALGO_TYPE_ASYM;
-         ret = virtio_crypto_handle_asym_req(vcrypto,
-                          &req.u.akcipher_req, op_info,
-                          out_iov, out_num);
--- 
-2.45.0
+In virtio_transport_recv_pkt() we already do something similar.
+
+>
+>> Also should we add a comment mentioning that we can't use
+>> virtio_transport_get_ops()? IIUC becuase the vsk can be not assigned
+>> to a specific transport, right?
+>>
+>
+>Correct. For virtio dgram socket, transport is not assigned unless
+>vsock_dgram_connect() is called. I will add a comment here explaining
+>this.
+
+Thanks,
+Stefano
 
 
