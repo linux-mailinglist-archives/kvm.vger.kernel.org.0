@@ -1,144 +1,196 @@
-Return-Path: <kvm+bounces-22679-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22680-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96BB994150E
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 17:02:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4965C94151A
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 17:07:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC1831C22FA3
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 15:02:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C26284F19
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 15:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F56F1A2C29;
-	Tue, 30 Jul 2024 15:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 569D31A2C0B;
+	Tue, 30 Jul 2024 15:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hTehNgBB"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD0F2A1C7
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 15:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5266B19E7D1
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 15:07:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722351732; cv=none; b=qDlZLrx0QgehvTXSeyzet17gMn6XcReCcBvEdBrCYDcLaW6oqetslbEwizqgoTRvnvi+MHa6Zlt/16++O4rv8sWeHE6xKR7NioB7lxN1PJXPhzduZuCk6KXUltFFJTubMobyTyC/vQyvQlaEbGaZDx8J3R6WIt/AmZ9biMbH0R4=
+	t=1722352045; cv=none; b=s7YQJFPhLXElmvvVU9/0hBL1wcFP+QCze1TGXUQ3j41WmTOVw1H7ndC1bb+FGR7tdtx/biBsjFhKUKEz0ERBmY4U2ubTYTnu34v8AqvTmegPf5/1qSedSV+IpfErWuLfwhdHzrGrwrh3k4K3SannAm//kqy6ET3kd1DQ6ZT7cbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722351732; c=relaxed/simple;
-	bh=dCAjbSVHlMwkD7O7vy5fSGdy6Q04vhWwEMcL2tkVET4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=o8G+bcuJj2jEgbkd4axfEsbdGqqwCpaztbZsZ1iDGbj9k/H/6Yqn3IdXzrezxR4+/wmgElNhwIRRGXHg4LJlKmyrki8AcjNvKwSvOG6oyvZPdqEky/E31epdpMVpMq2tplkDDOcLdrwIrmObQ0jA/hPBp6hZ9dSIAF1xwpQPtS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 788E11007;
-	Tue, 30 Jul 2024 08:02:35 -0700 (PDT)
-Received: from donnerap.manchester.arm.com (usa-sjc-imap-foss1.foss.arm.com [10.121.207.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A1D103F5A1;
-	Tue, 30 Jul 2024 08:02:08 -0700 (PDT)
-Date: Tue, 30 Jul 2024 16:02:00 +0100
-From: Andre Przywara <andre.przywara@arm.com>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: "J. =?UTF-8?B?TmV1c2Now6RmZXI=?=" <j.neuschaefer@gmx.net>,
- kvm@vger.kernel.org, Alyssa Ross <hi@alyssa.is>, will@kernel.org,
- julien.thierry.kdev@gmail.com
-Subject: Re: [PATCH kvmtool v2 2/2] Get __WORDSIZE from <sys/reg.h> for musl
- compat
-Message-ID: <20240730160200.3e0480da@donnerap.manchester.arm.com>
-In-Reply-To: <ZqfCOOhF9dGf3G_c@raptor>
-References: <20240727-musl-v2-0-b106252a1cba@gmx.net>
-	<20240727-musl-v2-2-b106252a1cba@gmx.net>
-	<ZqfCOOhF9dGf3G_c@raptor>
-Organization: ARM
-X-Mailer: Claws Mail 3.18.0 (GTK+ 2.24.32; aarch64-unknown-linux-gnu)
+	s=arc-20240116; t=1722352045; c=relaxed/simple;
+	bh=62K2RbLh0WJqBpT8WDkhyO03yHqYE4DcGWLklbA0N4Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mZy4h5Wt5TQZTKimYvmI5O26x22anekpz6UX53uDjax3oX3ioiLxQ2sE+Eb0fUVjLhjx0my2YYZZwF05RwJBQtWMWuKfy/D4j+NBLCfXhSQQbQty4aPJ7yhOSIpgmQmWwzY3ooPq4+/5Rk7s2tGJ5TowPwlYK/qYpwDys6i8VPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hTehNgBB; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722352042;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Ke8GKRqB2B+6FqIK+oRdAuIevXRCY/7RxOajgnb0gF4=;
+	b=hTehNgBB2kpxCl/dpbO22bgeiUXNRoONDnlXUCcxKs7oJvPEoUci+H0VVZikB+9SrqHx11
+	LtKBzDKBDClUpq7LH98ME2W9FyR+80GClLBDxfkkyQD+EqFcJrBASWH1FaLjHBFBiz1lbh
+	4ITY9Nv2EDxhqP3qk7ZCwimEUuPAikc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-160-oIfL0V5GO7ibpxSsl1HYGg-1; Tue, 30 Jul 2024 11:07:17 -0400
+X-MC-Unique: oIfL0V5GO7ibpxSsl1HYGg-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36873a449dfso1610408f8f.0
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 08:07:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722352036; x=1722956836;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ke8GKRqB2B+6FqIK+oRdAuIevXRCY/7RxOajgnb0gF4=;
+        b=tBB3fKtvh7Mk/D/DPcS2aukKj3uUX/Spww9d14RedmERy10O6bTZGf42ZkkgXCbYpx
+         bY/DMjKpas+0tUQGF8AJ8h0HifqjQQ5keUzBn9kS/SAGMC6685dLOxQy2+bms3p/iFVV
+         hHTHNdpSM/6tvLYbiFlfCT1PBdJTtTSLQPA8zyMHwIBKnZD25y3iKBUEdgF5bMEh4O2s
+         uBacAfoxpn0Im2HWmGjkaPhesgdaQA6t1+XSSs9+2xyaWYOMakGFaUpyLWAduS0TvFkm
+         Bb1h4vuDPUE51LzfOLARwZu+ZH0jtZP+rJAh0a6Kt/yXxFbYOb6W55MIwsY/MZ4aWBj8
+         Fwrg==
+X-Forwarded-Encrypted: i=1; AJvYcCWT+L0+MEUD+bPPHP7xsuOslBMUd7Go+n2DmskxMZxgTY1PslDzMDHfj47a9dOjYZmX8KnLqNV46bb2cTt7vDYKOriS
+X-Gm-Message-State: AOJu0Yzof6W4pwM0yLxhI//elXfNKMZUK8F95xeLfWfR4o6W2GfQkD4J
+	BtFMaKRWPvWWk0nt6INypPPvJ6lsjap9od7vi6MzNgDxyordPKV+EENl7Zk8C5xjKBIqFd5ZKuD
+	HuIvQNelXKaweTrSBYHHPSRCY1EpZdbUGxWqGS9iyk0O62HUsQA==
+X-Received: by 2002:adf:e3d1:0:b0:35f:fd7:6102 with SMTP id ffacd0b85a97d-36b8c8edd66mr1308666f8f.35.1722352036514;
+        Tue, 30 Jul 2024 08:07:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEBOtx3KIyHkoXcHB3B3oYrSLn3CftG9WjtV40vTkKL7hv1TsvqurIpgwbpj+2j2dGgVUdBFg==
+X-Received: by 2002:adf:e3d1:0:b0:35f:fd7:6102 with SMTP id ffacd0b85a97d-36b8c8edd66mr1308605f8f.35.1722352036026;
+        Tue, 30 Jul 2024 08:07:16 -0700 (PDT)
+Received: from [192.168.1.18] (lfbn-tou-1-3-122.w86-201.abo.wanadoo.fr. [86.201.10.122])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36861b54sm14789956f8f.95.2024.07.30.08.07.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 08:07:15 -0700 (PDT)
+Message-ID: <3e82436c-9bc7-4dfa-a048-fc1de6793c72@redhat.com>
+Date: Tue, 30 Jul 2024 17:07:12 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 04/18] qapi/common: Drop temporary 'prefix'
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, andrew@codeconstruct.com.au,
+ andrew@daynix.com, arei.gonglei@huawei.com, berrange@redhat.com,
+ berto@igalia.com, borntraeger@linux.ibm.com, clg@kaod.org, david@redhat.com,
+ den@openvz.org, eblake@redhat.com, eduardo@habkost.net,
+ farman@linux.ibm.com, farosas@suse.de, hreitz@redhat.com,
+ idryomov@gmail.com, iii@linux.ibm.com, jamin_lin@aspeedtech.com,
+ jasowang@redhat.com, joel@jms.id.au, jsnow@redhat.com, kwolf@redhat.com,
+ leetroy@gmail.com, marcandre.lureau@redhat.com, marcel.apfelbaum@gmail.com,
+ michael.roth@amd.com, mst@redhat.com, mtosatti@redhat.com,
+ nsg@linux.ibm.com, pasic@linux.ibm.com, pbonzini@redhat.com,
+ peter.maydell@linaro.org, peterx@redhat.com, philmd@linaro.org,
+ pizhenwei@bytedance.com, pl@dlhnet.de, richard.henderson@linaro.org,
+ stefanha@redhat.com, steven_lee@aspeedtech.com, thuth@redhat.com,
+ vsementsov@yandex-team.ru, wangyanan55@huawei.com,
+ yuri.benditovich@daynix.com, zhao1.liu@intel.com, qemu-block@nongnu.org,
+ qemu-arm@nongnu.org, qemu-s390x@nongnu.org, kvm@vger.kernel.org
+References: <20240730081032.1246748-1-armbru@redhat.com>
+ <20240730081032.1246748-5-armbru@redhat.com>
+Content-Language: en-US, fr
+From: =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clegoate@redhat.com>
+In-Reply-To: <20240730081032.1246748-5-armbru@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 29 Jul 2024 17:24:24 +0100
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On 7/30/24 10:10, Markus Armbruster wrote:
+> Recent commit "qapi: Smarter camel_to_upper() to reduce need for
+> 'prefix'" added a temporary 'prefix' to delay changing the generated
+> code.
+> 
+> Revert it.  This improves OffAutoPCIBAR's generated enumeration
+> constant prefix from OFF_AUTOPCIBAR_OFF to OFF_AUTO_PCIBAR_OFF.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 
-> Hi,
->=20
-> CC'ing the maintainers (can be found in README).
->=20
-> On Sat, Jul 27, 2024 at 07:11:03PM +0200, J. Neusch=C3=A4fer wrote:
-> > musl-libc doesn't provide <bits/wordsize.h>, but it defines __WORDSIZE
-> > in <sys/reg.h> and <sys/user.h>.
-> >=20
-> > Signed-off-by: J. Neusch=C3=A4fer <j.neuschaefer@gmx.net>
-> > ---
-> >  include/linux/bitops.h | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/include/linux/bitops.h b/include/linux/bitops.h
-> > index ae33922..4f133ba 100644
-> > --- a/include/linux/bitops.h
-> > +++ b/include/linux/bitops.h
-> > @@ -1,7 +1,7 @@
-> >  #ifndef _KVM_LINUX_BITOPS_H_
-> >  #define _KVM_LINUX_BITOPS_H_
-> >=20
-> > -#include <bits/wordsize.h>
-> > +#include <sys/reg.h> =20
->=20
-> When cross-compiling on x86 for arm64, as well as when compiling natively=
- for
-> arm64 I get this error:
->=20
-> In file included from include/linux/bitmap.h:7,
->                  from util/find.c:4:
-> include/linux/bitops.h:5:10: fatal error: sys/reg.h: No such file or dire=
-ctory
->     5 | #include <sys/reg.h>
->       |          ^~~~~~~~~~~
-> compilation terminated.
-> make: *** [Makefile:510: util/find.o] Error 1
-> make: *** Waiting for unfinished jobs....
-> In file included from include/linux/bitmap.h:7,
->                  from util/bitmap.c:9:
-> include/linux/bitops.h:5:10: fatal error: sys/reg.h: No such file or dire=
-ctory
->     5 | #include <sys/reg.h>
->       |          ^~~~~~~~~~~
-> compilation terminated.
-> make: *** [Makefile:510: util/bitmap.o] Error 1
->=20
-> Also, grep finds __WORDSIZE only in bits/wordsize.h on an x86 and arm64 m=
-achine:
 
-I wonder if __WORDSIZE (with two leading underscores!) is something
-portable enough to be used in userland tools in the first place. The
-kernel seems to use it, and that's where we inherited it from, I guess.
-But since we only use it in one place (to define BITS_PER_LONG), can't we
-just replace this there, with something based on "sizeof(long)"?
-Looks cleaner anyway, since "word" is an overloaded term.
+Reviewed-by: Cédric Le Goater <clg@redhat.com>
 
-Cheers,
-Andre
+Thanks,
 
->=20
-> $ grep -r "define __WORDSIZE" /usr/include/
-> /usr/include/bits/wordsize.h:# define __WORDSIZE			64
-> /usr/include/bits/wordsize.h:# define __WORDSIZE			32
-> /usr/include/bits/wordsize.h:# define __WORDSIZE32_SIZE_ULONG	1
-> /usr/include/bits/wordsize.h:# define __WORDSIZE32_PTRDIFF_LONG	1
-> /usr/include/bits/wordsize.h:#define __WORDSIZE_TIME64_COMPAT32	0
->=20
->=20
-> Thanks,
-> Alex
->=20
-> >=20
-> >  #include <linux/kernel.h>
-> >  #include <linux/compiler.h>
-> >=20
-> > --
-> > 2.43.0
-> >=20
-> >  =20
->=20
+C.
+
+
+> ---
+>   qapi/common.json |  1 -
+>   hw/vfio/pci.c    | 10 +++++-----
+>   2 files changed, 5 insertions(+), 6 deletions(-)
+> 
+> diff --git a/qapi/common.json b/qapi/common.json
+> index 25726d3113..7558ce5430 100644
+> --- a/qapi/common.json
+> +++ b/qapi/common.json
+> @@ -92,7 +92,6 @@
+>   # Since: 2.12
+>   ##
+>   { 'enum': 'OffAutoPCIBAR',
+> -  'prefix': 'OFF_AUTOPCIBAR',   # TODO drop
+>     'data': [ 'off', 'auto', 'bar0', 'bar1', 'bar2', 'bar3', 'bar4', 'bar5' ] }
+>   
+>   ##
+> diff --git a/hw/vfio/pci.c b/hw/vfio/pci.c
+> index 2407720c35..0a99e55247 100644
+> --- a/hw/vfio/pci.c
+> +++ b/hw/vfio/pci.c
+> @@ -1452,7 +1452,7 @@ static bool vfio_pci_relocate_msix(VFIOPCIDevice *vdev, Error **errp)
+>       int target_bar = -1;
+>       size_t msix_sz;
+>   
+> -    if (!vdev->msix || vdev->msix_relo == OFF_AUTOPCIBAR_OFF) {
+> +    if (!vdev->msix || vdev->msix_relo == OFF_AUTO_PCIBAR_OFF) {
+>           return true;
+>       }
+>   
+> @@ -1464,7 +1464,7 @@ static bool vfio_pci_relocate_msix(VFIOPCIDevice *vdev, Error **errp)
+>       /* PCI BARs must be a power of 2 */
+>       msix_sz = pow2ceil(msix_sz);
+>   
+> -    if (vdev->msix_relo == OFF_AUTOPCIBAR_AUTO) {
+> +    if (vdev->msix_relo == OFF_AUTO_PCIBAR_AUTO) {
+>           /*
+>            * TODO: Lookup table for known devices.
+>            *
+> @@ -1479,7 +1479,7 @@ static bool vfio_pci_relocate_msix(VFIOPCIDevice *vdev, Error **errp)
+>               return false;
+>           }
+>       } else {
+> -        target_bar = (int)(vdev->msix_relo - OFF_AUTOPCIBAR_BAR0);
+> +        target_bar = (int)(vdev->msix_relo - OFF_AUTO_PCIBAR_BAR0);
+>       }
+>   
+>       /* I/O port BARs cannot host MSI-X structures */
+> @@ -1624,7 +1624,7 @@ static bool vfio_msix_early_setup(VFIOPCIDevice *vdev, Error **errp)
+>           } else if (vfio_pci_is(vdev, PCI_VENDOR_ID_BAIDU,
+>                                  PCI_DEVICE_ID_KUNLUN_VF)) {
+>               msix->pba_offset = 0xb400;
+> -        } else if (vdev->msix_relo == OFF_AUTOPCIBAR_OFF) {
+> +        } else if (vdev->msix_relo == OFF_AUTO_PCIBAR_OFF) {
+>               error_setg(errp, "hardware reports invalid configuration, "
+>                          "MSIX PBA outside of specified BAR");
+>               g_free(msix);
+> @@ -3403,7 +3403,7 @@ static Property vfio_pci_dev_properties[] = {
+>                                      nv_gpudirect_clique,
+>                                      qdev_prop_nv_gpudirect_clique, uint8_t),
+>       DEFINE_PROP_OFF_AUTO_PCIBAR("x-msix-relocation", VFIOPCIDevice, msix_relo,
+> -                                OFF_AUTOPCIBAR_OFF),
+> +                                OFF_AUTO_PCIBAR_OFF),
+>   #ifdef CONFIG_IOMMUFD
+>       DEFINE_PROP_LINK("iommufd", VFIOPCIDevice, vbasedev.iommufd,
+>                        TYPE_IOMMUFD_BACKEND, IOMMUFDBackend *),
 
 
