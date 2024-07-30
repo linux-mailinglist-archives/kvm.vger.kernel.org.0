@@ -1,174 +1,160 @@
-Return-Path: <kvm+bounces-22659-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22660-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0393B940FB3
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 12:42:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA1C8940FCE
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 12:45:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B8083284B94
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 10:42:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27C8A1C22AF1
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 10:45:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65A8A19DFA5;
-	Tue, 30 Jul 2024 10:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C7211A0AFE;
+	Tue, 30 Jul 2024 10:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lv6jdWRV"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79AE019DF6E;
-	Tue, 30 Jul 2024 10:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3411719FA86;
+	Tue, 30 Jul 2024 10:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722335780; cv=none; b=GPjNUU44cQ0laO64hhn+N+AGgtaRc8ZlVAgaNKI3bKO9y/W3V8UXgV+BfIYajKUAe9qURoqbO1CWw0E7qaSY+d69MwCuIfVcJIg7yLKyTh7nlbkkbCJGP55+kDANsu0JPIZ0MzNzctvGsr7Arq+waj8gYaxpuqomhZsxCc8wNKE=
+	t=1722336013; cv=none; b=LD6FZTXoluaGseu9iMVcDA1GbZzpINrWonOlUu9QDpfV5Uzh5WHmaA9wPM+UON9RxpSDEI1qgQKL51nw9uWopafBlelOIFJJLD82tvrib3j3B8VdXk5pRa0oAGeLQtJY8DAlpVnMJHGryhKOW2WbbCohCFTA56iN6H3NQbMtwPo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722335780; c=relaxed/simple;
-	bh=RfiwyEUsPb8tPAYC80PiZ5qOL/iGu9KCxcDr+2YKA6M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KmbflGyPBCeNv3mfa/LcsghlBfQ7na0zPzsubcTo/RRNUNiqMHl0KKdieUi33ZqpHGv/DThVRzGTCebg+6AUSyVH1y8AgraCROmeBFE5sZSU09QFGLdkGmUUUyqLnl8rqLOIvwEgVWD6S0WEmIzK6rq/DrEPjk3/3W3P6++uMfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 5E68F1007;
-	Tue, 30 Jul 2024 03:36:42 -0700 (PDT)
-Received: from [10.57.94.83] (unknown [10.57.94.83])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 116653F766;
-	Tue, 30 Jul 2024 03:36:13 -0700 (PDT)
-Message-ID: <e05d2363-d3e4-4a23-9347-723454d603c9@arm.com>
-Date: Tue, 30 Jul 2024 11:36:12 +0100
+	s=arc-20240116; t=1722336013; c=relaxed/simple;
+	bh=l4VpL9x+WgkqxnYD2dAEQ8MULWjm5ogOKxxCT/nRsKE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fCWGh/YjwPCJlJAeoi58rTjSc1rpOk99s3eYssG2CuuXbZm61eO73u+SbfLnbQx0Y6HlgJami7I9Iku9U9XSFuIqqu9BD3nbQpRof3mjwzGNvIGGXn425o+1xL2Zb3+E5FKuaMgU9UQcPwfdimb94DlmU/ZUqmjx7zqlIkdrrXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lv6jdWRV; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353724.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46U9tKjU012030;
+	Tue, 30 Jul 2024 10:39:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	DkGdvAdKyg11kiXdiASBE8PWg35HTN6fIm33pARXv0M=; b=lv6jdWRVC7uz0NIW
+	l1NelhuPv8RIbUQotpKu8x6enuyXNRDQO+gIebwvS0VYFVDmi4K7pP2t6FHP4qgH
+	LpSCyYXgBMnj8pUokGna9wxetuUKq27HgJhi35ppf+zmp77VY55N3yW+KTm6xXho
+	d62+eQvjRXutiNE1lnGx3wpSxQ3jUuyL+k2EZoty07wJtX/bbqDLqANrCTJsymn7
+	d+cqPk9qiz5Cli/YgrKec5Hlr3ZYadyi6SV2/staT720h+lxAAi6T5UxcBKksgdr
+	IKN9Rgu3Q6o8/k8UE+AWVlzyhrlli28J9UQB0SBHEWGjRTdv6wyaP71b1IEVErvL
+	T3nrcw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40pra21bqv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Jul 2024 10:39:57 +0000 (GMT)
+Received: from m0353724.ppops.net (m0353724.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46UAdund021238;
+	Tue, 30 Jul 2024 10:39:56 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40pra21bqs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Jul 2024 10:39:56 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46U85H98011151;
+	Tue, 30 Jul 2024 10:39:56 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40ncqmm4kd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 30 Jul 2024 10:39:56 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46UAdoZB50921962
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 30 Jul 2024 10:39:52 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2C19820043;
+	Tue, 30 Jul 2024 10:39:50 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id F1A5820040;
+	Tue, 30 Jul 2024 10:39:49 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 30 Jul 2024 10:39:49 +0000 (GMT)
+Date: Tue, 30 Jul 2024 12:39:48 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-s390@vger.kernel.org, kvm@vger.kernel.org,
+        Andrew Morton
+ <akpm@linux-foundation.org>,
+        Matthew Wilcox <willy@infradead.org>,
+        Heiko
+ Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander
+ Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Janosch
+ Frank <frankja@linux.ibm.com>
+Subject: Re: [PATCH v1 0/3] mm: remove arch_make_page_accessible()
+Message-ID: <20240730123948.6833576c@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <20240729183844.388481-1-david@redhat.com>
+References: <20240729183844.388481-1-david@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 05/15] arm64: Mark all I/O as non-secure shared
-Content-Language: en-GB
-To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-6-steven.price@arm.com>
- <b20b7e5b-95aa-4fdb-88a7-72f8aa3da8db@redhat.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <b20b7e5b-95aa-4fdb-88a7-72f8aa3da8db@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -D3mUbFgCBPLb-63vf3XcLrcobweWmky
+X-Proofpoint-ORIG-GUID: JCR5ort0nw7-4C2vezlqKFBQVfD1e3XV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-30_11,2024-07-26_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=654
+ lowpriorityscore=0 clxscore=1011 adultscore=0 suspectscore=0
+ priorityscore=1501 spamscore=0 impostorscore=0 phishscore=0 mlxscore=0
+ bulkscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407300074
 
-Hi Gavin,
+Thank you for taking care of this!
 
-Thanks for looking at the patch. Responses inline.
 
-On 30/07/2024 02:36, Gavin Shan wrote:
-> On 7/1/24 7:54 PM, Steven Price wrote:
->> All I/O is by default considered non-secure for realms. As such
->> mark them as shared with the host.
->>
->> Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v3:
->>   * Add PROT_NS_SHARED to FIXMAP_PAGE_IO rather than overriding
->>     set_fixmap_io() with a custom function.
->>   * Modify ioreamp_cache() to specify PROT_NS_SHARED too.
->> ---
->>   arch/arm64/include/asm/fixmap.h | 2 +-
->>   arch/arm64/include/asm/io.h     | 8 ++++----
->>   2 files changed, 5 insertions(+), 5 deletions(-)
->>
+Whole series:
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
+
+On Mon, 29 Jul 2024 20:38:41 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> Now that s390x implements arch_make_folio_accessible(), let's convert
+> remaining users to use arch_make_folio_accessible() instead so we can
+> remove arch_make_page_accessible().
 > 
-> I'm unable to understand this. Steven, could you please explain a bit how
-> PROT_NS_SHARED is turned to a shared (non-secure) mapping to hardware?
-> According to tf-rmm's implementation in 
-> tf-rmm/lib/s2tt/src/s2tt_pvt_defs.h,
-> a shared (non-secure) mapping is is identified by NS bit (bit#55). I find
-> difficulties how the NS bit is correlate with PROT_NS_SHARED. For example,
-> how the NS bit is set based on PROT_NS_SHARED.
-
-
-There are two things at play here :
-
-1. Stage1 mapping controlled by the Realm (Linux in this case, as above).
-2. Stage2 mapping controlled by the RMM (with RMI commands from NS Host).
-
-Also :
-The Realm's IPA space is divided into two halves (decided by the IPA 
-Width of the Realm, not the NSbit #55), protected (Lower half) and
-Unprotected (Upper half). All stage2 mappings of the "Unprotected IPA"
-will have the NS bit (#55) set by the RMM. By design, any MMIO access
-to an unprotected half is sent to the NS Host by RMM and any page
-the Realm wants to share with the Host must be in the Upper half
-of the IPA.
-
-What we do above is controlling the "Stage1" used by the Linux. i.e,
-for a given VA, we flip the Guest "PA" (in reality IPA) to the
-"Unprotected" alias.
-
-e.g., DTB describes a UART at address 0x10_0000 to Realm (with an IPA 
-width of 40, like in the normal VM case), emulated by the host. Realm is
-trying to map this I/O address into Stage1 at VA. So we apply the
-BIT(39) as PROT_NS_SHARED while creating the Stage1 mapping.
-
-ie., VA == stage1 ==> BIT(39) | 0x10_0000 =(IPA)== > 0x80_10_0000
-
-Now, the Stage2 mapping won't be present for this IPA if it is emulated
-and thus an access to "VA" causes a Stage2 Abort to the Host, which the
-RMM allows the host to emulate. Otherwise a shared page would have been
-mapped by the Host (and NS bit set at Stage2 by RMM), allowing the
-data to be shared with the host.
-
-Does that answer your question ?
-
-Suzuki
-
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: Matthew Wilcox <willy@infradead.org>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Cc: Sven Schnelle <svens@linux.ibm.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
 > 
->> diff --git a/arch/arm64/include/asm/fixmap.h 
->> b/arch/arm64/include/asm/fixmap.h
->> index 87e307804b99..f2c5e653562e 100644
->> --- a/arch/arm64/include/asm/fixmap.h
->> +++ b/arch/arm64/include/asm/fixmap.h
->> @@ -98,7 +98,7 @@ enum fixed_addresses {
->>   #define FIXADDR_TOT_SIZE    (__end_of_fixed_addresses << PAGE_SHIFT)
->>   #define FIXADDR_TOT_START    (FIXADDR_TOP - FIXADDR_TOT_SIZE)
->> -#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE)
->> +#define FIXMAP_PAGE_IO     __pgprot(PROT_DEVICE_nGnRE | PROT_NS_SHARED)
->>   void __init early_fixmap_init(void);
->> diff --git a/arch/arm64/include/asm/io.h b/arch/arm64/include/asm/io.h
->> index 4ff0ae3f6d66..07fc1801c6ad 100644
->> --- a/arch/arm64/include/asm/io.h
->> +++ b/arch/arm64/include/asm/io.h
->> @@ -277,12 +277,12 @@ static inline void __const_iowrite64_copy(void 
->> __iomem *to, const void *from,
->>   #define ioremap_prot ioremap_prot
->> -#define _PAGE_IOREMAP PROT_DEVICE_nGnRE
->> +#define _PAGE_IOREMAP (PROT_DEVICE_nGnRE | PROT_NS_SHARED)
->>   #define ioremap_wc(addr, size)    \
->> -    ioremap_prot((addr), (size), PROT_NORMAL_NC)
->> +    ioremap_prot((addr), (size), (PROT_NORMAL_NC | PROT_NS_SHARED))
->>   #define ioremap_np(addr, size)    \
->> -    ioremap_prot((addr), (size), PROT_DEVICE_nGnRnE)
->> +    ioremap_prot((addr), (size), (PROT_DEVICE_nGnRnE | PROT_NS_SHARED))
->>   /*
->>    * io{read,write}{16,32,64}be() macros
->> @@ -303,7 +303,7 @@ static inline void __iomem 
->> *ioremap_cache(phys_addr_t addr, size_t size)
->>       if (pfn_is_map_memory(__phys_to_pfn(addr)))
->>           return (void __iomem *)__phys_to_virt(addr);
->> -    return ioremap_prot(addr, size, PROT_NORMAL);
->> +    return ioremap_prot(addr, size, PROT_NORMAL | PROT_NS_SHARED);
->>   }
->>   /*
+> David Hildenbrand (3):
+>   mm: simplify arch_make_folio_accessible()
+>   mm/gup: convert to arch_make_folio_accessible()
+>   s390/uv: drop arch_make_page_accessible()
 > 
-> Thanks,
-> Gavin
+>  arch/s390/include/asm/page.h |  2 --
+>  arch/s390/kernel/uv.c        |  5 -----
+>  include/linux/mm.h           | 18 +-----------------
+>  mm/gup.c                     |  8 +++++---
+>  4 files changed, 6 insertions(+), 27 deletions(-)
 > 
+> 
+> base-commit: 3bb434b9ff9bfeacf7f4aef6ae036146ae3c40cc
 
 
