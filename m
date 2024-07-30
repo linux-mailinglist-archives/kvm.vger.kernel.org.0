@@ -1,124 +1,116 @@
-Return-Path: <kvm+bounces-22682-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22683-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5474F941629
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 17:57:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F4DC941B85
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 18:56:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 868721C22F26
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 15:57:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4878B25D8F
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 16:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4226F1BA880;
-	Tue, 30 Jul 2024 15:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D91A18B46D;
+	Tue, 30 Jul 2024 16:53:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KloSbefG"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="U+jckZV0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692E429A2;
-	Tue, 30 Jul 2024 15:56:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83D2418801C;
+	Tue, 30 Jul 2024 16:52:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722355011; cv=none; b=FGNm0FTe28COMfAT4M3EryZY2gDJNy3/+05PWTF0CGy6iH4OvZfJtrY3S6iPm21wUcrdzX7TbN2JfYfmDqsENLaPczcuFxuk0tpySzljL8IUc8FOe4EXmCiwf/J1z1RE7AHtCLBb6lmx/i3DoF22BpC9YYR0L7BAWIWm/C2wO8I=
+	t=1722358381; cv=none; b=Fi0Bqf1bgES+nP6O8JAqTDECsLkxkoDSm6Io99JVudAWkEHy+TRsVJ7yGeSKGLvkSVbdoLspIDPTtIuYFK7iPK8yXGxcbW7bf3MqM+NxLizmt0ze/E08EIg7ohevV7DtnL8eXgzjh++AHtUyb/LV9URG9HsD3vFtL4/SwAnm6RE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722355011; c=relaxed/simple;
-	bh=NwxPPUduOd4UYeuGxtrrawyvduj3Rfr54xa8BTINUL8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KdZu2N3BgYmixQtHF/7qnECrtkaCMgTRVRO2lN4BlyH8biai/hSwaWlJT14PB8xi4/fErXCYoGBioRDxJpj6LOk/lgiaSMfjUlkOhShMvNphSrx7qILPLUryhXqec1HTk0nJfoCgg20ST6qZy1A1GIfdf2UolIsG/i3EhCRz9II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KloSbefG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E25D3C32782;
-	Tue, 30 Jul 2024 15:56:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722355011;
-	bh=NwxPPUduOd4UYeuGxtrrawyvduj3Rfr54xa8BTINUL8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=KloSbefGq6eTp3plC8iMf2GcsuBesky1HKZAXzQJpzWzh0ILWsIqoC0/SKjTkgj+1
-	 qepI5/xPYFNYxwXHKA5ijBeFBGy2UE7lspnkIindMibnIym5kVGDtdEdb7T2I31l+6
-	 wHXdajr+7W96WzOahcKWjVCnmCyLf/DDyDSnpIhG5A8Ksp44PifBvcs38y7bXllDwV
-	 Ooehd4BmRoUm2H3KizjmFoYhsCqZcPZfCP3k+FCuY9EfplADnbyck9kWYa3gL0+BFd
-	 HGEsFp1tq2Ik2pMt7yoQdtGL8Ubn6W6/mdcCF0iYxG2koW15Z669qCI/7RxMbGQSgz
-	 sI5hIrBrXeJFw==
-From: Will Deacon <will@kernel.org>
-To: kvm@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	Will Deacon <will@kernel.org>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Michal Luczaj <mhal@rbox.co>,
-	Alexander Potapenko <glider@google.com>,
-	Marc Zyngier <maz@kernel.org>
-Subject: [PATCH] KVM: Fix error path in kvm_vm_ioctl_create_vcpu() on xa_store() failure
-Date: Tue, 30 Jul 2024 16:56:46 +0100
-Message-Id: <20240730155646.1687-1-will@kernel.org>
-X-Mailer: git-send-email 2.20.1
+	s=arc-20240116; t=1722358381; c=relaxed/simple;
+	bh=acYkmx7Yj8SYjPzp076P9isbfl8X0+qYp4Ms1MYvVR4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=leLV/ELZZDuTjEbsKC8D/xIHgW3jghIbvNLSUJFhrxz7P7vsVIPlIwOCzouAWdA/VGOYdib4An9iOTRO3F+X0ye/fmvQksSYqs0VV4gSYzBb2L3/VpUN8sBYVlBmYVyCejDwfsrnYFfGYfKmkpArhJDa8s89lAZiy4YQVkbGZt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=U+jckZV0; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 76D6B120007;
+	Tue, 30 Jul 2024 19:52:53 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 76D6B120007
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1722358373;
+	bh=KLiTVr2w5RM4rRcfqLd3HLJ6BUMlDc+UogIM6fL3jyA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type:From;
+	b=U+jckZV0lF6/nktaviqUpB9QWpKZ06bSA5nKna95gYkPvul1lkIBb2cFM8BYMmUcH
+	 TgH+M9jgyeT7zyZVwy23k+SWNWwrWT/lr5O+ZPTuT6JNkY9y2gcngS+k/BAQvbMs+y
+	 /djj49R67rVazN97GwFt83B4XsQb9bLhIZ2l6CVmPZsKcAgfXgqccb+h2Tzi0ZpMyx
+	 uHDc+OerhWlHH5A3R8UGaTuG0Dk8S8m5EASRDJpXjsvTukCYJfnEkmxrANpd6sovf2
+	 YmnPlxpV77UoHxh/tzMKAp22ZTomr05YVr5+EYvc1kP6yl/W+mr9CzBr3Syi4CdcOI
+	 c5jQ0wjbYV7lA==
+Received: from smtp.sberdevices.ru (p-i-exch-sc-m02.sberdevices.ru [172.16.192.103])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue, 30 Jul 2024 19:52:53 +0300 (MSK)
+Received: from [172.28.192.160] (100.64.160.123) by
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Tue, 30 Jul 2024 19:52:52 +0300
+Message-ID: <510e1114-abac-7ad3-c690-94b8b14ffe69@salutedevices.com>
+Date: Tue, 30 Jul 2024 19:40:32 +0300
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [PATCH v1] MAINTAINERS: add me as reviewer of AF_VSOCK and
+ virtio-vsock
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
+	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20240728183325.1295283-1-avkrasnov@salutedevices.com>
+ <20240730084707.72ff802c@kernel.org>
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+In-Reply-To: <20240730084707.72ff802c@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-sc-m02.sberdevices.ru (172.16.192.103) To
+ p-i-exch-sc-m02.sberdevices.ru (172.16.192.103)
+X-KSMG-Rule-ID: 10
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 186794 [Jul 30 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 24 0.3.24 186c4d603b899ccfd4883d230c53f273b80e467f, {Tracking_arrow_text}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;smtp.sberdevices.ru:7.1.1,5.0.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;100.64.160.123:7.1.2;salutedevices.com:7.1.1, FromAlignment: s, ApMailHostAddress: 100.64.160.123
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean
+X-KSMG-LinksScanning: Clean
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2024/07/30 15:23:00 #26184428
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-If the xa_store() fails in kvm_vm_ioctl_create_vcpu() then we shouldn't
-drop the reference to the 'struct kvm' because the vCPU fd has been
-installed and will take care of the refcounting.
 
-This was found by inspection, but forcing the xa_store() to fail
-confirms the problem:
 
- | Unable to handle kernel paging request at virtual address ffff800080ecd960
- | Call trace:
- |  _raw_spin_lock_irq+0x2c/0x70
- |  kvm_irqfd_release+0x24/0xa0
- |  kvm_vm_release+0x1c/0x38
- |  __fput+0x88/0x2ec
- |  ____fput+0x10/0x1c
- |  task_work_run+0xb0/0xd4
- |  do_exit+0x210/0x854
- |  do_group_exit+0x70/0x98
- |  get_signal+0x6b0/0x73c
- |  do_signal+0xa4/0x11e8
- |  do_notify_resume+0x60/0x12c
- |  el0_svc+0x64/0x68
- |  el0t_64_sync_handler+0x84/0xfc
- |  el0t_64_sync+0x190/0x194
- | Code: b9000909 d503201f 2a1f03e1 52800028 (88e17c08)
+On 30.07.2024 18:47, Jakub Kicinski wrote:
+> On Sun, 28 Jul 2024 21:33:25 +0300 Arseniy Krasnov wrote:
+>> I'm working on AF_VSOCK and virtio-vsock.
+> 
+> If you want to review the code perhaps you can use lore+lei
+> and filter on the paths?
+> 
+> Adding people to MAINTAINERS is somewhat fraught.
 
-Add a new label to the error path so that we can branch directly to the
-xa_release() if the xa_store() fails.
+Ah ok, got it.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Michal Luczaj <mhal@rbox.co>
-Cc: Alexander Potapenko <glider@google.com>
-Cc: Marc Zyngier <maz@kernel.org>
-Signed-off-by: Will Deacon <will@kernel.org>
----
- virt/kvm/kvm_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d0788d0a72cc..b80dd8cead8c 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -4293,7 +4293,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- 
- 	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
- 		r = -EINVAL;
--		goto kvm_put_xa_release;
-+		goto err_xa_release;
- 	}
- 
- 	/*
-@@ -4310,6 +4310,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
- 
- kvm_put_xa_release:
- 	kvm_put_kvm_no_destroy(kvm);
-+err_xa_release:
- 	xa_release(&kvm->vcpu_array, vcpu->vcpu_idx);
- unlock_vcpu_destroy:
- 	mutex_unlock(&kvm->lock);
--- 
-2.46.0.rc1.232.g9752f9e123-goog
-
+Thanks, Arseniy
 
