@@ -1,121 +1,113 @@
-Return-Path: <kvm+bounces-22706-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22707-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E0F894218C
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 22:25:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8476D942196
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 22:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F0691C23E43
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 20:25:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3262B220B6
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 20:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4864918DF6D;
-	Tue, 30 Jul 2024 20:24:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13F4418DF63;
+	Tue, 30 Jul 2024 20:27:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bnaI6vaV"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d0nosym+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8F4C18A6D4
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 20:24:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656CD1662F4
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 20:27:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722371093; cv=none; b=mVy/qn6TunRIMKF4gJROnJBb8pbSYwVR2n0J3+Y1N7R6OqS6E0bjaImhgxR7t8Qj08d/DQ+JoSi7674BHF4XftcAxphCIuVvQD8IIuPiR+qDBB5aV/WNWVXYMOocFcvXvfbWSseXm3lxYvm+ybT9db3INsltzWgrKqqeJzvDchc=
+	t=1722371238; cv=none; b=RdjYt3g4vCqYnnho/2imfbGrBbgrsupxL0kNFYtiBEtIoJHmtUr735Kku23TKbJ0C2foLlx69REpEIL9kPPaubf6ucl7f1aPePmmREYtqaz7D9sHlGpXhAfyXZb03dYVz5b5l+8ykVkk+MPutT3NEcKpX+USTYG7HB9sLGB9x4o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722371093; c=relaxed/simple;
-	bh=z7GWh0jTkNCHG+CucoLOogt/YnUgFnvIKYAlKOoO2gU=;
+	s=arc-20240116; t=1722371238; c=relaxed/simple;
+	bh=umoPCtCkYW+giJeJdPSZn9npvUrDOn5+F2JD+veI3jI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QAmItpFqSDyG/HONj/H8EyiGqRjdRpNaVAahFSxrc9g9pNHDkvhCqkH5mF6tMO8+5G/K064Cu3z4fIqgysa7bHX15n27VbtxDc8oX8BE3D0WpEnjV4h8b6VAs/PNghV2w8KHrdzn796ZDel4q1ZBGrSI7KI7zL80DO57fv2bhWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bnaI6vaV; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=H9del1bxWDi5LS5ZdGbiAtn131NueCSmRKw/4RnVk7fTYuCD1X9lobayOiUjQf1cXLlSYBgkIo80eGhIT/CdWnXb8Ga3KVwPNw91/HwTcLO40krzylxS3fs5TnXjzi+Ixw98kv/hXW++8J+fCfvBylviytEv2CsBWK1PfZoygL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d0nosym+; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb5ba80e77so6192031a91.1
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 13:24:51 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0b8fa94718so3621355276.0
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 13:27:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722371091; x=1722975891; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722371235; x=1722976035; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7S3Oli6i7JzEF8SVo1JkM4Mpho9qGmQAiVdyShh3yxA=;
-        b=bnaI6vaVgoSQZhI6xSFDA63Do2WIrkqSxndzYqvDzbgdl+TkkT8f9pJvRmtAvnw26W
-         N71VnDK+GsvbYGczFfcmHxd0C+8Zz35zgzsZ68JwwI9TgtGntMIviQu6EjOu0b/ZnpLk
-         HCYjLaIqj+VQYaXE7cBUnnWMtHmW+QpEKBLb1C3Yn9YrpVpu/jQgQHW5l9sAnXFHx1uv
-         VB90IK+MPKg4sFzUrpbcyMHjb8m3EWymcSM3RvjThzHvjrNVIID8mCmLyEuAbUNQLDQN
-         qG/f/8I1fQ1diVOEl/smNtwBIl1eOCS+6uX0C9cIHRWqK2tVHWfufyRTzFSkm3i6Dvt6
-         Cb+g==
+        bh=BT66vEwt9iJsGeuvAMx6ZtRmhkH62brVnR8HWlVI5+E=;
+        b=d0nosym+8R6bCaBuXVBpXfv/GjSuXEiQYb3hF6tQl9ipx8qP8Gspp8giuhqKUfmR7W
+         6P2Gv52gy/QDmBDybuz8qdXvS9agSpXJW9LaNF932IuNO5JF4CDIfBfRTkLwb12ljUY2
+         vTlQ6HKgtZJi525GLuGXx+p0GQBNoTDPJjGbx2WJK6sZ6sX4XrR0TiYYCwbCPgwIq1ak
+         Gtv0IY89p7hLBN/DVkWGdvRDgKxvR+gwyaEb8craL7bBtWzme+0z27qFPOj6P7CZhuai
+         v49XS/dG00ZIWDMaPajstx2rjxcwBWhdWF2A21z0UcfpB0M8m9vzlA/fVSSOjUWekMP4
+         BnOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722371091; x=1722975891;
+        d=1e100.net; s=20230601; t=1722371235; x=1722976035;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7S3Oli6i7JzEF8SVo1JkM4Mpho9qGmQAiVdyShh3yxA=;
-        b=WUok1mgN2xa2n1oSu0aqh99eNi+2zXFDk/i/RCFxME10kr4H862bQ0kVGNW6RgfX/Y
-         x4byND+QhNcqHOWPiuPd8+wvMcpwOiWFeP8l5mcwFpQk9+yWXjRi9ivpLVMNKmKrTGLH
-         An/btMU/0DeRhhcC0yanPtNi1pKFI0v9xED9m9Jqoj1lHMai5xb75e7iiauqnaYDPncR
-         +VU797OMouWLWlvTH6f3nbz2aI80b7fnPnWzQORUXke5T0fkjh4QsA7QJdjAjLI/w8+L
-         nVF2xVY6cm7Au9CrEJQfvgOjyvHDpt3WtuxPhDkW7k2TkHvly6xd+A+ZcgyWWKdcXohd
-         6jvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX7Xt499vQ7/OtKJw1BwNv0XsHvgaDKRmXkmt6C6SuWzWnyKvGiv/Qv7Jp95+tcyZT1NWeQ5EOE/NgZPB1QBPSxXqht
-X-Gm-Message-State: AOJu0YzZduDEEEUL7c/iT1qhrd17wIEcmQWyF6TxVpLw69JHpNOtq8Oa
-	AnBL4x+uRMPVJIf+HTuEMmkonF54r2AJOZPNOt7zVMkwD5ayAZdQXpwiKouhXSveSWH7UWNnBEA
-	JVQ==
-X-Google-Smtp-Source: AGHT+IEPiHXtS314tlrQIAMbYrZnHsRms7BHYsbMaTjPiFclwHDMK7MPl03jGaRyUaHpVI56coh4fZoFV/g=
+        bh=BT66vEwt9iJsGeuvAMx6ZtRmhkH62brVnR8HWlVI5+E=;
+        b=NqT+k/r0fOX7mtGkWW0GNslaNDbF7Fu4Xs83f3nxdcneK2j9s/isxUw21XMTYhtCn0
+         1DHFDIl78j5edpKbzTAIclMSemw9DhjKaEHXgL5+3RyhowkSQYsvuudIv4tG7vn6KbD2
+         waNEZw/dPftJEd5Tbmr759BOeTiCIPYlFmyNWm7sRMdQSUYbDZUl1yuSOck9PbrSj2vb
+         tvsSxG4C6H1DKvVWp040GsNhkZWqD0iBajprAvNQqonJHlxWBJkeWNTx91vaPMzVXngs
+         vbWrNXUjbL0mNMEayMl8J9qTtrh3MKYQk2qDaBIKAJa34RmACc7iObHT5nM1sP9Kh6UT
+         zGRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVrVCxLFyi9tY/RCcpLv2Vcse3UioER3+2kxfxSiQ7mxap+lQmjSCO8OEmLMOjoTCfUm0JChW8YxptetCptJIfpfNdC
+X-Gm-Message-State: AOJu0Yy+INtftv+Fu57u+s6KSXACW/RyUdELwI7t+ZCAuUUVDaN2CfiO
+	3qLPjmeSU5XRf+0E+Ne2VCZ/gPe6ACeKzdu2w9cd1KiMJlkTilJ6vVMxy5WK+LPGjF660NUlk0N
+	sDw==
+X-Google-Smtp-Source: AGHT+IFMmEFgsZNC3++LEDK0GsTGhukj/h4zxeGJVMgx7iz1341o1TDyzrL9DkroENLBZiGZP09HcP7Uxu0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:6803:b0:2c9:7d81:fb1f with SMTP id
- 98e67ed59e1d1-2cf7e97a4d1mr361358a91.6.1722371090986; Tue, 30 Jul 2024
- 13:24:50 -0700 (PDT)
-Date: Tue, 30 Jul 2024 13:24:49 -0700
-In-Reply-To: <Zqk5IqoQBnQbbuCK@AUS-L1-JOHALLEN.amd.com>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1081:b0:e0b:1407:e357 with SMTP id
+ 3f1490d57ef6-e0b543f0dc9mr790814276.3.1722371235350; Tue, 30 Jul 2024
+ 13:27:15 -0700 (PDT)
+Date: Tue, 30 Jul 2024 13:27:13 -0700
+In-Reply-To: <db00e68b-2b34-49e1-aa72-425a35534762@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240730174751.15824-1-john.allen@amd.com> <ZqkqWTCa6GdeVykw@google.com>
- <Zqk5IqoQBnQbbuCK@AUS-L1-JOHALLEN.amd.com>
-Message-ID: <ZqlMEehDfursUXSB@google.com>
-Subject: Re: [PATCH] KVM: x86: Advertise SUCCOR and OVERFLOW_RECOV cpuid bits
+References: <20240730053215.33768-1-flyingpeng@tencent.com> <db00e68b-2b34-49e1-aa72-425a35534762@redhat.com>
+Message-ID: <ZqlMob2o-97KsB8t@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Conditionally call kvm_zap_obsolete_pages
 From: Sean Christopherson <seanjc@google.com>
-To: John Allen <john.allen@amd.com>
-Cc: pbonzini@redhat.com, kvm@vger.kernel.org, thomas.lendacky@amd.com, 
-	bp@alien8.de, mlevitsk@redhat.com, linux-kernel@vger.kernel.org, 
-	x86@kernel.org, yazen.ghannam@amd.com
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: flyingpenghao@gmail.com, kvm@vger.kernel.org, 
+	Peng Hao <flyingpeng@tencent.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 30, 2024, John Allen wrote:
-> On Tue, Jul 30, 2024 at 11:00:57AM -0700, Sean Christopherson wrote:
-> > On Tue, Jul 30, 2024, John Allen wrote:
-> > > Handling deferred, uncorrected MCEs on AMD guests is now possible with
-> > > additional support in qemu. Ensure that the SUCCOR and OVERFLOW_RECOV
-> > > bits are advertised to the guest in KVM.
-> > > 
-> > > Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-> > > Signed-off-by: John Allen <john.allen@amd.com>
-> > > ---
-> > >  arch/x86/kvm/cpuid.c   | 2 +-
-> > >  arch/x86/kvm/svm/svm.c | 7 +++++++
-> > >  2 files changed, 8 insertions(+), 1 deletion(-)
-> > > 
-> > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-> > > index 2617be544480..4745098416c3 100644
-> > > --- a/arch/x86/kvm/cpuid.c
-> > > +++ b/arch/x86/kvm/cpuid.c
-> > > @@ -1241,7 +1241,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
-> > >  
-> > >  		/* mask against host */
-> > >  		entry->edx &= boot_cpu_data.x86_power;
-> > > -		entry->eax = entry->ebx = entry->ecx = 0;
-> > > +		entry->eax = entry->ecx = 0;
+On Tue, Jul 30, 2024, Paolo Bonzini wrote:
+> On 7/30/24 07:32, flyingpenghao@gmail.com wrote:
 > > 
-> > Needs an override to prevent reporting all of EBX to userspace.
+> > When tdp_mmu is enabled, invalid root calls kvm_tdp_mmu_zap_invalidated_roots
+> > to implement it, and kvm_zap_obsolete_pages is not used.
 > > 
-> > 		cpuid_entry_override(entry, CPUID_8000_0007_EBX);
+> > Signed-off-by: Peng Hao<flyingpeng@tencent.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c | 3 ++-
+> >   1 file changed, 2 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 901be9e420a4..e91586c2ef87 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -6447,7 +6447,8 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
+> >   	 */
+> >   	kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS);
+> > -	kvm_zap_obsolete_pages(kvm);
+> > +	if (!tdp_mmu_enabled)
+> > +		kvm_zap_obsolete_pages(kvm);
 > 
-> Right, I see what you mean. We just want to expose these specific bits
-> and not all of EBX. I think with the patch as it is along with the
-> change you suggest below, this should resolve this as the above case
-> already has the cpuid_entry_override just above where it cuts off.
+> Can't you have obsolete pages from the shadow MMU that's used for nested
+> (nGPA->HPA) virtualization?
 
-Heh, nope, it doesn't.  The existing override is for EDX, this needs one for EBX.
+Yep.  And kvm_zap_obsolete_pages() is a relatively cheap nop if there are no
+pages on active_mmu_pages.  E.g. we could check kvm_memslots_have_rmaps(), but I
+don't see any point in doing so, as the existing code should be blazing fast
+relative to the total cost of the zap.
 
