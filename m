@@ -1,205 +1,149 @@
-Return-Path: <kvm+bounces-22693-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22694-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95541942056
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 21:10:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBC7D94206A
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 21:15:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 489412847CD
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 19:10:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAE861C23406
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 19:15:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D63E18B477;
-	Tue, 30 Jul 2024 19:10:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BCF018C923;
+	Tue, 30 Jul 2024 19:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="cskqiIVA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="S5ZTCDgP"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0406D18A6DF
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 19:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC881AA3F5
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 19:15:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722366629; cv=none; b=ncfS4LsjPUXniJglcOYaiFob2DmLpkdHsQ1BxGcSWBwYVi3UFVZAcTNX5sbeUdsujuRsZZmmDFZPMaywbgoRAaFTw9abX5eTQxia/8RKfKhiN4i2oOT2W5ugfkDyuAqcpuneBG07HkRhi24u8LHiv0kTApL9otyTUu3s5XzmTTw=
+	t=1722366943; cv=none; b=VtxVTSGL5zFrFOX71hRgO76rsgJ02VTAqX8zxXE/2Sjz3WgUbx3oEOWGRMSsWvltp7xJ/BNaj4bNelAsGk9eOjWVpitacdkjhjVPzcZ2ZXITojXEauqYgVzPwx0/+jkD729qVE7mq4mPcrBWwraMU2adSeFnTHX2JtLzu1f649k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722366629; c=relaxed/simple;
-	bh=cprG9uguQ5xQAd65VG0OmI1dSJ/AIFZZf/rzJXIqOG0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ht12T0FgXBvUe1KxUfrsuSCqCs6Eqpl/QQY1xZ0bq1VDI6m2bhfb4/WRTSCJc88QyWeD+lF6VCE/5a3La6l8Kodzub5LIh+D+cSdAV2f6b6oFB3iE49+5JCti+dSR3bRYdwONvGFJwQoWLoeaLzhladszAnPdkbFe8Abql8Akoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=cskqiIVA; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6659e81bc68so39836577b3.0
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 12:10:27 -0700 (PDT)
+	s=arc-20240116; t=1722366943; c=relaxed/simple;
+	bh=PETnK4VwC/UhIxIqGvXyjWJId5AWW0Ewo3pA8BJW22I=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ByAUV4ZRLuCfPqYo41gnh2oOg+AQW1KY6kUV6CqJ/hKOMjoJRCD4O0pBoha8HMIUWvUnetbb/H7NDmpkAJyzKHiOFoacg74lF0GX9+so4rPur0z4HrMJyPBivW9CYryEwAY4nJ2VrpabRJ6k5GiKm2S0GnB3CDNJ2AZia+71pys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=S5ZTCDgP; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0353b731b8so6755291276.2
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 12:15:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1722366627; x=1722971427; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6GUnz9l9Hov01YwHIE/X99jR0yCQ8jWPdAfQd5kTxAs=;
-        b=cskqiIVAToN8u5ifsNa0Ulq7laX0u7m8tS/Wl+D6PimGeNtq+U5Z0/BwHUtu4/JtCb
-         aW1LvkVXUqvQeVwsETU8Fo3LKdiWzlzXJx/mEumEGJduxRJIsXyiVENDoBZDHQb3cKx2
-         gNNvvVey/3/LdT17UM5DEqAyHhnzvdGno5iy1GaVFnRZF0CxCFpHAzsTI+wZcyhvEiJN
-         CrI+T4hxjE3hUA/dYsEmDhOS4O6DsihpgpKyqG8CDvqbTxMMWONvy75dv1yZOr9kj8ZY
-         oE0asvQyZ/OBGG321K2Bz18mjufhZpGO35gOC5Rgsvju5PhA+VxPOMcF5vGGK6SMk4ta
-         gnRw==
+        d=google.com; s=20230601; t=1722366940; x=1722971740; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ISzuCdCQ1ApBdrb/imzREuT+CY1/CgtGbhMTtqRUAc=;
+        b=S5ZTCDgPsH6EKImwBd5iINDaD2hRZ61tabcEsa/6THUwe2NbZb6lIISjl+EW4bwZg7
+         ffTtnwZouu8/On3aKf0QeOsxZNCFwo8jL1PlEC4KrzkmNnQFR0WER0F9UZSOc2ie6UK5
+         OqL8G9sUbLeSyidEaobP36gOyNsklBHEz2O7wg69/ddSlftGVAzWqeFb9HMgn776KgEY
+         uYJPdGsBIbMkZojbYYvHotZbiaCZXUe86s10FnStjPFaLGLoAT+gdNJveYK+B7PRMf/5
+         lRMvbCnLKfSTKrmVdzwDwUkxvx5bgP92m8lZ89i3/MpNsl+GK7wahITBTwCEO5yQvGTW
+         gOpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722366627; x=1722971427;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6GUnz9l9Hov01YwHIE/X99jR0yCQ8jWPdAfQd5kTxAs=;
-        b=UR2NgaMPrPdzKQeAZHQc2ItpD6qTgMIq+4y4EoB1p2vAZwJV49ZQuMS62Sx5oWAveb
-         BZ1d/qXb42xYJIBpNIkkuxV9X+VtzmXb7nN61cdwSsAbFpYN1e3/3Xeq/0ua265/vPSj
-         RklsAuhvRi7CgVcVPcNvDztAEITxYxMWedh2dMF1ibEzvSXnDEoybvNxBkGPY2yU54Ps
-         k21cz7TSiRryctMANuL/DRUYCJtszxfvXhXOnky3J9RZ9wkE8gkSNXdszOTR7OW5x4Qn
-         vmknksY1kjUCH2KgVQHTrNZPWBroUZdFKtym4ICZdxPsp/579SmteILStDh1EV8vqXBt
-         asbw==
-X-Forwarded-Encrypted: i=1; AJvYcCXoz5gsISZ9s5DGiiBJuUy0Z0y9RmPAA4VyhV9YGCU1iMpRCplFkXbGDLcdoLF+32EHsnL434COmMBXk799Xgmf4mSN
-X-Gm-Message-State: AOJu0YzCznufDUpXdDfAtQbJkkJG5lm7xNqHlF588FKym9+o6RNKyo4u
-	GRcsVmzsRN2J2rtRG6uKpmyr+sUsDBphGWTKRG55h4MKCcIuyTauOThSk3ZBBjQ=
-X-Google-Smtp-Source: AGHT+IFlD3BEKMaeWaD720WWKRAG4+pH3jrjmCrAEylXJ2sjoD6Kq8sCVxrr8pWB9p2fWNe43d139w==
-X-Received: by 2002:a0d:dac6:0:b0:618:95a3:70b9 with SMTP id 00721157ae682-67a09592d49mr116965087b3.36.1722366626922;
-        Tue, 30 Jul 2024 12:10:26 -0700 (PDT)
-Received: from localhost (syn-076-182-020-124.res.spectrum.com. [76.182.20.124])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6756c44ceb7sm26204097b3.140.2024.07.30.12.10.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 12:10:26 -0700 (PDT)
-Date: Tue, 30 Jul 2024 15:10:25 -0400
-From: Josef Bacik <josef@toxicpanda.com>
-To: viro@kernel.org
-Cc: linux-fsdevel@vger.kernel.org, amir73il@gmail.com, bpf@vger.kernel.org,
-	brauner@kernel.org, cgroups@vger.kernel.org, kvm@vger.kernel.org,
-	netdev@vger.kernel.org, torvalds@linux-foundation.org
-Subject: Re: [PATCH 08/39] experimental: convert fs/overlayfs/file.c to
- CLASS(...)
-Message-ID: <20240730191025.GB3830393@perftesting>
-References: <20240730050927.GC5334@ZenIV>
- <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-8-viro@kernel.org>
+        d=1e100.net; s=20230601; t=1722366940; x=1722971740;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8ISzuCdCQ1ApBdrb/imzREuT+CY1/CgtGbhMTtqRUAc=;
+        b=oAvhBhqNoq8dzT9qDaRQ2iGGfqTxyCdXAoOhOKWZvqvCU84LXigls/9PZPLISZMIJK
+         1uPoIbIJQhyCrIVKJr+03FNVX3x9hQ7VC8VEfHbgBxNnDOK2ICmPcz0dZ9ZhFkCOqROw
+         6Dp32w5arGInCEWSWZ9R/dw8RvgnuVnRM2HGjEUREu/3vxP0mWgR748FZEZ8gt7TCDTo
+         JeYtSEJSKo/z1G/WSNOTpM1dWfAzCrgSXEq/urLzsPMG/TXpEh+DLRwZHQAEvc6emqpa
+         AL3mDy5o8BdM9JwY2Nhg5BRrzpesm1IxUcdyw91QCXF2FPppRDx7EFoZaGvM1bZSEDYR
+         b6mg==
+X-Forwarded-Encrypted: i=1; AJvYcCVGg2rVBy+y813rCVOr0Oktvr683UfQP8UMfcLrzM9FD9HYUqEXC5HvtheQRBMmLkksTbQt0kHaBamNIPCPUz3LT/k6
+X-Gm-Message-State: AOJu0YzgIkWRiFzKOhCoM0OE5tPxtKBRU+7R1VdhfYviW6RSQQ604+Uw
+	mwZxpsmZPlmR04AZAUuPd4sAuEGze7SbrrvaorCWMQFscuoLQ8BnOq5idJ16WEj+yT2jqyuqELr
+	oag==
+X-Google-Smtp-Source: AGHT+IG9SmfuMb4gtd0Ao4BPZkLVByP1qx5TNQuKOL4wYDlOLmXqkqaZZiuA2JFi0z3WenSC5NZXiGCdyNk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2b8f:b0:e03:59e2:e82 with SMTP id
+ 3f1490d57ef6-e0b545a3f3dmr19046276.10.1722366939560; Tue, 30 Jul 2024
+ 12:15:39 -0700 (PDT)
+Date: Tue, 30 Jul 2024 12:15:38 -0700
+In-Reply-To: <96df1dd5-cc31-4e84-84fd-ea75b4800be8@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730051625.14349-8-viro@kernel.org>
+Mime-Version: 1.0
+References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-49-seanjc@google.com>
+ <96df1dd5-cc31-4e84-84fd-ea75b4800be8@redhat.com>
+Message-ID: <Zqk72jP1c8N0Pn1O@google.com>
+Subject: Re: [PATCH v12 48/84] KVM: Move x86's API to release a faultin page
+ to common KVM
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
+	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 30, 2024 at 01:15:54AM -0400, viro@kernel.org wrote:
-> From: Al Viro <viro@zeniv.linux.org.uk>
+On Tue, Jul 30, 2024, Paolo Bonzini wrote:
+> On 7/27/24 01:51, Sean Christopherson wrote:
+> > Move KVM x86's helper that "finishes" the faultin process to common KVM
+> > so that the logic can be shared across all architectures.  Note, not all
+> > architectures implement a fast page fault path, but the gist of the
+> > comment applies to all architectures.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c   | 24 ++----------------------
+> >   include/linux/kvm_host.h | 26 ++++++++++++++++++++++++++
+> >   2 files changed, 28 insertions(+), 22 deletions(-)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 95beb50748fc..2a0cfa225c8d 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -4323,28 +4323,8 @@ static u8 kvm_max_private_mapping_level(struct kvm *kvm, kvm_pfn_t pfn,
+> >   static void kvm_mmu_finish_page_fault(struct kvm_vcpu *vcpu,
+> >   				      struct kvm_page_fault *fault, int r)
+> >   {
+> > -	lockdep_assert_once(lockdep_is_held(&vcpu->kvm->mmu_lock) ||
+> > -			    r == RET_PF_RETRY);
+> > -
+> > -	if (!fault->refcounted_page)
+> > -		return;
+> > -
+> > -	/*
+> > -	 * If the page that KVM got from the *primary MMU* is writable, and KVM
+> > -	 * installed or reused a SPTE, mark the page/folio dirty.  Note, this
+> > -	 * may mark a folio dirty even if KVM created a read-only SPTE, e.g. if
+> > -	 * the GFN is write-protected.  Folios can't be safely marked dirty
+> > -	 * outside of mmu_lock as doing so could race with writeback on the
+> > -	 * folio.  As a result, KVM can't mark folios dirty in the fast page
+> > -	 * fault handler, and so KVM must (somewhat) speculatively mark the
+> > -	 * folio dirty if KVM could locklessly make the SPTE writable.
+> > -	 */
+> > -	if (r == RET_PF_RETRY)
+> > -		kvm_release_page_unused(fault->refcounted_page);
+> > -	else if (!fault->map_writable)
+> > -		kvm_release_page_clean(fault->refcounted_page);
+> > -	else
+> > -		kvm_release_page_dirty(fault->refcounted_page);
+> > +	kvm_release_faultin_page(vcpu->kvm, fault->refcounted_page,
+> > +				 r == RET_PF_RETRY, fault->map_writable);
 > 
-> There are four places where we end up adding an extra scope
-> covering just the range from constructor to destructor;
-> not sure if that's the best way to handle that.
-> 
-> The functions in question are ovl_write_iter(), ovl_splice_write(),
-> ovl_fadvise() and ovl_copyfile().
-> 
-> This is very likely *NOT* the final form of that thing - it
-> needs to be discussed.
-> 
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> ---
->  fs/overlayfs/file.c | 72 ++++++++++++++++++---------------------------
->  1 file changed, 29 insertions(+), 43 deletions(-)
-> 
-> diff --git a/fs/overlayfs/file.c b/fs/overlayfs/file.c
-> index 4b9e145bc7b8..a2911c632137 100644
-> --- a/fs/overlayfs/file.c
-> +++ b/fs/overlayfs/file.c
-> @@ -132,6 +132,8 @@ static struct fderr ovl_real_fdget(const struct file *file)
->  	return ovl_real_fdget_meta(file, false);
->  }
->  
-> +DEFINE_CLASS(fd_real, struct fderr, fdput(_T), ovl_real_fdget(file), struct file *file)
-> +
->  static int ovl_open(struct inode *inode, struct file *file)
->  {
->  	struct dentry *dentry = file_dentry(file);
-> @@ -174,7 +176,6 @@ static int ovl_release(struct inode *inode, struct file *file)
->  static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
->  {
->  	struct inode *inode = file_inode(file);
-> -	struct fderr real;
->  	const struct cred *old_cred;
->  	loff_t ret;
->  
-> @@ -190,7 +191,7 @@ static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
->  			return vfs_setpos(file, 0, 0);
->  	}
->  
-> -	real = ovl_real_fdget(file);
-> +	CLASS(fd_real, real)(file);
->  	if (fd_empty(real))
->  		return fd_error(real);
->  
-> @@ -211,8 +212,6 @@ static loff_t ovl_llseek(struct file *file, loff_t offset, int whence)
->  	file->f_pos = fd_file(real)->f_pos;
->  	ovl_inode_unlock(inode);
->  
-> -	fdput(real);
-> -
->  	return ret;
->  }
->  
-> @@ -253,8 +252,6 @@ static void ovl_file_accessed(struct file *file)
->  static ssize_t ovl_read_iter(struct kiocb *iocb, struct iov_iter *iter)
->  {
->  	struct file *file = iocb->ki_filp;
-> -	struct fderr real;
-> -	ssize_t ret;
->  	struct backing_file_ctx ctx = {
->  		.cred = ovl_creds(file_inode(file)->i_sb),
->  		.user_file = file,
-> @@ -264,22 +261,18 @@ static ssize_t ovl_read_iter(struct kiocb *iocb, struct iov_iter *iter)
->  	if (!iov_iter_count(iter))
->  		return 0;
->  
-> -	real = ovl_real_fdget(file);
-> +	CLASS(fd_real, real)(file);
->  	if (fd_empty(real))
->  		return fd_error(real);
->  
-> -	ret = backing_file_read_iter(fd_file(real), iter, iocb, iocb->ki_flags,
-> -				     &ctx);
-> -	fdput(real);
-> -
-> -	return ret;
-> +	return backing_file_read_iter(fd_file(real), iter, iocb, iocb->ki_flags,
-> +				      &ctx);
->  }
->  
->  static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
->  {
->  	struct file *file = iocb->ki_filp;
->  	struct inode *inode = file_inode(file);
-> -	struct fderr real;
->  	ssize_t ret;
->  	int ifl = iocb->ki_flags;
->  	struct backing_file_ctx ctx = {
-> @@ -295,7 +288,9 @@ static ssize_t ovl_write_iter(struct kiocb *iocb, struct iov_iter *iter)
->  	/* Update mode */
->  	ovl_copyattr(inode);
->  
-> -	real = ovl_real_fdget(file);
-> +	{
+> Does it make sense to move RET_PF_* to common code, and avoid a bool
+> argument here?
 
-Is this what we want to do from a code cleanliness standpoint?  This feels
-pretty ugly to me, I feal like it would be better to have something like
-
-scoped_class(fd_real, real) {
-	// code
-}
-
-rather than the {} at the same indent level as the underlying block.
-
-I don't feel super strongly about this, but I do feel like we need to either
-explicitly say "this is the way/an acceptable way to do this" from a code
-formatting standpoint, or we need to come up with a cleaner way of representing
-the scoped area.  Thanks,
-
-Josef
+After this series, probably?  Especially if/when we make "struct kvm_page_fault"
+a common structure and converge all arch code.  In this series, definitely not,
+as it would require even more patches to convert other architectures, and it's
+not clear that it would be a net win, at least not without even more massaging.
 
