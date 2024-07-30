@@ -1,204 +1,188 @@
-Return-Path: <kvm+bounces-22639-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22640-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03953940CB3
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 11:00:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00ED2940CBA
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 11:02:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E9DE1C242C0
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 09:00:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B073F286159
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 09:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E79FE194AC6;
-	Tue, 30 Jul 2024 09:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC0CD18FC93;
+	Tue, 30 Jul 2024 09:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Sslyd9/V"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ByT0UPg9"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C887194148
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 09:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B9B2188CB6
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 09:01:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722330006; cv=none; b=T6NfHIbm/V32XdEMzgI633C6H5s0Fb3kFt8eVqaxa1R2qUWWK6EV2NFCDL+6uHMBqc5yIyh9mJUpMCTlE3YOGrnMY6h6rAMmmBZYaylmbX1YjvbGC9guipvuToBWUYJusTEkTK7DwzwOPWcVucUfWeaCuvI5eelnKS/ySpMQAj8=
+	t=1722330118; cv=none; b=Ei8D62yn2mqKUlfgvekWoJoXcPkauUWB3Rg1uGfI+0gllz6rl1usv3nZ5Z6zRcbiXDp6zYgtU0EQuT/CCY5OiFrDR0Rf2Nw41Uj681gW13/bN7OvvusPtYLz40AgyFsriaalIeCsbfaw3CEQeiTi5BQmAsybNucpWEdTtvK6zFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722330006; c=relaxed/simple;
-	bh=M/AkRSTEBxVPMYGgrtIUkQpXASpWz++UT4T12uyKYr4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BNojTFOcDIbcXcdAojVi0fjxbg+D12Q6QTMhHcwE1mHzikIr5dZWNverqq6AANB6f9knNZNoZk0bhFeWhH7Eaqv89SK7PzGYpvxg6w2Bjc00ZBwqMA/wAxIzQPZKkLyyFswrKatMeVE6sJTLwTKn658ZaVYf+veTATF+qp/Zuos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Sslyd9/V; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1722330118; c=relaxed/simple;
+	bh=TlMqIE8wi5/RSUIj+yEMy9YelVmO9taQNHqiucKvk/s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MdtiKyeCVRkqu+gQhaqrkyMspWE2vet446e/p3V8wiekNocbCOUbifWdNocroR6IdCL/m74jgGXsjO+yXuzkgV4+FwLdUGo0M90VC18vPbEtAG3aDk6WI8SRukxlKcfmHtxPRGHfGu7gz1lIHI2hX2VHntK+yaEe6TbJoPfgRm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ByT0UPg9; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722330003;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	s=mimecast20190719; t=1722330115;
+	h=from:from:reply-to:reply-to:subject:subject:date:date:
+	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
+	 content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=3Vq57YbceZaPKW/jag25INSUT9w3HBYWgm/2iS/lmgI=;
-	b=Sslyd9/VDS93Nbkh5FbqukpEpRz1aE3Q13iTdBMxqNDOZt7i+OCcZZ/9SXSGxE9p+RzTy+
-	/Gl6UJTzpSJlKk9bh18U0XM8N6c2SNJl7/rMY7NefwJCAWAoGAK315ZPvGCyT5Cq6idE3x
-	x12oCQ+VPEChopU3O8MExwbKxk27u+o=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-505-Zp4w00ITPgSiZBUJjRxIKQ-1; Tue, 30 Jul 2024 05:00:01 -0400
-X-MC-Unique: Zp4w00ITPgSiZBUJjRxIKQ-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52fcb0f226bso5419705e87.0
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 02:00:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722330000; x=1722934800;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3Vq57YbceZaPKW/jag25INSUT9w3HBYWgm/2iS/lmgI=;
-        b=Yn64cQZ2hYb1kmD7FonirRAwVHJu1jVL8jAFE2BjNS8yMbb9RcETFKbGuOqPSBbm6e
-         KjZIolRfhWFMfxN7e4zJ6/0uflaAvN9Dl5g6wM83wRuxQmF5TxklUlIUyLR3QqTcvOpB
-         XyjolFVvHLO+0wtKFGODSXHFtPJijyJeD7QbJaXus7XRPRmkUsS2lAutda1WbGZlyf3K
-         dEv1UcgFh4MGQmt1mM5ON79W8Eb6elFuV28puuWTdU1QZegnEDzBalr69i7F6yHsICHI
-         r5D3DN1pz2hLJ9Uv9zJdOBF0jx2G2i4czCsoxZy46tW+1MpK8EjAWlJkmKaeFTdS9c7M
-         srbA==
-X-Gm-Message-State: AOJu0Yx7AJLYbPkJqK6YP5h1YmFPX3dNC2yPJ6VvaBhVpS7b26fUl4dA
-	r0AczUCpmI9IY4P30Ub9wH0wrqp1l6cynWpCGzIeD8IZXI48ikutUG0HAA+7ky3wR8ISoyvgIYt
-	mOhMIADNVSfHk3Ca+sPFYpnFTISue4dE7UwvqVj/nyWoIbFjm2Q==
-X-Received: by 2002:ac2:4bd4:0:b0:530:ac41:4ee with SMTP id 2adb3069b0e04-530ac410772mr853129e87.24.1722329999868;
-        Tue, 30 Jul 2024 01:59:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF1CX9fuid97Fo9k/P7XEAx/O03KlRJUJxp6LS6LdYujPfua6G8Lket79YT5PUqIa4JM4vZ8g==
-X-Received: by 2002:ac2:4bd4:0:b0:530:ac41:4ee with SMTP id 2adb3069b0e04-530ac410772mr853087e87.24.1722329999379;
-        Tue, 30 Jul 2024 01:59:59 -0700 (PDT)
-Received: from [192.168.10.47] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5ac63590d76sm7021589a12.24.2024.07.30.01.59.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jul 2024 01:59:58 -0700 (PDT)
-Message-ID: <bb2d52e8-ceff-46e8-83a1-4db535754aa0@redhat.com>
-Date: Tue, 30 Jul 2024 10:59:57 +0200
+	 in-reply-to:in-reply-to:references:references;
+	bh=2bb64z1B0PkvBwmQIOkISOJC81cCbnlZt6q61HyPEYo=;
+	b=ByT0UPg9g3rL+NWLPJSI2Ve+zmQQQI8sYwNktbzACWmXRcwht8N3s1zJ9zTazzSTJiL5QN
+	sa/9zn//ZEusWrN8DCaL5alBcxezTXuuIgeBdPDKcleMkFo10sXFdeTViQ/6SEVZP6wfJi
+	eJz53zR/Z17SMvMa486LNLGvVK7EmuI=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-353-mz5nYGKvNaqkVyLOfmD7IA-1; Tue,
+ 30 Jul 2024 05:01:52 -0400
+X-MC-Unique: mz5nYGKvNaqkVyLOfmD7IA-1
+Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 74EFA1955F41;
+	Tue, 30 Jul 2024 09:01:47 +0000 (UTC)
+Received: from redhat.com (unknown [10.42.28.108])
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CBCAA19560B2;
+	Tue, 30 Jul 2024 09:01:14 +0000 (UTC)
+Date: Tue, 30 Jul 2024 10:01:11 +0100
+From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com,
+	andrew@codeconstruct.com.au, andrew@daynix.com,
+	arei.gonglei@huawei.com, berto@igalia.com,
+	borntraeger@linux.ibm.com, clg@kaod.org, david@redhat.com,
+	den@openvz.org, eblake@redhat.com, eduardo@habkost.net,
+	farman@linux.ibm.com, farosas@suse.de, hreitz@redhat.com,
+	idryomov@gmail.com, iii@linux.ibm.com, jamin_lin@aspeedtech.com,
+	jasowang@redhat.com, joel@jms.id.au, jsnow@redhat.com,
+	kwolf@redhat.com, leetroy@gmail.com, marcandre.lureau@redhat.com,
+	marcel.apfelbaum@gmail.com, michael.roth@amd.com, mst@redhat.com,
+	mtosatti@redhat.com, nsg@linux.ibm.com, pasic@linux.ibm.com,
+	pbonzini@redhat.com, peter.maydell@linaro.org, peterx@redhat.com,
+	philmd@linaro.org, pizhenwei@bytedance.com, pl@dlhnet.de,
+	richard.henderson@linaro.org, stefanha@redhat.com,
+	steven_lee@aspeedtech.com, thuth@redhat.com,
+	vsementsov@yandex-team.ru, wangyanan55@huawei.com,
+	yuri.benditovich@daynix.com, zhao1.liu@intel.com,
+	qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-s390x@nongnu.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 11/18] qapi/crypto: Rename QCryptoHashAlgorithm to *Algo,
+ and drop prefix
+Message-ID: <Zqir1y4qyp-lwyuz@redhat.com>
+Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
+References: <20240730081032.1246748-1-armbru@redhat.com>
+ <20240730081032.1246748-12-armbru@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 50/84] KVM: VMX: Use __kvm_faultin_page() to get APIC
- access page/pfn
-To: Sean Christopherson <seanjc@google.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
- linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
- kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
- linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
- David Stevens <stevensd@chromium.org>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-51-seanjc@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <20240726235234.228822-51-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240730081032.1246748-12-armbru@redhat.com>
+User-Agent: Mutt/2.2.12 (2023-09-09)
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-On 7/27/24 01:51, Sean Christopherson wrote:
-> Use __kvm_faultin_page() get the APIC access page so that KVM can
-> precisely release the refcounted page, i.e. to remove yet another user
-> of kvm_pfn_to_refcounted_page().  While the path isn't handling a guest
-> page fault, the semantics are effectively the same; KVM just happens to
-> be mapping the pfn into a VMCS field instead of a secondary MMU.
+On Tue, Jul 30, 2024 at 10:10:25AM +0200, Markus Armbruster wrote:
+> QAPI's 'prefix' feature can make the connection between enumeration
+> type and its constants less than obvious.  It's best used with
+> restraint.
 > 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> QCryptoHashAlgorithm has a 'prefix' that overrides the generated
+> enumeration constants' prefix to QCRYPTO_HASH_ALG.
+> 
+> We could simply drop 'prefix', but then the prefix becomes
+> QCRYPTO_HASH_ALGORITHM, which is rather long.
+> 
+> We could additionally rename the type to QCryptoHashAlg, but I think
+> the abbreviation "alg" is less than clear.
+
+I would have gone with this, but it is a bit of a bike shed colouring
+debate so I'm not fussed
+
+> 
+> Rename the type to QCryptoHashAlgo instead.  The prefix becomes to
+> QCRYPTO_HASH_ALGO.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
 > ---
->   arch/x86/kvm/vmx/vmx.c | 13 +++++++++----
->   1 file changed, 9 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-> index 30032585f7dc..b109bd282a52 100644
-> --- a/arch/x86/kvm/vmx/vmx.c
-> +++ b/arch/x86/kvm/vmx/vmx.c
-> @@ -6786,8 +6786,10 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
->   	struct kvm *kvm = vcpu->kvm;
->   	struct kvm_memslots *slots = kvm_memslots(kvm);
->   	struct kvm_memory_slot *slot;
-> +	struct page *refcounted_page;
->   	unsigned long mmu_seq;
->   	kvm_pfn_t pfn;
-> +	bool ign;
+>  qapi/crypto.json                        | 17 +++++-----
+>  crypto/blockpriv.h                      |  2 +-
+>  crypto/hashpriv.h                       |  2 +-
+>  crypto/hmacpriv.h                       |  4 +--
+>  crypto/ivgenpriv.h                      |  2 +-
+>  include/crypto/afsplit.h                |  8 ++---
+>  include/crypto/block.h                  |  2 +-
+>  include/crypto/hash.h                   | 18 +++++-----
+>  include/crypto/hmac.h                   |  6 ++--
+>  include/crypto/ivgen.h                  |  6 ++--
+>  include/crypto/pbkdf.h                  | 10 +++---
+>  backends/cryptodev-builtin.c            |  8 ++---
+>  backends/cryptodev-lkcf.c               | 10 +++---
+>  block/parallels-ext.c                   |  2 +-
+>  block/quorum.c                          |  4 +--
+>  crypto/afsplit.c                        |  6 ++--
+>  crypto/block-luks.c                     | 16 ++++-----
+>  crypto/block.c                          |  2 +-
+>  crypto/hash-afalg.c                     | 26 +++++++--------
+>  crypto/hash-gcrypt.c                    | 20 +++++------
+>  crypto/hash-glib.c                      | 20 +++++------
+>  crypto/hash-gnutls.c                    | 20 +++++------
+>  crypto/hash-nettle.c                    | 18 +++++-----
+>  crypto/hash.c                           | 30 ++++++++---------
+>  crypto/hmac-gcrypt.c                    | 22 ++++++-------
+>  crypto/hmac-glib.c                      | 22 ++++++-------
+>  crypto/hmac-gnutls.c                    | 22 ++++++-------
+>  crypto/hmac-nettle.c                    | 22 ++++++-------
+>  crypto/hmac.c                           |  2 +-
+>  crypto/ivgen.c                          |  4 +--
+>  crypto/pbkdf-gcrypt.c                   | 36 ++++++++++----------
+>  crypto/pbkdf-gnutls.c                   | 36 ++++++++++----------
+>  crypto/pbkdf-nettle.c                   | 32 +++++++++---------
+>  crypto/pbkdf-stub.c                     |  4 +--
+>  crypto/pbkdf.c                          |  2 +-
+>  hw/misc/aspeed_hace.c                   | 16 ++++-----
+>  io/channel-websock.c                    |  2 +-
+>  target/i386/sev.c                       |  6 ++--
+>  tests/bench/benchmark-crypto-akcipher.c | 12 +++----
+>  tests/bench/benchmark-crypto-hash.c     | 10 +++---
+>  tests/bench/benchmark-crypto-hmac.c     |  6 ++--
+>  tests/unit/test-crypto-afsplit.c        | 10 +++---
+>  tests/unit/test-crypto-akcipher.c       |  6 ++--
+>  tests/unit/test-crypto-block.c          | 16 ++++-----
+>  tests/unit/test-crypto-hash.c           | 42 +++++++++++------------
+>  tests/unit/test-crypto-hmac.c           | 16 ++++-----
+>  tests/unit/test-crypto-ivgen.c          |  8 ++---
+>  tests/unit/test-crypto-pbkdf.c          | 44 ++++++++++++-------------
+>  ui/vnc.c                                |  2 +-
+>  util/hbitmap.c                          |  2 +-
+>  crypto/akcipher-gcrypt.c.inc            | 14 ++++----
+>  crypto/akcipher-nettle.c.inc            | 26 +++++++--------
+>  52 files changed, 350 insertions(+), 351 deletions(-)
 
-Even if you don't use it, call the out argument "writable".
+Acked-by: Daniel P. Berrangé <berrange@redhat.com>
 
-Paolo
 
->   
->   	/* Defer reload until vmcs01 is the current VMCS. */
->   	if (is_guest_mode(vcpu)) {
-> @@ -6823,7 +6825,7 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
->   	 * controls the APIC-access page memslot, and only deletes the memslot
->   	 * if APICv is permanently inhibited, i.e. the memslot won't reappear.
->   	 */
-> -	pfn = gfn_to_pfn_memslot(slot, gfn);
-> +	pfn = __kvm_faultin_pfn(slot, gfn, FOLL_WRITE, &ign, &refcounted_page);
->   	if (is_error_noslot_pfn(pfn))
->   		return;
->   
-> @@ -6834,10 +6836,13 @@ void vmx_set_apic_access_page_addr(struct kvm_vcpu *vcpu)
->   		vmcs_write64(APIC_ACCESS_ADDR, pfn_to_hpa(pfn));
->   
->   	/*
-> -	 * Do not pin apic access page in memory, the MMU notifier
-> -	 * will call us again if it is migrated or swapped out.
-> +	 * Do not pin the APIC access page in memory so that it can be freely
-> +	 * migrated, the MMU notifier will call us again if it is migrated or
-> +	 * swapped out.  KVM backs the memslot with anonymous memory, the pfn
-> +	 * should always point at a refcounted page (if the pfn is valid).
->   	 */
-> -	kvm_release_pfn_clean(pfn);
-> +	if (!WARN_ON_ONCE(!refcounted_page))
-> +		kvm_release_page_clean(refcounted_page);
->   
->   	/*
->   	 * No need for a manual TLB flush at this point, KVM has already done a
+With regards,
+Daniel
+-- 
+|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
+|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
+|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
 
 
