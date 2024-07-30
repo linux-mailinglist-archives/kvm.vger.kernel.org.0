@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-22657-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22658-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81EB0940EC2
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 12:16:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02CDE940EC9
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 12:18:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39A1B2811FB
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 10:16:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 261EF1C2263B
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 10:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12590195B28;
-	Tue, 30 Jul 2024 10:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC0C197A66;
+	Tue, 30 Jul 2024 10:17:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RVA1ji1R"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JtUTqNJk"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C231153BF7
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 10:16:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16C77187878
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 10:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722334566; cv=none; b=APaI1XvVLmdQn5uN38cEe5V0kkBZIDNkTY4248zc2bXwYMsVBP0bwV+9Qqp/BUmiPSEc+c85ZCxBdbumGHYtrIDXCnfdSIZNouRFdiW8xJCspEIvFvj2L+KNtUHBFwvDu9PxZOTqVMurh+L10hoNOi+bYQWyRz/XGJxyS7XQbs8=
+	t=1722334670; cv=none; b=N9odnML+BhGrKKeb8W1gZNKqIyIzJlAw+KJlD8nr2zpcG4ONlybfZX3ojmTGfMBHGrza9ptk+rZXiqjawnWKHy9HrRqIGlAtP1jyO/DYhiqdBwBzvBwd4s5XHigpjhU2x8wTmFlLwswsJv2nKonv5Ddtiev8+7aG37sT6wWnozE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722334566; c=relaxed/simple;
-	bh=dPE52On1XPPd1fO8a1wdKfBGJ7BxX18geH3vJBa8MP4=;
+	s=arc-20240116; t=1722334670; c=relaxed/simple;
+	bh=iNcv7NMi5eQwkUBbwceXg1bU0C6jvh9VNi8yqX7p7Ws=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tOfWZq1RhVZt+gp1RAeAnvs7I5nrmFYy0KRgFimBQ7pR/TAfnFqqJZKxB92KiRCLbMb/uFxu4uHCExcNNFk/dGk4FpERGSRoxHj17IAjYfBQ40cWZ1pwHawoVzkFEqvaXMN4bw5YN9o9cWK666zCmae2zHTpkTH/mrMzNGnj/U8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RVA1ji1R; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=FfZVj2boMAN2V53V/YCo2RDan6//tGxMMT0wK73gg1IUDw3dNrQh2SrzHEF1E438Rns3ctQ2Rn9rVg/cuKJsyUU7lX7wXrlZGUATBgKD4Tb/C2BRw0dbDyT8RGcL3+/wCjs13nPnQM1aTIq6DeKubqCJIwGRCn7WMSAgck8ehX8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JtUTqNJk; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722334563;
+	s=mimecast20190719; t=1722334667;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=owK5Gb4Y1b7hNFGBuCGYRLOJe16PvMmwqprOo8ysou4=;
-	b=RVA1ji1RR3O49suYH0NVPfL9j0jJep9dDTiEXVLkXd/LR8t2UOGfdQSXqZDt5obEeIF2OO
-	4Z3fahm+NsZcERO/rlQYQCGz+uPJqy/ISEOHwYljOmNOqMXb0zBzfXZ4t9NKLqGhdF6Jym
-	AABHHRvX+zZ7bnRsjekwtLlYmQviv+0=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=zHRUb9ZKLORwY2zU7h4UGQhjsrDz/4w8N8RZFuBzYHM=;
+	b=JtUTqNJkvp+eAEMI4GgwXh26EMpH95IB3kz7NaJyalIqV5BAV1dyx/qxfE2TEuP5qeEfoQ
+	9cc0eUxt1nbOCbfCwuzjzQLgR6vvmXsU6V2XIPpBguOkZxxgCcDYGQvt6/3D8dCK3rDMFn
+	nAWlFrCRW638Q5ude3Fy70FsOEdOXno=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-226-jbwO4g4uNCmhW6W7pRHzxQ-1; Tue, 30 Jul 2024 06:16:00 -0400
-X-MC-Unique: jbwO4g4uNCmhW6W7pRHzxQ-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-3688010b3bfso2457498f8f.3
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 03:16:00 -0700 (PDT)
+ us-mta-553-uQzzyjnMOYq5qYqjlb_Tww-1; Tue, 30 Jul 2024 06:17:46 -0400
+X-MC-Unique: uQzzyjnMOYq5qYqjlb_Tww-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4281310bf7aso26447715e9.1
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 03:17:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722334559; x=1722939359;
+        d=1e100.net; s=20230601; t=1722334665; x=1722939465;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=owK5Gb4Y1b7hNFGBuCGYRLOJe16PvMmwqprOo8ysou4=;
-        b=UN+hKw62v5Fy7GNbicS+c94vAN0bhIEFbnZVq712OxNfQmDjAmGfrjoXwPSLmWg0gn
-         uJC0Q0tPvcxtPdJRK6IwDDSLpuIm/Yj40t5zTczWdv/iHaYtcwE7MpQ3w1GBrKzKnew+
-         YE2ZPcF6QX0HvuYMwm08LhsOLnipu9GcT6z63OPt3pHNEgOGJMDm4mfU6ocYzpv+pXp2
-         bh+6+gmMW/3Loi6/YwTOzh4sZhVb4IXppjCqZ6i7Yx892RlwzDfF9Svx0+IfxYl9rJmN
-         0TAniil4Z7W0ijNiSuGe17ypclzzNPJfQo5GOuqWNmtA5QLZfwQ96duw/C5ensRVfP1S
-         EXgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0uyj4ec0gHK/Otp9rF700qWFOpGFInQSOCD6ARend1Wz0RfNgVvsK+MsCmoOn+u2IX2HLeemGT2Qygrnl5Tb97ImR
-X-Gm-Message-State: AOJu0YyaRHgp+NxBX+6dF6IXOgVDVPNwsIrCiCyjVS+wrXepDeaWs6SQ
-	/RAkamlUcRVw4CjJ6zRqSIXBQrNfOa1haZRy/F943w2Wy5zrvpJALJAFh/FoOIJQmlrz4qjVwLj
-	vqT8iSh8ypRgJ0mhwLMKiCeKITFW6DqLz13gvgxk8rXl8PQutbA==
-X-Received: by 2002:a5d:460c:0:b0:368:4226:407b with SMTP id ffacd0b85a97d-36b5d2e7860mr8236513f8f.61.1722334559093;
-        Tue, 30 Jul 2024 03:15:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF56qKYCOfp4HJaJ7NS+ZhOVMI3IH9nTtAn+VcLyU2FNsz6VVLyBd3yEBsZtBOX8Gtk+U0bSQ==
-X-Received: by 2002:a5d:460c:0:b0:368:4226:407b with SMTP id ffacd0b85a97d-36b5d2e7860mr8236470f8f.61.1722334558451;
-        Tue, 30 Jul 2024 03:15:58 -0700 (PDT)
+        bh=zHRUb9ZKLORwY2zU7h4UGQhjsrDz/4w8N8RZFuBzYHM=;
+        b=GcUiIGhpw1MNFuOq50wcLomSjIxxSMKY7bjPIYMqZMpNyX28cL+98ZTcIJilflD/EC
+         K49UhFbdLF02tJtTXTg1c4HSllLRcBtRgvfeNYTYeMPmQhfuMBa3m5ZSPzdM7aXKNDXm
+         mhm5ZFIL5CpDAjyasy28oTDqxr6LcZPkdfPbBJFU/TuEjniwrVrbGMeB9lGOyK/V4Hf1
+         lmZ3fwnUfF6iwj0YhvwPQrvj/BzLrIXuVgqJ58hWOeeVJAd6ln11zMFENLkugDucgSbU
+         OtcFowfv4Nzsqv7BCRwwtBDa5nI7KkfaKw9d409GPY5wXTmAlw/Ql9bbrAv/c9eXmBDQ
+         4ohg==
+X-Forwarded-Encrypted: i=1; AJvYcCUyTXvHFFSer1IxgVjsZN5Un4o/xLSJL4KQm/ieYVTvJyWwsBL3m/7Kf7O/PbzzHl+zvaFlOZVZk9Etlj0TfOC5gACW
+X-Gm-Message-State: AOJu0YwkuDbDUGcR0QyNju34n3aNjj4L88y0ws37LkGJ/ntFQZVlPPJl
+	KG1JS2ZtpfZBv8oQfALH7SW5XWZfup4K+Gk93i4YkWnVJWfm7DY5b6i8NFcRnxHLjPNfWvXDp2Q
+	cSqaauKWtQ/rV4nL2GIyCkUMRFu4I0q4iviRWqMAJKoA0pWjyvQ==
+X-Received: by 2002:a05:600c:1d1f:b0:424:ad14:6b79 with SMTP id 5b1f17b1804b1-42811d6dbfbmr70600755e9.8.1722334665200;
+        Tue, 30 Jul 2024 03:17:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFaV3qdlWbx8GtSBR66ch3gw4ikSw7LdpBZJNqVhSBuZwL0kQOQs9tiBzue/s+Uc3umEEsqRQ==
+X-Received: by 2002:a05:600c:1d1f:b0:424:ad14:6b79 with SMTP id 5b1f17b1804b1-42811d6dbfbmr70600525e9.8.1722334664689;
+        Tue, 30 Jul 2024 03:17:44 -0700 (PDT)
 Received: from [192.168.3.141] (p4ff233ea.dip0.t-ipconnect.de. [79.242.51.234])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36b36857e46sm14365191f8f.67.2024.07.30.03.15.56
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4280d37bb88sm152794745e9.38.2024.07.30.03.17.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jul 2024 03:15:57 -0700 (PDT)
-Message-ID: <ab528aa0-d4a5-4661-9715-43eb1681cfef@redhat.com>
-Date: Tue, 30 Jul 2024 12:15:56 +0200
+        Tue, 30 Jul 2024 03:17:44 -0700 (PDT)
+Message-ID: <1195d9ce-3f16-4b11-b6d2-88f593a25e0d@redhat.com>
+Date: Tue, 30 Jul 2024 12:17:42 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,23 +83,20 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 8/8] kvm: gmem: Allow restricted userspace mappings
-To: Patrick Roy <roypat@amazon.co.uk>, seanjc@google.com,
- Fuad Tabba <tabba@google.com>
-Cc: pbonzini@redhat.com, akpm@linux-foundation.org, dwmw@amazon.co.uk,
- rppt@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+Subject: Re: [RFC PATCH 0/8] Unmapping guest_memfd from Direct Map
+To: Patrick Roy <roypat@amazon.co.uk>,
+ "Vlastimil Babka (SUSE)" <vbabka@kernel.org>, seanjc@google.com,
+ pbonzini@redhat.com, akpm@linux-foundation.org, dwmw@amazon.co.uk,
+ rppt@kernel.org
+Cc: tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
  dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
  willy@infradead.org, graf@amazon.com, derekmn@amazon.com,
  kalyazin@amazon.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, dmatlack@google.com, chao.p.peng@linux.intel.com,
- xmarcalx@amazon.co.uk, James Gowans <jgowans@amazon.com>
+ linux-mm@kvack.org, dmatlack@google.com, tabba@google.com,
+ chao.p.peng@linux.intel.com, xmarcalx@amazon.co.uk
 References: <20240709132041.3625501-1-roypat@amazon.co.uk>
- <20240709132041.3625501-9-roypat@amazon.co.uk>
- <CA+EHjTynVpsqsudSVRgOBdNSP_XjdgKQkY_LwdqvPkpJAnAYKg@mail.gmail.com>
- <47ce1b10-e031-4ac1-b88f-9d4194533745@redhat.com>
- <f7106744-2add-4346-b3b6-49239de34b7f@amazon.co.uk>
- <f21d8157-a5e9-4acb-93fc-d040e9b585c8@redhat.com>
- <e26ec0bb-3c20-4732-a09b-83b6b6a6419a@amazon.co.uk>
+ <e12b91ef-ca0c-4b77-840b-dcfb2c76a984@kernel.org>
+ <7e175521-38bb-49f0-b1fb-8820f8708c9c@amazon.co.uk>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -147,110 +144,55 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <e26ec0bb-3c20-4732-a09b-83b6b6a6419a@amazon.co.uk>
+In-Reply-To: <7e175521-38bb-49f0-b1fb-8820f8708c9c@amazon.co.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
->> Hi,
->>
->> sorry for the late reply. Yes, you could have joined .... too late.
+On 26.07.24 08:55, Patrick Roy wrote:
 > 
-> No worries, I did end up joining to listen in to y'all's discussion
-> anyway :)
-
-Sorry for the late reply :(
-
 > 
->> There will be a summary posted soon. So far the agreement is that we're
->> planning on allowing shared memory as part guest_memfd, and will allow
->> that to get mapped and pinned. Private memory is not going to get mapped
->> and pinned.
->>
->> If we have to disallow pinning of shared memory on top for some use
->> cases (i.e., no directmap), I assume that could be added.
->>
+> On Mon, 2024-07-22 at 13:28 +0100, "Vlastimil Babka (SUSE)" wrote:
+>>> === Implementation ===
 >>>
->>>> Note that just from staring at this commit, I don't understand the
->>>> motivation *why* we would want to do that.
+>>> This patch series introduces a new flag to the `KVM_CREATE_GUEST_MEMFD`
+>>> to remove its pages from the direct map when they are allocated. When
+>>> trying to run a guest from such a VM, we now face the problem that
+>>> without either userspace or kernelspace mappings of guest_memfd, KVM
+>>> cannot access guest memory to, for example, do MMIO emulation of access
+>>> memory used to guest/host communication. We have multiple options for
+>>> solving this when running non-CoCo VMs: (1) implement a TDX-light
+>>> solution, where the guest shares memory that KVM needs to access, and
+>>> relies on paravirtual solutions where this is not possible (e.g. MMIO),
+>>> (2) have KVM use userspace mappings of guest_memfd (e.g. a
+>>> memfd_secret-style solution), or (3) dynamically reinsert pages into the
+>>> direct map whenever KVM wants to access them.
 >>>
->>> Fair - I admittedly didn't get into that as much as I probably should
->>> have. In our usecase, we do not have anything that pKVM would (I think)
->>> call "guest-private" memory. I think our memory can be better described
->>> as guest-owned, but always shared with the VMM (e.g. userspace), but
->>> ideally never shared with the host kernel. This model lets us do a lot
->>> of simplifying assumptions: Things like I/O can be handled in userspace
->>> without the guest explicitly sharing I/O buffers (which is not exactly
->>> what we would want long-term anyway, as sharing in the guest_memfd
->>> context means sharing with the host kernel), we can easily do VM
->>> snapshotting without needing things like TDX's TDH.EXPORT.MEM APIs, etc.
+>>> This RFC goes for option (3). Option (1) is a lot of overhead for very
+>>> little gain, since we are not actually constrained by a physical
+>>> inability to access guest memory (e.g. we are not in a TDX context where
+>>> accesses to guest memory cause a #MC). Option (2) has previously been
+>>> rejected [1].
 >>
->> Okay, so essentially you would want to use guest_memfd to only contain
->> shard memory and disallow any pinning like for secretmem.
+>> Do the pages have to have the same address when they are temporarily mapped?
+>> Wouldn't it be easier to do something similar to kmap_local_page() used for
+>> HIMEM? I.e. you get a temporary kernel mapping to do what's needed, but it
+>> doesn't have to alter the shared directmap.
+>>
+>> Maybe that was already discussed somewhere as unsuitable but didn't spot it
+>> here.
 > 
-> Yeah, this is pretty much what I thought we wanted before listening in
-> on Wednesday.
-> 
-> I've actually be thinking about this some more since then though. With
-> hugepages, if the VM is backed by, say, 2M pages, our on-demand direct
-> map insertion approach runs into the same problem that CoCo VMs have
-> when they're backed by hugepages: How to deal with the guest only
-> sharing a 4K range in a hugepage? If we want to restore the direct map
-> for e.g. the page containing kvm-clock data, then we can't simply go
-> ahead and restore the direct map for the entire 2M page, because there
-> very well might be stuff in the other 511 small guest pages that we
-> really do not want in the direct map. And we can't even take the
+> For what I had prototyped here, there's no requirement to have the pages
+> mapped at the same address (I remember briefly looking at memremap to
+> achieve the temporary mappings, but since that doesnt work for normal
+> memory, I gave up on that path). However, I think guest_memfd is moving
+> into a direction where ranges marked as "in-place shared" (e.g. those
+> that are temporarily reinserted into the direct map in this RFC)  should
+> be able to be GUP'd [1]. I think for that the direct map entries would
+> need to be present, right?
 
-Right, you'd only want to restore the direct map for a fragment. Or 
-dynamically map that fragment using kmap where required (as raised by 
-Vlastimil).
-
-> approach of letting the guest deal with the problem, because here
-> "sharing" is driven by the host, not the guest, so the guest cannot
-> possibly know that it maybe should avoid putting stuff it doesn't want
-> shared into those remaining 511 pages! To me that sounds a lot like the
-> whole "breaking down huge folios to allow GUP to only some parts of it"
-> thing mentioned on Wednesday.
-
-Yes. While it would be one logical huge page, it would be exposed to the 
-remainder of the kernel as 512 individual pages.
-
-> 
-> Now, if we instead treat "guest memory without direct map entries" as
-> "private", and "guest memory with direct map entries" as "shared", then
-> the above will be solved by whatever mechanism allows gupping/mapping of
-> only the "shared" parts of huge folios, IIUC. The fact that GUP is then
-> also allowed for the "shared" parts is not actually a problem for us -
-> we went down the route of disabling GUP altogether here because based on
-> [1] it sounded like GUP for anything gmem related would never happen.
-
-Right. Might there also be a case for removing the directmap for shared 
-memory or is that not really a requirement so far?
-
-> But after something is re-inserted into the direct map, we don't very
-> much care if it can be GUP-ed or not. In fact, allowing GUP for the
-> shared parts probably makes some things easier for us, as we can then do
-> I/O without bounce buffers by just in-place converting I/O-buffers to
-> shared, and then treating that shared slice of guest_memfd the same way
-> we treat traditional guest memory today. 
-
-Yes.
-
-> In a very far-off future, we'd
-> like to be able to do I/O without ever reinserting pages into the direct
-> map, but I don't think adopting this private/shared model for gmem would
-> block us from doing that?
-
-How would that I/O get triggered? GUP would require the directmap.
-
-> 
-> Although all of this does hinge on us being able to do the in-place
-> shared/private conversion without any guest involvement. Do you envision
-> that to be possible?
-
-Who would trigger the conversion and how? I don't see a reason why -- 
-for your use case -- user space shouldn't be able to trigger conversion 
-private <-> shared. At least nothing fundamental comes to mind that 
-would prohibit that.
+Yes, we'd allow GUP. Of course, one could think of a similar extension 
+like secretmem that would allow shared memory to get mapped into user 
+page tables but would disallow any GUP on (shared) guest_memfd memory.
 
 -- 
 Cheers,
