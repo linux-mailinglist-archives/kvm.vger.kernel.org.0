@@ -1,53 +1,52 @@
-Return-Path: <kvm+bounces-22695-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22698-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99C039420DA
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 21:44:06 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82ED09420E1
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 21:44:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9405B2556A
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 19:44:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E862C1F20C71
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 19:44:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD1918DF7A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B91218DF90;
 	Tue, 30 Jul 2024 19:43:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qktH8i96"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NdbqZI7j"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32F9718C905;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64D1F18C93F;
 	Tue, 30 Jul 2024 19:43:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722368604; cv=none; b=N+6T2cv2Bx5tN0Nu8FFp37f8M9iRRk64bRzD7Tb5rENb9h90WAuvk8/PL/n0v42uPpIFGvkHCdvfn+jHvVzMl0Gs618iyNqMGXLPpkdxaM5EEwywlmea4+3lkE5IQ4Nz1CV0W9dt6LjSfUWsLB4OR0RchdTnMfcB9yWrkMnQqNQ=
+	t=1722368604; cv=none; b=P3IIBSBx1xoVMEeopTPjOetG8kpAyDKSMGkJzdaHRc1XZ2OnC8/EYveWgVXjC9hbz16NwmvfOg3Y0QrRz15PpvE5NeGvdP+5QfsnAsj/l/F24Nx3XlDf4d5rBqoVxhBFQspSMWTvefat4ZntYjMvvXIVFGBp4myjaHqeZ8NBeJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722368604; c=relaxed/simple;
-	bh=6lCPGgT/MjQ71CyNAkh9/mHfe5+s94LaNyBMunL30ug=;
+	bh=j/fo2OFH999A9qSU4xh304Mv47Te5RJL6dmqOmXHt78=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=YxNirjLH07JU16luBQMLbc61E0Bhb5rER+3tq6EimCZ7mXBhkWpsXqOS0dEm4e+BIh1I3HAUWsCIzv3y3pgHvX0IKuefdtglbss8NX+p8QiJ8jFlGBb6lWnprQFNxe6gMJ2ik5/d7aEHGka78vREij9qKaLAAj9kTIqVHeMhNWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qktH8i96; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0B3A6C4AF0A;
+	 In-Reply-To:To:Cc; b=AyMdo9BrRutevkGZZ6tQ7g9Wj7FeMzCySJUTYOE5QISDK7r6m+Sw7BA64XLJ+0/JP3LAbvmPFsJWiF4sJCq9Op3EhqpU1XD1nKDZftdFyOT2YR8pj8PdZWqNnE2tOOarimaajtKFbPs6cV9fNQJU+xA3YC9HFc066wek4nAJniI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NdbqZI7j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 173AAC4AF10;
 	Tue, 30 Jul 2024 19:43:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722368604;
-	bh=6lCPGgT/MjQ71CyNAkh9/mHfe5+s94LaNyBMunL30ug=;
+	bh=j/fo2OFH999A9qSU4xh304Mv47Te5RJL6dmqOmXHt78=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=qktH8i96nf7OMM662osvtEDoFegl2szUZkLc+7RnC58qxhGLYwK6Jvg+sZVfSOCNh
-	 8VK0Vv7NSg1uZ/GOmqsajCXr4kapxf3qfGErTQ+35WlnCPPiJ2xmXbKdT+f4VFUK+1
-	 bJJb6FaPCLe5OgtaygM6yiWrfCLXLBAkd5xfCKl2LlPAgQQKg/8+Ral+RWiSQazCVG
-	 ArHj+bpwpvMN+GAX16w1qz4tmDlVz3jsafLlhvhebaEqDmPNjP0LatAXPud1ZRWiFx
-	 W19EXFgXaYW8npjE+VimCA0jNoO8UjK1TWOC+t9Sur4avxa4BL7kSvz1QLh2CuiNYE
-	 3hMzoYMl/46RQ==
+	b=NdbqZI7j1mwKpVlKIHiv4WHnHCpVfeKAcqqRkQgQHqfl1eudE6Bjh5MjkrdJGIUY/
+	 S8axWZDy5X3t7qBgUgCdl2rdVhSEu1vpuxW2gu7PgDYPYCrtiUOSE4XRdTiQCPtdXo
+	 f+R5K9qE9hUpB47alAOecHwfAPcFvhYmRLj8GAfEsYOVRReD9rCYjbn6pm+Dg5Y7ZC
+	 hCTECxJaLEALk8GTDgCv+pb3AkGoGTqIf+1UZBuu4Ef9b0IWm8ElKkjqzeVe4OgAm0
+	 H1GGI4h84Rss/s7dsPSGqyTlFQR8WWnbZuOyyZ4qPst1pxHg/dTQEdNp5mSERBz//2
+	 EXYrRa/12JKeQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EFD37C3DA49;
-	Tue, 30 Jul 2024 19:43:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C2A5C52D1F;
+	Tue, 30 Jul 2024 19:43:24 +0000 (UTC)
 From: Luigi Leonardi via B4 Relay <devnull+luigi.leonardi.outlook.com@kernel.org>
-Date: Tue, 30 Jul 2024 21:43:07 +0200
-Subject: [PATCH net-next v4 2/3] vsock/virtio: add SIOCOUTQ support for all
- virtio based transports
+Date: Tue, 30 Jul 2024 21:43:08 +0200
+Subject: [PATCH net-next v4 3/3] test/vsock: add ioctl unsent bytes test
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,7 +55,7 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240730-ioctl-v4-2-16d89286a8f0@outlook.com>
+Message-Id: <20240730-ioctl-v4-3-16d89286a8f0@outlook.com>
 References: <20240730-ioctl-v4-0-16d89286a8f0@outlook.com>
 In-Reply-To: <20240730-ioctl-v4-0-16d89286a8f0@outlook.com>
 To: Stefano Garzarella <sgarzare@redhat.com>, 
@@ -70,11 +69,11 @@ Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, kvm@vger.kernel.org, 
  Luigi Leonardi <luigi.leonardi@outlook.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1722368602; l=6312;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1722368602; l=5479;
  i=luigi.leonardi@outlook.com; s=20240730; h=from:subject:message-id;
- bh=WM5tJQ1sMl6dPQu1pIvYS3xrLkM7dMksggWh3AWnClI=;
- b=7Ojx1gE9NnSDikaMVsaz93NrWsStuAfd1/SUnR9xgkS9GPgrokXgxWZA5dlwMmbmIKIiiTfc6
- 4Y/HE6BjCg+D6gmA8jb40qnVhOKCl2P6XlxA0TJ7xLhdyQgHlI05eWS
+ bh=APW6nchLTElCgi+y0wB3e/LaM6SJ5yQdNDfK3On80wM=;
+ b=97r8rgp6DZOr8aqfPUPmSUoJA44xtHMwxUN0Qd1Fq+lBE3fV89JC0Hdhe3Vr/alBrGB3UwUTv
+ gP1THUkXLHgDaGhyqwvFNLlIbMJHyqjYztEWQQVPTRTHmhhsnGz8eu3
 X-Developer-Key: i=luigi.leonardi@outlook.com; a=ed25519;
  pk=rejHGgcyJQFeByIJsRIz/gA6pOPZJ1I2fpxoFD/jris=
 X-Endpoint-Received: by B4 Relay for luigi.leonardi@outlook.com/20240730
@@ -84,186 +83,169 @@ Reply-To: luigi.leonardi@outlook.com
 
 From: Luigi Leonardi <luigi.leonardi@outlook.com>
 
-Introduce support for virtio_transport_unsent_bytes
-ioctl for virtio_transport, vhost_vsock and vsock_loopback.
+Introduce two tests, one for SOCK_STREAM and one for SOCK_SEQPACKET,
+which use SIOCOUTQ ioctl to check that the number of unsent bytes is
+zero after delivering a packet.
 
-For all transports the unsent bytes counter is incremented
-in virtio_transport_get_credit.
-
-In virtio_transport (G2H) and in vhost-vsock (H2G) the counter
-is decremented when the skbuff is consumed. In vsock_loopback the
-same skbuff is passed from the transmitter to the receiver, so
-the counter is decremented before queuing the skbuff to the
-receiver.
+vsock_connect and vsock_accept are no longer static: this is to
+create more generic tests, allowing code to be reused for SEQPACKET
+and STREAM.
 
 Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
 ---
- drivers/vhost/vsock.c                   |  4 +++-
- include/linux/virtio_vsock.h            |  6 ++++++
- net/vmw_vsock/virtio_transport.c        |  4 +++-
- net/vmw_vsock/virtio_transport_common.c | 35 +++++++++++++++++++++++++++++++++
- net/vmw_vsock/vsock_loopback.c          |  6 ++++++
- 5 files changed, 53 insertions(+), 2 deletions(-)
+ tools/testing/vsock/util.c       |  6 +--
+ tools/testing/vsock/util.h       |  3 ++
+ tools/testing/vsock/vsock_test.c | 85 ++++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 91 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-index bf664ec9341b..802153e23073 100644
---- a/drivers/vhost/vsock.c
-+++ b/drivers/vhost/vsock.c
-@@ -244,7 +244,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
- 					restart_tx = true;
- 			}
- 
--			consume_skb(skb);
-+			virtio_transport_consume_skb_sent(skb, true);
- 		}
- 	} while(likely(!vhost_exceeds_weight(vq, ++pkts, total_len)));
- 	if (added)
-@@ -451,6 +451,8 @@ static struct virtio_transport vhost_transport = {
- 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
- 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
- 
-+		.unsent_bytes             = virtio_transport_unsent_bytes,
-+
- 		.read_skb = virtio_transport_read_skb,
- 	},
- 
-diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-index c82089dee0c8..0387d64e2c66 100644
---- a/include/linux/virtio_vsock.h
-+++ b/include/linux/virtio_vsock.h
-@@ -133,6 +133,7 @@ struct virtio_vsock_sock {
- 	u32 tx_cnt;
- 	u32 peer_fwd_cnt;
- 	u32 peer_buf_alloc;
-+	size_t bytes_unsent;
- 
- 	/* Protected by rx_lock */
- 	u32 fwd_cnt;
-@@ -193,6 +194,11 @@ s64 virtio_transport_stream_has_data(struct vsock_sock *vsk);
- s64 virtio_transport_stream_has_space(struct vsock_sock *vsk);
- u32 virtio_transport_seqpacket_has_data(struct vsock_sock *vsk);
- 
-+ssize_t virtio_transport_unsent_bytes(struct vsock_sock *vsk);
-+
-+void virtio_transport_consume_skb_sent(struct sk_buff *skb,
-+				       bool consume);
-+
- int virtio_transport_do_socket_init(struct vsock_sock *vsk,
- 				 struct vsock_sock *psk);
- int
-diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-index 64a07acfef12..e0160da4ef43 100644
---- a/net/vmw_vsock/virtio_transport.c
-+++ b/net/vmw_vsock/virtio_transport.c
-@@ -311,7 +311,7 @@ static void virtio_transport_tx_work(struct work_struct *work)
- 
- 		virtqueue_disable_cb(vq);
- 		while ((skb = virtqueue_get_buf(vq, &len)) != NULL) {
--			consume_skb(skb);
-+			virtio_transport_consume_skb_sent(skb, true);
- 			added = true;
- 		}
- 	} while (!virtqueue_enable_cb(vq));
-@@ -540,6 +540,8 @@ static struct virtio_transport virtio_transport = {
- 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
- 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
- 
-+		.unsent_bytes             = virtio_transport_unsent_bytes,
-+
- 		.read_skb = virtio_transport_read_skb,
- 	},
- 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index 16ff976a86e3..884ee128851e 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -463,6 +463,26 @@ void virtio_transport_inc_tx_pkt(struct virtio_vsock_sock *vvs, struct sk_buff *
+diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+index 554b290fefdc..a3d448a075e3 100644
+--- a/tools/testing/vsock/util.c
++++ b/tools/testing/vsock/util.c
+@@ -139,7 +139,7 @@ int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_po
  }
- EXPORT_SYMBOL_GPL(virtio_transport_inc_tx_pkt);
  
-+void virtio_transport_consume_skb_sent(struct sk_buff *skb, bool consume)
+ /* Connect to <cid, port> and return the file descriptor. */
+-static int vsock_connect(unsigned int cid, unsigned int port, int type)
++int vsock_connect(unsigned int cid, unsigned int port, int type)
+ {
+ 	union {
+ 		struct sockaddr sa;
+@@ -226,8 +226,8 @@ static int vsock_listen(unsigned int cid, unsigned int port, int type)
+ /* Listen on <cid, port> and return the first incoming connection.  The remote
+  * address is stored to clientaddrp.  clientaddrp may be NULL.
+  */
+-static int vsock_accept(unsigned int cid, unsigned int port,
+-			struct sockaddr_vm *clientaddrp, int type)
++int vsock_accept(unsigned int cid, unsigned int port,
++		 struct sockaddr_vm *clientaddrp, int type)
+ {
+ 	union {
+ 		struct sockaddr sa;
+diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+index e95e62485959..fff22d4a14c0 100644
+--- a/tools/testing/vsock/util.h
++++ b/tools/testing/vsock/util.h
+@@ -39,6 +39,9 @@ struct test_case {
+ void init_signals(void);
+ unsigned int parse_cid(const char *str);
+ unsigned int parse_port(const char *str);
++int vsock_connect(unsigned int cid, unsigned int port, int type);
++int vsock_accept(unsigned int cid, unsigned int port,
++		 struct sockaddr_vm *clientaddrp, int type);
+ int vsock_stream_connect(unsigned int cid, unsigned int port);
+ int vsock_bind_connect(unsigned int cid, unsigned int port,
+ 		       unsigned int bind_port, int type);
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index f851f8961247..8d38dbf8f41f 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -20,6 +20,8 @@
+ #include <sys/mman.h>
+ #include <poll.h>
+ #include <signal.h>
++#include <sys/ioctl.h>
++#include <linux/sockios.h>
+ 
+ #include "vsock_test_zerocopy.h"
+ #include "timeout.h"
+@@ -1238,6 +1240,79 @@ static void test_double_bind_connect_client(const struct test_opts *opts)
+ 	}
+ }
+ 
++#define MSG_BUF_IOCTL_LEN 64
++static void test_unsent_bytes_server(const struct test_opts *opts, int type)
 +{
-+	struct sock *s = skb->sk;
++	unsigned char buf[MSG_BUF_IOCTL_LEN];
++	int client_fd;
 +
-+	if (s && skb->len) {
-+		struct vsock_sock *vs = vsock_sk(s);
-+		struct virtio_vsock_sock *vvs;
-+
-+		vvs = vs->trans;
-+
-+		spin_lock_bh(&vvs->tx_lock);
-+		vvs->bytes_unsent -= skb->len;
-+		spin_unlock_bh(&vvs->tx_lock);
++	client_fd = vsock_accept(VMADDR_CID_ANY, opts->peer_port, NULL, type);
++	if (client_fd < 0) {
++		perror("accept");
++		exit(EXIT_FAILURE);
 +	}
 +
-+	if (consume)
-+		consume_skb(skb);
-+}
-+EXPORT_SYMBOL_GPL(virtio_transport_consume_skb_sent);
++	recv_buf(client_fd, buf, sizeof(buf), 0, sizeof(buf));
++	control_writeln("RECEIVED");
 +
- u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
- {
- 	u32 ret;
-@@ -475,6 +495,7 @@ u32 virtio_transport_get_credit(struct virtio_vsock_sock *vvs, u32 credit)
- 	if (ret > credit)
- 		ret = credit;
- 	vvs->tx_cnt += ret;
-+	vvs->bytes_unsent += ret;
- 	spin_unlock_bh(&vvs->tx_lock);
- 
- 	return ret;
-@@ -488,6 +509,7 @@ void virtio_transport_put_credit(struct virtio_vsock_sock *vvs, u32 credit)
- 
- 	spin_lock_bh(&vvs->tx_lock);
- 	vvs->tx_cnt -= credit;
-+	vvs->bytes_unsent -= credit;
- 	spin_unlock_bh(&vvs->tx_lock);
- }
- EXPORT_SYMBOL_GPL(virtio_transport_put_credit);
-@@ -1090,6 +1112,19 @@ void virtio_transport_destruct(struct vsock_sock *vsk)
- }
- EXPORT_SYMBOL_GPL(virtio_transport_destruct);
- 
-+ssize_t virtio_transport_unsent_bytes(struct vsock_sock *vsk)
++	close(client_fd);
++}
++
++static void test_unsent_bytes_client(const struct test_opts *opts, int type)
 +{
-+	struct virtio_vsock_sock *vvs = vsk->trans;
-+	size_t ret;
++	unsigned char buf[MSG_BUF_IOCTL_LEN];
++	int ret, fd, sock_bytes_unsent;
 +
-+	spin_lock_bh(&vvs->tx_lock);
-+	ret = vvs->bytes_unsent;
-+	spin_unlock_bh(&vvs->tx_lock);
++	fd = vsock_connect(opts->peer_cid, opts->peer_port, type);
++	if (fd < 0) {
++		perror("connect");
++		exit(EXIT_FAILURE);
++	}
 +
-+	return ret;
++	for (int i = 0; i < sizeof(buf); i++)
++		buf[i] = rand() & 0xFF;
++
++	send_buf(fd, buf, sizeof(buf), 0, sizeof(buf));
++	control_expectln("RECEIVED");
++
++	ret = ioctl(fd, SIOCOUTQ, &sock_bytes_unsent);
++	if (ret < 0) {
++		if (errno == EOPNOTSUPP) {
++			fprintf(stderr, "Test skipped, SIOCOUTQ not supported.\n");
++		} else {
++			perror("ioctl");
++			exit(EXIT_FAILURE);
++		}
++	} else if (ret == 0 && sock_bytes_unsent != 0) {
++		fprintf(stderr,
++			"Unexpected 'SIOCOUTQ' value, expected 0, got %i\n",
++			sock_bytes_unsent);
++		exit(EXIT_FAILURE);
++	}
++
++	close(fd);
 +}
-+EXPORT_SYMBOL_GPL(virtio_transport_unsent_bytes);
 +
- static int virtio_transport_reset(struct vsock_sock *vsk,
- 				  struct sk_buff *skb)
- {
-diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
-index 6dea6119f5b2..6e78927a598e 100644
---- a/net/vmw_vsock/vsock_loopback.c
-+++ b/net/vmw_vsock/vsock_loopback.c
-@@ -98,6 +98,8 @@ static struct virtio_transport loopback_transport = {
- 		.notify_buffer_size       = virtio_transport_notify_buffer_size,
- 		.notify_set_rcvlowat      = virtio_transport_notify_set_rcvlowat,
- 
-+		.unsent_bytes             = virtio_transport_unsent_bytes,
++static void test_stream_unsent_bytes_client(const struct test_opts *opts)
++{
++	test_unsent_bytes_client(opts, SOCK_STREAM);
++}
 +
- 		.read_skb = virtio_transport_read_skb,
++static void test_stream_unsent_bytes_server(const struct test_opts *opts)
++{
++	test_unsent_bytes_server(opts, SOCK_STREAM);
++}
++
++static void test_seqpacket_unsent_bytes_client(const struct test_opts *opts)
++{
++	test_unsent_bytes_client(opts, SOCK_SEQPACKET);
++}
++
++static void test_seqpacket_unsent_bytes_server(const struct test_opts *opts)
++{
++	test_unsent_bytes_server(opts, SOCK_SEQPACKET);
++}
++
+ #define RCVLOWAT_CREDIT_UPD_BUF_SIZE	(1024 * 128)
+ /* This define is the same as in 'include/linux/virtio_vsock.h':
+  * it is used to decide when to send credit update message during
+@@ -1523,6 +1598,16 @@ static struct test_case test_cases[] = {
+ 		.run_client = test_stream_rcvlowat_def_cred_upd_client,
+ 		.run_server = test_stream_cred_upd_on_low_rx_bytes,
  	},
++	{
++		.name = "SOCK_STREAM ioctl(SIOCOUTQ) 0 unsent bytes",
++		.run_client = test_stream_unsent_bytes_client,
++		.run_server = test_stream_unsent_bytes_server,
++	},
++	{
++		.name = "SOCK_SEQPACKET ioctl(SIOCOUTQ) 0 unsent bytes",
++		.run_client = test_seqpacket_unsent_bytes_client,
++		.run_server = test_seqpacket_unsent_bytes_server,
++	},
+ 	{},
+ };
  
-@@ -123,6 +125,10 @@ static void vsock_loopback_work(struct work_struct *work)
- 	spin_unlock_bh(&vsock->pkt_queue.lock);
- 
- 	while ((skb = __skb_dequeue(&pkts))) {
-+		/* Decrement the bytes_unsent counter without deallocating skb
-+		 * It is freed by the receiver.
-+		 */
-+		virtio_transport_consume_skb_sent(skb, false);
- 		virtio_transport_deliver_tap_pkt(skb);
- 		virtio_transport_recv_pkt(&loopback_transport, skb);
- 	}
 
 -- 
 2.45.2
