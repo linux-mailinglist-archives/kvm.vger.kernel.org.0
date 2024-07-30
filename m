@@ -1,287 +1,158 @@
-Return-Path: <kvm+bounces-22653-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22654-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5ADD5940D2D
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 11:14:12 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA1D0940D36
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 11:17:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC7631F2420F
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 09:14:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28EFC1F24648
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 09:17:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42EC3194A6B;
-	Tue, 30 Jul 2024 09:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A775194ACD;
+	Tue, 30 Jul 2024 09:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a2+7B9Yf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FsaST5ui"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7506194A56
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 09:13:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A47FC194AC7
+	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 09:16:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722330837; cv=none; b=QRV84R+jOLsCWknbY5EjYiDkOiVpP46dvJ7rY7bjzh7vVbnqeiu6XlplA2rpHJK5ZTT7AiJPrCKD7tGhup5NgCo0WdeP+0BCehlxPTVxZH2ICK4AzyzpQ1cZURR68jgU5I4sh4CyLXyswr1XGIt5zmBt9jD/QpeRPrQ+n+c2dKE=
+	t=1722331013; cv=none; b=favfQj8PoED79gFV109iHsc+s6CdVZnvRWya5t+k3qcEax9u4t2LdaTNtLfIxmN47HEGGfgl9+Y4N7Uw1Fe/2BcPGS2Y36o0kAUT0eCHQA/FQzkcYStFdtjYRNEo+Kqnz9eXtlm1vJ2PmuGlpb3pDW+qayuE8E9Jdov0VDqvxpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722330837; c=relaxed/simple;
-	bh=0fAab6w8aA/2ybHIRHyjn5sqMbiIUBA20w3jkUPQBtQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M8voV/jap7EKBYqE1oxY4DgXlr4TkLtXwDr7Tm2bF+8klAhjeHE1Px0vNzv7oOdC+2ODJrAfPjMzv9fJlKql0vandwPCgCdj7HIs/XS41b2gy3V3SrG2xItIMnRb13S3zcp0twmFi7d2Wb0i88OAuhtnKSNDUOa0eFp0nMfuE7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a2+7B9Yf; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1722331013; c=relaxed/simple;
+	bh=RujWWFICNS+D3KtquiXXKYFpSP4yMEPxvb8x0tkvbGg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Wy+wy3CPTUGJSIoUvP0d51V+zP5YTIVIKcCuEpFfsL75FWjDM38FgLNI/3+Pi2DRj//avF5g6ZbTYpFMT8Se/irm8SqKmXJ3I76l+56eNWRIY4+pMTos0U0rTM3ScuqWy70IXZM9avPKwWYZgwuNQUhZEiPkMmql3pgSTrcuu3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FsaST5ui; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722330834;
-	h=from:from:reply-to:reply-to:subject:subject:date:date:
-	 message-id:message-id:to:to:cc:cc:mime-version:mime-version:
-	 content-type:content-type:
+	s=mimecast20190719; t=1722331010;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oSLlIJR2ZPU1Tj2WbafVSnV32Cdn2vklNmUjcUUffwU=;
-	b=a2+7B9YfburTALjG3rqrdOHHZPfIHY2QIn8nxtM2G9TAC89cB9ByV1yEafDpMTGzasAku3
-	yQMgl1yhPyx/RWXDnIeZdtqI+gCxx05G+DIO79JirrPvyM49BPIp2mlvz7BMw9XRoLIgbT
-	cFTLU/3IQnha1XBsmy9c6f0DNPh7g+Y=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-121-C85vXwjOPM67FfiNoxbJfw-1; Tue,
- 30 Jul 2024 05:13:48 -0400
-X-MC-Unique: C85vXwjOPM67FfiNoxbJfw-1
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 571EC1955D4F;
-	Tue, 30 Jul 2024 09:13:43 +0000 (UTC)
-Received: from redhat.com (unknown [10.42.28.108])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E423B1955E89;
-	Tue, 30 Jul 2024 09:13:28 +0000 (UTC)
-Date: Tue, 30 Jul 2024 10:13:25 +0100
-From: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com,
-	andrew@codeconstruct.com.au, andrew@daynix.com,
-	arei.gonglei@huawei.com, berto@igalia.com,
-	borntraeger@linux.ibm.com, clg@kaod.org, david@redhat.com,
-	den@openvz.org, eblake@redhat.com, eduardo@habkost.net,
-	farman@linux.ibm.com, farosas@suse.de, hreitz@redhat.com,
-	idryomov@gmail.com, iii@linux.ibm.com, jamin_lin@aspeedtech.com,
-	jasowang@redhat.com, joel@jms.id.au, jsnow@redhat.com,
-	kwolf@redhat.com, leetroy@gmail.com, marcandre.lureau@redhat.com,
-	marcel.apfelbaum@gmail.com, michael.roth@amd.com, mst@redhat.com,
-	mtosatti@redhat.com, nsg@linux.ibm.com, pasic@linux.ibm.com,
-	pbonzini@redhat.com, peter.maydell@linaro.org, peterx@redhat.com,
-	philmd@linaro.org, pizhenwei@bytedance.com, pl@dlhnet.de,
-	richard.henderson@linaro.org, stefanha@redhat.com,
-	steven_lee@aspeedtech.com, thuth@redhat.com,
-	vsementsov@yandex-team.ru, wangyanan55@huawei.com,
-	yuri.benditovich@daynix.com, zhao1.liu@intel.com,
-	qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-s390x@nongnu.org,
-	kvm@vger.kernel.org
-Subject: Re: [PATCH 01/18] qapi: Smarter camel_to_upper() to reduce need for
- 'prefix'
-Message-ID: <ZqiutRoQuAsrllfj@redhat.com>
-Reply-To: Daniel =?utf-8?B?UC4gQmVycmFuZ8Op?= <berrange@redhat.com>
-References: <20240730081032.1246748-1-armbru@redhat.com>
- <20240730081032.1246748-2-armbru@redhat.com>
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=wSoM14Hbf8JWs7i+OFUf4B4qSfihpmSQKAXrIRgdk1Q=;
+	b=FsaST5uiIFtUY5E1HpK4WVMWvX5nucACBCNyS8O8Cku73AOY/cmZDFG6D5her0WGSG6BAn
+	/p60Rf3KByGRpTQ/EiBm+/bDEbOveynz84Pclsvp+I4w3i10/0UqPtkVSMKT97MpD7mGnR
+	vqYVFQr7rEU8pxQT5ygPlYhE7buwv9M=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-279-aSOqD3fKOPK_T7V8XBcMnw-1; Tue, 30 Jul 2024 05:16:48 -0400
+X-MC-Unique: aSOqD3fKOPK_T7V8XBcMnw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-52fcb0f226bso5440971e87.0
+        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 02:16:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722331007; x=1722935807;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wSoM14Hbf8JWs7i+OFUf4B4qSfihpmSQKAXrIRgdk1Q=;
+        b=SXi4MgSQSAbBMiL1N4LcqQaD1jtTzm0jqoJMqJbU7S6FmH44uwyN54YTXLqi+Gj0ZV
+         T4mglan+Dr0miqqT5nzLBGYuAm4vujH9EiWye8tJgdmXzyRwN80TwrXLaCLcXoY3JVLH
+         OQBj3kjF9BSUoV0SaOAYdFk7Gyrm9P4BWed6gkwmRO7PkurGi4rTAjYCY6YhPUTC51kD
+         gzplkPOpFhDuvGBt8zs2IGmToP/pUhfF20z9SoQSis+7t9afMG68i+uuV5DecEq/CH4a
+         Hn97nDCPuDSqaOXzTqZctgiahrDX7mD6IDQuD9QQYkzGU+QCL3g1PAjVT2pDfApH/dEw
+         +wxw==
+X-Gm-Message-State: AOJu0YwY99YWij211/qQ/BNE1LelMNh7TvhH8L8+hWZHLN1yjpTrdC+x
+	dIch8wTto/QV0oY7WKMJPYKn4LuYyTvelmrZtGlh7wj6ciff9UJI07HJ2y3VxnW0Ao5tmGg54vO
+	i8VTgy6CFMhv2UEMGNS5IytLQNcTLe/kesXxTAslVckJm7BDJMQ==
+X-Received: by 2002:ac2:4f12:0:b0:530:aa4b:81c7 with SMTP id 2adb3069b0e04-530aa4b8305mr2006857e87.59.1722331006985;
+        Tue, 30 Jul 2024 02:16:46 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEUF9I37oQHPenEa9PRrwCd26iqWipagbaN7wiWJUc1E4LVMqyaRp/Za4G9rA85eSycTZnByA==
+X-Received: by 2002:ac2:4f12:0:b0:530:aa4b:81c7 with SMTP id 2adb3069b0e04-530aa4b8305mr2006827e87.59.1722331006424;
+        Tue, 30 Jul 2024 02:16:46 -0700 (PDT)
+Received: from [192.168.10.47] ([151.95.101.29])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a7acab4ded1sm618552566b.56.2024.07.30.02.16.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jul 2024 02:16:45 -0700 (PDT)
+Message-ID: <db00e68b-2b34-49e1-aa72-425a35534762@redhat.com>
+Date: Tue, 30 Jul 2024 11:16:43 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240730081032.1246748-2-armbru@redhat.com>
-User-Agent: Mutt/2.2.12 (2023-09-09)
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: x86/mmu: Conditionally call kvm_zap_obsolete_pages
+To: flyingpenghao@gmail.com, seanjc@google.com
+Cc: kvm@vger.kernel.org, Peng Hao <flyingpeng@tencent.com>
+References: <20240730053215.33768-1-flyingpeng@tencent.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <20240730053215.33768-1-flyingpeng@tencent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jul 30, 2024 at 10:10:15AM +0200, Markus Armbruster wrote:
-> camel_to_upper() converts its argument from camel case to upper case
-> with '_' between words.  Used for generated enumeration constant
-> prefixes.
+On 7/30/24 07:32, flyingpenghao@gmail.com wrote:
 > 
-> When some of the words are spelled all caps, where exactly to insert
-> '_' is guesswork.  camel_to_upper()'s guesses are bad enough in places
-> to make people override them with a 'prefix' in the schema.
+> When tdp_mmu is enabled, invalid root calls kvm_tdp_mmu_zap_invalidated_roots
+> to implement it, and kvm_zap_obsolete_pages is not used.
 > 
-> Rewrite it to guess better:
-> 
-> 1. Insert '_' after a non-upper case character followed by an upper
->    case character:
-> 
->        OneTwo -> ONE_TWO
->        One2Three -> ONE2_THREE
-> 
-> 2. Insert '_' before the last upper case character followed by a
->    non-upper case character:
-> 
->        ACRONYMWord -> ACRONYM_Word
-> 
->    Except at the beginning (as in OneTwo above), or when there is
->    already one:
-> 
->        AbCd -> AB_CD
-> 
-> This changes the default enumeration constant prefix for a number of
-> enums.  Generated enumeration constants change only where the default
-> is not overridden with 'prefix'.
-> 
-> The following enumerations without a 'prefix' change:
-> 
->     enum       	     	 	    old camel_to_upper()
->     				    new camel_to_upper()
->     ------------------------------------------------------------------
->     DisplayGLMode                   DISPLAYGL_MODE
-> 				    DISPLAY_GL_MODE
->     EbpfProgramID                   EBPF_PROGRAMID
-> 				    EBPF_PROGRAM_ID
->     HmatLBDataType                  HMATLB_DATA_TYPE
-> 				    HMAT_LB_DATA_TYPE
->     HmatLBMemoryHierarchy           HMATLB_MEMORY_HIERARCHY
-> 				    HMAT_LB_MEMORY_HIERARCHY
->     MultiFDCompression              MULTIFD_COMPRESSION
-> 				    MULTI_FD_COMPRESSION
->     OffAutoPCIBAR                   OFF_AUTOPCIBAR
-> 				    OFF_AUTO_PCIBAR
->     QCryptoBlockFormat              Q_CRYPTO_BLOCK_FORMAT
-> 				    QCRYPTO_BLOCK_FORMAT
->     QCryptoBlockLUKSKeyslotState    Q_CRYPTO_BLOCKLUKS_KEYSLOT_STATE
-> 				    QCRYPTO_BLOCK_LUKS_KEYSLOT_STATE
->     QKeyCode                        Q_KEY_CODE
->     				    QKEY_CODE
->     XDbgBlockGraphNodeType          X_DBG_BLOCK_GRAPH_NODE_TYPE
-> 				    XDBG_BLOCK_GRAPH_NODE_TYPE
->     TestUnionEnumA		    TEST_UNION_ENUMA
->     				    TEST_UNION_ENUM_A
-> 
-> Add a 'prefix' so generated code doesn't change now.  Subsequent
-> commits will remove most of them again.  Two will remain:
-> MULTIFD_COMPRESSION, because migration code generally spells "multifd"
-> that way, and Q_KEY_CODE, because that one is baked into
-> subprojects/keycodemapdb/tools/keymap-gen.
-> 
-> The following enumerations with a 'prefix' change so that the prefix
-> is now superfluous:
-> 
->     enum       	     	 	    old camel_to_upper()
->     				    new camel_to_upper() [equal to prefix]
->     ------------------------------------------------------------------
->     BlkdebugIOType                  BLKDEBUGIO_TYPE
-> 				    BLKDEBUG_IO_TYPE
->     QCryptoTLSCredsEndpoint         Q_CRYPTOTLS_CREDS_ENDPOINT
-> 				    QCRYPTO_TLS_CREDS_ENDPOINT
->     QCryptoSecretFormat             Q_CRYPTO_SECRET_FORMAT
-> 				    QCRYPTO_SECRET_FORMAT
->     QCryptoCipherMode               Q_CRYPTO_CIPHER_MODE
-> 				    QCRYPTO_CIPHER_MODE
->     QCryptodevBackendType           Q_CRYPTODEV_BACKEND_TYPE
-> 				    QCRYPTODEV_BACKEND_TYPE
->     QType [builtin]                 Q_TYPE
-> 				    QTYPE
-> 
-> Drop these prefixes.
-> 
-> The following enumerations with a 'prefix' change without making the
-> 'prefix' superfluous:
-> 
->     enum       	     	 	    old camel_to_upper()
->     				    new camel_to_upper() [equal to prefix]
-> 				    prefix
->     ------------------------------------------------------------------
->     CpuS390Entitlement              CPUS390_ENTITLEMENT
-> 				    CPU_S390_ENTITLEMENT
-> 				    S390_CPU_ENTITLEMENT
->     CpuS390Polarization             CPUS390_POLARIZATION
-> 				    CPU_S390_POLARIZATION
-> 				    S390_CPU_POLARIZATION
->     CpuS390State                    CPUS390_STATE
-> 				    CPU_S390_STATE
-> 				    S390_CPU_STATE
->     QAuthZListFormat                Q_AUTHZ_LIST_FORMAT
-> 				    QAUTH_Z_LIST_FORMAT
-> 				    QAUTHZ_LIST_FORMAT
->     QAuthZListPolicy                Q_AUTHZ_LIST_POLICY
-> 				    QAUTH_Z_LIST_POLICY
-> 				    QAUTHZ_LIST_POLICY
->     QCryptoAkCipherAlgorithm        Q_CRYPTO_AK_CIPHER_ALGORITHM
-> 				    QCRYPTO_AK_CIPHER_ALGORITHM
-> 				    QCRYPTO_AKCIPHER_ALG
->     QCryptoAkCipherKeyType          Q_CRYPTO_AK_CIPHER_KEY_TYPE
-> 				    QCRYPTO_AK_CIPHER_KEY_TYPE
-> 				    QCRYPTO_AKCIPHER_KEY_TYPE
->     QCryptoCipherAlgorithm          Q_CRYPTO_CIPHER_ALGORITHM
-> 				    QCRYPTO_CIPHER_ALGORITHM
-> 				    QCRYPTO_CIPHER_ALG
->     QCryptoHashAlgorithm            Q_CRYPTO_HASH_ALGORITHM
-> 				    QCRYPTO_HASH_ALGORITHM
-> 				    QCRYPTO_HASH_ALG
->     QCryptoIVGenAlgorithm           Q_CRYPTOIV_GEN_ALGORITHM
-> 				    QCRYPTO_IV_GEN_ALGORITHM
-> 				    QCRYPTO_IVGEN_ALG
->     QCryptoRSAPaddingAlgorithm      Q_CRYPTORSA_PADDING_ALGORITHM
-> 				    QCRYPTO_RSA_PADDING_ALGORITHM
-> 				    QCRYPTO_RSA_PADDING_ALG
->     QCryptodevBackendAlgType        Q_CRYPTODEV_BACKEND_ALG_TYPE
-> 				    QCRYPTODEV_BACKEND_ALG_TYPE
-> 				    QCRYPTODEV_BACKEND_ALG
->     QCryptodevBackendServiceType    Q_CRYPTODEV_BACKEND_SERVICE_TYPE
-> 				    QCRYPTODEV_BACKEND_SERVICE_TYPE
-> 				    QCRYPTODEV_BACKEND_SERVICE
-> 
-> Subsequent commits will tweak things to remove most of these prefixes.
-> Only QAUTHZ_LIST_FORMAT and QAUTHZ_LIST_POLICY will remain.
-
-IIUC from above those two result in 
-
-			    QAUTH_Z_LIST_FORMAT
-			    QAUTH_Z_LIST_POLICY
-
-Is it possible to add a 3rd rule
-
- *  Single uppercase letter folds into the previous word
-
-or are there valid cases where we have a single uppercase
-that we want to preserve ?
-
-It sure would be nice to eliminate the 'prefix' concept,
-that we've clearly over-used, if we can kill the only 2
-remaining examples.
-
-> 
-> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> Signed-off-by: Peng Hao<flyingpeng@tencent.com>
 > ---
->  qapi/block-core.json                     |  3 +-
->  qapi/common.json                         |  1 +
->  qapi/crypto.json                         |  6 ++--
->  qapi/cryptodev.json                      |  1 -
->  qapi/ebpf.json                           |  1 +
->  qapi/machine.json                        |  1 +
->  qapi/migration.json                      |  1 +
->  qapi/ui.json                             |  2 ++
->  scripts/qapi/common.py                   | 42 ++++++++++++++----------
->  scripts/qapi/schema.py                   |  2 +-
->  tests/qapi-schema/alternate-array.out    |  1 -
->  tests/qapi-schema/comments.out           |  1 -
->  tests/qapi-schema/doc-good.out           |  1 -
->  tests/qapi-schema/empty.out              |  1 -
->  tests/qapi-schema/include-repetition.out |  1 -
->  tests/qapi-schema/include-simple.out     |  1 -
->  tests/qapi-schema/indented-expr.out      |  1 -
->  tests/qapi-schema/qapi-schema-test.json  |  1 +
->  tests/qapi-schema/qapi-schema-test.out   |  2 +-
->  19 files changed, 37 insertions(+), 33 deletions(-)
+>   arch/x86/kvm/mmu/mmu.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 901be9e420a4..e91586c2ef87 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -6447,7 +6447,8 @@ static void kvm_mmu_zap_all_fast(struct kvm *kvm)
+>   	 */
+>   	kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS);
+>   
+> -	kvm_zap_obsolete_pages(kvm);
+> +	if (!tdp_mmu_enabled)
+> +		kvm_zap_obsolete_pages(kvm);
+>   
 
-Reviewed-by: Daniel P. Berrangé <berrange@redhat.com>
+Can't you have obsolete pages from the shadow MMU that's used for 
+nested (nGPA->HPA) virtualization?
 
-
-With regards,
-Daniel
--- 
-|: https://berrange.com      -o-    https://www.flickr.com/photos/dberrange :|
-|: https://libvirt.org         -o-            https://fstop138.berrange.com :|
-|: https://entangle-photo.org    -o-    https://www.instagram.com/dberrange :|
+Paolo
 
 
