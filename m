@@ -1,273 +1,183 @@
-Return-Path: <kvm+bounces-22684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74863941EE3
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 19:35:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 719EA941EFF
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 19:48:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8FE01F21AC5
-	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 17:35:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26E3B282F27
+	for <lists+kvm@lfdr.de>; Tue, 30 Jul 2024 17:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55285189905;
-	Tue, 30 Jul 2024 17:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EF2189906;
+	Tue, 30 Jul 2024 17:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VYDCXo8i"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="dSl5KJk+"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2061.outbound.protection.outlook.com [40.107.92.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2BB31A76B4
-	for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 17:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722360926; cv=none; b=ozRVMUTTVfH/Oo+Wpm22ncz6AoKw+d4jCseesT/RqE8TWN9afWwn6FucRswW4tUVSsD4VyHm43P3MMZmmfCPJgBr3VFIT1xZzhMNS+zOVymTA30ZEvdcPOBLwtlaR3wcQhD987/6cr//LOkUH3hnc/7Huuv2Shjken3FMipziSs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722360926; c=relaxed/simple;
-	bh=kaHR19k0/F/oLlfNxYx6jh9dp6SYMsv+JIi44ubapSI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=knojSHjnva1Gj7o4pc6vrvx9IEXksATpwSpEKl7T0x40traq4y1Y+QzVW8UiNTXePEwtoHN8qJBiirMaYqMtUaO7Qeda5NfxCIBQZwiEyGPMbV6M0fiv8T19BgpjfvFNvOYG9rhlfr0nwYALB2uZRT2u3ZkJ76LL71IslGcqZy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VYDCXo8i; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722360923;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JGvvLnyHosynzU4qCCDWzexJdT4L2I6G7pAHyddJSVE=;
-	b=VYDCXo8iDQDUNZdB/gMIJK/82olrsv3KGks8j/4LIrk/9LA3aZzEnsqcwucDZn07/EorLS
-	D+UGRb6/ZSSrqj2QMxZC0GaO8wrNZu3zbfeOXhDAcWXQvEtxvZZig+J/iMRiTYE7wbDqMO
-	clY9x/aNgQyfL29KjIpT7lvoSo6/VXY=
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
- [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-lZaxWa2nOtikkVhdI2DyQQ-1; Tue, 30 Jul 2024 13:35:22 -0400
-X-MC-Unique: lZaxWa2nOtikkVhdI2DyQQ-1
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-81f968e53b0so554873839f.1
-        for <kvm@vger.kernel.org>; Tue, 30 Jul 2024 10:35:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722360921; x=1722965721;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JGvvLnyHosynzU4qCCDWzexJdT4L2I6G7pAHyddJSVE=;
-        b=MN2KpgJYiVloh78RVhpJtsPYW7Sap/nZQQ+Wtu75KYR3zwGYbZc78Zo7ZKkYZmff0n
-         O6C4BOzOLglN4YUcTHx4QGO5l/Rz5+3Q05ahUBmwQ1J7DFtSg9WpmBmQrUdhRQoZNcpx
-         VpC5cxolkBhUUW7m/n+wUh46lqJW1mfMkFwvJoDoVR05Dxk9qZ/kmdT0h9A799mdh6rW
-         maKypq+ANlXb+uKRNaOVMXd63lWX8nV9M1Qlcha+SYHN73rR/rX57OFBIxFbdzL/2QjX
-         jQ1WHvAzjmhwOOjw27MXaJtEw3tiS05b9jgrTK9HZ6X6+sX/MUOjSFU917oZQbHWgR2l
-         n73w==
-X-Forwarded-Encrypted: i=1; AJvYcCWwe0NBzTCX1PSnhG8Y993VstlqDstJHIzlItOWWN3Vz7L5Ggsq+ubJIkib4Y+Y+PiTBf2gGTEX9ag6iwBo2olkDZaG
-X-Gm-Message-State: AOJu0Yzl5aW0JDyoPk2oVIwad4rFwI/gIRog+D3GbO98S+sx3h+ElPnd
-	h0DIvDihxxK+ElcVx1+1fFtpAfdnYuRVGJNex/hBRg32a+M1yIyMixqtlVL9UdR8dIo5V+2rp55
-	i4rxbn1x+KMZHvYeLCqhjOQUc1IBuQInwNdI7z3s03IL7UziDxg==
-X-Received: by 2002:a05:6602:6b8c:b0:7f6:8650:9684 with SMTP id ca18e2360f4ac-81f95a478bamr1579929839f.5.1722360921399;
-        Tue, 30 Jul 2024 10:35:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHgpSmEalpua89Fpxw1wV639nT7n76zuIKZpMFI5rYYGWUEnZ2dK1ruqZiSANyryCDBNwUBow==
-X-Received: by 2002:a05:6602:6b8c:b0:7f6:8650:9684 with SMTP id ca18e2360f4ac-81f95a478bamr1579927739f.5.1722360920971;
-        Tue, 30 Jul 2024 10:35:20 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-81f7d74d59csm361138139f.22.2024.07.30.10.35.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jul 2024 10:35:20 -0700 (PDT)
-Date: Tue, 30 Jul 2024 11:35:17 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
- "joro@8bytes.org" <joro@8bytes.org>, "robin.murphy@arm.com"
- <robin.murphy@arm.com>, "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "nicolinc@nvidia.com" <nicolinc@nvidia.com>, "kvm@vger.kernel.org"
- <kvm@vger.kernel.org>, "chao.p.peng@linux.intel.com"
- <chao.p.peng@linux.intel.com>, "iommu@lists.linux.dev"
- <iommu@lists.linux.dev>, "baolu.lu@linux.intel.com"
- <baolu.lu@linux.intel.com>, "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "Pan, Jacob jun" <jacob.jun.pan@intel.com>, =?UTF-8?B?Q8OpZHJpYw==?= Le
- Goater <clg@redhat.com>
-Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
-Message-ID: <20240730113517.27b06160.alex.williamson@redhat.com>
-In-Reply-To: <BN9PR11MB5276C4EF3CFB6075C7FC60AC8CAA2@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240419103550.71b6a616.alex.williamson@redhat.com>
-	<BN9PR11MB52766862E17DF94F848575248C112@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20240423120139.GD194812@nvidia.com>
-	<BN9PR11MB5276B3F627368E869ED828558C112@BN9PR11MB5276.namprd11.prod.outlook.com>
-	<20240424001221.GF941030@nvidia.com>
-	<20240424122437.24113510.alex.williamson@redhat.com>
-	<20240424183626.GT941030@nvidia.com>
-	<20240424141349.376bdbf9.alex.williamson@redhat.com>
-	<20240426141117.GY941030@nvidia.com>
-	<20240426141354.1f003b5f.alex.williamson@redhat.com>
-	<20240429174442.GJ941030@nvidia.com>
-	<BN9PR11MB5276C4EF3CFB6075C7FC60AC8CAA2@BN9PR11MB5276.namprd11.prod.outlook.com>
-Organization: Red Hat
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87AE61A76C9;
+	Tue, 30 Jul 2024 17:48:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.61
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722361689; cv=fail; b=SztzD4zGCMfHjkAG+mL4eKkKz81WGCELste6HDJfzWZD9uUxZJmy/H/QeRCgSMSpc8E27yg7p8x39SgYUkvekOvIbqIpbcXC9ppwTpJP89vMifPQfkTk9UZLSRYx/IQ4b677qEXbNfOMvbYexpy/Nz+yxrHdZDMfw9S2Y5GrErw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722361689; c=relaxed/simple;
+	bh=UVdOoDqkW+JfDcHohtmWPsPUJfYRRob821dht5pIB9A=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VD2nbiyFE5NBQnWP/pCpWsL0yeZ9X7oU50kCO7Wz3WQVNOJfZ9mCdq80+1ynfzKk5Xun5cxs7xCdyuJ5YksPZKwCzT0lpMn4foL0WsXW5HG1nDdK5Puy4WTPX51EVy+uUaZUcIfhX0r00lSYe1L+QPh6iaK37iamqiwH5E+8U2Y=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=dSl5KJk+; arc=fail smtp.client-ip=40.107.92.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=iQk+EbKabk+C3qXUVfa4nHXAFM069gVob0RE5hKR3a7SWkIIimDLfufQYwud+NNpYLJHRhOLdc39SbzS1AtuPXmxCM6IEu6ASrVDoV6V5S9ILW2Sv/FhOeyY5/fS0nphYTglhKvzqotLIsL4ccZzw6zHw4fmiwJ2N2REeXaxy94me7tTJPEf/glHPSR3KJkXHeHjZAYodc0Yoa18gvYjPJ9ECt+aI6zfChOnSzabzc+7loCscCYPTC71e/ObOc1kH9/3Xww9FIqqaS7w35pD1LrgVuXWmHIPAmYK3E2RZQ+bwvQORVhsQH1ReIGU57kkvOSI350jaTX7nqnDgMaVdA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dIy98NjlSXC1ND3boF3xg+apJfE2tn3TX27mS+JLVIs=;
+ b=Ketu7yi2ahDx1q8rfybPsH0+OkNBFYtqauJQZfdzuurG2c1P5Jjm1H5awcii/iqHdv4uwZ+2Ypf/XuLSS6T1rXqvpGkQei6Ev1QQByUFkshAtlDWOHUJPLIdL35c+/yOXkFuCWsOpyuvftzpuCg5HuU6DtRMDaqPO7cPUCMtS0Oz33GgbhGpKbz3C909A06WwAUwNEfd26jmjQHeQILR9oCfWsLi3PUjWkK5r8yzwjT2qj23pfqRfokWUn0ofeanQ8+2lU1WS346OcuVWN++w72lwlB+RIXqmX27zYgazWFYpw0kdzueg4DgE47WdEjXY4RmffH2wsIYkEuEAHg8JA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dIy98NjlSXC1ND3boF3xg+apJfE2tn3TX27mS+JLVIs=;
+ b=dSl5KJk+gLK+8u5zXTg5MEaiRDKHfZIynWAcGEukDu4rNUJMN2m2CqY0xruIpfsZfDd9Jr2U6ejoALje6jf2oNrlGOE1WXsV1K/Jevr+7CN3vDvWRx0CVk2LTKPceBzf2D+/hvdRhgDNQjGW6VfVYtOcySOxVLLWQNBdkANSDMY=
+Received: from BN9PR03CA0516.namprd03.prod.outlook.com (2603:10b6:408:131::11)
+ by DM4PR12MB6446.namprd12.prod.outlook.com (2603:10b6:8:be::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7807.30; Tue, 30 Jul 2024 17:48:04 +0000
+Received: from BL02EPF0001A100.namprd03.prod.outlook.com
+ (2603:10b6:408:131:cafe::6a) by BN9PR03CA0516.outlook.office365.com
+ (2603:10b6:408:131::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.34 via Frontend
+ Transport; Tue, 30 Jul 2024 17:48:04 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF0001A100.mail.protection.outlook.com (10.167.242.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7828.19 via Frontend Transport; Tue, 30 Jul 2024 17:48:04 +0000
+Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 30 Jul
+ 2024 12:48:03 -0500
+From: John Allen <john.allen@amd.com>
+To: <pbonzini@redhat.com>, <kvm@vger.kernel.org>
+CC: <seanjc@google.com>, <thomas.lendacky@amd.com>, <bp@alien8.de>,
+	<mlevitsk@redhat.com>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>,
+	<yazen.ghannam@amd.com>, John Allen <john.allen@amd.com>
+Subject: [PATCH] KVM: x86: Advertise SUCCOR and OVERFLOW_RECOV cpuid bits
+Date: Tue, 30 Jul 2024 17:47:51 +0000
+Message-ID: <20240730174751.15824-1-john.allen@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A100:EE_|DM4PR12MB6446:EE_
+X-MS-Office365-Filtering-Correlation-Id: eb79fd1e-2629-491f-2b3d-08dcb0bfc355
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?IhUA/Ln3Jtzc+DS/swtsyWi+qq8og7oQcNHQ0ltqpwBCKw4NN2P83tnEhnml?=
+ =?us-ascii?Q?304fLRp40X4a1JQA4q+g4PqA1RUUNmFv9y0CeEwpmZ6rwJOgHSkmq2d8JSkK?=
+ =?us-ascii?Q?+7fysIxDq/nNmzFaRCCl4qa1nT6WAIYHJwOGCUy5ejPnAlw7Gx54hET4qWfc?=
+ =?us-ascii?Q?hx+QqUGhcCAMaeZTXYywrucXY7cEI5J7Y6FRWrtNdhCw16Q0e9us/JvUVZnR?=
+ =?us-ascii?Q?LHoU/BGx/VuONpGcy6evyyp9SDZ9z9qSa0HNz8LQdqB2hO2P0KWrIHcm0Atq?=
+ =?us-ascii?Q?5uDg8odAI0P747ChGDjpSkefmot+h7WiURHrTi7EaJ3ymanJ7v+gdjvljtX5?=
+ =?us-ascii?Q?W02zQ9GdpPexw0HhrVW1RavdEWXsoEgofWJ69ZQKIV6+bsRumcFh4ZHGpqt/?=
+ =?us-ascii?Q?dDacwVQP1oBcGy9X47tKjmFxdGEdEwJOH5y+7+RVq4BXktPyDc0KdOnLxtLV?=
+ =?us-ascii?Q?Nh8CIaEIXONN7ia0ic7Q8zsLNQK5CCeARg4ATib3pcQVjtqDpTDs82/5HzSn?=
+ =?us-ascii?Q?IJKGZ9DNWyW5TpJzUXYeErXOOsvxZcL4jQnu5y7jVty3wgeCwg4i8idsmoHc?=
+ =?us-ascii?Q?hNeXYgQVP3eG2YTfksOYh24OTubqsIBb1OXqqFTHbrykldylCfNynrPULGCr?=
+ =?us-ascii?Q?CXaOPp2cP55vwfdX0rXQcxBb5LJFhchFIovEaMyE05Q54uCAh/u6kmpeEHnF?=
+ =?us-ascii?Q?piuWO+gcNKNIe2jX1rZyt2V7gEeIu64LXI4aGMSxIs7mCCJ4zcopYsYTq9sv?=
+ =?us-ascii?Q?jKp/d6VB7PXryRW4SaL4+vd78wdD5tnAqgy9tns9cf9ikhHWmBpXZ06H2Efe?=
+ =?us-ascii?Q?dLLwvV3tcQEPV7O4mcNDX6chdMQM5uOljatz1OdLoXqPcUjwxXzFK3WIg+1x?=
+ =?us-ascii?Q?DP29wJMSF+1ZOPJUrf6EoN50s3/vNyGbtkhWLrxBaV0NQpNc5Sp+zEt2HdpO?=
+ =?us-ascii?Q?NobpU/64UdogVw2XOAA2kHnob0xpQTxrWalFNHIwxBdrt20/txXx9p4xP/RQ?=
+ =?us-ascii?Q?GBk+EIbIEpVTwQpAKE/IW8NU9aBx2k/86SkK0iDj5bwFa1e1uoP4bPiwZUaw?=
+ =?us-ascii?Q?HHV+LtYkXvHoSu8MkYmMhe02dWDcFoM15Dtcahs3GeCRLgzw+DglwzXgTbpi?=
+ =?us-ascii?Q?sdlqCYMK2CDqdLBi9VLzG9lmBWqdIFGwPkixJ/Nc1pDXlD5EEDbH6hUoW/It?=
+ =?us-ascii?Q?q/ocN33RVhVSkiojDSMI6qjyVMPH0+90KzWx2/aFOfvXr/aUb2/wUE0vGKNT?=
+ =?us-ascii?Q?nmSroELh3ZciKtEvcl0Q6Wm/oao6ptS59W9bQ4Gpta9IyuaqreioCBDl/YKH?=
+ =?us-ascii?Q?JNIBApyvpiQICLUczvqTggX6IMpRm4mxy23tKtA7NxhjtETVu8EZ+GMYum7n?=
+ =?us-ascii?Q?8d9dF1FVyeBwmw61ngGi8J4w8/1jFJ3Y+gPl92yC5g4zienE1thOFvJbMwTr?=
+ =?us-ascii?Q?3+Wpy0dH35QaySykvyPf+grCexvSWjsP?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jul 2024 17:48:04.1211
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: eb79fd1e-2629-491f-2b3d-08dcb0bfc355
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A100.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6446
 
-On Wed, 24 Jul 2024 02:26:20 +0000
-"Tian, Kevin" <kevin.tian@intel.com> wrote:
+Handling deferred, uncorrected MCEs on AMD guests is now possible with
+additional support in qemu. Ensure that the SUCCOR and OVERFLOW_RECOV
+bits are advertised to the guest in KVM.
 
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Tuesday, April 30, 2024 1:45 AM
-> > 
-> > On Fri, Apr 26, 2024 at 02:13:54PM -0600, Alex Williamson wrote:  
-> > > Regarding "if we accept that text file configuration should be
-> > > something the VMM supports", I'm not on board with this yet, so
-> > > applying it to PASID discussion seems premature.  
-> > 
-> > Sure, I'm just explaining a way this could all fit together.
-> >   
-> 
-> Thinking more along this direction.
-> 
-> I'm not sure how long it will take to standardize such text files and
-> share them across VMMs. We may need a way to move in steps in
-> Qemu to unblock the kernel development toward that end goal, e.g.
-> first accepting a pasid option plus user-specified offset (if offset
-> unspecified then auto-pick one in cap holes). Later when the text
-> file is ready then such per-cap options can be deprecated.
+Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
+Signed-off-by: John Allen <john.allen@amd.com>
+---
+ arch/x86/kvm/cpuid.c   | 2 +-
+ arch/x86/kvm/svm/svm.c | 7 +++++++
+ 2 files changed, 8 insertions(+), 1 deletion(-)
 
-Planned obsolescence is a hard sell.
-
-> This simple way won't fix the migration issue, but at least it's on
-> par with physical caps (i.e. fail the migration if offset mismatched
-> between dest/src) and both will be fixed when the text file model
-> is ready.
-> 
-> Then look at what uAPI is required to report the vPASID cap.
-> 
-> In earlier discussion it's leaning toward extending GET_HW_INFO
-> in iommufd given both iommu/pci support are required to get
-> PASID working and iommu driver will not report such support until
-> pasid has been enabled in both iommu/pci. With that there is no
-> need to further report PASID in vfio-pci.
-> 
-> But there may be other caps which are shared between VF and
-> PF while having nothing to do with the iommu. e.g. the Device
-> Serial Number extended cap (permitted but not recommended
-> in VF). If there is a need to report such cap on VF which doesn't
-> implement it to userspace, a vfio uAPI (device_feature or a new
-> one dedicated to synthetical vcap) appears to be inevitable.
-> 
-> So I wonder whether we leave this part untouched until a real
-> demand comes or use vpasid to formalize that uAPI to be forward
-> looking. If in the end such uAPI will exist then it's a bit weird to
-> have PASID escaped (especially when vfio-pci already reports
-> PRI/ATS  which have iommu dependency too in vconfig).
-> 
-> In concept the Qemu logic will be clearer if any PCI caps (real
-> or synthesized) is always conveyed via vfio-pci while iommufd is
-> for identifying a viommu cap.
-
-There are so many moving pieces here and the discussion trailed off a
-long time ago.  I have trouble keeping all the relevant considerations
-in my head, so let me try to enumerate them, please correct/add.
-
- - The PASID capability cannot be implemented on VFs per the PCIe spec.
-   All VFs share the PF PASID configuration.  This also implies that
-   the VF PASID capability is essentially emulated since the VF driver
-   cannot manipulate the PF PASID directly.
-
- - VFIO does not currently expose the PASID capability for PFs, nor
-   does anything construct a vPASID capability for VFs.
-
- - The PASID capability is only useful in combination with a vIOMMU
-   with PASID support, which does not yet exist in QEMU.
-
- - Some devices are known to place registers in configuration space,
-   outside of the capability chains, which historically makes it
-   difficult to place a purely virtual capability without potentially
-   masking such hidden registers.  Current virtual capabilities are
-   placed at vendor defined fixed locations to avoid conflicts.
-
- - There is some expectation that otherwise compatible devices may
-   not present identical capability chains, for example devices running
-   different firmware or devices from different vendors implementing a
-   standard register ABI (virtio) where capability chain layout is not
-   standardized.
-
- - There have been arguments that the layout of device capabilities is
-   a policy choice, where both the kernel and libvirt traditionally try
-   to avoid making policy decisions.
-
- - Seamless live migration of devices requires that configuration space
-   remains at least consistent, if not identical for much of it.
-   Capability offsets cannot change during live migration.  This leads
-   to the text file reference above, which is essentially just the
-   notion that if the VMM defines the capability layout in config
-   space, it would need to do so via a static reference, independent of
-   the layout of the physical device and we might want to share that
-   among multiple VMMs.
-
- - For a vfio-pci device to support live migration it must be enabled
-   to do so by a vfio-pci variant driver.
-
- - We've discussed in the community and seem to have a consensus that a
-   DVSEC (Designated Vendor Specific Extended Capability) could be
-   defined to describe unused configuration space.  Such a DVSEC could
-   be implemented natively by the device or supplied by a vfio-pci
-   variant driver.  There is currently no definition of such a DVSEC.
-
-So what are we trying to accomplish here.  PASID is the first
-non-device specific virtual capability that we'd like to insert into
-the VM view of the capability chain.  It won't be the last.
-
- - Do we push the policy of defining the capability offset to the user?
-
- - Do we do some hand waving that devices supporting PASID shouldn't
-   have hidden registers and therefore the VMM can simply find a gap?
-
- - Do we ask the hardware vendor or variant driver to insert a DVSEC to
-   identify available config space?
-
- - Do we handle this as just another device quirk, where we maintain a
-   table of supported devices and vPASID offset for each?
-
- - Do we consider this an inflection point where the VMM entirely takes
-   over the layout of the capability spaces to impose a stable
-   migration layout?  On what basis do we apply that inflection?
-
- - Also, do we require the same policy for both standard and extended
-   capability chains?
-
-I understand the desire to make some progress, but QEMU relies on
-integration with management tools, so a temporary option for a user to
-specify a PASID offset in isolation sounds like a non-starter to me.
-
-This might be a better sell if the user interface allowed fully
-defining the capability chain layout from the command line and this
-interface would continue to exist and supersede how the VMM might
-otherwise define the capability chain when used.  A fully user defined
-layout would be complicated though, so I think there would still be a
-desire for QEMU to consume or define a consistent policy itself.
-
-Even if QEMU defines the layout for a device, there may be multiple
-versions of that device.  For example, maybe we just add PASID now, but
-at some point we decide that we do want to replicate the PF serial
-number capability.  At that point we have versions of the device which
-would need to be tied to versions of the machine and maybe also
-selected via a profile switch on the device command line.
-
-If we want to simplify this, maybe we do just look at whether the
-vIOMMU is configured for PASID support and if the device supports it,
-then we just look for a gap and add the capability.  If we end up with
-different results between source and target for migration, then
-migration will fail.  Possibly we end up with a quirk table to override
-the default placement of specific capabilities on specific devices.
-That might evolve into a lookup for where we place all capabilities,
-which essentially turns into the "file" where the VMM defines the entire
-layout for some devices.
-
-This is already TL;DR, so I'll end with that before I further drowned
-the possibility of discussion.  Thanks,
-
-Alex
+diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
+index 2617be544480..4745098416c3 100644
+--- a/arch/x86/kvm/cpuid.c
++++ b/arch/x86/kvm/cpuid.c
+@@ -1241,7 +1241,7 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
+ 
+ 		/* mask against host */
+ 		entry->edx &= boot_cpu_data.x86_power;
+-		entry->eax = entry->ebx = entry->ecx = 0;
++		entry->eax = entry->ecx = 0;
+ 		break;
+ 	case 0x80000008: {
+ 		/*
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c115d26844f7..a6820b0915db 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -5199,6 +5199,13 @@ static __init void svm_set_cpu_caps(void)
+ 		kvm_cpu_cap_set(X86_FEATURE_SVME_ADDR_CHK);
+ 	}
+ 
++	/* CPUID 0x80000007 */
++	if (boot_cpu_has(X86_FEATURE_SUCCOR))
++		kvm_cpu_cap_set(X86_FEATURE_SUCCOR);
++
++	if (boot_cpu_has(X86_FEATURE_OVERFLOW_RECOV))
++		kvm_cpu_cap_set(X86_FEATURE_OVERFLOW_RECOV);
++
+ 	/* CPUID 0x80000008 */
+ 	if (boot_cpu_has(X86_FEATURE_LS_CFG_SSBD) ||
+ 	    boot_cpu_has(X86_FEATURE_AMD_SSBD))
+-- 
+2.34.1
 
 
