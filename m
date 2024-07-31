@@ -1,162 +1,142 @@
-Return-Path: <kvm+bounces-22798-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22799-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88F029433DD
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 18:08:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC88943408
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 18:19:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BFCA1F22CD8
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 16:08:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FC371F21CF0
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 16:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905091BD000;
-	Wed, 31 Jul 2024 16:08:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481981BC090;
+	Wed, 31 Jul 2024 16:19:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OPxNZr4+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RZoIpqTF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DBDD1BC083
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 16:08:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9671B3F1A
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 16:18:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722442093; cv=none; b=qga1MsrRrNltTKPwQ/8AI84cYstSNrrPQ6zTJ7sTc4kJf0HgG7LvEyMfiEbSkjl2u4NdkQLeTh3Lcx7XCoRQoR/Pf2VunWKLxMf1mslH0QKC5Ze+BDn2dEQyVnbg/tpl6MYnp51lg+aTzi69uASAAeWjbVFuXh2k+AGUT38Z9Is=
+	t=1722442740; cv=none; b=qRiwR+VDSS+t2P5baNkwxohDokr+0dTst8h0Mq5yrXEa0G0zCORBQ8El4kDanuvUTaF6Gg8SiAmLfSTK56qDfP10ubSoqiQM1JOso1Hic+6WxDM5gRb1DqTC91ychEeF51OYqALC+XQ/5bp+x3NeDpzTfGc9BBi9Lh4rlombMfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722442093; c=relaxed/simple;
-	bh=TxRgMungOKUObRv5Bwb73PU4MAgBMOeeymQ3Pv/4WHg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CY+/6Kp0ZGpOgXmnj5pULZGhf825WyIaJyqJCvZxK38dLpzUsFLDxQ9y4RSWaVxYuBLaxqqk+Js+XL0v6w0m4sbl8BUWwM/vpbef1KyXx07jS/pDkfeYryRh4prBuzONN99NKLXHvWQvMrzAxYh7YR/9w2KkRbupgfYxLzzWpdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OPxNZr4+; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722442091;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=e7W0ZiLKeSZAsU0ucqOVg1N0XEA5D5eoulVuuQsZPP0=;
-	b=OPxNZr4+yUWTXAiynPtlokkV8sJ3yBxTes5Dz703iGi6UKg7Bj8ye+wGab+AsPem1SodBl
-	wLhlR4yt9HAd7uzhyVCvvF737zRRbwtIEkdSnPTgVxIYky+JVRm8egZbpWxfFpPuH4sCVl
-	l5cKRQ3Nk7OU/IsQFy8Zur8zRO1yasU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-121-FuSQADJeNdW7EMj78VXDoQ-1; Wed, 31 Jul 2024 12:08:09 -0400
-X-MC-Unique: FuSQADJeNdW7EMj78VXDoQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4281f8994adso26540485e9.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 09:08:09 -0700 (PDT)
+	s=arc-20240116; t=1722442740; c=relaxed/simple;
+	bh=ElAcQ+gpc9rbYRw6zuWtY49Lo01Kky3BFlz2QoDeVlE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=haCkNdCvV9Vu6xsneWGdjS6hNRUf1fh6zX6pMrBEolGp8wTKbmqIVoJm1FSmP3qRZsM05kOe/gkR3Y3z1uKEgTTNRveKIpyd3MDRgRjIV5NqeedDAqx6vA/BJ7ydFMgzT2LlWNAuLaR9MFNHGfdwcZaAfLFuUOHzIwQ3mjexsUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RZoIpqTF; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-70d35b705d3so6362762b3a.3
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 09:18:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722442738; x=1723047538; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=KEkAg/E0EBKwZG+0w3Tkn7qnDNz9XXpCm5xfKJGg0ro=;
+        b=RZoIpqTFiy3ob5fef0NrGruFZ/sVu9oSCozCwnxWtoxQPaVMY1ga+DevPIc2fLO5qY
+         W+D8xou+WrVE+yGJXb3GMWWiAsDBuJGSWh98gAHb3XDsCq4FqVU+MVeTnSbKwNI+qbGq
+         zxxNnmTxjpSob/MUVi890c0nofo8x694oYYC6P/ICws+gJ9nl94oecfd7aa45O5Gp+A2
+         9Mwd1Xwpxl/UmtjQ9Uw8okkr9xDoj4PSdhnSgWHbYxXWX90KI1w7ByfGTf8hT1er++TZ
+         tpzxUtl7qcFPNUUzvIMU+kXbTV/bhw/ll5hsl8MzzuVh6+eGX/lpJAmlGbXslOMmTOgx
+         uRoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722442088; x=1723046888;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e7W0ZiLKeSZAsU0ucqOVg1N0XEA5D5eoulVuuQsZPP0=;
-        b=G6UsmzhNYa+fYfmdzQL70+HMV1GZ+EAp7aNzDA646OmN2R+eedg+arou0SqnZ9b9jT
-         0It8jLRT3cNjpxRViPFS7ALgYA25NLE4xAbKV6yqpIbDDQv3+CLaMQCmGaIHpJqnUb2Q
-         dCuvCtnOrfabyGlzfOF/Eaf1NITIAJqCX9dfFXlCVcCtRjdJDX43cSbPU5vQO2hShsR5
-         hBg9iDh/QFgKcwd9nfgb/bDlhluFX5oBC1OQ1DtMHZHAAsledYf+xcqka0SQj+yLwiHZ
-         HTmDdrh4S2KxB/RATmUcJmWghgQk2JoaEkIN7a5LvpGhe1beUh25XnniQP4H5xKj0mq6
-         uErA==
-X-Forwarded-Encrypted: i=1; AJvYcCUrj12869z0CevOfRs1FCT0YFGw3PtYYIOYT8tmD5V2CdvdF8iExnE0LKWQs64ZdmxmiZdrecTRPRf3niCqYIIi3Xiq
-X-Gm-Message-State: AOJu0YyMXzJfRdqhS1IfvAh6E8VfF+yzValMO/TY23bqu0re0prBrUOA
-	yPsOJ/aCHXM6MUiluZQ7IzVB7aEyermY+fmlb1QRV53FQeJTVz8gpqwxoZ/00O+J5+3Riql1eIM
-	rh0aX1W+/wo7jFhNM5V+tj05B2gnRAuUkudVwVwXD12qQB85E47oqRa3175Vtzxv+M68z3Ep9lJ
-	dfW5VJfLvc09HWobFD2E2RxCIm
-X-Received: by 2002:a05:600c:500d:b0:426:59aa:e2fe with SMTP id 5b1f17b1804b1-42811da0c21mr101166985e9.19.1722442088443;
-        Wed, 31 Jul 2024 09:08:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHXNXmdxukknFbORSsLN9RAmLlNZbQ4SYaLs+1BDxL6OKg7iIzHbgjnwDmN9W7kbPXlvKfLknKmgszAMbjmk4M=
-X-Received: by 2002:a05:600c:500d:b0:426:59aa:e2fe with SMTP id
- 5b1f17b1804b1-42811da0c21mr101166805e9.19.1722442087991; Wed, 31 Jul 2024
- 09:08:07 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722442738; x=1723047538;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KEkAg/E0EBKwZG+0w3Tkn7qnDNz9XXpCm5xfKJGg0ro=;
+        b=ZzGrPgETMOLtsDgJTnLbdJa8rFOmM+PEE4KxWsGFGcOCq+Sba2NpIA+Af7Xw3r2zlo
+         80lXl0OZ7wvFW82AbTZsk7Ydr/klVoo0ppovASy1uL3d325z+qo2lXmgzKcZmJPwhcd6
+         Bs7/jnpWlveE96PumtHyQWkMrEWd9U/EQpVKLVrVe08oHMlUiQZ2MbYNMYYzetSp+k+t
+         qWOC8sPYCwYM3mWDBvrj7V1vRybhwuupqeX60an/cBYJwzR093pQbP8O+jkzY2lRrj1h
+         QCiZdOgb36XeC44VaxL4OTbi/q4gqbBijUovdlwSC/JQ6mfJJOmiT2RuQeosv5O6olwo
+         Yznw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNS3UP4hChJrxWIUs9bxLKXd4P+1ccQ767BQzkMdVtDRf4dNpTT6fqFI5A4R4qRys5qcR90hyJkyx/d8eGrQEVWzz+
+X-Gm-Message-State: AOJu0Yyz3xvRH7DY7+qnI41knbZ3/bqoS08iARHU9QZBf6AU2toKxNmh
+	nhQOC78hKslqCyeM/CG5Jd+4h2gSjneD/CDq9I6lnb/2nFcVAmrgJfvSU3ec4Lw0GC6qp1xUWWE
+	W7A==
+X-Google-Smtp-Source: AGHT+IE3vR/52fbHBcG0mD8gAg08EvW707+6aqhxcpp+uszsjVVLSlqCBB7w2jlGO3uwCGZS192zyStdcJU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:1823:b0:70d:3548:bb59 with SMTP id
+ d2e1a72fcca58-70ecedefc97mr113184b3a.4.1722442738134; Wed, 31 Jul 2024
+ 09:18:58 -0700 (PDT)
+Date: Wed, 31 Jul 2024 09:18:56 -0700
+In-Reply-To: <3e5f7422-43ce-44d4-bff7-cc02165f08c0@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240730053215.33768-1-flyingpeng@tencent.com>
- <db00e68b-2b34-49e1-aa72-425a35534762@redhat.com> <ZqlMob2o-97KsB8t@google.com>
- <CAPm50aLGRrK12ZSJzYadqO7Z7hM25NyXPdCD1sg_dTPCKKhJ-w@mail.gmail.com>
- <2e66f368-4502-4604-a98f-d8afb43413eb@redhat.com> <CAPm50aJ2RtxM4bQE9Mq5Fz1tQy85K_eVW7cyKX3-n4o7H07YvQ@mail.gmail.com>
- <CABgObfb2MX_ZAX3Mz=2E0PwMp2p9XK+BrHXQ-tN0=MS+1BGsHg@mail.gmail.com> <ZqpWIXR1I53SD1-7@google.com>
-In-Reply-To: <ZqpWIXR1I53SD1-7@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Wed, 31 Jul 2024 18:07:56 +0200
-Message-ID: <CABgObfa8m1mfmTpVi13zVzEUKiZhKMFe8=rVBum=ORioS6d=xA@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Conditionally call kvm_zap_obsolete_pages
-To: Sean Christopherson <seanjc@google.com>
-Cc: Hao Peng <flyingpenghao@gmail.com>, kvm@vger.kernel.org, 
-	Peng Hao <flyingpeng@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240730155646.1687-1-will@kernel.org> <ccd40ae1-14aa-454e-9620-b34154f03e53@rbox.co>
+ <Zql3vMnR86mMvX2w@google.com> <20240731133118.GA2946@willie-the-truck> <3e5f7422-43ce-44d4-bff7-cc02165f08c0@rbox.co>
+Message-ID: <Zqpj8M3xhPwSVYHY@google.com>
+Subject: Re: [PATCH] KVM: Fix error path in kvm_vm_ioctl_create_vcpu() on
+ xa_store() failure
+From: Sean Christopherson <seanjc@google.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Will Deacon <will@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Alexander Potapenko <glider@google.com>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Jul 31, 2024 at 5:21=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
-> It's not even remotely close to 100 instructions.  It's not even 10 instr=
-uctions.
-> It's 3 instructions, and maybe two uops?
+On Wed, Jul 31, 2024, Michal Luczaj wrote:
+> On 7/31/24 15:31, Will Deacon wrote:
+> > On Tue, Jul 30, 2024 at 04:31:08PM -0700, Sean Christopherson wrote:
+> >> On Tue, Jul 30, 2024, Michal Luczaj wrote:
+> >>> On 7/30/24 17:56, Will Deacon wrote:
+> >>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> >>>> index d0788d0a72cc..b80dd8cead8c 100644
+> >>>> --- a/virt/kvm/kvm_main.c
+> >>>> +++ b/virt/kvm/kvm_main.c
+> >>>> @@ -4293,7 +4293,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+> >>>>  
+> >>>>  	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
+> >>>>  		r = -EINVAL;
+> >>>> -		goto kvm_put_xa_release;
+> >>>> +		goto err_xa_release;
+> >>>>  	}
+> >>>>  
+> >>>>  	/*
+> >>>> @@ -4310,6 +4310,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+> >>>>  
+> >>>>  kvm_put_xa_release:
+> >>>>  	kvm_put_kvm_no_destroy(kvm);
+> >>>> +err_xa_release:
+> >>>>  	xa_release(&kvm->vcpu_array, vcpu->vcpu_idx);
+> >>>>  unlock_vcpu_destroy:
+> >>>>  	mutex_unlock(&kvm->lock);
+> >>>
+> >>> My bad for neglecting the "impossible" path. Thanks for the fix.
+> >>>
+> >>> I wonder if it's complete. If we really want to consider the possibility of
+> >>> this xa_store() failing, then keeping vCPU fd installed and calling
+> >>> kmem_cache_free(kvm_vcpu_cache, vcpu) on the error path looks wrong.
+> >>
+> >> Yeah, the vCPU is exposed to userspace, freeing its assets will just cause
+> >> different problems.  KVM_BUG_ON() will prevent _new_ vCPU ioctl() calls (and kick
+> >> running vCPUs out of the guest), but it doesn't interrupt other CPUs, e.g. if
+> >> userspace is being sneaking and has already invoked a vCPU ioctl(), KVM will hit
+> >> a use-after-free (several of them).
+> > 
+> > Damn, yes. Just because we haven't returned the fd yet, doesn't mean
+> > userspace can't make use of it.
+> >
+> >> As Michal alluded to, it should be impossible for xa_store() to fail since KVM
+> >> pre-allocates/reserves memory.  Given that, deliberately leaking the vCPU seems
+> >> like the least awful "solution".
+> > 
+> > Could we actually just move the xa_store() before the fd creation? I
+> > can't immediately see any issues with that...
+> 
+> Hah, please see commit afb2acb2e3a3 :) Long story short: create_vcpu_fd()
+> can legally fail, which must be handled gracefully, which would involve
+> destruction of an already xa_store()ed vCPU, which is racy.
 
-Well yeah, I meant 100 instructions over the whole execution
-of the VM...
-
-Paolo
-
-> Modern compilers are smart enough to optimize usage of kvm_mmu_commit_zap=
-_page()
-> so that the caller inlines the list_empty(invalid_list) check, but the gu=
-ts of
-> the zap code are non-inlined.
->
-> So, as is, the generated code is:
->
->    0x00000000000599a7 <+55>:    mov    0x8d40(%r12),%rbp
->    0x00000000000599af <+63>:    cmp    %rbp,%r15
->    0x00000000000599b2 <+66>:    mov    0x8(%rbp),%rbx
->    0x00000000000599b6 <+70>:    je     0x599d6 <kvm_zap_obsolete_pages+10=
-2>
->
->    0x00000000000599d6 <+102>:   mov    0x8d48(%r12),%rax
->    0x00000000000599de <+110>:   cmp    %r14,%rax
->    0x00000000000599e1 <+113>:   je     0x59a5f <kvm_zap_obsolete_pages+23=
-9>
->
->    0x0000000000059a5f <+239>:   mov    0x8(%rsp),%rax
->    0x0000000000059a64 <+244>:   sub    %gs:0x28,%rax
->    0x0000000000059a6d <+253>:   jne    0x59a86 <kvm_zap_obsolete_pages+27=
-8>
->    0x0000000000059a6f <+255>:   add    $0x10,%rsp
->    0x0000000000059a73 <+259>:   pop    %rbx
->    0x0000000000059a74 <+260>:   pop    %rbp
->    0x0000000000059a75 <+261>:   pop    %r12
->    0x0000000000059a77 <+263>:   pop    %r13
->    0x0000000000059a79 <+265>:   pop    %r14
->    0x0000000000059a7b <+267>:   pop    %r15
->    0x0000000000059a7d <+269>:   ret
->
-> and adding an extra list_empty(kvm->arch.active_mmu_pages) generates:
->
->    0x000000000005999a <+42>:    mov    0x8d38(%rdi),%rax
->    0x00000000000599a1 <+49>:    cmp    %rax,%r15
->    0x00000000000599a4 <+52>:    je     0x59a6f <kvm_zap_obsolete_pages+25=
-5>
->
->    0x0000000000059a6f <+255>:   mov    0x8(%rsp),%rax
->    0x0000000000059a74 <+260>:   sub    %gs:0x28,%rax
->    0x0000000000059a7d <+269>:   jne    0x59a96 <kvm_zap_obsolete_pages+29=
-4>
->    0x0000000000059a7f <+271>:   add    $0x10,%rsp
->    0x0000000000059a83 <+275>:   pop    %rbx
->    0x0000000000059a84 <+276>:   pop    %rbp
->    0x0000000000059a85 <+277>:   pop    %r12
->    0x0000000000059a87 <+279>:   pop    %r13
->    0x0000000000059a89 <+281>:   pop    %r14
->    0x0000000000059a8b <+283>:   pop    %r15
->    0x0000000000059a8d <+285>:   ret
->
-> i.e. it elides the list_empty(invalid_list) check, that's it.
->
-
+Ya, the basic problem is that we have two ways of publishing the vCPU, fd and
+vcpu_array, with no way of setting both atomically.  Given that xa_store() should
+never fail, I vote we do the simple thing and deliberately leak the memory.
 
