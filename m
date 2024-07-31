@@ -1,240 +1,197 @@
-Return-Path: <kvm+bounces-22796-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22797-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE2F89433B4
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 17:54:08 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 531779433D6
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 18:05:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 651CF284AD4
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 15:54:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3039B25DBD
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 16:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796E31BBBD9;
-	Wed, 31 Jul 2024 15:54:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b="Q0zkzF8p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0AE71BC083;
+	Wed, 31 Jul 2024 16:05:29 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-00082601.pphosted.com (mx0a-00082601.pphosted.com [67.231.145.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66251799F
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 15:53:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.145.42
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A651BBBC7
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 16:05:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722441241; cv=none; b=qafjDrVAEVxYkCan6Y6+k5CYFoP5rfvfECIr/EPjJlX+p8GlLZz+mernNT9mrN1oNNKjvfu84dzjml8S1vCwpc83qkoiFYxVWxynsOta0QOMxaZdjcDWuIaam+Gpdi/EYiF0GPGre3kun4L/abU2hNWLDJNd1kRLRIOIm9poD0A=
+	t=1722441929; cv=none; b=hXUikM2Xn/h7N3ClyCPY4+t43GP6RsAvJypPvarBhBStScDPXCuZIX/udeAc5tW0lrtWWCOAH0hUDVJLACr9ce4rcGFFiE/pvC6vqhE4tiBcIVTbi+e3d3jo8IP0U236JIrT1TVCEphhXp2nACmkqAZUMpFx+4w8s6dz7Ji708M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722441241; c=relaxed/simple;
-	bh=jIWkQpZO3PpIcSipj6oP0IBHKsjZ8w7SKBDBZcf99PA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kMpcqCaP9zqV0PUNrDa0c0vqtpwDe1MzMHm/ANYESMrgZCtriOf1/YxKZVL4Fd606agIf51HiDL164NCDEPPyEdrYzR3RD//2ZTw1Ezu5tJxmOQdDs5CKvGSNAu2n2ItHftdMZcBASeUdEKCRQvc2s7M3g7Qc3JzaExghgGG6Ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com; spf=pass smtp.mailfrom=meta.com; dkim=pass (2048-bit key) header.d=meta.com header.i=@meta.com header.b=Q0zkzF8p; arc=none smtp.client-ip=67.231.145.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=meta.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=meta.com
-Received: from pps.filterd (m0148461.ppops.net [127.0.0.1])
-	by mx0a-00082601.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46VE2rqL014230
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 08:53:59 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=from
-	:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=s2048-2021-q4; bh=Zy6
-	VJrOVj8mJa4n6l6Htv/n8eRtnqnR9X3Re5ahdMCk=; b=Q0zkzF8pVzgb5WT1Hi6
-	Ww3hTJ2+9U0UNvv32ZzSaXYMKyhaqXpBH6fqhlyubXgGHjL+M6mOjI9Y0/YIF2Q1
-	SzEGqSu363/13O9pU73y4NNxOI3/h2ZFiCmCyH/XeBgbRM++T4TA67IQ+ayWNXX9
-	OQY787/dTR4vpr87EpMLJ1FJGtwuqTqFWGGSFPwLurEQYnNtKpTd5e7SVK0awgTZ
-	y03miib5g/Gf/DdSDBL9WABo3/PgMncMLYGyqkxLFsvp+OcEiRf2Ki5/rQzJYxKN
-	zDfWU+TKLzDF6FM3bkFaYibWjMdggprg2pcRNVWpGvmIjMrkKLFOV/xPl2I5joJp
-	1AQ==
-Received: from maileast.thefacebook.com ([163.114.130.16])
-	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 40qa6g5acm-6
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 08:53:58 -0700 (PDT)
-Received: from twshared19013.17.frc2.facebook.com (2620:10d:c0a8:1b::2d) by
- mail.thefacebook.com (2620:10d:c0a9:6f::8fd4) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1544.11; Wed, 31 Jul 2024 15:53:55 +0000
-Received: by devbig638.nha1.facebook.com (Postfix, from userid 544533)
-	id 2CBEB11394BA3; Wed, 31 Jul 2024 08:53:53 -0700 (PDT)
-From: Keith Busch <kbusch@meta.com>
-To: <kvm@vger.kernel.org>
-CC: <alex.williamson@redhat.com>, <jgg@ziepe.ca>,
-        Keith Busch
-	<kbusch@kernel.org>
-Subject: [PATCH rfc] vfio-pci: Allow write combining
-Date: Wed, 31 Jul 2024 08:53:52 -0700
-Message-ID: <20240731155352.3973857-1-kbusch@meta.com>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1722441929; c=relaxed/simple;
+	bh=u3EFQ8M28u9qY6CANyuFcamS2Vh7fWSDEBXMErYDl/Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D68+8VavPFJLCfbiUDzI0XqeEYHvmiPbfxjPtjgKeJcx84q0e9F6vl2NzZP3puqBdyIpqXcywgCFUn9cAhLzJMRoEwthE94zd+jkQXzpRjUKa0vIOPXRf71Tl7pNQafMmVRrH6ZvWozasV9S23xoci49rP10IEQP9wPewwPPhMY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 05E7D1007;
+	Wed, 31 Jul 2024 09:05:52 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BC8E73F5A1;
+	Wed, 31 Jul 2024 09:05:24 -0700 (PDT)
+Date: Wed, 31 Jul 2024 17:05:21 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+Message-ID: <ZqpgwaNzZbE-seyC@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+ <20240708165800.1220065-1-maz@kernel.org>
+ <ZqpLNT8bVFDB6oWJ@raptor>
+ <86r0b91sa3.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-FB-Internal: Safe
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 8G1ENu2f0BrTCT2qYtm5zkC5WpeapTlM
-X-Proofpoint-GUID: 8G1ENu2f0BrTCT2qYtm5zkC5WpeapTlM
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-07-31_10,2024-07-31_01,2024-05-17_01
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86r0b91sa3.wl-maz@kernel.org>
 
-From: Keith Busch <kbusch@kernel.org>
+Hi Marc,
 
-Write combining can be provide performance improvement for places that
-can safely use this capability.
+On Wed, Jul 31, 2024 at 04:43:16PM +0100, Marc Zyngier wrote:
+> On Wed, 31 Jul 2024 15:33:25 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> > > In order to plug the brokenness of our current AT implementation,
+> > > we need a SW walker that is going to... err.. walk the S1 tables
+> > > and tell us what it finds.
+> > > 
+> > > Of course, it builds on top of our S2 walker, and share similar
+> > > concepts. The beauty of it is that since it uses kvm_read_guest(),
+> > > it is able to bring back pages that have been otherwise evicted.
+> > > 
+> > > This is then plugged in the two AT S1 emulation functions as
+> > > a "slow path" fallback. I'm not sure it is that slow, but hey.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
+> > >  1 file changed, 520 insertions(+), 18 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > > index 71e3390b43b4c..8452273cbff6d 100644
+> > > --- a/arch/arm64/kvm/at.c
+> > > +++ b/arch/arm64/kvm/at.c
+> > > @@ -4,9 +4,305 @@
+> > >   * Author: Jintack Lim <jintack.lim@linaro.org>
+> > >   */
+> > >  
+> > > +#include <linux/kvm_host.h>
+> > > +
+> > > +#include <asm/esr.h>
+> > >  #include <asm/kvm_hyp.h>
+> > >  #include <asm/kvm_mmu.h>
+> > >  
+> > > +struct s1_walk_info {
+> > > +	u64	     baddr;
+> > > +	unsigned int max_oa_bits;
+> > > +	unsigned int pgshift;
+> > > +	unsigned int txsz;
+> > > +	int 	     sl;
+> > > +	bool	     hpd;
+> > > +	bool	     be;
+> > > +	bool	     nvhe;
+> > > +	bool	     s2;
+> > > +};
+> > > +
+> > > +struct s1_walk_result {
+> > > +	union {
+> > > +		struct {
+> > > +			u64	desc;
+> > > +			u64	pa;
+> > > +			s8	level;
+> > > +			u8	APTable;
+> > > +			bool	UXNTable;
+> > > +			bool	PXNTable;
+> > > +		};
+> > > +		struct {
+> > > +			u8	fst;
+> > > +			bool	ptw;
+> > > +			bool	s2;
+> > > +		};
+> > > +	};
+> > > +	bool	failed;
+> > > +};
+> > > +
+> > > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+> > > +{
+> > > +	wr->fst		= fst;
+> > > +	wr->ptw		= ptw;
+> > > +	wr->s2		= s2;
+> > > +	wr->failed	= true;
+> > > +}
+> > > +
+> > > +#define S1_MMU_DISABLED		(-127)
+> > > +
+> > > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> > > +			 struct s1_walk_result *wr, const u64 va, const int el)
+> > > +{
+> > > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> > > +	unsigned int stride, x;
+> > > +	bool va55, tbi;
+> > > +
+> > > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
+> > > +
+> > > +	va55 = va & BIT(55);
+> > > +
+> > > +	if (wi->nvhe && va55)
+> > > +		goto addrsz;
+> > > +
+> > > +	wi->s2 = el < 2 && (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_VM);
+> > > +
+> > > +	switch (el) {
+> > > +	case 1:
+> > > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> > > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
+> > > +		ttbr	= (va55 ?
+> > > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
+> > > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
+> > > +		break;
+> > > +	case 2:
+> > > +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> > > +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
+> > > +		ttbr	= (va55 ?
+> > > +			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
+> > > +			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
+> > > +		break;
+> > > +	default:
+> > > +		BUG();
+> > > +	}
+> > > +
+> > > +	/* Let's put the MMU disabled case aside immediately */
+> > > +	if (!(sctlr & SCTLR_ELx_M) ||
+> > > +	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > > +		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
+> > 
+> > As far as I can tell, if TBI, the pseudocode ignores bits 63:56 when checking
+> > for out-of-bounds VA for the MMU disabled case (above) and the MMU enabled case
+> > (below). That also matches the description of TBIx bits in the TCR_ELx
+> > registers.
+> 
+> Right. Then the check needs to be hoisted up and the VA sanitised
+> before we compare it to anything.
+> 
+> Thanks for all your review comments, but I am going to ask you to stop
+> here. You are reviewing a pretty old code base, and although I'm sure
+> you look at what is in my tree, I'd really like to post a new version
+> for everyone to enjoy.
 
-Previous discussions on the topic suggest a vfio user needs to
-explicitly request such a mapping, and it sounds like a new vfio
-specific ioctl to request this is one way recommended way to do that.
-This patch implements a new ioctl to achieve that so a user can request
-write combining on prefetchable memory. A new ioctl seems a bit much for
-just this purpose, so the implementation here provides a "flags" field
-with only the write combine option defined. The rest of the bits are
-reserved for future use.
+Got it.
 
-Link: https://lore.kernel.org/all/20171009025000.39435-1-aik@ozlabs.ru/
-Link: https://lore.kernel.org/lkml/ZLFBnACjoTbDmKuU@nvidia.com/
-Signed-off-by: Keith Busch <kbusch@kernel.org>
----
- drivers/vfio/pci/vfio_pci_core.c | 39 +++++++++++++++++++++++++++++++-
- include/linux/vfio_pci_core.h    |  1 +
- include/uapi/linux/vfio.h        | 17 ++++++++++++++
- 3 files changed, 56 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/vfio/pci/vfio_pci_core.c b/drivers/vfio/pci/vfio_pci=
-_core.c
-index ba0ce0075b2fb..c275c95eafe32 100644
---- a/drivers/vfio/pci/vfio_pci_core.c
-+++ b/drivers/vfio/pci/vfio_pci_core.c
-@@ -1042,12 +1042,18 @@ static int vfio_pci_ioctl_get_region_info(struct =
-vfio_pci_core_device *vdev,
- 		info.flags =3D VFIO_REGION_INFO_FLAG_READ |
- 			     VFIO_REGION_INFO_FLAG_WRITE;
- 		if (vdev->bar_mmap_supported[info.index]) {
-+			struct resource *res;
-+
- 			info.flags |=3D VFIO_REGION_INFO_FLAG_MMAP;
- 			if (info.index =3D=3D vdev->msix_bar) {
- 				ret =3D msix_mmappable_cap(vdev, &caps);
- 				if (ret)
- 					return ret;
- 			}
-+
-+			res =3D &vdev->pdev->resource[index];
-+			if (res->flags & IORESOURCE_PREFETCH)
-+				info.flags |=3D VFIO_REGION_INFO_FLAG_PREFETCH;
- 		}
-=20
- 		break;
-@@ -1223,6 +1229,32 @@ static int vfio_pci_ioctl_set_irqs(struct vfio_pci=
-_core_device *vdev,
- 	return ret;
- }
-=20
-+static int vfio_pci_ioctl_set_region_flags(struct vfio_pci_core_device *=
-vdev,
-+				   struct vfio_region_flags __user *arg)
-+{
-+	struct vfio_region_flags region_flags;
-+	struct resource *res;
-+	u32 index;
-+
-+	if (copy_from_user(&region_flags, arg, sizeof(region_flags)))
-+		return -EFAULT;
-+
-+	index =3D region_flags.index;
-+	if (index >=3D PCI_STD_NUM_BARS)
-+		return -EINVAL;
-+
-+	if (region_flags.flags & VFIO_REGION_FLAG_WRITE_COMBINE) {
-+		res =3D &vdev->pdev->resource[index];
-+		if (!(res->flags & IORESOURCE_MEM) ||
-+		    !(res->flags & IORESOURCE_PREFETCH))
-+			return -EINVAL;
-+		vdev->bar_write_combine[index] =3D true;
-+	} else
-+		vdev->bar_write_combine[index] =3D false;
-+
-+	return 0;
-+}
-+
- static int vfio_pci_ioctl_reset(struct vfio_pci_core_device *vdev,
- 				void __user *arg)
- {
-@@ -1484,6 +1516,8 @@ long vfio_pci_core_ioctl(struct vfio_device *core_v=
-dev, unsigned int cmd,
- 		return vfio_pci_ioctl_reset(vdev, uarg);
- 	case VFIO_DEVICE_SET_IRQS:
- 		return vfio_pci_ioctl_set_irqs(vdev, uarg);
-+	case VFIO_DEVICE_SET_REGION_FLAGS:
-+		return vfio_pci_ioctl_set_region_flags(vdev, uarg);
- 	default:
- 		return -ENOTTY;
- 	}
-@@ -1756,7 +1790,10 @@ int vfio_pci_core_mmap(struct vfio_device *core_vd=
-ev, struct vm_area_struct *vma
- 	}
-=20
- 	vma->vm_private_data =3D vdev;
--	vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
-+	if (vdev->bar_write_combine[index])
-+		vma->vm_page_prot =3D pgprot_writecombine(vma->vm_page_prot);
-+	else
-+		vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
- 	vma->vm_page_prot =3D pgprot_decrypted(vma->vm_page_prot);
-=20
- 	/*
-diff --git a/include/linux/vfio_pci_core.h b/include/linux/vfio_pci_core.=
-h
-index fbb472dd99b36..0e0122ce4196a 100644
---- a/include/linux/vfio_pci_core.h
-+++ b/include/linux/vfio_pci_core.h
-@@ -54,6 +54,7 @@ struct vfio_pci_core_device {
- 	struct pci_dev		*pdev;
- 	void __iomem		*barmap[PCI_STD_NUM_BARS];
- 	bool			bar_mmap_supported[PCI_STD_NUM_BARS];
-+	bool			bar_write_combine[PCI_STD_NUM_BARS];
- 	u8			*pci_config_map;
- 	u8			*vconfig;
- 	struct perm_bits	*msi_perm;
-diff --git a/include/uapi/linux/vfio.h b/include/uapi/linux/vfio.h
-index 2b68e6cdf1902..5537b20b23541 100644
---- a/include/uapi/linux/vfio.h
-+++ b/include/uapi/linux/vfio.h
-@@ -275,6 +275,7 @@ struct vfio_region_info {
- #define VFIO_REGION_INFO_FLAG_WRITE	(1 << 1) /* Region supports write */
- #define VFIO_REGION_INFO_FLAG_MMAP	(1 << 2) /* Region supports mmap */
- #define VFIO_REGION_INFO_FLAG_CAPS	(1 << 3) /* Info supports caps */
-+#define VFIO_REGION_INFO_FLAG_PREFETCH	(1 << 4) /* Region is prefetchabl=
-e */
- 	__u32	index;		/* Region index */
- 	__u32	cap_offset;	/* Offset within info struct of first cap */
- 	__aligned_u64	size;	/* Region size (bytes) */
-@@ -1821,6 +1822,22 @@ struct vfio_iommu_spapr_tce_remove {
- };
- #define VFIO_IOMMU_SPAPR_TCE_REMOVE	_IO(VFIO_TYPE, VFIO_BASE + 20)
-=20
-+/**
-+ * VFIO_DEVICE_SET_REGION_FLAGS	 - _IOW(VFIO_TYPE, VFIO_BASE + 21, struc=
-t vfio_region_flags)
-+ *
-+ * Set mapping options for the region
-+ *
-+ * Flags supported:
-+ * - VFIO_REGION_FLAG_WRITE_COMBINE: use write-combine when requested to=
- map
-+ *   this region. Supported only if the region is prefetchable.
-+ */
-+struct vfio_region_flags {
-+	__u32	index;		/* Region index */
-+	__u32	flags;		/* Region flags */
-+#define VFIO_REGION_FLAG_WRITE_COMBINE	(1 << 0)
-+};
-+#define VFIO_DEVICE_SET_REGION_FLAGS	_IO(VFIO_TYPE, VFIO_BASE + 21)
-+
- /* ***************************************************************** */
-=20
- #endif /* _UAPIVFIO_H */
---=20
-2.43.5
-
+Thanks,
+Alex
 
