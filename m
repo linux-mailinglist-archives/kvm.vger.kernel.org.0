@@ -1,119 +1,596 @@
-Return-Path: <kvm+bounces-22759-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22760-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90564942D1F
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 13:19:50 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DEDF942D6F
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 13:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3DB01C23175
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:19:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 048D4B2135B
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D49631AD41A;
-	Wed, 31 Jul 2024 11:19:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904A91AD9F2;
+	Wed, 31 Jul 2024 11:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PxFCTaCq"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="glscHq+B"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815B11AD3FD
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 11:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 986911A8BEF
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 11:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722424782; cv=none; b=c/xNQAfyhkbJe9b+141by63jO61KNtSjz7hQ84qIyG93WSwXaXjLeNZ9fEYcI5oSkG4Zaa1dDbpfMBLlsuXl2imO7SS1U1Mnvtf12wD+pYFPo7GOSU2TNRrQ3MCOX43v6Ee7Sr4BKwAVEOPJn1/7va5jJE0GsWS6AdKmTND3zVI=
+	t=1722426088; cv=none; b=Bp2liJm0IQrHBq6pVtuiUJKRy7Dj/cD5nqErokfWurJzK8kPx0oxhSc9rczC78wYjEOk5zy3R+GRpw5P/PnhyQk2GdYmWh4+QCE7lKorA5PBvKSWArv8MxaYEPkDUfgItfqkN6Uggpwdleg4rge3cLLRUGXhz/kCidvL3mHh3Lk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722424782; c=relaxed/simple;
-	bh=oSPMeUj42FGi9WvP3sddnZLCN+2Boz0MM9HS0iA2LnQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gTZVKSk8m+ekpS3x5KSGhA9Agd2zmfwCVSWZO7Vj+JB/3wioI9YOVDePAQ+i6ov7DHmxeJCGPT/Kr4+pu5FItKCX3Wv3/Sc8rl3eTm2dlE5pULhTLSaHr+BrTzDkNu1q3pPrANINFMpu6aPylmFu00qQtaxBrYVrRzZu/LtT/Rk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PxFCTaCq; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3684eb5be64so3034142f8f.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 04:19:40 -0700 (PDT)
+	s=arc-20240116; t=1722426088; c=relaxed/simple;
+	bh=cFNDOhnEcCjB1kUGQS6KyEJxIkghsZpCmafHyEVzIsY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ht2WRZBLATDiGM+YcN2vY/ZepbCQr/YHA0xUtyxvs6U27Znjrp1RdQcX8g05t8iAvo8wFjnTnoJquHUNJNDxCUTQXyIu3bq0sJHSTQp50PtcJpP6WPcyuRGkdDesaE7V66Jl6mUvMX5Xy5/fx3tglmX4p7wfI9QUrJ5XhijPh/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=glscHq+B; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a7a8a4f21aeso740686566b.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 04:41:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722424779; x=1723029579; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NuzFXMDtAcIapz+5vLfMazjtW7hNx/Z1JTP7GQBewnk=;
-        b=PxFCTaCq4ozzvGKGUUx+2wCGS34ET0k38CkwxFEBkDgaSgI9k1uHjiS6ci+BmJtcPz
-         7F1Fy0pqqQNJpmuyTJzZHfyU8BWaHKO7PKX5zmvBX95G0WnyNwt/jr65K8vTE2fzYwyH
-         NWxkiVkifnLx7/CePhPV85H53+qDw5lTSFIESKFcl6IEZLOCXSBwYrV9l6MiDBey3I0A
-         w77oIi5oCBfo9mcxP5T83lHKDKjOxHDvbI3CFOdhVawWm4YAGWJfSLkQme8CYkHvMc8g
-         7vjTwEUagp9mG+w0Tea8gSll+ZWArNbpxdnsPHHraUpPbTpb2I4b1jHH3ATAvuq/voo5
-         ia1g==
+        d=linaro.org; s=google; t=1722426085; x=1723030885; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=UCGv88z8oXGiMXFCqUtOxX3ttQjhRqpVd4GiLkZXyt8=;
+        b=glscHq+BKNDRnvgEuSi/X5ZHFzM8saHOqOMb8mwZuDPXqS2j9gF/wkg8aaIZdtHXRv
+         rcojgaUPpcDpLt20/hbYkDoj1bQBuWD6lWs73z5i8BlhdruRcZkRnDFbcnSE4GFi0i5v
+         cfxcBXPR2QI5L2Y5zwLg4XwaWsyjWqm2BskbCYfSYo/4nw8BvpLZL/MpOFM6c/Sl7gTK
+         av6x8IMLfF49lP0cktk4sKgCPABuwGBkhbuZkLQRBb4U3NGlINZYn8Xuiwpng5fOBKup
+         yokz87jzf9J00eWitTgtBlCsOs2rUPc6RApFsIdad1SigLwRJE8zRwxJpQoeOlWvt8bG
+         3slA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722424779; x=1723029579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1722426085; x=1723030885;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=NuzFXMDtAcIapz+5vLfMazjtW7hNx/Z1JTP7GQBewnk=;
-        b=remEVXieEASXP8QSWOxr4iYZ6l8S+jh652pFru7MYh5M4826KufxFlq1aMNlFW9EOs
-         UFccwXaOLaH4/1C5LdeCMOSCAe/NrlCKi3YIzWumvGgw6Aw3M5NYVk4Wmifv2C3I5k8B
-         oVLOaKxxv/O6tOSkKCH1ranVdySimfhW02YypoV4JMRwF+e8Q1gwh82MJx2t/0vga8Hu
-         272xx1LIsBCJwH1LBGyeM8zmw76QCheLmm5/Fqg73s3y2ZteRUnaXR01Z7CC21iMl0PP
-         /RlEJ3Fu8WKnixBgm6j9wjs7Wt1PSU3KkFusBfIYqVxKUUWdivKeFSMrHzD+uQA+iFcj
-         K7WQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV0MqpQCrxo4notsYYvyl1WXD0C/8Bsna5raYEUUxNvijKeVXJz2x+f8j2dHoKkcDGFyl3FxW918YU+Ur4kYfDF8EvP
-X-Gm-Message-State: AOJu0YzvNm/2kIUKpnsHuJ1NKJTyFkR3MT1gu2YX2T5GXlmNImAi/ZIW
-	7mXcY8O9wOQQZaEn1Zr1+1Ga+sSdhJ6eO/XlHJ9A2TnN3iH14pdRU82yrnsfbcJpHlArj6RnESX
-	sa4WDoARJusAACjTX2cOFDdYsx0g=
-X-Google-Smtp-Source: AGHT+IHIuxV0g/09GGRshSWjho+32TIONK/aAU9RMzch4PyAO79bqOeb49VX80jME+sszo/JQnyZRmOqUWhtTDjdY8c=
-X-Received: by 2002:a5d:50c4:0:b0:368:4c54:ae27 with SMTP id
- ffacd0b85a97d-36b5cf20053mr8625870f8f.36.1722424778453; Wed, 31 Jul 2024
- 04:19:38 -0700 (PDT)
+        bh=UCGv88z8oXGiMXFCqUtOxX3ttQjhRqpVd4GiLkZXyt8=;
+        b=pESitP30Q4lT5coh6kGn72RaxDcoZupWLrrv3wo8alQFo1M/hSnYKa2AAtZXFzLH/5
+         AWEr1bsjL8yT1Yu9zgTAdf4Hk2cvCGcM7Bck3H3f4ayjIjqflWGx1LjmA/YsGI9OHKNs
+         ZoKLx+64+H6lDXDHXJr9qMVuQ+vPfzi5Ysj6TZ5vqUYqmISO5PlwJsCBs2e/lBL4tlC/
+         JvH6wn2We7axDEJaRkdxS6J+i+rpHnwyU2bKrMBdWrq/9vFinnzOvm4pGs/hD4uAhdL7
+         TlvkU4c3d/jWuVsJVAge5FY6BVmhKWH+SulsvV/Op4SQUxk39/fJUvnRJpYpsrFZ/soD
+         Sm9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCX4Brv4xIcIMZL/S/R2CAWgJfaAyNdQSUMNsVGQzyMj7xd+6db4TtA+gYBb1tPv+mQfTILLMUpab8c1AwoKsageXf6g
+X-Gm-Message-State: AOJu0YxgfWpgKzdnjNhdSBarW5hgRIb8mwtu14MnZRE8nylXUs0NekG2
+	WWfi6JccFduQkza4ZN4LqjvZYcKP1f8edfNeLa7k8rBvF3mXYulP1XFu4YmdpJ4=
+X-Google-Smtp-Source: AGHT+IERbT3mDOnr0wYVIphcC6NA9Nef7A18dyNpPXwHmau89kaOXmVqgNFsAymuGSVehlLeMl/dsQ==
+X-Received: by 2002:a17:907:6092:b0:a7a:a06b:eebf with SMTP id a640c23a62f3a-a7d3ffb76bamr952514666b.22.1722426084491;
+        Wed, 31 Jul 2024 04:41:24 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad41961sm762866966b.131.2024.07.31.04.41.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jul 2024 04:41:23 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id EADA45F80B;
+	Wed, 31 Jul 2024 12:41:22 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: David Stevens <stevensd@chromium.org>,  Paolo Bonzini
+ <pbonzini@redhat.com>,  Yu Zhang <yu.c.zhang@linux.intel.com>,  Isaku
+ Yamahata <isaku.yamahata@gmail.com>,  Zhi Wang <zhi.wang.linux@gmail.com>,
+  Maxim Levitsky <mlevitsk@redhat.com>,  kvmarm@lists.linux.dev,
+  linux-kernel@vger.kernel.org,  kvm@vger.kernel.org
+Subject: Re: [PATCH v11 0/8] KVM: allow mapping non-refcounted pages
+In-Reply-To: <ZnXHQid_N1w4kLoC@google.com> (Sean Christopherson's message of
+	"Fri, 21 Jun 2024 11:32:34 -0700")
+References: <20240229025759.1187910-1-stevensd@google.com>
+	<ZnXHQid_N1w4kLoC@google.com>
+Date: Wed, 31 Jul 2024 12:41:22 +0100
+Message-ID: <87cymtdc0t.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730053215.33768-1-flyingpeng@tencent.com>
- <db00e68b-2b34-49e1-aa72-425a35534762@redhat.com> <ZqlMob2o-97KsB8t@google.com>
- <CAPm50aLGRrK12ZSJzYadqO7Z7hM25NyXPdCD1sg_dTPCKKhJ-w@mail.gmail.com> <2e66f368-4502-4604-a98f-d8afb43413eb@redhat.com>
-In-Reply-To: <2e66f368-4502-4604-a98f-d8afb43413eb@redhat.com>
-From: Hao Peng <flyingpenghao@gmail.com>
-Date: Wed, 31 Jul 2024 19:19:26 +0800
-Message-ID: <CAPm50aJ2RtxM4bQE9Mq5Fz1tQy85K_eVW7cyKX3-n4o7H07YvQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86/mmu: Conditionally call kvm_zap_obsolete_pages
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
-	Peng Hao <flyingpeng@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 31, 2024 at 6:01=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com>=
- wrote:
+Sean Christopherson <seanjc@google.com> writes:
+
+> On Thu, Feb 29, 2024, David Stevens wrote:
+>> From: David Stevens <stevensd@chromium.org>
+>>=20
+>> This patch series adds support for mapping VM_IO and VM_PFNMAP memory
+>> that is backed by struct pages that aren't currently being refcounted
+>> (e.g. tail pages of non-compound higher order allocations) into the
+>> guest.
+>>=20
+>> Our use case is virtio-gpu blob resources [1], which directly map host
+>> graphics buffers into the guest as "vram" for the virtio-gpu device.
+>> This feature currently does not work on systems using the amdgpu driver,
+>> as that driver allocates non-compound higher order pages via
+>> ttm_pool_alloc_page().
+>>=20
+>> First, this series replaces the gfn_to_pfn_memslot() API with a more
+>> extensible kvm_follow_pfn() API. The updated API rearranges
+>> gfn_to_pfn_memslot()'s args into a struct and where possible packs the
+>> bool arguments into a FOLL_ flags argument. The refactoring changes do
+>> not change any behavior.
+>>=20
+>> From there, this series extends the kvm_follow_pfn() API so that
+>> non-refconuted pages can be safely handled. This invloves adding an
+>> input parameter to indicate whether the caller can safely use
+>> non-refcounted pfns and an output parameter to tell the caller whether
+>> or not the returned page is refcounted. This change includes a breaking
+>> change, by disallowing non-refcounted pfn mappings by default, as such
+>> mappings are unsafe. To allow such systems to continue to function, an
+>> opt-in module parameter is added to allow the unsafe behavior.
+>>=20
+>> This series only adds support for non-refcounted pages to x86. Other
+>> MMUs can likely be updated without too much difficulty, but it is not
+>> needed at this point. Updating other parts of KVM (e.g. pfncache) is not
+>> straightforward [2].
 >
-> On 7/31/24 11:09, Hao Peng wrote:
-> >> Yep.  And kvm_zap_obsolete_pages() is a relatively cheap nop if there =
-are no
-> >> pages on active_mmu_pages.  E.g. we could check kvm_memslots_have_rmap=
-s(), but I
-> >> don't see any point in doing so, as the existing code should be blazin=
-g fast
-> >> relative to the total cost of the zap.
-> > Here can be optimized by judging whether active_mmu_pages is empty,
-> > just like kvm_zap_obsolete_pages.
-> > Regardless of L0 kvm or L1 kvm, when tdp_mmu is enabled, the
-> > active_mmu_pages list will not be used.
-> > When ept=3D0 , the probability that active_mmu_pages is empty is also
-> > high, not every time
-> > kvm_zap_obsolete_pages is called.
->
-> So if anything you could check list_empty(&kvm->arch.active_mmu_pages)
-> before the loop of kvm_zap_obsolete_pages(), similar to what is done in
-> kvm_mmu_zap_oldest_mmu_pages().  I doubt it can have any practical
-> benefit, though.
->
-> Paolo
->
-I did some tests, when ept=3D0,  kvm_zap_obsolete_pages was called 42
-times, and only 17 times
-active_mmu_page list was not empty. When tdp_mmu was enabled,
-active_mmu_page list
-was always empty.
+> FYI, on the off chance that someone else is eyeballing this, I am working=
+ on
+> revamping this series.  It's still a ways out, but I'm optimistic that we=
+'ll be
+> able to address the concerns raised by Christoph and Christian, and maybe=
+ even
+> get KVM out of the weeds straightaway (PPC looks thorny :-/).
+
+I've applied this series to the latest 6.9.x while attempting to
+diagnose some of the virtio-gpu problems it may or may not address.
+However launching KVM guests keeps triggering a bunch of BUGs that
+eventually leave a hung guest:
+
+  12:16:54 [root@draig:~] # dmesg -c=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20
+  [252080.141629] RAX: ffffffffffffffda RBX: 0000560a64915500 RCX: 00007faa=
+23e81c5b=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141629] RDX: 0000000000000000 RSI: 000000000000ae80 RDI: 00000000=
+00000017=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141630] RBP: 000000000000ae80 R08: 0000000000000000 R09: 00000000=
+00000000=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141630] R10: 0000000000000000 R11: 0000000000000246 R12: 00000000=
+00000000=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141631] R13: 0000000000000001 R14: 00000000000000b2 R15: 00000000=
+00000002=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141632]  </TASK>=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20
+  [252080.141632] BUG: Bad page state in process CPU 0/KVM  pfn:fb1665=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+  [252080.141633] page: refcount:0 mapcount:1 mapping:0000000000000000 inde=
+x:0x7fa8117c3 pfn:0xfb1665=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20
+  [252080.141633] flags: 0x17ffffc00a000c(referenced|uptodate|mappedtodisk|=
+swapbacked|node=3D0|zone=3D2|lastcpupid=3D0x1fffff)=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141634] page_type: 0x0()=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20
+  [252080.141635] raw: 0017ffffc00a000c dead000000000100 dead000000000122 0=
+000000000000000=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141635] raw: 00000007fa8117c3 0000000000000000 0000000000000000 0=
+000000000000000=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141635] page dumped because: nonzero mapcount=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141636] Modules linked in: vhost_net vhost vhost_iotlb tap tun ua=
+s usb_storage veth cfg80211 nf_conntrack_netlink xfrm_user xfrm_algo xt_add=
+rtype br_netfilter nft_ma
+  sq wireguard libchacha20poly1305 chacha_x86_64 poly1305_x86_64 curve25519=
+_x86_64 libcurve25519_generic libchacha ip6_udp_tunnel udp_tunnel rfcomm sn=
+d_seq_dummy snd_hrtimer s
+  nd_seq xt_CHECKSUM xt_MASQUERADE xt_conntrack ipt_REJECT nf_reject_ipv4 x=
+t_tcpudp nft_compat nft_chain_nat nf_nat nf_conntrack nf_defrag_ipv6 nf_def=
+rag_ipv4 nf_tables nfnetl
+  ink bridge stp llc qrtr overlay cmac algif_hash algif_skcipher af_alg bne=
+p binfmt_misc squashfs snd_hda_codec_hdmi intel_uncore_frequency snd_ctl_le=
+d intel_uncore_frequency_
+  common ledtrig_audio x86_pkg_temp_thermal intel_powerclamp coretemp snd_s=
+of_pci_intel_tgl snd_sof_intel_hda_common kvm_intel soundwire_intel soundwi=
+re_generic_allocation btu
+  sb snd_sof_intel_hda_mlink sd_mod soundwire_cadence btrtl snd_hda_codec_r=
+ealtek kvm sg snd_sof_intel_hda btintel snd_sof_pci btbcm snd_hda_codec_gen=
+eric btmtk=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141656]  snd_sof_xtensa_dsp crc32_pclmul bluetooth snd_hda_scodec=
+_component ghash_clmulni_intel snd_sof sha256_ssse3 sha1_ssse3 snd_sof_util=
+s snd_soc_hdac_hda snd_hd
+  a_ext_core snd_soc_acpi_intel_match snd_soc_acpi snd_soc_core snd_compres=
+s soundwire_bus sha3_generic jitterentropy_rng aesni_intel snd_hda_intel sn=
+d_intel_dspcfg crypto_sim
+  d sha512_ssse3 snd_intel_sdw_acpi cryptd sha512_generic uvcvideo snd_hda_=
+codec snd_usb_audio videobuf2_vmalloc uvc ctr videobuf2_memops snd_hda_core=
+ snd_usbmidi_lib videobuf
+  2_v4l2 snd_rawmidi drbg snd_hwdep dell_wmi snd_seq_device nls_ascii ahci =
+ansi_cprng iTCO_wdt processor_thermal_device_pci videodev nls_cp437 snd_pcm=
+ intel_pmc_bxt dell_smbio
+  s libahci processor_thermal_device rapl rtsx_pci_sdmmc iTCO_vendor_suppor=
+t ecdh_generic mmc_core mei_hdcp watchdog libata intel_rapl_msr videobuf2_c=
+ommon rfkill vfat process
+  or_thermal_wt_hint pl2303 snd_timer dcdbas dell_wmi_ddv dell_wmi_sysman p=
+rocessor_thermal_rfim ucsi_acpi fat intel_cstate usbserial intel_uncore cdc=
+_acm mc battery ecc=20=20=20=20=20=20
+  [252080.141670]  firmware_attributes_class dell_wmi_descriptor wmi_bmof d=
+ell_smm_hwmon processor_thermal_rapl pcspkr scsi_mod mei_me intel_lpss_pci =
+snd typec_ucsi igc e1000e
+   i2c_i801 rtsx_pci intel_rapl_common intel_lpss roles mei soundcore proce=
+ssor_thermal_wt_req i2c_smbus idma64 scsi_common processor_thermal_power_fl=
+oor typec processor_therm
+  al_mbox button intel_pmc_core int3403_thermal int340x_thermal_zone intel_=
+vsec pmt_telemetry intel_hid int3400_thermal pmt_class sparse_keymap acpi_t=
+ad acpi_pad acpi_thermal_
+  rel msr parport_pc ppdev lp parport fuse loop efi_pstore configfs efivarf=
+s ip_tables x_tables autofs4 ext4 crc16 mbcache jbd2 hid_microsoft joydev f=
+f_memless hid_generic usb
+  hid hid btrfs blake2b_generic libcrc32c crc32c_generic xor raid6_pq evdev=
+ dm_mod i915 i2c_algo_bit drm_buddy ttm drm_display_helper xhci_pci xhci_hc=
+d drm_kms_helper nvme nvm
+  e_core drm t10_pi usbcore video crc64_rocksoft crc64 crc_t10dif cec crct1=
+0dif_generic crct10dif_pclmul crc32c_intel rc_core usb_common crct10dif_com=
+mon wmi=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141686]  pinctrl_alderlake=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20
+  [252080.141686] CPU: 8 PID: 1819169 Comm: CPU 0/KVM Tainted: G    B   W  =
+        6.9.12-ajb-00008-gfcd4b7efbad0 #17=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141687] Hardware name: Dell Inc. Precision 3660/0PRR48, BIOS 2.8.=
+1 08/14/2023=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141688] Call Trace:=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20
+  [252080.141688]  <TASK>=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20
+  [252080.141688]  dump_stack_lvl+0x60/0x80=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141689]  bad_page+0x70/0x100=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141690]  free_unref_page_prepare+0x22a/0x370=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141692]  free_unref_folios+0xe5/0x340=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141693]  ? __mem_cgroup_uncharge_folios+0x7a/0xa0=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141694]  folios_put_refs+0x147/0x1e0=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141696]  ? __pfx_lru_add_fn+0x10/0x10=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141697]  folio_batch_move_lru+0xc8/0x140=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141699]  folio_add_lru+0x51/0xa0=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141700]  do_wp_page+0x4dd/0xb60=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141701]  __handle_mm_fault+0xb2a/0xe30=20=20=20=20=20=20=20=20=20=
+=20
+  [252080.141703]  handle_mm_fault+0x18c/0x320=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141704]  __get_user_pages+0x164/0x6f0=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141705]  get_user_pages_unlocked+0xe2/0x370=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141706]  hva_to_pfn+0xa0/0x740 [kvm]=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141724]  kvm_faultin_pfn+0xf3/0x5f0 [kvm]=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141750]  kvm_tdp_page_fault+0x100/0x150 [kvm]=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141774]  kvm_mmu_page_fault+0x27e/0x7f0 [kvm]=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141798]  ? em_rsm+0xad/0x170 [kvm]=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141823]  ? writeback_registers+0x44/0x80 [kvm]=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141848]  ? vmx_set_cr0+0xc7/0x1320 [kvm_intel]=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141853]  ? x86_emulate_insn+0x484/0xe60 [kvm]=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141877]  ? vmx_vmexit+0x6e/0xd0 [kvm_intel]=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141882]  ? vmx_vmexit+0x99/0xd0 [kvm_intel]=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141887]  vmx_handle_exit+0x129/0x930 [kvm_intel]=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141892]  kvm_arch_vcpu_ioctl_run+0x682/0x15b0 [kvm]=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20
+  [252080.141918]  kvm_vcpu_ioctl+0x23d/0x6f0 [kvm]=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141936]  ? __seccomp_filter+0x32f/0x500=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141937]  ? kvm_io_bus_read+0x42/0xd0 [kvm]=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141956]  __x64_sys_ioctl+0x90/0xd0=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141957]  do_syscall_64+0x80/0x190=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141958]  ? kvm_arch_vcpu_put+0x126/0x160 [kvm]=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141982]  ? vcpu_put+0x1e/0x50 [kvm]=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.141999]  ? kvm_arch_vcpu_ioctl_run+0x757/0x15b0 [kvm]=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20
+  [252080.142023]  ? kvm_vcpu_ioctl+0x29e/0x6f0 [kvm]=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142040]  ? __seccomp_filter+0x32f/0x500=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142042]  ? kvm_on_user_return+0x60/0x90 [kvm]=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142065]  ? fire_user_return_notifiers+0x30/0x60=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142066]  ? syscall_exit_to_user_mode+0x73/0x200=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142067]  ? do_syscall_64+0x8c/0x190=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142068]  ? kvm_on_user_return+0x60/0x90 [kvm]=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142090]  ? fire_user_return_notifiers+0x30/0x60=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142091]  ? syscall_exit_to_user_mode+0x73/0x200=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142092]  ? do_syscall_64+0x8c/0x190=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142093]  ? do_syscall_64+0x8c/0x190=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142094]  ? do_syscall_64+0x8c/0x190=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142095]  ? exc_page_fault+0x72/0x170=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20
+  [252080.142096]  entry_SYSCALL_64_after_hwframe+0x76/0x7e=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20=20=20=20=20=20=20=20
+
+This backtrace repeats for a large chunk of pfns
+
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
