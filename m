@@ -1,113 +1,145 @@
-Return-Path: <kvm+bounces-22743-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22744-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12092942A84
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:31:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFF42942B10
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:45:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C27A3283CA3
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 09:31:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F224D1C2477E
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 09:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B74C1AAE00;
-	Wed, 31 Jul 2024 09:31:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CF31AC42D;
+	Wed, 31 Jul 2024 09:44:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b/Gs3ea7"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OdEgWGtW"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5838A18C93B
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 09:31:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 467781AC42A
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 09:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722418298; cv=none; b=MSLwk/uffkPXUD9Tlmd8j/4RE89fVfAi9a8QFrTfuDwofmEwMR2BcLgfAgnuHLBbOvrI0dYwN9X4bz0lZlws/pTWisCO6FlP/zJC245wt3RWQgYyT0B423hvl7miROQaawSV5UfjUy70XPfObdnYYDxoUs31xj7AMYFob+4wHRY=
+	t=1722419069; cv=none; b=sjzxi/hAb3ct1RxwlN2muKk7AznTgqNrQG18GDA2hIIzO31HJIuctJ0shTJR+B7oKAC3IlAtRSWZap4Cu0vOLx13LLLsjKY9x+RAJ95gVvjVRJJDYqg4jsHvILx/hIWT5I6SuvCN+1L4qeX4bkZJKIg6W8cN5JNzXBm3YBjoImU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722418298; c=relaxed/simple;
-	bh=mXMwe7QfWwZZX25jxlawu2AU02xw0yh685W/Xsz2Tl8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Qki1IT4U4xnno8rOtz5SDny5Y67oNBVCIeMXGPsDAIrmZqkryNmpPALXnCWFFspc59mh+hQOxOiMclAPEmmgVVdmrWOJOmqNm3GiRldOt0acwgel9kE9bBhUiBSn3pMnD2XLbqUHu7FittgagRmMLefsJZXpFxMSCNy1OyuBC00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b/Gs3ea7; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1fd640a6454so41513625ad.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 02:31:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722418296; x=1723023096; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=tAPwW2R9RXiwXKmn2Hdsapf0RNjOOXrUnl+0TYu7r44=;
-        b=b/Gs3ea7wY+oDmWnJkLcgv9N+HgrSq970dNYlSq1FmZEgQLRQUoGLQMMd4Mlwg4kb8
-         qHBQ9JP1QT7SLF/nI9YY/R8Qgb0Mx0F4WJ8ADj1kDz1Ft0vjreIxjzi81H9X94mQqLNg
-         Ax1SKcFy71fQUXN/vo2jRX3c9UB/JHqP6skcEm3+SoGGVlVOFfwGh1qXbbc4Z7vjLvCK
-         pGeyxHnjpxJW7yiNpw0oZ4QNe61lVbiyYkoR8XC1BI3MQhkUNsJKUwivBrvjTvG/QiIC
-         T8lMTx33+nk6jFHh1C3U0qLxFUuBK2MN/+fuk9eTK2NxyrElZkfsb2eiJlA3wzxtww1Y
-         JKew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722418296; x=1723023096;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=tAPwW2R9RXiwXKmn2Hdsapf0RNjOOXrUnl+0TYu7r44=;
-        b=Cl+r+YiW5P9m085C+zl1ZOBDZnjrKzbQ2N+QW5Ec7f/f7dLZPu2GtU00bK8cN+Dbf+
-         fHODvIx5BclA1q+E0tm5ipbe64gaX0OXSjsQ13UTcrCTx999lCaTAjp17QbdxqLlmxIV
-         Deys6iixlNsPii3iRvuxeIs4xzpZQb6GdNiJvgYisn0R0rV1rrDC9HtbVFDHNV2zwKuE
-         Bq0YMd4pHHUtlTnnuDj/2etljqGKQ7qG/xB3PN7ed2GT5nikZEiZFYFMCFra9DdhQfO/
-         191u7FI3Ye7wwMj4+1HaxNRzdse56OGZQZ/HRWBeMfTxTZTq3SDxoZYAI+i5TxPQ66/h
-         lebg==
-X-Gm-Message-State: AOJu0YytdC8M/YW77MuPL2BCbdkmiAJ3xjBFxiBGJ0bfhjpYepcg448U
-	Uuks1ZHpRmsMYGJAVXgQRiWKEvwAbPWX29jcBiKpFf7pHVc/dIujLgSN9g==
-X-Google-Smtp-Source: AGHT+IHXvBtH4B7sSDb20TgaitZ2wF7pdEwxiSWQBcRMCU6/buiBTdo4QvjmftMbWcIBzVgdRSWg1Q==
-X-Received: by 2002:a17:903:32c3:b0:1ff:3b0f:d5e2 with SMTP id d9443c01a7336-1ff3b0fd8d7mr44186965ad.32.1722418296518;
-        Wed, 31 Jul 2024 02:31:36 -0700 (PDT)
-Received: from FLYINGPENG-MB1.tencent.com ([103.7.29.30])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1fed7837e40sm116570365ad.0.2024.07.31.02.31.34
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Wed, 31 Jul 2024 02:31:36 -0700 (PDT)
-From: flyingpenghao@gmail.com
-X-Google-Original-From: flyingpeng@tencent.com
-To: seanjc@google.com,
-	pbonzini@redhat.com
-Cc: kvm@vger.kernel.org,
-	Peng Hao <flyingpeng@tencent.com>
-Subject: [PATCH RESEND]  KVM: X86: conditionally call the release operation of memslot rmap
-Date: Wed, 31 Jul 2024 17:31:29 +0800
-Message-Id: <20240731093129.46143-1-flyingpeng@tencent.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1722419069; c=relaxed/simple;
+	bh=Ln0JdJINoWOICfhnOxZ2+dUVWTVNhUAGwfyLKIbUqEs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Mietdiz2Uypq7CSQCOT/QVVP7HfnBCeOrqkz4+m/tTTEricCb/tXO12xLr8poCiseoFL5Jue1T8pAnaZEVb8q3GyVigGLTgJ89ANBtkWBNq6jKOC/IhSbZ7aYShWpDhMJ7NElijpsiLyKvF2F1AqZh1oXZunueTqVd0uHA4GU6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OdEgWGtW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722419066;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NlUG8qVe5wIiIf508RxBtgklVOghS84a6q0P9i32l4w=;
+	b=OdEgWGtW6QzLMSj5vCPdn/V+FB6FDNKA34bZxNGzdPWHT+YFRooybDonbBhrNQDa8wxKh0
+	k4dm3a/OsLJftLweZK4WiUZ5zJCt6jt3ec38k8ZWNKpawWGwtVZx5Czke2ElueDPeVYbuU
+	qNbDy+qSjpHnOhiI+bTEwnOn397CAco=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-593-r8nXOTFzNsKJlug9DOsdQw-1; Wed,
+ 31 Jul 2024 05:44:22 -0400
+X-MC-Unique: r8nXOTFzNsKJlug9DOsdQw-1
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6C65B1955F3B;
+	Wed, 31 Jul 2024 09:44:14 +0000 (UTC)
+Received: from redhat.com (unknown [10.39.194.1])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E8F1519560AA;
+	Wed, 31 Jul 2024 09:43:54 +0000 (UTC)
+Date: Wed, 31 Jul 2024 11:43:52 +0200
+From: Kevin Wolf <kwolf@redhat.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: qemu-devel@nongnu.org, alex.williamson@redhat.com,
+	andrew@codeconstruct.com.au, andrew@daynix.com,
+	arei.gonglei@huawei.com, berrange@redhat.com, berto@igalia.com,
+	borntraeger@linux.ibm.com, clg@kaod.org, david@redhat.com,
+	den@openvz.org, eblake@redhat.com, eduardo@habkost.net,
+	farman@linux.ibm.com, farosas@suse.de, hreitz@redhat.com,
+	idryomov@gmail.com, iii@linux.ibm.com, jamin_lin@aspeedtech.com,
+	jasowang@redhat.com, joel@jms.id.au, jsnow@redhat.com,
+	leetroy@gmail.com, marcandre.lureau@redhat.com,
+	marcel.apfelbaum@gmail.com, michael.roth@amd.com, mst@redhat.com,
+	mtosatti@redhat.com, nsg@linux.ibm.com, pasic@linux.ibm.com,
+	pbonzini@redhat.com, peter.maydell@linaro.org, peterx@redhat.com,
+	philmd@linaro.org, pizhenwei@bytedance.com, pl@dlhnet.de,
+	richard.henderson@linaro.org, stefanha@redhat.com,
+	steven_lee@aspeedtech.com, thuth@redhat.com,
+	vsementsov@yandex-team.ru, wangyanan55@huawei.com,
+	yuri.benditovich@daynix.com, zhao1.liu@intel.com,
+	qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-s390x@nongnu.org,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH 01/18] qapi: Smarter camel_to_upper() to reduce need for
+ 'prefix'
+Message-ID: <ZqoHWPOeqF7uGncx@redhat.com>
+References: <20240730081032.1246748-1-armbru@redhat.com>
+ <20240730081032.1246748-2-armbru@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240730081032.1246748-2-armbru@redhat.com>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-From: Peng Hao <flyingpeng@tencent.com>
+Am 30.07.2024 um 10:10 hat Markus Armbruster geschrieben:
+> camel_to_upper() converts its argument from camel case to upper case
+> with '_' between words.  Used for generated enumeration constant
+> prefixes.
+> 
+> When some of the words are spelled all caps, where exactly to insert
+> '_' is guesswork.  camel_to_upper()'s guesses are bad enough in places
+> to make people override them with a 'prefix' in the schema.
+> 
+> Rewrite it to guess better:
+> 
+> 1. Insert '_' after a non-upper case character followed by an upper
+>    case character:
+> 
+>        OneTwo -> ONE_TWO
+>        One2Three -> ONE2_THREE
+> 
+> 2. Insert '_' before the last upper case character followed by a
+>    non-upper case character:
+> 
+>        ACRONYMWord -> ACRONYM_Word
+> 
+>    Except at the beginning (as in OneTwo above), or when there is
+>    already one:
+> 
+>        AbCd -> AB_CD
 
-memslot_rmap_alloc is called when kvm_memslot_have_rmaps is enabled,
-so memslot_rmap_free in the exception process should also be called
-under the same conditions.
+Maybe it's just me, but the exception "at the beginning" (in the sense
+of "after the first character") seems to be exactly where I thought
+"that looks strange" while going through your list below. In particular,
+I'd expect X_DBG_* instead of XDBG_*. I also thought that the Q_*
+spelling made more sense, though this might be less clear. But in case
+of doubt, less exceptions seems like a good choice.
 
-Signed-off-by: Peng Hao <flyingpeng@tencent.com>
----
- arch/x86/kvm/x86.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+> +    # Copy remainder of ``value`` to ``ret`` with '_' inserted
+> +    for ch in value[1:]:
+> +        if ch.isupper() == upc:
+> +            pass
+> +        elif upc:
+> +            # ``ret`` ends in upper case, next char isn't: insert '_'
+> +            # before the last upper case char unless there is one
+> +            # already, or it's at the beginning
+> +            if len(ret) > 2 and ret[-2] != '_':
+> +                ret = ret[:-1] + '_' + ret[-1]
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index af6c8cf6a37a..00a1d96699b8 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -12947,7 +12947,8 @@ static int kvm_alloc_memslot_metadata(struct kvm *kvm,
- 	return 0;
- 
- out_free:
--	memslot_rmap_free(slot);
-+	if (kvm_memslots_have_rmaps(kvm))
-+		memslot_rmap_free(slot);
- 
- 	for (i = 1; i < KVM_NR_PAGE_SIZES; ++i) {
- 		vfree(slot->arch.lpage_info[i - 1]);
--- 
-2.27.0
+I think in the code this means I would have expected len(ret) >= 2.
+
+Kevin
 
 
