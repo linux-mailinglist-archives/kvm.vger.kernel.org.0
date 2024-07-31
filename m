@@ -1,139 +1,151 @@
-Return-Path: <kvm+bounces-22804-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22805-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2E79943666
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 21:28:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E5C294368D
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 21:41:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 669711F277E2
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 19:28:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A5641C21EA8
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 19:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB0F14A0AE;
-	Wed, 31 Jul 2024 19:27:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2982815FA7A;
+	Wed, 31 Jul 2024 19:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="QihTxrdq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jirpesr8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5E9149C51;
-	Wed, 31 Jul 2024 19:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F42235280;
+	Wed, 31 Jul 2024 19:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722454068; cv=none; b=R5n2o2ACAZqLUHS2V3R/XjqGmLg+K/13ogOjuN0XN9GH61SofSWk2Mg5fBr9RPYzAPBrfYelSx9SV+naboeaEQ8zRFq0ODk0uusEkBls17rfAvTVc2fQDqpsQS9Cw6i9FwrXTDhl4eZdaLdmf2buQVAHeyj1IXESo5OhaJjCBSU=
+	t=1722454855; cv=none; b=UVyzzUNvSdIraYMrOSGoatPSU3NocSZgo1DvIHlL0DhX5WOqdnbxb8b1VP2iyu66b5cOACTsYqhnjyBnIXnj5JaeGs3EN/X73KarMibP09C9nHHrBrOg5ty5oRUY77XwGKse4z0EfdzZpSl7GJlvW0SsTMTnp0PD/pu3M1s/TVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722454068; c=relaxed/simple;
-	bh=Mhx8E0fT9obAxJYSTGJ2xXP2P1OHW/oSmyU+JnM5NMI=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=mDlBjFBWzABfcexKUgcS1n402IImIqQMat9mRfm0yV6/nHAcF1pOvSSlPp9yfGQb+a5f+TvT0nHHE6Db87pzAsdW87/INx2nOPJ5NztEAsi6KG2+Ez/oImZPlszvq3rIIr1EBJCZh31jCSTHi2PNcQ3YluXbMJbkSLjLmlGi0kA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=QihTxrdq; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1sZEz2-008LM1-1t; Wed, 31 Jul 2024 21:27:36 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
-	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
-	bh=5cZZTTx5MpJgwdaoTjtIaSNaIM4FcBhy+Kr0FE1iKtU=; b=QihTxrdqEswI3MLvYwAESwnzUX
-	jI9p+Z15WK/vcr4r0tVB3W+ejqL80bbMyrIlGLL90Uw9BVR9tgV3acAkPXyLsH8S8354Izgw5Knc2
-	8k3fDR3N5MSaxcTeFoKF9uLBbJ3h5rW06BThrMvrUBRQ+7qGCQlawvxcXm61ROfSSDIb4GZxyJqyk
-	MtYKJEheuwNKg6wo5Vr03SvT+ogdL9dXn9ZPRl6Q0ss26/RiQB+ef0GuEUPN/kitutvbkCKcaAmgu
-	vz+nvONjMVcSFBlmgvXKpWPD4zVbqOrgcKE01nnk/+H4EA65QQg16sr1mLAQ5k2LUQmcH4laK/g9d
-	BU3iPZ7w==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1sZEz1-0005EC-Ju; Wed, 31 Jul 2024 21:27:35 +0200
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1sZEyj-004luM-V7; Wed, 31 Jul 2024 21:27:18 +0200
-Message-ID: <9c77a7f7-4932-498a-ac51-65a5e755c926@rbox.co>
-Date: Wed, 31 Jul 2024 21:27:16 +0200
+	s=arc-20240116; t=1722454855; c=relaxed/simple;
+	bh=nZsTfRkPRsBDTl7KWkqYsSA/btlrP7383aII6HM3n8A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=thsYnDj8l7HYxm/cpyJ11SxY7VMwjA5cUWBgxqwGaRCVz8J7UUhmiVTj/v967UTo1tndJExlMnJDSBMDm42z2eblcyR+JayWAJlzCqw1l6xOcC/f7yqwMRSP1MHe5+tie7GADFKm2CspjdYGHpBpgKoopZZUyOZ+yiN7CtNtAcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jirpesr8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02D05C4AF0C;
+	Wed, 31 Jul 2024 19:40:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722454855;
+	bh=nZsTfRkPRsBDTl7KWkqYsSA/btlrP7383aII6HM3n8A=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Jirpesr8hL0Saat3zFCWd82wVd9xlaiYSjjEt4PXnxNews/E66FXNGAXW4/rhqRI1
+	 +SKwK9CU4UOFatLuZodIc9h/ZX1hCSxFNS/WeFi/FAMN/dVhI8mTihgLe3gu7YUg10
+	 JAttELO5VpzlUJizWP45nE4nmyY9ydtkIqwdB2q687Rci+HL9aYMIX/ln8k2u04OzS
+	 fQdCvcl7ccXf3gwrmL9r1NH51GRjSRORWzEniRm36b5wNRBHGpVjTAO2GVZsYPl13q
+	 ADVhYnqe6saqNH6l7Hl1ShCTR1857iSir3CmGlNy/9V55dXrmeyLvV8TCXDJKcDhfM
+	 PsO54X91NPNrg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sZFBs-00H6Gh-U0;
+	Wed, 31 Jul 2024 20:40:52 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: [PATCH v2 00/17] KVM: arm64: nv: Add support for address translation instructions
+Date: Wed, 31 Jul 2024 20:40:13 +0100
+Message-Id: <20240731194030.1991237-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Michal Luczaj <mhal@rbox.co>
-Subject: Re: [PATCH] KVM: Fix error path in kvm_vm_ioctl_create_vcpu() on
- xa_store() failure
-To: Sean Christopherson <seanjc@google.com>
-Cc: Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
- Alexander Potapenko <glider@google.com>, Marc Zyngier <maz@kernel.org>
-References: <20240730155646.1687-1-will@kernel.org>
- <ccd40ae1-14aa-454e-9620-b34154f03e53@rbox.co> <Zql3vMnR86mMvX2w@google.com>
- <20240731133118.GA2946@willie-the-truck>
- <3e5f7422-43ce-44d4-bff7-cc02165f08c0@rbox.co> <Zqpj8M3xhPwSVYHY@google.com>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <Zqpj8M3xhPwSVYHY@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, alexandru.elisei@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 7/31/24 18:18, Sean Christopherson wrote:
-> On Wed, Jul 31, 2024, Michal Luczaj wrote:
->> On 7/31/24 15:31, Will Deacon wrote:
->>> On Tue, Jul 30, 2024 at 04:31:08PM -0700, Sean Christopherson wrote:
->>>> On Tue, Jul 30, 2024, Michal Luczaj wrote:
->>>>> On 7/30/24 17:56, Will Deacon wrote:
->>>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
->>>>>> index d0788d0a72cc..b80dd8cead8c 100644
->>>>>> --- a/virt/kvm/kvm_main.c
->>>>>> +++ b/virt/kvm/kvm_main.c
->>>>>> @@ -4293,7 +4293,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
->>>>>>  
->>>>>>  	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
->>>>>>  		r = -EINVAL;
->>>>>> -		goto kvm_put_xa_release;
->>>>>> +		goto err_xa_release;
->>>>>>  	}
->>>>>>  
->>>>>>  	/*
->>>>>> @@ -4310,6 +4310,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
->>>>>>  
->>>>>>  kvm_put_xa_release:
->>>>>>  	kvm_put_kvm_no_destroy(kvm);
->>>>>> +err_xa_release:
->>>>>>  	xa_release(&kvm->vcpu_array, vcpu->vcpu_idx);
->>>>>>  unlock_vcpu_destroy:
->>>>>>  	mutex_unlock(&kvm->lock);
->>>>>
->>>>> My bad for neglecting the "impossible" path. Thanks for the fix.
->>>>>
->>>>> I wonder if it's complete. If we really want to consider the possibility of
->>>>> this xa_store() failing, then keeping vCPU fd installed and calling
->>>>> kmem_cache_free(kvm_vcpu_cache, vcpu) on the error path looks wrong.
->>>>
->>>> Yeah, the vCPU is exposed to userspace, freeing its assets will just cause
->>>> different problems.  KVM_BUG_ON() will prevent _new_ vCPU ioctl() calls (and kick
->>>> running vCPUs out of the guest), but it doesn't interrupt other CPUs, e.g. if
->>>> userspace is being sneaking and has already invoked a vCPU ioctl(), KVM will hit
->>>> a use-after-free (several of them).
->>>
->>> Damn, yes. Just because we haven't returned the fd yet, doesn't mean
->>> userspace can't make use of it.
->>>
->>>> As Michal alluded to, it should be impossible for xa_store() to fail since KVM
->>>> pre-allocates/reserves memory.  Given that, deliberately leaking the vCPU seems
->>>> like the least awful "solution".
->>>
->>> Could we actually just move the xa_store() before the fd creation? I
->>> can't immediately see any issues with that...
->>
->> Hah, please see commit afb2acb2e3a3 :) Long story short: create_vcpu_fd()
->> can legally fail, which must be handled gracefully, which would involve
->> destruction of an already xa_store()ed vCPU, which is racy.
-> 
-> Ya, the basic problem is that we have two ways of publishing the vCPU, fd and
-> vcpu_array, with no way of setting both atomically.  Given that xa_store() should
-> never fail, I vote we do the simple thing and deliberately leak the memory.
+This is the second revision of the address translation emulation for
+NV support on arm64 initially posted at [1]. I haven't kept an
+detailed change log of what happened since, but here are the
+highlights:
 
-I agree it's a good idea. So for a failed xa_store(), just drop the goto?
+  * A fair amount has changed in the series, starting with a lot of
+    bugs being fixed thanks to Alex's hard work comparing the
+    implementation and the pseudocode. All credits to him, this is a
+    lot harder than writing code.
+
+  * At Alex's request, the code structure is now a bit closer to the
+    pseudocode in a number of aspects, so that people can eyeball it
+    more easily.
+
+  * Whenever I could, I added references to ARM ARM rules to help with
+    cross-referencing the implementation and the requirements.
+
+  * FEAT_PAN2 support is now implemented using the... FEAT_PAN2
+    instructions (surprise!) instead of the previous version that was
+    using three different AT instructions.
+
+  * The code now has the notion of translation regime, which makes it
+    somehow clearer what is going on. I was pretty sceptical about it
+    initially, but it turned out rather OK.
+
+  * The series has been resplit to make it more digestable. Patch 13
+    is still on a mission to make you puke.
+
+I've added the usual reviewers on Cc, plus people who explicitly asked
+to be on it, and people who seem to be super keen on NV.
+
+Patches on top of 6.11-rc1, tested on my usual M2 (so VHE only).
+
+[1] https://lore.kernel.org/r/20240625133508.259829-1-maz@kernel.org
+
+Joey Gouly (1):
+  KVM: arm64: Make kvm_at() take an OP_AT_*
+
+Marc Zyngier (16):
+  arm64: Add missing APTable and TCR_ELx.HPD masks
+  arm64: Add PAR_EL1 field description
+  arm64: Add system register encoding for PSTATE.PAN
+  arm64: Add ESR_ELx_FSC_ADDRSZ_L() helper
+  KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
+  KVM: arm64: nv: Honor absence of FEAT_PAN2
+  KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}
+  KVM: arm64: nv: Add basic emulation of AT S1E1{R,W}P
+  KVM: arm64: nv: Add basic emulation of AT S1E2{R,W}
+  KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
+  KVM: arm64: nv: Make ps_to_output_size() generally available
+  KVM: arm64: nv: Add SW walker for AT S1 emulation
+  KVM: arm64: nv: Sanitise SCTLR_EL1.EPAN according to VM configuration
+  KVM: arm64: nv: Make AT+PAN instructions aware of FEAT_PAN3
+  KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
+  KVM: arm64: nv: Add support for FEAT_ATS1A
+
+ arch/arm64/include/asm/esr.h           |    5 +-
+ arch/arm64/include/asm/kvm_arm.h       |    1 +
+ arch/arm64/include/asm/kvm_asm.h       |    6 +-
+ arch/arm64/include/asm/kvm_nested.h    |   18 +-
+ arch/arm64/include/asm/pgtable-hwdef.h |    9 +
+ arch/arm64/include/asm/sysreg.h        |   22 +
+ arch/arm64/kvm/Makefile                |    2 +-
+ arch/arm64/kvm/at.c                    | 1058 ++++++++++++++++++++++++
+ arch/arm64/kvm/emulate-nested.c        |    2 +
+ arch/arm64/kvm/hyp/include/hyp/fault.h |    2 +-
+ arch/arm64/kvm/nested.c                |   34 +-
+ arch/arm64/kvm/sys_regs.c              |   60 ++
+ 12 files changed, 1192 insertions(+), 27 deletions(-)
+ create mode 100644 arch/arm64/kvm/at.c
+
+-- 
+2.39.2
+
 
