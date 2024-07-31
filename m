@@ -1,140 +1,139 @@
-Return-Path: <kvm+bounces-22803-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22804-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38CCC943580
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 20:14:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E79943666
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 21:28:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE4CB1F2200E
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 18:14:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 669711F277E2
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 19:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B33482DB;
-	Wed, 31 Jul 2024 18:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB0F14A0AE;
+	Wed, 31 Jul 2024 19:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XdxtNm5j"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="QihTxrdq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148B03BBF2;
-	Wed, 31 Jul 2024 18:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5E9149C51;
+	Wed, 31 Jul 2024 19:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722449674; cv=none; b=R0NNgvW/qUIgbA6IgSdWYWp3sVC8tuVD1cD8nIUcNaSxx5VoLvG+u/ec807ExJbeBH8FNPMzz0X2cGbf4JmNWkI9DmM7jbq/K6xib5b7iS9vJPNitoH/On3vcBTZGmSItUuXqjivOThvLt4ifIwP3ZxkxFCXehrU9FyvpRBZNmc=
+	t=1722454068; cv=none; b=R5n2o2ACAZqLUHS2V3R/XjqGmLg+K/13ogOjuN0XN9GH61SofSWk2Mg5fBr9RPYzAPBrfYelSx9SV+naboeaEQ8zRFq0ODk0uusEkBls17rfAvTVc2fQDqpsQS9Cw6i9FwrXTDhl4eZdaLdmf2buQVAHeyj1IXESo5OhaJjCBSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722449674; c=relaxed/simple;
-	bh=Pp0vWyL7VeDKadleGOEHNTdhDMPNVXeakIX5tgvvsCU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=m5cXv0CFfIuWTKgBURXbCUV6jNQ8yuMOsiysmwOiXYk7D+Oz2hPEkbJLfEXs9i4pQJL0sPgKtagVG7dwjR8Qhh4WB4PaetWPGzYcccs8Dz0WG9jrqsbamoVhNfq+E7NP7pBTvLhTuHnIQDJ2q7DISYmDt0fJISSELkt/apR35SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XdxtNm5j; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-3684e8220f9so695951f8f.1;
-        Wed, 31 Jul 2024 11:14:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722449671; x=1723054471; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pp0vWyL7VeDKadleGOEHNTdhDMPNVXeakIX5tgvvsCU=;
-        b=XdxtNm5jvf2ukVXdfu/2pFEfwrjpiI25CyYbxqrDGe2klH14/y3aSQ6XSI+YwkGQbw
-         atNUcciuw+dJ5lqTkV62dyTEeoV96ta6vcjEm8nNNDPDPpwf7Tnzgqmj4IzPofm93WdS
-         thwQnbsiQvm1BSwS8AAPGHJPiobLitebFssQIlRb8ToE46q1/pL9+M/zVHrmaqKH6HlQ
-         fEpdcjapz/+23AA7D5d5ApoLedbJ+4Iqms8TQ0ETQx/w+vbwo3UnSmSvv5cTL3phwgXD
-         IhDgxwI+VbnkcxJ0NkZZwJdUiOb9i5aMHcGnsbk8+jSqHEULAcRl7RLoMdVBLed9hiw4
-         +jUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722449671; x=1723054471;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pp0vWyL7VeDKadleGOEHNTdhDMPNVXeakIX5tgvvsCU=;
-        b=DFSYsgb/4FTbifeganFqZPbe5CBf3ArKeD3jSkB1W4wJd4vYFruG+6BPbFCQf4vtdv
-         u5GEw8M2Kr7mMvH1rBtNvPX79Y20PmhdSm6P7/D1mXzk/XuqXN17GKO+YQntvQKeuWNo
-         YNJQx0WlT9fqdDvLW+JlV7UmUGIAYe+MdkR0N4Zjpv0/wu6j0e64ivDvmdbNHf3mfgQo
-         uGHPB+hAAUmrER9eHyum5yPZfZVUSHjyGlRKXHyELonSFVnG9tsxzTdcNXsw0pw46MV7
-         uEUPK5nXNbD7llH9QbRQ7B6T0pdU3bPr2b6qdkSWVAg29esOgygIPWMdNwUhjsFGv0BE
-         NMwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUlB+ZaOqV6VX+u9BVl1k133RSwYXFHdLu0mS1h2tlYeiKf6Qkobg/L7xZVeaf6Ec7CM6J+925rOxFg2AUp97FksRIUgv3qDUSeqPRfOR3AmlVze3mJsotkt+CT3SWncO9eCmRrLQObjhGtukCTotb8e6/6y9nY5sDiHdjrR0gXxzzCFEej+v3DL3O/rj7TQ4PS/pzywsY62Mn4wBW5JNPbuSHm9nKl5rMU
-X-Gm-Message-State: AOJu0YwnvVtCrT2Dc6h4nVjzlEsSUvG40QNthfZ12B4FjHjEAvn/S2aq
-	S/EU9sH0ZURS/UFd9eZtMIvd4jLGar3ORYtltEkG/uOBSfHa/8ocJLtEuM1gFLGA5Ocawub2Afk
-	DuUWu8SkXeKOKaurw+n6uLq82qQM=
-X-Google-Smtp-Source: AGHT+IGv2ta3BQ/aeYaFuo6uJnDIs2Oh1PDBCcZrH55JaT3W4vssxSHelAFkF3XSYf9nggWCe12LvyT/WHK2KvkPs3c=
-X-Received: by 2002:a05:6000:4582:b0:365:aec0:e191 with SMTP id
- ffacd0b85a97d-36b8c8fdbdbmr4052808f8f.21.1722449671103; Wed, 31 Jul 2024
- 11:14:31 -0700 (PDT)
+	s=arc-20240116; t=1722454068; c=relaxed/simple;
+	bh=Mhx8E0fT9obAxJYSTGJ2xXP2P1OHW/oSmyU+JnM5NMI=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=mDlBjFBWzABfcexKUgcS1n402IImIqQMat9mRfm0yV6/nHAcF1pOvSSlPp9yfGQb+a5f+TvT0nHHE6Db87pzAsdW87/INx2nOPJ5NztEAsi6KG2+Ez/oImZPlszvq3rIIr1EBJCZh31jCSTHi2PNcQ3YluXbMJbkSLjLmlGi0kA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=QihTxrdq; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sZEz2-008LM1-1t; Wed, 31 Jul 2024 21:27:36 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:References:
+	Cc:To:Subject:From:MIME-Version:Date:Message-ID;
+	bh=5cZZTTx5MpJgwdaoTjtIaSNaIM4FcBhy+Kr0FE1iKtU=; b=QihTxrdqEswI3MLvYwAESwnzUX
+	jI9p+Z15WK/vcr4r0tVB3W+ejqL80bbMyrIlGLL90Uw9BVR9tgV3acAkPXyLsH8S8354Izgw5Knc2
+	8k3fDR3N5MSaxcTeFoKF9uLBbJ3h5rW06BThrMvrUBRQ+7qGCQlawvxcXm61ROfSSDIb4GZxyJqyk
+	MtYKJEheuwNKg6wo5Vr03SvT+ogdL9dXn9ZPRl6Q0ss26/RiQB+ef0GuEUPN/kitutvbkCKcaAmgu
+	vz+nvONjMVcSFBlmgvXKpWPD4zVbqOrgcKE01nnk/+H4EA65QQg16sr1mLAQ5k2LUQmcH4laK/g9d
+	BU3iPZ7w==;
+Received: from [10.9.9.74] (helo=submission03.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sZEz1-0005EC-Ju; Wed, 31 Jul 2024 21:27:35 +0200
+Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sZEyj-004luM-V7; Wed, 31 Jul 2024 21:27:18 +0200
+Message-ID: <9c77a7f7-4932-498a-ac51-65a5e755c926@rbox.co>
+Date: Wed, 31 Jul 2024 21:27:16 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731124505.2903877-1-linyunsheng@huawei.com> <20240731124505.2903877-5-linyunsheng@huawei.com>
-In-Reply-To: <20240731124505.2903877-5-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Wed, 31 Jul 2024 11:13:54 -0700
-Message-ID: <CAKgT0UcqdeSJdjZ_FfwyCnT927TwOkE4zchHLOkrBEmhGzex9g@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Subbaraya Sundeep <sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, intel-wired-lan@lists.osuosl.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	linux-nvme@lists.infradead.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-mm@kvack.org, bpf@vger.kernel.org, 
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+From: Michal Luczaj <mhal@rbox.co>
+Subject: Re: [PATCH] KVM: Fix error path in kvm_vm_ioctl_create_vcpu() on
+ xa_store() failure
+To: Sean Christopherson <seanjc@google.com>
+Cc: Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Alexander Potapenko <glider@google.com>, Marc Zyngier <maz@kernel.org>
+References: <20240730155646.1687-1-will@kernel.org>
+ <ccd40ae1-14aa-454e-9620-b34154f03e53@rbox.co> <Zql3vMnR86mMvX2w@google.com>
+ <20240731133118.GA2946@willie-the-truck>
+ <3e5f7422-43ce-44d4-bff7-cc02165f08c0@rbox.co> <Zqpj8M3xhPwSVYHY@google.com>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <Zqpj8M3xhPwSVYHY@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jul 31, 2024 at 5:50=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> Currently the page_frag API is returning 'virtual address'
-> or 'va' when allocing and expecting 'virtual address' or
-> 'va' as input when freeing.
->
-> As we are about to support new use cases that the caller
-> need to deal with 'struct page' or need to deal with both
-> 'va' and 'struct page'. In order to differentiate the API
-> handling between 'va' and 'struct page', add '_va' suffix
-> to the corresponding API mirroring the page_pool_alloc_va()
-> API of the page_pool. So that callers expecting to deal with
-> va, page or both va and page may call page_frag_alloc_va*,
-> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
->
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+On 7/31/24 18:18, Sean Christopherson wrote:
+> On Wed, Jul 31, 2024, Michal Luczaj wrote:
+>> On 7/31/24 15:31, Will Deacon wrote:
+>>> On Tue, Jul 30, 2024 at 04:31:08PM -0700, Sean Christopherson wrote:
+>>>> On Tue, Jul 30, 2024, Michal Luczaj wrote:
+>>>>> On 7/30/24 17:56, Will Deacon wrote:
+>>>>>> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+>>>>>> index d0788d0a72cc..b80dd8cead8c 100644
+>>>>>> --- a/virt/kvm/kvm_main.c
+>>>>>> +++ b/virt/kvm/kvm_main.c
+>>>>>> @@ -4293,7 +4293,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>>>>>>  
+>>>>>>  	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
+>>>>>>  		r = -EINVAL;
+>>>>>> -		goto kvm_put_xa_release;
+>>>>>> +		goto err_xa_release;
+>>>>>>  	}
+>>>>>>  
+>>>>>>  	/*
+>>>>>> @@ -4310,6 +4310,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>>>>>>  
+>>>>>>  kvm_put_xa_release:
+>>>>>>  	kvm_put_kvm_no_destroy(kvm);
+>>>>>> +err_xa_release:
+>>>>>>  	xa_release(&kvm->vcpu_array, vcpu->vcpu_idx);
+>>>>>>  unlock_vcpu_destroy:
+>>>>>>  	mutex_unlock(&kvm->lock);
+>>>>>
+>>>>> My bad for neglecting the "impossible" path. Thanks for the fix.
+>>>>>
+>>>>> I wonder if it's complete. If we really want to consider the possibility of
+>>>>> this xa_store() failing, then keeping vCPU fd installed and calling
+>>>>> kmem_cache_free(kvm_vcpu_cache, vcpu) on the error path looks wrong.
+>>>>
+>>>> Yeah, the vCPU is exposed to userspace, freeing its assets will just cause
+>>>> different problems.  KVM_BUG_ON() will prevent _new_ vCPU ioctl() calls (and kick
+>>>> running vCPUs out of the guest), but it doesn't interrupt other CPUs, e.g. if
+>>>> userspace is being sneaking and has already invoked a vCPU ioctl(), KVM will hit
+>>>> a use-after-free (several of them).
+>>>
+>>> Damn, yes. Just because we haven't returned the fd yet, doesn't mean
+>>> userspace can't make use of it.
+>>>
+>>>> As Michal alluded to, it should be impossible for xa_store() to fail since KVM
+>>>> pre-allocates/reserves memory.  Given that, deliberately leaking the vCPU seems
+>>>> like the least awful "solution".
+>>>
+>>> Could we actually just move the xa_store() before the fd creation? I
+>>> can't immediately see any issues with that...
+>>
+>> Hah, please see commit afb2acb2e3a3 :) Long story short: create_vcpu_fd()
+>> can legally fail, which must be handled gracefully, which would involve
+>> destruction of an already xa_store()ed vCPU, which is racy.
+> 
+> Ya, the basic problem is that we have two ways of publishing the vCPU, fd and
+> vcpu_array, with no way of setting both atomically.  Given that xa_store() should
+> never fail, I vote we do the simple thing and deliberately leak the memory.
 
-I am naking this patch. It is a pointless rename that is just going to
-obfuscate the git history for these callers.
-
-As I believe I said before I would prefer to see this work more like
-the handling of __get_free_pages and __free_pages in terms of the use
-of pages versus pointers and/or longs. Pushing this API aside because
-you want to reuse the name for something different isn't a valid
-reason to rename an existing API and will just lead to confusion.
+I agree it's a good idea. So for a failed xa_store(), just drop the goto?
 
