@@ -1,143 +1,163 @@
-Return-Path: <kvm+bounces-22823-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22824-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F5DA94372A
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 22:36:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3A8943795
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 23:12:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6140C1C21069
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 20:36:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7EC4283C46
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 21:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967221684AB;
-	Wed, 31 Jul 2024 20:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EAFE16C86E;
+	Wed, 31 Jul 2024 21:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WeyhuXd7"
+	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="o/Tz0jue"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921FE3B1BC
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 20:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DA2168C26
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 21:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722458189; cv=none; b=QjIW76KTkT2pUmzkiZlEXapMn4MrUNXcMGVeuRnAQFq0mH+kL+jlJjAD9uGhE0RVEPVB4l1NNRUQHa+zS0HzsFbTFhubZvhE80UibkAfvPdc1FcPZ7XYa2LhzalpmQgchzTtJmxBQHe9b+W9tKf6tw3deEBturOvsp+qvjCeTG8=
+	t=1722460317; cv=none; b=HwhL8y0OSAnJzdDlPhF83VNvQDjteHlk2fGQ5OD4mRHWorEJtj/A1X4/vQbM62p7QLsDWneYfHuvVyllCdXsRL29l5xTratx+IOZ+8h/+i08BwS616jSPtwV/VcF+nIMNlnzsnR5Y8Txu1WaURCnqE2FAUAvyNlc+awoH5M2G8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722458189; c=relaxed/simple;
-	bh=z1aLVeNoBym3Qjn/r9ThqGkDG4AOjTwKh0lTuQS/B+0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gkj/4Res8kV9+mxm2wSw1qV4uMG41ANRZXNErHgkrIo/kyGqyeUkSYOGCYbfYF3XNs3NiF8T08lRWcDFsvazg7c+PDuf7Fv+R11dj0RdzTWgfezx7t4DeBBes1NbdHQAhZvVruaHDbc02PNpENN5jZuLthIergDvj9r2NC1YS/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WeyhuXd7; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0bb206570aso2959887276.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 13:36:27 -0700 (PDT)
+	s=arc-20240116; t=1722460317; c=relaxed/simple;
+	bh=EZqrkOuzvZ52XOMTxZgs+Cr/oGYo9OlHNt4FT39kZOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GcpWySkY/BXFyinb1nERHd5D8ZeUBSdsjWEq3pRVi51Mu3+Uy6Qq5c2iZzyyvdDhSGRe5/sZxMT9T8aeJ7xti5CIHlCSd+IIi9C7QSW3r0ANfKhBD5cNDm81hbPQSbNOsqekDOq5HMALGbB9q/OGgxMUb28xFnIz4rrWLSSVlx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=o/Tz0jue; arc=none smtp.client-ip=209.85.210.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
+Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7094641d4e6so2071623a34.3
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 14:11:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722458186; x=1723062986; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Kd/mYHbPzOSIwsUM5m5UMPqJkKyWoklOLcVSOqbILGs=;
-        b=WeyhuXd7I/9HsccEAdIat5gekMhyyetArz33y71PyOc1qGoQJ6ZwTwBU03VoYXUnjD
-         nleVvSHuWKdvCA3G7jTW+JyMb9C8y1Cqbm6qVrQshdRN5ZLI/gBd6RMO81liQzZstVYW
-         bfIMboSjdr0bh9YSPItGecdUGm+i01vFy5gNWEn0w0xs4c+z9FTe19ekN+/YwDyMTYrr
-         dIa7LEg8wKXE3iDFHkisRRFDSpV74+q8hahraJeruURji5PC1E9eVja5XUcycN+yD+MK
-         6OT5iaX53wAvq9jSvmzfrAAdqXPgADCq50O7SFCAyFR+mpH8ndIPYZuW9/woaDSIR6N7
-         HblA==
+        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1722460315; x=1723065115; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/ZvLSXSFJMkLNlj/PaF0YPjUuieX1ria5CS3CzpzN5U=;
+        b=o/Tz0jueoXnJLP3/zDWGdTeVOz+pK88O+rYLrgv+astNn9nyc+Gsh7nNMvpHag8j6R
+         dyLiUreNWIh9u2CfyayqW2LkneyZcxLKuf822ORS/JcnrH5Sw40jivLodKvQgKIqEAbN
+         tIROT/P3HTWbFaFRsANix/TcWzOLUO7Jz5zajmeRxxRkkyzVddWGjCCSm1e1UZ+mNMzv
+         FYBkR7pdZnHBvn2Yn2HPdwCVdFH58TMx07f6qH3jtjgMokn4EiNmdz9uPYjQ0Jp6jHXP
+         27XR90fe/W0l9EoOo+fTmiHvhfw5bjLaddySWOx4xicQUC6GYHBMBsn6Fdc2pCGIKzQt
+         AcaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722458186; x=1723062986;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Kd/mYHbPzOSIwsUM5m5UMPqJkKyWoklOLcVSOqbILGs=;
-        b=FzE/JQpDbsnv79XDpfd3iyId+nKSpQRQrPAyiytVhqkqVB1aEQFtsrGV92NRUGwqSC
-         LsjDGiORqT1hmtHjLFb4vb+1m/b27CwIebvOqrw9UDLUuBpcS43w2wMa+UuyRUmx94Bv
-         ESOL1upo6h1p6RlElpd+NOo1+tGkXexPJb9lzpKrpP4t4pNOId5mvqR1yKmXbqFc7shR
-         cZ4iFc43ao5b3caj6wVp6o19yKRym//vuTjTv91xLBGjOQj3W2hpcK8VqrEiO2yapojN
-         a3bagZj/SSjk086CJN6z0pp/DdulKQC3T5Y0J6SK5KfdT49uvOYDwOY7jNbxAw3KxuNd
-         tXdA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCHS+tGKQbI7w4t0KGFc/4WZPS3b7Rz86NuK8/Bn0qS360h+dpvttB9xIO2izgS6PWdiSx20c5+zjdpXdSlfjcf6/T
-X-Gm-Message-State: AOJu0Ywgzxn82Fu13Fz6Vui52xtNtORRHmh6/o+59mleLR9xbc7zWglY
-	Wz7wJPyUeKDdA3qm7cih8WCgFHJWuNDUxW4b+DusiKl8jEDRTsgM1lsMHiEjZzLLQfiyCeBJs0n
-	G+A==
-X-Google-Smtp-Source: AGHT+IH0DRpeCdEjd5+EVXte2iiNPB7q7dTvECq86U0Z8nMo4fguKYduL9RXt42ZsXAM2SH8mq6gA4JZJ0k=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:18d2:b0:e0b:bf20:4ff8 with SMTP id
- 3f1490d57ef6-e0bccf7b434mr932276.0.1722458186501; Wed, 31 Jul 2024 13:36:26
- -0700 (PDT)
-Date: Wed, 31 Jul 2024 13:36:25 -0700
-In-Reply-To: <87a5hxfs3d.fsf@draig.linaro.org>
+        d=1e100.net; s=20230601; t=1722460315; x=1723065115;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/ZvLSXSFJMkLNlj/PaF0YPjUuieX1ria5CS3CzpzN5U=;
+        b=dcostZZ30ECEVe0qVg3WMXtWe2jMEiI7aQFeFCb1vPAPgjgRuPewHhIEFvuMzPPIIB
+         TFAy8yRf8s6/RoHkIYFPcewSWUtOHAJpY3HVXXYZXeoyVU8YZF+TJjtrdcBzCRjFgpSm
+         Mvmo+eVgBd9e+88ZvyMB0mq0ffiDFxRk7OLlN2uIuuIXUaE7RWnVUxzdXKhljr+PQe11
+         fVg7f1sMp6jXb4SZpMehVDX6lA+DfsKezPZSRiuwjE8kHd5CCCvb85XEEq81wfDKvf39
+         N6wGqDmMnalZ45fo6irNf/fiVeayQg8SmTbbCuagMPJ6hwFCzLRWpy8KPSnzxN9Hjjtd
+         2q3w==
+X-Forwarded-Encrypted: i=1; AJvYcCXUVxpCJrJBhlLF6aw5olX5lqrT4ME11363q3ao8DfKQA05KKdySQKKIJMDFeMAeQ70UEdC9VjGJYhDlira6KIGdEhk
+X-Gm-Message-State: AOJu0Yx5eK18t1AMNp0ga5XQu8zEkvxhOo5f+0iqcZdyKd5JbWG+8PlJ
+	NkKV/Nhb4W6kKuKODBUlRTiHSpoYPtDpShTt6ORjpt6lSqGPHmq/qivBm1ug+vRZTDaQznRo4Ux
+	3
+X-Google-Smtp-Source: AGHT+IEdPF4xP7dgcasA1jodltKHHpm66OEBCOUHqXVM+e0xNPzRPKTZfGITIWaB4wlFOb3gt6ptYA==
+X-Received: by 2002:a05:6830:610d:b0:708:f8c1:b901 with SMTP id 46e09a7af769-7096b84b7b3mr493240a34.18.1722460315099;
+        Wed, 31 Jul 2024 14:11:55 -0700 (PDT)
+Received: from localhost (syn-076-182-020-124.res.spectrum.com. [76.182.20.124])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1d73ea990sm779020385a.55.2024.07.31.14.11.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jul 2024 14:11:54 -0700 (PDT)
+Date: Wed, 31 Jul 2024 17:11:53 -0400
+From: Josef Bacik <josef@toxicpanda.com>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: viro@kernel.org, linux-fsdevel@vger.kernel.org, amir73il@gmail.com,
+	bpf@vger.kernel.org, brauner@kernel.org, cgroups@vger.kernel.org,
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH 08/39] experimental: convert fs/overlayfs/file.c to
+ CLASS(...)
+Message-ID: <20240731211153.GD3908975@perftesting>
+References: <20240730050927.GC5334@ZenIV>
+ <20240730051625.14349-1-viro@kernel.org>
+ <20240730051625.14349-8-viro@kernel.org>
+ <20240730191025.GB3830393@perftesting>
+ <20240730211225.GH5334@ZenIV>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-2-seanjc@google.com>
- <87a5hxfs3d.fsf@draig.linaro.org>
-Message-ID: <ZqqgSW1Z07aBGwQh@google.com>
-Subject: Re: [PATCH v12 01/84] KVM: arm64: Release pfn, i.e. put page, if
- copying MTE tags hits ZONE_DEVICE
-From: Sean Christopherson <seanjc@google.com>
-To: "Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240730211225.GH5334@ZenIV>
 
-On Wed, Jul 31, 2024, Alex Benn=C3=A9e wrote:
-> Sean Christopherson <seanjc@google.com> writes:
->=20
-> > Put the page reference acquired by gfn_to_pfn_prot() if
-> > kvm_vm_ioctl_mte_copy_tags() runs into ZONE_DEVICE memory.  KVM's less-
-> > than-stellar heuristics for dealing with pfn-mapped memory means that K=
-VM
-> > can get a page reference to ZONE_DEVICE memory.
-> >
-> > Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a gu=
-est")
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/arm64/kvm/guest.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> >
-> > diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
-> > index 11098eb7eb44..e1f0ff08836a 100644
-> > --- a/arch/arm64/kvm/guest.c
-> > +++ b/arch/arm64/kvm/guest.c
-> > @@ -1059,6 +1059,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
-> >  		page =3D pfn_to_online_page(pfn);
-> >  		if (!page) {
-> >  			/* Reject ZONE_DEVICE memory */
-> > +			kvm_release_pfn_clean(pfn);
->=20
-> I guess this gets renamed later in the series.
->=20
-> However my main comment is does lack of page always mean a ZONE_DEVICE?
+On Tue, Jul 30, 2024 at 10:12:25PM +0100, Al Viro wrote:
+> On Tue, Jul 30, 2024 at 03:10:25PM -0400, Josef Bacik wrote:
+> > On Tue, Jul 30, 2024 at 01:15:54AM -0400, viro@kernel.org wrote:
+> > > From: Al Viro <viro@zeniv.linux.org.uk>
+> > > 
+> > > There are four places where we end up adding an extra scope
+> > > covering just the range from constructor to destructor;
+> > > not sure if that's the best way to handle that.
+> > > 
+> > > The functions in question are ovl_write_iter(), ovl_splice_write(),
+> > > ovl_fadvise() and ovl_copyfile().
+> > > 
+> > > This is very likely *NOT* the final form of that thing - it
+>     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> > > needs to be discussed.
+> 
 
-Nope.
+Fair, I think I misunderstood what you were unhappy with in that code.
 
-> Looking at pfn_to_online_page() I see a bunch of other checks first. Why
-> isn't it that functions responsibility to clean up after itself if its
-> returning NULLs?
+> > Is this what we want to do from a code cleanliness standpoint?  This feels
+> > pretty ugly to me, I feal like it would be better to have something like
+> > 
+> > scoped_class(fd_real, real) {
+> > 	// code
+> > }
+> > 
+> > rather than the {} at the same indent level as the underlying block.
+> > 
+> > I don't feel super strongly about this, but I do feel like we need to either
+> > explicitly say "this is the way/an acceptable way to do this" from a code
+> > formatting standpoint, or we need to come up with a cleaner way of representing
+> > the scoped area.
+> 
+> That's a bit painful in these cases - sure, we can do something like
+> 	scoped_class(fd_real, real)(file) {
+> 		if (fd_empty(fd_real)) {
+> 			ret = fd_error(real);
+> 			break;
+> 		}
+> 		old_cred = ovl_override_creds(file_inode(file)->i_sb);
+> 		ret = vfs_fallocate(fd_file(real), mode, offset, len);
+> 		revert_creds(old_cred);
+> 
+> 		/* Update size */
+> 		ovl_file_modified(file);  
+> 	}
+> but that use of break would need to be documented.  And IMO anything like
+>         scoped_cond_guard (mutex_intr, return -ERESTARTNOINTR,
+> 			   &task->signal->cred_guard_mutex) {
+> is just distasteful ;-/  Control flow should _not_ be hidden that way;
+> it's hard on casual reader.
+> 
+> The variant I'd put in there is obviously not suitable for merge - we need
+> something else, the question is what that something should be...
 
-pfn_to_online_page() is more strict than gfn_to_pfn_prot().  At least in th=
-eory,
-gfn_to_pfn_prot() could return a pfn that has an associated "struct page", =
-with
-a reference held to said page.  But for that same pfn, pfn_to_online_page()=
- could
-return NULL, in which case KVM needs to put the reference it acquired via
-gfn_to_pfn_prot().
+I went and looked at our c++ codebase to see what they do here, and it appears
+that this is the accepted norm for this style of scoped variables
+
+{
+	CLASS(fd_real, real_out)(file_out);
+	// blah blah
+}
+
+Looking at our code guidelines this appears to be the widely accepted norm, and
+I don't hate it.  I feel like this is more readable than the scoped_class()
+idea, and is honestly the cleanest solution.  Thanks,
+
+Josef
 
