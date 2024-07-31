@@ -1,144 +1,183 @@
-Return-Path: <kvm+bounces-22750-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22751-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0930A942B93
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 12:05:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BDB4942BB8
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 12:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BB6F1C2163F
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 10:05:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 51CA0281680
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 10:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 589A41AAE0C;
-	Wed, 31 Jul 2024 10:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52DFF1AC434;
+	Wed, 31 Jul 2024 10:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VniCP4ZN"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A771A7F9F
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 10:05:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC2F11AAE37
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 10:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722420312; cv=none; b=E/MDRC3i6AbhRyR/j21nQKiNOAVolMe3a1cWYtZtuCfru0EHe+dGhGw6KpxrouEBK/EDwRzEPgpWq+Ncrvwa+YjpEidwDRYrLW603e0QcHX7hCHRF91wN+qvhTSXqGK5zJBrZFgvZK/NbKR4Wxu6gNXfDxaN5KYO5inxx4tuTOU=
+	t=1722420685; cv=none; b=do6keKhBRGHtUCxMip9y2ULF+6oMRaUltmIQETaXJQlVTEe3/+8M1K1khWDz4rLWqhAUvlHOPWwcZpKXoSzvw20Al0qHBFP0tJMbWqqypJ3L5M4mqOdXZ6Z6jH3bdRTy9B6fYDiPS9aUYJXDBGSKDnZ5gdVl72Ev4hA4pqy1sz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722420312; c=relaxed/simple;
-	bh=K+vD9/aMeC1TJMgPdGGFbotOzCqA5/w8SWFYS2npk0I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NojgPD5UBpFP4rP8BNiC9aKIKwEDCeWke42SofNmxLApTMSyCcXXl8WJVSlNaC3Px7MJwgn6Y4KCYLjH8UFBkWLdyuIjJsYV46WDAp7PDJu7seNiggE3HglbDa7+NV/d3A2GUH3qrHPSfcJ+OEsLlz9IS30jp88ssNnlag2gE3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 49EBF1007;
-	Wed, 31 Jul 2024 03:05:35 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 0D7233F5A1;
-	Wed, 31 Jul 2024 03:05:07 -0700 (PDT)
-Date: Wed, 31 Jul 2024 11:05:05 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 00/12] KVM: arm64: nv: Add support for address
- translation instructions
-Message-ID: <ZqoMUb_Q6n8J_pYq@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
+	s=arc-20240116; t=1722420685; c=relaxed/simple;
+	bh=Sq9n6KW2L62PoNaPgAhcSBQ095yaepbtslyXd5S+u84=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jpKoUhJf4R8o7dOxaIIH70apgs5qWdAPAQ6qQ0JHp32tcuWY2fp0KMOVrJrcV3reSAbYkknOJdTFohf0I9C1en6Hr0s95M9G+F3QCO+OxfoBCKEGNmggtmoEoSxAmIo+XyfrjP7NN7MHvdbjSoU2tIskRpADOhe+VOC6xRKERiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VniCP4ZN; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722420682;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=tVOY32nDLXc6iJSQkl0LgklBYr2OAHTjSvree4scyEk=;
+	b=VniCP4ZNwErRrbyjKp30rItzUtd28UUNLiAhX7U5EYvz08PSwqBimcIBmQWiUJ6nyb1UXa
+	hsN13xib7/B3LF4osYsx/q680kVrJC4WaXDTZ+hUszrLSNyC6FUuwIOY9Ft2/BY7+9FWum
+	qJCFId/1lxXoJmI58Yv11VVu6SmeZtM=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-167-yOj86xnDMr6tNtspMWMN9Q-1; Wed, 31 Jul 2024 06:11:21 -0400
+X-MC-Unique: yOj86xnDMr6tNtspMWMN9Q-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a7a999275f8so279922366b.1
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 03:11:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722420680; x=1723025480;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tVOY32nDLXc6iJSQkl0LgklBYr2OAHTjSvree4scyEk=;
+        b=CDAFo1I4FhoHqB+bdQLsMquozW5QUlzLFUpZnvokquvfkHi1Q6Q8MG3iG+3hMmlIOc
+         rJ+szuSR4Jecd3rnFWnrsEvt4IRw+ZBNEDmFgoEEZuXvjuKS4TzI7qqnJ4O+6JsvL8Ax
+         zD9MOI1k649tJ/PYb5YHV3OCQpbRjgIYFsIRZ4jdrcF6TiINwyTyGHuwLVX8rB6fDJwZ
+         528L+C0zL9JbxRQGmJUGZ9Y1jmp4NmhXmh/6mVCc1rd91aUlQHqY/jmL67+xEC81dCR3
+         dVWxVcGn1YyVV6KYC+tFPvPhSwgBGaQB9NVFxT1DYvB5ycLPCcoLiiipKGVV8a71cmSf
+         X3FQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUwtfTVd14Tkbc9E4jmzF20maWwRT0pA7+9J7BXDxlNtbdzeTIPjUDAtnPLi5pVKuhzOwv2TnSX4Q9g2u4Xh8CpNZHz
+X-Gm-Message-State: AOJu0YzDDc8xf3zy6T6Dwe1+uJs7UBSvmK8lDme8VkAqnwN1PUWHSgJC
+	e02ct13kALQYXB/Lr/pyVfZja0p6JWkP7jSGOYPetYgr3PM/9BaGMXNczv6FyJK70SgmUklbnji
+	CW74I/aAmujtGEYbs1rKWOVl/B56YXMcYI9rkVEvrL1jv74DMew==
+X-Received: by 2002:a05:6402:1e93:b0:5a2:97d7:c728 with SMTP id 4fb4d7f45d1cf-5b01d84be21mr14060535a12.0.1722420680279;
+        Wed, 31 Jul 2024 03:11:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG5ltltaZS4FNkIqSYTQjIEvClgTY8vCephyRSRLNCT8UhCNDO85YiJ57LsvbZOjsbL8Hv0Cg==
+X-Received: by 2002:a05:6402:1e93:b0:5a2:97d7:c728 with SMTP id 4fb4d7f45d1cf-5b01d84be21mr14060501a12.0.1722420679761;
+        Wed, 31 Jul 2024 03:11:19 -0700 (PDT)
+Received: from [192.168.10.81] ([151.95.101.29])
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5af3ad32a9bsm7111674a12.53.2024.07.31.03.11.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Jul 2024 03:11:19 -0700 (PDT)
+Message-ID: <a0418ced-260b-4b14-9124-c94ce46a0944@redhat.com>
+Date: Wed, 31 Jul 2024 12:11:17 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240625133508.259829-1-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 34/84] KVM: Add a helper to lookup a pfn without
+ grabbing a reference
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-35-seanjc@google.com>
+ <63c41e25-2523-4397-96b4-557394281443@redhat.com>
+ <ZqlJxJyOdsR206Zc@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <ZqlJxJyOdsR206Zc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Marc,
+On 7/30/24 22:15, Sean Christopherson wrote:
+> On Tue, Jul 30, 2024, Paolo Bonzini wrote:
+>> On 7/27/24 01:51, Sean Christopherson wrote:
+>>> Add a kvm_follow_pfn() wrapper, kvm_lookup_pfn(), to allow looking up a
+>>> gfn=>pfn mapping without the caller getting a reference to any underlying
+>>> page.  The API will be used in flows that want to know if a gfn points at
+>>> a valid pfn, but don't actually need to do anything with the pfn.
+>>
+>> Can you rename the function kvm_gfn_has_pfn(), or kvm_gfn_can_be_mapped(),
+>> and make it return a bool?
+> 
+> Heh, sure.  I initially planned on having it return a bool, but I couldn't figure
+> out a name, mainly because the kernel's pfn_valid() makes things like
+> kvm_gfn_has_valid_pfn() confusing/misleading :-(
+> 
+>> (As an aside, I wonder if reexecute_instruction() could just use
+>> kvm_is_error_hva(kvm_vcpu_gfn_to_hva(vcpu, gpa_to_gfn(gpa)) instead of going
+>> all the way to a pfn.  But it's ok to be more restrictive).
+> 
+> Heh #2, I wondered the same thing.  I think it would work?  Verifying that there's
+> a usable pfn also protects against retrying an access that hit -EHWPOISON, but I'm
+> prety sure that would require a rare race, and I don't think it could result in
+> the guest being put into an infinite loop.
 
-On Tue, Jun 25, 2024 at 02:34:59PM +0100, Marc Zyngier wrote:
-> Another task that a hypervisor supporting NV on arm64 has to deal with
-> is to emulate the AT instruction, because we multiplex all the S1
-> translations on a single set of registers, and the guest S2 is never
-> truly resident on the CPU.
+Indeed, and even the check in kvm_alloc_apic_access_page() is totally 
+useless.  The page can go away at any time between the call and 
+vmx_set_apic_access_page_addr() or, for AMD, the #NPF on 
+APIC_DEFAULT_PHYS_BASE.
 
-I'm unfamiliar with the state of NV support in KVM, but I thought I would have a
-look at when AT trapping is enabled. As far as I can tell, it's only enabled in
-vhe/switch.c::__activate_traps() -> compute_hcr() if is_hyp_ctct(vcpu). Found
-this by grep'ing for HCR_AT.
+Yes, it's verifying that the system isn't under extreme memory pressure, 
+but in practice a 4K get_user_pages is never going to fail, it's just 
+going to cause something else to be swapped.  I'd just get rid of both 
+of them, so there's no need for kvm_lookup_pfn().
 
-Assuming the above is correct, I am curious about the following:
+Paolo
 
-- The above paragraph mentions guest's stage 2 (and the code takes that into
-  consideration), yet when is_hyp_ctxt() is true it is likely that the guest
-  stage 2 is not enabled. Are you planning to enable the AT trap based on
-  virtual HCR_EL2.VM being set in a later series?
-
-- A guest might also set the HCR_EL2.AT bit in the virtual HCR_EL2 register. I
-  suppose I have the same question, injecting the exception back into the guest
-  is going to be handled in another series?
-
-Thanks,
-Alex
-
-> 
-> So given that we lie about page tables, we also have to lie about
-> translation instructions, hence the emulation. Things are made
-> complicated by the fact that guest S1 page tables can be swapped out,
-> and that our shadow S2 is likely to be incomplete. So while using AT
-> to emulate AT is tempting (and useful), it is not going to always
-> work, and we thus need a fallback in the shape of a SW S1 walker.
-> 
-> This series is built in 4 basic blocks:
-> 
-> - Add missing definition and basic reworking
-> 
-> - Dumb emulation of all relevant AT instructions using AT instructions
-> 
-> - Add a SW S1 walker that is using our S2 walker
-> 
-> - Add FEAT_ATS1A support, which is almost trivial
-> 
-> This has been tested by comparing the output of a HW walker with the
-> output of the SW one. Obviously, this isn't bullet proof, and I'm
-> pretty sure there are some nasties in there.
-> 
-> In a departure from my usual habit, this series is on top of
-> kvmarm/next, as it depends on the NV S2 shadow code.
-> 
-> Joey Gouly (1):
->   KVM: arm64: make kvm_at() take an OP_AT_*
-> 
-> Marc Zyngier (11):
->   arm64: Add missing APTable and TCR_ELx.HPD masks
->   arm64: Add PAR_EL1 field description
->   KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
->   KVM: arm64: nv: Honor absence of FEAT_PAN2
->   KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}[P]
->   KVM: arm64: nv: Add basic emulation of AT S1E2{R,W}
->   KVM: arm64: nv: Add emulation of AT S12E{0,1}{R,W}
->   KVM: arm64: nv: Make ps_to_output_size() generally available
->   KVM: arm64: nv: Add SW walker for AT S1 emulation
->   KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
->   KVM: arm64: nv: Add support for FEAT_ATS1A
-> 
->  arch/arm64/include/asm/kvm_arm.h       |    1 +
->  arch/arm64/include/asm/kvm_asm.h       |    6 +-
->  arch/arm64/include/asm/kvm_nested.h    |   18 +-
->  arch/arm64/include/asm/pgtable-hwdef.h |    7 +
->  arch/arm64/include/asm/sysreg.h        |   19 +
->  arch/arm64/kvm/Makefile                |    2 +-
->  arch/arm64/kvm/at.c                    | 1007 ++++++++++++++++++++++++
->  arch/arm64/kvm/emulate-nested.c        |    2 +
->  arch/arm64/kvm/hyp/include/hyp/fault.h |    2 +-
->  arch/arm64/kvm/nested.c                |   26 +-
->  arch/arm64/kvm/sys_regs.c              |   60 ++
->  11 files changed, 1125 insertions(+), 25 deletions(-)
->  create mode 100644 arch/arm64/kvm/at.c
-> 
-> -- 
-> 2.39.2
-> 
-> 
 
