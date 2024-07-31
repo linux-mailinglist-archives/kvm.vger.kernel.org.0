@@ -1,226 +1,161 @@
-Return-Path: <kvm+bounces-22753-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22754-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F1EA942BCE
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 12:18:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A759942BD1
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 12:18:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF6EF1F231F3
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 10:18:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 255DD1F21D3B
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 10:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 602C41AB53E;
-	Wed, 31 Jul 2024 10:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608541AC430;
+	Wed, 31 Jul 2024 10:18:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RtAhcwgf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YyNnEVCt"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895081CF93;
-	Wed, 31 Jul 2024 10:18:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0704953370
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 10:18:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722421089; cv=none; b=ELGxZz394OITFHKZ54GiLMbBdBkWYNIzZdDJjfNaD8iX97BA/HHEZtRkJcir7WsX7FEUKGNNXUTnPkuNSA5uRvYSyGh4PMWkKt4OOM0SxYc8BcyFgKEu5P2Zn/CA2Rh6g8NL/pciNS6Z5kNwiRUHYEC2X0pXADJUpQ0pSBh1Bnk=
+	t=1722421106; cv=none; b=d/xsHEaQUhdjZPF8DCLtuMdGFSaB78AoLmbwT+ByZ5YadyVZM8zVj8QIpVaHVYCRZ8JlimYpR2/F0xmn7qSblF39FwPuRwp9kvCz3WmdNTdhSX1Fm6B3VzAIZI8Ck+qSi3VLTLYrefpjSHDptavQiCiUiirRSeBqUxJom99U3C4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722421089; c=relaxed/simple;
-	bh=0qWIYRSbQPUoLX7x3NLoVeGv/6AMKewMa0CxmLbwjGA=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ulBYukdwXLnP9A06ytEdXtKiWgKFulMB+dR7uUMCVORnKYGtltp/hh3bXGw/s3IJBTnwLL5kDJPaVvs1DdY5vmLZhR3yjiKDY1tbTW3yV1DKUGlyFKaUfOAZkFRNt+NbqinpT6B/98fBRRa2OR8/3yT31lCf/fwS2SS9EEyAry4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RtAhcwgf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E7F0C116B1;
-	Wed, 31 Jul 2024 10:18:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722421089;
-	bh=0qWIYRSbQPUoLX7x3NLoVeGv/6AMKewMa0CxmLbwjGA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RtAhcwgfOs1c+Wd4kjJEpRMtwSlM4r2m7nja3xFNeD2t5KCtoIbIlHJPNIJu5jtIE
-	 HKV9Pk7S8MhCPEWI0FgpuST0ElXcyzczs8aJ40F6lbBUPC8FwrRd9kaCp6jRKdRvfw
-	 l1NJxGWPPhGQf4vEPSjkK3VCssqgnt/SaX2tVtI3OWWsVZW3k8M+VsqfZ1URVbv6lr
-	 j055E6hjLylLkPL9Bb9QnJ6lxtaHq8NLVoAV+nSYvWA43Oh4jOhPVLvX8U3p3DaFBe
-	 RYlUnjSHE2g+ecamim2IuYHBSIRRhJJK2+EvgKRZ8gdPRhjKfRzvVKSRUoRdHi8OF6
-	 Vyt3ai5En1f2A==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sZ6PG-00Gx5v-VO;
-	Wed, 31 Jul 2024 11:18:07 +0100
-Date: Wed, 31 Jul 2024 11:18:06 +0100
-Message-ID: <86ttg527c1.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <ZqoJiiNPWBtRhRur@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<Zqe0iBtD4389Lhei@raptor>
-	<86v80m0wlb.wl-maz@kernel.org>
-	<ZqoJiiNPWBtRhRur@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1722421106; c=relaxed/simple;
+	bh=+PrbklTeRiXOHSRdGh97gn5y602otpyl/4PgxVx+Rds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=p7yjnFemLrspV+aTxNQVUQ6FyAMyo5mkco+6XLtWYcsruaDSitLnWXYuctoKED2pPoxQdIJIeqj/mDmvXld0wN6Lv7ub6UHdvO/5tAo+bTbg7CMB2AaqAnHe1ClTAprCwIM6qqDU/eTZ5R2HvLYDi8UO7IuXT9j2TVMHZwzhNtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YyNnEVCt; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722421103;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=+NI98OckWfv6J2NFyowBM8d76asTvKwKn+KYX73y9eY=;
+	b=YyNnEVCtxmJ5kdzZ1LkhKrp7iY8y3Is0Zgf6OAOOctVMsDMQVRLNxp/MElcZ/ETVl8aFg4
+	EzOna+NZ4rdRS5mSDjVYlkiSeO52rHxKTY20en3YZfPjZCMGwCFp+stc23RuZ8zYUTM+FE
+	Mx1yoZbxOtSE1xPIX8yUbja88xjzuSc=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-473-9m-5gUfLNbyM3oGDR6IlNw-1; Wed, 31 Jul 2024 06:18:22 -0400
+X-MC-Unique: 9m-5gUfLNbyM3oGDR6IlNw-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a7ab4817f34so481913766b.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 03:18:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722421101; x=1723025901;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+NI98OckWfv6J2NFyowBM8d76asTvKwKn+KYX73y9eY=;
+        b=Aob8RWZKTvWWnDUhE0cl9BSWBy5+720zjj6mp29X6E3Bvanop2RSTBKOvIGMGHCsyF
+         AJnmHZt581uSBeIvqFqfDlbX2GetpbFWN3UzzoS+s1JPjbu7YnEsiIj1xVgwq1NqUrZj
+         856mrdXZhQWhJ4JP7ZD0C5UFc79+Gp3+3Zlt4+OZeSCv4lij/YC/jK+BNQpDMwZvoile
+         Oj3tVcP2ClBR3p9aHH8tDCw/RMgwY8VPClsr1vrPI0gEtBIZU1YTwC28OULiBsF6rlXc
+         y8QeXsddZLqVqPNYA3YyjdLMwlVQJWR7tzmuszFZPeuj7ewmyNiUunJfr1EyMSPh2TXc
+         ToNg==
+X-Forwarded-Encrypted: i=1; AJvYcCU3hZQfDGBSDuVdxPXu2+CvS42EjTlQUWJxNJMLv5E4/zb/QHfOLzrQY0J8iAcejgFVx6o/G+K799SDx7sq2KOJOObR
+X-Gm-Message-State: AOJu0YwupcU85gvKkXhIoZBQHPezXxFUA5vHIOE/K414mwgm6p8Ne5+f
+	L4c7eJ8r1pKJ7hkqpp578Fe18K6ABLzZlX6gTfUoFc4COA4p7MO7x7ajHbdVow+BCSRlAAIqDmm
+	qXkgj3N/s0q/pTjtjqw8+d/IWPeuFSxzMOiKnfJPxDJAex7Kg0g==
+X-Received: by 2002:a17:907:3faa:b0:a7a:9f0f:ab2c with SMTP id a640c23a62f3a-a7d40087cdamr1036564666b.29.1722421100739;
+        Wed, 31 Jul 2024 03:18:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFbiyRYwcc7mzxbNr2j9CKiWLwtYHnw4iXERZ6Q+gmmNAwBwkH3zd03419QU5BCHgaYtt01lw==
+X-Received: by 2002:a17:907:3faa:b0:a7a:9f0f:ab2c with SMTP id a640c23a62f3a-a7d40087cdamr1036561866b.29.1722421100197;
+        Wed, 31 Jul 2024 03:18:20 -0700 (PDT)
+Received: from [192.168.10.81] ([151.95.101.29])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a7acab52d51sm750409766b.79.2024.07.31.03.18.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Jul 2024 03:18:19 -0700 (PDT)
+Message-ID: <a76a83de-5dfd-495b-904a-878e1483e5f6@redhat.com>
+Date: Wed, 31 Jul 2024 12:18:17 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v12 48/84] KVM: Move x86's API to release a faultin page
+ to common KVM
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
+ Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
+ Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
+ Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-49-seanjc@google.com>
+ <96df1dd5-cc31-4e84-84fd-ea75b4800be8@redhat.com>
+ <Zqk72jP1c8N0Pn1O@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <Zqk72jP1c8N0Pn1O@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 31 Jul 2024 10:53:14 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> Hi,
-> 
-> On Wed, Jul 31, 2024 at 09:55:28AM +0100, Marc Zyngier wrote:
-> > On Mon, 29 Jul 2024 16:26:00 +0100,
-> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > > 
-> > > Hi Marc,
-> > > 
-> > > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > > > In order to plug the brokenness of our current AT implementation,
-> > > > we need a SW walker that is going to... err.. walk the S1 tables
-> > > > and tell us what it finds.
-> > > > 
-> > > > Of course, it builds on top of our S2 walker, and share similar
-> > > > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > > > it is able to bring back pages that have been otherwise evicted.
-> > > > 
-> > > > This is then plugged in the two AT S1 emulation functions as
-> > > > a "slow path" fallback. I'm not sure it is that slow, but hey.
-> > > > 
-> > > > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > > > ---
-> > > >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
-> > > >  1 file changed, 520 insertions(+), 18 deletions(-)
-> > > > 
-> > > > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > > > index 71e3390b43b4c..8452273cbff6d 100644
-> > > > --- a/arch/arm64/kvm/at.c
-> > > > +++ b/arch/arm64/kvm/at.c
-> > > > @@ -4,9 +4,305 @@
-> > > >   * Author: Jintack Lim <jintack.lim@linaro.org>
-> > > >   */
-> > > >  
-> > > > +#include <linux/kvm_host.h>
-> > > > +
-> > > > +#include <asm/esr.h>
-> > > >  #include <asm/kvm_hyp.h>
-> > > >  #include <asm/kvm_mmu.h>
-> > > >  
-> > > > +struct s1_walk_info {
-> > > > +	u64	     baddr;
-> > > > +	unsigned int max_oa_bits;
-> > > > +	unsigned int pgshift;
-> > > > +	unsigned int txsz;
-> > > > +	int 	     sl;
-> > > > +	bool	     hpd;
-> > > > +	bool	     be;
-> > > > +	bool	     nvhe;
-> > > > +	bool	     s2;
-> > > > +};
-> > > > +
-> > > > +struct s1_walk_result {
-> > > > +	union {
-> > > > +		struct {
-> > > > +			u64	desc;
-> > > > +			u64	pa;
-> > > > +			s8	level;
-> > > > +			u8	APTable;
-> > > > +			bool	UXNTable;
-> > > > +			bool	PXNTable;
-> > > > +		};
-> > > > +		struct {
-> > > > +			u8	fst;
-> > > > +			bool	ptw;
-> > > > +			bool	s2;
-> > > > +		};
-> > > > +	};
-> > > > +	bool	failed;
-> > > > +};
-> > > > +
-> > > > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
-> > > > +{
-> > > > +	wr->fst		= fst;
-> > > > +	wr->ptw		= ptw;
-> > > > +	wr->s2		= s2;
-> > > > +	wr->failed	= true;
-> > > > +}
-> > > > +
-> > > > +#define S1_MMU_DISABLED		(-127)
-> > > > +
-> > > > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> > > > +			 struct s1_walk_result *wr, const u64 va, const int el)
-> > > > +{
-> > > > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> > > > +	unsigned int stride, x;
-> > > > +	bool va55, tbi;
-> > > > +
-> > > > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
-> > > 
-> > > Where 'el' is computed in handle_at_slow() as:
-> > > 
-> > > 	/*
-> > > 	 * We only get here from guest EL2, so the translation regime
-> > > 	 * AT applies to is solely defined by {E2H,TGE}.
-> > > 	 */
-> > > 	el = (vcpu_el2_e2h_is_set(vcpu) &&
-> > > 	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
-> > > 
-> > > I think 'nvhe' will always be false ('el' is 2 only when E2H is
-> > > set).
-> > 
-> > Yeah, there is a number of problems here. el should depend on both the
-> > instruction (some are EL2-specific) and the HCR control bits. I'll
-> > tackle that now.
-> 
-> Yeah, also noticed that how sctlr, tcr and ttbr are chosen in setup_s1_walk()
-> doesn't look quite right for the nvhe case.
+On 7/30/24 21:15, Sean Christopherson wrote:
+>> Does it make sense to move RET_PF_* to common code, and avoid a bool
+>> argument here?
+> After this series, probably?  Especially if/when we make "struct kvm_page_fault"
+> a common structure and converge all arch code.  In this series, definitely not,
+> as it would require even more patches to convert other architectures, and it's
+> not clear that it would be a net win, at least not without even more massaging.
 
-Are you sure? Assuming the 'el' value is correct (and I think I fixed
-that on my local branch), they seem correct to me (we check for va55
-early in the function to avoid an later issue).
+It does not seem to be hard, but I agree that all the other 
+architectures right now use 0/-errno in the callers of 
+kvm_release_faultin_page().
 
-Can you point out what exactly fails in that logic?
+Paolo
 
->
-> > 
-> > > I'm curious about what 'el' represents. The translation regime for the AT
-> > > instruction?
-> > 
-> > Exactly that.
-> 
-> Might I make a suggestion here? I was thinking about dropping the (el, wi-nvhe*)
-> tuple to represent the translation regime and have a wi->regime (or similar) to
-> unambiguously encode the regime. The value can be an enum with three values to
-> represent the three possible regimes (REGIME_EL10, REGIME_EL2, REGIME_EL20).
-
-I've been thinking of that, but I'm wondering whether that just
-results in pretty awful code in the end, because we go from 2 cases
-(el==1 or el==2) to 3. But most of the time, we don't care about the
-E2H=0 case, because we can handle it just like E2H=1.
-
-I'll give it a go and see what it looks like.
-
-Thanks,
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
 
