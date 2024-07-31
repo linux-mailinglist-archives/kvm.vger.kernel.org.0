@@ -1,195 +1,214 @@
-Return-Path: <kvm+bounces-22737-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22738-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B60F9429B9
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 10:55:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA15A9429E1
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02518B2135B
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 08:55:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 198281C2203D
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 09:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F0D1A8C03;
-	Wed, 31 Jul 2024 08:55:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MSTXZA2f"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B4B1AAE28;
+	Wed, 31 Jul 2024 09:03:20 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E0C1A8BEF;
-	Wed, 31 Jul 2024 08:55:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87B481A8C19;
+	Wed, 31 Jul 2024 09:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722416131; cv=none; b=GQBUxSz889WwZBioOU3Otlcl8WTxB+LcO8v33fqQ2ThULNWetHiAe4dYTtJULxHEX60WyYG4u9Dv3M9WWtpMAAli52cJqgJWk/OIFGP00JIhUKahHSxYeOnGAhvaeROOaNnwZh9t/OSIswynG20lE0qdyOL2qtMwgN2VVwZeVFQ=
+	t=1722416599; cv=none; b=S5792ea5U6Caou0lwZOXL8y5PA0UvHXKBxZTvjx7DNEpGC1RKZU/QyOaOcbgIYilfthTD3kJ1NRuLPvuC/VPgf3L17QSJ8ulEzAVn8AgrEcvwYMAAVn1BPeRUYC/1EiyGY7xP8Br3ZLdSLsjP+7Zky4EUqaXF0WBIzgro/OYNNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722416131; c=relaxed/simple;
-	bh=1/obZN8eqhuQg8eIft5PGQVdNA3F7mgIIsdD8/S63mQ=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=EUEaEGWbC+6OUnxj/mDPbmWR7sOxcFlDqv+e5ST9hKVnVGWTXSXYoPxuIsaa/wGzJFE9Sb+S2kBhuDadBzxTgkDG8xsr1ADtaneyicS8viQ4A3nrSIFwcgKfarJKYaSLuauVGwp01WuTt0kZgcm5XxAl1Alg1H/4q9KHfQRd/lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MSTXZA2f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 127ABC4AF0C;
-	Wed, 31 Jul 2024 08:55:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722416131;
-	bh=1/obZN8eqhuQg8eIft5PGQVdNA3F7mgIIsdD8/S63mQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MSTXZA2fnA63cmsiN2ODSRPS1XC56eQdFCOdGllAcNyvxz0O0a97sm6/2v57AZBtq
-	 Cjo8cxtikdmP3xM67DNL7BbvRQ5dO7OvGjI16Sp1G5DVPvFJMAku3rkTet9WJrohrW
-	 qPAF/pG8ZaV4I1aWh4Y05d0yTxLkOUwIO2Stc2ed7/Q17nim+p7r8zdw1lOlXgTszn
-	 zWFTPiOna+9iSe/zmjeQQbgzixZ3FJrwoBf6NJ0OKHCcYAZn8uSa343zt09oFSIxQt
-	 q5ueDbHn1+fleKmaisw8ARcc/uJXR8vcAL0CEmW2WMtCqgnzRapTVOsd+qzEkXCZLb
-	 KdkZCIAmexMLw==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sZ57I-00Gv7m-Dk;
-	Wed, 31 Jul 2024 09:55:28 +0100
-Date: Wed, 31 Jul 2024 09:55:28 +0100
-Message-ID: <86v80m0wlb.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>
-Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <Zqe0iBtD4389Lhei@raptor>
-References: <20240625133508.259829-1-maz@kernel.org>
-	<20240708165800.1220065-1-maz@kernel.org>
-	<Zqe0iBtD4389Lhei@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1722416599; c=relaxed/simple;
+	bh=L4DRVaflXM78NURF1PSq70OfloJDJuv4xDuaFsKoiF4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bI41AWnIgLbWLVjJLBQioldE1SZkzwE7PWU4bd1YJ647OWFQv0Yd4MWLaWlTKZ7pA3Y8suz8xSkQDgK2zRiFi7w68UtdkiLCT9/v8d4IZdZE5M2AW/fabig01HFphkG1fuzG8WCSG9Zhi8mPOQl0G1FR1Erdb98XlY0L3e07ONg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 7DDAF1007;
+	Wed, 31 Jul 2024 02:03:36 -0700 (PDT)
+Received: from [10.57.94.83] (unknown [10.57.94.83])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 94C093F5A1;
+	Wed, 31 Jul 2024 02:03:08 -0700 (PDT)
+Message-ID: <6b7db3ba-5556-4aae-961c-4ecf31efda5d@arm.com>
+Date: Wed, 31 Jul 2024 10:03:07 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 05/15] arm64: Mark all I/O as non-secure shared
+Content-Language: en-GB
+To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
+ kvm@vger.kernel.org, kvmarm@lists.linux.dev
+Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
+ Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
+ <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
+ Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
+References: <20240701095505.165383-1-steven.price@arm.com>
+ <20240701095505.165383-6-steven.price@arm.com>
+ <b20b7e5b-95aa-4fdb-88a7-72f8aa3da8db@redhat.com>
+ <e05d2363-d3e4-4a23-9347-723454d603c9@arm.com>
+ <68acf6c9-4ab8-4ed5-bddc-f3fc5313597e@redhat.com>
+From: Suzuki K Poulose <suzuki.poulose@arm.com>
+In-Reply-To: <68acf6c9-4ab8-4ed5-bddc-f3fc5313597e@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 29 Jul 2024 16:26:00 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On 31/07/2024 07:36, Gavin Shan wrote:
+> Hi Suzuki,
 > 
-> Hi Marc,
+> On 7/30/24 8:36 PM, Suzuki K Poulose wrote:
+>> On 30/07/2024 02:36, Gavin Shan wrote:
+>>> On 7/1/24 7:54 PM, Steven Price wrote:
+>>> I'm unable to understand this. Steven, could you please explain a bit 
+>>> how
+>>> PROT_NS_SHARED is turned to a shared (non-secure) mapping to hardware?
+>>> According to tf-rmm's implementation in 
+>>> tf-rmm/lib/s2tt/src/s2tt_pvt_defs.h,
+>>> a shared (non-secure) mapping is is identified by NS bit (bit#55). I 
+>>> find
+>>> difficulties how the NS bit is correlate with PROT_NS_SHARED. For 
+>>> example,
+>>> how the NS bit is set based on PROT_NS_SHARED.
+>>
+>>
+>> There are two things at play here :
+>>
+>> 1. Stage1 mapping controlled by the Realm (Linux in this case, as above).
+>> 2. Stage2 mapping controlled by the RMM (with RMI commands from NS Host).
+>>
+>> Also :
+>> The Realm's IPA space is divided into two halves (decided by the IPA 
+>> Width of the Realm, not the NSbit #55), protected (Lower half) and
+>> Unprotected (Upper half). All stage2 mappings of the "Unprotected IPA"
+>> will have the NS bit (#55) set by the RMM. By design, any MMIO access
+>> to an unprotected half is sent to the NS Host by RMM and any page
+>> the Realm wants to share with the Host must be in the Upper half
+>> of the IPA.
+>>
+>> What we do above is controlling the "Stage1" used by the Linux. i.e,
+>> for a given VA, we flip the Guest "PA" (in reality IPA) to the
+>> "Unprotected" alias.
+>>
+>> e.g., DTB describes a UART at address 0x10_0000 to Realm (with an IPA 
+>> width of 40, like in the normal VM case), emulated by the host. Realm is
+>> trying to map this I/O address into Stage1 at VA. So we apply the
+>> BIT(39) as PROT_NS_SHARED while creating the Stage1 mapping.
+>>
+>> ie., VA == stage1 ==> BIT(39) | 0x10_0000 =(IPA)== > 0x80_10_0000
+>>
+>                                                       0x8000_10_0000
+
+Yep, my bad.
+
 > 
-> On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
-> > In order to plug the brokenness of our current AT implementation,
-> > we need a SW walker that is going to... err.. walk the S1 tables
-> > and tell us what it finds.
-> > 
-> > Of course, it builds on top of our S2 walker, and share similar
-> > concepts. The beauty of it is that since it uses kvm_read_guest(),
-> > it is able to bring back pages that have been otherwise evicted.
-> > 
-> > This is then plugged in the two AT S1 emulation functions as
-> > a "slow path" fallback. I'm not sure it is that slow, but hey.
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 520 insertions(+), 18 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-> > index 71e3390b43b4c..8452273cbff6d 100644
-> > --- a/arch/arm64/kvm/at.c
-> > +++ b/arch/arm64/kvm/at.c
-> > @@ -4,9 +4,305 @@
-> >   * Author: Jintack Lim <jintack.lim@linaro.org>
-> >   */
-> >  
-> > +#include <linux/kvm_host.h>
-> > +
-> > +#include <asm/esr.h>
-> >  #include <asm/kvm_hyp.h>
-> >  #include <asm/kvm_mmu.h>
-> >  
-> > +struct s1_walk_info {
-> > +	u64	     baddr;
-> > +	unsigned int max_oa_bits;
-> > +	unsigned int pgshift;
-> > +	unsigned int txsz;
-> > +	int 	     sl;
-> > +	bool	     hpd;
-> > +	bool	     be;
-> > +	bool	     nvhe;
-> > +	bool	     s2;
-> > +};
-> > +
-> > +struct s1_walk_result {
-> > +	union {
-> > +		struct {
-> > +			u64	desc;
-> > +			u64	pa;
-> > +			s8	level;
-> > +			u8	APTable;
-> > +			bool	UXNTable;
-> > +			bool	PXNTable;
-> > +		};
-> > +		struct {
-> > +			u8	fst;
-> > +			bool	ptw;
-> > +			bool	s2;
-> > +		};
-> > +	};
-> > +	bool	failed;
-> > +};
-> > +
-> > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
-> > +{
-> > +	wr->fst		= fst;
-> > +	wr->ptw		= ptw;
-> > +	wr->s2		= s2;
-> > +	wr->failed	= true;
-> > +}
-> > +
-> > +#define S1_MMU_DISABLED		(-127)
-> > +
-> > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
-> > +			 struct s1_walk_result *wr, const u64 va, const int el)
-> > +{
-> > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> > +	unsigned int stride, x;
-> > +	bool va55, tbi;
-> > +
-> > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
+>> Now, the Stage2 mapping won't be present for this IPA if it is emulated
+>> and thus an access to "VA" causes a Stage2 Abort to the Host, which the
+>> RMM allows the host to emulate. Otherwise a shared page would have been
+>> mapped by the Host (and NS bit set at Stage2 by RMM), allowing the
+>> data to be shared with the host.
+>>
 > 
-> Where 'el' is computed in handle_at_slow() as:
+> Thank you for the explanation and details. It really helps to understand
+> how the access fault to the unprotected space (upper half) is routed to NS
+> host, and then VMM (QEMU) for emulation. If the commit log can be improved
+> with those information, it will make reader easier to understand the code.
 > 
-> 	/*
-> 	 * We only get here from guest EL2, so the translation regime
-> 	 * AT applies to is solely defined by {E2H,TGE}.
-> 	 */
-> 	el = (vcpu_el2_e2h_is_set(vcpu) &&
-> 	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
+> I had the following call trace and it seems the address 0x8000_10_1000 is
+> converted to 0x10_0000 in [1], based on current code base (branch: 
+> cca-full/v3).
+> At [1], the GPA is masked with kvm_gpa_stolen_bits() so that BIT#39 is 
+> removed
+> in this particular case.
 > 
-> I think 'nvhe' will always be false ('el' is 2 only when E2H is
-> set).
+>    kvm_vcpu_ioctl(KVM_RUN)                         // non-secured host
+>    kvm_arch_vcpu_ioctl_run
+>    kvm_rec_enter
+>    rmi_rec_enter                                   // -> SMC_RMI_REC_ENTER
+>      :
+>    rmm_handler                                     // tf-rmm
+>    handle_ns_smc
+>    smc_rec_enter
+>    rec_run_loop
+>    run_realm
+>      :
+>    el2_vectors
+>    el2_sync_lel
+>    realm_exit
+>      :
+>    handle_realm_exit
+>    handle_exception_sync
+>    handle_data_abort
+>      :
+>    handle_rme_exit                                 // non-secured host
+>    rec_exit_sync_dabt
+>    kvm_handle_guest_abort                          // -> [1]
 
-Yeah, there is a number of problems here. el should depend on both the
-instruction (some are EL2-specific) and the HCR control bits. I'll
-tackle that now.
+Correct. KVM deals with "GFN" and as such masks the "protection" bit,
+as the IPA is split.
 
-> I'm curious about what 'el' represents. The translation regime for the AT
-> instruction?
+>    gfn_to_memslot
+>    io_mem_abort
+>    kvm_io_bus_write                                // -> 
+> run->exit_reason = KVM_EXIT_MMIO
+> 
+> Another question is how the Granule Protection Check (GPC) table is 
+> updated so
+> that the corresponding granule (0x8000_10_1000) to is accessible by NS 
+> host? I
+> mean how the BIT#39 is synchronized to GPC table and translated to the 
+> property
+> "granule is accessible by NS host".
 
-Exactly that.
+Good question. GPC is only applicable for memory accesses that are 
+actually "made" (think of this as Stage3).
+In this case, the Stage2 walk causes an abort and as such the address is
+never "accessed" (like in the normal VM) and host handles it.
+In case of a "shared" memory page, the "stage2" mapping created *could*
+(RMM doesn't guarantee what gets mapped on the Unprotected alias) be
+mapped to a Granule in the NS PAS (normal world page), via 
+RMI_RTT_MAP_UNPROTECTED. RMM only guarantees that the output of the
+Stage2 translation is "NS" PAS (the actual PAS of the Granule may not
+be NS, e.g. if we have a malicious host).
 
-Thanks,
+Now, converting a "protected IPA" to "shared" (even though we don't
+share the same Physical page for the aliases with guest_mem, but
+CCA doesn't prevent this) would take the following route :
 
-	M.
+Realm: IPA_STATE_SET(ipa, RIPAS_EMPTY)-> REC Exit ->
+        Host Reclaims the "PA" backing "IPA" via RMI_DATA_DESTROY ->
+        Change PAS to Realm (RMI_GRANULE_UNDELEGATE)
 
--- 
-Without deviation from the norm, progress is not possible.
+Realm: Access the BIT(39)|ipa => Stage2 Fault ->
+        Host maps "BIT(39)|ipa" vai RMI_RTT_MAP_UNPROTECTED.
+
+The important things to remember:
+
+1) "NS_PROT" is just a way to access the "Aliased IPA" in the 
+UNPROTECTED half and is only a "Stage1" change.
+2) It doesn't *change the PAS* of the backing PA implicitly
+3) It doesn't change the PAS of the resulting "Translation" at Stage2, 
+instead it targets a "different IPA"->PA translation and the resulting
+*access* is guaranteed to be NS PAS.
+
+Suzuki
+
+> Thanks,
+> Gavin
+> 
+> 
+> 
+> 
+> 
+
 
