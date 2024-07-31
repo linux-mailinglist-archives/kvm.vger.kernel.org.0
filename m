@@ -1,174 +1,164 @@
-Return-Path: <kvm+bounces-22792-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22793-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 143359432E8
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 17:17:00 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A86AC943313
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 17:22:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C8291C211D0
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 15:16:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA8541C218B3
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 15:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 119951D3626;
-	Wed, 31 Jul 2024 15:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832351BD4F6;
+	Wed, 31 Jul 2024 15:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="fRdWxwX/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FAfUbDq8"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2076.outbound.protection.outlook.com [40.107.92.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AB611CB32F;
-	Wed, 31 Jul 2024 15:09:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.76
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722438590; cv=fail; b=MBI12GyWfrP+8tN1pl8TbJblks3quzEPToStlNZdWdzWLbNl7YuxB4wSjSCg9rTW41NYArqMjICmvrAOtvOV2hGW+98bkkHmV/S4T4R/Jku1QQW+SBvZnjEA90oLxhgZbx3sh6cOWebTAu/+ofb4xzl6L2hYaULwY804Bz5tx8I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722438590; c=relaxed/simple;
-	bh=2k6VbzH2BIqJNNwYxpT7TO+paYM30wolsECgnn94tRQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MwS1kr3jlKkdxyPNP0vjxq7O3oMCDeU+8jppLYJj+5D6hyn6FkXzu9x8om5VdzewG6E6/lBuEGyA1KgiBABAjlOT30KYiDjzHfxX31IVX3neGqOf7sdp4PfL4TYMwnOjX/Vq4HthqwY5rYbpjJWv95gaFqSMMQZ26rLncL7BEu8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=fRdWxwX/; arc=fail smtp.client-ip=40.107.92.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=IX+BMBa9iti0Sx3v42x3CsK59eV70bbqiXzomz1ODUBtra++QYJBMHP/GJgKh9dmUgM84SpbfpWFqltA8TJd9d/GIA1+LRo8kl2LqKiKSq04ABlObTLDd8X7l4GIxqlcUutrTzUJsh5184DafbMrK49dIiKOig9tMBGqOVEfijeC4e9PSfDMY29qg9BHSo04kn/zYsGSQskBObdvBWekLEqTN3WRKtB7wLhgFRSy0BHxHFMK+lOYrqkE2bHVhlF8GpYGTOich529xcpUKX7vC9Gl1cClHRY0gAn8C6fDZ6cNxC5lOZzZ7ockiFPLHLyscj0urQF5F3Y3MATtMcNS1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=R35YcfpMfkkvWIJmb1WPtShF2Ta3rExIk7TUgVjB+5Y=;
- b=uyJmo1XlB0C0KZ5WEOm9wfxayaxBmOpTp1ZfQcSxp67WscS2d29kwKKKbt6Ba8K2qhC53kl3l7NIIxUhtPtMYyvvwcCiU2niy5XRTGAA8C4cP9gIIdCHt8pyv3fnWZRIrBYLG3gRzwDWRE9pW3akuAOG3sa5lEgGmgkcw/xVW6mqwaHs8QLyyIDl3gIB459Zafkp4l94QMTYj1dvv1iydlNpHYbYUjfxf4EjbPpGMP2eMyjIPxtKgDDSAXfJoZ0cPFhefXQ82zZPeIf3PksCG++pyeQvVNpa+mfGYOqAXFT2R8kcHG+VeYF0TCCc8bcndwVIrfhjcru7R+QmZLxPHA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=R35YcfpMfkkvWIJmb1WPtShF2Ta3rExIk7TUgVjB+5Y=;
- b=fRdWxwX/pKN/kKsW82CjWXMxFs0DBD8b1L41+A2Z/NESDZEANDLfzsRNjeaUQRM/T/WvoZNpqPaweJbfgB34qeJiAfInBS+ks9N9q7eJrtcW230fNcywPQUuJczoEyHKArE2If1m1EH70fcbE50JK6Uu0egIITM3Nq30+Plxfto=
-Received: from DM6PR13CA0030.namprd13.prod.outlook.com (2603:10b6:5:bc::43) by
- DM6PR12MB4137.namprd12.prod.outlook.com (2603:10b6:5:218::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7828.20; Wed, 31 Jul 2024 15:09:45 +0000
-Received: from DS3PEPF0000C37D.namprd04.prod.outlook.com
- (2603:10b6:5:bc:cafe::8) by DM6PR13CA0030.outlook.office365.com
- (2603:10b6:5:bc::43) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7762.23 via Frontend
- Transport; Wed, 31 Jul 2024 15:09:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DS3PEPF0000C37D.mail.protection.outlook.com (10.167.23.7) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7828.19 via Frontend Transport; Wed, 31 Jul 2024 15:09:45 +0000
-Received: from gomati.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 31 Jul
- 2024 10:09:41 -0500
-From: Nikunj A Dadhania <nikunj@amd.com>
-To: <linux-kernel@vger.kernel.org>, <thomas.lendacky@amd.com>, <bp@alien8.de>,
-	<x86@kernel.org>, <kvm@vger.kernel.org>
-CC: <mingo@redhat.com>, <tglx@linutronix.de>, <dave.hansen@linux.intel.com>,
-	<pgonda@google.com>, <seanjc@google.com>, <pbonzini@redhat.com>,
-	<nikunj@amd.com>
-Subject: [PATCH v11 20/20] x86/cpu/amd: Do not print FW_BUG for Secure TSC
-Date: Wed, 31 Jul 2024 20:38:11 +0530
-Message-ID: <20240731150811.156771-21-nikunj@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240731150811.156771-1-nikunj@amd.com>
-References: <20240731150811.156771-1-nikunj@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39F221BC06D
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 15:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722439205; cv=none; b=FAGB5GMNKTfnhtBkgPuJrxBY8zCQ5QbQZqQB7uhIvdcCZQth4SmklGkVexiwHPSIaHB9YkLaNv3+lEeABAqxh8rBDUnSxvKSvDOY+KVFGJuyl7VwZ3H2O4racG5tXmWtSW68phohvHDHldWMZSBioijy83fEYSl23XZwz8SAh/A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722439205; c=relaxed/simple;
+	bh=mrnvQl6M+lb/gTQFQ85ejkCOiwiHss34vbITuDkqy5c=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=fYjxRwN+6tO+beA96I4si6TNNc5MJwodWaLAbcNZgz2CdbfiMriBUq25IYDWCxEg5xrMnoHpAwKepCcCK4aQFsnAML733bLKGqF7Z6SgcPbWwPx/RjhJIfmpUPODBk75DGCQ5JuNPWOysX0bWY5qI72Z8RITESpaujoPqZpbU2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FAfUbDq8; arc=none smtp.client-ip=209.85.128.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-650fccfd1dfso105493397b3.0
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 08:20:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722439203; x=1723044003; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+awCnTQ6n6w0kReOKqFcxkIXj5QkErgyYJsc3T/RE3k=;
+        b=FAfUbDq8Gb7FiRiYhZvQzWZTus2szjlVXl4ruAlQtmiq+6Yy+KMBeh2pSJx3I8uG5c
+         Hg7cJYYOpSiW2GFqMKEO1Ro8XmFTZnUmImTg5bcVQ2nFeDTb4VWUHpjr1LH8BxpKJLhk
+         I04lx5LHulGtsjPECWXbpLf9WagimgKewzu8q+qBCEkMKv1QZ79ApY4v4MSruwZO2xyi
+         xnxewVstaGV2SzLwR5Q68JkvyAfgPlX2vc4tjz9XIuwIC/eb+IDgnzLJgPFyLBMfWVtE
+         45WqTaXI8SMHEvLxVialdg9rFo8jFCB8ezoGdsQJn1E+0bdUNH6ThPLhT1QTvmXgl6Ik
+         CUXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722439203; x=1723044003;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=+awCnTQ6n6w0kReOKqFcxkIXj5QkErgyYJsc3T/RE3k=;
+        b=lqYZsi3gCjgvjwWvtKsZ/NO40mZd0ykUJFJyoUYjv8w8Lw6U7ek6fj3I2EOBIEccbT
+         Cyy7cyz4OlOgaT5lpUJsGTQWktx7FN3XtTs+2bHejUoC5pP7CEyy8zYIgHF3maMaQl1d
+         8B0BIBTwNU7JbgXSm2wQuL/hArS68hxwSX3DpDFfeeiaO5fu+EzPkR4FGB3yiGcN3Yuy
+         jg3b8TY+HmZM6dD/1oQPHTA/7u25EgtI+g5rVIeHXobqqLbpegy6A9a7QWPeBDAEMSgf
+         vTug6M/E8m11g1v6N/awjV+i44dFnm0SJBb/oU7pjvHOwuaZ7tiyjd+UR/95Kkou7g5D
+         rEsA==
+X-Forwarded-Encrypted: i=1; AJvYcCUcqwpg4e8IyHaTroHcxlhsoOE+k3QefwkY1bfV+xLoq9518J8HqP8PA5ivkapjS7Dr1E78TiOnkUDSrphzkdE1W9Zn
+X-Gm-Message-State: AOJu0Yz/ikOdkDaX7jTvufNyS23/pHy/db24cxyKBvdYNL5Sek6DGz66
+	2WJ7D8rnpykLB2L3WRYZXwLZyDXW9Ujbq+IEcYTvkgSLdOMNRoBjIuqONECc64UHqEGg8PlVABA
+	q7Q==
+X-Google-Smtp-Source: AGHT+IHkbvLVC/6tbuP4uZAhmbZgdzd7NoE0b5j4mmANdCAtR4G9YeAyrN7wTLF0fWbNpjsi5YL6he30vJc=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:ece:b0:62f:f535:f2c with SMTP id
+ 00721157ae682-67a053db18cmr4236867b3.2.1722439203063; Wed, 31 Jul 2024
+ 08:20:03 -0700 (PDT)
+Date: Wed, 31 Jul 2024 08:20:01 -0700
+In-Reply-To: <CABgObfb2MX_ZAX3Mz=2E0PwMp2p9XK+BrHXQ-tN0=MS+1BGsHg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS3PEPF0000C37D:EE_|DM6PR12MB4137:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2431b0ee-0c4d-4678-e36d-08dcb172d009
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|7416014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?elEgJjT5FbuQ8tfjLqoqI5eFNWzyijAjWL+kZt1sHfuTX3QLTH+oLGgCdLFH?=
- =?us-ascii?Q?FNrkdESnAg+tdwDofX+E8XNxL6HwCwtGLHQJZwePn8gVapzkSXYBBlUjjtOL?=
- =?us-ascii?Q?mhbltsIdVwOwWHmW/QRErlDUOS7xT91u/vdtaYi6blheDkKnadRuqa6cjx1l?=
- =?us-ascii?Q?0B2fgK1kFKvEieWMq/9ASVOgpaMTysYR04ELXu7liS/dKBOhFTE5+nF+iNnA?=
- =?us-ascii?Q?o6FZ134TZAIaM+f4BfugeWrvOTJDYvqo+qD6LAng8MCVWzhpO8pbXj9KVl0v?=
- =?us-ascii?Q?aRcoXQ72H8OCf8F8HMUO1fuImlO0odzRqSmKBo5cxh8KxNnFKqGWOu5+j2th?=
- =?us-ascii?Q?MRuuPzPlVLwxjrEAbG23hW6ns0iq7bg05uEFZ142J9f3HRXXrY+QiqN+IVJb?=
- =?us-ascii?Q?fnoNf1LZI96K0jbuKxpie+KVrgybOcouFUFwzs1/uRF1hq9HvSlQfXI9uUNA?=
- =?us-ascii?Q?9izLhSYlrGmpkCNBYCE9Mhpt5lURk7rh8KLIEUNZ0JwEbP7aVdrl8Vvxkg2g?=
- =?us-ascii?Q?m+juT9J4u0E+9t66o9yOJtewqH3yaxZKlOHd47+ga2ASClrzTNWCJKl4vOSB?=
- =?us-ascii?Q?6XMLP5+e2eZ0XJzBhi7suMmm9JU4qz4MsBInLJK+d9y5KfT3mSjU4Rhvrbhj?=
- =?us-ascii?Q?y8LgzYiLEje4++/D0uytdc2Zp7uUFS3fq/A09z5g3GdMc++MOgeLUecrb7QO?=
- =?us-ascii?Q?BGEH1Ipp9oDB+OIzJYxekOiA/EStf80gTcpk+/cqNGVpoUXeC8S37YFrFu+H?=
- =?us-ascii?Q?uolHMPPCBF0nnXqJcfyHtQv1Q9ufhuxS4p9dhClBg6kdvUXw4x3SnqtBU+oD?=
- =?us-ascii?Q?NmR3Pqm61Yt6JU9h2orvRxPyBAV/gvYRTcsLvvQhRvnmk14vyldrG4tH8N6q?=
- =?us-ascii?Q?SPGXpZ707snv7rnrEqTIvHy7BiwjgowJZ+qV5dNHoUXaBftBat1sxOZ5tGx5?=
- =?us-ascii?Q?wMxMts9ygjFy/Z0JAc4nOoUnt0kIT3iyx7AdUzjCAiEnRLE5PbHJxiVcGNWn?=
- =?us-ascii?Q?j8zxKRkO1V6JSrF4KQHNXrdPSDaSHpB8qCsYj9JcirBfGN4GVZGA//J0BHEE?=
- =?us-ascii?Q?rxvQVs8qKrwVOKh633U0Co8ty4THRRaTIvgNJ+XHt+gpBm5FHS6TXcgC4SgG?=
- =?us-ascii?Q?AlpqRmqcAhQyeOLMonwqPbblzZWFYFWYRZegzPTu2etZdXoo2SL75rS14gLF?=
- =?us-ascii?Q?w96G/QKLT5FbjQlYr2NMi4MsgVSB5UlUYRSfzkEDPgV3xTAc3lzgOncgvaVL?=
- =?us-ascii?Q?rKHeRBjlEdCC1cndahD59Y3ux+TJLLFZogdGv3VNBsBnZwAhNKLcOdhiV6LG?=
- =?us-ascii?Q?N53U5h0Ryp/qJZ9xML7FQ63Wc58Bf1+243Ce/CTn/xWaZovu44wz8d0XyD1k?=
- =?us-ascii?Q?q0Imao4Ypow5+3CL7CDs2X/wCamRK6AiT9yZwoTiWaop07D7Dr1q0KCTW5kJ?=
- =?us-ascii?Q?uyV1YLlcC9JUZBcdyMwjVjua53TzkVxl?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(7416014)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 15:09:45.3371
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2431b0ee-0c4d-4678-e36d-08dcb172d009
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS3PEPF0000C37D.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4137
+Mime-Version: 1.0
+References: <20240730053215.33768-1-flyingpeng@tencent.com>
+ <db00e68b-2b34-49e1-aa72-425a35534762@redhat.com> <ZqlMob2o-97KsB8t@google.com>
+ <CAPm50aLGRrK12ZSJzYadqO7Z7hM25NyXPdCD1sg_dTPCKKhJ-w@mail.gmail.com>
+ <2e66f368-4502-4604-a98f-d8afb43413eb@redhat.com> <CAPm50aJ2RtxM4bQE9Mq5Fz1tQy85K_eVW7cyKX3-n4o7H07YvQ@mail.gmail.com>
+ <CABgObfb2MX_ZAX3Mz=2E0PwMp2p9XK+BrHXQ-tN0=MS+1BGsHg@mail.gmail.com>
+Message-ID: <ZqpWIXR1I53SD1-7@google.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Conditionally call kvm_zap_obsolete_pages
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Hao Peng <flyingpenghao@gmail.com>, kvm@vger.kernel.org, 
+	Peng Hao <flyingpeng@tencent.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-When Secure TSC is enabled and TscInvariant (bit 8) in CPUID_8000_0007_edx
-is set, the kernel complains with the below firmware bug:
+On Wed, Jul 31, 2024, Paolo Bonzini wrote:
+> On Wed, Jul 31, 2024 at 1:19=E2=80=AFPM Hao Peng <flyingpenghao@gmail.com=
+> wrote:
+> > > So if anything you could check list_empty(&kvm->arch.active_mmu_pages=
+)
+> > > before the loop of kvm_zap_obsolete_pages(), similar to what is done =
+in
+> > > kvm_mmu_zap_oldest_mmu_pages().  I doubt it can have any practical
+> > > benefit, though.
+> >
+> > I did some tests, when ept=3D0,  kvm_zap_obsolete_pages was called 42
+> > times, and only 17 times
+> > active_mmu_page list was not empty. When tdp_mmu was enabled,
+> > active_mmu_page list
+> > was always empty.
+>=20
+> Did you also test with nested virtual machines running?
+>=20
+> In any case, we're talking of a difference of about 100 instructions
+> at most, so it's irrelevant.
 
-[Firmware Bug]: TSC doesn't count with P0 frequency!
+It's not even remotely close to 100 instructions.  It's not even 10 instruc=
+tions.
+It's 3 instructions, and maybe two uops?
 
-Secure TSC does not need to run at P0 frequency; the TSC frequency is set
-by the VMM as part of the SNP_LAUNCH_START command. Skip this check when
-Secure TSC is enabled
+Modern compilers are smart enough to optimize usage of kvm_mmu_commit_zap_p=
+age()
+so that the caller inlines the list_empty(invalid_list) check, but the guts=
+ of
+the zap code are non-inlined.
 
-Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-Tested-by: Peter Gonda <pgonda@google.com>
----
- arch/x86/kernel/cpu/amd.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+So, as is, the generated code is:
 
-diff --git a/arch/x86/kernel/cpu/amd.c b/arch/x86/kernel/cpu/amd.c
-index be5889bded49..87b55d2183a0 100644
---- a/arch/x86/kernel/cpu/amd.c
-+++ b/arch/x86/kernel/cpu/amd.c
-@@ -370,7 +370,8 @@ static void bsp_determine_snp(struct cpuinfo_x86 *c)
- 
- static void bsp_init_amd(struct cpuinfo_x86 *c)
- {
--	if (cpu_has(c, X86_FEATURE_CONSTANT_TSC)) {
-+	if (cpu_has(c, X86_FEATURE_CONSTANT_TSC) &&
-+	    !cc_platform_has(CC_ATTR_GUEST_SECURE_TSC)) {
- 
- 		if (c->x86 > 0x10 ||
- 		    (c->x86 == 0x10 && c->x86_model >= 0x2)) {
--- 
-2.34.1
+   0x00000000000599a7 <+55>:	mov    0x8d40(%r12),%rbp
+   0x00000000000599af <+63>:	cmp    %rbp,%r15
+   0x00000000000599b2 <+66>:	mov    0x8(%rbp),%rbx
+   0x00000000000599b6 <+70>:	je     0x599d6 <kvm_zap_obsolete_pages+102>
 
+   0x00000000000599d6 <+102>:	mov    0x8d48(%r12),%rax
+   0x00000000000599de <+110>:	cmp    %r14,%rax
+   0x00000000000599e1 <+113>:	je     0x59a5f <kvm_zap_obsolete_pages+239>
+
+   0x0000000000059a5f <+239>:	mov    0x8(%rsp),%rax
+   0x0000000000059a64 <+244>:	sub    %gs:0x28,%rax
+   0x0000000000059a6d <+253>:	jne    0x59a86 <kvm_zap_obsolete_pages+278>
+   0x0000000000059a6f <+255>:	add    $0x10,%rsp
+   0x0000000000059a73 <+259>:	pop    %rbx
+   0x0000000000059a74 <+260>:	pop    %rbp
+   0x0000000000059a75 <+261>:	pop    %r12
+   0x0000000000059a77 <+263>:	pop    %r13
+   0x0000000000059a79 <+265>:	pop    %r14
+   0x0000000000059a7b <+267>:	pop    %r15
+   0x0000000000059a7d <+269>:	ret
+
+and adding an extra list_empty(kvm->arch.active_mmu_pages) generates:
+
+   0x000000000005999a <+42>:	mov    0x8d38(%rdi),%rax
+   0x00000000000599a1 <+49>:	cmp    %rax,%r15
+   0x00000000000599a4 <+52>:	je     0x59a6f <kvm_zap_obsolete_pages+255>
+
+   0x0000000000059a6f <+255>:	mov    0x8(%rsp),%rax
+   0x0000000000059a74 <+260>:	sub    %gs:0x28,%rax
+   0x0000000000059a7d <+269>:	jne    0x59a96 <kvm_zap_obsolete_pages+294>
+   0x0000000000059a7f <+271>:	add    $0x10,%rsp
+   0x0000000000059a83 <+275>:	pop    %rbx
+   0x0000000000059a84 <+276>:	pop    %rbp
+   0x0000000000059a85 <+277>:	pop    %r12
+   0x0000000000059a87 <+279>:	pop    %r13
+   0x0000000000059a89 <+281>:	pop    %r14
+   0x0000000000059a8b <+283>:	pop    %r15
+   0x0000000000059a8d <+285>:	ret
+
+i.e. it elides the list_empty(invalid_list) check, that's it.
 
