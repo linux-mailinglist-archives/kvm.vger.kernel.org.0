@@ -1,119 +1,144 @@
-Return-Path: <kvm+bounces-22800-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22801-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF5B943411
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 18:22:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BCD8B943415
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 18:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F93B1F2242A
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 16:22:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 739CD1F22695
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 16:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283001BC09D;
-	Wed, 31 Jul 2024 16:22:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 753071BC07C;
+	Wed, 31 Jul 2024 16:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C2MBkEav"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="biJfHcwA"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4B01CAA9;
-	Wed, 31 Jul 2024 16:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F631CAA9
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 16:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722442942; cv=none; b=u3535e0STKDCCLuViS0mwO1feH4cpfwJ2WZCvTY1150eKUt37mHdSKvF7sTNwFd9pZZ8S5+M6rvHAyG2aNpnRGJ84fZf+v/h7Oxm+Y+K7s3Qp5s98E+FkDL9QJShloRzZlOS7rgqKajRN1SN7vrLQEJL99n+r/5lNM/FOCsiG+4=
+	t=1722443019; cv=none; b=a7WyHUzyzHTnpoFoGLCkCRP3tvKn0zCGx5srWv+VTFxLtZ6xdBa1/Llbd65wI3SZfqZT0+CXtL1myBsH3tvNX8Yjjv/66Lj2c8/cSG6PPCSQYrHHmXSj5FWW5AxP8H4BZzK/+0ND5z8JUYinQemwUTg6l4MSbYc7g+CuUBpv4Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722442942; c=relaxed/simple;
-	bh=4xS0pD2n/vpTAJI9k2seY/mT9WcQsaPxpoFu1kzIwSY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ePgAz01CxZkM6c3nG86HyRMmoUSNQX4uOmxRfhW6arp0Uavl1WM3iPz/1huXPi1kQHoVPslAEyX4/CYnir9hv2PpNZputmMt4fI3DdnYxm8D4UruaXqYBJFPbOmftQfR+tO07AbFF2olnTAWmeYyw34Ku9Y8w13LpHQnolKhgMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C2MBkEav; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FC3EC116B1;
-	Wed, 31 Jul 2024 16:22:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722442941;
-	bh=4xS0pD2n/vpTAJI9k2seY/mT9WcQsaPxpoFu1kzIwSY=;
-	h=From:Date:Subject:To:Cc:From;
-	b=C2MBkEavnwa7rJ0kZ6GI52VlH99xH0jl9GgQckr4U22QF1wbaiyYfZS2iN4ZFMVPo
-	 3q39Q5+M5eeaEBGfXwDM/YBr8h61g4cd+XHy3ibH7EWN3WEvp0EkeCOmfVzh+0Mcnh
-	 AT6hJ/Io+sUULd9tDslVf+aTTDWJKHB4dtXpsKep8+nIB/+9e+AspZiFJ0ONroji50
-	 BKnBXAPFJ7PdKYoswBaWwFj1nHzFWHBDSiKd5D8mhpdtmAu+yNhxKdmnOFpchzqzbB
-	 6oPhsqyb/l9AOyVmJhcXk2kjTNQGwQqGOJ4FPn01qBt3fJKw8J2FCZEhVen4ShKzGE
-	 WcxzWG4VQZMAg==
-From: Mark Brown <broonie@kernel.org>
-Date: Wed, 31 Jul 2024 17:21:13 +0100
-Subject: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in
- get-reg-list
+	s=arc-20240116; t=1722443019; c=relaxed/simple;
+	bh=2HhUeVKAqujM6tGjz7xY7eoGDJF2k6V8JCfwVRNXp0M=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=IW1Kms2oZ05VV8tnBExSJibeoO183gzhbOxz0qaxmu9kl4dsy8ab9SQFb+bJW6Zgi/GdfKaXBdldI+QE5POYndM8Q2u881Q8I/SdMBMwlAYpjT1vcLWZ2V3gLNoLPZH7IW9Sj5ifN3Iwgo8rq1+WTCTO7seMiWgZO3zwtDXploM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=biJfHcwA; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a7a8553db90so813460366b.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 09:23:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1722443016; x=1723047816; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/Jy3Eo6Gu+vhJFsd2nEOfkihTm91GOS2uDXcn/bR1Cs=;
+        b=biJfHcwAcXl5q7WHRKuHuTlJpEVNHd/ETzyt8bdMQqx09kSVQdUbzlc84RSDJs1FGO
+         fJ7i/T87Q6CA7d7D5Y22ilGEhOMdOd9CpUn3uYrwX52tZX1fEuvndacJiVMJEpnOhF8h
+         JseXeFiC4wl6gSoHQBOwzW4q6AKC3NoZfZYzKx7zGNJdUTt84uKxeTxSBSEefzAr2ECB
+         /hCxo75bYp+vx7zEWp2qyBMA9yU0ewUx8QuQiQUSJ6qR1NhQUjjtL8Ac/ajeVk1fMWtF
+         +bhPybB6eQCsjIk2Yq33QlZSICOC40hdNK1Sj4hXSv8ySBLljNr6crzZpXZhY2/vK4nl
+         nrDQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722443016; x=1723047816;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/Jy3Eo6Gu+vhJFsd2nEOfkihTm91GOS2uDXcn/bR1Cs=;
+        b=vr0e3Tj+9HsKIoxxo38MFeDmA5PdZuz6m9eg8ge/6oKq647vqtQ6TedS4qTGlzY1G8
+         lmHBtLBxJ/HJQ7N0O3tLtgBzx70NknQhBLqN5fta5LNoKVZWD7qg2Dr4LtBxkz72uwgQ
+         AlJd1AsblH7watQEFeaKVLBpd9aKwyKycCLx56ulY+3N6Ux9AfmFkB1G/CZMrREjrk0z
+         3ravsvLJajFqy0xiVjGGvwN8sUE/oEvAL2DLjK60/jqcK8wU5B8nhyg0OmyteQebiFxf
+         cvdSbtfzzmfKwtJ0AwHnhbpzem/KFVycfRP1rdHZgKJTZPNJnkoDdu3M713kqSOU9827
+         1McA==
+X-Forwarded-Encrypted: i=1; AJvYcCW9sHTtAxgIvJQub2NiqK7bfqtj4zcJePQh8FgF4P1N2x8HGCv2aHgKw8Vkq+AooxK8x/02VlChH6WbGUeNiFR8uvM2
+X-Gm-Message-State: AOJu0Yw47K3Ey88t5lyCGSN6t8WfA8ky4YlZeWsyj8Bu8pppsVRszWLw
+	XKCNbzpRTe/1LuAR+6D2c19HSOANZB8dOkL/Q1aCRJTgFUTkoNvPjvJ+WibE2Pc=
+X-Google-Smtp-Source: AGHT+IFaeuLsqXvHIvwNkMOmXQ/kk95KnaHAVzfZZFY2rJSwrdZANzuSfUeE19U50MBeGB1J/TbUHg==
+X-Received: by 2002:a17:907:a0d5:b0:a7a:b070:92c6 with SMTP id a640c23a62f3a-a7d40116a4bmr801926666b.50.1722443015967;
+        Wed, 31 Jul 2024 09:23:35 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad416basm784769266b.104.2024.07.31.09.23.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jul 2024 09:23:35 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 614DC5F8CB;
+	Wed, 31 Jul 2024 17:23:34 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
+ <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
+ <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
+ Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
+  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
+ <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
+  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
+  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
+  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
+  David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 01/84] KVM: arm64: Release pfn, i.e. put page, if
+ copying MTE tags hits ZONE_DEVICE
+In-Reply-To: <20240726235234.228822-2-seanjc@google.com> (Sean
+	Christopherson's message of "Fri, 26 Jul 2024 16:51:10 -0700")
+References: <20240726235234.228822-1-seanjc@google.com>
+	<20240726235234.228822-2-seanjc@google.com>
+Date: Wed, 31 Jul 2024 17:23:34 +0100
+Message-ID: <87a5hxfs3d.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAHlkqmYC/x2MSQqAMAwAvyI5G2i1WvEr4qHVqEFcaESE4t8tH
- gdmJoJQYBJoswiBbhY+9gQ6z2BY3D4T8pgYClUYZUuN672hC1ttcOIHRZ9MeJFc6IzytaeqGa2
- HlJ+BkvGvu/59P+CCE1pqAAAA
-To: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
- James Morse <james.morse@arm.com>, 
- Suzuki K Poulose <suzuki.poulose@arm.com>, 
- Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
- Catalin Marinas <catalin.marinas@arm.com>, Joey Gouly <joey.gouly@arm.com>
-Cc: linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
- kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Mark Brown <broonie@kernel.org>
-X-Mailer: b4 0.15-dev-37811
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1222; i=broonie@kernel.org;
- h=from:subject:message-id; bh=4xS0pD2n/vpTAJI9k2seY/mT9WcQsaPxpoFu1kzIwSY=;
- b=owEBbQGS/pANAwAKASTWi3JdVIfQAcsmYgBmqmS6GOeWEWP62/aXDViXEkZrsrUtBn51zh/OWFiZ
- uDkGI/aJATMEAAEKAB0WIQSt5miqZ1cYtZ/in+ok1otyXVSH0AUCZqpkugAKCRAk1otyXVSH0E06B/
- 9VOmuwqQYplgVUUsHIPEJG5GVO9uTAgm62aij3o6EomU20qF9CObSRrFct3b0xaucS568Co/VI6tpp
- gWS3LZJAz5GqV1E1ZynABm+8i9Fo8tVfaWY/E16wv4/DSNNOYApn7+5p7p+sodTV6y2v5y4rWulO9D
- DnT2pOYhB6A163lBIbSdOuFoeLfDRcvA0ou2OICK3GUDa0H5993gqjVbJhh8dSmvSA43qhm6yLW7Oe
- qotWzu21jHfs+PPxIPBVstkTPueah2l0mESFTOOGEi7PcMIUMF7uCjrpiJZqwowtAyjyeL1Iyqcjl4
- 4yOCGR/2Cb/u/Y8Hf+11+sr7jTugSm
-X-Developer-Key: i=broonie@kernel.org; a=openpgp;
- fpr=3F2568AAC26998F9E813A1C5C3F436CA30F5D8EB
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The ID register for S1PIE is ID_AA64MMFR3_EL1.S1PIE which is bits 11:8 but
-get-reg-list uses a shift of 4, checking SCTLRX instead. Use a shift of 8
-instead.
+Sean Christopherson <seanjc@google.com> writes:
 
-Fixes: 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indirection registers")
-Signed-off-by: Mark Brown <broonie@kernel.org>
----
- tools/testing/selftests/kvm/aarch64/get-reg-list.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> Put the page reference acquired by gfn_to_pfn_prot() if
+> kvm_vm_ioctl_mte_copy_tags() runs into ZONE_DEVICE memory.  KVM's less-
+> than-stellar heuristics for dealing with pfn-mapped memory means that KVM
+> can get a page reference to ZONE_DEVICE memory.
+>
+> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a gues=
+t")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/arm64/kvm/guest.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 11098eb7eb44..e1f0ff08836a 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -1059,6 +1059,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  		page =3D pfn_to_online_page(pfn);
+>  		if (!page) {
+>  			/* Reject ZONE_DEVICE memory */
+> +			kvm_release_pfn_clean(pfn);
 
-diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-index 709d7d721760..4abebde78187 100644
---- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-+++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-@@ -32,13 +32,13 @@ static struct feature_id_reg feat_id_regs[] = {
- 	{
- 		ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
--		4,
-+		8,
- 		1
- 	},
- 	{
- 		ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
- 		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
--		4,
-+		8,
- 		1
- 	}
- };
+I guess this gets renamed later in the series.
 
----
-base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
-change-id: 20240731-kvm-arm64-fix-s1pie-test-a40b6be58d7b
+However my main comment is does lack of page always mean a ZONE_DEVICE?
+Looking at pfn_to_online_page() I see a bunch of other checks first. Why
+isn't it that functions responsibility to clean up after itself if its
+returning NULLs?
 
-Best regards,
--- 
-Mark Brown <broonie@kernel.org>
+>  			ret =3D -EFAULT;
+>  			goto out;
+>  		}
 
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
