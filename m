@@ -1,186 +1,219 @@
-Return-Path: <kvm+bounces-22769-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22768-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E644943224
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 16:38:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 212C594321F
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 16:37:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31AFE1C218CC
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 14:38:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCC6D2822C3
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 14:37:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D501BBBF5;
-	Wed, 31 Jul 2024 14:37:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B121BBBCB;
+	Wed, 31 Jul 2024 14:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="PbKaWnOY"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="j44eJuEl"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2047.outbound.protection.outlook.com [40.107.223.47])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C9E1DDC9;
-	Wed, 31 Jul 2024 14:37:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.47
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722436661; cv=fail; b=K+W6GmQxVd52Cl25zS0HhVKSVA6wh4DF/YVOUAXFZ4ohSMvPxbAxthBiY5+B/Q4qhMpxOExGs55XeGH87pIa1pj7Q5VHjycGhpzI0yEFRHXSyA0tWqnY5jifpC7ndSXxzGr3j1b4q9kwxBAXsuqPAsF3WZVKXADZJtAFh6ZVqNQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722436661; c=relaxed/simple;
-	bh=bxnY19o6pPmTix1flyLltP0l18xq6oyV2uxM4DowdP4=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Go/dP0JvVL/dXX8sIgkyZecoR3pz7PjwPK43PkcAngy6QyR7wTaX5kORQ3C64GAg9h5FEDP+N8Vxgo7Fr5FV70ZvdNLDGBvnoMQrpYO8l/80Iy1R0zkgFSFkuOPch1O6RDhnGLEefl0g81ZvaSiL/qqIpnD7LYORYeGdZDyQNSc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=PbKaWnOY; arc=fail smtp.client-ip=40.107.223.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=oLBQkOUfs0CITdCWhLBLHZ27CQEcpUl2FODKyWRTlH3O2nUpwVkNEvBZaAgwCIKQnII5XEZLNYnaN3oaY1c2Iko13y8Q5tN0tHsx+V0HwKLlh62BzHIWDM++cSUWkWkJ9unz1ioJOMk59yxEOCbAOGN3mLzTvMjVuYv0db/BDzBfstmBu6PhwZyasyia5Wqnuc+6bf9NN18MHX70qVDp5Ebm+DTqAgWFDRnqZnPRrufBChnn+jvJfZd0jI2LORsKds+wrEDc/uoiU7q9fBMnARW+8OcuRo6TIGrxcbB/8iTIy3CX8LOmiv3ZOzJQDwWGiuXvCwdJxdUrbkv9jPGN2A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MeDUULQtWm/kyvL5w6tSM/K6BP5RDE1YfylxD87KvYw=;
- b=ZQ1pF+nXAmJ7hk6UPKWPUxeuJW19kGaeFZzR64mMS4EJVslyfepgrE7TXE7t2WRHLdRnBzr/sjy22S4TTeHuk8SipAZH0i0D1djArgKXCNMI7CZk1tM84v25l7BlQGYghlGD9miElI6QhGYU0xS8gTdgbZ1niNWyoCXJtH4QsKrGg7qeN7Y3GFVYTivqyA/VTCCWxBbfwdD1xf6SvePL+AOvD5cAdgcbDJ5NYMznXyZWs/OGYjSfNG6bKA7NoL4qyl4yZLzi7D5FSwHe20P4ibS64H+ZrlkZUYGJUNm9RimtnxD20Cm/2rwQx660wSBD9APnZBiodTfED4oUqJQsgw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=MeDUULQtWm/kyvL5w6tSM/K6BP5RDE1YfylxD87KvYw=;
- b=PbKaWnOY4Ueb0/S0IyZf0U6oCYpKW54/4DHHfLJmPDzCMGuby49vFtS4yt3XShTJwWq1um7XPxCmEgjqu6pbwJaplJqhSkr9BUXMrUPtrYbUBkJhxa94ADGAdaf86Q1iXNsGG0hq2///TMpvCtPK57V8w53WiRdddYp/G1v0mgg=
-Received: from BL1PR13CA0246.namprd13.prod.outlook.com (2603:10b6:208:2ba::11)
- by IA1PR12MB8311.namprd12.prod.outlook.com (2603:10b6:208:3fa::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Wed, 31 Jul
- 2024 14:37:33 +0000
-Received: from BL6PEPF00022575.namprd02.prod.outlook.com
- (2603:10b6:208:2ba:cafe::6b) by BL1PR13CA0246.outlook.office365.com
- (2603:10b6:208:2ba::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.29 via Frontend
- Transport; Wed, 31 Jul 2024 14:37:32 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL6PEPF00022575.mail.protection.outlook.com (10.167.249.43) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7828.19 via Frontend Transport; Wed, 31 Jul 2024 14:37:32 +0000
-Received: from jallen-jump-host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 31 Jul
- 2024 09:37:31 -0500
-From: John Allen <john.allen@amd.com>
-To: <pbonzini@redhat.com>, <kvm@vger.kernel.org>, <seanjc@google.com>
-CC: <thomas.lendacky@amd.com>, <bp@alien8.de>, <mlevitsk@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <x86@kernel.org>, <yazen.ghannam@amd.com>,
-	John Allen <john.allen@amd.com>
-Subject: [PATCH v2] KVM: x86: Advertise SUCCOR and OVERFLOW_RECOV cpuid bits
-Date: Wed, 31 Jul 2024 14:36:49 +0000
-Message-ID: <20240731143649.17082-1-john.allen@amd.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA3E1B3749;
+	Wed, 31 Jul 2024 14:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722436653; cv=none; b=cPROV+c9UIggAuyLnVmM4il3aCRIIlGKvuVBQqCQbVB4Z+WbxbexGryZv1z9SqrhQPHPqw2ap3x9vWO3H369Lvz6Ob4u19/DDppqbnO7ELD6gUplf3uoZgzOzMGOQ8Ompl5Th5vNPyvUk6aet6AMZbu1kJELfH9qzDJ3Q/2iCCg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722436653; c=relaxed/simple;
+	bh=0Undm33bXhx/5AD5wv/i/BKQZkaUcE0GJqpv5YCWWgY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O1pZ52fCMp2Ttfq6eOR/hBV+HPG1QMaM+GJuSkLZkulB1Ya+1dOyR2NWWIL/6IG2FEW0+lqGOCyCneYmkqRNhPXjag3GbbKUlIztX1TH4Z5WOYt/syZb/FZOnYTsw7wTGz7Z15pL2Bflahia6UocMkJ19vCuT+NbGW1rVFnGoW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=j44eJuEl; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 46VCurap030022;
+	Wed, 31 Jul 2024 14:37:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=o
+	rzJUqc4J+ilKifAkYtKiVJ1HPhjWawscWbk4iIWdkE=; b=j44eJuElUZYa5dF61
+	2EAlg94gjEWnn8amqeOdxiJKbceSpQLLFg2xMyBS2gLzNOsqGOGotsMp3ibgSGia
+	f5ZAPdmS7hzKPWKMNuHTgiCOlxu2eW0R18Bn45vTWhvLgMyHwpBXpWVaGiLi7wYC
+	1g8+M6CagwdcK62PiUkeGeDjKpt/cWMSYrmrSTVpersUjNrgBZV+9nPVV/FLEls9
+	MvsU7czfjmSqyigK96uhm1axPijypEbJNwm0GK6PK9tOfNSZqFWsf2XYObzvu6LZ
+	FCwod58QbbQt27wrUUgDHZ3Woo7nSK6Y60aGTW4YowvT2rxuCCVJMiPhQovdXtnP
+	JUkfQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40qnbugee3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 14:37:26 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 46VEZNGb019495;
+	Wed, 31 Jul 2024 14:37:26 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40qnbugee0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 14:37:26 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 46VCxwtG003857;
+	Wed, 31 Jul 2024 14:37:25 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 40ndemkus6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jul 2024 14:37:25 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 46VEbKRb33948280
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 31 Jul 2024 14:37:22 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0C1342004B;
+	Wed, 31 Jul 2024 14:37:20 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6BBE520040;
+	Wed, 31 Jul 2024 14:37:19 +0000 (GMT)
+Received: from [9.179.1.161] (unknown [9.179.1.161])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed, 31 Jul 2024 14:37:19 +0000 (GMT)
+Message-ID: <59ab0ce7-9434-4f99-9fb5-dcf6bf90fb2f@linux.ibm.com>
+Date: Wed, 31 Jul 2024 16:37:19 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF00022575:EE_|IA1PR12MB8311:EE_
-X-MS-Office365-Filtering-Correlation-Id: 26182e5a-2a5a-4abc-0241-08dcb16e502c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ky91cJXKQElIXRdsaqR3hocQoas+gbtqDge6PaVf5Y9XfRgPBhTugh6HS03J?=
- =?us-ascii?Q?aJDSO1EL9p/NutaMPwPzcdlTwXBzdVaghQcHK5+qHBedvK5UurKHIA75ia1b?=
- =?us-ascii?Q?J9lC9G2IjhDfK34I6hQ39VZICcVGYlLsdyUEaweG52HO9R+KeqL7wfdfy7Y5?=
- =?us-ascii?Q?7Jju2KrpvXVvGxTD99t9fsUCuZJ/OK0La8gvlU8zTqYDSeHLQgy/ukMaFLym?=
- =?us-ascii?Q?38Il5qkQa5hAAskCoZ1b3fV2rmaRPYLeB0DiLDNOAAeB4qZmZFIH7auwBQk/?=
- =?us-ascii?Q?mmsvATrNonVR5u/MZfwWt6gHp0cNgDwkwHDuqsL5xNjIURN6J2qBXUPkH0P4?=
- =?us-ascii?Q?rnUuK/07tGEBqJHCStaS1BNaZpZa03TPwCUgener6fG+aZNxLBePkRAFBS6f?=
- =?us-ascii?Q?uclPj0l27vT7FYM7b0udcGafb12GeLOT1PaE+Tkm6P7uIf7R1YgLXwh+T7r3?=
- =?us-ascii?Q?jXnMSIwo418mBxj7rLjCaaxjjL0v0G4K4VDxEaGGpAFDUYaAvpuf17SYQ/an?=
- =?us-ascii?Q?IPf/tujCDCScrrXsZBeWetWC95GXbTr5onNOHTN2SWX3BWUjgLlDvGaLhrnC?=
- =?us-ascii?Q?4ks3Jw5ME6YoUVdW96QisntWFhb+BGVcU6jIzj30Evau0wtcTM39yXAxcBTH?=
- =?us-ascii?Q?/az9wN3TKmlfPoijuiouS444rFs7ORfRNxhBlBPODuTmqrJ3cV/0m7vFOSad?=
- =?us-ascii?Q?RWVqT9bySVQ4i2gHxHSRhlbYLesbxcZD3GKe3CjiH02P3WamC+YJKOX7FrLZ?=
- =?us-ascii?Q?lao7fIxd2r4FW1ITraxjpW40A3AFbue1l2jpubpQ5phbqOaXb+8m8DwR0TMb?=
- =?us-ascii?Q?EeubuCZTsiMPXlkecm/8i7w5VzdTnZeTSCjFeY42UKxTLvERbtQn02e43hM6?=
- =?us-ascii?Q?Qmv61U8qrohBS80579rlotwQV0Cqi+hfyMTD3zxEa1JZNVHnK+l4I73RI+v4?=
- =?us-ascii?Q?bOt+27rL/nxla8b63c+8vjQ1ORbuY6DqB6HgJf6BFMrO6tq2hfGPNPT/9TAY?=
- =?us-ascii?Q?2Hqfz+8lomnHu/l54hqlQdxmg1/eCUb+NluUCSy+T1ckuksrdpLhQAeSOgte?=
- =?us-ascii?Q?DrTlizPdnriHtsWaRmYfS6r5RoHM0G69kB3YnkDrgdkAKW8/PWb81DEOiVEF?=
- =?us-ascii?Q?7usKPvTjsvtEdiGPkmEH1yAs5iPDrmcc8BmkaLULaWsIWS1ZRrRuTCk/PmVe?=
- =?us-ascii?Q?hVAwS7tuzwhxmBoEXovBnoPRX4xE5HFd7LlB7mO+3VG1MSTdyyi+sZbkEzzo?=
- =?us-ascii?Q?j+TLpRnldLqZdmUhSkMtDUtDHNX4ZC7dqT7WBY2SlfRQmGxqgkU6wypgJA9l?=
- =?us-ascii?Q?CD5PmEgDG8lq7BoWw5JY46yA24EBRMQNRyzwOeKpaS3T9e8qotsD7FB0DZbL?=
- =?us-ascii?Q?Vexgr1jpQT9jgfxVmRfHLsTlnkFU9xTgP7CsfYzXmPRCkB5qV5cRSh+iOVCB?=
- =?us-ascii?Q?b6MhoFsoNCFo7aRRk61tyqelbtdKJ9t8?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jul 2024 14:37:32.8254
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 26182e5a-2a5a-4abc-0241-08dcb16e502c
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF00022575.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8311
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 06/10] selftests: kvm: s390: Add VM run test case
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+References: <20240730072413.143556-1-schlameuss@linux.ibm.com>
+ <20240730072413.143556-7-schlameuss@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20240730072413.143556-7-schlameuss@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7VeZiCoDis1yIjyt-eboV8tUVlzF-CJ1
+X-Proofpoint-ORIG-GUID: 6ZvI3pmHQWPi4C8YbPt_NAD1EkFZ2T0_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-07-31_09,2024-07-31_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 suspectscore=0
+ impostorscore=0 phishscore=0 priorityscore=1501 mlxlogscore=999
+ clxscore=1015 adultscore=0 lowpriorityscore=0 mlxscore=0 malwarescore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2407310103
 
-Handling deferred, uncorrected MCEs on AMD guests is now possible with
-additional support in qemu. Ensure that the SUCCOR and OVERFLOW_RECOV
-bits are advertised to the guest in KVM.
+On 7/30/24 9:24 AM, Christoph Schlameuss wrote:
+> Add test case running code interacting with registers within a
+> ucontrol VM.
+> 
+> * Add uc_gprs test case
+> 
+> The test uses the same VM setup using the fixture and debug macros
+> introduced in earlier patches in this series.
+> 
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> ---
+>   .../selftests/kvm/s390x/ucontrol_test.c       | 126 ++++++++++++++++++
+>   1 file changed, 126 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> index 029233374465..817b1e08559c 100644
+> --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> @@ -41,6 +41,23 @@ void require_ucontrol_admin(void)
+>   	TEST_REQUIRE(kvm_has_cap(KVM_CAP_S390_UCONTROL));
+>   }
+[...]
+> +/* verify SIEIC exit
+> + * * reset stop requests
+> + * * fail on codes not expected in the test cases
+> + */
+> +static bool uc_handle_sieic(FIXTURE_DATA(uc_kvm) * self)
+> +{
+> +	struct kvm_s390_sie_block *sie_block = self->sie_block;
+> +	struct kvm_run *run = self->run;
+> +
+> +	/* check SIE interception code */
+> +	pr_info("sieic: 0x%2x 0x%4x 0x%4x\n",
 
-Suggested-by: Paolo Bonzini <pbonzini@redhat.com>
-Signed-off-by: John Allen <john.allen@amd.com>
----
-v2:
-  - Add cpuid_entry_override for CPUID_8000_0007_EBX.
-  - Handle masking bits in arch/x86/kvm/cpuid.c
----
- arch/x86/kvm/cpuid.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+I don't think there should be a space before the 4:
+sieic: 0x 4 0x8300 0x440000
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 2617be544480..f8e1fd409cee 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -743,6 +743,11 @@ void kvm_set_cpu_caps(void)
- 	if (!tdp_enabled && IS_ENABLED(CONFIG_X86_64))
- 		kvm_cpu_cap_set(X86_FEATURE_GBPAGES);
- 
-+	kvm_cpu_cap_mask(CPUID_8000_0007_EBX,
-+		F(OVERFLOW_RECOV) |
-+		F(SUCCOR)
-+	);
-+
- 	kvm_cpu_cap_init_kvm_defined(CPUID_8000_0007_EDX,
- 		SF(CONSTANT_TSC)
- 	);
-@@ -1237,11 +1242,12 @@ static inline int __do_cpuid_func(struct kvm_cpuid_array *array, u32 function)
- 		entry->edx &= ~GENMASK(17, 16);
- 		break;
- 	case 0x80000007: /* Advanced power management */
-+		cpuid_entry_override(entry, CPUID_8000_0007_EBX);
- 		cpuid_entry_override(entry, CPUID_8000_0007_EDX);
- 
- 		/* mask against host */
- 		entry->edx &= boot_cpu_data.x86_power;
--		entry->eax = entry->ebx = entry->ecx = 0;
-+		entry->eax = entry->ecx = 0;
- 		break;
- 	case 0x80000008: {
- 		/*
--- 
-2.34.1
+We can automatically add in the missing 0
+0x%02x
+
+> +		run->s390_sieic.icptcode,
+> +		run->s390_sieic.ipa,
+> +		run->s390_sieic.ipb);
+> +	switch (run->s390_sieic.icptcode) {
+> +	case ICPT_STOP:
+> +		/* stopped via sie V P --> ignore */
+> +		/* reset stop request */
+> +		sie_block->cpuflags = sie_block->cpuflags & ~CPUSTAT_STOP_INT;
+> +		pr_info("sie V P - cleared %.4x\n", sie_block->cpuflags);
+> +		break;
+
+With the added code that removes the P bit this shouldn't be called 
+anymore, no?
+
+> +	case ICPT_INST:
+> +		/* end execution in caller on intercepted instruction */
+> +		return false;
+> +	default:
+> +		TEST_FAIL("UNEXPECTED SIEIC CODE %d", run->s390_sieic.icptcode);
+> +	}
+> +	return true;
+> +}
 
 
