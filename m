@@ -1,178 +1,185 @@
-Return-Path: <kvm+bounces-22746-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22747-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28E3E942B3E
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:51:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8672E942B47
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6740CB25BFC
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 09:51:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B935D1C20D89
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 09:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375041AB52F;
-	Wed, 31 Jul 2024 09:50:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LnbZA/qG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B61F1AAE20;
+	Wed, 31 Jul 2024 09:53:22 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12701A8C19
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 09:50:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC8291A8C19
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 09:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722419446; cv=none; b=ZXGIi5nJuN+OYsaAsBDQ2fV/h1756NCBj8OjdR+a4rNSlZUsZr0mBN/bep9dcWatFWuYE9Z8nbmwK5NS+UvdAxkX9SePtbbP7rNE3pDuFocBOlkHNG8n3F4Bd1fhT72FkTSl+GnuJUbBdXxoL8kaxOijPelODxCOLhtwQREPNic=
+	t=1722419601; cv=none; b=nPIMJlbe9AvVrFfM2U2mn7reBTQ6fZvnIwjJG8ZCqO31mMIGynTW564FrNyZGAy+bhbeIxqf2g6ph/sj/jami1pRP6rHoAjnD46SJQ7t6KaY0PeijKSdpuHUwu4lRqeXScBjdXBQfrsef8zHSZUyExkOc4+1wx6BGjDqTgnU5X0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722419446; c=relaxed/simple;
-	bh=XTrejJ34wyqTmqzJGqmoE5EbaZZYWrCKbhJX3mWbjW0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pdw8Xix3QZSenCPS3S/l8/ZRLH2KiV3/0CvpH+kBKGLrdBBaLWBulPlPf3hrl6BqWnOFGVcU6KDIQWCeSgpLH9TA9qFxrNur77XxKAH95MYcIbaRKAxnROM9eQ5Ax4hnQGNes8MFmwommB3vygv6iUl8GgS8l1KNWHx92BWUOTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LnbZA/qG; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722419443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kF8YsGqLWNT4+a8R4w4P9MUEGEAYWYiYSABna27uXpU=;
-	b=LnbZA/qGVwu4X/sfJkfOBgwzvLNrCGn4UyWLR2eyrHpVB/59sDJwz9BT/ZfaSU212E8Peo
-	XOUmDhbUaPCWT6pLIkKHlN6wAsPoNVAaS2HdqDe8UwOWHueBl/hzIeItIUQQ+pv2k75PbK
-	FsektndLZElXH/Sn1efIpORkfR5ynYM=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-4wa7dgy1Om6hnwZ5ESxGgA-1; Wed, 31 Jul 2024 05:50:41 -0400
-X-MC-Unique: 4wa7dgy1Om6hnwZ5ESxGgA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a7ab81eea72so477816866b.2
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 02:50:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722419440; x=1723024240;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kF8YsGqLWNT4+a8R4w4P9MUEGEAYWYiYSABna27uXpU=;
-        b=rUBRgV8KHfneO6NfxyzBx+C2huVO5F3ImWX2TLzf5cOCgwTvl5NdIfLSUCenxHQeJP
-         7XhOMjTeR/dtpRkx4JhNWg+Lyc1LmxhQTVCA9+MHJt0e0mOL35Mdyx/BFRQKQhq7g5Vp
-         7EmVLtfELLtulaH6FVap7NcbOkzwUh3dCs55Vw7GacN/CLcaI2PGSGT0s+mLQJZSLFLy
-         HLzHWjYm/CRqq56FEU9NiyV9cZQRyS/y+nNajp7hr1xnaL99jYoeEPydGq5+DRlxDuz0
-         E+SmXHXGvi1iDdpYfhkCROfHsFNbiFd8+T/8m/qvdDv57LHdjW0uCf4GWx0t+6/Lq1su
-         NIYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV7jFv9Y53Q2v0XZQIPpgMe2oRc8nGqYbHHZDHhAVlFyVKrnthmbR+PXPAwoFfTU55wFXsSysLsE0bTGGSRfsOqw0LB
-X-Gm-Message-State: AOJu0YyzovUAxydM64nehV6IBWaae89pc0vDZJq83i/tBKK+zz3EsJEV
-	Gr3CExgVIeT/omLWBraTG9+xQBW8ehDwAZHLknM7UZU6B7G8nYVZ6DpBk1eemXWMkbRS5EJPMdm
-	7oG2kfPbgmgW6pe3iO6VUBCaI/jFzT5Yn9V8+gRzbaKUCVHLgow==
-X-Received: by 2002:a17:907:94cb:b0:a7a:bece:6223 with SMTP id a640c23a62f3a-a7d3ff7b8e4mr1064731466b.6.1722419440614;
-        Wed, 31 Jul 2024 02:50:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHm0sw2f7Q/hSxPLtTI3KYQw5uCrmW/NKDuI5rQ7HlgfsjazxGbnWK3KS2H8Xhx5SNKvtVQug==
-X-Received: by 2002:a17:907:94cb:b0:a7a:bece:6223 with SMTP id a640c23a62f3a-a7d3ff7b8e4mr1064728266b.6.1722419440130;
-        Wed, 31 Jul 2024 02:50:40 -0700 (PDT)
-Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a7acad93105sm746255566b.167.2024.07.31.02.50.38
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Jul 2024 02:50:39 -0700 (PDT)
-Message-ID: <57ba7e1d-0121-4d71-89b8-c61c476ca724@redhat.com>
-Date: Wed, 31 Jul 2024 11:50:38 +0200
+	s=arc-20240116; t=1722419601; c=relaxed/simple;
+	bh=OJIosK3Ql2nbnFRp+YXJmhi072hMp3NTP8G7ibcFI9I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lMe8vyNtGpa65WDsGwUUhM6T7zMPwL5dvE5vGntWp//d9nYDfmgO1f91a+9vv9M36eXTN0l01CsYwjRU2+dWuKj5FL4rZks7GrmVxdnoDieGZUq+z54fUsmYoNEljQSvKigLi1Z6oqcLluCfYysAhj3dK/0uWs3qSq/JE2wd6/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CD5831007;
+	Wed, 31 Jul 2024 02:53:44 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 7C40C3F5A1;
+	Wed, 31 Jul 2024 02:53:17 -0700 (PDT)
+Date: Wed, 31 Jul 2024 10:53:14 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH 10/12] KVM: arm64: nv: Add SW walker for AT S1 emulation
+Message-ID: <ZqoJiiNPWBtRhRur@raptor>
+References: <20240625133508.259829-1-maz@kernel.org>
+ <20240708165800.1220065-1-maz@kernel.org>
+ <Zqe0iBtD4389Lhei@raptor>
+ <86v80m0wlb.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v12 84/84] KVM: Don't grab reference on VM_MIXEDMAP pfns
- that have a "struct page"
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>,
- Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>,
- Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-85-seanjc@google.com>
- <992c4a07-fb84-42d8-93b3-96fb3a12c8e0@redhat.com>
- <ZqlLWl0R1p41CS0O@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <ZqlLWl0R1p41CS0O@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <86v80m0wlb.wl-maz@kernel.org>
 
-On 7/30/24 22:21, Sean Christopherson wrote:
-> On Tue, Jul 30, 2024, Paolo Bonzini wrote:
->> On 7/27/24 01:52, Sean Christopherson wrote:
->>> Now that KVM no longer relies on an ugly heuristic to find its struct page
->>> references, i.e. now that KVM can't get false positives on VM_MIXEDMAP
->>> pfns, remove KVM's hack to elevate the refcount for pfns that happen to
->>> have a valid struct page.  In addition to removing a long-standing wart
->>> in KVM, this allows KVM to map non-refcounted struct page memory into the
->>> guest, e.g. for exposing GPU TTM buffers to KVM guests.
->>
->> Feel free to leave it to me for later, but there are more cleanups that
->> can be made, given how simple kvm_resolve_pfn() is now:
+Hi,
+
+On Wed, Jul 31, 2024 at 09:55:28AM +0100, Marc Zyngier wrote:
+> On Mon, 29 Jul 2024 16:26:00 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Mon, Jul 08, 2024 at 05:57:58PM +0100, Marc Zyngier wrote:
+> > > In order to plug the brokenness of our current AT implementation,
+> > > we need a SW walker that is going to... err.. walk the S1 tables
+> > > and tell us what it finds.
+> > > 
+> > > Of course, it builds on top of our S2 walker, and share similar
+> > > concepts. The beauty of it is that since it uses kvm_read_guest(),
+> > > it is able to bring back pages that have been otherwise evicted.
+> > > 
+> > > This is then plugged in the two AT S1 emulation functions as
+> > > a "slow path" fallback. I'm not sure it is that slow, but hey.
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/at.c | 538 ++++++++++++++++++++++++++++++++++++++++++--
+> > >  1 file changed, 520 insertions(+), 18 deletions(-)
+> > > 
+> > > diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> > > index 71e3390b43b4c..8452273cbff6d 100644
+> > > --- a/arch/arm64/kvm/at.c
+> > > +++ b/arch/arm64/kvm/at.c
+> > > @@ -4,9 +4,305 @@
+> > >   * Author: Jintack Lim <jintack.lim@linaro.org>
+> > >   */
+> > >  
+> > > +#include <linux/kvm_host.h>
+> > > +
+> > > +#include <asm/esr.h>
+> > >  #include <asm/kvm_hyp.h>
+> > >  #include <asm/kvm_mmu.h>
+> > >  
+> > > +struct s1_walk_info {
+> > > +	u64	     baddr;
+> > > +	unsigned int max_oa_bits;
+> > > +	unsigned int pgshift;
+> > > +	unsigned int txsz;
+> > > +	int 	     sl;
+> > > +	bool	     hpd;
+> > > +	bool	     be;
+> > > +	bool	     nvhe;
+> > > +	bool	     s2;
+> > > +};
+> > > +
+> > > +struct s1_walk_result {
+> > > +	union {
+> > > +		struct {
+> > > +			u64	desc;
+> > > +			u64	pa;
+> > > +			s8	level;
+> > > +			u8	APTable;
+> > > +			bool	UXNTable;
+> > > +			bool	PXNTable;
+> > > +		};
+> > > +		struct {
+> > > +			u8	fst;
+> > > +			bool	ptw;
+> > > +			bool	s2;
+> > > +		};
+> > > +	};
+> > > +	bool	failed;
+> > > +};
+> > > +
+> > > +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+> > > +{
+> > > +	wr->fst		= fst;
+> > > +	wr->ptw		= ptw;
+> > > +	wr->s2		= s2;
+> > > +	wr->failed	= true;
+> > > +}
+> > > +
+> > > +#define S1_MMU_DISABLED		(-127)
+> > > +
+> > > +static int setup_s1_walk(struct kvm_vcpu *vcpu, struct s1_walk_info *wi,
+> > > +			 struct s1_walk_result *wr, const u64 va, const int el)
+> > > +{
+> > > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> > > +	unsigned int stride, x;
+> > > +	bool va55, tbi;
+> > > +
+> > > +	wi->nvhe = el == 2 && !vcpu_el2_e2h_is_set(vcpu);
+> > 
+> > Where 'el' is computed in handle_at_slow() as:
+> > 
+> > 	/*
+> > 	 * We only get here from guest EL2, so the translation regime
+> > 	 * AT applies to is solely defined by {E2H,TGE}.
+> > 	 */
+> > 	el = (vcpu_el2_e2h_is_set(vcpu) &&
+> > 	      vcpu_el2_tge_is_set(vcpu)) ? 2 : 1;
+> > 
+> > I think 'nvhe' will always be false ('el' is 2 only when E2H is
+> > set).
 > 
-> I'll revisit kvm_resolve_pfn(), Maxim also wasn't a fan of a similar helper that
-> existed in v11.
+> Yeah, there is a number of problems here. el should depend on both the
+> instruction (some are EL2-specific) and the HCR control bits. I'll
+> tackle that now.
 
-FWIW kvm_resolve_pfn() is totally fine as an intermediate step.  Just 
-food for thought for possible follow-ups.
+Yeah, also noticed that how sctlr, tcr and ttbr are chosen in setup_s1_walk()
+doesn't look quite right for the nvhe case.
 
->> Also, check_user_page_hwpoison() should not be needed anymore, probably
->> not since commit 234b239bea39 ("kvm: Faults which trigger IO release the
->> mmap_sem", 2014-09-24) removed get_user_pages_fast() from hva_to_pfn_slow().
 > 
-> Ha, I *knew* this sounded familiar.  Past me apparently came to the same
-> conclusion[*], though I wrongly suspected a memory leak and promptly forgot to
-> ever send a patch.  I'll tack one on this time around.
+> > I'm curious about what 'el' represents. The translation regime for the AT
+> > instruction?
+> 
+> Exactly that.
 
-As you prefer.
+Might I make a suggestion here? I was thinking about dropping the (el, wi-nvhe*)
+tuple to represent the translation regime and have a wi->regime (or similar) to
+unambiguously encode the regime. The value can be an enum with three values to
+represent the three possible regimes (REGIME_EL10, REGIME_EL2, REGIME_EL20).
 
-Paolo
+Just a thought though, feel free to ignore at your leisure.
 
+*wi->single_range on the kvm-arm64/nv-at-pan-WIP branch.
+
+Thanks,
+Alex
 
