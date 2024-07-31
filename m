@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-22815-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22813-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE230943697
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 21:42:03 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29785943695
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 21:41:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1AFDFB20A93
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 19:42:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D21DE1F21EB1
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 19:41:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1482516CD08;
-	Wed, 31 Jul 2024 19:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA53916C86B;
+	Wed, 31 Jul 2024 19:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mBI6wXCp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fepE5hm3"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6651684A6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE6211684A3;
 	Wed, 31 Jul 2024 19:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722454857; cv=none; b=CMpV2E1lD8wzqfX7TsoJbCR2/XKVVeZvSIU0tt8bD9/l5uJp24kPKRusjHfoKU82TOmVHDyT3pFoR5gOsgSjc6/sdonD3giXfd9mYQjVKe92B6MNtrvpt+iHYxHBKEUJHvSvBq5p6dct+XanpVyjl/r3S2IzpTAB09wK6OK1pow=
+	t=1722454857; cv=none; b=fnBQ1QNpsAfb+1i9kxl8FQG9RtJuT0Ho28mKGVRdKvRSPJveCxpWkiwWadvZ1oGRipr/c1QXExLud5f9Z9dVEXPYkc5xrh8nAjyI16pF57Lw0J1hJlyJDfz6AZYp3mt8KZLPfz6V/ypv/PNlI7X8qp/+YZCxfVtvTNjJeNsRLro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722454857; c=relaxed/simple;
-	bh=aU4Ozt59GbaUbO3+PotNeMwxVTRMgu3/5LP0uRVy3Do=;
+	bh=vSHhjuKzB4XiKT8IC31iaRepSYA94uoZc8/lCfNk+mU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IVABAXXRKlb0IKqv1l+cR3igkGFTB2BaJBY0FLnxwZ0InFewOjlvzEd0ngW6VvrUcaHfWNE3ndeddvVmsYFCo4pysbX4YbTb3ZeZVGGiS2eth+0CL5DZTqrlB4Q2HmdWCqcriNTzaqsbzxelbayVAdrsFzCqcDzsm3W9aWeTtxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mBI6wXCp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90D03C4AF11;
+	 MIME-Version; b=oq9klTUsYxgNpjhJOqHBZauuJTDVByL2wTJoWoucV7KuYcj5Yxwdq7raU3uIPgOLirQ62jpmxtjeTLb7UegAs1EyRKxWVvNJ2b40KczQEPGlGtgRckBymLhiGuMYFoOqApOOAzpMqGi+7mKf5GAE7OwpKB25ZwJaX4YfRFmm1t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fepE5hm3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 814DBC4AF14;
 	Wed, 31 Jul 2024 19:40:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1722454856;
-	bh=aU4Ozt59GbaUbO3+PotNeMwxVTRMgu3/5LP0uRVy3Do=;
+	bh=vSHhjuKzB4XiKT8IC31iaRepSYA94uoZc8/lCfNk+mU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=mBI6wXCp/ib6DJ04kF/lotNy4Ld8PB2dpvvkLHDq7M7yTIbBisHowJwQRPKL9Vynj
-	 NUkKk0KrpwOdyCKQ6i9QfVPk5qRFXHyqyRIlMUJ1QZ3qZra8xvPcsbhxGalxWq9wsc
-	 7vuX4kdv7ptiiDewVx4YxL5Jbuz4dvT2K0+2sLkQfTYl5RUZejI+p+ZF7cnHqRnIkx
-	 ufEGDvr3EG9GRJCtwnoLuxshcTh68Y0o/7vbok30JRfLrlZN330lkCYiNFZF3HQadp
-	 0CYIMqt52esroi/gOQozwzCd1/xC5dVkcUM1QcMeeBCNuYKSrayo/WGbi9WoDuxHVJ
-	 d45qhfJbvH/1g==
+	b=fepE5hm3b3S259rwLJlthl1W/aYX/LoOe7tpgUznxAKumBl1pSc58VZK1yYVFbj7V
+	 4G3IY+l86if/ATULD/VjqZxee9P13KxPD3Kgg6XKZC5yZQ68PS+04vFUgKwRhZOp8h
+	 WB524cWW2yJZWRyw19YEdq4l9tZNuuM7KnTBykiTgG1W7/6PGpSTCwnfIZbDfxnOvt
+	 5BWmHL5tJsN8kGFRfqHDjjHtwX1UTBRMkEuieBj63CujF7ycJLGMczDpe9g0+b0Hf+
+	 KkxI+0w73tRIiodMmr1Oec5+gW7hPkYgCLn6w4fWKK/99Gg7NNQqv+BLDhz6vlT2Cp
+	 Sk87TCgqihRmg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sZFBu-00H6Gh-Lj;
+	id 1sZFBu-00H6Gh-SG;
 	Wed, 31 Jul 2024 20:40:54 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -59,9 +59,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v2 08/17] KVM: arm64: nv: Add basic emulation of AT S1E{0,1}{R,W}
-Date: Wed, 31 Jul 2024 20:40:21 +0100
-Message-Id: <20240731194030.1991237-9-maz@kernel.org>
+Subject: [PATCH v2 09/17] KVM: arm64: nv: Add basic emulation of AT S1E1{R,W}P
+Date: Wed, 31 Jul 2024 20:40:22 +0100
+Message-Id: <20240731194030.1991237-10-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240731194030.1991237-1-maz@kernel.org>
 References: <20240731194030.1991237-1-maz@kernel.org>
@@ -77,203 +77,60 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Emulating AT instructions is one the tasks devolved to the host
-hypervisor when NV is on.
+Building on top of our primitive AT S1E{0,1}{R,W} emulation,
+add minimal support for the FEAT_PAN2 instructions, momentary
+context-switching PSTATE.PAN so that it takes effect in the
+context of the guest.
 
-Here, we take the basic approach of emulating AT S1E{0,1}{R,W}
-using the AT instructions themselves. While this mostly work,
-it doesn't *always* work:
-
-- S1 page tables can be swapped out
-
-- shadow S2 can be incomplete and not contain mappings for
-  the S1 page tables
-
-We are not trying to handle these case here, and defer it to
-a later patch. Suitable comments indicate where we are in dire
-need of better handling.
-
-Co-developed-by: Jintack Lim <jintack.lim@linaro.org>
-Signed-off-by: Jintack Lim <jintack.lim@linaro.org>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_asm.h |   1 +
- arch/arm64/kvm/Makefile          |   2 +-
- arch/arm64/kvm/at.c              | 140 +++++++++++++++++++++++++++++++
- 3 files changed, 142 insertions(+), 1 deletion(-)
- create mode 100644 arch/arm64/kvm/at.c
+ arch/arm64/kvm/at.c | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_asm.h b/arch/arm64/include/asm/kvm_asm.h
-index 25f49f5fc4a6..9b6c9f4f4d88 100644
---- a/arch/arm64/include/asm/kvm_asm.h
-+++ b/arch/arm64/include/asm/kvm_asm.h
-@@ -236,6 +236,7 @@ extern void __kvm_tlb_flush_vmid(struct kvm_s2_mmu *mmu);
- extern int __kvm_tlbi_s1e2(struct kvm_s2_mmu *mmu, u64 va, u64 sys_encoding);
- 
- extern void __kvm_timer_set_cntvoff(u64 cntvoff);
-+extern void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr);
- 
- extern int __kvm_vcpu_run(struct kvm_vcpu *vcpu);
- 
-diff --git a/arch/arm64/kvm/Makefile b/arch/arm64/kvm/Makefile
-index a6497228c5a8..8a3ae76b4da2 100644
---- a/arch/arm64/kvm/Makefile
-+++ b/arch/arm64/kvm/Makefile
-@@ -14,7 +14,7 @@ kvm-y += arm.o mmu.o mmio.o psci.o hypercalls.o pvtime.o \
- 	 inject_fault.o va_layout.o handle_exit.o \
- 	 guest.o debug.o reset.o sys_regs.o stacktrace.o \
- 	 vgic-sys-reg-v3.o fpsimd.o pkvm.o \
--	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o \
-+	 arch_timer.o trng.o vmid.o emulate-nested.o nested.o at.o \
- 	 vgic/vgic.o vgic/vgic-init.o \
- 	 vgic/vgic-irqfd.o vgic/vgic-v2.o \
- 	 vgic/vgic-v3.o vgic/vgic-v4.o \
 diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-new file mode 100644
-index 000000000000..da378ad834cd
---- /dev/null
+index da378ad834cd..92df948350e1 100644
+--- a/arch/arm64/kvm/at.c
 +++ b/arch/arm64/kvm/at.c
-@@ -0,0 +1,140 @@
-+// SPDX-License-Identifier: GPL-2.0-only
-+/*
-+ * Copyright (C) 2017 - Linaro Ltd
-+ * Author: Jintack Lim <jintack.lim@linaro.org>
-+ */
-+
-+#include <asm/kvm_hyp.h>
-+#include <asm/kvm_mmu.h>
-+
-+struct mmu_config {
-+	u64	ttbr0;
-+	u64	ttbr1;
-+	u64	tcr;
-+	u64	mair;
-+	u64	sctlr;
-+	u64	vttbr;
-+	u64	vtcr;
-+	u64	hcr;
-+};
-+
-+static void __mmu_config_save(struct mmu_config *config)
+@@ -49,6 +49,28 @@ static void __mmu_config_restore(struct mmu_config *config)
+ 	write_sysreg(config->vtcr,	vtcr_el2);
+ }
+ 
++static bool at_s1e1p_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
 +{
-+	config->ttbr0	= read_sysreg_el1(SYS_TTBR0);
-+	config->ttbr1	= read_sysreg_el1(SYS_TTBR1);
-+	config->tcr	= read_sysreg_el1(SYS_TCR);
-+	config->mair	= read_sysreg_el1(SYS_MAIR);
-+	config->sctlr	= read_sysreg_el1(SYS_SCTLR);
-+	config->vttbr	= read_sysreg(vttbr_el2);
-+	config->vtcr	= read_sysreg(vtcr_el2);
-+	config->hcr	= read_sysreg(hcr_el2);
-+}
-+
-+static void __mmu_config_restore(struct mmu_config *config)
-+{
-+	write_sysreg(config->hcr,	hcr_el2);
-+
-+	/*
-+	 * ARM errata 1165522 and 1530923 require TGE to be 1 before
-+	 * we update the guest state.
-+	 */
-+	asm(ALTERNATIVE("nop", "isb", ARM64_WORKAROUND_SPECULATIVE_AT));
-+
-+	write_sysreg_el1(config->ttbr0,	SYS_TTBR0);
-+	write_sysreg_el1(config->ttbr1,	SYS_TTBR1);
-+	write_sysreg_el1(config->tcr,	SYS_TCR);
-+	write_sysreg_el1(config->mair,	SYS_MAIR);
-+	write_sysreg_el1(config->sctlr,	SYS_SCTLR);
-+	write_sysreg(config->vttbr,	vttbr_el2);
-+	write_sysreg(config->vtcr,	vtcr_el2);
-+}
-+
-+/*
-+ * Return the PAR_EL1 value as the result of a valid translation.
-+ *
-+ * If the translation is unsuccessful, the value may only contain
-+ * PAR_EL1.F, and cannot be taken at face value. It isn't an
-+ * indication of the translation having failed, only that the fast
-+ * path did not succeed, *unless* it indicates a S1 permission fault.
-+ */
-+static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-+{
-+	struct mmu_config config;
-+	struct kvm_s2_mmu *mmu;
++	u64 host_pan;
 +	bool fail;
-+	u64 par;
 +
-+	par = SYS_PAR_EL1_F;
-+
-+	/*
-+	 * We've trapped, so everything is live on the CPU. As we will
-+	 * be switching contexts behind everybody's back, disable
-+	 * interrupts while holding the mmu lock.
-+	 */
-+	guard(write_lock_irqsave)(&vcpu->kvm->mmu_lock);
-+
-+	/*
-+	 * If HCR_EL2.{E2H,TGE} == {1,1}, the MMU context is already
-+	 * the right one (as we trapped from vEL2). If not, save the
-+	 * full MMU context.
-+	 */
-+	if (vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu))
-+		goto skip_mmu_switch;
-+
-+	/*
-+	 * Obtaining the S2 MMU for a L2 is horribly racy, and we may not
-+	 * find it (recycled by another vcpu, for example). When this
-+	 * happens, admit defeat immediately and use the SW (slow) path.
-+	 */
-+	mmu = lookup_s2_mmu(vcpu);
-+	if (!mmu)
-+		return par;
-+
-+	__mmu_config_save(&config);
-+
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR0_EL1),	SYS_TTBR0);
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TTBR1_EL1),	SYS_TTBR1);
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, TCR_EL1),	SYS_TCR);
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, MAIR_EL1),	SYS_MAIR);
-+	write_sysreg_el1(vcpu_read_sys_reg(vcpu, SCTLR_EL1),	SYS_SCTLR);
-+	__load_stage2(mmu, mmu->arch);
-+
-+skip_mmu_switch:
-+	/* Clear TGE, enable S2 translation, we're rolling */
-+	write_sysreg((config.hcr & ~HCR_TGE) | HCR_VM,	hcr_el2);
-+	isb();
++	host_pan = read_sysreg_s(SYS_PSTATE_PAN);
++	write_sysreg_s(*vcpu_cpsr(vcpu) & PSTATE_PAN, SYS_PSTATE_PAN);
 +
 +	switch (op) {
-+	case OP_AT_S1E1R:
-+		fail = __kvm_at(OP_AT_S1E1R, vaddr);
++	case OP_AT_S1E1RP:
++		fail = __kvm_at(OP_AT_S1E1RP, vaddr);
 +		break;
-+	case OP_AT_S1E1W:
-+		fail = __kvm_at(OP_AT_S1E1W, vaddr);
-+		break;
-+	case OP_AT_S1E0R:
-+		fail = __kvm_at(OP_AT_S1E0R, vaddr);
-+		break;
-+	case OP_AT_S1E0W:
-+		fail = __kvm_at(OP_AT_S1E0W, vaddr);
-+		break;
-+	default:
-+		WARN_ON_ONCE(1);
-+		fail = true;
++	case OP_AT_S1E1WP:
++		fail = __kvm_at(OP_AT_S1E1WP, vaddr);
 +		break;
 +	}
 +
-+	if (!fail)
-+		par = read_sysreg_par();
++	write_sysreg_s(host_pan, SYS_PSTATE_PAN);
 +
-+	if (!(vcpu_el2_e2h_is_set(vcpu) && vcpu_el2_tge_is_set(vcpu)))
-+		__mmu_config_restore(&config);
-+
-+	return par;
++	return fail;
 +}
 +
-+void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
-+{
-+	u64 par = __kvm_at_s1e01_fast(vcpu, op, vaddr);
-+
-+	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
-+}
+ /*
+  * Return the PAR_EL1 value as the result of a valid translation.
+  *
+@@ -105,6 +127,10 @@ static u64 __kvm_at_s1e01_fast(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+ 	isb();
+ 
+ 	switch (op) {
++	case OP_AT_S1E1RP:
++	case OP_AT_S1E1WP:
++		fail = at_s1e1p_fast(vcpu, op, vaddr);
++		break;
+ 	case OP_AT_S1E1R:
+ 		fail = __kvm_at(OP_AT_S1E1R, vaddr);
+ 		break;
 -- 
 2.39.2
 
