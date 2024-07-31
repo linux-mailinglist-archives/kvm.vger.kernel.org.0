@@ -1,255 +1,160 @@
-Return-Path: <kvm+bounces-22733-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22734-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F7A94283C
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 09:40:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DAB59428E4
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 10:11:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 652171F23317
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 07:40:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0DFB1F23DC7
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 08:11:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 401391A76CD;
-	Wed, 31 Jul 2024 07:40:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8316D1A7F73;
+	Wed, 31 Jul 2024 08:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Os4iKP1g"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="XzpWOj9u"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0FD618DF63
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 07:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1093B450E2
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 08:11:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722411602; cv=none; b=EgUp8YDHnxxCMEAjhxjiWy4hXYWLuXO/GnjP9cmNF5a+6OWLrHnsya1zaYVjNR1eMu3SRE0xwqjzcsApNLRvu1SV2rWYu98PrDmbx0XR+Qdc0hTZO7PgNG352rKOJNinDMVOOvVbZV9TTdpkWLo4kviRKVLfqnYEbHc4dxgJbXA=
+	t=1722413480; cv=none; b=VQw09XQlW3r98hkJPIwC1LbNeUEbcneUrEZH5ZL/BLJxbrQZB3L1nQfK2AMptVmKjolglzgEOPBJ0zy7Y5ol3ieSfYTD9qhkBAHBFb8qHx7bfU0MCCzg2EYWJ6QDK/VcF3TkHdRQnrYfn9OPCaolR3A9qT4d5awll5zDSmogtgo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722411602; c=relaxed/simple;
-	bh=BaxCt27OZsHcMWoUAgXJmK2Vffoa7dbbJn3AJYpv87s=;
+	s=arc-20240116; t=1722413480; c=relaxed/simple;
+	bh=2Gl8bDEMJ7EROOAewtyGSnYyggrq+9cliJTSl46a0AU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pkWvPDJlxkTd1KHMNBAN38NDjh56HPJzHp9uFhPNidaht4+LeH+UTgYYZhADpt+a2YuEFTM8T6R1zLUw532AJh3HomG7kOdzEc1KHM73JGu0aN8c06hw0NmGId/b58iWIMRX+fMisRPCaKeRsSA7V+HH4Mz/Hq+7p3XGA2zVeRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Os4iKP1g; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722411599;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BHg5YCh5BA7hqCWyo1rRiqsfxT+DXFPGHFeuupOZS4M=;
-	b=Os4iKP1gn/oyHQ8epkSQxIviDxyGHuRfWC3KPIMwEckq+jWRMWcAZMgbt2NIzrxHSvZoxB
-	Kgm/fb5P2mgTcHRd9/8pws8FfB3Eb16voGYE1zsB8JyXlygeNH0lwLWcdV66WV1ot1qI6E
-	G2oEO/sVnGIMOoiPtci5TmYCZHIYeBs=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-230-7UZ6Jc-qPHe4jQnz1Fl83w-1; Wed, 31 Jul 2024 03:39:58 -0400
-X-MC-Unique: 7UZ6Jc-qPHe4jQnz1Fl83w-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ef311ad4bcso54106771fa.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 00:39:57 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Df8/o457uARdSJ+fHSOTnhcmN++8P06A6zvjD0BoSoUrny9H8lXjxZYhjCTCqRfDSULJvQpvVX2vv7JkpFwtvQS2V0HUovEecWD70gYNaiwj+2egDWXZ6//l8/L8n7kqZQTqfNEmTrR79YKLa2FNPu++MQWzWMcaYYp2Nji5pkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=XzpWOj9u; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5af6a1afa63so5673285a12.0
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 01:11:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1722413476; x=1723018276; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/6o5eOKMgYVhFfCfAX4KZTyTvIb4CeiZ7EcRemTMKgE=;
+        b=XzpWOj9uEN/HBmC9Nti+ZlboUO4ecfQm5gr1NLQKCQc0igzf0i5g79lvBw2D+a65WX
+         /6dTtywIK7b7CvxNlUopjQwCTaWtv7bGOEzztsDGFqWJQP8Dlsc+OZnxBvgFl3f5WYW1
+         oXTwrmJUAaYDjI+DI64eTa8DT0jxSX0P1IyJ5YJUWFEEt+/yK7wAe1Uvd7uk9fI2AkaT
+         Nu4eyojBTu0TBMdYRwSreHYknBNCZYLJBwxEeOtvYxYLQ7PaF6W+GirnfKJAWwZdea+J
+         GADeRlayoG2b6FfyGv9oRNvpxy7gfyrMJngbXCTVowCEXWwk4GQLQIgAn0Zq6616Z+Qh
+         FEEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722411596; x=1723016396;
+        d=1e100.net; s=20230601; t=1722413476; x=1723018276;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BHg5YCh5BA7hqCWyo1rRiqsfxT+DXFPGHFeuupOZS4M=;
-        b=cnT/0pAjPyCMLvwoiwZJD9n38kpRHNuBcJplWPaFD3goqsXx/eM/9s2GzB62ucLPBO
-         lORywyHNTnz52x4B004+xBkqdUgRFSqrPi//lL0PXwumn+B6UZzdZlmbj92txqufDu24
-         ksn9KaG+KE/tbTY/6KbvISb7yevmMhuABpedZrS4Z8tsePeTGP8dk45GcnEdq8iTIrBL
-         jD1SNK9RNXXyHtUtOt3o87Qh/ahxNWM98t26BDc+jp9RINWmsPekI5NHJlqdHUNXrR62
-         qNfJxEE8XcZSwObWSCC55yccfyVhBH4EKt3abJ9QEGkB1wto1gAFY2JnYX1WjtLopsRS
-         iMkA==
-X-Forwarded-Encrypted: i=1; AJvYcCVF56HRfESRTOCIP78crsmjLu74LSFadfJnv9gDJVhQchOMRANwiAmtYFaBEtSkavi5Vkd9jPcKWpB6KVbIzJEKHzWZ
-X-Gm-Message-State: AOJu0YybH4rC5zmowSTHfdvGKW9iOU0PklCZyfm6Pe3QPlVvd4TNJZgm
-	DigN2pHC9SVCMDJY8PzIImJfI5HC9abI7FI4Ir2SdSpPjsCrts3jyLdi2WZOPZRJWyil/NueCzb
-	3Miv6wsrQoA0Y0SGaUltZAb9miR4epwoUbtlg3q/NOxt9PLVR1Mspcb6giA==
-X-Received: by 2002:a2e:9687:0:b0:2ef:23ec:9357 with SMTP id 38308e7fff4ca-2f12ea9b35bmr88693071fa.0.1722411596255;
-        Wed, 31 Jul 2024 00:39:56 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFQrkoDxw+l0VIlIR0+Qgk+955MiL63klXTLU5DFu/vj4R5NQt4RkfZvM7Q37gJtl9EWRqz2w==
-X-Received: by 2002:a2e:9687:0:b0:2ef:23ec:9357 with SMTP id 38308e7fff4ca-2f12ea9b35bmr88692741fa.0.1722411595293;
-        Wed, 31 Jul 2024 00:39:55 -0700 (PDT)
-Received: from sgarzare-redhat (host-82-57-51-79.retail.telecomitalia.it. [82.57.51.79])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282bb6403bsm10938855e9.35.2024.07.31.00.39.54
+        bh=/6o5eOKMgYVhFfCfAX4KZTyTvIb4CeiZ7EcRemTMKgE=;
+        b=qzMwxi0BYbVJ63/QwIrVsQU4qV4ggKfv4w72ez28loG9kDKm6+CwgmJEayNGVgXmqA
+         4ic1IIBf4MliSlaUYYpp33hj615+u8cDMx0suBmvxuZGzp3Z3OsbkxWWnvQQF2e4Wbkr
+         n7YbBUu1KtHFXp8QHczEcwzxE4ZsnIAZIvODrm2o/p4lNHF9wXaGGFQybEZi3YTUf6KT
+         ak57++lfZ1aTM/zcvjZj/NWHO6svd5vNhbwZ2Ma5bWEjzq+/p4KEuHVoFpeAO9+kR6T0
+         HhJoaPX6QH47rlEiQmUaeWYCCwDoQqWPr/WPj7yej4EqUm1axcwjmYH9VEC7/qG7/b7A
+         sNsA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4/EP6syBwpl9zOD+I4KiRtsxNAwbSHauVrtmrPN3DBBoRtDCiWVfBfakEEHlYFQhX7peaMOHVsk4vY3sHCCMkuewv
+X-Gm-Message-State: AOJu0Yz6HiBSCUoQicIDpogQCXMZYX8vjDAHYXiVql47TyR7ssbakrr6
+	iLva83k3Fn3J8dZbzXNM0ODHp2A39zlrDnCH80fAH3tPNT3W2tCtgjCWHLeirTM=
+X-Google-Smtp-Source: AGHT+IF8KtMuBT/lx87J71F/lRrgIXThKYLKm0Q9zh/TR0QeaI4sQXL1DHSiINUT/9ZA+lMCzDpL5Q==
+X-Received: by 2002:a17:907:1b26:b0:a7a:af5d:f312 with SMTP id a640c23a62f3a-a7d4011442emr913154866b.46.1722413475678;
+        Wed, 31 Jul 2024 01:11:15 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acad414e2sm738525466b.127.2024.07.31.01.11.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 00:39:54 -0700 (PDT)
-Date: Wed, 31 Jul 2024 09:39:50 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: luigi.leonardi@outlook.com
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Marco Pinna <marco.pinn95@gmail.com>
-Subject: Re: [PATCH net-next v4 2/2] vsock/virtio: avoid queuing packets when
- intermediate queue is empty
-Message-ID: <yrw4u5lwsiovb36i2vhc7qtwcai2us5uoqhb5zpabfqgxp267g@nmqtvj4oqndc>
-References: <20240730-pinna-v4-0-5c9179164db5@outlook.com>
- <20240730-pinna-v4-2-5c9179164db5@outlook.com>
+        Wed, 31 Jul 2024 01:11:15 -0700 (PDT)
+Date: Wed, 31 Jul 2024 10:11:14 +0200
+From: Andrew Jones <ajones@ventanamicro.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
+	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
+	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
+	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, loongarch@lists.linux.dev, 
+	linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 58/84] KVM: RISC-V: Use kvm_faultin_pfn() when
+ mapping pfns into the guest
+Message-ID: <20240731-a5f8928d385945f049e5f96e@orel>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-59-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240730-pinna-v4-2-5c9179164db5@outlook.com>
+In-Reply-To: <20240726235234.228822-59-seanjc@google.com>
 
-On Tue, Jul 30, 2024 at 09:47:32PM GMT, Luigi Leonardi via B4 Relay wrote:
->From: Luigi Leonardi <luigi.leonardi@outlook.com>
->
->When the driver needs to send new packets to the device, it always
->queues the new sk_buffs into an intermediate queue (send_pkt_queue)
->and schedules a worker (send_pkt_work) to then queue them into the
->virtqueue exposed to the device.
->
->This increases the chance of batching, but also introduces a lot of
->latency into the communication. So we can optimize this path by
->adding a fast path to be taken when there is no element in the
->intermediate queue, there is space available in the virtqueue,
->and no other process that is sending packets (tx_lock held).
->
->The following benchmarks were run to check improvements in latency and
->throughput. The test bed is a host with Intel i7-10700KF CPU @ 3.80GHz
->and L1 guest running on QEMU/KVM with vhost process and all vCPUs
->pinned individually to pCPUs.
->
->- Latency
->   Tool: Fio version 3.37-56
->   Mode: pingpong (h-g-h)
->   Test runs: 50
->   Runtime-per-test: 50s
->   Type: SOCK_STREAM
->
->In the following fio benchmark (pingpong mode) the host sends
->a payload to the guest and waits for the same payload back.
->
->fio process pinned both inside the host and the guest system.
->
->Before: Linux 6.9.8
->
->Payload 64B:
->
->	1st perc.	overall		99th perc.
->Before	12.91		16.78		42.24		us
->After	9.77		13.57		39.17		us
->
->Payload 512B:
->
->	1st perc.	overall		99th perc.
->Before	13.35		17.35		41.52		us
->After	10.25		14.11		39.58		us
->
->Payload 4K:
->
->	1st perc.	overall		99th perc.
->Before	14.71		19.87		41.52		us
->After	10.51		14.96		40.81		us
->
->- Throughput
->   Tool: iperf-vsock
->
->The size represents the buffer length (-l) to read/write
->P represents the number of parallel streams
->
->P=1
->	4K	64K	128K
->Before	6.87	29.3	29.5 Gb/s
->After	10.5	39.4	39.9 Gb/s
->
->P=2
->	4K	64K	128K
->Before	10.5	32.8	33.2 Gb/s
->After	17.8	47.7	48.5 Gb/s
->
->P=4
->	4K	64K	128K
->Before	12.7	33.6	34.2 Gb/s
->After	16.9	48.1	50.5 Gb/s
+On Fri, Jul 26, 2024 at 04:52:07PM GMT, Sean Christopherson wrote:
+> Convert RISC-V to __kvm_faultin_pfn()+kvm_release_faultin_page(), which
+> are new APIs to consolidate arch code and provide consistent behavior
+> across all KVM architectures.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/riscv/kvm/mmu.c | 11 ++++-------
+>  1 file changed, 4 insertions(+), 7 deletions(-)
+> 
+> diff --git a/arch/riscv/kvm/mmu.c b/arch/riscv/kvm/mmu.c
+> index 806f68e70642..f73d6a79a78c 100644
+> --- a/arch/riscv/kvm/mmu.c
+> +++ b/arch/riscv/kvm/mmu.c
+> @@ -601,6 +601,7 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>  	bool logging = (memslot->dirty_bitmap &&
+>  			!(memslot->flags & KVM_MEM_READONLY)) ? true : false;
+>  	unsigned long vma_pagesize, mmu_seq;
+> +	struct page *page;
+>  
+>  	/* We need minimum second+third level pages */
+>  	ret = kvm_mmu_topup_memory_cache(pcache, gstage_pgd_levels);
+> @@ -631,7 +632,7 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>  
+>  	/*
+>  	 * Read mmu_invalidate_seq so that KVM can detect if the results of
+> -	 * vma_lookup() or gfn_to_pfn_prot() become stale priort to acquiring
+> +	 * vma_lookup() or __kvm_faultin_pfn() become stale priort to acquiring
+                                                            ^ while here
+						could fix this typo
 
-Great improvement! Thanks again for this work!
-
->
->The performance improvement is related to this optimization,
->I used a ebpf kretprobe on virtio_transport_send_skb to check
->that each packet was sent directly to the virtqueue
->
->Co-developed-by: Marco Pinna <marco.pinn95@gmail.com>
->Signed-off-by: Marco Pinna <marco.pinn95@gmail.com>
->Signed-off-by: Luigi Leonardi <luigi.leonardi@outlook.com>
->---
-> net/vmw_vsock/virtio_transport.c | 39 +++++++++++++++++++++++++++++++++++----
-> 1 file changed, 35 insertions(+), 4 deletions(-)
-
-All my comments have been resolved. I let iperf run bidirectionally for 
-a long time and saw no problems, so:
-
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-
-
->
->diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
->index f641e906f351..f992f9a216f0 100644
->--- a/net/vmw_vsock/virtio_transport.c
->+++ b/net/vmw_vsock/virtio_transport.c
->@@ -208,6 +208,28 @@ virtio_transport_send_pkt_work(struct work_struct *work)
-> 		queue_work(virtio_vsock_workqueue, &vsock->rx_work);
-> }
->
->+/* Caller need to hold RCU for vsock.
->+ * Returns 0 if the packet is successfully put on the vq.
->+ */
->+static int virtio_transport_send_skb_fast_path(struct virtio_vsock *vsock, struct sk_buff *skb)
->+{
->+	struct virtqueue *vq = vsock->vqs[VSOCK_VQ_TX];
->+	int ret;
->+
->+	/* Inside RCU, can't sleep! */
->+	ret = mutex_trylock(&vsock->tx_lock);
->+	if (unlikely(ret == 0))
->+		return -EBUSY;
->+
->+	ret = virtio_transport_send_skb(skb, vq, vsock);
->+	if (ret == 0)
->+		virtqueue_kick(vq);
->+
->+	mutex_unlock(&vsock->tx_lock);
->+
->+	return ret;
->+}
->+
-> static int
-> virtio_transport_send_pkt(struct sk_buff *skb)
-> {
->@@ -231,11 +253,20 @@ virtio_transport_send_pkt(struct sk_buff *skb)
-> 		goto out_rcu;
-> 	}
->
->-	if (virtio_vsock_skb_reply(skb))
->-		atomic_inc(&vsock->queued_replies);
->+	/* If send_pkt_queue is empty, we can safely bypass this queue
->+	 * because packet order is maintained and (try) to put the packet
->+	 * on the virtqueue using virtio_transport_send_skb_fast_path.
->+	 * If this fails we simply put the packet on the intermediate
->+	 * queue and schedule the worker.
->+	 */
->+	if (!skb_queue_empty_lockless(&vsock->send_pkt_queue) ||
->+	    virtio_transport_send_skb_fast_path(vsock, skb)) {
->+		if (virtio_vsock_skb_reply(skb))
->+			atomic_inc(&vsock->queued_replies);
->
->-	virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
->-	queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
->+		virtio_vsock_skb_queue_tail(&vsock->send_pkt_queue, skb);
->+		queue_work(virtio_vsock_workqueue, &vsock->send_pkt_work);
->+	}
->
-> out_rcu:
-> 	rcu_read_unlock();
->
->-- 
->2.45.2
->
+>  	 * kvm->mmu_lock.
+>  	 *
+>  	 * Rely on mmap_read_unlock() for an implicit smp_rmb(), which pairs
+> @@ -647,7 +648,7 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>  		return -EFAULT;
+>  	}
+>  
+> -	hfn = gfn_to_pfn_prot(kvm, gfn, is_write, &writable);
+> +	hfn = kvm_faultin_pfn(vcpu, gfn, is_write, &writable, &page);
+>  	if (hfn == KVM_PFN_ERR_HWPOISON) {
+>  		send_sig_mceerr(BUS_MCEERR_AR, (void __user *)hva,
+>  				vma_pageshift, current);
+> @@ -681,11 +682,7 @@ int kvm_riscv_gstage_map(struct kvm_vcpu *vcpu,
+>  		kvm_err("Failed to map in G-stage\n");
+>  
+>  out_unlock:
+> -	if ((!ret || ret == -EEXIST) && writable)
+> -		kvm_set_pfn_dirty(hfn);
+> -	else
+> -		kvm_release_pfn_clean(hfn);
+> -
+> +	kvm_release_faultin_page(kvm, page, ret && ret != -EEXIST, writable);
+>  	spin_unlock(&kvm->mmu_lock);
+>  	return ret;
+>  }
+> -- 
+> 2.46.0.rc1.232.g9752f9e123-goog
+> 
 >
 
+Reviewed-by: Andrew Jones <ajones@ventanamicro.com>
 
