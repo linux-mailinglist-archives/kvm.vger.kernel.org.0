@@ -1,518 +1,134 @@
-Return-Path: <kvm+bounces-22739-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22740-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69CD49429EA
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:06:15 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 708669429F0
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 11:09:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED60B1F25A43
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 09:06:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19CBE1F230C7
+	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 09:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AD611AAE08;
-	Wed, 31 Jul 2024 09:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9FF41A8C15;
+	Wed, 31 Jul 2024 09:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PRxxkJPI"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F102718CBE2;
-	Wed, 31 Jul 2024 09:06:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E8641CF93
+	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 09:09:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722416766; cv=none; b=WS5xYT4Kjwnis4NEC5ZfPskmQKzNTfZAXuF1q+hcZn2BxM1gqEvCHsHXQkus4aWzwBPz0I2AUyzOzTU1N9kES7SdhdV4hUifyFVwB2zP8grSWxkB4lgYCQA6HwF/JTzE/7lZk/WuBraXNJfsfPMofe2BcCle0ef9F74Mlf2CvuE=
+	t=1722416978; cv=none; b=MJp1tGWlgyy1eRI90yOPIv0xHMm31Gkot8oyV4FUlIyPo4U0eMArLIjMWZ2Nh6vHggsBdFGIQQeSh54gWF6oQhMHDm7YZp0bsUZVv0rfXikWe8lk7FvMtm/w+t7XoXxrOdswSKGLd7CKzWEaFktI+BJtpetPgWrNF6ozJnzkolk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722416766; c=relaxed/simple;
-	bh=ZBP69a7Qz9AKbdvVTW2t0/bNPMxBzb6bEMYliDYZoMs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VelYKtAEKJE4/8I9KMgD/yN5T+3p0k+snzUbUQACW+XYnJPL5ZwH3dhK0SSKV15xDG1IsWtbTJ1zNAV+RFePAKRbFM01RJwV1eTNp3y8zBfDejV3602JcOFLT5oVD14Ugio31HbhKuT1sypfibexP51tOVFWMxVNFXJaA/spvng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 284DD1007;
-	Wed, 31 Jul 2024 02:06:29 -0700 (PDT)
-Received: from [10.57.94.83] (unknown [10.57.94.83])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id A80913F5A1;
-	Wed, 31 Jul 2024 02:06:00 -0700 (PDT)
-Message-ID: <cde39215-1203-4f98-9145-ecf0078c48be@arm.com>
-Date: Wed, 31 Jul 2024 10:05:59 +0100
+	s=arc-20240116; t=1722416978; c=relaxed/simple;
+	bh=jTjMQkHPYf5VCtzPxx0NiYPDQ/mPsKYrTuOakLDMMl4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Wo5xvB0BkVS98w7GRKteIHF+NmXNJlb510rpMiECHI1OA6xEPDMSzQhvGDoQbmAvB138PYeuuqtJ0ydZDyymjC7moAm0zHO7Xj+2075imjv/pXDACdEbFfEmWrsLes1igfgEIr0QROPJ/1R4ziu8D3+D/4fMLbyUYH/AJKAmXqA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PRxxkJPI; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-52f01ec08d6so8352219e87.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 02:09:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722416974; x=1723021774; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nSOSWcjsJMRfByaAd0f8E/sqq6Gxnp/EVzKyteMWkiE=;
+        b=PRxxkJPIFf0j9HLZSm7amcVLpdLf+/ekgY4tlQLqE6acNJKZJIyi3n+soz+FAkP7wX
+         CyiNM6YlxYbxt5IK22JAujeBwnFF2/Kf2FNJOS0VfpXwwohhHEMrEZuACYmSxUef7Xif
+         im6l+dRhe7lUbpConFqLVBacRglHvQ+s9vEaQbi9HIjMvsMxB1o3wPBXEKwzWJaVK4nS
+         XP7TxqDi+YeC8WALDEvVetgNU7Y1E1pl8lHzEr1HZh8ipmOr9AUPlrMjIfWNO6zEUQ2u
+         IEV0OJjo7BYpjd98iSQX5ISbRYj+wWkVwTUHFymIRTTx5q5h7L/8HhN6zyo3ePvVA5jh
+         CObA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722416974; x=1723021774;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nSOSWcjsJMRfByaAd0f8E/sqq6Gxnp/EVzKyteMWkiE=;
+        b=e6My+GyT/tlEI6cDH42M86xrRhvlDB46w/c+2mS4atF0aLyuZxJzkCQyhUpRkSL8UL
+         b31t2Gh2NeshaAMF0948fjN3fyR7pxU57uQnDvW0G/UpWKwQUsAPZqj76K31ktgSv0Nb
+         qwXuptdxcJb5ssoOzKtlezFrw9eiKiTlpP17gLiWwZ4M+2J/G8gwxrl9YWDajL0iC+C9
+         Lo0aGjDeMXUaZO3XbD15lznFbPaK4GewOMlbzZjp3m766YM2PZljlE5ZztKDgISbuhHL
+         IWVXL33pqbFrI/JVTNoFk4w/18ufNhP/JNqOEzoLtQYq8DkQ1VP3WtUIOIRujE/K9h4r
+         R3Eg==
+X-Forwarded-Encrypted: i=1; AJvYcCVhiNF/RopCqxs55xGDABqM4nchM5OplAUABAbIocIx6PvJxJRa12+iMMUMbk5mRbJxDTcijYj7/gpf93+dpNPIlob7
+X-Gm-Message-State: AOJu0YwawE5UgPkuWXgV/WtDaJgEYC76ICmV+OjsFusU4lAa/6rqz/1E
+	cV2uCj63n0iru8DJE+l/2ey2XJGZ+3l0zxitoN+HjbWthevcsHahBk0NzCryp62fvMCuvQMhSzg
+	49cO7aaT1UGeR7UNMWV3zE3ev9ZB5a8yB
+X-Google-Smtp-Source: AGHT+IEBqqXX2IOyrSS+NE1k0TjfrfTptqbO9Mhdf4x5JMeIFLrixWbi5nSl8YmJu/HSUcbd4Yl9Pesifn7lPxGijII=
+X-Received: by 2002:ac2:5b0f:0:b0:52f:c10d:21f0 with SMTP id
+ 2adb3069b0e04-5309b2d8ac3mr7928025e87.54.1722416974021; Wed, 31 Jul 2024
+ 02:09:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 03/15] arm64: Detect if in a realm and set RIPAS RAM
-Content-Language: en-GB
-To: Gavin Shan <gshan@redhat.com>, Steven Price <steven.price@arm.com>,
- kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-4-steven.price@arm.com>
- <2b4f0496-99f4-4bc6-af6c-a8be8fca69a8@redhat.com>
- <7203814a-1a1d-41c4-8fc5-95216e2febcd@arm.com>
- <3e30f7b8-c7a4-4ab9-8afc-a48c84e62728@redhat.com>
-From: Suzuki K Poulose <suzuki.poulose@arm.com>
-In-Reply-To: <3e30f7b8-c7a4-4ab9-8afc-a48c84e62728@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240730053215.33768-1-flyingpeng@tencent.com>
+ <db00e68b-2b34-49e1-aa72-425a35534762@redhat.com> <ZqlMob2o-97KsB8t@google.com>
+In-Reply-To: <ZqlMob2o-97KsB8t@google.com>
+From: Hao Peng <flyingpenghao@gmail.com>
+Date: Wed, 31 Jul 2024 17:09:22 +0800
+Message-ID: <CAPm50aLGRrK12ZSJzYadqO7Z7hM25NyXPdCD1sg_dTPCKKhJ-w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Conditionally call kvm_zap_obsolete_pages
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
+	Peng Hao <flyingpeng@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 31/07/2024 08:03, Gavin Shan wrote:
-> Hi Suzuki,
-> 
-> On 7/30/24 11:51 PM, Suzuki K Poulose wrote:
->> On 30/07/2024 00:37, Gavin Shan wrote:
->>> On 7/1/24 7:54 PM, Steven Price wrote:
->>>> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>>
->>>> Detect that the VM is a realm guest by the presence of the RSI
->>>> interface.
->>>>
->>>> If in a realm then all memory needs to be marked as RIPAS RAM 
->>>> initially,
->>>> the loader may or may not have done this for us. To be sure iterate 
->>>> over
->>>> all RAM and mark it as such. Any failure is fatal as that implies the
->>>> RAM regions passed to Linux are incorrect - which would mean failing
->>>> later when attempting to access non-existent RAM.
->>>>
->>>> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->>>> Co-developed-by: Steven Price <steven.price@arm.com>
->>>> Signed-off-by: Steven Price <steven.price@arm.com>
->>>> ---
->>>> Changes since v3:
->>>>   * Provide safe/unsafe versions for converting memory to protected,
->>>>     using the safer version only for the early boot.
->>>>   * Use the new psci_early_test_conduit() function to avoid calling an
->>>>     SMC if EL3 is not present (or not configured to handle an SMC).
->>>> Changes since v2:
->>>>   * Use DECLARE_STATIC_KEY_FALSE rather than "extern struct
->>>>     static_key_false".
->>>>   * Rename set_memory_range() to rsi_set_memory_range().
->>>>   * Downgrade some BUG()s to WARN()s and handle the condition by
->>>>     propagating up the stack. Comment the remaining case that ends in a
->>>>     BUG() to explain why.
->>>>   * Rely on the return from rsi_request_version() rather than checking
->>>>     the version the RMM claims to support.
->>>>   * Rename the generic sounding arm64_setup_memory() to
->>>>     arm64_rsi_setup_memory() and move the call site to setup_arch().
->>>> ---
->>>>   arch/arm64/include/asm/rsi.h      | 64 +++++++++++++++++++++++++
->>>>   arch/arm64/include/asm/rsi_cmds.h | 22 +++++++++
->>>>   arch/arm64/kernel/Makefile        |  3 +-
->>>>   arch/arm64/kernel/rsi.c           | 77 
->>>> +++++++++++++++++++++++++++++++
->>>>   arch/arm64/kernel/setup.c         |  8 ++++
->>>>   5 files changed, 173 insertions(+), 1 deletion(-)
->>>>   create mode 100644 arch/arm64/include/asm/rsi.h
->>>>   create mode 100644 arch/arm64/kernel/rsi.c
->>>>
->>>> diff --git a/arch/arm64/include/asm/rsi.h 
->>>> b/arch/arm64/include/asm/rsi.h
->>>> new file mode 100644
->>>> index 000000000000..29fdc194d27b
->>>> --- /dev/null
->>>> +++ b/arch/arm64/include/asm/rsi.h
->>>> @@ -0,0 +1,64 @@
->>>> +/* SPDX-License-Identifier: GPL-2.0-only */
->>>> +/*
->>>> + * Copyright (C) 2024 ARM Ltd.
->>>> + */
->>>> +
->>>> +#ifndef __ASM_RSI_H_
->>>> +#define __ASM_RSI_H_
->>>> +
->>>> +#include <linux/jump_label.h>
->>>> +#include <asm/rsi_cmds.h>
->>>> +
->>>> +DECLARE_STATIC_KEY_FALSE(rsi_present);
->>>> +
->>>> +void __init arm64_rsi_init(void);
->>>> +void __init arm64_rsi_setup_memory(void);
->>>> +static inline bool is_realm_world(void)
->>>> +{
->>>> +    return static_branch_unlikely(&rsi_present);
->>>> +}
->>>> +
->>>> +static inline int rsi_set_memory_range(phys_addr_t start, 
->>>> phys_addr_t end,
->>>> +                       enum ripas state, unsigned long flags)
->>>> +{
->>>> +    unsigned long ret;
->>>> +    phys_addr_t top;
->>>> +
->>>> +    while (start != end) {
->>>> +        ret = rsi_set_addr_range_state(start, end, state, flags, 
->>>> &top);
->>>> +        if (WARN_ON(ret || top < start || top > end))
->>>> +            return -EINVAL;
->>>> +        start = top;
->>>> +    }
->>>> +
->>>> +    return 0;
->>>> +}
->>>> +
->>>
->>> @flags has been defined as int instead of unsigned long, which is 
->>> inconsistent
->>> to TF-RMM's definitions since it has type of 'unsigned long'.
->>
->> Sorry, do you mean that TF-RMM treats the "flags" as an "int" instead of
->> unsigned long and we should be consistent with TF-RMM ? If so, I don't
->> think that is correct. We should be compliant to the RMM spec, which
->> describes "RsiRipasChangeFlags" as a 64bit value and thus must be
->> 'unsigned long' as we used here.
->>
-> 
-> No worries, I guess I didn't make myself clear enough. Sorry about that.
-> Let me explain it with more details. @flag is passed down as the following
-> call trace shows.
-> 
->    rsi_set_memory_range_protected_safe
->      rsi_set_memory_range                             // 
-> RSI_NO_CHANGE_DESTROYED
->        rsi_set_addr_range_state
->          arm_smccc_smc(SMC_RSI_IPA_STATE_SET, ...)
-> 
-> The kernel defines RSI_CHANGE_DESTROYED as a "int" value, but same flag has
-> been defined as 'unsigned int' value in tf-rmm. However, kernel uses 
-> 'unsigned
-> long' flags to hold it.
-> 
->    // kernel's prototype - 'unsigned long flags'
->    static inline int rsi_set_memory_range(phys_addr_t start, phys_addr_t 
-> end,
->                                         enum ripas state, unsigned long 
-> flags)
-> 
->    // kernel's definition - 'int'
->    #define RSI_CHANGE_DESTROYED    0
+On Wed, Jul 31, 2024 at 4:27=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Tue, Jul 30, 2024, Paolo Bonzini wrote:
+> > On 7/30/24 07:32, flyingpenghao@gmail.com wrote:
+> > >
+> > > When tdp_mmu is enabled, invalid root calls kvm_tdp_mmu_zap_invalidat=
+ed_roots
+> > > to implement it, and kvm_zap_obsolete_pages is not used.
+> > >
+> > > Signed-off-by: Peng Hao<flyingpeng@tencent.com>
+> > > ---
+> > >   arch/x86/kvm/mmu/mmu.c | 3 ++-
+> > >   1 file changed, 2 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > > index 901be9e420a4..e91586c2ef87 100644
+> > > --- a/arch/x86/kvm/mmu/mmu.c
+> > > +++ b/arch/x86/kvm/mmu/mmu.c
+> > > @@ -6447,7 +6447,8 @@ static void kvm_mmu_zap_all_fast(struct kvm *kv=
+m)
+> > >      */
+> > >     kvm_make_all_cpus_request(kvm, KVM_REQ_MMU_FREE_OBSOLETE_ROOTS);
+> > > -   kvm_zap_obsolete_pages(kvm);
+> > > +   if (!tdp_mmu_enabled)
+> > > +           kvm_zap_obsolete_pages(kvm);
+> >
+> > Can't you have obsolete pages from the shadow MMU that's used for neste=
+d
+> > (nGPA->HPA) virtualization?
+>
+> Yep.  And kvm_zap_obsolete_pages() is a relatively cheap nop if there are=
+ no
+> pages on active_mmu_pages.  E.g. we could check kvm_memslots_have_rmaps()=
+, but I
+> don't see any point in doing so, as the existing code should be blazing f=
+ast
+> relative to the total cost of the zap.
+Here can be optimized by judging whether active_mmu_pages is empty,
+just like kvm_zap_obsolete_pages.
+Regardless of L0 kvm or L1 kvm, when tdp_mmu is enabled, the
+active_mmu_pages list will not be used.
+When ept=3D0 , the probability that active_mmu_pages is empty is also
+high, not every time
+kvm_zap_obsolete_pages is called.
 
-Thanks for the detailed explanation, you are right, we should fix it.
-
-> 
->    // tf-rmm's definition - 'unsigned int'
->    #define U(_x)                 (unsigned int)(_x)
->    #define RSI_CHANGE_DESTROYED  U(0)
-> 
->>>
->>>> +/*
->>>> + * Convert the specified range to RAM. Do not use this if you rely 
->>>> on the
->>>> + * contents of a page that may already be in RAM state.
->>>> + */
->>>> +static inline int rsi_set_memory_range_protected(phys_addr_t start,
->>>> +                         phys_addr_t end)
->>>> +{
->>>> +    return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
->>>> +                    RSI_CHANGE_DESTROYED);
->>>> +}
->>>> +
->>>> +/*
->>>> + * Convert the specified range to RAM. Do not convert any pages 
->>>> that may have
->>>> + * been DESTROYED, without our permission.
->>>> + */
->>>> +static inline int rsi_set_memory_range_protected_safe(phys_addr_t 
->>>> start,
->>>> +                              phys_addr_t end)
->>>> +{
->>>> +    return rsi_set_memory_range(start, end, RSI_RIPAS_RAM,
->>>> +                    RSI_NO_CHANGE_DESTROYED);
->>>> +}
->>>> +
->>>> +static inline int rsi_set_memory_range_shared(phys_addr_t start,
->>>> +                          phys_addr_t end)
->>>> +{
->>>> +    return rsi_set_memory_range(start, end, RSI_RIPAS_EMPTY, 0);
->>>> +}
->>>> +#endif
->>>
->>> s/0/RSI_NO_CHANGE_DESTROYED
->>
->> This is not required as we do not care if the GRANULE was destroyed or
->> not, since it is going to be "UNUSED" anyway in a protected way 
->> (RIPAS_EMPTY). And we do not rely on the contents of the memory being
->> preserved, when the page is made shared (In fact we cannot do that
->> with Arm CCA).
->>
->> Thus we do not get any security benefits with the flag. The flag is ONLY
->> useful, when the Realm does a "blanket" IPA_STATE_SET(RIPAS_RAM) for
->> all of its memory area described as RAM. In this case, we want to make
->> sure that the Host hasn't destroyed any DATA that was loaded (and
->> measured) in the "NEW" state.
->>
->> e.g, Host loads Kernel at Addr X in RAM (which is transitioned to 
->> RIPAS_RAM, measured in RIM by RMM) and ACTIVATEs the Realm. Host could 
->> then destroy some pages of the loaded image before the Realm boots (thus
->> transitioning into DESTROYED). But for the Realm, at early boot, it is
->> much easier to "mark" the entire RAM region as RIPAS_RAM,
->>
->>
->> for_each_memory_region(region) {
->>      set_ipa_state_range(region->start, region->end, RIPAS_RAM, 
->> RSI_NO_CHANGE_DESTROYED);
->> }
->>
->> rather than performing:
->>
->> for_each_granule(g in DRAM) :
->>
->> switch (rsi_get_ipa_state(g)) {
->> case RIPAS_EMPTY: rsi_set_ipa_state(g, RIPAS_RAM); break;
->> case RIPAS_RAM: break; /* Nothing to do */
->> case DESTROYED: BUG();
->> }
->>
->>
-> 
-> The point was 0 and RSI_NO_CHANGE_DESTROYED are interchangeable. Since 
-> RSI_NO_CHANGE_DESTROYED
-> has been defined as 0, why we don't used RSI_NO_CHANGE_DESTROYED?
-
-Ah, my bad. But like I said, we should instead use the 
-RSI_CHANGE_DESTROYED for transitions to EMPTY.
-
-Suzuki
-
-
-
-> 
->>
->>> s/#endif/#endif /* __ASM_RSI_H_ */
->>>
->>>> diff --git a/arch/arm64/include/asm/rsi_cmds.h 
->>>> b/arch/arm64/include/asm/rsi_cmds.h
->>>> index 89e907f3af0c..acb557dd4b88 100644
->>>> --- a/arch/arm64/include/asm/rsi_cmds.h
->>>> +++ b/arch/arm64/include/asm/rsi_cmds.h
->>>> @@ -10,6 +10,11 @@
->>>>   #include <asm/rsi_smc.h>
->>>> +enum ripas {
->>>> +    RSI_RIPAS_EMPTY,
->>>> +    RSI_RIPAS_RAM,
->>>> +};
->>>> +
->>>>   static inline unsigned long rsi_request_version(unsigned long req,
->>>>                           unsigned long *out_lower,
->>>>                           unsigned long *out_higher)
->>>> @@ -35,4 +40,21 @@ static inline unsigned long 
->>>> rsi_get_realm_config(struct realm_config *cfg)
->>>>       return res.a0;
->>>>   }
->>>> +static inline unsigned long rsi_set_addr_range_state(phys_addr_t 
->>>> start,
->>>> +                             phys_addr_t end,
->>>> +                             enum ripas state,
->>>> +                             unsigned long flags,
->>>> +                             phys_addr_t *top)
->>>> +{
->>>> +    struct arm_smccc_res res;
->>>> +
->>>> +    arm_smccc_smc(SMC_RSI_IPA_STATE_SET, start, end, state,
->>>> +              flags, 0, 0, 0, &res);
->>>> +
->>>> +    if (top)
->>>> +        *top = res.a1;
->>>> +
->>>> +    return res.a0;
->>>> +}
->>>> +
->>>>   #endif
->>>> diff --git a/arch/arm64/kernel/Makefile b/arch/arm64/kernel/Makefile
->>>> index 763824963ed1..a483b916ed11 100644
->>>> --- a/arch/arm64/kernel/Makefile
->>>> +++ b/arch/arm64/kernel/Makefile
->>>> @@ -33,7 +33,8 @@ obj-y            := debug-monitors.o entry.o irq.o 
->>>> fpsimd.o        \
->>>>                  return_address.o cpuinfo.o cpu_errata.o        \
->>>>                  cpufeature.o alternative.o cacheinfo.o        \
->>>>                  smp.o smp_spin_table.o topology.o smccc-call.o    \
->>>> -               syscall.o proton-pack.o idle.o patching.o pi/
->>>> +               syscall.o proton-pack.o idle.o patching.o pi/    \
->>>> +               rsi.o
->>>>   obj-$(CONFIG_COMPAT)            += sys32.o signal32.o            \
->>>>                          sys_compat.o
->>>> diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
->>>> new file mode 100644
->>>> index 000000000000..f01bff9dab04
->>>> --- /dev/null
->>>> +++ b/arch/arm64/kernel/rsi.c
->>>> @@ -0,0 +1,77 @@
->>>> +// SPDX-License-Identifier: GPL-2.0-only
->>>> +/*
->>>> + * Copyright (C) 2023 ARM Ltd.
->>>> + */
->>>> +
->>>> +#include <linux/jump_label.h>
->>>> +#include <linux/memblock.h>
->>>> +#include <linux/psci.h>
->>>> +#include <asm/rsi.h>
->>>> +
->>>> +DEFINE_STATIC_KEY_FALSE_RO(rsi_present);
->>>> +EXPORT_SYMBOL(rsi_present);
->>>> +
->>>> +static bool rsi_version_matches(void)
->>>> +{
->>>> +    unsigned long ver_lower, ver_higher;
->>>> +    unsigned long ret = rsi_request_version(RSI_ABI_VERSION,
->>>> +                        &ver_lower,
->>>> +                        &ver_higher);
->>>> +
->>>> +    if (ret == SMCCC_RET_NOT_SUPPORTED)
->>>> +        return false;
->>>> +
->>>> +    if (ret != RSI_SUCCESS) {
->>>> +        pr_err("RME: RMM doesn't support RSI version %u.%u. 
->>>> Supported range: %lu.%lu-%lu.%lu\n",
->>>> +               RSI_ABI_VERSION_MAJOR, RSI_ABI_VERSION_MINOR,
->>>> +               RSI_ABI_VERSION_GET_MAJOR(ver_lower),
->>>> +               RSI_ABI_VERSION_GET_MINOR(ver_lower),
->>>> +               RSI_ABI_VERSION_GET_MAJOR(ver_higher),
->>>> +               RSI_ABI_VERSION_GET_MINOR(ver_higher));
->>>> +        return false;
->>>> +    }
->>>> +
->>>> +    pr_info("RME: Using RSI version %lu.%lu\n",
->>>> +        RSI_ABI_VERSION_GET_MAJOR(ver_lower),
->>>> +        RSI_ABI_VERSION_GET_MINOR(ver_lower));
->>>> +
->>>> +    return true;
->>>> +}
->>>> +
->>>> +void __init arm64_rsi_setup_memory(void)
->>>> +{
->>>> +    u64 i;
->>>> +    phys_addr_t start, end;
->>>> +
->>>> +    if (!is_realm_world())
->>>> +        return;
->>>> +
->>>> +    /*
->>>> +     * Iterate over the available memory ranges and convert the 
->>>> state to
->>> ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
->>>                                               blocks and convert them to
->>
->> TBH, I don't see any significant difference between the two. Am I
->> missing something ?
->>
-> 
-> for_each_mem_range() is a helper provided by memory block management 
-> module.
-> So 'memory block' sounds like more accurate than broadly used term "memory
-> range" here.
-> 
->>>
->>>> +     * protected memory. We should take extra care to ensure that 
->>>> we DO NOT
->>>> +     * permit any "DESTROYED" pages to be converted to "RAM".
->>>> +     *
->>>> +     * BUG_ON is used because if the attempt to switch the memory to
->>>> +     * protected has failed here, then future accesses to the 
->>>> memory are
->>>> +     * simply going to be reflected as a fault which we can't handle.
->>>> +     * Bailing out early prevents the guest limping on and dieing 
->>>> later.
->>>> +     */
->>>> +    for_each_mem_range(i, &start, &end) {
->>>> +        BUG_ON(rsi_set_memory_range_protected_safe(start, end));
->>>> +    }
->>>> +}
->>>> +
->>>
->>> If I'm understanding the code completely, this changes the memory 
->>> state from
->>> RIPAS_EMPTY to RIPAS_RAM so that the following page faults can be 
->>> routed to
->>> host properly. Otherwise, a SEA is injected to the realm according to
->>> tf-rmm/runtime/core/exit.c::handle_data_abort(). The comments can be 
->>> more
->>> explicit to replace "fault" with "SEA (Synchronous External Abort)".
->>
->> Agreed.  SEA is more accurate than fault.
->>
-> 
-> Ok.
-> 
->>>
->>> Besides, this forces a guest exit with reason RMI_EXIT_RIPAS_CHANGE 
->>> which is
->>> handled by the host, where RMI_RTT_SET_RIPAS is triggered to convert 
->>> the memory
->>> state from RIPAS_EMPTY to RIPAS_RAM. The question is why the 
->>> conversion can't
->>> be done by VMM (QEMU)?
->>
->> A VMM could potentially do this via INIT_RIPAS at Realm creation for
->> the entire RAM. But, as far as the Realm is concerned it is always 
->> safer to do this step and is relatively a lightweight operation at 
->> boot. Physical pages need not be allocated/mapped in stage2 with the 
->> IPA State change.
->>
-> 
-> Ok. Thanks for the explanation.
-> 
->>
->> Suzuki
->>>
->>>> +void __init arm64_rsi_init(void)
->>>> +{
->>>> +    /*
->>>> +     * If PSCI isn't using SMC, RMM isn't present. Don't try to 
->>>> execute an
->>>> +     * SMC as it could be UNDEFINED.
->>>> +     */
->>>> +    if (!psci_early_test_conduit(SMCCC_CONDUIT_SMC))
->>>> +        return;
->>>> +    if (!rsi_version_matches())
->>>> +        return;
->>>> +
->>>> +    static_branch_enable(&rsi_present);
->>>> +}
->>>> +
->>>> diff --git a/arch/arm64/kernel/setup.c b/arch/arm64/kernel/setup.c
->>>> index a096e2451044..143f87615af0 100644
->>>> --- a/arch/arm64/kernel/setup.c
->>>> +++ b/arch/arm64/kernel/setup.c
->>>> @@ -43,6 +43,7 @@
->>>>   #include <asm/cpu_ops.h>
->>>>   #include <asm/kasan.h>
->>>>   #include <asm/numa.h>
->>>> +#include <asm/rsi.h>
->>>>   #include <asm/scs.h>
->>>>   #include <asm/sections.h>
->>>>   #include <asm/setup.h>
->>>> @@ -293,6 +294,11 @@ void __init __no_sanitize_address 
->>>> setup_arch(char **cmdline_p)
->>>>        * cpufeature code and early parameters.
->>>>        */
->>>>       jump_label_init();
->>>> +    /*
->>>> +     * Init RSI before early param so that "earlycon" console uses the
->>>> +     * shared alias when in a realm
->>>> +     */
->>>> +    arm64_rsi_init();
->>>>       parse_early_param();
->>>>       dynamic_scs_init();
->>>> @@ -328,6 +334,8 @@ void __init __no_sanitize_address 
->>>> setup_arch(char **cmdline_p)
->>>>       arm64_memblock_init();
->>>> +    arm64_rsi_setup_memory();
->>>> +
->>>>       paging_init();
->>>>       acpi_table_upgrade();
->>>
-> 
-> Thanks,
-> Gavin
-> 
-
+Thanks.
 
