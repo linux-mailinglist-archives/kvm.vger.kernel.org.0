@@ -1,128 +1,151 @@
-Return-Path: <kvm+bounces-22918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22913-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCB0B94482B
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:26:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2630C94481F
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:25:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98F13284A0B
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:26:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D19C81F290D3
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59C01A08A4;
-	Thu,  1 Aug 2024 09:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7CA189B99;
+	Thu,  1 Aug 2024 09:21:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GhqVPvaf"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="DGajlqK0"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC857170A37;
-	Thu,  1 Aug 2024 09:22:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 281DA18952C
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 09:21:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722504149; cv=none; b=lFiL2HHU/uU3Co2aEHqUTdvaxebz3MkfqPHgGx0wNAnDnj6moJYARwmqN8xuZ5HLDNTTHB02BTYHVrtfdf8wBVWOprl17+TpbCb2+ZAElrNYRUM18e25UCbq2ZKhFculVksl7OJ1o9okDL8QstJ5YVcJm6UQmge20efpipUdgJY=
+	t=1722504067; cv=none; b=UWbIcC0pbgSd9tE8d/CtALo1w48JjJ6TzJEkEdbu2A3CFl0t6bST0HmaKCMn3HfVP0AfY4jdsiAV3fhnpxb5FVYUpQIwu3fCHb9cKlOe79b1iNAVKrbcjqjKnurV2+gs9PHc7nVEFzSSC/YxRfPGcDBMs+ynPxDZSppdz+Wg/iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722504149; c=relaxed/simple;
-	bh=Xu/A5wRo87cCV/14kvsmL7JZiq2gS7qhR9OHy9H2AHg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XzK+cD8ECG2MhH+jB7Y5GjDPERXMlJW+qXXPr4kkEo1cCQFM9rA7sHw3njCqVv4erxXeXHbrd51yZc5Jp3xLpcgTCttCHFlfwAd/BmJMIGqZaTjQd31WUTEw1rrpOX6O0I/J9+2yF8oFjlOSi/gQQe8BhPkK+rsFnyU5/cgj5Fk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GhqVPvaf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EB01C32786;
-	Thu,  1 Aug 2024 09:22:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722504149;
-	bh=Xu/A5wRo87cCV/14kvsmL7JZiq2gS7qhR9OHy9H2AHg=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GhqVPvafnl8Anxk2NuReshvN5RzJri4ekYed+/VQ+QcTAnDN6y7wcrKDfHU9zf988
-	 Pzf8KdipR41679BOhiEG2Ft5rdJvbg4tv5gA4QH6S+8waVI1Bsxvg+azpjEbdciGUP
-	 5uRnZH2IYYA1XMRUBOi2QZqP0+dJ5QKQLVdmSnRObZwRQ0L16kx2jSzP0xKUcyhlr8
-	 xXpvX1cPi/NydeKp2TYneC3PCST2ocMM3+Bu1AIJ18anPcCW4cuctkagQeA9++CYwa
-	 XxXQRos9MpulOAIQCyA8PJM84+crZUwNcdFs2qc4LWTtPsPsrrW4i2p15ygzIOKqj4
-	 tuV5BM8KudRZQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sZRyb-00HKNZ-LE;
-	Thu, 01 Aug 2024 10:20:01 +0100
-From: Marc Zyngier <maz@kernel.org>
-To: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Fuad Tabba <tabba@google.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v2 8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace and guests
-Date: Thu,  1 Aug 2024 10:19:55 +0100
-Message-Id: <20240801091955.2066364-9-maz@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240801091955.2066364-1-maz@kernel.org>
-References: <20240801091955.2066364-1-maz@kernel.org>
+	s=arc-20240116; t=1722504067; c=relaxed/simple;
+	bh=3Io79nUQn8ypd8PwwL4q+T1yD0diA5Tfaz6TUlMiA8c=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=nC6WOyU/W/mrjcsNHKt8nb/80pW/wBvhe3Z6MiSVeeJGu2277UfiaL9G1D7fmPH6ssaKFVrn+DvTMKOK3UXZEESo2VDoG9neZS7DXqGO8MtZSSUNwQqvyd2aEIzPgR+KcSTIAq6aKGTh8IJoiP9UjBmAbJRifW/yHS/LUuAg0Yc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=DGajlqK0; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5ab2baf13d9so9488537a12.2
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 02:21:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1722504063; x=1723108863; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GQVA9z2jkUPxM3dqZI0KDPVXgKoffaizeXmufcNkJbk=;
+        b=DGajlqK0Gyyn+hPULgUkUgLzFdFHcVAbeY+X9Ca3AuD4/ymatLH6HcO3HTy9H5NHME
+         zOx0sjQGqO01y3smYzWX3bGI2hB8ey4cdvJmQ4czCcKGgs18/hV1O+BExa0tqFSBsZxc
+         IcaGGusT/x4c4DC0Jv++B5VV1Ri1m+kaFDOh7Gi1kolcCKrMdqUWlzK9ex5x1sNLqgji
+         4r7ACboz+24dUCqbYkIUSPJthaQpS0kd6oneYvNmoGmKGXwEIhqiez5/pVgIJm5bVZ7E
+         GfLlo6UUnXNhDRNR7aSIoq9kSLs8qJhVwUt410Fw9s6uzhE5i5iPIHTy49w4GD/a5oFI
+         yORQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722504063; x=1723108863;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GQVA9z2jkUPxM3dqZI0KDPVXgKoffaizeXmufcNkJbk=;
+        b=AhKziHvotYNGhWl8CBYZ7lF6y4WP3y40x3v4dtYewiEDzQkF9aw1Kt6HSrWk8fet0n
+         ayLh7dUty5xB+Ok1exnPcqPhLmpon8YN0h8KeVV1jnbP61yPmWIyOvJqyIRerMhacLoe
+         Nf1PEf5+p5vYrIuj1/HE5wQG8KsHbIow+asB+CItbXhkntr++2VvrLDBzDPRGOx8QPUk
+         idMLiK0/xUX+iMBXoFthhlBTkjYNLRgNpfLVVTGMJLEqtI0nSy9HbPPIHUIf6IZ+mczS
+         UkTS3nKQHwnPc/s9UtElZVPkiMqXuC0teFBGxVmZK8/PHa+ULCgRbNhQsMahAZwyv0W/
+         fCCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVpuaqNBs3Zc0syDunaEQHQJhBry0oBNN9dm3S0j+2ujOx/7my+jYos41y/PNcS9SHyidJ01flY/M37Vh8emrKd9Xge
+X-Gm-Message-State: AOJu0Yyw2bIO014KWx05x36vVB452LYEMRxvjB7sOztaE1v+OLmpJzqR
+	p71S//4DxPAKba3o4fWzosUf8enAZvUrl00tDnp4/MdcyX9gsKgKB/7Kd89oDn8=
+X-Google-Smtp-Source: AGHT+IG4an2mFFKr4wz3Z9DFgeOmmND21A8Rbh3YvwoLKrs/2dCx443xl5h3j8lRXM2FS1yhxPSg2w==
+X-Received: by 2002:a50:ee82:0:b0:5a3:3062:36d6 with SMTP id 4fb4d7f45d1cf-5b6fe72ddc6mr1090738a12.1.1722504062925;
+        Thu, 01 Aug 2024 02:21:02 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5b017787967sm7857844a12.9.2024.08.01.02.21.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 02:21:01 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 51C785F80C;
+	Thu,  1 Aug 2024 10:20:59 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
+ <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
+ <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
+ Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
+  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
+ <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
+  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
+  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
+  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
+  David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 05/84] KVM: Add kvm_release_page_unused() API to put
+ pages that KVM never consumes
+In-Reply-To: <20240726235234.228822-6-seanjc@google.com> (Sean
+	Christopherson's message of "Fri, 26 Jul 2024 16:51:14 -0700")
+References: <20240726235234.228822-1-seanjc@google.com>
+	<20240726235234.228822-6-seanjc@google.com>
+Date: Thu, 01 Aug 2024 10:20:59 +0100
+Message-ID: <87wml0egzo.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com, broonie@kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Everything is now in place for a guest to "enjoy" FP8 support.
-Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
-explicit restriction of only being able to clear FPMR.
+Sean Christopherson <seanjc@google.com> writes:
 
-All other features (MTE* at the time of writing) are hidden
-and not writable.
+> Add an API to release an unused page, i.e. to put a page without marking
+> it accessed or dirty.  The API will be used when KVM faults-in a page but
+> bails before installing the guest mapping (and other similar flows).
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  include/linux/kvm_host.h | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 3d9617d1de41..c5d39a337aa3 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -1201,6 +1201,15 @@ unsigned long gfn_to_hva_prot(struct kvm *kvm, gfn=
+_t gfn, bool *writable);
+>  unsigned long gfn_to_hva_memslot(struct kvm_memory_slot *slot, gfn_t gfn=
+);
+>  unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gfn_=
+t gfn,
+>  				      bool *writable);
+> +
+> +static inline void kvm_release_page_unused(struct page *page)
+> +{
+> +	if (!page)
+> +		return;
+> +
+> +	put_page(page);
+> +}
 
-Signed-off-by: Marc Zyngier <maz@kernel.org>
----
- arch/arm64/kvm/sys_regs.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
+I guess it's unfamiliarity with the mm layout but I was trying to find
+where the get_pages come from to see the full pattern of allocate and
+return. I guess somewhere in the depths of hva_to_pfn() from
+hva_to_pfn_retry()? I think the indirection of the page walking confuses
+me ;-)
 
-diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-index 51627add0a72..da6d017f24a1 100644
---- a/arch/arm64/kvm/sys_regs.c
-+++ b/arch/arm64/kvm/sys_regs.c
-@@ -1722,6 +1722,15 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
- 	return val;
- }
- 
-+static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
-+					  const struct sys_reg_desc *rd)
-+{
-+	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
-+
-+	/* We only expose FPMR */
-+	return val & ID_AA64PFR2_EL1_FPMR;
-+}
-+
- #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
- ({									       \
- 	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
-@@ -2381,7 +2390,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
- 		   ID_AA64PFR0_EL1_AdvSIMD |
- 		   ID_AA64PFR0_EL1_FP), },
- 	ID_SANITISED(ID_AA64PFR1_EL1),
--	ID_UNALLOCATED(4,2),
-+	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
-+	  .access	= access_id_reg,
-+	  .get_user	= get_id_reg,
-+	  .set_user	= set_id_reg,
-+	  .reset	= read_sanitised_id_aa64pfr2_el1,
-+	  .val		= ID_AA64PFR2_EL1_FPMR, },
- 	ID_UNALLOCATED(4,3),
- 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
- 	ID_HIDDEN(ID_AA64SMFR0_EL1),
--- 
-2.39.2
+Anyway the API seems reasonable enough given the other kvm_release_
+functions.
 
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
