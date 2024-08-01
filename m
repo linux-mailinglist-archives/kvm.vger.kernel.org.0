@@ -1,130 +1,192 @@
-Return-Path: <kvm+bounces-22891-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22892-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AC5C944288
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 07:06:38 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C5B944526
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:05:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 832A4289CF5
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 05:06:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3308C1F26984
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 07:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C4915442A;
-	Thu,  1 Aug 2024 05:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01B53158521;
+	Thu,  1 Aug 2024 07:05:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KB4fx7ok"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jaLDPIXV"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818C0153BE8
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 05:01:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2850157493;
+	Thu,  1 Aug 2024 07:05:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722488462; cv=none; b=LklWWxJGpBZRifV4+hJsDI4be/6Wdhw9+sJzMEIJvlQvUahjIuWBVxBrp0HhIdb0ym5y7K/vLTx8cNHVNnHbo6saf2p82hnDHGPqdgTDynCrgMQnwgKyi/AUP6Miblm1T/2U9XNNVxkgE9csaX31qSqZhW57RNti3mfepCsIDkM=
+	t=1722495939; cv=none; b=c/kSs+eiKLIRMaB/CEMxR767pW29KdHrd78qcqa7I4HKd+4LKmVC5OYA2Fb60zDHJQsz7aZMjO0M3RvATKGWk3j6To/7EXWccz051Q0xVgg44GUb4hNRjoOtIBgafsoi2nJIIJrXtE3Y3RCGe6TRWWRXJQ7rOtlifzqONNFqDR0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722488462; c=relaxed/simple;
-	bh=fXP7LGydKCxqdr0K8IzhBFKvsQh/bpt5mTvxJ7gEmnI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Djjw/lLsu9oi3+aZ3rPvrPrXH1R4kcYdEkGk5JkKFPPUl9yyTNykt+MFIV5JFdDrtJSluMIExxyT4AcZtV25CW5ekREpyIudEmL7uYy5YfZbZS/4l0MCqJ9GH15HLzoBzuPnHLAei0JNJM/zwSVS4LdM1WDIaeCcp0/Yv4HRQz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KB4fx7ok; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-6c8f99fef10so7062694a12.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 22:01:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722488460; x=1723093260; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=GjoERFKejGpS4usQM9OjkSeO52H+0Hj79NteoX98Mb4=;
-        b=KB4fx7ok7gWdQwbs/O4qurCUMMjvJtT7UpIif3wf+yWCJt1uvMuSLcAQX8I494oCCy
-         dGK4cYDqBty7+yBvMhBG6uAgKsNBID/WYfX+xbwSH2YsMSg6jKfgRXa61IPc65G8f/3q
-         XhM7lPdiTiOIGQzSqTPPjBMdt2vqLiOVKvTX0GotIwtWCFvjMx2ycjLyo3fQoIXIAaUr
-         GITAmzcs+XUa0myy5qXLVK5CeA6noSfg73CtI0dv+Aux4Foywqkvm2e1i5KkgKyY6ng6
-         JujhRX8imve7o7BVK5NcWiYKKOf9PkiDklE4FReoCAm7lSTDYp9cD5py7X18wZ6vU0+u
-         iMzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722488460; x=1723093260;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=GjoERFKejGpS4usQM9OjkSeO52H+0Hj79NteoX98Mb4=;
-        b=XI5CYvQMiMgEsLMpfa/l19lDBGT4hPtCL6uVd8IWtRkIgMHfuGyJ1czrz7Hjhn0uLR
-         HgUYa9jOf3fIdFWOrOIW1QvioDRFzuIywsqooeXK8zBW3bIaMkoZHTg16QMKMnG/UOyS
-         dyExhcQrnnBU8NAoRYMGzEVY+ajbhw0es1CCVG+ac4/9nLvxTWrtKW+RGuV5vMZ9oQmB
-         lnRvE4eionpVZaZE0i0MBXDkzsAxJ+3v/18rEOjmvkVSGW5QJO2J0yY41uji6D9Zjstc
-         RoBRQvYnluaXNwyymOqFp65tqwRkXUrNh7/oIDvlG688Bykyn6rjbuNTKrz1xcezMIzL
-         EPUA==
-X-Forwarded-Encrypted: i=1; AJvYcCURS+A5+LJW458m7PRA5F8hlyGY+dGZ3u6kv0lM/oWZc8KPHx2q2RvKQPGdxx6k0dNfKWtVvsSv89OKI0mgdKVi6x36
-X-Gm-Message-State: AOJu0Yyn01iC6MTLmiez0aoBRfUkIyhhHiJ9Is1tX9yTPZG7Al0KbBmA
-	y06tT5Zn/oVAH7HoBmF+wJlNKthaQJYB9xYLXKfR86y7L3Y7Xzy3F6CjwlBEpkUEYcxfHY4BSbK
-	uVrmqmw==
-X-Google-Smtp-Source: AGHT+IGH2B5hZj0CoAd0yBCiQG/xuC2VJX4+PA9cCxAa4A9gXQ/fi05isczh9OmtU5VnOqVQD7tgqygc9Fct
-X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a63:2543:0:b0:7a1:1324:6294 with SMTP id
- 41be03b00d2f7-7b6362e5872mr2479a12.8.1722488459548; Wed, 31 Jul 2024 22:00:59
- -0700 (PDT)
-Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Thu,  1 Aug 2024 04:59:07 +0000
-In-Reply-To: <20240801045907.4010984-1-mizhang@google.com>
+	s=arc-20240116; t=1722495939; c=relaxed/simple;
+	bh=XraUQjCtFf8ztpF2D3fU8kOVCXFn67HeKZIDZGXiLIE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FNiDYjtMiXvcZzwPxTlyqI0ATcJ4cjooEQO9I4R3iHNRmHqy7ELj7nd1RUuZ5uJE4Ut5TNhP+ZSNAUvkot5Odsx1bpF3BHonSCjKb1q+uZsqrC9d9jXqbI0L8FXsPBxZRagu/WF09V1hKRwI0Y5tMc97vz7fh3Z379z8LxaNVuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jaLDPIXV; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47150EfY027967;
+	Thu, 1 Aug 2024 07:05:33 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	OKGrkHEK7wXuO+ka2Pne/x8eBnaRNHWYgDurxw264VQ=; b=jaLDPIXVC16ZRKg5
+	Xj/zlhoogDmwL+6AHs49xPrXW349DSh5+7Afd9ozr/fVJ0sezO8WbbGZvg3ZeH/b
+	WlZ8Ib3aiHSBv3mqQdSq4eWFTp0eTvzslNT2Ce/TyWO8l9104qg2TMxxjLPSwnMX
+	30KtMtu1wjyWbt192uwrJYDMkKVS39d3s7EWSJlbI8FSb7SWj3IrifebfAVifMXg
+	SEi4iX52ZtfWpXwgayu0zY8TEmI0RePT1ccCEPZNM2gnFK6WOBSyRK7G9B9r0I7x
+	t5Hdsb1W7RB3MkDUtCQzIt+M7jSEViZyw0XLtw3tuZfRIOY7xHib9vrbhGfmCM7G
+	pAvK7w==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40qx3cs0y2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 07:05:33 +0000 (GMT)
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47175XrW020494;
+	Thu, 1 Aug 2024 07:05:33 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40qx3cs0y0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 07:05:32 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47146p28029118;
+	Thu, 1 Aug 2024 07:05:31 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40nbm10gxb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 07:05:31 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47175Psk30671566
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 1 Aug 2024 07:05:27 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9F39720040;
+	Thu,  1 Aug 2024 07:05:25 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1844320043;
+	Thu,  1 Aug 2024 07:05:25 +0000 (GMT)
+Received: from darkmoore (unknown [9.179.23.97])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu,  1 Aug 2024 07:05:25 +0000 (GMT)
+Date: Thu, 1 Aug 2024 09:05:22 +0200
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah
+ Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand
+ <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: Re: [PATCH v3 06/10] selftests: kvm: s390: Add VM run test case
+Message-ID: <20240801090522.1e92849e.schlameuss@linux.ibm.com>
+In-Reply-To: <59ab0ce7-9434-4f99-9fb5-dcf6bf90fb2f@linux.ibm.com>
+References: <20240730072413.143556-1-schlameuss@linux.ibm.com>
+	<20240730072413.143556-7-schlameuss@linux.ibm.com>
+	<59ab0ce7-9434-4f99-9fb5-dcf6bf90fb2f@linux.ibm.com>
+Organization: IBM
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240801045907.4010984-1-mizhang@google.com>
-X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240801045907.4010984-59-mizhang@google.com>
-Subject: [RFC PATCH v3 58/58] perf/x86/amd: Support PERF_PMU_CAP_PASSTHROUGH_VPMU
- for AMD host
-From: Mingwei Zhang <mizhang@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
-	Kan Liang <kan.liang@intel.com>, Zhenyu Wang <zhenyuw@linux.intel.com>, 
-	Manali Shukla <manali.shukla@amd.com>, Sandipan Das <sandipan.das@amd.com>
-Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>, 
-	Ian Rogers <irogers@google.com>, Namhyung Kim <namhyung@kernel.org>, 
-	Mingwei Zhang <mizhang@google.com>, gce-passthrou-pmu-dev@google.com, 
-	Samantha Alt <samantha.alt@intel.com>, Zhiyuan Lv <zhiyuan.lv@intel.com>, 
-	Yanfei Xu <yanfei.xu@intel.com>, Like Xu <like.xu.linux@gmail.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Raghavendra Rao Ananta <rananta@google.com>, kvm@vger.kernel.org, 
-	linux-perf-users@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: WB_bdQYMj_kh5daxP94B1Izq_Nlci7am
+X-Proofpoint-ORIG-GUID: psQ76GLVwQfEveDoxHT0awHRGskNwHkk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-01_04,2024-07-31_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
+ mlxscore=0 lowpriorityscore=0 clxscore=1015 impostorscore=0 suspectscore=0
+ mlxlogscore=999 malwarescore=0 phishscore=0 spamscore=0 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408010038
 
-From: Sandipan Das <sandipan.das@amd.com>
+On Wed, 31 Jul 2024 16:37:19 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
 
-Apply the PERF_PMU_CAP_PASSTHROUGH_VPMU flag for version 2 and later
-implementations of the core PMU. Aside from having Global Control and
-Status registers, virtualizing the PMU using the passthrough model
-requires an interface to set or clear the overflow bits in the Global
-Status MSRs while restoring or saving the PMU context of a vCPU.
+> On 7/30/24 9:24 AM, Christoph Schlameuss wrote:
+> > Add test case running code interacting with registers within a
+> > ucontrol VM.
+> > 
+> > * Add uc_gprs test case
+> > 
+> > The test uses the same VM setup using the fixture and debug macros
+> > introduced in earlier patches in this series.
+> > 
+> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> > ---
+> >   .../selftests/kvm/s390x/ucontrol_test.c       | 126 ++++++++++++++++++
+> >   1 file changed, 126 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > index 029233374465..817b1e08559c 100644
+> > --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > @@ -41,6 +41,23 @@ void require_ucontrol_admin(void)
+> >   	TEST_REQUIRE(kvm_has_cap(KVM_CAP_S390_UCONTROL));
+> >   }  
+> [...]
+> > +/* verify SIEIC exit
+> > + * * reset stop requests
+> > + * * fail on codes not expected in the test cases
+> > + */
+> > +static bool uc_handle_sieic(FIXTURE_DATA(uc_kvm) * self)
+> > +{
+> > +	struct kvm_s390_sie_block *sie_block = self->sie_block;
+> > +	struct kvm_run *run = self->run;
+> > +
+> > +	/* check SIE interception code */
+> > +	pr_info("sieic: 0x%2x 0x%4x 0x%4x\n",  
+> 
+> I don't think there should be a space before the 4:
+> sieic: 0x 4 0x8300 0x440000
+> 
+> We can automatically add in the missing 0
+> 0x%02x
+> 
 
-PerfMonV2-capable hardware has additional MSRs for this purpose namely,
-PerfCntrGlobalStatusSet and PerfCntrGlobalStatusClr, thereby making it
-suitable for use with passthrough PMU.
+At some point I considered that easier to read without the leading
+zeroes, but even that is not even true for me any more. I will change
+that to "sieic: 0x%.2x 0x%.4x 0x%.4x\n".
 
-Signed-off-by: Sandipan Das <sandipan.das@amd.com>
-Signed-off-by: Mingwei Zhang <mizhang@google.com>
----
- arch/x86/events/amd/core.c | 2 ++
- 1 file changed, 2 insertions(+)
+> > +		run->s390_sieic.icptcode,
+> > +		run->s390_sieic.ipa,
+> > +		run->s390_sieic.ipb);
+> > +	switch (run->s390_sieic.icptcode) {
+> > +	case ICPT_STOP:
+> > +		/* stopped via sie V P --> ignore */
+> > +		/* reset stop request */
+> > +		sie_block->cpuflags = sie_block->cpuflags & ~CPUSTAT_STOP_INT;
+> > +		pr_info("sie V P - cleared %.4x\n", sie_block->cpuflags);
+> > +		break;  
+> 
+> With the added code that removes the P bit this shouldn't be called 
+> anymore, no?
+> 
 
-diff --git a/arch/x86/events/amd/core.c b/arch/x86/events/amd/core.c
-index 1fc4ce44e743..09f61821029f 100644
---- a/arch/x86/events/amd/core.c
-+++ b/arch/x86/events/amd/core.c
-@@ -1426,6 +1426,8 @@ static int __init amd_core_pmu_init(void)
- 
- 		amd_pmu_global_cntr_mask = (1ULL << x86_pmu.num_counters) - 1;
- 
-+		x86_get_pmu(smp_processor_id())->capabilities |= PERF_PMU_CAP_PASSTHROUGH_VPMU;
-+
- 		/* Update PMC handling functions */
- 		x86_pmu.enable_all = amd_pmu_v2_enable_all;
- 		x86_pmu.disable_all = amd_pmu_v2_disable_all;
--- 
-2.46.0.rc1.232.g9752f9e123-goog
+Yes, you are right this is no longer needed. And I will remove it.
+
+> > +	case ICPT_INST:
+> > +		/* end execution in caller on intercepted instruction */
+> > +		return false;
+> > +	default:
+> > +		TEST_FAIL("UNEXPECTED SIEIC CODE %d", run->s390_sieic.icptcode);
+> > +	}
+> > +	return true;
+> > +}  
+> 
 
 
