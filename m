@@ -1,148 +1,212 @@
-Return-Path: <kvm+bounces-22978-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22979-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 909A19452A2
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 20:15:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CA209452A7
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 20:17:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 33BB51F24869
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 18:15:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FC171C20B78
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 18:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4F151487E2;
-	Thu,  1 Aug 2024 18:15:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DF214374D;
+	Thu,  1 Aug 2024 18:17:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ibjTmkfO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bx17xFoF"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F0DC13C901
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 18:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722853A8F7
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 18:17:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722536141; cv=none; b=S2LxMYpbfidYkz+Asx1yFlzUq4LnhU5+nEBvnkpk8+WbQmatPSjeuZhgL/06W1pcA7liqvStedh1gJ3bNE7z1X8CcGJqJr8UJVxGe79culLjIzU//uAO9GzoqX17SU8jWqH3A0cCow03Lc4vTjeBn+fxe+vN6mafzo2oWKtEBKw=
+	t=1722536228; cv=none; b=HTuuSihtmruZcoOISuYiSk7HVN9fN27VzjubzZbFHcHouJMJZB0Qi1wUB12v2UYTiCVBjqSBZ8P94gPCrV2ZrORkhyQzQEHRlRaeqmuIJej1DjAeyNVAwNKtFCiEdnmKFtNAj/5z1Nu3WW5KBRg2MfQC59WIpNk28wuDF+l4SnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722536141; c=relaxed/simple;
-	bh=SUfyZKUo0IFCp9KDhlQwd3l6b/z5WFA0jaDZUeAQ/tg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UIz/UxCLz+uDS7P2vt9UQ7Q9TIurs9UcMd8gwmsZ3ZZeV440byYdDlhTUTt+4lqXowUAUt8/yYdNPqvkosuEie07DAUw/WjWHcTaHb/MnuJHCbEJ2nWGB8H6JK4iOiCwvgjzHxapq86TzmBsz3MKOL8DgX50e4H17MLHaEpFH8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ibjTmkfO; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1722536228; c=relaxed/simple;
+	bh=rmRX+y/Ej1+8Rcrosw+lzasPZb6Wp1vWqYKcskl81vk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=m8vgHGZ8Almm/34qFm6qvDXTP+8PDYhrU+EOcALo+YOKTdi/O9yk3y4tDd6AgIQ5fLWeASsOSTSflqlX93PF45XBOAhQz++EyRj7vkwyTUVdnf5vMWrl2GNMFrG2P4+r+SXu+NW8CX83UmAWY8m2KtSnrsb8p9fn3Lr8GNm16H8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bx17xFoF; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722536137;
+	s=mimecast20190719; t=1722536225;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UaZOROEvjpdbqu1dopLC2Lkrj6Dr9/VPZUA+DhTI8M4=;
-	b=ibjTmkfO2XoxUoWWakcEr02B04XguFk2Mb3hZX6pbzVaf0XCRUHmbAFsJcVj/l+yXWjUsL
-	Ef7DH43XN8rdynqLbSg474Xal7dBverwkSY5djAZfNTfU5oG8FofMqM9d0e7JOrCewjUdW
-	QvigC+u/TODJl9DFfHnU9oB9p5evLYI=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=TVHOrpYoPcJT+tNfiWQq/a0OCpSzgRKdA7SS9IhH11w=;
+	b=bx17xFoFv5E+vLDVeExPpaLJXCVfFAUG0fZHnUlDfEA60g4Pq0QmcEKog6g/5EdcbUTZgi
+	LDC0B/nkjdowPLa1p5w0rxo9kvKT7eEhSOdREcPI2pkC8av8zStsaF0MWgv6vbAawO9xKh
+	h98E/8BD10ax6eB2edhJeb0ksizH9nk=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-438-C1Y6RfQJNZSZ820fa7dkIw-1; Thu, 01 Aug 2024 14:15:36 -0400
-X-MC-Unique: C1Y6RfQJNZSZ820fa7dkIw-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-52efd629749so9139470e87.2
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 11:15:36 -0700 (PDT)
+ us-mta-413-TyEPj2GjOPuLYmXBjTtW9g-1; Thu, 01 Aug 2024 14:17:00 -0400
+X-MC-Unique: TyEPj2GjOPuLYmXBjTtW9g-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-81f93601444so1027425839f.2
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 11:17:00 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722536135; x=1723140935;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1722536220; x=1723141020;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UaZOROEvjpdbqu1dopLC2Lkrj6Dr9/VPZUA+DhTI8M4=;
-        b=N2cM4GEHZlRT1/yPYG7wtfAkKewc89Ko0pZmyfECWkgQMFQEJvhcSaCsGM9duRkOig
-         onkBgivrNVSJgr71GZAWqWM0uS5jGuF0RcoCOU944qYoG7YQyApzbRyig2apGX2E7M1A
-         uWisgLb+FsvEJPWkItJLhZzb8pcipf4dPy9r+jp/fqyGj/UMLYKatkORkiIAD8FUoMzl
-         tPGtcmrq2J8vBDdiE3tkfXcb3q8Xqzx2b0wncVpgEKnDYsY8J7ynk4zEDFQthqFC73SE
-         1wyMeFfuMXulGYwG3qUUqcufnnUxD8FVeO+TmcQeS92gwQfwM09XmAV3IbvIgrSIR+cf
-         h0YQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWx08xiZrEvR/Ph63pjn3ZnqklswIpPnEamiW4fqzPZqrz5iCztcTeUsNulD0Z+PNSZut/vMyIqFohJO8yagxXw9Gun
-X-Gm-Message-State: AOJu0YzECR4vlaXRHOUL2BMF5Q/1cGry1LZhyLBnoIRuukoJG+H6c10t
-	qWE1AReEqfXA8xFm3eA7hNf6nW4VcH0PIFeachRuGHSDFolG/rnoLSpbWB28upqozeqvdrVtBQI
-	92S0HqBYvLoZC1DB/hZlg1dXXkHr8SAtns82iecFvfQQdXMqhsQU+ZQBHrVWEF61Iv8NRWUTAiG
-	LvHiHw0kEbchWOCLpmEeiY5/Wp
-X-Received: by 2002:a2e:874b:0:b0:2ef:29b7:18a7 with SMTP id 38308e7fff4ca-2f15ab0c224mr8027081fa.37.1722536134885;
-        Thu, 01 Aug 2024 11:15:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEW/QthBnS2n2JpnEiBTz7UDN3Rn0ZpSHt4zKv0qUnmJfmwCaik8m91bLxVWR1bJoJl2RmwJ89dnkiDtZdyq7c=
-X-Received: by 2002:a2e:874b:0:b0:2ef:29b7:18a7 with SMTP id
- 38308e7fff4ca-2f15ab0c224mr8026601fa.37.1722536134319; Thu, 01 Aug 2024
- 11:15:34 -0700 (PDT)
+        bh=TVHOrpYoPcJT+tNfiWQq/a0OCpSzgRKdA7SS9IhH11w=;
+        b=OdMnCm4mm4Na8pmapRiDwuTQcLKaFBYxxAZwGJhZid1GJx8I+Qm3sdrs8s9jZaHqLR
+         AbOe55S+jxT6cQWYeVwwwzwt0khHV5mupgXtuts5Z+ix3Uw3E4W8Mid16b00y8Q48yKE
+         5+a0eBN51x4GDIq3H51+xv9cdJ1uX2Iki/aCkq1GjDheVht6mCpKuzyDdcSDzUetpeGQ
+         y4/QMpXlKG7UWR9SCaM8987d1ZHeViQCxl18CjTscfg2CH50EBioRD9F4Dc3rWjH5Y9n
+         e3uJkHjcDk285SPqzRUMaSQFY0izrpVEWzOQxiGVyLkppoJE9sNF/Jn2aS9vPAf81F6O
+         XpkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVOx+9Adn/e77VPlipeAmQ+VsfMJ5J+EDA1fDcyg6B2QBRoyCZ7Dp7LavKGdwH8UAkmWueD6ndX/smTNDuo9HNqXqQC
+X-Gm-Message-State: AOJu0YzdxwS8t0EDPMpmAr5XTAYJ19UzivgbeJShiyQoLM4Jaswt9MbI
+	YzGXrgbyk1W/NUi1E3WyxBSux0Bh7ADQ2JaDg7kFUaHtGcxVub1xHflRK4rO/FpnSNjhbBkSP+A
+	B7r2d06sdK8r3R7gOaH9tYMGvxO3t2TlALQj7MliE5xQwM4kg4w==
+X-Received: by 2002:a05:6602:2d8f:b0:81f:9de7:57ee with SMTP id ca18e2360f4ac-81fd43650c6mr135509539f.7.1722536220075;
+        Thu, 01 Aug 2024 11:17:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGJ9IaNXbuUxh4C2kt23/sZXAfuCKTZ/vYjOkJCL7jwjave4qhFmlrQnXt4jdUrXG0cyUUh3Q==
+X-Received: by 2002:a05:6602:2d8f:b0:81f:9de7:57ee with SMTP id ca18e2360f4ac-81fd43650c6mr135506339f.7.1722536219373;
+        Thu, 01 Aug 2024 11:16:59 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4c8d6988402sm46102173.9.2024.08.01.11.16.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 11:16:58 -0700 (PDT)
+Date: Thu, 1 Aug 2024 12:16:57 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org, Keith Busch
+ <kbusch@kernel.org>
+Subject: Re: [PATCH rfc] vfio-pci: Allow write combining
+Message-ID: <20240801121657.20f0fdb4.alex.williamson@redhat.com>
+In-Reply-To: <20240801175339.GB4830@ziepe.ca>
+References: <20240731155352.3973857-1-kbusch@meta.com>
+	<20240801141914.GC3030761@ziepe.ca>
+	<20240801094123.4eda2e91.alex.williamson@redhat.com>
+	<20240801161130.GD3030761@ziepe.ca>
+	<20240801105218.7c297f9a.alex.williamson@redhat.com>
+	<20240801171355.GA4830@ziepe.ca>
+	<20240801113344.1d5b5bfe.alex.williamson@redhat.com>
+	<20240801175339.GB4830@ziepe.ca>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240501085210.2213060-3-michael.roth@amd.com> <20240801173955.1975034-1-ackerleytng@google.com>
-In-Reply-To: <20240801173955.1975034-1-ackerleytng@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Date: Thu, 1 Aug 2024 20:15:22 +0200
-Message-ID: <CABgObfZbS7LsKM_w2ZSpb82oBAHF=pJfVJ+45k7=vVVWHK5Y6A@mail.gmail.com>
-Subject: Re: [PATCH] Fixes: f32fb32820b1 ("KVM: x86: Add hook for determining
- max NPT mapping level")
-To: Ackerley Tng <ackerleytng@google.com>
-Cc: michael.roth@amd.com, ak@linux.intel.com, alpergun@google.com, 
-	ardb@kernel.org, ashish.kalra@amd.com, bp@alien8.de, 
-	dave.hansen@linux.intel.com, dovmurik@linux.ibm.com, hpa@zytor.com, 
-	jarkko@kernel.org, jmattson@google.com, vannapurve@google.com, 
-	erdemaktas@google.com, jroedel@suse.de, kirill@shutemov.name, 
-	kvm@vger.kernel.org, liam.merwick@oracle.com, linux-coco@lists.linux.dev, 
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, luto@kernel.org, mingo@redhat.com, 
-	nikunj.dadhania@amd.com, pankaj.gupta@amd.com, peterz@infradead.org, 
-	pgonda@google.com, rientjes@google.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, seanjc@google.com, slp@redhat.com, 
-	srinivas.pandruvada@linux.intel.com, tglx@linutronix.de, 
-	thomas.lendacky@amd.com, tobin@ibm.com, tony.luck@intel.com, vbabka@suse.cz, 
-	vkuznets@redhat.com, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 1, 2024 at 7:40=E2=80=AFPM Ackerley Tng <ackerleytng@google.com=
-> wrote:
->
-> The `if (req_max_level)` test was meant ignore req_max_level if
-> PG_LEVEL_NONE was returned. Hence, this function should return
-> max_level instead of the ignored req_max_level.
->
-> Signed-off-by: Ackerley Tng <ackerleytng@google.com>
-> Change-Id: I403898aacc379ed98ba5caa41c9f1c52f277adc2
+On Thu, 1 Aug 2024 14:53:39 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-It's worth pointing out that this is only a latent issue for now,
-since guest_memfd does not support large pages ( __kvm_gmem_get_pfn
-always returns 0).
+> On Thu, Aug 01, 2024 at 11:33:44AM -0600, Alex Williamson wrote:
+> > On Thu, 1 Aug 2024 14:13:55 -0300
+> > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >   
+> > > On Thu, Aug 01, 2024 at 10:52:18AM -0600, Alex Williamson wrote:  
+> > > > > > vfio_region_info.flags in not currently tested for input therefore this
+> > > > > > proposal could lead to unexpected behavior for a caller that doesn't
+> > > > > > currently zero this field.  It's intended as an output-only field.      
+> > > > > 
+> > > > > Perhaps a REGION_INFO2 then?
+> > > > > 
+> > > > > I still think per-request is better than a global flag    
+> > > > 
+> > > > I don't understand why we'd need a REGION_INFO2, we already have
+> > > > support for defining new regions.    
+> > > 
+> > > It is not a new region, it is a modified mmap behavior for an existing
+> > > region.  
+> > 
+> > If we're returning a different offset into the vfio device file from
+> > which to get a WC mapping, what's the difference?   
+> 
+> I think it is a pretty big difference.. The offset is just a "mmap
+> cookie", it doesn't have to be 1:1 with the idea of a region.
+> 
+> > A vfio "region" is
+> > describing a region or range of the vfio device file descriptor.  
+> 
+> I'm thinking a region is describing an area of memory that is
+> available in the VFIO device. The offset output is just a "mmap
+> cookie" to tell userspace how to mmap it. Having N mmap cookies for 1
+> region is OK.
 
-Queued with a small note in the commit message and fixed subject.
+Is an "mmap cookie" an offset into the vfio device file where mmap'ing
+that offset results in a WC mapping to a specific device resource?
+Isn't that just a region that doesn't have an index or supporting
+infrastructure?
+ 
+> > > > We'd populate these new regions only for BARs that support prefetch and
+> > > > mmap     
+> > >
+> > > That's not the point, prefetch has nothing to do with write combining.  
+> > 
+> > I was following the original proposal in this thread that added a
+> > prefetch flag to REGION_INFO and allowed enabling WC only for
+> > IORESOURCE_PREFETCH.  
+> 
+> Oh, I didn't notice that, it shouldn't do that. Returning the
+> VFIO_REGION_FLAG_WRITE_COMBINE makes sense, but it shouldn't effect
+> what the kernel allows.
+> 
+> > > Doubling all the region indexes just for WC does not seem like a good
+> > > idea to me...  
+> > 
+> > Is the difference you see that in the REQ_WC proposal the user is
+> > effectively asking vfio to pop a WC region into existence vs here
+> > they're pre-populated?   
+> 
+> ?? This didn't create more regions AFAICT. It created a new global
+> 
+> +	bool			bar_write_combine[PCI_STD_NUM_BARS];
+> 
+> Which controls what NC/WC the mmap creates when called:
+> 
+> +	if (vdev->bar_write_combine[index])
+> +		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+> +	else
+> +		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> 
+> You get the same output from REGION_INFO, same number of regions.
 
-Thanks,
+It was your proposal that introduced REQ_WC, this is Keith's original
+proposal.  I'm equating a REQ_WC request inventing an "mmap cookie" as
+effectively the same as bringing a lightweight region into existence
+because it defines a section of the vfio device file to have specific
+mmap semantics.
 
-Paolo
+> It was the other proposal from long ago that created more regions.
+> 
+> This is what I like and would prefer to stick with. REGION_INFO
+> doesn't really change, we don't have two regions refering to the same
+> physical memory, and we find some way to request NC/WC of a region at
+> mmap time.
 
+"At mmap time" means that something in the vma needs to describe to us
+to use the WC semantics, where I think you're proposing that the "mmap
+cookie" provides a specific vm_pgoff which we already use to determine
+the region index.  So whether or not we want to call this a region,
+it's effectively in the same address space as regions.  Therefore "mmap
+cookie" ~= "region offset".
 
-> ---
->  arch/x86/kvm/mmu/mmu.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 901be9e420a4..e6b73774645d 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -4335,7 +4335,7 @@ static u8 kvm_max_private_mapping_level(struct kvm =
-*kvm, kvm_pfn_t pfn,
->         if (req_max_level)
->                 max_level =3D min(max_level, req_max_level);
->
-> -       return req_max_level;
-> +       return max_level;
->  }
->
->  static int kvm_faultin_pfn_private(struct kvm_vcpu *vcpu,
-> --
-> 2.46.0.rc2.264.g509ed76dc8-goog
->
+> A global is a neat trick, but it would be cleaner to request
+> properties of the mmap when the "mmap cookie" is obtained.
+> 
+> > At the limit they're the same.  We could use a
+> > DEVICE_FEATURE to ask vfio to selectively populate WC regions after
+> > which the user could re-enumerate additional regions, or in fact to
+> > switch on WC for a given region if we want to go that route.  Thanks,  
+> 
+> This is still adding more regions and reporting more stuff from
+> REGION_INFO, that is what I would like to avoid.
+
+Why?  This reminds me of hidden registers outside of capability chains
+in PCI config space.  Thanks,
+
+Alex
 
 
