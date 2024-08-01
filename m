@@ -1,169 +1,144 @@
-Return-Path: <kvm+bounces-22825-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22826-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5257943FC9
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 03:51:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDE3C943FD8
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 03:53:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 147C01C21330
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 01:51:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E26391C22DD0
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 01:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72A02C6B7;
-	Thu,  1 Aug 2024 00:48:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F267A12E1DB;
+	Thu,  1 Aug 2024 01:02:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eUNDpcTt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K67U6rB8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E992D7A8
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 00:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E7D91CFB6
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 01:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722473293; cv=none; b=VRy/gFPcZrW5wAlEPrzVAY4ZSZx9aexqzM7ujH0FvChYvJ7zEuoioKCCw1Hjf91Ydy0yRg1j/GQ8vqsseQZNpC4RUAZwN10VhKE1J4AHDERa4XOgynRlU4WnaQRtX97MaXuup5ugJFLSZ7dL8qgdjvNk4zhFbv+1BGPfZftiKCo=
+	t=1722474173; cv=none; b=NiRuu1Vv9hYfMwJAgEjur64Icst1HNIZakJ9OAzSwT+W6dUclpXKe5aM8BnumDEOUpZB4rTOAgZCptJ/puLPlLNUEPabisfNTqV0Oc6p/4PALFNXF0RIFbUt9cjQ48vT82gHPB2pijfX/xm9s3BOr31I4HlaRqhNNDWsKtw4JtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722473293; c=relaxed/simple;
-	bh=5V+7pkjfE2XZiiuBjUTWzLnRrMoiivIoOcezkBx35zY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=azpMJndknPZdcHctglsW3TjpWSLOpr418b5ndISXiHlOrpYnKgm0vMlCKrZIPKdtizPP8JmXkksDTl256sx4UCkP35i3F8mS5Lzu7WoSr4KjSlaM1pxGLhueDKONR6BoMQsy1900qL95mIHvyxP/FemlpR1ThvS84FQDD4uNSZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eUNDpcTt; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1722474173; c=relaxed/simple;
+	bh=trfOjqROMQExmdAYqvVqzCEWjlvRDVsttppf2bDr/Uo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KWGKP59324uZYJk9fPA7ugZLSB/v0kCS4p27ZyHU7/Ian2nqt2RX2cvxWUE27lScY/6D8p69KAZBf9o0PD4JuNR+q+Pb+j9qpYYPyNOBWZxOJpkDThvf2+tz0Efgzooq2WhNp+yhN9/XRCmv4gUPFmMgO+6IaIv/BPdXQVc68u0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K67U6rB8; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722473290;
+	s=mimecast20190719; t=1722474169;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=RFQclzW/vuWIgsBJAJ96++9Y/pmxYncNjR7KuXyfSF4=;
-	b=eUNDpcTtfdwY8MTSrIy3vXW2Lczd2/chI99X2at6Fcg0G9aqaw1r/bqccg66dtk1+yMXMd
-	XqyCoZONt13+btAqkeu4i4RHtkJVP9IfZPoMvprSTrkKW+pvP3sqWHxW2cJhUIVOp5dMIk
-	n2G30RlgQpqrv/lvdyC1KQeIVEPoWFs=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=2EPtgXVG1DmXN8mUPqzXK4hPCx8jDKiZuZxR6dbrnTQ=;
+	b=K67U6rB8qJl5o215w6zBP53N78+ecuQTEfIsQt/3PKBtmQFBc1X76wpZGgayD2sSAmIi+/
+	luTSnAxP5MM4+QeGzpeflLHmpj3uahsmLpEfnijqfrpZp+I7YHSag+WxPhTqmFpw+9rwX5
+	VYPtidLgDQ8mzdhzAOktMTkUG3y8fZ8=
+Received: from mail-yw1-f200.google.com (mail-yw1-f200.google.com
+ [209.85.128.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-690-GI0obu9gMEaKa7RW5i4Qew-1; Wed, 31 Jul 2024 20:48:09 -0400
-X-MC-Unique: GI0obu9gMEaKa7RW5i4Qew-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7a1d0b29198so689811085a.2
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 17:48:09 -0700 (PDT)
+ us-mta-7-B6U0GAdJO4GqUKcmqOId0g-1; Wed, 31 Jul 2024 21:02:48 -0400
+X-MC-Unique: B6U0GAdJO4GqUKcmqOId0g-1
+Received: by mail-yw1-f200.google.com with SMTP id 00721157ae682-6688c44060fso128546207b3.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 18:02:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722473289; x=1723078089;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RFQclzW/vuWIgsBJAJ96++9Y/pmxYncNjR7KuXyfSF4=;
-        b=caNpv/Cbm42ccZMt3WR5Z9xEZJoLo9QXXE/NfS6gpV08wrmfBFf6xFE0vznj0JxPgi
-         hzsR33AwRyJkLNeuLlh/bzZMzvtTgpgsy+cc5TFU5sriOOq8ihJT+1bZ7F7yOOTOuSYd
-         blTfWndkaHKuw8ysvWUDqATIhm/elxO4DPwQ5hEyDV7BAXNQMi6DSoBKw0MF4KLQbuHr
-         Zw/lCrg3Oib2QbdAMiYjYukeYanKm5qvg+v883cQoeoDLXmCE+DP2xDzE2Maq2XJn719
-         0+psAmR0UYj27t41OauR2VG6dreCXrMkf5RctVZpUFCCZNLGCyGMROZzuukM7hLinbam
-         4wSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWAKN2wtljYru9JewygoOPHtvY3Ei+8gDX93hXCujYYlxzlyayHAOBs12apdhJng6VvEuavjhbi4gU1s1njWELkY1bG
-X-Gm-Message-State: AOJu0Yz8mTjMTuBazVECcce63+f3x5HkoeMZfw8Qp6JwiujnvLiWKYMU
-	T4XB0W+A5XMSql5vcOz1EceCmP8IFhbIZ3+ZeCBgt79ay8nJSmHfgIvJOO2Gvt6iR3kv+LDKp+a
-	3PRu83XX5VwJ2Uyp7CXG2fypj96AxNzoVKg6W/vebXsys9ktbow==
-X-Received: by 2002:a05:620a:24c1:b0:79f:1e1:faa7 with SMTP id af79cd13be357-7a30c654a9emr124840985a.17.1722473288671;
-        Wed, 31 Jul 2024 17:48:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHrkwsj+j0FIIhACoKbuelZI3ds0w5Xqfu2eQJH7G5c6HZxlsFtxr6D1099YDkyRiNMJSdm4g==
-X-Received: by 2002:a05:620a:24c1:b0:79f:1e1:faa7 with SMTP id af79cd13be357-7a30c654a9emr124838585a.17.1722473288292;
-        Wed, 31 Jul 2024 17:48:08 -0700 (PDT)
-Received: from [192.168.5.27] ([172.56.119.20])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1e4292ae6sm628776985a.74.2024.07.31.17.48.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Jul 2024 17:48:07 -0700 (PDT)
-Message-ID: <2331dba4-4366-48fd-baaf-a5579df8ab59@redhat.com>
-Date: Wed, 31 Jul 2024 20:48:05 -0400
+        d=1e100.net; s=20230601; t=1722474168; x=1723078968;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2EPtgXVG1DmXN8mUPqzXK4hPCx8jDKiZuZxR6dbrnTQ=;
+        b=lUmprxCPdKtllfa5UtkEBTRUDdH/TkTos3ubbjCvVjZzr0YSBJCsLJOi/JynjlPIr4
+         FyLyPN8/8GjyS0edGHcDmQHg38bdY4EJszGYIoMaAK10vnetWyqN10mdxZmUC6pCKh2U
+         NkvZkNScwtQjDvZBIOuKSHSFpxhx4+K39sijwhEk3kRX3Z9hGpyA4cdxbcGnbu1ieZDh
+         jSCrDFtL/WhDuqZkcfSqlVLVvo7Qah0vVAr7P88+Y1fAbLK23FoFs8DYYUhFZsFaa/op
+         JI+x9D25GjZ/PR42mWzcWlLn/PsHTlQMhj45B2IU7YUpxcxldSXrwfp/94oP7ReIqHMA
+         0Jtw==
+X-Forwarded-Encrypted: i=1; AJvYcCVVJea+++T8reTo6MrfABMLDpPc6uYHC8vtQO6zOTiiwGa/i8DhDkv3OunVX2oF+MwR7tgo1C2iZe2GXt4JQ2xKzIjC
+X-Gm-Message-State: AOJu0Yz8LRMffDE7uZurv8Syv6IgU0Z4hFFHfFNkkFRU2PNRm4Ps4+Kf
+	ihQPoX3pN4ZLJCeb6hlK1yuZTiibfYa0fAdfWrr13uXcq2fyNoB9iP25EUDJ1sM77/by8DnB6B5
+	0N11fA3CmjdKBrgvuXMEBitlMSzYDZrmbR+NS9YJE3PdhHw0XuJrXAP+zqtmnGG44vIpJb98E/d
+	zt7tFEcOJAZJt4bl3cru/7qT8D
+X-Received: by 2002:a0d:d2c2:0:b0:65f:7cee:43b with SMTP id 00721157ae682-6874c831fd1mr1432647b3.19.1722474167827;
+        Wed, 31 Jul 2024 18:02:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEkc15aDKVHH3uOKMYYIWFcMJ5yGLicXXFfZd+KYx38Ns7DB7mfW6sSOPgdc+j5g3qEXTbXjO95vBc0SsuX67E=
+X-Received: by 2002:a0d:d2c2:0:b0:65f:7cee:43b with SMTP id
+ 00721157ae682-6874c831fd1mr1432307b3.19.1722474167551; Wed, 31 Jul 2024
+ 18:02:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 12/13] Bump avocado to 103.0
-To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- qemu-devel@nongnu.org
-Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
- Beraldo Leal <bleal@redhat.com>,
- Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
- David Woodhouse <dwmw2@infradead.org>,
- Leif Lindholm <quic_llindhol@quicinc.com>,
- Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org,
- =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
- Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
- Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
-References: <20240726134438.14720-1-crosa@redhat.com>
- <20240726134438.14720-13-crosa@redhat.com>
- <2d85304c-ccec-43d1-8806-bdf7b861543d@linaro.org>
-Content-Language: en-US
+References: <20240726134438.14720-1-crosa@redhat.com> <20240726134438.14720-4-crosa@redhat.com>
+ <ZqdvR3UFBCAu8wiI@redhat.com>
+In-Reply-To: <ZqdvR3UFBCAu8wiI@redhat.com>
 From: Cleber Rosa <crosa@redhat.com>
-In-Reply-To: <2d85304c-ccec-43d1-8806-bdf7b861543d@linaro.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Date: Wed, 31 Jul 2024 21:02:36 -0400
+Message-ID: <CA+bd_6Lepg=uXs1NViYV5eZBGot2ZRAYUi-NDXwSBsdBk17LPA@mail.gmail.com>
+Subject: Re: [PATCH 03/13] tests/avocado/intel_iommu.py: increase timeout
+To: =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
+	Eric Auger <eric.auger@redhat.com>
+Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, 
+	Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>, 
+	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, David Woodhouse <dwmw2@infradead.org>, 
+	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Leif Lindholm <quic_llindhol@quicinc.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org, 
+	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, 
+	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org, 
+	Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Akihiko Odaki <akihiko.odaki@daynix.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-On 7/29/24 8:02 AM, Philippe Mathieu-Daudé wrote:
-> Does that restore feature parity for macOS developers? Because this
-> community has been left behind ignored for over 2 years and already
-> looked at alternatives for functional testing.
+On Mon, Jul 29, 2024 at 6:30=E2=80=AFAM Daniel P. Berrang=C3=A9 <berrange@r=
+edhat.com> wrote:
+>
+> On Fri, Jul 26, 2024 at 09:44:28AM -0400, Cleber Rosa wrote:
+> > Based on many runs, the average run time for these 4 tests is around
+> > 250 seconds, with 320 seconds being the ceiling.  In any way, the
+> > default 120 seconds timeout is inappropriate in my experience.
+> > Let's increase the timeout so these tests get a chance to completion.
+>
+> A high watermark of over 5 minutes is pretty long for a test.
 >
 
-Hi Phillipe,
+I agree.
 
+> Looking at the test I see it runs
+>
+>    self.ssh_command('dnf -y install numactl-devel')
+>
+> but then never actually uses the installed package.
+>
+> I expect that most of the wallclock time here is coming from having
+> dnf download all the repodata, 4 times over.
+>
 
-As early as Avocado 102.0,  macOS support is pretty complete. The exact 
-words on the release notes[1] are:
+Exactly.
 
+> If the intention was to test networking, then replace this with
+> something that doesn't have to download 100's of MB of data, then
+> see what kind of running time we get before increasing any timeout.
+>
+>
 
-"User of macOS will have a better experience when using Avocado. The 
-full set of Avocado’s selftests are now run under macOS on CI. Please be 
-advised that macOS is not currently supported at the same level of 
-Linux-based operating systems due to the lack of 
-contributors/maintainers with access to the needed hardware. If you are 
-a user/developer and are willing to contribute to this, please let the 
-Avocado team know."
+I was trying not to get in the way of the original test writer.
 
+Eric,
 
-When it comes to the lack of updates, that is a longer discussion 
-indeed.  When it comes to alternatives, I don't expect the QEMU project 
-to do anything else than what it's in its best interest. As late as this 
-can be, please take it for what it's worth.  If it does any good to 
-QEMU, please consider it.
+Are you OK with replacing this command for a simpler file transfer?
+Any suggestions?
 
-
-Best,
-
+Regards,
 - Cleber.
-
-
-[1] - https://avocado-framework.readthedocs.io/en/latest/releases/102_0.html
-
-
->> Reference: 
->> https://avocado-framework.readthedocs.io/en/103.0/releases/lts/103_0.html
->> Signed-off-by: Cleber Rosa <crosa@redhat.com>
->> ---
->>   pythondeps.toml | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/pythondeps.toml b/pythondeps.toml
->> index f6e590fdd8..175cf99241 100644
->> --- a/pythondeps.toml
->> +++ b/pythondeps.toml
->> @@ -30,5 +30,5 @@ sphinx_rtd_theme = { accepted = ">=0.5", installed 
->> = "1.1.1" }
->>   # Note that qemu.git/python/ is always implicitly installed.
->>   # Prefer an LTS version when updating the accepted versions of
->>   # avocado-framework, for example right now the limit is 92.x.
->> -avocado-framework = { accepted = "(>=88.1, <93.0)", installed = 
->> "88.1", canary = "avocado" }
->> +avocado-framework = { accepted = "(>=103.0, <104.0)", installed = 
->> "103.0", canary = "avocado" }
->>   pycdlib = { accepted = ">=1.11.0" }
->
 
 
