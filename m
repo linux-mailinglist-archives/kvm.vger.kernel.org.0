@@ -1,153 +1,108 @@
-Return-Path: <kvm+bounces-22996-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22997-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37B2B94547C
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 00:23:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F3C945498
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 00:44:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 590021C2303C
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 22:23:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43FDC28454E
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 22:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61B9014D2A8;
-	Thu,  1 Aug 2024 22:23:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEB114D296;
+	Thu,  1 Aug 2024 22:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="i34z4aBH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Lfo7KuAV"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C75D14B953
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 22:22:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F88F38DD6
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 22:44:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722550981; cv=none; b=G4iK5k7f7DWRBbcSwegZp7ZjyQOmnbG1nfzrawW7FFUS3Mu8zmoOHkCy+UzFD6su3fzBxk0WelcrrWhsz6Pe0wrdFnTaUyOL/gkd6GhGw7C2MHSC4dhwo/L7NRCFjSm6QAHVo94YBOud9+XASmpQyxrBui+lc71ot/Eb38mDPnE=
+	t=1722552245; cv=none; b=KKKlZUE/lTbeHD58C7Yl5/QR+GtI2POTjS3p3xSfg1DDsFPIUqud8nWMhakfUcBvI/th4yIFVqBnvmBnCzpAtCzHk5yrAOKMkuV3XyF6LUte5clFEwFFkUOk1RIJauKxYOsk+5hS2+sHeSg9OmeAjgtZAfyAsLfIpD39TYr+ZOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722550981; c=relaxed/simple;
-	bh=83y5jcISbGVgHhdSye9Ayo9+ylHkjQBs4zkhSX1JibY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CIjXf9WDcPNSfUEJE3eRey9LrLG2/LescfgbYtWUpiZLDAOmR7kWfcF34HcKaVu9tRrx/JkJsTfDOiMTK9Xfqe78007TF/JDHI8q9Wt75HhW3ON6JYpsMGYSS+PwnSaszpAPpfMmXt6wFnAdhWH1+1GEJ0I4FD0t8PUqHcK34a8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=i34z4aBH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722550979;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=acXEWndKlCVnwDNwF3qRu8zmTJbIkY9TPABZaKHwjrc=;
-	b=i34z4aBHQMuaFPIEZPR7LjW7CPd+7B33wIa7So6so6IPMiBKXU93buLRzJ283hGDZ69J+1
-	E+60RwKBnnAzk6mFLa/yl6vOP8GKmUDMEixo14mtHMn3+YUi48AsMP0kM/UEBhaX0CTzaM
-	/jYQrEsmL8gtwchL476U5cT5KVDczNc=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-619-6Su7PQkfMbmoExs75HI2uA-1; Thu, 01 Aug 2024 18:22:55 -0400
-X-MC-Unique: 6Su7PQkfMbmoExs75HI2uA-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7a1d3392009so52671985a.3
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 15:22:55 -0700 (PDT)
+	s=arc-20240116; t=1722552245; c=relaxed/simple;
+	bh=lq3VBorsI74MMj3Lqck3lrsi3fdGR/6G+iOUm2eJ8wc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gBrwBtLauGbDkIJIuYzt45ENTeKB5E+oOpp9aVnInpA446FfL3s/D3zujEdx8bhW/Xk8uPisu3FUUIEwu/fk73gKRvyRtcpZ7MFuLyWZKj55vNXOa+o1reL3/zqXjkqz84JqsqN5ar5WhcyCD7kFYzbusjcDfdcjDs0e72mTHjI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Lfo7KuAV; arc=none smtp.client-ip=209.85.210.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-70e9ea89b42so6743775b3a.3
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 15:44:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722552244; x=1723157044; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p85cwU83Btirpz320PiS8rUe0YP6eP6Qw8YmMGvdQno=;
+        b=Lfo7KuAVtk8v5trLNAAwaMual7t21JwO/W8EvOKU0ZqhtOygG0AUDcpCSM3HC7eesx
+         9oeyN1l6cjjUqIlTsXVIt9RBveR4Va0r6NaEj+VMXqdLisWKGlJsYbgrCgeUqMIWfzt1
+         vnt9dXXpVEt3/yjMiVQHjUXLQJerWv2YA2FqYdTY3AAEMSmsXm4Ar0ksVIKgbQ5/+8sh
+         BSJyfc+hiIHE+diwGIR3csT0a1WrbefL1hQGJBtgIZO/8fpC/g5bx56NUWetJqOp/GWe
+         YG9h+kGK6MkaOL1Zjl58JBgilVbOqydbpvitAQvN1pXIUOpGPIyqSejOUWDRXzmlvL1Z
+         g3mA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722550975; x=1723155775;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=acXEWndKlCVnwDNwF3qRu8zmTJbIkY9TPABZaKHwjrc=;
-        b=K2UElhWcT3BSZaBY4j8SQK+zZcAJjat8j7YB3+YD/eta4NQdPQSiOcl7A6x8nwt57e
-         jTt+HiFa8djtuvHONI9tvxbmugxRdrAOXwcgzl9Y9PTeArizHsYUB4lXuJtiSbQA+5jF
-         cU8q4oTBon8clYbk436mEPNWXqPqPg1uIENJQ0zcAhPu7eo4ez6aLIhsZkwQ8hHyFDVr
-         xFcnyuPHmxgxUF0eJxyUgfleXsHq7/sQA6MgcC0irFd7VqLrsWcuNo+nphQXKOgUFKYY
-         x7D0joPB6gByYfPCgcrBOTwQjahpxSa4BDGMgNcotPnPqYe3gjhH+rMkbhvTK4VHl62I
-         7KWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXnS2iWDszXDhbNcH3NIXNQz1ocfAyEffE0i8ruGYz4lt30gTKHTzPuiZn4Ma6a41+5Vq8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypYTPXZ/O6Z7fCuvFH3V7btpMvVHfR24hvJebnSkbVpwhoyeWp
-	MirjOiI12MUv0N6u5a5FUssZRK8T8YRQiE6jZ5bUTYe+/3qw26+1P+/SVkcekisLjaxa9MON+GS
-	6xkhRxqUqBCRTIK1D5RlLZl54CrBixDw9mvsgscyOW5ONmA66iw==
-X-Received: by 2002:a05:620a:3902:b0:79f:78a:f7d6 with SMTP id af79cd13be357-7a34ef0f061mr104413885a.1.1722550975313;
-        Thu, 01 Aug 2024 15:22:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEepfEQvZgBRjF0n6c40OJFUnxDJginkdVQ49bHtnVFZ0KbqFVRZ0T0eM1Jvx3otgOTXKNadw==
-X-Received: by 2002:a05:620a:3902:b0:79f:78a:f7d6 with SMTP id af79cd13be357-7a34ef0f061mr104411785a.1.1722550974882;
-        Thu, 01 Aug 2024 15:22:54 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a34f787aa6sm31839085a.103.2024.08.01.15.22.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Aug 2024 15:22:54 -0700 (PDT)
-Date: Thu, 1 Aug 2024 18:22:51 -0400
-From: Peter Xu <peterx@redhat.com>
-To: James Houghton <jthoughton@google.com>
-Cc: kalyazin@amazon.com, Marc Zyngier <maz@kernel.org>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	David Matlack <dmatlack@google.com>, kvm@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	roypat@amazon.co.uk, Paolo Bonzini <pbonzini@redhat.com>
-Subject: Re: [RFC PATCH 14/18] KVM: Add asynchronous userfaults,
- KVM_READ_USERFAULT
-Message-ID: <ZqwKuzfAs7pvdHAN@x1n>
-References: <20240710234222.2333120-1-jthoughton@google.com>
- <20240710234222.2333120-15-jthoughton@google.com>
- <4e5c2904-f628-4391-853e-37b7f0e132e8@amazon.com>
- <CADrL8HUn-A+k-+A8WvreKtvxW-b9zZvgAGMkkaR7gCLsPr3XPg@mail.gmail.com>
- <4cd16922-2373-4894-b888-83a6bb3978e7@amazon.com>
- <CADrL8HVuvBAMcuoifhjuSBpVOA3Av+_k4e=waD81ajKX4gXPHw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1722552244; x=1723157044;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=p85cwU83Btirpz320PiS8rUe0YP6eP6Qw8YmMGvdQno=;
+        b=IbqbIOOpfU1evNG8twTX1S5rEP+pzI3DsFjWMCG9I0r+d+v0l8brso5hj7EytRz7CF
+         +UirCmq4gr5LU/wLJHj0HX9SSKRW6sJZrGcDTej33HsgKhzE5s2CcsEELVj97CKGVrNZ
+         W1Zwzj8EZhXJdjkpYeHEfwx18Mhn1wOtPFuqzEGke4tcVM1PwyWGORv38U/zurmhkb4Y
+         1tTHD5JYQ8SeWZJ8MzPIJ7xuwc7QOSrjcL578AqC6D3ssOztp0qou8vlOlva8bmSI2hT
+         QRfAMjJ3wCxX52shVF1ZhCiahuLPvxuUjudzG4YLCwJoppdVDKPwelHfw6uQdyKwbQZd
+         39zg==
+X-Gm-Message-State: AOJu0Yy22NAwf9woXEhzrVjE1EdnCtjlgwKdNWSYMYfUrO/B3DJewZtF
+	GaGZ7IvDA7vNGB3bosMTCe3Jzh5byytF5FkmR4z5txQ0rXFkcVwU1x9/U7UTqt+OAo9qRAw/2MV
+	gGA==
+X-Google-Smtp-Source: AGHT+IEmR7D4g/Tw8EyfOWI7dF5c0FZtLAEI5aDeLZlNzohQhY4pE4dwXTrp2wXUEy2kRsQwoPrBvaSEB/8=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:949c:b0:705:ca19:2d08 with SMTP id
+ d2e1a72fcca58-7106d0ca7camr10974b3a.6.1722552243470; Thu, 01 Aug 2024
+ 15:44:03 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Thu,  1 Aug 2024 15:43:49 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <CADrL8HVuvBAMcuoifhjuSBpVOA3Av+_k4e=waD81ajKX4gXPHw@mail.gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
+Message-ID: <20240801224349.25325-1-seanjc@google.com>
+Subject: [ANNOUNCE] PUCK Agenda - 2024.08.07 - KVM userfault
+ (guest_memfd/HugeTLB postcopy)
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Peter Xu <peterx@redhat.com>, James Houghton <jthoughton@google.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Axel Rasmussen <axelrasmussen@google.com>, David Matlack <dmatlack@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jul 29, 2024 at 02:09:16PM -0700, James Houghton wrote:
-> > A more general question is, it looks like Userfaultfd's main purpose was
-> > to support the postcopy use case [2], yet it fails to do that
-> > efficiently for large VMs. Would it be ideologically better to try to
-> > improve Userfaultfd's performance (similar to how it was attempted in
-> > [3]) or is that something you have already looked into and reached a
-> > dead end as a part of [4]?
-> 
-> My end goal with [4] was to take contention out of the vCPU +
-> userfault path completely (so, if we are taking a lock exclusively, we
-> are the only one taking it). I came to the conclusion that the way to
-> do this that made the most sense was Anish's memory fault exits idea.
-> I think it's possible to make userfaults scale better themselves, but
-> it's much more challenging than the memory fault exits approach for
-> KVM (and I don't have a good way to do it in mind).
-> 
-> > [1] https://lore.kernel.org/lkml/4AEFB823.4040607@redhat.com/T/
-> > [2] https://lwn.net/Articles/636226/
-> > [3] https://lore.kernel.org/lkml/20230905214235.320571-1-peterx@redhat.com/
-> > [4]
-> > https://lore.kernel.org/linux-mm/CADrL8HVDB3u2EOhXHCrAgJNLwHkj2Lka1B_kkNb0dNwiWiAN_Q@mail.gmail.com/
+Early warning for next week's PUCK since there's actually a topic this time.
+James is going to lead a discussion on KVM userfault[*](name subject to change).
 
-Thanks for the link here on [3].  Just to mention I still remember I have
-more thoughts on userfault-generic optimizations on top of this one at that
-time, like >1 queues rather than one.  Maybe that could also help, maybe
-not.
+I Cc'd folks a few folks that I know are interested, please forward this on
+as needed.
 
-Even with that I think it'll be less-scalable than vcpu exits for
-sure.. but still, I am always not yet convinced those "speed" are extremely
-necessary, because postcopy overhead should be page movements, IMHO.  Maybe
-there's scalability on the locks with userfault right now, but maybe that's
-fixable?
+Early warning #2, PUCK is canceled for August 14th, as I'll be traveling, though
+y'all are welcome to meet without me.
 
-I'm not sure whether I'm right, but IMHO the perf here isn't the critical
-part.  Now IMHO it's about guest_memfd is not aligned to how userfault is
-defined (with a mapping first, if without fd-extension), I think it indeed
-can make sense, or say, have choice on implementing that in KVM if that's
-easier.  So maybe other things besides the perf point here matters more.
+[*] https://lore.kernel.org/all/20240710234222.2333120-1-jthoughton@google.com
 
-Thanks,
+Time:     6am PDT
+Video:    https://meet.google.com/vdb-aeqo-knk
+Phone:    https://tel.meet/vdb-aeqo-knk?pin=3003112178656
 
--- 
-Peter Xu
+Calendar: https://calendar.google.com/calendar/u/0?cid=Y182MWE1YjFmNjQ0NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGdyb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
+Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l986SngGlhPH?resourcekey=0-FDy0ykM3RerZedI8R-zj4A&usp=drive_link
 
+Future Schedule:
+Augst   7th - KVM userfault
+August 14th - Canceled (Sean unavailable)
+August 21st - Available
+August 28th - Available
 
