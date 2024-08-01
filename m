@@ -1,108 +1,120 @@
-Return-Path: <kvm+bounces-22924-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22925-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 290AD944854
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:30:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C010944878
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:33:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C83891F22EEC
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:30:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9CAC28693B
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E15C16FF44;
-	Thu,  1 Aug 2024 09:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E35DD18455D;
+	Thu,  1 Aug 2024 09:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NHiTn5Pa"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1BC13C8EE;
-	Thu,  1 Aug 2024 09:30:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D3B18454C
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 09:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722504629; cv=none; b=ORYcbfBJAfJr8G3ZlH4ao7YqDbpBgVvurwZd3zRnQ9SN+B6JQ0nv5l4QeSRcrjn5dA2G2hjzYl4sYEqln2bTewhdUcuYm0aJpihHZYNTvg5wnsftphfKGMN9iG2+FdIpZuUgi4UHc7SidbCpIu+2UaYg2Tfh49zTNHzoqVVXC1I=
+	t=1722504714; cv=none; b=ECiEIQ2nKZiyYpwV8uFoBggsixoFxrD0iWVxcMeEVvg7v1fKnklzDIQQVpZJjsE/jPTqA6ibN2NdTzoimSo29XJbIMRMPdx3BVD9ISjvrYi8eUb1czQUuaPPYHZTKVPqVEyHQwA1XjWHdyth8aYG6xCciZLbjNU5GyC/h1Z1SSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722504629; c=relaxed/simple;
-	bh=/OTW+2gYWzzGtg5eh5Ri6h4zgQIrGeCZb7gtCGgQcJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G3TbEMR7zhO8+cmWhkwGHCS20i124fcdeZfXLyUB+yVafotxXnghXZ0ZyQ8Aj/4qHIEWhBwmi+JESipFVFyeI34gyN43WGVDXCACLBMabc9HQTXRvhTqeOCC3VO3AGS23Mmi5aPYeq96rwC/0BsFV2YpVvB55xe9GJpBSQGnSk0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id A013EDA7;
-	Thu,  1 Aug 2024 02:30:52 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 681BB3F5A1;
-	Thu,  1 Aug 2024 02:30:25 -0700 (PDT)
-Date: Thu, 1 Aug 2024 10:30:20 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Mark Brown <broonie@kernel.org>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in
- get-reg-list
-Message-ID: <20240801093020.GA841418@e124191.cambridge.arm.com>
-References: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
+	s=arc-20240116; t=1722504714; c=relaxed/simple;
+	bh=Rijpxav22ULBZ/jbonQFBSqZGbACHb2Ltfu5GqR29ew=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=eYBMdH6Zln08pmWKUF/C842AujrG3NAP7bqGt2xjKkmN/qOXqt85HfW/yyzS7vCPm/gp+2Lq2eohZkRKHPBW/3Vm/VcdSMbPQZFm2yZaoOIMElUJchvDW0he4WKgle2RZSHrHQci12kg8Ve9pHA8jCdnam12/1No8keQrfYgs4E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NHiTn5Pa; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a7aa4ca9d72so848308466b.0
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 02:31:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1722504709; x=1723109509; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Rijpxav22ULBZ/jbonQFBSqZGbACHb2Ltfu5GqR29ew=;
+        b=NHiTn5PaXsFBhGMxXwLqmyIc9iZiaTO8jfKsKgJugmD/MnTo42TLsjTKZyMbvVheXo
+         pIC9smJg4It7nEZ4vD33ZNzf/gqF6Kh4GagP1IZo/9KngfsvAC4ZpqqL6oEGvEcNsgUt
+         yBQ9lKBxGIYCIKFGg7fNyT1No6REkiBrYJoA0qh0x3qIbIhijfd+vi2seyT3+YEpo/Gp
+         tpd2wy+uYkya8YgiC+1x9WU/IQ9Wvqz2JxMGgABklnFDGoHVmI0xUaCJnTaRKEjFeeZ7
+         bITpyj35nrOeCN5APWGj/m+pDtX9eRwaxztSw4AaGXZ/oEpt4yo+ov1tm3lOoxYmr8Ec
+         Ep7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722504709; x=1723109509;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Rijpxav22ULBZ/jbonQFBSqZGbACHb2Ltfu5GqR29ew=;
+        b=Sy9kkMB7GqpQuV6vhSRtVnF7MlkRCr/qf0D3iOMAXpZNufVGIwc3l3nStNL/FqC2BT
+         0Vjbz4C3tkoelIfUdirC24EeE0TS/yQapq/odBJL5+u86pgTHv1x+uyfGADoDwJfwPe9
+         NlRhQS7TrhRMfBRVyOE+QVy1LXMC4e+vzHYq+PyHYN+O16aOpTf/dUV58zBrF79W4SWL
+         k2Rp8zLOQdyAHXUx3pTMrnJoE6ojDWsPP/vVHHM6xUjcfknt4bAzbcGyFgrbwjP63xch
+         GaHTXM6KjQYPwaXsLYWR+D3k0obW52k1FbQHfIam9M58PBWpyGeZhdvFg3iuthL5lLX8
+         oXtg==
+X-Forwarded-Encrypted: i=1; AJvYcCVONBgNDsIUItGhUniome1O+T9tHhrp+NmiXKi35KBIREqrvJq+L7BjvCfvXXGExfIy22/nqA6yN0rNcmhUcMPbonN4
+X-Gm-Message-State: AOJu0YwYfI64/qj12h2fUlxbaRrpV+nlj8V/pFrI7HqiG0Bp3Q2ER5j9
+	lV5y0bhYDgvy4KXSemZZ+IjawZL+R6Ur7e4qQWiQsXEP9sfkNcjE0hV1T6sZztY=
+X-Google-Smtp-Source: AGHT+IG5iXbqJIGCb3pyknIex0iMsjWXZk5BqBH1pB4+wqA2VBzM+EI5zwQ/R0bb0H5+cKiu5+pmpA==
+X-Received: by 2002:a17:907:968b:b0:a77:cdaa:88ab with SMTP id a640c23a62f3a-a7daf544a4fmr161420366b.15.1722504708836;
+        Thu, 01 Aug 2024 02:31:48 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7acadb8313sm876290366b.211.2024.08.01.02.31.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 02:31:47 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 5DD7F5F80C;
+	Thu,  1 Aug 2024 10:31:46 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
+ <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
+ <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
+ Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
+  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
+ <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
+  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
+  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
+  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
+  David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 12/84] KVM: Drop @atomic param from gfn=>pfn and
+ hva=>pfn APIs
+In-Reply-To: <20240726235234.228822-13-seanjc@google.com> (Sean
+	Christopherson's message of "Fri, 26 Jul 2024 16:51:21 -0700")
+References: <20240726235234.228822-1-seanjc@google.com>
+	<20240726235234.228822-13-seanjc@google.com>
+Date: Thu, 01 Aug 2024 10:31:46 +0100
+Message-ID: <87plqseghp.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jul 31, 2024 at 05:21:13PM +0100, Mark Brown wrote:
-> The ID register for S1PIE is ID_AA64MMFR3_EL1.S1PIE which is bits 11:8 but
-> get-reg-list uses a shift of 4, checking SCTLRX instead. Use a shift of 8
-> instead.
-> 
-> Fixes: 5f0419a0083b ("KVM: selftests: get-reg-list: add Permission Indirection registers")
-> Signed-off-by: Mark Brown <broonie@kernel.org>
+Sean Christopherson <seanjc@google.com> writes:
 
-Argh!
+> Drop @atomic from the myriad "to_pfn" APIs now that all callers pass
+> "false".
+>
+> No functional change intended.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 
-Thanks for spotting that.
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
-
-> ---
->  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> index 709d7d721760..4abebde78187 100644
-> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
-> @@ -32,13 +32,13 @@ static struct feature_id_reg feat_id_regs[] = {
->  	{
->  		ARM64_SYS_REG(3, 0, 10, 2, 2),	/* PIRE0_EL1 */
->  		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-> -		4,
-> +		8,
->  		1
->  	},
->  	{
->  		ARM64_SYS_REG(3, 0, 10, 2, 3),	/* PIR_EL1 */
->  		ARM64_SYS_REG(3, 0, 0, 7, 3),	/* ID_AA64MMFR3_EL1 */
-> -		4,
-> +		8,
->  		1
->  	}
->  };
-> 
-> ---
-> base-commit: 8400291e289ee6b2bf9779ff1c83a291501f017b
-> change-id: 20240731-kvm-arm64-fix-s1pie-test-a40b6be58d7b
-> 
-> Best regards,
-> -- 
-> Mark Brown <broonie@kernel.org>
-> 
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
