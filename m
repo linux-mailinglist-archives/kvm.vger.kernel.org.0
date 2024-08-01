@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-22985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E7889452CC
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 20:36:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D589452CF
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 20:36:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39315282BAD
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 18:36:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B28D11F24519
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 18:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817F114C5A4;
-	Thu,  1 Aug 2024 18:35:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4D7A14D449;
+	Thu,  1 Aug 2024 18:35:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yg+DOyGW"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="T6f4Ughv"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A3CF14B94B
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 18:35:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A2E14C5A7
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 18:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722537307; cv=none; b=h9YFcZsSKSzol0suFTWaw6rN83moOBm3riW6TmKFs0OMuFjn/j8svHAXa9bF+9cPTkAUhtuZtWMyW+iwARa/7nC4eIV0h5+IaS+JQNfE6l20/827N7oSEbdheaTuWmeTw8ep5sPuIYCcHar7NW8DZfBSVlLfSVEpNYaBeKFAxDY=
+	t=1722537309; cv=none; b=GL0J2+NYs08aBOkJBSibhszTNfUyGZ2ff4K577O59BpQzPKrDGCOtZhflRu1pzTsDRFG/dqCdcK+z24jtRDndLV5LxjdLMzvy3KRgxn5ajdmUVr03hrst9OW0f5sFkBgo31iZ6grau3Qc2/bVEXnCtJ+PtKVHnxEg0xXKAIXOGQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722537307; c=relaxed/simple;
-	bh=+209Dl5mjZfEzPCjJbS6cYtHb+T8VqI2r8B2gBeStTo=;
+	s=arc-20240116; t=1722537309; c=relaxed/simple;
+	bh=/XSoRdfaJzNo/ZGf04C230tSmY5GFwai1Y6z9V+ll3s=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mrWSaFA/OKBeObYVYXbTmR8QFj6twgSfqT0cVgzVPyIc4Zud2X7FUyozZqrhlJUbpGuaDIUj3vBhk3O34VLvHkNYGEPaFE/AfP6ALfqFGeDkV8oreKOjKrvn/QFnuLEKkaqOxiF+bSxw94Gtm68bsyERcPDbWwcLOaS73ODf2sg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yg+DOyGW; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=TbOroBtNPsgZ8kSwXADjqkLE6M6mIUW3icrru3skLkkiXqNX+ukdEkdWy6hIdJPSlZ/h4x9hQFXgLhCmCX1nwCmPwfHgghUQRel4mySgfiIUEOI4p6Fwwt9PrsZUbVVMBLF9cRd7Z7SkkmAChcutOudIJgO3TJhlZ3upQP39ggk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=T6f4Ughv; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-78e323b3752so4784002a12.0
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 11:35:06 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-7104d2cac39so2257873b3a.1
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 11:35:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722537306; x=1723142106; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722537308; x=1723142108; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=nLllgIeEL1wMurU3ykZwAR8levnh4hSK0+7xKRqL5Is=;
-        b=yg+DOyGW4l4CuPriZwCOwA1CXdeCsL5OHnUHQq4LbhxF81Vjc7HCcYYkvOKz+kvbt2
-         ABmdS3dqKolKdl9fGuiZ5n/vTP18iMb3WEWlr6jbjMMEMihkBvMPkV1IZNyV0Yk/3qVm
-         DWCXtK1YziHMIcnvFP8g0EgdfDL7jz1GbnNll3EAmTMcACLhmnvSKXZXZmKUHsJqamLZ
-         SfFCqFkhiiyFAFAzLAUYQpwBZnC7l3+k0w3LyYltZTlRehAPBMffsQykie7Nr7azDIG/
-         WgyN2cMvPQS9V/cV5jhzxCrjtRZ5VvxbD252RIKZDWlqjhMP5pBnPWD8CiipV6q61JMu
-         K5tA==
+        bh=YgfeHTUFXLVGjVFJpfNzwAaN7GsDEU7AXhuO1w5LlJU=;
+        b=T6f4UghvEEptu57168f+L/zM2OSsfTUEmq1aYaownOtHbbaFnbOQ8PWU0JuKJgce0H
+         9fQZZawMVXL1956CtTaup8jRe66DfJ2jxln5sAhr19titUwv3w2uBWqXPqqVv6dd5WTu
+         cGEgRY1qU5xXsf66qMwFiRjqe1LhSabKEpXXdGiP8fkoZFZ/AXnxagDFTf506ChfutbB
+         BerF3q22V5B07c89wofMVqoMFo/AZJvDayCRHBYir2P56J1tZ7SoqPkDBHGQY5kJMLAd
+         LCfJVXCXpldMdtKUwjNRwX2jOX+xLfvMyHOearGAJAIiUZPadY5Q6Hq2DGw2t2lH8qkY
+         Il3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722537306; x=1723142106;
+        d=1e100.net; s=20230601; t=1722537308; x=1723142108;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nLllgIeEL1wMurU3ykZwAR8levnh4hSK0+7xKRqL5Is=;
-        b=Khh17TE2ZzglrP3xTRSJ/BFWX2zPOYX5STh5+cKQ2pjTm5KSwSVsY4jTMQawE4IJEt
-         BtIgs685DJ9vads7cLZOcb1Ee+XGXteYuOSoN1gxnQICOyBlSC+/wtJVlg1GjKgNsOnV
-         DWwrd5Tn0/1jUzU+in5O8yXjakidCz0aQgOqHi4WGqY669cWguJbvU+VR6JFVE93bJxy
-         a2f0STtfsWPi1oYIGa+Ezzh5Su2qtcEXM9ERGgfG+RigD7Yx0WO2igeaBmeRZD4NcM3z
-         Z/hElpofg/NVos8ac2rCu0xK080AtWpRGIS3beqx2YJvCDt/BHKICPWfWsLJ5dKKVSmg
-         M91A==
-X-Gm-Message-State: AOJu0YxCxRonm37mbRXTQZMlXMusk3rfOtM+2HK5dkMTVjscgdT1OSli
-	n0fJf5Hy824eB+nJ7CDXREGEZXX41DzTUVhyoKb+SPZfvEPcVvQ/Rqec78Ykd74FbgiuLR3bxlN
-	2tw==
-X-Google-Smtp-Source: AGHT+IGJTez0OFwM+Kmo7Ln7XZmkdAZ4Q1iTleNtDtm577nIAAAdrxOHonp4x5mucOt9Mkl1xYEJT8P1AFM=
+        bh=YgfeHTUFXLVGjVFJpfNzwAaN7GsDEU7AXhuO1w5LlJU=;
+        b=ZvRRLKxtW8a3hLjznc3wd/Np5uOrsiV/BfCnbP2fGQEy3EQ4bvEWvbVinM/+ATBQed
+         f7VudWlQdP0TtdI4HtnwX5qNYR6eYWeoFjVThVrAQ1JU6wNadVUFIca1OPJEkT8a3NNT
+         TdYven33xQ1Uvcsevb6Q6QT6hRiyCf2QoyBrbYj4iAETYnd11skriNaUIZcmLCopjE2d
+         NtvPhPjOeM1O+I2tRqLng50gbOLgFVsEU8pGEKmF+P0u2AVu7aQQj+gd0eSbnRfGEsGI
+         fWLk5yb9/H/a2QrG+FZbQ/peh8ptg8TfCB1XM9zdbjn0BZCkGV6F4x1VbXw1qTsAv7Ma
+         dRAQ==
+X-Gm-Message-State: AOJu0Yz9jQR9pgdjqC7zX1QaENo6erndNTlT8wOUCi9FqPcEhGyds5L0
+	MMCP4CIcvOpCpFYytyY/fFK9slKqk7f0MsZPjfaqFbcg6OHQVLeBXFs/zf2m7kJqs/XK1B3aooe
+	Q3A==
+X-Google-Smtp-Source: AGHT+IHTWEhjwHtp09vWEbUgtVyznzcr5+x5rCkfOWJrq49bIvfwRkVTlE43qqkCOx+dDWfaukt6/MOxYM0=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:3f41:0:b0:7a1:2fb5:3ff7 with SMTP id
- 41be03b00d2f7-7b7438b1dc8mr1940a12.0.1722537305573; Thu, 01 Aug 2024 11:35:05
+ (user=seanjc job=sendgmr) by 2002:a05:6a00:949c:b0:705:ca19:2d08 with SMTP id
+ d2e1a72fcca58-7106d0ca7camr8792b3a.6.1722537307533; Thu, 01 Aug 2024 11:35:07
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Thu,  1 Aug 2024 11:34:49 -0700
+Date: Thu,  1 Aug 2024 11:34:50 -0700
 In-Reply-To: <20240801183453.57199-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,46 +75,44 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240801183453.57199-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240801183453.57199-6-seanjc@google.com>
-Subject: [RFC PATCH 5/9] KVM: x86/mmu: Free up A/D bits in FROZEN_SPTE
+Message-ID: <20240801183453.57199-7-seanjc@google.com>
+Subject: [RFC PATCH 6/9] KVM: x86/mmu: Process only valid TDP MMU roots when
+ aging a gfn range
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Remove all flavors of A/D bits from FROZEN_SPTE so that KVM can keep A/D
-bits set in SPTEs that are frozen, without getting false positives.
+Skip invalid TDP MMU roots when aging a gfn range.  There is zero reason
+to process invalid roots, as they by definition hold stale information.
+E.g. if a root is invalid because its from a previous memslot generation,
+in the unlikely event the root has a SPTE for the gfn, then odds are good
+that the gfn=>hva mapping is different, i.e. doesn't map to the hva that
+is being aged by the primary MMU.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/mmu/spte.h | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ arch/x86/kvm/mmu/tdp_mmu.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/spte.h b/arch/x86/kvm/mmu/spte.h
-index ba7ff1dfbeb2..d403ecdfcb8e 100644
---- a/arch/x86/kvm/mmu/spte.h
-+++ b/arch/x86/kvm/mmu/spte.h
-@@ -216,15 +216,17 @@ extern u64 __read_mostly shadow_nonpresent_or_rsvd_mask;
-  * should not modify the SPTE.
-  *
-  * Use a semi-arbitrary value that doesn't set RWX bits, i.e. is not-present on
-- * both AMD and Intel CPUs, and doesn't set PFN bits, i.e. doesn't create a L1TF
-- * vulnerability.
-+ * both AMD and Intel CPUs, doesn't set any A/D bits, and doesn't set PFN bits,
-+ * i.e. doesn't create a L1TF vulnerability.
-  *
-  * Only used by the TDP MMU.
-  */
--#define FROZEN_SPTE	(SHADOW_NONPRESENT_VALUE | 0x5a0ULL)
-+#define FROZEN_SPTE	(SHADOW_NONPRESENT_VALUE | 0x498ULL)
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 2b0fc601d2ce..b358642890e1 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -1202,9 +1202,11 @@ static __always_inline bool kvm_tdp_mmu_handle_gfn(struct kvm *kvm,
  
- /* Removed SPTEs must not be misconstrued as shadow present PTEs. */
- static_assert(!(FROZEN_SPTE & SPTE_MMU_PRESENT_MASK));
-+static_assert(!(FROZEN_SPTE & (PT_ACCESSED_MASK | VMX_EPT_ACCESS_BIT)));
-+static_assert(!(FROZEN_SPTE & (PT_DIRTY_MASK | VMX_EPT_DIRTY_BIT)));
+ 	/*
+ 	 * Don't support rescheduling, none of the MMU notifiers that funnel
+-	 * into this helper allow blocking; it'd be dead, wasteful code.
++	 * into this helper allow blocking; it'd be dead, wasteful code.  Note,
++	 * this helper must NOT be used to unmap GFNs, as it processes only
++	 * valid roots!
+ 	 */
+-	for_each_tdp_mmu_root(kvm, root, range->slot->as_id) {
++	for_each_valid_tdp_mmu_root(kvm, root, range->slot->as_id) {
+ 		rcu_read_lock();
  
- static inline bool is_frozen_spte(u64 spte)
- {
+ 		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end)
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
