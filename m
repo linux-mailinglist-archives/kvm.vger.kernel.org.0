@@ -1,163 +1,169 @@
-Return-Path: <kvm+bounces-22824-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22825-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F3A8943795
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 23:12:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5257943FC9
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 03:51:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7EC4283C46
-	for <lists+kvm@lfdr.de>; Wed, 31 Jul 2024 21:12:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 147C01C21330
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 01:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EAFE16C86E;
-	Wed, 31 Jul 2024 21:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72A02C6B7;
+	Thu,  1 Aug 2024 00:48:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="o/Tz0jue"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eUNDpcTt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f46.google.com (mail-ot1-f46.google.com [209.85.210.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DA2168C26
-	for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 21:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E992D7A8
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 00:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722460317; cv=none; b=HwhL8y0OSAnJzdDlPhF83VNvQDjteHlk2fGQ5OD4mRHWorEJtj/A1X4/vQbM62p7QLsDWneYfHuvVyllCdXsRL29l5xTratx+IOZ+8h/+i08BwS616jSPtwV/VcF+nIMNlnzsnR5Y8Txu1WaURCnqE2FAUAvyNlc+awoH5M2G8k=
+	t=1722473293; cv=none; b=VRy/gFPcZrW5wAlEPrzVAY4ZSZx9aexqzM7ujH0FvChYvJ7zEuoioKCCw1Hjf91Ydy0yRg1j/GQ8vqsseQZNpC4RUAZwN10VhKE1J4AHDERa4XOgynRlU4WnaQRtX97MaXuup5ugJFLSZ7dL8qgdjvNk4zhFbv+1BGPfZftiKCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722460317; c=relaxed/simple;
-	bh=EZqrkOuzvZ52XOMTxZgs+Cr/oGYo9OlHNt4FT39kZOM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GcpWySkY/BXFyinb1nERHd5D8ZeUBSdsjWEq3pRVi51Mu3+Uy6Qq5c2iZzyyvdDhSGRe5/sZxMT9T8aeJ7xti5CIHlCSd+IIi9C7QSW3r0ANfKhBD5cNDm81hbPQSbNOsqekDOq5HMALGbB9q/OGgxMUb28xFnIz4rrWLSSVlx0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=o/Tz0jue; arc=none smtp.client-ip=209.85.210.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
-Received: by mail-ot1-f46.google.com with SMTP id 46e09a7af769-7094641d4e6so2071623a34.3
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 14:11:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1722460315; x=1723065115; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/ZvLSXSFJMkLNlj/PaF0YPjUuieX1ria5CS3CzpzN5U=;
-        b=o/Tz0jueoXnJLP3/zDWGdTeVOz+pK88O+rYLrgv+astNn9nyc+Gsh7nNMvpHag8j6R
-         dyLiUreNWIh9u2CfyayqW2LkneyZcxLKuf822ORS/JcnrH5Sw40jivLodKvQgKIqEAbN
-         tIROT/P3HTWbFaFRsANix/TcWzOLUO7Jz5zajmeRxxRkkyzVddWGjCCSm1e1UZ+mNMzv
-         FYBkR7pdZnHBvn2Yn2HPdwCVdFH58TMx07f6qH3jtjgMokn4EiNmdz9uPYjQ0Jp6jHXP
-         27XR90fe/W0l9EoOo+fTmiHvhfw5bjLaddySWOx4xicQUC6GYHBMBsn6Fdc2pCGIKzQt
-         AcaA==
+	s=arc-20240116; t=1722473293; c=relaxed/simple;
+	bh=5V+7pkjfE2XZiiuBjUTWzLnRrMoiivIoOcezkBx35zY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=azpMJndknPZdcHctglsW3TjpWSLOpr418b5ndISXiHlOrpYnKgm0vMlCKrZIPKdtizPP8JmXkksDTl256sx4UCkP35i3F8mS5Lzu7WoSr4KjSlaM1pxGLhueDKONR6BoMQsy1900qL95mIHvyxP/FemlpR1ThvS84FQDD4uNSZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eUNDpcTt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722473290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RFQclzW/vuWIgsBJAJ96++9Y/pmxYncNjR7KuXyfSF4=;
+	b=eUNDpcTtfdwY8MTSrIy3vXW2Lczd2/chI99X2at6Fcg0G9aqaw1r/bqccg66dtk1+yMXMd
+	XqyCoZONt13+btAqkeu4i4RHtkJVP9IfZPoMvprSTrkKW+pvP3sqWHxW2cJhUIVOp5dMIk
+	n2G30RlgQpqrv/lvdyC1KQeIVEPoWFs=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-690-GI0obu9gMEaKa7RW5i4Qew-1; Wed, 31 Jul 2024 20:48:09 -0400
+X-MC-Unique: GI0obu9gMEaKa7RW5i4Qew-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7a1d0b29198so689811085a.2
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 17:48:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722460315; x=1723065115;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/ZvLSXSFJMkLNlj/PaF0YPjUuieX1ria5CS3CzpzN5U=;
-        b=dcostZZ30ECEVe0qVg3WMXtWe2jMEiI7aQFeFCb1vPAPgjgRuPewHhIEFvuMzPPIIB
-         TFAy8yRf8s6/RoHkIYFPcewSWUtOHAJpY3HVXXYZXeoyVU8YZF+TJjtrdcBzCRjFgpSm
-         Mvmo+eVgBd9e+88ZvyMB0mq0ffiDFxRk7OLlN2uIuuIXUaE7RWnVUxzdXKhljr+PQe11
-         fVg7f1sMp6jXb4SZpMehVDX6lA+DfsKezPZSRiuwjE8kHd5CCCvb85XEEq81wfDKvf39
-         N6wGqDmMnalZ45fo6irNf/fiVeayQg8SmTbbCuagMPJ6hwFCzLRWpy8KPSnzxN9Hjjtd
-         2q3w==
-X-Forwarded-Encrypted: i=1; AJvYcCXUVxpCJrJBhlLF6aw5olX5lqrT4ME11363q3ao8DfKQA05KKdySQKKIJMDFeMAeQ70UEdC9VjGJYhDlira6KIGdEhk
-X-Gm-Message-State: AOJu0Yx5eK18t1AMNp0ga5XQu8zEkvxhOo5f+0iqcZdyKd5JbWG+8PlJ
-	NkKV/Nhb4W6kKuKODBUlRTiHSpoYPtDpShTt6ORjpt6lSqGPHmq/qivBm1ug+vRZTDaQznRo4Ux
-	3
-X-Google-Smtp-Source: AGHT+IEdPF4xP7dgcasA1jodltKHHpm66OEBCOUHqXVM+e0xNPzRPKTZfGITIWaB4wlFOb3gt6ptYA==
-X-Received: by 2002:a05:6830:610d:b0:708:f8c1:b901 with SMTP id 46e09a7af769-7096b84b7b3mr493240a34.18.1722460315099;
-        Wed, 31 Jul 2024 14:11:55 -0700 (PDT)
-Received: from localhost (syn-076-182-020-124.res.spectrum.com. [76.182.20.124])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1d73ea990sm779020385a.55.2024.07.31.14.11.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jul 2024 14:11:54 -0700 (PDT)
-Date: Wed, 31 Jul 2024 17:11:53 -0400
-From: Josef Bacik <josef@toxicpanda.com>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: viro@kernel.org, linux-fsdevel@vger.kernel.org, amir73il@gmail.com,
-	bpf@vger.kernel.org, brauner@kernel.org, cgroups@vger.kernel.org,
-	kvm@vger.kernel.org, netdev@vger.kernel.org,
-	torvalds@linux-foundation.org
-Subject: Re: [PATCH 08/39] experimental: convert fs/overlayfs/file.c to
- CLASS(...)
-Message-ID: <20240731211153.GD3908975@perftesting>
-References: <20240730050927.GC5334@ZenIV>
- <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-8-viro@kernel.org>
- <20240730191025.GB3830393@perftesting>
- <20240730211225.GH5334@ZenIV>
+        d=1e100.net; s=20230601; t=1722473289; x=1723078089;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RFQclzW/vuWIgsBJAJ96++9Y/pmxYncNjR7KuXyfSF4=;
+        b=caNpv/Cbm42ccZMt3WR5Z9xEZJoLo9QXXE/NfS6gpV08wrmfBFf6xFE0vznj0JxPgi
+         hzsR33AwRyJkLNeuLlh/bzZMzvtTgpgsy+cc5TFU5sriOOq8ihJT+1bZ7F7yOOTOuSYd
+         blTfWndkaHKuw8ysvWUDqATIhm/elxO4DPwQ5hEyDV7BAXNQMi6DSoBKw0MF4KLQbuHr
+         Zw/lCrg3Oib2QbdAMiYjYukeYanKm5qvg+v883cQoeoDLXmCE+DP2xDzE2Maq2XJn719
+         0+psAmR0UYj27t41OauR2VG6dreCXrMkf5RctVZpUFCCZNLGCyGMROZzuukM7hLinbam
+         4wSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAKN2wtljYru9JewygoOPHtvY3Ei+8gDX93hXCujYYlxzlyayHAOBs12apdhJng6VvEuavjhbi4gU1s1njWELkY1bG
+X-Gm-Message-State: AOJu0Yz8mTjMTuBazVECcce63+f3x5HkoeMZfw8Qp6JwiujnvLiWKYMU
+	T4XB0W+A5XMSql5vcOz1EceCmP8IFhbIZ3+ZeCBgt79ay8nJSmHfgIvJOO2Gvt6iR3kv+LDKp+a
+	3PRu83XX5VwJ2Uyp7CXG2fypj96AxNzoVKg6W/vebXsys9ktbow==
+X-Received: by 2002:a05:620a:24c1:b0:79f:1e1:faa7 with SMTP id af79cd13be357-7a30c654a9emr124840985a.17.1722473288671;
+        Wed, 31 Jul 2024 17:48:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHrkwsj+j0FIIhACoKbuelZI3ds0w5Xqfu2eQJH7G5c6HZxlsFtxr6D1099YDkyRiNMJSdm4g==
+X-Received: by 2002:a05:620a:24c1:b0:79f:1e1:faa7 with SMTP id af79cd13be357-7a30c654a9emr124838585a.17.1722473288292;
+        Wed, 31 Jul 2024 17:48:08 -0700 (PDT)
+Received: from [192.168.5.27] ([172.56.119.20])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a1e4292ae6sm628776985a.74.2024.07.31.17.48.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Jul 2024 17:48:07 -0700 (PDT)
+Message-ID: <2331dba4-4366-48fd-baaf-a5579df8ab59@redhat.com>
+Date: Wed, 31 Jul 2024 20:48:05 -0400
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730211225.GH5334@ZenIV>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 12/13] Bump avocado to 103.0
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Peter Maydell <peter.maydell@linaro.org>, Thomas Huth <thuth@redhat.com>,
+ Beraldo Leal <bleal@redhat.com>,
+ Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
+ David Woodhouse <dwmw2@infradead.org>,
+ Leif Lindholm <quic_llindhol@quicinc.com>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org,
+ Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Akihiko Odaki <akihiko.odaki@daynix.com>
+References: <20240726134438.14720-1-crosa@redhat.com>
+ <20240726134438.14720-13-crosa@redhat.com>
+ <2d85304c-ccec-43d1-8806-bdf7b861543d@linaro.org>
+Content-Language: en-US
+From: Cleber Rosa <crosa@redhat.com>
+In-Reply-To: <2d85304c-ccec-43d1-8806-bdf7b861543d@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jul 30, 2024 at 10:12:25PM +0100, Al Viro wrote:
-> On Tue, Jul 30, 2024 at 03:10:25PM -0400, Josef Bacik wrote:
-> > On Tue, Jul 30, 2024 at 01:15:54AM -0400, viro@kernel.org wrote:
-> > > From: Al Viro <viro@zeniv.linux.org.uk>
-> > > 
-> > > There are four places where we end up adding an extra scope
-> > > covering just the range from constructor to destructor;
-> > > not sure if that's the best way to handle that.
-> > > 
-> > > The functions in question are ovl_write_iter(), ovl_splice_write(),
-> > > ovl_fadvise() and ovl_copyfile().
-> > > 
-> > > This is very likely *NOT* the final form of that thing - it
->     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> > > needs to be discussed.
-> 
 
-Fair, I think I misunderstood what you were unhappy with in that code.
+On 7/29/24 8:02 AM, Philippe Mathieu-Daudé wrote:
+> Does that restore feature parity for macOS developers? Because this
+> community has been left behind ignored for over 2 years and already
+> looked at alternatives for functional testing.
+>
 
-> > Is this what we want to do from a code cleanliness standpoint?  This feels
-> > pretty ugly to me, I feal like it would be better to have something like
-> > 
-> > scoped_class(fd_real, real) {
-> > 	// code
-> > }
-> > 
-> > rather than the {} at the same indent level as the underlying block.
-> > 
-> > I don't feel super strongly about this, but I do feel like we need to either
-> > explicitly say "this is the way/an acceptable way to do this" from a code
-> > formatting standpoint, or we need to come up with a cleaner way of representing
-> > the scoped area.
-> 
-> That's a bit painful in these cases - sure, we can do something like
-> 	scoped_class(fd_real, real)(file) {
-> 		if (fd_empty(fd_real)) {
-> 			ret = fd_error(real);
-> 			break;
-> 		}
-> 		old_cred = ovl_override_creds(file_inode(file)->i_sb);
-> 		ret = vfs_fallocate(fd_file(real), mode, offset, len);
-> 		revert_creds(old_cred);
-> 
-> 		/* Update size */
-> 		ovl_file_modified(file);  
-> 	}
-> but that use of break would need to be documented.  And IMO anything like
->         scoped_cond_guard (mutex_intr, return -ERESTARTNOINTR,
-> 			   &task->signal->cred_guard_mutex) {
-> is just distasteful ;-/  Control flow should _not_ be hidden that way;
-> it's hard on casual reader.
-> 
-> The variant I'd put in there is obviously not suitable for merge - we need
-> something else, the question is what that something should be...
+Hi Phillipe,
 
-I went and looked at our c++ codebase to see what they do here, and it appears
-that this is the accepted norm for this style of scoped variables
 
-{
-	CLASS(fd_real, real_out)(file_out);
-	// blah blah
-}
+As early as Avocado 102.0,  macOS support is pretty complete. The exact 
+words on the release notes[1] are:
 
-Looking at our code guidelines this appears to be the widely accepted norm, and
-I don't hate it.  I feel like this is more readable than the scoped_class()
-idea, and is honestly the cleanest solution.  Thanks,
 
-Josef
+"User of macOS will have a better experience when using Avocado. The 
+full set of Avocado’s selftests are now run under macOS on CI. Please be 
+advised that macOS is not currently supported at the same level of 
+Linux-based operating systems due to the lack of 
+contributors/maintainers with access to the needed hardware. If you are 
+a user/developer and are willing to contribute to this, please let the 
+Avocado team know."
+
+
+When it comes to the lack of updates, that is a longer discussion 
+indeed.  When it comes to alternatives, I don't expect the QEMU project 
+to do anything else than what it's in its best interest. As late as this 
+can be, please take it for what it's worth.  If it does any good to 
+QEMU, please consider it.
+
+
+Best,
+
+- Cleber.
+
+
+[1] - https://avocado-framework.readthedocs.io/en/latest/releases/102_0.html
+
+
+>> Reference: 
+>> https://avocado-framework.readthedocs.io/en/103.0/releases/lts/103_0.html
+>> Signed-off-by: Cleber Rosa <crosa@redhat.com>
+>> ---
+>>   pythondeps.toml | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/pythondeps.toml b/pythondeps.toml
+>> index f6e590fdd8..175cf99241 100644
+>> --- a/pythondeps.toml
+>> +++ b/pythondeps.toml
+>> @@ -30,5 +30,5 @@ sphinx_rtd_theme = { accepted = ">=0.5", installed 
+>> = "1.1.1" }
+>>   # Note that qemu.git/python/ is always implicitly installed.
+>>   # Prefer an LTS version when updating the accepted versions of
+>>   # avocado-framework, for example right now the limit is 92.x.
+>> -avocado-framework = { accepted = "(>=88.1, <93.0)", installed = 
+>> "88.1", canary = "avocado" }
+>> +avocado-framework = { accepted = "(>=103.0, <104.0)", installed = 
+>> "103.0", canary = "avocado" }
+>>   pycdlib = { accepted = ">=1.11.0" }
+>
+
 
