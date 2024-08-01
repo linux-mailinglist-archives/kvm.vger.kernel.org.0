@@ -1,233 +1,182 @@
-Return-Path: <kvm+bounces-22936-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22937-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07967944A5E
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 13:28:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C4A6944B22
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 14:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AC941C21FEF
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:28:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA8D1288761
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 12:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98036189B96;
-	Thu,  1 Aug 2024 11:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EF21A01C5;
+	Thu,  1 Aug 2024 12:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N04jRzRF"
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="aF9reSw0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05olkn2097.outbound.protection.outlook.com [40.92.90.97])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A863189B93
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 11:28:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722511720; cv=none; b=Hs6h2TCVUZZS/8p8+2caLiin+HNwZvsOO+4TKLUjmkszmC1SI7HpLjPSl7x5CdlAkS87lJRhXC3GKUyXFCu34meIhhAvi4ziiQYvunwAxYuumnY1gZ8IK1l3FxuCyPY1xaTte6njnSRMmPZlh5PoF1fn77Zz5yfZTypciMLiurM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722511720; c=relaxed/simple;
-	bh=+j+fRaXOovYjzMGUUzUtuWYeyJ1Eb5QWXviqc97u2Tg=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=S8jtRNmtFtBrQpsbRpc2RADVG4EviDYH/GhgtXRc/ntSG2GvKpv3ytDyBZuLqVmHtnwdFNyRejjwkTtCWI8jV+e5AK2HyRBBMgHR1P0uFaQo3vZfPR+qwUGqYSYqga4TEVTHSNNy1ZcWqlUDIYGQY/I8OMDDBQVmyrv0nIdcK68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N04jRzRF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722511717;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rDxUGggwXWhjZViKaa52XrXs/fzrEJLE9M/NPwvujOg=;
-	b=N04jRzRFIEs2ysgVCBSH+vvB1Tw62RaN36No35gsRbu+q4cJaOENLosPuUfhNgW3DGuSfM
-	t5jw5W73srwfDrNZs22yPOAjTPv9EncJfEZUos6uh5lfhqMJnwpDLer27fwxzg2VbZjRYZ
-	dbgbk6Q9pDZs0J7kSHuwxd0g2+DHhRo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-639-UbpUzyWTMHCWhQlKJuqY3g-1; Thu,
- 01 Aug 2024 07:28:34 -0400
-X-MC-Unique: UbpUzyWTMHCWhQlKJuqY3g-1
-Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id B0D291955F28;
-	Thu,  1 Aug 2024 11:28:31 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.65])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 77B3419560AE;
-	Thu,  1 Aug 2024 11:28:29 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id 6556C21E6692; Thu,  1 Aug 2024 13:28:27 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Daniel P . =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>,  Eduardo
- Habkost
- <eduardo@habkost.net>,  Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-  Philippe =?utf-8?Q?Mathieu-Daud=C3=A9?= <philmd@linaro.org>,  Yanan Wang
- <wangyanan55@huawei.com>,  "Michael S . Tsirkin" <mst@redhat.com>,  Paolo
- Bonzini <pbonzini@redhat.com>,  Richard Henderson
- <richard.henderson@linaro.org>,  Eric Blake <eblake@redhat.com>,  Marcelo
- Tosatti <mtosatti@redhat.com>,  Alex =?utf-8?Q?Benn=C3=A9e?=
- <alex.bennee@linaro.org>,
-  Peter Maydell <peter.maydell@linaro.org>,  Jonathan Cameron
- <Jonathan.Cameron@huawei.com>,  Sia Jee Heng
- <jeeheng.sia@starfivetech.com>,  qemu-devel@nongnu.org,
-  kvm@vger.kernel.org,  qemu-riscv@nongnu.org,  qemu-arm@nongnu.org,
-  Zhenyu Wang <zhenyu.z.wang@intel.com>,  Dapeng Mi
- <dapeng1.mi@linux.intel.com>,  Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache object
-In-Reply-To: <ZqtXP9MViOlyhEsu@intel.com> (Zhao Liu's message of "Thu, 1 Aug
-	2024 17:37:03 +0800")
-References: <20240704031603.1744546-1-zhao1.liu@intel.com>
-	<20240704031603.1744546-9-zhao1.liu@intel.com>
-	<87r0bl35ug.fsf@pond.sub.org> <Zp5vxtXWDeHAdPok@intel.com>
-	<87bk2nnev2.fsf@pond.sub.org> <ZqEN1kZaQcuY4UPG@intel.com>
-	<87le1psuv3.fsf@pond.sub.org> <ZqtXP9MViOlyhEsu@intel.com>
-Date: Thu, 01 Aug 2024 13:28:27 +0200
-Message-ID: <87mslweb38.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E75A16D9A8;
+	Thu,  1 Aug 2024 12:18:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.90.97
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722514705; cv=fail; b=AIHpRTkoh/nRubYd03yWxl341kr+IQUJnKM2jlJ9w9d13JVuK0N0//JFZ3odCrlpP/lBcGpuGS38w3pJ5fP8oChxbkYUF0xyzT2CgxH8N+dvereDMFqj2osWgH6qwxC/SlLwHEWQlbOJT34+L09b+UHaPz3CkdPPFaglhGJ1MUI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722514705; c=relaxed/simple;
+	bh=yn1T5EXFnpN2UyQBUCV1nN/Jp5AAkivUHNzAtG20zkQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=EHfXNQ0Nos3x9I/U+DIpImjExf8g78riFJwMQVNSXkSZbeQlo4pOSiTZjuoQDfHUpjX7XxYaFURkfD0gnTnKFnyXDca6VIJqZlKxei3IvjQe9XTIRJAoi7tOI4igrbznfXyFar5gMwTauGLohXjTzKkJQSSXU4raul5lQfMfP+M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=aF9reSw0; arc=fail smtp.client-ip=40.92.90.97
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=LQy8Nk6G1Yvb2qiInlHhpjTPUXjpB3+JlrI8Prysd8LJAq6dvl8Z6ikTQ4kseuky5FLBMkronBMRXvN6tm5KbD2BQAYUGrNYQDzGXvOYrcK+NKMUewfKL8i1Al8FAtCzbjBERlzyNBSOzTr490BtTU/eYAR3NBVnhDxvuzDy7Ylz7Ms1duEQhfBKvSHpqw1L3ZDcMUjO6QlrKU4GKFapzg5v40dtuQ4spAOO+MMcNVdYV0nhDeS9LtO3U91M6yqwGULPmYjFnGJVziCjFkXGjQ/Du9QRlEc371YLci3t3eiV2O+K6inWVRKdi14/hBm2lPrB7dDqjI+K/vcCThvgLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uGnO4fXcZ2TaTfZ2jZ6hPVgOHSGEofFcIDJJISTrQNg=;
+ b=qczie6djIjn1oBoluwkv7XwZeaT3k7PvD5lybtLLtcZjJTPbA9xE6ewAVxVE39kQ5GAAgs5TUanEq9Oc01cGnQGMyW6E9MJN9mvN1HdgpIM0ohCBs2RdH22pHL0m3MSech+hLogJjQ+hO1Zaa7p2O2jKhPowxk4DKIEvTGea7nMcA4+/9Xx5z/iIsczWjnHEz58gLEE0L0ma2RlPKQIhVG4Gkg5hz5/kmCK1IQqQrvqS03O2URbZlUr0UXr3F6zmBVXYJz08YuwpGwf5o8Irl7VB8ACLxV49EPppxnX8yhnz8zC0bDzZ0g360s6WvCe+l2+zDV3NxvP5TjdKBdztRw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uGnO4fXcZ2TaTfZ2jZ6hPVgOHSGEofFcIDJJISTrQNg=;
+ b=aF9reSw0bdlNG6bZH6h4OPollJEAHR0vk6e1YclzLVw5I8JVhgrmrgFDYa1Uqm0FV/6bPfWuyGYSumiAgWakrNui9iTpVhXXhsHyenbDKQJTYCuDdtrnppvchWboIrhhf7fS077JQa/dqMB9tDCuiSCofW/1lQTg/cqjSWc9pg9a048aiur+ZSI0GY7Fd6HSc1P6N7xCvHea3vouJwjifBlspKeHVM3cWIOUqlL7rp9v38BLX8ztj7VwaungzHCJjqagd2ZAFTUHH37nuLDZNKpmqm9vVCmZHpZdCfW3Mh+LOK5MiqNHphQP5IrS10MtDEKhXxvYiuLvGLNHljXyYg==
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:642::8)
+ by AS8P194MB1622.EURP194.PROD.OUTLOOK.COM (2603:10a6:20b:371::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Thu, 1 Aug
+ 2024 12:18:20 +0000
+Received: from AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930]) by AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ ([fe80::3d63:e123:2c2f:c930%4]) with mapi id 15.20.7828.021; Thu, 1 Aug 2024
+ 12:18:20 +0000
+From: Luigi Leonardi <luigi.leonardi@outlook.com>
+To: ameryhung@gmail.com
+Cc: amery.hung@bytedance.com,
+	bobby.eshleman@bytedance.com,
+	bpf@vger.kernel.org,
+	bryantan@vmware.com,
+	dan.carpenter@linaro.org,
+	davem@davemloft.net,
+	decui@microsoft.com,
+	edumazet@google.com,
+	haiyangz@microsoft.com,
+	jasowang@redhat.com,
+	jiang.wang@bytedance.com,
+	kuba@kernel.org,
+	kvm@vger.kernel.org,
+	kys@microsoft.com,
+	linux-hyperv@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mst@redhat.com,
+	netdev@vger.kernel.org,
+	oxffffaa@gmail.com,
+	pabeni@redhat.com,
+	pv-drivers@vmware.com,
+	sgarzare@redhat.com,
+	simon.horman@corigine.com,
+	stefanha@redhat.com,
+	vdasa@vmware.com,
+	virtualization@lists.linux-foundation.org,
+	wei.liu@kernel.org,
+	xiyou.wangcong@gmail.com,
+	xuanzhuo@linux.alibaba.com,
+	Luigi Leonardi <luigi.leonardi@outlook.com>
+Subject: Re: [RFC PATCH net-next v6 12/14] vsock/loopback: implement datagram support
+Date: Thu,  1 Aug 2024 14:18:10 +0200
+Message-ID:
+ <AS2P194MB2170C5B197652F909252BA809AB22@AS2P194MB2170.EURP194.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <20240710212555.1617795-13-amery.hung@bytedance.com>
+References: <20240710212555.1617795-13-amery.hung@bytedance.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [AIzebGsfxEzyNksU4t6mV/+sZHX+k9gt]
+X-ClientProxiedBy: MI1P293CA0011.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:2::20) To AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+ (2603:10a6:20b:642::8)
+X-Microsoft-Original-Message-ID:
+ <20240801121810.51876-1-luigi.leonardi@outlook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS2P194MB2170:EE_|AS8P194MB1622:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6a383474-8592-4338-3f16-08dcb224078e
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|8060799006|5072599009|19110799003|461199028|3412199025|440099028|1710799026;
+X-Microsoft-Antispam-Message-Info:
+	iuVfgoNLWmbaopQ6N6AfRJRdewbMW6OZksW7Fbf8+fxs0utHvKemxrWJntQxVTdEv6LqV3FXU7snXPIVCGM/wlhg+makz7Hu9uSl3XAFxLn+me2u6neJftBKrDrSGNcxY0chdKWxg0i6tXV9FUM8qsEO972D4Cj/yBXnOZJMocongAyGs1NhRHYlQ7ZVWMJNvR7kGt1GorQVFgCv41HRGF7CN45yvj/b6eOHn6U8cvJLrUixGB7efmWsKUPgcV13tzP76wYMFp7wSR2i/SBHqT2Xu4tT9oXpNt/BZ6zxU2FP9TT5hs06WxwOrJ7DI+z02r8F1iYigW029oKyoB9/XuwWqxTew1JjHGAEKX2kB3lC//1AxGPuERzFVTgHTjefX9tIyWEEmZm0yPofbVAZ89jc2pTeDf1fSvrTW3g2RhNFinASg8/+CTTciBhanMrwMNmtycEq7FqnAOV3MJP9IC9oNvaL6W4TuhuUl2hndPbrzIjvM+jE68CdK75bkC24gSWsbRwCZvx7ozZHXQswPGJORRfRjBenMrmTRAVccnO3EQ+mQ0kUwYmAPxBr3fXfZh3UlN7VHbqwz+g6qNL8kie1U54mSPKQ0tWKPvDFfc0li5MIU4jFrgSHoIzfgNp06e1oDhokVENEgwf1Qx9sENh+FNhz4AO9++BmCRrwVq5aIJhEmolpsp1QxTQWDUgmccxDeG/q4vElu6Ux1M7EZQ==
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?rJYFAblC/gDnMVbKFjlQRTLAf6ZBpUtpFt53lvjX1eItiaai8geDs/Dm+yiP?=
+ =?us-ascii?Q?R37Fs8rm8GpOKoGzPRVlSlkiZ+RENFkQnQIqAiwjpsdLaFP91nnDW8dQHlCz?=
+ =?us-ascii?Q?jcPQPWGSwQzQla1cjOSiucxzE59NPz+qKbsFmQJsA8ZapDqUlcgUr2/RcrNG?=
+ =?us-ascii?Q?Is3bWYh4sHqyFwDzxywfLcoBQzflXI8nyGNnOu6WxJT52YT0Stlz+cDJEETf?=
+ =?us-ascii?Q?L5XUCJah36m9j8Jk1v0wRSjifvRq9Phe5LFMS6TazGcztHBSh/0PkyJlf+GM?=
+ =?us-ascii?Q?qtkYGHSZdAVOsUWZUKEjq2Gx1U5XycsdvkrYm4p5wh5Navlv2mtlg/pl1k+g?=
+ =?us-ascii?Q?6bFefcZ8oxZz06O2NnpdE/3TeJCWBs6pJAXsbPStjUH8cCOJKqh9xwmpb9sJ?=
+ =?us-ascii?Q?DUa09ByueE/w6/vWbkn81XfzYzVWPYxZvdm1ObqL8LHWTq/wFmwHLCUUknhQ?=
+ =?us-ascii?Q?TzLygcvFCB+SG035LfYb3lz8rPK9upftTF29EsHeWF5VCfadtdMD5vrD36IX?=
+ =?us-ascii?Q?/lXr4aFuX+JKv0ez4SvcIT5BUa7MbYq9HKOu4ao8cuR5XiwucoKdqZ0YDDV/?=
+ =?us-ascii?Q?sKii7NEPN2ALhttcG1B9Tve2YkrOkCFlkLlZthbLNHtEIFVjeaH6ia8IrACZ?=
+ =?us-ascii?Q?MQvUNkPhsQwjcar8qGdCTWsK9AMbXx+dd6+MXBuIkCdx3DH8yGrxASdFMt0C?=
+ =?us-ascii?Q?cNVr4WXi9qKwN+/iqeJf3IXLNZ4bOBHZeDRyAwaH0jxvBtXpbAk6yliotgfd?=
+ =?us-ascii?Q?HPAQGp3vdlHquabUKovYvp7GaK6BNpqawxLmbZt7Lq2x4rCe5peUkKxq4zpo?=
+ =?us-ascii?Q?Nbo1XgdIxflp835zm0vxYLVvKqh3hp6X9PEM7nBbw2FtKlwwZUWphPrJOb2F?=
+ =?us-ascii?Q?x9QY0vr9rvq59zNFkND2kwlRd8j+Oi1T7NqbgbAPWb74sM7ubN9dqIIxc6wK?=
+ =?us-ascii?Q?tYubwAGh9A2B+06CG8INY6LJmmQAxHcBwTCXCRW9n5iqpMO2n68rxNRNiQzE?=
+ =?us-ascii?Q?A3GnVC/IA2SPp/R3VzYOssASMW9REhqQX63FJqlAXrZRDG5XRswjS/aUpLNm?=
+ =?us-ascii?Q?3rQmn2U3B/lTvBaoduWh0uRA/bV2t6PMcBBV7Kv+Nt1aoJvw9Fw378KMupQB?=
+ =?us-ascii?Q?EuU/4BtIXg6eaVEs1Bopbj36Ts54ue3YAjKbAbuew671a0DFu1UU2K4Cy0Wx?=
+ =?us-ascii?Q?SSg9Nxj2jfX9NpzCtuw3FU6JOnA9LZ/ovYUetqfEZKlxJ9lB7ZvuA20W0U9I?=
+ =?us-ascii?Q?fp7W6xFaQ/fpywtEDFO0?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6a383474-8592-4338-3f16-08dcb224078e
+X-MS-Exchange-CrossTenant-AuthSource: AS2P194MB2170.EURP194.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Aug 2024 12:18:20.0028
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8P194MB1622
 
-Zhao Liu <zhao1.liu@intel.com> writes:
-
-> On Thu, Jul 25, 2024 at 11:07:12AM +0200, Markus Armbruster wrote:
->> Date: Thu, 25 Jul 2024 11:07:12 +0200
->> From: Markus Armbruster <armbru@redhat.com>
->> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
->>  object
->> 
->> Zhao Liu <zhao1.liu@intel.com> writes:
->> 
->> > Hi Markus and Daniel,
->> >
->> > I have the questions about the -object per cache implementation:
->> >
->> > On Wed, Jul 24, 2024 at 02:39:29PM +0200, Markus Armbruster wrote:
->> >> Date: Wed, 24 Jul 2024 14:39:29 +0200
->> >> From: Markus Armbruster <armbru@redhat.com>
->> >> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
->> >>  object
->> >> 
->> >> Zhao Liu <zhao1.liu@intel.com> writes:
->> >> 
->> >> > Hi Markus,
->> >> >
->> >> > On Mon, Jul 22, 2024 at 03:37:43PM +0200, Markus Armbruster wrote:
->> >> >> Date: Mon, 22 Jul 2024 15:37:43 +0200
->> >> >> From: Markus Armbruster <armbru@redhat.com>
->> >> >> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
->> >> >>  object
->> >> >> 
->> >> >> Zhao Liu <zhao1.liu@intel.com> writes:
->> >> >> 
->> >> >> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
->> >> >> 
->> >> >> This patch is just documentation.  The code got added in some previous
->> >> >> patch.  Would it make sense to squash this patch into that previous
->> >> >> patch?
->> >> >
->> >> > OK, I'll merge them.
->> >> >
->> >> >> > ---
->> >> >> > Changes since RFC v2:
->> >> >> >  * Rewrote the document of smp-cache object.
->> >> >> >
->> >> >> > Changes since RFC v1:
->> >> >> >  * Use "*_cache=topo_level" as -smp example as the original "level"
->> >> >> >    term for a cache has a totally different meaning. (Jonathan)
->> >> >> > ---
->> >> >> >  qemu-options.hx | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
->> >> >> >  1 file changed, 58 insertions(+)
->> >> >> >
->> >> >> > diff --git a/qemu-options.hx b/qemu-options.hx
->> >> >> > index 8ca7f34ef0c8..4b84f4508a6e 100644
->> >> >> > --- a/qemu-options.hx
->> >> >> > +++ b/qemu-options.hx
->> >> >> > @@ -159,6 +159,15 @@ SRST
->> >> >> >          ::
->> >> >> >  
->> >> >> >              -machine cxl-fmw.0.targets.0=cxl.0,cxl-fmw.0.targets.1=cxl.1,cxl-fmw.0.size=128G,cxl-fmw.0.interleave-granularity=512
->> >> >> > +
->> >> >> > +    ``smp-cache='id'``
->> >> >> > +        Allows to configure cache property (now only the cache topology level).
->> >> >> > +
->> >> >> > +        For example:
->> >> >> > +        ::
->> >> >> > +
->> >> >> > +            -object '{"qom-type":"smp-cache","id":"cache","caches":[{"name":"l1d","topo":"core"},{"name":"l1i","topo":"core"},{"name":"l2","topo":"module"},{"name":"l3","topo":"die"}]}'
->> >> >> > +            -machine smp-cache=cache
->> >> >> >  ERST
->> >> >> >  
->> >> >> >  DEF("M", HAS_ARG, QEMU_OPTION_M,
->> >> >> > @@ -5871,6 +5880,55 @@ SRST
->> >> >> >          ::
->> >> >> >  
->> >> >> >              (qemu) qom-set /objects/iothread1 poll-max-ns 100000
->> >> >> > +
->> >> >> > +    ``-object '{"qom-type":"smp-cache","id":id,"caches":[{"name":cache_name,"topo":cache_topo}]}'``
->> >> >> > +        Create an smp-cache object that configures machine's cache
->> >> >> > +        property. Currently, cache property only include cache topology
->> >> >> > +        level.
->> >> >> > +
->> >> >> > +        This option must be written in JSON format to support JSON list.
->> >> >> 
->> >> >> Why?
->> >> >
->> >> > I'm not familiar with this, so I hope you could educate me if I'm wrong.
->> >> >
->> >> > All I know so far is for -object that defining a list can only be done in
->> >> > JSON format and not with a numeric index like a keyval based option, like:
->> >> >
->> >> > -object smp-cache,id=cache0,caches.0.name=l1i,caches.0.topo=core: Parameter 'caches' is missing
->> >> >
->> >> > the above doesn't work.
->> >> >
->> >> > Is there any other way to specify a list in command line?
->> >> 
->> >> The command line is a big, sprawling mess :)
->> >> 
->> >> -object supports either a JSON or a QemuOpts argument.  *Not* keyval!
->> >> 
->> >> Both QemuOpts and keyval parse something like KEY=VALUE,...  Keyval
->> >> supports arrays and objects via dotted keys.  QemuOpts doesn't natively
->> >> support arrays and objects, but its users can hack around that
->> >> limitation in various ways.  -object doesn't.  So you're right, it's
->> >> JSON or bust here.
->> >> 
->> >> However, if we used one object per cache instead, we could get something
->> >> like
->> >> 
->> >>     -object smp-cache,name=l1d,...
->> >>     -object smp-cache,name=l1u,...
->> >>     -object smp-cache,name=l2,...
->> >>     ...
->> >
->> > Current, I use -object to create a smp_cache object, and link it to
->> > MachineState by -machine,smp-cache=obj_id.
->> >
->> > Then for the objects per cache, how could I link them to machine?
->> >
->> > Is it possible that I create something static in smp_cache.c and expose
->> > all the cache information to machine through some interface?
->> 
->> Good questions.  However, before we head deeper into the weeds here, I
->> feel we should discuss the things below.  And before we do that, I need
->> a clear understanding of the use case.  Elsewhere in this thread, I just
->> described the use case as I understand it.  Please reply there.  I'll
->> then come back to this message.
->> 
->> [...]
+> +static bool vsock_loopback_dgram_allow(u32 cid, u32 port)
+> +{
+> +	return true;
+> +}
+> +
+>  static bool vsock_loopback_seqpacket_allow(u32 remote_cid);
+>  static bool vsock_loopback_msgzerocopy_allow(void)
+>  {
+> @@ -66,7 +71,7 @@ static struct virtio_transport loopback_transport = {
+>  		.cancel_pkt               = vsock_loopback_cancel_pkt,
 >
-> Jonathan and I provided different use cases for x86 and Arm. Could we
-> come back here to continue the discussion? :)
+>  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+> -		.dgram_allow              = virtio_transport_dgram_allow,
+> +		.dgram_allow              = vsock_loopback_dgram_allow,
+>
+>  		.stream_dequeue           = virtio_transport_stream_dequeue,
+>  		.stream_enqueue           = virtio_transport_stream_enqueue,
+> --
+> 2.20.1
 
-Can you provide a brief summary of the design alternatives that have
-been proposed so far?  Because I've lost track.
+Code LGTM! Just because you have to send a new version I'd modify
+the commit message to something like:
+"Add 'vsock_loopback_dgram_allow' callback for datagram support."
 
+Feel free to change it :)
+
+Thank you,
+Luigi
 
