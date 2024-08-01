@@ -1,110 +1,150 @@
-Return-Path: <kvm+bounces-22991-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22992-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C1594532C
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 21:15:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E51059453A3
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 22:09:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E22D1B233E3
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 19:15:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FABA1C21975
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 20:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A3314A634;
-	Thu,  1 Aug 2024 19:14:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F7B14AD32;
+	Thu,  1 Aug 2024 20:09:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RO6UZUDA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uaVf5YoA"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB9114A4EB;
-	Thu,  1 Aug 2024 19:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24D3414AD02;
+	Thu,  1 Aug 2024 20:09:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722539684; cv=none; b=NiaUUtJNWez7L6aP5CdhtvMNQrVDK6zU/kRitx2P43r/RiWi8NioQgZugXa5FVDcQSeLsELNxnihSCVrfnZ4neC8T5axxC7B9fff4VK3UO6K+FQSLBb2U3/LWWWbNFoJjTTxhN0Gl9CE9RznVDJeN+F2P9pyBzkS52bkvhM0mhQ=
+	t=1722542984; cv=none; b=YUUhczGYQsx7r6zhhijDhN5/UC3cfc6FhrOMg4hvjBb/mRez5h9dxNEnt0104NoyA1gq1Rm3SWk6eey3JAy9XF4FFiColL3BP4uVebEABblAeGahSyGB/9ccTNvVyL3q7hoj1Fvbzx7eNZPcJent2cHrP07qsTFa4jnXRHBJa9E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722539684; c=relaxed/simple;
-	bh=01anIdeFIR/TWrwSz1YbUxgJaSbTkSDm5rr3OWMkjdM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q/RD1CAdhASdFVUFLGIJ8ip0e4vTejXYZB2HJfAbWYsn5EzudXT9g1SSARE8u9g+ID6ScdagUEwSe2gVXoNZeFZKRCWR42drVvhd9kp2YNz0z7H75L3gVLH9sCsYtTIIsdcBPatMhg428/u6sQ5xRt8ncOKWq90jdVV2UewO+F4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RO6UZUDA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2774DC32786;
-	Thu,  1 Aug 2024 19:14:40 +0000 (UTC)
+	s=arc-20240116; t=1722542984; c=relaxed/simple;
+	bh=OwYu5izJDFdDC+bLnsi3uCpm9R42AT+Pbfnx3S5QwQM=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=R8mtWiOOeg9nK82SzDqLYNYOXa+huqdC87wFMthH6x5NpeblbyC6ACLWrTuC3sI+qGw/zKyDSvfEe+4osdO86RpPHMQLZIm6dzwzu/NgYN2lbrMqPTTN4aaZPbCmRUJxh/9RqtNRT/cnJ5zHzClkR0XYo8xHVkCkWCb22V9PHqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uaVf5YoA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98FF3C32786;
+	Thu,  1 Aug 2024 20:09:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722539683;
-	bh=01anIdeFIR/TWrwSz1YbUxgJaSbTkSDm5rr3OWMkjdM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RO6UZUDAEWZsWglXXKwTFsO9xVKhj0mTi/mnbKGJ3sSIk2oDgZUW9OUdoYGuJgXPa
-	 C/yFMnWp+SIejEgWyGoD/6I+ULSONP7a0ZFnOavGK8fQc2YyiIpwFAUbdAmEZtRAvM
-	 h+85u7I2JI+JzDN72osT7qL8MvzQFgl30lT6HrjfHdtTyrbzGQxy/YGiD7ynitZ7iU
-	 1w2Wcno/6JehBQOutAcGaqGiQnu+CZAo/YxNlED1kB9cc8+jnllBVUHkWvZcE3s7kv
-	 hbSj247qiGc2OLqocHmEJPVlCApYkY4FL7OzBoH8Wsq/RmvjxsFTqADVza06CvBeq8
-	 9kaR6WsVHUbVg==
-Date: Thu, 1 Aug 2024 20:14:38 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
+	s=k20201202; t=1722542983;
+	bh=OwYu5izJDFdDC+bLnsi3uCpm9R42AT+Pbfnx3S5QwQM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uaVf5YoABf0g2ST3gdEk0dpt7BoxwNuIEY/0zP1fW/FGIy60R3suuFjO0pV9EWr+S
+	 h7aul0S6c9EoIbCuci93a57vCwekSVnp6DHoKE/j1TeN0QXJdEV2c5mlIrxt+ImR7e
+	 rdlIAtAvWskSTzSvBr+uI8Q3SaE46Q4EIMGkWuIdKoRFIMkhlbPycfYdJ8Yrv7de0y
+	 x6OFszzF9iCF8fye8rYN0Fi5OK4BgS5/hyV2NF5WaO6SQzWP7YT4HLwbYLTYgitOiI
+	 zz/eP+3ylgjHgP/zWwk+DFo8qouevFPkXwey347Yfv1MaSxmYDKb8MRQySv4vRe9aJ
+	 ptSQxH05hkPfA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sZc7I-00HW3I-VZ;
+	Thu, 01 Aug 2024 21:09:41 +0100
+Date: Thu, 01 Aug 2024 21:09:40 +0100
+Message-ID: <87ttg43szf.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
 	James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in
- get-reg-list
-Message-ID: <811ea0eb-bc87-4ac3-8bca-27c787e43051@sirena.org.uk>
-References: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
- <86le1g19aa.wl-maz@kernel.org>
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Fuad Tabba <tabba@google.com>,
+	Joey Gouly <joey.gouly@arm.com>
+Subject: Re: [PATCH v2 4/8] KVM: arm64: Add save/restore support for FPMR
+In-Reply-To: <1a00165f-7ae5-4c58-9283-836716205db7@sirena.org.uk>
+References: <20240801091955.2066364-1-maz@kernel.org>
+	<20240801091955.2066364-5-maz@kernel.org>
+	<1a00165f-7ae5-4c58-9283-836716205db7@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Yi/EHoEl7X6dkR4r"
-Content-Disposition: inline
-In-Reply-To: <86le1g19aa.wl-maz@kernel.org>
-X-Cookie: Be cautious in your daily affairs.
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, tabba@google.com, joey.gouly@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Thu, 01 Aug 2024 20:07:16 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (7bit)>]
+> On Thu, Aug 01, 2024 at 10:19:51AM +0100, Marc Zyngier wrote:
+> 
+> > index 6af179c6356d..2466dd231362 100644
+> > --- a/arch/arm64/kvm/hyp/nvhe/switch.c
+> > +++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+> > @@ -198,6 +198,15 @@ static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+> >  	} else {
+> >  		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+> >  	}
+> > +
+> > +	if (kvm_has_fpmr(vcpu->kvm)) {
+> 
+> nVHE is faulting for me, apparently on the kvm_has_fpmr() check though I
+> ran out of time to actually figure out where exactly it is going wrong.
+> I'll have a further poke tomorrow.  Backtrace below.
 
---Yi/EHoEl7X6dkR4r
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Well, that's actually pretty obvious when you see the crash
+(FAR:ffffff880115cd1c spills the beans).
 
-On Thu, Aug 01, 2024 at 05:45:49PM +0100, Marc Zyngier wrote:
+>
+> > +		u64 fpmr = read_sysreg_s(SYS_FPMR);
+> > +
+> > +		if (unlikely(is_protected_kvm_enabled()))
+> > +			*host_data_ptr(fpmr) = fpmr;
+> 
+> That looks wrong until you remember what host_data_ptr() does but but
+> it's actually fine.  host_data_ptr() is looking inside the struct
+> kvm_host_data for the CPU rather than referencing the locally defined
+> variable fpmr here.  I do think it's worth avoiding the name collision
+> though, perhaps just avoid the temporary variable?
 
-> Can we please switch all this stuff to symbolic naming instead of
-> magic numbers? Given how much effort is going into the "automated
-> generation" thing, it is mind-boggling that the tests still rely on
-> handcrafted numbers. We just end-up with two different sets of bugs.
+I'll rename the variable if that avoids people getting their brains in
+a twist. Full potential fix below.
 
-> At the moment, the level of confidence I have in this stuff is
-> sub-zero.
+Thanks,
 
-Yeah, I was wondering why this wasn't using the generated values
-especially given that the generated headers are available to tools - I
-wasn't sure if this was a deliberate decision to cross check the data
-entry or something.  I'd certainly be happy to convert, though that does
-seem a bit invasive for a fix.
+	M.
 
---Yi/EHoEl7X6dkR4r
-Content-Type: application/pgp-signature; name="signature.asc"
+diff --git a/arch/arm64/kvm/hyp/nvhe/switch.c b/arch/arm64/kvm/hyp/nvhe/switch.c
+index 2466dd231362..c0832ca0285b 100644
+--- a/arch/arm64/kvm/hyp/nvhe/switch.c
++++ b/arch/arm64/kvm/hyp/nvhe/switch.c
+@@ -199,13 +199,13 @@ static void kvm_hyp_save_fpsimd_host(struct kvm_vcpu *vcpu)
+ 		__fpsimd_save_state(*host_data_ptr(fpsimd_state));
+ 	}
+ 
+-	if (kvm_has_fpmr(vcpu->kvm)) {
+-		u64 fpmr = read_sysreg_s(SYS_FPMR);
++	if (kvm_has_fpmr(kern_hyp_va(vcpu->kvm))) {
++		u64 val = read_sysreg_s(SYS_FPMR);
+ 
+ 		if (unlikely(is_protected_kvm_enabled()))
+-			*host_data_ptr(fpmr) = fpmr;
++			*host_data_ptr(fpmr) = val;
+ 		else
+-			**host_data_ptr(fpmr_ptr) = fpmr;
++			**host_data_ptr(fpmr_ptr) = val;
+ 	}
+ }
+ 
 
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmar3p0ACgkQJNaLcl1U
-h9CLLQf/eEUB37vfZfDmSeqDsqzTJxrgeoFWmua8m3kh7D1xJkT/G8sCyaJjErpr
-4HYDfLgkBajnm+kHRk742Ou8t9nMA9FXfkmf7c/dV1aoAXkBPFXfEtixXsTNZE6M
-S8qxvb8jtvEMRWkxwONbifDelVkIn2sYwNpIDhPLPuU91evqBJyOh12BJi7k7TEq
-jwERSrSZGFmkfxetToXyj/sVcydl7etTttU8Nl5UleaXOT/aRaCM0TbJX58osaKn
-ajLQt7TiDEqYYGulWDePcmZIRWaYMdjx10FmZek8HkzqHYdUGLMofK6b6Girs+Jn
-RnAHOD+8aLKjAHUakhF1I4E9eFkIQA==
-=XmxA
------END PGP SIGNATURE-----
-
---Yi/EHoEl7X6dkR4r--
+-- 
+Without deviation from the norm, progress is not possible.
 
