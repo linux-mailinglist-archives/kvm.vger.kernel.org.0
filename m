@@ -1,140 +1,117 @@
-Return-Path: <kvm+bounces-22831-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22832-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 316DA9441F4
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 05:39:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6467594423F
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 06:34:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55DF41C2187D
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 03:39:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ED799B223EE
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 04:34:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 849B313C818;
-	Thu,  1 Aug 2024 03:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C70B713D511;
+	Thu,  1 Aug 2024 04:34:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zh3uhhOd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iENrUYXl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B4081EB4A0
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 03:39:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B9F5FEED
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 04:34:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722483592; cv=none; b=MBL70luj3Z3frP2PV2m1zhEZLaCeezf8oKk8XIT+Us0oaQ2prY5ufTV3w4EKzF9ZzrP59YP3vFQiVUD03TBzRIWilY8Drf1q8IU+sfVe8/bzg7uT26hEmglvZpADre8FlvmbsJGnS00z/yLjg5elzh+RIGIz1LB+LwgoHpL2ZLQ=
+	t=1722486854; cv=none; b=MLMWcVLObIbynlXCUExrFsPxnmJoOVYx3/fFoyUCbQyMxzng4MPHIxerdf7BFc0/dr+yEp57LhWAfyA6HUvTk/s4t3534cr8OAW2CCCuOWRiAPhjRiD5mdmT2ScFo2en/LvzhgCIZhDgD0YgrXPDVaUT/cBRDTjB1dPtfVCfivU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722483592; c=relaxed/simple;
-	bh=vWtCZxxAAPO6zJnXDAJSgm3vET+YUexDNg/707VMj5g=;
+	s=arc-20240116; t=1722486854; c=relaxed/simple;
+	bh=Qg3KLbjpl0UxtYDGbUYottI8ryXXex5+WzWO5Y1EMPA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AqylI0FM5NgUrECK8APlZsl/9RnbkpPinK2I7+5qDOsBHl7YWVvZo8X4mueFOmT/lLx0ajBZxjxgNG1e8mzRS9ufIjX62MGDyPIbEBQ+GG9fy56n7rZfQ/XoGbAmhCVX/ZKk4Hiyw42Ly2roshvtrMflz81629rprE8YTD+HbHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zh3uhhOd; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722483589;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a9W2VRIIGErciPW7gZomIT9/wCLlvJpDwZh2b3ecZfw=;
-	b=Zh3uhhOd9/s5i20Prnd+UkjoqOTjCNpj//kECTRFyhVPjn95NkigSnhH70uc5abPA6z5OC
-	iihXlLCgxpZ07dQq9QMf/PJj1tcZEsgt7Knnn5qnmDPis5HyyrKfKL8D9lDCFaaMo4dQQl
-	L7ZovpjOrpyTQEG5Fac8mfJHYhptDaU=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-650-vXZG02OFOqitr8q6pae5cQ-1; Wed, 31 Jul 2024 23:39:48 -0400
-X-MC-Unique: vXZG02OFOqitr8q6pae5cQ-1
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-650b621f4cdso118891047b3.1
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 20:39:48 -0700 (PDT)
+	 To:Cc:Content-Type; b=RNUFUIUKU8FDtLKz/mfgi1bg4bR2TdGoqdKek4rV/6Gro5J+xFLWjIU9Av1F7zXN02lFHdDnoEBcqLI/XeedlnrjxkDpowg73eYZXR2cxnGQorY0CkhX2jHI6JTGi131YLFUrOlaEBV7545QiyfqUgjwFctenXoPQW+QS1CyZTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iENrUYXl; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-3687f91af40so3577410f8f.0
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 21:34:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722486851; x=1723091651; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qGZpnYP4EfQ60xPmQeFDF5gCZVSkW8TEfCy2z7E1Hi8=;
+        b=iENrUYXltSRg4fgHaPlr6Q/HE0ro0XR6TnCXJu+qcBI0ickBkPthoToPpYsHw8mQBI
+         op6MzPuTniEfID4KpoFtD4BhdUkhTwNMCXceYaH62g/2oWGkiVGE6rieJ9l4Q6VwgqcK
+         pwpGdLPGuJx9kCi2jjy5vcNYaoArNLMsY2wTXmiUHkjKpz4pvGpXoJUOwLJuoonLTbx5
+         p7WQ/sCMzvKb+pe1m7a6Jhnq+0ueF2sCxXDwQZLkxr1nibBxfRRQpvggepWcvuawdOdB
+         BbjzlW0LGh9zdBUaUw0o7AZDDANwF+atDq7cXgh1XimtiCU9BAHo2pSTNQQMmDcUpUoS
+         rUEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722483587; x=1723088387;
+        d=1e100.net; s=20230601; t=1722486851; x=1723091651;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=a9W2VRIIGErciPW7gZomIT9/wCLlvJpDwZh2b3ecZfw=;
-        b=WjKIGAL64Zw0ROCUfj5vom/qlo7H9euYif7kVFF5esBLwwVCZ9cpaNFXiyQkGvULXd
-         Shfso2tnK4qRc/BEcK7XbcgKqdBPoc+Nlts6ez4E16eaCWh96rn7YOQu/yfVXnZatfqa
-         xFIuknjx22NcdHVFhxDxYNzCkwN9+gQ9zdaNadr+6eE1osM41qZwGO6wlLQj832MoH1e
-         HKdwm6yqH6t+QuOHvNVHtMiBJXDPJ9BeamDkaOjzlsnsF2fFvttDwyMwcbLtPn9xX3Np
-         /4HnsoYX6ZrECxnZs3u/Yi2UtjJkfn1Npe4qdAtc0pB95sJEnU73GlHGtKhCbMa5cdvf
-         57Fg==
-X-Forwarded-Encrypted: i=1; AJvYcCUayYdsCxHN0v4q6UXdXKBXecGda4KRyHwLyB/1os8R2jDdaYHkjZY1SArEVWiR1+VQCI7uhbqqVM923eac+sGqYeZs
-X-Gm-Message-State: AOJu0Yz8arEYe1TxNGX/iiR3Qm3ss2p/uHb7KaMdHcrk9i7snNc+DB+r
-	nQm+AF58AqR8D+Znn5y2pCdd3YneJkxF50aMKIZFYBAG9qWV21mXz8A1TvLWrT+rJimojGghF0j
-	bEqP2siSDCsT26SVwP0t/VsiC4CB5V5bVq2mC99W2n1f2xzWFm/22N89iVFY2h0WKm7S5fNGauu
-	4brIVYVtUyY4K0pnm1RAF5Y/rU
-X-Received: by 2002:a0d:dc81:0:b0:65f:8218:8b2f with SMTP id 00721157ae682-6874f605a38mr12027997b3.43.1722483587798;
-        Wed, 31 Jul 2024 20:39:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFLNXMjkzKFeq0Hkwcz0rr8sBTxEfS/YnzcIywxu4UXEdTXHUdyXidwbCMQ4MFl7YAW13Q/2xD4unAf0lbN7CQ=
-X-Received: by 2002:a0d:dc81:0:b0:65f:8218:8b2f with SMTP id
- 00721157ae682-6874f605a38mr12027747b3.43.1722483587507; Wed, 31 Jul 2024
- 20:39:47 -0700 (PDT)
+        bh=qGZpnYP4EfQ60xPmQeFDF5gCZVSkW8TEfCy2z7E1Hi8=;
+        b=H6uxqCXFuDQCCYnVFhcKj00tje03FgyWvMBxEVhnH4ICek7Jr2x7ZQkDSKrEsNslNO
+         F/7vLk3ZGbKnoIbfrsDnqbQVo+cgNDCmmbl4l5GFTK4umcpMJ1PgNAIDOfmlrTvRu3rC
+         rKYywXn6u3WbwVk3x4MOHOvfSZ4vu9jFMnf/fdqHHWjBuk+9fUAw3mQiq1YJW9gT98ig
+         H+4Z4PVS5WyAM+yhIwX6zw6s3I6chgEXt3x2/9M903hVaQZT94kfOl47voYcXbofjVtX
+         Wz2g6xQx3hhL4FB7wMUCJH7KsRTxhkQiGBjE7uNjmLghVk8QQlg4VG5rs+6jIySLruKI
+         Rutw==
+X-Forwarded-Encrypted: i=1; AJvYcCUA3rqYW40cSLHr47Xlrzz9YxANVMfgxxIIHZnTMNLsX+1ZD4s0clGAtFfpW02x049hSekNppJecQVQY76K2GYVp38E
+X-Gm-Message-State: AOJu0YwBKIfUCzLMf0Rxn8w6QrFCTrq7QOrhYXUhX8V310gs7eubSnfG
+	nlzfzS+vz28FTw6A2A881BGB76Fel4ZK/SESNgVORgvkDwDhBoBlTstBW89K/XzZP7194i7eNW/
+	ac5nq3lCo2qkBSa4q6ljAfp6HRVE=
+X-Google-Smtp-Source: AGHT+IGhDeba37g9uG8nUhdB3rcgm5MnCnQapsDtFa8kwxJpHsWM8RDhaORDzngsUNB0aHdFahMppn1c0KQD66nV0/A=
+X-Received: by 2002:adf:fd8b:0:b0:368:4e38:790c with SMTP id
+ ffacd0b85a97d-36baacd1c74mr843459f8f.14.1722486850440; Wed, 31 Jul 2024
+ 21:34:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240726134438.14720-1-crosa@redhat.com> <20240726134438.14720-11-crosa@redhat.com>
- <a7f2d78a-4de6-4bc6-9d54-ee646a9001fe@linaro.org>
-In-Reply-To: <a7f2d78a-4de6-4bc6-9d54-ee646a9001fe@linaro.org>
-From: Cleber Rosa <crosa@redhat.com>
-Date: Wed, 31 Jul 2024 23:39:36 -0400
-Message-ID: <CA+bd_6L7o05mENKVuLLfMFK9OF6ckU23ue0xmxiWO5oiT4ZEbw@mail.gmail.com>
-Subject: Re: [PATCH 10/13] tests/avocado/tuxrun_baselines.py: use Avocado's
- zstd support
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc: qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, 
-	Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>, 
-	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, David Woodhouse <dwmw2@infradead.org>, 
-	Leif Lindholm <quic_llindhol@quicinc.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org, 
-	=?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
-	Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, 
-	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org, 
-	Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Akihiko Odaki <akihiko.odaki@daynix.com>
+References: <20240730053215.33768-1-flyingpeng@tencent.com>
+ <db00e68b-2b34-49e1-aa72-425a35534762@redhat.com> <ZqlMob2o-97KsB8t@google.com>
+ <CAPm50aLGRrK12ZSJzYadqO7Z7hM25NyXPdCD1sg_dTPCKKhJ-w@mail.gmail.com>
+ <2e66f368-4502-4604-a98f-d8afb43413eb@redhat.com> <CAPm50aJ2RtxM4bQE9Mq5Fz1tQy85K_eVW7cyKX3-n4o7H07YvQ@mail.gmail.com>
+ <CABgObfb2MX_ZAX3Mz=2E0PwMp2p9XK+BrHXQ-tN0=MS+1BGsHg@mail.gmail.com>
+In-Reply-To: <CABgObfb2MX_ZAX3Mz=2E0PwMp2p9XK+BrHXQ-tN0=MS+1BGsHg@mail.gmail.com>
+From: Hao Peng <flyingpenghao@gmail.com>
+Date: Thu, 1 Aug 2024 12:33:58 +0800
+Message-ID: <CAPm50aJLrGfsVvaavPGZ_u0pwfFWEDGsaOx7sgXDOycJWTzyOg@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86/mmu: Conditionally call kvm_zap_obsolete_pages
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: Sean Christopherson <seanjc@google.com>, kvm@vger.kernel.org, 
+	Peng Hao <flyingpeng@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jul 29, 2024 at 10:39=E2=80=AFAM Philippe Mathieu-Daud=C3=A9
-<philmd@linaro.org> wrote:
+On Wed, Jul 31, 2024 at 11:00=E2=80=AFPM Paolo Bonzini <pbonzini@redhat.com=
+> wrote:
 >
-> On 26/7/24 15:44, Cleber Rosa wrote:
-> > Signed-off-by: Cleber Rosa <crosa@redhat.com>
-> > ---
-> >   tests/avocado/tuxrun_baselines.py | 16 ++++++----------
-> >   1 file changed, 6 insertions(+), 10 deletions(-)
+> On Wed, Jul 31, 2024 at 1:19=E2=80=AFPM Hao Peng <flyingpenghao@gmail.com=
+> wrote:
+> > > So if anything you could check list_empty(&kvm->arch.active_mmu_pages=
+)
+> > > before the loop of kvm_zap_obsolete_pages(), similar to what is done =
+in
+> > > kvm_mmu_zap_oldest_mmu_pages().  I doubt it can have any practical
+> > > benefit, though.
 > >
-> > diff --git a/tests/avocado/tuxrun_baselines.py b/tests/avocado/tuxrun_b=
-aselines.py
-> > index 736e4aa289..bd02e88ed6 100644
-> > --- a/tests/avocado/tuxrun_baselines.py
-> > +++ b/tests/avocado/tuxrun_baselines.py
-> > @@ -17,6 +17,7 @@
-> >   from avocado_qemu import QemuSystemTest
-> >   from avocado_qemu import exec_command, exec_command_and_wait_for_patt=
-ern
-> >   from avocado_qemu import wait_for_console_pattern
-> > +from avocado.utils import archive
-> >   from avocado.utils import process
-> >   from avocado.utils.path import find_command
-> >
-> > @@ -40,17 +41,12 @@ def get_tag(self, tagname, default=3DNone):
-> >
-> >           return default
-> >
-> > +    @skipUnless(archive._probe_zstd_cmd(),
+> > I did some tests, when ept=3D0,  kvm_zap_obsolete_pages was called 42
+> > times, and only 17 times
+> > active_mmu_page list was not empty. When tdp_mmu was enabled,
+> > active_mmu_page list
+> > was always empty.
 >
-> _probe_zstd_cmd() isn't public AFAICT, but more importantly
-> this doesn't work because this method has been added in v101.0.
+> Did you also test with nested virtual machines running?
 >
+yes, have similar results.
 
-While it's not the best practice to use private functions, I just
-couldn't accept rewriting that for the skip condition.  I can make
-sure future  versions (including 103.1) make it public.
-
-Also, these patches count on the bump to 103.0 indeed.
-
+> In any case, we're talking of a difference of about 100 instructions
+> at most, so it's irrelevant.
+>
+> Paolo
+>
 
