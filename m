@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-22840-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22841-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EBAA944254
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 07:00:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8129944255
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 07:00:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FB471C2200B
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 05:00:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 16C591C22535
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 05:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ED20145B09;
-	Thu,  1 Aug 2024 04:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C248A146D7A;
+	Thu,  1 Aug 2024 04:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ut/bMld9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="W1znYxYD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CB88143885
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 04:59:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3665B1448E5
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 04:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722488366; cv=none; b=F1Bpw0oEt8K9tfso5CQs2Q2Ohhy13YSr4pobFIRhGtWYrInD3A6mepOVLGVnC49VG+/UxMsoM5SKonl0+a/QtvlI/pGMXiHnf81GxTuwuhSX/KpUcN14ISCFMp21aiM6rhVDUoZk4WQbygymuMr30nyleBC7T3dLpGuvvEF1IK8=
+	t=1722488370; cv=none; b=aYNSk08TnzEU4TYW4rmEztAYgzIUBplUjBLmJJCi4gmsjEMHezHd9ajeMVqaVg/lL58JWxLxepi3rSyQu0pjrnIl5v5jBNdxtOFciW8H7RMdwe9JCpwGTHZRztKAgkAMcjlYNYcr48ZZO+8/9/NXJTZAZatKKaN+kJiFiLIj1u0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722488366; c=relaxed/simple;
-	bh=dif1OkND5KGhR45F83fypWTka4+w2DTtKcoRJeXtzhM=;
+	s=arc-20240116; t=1722488370; c=relaxed/simple;
+	bh=tpzCQzHMZFX7c1AT5cMEt40rEO2f6HsB/bvU99X/K/0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=STgnjlU3VopOu7ItV+VlP4ddlz2Z4tb/gJtRwqoQMNKPAV57BbebbbAxZMq2p1aAEaV7u8dNXOsNsFWk0e7ou+MMxAQU0LQDpSvNzOdqcq+cfAjovGBn5nSLIXsfGSTB9h6filORuX0vZQ0OxF5LPTjNHf4REpBC8+LWAAqY1Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ut/bMld9; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=Qnvgf1G27+RoQydG780MTFAtKROp8wa/n+1DE9vjWkuwg9BeNDmDqtkEmWBUttZQ/tqd7PiEqXNhVEmNyA5Kw04eV+jPgh929QcZ3pnERQ+88fgXAcE3dGOiXytSAmzKlr7iJ/8DaHMDvOSIvqwyJzI44fE+1pBVqlo2VGtE1/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=W1znYxYD; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2cb81c562edso6400714a91.2
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 21:59:24 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03b3f48c65so9617082276.0
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 21:59:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722488364; x=1723093164; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722488366; x=1723093166; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=xPzgKPV3k5GL7Cs71Q56CHqm2Jkw0rEVhVnkYtPwoz8=;
-        b=Ut/bMld9jrJaj+OtAWz3nwf2pduw72QUtUAL1MT4Jy5gONyUAahhIUWFr1oxm8qDYj
-         kJjduelhNMoP48SvCusPOEHcP3PFadPvArz7jVhS0A4r4OXPIEMHYgjecHKuhGHiy8i8
-         Kkcs84V/PbaOLcoO9HcFPZnxSzzcNiJjBGeqWNc6KWt9pgh3svdxBYsV/8xILorxzgrS
-         csiOJCaQAXD+y/Og/wIlCJ+xNU/32eA8dLzBJ7tAuXBi6Pbcf+POcsSpOWGXEuXvRlZS
-         bC11xaiab9R4dEJOS3yeqFu8+RwT+BJ9fWP1PGJA42XuLmf46HeNLrFhZGEj16YYFl2Z
-         Q/AA==
+        bh=PXHETXmeoMyzkRFbIwNld5EMsoT/IC0GxFRJGsoikdg=;
+        b=W1znYxYDNIkT5ESLvQEVZAcVXsPQvOfMnihoSnQvE6oNtYxN+RFVSAP+CEUWUB4qsb
+         4/z16SSeDtYHzoTFjCjVVP+Gejc7Trffs/o5PBIGnBHU6r3OOaovaLg6msH6ooFMBV6d
+         cxrobBnER8CsSQpVSGcjYwhWEzYty+8bJbmKyL+EwrfefAcFZwPI9RTkGy8KSnXPbvaU
+         +GoE13q5jjclRCXp3HyPF2RsDAN+6M705PENmctOFxJeMX0bX5J6kJUAO+sRo0THKpDT
+         p5D7Wp7hDhQt3nbxgP42q46N6U/slLpgu4iTJ4xb5GVh7VPTjn828TamQAoYlM57BsLm
+         4ZAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722488364; x=1723093164;
+        d=1e100.net; s=20230601; t=1722488366; x=1723093166;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xPzgKPV3k5GL7Cs71Q56CHqm2Jkw0rEVhVnkYtPwoz8=;
-        b=pz11WfGP2uA6o9Qd+Vxp3DIlf8tlXfTc9359UrU3LVe776DEACcE4mD48UrLN7speH
-         sYZsO/XC6LwTNopgMAceJSgqPaaBcFSBlyxC6qe6ovya4c3eAyeG6eQvSp6vLaH5uSnS
-         uQy7EKIhJRMn3SJ0HDt/cRbppSOhLbugk6h8ubm20oyTDbXDx80A5CQaJk5mOBpTONyq
-         P+aeitSR3b3YLfm1x9EI9wvZog+KWlQkimS734OdtuOCIYGEHseYlxQlBKoyvjXE8YzG
-         sN5MJoWWCrMWR34pLC6/+ckUinS9MNPfyzciTLlZ7WZMMxJqUbmyjd5wh1L+0/AFNMTS
-         N58g==
-X-Forwarded-Encrypted: i=1; AJvYcCVpiLFcNh3iOldvDhLMtIXLrFhro9ytsC8SScYtirHr2HR/3Uy0VK+8ohFuchuSvrMgbox5CySSgG6l0KIzkvzzG89s
-X-Gm-Message-State: AOJu0YwyiTqiflWofwnJtjTj4B/LXdKrfSyng8EabJfyVe44Oe4bMwZD
-	eUr/ZbIwb7LEInLdARuv6/L9E/ogwvA5Y/DCdyWmeTnsplfEMsGd7RLc8ukt9MCagtbOjl/5oul
-	yAetNXA==
-X-Google-Smtp-Source: AGHT+IFz+avBXprMtBMgz1SOFfYLpvVoYnZfKnbG8nnpFLCHengkkev16Do8OqHeqS65tqNLTt7NTgV+82xq
-X-Received: from mizhang-super.c.googlers.com ([34.105.13.176]) (user=mizhang
- job=sendgmr) by 2002:a17:90a:c794:b0:2c9:7ebd:969d with SMTP id
- 98e67ed59e1d1-2cfe7b550bcmr14138a91.4.1722488364284; Wed, 31 Jul 2024
- 21:59:24 -0700 (PDT)
+        bh=PXHETXmeoMyzkRFbIwNld5EMsoT/IC0GxFRJGsoikdg=;
+        b=bA/d406EusCRpUIoSK5vkIJGoh5MqdzR9qeA2z79DRNnh4HqVIdI422OALkfFG22Qs
+         +1GcBKBGJA4qY+5r85xwauOReKhIJpgZoROp3wN1kZmt1kVmbIxdt6A1xdYn+La+2UEj
+         vFTB2IDykdv32ymQeydBLuzWGEVZ9fpF1YeUBG6NBo/TUYjrsRrw7hlx5yuhn+Umeziw
+         FxWuN1MsKzMDVMHRpD45dNeeVsLZUXM7Y7GRyTfLy8YqDVmVcLNVAEB+83E5xzfu7ZfS
+         XTGBxtZQz0ruVQ2ETfiSYm2CRQQ4xgPI5lqX5UwGBDO3SF6AcXVrZDW2Atv4joLAoEoR
+         iNJw==
+X-Forwarded-Encrypted: i=1; AJvYcCWObMlGKvTFKkNIDO9FBD/Bdy2W78wf4UB8JmTIYs2SxJaxti7pdfZiaOnOal2iiSa4BsEIe9phhHtFaRO8c9TL5Wq/
+X-Gm-Message-State: AOJu0YwHXEdOGFKIJo0KPBeA+1M+kAZlJkdnUEvfdpghMATTb3cyfvu9
+	fo1cncqv98PUdIk9MHzDDNvKSLg+v9g87Kgn64rOSU3Nski2z3FDJRVC8xiUX3eRu/l+5s6o4cH
+	cO0/mYg==
+X-Google-Smtp-Source: AGHT+IEHQusDUcT+dsbbixAwzBJb2jo69k9Y9gegBibYfPM2SYsP1xjAxKCxFo07IkBWHLNsgRYNtIIxRUIb
+X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
+ job=sendgmr) by 2002:a05:6902:1501:b0:e0b:edb:143c with SMTP id
+ 3f1490d57ef6-e0bccf8a219mr6379276.0.1722488366177; Wed, 31 Jul 2024 21:59:26
+ -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Thu,  1 Aug 2024 04:58:16 +0000
+Date: Thu,  1 Aug 2024 04:58:17 +0000
 In-Reply-To: <20240801045907.4010984-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,8 +76,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240801045907.4010984-1-mizhang@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240801045907.4010984-8-mizhang@google.com>
-Subject: [RFC PATCH v3 07/58] perf: Skip pmu_ctx based on event_type
+Message-ID: <20240801045907.4010984-9-mizhang@google.com>
+Subject: [RFC PATCH v3 08/58] perf: Clean up perf ctx time
 From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
@@ -94,273 +94,201 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Kan Liang <kan.liang@linux.intel.com>
 
-To optimize the cgroup context switch, the perf_event_pmu_context
-iteration skips the PMUs without cgroup events. A bool cgroup was
-introduced to indicate the case. It can work, but this way is hard to
-extend for other cases, e.g. skipping non-passthrough PMUs. It doesn't
-make sense to keep adding bool variables.
-
-Pass the event_type instead of the specific bool variable. Check both
-the event_type and related pmu_ctx variables to decide whether skipping
-a PMU.
-
-Event flags, e.g., EVENT_CGROUP, should be cleard in the ctx->is_active.
-Add EVENT_FLAGS to indicate such event flags.
+The current perf tracks two timestamps for the normal ctx and cgroup.
+The same type of variables and similar codes are used to track the
+timestamps. In the following patch, the third timestamp to track the
+guest time will be introduced.
+To avoid the code duplication, add a new struct perf_time_ctx and factor
+out a generic function update_perf_time_ctx().
 
 No functional change.
 
+Suggested-by: Peter Zijlstra (Intel) <peterz@infradead.org>
 Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
-Tested-by: Yongwei Ma <yongwei.ma@intel.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- kernel/events/core.c | 70 +++++++++++++++++++++++---------------------
- 1 file changed, 37 insertions(+), 33 deletions(-)
+ include/linux/perf_event.h | 13 +++++----
+ kernel/events/core.c       | 59 +++++++++++++++++++-------------------
+ 2 files changed, 37 insertions(+), 35 deletions(-)
 
-diff --git a/kernel/events/core.c b/kernel/events/core.c
-index 45868d276cde..7cb51dbf897a 100644
---- a/kernel/events/core.c
-+++ b/kernel/events/core.c
-@@ -376,6 +376,7 @@ enum event_type_t {
- 	/* see ctx_resched() for details */
- 	EVENT_CPU = 0x8,
- 	EVENT_CGROUP = 0x10,
-+	EVENT_FLAGS = EVENT_CGROUP,
- 	EVENT_ALL = EVENT_FLEXIBLE | EVENT_PINNED,
+diff --git a/include/linux/perf_event.h b/include/linux/perf_event.h
+index 45d1ea82aa21..e22cdb6486e6 100644
+--- a/include/linux/perf_event.h
++++ b/include/linux/perf_event.h
+@@ -906,6 +906,11 @@ struct perf_event_groups {
+ 	u64		index;
  };
  
-@@ -699,23 +700,32 @@ do {									\
- 	___p;								\
- })
++struct perf_time_ctx {
++	u64		time;
++	u64		stamp;
++	u64		offset;
++};
  
--static void perf_ctx_disable(struct perf_event_context *ctx, bool cgroup)
-+static bool perf_skip_pmu_ctx(struct perf_event_pmu_context *pmu_ctx,
-+			      enum event_type_t event_type)
-+{
-+	if ((event_type & EVENT_CGROUP) && !pmu_ctx->nr_cgroups)
-+		return true;
+ /**
+  * struct perf_event_context - event context structure
+@@ -945,9 +950,7 @@ struct perf_event_context {
+ 	/*
+ 	 * Context clock, runs when context enabled.
+ 	 */
+-	u64				time;
+-	u64				timestamp;
+-	u64				timeoffset;
++	struct perf_time_ctx		time;
+ 
+ 	/*
+ 	 * These fields let us detect when two contexts have both
+@@ -1040,9 +1043,7 @@ struct bpf_perf_event_data_kern {
+  * This is a per-cpu dynamically allocated data structure.
+  */
+ struct perf_cgroup_info {
+-	u64				time;
+-	u64				timestamp;
+-	u64				timeoffset;
++	struct perf_time_ctx		time;
+ 	int				active;
+ };
+ 
+diff --git a/kernel/events/core.c b/kernel/events/core.c
+index 7cb51dbf897a..c25e2bf27001 100644
+--- a/kernel/events/core.c
++++ b/kernel/events/core.c
+@@ -775,7 +775,7 @@ static inline u64 perf_cgroup_event_time(struct perf_event *event)
+ 	struct perf_cgroup_info *t;
+ 
+ 	t = per_cpu_ptr(event->cgrp->info, event->cpu);
+-	return t->time;
++	return t->time.time;
+ }
+ 
+ static inline u64 perf_cgroup_event_time_now(struct perf_event *event, u64 now)
+@@ -784,20 +784,16 @@ static inline u64 perf_cgroup_event_time_now(struct perf_event *event, u64 now)
+ 
+ 	t = per_cpu_ptr(event->cgrp->info, event->cpu);
+ 	if (!__load_acquire(&t->active))
+-		return t->time;
+-	now += READ_ONCE(t->timeoffset);
++		return t->time.time;
++	now += READ_ONCE(t->time.offset);
+ 	return now;
+ }
+ 
++static inline void update_perf_time_ctx(struct perf_time_ctx *time, u64 now, bool adv);
 +
-+	return false;
+ static inline void __update_cgrp_time(struct perf_cgroup_info *info, u64 now, bool adv)
+ {
+-	if (adv)
+-		info->time += now - info->timestamp;
+-	info->timestamp = now;
+-	/*
+-	 * see update_context_time()
+-	 */
+-	WRITE_ONCE(info->timeoffset, info->time - info->timestamp);
++	update_perf_time_ctx(&info->time, now, adv);
+ }
+ 
+ static inline void update_cgrp_time_from_cpuctx(struct perf_cpu_context *cpuctx, bool final)
+@@ -860,7 +856,7 @@ perf_cgroup_set_timestamp(struct perf_cpu_context *cpuctx)
+ 	for (css = &cgrp->css; css; css = css->parent) {
+ 		cgrp = container_of(css, struct perf_cgroup, css);
+ 		info = this_cpu_ptr(cgrp->info);
+-		__update_cgrp_time(info, ctx->timestamp, false);
++		__update_cgrp_time(info, ctx->time.stamp, false);
+ 		__store_release(&info->active, 1);
+ 	}
+ }
+@@ -1469,18 +1465,11 @@ static void perf_unpin_context(struct perf_event_context *ctx)
+ 	raw_spin_unlock_irqrestore(&ctx->lock, flags);
+ }
+ 
+-/*
+- * Update the record of the current time in a context.
+- */
+-static void __update_context_time(struct perf_event_context *ctx, bool adv)
++static inline void update_perf_time_ctx(struct perf_time_ctx *time, u64 now, bool adv)
+ {
+-	u64 now = perf_clock();
+-
+-	lockdep_assert_held(&ctx->lock);
+-
+ 	if (adv)
+-		ctx->time += now - ctx->timestamp;
+-	ctx->timestamp = now;
++		time->time += now - time->stamp;
++	time->stamp = now;
+ 
+ 	/*
+ 	 * The above: time' = time + (now - timestamp), can be re-arranged
+@@ -1491,7 +1480,19 @@ static void __update_context_time(struct perf_event_context *ctx, bool adv)
+ 	 * it's (obviously) not possible to acquire ctx->lock in order to read
+ 	 * both the above values in a consistent manner.
+ 	 */
+-	WRITE_ONCE(ctx->timeoffset, ctx->time - ctx->timestamp);
++	WRITE_ONCE(time->offset, time->time - time->stamp);
 +}
 +
-+static void perf_ctx_disable(struct perf_event_context *ctx, enum event_type_t event_type)
++/*
++ * Update the record of the current time in a context.
++ */
++static void __update_context_time(struct perf_event_context *ctx, bool adv)
++{
++	u64 now = perf_clock();
++
++	lockdep_assert_held(&ctx->lock);
++
++	update_perf_time_ctx(&ctx->time, now, adv);
+ }
+ 
+ static void update_context_time(struct perf_event_context *ctx)
+@@ -1509,7 +1510,7 @@ static u64 perf_event_time(struct perf_event *event)
+ 	if (is_cgroup_event(event))
+ 		return perf_cgroup_event_time(event);
+ 
+-	return ctx->time;
++	return ctx->time.time;
+ }
+ 
+ static u64 perf_event_time_now(struct perf_event *event, u64 now)
+@@ -1523,9 +1524,9 @@ static u64 perf_event_time_now(struct perf_event *event, u64 now)
+ 		return perf_cgroup_event_time_now(event, now);
+ 
+ 	if (!(__load_acquire(&ctx->is_active) & EVENT_TIME))
+-		return ctx->time;
++		return ctx->time.time;
+ 
+-	now += READ_ONCE(ctx->timeoffset);
++	now += READ_ONCE(ctx->time.offset);
+ 	return now;
+ }
+ 
+@@ -11302,14 +11303,14 @@ static void task_clock_event_update(struct perf_event *event, u64 now)
+ 
+ static void task_clock_event_start(struct perf_event *event, int flags)
  {
- 	struct perf_event_pmu_context *pmu_ctx;
- 
- 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
--		if (cgroup && !pmu_ctx->nr_cgroups)
-+		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
- 			continue;
- 		perf_pmu_disable(pmu_ctx->pmu);
- 	}
+-	local64_set(&event->hw.prev_count, event->ctx->time);
++	local64_set(&event->hw.prev_count, event->ctx->time.time);
+ 	perf_swevent_start_hrtimer(event);
  }
  
--static void perf_ctx_enable(struct perf_event_context *ctx, bool cgroup)
-+static void perf_ctx_enable(struct perf_event_context *ctx, enum event_type_t event_type)
+ static void task_clock_event_stop(struct perf_event *event, int flags)
  {
- 	struct perf_event_pmu_context *pmu_ctx;
- 
- 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
--		if (cgroup && !pmu_ctx->nr_cgroups)
-+		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
- 			continue;
- 		perf_pmu_enable(pmu_ctx->pmu);
- 	}
-@@ -877,7 +887,7 @@ static void perf_cgroup_switch(struct task_struct *task)
- 		return;
- 
- 	perf_ctx_lock(cpuctx, cpuctx->task_ctx);
--	perf_ctx_disable(&cpuctx->ctx, true);
-+	perf_ctx_disable(&cpuctx->ctx, EVENT_CGROUP);
- 
- 	ctx_sched_out(&cpuctx->ctx, EVENT_ALL|EVENT_CGROUP);
- 	/*
-@@ -893,7 +903,7 @@ static void perf_cgroup_switch(struct task_struct *task)
- 	 */
- 	ctx_sched_in(&cpuctx->ctx, EVENT_ALL|EVENT_CGROUP);
- 
--	perf_ctx_enable(&cpuctx->ctx, true);
-+	perf_ctx_enable(&cpuctx->ctx, EVENT_CGROUP);
- 	perf_ctx_unlock(cpuctx, cpuctx->task_ctx);
+ 	perf_swevent_cancel_hrtimer(event);
+-	task_clock_event_update(event, event->ctx->time);
++	task_clock_event_update(event, event->ctx->time.time);
  }
  
-@@ -2732,9 +2742,9 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
- 
- 	event_type &= EVENT_ALL;
- 
--	perf_ctx_disable(&cpuctx->ctx, false);
-+	perf_ctx_disable(&cpuctx->ctx, 0);
- 	if (task_ctx) {
--		perf_ctx_disable(task_ctx, false);
-+		perf_ctx_disable(task_ctx, 0);
- 		task_ctx_sched_out(task_ctx, event_type);
- 	}
- 
-@@ -2752,9 +2762,9 @@ static void ctx_resched(struct perf_cpu_context *cpuctx,
- 
- 	perf_event_sched_in(cpuctx, task_ctx);
- 
--	perf_ctx_enable(&cpuctx->ctx, false);
-+	perf_ctx_enable(&cpuctx->ctx, 0);
- 	if (task_ctx)
--		perf_ctx_enable(task_ctx, false);
-+		perf_ctx_enable(task_ctx, 0);
- }
- 
- void perf_pmu_resched(struct pmu *pmu)
-@@ -3299,9 +3309,6 @@ ctx_sched_out(struct perf_event_context *ctx, enum event_type_t event_type)
- 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
- 	struct perf_event_pmu_context *pmu_ctx;
- 	int is_active = ctx->is_active;
--	bool cgroup = event_type & EVENT_CGROUP;
--
--	event_type &= ~EVENT_CGROUP;
- 
- 	lockdep_assert_held(&ctx->lock);
- 
-@@ -3336,7 +3343,7 @@ ctx_sched_out(struct perf_event_context *ctx, enum event_type_t event_type)
- 		barrier();
- 	}
- 
--	ctx->is_active &= ~event_type;
-+	ctx->is_active &= ~(event_type & ~EVENT_FLAGS);
- 	if (!(ctx->is_active & EVENT_ALL))
- 		ctx->is_active = 0;
- 
-@@ -3349,7 +3356,7 @@ ctx_sched_out(struct perf_event_context *ctx, enum event_type_t event_type)
- 	is_active ^= ctx->is_active; /* changed bits */
- 
- 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
--		if (cgroup && !pmu_ctx->nr_cgroups)
-+		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
- 			continue;
- 		__pmu_ctx_sched_out(pmu_ctx, is_active);
- 	}
-@@ -3543,7 +3550,7 @@ perf_event_context_sched_out(struct task_struct *task, struct task_struct *next)
- 		raw_spin_lock_nested(&next_ctx->lock, SINGLE_DEPTH_NESTING);
- 		if (context_equiv(ctx, next_ctx)) {
- 
--			perf_ctx_disable(ctx, false);
-+			perf_ctx_disable(ctx, 0);
- 
- 			/* PMIs are disabled; ctx->nr_pending is stable. */
- 			if (local_read(&ctx->nr_pending) ||
-@@ -3563,7 +3570,7 @@ perf_event_context_sched_out(struct task_struct *task, struct task_struct *next)
- 			perf_ctx_sched_task_cb(ctx, false);
- 			perf_event_swap_task_ctx_data(ctx, next_ctx);
- 
--			perf_ctx_enable(ctx, false);
-+			perf_ctx_enable(ctx, 0);
- 
- 			/*
- 			 * RCU_INIT_POINTER here is safe because we've not
-@@ -3587,13 +3594,13 @@ perf_event_context_sched_out(struct task_struct *task, struct task_struct *next)
- 
- 	if (do_switch) {
- 		raw_spin_lock(&ctx->lock);
--		perf_ctx_disable(ctx, false);
-+		perf_ctx_disable(ctx, 0);
- 
- inside_switch:
- 		perf_ctx_sched_task_cb(ctx, false);
- 		task_ctx_sched_out(ctx, EVENT_ALL);
- 
--		perf_ctx_enable(ctx, false);
-+		perf_ctx_enable(ctx, 0);
- 		raw_spin_unlock(&ctx->lock);
- 	}
- }
-@@ -3890,12 +3897,12 @@ static void pmu_groups_sched_in(struct perf_event_context *ctx,
- 
- static void ctx_groups_sched_in(struct perf_event_context *ctx,
- 				struct perf_event_groups *groups,
--				bool cgroup)
-+				enum event_type_t event_type)
+ static int task_clock_event_add(struct perf_event *event, int flags)
+@@ -11329,8 +11330,8 @@ static void task_clock_event_del(struct perf_event *event, int flags)
+ static void task_clock_event_read(struct perf_event *event)
  {
- 	struct perf_event_pmu_context *pmu_ctx;
+ 	u64 now = perf_clock();
+-	u64 delta = now - event->ctx->timestamp;
+-	u64 time = event->ctx->time + delta;
++	u64 delta = now - event->ctx->time.stamp;
++	u64 time = event->ctx->time.time + delta;
  
- 	list_for_each_entry(pmu_ctx, &ctx->pmu_ctx_list, pmu_ctx_entry) {
--		if (cgroup && !pmu_ctx->nr_cgroups)
-+		if (perf_skip_pmu_ctx(pmu_ctx, event_type))
- 			continue;
- 		pmu_groups_sched_in(ctx, groups, pmu_ctx->pmu);
- 	}
-@@ -3912,9 +3919,6 @@ ctx_sched_in(struct perf_event_context *ctx, enum event_type_t event_type)
- {
- 	struct perf_cpu_context *cpuctx = this_cpu_ptr(&perf_cpu_context);
- 	int is_active = ctx->is_active;
--	bool cgroup = event_type & EVENT_CGROUP;
--
--	event_type &= ~EVENT_CGROUP;
- 
- 	lockdep_assert_held(&ctx->lock);
- 
-@@ -3932,7 +3936,7 @@ ctx_sched_in(struct perf_event_context *ctx, enum event_type_t event_type)
- 		barrier();
- 	}
- 
--	ctx->is_active |= (event_type | EVENT_TIME);
-+	ctx->is_active |= ((event_type & ~EVENT_FLAGS) | EVENT_TIME);
- 	if (ctx->task) {
- 		if (!is_active)
- 			cpuctx->task_ctx = ctx;
-@@ -3947,11 +3951,11 @@ ctx_sched_in(struct perf_event_context *ctx, enum event_type_t event_type)
- 	 * in order to give them the best chance of going on.
- 	 */
- 	if (is_active & EVENT_PINNED)
--		ctx_groups_sched_in(ctx, &ctx->pinned_groups, cgroup);
-+		ctx_groups_sched_in(ctx, &ctx->pinned_groups, event_type);
- 
- 	/* Then walk through the lower prio flexible groups */
- 	if (is_active & EVENT_FLEXIBLE)
--		ctx_groups_sched_in(ctx, &ctx->flexible_groups, cgroup);
-+		ctx_groups_sched_in(ctx, &ctx->flexible_groups, event_type);
+ 	task_clock_event_update(event, time);
  }
- 
- static void perf_event_context_sched_in(struct task_struct *task)
-@@ -3966,11 +3970,11 @@ static void perf_event_context_sched_in(struct task_struct *task)
- 
- 	if (cpuctx->task_ctx == ctx) {
- 		perf_ctx_lock(cpuctx, ctx);
--		perf_ctx_disable(ctx, false);
-+		perf_ctx_disable(ctx, 0);
- 
- 		perf_ctx_sched_task_cb(ctx, true);
- 
--		perf_ctx_enable(ctx, false);
-+		perf_ctx_enable(ctx, 0);
- 		perf_ctx_unlock(cpuctx, ctx);
- 		goto rcu_unlock;
- 	}
-@@ -3983,7 +3987,7 @@ static void perf_event_context_sched_in(struct task_struct *task)
- 	if (!ctx->nr_events)
- 		goto unlock;
- 
--	perf_ctx_disable(ctx, false);
-+	perf_ctx_disable(ctx, 0);
- 	/*
- 	 * We want to keep the following priority order:
- 	 * cpu pinned (that don't need to move), task pinned,
-@@ -3993,7 +3997,7 @@ static void perf_event_context_sched_in(struct task_struct *task)
- 	 * events, no need to flip the cpuctx's events around.
- 	 */
- 	if (!RB_EMPTY_ROOT(&ctx->pinned_groups.tree)) {
--		perf_ctx_disable(&cpuctx->ctx, false);
-+		perf_ctx_disable(&cpuctx->ctx, 0);
- 		ctx_sched_out(&cpuctx->ctx, EVENT_FLEXIBLE);
- 	}
- 
-@@ -4002,9 +4006,9 @@ static void perf_event_context_sched_in(struct task_struct *task)
- 	perf_ctx_sched_task_cb(cpuctx->task_ctx, true);
- 
- 	if (!RB_EMPTY_ROOT(&ctx->pinned_groups.tree))
--		perf_ctx_enable(&cpuctx->ctx, false);
-+		perf_ctx_enable(&cpuctx->ctx, 0);
- 
--	perf_ctx_enable(ctx, false);
-+	perf_ctx_enable(ctx, 0);
- 
- unlock:
- 	perf_ctx_unlock(cpuctx, ctx);
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
