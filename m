@@ -1,118 +1,145 @@
-Return-Path: <kvm+bounces-22959-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22960-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 220DF944F7B
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 17:39:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18E3B944F83
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 17:41:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5314A1C23A01
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 15:39:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7BF1289D62
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 15:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8EB1B1505;
-	Thu,  1 Aug 2024 15:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1981F1B32A1;
+	Thu,  1 Aug 2024 15:41:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PtK89mur"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KZ1LmPyD"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4979213D240
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 15:39:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AB3042049
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 15:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722526790; cv=none; b=fThzOK6ad7QDoEvTEiFhs4wjppT2/bSWHF5BJqyb4BZJG/aW2t/pUAJ6lEcVKAevblbbuxHnV5CUxg24cRqjmg/HLHueJ5mThuvthjX+4GpLPUWh7W8wJniXBUCHut+POzTpiG8FfIdXzAtk9T6zYRXIOOKYiXekhf36p1D3mls=
+	t=1722526891; cv=none; b=cnU8U5dqrkGCKlT6HlTtHnBXW4wQ5AGOVNtg8DIJFckSWnrBSWdtTXn5ufZPK3X7jPT6Gq5tkKIUAGmniNtO6SMuj03JoMcGve09RB19rm6ypPNhqRj2NjYLe1Ehus/lmI6ykSxe6hgMXTyTjQJcIntdT23Mfk/gjixt5wMua8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722526790; c=relaxed/simple;
-	bh=Fars94PR2I1z6GGDqirmQhcGrg0IRY2MO4vQOMYyXj4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hmQvTSZo8PrvLfE77+9nZ4cJXglCgJpBSQ3SJ/WmJPzAywZqvOheB3yDu34nAukqis9U0mUY0tA0fFbe06v5ayVyjWQA6eYP4LUPFIlIlhOgwuF8VcMqwlRyxhfd+/aC9HdwWHjqJ4bxCUwl3Lk1QSMKqQZsxOwMn6tgkUNfD1Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PtK89mur; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1722526891; c=relaxed/simple;
+	bh=TqtTHFkHdrU+w5H01QuxOvyTv7YQdBMPyjAR+uHA+TE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NPCGD+fV6NI8KFk3g7h7rT/PUkJyoV6aWkIZC/guXSWNEVslcycel965wvyIj45neyaBu9zeaeLJ9NtwyvMuZ+zwY81ArwafrFtoFe3T8GTwH17D6kXDJNAZSq8j9ZL5pmklFYbYInZjw7Tel0YbIAyCQ/YVm9uYUXAiTh/o7Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KZ1LmPyD; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722526787;
+	s=mimecast20190719; t=1722526888;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cvtcL26MELukLXBLKiU1OvgArmvH0sx0AOPSGAsOPYQ=;
-	b=PtK89murbmqpf5X7opHSGe0ko272oJBhFrenHW8y1gIdtzOQigTYEhf/5h2y+LiVx7yE+I
-	G1kve+Z/7x92l7sdctXxgw2UnAtCuSY0J4IPJC4oRW1X2SP0i24DdUIuH31obKpLWgdl9H
-	UDbHc1TEkobntn4PFpr6i4k7i9PHqaw=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=x0jkUwUSwfb5o9OMU/gJuQXr3j6VILXirLVqM0pfXY4=;
+	b=KZ1LmPyDs16Q4uc2TiztD9ib7lbc5vbqfJ7+vB7aCrHDTImq+7Bx/XZt17+jZ+oLwhoVOv
+	YSoh32W4qMB9TuFcUUOfLLH56BVUMX7ofD9IeyFrBMQXxpYK4R9C63JAZEzc3QrMOqW39f
+	cQMzwUReez2WAQjcZd98ZYEgqTM/y+c=
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
+ [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-601-6iHOP8tlOoyOXxXEAG5WGw-1; Thu, 01 Aug 2024 11:39:45 -0400
-X-MC-Unique: 6iHOP8tlOoyOXxXEAG5WGw-1
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-64b70c4a269so132736927b3.1
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 08:39:45 -0700 (PDT)
+ us-mta-539-srHKoPlNPLCV8xglK0sjCg-1; Thu, 01 Aug 2024 11:41:26 -0400
+X-MC-Unique: srHKoPlNPLCV8xglK0sjCg-1
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-81d1b92b559so1009943839f.0
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 08:41:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722526785; x=1723131585;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1722526886; x=1723131686;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=cvtcL26MELukLXBLKiU1OvgArmvH0sx0AOPSGAsOPYQ=;
-        b=BmGT/47n9KfQNxtCT5N3kjQZY8dxH7LWyfuzU8uLq89UcBtt/nCkHs6I22neUuWpH4
-         shCtWC8fxO0x8gjymKUwZxOv1S8eRVs5NIvIMIDk/vGtYbA52rTxPPSGkSkUNxklMKZG
-         lhc3/yyYT8B9BkZ6y5KwitjJHRCiYRQoslOuOY0kPzi1TOgMpq53J4NH4Sjj0sdkalAS
-         YCjQK+o+vimpsXOKvC6zMwIZrVwm9forrQNpCI6FO1GcjsagFWTmfYC5KmmPrnKSzX2g
-         +IEc8bPGO8FCxj3zgYEd6nbHV0yAaYSAeRrHLxKKqsiKv4gsXdpcgGD5rB+3H7fZj5tJ
-         XncQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGoMCl62DssrX2trPQBnnbIsviIFISsrZfUBHWj8Eeg4bLVNDb7FTKpqfQ03FO2KU1d32dkT4UjZ8Hw57O3MPs5yqm
-X-Gm-Message-State: AOJu0YwfqazzJ1WIkkk/yFrWoirUaoymrQ5KIYKgn/zBA9P/Q6ZF31bq
-	VrN4zQPPYEuoVNRTU67otQaS9/jh9Ds3LIh+Z4roQEIhoUM9eADNAIG9xNRCHSD8qm5iKP+O5jH
-	Y98TIYrT9lK1dXKJbYYujI5/wRSl30zuJ7BVPJcH+klQxhELF4sJQmWhbhLNDbb+znkCrUe1aUr
-	98Rv0BgJrcd+qQUDRgmelVh4RG
-X-Received: by 2002:a81:6ec3:0:b0:65f:851d:8fb with SMTP id 00721157ae682-689614169ecmr5418707b3.19.1722526785276;
-        Thu, 01 Aug 2024 08:39:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHEstoQY1wa9dYRGq1XTayGmAh4S4JQ1xiqn++gZGCkL13Di/n3qojj4QYU6j5a+xzQ2XxaZWOdBKgFbysxmOk=
-X-Received: by 2002:a81:6ec3:0:b0:65f:851d:8fb with SMTP id
- 00721157ae682-689614169ecmr5418347b3.19.1722526784938; Thu, 01 Aug 2024
- 08:39:44 -0700 (PDT)
+        bh=x0jkUwUSwfb5o9OMU/gJuQXr3j6VILXirLVqM0pfXY4=;
+        b=Epn26q4ctaGQ3Ao2XrBsHtPOS0dYRdO1xW6d8hBTzOJanPp3cq8XigisPX4Fk1nan+
+         5NyfCsAHTsvvCX9Uwce8ESDJfF6gYcuYC157Z/3IJzjWziE/upRcBKwVDlHxSY7yEnik
+         7JFEoapG4GzjZ5mFPJ4IeV7l3ocSDF1LsoQJbPj/uzQfl4/7dEA/zyejUItjdymDQD2B
+         Qv/iZ0Hqe5UXHiRRRAQy+IdTOvSQGy+zgAxUTqRp+apFLzDfurI9UuKsl4ed08fwYRZn
+         t+r3aqCQgRFbhCs+BQhYBge54raBYsuuanOTjCtRhsi+SXElYljMkLbTCTRF1fQBVbV2
+         UX3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUywgyO8+wm4mlAXZiJPIDn9XunHzEiivhG/QOvEIpx7Dv1EIKb4XWTUngaT4/SP2ijooM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzG4vKmQVjnQENIbsCbZv9Tximo6TdKRhWNOgBG4doZG8cZ5sWM
+	EhgkPAO9e+vTCf+6TgYsvKQ1M2/7NV+vXunwtseES+jB79DChGekhHOzFI39RS4HTdgX4a1OOCx
+	gB+5/4xO+cGqKKAKeKhXxda8/42+OVF8Rv8Cbh9ogw51D6cCT6SUk/JqxPA==
+X-Received: by 2002:a05:6602:6423:b0:7fa:2902:aec5 with SMTP id ca18e2360f4ac-81fd43f90c8mr83778939f.17.1722526885888;
+        Thu, 01 Aug 2024 08:41:25 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG059LRf2rIjuHE7r+DsGNo0Z5nTdhm7GoFU+8MkkSCDAMD9lp1m5d+5iq+neF29ByQcuLWhg==
+X-Received: by 2002:a05:6602:6423:b0:7fa:2902:aec5 with SMTP id ca18e2360f4ac-81fd43f90c8mr83776639f.17.1722526885492;
+        Thu, 01 Aug 2024 08:41:25 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id ca18e2360f4ac-81fd4c7c98esm2424639f.0.2024.08.01.08.41.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 08:41:25 -0700 (PDT)
+Date: Thu, 1 Aug 2024 09:41:23 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org, Keith Busch
+ <kbusch@kernel.org>
+Subject: Re: [PATCH rfc] vfio-pci: Allow write combining
+Message-ID: <20240801094123.4eda2e91.alex.williamson@redhat.com>
+In-Reply-To: <20240801141914.GC3030761@ziepe.ca>
+References: <20240731155352.3973857-1-kbusch@meta.com>
+	<20240801141914.GC3030761@ziepe.ca>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240726134438.14720-1-crosa@redhat.com> <20240726134438.14720-8-crosa@redhat.com>
- <Zqd10nIix4gXKtDw@redhat.com> <63ef2c5b9ab213f544173df027abf5b056d59e8a.camel@infradead.org>
- <87wml0coat.fsf@draig.linaro.org>
-In-Reply-To: <87wml0coat.fsf@draig.linaro.org>
-From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 1 Aug 2024 11:39:32 -0400
-Message-ID: <CA+bd_6JNRhj4K48Fg_yb7KeXmEYgzxyT1NJJJ6K0yFxamc9UwQ@mail.gmail.com>
-Subject: Re: [PATCH 07/13] tests/avocado/kvm_xen_guest.py: cope with asset RW requirements
-To: =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>
-Cc: David Woodhouse <dwmw2@infradead.org>, =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>, 
-	qemu-devel@nongnu.org, Peter Maydell <peter.maydell@linaro.org>, 
-	Thomas Huth <thuth@redhat.com>, Beraldo Leal <bleal@redhat.com>, 
-	Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, 
-	=?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Leif Lindholm <quic_llindhol@quicinc.com>, Jiaxun Yang <jiaxun.yang@flygoat.com>, kvm@vger.kernel.org, 
-	Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, 
-	Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-arm@nongnu.org, 
-	Radoslaw Biernacki <rad@semihalf.com>, Paul Durrant <paul@xen.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Akihiko Odaki <akihiko.odaki@daynix.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Aug 1, 2024 at 10:26=E2=80=AFAM Alex Benn=C3=A9e <alex.bennee@linar=
-o.org> wrote:
-> There are no real failures with readonly=3Don although you do see init
-> complain a bit about not being able to mount /dev and open log files.
-> snapshot allows that to happen but doesn't change the underlying
-> storage.
->
+On Thu, 1 Aug 2024 11:19:14 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-I could swear I experienced failures when I developed this patch.  But
-like your patch b9371a7b90 already fixes it.
+> On Wed, Jul 31, 2024 at 08:53:52AM -0700, Keith Busch wrote:
+> > From: Keith Busch <kbusch@kernel.org>
+> > 
+> > Write combining can be provide performance improvement for places that
+> > can safely use this capability.
+> > 
+> > Previous discussions on the topic suggest a vfio user needs to
+> > explicitly request such a mapping, and it sounds like a new vfio
+> > specific ioctl to request this is one way recommended way to do that.
+> > This patch implements a new ioctl to achieve that so a user can request
+> > write combining on prefetchable memory. A new ioctl seems a bit much for
+> > just this purpose, so the implementation here provides a "flags" field
+> > with only the write combine option defined. The rest of the bits are
+> > reserved for future use.  
+> 
+> This is a neat hack for sure
+> 
+> But how about adding this flag to vfio_region_info ?
+> 
+> @@ -275,6 +289,7 @@ struct vfio_region_info {
+>  #define VFIO_REGION_INFO_FLAG_WRITE    (1 << 1) /* Region supports write */
+>  #define VFIO_REGION_INFO_FLAG_MMAP     (1 << 2) /* Region supports mmap */
+>  #define VFIO_REGION_INFO_FLAG_CAPS     (1 << 3) /* Info supports caps */
+> +#define VFIO_REGION_INFO_REQ_WC         (1 << 4) /* Request a write combining mapping*/
+>         __u32   index;          /* Region index */
+>         __u32   cap_offset;     /* Offset within info struct of first cap */
+>         __aligned_u64   size;   /* Region size (bytes) */
+> 
+> 
+> It specify REQ_WC when calling VFIO_DEVICE_GET_REGION_INFO
+> 
+> The kernel will then return an offset value that yields a WC
+> mapping. It doesn't displace the normal non-WC mapping?
+> 
+> Arguably we should fixup the kernel to put the mmap cookies into a
+> maple tree so they can be dynamically allocated and more densely
+> packed.
 
-Dropping this one.
+vfio_region_info.flags in not currently tested for input therefore this
+proposal could lead to unexpected behavior for a caller that doesn't
+currently zero this field.  It's intended as an output-only field.
+Thanks,
 
-Thanks!
-- Cleber.
+Alex
+
 
 
