@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-22876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 399C3944279
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 07:04:23 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 956BC94427A
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 07:04:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9547288282
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 05:04:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00D3BB2330D
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 05:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF92A1509A6;
-	Thu,  1 Aug 2024 05:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7D61509BE;
+	Thu,  1 Aug 2024 05:00:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BJexU4ZM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PFvEsRow"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E4115098A
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 05:00:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97921509A5
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 05:00:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722488433; cv=none; b=l421l2EtY8fpbDOJpMj7CXAWRzPbyQDJIwlzW4/eUw3uGI6kkzzf+pna3raRtUoU0Z5Hzgv5VPvUl6u2do9PMx+FILSqc78UI1WGfRyKsrZlwyJulfymhHYUvRk0OZnIBEVm87jtPGKzo1SFWkavNLAouxtRgHQHUhbVU7j6raE=
+	t=1722488435; cv=none; b=H1b/05+ySnbXW9+huU1Hm7b5QcjVmt1ZGAZ5eb6+vYFv3JqiPdSXxdv6I/IsYMhJrCcwXnm8OLcEd/PTRRdQP2lEFygqKn6z6lFWYhFSAxDwG2two4B77dXMZvUNUxoyOog4KgeOpkpXGW/Tpd3bHs3Q4+RGBNc24G97JTbIWYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722488433; c=relaxed/simple;
-	bh=h2BIhzPWqK1WX6sUig0pWm4EWfyb/ZKPY5ztzMGHoIY=;
+	s=arc-20240116; t=1722488435; c=relaxed/simple;
+	bh=gtemBvTk2lbV8xf3rduUWl3sB4EfzskwrEwm5VO2/vE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XyDbFD50yeVHHI/caSI0v0PDw7bTHThKTmceQ6O1jgG+/ti1qK+g9f1mg+38SDhhct/FzncWr0MUHaqn2XXWiWz5yIOqEzFkmYUHnC+MpD5Qm7/jeWP6YnlrCstw/Irhf6Zc+cpNRyA9HgGpk/JWuquCNf98hT6qq86W+MOHREg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BJexU4ZM; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=F/lOCdgrcexcmnf4UweLWXU7PwJtkycobnPKSCSvus2KXyHuUqdw9KOYFwoTFitooDe3k6QzPhk9OVnHGX3ndH4x/LlCfmEkqzPlqyD/VazMNfapa/cCZNW4i927POWa8wxwc44TmA76nT6NuCOVmlNUtjtezhcNY/S8Htd0cmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PFvEsRow; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2cb567fccf4so6417213a91.0
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 22:00:31 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-650fccfd1dfso120371997b3.0
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 22:00:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722488431; x=1723093231; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722488433; x=1723093233; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=OoGP7Z9uDxmG6CzYVyLj44ANC+cEU7w76pDMHfnQCbo=;
-        b=BJexU4ZMaVaNo47MAlItEsi4c4vh+EHaRfRYRvdy9SlXk5cyYM0FIi2elFyRBW8/0u
-         mXA3tnqvc+7ExlIgMT04vlXVj+x9jrKgfJVQx2JaP+gXw0iHDK+BaDI6oDPm0gzj16fv
-         Jn+aa6cPghv63xh5vT+PsUs6ViFoJBtHuFLJN3unTYag3syNWlj/ZW7yB+UydXFzwFta
-         WkEHA3MxEHnbgOLvPrq5Cb8Nb2J7Q3Ml3ot0yx/oo9O0199aCAOXpEF1sMF5N0PaKbHh
-         n74K/J/8W+4bbcZTHYOx0LPczExx6bupi8hjpj9kbXcfvpfRE7kfSk4W7lBFEYq0KGUw
-         yudA==
+        bh=TIaORN0fE0skJR5pSCv7IKrnjEmXFRXmkgvuWeH6mb8=;
+        b=PFvEsRowABhzjOebOTBtaYd3yoGrCsT0R+Jb4sHXQ2OKiE9Gd8gaHqFFZUmEF6rtLQ
+         DkTBTu+ClomVXcpwqpVmf6EUO5BVUQDEIi/V8FEUU0Cmm8AHrE5QzlUUY/YiDksmpo15
+         ZejNfZM/62H5C72HThkNywl3vn3aAReUYR48IVDoyi5JijSDs1zNfJy42us8W4XckJGg
+         0r0kfdn7Hn2HEb0uc1bumQIUNI2RVqB1/zKNjasUQyzsg22qIC3OqLYxbXsJF/DP7Sat
+         /43mmeyLRujSyGlNpwmk5bctVp5WKqTaJXznrQ85AL4bODmIFSyR4sIsFyFxuL1eVCCC
+         Rf/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722488431; x=1723093231;
+        d=1e100.net; s=20230601; t=1722488433; x=1723093233;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=OoGP7Z9uDxmG6CzYVyLj44ANC+cEU7w76pDMHfnQCbo=;
-        b=s6QIr+9y5i8xAnt4RdhMsAPlugUMCIaWFp7HArHO/fY9RsNaex6Cpa3V4xGgwSIT2N
-         NZnPkOzqqoIyELP4lTmKOPpqbxDt9Ib+iNh89JOTP7bzcQankkgfD2+La886uAAXB+Ky
-         AEzoIng+NMTTTg74qd3W8voo965hDPokAChxImSuaiY11sg233Et+v2VU7F/EGZOhs+w
-         CrtmhJIiiL9ZaQAvSPqdKRfZHoD+V26XwZo1q7ciWJ10+GUnGuX168opaxyGYLfD9fOX
-         yCAhzZxE20p1dFmZLYGvy0cfMCRn+F6HI9uYNVxpD5PWJ8/0uOt72T3hW6PdkVI7Caq4
-         GhEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUN469QbJ9Nx3BEdlWIbPUwJ3f7JkL5O1AeWjg4SfASOBo/tnAajwHcjuRUsRq0+O3gv/dnXu1DDfcDzCEqMhJUTKR+
-X-Gm-Message-State: AOJu0YxxYwTvt5dj0Gm+228nKuz5EYVRpxTC5tzn8ZlXcOR5Bx12w80Y
-	6X77KfG/D1YX+jetLFu5UNWIWvcIv3d/mR2sfihhlJveMgkdC40olYK6MVEfTxtLNloUhHjqGzx
-	vE89O2g==
-X-Google-Smtp-Source: AGHT+IE0SUiysq8onpo5FTRQNhm7CnSNYELnvE81ag75kjeNorppDjOFmoYHczpasFS8m6aV5EhpFQVwJMND
+        bh=TIaORN0fE0skJR5pSCv7IKrnjEmXFRXmkgvuWeH6mb8=;
+        b=VAis3KeiaGxxiHCBVtmGQDBBlX/GZgSHnYN/HuEiiL7R2r4jyRYK9pCvcK+mKraO7o
+         l+1lbbAwcHN5V7cJ4uMTIz59b2hAHk2voUVQLwmL9aO5R5dXw9jqMm4t9pd9rIr8FRMN
+         hVF2he4otP7LMTliX8+VjcKLUlDNheHEyq+IZto96Q4jC4/cxqrZs5h5FZooA5EsGM6y
+         UQOVmjkycb0zrASbEpGufq7fwd5kRJ4wCZMbxEhrnsc5NRmO+JwH9mIpn/Np/tNobqgv
+         CNsVT7wbbXiuZXI0BO6qVR/mLeSrU6VwA/BYbPJxoh0bYeYVPZO0D8aoHn912XN3uPYF
+         8Jsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWozEGohh8rX1Jc4KtuF9OObtUsGuU3XmjDx63FvRflFrCmUDYKryNs+JHQgSAja+J/LlxooS6w5AqqAkVZ3U/siymp
+X-Gm-Message-State: AOJu0YwUll37uoiqpb2YJihvexZMbfj0CZwK0nfJRfrIFlAPSU8KhbXd
+	ckMUpkMJTdorzBhMjO64n6DYlg5cCeI1zJl48iEI3zdPig4sAv4fVCNd3IYUuX+TWggSddIo+4n
+	3UaV91Q==
+X-Google-Smtp-Source: AGHT+IE6GrVg0oI7YgKfRUu8LQp7LFjo+hVTe1xzxA7oLbHsyfE7RwuRCLp1ZikHSyVNP5OgmZRb2O/kzfY7
 X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a17:90b:4f90:b0:2c9:9a89:a2ae with SMTP id
- 98e67ed59e1d1-2cfe73470b4mr16443a91.0.1722488431039; Wed, 31 Jul 2024
- 22:00:31 -0700 (PDT)
+ job=sendgmr) by 2002:a05:6902:2009:b0:e0b:1407:e357 with SMTP id
+ 3f1490d57ef6-e0bcd1fd0e3mr2207276.3.1722488432889; Wed, 31 Jul 2024 22:00:32
+ -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Thu,  1 Aug 2024 04:58:52 +0000
+Date: Thu,  1 Aug 2024 04:58:53 +0000
 In-Reply-To: <20240801045907.4010984-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240801045907.4010984-1-mizhang@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240801045907.4010984-44-mizhang@google.com>
-Subject: [RFC PATCH v3 43/58] KVM: x86/pmu: Introduce PMU operator for setting
- counter overflow
+Message-ID: <20240801045907.4010984-45-mizhang@google.com>
+Subject: [RFC PATCH v3 44/58] KVM: x86/pmu: Implement emulated counter
+ increment for passthrough PMU
 From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
@@ -93,67 +93,103 @@ Cc: Jim Mattson <jmattson@google.com>, Stephane Eranian <eranian@google.com>,
 	linux-perf-users@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Introduce PMU operator for setting counter overflow. When emulating counter
-increment, multiple counters could overflow at the same time, i.e., during
-the execution of the same instruction. In passthrough PMU, having an PMU
-operator provides convenience to update the PMU global status in one shot
-with details hidden behind the vendor specific implementation.
+Implement emulated counter increment for passthrough PMU under KVM_REQ_PMU.
+Defer the counter increment to KVM_REQ_PMU handler because counter
+increment requests come from kvm_pmu_trigger_event() which can be triggered
+within the KVM_RUN inner loop or outside of the inner loop. This means the
+counter increment could happen before or after PMU context switch.
+
+So process counter increment in one place makes the implementation simple.
 
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
+Co-developed-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 ---
- arch/x86/include/asm/kvm-x86-pmu-ops.h | 1 +
- arch/x86/kvm/pmu.h                     | 1 +
- arch/x86/kvm/vmx/pmu_intel.c           | 5 +++++
- 3 files changed, 7 insertions(+)
+ arch/x86/kvm/pmu.c | 41 +++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 39 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm-x86-pmu-ops.h b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-index 72ca78df8d2b..bd5b118a5ce5 100644
---- a/arch/x86/include/asm/kvm-x86-pmu-ops.h
-+++ b/arch/x86/include/asm/kvm-x86-pmu-ops.h
-@@ -28,6 +28,7 @@ KVM_X86_PMU_OP_OPTIONAL(passthrough_pmu_msrs)
- KVM_X86_PMU_OP_OPTIONAL(save_pmu_context)
- KVM_X86_PMU_OP_OPTIONAL(restore_pmu_context)
- KVM_X86_PMU_OP_OPTIONAL(incr_counter)
-+KVM_X86_PMU_OP_OPTIONAL(set_overflow)
- 
- #undef KVM_X86_PMU_OP
- #undef KVM_X86_PMU_OP_OPTIONAL
-diff --git a/arch/x86/kvm/pmu.h b/arch/x86/kvm/pmu.h
-index 325f17673a00..78a7f0c5f3ba 100644
---- a/arch/x86/kvm/pmu.h
-+++ b/arch/x86/kvm/pmu.h
-@@ -45,6 +45,7 @@ struct kvm_pmu_ops {
- 	void (*save_pmu_context)(struct kvm_vcpu *vcpu);
- 	void (*restore_pmu_context)(struct kvm_vcpu *vcpu);
- 	bool (*incr_counter)(struct kvm_pmc *pmc);
-+	void (*set_overflow)(struct kvm_vcpu *vcpu);
- 
- 	const u64 EVENTSEL_EVENT;
- 	const int MAX_NR_GP_COUNTERS;
-diff --git a/arch/x86/kvm/vmx/pmu_intel.c b/arch/x86/kvm/vmx/pmu_intel.c
-index 42af2404bdb9..2d46c911f0b7 100644
---- a/arch/x86/kvm/vmx/pmu_intel.c
-+++ b/arch/x86/kvm/vmx/pmu_intel.c
-@@ -881,6 +881,10 @@ static void intel_restore_guest_pmu_context(struct kvm_vcpu *vcpu)
- 	wrmsrl(MSR_CORE_PERF_FIXED_CTR_CTRL, pmu->fixed_ctr_ctrl_hw);
+diff --git a/arch/x86/kvm/pmu.c b/arch/x86/kvm/pmu.c
+index 5cc539bdcc7e..41057d0122bd 100644
+--- a/arch/x86/kvm/pmu.c
++++ b/arch/x86/kvm/pmu.c
+@@ -510,6 +510,18 @@ static int reprogram_counter(struct kvm_pmc *pmc)
+ 				     eventsel & ARCH_PERFMON_EVENTSEL_INT);
  }
  
-+static void intel_set_overflow(struct kvm_vcpu *vcpu)
++static void kvm_pmu_handle_event_in_passthrough_pmu(struct kvm_vcpu *vcpu)
 +{
++	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
++
++	static_call_cond(kvm_x86_pmu_set_overflow)(vcpu);
++
++	if (atomic64_read(&pmu->__reprogram_pmi)) {
++		kvm_make_request(KVM_REQ_PMI, vcpu);
++		atomic64_set(&pmu->__reprogram_pmi, 0ull);
++	}
 +}
 +
- struct kvm_pmu_ops intel_pmu_ops __initdata = {
- 	.rdpmc_ecx_to_pmc = intel_rdpmc_ecx_to_pmc,
- 	.msr_idx_to_pmc = intel_msr_idx_to_pmc,
-@@ -897,6 +901,7 @@ struct kvm_pmu_ops intel_pmu_ops __initdata = {
- 	.save_pmu_context = intel_save_guest_pmu_context,
- 	.restore_pmu_context = intel_restore_guest_pmu_context,
- 	.incr_counter = intel_incr_counter,
-+	.set_overflow = intel_set_overflow,
- 	.EVENTSEL_EVENT = ARCH_PERFMON_EVENTSEL_EVENT,
- 	.MAX_NR_GP_COUNTERS = KVM_INTEL_PMC_MAX_GENERIC,
- 	.MIN_NR_GP_COUNTERS = 1,
+ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+ {
+ 	DECLARE_BITMAP(bitmap, X86_PMC_IDX_MAX);
+@@ -517,6 +529,9 @@ void kvm_pmu_handle_event(struct kvm_vcpu *vcpu)
+ 	struct kvm_pmc *pmc;
+ 	int bit;
+ 
++	if (is_passthrough_pmu_enabled(vcpu))
++		return kvm_pmu_handle_event_in_passthrough_pmu(vcpu);
++
+ 	bitmap_copy(bitmap, pmu->reprogram_pmi, X86_PMC_IDX_MAX);
+ 
+ 	/*
+@@ -848,6 +863,17 @@ void kvm_pmu_destroy(struct kvm_vcpu *vcpu)
+ 	kvm_pmu_reset(vcpu);
+ }
+ 
++static void kvm_passthrough_pmu_incr_counter(struct kvm_vcpu *vcpu, struct kvm_pmc *pmc)
++{
++	if (static_call(kvm_x86_pmu_incr_counter)(pmc)) {
++		__set_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->global_status);
++		kvm_make_request(KVM_REQ_PMU, vcpu);
++
++		if (pmc->eventsel & ARCH_PERFMON_EVENTSEL_INT)
++			set_bit(pmc->idx, (unsigned long *)&pmc_to_pmu(pmc)->reprogram_pmi);
++	}
++}
++
+ static void kvm_pmu_incr_counter(struct kvm_pmc *pmc)
+ {
+ 	pmc->emulated_counter++;
+@@ -880,7 +906,8 @@ static inline bool cpl_is_matched(struct kvm_pmc *pmc)
+ 	return (static_call(kvm_x86_get_cpl)(pmc->vcpu) == 0) ? select_os : select_user;
+ }
+ 
+-void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
++static void __kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel,
++				    bool is_passthrough)
+ {
+ 	DECLARE_BITMAP(bitmap, X86_PMC_IDX_MAX);
+ 	struct kvm_pmu *pmu = vcpu_to_pmu(vcpu);
+@@ -914,9 +941,19 @@ void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
+ 		    !pmc_event_is_allowed(pmc) || !cpl_is_matched(pmc))
+ 			continue;
+ 
+-		kvm_pmu_incr_counter(pmc);
++		if (is_passthrough)
++			kvm_passthrough_pmu_incr_counter(vcpu, pmc);
++		else
++			kvm_pmu_incr_counter(pmc);
+ 	}
+ }
++
++void kvm_pmu_trigger_event(struct kvm_vcpu *vcpu, u64 eventsel)
++{
++	bool is_passthrough = is_passthrough_pmu_enabled(vcpu);
++
++	__kvm_pmu_trigger_event(vcpu, eventsel, is_passthrough);
++}
+ EXPORT_SYMBOL_GPL(kvm_pmu_trigger_event);
+ 
+ static bool is_masked_filter_valid(const struct kvm_x86_pmu_event_filter *filter)
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
