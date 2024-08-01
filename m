@@ -1,68 +1,82 @@
-Return-Path: <kvm+bounces-22932-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22933-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21D09944951
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 12:30:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1F5694498B
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 12:41:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CACA6282127
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 10:30:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 411D01F2724A
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 10:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237E4183CD0;
-	Thu,  1 Aug 2024 10:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2426189B8C;
+	Thu,  1 Aug 2024 10:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="uE9BADz4"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="KdCbimfC"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 320D64503A;
-	Thu,  1 Aug 2024 10:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54614189910;
+	Thu,  1 Aug 2024 10:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722508231; cv=none; b=a0Tnzgdw5TMb8qkG/emuPZHQatDga5VxpRqFHNPsGO3pGAeDQIiYEdbq38bknH5Pbe/F5jruLOfaanhwe5sbq9b+I9s9vr1iK3nCmiKfwWG6CcXIiBT4SU4m4B0OiouuWh+B13LKvnglYvMQt+X2hAJ1f/q9NhDhFFKcOWXu5M0=
+	t=1722508855; cv=none; b=Vm4C9GD5Ja2XMFHCyO2a8tjMJDJT5UrrAQ1qFCOmz4kjFnSEYrSJXcgqGtGEl8RO5ZtY8VI1woNezMPqDVdzRG2/tuv0GqbwZTlDvto9ulHE0Fv4Lrjh3WrdzLNCoJbw5h3uV/+YZ3T/o5g6rAuvQpvp4X4SHL5MVAqcBshjMWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722508231; c=relaxed/simple;
-	bh=TeXgvZtmVSsWOyWvwGwQNHpvFHcawwpfpA+OnYmmyEg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ZVKqfUonXyIT4AfOjqVTa6+lb9yI7bgGu9cUviihJGaTXsTR8yJgY8DoWvA1uxtGZUppVTBQaLGp7GM8FqmzMswccBvBJjSj9KazxakiCb14Yo3/O9X5+ztMLz4tiixTvi/GTLPgLzzXG4vXBF0HkKiVXqyUiIZ/duimB8rf6JY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=uE9BADz4; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1722508229; x=1754044229;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=OVVbgg3i7ObhzDXrRl+WHtJky+rbfnkhgnMTtTNFVvM=;
-  b=uE9BADz43zxPo0mxslQCLpPSug259uDOe225dLLHnh8VPUOJHT09NVIF
-   b55yT2g3Ss5cFmFNFBt34T3k5G/HGPPyrgjyexsCaA2PdyrjCTqPXBNvi
-   4B1nprGZN62Iar9EsVF6k4ZN5u84KDjl0geThyPoMMyUXy6PYyE52v1Gd
-   g=;
-X-IronPort-AV: E=Sophos;i="6.09,254,1716249600"; 
-   d="scan'208";a="418659193"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2024 10:30:26 +0000
-Received: from EX19MTAUEA001.ant.amazon.com [10.0.0.204:41573]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.0.142:2525] with esmtp (Farcaster)
- id af2fe4b0-83dd-4544-a4ed-27a0ca73effc; Thu, 1 Aug 2024 10:30:25 +0000 (UTC)
-X-Farcaster-Flow-ID: af2fe4b0-83dd-4544-a4ed-27a0ca73effc
-Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
- EX19MTAUEA001.ant.amazon.com (10.252.134.203) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 1 Aug 2024 10:30:25 +0000
-Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
- EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 1 Aug 2024 10:30:25 +0000
-Received: from [127.0.0.1] (172.19.88.180) by mail-relay.amazon.com
- (10.252.135.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34 via Frontend
- Transport; Thu, 1 Aug 2024 10:30:22 +0000
-Message-ID: <e8663138-b75b-472d-8dcc-589b2ef91e53@amazon.co.uk>
-Date: Thu, 1 Aug 2024 11:30:21 +0100
+	s=arc-20240116; t=1722508855; c=relaxed/simple;
+	bh=7SP8K6iFeuNlD89qCpI31669Qk3c6Zk/NPDjzo9CKu0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hgNUWtsgI3MEN8/YVIuFLIGGOVxnHvH9HwYy5rOTHyTpLYczLNiJjH23s/Hk6OZG9a72HrF/Oi8lBZzNwN8WCb/zyb4wA+znEIOSjUPUk1N+EfwlOT3Up2q/Pl3QTOpfCAcqQ+Ns8jyBCDW1dtyD7fitAp/po5XX06fIjNdGkSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=KdCbimfC; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4718K2nH003757;
+	Thu, 1 Aug 2024 10:40:44 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=+
+	xBul6YCiyxa8MhSzWJ3pk+PMK9EtyMa46f+FT2Zu/Q=; b=KdCbimfCuz1uz2GbY
+	aHciRJcz/Scf0qnZTtljV6mYDihbbOlmusqBQ91MpdVKYAHMoAqj7fJy93kU+sMF
+	FDXIdZIz9qNjpbZrA29jivyzBenZUtZUyhn2P9K+q09BTD6AWtEk+KJM0ZckuCJy
+	/hm7HNyjrwPkLyR/I1vIGjJSsFgXSMd5hkXRzF44V5KpAXqPmvLQ0Cnz9zM+QOtc
+	HK3MmjSfXqYQT9wVpLBAaM0ClB1Q8akgoI09HWdMHVwdZBg+jFKB2CvH9NPFjkSr
+	rOBKQVRmsqOlAJ3izlCNEv53zB7wvqntJhhOg2tex9guc4ZYvLw5Ty8iOydX9SGn
+	IUFvg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40r5jsgfks-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 10:40:44 +0000 (GMT)
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 471AehD1014493;
+	Thu, 1 Aug 2024 10:40:44 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40r5jsgfkq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 10:40:43 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4718vBjE003857;
+	Thu, 1 Aug 2024 10:40:43 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 40ndems00h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 10:40:43 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 471AebIs59048334
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 1 Aug 2024 10:40:39 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 31DE22004B;
+	Thu,  1 Aug 2024 10:40:37 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C6E4520040;
+	Thu,  1 Aug 2024 10:40:36 +0000 (GMT)
+Received: from [9.152.224.253] (unknown [9.152.224.253])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  1 Aug 2024 10:40:36 +0000 (GMT)
+Message-ID: <67633877-37dc-4436-88e3-212eb963b706@linux.ibm.com>
+Date: Thu, 1 Aug 2024 12:40:36 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -70,175 +84,94 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 8/8] kvm: gmem: Allow restricted userspace mappings
-To: David Hildenbrand <david@redhat.com>, <seanjc@google.com>, Fuad Tabba
-	<tabba@google.com>
-CC: <pbonzini@redhat.com>, <akpm@linux-foundation.org>, <dwmw@amazon.co.uk>,
-	<rppt@kernel.org>, <tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <hpa@zytor.com>,
-	<willy@infradead.org>, <graf@amazon.com>, <derekmn@amazon.com>,
-	<kalyazin@amazon.com>, <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-mm@kvack.org>, <dmatlack@google.com>, <chao.p.peng@linux.intel.com>,
-	<xmarcalx@amazon.co.uk>, James Gowans <jgowans@amazon.com>
-References: <20240709132041.3625501-1-roypat@amazon.co.uk>
- <20240709132041.3625501-9-roypat@amazon.co.uk>
- <CA+EHjTynVpsqsudSVRgOBdNSP_XjdgKQkY_LwdqvPkpJAnAYKg@mail.gmail.com>
- <47ce1b10-e031-4ac1-b88f-9d4194533745@redhat.com>
- <f7106744-2add-4346-b3b6-49239de34b7f@amazon.co.uk>
- <f21d8157-a5e9-4acb-93fc-d040e9b585c8@redhat.com>
- <e26ec0bb-3c20-4732-a09b-83b6b6a6419a@amazon.co.uk>
- <ab528aa0-d4a5-4661-9715-43eb1681cfef@redhat.com>
-From: Patrick Roy <roypat@amazon.co.uk>
+Subject: Re: [PATCH v3 10/10] s390: Enable KVM_S390_UCONTROL config in
+ debug_defconfig
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+References: <20240730072413.143556-1-schlameuss@linux.ibm.com>
+ <20240730072413.143556-11-schlameuss@linux.ibm.com>
 Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <ab528aa0-d4a5-4661-9715-43eb1681cfef@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20240730072413.143556-11-schlameuss@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ktSfHwZeMu4gt4T6KOo4s_HlIwm3Zny3
+X-Proofpoint-GUID: 71_nZoB6ampku_pdp4ndL3_5LeBD6ps0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-01_07,2024-07-31_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 spamscore=0
+ phishscore=0 mlxscore=0 mlxlogscore=999 suspectscore=0 priorityscore=1501
+ malwarescore=0 clxscore=1015 impostorscore=0 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408010065
 
-On Tue, 2024-07-30 at 11:15 +0100, David Hildenbrand wrote:
->>> Hi,
->>>
->>> sorry for the late reply. Yes, you could have joined .... too late.
->>
->> No worries, I did end up joining to listen in to y'all's discussion
->> anyway :)
+On 7/30/24 9:24 AM, Christoph Schlameuss wrote:
+> To simplify testing enable UCONTROL KVM by default in debug kernels.
 > 
-> Sorry for the late reply :(
-
-No worries :)
-
->>
->>> There will be a summary posted soon. So far the agreement is that we're
->>> planning on allowing shared memory as part guest_memfd, and will allow
->>> that to get mapped and pinned. Private memory is not going to get mapped
->>> and pinned.
->>>
->>> If we have to disallow pinning of shared memory on top for some use
->>> cases (i.e., no directmap), I assume that could be added.
->>>
->>>>
->>>>> Note that just from staring at this commit, I don't understand the
->>>>> motivation *why* we would want to do that.
->>>>
->>>> Fair - I admittedly didn't get into that as much as I probably should
->>>> have. In our usecase, we do not have anything that pKVM would (I think)
->>>> call "guest-private" memory. I think our memory can be better described
->>>> as guest-owned, but always shared with the VMM (e.g. userspace), but
->>>> ideally never shared with the host kernel. This model lets us do a lot
->>>> of simplifying assumptions: Things like I/O can be handled in userspace
->>>> without the guest explicitly sharing I/O buffers (which is not exactly
->>>> what we would want long-term anyway, as sharing in the guest_memfd
->>>> context means sharing with the host kernel), we can easily do VM
->>>> snapshotting without needing things like TDX's TDH.EXPORT.MEM APIs, etc.
->>>
->>> Okay, so essentially you would want to use guest_memfd to only contain
->>> shard memory and disallow any pinning like for secretmem.
->>
->> Yeah, this is pretty much what I thought we wanted before listening in
->> on Wednesday.
->>
->> I've actually be thinking about this some more since then though. With
->> hugepages, if the VM is backed by, say, 2M pages, our on-demand direct
->> map insertion approach runs into the same problem that CoCo VMs have
->> when they're backed by hugepages: How to deal with the guest only
->> sharing a 4K range in a hugepage? If we want to restore the direct map
->> for e.g. the page containing kvm-clock data, then we can't simply go
->> ahead and restore the direct map for the entire 2M page, because there
->> very well might be stuff in the other 511 small guest pages that we
->> really do not want in the direct map. And we can't even take the
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> ---
+>   arch/s390/configs/debug_defconfig | 1 +
+>   1 file changed, 1 insertion(+)
 > 
-> Right, you'd only want to restore the direct map for a fragment. Or
-> dynamically map that fragment using kmap where required (as raised by
-> Vlastimil).
+> diff --git a/arch/s390/configs/debug_defconfig b/arch/s390/configs/debug_defconfig
+> index ea63a7342f5f..0c989caed19a 100644
+> --- a/arch/s390/configs/debug_defconfig
+> +++ b/arch/s390/configs/debug_defconfig
+> @@ -59,6 +59,7 @@ CONFIG_CMM=m
+>   CONFIG_APPLDATA_BASE=y
+>   CONFIG_S390_HYPFS_FS=y
+>   CONFIG_KVM=m
+> +CONFIG_KVM_S390_UCONTROL=y
 
-Can the kmap approach work if the memory is supposed to be GUP-able?
+Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
 
->> approach of letting the guest deal with the problem, because here
->> "sharing" is driven by the host, not the guest, so the guest cannot
->> possibly know that it maybe should avoid putting stuff it doesn't want
->> shared into those remaining 511 pages! To me that sounds a lot like the
->> whole "breaking down huge folios to allow GUP to only some parts of it"
->> thing mentioned on Wednesday.
-> 
-> Yes. While it would be one logical huge page, it would be exposed to the
-> remainder of the kernel as 512 individual pages.
-> 
->>
->> Now, if we instead treat "guest memory without direct map entries" as
->> "private", and "guest memory with direct map entries" as "shared", then
->> the above will be solved by whatever mechanism allows gupping/mapping of
->> only the "shared" parts of huge folios, IIUC. The fact that GUP is then
->> also allowed for the "shared" parts is not actually a problem for us -
->> we went down the route of disabling GUP altogether here because based on
->> [1] it sounded like GUP for anything gmem related would never happen.
-> 
-> Right. Might there also be a case for removing the directmap for shared
-> memory or is that not really a requirement so far?
-
-No, not really - we would only mark as "shared" memory that _needs_ to
-be in the direct map for functional reasons (e.g. MMIO instruction
-emulation, etc.).
-
->> But after something is re-inserted into the direct map, we don't very
->> much care if it can be GUP-ed or not. In fact, allowing GUP for the
->> shared parts probably makes some things easier for us, as we can then do
->> I/O without bounce buffers by just in-place converting I/O-buffers to
->> shared, and then treating that shared slice of guest_memfd the same way
->> we treat traditional guest memory today.
-> 
-> Yes.
-> 
->> In a very far-off future, we'd
->> like to be able to do I/O without ever reinserting pages into the direct
->> map, but I don't think adopting this private/shared model for gmem would
->> block us from doing that?
-> 
-> How would that I/O get triggered? GUP would require the directmap.
-
-I was hoping that this "phyr" thing Matthew has been talking about [1]
-would allow somehow doing I/O without direct map entries/GUP, but maybe
-I am misunderstanding something.
-
->>
->> Although all of this does hinge on us being able to do the in-place
->> shared/private conversion without any guest involvement. Do you envision
->> that to be possible?
-> 
-> Who would trigger the conversion and how? I don't see a reason why --
-> for your use case -- user space shouldn't be able to trigger conversion
-> private <-> shared. At least nothing fundamental comes to mind that
-> would prohibit that.
-
-Either KVM itself would trigger the conversions whenever it wants to
-access gmem (e.g. each place in this series where there is a
-set_direct_map_{invalid,default} it would do a shared/private
-conversion), or userspace would do it via some syscall/ioctl (the one
-place I can think of right now is I/O, where the VMM receives a virtio
-buffer from the guest and converts it from private to shared in-place.
-Although I guess 2 syscalls for each I/O operation aren't great
-perf-wise, so maybe swiotlb still wins out here?).
-
-I actually see that Fuad just posted an RFC series that implements the
-basic shared/private handling [2], so will probably also comment about
-this over there after I had a closer look :)
-
-> -- 
-> Cheers,
-> 
-> David / dhildenb
-
-Best, 
-Patrick
-
-[1]: https://lore.kernel.org/netdev/Yd0IeK5s%2FE0fuWqn@casper.infradead.org/T/
-[2]: https://lore.kernel.org/kvm/20240801090117.3841080-1-tabba@google.com/T/#t
 
