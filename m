@@ -1,159 +1,120 @@
-Return-Path: <kvm+bounces-22998-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22999-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6FDC9454D4
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 01:14:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B89AD945508
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 01:53:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB3421C231AD
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 23:14:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51F79B219CD
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 23:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B2E14D711;
-	Thu,  1 Aug 2024 23:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB79414E2F0;
+	Thu,  1 Aug 2024 23:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2XaWA3zO"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JQn35Y0z"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0F05745F2
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 23:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562A614D451
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 23:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722554061; cv=none; b=qzqACHduuvoME7FAaakE8+AJl2GvSGUKVMtdZukn83XG1rHtEz2rMJ4+AEmTS1S/iEUda3Jy2ysHPRkTTcCiydutDDp0zbHnTMnC8nvzuS4T5584k8naojX3UyHiBuXOjMseZ4N4k0YUwX2pGeGoM+o6QBRLhFMqTrbFPfZ6PjE=
+	t=1722556422; cv=none; b=eh0tpA5XSbsxkRdhRqDkGycAkLuAD8elRe2IW34n0NmoV2qu2ymuonn4WC/b6MzRhGZz4HEhef0Vb9PlCeIeO3LH2xacYGYvlWZUFdapnDjEjXaQtKyuvnBkieumJ52XNLwrKdnvEYxkD+JPGHi9PkHpnRXwJNHBQ9PUrG9L0HY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722554061; c=relaxed/simple;
-	bh=LakDI92yHujNYi+vD9cXq4g/itDQoPvZyDTcFrObMss=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YZNcbpV9b+nxqDxyBO4uJzoY2YBqximj59zT//clHI5SMn6qG0fBCGHFaGh9ClrAzpBY6dgzAya5rsyrOh/3eTKWCXPro98YeCocrgLe/F57uEtBfvOKfCBd6zHEAUQhmEPBYtDciytRpdqvmAXl1mMcw2aMdAmPRSLIuSgKi+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2XaWA3zO; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-45029af1408so748491cf.1
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 16:14:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722554057; x=1723158857; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bgdFSK67EnlVzS0oNU0oXBgCMZ8Z41GsOasZvN/Cis8=;
-        b=2XaWA3zOsJ4S2ygMgyNenxDkJ38LqY5WmqGCcFyVYHoOThtiSYgj6TLmFu2QnejLoq
-         kN/4QvQGukrRW+Ka7yBLhgaUhbDUMDv5fRE1nA1fFC0Dz6hLWnW9bJRZG0nJtViTdGck
-         /eUgRy8JzoapLc29vL3Fxpq0NGNZZj94siiKK/0OgCXmwUrTVlfyev7azDnrQukmrWTS
-         m9Q6SyWHI4AnxzM5STKktxRLfe/M3rVKEN30rLNTz5Mdhhmjrjg+P1SwPrazQLLLNUKc
-         e0/Y8V6sybzi3kMrg2kF252/0pZbDiDtpKy6lt8v1bvKXQYICJDhB3EwdshP1Tal74rp
-         HJeQ==
+	s=arc-20240116; t=1722556422; c=relaxed/simple;
+	bh=0bZmjV35Y0DFFdYimWpib0vJhpUru5xOxkDSJHkavgU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Rg2Gnnb/4TVI7/FVhAJw7M6o7K8IO60Fl16x5IO0dqfJpBcM4HrVJUs6mlSLEEvEKDAuZJZh6nxKVF8jxp4AIiA1A6NagGJ3tjL7gI+xZElQqufFkvXiGwr2C0NkBBgFh8zVhDGNscIZ9XtkuFrVmcQJ6UskgXdjHtGRhJ341y0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JQn35Y0z; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722556419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=OUSx7yeM//U7xgBRSiunnDzCLJUpTvy9KfWqh4xwHw4=;
+	b=JQn35Y0zCbg4qvTKLp0DRPO6Ag6NGmptLqoDQ6KqOJr72kSkFg+vA+sByxNsgW25YuZryj
+	c38YtOljpNrhafjZ3vHAioGT1PgB1I6JbJcHgiQ1DBMNiyk0C0UiIyESiF/R3GP9MVBEBw
+	mLFLNF18oNHUGRTWerVoTqpnHPFZS8M=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-70-kJORcFtKMmKxfVvpGLX08w-1; Thu, 01 Aug 2024 19:53:37 -0400
+X-MC-Unique: kJORcFtKMmKxfVvpGLX08w-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52efcb739adso1975307e87.2
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 16:53:37 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722554057; x=1723158857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bgdFSK67EnlVzS0oNU0oXBgCMZ8Z41GsOasZvN/Cis8=;
-        b=W665kzq1BPUOW7C/To5Bv59aS6UVsaBwghpxn8b+xeHNU9SqeAkLuvz8a7fUaiKTve
-         Twg6H0txMpjGuyRU7LpCHCCfhm+emTkma+W2Ff6czX5pI46+RAPnSx2Dzji4vkB3EOLq
-         +j0WG9IszqUUPj+OwAbgjdgwpu3ye6ddCmM/3wE0VWQz1zsTyiPmMhPw2tc3QCPpjwlj
-         4b3BeWr6btxJH5H6jhoedE7BSF61LnLBiOocBbgoK/XZSmp+cmCTVv+wkqGlJ+TES2Df
-         UYmm3MhuTfpYTYG78qtXJMYqUo1VHvpQexTIiVz3327oN1q978vBrgc9iaK4IKMjyBsi
-         /z2A==
-X-Forwarded-Encrypted: i=1; AJvYcCXGibZqr8zY6h9HWfpGx7kxmxbb5IRe1bi0JcIIeoF+RPLHXqI2M3l+0BYNcb1Kjld+E5oilsZMyWzaL8ie1Yu6I9YH
-X-Gm-Message-State: AOJu0YwbAI4wi7vNJI89hLy5J9kt20QR7Pi+T2LJ4iG57LvXj6W7e0ES
-	IZSj5uU6Dlt8A8yekAKL95YSl0o+0tgNMTKzgPoQOKtkZOuefKmma7rumYNMcQlef4os7Jg9X9G
-	a2ZxoF2Mx6i0hJuzKDJWV6TQfsC1qCmSY+Edt
-X-Google-Smtp-Source: AGHT+IEavFuwjE3Uo37LnJzCLlUcmMvqQudZCR32/8HyzTxNRzd5eGXPN4zy9/nrSL3qCpUTpDg7un5y0ylSK+y54Ao=
-X-Received: by 2002:a05:622a:178a:b0:447:e153:66e0 with SMTP id
- d75a77b69052e-4518c6e3d95mr497911cf.2.1722554057325; Thu, 01 Aug 2024
- 16:14:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722556416; x=1723161216;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=OUSx7yeM//U7xgBRSiunnDzCLJUpTvy9KfWqh4xwHw4=;
+        b=ceP13+hMlqNCtWN9d1JcKOt+DsRDcuRpZ+5HOfW8yoQU73Dmc84z/eoDNzntjcPLc0
+         jdDRWjE1NYr3k0xCaMUNK4yzSvCMnwg2www/vMeSJhqzmKqq4NrpgpJSFgXMff4EbJgf
+         0p8SyXYQPEgvDoQagYBSQACiklAvypbFWKxf9m8vlQ5gUlJFZ3kW9pzVqJoMGUfsXVw4
+         DRNzCfgShdtXpbmNK1XjCbwMYUscG+mI8dmfTIpmT2Z82YXPKPT8Io1+W6IxMWHvPxZx
+         e2UCX8tOULr8AA2baIbdbzV4KsGy7AL6O0OVx/Iesrj8GZecR/qvCrhxn7bgBGPRvMli
+         ntFw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDk5Z8bFdshPRK57f4gOjooD9PUOMkBub9Q7Zqdq3UzhVi2J/pat7bDrutG7kPMwhR026lgSjCUNXAyyCBCkVfB7K+
+X-Gm-Message-State: AOJu0Yyxmp18+fh8e+D64JAPx2cr0UOAIdhFKI94+HDeXgjmF+DTUrrr
+	CW2SB+VIIbaAVr46i3A0XrRO19R+KDxQLjExiYF1QrQoBcYSQ6ttxSeTvzxj65DDStnNs6RiNXM
+	pM7wRQMRXmkstD6Pj0fAZPJZEQIGVT1TZKHihb5zdWCPtM9SdRD/++vV7+w==
+X-Received: by 2002:a05:6512:2805:b0:52c:dfa7:53a2 with SMTP id 2adb3069b0e04-530bb6c7b28mr976214e87.50.1722556415754;
+        Thu, 01 Aug 2024 16:53:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IExnzW1SZ0twUMkNblcsaDTxDqmZnuFJH/xxGE6TmjBsdB/4VFoq/tSC1skMpS/DYOFOCcPiQ==
+X-Received: by 2002:a05:6512:2805:b0:52c:dfa7:53a2 with SMTP id 2adb3069b0e04-530bb6c7b28mr976202e87.50.1722556415163;
+        Thu, 01 Aug 2024 16:53:35 -0700 (PDT)
+Received: from avogadro.local ([151.95.101.29])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9c0c58esm32725666b.86.2024.08.01.16.53.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Aug 2024 16:53:34 -0700 (PDT)
+From: Paolo Bonzini <pbonzini@redhat.com>
+To: linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org
+Cc: Michael Roth <michael.roth@amd.com>
+Subject: [PATCH] KVM: SEV: allow KVM_SEV_GET_ATTESTATION_REPORT for SNP guests
+Date: Fri,  2 Aug 2024 01:53:33 +0200
+Message-ID: <20240801235333.357075-1-pbonzini@redhat.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-6-jthoughton@google.com> <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
-In-Reply-To: <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
-From: James Houghton <jthoughton@google.com>
-Date: Thu, 1 Aug 2024 16:13:40 -0700
-Message-ID: <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
-Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
- clear_young MMU notifiers
-To: David Hildenbrand <david@redhat.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ankit Agrawal <ankita@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>, 
-	Catalin Marinas <catalin.marinas@arm.com>, David Matlack <dmatlack@google.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Sean Christopherson <seanjc@google.com>, 
-	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
-	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, 
-	Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Aug 1, 2024 at 2:36=E2=80=AFAM David Hildenbrand <david@redhat.com>=
- wrote:
->
-> On 24.07.24 03:10, James Houghton wrote:
-> > For implementers, the fast_only bool indicates that the age information
-> > needs to be harvested such that we do not slow down other MMU operation=
-s,
-> > and ideally that we are not ourselves slowed down by other MMU
-> > operations.  Usually this means that the implementation should be
-> > lockless.
->
-> But what are the semantics if "fast_only" cannot be achieved by the
-> implementer?
->
-> Can we add some documentation to the new functions that explain what
-> this mysterious "fast_only" is and what the expected semantics are?
-> Please? :)
+Even though KVM_SEV_GET_ATTESTATION_REPORT is not one of the commands
+that were added for SEV-SNP guests, it can be applied to them.  Filtering
+it out, for example, makes the QEMU command query-sev-attestation-report
+fail.
 
-Thanks for pointing out the missing documentation. How's this?
+Cc: Michael Roth <michael.roth@amd.com>
+Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+---
+ arch/x86/kvm/svm/sev.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
-index 45c5995ebd84..c21992036dd3 100644
---- a/include/linux/mmu_notifier.h
-+++ b/include/linux/mmu_notifier.h
-@@ -106,6 +106,18 @@ struct mmu_notifier_ops {
-         * clear_young is a lightweight version of clear_flush_young. Like =
-the
-         * latter, it is supposed to test-and-clear the young/accessed bitf=
-lag
-         * in the secondary pte, but it may omit flushing the secondary tlb=
-.
-+        *
-+        * The fast_only parameter indicates that this call should not bloc=
-k,
-+        * and this function should not cause other MMU notifier calls to
-+        * block. Usually this means that the implementation should be
-+        * lockless.
-+        *
-+        * When called with fast_only, this notifier will be a no-op unless
-+        * has_fast_aging is set on the struct mmu_notifier.
-+        *
-+        * When fast_only is true, if the implementer cannot determine that=
- a
-+        * range is young without blocking, it should return 0 (i.e.,
-+        * that the range is NOT young).
-         */
-        int (*clear_young)(struct mmu_notifier *subscription,
-                           struct mm_struct *mm,
-@@ -118,6 +130,8 @@ struct mmu_notifier_ops {
-         * the secondary pte. This is used to know if the page is
-         * frequently used without actually clearing the flag or tearing
-         * down the secondary mapping on the page.
-+        *
-+        * The fast_only parameter has the same meaning as with clear_young=
-.
-         */
-        int (*test_young)(struct mmu_notifier *subscription,
-                          struct mm_struct *mm,
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 5c125e4c1096..17307257d632 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -2587,7 +2587,9 @@ int sev_mem_enc_ioctl(struct kvm *kvm, void __user *argp)
+ 	 * Once KVM_SEV_INIT2 initializes a KVM instance as an SNP guest, only
+ 	 * allow the use of SNP-specific commands.
+ 	 */
+-	if (sev_snp_guest(kvm) && sev_cmd.id < KVM_SEV_SNP_LAUNCH_START) {
++	if (sev_snp_guest(kvm) &&
++	    sev_cmd.id < KVM_SEV_SNP_LAUNCH_START &&
++	    sev_cmd.id != KVM_SEV_GET_ATTESTATION_REPORT) {
+ 		r = -EPERM;
+ 		goto out;
+ 	}
+-- 
+2.45.2
 
-I've also moved the commit that follows this one (the one that adds
-has_fast_aging) to be before this one so that the comment makes sense.
 
