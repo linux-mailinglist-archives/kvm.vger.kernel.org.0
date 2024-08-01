@@ -1,173 +1,178 @@
-Return-Path: <kvm+bounces-22947-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22948-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC547944E45
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 16:43:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F1EC944EC2
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 17:06:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B08AB21346
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 14:43:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDEA7282E16
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 15:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 362281A57F1;
-	Thu,  1 Aug 2024 14:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254E713BC0B;
+	Thu,  1 Aug 2024 15:06:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YYE9UY03"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Nk2dCEcq"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EA01A57DF
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 14:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD24813B5A6;
+	Thu,  1 Aug 2024 15:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722523397; cv=none; b=OIDKAZa1vvCpEVNdYYR12N3bzLhpPLzoUv5f8D+/0K0KQYMi3Wh39mFQ8JxqIv6JZ3dFrL2uhTpPFIUHlA0Oj5vbF1EBDN0G2Qc3E7OygQH9NVwM2ER0+Wgdbxo2VQ9foAI1PFojp43Njca+kwQKYAJMsJAV4N3Le9bo5JJe9aw=
+	t=1722524799; cv=none; b=B/fwyVbzuKQA4cff1MgtNitrhMA/kPVeaIABaT6vm+tB6zF96Zp//KmCvKCC7uB0SFjJDpQeAjRdFqXLo+xPjSoNS7bOKQ91xo0ZynjXhbSNOK2mC5iLw8pyN1ZnKkjX+PrVO2W16mrGQt8ZIgmuNY+w+eetcOkIvaNhPUaSByE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722523397; c=relaxed/simple;
-	bh=IsY6cT/EMNbdEHxsGGmKU2yom71VQGN3eoqzlVoDRMA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Vojookl6i9yIjjI082PvGRI5yX0QXi/C2NvxzlKTImBAC3ifwsFiWqQjghKGV5fEfgbWzRKCQGQyiRFL8j6d4RVDDn+uHIMiS6CNeM8p1n+YpwjjK5Tili0VHFyRlGr2r7y/wTN+1HDihEMRNKwoldV2wtw3D0U+U9GuEj4RWBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YYE9UY03; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e05d72f044cso9865321276.3
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 07:43:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722523395; x=1723128195; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9BUCK9RfTKafiexBRvCEwFw2qC43V57hNjDHfumiy08=;
-        b=YYE9UY03WQXLd7HA54lXGldbJlRGM4DHY9ytzkq4PbfGlKR42ibEuz87xtMFFZxHbl
-         dTe65TWt75K5mHOpMYT8GsgFIgcDKPpmDJej+dLWm5ivKhrXPHHXaeI5AwnvZsgKSChl
-         NZEJXzP+qB8kPr/XOXBHOPRosXOGbxov/d7IA3RpYPJusxC5GoFEvNgz+Fan8bibhFt9
-         BKT1oqtQKqGSY8rKJGpitLat4IsYrtnM/AFpM6l2Amoz1UEbdIngFmUcKsdfq3abrBbq
-         eaLWPZmIYHo3iOfrKjFuVqbaj+Bk3FyfpWZ24fLk04K7zlFigQlD0H3Wa1JqFEMVcOjR
-         oglg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722523395; x=1723128195;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=9BUCK9RfTKafiexBRvCEwFw2qC43V57hNjDHfumiy08=;
-        b=rOOkdEHrWFyxCqsEN6qDEwhI3Dpx//wpKDOIaLIndLAjP7+Bn7lactwEyXmmoVhsi2
-         qL88QguX9Uyzodj84NIwBUOGYgUHA3Z73mfU8AwQnu1cWjk6gQHh91okbCxFV1DpB+AU
-         GetW9eC15yARuSNKJ/K1F26GJUObuIcFEMC6BdbTZrHFvpwjC02d3MU708pNyCZ6RLsH
-         vKufkcrDUj7aL32VDcGpQI/ChpamuCW1kjujTXXJ8gV3LKO3crrOlDaSB0uucgOCXsRO
-         xIITh50Vgnpj9S4Xr38aagI9w08jMDGN+wHmIbxRuf3/IupZB1NcOrJVhKxSwOkBvS0v
-         leiA==
-X-Forwarded-Encrypted: i=1; AJvYcCVB8WaxS3jz4G5gfAj6ZhHoNjo0GFrauOOmmheM+flvy++S1sYu5WBn9GjZxpCmnbw/87xZ0YCeQprhV/AAWeqNCMIn
-X-Gm-Message-State: AOJu0YzN5hZ7Lm0z0BlRTCd9kfo3Me+mraUS9AFKCVKr6jPUcnUqFb8R
-	cus9r/QWw84NEY7s0idNUg7nX1x9RfpP1PlQsyBjUEK8UWzRIa6L0rqxoBpk6+fWwyZ5E+Yuox6
-	/yw==
-X-Google-Smtp-Source: AGHT+IHkE7Ce/eHqXIIWUhOrz6iZ7wUAM+0kNmbjyrQoG1wEe6+vtvmxZ2gwjb9N0RAQKGaJuDaT2daG0VE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1104:b0:e0b:b6f3:85 with SMTP id
- 3f1490d57ef6-e0bde2f0105mr658276.2.1722523394843; Thu, 01 Aug 2024 07:43:14
- -0700 (PDT)
-Date: Thu, 1 Aug 2024 07:43:13 -0700
-In-Reply-To: <87wml0egzo.fsf@draig.linaro.org>
+	s=arc-20240116; t=1722524799; c=relaxed/simple;
+	bh=f/PIjaNsyFEjsegwxwGwOoPM5O7TpgvYy9TNg4JeDr4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D4gmFDFtY3ukyf41fHTh1Zbn8AbSNdNeZ6HkFCL+lWrc4U5FsF2XH8GvPC5IvnYBxwSfTWPPQlPcf38XHSfWbetSr1GY3rX8CvkUjHC1hvutoWZCFZuYVay4wJi3sWyTVX4i+WzKolIDHQYzgEcmtf4VyQvHx+vwnQ5oCnO23lM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Nk2dCEcq; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 471BR1Ju012462;
+	Thu, 1 Aug 2024 15:06:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	Wrpw/Oj0t4PU//9fSYE0T/rzsi45ifkJQqqCsVWX3W8=; b=Nk2dCEcq8iOsyCod
+	sNX20V5QsqRKS9W7CFt/jrfELLPU6P5zJYHTO02nQ/Nk9I69qGIthaPyh1JPVpav
+	HF2iTdMFQ4AdbLVQBTC0ahylfIj6zJ/F+DfZPGqbVo4M+Gg6aGUoML1epjfP+cx7
+	OulMzlK1xp5Hu1PrXtjBBmJdrphb9lNsUG/WBru/x8pv6zblznPS+hHVB9g2tNun
+	hswNSDnSbm8RMnI97tn50uDJMsSYJ85r08SFAj9LTMXLJjQTqU2h6r83BVpMvq5k
+	L7AmuviqJ4DywL5jpmQ8JsevapuPk8GI9EteA2PEYGVFMwWKGZEZhIFKg5No74Yg
+	U9gSTA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40r3tpsdwg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 15:06:25 +0000 (GMT)
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 471F6PVG026778;
+	Thu, 1 Aug 2024 15:06:25 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40r3tpsdwe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 15:06:25 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 471Esheg029100;
+	Thu, 1 Aug 2024 15:06:24 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40nbm12k32-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Aug 2024 15:06:24 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 471F6IV851446126
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 1 Aug 2024 15:06:20 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ADA4A20043;
+	Thu,  1 Aug 2024 15:06:18 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0DB1320040;
+	Thu,  1 Aug 2024 15:06:18 +0000 (GMT)
+Received: from darkmoore (unknown [9.179.23.97])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Thu,  1 Aug 2024 15:06:17 +0000 (GMT)
+Date: Thu, 1 Aug 2024 17:06:15 +0200
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah
+ Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand
+ <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: Re: [PATCH v3 07/10] selftests: kvm: s390: Add uc_map_unmap VM test
+ case
+Message-ID: <20240801170615.7ae660b8.schlameuss@linux.ibm.com>
+In-Reply-To: <0b323867-a2f8-4bae-9f33-02ecf8362a13@linux.ibm.com>
+References: <20240730072413.143556-1-schlameuss@linux.ibm.com>
+	<20240730072413.143556-8-schlameuss@linux.ibm.com>
+	<0b323867-a2f8-4bae-9f33-02ecf8362a13@linux.ibm.com>
+Organization: IBM
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-6-seanjc@google.com>
- <87wml0egzo.fsf@draig.linaro.org>
-Message-ID: <ZqufAYyVOa9M1z76@google.com>
-Subject: Re: [PATCH v12 05/84] KVM: Add kvm_release_page_unused() API to put
- pages that KVM never consumes
-From: Sean Christopherson <seanjc@google.com>
-To: "Alex =?utf-8?Q?Benn=C3=A9e?=" <alex.bennee@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>, 
-	Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Janosch Frank <frankja@linux.ibm.com>, Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 4UWn2-wLIbYKO1YQVTE_eqAbT8JYvG5e
+X-Proofpoint-ORIG-GUID: MZZ11_489Fa0UuigIPgxN5yo9ZEz9igN
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-01_13,2024-08-01_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 mlxscore=0
+ mlxlogscore=982 malwarescore=0 adultscore=0 spamscore=0 priorityscore=1501
+ bulkscore=0 clxscore=1015 impostorscore=0 lowpriorityscore=0 phishscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408010097
 
-On Thu, Aug 01, 2024, Alex Benn=C3=A9e wrote:
-> Sean Christopherson <seanjc@google.com> writes:
->=20
-> > Add an API to release an unused page, i.e. to put a page without markin=
-g
-> > it accessed or dirty.  The API will be used when KVM faults-in a page b=
-ut
-> > bails before installing the guest mapping (and other similar flows).
-> >
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+On Thu, 1 Aug 2024 11:08:30 +0200
+Janosch Frank <frankja@linux.ibm.com> wrote:
+
+> On 7/30/24 9:24 AM, Christoph Schlameuss wrote:
+> > Add a test case verifying basic running and interaction of ucontrol VMs.
+> > Fill the segment and page tables for allocated memory and map memory on
+> > first access.
+> > 
+> > * uc_map_unmap
+> >    Store and load data to mapped and unmapped memory and use pic segment
+> >    translation handling to map memory on access.
+> > 
+> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
 > > ---
-> >  include/linux/kvm_host.h | 9 +++++++++
-> >  1 file changed, 9 insertions(+)
-> >
-> > diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> > index 3d9617d1de41..c5d39a337aa3 100644
-> > --- a/include/linux/kvm_host.h
-> > +++ b/include/linux/kvm_host.h
-> > @@ -1201,6 +1201,15 @@ unsigned long gfn_to_hva_prot(struct kvm *kvm, g=
-fn_t gfn, bool *writable);
-> >  unsigned long gfn_to_hva_memslot(struct kvm_memory_slot *slot, gfn_t g=
-fn);
-> >  unsigned long gfn_to_hva_memslot_prot(struct kvm_memory_slot *slot, gf=
-n_t gfn,
-> >  				      bool *writable);
-> > +
-> > +static inline void kvm_release_page_unused(struct page *page)
-> > +{
-> > +	if (!page)
-> > +		return;
-> > +
-> > +	put_page(page);
-> > +}
->=20
-> I guess it's unfamiliarity with the mm layout but I was trying to find
-> where the get_pages come from to see the full pattern of allocate and
-> return. I guess somewhere in the depths of hva_to_pfn() from
-> hva_to_pfn_retry()?
+> >   .../selftests/kvm/s390x/ucontrol_test.c       | 165 +++++++++++++++++-
+> >   1 file changed, 164 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > index 817b1e08559c..b7f760f980fd 100644
+> > --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > @@ -16,7 +16,13 @@
+> >   #include <linux/capability.h>
+> >   #include <linux/sizes.h>
+> >   
+> > +#define UC_PIC_SEGMENT_TRANSLATION 0x10  
+> 
+> That's a bit clearer and used by KVM:
+> #define PGM_SEGMENT_TRANSLATION		0x10
+> 
 
-If successful, get_user_page_fast_only() and get_user_pages_unlocked() grab=
- a
-reference on behalf of the caller.
+I will rename the constant here. (The original constant is defined in
+kvm_host.h which is not pulled into the userspace selftests.)
+Also since this is only used here so far and does not really fit into
+processor.h or sie.h, I would leave that here for now.
 
-As of this patch, hva_to_pfn_remapped() also grabs a reference to pages tha=
-t
-appear to be refcounted, which is the underlying wart this series aims to f=
-ix.
-In KVM's early days, it _only_ supported GUP, i.e. if KVM got a pfn, that p=
-fn
-was (a) backed by struct page and (b) KVM had a reference to said page.  Th=
-at
-led to the current mess, as KVM didn't get reworked to properly track pages=
- vs.
-pfns when support for VM_MIXEDMAP was added.
+[...]
 
-	/*
-	 * Get a reference here because callers of *hva_to_pfn* and
-	 * *gfn_to_pfn* ultimately call kvm_release_pfn_clean on the
-	 * returned pfn.  This is only needed if the VMA has VM_MIXEDMAP
-	 * set, but the kvm_try_get_pfn/kvm_release_pfn_clean pair will
-	 * simply do nothing for reserved pfns.
-	 *
-	 * Whoever called remap_pfn_range is also going to call e.g.
-	 * unmap_mapping_range before the underlying pages are freed,
-	 * causing a call to our MMU notifier.
-	 *
-	 * Certain IO or PFNMAP mappings can be backed with valid
-	 * struct pages, but be allocated without refcounting e.g.,
-	 * tail pages of non-compound higher order allocations, which
-	 * would then underflow the refcount when the caller does the
-	 * required put_page. Don't allow those pages here.
-	 */
-	if (!kvm_try_get_pfn(pfn))
-		r =3D -EFAULT;
+> > @@ -245,7 +338,11 @@ static bool uc_handle_sieic(FIXTURE_DATA(uc_kvm) * self)
+> >   		break;
+> >   	case ICPT_INST:
+> >   		/* end execution in caller on intercepted instruction */
+> > +		pr_info("sie instruction interception\n");  
+> 
+> That should have been part of an earlier patch?
+> 
+
+Yes, on closer observation this is actually already needed in patch 6:
+"selftests: kvm: s390: Add VM run test case".
+
+I will also make sure all patches do run on its own again before
+sending the next version.
+
+Good catch, thank you.
+
+[...]
+
+I will also fix up the comments as advised.
+
+Christoph
 
