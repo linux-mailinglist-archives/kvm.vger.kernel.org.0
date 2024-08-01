@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-22844-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22845-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6CA4944258
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 07:00:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A606944259
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 07:00:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81B19283F55
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 05:00:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EE6A1C22488
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 05:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 272B114885C;
-	Thu,  1 Aug 2024 04:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63CFB1422DE;
+	Thu,  1 Aug 2024 04:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TojKWnip"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EBQvuhYE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8F68141987
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 04:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151F614885B
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 04:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722488373; cv=none; b=se6R47rm16uBAoVgWSOFs+cQ31fWwE5ze73u6nZP60r8KI/KQLejGdhxRKREK9wxisybxMb0MMAr7tB9nykG8dILSvk48uhemeJM9Zd1j43+xZLTi4lCGy8id0YbO0m0RpjRnS49Ts06aQd+Bx4p8vMBbd4JSGFXZepNrFB1AsQ=
+	t=1722488375; cv=none; b=UmciHKPLfvL/WYJOrXLlHUHkKEMsCfVpzpDmb5LJnh8di141OeG2CGWOB2n5gnFgHKkVlLKYB4XUsOsxJ5PJ30xcHxzk3s3R8dE2hcS04mS7y41A6mZC6xWm9hwPbfje40tIyLdWbhY8A/ntcA+OPY0TEOjdrniLk31agTCBx1g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722488373; c=relaxed/simple;
-	bh=U9q0KA3ceAZtvfLGiI0Um1mr6SQ6acjihjd/dq5pXZc=;
+	s=arc-20240116; t=1722488375; c=relaxed/simple;
+	bh=rqzRetFhlSPkAjMKC/ToO5qCQVBnIVY/hV21gk6XRpE=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Qs7G7QmNPS/6+CiMIO/VCg811BrecO8a1jI1kF9MO801Sn5kwb/NiTk4uCbZ/PV/iHNSZPRGQ71VJgtrx+/deEvhr3rxhZ5zgSUrRoixlf56hl/KzaLhftBqcHI05wpIUtXiyCY3Ro0SkiyuLojET+iV5R4IGiepCH/f7zdp/do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TojKWnip; arc=none smtp.client-ip=209.85.216.73
+	 To:Cc:Content-Type; b=JrbzKlWYC6eYdoXEDcXyz6mmEtC5qCMIH1sSAbQvUwdvL4oYgfCLhd7GeuGqkeosM2TwDuvh1zg5OXzs7Q1lzzC3bbqE2wmkcrsqlCRI8UvTPjijQ8b5V+8suw6WxU5j55TuryQ20xw5m9gV+p854JvRBJzx6SQtuDDbKRKutk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EBQvuhYE; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--mizhang.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2cb6c5f9810so6593797a91.2
-        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 21:59:31 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fc52d3c76eso60606935ad.3
+        for <kvm@vger.kernel.org>; Wed, 31 Jul 2024 21:59:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722488371; x=1723093171; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722488373; x=1723093173; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=EfFo/7SOA2NaX48pCngKagowZ/hRWebUXr42Y4/rrHs=;
-        b=TojKWnip8flvl93DDu4hmLwAAFDfPhTI7fsB/LESFyxKszGYKMxD20Ua+pLmSDGnuW
-         mGwYIhXFNOOQMewUYymaTHsPOPk2GimCuRqLfF/gRcYxZAMT4sioExoMmZFk0lhO66Bi
-         ItzRvD/3QZkhHZONAY5ECD6M+YmfcgeIlDS5QuKQyEnzAzSx53gocb8Po1DX0r9UyjFK
-         jfl0k42ok+6JYltXOvRDqRyyi9Etc0RA/ppzmLYwOD7ijs51wjvQ/ONqJSi8pa+vNGbE
-         6FLGe7chpvaxoMBDrHjf95XzfetTqWjsok431lrLhGK3Be2Fc86BThImHZRfRvvPqByD
-         7MUQ==
+        bh=q8fJNbHfJJMZMWvZ8/ilEbDnuyOnCJRnwYPgtX9B8zU=;
+        b=EBQvuhYEF2hLBwB9p0dZU+vCewr6r82B4c16txNDNUXdzlZEFk5TsJ8Hq0qzg4axbY
+         Et3/eL+K1o1Jukuoh7GpVKeuOvPPz9c8MU8QH0X4hXSN1DO2Dg0tcpUKlw3+VZ1m9CM5
+         bWBiZboaGcm+vZawyJ/77Qd1jnj3oyH/3s+Vc4QW5Wft5YyZzKDClvN2yYWmaSQhd7Ii
+         URMQg+7o052WPFXJGEyVcqEkgn7msghLC1aIxnm8Z2b3YbZXPRI46uPmC2Wx/+Kt3u9f
+         TSOSaZZARCwbdmwUuHoPKZzr876aPwgKvbyNT0OYJJyUoO2RXrWT4sihYpqYiawV6rXv
+         SMYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722488371; x=1723093171;
+        d=1e100.net; s=20230601; t=1722488373; x=1723093173;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=EfFo/7SOA2NaX48pCngKagowZ/hRWebUXr42Y4/rrHs=;
-        b=Tz3KuFvO5EsEg2DHUGrWJqYJQTUbN9UGm8TQS2ol6xuCoMC5UYs+6JfHnLYR0Wo6EU
-         SIcZm5BYkND8Ps1jIdTUPHMuS4QuV1NlTxm5CkjuSHcY2IQiAe4ciCrA3hWDqFLHV6y3
-         yBDMuK2bjF9IGUOD5fmHzSDyyVQDoJkxhcP/74DS3ijwd/0Yvfoq6ysIIlRwlAXUS0OL
-         67B0cjOjv2Zv60hfozyo+p9hiAm729MGWQIrMgp3UKGCt5PWx9uxGyJBvNXbN8MsjC3d
-         EbKEzJwUFAKBzrqvDDInvKUu5G/igmP6sBjTjelmH8nxOZs0qVdqqwswG3j9XBKpsjuR
-         thkA==
-X-Forwarded-Encrypted: i=1; AJvYcCW8YIAULCJSli3Nh4MKw1qIiO283HCtAJ8+s8UIWmXOaTnF4d5FnwQdwgmvqDNiE3FaBnqA55UUNrBihm/gKZC29i6N
-X-Gm-Message-State: AOJu0YxPmDHUeTA99bYqjWx1tDYXYvMG7lVCcjrj/MS9oFaUKcIeeBvp
-	hM0GKhjyhW95nkVKr7aGNyIiUSjpecYfAgOHVphNYSV4RgflbXV9j4iPQfko19HmiEhDkzXRM7+
-	+rxWvUg==
-X-Google-Smtp-Source: AGHT+IH80Lb85B5R8lk+f773M0uEW3Y0z51r3A8XQV/UqIsQk9O6qLgF2FJ/z2vQpwIO9/0ZtI8d/04lsfh4
+        bh=q8fJNbHfJJMZMWvZ8/ilEbDnuyOnCJRnwYPgtX9B8zU=;
+        b=Z21TRmuGKwjed7GQNTTBtVuV1fQ66Xp7JsTvuUutbyBC7fC1KY7AEQQR6w9Zr0vpfu
+         FlZy16GGBct1puD8kneHEP6NvVWz4dMUbiMzlmQKqzGGUcGLEX+iTl0c4Uk1R4nSIUl+
+         qqsO0SCCv8IrOVOG5xsobG7zF/BmlUd3dhZ6u8baxx2OUpDNLkH9SfVP7NrVAmgqiN14
+         EJjESrpVyXEe4q1+L+aI6n/5Bopn3VgVW8Ejm3U+Cr48o5qQC94Px/wp1cueeJV2zN1n
+         Q9D+j01wpjLRghGX8wtcjZOLFbkI6QWELbhGetaVhTlsUBoj8b2NvfaJcX63j8nTMkzG
+         vILA==
+X-Forwarded-Encrypted: i=1; AJvYcCVYF4QBgfpTE1sPo/2yJY6Cniw3fertZf4N3fVCfQ0A1bk5ltvmIZNOaXoV2Zl3jR0hVS3gCyAfN9ZFmeCTMmYSHzR5
+X-Gm-Message-State: AOJu0YwKQXghkMzju8s+M+gFYxf2VGwEbSTAE0uuCT1zfdZrETXSdtGn
+	hfVL2dDN3gH813fzs8TmAYt0Q5oFRZwFa2+W4/MlK9d7d8NpyrsWrZ0VVEfXV4mQBy3uXHTUZGq
+	HBjWOxQ==
+X-Google-Smtp-Source: AGHT+IH5q/6b1ijF1gNpeziEBYhuxhp9BV0CkRuIrN05ArJLU9odNox6SNQDBwusFWLqlSvpRCQsofQEqZle
 X-Received: from mizhang-super.c.googlers.com ([35.247.89.60]) (user=mizhang
- job=sendgmr) by 2002:a17:90b:1b06:b0:2c9:61f9:9aea with SMTP id
- 98e67ed59e1d1-2cfe7b4c4d2mr70658a91.5.1722488371281; Wed, 31 Jul 2024
- 21:59:31 -0700 (PDT)
+ job=sendgmr) by 2002:a17:902:bb89:b0:1fe:d72d:13bc with SMTP id
+ d9443c01a7336-1ff4ce87265mr738715ad.5.1722488373141; Wed, 31 Jul 2024
+ 21:59:33 -0700 (PDT)
 Reply-To: Mingwei Zhang <mizhang@google.com>
-Date: Thu,  1 Aug 2024 04:58:20 +0000
+Date: Thu,  1 Aug 2024 04:58:21 +0000
 In-Reply-To: <20240801045907.4010984-1-mizhang@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -76,9 +76,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240801045907.4010984-1-mizhang@google.com>
 X-Mailer: git-send-email 2.46.0.rc1.232.g9752f9e123-goog
-Message-ID: <20240801045907.4010984-12-mizhang@google.com>
-Subject: [RFC PATCH v3 11/58] x86/irq: Factor out common code for installing
- kvm irq handler
+Message-ID: <20240801045907.4010984-13-mizhang@google.com>
+Subject: [RFC PATCH v3 12/58] perf: core/x86: Register a new vector for KVM
+ GUEST PMI
 From: Mingwei Zhang <mizhang@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
 	Xiong Zhang <xiong.y.zhang@intel.com>, Dapeng Mi <dapeng1.mi@linux.intel.com>, 
@@ -95,94 +95,148 @@ Content-Type: text/plain; charset="UTF-8"
 
 From: Xiong Zhang <xiong.y.zhang@linux.intel.com>
 
-KVM will register irq handler for POSTED_INTR_WAKEUP_VECTOR and
-KVM_GUEST_PMI_VECTOR, the existing kvm_set_posted_intr_wakeup_handler() is
-renamed to x86_set_kvm_irq_handler(), and vector input parameter is used
-to distinguish POSTED_INTR_WARKUP_VECTOR and KVM_GUEST_PMI_VECTOR.
+Create a new vector in the host IDT for kvm guest PMI handling within
+mediated passthrough vPMU. In addition, guest PMI handler registration
+is added into x86_set_kvm_irq_handler().
 
-Caller should call x86_set_kvm_irq_handler() once to register
-a non-dummy handler for each vector. If caller register one
-handler for a vector, later the caller register the same or different
-non-dummy handler again, the second call will output warn message.
+This is the preparation work to support mediated passthrough vPMU to
+handle kvm guest PMIs without interference from PMI handler of the host
+PMU.
 
-Suggested-by: Sean Christopherson <seanjc@google.com>
+Signed-off-by: Dapeng Mi <dapeng1.mi@linux.intel.com>
 Signed-off-by: Xiong Zhang <xiong.y.zhang@linux.intel.com>
 Tested-by: Yongwei Ma <yongwei.ma@intel.com>
 Signed-off-by: Mingwei Zhang <mizhang@google.com>
 ---
- arch/x86/include/asm/irq.h |  2 +-
- arch/x86/kernel/irq.c      | 18 ++++++++++++------
- arch/x86/kvm/vmx/vmx.c     |  4 ++--
- 3 files changed, 15 insertions(+), 9 deletions(-)
+ arch/x86/include/asm/hardirq.h                |  1 +
+ arch/x86/include/asm/idtentry.h               |  1 +
+ arch/x86/include/asm/irq_vectors.h            |  5 ++++-
+ arch/x86/kernel/idt.c                         |  1 +
+ arch/x86/kernel/irq.c                         | 21 +++++++++++++++++++
+ .../beauty/arch/x86/include/asm/irq_vectors.h |  5 ++++-
+ 6 files changed, 32 insertions(+), 2 deletions(-)
 
-diff --git a/arch/x86/include/asm/irq.h b/arch/x86/include/asm/irq.h
-index 194dfff84cb1..050a247b69b4 100644
---- a/arch/x86/include/asm/irq.h
-+++ b/arch/x86/include/asm/irq.h
-@@ -30,7 +30,7 @@ struct irq_desc;
- extern void fixup_irqs(void);
- 
- #if IS_ENABLED(CONFIG_KVM)
--extern void kvm_set_posted_intr_wakeup_handler(void (*handler)(void));
-+void x86_set_kvm_irq_handler(u8 vector, void (*handler)(void));
+diff --git a/arch/x86/include/asm/hardirq.h b/arch/x86/include/asm/hardirq.h
+index c67fa6ad098a..42a396763c8d 100644
+--- a/arch/x86/include/asm/hardirq.h
++++ b/arch/x86/include/asm/hardirq.h
+@@ -19,6 +19,7 @@ typedef struct {
+ 	unsigned int kvm_posted_intr_ipis;
+ 	unsigned int kvm_posted_intr_wakeup_ipis;
+ 	unsigned int kvm_posted_intr_nested_ipis;
++	unsigned int kvm_guest_pmis;
  #endif
+ 	unsigned int x86_platform_ipis;	/* arch dependent */
+ 	unsigned int apic_perf_irqs;
+diff --git a/arch/x86/include/asm/idtentry.h b/arch/x86/include/asm/idtentry.h
+index d4f24499b256..7b1e3e542b1d 100644
+--- a/arch/x86/include/asm/idtentry.h
++++ b/arch/x86/include/asm/idtentry.h
+@@ -745,6 +745,7 @@ DECLARE_IDTENTRY_SYSVEC(IRQ_WORK_VECTOR,		sysvec_irq_work);
+ DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_VECTOR,		sysvec_kvm_posted_intr_ipi);
+ DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_WAKEUP_VECTOR,	sysvec_kvm_posted_intr_wakeup_ipi);
+ DECLARE_IDTENTRY_SYSVEC(POSTED_INTR_NESTED_VECTOR,	sysvec_kvm_posted_intr_nested_ipi);
++DECLARE_IDTENTRY_SYSVEC(KVM_GUEST_PMI_VECTOR,	        sysvec_kvm_guest_pmi_handler);
+ #else
+ # define fred_sysvec_kvm_posted_intr_ipi		NULL
+ # define fred_sysvec_kvm_posted_intr_wakeup_ipi		NULL
+diff --git a/arch/x86/include/asm/irq_vectors.h b/arch/x86/include/asm/irq_vectors.h
+index 13aea8fc3d45..ada270e6f5cb 100644
+--- a/arch/x86/include/asm/irq_vectors.h
++++ b/arch/x86/include/asm/irq_vectors.h
+@@ -77,7 +77,10 @@
+  */
+ #define IRQ_WORK_VECTOR			0xf6
  
- extern void (*x86_platform_ipi_callback)(void);
+-/* 0xf5 - unused, was UV_BAU_MESSAGE */
++#if IS_ENABLED(CONFIG_KVM)
++#define KVM_GUEST_PMI_VECTOR		0xf5
++#endif
++
+ #define DEFERRED_ERROR_VECTOR		0xf4
+ 
+ /* Vector on which hypervisor callbacks will be delivered */
+diff --git a/arch/x86/kernel/idt.c b/arch/x86/kernel/idt.c
+index f445bec516a0..0bec4c7e2308 100644
+--- a/arch/x86/kernel/idt.c
++++ b/arch/x86/kernel/idt.c
+@@ -157,6 +157,7 @@ static const __initconst struct idt_data apic_idts[] = {
+ 	INTG(POSTED_INTR_VECTOR,		asm_sysvec_kvm_posted_intr_ipi),
+ 	INTG(POSTED_INTR_WAKEUP_VECTOR,		asm_sysvec_kvm_posted_intr_wakeup_ipi),
+ 	INTG(POSTED_INTR_NESTED_VECTOR,		asm_sysvec_kvm_posted_intr_nested_ipi),
++	INTG(KVM_GUEST_PMI_VECTOR,		asm_sysvec_kvm_guest_pmi_handler),
+ # endif
+ # ifdef CONFIG_IRQ_WORK
+ 	INTG(IRQ_WORK_VECTOR,			asm_sysvec_irq_work),
 diff --git a/arch/x86/kernel/irq.c b/arch/x86/kernel/irq.c
-index 385e3a5fc304..18cd418fe106 100644
+index 18cd418fe106..b29714e23fc4 100644
 --- a/arch/x86/kernel/irq.c
 +++ b/arch/x86/kernel/irq.c
-@@ -312,16 +312,22 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_x86_platform_ipi)
+@@ -183,6 +183,12 @@ int arch_show_interrupts(struct seq_file *p, int prec)
+ 		seq_printf(p, "%10u ",
+ 			   irq_stats(j)->kvm_posted_intr_wakeup_ipis);
+ 	seq_puts(p, "  Posted-interrupt wakeup event\n");
++
++	seq_printf(p, "%*s: ", prec, "VPMU");
++	for_each_online_cpu(j)
++		seq_printf(p, "%10u ",
++			   irq_stats(j)->kvm_guest_pmis);
++	seq_puts(p, " KVM GUEST PMI\n");
+ #endif
+ #ifdef CONFIG_X86_POSTED_MSI
+ 	seq_printf(p, "%*s: ", prec, "PMN");
+@@ -311,6 +317,7 @@ DEFINE_IDTENTRY_SYSVEC(sysvec_x86_platform_ipi)
+ #if IS_ENABLED(CONFIG_KVM)
  static void dummy_handler(void) {}
  static void (*kvm_posted_intr_wakeup_handler)(void) = dummy_handler;
++static void (*kvm_guest_pmi_handler)(void) = dummy_handler;
  
--void kvm_set_posted_intr_wakeup_handler(void (*handler)(void))
-+void x86_set_kvm_irq_handler(u8 vector, void (*handler)(void))
+ void x86_set_kvm_irq_handler(u8 vector, void (*handler)(void))
  {
--	if (handler)
-+	if (!handler)
-+		handler = dummy_handler;
-+
-+	if (vector == POSTED_INTR_WAKEUP_VECTOR &&
-+	    (handler == dummy_handler ||
-+	     kvm_posted_intr_wakeup_handler == dummy_handler))
+@@ -321,6 +328,10 @@ void x86_set_kvm_irq_handler(u8 vector, void (*handler)(void))
+ 	    (handler == dummy_handler ||
+ 	     kvm_posted_intr_wakeup_handler == dummy_handler))
  		kvm_posted_intr_wakeup_handler = handler;
--	else {
--		kvm_posted_intr_wakeup_handler = dummy_handler;
-+	else
-+		WARN_ON_ONCE(1);
++	else if (vector == KVM_GUEST_PMI_VECTOR &&
++		 (handler == dummy_handler ||
++		  kvm_guest_pmi_handler == dummy_handler))
++		kvm_guest_pmi_handler = handler;
+ 	else
+ 		WARN_ON_ONCE(1);
+ 
+@@ -356,6 +367,16 @@ DEFINE_IDTENTRY_SYSVEC_SIMPLE(sysvec_kvm_posted_intr_nested_ipi)
+ 	apic_eoi();
+ 	inc_irq_stat(kvm_posted_intr_nested_ipis);
+ }
 +
-+	if (handler == dummy_handler)
- 		synchronize_rcu();
--	}
- }
--EXPORT_SYMBOL_GPL(kvm_set_posted_intr_wakeup_handler);
-+EXPORT_SYMBOL_GPL(x86_set_kvm_irq_handler);
++/*
++ * Handler for KVM_GUEST_PMI_VECTOR.
++ */
++DEFINE_IDTENTRY_SYSVEC(sysvec_kvm_guest_pmi_handler)
++{
++	apic_eoi();
++	inc_irq_stat(kvm_guest_pmis);
++	kvm_guest_pmi_handler();
++}
+ #endif
  
- /*
-  * Handler for POSTED_INTERRUPT_VECTOR.
-diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
-index b3c83c06f826..ad465881b043 100644
---- a/arch/x86/kvm/vmx/vmx.c
-+++ b/arch/x86/kvm/vmx/vmx.c
-@@ -8292,7 +8292,7 @@ void vmx_migrate_timers(struct kvm_vcpu *vcpu)
+ #ifdef CONFIG_X86_POSTED_MSI
+diff --git a/tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h b/tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h
+index 13aea8fc3d45..670dcee46631 100644
+--- a/tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h
++++ b/tools/perf/trace/beauty/arch/x86/include/asm/irq_vectors.h
+@@ -77,7 +77,10 @@
+  */
+ #define IRQ_WORK_VECTOR			0xf6
  
- void vmx_hardware_unsetup(void)
- {
--	kvm_set_posted_intr_wakeup_handler(NULL);
-+	x86_set_kvm_irq_handler(POSTED_INTR_WAKEUP_VECTOR, NULL);
+-/* 0xf5 - unused, was UV_BAU_MESSAGE */
++#if IS_ENABLED(CONFIG_KVM)
++#define KVM_GUEST_PMI_VECTOR           0xf5
++#endif
++
+ #define DEFERRED_ERROR_VECTOR		0xf4
  
- 	if (nested)
- 		nested_vmx_hardware_unsetup();
-@@ -8602,7 +8602,7 @@ __init int vmx_hardware_setup(void)
- 	if (r && nested)
- 		nested_vmx_hardware_unsetup();
- 
--	kvm_set_posted_intr_wakeup_handler(pi_wakeup_handler);
-+	x86_set_kvm_irq_handler(POSTED_INTR_WAKEUP_VECTOR, pi_wakeup_handler);
- 
- 	return r;
- }
+ /* Vector on which hypervisor callbacks will be delivered */
 -- 
 2.46.0.rc1.232.g9752f9e123-goog
 
