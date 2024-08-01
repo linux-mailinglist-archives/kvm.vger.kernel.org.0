@@ -1,178 +1,236 @@
-Return-Path: <kvm+bounces-22927-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22914-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62473944896
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:36:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C71A944821
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:25:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85A4C1C21096
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:36:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D7D61F29625
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384B9170A28;
-	Thu,  1 Aug 2024 09:36:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E271189BA7;
+	Thu,  1 Aug 2024 09:21:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WRSdpF5n"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="RunV0jCD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0307515252D
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 09:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82506189BA1
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 09:21:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722504982; cv=none; b=unTIJXwEVru2D0xCkuPRyqTnr7YdZmICDcEzOpkT+Brk/Uat/y6qYCi+43znr+ICmRff1Y7vmCMn5+kDE3YplOItV/cO3swJ3XUqP6p0AlWc2gcAWQXSSw8hgRYjKelrLjJh5zxe/1F1akb1/RUsCq8/lgp7ae0m0WvxxBRHWjY=
+	t=1722504083; cv=none; b=EideAnyUO8f0xjThejip1oq6bBEzpK8SBvxSMUTUGtNK7/ZoyMW0WvxHVVKwzZh7rh38qt++ZCAxsEOxClNQ6z7ZxuYleGGusn25FCRw3wBcqIVOZZkUbH62AvhLSCsn+EkxMF/0HJfXNVVOfwOSsHTeobnD08CIst05guuXe94=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722504982; c=relaxed/simple;
-	bh=RQAbB+4xwgd8rgrT5Xo97jqhsVqqGwZd4S+HhvCqU10=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UgFTMKFWRFF/oA61ia26gaHJDITgczDlDC3fiwyXFVWX/bvUeGXirGmEAZS7QedyOn6XoBajexYeNFtErWIdk1gP5P9xVWtUd8hUc6vfEOZQaNOjf4oTd9eBm9el+y6g6vja39FMDLDp7RbHPy8kV8RspNLG9bdqPpbwmXR2u78=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WRSdpF5n; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722504980;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=KJ/HMyeCTpAdrNibsjz2nmyKmky95K7l5NS86QU5jXI=;
-	b=WRSdpF5nIlH3YQJR5Pax8xPkCgS67DZr2oAvxXFlc9hA2+N/GtgrsMB9BwtLhUIMkaGEIe
-	mi11qs8253xusQGcFDtSMrbvImiWJgrvaFlxEOY5kEuePQKaiEDju8yrU1p1cmDY+hTbSy
-	NKkuRXx+/OTSZlixwgHSTvN/t3jCEC4=
-Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
- [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-lTeyqaZHND2kX1ftzPPf3Q-1; Thu, 01 Aug 2024 05:36:18 -0400
-X-MC-Unique: lTeyqaZHND2kX1ftzPPf3Q-1
-Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52efcb739adso1164622e87.2
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 02:36:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722504977; x=1723109777;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=KJ/HMyeCTpAdrNibsjz2nmyKmky95K7l5NS86QU5jXI=;
-        b=lu4zZyMZIj9R+fdSXWSNgU6wJOHje3x1zfQ7BqAiQYEKMqmagCWWxOETmUrMRHALy9
-         HQaYRRjfWaqwuk3TM4ZCYNc04htxDyIhl5KN+2cSNSO3vQd8+sz86xnrBXhePsRyVs+H
-         re1eyavvV0oq6oauAnp0hH6bgHHvkE/99LOTMg/UWSixwrQaMjNHsRpLH8aIurOIvQP7
-         SoHU0jEq1+WbCbo/N38+/0C2n02MfQ7fuEOTZr/3alue29HsEBlLiU0oZwPnyCSZrk9a
-         PUB5CqBJ8Aok/+wkzDizPioQvulGDHXP7EushyYOO0m3KwgVFcc3TXEVSzBIu5cja6N6
-         g4nw==
-X-Forwarded-Encrypted: i=1; AJvYcCUGftklAk7zpwl9LrTUDPWp6euEE+rGGOHT4IKecr1F3coPLrAlU2wpRcIzh5iBSjkZSBS6dv53DEc0jxu3/aoyUA38
-X-Gm-Message-State: AOJu0YxSH2GViFz6EGGFw5YydFxoD3potw5Z7rCTk69qD++D55mYVso7
-	C6YQ2AAKjJUPzsrY0a8u4+C/x0gkFYG6cgN5WayJ105SXkP0t1d4eZw8QUHUQuxS98Bac3BMksU
-	EYFl3FPdBfMRTBg6pSGgfWndFnS3jkJ/kY6UWhuNDL1xM9VfU+w==
-X-Received: by 2002:ac2:46ef:0:b0:530:ae0a:ab7a with SMTP id 2adb3069b0e04-530b61aa918mr892639e87.17.1722504977096;
-        Thu, 01 Aug 2024 02:36:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFBu+QMo4gAEWvVK7f3J31mT8lTsS1wPjplRZ9rVb/L5dLtT7Zpo/p40oBB0gNZnxzN3H/cdw==
-X-Received: by 2002:ac2:46ef:0:b0:530:ae0a:ab7a with SMTP id 2adb3069b0e04-530b61aa918mr892597e87.17.1722504976510;
-        Thu, 01 Aug 2024 02:36:16 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c707:5c00:e650:bcd7:e2a0:54fe? (p200300cbc7075c00e650bcd7e2a054fe.dip0.t-ipconnect.de. [2003:cb:c707:5c00:e650:bcd7:e2a0:54fe])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282baccccfsm50752385e9.29.2024.08.01.02.36.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Aug 2024 02:36:16 -0700 (PDT)
-Message-ID: <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
-Date: Thu, 1 Aug 2024 11:36:14 +0200
+	s=arc-20240116; t=1722504083; c=relaxed/simple;
+	bh=Xmg/968fCVUCGZYT797Z9jjQKkMZwiEQFs2Df4qxxrw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YXG0rPyjMRwCJjReCX2v6SJzRqYzu5cf5rH4B8d8cR5yHNaqGtzt4mYnZj3VLyrPADDNlTCFXda2aNCCVBrhdEd1to3hXN8golH3DkgDCrDxYS/2lzI00me3HzPzQkiYKO6lhtmZxV3DkovMtEte7C17L3YE6Ga8qq+pzsYa92Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=RunV0jCD; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722504082; x=1754040082;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Xmg/968fCVUCGZYT797Z9jjQKkMZwiEQFs2Df4qxxrw=;
+  b=RunV0jCDp13wMvsQ1YB4AlT/RhCoqAblWtuLVU0rCrY28gyOX7Wgz9d2
+   TCHX7chJEheVVbS0uRS8yoM42SfVAgyjZQEeabdqt0iUbGHMq5ao8Pwth
+   Wa46Jd1efqD3iKGwJ67d/l+8Em2dbyVzuq8acEl1ekjr8w55KGp9niu+a
+   oxkB1LGd5zuVRwS67S9dOYC+xQ0XdHeBeGOvo6DCTBkOytP9BFnnHiPkU
+   hh7JPfygSh1uEGAv/3XrVMLKejqiwR4+jRX1dQ0fGNLgDSoIhM64THXRI
+   I+qBdhq5eeWQCe2PhhANIQ+a1GndvC5T/Htn5B120U36qaJFy3MfBmJfz
+   A==;
+X-CSE-ConnectionGUID: 8LbtIdw+TnCMCxO5HDU++A==
+X-CSE-MsgGUID: aeDc6bNbRdCz4EXOeLY78A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11150"; a="20385173"
+X-IronPort-AV: E=Sophos;i="6.09,254,1716274800"; 
+   d="scan'208";a="20385173"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Aug 2024 02:21:21 -0700
+X-CSE-ConnectionGUID: D84dmaN6SuK0K8x9jJDrlw==
+X-CSE-MsgGUID: YCFLQ0uPTG+Bm5RJ5hwSpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,254,1716274800"; 
+   d="scan'208";a="59787927"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa005.jf.intel.com with ESMTP; 01 Aug 2024 02:21:16 -0700
+Date: Thu, 1 Aug 2024 17:37:03 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Markus Armbruster <armbru@redhat.com>
+Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
+	Eduardo Habkost <eduardo@habkost.net>,
+	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
+	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
+	Yanan Wang <wangyanan55@huawei.com>,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Eric Blake <eblake@redhat.com>,
+	Marcelo Tosatti <mtosatti@redhat.com>,
+	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
+	Peter Maydell <peter.maydell@linaro.org>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
+	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
+	Zhenyu Wang <zhenyu.z.wang@intel.com>,
+	Dapeng Mi <dapeng1.mi@linux.intel.com>,
+	Yongwei Ma <yongwei.ma@intel.com>
+Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache object
+Message-ID: <ZqtXP9MViOlyhEsu@intel.com>
+References: <20240704031603.1744546-1-zhao1.liu@intel.com>
+ <20240704031603.1744546-9-zhao1.liu@intel.com>
+ <87r0bl35ug.fsf@pond.sub.org>
+ <Zp5vxtXWDeHAdPok@intel.com>
+ <87bk2nnev2.fsf@pond.sub.org>
+ <ZqEN1kZaQcuY4UPG@intel.com>
+ <87le1psuv3.fsf@pond.sub.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
- clear_young MMU notifiers
-To: James Houghton <jthoughton@google.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ankit Agrawal <ankita@nvidia.com>,
- Axel Rasmussen <axelrasmussen@google.com>,
- Catalin Marinas <catalin.marinas@arm.com>,
- David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>,
- James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
- Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>,
- Raghavendra Rao Ananta <rananta@google.com>,
- Ryan Roberts <ryan.roberts@arm.com>, Sean Christopherson
- <seanjc@google.com>, Shaoqin Huang <shahuang@redhat.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>,
- Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>,
- Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
- kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
-References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-6-jthoughton@google.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
- dBrn+lhhOYjjNefFQou6478faXE6o2AhmebqT4KiQoUQFV4R7y1KMEKoSyy8hQaK1umALTdL
- QZLQMzNE74ap+GDK0wnacPQFpcG1AE9RMq3aeErY5tujekBS32jfC/7AnH7I0v1v1TbbK3Gp
- XNeiN4QroO+5qaSr0ID2sz5jtBLRb15RMre27E1ImpaIv2Jw8NJgW0k/D1RyKCwaTsgRdwuK
- Kx/Y91XuSBdz0uOyU/S8kM1+ag0wvsGlpBVxRR/xw/E8M7TEwuCZQArqqTCmkG6HGcXFT0V9
- PXFNNgV5jXMQRwU0O/ztJIQqsE5LsUomE//bLwzj9IVsaQpKDqW6TAPjcdBDPLHvriq7kGjt
- WhVhdl0qEYB8lkBEU7V2Yb+SYhmhpDrti9Fq1EsmhiHSkxJcGREoMK/63r9WLZYI3+4W2rAc
- UucZa4OT27U5ZISjNg3Ev0rxU5UH2/pT4wJCfxwocmqaRr6UYmrtZmND89X0KigoFD/XSeVv
- jwBRNjPAubK9/k5NoRrYqztM9W6sJqrH8+UWZ1Idd/DdmogJh0gNC0+N42Za9yBRURfIdKSb
- B3JfpUqcWwE7vUaYrHG1nw54pLUoPG6sAA7Mehl3nd4pZUALHwARAQABzSREYXZpZCBIaWxk
- ZW5icmFuZCA8ZGF2aWRAcmVkaGF0LmNvbT7CwZgEEwEIAEICGwMGCwkIBwMCBhUIAgkKCwQW
- AgMBAh4BAheAAhkBFiEEG9nKrXNcTDpGDfzKTd4Q9wD/g1oFAl8Ox4kFCRKpKXgACgkQTd4Q
- 9wD/g1oHcA//a6Tj7SBNjFNM1iNhWUo1lxAja0lpSodSnB2g4FCZ4R61SBR4l/psBL73xktp
- rDHrx4aSpwkRP6Epu6mLvhlfjmkRG4OynJ5HG1gfv7RJJfnUdUM1z5kdS8JBrOhMJS2c/gPf
- wv1TGRq2XdMPnfY2o0CxRqpcLkx4vBODvJGl2mQyJF/gPepdDfcT8/PY9BJ7FL6Hrq1gnAo4
- 3Iv9qV0JiT2wmZciNyYQhmA1V6dyTRiQ4YAc31zOo2IM+xisPzeSHgw3ONY/XhYvfZ9r7W1l
- pNQdc2G+o4Di9NPFHQQhDw3YTRR1opJaTlRDzxYxzU6ZnUUBghxt9cwUWTpfCktkMZiPSDGd
- KgQBjnweV2jw9UOTxjb4LXqDjmSNkjDdQUOU69jGMUXgihvo4zhYcMX8F5gWdRtMR7DzW/YE
- BgVcyxNkMIXoY1aYj6npHYiNQesQlqjU6azjbH70/SXKM5tNRplgW8TNprMDuntdvV9wNkFs
- 9TyM02V5aWxFfI42+aivc4KEw69SE9KXwC7FSf5wXzuTot97N9Phj/Z3+jx443jo2NR34XgF
- 89cct7wJMjOF7bBefo0fPPZQuIma0Zym71cP61OP/i11ahNye6HGKfxGCOcs5wW9kRQEk8P9
- M/k2wt3mt/fCQnuP/mWutNPt95w9wSsUyATLmtNrwccz63XOwU0EVcufkQEQAOfX3n0g0fZz
- Bgm/S2zF/kxQKCEKP8ID+Vz8sy2GpDvveBq4H2Y34XWsT1zLJdvqPI4af4ZSMxuerWjXbVWb
- T6d4odQIG0fKx4F8NccDqbgHeZRNajXeeJ3R7gAzvWvQNLz4piHrO/B4tf8svmRBL0ZB5P5A
- 2uhdwLU3NZuK22zpNn4is87BPWF8HhY0L5fafgDMOqnf4guJVJPYNPhUFzXUbPqOKOkL8ojk
- CXxkOFHAbjstSK5Ca3fKquY3rdX3DNo+EL7FvAiw1mUtS+5GeYE+RMnDCsVFm/C7kY8c2d0G
- NWkB9pJM5+mnIoFNxy7YBcldYATVeOHoY4LyaUWNnAvFYWp08dHWfZo9WCiJMuTfgtH9tc75
- 7QanMVdPt6fDK8UUXIBLQ2TWr/sQKE9xtFuEmoQGlE1l6bGaDnnMLcYu+Asp3kDT0w4zYGsx
- 5r6XQVRH4+5N6eHZiaeYtFOujp5n+pjBaQK7wUUjDilPQ5QMzIuCL4YjVoylWiBNknvQWBXS
- lQCWmavOT9sttGQXdPCC5ynI+1ymZC1ORZKANLnRAb0NH/UCzcsstw2TAkFnMEbo9Zu9w7Kv
- AxBQXWeXhJI9XQssfrf4Gusdqx8nPEpfOqCtbbwJMATbHyqLt7/oz/5deGuwxgb65pWIzufa
- N7eop7uh+6bezi+rugUI+w6DABEBAAHCwXwEGAEIACYCGwwWIQQb2cqtc1xMOkYN/MpN3hD3
- AP+DWgUCXw7HsgUJEqkpoQAKCRBN3hD3AP+DWrrpD/4qS3dyVRxDcDHIlmguXjC1Q5tZTwNB
- boaBTPHSy/Nksu0eY7x6HfQJ3xajVH32Ms6t1trDQmPx2iP5+7iDsb7OKAb5eOS8h+BEBDeq
- 3ecsQDv0fFJOA9ag5O3LLNk+3x3q7e0uo06XMaY7UHS341ozXUUI7wC7iKfoUTv03iO9El5f
- XpNMx/YrIMduZ2+nd9Di7o5+KIwlb2mAB9sTNHdMrXesX8eBL6T9b+MZJk+mZuPxKNVfEQMQ
- a5SxUEADIPQTPNvBewdeI80yeOCrN+Zzwy/Mrx9EPeu59Y5vSJOx/z6OUImD/GhX7Xvkt3kq
- Er5KTrJz3++B6SH9pum9PuoE/k+nntJkNMmQpR4MCBaV/J9gIOPGodDKnjdng+mXliF3Ptu6
- 3oxc2RCyGzTlxyMwuc2U5Q7KtUNTdDe8T0uE+9b8BLMVQDDfJjqY0VVqSUwImzTDLX9S4g/8
- kC4HRcclk8hpyhY2jKGluZO0awwTIMgVEzmTyBphDg/Gx7dZU1Xf8HFuE+UZ5UDHDTnwgv7E
- th6RC9+WrhDNspZ9fJjKWRbveQgUFCpe1sa77LAw+XFrKmBHXp9ZVIe90RMe2tRL06BGiRZr
- jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240724011037.3671523-6-jthoughton@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87le1psuv3.fsf@pond.sub.org>
 
-On 24.07.24 03:10, James Houghton wrote:
-> For implementers, the fast_only bool indicates that the age information
-> needs to be harvested such that we do not slow down other MMU operations,
-> and ideally that we are not ourselves slowed down by other MMU
-> operations.  Usually this means that the implementation should be
-> lockless.
+On Thu, Jul 25, 2024 at 11:07:12AM +0200, Markus Armbruster wrote:
+> Date: Thu, 25 Jul 2024 11:07:12 +0200
+> From: Markus Armbruster <armbru@redhat.com>
+> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
+>  object
+> 
+> Zhao Liu <zhao1.liu@intel.com> writes:
+> 
+> > Hi Markus and Daniel,
+> >
+> > I have the questions about the -object per cache implementation:
+> >
+> > On Wed, Jul 24, 2024 at 02:39:29PM +0200, Markus Armbruster wrote:
+> >> Date: Wed, 24 Jul 2024 14:39:29 +0200
+> >> From: Markus Armbruster <armbru@redhat.com>
+> >> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
+> >>  object
+> >> 
+> >> Zhao Liu <zhao1.liu@intel.com> writes:
+> >> 
+> >> > Hi Markus,
+> >> >
+> >> > On Mon, Jul 22, 2024 at 03:37:43PM +0200, Markus Armbruster wrote:
+> >> >> Date: Mon, 22 Jul 2024 15:37:43 +0200
+> >> >> From: Markus Armbruster <armbru@redhat.com>
+> >> >> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
+> >> >>  object
+> >> >> 
+> >> >> Zhao Liu <zhao1.liu@intel.com> writes:
+> >> >> 
+> >> >> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
+> >> >> 
+> >> >> This patch is just documentation.  The code got added in some previous
+> >> >> patch.  Would it make sense to squash this patch into that previous
+> >> >> patch?
+> >> >
+> >> > OK, I'll merge them.
+> >> >
+> >> >> > ---
+> >> >> > Changes since RFC v2:
+> >> >> >  * Rewrote the document of smp-cache object.
+> >> >> >
+> >> >> > Changes since RFC v1:
+> >> >> >  * Use "*_cache=topo_level" as -smp example as the original "level"
+> >> >> >    term for a cache has a totally different meaning. (Jonathan)
+> >> >> > ---
+> >> >> >  qemu-options.hx | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
+> >> >> >  1 file changed, 58 insertions(+)
+> >> >> >
+> >> >> > diff --git a/qemu-options.hx b/qemu-options.hx
+> >> >> > index 8ca7f34ef0c8..4b84f4508a6e 100644
+> >> >> > --- a/qemu-options.hx
+> >> >> > +++ b/qemu-options.hx
+> >> >> > @@ -159,6 +159,15 @@ SRST
+> >> >> >          ::
+> >> >> >  
+> >> >> >              -machine cxl-fmw.0.targets.0=cxl.0,cxl-fmw.0.targets.1=cxl.1,cxl-fmw.0.size=128G,cxl-fmw.0.interleave-granularity=512
+> >> >> > +
+> >> >> > +    ``smp-cache='id'``
+> >> >> > +        Allows to configure cache property (now only the cache topology level).
+> >> >> > +
+> >> >> > +        For example:
+> >> >> > +        ::
+> >> >> > +
+> >> >> > +            -object '{"qom-type":"smp-cache","id":"cache","caches":[{"name":"l1d","topo":"core"},{"name":"l1i","topo":"core"},{"name":"l2","topo":"module"},{"name":"l3","topo":"die"}]}'
+> >> >> > +            -machine smp-cache=cache
+> >> >> >  ERST
+> >> >> >  
+> >> >> >  DEF("M", HAS_ARG, QEMU_OPTION_M,
+> >> >> > @@ -5871,6 +5880,55 @@ SRST
+> >> >> >          ::
+> >> >> >  
+> >> >> >              (qemu) qom-set /objects/iothread1 poll-max-ns 100000
+> >> >> > +
+> >> >> > +    ``-object '{"qom-type":"smp-cache","id":id,"caches":[{"name":cache_name,"topo":cache_topo}]}'``
+> >> >> > +        Create an smp-cache object that configures machine's cache
+> >> >> > +        property. Currently, cache property only include cache topology
+> >> >> > +        level.
+> >> >> > +
+> >> >> > +        This option must be written in JSON format to support JSON list.
+> >> >> 
+> >> >> Why?
+> >> >
+> >> > I'm not familiar with this, so I hope you could educate me if I'm wrong.
+> >> >
+> >> > All I know so far is for -object that defining a list can only be done in
+> >> > JSON format and not with a numeric index like a keyval based option, like:
+> >> >
+> >> > -object smp-cache,id=cache0,caches.0.name=l1i,caches.0.topo=core: Parameter 'caches' is missing
+> >> >
+> >> > the above doesn't work.
+> >> >
+> >> > Is there any other way to specify a list in command line?
+> >> 
+> >> The command line is a big, sprawling mess :)
+> >> 
+> >> -object supports either a JSON or a QemuOpts argument.  *Not* keyval!
+> >> 
+> >> Both QemuOpts and keyval parse something like KEY=VALUE,...  Keyval
+> >> supports arrays and objects via dotted keys.  QemuOpts doesn't natively
+> >> support arrays and objects, but its users can hack around that
+> >> limitation in various ways.  -object doesn't.  So you're right, it's
+> >> JSON or bust here.
+> >> 
+> >> However, if we used one object per cache instead, we could get something
+> >> like
+> >> 
+> >>     -object smp-cache,name=l1d,...
+> >>     -object smp-cache,name=l1u,...
+> >>     -object smp-cache,name=l2,...
+> >>     ...
+> >
+> > Current, I use -object to create a smp_cache object, and link it to
+> > MachineState by -machine,smp-cache=obj_id.
+> >
+> > Then for the objects per cache, how could I link them to machine?
+> >
+> > Is it possible that I create something static in smp_cache.c and expose
+> > all the cache information to machine through some interface?
+> 
+> Good questions.  However, before we head deeper into the weeds here, I
+> feel we should discuss the things below.  And before we do that, I need
+> a clear understanding of the use case.  Elsewhere in this thread, I just
+> described the use case as I understand it.  Please reply there.  I'll
+> then come back to this message.
+> 
+> [...]
 
-But what are the semantics if "fast_only" cannot be achieved by the 
-implementer?
+Jonathan and I provided different use cases for x86 and Arm. Could we
+come back here to continue the discussion? :)
 
-Can we add some documentation to the new functions that explain what 
-this mysterious "fast_only" is and what the expected semantics are? 
-Please? :)
+Thanks,
+Zhao
 
--- 
-Cheers,
-
-David / dhildenb
 
 
