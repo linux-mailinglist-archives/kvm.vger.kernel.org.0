@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-22926-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-22927-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A843294488A
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:34:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62473944896
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 11:36:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E0CA2858B2
-	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:34:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85A4C1C21096
+	for <lists+kvm@lfdr.de>; Thu,  1 Aug 2024 09:36:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86921183CA7;
-	Thu,  1 Aug 2024 09:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 384B9170A28;
+	Thu,  1 Aug 2024 09:36:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vek5F/6M"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WRSdpF5n"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B4016F909
-	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 09:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0307515252D
+	for <kvm@vger.kernel.org>; Thu,  1 Aug 2024 09:36:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722504856; cv=none; b=T2WqoMQtAqo2wuXAz1cN6P3DrBPXt61d+o6uskQmO3uDWC7QefJvMi6P7f3MxNui0c5h23KvS5i8RxI4M0QADUW5IRljuuQ/SHWN0Pkecx0c93zrvakOuVsw1w/deAGSIXfwOmUOxzzxf8JSn9Hnsulu7bm5GGnl/50nSB8qbKs=
+	t=1722504982; cv=none; b=unTIJXwEVru2D0xCkuPRyqTnr7YdZmICDcEzOpkT+Brk/Uat/y6qYCi+43znr+ICmRff1Y7vmCMn5+kDE3YplOItV/cO3swJ3XUqP6p0AlWc2gcAWQXSSw8hgRYjKelrLjJh5zxe/1F1akb1/RUsCq8/lgp7ae0m0WvxxBRHWjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722504856; c=relaxed/simple;
-	bh=OtlDzdM4oe21GfBWlTz0hmen8eQS7uEIYayF2mQiqdM=;
+	s=arc-20240116; t=1722504982; c=relaxed/simple;
+	bh=RQAbB+4xwgd8rgrT5Xo97jqhsVqqGwZd4S+HhvCqU10=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ERrNqQ5PLpqO+hCzaqbNRthOA7EPgg1spuiRTAfl9yB6PS0a0Fx32NNfX1SZ3EQZf0F6D9BQkJ8oXIT1K5SUuxOkr4iVMvLXYv2jsTsqzR2mBWXtihwzh3T7LzpeRWjJBwYOrelHW/c5Qr9lUXUKEvFk8u4Og/NHvy227qMqWJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vek5F/6M; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=UgFTMKFWRFF/oA61ia26gaHJDITgczDlDC3fiwyXFVWX/bvUeGXirGmEAZS7QedyOn6XoBajexYeNFtErWIdk1gP5P9xVWtUd8hUc6vfEOZQaNOjf4oTd9eBm9el+y6g6vja39FMDLDp7RbHPy8kV8RspNLG9bdqPpbwmXR2u78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WRSdpF5n; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722504852;
+	s=mimecast20190719; t=1722504980;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=4zaTn/YFgotAIGylW43Vgzq+0aYbo1DIlhcwsiRMBu0=;
-	b=Vek5F/6MMQOoOvVqL16YmpJ9PbtHMVnzrmuNKPGFRp3F69mz+w8yy8OO++cI/B3S1mr9I/
-	wmS+mNbtwBkxBhezYQFHBU3QOqPLuVJnr1DsbOPMtlqL6I8iDfmECVsONVKT4m6TFU3+xJ
-	+ULBd5Q3+t3mEDlBOkho60Rp04Lbss8=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=KJ/HMyeCTpAdrNibsjz2nmyKmky95K7l5NS86QU5jXI=;
+	b=WRSdpF5nIlH3YQJR5Pax8xPkCgS67DZr2oAvxXFlc9hA2+N/GtgrsMB9BwtLhUIMkaGEIe
+	mi11qs8253xusQGcFDtSMrbvImiWJgrvaFlxEOY5kEuePQKaiEDju8yrU1p1cmDY+hTbSy
+	NKkuRXx+/OTSZlixwgHSTvN/t3jCEC4=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-655-nRJY2JeENaSMban8-8bEyQ-1; Thu, 01 Aug 2024 05:34:11 -0400
-X-MC-Unique: nRJY2JeENaSMban8-8bEyQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-426624f4ce3so39873925e9.1
-        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 02:34:11 -0700 (PDT)
+ us-mta-299-lTeyqaZHND2kX1ftzPPf3Q-1; Thu, 01 Aug 2024 05:36:18 -0400
+X-MC-Unique: lTeyqaZHND2kX1ftzPPf3Q-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-52efcb739adso1164622e87.2
+        for <kvm@vger.kernel.org>; Thu, 01 Aug 2024 02:36:18 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722504850; x=1723109650;
+        d=1e100.net; s=20230601; t=1722504977; x=1723109777;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=4zaTn/YFgotAIGylW43Vgzq+0aYbo1DIlhcwsiRMBu0=;
-        b=QcYNsZeIOCB2zY95eJLtI4r6F1vCIPIS6fMx+ZoC1OP4kl2F3tW2qtTIRzKAlCF0KV
-         tp3tyvHImlZWpq/Mu25vTu7EIYInqLnqR/uVGA9f8S2Lkf5+kY1VVdr+vWcr17FuGm6g
-         jd+oASjWH1dO/Fm9m6JzpfFbmZOGHH6Mf1xGqj0kcwcpfrVocIXwp2X5W+/78ztB01OU
-         axdjDIMBGAQ3AtxtMYpmZpxHQmHWdbHFQxv1LIj7uC3VG4vTnFZ1rEhkdSPE715V9/BM
-         N5SZMKyFyvRyvNSL/Eq2xKCSHSCGhLrnU86aBST+5E7HM1/unJA6D6A+3geM13oEZBZm
-         f/vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUGprTe/IjjBzUuE0HSGhFlxp4T3Q32BGRP2NM6qMWWuqw93GMLOgGrPehD0Nv8KWiWuxAiqiYE/BioXEoMhtPZpp6m
-X-Gm-Message-State: AOJu0YxxLJ47ZFbTYAZFLTnKeEzkPUBqWOaJ1BT2FwqdOPhMKj17CW9H
-	q7xGy89rrU0PQwH8ZhdaqstQb4PkW779TYd6aYjbgFNGRpyUI1nM7RBgscO8lPYRwJzogKhDb/m
-	8ST0ryhw3pE2Ic9tiPuNli8cFcYejE2nKRRYnhRFWo9hY9G8Kfw==
-X-Received: by 2002:a05:600c:46d2:b0:427:abf6:f0e6 with SMTP id 5b1f17b1804b1-428a9bdba6dmr16727015e9.9.1722504850113;
-        Thu, 01 Aug 2024 02:34:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGsdIi9cbdhCyGOUOk209ImdY8rj8k70L4gcpiRY4RmZ4B6fxJ3acejCtVHfR5vm+WNgcQG9g==
-X-Received: by 2002:a05:600c:46d2:b0:427:abf6:f0e6 with SMTP id 5b1f17b1804b1-428a9bdba6dmr16726645e9.9.1722504849565;
-        Thu, 01 Aug 2024 02:34:09 -0700 (PDT)
+        bh=KJ/HMyeCTpAdrNibsjz2nmyKmky95K7l5NS86QU5jXI=;
+        b=lu4zZyMZIj9R+fdSXWSNgU6wJOHje3x1zfQ7BqAiQYEKMqmagCWWxOETmUrMRHALy9
+         HQaYRRjfWaqwuk3TM4ZCYNc04htxDyIhl5KN+2cSNSO3vQd8+sz86xnrBXhePsRyVs+H
+         re1eyavvV0oq6oauAnp0hH6bgHHvkE/99LOTMg/UWSixwrQaMjNHsRpLH8aIurOIvQP7
+         SoHU0jEq1+WbCbo/N38+/0C2n02MfQ7fuEOTZr/3alue29HsEBlLiU0oZwPnyCSZrk9a
+         PUB5CqBJ8Aok/+wkzDizPioQvulGDHXP7EushyYOO0m3KwgVFcc3TXEVSzBIu5cja6N6
+         g4nw==
+X-Forwarded-Encrypted: i=1; AJvYcCUGftklAk7zpwl9LrTUDPWp6euEE+rGGOHT4IKecr1F3coPLrAlU2wpRcIzh5iBSjkZSBS6dv53DEc0jxu3/aoyUA38
+X-Gm-Message-State: AOJu0YxSH2GViFz6EGGFw5YydFxoD3potw5Z7rCTk69qD++D55mYVso7
+	C6YQ2AAKjJUPzsrY0a8u4+C/x0gkFYG6cgN5WayJ105SXkP0t1d4eZw8QUHUQuxS98Bac3BMksU
+	EYFl3FPdBfMRTBg6pSGgfWndFnS3jkJ/kY6UWhuNDL1xM9VfU+w==
+X-Received: by 2002:ac2:46ef:0:b0:530:ae0a:ab7a with SMTP id 2adb3069b0e04-530b61aa918mr892639e87.17.1722504977096;
+        Thu, 01 Aug 2024 02:36:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFBu+QMo4gAEWvVK7f3J31mT8lTsS1wPjplRZ9rVb/L5dLtT7Zpo/p40oBB0gNZnxzN3H/cdw==
+X-Received: by 2002:ac2:46ef:0:b0:530:ae0a:ab7a with SMTP id 2adb3069b0e04-530b61aa918mr892597e87.17.1722504976510;
+        Thu, 01 Aug 2024 02:36:16 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c707:5c00:e650:bcd7:e2a0:54fe? (p200300cbc7075c00e650bcd7e2a054fe.dip0.t-ipconnect.de. [2003:cb:c707:5c00:e650:bcd7:e2a0:54fe])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282dae2f73sm43560015e9.21.2024.08.01.02.34.07
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282baccccfsm50752385e9.29.2024.08.01.02.36.14
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Aug 2024 02:34:09 -0700 (PDT)
-Message-ID: <6ddd626e-23c3-48aa-9753-ab8d73a5f798@redhat.com>
-Date: Thu, 1 Aug 2024 11:34:07 +0200
+        Thu, 01 Aug 2024 02:36:16 -0700 (PDT)
+Message-ID: <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
+Date: Thu, 1 Aug 2024 11:36:14 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 04/11] mm: Add missing mmu_notifier_clear_young for
- !MMU_NOTIFIER
+Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
+ clear_young MMU notifiers
 To: James Houghton <jthoughton@google.com>,
  Andrew Morton <akpm@linux-foundation.org>,
  Paolo Bonzini <pbonzini@redhat.com>
@@ -104,7 +104,7 @@ Cc: Ankit Agrawal <ankita@nvidia.com>,
  kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
 References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-5-jthoughton@google.com>
+ <20240724011037.3671523-6-jthoughton@google.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -152,55 +152,23 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20240724011037.3671523-5-jthoughton@google.com>
+In-Reply-To: <20240724011037.3671523-6-jthoughton@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 24.07.24 03:10, James Houghton wrote:
-> Remove the now unnecessary ifdef in mm/damon/vaddr.c as well.
-> 
-> Signed-off-by: James Houghton <jthoughton@google.com>
-> ---
->   include/linux/mmu_notifier.h | 7 +++++++
->   mm/damon/vaddr.c             | 2 --
->   2 files changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
-> index d39ebb10caeb..e2dd57ca368b 100644
-> --- a/include/linux/mmu_notifier.h
-> +++ b/include/linux/mmu_notifier.h
-> @@ -606,6 +606,13 @@ static inline int mmu_notifier_clear_flush_young(struct mm_struct *mm,
->   	return 0;
->   }
->   
-> +static inline int mmu_notifier_clear_young(struct mm_struct *mm,
-> +					   unsigned long start,
-> +					   unsigned long end)
-> +{
-> +	return 0;
-> +}
-> +
->   static inline int mmu_notifier_test_young(struct mm_struct *mm,
->   					  unsigned long address)
->   {
-> diff --git a/mm/damon/vaddr.c b/mm/damon/vaddr.c
-> index 381559e4a1fa..a453d77565e6 100644
-> --- a/mm/damon/vaddr.c
-> +++ b/mm/damon/vaddr.c
-> @@ -351,11 +351,9 @@ static void damon_hugetlb_mkold(pte_t *pte, struct mm_struct *mm,
->   		set_huge_pte_at(mm, addr, pte, entry, psize);
->   	}
->   
-> -#ifdef CONFIG_MMU_NOTIFIER
->   	if (mmu_notifier_clear_young(mm, addr,
->   				     addr + huge_page_size(hstate_vma(vma))))
->   		referenced = true;
-> -#endif /* CONFIG_MMU_NOTIFIER */
->   
->   	if (referenced)
->   		folio_set_young(folio);
+> For implementers, the fast_only bool indicates that the age information
+> needs to be harvested such that we do not slow down other MMU operations,
+> and ideally that we are not ourselves slowed down by other MMU
+> operations.  Usually this means that the implementation should be
+> lockless.
 
-Acked-by: David Hildenbrand <david@redhat.com>
+But what are the semantics if "fast_only" cannot be achieved by the 
+implementer?
+
+Can we add some documentation to the new functions that explain what 
+this mysterious "fast_only" is and what the expected semantics are? 
+Please? :)
 
 -- 
 Cheers,
