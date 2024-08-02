@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-23110-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23111-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E598A946370
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:56:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AEFA946371
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 887CA1F23067
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:56:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68BC81C21407
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2069166F2A;
-	Fri,  2 Aug 2024 18:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1BE616BE22;
+	Fri,  2 Aug 2024 18:55:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xjWyUzkZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PDw3Ddam"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87EC3166F03
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 18:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE29166F1F
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 18:55:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722624925; cv=none; b=Ras0nVOn6smrQQj8C1sHck4Sn0xi5vJBuWsfTd/zSCZPPU/1rXqbdjrK5Wx3QVnLSCOkHlvKfQ/YuvWhxKFOtMWJG33b33jKKV3bdWl4m4sV9er519qewHilakz9j4BKmxcXr8YgmlPdiJTxsgLj3qMUtYacwvq0j2uSgxC6i/I=
+	t=1722624927; cv=none; b=PBWyGa3zAghAokGitHr6LRi6VViskF/sHu/XihSqu1ML+MPlRPCeEdJN8ZxMq/kmOIa7sEgCF51werLXzCKT4UvJlEEGgOMKPTw+/mdCVKm+/tme/bZQP5SH/c3RXIEfcUbC7ojJO2W1dEwGHRNF2m6qTvdgYHxthf1kf4ziSY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722624925; c=relaxed/simple;
-	bh=kjmltdsCXgKPMkW3IMsblXwYB48Jaerc0S/NQl7JwnA=;
+	s=arc-20240116; t=1722624927; c=relaxed/simple;
+	bh=LDOaWJALh8LIEd1qVXVH8rc9BOsSwO8ZCATmsDwRVXQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=HcYeFs6nNEbK+JL9NTEG7gSF0tB084BGHT5/73oMNW6TQYF2OC1puopJWwBGMmeD0wk7WQcQvs6meT2OMQf99fT4JdxbHjLGb6ZApPkOS86mEu3seQT3auLk6vSJcgjLptSz7XcuwcqFZru2VUwFIgkTZDpKHo16VPit7HvYhgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xjWyUzkZ; arc=none smtp.client-ip=209.85.210.201
+	 To:Cc:Content-Type; b=bM6u3GDMhUYj14Wa50sGaA2OFhmOw9RtsLL9h95Pcu4ODG23xPfT1SzVn+JgL/jyZ+CjdvWhhAVZEMkZj8ypMDPf3785EQ+FkZgzJ7RPNPxg5lq/fd07uuYXbe5nGC0EB0i2/jq3t+XAnTRFwep+y4KitZ0nqd+U7grFNf0Pvm0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PDw3Ddam; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70d1c8d98baso7685969b3a.3
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 11:55:24 -0700 (PDT)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0bcd04741fso4509649276.2
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 11:55:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722624924; x=1723229724; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722624925; x=1723229725; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=we0IZnPi8qUdBH21Q34g43aYFvRsaJnFKoOJjzQh/Cc=;
-        b=xjWyUzkZNKxNtn+r2nW2p9Bsf/fIsdIwzcjl37OTGwZJcnW8v4FNXoaK7g4GJXFktK
-         w81tDg29tOA0sS3NnLeqcL8HfJ23vTiwvZRdjyTYgM1/N6PkT7Eu/0wL49VvvozmJuIy
-         igE25Y8h4D3eIcePUzjekGlUeHoH5SA1eB2sKyGKC88qOxkHSai0TzW+Lj+qxNNcQtIY
-         Rw/iQQPaTPkTqdxvSTQ4oTv7acxrAOdT7QsOCKKhQWbHoLmIfT1gX65TnuAFYwsuE5wP
-         P2fbEwvXuFPj1+cKpYaPuNzbt9eKxYkiSEvv1vjf95RgTutYcQhrg0UIsv+CourmxOpi
-         R9Dg==
+        bh=FE77h25ouI+MvHqHcKNFD0Aq2a2Ny5IL+xeLrJLvY5s=;
+        b=PDw3DdamHXrRNXvwvIcYifvgTmEBS7X4Qz3hQbuupkM4SxaQvUxRqWmNPiNZn6TkwV
+         2KlvUdUokRBQ3NOmBly0C8JlQl30QB1HhGQbINRnKscyNvDvXi5Rd6cBkew4+4zi21rf
+         k5OWASfQzDPhRJwC+AIoQ3GYiSi3xAFNcBCC/U80SN/7xS8Cj8mT3dXeNwdLAOD3lLsB
+         2NBSihb4gqzMo9hulpm1SF6toxxRBv9B+U81l09nmYVxy0iMpAS6oLYl5ySOH/uXtxMV
+         zSR5Tagz1TQ0ndVVt8qSagsobAp2KiCHq81diK6LuUalEtOpG8Y5z7XlQd/s6AQclKkt
+         0w7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722624924; x=1723229724;
+        d=1e100.net; s=20230601; t=1722624925; x=1723229725;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=we0IZnPi8qUdBH21Q34g43aYFvRsaJnFKoOJjzQh/Cc=;
-        b=uxbR7bJMGhBqKJjdlUqRFkwWpomeNgMUNjyVucVDifXj8OUx15sawB05VaR+M4IFKW
-         JvuJT+oqc+yTI+5kgB3hZMshZD2cQbjOBccilV1h3ds1q/8xWqWWFNtgntDZ407oFVMB
-         WMnbFX6EKcs7qnkK6rFkIKZKjEobX42F5y9TOwO2en2zs8/BNrJeWCwv1X2JieLoudK1
-         9ycAacUPoMwgc/CFJBhQCsrJDCslACxV33oFkz10HU6FECghIcWR4ENNjsDI82RbnoZr
-         4CafJvWdda69vdpjQJ+JoSYup1QNUbUsp5YZWIGYEyTJ5uRU/uy9jR76TU803QNHN4Ut
-         P1Aw==
-X-Gm-Message-State: AOJu0YyP1FXo770lM4HquhOfTa7qOSgtk67d53D/1TmFxscYSq61ioJD
-	mIvZ+/owLLGJcV4uQqhq9IPj2XdACI4Ug/TXWQg9KvAZZdT2HsSUEAWMr2sp3RNnK5rAU4r1KIV
-	3Ig==
-X-Google-Smtp-Source: AGHT+IEiVUyg3cRTenUl1DMYkpNViP+8/KEgruSIT0O6BErR/eJJeNw48joChrB8Tb77n+YwJBdtgeqOjr8=
+        bh=FE77h25ouI+MvHqHcKNFD0Aq2a2Ny5IL+xeLrJLvY5s=;
+        b=wouX1j6lFxjPOE4cpsUUute4iNERGBI5IO771v00U22F/aRwqKLMRE1UO8AY7iiTT7
+         wCfo7qM1htAf0ON3h4Roy5iTRnMzrV9SgmjvUdUaReqtLhZw468Hk4DAgFbUyAW/FAuY
+         p0W454b3oMTnpL0Ylg8KAhy+k92/z3BomsefjYQpDwLF51moD/M5tQXjHGwJovvS2Cg0
+         Ii44Ha5BLYgih2HHYCD3QfNexggGwFS54mwdkh2+Amu49kHkEsqJbC9nOZkoDfZbXCPP
+         Ek1NbTfGoMYL1FhJ4bNUoq9/aBfigA6geg9boFmmSp7Ziu4FRpkBJK4YfFTo4DM7Ync+
+         g3qA==
+X-Gm-Message-State: AOJu0YzkWGjQqN586rWp3EiEMJTLKO4zrz053LVbk2gmGX/czONPYqGJ
+	zjMpflpcHsAhibzU4ngzOGLflxrZBADrMEaqkSPB86rhTnuRYEJolEYtKc67LVF3rUphmPVMpJt
+	qQw==
+X-Google-Smtp-Source: AGHT+IEzFcg9v5dqpL46Kk3NBRRR4k+8FlZyX8gqz3k2cnpL3lAj/Gmokl2ZzR9H5/8TOAiTDCSBElhz7Yk=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:6f0e:b0:710:4d08:e41f with SMTP id
- d2e1a72fcca58-7106d08296emr34497b3a.4.1722624923625; Fri, 02 Aug 2024
- 11:55:23 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:154e:b0:dfb:22ca:1efd with SMTP id
+ 3f1490d57ef6-e0bde3ec6a5mr266556276.9.1722624925601; Fri, 02 Aug 2024
+ 11:55:25 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 11:55:06 -0700
+Date: Fri,  2 Aug 2024 11:55:07 -0700
 In-Reply-To: <20240802185511.305849-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,57 +75,34 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240802185511.305849-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802185511.305849-5-seanjc@google.com>
-Subject: [PATCH 4/9] KVM: x86: Reject userspace attempts to access
- PERF_CAPABILITIES w/o PDCM
+Message-ID: <20240802185511.305849-6-seanjc@google.com>
+Subject: [PATCH 5/9] KVM: VMX: Remove restriction that PMU version > 0 for PERF_CAPABILITIES
 From: Sean Christopherson <seanjc@google.com>
 To: Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Reject userspace accesses to PERF_CAPABILITIES if PDCM isn't set in guest
-CPUID, i.e. if the vCPU doesn't actually have PERF_CAPABILITIES.  But!  Do
-so via KVM_MSR_RET_UNSUPPORTED, so that reads get '0' and writes of '0'
-are ignored if KVM advertised support PERF_CAPABILITIES.
-
-KVM's ABI is that userspace must set guest CPUID prior to setting MSRs,
-and that setting MSRs that aren't supposed exist is disallowed (modulo the
-'0' exemption).
+Drop the restriction that the PMU version is non-zero when handling writes
+to PERF_CAPABILITIES now that KVM unconditionally checks for PDCM support.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/x86.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
+ arch/x86/kvm/vmx/vmx.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9b52d8f3304f..dbb5e06ef264 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3803,8 +3803,10 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		vcpu->arch.arch_capabilities = data;
+diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+index c1d06f800b8e..f636d811bdc1 100644
+--- a/arch/x86/kvm/vmx/vmx.c
++++ b/arch/x86/kvm/vmx/vmx.c
+@@ -2460,8 +2460,6 @@ int vmx_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+ 			vmx->pt_desc.guest.addr_a[index / 2] = data;
  		break;
  	case MSR_IA32_PERF_CAPABILITIES:
--		if (!msr_info->host_initiated)
+-		if (data && !vcpu_to_pmu(vcpu)->version)
 -			return 1;
-+		if (!msr_info->host_initiated ||
-+		    !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
-+			return KVM_MSR_RET_UNSUPPORTED;
-+
- 		if (data & ~kvm_caps.supported_perf_cap)
- 			return 1;
- 
-@@ -4263,9 +4265,8 @@ int kvm_get_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 		msr_info->data = vcpu->arch.arch_capabilities;
- 		break;
- 	case MSR_IA32_PERF_CAPABILITIES:
--		if (!msr_info->host_initiated &&
--		    !guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
--			return 1;
-+		if (!guest_cpuid_has(vcpu, X86_FEATURE_PDCM))
-+			return KVM_MSR_RET_UNSUPPORTED;
- 		msr_info->data = vcpu->arch.perf_capabilities;
- 		break;
- 	case MSR_IA32_POWER_CTL:
+ 		if (data & PMU_CAP_LBR_FMT) {
+ 			if ((data & PMU_CAP_LBR_FMT) !=
+ 			    (kvm_caps.supported_perf_cap & PMU_CAP_LBR_FMT))
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
