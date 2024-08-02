@@ -1,352 +1,243 @@
-Return-Path: <kvm+bounces-23029-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23030-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE08C945D5C
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 13:44:59 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01915945D6F
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 13:53:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1D9F1C210BF
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 11:44:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C57C3B21171
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 11:53:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01F0A1E287F;
-	Fri,  2 Aug 2024 11:44:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA5301E289D;
+	Fri,  2 Aug 2024 11:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="I/RrvYXc"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="hXLq0DsQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-9105.amazon.com (smtp-fw-9105.amazon.com [207.171.188.204])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3E71DB430;
-	Fri,  2 Aug 2024 11:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.204
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED7B1DF660
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 11:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722599089; cv=none; b=McN9MOCY41BQfCq3oFTOFxc9An/1NfHiCdhN7Hwc37crjiU3s10oFRvI0iRAWiLNnGxZeU7wHQv9ydj2+12gAD2i3TPM1x5x5X0FrFIsSean7MCr49NUNR9UfeVghR1/X3jJEFGmKiDXqGbBC2CQ7M3dvdqdNJcU6XyW6VGnbGs=
+	t=1722599593; cv=none; b=qzrsVGIf3pUPkCoWMrLLYm+zvwV6JmdtxrMEtU0JbNBZULVhb6kiHi8c0NrCpb+VEn+pzyetYH3m97Bf0FOvCYPWHWEiBb28/ntGgW0P3ayfJuJSOnye0TRAk6i95bAAFNCUGpgTfK/4TAdIV7ZpqjkEORTQjXW7Du7KS9HC+3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722599089; c=relaxed/simple;
-	bh=3lG7VY7KVCzB8GJjdeaFBAJ9Yy8cXe8V9oNboo4PskA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=EyXIUE193JjFb0+GjnjfP6nWtI5IdJE6UHimLoRujU2wV7t6mW2kt1gXH56NnGz86moCIQnsUaV07xnTo5li4W8JJuVL3en+qXwk2vXp2sJe9F8M9oH+cV856dKx1AwMEHqtE1X7Eh5z2zSgG6dReTX8/59kzz+YYEXgQsZpDT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.de; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=I/RrvYXc; arc=none smtp.client-ip=207.171.188.204
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.de
+	s=arc-20240116; t=1722599593; c=relaxed/simple;
+	bh=MCIn1+xsBaSpE0QsU6s5svPv+VVsVbonIpXmi8X0JyA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ifr26jB/f3W/7qJWyCItTtC01a+F1aeFVT6g1lV1ASlIHUTnBYOhSEuYsRS3eDZDki0mCp8cGwbyXztb9x4YnSxacHkKY9vOTSkJmNDxNTGfaXCGh1W58xFfYIX+HqmxaCowUZnjWN0ZjwvoE/YEtWROLlqp2oC4MuwXorhQAe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=hXLq0DsQ; arc=none smtp.client-ip=209.85.222.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7a20b8fa6dcso178618785a.3
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 04:53:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722599087; x=1754135087;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=D15xhl8DebUMgUbMT6yp8Gi9oGiElLirxernELMeMWY=;
-  b=I/RrvYXctDmWrpbxIFPqyE0JKAGhVAjxi51n3HAspxKwMTXM8G1zK/gI
-   r0m6/mBGA8ZpEMWRBjJ57+zFX950U4qqVEaQ3SB4CYl9cAAlfjlvHnlxs
-   uNgI/PIDTQwq4wBQHjE91MCuuh0OVrJIa5ANiwe9Xd2v8zmL0BpGyd+/m
-   U=;
-X-IronPort-AV: E=Sophos;i="6.09,257,1716249600"; 
-   d="scan'208";a="747281510"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 11:44:40 +0000
-Received: from EX19MTAEUA002.ant.amazon.com [10.0.17.79:21666]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.33.124:2525] with esmtp (Farcaster)
- id b9f1b537-0da7-43c0-9e59-d27fb5ad33fb; Fri, 2 Aug 2024 11:44:39 +0000 (UTC)
-X-Farcaster-Flow-ID: b9f1b537-0da7-43c0-9e59-d27fb5ad33fb
-Received: from EX19D010EUA003.ant.amazon.com (10.252.50.136) by
- EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 2 Aug 2024 11:44:39 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
- EX19D010EUA003.ant.amazon.com (10.252.50.136) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 2 Aug 2024 11:44:38 +0000
-Received: from dev-dsk-stollmc-1a-533028aa.eu-west-1.amazon.com
- (10.253.87.190) by mail-relay.amazon.com (10.250.64.254) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
- 15.2.1258.34 via Frontend Transport; Fri, 2 Aug 2024 11:44:36 +0000
-From: Carsten Stollmaier <stollmc@amazon.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
-	<pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
-	<mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, "H. Peter Anvin"
-	<hpa@zytor.com>
-CC: <nh-open-source@amazon.com>, Carsten Stollmaier <stollmc@amazon.com>,
-	David Woodhouse <dwmw2@infradead.org>, Peter Xu <peterx@redhat.com>,
-	Sebastian Biemueller <sbiemue@amazon.de>, <kvm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH] KVM: x86: Use gfn_to_pfn_cache for steal_time
-Date: Fri, 2 Aug 2024 11:44:01 +0000
-Message-ID: <20240802114402.96669-1-stollmc@amazon.com>
-X-Mailer: git-send-email 2.40.1
+        d=ziepe.ca; s=google; t=1722599590; x=1723204390; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zMZrxWtfpNPZ2fm2KVk57wotJxUWPYI8ZsWDXsbq9mY=;
+        b=hXLq0DsQEa1q8pq8Tr3JE0do4a2Qi/D1cV77OVchyhvvHapHFAK5djD272M44k+bDP
+         o1YHu5RSenlYjCGwGMsYGZtxSXLQrTSXH0/P0fXq6oflYtoaMQVRDR9nUrJWbBY0kx2o
+         COk01ef62rNTzHYyDtVJ60eJFx3Xl7byWJzLLw+aCdVDY+/Pia74QfAchy/bN/JPDCpi
+         udUj8AY6poZe8xj7rVU2sC59MMylyPewTTOh28jYSu3r1wlqNF/LwSk5Dgwi9iTV4g72
+         JPxKi9E2esR6jIGw+Gh93ThkZAdcsrlnu8iOcqvcnwjGHOCY60a8WsFqwJmnygB+tMfI
+         DpcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722599590; x=1723204390;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zMZrxWtfpNPZ2fm2KVk57wotJxUWPYI8ZsWDXsbq9mY=;
+        b=C3s46QZy7WSYNBepSxu510uFhc8m4a/7DdvSN12neVc3Mne5rgpUHPDFqZ0PEa0aO3
+         mrN8FV/iU+b1y+jFv7octQGvWoyj7Ggdql/aw8xVpk0B/68QLONt/D1VzOkiixyXC7P9
+         4LihnEsHvh1Q5ML4HzKd94Y2IGl8K6IPPsOpy06ZAF4G11dTpeBoY8knxG6alW8qmNKm
+         Y2QiBu4YEJ5ROzzNjPjrK6VwgsptgYyFVrlSKaxJUP5qd3l840ORxGo2Hs/lz3iYo7Wr
+         vzFD6xc07tDVm5jpDPEIUVOLeZy7AhsItgrUby/Q5i2F40aUKQzTbFpC8viI4XOQ7kWp
+         kyyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXOtyTM4ps6pk+Y/2JmPCCvgg657otikCCe/4IBRzDt1lgcNbZ9Gplo92u7djqpN66BhTC4OKZv0dTs3Ood/+VGYLn+
+X-Gm-Message-State: AOJu0YzkBixsTtk5krooxvyB/KJnLo/XaSXniVhCkOKFiA/pQEO4lFwc
+	Nv127ws0UkloILD2J6SaQdXG2CkT9sZd6VAnNW9vNwUoEpgLqEDNcD4BLuw+8x0=
+X-Google-Smtp-Source: AGHT+IHbZYP+Df1u7MHAcffXRoNEB3qBsrCJugpSaB1zcuzXpQbrivnr3cz1GtG9bpYPxTTz8RcanA==
+X-Received: by 2002:a05:620a:4103:b0:7a2:d63:4cc6 with SMTP id af79cd13be357-7a34ef5ce33mr340534385a.39.1722599589866;
+        Fri, 02 Aug 2024 04:53:09 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a34f7724c1sm78627685a.84.2024.08.02.04.53.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 04:53:09 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sZqqK-002sFQ-HD;
+	Fri, 02 Aug 2024 08:53:08 -0300
+Date: Fri, 2 Aug 2024 08:53:08 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Alex Williamson <alex.williamson@redhat.com>
+Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org,
+	Keith Busch <kbusch@kernel.org>
+Subject: Re: [PATCH rfc] vfio-pci: Allow write combining
+Message-ID: <20240802115308.GA676757@ziepe.ca>
+References: <20240731155352.3973857-1-kbusch@meta.com>
+ <20240801141914.GC3030761@ziepe.ca>
+ <20240801094123.4eda2e91.alex.williamson@redhat.com>
+ <20240801161130.GD3030761@ziepe.ca>
+ <20240801105218.7c297f9a.alex.williamson@redhat.com>
+ <20240801171355.GA4830@ziepe.ca>
+ <20240801113344.1d5b5bfe.alex.williamson@redhat.com>
+ <20240801175339.GB4830@ziepe.ca>
+ <20240801121657.20f0fdb4.alex.williamson@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240801121657.20f0fdb4.alex.williamson@redhat.com>
 
-On vcpu_run, before entering the guest, the update of the steal time
-information causes a page-fault if the page is not present. In our
-scenario, this gets handled by do_user_addr_fault and successively
-handle_userfault since we have the region registered to that.
+On Thu, Aug 01, 2024 at 12:16:57PM -0600, Alex Williamson wrote:
+> On Thu, 1 Aug 2024 14:53:39 -0300
+> Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> 
+> > On Thu, Aug 01, 2024 at 11:33:44AM -0600, Alex Williamson wrote:
+> > > On Thu, 1 Aug 2024 14:13:55 -0300
+> > > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > >   
+> > > > On Thu, Aug 01, 2024 at 10:52:18AM -0600, Alex Williamson wrote:  
+> > > > > > > vfio_region_info.flags in not currently tested for input therefore this
+> > > > > > > proposal could lead to unexpected behavior for a caller that doesn't
+> > > > > > > currently zero this field.  It's intended as an output-only field.      
+> > > > > > 
+> > > > > > Perhaps a REGION_INFO2 then?
+> > > > > > 
+> > > > > > I still think per-request is better than a global flag    
+> > > > > 
+> > > > > I don't understand why we'd need a REGION_INFO2, we already have
+> > > > > support for defining new regions.    
+> > > > 
+> > > > It is not a new region, it is a modified mmap behavior for an existing
+> > > > region.  
+> > > 
+> > > If we're returning a different offset into the vfio device file from
+> > > which to get a WC mapping, what's the difference?   
+> > 
+> > I think it is a pretty big difference.. The offset is just a "mmap
+> > cookie", it doesn't have to be 1:1 with the idea of a region.
+> > 
+> > > A vfio "region" is
+> > > describing a region or range of the vfio device file descriptor.  
+> > 
+> > I'm thinking a region is describing an area of memory that is
+> > available in the VFIO device. The offset output is just a "mmap
+> > cookie" to tell userspace how to mmap it. Having N mmap cookies for 1
+> > region is OK.
+> 
+> Is an "mmap cookie" an offset into the vfio device file where mmap'ing
+> that offset results in a WC mapping to a specific device resource?
 
-handle_userfault uses TASK_INTERRUPTIBLE, so it is interruptible by
-signals. do_user_addr_fault then busy-retries it if the pending signal
-is non-fatal. This leads to contention of the mmap_lock.
+Yes
 
-This patch replaces the use of gfn_to_hva_cache with gfn_to_pfn_cache,
-as gfn_to_pfn_cache ensures page presence for the memory access,
-preventing the contention of the mmap_lock.
+> Isn't that just a region that doesn't have an index or supporting
+> infrastructure?
 
-Signed-off-by: Carsten Stollmaier <stollmc@amazon.com>
-CC: David Woodhouse <dwmw2@infradead.org>
-CC: Sean Christopherson <seanjc@google.com>
-CC: Paolo Bonzini <pbonzini@redhat.com>
-CC: Peter Xu <peterx@redhat.com>
-CC: Sebastian Biemueller <sbiemue@amazon.de>
----
- arch/x86/include/asm/kvm_host.h |   2 +-
- arch/x86/kvm/x86.c              | 115 +++++++++++++++-----------------
- 2 files changed, 54 insertions(+), 63 deletions(-)
+No? It is a "mmap cookie" that has the requested mmap-time properties.
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index 950a03e0181e..63d0c0cd7a8e 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -898,7 +898,7 @@ struct kvm_vcpu_arch {
- 		u8 preempted;
- 		u64 msr_val;
- 		u64 last_steal;
--		struct gfn_to_hva_cache cache;
-+		struct gfn_to_pfn_cache cache;
- 	} st;
- 
- 	u64 l1_tsc_offset;
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index af6c8cf6a37a..2b8adbadfc50 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3652,10 +3652,8 @@ EXPORT_SYMBOL_GPL(kvm_service_local_tlb_flush_requests);
- 
- static void record_steal_time(struct kvm_vcpu *vcpu)
- {
--	struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
--	struct kvm_steal_time __user *st;
--	struct kvm_memslots *slots;
--	gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
-+	struct gfn_to_pfn_cache *gpc = &vcpu->arch.st.cache;
-+	struct kvm_steal_time *st;
- 	u64 steal;
- 	u32 version;
- 
-@@ -3670,42 +3668,26 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
- 	if (WARN_ON_ONCE(current->mm != vcpu->kvm->mm))
- 		return;
- 
--	slots = kvm_memslots(vcpu->kvm);
--
--	if (unlikely(slots->generation != ghc->generation ||
--		     gpa != ghc->gpa ||
--		     kvm_is_error_hva(ghc->hva) || !ghc->memslot)) {
-+	read_lock(&gpc->lock);
-+	while (!kvm_gpc_check(gpc, sizeof(*st))) {
- 		/* We rely on the fact that it fits in a single page. */
- 		BUILD_BUG_ON((sizeof(*st) - 1) & KVM_STEAL_VALID_BITS);
- 
--		if (kvm_gfn_to_hva_cache_init(vcpu->kvm, ghc, gpa, sizeof(*st)) ||
--		    kvm_is_error_hva(ghc->hva) || !ghc->memslot)
-+		read_unlock(&gpc->lock);
-+
-+		if (kvm_gpc_refresh(gpc, sizeof(*st)))
- 			return;
-+
-+		read_lock(&gpc->lock);
- 	}
- 
--	st = (struct kvm_steal_time __user *)ghc->hva;
-+	st = (struct kvm_steal_time *)gpc->khva;
- 	/*
- 	 * Doing a TLB flush here, on the guest's behalf, can avoid
- 	 * expensive IPIs.
- 	 */
- 	if (guest_pv_has(vcpu, KVM_FEATURE_PV_TLB_FLUSH)) {
--		u8 st_preempted = 0;
--		int err = -EFAULT;
--
--		if (!user_access_begin(st, sizeof(*st)))
--			return;
--
--		asm volatile("1: xchgb %0, %2\n"
--			     "xor %1, %1\n"
--			     "2:\n"
--			     _ASM_EXTABLE_UA(1b, 2b)
--			     : "+q" (st_preempted),
--			       "+&r" (err),
--			       "+m" (st->preempted));
--		if (err)
--			goto out;
--
--		user_access_end();
-+		u8 st_preempted = xchg(&st->preempted, 0);
- 
- 		vcpu->arch.st.preempted = 0;
- 
-@@ -3713,39 +3695,32 @@ static void record_steal_time(struct kvm_vcpu *vcpu)
- 				       st_preempted & KVM_VCPU_FLUSH_TLB);
- 		if (st_preempted & KVM_VCPU_FLUSH_TLB)
- 			kvm_vcpu_flush_tlb_guest(vcpu);
--
--		if (!user_access_begin(st, sizeof(*st)))
--			goto dirty;
- 	} else {
--		if (!user_access_begin(st, sizeof(*st)))
--			return;
--
--		unsafe_put_user(0, &st->preempted, out);
-+		st->preempted = 0;
- 		vcpu->arch.st.preempted = 0;
- 	}
- 
--	unsafe_get_user(version, &st->version, out);
-+	version = st->version;
- 	if (version & 1)
- 		version += 1;  /* first time write, random junk */
- 
- 	version += 1;
--	unsafe_put_user(version, &st->version, out);
-+	st->version = version;
- 
- 	smp_wmb();
- 
--	unsafe_get_user(steal, &st->steal, out);
-+	steal = st->steal;
- 	steal += current->sched_info.run_delay -
- 		vcpu->arch.st.last_steal;
- 	vcpu->arch.st.last_steal = current->sched_info.run_delay;
--	unsafe_put_user(steal, &st->steal, out);
-+	st->steal = steal;
- 
- 	version += 1;
--	unsafe_put_user(version, &st->version, out);
-+	st->version = version;
-+
-+	kvm_gpc_mark_dirty_in_slot(gpc);
- 
-- out:
--	user_access_end();
-- dirty:
--	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
-+	read_unlock(&gpc->lock);
- }
- 
- static bool kvm_is_msr_to_save(u32 msr_index)
-@@ -4020,8 +3995,12 @@ int kvm_set_msr_common(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 
- 		vcpu->arch.st.msr_val = data;
- 
--		if (!(data & KVM_MSR_ENABLED))
--			break;
-+		if (data & KVM_MSR_ENABLED) {
-+			kvm_gpc_activate(&vcpu->arch.st.cache, data & ~KVM_MSR_ENABLED,
-+					sizeof(struct kvm_steal_time));
-+		} else {
-+			kvm_gpc_deactivate(&vcpu->arch.st.cache);
-+		}
- 
- 		kvm_make_request(KVM_REQ_STEAL_UPDATE, vcpu);
- 
-@@ -5051,11 +5030,10 @@ void kvm_arch_vcpu_load(struct kvm_vcpu *vcpu, int cpu)
- 
- static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- {
--	struct gfn_to_hva_cache *ghc = &vcpu->arch.st.cache;
--	struct kvm_steal_time __user *st;
--	struct kvm_memslots *slots;
-+	struct gfn_to_pfn_cache *gpc = &vcpu->arch.st.cache;
-+	struct kvm_steal_time *st;
- 	static const u8 preempted = KVM_VCPU_PREEMPTED;
--	gpa_t gpa = vcpu->arch.st.msr_val & KVM_STEAL_VALID_BITS;
-+	unsigned long flags;
- 
- 	/*
- 	 * The vCPU can be marked preempted if and only if the VM-Exit was on
-@@ -5080,20 +5058,28 @@ static void kvm_steal_time_set_preempted(struct kvm_vcpu *vcpu)
- 	if (unlikely(current->mm != vcpu->kvm->mm))
- 		return;
- 
--	slots = kvm_memslots(vcpu->kvm);
--
--	if (unlikely(slots->generation != ghc->generation ||
--		     gpa != ghc->gpa ||
--		     kvm_is_error_hva(ghc->hva) || !ghc->memslot))
--		return;
-+	read_lock_irqsave(&gpc->lock, flags);
-+	if (!kvm_gpc_check(gpc, sizeof(*st)))
-+		goto out_unlock_gpc;
- 
--	st = (struct kvm_steal_time __user *)ghc->hva;
-+	st = (struct kvm_steal_time *)gpc->khva;
- 	BUILD_BUG_ON(sizeof(st->preempted) != sizeof(preempted));
- 
--	if (!copy_to_user_nofault(&st->preempted, &preempted, sizeof(preempted)))
--		vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
-+	st->preempted = preempted;
-+	vcpu->arch.st.preempted = KVM_VCPU_PREEMPTED;
- 
--	mark_page_dirty_in_slot(vcpu->kvm, ghc->memslot, gpa_to_gfn(ghc->gpa));
-+	kvm_gpc_mark_dirty_in_slot(gpc);
-+
-+out_unlock_gpc:
-+	read_unlock_irqrestore(&gpc->lock, flags);
-+}
-+
-+static void kvm_steal_time_reset(struct kvm_vcpu *vcpu)
-+{
-+	kvm_gpc_deactivate(&vcpu->arch.st.cache);
-+	vcpu->arch.st.preempted = 0;
-+	vcpu->arch.st.msr_val = 0;
-+	vcpu->arch.st.last_steal = 0;
- }
- 
- void kvm_arch_vcpu_put(struct kvm_vcpu *vcpu)
-@@ -12219,6 +12205,8 @@ int kvm_arch_vcpu_create(struct kvm_vcpu *vcpu)
- 
- 	kvm_gpc_init(&vcpu->arch.pv_time, vcpu->kvm);
- 
-+	kvm_gpc_init(&vcpu->arch.st.cache, vcpu->kvm);
-+
- 	if (!irqchip_in_kernel(vcpu->kvm) || kvm_vcpu_is_reset_bsp(vcpu))
- 		vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
- 	else
-@@ -12331,6 +12319,8 @@ void kvm_arch_vcpu_destroy(struct kvm_vcpu *vcpu)
- {
- 	int idx;
- 
-+	kvm_steal_time_reset(vcpu);
-+
- 	kvmclock_reset(vcpu);
- 
- 	kvm_x86_call(vcpu_free)(vcpu);
-@@ -12401,7 +12391,8 @@ void kvm_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
- 	kvm_make_request(KVM_REQ_EVENT, vcpu);
- 	vcpu->arch.apf.msr_en_val = 0;
- 	vcpu->arch.apf.msr_int_val = 0;
--	vcpu->arch.st.msr_val = 0;
-+
-+	kvm_steal_time_reset(vcpu);
- 
- 	kvmclock_reset(vcpu);
- 
--- 
-2.40.1
+Today the kernel side binds the mmap offset to the index in a computed
+way, but from a API perspective userspace does REGION_INFO and gets
+back an opaque "mmap cookie" that it uses to pass to mmap to get back
+the thing describe by REGION_INFO. Userspace has no idea about any
+structure to the cookie numbers.
+  
+> > Which controls what NC/WC the mmap creates when called:
+> > 
+> > +	if (vdev->bar_write_combine[index])
+> > +		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+> > +	else
+> > +		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> > 
+> > You get the same output from REGION_INFO, same number of regions.
+> 
+> It was your proposal that introduced REQ_WC, this is Keith's original
+> proposal.  I'm equating a REQ_WC request inventing an "mmap cookie" as
+> effectively the same as bringing a lightweight region into existence
+> because it defines a section of the vfio device file to have specific
+> mmap semantics.
 
+Well, again, it is not a region, it is just a record that this mmap
+cookie uses X region with Y mapping flags. The number of regions don't
+change. Critically from a driver perspective the number of regions and
+region indexes wouldn't change.
 
+I am not thing of making a new region, I am thinking of adjusting how
+mmap works. Like today we do this:
 
+	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
 
-Amazon Web Services Development Center Germany GmbH
-Krausenstr. 38
-10117 Berlin
-Geschaeftsfuehrung: Christian Schlaeger, Jonathan Weiss
-Eingetragen am Amtsgericht Charlottenburg unter HRB 257764 B
-Sitz: Berlin
-Ust-ID: DE 365 538 597
+So maybe instead it is something like:
 
+      vfio_decode_mmap_cookie(vma, &index, &flags);
+      if (flags & VFIO_MMAP_WC)
+          prot = pgprot_writecombine(..)
+
+From a driver perspective the region indexes don't change at all. This
+is what I think is important here.
+
+> > It was the other proposal from long ago that created more regions.
+> > 
+> > This is what I like and would prefer to stick with. REGION_INFO
+> > doesn't really change, we don't have two regions refering to the same
+> > physical memory, and we find some way to request NC/WC of a region at
+> > mmap time.
+> 
+> "At mmap time" means that something in the vma needs to describe to us
+> to use the WC semantics, where I think you're proposing that the "mmap
+> cookie" provides a specific vm_pgoff which we already use to determine
+> the region index.  
+
+Yes
+
+> So whether or not we want to call this a region,
+> it's effectively in the same address space as regions.  Therefore "mmap
+> cookie" ~= "region offset".
+
+Well, that is just the current implementation. What we did in RDMA
+when we switched from hard coded mmap cookies to dynamic ones is
+use an xarray (today this should be a maple tree) to dynamically
+allocate mmap cookies whenever the driver returns something to
+userspace. During the mmap fop the pgoff is fed back through the maple
+tree to get the description of what the cookie represents.
+
+So the encoding of cookies is completely disjoint from whatever the
+underlying thing is. If you want the same region to be mapped with two
+or three different prot flags you just ask for two or three cookies
+and at mmap time you can recover the region pointer and the mmap
+flags.
+
+So VFIO could do several different things here to convay the mmap
+flags through the cookie, including somehow encoding it in a pgoff
+bit, or using a dynamic maple tree scheme.
+
+My point is to not confuse the pgoff encoding with the driver concept
+of a region. The region is a single peice of memory, the "mmap cookie"s
+are just handles to it. Adding more data to the handle is not the same
+as adding more regions.
+
+> > > At the limit they're the same.  We could use a
+> > > DEVICE_FEATURE to ask vfio to selectively populate WC regions after
+> > > which the user could re-enumerate additional regions, or in fact to
+> > > switch on WC for a given region if we want to go that route.  Thanks,  
+> > 
+> > This is still adding more regions and reporting more stuff from
+> > REGION_INFO, that is what I would like to avoid.
+> 
+> Why?  This reminds me of hidden registers outside of capability chains
+> in PCI config space.  Thanks,
+
+The mmap offsets are not (supposed to be) ABI in the VFIO ioctls. The
+encoding is entirely opaque inside the kernel already. Apps are
+supposed to use REGION_INFO to learn the value to pass to mmap. ie
+things like VFIO_PCI_OFFSET_SHIFT are not in the uAPI header.
+
+Jason
 
