@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-23131-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23132-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 830DE94644B
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:20:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26B0794644D
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:21:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 049FC1F2285E
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:20:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BF341C20A66
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFCA535A3;
-	Fri,  2 Aug 2024 20:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B9BE535A3;
+	Fri,  2 Aug 2024 20:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hIQdZ5Dg"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gQIG0KjY"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151CB1ABEAB
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:20:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B84091ABEAB
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722630015; cv=none; b=Z1Ff1CeZ4S0YdBHbiyl6aiMY5MOEBpCQ8e4hRzNZHgfyQpMle1o3ygyGvEc0x8cbIrsR7yFDEPMGqqusNBuDoXJocUxYZQz896tlQPeCacr+Y3SYz9ud71dVkwHgb3Uah+91Q9Z7TsCuSYxevcqOiAZj8MsBWJXjgsWWiunaAM8=
+	t=1722630086; cv=none; b=ft7jjZtCvOaS+nAt08eCz426rw7FDNwxD3srbeZUglL2CiJYz4MkkzPRhweff5d6Pqr1RGIYdEYUNaeRPh5eYgzDuSs82E9dOdh2MPb6BQY2aLt5VLq6Y7PTRayMyln21MvTF15HbDLkHni28RMLH0+VcFYwPy3hkWYxfZbkRaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722630015; c=relaxed/simple;
-	bh=f5wk1BYE1qFGiIzXiTtgFC/3NOx8IBR69a3l+kDiJQE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gaxMK/Mh/Q3YA5WGXeS7pN9Zv4V+FJVW6Lf1mYLYk3SM0LwuEUFlAxI24Yk80pIuo0MHFykhHiBKg3JH2vqK6oAjN9VTASxQaxLihH9VF/A92T74KQG6Kji2l6KyLwflAKuQL7hMBv+cRzO9mH/unnb0QERnOE2rNw5bwgdZgXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hIQdZ5Dg; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1722630086; c=relaxed/simple;
+	bh=k3/t2Q1agwZ0l4VOh1yi6PwF8hdZItVhHkNDBShV5kA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=CMuUT1N+d7o3d7gYpqoRaVFcwXY7w9bJvULiroSvw6GxqUHOVH0YHwKjwzSBgtJtGFZ20aq/AyCmexCoTcXZvkD1dS00v98gldsTm5/y11rkzTdZkFF8+J/LUd37zhKxv5Hh7oBHrcmWjoFel1Ez2JaDICO7OAkD2KsMHxW12L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gQIG0KjY; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-66a8ce9eecfso52485887b3.1
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:20:13 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-664aa55c690so177211177b3.2
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:21:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722630013; x=1723234813; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722630084; x=1723234884; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LiQAcpRKpe7+E/+WMw3cwWwkg0i5rhbg/4mNpxGloLQ=;
-        b=hIQdZ5DgTwFsEo+zmzuY7gNo/0mxExLnCmbm33stD+zokSM9Fk2ZD3+hrfS2CR/74m
-         Kv6fdr6TkvGGQGqtZJbwZPh05k91je1QQF/xfijYF9h5QbpOlp3bPOw/ledwGjL9vVYe
-         Xjrh+VuU1ueOEU1qHvTmuN0X++7karrxqZTqOFjMy4dCh56fJxJ1GAQ0FEwziOl9jQOu
-         izEBJRDKtmdVnGLW3nfyykZEYa2uv7x+RlY4G7kmpXGQ1MisGNq5b3f/iZdonUyJ1fla
-         o7wrURA5ZTY8b8vZo9lZtTrtNnhS9tN4CkFF3yzvf+j9GYIckI9EkF/v7JBXTN4UdXiM
-         loyg==
+        bh=wSbtzjQvQpAq1eRxKfGE8sitFVHQ69Ko3fhczaBymYk=;
+        b=gQIG0KjY+G2BPF+zshS8BOlFSArITZgrryAHW4z+3cvf4ojbiTvVxni9Wai1UioXGr
+         PS9z/CNtuyee6x6xhKemg2/RhLaP+3tJ5LhSzuKk7aHK9CU/YDErLtquwFMwBKvU5GOF
+         516Cx2K/X8q/2wCxYNrM16G2wx1CWzfa1F5Hhx1oNUVDJHyiOzB9351pNHHmyJ5Kl+fJ
+         UBzLDX6Dam9RVsHaxaE7s2Otsn2vwiZUnIwI8juljWlK9HWgD/RoY/Zb+pLkFSSz/oaY
+         t3dsYs5hO7ySjY1LGpf70s6WKAwEeTwRbJQUdyIj+tcv23KA96FLidiBStRI7AbY3hDR
+         KVPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722630013; x=1723234813;
+        d=1e100.net; s=20230601; t=1722630084; x=1723234884;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LiQAcpRKpe7+E/+WMw3cwWwkg0i5rhbg/4mNpxGloLQ=;
-        b=pCTZRMcyTd+HxiMr3EYQtQbDmm7k/pV1CInpC/t0e3+dFZTc+fTlheVsMr5YSul93C
-         eT4t6Ql9v1d2DhPOaenqZvKN+zuCc5MwkR9n9FjXY9xldCqLqy1OnNZ/tfCm4U9cTCGq
-         oPvSvmvjyPYrfK+mUToVfUrC3uVMtsQSugJwDV82KhR6Pa0g3gSkWltgGm5bPad7J6tv
-         w8hj37zmnGLVb4wtoAFVYsRkoOh9DnApxnpOAaXzEQnt7rqpXWD5Vlvtvd4sz3l7Psij
-         PvmP6MwWd+f0KOzj4mCehj/Pvo1V/4Odt9oLI9efvftAYQcNC2EVmH7+0A+1H6CQ7bnG
-         tZ0w==
-X-Gm-Message-State: AOJu0Yw1FIK2NIvRdZu0Gi6tcf0UuAsB/GYL04U37mScbtcKp+QKg3I9
-	VgHqALDCikgI7aOG1N0UFXtrM6IwFlyQ17VO9lfrKcucD5txlyCG5DSotGKlgwBXV2U//z3tiD9
-	Gng==
-X-Google-Smtp-Source: AGHT+IH1+DZ9dslVBjL+N5f3Pd9iBLWduh+TbgNV+/sWoiV+TYiGZGIaviiJqBarqG931ibfyvNy8OtMYe4=
+        bh=wSbtzjQvQpAq1eRxKfGE8sitFVHQ69Ko3fhczaBymYk=;
+        b=targKIWV6sdisLzXwiIQw37t624DuwL4tS/96ee9/bZ8fSHX/6kmDT3A6pgaZejy0G
+         tib/IAJmVDl7e7mJm2S+ucivTh4VxO29x18R6lKB1/8f3g8K1hSIOH3Wq1wXGXDS24T3
+         /Gs5MsBaR/f/AXqXlXu7qj6N2MmtApLrDP4EZu4G14aBN9NK7qYYQ/fyRvl0owyqxUDp
+         +lovTbf21HVU0My4kkH8rvGlI0znSeaxJ78Wi7TChXAgmaWUZ7NAgItF7ln81wSCA6Jj
+         aWfwQ5hEHjs0gua89lJip17k8kmdOnDYnuQY+0llORkqoilh4Ka+bOuD2T1i9PvDenHD
+         VEJA==
+X-Gm-Message-State: AOJu0YyLF6GwBRulxqCyHfjOmIUO4Tdvjtl/cYdZM951wtgO8kFDPW5X
+	B2jW4lBEy+QD5UWZdPuWX+e7hJPsSFz7Kxp7Ttx77uZzoNvPXFPjrC4lpQZtoLocgUSNC6tGFbC
+	8kA==
+X-Google-Smtp-Source: AGHT+IGDiO151ypnhn4EaGGcDBfUrjdXSX4S344OxLk9bmjlh1hIj5LlSBITxT0ie316eWk6q2RSjw89xfs=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:d82:b0:65b:a403:5ec1 with SMTP id
- 00721157ae682-68964d4e782mr1368287b3.4.1722630013194; Fri, 02 Aug 2024
- 13:20:13 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2b8b:b0:e0b:d729:ff8d with SMTP id
+ 3f1490d57ef6-e0bde21e302mr297332276.5.1722630083866; Fri, 02 Aug 2024
+ 13:21:23 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 13:20:06 -0700
+Date: Fri,  2 Aug 2024 13:21:21 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,124 +71,151 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802202006.340854-1-seanjc@google.com>
-Subject: [PATCH v2] KVM: x86/mmu: Clean up function comments for dirty logging APIs
+Message-ID: <20240802202121.341348-1-seanjc@google.com>
+Subject: [PATCH] KVM: Rework core loop of kvm_vcpu_on_spin() to use a single for-loop
 From: Sean Christopherson <seanjc@google.com>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>
+	Sean Christopherson <seanjc@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rework the function comment for kvm_arch_mmu_enable_log_dirty_pt_masked()
-into the body of the function, as it has gotten a bit stale, is harder to
-read without the code context, and is the last source of warnings for W=1
-builds in KVM x86 due to using a kernel-doc comment without documenting
-all parameters.
+Rework kvm_vcpu_on_spin() to use a single for-loop instead of making "two"
+passes over all vCPUs.  Given N=kvm->last_boosted_vcpu, the logic is to
+iterate from vCPU[N+1]..vcpu[N-1], i.e. using two loops is just a kludgy
+way of handling the wrap from the last vCPU to vCPU0 when a boostable vCPU
+isn't found in vcpu[N+1]..vcpu[MAX].
 
-Opportunistically subsume the functions comments for
-kvm_mmu_write_protect_pt_masked() and kvm_mmu_clear_dirty_pt_masked(), as
-there is no value in regurgitating similar information at a higher level,
-and capturing the differences between write-protection and PML-based dirty
-logging is best done in a common location.
+Open code the xa_load() instead of using kvm_get_vcpu() to avoid reading
+online_vcpus in every loop, as well as the accompanying smp_rmb(), i.e.
+make it a custom kvm_for_each_vcpu(), for all intents and purposes.
 
-No functional change intended.
+Oppurtunistically clean up the comment explaining the logic.
 
-Cc: David Matlack <dmatlack@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
+ virt/kvm/kvm_main.c | 100 +++++++++++++++++++++++++-------------------
+ 1 file changed, 56 insertions(+), 44 deletions(-)
 
-v2: Put the comments in the function body. [David]
-
-v1: https://lore.kernel.org/all/20240611215805.340664-1-seanjc@google.com
-
- arch/x86/kvm/mmu/mmu.c | 48 +++++++++++++-----------------------------
- 1 file changed, 15 insertions(+), 33 deletions(-)
-
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 901be9e420a4..45e7e9bd5e76 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -1307,15 +1307,6 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
- 	return flush;
- }
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d0788d0a72cc..f357bec57d08 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4029,59 +4029,71 @@ bool __weak kvm_arch_dy_has_pending_interrupt(struct kvm_vcpu *vcpu)
  
--/**
-- * kvm_mmu_write_protect_pt_masked - write protect selected PT level pages
-- * @kvm: kvm instance
-- * @slot: slot to protect
-- * @gfn_offset: start of the BITS_PER_LONG pages we care about
-- * @mask: indicates which pages we should protect
-- *
-- * Used when we do not need to care about huge page mappings.
-- */
- static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 				     struct kvm_memory_slot *slot,
- 				     gfn_t gfn_offset, unsigned long mask)
-@@ -1339,16 +1330,6 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
- 	}
- }
- 
--/**
-- * kvm_mmu_clear_dirty_pt_masked - clear MMU D-bit for PT level pages, or write
-- * protect the page if the D-bit isn't supported.
-- * @kvm: kvm instance
-- * @slot: slot to clear D-bit
-- * @gfn_offset: start of the BITS_PER_LONG pages we care about
-- * @mask: indicates which pages we should clear D-bit
-- *
-- * Used for PML to re-log the dirty GPAs after userspace querying dirty_bitmap.
-- */
- static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 					 struct kvm_memory_slot *slot,
- 					 gfn_t gfn_offset, unsigned long mask)
-@@ -1372,24 +1353,16 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
- 	}
- }
- 
--/**
-- * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
-- * PT level pages.
-- *
-- * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
-- * enable dirty logging for them.
-- *
-- * We need to care about huge page mappings: e.g. during dirty logging we may
-- * have such mappings.
-- */
- void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 				struct kvm_memory_slot *slot,
- 				gfn_t gfn_offset, unsigned long mask)
+ void kvm_vcpu_on_spin(struct kvm_vcpu *me, bool yield_to_kernel_mode)
  {
- 	/*
--	 * Huge pages are NOT write protected when we start dirty logging in
--	 * initially-all-set mode; must write protect them here so that they
--	 * are split to 4K on the first write.
-+	 * If the slot was assumed to be "initially all dirty", write-protect
-+	 * huge pages to ensure they are split to 4KiB on the first write (KVM
-+	 * dirty logs at 4KiB granularity). If eager page splitting is enabled,
-+	 * immediately try to split huge pages, e.g. so that vCPUs don't get
-+	 * saddled with the cost of splitting.
- 	 *
- 	 * The gfn_offset is guaranteed to be aligned to 64, but the base_gfn
- 	 * of memslot has no such restriction, so the range can cross two large
-@@ -1411,7 +1384,16 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
- 						       PG_LEVEL_2M);
- 	}
++	int nr_vcpus, start, i, idx, yielded;
+ 	struct kvm *kvm = me->kvm;
+ 	struct kvm_vcpu *vcpu;
+-	int last_boosted_vcpu;
+-	unsigned long i;
+-	int yielded = 0;
+ 	int try = 3;
+-	int pass;
  
--	/* Now handle 4K PTEs.  */
-+	/*
-+	 * (Re)Enable dirty logging for all 4KiB SPTEs that map the GFNs in
-+	 * mask.  If PML is enabled and the and the GFN doesn't need to be
-+	 * write-protected for other reasons, e.g. shadow paging, clear the
-+	 * Dirty bit.  Otherwise clear the Writable bit.
+-	last_boosted_vcpu = READ_ONCE(kvm->last_boosted_vcpu);
++	nr_vcpus = atomic_read(&kvm->online_vcpus);
++	if (nr_vcpus < 2)
++		return;
++
++	/* Pairs with the smp_wmb() in kvm_vm_ioctl_create_vcpu(). */
++	smp_rmb();
++
+ 	kvm_vcpu_set_in_spin_loop(me, true);
++
+ 	/*
+-	 * We boost the priority of a VCPU that is runnable but not
+-	 * currently running, because it got preempted by something
+-	 * else and called schedule in __vcpu_run.  Hopefully that
+-	 * VCPU is holding the lock that we need and will release it.
+-	 * We approximate round-robin by starting at the last boosted VCPU.
++	 * The current vCPU ("me") is spinning in kernel mode, i.e. is likely
++	 * waiting for a resource to become available.  Attempt to yield to a
++	 * vCPU that is runnable, but not currently running, e.g. because the
++	 * vCPU was preempted by a higher priority task.  With luck, the vCPU
++	 * that was preempted is holding a lock or some other resource that the
++	 * current vCPU is waiting to acquire, and yielding to the other vCPU
++	 * will allow it to make forward progress and release the lock (or kick
++	 * the spinning vCPU, etc).
 +	 *
-+	 * Note that kvm_mmu_clear_dirty_pt_masked() is called whenever PML is
-+	 * enabled but it chooses between clearing the Dirty bit and Writeable
-+	 * bit based on the context.
-+	 */
- 	if (kvm_x86_ops.cpu_dirty_log_size)
- 		kvm_mmu_clear_dirty_pt_masked(kvm, slot, gfn_offset, mask);
- 	else
++	 * Since KVM has no insight into what exactly the guest is doing,
++	 * approximate a round-robin selection by iterating over all vCPUs,
++	 * starting at the last boosted vCPU.  I.e. if N=kvm->last_boosted_vcpu,
++	 * iterate over vCPU[N+1]..vCPU[N-1], wrapping as needed.
++	 *
++	 * Note, this is inherently racy, e.g. if multiple vCPUs are spinning,
++	 * they may all try to yield to the same vCPU(s).  But as above, this
++	 * is all best effort due to KVM's lack of visibility into the guest.
+ 	 */
+-	for (pass = 0; pass < 2 && !yielded && try; pass++) {
+-		kvm_for_each_vcpu(i, vcpu, kvm) {
+-			if (!pass && i <= last_boosted_vcpu) {
+-				i = last_boosted_vcpu;
+-				continue;
+-			} else if (pass && i > last_boosted_vcpu)
+-				break;
+-			if (!READ_ONCE(vcpu->ready))
+-				continue;
+-			if (vcpu == me)
+-				continue;
+-			if (kvm_vcpu_is_blocking(vcpu) && !vcpu_dy_runnable(vcpu))
+-				continue;
++	start = READ_ONCE(kvm->last_boosted_vcpu) + 1;
++	for (i = 0; i < nr_vcpus; i++) {
++		idx = (start + i) % nr_vcpus;
++		if (idx == me->vcpu_idx)
++			continue;
+ 
+-			/*
+-			 * Treat the target vCPU as being in-kernel if it has a
+-			 * pending interrupt, as the vCPU trying to yield may
+-			 * be spinning waiting on IPI delivery, i.e. the target
+-			 * vCPU is in-kernel for the purposes of directed yield.
+-			 */
+-			if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
+-			    !kvm_arch_dy_has_pending_interrupt(vcpu) &&
+-			    !kvm_arch_vcpu_preempted_in_kernel(vcpu))
+-				continue;
+-			if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
+-				continue;
++		vcpu = xa_load(&kvm->vcpu_array, idx);
++		if (!READ_ONCE(vcpu->ready))
++			continue;
++		if (kvm_vcpu_is_blocking(vcpu) && !vcpu_dy_runnable(vcpu))
++			continue;
+ 
+-			yielded = kvm_vcpu_yield_to(vcpu);
+-			if (yielded > 0) {
+-				WRITE_ONCE(kvm->last_boosted_vcpu, i);
+-				break;
+-			} else if (yielded < 0) {
+-				try--;
+-				if (!try)
+-					break;
+-			}
++		/*
++		 * Treat the target vCPU as being in-kernel if it has a pending
++		 * interrupt, as the vCPU trying to yield may be spinning
++		 * waiting on IPI delivery, i.e. the target vCPU is in-kernel
++		 * for the purposes of directed yield.
++		 */
++		if (READ_ONCE(vcpu->preempted) && yield_to_kernel_mode &&
++		    !kvm_arch_dy_has_pending_interrupt(vcpu) &&
++		    !kvm_arch_vcpu_preempted_in_kernel(vcpu))
++			continue;
++
++		if (!kvm_vcpu_eligible_for_directed_yield(vcpu))
++			continue;
++
++		yielded = kvm_vcpu_yield_to(vcpu);
++		if (yielded > 0) {
++			WRITE_ONCE(kvm->last_boosted_vcpu, i);
++			break;
++		} else if (yielded < 0 && !--try) {
++			break;
+ 		}
+ 	}
+ 	kvm_vcpu_set_in_spin_loop(me, false);
 
 base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 -- 
