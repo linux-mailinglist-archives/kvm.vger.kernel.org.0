@@ -1,180 +1,178 @@
-Return-Path: <kvm+bounces-23054-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23055-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3C5A9460D5
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:53:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08B029460E7
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:55:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DC10281CA9
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:53:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7202EB231DB
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:55:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E010D1537C9;
-	Fri,  2 Aug 2024 15:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CCB41537AE;
+	Fri,  2 Aug 2024 15:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3AvOswIo"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hs7X+lNe"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32043136341
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC03D136349
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722614011; cv=none; b=DlPH1Ea/14V6JWMuZ1N5I4gg/95iDvNc6Ot6WqTdcMCXi53hU4GA2aijNQGfYdW7Z4T5ZPs27eOXNfgfs7EIHvH3Rlrm0HjPy4Q5e36DkalQN13XfA4rmUG/qWK471X3kwfnzLbZIz88FEALkbOVlkfW1jYz68FI5AdqLfDTEf0=
+	t=1722614141; cv=none; b=cksblocMB/pBxPDL3ozLv8wxUY2ELKK+q9yAnDe9s6jHxG/uaP0BsDKt8f34b1FE/WydR/zX60l5jRmpcoxnbcrKOdqzQQ++R2lbR9pZZtracI7/ZubFMTWYmx8Ah018yvTjf04t9u+TVgO8qcBcteOp0LrbxdbdfePraqcB3gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722614011; c=relaxed/simple;
-	bh=HfRW5DmJhxhXde7xQghASIZD9c7a0wgm8T+Cw16zeMA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UW7uh+pD5+rwf9k9d8oLSQSptseJY2+LMfVFXZIobI1hgKa7LMb+XR2+qMCKPZCWNHb+BE4BR8gsAF/NeB0h4Zn4FsdrX08vDAYS4s5Kzv/86l1GuZAHvsa6kbJfj6HMztDr9geUWhudCdB205wCsYXVxItH2Q3wD+xqid7ztuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3AvOswIo; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-7106fcb5543so948429b3a.2
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 08:53:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722614007; x=1723218807; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OQflQF1VpeXc1q1T34zDznynP2cVcjD3C+kAeL3RI/M=;
-        b=3AvOswIowHGrDrNrq7RCNaFP+zYg1JxAk6FngLPeJ3LzKbBLI6yimNRZE5FpMKzCY9
-         sRnVyaZwzyB6MvuNUo2BQO8FAGQ+wO7+vFOLai1JPWO5X2oLFXID8jE08FlhvsUWTMJ+
-         dw3HbT3oJBcwI06rQUaAEO9CPqr/pO3zpjSZpeh/RuYpVibpaXZZdRIz4SH0vag9TlXp
-         os1XCI25snodu5e4U/fcQKEQ59oAGlXpcOiF8U1OA+TnzZn/VDQJYglGW0Ocs2CnyFn+
-         ZnchZON2CNgPPycByVTIqvudZuYXZj87q+k+RxDFUuZ+aE/8CenN6I/9+3WfkO56aMRz
-         IA4Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722614007; x=1723218807;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OQflQF1VpeXc1q1T34zDznynP2cVcjD3C+kAeL3RI/M=;
-        b=rqGCqLx9kM17byDLpqYHp4qMcT+GTJgMwj7+e5770lkzXbgT2zH1mo8PRP8dWoqoVI
-         gl80tV9Rgofu1WnJ4H1jXr+asDrkMqzz1NRKGGFfiTgEj6b2Mfe5T8LlybKsiIwPfXKl
-         7s+8D9J2Y7wN1LBP3FmzCEMJm/59x2uGN5yVfx4syubNwvqPsD2uzfuTlMXGw9oR96TY
-         +bscQ0X2VKFkWO0ALuPCDqJkDzalNWqMnELHb1L6fCkxKJX94SZeK13+0BOTDBZt0GC9
-         2W1ndDi2B08tYsv8YSwhBM5mUyOkM9uNbNdRn5GAjz8CqeonYKWxSU9QJRz/mqaYzqvH
-         67OA==
-X-Gm-Message-State: AOJu0Yy0Ygx4X1mrT0HW78o3uGAlANDWymuCdeOGAbgmxB+tI8ZjxcDR
-	ErK6OQPiWh3w1zAP9bN4voBr2h1czHDjx+q50dCGp/S/U+Rft9XMOpP9WQ+Qd4KKfWlOu1NMf6I
-	EYg==
-X-Google-Smtp-Source: AGHT+IGAq55hoq+7zWXDHX5qWCzZXyIak9Ckv9V5U//xtLLkFkk6XDyP9DgONLQBDJ79qPxHDM35sdQTUL4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:6f69:b0:70e:9e1e:e6ed with SMTP id
- d2e1a72fcca58-7106cf9c4dcmr32915b3a.2.1722614007037; Fri, 02 Aug 2024
- 08:53:27 -0700 (PDT)
-Date: Fri, 2 Aug 2024 08:53:25 -0700
-In-Reply-To: <20240802151608.72896-2-mlevitsk@redhat.com>
+	s=arc-20240116; t=1722614141; c=relaxed/simple;
+	bh=aSl3GDoexr7Yt74Cnz0YsaFdausfDIyrzV3WsAcdZ9s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Zqeis5kfcgfhR3UA1FYTUTUii2qyvKCPvtTxNP/3k4dpwAhcwECOXkhBNQu/mfv0hMEscQXuE6b6KEijibDh+c4PI0cX5jcwn/gUUbOBAnyg1Kev4wY5tkWJ+oPf7rso6n2h5JnHiG/Xo+G5xJZ98CSR6prTewcBnVipy1IAmls=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hs7X+lNe; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722614138;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=L1rljUKvL0U4qJqT07GMyS3ShSSr+C5zU092arRl9Dk=;
+	b=hs7X+lNe2cYZm5sr73II51hgrS2ctmjLiH5N27FLzxZfwBYET7yKbFxd47AInxtCefBu+i
+	QE8AvHCwfo/0Bz5aG/qYRwGNkBGdsraJjFdXu2u/pEFndYJqobW6YdpqD6+P+flXcK3rkS
+	B9RrcbWSXQ7nE6b29Gvne4A2SwQhHLg=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-581-nld39d-uMKGpUalxEQkpag-1; Fri,
+ 02 Aug 2024 11:55:35 -0400
+X-MC-Unique: nld39d-uMKGpUalxEQkpag-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0C34D1944AB0;
+	Fri,  2 Aug 2024 15:55:33 +0000 (UTC)
+Received: from t14s.redhat.com (unknown [10.39.192.113])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 68195300018D;
+	Fri,  2 Aug 2024 15:55:26 +0000 (UTC)
+From: David Hildenbrand <david@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-mm@kvack.org,
+	linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	David Hildenbrand <david@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+Subject: [PATCH v1 00/11] mm: replace follow_page() by folio_walk
+Date: Fri,  2 Aug 2024 17:55:13 +0200
+Message-ID: <20240802155524.517137-1-david@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240802151608.72896-1-mlevitsk@redhat.com> <20240802151608.72896-2-mlevitsk@redhat.com>
-Message-ID: <Zq0A9R5R_MAFrqTP@google.com>
-Subject: Re: [PATCH v2 1/2] KVM: x86: relax canonical check for some x86
- architectural msrs
-From: Sean Christopherson <seanjc@google.com>
-To: Maxim Levitsky <mlevitsk@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ingo Molnar <mingo@redhat.com>, x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Chao Gao <chao.gao@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Aug 02, 2024, Maxim Levitsky wrote:
-> Several architectural msrs (e.g MSR_KERNEL_GS_BASE) must contain
-> a canonical address, and according to Intel PRM, this is enforced
-> by a #GP canonical check during MSR write.
-> 
-> However as it turns out, the supported address width
-> used for this canonical check is determined only
-> by host cpu model:
+Looking into a way of moving the last folio_likely_mapped_shared() call
+in add_folio_for_migration() under the PTL, I found myself removing
+follow_page(). This paves the way for cleaning up all the FOLL_, follow_*
+terminology to just be called "GUP" nowadays.
 
-Please try to wrap consistently and sanely, this is unnecessarily hard to read
-because every paragraph manages to wrap at a different column.
+The new page table walker will lookup a mapped folio and return to the
+caller with the PTL held, such that the folio cannot get unmapped
+concurrently. Callers can then conditionally decide whether they really
+want to take a short-term folio reference or whether the can simply
+unlock the PTL and be done with it.
 
-> if CPU *supports* 5 level paging, the width will be 57
-> regardless of the state of CR4.LA57.
-> 
-> Experemental tests on a Sapphire Rapids CPU and on a Zen4 CPU
-> confirm this behavior.
-> 
-> In addition to that, the Intel ISA extension manual mentions that this might
-> be the architectural behavior:
-> 
-> Architecture Instruction Set Extensions and Future Features Programming Reference [1].
-> Chapter 6.4:
-> 
-> "CANONICALITY CHECKING FOR DATA ADDRESSES WRITTEN TO CONTROL REGISTERS AND
-> MSRS"
-> 
-> "In Processors that support LAM continue to require the addresses written to
-> control registers or MSRs to be 57-bit canonical if the processor _supports_
-> 5-level paging or 48-bit canonical if it supports only 4-level paging"
-> 
-> [1]: https://cdrdv2.intel.com/v1/dl/getContent/671368
-> 
-> Suggested-by: Chao Gao <chao.gao@intel.com>
-> Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
-> ---
->  arch/x86/kvm/x86.c | 11 ++++++++++-
->  1 file changed, 10 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index a6968eadd418..3582f0bb7644 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -1844,7 +1844,16 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
->  	case MSR_KERNEL_GS_BASE:
->  	case MSR_CSTAR:
->  	case MSR_LSTAR:
-> -		if (is_noncanonical_address(data, vcpu))
-> +
-> +		/*
-> +		 * Both AMD and Intel cpus allow values which
-> +		 * are canonical in the 5 level paging mode but are not
-> +		 * canonical in the 4 level paging mode to be written
-> +		 * to the above MSRs, as long as the host CPU supports
-> +		 * 5 level paging, regardless of the state of the CR4.LA57.
-> +		 */
-> +		if (!__is_canonical_address(data,
-> +			kvm_cpu_cap_has(X86_FEATURE_LA57) ? 57 : 48))
+folio_walk is similar to page_vma_mapped_walk(), except that we don't know
+the folio we want to walk to and that we are only walking to exactly one
+PTE/PMD/PUD.
 
-Please align indentation.
+folio_walk provides access to the pte/pmd/pud (and the referenced folio
+page because things like KSM need that), however, as part of this series
+no page table modifications are performed by users.
 
-Checking kvm_cpu_cap_has() is wrong.  What the _host_ supports is irrelevant,
-what matters is what the guest CPU supports, i.e. this should check guest CPUID.
-Ah, but for safety, KVM also needs to check kvm_cpu_cap_has() to prevent faulting
-on a bad load into hardware.  Which means adding a "governed" feature until my
-CPUID rework lands.
+We might be able to convert some other walk_page_range() users that really
+only walk to one address, such as DAMON with
+damon_mkold_ops/damon_young_ops. It might make sense to extend folio_walk
+in the future to optionally fault in a folio (if applicable), such that we
+can replace some get_user_pages() users that really only want to lookup
+a single page/folio under PTL without unconditionally grabbing a folio
+reference.
 
-And I'm pretty sure this fix is incomplete, as nVMX's consistency checks on MSRs
-that are loaded via dedicated VMCS fields likely need the same treatment, e.g.
-presumably these checks should follow the MSR handling.
+I have plans to extend the approach to a range walker that will try
+batching various page table entries (not just folio pages) to be a better
+replace for walk_page_range() -- and users will be able to opt in which
+type of page table entries they want to process -- but that will require
+more work and more thoughts.
 
-	if (CC(is_noncanonical_address(vmcs12->host_ia32_sysenter_esp, vcpu)) ||
-	    CC(is_noncanonical_address(vmcs12->host_ia32_sysenter_eip, vcpu)))
-		return -EINVAL;
+KSM seems to work just fine (ksm_functional_tests selftests) and
+move_pages seems to work (migration selftest). I tested the leaf
+implementation excessively using various hugetlb sizes (64K, 2M, 32M, 1G)
+on arm64 using move_pages and did some more testing on x86-64. Cross
+compiled on a bunch of architectures.
 
+I am not able to test the s390x Secure Execution changes, unfortunately.
 
-	    (CC(is_noncanonical_address(vmcs12->guest_bndcfgs & PAGE_MASK, vcpu)) ||
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+Cc: Jonathan Corbet <corbet@lwn.net>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Janosch Frank <frankja@linux.ibm.com>
+Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>
+Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
 
-So I think we probably need a dedicated helper for MSRs.
+David Hildenbrand (11):
+  mm: provide vm_normal_(page|folio)_pmd() with
+    CONFIG_PGTABLE_HAS_HUGE_LEAVES
+  mm/pagewalk: introduce folio_walk_start() + folio_walk_end()
+  mm/migrate: convert do_pages_stat_array() from follow_page() to
+    folio_walk
+  mm/migrate: convert add_page_for_migration() from follow_page() to
+    folio_walk
+  mm/ksm: convert get_mergeable_page() from follow_page() to folio_walk
+  mm/ksm: convert scan_get_next_rmap_item() from follow_page() to
+    folio_walk
+  mm/huge_memory: convert split_huge_pages_pid() from follow_page() to
+    folio_walk
+  s390/uv: convert gmap_destroy_page() from follow_page() to folio_walk
+  s390/mm/fault: convert do_secure_storage_access() from follow_page()
+    to folio_walk
+  mm: remove follow_page()
+  mm/ksm: convert break_ksm() from walk_page_range_vma() to folio_walk
 
-Hmm, and I suspect these are wrong too, but in a different way.  Toggling host
-LA57 on VM-Exit is legal[*], so logically, KVM should use CR4.LA57 from
-vmcs12->host_cr4, not the vCPU's current CR4 value.  Which makes me _really_
-curious if Intel CPUs actually get that right.
+ Documentation/mm/transhuge.rst |   6 +-
+ arch/s390/kernel/uv.c          |  18 ++-
+ arch/s390/mm/fault.c           |  16 ++-
+ include/linux/mm.h             |   3 -
+ include/linux/pagewalk.h       |  58 ++++++++++
+ mm/filemap.c                   |   2 +-
+ mm/gup.c                       |  24 +---
+ mm/huge_memory.c               |  18 +--
+ mm/ksm.c                       | 127 +++++++++------------
+ mm/memory.c                    |   2 +-
+ mm/migrate.c                   | 131 ++++++++++-----------
+ mm/nommu.c                     |   6 -
+ mm/pagewalk.c                  | 202 +++++++++++++++++++++++++++++++++
+ 13 files changed, 413 insertions(+), 200 deletions(-)
 
-	if (CC(is_noncanonical_address(vmcs12->host_fs_base, vcpu)) ||
-	    CC(is_noncanonical_address(vmcs12->host_gs_base, vcpu)) ||
-	    CC(is_noncanonical_address(vmcs12->host_gdtr_base, vcpu)) ||
-	    CC(is_noncanonical_address(vmcs12->host_idtr_base, vcpu)) ||
-	    CC(is_noncanonical_address(vmcs12->host_tr_base, vcpu)) ||
-	    CC(is_noncanonical_address(vmcs12->host_rip, vcpu)))
-		return -EINVAL;
+-- 
+2.45.2
 
-[*] https://lore.kernel.org/all/20210622211124.3698119-1-seanjc@google.com
 
