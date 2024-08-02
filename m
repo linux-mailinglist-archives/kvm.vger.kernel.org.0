@@ -1,188 +1,229 @@
-Return-Path: <kvm+bounces-23066-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23067-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1F1A946121
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:59:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A805B94612A
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:00:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 673C71F21721
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:59:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A97B1F21C0B
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 16:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBB411A34B7;
-	Fri,  2 Aug 2024 15:56:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B45015C145;
+	Fri,  2 Aug 2024 15:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HhTudOSc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RHukL+u3"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B5921A34AA
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:56:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED971A34D2
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722614214; cv=none; b=Qhf08HwBsRtZD/2GxkgxSJVEh3lGZWoTCHBZYrtnFAp5fj+k9lVS1ERb2H16umxP5k62vr7KhSVE7ex9E0ipSqgLweIkhPCMl7M66I2V49CFeYbzPQ3xbqhUWp/VROyJFQQ3dNoeF9KC8ZpNukn+ShIHW/jKHKmCZcZsdhiCPxw=
+	t=1722614279; cv=none; b=A/V97aqZXIEnMflulTSiGbAB1GRJFqfOAv6RPVMuUGwIg4J89bhM8Gx+Z7+UDdGC0TzpLSARxI7xCnW1KyS19tSfEp78vKcWFlawOK7s56w6xV7aVe+OdAxzp1FxVgzwidvk+nw/Gjw/UbutREYhJS0abokXokDlMR/L5axs96o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722614214; c=relaxed/simple;
-	bh=B9QpgUZqHBSgII4REwP9lD0/53JlrVZdILJpl6GeaCQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=GBv7747G1gASF+PgVUKa3Mm/YOSIr1mU60ZSsWl887xCx1SDevEjTYe/B3Zmdzb/oEQOqbn3YxQFn5vgwB9N9YGo9J4Bz2O/4M+ZDpn3wBEHSDD+OAwyVL+ojw/HcFak4tmpAKGbr/SiPbEbvnQ7zJtyjdPgXp/3ejGwrbuqfcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HhTudOSc; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1722614279; c=relaxed/simple;
+	bh=JjynDV1hhOJHzj07YzBxKkFXQ+7j3t5lUDVQGJ/KsMY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aTsCiDGTZZu1RMmGC/tSvejCLufkGkIFMupiAs7TBi5pXicnwCqatUyL5YR8sEoZrWDvhOodEke6DzjKMts+XsWCGFM+MQlJE8e+yqzn/ZDn3+stKGq5hbTsx8jlmHei1n0sGrsoOXRuzkzx8heNJDILzlufMoR4pWAzR4aGL4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RHukL+u3; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722614211;
+	s=mimecast20190719; t=1722614274;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XisBOloUEP3qStGU5kEnvOleMULjhsDMvLI1Qb38ywI=;
-	b=HhTudOSczoDCzNBQBnIpia1CQZtRqjMaQQvctcz8uWfl66KLPLUyn1ol+K/k191SmfJMPC
-	dNrmVHXMqvC+ubNoXK0PsnTG0RTa8SC64T5iDnWwQ16YMJtictZtzwmkevfTyKqs+6yRnt
-	Hl2lreAjSkmNVDvvDQGeRkcDoFO/0aE=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-533-7fMx_I3IMvS20EQpewJYGQ-1; Fri,
- 02 Aug 2024 11:56:48 -0400
-X-MC-Unique: 7fMx_I3IMvS20EQpewJYGQ-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 833C51955D4D;
-	Fri,  2 Aug 2024 15:56:45 +0000 (UTC)
-Received: from t14s.redhat.com (unknown [10.39.192.113])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id B30F4300018D;
-	Fri,  2 Aug 2024 15:56:39 +0000 (UTC)
-From: David Hildenbrand <david@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-mm@kvack.org,
-	linux-doc@vger.kernel.org,
-	kvm@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org,
-	David Hildenbrand <david@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-Subject: [PATCH v1 11/11] mm/ksm: convert break_ksm() from walk_page_range_vma() to folio_walk
-Date: Fri,  2 Aug 2024 17:55:24 +0200
-Message-ID: <20240802155524.517137-12-david@redhat.com>
-In-Reply-To: <20240802155524.517137-1-david@redhat.com>
-References: <20240802155524.517137-1-david@redhat.com>
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=o8CyxVqweIF0ieon88U7x8sp9PNeNO828g6IWuk2Csg=;
+	b=RHukL+u3DxspbuU6RSzBmMt8hhbDOjawCzH2bN+eHHB3WeTQ8Z220amJwzTQqsoegTJW/T
+	qqI7LGEATQ3JeT8y4FdWSOTobcyb4izLdbifkBir8LmwMr+I12fhZwFQVVSk1K1Lb4Dqah
+	kAv07QyMZkG5ZlY9K2hPlOOdkztZbBw=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-364-qrpzkW3dNCeN3oIgkZaD4g-1; Fri, 02 Aug 2024 11:57:52 -0400
+X-MC-Unique: qrpzkW3dNCeN3oIgkZaD4g-1
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4282164fcbcso40515085e9.2
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 08:57:51 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722614270; x=1723219070;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=o8CyxVqweIF0ieon88U7x8sp9PNeNO828g6IWuk2Csg=;
+        b=qmhFQjrdWwH1iWFka6kAAlsb5KnbPsL+fpUgw09rt4Yka9Wc3JTpGST8lRG1K/TI7J
+         pRsfOb+yvERMueC6ldBba0qTpMQlNrKqLWTWFjKb6Ukkk1KYkhEcAujiCvzMYAkzIv84
+         qL2VMBFuxkpxVjT6NPX6pIv2gmq5ARK41MNpglBqsifNJqwuB9YKLaUv3OPbSOAQQ7ny
+         57CDD+7aHoYE2X0fN2Sv95cT9de/V9Zt1We94Q0mPFtjUCmk67Dk9SYUrGXrhoYKUfuR
+         wd7AHJ6pXEeL0TTt7FlpctC8hNxI6dUP2b7fkFZYBT0nKHez/uQ2ZC+3/Q7FHSUh6tsV
+         mVlA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4VjjIqnS/PIvmN38bjS5EzdUHh1BwWXVnf6SU0ZplM8Atx19C9+OHuUTNZkYjQp+xWnttXNrPcJ9qlcCObxsoOPlW
+X-Gm-Message-State: AOJu0Yz8DmeE6yNahLlVapVwieZ/kOsvsyZ7290pgSVQcw9nagVeW8OF
+	PBnuMO6uvi5+ZEYGVJjX0pGs4IHmhA19ZSFlu+I+lDfCoSdhwDh8jofvDcHAZ43o0Lf9mpYlPHR
+	o6YIAUwEGbC9pamGjdufWJ/DxrS58RbPsLM8LsdoaeRXe4//CXg==
+X-Received: by 2002:a05:600c:3b92:b0:426:6388:d59f with SMTP id 5b1f17b1804b1-428e6f88ab5mr25998235e9.1.1722614269693;
+        Fri, 02 Aug 2024 08:57:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEAB/iWp0kcpjrY5OhvPv/Oyo/lMW/wjh0JrgfYiA+llWqgY/XCkve1AK7hUM/XO2A+l7mNIQ==
+X-Received: by 2002:a05:600c:3b92:b0:426:6388:d59f with SMTP id 5b1f17b1804b1-428e6f88ab5mr25997875e9.1.1722614269088;
+        Fri, 02 Aug 2024 08:57:49 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c717:e700:a3df:9aa8:9edb:dcac? (p200300cbc717e700a3df9aa89edbdcac.dip0.t-ipconnect.de. [2003:cb:c717:e700:a3df:9aa8:9edb:dcac])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b89a86dsm98639065e9.1.2024.08.02.08.57.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Aug 2024 08:57:48 -0700 (PDT)
+Message-ID: <1ea7a0d2-e640-4549-ac0e-8ae0df8d8e6a@redhat.com>
+Date: Fri, 2 Aug 2024 17:57:46 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
+ clear_young MMU notifiers
+To: James Houghton <jthoughton@google.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>,
+ Catalin Marinas <catalin.marinas@arm.com>,
+ David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>,
+ James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Raghavendra Rao Ananta <rananta@google.com>,
+ Ryan Roberts <ryan.roberts@arm.com>, Sean Christopherson
+ <seanjc@google.com>, Shaoqin Huang <shahuang@redhat.com>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>,
+ Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>,
+ Zenghui Yu <yuzenghui@huawei.com>, kvmarm@lists.linux.dev,
+ kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, linux-mm@kvack.org
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-6-jthoughton@google.com>
+ <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
+ <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Let's simplify by reusing folio_walk. Keep the existing behavior by
-handling migration entries and zeropages.
+On 02.08.24 01:13, James Houghton wrote:
+> On Thu, Aug 1, 2024 at 2:36 AM David Hildenbrand <david@redhat.com> wrote:
+>>
+>> On 24.07.24 03:10, James Houghton wrote:
+>>> For implementers, the fast_only bool indicates that the age information
+>>> needs to be harvested such that we do not slow down other MMU operations,
+>>> and ideally that we are not ourselves slowed down by other MMU
+>>> operations.  Usually this means that the implementation should be
+>>> lockless.
+>>
+>> But what are the semantics if "fast_only" cannot be achieved by the
+>> implementer?
+>>
+>> Can we add some documentation to the new functions that explain what
+>> this mysterious "fast_only" is and what the expected semantics are?
+>> Please? :)
+> 
+> Thanks for pointing out the missing documentation. How's this?
+> 
+> diff --git a/include/linux/mmu_notifier.h b/include/linux/mmu_notifier.h
+> index 45c5995ebd84..c21992036dd3 100644
+> --- a/include/linux/mmu_notifier.h
+> +++ b/include/linux/mmu_notifier.h
+> @@ -106,6 +106,18 @@ struct mmu_notifier_ops {
+>           * clear_young is a lightweight version of clear_flush_young. Like the
+>           * latter, it is supposed to test-and-clear the young/accessed bitflag
+>           * in the secondary pte, but it may omit flushing the secondary tlb.
+> +        *
 
-Signed-off-by: David Hildenbrand <david@redhat.com>
----
- mm/ksm.c | 63 ++++++++++++++------------------------------------------
- 1 file changed, 16 insertions(+), 47 deletions(-)
+Probably makes sense to highlight the parameters like @fast_only
 
-diff --git a/mm/ksm.c b/mm/ksm.c
-index 0f5b2bba4ef0..8e53666bc7b0 100644
---- a/mm/ksm.c
-+++ b/mm/ksm.c
-@@ -608,47 +608,6 @@ static inline bool ksm_test_exit(struct mm_struct *mm)
- 	return atomic_read(&mm->mm_users) == 0;
- }
- 
--static int break_ksm_pmd_entry(pmd_t *pmd, unsigned long addr, unsigned long next,
--			struct mm_walk *walk)
--{
--	struct page *page = NULL;
--	spinlock_t *ptl;
--	pte_t *pte;
--	pte_t ptent;
--	int ret;
--
--	pte = pte_offset_map_lock(walk->mm, pmd, addr, &ptl);
--	if (!pte)
--		return 0;
--	ptent = ptep_get(pte);
--	if (pte_present(ptent)) {
--		page = vm_normal_page(walk->vma, addr, ptent);
--	} else if (!pte_none(ptent)) {
--		swp_entry_t entry = pte_to_swp_entry(ptent);
--
--		/*
--		 * As KSM pages remain KSM pages until freed, no need to wait
--		 * here for migration to end.
--		 */
--		if (is_migration_entry(entry))
--			page = pfn_swap_entry_to_page(entry);
--	}
--	/* return 1 if the page is an normal ksm page or KSM-placed zero page */
--	ret = (page && PageKsm(page)) || is_ksm_zero_pte(ptent);
--	pte_unmap_unlock(pte, ptl);
--	return ret;
--}
--
--static const struct mm_walk_ops break_ksm_ops = {
--	.pmd_entry = break_ksm_pmd_entry,
--	.walk_lock = PGWALK_RDLOCK,
--};
--
--static const struct mm_walk_ops break_ksm_lock_vma_ops = {
--	.pmd_entry = break_ksm_pmd_entry,
--	.walk_lock = PGWALK_WRLOCK,
--};
--
- /*
-  * We use break_ksm to break COW on a ksm page by triggering unsharing,
-  * such that the ksm page will get replaced by an exclusive anonymous page.
-@@ -665,16 +624,26 @@ static const struct mm_walk_ops break_ksm_lock_vma_ops = {
- static int break_ksm(struct vm_area_struct *vma, unsigned long addr, bool lock_vma)
- {
- 	vm_fault_t ret = 0;
--	const struct mm_walk_ops *ops = lock_vma ?
--				&break_ksm_lock_vma_ops : &break_ksm_ops;
-+
-+	if (lock_vma)
-+		vma_start_write(vma);
- 
- 	do {
--		int ksm_page;
-+		bool ksm_page = false;
-+		struct folio_walk fw;
-+		struct folio *folio;
- 
- 		cond_resched();
--		ksm_page = walk_page_range_vma(vma, addr, addr + 1, ops, NULL);
--		if (WARN_ON_ONCE(ksm_page < 0))
--			return ksm_page;
-+		folio = folio_walk_start(&fw, vma, addr,
-+					 FW_MIGRATION | FW_ZEROPAGE);
-+		if (folio) {
-+			/* Small folio implies FW_LEVEL_PTE. */
-+			if (!folio_test_large(folio) &&
-+			    (folio_test_ksm(folio) || is_ksm_zero_pte(fw.pte)))
-+				ksm_page = true;
-+			folio_walk_end(&fw, vma);
-+		}
-+
- 		if (!ksm_page)
- 			return 0;
- 		ret = handle_mm_fault(vma, addr,
+> +        * The fast_only parameter indicates that this call should not block,
+> +        * and this function should not cause other MMU notifier calls to
+> +        * block. Usually this means that the implementation should be
+> +        * lockless.
+> +        *
+> +        * When called with fast_only, this notifier will be a no-op unless
+> +        * has_fast_aging is set on the struct mmu_notifier.
+
+"... and will return 0 (NOT young)." ?
+
+> +        *
+> +        * When fast_only is true, if the implementer cannot determine that a
+> +        * range is young without blocking, it should return 0 (i.e.,
+> +        * that the range is NOT young).
+>           */
+>          int (*clear_young)(struct mmu_notifier *subscription,
+>                             struct mm_struct *mm,
+> @@ -118,6 +130,8 @@ struct mmu_notifier_ops {
+>           * the secondary pte. This is used to know if the page is
+>           * frequently used without actually clearing the flag or tearing
+>           * down the secondary mapping on the page.
+> +        *
+> +        * The fast_only parameter has the same meaning as with clear_young.
+>           */
+>          int (*test_young)(struct mmu_notifier *subscription,
+>                            struct mm_struct *mm,
+> 
+> I've also moved the commit that follows this one (the one that adds
+> has_fast_aging) to be before this one so that the comment makes sense.
+
+
+Makes sense, thanks!
+
 -- 
-2.45.2
+Cheers,
+
+David / dhildenb
 
 
