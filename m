@@ -1,75 +1,75 @@
-Return-Path: <kvm+bounces-23025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1950D945CBC
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 13:03:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FC97945D0F
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 13:16:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E8E4B2210D
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 11:03:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C23182814E9
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 11:16:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 205141E2102;
-	Fri,  2 Aug 2024 11:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE1B1DF692;
+	Fri,  2 Aug 2024 11:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gYn7FH84"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fwoudIRm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B544A1DF674
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 11:03:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2991DAC6C
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 11:16:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722596596; cv=none; b=lhJS4TC/jp+3z9cNBftiTxBG+L+NmQSDaRKIVk3kDXv6nQbEn3Oo4wHdJZ6e9nU9PTC6ZGhulvDndov8PHGdNn0hvZlubR7DtBD3tqyrs3DPtC0AznJJxd2WySn1CIDkKcVuYkoiIqck9MyzhIGcPZ6J/Q9tePJR1h7pGaQsH3s=
+	t=1722597376; cv=none; b=OSU5gp5QAXPk572gOpPZ4+KMFATapYl8neWZX04IK12N/c86uTeDH7Q9BBR3oQvFERSx/ex4x2fH1fHy5P7ykXgkh2zGPh+jHwxeYHXILabkJq6je1JtT0e/1BIlNqwJphwkzZGOaXRCNHRUE/8xybeEL6auWKNxbk2L6YraB74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722596596; c=relaxed/simple;
-	bh=f7XccJFQ+QycCZFwHexROwL6oGOM5nxC8z9cehuDsO8=;
+	s=arc-20240116; t=1722597376; c=relaxed/simple;
+	bh=5/L0Yc2Z+AOSOKZw3/Dotf6pZ+cloK9IZVwKZGtH7AE=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LMcdB86hfFZnRqS+/1NotgQtl4MQ0UliADIUwluLww1XYu7AiQ5qHqfFGadtY5N9uyQNGAemVCsvK2oZsr64vAGmEwX6osSt90rzZfpQp7JW83HdmBkNJrprqRKuDjyPnTjSes9B3gJF813Gn5V8Wbk3ooNZOINARCnko5KMh+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gYn7FH84; arc=none smtp.client-ip=209.85.208.51
+	 MIME-Version:Content-Type; b=LH4gza743+B7wbmwWjXpAMEvah1ifrpjdAa6YoQ/8z2z51cX3zBe3iuxZC+orkdoyWSVKFPDvoV60/tRbyW6wlSdHOYy6f3opjhngjuyVPhOjOHAbopiqx9/z5YNGx/+U25Mq2Rov2g1t+fDrmuWrNImJb5rs5W3mVspj31Yy5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fwoudIRm; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5af6a1afa7bso9109880a12.1
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 04:03:14 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a79df5af51so5540978a12.0
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 04:16:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722596593; x=1723201393; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1722597373; x=1723202173; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:references
          :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=f7XccJFQ+QycCZFwHexROwL6oGOM5nxC8z9cehuDsO8=;
-        b=gYn7FH843NJAf4QDXl8odZop6k2I5+dh+FqYxirPuCKtEz4R0FxPXoaYfipO8vpst2
-         MXmDeZ3fKtc88eSGc33VW25WevG+7/u7PNIJjgFQc3CLhspa1y/kl75Vl4NHBIp3JNWe
-         U24wKf9Km5OCrQE13K1FBuAZOVd/xPdAksG+QA+gg3c/d8SeDda/WVTIO59qeChyFfAN
-         OwtFzfj0o6fzHBTEzecDPlmO1J0YsOMvTINTpPPP3Lt2UpZuebsd6Ckzj3dpRYPG4o2e
-         mErnONmBKNV79TB5IWueRsD0TQTZcO8j/FsVSOaxDMD3teaqIJaDuF0Ajyyb7OE/a6mv
-         T0qg==
+        bh=h+a+YbUYnYp2O9o3vDX++ZHVr+zNy81A/L7Ak8HFY0M=;
+        b=fwoudIRmwyCZlvfZAYP55lQcN+bde7o08iQUsXGJ/fUVJ1Tf4MSd9mmhuHU3dSCrX0
+         W3Tau751iP6vRYFZW9yxiV609CXOQ6fzoqnmowcurzv2TWw5tHNLy2Z8r7bsYH/CJG93
+         gi4+fx4KAfHEf4ahly+/x1/RHo+wyHG7H64Pv8TUj17ZApMqNMra+oGnF0xbwewFXfT2
+         tPi1FLl4/+XJhnn81LdxSTjN/SsAK0UbQP5WpGHja82rTztj2E8wE7jAzP5h3xvb57vQ
+         WDCK6fWMywgyF6T5pFcJycbxuICu9UO7uz+hhfBKlzsZTpJHt1WEfpJWzdUSmZdlD0Lv
+         6szw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722596593; x=1723201393;
+        d=1e100.net; s=20230601; t=1722597373; x=1723202173;
         h=content-transfer-encoding:mime-version:message-id:date:references
          :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=f7XccJFQ+QycCZFwHexROwL6oGOM5nxC8z9cehuDsO8=;
-        b=GC0Wr/9Ji9CviAVizceANtrR1XpU+HhpuP82ngsxLwCNuc33uLR3yDhLStC8Hfgiux
-         KCtV24oflnSInB1la2FGC9asyBjyZZjoasxKzDoA73BdU91u9MmFbAB3fJS16vWqEMWf
-         f0WBfIIU4e1IlVF/Cd7zF9THND+CPYyZTLm4lwUG85Xzt/licGhNAaUqmKii9lBFnWZf
-         GTxeRdXhocENbxVY5qf4T+b+E5JYGqVSQoZePL+EAJ63wYxcyKxjnt8w1hsQu+Pp2lkh
-         fTnfpjkVRmIsjytfwKt6yGrarQRsMue4ZvVVApVwIjGDdJzVGj40smGBC2rGV8HIH7Ft
-         13PQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURML9EtTx9scDtr5r1uM/kUkTkODLW6ay4bpk830rW96oWtxJjlDcjF10oG366ruM2JHw+fAKHuMLieFc++2uUBB0V
-X-Gm-Message-State: AOJu0YwmDG5XJFfxeclwPYPcekPmO32JAqgh7DcDlgiUtQjf/NBtUU1d
-	OXRmoZRwi5qVPfE64nbCdNMupQCcqitjFwqNNtcXIympDLFWqjrQqeaLn59uNpM=
-X-Google-Smtp-Source: AGHT+IFGQonexgpZjGUwl51oIYY4w2W/jqJ1zQyOCpk3kJFGs8T5j8dynyIwmzMmmRUPMHGi6NWZlQ==
-X-Received: by 2002:a17:907:7f24:b0:a7d:a29e:5c41 with SMTP id a640c23a62f3a-a7dc5029a1dmr251865166b.40.1722596592689;
-        Fri, 02 Aug 2024 04:03:12 -0700 (PDT)
+        bh=h+a+YbUYnYp2O9o3vDX++ZHVr+zNy81A/L7Ak8HFY0M=;
+        b=mPmHWki4eIwm76tU6vfZc3bj5Pqjn+dRFSn4gGnP+/o0bc+m8ANkGGK2TP5o+YyhX+
+         oDtvZpGWvJ011jzqBEF3k0CcoYFx8zzW/Mp3mKtzW2UelD+QNCyHCBNWODqqnx8MMYeS
+         6jMiGzY6N3NX2hJVsGEalGNoYJyOrZOcedWRV0p4Xi2ur2p7Vyp2zgeiHzvF/KtNJtVN
+         rT+wUmVOQ4QNgPY985DUu2i2J1zRA4HqiH9/B6DHD8dmXX9cnz3KSkSQlfv8hAhhvY3s
+         xaIENl+YwAm0StrHIJ0CfCWNCgvP4X8F2mT0i6Lw21PhEUnenx/ZPAYZcVkXE+h8XUV3
+         u9QQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXKCH+b06rxHKmI3Jpzv5lTwTJkt3UmX0sM7YxJuemKvLAWESFSlzHwzeqcY8sjyq8aMqW9kUpKF1OtiF3lfVe9BOGP
+X-Gm-Message-State: AOJu0YyeVLNQjhGj1noTZdBK+DC+DOWMnaU22ALoHj8f8VUDuVbvqYLD
+	0aTqtep/Fq1EOL+LkcjYcQrf5oAnkE5NyNh1qHo/tC8e0vrdyd2JBLHletD2PEM=
+X-Google-Smtp-Source: AGHT+IHUr2+eigMQMyKiFV2SC/+LcUpbtIeuSXGg+vhEQqD67tJuIK6amWVCFT4RRO+CzEGYIGxtXA==
+X-Received: by 2002:a17:907:25c5:b0:a7a:acae:340b with SMTP id a640c23a62f3a-a7dc628bf8fmr256404766b.31.1722597372903;
+        Fri, 02 Aug 2024 04:16:12 -0700 (PDT)
 Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9e8676fsm84603966b.164.2024.08.02.04.03.12
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9bcb19csm87224666b.42.2024.08.02.04.16.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 04:03:12 -0700 (PDT)
+        Fri, 02 Aug 2024 04:16:08 -0700 (PDT)
 Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 24FEC5F8A9;
-	Fri,  2 Aug 2024 12:03:11 +0100 (BST)
+	by draig.lan (Postfix) with ESMTP id 91DEE5F8A9;
+	Fri,  2 Aug 2024 12:16:04 +0100 (BST)
 From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
 To: Sean Christopherson <seanjc@google.com>
 Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
@@ -86,14 +86,14 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
   kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
   linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
   David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 83/84] KVM: Drop APIs that manipulate "struct page"
- via pfns
-In-Reply-To: <20240726235234.228822-84-seanjc@google.com> (Sean
-	Christopherson's message of "Fri, 26 Jul 2024 16:52:32 -0700")
+Subject: Re: [PATCH v12 11/84] KVM: Rename gfn_to_page_many_atomic() to
+ kvm_prefetch_pages()
+In-Reply-To: <20240726235234.228822-12-seanjc@google.com> (Sean
+	Christopherson's message of "Fri, 26 Jul 2024 16:51:20 -0700")
 References: <20240726235234.228822-1-seanjc@google.com>
-	<20240726235234.228822-84-seanjc@google.com>
-Date: Fri, 02 Aug 2024 12:03:11 +0100
-Message-ID: <87jzgzchlc.fsf@draig.linaro.org>
+	<20240726235234.228822-12-seanjc@google.com>
+Date: Fri, 02 Aug 2024 12:16:04 +0100
+Message-ID: <87frrncgzv.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -105,13 +105,52 @@ Content-Transfer-Encoding: quoted-printable
 
 Sean Christopherson <seanjc@google.com> writes:
 
-> Remove all kvm_{release,set}_pfn_*() APIs not that all users are gone.
+> Rename gfn_to_page_many_atomic() to kvm_prefetch_pages() to try and
+> communicate its true purpose, as the "atomic" aspect is essentially a
+> side effect of the fact that x86 uses the API while holding mmu_lock.
 
-now?
+It's never too late to start adding some kdoc annotations to a function
+and renaming a kvm_host API call seems like a good time to do it.
 
-Otherwise:
+> E.g. even if mmu_lock weren't held, KVM wouldn't want to fault-in pages,
+> as the goal is to opportunistically grab surrounding pages that have
+> already been accessed and/or dirtied by the host, and to do so quickly.
+>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+<snip>
 
-Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
+/**
+ * kvm_prefetch_pages() - opportunistically grab previously accessed pages
+ * @slot: which @kvm_memory_slot the pages are in
+ * @gfn: guest frame
+ * @pages: array to receives page pointers
+ * @nr_pages: number of pages
+ *
+ * Returns the number of pages actually mapped.
+ */
+
+?
+
+>=20=20
+> -int gfn_to_page_many_atomic(struct kvm_memory_slot *slot, gfn_t gfn,
+> -			    struct page **pages, int nr_pages)
+> +int kvm_prefetch_pages(struct kvm_memory_slot *slot, gfn_t gfn,
+> +		       struct page **pages, int nr_pages)
+>  {
+>  	unsigned long addr;
+>  	gfn_t entry =3D 0;
+> @@ -3075,7 +3075,7 @@ int gfn_to_page_many_atomic(struct kvm_memory_slot =
+*slot, gfn_t gfn,
+>=20=20
+>  	return get_user_pages_fast_only(addr, nr_pages, FOLL_WRITE, pages);
+>  }
+> -EXPORT_SYMBOL_GPL(gfn_to_page_many_atomic);
+> +EXPORT_SYMBOL_GPL(kvm_prefetch_pages);
+>=20=20
+>  /*
+>   * Do not use this helper unless you are absolutely certain the gfn _mus=
+t_ be
 
 --=20
 Alex Benn=C3=A9e
