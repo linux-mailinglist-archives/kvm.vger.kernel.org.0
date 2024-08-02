@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-23130-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23131-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9819946443
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:16:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 830DE94644B
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA669B21DC9
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:16:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 049FC1F2285E
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92407535A3;
-	Fri,  2 Aug 2024 20:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DFCA535A3;
+	Fri,  2 Aug 2024 20:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0HY8IUiH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hIQdZ5Dg"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805DC33DF
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 151CB1ABEAB
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:20:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722629794; cv=none; b=uAwCD7uv1+Dqi+5JBkU9mqgnvF80pFwKDU9EY33SbzWuw02tx/TXmPtQPZ/u2JeG2PDZcjyaLMRrtRzOvW9GdGfZEVgZiecG4awVhW/kzNgw5wgrIcVAimqggmA/WNAGEoy3XOY91VDP6l2eVihCqAPJ3EYUskftXgrd0xg8bx8=
+	t=1722630015; cv=none; b=Z1Ff1CeZ4S0YdBHbiyl6aiMY5MOEBpCQ8e4hRzNZHgfyQpMle1o3ygyGvEc0x8cbIrsR7yFDEPMGqqusNBuDoXJocUxYZQz896tlQPeCacr+Y3SYz9ud71dVkwHgb3Uah+91Q9Z7TsCuSYxevcqOiAZj8MsBWJXjgsWWiunaAM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722629794; c=relaxed/simple;
-	bh=TXvdlxOVU7doVd8ZsCfPhM1Ucj5S0xNZ2Rcj/xvqPgc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=U9kxYR1nju1GXF+0bttCZ8Zm9SGGpOk8HB6A1iAp16cDIIIsrHDqNUM+Bncbj/xiWbdOXFGokROyW8M4JSzXr0GSFU4aqj8ymFxidxL0j7Q7klU/evCWTuL6HtfAaGmQkv+kWcEXKaHEfatRgTM/77bW5+GdvjS73Ng21pdvnHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0HY8IUiH; arc=none smtp.client-ip=209.85.210.201
+	s=arc-20240116; t=1722630015; c=relaxed/simple;
+	bh=f5wk1BYE1qFGiIzXiTtgFC/3NOx8IBR69a3l+kDiJQE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gaxMK/Mh/Q3YA5WGXeS7pN9Zv4V+FJVW6Lf1mYLYk3SM0LwuEUFlAxI24Yk80pIuo0MHFykhHiBKg3JH2vqK6oAjN9VTASxQaxLihH9VF/A92T74KQG6Kji2l6KyLwflAKuQL7hMBv+cRzO9mH/unnb0QERnOE2rNw5bwgdZgXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hIQdZ5Dg; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70d1a9bad5dso9164929b3a.0
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:16:33 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-66a8ce9eecfso52485887b3.1
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:20:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722629793; x=1723234593; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722630013; x=1723234813; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=jZQFLav+WlDGG6CozZMcdSkYFx1BmtT+dLZeZWTkJks=;
-        b=0HY8IUiH+anGj05Z1ZKisCJvw9fuBaiTE09x8iDjrZqXj/ReWC626MsvdJ3gnCkXWx
-         +TXRp0cAhlgOnHOHJLXQU32efo104BNZ3OLsaHhADYeUH8UixsOouTuboOZNAqxbR+W8
-         T+kenzNTsa6B2z2kXrFAVbsJU57OvdQGt8AFYL4AzpG3xh5FmjHULYu/NCryDvyk0cKm
-         C9se5OTzTOCDvny+Kg2bH8BGReGw7iAcUAALcu8I6z4wwi70RQUF1J/iqXnzKEUKVvdi
-         Y3RWX0aIeotu5+1+PodLJ+KGETg96z2n4/lXHrJKw1kn4BY5OdvtdoTWPMv92vcjL8M9
-         mK0Q==
+        bh=LiQAcpRKpe7+E/+WMw3cwWwkg0i5rhbg/4mNpxGloLQ=;
+        b=hIQdZ5DgTwFsEo+zmzuY7gNo/0mxExLnCmbm33stD+zokSM9Fk2ZD3+hrfS2CR/74m
+         Kv6fdr6TkvGGQGqtZJbwZPh05k91je1QQF/xfijYF9h5QbpOlp3bPOw/ledwGjL9vVYe
+         Xjrh+VuU1ueOEU1qHvTmuN0X++7karrxqZTqOFjMy4dCh56fJxJ1GAQ0FEwziOl9jQOu
+         izEBJRDKtmdVnGLW3nfyykZEYa2uv7x+RlY4G7kmpXGQ1MisGNq5b3f/iZdonUyJ1fla
+         o7wrURA5ZTY8b8vZo9lZtTrtNnhS9tN4CkFF3yzvf+j9GYIckI9EkF/v7JBXTN4UdXiM
+         loyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722629793; x=1723234593;
+        d=1e100.net; s=20230601; t=1722630013; x=1723234813;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZQFLav+WlDGG6CozZMcdSkYFx1BmtT+dLZeZWTkJks=;
-        b=mRqOFvO7FGmIH36MfmicQ3xFDkMLzcRdVkz2bCnmJ/b+wHLfuK/f0UILXQ+KWbXYXr
-         UH3b9DhZzln0S2frJSpwyVmOgBkSchju+LfJZMadpS73dN6rAHS8WE2H1x3zZ/IVVrth
-         0SnfF1zOY4dK6VhA1zYgYMMj2IRDQS7s7/wUgqOUrbR2StqO3Vvfxl21Y13YsJ2UXtii
-         allOimD8pQ/0JTbbyb582Jbxc1gfOrvYldUAj7lMGkiJnxXgFCBBCpk67D3NqNJn4Tdc
-         VZbV9puzzFmqaOsRPZZb2K1q8NyQ+xDtZ3dxScBWUvokAtulzxlOkeVxloSCY4CPg5pc
-         SyGg==
-X-Gm-Message-State: AOJu0Yyz1rYug9jDIOcZm088pyRl73nRztYz0/rCe/HggIqs772d1UUM
-	JqEkYEl4CPW8Hcua2FumvGQHFDuHFQ71Le7bC4UU0XJXEAn3dx/AUiQUuf6088Y4IrWYvPLdEPH
-	ROQ==
-X-Google-Smtp-Source: AGHT+IFb99jmBNeDqQRBYLcydt+zXBMQx4p/CU8oV2WUABtLxdEGZvp3I6qLVp2sa1B93X8GgzfSYMLoBaw=
+        bh=LiQAcpRKpe7+E/+WMw3cwWwkg0i5rhbg/4mNpxGloLQ=;
+        b=pCTZRMcyTd+HxiMr3EYQtQbDmm7k/pV1CInpC/t0e3+dFZTc+fTlheVsMr5YSul93C
+         eT4t6Ql9v1d2DhPOaenqZvKN+zuCc5MwkR9n9FjXY9xldCqLqy1OnNZ/tfCm4U9cTCGq
+         oPvSvmvjyPYrfK+mUToVfUrC3uVMtsQSugJwDV82KhR6Pa0g3gSkWltgGm5bPad7J6tv
+         w8hj37zmnGLVb4wtoAFVYsRkoOh9DnApxnpOAaXzEQnt7rqpXWD5Vlvtvd4sz3l7Psij
+         PvmP6MwWd+f0KOzj4mCehj/Pvo1V/4Odt9oLI9efvftAYQcNC2EVmH7+0A+1H6CQ7bnG
+         tZ0w==
+X-Gm-Message-State: AOJu0Yw1FIK2NIvRdZu0Gi6tcf0UuAsB/GYL04U37mScbtcKp+QKg3I9
+	VgHqALDCikgI7aOG1N0UFXtrM6IwFlyQ17VO9lfrKcucD5txlyCG5DSotGKlgwBXV2U//z3tiD9
+	Gng==
+X-Google-Smtp-Source: AGHT+IH1+DZ9dslVBjL+N5f3Pd9iBLWduh+TbgNV+/sWoiV+TYiGZGIaviiJqBarqG931ibfyvNy8OtMYe4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:aa7:8e9c:0:b0:70b:a46:7dfa with SMTP id
- d2e1a72fcca58-7106d0a4be6mr112403b3a.5.1722629792616; Fri, 02 Aug 2024
- 13:16:32 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:690c:d82:b0:65b:a403:5ec1 with SMTP id
+ 00721157ae682-68964d4e782mr1368287b3.4.1722630013194; Fri, 02 Aug 2024
+ 13:20:13 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 13:16:30 -0700
+Date: Fri,  2 Aug 2024 13:20:06 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,57 +71,124 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802201630.339306-1-seanjc@google.com>
-Subject: [PATCH] KVM: x86: Use this_cpu_ptr() instead of per_cpu_ptr(smp_processor_id())
+Message-ID: <20240802202006.340854-1-seanjc@google.com>
+Subject: [PATCH v2] KVM: x86/mmu: Clean up function comments for dirty logging APIs
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Isaku Yamahata <isaku.yamahata@intel.com>, Chao Gao <chao.gao@intel.com>, 
-	Yuan Yao <yuan.yao@intel.com>
+	David Matlack <dmatlack@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-From: Isaku Yamahata <isaku.yamahata@intel.com>
+Rework the function comment for kvm_arch_mmu_enable_log_dirty_pt_masked()
+into the body of the function, as it has gotten a bit stale, is harder to
+read without the code context, and is the last source of warnings for W=1
+builds in KVM x86 due to using a kernel-doc comment without documenting
+all parameters.
 
-Use this_cpu_ptr() instead of open coding the equivalent in various
-user return MSR helpers.
+Opportunistically subsume the functions comments for
+kvm_mmu_write_protect_pt_masked() and kvm_mmu_clear_dirty_pt_masked(), as
+there is no value in regurgitating similar information at a higher level,
+and capturing the differences between write-protection and PML-based dirty
+logging is best done in a common location.
 
-Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-Reviewed-by: Chao Gao <chao.gao@intel.com>
-Reviewed-by: Yuan Yao <yuan.yao@intel.com>
-[sean: massage changelog]
+No functional change intended.
+
+Cc: David Matlack <dmatlack@google.com>
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
 
-Not entirely sure where this came from, found it in one of my myriad branches
-while doing "spring" cleaning.
+v2: Put the comments in the function body. [David]
 
- arch/x86/kvm/x86.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+v1: https://lore.kernel.org/all/20240611215805.340664-1-seanjc@google.com
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index af6c8cf6a37a..518baf47ef1c 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -427,8 +427,7 @@ static void kvm_user_return_msr_cpu_online(void)
+ arch/x86/kvm/mmu/mmu.c | 48 +++++++++++++-----------------------------
+ 1 file changed, 15 insertions(+), 33 deletions(-)
+
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 901be9e420a4..45e7e9bd5e76 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -1307,15 +1307,6 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+ 	return flush;
+ }
  
- int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
+-/**
+- * kvm_mmu_write_protect_pt_masked - write protect selected PT level pages
+- * @kvm: kvm instance
+- * @slot: slot to protect
+- * @gfn_offset: start of the BITS_PER_LONG pages we care about
+- * @mask: indicates which pages we should protect
+- *
+- * Used when we do not need to care about huge page mappings.
+- */
+ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 				     struct kvm_memory_slot *slot,
+ 				     gfn_t gfn_offset, unsigned long mask)
+@@ -1339,16 +1330,6 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+ 	}
+ }
+ 
+-/**
+- * kvm_mmu_clear_dirty_pt_masked - clear MMU D-bit for PT level pages, or write
+- * protect the page if the D-bit isn't supported.
+- * @kvm: kvm instance
+- * @slot: slot to clear D-bit
+- * @gfn_offset: start of the BITS_PER_LONG pages we care about
+- * @mask: indicates which pages we should clear D-bit
+- *
+- * Used for PML to re-log the dirty GPAs after userspace querying dirty_bitmap.
+- */
+ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 					 struct kvm_memory_slot *slot,
+ 					 gfn_t gfn_offset, unsigned long mask)
+@@ -1372,24 +1353,16 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+ 	}
+ }
+ 
+-/**
+- * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
+- * PT level pages.
+- *
+- * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
+- * enable dirty logging for them.
+- *
+- * We need to care about huge page mappings: e.g. during dirty logging we may
+- * have such mappings.
+- */
+ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 				struct kvm_memory_slot *slot,
+ 				gfn_t gfn_offset, unsigned long mask)
  {
--	unsigned int cpu = smp_processor_id();
--	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-+	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
- 	int err;
+ 	/*
+-	 * Huge pages are NOT write protected when we start dirty logging in
+-	 * initially-all-set mode; must write protect them here so that they
+-	 * are split to 4K on the first write.
++	 * If the slot was assumed to be "initially all dirty", write-protect
++	 * huge pages to ensure they are split to 4KiB on the first write (KVM
++	 * dirty logs at 4KiB granularity). If eager page splitting is enabled,
++	 * immediately try to split huge pages, e.g. so that vCPUs don't get
++	 * saddled with the cost of splitting.
+ 	 *
+ 	 * The gfn_offset is guaranteed to be aligned to 64, but the base_gfn
+ 	 * of memslot has no such restriction, so the range can cross two large
+@@ -1411,7 +1384,16 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+ 						       PG_LEVEL_2M);
+ 	}
  
- 	value = (value & mask) | (msrs->values[slot].host & ~mask);
-@@ -450,8 +449,7 @@ EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
- 
- static void drop_user_return_notifiers(void)
- {
--	unsigned int cpu = smp_processor_id();
--	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-+	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
- 
- 	if (msrs->registered)
- 		kvm_on_user_return(&msrs->urn);
+-	/* Now handle 4K PTEs.  */
++	/*
++	 * (Re)Enable dirty logging for all 4KiB SPTEs that map the GFNs in
++	 * mask.  If PML is enabled and the and the GFN doesn't need to be
++	 * write-protected for other reasons, e.g. shadow paging, clear the
++	 * Dirty bit.  Otherwise clear the Writable bit.
++	 *
++	 * Note that kvm_mmu_clear_dirty_pt_masked() is called whenever PML is
++	 * enabled but it chooses between clearing the Dirty bit and Writeable
++	 * bit based on the context.
++	 */
+ 	if (kvm_x86_ops.cpu_dirty_log_size)
+ 		kvm_mmu_clear_dirty_pt_masked(kvm, slot, gfn_offset, mask);
+ 	else
 
 base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 -- 
