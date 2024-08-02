@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-23059-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23060-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4C619460FC
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:57:27 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 758F4946102
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:57:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C87481C21592
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:57:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20FBB1F2272A
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B04E20011E;
-	Fri,  2 Aug 2024 15:56:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1622F21C16C;
+	Fri,  2 Aug 2024 15:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OZKeBxdY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OubIpU+N"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF91F1E3CA5
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D519B1E486C
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:56:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722614172; cv=none; b=JBLyZIshX3y4yAH8Z9dGUXLv5hbv0k5i88AgXzL0dBtzz+NAme+xHQQ1eTOtm7EjzyYCk38l7k6IY8UYpo52HdMBI6XfI1Xo8CYegSpCUKuUmShK2JrsTzcbPUY0b46roSHof0Lu88nRe78CxT8TjWKcaAvzZiYwOi2um/qpYCo=
+	t=1722614176; cv=none; b=Jl/KHbbSTEXiQ7Am1cS73Odv9Mzxz3zR3m/lwvbPRgC3j140Msxiz2amRS9sbxuN4btZwiOmt/AEEMArVUFVHR8aisGu+DQPa9mXvpPkaQeonFxTaIWyEdQO7jOTje0AAS+f70f3gO9qFUvUyWAiaxRjP2FFKoGTYTdtU34uTCU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722614172; c=relaxed/simple;
-	bh=0PHdseon7tXgt7KnjM1V2dOzESCD71xZm07JeIYRqCY=;
+	s=arc-20240116; t=1722614176; c=relaxed/simple;
+	bh=P92AymmJj/Ft8pl2A+91m7BSNQa3s/9+AJd/Q8AkboU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IbHh3KXThaE5UnLS8LZhgHwYhuhVX7GZyruaj56BnM8j/TZEF4m/2lmmyun8Iqe75qDTV1gn6MHpJ5s37UudVNKLoCL8b9EkRaMknH/LO3KIAk6tyPRQX7NwIayCgeluJqsagE/6P3ZA/lb/+fisXH2paHhx5feum2Wkt5t3liQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OZKeBxdY; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=G7OK6gt9CI/qKCUFQ+9V1jhTm3ymEyoGjbsdAFXySCwlM3Jy7Yn/olKjLO0B0c3hyPES9QSvCA0GYBtkY4N2gKbaP3+16/bgrHOvNjUIK9gfcge75TkgfbmYEdHYW0iv+9KXEsLwowdXVzRJiFEfix6JDWNo7r5RhNKdKBRboVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OubIpU+N; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722614168;
+	s=mimecast20190719; t=1722614174;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=WGUlr9yCrIjZfp2Jios2/QtrJcjV6+nMbt6NumQJE9A=;
-	b=OZKeBxdYIflPsUSvPtMo03AmuvdX1xJgfM7uJQURD2afWlncALCdKkdjfIEQp6Q72iDPeM
-	GNvIRlsbe0M4IzvlXypjwwbggFB+UFS0c4biMQJMSnpoUO8Y+6t+oVdd0d5izUv7TIJwzf
-	Fy86vLvLO7zn2cSFO2iO16YhBhG+1/c=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=Dsokb2QZ1A8J7FAYTpU1vDg99kVkubfGaPDc1WAA3q4=;
+	b=OubIpU+NhCmv6kWJXFG8SkcZ52HY1WtLa9Sh+cdgbI9vntamICNshmtNgdrMw0WXG1SAVb
+	0lT7FCOD+enmN4xzYXtBJeqk6tXnVFlLZ14gmlYHl6yCkALd3wsmhGcl4CW6eWKhwn7rbP
+	R8CGFIsmc6Qmuko9WC6fzXHnZz8X1Kw=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-8-GL6qdjBaOLKZo_tI8pVNMA-1; Fri,
- 02 Aug 2024 11:56:03 -0400
-X-MC-Unique: GL6qdjBaOLKZo_tI8pVNMA-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-318-NNjgzyEROca_nRik9KEcaw-1; Fri,
+ 02 Aug 2024 11:56:08 -0400
+X-MC-Unique: NNjgzyEROca_nRik9KEcaw-1
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9722A1955D4D;
-	Fri,  2 Aug 2024 15:55:59 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4CD5B19560B1;
+	Fri,  2 Aug 2024 15:56:06 +0000 (UTC)
 Received: from t14s.redhat.com (unknown [10.39.192.113])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 863C5300018D;
-	Fri,  2 Aug 2024 15:55:53 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 241AD300018D;
+	Fri,  2 Aug 2024 15:55:59 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -75,9 +75,9 @@ Cc: linux-mm@kvack.org,
 	Alexander Gordeev <agordeev@linux.ibm.com>,
 	Sven Schnelle <svens@linux.ibm.com>,
 	Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-Subject: [PATCH v1 04/11] mm/migrate: convert add_page_for_migration() from follow_page() to folio_walk
-Date: Fri,  2 Aug 2024 17:55:17 +0200
-Message-ID: <20240802155524.517137-5-david@redhat.com>
+Subject: [PATCH v1 05/11] mm/ksm: convert get_mergeable_page() from follow_page() to folio_walk
+Date: Fri,  2 Aug 2024 17:55:18 +0200
+Message-ID: <20240802155524.517137-6-david@redhat.com>
 In-Reply-To: <20240802155524.517137-1-david@redhat.com>
 References: <20240802155524.517137-1-david@redhat.com>
 Precedence: bulk
@@ -89,179 +89,64 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Let's use folio_walk instead, so we can avoid taking a folio reference
-when we won't even be trying to migrate the folio and to get rid of
-another follow_page()/FOLL_DUMP user. Use FW_ZEROPAGE so we can return
-"-EFAULT" for it as documented.
+Let's use folio_walk instead, for example avoiding taking temporary
+folio references if the folio does not even apply and getting rid of
+one more follow_page() user.
 
-We now perform the folio_likely_mapped_shared() check under PTL, which
-is what we want: relying on the mapcount and friends after dropping the
-PTL does not make too much sense, as the page can get unmapped
-concurrently from this process.
-
-Further, we perform the folio isolation under PTL, similar to how we
-handle it for MADV_PAGEOUT.
-
-The possible return values for follow_page() were confusing, especially
-with FOLL_DUMP set. We'll handle it like documented in the man page:
- * -EFAULT: This is a zero page or the memory area is not mapped by the
-    process.
- * -ENOENT: The page is not present.
-
-We'll keep setting -ENOENT for ZONE_DEVICE. Maybe not the right thing to
-do, but it likely doesn't really matter (just like for weird devmap,
-whereby we fake "not present").
-
-The other errros are left as is, and match the documentation in the man
-page.
-
-While at it, rename add_page_for_migration() to
-add_folio_for_migration().
-
-We'll lose the "secretmem" check, but that shouldn't really matter
-because these folios cannot ever be migrated. Should vma_migratable()
-refuse these VMAs? Maybe.
+Note that zeropages obviously don't apply: old code could just have
+specified FOLL_DUMP. Anon folios are never secretmem, so we don't care
+about losing the check in follow_page().
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- mm/migrate.c | 100 +++++++++++++++++++++++----------------------------
- 1 file changed, 45 insertions(+), 55 deletions(-)
+ mm/ksm.c | 26 ++++++++++++++------------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-diff --git a/mm/migrate.c b/mm/migrate.c
-index b5365a434ba9..e1383d9cc944 100644
---- a/mm/migrate.c
-+++ b/mm/migrate.c
-@@ -2112,76 +2112,66 @@ static int do_move_pages_to_node(struct list_head *pagelist, int node)
- 	return err;
- }
- 
-+static int __add_folio_for_migration(struct folio *folio, int node,
-+		struct list_head *pagelist, bool migrate_all)
-+{
-+	if (is_zero_folio(folio) || is_huge_zero_folio(folio))
-+		return -EFAULT;
-+
-+	if (folio_is_zone_device(folio))
-+		return -ENOENT;
-+
-+	if (folio_nid(folio) == node)
-+		return 0;
-+
-+	if (folio_likely_mapped_shared(folio) && !migrate_all)
-+		return -EACCES;
-+
-+	if (folio_test_hugetlb(folio)) {
-+		if (isolate_hugetlb(folio, pagelist))
-+			return 1;
-+	} else if (folio_isolate_lru(folio)) {
-+		list_add_tail(&folio->lru, pagelist);
-+		node_stat_mod_folio(folio,
-+			NR_ISOLATED_ANON + folio_is_file_lru(folio),
-+			folio_nr_pages(folio));
-+		return 1;
-+	}
-+	return -EBUSY;
-+}
-+
- /*
-- * Resolves the given address to a struct page, isolates it from the LRU and
-+ * Resolves the given address to a struct folio, isolates it from the LRU and
-  * puts it to the given pagelist.
-  * Returns:
-- *     errno - if the page cannot be found/isolated
-+ *     errno - if the folio cannot be found/isolated
-  *     0 - when it doesn't have to be migrated because it is already on the
-  *         target node
-  *     1 - when it has been queued
-  */
--static int add_page_for_migration(struct mm_struct *mm, const void __user *p,
-+static int add_folio_for_migration(struct mm_struct *mm, const void __user *p,
- 		int node, struct list_head *pagelist, bool migrate_all)
- {
+diff --git a/mm/ksm.c b/mm/ksm.c
+index 14d9e53b1ec2..742b005f3f77 100644
+--- a/mm/ksm.c
++++ b/mm/ksm.c
+@@ -767,26 +767,28 @@ static struct page *get_mergeable_page(struct ksm_rmap_item *rmap_item)
+ 	struct mm_struct *mm = rmap_item->mm;
+ 	unsigned long addr = rmap_item->address;
  	struct vm_area_struct *vma;
--	unsigned long addr;
 -	struct page *page;
++	struct page *page = NULL;
 +	struct folio_walk fw;
- 	struct folio *folio;
--	int err;
-+	unsigned long addr;
-+	int err = -EFAULT;
++	struct folio *folio;
  
  	mmap_read_lock(mm);
- 	addr = (unsigned long)untagged_addr_remote(mm, p);
+ 	vma = find_mergeable_vma(mm, addr);
+ 	if (!vma)
+ 		goto out;
  
--	err = -EFAULT;
- 	vma = vma_lookup(mm, addr);
--	if (!vma || !vma_migratable(vma))
+-	page = follow_page(vma, addr, FOLL_GET);
+-	if (IS_ERR_OR_NULL(page))
 -		goto out;
--
--	/* FOLL_DUMP to ignore special (like zero) pages */
--	page = follow_page(vma, addr, FOLL_GET | FOLL_DUMP);
--
--	err = PTR_ERR(page);
--	if (IS_ERR(page))
--		goto out;
--
--	err = -ENOENT;
--	if (!page)
--		goto out;
--
--	folio = page_folio(page);
--	if (folio_is_zone_device(folio))
--		goto out_putfolio;
--
--	err = 0;
--	if (folio_nid(folio) == node)
--		goto out_putfolio;
--
--	err = -EACCES;
--	if (folio_likely_mapped_shared(folio) && !migrate_all)
--		goto out_putfolio;
--
--	err = -EBUSY;
--	if (folio_test_hugetlb(folio)) {
--		if (isolate_hugetlb(folio, pagelist))
--			err = 1;
--	} else {
--		if (!folio_isolate_lru(folio))
--			goto out_putfolio;
--
--		err = 1;
--		list_add_tail(&folio->lru, pagelist);
--		node_stat_mod_folio(folio,
--			NR_ISOLATED_ANON + folio_is_file_lru(folio),
--			folio_nr_pages(folio));
-+	if (vma && vma_migratable(vma)) {
-+		folio = folio_walk_start(&fw, vma, addr, FW_ZEROPAGE);
-+		if (folio) {
-+			err = __add_folio_for_migration(folio, node, pagelist,
-+							migrate_all);
-+			folio_walk_end(&fw, vma);
-+		} else {
-+			err = -ENOENT;
+-	if (is_zone_device_page(page))
+-		goto out_putpage;
+-	if (PageAnon(page)) {
++	folio = folio_walk_start(&fw, vma, addr, 0);
++	if (folio) {
++		if (!folio_is_zone_device(folio) &&
++		    folio_test_anon(folio)) {
++			folio_get(folio);
++			page = fw.page;
 +		}
- 	}
--out_putfolio:
--	/*
--	 * Either remove the duplicate refcount from folio_isolate_lru()
--	 * or drop the folio ref if it was not isolated.
--	 */
--	folio_put(folio);
++		folio_walk_end(&fw, vma);
++	}
++out:
++	if (page) {
+ 		flush_anon_page(vma, page, addr);
+ 		flush_dcache_page(page);
+-	} else {
+-out_putpage:
+-		put_page(page);
 -out:
+-		page = NULL;
+ 	}
  	mmap_read_unlock(mm);
- 	return err;
- }
-@@ -2275,8 +2265,8 @@ static int do_pages_move(struct mm_struct *mm, nodemask_t task_nodes,
- 		 * Errors in the page lookup or isolation are not fatal and we simply
- 		 * report them via status
- 		 */
--		err = add_page_for_migration(mm, p, current_node, &pagelist,
--					     flags & MPOL_MF_MOVE_ALL);
-+		err = add_folio_for_migration(mm, p, current_node, &pagelist,
-+					      flags & MPOL_MF_MOVE_ALL);
- 
- 		if (err > 0) {
- 			/* The page is successfully queued for migration */
+ 	return page;
 -- 
 2.45.2
 
