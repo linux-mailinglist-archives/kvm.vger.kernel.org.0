@@ -1,158 +1,125 @@
-Return-Path: <kvm+bounces-23087-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23088-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C51569462E9
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:19:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C77EA9462EB
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:20:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85BAF282C97
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:19:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 888731F21D85
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E2515C156;
-	Fri,  2 Aug 2024 18:19:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E88165F1D;
+	Fri,  2 Aug 2024 18:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SezKx380"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hiqnT3b/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205CE1AE05A
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 18:19:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A6015C128
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 18:19:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722622780; cv=none; b=HSx13GJ2+o0OsqGIowI47QXMW0XuXwDh+AgLOPsL0VFvFKl8MI0+nJQxkg71ljr1B0iv8CY4zBJ3gnJhmtXpw4hq8vz63M8tDT09UJiPDHiomtRSI3k+f796ffmtAWKPsIYoK0i3F7ODJcn0hTSmGzdHthbj5Eucl58mTjZK5QY=
+	t=1722622782; cv=none; b=Edr7fz0aX5841GzmGzcJIZ05cLuvanckawoEJqUcOzF0gd1oVC3YkDO3h8dhSxKt+lLZhM31KHwEzv7hFAWlDXItwHqw6/vbM4Twlxxznd2xnuwT9EaF5XiCRWuKm7JZswiuaO9YsePeYp7CbaFwspStAyA+Zlxq6j9qS597VBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722622780; c=relaxed/simple;
-	bh=g5DCrivJfscGQJsAj/olVwFg1c/ACZKfEBkGsjkZnpE=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=H6eZHwhRAV7u3D0Or9nswZdrY27Mtl10ugQKKRsa1NlRMdPL0094CYUNExraDtFb8Do454fHWW7xmSIpBDRmGWNMC0yu2JbL5jcyfif0YRh6WmlbrT7SKHFJiPgR3xX0IFBj/zTeUOSE9+C8ScxcorQitAygU3MsqdafJKyhexA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SezKx380; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1722622782; c=relaxed/simple;
+	bh=PqAkbeX46Q/uqruzqqUfbvSnJ64882JvtNzQyytCBAs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=c/hdSN9cw05brZM5ev9aNnkrGjC+HgscOk+4YvIewLa7Ss7tJ/PqBU5rVstmnNMJOsvIqJiyHaGuYNc4wB7XCyMbGqx/ORNCNtc8YsQK3RzBtjUOOxhCDR8wh/+XXZBh8GtSRdNSXNNoH1KOI8L8PcHt49046htXsV2iXZs99lM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hiqnT3b/; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fee7c9e4a4so67538255ad.2
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 11:19:38 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb685d5987so10451462a91.2
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 11:19:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722622778; x=1723227578; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p99bB6rFk1E0Qk5WCBmO4dKzx4FN/Po7pdDDEwtD+VA=;
-        b=SezKx380CFxSjnP+JQGFwTHEx8hQ5WGfPaTxm/bFLfJckCy98o5wrkW2CC1c0YXOUX
-         lEA3xYgh+qzrNY0MdA2kBos9g1OouxRf5wx2J9Rggm0N8R2rwMd6WipADj79/+SOtY14
-         RgqfPxCwMRtgl826X1Q1mpPTj7PIatP8lffOmhqZkvaBEdsleOqTeRC8o1qQaVh3ikmi
-         LnHOJ6N89C8VbnXFctsLX3i37vJtAaR+9gQO1DsoPAf96+V0nJYg393FCslY8jBT8HMc
-         gCW12UTNfBP0CNF6c4So6oM5AWM00QHsu7fZSY7K2XF3Dkp33qscqDCuYB2jJSL5WHKd
-         vW+Q==
+        d=google.com; s=20230601; t=1722622780; x=1723227580; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=jQvD2XFUOoXKh/qvHzE0oWtyWzaKX7emTzrWlGmUYVU=;
+        b=hiqnT3b//4qEz60ZslEs2FYz1j2vX05lU6bI4eOSCbB608l5M2wq9W9cY1Ggi9Nexl
+         2B6XQvhIEgfF7Mq86iWVM2zNmfhvHUF4b6D2C7cViz4tRFuLm/d6/Zo928TXsCztE0ol
+         b2Hc5T6XGaXKbr/lVb9TDca8tpq3v6pIWuKawRmdPsLl5WUlvscmPuFjjKDAF2XNAYJl
+         MTJjUe1Hqd2X+SepUWGtuSCg1PhDvH0VzDBKRYeGYxpACX8apFYIbKmt2j/pr3N7nNiH
+         naFJeCeriNxNg8DedqBgx/x7jSiA7EqZDYQffQAnAankoNhUl/zlb0NPiCvot9H6x0mS
+         wy7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722622778; x=1723227578;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=p99bB6rFk1E0Qk5WCBmO4dKzx4FN/Po7pdDDEwtD+VA=;
-        b=dd5IJTQ/v0YAaTbFIUcz6Ia/GeYW+2IIeCZOQqWp3bNuvXAN/Hra/DBZyvqepgVoi7
-         9CiSajIa6iMX5xBdWgRoz4XUZcwPz3KZMZ5z+GwPpn20ak0FepbwCI5GmNCn50+kYfqS
-         uySwkF2pREmofdQf0tJSAygCy/6JqiBgQ0WPWJ02jhuJbbi5RREmQ43oPzoGpMSNEOMT
-         hg7hgAEA8rxBYVe4ZX+1MvWfBo51rvJvVrRiMb58knM76CFaXNLCvWF0OWB/B1lCNRra
-         fg2omDUuaujN1dL+NgbgBe6zOyA9A67raWPLnm1+pCFjk5pRqmCChE1jvHW/GTfWGWWo
-         vyaA==
-X-Gm-Message-State: AOJu0Yw+AWUDi3CfXajOF0wfHy1WoLzEkHm1v6/8X80BwvJjoATEAGAN
-	KJP/20d4KzvHZLQPlM39EDJoYKOuLrfOERdRTsr2DAxMB1sIZxEpszIfgGIgrn45v9PBROKOGx3
-	uvQ==
-X-Google-Smtp-Source: AGHT+IFoscLe03nTUDGGcFRuyJrRv6kdtTJblF4kSXqKij8H2j5hOlnaVhA/9ziRv3whGQXlfznLCmHN+sM=
+        d=1e100.net; s=20230601; t=1722622780; x=1723227580;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jQvD2XFUOoXKh/qvHzE0oWtyWzaKX7emTzrWlGmUYVU=;
+        b=Ny2yb/PSEIs3sk/6CQMZRpXqgUBvZxw9NoluiEiIk7K4+dLf2x5pnwbdhlJm379GUq
+         VEUYoZhVzXtc0X4NnCbELJg4GsqgvmUn/jsWuFTfMokKiD9TQjCJ3sphARTWFCRCDaYN
+         LTxw07+YOcpdorhmp/hJ1hk5Mk3+mlx202nUWTqYfzHumjCiFoe+xyqxIYde7H5L3lpR
+         rpuIBcXrSEJiPyb2khyNUgrou5GF6B/IT+jPx+GXi0qnt2RmgGdh4hc9NN35T4Cy/3lg
+         nyLv3TREruDXvbNpUsWpp40baYpcW1Lq2h64R4hOeDX0Q3kX+Cdsv793GWrPkJ7d4s4p
+         Solw==
+X-Gm-Message-State: AOJu0YyIh1d+DVyIRfDyQqfjAvot+h78CZuzoYidYeuBFm7g1yz9bQoa
+	UMlBjXyCvGv8wva2WPGxsFfkci66Z+n/2oEzoNAZ30nfmfvPZFF7sFOsyq+C40RvTT1CN8dTkc/
+	zTw==
+X-Google-Smtp-Source: AGHT+IG6uu1lx5JAUSYw/bNj45a08OL8ZJ97prbP8I5rSjynR6V2S9qofwrzh1JA+MVBjXVGnS3x1i7++1I=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:244b:b0:1fb:80c5:ce5d with SMTP id
- d9443c01a7336-1ff572749dfmr1929745ad.4.1722622778205; Fri, 02 Aug 2024
- 11:19:38 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90b:2354:b0:2c9:7fb8:ef1d with SMTP id
+ 98e67ed59e1d1-2cff952b45fmr67521a91.6.1722622780012; Fri, 02 Aug 2024
+ 11:19:40 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 11:19:25 -0700
+Date: Fri,  2 Aug 2024 11:19:26 -0700
+In-Reply-To: <20240802181935.292540-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240802181935.292540-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802181935.292540-1-seanjc@google.com>
-Subject: [PATCH v2 00/10] KVM: x86: Clean up MSR access/failure handling
+Message-ID: <20240802181935.292540-2-seanjc@google.com>
+Subject: [PATCH v2 01/10] KVM: SVM: Disallow guest from changing userspace's
+ MSR_AMD64_DE_CFG value
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Tom Lendacky <thomas.lendacky@amd.com>, Weijiang Yang <weijiang.yang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Rework KVM's MSR access handling, and more specific the handling of failures,
-to begin the march towards removing host_initiated exemptions for CPUID
-checks, e.g. to eventually turn code like this:
+Inject a #GP if the guest attempts to change MSR_AMD64_DE_CFG from its
+*current* value, not if the guest attempts to write a value other than
+KVM's set of supported bits.  As per the comment and the changelog of the
+original code, the intent is to effectively make MSR_AMD64_DE_CFG read-
+only for the guest.
 
-		if (!msr_info->host_initiated &&
-		    !guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
-			return 1;
+Opportunistically use a more conventional equality check instead of an
+exclusive-OR check to detect attempts to change bits.
 
-into
+Fixes: d1d93fa90f1a ("KVM: SVM: Add MSR-based feature support for serializing LFENCE")
+Cc: Tom Lendacky <thomas.lendacky@amd.com>
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/svm/svm.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-		if (!guest_cpuid_has(vcpu, X86_FEATURE_XSAVES))
-			return KVM_MSR_RET_UNSUPPORTED;
-
-For all intents and purposes, KVM already requires setting guest CPUID before
-setting MSRs, as there are multiple MSR flows that simply cannot work if CPUID
-isn't in place.
-
-But because KVM's ABI is that userspace is allowed to save/restore MSRs that
-are advertised to usersepace regardless of the vCPU CPUID model, KVM has ended
-up with code like the above where KVM unconditionally allows host accesses.
-
-The idea here is to funnel all MSR accesses through a single helper so that
-KVM can make the "host_initiated" exception in a single location based on
-KVM_MSR_RET_UNSUPPORTED, i.e. so that KVM doesn't need one-off checks for every
-MSR, which is especially problematic for CET where a Venn diagram is needed to
-map CET MSR existence to CPUID feature bits.
-
-This series doesn't actually remove the existing host_initiated checks.  I
-*really* wanted to do that here, but removing all the existing checks is
-non-trivial and has a high chance of subtly breaking userspace.  I still want
-to eventually get there, but it needs to be a slower, more thoughtful process.
-
-For now, the goal is to allow new features to omit the host_initiated checks
-without creating a weird userspace ABI, e.g to simplify the aforementioned CET
-support.
-
-v2:
- - Rebase (really the only reason I posted v2).
- - Collect reviews. [Weijiang]
-
-v1:
- - https://lore.kernel.org/all/20240425181422.3250947-1-seanjc@google.com
-
-Sean Christopherson (10):
-  KVM: SVM: Disallow guest from changing userspace's MSR_AMD64_DE_CFG
-    value
-  KVM: x86: Move MSR_TYPE_{R,W,RW} values from VMX to x86, as enums
-  KVM: x86: Rename KVM_MSR_RET_INVALID to KVM_MSR_RET_UNSUPPORTED
-  KVM: x86: Refactor kvm_x86_ops.get_msr_feature() to avoid
-    kvm_msr_entry
-  KVM: x86: Rename get_msr_feature() APIs to get_feature_msr()
-  KVM: x86: Refactor kvm_get_feature_msr() to avoid struct kvm_msr_entry
-  KVM: x86: Funnel all fancy MSR return value handling into a common
-    helper
-  KVM: x86: Hoist x86.c's global msr_* variables up above
-    kvm_do_msr_access()
-  KVM: x86: Suppress failures on userspace access to advertised,
-    unsupported MSRs
-  KVM: x86: Suppress userspace access failures on unsupported,
-    "emulated" MSRs
-
- arch/x86/include/asm/kvm-x86-ops.h |   2 +-
- arch/x86/include/asm/kvm_host.h    |   2 +-
- arch/x86/kvm/svm/svm.c             |  29 +-
- arch/x86/kvm/vmx/main.c            |   2 +-
- arch/x86/kvm/vmx/vmx.c             |   8 +-
- arch/x86/kvm/vmx/vmx.h             |   4 -
- arch/x86/kvm/vmx/x86_ops.h         |   2 +-
- arch/x86/kvm/x86.c                 | 513 ++++++++++++++---------------
- arch/x86/kvm/x86.h                 |  21 +-
- 9 files changed, 294 insertions(+), 289 deletions(-)
-
-
-base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index c115d26844f7..550ead197543 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -3189,8 +3189,13 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
+ 		if (data & ~msr_entry.data)
+ 			return 1;
+ 
+-		/* Don't allow the guest to change a bit, #GP */
+-		if (!msr->host_initiated && (data ^ msr_entry.data))
++		/*
++		 * Don't let the guest change the host-programmed value.  The
++		 * MSR is very model specific, i.e. contains multiple bits that
++		 * are completely unknown to KVM, and the one bit known to KVM
++		 * is simply a reflection of hardware capatibilies.
++		 */
++		if (!msr->host_initiated && data != svm->msr_decfg)
+ 			return 1;
+ 
+ 		svm->msr_decfg = data;
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
