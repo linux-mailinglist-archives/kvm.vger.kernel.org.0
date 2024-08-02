@@ -1,147 +1,149 @@
-Return-Path: <kvm+bounces-23035-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23036-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F00D945DDC
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 14:38:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9B5E945DF3
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 14:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 132DEB22405
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 12:38:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB34A1C21F23
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 12:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE841E3CC6;
-	Fri,  2 Aug 2024 12:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44E1E1E3CC4;
+	Fri,  2 Aug 2024 12:40:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="EZAy3bMq"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fk1du2fL"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 170FF4C62A;
-	Fri,  2 Aug 2024 12:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 244561E3CA8;
+	Fri,  2 Aug 2024 12:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722602314; cv=none; b=UUbK/DRSEq0RM6HXNXNhY/1kg37m0t8J9k6ETJRwBMd0HPzeU3D4erioDMPxRYQ85fbnLVn9YKoFsdl3J0Jf+azvCm9+bL0SltJpuguzKzrdrTPiMQ3SBJngI6ueLoQKJJEmgl5sgIQY3jTDBFGBaPzGU4F6ZzM8+ch/te/AjAA=
+	t=1722602428; cv=none; b=d3WqMmbta5+BdUmL7VtfvcSAa1RDtUhZ/gAmwLZKhxAqWs8cgXeG8SdCwreH9VYJVfc/WP6RZ9D0E+VAgakJ2QOAWx3CKqxKGWmxnr0B0hPyavR0CSPV7l2UBoeHa06l8SUw4kP9NJkewuouU1q1d3vY8S+DNnLnRniVtFXex4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722602314; c=relaxed/simple;
-	bh=t71yf5KI3pImrAkxMTmygMtLIymhmLlch0j+/T2K0I4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oEMq6H89RlZxaS6cUC8/FvPYfunzvzBE3sJFU6jWCqLHsmKPQKjiCzoqT8Kmb2uMNOpCfDhbGjYVwdcq6EVBse52Ggk0751LaaTp7E5gB2RDr6jaotWvQq7VmMjaFai2yu9t7D9guF8LP1l0p9WPxcNgb7+/tIaJzcrx2ffXlB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=EZAy3bMq; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=In-Reply-To:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=a2xbx+l3XorIuUZYCisP3R92j0F82O08k/og0JN1IR0=; b=EZAy3bMqVSECnfwHSQ4Wu0uA6q
-	xV0U4klQWNuJ8HJ4o4DJkHV3i7ZQsgJzvcTdomKwrDwjn2GkObh0pkOu11soxlKpqx3InSYdzUbc0
-	ay5YHfmCZSZVuNqcUWBfSyaERGbgEEv9Y0OP0F+J/u9qUNLsx0s0lbOJ+Eid1eps6v7xkgmH391Wf
-	7jj0j+l+ntzSByqfmqqT5rPB86spd7D5USB8d2viqfuVLFIjZPjBEl6A+dfhYSBgbNQHt+wf8/CUr
-	OcEacAF/XFzMHrzu6dMueYEpjoGdsB4A3yrtFZhRuc55k4AWNoeJ8WDkP4MEx5zI/ZkyBkz5cJ2mH
-	vBWBeFXA==;
-Received: from willy by casper.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sZrY3-0000000112T-0NMz;
-	Fri, 02 Aug 2024 12:38:19 +0000
-Date: Fri, 2 Aug 2024 13:38:18 +0100
-From: Matthew Wilcox <willy@infradead.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Carsten Stollmaier <stollmc@amazon.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, nh-open-source@amazon.com,
-	Peter Xu <peterx@redhat.com>,
-	Sebastian Biemueller <sbiemue@amazon.de>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>,
-	Andrea Arcangeli <aarcange@redhat.com>
-Subject: Re: [PATCH] KVM: x86: Use gfn_to_pfn_cache for steal_time
-Message-ID: <ZqzTOvyKRI0qzwCT@casper.infradead.org>
-References: <20240802114402.96669-1-stollmc@amazon.com>
- <b40f244f50ce3a14d637fd1769a9b3f709b0842e.camel@infradead.org>
+	s=arc-20240116; t=1722602428; c=relaxed/simple;
+	bh=U8MMlzk89Z3SW73G9T94CJ47z505jMvWq8xQMCAPf74=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PdgfLzREnAsji3ZnJibFN1z9e544A0yaqPZEOR/3q4/6J8+PiL+X3iEs6hBjDzJJP+m3dPsbBZ4pq6mT/oUdkV4fMO/jaHtpprFIbUFbY45ELt12Diie8H6dCosPfIlPhfGuOXfD5HHQScEb9vQXNKJgmR/JI92Lb2glafEIdpE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fk1du2fL; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 472ASgnQ012379;
+	Fri, 2 Aug 2024 12:40:25 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=T
+	avorW6hh6S+jBvUAKi6eOdaXlh3TmdakA8/GiObTws=; b=fk1du2fLS4vIMIAGm
+	bEmMAEfbRlkGOnmdX/4zFqQE0wGjVG8q5BWE8I5VhHqYfwSpPxjl3ufdJDVPCv84
+	LA7SpJJ73HMjLxayhmhw2DfTsYjSmwCJrNcBEvwsP8Z7gdImrmQUm539gMfrx2Ir
+	t+8VxXYQ3JLNr53E5WPwIOY14ywvpTctCPCc0qU3GzLHxVjOoZCqwuJb99Q/Q9eS
+	EDHJ7q1km3QTsh6cGZu7aH+/5JZdTWOQYkhL7HFkHjXQl/iR0l8udqnp9+/HOqKI
+	YQjy7ZVlnBtqF2RL6fS+LGo33WWfk0rMj+Akdku/BZXbik5uNL0WW2PpDGlN8XBA
+	Ef3hA==
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40rwqw88m3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 02 Aug 2024 12:40:25 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 472A02NZ007682;
+	Fri, 2 Aug 2024 12:40:24 GMT
+Received: from smtprelay01.wdc07v.mail.ibm.com ([172.16.1.68])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40nb7uqfpk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 02 Aug 2024 12:40:24 +0000
+Received: from smtpav05.wdc07v.mail.ibm.com (smtpav05.wdc07v.mail.ibm.com [10.39.53.232])
+	by smtprelay01.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 472CeKs946530898
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 2 Aug 2024 12:40:22 GMT
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D509758059;
+	Fri,  2 Aug 2024 12:40:20 +0000 (GMT)
+Received: from smtpav05.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B80FD58043;
+	Fri,  2 Aug 2024 12:40:18 +0000 (GMT)
+Received: from [9.179.14.7] (unknown [9.179.14.7])
+	by smtpav05.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  2 Aug 2024 12:40:18 +0000 (GMT)
+Message-ID: <4d5d5368-88c1-4eff-b0fa-8b0e47957b89@linux.ibm.com>
+Date: Fri, 2 Aug 2024 14:40:17 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b40f244f50ce3a14d637fd1769a9b3f709b0842e.camel@infradead.org>
-
-On Fri, Aug 02, 2024 at 01:03:16PM +0100, David Woodhouse wrote:
-> On Fri, 2024-08-02 at 11:44 +0000, Carsten Stollmaier wrote:
-> > handle_userfault uses TASK_INTERRUPTIBLE, so it is interruptible by
-> > signals. do_user_addr_fault then busy-retries it if the pending signal
-> > is non-fatal. This leads to contention of the mmap_lock.
-
-Why does handle_userfault use TASK_INTERRUPTIBLE?  We really don't
-want to stop handling a page fault just because somebody resized a
-window or a timer went off.  TASK_KILLABLE, sure.
-
-This goes all the way back to Andreas' terse "add new syscall"
-patch, so there's no justification for it in the commit logs.
-
-> The busy-loop causes so much contention on mmap_lock that post-copy
-> live migration fails to make progress, and is leading to failures. Yes?
-> 
-> > This patch replaces the use of gfn_to_hva_cache with gfn_to_pfn_cache,
-> > as gfn_to_pfn_cache ensures page presence for the memory access,
-> > preventing the contention of the mmap_lock.
-> > 
-> > Signed-off-by: Carsten Stollmaier <stollmc@amazon.com>
-> 
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> I think this makes sense on its own, as it addresses the specific case
-> where KVM is *likely* to be touching a userfaulted (guest) page. And it
-> allows us to ditch yet another explicit asm exception handler.
-> 
-> We should note, though, that in terms of the original problem described
-> above, it's a bit of a workaround. It just means that by using
-> kvm_gpc_refresh() to obtain the user page, we end up in
-> handle_userfault() without the FAULT_FLAG_INTERRUPTIBLE flag.
-> 
-> (Note to self: should kvm_gpc_refresh() take fault flags, to allow
-> interruptible and killable modes to be selected by its caller?)
-> 
-> 
-> An alternative workaround (which perhaps we should *also* consider)
-> looked like this (plus some suitable code comment, of course):
-> 
-> --- a/arch/x86/mm/fault.c
-> +++ b/arch/x86/mm/fault.c
-> @@ -1304,6 +1304,8 @@ void do_user_addr_fault(struct pt_regs *regs,
->          */
->         if (user_mode(regs))
->                 flags |= FAULT_FLAG_USER;
-> +       else
-> +               flags &= ~FAULT_FLAG_INTERRUPTIBLE;
->  
->  #ifdef CONFIG_X86_64
->         /*
-> 
-> 
-> That would *also* handle arbitrary copy_to_user/copy_from_user() to
-> userfault pages, which could theoretically hit the same busy loop.
-> 
-> I'm actually tempted to make user access *interruptible* though, and
-> either add copy_{from,to}_user_interruptible() or change the semantics
-> of the existing ones (which I believe are already killable).
-> 
-> That would require each architecture implementing interruptible
-> exceptions, by doing an extable lookup before the retry. Not overly
-> complex, but needs to be done for all architectures (although not at
-> once; we could live with not-yet-done architectures just remaining
-> killable).
-> 
-> Thoughts?
-> 
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 1/1] s390/uv: Panic if the security of the system
+ cannot be guaranteed.
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>, linux-kernel@vger.kernel.org
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org, hca@linux.ibm.com,
+        agordeev@linux.ibm.com, gor@linux.ibm.com, borntraeger@de.ibm.com,
+        svens@linux.ibm.com, frankja@linux.ibm.com, nsg@linux.ibm.com,
+        nrb@linux.ibm.com
+References: <20240801112548.85303-1-imbrenda@linux.ibm.com>
+Content-Language: en-US
+From: Steffen Eiden <seiden@linux.ibm.com>
+In-Reply-To: <20240801112548.85303-1-imbrenda@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7mQCUslHwYU6ZCxA-yA4MLQMPYoXnLbl
+X-Proofpoint-ORIG-GUID: 7mQCUslHwYU6ZCxA-yA4MLQMPYoXnLbl
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-02_08,2024-08-02_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 lowpriorityscore=0
+ mlxscore=0 clxscore=1011 priorityscore=1501 malwarescore=0 impostorscore=0
+ bulkscore=0 adultscore=0 mlxlogscore=580 phishscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408020084
 
 
+
+On 8/1/24 1:25 PM, Claudio Imbrenda wrote:
+> The return value uv_set_shared() and uv_remove_shared() (which are
+> wrappers around the share() function) is not always checked. The system
+> integrity of a protected guest depends on the Share and Unshare UVCs
+> being successful. This means that any caller that fails to check the
+> return value will compromise the security of the protected guest.
+> 
+> No code path that would lead to such violation of the security
+> guarantees is currently exercised, since all the areas that are shared
+> never get unshared during the lifetime of the system. This might
+> change and become an issue in the future.
+> 
+> The Share and Unshare UVCs can only fail in case of hypervisor
+> misbehaviour (either a bug or malicious behaviour). In such cases there
+> is no reasonable way forward, and the system needs to panic.
+> 
+> This patch replaces the return at the end of the share() function with
+> a panic, to guarantee system integrity.
+> 
+> Fixes: 5abb9351dfd9 ("s390/uv: introduce guest side ultravisor code")
+> Signed-off-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Reviewed-by: Steffen Eiden <seiden@linux.ibm.com>
+> ---
+>   arch/s390/include/asm/uv.h | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/arch/s390/include/asm/uv.h b/arch/s390/include/asm/uv.h
+> index 0b5f8f3e84f1..153d93468b77 100644
+> --- a/arch/s390/include/asm/uv.h
+> +++ b/arch/s390/include/asm/uv.h
+> @@ -441,7 +441,10 @@ static inline int share(unsigned long addr, u16 cmd)
+>   
+>   	if (!uv_call(0, (u64)&uvcb))
+>   		return 0;
+> -	return -EINVAL;
+> +	pr_err("%s UVC failed (rc: 0x%x, rrc: 0x%x), possible hypervisor bug.\n",
+> +	       uvcb.header.cmd == UVC_CMD_SET_SHARED_ACCESS ? "Share" : "Unshare",
+> +	       uvcb.header.rc, uvcb.header.rrc);
+> +	panic("System security cannot be guaranteed unless the system panics now.\n");
+>   }
+>   
+>   /*
 
