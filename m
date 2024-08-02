@@ -1,78 +1,82 @@
-Return-Path: <kvm+bounces-23134-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23135-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D21946463
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:30:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCEF2946464
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:30:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97C581C20DA5
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:30:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 677391F21C6F
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08497A15B;
-	Fri,  2 Aug 2024 20:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BBB53389;
+	Fri,  2 Aug 2024 20:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rC8AP7hD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MVbnxhHy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D0546B91
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:29:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEB8770EB
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:29:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722630586; cv=none; b=fBZRf4KhtIYw6hRd0+199ZR1LkumtWRDoycKfcUfuS0S2AEklPggTKA+g40l6xCbrLVWV7v/tgk0W3+HZgMyuiDq56voukzqzdJj0jgXX+jDXC2g4/QcD3GKqkuxWayHgmHcAwDRgy0ITtutZRM/tLjyb763wKstoWtE5LC8xzo=
+	t=1722630588; cv=none; b=Uje1Udh63sQEJcN5H9/Y7U38kFoZ/PoH+tuxO/LqzvR/qwpTJ0aMyhjUH/y5QEby2BOxof1oAhIferiAnH8pFprdPVEl8zWJ1BcpaUZ7kHleDlzD5Q4wgR5CY7xHD72TvKYk25WQeXkAFrzdvHE1q7dbYLAaVu1Aj1DYCrhFgro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722630586; c=relaxed/simple;
-	bh=l2pw4PqSYTqENlQeojQEIlKcrxUVCty1cPi4OYAbveA=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dkQFxjX3RG8gDUymaP6yLhTRfq6Cv6Hyzb8lN5IDxzWsKJ4nV/NQkDkCQ+wRNWXpwBOg+1BtqFSKX2ojW4rgbKKMKPi1ORboNlwdo9EfbK7bno0QaGQU66pbkGts9T4dRmsFl6MqcNTDr3TcTrG/GhVTPrNL1EEBAMuIkPNKUOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rC8AP7hD; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1722630588; c=relaxed/simple;
+	bh=WF3wrP9FVCWhvI5s7M5QfSDvoGTfsLiiwSyrSJY3GNs=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=OaNE+O9AJVrfpLvxzHjGezB6biGff4QaYgSZ7/TtYJjM2xzpaPWLd3xGStwRHQFgr047Znqb0vONMVlE5up5nKBT4SsN6yDTq3ItQ+lYoq1y6yMurZWCTl7vRLn2snnLREg/sGu2R+Iv+OAAw8h2r7zM3lGWY6eiUTBhL5PcCqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MVbnxhHy; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6886cd07673so48105957b3.3
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:29:44 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fd72932d74so72501785ad.1
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:29:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722630584; x=1723235384; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OpWX4VZCbnXKP6XhT+I6JbMrTYPhaOiN05VsWUmHsfs=;
-        b=rC8AP7hD+o2iSJ0uU8ZgNHScyu0RVA9Z2FwHRlh8bSiGePRgJfRDf/+xVXy6LFEetx
-         jNn2TtIw+Cmwz2xQKeJQGxMnlA95O7tuCdNhKWTfTdUdsXtu14hmMWwdjDpAk61qPdW0
-         jKVzz7bxkwMfzehgsUKj0ronf7qfBs/pz26F+30cjXYj/u+9CCMTfLWuBqYu16c4G99D
-         FRxUBzLNlG831h3cJvL6fH2KZpaX43mPrMSaAwGH9OAVeXlStRJp/3q7P2aSuj7Zjrk0
-         FpPr61J8f8hZB5pf/0UAlf8aP5lKK1ROqKphk9HSugxyY0G6Ms+2M4klnKBdgwOcNqnW
-         cH5g==
+        d=google.com; s=20230601; t=1722630585; x=1723235385; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=jXAWPfkwqKY8wTkDhDCSEwSk5HKMwXuyqi+tQSb2i8o=;
+        b=MVbnxhHy2VMj7/I9cdfKtAYS+0iJ9eFoIDKKfKAl9v5ma4/B4bVfQefeYE/KWTQOBC
+         /va47bj1626WHACpMLgILV/rjEdjcTPqP+d0HJKyQzWtj67rYbHiFtQvsQt1KP7jIpDb
+         /QSAODTMocpxEhTU/pZ4N/j7qFaIsb6FDPBwIuIR2z9OqognOuAgrYRSuLkbSAR9YLMn
+         rVGQPQSNf0Pj6RApS1+xXYJyGOxxgR/1MDYIh54I+xP6HN/mLwTDbklu8BPNVx4t0nsK
+         uaVMOOfnsn/PFPNYNTA8zX67IkNhQ+j1tvznhH6S0S85LokDKn+rCWETfF+MTipw5/JF
+         1UHQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722630584; x=1723235384;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OpWX4VZCbnXKP6XhT+I6JbMrTYPhaOiN05VsWUmHsfs=;
-        b=dC/xSt85unQAw9IBNUAvDDVBmURAWaUjCbJHtspMXJDEGp/Cxn6Suo+XUrKJFlOv2Y
-         axn2FXc2l1uOctD3eaUUmwonXsAuz8KQgUiq4BJXjAzq517lv8caOng2dcM2/L2GkYvp
-         UEDcYVFs1gqlsTLHluwJKe0geCf3WBeU/wqRNKT1wS7ME/OEQeF/cPgEWaJcsum9TcpB
-         9wBlR1S5sVckHYK2BLNBOxYASKmu9ouMjfpD4m36T99rCmEP3AHpVovsP5zrXbCKfcZR
-         wxcBi+D6NFo+wugjQXQQW5a27e6MDJq0KLsJMWtUL+SpJFPvB+Mb4KFsjMboMFKH9hsd
-         GQDA==
-X-Gm-Message-State: AOJu0Ywbt8y/nD88KkfmUE5j/4ZONMmzMo1yBIpT30tg36GrlmGr2fMh
-	p071cJrFKPTUUFDOacsDlwlDIkjlMNlCmaH28UOj3kfgybpK4SDB71D+ZAgnSCsDpAdA4SIZWX4
-	6Zg==
-X-Google-Smtp-Source: AGHT+IGgFlKdqMHR7BL18rAEWzUIwmbuzm/DOyuEivSn1SzJj5+EN1uFdD7r0ZBjP/F0caZ+UNRhm2lPg9o=
+        d=1e100.net; s=20230601; t=1722630585; x=1723235385;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jXAWPfkwqKY8wTkDhDCSEwSk5HKMwXuyqi+tQSb2i8o=;
+        b=j/5j++amPJLeSOMMFGUOj6bCnFGz9WvUcFA0vGvCcjCHwbHxc1N13Fus9BAtigVJbg
+         RoHPg7A6JBjVjew3TllFbLoCPTzDudNRBznoqLVJwND68H9spjr3PJW1uxAwU8z8gJe2
+         gcGtkUTQOeJljySkfv1p+flMpnBTtOnUNw58cxzzUCEot6+CNQ5/GA6E0QbNzj57t3Lc
+         9rsX1GO7PIwtwrZljvNN9z6CLzr4yj/vLXLt+ulnbV75MRA+WeAvy8JfObnXGtJiKIsz
+         KpCH9LDXctDXWEFPJMCUangx5XAOoyVm7pVNDFf/uMsqh7D7xvxJq5i6zHMuueKzKInS
+         9lIg==
+X-Gm-Message-State: AOJu0Yw7CjIjQPBPD1dd2Yr0o2EBfsVkvhpMKRqZn4wdTO3anTM/BpaT
+	bN8jx/P3htnaVE/QfVPob+HobpdIiAt/l9Uoy7uEKlD2ALpJ8Hm9zA8Al3F8Rr749oGmPdotoSN
+	4pA==
+X-Google-Smtp-Source: AGHT+IHnpZirsws9d8gFRBxELSmDfY/2At0fV7PYAnQIyxbIG/QFYTbOfn7GUnAfrDZ4vyLXfQ6B8vHnAEA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2b84:b0:e0b:bafe:a7ff with SMTP id
- 3f1490d57ef6-e0bde264493mr8422276.6.1722630583760; Fri, 02 Aug 2024 13:29:43
- -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:ec92:b0:1fd:6529:7443 with SMTP id
+ d9443c01a7336-1ff5748d388mr2108555ad.11.1722630585507; Fri, 02 Aug 2024
+ 13:29:45 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 13:29:39 -0700
+Date: Fri,  2 Aug 2024 13:29:40 -0700
+In-Reply-To: <20240802202941.344889-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240802202941.344889-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802202941.344889-1-seanjc@google.com>
-Subject: [PATCH 0/2] KVM: x86: Disallow changing x2APIC ID via userspace
+Message-ID: <20240802202941.344889-2-seanjc@google.com>
+Subject: [PATCH 1/2] KVM: x86: Make x2APIC ID 100% readonly
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -80,26 +84,103 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Silently ignore userspace attempts to change the x2APIC ID via
-KVM_SET_LAPIC.
+Ignore the userspace provided x2APIC ID when fixing up APIC state for
+KVM_SET_LAPIC, i.e. make the x2APIC fully readonly in KVM.  Commit
+a92e2543d6a8 ("KVM: x86: use hardware-compatible format for APIC ID
+register"), which added the fixup, didn't intend to allow userspace to
+modify the x2APIC ID.  In fact, that commit is when KVM first started
+treating the x2APIC ID as readonly, apparently to fix some race:
 
-I've been hunting for this series since January[*], and *finally* stumbled
-across it while tidying up my (too) many git trees.
+ static inline u32 kvm_apic_id(struct kvm_lapic *apic)
+ {
+-       return (kvm_lapic_get_reg(apic, APIC_ID) >> 24) & 0xff;
++       /* To avoid a race between apic_base and following APIC_ID update when
++        * switching to x2apic_mode, the x2apic mode returns initial x2apic id.
++        */
++       if (apic_x2apic_mode(apic))
++               return apic->vcpu->vcpu_id;
++
++       return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
+ }
 
-[*] https://lore.kernel.org/all/ZbPkHvuJv0EdJhVN@google.com
+Furthermore, KVM doesn't support delivering interrupts to vCPUs with a
+modified x2APIC ID, but KVM *does* return the modified value on a guest
+RDMSR and for KVM_GET_LAPIC.  I.e. no remotely sane setup can actually
+work with a modified x2APIC ID.
 
-Michal Luczaj (1):
-  KVM: selftests: Add a testcase to verify x2APIC is fully readonly
+Making the x2APIC ID fully readonly fixes a WARN in KVM's optimized map
+calculation, which expects the LDR to align with the x2APIC ID.
 
-Sean Christopherson (1):
-  KVM: x86: Make x2APIC ID 100% readonly
+  WARNING: CPU: 2 PID: 958 at arch/x86/kvm/lapic.c:331 kvm_recalculate_apic_map+0x609/0xa00 [kvm]
+  CPU: 2 PID: 958 Comm: recalc_apic_map Not tainted 6.4.0-rc3-vanilla+ #35
+  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.2-1-1 04/01/2014
+  RIP: 0010:kvm_recalculate_apic_map+0x609/0xa00 [kvm]
+  Call Trace:
+   <TASK>
+   kvm_apic_set_state+0x1cf/0x5b0 [kvm]
+   kvm_arch_vcpu_ioctl+0x1806/0x2100 [kvm]
+   kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
+   __x64_sys_ioctl+0xb8/0xf0
+   do_syscall_64+0x56/0x80
+   entry_SYSCALL_64_after_hwframe+0x46/0xb0
+  RIP: 0033:0x7fade8b9dd6f
 
- arch/x86/kvm/lapic.c                          | 18 +++++++++---
- .../selftests/kvm/x86_64/xapic_state_test.c   | 28 +++++++++++++++++++
- 2 files changed, 42 insertions(+), 4 deletions(-)
+Reported-by: Michal Luczaj <mhal@rbox.co>
+Closes: https://lore.kernel.org/all/814baa0c-1eaa-4503-129f-059917365e80@rbox.co
+Reported-by: Haoyu Wu <haoyuwu254@gmail.com>
+Closes: https://lore.kernel.org/all/20240126161633.62529-1-haoyuwu254@gmail.com
+Reported-by: syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
+Closes: https://lore.kernel.org/all/000000000000c2a6b9061cbca3c3@google.com
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/lapic.c | 18 ++++++++++++++----
+ 1 file changed, 14 insertions(+), 4 deletions(-)
 
-
-base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index a7172ba59ad2..c6a59871acb3 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -2966,18 +2966,28 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+ 		struct kvm_lapic_state *s, bool set)
+ {
+ 	if (apic_x2apic_mode(vcpu->arch.apic)) {
++		u32 x2apic_id = kvm_x2apic_id(vcpu->arch.apic);
+ 		u32 *id = (u32 *)(s->regs + APIC_ID);
+ 		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
+ 		u64 icr;
+ 
+ 		if (vcpu->kvm->arch.x2apic_format) {
+-			if (*id != vcpu->vcpu_id)
++			if (*id != x2apic_id)
+ 				return -EINVAL;
+ 		} else {
++			/*
++			 * Ignore the userspace value when setting APIC state.
++			 * KVM's model is that the x2APIC ID is readonly, e.g.
++			 * KVM only supports delivering interrupts to KVM's
++			 * version of the x2APIC ID.  However, for backwards
++			 * compatibility, don't reject attempts to set a
++			 * mismatched ID for userspace that hasn't opted into
++			 * x2apic_format.
++			 */
+ 			if (set)
+-				*id >>= 24;
++				*id = x2apic_id;
+ 			else
+-				*id <<= 24;
++				*id = x2apic_id << 24;
+ 		}
+ 
+ 		/*
+@@ -2986,7 +2996,7 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
+ 		 * split to ICR+ICR2 in userspace for backwards compatibility.
+ 		 */
+ 		if (set) {
+-			*ldr = kvm_apic_calc_x2apic_ldr(*id);
++			*ldr = kvm_apic_calc_x2apic_ldr(x2apic_id);
+ 
+ 			icr = __kvm_lapic_get_reg(s->regs, APIC_ICR) |
+ 			      (u64)__kvm_lapic_get_reg(s->regs, APIC_ICR2) << 32;
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
