@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-23038-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23039-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E430945E21
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 14:53:41 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 551BC945E2D
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 14:57:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9180A1F22488
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 12:53:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D8EFF1F23F2B
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 12:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 725141E3CC9;
-	Fri,  2 Aug 2024 12:53:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 482511E3CDA;
+	Fri,  2 Aug 2024 12:57:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="gk5Gcgpj"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Fd78y2E2"
 X-Original-To: kvm@vger.kernel.org
 Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0286F1C0DEC;
-	Fri,  2 Aug 2024 12:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E95D91E3CCB;
+	Fri,  2 Aug 2024 12:57:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722603210; cv=none; b=nEOxBgObTFpJMcb2gdFE7Od+NdFU4APEvOX3nQEL8/hudYyHll7M0G5XeVA1ErpXxAdEFvQjgfjCOgeWu0s5U0CSW9kd4zji6K06ofegwJaDNlhrgPrbMwqJejiLE9sWD6c1K2uG6HerosYrN36EDlK7sL6SRDd6AeVp9p1WC+M=
+	t=1722603430; cv=none; b=a+wOS/TtDq8bsXUtJUs9edlsPer72N0jRsG9zLsvKjsBhSkouFubKg0uZZrn/Byr5uaiS4TQkYYnIwwGrCANTzdmCsnIlTI5djKtlv9J4iF/M1dkUZSwMVo1sTo/HIqkAbXJsC4iEdWbykiO6dh1vvtZD/SyB+N9idca+J4AoE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722603210; c=relaxed/simple;
-	bh=IPSAKkvoXrd/TERC2Pb3EJxslwwNPmnKelXrEIuX6rI=;
+	s=arc-20240116; t=1722603430; c=relaxed/simple;
+	bh=G9IWJMc3Z25xogsluFuEXcYSFR4VFZFPkzNCyDNLzJ8=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e6JNahtNMRuUTxajqyQM1DPUIztJamUYZ/UPgvioJbMqlSKc06hb3ebB8OcrS8pF7KTN+ooUVYkNvlc8nRmlXGfovn6fqG6E5UAOBzD7uVaY5wJNAKwjr2OlX0b7L10RyhMTsYYLlFloZbz83TTQycEpJ85sNMiIiC1GGz81rM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=gk5Gcgpj; arc=none smtp.client-ip=90.155.50.34
+	 Content-Type:MIME-Version; b=cjTGTC+wbDG09m/rHM+nG+pxnnhvwCriwp6J5krHX+Ye/GnvNKqHVASQVSOKvT6W4N9cg05zg5C8/wUzOHfOsSb5syt/c2quGKqXfqHJ1J/XJmp9BcZf7BpLFQ8+26cce8I0UMCnaka1G6gaObpdMK8NNVc16AcTwqgJvT6Rl0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Fd78y2E2; arc=none smtp.client-ip=90.155.50.34
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
 	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=9C0txoyRv53d0LXmfV4O/jld3nQsaMKAicBUBmaAY9I=; b=gk5GcgpjJbKKptiDGl0ya2ufFQ
-	LgyRrcBT8hsG6ptQjze9M5jyyZE6fzLNmSwf5c0D0GUMqWgqoBVHdAsACc0Cb/aFjLeJRO/756lPV
-	OIIulHnkSO9dlJmrrNOF7Mtu08uX9tO31U4vxyTgWEVHW2qBXuoKnHFabFLyQSAPlPM3Gqx9wsujs
-	pVpimTkfm7LoZPBZYuQ3uGLbVYLrzls6S9ToKc4qVD2zXas51CJKxTA21WuK9JOR59rZuKgWNiJy/
-	yNnuT5Qc9sZqGD7jBFx2beBN4POCKrjXioRgvMd+kZF2wj0gk/TDKQNYCJR5ceJR7v49MLpij73PN
-	eMzi5++A==;
+	bh=G9IWJMc3Z25xogsluFuEXcYSFR4VFZFPkzNCyDNLzJ8=; b=Fd78y2E2HRLmygk4Cr5Cm3+bia
+	YpgX+3sRenAq3HBT1cBrFMVFcA+2mez2jPE3Mx2Qw2Izgp8K1wxybQfJ1gbi6oykxEcVTRvP/LonD
+	7fBBc9x5ZyHOAWY/qutnjsW8Sf2PlQGN2fxCOedimZcOS0zqUA8PX2IIs1NbD3w1ilnHrsVk7jsLk
+	eC6vAFfjP8OEpCvuwKw0W4bSAxJpenh9QtMI6udwTBGcPh7Vn/OBgUU1ER2VxFGAMb92WDMuKdirr
+	5Id1HQo9SUQXeqv85xjnmoOdUgF24i7rMhUiKBobntwaSrbdb9erWLceJ2SzxekawD/mHJ+zIzMAQ
+	GF4s9Udw==;
 Received: from [2001:8b0:10b:5:baa5:735b:df3b:ad66] (helo=u3832b3a9db3152.ant.amazon.com)
 	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1sZrmY-000000011mf-0fCr;
-	Fri, 02 Aug 2024 12:53:18 +0000
-Message-ID: <ae8606f26bd559263e232d5f0b9e3fe7ac7ccd33.camel@infradead.org>
+	id 1sZrq7-000000011vy-2Qrh;
+	Fri, 02 Aug 2024 12:57:00 +0000
+Message-ID: <cd3fb0ac435d2516f9c5d921a3c8d0d09e3fbf73.camel@infradead.org>
 Subject: Re: [PATCH] KVM: x86: Use gfn_to_pfn_cache for steal_time
 From: David Woodhouse <dwmw2@infradead.org>
 To: Matthew Wilcox <willy@infradead.org>
@@ -58,13 +58,14 @@ Cc: Carsten Stollmaier <stollmc@amazon.com>, Sean Christopherson
  kvm@vger.kernel.org, linux-kernel@vger.kernel.org, Andrew Morton
  <akpm@linux-foundation.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
  Andrea Arcangeli <aarcange@redhat.com>
-Date: Fri, 02 Aug 2024 13:53:17 +0100
-In-Reply-To: <ZqzTOvyKRI0qzwCT@casper.infradead.org>
+Date: Fri, 02 Aug 2024 13:56:58 +0100
+In-Reply-To: <ae8606f26bd559263e232d5f0b9e3fe7ac7ccd33.camel@infradead.org>
 References: <20240802114402.96669-1-stollmc@amazon.com>
 	 <b40f244f50ce3a14d637fd1769a9b3f709b0842e.camel@infradead.org>
 	 <ZqzTOvyKRI0qzwCT@casper.infradead.org>
+	 <ae8606f26bd559263e232d5f0b9e3fe7ac7ccd33.camel@infradead.org>
 Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-BBKSddBfoWEUvesBzQl/"
+	boundary="=-wnXlQ7VT1N8w0sxttcKq"
 User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,78 +76,78 @@ MIME-Version: 1.0
 X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
 
 
---=-BBKSddBfoWEUvesBzQl/
+--=-wnXlQ7VT1N8w0sxttcKq
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2024-08-02 at 13:38 +0100, Matthew Wilcox wrote:
-> On Fri, Aug 02, 2024 at 01:03:16PM +0100, David Woodhouse wrote:
-> > On Fri, 2024-08-02 at 11:44 +0000, Carsten Stollmaier wrote:
-> > > handle_userfault uses TASK_INTERRUPTIBLE, so it is interruptible by
-> > > signals. do_user_addr_fault then busy-retries it if the pending signa=
-l
-> > > is non-fatal. This leads to contention of the mmap_lock.
+On Fri, 2024-08-02 at 13:53 +0100, David Woodhouse wrote:
+> On Fri, 2024-08-02 at 13:38 +0100, Matthew Wilcox wrote:
+> > On Fri, Aug 02, 2024 at 01:03:16PM +0100, David Woodhouse wrote:
+> > > On Fri, 2024-08-02 at 11:44 +0000, Carsten Stollmaier wrote:
+> > > > handle_userfault uses TASK_INTERRUPTIBLE, so it is interruptible by
+> > > > signals. do_user_addr_fault then busy-retries it if the pending sig=
+nal
+> > > > is non-fatal. This leads to contention of the mmap_lock.
+> >=20
+> > Why does handle_userfault use TASK_INTERRUPTIBLE?=C2=A0 We really don't
+> > want to stop handling a page fault just because somebody resized a
+> > window or a timer went off.=C2=A0 TASK_KILLABLE, sure.
 >=20
-> Why does handle_userfault use TASK_INTERRUPTIBLE?=C2=A0 We really don't
-> want to stop handling a page fault just because somebody resized a
-> window or a timer went off.=C2=A0 TASK_KILLABLE, sure.
-
-Well, the literal answer there in this case is "because we ask it to".
-
-The handle_userfault() function will literally do what it's told by the
-fault flags:=20
-
-static inline unsigned int userfaultfd_get_blocking_state(unsigned int flag=
-s)
-{
-	if (flags & FAULT_FLAG_INTERRUPTIBLE)
-		return TASK_INTERRUPTIBLE;
-
-	if (flags & FAULT_FLAG_KILLABLE)
-		return TASK_KILLABLE;
-
-	return TASK_UNINTERRUPTIBLE;
-}
-
-
-Hence the other potential workaround I mentioned, for
-do_user_addr_fault() *not* to ask it to, for faults from the kernel:
-
-> >=20
-> > --- a/arch/x86/mm/fault.c
-> > +++ b/arch/x86/mm/fault.c
-> > @@ -1304,6 +1304,8 @@ void do_user_addr_fault(struct pt_regs *regs,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (user_mode(regs))
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+> Well, the literal answer there in this case is "because we ask it to".
+>=20
+> The handle_userfault() function will literally do what it's told by the
+> fault flags:=20
+>=20
+> static inline unsigned int userfaultfd_get_blocking_state(unsigned int fl=
+ags)
+> {
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (flags & FAULT_FLAG_IN=
+TERRUPTIBLE)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0return TASK_INTERRUPTIBLE;
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0if (flags & FAULT_FLAG_KI=
+LLABLE)
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0return TASK_KILLABLE;
+>=20
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0return TASK_UNINTERRUPTIB=
+LE;
+> }
+>=20
+>=20
+> Hence the other potential workaround I mentioned, for
+> do_user_addr_fault() *not* to ask it to, for faults from the kernel:
+>=20
+> > >=20
+> > > --- a/arch/x86/mm/fault.c
+> > > +++ b/arch/x86/mm/fault.c
+> > > @@ -1304,6 +1304,8 @@ void do_user_addr_fault(struct pt_regs *regs,
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (user_mode(regs))
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
 =A0=C2=A0=C2=A0=C2=A0 flags |=3D FAULT_FLAG_USER;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 flags &=3D ~FAULT_FLAG_INTERRUPTIBLE;
-> > =C2=A0
-> > =C2=A0#ifdef CONFIG_X86_64
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
-> >=20
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
+> > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 flags &=3D ~FAULT_FLAG_INTERRUPTIBLE;
+> > > =C2=A0
+> > > =C2=A0#ifdef CONFIG_X86_64
+> > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /*
+> > >=20
+>=20
+>=20
+> But I don't know that I agree with your statement above, that we "don't
+> want to stop handling a page fault just because somebody resized a
+> window or a timer went off".=20
+
+See also "we don't want to stop waiting for a page fault, just because
+somebody hit Ctrl-C, but SIGINT has a trivial handler to do some minor
+cleanup before exiting so it isn't considered a *fatal* signal".
+
+I'm very sure I'd disagree with that one :)
 
 
-But I don't know that I agree with your statement above, that we "don't
-want to stop handling a page fault just because somebody resized a
-window or a timer went off".=20
-
-In fact, I don't think we *do* even stop handling the page fault in
-those cases; we just stop *waiting* for it to be handled.=20
-
-In fact, couldn't you contrive a test case where a thread is handling
-its own uffd faults via SIGIO, where it's the opposite of what you say.
-In that case the *only* way the fault actually gets handled is if we
-let the signal happen instead of just waiting?=C2=A0
-
-That doesn't seem like *such* a contrived case either =E2=80=94 that seems
-perfectly reasonable for a vCPU thread, to then handle its own missing
-pages?
-
-
---=-BBKSddBfoWEUvesBzQl/
+--=-wnXlQ7VT1N8w0sxttcKq
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Disposition: attachment; filename="smime.p7s"
 Content-Transfer-Encoding: base64
@@ -238,25 +239,25 @@ IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
 dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
 NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
 xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwODAyMTI1MzE3WjAvBgkqhkiG9w0BCQQxIgQgNqis07dc
-cfckTF19+D8CW+h2oPPC48UUVMYqyJqdACcwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
+DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwODAyMTI1NjU4WjAvBgkqhkiG9w0BCQQxIgQg5T1EYPAx
+ApaE1DaQrH3oWYTYM4xfMt+aC4Evp0/yPDwwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
 BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
 A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
 dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
 DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
 MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
 Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgA4j/1vlQxyFSHdp6Rba4e5bli9Da+C2gZl
-6vokVPt0wtBEWOMyIaqT2HT7DUftbNqNtU1fcI8xpgDaMSShcwY9RVtp7CEM0Lsb42/tdyl0loIg
-N8GaHSAVmEkhkv36KiENz4eKZSolk3ZzVVfX4z+oCCgRbmeAmbAheDbBcECgB/9hU2HldR7PZ6va
-DGyJFWTi3yQrVVX4tbPYIpSFDQ4L8A7L+AWqKMs5qpq4D8FD4iUnNjTaUgL7Hv+GpoxLLKULWuyi
-ChyFigrfFdYgqITNqNbh2IXH57hAPFpImwsvlAoWEktb0CNZzGiv1ZzF4YtCKRIACPwHpe065EE5
-OIgudqWDatatbkmwfKS3yZpMw1J+VNuq8N2ktrhgZnZAcnvCMKBUVNYhMqFUBDD1c0wjGu3MVAmB
-h3XuLnPI5Pco0LD24y5BEnvxl1kJnfPMfmyjJdCHOUhl2quM8tdlLq1oZSI/sFRnxJ2PXKr3jJo/
-DwgjaNzp+dofozCec8NdGSFlrMmSfv6TEj/6G1OXSvKXZRxnzgBuHVzYt6l+iqRWI5qWsvlSboSD
-aR2s2lsbGslBhuYuZ/Pbu7SGMRvdb5YNkkYDxg636Gkbgdy/5jMOjR4BnEILdO+vX0ajy1MKHySD
-I/bCFWQeD8xDv/HqKsHFmOD/EQ5H+fTeeDC/I/9FWQAAAAAAAA==
+lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBUw8Yuth8oTRJeRuW4bGGyn1qsgA3kNxQ5
+Fqiwy4qkrKY+zXhe3or1mr9Zu4eb4DHuUOVHSKmzC6UsNX1yuSvLD+7OatcobQuXt9anJ7VmfGbf
+nGk+vDAUaivqm+uaG0Q12w61FL+1hmyLk8pn5xqh3/qQxipNmVIKh/anItx8zC0a7CfBZH2AQXEM
+Iusy6MJLabumi0qemP6zFse1duZlbsVdIezMxb1hrPvO8WinX5eAUS7xi06/L4m8kvIePa7XTz42
+d7c7ydAAXMt1PyG38sF24bDZNg2gQZD4tzPymPTnmDykuXJjgbRcRniPKrGzZSNEUmUryYWbQ16l
+pg6PgZvac0Xv+Ttq8rTfRvnkykiXVO2McjP1lnqbfmaye5i/h/GbwUjhqG3KC0sIZGE/3ydf2lgx
+3ihVbmaPy3GYOUKR51YZfZ9UK/J8fCcwgbDyg59lv5VPfgQJrDADb7HJfJMXVitkMcssXQQQMokU
+bv+6YhZjI2YTAHN4H+hTDUWal+CMGIbB1x7X5l7eHTDMV6DuIHyI4KwYDAOHvoNGMXBPvorYSfqr
+5+q5DVixxPVnOOH43F/G49jSB9AEmV1TuNuZLrtA6EYg1OyxXMUS4CcibOvPkR6P9SNbdij4aUNt
+3jxpKM0h541NmECBdAAIQMvPEotH/lbXoIII+ZQlHwAAAAAAAA==
 
 
---=-BBKSddBfoWEUvesBzQl/--
+--=-wnXlQ7VT1N8w0sxttcKq--
 
