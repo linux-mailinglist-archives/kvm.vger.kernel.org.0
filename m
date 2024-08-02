@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-23099-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23100-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BD0946320
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:27:12 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4BC0946322
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:27:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4878B28345B
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:27:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FE99B22809
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:27:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3C53DAC04;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79A91547C7;
 	Fri,  2 Aug 2024 18:23:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V1efgfqv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EEbJIoLi"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF79F21C18E
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 18:23:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DAE51AE025
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 18:23:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722623008; cv=none; b=IjerLqfKp56/fdzZ3YCutsemO43iZGjOH3ZGmRD2n9UXAb2pbyunicCbNwpcCcG/3Ml25DiDETh1YNWeUK1ZPqCXBo5Io7NaLOQwirFfRzhM12K2jfnveniGrYuSKzh0Eji4K7oV4WQMhzPa1Txf8gpxQGX+eeA9Bt81/YtNevk=
+	t=1722623008; cv=none; b=nkUUsV7Wvq3oPA21vSz+7m3AuVEur0aHgEsPafMolmE4OH+uwsiZ9xKbl+MGN0aVqr75lp86mu3ap3T3YuWOrr+Yw/kOHG4KHTzR4jBshD2HPWklodcQqNmVztbF6t1Jvijc1ZfdtJRNN7DWP9y6uWGhHXb5LDVmBWk2ZlLrZJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1722623008; c=relaxed/simple;
-	bh=t5yfFgH9ibPxbspkUAv08vifOSOXvkrbmarqeKUHNec=;
+	bh=UOPSp+FZQmDfF+51Ouz9o/l/tRhvkbieD1vkglnMcTs=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=bgMb4EKAAnG07Uz63K3S8NLWiylgoDb8k5qvtmQsb3ygA+eEVPx3vUZS3fFyBPHh6iXrkD9cfapZN0hTjr/hr/UnJsYbYbWy281i8QWzmfMt6XusGVDoR0vfLAZBQmCJRfzPJazfCplC14KUuI8MZbDarg0iviHISb798kwVH7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V1efgfqv; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=UEu0VLdUqSq2m3t0mOzMrSeTd3A70vQ9r+VRV1l/V1VYhIb64UlvJD5GR/apF3m6Z/eRoIMmrwStsCtVnGxx/Jz2pgQGlbVyavmPOKEucg62kwIQueZ7NWk9RfnV2NyTg6Wh7ZfGZ8lo3qx2OnV4NgqQP/tp993KkDQm1rZ+zkA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EEbJIoLi; arc=none smtp.client-ip=209.85.166.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0be2c7c34dso2004674276.2
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 11:23:26 -0700 (PDT)
+Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-39794551bfbso147667095ab.1
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 11:23:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722623005; x=1723227805; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722623006; x=1723227806; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=v+gWTjgtCkRYFWW1GzmPZwN0r2c2xgD+FnvKvPUO5Yc=;
-        b=V1efgfqvQhNS8R8AhLyNT4/+7fMZg4geGq+SW0T8S+Orq/3tGtafAi3KPDC0eL63tF
-         uAe+EcqtWyiqXc/1gJsXfRgSM1ConfqMx6gaecPTKFsrJ4Zu4a4OE0ulJ3SXvZ6T7QRN
-         p2sPPeEui+6WqS4WnUwjAT7snCbwPOtmxbaX0cW+knNyer4NQBN1+7LJM4NkIyMoaIET
-         n6jamXzXzVnHUX/0RQKXwRq0nfEibbOLSl0m4wt3z4cWdoYlZGpPeT3/wtiHK3KVI+Dj
-         IBPn/DEdMEBlQBF3a2tYcEFKP9je1W2q7647uBPRm53W4GwRjQNsSqZE1pYEtk/nGjNj
-         X1hw==
+        bh=RRuHJt5f8UEqRhMujJ6ws/U8D/VRWtkp4PLpixwqCfM=;
+        b=EEbJIoLi7tDpUs3YagyATJ9PkDEBXm3frUm283OcfDXwaPgkS6eaYiaqQqBVz8Dj7K
+         cRMO3FUMR9e12FiZfeZKOo6H0yx8TMhmT8rKQK6y3QDStTQenDI70LnF44dlzGJrJHhD
+         rMJFCpq9zfTlwdNoF3KlcLZUwKM/RS1+uIntc1T0zqzbV/4y9I21I4WhoFzHpYQU4Hmm
+         fjT0YTD7coohMATEubq6MUbioOgIqrQZsu/o3VwnAk7TyiGKSK9eDEoyE4vT9fyFmGxf
+         9fY9Cm23v0qU1GSVn/oIOQVIHEXy7uMjy+LZ92Tv8toDlGcG34VI1jovmM8p5i1Rtmlo
+         /hYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722623005; x=1723227805;
+        d=1e100.net; s=20230601; t=1722623006; x=1723227806;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=v+gWTjgtCkRYFWW1GzmPZwN0r2c2xgD+FnvKvPUO5Yc=;
-        b=QYfnvAv3ahqwfZAeAUN/1Js+MBI6BdPbPHZ7D939mTg1GNLXsw0WtV08322WL4EyhV
-         t1fdKGFB9ETISjhpI8lc/UsQQWrP5ttteFtXx9mua9Z9gXNutY6iV9s4ahqvnWJG2hZ9
-         oeUk5c74ra6sNKbC5zloVFvp2oaAJfuSr32foMng71HTFu87ej0QjeHwHik/x24Qn2Oc
-         ikUsDqSKDpraAcE06ZaaPMTpSnpjhnOyrAEKANM2XUjhNwZ6zUdraUf3UEbO2pmL6mwL
-         MrJIQ8WyYsYLhQUaaN9UJWtJbj7cgkU/U4P6AfRzo0RIQZ5AVMGG3JIaAWBCKYxhJ+zQ
-         aE0A==
-X-Gm-Message-State: AOJu0YxNt22UYzjrXuH1KGdNeTKtHFjUrvWAMVbwErtvRb0HT701j8qf
-	eAz66hx4XTu4YemJgcNBO+eWgDZcCToAZBbv1LocknFTl9w5TUUclkPBfILamzEVo/LzyMYFX3E
-	ymOQenKBSkJKUvSmfWubMd7cD7SmrtmQJGeURqDJFTP5EJ5xXOx7i+HzrifvuYkAAp2Jw0JruUH
-	MK97+1eEWSBDQWgiyYozXuFCUGHaqpgUgVyqXd3mQ7cYaZ/vJj6Bm5E5w=
-X-Google-Smtp-Source: AGHT+IHIxi2bUOzRGGFcYEQj+O4fh0rQpQV9JaZDgKLUag1mDu0fuzixL7xb4lP4fZSR8NjHgonBhqXCr0OCVlzOFg==
+        bh=RRuHJt5f8UEqRhMujJ6ws/U8D/VRWtkp4PLpixwqCfM=;
+        b=f3KXjR2ilgubadOur6fbhFOHv0t8dVcHM5bD0qr58GWVQf9DvlTUlTCHyfNgFKSrTW
+         kweMdHtS95szsGjtQq5i7rUGGuO5dWXFZC6MkQm5eLAjX1mhBYeqN4GkcPpdGhPMsojn
+         T+YCR5ATcCf7LcFRd9oXBXokSodlWLGr4Ozy2HcRZcGb+0MhwglvVf435B0rxkmONXlM
+         7AYNr1XcPW5SsIYm3VWOr2NM3lznMSwSrULRX1oa/y6OuEU2E7vqHX/tU6TppCQYFqYt
+         pG9VuA5IrDiEdUrIc9i9rNQ99k5a2MIhPf5MOq1zE2oZTg8Idvc7ly3ks9iz1R8cEJ5s
+         nHqg==
+X-Gm-Message-State: AOJu0Yy4q3u01FZiUb6olZYgb/06u3F833BcrNpaDASBL85mRxyA7QmA
+	2Fu8/XueNnpMPh8YAvnj5s1h5ZmgE7boPdDDdQfvfVokvxYY7e+H/wlOhP5hjJQT+KZDZYcJJj/
+	NC9VagN3P3464ntZO7lCpbV/+lVZVnk5WbrTos3iUP8hFE6jZGv4tGaQiVVJh7L3sjg1Ycyiw3c
+	85nEB67XU58MwRGxO2wSC65A/6S1Y5gwTcjynCqc3nhhB0WdCh340/elI=
+X-Google-Smtp-Source: AGHT+IH+qdsE9Pulh3jM+KdRLjaVJ8bLIzcSeaVMDxPEcgK7lwNWqj77zoW2jB061hVe9Kxx3aBXWT8ru/NX+/TVIw==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a5b:bc7:0:b0:e0b:c0a5:71e2 with SMTP
- id 3f1490d57ef6-e0bde45ffb2mr14075276.11.1722623005492; Fri, 02 Aug 2024
- 11:23:25 -0700 (PDT)
-Date: Fri,  2 Aug 2024 18:22:35 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a05:6e02:1561:b0:397:2946:c83c with
+ SMTP id e9e14a558f8ab-39b1fc4cdf8mr3543775ab.4.1722623006552; Fri, 02 Aug
+ 2024 11:23:26 -0700 (PDT)
+Date: Fri,  2 Aug 2024 18:22:36 +0000
 In-Reply-To: <20240802182240.1916675-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240802182240.1916675-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802182240.1916675-2-coltonlewis@google.com>
-Subject: [PATCH 1/6] KVM: x86: selftests: Fix typos in macro variable use
+Message-ID: <20240802182240.1916675-3-coltonlewis@google.com>
+Subject: [PATCH 2/6] KVM: x86: selftests: Define AMD PMU CPUID leaves
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Mingwei Zhang <mizhang@google.com>, Jinrong Liang <ljr.kernel@gmail.com>, 
@@ -85,40 +85,56 @@ Cc: Mingwei Zhang <mizhang@google.com>, Jinrong Liang <ljr.kernel@gmail.com>,
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Without the leading underscore, these variables are referencing a
-variable in the calling scope. It only worked before by accident
-because all calling scopes had a variable with the right name.
+This defined the CPUID calls to determine what extensions and
+properties are available. AMD reference manual names listed below.
+
+* PerfCtrExtCore (six core counters instead of four)
+* PerfCtrExtNB (four counters for northbridge events)
+* PerfCtrExtL2I (four counters for L2 cache events)
+* PerfMonV2 (support for registers to control multiple
+  counters with a single register write)
+* LbrAndPmcFreeze (support for freezing last branch recorded stack on
+  performance counter overflow)
+* NumPerfCtrCore (number of core counters)
+* NumPerfCtrNB (number of northbridge counters)
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- tools/testing/selftests/kvm/x86_64/pmu_counters_test.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ tools/testing/selftests/kvm/include/x86_64/processor.h | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index 698cb36989db..0e305e43a93b 100644
---- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -174,7 +174,7 @@ do {										\
+diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
+index a0c1440017bb..9d87b5f8974f 100644
+--- a/tools/testing/selftests/kvm/include/x86_64/processor.h
++++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
+@@ -183,6 +183,9 @@ struct kvm_x86_cpu_feature {
+ #define	X86_FEATURE_GBPAGES		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 26)
+ #define	X86_FEATURE_RDTSCP		KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 27)
+ #define	X86_FEATURE_LM			KVM_X86_CPU_FEATURE(0x80000001, 0, EDX, 29)
++#define	X86_FEATURE_PERF_CTR_EXT_CORE	KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 23)
++#define	X86_FEATURE_PERF_CTR_EXT_NB	KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 24)
++#define	X86_FEATURE_PERF_CTR_EXT_L2I	KVM_X86_CPU_FEATURE(0x80000001, 0, ECX, 28)
+ #define	X86_FEATURE_INVTSC		KVM_X86_CPU_FEATURE(0x80000007, 0, EDX, 8)
+ #define	X86_FEATURE_RDPRU		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 4)
+ #define	X86_FEATURE_AMD_IBPB		KVM_X86_CPU_FEATURE(0x80000008, 0, EBX, 12)
+@@ -195,6 +198,8 @@ struct kvm_x86_cpu_feature {
+ #define	X86_FEATURE_VGIF		KVM_X86_CPU_FEATURE(0x8000000A, 0, EDX, 16)
+ #define X86_FEATURE_SEV			KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 1)
+ #define X86_FEATURE_SEV_ES		KVM_X86_CPU_FEATURE(0x8000001F, 0, EAX, 3)
++#define	X86_FEATURE_PERF_MON_V2		KVM_X86_CPU_FEATURE(0x80000022, 0, EAX, 0)
++#define	X86_FEATURE_PERF_LBR_PMC_FREEZE	KVM_X86_CPU_FEATURE(0x80000022, 0, EAX, 2)
  
- #define GUEST_TEST_EVENT(_idx, _event, _pmc, _pmc_msr, _ctrl_msr, _value, FEP)	\
- do {										\
--	wrmsr(pmc_msr, 0);							\
-+	wrmsr(_pmc_msr, 0);							\
- 										\
- 	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
- 		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt .", FEP);	\
-@@ -331,9 +331,9 @@ __GUEST_ASSERT(expect_gp ? vector == GP_VECTOR : !vector,			\
- 	       expect_gp ? "#GP" : "no fault", msr, vector)			\
+ /*
+  * KVM defined paravirt features.
+@@ -281,6 +286,8 @@ struct kvm_x86_cpu_property {
+ #define X86_PROPERTY_GUEST_MAX_PHY_ADDR		KVM_X86_CPU_PROPERTY(0x80000008, 0, EAX, 16, 23)
+ #define X86_PROPERTY_SEV_C_BIT			KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 0, 5)
+ #define X86_PROPERTY_PHYS_ADDR_REDUCTION	KVM_X86_CPU_PROPERTY(0x8000001F, 0, EBX, 6, 11)
++#define X86_PROPERTY_NUM_PERF_CTR_CORE		KVM_X86_CPU_PROPERTY(0x80000022, 0, EBX, 0, 3)
++#define X86_PROPERTY_NUM_PERF_CTR_NB		KVM_X86_CPU_PROPERTY(0x80000022, 0, EBX, 10, 15)
  
- #define GUEST_ASSERT_PMC_VALUE(insn, msr, val, expected)			\
--	__GUEST_ASSERT(val == expected_val,					\
-+	__GUEST_ASSERT(val == expected,					\
- 		       "Expected " #insn "(0x%x) to yield 0x%lx, got 0x%lx",	\
--		       msr, expected_val, val);
-+		       msr, expected, val);
+ #define X86_PROPERTY_MAX_CENTAUR_LEAF		KVM_X86_CPU_PROPERTY(0xC0000000, 0, EAX, 0, 31)
  
- static void guest_test_rdpmc(uint32_t rdpmc_idx, bool expect_success,
- 			     uint64_t expected_val)
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
