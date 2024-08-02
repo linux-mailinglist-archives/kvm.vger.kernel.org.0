@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-23057-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23058-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5579460F1
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:56:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDE2C9460F6
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:56:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF08B1F222E4
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:56:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CFCC1C2162B
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:56:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14F1D1537C6;
-	Fri,  2 Aug 2024 15:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CAD166F33;
+	Fri,  2 Aug 2024 15:56:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TIfX8drz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iD1CoK8y"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7A51537B8
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:55:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C77751537D0
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722614154; cv=none; b=e28e7TvtnD9Elta6rL7PGPzsOw2QrbFC07KzlwgUs2lNlNFostAb1B8b3cz94wBlMo/Qyj0+gLqnvV4CSolBjOV1iBnjXjkLPGMALE4Zw4WmjtTyMGagcb2xUjX/yHRllef3A8LmVABktec/Ez7ml4LpZGYidKVoPKsK7Qk/OwY=
+	t=1722614161; cv=none; b=FEOF3VYPGcRzdS4hiUOzeXoaYxjhcSV2Br/56WnVecu5Dv2utJjLII/5ltkPmEumu3cYJGmwbbVNS8k+74mZx9iHGAUHEfQdf2D2/sykaVn/j60h71NQh+eTur0qbk3w/dULxV44K+Kyc3F/MpWMfntyVXkru4w8aXgUI2L8FCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722614154; c=relaxed/simple;
-	bh=+2mciwQZhQgiba+/ptMKy+LVt5h9+laF7gW8HKD2Vew=;
+	s=arc-20240116; t=1722614161; c=relaxed/simple;
+	bh=bP6pH0ekuQFtmuSKGa8PXlt8u6jV+CJT+tkCQ3nBDTs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ObquIjVv1EyZn6jcO076OXrKMvfxtnbR00EPihG2GYgBcBi0RZGWjWjjqC8Aelxruwu1X0O/hLrizw3pird/zTzA+kQzh8YYXOuAo9R2MA0UBL7KLeC3YPXVNrFpgRZ9egK5z9hCTbN4qAnyz0s+u5ZIBbuQTBOP+Rn9JBAzWZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TIfX8drz; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=rqyS7RwPPk3+pQyaFf/Kxk/MPhLXi4LJ7vbQ9qsV2nEYYXA7ZqB7OCpb8SzvHCgO51OMnu8B03ydRZf6J1uJp2N/0aCskH0GfsuNjo8rbxqN1FUgnrzMK+n9tjr/1iWNaj88SgwQcnMi8/iRP/2DKNdrt+W2KUod+uknXPqU5Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iD1CoK8y; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722614151;
+	s=mimecast20190719; t=1722614159;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=UsiWiNzwiDquKdRCTf6m6XAEYG/mEcIY3V2xwGU3/s4=;
-	b=TIfX8drzhTr4lkUr4JU+8Urygs1Kf/hkBu2/OLj8XuXkDtpxhQMWW8ya5HWWYGHd6+qIL4
-	N8+6Sm+XeJxhd7xHRAMXLPjP3te+mfsNTp1LSmRHR8ATvxTBaLVCIJO8sQf9flJjkPJoT6
-	6/jBzqfraRPJLHmo+w2w1ek3GolPYcM=
+	bh=bw5wWvDZXB6NwMKpULq7b52Hk472J0+TTnpqg3dn/tg=;
+	b=iD1CoK8yND4V5mBrxk2QaHXqmMGZaVxG20SVfRJw24Yqr+DOmj3x5kRJ2SQdn4biaxJBQL
+	XDWBS0tyAdDSaJdMs3lbHR0x0hZ7BnxLc8zYaHqdKEFVw1eN6x/7JFZ0i7j8m4LtIGrJDt
+	Gp0XS5rQ5D1Od2CaZBlyiXoRwooVrAM=
 Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-295-BK2N-7WpOw6In_X1MJIYww-1; Fri,
- 02 Aug 2024 11:55:48 -0400
-X-MC-Unique: BK2N-7WpOw6In_X1MJIYww-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-63-0uIxfBSuNxWDrKG_hH-lfg-1; Fri,
+ 02 Aug 2024 11:55:55 -0400
+X-MC-Unique: 0uIxfBSuNxWDrKG_hH-lfg-1
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 19D131944AAF;
-	Fri,  2 Aug 2024 15:55:46 +0000 (UTC)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2085618B669A;
+	Fri,  2 Aug 2024 15:55:53 +0000 (UTC)
 Received: from t14s.redhat.com (unknown [10.39.192.113])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 5F05D300018D;
-	Fri,  2 Aug 2024 15:55:40 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A8A8F3000198;
+	Fri,  2 Aug 2024 15:55:46 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -75,9 +75,9 @@ Cc: linux-mm@kvack.org,
 	Alexander Gordeev <agordeev@linux.ibm.com>,
 	Sven Schnelle <svens@linux.ibm.com>,
 	Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-Subject: [PATCH v1 02/11] mm/pagewalk: introduce folio_walk_start() + folio_walk_end()
-Date: Fri,  2 Aug 2024 17:55:15 +0200
-Message-ID: <20240802155524.517137-3-david@redhat.com>
+Subject: [PATCH v1 03/11] mm/migrate: convert do_pages_stat_array() from follow_page() to folio_walk
+Date: Fri,  2 Aug 2024 17:55:16 +0200
+Message-ID: <20240802155524.517137-4-david@redhat.com>
 In-Reply-To: <20240802155524.517137-1-david@redhat.com>
 References: <20240802155524.517137-1-david@redhat.com>
 Precedence: bulk
@@ -89,316 +89,89 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-We want to get rid of follow_page(), and have a more reasonable way to
-just lookup a folio mapped at a certain address, perform some checks while
-still under PTL, and then only conditionally grab a folio reference if
-really required.
+Let's use folio_walk instead, so we can avoid taking a folio reference
+just to read the nid and get rid of another follow_page()/FOLL_DUMP
+user. Use FW_ZEROPAGE so we can return "-EFAULT" for it as documented.
 
-Further, we might want to get rid of some walk_page_range*() users that
-really only want to temporarily lookup a single folio at a single address.
+The possible return values for follow_page() were confusing, especially
+with FOLL_DUMP set. We'll handle it like documented in the man page:
 
-So let's add a new page table walker that does exactly that, similarly
-to GUP also being able to walk hugetlb VMAs.
+* -EFAULT: This is a zero page or the memory area is not mapped by the
+   process.
+* -ENOENT: The page is not present.
 
-Add folio_walk_end() as a macro for now: the compiler is not easy to
-please with the pte_unmap()->kunmap_local().
+We'll keep setting -ENOENT for ZONE_DEVICE. Maybe not the right thing to
+do, but it likely doesn't really matter (just like for weird devmap,
+whereby we fake "not present").
 
-Note that one difference between follow_page() and get_user_pages(1) is
-that follow_page() will not trigger faults to get something mapped. So
-folio_walk is at least currently not a replacement for get_user_pages(1),
-but could likely be extended/reused to achieve something similar in the
-future.
+Note that the other errors (-EACCESS, -EBUSY, -EIO, -EINVAL, -ENOMEM)
+so far only applied when actually moving pages, not when only
+querying stats.
+
+We'll effectively drop the "secretmem" check we had in follow_page(), but
+that shouldn't really matter here, we're not accessing folio/page content
+after all.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- include/linux/pagewalk.h |  58 +++++++++++
- mm/pagewalk.c            | 202 +++++++++++++++++++++++++++++++++++++++
- 2 files changed, 260 insertions(+)
+ mm/migrate.c | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/include/linux/pagewalk.h b/include/linux/pagewalk.h
-index 27cd1e59ccf7..f5eb5a32aeed 100644
---- a/include/linux/pagewalk.h
-+++ b/include/linux/pagewalk.h
-@@ -130,4 +130,62 @@ int walk_page_mapping(struct address_space *mapping, pgoff_t first_index,
- 		      pgoff_t nr, const struct mm_walk_ops *ops,
- 		      void *private);
+diff --git a/mm/migrate.c b/mm/migrate.c
+index aa482c954cb0..b5365a434ba9 100644
+--- a/mm/migrate.c
++++ b/mm/migrate.c
+@@ -50,6 +50,7 @@
+ #include <linux/random.h>
+ #include <linux/sched/sysctl.h>
+ #include <linux/memory-tiers.h>
++#include <linux/pagewalk.h>
  
-+typedef int __bitwise folio_walk_flags_t;
-+
-+/*
-+ * Walk migration entries as well. Careful: a large folio might get split
-+ * concurrently.
-+ */
-+#define FW_MIGRATION			((__force folio_walk_flags_t)BIT(0))
-+
-+/* Walk shared zeropages (small + huge) as well. */
-+#define FW_ZEROPAGE			((__force folio_walk_flags_t)BIT(1))
-+
-+enum folio_walk_level {
-+	FW_LEVEL_PTE,
-+	FW_LEVEL_PMD,
-+	FW_LEVEL_PUD,
-+};
-+
-+/**
-+ * struct folio_walk - folio_walk_start() / folio_walk_end() data
-+ * @page:	exact folio page referenced (if applicable)
-+ * @level:	page table level identifying the entry type
-+ * @pte:	pointer to the page table entry (FW_LEVEL_PTE).
-+ * @pmd:	pointer to the page table entry (FW_LEVEL_PMD).
-+ * @pud:	pointer to the page table entry (FW_LEVEL_PUD).
-+ * @ptl:	pointer to the page table lock.
-+ *
-+ * (see folio_walk_start() documentation for more details)
-+ */
-+struct folio_walk {
-+	/* public */
-+	struct page *page;
-+	enum folio_walk_level level;
-+	union {
-+		pte_t *ptep;
-+		pud_t *pudp;
-+		pmd_t *pmdp;
-+	};
-+	union {
-+		pte_t pte;
-+		pud_t pud;
-+		pmd_t pmd;
-+	};
-+	/* private */
-+	struct vm_area_struct *vma;
-+	spinlock_t *ptl;
-+};
-+
-+struct folio *folio_walk_start(struct folio_walk *fw,
-+		struct vm_area_struct *vma, unsigned long addr,
-+		folio_walk_flags_t flags);
-+
-+#define folio_walk_end(__fw, __vma) do { \
-+	spin_unlock((__fw)->ptl); \
-+	if (likely((__fw)->level == FW_LEVEL_PTE)) \
-+		pte_unmap((__fw)->ptep); \
-+	vma_pgtable_walk_end(__vma); \
-+} while (0)
-+
- #endif /* _LINUX_PAGEWALK_H */
-diff --git a/mm/pagewalk.c b/mm/pagewalk.c
-index ae2f08ce991b..cd79fb3b89e5 100644
---- a/mm/pagewalk.c
-+++ b/mm/pagewalk.c
-@@ -3,6 +3,8 @@
- #include <linux/highmem.h>
- #include <linux/sched.h>
- #include <linux/hugetlb.h>
-+#include <linux/swap.h>
-+#include <linux/swapops.h>
+ #include <asm/tlbflush.h>
  
- /*
-  * We want to know the real level where a entry is located ignoring any
-@@ -654,3 +656,203 @@ int walk_page_mapping(struct address_space *mapping, pgoff_t first_index,
+@@ -2331,28 +2332,26 @@ static void do_pages_stat_array(struct mm_struct *mm, unsigned long nr_pages,
+ 	for (i = 0; i < nr_pages; i++) {
+ 		unsigned long addr = (unsigned long)(*pages);
+ 		struct vm_area_struct *vma;
+-		struct page *page;
++		struct folio_walk fw;
++		struct folio *folio;
+ 		int err = -EFAULT;
  
- 	return err;
- }
-+
-+/**
-+ * folio_walk_start - walk the page tables to a folio
-+ * @fw: filled with information on success.
-+ * @vma: the VMA.
-+ * @addr: the virtual address to use for the page table walk.
-+ * @flags: flags modifying which folios to walk to.
-+ *
-+ * Walk the page tables using @addr in a given @vma to a mapped folio and
-+ * return the folio, making sure that the page table entry referenced by
-+ * @addr cannot change until folio_walk_end() was called.
-+ *
-+ * As default, this function returns only folios that are not special (e.g., not
-+ * the zeropage) and never returns folios that are supposed to be ignored by the
-+ * VM as documented by vm_normal_page(). If requested, zeropages will be
-+ * returned as well.
-+ *
-+ * As default, this function only considers present page table entries.
-+ * If requested, it will also consider migration entries.
-+ *
-+ * If this function returns NULL it might either indicate "there is nothing" or
-+ * "there is nothing suitable".
-+ *
-+ * On success, @fw is filled and the function returns the folio while the PTL
-+ * is still held and folio_walk_end() must be called to clean up,
-+ * releasing any held locks. The returned folio must *not* be used after the
-+ * call to folio_walk_end(), unless a short-term folio reference is taken before
-+ * that call.
-+ *
-+ * @fw->page will correspond to the page that is effectively referenced by
-+ * @addr. However, for migration entries and shared zeropages @fw->page is
-+ * set to NULL. Note that large folios might be mapped by multiple page table
-+ * entries, and this function will always only lookup a single entry as
-+ * specified by @addr, which might or might not cover more than a single page of
-+ * the returned folio.
-+ *
-+ * This function must *not* be used as a naive replacement for
-+ * get_user_pages() / pin_user_pages(), especially not to perform DMA or
-+ * to carelessly modify page content. This function may *only* be used to grab
-+ * short-term folio references, never to grab long-term folio references.
-+ *
-+ * Using the page table entry pointers in @fw for reading or modifying the
-+ * entry should be avoided where possible: however, there might be valid
-+ * use cases.
-+ *
-+ * WARNING: Modifying page table entries in hugetlb VMAs requires a lot of care.
-+ * For example, PMD page table sharing might require prior unsharing. Also,
-+ * logical hugetlb entries might span multiple physical page table entries,
-+ * which *must* be modified in a single operation (set_huge_pte_at(),
-+ * huge_ptep_set_*, ...). Note that the page table entry stored in @fw might
-+ * not correspond to the first physical entry of a logical hugetlb entry.
-+ *
-+ * The mmap lock must be held in read mode.
-+ *
-+ * Return: folio pointer on success, otherwise NULL.
-+ */
-+struct folio *folio_walk_start(struct folio_walk *fw,
-+		struct vm_area_struct *vma, unsigned long addr,
-+		folio_walk_flags_t flags)
-+{
-+	unsigned long entry_size;
-+	bool expose_page = true;
-+	struct page *page;
-+	pud_t *pudp, pud;
-+	pmd_t *pmdp, pmd;
-+	pte_t *ptep, pte;
-+	spinlock_t *ptl;
-+	pgd_t *pgdp;
-+	p4d_t *p4dp;
-+
-+	mmap_assert_locked(vma->vm_mm);
-+	vma_pgtable_walk_begin(vma);
-+
-+	if (WARN_ON_ONCE(addr < vma->vm_start || addr >= vma->vm_end))
-+		goto not_found;
-+
-+	pgdp = pgd_offset(vma->vm_mm, addr);
-+	if (pgd_none_or_clear_bad(pgdp))
-+		goto not_found;
-+
-+	p4dp = p4d_offset(pgdp, addr);
-+	if (p4d_none_or_clear_bad(p4dp))
-+		goto not_found;
-+
-+	pudp = pud_offset(p4dp, addr);
-+	pud = pudp_get(pudp);
-+	if (pud_none(pud))
-+		goto not_found;
-+	if (IS_ENABLED(CONFIG_PGTABLE_HAS_HUGE_LEAVES) && pud_leaf(pud)) {
-+		ptl = pud_lock(vma->vm_mm, pudp);
-+		pud = pudp_get(pudp);
-+
-+		entry_size = PUD_SIZE;
-+		fw->level = FW_LEVEL_PUD;
-+		fw->pudp = pudp;
-+		fw->pud = pud;
-+
-+		if (!pud_present(pud) || pud_devmap(pud)) {
-+			spin_unlock(ptl);
-+			goto not_found;
-+		} else if (!pud_leaf(pud)) {
-+			spin_unlock(ptl);
-+			goto pmd_table;
+ 		vma = vma_lookup(mm, addr);
+ 		if (!vma)
+ 			goto set_status;
+ 
+-		/* FOLL_DUMP to ignore special (like zero) pages */
+-		page = follow_page(vma, addr, FOLL_GET | FOLL_DUMP);
+-
+-		err = PTR_ERR(page);
+-		if (IS_ERR(page))
+-			goto set_status;
+-
+-		err = -ENOENT;
+-		if (!page)
+-			goto set_status;
+-
+-		if (!is_zone_device_page(page))
+-			err = page_to_nid(page);
+-
+-		put_page(page);
++		folio = folio_walk_start(&fw, vma, addr, FW_ZEROPAGE);
++		if (folio) {
++			if (is_zero_folio(folio) || is_huge_zero_folio(folio))
++				err = -EFAULT;
++			else if (folio_is_zone_device(folio))
++				err = -ENOENT;
++			else
++				err = folio_nid(folio);
++			folio_walk_end(&fw, vma);
++		} else {
++			err = -ENOENT;
 +		}
-+		/*
-+		 * TODO: vm_normal_page_pud() will be handy once we want to
-+		 * support PUD mappings in VM_PFNMAP|VM_MIXEDMAP VMAs.
-+		 */
-+		page = pud_page(pud);
-+		goto found;
-+	}
-+
-+pmd_table:
-+	VM_WARN_ON_ONCE(pud_leaf(*pudp));
-+	pmdp = pmd_offset(pudp, addr);
-+	pmd = pmdp_get_lockless(pmdp);
-+	if (pmd_none(pmd))
-+		goto not_found;
-+	if (IS_ENABLED(CONFIG_PGTABLE_HAS_HUGE_LEAVES) && pmd_leaf(pmd)) {
-+		ptl = pmd_lock(vma->vm_mm, pmdp);
-+		pmd = pmdp_get(pmdp);
-+
-+		entry_size = PMD_SIZE;
-+		fw->level = FW_LEVEL_PMD;
-+		fw->pmdp = pmdp;
-+		fw->pmd = pmd;
-+
-+		if (pmd_none(pmd)) {
-+			spin_unlock(ptl);
-+			goto not_found;
-+		} else if (!pmd_leaf(pmd)) {
-+			spin_unlock(ptl);
-+			goto pte_table;
-+		} else if (pmd_present(pmd)) {
-+			page = vm_normal_page_pmd(vma, addr, pmd);
-+			if (page) {
-+				goto found;
-+			} else if ((flags & FW_ZEROPAGE) &&
-+				    is_huge_zero_pmd(pmd)) {
-+				page = pfn_to_page(pmd_pfn(pmd));
-+				expose_page = false;
-+				goto found;
-+			}
-+		} else if ((flags & FW_MIGRATION) &&
-+			   is_pmd_migration_entry(pmd)) {
-+			swp_entry_t entry = pmd_to_swp_entry(pmd);
-+
-+			page = pfn_swap_entry_to_page(entry);
-+			expose_page = false;
-+			goto found;
-+		}
-+		spin_unlock(ptl);
-+		goto not_found;
-+	}
-+
-+pte_table:
-+	VM_WARN_ON_ONCE(pmd_leaf(pmdp_get_lockless(pmdp)));
-+	ptep = pte_offset_map_lock(vma->vm_mm, pmdp, addr, &ptl);
-+	if (!ptep)
-+		goto not_found;
-+	pte = ptep_get(ptep);
-+
-+	entry_size = PAGE_SIZE;
-+	fw->level = FW_LEVEL_PTE;
-+	fw->ptep = ptep;
-+	fw->pte = pte;
-+
-+	if (pte_present(pte)) {
-+		page = vm_normal_page(vma, addr, pte);
-+		if (page)
-+			goto found;
-+		if ((flags & FW_ZEROPAGE) &&
-+		    is_zero_pfn(pte_pfn(pte))) {
-+			page = pfn_to_page(pte_pfn(pte));
-+			expose_page = false;
-+			goto found;
-+		}
-+	} else if (!pte_none(pte)) {
-+		swp_entry_t entry = pte_to_swp_entry(pte);
-+
-+		if ((flags & FW_MIGRATION) &&
-+		    is_migration_entry(entry)) {
-+			page = pfn_swap_entry_to_page(entry);
-+			expose_page = false;
-+			goto found;
-+		}
-+	}
-+	pte_unmap_unlock(ptep, ptl);
-+not_found:
-+	vma_pgtable_walk_end(vma);
-+	return NULL;
-+found:
-+	if (expose_page)
-+		/* Note: Offset from the mapped page, not the folio start. */
-+		fw->page = nth_page(page, (addr & (entry_size - 1)) >> PAGE_SHIFT);
-+	else
-+		fw->page = NULL;
-+	fw->ptl = ptl;
-+	return page_folio(page);
-+}
+ set_status:
+ 		*status = err;
+ 
 -- 
 2.45.2
 
