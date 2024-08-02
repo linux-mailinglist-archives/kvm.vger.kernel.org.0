@@ -1,236 +1,297 @@
-Return-Path: <kvm+bounces-23083-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23084-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A6A946237
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 19:01:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E19C94623A
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 19:05:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 482761C21006
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:01:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C46971F22760
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC4515C12A;
-	Fri,  2 Aug 2024 17:01:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FDDB1537A0;
+	Fri,  2 Aug 2024 17:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bsmO4F2k"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hj5BT8RI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700D116BE14;
-	Fri,  2 Aug 2024 17:01:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A547416BE2D
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 17:05:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722618080; cv=none; b=oDyqWrK3Ao6zUanKYIFR+bu5rC4v9tuKG9rpAVpmH+I8MWVidki0miVt91WwPdJRTY1EzVCC0iemZnzEyNO8diFkJna8p3cylzzP9HxNugV/Ebqtd7vKv+h4gT29WPbb9OqyB9BWKSaz9ePne7Mzl0igfTH00tld60vmOqSJSi0=
+	t=1722618314; cv=none; b=prqeXcpLidXTQDL3twMNComnf5uuyuSOAcvjDdXirGP4wjLvISgygWv4fwSvwc2fii3PWtm4PgzVqJY+of0W+n7tCf2VV3i2q0XBa2us6iNFPCXnbx5Jc2rENSAyu0YI0LSOEA6aZcR4H7f/ZoU+eUnmgc4JHQl7HATKDePirD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722618080; c=relaxed/simple;
-	bh=PlUfNCqxVe9v+v7ZCfIJKFswC6CmaMtq9PjiV01p50s=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hW8WrFGq6WlIhbzryoRb946xZQZ1vCkWg+jvx+We9hbYOdOC4U5/sV2/yX6MWZb7sLCEb7ULDnjKChxogLtOtRDAdVNB9sRVwq3qfDtprQD22fhhXy0V1YjEtGg9C9Qr2CcrRYeAnQs5/ACGxMdWU4YRr0j0JnGBpbzaoUK9uTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bsmO4F2k; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3685a564bafso4082088f8f.3;
-        Fri, 02 Aug 2024 10:01:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722618077; x=1723222877; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vpcsgqmtuPo+pz6tWtSNKqkTo9JxSymPCppu91onA2Q=;
-        b=bsmO4F2knRDOZMfNEU8Azk/GNULiAXnxS80JPpv+axd85tLDm6m6LntUcX8SZSJQe1
-         IS3Cv2SuD5kKrwgvB/OOQegjQQveY4am6XzsMLOwSWU498byLpxFCjTBuy9ffp6q4F9i
-         Ru8kpokPX9W4PQ2yQvLPm87LFk/dfKVlNhzpokwERjCUSp/M16r7M4Y8PQGm231Nv7fj
-         3QEirIC3qXOygmk1THZfjsGDyVVamcMNQ4i9zbTp+MWVMkTbdW/rAw82gLqdizp+rUiW
-         jUblW154JJ9xY4VWKAVaxf7Xg8xTl85Y2DOe917+hEiN15FBuCRMLPkhg5UdlNi1JMVp
-         YAIQ==
+	s=arc-20240116; t=1722618314; c=relaxed/simple;
+	bh=LYZeEoXD1MRcP7FnteINA5VYc1IRTum2LPZ8Op3jy5g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PO17+gHW0G82pl2sBUy+MF+PIQiiN3ayciTw6Q1jThHKWSmtkSXmGATGeWUD4RYe1Ad2g17yrZJ11/Xji5jEgbJFPNVFNjqePaE7qCaLgVUyCcLufMWYrMdNzugErnwbkRHmqOvX3IKBM2XhoMAdpgbyc298mnIbj5EUSmHUYgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hj5BT8RI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722618311;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=NiwMIboffiHIHm8ZNuV6tBbNURnyVhFmDSlOxVZsJZE=;
+	b=hj5BT8RIIRbEx6TDpM7BWm0Jz3QcgFzuN9z8is1pBfbonFdqkIICsmeIbKOPdvw5h4gBHk
+	ZWrvL6XtXKSLApHq6uqWqzJKw7DCv/PhxSaLgSiCMfP78vy2whIoP1dSJBoSEEJsgc11yd
+	T7cXt8kXgzWbqA+LFsoYa5pVL0Wz9Gc=
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com
+ [209.85.166.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-539-3LUvMvv6Nq-KbzO4sdYoOg-1; Fri, 02 Aug 2024 13:05:10 -0400
+X-MC-Unique: 3LUvMvv6Nq-KbzO4sdYoOg-1
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-81f8edd731cso1170857639f.0
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 10:05:10 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722618077; x=1723222877;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vpcsgqmtuPo+pz6tWtSNKqkTo9JxSymPCppu91onA2Q=;
-        b=KDDVxN/D5HYlBLQSJViX6rMhqE843Bcii5kyGewydbuag6RnpmBM+c2SbJbkJa+ec0
-         z5fPmoQFSPsnO2Vcvh7vl1TmR3V/mvfcVW32+SU+UTL1vUb4SXBfgrrvREC2HF8NUFaJ
-         MO3T+6CPLolZIsDjrMJexYzk2g33MVDOZwnDC46kfjZr0ckT1CjQMkuDexXb3OI2Fltu
-         iy3AcQ6kGqWeR2HQaO2AuNdPX2peDi77XucsmQ7wxx567xxWOrOtMYhaDR7QtIcUe2g0
-         i31mENT9oZfxMxHIbupahaWUjek+abfLzY+eneR0jmerBAZUtPKFsPmNEwj7198XOoQD
-         Cr+A==
-X-Forwarded-Encrypted: i=1; AJvYcCXG6dVZmnAKzqHrqFaAiBzhvS1MW1TTlJqRsJ1WzEnpE5zd7UMa44qEYu5lsaJxKqFTjKCp3ngAf4E/DmPRJDVcKLtuPMIBc9S/Qj7H8FK1X76/9NaX7f/jQ0qxyYpECCiXPmmoj9H50rPKWdd26MbwmfeeAv3vFpHthI0/aFnBzEPPezcwSbAVmQY6HqEjs2ubW3cI/PD9i70xGJpqmO3roidaKrCsofil
-X-Gm-Message-State: AOJu0YyvfFSIpqJCSXRFCzchI/w6empGhWLOTgBIUok3AXaBJ3j+yI1s
-	o9pCL4N0SYmqbtMU8FAcQMSvShsjcGUosd0rUlEtMV1crQOWGQdh3voxpDebB265+IdOaCde53r
-	j635c7p4VOxtNL8tQliGgabKRX/s=
-X-Google-Smtp-Source: AGHT+IH75FU4JpBvhRKVqmFn8me2clEuJ7/a5V8Xhv6OElYPF/ofyi1s2L5ZzsGAeeZuvfLRALy59I0v9WsGM6Mhk90=
-X-Received: by 2002:adf:e98a:0:b0:368:4d33:9aac with SMTP id
- ffacd0b85a97d-36bbc0fc757mr2416504f8f.31.1722618076415; Fri, 02 Aug 2024
- 10:01:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1722618309; x=1723223109;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NiwMIboffiHIHm8ZNuV6tBbNURnyVhFmDSlOxVZsJZE=;
+        b=q5XW6M4dw5zDp9jE53pugN1ugAoOC0X+exB8TU9fMKgnmNkRP+nM0jOn0QtFlRcu0T
+         wZzjpQLj6zjYzHvFH8cm0VYaN/w9AdGzgvSFnfEIvxBwqE28rGdD/lEGxKYJFMljaAg2
+         qkYXVkEbetWfmKQNXJOuOcTEJFhxOIJ5R9nJO1BqItm5owf6UxdRJbaYdk1miLk4LsTd
+         x1DXQiiNmff4bm8WcGiFsa83XO5tyHNAvMF9ZUikKUgtIKLMpYG6Kf0uqJIyzAH/og4q
+         gvD6eLbyX3uyXgASUs5+GkvQMS0cJtW9dlxjFOpdjI4Zm+bQEQ9ixyuXO6eXcIFjkEBf
+         cMig==
+X-Forwarded-Encrypted: i=1; AJvYcCXVHNXTCQ6opD0TZh/6UO0FuZcObLKI++t+WltNhFfINN5BS7speX4SAMOiGvebwJ8++5kVz9mg1NMFflPSC8cG5hFm
+X-Gm-Message-State: AOJu0YzzU9YhGbrL6DsM2EXspPCHv++O8qSoXnMyoUfNV4NpbUNpLrB0
+	o/tn1dvMKShYLs5jmjlK+UjaUjYX0LVHUtyubzrX/bxQJTUmBNV5/tsDsJ8sAp+B2rr57A/w3UT
+	M0PAqj+yy1KwJ/PwOKRPjuM0xhUTSY8/PXbWuhkrqcO3BNkP2uqCjBC6apg==
+X-Received: by 2002:a05:6602:3fc3:b0:81f:945b:7f6d with SMTP id ca18e2360f4ac-81fd4364336mr583644539f.6.1722618308777;
+        Fri, 02 Aug 2024 10:05:08 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEmwj7ILacE2PwC+KISiQWi0MFEeCxVDRLlojbE7Wvet94Gg/jU7apem7YxTLJf80UCdBJ8nQ==
+X-Received: by 2002:a05:6602:3fc3:b0:81f:945b:7f6d with SMTP id ca18e2360f4ac-81fd4364336mr583638539f.6.1722618307960;
+        Fri, 02 Aug 2024 10:05:07 -0700 (PDT)
+Received: from redhat.com ([38.15.36.11])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4c8d69a8009sm535597173.49.2024.08.02.10.05.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 10:05:07 -0700 (PDT)
+Date: Fri, 2 Aug 2024 11:05:06 -0600
+From: Alex Williamson <alex.williamson@redhat.com>
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org, Keith Busch
+ <kbusch@kernel.org>
+Subject: Re: [PATCH rfc] vfio-pci: Allow write combining
+Message-ID: <20240802110506.23815394.alex.williamson@redhat.com>
+In-Reply-To: <20240802115308.GA676757@ziepe.ca>
+References: <20240731155352.3973857-1-kbusch@meta.com>
+	<20240801141914.GC3030761@ziepe.ca>
+	<20240801094123.4eda2e91.alex.williamson@redhat.com>
+	<20240801161130.GD3030761@ziepe.ca>
+	<20240801105218.7c297f9a.alex.williamson@redhat.com>
+	<20240801171355.GA4830@ziepe.ca>
+	<20240801113344.1d5b5bfe.alex.williamson@redhat.com>
+	<20240801175339.GB4830@ziepe.ca>
+	<20240801121657.20f0fdb4.alex.williamson@redhat.com>
+	<20240802115308.GA676757@ziepe.ca>
+Organization: Red Hat
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731124505.2903877-1-linyunsheng@huawei.com>
- <20240731124505.2903877-5-linyunsheng@huawei.com> <CAKgT0UcqdeSJdjZ_FfwyCnT927TwOkE4zchHLOkrBEmhGzex9g@mail.gmail.com>
- <22fda86c-d688-42e7-99e8-e2f8fcf1a5ba@huawei.com> <CAKgT0UcuGj8wvC87=A+hkarRupfhjGM0BPzLUT2AJc8Ovg_TFg@mail.gmail.com>
- <877efebe-f316-4192-aada-dd2657b74125@huawei.com>
-In-Reply-To: <877efebe-f316-4192-aada-dd2657b74125@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Fri, 2 Aug 2024 10:00:39 -0700
-Message-ID: <CAKgT0UfUkqR2TJQt6cSEdANNxQEOkjGqpPXhaXmrrxB0KwXmEQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Subbaraya Sundeep <sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, intel-wired-lan@lists.osuosl.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	linux-nvme@lists.infradead.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-mm@kvack.org, bpf@vger.kernel.org, 
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 2, 2024 at 3:05=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> On 2024/8/1 23:21, Alexander Duyck wrote:
-> > On Thu, Aug 1, 2024 at 6:01=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei=
-.com> wrote:
-> >>
-> >> On 2024/8/1 2:13, Alexander Duyck wrote:
-> >>> On Wed, Jul 31, 2024 at 5:50=E2=80=AFAM Yunsheng Lin <linyunsheng@hua=
-wei.com> wrote:
-> >>>>
-> >>>> Currently the page_frag API is returning 'virtual address'
-> >>>> or 'va' when allocing and expecting 'virtual address' or
-> >>>> 'va' as input when freeing.
-> >>>>
-> >>>> As we are about to support new use cases that the caller
-> >>>> need to deal with 'struct page' or need to deal with both
-> >>>> 'va' and 'struct page'. In order to differentiate the API
-> >>>> handling between 'va' and 'struct page', add '_va' suffix
-> >>>> to the corresponding API mirroring the page_pool_alloc_va()
-> >>>> API of the page_pool. So that callers expecting to deal with
-> >>>> va, page or both va and page may call page_frag_alloc_va*,
-> >>>> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
-> >>>>
-> >>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> >>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> >>>> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> >>>
-> >>> I am naking this patch. It is a pointless rename that is just going t=
-o
-> >>> obfuscate the git history for these callers.
-> >>
-> >> I responded to your above similar comment in v2, and then responded mo=
-re
-> >> detailedly in v11, both got not direct responding, it would be good to
-> >> have more concrete feedback here instead of abstract argument.
-> >>
-> >> https://lore.kernel.org/all/74e7259a-c462-e3c1-73ac-8e3f49fb80b8@huawe=
-i.com/
-> >> https://lore.kernel.org/all/11187fe4-9419-4341-97b5-6dad7583b5b6@huawe=
-i.com/
-> >
-> > I will make this much more understandable. This patch is one of the
-> > ones that will permanently block this set in my opinion. As such I
-> > will never ack this patch as I see no benefit to it. Arguing with me
-> > on this is moot as you aren't going to change my mind, and I don't
-> > have all day to argue back and forth with you on every single patch.
->
-> Let's move on to more specific technical discussion then.
->
-> >
-> > As far as your API extension and naming maybe you should look like
-> > something like bio_vec and borrow the naming from that since that is
-> > essentially what you are passing back and forth is essentially that
-> > instead of a page frag which is normally a virtual address.
->
-> I thought about adding something like bio_vec before, but I am not sure
-> what you have in mind is somthing like I considered before?
-> Let's say that we reuse bio_vec like something below for the new APIs:
->
-> struct bio_vec {
->         struct page     *bv_page;
->         void            *va;
->         unsigned int    bv_len;
->         unsigned int    bv_offset;
-> };
+On Fri, 2 Aug 2024 08:53:08 -0300
+Jason Gunthorpe <jgg@ziepe.ca> wrote:
 
-I wasn't suggesting changing the bio_vec. I was suggesting that be
-what you pass as a pointer reference instead of the offset. Basically
-your use case is mostly just for populating bio_vec style structures
-anyway.
+> On Thu, Aug 01, 2024 at 12:16:57PM -0600, Alex Williamson wrote:
+> > On Thu, 1 Aug 2024 14:53:39 -0300
+> > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> >   
+> > > On Thu, Aug 01, 2024 at 11:33:44AM -0600, Alex Williamson wrote:  
+> > > > On Thu, 1 Aug 2024 14:13:55 -0300
+> > > > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > > >     
+> > > > > On Thu, Aug 01, 2024 at 10:52:18AM -0600, Alex Williamson wrote:    
+> > > > > > > > vfio_region_info.flags in not currently tested for input therefore this
+> > > > > > > > proposal could lead to unexpected behavior for a caller that doesn't
+> > > > > > > > currently zero this field.  It's intended as an output-only field.        
+> > > > > > > 
+> > > > > > > Perhaps a REGION_INFO2 then?
+> > > > > > > 
+> > > > > > > I still think per-request is better than a global flag      
+> > > > > > 
+> > > > > > I don't understand why we'd need a REGION_INFO2, we already have
+> > > > > > support for defining new regions.      
+> > > > > 
+> > > > > It is not a new region, it is a modified mmap behavior for an existing
+> > > > > region.    
+> > > > 
+> > > > If we're returning a different offset into the vfio device file from
+> > > > which to get a WC mapping, what's the difference?     
+> > > 
+> > > I think it is a pretty big difference.. The offset is just a "mmap
+> > > cookie", it doesn't have to be 1:1 with the idea of a region.
+> > >   
+> > > > A vfio "region" is
+> > > > describing a region or range of the vfio device file descriptor.    
+> > > 
+> > > I'm thinking a region is describing an area of memory that is
+> > > available in the VFIO device. The offset output is just a "mmap
+> > > cookie" to tell userspace how to mmap it. Having N mmap cookies for 1
+> > > region is OK.  
+> > 
+> > Is an "mmap cookie" an offset into the vfio device file where mmap'ing
+> > that offset results in a WC mapping to a specific device resource?  
+> 
+> Yes
+> 
+> > Isn't that just a region that doesn't have an index or supporting
+> > infrastructure?  
+> 
+> No? It is a "mmap cookie" that has the requested mmap-time properties.
+> 
+> Today the kernel side binds the mmap offset to the index in a computed
+> way, but from a API perspective userspace does REGION_INFO and gets
+> back an opaque "mmap cookie" that it uses to pass to mmap to get back
+> the thing describe by REGION_INFO. Userspace has no idea about any
+> structure to the cookie numbers.
 
-> It seems we have the below options for the new API:
->
-> option 1, it seems like a better option from API naming point of view, bu=
-t
-> it needs to return a bio_vec pointer to the caller, it seems we need to h=
-ave
-> extra space for the pointer, I am not sure how we can avoid the memory wa=
-ste
-> for sk_page_frag() case in patch 12:
-> struct bio_vec *page_frag_alloc_bio(struct page_frag_cache *nc,
->                                     unsigned int fragsz, gfp_t gfp_mask);
->
-> option 2, it need both the caller and callee to have a its own local spac=
-e
-> for 'struct bio_vec ', I am not sure if passing the content instead of
-> the pointer of a struct through the function returning is the common patt=
-ern
-> and if it has any performance impact yet:
-> struct bio_vec page_frag_alloc_bio(struct page_frag_cache *nc,
->                                    unsigned int fragsz, gfp_t gfp_mask);
->
-> option 3, the caller passes the pointer of 'struct bio_vec ' to the calle=
-e,
-> and page_frag_alloc_bio() fills in the data, I am not sure what is the po=
-int
-> of indirect using 'struct bio_vec ' instead of passing 'va' & 'fragsz' &
-> 'offset' through pointers directly:
-> bool page_frag_alloc_bio(struct page_frag_cache *nc,
->                          unsigned int fragsz, gfp_t gfp_mask, struct bio_=
-vec *bio);
->
-> If one of the above option is something in your mind? Yes, please be more=
- specific
-> about which one is the prefer option, and why it is the prefer option tha=
-n the one
-> introduced in this patchset?
->
-> If no, please be more specific what that is in your mind?
+REGION_INFO is part of what I'm referring to as infrastructure.
+Userspace knows a number of regions, ie. indexes, via DEVICE_INFO and
+iterates those regions using REGION_INFO to get the mmap cookie, ie.
+file offset.  The ABI is flexible here, the first few region indexes
+are static mappings to vfio-pci specific device resources and
+additional mappings are described as device specific resources using
+the REGION_INFO capability chain.
 
-Option 3 is more or less what I had in mind. Basically you would
-return an int to indicate any errors and you would be populating a
-bio_vec during your allocation. In addition you would use the bio_vec
-as a tracker of the actual fragsz so when you commit you are
-committing with the fragsz as it was determined at the time of putting
-the bio_vec together so you can theoretically catch things like if the
-underlying offset had somehow changed from the time you setup the
-allocation. It would fit well into your probe routines since they are
-all essentially passing the page, offset, and fragsz throughout the
-code.
+> > > Which controls what NC/WC the mmap creates when called:
+> > > 
+> > > +	if (vdev->bar_write_combine[index])
+> > > +		vma->vm_page_prot = pgprot_writecombine(vma->vm_page_prot);
+> > > +	else
+> > > +		vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
+> > > 
+> > > You get the same output from REGION_INFO, same number of regions.  
+> > 
+> > It was your proposal that introduced REQ_WC, this is Keith's original
+> > proposal.  I'm equating a REQ_WC request inventing an "mmap cookie" as
+> > effectively the same as bringing a lightweight region into existence
+> > because it defines a section of the vfio device file to have specific
+> > mmap semantics.  
+> 
+> Well, again, it is not a region, it is just a record that this mmap
+> cookie uses X region with Y mapping flags. The number of regions don't
+> change. Critically from a driver perspective the number of regions and
+> region indexes wouldn't change.
+
+Why is this critical?  As above, for vfio-pci devices the first few
+region indexes are static mappings to specific PCI resources and
+additional resources beyond VFIO_PCI_NUM_REGIONS are device specific
+and described by a region type in the capability chain.
+
+None of the static regions move and it's part of the defined ABI for
+userspace to iterate additional regions.
+
+> I am not thing of making a new region, I am thinking of adjusting how
+> mmap works. Like today we do this:
+> 
+> 	index = vma->vm_pgoff >> (VFIO_PCI_OFFSET_SHIFT - PAGE_SHIFT);
+> 
+> So maybe instead it is something like:
+> 
+>       vfio_decode_mmap_cookie(vma, &index, &flags);
+>       if (flags & VFIO_MMAP_WC)
+>           prot = pgprot_writecombine(..)
+> 
+> From a driver perspective the region indexes don't change at all. This
+> is what I think is important here.
+
+The only thing that changes is that num_regions increases and the user
+can go check REGION_INFO on those newly reported regions.  The way we
+currently calculate the index from the vm_pgoff is implementation, not
+uAPI.  We can change that if necessary.  Userspace should always get
+the offset, ie. mmap cookie, from REGION_INFO and the initial set of
+region indexes to device resources are fixed, they will not change.
+
+> > > It was the other proposal from long ago that created more regions.
+> > > 
+> > > This is what I like and would prefer to stick with. REGION_INFO
+> > > doesn't really change, we don't have two regions refering to the same
+> > > physical memory, and we find some way to request NC/WC of a region at
+> > > mmap time.  
+> > 
+> > "At mmap time" means that something in the vma needs to describe to us
+> > to use the WC semantics, where I think you're proposing that the "mmap
+> > cookie" provides a specific vm_pgoff which we already use to determine
+> > the region index.    
+> 
+> Yes
+> 
+> > So whether or not we want to call this a region,
+> > it's effectively in the same address space as regions.  Therefore "mmap
+> > cookie" ~= "region offset".  
+> 
+> Well, that is just the current implementation. What we did in RDMA
+> when we switched from hard coded mmap cookies to dynamic ones is
+> use an xarray (today this should be a maple tree) to dynamically
+> allocate mmap cookies whenever the driver returns something to
+> userspace. During the mmap fop the pgoff is fed back through the maple
+> tree to get the description of what the cookie represents.
+
+Sure, we could do that too, the current implementation (not uAPI) just
+uses some upper bits to create fixed region address spaces.  The only
+thing we should need to keep consistent is the mapping of indexes to
+device resources up through VFIO_PCI_NUM_REGIONS.
+
+> So the encoding of cookies is completely disjoint from whatever the
+> underlying thing is. If you want the same region to be mapped with two
+> or three different prot flags you just ask for two or three cookies
+> and at mmap time you can recover the region pointer and the mmap
+> flags.
+> 
+> So VFIO could do several different things here to convay the mmap
+> flags through the cookie, including somehow encoding it in a pgoff
+> bit, or using a dynamic maple tree scheme.
+> 
+> My point is to not confuse the pgoff encoding with the driver concept
+> of a region. The region is a single peice of memory, the "mmap cookie"s
+> are just handles to it. Adding more data to the handle is not the same
+> as adding more regions.
+
+I don't get it.  Take for instance PCI config space.  Given the right
+GPU, I can get to config space through an I/O port region, an MMIO
+region (possibly multiple ways), and the config space region itself.
+Therefore based on this hardware implementation there is no unique
+mapping that says that config space is uniquely accessible via a single
+region.  Each of these regions has different semantics.  If the layout
+of the device can cause this, why do we restrict ourselves that a given
+BAR can only be accessed via a signle region and we need to play games
+with terminology to call it an mmap cookie rather than officially
+creating a region with WC mmap semantics?
+
+> > > > At the limit they're the same.  We could use a
+> > > > DEVICE_FEATURE to ask vfio to selectively populate WC regions after
+> > > > which the user could re-enumerate additional regions, or in fact to
+> > > > switch on WC for a given region if we want to go that route.  Thanks,    
+> > > 
+> > > This is still adding more regions and reporting more stuff from
+> > > REGION_INFO, that is what I would like to avoid.  
+> > 
+> > Why?  This reminds me of hidden registers outside of capability chains
+> > in PCI config space.  Thanks,  
+> 
+> The mmap offsets are not (supposed to be) ABI in the VFIO ioctls. The
+> encoding is entirely opaque inside the kernel already. Apps are
+> supposed to use REGION_INFO to learn the value to pass to mmap. ie
+> things like VFIO_PCI_OFFSET_SHIFT are not in the uAPI header.
+
+Exactly, which gives us the flexibility to add new regions as
+necessary.  The mechanism by which userspace iterates regions is
+already provided in the uABI.  The initial set of static vfio-pci
+regions require fixed indexes, but not fixed offsets.
+VFIO_PCI_OFFSET_SHIFT is only an internal implementation detail.  Thanks
+
+Alex
+
 
