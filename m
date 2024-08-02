@@ -1,107 +1,110 @@
-Return-Path: <kvm+bounces-23160-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23161-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E973A9465EC
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 00:41:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA19B9465ED
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 00:41:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C7DEB22203
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:41:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B5FA2831D2
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:41:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17F613A245;
-	Fri,  2 Aug 2024 22:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5535713C66A;
+	Fri,  2 Aug 2024 22:41:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f6aOTMue"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0onijI8D"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53C913C3E4
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 22:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC95D13C3F9
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 22:41:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722638463; cv=none; b=MTZqD3o7HNXJ2Jg8yRL/bM685e3Oww1txNijXBIveDsQ8c1tdUgyE/BSR2xJQTPx9lhlqCViOVTx/1+IVwW0Ai7ZVYfmJRPFXE7Cfr4lyUtShBTirIo3Gg7XKe6tieyVPId4M1r80miZPCtIN+FlJEj9f0vfnhZCL/tys091Ejo=
+	t=1722638464; cv=none; b=c+FvqaptyotUTg593BfaA9HcZ1vZSyUpeEgqWJZEDoHLbbFr4c09XnEm8vc+jPdqi+exWgYkLuASFpx8G8g77aCSuM2Ui6GcmyAZooz47U60y+Ui03RFLPDV5umQ3/rHXxXWF+eePx92BX+bAaGYlfbIkH0/qcOxnOuZNehDDYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722638463; c=relaxed/simple;
-	bh=qr5BTy+0rP4m99VwQ0GuNK/YeJP/WBSk49NkTt1nPdc=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=X7Aj2PjVIRT5ZqdWEn2EV3oTtAYuGfSufURS/jJ07niBm+zat52Zz/I791ZzEncqzojmwCzrAN6f5MUX6Qinjy1pkaM4YN0InkKkLPrTQL1gfqgAQtFY+6k57FE+RZtJYgDEmK6eiC9Bg5S0LD/OXnL0L/VWwQjLbGlUz4nqhv4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f6aOTMue; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1722638464; c=relaxed/simple;
+	bh=+8PWqUn5v8ELFuwRLcfeynpHGo4ajB+2U+KO7lA8yMI=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=ILcmlBC6vyWRnIVpNYwTyFEXAeq/fcKIkrrAq8/LF+TDbKXk/ljg4wgEAXm6su0G1ivOoAzMnh3wUARTdNVVLHwoIMBal59KtZJemlsxWvNx9BpsxLWObqSXFQ2gPeao4b/ZC6gs0CmIpQ91CaEm2W/ri/TW12jVR/fpty47wHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0onijI8D; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--amoorthy.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-672bea19dd3so187365587b3.1
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 15:41:01 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0872023b7dso13629930276.2
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 15:41:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722638460; x=1723243260; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=XoExkem0pI3PQlrsfFLGIInPgK2Os7OnG4xaWi9xIB0=;
-        b=f6aOTMueMTSpxOl8NLfQkzBSLRkGt9H5UPo4QClFtuBmvb/+29ne6ShX3w0OZnLCRY
-         d5U5K57V63ZOcuWOAg2Op09lFeLGCH0yex5iBF8ZQCHcInb9fIUEvw9geHZZHPyM3DpK
-         ZBlou7/eHiS2boPmDeNcE0K54z4SnjrSrh57RJGp//OapS+/MVSjQQ3ek2QOAtGiLryL
-         gCeQBSYVEa8fip0aRXlNHYbOz7yo+qFYWNDlz56SEI4XCp0TOpAjGq5k8t8LyngLCv9j
-         NKbyaDTeWYbcxZwRVdwlUcfa1cuwzXM3ulsrRJtCl7VdQOws7PFnqqPQ9QCDQiytMcL1
-         QaEQ==
+        d=google.com; s=20230601; t=1722638461; x=1723243261; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wQg/YvoMgl7FyNj9U0nitSnR849bmsnUb2Q2PwwvwGA=;
+        b=0onijI8DPv0zFSKfF0oUVLZlb74CWn8L+9fqircR2gJGIHSa/0C4XFNk82lYcCqGrS
+         meoiyN7usZ3JRbs1xVI+a/za9pgCHr40uFuilf6MWj7KJCo30GQHbGfMGKhw4xCExF7D
+         nQvy8H4enAskKXh2zCiFnjrgBg3VqSNnReWcuMBkSVbfKiDtjfx94Feql+xouRzEa4+A
+         jzWm3CZC9idBvTSIYzULEB+87kvj3eaYsZHb9hCnRyHpnYWEmj3l+umMbGt/mJfAA1Hf
+         3ajreWlx6TeOei5FXSO/Q8A5ypI1GcxC/mBvG8xx6E1uSTYx94+eSsqwMikFmBrxjN0z
+         xijA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722638460; x=1723243260;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XoExkem0pI3PQlrsfFLGIInPgK2Os7OnG4xaWi9xIB0=;
-        b=p5mkUlPlxH0s4c1RdrcFYh2TPDRIg6gC+kwmPOgX8Mv/oea5xWOKxFXbLfnZZaIKlk
-         ZhLQ8DEfwVjfhdbHr0YyLLNwSUobGiS1yysB14rs9/ygglgY/kywQo6RPk8PGeTcZnH6
-         wJ/ZHkeEv5nx3XQZh2cbMEI3w5q/VAuyrD4FUFyqEbvhwqSKZ7KstK/VmTtvsPjDzMI7
-         7BrakS9SgTRM3mV4b1ini9pQuAZsoCGmXKTbd2dECsm6dFgQQ6fGqTagJoAq8MDE9oTC
-         VixoCe+4fMXN9B1QMu9vMqrNZB3DLYEZAQZkkQDMPxG5fuA83IppCF88T8fzMibdetaM
-         MS+w==
-X-Gm-Message-State: AOJu0YxTMUOQ9yBv59VSh99pWltADhw8e45/6JVqfQnZNX6ddnKEhpkF
-	j4BibXlRdhru/JdRwEFpUoErAuBB2UMbadMi6cIMuKtExO3Vj9ROvdq/bbcQYOh+DaRXDy8Fc/9
-	eFQnTJRGNGw==
-X-Google-Smtp-Source: AGHT+IHWsNULlr0OmaF5l6nZ9yDeq3lPANgbS+u1ex6NibNf4/8aS9SuVg1An9LGCqPy2z4RP/nXzJOyr2/9rQ==
+        d=1e100.net; s=20230601; t=1722638461; x=1723243261;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wQg/YvoMgl7FyNj9U0nitSnR849bmsnUb2Q2PwwvwGA=;
+        b=TaLGeth6sbXRTEnO9rcBZz1gy0UYFUK2AZp8uqpBWLxRoTsCYE3U6T/f0LTRDgUVGr
+         FgXWfNHiU/Vf/zGm/oDptYOaVchWOZ0eOHm14wHAfMHEVfhF91uXad/CPTLOUq1xZNq1
+         cwUFuAXUYqAMYnfolJwxtRvkJGh45XL42JtSr9iaeKtsA0dcNVvI/LH4gmJLzCcSRR4C
+         hcvFKoyJnBArdA2MKgXDRR231qs1hNsxQjSBw7SxE+nqaxeIbdI2p8swviSyTNKTL3GN
+         QSNnoRMdDSYu9VYDbOfuKhlNnt9zSgGKNduEk/L9GXE8463117ok2Fh5mlJhlyi90s+z
+         TlCQ==
+X-Gm-Message-State: AOJu0YybjpJAIrnSf9b4OZo8CtWynv8R/wsgALBDEU5lRbr7nGiHPS32
+	JtlpHqAnIhEkKXXpSf7luXOVLATPaijEaZ7ypppTkiprztKC+K24N4pRl3v3PIOYPJxbcNGkeyv
+	lPHhLWWiWDw==
+X-Google-Smtp-Source: AGHT+IGtFaFx4zh5naUYBzERvzjQFXAsvrg5mgn76ZrbuxK1hvekubdwutq95TgJoPA0V0wp7mG5L6tjyEmn4g==
 X-Received: from laogai.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:2c9])
- (user=amoorthy job=sendgmr) by 2002:a05:690c:86:b0:673:b39a:92ce with SMTP id
- 00721157ae682-689601ab898mr265957b3.3.1722638460490; Fri, 02 Aug 2024
- 15:41:00 -0700 (PDT)
-Date: Fri,  2 Aug 2024 22:40:28 +0000
+ (user=amoorthy job=sendgmr) by 2002:a05:6902:100c:b0:e0b:4dd5:3995 with SMTP
+ id 3f1490d57ef6-e0bde4abb59mr7845276.7.1722638461690; Fri, 02 Aug 2024
+ 15:41:01 -0700 (PDT)
+Date: Fri,  2 Aug 2024 22:40:29 +0000
+In-Reply-To: <20240802224031.154064-1-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240802224031.154064-1-amoorthy@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802224031.154064-1-amoorthy@google.com>
-Subject: [PATCH 0/3] Set up KVM_EXIT_MEMORY_FAULTs when arm64/x86 stage-2
- fault handlers fail
+Message-ID: <20240802224031.154064-2-amoorthy@google.com>
+Subject: [PATCH 1/3] KVM: x86: Do a KVM_MEMORY_FAULT EXIT when stage-2 fault
+ handler EFAULTs
 From: Anish Moorthy <amoorthy@google.com>
 To: seanjc@google.com, oliver.upton@linux.dev
 Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev, jthoughton@google.com, 
 	amoorthy@google.com, rananta@google.com
 Content-Type: text/plain; charset="UTF-8"
 
-Memory fault exits were originally conceived for the stage-2 fault
-handlers in the first place: it's probably time they were actually added
-there :)
+Right now userspace just gets a bare EFAULT when the stage-2 fault
+handler fails to fault in the relevant page. Set up a memory fault exit
+when this happens, which at the very least eases debugging and might
+also let userspace decide on/take some specific action other than
+crashing the VM.
 
-Sean and Oliver: you guys were having a discussion on the arm64 patch
-the last time I posted it: here's the link in case you need it.
-https://lore.kernel.org/kvm/20240215235405.368539-9-amoorthy@google.com/
+Signed-off-by: Anish Moorthy <amoorthy@google.com>
+---
+ arch/x86/kvm/mmu/mmu.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Anish Moorthy (3):
-  KVM: x86: Do a KVM_MEMORY_FAULT EXIT when stage-2 fault handler
-    EFAULTs
-  KVM: arm64: Declare support for KVM_CAP_MEMORY_FAULT_INFO
-  KVM: arm64: Do a KVM_EXIT_MEMORY_FAULT when stage-2 fault handler
-    EFAULTs
-
- Documentation/virt/kvm/api.rst | 2 +-
- arch/arm64/kvm/arm.c           | 1 +
- arch/arm64/kvm/mmu.c           | 5 ++++-
- arch/x86/kvm/mmu/mmu.c         | 1 +
- 4 files changed, 7 insertions(+), 2 deletions(-)
-
-
-base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 901be9e420a4..c22c807696ae 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3264,6 +3264,7 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 		return RET_PF_RETRY;
+ 	}
+ 
++	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+ 	return -EFAULT;
+ }
+ 
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
