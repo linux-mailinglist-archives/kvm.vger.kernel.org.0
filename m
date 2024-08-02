@@ -1,59 +1,61 @@
-Return-Path: <kvm+bounces-23049-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D3A946016
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:17:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 447EE946018
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:18:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8235A1C221A6
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:17:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE3EB1F2430F
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03851136346;
-	Fri,  2 Aug 2024 15:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE5C21C19B;
+	Fri,  2 Aug 2024 15:16:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFintkjt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NH4fM93l"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D2515C14B
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:16:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0B421C16E
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:16:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722611782; cv=none; b=dIp2IaN9tG5BMBi8zXCzctE3uIoGyq9R4HIak96kCe3jPtuxDKkuGLd4Su3IJCwFJfSRU3sO4koTiO8MW8oVHAsXFLvhiIOjr+OZaoQ0VLbxYJ6vO+GtIka+OPtF8RmrmTLIvjWNf2NUDmoCvmY1W48IZ3KmGVNHRsQ6nwFkHYI=
+	t=1722611787; cv=none; b=jGnym7WyJ/dg5rta+pr7jCtxzqRl8vAlBaKb4Q3B2EkjwYIiys7tWAjKf8pLm18rbcgh5Dkr5pbRq6JmEBu8GTkrn6pNjgag8aFEU0Kzz+RUJSl0YHiGfY3itXt4lRSIx+twm0Ujjx/EuSW4t7oZnUaeZ3v4A3i7ECnti1R3nRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722611782; c=relaxed/simple;
-	bh=iuimfJknKx17ZsRwE8HxkPVR9wtDKQz5UqYPwUcW5+E=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=L8I8WLtqwxYr7CpIQSd/Dt4DjFUk1aTHW/atFiq8xrJP6VyIzgOf4axurM4n7v0XzzN14Ee2J08Zt9JJJZPzlxOescOR98h8aS6xl2RCgWuuNmrdEoWqUG2sINZj73sJ4UxgCEVoxLsfoyyFFGrFuj6r+mx7iTkfzgzJBMno9iA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jFintkjt; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1722611787; c=relaxed/simple;
+	bh=7RzWm4TVAza6SKjenqIEuJ97Sb8DDWQkvSq/IOSwezw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=fonAFTLxa9HjSjv9KOMWv5jl6gzIXe6vmKTU37eM8ApWVwK85WNLlXija32792bRW8Po9BsC8EjtvoWpvP6QK0cPkoln22H6VYdZPvQzDXcKILBcJJM7vU8oj1sXj3zOC+d1bmpvDEG2oXh1Mx8TLqRt1Sb89bGrZ/E2l6Hcqog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NH4fM93l; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722611779;
+	s=mimecast20190719; t=1722611784;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=dB8ZjsQi0DqhQ19QW4eHSso4LuqSpVC05OgWx9LUJeU=;
-	b=jFintkjth0O+AKuylQy1hOpKfsuzIS8DpPnH1yQtjNPJ7YjhBy3b4xO0gqcOfKF/mVXxIr
-	HYOZt+nJQkwYWmZrXhBLyT0OeEMY5oj29lrAhNBR/RS/oR/EuzULUfRxiXCzsq9FMXnDct
-	x+R8gIjuUPtQkFwqn13opzei1CXuJ3A=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ikT1XcHCFVzQ6kf/Q0zvP0r3BIvuRrjrVEasPutpHds=;
+	b=NH4fM93ldbhoKNhO+VWd9s7FAhagrjT3iha+yXpXU9BYmKFVmEgUA3OA04mKa8wBLdq1HE
+	X9Q8MlyIKWNSrkRfkPm+DEeU1PX2L0np8idUW1f5ycrAKyQkSl86y5DEE2pPWGBL28Mw/j
+	BQL1Te+cAP9/1y+j3BNTX5+2HYUBgNo=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-626-sELmaxqFNACf-wJmQ0HHjw-1; Fri,
- 02 Aug 2024 11:16:16 -0400
-X-MC-Unique: sELmaxqFNACf-wJmQ0HHjw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-32-a903dtmwMDuLrwaGtfwyTQ-1; Fri,
+ 02 Aug 2024 11:16:21 -0400
+X-MC-Unique: a903dtmwMDuLrwaGtfwyTQ-1
 Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6DDED195421F;
-	Fri,  2 Aug 2024 15:16:14 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 2CC9B1955D53;
+	Fri,  2 Aug 2024 15:16:19 +0000 (UTC)
 Received: from intellaptop.redhat.com (unknown [10.47.238.37])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EE2481955E80;
-	Fri,  2 Aug 2024 15:16:09 +0000 (UTC)
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 94D441955E8C;
+	Fri,  2 Aug 2024 15:16:14 +0000 (UTC)
 From: Maxim Levitsky <mlevitsk@redhat.com>
 To: kvm@vger.kernel.org
 Cc: Sean Christopherson <seanjc@google.com>,
@@ -65,51 +67,79 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	x86@kernel.org,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v2 0/2] Relax canonical checks on some arch msrs
-Date: Fri,  2 Aug 2024 18:16:06 +0300
-Message-Id: <20240802151608.72896-1-mlevitsk@redhat.com>
-Content-Type: text/plain; charset="utf-8"
+	Maxim Levitsky <mlevitsk@redhat.com>,
+	Chao Gao <chao.gao@intel.com>
+Subject: [PATCH v2 1/2] KVM: x86: relax canonical check for some x86 architectural msrs
+Date: Fri,  2 Aug 2024 18:16:07 +0300
+Message-Id: <20240802151608.72896-2-mlevitsk@redhat.com>
+In-Reply-To: <20240802151608.72896-1-mlevitsk@redhat.com>
+References: <20240802151608.72896-1-mlevitsk@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-Recently we came up upon a failure where likely the guest writes=0D
-0xff4547ceb1600000 to MSR_KERNEL_GS_BASE and later on, qemu=0D
-sets this value via KVM_PUT_MSRS, and is rejected by the=0D
-kernel, likely due to not being canonical in 4 level paging.=0D
-=0D
-I did some reverse engineering and to my surprise I found out=0D
-that both Intel and AMD have very loose checks in regard to=0D
-non canonical addresses written to this and several other msrs,=0D
-when the CPU supports 5 level paging.=0D
-=0D
-Patch #1 addresses this, making KVM tolerate this.=0D
-=0D
-Patch #2 is just a fix for a semi theoretical bug, found=0D
-while trying to debug the issue.=0D
-=0D
-V2: addressed a very good feedback from Chao Gao. Thanks!=0D
-=0D
-Best regards,=0D
-	Maxim Levitsky=0D
-=0D
-Maxim Levitsky (2):=0D
-  KVM: x86: relax canonical check for some x86 architectural msrs=0D
-  KVM: SVM: fix emulation of msr reads/writes of MSR_FS_BASE and=0D
-    MSR_GS_BASE=0D
-=0D
- arch/x86/kvm/svm/svm.c | 12 ++++++++++++=0D
- arch/x86/kvm/x86.c     | 11 ++++++++++-=0D
- 2 files changed, 22 insertions(+), 1 deletion(-)=0D
-=0D
--- =0D
-2.40.1=0D
-=0D
+Several architectural msrs (e.g MSR_KERNEL_GS_BASE) must contain
+a canonical address, and according to Intel PRM, this is enforced
+by a #GP canonical check during MSR write.
+
+However as it turns out, the supported address width
+used for this canonical check is determined only
+by host cpu model:
+if CPU *supports* 5 level paging, the width will be 57
+regardless of the state of CR4.LA57.
+
+Experemental tests on a Sapphire Rapids CPU and on a Zen4 CPU
+confirm this behavior.
+
+In addition to that, the Intel ISA extension manual mentions that this might
+be the architectural behavior:
+
+Architecture Instruction Set Extensions and Future Features Programming Reference [1].
+Chapter 6.4:
+
+"CANONICALITY CHECKING FOR DATA ADDRESSES WRITTEN TO CONTROL REGISTERS AND
+MSRS"
+
+"In Processors that support LAM continue to require the addresses written to
+control registers or MSRs to be 57-bit canonical if the processor _supports_
+5-level paging or 48-bit canonical if it supports only 4-level paging"
+
+[1]: https://cdrdv2.intel.com/v1/dl/getContent/671368
+
+Suggested-by: Chao Gao <chao.gao@intel.com>
+Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+---
+ arch/x86/kvm/x86.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index a6968eadd418..3582f0bb7644 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -1844,7 +1844,16 @@ static int __kvm_set_msr(struct kvm_vcpu *vcpu, u32 index, u64 data,
+ 	case MSR_KERNEL_GS_BASE:
+ 	case MSR_CSTAR:
+ 	case MSR_LSTAR:
+-		if (is_noncanonical_address(data, vcpu))
++
++		/*
++		 * Both AMD and Intel cpus allow values which
++		 * are canonical in the 5 level paging mode but are not
++		 * canonical in the 4 level paging mode to be written
++		 * to the above MSRs, as long as the host CPU supports
++		 * 5 level paging, regardless of the state of the CR4.LA57.
++		 */
++		if (!__is_canonical_address(data,
++			kvm_cpu_cap_has(X86_FEATURE_LA57) ? 57 : 48))
+ 			return 1;
+ 		break;
+ 	case MSR_IA32_SYSENTER_EIP:
+-- 
+2.40.1
 
 
