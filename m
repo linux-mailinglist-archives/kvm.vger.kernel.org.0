@@ -1,119 +1,99 @@
-Return-Path: <kvm+bounces-23140-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23142-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BEEA94647B
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:39:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C54894648D
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:45:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB3152828A3
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:39:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CEC51C20D08
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:45:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E3E13632B;
-	Fri,  2 Aug 2024 20:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0846F06B;
+	Fri,  2 Aug 2024 20:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WSU7wFT7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EfEmas5p"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9903912AAE2
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4910850285
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722631151; cv=none; b=nMeIzrNcHXM5DOgbr3Ri3IV8D1VRLE+o/WOqFopUW38mZ5WuYa0sOoJq2S4z2Gwz+8iosjubX3mZW2bvKMLQ0MLpgfqxpqHuvcImQ4ZHfDR/AcXTku9ydzdZKr2Rgbe10GVs/gqLFgrEgj3X7ISn9+CxxVxrfm7WR3XS0iMo0CA=
+	t=1722631516; cv=none; b=ANp0QISsG7uYPP+4EEH0F2r6BuzuCpeqakDGGWcHkQ9KMOX1wm0BLHo3Tne6tvJUkoBo7/Y6LT5ykiagVCdYxf0zyNtUZkC2hWTqUG0oH1+3QFU7kffQbY7LTfD9C/D0KwJSx0uYBjK8ot2/2mbkMck1SuZHKVbLkRHBOtOk6SI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722631151; c=relaxed/simple;
-	bh=ul3I8jtNfEVe2uxdPBcvEuYLJaZMuXyRTYdE99HTjQY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=DqrH7wea2U7j1cRjQMJoyHoQs55c32A7DTeYW7zjp3BbUN94dOhFSIj6jSRs96LPm9lFhKOip65a4OklP6TfGkz/hjs3i+ZlTSLwWzVwDTJALJ3rHjdedO0areTh7mK1z34BQgI58cP/Q94nSUnehX9P+t7eivhBHx2XYi5CgzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WSU7wFT7; arc=none smtp.client-ip=209.85.128.202
+	s=arc-20240116; t=1722631516; c=relaxed/simple;
+	bh=0EKMTekG2PqcHIBi8ou09HKVSjTqI9BmwZ+AxWSB7VE=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ilxx1oAQWC5r8NkS9Meb1ghTDvCRVUsVlX5efi+fx6/xn0OaFYLuMwJtnZcEsMZPFLzHn0C6Iksz9zpLi0FB9DMTWV65QR/SEsujLnuFE6XsytNKp7Rhb86HM0W2mmyycXBosNIKlTuEA1jS7eCnl4ftkHQbKF1OtRkf8GGddIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EfEmas5p; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-664fc7c4e51so165288437b3.3
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:39:09 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cd2c7904dcso8696834a91.0
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:45:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722631148; x=1723235948; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=UjvdKHX5XmbdhKLTWlXN2ri3L77fxrqJCXnnfCjoJs8=;
-        b=WSU7wFT7U36UARGVoVUTZUcunD+twpI4AKK76AqUPiys9it226ott+xEmVe7CHivdx
-         IXDlp7TFucZK8OvRnzA2Vnso9wBzaHKVz1zs9LafIosw5NZ9nscV7yRcuH5FARh23VUp
-         Jpw5CHYXpd/zzMBTBqCWWCB71g3pNixI8FpMmfXgbsjJSNPb5wuUv+bLXKjuHDUpTg81
-         6j14Q63GQIg53L1aka8rItRQew9p0DihLyKEn7VbTyUBMEUEk5Do+Cn0hEKyEoxz7qc0
-         2Ws7mVMIAI17sTSgglmTmDZUQgKYSOF5tOsofoN4+Ixob6LRIk+s6rMo+EczdQZrKUC/
-         XDwA==
+        d=google.com; s=20230601; t=1722631515; x=1723236315; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dmc+SGjIL8rAfHuvBfDUF1oUfGiI+T3IHfocQMC9wxs=;
+        b=EfEmas5pN0LwKp0sSuJxZ17yUauCvXSGfB8uvadaPTR97iXNb6ZAKr9wnkiowUKw3T
+         0xljMdpEytpElO0p0nXT9bYYnQhaPXjzVylwuBo86RIWHt3jLIoMQsaGXRwj4vG9Xr9O
+         0/eH/bZsfXRwYNayJ23jLEaIGf5e1XB/ob2v1nKXdFlgdTpMG5Wn2pbzubWidccEsXby
+         hzqjteMJH+k+Nf/C2Bj47SfEXpJLGy1s+VktY4AIzkfk25QU3U1qW8Mq2KEalkCVCwnw
+         E2Vp6ok2KrLBQi4ZgOYm8Yw8rJfMjZtDsPlnTzTmIQYC0VfiLcoK09dIZXCoT8ZvTxno
+         3wuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722631149; x=1723235949;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UjvdKHX5XmbdhKLTWlXN2ri3L77fxrqJCXnnfCjoJs8=;
-        b=SyH5lq76aEEl38TvBxkFUc7DD64HEDV+TFYbRNkyVqa1pGlBpxkChVfsSQTmaDlrn+
-         8SmJoWa6IFMS1U1ETT8x2w90lYIrC8X4KIOyRFCrNglf66rvXdpgtqDGcnwxPaZIgIJb
-         Mf2gAvQPBAktcnF7WxWYWrdLZy0D2PqYA00XT9xT+/44qDnjQiWjtnxGTPXRQnHZXBqM
-         m1hibvwpvZL0+E/0x3AU1pwNNvfX7BJI9TlVUsmeoTc6DMxldvFn+EdrLqEinqSXLtZu
-         kx6cVVyMK/yGq8Rz/ttpeBXG80Yp2Q6sfSTslhw81K2MMG1LYgwD049r66krMMvuZHPx
-         l/og==
-X-Gm-Message-State: AOJu0YzIYQYTID+wY9/nL9pldCSTzqN78TRm/+s3HTTH9ds9pb6isX7d
-	FjnhMuhMnCMZSLPLYDb/0LTkTlrfEw2Tc572yfpL92yRpG0RwpoFUIHu6eEwecArfSd2m5eYy64
-	07Q==
-X-Google-Smtp-Source: AGHT+IEPSQRTx7gBHRSttp+7gITI0epwEssMzt1KPQLzKi+lHEKLoj+vlFZlHc60M8o1PIdYF4z2PAULIsM=
+        d=1e100.net; s=20230601; t=1722631515; x=1723236315;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dmc+SGjIL8rAfHuvBfDUF1oUfGiI+T3IHfocQMC9wxs=;
+        b=jNRvCpQbOORlAEUaGpEQo0K/gC6RQkdelJp8b90HRjnIfOFStxdHBYUjQXH7hVSmX+
+         h3wSpCli1gZoeoJsZMZRds8C+x6zNesRCr17IWZEKOf2PG/QjuaV1nsqwbnDUsuqcSOm
+         N2hWP+rUimHqsJ2A50u/j+GD+kworQgTdU2kEh+OwQF96kTnifVudV+ufxJd/7dmyyk0
+         p9asUTYSVD9r03z8wWZ09HbEmLMqk+w3ElVcaj34Gyx5h4B/wTum0qad56+bcw2BZKJ3
+         t4QuMzeAQAEHiggKiDwTUauOdHYIWS4TKW3KGPZMjzUlMU5MqOJAjx59bCNDUluh7+Ov
+         /UCg==
+X-Gm-Message-State: AOJu0YyF+Cg5b+ys6ieHmdpBDxGgM8ZENNFHlFpyPSYASx9A3sGm/eW7
+	fBNwXYd5zEMEQSoiqf1GOotGUhHP2PpuHH0rqIvHzb2h1ht+ywcjBjU0RIIZvx2A0r44+oJPDMb
+	2tg==
+X-Google-Smtp-Source: AGHT+IHHYSd52C/B4t1dkkwmxUIyBuw/Yequ85veuY2fdTDW1jV8v6EjSfptEUDCMZOcj82hlePhD4p/o+8=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:10:b0:64a:8aec:617c with SMTP id
- 00721157ae682-68959efadcfmr3215337b3.0.1722631148748; Fri, 02 Aug 2024
- 13:39:08 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:d188:b0:2c8:e1f8:afb with SMTP id
+ 98e67ed59e1d1-2cff93d478fmr10414a91.1.1722631513634; Fri, 02 Aug 2024
+ 13:45:13 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 13:39:00 -0700
-In-Reply-To: <20240802203900.348808-1-seanjc@google.com>
+Date: Fri,  2 Aug 2024 13:45:08 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240802203900.348808-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802203900.348808-4-seanjc@google.com>
-Subject: [PATCH 3/3] KVM: x86/mmu: Reword a misleading comment about checking gpte_changed()
+Message-ID: <20240802204511.352017-1-seanjc@google.com>
+Subject: [PATCH 0/3] KVM: SVM: Clean up SEV-ES save area management
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Rewrite the comment in FNAME(fetch) to explain why KVM needs to check that
-the gPTE is still fresh before continuing the shadow page walk, even if
-KVM already has a linked shadow page for the gPTE in question.
+Clean up KVM's handling of the SEV-ES host save area, and opportunistically
+add a helper to dedup code for converting an SME-tweaked PA back into its
+struct page.
 
-No functional change intended.
+Sean Christopherson (3):
+  KVM: SVM: Add a helper to convert a SME-aware PA back to a struct page
+  KVM: SVM: Add host SEV-ES save area structure into VMCB via a union
+  KVM: SVM: Track the per-CPU host save area as a VMCB pointer
 
-Signed-off-by: Sean Christopherson <seanjc@google.com>
----
- arch/x86/kvm/mmu/paging_tmpl.h | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+ arch/x86/include/asm/svm.h | 20 +++++++++++++++-----
+ arch/x86/kvm/svm/svm.c     | 24 ++++++++++++------------
+ arch/x86/kvm/svm/svm.h     | 18 ++++++++++++++++--
+ 3 files changed, 43 insertions(+), 19 deletions(-)
 
-diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
-index 480c54122991..405bd7ceee2a 100644
---- a/arch/x86/kvm/mmu/paging_tmpl.h
-+++ b/arch/x86/kvm/mmu/paging_tmpl.h
-@@ -695,8 +695,14 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
- 			return RET_PF_RETRY;
- 
- 		/*
--		 * Verify that the gpte in the page we've just write
--		 * protected is still there.
-+		 * Verify that the gpte in the page, which is now either
-+		 * write-protected or unsync, wasn't modified between the fault
-+		 * and acquiring mmu_lock.  This needs to be done even when
-+		 * reusing an existing shadow page to ensure the information
-+		 * gathered by the walker matches the information stored in the
-+		 * shadow page (which could have been modified by a different
-+		 * vCPU even if the page was already linked).  Holding mmu_lock
-+		 * prevents the shadow page from changing after this point.
- 		 */
- 		if (FNAME(gpte_changed)(vcpu, gw, it.level - 1))
- 			return RET_PF_RETRY;
+
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
