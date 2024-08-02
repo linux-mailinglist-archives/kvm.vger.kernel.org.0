@@ -1,311 +1,250 @@
-Return-Path: <kvm+bounces-23010-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23012-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F27AB945917
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 09:42:36 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67BFD9459DD
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 10:27:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 761651F24127
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 07:42:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E88391F2217C
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 08:27:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D6F1BF305;
-	Fri,  2 Aug 2024 07:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADB41C2325;
+	Fri,  2 Aug 2024 08:26:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GfLrDaZb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fAIL+Upn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1CE645020
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 07:42:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722584548; cv=none; b=XRvFFTCwnNyG10HO4g1L2Yh3HavbEg3yR9yzlbARXSnB4bhxxbBxn6go21VKBd8pZlhTnr9RVJB82ctSquYgFAileFWzgHXxiXO5ecJRxWFNIjv6tlabDqzMJxDfpRJCXM/Urv2/wpZrK5t5fuaCejPUtN2OW1G1I4GKwgKxeIo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722584548; c=relaxed/simple;
-	bh=98bICXwlLoB9PagSTdgthbA/jG/d2EhJwMrIVt9kYvE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hp/fzvKcs9zDhKlNVYUtBje4yK4dUjIKm3DrgxFoBlBbCw4yKWcc7lAXE72yU1XgLmwNCy0IrCrYEw2vnIqabuulXCQ6152DXO0hShMV3N9hb5n4EREgLPyaZRHsKoTdSImg15gaMkv3QTRvQHkQs4fP4Mm9WlcPHKt/jsi2YQU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GfLrDaZb; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BD113FF6;
+	Fri,  2 Aug 2024 08:26:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722587218; cv=fail; b=Q1FcbiW4wtyTJftcuC//tIrg5VM/2Rr4V3ybnI6f0KmX9+GYjPxwJBduz/YURqVbRcK+EYi6W5YK1RghU0gU1g4AYoRaZcP1nTNo9yMIPOcZOFiozJVhik0uj1Av6b9fAGxGq4NY45gvo0bGT8Hqmvx95UwnP4c0Q4MgqwMBVkc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722587218; c=relaxed/simple;
+	bh=xYvxiXaRe6VmcOP5T/OraP2LF1QF5aXHoXyQJkxkALA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NnH0TVryU9sW9mvY+grSL286NhACt3tGo2bEOcs/mk8Nyfqn7hwgP4MGYtJAy+WFxNxnVQiqocC2skL7uRCK+v2FuVb8Q8XZlMdX93+h4Nd/0RJvCEApuz4ailxjHfkKmIe6mwye58JilQ6QMDPipuN8mSUhjUjgeGpTPsPYPQc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fAIL+Upn; arc=fail smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722584547; x=1754120547;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=98bICXwlLoB9PagSTdgthbA/jG/d2EhJwMrIVt9kYvE=;
-  b=GfLrDaZbRgo0z+l0sTkdZACO3RzfaclPXAC+5KSljkLw4SuvW1QF+v++
-   WqGyeqFioP0Hb+cguOwSrA8R7jp7WxlDw8yF3pn07BTYGj1DYr/aNk67f
-   rBNgi/7UZz1sq5PhSu/3CMjT6hUsBqBtPbJKM4Y06d/5QkQXbC/itGMm5
-   t2YABPWn3p/y7c0k2cCfbTRc3hZzp1O+myyw+v5mhMQB4XzMJ/sxGf03i
-   oSn49xFrBdLI1WFXWa24ipFkEkA37INK7/I3lylwENZpbbXix+dWWGBiH
-   BOcMbkqPM1yKwcu0r2q5WXh8Szzb4hi1jLWslmp0Hl3Q3KjcBTpdyMT75
-   w==;
-X-CSE-ConnectionGUID: BTqbCjJTT0qU3fl+ZYfCEw==
-X-CSE-MsgGUID: 52B6WHpjRo2zDSX8eaKYBA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11151"; a="20172648"
+  t=1722587217; x=1754123217;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=xYvxiXaRe6VmcOP5T/OraP2LF1QF5aXHoXyQJkxkALA=;
+  b=fAIL+UpnvuZclxUzJ3+JGB62TGQBwxngqRdJvk72feb/moppMbP59aDw
+   R+LxBEkFhlDTqfvyjochqMFT7F8mq/RLvlnoy+1zENvZwiyStWQ43V2To
+   wZuHKY7Zfyxrr/SPtGIw6jJGZgtsN3xBE2LfimJp2nqCiKo5UiYyDUMxg
+   VFvs60M4ji0OLragWGdjr+YbX+XSJ6Vixy1SMxARMPPl12hP+4n7fERJD
+   KbffLoZx3U50xAKpZqO3Sp66vcCw0cu/NTjJUU0I+sXCY/eG/ZfEypJQR
+   A7zu/lVIYXg9pHIYt/riJhIO9TRp26Xyj5pJteCt0G8ca3rGIAx58ET7K
+   Q==;
+X-CSE-ConnectionGUID: vva9ZQNDTXe3Rkcez+vbmg==
+X-CSE-MsgGUID: kYCbKempROW6oJgD9jNzUw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11151"; a="38053719"
 X-IronPort-AV: E=Sophos;i="6.09,257,1716274800"; 
-   d="scan'208";a="20172648"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 00:42:23 -0700
-X-CSE-ConnectionGUID: YxAOI0TlQYOZ2sHkI+xz/A==
-X-CSE-MsgGUID: LgIiHlT2SK2ZXV97TQKygQ==
+   d="scan'208";a="38053719"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Aug 2024 01:26:55 -0700
+X-CSE-ConnectionGUID: YzFSaJjQREWZnSkpX2udZw==
+X-CSE-MsgGUID: HyaLYcvpQ+q2nGOhhQdYMA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,257,1716274800"; 
-   d="scan'208";a="55239962"
-Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
-  by orviesa009.jf.intel.com with ESMTP; 02 Aug 2024 00:42:15 -0700
-Date: Fri, 2 Aug 2024 15:58:02 +0800
-From: Zhao Liu <zhao1.liu@intel.com>
-To: Markus Armbruster <armbru@redhat.com>
-Cc: Daniel P =?iso-8859-1?Q?=2E_Berrang=E9?= <berrange@redhat.com>,
-	Eduardo Habkost <eduardo@habkost.net>,
-	Marcel Apfelbaum <marcel.apfelbaum@gmail.com>,
-	Philippe =?iso-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-	Yanan Wang <wangyanan55@huawei.com>,
-	"Michael S . Tsirkin" <mst@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Eric Blake <eblake@redhat.com>,
-	Marcelo Tosatti <mtosatti@redhat.com>,
-	Alex =?iso-8859-1?Q?Benn=E9e?= <alex.bennee@linaro.org>,
-	Peter Maydell <peter.maydell@linaro.org>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Sia Jee Heng <jeeheng.sia@starfivetech.com>, qemu-devel@nongnu.org,
-	kvm@vger.kernel.org, qemu-riscv@nongnu.org, qemu-arm@nongnu.org,
-	Zhenyu Wang <zhenyu.z.wang@intel.com>,
-	Dapeng Mi <dapeng1.mi@linux.intel.com>,
-	Yongwei Ma <yongwei.ma@intel.com>
-Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache object
-Message-ID: <ZqyRik4UHHz3xaKl@intel.com>
-References: <20240704031603.1744546-1-zhao1.liu@intel.com>
- <20240704031603.1744546-9-zhao1.liu@intel.com>
- <87r0bl35ug.fsf@pond.sub.org>
- <Zp5vxtXWDeHAdPok@intel.com>
- <87bk2nnev2.fsf@pond.sub.org>
- <ZqEN1kZaQcuY4UPG@intel.com>
- <87le1psuv3.fsf@pond.sub.org>
- <ZqtXP9MViOlyhEsu@intel.com>
- <87mslweb38.fsf@pond.sub.org>
+   d="scan'208";a="92876259"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 02 Aug 2024 01:26:55 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 2 Aug 2024 01:26:54 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 2 Aug 2024 01:26:54 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Fri, 2 Aug 2024 01:26:54 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.42) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Fri, 2 Aug 2024 01:26:53 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=eMvDyxKXz8aWgEBw7QScDAShK5dW/8SnPnBwXj5jvD+l9qPWMsoNVCTrf//mhzF7QH5mRf481efk3moyxKW7w+J+1NoiGn6GZGH7URvH0xHthZl3KXLHW8LOS8bjiD2rK8tKXkd1EyNrIWzEhYNSyqviA58W0V6FTCSVhx1oxXISCwAM9kfY+Cxe/L/ray+seIqxW6scfhKjQK1YOU9AB20OI53kcX3V360wnkoBHAJQggoAH+ibIgE5bSufn9xP9AVfix5lr3T2xxs0+qmQ9JbeV3S1cdMnEaUZh+RHyeKqFgIk4wkj36f83NauaJwv8S50HCyo2VfEz+nQiG9/6Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uqbT47+81ID/+mEUV7gO4Or1gm1l+hhSNBbW9JFIpWM=;
+ b=PYwBAOTAThzPULua9/0uuDwdizfKSMNChp/qyFM1kM2HwosDVifXsDQ3zw1lraBa/wehTUbsmGDIWiP2e+Ty1M69zImK38K0P1vnHEOU+4UpY7QDXg5Fb/YHAhtH0boxmiunoIu95QZH5zl85f07v2N7kJNnegzkTfQ2oHn0Lqvffz/kKrC99cewBospq+1cS9ce6CLizuVJoDsSv0X4mSGCFtQKfBJyYPQprferhsXTu1RtAdtpq0QAStMNYeCqcWo0KnRx5gYfo1SNvvbCsK9v6WK/eWL52u4LpdSSFBdwwzXxQwlRhY6bz4EraVO3Ec72WhlwjebMOcmwc81JXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by IA0PR11MB8380.namprd11.prod.outlook.com (2603:10b6:208:485::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.23; Fri, 2 Aug
+ 2024 08:26:48 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::b576:d3bd:c8e0:4bc1%3]) with mapi id 15.20.7828.021; Fri, 2 Aug 2024
+ 08:26:48 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>, David Hildenbrand <david@redhat.com>
+CC: Mostafa Saleh <smostafa@google.com>, John Hubbard <jhubbard@nvidia.com>,
+	Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>, Matthew Wilcox
+	<willy@infradead.org>, "maz@kernel.org" <maz@kernel.org>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-msm@vger.kernel.org"
+	<linux-arm-msm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, Fuad Tabba <tabba@google.com>,
+	"Xu, Yilun" <yilun.xu@intel.com>, "Qiang, Chenyi" <chenyi.qiang@intel.com>
+Subject: RE: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
+Thread-Topic: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
+Thread-Index: AQHawdyTbbj3CTyCxU2oU4wQ5oQq6rHOYY8AgABR7QCAAe6NAIAAEoqAgAAFggCAQyU6EA==
+Date: Fri, 2 Aug 2024 08:26:48 +0000
+Message-ID: <BN9PR11MB5276D7FAC258CFC02F75D0648CB32@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
+ <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
+ <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
+ <ZnQpslcah7dcSS8z@google.com>
+ <1ab73f42-9397-4fc7-8e62-2627b945f729@redhat.com>
+ <20240620143406.GJ2494510@nvidia.com>
+In-Reply-To: <20240620143406.GJ2494510@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|IA0PR11MB8380:EE_
+x-ms-office365-filtering-correlation-id: 1f8e64d2-2791-4bc4-8937-08dcb2ccda66
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?iiEYoFDYAZrZza4g+RuqRyI414K36ZM21dE/zau4tAu8O63swX2nXY7r5ACX?=
+ =?us-ascii?Q?q1zsdaG+L3oL8Pvq6bYKry2IrYVC8pgLqeJUNm1b4hBo+bveii2I5sJl4Zfb?=
+ =?us-ascii?Q?9Ng0Mt2kcp6yPaqlnx8KewzBvlr1kTU9K/daPLMf53BZSNcN9BbSw4XHdl6M?=
+ =?us-ascii?Q?kp3TgWAzDMSBpVRQwX/ecjgdlGogMsOoZcfm3YXGJbLDP4151AWFe4pXbR80?=
+ =?us-ascii?Q?iV4saJvZ0Wc0SCdh38eGbuFEa64T3a5KM4aQS1h8QJnl6rDlNHO+JzsWgHcH?=
+ =?us-ascii?Q?DPa1QIjuvQnIeXPNDqboxBUlkmt33eg/zTN0/8xqe8HqMS9LitLzCmON+40B?=
+ =?us-ascii?Q?rbVUXTa0UDNb4/1EeDOfwOgEIRT/QJGt6y7meSp2lKWT3L5dBFneZxQqBRUU?=
+ =?us-ascii?Q?//xnNT8W1P1a5fq5/878hoxpGJfFN2QgMnklmsKj+yC750TB9IXQV1YCSLch?=
+ =?us-ascii?Q?M25PNMTKoscsdYPar+vlxLdUR5QJ9Aoi2p0jxrJ3S8tHMmV5vNLmNCtlbQuG?=
+ =?us-ascii?Q?JrvfwCoSUDGW+KZ1CJfZuhPazE3wgJEceAZkkWHNoNVXl5/yVVkyRyjKUcr0?=
+ =?us-ascii?Q?A+B5VThEmzhxH1BfWe7/90gBPlnv265tw/VBfq9M0lzusLOGwAuNudWwlfih?=
+ =?us-ascii?Q?URWxPW48vTCbSJGxbpaQWX9eSBoYV6qJw1SCntCUSO3R55DC/0PBj0v6+xTV?=
+ =?us-ascii?Q?gGqSZenFB9ai6nqn6GRXnQDfAyyrlP562cOc0EZdvVdGW8I+xWQqJU2BGgkh?=
+ =?us-ascii?Q?X7vRzvoX0hyrPX/eT7teQnZ3xUCJArwhlErXkbw2/mAGXvM4UCcRkapyw+ee?=
+ =?us-ascii?Q?YG+BAK+0iFW8B7xPRUiGyEHoSuRc5/9FjD1+g4cgOVSYAWc/S5wf6BQE5gdL?=
+ =?us-ascii?Q?PuNlKuZF693tU2Jwp4Pf0lQ3pm2rnBnalDX5VVgA3f0wR5NwG4UUXBQOCF4T?=
+ =?us-ascii?Q?GTwGDPq2WspGU+C6RW4e+Y+Zk8XnxAF5VD2Gks6E3ijnQe7fgRdA2xpfjPJF?=
+ =?us-ascii?Q?xtCdnufKc+1i18gKTp9wqCRs8PSAIpVcMq6LOUtu12YW2Zlu0P7vDvXxvrIR?=
+ =?us-ascii?Q?Ufq2Je/Ax8yvGFTylyY4+O7Ts6TJQ9xvn8gI3kbfBgjX0Wavg2Z2vt+vQrcg?=
+ =?us-ascii?Q?/NkiC8wpJYi2hg02OFYmlgXD3QJ3H+RkBhhqppkGu/NxPZ5hzIBJ32YqM0Do?=
+ =?us-ascii?Q?T1eXcM5GW6vnqXCTrivcR25RpHfFZNnj5X8rQaQMOMIjTUsPKClCsX3mssD1?=
+ =?us-ascii?Q?EVVpYmkQ4+cLfZ0/IVnm1OTBA1fATABKGKZmAGhSlp9z7wZ68gNYdgTrwovM?=
+ =?us-ascii?Q?lHI+VDbIUpBeEAsk3TJmjcZE+7M5Coh8c+mjssLMQY6AQRXwdg5Mb5Y10Dlw?=
+ =?us-ascii?Q?OOQzHu8=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?tDAWzJZlksgSBAbb8Jw5h+82jSG4zuSgEoszgfZXFYiYcELZ9SdZVMoS0YCW?=
+ =?us-ascii?Q?muWzoC3HghSYyvhnmWnmzRHPY5qNnXZEZd32IlCmsr9BbDea5X8Z1ZtYGyOq?=
+ =?us-ascii?Q?4hkpC6JznieSCJluKzX9bOEy736D1ziMJf/SjMkiKm/FMzqS65p+wt0BRuoT?=
+ =?us-ascii?Q?+8Y5tCjQtgjBwEHTrorEFmhZVyUrCDAAunGIXLDlXSwDpJ3nwmFmFmthwynH?=
+ =?us-ascii?Q?cMBlN3mhFIpt/SVlXYzWuf/qMosrZ63tX1+0xkaFglzaMc6zEHJJeRfBTp93?=
+ =?us-ascii?Q?eWMlAzsL7HxJBp61VnEUxKJ34EFcymftapxx4Fcb00I4YjayJc1b0HbSsDS8?=
+ =?us-ascii?Q?9laIxPIVVdutnT5JZ1tao/NirAS695jYxLIHiX4Lk5pbG8jYoMrQjHdvOylK?=
+ =?us-ascii?Q?Kja42XKLGE9GfZvv1IMSIotgsNScu5TbJyAF9AKeEDXcKJ8325WAI511gUr/?=
+ =?us-ascii?Q?U4rEC+bwM8RhTTte7qT6ocfaaEu87wvcsGw74lZmpsVJO3ksvGv53ssdH73/?=
+ =?us-ascii?Q?ZikpMR6wnEAhJdOrutB9zywzbb3nN/rK8ad5SF08p8OSdOWiVQn2OwsQDdEn?=
+ =?us-ascii?Q?Lo38rrBuRIpFKs4S5I+NHcPzD0XMNstIyAee76LSWKGV6t3CVKI7zzpG9GWl?=
+ =?us-ascii?Q?7mrycNsYwysIMyqPIkzd39laspuO2gKrA+w/GpKQUBjIVQjOAdOgfhiG8URM?=
+ =?us-ascii?Q?VlH6caHC6OxMjGVXpxUBa8XGIxaNTlHomB0Hq7yffE30C00w0dSJ00z7bwWz?=
+ =?us-ascii?Q?NFO/G7ko1OouwwT1NwlzJjqdJQKV+9U4StvxN3NX0QcivLWsnj4XUzjYebZy?=
+ =?us-ascii?Q?wpmGbOjF+xG+KD6JDsjIAk5SKmahyWP6CkDWcSjtu3XUaZh0+SW56XQZhWAC?=
+ =?us-ascii?Q?OqZwBab9QX44OkmVxCGkWony7Deidtxldsy/x/21/BD3WRD9BuuecmePLBt4?=
+ =?us-ascii?Q?n/Vm3yee940JfAOln5YWjWbuEAR9fI8DfFL44vm3Cg5h+kyjhKY1SKOzf5hR?=
+ =?us-ascii?Q?//fE1/ZWyDmygP7pMKLe/dWU64V8tKuxdBwO8xCklaSpaP0JAtbIW3EDl5LN?=
+ =?us-ascii?Q?B6ioverVV3Wue+6wMW0erxDuZKYIxAe9o9GYxcVOXBaCP4L6LaZV1uA3g3/Z?=
+ =?us-ascii?Q?GWmZtM57Y/CxGigyhrntrtDr6uCEHd1DP0gQg6UGfhLnGbecqD5rICBLtOoG?=
+ =?us-ascii?Q?TXiHUSLuggYInZ8HQgpPxByAHCPZe5SVIfQEYglp7aodA78QB7fwiSv6rxz5?=
+ =?us-ascii?Q?4NEysXpB77gksIlWs0ElSUz6wMBEGY6tR0eWw8c2XzEdTRt98TLztyd4wYJ5?=
+ =?us-ascii?Q?bHrkQ7N/fbVv+F4w7oz+rrCkRxa9F+cRL95ySUNHtFS1fhWktE9Yr//rugus?=
+ =?us-ascii?Q?jERETvfSXiTHdVVw/76tgAvJOnIWIYCtgaSl5jQTrhMz3UdrCYOG9A9JjzBi?=
+ =?us-ascii?Q?r3EjANObFXLiOBkzM/amT0u/RM/pO24Xv7lWFuVY14194q6tUoF48tLT0WZF?=
+ =?us-ascii?Q?xhhkmS61bvr5cfVh2EK88t4ESu8Dhq/l74bE0nV1I1Up6E+bx+ef9ZQDq5BE?=
+ =?us-ascii?Q?tibsRtWbBD4P+u6TlurYsNbCWdBhqFq8nl6jm1fY?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87mslweb38.fsf@pond.sub.org>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1f8e64d2-2791-4bc4-8937-08dcb2ccda66
+X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Aug 2024 08:26:48.6885
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: YUgTXdmJiwm0xxsYGPPAn8THIoqzkUXzfUn8JqfVK57b6g0EUaOlDthfawGLNsJ7aOUYjDnebpmQHvk+wDbrUw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB8380
+X-OriginatorOrg: intel.com
 
-On Thu, Aug 01, 2024 at 01:28:27PM +0200, Markus Armbruster wrote:
-> Date: Thu, 01 Aug 2024 13:28:27 +0200
-> From: Markus Armbruster <armbru@redhat.com>
-> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
->  object
-> 
-> Zhao Liu <zhao1.liu@intel.com> writes:
-> 
-> > On Thu, Jul 25, 2024 at 11:07:12AM +0200, Markus Armbruster wrote:
-> >> Date: Thu, 25 Jul 2024 11:07:12 +0200
-> >> From: Markus Armbruster <armbru@redhat.com>
-> >> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
-> >>  object
-> >> 
-> >> Zhao Liu <zhao1.liu@intel.com> writes:
-> >> 
-> >> > Hi Markus and Daniel,
-> >> >
-> >> > I have the questions about the -object per cache implementation:
-> >> >
-> >> > On Wed, Jul 24, 2024 at 02:39:29PM +0200, Markus Armbruster wrote:
-> >> >> Date: Wed, 24 Jul 2024 14:39:29 +0200
-> >> >> From: Markus Armbruster <armbru@redhat.com>
-> >> >> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
-> >> >>  object
-> >> >> 
-> >> >> Zhao Liu <zhao1.liu@intel.com> writes:
-> >> >> 
-> >> >> > Hi Markus,
-> >> >> >
-> >> >> > On Mon, Jul 22, 2024 at 03:37:43PM +0200, Markus Armbruster wrote:
-> >> >> >> Date: Mon, 22 Jul 2024 15:37:43 +0200
-> >> >> >> From: Markus Armbruster <armbru@redhat.com>
-> >> >> >> Subject: Re: [PATCH 8/8] qemu-options: Add the description of smp-cache
-> >> >> >>  object
-> >> >> >> 
-> >> >> >> Zhao Liu <zhao1.liu@intel.com> writes:
-> >> >> >> 
-> >> >> >> > Signed-off-by: Zhao Liu <zhao1.liu@intel.com>
-> >> >> >> 
-> >> >> >> This patch is just documentation.  The code got added in some previous
-> >> >> >> patch.  Would it make sense to squash this patch into that previous
-> >> >> >> patch?
-> >> >> >
-> >> >> > OK, I'll merge them.
-> >> >> >
-> >> >> >> > ---
-> >> >> >> > Changes since RFC v2:
-> >> >> >> >  * Rewrote the document of smp-cache object.
-> >> >> >> >
-> >> >> >> > Changes since RFC v1:
-> >> >> >> >  * Use "*_cache=topo_level" as -smp example as the original "level"
-> >> >> >> >    term for a cache has a totally different meaning. (Jonathan)
-> >> >> >> > ---
-> >> >> >> >  qemu-options.hx | 58 +++++++++++++++++++++++++++++++++++++++++++++++++
-> >> >> >> >  1 file changed, 58 insertions(+)
-> >> >> >> >
-> >> >> >> > diff --git a/qemu-options.hx b/qemu-options.hx
-> >> >> >> > index 8ca7f34ef0c8..4b84f4508a6e 100644
-> >> >> >> > --- a/qemu-options.hx
-> >> >> >> > +++ b/qemu-options.hx
-> >> >> >> > @@ -159,6 +159,15 @@ SRST
-> >> >> >> >          ::
-> >> >> >> >  
-> >> >> >> >              -machine cxl-fmw.0.targets.0=cxl.0,cxl-fmw.0.targets.1=cxl.1,cxl-fmw.0.size=128G,cxl-fmw.0.interleave-granularity=512
-> >> >> >> > +
-> >> >> >> > +    ``smp-cache='id'``
-> >> >> >> > +        Allows to configure cache property (now only the cache topology level).
-> >> >> >> > +
-> >> >> >> > +        For example:
-> >> >> >> > +        ::
-> >> >> >> > +
-> >> >> >> > +            -object '{"qom-type":"smp-cache","id":"cache","caches":[{"name":"l1d","topo":"core"},{"name":"l1i","topo":"core"},{"name":"l2","topo":"module"},{"name":"l3","topo":"die"}]}'
-> >> >> >> > +            -machine smp-cache=cache
-> >> >> >> >  ERST
-> >> >> >> >  
-> >> >> >> >  DEF("M", HAS_ARG, QEMU_OPTION_M,
-> >> >> >> > @@ -5871,6 +5880,55 @@ SRST
-> >> >> >> >          ::
-> >> >> >> >  
-> >> >> >> >              (qemu) qom-set /objects/iothread1 poll-max-ns 100000
-> >> >> >> > +
-> >> >> >> > +    ``-object '{"qom-type":"smp-cache","id":id,"caches":[{"name":cache_name,"topo":cache_topo}]}'``
-> >> >> >> > +        Create an smp-cache object that configures machine's cache
-> >> >> >> > +        property. Currently, cache property only include cache topology
-> >> >> >> > +        level.
-> >> >> >> > +
-> >> >> >> > +        This option must be written in JSON format to support JSON list.
-> >> >> >> 
-> >> >> >> Why?
-> >> >> >
-> >> >> > I'm not familiar with this, so I hope you could educate me if I'm wrong.
-> >> >> >
-> >> >> > All I know so far is for -object that defining a list can only be done in
-> >> >> > JSON format and not with a numeric index like a keyval based option, like:
-> >> >> >
-> >> >> > -object smp-cache,id=cache0,caches.0.name=l1i,caches.0.topo=core: Parameter 'caches' is missing
-> >> >> >
-> >> >> > the above doesn't work.
-> >> >> >
-> >> >> > Is there any other way to specify a list in command line?
-> >> >> 
-> >> >> The command line is a big, sprawling mess :)
-> >> >> 
-> >> >> -object supports either a JSON or a QemuOpts argument.  *Not* keyval!
-> >> >> 
-> >> >> Both QemuOpts and keyval parse something like KEY=VALUE,...  Keyval
-> >> >> supports arrays and objects via dotted keys.  QemuOpts doesn't natively
-> >> >> support arrays and objects, but its users can hack around that
-> >> >> limitation in various ways.  -object doesn't.  So you're right, it's
-> >> >> JSON or bust here.
-> >> >> 
-> >> >> However, if we used one object per cache instead, we could get something
-> >> >> like
-> >> >> 
-> >> >>     -object smp-cache,name=l1d,...
-> >> >>     -object smp-cache,name=l1u,...
-> >> >>     -object smp-cache,name=l2,...
-> >> >>     ...
-> >> >
-> >> > Current, I use -object to create a smp_cache object, and link it to
-> >> > MachineState by -machine,smp-cache=obj_id.
-> >> >
-> >> > Then for the objects per cache, how could I link them to machine?
-> >> >
-> >> > Is it possible that I create something static in smp_cache.c and expose
-> >> > all the cache information to machine through some interface?
-> >> 
-> >> Good questions.  However, before we head deeper into the weeds here, I
-> >> feel we should discuss the things below.  And before we do that, I need
-> >> a clear understanding of the use case.  Elsewhere in this thread, I just
-> >> described the use case as I understand it.  Please reply there.  I'll
-> >> then come back to this message.
-> >> 
-> >> [...]
-> >
-> > Jonathan and I provided different use cases for x86 and Arm. Could we
-> > come back here to continue the discussion? :)
-> 
-> Can you provide a brief summary of the design alternatives that have
-> been proposed so far?  Because I've lost track.
+> From: Jason Gunthorpe <jgg@nvidia.com>
+> Sent: Thursday, June 20, 2024 10:34 PM
+>=20
+> On Thu, Jun 20, 2024 at 04:14:23PM +0200, David Hildenbrand wrote:
+>=20
+> > 1) How would the device be able to grab/access "private memory", if not
+> >    via the user page tables?
+>=20
+> The approaches I'm aware of require the secure world to own the IOMMU
+> and generate the IOMMU page tables. So we will not use a GUP approach
+> with VFIO today as the kernel will not have any reason to generate a
+> page table in the first place. Instead we will say "this PCI device
+> translates through the secure world" and walk away.
+>=20
+> The page table population would have to be done through the KVM path.
+>=20
 
-No problem!
+Sorry for noting this discussion late. Dave pointed it to me in a related
+thread [1].
 
-Currently, we have the following options:
+I had an impression that above approach fits some trusted IO arch (e.g.
+TDX Connect which has a special secure I/O page table format and
+requires sharing it between IOMMU/KVM) but not all.
 
-* 1st: The first one is just to configure cache topology with several
-  options in -smp:
+e.g. SEV-TIO spec [2] (page 8) describes to have the IOMMU walk the
+existing I/O page tables to get HPA and then verify it through a new
+permission table (RMP) for access control.
 
-  -smp l1i-cache-topo=core,l1d-cache-topo-core
+That arch may better fit a scheme in which the I/O page tables are
+still managed by VFIO/IOMMUFD and RMP is managed by KVM, with an
+an extension to the MAP_DMA call to accept a [guest_memfd, offset]
+pair to find out the pfn instead of using host virtual address.
 
-  This one lacks scalability to support the cache size that ARM will
-  need in the future.
+looks the Linux MM alignment session [3] did mention "guest_memfd
+will take ownership of the hugepages, and provide interested parties
+(userspace, KVM, iommu) with pages to be used" to support that extension?
 
+[1] https://lore.kernel.org/kvm/272e3dbf-ed4a-43f5-8b5f-56bf6d74930c@redhat=
+.com/
+[2] https://www.amd.com/system/files/documents/sev-tio-whitepaper.pdf
+[3] https://lore.kernel.org/kvm/20240712232937.2861788-1-ackerleytng@google=
+.com/
 
-* 2nd: The cache list object in -smp.
-
-  The idea was to use JSON to configure the cache list. However, the
-  underlying implementation of -smp at the moment is keyval parsing,
-  which is not compatible with JSON.
-
-  If we can not insist on JSON format, then cache lists can also be
-  implemented in the following way:
-  
-  -smp caches.0.name=l1i,caches.0.topo=core,\
-       caches.1.name=l1d,caches.1.topo=core
-
-
-* 3rd: The cache list object linked in -machine.
-
-  Considering that -object is JSON-compatible so that defining lists via
-  JSON is more friendly, I implemented the caches list via -object and
-  linked it to MachineState:
-
-  -object '{"qom-type":"smp-cache","id":"obj","caches":[{"name":"l1d","topo":"core"},{"name":"l1i","topo":"core"}]}'
-  -machine smp-caches=obj
-
-
-* 4th: The per cache object without any list:
-
-  -object smp-cache,id=cache0,name=l1i,topo=core \
-  -object smp-cache,id=cache1,name=l1d,topo=core
-
-  This proposal is clearer, but there are a few opens:
-  - I plan to push qom-topo forward, which would abstract CPU related
-    topology levels and cache to "device" instead of object. Is there a
-    conflict here?
-
-  - Multiple cache objects can't be linked to the machine on the command
-    line, so I maintain a static cache list in smp_cache.c and expose
-    the cache information to the machine through some interface. is this
-    way acceptable?
-
-
-In summary, the 4th proposal was the most up in the air, as it looked to
-be conflict with the hybrid topology I wanted to do (and while hybrid
-topology may not be accepted by the community either, I thought it would
-be best for the two work to be in the same direction).
-
-The difference between 2nd and 3rd is about the JSON requirement, if JSON
-is mandatory for now then it's 3rd, if it's not mandatory (or accept to
-make -machine/-smp support JSON in the future), 2nd looks cleaner, which
-puts the caches list in -smp.
-
-Regards,
-Zhao
-
-
+Thanks
+Kevin
 
