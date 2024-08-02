@@ -1,69 +1,69 @@
-Return-Path: <kvm+bounces-23129-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23130-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B444D946441
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:14:44 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9819946443
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:16:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5EC11C2146F
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:14:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA669B21DC9
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:16:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF47F6A33A;
-	Fri,  2 Aug 2024 20:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92407535A3;
+	Fri,  2 Aug 2024 20:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mATlp4Jt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="0HY8IUiH"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B8B4C61B
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805DC33DF
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:16:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722629674; cv=none; b=QHtCKl0MbXj5FszjnOIkvA5s2KuCyxYj03TLAIxE4Nhl8NPm7HnfSADdyrwlLCSJK48ljPjKl+mrJcXFDSsIV2UzWd6Xyk5bYBXkqj2L7DZhuABTl0FfOy1W6pHHH2eOgc7KCVKEzDN3uAj6hinCbj17oR+TlNbOISiP9F8Ub0U=
+	t=1722629794; cv=none; b=uAwCD7uv1+Dqi+5JBkU9mqgnvF80pFwKDU9EY33SbzWuw02tx/TXmPtQPZ/u2JeG2PDZcjyaLMRrtRzOvW9GdGfZEVgZiecG4awVhW/kzNgw5wgrIcVAimqggmA/WNAGEoy3XOY91VDP6l2eVihCqAPJ3EYUskftXgrd0xg8bx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722629674; c=relaxed/simple;
-	bh=xe5PnUuA6XU4wC83rP+yXvrEX+ZHetMhcLHOc+nWmBw=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ikPJujBtL78DXW4KFa5LiAKlZakiMwtoql6FKq6whJC4G/Q4xBNLGJBrjVdGzOhkLRYv02EmS4wu8Z16GQfEHhUOfQcfUMyi7jB2MI9+HD0LkQfrQ0Ar5ulsLxVPeCqE0CXsU6kFILn9YD8BCQli77TYSQ/GzpLsuVYW4XfSBfg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mATlp4Jt; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1722629794; c=relaxed/simple;
+	bh=TXvdlxOVU7doVd8ZsCfPhM1Ucj5S0xNZ2Rcj/xvqPgc=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=U9kxYR1nju1GXF+0bttCZ8Zm9SGGpOk8HB6A1iAp16cDIIIsrHDqNUM+Bncbj/xiWbdOXFGokROyW8M4JSzXr0GSFU4aqj8ymFxidxL0j7Q7klU/evCWTuL6HtfAaGmQkv+kWcEXKaHEfatRgTM/77bW5+GdvjS73Ng21pdvnHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=0HY8IUiH; arc=none smtp.client-ip=209.85.210.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fc596b86a6so37639845ad.1
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:14:32 -0700 (PDT)
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-70d1a9bad5dso9164929b3a.0
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:16:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722629672; x=1723234472; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722629793; x=1723234593; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WQ+fEs3LsntUlJZqxcHJm6QlCpJ7OHbayZdrEYcxOd0=;
-        b=mATlp4JtpwPe93Ysth8NLRyYWv9aLg9tLpld9gWet4SQ9zHXR67E1lZjIAKLXfHxIu
-         KxVNenPJ6FSKIc5slGjqV1KmF7HZaPmlRltcy9dQ/h2lE93YO0vtjWqX2CqMDjAHY0hb
-         MO2JbjE3ddVndQkQrStIhSLQMhQkbaxbCMC0eZBWRzpZOPGI7K+xviNXEbnYnkuDIQ2A
-         aS/VDpNo/LoseY5HvMvjeTen5EU4srPSrywucyxdgMNCSzs84H9kvGrIUZc1kECUTL05
-         vdSGGNYFfjoSZZGa0xkvXVwCqcFikbmJLUw2z8YYixVedyp3631QXK2UlCRMWtZE64/P
-         L48w==
+        bh=jZQFLav+WlDGG6CozZMcdSkYFx1BmtT+dLZeZWTkJks=;
+        b=0HY8IUiH+anGj05Z1ZKisCJvw9fuBaiTE09x8iDjrZqXj/ReWC626MsvdJ3gnCkXWx
+         +TXRp0cAhlgOnHOHJLXQU32efo104BNZ3OLsaHhADYeUH8UixsOouTuboOZNAqxbR+W8
+         T+kenzNTsa6B2z2kXrFAVbsJU57OvdQGt8AFYL4AzpG3xh5FmjHULYu/NCryDvyk0cKm
+         C9se5OTzTOCDvny+Kg2bH8BGReGw7iAcUAALcu8I6z4wwi70RQUF1J/iqXnzKEUKVvdi
+         Y3RWX0aIeotu5+1+PodLJ+KGETg96z2n4/lXHrJKw1kn4BY5OdvtdoTWPMv92vcjL8M9
+         mK0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722629672; x=1723234472;
+        d=1e100.net; s=20230601; t=1722629793; x=1723234593;
         h=cc:to:from:subject:message-id:mime-version:date:reply-to
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WQ+fEs3LsntUlJZqxcHJm6QlCpJ7OHbayZdrEYcxOd0=;
-        b=WRd5SZO7Hpbt61xJUaHm+N/tLMKI5Mbf8ow4cywLn3gENZHzVWRvZdoYDj1OA8fHcu
-         Z0M6m3N6WHVOYqKGZ8HZRDKi/lvmMlQSp5/4nsFH8Bpi1ZfD2FeoSTVh5u3raOS4n2o4
-         x/OxHmbE80II7O6e4lYGGWD9V1SszE8cuDHCweYk8ourHjD/Ke7FEhaLcR4+1cRlexiy
-         lCso00dJCC2e+29seK+xmnTjN82sgQhEzrCh1kayte39Nk6oAj+q1/eoxcEftFpiQLXu
-         VmJL7tQGwgSqYHA1w8sg1SWx8l9ePxaUJfTOdw4b1o4QAVpkg/XXmR305ZbXx5fQKwUd
-         y1ug==
-X-Gm-Message-State: AOJu0YxD5Cjmxd9y7t21wbIs8l9z4V5g9uzyGJKtkPeeI0FfJK27X0pP
-	zKtYWltIyfg1SwHm3X3Ws7l3GQseM1rW3snYJFsGNWBmsA6pCTTzNUOieGqnmyl2kT5oBzmWb8d
-	luw==
-X-Google-Smtp-Source: AGHT+IHDcF0qP1uJC6IVnhoZQo/YQGDSYJtI4Xt2dbbYqJZ/1Z4WIL3eIZE7tO+KB7/Cx1q3ay0AoCbiBbQ=
+        bh=jZQFLav+WlDGG6CozZMcdSkYFx1BmtT+dLZeZWTkJks=;
+        b=mRqOFvO7FGmIH36MfmicQ3xFDkMLzcRdVkz2bCnmJ/b+wHLfuK/f0UILXQ+KWbXYXr
+         UH3b9DhZzln0S2frJSpwyVmOgBkSchju+LfJZMadpS73dN6rAHS8WE2H1x3zZ/IVVrth
+         0SnfF1zOY4dK6VhA1zYgYMMj2IRDQS7s7/wUgqOUrbR2StqO3Vvfxl21Y13YsJ2UXtii
+         allOimD8pQ/0JTbbyb582Jbxc1gfOrvYldUAj7lMGkiJnxXgFCBBCpk67D3NqNJn4Tdc
+         VZbV9puzzFmqaOsRPZZb2K1q8NyQ+xDtZ3dxScBWUvokAtulzxlOkeVxloSCY4CPg5pc
+         SyGg==
+X-Gm-Message-State: AOJu0Yyz1rYug9jDIOcZm088pyRl73nRztYz0/rCe/HggIqs772d1UUM
+	JqEkYEl4CPW8Hcua2FumvGQHFDuHFQ71Le7bC4UU0XJXEAn3dx/AUiQUuf6088Y4IrWYvPLdEPH
+	ROQ==
+X-Google-Smtp-Source: AGHT+IFb99jmBNeDqQRBYLcydt+zXBMQx4p/CU8oV2WUABtLxdEGZvp3I6qLVp2sa1B93X8GgzfSYMLoBaw=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:110e:b0:1fb:526a:5d60 with SMTP id
- d9443c01a7336-1ff57b85debmr1624915ad.4.1722629671812; Fri, 02 Aug 2024
- 13:14:31 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:aa7:8e9c:0:b0:70b:a46:7dfa with SMTP id
+ d2e1a72fcca58-7106d0a4be6mr112403b3a.5.1722629792616; Fri, 02 Aug 2024
+ 13:16:32 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 13:14:29 -0700
+Date: Fri,  2 Aug 2024 13:16:30 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,69 +71,57 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802201429.338412-1-seanjc@google.com>
-Subject: [PATCH] KVM: selftests: Always unlink memory regions when deleting
- (VM free)
+Message-ID: <20240802201630.339306-1-seanjc@google.com>
+Subject: [PATCH] KVM: x86: Use this_cpu_ptr() instead of per_cpu_ptr(smp_processor_id())
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Sean Christopherson <seanjc@google.com>
+	Isaku Yamahata <isaku.yamahata@intel.com>, Chao Gao <chao.gao@intel.com>, 
+	Yuan Yao <yuan.yao@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Unlink memory regions when freeing a VM, even though it's not strictly
-necessary since all tracking structures are freed soon after.  The time
-spent deleting entries is negligible, and not unlinking entries is
-confusing, e.g. it's easy to overlook that the tree structures are
-freed by the caller.
+From: Isaku Yamahata <isaku.yamahata@intel.com>
 
+Use this_cpu_ptr() instead of open coding the equivalent in various
+user return MSR helpers.
+
+Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+Reviewed-by: Chao Gao <chao.gao@intel.com>
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
+[sean: massage changelog]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- tools/testing/selftests/kvm/lib/kvm_util.c | 15 ++++++---------
- 1 file changed, 6 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/kvm/lib/kvm_util.c b/tools/testing/selftests/kvm/lib/kvm_util.c
-index 56b170b725b3..75f2d737c49f 100644
---- a/tools/testing/selftests/kvm/lib/kvm_util.c
-+++ b/tools/testing/selftests/kvm/lib/kvm_util.c
-@@ -712,16 +712,13 @@ void kvm_vm_release(struct kvm_vm *vmp)
- }
+Not entirely sure where this came from, found it in one of my myriad branches
+while doing "spring" cleaning.
+
+ arch/x86/kvm/x86.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index af6c8cf6a37a..518baf47ef1c 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -427,8 +427,7 @@ static void kvm_user_return_msr_cpu_online(void)
  
- static void __vm_mem_region_delete(struct kvm_vm *vm,
--				   struct userspace_mem_region *region,
--				   bool unlink)
-+				   struct userspace_mem_region *region)
+ int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
  {
- 	int ret;
+-	unsigned int cpu = smp_processor_id();
+-	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
++	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
+ 	int err;
  
--	if (unlink) {
--		rb_erase(&region->gpa_node, &vm->regions.gpa_tree);
--		rb_erase(&region->hva_node, &vm->regions.hva_tree);
--		hash_del(&region->slot_node);
--	}
-+	rb_erase(&region->gpa_node, &vm->regions.gpa_tree);
-+	rb_erase(&region->hva_node, &vm->regions.hva_tree);
-+	hash_del(&region->slot_node);
+ 	value = (value & mask) | (msrs->values[slot].host & ~mask);
+@@ -450,8 +449,7 @@ EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
  
- 	region->region.memory_size = 0;
- 	vm_ioctl(vm, KVM_SET_USER_MEMORY_REGION2, &region->region);
-@@ -762,7 +759,7 @@ void kvm_vm_free(struct kvm_vm *vmp)
- 
- 	/* Free userspace_mem_regions. */
- 	hash_for_each_safe(vmp->regions.slot_hash, ctr, node, region, slot_node)
--		__vm_mem_region_delete(vmp, region, false);
-+		__vm_mem_region_delete(vmp, region);
- 
- 	/* Free sparsebit arrays. */
- 	sparsebit_free(&vmp->vpages_valid);
-@@ -1270,7 +1267,7 @@ void vm_mem_region_move(struct kvm_vm *vm, uint32_t slot, uint64_t new_gpa)
-  */
- void vm_mem_region_delete(struct kvm_vm *vm, uint32_t slot)
+ static void drop_user_return_notifiers(void)
  {
--	__vm_mem_region_delete(vm, memslot2region(vm, slot), true);
-+	__vm_mem_region_delete(vm, memslot2region(vm, slot));
- }
+-	unsigned int cpu = smp_processor_id();
+-	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
++	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
  
- void vm_guest_mem_fallocate(struct kvm_vm *vm, uint64_t base, uint64_t size,
+ 	if (msrs->registered)
+ 		kvm_on_user_return(&msrs->urn);
 
 base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 -- 
