@@ -1,119 +1,110 @@
-Return-Path: <kvm+bounces-23118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED55946412
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 21:51:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB86F946414
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 21:51:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A60C283A38
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 19:51:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08E271C2153D
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 19:51:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60BC61FDA;
-	Fri,  2 Aug 2024 19:51:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 554997764E;
+	Fri,  2 Aug 2024 19:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wdAXkz7G"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RvfoDdEd"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8B01ABEC9
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 19:51:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CB034D8A1
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 19:51:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722628285; cv=none; b=E+ncCGc9JQWthzJdHJiyryC9f1kNTZcTwwVOEjhh3RNtxwdArWUkG75Fq03TMGNARt8fp1NhjnXTQ/LG3kk8G7xti0jjEklIUQZxR43G3nOSDeYgi/Y0+vV1K22AH1HwtTgeHadQTWu3zyBQqtXL9qPIN2rFnNVd8mDdtq/755o=
+	t=1722628287; cv=none; b=eDDqZwRrQK6A9HpvuF6V2vT/7tWROzCNM4NDHPdutmt1CEdxCCg/g/cDCiF1DfT8ZjEy0lukhTUOP79y2HgM4FEh0pxFJEnFVghINZCMBkFBC3wJT+KPYfvehpz8tj85UwEw8PN1Rj3ulR50Nrwo5JrJk44uRkL2GRsyA5GFgxM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722628285; c=relaxed/simple;
-	bh=xdSanLFGFMWba8L0va07jfZf9yllgVPIpa3BEmbMGwo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AegNhXYVeln1VshjEHfM0eKozj162b8/dt/fZl1Xey0lT4mi6AE470jXbK4SZ7UIx+u6f1vghsT4hpnmm/BmiEWnkVu7Q9QDj0CotLjIfwNXPzusj7RFN/kz+UYEp6wwL4cVILKV6ggY/Zcxc0mno+fiz5tDCprT7sQl78ivrmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wdAXkz7G; arc=none smtp.client-ip=209.85.128.201
+	s=arc-20240116; t=1722628287; c=relaxed/simple;
+	bh=zql+KU31olSPyMQGIOOmlA41hrQI7991hIRTrHnkF5g=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=uCruVV7DrnwPznyLwk+dbUllvtQeJMyGTc1LIeBnf3rk/f5cPPX45ST5rwt5dgwJxWTMnDSIMOs7YQuxCGjogN35gf5E1etZQEhnwYDYCbrAWc7m3BLPWwQdBS+gERyurATtPjAfUAZoYCzoBbkV7qc9s0/6fsEMhySeINNn2zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RvfoDdEd; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-664ccf0659cso168192117b3.1
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 12:51:23 -0700 (PDT)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0ba318b1b2so8600275276.0
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 12:51:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722628282; x=1723233082; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dRePbcv0Jk0c/q3ujH+fDFJfEYjiNG/9PTNMG0T5GSk=;
-        b=wdAXkz7GF7XfP6lPK3JYEzIyDx0mKNavohpfgHL88E2fQv16WLSHJCiHP4bpM2yyWD
-         j8dPnRLrWuGsVUBrNx6YFfGPugFv4b3Or2+2Ez+VR/FeCTv0uggH4j+Tuh7Er7+MuJ1r
-         JbmviaOnTY2se2dPM8a1a8qpqKzNj1Wmn8YrD5Mm6Zgc9yhDPXEpeqfovWxbfvPYnEPO
-         znEOS42xG5oHlUDQhdELeRMw8zVt0MeO3gKiJUfOXn4E9BajhYGdXINQjAQBBxJLmF/X
-         UVbs7wKALZ2sz23ZzuVm4C9HJwVg99ttyPI96iWtVtA0HPziDmnnNZy841xnWwmUJ4kP
-         2rEA==
+        d=google.com; s=20230601; t=1722628284; x=1723233084; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
+        bh=j3MDuI39zu1XA4gRdGvyMxqjMSntoDT90qhT0kUFZqs=;
+        b=RvfoDdEdubGsBZqZvhW7Mwi2ErJo/qjP2Dc430keGlJ4PbjVJ+396w4eXSD62UNmt2
+         WTJGpuLtEZJcKN0qUZF1J2e3l28yUH9j/TvNSDAtA843Z6W59goEPq8Kl60flLVuXCKW
+         t1vaFZ6RArUF9ojfUtVUaKggx9Wz8T6gERL1oClnZD3FmuF4GED045x7NBdF3Ni07+Xm
+         dUXCF24Jd43HLSqOuX8LS25M1UawDTHoZfSBdDR/Qq5w4et58tv84mPSVfvAzluVBwJx
+         l0TGP1hVNtUJ+F9bC0hU2YVJykcivKxtTKQBDNlwynuYMN+Uv2HgCk0i6gOASzRkU+lu
+         wbNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722628282; x=1723233082;
-        h=cc:to:from:subject:message-id:mime-version:date:reply-to
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dRePbcv0Jk0c/q3ujH+fDFJfEYjiNG/9PTNMG0T5GSk=;
-        b=ZhMSk/8KI7L9ILm0FzK1Vu27FQOERpCGJYtzGzDQ5rPUuzmIUOG6C3i3fnU6mtM4Z2
-         b3ye8GFSzgvw7ba7bXH8oRCK82ZTKBGKo47bPwmZISzikrpbCGYaL3lxQS1r/Sh9y4Tu
-         9WzW9NBG3svAd2mRStWlH5wUyXfnrJSP87LJfcFQ8inOiIvpbS2T7F2ck1d0AiL8xKpR
-         M1jqnG4tDNPotIfVwVf1YKH1TePd/+RJmVeJhsZ5+9zPYFnBcmAe99JfqQ0cScNayuVK
-         sZL9dJgsihc7fFeTHA+KGper7MkYAvQVpHjFDyiPWWhcYCFQGoBqLxUVMe9NLi9QC8gt
-         XHsw==
-X-Gm-Message-State: AOJu0Ywpt8TpUyNsPTcLBDYt3z41qvrK9XKwaSNcCZD5e5a27qcFFUrg
-	zg2ATV6nwvxqxQtN+xdDx+jEL42LCGLecd+rT2tl6l+Yl79d3aagb9HnKu6j0xN/VsXub+QVqHc
-	MyA==
-X-Google-Smtp-Source: AGHT+IE5YVzery3YWSIUahvseviZoBDs9GNQK/RnAw0rCur245kSb6c04TZt+gZRN8dnLYCWg6B0H8RFHnY=
+        d=1e100.net; s=20230601; t=1722628284; x=1723233084;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j3MDuI39zu1XA4gRdGvyMxqjMSntoDT90qhT0kUFZqs=;
+        b=mEWx1s0F76izPJo/IgOw9DqgNY0p6XgZTKwT1gY2R23CHo6uWp/XY4LK6FA1le0cim
+         9Txs4poJw2MV7zHHgD2I22QP/sR9NN3phwXcwt8Too8Lxin1bJStVjYtnTi4sPtIBzTG
+         +NFQzjP8/7RxxxkJMAFMfW+wO8eAD/+kYlTh5nrlMBq7294AiOsX75xp7/1CQzilZbk+
+         w4gRHaFZ55g+vH3OOEj54Tg0u4pFRzIP7LbYavKHnpC11mpSNWqvmCfJFw39pf3cKHHO
+         9SRJwD2MetfpiAowrSirY79m/UR3CGvc5DUnmN7FA1woaPCaLCF3TeN0FY5hqT52PRPy
+         U9ew==
+X-Gm-Message-State: AOJu0YwyH/bvPhFf6ORn2zJlvz9pXCPOmARO2QeAX6IB4dZ5+LWHKfhz
+	bGsj2q9uUtKp/LHXB6jCw2YtK71pEBxHyu/VUOBPyl8ZAf1rPzSdcq4eNp5OddXCcG3mxag+Cce
+	Wgw==
+X-Google-Smtp-Source: AGHT+IHXmtQ4fn/w4A9o1IxjByT19mNXJlLz8OGSPq2+ASik931Ksxoz9M3ugqUoQtYF2Bf10ojDjPLGf1M=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:2483:b0:e03:a0b2:f73 with SMTP id
- 3f1490d57ef6-e0bde2f3cdbmr32634276.6.1722628282405; Fri, 02 Aug 2024 12:51:22
+ (user=seanjc job=sendgmr) by 2002:a5b:405:0:b0:e0b:f69b:da30 with SMTP id
+ 3f1490d57ef6-e0bf69be1bdmr634276.9.1722628284272; Fri, 02 Aug 2024 12:51:24
  -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 12:51:15 -0700
+Date: Fri,  2 Aug 2024 12:51:16 -0700
+In-Reply-To: <20240802195120.325560-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20240802195120.325560-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802195120.325560-1-seanjc@google.com>
-Subject: [PATCH 0/5] KVM: x86: Fastpath cleanup, fix, and enhancement
+Message-ID: <20240802195120.325560-2-seanjc@google.com>
+Subject: [PATCH 1/5] KVM: x86: Re-enter guest if WRMSR(X2APIC_ICR) fastpath is successful
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-This series was prompted by observations of HLT-exiting when debugging
-a throughput issue related to posted interrupts.  When KVM is running in
-a nested scenario, a rather surprising number of HLT exits occur with an
-unmasked interrupt already pending.  I didn't debug too deeply into the
-guest side of things, but I suspect what is happening is that it's fairly
-easy for L2 to be interrupted (by L1 or L0) between checking if it (the
-CPU) should enter an idle state and actually executing STI;HLT.
+Re-enter the guest in the fastpath if WRMSR emulation for x2APIC's ICR is
+successful, as no additional work is needed, i.e. there is no code unique
+for WRMSR exits between the fastpath and the "!= EXIT_FASTPATH_NONE" check
+in __vmx_handle_exit().
 
-AFAICT, a non-nested setup doesn't benefit much, if at all.  But, I don't
-see any downside to checking for a wake event in the fastpath, e.g. it's
-basically a "zero" time halt-polling mechanism.
+Signed-off-by: Sean Christopherson <seanjc@google.com>
+---
+ arch/x86/kvm/x86.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-The other patches fix flaws found by inspection when adding HLT-exiting
-to the faspath.
-
-Note, the userspace-exit logic is basically untested, i.e. I probably
-need to write a selftest...
-
-Sean Christopherson (5):
-  KVM: x86: Re-enter guest if WRMSR(X2APIC_ICR) fastpath is successful
-  KVM: x86: Dedup fastpath MSR post-handling logic
-  KVM: x86: Exit to userspace if fastpath triggers one on instruction
-    skip
-  KVM: x86: Reorganize code in x86.c to co-locate vCPU blocking/running
-    helpers
-  KVM: x86: Add fastpath handling of HLT VM-Exits
-
- arch/x86/include/asm/kvm_host.h |   1 +
- arch/x86/kvm/svm/svm.c          |  13 +-
- arch/x86/kvm/vmx/vmx.c          |   2 +
- arch/x86/kvm/x86.c              | 319 +++++++++++++++++---------------
- arch/x86/kvm/x86.h              |   1 +
- 5 files changed, 188 insertions(+), 148 deletions(-)
-
-
-base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+index af6c8cf6a37a..cf397110953f 100644
+--- a/arch/x86/kvm/x86.c
++++ b/arch/x86/kvm/x86.c
+@@ -2173,7 +2173,7 @@ fastpath_t handle_fastpath_set_msr_irqoff(struct kvm_vcpu *vcpu)
+ 		data = kvm_read_edx_eax(vcpu);
+ 		if (!handle_fastpath_set_x2apic_icr_irqoff(vcpu, data)) {
+ 			kvm_skip_emulated_instruction(vcpu);
+-			ret = EXIT_FASTPATH_EXIT_HANDLED;
++			ret = EXIT_FASTPATH_REENTER_GUEST;
+ 		}
+ 		break;
+ 	case MSR_IA32_TSC_DEADLINE:
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
