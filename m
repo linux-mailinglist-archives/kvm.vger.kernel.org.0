@@ -1,136 +1,124 @@
-Return-Path: <kvm+bounces-23047-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23048-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D701945F6A
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 16:27:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C344945F79
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 16:33:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFE351C210C1
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 14:27:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0306A1F217E4
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 14:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4E88200109;
-	Fri,  2 Aug 2024 14:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8743F210194;
+	Fri,  2 Aug 2024 14:33:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LNrTxs4s"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="TvmP6Q89"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6144118B48C
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 14:27:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B83210183
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 14:33:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722608871; cv=none; b=cFDj0gqLmh7xX20cPfTIocXWxD11cyGr8wemo4nt0LQskV4e4QkS7/sUxUMndi1k9ecwek8fjwVl0f9/BWxpr4jldFT2Ta/ld+I1CiWdu9Mmoa2rBy5sPcxRxxry/X/4OcI5jqbrwqUTWa+1nYUtv98Ubo6+cqHvHdrtCmDTMVc=
+	t=1722609229; cv=none; b=OQgC1VZUXhznrjn9WsVIKqjP1i/AAf5l5sIeRahbBjL1uYT0dYQzEW8RY93OA5s9bChJhXbhrHpfQ0UiEaeWfk6+HhCUvJAsFfr52ZjwVDsirL3pZsitX/GQiZ5dOleSNVp9hCOLFQF80xlrkNnMlYXR2XhYx95iTObLmc2V36c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722608871; c=relaxed/simple;
-	bh=X4jmHBSxvxql7GSDWaFyUViEdiHMRKgMs/wop+HFBAk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mgLRWIXgllg+XcJPH0dlANdWfrAxJnZY44Ph+pWJrC926qtAe4JLwDUMaaskoVI1ebFswe4pt2wyrJ7RpMsGVz08zYb94mHXvwhFPPfUdNCkbmhwMzZARiIPqCCFNlef5wAPHcrLqS3Gu8KLQg9+dCIlX6pcA9i4L9CAOuDSXZE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LNrTxs4s; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722608868;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0AF836Ndnqh+hwBkZ5YXfF8VJZkH/V2VUoPsaRxoRbo=;
-	b=LNrTxs4sGNC5O698Ma5pmjalcVXD094p/HYvlYeTMhwB7BI/g9qcNMxcjSebmkYVbbJpmR
-	LEadjh6WEYbBHb4+GqOAMier8xrOZ53QvFueCfz26ME7aCmfZm5hkM7ABUdSjWOx/4TlLb
-	H8yRCVrG0ARKHVRRvZQNrV1vcNxQtW4=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-447-XWO4I8cYMCuIDar7bdZhBw-1; Fri,
- 02 Aug 2024 10:27:43 -0400
-X-MC-Unique: XWO4I8cYMCuIDar7bdZhBw-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 28AEC1955F3B;
-	Fri,  2 Aug 2024 14:27:30 +0000 (UTC)
-Received: from blackfin.pond.sub.org (unknown [10.39.192.65])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E9187300018D;
-	Fri,  2 Aug 2024 14:27:25 +0000 (UTC)
-Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
-	id B5E1B21E668F; Fri,  2 Aug 2024 16:27:23 +0200 (CEST)
-From: Markus Armbruster <armbru@redhat.com>
-To: Daniel P. =?utf-8?Q?Berrang=C3=A9?= <berrange@redhat.com>
-Cc: qemu-devel@nongnu.org,  alex.williamson@redhat.com,
-  andrew@codeconstruct.com.au,  andrew@daynix.com,
-  arei.gonglei@huawei.com,  berto@igalia.com,  borntraeger@linux.ibm.com,
-  clg@kaod.org,  david@redhat.com,  den@openvz.org,  eblake@redhat.com,
-  eduardo@habkost.net,  farman@linux.ibm.com,  farosas@suse.de,
-  hreitz@redhat.com,  idryomov@gmail.com,  iii@linux.ibm.com,
-  jamin_lin@aspeedtech.com,  jasowang@redhat.com,  joel@jms.id.au,
-  jsnow@redhat.com,  kwolf@redhat.com,  leetroy@gmail.com,
-  marcandre.lureau@redhat.com,  marcel.apfelbaum@gmail.com,
-  michael.roth@amd.com,  mst@redhat.com,  mtosatti@redhat.com,
-  nsg@linux.ibm.com,  pasic@linux.ibm.com,  pbonzini@redhat.com,
-  peter.maydell@linaro.org,  peterx@redhat.com,  philmd@linaro.org,
-  pizhenwei@bytedance.com,  pl@dlhnet.de,  richard.henderson@linaro.org,
-  stefanha@redhat.com,  steven_lee@aspeedtech.com,  thuth@redhat.com,
-  vsementsov@yandex-team.ru,  wangyanan55@huawei.com,
-  yuri.benditovich@daynix.com,  zhao1.liu@intel.com,
-  qemu-block@nongnu.org,  qemu-arm@nongnu.org,  qemu-s390x@nongnu.org,
-  kvm@vger.kernel.org
-Subject: Re: [PATCH 11/18] qapi/crypto: Rename QCryptoHashAlgorithm to
- *Algo, and drop prefix
-In-Reply-To: <ZqoIDEjiUqK2dZx4@redhat.com> ("Daniel P. =?utf-8?Q?Berrang?=
- =?utf-8?Q?=C3=A9=22's?= message of
-	"Wed, 31 Jul 2024 10:46:52 +0100")
-References: <20240730081032.1246748-1-armbru@redhat.com>
-	<20240730081032.1246748-12-armbru@redhat.com>
-	<Zqir1y4qyp-lwyuz@redhat.com> <8734nrgj5i.fsf@pond.sub.org>
-	<ZqoIDEjiUqK2dZx4@redhat.com>
-Date: Fri, 02 Aug 2024 16:27:23 +0200
-Message-ID: <87le1fxano.fsf@pond.sub.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1722609229; c=relaxed/simple;
+	bh=fLYyGpAg5z2pEFUgcCJcCIdOqe8KSGQokEWEe44JteE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aNkWCCiIGC+w3+++T/PGczomq+BU2jWRt1gwr8ts9ybtvxP9d3RU4N3Ipv6ZBH9R+3QEd+ZH/0ISaCx/zKUtO9nfYWWNhMfiqIoweinUYQted2duqRArKmljHA43AvQZa1PonGS/4M2yJnDFG8COSX4J/959BZMmodoWMLRQstA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=TvmP6Q89; arc=none smtp.client-ip=209.85.210.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-70944dc8dc6so4435845a34.3
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 07:33:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1722609226; x=1723214026; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8+0LCZb62SJcm4AJo4i6+oz94H7jhu4Xatg5nbWNkAo=;
+        b=TvmP6Q89dw2ueJCF5WmzjKi4ofp1QY3I1PiCmLjHW5cMP+pZeu4b4/tskzr0hcURKj
+         hOIVwvSPgiX12hszW3kR2TDgyVXxa38JEdiBg0CPJlmGVNy0FhXvrKPWl/ir2bjmLIqJ
+         iuTdBkk2CKZfY4hkR/9+SB0CRvroC6ujFzBNzhYwH0R1C3O/vH+faVlLXNXtfBD9ZZHJ
+         9p0cCcbLkBG9y4pwPDDZOfgULHI29v04AJ1BQViDS2W5kyluTy54kKGikH34Uh4RNCLn
+         fyixhRzzZafK3gGaeBlL7HKIOVuYly6bbNEnz/AJy/VAnvLhyn0T9SF6s5SIJLJxaB1u
+         lelg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722609226; x=1723214026;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8+0LCZb62SJcm4AJo4i6+oz94H7jhu4Xatg5nbWNkAo=;
+        b=CKp04eQLxqC9ZUWK43dv22B6y3X0Uf1Igbaw5NxrncOw+ZXwDmqcoWqEHxcKbJQx4N
+         KXWEGtfyXisoLzaO7rfJHVLj5CaD7ESmTj01HObLdQbLhqmUF88tLlQ+ZejG7IgIoyJ5
+         zwqSmHaYopVjS8KzRlJSolyqr9yzk8VZ+rP1Z3cYsi/dndGEz15HT+oSXrJHC/k3hWti
+         IPTA2xicG0mGNCTzK6rfCxMeKD3EC4k8N3BRZo5iTIFHhLsHDs1nnz5nmvJKEVyip1lp
+         JCPtN2AzokSPtqJPpnr+3KpBfzJmaKvGzPk+VFnC+ERSvGgTUuhKHYJQruA2Im3mMEhr
+         GnIw==
+X-Forwarded-Encrypted: i=1; AJvYcCXS7tYsNqDmze7jejMDD2NoKQpWoXS9uOWhV/y3uRxsLvgxJLS1iYkrLT/onm9eRzwg42/V6VwhJcy8YBk9de9QAWJA
+X-Gm-Message-State: AOJu0Yzw39bNmCX6aesCaRzrxOH+Yb5BPWeETSH3PuFvRj+2ectIhp9m
+	/1geoC7vC7iAtdRnVSrxRAv5L+b7aZ4Aulfut4vUl+4Nv5KG4FJTfDhlOgooo27wIYbV5HJtT6D
+	7
+X-Google-Smtp-Source: AGHT+IGa2DWh+CgK9NU/iH34exTcUtNtsWvavMBtrV9+dI+8bdEl40KugSsFUG5Z7nRGAiST7PXG0w==
+X-Received: by 2002:a05:6830:6f83:b0:703:5db8:805 with SMTP id 46e09a7af769-709b0bd2a5fmr5346172a34.4.1722609196382;
+        Fri, 02 Aug 2024 07:33:16 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a34f6fb283sm90636485a.60.2024.08.02.07.33.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Aug 2024 07:33:15 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sZtLH-003ihs-6Q;
+	Fri, 02 Aug 2024 11:33:15 -0300
+Date: Fri, 2 Aug 2024 11:33:15 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org
+Subject: Re: [PATCH rfc] vfio-pci: Allow write combining
+Message-ID: <20240802143315.GB676757@ziepe.ca>
+References: <20240731155352.3973857-1-kbusch@meta.com>
+ <20240801141914.GC3030761@ziepe.ca>
+ <20240801094123.4eda2e91.alex.williamson@redhat.com>
+ <20240801161130.GD3030761@ziepe.ca>
+ <20240801105218.7c297f9a.alex.williamson@redhat.com>
+ <20240801171355.GA4830@ziepe.ca>
+ <20240801113344.1d5b5bfe.alex.williamson@redhat.com>
+ <ZqzsMcrEg5MCV48t@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZqzsMcrEg5MCV48t@kbusch-mbp.dhcp.thefacebook.com>
 
-Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
+On Fri, Aug 02, 2024 at 08:24:49AM -0600, Keith Busch wrote:
+> On Thu, Aug 01, 2024 at 11:33:44AM -0600, Alex Williamson wrote:
+> > On Thu, 1 Aug 2024 14:13:55 -0300
+> > Jason Gunthorpe <jgg@ziepe.ca> wrote:
+> > 
+> > > On Thu, Aug 01, 2024 at 10:52:18AM -0600, Alex Williamson wrote:
+> >  
+> > > > We'd populate these new regions only for BARs that support prefetch and
+> > > > mmap   
+> > > 
+> > > That's not the point, prefetch has nothing to do with write combining.
+> > 
+> > I was following the original proposal in this thread that added a
+> > prefetch flag to REGION_INFO and allowed enabling WC only for
+> > IORESOURCE_PREFETCH.
+> 
+> Which itself follows the existing pattern from
+> pci_create_resource_files(), which creates a write combine
+> resource<X>_wc file only when IORESOURCE_PREFETCH is set. But yeah,
+> prefetch isn't necessary for wc, but it seems to indicate it's safe.
 
-> On Tue, Jul 30, 2024 at 02:26:49PM +0200, Markus Armbruster wrote:
->> Daniel P. Berrang=C3=A9 <berrange@redhat.com> writes:
->>=20
->> > On Tue, Jul 30, 2024 at 10:10:25AM +0200, Markus Armbruster wrote:
->> >> QAPI's 'prefix' feature can make the connection between enumeration
->> >> type and its constants less than obvious.  It's best used with
->> >> restraint.
->> >>=20
->> >> QCryptoHashAlgorithm has a 'prefix' that overrides the generated
->> >> enumeration constants' prefix to QCRYPTO_HASH_ALG.
->> >>=20
->> >> We could simply drop 'prefix', but then the prefix becomes
->> >> QCRYPTO_HASH_ALGORITHM, which is rather long.
->> >>=20
->> >> We could additionally rename the type to QCryptoHashAlg, but I think
->> >> the abbreviation "alg" is less than clear.
->> >
->> > I would have gone with this, but it is a bit of a bike shed colouring
->> > debate so I'm not fussed
->>=20
->> Either solution seems okay, so I went with my personal preference.  Do
->> feel free to state yours and ask me to respin!
->
-> After reviewing the patches that follow, I'd observe that picking
-> Algo has made the following patches much larger than if it had
-> stuck with Alg. Basically changing both the types & constants,
-> instead of only having to change the types.=20
+Yes, I know, that code isn't right either... It seems to be the root
+of this odd "prefetch and WC are related" idea.
 
-Yes.  Worth the more obvious names to me, but again, feel free to ask me
-to respin for less churn.
-
+Jason
 
