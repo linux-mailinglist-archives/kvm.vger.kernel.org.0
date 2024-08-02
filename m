@@ -1,124 +1,115 @@
-Return-Path: <kvm+bounces-23048-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23049-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C344945F79
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 16:33:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50D3A946016
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:17:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0306A1F217E4
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 14:33:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8235A1C221A6
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:17:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8743F210194;
-	Fri,  2 Aug 2024 14:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03851136346;
+	Fri,  2 Aug 2024 15:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="TvmP6Q89"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFintkjt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80B83210183
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 14:33:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4D2515C14B
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722609229; cv=none; b=OQgC1VZUXhznrjn9WsVIKqjP1i/AAf5l5sIeRahbBjL1uYT0dYQzEW8RY93OA5s9bChJhXbhrHpfQ0UiEaeWfk6+HhCUvJAsFfr52ZjwVDsirL3pZsitX/GQiZ5dOleSNVp9hCOLFQF80xlrkNnMlYXR2XhYx95iTObLmc2V36c=
+	t=1722611782; cv=none; b=dIp2IaN9tG5BMBi8zXCzctE3uIoGyq9R4HIak96kCe3jPtuxDKkuGLd4Su3IJCwFJfSRU3sO4koTiO8MW8oVHAsXFLvhiIOjr+OZaoQ0VLbxYJ6vO+GtIka+OPtF8RmrmTLIvjWNf2NUDmoCvmY1W48IZ3KmGVNHRsQ6nwFkHYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722609229; c=relaxed/simple;
-	bh=fLYyGpAg5z2pEFUgcCJcCIdOqe8KSGQokEWEe44JteE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aNkWCCiIGC+w3+++T/PGczomq+BU2jWRt1gwr8ts9ybtvxP9d3RU4N3Ipv6ZBH9R+3QEd+ZH/0ISaCx/zKUtO9nfYWWNhMfiqIoweinUYQted2duqRArKmljHA43AvQZa1PonGS/4M2yJnDFG8COSX4J/959BZMmodoWMLRQstA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=TvmP6Q89; arc=none smtp.client-ip=209.85.210.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-70944dc8dc6so4435845a34.3
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 07:33:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1722609226; x=1723214026; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8+0LCZb62SJcm4AJo4i6+oz94H7jhu4Xatg5nbWNkAo=;
-        b=TvmP6Q89dw2ueJCF5WmzjKi4ofp1QY3I1PiCmLjHW5cMP+pZeu4b4/tskzr0hcURKj
-         hOIVwvSPgiX12hszW3kR2TDgyVXxa38JEdiBg0CPJlmGVNy0FhXvrKPWl/ir2bjmLIqJ
-         iuTdBkk2CKZfY4hkR/9+SB0CRvroC6ujFzBNzhYwH0R1C3O/vH+faVlLXNXtfBD9ZZHJ
-         9p0cCcbLkBG9y4pwPDDZOfgULHI29v04AJ1BQViDS2W5kyluTy54kKGikH34Uh4RNCLn
-         fyixhRzzZafK3gGaeBlL7HKIOVuYly6bbNEnz/AJy/VAnvLhyn0T9SF6s5SIJLJxaB1u
-         lelg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722609226; x=1723214026;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8+0LCZb62SJcm4AJo4i6+oz94H7jhu4Xatg5nbWNkAo=;
-        b=CKp04eQLxqC9ZUWK43dv22B6y3X0Uf1Igbaw5NxrncOw+ZXwDmqcoWqEHxcKbJQx4N
-         KXWEGtfyXisoLzaO7rfJHVLj5CaD7ESmTj01HObLdQbLhqmUF88tLlQ+ZejG7IgIoyJ5
-         zwqSmHaYopVjS8KzRlJSolyqr9yzk8VZ+rP1Z3cYsi/dndGEz15HT+oSXrJHC/k3hWti
-         IPTA2xicG0mGNCTzK6rfCxMeKD3EC4k8N3BRZo5iTIFHhLsHDs1nnz5nmvJKEVyip1lp
-         JCPtN2AzokSPtqJPpnr+3KpBfzJmaKvGzPk+VFnC+ERSvGgTUuhKHYJQruA2Im3mMEhr
-         GnIw==
-X-Forwarded-Encrypted: i=1; AJvYcCXS7tYsNqDmze7jejMDD2NoKQpWoXS9uOWhV/y3uRxsLvgxJLS1iYkrLT/onm9eRzwg42/V6VwhJcy8YBk9de9QAWJA
-X-Gm-Message-State: AOJu0Yzw39bNmCX6aesCaRzrxOH+Yb5BPWeETSH3PuFvRj+2ectIhp9m
-	/1geoC7vC7iAtdRnVSrxRAv5L+b7aZ4Aulfut4vUl+4Nv5KG4FJTfDhlOgooo27wIYbV5HJtT6D
-	7
-X-Google-Smtp-Source: AGHT+IGa2DWh+CgK9NU/iH34exTcUtNtsWvavMBtrV9+dI+8bdEl40KugSsFUG5Z7nRGAiST7PXG0w==
-X-Received: by 2002:a05:6830:6f83:b0:703:5db8:805 with SMTP id 46e09a7af769-709b0bd2a5fmr5346172a34.4.1722609196382;
-        Fri, 02 Aug 2024 07:33:16 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a34f6fb283sm90636485a.60.2024.08.02.07.33.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 07:33:15 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sZtLH-003ihs-6Q;
-	Fri, 02 Aug 2024 11:33:15 -0300
-Date: Fri, 2 Aug 2024 11:33:15 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Keith Busch <kbusch@kernel.org>
-Cc: Alex Williamson <alex.williamson@redhat.com>,
-	Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org
-Subject: Re: [PATCH rfc] vfio-pci: Allow write combining
-Message-ID: <20240802143315.GB676757@ziepe.ca>
-References: <20240731155352.3973857-1-kbusch@meta.com>
- <20240801141914.GC3030761@ziepe.ca>
- <20240801094123.4eda2e91.alex.williamson@redhat.com>
- <20240801161130.GD3030761@ziepe.ca>
- <20240801105218.7c297f9a.alex.williamson@redhat.com>
- <20240801171355.GA4830@ziepe.ca>
- <20240801113344.1d5b5bfe.alex.williamson@redhat.com>
- <ZqzsMcrEg5MCV48t@kbusch-mbp.dhcp.thefacebook.com>
+	s=arc-20240116; t=1722611782; c=relaxed/simple;
+	bh=iuimfJknKx17ZsRwE8HxkPVR9wtDKQz5UqYPwUcW5+E=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=L8I8WLtqwxYr7CpIQSd/Dt4DjFUk1aTHW/atFiq8xrJP6VyIzgOf4axurM4n7v0XzzN14Ee2J08Zt9JJJZPzlxOescOR98h8aS6xl2RCgWuuNmrdEoWqUG2sINZj73sJ4UxgCEVoxLsfoyyFFGrFuj6r+mx7iTkfzgzJBMno9iA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jFintkjt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722611779;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=dB8ZjsQi0DqhQ19QW4eHSso4LuqSpVC05OgWx9LUJeU=;
+	b=jFintkjth0O+AKuylQy1hOpKfsuzIS8DpPnH1yQtjNPJ7YjhBy3b4xO0gqcOfKF/mVXxIr
+	HYOZt+nJQkwYWmZrXhBLyT0OeEMY5oj29lrAhNBR/RS/oR/EuzULUfRxiXCzsq9FMXnDct
+	x+R8gIjuUPtQkFwqn13opzei1CXuJ3A=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-626-sELmaxqFNACf-wJmQ0HHjw-1; Fri,
+ 02 Aug 2024 11:16:16 -0400
+X-MC-Unique: sELmaxqFNACf-wJmQ0HHjw-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6DDED195421F;
+	Fri,  2 Aug 2024 15:16:14 +0000 (UTC)
+Received: from intellaptop.redhat.com (unknown [10.47.238.37])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id EE2481955E80;
+	Fri,  2 Aug 2024 15:16:09 +0000 (UTC)
+From: Maxim Levitsky <mlevitsk@redhat.com>
+To: kvm@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
+	linux-kernel@vger.kernel.org,
+	Borislav Petkov <bp@alien8.de>,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	x86@kernel.org,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Maxim Levitsky <mlevitsk@redhat.com>
+Subject: [PATCH v2 0/2] Relax canonical checks on some arch msrs
+Date: Fri,  2 Aug 2024 18:16:06 +0300
+Message-Id: <20240802151608.72896-1-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZqzsMcrEg5MCV48t@kbusch-mbp.dhcp.thefacebook.com>
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Fri, Aug 02, 2024 at 08:24:49AM -0600, Keith Busch wrote:
-> On Thu, Aug 01, 2024 at 11:33:44AM -0600, Alex Williamson wrote:
-> > On Thu, 1 Aug 2024 14:13:55 -0300
-> > Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> > 
-> > > On Thu, Aug 01, 2024 at 10:52:18AM -0600, Alex Williamson wrote:
-> >  
-> > > > We'd populate these new regions only for BARs that support prefetch and
-> > > > mmap   
-> > > 
-> > > That's not the point, prefetch has nothing to do with write combining.
-> > 
-> > I was following the original proposal in this thread that added a
-> > prefetch flag to REGION_INFO and allowed enabling WC only for
-> > IORESOURCE_PREFETCH.
-> 
-> Which itself follows the existing pattern from
-> pci_create_resource_files(), which creates a write combine
-> resource<X>_wc file only when IORESOURCE_PREFETCH is set. But yeah,
-> prefetch isn't necessary for wc, but it seems to indicate it's safe.
+Recently we came up upon a failure where likely the guest writes=0D
+0xff4547ceb1600000 to MSR_KERNEL_GS_BASE and later on, qemu=0D
+sets this value via KVM_PUT_MSRS, and is rejected by the=0D
+kernel, likely due to not being canonical in 4 level paging.=0D
+=0D
+I did some reverse engineering and to my surprise I found out=0D
+that both Intel and AMD have very loose checks in regard to=0D
+non canonical addresses written to this and several other msrs,=0D
+when the CPU supports 5 level paging.=0D
+=0D
+Patch #1 addresses this, making KVM tolerate this.=0D
+=0D
+Patch #2 is just a fix for a semi theoretical bug, found=0D
+while trying to debug the issue.=0D
+=0D
+V2: addressed a very good feedback from Chao Gao. Thanks!=0D
+=0D
+Best regards,=0D
+	Maxim Levitsky=0D
+=0D
+Maxim Levitsky (2):=0D
+  KVM: x86: relax canonical check for some x86 architectural msrs=0D
+  KVM: SVM: fix emulation of msr reads/writes of MSR_FS_BASE and=0D
+    MSR_GS_BASE=0D
+=0D
+ arch/x86/kvm/svm/svm.c | 12 ++++++++++++=0D
+ arch/x86/kvm/x86.c     | 11 ++++++++++-=0D
+ 2 files changed, 22 insertions(+), 1 deletion(-)=0D
+=0D
+-- =0D
+2.40.1=0D
+=0D
 
-Yes, I know, that code isn't right either... It seems to be the root
-of this odd "prefetch and WC are related" idea.
-
-Jason
 
