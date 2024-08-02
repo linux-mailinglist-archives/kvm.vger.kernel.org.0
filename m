@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-23088-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23089-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C77EA9462EB
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:20:11 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 521259462ED
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:20:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 888731F21D85
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:20:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F297D1F21C06
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 18:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E88165F1D;
-	Fri,  2 Aug 2024 18:19:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0C2165F08;
+	Fri,  2 Aug 2024 18:19:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hiqnT3b/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qUbjaSmt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A6015C128
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 18:19:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA0B165F06
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 18:19:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722622782; cv=none; b=Edr7fz0aX5841GzmGzcJIZ05cLuvanckawoEJqUcOzF0gd1oVC3YkDO3h8dhSxKt+lLZhM31KHwEzv7hFAWlDXItwHqw6/vbM4Twlxxznd2xnuwT9EaF5XiCRWuKm7JZswiuaO9YsePeYp7CbaFwspStAyA+Zlxq6j9qS597VBc=
+	t=1722622784; cv=none; b=XefD6rXdzCInG/QDHU6LZUJhtIaatvWttgdT0s102Jj2F5yv8jOdHdeaAppHq3J9jsRmasTN8Vuq/koj+lkZYkfTWpnO5CUV/bdyDTR2pMu+0tguSU71yXDpSX3jJyjk6dEGhmBa4PKCvlYT+d5+yGy2jrF6IzSMbpBEgFYdL9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722622782; c=relaxed/simple;
-	bh=PqAkbeX46Q/uqruzqqUfbvSnJ64882JvtNzQyytCBAs=;
+	s=arc-20240116; t=1722622784; c=relaxed/simple;
+	bh=hkR6QEr+WLoDq3xFNE6eHV98zpNeTguqeGIsqeOvNJA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=c/hdSN9cw05brZM5ev9aNnkrGjC+HgscOk+4YvIewLa7Ss7tJ/PqBU5rVstmnNMJOsvIqJiyHaGuYNc4wB7XCyMbGqx/ORNCNtc8YsQK3RzBtjUOOxhCDR8wh/+XXZBh8GtSRdNSXNNoH1KOI8L8PcHt49046htXsV2iXZs99lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hiqnT3b/; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=rmNbF0B6hICSJmDjn+SjqR8aLF/vBdRtJB2LvwxslxMArgCiW6aQYBWoZlcQ2/xqtEgWVJullSt1ncgN5ivOEipCLHKn8o0yBSdaCvHq1z4vP5wYmuDrAcBv4ke+olXl6pB4aFzVDJEOnITDNVvuLzX9B2yITo3Mvu934BP4ErI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qUbjaSmt; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb685d5987so10451462a91.2
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 11:19:40 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7b696999c65so1841622a12.3
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 11:19:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722622780; x=1723227580; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722622782; x=1723227582; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=jQvD2XFUOoXKh/qvHzE0oWtyWzaKX7emTzrWlGmUYVU=;
-        b=hiqnT3b//4qEz60ZslEs2FYz1j2vX05lU6bI4eOSCbB608l5M2wq9W9cY1Ggi9Nexl
-         2B6XQvhIEgfF7Mq86iWVM2zNmfhvHUF4b6D2C7cViz4tRFuLm/d6/Zo928TXsCztE0ol
-         b2Hc5T6XGaXKbr/lVb9TDca8tpq3v6pIWuKawRmdPsLl5WUlvscmPuFjjKDAF2XNAYJl
-         MTJjUe1Hqd2X+SepUWGtuSCg1PhDvH0VzDBKRYeGYxpACX8apFYIbKmt2j/pr3N7nNiH
-         naFJeCeriNxNg8DedqBgx/x7jSiA7EqZDYQffQAnAankoNhUl/zlb0NPiCvot9H6x0mS
-         wy7A==
+        bh=j/AuksRw4eRbr1UmkMXYc3JTMMOK1vQLnbFBUZIHu+k=;
+        b=qUbjaSmtDzLUyisDRt9YLwEL4LMl9q0mEedHKeOLJS/7HWGAl4IslbUd7hO8m9d3t3
+         OALMeeOC1sSlKvF3YLBO+2uhD5iyNsuitisDctY/haJP83hwSnDqPrLJb35g2/KKgP7r
+         qmJ+zhYUomzvKPGeOLiHX8NqFeJ5Lf47DFvLanNP/0Ic5lnwB/zXisNn46fa+Ex1Znf9
+         OuykVn19yz6IdDX6OM2g4BZ2k9Xg5YWKD0AOG983/i7Y9V6swaPINeWnQLPymnDJYioc
+         UsgRjQVxSXa0+jDEUeorBMTRGII0m4bRYskju/k1O6wrZuGlcLDaUHygbSxU1QyAPeHW
+         RMRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722622780; x=1723227580;
+        d=1e100.net; s=20230601; t=1722622782; x=1723227582;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jQvD2XFUOoXKh/qvHzE0oWtyWzaKX7emTzrWlGmUYVU=;
-        b=Ny2yb/PSEIs3sk/6CQMZRpXqgUBvZxw9NoluiEiIk7K4+dLf2x5pnwbdhlJm379GUq
-         VEUYoZhVzXtc0X4NnCbELJg4GsqgvmUn/jsWuFTfMokKiD9TQjCJ3sphARTWFCRCDaYN
-         LTxw07+YOcpdorhmp/hJ1hk5Mk3+mlx202nUWTqYfzHumjCiFoe+xyqxIYde7H5L3lpR
-         rpuIBcXrSEJiPyb2khyNUgrou5GF6B/IT+jPx+GXi0qnt2RmgGdh4hc9NN35T4Cy/3lg
-         nyLv3TREruDXvbNpUsWpp40baYpcW1Lq2h64R4hOeDX0Q3kX+Cdsv793GWrPkJ7d4s4p
-         Solw==
-X-Gm-Message-State: AOJu0YyIh1d+DVyIRfDyQqfjAvot+h78CZuzoYidYeuBFm7g1yz9bQoa
-	UMlBjXyCvGv8wva2WPGxsFfkci66Z+n/2oEzoNAZ30nfmfvPZFF7sFOsyq+C40RvTT1CN8dTkc/
-	zTw==
-X-Google-Smtp-Source: AGHT+IG6uu1lx5JAUSYw/bNj45a08OL8ZJ97prbP8I5rSjynR6V2S9qofwrzh1JA+MVBjXVGnS3x1i7++1I=
+        bh=j/AuksRw4eRbr1UmkMXYc3JTMMOK1vQLnbFBUZIHu+k=;
+        b=hndch1dZiZoqqLv/EHlDSlpbC5s1XDlxMkbicLp3hWN/jsubitzX6TSmUH0/l0tavI
+         5PvIspty0dGXOrxr2SwhSQgXspBTIxpXGlZ7+9IftnnXa7DuhfnS6lcTHzDlRd3E1Z89
+         hA+BaNwwYFpu4eWvR4JgAYnCWaerl0oIPx2dziWaPPZpD3tOY7Iv9ueapOVAztSVbyUi
+         cd34SCMrdq4ynsKOUp6FrHoBoJDCGaVcS1DDvhQszeXJEdV4S6KfStupQrNzwmC9U5AL
+         GpTJo316n1dNc6HLMpPVvs7ib1WRhvVpWaY8OhgrRuCG/l/zlK3z4yGyhDE7HtJ7SnlX
+         ymOQ==
+X-Gm-Message-State: AOJu0YzACrs9Icos6bjViWTmoqprBdQNpwF2kUimsbUjDWJCk6kN0/L9
+	0fCrBUhBQ29X6EvygQkMs+dLF28Uh+hgJ7PJQhZcJv6YN3bzA21lqzBlW/7pVw7/sJoM+dkTe0h
+	XXg==
+X-Google-Smtp-Source: AGHT+IHLj8X+lZRtIC24TP4NuRlObpH/Kd495L+iYe6/wJIc4BaC8JUsz1rCyorY9vbGmn7x9ISQkirN3fU=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:2354:b0:2c9:7fb8:ef1d with SMTP id
- 98e67ed59e1d1-2cff952b45fmr67521a91.6.1722622780012; Fri, 02 Aug 2024
- 11:19:40 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a05:6a02:494:b0:79d:9ea1:e03f with SMTP id
+ 41be03b00d2f7-7b74a2fde72mr7518a12.8.1722622781900; Fri, 02 Aug 2024 11:19:41
+ -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 11:19:26 -0700
+Date: Fri,  2 Aug 2024 11:19:27 -0700
 In-Reply-To: <20240802181935.292540-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,51 +75,61 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240802181935.292540-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802181935.292540-2-seanjc@google.com>
-Subject: [PATCH v2 01/10] KVM: SVM: Disallow guest from changing userspace's
- MSR_AMD64_DE_CFG value
+Message-ID: <20240802181935.292540-3-seanjc@google.com>
+Subject: [PATCH v2 02/10] KVM: x86: Move MSR_TYPE_{R,W,RW} values from VMX to
+ x86, as enums
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	Tom Lendacky <thomas.lendacky@amd.com>, Weijiang Yang <weijiang.yang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Inject a #GP if the guest attempts to change MSR_AMD64_DE_CFG from its
-*current* value, not if the guest attempts to write a value other than
-KVM's set of supported bits.  As per the comment and the changelog of the
-original code, the intent is to effectively make MSR_AMD64_DE_CFG read-
-only for the guest.
+Move VMX's MSR_TYPE_{R,W,RW} #defines to x86.h, as enums, so that they can
+be used by common x86 code, e.g. instead of doing "bool write".
 
-Opportunistically use a more conventional equality check instead of an
-exclusive-OR check to detect attempts to change bits.
+Opportunistically tweak the definitions to make it more obvious that the
+values are bitmasks, not arbitrary ascending values.
 
-Fixes: d1d93fa90f1a ("KVM: SVM: Add MSR-based feature support for serializing LFENCE")
-Cc: Tom Lendacky <thomas.lendacky@amd.com>
+No functional change intended.
+
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/svm/svm.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ arch/x86/kvm/vmx/vmx.h | 4 ----
+ arch/x86/kvm/x86.h     | 6 ++++++
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index c115d26844f7..550ead197543 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -3189,8 +3189,13 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 		if (data & ~msr_entry.data)
- 			return 1;
+diff --git a/arch/x86/kvm/vmx/vmx.h b/arch/x86/kvm/vmx/vmx.h
+index 42498fa63abb..3839afb921e2 100644
+--- a/arch/x86/kvm/vmx/vmx.h
++++ b/arch/x86/kvm/vmx/vmx.h
+@@ -17,10 +17,6 @@
+ #include "run_flags.h"
+ #include "../mmu.h"
  
--		/* Don't allow the guest to change a bit, #GP */
--		if (!msr->host_initiated && (data ^ msr_entry.data))
-+		/*
-+		 * Don't let the guest change the host-programmed value.  The
-+		 * MSR is very model specific, i.e. contains multiple bits that
-+		 * are completely unknown to KVM, and the one bit known to KVM
-+		 * is simply a reflection of hardware capatibilies.
-+		 */
-+		if (!msr->host_initiated && data != svm->msr_decfg)
- 			return 1;
+-#define MSR_TYPE_R	1
+-#define MSR_TYPE_W	2
+-#define MSR_TYPE_RW	3
+-
+ #define X2APIC_MSR(r) (APIC_BASE_MSR + ((r) >> 4))
  
- 		svm->msr_decfg = data;
+ #ifdef CONFIG_X86_64
+diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+index 50596f6f8320..499adef96038 100644
+--- a/arch/x86/kvm/x86.h
++++ b/arch/x86/kvm/x86.h
+@@ -504,6 +504,12 @@ int kvm_handle_memory_failure(struct kvm_vcpu *vcpu, int r,
+ int kvm_handle_invpcid(struct kvm_vcpu *vcpu, unsigned long type, gva_t gva);
+ bool kvm_msr_allowed(struct kvm_vcpu *vcpu, u32 index, u32 type);
+ 
++enum kvm_msr_access {
++	MSR_TYPE_R	= BIT(0),
++	MSR_TYPE_W	= BIT(1),
++	MSR_TYPE_RW	= MSR_TYPE_R | MSR_TYPE_W,
++};
++
+ /*
+  * Internal error codes that are used to indicate that MSR emulation encountered
+  * an error that should result in #GP in the guest, unless userspace
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
