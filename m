@@ -1,164 +1,120 @@
-Return-Path: <kvm+bounces-23117-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23118-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 061159463F1
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 21:32:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DED55946412
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 21:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B010E282F79
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 19:32:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A60C283A38
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 19:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E549B50269;
-	Fri,  2 Aug 2024 19:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60BC61FDA;
+	Fri,  2 Aug 2024 19:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vReEFtMb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wdAXkz7G"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E5331ABEA5
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 19:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D8B01ABEC9
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 19:51:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722627133; cv=none; b=RE7DZ7RFXjVP41Ycqgb4fSDiUBSQz3LSDXts4tUi8g+URhZaUU06krTKytyfpfyttl3/4+EXcJEYPxdqxlrx8IIEbA8HYgmjQy+67vN0aG091FI5t/O3l27unb3sOQU+4Bp53S1xzskxCTGmqHE4rl2kwsw1/gH411sQPR6joSs=
+	t=1722628285; cv=none; b=E+ncCGc9JQWthzJdHJiyryC9f1kNTZcTwwVOEjhh3RNtxwdArWUkG75Fq03TMGNARt8fp1NhjnXTQ/LG3kk8G7xti0jjEklIUQZxR43G3nOSDeYgi/Y0+vV1K22AH1HwtTgeHadQTWu3zyBQqtXL9qPIN2rFnNVd8mDdtq/755o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722627133; c=relaxed/simple;
-	bh=csd0MkbfiRZ32mkpXZ9twM9kRQL1vy8OM+kdMsU6aRQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=crJAAE4gOgeMtKEnD5PNvyI+hxx4KBvcGuifyT+88g8GjBDIKP4iaQsRUFqKXp9f6x8oODuBMQECw9pWMs858rV+cYGGd4rXLomW2IGBHdX6yZSM0Wr0Te9lwp/flPG1Vd22fmnr7hIoGGVDERIK9ghFO+hGHuDJ3cChpUrROH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vReEFtMb; arc=none smtp.client-ip=209.85.216.73
+	s=arc-20240116; t=1722628285; c=relaxed/simple;
+	bh=xdSanLFGFMWba8L0va07jfZf9yllgVPIpa3BEmbMGwo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=AegNhXYVeln1VshjEHfM0eKozj162b8/dt/fZl1Xey0lT4mi6AE470jXbK4SZ7UIx+u6f1vghsT4hpnmm/BmiEWnkVu7Q9QDj0CotLjIfwNXPzusj7RFN/kz+UYEp6wwL4cVILKV6ggY/Zcxc0mno+fiz5tDCprT7sQl78ivrmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wdAXkz7G; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2cfe9270d82so2854030a91.3
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 12:32:11 -0700 (PDT)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-664ccf0659cso168192117b3.1
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 12:51:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722627130; x=1723231930; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=TTqa7oavJrWkxSTFWtVmMnGsBDrmN4Dgl5PSeoZtRS0=;
-        b=vReEFtMb8CAFhD48LXhHNrq42SN4FMUwrKuHu78nDaMkuGiLYNH1S3ueug3tXdbDSD
-         q5/zS/NxBlhvweltAffWXpLjFA5ySn6JAucM8gptfp+77wlNo33nuMzRmAFXoqKiFujy
-         6mwzUX4RAO5+z24IWxRWuO3kF1fGqaF59au7q9oQbBS2XmJxRikAZTTvt4I04CpjPrSa
-         S6fxMg8+gTW+e1qpQ46Y2+B23wGX7N6vDh2eewOPELlk5rV7qX1tHxZoJ3XqWw11R+jx
-         Luz+GmqHYSNzPr/kjcU1hIY9WUn9VQat5QdbLPsFxWpAIPbZ39r2dQTyic6l7T55ERUj
-         ejwg==
+        d=google.com; s=20230601; t=1722628282; x=1723233082; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dRePbcv0Jk0c/q3ujH+fDFJfEYjiNG/9PTNMG0T5GSk=;
+        b=wdAXkz7GF7XfP6lPK3JYEzIyDx0mKNavohpfgHL88E2fQv16WLSHJCiHP4bpM2yyWD
+         j8dPnRLrWuGsVUBrNx6YFfGPugFv4b3Or2+2Ez+VR/FeCTv0uggH4j+Tuh7Er7+MuJ1r
+         JbmviaOnTY2se2dPM8a1a8qpqKzNj1Wmn8YrD5Mm6Zgc9yhDPXEpeqfovWxbfvPYnEPO
+         znEOS42xG5oHlUDQhdELeRMw8zVt0MeO3gKiJUfOXn4E9BajhYGdXINQjAQBBxJLmF/X
+         UVbs7wKALZ2sz23ZzuVm4C9HJwVg99ttyPI96iWtVtA0HPziDmnnNZy841xnWwmUJ4kP
+         2rEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722627130; x=1723231930;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TTqa7oavJrWkxSTFWtVmMnGsBDrmN4Dgl5PSeoZtRS0=;
-        b=vHOfsXpWA9WB4JKH6cvryYjtdkCJMBo7yafoBYvYdiaMUem/GwU+lYy0UQ9+pycGAa
-         CNFDoMCT0TnOP9vW61d3pCUH7TMcC/fs18nIkd+qCKmv8tsCxvUGtUYbVQP3amp+5nhg
-         BkFrpNWezlj84d1CZ+oESaq8OwA8m33iwKnmsiWR2fr453Js0uy/yG8SVnoxdvZmxT6b
-         uyjZF59NKLefss3AQxSzmhsjrojm91TjaoLrifB099ymGXeVsqqN70C7QUY5jklUO/2r
-         0ZxO22hP7TFUc0VHqevcZeOHWuoOoIzlqyAG1HaVqf5//ppmcgywQOyIc7/hLNeBGvvw
-         UaxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfrC+O+MXSkw2+d1CzjpUWbjeWd29klS2cYTzdNGEqB2KwqZOiObQN7kPeHI75UbbxRMcIKOUG12JDIozpMpkOz7jL
-X-Gm-Message-State: AOJu0YysstpYH39iMClZpP2WBaWIINUYT2kS2xgbNRMap6B/ppf5rk7s
-	HKUOz+OCj+Q+RS0/nybWaxrdhrMq5xjvhDoPgzJgq/FOFID99z6uBkJCLih0F1w7fGB3Insl3I+
-	ydw==
-X-Google-Smtp-Source: AGHT+IHxpD4UvI3cH5YcMAfSn5X/q5FbzhvcZwiTnoiXfWEKupcq/mKgFqqrl+E4nqq+ftOi/sOAAYuzYXs=
+        d=1e100.net; s=20230601; t=1722628282; x=1723233082;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dRePbcv0Jk0c/q3ujH+fDFJfEYjiNG/9PTNMG0T5GSk=;
+        b=ZhMSk/8KI7L9ILm0FzK1Vu27FQOERpCGJYtzGzDQ5rPUuzmIUOG6C3i3fnU6mtM4Z2
+         b3ye8GFSzgvw7ba7bXH8oRCK82ZTKBGKo47bPwmZISzikrpbCGYaL3lxQS1r/Sh9y4Tu
+         9WzW9NBG3svAd2mRStWlH5wUyXfnrJSP87LJfcFQ8inOiIvpbS2T7F2ck1d0AiL8xKpR
+         M1jqnG4tDNPotIfVwVf1YKH1TePd/+RJmVeJhsZ5+9zPYFnBcmAe99JfqQ0cScNayuVK
+         sZL9dJgsihc7fFeTHA+KGper7MkYAvQVpHjFDyiPWWhcYCFQGoBqLxUVMe9NLi9QC8gt
+         XHsw==
+X-Gm-Message-State: AOJu0Ywpt8TpUyNsPTcLBDYt3z41qvrK9XKwaSNcCZD5e5a27qcFFUrg
+	zg2ATV6nwvxqxQtN+xdDx+jEL42LCGLecd+rT2tl6l+Yl79d3aagb9HnKu6j0xN/VsXub+QVqHc
+	MyA==
+X-Google-Smtp-Source: AGHT+IE5YVzery3YWSIUahvseviZoBDs9GNQK/RnAw0rCur245kSb6c04TZt+gZRN8dnLYCWg6B0H8RFHnY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:50cf:b0:2c9:61f9:9b27 with SMTP id
- 98e67ed59e1d1-2cff9526286mr68117a91.5.1722627130434; Fri, 02 Aug 2024
- 12:32:10 -0700 (PDT)
-Date: Fri, 2 Aug 2024 12:32:09 -0700
-In-Reply-To: <a039b758-d4e3-3798-806f-25bceb2f33a5@loongson.cn>
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2483:b0:e03:a0b2:f73 with SMTP id
+ 3f1490d57ef6-e0bde2f3cdbmr32634276.6.1722628282405; Fri, 02 Aug 2024 12:51:22
+ -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  2 Aug 2024 12:51:15 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-65-seanjc@google.com>
- <a039b758-d4e3-3798-806f-25bceb2f33a5@loongson.cn>
-Message-ID: <Zq00OYowF5kc9QFE@google.com>
-Subject: Re: [PATCH v12 64/84] KVM: LoongArch: Mark "struct page" pfns dirty
- only in "slow" page fault path
+X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
+Message-ID: <20240802195120.325560-1-seanjc@google.com>
+Subject: [PATCH 0/5] KVM: x86: Fastpath cleanup, fix, and enhancement
 From: Sean Christopherson <seanjc@google.com>
-To: maobibo <maobibo@loongson.cn>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao <zhaotianrui@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 02, 2024, maobibo wrote:
-> On 2024/7/27 =E4=B8=8A=E5=8D=887:52, Sean Christopherson wrote:
-> > Mark pages/folios dirty only the slow page fault path, i.e. only when
-> > mmu_lock is held and the operation is mmu_notifier-protected, as markin=
-g a
-> > page/folio dirty after it has been written back can make some filesyste=
-ms
-> > unhappy (backing KVM guests will such filesystem files is uncommon, and
-> > the race is minuscule, hence the lack of complaints).
-> >=20
-> > See the link below for details.
-> >=20
-> > Link: https://lore.kernel.org/all/cover.1683044162.git.lstoakes@gmail.c=
-om
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >   arch/loongarch/kvm/mmu.c | 18 ++++++++++--------
-> >   1 file changed, 10 insertions(+), 8 deletions(-)
-> >=20
-> > diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
-> > index 2634a9e8d82c..364dd35e0557 100644
-> > --- a/arch/loongarch/kvm/mmu.c
-> > +++ b/arch/loongarch/kvm/mmu.c
-> > @@ -608,13 +608,13 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcp=
-u, unsigned long gpa, bool writ
-> >   		if (kvm_pte_young(changed))
-> >   			kvm_set_pfn_accessed(pfn);
-> > -		if (kvm_pte_dirty(changed)) {
-> > -			mark_page_dirty(kvm, gfn);
-> > -			kvm_set_pfn_dirty(pfn);
-> > -		}
-> >   		if (page)
-> >   			put_page(page);
-> >   	}
-> > +
-> > +	if (kvm_pte_dirty(changed))
-> > +		mark_page_dirty(kvm, gfn);
-> > +
-> >   	return ret;
-> >   out:
-> >   	spin_unlock(&kvm->mmu_lock);
-> > @@ -915,12 +915,14 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, un=
-signed long gpa, bool write)
-> >   	else
-> >   		++kvm->stat.pages;
-> >   	kvm_set_pte(ptep, new_pte);
-> > -	spin_unlock(&kvm->mmu_lock);
-> > -	if (prot_bits & _PAGE_DIRTY) {
-> > -		mark_page_dirty_in_slot(kvm, memslot, gfn);
-> > +	if (writeable)
-> Is it better to use write or (prot_bits & _PAGE_DIRTY) here?  writable is
-> pte permission from function hva_to_pfn_slow(), write is fault action.
+This series was prompted by observations of HLT-exiting when debugging
+a throughput issue related to posted interrupts.  When KVM is running in
+a nested scenario, a rather surprising number of HLT exits occur with an
+unmasked interrupt already pending.  I didn't debug too deeply into the
+guest side of things, but I suspect what is happening is that it's fairly
+easy for L2 to be interrupted (by L1 or L0) between checking if it (the
+CPU) should enter an idle state and actually executing STI;HLT.
 
-Marking folios dirty in the slow/full path basically necessitates marking t=
-he
-folio dirty if KVM creates a writable SPTE, as KVM won't mark the folio dir=
-ty
-if/when _PAGE_DIRTY is set.
+AFAICT, a non-nested setup doesn't benefit much, if at all.  But, I don't
+see any downside to checking for a wake event in the fastpath, e.g. it's
+basically a "zero" time halt-polling mechanism.
 
-Practically speaking, I'm 99.9% certain it doesn't matter.  The folio is ma=
-rked
-dirty by core MM when the folio is made writable, and cleaning the folio tr=
-iggers
-an mmu_notifier invalidation.  I.e. if the page is mapped writable in KVM's
-stage-2 PTEs, then its folio has already been marked dirty.
+The other patches fix flaws found by inspection when adding HLT-exiting
+to the faspath.
+
+Note, the userspace-exit logic is basically untested, i.e. I probably
+need to write a selftest...
+
+Sean Christopherson (5):
+  KVM: x86: Re-enter guest if WRMSR(X2APIC_ICR) fastpath is successful
+  KVM: x86: Dedup fastpath MSR post-handling logic
+  KVM: x86: Exit to userspace if fastpath triggers one on instruction
+    skip
+  KVM: x86: Reorganize code in x86.c to co-locate vCPU blocking/running
+    helpers
+  KVM: x86: Add fastpath handling of HLT VM-Exits
+
+ arch/x86/include/asm/kvm_host.h |   1 +
+ arch/x86/kvm/svm/svm.c          |  13 +-
+ arch/x86/kvm/vmx/vmx.c          |   2 +
+ arch/x86/kvm/x86.c              | 319 +++++++++++++++++---------------
+ arch/x86/kvm/x86.h              |   1 +
+ 5 files changed, 188 insertions(+), 148 deletions(-)
+
+
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+-- 
+2.46.0.rc2.264.g509ed76dc8-goog
+
 
