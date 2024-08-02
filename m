@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-23064-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23065-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C36494611A
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:59:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2342694611E
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 17:59:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 267571F21D59
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:59:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 908F61F21C2C
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 15:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E44717E72B;
-	Fri,  2 Aug 2024 15:56:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4AC1A34A3;
+	Fri,  2 Aug 2024 15:56:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f0TtLs3b"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h+y+SmvA"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F23117E705
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA77B14EC57
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 15:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722614207; cv=none; b=LYC/R7KwMyoTIEJLmYxFJOKQ2kY/yGj5hv+yMyT0ILglLMN+s3HpQmsglJys+T1sxFpc12ilUOMM9DBcL2BteTXnf9Khkm6bOHu2CDZ0RcLBpvcgZA5eclHKKck9UnlLxif34gY7aaREK1PviHevYzVQuVKMUJuRTnvPjRzg2dQ=
+	t=1722614210; cv=none; b=liL++DM3F2jkBFUjDH8PDEl3BOSVZyrNB+1rzNF+6f4dLgD5qm9jnfeUCcqSWHdJNCM8O3rZsZE9oj9mYBiTMhEuXJ8DbKEdYbxRGM7MSSsN9+BXqWYL9cjPIq9ctUF7KrPQZOHtZpFpGoxl9+2BvH3o7hYboe2X1eTAdjWxlMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722614207; c=relaxed/simple;
-	bh=D7p0bladQLZdcwqcqDuCFmY1nVG1fLgP938/gYuixF0=;
+	s=arc-20240116; t=1722614210; c=relaxed/simple;
+	bh=BHfhJrsd92h4Q1KfRv5HAZdhBRATlXmf64EjgmZS4Bg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g/XVkxaYNykPaGaI1Q0oOmFGSalauIjm0R8W1Kwu6utK5tJ2Ni42qpfgVdWuD/wdm1FFjnOlmG7oZf/qH1CJ+M35myOmSC8Xz4fSgO69oUcGtJhSLVUonciwvVsOoO9dZQDq73uvBWpDwkizG0yhmQ7DJY/DcQnZd56qcsOZRNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f0TtLs3b; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=Xcgrd/WKG/aaI4kkMJ3sZfmk6iFkzClmcr7DhNoYvOGq6326XNbdUTxS2aRkyWv6rq8W811dENACRLigTKwwYbpEVGJYhIFoBZdHrQtr1Wxrtde/2NHlBEJ9WL89fSFLdFhtNWgzy4eJYJRxFx18FtJlY3WLszfwiK5+g2I0lXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h+y+SmvA; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722614203;
+	s=mimecast20190719; t=1722614208;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Y8hDUFeX9csW/JE1owVpjHxLVtzwb2VhQ3RSyvg6DEc=;
-	b=f0TtLs3bjsEhCvNLIivKYozUU5WnT2Pqj0C+4rbhCMIul/xABTHy1PHyRcTF8PpLBaWjD6
-	ew++LhdWIjzOju/JkkkCkIlU+wIfyP5aOFlJrYYN1uS88uQ95vHI57VYA4e+KKpZ5sfK6Q
-	q1gj3VP1uQ5ks7NCNupmcLorSrutPb0=
+	bh=MPEnEoi5Ma31G0FuCm1jYE13UYiHj4w8jLpqqbcOSIc=;
+	b=h+y+SmvAAiZkxG9NZqLM2wk40jadIEBjg+XrcZFZgx/YKFu5RDe49NNdvJ36yhhWJLB8t1
+	bxcptxFfbLl1s8032yQ3Pg3LOpLL4hNQu/XCGRm1rXrSlbvWMRTLHVoNoP47FP3VUjCcVU
+	ZX6camtMkpd8N1M1aQKZn4UhpsLmJdU=
 Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-314-xQRxca8hNvOMbFAn_7Ci0g-1; Fri,
- 02 Aug 2024 11:56:36 -0400
-X-MC-Unique: xQRxca8hNvOMbFAn_7Ci0g-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-150-6ny0YSGpPsS9rY-jD1QXAg-1; Fri,
+ 02 Aug 2024 11:56:42 -0400
+X-MC-Unique: 6ny0YSGpPsS9rY-jD1QXAg-1
 Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9C68619776D7;
-	Fri,  2 Aug 2024 15:56:32 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 420521944B27;
+	Fri,  2 Aug 2024 15:56:39 +0000 (UTC)
 Received: from t14s.redhat.com (unknown [10.39.192.113])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id CD843300018D;
-	Fri,  2 Aug 2024 15:56:26 +0000 (UTC)
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 13545300018D;
+	Fri,  2 Aug 2024 15:56:32 +0000 (UTC)
 From: David Hildenbrand <david@redhat.com>
 To: linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org,
@@ -75,9 +75,9 @@ Cc: linux-mm@kvack.org,
 	Alexander Gordeev <agordeev@linux.ibm.com>,
 	Sven Schnelle <svens@linux.ibm.com>,
 	Gerald Schaefer <gerald.schaefer@linux.ibm.com>
-Subject: [PATCH v1 09/11] s390/mm/fault: convert do_secure_storage_access() from follow_page() to folio_walk
-Date: Fri,  2 Aug 2024 17:55:22 +0200
-Message-ID: <20240802155524.517137-10-david@redhat.com>
+Subject: [PATCH v1 10/11] mm: remove follow_page()
+Date: Fri,  2 Aug 2024 17:55:23 +0200
+Message-ID: <20240802155524.517137-11-david@redhat.com>
 In-Reply-To: <20240802155524.517137-1-david@redhat.com>
 References: <20240802155524.517137-1-david@redhat.com>
 Precedence: bulk
@@ -89,75 +89,122 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Let's get rid of another follow_page() user and perform the conversion
-under PTL: Note that this is also what follow_page_pte() ends up doing.
-
-Unfortunately we cannot currently optimize out the additional reference,
-because arch_make_folio_accessible() must be called with a raised
-refcount to protect against concurrent conversion to secure. We can just
-move the arch_make_folio_accessible() under the PTL, like
-follow_page_pte() would.
-
-We'll effectively drop the "writable" check implied by FOLL_WRITE:
-follow_page_pte() would also not check that when calling
-arch_make_folio_accessible(), so there is no good reason for doing that
-here.
-
-We'll lose the secretmem check from follow_page() as well, about which
-we shouldn't really care about.
+All users are gone, let's remove it and any leftovers in comments. We'll
+leave any FOLL/follow_page_() naming cleanups as future work.
 
 Signed-off-by: David Hildenbrand <david@redhat.com>
 ---
- arch/s390/mm/fault.c | 16 ++++++++++------
- 1 file changed, 10 insertions(+), 6 deletions(-)
+ Documentation/mm/transhuge.rst |  6 +++---
+ include/linux/mm.h             |  3 ---
+ mm/filemap.c                   |  2 +-
+ mm/gup.c                       | 24 +-----------------------
+ mm/nommu.c                     |  6 ------
+ 5 files changed, 5 insertions(+), 36 deletions(-)
 
-diff --git a/arch/s390/mm/fault.c b/arch/s390/mm/fault.c
-index 8e149ef5e89b..ad8b0d6b77ea 100644
---- a/arch/s390/mm/fault.c
-+++ b/arch/s390/mm/fault.c
-@@ -34,6 +34,7 @@
- #include <linux/uaccess.h>
- #include <linux/hugetlb.h>
- #include <linux/kfence.h>
-+#include <linux/pagewalk.h>
- #include <asm/asm-extable.h>
- #include <asm/asm-offsets.h>
- #include <asm/ptrace.h>
-@@ -492,9 +493,9 @@ void do_secure_storage_access(struct pt_regs *regs)
- 	union teid teid = { .val = regs->int_parm_long };
- 	unsigned long addr = get_fault_address(regs);
- 	struct vm_area_struct *vma;
-+	struct folio_walk fw;
- 	struct mm_struct *mm;
- 	struct folio *folio;
--	struct page *page;
- 	struct gmap *gmap;
- 	int rc;
+diff --git a/Documentation/mm/transhuge.rst b/Documentation/mm/transhuge.rst
+index 1ba0ad63246c..a2cd8800d527 100644
+--- a/Documentation/mm/transhuge.rst
++++ b/Documentation/mm/transhuge.rst
+@@ -31,10 +31,10 @@ Design principles
+   feature that applies to all dynamic high order allocations in the
+   kernel)
  
-@@ -536,15 +537,18 @@ void do_secure_storage_access(struct pt_regs *regs)
- 		vma = find_vma(mm, addr);
- 		if (!vma)
- 			return handle_fault_error(regs, SEGV_MAPERR);
--		page = follow_page(vma, addr, FOLL_WRITE | FOLL_GET);
--		if (IS_ERR_OR_NULL(page)) {
-+		folio = folio_walk_start(&fw, vma, addr, 0);
-+		if (!folio) {
- 			mmap_read_unlock(mm);
- 			break;
- 		}
--		folio = page_folio(page);
--		if (arch_make_folio_accessible(folio))
--			send_sig(SIGSEGV, current, 0);
-+		/* arch_make_folio_accessible() needs a raised refcount. */
-+		folio_get(folio);
-+		rc = arch_make_folio_accessible(folio);
- 		folio_put(folio);
-+		folio_walk_end(&fw, vma);
-+		if (rc)
-+			send_sig(SIGSEGV, current, 0);
- 		mmap_read_unlock(mm);
- 		break;
- 	case KERNEL_FAULT:
+-get_user_pages and follow_page
+-==============================
++get_user_pages and pin_user_pages
++=================================
+ 
+-get_user_pages and follow_page if run on a hugepage, will return the
++get_user_pages and pin_user_pages if run on a hugepage, will return the
+ head or tail pages as usual (exactly as they would do on
+ hugetlbfs). Most GUP users will only care about the actual physical
+ address of the page and its temporary pinning to release after the I/O
+diff --git a/include/linux/mm.h b/include/linux/mm.h
+index 2f6c08b53e4f..ee8cea73d415 100644
+--- a/include/linux/mm.h
++++ b/include/linux/mm.h
+@@ -3527,9 +3527,6 @@ static inline vm_fault_t vmf_fs_error(int err)
+ 	return VM_FAULT_SIGBUS;
+ }
+ 
+-struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+-			 unsigned int foll_flags);
+-
+ static inline int vm_fault_to_errno(vm_fault_t vm_fault, int foll_flags)
+ {
+ 	if (vm_fault & VM_FAULT_OOM)
+diff --git a/mm/filemap.c b/mm/filemap.c
+index d62150418b91..4130be74f6fd 100644
+--- a/mm/filemap.c
++++ b/mm/filemap.c
+@@ -112,7 +112,7 @@
+  *    ->swap_lock		(try_to_unmap_one)
+  *    ->private_lock		(try_to_unmap_one)
+  *    ->i_pages lock		(try_to_unmap_one)
+- *    ->lruvec->lru_lock	(follow_page->mark_page_accessed)
++ *    ->lruvec->lru_lock	(follow_page_mask->mark_page_accessed)
+  *    ->lruvec->lru_lock	(check_pte_range->isolate_lru_page)
+  *    ->private_lock		(folio_remove_rmap_pte->set_page_dirty)
+  *    ->i_pages lock		(folio_remove_rmap_pte->set_page_dirty)
+diff --git a/mm/gup.c b/mm/gup.c
+index 3e8484c893aa..d19884e097fd 100644
+--- a/mm/gup.c
++++ b/mm/gup.c
+@@ -1072,28 +1072,6 @@ static struct page *follow_page_mask(struct vm_area_struct *vma,
+ 	return page;
+ }
+ 
+-struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+-			 unsigned int foll_flags)
+-{
+-	struct follow_page_context ctx = { NULL };
+-	struct page *page;
+-
+-	if (vma_is_secretmem(vma))
+-		return NULL;
+-
+-	if (WARN_ON_ONCE(foll_flags & FOLL_PIN))
+-		return NULL;
+-
+-	/*
+-	 * We never set FOLL_HONOR_NUMA_FAULT because callers don't expect
+-	 * to fail on PROT_NONE-mapped pages.
+-	 */
+-	page = follow_page_mask(vma, address, foll_flags, &ctx);
+-	if (ctx.pgmap)
+-		put_dev_pagemap(ctx.pgmap);
+-	return page;
+-}
+-
+ static int get_gate_page(struct mm_struct *mm, unsigned long address,
+ 		unsigned int gup_flags, struct vm_area_struct **vma,
+ 		struct page **page)
+@@ -2519,7 +2497,7 @@ static bool is_valid_gup_args(struct page **pages, int *locked,
+ 	 * These flags not allowed to be specified externally to the gup
+ 	 * interfaces:
+ 	 * - FOLL_TOUCH/FOLL_PIN/FOLL_TRIED/FOLL_FAST_ONLY are internal only
+-	 * - FOLL_REMOTE is internal only and used on follow_page()
++	 * - FOLL_REMOTE is internal only, set in (get|pin)_user_pages_remote()
+ 	 * - FOLL_UNLOCKABLE is internal only and used if locked is !NULL
+ 	 */
+ 	if (WARN_ON_ONCE(gup_flags & INTERNAL_GUP_FLAGS))
+diff --git a/mm/nommu.c b/mm/nommu.c
+index 40cac1348b40..385b0c15add8 100644
+--- a/mm/nommu.c
++++ b/mm/nommu.c
+@@ -1578,12 +1578,6 @@ SYSCALL_DEFINE5(mremap, unsigned long, addr, unsigned long, old_len,
+ 	return ret;
+ }
+ 
+-struct page *follow_page(struct vm_area_struct *vma, unsigned long address,
+-			 unsigned int foll_flags)
+-{
+-	return NULL;
+-}
+-
+ int remap_pfn_range(struct vm_area_struct *vma, unsigned long addr,
+ 		unsigned long pfn, unsigned long size, pgprot_t prot)
+ {
 -- 
 2.45.2
 
