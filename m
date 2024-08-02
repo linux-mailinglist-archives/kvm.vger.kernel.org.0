@@ -1,233 +1,106 @@
-Return-Path: <kvm+bounces-23133-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23134-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6665946461
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:29:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73D21946463
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:30:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DCBFB20D4A
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:29:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97C581C20DA5
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4011656440;
-	Fri,  2 Aug 2024 20:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08497A15B;
+	Fri,  2 Aug 2024 20:29:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O0ddN3d7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rC8AP7hD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D732335C0
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D0546B91
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722630579; cv=none; b=JQcgPWa/B/vV+N5GUQFw56K2HmzRc50CwDceB9YVAfgajxZtxmoH32PUhlWHFyOGVVhiwLqx98CkLnO/fsdKKdgCs1Dr86ck/eyIvz2efQy4xM57VsvTvjL1BoxcFKI6ghYypwbPvqtq15jKiRjDI48jlOWv0z4/Rj8wBilcOH8=
+	t=1722630586; cv=none; b=fBZRf4KhtIYw6hRd0+199ZR1LkumtWRDoycKfcUfuS0S2AEklPggTKA+g40l6xCbrLVWV7v/tgk0W3+HZgMyuiDq56voukzqzdJj0jgXX+jDXC2g4/QcD3GKqkuxWayHgmHcAwDRgy0ITtutZRM/tLjyb763wKstoWtE5LC8xzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722630579; c=relaxed/simple;
-	bh=CMki9I2Y5hDPbvNKXl8/tTfJe8Wm9//Xu6+W9DDmr6M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o5PMZyOcdhqYiuhvj18jSvMeNM/eUFHl/lo9liUfgg73XV8zb5devQd3XhFAFeDrbzs6oirf/5i3wOPxYZHK3k4EJ30vD17DPXzBbgxUoUrDstdE0QVYGM6eODvywF13R//qHss7w2cR/T8OjdwXMUypyLxKkWctR2WHuPrwK2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O0ddN3d7; arc=none smtp.client-ip=209.85.167.42
+	s=arc-20240116; t=1722630586; c=relaxed/simple;
+	bh=l2pw4PqSYTqENlQeojQEIlKcrxUVCty1cPi4OYAbveA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dkQFxjX3RG8gDUymaP6yLhTRfq6Cv6Hyzb8lN5IDxzWsKJ4nV/NQkDkCQ+wRNWXpwBOg+1BtqFSKX2ojW4rgbKKMKPi1ORboNlwdo9EfbK7bno0QaGQU66pbkGts9T4dRmsFl6MqcNTDr3TcTrG/GhVTPrNL1EEBAMuIkPNKUOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rC8AP7hD; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-52efc82c872so14817e87.1
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:29:37 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6886cd07673so48105957b3.3
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:29:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722630576; x=1723235376; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f2uDO9ShPfNpZoAJ6K9acrrg1s8RVj7WAqg5LH0JB1k=;
-        b=O0ddN3d7Bq2vTC+wpMCvnlPFrd+fqkb9tStXhjEpsGSV2e61EnXSW6SCWQ7ocFN3ui
-         xQA1ZPCD90S6FilcaeRqIHyf7nXPF37VRantZtunX4FUSGBPSjdwiZdqulK7I5vQANiA
-         gCcQ7eQNQmR8QB9ctIFszeQWGQDzWiXThOpNvUd+2RYX0VrpmwQRhtzxQB3/RsIPKzb+
-         vyd5LqOG/te52XxpjsQWw8Z3MA9X9STVJ3O2SxDNKBB8maEAgd0W8/r2Yi8MlKHpkN6f
-         nyiVyF7qVjBxGHA6WCQOK6x3rHrbXLfkZj0rG12OCVWJIvP8FxaVtVSurQUuXcKMjWup
-         9wwg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722630576; x=1723235376;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=google.com; s=20230601; t=1722630584; x=1723235384; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=f2uDO9ShPfNpZoAJ6K9acrrg1s8RVj7WAqg5LH0JB1k=;
-        b=ZfJvkeICfH7l61EzP9olvr7v78vBcXKB1Vq/ofNLWPfRb6utctMc5VJY+7PEMBplV9
-         XYm6SinKKIf71kXej1tX2uDt1L1PqgpEKZ+v6pI2Nn5FaGAS13F4GQjDeuauIHlIo9D1
-         uPuhWVSZHPUIF0iWgPAm4KiljzAAzj2H3XzRVihYGuH4Ep3qEhnk8PWOILv7lvaB4ey9
-         VxiU8EvECnjxCUfLJljNEw4P6hqDDoDITIHaCLqL8HtLV4PQmzNduNMUGhQFlLUwaiH2
-         dV9r8f5npfUKmFAw/Xp5kHARyuSympIBfRJBUJCS8WvtabC348bvptJyK/0TH8SV8dzX
-         86rw==
-X-Forwarded-Encrypted: i=1; AJvYcCU5CXaT8i154vYxrB1SX/UIWCvUk7k/RwvSk4oOfD3di2g18YR7G7C8tDhdneHfjyiRs3AImtkz+cJ25w5q3ISOm1ag
-X-Gm-Message-State: AOJu0Ywb2+2bD9absEJgCsybyyxPfSeugbwRDnwChnt6ZXU2rG9cKio6
-	CHcwGg/5Ih8epEM2dfQkgNM3tEsJRgLnVFID/BlyDt404hBnLxe9151T/LYfnpYb8xhJQcCm7qp
-	vNm8yrJpM+Jr0VRzfB4sLCmCXpSBDZRlsxIXe
-X-Google-Smtp-Source: AGHT+IFVMP6/AIADLfhzpRRtoWiEvCdz1UG4nR4KuW4rmv8Vt8+GJoT3o9txbVT3Dv1Y4rdQE3zf0+OrJwZBdgLqa1U=
-X-Received: by 2002:a05:6512:3d0b:b0:52c:b243:cd02 with SMTP id
- 2adb3069b0e04-530c46d7982mr6068e87.1.1722630575181; Fri, 02 Aug 2024 13:29:35
+        bh=OpWX4VZCbnXKP6XhT+I6JbMrTYPhaOiN05VsWUmHsfs=;
+        b=rC8AP7hD+o2iSJ0uU8ZgNHScyu0RVA9Z2FwHRlh8bSiGePRgJfRDf/+xVXy6LFEetx
+         jNn2TtIw+Cmwz2xQKeJQGxMnlA95O7tuCdNhKWTfTdUdsXtu14hmMWwdjDpAk61qPdW0
+         jKVzz7bxkwMfzehgsUKj0ronf7qfBs/pz26F+30cjXYj/u+9CCMTfLWuBqYu16c4G99D
+         FRxUBzLNlG831h3cJvL6fH2KZpaX43mPrMSaAwGH9OAVeXlStRJp/3q7P2aSuj7Zjrk0
+         FpPr61J8f8hZB5pf/0UAlf8aP5lKK1ROqKphk9HSugxyY0G6Ms+2M4klnKBdgwOcNqnW
+         cH5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722630584; x=1723235384;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OpWX4VZCbnXKP6XhT+I6JbMrTYPhaOiN05VsWUmHsfs=;
+        b=dC/xSt85unQAw9IBNUAvDDVBmURAWaUjCbJHtspMXJDEGp/Cxn6Suo+XUrKJFlOv2Y
+         axn2FXc2l1uOctD3eaUUmwonXsAuz8KQgUiq4BJXjAzq517lv8caOng2dcM2/L2GkYvp
+         UEDcYVFs1gqlsTLHluwJKe0geCf3WBeU/wqRNKT1wS7ME/OEQeF/cPgEWaJcsum9TcpB
+         9wBlR1S5sVckHYK2BLNBOxYASKmu9ouMjfpD4m36T99rCmEP3AHpVovsP5zrXbCKfcZR
+         wxcBi+D6NFo+wugjQXQQW5a27e6MDJq0KLsJMWtUL+SpJFPvB+Mb4KFsjMboMFKH9hsd
+         GQDA==
+X-Gm-Message-State: AOJu0Ywbt8y/nD88KkfmUE5j/4ZONMmzMo1yBIpT30tg36GrlmGr2fMh
+	p071cJrFKPTUUFDOacsDlwlDIkjlMNlCmaH28UOj3kfgybpK4SDB71D+ZAgnSCsDpAdA4SIZWX4
+	6Zg==
+X-Google-Smtp-Source: AGHT+IGgFlKdqMHR7BL18rAEWzUIwmbuzm/DOyuEivSn1SzJj5+EN1uFdD7r0ZBjP/F0caZ+UNRhm2lPg9o=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:2b84:b0:e0b:bafe:a7ff with SMTP id
+ 3f1490d57ef6-e0bde264493mr8422276.6.1722630583760; Fri, 02 Aug 2024 13:29:43
  -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  2 Aug 2024 13:29:39 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240802200136.329973-1-seanjc@google.com> <20240802200136.329973-3-seanjc@google.com>
-In-Reply-To: <20240802200136.329973-3-seanjc@google.com>
-From: Steve Rutherford <srutherford@google.com>
-Date: Fri, 2 Aug 2024 13:28:56 -0700
-Message-ID: <CABayD+dHLXwQK3YdwVi6raf+CF3XOaAiAG+tfDYPiZFzqeVXpQ@mail.gmail.com>
-Subject: Re: [PATCH 2/2] KVM: Protect vCPU's "last run PID" with rwlock, not RCU
-To: Sean Christopherson <seanjc@google.com>
-Cc: Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
-	Paolo Bonzini <pbonzini@redhat.com>, linux-arm-kernel@lists.infradead.org, 
-	kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
+Message-ID: <20240802202941.344889-1-seanjc@google.com>
+Subject: [PATCH 0/2] KVM: x86: Disallow changing x2APIC ID via userspace
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Michal Luczaj <mhal@rbox.co>, Haoyu Wu <haoyuwu254@gmail.com>, 
+	syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 2, 2024 at 1:01=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> To avoid jitter on KVM_RUN due to synchronize_rcu(), use a rwlock instead
-> of RCU to protect vcpu->pid, a.k.a. the pid of the task last used to a
-> vCPU.  When userspace is doing M:N scheduling of tasks to vCPUs, e.g. to
-> run SEV migration helper vCPUs during post-copy, the synchronize_rcu()
-> needed to change the PID associated with the vCPU can stall for hundreds
-> of milliseconds, which is problematic for latency sensitive post-copy
-> operations.
->
-> In the directed yield path, do not acquire the lock if it's contended,
-> i.e. if the associated PID is changing, as that means the vCPU's task is
-> already running.
->
-> Reported-by: Steve Rutherford <srutherford@google.com>
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  arch/arm64/include/asm/kvm_host.h |  2 +-
->  include/linux/kvm_host.h          |  3 ++-
->  virt/kvm/kvm_main.c               | 32 +++++++++++++++++--------------
->  3 files changed, 21 insertions(+), 16 deletions(-)
->
-> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/k=
-vm_host.h
-> index a33f5996ca9f..7199cb014806 100644
-> --- a/arch/arm64/include/asm/kvm_host.h
-> +++ b/arch/arm64/include/asm/kvm_host.h
-> @@ -1115,7 +1115,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu=
-,
->  void kvm_arm_halt_guest(struct kvm *kvm);
->  void kvm_arm_resume_guest(struct kvm *kvm);
->
-> -#define vcpu_has_run_once(vcpu)        !!rcu_access_pointer((vcpu)->pid)
-> +#define vcpu_has_run_once(vcpu)        (!!READ_ONCE((vcpu)->pid))
->
->  #ifndef __KVM_NVHE_HYPERVISOR__
->  #define kvm_call_hyp_nvhe(f, ...)                                       =
-       \
-> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
-> index 689e8be873a7..d6f4e8b2b44c 100644
-> --- a/include/linux/kvm_host.h
-> +++ b/include/linux/kvm_host.h
-> @@ -342,7 +342,8 @@ struct kvm_vcpu {
->  #ifndef __KVM_HAVE_ARCH_WQP
->         struct rcuwait wait;
->  #endif
-> -       struct pid __rcu *pid;
-> +       struct pid *pid;
-> +       rwlock_t pid_lock;
->         int sigset_active;
->         sigset_t sigset;
->         unsigned int halt_poll_ns;
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 91048a7ad3be..fabffd85fa34 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -486,6 +486,7 @@ static void kvm_vcpu_init(struct kvm_vcpu *vcpu, stru=
-ct kvm *kvm, unsigned id)
->         vcpu->kvm =3D kvm;
->         vcpu->vcpu_id =3D id;
->         vcpu->pid =3D NULL;
-> +       rwlock_init(&vcpu->pid_lock);
->  #ifndef __KVM_HAVE_ARCH_WQP
->         rcuwait_init(&vcpu->wait);
->  #endif
-> @@ -513,7 +514,7 @@ static void kvm_vcpu_destroy(struct kvm_vcpu *vcpu)
->          * the vcpu->pid pointer, and at destruction time all file descri=
-ptors
->          * are already gone.
->          */
-> -       put_pid(rcu_dereference_protected(vcpu->pid, 1));
-> +       put_pid(vcpu->pid);
->
->         free_page((unsigned long)vcpu->run);
->         kmem_cache_free(kvm_vcpu_cache, vcpu);
-> @@ -3930,15 +3931,17 @@ EXPORT_SYMBOL_GPL(kvm_vcpu_kick);
->
->  int kvm_vcpu_yield_to(struct kvm_vcpu *target)
->  {
-> -       struct pid *pid;
->         struct task_struct *task =3D NULL;
->         int ret;
->
-> -       rcu_read_lock();
-> -       pid =3D rcu_dereference(target->pid);
-> -       if (pid)
-> -               task =3D get_pid_task(pid, PIDTYPE_PID);
-> -       rcu_read_unlock();
-> +       if (!read_trylock(&target->pid_lock))
-> +               return 0;
-> +
-> +       if (target->pid)
-> +               task =3D get_pid_task(target->pid, PIDTYPE_PID);
-> +
-> +       read_unlock(&target->pid_lock);
-> +
->         if (!task)
->                 return 0;
->         ret =3D yield_to(task, 1);
-> @@ -4178,9 +4181,9 @@ static int vcpu_get_pid(void *data, u64 *val)
->  {
->         struct kvm_vcpu *vcpu =3D data;
->
-> -       rcu_read_lock();
-> -       *val =3D pid_nr(rcu_dereference(vcpu->pid));
-> -       rcu_read_unlock();
-> +       read_lock(&vcpu->pid_lock);
-> +       *val =3D pid_nr(vcpu->pid);
-> +       read_unlock(&vcpu->pid_lock);
->         return 0;
->  }
->
-> @@ -4466,7 +4469,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
->                 r =3D -EINVAL;
->                 if (arg)
->                         goto out;
-> -               oldpid =3D rcu_access_pointer(vcpu->pid);
-> +               oldpid =3D vcpu->pid;
+Silently ignore userspace attempts to change the x2APIC ID via
+KVM_SET_LAPIC.
 
-Overall this patch looks correct, but this spot took me a moment, and
-I want to confirm. This skips the reader lock since writing only
-happens just below, under the vcpu lock, and we've already taken that
-lock?
+I've been hunting for this series since January[*], and *finally* stumbled
+across it while tidying up my (too) many git trees.
 
->                 if (unlikely(oldpid !=3D task_pid(current))) {
->                         /* The thread running this VCPU changed. */
->                         struct pid *newpid;
-> @@ -4476,9 +4479,10 @@ static long kvm_vcpu_ioctl(struct file *filp,
->                                 break;
->
->                         newpid =3D get_task_pid(current, PIDTYPE_PID);
-> -                       rcu_assign_pointer(vcpu->pid, newpid);
-> -                       if (oldpid)
-> -                               synchronize_rcu();
-> +                       write_lock(&vcpu->pid_lock);
-> +                       vcpu->pid =3D newpid;
-> +                       write_unlock(&vcpu->pid_lock);
-> +
->                         put_pid(oldpid);
->                 }
->                 vcpu->wants_to_run =3D !READ_ONCE(vcpu->run->immediate_ex=
-it__unsafe);
-> --
-> 2.46.0.rc2.264.g509ed76dc8-goog
->
+[*] https://lore.kernel.org/all/ZbPkHvuJv0EdJhVN@google.com
+
+Michal Luczaj (1):
+  KVM: selftests: Add a testcase to verify x2APIC is fully readonly
+
+Sean Christopherson (1):
+  KVM: x86: Make x2APIC ID 100% readonly
+
+ arch/x86/kvm/lapic.c                          | 18 +++++++++---
+ .../selftests/kvm/x86_64/xapic_state_test.c   | 28 +++++++++++++++++++
+ 2 files changed, 42 insertions(+), 4 deletions(-)
+
+
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+-- 
+2.46.0.rc2.264.g509ed76dc8-goog
+
 
