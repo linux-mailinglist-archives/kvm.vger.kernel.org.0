@@ -1,89 +1,124 @@
-Return-Path: <kvm+bounces-23014-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23015-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F48F945A15
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 10:37:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FB05945A59
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 11:00:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CEEF287883
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 08:37:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1A581C21DDF
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 09:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8BE1C232C;
-	Fri,  2 Aug 2024 08:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5E261D0DF6;
+	Fri,  2 Aug 2024 09:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="SzNNVzhA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZXPVSNSR"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0955E1CAB3
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 08:36:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092711D0DDC;
+	Fri,  2 Aug 2024 09:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722587813; cv=none; b=j6GCbzrLWgOlRaq0HDKy5T4y2GWxrbtC5I0NGfFzZ1u1NVIxOb/5XmHz1Okh72TsqegUr/BCgLQr8AL3UuNdc6Zwqld8ER4zg0PV/YFF+6oLOSPrhVAKR8OwFI6ACywp2XIr+3pGyM0NeLCUcL8z53MJkUvG+CSf5QXnctMKiIo=
+	t=1722589232; cv=none; b=CZDBCU/PRz1D2R2mgII2ObA7ozS1Jqa23DD4jQaN9hUToqDc/mWmcBLE5qRtGuS1FMFEEcmDjUm/QBES9/l37QADagKGNI6vsBYkdmnYEv0V2AU5vY7rWFUyiHwIXBa5xTPPMDuze3SaLU9v/JncsD0wMrIp5NgCTvUHrRmuFa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722587813; c=relaxed/simple;
-	bh=uH73t2uudehW4cmTGCt4ob5bIIcqZvMN2P0AqT2U35E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M0Lk9fdd55mgTkAUMajggYyZ1PIBXA1ni3nwaK/6knmGaOSY5jjroQf/tkAUglQ+m5Exd6sDGIxeNrbRNAQHviC5ZeQosi+z2oUTqIMcAirUEzHduEAWobJbTdNTnYqueQfpQRe8UXAKCsIa2vYQGWYk1lvvjRoksTysXmRES00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=SzNNVzhA; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 2 Aug 2024 10:36:42 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1722587807;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FRlttjyDqNVgAy/GeHfeYkuOTli7qGERroWjKCD1nNU=;
-	b=SzNNVzhAYjQJiuVFnUv6Vgf3GXJGOJYxkiqQ8I3hu+zAlXIHqpHWaBIEpO0vCMVqcHmEtX
-	uGiENFxJceH1kz+SfwhR2W1xiaB8u0mhREzuywBsxetpVZY0k49QXXonjaLl5WxdVq1f95
-	MshIZ9J7RaVVAOlAw6RXqtVbXO4nBog=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: James Raphael Tiovalen <jamestiotio@gmail.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	atishp@rivosinc.com, cade.richard@berkeley.edu
-Subject: Re: [kvm-unit-tests PATCH v6 5/5] riscv: sbi: Add test for timer
- extension
-Message-ID: <20240802-e1bd80fc34bfd2caaf52d0b8@orel>
-References: <20240730061821.43811-1-jamestiotio@gmail.com>
- <20240730061821.43811-6-jamestiotio@gmail.com>
+	s=arc-20240116; t=1722589232; c=relaxed/simple;
+	bh=LCAUnK30xDB8ecVE/x8xdfHib0sA8+f1IZAZIFEnS9Y=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Wzw1ZEMPr93vDpMG4ehlt/qRTRyRFZnOMns/gbMlHmEnhjYTaFsWIvJUmKZqUtYVbvTwUNuESWtW+jvOI5hizU1UDUMXq00UVB+5By2Eu6oEQBVbqdZbdNV1qr6+xrtqjHofGwgNoCOgaEPmKgTWUAQP27AuB8/+94n42R1MDfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZXPVSNSR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B077C32782;
+	Fri,  2 Aug 2024 09:00:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722589231;
+	bh=LCAUnK30xDB8ecVE/x8xdfHib0sA8+f1IZAZIFEnS9Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZXPVSNSRqBLVr+7hyXlHZISMUqc+qQUEBqA2c9n8LkZyFheGoSAFqf4H5fkQ9WsRz
+	 wMIwdiHu6fw7hLhmbxnm3tS6LAlr4sh3tBfEnalRuzzYjrHmz0ewdZ4spniy+fSnMq
+	 q1fFme4nsfnwFWUjCsSlTsO/MTkQDD/AkcCCGjUEd+Jaz+bbnlVrltehrukamTC7V4
+	 YuPVTLyxabGQ5tHPiyS6kzQLTlvjW4U0YgIzTF1eSNKxrs1zngTn6Xf4NFy9LTkaYX
+	 zT/bm8q3hcLV7SuDCzEkaNnHMTGrE7RklBgPKUo7oNJ/i1sgegnzziua46Y8HnGVBx
+	 83By+Lvke42RQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sZo9E-0003B2-UD;
+	Fri, 02 Aug 2024 10:00:29 +0100
+Date: Fri, 02 Aug 2024 10:00:28 +0100
+Message-ID: <86jzgz1eqb.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] KVM: selftests: arm64: Correct feature test for S1PIE in get-reg-list
+In-Reply-To: <811ea0eb-bc87-4ac3-8bca-27c787e43051@sirena.org.uk>
+References: <20240731-kvm-arm64-fix-s1pie-test-v1-1-a9253f3b7db4@kernel.org>
+	<86le1g19aa.wl-maz@kernel.org>
+	<811ea0eb-bc87-4ac3-8bca-27c787e43051@sirena.org.uk>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730061821.43811-6-jamestiotio@gmail.com>
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Tue, Jul 30, 2024 at 02:18:20PM GMT, James Raphael Tiovalen wrote:
-> Add a test for the set_timer function of the time extension. The test
-> checks that:
-> - The time extension is available
-> - The installed timer interrupt handler is called
-> - The timer interrupt is received within a reasonable time interval
-> - The timer interrupt pending bit is cleared after the set_timer SBI
->   call is made
-> - The timer interrupt can be cleared either by requesting a timer
->   interrupt infinitely far into the future or by masking the timer
->   interrupt
+On Thu, 01 Aug 2024 20:14:38 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> [1  <text/plain; us-ascii (7bit)>]
+> On Thu, Aug 01, 2024 at 05:45:49PM +0100, Marc Zyngier wrote:
+> 
+> > Can we please switch all this stuff to symbolic naming instead of
+> > magic numbers? Given how much effort is going into the "automated
+> > generation" thing, it is mind-boggling that the tests still rely on
+> > handcrafted numbers. We just end-up with two different sets of bugs.
+> 
+> > At the moment, the level of confidence I have in this stuff is
+> > sub-zero.
+> 
+> Yeah, I was wondering why this wasn't using the generated values
+> especially given that the generated headers are available to tools - I
+> wasn't sure if this was a deliberate decision to cross check the data
+> entry or something.
 
-I've modified the "or by masking the timer interrupt" test to work as I'd
-expect it to based on a bit more thought about what the SBI TIME extension
-spec is trying to say (we should clarify the spec with the PR you've
-written). I also added a test for ensuring a timer is pending immediately
-when setting the time with a value of zero. All tests pass.
+We've lost that battle a long time ago, given the numbers of bugs the
+sysreg file has had. The real reason is that the ABI reports the
+encoding, and that it is rather easy to just dump stuff back into the
+test using the script described in the very first commit for the test.
 
-I also moved some code around a bit and a couple other minor cleanups.
+Also, the test predates the generated stuff by some margin.
 
-And (drum roll, please), it's now merged!
+> I'd certainly be happy to convert, though that does
+> seem a bit invasive for a fix.
+
+Not for a point fix, for sure. And if you do, make sure it is entirely
+scripted.
 
 Thanks,
-drew
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
