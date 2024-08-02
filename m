@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-23135-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23136-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCEF2946464
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:30:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2995C946467
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:30:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 677391F21C6F
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D363B2824F0
+	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 20:30:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BBB53389;
-	Fri,  2 Aug 2024 20:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3640F13213F;
+	Fri,  2 Aug 2024 20:29:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MVbnxhHy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="c/3sxpIp"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DEB8770EB
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:29:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5376C52F6F
+	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 20:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722630588; cv=none; b=Uje1Udh63sQEJcN5H9/Y7U38kFoZ/PoH+tuxO/LqzvR/qwpTJ0aMyhjUH/y5QEby2BOxof1oAhIferiAnH8pFprdPVEl8zWJ1BcpaUZ7kHleDlzD5Q4wgR5CY7xHD72TvKYk25WQeXkAFrzdvHE1q7dbYLAaVu1Aj1DYCrhFgro=
+	t=1722630590; cv=none; b=dR7xmo9J//3k4vFi6RL9elUaKe80dJinwghFlozo/da6zp33Uz6SSK7yotLLyCY24zXgr5LjFJMXsWxUwuKHmJDWPIKYzVLgjOUR0M/HBoCrPeQ/89rCn8rmuBb+65ILt0ulVtKdU48UEkCD5BrDfPBQO6GdwPXKc631LX7KHqY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722630588; c=relaxed/simple;
-	bh=WF3wrP9FVCWhvI5s7M5QfSDvoGTfsLiiwSyrSJY3GNs=;
+	s=arc-20240116; t=1722630590; c=relaxed/simple;
+	bh=40gwNMpJVGKV5q7dYqyY/bOpVlLRQuxsneTOTjEjCrM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=OaNE+O9AJVrfpLvxzHjGezB6biGff4QaYgSZ7/TtYJjM2xzpaPWLd3xGStwRHQFgr047Znqb0vONMVlE5up5nKBT4SsN6yDTq3ItQ+lYoq1y6yMurZWCTl7vRLn2snnLREg/sGu2R+Iv+OAAw8h2r7zM3lGWY6eiUTBhL5PcCqI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MVbnxhHy; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=FLryi14GZ1nmu0OyNlVtUU7Gw+2EHWMfSZ7gmrb4HeUVysPm9RhNoi/Y0pnwyzABW8EfzxXikHMq70048Z6TJnY4ErFxf71/uZe5+MaBQL12xL8kEONEXybE6LffiT/hwRok42nfllkZfTMC/rY7E091sLur7zb3lfVmheT5B/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=c/3sxpIp; arc=none smtp.client-ip=209.85.214.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fd72932d74so72501785ad.1
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:29:46 -0700 (PDT)
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fc6ac9a4aaso84243105ad.1
+        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 13:29:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722630585; x=1723235385; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722630587; x=1723235387; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=jXAWPfkwqKY8wTkDhDCSEwSk5HKMwXuyqi+tQSb2i8o=;
-        b=MVbnxhHy2VMj7/I9cdfKtAYS+0iJ9eFoIDKKfKAl9v5ma4/B4bVfQefeYE/KWTQOBC
-         /va47bj1626WHACpMLgILV/rjEdjcTPqP+d0HJKyQzWtj67rYbHiFtQvsQt1KP7jIpDb
-         /QSAODTMocpxEhTU/pZ4N/j7qFaIsb6FDPBwIuIR2z9OqognOuAgrYRSuLkbSAR9YLMn
-         rVGQPQSNf0Pj6RApS1+xXYJyGOxxgR/1MDYIh54I+xP6HN/mLwTDbklu8BPNVx4t0nsK
-         uaVMOOfnsn/PFPNYNTA8zX67IkNhQ+j1tvznhH6S0S85LokDKn+rCWETfF+MTipw5/JF
-         1UHQ==
+        bh=ITybHSn2lgwdo9OgBova5WgDb3bxvpvix4dcDu0Ihw0=;
+        b=c/3sxpIpXfRKHLe/ZVGoCqG3+vIZwM7cQiF9dKlnKvDjsH6+0lVVKhCghyiYFcBb8P
+         nUnTI0n4HS8pKXBY5fWso0PWnCLWjJz9N7Qj6j1C5tmr7FpsFrAxXVZHH+0E2xry7EfC
+         oPiw18Ik/cZnpASMk1wRMiCGUDrKQbtNmWJHcvCNBUHeJqW5JI3QbqF/mAciGtElR3Dx
+         FAk3EeVpvvG90YKfN6b/Zo/mqNQCfwMQCxbTHSq9d2rGyjyVZQspdOIelxOuKR/eJMsm
+         4DSrl5JgZgKFmAfg2S6p8RUkC3gJOz1Zt3i+uIxxvTqixdFK7dZABHqDiJd1g6Qqa5bw
+         vG3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722630585; x=1723235385;
+        d=1e100.net; s=20230601; t=1722630587; x=1723235387;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=jXAWPfkwqKY8wTkDhDCSEwSk5HKMwXuyqi+tQSb2i8o=;
-        b=j/5j++amPJLeSOMMFGUOj6bCnFGz9WvUcFA0vGvCcjCHwbHxc1N13Fus9BAtigVJbg
-         RoHPg7A6JBjVjew3TllFbLoCPTzDudNRBznoqLVJwND68H9spjr3PJW1uxAwU8z8gJe2
-         gcGtkUTQOeJljySkfv1p+flMpnBTtOnUNw58cxzzUCEot6+CNQ5/GA6E0QbNzj57t3Lc
-         9rsX1GO7PIwtwrZljvNN9z6CLzr4yj/vLXLt+ulnbV75MRA+WeAvy8JfObnXGtJiKIsz
-         KpCH9LDXctDXWEFPJMCUangx5XAOoyVm7pVNDFf/uMsqh7D7xvxJq5i6zHMuueKzKInS
-         9lIg==
-X-Gm-Message-State: AOJu0Yw7CjIjQPBPD1dd2Yr0o2EBfsVkvhpMKRqZn4wdTO3anTM/BpaT
-	bN8jx/P3htnaVE/QfVPob+HobpdIiAt/l9Uoy7uEKlD2ALpJ8Hm9zA8Al3F8Rr749oGmPdotoSN
-	4pA==
-X-Google-Smtp-Source: AGHT+IHnpZirsws9d8gFRBxELSmDfY/2At0fV7PYAnQIyxbIG/QFYTbOfn7GUnAfrDZ4vyLXfQ6B8vHnAEA=
+        bh=ITybHSn2lgwdo9OgBova5WgDb3bxvpvix4dcDu0Ihw0=;
+        b=kTmv7b9D+6crdEi25s29ieqR8xUAUOj0HalszvNFA3/14C62XY6A6u6FwfoG8e5EGd
+         iGTlK6vtlfZxWQYskwuQQseKQqeUx2UfdcdhEvyPk1+tGfZkO8juvC4KcAiAmLdb64YV
+         8Hd/G9LUoUA3L2kftPdSanXBcCz7o3CYEa2/8m5bqMg02sENkNTdtjhQVKtnGU/UT6Ma
+         h3fG7V/i7W5F4O4SQ9dlo5EYf0sTZf54a0LlEwrH7JhePlV4YgiRXUmxHvB0dVz19NW3
+         LtiuQ/x4ycnA2A+A4p4s5ANO//c9/LbN9DPhQunLrNaew2OtN518knpH4C1dVt8wCjb9
+         U9Eg==
+X-Gm-Message-State: AOJu0YzVsbU65PJPbowd17kWvUrDsXymmAvGcj9QAeAYyg/Mdpi0VAMz
+	yaY74Jr9K7UR7evqH4sfhJEdUzbR2mV6dRtVhN+alynpD8HAwmp1fkSxXphAq41icqVT+lWFAbF
+	a8Q==
+X-Google-Smtp-Source: AGHT+IGRq+dVNGtNV9XqcGvZVjcLmkzM3kpMD7Cek6RunfBtNP9VV5PoU3KDoqHiJRj+R7bIJmacvOz29AY=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ec92:b0:1fd:6529:7443 with SMTP id
- d9443c01a7336-1ff5748d388mr2108555ad.11.1722630585507; Fri, 02 Aug 2024
- 13:29:45 -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:902:b686:b0:1fb:7978:6cc with SMTP id
+ d9443c01a7336-1ff57290c0cmr1353185ad.5.1722630587428; Fri, 02 Aug 2024
+ 13:29:47 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  2 Aug 2024 13:29:40 -0700
+Date: Fri,  2 Aug 2024 13:29:41 -0700
 In-Reply-To: <20240802202941.344889-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,8 +75,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240802202941.344889-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.rc2.264.g509ed76dc8-goog
-Message-ID: <20240802202941.344889-2-seanjc@google.com>
-Subject: [PATCH 1/2] KVM: x86: Make x2APIC ID 100% readonly
+Message-ID: <20240802202941.344889-3-seanjc@google.com>
+Subject: [PATCH 2/2] KVM: selftests: Add a testcase to verify x2APIC is fully readonly
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -84,103 +84,64 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Ignore the userspace provided x2APIC ID when fixing up APIC state for
-KVM_SET_LAPIC, i.e. make the x2APIC fully readonly in KVM.  Commit
-a92e2543d6a8 ("KVM: x86: use hardware-compatible format for APIC ID
-register"), which added the fixup, didn't intend to allow userspace to
-modify the x2APIC ID.  In fact, that commit is when KVM first started
-treating the x2APIC ID as readonly, apparently to fix some race:
+From: Michal Luczaj <mhal@rbox.co>
 
- static inline u32 kvm_apic_id(struct kvm_lapic *apic)
- {
--       return (kvm_lapic_get_reg(apic, APIC_ID) >> 24) & 0xff;
-+       /* To avoid a race between apic_base and following APIC_ID update when
-+        * switching to x2apic_mode, the x2apic mode returns initial x2apic id.
-+        */
-+       if (apic_x2apic_mode(apic))
-+               return apic->vcpu->vcpu_id;
-+
-+       return kvm_lapic_get_reg(apic, APIC_ID) >> 24;
- }
+Add a test to verify that userspace can't change a vCPU's x2APIC ID by
+abusing KVM_SET_LAPIC.  KVM models the x2APIC ID (and x2APIC LDR) as
+readonly, and silently ignores userspace attempts to change the x2APIC ID
+for backwards compatibility.
 
-Furthermore, KVM doesn't support delivering interrupts to vCPUs with a
-modified x2APIC ID, but KVM *does* return the modified value on a guest
-RDMSR and for KVM_GET_LAPIC.  I.e. no remotely sane setup can actually
-work with a modified x2APIC ID.
-
-Making the x2APIC ID fully readonly fixes a WARN in KVM's optimized map
-calculation, which expects the LDR to align with the x2APIC ID.
-
-  WARNING: CPU: 2 PID: 958 at arch/x86/kvm/lapic.c:331 kvm_recalculate_apic_map+0x609/0xa00 [kvm]
-  CPU: 2 PID: 958 Comm: recalc_apic_map Not tainted 6.4.0-rc3-vanilla+ #35
-  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.2-1-1 04/01/2014
-  RIP: 0010:kvm_recalculate_apic_map+0x609/0xa00 [kvm]
-  Call Trace:
-   <TASK>
-   kvm_apic_set_state+0x1cf/0x5b0 [kvm]
-   kvm_arch_vcpu_ioctl+0x1806/0x2100 [kvm]
-   kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
-   __x64_sys_ioctl+0xb8/0xf0
-   do_syscall_64+0x56/0x80
-   entry_SYSCALL_64_after_hwframe+0x46/0xb0
-  RIP: 0033:0x7fade8b9dd6f
-
-Reported-by: Michal Luczaj <mhal@rbox.co>
-Closes: https://lore.kernel.org/all/814baa0c-1eaa-4503-129f-059917365e80@rbox.co
-Reported-by: Haoyu Wu <haoyuwu254@gmail.com>
-Closes: https://lore.kernel.org/all/20240126161633.62529-1-haoyuwu254@gmail.com
-Reported-by: syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/all/000000000000c2a6b9061cbca3c3@google.com
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+[sean: write changelog, add to existing test]
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/kvm/lapic.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
+ .../selftests/kvm/x86_64/xapic_state_test.c   | 28 +++++++++++++++++++
+ 1 file changed, 28 insertions(+)
 
-diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
-index a7172ba59ad2..c6a59871acb3 100644
---- a/arch/x86/kvm/lapic.c
-+++ b/arch/x86/kvm/lapic.c
-@@ -2966,18 +2966,28 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
- 		struct kvm_lapic_state *s, bool set)
+diff --git a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+index 69849acd95b0..618cd2442390 100644
+--- a/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
++++ b/tools/testing/selftests/kvm/x86_64/xapic_state_test.c
+@@ -184,6 +184,33 @@ static void test_apic_id(void)
+ 	kvm_vm_free(vm);
+ }
+ 
++static void test_x2apic_id(void)
++{
++	struct kvm_lapic_state lapic = {};
++	struct kvm_vcpu *vcpu;
++	struct kvm_vm *vm;
++	int i;
++
++	vm = vm_create_with_one_vcpu(&vcpu, NULL);
++	vcpu_set_msr(vcpu, MSR_IA32_APICBASE, MSR_IA32_APICBASE_ENABLE | X2APIC_ENABLE);
++
++	/*
++	 * Try stuffing a modified x2APIC ID, KVM should ignore the value and
++	 * always return the vCPU's default/readonly x2APIC ID.
++	 */
++	for (i = 0; i <= 0xff; i++) {
++		*(u32 *)(lapic.regs + APIC_ID) = i << 24;
++		*(u32 *)(lapic.regs + APIC_SPIV) = APIC_SPIV_APIC_ENABLED;
++		vcpu_ioctl(vcpu, KVM_SET_LAPIC, &lapic);
++
++		vcpu_ioctl(vcpu, KVM_GET_LAPIC, &lapic);
++		TEST_ASSERT(*((u32 *)&lapic.regs[APIC_ID]) == vcpu->id << 24,
++			    "x2APIC ID should be fully readonly");
++	}
++
++	kvm_vm_free(vm);
++}
++
+ int main(int argc, char *argv[])
  {
- 	if (apic_x2apic_mode(vcpu->arch.apic)) {
-+		u32 x2apic_id = kvm_x2apic_id(vcpu->arch.apic);
- 		u32 *id = (u32 *)(s->regs + APIC_ID);
- 		u32 *ldr = (u32 *)(s->regs + APIC_LDR);
- 		u64 icr;
+ 	struct xapic_vcpu x = {
+@@ -211,4 +238,5 @@ int main(int argc, char *argv[])
+ 	kvm_vm_free(vm);
  
- 		if (vcpu->kvm->arch.x2apic_format) {
--			if (*id != vcpu->vcpu_id)
-+			if (*id != x2apic_id)
- 				return -EINVAL;
- 		} else {
-+			/*
-+			 * Ignore the userspace value when setting APIC state.
-+			 * KVM's model is that the x2APIC ID is readonly, e.g.
-+			 * KVM only supports delivering interrupts to KVM's
-+			 * version of the x2APIC ID.  However, for backwards
-+			 * compatibility, don't reject attempts to set a
-+			 * mismatched ID for userspace that hasn't opted into
-+			 * x2apic_format.
-+			 */
- 			if (set)
--				*id >>= 24;
-+				*id = x2apic_id;
- 			else
--				*id <<= 24;
-+				*id = x2apic_id << 24;
- 		}
- 
- 		/*
-@@ -2986,7 +2996,7 @@ static int kvm_apic_state_fixup(struct kvm_vcpu *vcpu,
- 		 * split to ICR+ICR2 in userspace for backwards compatibility.
- 		 */
- 		if (set) {
--			*ldr = kvm_apic_calc_x2apic_ldr(*id);
-+			*ldr = kvm_apic_calc_x2apic_ldr(x2apic_id);
- 
- 			icr = __kvm_lapic_get_reg(s->regs, APIC_ICR) |
- 			      (u64)__kvm_lapic_get_reg(s->regs, APIC_ICR2) << 32;
+ 	test_apic_id();
++	test_x2apic_id();
+ }
 -- 
 2.46.0.rc2.264.g509ed76dc8-goog
 
