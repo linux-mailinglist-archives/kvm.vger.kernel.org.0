@@ -1,277 +1,170 @@
-Return-Path: <kvm+bounces-23166-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23167-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC01F9468B4
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 10:36:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6387A9468DF
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 11:36:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67E722821F5
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 08:36:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2357E281F4E
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 09:36:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D8014E2D7;
-	Sat,  3 Aug 2024 08:36:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F5114F111;
+	Sat,  3 Aug 2024 09:35:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="G7Qtmvdv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QM+nyj2r"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21FBA11725;
-	Sat,  3 Aug 2024 08:36:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6117E2EAEA;
+	Sat,  3 Aug 2024 09:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722674179; cv=none; b=tnPpkE/QRquXtKTElLZd9rdohXIiTGBRfALYPQ9Q0L+AJOyDI4YyXCPnpVrfjvgxu86kL/AJiT2p8ACR76zZdxBDRfriUyb4pfbuhgZp/kStfkjh5uiRoAtyW3leKNrmbji9l/WTSy4j5T59pXu7/D7pnOG2XKHDEbe4DEI3pvw=
+	t=1722677757; cv=none; b=Hut75TLVwJBMCoEouAInJ3IYmLeZAbvASVOmIrI54978+EldmKAzKuKP40XRpgF8vxduLrlLON1bLcGij0/u6hhNAGAEUjQk5XZdgnL/DsNOf9DmI+Q1c0ddrNDOa2bnJArQG01x6XZDYONtDLCuYZ8bqhkCXXcodHK67mYzFvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722674179; c=relaxed/simple;
-	bh=yBf+RLbG4Za/jAmRaPVr1ozXMBW06hGuPsAWhuYFieQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=e/Fk2pbGWxV0Vm5AfQVjomB6r8li4wffLmSGbrkyYLSJA5LIX7psGs4C9RmY7rrdaWusFjc76ME9Te8wicfvphBhypd4OL0d+o/X5OKB9MoDWHqpZa1I4QgBZoQaoSgjcCkcVmceip8583O3gb7Abpe/a0lXfHqFdu8rg/Rzj9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=G7Qtmvdv; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=sX5mPvQNHxeir1HLtFut4TlTQw0C1g9TxiByvinTdD0=; b=G7QtmvdvyG06aZzHZ0LdapcGTZ
-	uFky4+yk4xNjaYjXHhdos2uG5r9to4GwHbSUFcRGIEMn8zIrFjczBa+E0M4kmFs1T/fspzruxquH0
-	HO2M8zODkyno7icX9oz3wATgKpqnA0J5zgdPfRhxvhhBnHUMY8yoVNNwJaCNGnsiELZYdJOdhthKc
-	sVZ3WHYJd9BlzvSNM2zsLrjau1cy3CqOZC2vDz2kx8A/0J4xzx8eKGV2JUFgaIkqU1SbLtIM3j8Xu
-	O3WTczlog+1EYOO4u7hOsXA2Mbw9ICKNCEYAizNMi5XVUqtn0UQSfXjTUtLKAbEzJy4eREeJPa4Nh
-	chYDY0Pw==;
-Received: from [2001:8b0:10b:5:baa5:735b:df3b:ad66] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1saAF2-00000001wIH-3oNd;
-	Sat, 03 Aug 2024 08:35:57 +0000
-Message-ID: <ae8412474f793ff59d5567bc721dc012d6ee0199.camel@infradead.org>
-Subject: Re: [PATCH] KVM: x86: Use gfn_to_pfn_cache for steal_time
-From: David Woodhouse <dwmw2@infradead.org>
-To: Peter Xu <peterx@redhat.com>
-Cc: Carsten Stollmaier <stollmc@amazon.com>, Sean Christopherson
- <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner
- <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
- <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>, nh-open-source@amazon.com, Sebastian
- Biemueller <sbiemue@amazon.de>, kvm@vger.kernel.org,
- linux-kernel@vger.kernel.org,  Matthew Wilcox <willy@infradead.org>, Andrew
- Morton <akpm@linux-foundation.org>, "linux-mm@kvack.org"
- <linux-mm@kvack.org>
-Date: Sat, 03 Aug 2024 09:35:56 +0100
-In-Reply-To: <Zq1gavwLBHeSr2ju@x1n>
-References: <20240802114402.96669-1-stollmc@amazon.com>
-	 <b40f244f50ce3a14d637fd1769a9b3f709b0842e.camel@infradead.org>
-	 <Zq1gavwLBHeSr2ju@x1n>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-JMXSzu51Qr8KhmrBCDra"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1722677757; c=relaxed/simple;
+	bh=JEbsnrTzSmhOmnx/e5esxkcGV3rSX/GncsC3HN+bUFQ=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LKvetop4G6fzM4ipQ3Xg8Q+Tv1BpM2PKQKEafClEvDjxKmH8aIG2EklWft2f7j5mNDLG9xLmtH4bAHh3a1qc54IUprlOHrG1Cw+kuJmYOzgutxL5wDNHlY5ge+mI+ZnxNWoETsI4BWsFrzlm8KprIku4ZCYtifQ+7dfpJvNz8YE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QM+nyj2r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFEB8C116B1;
+	Sat,  3 Aug 2024 09:35:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722677757;
+	bh=JEbsnrTzSmhOmnx/e5esxkcGV3rSX/GncsC3HN+bUFQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QM+nyj2rOf9eNpv7HTwm4Yvl582CUak/+I/ywihkAhigADTLUmGK3qsrg3uF8Us4q
+	 T9yLXq2uDCIwL7Pv0MCAOhngtRrfD9MkmfEWacBXfwJW9UrymMbMp4zQGJnXS2Vqzu
+	 ZFAJYky7XnrZ7rBfaYXLSf+E2LvM6d2JWJVc92KWaHOxqu3QOwIToL5Ce/1HFSCq4t
+	 cgbQ/quWJmy1EQGKjMI4WT7a+9mVA2bKKVXtkynyv197wWgqq0k+ModGmORY0nMJb6
+	 BrRnR2rYJXBCHjIUePO74SA0IZQt6ZswKVvxHOmNHEW2cOVm/BAumIgH7ohiaG6gbI
+	 FSG+KbS1j28zw==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1saBB4-000Ymy-Mz;
+	Sat, 03 Aug 2024 10:35:54 +0100
+Date: Sat, 03 Aug 2024 10:35:54 +0100
+Message-ID: <868qxe0wzp.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Mark Brown <broonie@kernel.org>
+Cc: Oliver Upton <oliver.upton@linux.dev>,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: selftests: arm64: Use generated defines for named system registers
+In-Reply-To: <20240802-kvm-arm64-get-reg-list-v1-2-3a5bf8f80765@kernel.org>
+References: <20240802-kvm-arm64-get-reg-list-v1-0-3a5bf8f80765@kernel.org>
+	<20240802-kvm-arm64-get-reg-list-v1-2-3a5bf8f80765@kernel.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: broonie@kernel.org, oliver.upton@linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, pbonzini@redhat.com, shuah@kernel.org, catalin.marinas@arm.com, joey.gouly@arm.com, linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
+On Fri, 02 Aug 2024 22:57:54 +0100,
+Mark Brown <broonie@kernel.org> wrote:
+> 
+> Currently the get-reg-list test uses directly specified numeric values to
+> define system registers to validate. Since we already have a macro which
+> allows us to use the generated system register definitions from the main
+> kernel easily let's update all the registers where we have specified the
+> name in a comment to just use that macro. This reduces the number of
+> places where we need to validate the name to number mapping.
+> 
+> This conversion was done with the sed command:
+> 
+>   sed -i -E 's-ARM64_SYS_REG.*/\* (.*) \*/-KVM_ARM64_SYS_REG(SYS_\1),-' tools/testing/selftests/kvm/aarch64/get-reg-list.c
+>
 
---=-JMXSzu51Qr8KhmrBCDra
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+[Eyes rolling]
 
-On Fri, 2024-08-02 at 18:40 -0400, Peter Xu wrote:
-> On Fri, Aug 02, 2024 at 01:03:16PM +0100, David Woodhouse wrote:
-> > An alternative workaround (which perhaps we should *also* consider)
-> > looked like this (plus some suitable code comment, of course):
-> >=20
-> > --- a/arch/x86/mm/fault.c
-> > +++ b/arch/x86/mm/fault.c
-> > @@ -1304,6 +1304,8 @@ void do_user_addr_fault(struct pt_regs *regs,
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 */
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (user_mode(regs))
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 flags |=3D FAULT_FLAG_USER;
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 else
-> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 flags &=3D ~FAULT_FLAG_INTERRUPTIBLE;
-> > =C2=A0
-...
-> Instead of "interruptible exception" or the original patch (which might
-> still be worthwhile, though?=C2=A0 I didn't follow much on kvm and the ne=
-w gpc
-> cache, but looks still nicer than get/put user from initial glance), abov=
-e
+What I asked about scripting the whole thing, it never occurred to me
+that you would use the *comments* as a reliable source of information.
+Do we have anything less reliable than comments in the kernel?
 
-Yes, I definitely think we want the GPC conversion anyway. That's why I
-suggested it to Carsten, to resolve our *immediate* problem while we
-continue to ponder the general case.
+The matching must be done from the arch/arm64/tools/sysreg file,
+because that's the (admittedly dubious) source of truth. We actually
+trust the encodings because they are reported by the kernel itself.
+The comment is hand-written, and likely wrong.
 
-> looks like the easier and complete solution to me.=C2=A0 For "completenes=
-s", I
-> mean I am not sure how many other copy_to/from_user() code in kvm can hit
-> this, so looks like still possible to hit outside steal time page?
+Also, this hides the horrible truth about existing ABI bugs, see
+below.
 
-Right. It theoretically applies to *any* user access. It's just that
-anything other than *guest* pages is slightly less likely to be backed
-by userfaultfd.
+> We still have a number of numerically specified registers, some of these
+> are reserved registers without defined names (eg, unallocated ID registers)
+> and others don't have kernel macro definitions yet.
+> 
+> No change in the generated output.
+> 
+> Suggested-by: Marc Zyngier <maz@kernel.org>
+> Signed-off-by: Mark Brown <broonie@kernel.org>
+> ---
+>  tools/testing/selftests/kvm/aarch64/get-reg-list.c | 208 ++++++++++-----------
+>  1 file changed, 104 insertions(+), 104 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/aarch64/get-reg-list.c b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> index a00322970578..4d786c4ab28a 100644
+> --- a/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> +++ b/tools/testing/selftests/kvm/aarch64/get-reg-list.c
+> @@ -313,14 +313,14 @@ static __u64 base_regs[] = {
+>  	KVM_REG_ARM_FW_FEAT_BMAP_REG(0),	/* KVM_REG_ARM_STD_BMAP */
+>  	KVM_REG_ARM_FW_FEAT_BMAP_REG(1),	/* KVM_REG_ARM_STD_HYP_BMAP */
+>  	KVM_REG_ARM_FW_FEAT_BMAP_REG(2),	/* KVM_REG_ARM_VENDOR_HYP_BMAP */
+> -	ARM64_SYS_REG(3, 3, 14, 3, 1),	/* CNTV_CTL_EL0 */
+> -	ARM64_SYS_REG(3, 3, 14, 3, 2),	/* CNTV_CVAL_EL0 */
+> +	KVM_ARM64_SYS_REG(SYS_CNTV_CTL_EL0),
+> +	KVM_ARM64_SYS_REG(SYS_CNTV_CVAL_EL0),
+>  	ARM64_SYS_REG(3, 3, 14, 0, 2),
 
-> I thought only the slow fault path was involved in INTERRUPTIBLE thing an=
-d
-> that was the plan, but I guess I overlooked how the default value could
-> affect copy to/from user invoked from KVM as well..
->=20
-> With above patch to drop FAULT_FLAG_INTERRUPTIBLE for !user, KVM can stil=
-l
-> opt-in INTERRUPTIBLE anywhere by leveraging hva_to_pfn[_slow]() API, whic=
-h
-> is "INTERRUPTIBLE"-ready with a boolean the caller can set. But the calle=
-r
-> will need to be able to process KVM_PFN_ERR_SIGPENDING.
+Great. So not only you fail convert a register, but you also ignore
+the nugget described in arch/arm64/invlude/uapi/asm/kvm.h:267.
 
-Right. I think converting kvm_{read,write}_guest() and friends to do
-that and be interruptible might make sense?
+Sure, having both described hides the crap, as we don't attach any
+significance to the registers themselves. But that shows how
+untrustworthy the comments are.
 
-The patch snippet above obviously only fixes it for x86 and would need
-to be done across the board. Unless we do this one instead, abusing the
-knowledge that uffd is the only thing which honours
-FAULT_FLAG_INTERRUPTIBLE?
+> -	ARM64_SYS_REG(3, 0, 0, 0, 0),	/* MIDR_EL1 */
+> -	ARM64_SYS_REG(3, 0, 0, 0, 6),	/* REVIDR_EL1 */
+> -	ARM64_SYS_REG(3, 1, 0, 0, 1),	/* CLIDR_EL1 */
+> -	ARM64_SYS_REG(3, 1, 0, 0, 7),	/* AIDR_EL1 */
+> -	ARM64_SYS_REG(3, 3, 0, 0, 1),	/* CTR_EL0 */
+> +	KVM_ARM64_SYS_REG(SYS_MIDR_EL1),
+> +	KVM_ARM64_SYS_REG(SYS_REVIDR_EL1),
+> +	KVM_ARM64_SYS_REG(SYS_CLIDR_EL1),
+> +	KVM_ARM64_SYS_REG(SYS_AIDR_EL1),
+> +	KVM_ARM64_SYS_REG(SYS_CTR_EL0),
+>  	ARM64_SYS_REG(2, 0, 0, 0, 4),
+>  	ARM64_SYS_REG(2, 0, 0, 0, 5),
+>  	ARM64_SYS_REG(2, 0, 0, 0, 6),
 
---- a/fs/userfaultfd.c
-+++ b/fs/userfaultfd.c
-@@ -351,7 +351,7 @@ static inline bool userfaultfd_must_wait(struct userfau=
-ltfd_ctx *ctx,
-=20
- static inline unsigned int userfaultfd_get_blocking_state(unsigned int fla=
-gs)
- {
--       if (flags & FAULT_FLAG_INTERRUPTIBLE)
-+       if ((flags & FAULT_FLAG_INTERRUPTIBLE) && (flags & FAULT_FLAG_USER)=
-)
-                return TASK_INTERRUPTIBLE;
-=20
-        if (flags & FAULT_FLAG_KILLABLE)
+As far as I can tell, these registers are not unallocated, and they
+should be named.
 
-I still quite like the idea of *optional* interruptible exceptions, as
-seen in my proof of concept. Perhaps we wouldn't want the read(2) and
-write(2) system calls to use them, but there are plenty of other system
-calls which could be interruptible instead of blocking.
+Thanks,
 
-Right now, even the simple case of a trivial SIGINT handler which does
-some minor cleanup before exiting, makes it a non-fatal signal so the
-kernel blocks and waits for ever.
+	M.
 
-
---=-JMXSzu51Qr8KhmrBCDra
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
-
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwODAzMDgzNTU2WjAvBgkqhkiG9w0BCQQxIgQg7KLBfDJQ
-zM912CqpMePw5vdPh3Ee2ixqKQAo9Q2aT1gwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgAZ/SJ05sxvHyLK3HmFlbmYXYBBJ95+GsAX
-WYEisxMPADPOmQ6XqE1kmS2SaE9g6i065pFXiqzP/tC7cAUnygY8uIMPjcluCgmNC+vwtmWNEyZr
-3BVh26DA6hVkGiHMToCNHflZFD8DrW+QCyNerF6w+lwaAVEQZbTpatpf4crLmOV3Esfv5oZ+qnlT
-kbmiJZ/qr7oi8B4R4MT3n6pBhZtP7mu3+u7kE7ucq5lHXqvBE7eUq9UxMhto+CYqfT5+f+AHighu
-NKBJqYReKJVfnRQ7qZSBmbZVt2K+fYoGFljQZyLi8RYgiCONOF57Ri4XygojZc4lcrdX0FDhgvLB
-q2LwhuPjgq2KO+WJHrJyRgqcsatgi9NR0WgKvJ/pXfnIj/n/bI4RDjZo7Xp6L5q7tCe6ozCH4fYN
-2SIspjEQqOK0ioT6Vr6LmCZeNP6LxDYBbjUB29r1/WdSPpAAy7ZxMn0atyWdTlpj+i+TNowHPZL4
-yoaNuufB7YWxtL8jkjNSfvgC5E7WSUX9V3ozGGT8iWU6rT5haMCv3F9T8zDMUqlBXY7AGj4IZL76
-010g8LM3wzbkG1t4g8rGIfHB0PK80DdhoNWUUPtVY/vluT4Igfd5lPYF3bAfgSAK0o59ANpPU+Lu
-rq+Cm3LPRJuutoYHRgS3MA9d0TG4CSlz52jMMIlaPQAAAAAAAA==
-
-
---=-JMXSzu51Qr8KhmrBCDra--
+-- 
+Without deviation from the norm, progress is not possible.
 
