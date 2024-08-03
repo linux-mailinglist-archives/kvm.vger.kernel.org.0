@@ -1,190 +1,170 @@
-Return-Path: <kvm+bounces-23159-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23164-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B9E9465EA
-	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 00:41:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EA209466FA
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 05:02:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 211C21F22BBE
-	for <lists+kvm@lfdr.de>; Fri,  2 Aug 2024 22:41:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E40EC1F21CB5
+	for <lists+kvm@lfdr.de>; Sat,  3 Aug 2024 03:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC3213AA47;
-	Fri,  2 Aug 2024 22:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="C5hSFL3U"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18DF9FC01;
+	Sat,  3 Aug 2024 03:02:26 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B43A56446
-	for <kvm@vger.kernel.org>; Fri,  2 Aug 2024 22:40:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F53F9E4;
+	Sat,  3 Aug 2024 03:02:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722638451; cv=none; b=AZYoUGV4fWJ2DHFC5FNCoRFkWROqcnlDAl4X17h4hTciJmGGYt83z/vJIohz3arW2iKRYzUvReLh9ABY+J0ZMVA5cpVOUPUoBNwYDkrdGNjkP67YBZsFK1b20gtMXwhIXtfORf51s7/R02HFcjnn1MLTlnlzo/08r2L/A0ueZqc=
+	t=1722654145; cv=none; b=cHCs+U7i1EXGYB9oX+QB+H8hvdm9C1GbrA2TGRpXh4ol5xo1Zeo6ijDPViQ1QH7KYUYFgw4u9JFyWCdRhsRtNJQIHqhYRPBCZiQAzUl8rp/fLspUN/h3p0NXjZH6+ZP4IkcILfYRgJQX3HOf18Qgk/IvUA6T3bSWhApnE4/ncxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722638451; c=relaxed/simple;
-	bh=2Ox92wS/j6LT6RW2Owt087/gAztSsKgOWN6KoTSnzI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H87iS+TUj87Vm71GmljUduhvuF6JAbFyQWvgVN3a8PYjENUUHNF9n79sUZqgeFBe77J5s5PPcgmM5aOV0w+TsD7BQ8jykz5dCN1q6wNWlqqU9C74gCZ3jEDYEUpmJ+aymSK1gzoA/EfObLqxsdxXClQDdmmhrHBOYS3iooz2c3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=C5hSFL3U; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722638447;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UIQ24+48TE0Ta9LNm8rRrMJXnuaT0qzUCWhnHkojtRo=;
-	b=C5hSFL3UBYsGPDVqyTmba/8c/CqjFUOS4CmD/mWs5YP5mL2Qjcw+urMQmCL3jgFSdDGGKS
-	So9nqwpc5MLZb7gXeufCdQLSZDIVa0aau6sEsUXbfHg6DOdgJWTelOLKS2ecmDw10TOxo2
-	Mt1F5EPFndv4uRzxV5O2RCS16o4EqSc=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-86-hfLHcd5UPPmD4prrz9cHDw-1; Fri, 02 Aug 2024 18:40:46 -0400
-X-MC-Unique: hfLHcd5UPPmD4prrz9cHDw-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6bba0f9d3efso1938616d6.3
-        for <kvm@vger.kernel.org>; Fri, 02 Aug 2024 15:40:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722638446; x=1723243246;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=UIQ24+48TE0Ta9LNm8rRrMJXnuaT0qzUCWhnHkojtRo=;
-        b=A5G8KvHR7Pj/4AQBB4k+3dZf7Al8bhWGoBTz8rkjIfv8eY8jn7kvzy6YV78Es8NGRW
-         2AZCtml4kwbgAXtTLncM/AG34OVygXYOIDlsaEIcTmTfN/Zpuo58fm/bOaCWqZTEyOpO
-         Mc2X7lLjHIlOHfcq3kzRJ9hKdUlD1tBEKrkI7NCV2OvCu/X7rNgp4wX2+NgeZpbGOxEt
-         N9ot768+jfO1fd8e29HHT2J/79b8hq08Bflexq3Qfe+P+L1fXGXvfrVTk/EM2SoNp9ym
-         RImJeFY1jpQ7cr2MIw3O1RxNroPIQFbjzPYB87BNdfpmxDbj8rJpmQja3Dr90fkBYLta
-         SIMA==
-X-Forwarded-Encrypted: i=1; AJvYcCVDXgwA204H7k3lQhd2n3asnI72vYuF93L6tCw9GYGbp/4lEJdmkFNU8U+Y51N87SKt8w8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzeGui/hP4sTwzrxp1j+kXbSjAGLFyjR9X03U0n489svKMCSB24
-	ts7oOJe3O8VaiwvdLzH8LL/jhS53mZq5mUAN9ZJGHx82kypskvs7/VPMI1nZG6mEyHbJemLuact
-	MOzPdGftH8UPc6zUEHKKDOECZcJsnReyJKCeh+XZ7JeRMhAU4vw==
-X-Received: by 2002:a05:6214:3008:b0:6b7:885c:b750 with SMTP id 6a1803df08f44-6bb9832e268mr35451826d6.1.1722638445948;
-        Fri, 02 Aug 2024 15:40:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGGuQ/TysjxPmr8e9IL8H+rnOjczzC8Pn9LtVkMqryMZ3GwIYnbZ1EzE5cR19PNfrempSFmMA==
-X-Received: by 2002:a05:6214:3008:b0:6b7:885c:b750 with SMTP id 6a1803df08f44-6bb9832e268mr35451646d6.1.1722638445539;
-        Fri, 02 Aug 2024 15:40:45 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c86baa8sm10847796d6.118.2024.08.02.15.40.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Aug 2024 15:40:45 -0700 (PDT)
-Date: Fri, 2 Aug 2024 18:40:42 -0400
-From: Peter Xu <peterx@redhat.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Carsten Stollmaier <stollmc@amazon.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>, nh-open-source@amazon.com,
-	Sebastian Biemueller <sbiemue@amazon.de>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Matthew Wilcox <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"linux-mm@kvack.org" <linux-mm@kvack.org>
-Subject: Re: [PATCH] KVM: x86: Use gfn_to_pfn_cache for steal_time
-Message-ID: <Zq1gavwLBHeSr2ju@x1n>
-References: <20240802114402.96669-1-stollmc@amazon.com>
- <b40f244f50ce3a14d637fd1769a9b3f709b0842e.camel@infradead.org>
+	s=arc-20240116; t=1722654145; c=relaxed/simple;
+	bh=NoDHZy9WHNV+LcYNuOiFb+aviu1JIBbgKM7qngzRd8c=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=dLeofUESOjhfIlHkN+2VHZklkZ49p4GR0NFUearBAaTq/6QkMXtGvXhFUlctLCouqudzVPaB2sUKzlRLW+0oG5udm+FU19iRHc+eKU43vjhIyBYz6fY5+tDcTYH0d4qDDaCeOLYgE4yKFoPnt0ZQ3hhWvIZBKlhrYwQhgov1bww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8BxKuq2na1mzuEGAA--.24038S3;
+	Sat, 03 Aug 2024 11:02:14 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMCxwuGwna1mXuwAAA--.5506S3;
+	Sat, 03 Aug 2024 11:02:10 +0800 (CST)
+Subject: Re: [PATCH v12 64/84] KVM: LoongArch: Mark "struct page" pfns dirty
+ only in "slow" page fault path
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+ loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+ linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+ linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+ David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-65-seanjc@google.com>
+ <a039b758-d4e3-3798-806f-25bceb2f33a5@loongson.cn>
+ <Zq00OYowF5kc9QFE@google.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <345d89c1-4f31-6b49-2cd4-a0696210fa7c@loongson.cn>
+Date: Sat, 3 Aug 2024 11:02:07 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <b40f244f50ce3a14d637fd1769a9b3f709b0842e.camel@infradead.org>
+In-Reply-To: <Zq00OYowF5kc9QFE@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMCxwuGwna1mXuwAAA--.5506S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj93XoWxJFyfAryfKw1fGw43AFyrGrX_yoW5uw17pF
+	WUCFWqkFs5tryYyrZrt39IvrWrK39xKr1xX3W7J34Fkas0qr1IqF10grWfWFyUA3yfAayS
+	qr4UKF9xuFZ8AwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUt529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
+	Gr0_Gr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
+	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
+	XwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
+	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l
+	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxV
+	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI
+	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
+	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI
+	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUShiSDUUUU
 
-On Fri, Aug 02, 2024 at 01:03:16PM +0100, David Woodhouse wrote:
-> On Fri, 2024-08-02 at 11:44 +0000, Carsten Stollmaier wrote:
-> > On vcpu_run, before entering the guest, the update of the steal time
-> > information causes a page-fault if the page is not present. In our
-> > scenario, this gets handled by do_user_addr_fault and successively
-> > handle_userfault since we have the region registered to that.
-> > 
-> > handle_userfault uses TASK_INTERRUPTIBLE, so it is interruptible by
-> > signals. do_user_addr_fault then busy-retries it if the pending signal
-> > is non-fatal. This leads to contention of the mmap_lock.
-> 
-> The busy-loop causes so much contention on mmap_lock that post-copy
-> live migration fails to make progress, and is leading to failures. Yes?
-> 
-> > This patch replaces the use of gfn_to_hva_cache with gfn_to_pfn_cache,
-> > as gfn_to_pfn_cache ensures page presence for the memory access,
-> > preventing the contention of the mmap_lock.
-> > 
-> > Signed-off-by: Carsten Stollmaier <stollmc@amazon.com>
-> 
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> I think this makes sense on its own, as it addresses the specific case
-> where KVM is *likely* to be touching a userfaulted (guest) page. And it
-> allows us to ditch yet another explicit asm exception handler.
-> 
-> We should note, though, that in terms of the original problem described
-> above, it's a bit of a workaround. It just means that by using
-> kvm_gpc_refresh() to obtain the user page, we end up in
-> handle_userfault() without the FAULT_FLAG_INTERRUPTIBLE flag.
-> 
-> (Note to self: should kvm_gpc_refresh() take fault flags, to allow
-> interruptible and killable modes to be selected by its caller?)
-> 
-> 
-> An alternative workaround (which perhaps we should *also* consider)
-> looked like this (plus some suitable code comment, of course):
-> 
-> --- a/arch/x86/mm/fault.c
-> +++ b/arch/x86/mm/fault.c
-> @@ -1304,6 +1304,8 @@ void do_user_addr_fault(struct pt_regs *regs,
->          */
->         if (user_mode(regs))
->                 flags |= FAULT_FLAG_USER;
-> +       else
-> +               flags &= ~FAULT_FLAG_INTERRUPTIBLE;
->  
->  #ifdef CONFIG_X86_64
->         /*
-> 
-> 
-> That would *also* handle arbitrary copy_to_user/copy_from_user() to
-> userfault pages, which could theoretically hit the same busy loop.
-> 
-> I'm actually tempted to make user access *interruptible* though, and
-> either add copy_{from,to}_user_interruptible() or change the semantics
-> of the existing ones (which I believe are already killable).
-> 
-> That would require each architecture implementing interruptible
-> exceptions, by doing an extable lookup before the retry. Not overly
-> complex, but needs to be done for all architectures (although not at
-> once; we could live with not-yet-done architectures just remaining
-> killable).
-> 
-> Thoughts?
 
-Instead of "interruptible exception" or the original patch (which might
-still be worthwhile, though?  I didn't follow much on kvm and the new gpc
-cache, but looks still nicer than get/put user from initial glance), above
-looks like the easier and complete solution to me.  For "completeness", I
-mean I am not sure how many other copy_to/from_user() code in kvm can hit
-this, so looks like still possible to hit outside steal time page?
 
-I thought only the slow fault path was involved in INTERRUPTIBLE thing and
-that was the plan, but I guess I overlooked how the default value could
-affect copy to/from user invoked from KVM as well..
+On 2024/8/3 上午3:32, Sean Christopherson wrote:
+> On Fri, Aug 02, 2024, maobibo wrote:
+>> On 2024/7/27 上午7:52, Sean Christopherson wrote:
+>>> Mark pages/folios dirty only the slow page fault path, i.e. only when
+>>> mmu_lock is held and the operation is mmu_notifier-protected, as marking a
+>>> page/folio dirty after it has been written back can make some filesystems
+>>> unhappy (backing KVM guests will such filesystem files is uncommon, and
+>>> the race is minuscule, hence the lack of complaints).
+>>>
+>>> See the link below for details.
+>>>
+>>> Link: https://lore.kernel.org/all/cover.1683044162.git.lstoakes@gmail.com
+>>> Signed-off-by: Sean Christopherson <seanjc@google.com>
+>>> ---
+>>>    arch/loongarch/kvm/mmu.c | 18 ++++++++++--------
+>>>    1 file changed, 10 insertions(+), 8 deletions(-)
+>>>
+>>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+>>> index 2634a9e8d82c..364dd35e0557 100644
+>>> --- a/arch/loongarch/kvm/mmu.c
+>>> +++ b/arch/loongarch/kvm/mmu.c
+>>> @@ -608,13 +608,13 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
+>>>    		if (kvm_pte_young(changed))
+>>>    			kvm_set_pfn_accessed(pfn);
+>>> -		if (kvm_pte_dirty(changed)) {
+>>> -			mark_page_dirty(kvm, gfn);
+>>> -			kvm_set_pfn_dirty(pfn);
+>>> -		}
+>>>    		if (page)
+>>>    			put_page(page);
+>>>    	}
+>>> +
+>>> +	if (kvm_pte_dirty(changed))
+>>> +		mark_page_dirty(kvm, gfn);
+>>> +
+>>>    	return ret;
+>>>    out:
+>>>    	spin_unlock(&kvm->mmu_lock);
+>>> @@ -915,12 +915,14 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>>>    	else
+>>>    		++kvm->stat.pages;
+>>>    	kvm_set_pte(ptep, new_pte);
+>>> -	spin_unlock(&kvm->mmu_lock);
+>>> -	if (prot_bits & _PAGE_DIRTY) {
+>>> -		mark_page_dirty_in_slot(kvm, memslot, gfn);
+>>> +	if (writeable)
+>> Is it better to use write or (prot_bits & _PAGE_DIRTY) here?  writable is
+>> pte permission from function hva_to_pfn_slow(), write is fault action.
+> 
+> Marking folios dirty in the slow/full path basically necessitates marking the
+> folio dirty if KVM creates a writable SPTE, as KVM won't mark the folio dirty
+> if/when _PAGE_DIRTY is set.
+> 
+> Practically speaking, I'm 99.9% certain it doesn't matter.  The folio is marked
+> dirty by core MM when the folio is made writable, and cleaning the folio triggers
+> an mmu_notifier invalidation.  I.e. if the page is mapped writable in KVM's
+yes, it is. Thanks for the explanation. kvm_set_pfn_dirty() can be put 
+only in slow page fault path. I only concern with fault type, read fault 
+type can set pte entry writable however not _PAGE_DIRTY at stage-2 mmu 
+table.
 
-With above patch to drop FAULT_FLAG_INTERRUPTIBLE for !user, KVM can still
-opt-in INTERRUPTIBLE anywhere by leveraging hva_to_pfn[_slow]() API, which
-is "INTERRUPTIBLE"-ready with a boolean the caller can set. But the caller
-will need to be able to process KVM_PFN_ERR_SIGPENDING.
+> stage-2 PTEs, then its folio has already been marked dirty.
+Considering one condition although I do not know whether it exists 
+actually. user mode VMM writes the folio with hva address firstly, then 
+VCPU thread *reads* the folio. With primary mmu table, pte entry is 
+writable and _PAGE_DIRTY is set, with secondary mmu table(state-2 PTE 
+table), it is pte_none since the filio is accessed at first time, so 
+there will be slow page fault path for stage-2 mmu page table filling.
 
-Thanks,
+Since it is read fault, stage-2 PTE will be created with 
+_PAGE_WRITE(coming from function hva_to_pfn_slow()), however _PAGE_DIRTY 
+is not set. Do we need call kvm_set_pfn_dirty() at this situation?
 
--- 
-Peter Xu
+Regards
+Bibo Mao
 
 
