@@ -1,116 +1,151 @@
-Return-Path: <kvm+bounces-23174-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23175-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 361B8946D66
-	for <lists+kvm@lfdr.de>; Sun,  4 Aug 2024 10:18:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB8B8946DE6
+	for <lists+kvm@lfdr.de>; Sun,  4 Aug 2024 11:21:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 695231C2140B
-	for <lists+kvm@lfdr.de>; Sun,  4 Aug 2024 08:18:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6364F2817B0
+	for <lists+kvm@lfdr.de>; Sun,  4 Aug 2024 09:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867351CD1F;
-	Sun,  4 Aug 2024 08:18:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E21A224F6;
+	Sun,  4 Aug 2024 09:21:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ara32mym"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l81fgcw3"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D4431CAB9
-	for <kvm@vger.kernel.org>; Sun,  4 Aug 2024 08:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274DF320B;
+	Sun,  4 Aug 2024 09:21:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722759489; cv=none; b=qkPuF0RfI1XlZR41RKRslSnK3SWoyhh14VJGPwAk31buz8393U6QKMOEbBDjBhGCmwbIM/cdCqTC66BdYA1E6rLC8ajgO2G/qRbjcA5c2iPE7vEk4VZuO0KDcxob9eZTaQ9aYiJD1rdtymUfHXHHm7wWAs9dIy/zx3UELHg9KXE=
+	t=1722763307; cv=none; b=Q2KGZCmRR4Q2xws4BG+0YYMnICrsVKo2CKQE0ErL/6r8T02G9lkFZo9ccgTvR20Uso+sd1ZrSlifb+32kwVyjOIYOZzfUa/yjgJQLJ/Ru96Q+UVfdsDGQH8iyPMPP5VH5/8vW8Vj6zX3iBZbQvIIwP81C6RAWByWrexEyUrbmIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722759489; c=relaxed/simple;
-	bh=ZYRZnef0yxaS5bV9saKBDKO14pgVNfmF9j2Bk9jzlJk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GNPNswpeRy3DyCfnIZsMGLvO3y0+qwb7vUIaIcAoh8M4ab0Rnj9e9dyIzGljyOu9NSspLSeoHajjznzmEmRSfj1W/4ETwth8XSl0p5mMvCV8AQkdDr+8Yw7Z7pZiSYdv0JkDcIXoK/7kMdFHPbtR2IF9HPMekuXm7Q0DgQTxtKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ara32mym; arc=none smtp.client-ip=91.218.175.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <401bebca-9637-4626-901f-e46b2d058768@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1722759484;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BR8nESmyux7KPrlPtWm/y86ziQt1dIfCuk1340ZZ33o=;
-	b=ara32mymUPXn1tDy4bLqkZuYghp73ABnXKvkf214k9mbGPs4NlINmZEHazKOB+P84dAFc7
-	luVgeGbq8L7ea+dNC0SpntN3dVFowg3obE63kXZvD+oCKpN2lmqh2cwtEnOGvKKkYCyhrp
-	kwRXT5GHI+wbOmfqrTETGUTO+1NIvio=
-Date: Sun, 4 Aug 2024 16:17:47 +0800
+	s=arc-20240116; t=1722763307; c=relaxed/simple;
+	bh=YqVP8ZHxp1yJban5jv+izZlf+awTJjF2bAUM/uiFMDg=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OOVAuJdVola7LCZs2AoapY17uT4Ov7qSYJWJNDc16UnGdL7y3GHc/1l5h3jm9nbXeHn+gBsISsW+0JrraSW1NAddnRFehzNKtwVRa3LjrYQNdQyNAlPhGZrHLsTaG7QwR1ihWYYqXciXAQZtmB5Gk+DjAfp+ZZV5zrALTKUGhDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l81fgcw3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B6CF5C32786;
+	Sun,  4 Aug 2024 09:21:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722763306;
+	bh=YqVP8ZHxp1yJban5jv+izZlf+awTJjF2bAUM/uiFMDg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=l81fgcw3S5FNSYeV+Q8QEnZ/szHofUY9q6fZeCCOeMyjlDR4fu+iTQ0i1oJZYhHQ0
+	 cxzERANif8Fd137qhTWlkAtKVmvXcTtoMsrTaUgsqsVxsiXXiZnCvejAKZxPixiOXa
+	 2soST4lUHju5qpJo+gpL2I4Bpeyxagb+EtS7yuu7jsazgDpDwRBLzvCvyqcvzEdU0i
+	 k9O+Ls8ekj4QKEf7cvcmqCcjRqlm7o378JTY5rnXSr5ZKV7vA1THTql0bJ96nlr2N+
+	 KqKWgCpiwkgiCyGvFedNGmoUBU4CGJIZ2K5N8lVlpMgW3fvRbagZFxW3WsVJyRSOXr
+	 tMBYk/617UqdA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1saXQu-000kBS-Ac;
+	Sun, 04 Aug 2024 10:21:44 +0100
+Date: Sun, 04 Aug 2024 10:21:44 +0100
+Message-ID: <867ccw1w47.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: 	Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <zenghui.yu@linux.dev>
+Cc: Takahiro Itazuri <itazur@amazon.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Dave Martin <Dave.Martin@arm.com>,
+	linux-doc@vger.kernel.org,
+	kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	zulinx86@gmail.com,
+	kvmarm@lists.linux.dev,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	glider@google.com
+Subject: Re: [PATCH v2] docs: KVM: Fix register ID of SPSR_FIQ
+In-Reply-To: <401bebca-9637-4626-901f-e46b2d058768@linux.dev>
+References: <20230606154628.95498-1-itazur@amazon.com>
+	<401bebca-9637-4626-901f-e46b2d058768@linux.dev>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.3
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Subject: Re: [PATCH v2] docs: KVM: Fix register ID of SPSR_FIQ
-To: Takahiro Itazuri <itazur@amazon.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Dave Martin <Dave.Martin@arm.com>, linux-doc@vger.kernel.org,
- kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zulinx86@gmail.com,
- kvmarm@lists.linux.dev, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, James Morse <james.morse@arm.com>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, glider@google.com
-References: <20230606154628.95498-1-itazur@amazon.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Zenghui Yu <zenghui.yu@linux.dev>
-In-Reply-To: <20230606154628.95498-1-itazur@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: oliver.upton@linux.dev, zenghui.yu@linux.dev, itazur@amazon.com, pbonzini@redhat.com, corbet@lwn.net, Dave.Martin@arm.com, linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, zulinx86@gmail.com, kvmarm@lists.linux.dev, james.morse@arm.com, suzuki.poulose@arm.com, glider@google.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-+Cc kvmarm people and the list ...
-
-On 2023/6/6 23:46, Takahiro Itazuri wrote:
-> Fixes the register ID of SPSR_FIQ.
+On Sun, 04 Aug 2024 09:17:47 +0100,
+Zenghui Yu <zenghui.yu@linux.dev> wrote:
 > 
-> SPSR_FIQ is a 64-bit register and the 64-bit register size mask is
-> 0x0030000000000000ULL.
-> 
-> Fixes: fd3bc912d3d1 ("KVM: Documentation: Document arm64 core registers in detail")
-> Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
+> +Cc kvmarm people and the list ...
 
-... since you're fixing the encoding of an *arm64* core register and the
-mentioned commit fd3bc912d3d1 was merged via the kvmarm tree. I guess
-this is the main reason why this patch has been blocked on the list for
-over a year, as pointed out recently by Alexander [*].
+Thanks Zenghui.
 
 > 
-> ---
-> Changes from v1
-> - Add a description about the 64-bit register size mask in the commit
->   message.
-> - Link: https://lore.kernel.org/all/20230410121927.26953-1-itazur@amazon.com/
+> On 2023/6/6 23:46, Takahiro Itazuri wrote:
+> > Fixes the register ID of SPSR_FIQ.
+> > 
+> > SPSR_FIQ is a 64-bit register and the 64-bit register size mask is
+> > 0x0030000000000000ULL.
+> > 
+> > Fixes: fd3bc912d3d1 ("KVM: Documentation: Document arm64 core registers in detail")
+> > Signed-off-by: Takahiro Itazuri <itazur@amazon.com>
 > 
-> ---
->  Documentation/virt/kvm/api.rst | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> ... since you're fixing the encoding of an *arm64* core register and the
+> mentioned commit fd3bc912d3d1 was merged via the kvmarm tree. I guess
+> this is the main reason why this patch has been blocked on the list for
+> over a year, as pointed out recently by Alexander [*].
+
+That, and the fact that this is send to an email address I haven't
+been reachable on for about 5 years...
+
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index a5c803f39832..65dad2581751 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -2535,7 +2535,7 @@ Specifically:
->    0x6030 0000 0010 004a SPSR_ABT    64  spsr[KVM_SPSR_ABT]
->    0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
->    0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
-> -  0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
-> +  0x6030 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
->    0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]    [1]_
->    0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]    [1]_
->    ...
+> > 
+> > ---
+> > Changes from v1
+> > - Add a description about the 64-bit register size mask in the commit
+> >   message.
+> > - Link: https://lore.kernel.org/all/20230410121927.26953-1-itazur@amazon.com/
+> > 
+> > ---
+> >  Documentation/virt/kvm/api.rst | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> > index a5c803f39832..65dad2581751 100644
+> > --- a/Documentation/virt/kvm/api.rst
+> > +++ b/Documentation/virt/kvm/api.rst
+> > @@ -2535,7 +2535,7 @@ Specifically:
+> >    0x6030 0000 0010 004a SPSR_ABT    64  spsr[KVM_SPSR_ABT]
+> >    0x6030 0000 0010 004c SPSR_UND    64  spsr[KVM_SPSR_UND]
+> >    0x6030 0000 0010 004e SPSR_IRQ    64  spsr[KVM_SPSR_IRQ]
+> > -  0x6060 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
+> > +  0x6030 0000 0010 0050 SPSR_FIQ    64  spsr[KVM_SPSR_FIQ]
+> >    0x6040 0000 0010 0054 V0         128  fp_regs.vregs[0]    [1]_
+> >    0x6040 0000 0010 0058 V1         128  fp_regs.vregs[1]    [1]_
+> >    ...
+> 
+> The change itself looks reasonable.
+> 
+> Thanks,
+> Zenghui
+> 
+> [*] https://lore.kernel.org/all/20240802132036.914457-1-glider@google.com
 
-The change itself looks reasonable.
+In case Oliver picks this up for 6.11:
 
-Thanks,
-Zenghui
+Acked-by: Marc Zyngier <maz@kernel.org>
 
-[*] https://lore.kernel.org/all/20240802132036.914457-1-glider@google.com
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
