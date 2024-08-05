@@ -1,49 +1,49 @@
-Return-Path: <kvm+bounces-23294-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23298-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D774B948694
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 02:18:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E6FE9486DE
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 03:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14A551C2103D
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 00:18:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEEF72815BB
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 01:04:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3870F4A29;
-	Tue,  6 Aug 2024 00:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02C5B1EB44;
+	Tue,  6 Aug 2024 01:03:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gentwo.org header.i=@gentwo.org header.b="To+la7S5"
+	dkim=pass (1024-bit key) header.d=gentwo.org header.i=@gentwo.org header.b="QQ8tldQY"
 X-Original-To: kvm@vger.kernel.org
 Received: from gentwo.org (gentwo.org [62.72.0.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078F210E5;
-	Tue,  6 Aug 2024 00:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AEF59475;
+	Tue,  6 Aug 2024 01:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.72.0.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722903517; cv=none; b=qcW2XZcnBdmTLbKpFSDu1gClQaKrg+u2lFGPPCypooB1tlz+EHvoMuEAfyzaxZHb+LIL6Njq/9s2nqe++VH+VkZGy3jX8MY/CFCiZ/46IwY7LpgXAQ0BxonoVzM4mCOhErXRLGbMWXVqg5MrsMTkXQaYESkn9wQ5etDo5KsEBb8=
+	t=1722906218; cv=none; b=OncdVSGjfYi5K3gHPzPA9Oc/PeVQ9Pba3oKPog33BRFx52liSJRAlIiBLzXEzb2lVeBHYsu/O2Rm/lQa8V648jXCbXzHF0+jy7qhxd9d1QFzRSqde7Dl1XHeNPTXKpYtsdgtMXXz51j0DjKuoxX32n+vxSIO8TKY4KOYlC62eV8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722903517; c=relaxed/simple;
-	bh=AIwVlVYhRNiZJnUeGonomBvXhSHWG/wfktvdWfWGQd4=;
+	s=arc-20240116; t=1722906218; c=relaxed/simple;
+	bh=mI9/CNrBD5qXZqkW6Ldkif5sH8/bXop/GckPD/gd55A=;
 	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=qRjl7CVTJl8R8IdqOZBcWaZYhVixWMcwnaEQyMoQqqJ2N4LM5O+0kP/Pb0c/YQJ4A2cYbUcRc5uw7e7kQ64tw7fqud5/74RJg6bqwlM6S9dwjvtD1eqc/Hsp2JQjAL6k8zMwf7O5axVwS5f7IDAR3uee63TyPNRN8VqrX9+lDmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gentwo.org; spf=pass smtp.mailfrom=gentwo.org; dkim=pass (1024-bit key) header.d=gentwo.org header.i=@gentwo.org header.b=To+la7S5; arc=none smtp.client-ip=62.72.0.81
+	 MIME-Version:Content-Type; b=ZuCeJ+FdPyd9bPcDg0mBo9GEpGbC/fx0/xxqkPzEhRrZULw7W1I2MK4UeInaRjoO8Ra5b85qrr8mwUEJoq8DwNRgx4Bugq+1layBDGU5AnonlWo/4vAtPB3PsaDqvEg77abNYoQqDIJi/gE8gI32t3OZX4C5JHPRfl2VXR98aR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gentwo.org; spf=pass smtp.mailfrom=gentwo.org; dkim=pass (1024-bit key) header.d=gentwo.org header.i=@gentwo.org header.b=QQ8tldQY; arc=none smtp.client-ip=62.72.0.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=gentwo.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gentwo.org
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gentwo.org;
-	s=default; t=1722899240;
-	bh=AIwVlVYhRNiZJnUeGonomBvXhSHWG/wfktvdWfWGQd4=;
+	s=default; t=1722899398;
+	bh=mI9/CNrBD5qXZqkW6Ldkif5sH8/bXop/GckPD/gd55A=;
 	h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-	b=To+la7S5p3eu3qmBjPe5pgJ9FVxctQOu0NnZMHOmM2eDjMDtN8VMPuGKganesl+D/
-	 1MGkpzzXp7rtfuVSht+sKxomEGi3/whNNTcoXZlK1HxJBI1bagsB5bhD5ISXJJx8cu
-	 ct/oG6XWQBZNB4drdnS38OhUZoiD8PyEbKscMPt8=
+	b=QQ8tldQYNuBdPn9xY6a20azTd0sdwHKhcR/eapjZTCzSNoTpabS307v8Ygb81en/Z
+	 mat7wjips2JSHK5yyI2pW8jghlQzeBFDTfTZWLdjFQIsgQUURJF6S3GXi0afZPMc+Y
+	 fSNRclbuyOYsljB1FCyCO8BjzSTlkteUdDh/grdY=
 Received: by gentwo.org (Postfix, from userid 1003)
-	id 5284E4035B; Mon,  5 Aug 2024 16:07:20 -0700 (PDT)
+	id 1DF9840402; Mon,  5 Aug 2024 16:09:58 -0700 (PDT)
 Received: from localhost (localhost [127.0.0.1])
-	by gentwo.org (Postfix) with ESMTP id 50FD3401CA;
-	Mon,  5 Aug 2024 16:07:20 -0700 (PDT)
-Date: Mon, 5 Aug 2024 16:07:20 -0700 (PDT)
+	by gentwo.org (Postfix) with ESMTP id 1AB86401CA;
+	Mon,  5 Aug 2024 16:09:58 -0700 (PDT)
+Date: Mon, 5 Aug 2024 16:09:58 -0700 (PDT)
 From: "Christoph Lameter (Ampere)" <cl@gentwo.org>
 To: Ankur Arora <ankur.a.arora@oracle.com>
 cc: linux-pm@vger.kernel.org, kvm@vger.kernel.org, 
@@ -56,11 +56,11 @@ cc: linux-pm@vger.kernel.org, kvm@vger.kernel.org,
     harisokn@amazon.com, mtosatti@redhat.com, sudeep.holla@arm.com, 
     misono.tomohiro@fujitsu.com, joao.m.martins@oracle.com, 
     boris.ostrovsky@oracle.com, konrad.wilk@oracle.com
-Subject: Re: [PATCH v6 01/10] cpuidle/poll_state: poll via
- smp_cond_load_relaxed()
-In-Reply-To: <20240726201332.626395-2-ankur.a.arora@oracle.com>
-Message-ID: <29534bd1-1628-e0fb-eb81-6b789133ff43@gentwo.org>
-References: <20240726201332.626395-1-ankur.a.arora@oracle.com> <20240726201332.626395-2-ankur.a.arora@oracle.com>
+Subject: Re: [PATCH v6 02/10] cpuidle: rename ARCH_HAS_CPU_RELAX to
+ ARCH_HAS_OPTIMIZED_POLL
+In-Reply-To: <20240726201332.626395-3-ankur.a.arora@oracle.com>
+Message-ID: <43b24caf-2ade-e229-21f4-8c01a47f37ed@gentwo.org>
+References: <20240726201332.626395-1-ankur.a.arora@oracle.com> <20240726201332.626395-3-ankur.a.arora@oracle.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -71,37 +71,13 @@ Content-Type: text/plain; charset=US-ASCII; format=flowed
 
 On Fri, 26 Jul 2024, Ankur Arora wrote:
 
-> diff --git a/drivers/cpuidle/poll_state.c b/drivers/cpuidle/poll_state.c
-> index 9b6d90a72601..532e4ed19e0f 100644
-> --- a/drivers/cpuidle/poll_state.c
-> +++ b/drivers/cpuidle/poll_state.c
-> @@ -21,21 +21,21 @@ static int __cpuidle poll_idle(struct cpuidle_device *dev,
->
-> 	raw_local_irq_enable();
-> 	if (!current_set_polling_and_test()) {
-> -		unsigned int loop_count = 0;
-> +		unsigned int loop_count;
-> 		u64 limit;
+> However, recent changes in poll_idle() mean that a higher level
+> primitive -- smp_cond_load_relaxed() is used for polling. This would
+> in-turn use cpu_relax() or an architecture specific implementation.
 
-loop_count is only used in the while loop below. So the declaration 
-could be placed below the while.
 
->
-> 		limit = cpuidle_poll_time(drv, dev);
->
-> 		while (!need_resched()) {
-> -			cpu_relax();
-> -			if (loop_count++ < POLL_IDLE_RELAX_COUNT)
-> -				continue;
-> -
-> 			loop_count = 0;
-> 			if (local_clock_noinstr() - time_start > limit) {
-> 				dev->poll_time_limit = true;
-> 				break;
-> 			}
-
-Looks ok otherwise
-
-Reviewed-by: Christoph Lameter <cl@linux.com>
+Maybe explain here that smp_cond_load_relaxed will potentially wait for 
+important events such as a cacheline changing. Thereby making the busy 
+poll unnecessary and optimizing power use.
 
 
