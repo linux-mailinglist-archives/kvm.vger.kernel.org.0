@@ -1,296 +1,375 @@
-Return-Path: <kvm+bounces-23216-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23217-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A60FA947A34
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 13:05:26 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 355D2947A37
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 13:06:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34F191F21981
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 11:05:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 973A9B22148
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 11:06:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D151553B1;
-	Mon,  5 Aug 2024 11:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 340531553B1;
+	Mon,  5 Aug 2024 11:06:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="enbaifhC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iDOc+MBi"
 X-Original-To: kvm@vger.kernel.org
-Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC1113AD11;
-	Mon,  5 Aug 2024 11:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B241537D9
+	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 11:06:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722855914; cv=none; b=TnzO8VJ/xwmtqioDzHQ57Se+4ZrWTNaoMGNFdfg8GXCg/DEVq1vNwKKSogKdXyZt9VRjDN0xjkF9piO4WKHX7J/1iS4TCoqixRhG/2S8+V4Vr0yT5iSnhGXcPS2Al59ZtAy3j2C4mS0mCh9qQ/cZwTD+nrGFLDU0KJVsWEqmjxw=
+	t=1722856005; cv=none; b=eWhtoYE7hgZjMUlLiljmxxfwBXaB6H2j8FpD+2xs9w0vfO77116n3pTXLAwuWdr/fc5zpoFsV0PEnFhJj6YdKEyw7nzF8eX+rhcHjHVXuffyOerWMU3vizuiEA/FdZhei84Qhu78MUKmtNMMdVRhuOL1XgPyrmvARrwazrfiDZY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722855914; c=relaxed/simple;
-	bh=xwtO5RXzHBcmxQL5633aul60YJaq4nzOWX+xo+zdUac=;
+	s=arc-20240116; t=1722856005; c=relaxed/simple;
+	bh=ZROb3dB2VaVaGsnp5zkOSyH+sb3xDkLcZAhsWX2SuaU=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=B9RnsRjfGhfWA5QmKldoOhV9KELdljxPQ5HGlBBoez7b8UyPlKIj5bRjYOhhH3DXrYh53y4pMxCIJ0Pu1HX7KJEo4y+eKuQooeri0OZxz//bLiglSCV1epvw6uGnfzPCzl7+NLyuRo925hFnsMVAS8uea9aF8hj7SZmHV5FEwaI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=casper.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=enbaifhC; arc=none smtp.client-ip=90.155.50.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=casper.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=casper.20170209; h=MIME-Version:Content-Type:References:
-	In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=xwtO5RXzHBcmxQL5633aul60YJaq4nzOWX+xo+zdUac=; b=enbaifhC3m1JrpJqszHaxaZXV7
-	a5eepbreqci1P8O7YcG6m5wl5I4CMc8ZdjoM72h16KHh30nn56L1nHOws4e8fneJ7D5yAA72IAUsP
-	SnFMswjpc1zrYFd7zqKco/GIM+NefRsdSMPphQm4AlJiyfL3Ab/7PlToVli44E0RBqB0w1QKAiPmR
-	xYotAuwgDwuuPe/P5uwN7UzD5VyRh53UtK5+IOSoxEWBWNCKHdEwplem4ZAmkTz1gkYJjOoUQZO4N
-	PZc9QfNiFQB+DdLQDki8tvoCTsZNFLex0DKlC+fd0xmE+E0wiUWdTiobb+FF4BN1CrB2ZYY5EaqE6
-	Un6VsLdw==;
-Received: from [2001:8b0:10b:5:24c3:c120:52d3:3ec3] (helo=u3832b3a9db3152.ant.amazon.com)
-	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1savWI-00000004BP1-1fUe;
-	Mon, 05 Aug 2024 11:04:54 +0000
-Message-ID: <294c8c437c2e48b318b8c27eb7467430dfcba92b.camel@infradead.org>
-Subject: Re: [PATCH v2 6/8] KVM: Fix multiple races in gfn=>pfn cache refresh
-From: David Woodhouse <dwmw2@infradead.org>
-To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
- <pbonzini@redhat.com>,  "Hussain, Mushahid" <hmushi@amazon.co.uk>
-Cc: Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li
- <wanpengli@tencent.com>,  Jim Mattson <jmattson@google.com>, Joerg Roedel
- <joro@8bytes.org>, kvm@vger.kernel.org,  linux-kernel@vger.kernel.org,
- Mingwei Zhang <mizhang@google.com>, Maxim Levitsky <mlevitsk@redhat.com>
-Date: Mon, 05 Aug 2024 12:04:53 +0100
-In-Reply-To: <20220427014004.1992589-7-seanjc@google.com>
-References: <20220427014004.1992589-1-seanjc@google.com>
-	 <20220427014004.1992589-7-seanjc@google.com>
-Content-Type: multipart/signed; micalg="sha-256"; protocol="application/pkcs7-signature";
-	boundary="=-pYINBt3vSQZ5N5ARMJLf"
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	 Content-Type:MIME-Version; b=cZeEca676U9Rl1bU79KJWR2uwE8QwQjP7azeXs0131YEpivf5RILpoIsg75eiMPLAz9dDKOWZiKl2W+vPRF4AVjDvlyFWxndN+3mtMNzn7xd+12SWimDhNZKShjqo1Ai+jDdIG6q7gv8DGcW0XgjqSwHksqCFRqsh3s7ZplQB10=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iDOc+MBi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722856002;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0EuEhaqkma5nF/MDa1ex/CbEv6H+NURzLYv8ieItZpQ=;
+	b=iDOc+MBiiQvuTmsT/DPTESxV+ApZy9NgcilY05hm8MtkVeoH4F89sxAp/MmfqTmvWsVMb5
+	mwClmVb9guKbTKMAyK4ceYgrXiFWhuCOpIN4I6aU0auumA52w9vrLiLGurAvdDNv/tUqeI
+	lNbNjRDRAGMg1pmEvYDOycxdH9/b2m0=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-650-2mPNRhHWN5avDJWDHoWZ0Q-1; Mon, 05 Aug 2024 07:06:39 -0400
+X-MC-Unique: 2mPNRhHWN5avDJWDHoWZ0Q-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3684ea1537fso5293131f8f.1
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 04:06:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722855998; x=1723460798;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0EuEhaqkma5nF/MDa1ex/CbEv6H+NURzLYv8ieItZpQ=;
+        b=Y2MdO/hYqTj7uOZdnF1YPWRl5QYlciwlI0zolekIcSziOu4FJbASaJgiXzDXuzWs+q
+         tj4zOUh4q6nVKU5yqtC5CQwrJv47OXq9/Ug78G73smlk99YV2XzO/Acg/ZrRrvQ8A+ZC
+         itRZsF7hSJBAw7wuzLdjySPshUe1bYnVNupQe9vyXvwWt4iNA18aLg9tWkG7kXgfCfU9
+         LpvLWF+YoouJHWfwefp6Bs9MM2+htx2MX+0rk4UcCRJbDi4PyLdLyn41cD5W0N7G5de/
+         c1Ic1zG8i5VIhdV82h/mUUGpUb+3bUSSd+5E0HjOnyPyFBUw/C4Ic/FUsSVdsHs9WBhB
+         c3PA==
+X-Forwarded-Encrypted: i=1; AJvYcCXh3VkID1R9IXe3V2dK/B27+n7t6YMnrAzMfDb2Q5XeWvNlcydwOmrma8U7m9Te+pEMS6EFP68Ylsc5o4oEqCKMnoVW
+X-Gm-Message-State: AOJu0YzQBHagQIMIxBcjwHMQrwroIpyHGnB0+fdukCjJBPpR40MXry2d
+	LS6BWdd/armBPAVrszZxQHIycpKkR4VsJMq0rZYZBQknh0/XYT8GVvPqQUCra8ptrvLmyK4Fi2i
+	8BmdjZYUQ6cR5Eke2LKZl6Ra2K3hlyqbNgAiWxG0kbTe6EHYr2Q==
+X-Received: by 2002:a5d:518c:0:b0:366:e7aa:7fa5 with SMTP id ffacd0b85a97d-36bbc0f7f87mr7350779f8f.1.1722855997900;
+        Mon, 05 Aug 2024 04:06:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF6dg7LPJI84OZv+IpNHY8eZR1NrMnc4r04apwnaanq3LD1mnPJZ5UQZpkQV2fYA8faTO8Xtg==
+X-Received: by 2002:a5d:518c:0:b0:366:e7aa:7fa5 with SMTP id ffacd0b85a97d-36bbc0f7f87mr7350755f8f.1.1722855997347;
+        Mon, 05 Aug 2024 04:06:37 -0700 (PDT)
+Received: from intellaptop.lan ([2a06:c701:778d:5201:3e8a:4c9c:25dd:6ccc])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbcf0cc58sm9526157f8f.2.2024.08.05.04.06.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 04:06:36 -0700 (PDT)
+Message-ID: <8f35b524cda53aff29a9389c79742fc14f77ec68.camel@redhat.com>
+Subject: Re: [PATCH v2 22/49] KVM: x86: Add a macro to precisely handle
+ aliased 0x1.EDX CPUID features
+From: mlevitsk@redhat.com
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov
+ <vkuznets@redhat.com>,  kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Hou Wenlong <houwenlong.hwl@antgroup.com>, Kechen Lu <kechenl@nvidia.com>,
+ Oliver Upton <oliver.upton@linux.dev>, Binbin Wu
+ <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>,
+ Robert Hoo <robert.hoo.linux@gmail.com>
+Date: Mon, 05 Aug 2024 14:06:35 +0300
+In-Reply-To: <ZqKb_JJlUED5JUHP@google.com>
+References: <20240517173926.965351-1-seanjc@google.com>
+	 <20240517173926.965351-23-seanjc@google.com>
+	 <43ef06aca700528d956c8f51101715df86f32a91.camel@redhat.com>
+	 <ZoxVa55MIbAz-WnM@google.com>
+	 <3da2be9507058a15578b5f736bc179dc3b5e970f.camel@redhat.com>
+	 <ZqKb_JJlUED5JUHP@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4 (3.44.4-3.fc36) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by casper.infradead.org. See http://www.infradead.org/rpr.html
+
+=D0=A3 =D1=87=D1=82, 2024-07-25 =D1=83 11:39 -0700, Sean Christopherson =D0=
+=BF=D0=B8=D1=88=D0=B5:
+> > On Wed, Jul 24, 2024, Maxim Levitsky wrote:
+> > > > On Mon, 2024-07-08 at 14:08 -0700, Sean Christopherson wrote:
+> > > > > > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
+> > > > > > > > On Fri, 2024-05-17 at 10:38 -0700, Sean Christopherson wrot=
+e:
+> > > > > > > > > > Add a macro to precisely handle CPUID features that AMD=
+ duplicated from
+> > > > > > > > > > CPUID.0x1.EDX into CPUID.0x8000_0001.EDX.=C2=A0 This wi=
+ll allow adding an
+> > > > > > > > > > assert that all features passed to kvm_cpu_cap_init() m=
+atch the word being
+> > > > > > > > > > processed, e.g. to prevent passing a feature from CPUID=
+ 0x7 to CPUID 0x1.
+> > > > > > > > > >=20
+> > > > > > > > > > Because the kernel simply reuses the X86_FEATURE_* defi=
+nitions from
+> > > > > > > > > > CPUID.0x1.EDX, KVM's use of the aliased features would =
+result in false
+> > > > > > > > > > positives from such an assert.
+> > > > > > > > > >=20
+> > > > > > > > > > No functional change intended.
+> > > > > > > > > >=20
+> > > > > > > > > > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > > > > > > > > > ---
+> > > > > > > > > > =C2=A0arch/x86/kvm/cpuid.c | 24 +++++++++++++++++------=
+-
+> > > > > > > > > > =C2=A01 file changed, 17 insertions(+), 7 deletions(-)
+> > > > > > > > > >=20
+> > > > > > > > > > diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.=
+c
+> > > > > > > > > > index 5e3b97d06374..f2bd2f5c4ea3 100644
+> > > > > > > > > > --- a/arch/x86/kvm/cpuid.c
+> > > > > > > > > > +++ b/arch/x86/kvm/cpuid.c
+> > > > > > > > > > @@ -88,6 +88,16 @@ u32 xstate_required_size(u64 xstate_=
+bv, bool compacted)
+> > > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(name)=
+;=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0\
+> > > > > > > > > > =C2=A0})
+> > > > > > > > > > =C2=A0
+> > > > > > > > > > +/*
+> > > > > > > > > > + * Aliased Features - For features in 0x8000_0001.EDX =
+that are duplicates of
+> > > > > > > > > > + * identical 0x1.EDX features, and thus are aliased fr=
+om 0x1 to 0x8000_0001.
+> > > > > > > > > > + */
+> > > > > > > > > > +#define AF(name)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0\
+> > > > > > > > > > +({=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0\
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0BUILD_BUG_ON=
+(__feature_leaf(X86_FEATURE_##name) !=3D CPUID_1_EDX);=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0\
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0feature_bit(=
+name);=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0\
+> > > > > > > > > > +})
+> > > > > > > > > > +
+> > > > > > > > > > =C2=A0/*
+> > > > > > > > > > =C2=A0 * Magic value used by KVM when querying userspac=
+e-provided CPUID entries and
+> > > > > > > > > > =C2=A0 * doesn't care about the CPIUD index because the=
+ index of the function in
+> > > > > > > > > > @@ -758,13 +768,13 @@ void kvm_set_cpu_caps(void)
+> > > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0);
+> > > > > > > > > > =C2=A0
+> > > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0kvm_cpu=
+_cap_init(CPUID_8000_0001_EDX,
+> > > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(FPU) | F(VME) | F(DE) | F(PSE) |
+> > > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(TSC) | F(MSR) | F(PAE) | F(MCE) |
+> > > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(CX8) | F(APIC) | 0 /* Reserved */ | F=
+(SYSCALL) |
+> > > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(MTRR) | F(PGE) | F(MCA) | F(CMOV) |
+> > > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(PAT) | F(PSE36) | 0 /* Reserved */ |
+> > > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(NX) | 0 /* Reserved */ | F(MMXEXT) | =
+F(MMX) |
+> > > > > > > > > > -=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(FXSR) | F(FXSR_OPT) | X86_64_F(GBPAGE=
+S) | F(RDTSCP) |
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AF(FPU) | AF(VME) | AF(DE) | AF(PSE) |
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AF(TSC) | AF(MSR) | AF(PAE) | AF(MCE) |
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AF(CX8) | AF(APIC) | 0 /* Reserved */ |=
+ F(SYSCALL) |
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AF(MTRR) | AF(PGE) | AF(MCA) | AF(CMOV)=
+ |
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AF(PAT) | AF(PSE36) | 0 /* Reserved */ =
+|
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0F(NX) | 0 /* Reserved */ | F(MMXEXT) | =
+AF(MMX) |
+> > > > > > > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0AF(FXSR) | F(FXSR_OPT) | X86_64_F(GBPAG=
+ES) | F(RDTSCP) |
+> > > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A00 /* Reserved */ | X86_64_F(LM) |=
+ F(3DNOWEXT) | F(3DNOW)
+> > > > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0);
+> > > > > > > > > > =C2=A0
+> > > > > > > >=20
+> > > > > > > > Hi,
+> > > > > > > >=20
+> > > > > > > > What if we defined the aliased features instead.
+> > > > > > > > Something like this:
+> > > > > > > >=20
+> > > > > > > > #define __X86_FEATURE_8000_0001_ALIAS(feature) \
+> > > > > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0(feature + =
+(CPUID_8000_0001_EDX - CPUID_1_EDX) * 32)
+> > > > > > > >=20
+> > > > > > > > #define KVM_X86_FEATURE_FPU_ALIAS=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0__X86_FEATURE_8000_0001_ALIAS(KVM_X86_FEATURE_FPU)
+> > > > > > > > #define KVM_X86_FEATURE_VME_ALIAS=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0__X86_FEATURE_8000_0001_ALIAS(KVM_X86_FEATURE_VME)
+> > > > > > > >=20
+> > > > > > > > And then just use for example the 'F(FPU_ALIAS)' in the CPU=
+ID_8000_0001_EDX
+> > > > > >=20
+> > > > > > At first glance, I really liked this idea, but after working th=
+rough the
+> > > > > > ramifications, I think I prefer "converting" the flag when pass=
+ing it to
+> > > > > > kvm_cpu_cap_init().=C2=A0 In-place conversion makes it all but =
+impossible for KVM to
+> > > > > > check the alias, e.g. via guest_cpu_cap_has(), especially since=
+ the AF() macro
+> > > > > > doesn't set the bits in kvm_known_cpu_caps (if/when a non-hacky=
+ validation of
+> > > > > > usage becomes reality).
+> > > >=20
+> > > > Could you elaborate on this as well?
+> > > >=20
+> > > > My suggestion was that we can just treat aliases as completely inde=
+pendent
+> > > > and dummy features, say KVM_X86_FEATURE_FPU_ALIAS, and pass them as=
+ is to the
+> > > > guest, which means that if an alias is present in host cpuid, it ap=
+pears in
+> > > > kvm caps, and thus qemu can then set it in guest cpuid.
+> > > >=20
+> > > > I don't think that we need any special treatment for them if you lo=
+ok at it
+> > > > this way.=C2=A0 If you don't agree, can you give me an example?
+> >=20
+> > KVM doesn't honor the aliases beyond telling userspace they can be set =
+(see below
+> > for all the aliased features that KVM _should_ be checking).=C2=A0 The =
+APM clearly
+> > states that the features are the same as their CPUID.0x1 counterparts, =
+but Intel
+> > CPUs don't support the aliases.=C2=A0 So, as you also note below, I thi=
+nk we could
+> > unequivocally say that enumerating the aliases but not the "real" featu=
+res is a
+> > bogus CPUID model, but we can't say the opposite, i.e. the real feature=
+s can
+> > exists without the aliases.
+> >=20
+> > And that means that KVM must never query the aliases, e.g. should never=
+ do
+> > guest_cpu_cap_has(KVM_X86_FEATURE_FPU_ALIAS), because the result is ess=
+entially
+> > meaningless.=C2=A0 It's a small thing, but if KVM_X86_FEATURE_FPU_ALIAS=
+ simply doesn't
+> > exist, i.e. we do in-place conversion, then it's impossible to feed the=
+ aliases
+> > into things like guest_cpu_cap_has().
+
+This only makes my case stronger - treating the aliases as just features wi=
+ll
+allow us to avoid adding more logic to code which is already too complex IM=
+HO.
+
+If your concern is that features could be queried by guest_cpu_cap_has()
+that is easy to fix, we can (and should) put them into a separate file and
+#include them only in cpuid.c.
+
+We can even #undef the __X86_FEATURE_8000_0001_ALIAS macro after the kvm_se=
+t_cpu_caps,
+then if I understand the macro pre-processor correctly, any use of feature =
+alias
+macros will not fully evaluate and cause a compile error.
 
 
---=-pYINBt3vSQZ5N5ARMJLf
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
 
-T24gV2VkLCAyMDIyLTA0LTI3IGF0IDAxOjQwICswMDAwLCBTZWFuIENocmlzdG9waGVyc29uIHdy
-b3RlOgo+IFJld29yayB0aGUgZ2ZuPT5wZm4gY2FjaGUgKGdwYykgcmVmcmVzaCBsb2dpYyB0byBh
-ZGRyZXNzIG11bHRpcGxlIHJhY2VzCj4gYmV0d2VlbiB0aGUgY2FjaGUgaXRzZWxmLCBhbmQgYmV0
-d2VlbiB0aGUgY2FjaGUgYW5kIG1tdV9ub3RpZmllciBldmVudHMuCj4gCj4gVGhlIGV4aXN0aW5n
-IHJlZnJlc2ggY29kZSBhdHRlbXB0cyB0byBndWFyZCBhZ2FpbnN0IHJhY2VzIHdpdGggdGhlCj4g
-bW11X25vdGlmaWVyIGJ5IHNwZWN1bGF0aXZlbHkgbWFya2luZyB0aGUgY2FjaGUgdmFsaWQsIGFu
-ZCB0aGVuIG1hcmtpbmcKPiBpdCBpbnZhbGlkIGlmIGEgbW11X25vdGlmaWVyIGludmFsaWRhdGlv
-biBvY2N1cnMuwqAgVGhhdCBoYW5kbGVzIHRoZSBjYXNlCj4gd2hlcmUgYW4gaW52YWxpZGF0aW9u
-IG9jY3VycyBiZXR3ZWVuIGRyb3BwaW5nIGFuZCByZS1hY3F1aXJpbmcgZ3BjLT5sb2NrLAo+IGJ1
-dCBpdCBkb2Vzbid0IGhhbmRsZSB0aGUgc2NlbmFyaW8gd2hlcmUgdGhlIGNhY2hlIGlzIHJlZnJl
-c2hlZCBhZnRlciB0aGUKPiBjYWNoZSB3YXMgaW52YWxpZGF0ZWQgYnkgdGhlIG5vdGlmaWVyLCBi
-dXQgYmVmb3JlIHRoZSBub3RpZmllciBlbGV2YXRlcwo+IG1tdV9ub3RpZmllcl9jb3VudC7CoCBU
-aGUgZ3BjIHJlZnJlc2ggY2FuJ3QgdXNlIHRoZSAicmV0cnkiIGhlbHBlciBhcyBpdHMKPiBpbnZh
-bGlkYXRpb24gb2NjdXJzIF9iZWZvcmVfIG1tdV9ub3RpZmllcl9jb3VudCBpcyBlbGV2YXRlZCBh
-bmQgYmVmb3JlCj4gbW11X25vdGlmaWVyX3JhbmdlX3N0YXJ0IGlzIHNldC91cGRhdGVkLgo+IAo+
-IMKgIENQVTDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgIENQVTEKPiDCoCAtLS0twqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAtLS0tCj4g
-Cj4gwqAgZ2ZuX3RvX3Bmbl9jYWNoZV9pbnZhbGlkYXRlX3N0YXJ0KCkKPiDCoCB8Cj4gwqAgLT4g
-Z3BjLT52YWxpZCA9IGZhbHNlOwo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAga3ZtX2dmbl90
-b19wZm5fY2FjaGVfcmVmcmVzaCgpCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8Cj4gwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8LT4gZ3BjLT52YWxpZCA9IHRydWU7Cj4gCj4gwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoCBodmFfdG9fcGZuX3JldHJ5KCkKPiDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgIHwKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIC0+IGFjcXVpcmUga3ZtLT5t
-bXVfbG9jawo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAga3ZtLT5tbXVfbm90aWZp
-ZXJfY291bnQgPT0gMAo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgbW11X3NlcSA9
-PSBrdm0tPm1tdV9ub3RpZmllcl9zZXEKPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-IGRyb3Aga3ZtLT5tbXVfbG9jawo+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgcmV0
-dXJuIHBmbiAnWCcKPiDCoCBhY3F1aXJlIGt2bS0+bW11X2xvY2sKPiDCoCBrdm1faW5jX25vdGlm
-aWVyX2NvdW50KCkKPiDCoCBkcm9wIGt2bS0+bW11X2xvY2soKQo+IMKgIGtlcm5lbCBmcmVlcyBw
-Zm4gJ1gnCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBrdm1fZ2ZuX3RvX3Bmbl9jYWNoZV9j
-aGVjaygpCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB8Cj4gwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoCB8LT4gZ3BjLT52YWxpZCA9PSB0cnVlCj4gCj4gwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoCBjYWxsZXIgYWNjZXNzZXMgZnJlZWQgcGZuICdYJwo+IAo+IEtleSBvZmYgb2YgbW5fYWN0
-aXZlX2ludmFsaWRhdGVfY291bnQgdG8gZGV0ZWN0IHRoYXQgYSBwZm5jYWNoZSByZWZyZXNoCj4g
-bmVlZHMgdG8gd2FpdCBmb3IgYW4gaW4tcHJvZ3Jlc3MgbW11X25vdGlmaWVyIGludmFsaWRhdGlv
-bi7CoCBXaGlsZQo+IG1uX2FjdGl2ZV9pbnZhbGlkYXRlX2NvdW50IGlzIG5vdCBndWFyYW50ZWVk
-IHRvIGJlIHN0YWJsZSwgaXQgaXMKPiBndWFyYW50ZWVkIHRvIGJlIGVsZXZhdGVkIHByaW9yIHRv
-IGFuIGludmFsaWRhdGlvbiBhY3F1aXJpbmcgZ3BjLT5sb2NrLAo+IHNvIGVpdGhlciB0aGUgcmVm
-cmVzaCB3aWxsIHNlZSBhbiBhY3RpdmUgaW52YWxpZGF0aW9uIGFuZCB3YWl0LCBvciB0aGUKPiBp
-bnZhbGlkYXRpb24gd2lsbCBydW4gYWZ0ZXIgdGhlIHJlZnJlc2ggY29tcGxldGVzLgo+IAo+IFNw
-ZWN1bGF0aXZlbHkgbWFya2luZyB0aGUgY2FjaGUgdmFsaWQgaXMgaXRzZWxmIGZsYXdlZCwgYXMg
-YSBjb25jdXJyZW50Cj4ga3ZtX2dmbl90b19wZm5fY2FjaGVfY2hlY2soKSB3b3VsZCBzZWUgYSB2
-YWxpZCBjYWNoZSB3aXRoIHN0YWxlIHBmbi9raHZhCj4gdmFsdWVzLsKgIFRoZSBLVk0gWGVuIHVz
-ZSBjYXNlIGV4cGxpY2l0bHkgYWxsb3dzL3dhbnRzIG11bHRpcGxlIHVzZXJzOwo+IGV2ZW4gdGhv
-dWdoIHRoZSBjYWNoZXMgYXJlIGFsbG9jYXRlZCBwZXIgdkNQVSwgX19rdm1feGVuX2hhc19pbnRl
-cnJ1cHQoKQo+IGNhbiByZWFkIGEgZGlmZmVyZW50IHZDUFUgKG9yIHZDUFVzKS7CoCBBZGRyZXNz
-IHRoaXMgcmFjZSBieSBpbnZhbGlkYXRpbmcKPiB0aGUgY2FjaGUgcHJpb3IgdG8gZHJvcHBpbmcg
-Z3BjLT5sb2NrICh0aGlzIGlzIG1hZGUgcG9zc2libGUgYnkgZml4aW5nCj4gdGhlIGFib3ZlIG1t
-dV9ub3RpZmllciByYWNlKS4KPiAKPiBGaW5hbGx5LCB0aGUgcmVmcmVzaCBsb2dpYyBkb2Vzbid0
-IHByb3RlY3QgYWdhaW5zdCBjb25jdXJyZW50IHJlZnJlc2hlcwo+IHdpdGggZGlmZmVyZW50IEdQ
-QXMgKHdoaWNoIG1heSBvciBtYXkgbm90IGJlIGEgZGVzaXJlZCB1c2UgY2FzZSwgYnV0IGl0cwo+
-IGFsbG93ZWQgaW4gdGhlIGNvZGUpLCBub3IgZG9lcyBpdCBwcm90ZWN0IGFnYWluc3QgYSBmYWxz
-ZSBuZWdhdGl2ZSBvbiB0aGUKPiBtZW1zbG90IGdlbmVyYXRpb24uwqAgSWYgdGhlIGZpcnN0IHJl
-ZnJlc2ggc2VlcyBhIHN0YWxlIG1lbXNsb3QgZ2VuZXJhdGlvbiwKPiBpdCB3aWxsIHJlZnJlc2gg
-dGhlIGh2YSBhbmQgZ2VuZXJhdGlvbiBiZWZvcmUgbW92aW5nIG9uIHRvIHRoZSBodmE9PnBmbgo+
-IHRyYW5zbGF0aW9uLsKgIElmIGl0IHRoZW4gZHJvcHMgZ3BjLT5sb2NrLCBhIGRpZmZlcmVudCB1
-c2VyIGNhbiBjb21lIGFsb25nLAo+IGFjcXVpcmUgZ3BjLT5sb2NrLCBzZWUgdGhhdCB0aGUgbWVt
-c2xvdCBnZW5lcmF0aW9uIGlzIGZyZXNoLCBhbmQgc2tpcAo+IHRoZSBodmE9PnBmbiB1cGRhdGUg
-ZHVlIHRvIHRoZSB1c2Vyc3BhY2UgYWRkcmVzcyBhbHNvIG1hdGNoaW5nIChiZWNhdXNlCj4gaXQg
-dG9vIHdhcyB1cGRhdGVkKS7CoCBBZGRyZXNzIHRoaXMgcmFjZSBieSBhZGRpbmcgYW4gImluLXBy
-b2dyZXNzIiBmbGFnCj4gc28gdGhhdCB0aGUgcmVmcmVzaCB0aGF0IGFjcXVpcmVzIGdwYy0+bG9j
-ayBmaXJzdCBydW5zIHRvIGNvbXBsZXRpb24KPiBiZWZvcmUgb3RoZXIgdXNlcnMgY2FuIHN0YXJ0
-IHRoZWlyIHJlZnJlc2guCj4gCj4gQ29tcGxpY2F0aW5nIGFsbCBvZiB0aGlzIGlzIHRoZSBmYWN0
-IHRoYXQgYm90aCB0aGUgaHZhPT5wZm4gcmVzb2x1dGlvbgo+IGFuZCBtYXBwaW5nIG9mIHRoZSBr
-ZXJuZWwgYWRkcmVzcyBjYW4gc2xlZXAsIGkuZS4gbXVzdCBiZSBkb25lIG91dHNpZGUKPiBvZiBn
-cGMtPmxvY2sKPiAKPiBGaXggdGhlIGFib3ZlIHJhY2VzIGluIG9uZSBmZWxsIHN3b29wLCB0cnlp
-bmcgdG8gZml4IGVhY2ggaW5kaXZpZHVhbCByYWNlCj4gaW4gYSBzYW5lIG1hbm5lciBpcyBpbXBv
-c3NpYmxlLCBmb3IgYWxsIGludGVudHMgYW5kIHB1cnBvc2VzLgoKSG0sIHRoZSBwcm9ibGVtIHdp
-dGggdGhpcyAoY29tbWl0IDU4Y2Q0MDdjYTRjNjI3OCkgaXMgdGhhdCBpdCBlbmRzIHVwCmFjdGlu
-ZyBsaWtlIGEgKnJlYWxseSogdW5mYWlyIHJlYWQvd3JpdGUgbG9jay4KCklmIHRoZXJlIGFyZSBh
-IGxvdCBvZiAnd3JpdGVycycgaW52YWxpZGF0aW5nIG90aGVyIEhWQSByYW5nZXMsIHRoZW4gdGhl
-Cmh2YV90b19wZm5fcmV0cnkoKSBmdW5jdGlvbiBhcyB0aGUgJ3JlYWRlcicgd2lsbCBiYWNrIG9m
-ZiBmb3IgZXZlciBhbmQKbmV2ZXIgbWFrZSBwcm9ncmVzcy4gRXZlbiB3aGlsZSBhIHNpbmdsZSBv
-dGhlciBpbnZhbGlkYXRpb24gaXMgYWN0aXZlCigtPm1uX2FjdGl2ZV9pbnZhbGlkYXRlX2NvdW50
-IGlzIG5vbi16ZXJvKSwgaHZhX3RvX3Bmbl9yZXRyeSgpIHdpbGwKanVzdCBzcGluIGluIGFuIGVs
-YWJvcmF0ZSBidXN5LXdhaXQgbG9vcCwgbWFwcGluZyBzYW1lIHBhZ2Ugb3ZlciBhbmQKb3ZlciBh
-Z2Fpbi4KCihJbiB0aGUgcmVwcm8gY2FzZSBJJ20gbm90IGVudGlyZWx5IHN1cmUgKndoeSogdGhl
-cmUgYXJlIHVzZXJzcGFjZQp0aHJlYWRzIGJhc2hpbmcgb24gTUFEVl9ET05UTkVFRCBhbmQgY2F1
-c2luZyB0aGlzLCBidXQgJ0Rvbid0IERvIFRoYXQKVGhlbicgaXMgb25seSBhIHBhcnRpYWwgYW5z
-d2VyLiBUaGUga2VybmVsJ3Mgb3duIGxvY2tpbmcgc2hvdWxkIGFsbG93Cml0IHRvIG1ha2UgcHJv
-Z3Jlc3MgcmVnYXJkbGVzcy4pCgpJZiB3ZSBjYWxsIHRoZSBHUEMgaW52YWxpZGF0ZSBmdW5jdGlv
-biBmcm9tIGludmFsaWRhdGVfcmFuZ2VfZW5kKCkKaW5zdGVhZCBvZiBfc3RhcnQsIGNhbid0IHdl
-IGRvIGl0IGNvbmN1cnJlbnRseSB3aXRob3V0IGhhdmluZyB0byBjaGVjawpmb3IgYWN0aXZlIGlu
-dmFsaWRhdGlvbnMgb3IgbW11X2ludmFsaWRhdGVfc2VxPwoKV2UgY2FuIHRoZW4gaW50cm9kdWNl
-IGEgJ3ZhbGlkYXRpbmcnIGZsYWcsIHNldCBiZWZvcmUgdGhlIGF0dGVtcHQgdG8KaHZhX3RvX3Bm
-bigpIGluIHRoZSBsb29wLCBzbyB0aGF0IHRoZSB0cmFuc2xhdGlvbiBjYW4gYmUgc2hvdCBkb3du
-CmJlZm9yZSBpdCdzIGV2ZW4gbWFkZS4gQW5kIHVzZSAqdGhhdCogYXMgdGhlIHRyaWdnZXIgZm9y
-IHRoZSByZXRyeSBsb29wCnNvIHRoYXQgb25seSBoYXMgdG8gcmV0cnkgaWYgaXRzICpvd24qIHVI
-VkEgaXMgbWVzc2VkIHdpdGguCgpQYXRjaCBmb2xsb3dzLi4uCgoK
+> >=20
+> > Heh, on a related topic, __cr4_reserved_bits() fails to account for any=
+ of the
+> > aliased features.=C2=A0 Unless I'm missing something, VME, DE, TSC, PSE=
+, PAE, PGE and
+> > MCE, all need to be handled in __cr4_reserved_bits().=C2=A0
+> > =C2=A0Amusingly,=20
+> > nested_vmx_cr_fixed1_bits_update() handles the aliased legacy features.=
+=C2=A0 I don't
+> > see any reason for nested_vmx_cr_fixed1_bits_update() to manually query=
+ guest
+> > CPUID, it should be able to use cr4_guest_rsvd_bits verbatim.
+
+Yep, this should be fixed - this patch series is about to grow even more I =
+guess,
+or rather let me suggest that you split it into several patch series, which
+can be merged and discussed separately.
 
 
---=-pYINBt3vSQZ5N5ARMJLf
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Transfer-Encoding: base64
+> >=20
+> > > > > > Side topic, if it's not already documented somewhere else, kvm/=
+x86/cpuid.rst
+> > > > > > should call out that KVM only honors the features in CPUID.0x1,=
+ i.e. that setting
+> > > > > > aliased bits in CPUID.0x8000_0001 is supported if and only if t=
+he bit(s) is also
+> > > > > > set in CPUID.0x1.
+> > > >=20
+> > > > To be honest if KVM enforces this, such enforcement can be removed =
+IMHO:
+> >=20
+> > There's no enforcement, and as above I agree that this would be a bogus=
+ CPUID
+> > model.=C2=A0 I was thinking that it could be helpful to document that K=
+VM never checks
+> > the aliases, but on second though, it's probably unnecessary because th=
+e APM does
+> > say
+> >=20
+> > =C2=A0 Same as CPUID Fn0000_0001_EDX[...]
+> >=20
+> > for all the bits, i.e. setting the aliases without the real bits is an
+> > architectural violation.
 
-MIAGCSqGSIb3DQEHAqCAMIACAQExDzANBglghkgBZQMEAgEFADCABgkqhkiG9w0BBwEAAKCCEkQw
-ggYQMIID+KADAgECAhBNlCwQ1DvglAnFgS06KwZPMA0GCSqGSIb3DQEBDAUAMIGIMQswCQYDVQQG
-EwJVUzETMBEGA1UECBMKTmV3IEplcnNleTEUMBIGA1UEBxMLSmVyc2V5IENpdHkxHjAcBgNVBAoT
-FVRoZSBVU0VSVFJVU1QgTmV0d29yazEuMCwGA1UEAxMlVVNFUlRydXN0IFJTQSBDZXJ0aWZpY2F0
-aW9uIEF1dGhvcml0eTAeFw0xODExMDIwMDAwMDBaFw0zMDEyMzEyMzU5NTlaMIGWMQswCQYDVQQG
-EwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYD
-VQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50
-aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKC
-AQEAyjztlApB/975Rrno1jvm2pK/KxBOqhq8gr2+JhwpKirSzZxQgT9tlC7zl6hn1fXjSo5MqXUf
-ItMltrMaXqcESJuK8dtK56NCSrq4iDKaKq9NxOXFmqXX2zN8HHGjQ2b2Xv0v1L5Nk1MQPKA19xeW
-QcpGEGFUUd0kN+oHox+L9aV1rjfNiCj3bJk6kJaOPabPi2503nn/ITX5e8WfPnGw4VuZ79Khj1YB
-rf24k5Ee1sLTHsLtpiK9OjG4iQRBdq6Z/TlVx/hGAez5h36bBJMxqdHLpdwIUkTqT8se3ed0PewD
-ch/8kHPo5fZl5u1B0ecpq/sDN/5sCG52Ds+QU5O5EwIDAQABo4IBZDCCAWAwHwYDVR0jBBgwFoAU
-U3m/WqorSs9UgOHYm8Cd8rIDZsswHQYDVR0OBBYEFAnA8vwL2pTbX/4r36iZQs/J4K0AMA4GA1Ud
-DwEB/wQEAwIBhjASBgNVHRMBAf8ECDAGAQH/AgEAMB0GA1UdJQQWMBQGCCsGAQUFBwMCBggrBgEF
-BQcDBDARBgNVHSAECjAIMAYGBFUdIAAwUAYDVR0fBEkwRzBFoEOgQYY/aHR0cDovL2NybC51c2Vy
-dHJ1c3QuY29tL1VTRVJUcnVzdFJTQUNlcnRpZmljYXRpb25BdXRob3JpdHkuY3JsMHYGCCsGAQUF
-BwEBBGowaDA/BggrBgEFBQcwAoYzaHR0cDovL2NydC51c2VydHJ1c3QuY29tL1VTRVJUcnVzdFJT
-QUFkZFRydXN0Q0EuY3J0MCUGCCsGAQUFBzABhhlodHRwOi8vb2NzcC51c2VydHJ1c3QuY29tMA0G
-CSqGSIb3DQEBDAUAA4ICAQBBRHUAqznCFfXejpVtMnFojADdF9d6HBA4kMjjsb0XMZHztuOCtKF+
-xswhh2GqkW5JQrM8zVlU+A2VP72Ky2nlRA1GwmIPgou74TZ/XTarHG8zdMSgaDrkVYzz1g3nIVO9
-IHk96VwsacIvBF8JfqIs+8aWH2PfSUrNxP6Ys7U0sZYx4rXD6+cqFq/ZW5BUfClN/rhk2ddQXyn7
-kkmka2RQb9d90nmNHdgKrwfQ49mQ2hWQNDkJJIXwKjYA6VUR/fZUFeCUisdDe/0ABLTI+jheXUV1
-eoYV7lNwNBKpeHdNuO6Aacb533JlfeUHxvBz9OfYWUiXu09sMAviM11Q0DuMZ5760CdO2VnpsXP4
-KxaYIhvqPqUMWqRdWyn7crItNkZeroXaecG03i3mM7dkiPaCkgocBg0EBYsbZDZ8bsG3a08LwEsL
-1Ygz3SBsyECa0waq4hOf/Z85F2w2ZpXfP+w8q4ifwO90SGZZV+HR/Jh6rEaVPDRF/CEGVqR1hiuQ
-OZ1YL5ezMTX0ZSLwrymUE0pwi/KDaiYB15uswgeIAcA6JzPFf9pLkAFFWs1QNyN++niFhsM47qod
-x/PL+5jR87myx5uYdBEQkkDc+lKB1Wct6ucXqm2EmsaQ0M95QjTmy+rDWjkDYdw3Ms6mSWE3Bn7i
-5ZgtwCLXgAIe5W8mybM2JzCCBhQwggT8oAMCAQICEQDGvhmWZ0DEAx0oURL6O6l+MA0GCSqGSIb3
-DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVyMRAwDgYD
-VQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNlY3RpZ28g
-UlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBMB4XDTIyMDEwNzAw
-MDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJARYTZHdtdzJAaW5mcmFkZWFkLm9y
-ZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3GpC2bomUqk+91wLYBzDMcCj5C9m6
-oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZHh7htyAkWYVoFsFPrwHounto8xTsy
-SSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT9YgcBqKCo65pTFmOnR/VVbjJk4K2
-xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNjP+qDrh0db7PAjO1D4d5ftfrsf+kd
-RR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy2U+eITZ5LLE5s45mX2oPFknWqxBo
-bQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3BgBEmfsYWlBXO8rVXfvPgLs32VdV
-NZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/7auNVRmPB3v5SWEsH8xi4Bez2V9U
-KxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmdlFYhAflWKQ03Ufiu8t3iBE3VJbc2
-5oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9aelIl6vtbhMA+l0nfrsORMa4kobqQ5
-C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMBAAGjggHMMIIByDAfBgNVHSMEGDAW
-gBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeDMcimo0oz8o1R1Nver3ZVpSkwDgYD
-VR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYwFAYIKwYBBQUHAwQGCCsGAQUFBwMC
-MEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYBBQUHAgEWF2h0dHBzOi8vc2VjdGln
-by5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9jcmwuc2VjdGlnby5jb20vU2VjdGln
-b1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1haWxDQS5jcmwwgYoGCCsGAQUFBwEB
-BH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdvLmNvbS9TZWN0aWdvUlNBQ2xpZW50
-QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAjBggrBgEFBQcwAYYXaHR0cDovL29j
-c3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5mcmFkZWFkLm9yZzANBgkqhkiG9w0B
-AQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQvQ/fzPXmtR9t54rpmI2TfyvcKgOXp
-qa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvIlSPrzIB4Z2wyIGQpaPLlYflrrVFK
-v9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9ChWFfgSXvrWDZspnU3Gjw/rMHrGnql
-Htlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0whpBtXdyDjzBtQTaZJ7zTT/vlehc/
-tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9IzCCBhQwggT8oAMCAQICEQDGvhmW
-Z0DEAx0oURL6O6l+MA0GCSqGSIb3DQEBCwUAMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3Jl
-YXRlciBNYW5jaGVzdGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0
-ZWQxPjA8BgNVBAMTNVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJl
-IEVtYWlsIENBMB4XDTIyMDEwNzAwMDAwMFoXDTI1MDEwNjIzNTk1OVowJDEiMCAGCSqGSIb3DQEJ
-ARYTZHdtdzJAaW5mcmFkZWFkLm9yZzCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIBALQ3
-GpC2bomUqk+91wLYBzDMcCj5C9m6oZaHwvmIdXftOgTbCJXADo6G9T7BBAebw2JV38EINgKpy/ZH
-h7htyAkWYVoFsFPrwHounto8xTsySSePMiPlmIdQ10BcVSXMUJ3Juu16GlWOnAMJY2oYfEzmE7uT
-9YgcBqKCo65pTFmOnR/VVbjJk4K2xE34GC2nAdUQkPFuyaFisicc6HRMOYXPuF0DuwITEKnjxgNj
-P+qDrh0db7PAjO1D4d5ftfrsf+kdRR4gKVGSk8Tz2WwvtLAroJM4nXjNPIBJNT4w/FWWc/5qPHJy
-2U+eITZ5LLE5s45mX2oPFknWqxBobQZ8a9dsZ3dSPZBvE9ZrmtFLrVrN4eo1jsXgAp1+p7bkfqd3
-BgBEmfsYWlBXO8rVXfvPgLs32VdVNZxb/CDWPqBsiYv0Hv3HPsz07j5b+/cVoWqyHDKzkaVbxfq/
-7auNVRmPB3v5SWEsH8xi4Bez2V9UKxfYCnqsjp8RaC2/khxKt0A552Eaxnz/4ly/2C7wkwTQnBmd
-lFYhAflWKQ03Ufiu8t3iBE3VJbc25oMrglj7TRZrmKq3CkbFnX0fyulB+kHimrt6PIWn7kgyl9ae
-lIl6vtbhMA+l0nfrsORMa4kobqQ5C5rveVgmcIad67EDa+UqEKy/GltUwlSh6xy+TrK1tzDvAgMB
-AAGjggHMMIIByDAfBgNVHSMEGDAWgBQJwPL8C9qU21/+K9+omULPyeCtADAdBgNVHQ4EFgQUzMeD
-Mcimo0oz8o1R1Nver3ZVpSkwDgYDVR0PAQH/BAQDAgWgMAwGA1UdEwEB/wQCMAAwHQYDVR0lBBYw
-FAYIKwYBBQUHAwQGCCsGAQUFBwMCMEAGA1UdIAQ5MDcwNQYMKwYBBAGyMQECAQEBMCUwIwYIKwYB
-BQUHAgEWF2h0dHBzOi8vc2VjdGlnby5jb20vQ1BTMFoGA1UdHwRTMFEwT6BNoEuGSWh0dHA6Ly9j
-cmwuc2VjdGlnby5jb20vU2VjdGlnb1JTQUNsaWVudEF1dGhlbnRpY2F0aW9uYW5kU2VjdXJlRW1h
-aWxDQS5jcmwwgYoGCCsGAQUFBwEBBH4wfDBVBggrBgEFBQcwAoZJaHR0cDovL2NydC5zZWN0aWdv
-LmNvbS9TZWN0aWdvUlNBQ2xpZW50QXV0aGVudGljYXRpb25hbmRTZWN1cmVFbWFpbENBLmNydDAj
-BggrBgEFBQcwAYYXaHR0cDovL29jc3Auc2VjdGlnby5jb20wHgYDVR0RBBcwFYETZHdtdzJAaW5m
-cmFkZWFkLm9yZzANBgkqhkiG9w0BAQsFAAOCAQEAyW6MUir5dm495teKqAQjDJwuFCi35h4xgnQv
-Q/fzPXmtR9t54rpmI2TfyvcKgOXpqa7BGXNFfh1JsqexVkIqZP9uWB2J+uVMD+XZEs/KYNNX2PvI
-lSPrzIB4Z2wyIGQpaPLlYflrrVFKv9CjT2zdqvy2maK7HKOQRt3BiJbVG5lRiwbbygldcALEV9Ch
-WFfgSXvrWDZspnU3Gjw/rMHrGnqlHtlyebp3pf3fSS9kzQ1FVtVIDrL6eqhTwJxe+pXSMMqFiN0w
-hpBtXdyDjzBtQTaZJ7zTT/vlehc/tDuqZwGHm/YJy883Ll+GP3NvOkgaRGWEuYWJJ6hFCkXYjyR9
-IzGCBMcwggTDAgEBMIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVz
-dGVyMRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMT
-NVNlY3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEA
-xr4ZlmdAxAMdKFES+jupfjANBglghkgBZQMEAgEFAKCCAeswGAYJKoZIhvcNAQkDMQsGCSqGSIb3
-DQEHATAcBgkqhkiG9w0BCQUxDxcNMjQwODA1MTEwNDUzWjAvBgkqhkiG9w0BCQQxIgQgiGU/Hiej
-Cd/YLddHB/HLOVgPqfxCsDqEcDIqwfOuGZkwgb0GCSsGAQQBgjcQBDGBrzCBrDCBljELMAkGA1UE
-BhMCR0IxGzAZBgNVBAgTEkdyZWF0ZXIgTWFuY2hlc3RlcjEQMA4GA1UEBxMHU2FsZm9yZDEYMBYG
-A1UEChMPU2VjdGlnbyBMaW1pdGVkMT4wPAYDVQQDEzVTZWN0aWdvIFJTQSBDbGllbnQgQXV0aGVu
-dGljYXRpb24gYW5kIFNlY3VyZSBFbWFpbCBDQQIRAMa+GZZnQMQDHShREvo7qX4wgb8GCyqGSIb3
-DQEJEAILMYGvoIGsMIGWMQswCQYDVQQGEwJHQjEbMBkGA1UECBMSR3JlYXRlciBNYW5jaGVzdGVy
-MRAwDgYDVQQHEwdTYWxmb3JkMRgwFgYDVQQKEw9TZWN0aWdvIExpbWl0ZWQxPjA8BgNVBAMTNVNl
-Y3RpZ28gUlNBIENsaWVudCBBdXRoZW50aWNhdGlvbiBhbmQgU2VjdXJlIEVtYWlsIENBAhEAxr4Z
-lmdAxAMdKFES+jupfjANBgkqhkiG9w0BAQEFAASCAgBEOuWM+YcgaKAkoFnN2A+2+YqepvHzUND4
-RmSAVnsWiwcM6AvFsQMe/RbUISQP0HNCCUawhEaOkGkEnVqNRJjPhU7SV/wJJs3dNYoxOeqtuARn
-Tyw/8sUP2FEVQpFKWbmAAbogVPNSpA9puJtfKNOyy45Cnxg8MzOsjdy5yL5usYMqu6cHZInqA1Gc
-b4ZPAUkMFImSpCGa4AywO0JZlTSd4VinIz76l6UTQrU4V+/jN3Mnb4E7dwUqC200Pw/8WBVNgqE/
-KswHaEoQTCvFTsGtI+GUzZKEXqDJXEEGBtgl2qGSbzjYYshAiC8qfIJLIDWA74O1wargJBgJ9ZmP
-sf/4WKCOZgZp0mY+lupgg7o4YTdC+Tx2ZwZFXTuVrOD5v6356JZEK4Mm1KEKwRqiHRoem3L5+yYd
-EG/6w5TN1mfcXdV57YBjXusBeCBkMGQPMn2DuJwQ+R1cfp4UY+06SfvzhLYH/s/evxC1PrGvNXW2
-LZlgh/TqRY1kfP2Ahie5Yzz1xjVDl4u8jkhRhjhSdkedb5SDxAHenZLqMFeBzu7XsQ3GcJ2rfofE
-ZPbUqOWJwi7uJuehiWtOTo0h/ehdFjXZiCcv6LqCZuuB8hv0ApwEaCSUXWpNDPSIbJp2ik/sW2YY
-3QyauYACD8f1l77alwvjQhFM63M67CnHu4Nj1g9VIAAAAAAAAA==
+Regardless if this is an architectural violation or not, KVM should allow t=
+his
+because it allows many architectural violations, like AVX3 with no XSAVE, a=
+nd such.
+
+IMHO being consistent is more important than being right in only some cases=
+,
+and I don't think we want to start enforcing all the CPUID dependencies
+(I actually won't object to this).
+
+Best regards,
+	Maxim Levitsky
 
 
---=-pYINBt3vSQZ5N5ARMJLf--
+> >=20
+
 
