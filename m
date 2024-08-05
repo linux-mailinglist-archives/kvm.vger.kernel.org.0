@@ -1,201 +1,125 @@
-Return-Path: <kvm+bounces-23191-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23192-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFA08947675
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 09:59:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4A1947771
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 10:38:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AB54281938
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 07:59:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 234A2B21C12
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 08:38:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AE3114B064;
-	Mon,  5 Aug 2024 07:59:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571E014EC73;
+	Mon,  5 Aug 2024 08:38:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KcZyq9Zt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MEF8FkdX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34449149C68;
-	Mon,  5 Aug 2024 07:59:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A9B152E12
+	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 08:38:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722844759; cv=none; b=jTngZob/bDdsP28icbahkb6s8UlPL/gjBSG/ljZbHvojpEQrsl32lhBkKQIN8H0F23L3yeOB8FqOROGWlZ62jzSS+XTBy3hcbXxR/s+3hyXwmLvhAZ0ZGuae+X9myziNMBTdbBxR2wXf/Dt3W1WervN1MaHkIslY8GnjmYp+5/M=
+	t=1722847089; cv=none; b=rfDzrpaRwnk98Nlf7rHfdmx1ZharjRKEc23DMyaZlZp6S4fkG36ztFoseH18X1W3dv8QhWyyiVRGAoZ33ogn4mvHvu90WFoOw7s9GYpw6BZEKnJpkksiwfLlHHlDpgKfmlnS+lT4Z7+n9Wy6DvtbVE+IsPcoHW3CrrUC1yfhGEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722844759; c=relaxed/simple;
-	bh=NKf63D9jiD2a9CqpHJMdfC3i7PiyG9ITClmyQ+0bY9c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bNCsCwpzisfMil03olpMhG1moPCxh83RoOlhHWItOhhBRo9xxAR84Hy6hOy+Xk9ilYx7fUixUx1IOvbJCoMXQ/NMUVnGLux2rKjwf+WGpEysmlLtAtjB/1v1+pK7F+UcbS+t7vmRgQzvSJBJRgRcfOzv8Mx3g3x+Kl6dEJCsdCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KcZyq9Zt; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722844757; x=1754380757;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NKf63D9jiD2a9CqpHJMdfC3i7PiyG9ITClmyQ+0bY9c=;
-  b=KcZyq9Zt4rcUTZu0DRTbsXLL96Lac6PNT0kG03pQ4baZgJe4qpOgIzWZ
-   TyKiRLO0T9jt4cnIlKkzTYAVrHpvQ8ZRwJx0PmzBG6hXbuLxTC29Yx6ej
-   5aY87I1MyAxq/hmkQhbrDJR3Tk/2wIL06omOTQLaf8BEjdDfkTYhL55Id
-   mPs8qOHoBSS5MGb1dJqa31BtSrXx3gYB2U8TaNmSwZWoJnLX9U23fy+12
-   2hUkFPb1ZCdSZXem+n7lS5zWrw6mCvLQUJdEwThIfRNMSBTHKq7axWizJ
-   9QxVDBkldaTZwsSKnYWw8+dfVqAeVYRUeWUSMakMGGWiap/jrNkpzYyqC
-   A==;
-X-CSE-ConnectionGUID: e6xdijh+T9qsw7fVkTzfeg==
-X-CSE-MsgGUID: MedZytc9T7+MzQiS9ctvnw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11154"; a="38251012"
-X-IronPort-AV: E=Sophos;i="6.09,264,1716274800"; 
-   d="scan'208";a="38251012"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 00:59:17 -0700
-X-CSE-ConnectionGUID: +18DwL1fT9aR++Xt8KkH2g==
-X-CSE-MsgGUID: iF66DRgnR2CYlfZTc85cew==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,264,1716274800"; 
-   d="scan'208";a="56000060"
-Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
-  by orviesa009.jf.intel.com with ESMTP; 05 Aug 2024 00:59:14 -0700
-Date: Mon, 5 Aug 2024 15:59:11 +0800
-From: Yuan Yao <yuan.yao@linux.intel.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 9/9] KVM: x86/mmu: Track SPTE accessed info across
- mmu_notifier PROT changes
-Message-ID: <20240805075911.3cxfzewmqlkmvgfw@yy-desk-7060>
-References: <20240801183453.57199-1-seanjc@google.com>
- <20240801183453.57199-10-seanjc@google.com>
+	s=arc-20240116; t=1722847089; c=relaxed/simple;
+	bh=xcF6Mfrw40Jw8RGQ0v/6ZTNK3dJLj6b1R4dFkTsR3B0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Sf2SiCkKGsvycHkpw1+wDcbXmIVPcHBU/JuyzxNCSA8sJHJVn9vshm7Qis7zsKigsA28NIJJu9SHWID3ohiATQ35Kyv9Z7dr2op9M0qV2N96JYylL6sY+/B1KWgeBcLd0yKaKfTBZSea1T/VROMGc62vb2Pq9WblhzI7uzcwpqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MEF8FkdX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722847086;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XUcHAQllXYYJE9iTeuUZ5vK3MCPBiGRYOafe/DWV6AE=;
+	b=MEF8FkdXsEOJCp2EM7clu1X781pz9F26ZogKzinz7pQ/xeZFR6RPqEtpnmAIV2J9PpdRZo
+	E2nEYzuR/r0iQGPAqH++uX6iA8VL1KcI1UZezx1L41OuwJXwacLSPVIh95HV5kSQf3N1cn
+	kR+oxIqdmbVt1pFcUIrVb8cMUreaYnM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-544-tYfO-WW4M7OPxktfkT-oiw-1; Mon, 05 Aug 2024 04:38:04 -0400
+X-MC-Unique: tYfO-WW4M7OPxktfkT-oiw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4280a39ecebso25173615e9.0
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 01:38:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722847083; x=1723451883;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XUcHAQllXYYJE9iTeuUZ5vK3MCPBiGRYOafe/DWV6AE=;
+        b=sJPOMJinvD35qGe+0rv/JzFyb8o7Fv63LdQLaKwF6P5b9OvK3tNNMLcFvE2s01IB/Z
+         ZO8FoQ7R6UWgEJwPtyVMDcVCmjpc2KeaqosV832v7JVti/i/i/Pff7sSOrkh+Ag7207t
+         nGaEJzUXSCV8/ZWD31dn+DelWs75X/k7ifTJwrAn65eLA9+OI41Jzk0pDnnEwAadfUOE
+         S7b5QSdkFPqdRiILbl6syNkdYMHEpjl6x5iwU81S7NR6W6zz+PRq7SXJP1AbM5Pk7baY
+         iqlUU1+TrnHPCKkBZwjcUfzNFwTBLEHZu2yhI45rsNrmmUVf2pEoAcau47fs0WHETpMX
+         yHHA==
+X-Gm-Message-State: AOJu0YzMVIZ4kNqWk5roYzjyDdEYp2p0yLKffkMjxu0Krt+2AKsYWPTf
+	xOZy3PZoYlV77AjkvxkodQqMF58zzvLBZv8UXWWn/F4x6lEOBm8OclA0kdXgWOJZA2isuHltOEc
+	uxE+Q34hpapSed7ED2diSzw2jUdrImRPlYrKGXlQcV6QESpWzDQ==
+X-Received: by 2002:a05:6000:1151:b0:362:2af4:43cc with SMTP id ffacd0b85a97d-36bbbe5be99mr7049780f8f.19.1722847083329;
+        Mon, 05 Aug 2024 01:38:03 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH0NE1Ot8rOByWZ3stWd4olh4hwJV37rmCDmeoi9oON5ME/krtX9d8mKmYlwDG6bB1c0zomxg==
+X-Received: by 2002:a05:6000:1151:b0:362:2af4:43cc with SMTP id ffacd0b85a97d-36bbbe5be99mr7049758f8f.19.1722847082890;
+        Mon, 05 Aug 2024 01:38:02 -0700 (PDT)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd02200asm9095297f8f.54.2024.08.05.01.38.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 01:38:02 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Yue Haibing <yuehaibing@huawei.com>, seanjc@google.com,
+ pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, yuehaibing@huawei.com
+Subject: Re: [PATCH -next] KVM: x86: hyper-v: Remove unused inline function
+ kvm_hv_free_pa_page()
+In-Reply-To: <20240803113233.128185-1-yuehaibing@huawei.com>
+References: <20240803113233.128185-1-yuehaibing@huawei.com>
+Date: Mon, 05 Aug 2024 10:38:01 +0200
+Message-ID: <87sevjgyae.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240801183453.57199-10-seanjc@google.com>
-User-Agent: NeoMutt/20171215
+Content-Type: text/plain
 
-On Thu, Aug 01, 2024 at 11:34:53AM -0700, Sean Christopherson wrote:
-> Preserve Accessed information when zapping SPTEs in response to an
-> mmu_notifier protection change, e.g. if KVM is zapping SPTEs because
-> NUMA balancing kicked in.  KVM is not required to fully unmap the SPTE,
-> and the core VMA information isn't changing, i.e. the information is
-> still fresh and useful.
+Yue Haibing <yuehaibing@huawei.com> writes:
+
+> There is no caller in tree since introduction in commit b4f69df0f65e ("KVM:
+> x86: Make Hyper-V emulation optional")
+
+Yea, I tried some history digging but came out empty handed and I have
+to admit I have no idea how and when I added this stub. Thanks for the
+cleanup!
+
+Reviewed-by: Vitaly Kuznetsov <vkuznets@redhat.com>
+
 >
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
 > ---
->  arch/x86/kvm/mmu/tdp_mmu.c | 31 +++++++++++++++++++++++++------
->  1 file changed, 25 insertions(+), 6 deletions(-)
+>  arch/x86/kvm/hyperv.h | 1 -
+>  1 file changed, 1 deletion(-)
 >
-> diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-> index ac3200ce00f9..780f35a22c05 100644
-> --- a/arch/x86/kvm/mmu/tdp_mmu.c
-> +++ b/arch/x86/kvm/mmu/tdp_mmu.c
-> @@ -838,7 +838,8 @@ bool kvm_tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->   * operation can cause a soft lockup.
->   */
->  static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
-> -			      gfn_t start, gfn_t end, bool can_yield, bool flush)
-> +			      gfn_t start, gfn_t end, bool can_yield,
-> +			      bool keep_accessed_bit, bool flush)
->  {
->  	struct tdp_iter iter;
->
-> @@ -849,17 +850,29 @@ static bool tdp_mmu_zap_leafs(struct kvm *kvm, struct kvm_mmu_page *root,
->  	rcu_read_lock();
->
->  	for_each_tdp_pte_min_level(iter, root, PG_LEVEL_4K, start, end) {
-> +		u64 new_spte = SHADOW_NONPRESENT_VALUE;
-> +
->  		if (can_yield &&
->  		    tdp_mmu_iter_cond_resched(kvm, &iter, flush, false)) {
->  			flush = false;
->  			continue;
->  		}
->
-> +		/*
-> +		 * Note, this will fail to clear non-present, accessed SPTEs,
-> +		 * but that isn't a functional problem, it can only result in
-> +		 * a _potential_ false positive  in the unlikely scenario that
-> +		 * the primary MMU zaps an hva, reinstalls a new hva, and ages
-> +		 * the new hva, all before KVM accesses the hva.
-> +		 */
->  		if (!is_shadow_present_pte(iter.old_spte) ||
->  		    !is_last_spte(iter.old_spte, iter.level))
->  			continue;
->
-> -		tdp_mmu_iter_set_spte(kvm, &iter, SHADOW_NONPRESENT_VALUE);
-> +		if (keep_accessed_bit)
-> +			new_spte |= iter.old_spte & shadow_accessed_mask;
-> +
-> +		tdp_mmu_iter_set_spte(kvm, &iter, new_spte);
->
->  		/*
->  		 * Zappings SPTEs in invalid roots doesn't require a TLB flush,
-> @@ -889,7 +902,7 @@ bool kvm_tdp_mmu_zap_leafs(struct kvm *kvm, gfn_t start, gfn_t end, bool flush)
->
->  	lockdep_assert_held_write(&kvm->mmu_lock);
->  	for_each_valid_tdp_mmu_root_yield_safe(kvm, root, -1)
-> -		flush = tdp_mmu_zap_leafs(kvm, root, start, end, true, flush);
-> +		flush = tdp_mmu_zap_leafs(kvm, root, start, end, true, false, flush);
->
->  	return flush;
+> diff --git a/arch/x86/kvm/hyperv.h b/arch/x86/kvm/hyperv.h
+> index 923e64903da9..913bfc96959c 100644
+> --- a/arch/x86/kvm/hyperv.h
+> +++ b/arch/x86/kvm/hyperv.h
+> @@ -286,7 +286,6 @@ static inline int kvm_hv_hypercall(struct kvm_vcpu *vcpu)
+>  	return HV_STATUS_ACCESS_DENIED;
 >  }
-> @@ -1180,11 +1193,13 @@ int kvm_tdp_mmu_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
->  bool kvm_tdp_mmu_unmap_gfn_range(struct kvm *kvm, struct kvm_gfn_range *range,
->  				 bool flush)
+>  static inline void kvm_hv_vcpu_purge_flush_tlb(struct kvm_vcpu *vcpu) {}
+> -static inline void kvm_hv_free_pa_page(struct kvm *kvm) {}
+>  static inline bool kvm_hv_synic_has_vector(struct kvm_vcpu *vcpu, int vector)
 >  {
-> +	bool keep_a_bit = range->arg.event == MMU_NOTIFY_PROTECTION_VMA ||
-> +			  range->arg.event == MMU_NOTIFY_PROTECTION_PAGE;
->  	struct kvm_mmu_page *root;
->
->  	__for_each_tdp_mmu_root_yield_safe(kvm, root, range->slot->as_id, false)
->  		flush = tdp_mmu_zap_leafs(kvm, root, range->start, range->end,
-> -					  range->may_block, flush);
-> +					  range->may_block, keep_a_bit, flush);
->
->  	return flush;
->  }
-> @@ -1201,7 +1216,11 @@ static void kvm_tdp_mmu_age_spte(struct tdp_iter *iter)
->  {
->  	u64 new_spte;
->
-> -	if (spte_ad_enabled(iter->old_spte)) {
-> +	if (spte_ad_enabled(iter->old_spte) ||
-> +	    !is_shadow_present_pte(iter->old_spte)) {
-> +		KVM_MMU_WARN_ON(!is_shadow_present_pte(iter->old_spte) &&
-> +				iter->old_spte != (SHADOW_NONPRESENT_VALUE | shadow_accessed_mask));
+>  	return false;
 
-Is that possible some sptes are zapped by
-kvm_tdp_mmu_zap_leafs(keep_accessed_bit = false) i.e. from kvm_post_set_cr0(),
-then handled by __kvm_tdp_mmu_age_gfn_range() for aging before
-accessed by guest again ?
-In this scenario the spte is non-present w/o A bit set.
+-- 
+Vitaly
 
-> +
->  		iter->old_spte = tdp_mmu_clear_spte_bits(iter->sptep,
->  							 iter->old_spte,
->  							 shadow_accessed_mask,
-> @@ -1235,7 +1254,7 @@ static bool __kvm_tdp_mmu_age_gfn_range(struct kvm *kvm,
->  	for_each_valid_tdp_mmu_root(kvm, root, range->slot->as_id) {
->  		rcu_read_lock();
->
-> -		tdp_root_for_each_leaf_pte(iter, root, range->start, range->end) {
-> +		tdp_root_for_each_pte(iter, root, range->start, range->end) {
-
-This also clears the A bit of non-leaf entries for aging, I remember
-KVM doesn't care them before, could you please explain the reason of
-this ?
-
->  			if (!is_accessed_spte(iter.old_spte))
->  				continue;
->
-> --
-> 2.46.0.rc1.232.g9752f9e123-goog
->
->
 
