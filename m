@@ -1,122 +1,276 @@
-Return-Path: <kvm+bounces-23269-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23270-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 759E3948583
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 00:51:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0F9F9485AD
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 00:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DD626B219F8
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 22:51:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3BD91C20FDB
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 22:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5043416CD3A;
-	Mon,  5 Aug 2024 22:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCCC416E877;
+	Mon,  5 Aug 2024 22:56:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="v9/JbKBc"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a29bvxtW"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBF6149C4E
-	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 22:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D47A14EC51
+	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 22:56:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722898302; cv=none; b=VPjgbBCCafWJNOJvV5Wvfft8/3vFAzueGMONQWErWSkg2PGtuSMD9RDMWc0WPd/q/Vknm8pikU8lSmy4K3Xl0XFpzbmxzQbbFVRkCXudGBXemeyaQKr8kpBh0KInAS9oGWUSzqx6WXKuhhnuDJgiplZSrSRXO5JqR/ea7WSshMU=
+	t=1722898613; cv=none; b=UHWB0XvywPWj6d855zta7o+jnCBi7wZd6iSZj/y0+0bgYikuIxuYg3unex9tD9IHOMlZ6Pv9RQT+EtmnIgtfpIEyNdOrliM7jwqWtiSDiJ67JKxWSRzkITAE/Aj1rTNBWo8wA7dyH2d25/Wi5ensHCwP2SpwIXudaxHffR6tpvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722898302; c=relaxed/simple;
-	bh=p3tLUrfNddfAk1UuCgvQpVj7bRwtyBexnrqg2usS0hY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/rxiHqLHl0aXxs2Cn7maYtVkk4LM9s1IXabEgWK8S+ntI9vp5ZdNadHc1gjrR1jn7G+ClwBeNXmXzjzlUnS8Wh6BjARtu6B95GvD7L9T0TZtNpwulY6uy+4KCG0L426wqoS/NRoraf9U06j08h5F/3HxnkPiMuizEuXCNztIWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=v9/JbKBc; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 5 Aug 2024 22:51:28 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1722898297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z1HJCaOT1LQo49Cr/YJoEzk2PYQNpvUa5TuxAjrVzEA=;
-	b=v9/JbKBctJQE+c4stOdYSdwf4gIW5RIT+YJgQxfvgeUDKtGBiDgfc8Z7gBuVDLSmhghF8V
-	7sCHwAmUn2S0baVM5q5q10vxtxudc3s0xb+c3jg95jTGgYECqQX4h123vkkjZl5GEo5u9l
-	1b7ILkdTEUUBpHDfwGbtTNmRjMDxo00=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Anish Moorthy <amoorthy@google.com>
-Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev,
-	jthoughton@google.com, rananta@google.com
-Subject: Re: [PATCH 2/3] KVM: arm64: Declare support for
- KVM_CAP_MEMORY_FAULT_INFO
-Message-ID: <ZrFXcHnhXUcjof1U@linux.dev>
-References: <20240802224031.154064-1-amoorthy@google.com>
- <20240802224031.154064-3-amoorthy@google.com>
+	s=arc-20240116; t=1722898613; c=relaxed/simple;
+	bh=sn0BWT1RLULVmUgfRsG6NoLlaNP+PkEL86j2AeRBgdU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=CmOXJR5kSqOWF6OsyywmhNuE4fNHhb9Tl14wNqd3z4EF7rUyYFLrmeQOIlq6MlFxZ+mQ/cSHW7kzHRMNTIc5oQ8ORNB7PS30fCLpyFzQjtXK4w8mEAdg64PLYhENTi7fM3IrhWhRqSeTY7CQXwOh6/JMUkXP+gm5t2iJwbqm5nc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a29bvxtW; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fc4e03a885so93251755ad.2
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 15:56:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722898611; x=1723503411; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IDWgyjsH45NVEgZyg18i/C/FIL++a8gaLVuK3tZHbm4=;
+        b=a29bvxtWYj9Ja6JjSPZJDWoPePNz7TpKH067VO6cYCmaspUNpGgw7wg45nBBTvXj3Y
+         aJ5XlNFzDohM2fvymUNIwEi5aqHz0536dPqWEqe2w40bDP0+h2NhLvqh1EFXFL0UcpzM
+         fPFJlyjhtQcucPbnKHZvF/UTPL0E2yF19kt/5NTMYyjB4myDtFvKuuL47nN6p9aV0X+J
+         7oYt/qf/Tqzryar+Eye2RF3bbPyuT/SYxWu3iF88vwigfTQmvzPxlZnfNDww1B3v9EyR
+         7QbsLQbSduQs9KrG4fzgcxAU6l/cgJcQ3t3EGOVG3PMJIqglc/xV81+bK52FnmQBUckw
+         Vqqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722898611; x=1723503411;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IDWgyjsH45NVEgZyg18i/C/FIL++a8gaLVuK3tZHbm4=;
+        b=R3EB+0Ig2heFUfktaTeW7R/1jg2DjYEfmwEX5BQuljZb7Nm9fmcUd0lIRn+MOoq6KV
+         wbAmW6Z1w9yDgtcyA6f5QrgnAQ+ORssztsRu2LrlvWI1Ls7KLNafbn2gHOxkFnUXfxTR
+         M/awiL/1uOsclPRNNapPaP2bK0OZse1y3cmOynwqdVV17HFvauZyWlweXyU2vFiZsz8q
+         eIBqZhxA4SQUP4P3F8/7+tfFuiLO4dZliMndFdUTqd7DhQ8XKOmy7hBHUgxRqBA9mdqO
+         TyRRHcgand1ks1lYauGkxCzc11/m6O4j8gDKykXkgzqs+hvBLRynvxAmgkHe75QYyx6n
+         ZWSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW/hPnDqjHErCkSrrl2TikhbA9s4eCtsThM1P3GWfLRIM43LdmT7Gm5Qt6TWUsBYLtWfk0lZie8c0TClQlHqGE+CseV
+X-Gm-Message-State: AOJu0YyzOi/XS3bilwRdEUF+YlhEo+KU1kLksBZdwaGqLgLDKvortAQM
+	L8C0/Cb4vgtWSOwjkLw/57cTFrrQrpNwb0ZvNuyoIDXesVwodzqG7UXwNERcloNiueoEArFkC2Q
+	HTg==
+X-Google-Smtp-Source: AGHT+IGQexEmm27AzoGH3anORPtQZrXawJzpbk+oTyTSXnOYC11+L1WFY4txX6zASCpgbESs03OW1CF70tE=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:e743:b0:1fb:54d9:ebb3 with SMTP id
+ d9443c01a7336-1ff57309939mr8340285ad.6.1722898610647; Mon, 05 Aug 2024
+ 15:56:50 -0700 (PDT)
+Date: Mon, 5 Aug 2024 15:56:49 -0700
+In-Reply-To: <07987fc3-5c47-4e77-956c-dae4bdf4bc2b@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240802224031.154064-3-amoorthy@google.com>
-X-Migadu-Flow: FLOW_OUT
+Mime-Version: 1.0
+References: <20240730155646.1687-1-will@kernel.org> <ccd40ae1-14aa-454e-9620-b34154f03e53@rbox.co>
+ <Zql3vMnR86mMvX2w@google.com> <20240731133118.GA2946@willie-the-truck>
+ <3e5f7422-43ce-44d4-bff7-cc02165f08c0@rbox.co> <Zqpj8M3xhPwSVYHY@google.com>
+ <20240801124131.GA4730@willie-the-truck> <07987fc3-5c47-4e77-956c-dae4bdf4bc2b@rbox.co>
+Message-ID: <ZrFYsSPaDWUHOl0N@google.com>
+Subject: Re: [PATCH] KVM: Fix error path in kvm_vm_ioctl_create_vcpu() on
+ xa_store() failure
+From: Sean Christopherson <seanjc@google.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Will Deacon <will@kernel.org>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Alexander Potapenko <glider@google.com>, Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Aug 02, 2024 at 10:40:30PM +0000, Anish Moorthy wrote:
-> Although arm64 doesn't currently use memory fault exits anywhere,
-> it's still valid to advertise the capability: and a subsequent commit
-> will add KVM_EXIT_MEMORY_FAULTs to the stage-2 fault handler
+On Sun, Aug 04, 2024, Michal Luczaj wrote:
+> On 8/1/24 14:41, Will Deacon wrote:
+> > On Wed, Jul 31, 2024 at 09:18:56AM -0700, Sean Christopherson wrote:
+> >> [...]
+> >> Ya, the basic problem is that we have two ways of publishing the vCPU, fd and
+> >> vcpu_array, with no way of setting both atomically.  Given that xa_store() should
+> >> never fail, I vote we do the simple thing and deliberately leak the memory.
+> > 
+> > I'm inclined to agree. This conversation did momentarily get me worried
+> > about the window between the successful create_vcpu_fd() and the
+> > xa_store(), but it looks like 'kvm->online_vcpus' protects that.
+> > 
+> > I'll spin a v2 leaking the vCPU, then.
 > 
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->  Documentation/virt/kvm/api.rst | 2 +-
->  arch/arm64/kvm/arm.c           | 1 +
->  2 files changed, 2 insertions(+), 1 deletion(-)
+> But perhaps you're right. The window you've described may be an issue.
+> For example:
 > 
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index 8e5dad80b337..49c504b12688 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8128,7 +8128,7 @@ unavailable to host or other VMs.
->  7.34 KVM_CAP_MEMORY_FAULT_INFO
->  ------------------------------
+> static u64 get_time_ref_counter(struct kvm *kvm)
+> {
+> 	...
+> 	vcpu = kvm_get_vcpu(kvm, 0); // may still be NULL
+> 	tsc = kvm_read_l1_tsc(vcpu, rdtsc());
+> 	return mul_u64_u64_shr(tsc, hv->tsc_ref.tsc_scale, 64)
+> 		+ hv->tsc_ref.tsc_offset;
+> }
+> 
+> u64 kvm_read_l1_tsc(struct kvm_vcpu *vcpu, u64 host_tsc)
+> {
+> 	return vcpu->arch.l1_tsc_offset +
+> 		kvm_scale_tsc(host_tsc, vcpu->arch.l1_tsc_scaling_ratio);
+> }
+> 
+> After stuffing msleep() between fd install and vcpu_array store:
+> 
+> [  125.296110] BUG: kernel NULL pointer dereference, address: 0000000000000b38
+> [  125.296203] #PF: supervisor read access in kernel mode
+> [  125.296266] #PF: error_code(0x0000) - not-present page
+> [  125.296327] PGD 12539e067 P4D 12539e067 PUD 12539d067 PMD 0
+> [  125.296392] Oops: Oops: 0000 [#1] PREEMPT SMP NOPTI
+> [  125.296454] CPU: 12 UID: 1000 PID: 1179 Comm: a.out Not tainted 6.11.0-rc1nokasan+ #19
+> [  125.296521] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
+> [  125.296585] RIP: 0010:kvm_read_l1_tsc+0x6/0x50 [kvm]
+> [  125.297376] Call Trace:
+> [  125.297430]  <TASK>
+> [  125.297919]  get_time_ref_counter+0x70/0x90 [kvm]
+> [  125.298039]  kvm_hv_get_msr_common+0xc1/0x7d0 [kvm]
+> [  125.298150]  __kvm_get_msr+0x72/0xf0 [kvm]
+> [  125.298421]  do_get_msr+0x16/0x50 [kvm]
+> [  125.298531]  msr_io+0x9d/0x110 [kvm]
+> [  125.298626]  kvm_arch_vcpu_ioctl+0xdc5/0x19c0 [kvm]
+> [  125.299345]  kvm_vcpu_ioctl+0x6cc/0x920 [kvm]
+> [  125.299540]  __x64_sys_ioctl+0x90/0xd0
+> [  125.299582]  do_syscall_64+0x93/0x180
+> [  125.300206]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  125.300243] RIP: 0033:0x7f2d64aded2d
+> 
+> So, is get_time_ref_counter() broken (with a trivial fix) or should it be
+> considered a regression after commit afb2acb2e3a3
+> ("KVM: Fix vcpu_array[0] races")?
 
-<nitpick>
+The latter, though arguably afb2acb2e3a3 isn't really a regression since it
+essentially just reverts back to the pre-Xarray code, i.e. the bug was always
+there, it was just temporarily masked by a worst bug.
 
-The wording of the cap documentation isn't as relaxed as I'd
-anticipated. Perhaps:
+I don't think we want to go down the path of declaring get_time_ref_counter()
+broken, because that is going to result in an impossible programming model.
 
-  The presence of this capability indicates that KVM_RUN *may* fill
-  kvm_run.memory_fault if ...
+Ha!  We can kill two birds with one stone.  If we take vcpu->mutex before installing
+the file descriptor, and hold it until online_vcpus is bumped, userspace
 
-IOW, userspace is not guaranteed that the structure is filled for every
-'memory fault'.
+Argh, so close, kvm_arch_vcpu_async_ioctl() throws a wrench in that idea.  Double
+argh, whether or not an ioctl is async is buried in arch code.
 
-> -:Architectures: x86
-> +:Architectures: x86, arm64
+I still think it makes sense to grab vcpu->mutex for synchronous ioctls.  That
+way there's no vibisle change to userspace, and we can lean on that code to reject
+the async ioctls, as I can't imagine there's a practical use case for emitting an
+an async ioctl without first doing a synchronous ioctl.  E.g. in addition to the
+below patch, plus changes to add kvm_arch_is_async_vcpu_ioctl():
 
-nitpick: alphabetize
+	/*
+	 * Some architectures have vcpu ioctls that are asynchronous to vcpu
+	 * execution; mutex_lock() would break them.  Disallow asynchronous
+	 * ioctls until the vCPU is fully online.  This can only happen if
+	 * userspace has *never* a done a synchronous ioctl, as acquiring the
+	 * vCPU's mutex ensures the vCPU is online, i.e. isn't a restriction
+	 * for any practical use case.
+	 */
+	if (kvm_arch_is_async_vcpu_ioctl(ioctl)) {
+		if (vcpu->vcpu_idx < atomic_read(&kvm->online_vcpus))
+			return -EINVAL;
+		return kvm_vcpu_async_ioctl(filp, ioctl, arg);
+	}
 
->  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
->  
->  The presence of this capability indicates that KVM_RUN will fill
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a7ca776b51ec..4121b5a43b9c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -335,6 +335,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
->  	case KVM_CAP_IRQFD_RESAMPLE:
->  	case KVM_CAP_COUNTER_OFFSET:
-> +	case KVM_CAP_MEMORY_FAULT_INFO:
->  		r = 1;
->  		break;
+Alternatively, we could go for the super simple change and cross our fingers that
+no "real" VMM emits vCPU ioctls before KVM_CREATE_VCPU returns.
 
-Please just squash this into the following patch. Introducing the
-capability without the implied functionality doesn't make a lot of
-sense.
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d0788d0a72cc..9ae9022a015f 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4450,6 +4450,9 @@ static long kvm_vcpu_ioctl(struct file *filp,
+        if (unlikely(_IOC_TYPE(ioctl) != KVMIO))
+                return -EINVAL;
+ 
++       if (unlikely(vcpu->vcpu_idx < atomic_read(&kvm->online_vcpus)))
++               return -EINVAL;
++
+        /*
+         * Some architectures have vcpu ioctls that are asynchronous to vcpu
+         * execution; mutex_lock() would break them.
 
+
+
+The mutex approach, sans async ioctl support:
+
+---
+ virt/kvm/kvm_main.c | 28 +++++++++++++++++++---------
+ 1 file changed, 19 insertions(+), 9 deletions(-)
+
+diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+index d0788d0a72cc..0a9c390b18a3 100644
+--- a/virt/kvm/kvm_main.c
++++ b/virt/kvm/kvm_main.c
+@@ -4269,12 +4269,6 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 
+ 	mutex_lock(&kvm->lock);
+ 
+-#ifdef CONFIG_LOCKDEP
+-	/* Ensure that lockdep knows vcpu->mutex is taken *inside* kvm->lock */
+-	mutex_lock(&vcpu->mutex);
+-	mutex_unlock(&vcpu->mutex);
+-#endif
+-
+ 	if (kvm_get_vcpu_by_id(kvm, id)) {
+ 		r = -EEXIST;
+ 		goto unlock_vcpu_destroy;
+@@ -4285,15 +4279,29 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 	if (r)
+ 		goto unlock_vcpu_destroy;
+ 
+-	/* Now it's all set up, let userspace reach it */
++	/*
++	 * Now it's all set up, let userspace reach it.  Grab the vCPU's mutex
++	 * so that userspace can't invoke vCPU ioctl()s until the vCPU is fully
++	 * visibile (per online_vcpus), e.g. so that KVM doesn't get tricked
++	 * into a NULL-pointer dereference because KVM thinks the _current_
++	 * vCPU doesn't exist.  As a bonus, taking vcpu->mutex ensures lockdep
++	 * knows it's taken *inside* kvm->lock.
++	 */
++	mutex_lock(&vcpu->mutex);
+ 	kvm_get_kvm(kvm);
+ 	r = create_vcpu_fd(vcpu);
+ 	if (r < 0)
+ 		goto kvm_put_xa_release;
+ 
++	/*
++	 * xa_store() should never fail, see xa_reserve() above.  Leak the vCPU
++	 * if the impossible happens, as userspace already has access to the
++	 * vCPU, i.e. freeing the vCPU before userspace puts its file reference
++	 * would trigger a use-after-free.
++	 */
+ 	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
+-		r = -EINVAL;
+-		goto kvm_put_xa_release;
++		mutex_unlock(&vcpu->mutex);
++		return -EINVAL;
+ 	}
+ 
+ 	/*
+@@ -4302,6 +4310,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 	 */
+ 	smp_wmb();
+ 	atomic_inc(&kvm->online_vcpus);
++	mutex_unlock(&vcpu->mutex);
+ 
+ 	mutex_unlock(&kvm->lock);
+ 	kvm_arch_vcpu_postcreate(vcpu);
+@@ -4309,6 +4318,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+ 	return r;
+ 
+ kvm_put_xa_release:
++	mutex_unlock(&vcpu->mutex);
+ 	kvm_put_kvm_no_destroy(kvm);
+ 	xa_release(&kvm->vcpu_array, vcpu->vcpu_idx);
+ unlock_vcpu_destroy:
+
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 -- 
-Thanks,
-Oliver
 
