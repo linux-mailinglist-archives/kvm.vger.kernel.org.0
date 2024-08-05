@@ -1,171 +1,130 @@
-Return-Path: <kvm+bounces-23236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F440947F10
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 18:17:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 01977947F4F
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 18:26:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FFF71C21B4F
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 16:17:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 332B61C20752
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 16:26:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5ED915C125;
-	Mon,  5 Aug 2024 16:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D5215C158;
+	Mon,  5 Aug 2024 16:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dE9vq1Bu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qY6MB4L5"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E31FC376F5;
-	Mon,  5 Aug 2024 16:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A09715B13A
+	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 16:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722874610; cv=none; b=KiShkVMzy3riGBIWjU6WexpAhqQrLXPCcN67Ho7Ct/PUjhg686UGaa+GcQzcyv6e3hR/J3liKIQ9Rkd5xxvmI5NIYBO6XgDEKS3EAki1URQmyG5JQ5sQsyfv/hqR4mZ0oDz9xC1FQ9iSr60AMlovL/DaJESfc4Iu9cm4eVQFxyM=
+	t=1722875173; cv=none; b=JYTq06I0DkyaxxhfXMXyUWKEoeMBfG8KN/UQKYzWX+bQB4q7TI2qVNozZbHvlW9zzB7DrMsV5A1hyPMfLJvR9bc1uyAEZadSElMOIf+Oa8F7tG88JLBWXZExzGO2DKCGo9zmTD49S2aw2fqgzAgGF9Cpa39PBV22AN4S27VBv4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722874610; c=relaxed/simple;
-	bh=y9ldZbTyfHtWmV56N6wsb2EpJn4YFyke+2byGlPJ2Ck=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oqDlFTXSmSzJKkne3TIKWJ/9Q9iMA8m60W/+A0kE1L9pdsYSddQM2DvuZ1rEjhGFepTzjYeQU1UnZgt/qLIcyI1yDxeXpdP/C5JKZSDx9bu3KlTxob7C5XgQ7TaCYVi5B11f5rIUY+pFfoocNvnw7nl4Ud88D+SAFT8XKbZBtp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dE9vq1Bu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C69E9C4AF0C;
-	Mon,  5 Aug 2024 16:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722874609;
-	bh=y9ldZbTyfHtWmV56N6wsb2EpJn4YFyke+2byGlPJ2Ck=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=dE9vq1BuB7DySNJ0jmsO8oDVdSmXiOtDPZZ+qMEI4JVqefYufKzfUqg36Y8Gtymsn
-	 yw8UXACxwiu7eOw2VaFkkLc9DKj+IcG8GYXfAQ7axO+sy+4Opse6dwr+CwW795gh8I
-	 Yy6XsxPaiwvT55c5+H2DphPa9LPRBo7WzA/TKvrZcGTy6LsO6m1iXKKZedZzwVB504
-	 QjmY78WVHFacbV9dV2pWObXlY4M94SsfzOB7Qh40ctDl74gMT+EI9RHeQlieTk7c+6
-	 CJ71uHEUxPNKvoJxM44gmoUiTq6g1QfZFJY3baXmSMWlbwiJAcTvBXyD+N4ly0eZ4k
-	 fI8UPtwF5DtqQ==
-Date: Mon, 5 Aug 2024 17:16:43 +0100
-From: Mark Brown <broonie@kernel.org>
-To: Marc Zyngier <maz@kernel.org>
-Cc: Oliver Upton <oliver.upton@linux.dev>,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: selftests: arm64: Use generated defines for
- named system registers
-Message-ID: <6c1beda4-7211-4f64-95c8-7a11c489b145@sirena.org.uk>
-References: <20240802-kvm-arm64-get-reg-list-v1-0-3a5bf8f80765@kernel.org>
- <20240802-kvm-arm64-get-reg-list-v1-2-3a5bf8f80765@kernel.org>
- <868qxe0wzp.wl-maz@kernel.org>
+	s=arc-20240116; t=1722875173; c=relaxed/simple;
+	bh=V7wy/IY78ADKe6MCQ9wGcOxH7LMu1vqwY8ggZZNETsw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=kBXa4kXHbzsx2xVXp6fJ5p4d8sqHNF+UD36V/aLSw8xxzOxHTLUYeXv/jqmIISAlREFrV2feGFtHsHS3pRVjSFcgnsp8YpPrdkbC1juZThSa2rl27gBGuiSejgN20AjfEEpr1oPwmUPYJsBXkFlKklDXykFLoz4vv35Q/Aesyi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qY6MB4L5; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7a1188b3bc2so8919897a12.2
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 09:26:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722875171; x=1723479971; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LTrtRaPSzzv6povC2MZbVu/ikbGDz5GKGualsN8e2oo=;
+        b=qY6MB4L5Lwi31rkl+bvZzaYqBl+XPnHuBcWu5CE/d5szt00UxkuBzG5B57wDEWIu3t
+         LKHInBSXlHPHHBGu/pjLj7TcU7pxyqA6+Yzvt0ZyRdzli5o134jHG00eYiuRTbrS/egD
+         ej9nZUtxAEv0zwPXH5nABT6eC99x2dTFkIiLfG7AS3OLOnEOzrFK/fVgbtmKve8jKmfJ
+         rI68daVLPCdmtx84mBWJiXYGbImLInBKB+wf6zAfcEvuW+pykNoqAcq0TMX/ACvSEi9H
+         zZxJHYXJFf3BUAz0PLu/u3WtF46zY63dmR/mU5+As4zbGHyIQ8PMHJYlsS5HT30kDbAj
+         L5dw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722875171; x=1723479971;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LTrtRaPSzzv6povC2MZbVu/ikbGDz5GKGualsN8e2oo=;
+        b=ADsGvsUooxDf2nfAT5FnCeI3UEAg1hTriFuL0dYQiRrsRmxJSvimU4yCMO4T52iqIv
+         SgzwztppNGmVUB2wmktNOg4pF2CwMgyOygAOXewrMgHbA8pRmLT8IK7PDt8KfNuSaTV/
+         aJBU4EyE6M7T3vgLraBacBLt4CEv6UEjvj+ytnTMlqV6b0WK2KOnaEzhtWK9D9/tTjjE
+         YoDG6gdzIUmCVx2Aw1H5j1GVaBTlKCHqDCthT6yrZMGhlOxSxGw7wRrcvx9rBT0e4K14
+         sncz8vcBJSTLhwyaPZh7vsxFO3htnUacSY8wpCgu2iamGHEp6DuX0pLIvK9PS+4UUNq5
+         NLnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWAyvOqdGW2p0SI4uQM5VDZyVzCGpFf5AVFW1GJ5iIql4m3N4i0QMhdO5P3XI7hiUcWCT3Ct+jors/PpDIL68tfP7z9
+X-Gm-Message-State: AOJu0YzRT4Tut0aXFI+uzwMqHrZDnlM+Z6r2vQyNa9rVyOIaKoDg77tS
+	aT69FWGADgKYX5FNZugj7kbSh9ac7x4tQdBT+gmQ5kH9Swbm+Cs5KmXFErkTaOMlhiap+EXGO90
+	74Q==
+X-Google-Smtp-Source: AGHT+IEw6cjRWnePzyF97nk0/YCd4IV9HttqCP5c4LXLKTNvkvgZNp5EEi3fIHSWkDuAjgZYuZu0HrMv3+A=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:3f41:0:b0:7a1:2fb5:3ff7 with SMTP id
+ 41be03b00d2f7-7b7438b1dc8mr27331a12.0.1722875171415; Mon, 05 Aug 2024
+ 09:26:11 -0700 (PDT)
+Date: Mon, 5 Aug 2024 09:26:04 -0700
+In-Reply-To: <eaa907ef-6839-48c6-bfb7-0e6ba2706c52@rbox.co>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vBXB/GZWADW/Ncoh"
-Content-Disposition: inline
-In-Reply-To: <868qxe0wzp.wl-maz@kernel.org>
-X-Cookie: Goodbye, cool world.
+Mime-Version: 1.0
+References: <20240802202941.344889-1-seanjc@google.com> <20240802202941.344889-2-seanjc@google.com>
+ <eaa907ef-6839-48c6-bfb7-0e6ba2706c52@rbox.co>
+Message-ID: <ZrD9HHaMBqNGEaaW@google.com>
+Subject: Re: [PATCH 1/2] KVM: x86: Make x2APIC ID 100% readonly
+From: Sean Christopherson <seanjc@google.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Haoyu Wu <haoyuwu254@gmail.com>, 
+	syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="us-ascii"
 
+On Sun, Aug 04, 2024, Michal Luczaj wrote:
+> On 8/2/24 22:29, Sean Christopherson wrote:
+> > [...]
+> > Making the x2APIC ID fully readonly fixes a WARN in KVM's optimized map
+> > calculation, which expects the LDR to align with the x2APIC ID.
+> > 
+> >   WARNING: CPU: 2 PID: 958 at arch/x86/kvm/lapic.c:331 kvm_recalculate_apic_map+0x609/0xa00 [kvm]
+> >   CPU: 2 PID: 958 Comm: recalc_apic_map Not tainted 6.4.0-rc3-vanilla+ #35
+> >   Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.2-1-1 04/01/2014
+> >   RIP: 0010:kvm_recalculate_apic_map+0x609/0xa00 [kvm]
+> >   Call Trace:
+> >    <TASK>
+> >    kvm_apic_set_state+0x1cf/0x5b0 [kvm]
+> >    kvm_arch_vcpu_ioctl+0x1806/0x2100 [kvm]
+> >    kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
+> >    __x64_sys_ioctl+0xb8/0xf0
+> >    do_syscall_64+0x56/0x80
+> >    entry_SYSCALL_64_after_hwframe+0x46/0xb0
+> >   RIP: 0033:0x7fade8b9dd6f
+> 
+> Isn't this WARN_ON_ONCE() inherently racy, though? With your patch applied,
+> it can still be hit by juggling the APIC modes.
 
---vBXB/GZWADW/Ncoh
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Doh, right, the logic is unfortunately cross-vCPU.  The sanity check could be
+conditioned on the APIC belonging to the running/loaded vCPU, but I'm leaning
+towards deleting it entirely.  Though it did detect the KVM_SET_LAPIC backdoor...
 
-On Sat, Aug 03, 2024 at 10:35:54AM +0100, Marc Zyngier wrote:
-> Mark Brown <broonie@kernel.org> wrote:
+Anyone have a preference, or better idea?
 
-> > This conversion was done with the sed command:
+diff --git a/arch/x86/kvm/lapic.c b/arch/x86/kvm/lapic.c
+index a7172ba59ad2..67a0c116ebc0 100644
+--- a/arch/x86/kvm/lapic.c
++++ b/arch/x86/kvm/lapic.c
+@@ -352,7 +352,8 @@ static void kvm_recalculate_logical_map(struct kvm_apic_map *new,
+         * additional work is required.
+         */
+        if (apic_x2apic_mode(apic)) {
+-               WARN_ON_ONCE(ldr != kvm_apic_calc_x2apic_ldr(kvm_x2apic_id(apic)));
++               WARN_ON_ONCE(ldr != kvm_apic_calc_x2apic_ldr(kvm_x2apic_id(apic)) &&
++                            vcpu == kvm_get_running_vcpu());
+                return;
+        }
+ 
 
-> >   sed -i -E 's-ARM64_SYS_REG.*/\* (.*) \*/-KVM_ARM64_SYS_REG(SYS_\1),-' tools/testing/selftests/kvm/aarch64/get-reg-list.c
-
-> [Eyes rolling]
-
-> What I asked about scripting the whole thing, it never occurred to me
-> that you would use the *comments* as a reliable source of information.
-> Do we have anything less reliable than comments in the kernel?
-
-I think we should ultimately be using both the comments and the
-encodings - the comments indicate what people thought was being tested
-and it's useful to make sure we have that coverage even if the
-implementation were to have been wrong.
-
-Doing this step is also going to have picked up registers which we don't
-yet have in the sysreg file, some of which are going to be painful to
-add there (things like ESR for example) so aren't likely to get done in
-a hurry due to complexity in their definitions.
-
-This was quick to do, represents progress, and offers a hint to anyone
-adding new registers that they should use the symbolic definitions.
-
-> The matching must be done from the arch/arm64/tools/sysreg file,
-> because that's the (admittedly dubious) source of truth. We actually
-> trust the encodings because they are reported by the kernel itself.
-> The comment is hand-written, and likely wrong.
-
-Sure, there's a reason I compared the resulting binaries rather than
-just trusting that the conversion gave the same result.
-
-> > -	ARM64_SYS_REG(3, 3, 14, 3, 1),	/* CNTV_CTL_EL0 */
-> > -	ARM64_SYS_REG(3, 3, 14, 3, 2),	/* CNTV_CVAL_EL0 */
-> > +	KVM_ARM64_SYS_REG(SYS_CNTV_CTL_EL0),
-> > +	KVM_ARM64_SYS_REG(SYS_CNTV_CVAL_EL0),
-> >  	ARM64_SYS_REG(3, 3, 14, 0, 2),
-
-> Great. So not only you fail convert a register, but you also ignore
-> the nugget described in arch/arm64/invlude/uapi/asm/kvm.h:267.
-
-That's that CNTV_CTL_EL0 and CNTV_CVAL_EL0 have their encodings
-reversed in the ABI.
-
-> Sure, having both described hides the crap, as we don't attach any
-> significance to the registers themselves. But that shows how
-> untrustworthy the comments are.
-
-I'm afraid that any automated conversion is likely to trip over an ABI
-issue like that - the obvious thing to do when looking up by encoding
-would be to just emit a KVM_ARM64_SYS_REG() if we find the encoding
-which would give the same end result.  I'll add a separate manual update
-of these registers.
-
-Are there any other similar issues?  I didn't spot anything in kvm.h.
-
-> >  	ARM64_SYS_REG(2, 0, 0, 0, 4),
-> >  	ARM64_SYS_REG(2, 0, 0, 0, 5),
-> >  	ARM64_SYS_REG(2, 0, 0, 0, 6),
-
-> As far as I can tell, these registers are not unallocated, and they
-> should be named.
-
-I agree that we should do all named registers eventually, the above are
-numbered debug registers (DBGBVR0_EL1, DBGBCR0_EL1 and DBGWVR0_EL1)
-which aren't in the sysreg file yet so wouldn't currently be covered by
-a conversion based on pulling encodings from there.  They could also be
-done immediately with a generator script as there are DBGBVRn_EL1 style
-macros there.
-
-Like I say this is a quick first step and does improve things, there's
-still more to do but I do think this moves us forward.  We can and
-should come back later and build on things as people have time.
-
---vBXB/GZWADW/Ncoh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmaw+usACgkQJNaLcl1U
-h9A5QQf/eq0ZOdpYjJXRG4CZ3SHDFIZ/NM9H8ZnuG8wQ5BVfd1DI1hdEiZ9P+jT5
-IgxAmzyq0jBtYm+llNM9Bh/KmjK9rLDfqIDPmfgpIKithc/IVo56E5SYXakQG5Fl
-7pAT1nQt9Favk+dUlWY/4gShcfvJw12CpZn6hGI+6ZYr5tfYL7WbCrSlJ9XXlVPX
-NU3YDGHDj0x2jiQDLndhAEeg53i3KwXSsngtyXQejpaI5GB6EIdTUKQ0bOVBoDq2
-2PUjl74LLOZ/ELvCZsRGm7bPhZeMV5QBafI4H2Dl2fE02TM5ObCIjSW3sDdQXZTf
-v6kOGV2I6Y9d+DfFwOec3a308g10rQ==
-=TkJy
------END PGP SIGNATURE-----
-
---vBXB/GZWADW/Ncoh--
 
