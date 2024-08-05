@@ -1,108 +1,129 @@
-Return-Path: <kvm+bounces-23229-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23230-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3290B947CF0
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 16:36:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C67947CFA
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 16:41:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 636021C21BB6
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 14:36:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D8EA284893
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 14:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84251158DDF;
-	Mon,  5 Aug 2024 14:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB95D537FF;
+	Mon,  5 Aug 2024 14:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b="RNpaM8+L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SDmbCmd9"
 X-Original-To: kvm@vger.kernel.org
-Received: from outgoing.mit.edu (outgoing-auth-1.mit.edu [18.9.28.11])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182171552FF
-	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 14:35:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.9.28.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A2E139CFF
+	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 14:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722868529; cv=none; b=XKIUHA2wwcSEresv4OhYqBBdhnm/afIAlioSqMHtohO1Im0H0yA7p9Jqdo2hZFtTtyJyDTC4ED1e3gMm3O7cFzB2GCKbrZxN+e2RijbA0aXHJKSwNUY/r5zpH37huu2EgrbgQT3aWTUdeRniOhf8OqWcDkKyPv3ubNxkDQTxI10=
+	t=1722868902; cv=none; b=D6HaD7pbiyEXQbps40AifwcRHyJBTp+Au3w9p6MgfvoZ1BahEPsRy6eOTUFRh5Qo6tn7APqgbwgdGu63UtVlL4QkKMzNsPnMSSSbMxFGQ6YCV326ldeOJM2isfSDvXwUnUnP7XhDFSVmgAO+DTA3435tGOxJNA5LO0K67LBrN/I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722868529; c=relaxed/simple;
-	bh=vXe8Xkug6TZxY5RcgrU7GWSnbNradf9MTr3q34K6reY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kPTHd+rMEG5sWatPStIDjwVMWT41qT4LNhieQOInKFQpf8wNThPWRG4TG6BQWypHEdTSILL0DXRYFFzcukfPJYDSAMpMr2Q3ICUzxGR5KWnzqV9kJicka56T5kt+OxS5g0eelm9rUndE27BSMRNyOJKB3BTX/0XV7aWjQIRumtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu; spf=pass smtp.mailfrom=mit.edu; dkim=pass (2048-bit key) header.d=mit.edu header.i=@mit.edu header.b=RNpaM8+L; arc=none smtp.client-ip=18.9.28.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mit.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mit.edu
-Received: from cwcc.thunk.org (pool-173-48-111-165.bstnma.fios.verizon.net [173.48.111.165])
-	(authenticated bits=0)
-        (User authenticated as tytso@ATHENA.MIT.EDU)
-	by outgoing.mit.edu (8.14.7/8.12.4) with ESMTP id 475EWNxu014397
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 5 Aug 2024 10:32:24 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mit.edu; s=outgoing;
-	t=1722868348; bh=HNqj/+/nTZPBR7gnswUv8CXGIulX1uayMeFA8elCAro=;
-	h=Date:From:Subject:Message-ID:MIME-Version:Content-Type;
-	b=RNpaM8+LReWAzjQ9Dm7QmvAErWmf25f4v7g1cHyC0ximCdwvaie3O1uw/L0UC/Ha3
-	 3EZixtlAk0i0FkX0gO9E/fOy59kc9S4xYIc5B7lHIylAPZnpWkqQ7UhF/EvXW6t0Nd
-	 d0oHLXMqgdZ1lVjI03Xzyow23CxcE4PhM6u6KAQBoRpZNMM+r7NMUxf0zwW8gk17sP
-	 mW9/fhfVMNlsO7Oih2lhCFVWvG6KNwLUPEwHF+TqIQDppb2sRw9QoHVhyL8cRdpltH
-	 ob2SPahJ+IQEGaJk/zIphkoekpCPZ1qtf+VDFjPYNGveodbl4IEW2Gi2rsQyALqmPw
-	 Aha9MK/CoTiiQ==
-Received: by cwcc.thunk.org (Postfix, from userid 15806)
-	id AA0F515C0330; Mon, 05 Aug 2024 10:32:23 -0400 (EDT)
-Date: Mon, 5 Aug 2024 10:32:23 -0400
-From: "Theodore Ts'o" <tytso@mit.edu>
-To: James Gowans <jgowans@amazon.com>
-Cc: linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Alexander Viro <viro@zeniv.linux.org.uk>,
-        Steve Sistare <steven.sistare@oracle.com>,
-        Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-        Anthony Yznaga <anthony.yznaga@oracle.com>,
-        Mike Rapoport <rppt@kernel.org>,
-        Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
-        Jason Gunthorpe <jgg@ziepe.ca>, linux-fsdevel@vger.kernel.org,
-        Usama Arif <usama.arif@bytedance.com>, kvm@vger.kernel.org,
-        Alexander Graf <graf@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>,
-        Paul Durrant <pdurrant@amazon.co.uk>,
-        Nicolas Saenz Julienne <nsaenz@amazon.es>
-Subject: Re: [PATCH 00/10] Introduce guestmemfs: persistent in-memory
- filesystem
-Message-ID: <20240805143223.GA1110778@mit.edu>
-References: <20240805093245.889357-1-jgowans@amazon.com>
+	s=arc-20240116; t=1722868902; c=relaxed/simple;
+	bh=ecjp0Hf0iQhOloLg+5THly2RViSs1xyysVIbS5xlfqk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pmrnsRN+fsr7LjnRYAbIY5cM7z660YpiDxvLlZwlA9jKQYkbi81B4UjhCypi6xuGC/5K3ZfXbniq8z1mepGUBI2GBh31p+PI/rwr/FrGItwqv3eGZaguU59jxj25uGHeYsoT0BJAFCyd3PFYTy3p2cZ6WTO7TGjHUY7wJp+3EAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SDmbCmd9; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722868899;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=is1WM++VT4Ceny6+rACPKsaEum5ihnLIwJEdmx2bnoE=;
+	b=SDmbCmd9R1UyCm/Qs91hs4DV/jBMC7231b5IBYF0xuOODnEX8m0Km4bzXXC7NM6Yw99qoY
+	VAWr9q20BNWGxdk9NoH3s0/VUII98sw9t+tRQzBHwdErSsRpw7A2gJx4D9ZT7xFBMIt8Sh
+	8HwKYBbwKnHbkUIA3dTI0+oW1Zt5vfU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-lg_LBn6GPjebG2Zv5Z0RBA-1; Mon, 05 Aug 2024 10:41:38 -0400
+X-MC-Unique: lg_LBn6GPjebG2Zv5Z0RBA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3684ea1537fso5401930f8f.1
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 07:41:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722868897; x=1723473697;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=is1WM++VT4Ceny6+rACPKsaEum5ihnLIwJEdmx2bnoE=;
+        b=qm5NKaoSoIxtu7KIvENysfNFPEnucQG9ktMaiXL1tJuWOvL0Visl8DC/NmpX6sG10f
+         t2rZQj/r8cwmQ6QqvABP7uTF3epgMsfVjOLPvyN7LT3xYp+jwZo7/CZXefLkqe5dSrm1
+         iP/Prrt8Z10X/bLk9gCAGngX4FNDCa8OkbHCIJ60ICQY7W30AWqkWW/FqZCvV1cwO8+F
+         qJ+kct/uAFXBhQ4ktx2iOtbUWhgKWjvve83wp7ktyOd5ENYCB39X/7fpPQxmM8vHs24h
+         Zq16aasFVhJ3tOvmGkpflLgq1UQ6O4qNUjvLANwAKo54m6QaEZFCFx8QlZsr4Hf/u2Ja
+         Wueg==
+X-Forwarded-Encrypted: i=1; AJvYcCW3GQcaRbbVjKakYrDgNw90TFUDrRo1Dye6X62kpABxQrHaW8yhy42quR0ZC/5mypTjw98fkBr140ItAZSXjK2EvZqB
+X-Gm-Message-State: AOJu0YwlWRbAe3WedR0zZg8h5yM/hPa+T/fiIcpttC+LnaOJ8nud442x
+	TU2h5SdbEJqq7rPb1Vz/EUUNReRlPWv9Xk/u+Q3K4jON1NOc1kWVo9f+TEIIrJSFqB0HrF22Xij
+	jFxsacuue9XTQeXfwskrFHgfAd6dfNxGMUd0HZ/84jk7dKdXtxxWeanAeNtnMRX0xFyXfSzKzxh
+	stCgFsnQdtlG/XhOjKwt7rpWc1
+X-Received: by 2002:a05:6000:dd0:b0:368:3079:427f with SMTP id ffacd0b85a97d-36bbc12c503mr6358669f8f.30.1722868896955;
+        Mon, 05 Aug 2024 07:41:36 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGORe404OR8+lZHyt0xrqRf0852CVHZ5agUPquA97aY6bZLBMVWP/j7MHMW1GPe6Vlxbu6hfVrrT5hYjROrP3g=
+X-Received: by 2002:a05:6000:dd0:b0:368:3079:427f with SMTP id
+ ffacd0b85a97d-36bbc12c503mr6358656f8f.30.1722868896526; Mon, 05 Aug 2024
+ 07:41:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240805093245.889357-1-jgowans@amazon.com>
+References: <20240805093245.889357-1-jgowans@amazon.com> <20240805143223.GA1110778@mit.edu>
+In-Reply-To: <20240805143223.GA1110778@mit.edu>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Mon, 5 Aug 2024 16:41:25 +0200
+Message-ID: <CABgObfYhg6uoR7cQN4wf3bNLZbHfXv6fr35aKsKbqMvuv20Xrg@mail.gmail.com>
+Subject: Re: [PATCH 00/10] Introduce guestmemfs: persistent in-memory filesystem
+To: "Theodore Ts'o" <tytso@mit.edu>
+Cc: James Gowans <jgowans@amazon.com>, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Steve Sistare <steven.sistare@oracle.com>, Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+	Anthony Yznaga <anthony.yznaga@oracle.com>, Mike Rapoport <rppt@kernel.org>, 
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org, 
+	Jason Gunthorpe <jgg@ziepe.ca>, linux-fsdevel@vger.kernel.org, 
+	Usama Arif <usama.arif@bytedance.com>, kvm@vger.kernel.org, 
+	Alexander Graf <graf@amazon.com>, David Woodhouse <dwmw@amazon.co.uk>, 
+	Paul Durrant <pdurrant@amazon.co.uk>, Nicolas Saenz Julienne <nsaenz@amazon.es>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Aug 05, 2024 at 11:32:35AM +0200, James Gowans wrote:
-> Guestmemfs implements preservation acrosss kexec by carving out a
-> large contiguous block of host system RAM early in boot which is
-> then used as the data for the guestmemfs files.
+On Mon, Aug 5, 2024 at 4:35=E2=80=AFPM Theodore Ts'o <tytso@mit.edu> wrote:
+> On Mon, Aug 05, 2024 at 11:32:35AM +0200, James Gowans wrote:
+> > Guestmemfs implements preservation acrosss kexec by carving out a
+> > large contiguous block of host system RAM early in boot which is
+> > then used as the data for the guestmemfs files.
+>
+> Also, the VMM update process is not a common case thing, so we don't
+> need to optimize for performance.  If we need to temporarily use
+> swap/zswap to allocate memory at VMM update time, and if the pages
+> aren't contiguous when they are copied out before doing the VMM
+> update
 
-Why does the memory have to be (a) contiguous, and (b) carved out of
-*host* system memory early in boot?  This seems to be very inflexible;
-it means that you have to know how much memory will be needed for
-guestmemfs in early boot.
+I'm not sure I understand, where would this temporary allocation happen?
 
-Also, the VMM update process is not a common case thing, so we don't
-need to optimize for performance.  If we need to temporarily use
-swap/zswap to allocate memory at VMM update time, and if the pages
-aren't contiguous when they are copied out before doing the VMM
-update, that might be very well worth the vast of of memory needed to
-pay for reserving memory on the host for the VMM update that only
-might happen once every few days/weeks/months (depending on whether
-you are doing update just for high severity security fixes, or for
-random VMM updates).
+> that might be very well worth the vast of of memory needed to
+> pay for reserving memory on the host for the VMM update that only
+> might happen once every few days/weeks/months (depending on whether
+> you are doing update just for high severity security fixes, or for
+> random VMM updates).
+>
+> Even if you are updating the VMM every few days, it still doesn't seem
+> that permanently reserving contiguous memory on the host can be
+> justified from a TCO perspective.
 
-Even if you are updating the VMM every few days, it still doesn't seem
-that permanently reserving contiguous memory on the host can be
-justified from a TCO perspective.
+As far as I understand, this is intended for use in systems that do
+not do anything except hosting VMs, where anyway you'd devote 90%+ of
+host memory to hugetlbfs gigapages.
 
-Cheers,
+Paolo
 
-						- Ted
 
