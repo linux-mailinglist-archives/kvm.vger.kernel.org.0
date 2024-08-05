@@ -1,204 +1,258 @@
-Return-Path: <kvm+bounces-23260-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23261-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 307569483BC
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 22:54:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 605339484EC
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 23:36:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 543311C20F57
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 20:54:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8394A1C20A78
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 21:36:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1537216BE38;
-	Mon,  5 Aug 2024 20:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88CC016D338;
+	Mon,  5 Aug 2024 21:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NFxZimmP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="foK7udw6"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6C08469
-	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 20:54:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFD357323
+	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 21:35:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722891255; cv=none; b=aWHgicgZVGFOKTJDYP5w4qmbqv/NZC/H+0HpZerAtGtpmnhpLRBearWS/6KV4zs0gkaJDcJ9JbHfZRNP3GKnoaWDAnuDvQRC4Q/Y0Vzf2aM0UGjyJ26/B9Yhp1hyROETSje7viDWRfQ1kC6BPEBcKgpmyESEAzGKWEm31R3EjjE=
+	t=1722893756; cv=none; b=FPqBC3I3PjKs3E1Awsye99PIzMx3jyPjatxYqaTsDE3uitO5bFuSyJuH45jf0Mhe2cei+9+3wAPAxgP0eJmEWfKDMxUShY7oZnNB+1aY+nNyBFQCyqVUwpyFDTGCuL1h3f0U50qjk2/1c5cMn6QJPasLZvdg5ZyE4G94Qv5FDVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722891255; c=relaxed/simple;
-	bh=4K6QTR6HvNRPQ7887+ZOCG9zsjAWM1Dl8u50rzFuCt8=;
+	s=arc-20240116; t=1722893756; c=relaxed/simple;
+	bh=u4ywBlsRL0BxaT3cYq2Z2kIJTx4MW2c/ESHGD59dVq8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=UhPwcXplSZIKmjowYeKuhFKmE8DJ/XS3FXnNFWFHokEsJ88noAL3fjmzTb5GXKzm7oFbEdZm1VrRDhKg7b4SPrtBSXMWJkd3Wp3AZQiVqycdVMeNHsA9v6eWK3d4+pw2sfPkfWuEUUSYFiYCYNbJMaE7rumXfQkqSlaEUffpZ64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NFxZimmP; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=JUr1CFebKA9InMesGMMG2q2z3fMtH7HKGr1AI5fgEFZpdnD8Av8niFib+Fco5RAclfvwTPkVAGKAUNIW/1CElBVD4DdTOYHh8XPxTsZe/9ZUgJuN2gzbnJe2WIOwp59tdRz6FiPfrlfi0VHCncS13bq1iCCuVPZoI0/9CFc1BJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=foK7udw6; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0be1808a36so6675763276.1
-        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 13:54:13 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a30753fe30so8506766a12.3
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 14:35:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722891253; x=1723496053; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1722893755; x=1723498555; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=NMlpeHo+HyY4kal0mMvXGCf6/Wgtc0+eV5pFZe1YOkg=;
-        b=NFxZimmPaArlkQJfBHjNs3otTKq/FFuCaQD2vN8KvNSOfjT2d7wUDj8+pqK8uFnyYX
-         FuG95kFwa5bVumzinX6Qtt7+5Rof4HOfrndMdINh5WCzbclyxya7d286Oo5KhNnkDv0e
-         c2KOgi6NAMSgp097r4NwO3OxTq8ZvZl0GFXblAkHqyCZ8JXUifMJNFOw1erX58XHv+gO
-         MzWm8l2ATZUkb3Rt8KH/AmRc1PyIQT4x0OiVtjo2MAI2Pk/uSI6prkvyBqVXgV0NsKzO
-         uJGh7D9aexNcdwAz77ViO7Glcrf4R0uJvEkkGG0Cj+vPPDCL6hwKFK/yEQOprKX9w/a1
-         ZCIA==
+        bh=7zEougPEyu/XsP7BiNYzpW05XehPP1UwCYeavBIksYY=;
+        b=foK7udw6/eXCG0b3mNVvBvRdmlHZacwzmElavHqAKxFpVhuD63LWWL5LfF8mDpoLig
+         taGxtnetywrBDA5U3/j4m4ucuDENqt1GCUyUD3eWcgTPkXVoOCrXgSoNocmnP5biig8h
+         nEyS7AuPo9Fxqqy946F6m5cWpSOXQyeTMaQ4FPJZ0nWM5hAoz/VmuIR2lX0H0w8a0Zyo
+         3mHWUfpsX6SblLvZPCZYMmVveVA8dgpNxI25YunPbTfAWFRsjHzjGR0dURSFQjfMSiBW
+         dRJxScTppTQoKgTY882BHNUB8aNdYynJmHpRDdEtwgkExyp6d0izEyOitJlSOZKy4W/w
+         3mPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722891253; x=1723496053;
+        d=1e100.net; s=20230601; t=1722893755; x=1723498555;
         h=content-transfer-encoding:cc:to:from:subject:message-id:references
          :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=NMlpeHo+HyY4kal0mMvXGCf6/Wgtc0+eV5pFZe1YOkg=;
-        b=UuZCizRoTWV+bkZlccbvRaO4PKANeuXihtAsYG6oVw3/kBGIsVuCnNh4c84/Si2amF
-         or34F95YQdTRzUplOUiQUEk7PsRz/0lmEXNWqyuj5HlwVp7fPJRn2r9bdMkIW28KH7jo
-         83I8KNFGF/GfX8AkR7Kk2q0R6rZFmWmRJsjMb2s0wHCA2cTtgcW5g0SEuduwfObHPKof
-         MwcO3tJsXDDQ1xs3BLxjOs/gdIGaXV5LFa1oSCjkENzl1iya226q4/LqXfjTnSje0ojF
-         vl2MgLF4hCr03wESX+HzZ0dQwixf0KHpuuBEwSruZMZuYCYz1DCvroBqcG8CvUZuc31n
-         mRkQ==
-X-Gm-Message-State: AOJu0Yw19oPiE/fElWHDenSKZWhnuycNpYHrcXAmehFNoA3RH0AnR61S
-	h2qvnBy40t2vqrc68C8dCi47Zh8EEFfwNajHv04VK+R9tzz79GjIUycPSGWW4lzVNPcqDXHn/yo
-	U8Q==
-X-Google-Smtp-Source: AGHT+IH5AyNFdYN4/Gz/qGAS0tjwBQNkFLZjkGowb/SR6Kr7Xn6v/UbkFeCWwxD/z7GlyKyujyrajh9pOz8=
+        bh=7zEougPEyu/XsP7BiNYzpW05XehPP1UwCYeavBIksYY=;
+        b=Qt+upUoaML9aeTrIrnLe/Ijef/FvChE54VQvkIs8+olC1crJWHa10vZglNO1WvdJkV
+         NeS+yNRs+0BCMPUWb1e+wf88DGiCxoLpHEhMRVgZv6MKiIemvWMfTEn+2MGkh8+aCE1/
+         zXRMWrV7kVzJPL8vvHWtkoxhuX/8yvHt2wVnFMJrddtTmVuGswVU/HRqHsg5r3tfBqVw
+         ERQUeVvSV8BGl8n9rVOL+/404dHQjSw2wka1IbfqUbViVo/imy+/5nezIzgZSnTVn0iA
+         0N7GdCwX8EPeVS9bcs7RSdw6V9trqggeEFMQNdEPqM1LW0zg3qq1ZcNEyxwhdMSECgc5
+         /ghQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWtahK5Uz7gbGDhCe9IZXwZw/6sK/GYF8b5+o/tV7xiUEf1o93SJzBogkFu4ELvBDXZJeuroYD6ubhxYAob3fWPOzfs
+X-Gm-Message-State: AOJu0YyGNyvPAcwHAotpuDFZd5bRTw63FTKqt8aJEIGBGGmnmDKF2hzj
+	ZqeWh7ETJSEAhPwN3phbdTgvh0s5g4xH001miPRVoAb1Z/eYeIuCwFURZoE0x7dadXR1ZUYr66t
+	ExQ==
+X-Google-Smtp-Source: AGHT+IHOyNGBl0lTxCv1pGrwQOW9eslx0DzywsCu/KV//UKtHQ2KhGiXtjHiSMZdzddUzk4dGaKgMyPOW3Q=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:c08:b0:e0b:bafe:a7f3 with SMTP id
- 3f1490d57ef6-e0bde428581mr567572276.11.1722891252816; Mon, 05 Aug 2024
- 13:54:12 -0700 (PDT)
-Date: Mon, 5 Aug 2024 13:54:11 -0700
-In-Reply-To: <b6569c6d40317e957cff9309dcfe943d72544b60.camel@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a63:bd4a:0:b0:785:e3e:38d3 with SMTP id
+ 41be03b00d2f7-7b74853d441mr28660a12.7.1722893754549; Mon, 05 Aug 2024
+ 14:35:54 -0700 (PDT)
+Date: Mon, 5 Aug 2024 14:35:53 -0700
+In-Reply-To: <ffa76b1b62c5cd2001f5f313009376e131bc2817.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240802151608.72896-1-mlevitsk@redhat.com> <20240802151608.72896-2-mlevitsk@redhat.com>
- <Zq0A9R5R_MAFrqTP@google.com> <cdb61fa7cc5cfe69b030493ea566cbf40f3ec2e1.camel@redhat.com>
- <ZrEAXVhH3w6Q0tIy@google.com> <b6569c6d40317e957cff9309dcfe943d72544b60.camel@redhat.com>
-Message-ID: <ZrE78zQYU95o6QCq@google.com>
-Subject: Re: [PATCH v2 1/2] KVM: x86: relax canonical check for some x86
- architectural msrs
+References: <20240517173926.965351-1-seanjc@google.com> <20240517173926.965351-25-seanjc@google.com>
+ <20d3017a8dd54b345104bf2e5cb888a22a1e0a53.camel@redhat.com>
+ <ZoxaOqvXzTH6O64D@google.com> <31cf77d34fc49735e6dff57344a0e532e028a975.camel@redhat.com>
+ <ZqQybtNkhSVZDOTu@google.com> <ffa76b1b62c5cd2001f5f313009376e131bc2817.camel@redhat.com>
+Message-ID: <ZrFFua_7kWKBESbe@google.com>
+Subject: Re: [PATCH v2 24/49] KVM: x86: #undef SPEC_CTRL_SSBD in cpuid.c to
+ avoid macro collisions
 From: Sean Christopherson <seanjc@google.com>
 To: mlevitsk@redhat.com
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Borislav Petkov <bp@alien8.de>, "H. Peter Anvin" <hpa@zytor.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Ingo Molnar <mingo@redhat.com>, x86@kernel.org, Thomas Gleixner <tglx@linutronix.de>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, Chao Gao <chao.gao@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Vitaly Kuznetsov <vkuznets@redhat.com>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Hou Wenlong <houwenlong.hwl@antgroup.com>, 
+	Kechen Lu <kechenl@nvidia.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Binbin Wu <binbin.wu@linux.intel.com>, Yang Weijiang <weijiang.yang@intel.com>, 
+	Robert Hoo <robert.hoo.linux@gmail.com>, Borislav Petkov <bp@alien8.de>
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: quoted-printable
 
++Boris
+
 On Mon, Aug 05, 2024, mlevitsk@redhat.com wrote:
-> =D0=A3 =D0=BF=D0=BD, 2024-08-05 =D1=83 09:39 -0700, Sean Christopherson =
+> =D0=A3 =D0=BF=D1=82, 2024-07-26 =D1=83 16:34 -0700, Sean Christopherson =
 =D0=BF=D0=B8=D1=88=D0=B5:
-> > On Mon, Aug 05, 2024, mlevitsk@redhat.com=C2=A0wrote:
-> > > =D0=A3 =D0=BF=D1=82, 2024-08-02 =D1=83 08:53 -0700, Sean Christophers=
-on =D0=BF=D0=B8=D1=88=D0=B5:
-> > > > > > > Checking kvm_cpu_cap_has() is wrong.=C2=A0 What the _host_ su=
-pports is irrelevant,
-> > > > > > > what matters is what the guest CPU supports, i.e. this should=
- check guest CPUID.
-> > > > > > > Ah, but for safety, KVM also needs to check kvm_cpu_cap_has()=
- to prevent faulting
-> > > > > > > on a bad load into hardware.=C2=A0 Which means adding a "gove=
-rned" feature until my
-> > > > > > > CPUID rework lands.
+> > > On Wed, Jul 24, 2024, Maxim Levitsky wrote:
+> > > > > On Mon, 2024-07-08 at 14:29 -0700, Sean Christopherson wrote:
+> > > > > > > On Thu, Jul 04, 2024, Maxim Levitsky wrote:
+> > > > > > > > > Maybe we should instead rename the SPEC_CTRL_SSBD to
+> > > > > > > > > 'MSR_IA32_SPEC_CTRL_SSBD' and together with it, other fie=
+lds of this msr.=C2=A0 It
+> > > > > > > > > seems that at least some msrs in this file do this.
+> > > > > > >=20
+> > > > > > > Yeah, the #undef hack is quite ugly.=C2=A0 But I didn't (and =
+still don't) want to
+> > > > > > > introduce all the renaming churn in the middle of this alread=
+y too-big series,
+> > > > > > > especially since it would require touching quite a bit of cod=
+e outside of KVM.
+> > > > >=20
+> > > > > > >=20
+> > > > > > > I'm also not sure that's the right thing to do; I kinda feel =
+like KVM is the one
+> > > > > > > that's being silly here.
+> > > > >=20
+> > > > > I don't think that KVM is silly here. I think that hardware defin=
+itions like
+> > > > > MSRs, register names, register bit fields, etc, *must* come with =
+a unique
+> > > > > prefix, it's not an issue of breaking some deeply nested macro, b=
+ut rather an
+> > > > > issue of readability.
 > > >=20
-> > > Well the problem is that we passthrough these MSRs, and that means th=
-at the guest
-> > > can modify them at will, and only ucode can prevent it from doing so.
+> > > For the MSR names themselves, yes, I agree 100%.=C2=A0 But for the bi=
+ts and mask, I
+> > > disagree.=C2=A0 It's simply too verbose, especially given that in the=
+ vast majority
+> > > of cases simply looking at the surrounding code will provide enough c=
+ontext to
+> > > glean an understanding of what's going on.
+>=20
+> I am not that sure about this, especially if someone by mistake uses a fl=
+ag
+> that belong to one MSR, in some unrelated place. Verbose code is rarely a=
+ bad thing.
+>=20
+>=20
+> > > =C2=A0 E.g. even for SPEC_CTRL_SSBD, where
+> > > there's an absurd amount of magic and layering, looking at the #defin=
+e makes
+> > > it fairly obvious that it belongs to MSR_IA32_SPEC_CTRL.
 > > >=20
-> > > So even if the 5 level paging is disabled in the guest's CPUID, but h=
-ost supports it,
-> > > nothing will prevent the guest to write non canonical value to one of=
- those MSRs,=C2=A0
-> > > and later KVM during migration or just KVM_SET_SREGS will fail.
-> > =C2=A0
-> > Ahh, and now I recall the discussions around the virtualization holes w=
-ith LA57.
-> >=20
-> > > Thus I used kvm_cpu_cap_has on purpose to make KVM follow the actual =
-ucode
-> > > behavior.
-> >=20
-> > I'm leaning towards having KVM do the right thing when emulation happen=
-s to be
-> > triggered.=C2=A0 If KVM checks kvm_cpu_cap_has() instead of guest_cpu_c=
-ap_has() (looking
-> > at the future), then KVM will extend the virtualization hole to MSRs th=
-at are
-> > never passed through, and also to the nested VMX checks.=C2=A0 Or I sup=
-pose we could
-> > add separate helpers for passthrough MSRs vs. non-passthrough, but that=
- seems
-> > like it'd add very little value and a lot of maintenance burden.
-> >=20
-> > Practically speaking, outside of tests, I can't imagine the guest will =
-ever care
-> > if there is inconsistent behavior with respect to loading non-canonical=
- values
-> > into MSRs.
-> >=20
+> > > And for us x86 folks, who obviously look at this code far more often =
+than non-x86
+> > > folks, I find it valuable to know that a bit/mask is exactly that, an=
+d _not_ an
+> > > MSR index.=C2=A0 E.g. VMX_BASIC_TRUE_CTLS is a good example, where re=
+naming that to
+> > > MSR_VMX_BASIC_TRUE_CTLS would make it look too much like MSR_IA32_VMX=
+_TRUE_ENTRY_CTLS
+> > > and all the other "true" VMX MSRs.
+> > >=20
+> > > > > SPEC_CTRL_SSBD for example won't mean much to someone who only kn=
+ows ARM, while
+> > > > > MSR_SPEC_CTRL_SSBD, or even better IA32_MSR_SPEC_CTRL_SSBD, lets =
+you instantly know
+> > > > > that this is a MSR, and anyone with even a bit of x86 knowledge s=
+hould at least have
+> > > > > heard about what a MSR is.
+> > > > >=20
+> > > > > In regard to X86_FEATURE_INTEL_SSBD, I don't oppose this idea, be=
+cause we have
+> > > > > X86_FEATURE_AMD_SSBD, but in general I do oppose the idea of addi=
+ng 'INTEL' prefix,
+> > >=20
+> > > Ya, those are my feelings exactly.=C2=A0 And in this case, since we a=
+lready have an
+> > > AMD variant, I think it's actually a net positive to add an INTEL var=
+iant so that
+> > > it's clear that Intel and AMD ended up defining separate CPUID to enu=
+merate the
+> > > same basic info.
+> > >=20
+> > > > > because it sets a not that good precedent, because most of the fe=
+atures on x86
+> > > > > are first done by Intel, but then are also implemented by AMD, an=
+d thus an intel-only
+> > > > > feature name can stick after it becomes a general x86 feature.
+> > > > >=20
+> > > > > IN case of X86_FEATURE_INTEL_SSBD, we already have sadly differen=
+t CPUID bits for
+> > > > > each vendor (although I wonder if AMD also sets the X86_FEATURE_I=
+NTEL_SSBD).
+> > > > >=20
+> > > > > I vote to rename 'SPEC_CTRL_SSBD', it can be done as a standalone=
+ patch, and can
+> > > > > be accepted right now, even before this patch series is accepted.
+> > >=20
+> > > If we go that route, then we also need to rename nearly ever bit/mask=
+ definition
+> > > in msr-index.h, otherwise SPEC_CTRL_* will be the odd ones out.=C2=A0=
+ And as above, I
+> > > don't think this is the right direction.
 >=20
-> Hi,
+> Honestly not really. If you look carefully at the file, many bits are alr=
+eady defined
+> in the way I suggest, for example:
 >=20
-> If we weren't allowing the guest (and even nested guest assuming that L1
-> hypervisor allows it) to write these MSRs directly, I would have agreed w=
-ith
-> you, but we do allow this.
->=20
-> This means that for example a L2, even a malicious L2, can on purpose wri=
-te
-> non canonical value to one of these MSRs, and later on, KVM could kill th=
-e L0
-                                                                           =
-  L1?
-> due to canonical check.
+> MSR_PLATFORM_INFO_CPUID_FAULT_BIT
+> MSR_IA32_POWER_CTL_BIT_EE
+> MSR_INTEGRITY_CAPS_ARRAY_BIST_BIT
+> MSR_AMD64_DE_CFG_LFENCE_SERIALIZE_BIT
 
-Ugh, right, if L1 manually saves/restores MSRs and happens to trigger emula=
-tion
-on WRMSR at the 'wrong" time.
+Heh, I know there are some bits that have an "MSR" prefix, hence "nearly ev=
+ery".
 
-Host userspace save/restore would suffer the same problem.  We could grant =
-host
-userspace accesses an exception, but that's rather pointless.
+> This file has all kind of names for both msrs and flags. There is not muc=
+h
+> order, so renaming the bit definitions of IA32_SPEC_CTRL won't increase t=
+he
+> level of disorder in this file IMHO.
 
-> Or L1 (not Linux, because it only lets canonical GS_BASE/FS_BASE), allow =
-the
-> untrusted userspace to write any value to say GS_BASE, thus allowing
-> malicious L1 userspace to crash L1 (also a security violation).
+It depends on what direction msr-index.h is headed.  If the long-term prefe=
+rence
+is to have bits/masks namespaced with only their associated MSR name, i.e. =
+no
+explicit MSR_, then renaming the bits is counter-productive.
 
-FWIW, I don't think this is possible.  WR{FS,GS}BASE and other instructions=
- that
-load FS/GS.base honor CR4.LA57, it's only WRMSR that does not.
+I added Boris, who I believe was the most opinionated about the MSR bit nam=
+es,
+i.e. who can most likely give us the closest thing to an authoritative answ=
+er as
+to the preferred style.
 
-> IMHO if we really want to do it right, we need to disable pass-though of
-> these MSRs if ucode check is more lax than our check, that is if L1 is
-> running without 5 level paging enabled but L0 does have it supported.
->
-> I don't know if this configuration is common, and thus how much this will
-> affect performance.
+Boris, we're debating about the best way to solve a weird collision between=
+:
 
-MSR_FS_BASE and SR_KERNEL_GS_BASE are hot spots when WR{FS,GS}BASE are unsu=
-pported,
-or if the guest kernels doesn't utilize those instructions.
+  #define SPEC_CTRL_SSBD
 
-All in all, I agree it's not worth trying to plug the virtualization hole f=
-or MSRs,
-especially since mimicking hardware yields much simpler code overall.  E.g.=
- add
-a dedicated MSR helper, and have that one check kvm_cpu_cap_has(), includin=
-g in
-VM-Entry flows, but keep the existing is_noncanonical_address() for all non=
--WRMSR
-path.
+and
 
-Something like this?
+  #define X86_FEATURE_SPEC_CTRL_SSBD
 
-static inline bool is_noncanonical_msr_value(u64 la)
-{
-	u8 virt_addr_bits =3D kvm_cpu_cap_has(X86_FEATURE_LA57) ? 57 : 48;
+KVM wants to use its CPUID macros to essentially do:
 
-	return !__is_canonical_address(la, virt_addr_bits);
-}
+  #define F(name) (X86_FEATURE_##name)
+
+as a shorthand for X86_FEATURE_SPEC_CTRL_SSBD, but that can cause build fai=
+lures
+depending on how KVM's macros are layered.  E.g. SPEC_CTRL_SSBD can get res=
+olved
+to its value prior to token concatentation and result in KVM effectively ge=
+nerating
+X86_FEATURE_BIT(SPEC_CTRL_SSBD_SHIFT).
+
+One of the proposed solutions is to rename all of the SPEC_CTRL_* bit defin=
+itions
+to add a MSR_ prefix, e.g. to generate MSR_SPEC_CTRL_SSBD and avoid the con=
+flict.
+My recollection from the IA32_FEATURE_CONTROL rework a few years back is th=
+at you
+wanted to prioritize shorter names over having everything namespaced with M=
+SR_,
+i.e. that this approach is a non-starter.
 
