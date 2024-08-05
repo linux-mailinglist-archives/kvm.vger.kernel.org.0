@@ -1,73 +1,99 @@
-Return-Path: <kvm+bounces-23276-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23277-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3FC9485E8
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 01:27:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9B999485EC
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 01:29:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9C981F23730
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 23:27:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A484F283BA8
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 23:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80ECC16E877;
-	Mon,  5 Aug 2024 23:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBFE16EC02;
+	Mon,  5 Aug 2024 23:29:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RKwoJraZ"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="MUjxSBCC"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-170.mta1.migadu.com (out-170.mta1.migadu.com [95.215.58.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0FEA16D9A4
-	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 23:27:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3C816CD12
+	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 23:29:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722900427; cv=none; b=euaV4PNmASm/JVTS0DecPnke7dVCrD2p2r6pEDuJb07ov+VkNuONSu9vPLcIKVJRfvsXHayc77p8+Q0DwAMdoNHnxz1AmHy2fBwtbq/NqG1CXoOeJB9dhlPucp6ODbLuFUsbw0sP9s8GZupXijN0dN7u8KhgUgtSQkRj9KomQKw=
+	t=1722900552; cv=none; b=eTXJxnRDGP94h+4PgKDwt9i6a8TZvkjGuhcBFKTNl+OOaQ/n8KXDEfIp/MH0CWMWPvbPXHMvxaBDsaoknfgBh/p+3700QdtntISMtL9ItCafWQqXeYPst8Zs0Axweb56xs8laDyJpIr0a8Rb8GAU8kd/zi8lE/hH3aqOb+Q78IY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722900427; c=relaxed/simple;
-	bh=TGXOf7/1guqVacY7V5I/og3eT0WLPefs7Me46InMVQI=;
+	s=arc-20240116; t=1722900552; c=relaxed/simple;
+	bh=Ud+vs2yn6sXlpWsYL0inF2KS4QwbN9S8Dxwgfx2J134=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dpHf6u/QiHzxzZG0xPIT5Q+Rc1TkTtUnCG8QCiWHURXlaN8NC78mMmg89mKEDU1imgjCLPjydXbaHAyzU2uzaalhmPJjX3tBR9Mpyi4F5KMr9vm/ejlkBOVUfvuHvFji8cNtTHVwysBMoV93OHKFeyNq9SaPwMG3d5VL+55vjhM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RKwoJraZ; arc=none smtp.client-ip=95.215.58.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 5 Aug 2024 23:26:54 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1722900421;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=N/Y4ENu+y9slWM0GBwHxlJjHc94wXfdkp05Gs7ZabqI=;
-	b=RKwoJraZF8EcCuf9Yeaydj7V+54xjIFKFDGqqwUhB7a+wtctICJfGkJrTsxTgXHoUCGmr/
-	MxT6+GXFZukzNHF22AQeMcjuXCNYLrDgYRshsfdGgn8o53cA/EySOVyTW+EnxUHWDvXDVo
-	mtK4xMi/hhtI0dNWL878kUCnrmNBHXM=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Oliver Upton <oliver.upton@linux.dev>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
-	Tianrui Zhao <zhaotianrui@loongson.cn>,
-	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Janosch Frank <frankja@linux.ibm.com>,
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	David Matlack <dmatlack@google.com>,
-	David Stevens <stevensd@chromium.org>,
-	Fuad Tabba <tabba@google.com>
-Subject: Re: [PATCH v12 54/84] KVM: arm64: Mark "struct page" pfns
- accessed/dirty before dropping mmu_lock
-Message-ID: <ZrFfvjy_-Tyx4xUV@linux.dev>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-55-seanjc@google.com>
- <ZrFfgzRbiqT-Zi2O@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=msk9apIPp9QNpM7MFhwnR9NVEH4+jTW2otVOtcGkz9PFeo2bJQt1Yhm0uD5e8unicOQR5Le+BQD4pIE9IqSdu7um68DrjxbJIa5KM1S/2UHyhNyXqqHpJbOpF3mt3nnfuHxJ88DqmS9CXeKxw/5RkCG/LIaZ0L/prU3JcpzQerY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=MUjxSBCC; arc=none smtp.client-ip=209.85.219.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6b7a0ef0dfcso483906d6.1
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 16:29:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1722900549; x=1723505349; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ud+vs2yn6sXlpWsYL0inF2KS4QwbN9S8Dxwgfx2J134=;
+        b=MUjxSBCCZ4a/cVUr5whOihgnOhTIYXF0aEXKzqmkYPINjr2E2onX+wwDkAu+tt2jae
+         vSjt3pDf+aBqVfC6dxFEHZ4svDH4LrmEjCYAZQmduXCp8vXix+jxlUBHhKYHgGaW1/yW
+         l1qN0qq+usNSXvQSyq+Tp+0B7x0NEuXEqscpTUhcgY78HAWu031Us+eLGQZeS/W1bgpN
+         XrGWKsKl/uBIBeA52qi4Oe88x5h/I0Kru6lucgexVGr11pbUeyTKRCcPPxk3rluDsfcY
+         cnpLlQy/ciP3+sS+qh9bugNx+UutmpyKVOmDR10/tFV4LnHprPI+JcbOi1lfrY9xRfAU
+         pKiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722900549; x=1723505349;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ud+vs2yn6sXlpWsYL0inF2KS4QwbN9S8Dxwgfx2J134=;
+        b=M6n4g17CTzZUVjPtprsaKYaHLJDbRf1G0UqfYAA7Xm8FkWfX9B+4PB31+cTpx7NrrC
+         tOw/IuzBNbzjZ84qZuEzoWPZRYUJ+RJCSaH6ABPQRvamK8G29ERbbKdC+vi2h/G+g34E
+         wv+7TcwNn2o4btPC1uzMIK7jVzhHvCDdNFZSitW6w4SjiMc3OgcECVOf17QG1rH8eELz
+         nVJYUctIetpooqfwuzK6EIYSEKJoa94syOBEgaSPzzijLVW0BU/j0Tdv8fk7o4KbNT6L
+         QW/95WU50kdllv7SPUyb5BQ1/jZkEEw+2Zt/GLwxHwtxb9CqPN0t/Q4UEgLvaRcUOltO
+         OsDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXyvN9xk+2qPn9vAc7eMCrea0aNbeZvBif1AE1KMxC5Ch1xxqk4NNkR73uEYkseqDPhtKs8sSFe+yopsUgHOXKMeZD9
+X-Gm-Message-State: AOJu0YxYilVf26K2dhqTWbHefa8hJcYLbfIgGXvT0s14aDc/hHMGdkoF
+	saKt8OVl+tTRvGPG+vjn463psUewZhVTw33Kf91MIQFAfj4OtO6xKOP9TypWHng=
+X-Google-Smtp-Source: AGHT+IEUqd6hIg9HDyEzlke8VzqWmU4TFD6nLDglYJ354O5s+08g370xcdmQz9qNHG00XmeufXnXGg==
+X-Received: by 2002:a0c:f209:0:b0:6bb:b478:52fd with SMTP id 6a1803df08f44-6bbb4785327mr1712666d6.31.1722900549464;
+        Mon, 05 Aug 2024 16:29:09 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c83cc30sm39451646d6.101.2024.08.05.16.29.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Aug 2024 16:29:08 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sb78W-00BvtY-0n;
+	Mon, 05 Aug 2024 20:29:08 -0300
+Date: Mon, 5 Aug 2024 20:29:08 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Jan Kara <jack@suse.cz>
+Cc: James Gowans <jgowans@amazon.com>, linux-kernel@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Steve Sistare <steven.sistare@oracle.com>,
+	Christian Brauner <brauner@kernel.org>,
+	Anthony Yznaga <anthony.yznaga@oracle.com>,
+	Mike Rapoport <rppt@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>, linux-mm@kvack.org,
+	linux-fsdevel@vger.kernel.org,
+	Usama Arif <usama.arif@bytedance.com>, kvm@vger.kernel.org,
+	Alexander Graf <graf@amazon.com>,
+	David Woodhouse <dwmw@amazon.co.uk>,
+	Paul Durrant <pdurrant@amazon.co.uk>,
+	Nicolas Saenz Julienne <nsaenz@amazon.es>,
+	Muchun Song <muchun.song@linux.dev>
+Subject: Re: [PATCH 00/10] Introduce guestmemfs: persistent in-memory
+ filesystem
+Message-ID: <20240805232908.GD676757@ziepe.ca>
+References: <20240805093245.889357-1-jgowans@amazon.com>
+ <20240805200151.oja474ju4i32y5bj@quack3>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -76,77 +102,29 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZrFfgzRbiqT-Zi2O@linux.dev>
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <20240805200151.oja474ju4i32y5bj@quack3>
 
-On Mon, Aug 05, 2024 at 11:26:03PM +0000, Oliver Upton wrote:
-> [+cc Fuad]
+On Mon, Aug 05, 2024 at 10:01:51PM +0200, Jan Kara wrote:
 
-Take 2!
+> > 4. Device assignment: being able to use guestmemfs memory for
+> > VFIO/iommufd mappings, and allow those mappings to survive and continue
+> > to be used across kexec.
 
-> Fuad, you mentioned in commit 9c30fc615daa ("KVM: arm64: Move setting
-> the page as dirty out of the critical section") that restructuring
-> around the MMU lock was helpful for reuse (presumably for pKVM), but I
-> lack the context there.
-> 
-> On Fri, Jul 26, 2024 at 04:52:03PM -0700, Sean Christopherson wrote:
-> > Mark pages/folios accessed+dirty prior to dropping mmu_lock, as marking a
-> > page/folio dirty after it has been written back can make some filesystems
-> > unhappy (backing KVM guests will such filesystem files is uncommon, and
-> 
-> typo: s/will/with/
-> 
-> > the race is minuscule, hence the lack of complaints).  See the link below
-> > for details.
-> > 
-> > This will also allow converting arm64 to kvm_release_faultin_page(), which
-> > requires that mmu_lock be held (for the aforementioned reason).
-> > 
-> > Link: https://lore.kernel.org/all/cover.1683044162.git.lstoakes@gmail.com
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 22ee37360c4e..ce13c3d884d5 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1685,15 +1685,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >  	}
-> >  
-> >  out_unlock:
-> > +	if (writable && !ret)
-> > +		kvm_set_pfn_dirty(pfn);
-> 
-> I'm guessing you meant kvm_release_pfn_dirty() here, because this leaks
-> a reference.
-> 
-> > +	else
-> > +		kvm_release_pfn_clean(pfn);
-> > +
-> >  	read_unlock(&kvm->mmu_lock);
-> >  
-> >  	/* Mark the page dirty only if the fault is handled successfully */
-> > -	if (writable && !ret) {
-> > -		kvm_set_pfn_dirty(pfn);
-> > +	if (writable && !ret)
-> >  		mark_page_dirty_in_slot(kvm, memslot, gfn);
-> > -	}
-> >  
-> > -	kvm_release_pfn_clean(pfn);
-> >  	return ret != -EAGAIN ? ret : 0;
-> >  }
-> >  
-> > -- 
-> > 2.46.0.rc1.232.g9752f9e123-goog
-> > 
-> 
-> -- 
-> Thanks,
-> Oliver
+That's a fun one. Proposals for that will be very interesting!
 
--- 
-Thanks,
-Oliver
+> To me the basic functionality resembles a lot hugetlbfs. Now I know very
+> little details about hugetlbfs so I've added relevant folks to CC. Have you
+> considered to extend hugetlbfs with the functionality you need (such as
+> preservation across kexec) instead of implementing completely new filesystem?
+
+In mm circles we've broadly been talking about splitting the "memory
+provider" part out of hugetlbfs into its own layer. This would include
+the carving out of kernel memory at boot and organizing it by page
+size to allow huge ptes.
+
+It would make alot of sense to have only one carve out mechanism, and
+several consumers - hugetlbfs, the new private guestmemfd, this thing,
+for example.
+
+Jason
 
