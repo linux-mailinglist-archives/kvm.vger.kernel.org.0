@@ -1,161 +1,117 @@
-Return-Path: <kvm+bounces-23226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23227-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5F2F947C95
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 16:12:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A982A947CCB
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 16:27:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A7A01F22B71
-	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 14:12:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA9E11C21D5F
+	for <lists+kvm@lfdr.de>; Mon,  5 Aug 2024 14:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5915013A3E4;
-	Mon,  5 Aug 2024 14:12:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9727F13A884;
+	Mon,  5 Aug 2024 14:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Lo2Ip46l"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Wm8YjdsU"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A727517C64;
-	Mon,  5 Aug 2024 14:12:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298263EA64
+	for <kvm@vger.kernel.org>; Mon,  5 Aug 2024 14:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722867137; cv=none; b=oTh0NtzpuDRx0iuYyGfJCMFOTLxbjnfDWQxb4reuQcYmDcu1gKKUp31oYSWlYnaquGGeyFxszI3o1OFvIQAIxTR50UPsD8wp7brb+I8GIIeP4D+Oe9vWfBtfVcZj5Das1QmqE5TYZ0YYQv98YIpQU7lnIK8XGSwxN3aJ7Bv1pmA=
+	t=1722868024; cv=none; b=h+CKYQXZ3F3BhClIdA1XC1vs7MaE9iZ8M2Txqbks+WF1FVPY16xT5XzK6bgiICn+Wt/uhw8l8+yhxTEn6tU4Vg/ufJe/m7v4uvMKUhq7DkeaUfp6sbmWqDlGVOR/Fiu54gyQ8Q3r0FOYFcsdxukiWrivhwVT8eSZ5OSeX6cQGd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722867137; c=relaxed/simple;
-	bh=9M4xpkoH3LimV0O0XQcpYnwFUNXxsSPpdOBU2ZuvMyY=;
-	h=Subject:MIME-Version:Content-Type:Date:Message-ID:CC:From:To:
-	 References:In-Reply-To; b=MfR2Uo70qspShBNPq0l2OxJaCH9rvj5Nl6YeiOv/wOWcoA5fi5qlUhEcFRoGH3zAaLS6Rb3MQnkN2XiS8jRjpNUihHrFOfcsum1VIpnCNddadXd+MY1cXbHkYH6FG1qVcmi35OOtSzFLrIDQ7+gP1I3RxKOid60PeSfAHak/yDA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.es; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Lo2Ip46l; arc=none smtp.client-ip=99.78.197.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.es
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1722867135; x=1754403135;
-  h=mime-version:content-transfer-encoding:date:message-id:
-   cc:from:to:references:in-reply-to:subject;
-  bh=MK25yrGsMeryEu/GddZa4lO4IjN5z+54ON7xDCNErE8=;
-  b=Lo2Ip46lrst1H5aB7j2LI1HD6MWx6P2XQcFLmajRQ4QXSczhFQRQEcKJ
-   9YjGWrwxdBeaWGWBYJgEI9sT2HCT+BH5PUousdxcNxhSDX6FLlkFc72KK
-   JvHMkPIJPYl1jMOrRB/60O2TJpkhsnmwS2Nn8iADSrfV+bBOnMczxgagP
-   s=;
-X-IronPort-AV: E=Sophos;i="6.09,264,1716249600"; 
-   d="scan'208";a="112496171"
-Subject: Re: [PATCH 01/18] KVM: x86: hyper-v: Introduce XMM output support
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.214])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 14:08:58 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:29010]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.0.23:2525] with esmtp (Farcaster)
- id e194f651-d149-4251-920f-bb202d846005; Mon, 5 Aug 2024 14:08:57 +0000 (UTC)
-X-Farcaster-Flow-ID: e194f651-d149-4251-920f-bb202d846005
-Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.28) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 5 Aug 2024 14:08:56 +0000
-Received: from localhost (10.13.235.138) by EX19D004EUC001.ant.amazon.com
- (10.252.51.190) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34; Mon, 5 Aug 2024
- 14:08:50 +0000
+	s=arc-20240116; t=1722868024; c=relaxed/simple;
+	bh=F+ZmQ/VqMymoQm28PJj2JRZECejmP5G3PlthE9JS14Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aTKhRnhHt9CnVW0i2p6a8Wev95wBE40cX0MnhZqW7dcy0KpPTo7CwIKbfXp6y7uQ3a2bWcGmg+wBVIANL7730czya3SSuVQOJ0s6QM1BSQ+n3VFmQCGTo3I1BBW00t/EhLikIGwSPxS/afqkEbvMFvEEt1jaFZLOOfuAsBqWBlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Wm8YjdsU; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Mon, 5 Aug 2024 16:26:55 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1722868018;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yjx4EHLzVjCv54dbG7vmeeuAamNfgD0DI460Fr/FHR8=;
+	b=Wm8YjdsUw52kqyq7ok67Xg9+QfzGzMvsqbrSgKHcD75ZY30t+O6yIvnJKNN9oqP8WnIMEQ
+	7fKrr0dJsAWMDuWsK1QJJb6jhboLVLJ4Z1xrFrpbtCWe9HmcCyJBqDsFoBY/uHhJUg6Ovt
+	fRPqZKuw4g025NGNi+fTxTCWDLn3ZL8=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Cade Richard <cade.richard@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu, jamestiotio@gmail.com
+Subject: Re: [PATCH kvm-unit-tests] riscv: Fix virt_to_phys()
+Message-ID: <20240805-1d135dd842be42acbe313193@orel>
+References: <20240706-virt-to-phys-v1-1-7a4dc11f542c@berkeley.edu>
+ <20240715-259591b706e831a2cf19f618@orel>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="UTF-8"
-Date: Mon, 5 Aug 2024 14:08:46 +0000
-Message-ID: <D381CRQ2XJL9.1NBVMKT4SR51P@amazon.com>
-CC: <pbonzini@redhat.com>, <seanjc@google.com>, <linux-doc@vger.kernel.org>,
-	<linux-hyperv@vger.kernel.org>, <linux-arch@vger.kernel.org>,
-	<linux-trace-kernel@vger.kernel.org>, <graf@amazon.de>,
-	<dwmw2@infradead.org>, <pdurrant@amazon.com>, <mlevitsk@redhat.com>,
-	<jgowans@amazon.com>, <corbet@lwn.net>, <decui@microsoft.com>,
-	<tglx@linutronix.de>, <mingo@redhat.com>, <bp@alien8.de>,
-	<dave.hansen@linux.intel.com>, <x86@kernel.org>, <amoorthy@google.com>
-From: Nicolas Saenz Julienne <nsaenz@amazon.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>, <linux-kernel@vger.kernel.org>,
-	<kvm@vger.kernel.org>
-X-Mailer: aerc 0.17.0-152-g73bcb4661460-dirty
-References: <20240609154945.55332-1-nsaenz@amazon.com>
- <20240609154945.55332-2-nsaenz@amazon.com> <87tth0rku3.fsf@redhat.com>
- <D2RVJ6QCVNOU.XC0OC54QHI51@amazon.com> <878qxk5mox.fsf@redhat.com>
-In-Reply-To: <878qxk5mox.fsf@redhat.com>
-X-ClientProxiedBy: EX19D046UWA004.ant.amazon.com (10.13.139.76) To
- EX19D004EUC001.ant.amazon.com (10.252.51.190)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240715-259591b706e831a2cf19f618@orel>
+X-Migadu-Flow: FLOW_OUT
 
-On Mon Jul 29, 2024 at 1:53 PM UTC, Vitaly Kuznetsov wrote:
-> CAUTION: This email originated from outside of the organization. Do not c=
-lick links or open attachments unless you can confirm the sender and know t=
-he content is safe.
-> Nicolas Saenz Julienne <nsaenz@amazon.com> writes:
->
-> > Hi Vitaly,
-> > Thanks for having a look at this.
+On Mon, Jul 15, 2024 at 03:57:12PM GMT, Andrew Jones wrote:
+> On Sat, Jul 06, 2024 at 04:09:44PM GMT, Cade Richard wrote:
+> > 
+> 
+> Needs a commit message stating it's currently broken for anything
+> other than addresses on page boundaries and that this is the fix.
+> 
+> > 
+> > ---
+> 
+> These dashes shouldn't be here. With them, git will strip the s-o-b on
+> commit.
+> 
+> Please also add
+> 
+> Fixes: 23100d972705 ("riscv: Enable vmalloc")
+> 
+> > Signed-off-by: Cade Richard <cade.richard@berkeley.edu>
+> > ---
+> >  lib/riscv/mmu.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/lib/riscv/mmu.c b/lib/riscv/mmu.c
+> > index bd006881..c4770552 100644
+> > --- a/lib/riscv/mmu.c
+> > +++ b/lib/riscv/mmu.c
+> > @@ -194,7 +194,7 @@ unsigned long virt_to_phys(volatile void *address)
+> >  	paddr = virt_to_pte_phys(pgtable, (void *)address);
+> >  	assert(sizeof(long) == 8 || !(paddr >> 32));
+> >  
+> > -	return (unsigned long)paddr;
+> > +	return (unsigned long)paddr | ((unsigned long) address & 0x00000FFF);
+> 
+> Let's add
+> 
+>   #define offset_in_page(p) ((unsigned long)(p) & ~PAGE_MASK)
+> 
+> to lib/asm-generic/page.h and use it here.
+> 
+> >  }
+> >  
+> >  void *phys_to_virt(unsigned long address)
 > >
-> > On Mon Jul 8, 2024 at 2:59 PM UTC, Vitaly Kuznetsov wrote:
-> >> Nicolas Saenz Julienne <nsaenz@amazon.com> writes:
-> >>
-> >> > Prepare infrastructure to be able to return data through the XMM
-> >> > registers when Hyper-V hypercalls are issues in fast mode. The XMM
-> >> > registers are exposed to user-space through KVM_EXIT_HYPERV_HCALL an=
-d
-> >> > restored on successful hypercall completion.
-> >> >
-> >> > Signed-off-by: Nicolas Saenz Julienne <nsaenz@amazon.com>
-> >> >
-> >> > ---
-> >> >
-> >> > There was some discussion in the RFC about whether growing 'struct
-> >> > kvm_hyperv_exit' is ABI breakage. IMO it isn't:
-> >> > - There is padding in 'struct kvm_run' that ensures that a bigger
-> >> >   'struct kvm_hyperv_exit' doesn't alter the offsets within that str=
-uct.
-> >> > - Adding a new field at the bottom of the 'hcall' field within the
-> >> >   'struct kvm_hyperv_exit' should be fine as well, as it doesn't alt=
-er
-> >> >   the offsets within that struct either.
-> >> > - Ultimately, previous updates to 'struct kvm_hyperv_exit's hint tha=
-t
-> >> >   its size isn't part of the uABI. It already grew when syndbg was
-> >> >   introduced.
-> >>
-> >> Yes but SYNDBG exit comes with KVM_EXIT_HYPERV_SYNDBG. While I don't s=
-ee
-> >> any immediate issues with the current approach, we may want to introdu=
-ce
-> >> something like KVM_EXIT_HYPERV_HCALL_XMM: the userspace must be prepar=
-ed
-> >> to handle this new information anyway and it is better to make
-> >> unprepared userspace fail with 'unknown exit' then to mishandle a
-> >> hypercall by ignoring XMM portion of the data.
-> >
-> > OK, I'll go that way. Just wanted to get a better understanding of why
-> > you felt it was necessary.
-> >
+> 
+> Thanks,
+> drew
 >
-> (sorry for delayed reply, I was on vacation)
->
-> I don't think it's an absolute must but it appears as a cleaner approach
-> to me.
->
-> Imagine there's some userspace which handles KVM_EXIT_HYPERV_HCALL today
-> and we want to add XMM handling there. How would we know if xmm portion
-> of the data is actually filled by KVM or not? With your patch, we can of
-> course check for HV_X64_HYPERCALL_XMM_OUTPUT_AVAILABLE in
-> KVM_GET_SUPPORTED_HV_CPUID but this is not really straightforward, is
-> it? Checking the size is not good either. E.g. think about downstream
-> versions of KVM which may or may not have certain backports. In case we
-> (theoretically) do several additions to 'struct kvm_hyperv_exit', it
-> will quickly become a nightmare.
->
-> On the contrary, KVM_EXIT_HYPERV_HCALL_XMM (or just
-> KVM_EXIT_HYPERV_HCALL2) approach looks cleaner: once userspace sees it,
-> it knows that 'xmm' portion of the data can be relied upon.
 
-Makes sense, thanks for the explanation.
+Since this is a fix that I'd like to get in sooner than later, I've made
+my suggested changes myself and merged it.
 
-Nicolas
+Thanks,
+drew
 
