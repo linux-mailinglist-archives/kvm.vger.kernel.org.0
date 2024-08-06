@@ -1,83 +1,86 @@
-Return-Path: <kvm+bounces-23422-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23423-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A432949731
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:57:51 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8AFB94973B
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:59:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12733B21AF0
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:57:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76D89B23F39
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:59:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A3F5770FD;
-	Tue,  6 Aug 2024 17:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153447C6D4;
+	Tue,  6 Aug 2024 17:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QOrGkEHb"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dfdWBFOl"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13E2757F8
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:57:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D1F4D9FE
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:59:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722967054; cv=none; b=HjdgRtQkSlVcEmKj+O4jbeTm+bEcdSIi9i6EdFli2VXn97gD/6mOA6dKjBjb2yvJOYy6vdD6pjxww4+xhKSFV6zy27ZWTlCs2B4KwyA5CJNPiVygbj0NM4c+pv4YllaXnLyTKbTIVTQ02DExtlgJCbrcOzmaNahNH01JX+ABCsg=
+	t=1722967143; cv=none; b=k8Xfgaqw4Ll9IyIMG2n0I9rGOBXiVBXtlvFp0cqb6yqcCGp7nbILD6uZJdUJItw+6xk5mPamhYTefpBN0ObRHMqlXpaDELUuMt55yxx3oGJCbggjtEQTwue13U0sSvukEoDod0eu1ThIE+JLbjej8iugQLlk3HRiV4y2gsfzRiM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722967054; c=relaxed/simple;
-	bh=Y3kpDopP34wSS4aefVZmlrz8cQFzCX6exogFHU3d/Qg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=A9UPgO694XVsFR+5+zu0b47xhpDfGHc2FMXGKVviYHX7vA0t/qEG8g4gyxaNlmxSFAmtQDkgrOLdKyeSobkREFkEI/I9oolXfcRIP/lWmurYnrxgdb/DZb5TNX8vjgXuf9luH6ogJrwixFTt9C65QrAkJGUKqyFk1sryckCYXSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QOrGkEHb; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722967050;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=PCE6y3gd/ZLdIqr+zXDfXpXA+sJAwSBPUwATht6B/14=;
-	b=QOrGkEHbq18AlKXPOs5GgVYjKtcUBLYRET7OWvQPpOqEZ+FgEQR2WVsuWvotDJ+6iQUL/V
-	Io6lMOFhkRfYwSoJF6BTijEFr6mXED1+pmh52s1YpeAlsvtpAf2zb1iAaFj9XcwUfTk/mw
-	V+BSqEXJPq/O4XGQ59SRm8egiJryrjI=
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
- [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-211-d4H4NTY8N7aLB-9T6UOFJA-1; Tue, 06 Aug 2024 13:57:29 -0400
-X-MC-Unique: d4H4NTY8N7aLB-9T6UOFJA-1
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5a37b858388so698275a12.1
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 10:57:29 -0700 (PDT)
+	s=arc-20240116; t=1722967143; c=relaxed/simple;
+	bh=Vr4ssX3LexIo2N6PgFRtbpKq5//JSwMuoHCZ2wWW88c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AQcP5vmPxapQbozFbBVTl1O21Y5uT/cQaltTSDk/F4hPqSEELgV2N4LYXfdiQiHeF1Y2eq4ePAAagaOWJEVf6O/2BHsT9/K3vKzNlmcSQmIXNIktdYiAMKyP5HEIKnUcs8fzgTFHRsPkC23jeieLjQMxr3anrfIXMkPZ6LHC9o4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=dfdWBFOl; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3dc16d00ba6so490160b6e.0
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 10:59:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1722967141; x=1723571941; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9reD6LjBIDqI3rzCI/2rJ/w7uTHYKxSa2MJZ9OknCy8=;
+        b=dfdWBFOlaaALwxoIKu0QSosUVGXBLx4UNDbO54AvopPTo9IOW8/NzY9mQXQfJfHnpv
+         7S+3ol2Kbt2hYwvLqhGzwl9aquRu/80zuvfXeD6qaKnefoTHn1mRUmb9tw2IRpaGYVcz
+         V731EOf8WLioZ7giCcg44U6TR2aJXJi3q088YwzTDxAI4nRl32JY5XDG//QtE/QCAnj5
+         cPgbU+W8RIW/rSq2Aun0u4bDRnnVGQ9BM+BabAKkBk6oy0GLaUZju+XBwww6a/3e3Pbq
+         MVMTU9QkSngPFAzPaeeQAhEkOkJJcOEKOCznKXrrmloa7gGU1ZZOb6mpSfSzE3Spsaid
+         fplg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722967048; x=1723571848;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=PCE6y3gd/ZLdIqr+zXDfXpXA+sJAwSBPUwATht6B/14=;
-        b=rqndrrCVggGQ+dJ3sqHyqK5whcIoyuNw6swkvp1kikACXCbcGF6uxV+ok8me61K0j5
-         FX8UjEgIC1ZdmuzWCgaeb4hh/6PS/geFazOC3t82sa4aLh+jSgj8Ka1OzFntuOcXx1dR
-         8zTFW49+7s5TT9Hs3lLqI4+e8PYtG5bD4XBNGtSP8aE3YxzcFXN/+hDdbIuE8/vWfT8W
-         Cz8EZdaMnbyVlvUZOZSeiVajzG4NjH+E8r0tJIPHXgFlVheJSI1m3qF0UXSgC+yf9ohw
-         annMDLpBhlZEmUr0sr4JvqcwJ3MwxAgCTrqjiAfEAH/KecXGxgLixIxbAKqRaF2qlP+J
-         fzaA==
-X-Gm-Message-State: AOJu0Yw+4jdgSBlf568sPW1iTKMWDOF2JH4iKfma4bzgywCJCU7JnHFs
-	Kl16NzLdo3WcnY4n9gITs/61A+4B6lKZZw/VHLRG5fxI7ukyyyOSaEcew+AtCmx4LnnTQpGIsxT
-	KiIriVF02z469zsvw3XtMPk4lnyUkebnKZDBf60stjJWLXTyGPw==
-X-Received: by 2002:aa7:dcd9:0:b0:5a1:40d9:6a46 with SMTP id 4fb4d7f45d1cf-5b7f5dc5d68mr10453927a12.36.1722967048117;
-        Tue, 06 Aug 2024 10:57:28 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF9wiBpXfkiQpEvZZyARq7/ap2Ik8pTsT+kT/0l0ZHqK+AvR7K5fHmkyUYpLFX0WwVH0aYZHw==
-X-Received: by 2002:aa7:dcd9:0:b0:5a1:40d9:6a46 with SMTP id 4fb4d7f45d1cf-5b7f5dc5d68mr10453907a12.36.1722967047202;
-        Tue, 06 Aug 2024 10:57:27 -0700 (PDT)
-Received: from redhat.com ([2.55.35.170])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5ba442ed7f1sm4421307a12.81.2024.08.06.10.57.24
+        d=1e100.net; s=20230601; t=1722967141; x=1723571941;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9reD6LjBIDqI3rzCI/2rJ/w7uTHYKxSa2MJZ9OknCy8=;
+        b=SEwKTCV6SucXU0crZzi/Wd/JJN5OkUn0ltyDNe9NLDxb5DyhqJjK87aI1W9ww+oCab
+         ieyv9o2Z3t3pPV64qiqSRbgc2qJzGTgpTgz+z1KY5ZJhJVwPELBbcnEI6+YdAXfbVbE9
+         UVel/9cm2Xp2mL7A4ULrdXT/mo+MpmczkziaiU4GboPRR81+6BfMS/hGdIurrvbDV21s
+         99aqQMjVk6aqhuSKiFZXjWiF7ldlAz2pPHkUhZCr5HjqCTTUyV1w1GPE1GUobjHZu/+K
+         9fUdOaIGMfEcvMnZgEBSPRBxP9rZoNchBtxMPU6ewmw67we5eBeDpOBJdUQuBntekM88
+         ee2g==
+X-Forwarded-Encrypted: i=1; AJvYcCVMFboNmLNvuSOgs1q0IS00U6qNIXAAIaf8yIXktbgTyTEIoCt7KmdPiI44ENzXtoorO9YwiTKR7Do6L0wrdDK16VXN
+X-Gm-Message-State: AOJu0YwS6TQp8SQb0spKNteLXhAZq6O+Wb5DFVY4WloO30CRQXEnyZxW
+	g5aPazoUqFTRYGhIxDACcmeCn8V2Yabk+gJpfQcfvrETinn92ssRnpfWwyd+ETE=
+X-Google-Smtp-Source: AGHT+IEwktuJ1CtYSzQb94QGzgaDodUnXytdXmjscinDnu4jw335ZRMBxJxoUFxjs8sU40IQz5cmUA==
+X-Received: by 2002:a05:6808:2212:b0:3d9:e1d1:157e with SMTP id 5614622812f47-3db5582e299mr22117856b6e.35.1722967140874;
+        Tue, 06 Aug 2024 10:59:00 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4518a6c547asm39893111cf.30.2024.08.06.10.59.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 10:57:26 -0700 (PDT)
-Date: Tue, 6 Aug 2024 13:57:22 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dtatulea@nvidia.com, jasowang@redhat.com, mst@redhat.com,
-	stable@vger.kernel.org
-Subject: [GIT PULL] virtio: bugfix
-Message-ID: <20240806135722-mutt-send-email-mst@kernel.org>
+        Tue, 06 Aug 2024 10:59:00 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sbOSZ-00Fhpe-RT;
+	Tue, 06 Aug 2024 14:58:59 -0300
+Date: Tue, 6 Aug 2024 14:58:59 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Christian Brauner <brauner@kernel.org>, bpf@vger.kernel.org,
+	Amir Goldstein <amir73il@gmail.com>, kvm@vger.kernel.org,
+	cgroups@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCHSET][RFC] struct fd and memory safety
+Message-ID: <20240806175859.GT676757@ziepe.ca>
+References: <20240730050927.GC5334@ZenIV>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -86,32 +89,35 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-Mutt-Fcc: =sent
+In-Reply-To: <20240730050927.GC5334@ZenIV>
 
-The following changes since commit 6d834691da474ed1c648753d3d3a3ef8379fa1c1:
+On Tue, Jul 30, 2024 at 06:09:27AM +0100, Al Viro wrote:
 
-  virtio_pci_modern: remove admin queue serialization lock (2024-07-17 05:43:21 -0400)
+> 	* ib_uverbs_open_xrcd().  FWIW, a closer look shows that the
+> damn thing is buggy - it accepts _any_ descriptor and pins the associated
+> inode.  mount tmpfs, open a file there, feed it to that, unmount and
+> watch the show...
 
-are available in the Git repository at:
+What happens? There is still an igrab() while it is in the red black
+tree?
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+> AFAICS, that's done for the sake of libibverbs and
+> I've no idea how it's actually used - all examples I'd been able to
+> find use -1 for descriptor here.  Needs to be discussed with infiniband
+> folks (Sean Hefty?).  For now, leave that as-is.
 
-for you to fetch changes up to 0823dc64586ba5ea13a7d200a5d33e4c5fa45950:
+The design seems insane, but it is what it is from 20 years ago..
 
-  vhost-vdpa: switch to use vmf_insert_pfn() in the fault handler (2024-07-26 03:26:02 -0400)
+Userspace can affiliate this "xrc domain" with a file in the
+filesystem. Any file. That is actually a deliberate part of the API.
 
-----------------------------------------------------------------
-virtio: bugfix
+This is done as some ugly way to pass xrc domain object from process A
+to process B. IIRC the idea is process A will affiliate the object
+with a file and then B will be able to access the shared object if B
+is able to open the file.
 
-Fixes a single, long-standing issue with kick pass-through vdpa.
+It looks like the code keeps a red/black tree of this association, and
+holds an igrab while the inode is in that tree..
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-
-----------------------------------------------------------------
-Jason Wang (1):
-      vhost-vdpa: switch to use vmf_insert_pfn() in the fault handler
-
- drivers/vhost/vdpa.c | 8 +-------
- 1 file changed, 1 insertion(+), 7 deletions(-)
-
+Jason
 
