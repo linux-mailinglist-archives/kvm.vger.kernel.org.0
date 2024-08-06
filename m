@@ -1,172 +1,135 @@
-Return-Path: <kvm+bounces-23321-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23322-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECA92948B3F
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 10:25:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B251948B47
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 10:26:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACDAC284989
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 08:25:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5D4571C22BA5
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 08:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D741BD4E3;
-	Tue,  6 Aug 2024 08:25:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C58B1BD4E3;
+	Tue,  6 Aug 2024 08:26:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tYPRa2kB"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="MhlOlm+a"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C8641BD015
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 08:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647051BD00A;
+	Tue,  6 Aug 2024 08:26:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722932724; cv=none; b=OeuERWMOXx9Jefguy/o+D1kwmdgELYNngi/qX/kbTOaw9Xotcaimg4jian4Z7g/Ui+8qM1gxEdQxeXjapNH3D4EZ7kix14VNkMD6L6VCvkuuQEDKG7fBkEo1sJ2pyIY4rMWLYSQM62SfDFlWW4FFlkRswCCtu7F5FTzsZh1edvk=
+	t=1722932788; cv=none; b=SH5BNEvy0s8rrrGltRCvDuF5Ah7O+WWVuex77qy0MeIYkjMbWPHyFvHNwTt0qx9cU7BVtFlv/xtQvz6COfiPCKW74siysmD6hLlr/DS0mjMhBqM0y1nPK5fAh4PXjO5TB/E3c1dEYIbEiYpfUrNbKQ1kRX9fXj2BXU+D/ZcZMwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722932724; c=relaxed/simple;
-	bh=k7zHAEEEUxyRomVtvnM2viO2YFKTnrtBHjiLIBw6Z38=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uPxa1Rfo4eji1SFrkRo6dXGkZHseV29lvHoZEWrGVveaDwJ///2u6mZOvBOyM6sYKp4c0maqKuc/+4b/CRQKoVCWQ6JIR/bysCVz3lyTFg9XxD9vKHOKzhylP73TSjh/KDQCZXZd1fJIMl1m/TubaU2rxbPZiyImArmUhAJUaTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tYPRa2kB; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-428f5c0833bso11530885e9.0
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 01:25:22 -0700 (PDT)
+	s=arc-20240116; t=1722932788; c=relaxed/simple;
+	bh=XVIfxLlcD8aXE+J8hdCh5vskTp9Tk/E9A2XP/YqNYxM=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=HfQU3E1FQtw3a6lAEQ7PJHmvI2xoPVYT1p23ZCKvIg2j5v2rVWhKDSvnisPY3ytEQFVLm80wcIJ052Xpl1E643zLdSp+LG01LL7dgU8jjaQUXp5VEbKLIlP5mi7LzkXs6x3wAqeP5GFyJQwHbYg5tubtfYxcdKZDrDC+jIcnUCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=MhlOlm+a; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722932721; x=1723537521; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mJJmve+UBZqWHPzqvXAkYx9wHC1+4s/jebXaeWpKSm4=;
-        b=tYPRa2kB2odRm+MJ+l681PUDuyo3bcqu/eESNFU6taVOoHz5LAYAbhSqCGA8033Jla
-         RqREqsEUfdIM0PbEM4MqsH5VsBeZnroBOHpCPFBxo/IUuFxB86M1shxBXmpHfaNN6fKI
-         PqnjUs/RJSgDq8LaSoYAWSuCfg97pnKHR2ZLa/kTQozXbSTxGgTM5Z+Dntypd0s0dWDr
-         EpcTrBH0lcgsKJg92ZjF8X8uK6ir6HAW1qo2NPmqGAD0GCSrlZbs9SAt9ObiH3ezsV6T
-         YfqlquUFL/j3pLhEP8GPsOzmlMJ49JAeNPFBT+ZPJYIsK0HBlIgIq6Xo3F7erZXDW3GR
-         GNiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722932721; x=1723537521;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mJJmve+UBZqWHPzqvXAkYx9wHC1+4s/jebXaeWpKSm4=;
-        b=Vm7TtjFuhznFDlAM/xA5/9gbWDbmZkeEB8P/KoMqEaEsfFD/f1geoTiTJbULPs2BDl
-         gvX8PJRoaWviPD8D/JE7ItSTs9Q/9h8ZxMn/Z2gOJRZyywVRhZ7hEt8ozKuiA7ky871a
-         YyLHSiaCXVqU5rEQujXzeaOvHYMxIWfUF5hxxhT1c/dEgcgADTQgy8pw2OewSwxYh0Tg
-         etsITUkqtySsrqRN9iQnhMeaEdJY8oHRqNSRjLgpbZcvUd1se2F3f/OwdULYFYt4h4HU
-         hFfO5aJx7tAcFWdJR+aOFpts62/x5tcgYPKGWXj515BJsvZF9PpwCoRMGxUgNnenVRvZ
-         UE4A==
-X-Forwarded-Encrypted: i=1; AJvYcCX8gPp0plvjqxJYU/bXggO/4G0WzNHo+pLYPRRZJMHhQ1aGU488Zhiaxor8TA5I8/4or3HdvyLm2NoajqpJN0n42UxO
-X-Gm-Message-State: AOJu0YyJ6V6o8qzlQugAN/bswk6R9aEy8so7/t2cyOQ9M0Wl7BnnsfeV
-	oXSe+wNuLWm1AdJ2rLDFuNpd2KCEE21jPV3jbOnU70ZAFQdHZO2i2geaOyYtvMRNYlWIBrGaPFQ
-	jJfIWzHc6NmUhM+X5TgNsBNRWIhEk9FibVFfB
-X-Google-Smtp-Source: AGHT+IEuJVBQVgvvzdKoA/IljQMVSQQCy4ILUfIi4PfR2IcPP3crNOUdNiIGa90I2U+SlhluocGZ2/3ZifLac4nEAJY=
-X-Received: by 2002:a05:6000:1151:b0:362:2af4:43cc with SMTP id
- ffacd0b85a97d-36bbbe5be99mr9354068f8f.19.1722932721184; Tue, 06 Aug 2024
- 01:25:21 -0700 (PDT)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1722932787; x=1754468787;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-id:content-transfer-encoding:mime-version:subject;
+  bh=XVIfxLlcD8aXE+J8hdCh5vskTp9Tk/E9A2XP/YqNYxM=;
+  b=MhlOlm+aOEZc3P72AK339/IDVR1DnCY/lGvvAMaNcR2JL74F0ordZuef
+   SKIMxBCwfHMKb/t8CU4owc56N4HraocMPszW/uf0vnHlpOVt0x5/QP82F
+   P3ZbillGk/hJwgu98RPK5H4pmXFKJn3iFb9eRIVdwIDaGWl0Bp5Kxo9ul
+   k=;
+X-IronPort-AV: E=Sophos;i="6.09,267,1716249600"; 
+   d="scan'208";a="318395121"
+Subject: Re: [PATCH 00/10] Introduce guestmemfs: persistent in-memory filesystem
+Thread-Topic: [PATCH 00/10] Introduce guestmemfs: persistent in-memory filesystem
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 08:26:23 +0000
+Received: from EX19MTAEUA002.ant.amazon.com [10.0.43.254:17875]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.21.248:2525] with esmtp (Farcaster)
+ id 4f4de83e-f658-4ec0-843f-65d77b69dbad; Tue, 6 Aug 2024 08:26:22 +0000 (UTC)
+X-Farcaster-Flow-ID: 4f4de83e-f658-4ec0-843f-65d77b69dbad
+Received: from EX19D004EUC001.ant.amazon.com (10.252.51.190) by
+ EX19MTAEUA002.ant.amazon.com (10.252.50.124) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 6 Aug 2024 08:26:22 +0000
+Received: from EX19D014EUC004.ant.amazon.com (10.252.51.182) by
+ EX19D004EUC001.ant.amazon.com (10.252.51.190) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 6 Aug 2024 08:26:22 +0000
+Received: from EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41]) by
+ EX19D014EUC004.ant.amazon.com ([fe80::76dd:4020:4ff2:1e41%3]) with mapi id
+ 15.02.1258.034; Tue, 6 Aug 2024 08:26:22 +0000
+From: "Gowans, James" <jgowans@amazon.com>
+To: "jack@suse.cz" <jack@suse.cz>, "jgg@ziepe.ca" <jgg@ziepe.ca>
+CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>, "rppt@kernel.org"
+	<rppt@kernel.org>, "brauner@kernel.org" <brauner@kernel.org>, "Graf (AWS),
+ Alexander" <graf@amazon.de>, "anthony.yznaga@oracle.com"
+	<anthony.yznaga@oracle.com>, "steven.sistare@oracle.com"
+	<steven.sistare@oracle.com>, "akpm@linux-foundation.org"
+	<akpm@linux-foundation.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Durrant, Paul" <pdurrant@amazon.co.uk>,
+	"seanjc@google.com" <seanjc@google.com>, "pbonzini@redhat.com"
+	<pbonzini@redhat.com>, "linux-mm@kvack.org" <linux-mm@kvack.org>, "Woodhouse,
+ David" <dwmw@amazon.co.uk>, "Saenz Julienne, Nicolas" <nsaenz@amazon.es>,
+	"muchun.song@linux.dev" <muchun.song@linux.dev>, "viro@zeniv.linux.org.uk"
+	<viro@zeniv.linux.org.uk>, "nh-open-source@amazon.com"
+	<nh-open-source@amazon.com>, "linux-fsdevel@vger.kernel.org"
+	<linux-fsdevel@vger.kernel.org>
+Thread-Index: AQHa5xp7YUfIGy2/kUGqgjccLElzprIZFmqAgAA56gCAAJYYAA==
+Date: Tue, 6 Aug 2024 08:26:21 +0000
+Message-ID: <0ecbbd25ccddcdf79b90fdfd25ac62ade6cfd01c.camel@amazon.com>
+References: <20240805093245.889357-1-jgowans@amazon.com>
+	 <20240805200151.oja474ju4i32y5bj@quack3> <20240805232908.GD676757@ziepe.ca>
+In-Reply-To: <20240805232908.GD676757@ziepe.ca>
+Accept-Language: en-ZA, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <2C847BE97C8F2447A1A080B33F49ABEA@amazon.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240726235234.228822-1-seanjc@google.com> <20240726235234.228822-55-seanjc@google.com>
- <ZrFfgzRbiqT-Zi2O@linux.dev>
-In-Reply-To: <ZrFfgzRbiqT-Zi2O@linux.dev>
-From: Fuad Tabba <tabba@google.com>
-Date: Tue, 6 Aug 2024 09:24:43 +0100
-Message-ID: <CA+EHjTxZwDOeC94Y1otxcp-mcwUZA=TpQp4pav-E8Xvb2MA64Q@mail.gmail.com>
-Subject: Re: [PATCH v12 54/84] KVM: arm64: Mark "struct page" pfns
- accessed/dirty before dropping mmu_lock
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Marc Zyngier <maz@kernel.org>, Tianrui Zhao <zhaotianrui@loongson.cn>, Bibo Mao <maobibo@loongson.cn>, 
-	Huacai Chen <chenhuacai@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Anup Patel <anup@brainfault.org>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Christian Borntraeger <borntraeger@linux.ibm.com>, Janosch Frank <frankja@linux.ibm.com>, 
-	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	loongarch@lists.linux.dev, linux-mips@vger.kernel.org, 
-	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org, 
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
 
-Hi Oliver,
-
-On Tue, 6 Aug 2024 at 00:26, Oliver Upton <oliver.upton@linux.dev> wrote:
->
-> [+cc Fuad]
->
-> Fuad, you mentioned in commit 9c30fc615daa ("KVM: arm64: Move setting
-> the page as dirty out of the critical section") that restructuring
-> around the MMU lock was helpful for reuse (presumably for pKVM), but I
-> lack the context there.
-
-That was for some refactoring I'd done later on for mem_aborts in
-pKVM. That said, I didn't know at the time that there might be a race
-with some filesystems. I'll keep this in mind for the pKVM code we
-have for now, and when upstreaming.
-
-Thanks,
-/fuad
-
-> On Fri, Jul 26, 2024 at 04:52:03PM -0700, Sean Christopherson wrote:
-> > Mark pages/folios accessed+dirty prior to dropping mmu_lock, as marking a
-> > page/folio dirty after it has been written back can make some filesystems
-> > unhappy (backing KVM guests will such filesystem files is uncommon, and
->
-> typo: s/will/with/
->
-> > the race is minuscule, hence the lack of complaints).  See the link below
-> > for details.
-> >
-> > This will also allow converting arm64 to kvm_release_faultin_page(), which
-> > requires that mmu_lock be held (for the aforementioned reason).
-> >
-> > Link: https://lore.kernel.org/all/cover.1683044162.git.lstoakes@gmail.com
-> > Signed-off-by: Sean Christopherson <seanjc@google.com>
-> > ---
-> >  arch/arm64/kvm/mmu.c | 10 ++++++----
-> >  1 file changed, 6 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> > index 22ee37360c4e..ce13c3d884d5 100644
-> > --- a/arch/arm64/kvm/mmu.c
-> > +++ b/arch/arm64/kvm/mmu.c
-> > @@ -1685,15 +1685,17 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
-> >       }
-> >
-> >  out_unlock:
-> > +     if (writable && !ret)
-> > +             kvm_set_pfn_dirty(pfn);
->
-> I'm guessing you meant kvm_release_pfn_dirty() here, because this leaks
-> a reference.
->
-> > +     else
-> > +             kvm_release_pfn_clean(pfn);
-> > +
-> >       read_unlock(&kvm->mmu_lock);
-> >
-> >       /* Mark the page dirty only if the fault is handled successfully */
-> > -     if (writable && !ret) {
-> > -             kvm_set_pfn_dirty(pfn);
-> > +     if (writable && !ret)
-> >               mark_page_dirty_in_slot(kvm, memslot, gfn);
-> > -     }
-> >
-> > -     kvm_release_pfn_clean(pfn);
-> >       return ret != -EAGAIN ? ret : 0;
-> >  }
-> >
-> > --
-> > 2.46.0.rc1.232.g9752f9e123-goog
-> >
->
-> --
-> Thanks,
-> Oliver
->
+T24gTW9uLCAyMDI0LTA4LTA1IGF0IDIwOjI5IC0wMzAwLCBKYXNvbiBHdW50aG9ycGUgd3JvdGU6
+DQo+IA0KPiBPbiBNb24sIEF1ZyAwNSwgMjAyNCBhdCAxMDowMTo1MVBNICswMjAwLCBKYW4gS2Fy
+YSB3cm90ZToNCj4gDQo+ID4gPiA0LiBEZXZpY2UgYXNzaWdubWVudDogYmVpbmcgYWJsZSB0byB1
+c2UgZ3Vlc3RtZW1mcyBtZW1vcnkgZm9yDQo+ID4gPiBWRklPL2lvbW11ZmQgbWFwcGluZ3MsIGFu
+ZCBhbGxvdyB0aG9zZSBtYXBwaW5ncyB0byBzdXJ2aXZlIGFuZCBjb250aW51ZQ0KPiA+ID4gdG8g
+YmUgdXNlZCBhY3Jvc3Mga2V4ZWMuDQo+IA0KPiBUaGF0J3MgYSBmdW4gb25lLiBQcm9wb3NhbHMg
+Zm9yIHRoYXQgd2lsbCBiZSB2ZXJ5IGludGVyZXN0aW5nIQ0KDQpZdXAhIFdlIGhhdmUgYW4gTFBD
+IHNlc3Npb24gZm9yIHRoaXM7IGxvb2tpbmcgZm9yd2FyZCB0byBkaXNjdXNzaW5nIG1vcmUNCnRo
+ZXJlOiBodHRwczovL2xwYy5ldmVudHMvZXZlbnQvMTgvY29udHJpYnV0aW9ucy8xNjg2Lw0KSSds
+bCBiZSB3b3JraW5nIG9uIGEgaW9tbXVmZCBSRkMgc29vbjsgc2hvdWxkIGdldCBpdCBvdXQgYmVm
+b3JlIHRoZW4uDQoNCj4gDQo+ID4gVG8gbWUgdGhlIGJhc2ljIGZ1bmN0aW9uYWxpdHkgcmVzZW1i
+bGVzIGEgbG90IGh1Z2V0bGJmcy4gTm93IEkga25vdyB2ZXJ5DQo+ID4gbGl0dGxlIGRldGFpbHMg
+YWJvdXQgaHVnZXRsYmZzIHNvIEkndmUgYWRkZWQgcmVsZXZhbnQgZm9sa3MgdG8gQ0MuIEhhdmUg
+eW91DQo+ID4gY29uc2lkZXJlZCB0byBleHRlbmQgaHVnZXRsYmZzIHdpdGggdGhlIGZ1bmN0aW9u
+YWxpdHkgeW91IG5lZWQgKHN1Y2ggYXMNCj4gPiBwcmVzZXJ2YXRpb24gYWNyb3NzIGtleGVjKSBp
+bnN0ZWFkIG9mIGltcGxlbWVudGluZyBjb21wbGV0ZWx5IG5ldyBmaWxlc3lzdGVtPw0KPiANCj4g
+SW4gbW0gY2lyY2xlcyB3ZSd2ZSBicm9hZGx5IGJlZW4gdGFsa2luZyBhYm91dCBzcGxpdHRpbmcg
+dGhlICJtZW1vcnkNCj4gcHJvdmlkZXIiIHBhcnQgb3V0IG9mIGh1Z2V0bGJmcyBpbnRvIGl0cyBv
+d24gbGF5ZXIuIFRoaXMgd291bGQgaW5jbHVkZQ0KPiB0aGUgY2FydmluZyBvdXQgb2Yga2VybmVs
+IG1lbW9yeSBhdCBib290IGFuZCBvcmdhbml6aW5nIGl0IGJ5IHBhZ2UNCj4gc2l6ZSB0byBhbGxv
+dyBodWdlIHB0ZXMuDQo+IA0KPiBJdCB3b3VsZCBtYWtlIGFsb3Qgb2Ygc2Vuc2UgdG8gaGF2ZSBv
+bmx5IG9uZSBjYXJ2ZSBvdXQgbWVjaGFuaXNtLCBhbmQNCj4gc2V2ZXJhbCBjb25zdW1lcnMgLSBo
+dWdldGxiZnMsIHRoZSBuZXcgcHJpdmF0ZSBndWVzdG1lbWZkLCB0aGlzIHRoaW5nLA0KPiBmb3Ig
+ZXhhbXBsZS4NCg0KVGhlIGFjdHVhbCBhbGxvY2F0aW9uIGluIGd1ZXN0bWVtZnMgaXNuJ3QgdG9v
+IGNvbXBsZXgsIGJhc2ljYWxseSBqdXN0IGENCmhvb2sgaW4gbWVtX2luaXQoKSAodGhhdCdzIGEg
+Yml0IHl1Y2t5IGFzIGl0J3MgYXJjaC1zcGVjaWZpYykgYW5kIHRoZW4gYQ0KY2FsbCB0byBtZW1i
+bG9jayBhbGxvY2F0b3IuDQpUaGF0IGJlaW5nIHNhaWQsIHRoZSBmdW5jdGlvbmFsaXR5IGZvciB0
+aGlzIHBhdGNoIHNlcmllcyBpcyBjdXJyZW50bHkNCmludGVudGlvbmFsbHkgbGltaXRlZDogbWlz
+c2luZyBOVU1BIHN1cHBvcnQsIGFuZCBvbmx5IGRvaW5nIFBNRCAoMiBNaUIpDQpibG9jayBhbGxv
+Y2F0aW9ucyBmb3IgZmlsZXMgLSB3ZSB3YW50IFBVRCAoMSBHaUIpIHdoZXJlIHBvc3NpYmxlIGZh
+bGxpbmcNCmJhY2sgdG8gc3BsaXR0aW5nIHRvIDIgTWlCIGZvciBzbWFsbGVyIGZpbGVzLiBUaGF0
+IHdpbGwgY29tcGxpY2F0ZQ0KdGhpbmdzLCBzbyBwZXJoYXBzIGEgbWVtb3J5IHByb3ZpZGVyIHdp
+bGwgYmUgdXNlZnVsIHdoZW4gdGhpcyBnZXRzIG1vcmUNCmZ1bmN0aW9uYWxseSBjb21wbGV0ZS4g
+S2VlbiB0byBoZWFyIG1vcmUhDQoNCkpHDQoNCg0K
 
