@@ -1,80 +1,79 @@
-Return-Path: <kvm+bounces-23410-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23411-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F2FF94969B
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:24:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F449496A4
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:25:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57D16281E2F
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:24:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C94EE1C222A5
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:25:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD3450276;
-	Tue,  6 Aug 2024 17:23:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508F557CB6;
+	Tue,  6 Aug 2024 17:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jia9AX2I"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="BChA6+7H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+Received: from mail-qv1-f45.google.com (mail-qv1-f45.google.com [209.85.219.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6433BB50
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FE157CB4
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722965033; cv=none; b=uuELYQBFgwO28+gVRZ5oAShAOFtPDrORI4/HyofoyT3thwNmiBLS15pjb7Jg/fHj9ZvMOxLsNQcmxEtPdAQE2FAeayWEwD2BBYrjbZGED8Z5LEA1BMKGoTZdGw0frB4FPjC5EtkG9I0N1LcE9UhHzLJq9C46m4pBWY3z/Sr/+ro=
+	t=1722965098; cv=none; b=B+hzHGi2bKWCPGwmlvE1xrerZ1VFKKRi1dk/FqZ9+dwC5LKmIhnRyjTgw0L1RlS5gSKgaTimpLfLhgguqLpf/heUgJvc/RTqad4/YFlQ78VLFsxLHIg7zww9e7LcX12RBfbi/U1hBQNz+AiWzHWrmucynEZqlnh/DDOvDZpIMqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722965033; c=relaxed/simple;
-	bh=WbFlE5+qPAkFqLnreSC1NqqOFCvXcZe2PPM30+LdzcE=;
+	s=arc-20240116; t=1722965098; c=relaxed/simple;
+	bh=MqaKHZxPTEOOQL0dPc8HBy57ffLggZgGByL+56jCEA8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HlclvovBM3beyEkZ6Bnhw2Z6ZYoXzUFk2Ypa8of2PIsqTg8IkTsAiehb5Zb4N8FuXAO5Ci/Qvc/vynTWnTjMuUZbs0pYu6HOIYs0F/iq5fddDIn0SYzcEzA8pd8I04mAiRQTWhDLlH/c95v5ZNG31VedSAmoaDTnF8ZpSwRMOMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jia9AX2I; arc=none smtp.client-ip=209.85.222.181
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMsiLcnfUqPcBhPUPK4HKOD7paRLY5dTOWrBSXC20Fc8SEfK+1Z4HJcu3/mh/ikEU6dvJYb9nTwqZzusRSW61sPZzmNg69bmoTia29xgAyW1/sTdyF3xQ5gAAB00rtV4RpTksrbsG6S3/G/9zLMxHt6RxiZ3o2OTWrQCy7CMYOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=BChA6+7H; arc=none smtp.client-ip=209.85.219.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7a1e0ff6871so56001785a.2
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 10:23:51 -0700 (PDT)
+Received: by mail-qv1-f45.google.com with SMTP id 6a1803df08f44-6bb96ef0e96so5105386d6.2
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 10:24:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1722965031; x=1723569831; darn=vger.kernel.org;
+        d=ziepe.ca; s=google; t=1722965096; x=1723569896; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=F4rmNPnz+kGMra0RQJtqJ1i8be+boDPo204/oBt9Rcs=;
-        b=jia9AX2IwxxpNeVnIvgp/19a/HX+RXv3L7cvDxoJF+Fu43uKodSDtVMLcvttrHeoXs
-         pbAKye7Di66sH8ESpYcmctnvBXoMBks3gzdIGJDCCRQbMrAbAhFLsbndQX9UZpn9ypvs
-         TixyeUbRQ4mWxO+3tqc1z/bgaOZIT3+jhrsYo/5PIS+y+1FMKw6snw3+DUy/2YXLgLr4
-         FQNGCQC75wC1zgTzxkp/LFOFRzalJLD0GgzzM9L3dx6e6lcyl/edgplKEN391iQYcSkR
-         Ah8UpleU87LZ7JuscB/vaG026fENfZ2t62/sOxK/9AvYrNwyVgkW6bP6Uxoc/HXXih8S
-         UnDA==
+        bh=T7HE5qomFnShgNw+dAFpKQn8211Vw3rMqkRCxPcaqwk=;
+        b=BChA6+7H/DuZuuDVTwc+kJUGl1JRoCiifBWKlPvb1riMENYJzszeIpxuIsQbSP0+NE
+         fBPt2Wv4qvhC3hd4HMT1sbHXF+lV1eSgk/S3YWaVZbx3Kz52S552eGV2lrzXdvzpqe25
+         N2dtGTP2NxAQAfLzt+sngLqrmUUhZLOUNvruIytZDoKJLnlEhJuOdtLHP9udVZhhobmk
+         4gsORT73GIjgFQgjITxIzWHsj4FqgfA1kk4bwzK0w/HbTlAVGJmN5r9AsqcgZ+8xOtW0
+         rkVo9OLabzEE1Jw3cQKEyh8OIuIA03szr+WDoBPvk6iZPOAaOu/PscuJ94rqC4PQzvBr
+         8THg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722965031; x=1723569831;
+        d=1e100.net; s=20230601; t=1722965096; x=1723569896;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F4rmNPnz+kGMra0RQJtqJ1i8be+boDPo204/oBt9Rcs=;
-        b=tOLfFktyD+1lb8lumug8EGlkARItYFwJ0Cl7qqSb9eCaVXs9CEDMAw+3oT6Q1WCyJ8
-         EumKvx5n+J2PX2YwzUVL0ZUirS78cwZtuJDr8GzE/tlSnszFZeFTJSA0rsjMQGePZIyN
-         3G/obJ3nktKPFva9Ix57H9phtnCNxtLXDBZverjUJZL6k0PUD+Y00ar0TSoLmoqXnV00
-         UXxWkuI2m9DBPEDHz6uKsKghw9MYpbljfbd44QISwFOPZsfBJzrhy4PQ5fiyiqsgl7N1
-         CAFUdv9tDZ1iyXiay6CHy3wa2Qty9Xg/jaEuvfq80tO5/csj4+scsy2WEqESkZt7qFKz
-         cTzw==
-X-Forwarded-Encrypted: i=1; AJvYcCUJms8YMJeS0ep1Fu3OYAQAjj6kXor7dVQBv4SgUQ/UpTIwT1IFwNquufgYbgL9yPXOd1M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxDQJz/bEAJFp4Ik2ttgDp3IoKA16LQOpZ92mTScNUynJshqhL/
-	NCoTSDFQCQAFGn1ZwQ+gJbc+d8hZDP5yUU3p5ZZZ3u+XSF8VDTTHLhnay55tnTQ=
-X-Google-Smtp-Source: AGHT+IGN/g/G+FXYvmY4HkM76lkSBKmxvlD+n6uvRjDt3aMuV/oycOrSHTiQPvVwSkF6jaF3MwJXew==
-X-Received: by 2002:a05:6214:5f03:b0:6b0:7ba0:ef67 with SMTP id 6a1803df08f44-6bb9840713dmr163494426d6.31.1722965030621;
-        Tue, 06 Aug 2024 10:23:50 -0700 (PDT)
+        bh=T7HE5qomFnShgNw+dAFpKQn8211Vw3rMqkRCxPcaqwk=;
+        b=iemd5/VMEpyP/qWOvYmkgJsCAoBpLVVE4k+LiY9XyG5zrJmQfH1D2DJ0uVIGWGeXj7
+         9DECKk9b29H4/ehJhKwFaEjQZ2fxEq9qwIXnXhqrPElX2MGw+JfKVYTjjAn92hJl3b+5
+         xlPh87J3GMhBgMYc22Ftz4/AqcYmppLQn6DvzYHGhh5oKHKFr93KPhl6+pOWE8P+O65i
+         dp77oBarjwPxH0wSib5d7SZbVOBu/72bMYRpboK2qr7Ox0zhUt3RwK3U7+0YCjcTEm3l
+         q+1pyXaS15GsQcMsCVewNDJzioL46D+ySP4BaTfSq2iSRjKQwqmfxAwcH1/q8EJ8/zmc
+         eyPA==
+X-Forwarded-Encrypted: i=1; AJvYcCUFXnsAEvxv+l6l/mQVBKgw5D7Topv4VDx3S2snKGAsgj6mbwfyqEynUW5BS2Nk9E04rUPTMlO4U9CjR4x4fXjkz9EH
+X-Gm-Message-State: AOJu0YxrGh3pkehCtFYov63InpGiAkQePN8a/AfFnYM6+YUkB3UcLr32
+	kJep3Hf/1ekpTFxHTfvfStNV0V6m5S9wjf7p+ecnrLDlsPjCRC0E1ZLny+MRUuo=
+X-Google-Smtp-Source: AGHT+IFa9dVhWCrdPdbUkpdGZrho6h2SYLIO4aEGRVqFcYo1XlMAaNoBZNabBpbHu2isVnX5Mnu2Pw==
+X-Received: by 2002:a05:6214:3a08:b0:6b7:9bdd:c5ac with SMTP id 6a1803df08f44-6bb9845d291mr182312036d6.54.1722965095947;
+        Tue, 06 Aug 2024 10:24:55 -0700 (PDT)
 Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c79744esm48263166d6.40.2024.08.06.10.23.50
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c86772bsm48644876d6.124.2024.08.06.10.24.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 10:23:50 -0700 (PDT)
+        Tue, 06 Aug 2024 10:24:55 -0700 (PDT)
 Received: from jgg by wakko with local (Exim 4.95)
 	(envelope-from <jgg@ziepe.ca>)
-	id 1sbNuX-00FYRk-Mv;
-	Tue, 06 Aug 2024 14:23:49 -0300
-Date: Tue, 6 Aug 2024 14:23:49 -0300
+	id 1sbNvb-00FYkR-1o;
+	Tue, 06 Aug 2024 14:24:55 -0300
+Date: Tue, 6 Aug 2024 14:24:55 -0300
 From: Jason Gunthorpe <jgg@ziepe.ca>
 To: James Houghton <jthoughton@google.com>
-Cc: David Hildenbrand <david@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
+Cc: Andrew Morton <akpm@linux-foundation.org>,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Ankit Agrawal <ankita@nvidia.com>,
 	Axel Rasmussen <axelrasmussen@google.com>,
@@ -94,13 +93,11 @@ Cc: David Hildenbrand <david@redhat.com>,
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
- clear_young MMU notifiers
-Message-ID: <20240806172349.GQ676757@ziepe.ca>
+Subject: Re: [PATCH v6 04/11] mm: Add missing mmu_notifier_clear_young for
+ !MMU_NOTIFIER
+Message-ID: <20240806172455.GR676757@ziepe.ca>
 References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-6-jthoughton@google.com>
- <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
- <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
+ <20240724011037.3671523-5-jthoughton@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -109,26 +106,18 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
+In-Reply-To: <20240724011037.3671523-5-jthoughton@google.com>
 
-On Thu, Aug 01, 2024 at 04:13:40PM -0700, James Houghton wrote:
-> --- a/include/linux/mmu_notifier.h
-> +++ b/include/linux/mmu_notifier.h
-> @@ -106,6 +106,18 @@ struct mmu_notifier_ops {
->          * clear_young is a lightweight version of clear_flush_young. Like the
->          * latter, it is supposed to test-and-clear the young/accessed bitflag
->          * in the secondary pte, but it may omit flushing the secondary tlb.
-> +        *
-> +        * The fast_only parameter indicates that this call should not block,
-> +        * and this function should not cause other MMU notifier calls to
-> +        * block. Usually this means that the implementation should be
-> +        * lockless.
-> +        *
-> +        * When called with fast_only, this notifier will be a no-op unless
-> +        * has_fast_aging is set on the struct mmu_notifier.
+On Wed, Jul 24, 2024 at 01:10:29AM +0000, James Houghton wrote:
+> Remove the now unnecessary ifdef in mm/damon/vaddr.c as well.
+> 
+> Signed-off-by: James Houghton <jthoughton@google.com>
+> ---
+>  include/linux/mmu_notifier.h | 7 +++++++
+>  mm/damon/vaddr.c             | 2 --
+>  2 files changed, 7 insertions(+), 2 deletions(-)
 
-If you add a has_fast_aging I wonder if it is better to introduce new
-ops instead? The semantics are a bit easier to explain that way
+Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
 
 Jason
 
