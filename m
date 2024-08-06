@@ -1,202 +1,340 @@
-Return-Path: <kvm+bounces-23375-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23376-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D9C894929A
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 16:05:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BACE9492A6
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 16:08:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C4B12813C8
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 14:05:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 252A11F21E36
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 14:08:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 446A818D626;
-	Tue,  6 Aug 2024 14:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA1C18D63B;
+	Tue,  6 Aug 2024 14:08:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pvFSeODq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="g46kvkU+"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2063.outbound.protection.outlook.com [40.107.236.63])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5DBE18D627
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 14:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.63
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722953145; cv=fail; b=NmW7StsBwHklg47v2jmOzAPKoo2e2lESvvB+86bSL+XV/j5TlKw4M4okDzxKkArztenVchPt6YzHS5TJFrs/UHBxhk7ietJ2g+ARX9WYVG8vj3GVuo+rwEsfQyGpUJjYxr/dkooK+v2unrf5NhO6T57H5W5NAHB4FSvc2MkF8HY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722953145; c=relaxed/simple;
-	bh=tXHVU+RjtBxosSgnlFHob8KCpCZxvko0cDgGofS+4tY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=iFyIVlvZ6ziqFLyoZF5ZraWKIWjxJXPQcJrtNCWgFaaH91TFMM9zdaXls1LjUBkyfW77UB8R4l0giDTB3zijUEJxFsiH1x1d8meoEgz7xv/M2ymBwt9DrSfbZvtFqKj5f0249lN9XFUzxHlEzIW5eN6/zHjJEo76vyuiQBqFoPo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pvFSeODq; arc=fail smtp.client-ip=40.107.236.63
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=KcPcUQZLkbIDyfGyEd5mOZ/g02oGvHyZYE2XprK7l1fplPpby4jm7ohP5CcfuM5LWbhgp1F7AvKnkhyHaRmLmJILCNavsgFKIYVj8YmMHQyzExjeBmrGR51Fvdz7D5A22gB1CxyzS6gRjLSGhKEoHPS0g+Sf67bFahKfJGgGVANVXALJk0D5NOtZC7EbQONBtJGx2Ha5oIGOha+9Nbnrj6WA18DHVnqi/1m0vFnnSXuuCkbOEM18lQZQct3nuEbrnP+mHJvfnLmGldh+oxaGXnhKsSmxcxeyROUTlcPYefJnhgCMwZzxEe0nIaJQiQouTi+iZewStDDtzzPWnEPwDg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UDVQyemReTm7xfYbJvItIT5A55v3ufSjVqez1axdKo0=;
- b=gMoaDhV7hRQ5HoQZ4mxTocd2EnLi6wg3JxRUjAW3KvhO+B0Pe/exSFotvmOJOElUhKZ5lmNBEVHDQUBD8muFD2FmYQ/CYZ1EBz0TktArHsxgXlUXkNfXLTfH9e6x3wKVOiSNpyydmaCYvRKQapv/IOMzRyv0v06wcJ2zkcf08dKujt5UryqsWlcE5g+llyE+TvFFAr178ifzKJlu25QGjEODBFUj1CpNEctld6tDCwwX7Zam3pp17oUMgDqMKlFwb3+CL87BHpNVXQXQlUwpo3Qqkw72DuPsI9vXOl/eiWSG85PZvLGcJwQSZhe7jh7TpdCTBfd8OB7jkWzx3FEUJQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UDVQyemReTm7xfYbJvItIT5A55v3ufSjVqez1axdKo0=;
- b=pvFSeODqAj6mgm4VdxHaPSN+Wt8pQj+UUXZNBZk85pFc3lhLRjDbpxmb43bG7RJrCxGwchVuTDQUWxlncZM3QXXBRZ56tio0xTeVhDS03QsdvlNUO2BZ4nsR1zcMVXYkDZJ/8FLcA48WUzq/O9Nh0+FqWDnlgtjh7F6C7UL5CfBf7VSiKrGsCwc/co6Qh+zfXNWeNIfwwMduG80wNBOogITxy/T9N1dsS/SAhShaTB9aPweuJAggZvOo1kL3ImVojrwCPeayT5WSSmSCqdCY8TpKxfdv9AkjVhUejfZSPE/cEcvBrG9YjOE9gSrEIs59HfGpuSBX5VXhy2GV7CoOiA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by BL3PR12MB6572.namprd12.prod.outlook.com (2603:10b6:208:38f::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.13; Tue, 6 Aug
- 2024 14:05:39 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7849.008; Tue, 6 Aug 2024
- 14:05:39 +0000
-Date: Tue, 6 Aug 2024 11:05:37 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: "Tian, Kevin" <kevin.tian@intel.com>, "Liu, Yi L" <yi.l.liu@intel.com>,
-	"joro@8bytes.org" <joro@8bytes.org>,
-	"robin.murphy@arm.com" <robin.murphy@arm.com>,
-	"eric.auger@redhat.com" <eric.auger@redhat.com>,
-	"nicolinc@nvidia.com" <nicolinc@nvidia.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>,
-	"baolu.lu@linux.intel.com" <baolu.lu@linux.intel.com>,
-	"Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
-	"Pan, Jacob jun" <jacob.jun.pan@intel.com>,
-	=?utf-8?Q?C=C3=A9dric?= Le Goater <clg@redhat.com>
-Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
-Message-ID: <20240806140537.GM478300@nvidia.com>
-References: <20240424141349.376bdbf9.alex.williamson@redhat.com>
- <20240426141117.GY941030@nvidia.com>
- <20240426141354.1f003b5f.alex.williamson@redhat.com>
- <20240429174442.GJ941030@nvidia.com>
- <BN9PR11MB5276C4EF3CFB6075C7FC60AC8CAA2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240730113517.27b06160.alex.williamson@redhat.com>
- <BN9PR11MB5276D184783C687B0B1B6FE68CB12@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240731110436.7a569ce0.alex.williamson@redhat.com>
- <BN9PR11MB5276BEBDDD6720C2FEFD4B718CB22@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240802122528.329814a7.alex.williamson@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240802122528.329814a7.alex.williamson@redhat.com>
-X-ClientProxiedBy: MN2PR07CA0018.namprd07.prod.outlook.com
- (2603:10b6:208:1a0::28) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7358318D628
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 14:08:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722953313; cv=none; b=l2okvVKntvTF64wMyNUxNScNT/SMfpb+MjgaYmE+Vs483WI8JiDGOtUJFyToPJ3WX4Irb2TZmHdnTmDPppEEAI9cp2LXT/Re2oQlhy5BeVVbQdilnxLHfivHrU9g/Uf4coDGttw8vb01weMNFtSvtZrQdKh1cU6AQonqFkODyuI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722953313; c=relaxed/simple;
+	bh=vlGmBOftKIZpdRBPTZhL4vlLvSmtYIuAmQ+hY+0/2Vc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y/Lj08iWTteHZmX0QDALQ0jx3G4M7JxvcjjHbFGWrR6Jcr4ehEYwpojfpdwe+5x0RPHr70exNnLCCkGMBRoEA3FFWZJ7uAeRONTS/KmAU1LVSwV6/gZhSpiocdA2rBDhuIbi4LhzqYrhMT40JJvOZc+l7SdXP7cJ78brwCooA78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=g46kvkU+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1722953310;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hbna4654uDKbKfBgT+7Y7s0hXv1oN4OUzzUqS0K6H94=;
+	b=g46kvkU+Rk8v6s7oXVzIy2FrwHvE5QKrX6je26vJ4GUKRFJZyaSbb5xPVYZIZx3nrZJmqj
+	bSrHuIeuSZRj3YyZOJor4/NedpCyIHapu9/0V3heLuo4eSZ2A9JINyYcIrPFs01VpSIjAp
+	e2onHp8SbfSW15+550+6+vl6fMN+jMo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-101-rNZLf6xTNSihhqJ69J5fZg-1; Tue, 06 Aug 2024 10:08:29 -0400
+X-MC-Unique: rNZLf6xTNSihhqJ69J5fZg-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-369bf135b49so548126f8f.0
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 07:08:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722953308; x=1723558108;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hbna4654uDKbKfBgT+7Y7s0hXv1oN4OUzzUqS0K6H94=;
+        b=D+kV8wQjje2vGWzVRt1Z4e+xMx/NtuZu9Gm9IWPg+JPpxDUHkAWf16FfRS8cWNJ4Zh
+         QuJSAV34mcIImV7AeEwS1UZFZC57YLtIKBahyuPSvcRwJ0NjHOSIhJVPg/cYO/m+G+Vy
+         pXsjQUT+xd76xieqNWLf+99qONNVIde2FEeCCSU1H2gStgxkQfRnEGTdfUC7PlKwu6MJ
+         hQkLKv+cIXhPXTG62h58KpB5Knzh1D0CmrdqaeYSeb/f8pDg7m7qSIQ12q5kart2MrCG
+         k9c28gZ/d2topVVUjQXT/TROM54aHc9lZhO4RKpQsDfG7q/c/xkaHIrCfEQA59/ypE95
+         qGXw==
+X-Forwarded-Encrypted: i=1; AJvYcCXSnx6DI+NPXew/b7bFhGkjRgYspQ7QoUTgQIlxEyCBb/KWqucfrPgJe6Kkfj0lFQ+lOMSKYRfiglWclQGSZZqO7UBD
+X-Gm-Message-State: AOJu0Ywvf/8JYNa+TCu4+T6mmvFVcEqzSVHY08mTkK14y8pLm6pWhdA8
+	n32DVd9aoJYLErzLjnnmbPT7xIrgLTcCsDstpPp+K6Hc1iTKq3+TY6PvCDwrZ8VnP2PZNLXOd/j
+	KLERYvDUzrWhuVRgu2eE2CAPriR/PkBvurGG0zCJqWtVebjaOdw==
+X-Received: by 2002:a5d:6892:0:b0:362:23d5:3928 with SMTP id ffacd0b85a97d-36bb35c5ecdmr13692099f8f.17.1722953307889;
+        Tue, 06 Aug 2024 07:08:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IExCTsj02K2WYXzGt8u2T0xh3iMsv4w2hInseiESktzMOYaBeImfP7qFcOLNkB4yhVrCXP4fw==
+X-Received: by 2002:a5d:6892:0:b0:362:23d5:3928 with SMTP id ffacd0b85a97d-36bb35c5ecdmr13692066f8f.17.1722953307274;
+        Tue, 06 Aug 2024 07:08:27 -0700 (PDT)
+Received: from [192.168.3.141] (p4ff234d2.dip0.t-ipconnect.de. [79.242.52.210])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282bb97fbasm245003675e9.41.2024.08.06.07.08.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Aug 2024 07:08:26 -0700 (PDT)
+Message-ID: <c55fc93d-270b-4b11-9b38-b54f350ea6c9@redhat.com>
+Date: Tue, 6 Aug 2024 16:08:25 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|BL3PR12MB6572:EE_
-X-MS-Office365-Filtering-Correlation-Id: a8aed63e-c51f-4dd9-0b8e-08dcb620d99f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|7416014|366016;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Eo2sXk3ms4qbZizTdH4iXMJtbJQmVXdc3Ttex4LvDgt6U52dJD0NXONSdYCN?=
- =?us-ascii?Q?HECJrnSmGSI4BZ7BUxDnM+pmW4Cr/NZltT2ejlso2iOSjQ7bFpRQ2KLNRNqt?=
- =?us-ascii?Q?kW6uH0QN5NQNnMNc6KjQaElAoKbkaYX9MGVxYnhxBmxnRmKf4nbkkwNGvrqP?=
- =?us-ascii?Q?blmeOe05CNZgZHZevwjhj418rXTw+60bOci0Dlc5eIfFjp2dc3z7/A99tgKB?=
- =?us-ascii?Q?zneQLH8DOz+QXW0Qfeja/on/OEVOKWEy6TFD/MWu28ZDgfp60IubmGl3uwzW?=
- =?us-ascii?Q?qAScKZnH4IjscJ9YTIkANOgq5v3BULHA2U8FVqrmS3Kaavpoo0Khf6PjbaGR?=
- =?us-ascii?Q?GihkLh1RewP3zYUEe0nMCKs9jyrevS2qpBMlAeELV040cbjGHC05CKwO5RYM?=
- =?us-ascii?Q?YLnxUD47tC9fWAUujSmq4lhBE8UmEMqBBd1Df9dAhTmRajuiixqtVc92RfDL?=
- =?us-ascii?Q?uv49R7iP3fM5vesoIIjR8dA9W5PJMVxTrfMauYeWCnN5/vwRdN/9DB5vd/aT?=
- =?us-ascii?Q?6jFm8WpHaxQByZzO2OZa3AfEcLepxqa2MATEw4QLiKu8r8lQQM+4gtL9Dxeb?=
- =?us-ascii?Q?NXhj5vifehQHSC+vtbM1ykzdM5oJ/n2zqlVIiOWeZZqqsoTS7v6zUy+79MJO?=
- =?us-ascii?Q?XabGsqsiGz1f4wmaLPBVjwGlu5yHHdxfOiD3W7Ghl+x3RfnLYtJzz6LhnpN1?=
- =?us-ascii?Q?OQjImJUQ8TthbiZGMxB7TbYL9wJ1Q7ZbiCOmjaMB/W8neQQXQQXcp2VW0zPQ?=
- =?us-ascii?Q?eXxNam0zKJtYjyu+fPI+CsW8uP9ybexvObXwmbgQdpMmTu50zQDZEll9s1HA?=
- =?us-ascii?Q?n0eDGupcqAe6rI1iQ84guniGpPXosUhbDTajss/0eXOsMOw+PfN00FDETUgz?=
- =?us-ascii?Q?CZQUsODwrp4hs5CQtf7+3qba8ocM/pj+MEyDHbGqkAmDVi1j6uD2oIJHr7fV?=
- =?us-ascii?Q?9ylOXmFU+fwXmq5TN7RU2ZFLgs42tIwtTgEo6JIv+otesUVjxH0QRYnmm7IP?=
- =?us-ascii?Q?s/LoFdxauaQeZH3I1DzfQjtA/fi0YXXHMTLGEiBdJhgpMs+hPeB9ZHv9JOyz?=
- =?us-ascii?Q?ia39bxFTNHA2Z/reywfO0yeI70ZAQKLiXiX+aCztp1fALzXxBe83M4EFGql9?=
- =?us-ascii?Q?CCgJIeo2qnsY5dUSqHHv9DT0xSzqtK5+oy7P8iNCS5lc+T/3iuioMB4xvRRf?=
- =?us-ascii?Q?ZmANSADsXu5NzTYVHYFhFxd6meZkY5iELA1a9Pm09FLlxUscaNcR5aYo5psB?=
- =?us-ascii?Q?lRY6WS5GFBKODjsJZuxNJJJMvfVQ3MuvOz5yjyxOpWEbsnXYnfoEBys6xY3p?=
- =?us-ascii?Q?4O/ZDu8gVuPN7wo/zsV60tVZ+ZAQUTVjMxeNcL+SMmRozA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(7416014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?l72gPe1aoT68kfba+oQOrHbYUjRgOS07THTK5ASHTO0XYwwrLO0AFW/wpTur?=
- =?us-ascii?Q?tyGajsnUPA/MRAp3675Opx4v4JAFb0pOuR28RJ+fz5wLUQIYW9xeRKyyktmK?=
- =?us-ascii?Q?seIbWyOpkjl6Q7LGOh8bLFiBJQGHkeM8GlWVQdOkC54O7mnYC6xRepfmZmAq?=
- =?us-ascii?Q?Kl6D7dJBCBGUQox3NgM029SSpxorcm4qsN0TBa44PqsLLxpPDN6IQkdbKLlt?=
- =?us-ascii?Q?XLxagm7WOgHLB4uikVYCce267uDhnOr/x+PCGpxIwz6fIMXbNqpsmNFYal3t?=
- =?us-ascii?Q?mhA/ULc4+1DGyAa3Vp7EnBIWIzOV7jVXxbcymsvdyfGrsru0s653XFmnPcPP?=
- =?us-ascii?Q?ll7LptBwMWiMz3vtYGDNmdpRZqPQX4makrhK4FTwlKCkeBeI40vwuUk7ZaqD?=
- =?us-ascii?Q?VNwIkRFqAu4U/pTZculjfWW0R69RQWhb/QcDMhVVAVr2lA1Pq0umlMo4+rN3?=
- =?us-ascii?Q?/stHxv04w9l13rKZB2TrD4+tSIb5JBnAcyowEa1yix/9XIGY9C9MPbXOG7lx?=
- =?us-ascii?Q?UwQbgnNB/KXcaJSPMu6Nr6oWCIxpwinjCeFXicw+aI4/3OXv1QIOwDgNRl44?=
- =?us-ascii?Q?P1KDD92ALD20L7Qs6JOsbJgomRqa6HxJXVLKOdonqrzOQeTKw/tz91qEewrB?=
- =?us-ascii?Q?X3FnMwAIJz9WpeMDHDj56/t5SlgKSMeRM/NQHNodVCs9p7H13RYG2easjSop?=
- =?us-ascii?Q?kCiMZWu8mxFyeHbf3FBCSwh6Bcij04pNtX2qyPafi5AGj8Ga8OZkk7ksfHK1?=
- =?us-ascii?Q?GrfrXZJVfnhVvocO5PLH4XAc4pFR9hXc8NKSKmJAL4O3CaQSvULdd22KRaOv?=
- =?us-ascii?Q?pIsfMxbaKdRcMF3wn3ujtCAOvQOe/ulyMKPyEIiU1kkEgMlhpEiSvGRLbLE+?=
- =?us-ascii?Q?zeZ8l+Eg/n5flVpL7F1uzOSqbtG69Wt9f9tqjqZ+ezYy/bjBUTSSgVgku2nr?=
- =?us-ascii?Q?4B5jhnwUXSb9E8vmaXB5LhFFP6Maz0nk0MRFTGjeET3kK6b2q0r7UuZ+1Lzx?=
- =?us-ascii?Q?l67jfzkSFAwadihOUDSP7sVKqJ2zuEuJREC2/cRA3kdVE6zymkCAQkrMp3iC?=
- =?us-ascii?Q?trpS545bw1VJmxCxUyRWd6AqhK3Gtb+8bXm4Ik7s0/Q32aiSsC9dZ3A1Pmeg?=
- =?us-ascii?Q?y2eZqwEd8EE/P/SBuh06OB0uq5UanBY/hYe6xErJDHejU1ofslopWqSBUKyp?=
- =?us-ascii?Q?gS4uc/x6AGo3hpctPlNFL9O4RLvbWe/zpuAhJboi2GlNN4q8gh1zQW6LR8O2?=
- =?us-ascii?Q?d4sY056HGZsD27Rb31xCcfHx1VRg5XJF2o5FCfLikvMzhliSdQXf7s/Xbcjv?=
- =?us-ascii?Q?o9HOrMqar8NPhGnsIyP7Asc2YMqvfwAp4t1YKVwbIFyZybIa6yxnmctnVOb1?=
- =?us-ascii?Q?QE/AzLJ+4flRC4RRJ/Hoh5GMZBVkFK8JUhrTF9xQ4MRpGx+F25/6zq+RQrSr?=
- =?us-ascii?Q?Cub0jMxoIVEaXWUbNXaLwu9GTSMA7K4ICf4oEW/QtPjLgw6i9UumxMtammkG?=
- =?us-ascii?Q?qZ4t4bz28y0CfMUoBg9Ngy3Cq2pkojbjX2Qv4RA6dIn5NS+/2f0Zq95sEPEE?=
- =?us-ascii?Q?AS5Ub4GiZzY84UV1ZEo=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a8aed63e-c51f-4dd9-0b8e-08dcb620d99f
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2024 14:05:38.9786
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nSKMBjELXcCxP4rLBekpbZ8nxQ7IihlqyGxILSonWWXI1ww4wXC4cH8kWWwGziYL
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6572
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 3/4] mm: guest_memfd: Add option to remove guest
+ private memory from direct map
+To: Elliot Berman <quic_eberman@quicinc.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+ <seanjc@google.com>, Fuad Tabba <tabba@google.com>,
+ Patrick Roy <roypat@amazon.co.uk>, qperret@google.com,
+ Ackerley Tng <ackerleytng@google.com>
+Cc: linux-coco@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
+References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
+ <20240805-guest-memfd-lib-v1-3-e5a29a4ff5d7@quicinc.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240805-guest-memfd-lib-v1-3-e5a29a4ff5d7@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 02, 2024 at 12:25:28PM -0600, Alex Williamson wrote:
-
-> > I envision an extension to vfio device feature or a new vfio uAPI
-> > for reporting virtual capabilities as augment to the ones filled in
-> > vconfig space. 
+On 05.08.24 20:34, Elliot Berman wrote:
+> This patch was reworked from Patrick's patch:
+> https://lore.kernel.org/all/20240709132041.3625501-6-roypat@amazon.co.uk/
 > 
-> Should ATS and PRI be reported through vfio-pci or should we just turn
-> them off to be more like PASID?  Maybe the issue simply hasn't arisen
-> yet because we don't have vIOMMU support and with that support QEMU
-> might need to filter out those capabilities and look elsewhere.
-> Anyway, iommufd and vfio-pci should not duplicate each other here.
+> While guest_memfd is not available to be mapped by userspace, it is
+> still accessible through the kernel's direct map. This means that in
+> scenarios where guest-private memory is not hardware protected, it can
+> be speculatively read and its contents potentially leaked through
+> hardware side-channels. Removing guest-private memory from the direct
+> map, thus mitigates a large class of speculative execution issues
+> [1, Table 1].
 
-ATS and PRI are strictly controlled only by the iommu driver, VFIO
-must not change them dynamically.
+I think you have to point out here that the speculative execution issues 
+are primarily only an issue when guest_memfd private memory is used 
+without TDX and friends where the memory would be encrypted either way.
 
-Effectively they become set/unset based on what domains are attached
-through iommufd.
+Or am I wrong?
 
-PRI is turned on when any fault capable domain is attached, eg the
-HWPT uses IOMMU_HWPT_FAULT_ID_VALID. I'm not sure I know the full
-story here how this will work on the qemu side, but I would guess that
-PRI changes in the virtual config space will result in different
-nesting domains becoming attached?
+> 
+> Direct map removal do not reuse the `.prepare` machinery, since
+> `prepare` can be called multiple time, and it is the responsibility of
+> the preparation routine to not "prepare" the same folio twice [2]. Thus,
+> instead explicitly check if `filemap_grab_folio` allocated a new folio,
+> and remove the returned folio from the direct map only if this was the
+> case.
+> 
+> The patch uses release_folio instead of free_folio to reinsert pages
+> back into the direct map as by the time free_folio is called,
+> folio->mapping can already be NULL. This means that a call to
+> folio_inode inside free_folio might deference a NULL pointer, leaving no
+> way to access the inode which stores the flags that allow determining
+> whether the page was removed from the direct map in the first place.
+> 
+> [1]: https://download.vusec.net/papers/quarantine_raid23.pdf
+> 
+> Cc: Patrick Roy <roypat@amazon.co.uk>
+> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
+> ---
+>   include/linux/guest_memfd.h |  8 ++++++
+>   mm/guest_memfd.c            | 65 ++++++++++++++++++++++++++++++++++++++++++++-
+>   2 files changed, 72 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/linux/guest_memfd.h b/include/linux/guest_memfd.h
+> index be56d9d53067..f9e4a27aed67 100644
+> --- a/include/linux/guest_memfd.h
+> +++ b/include/linux/guest_memfd.h
+> @@ -25,6 +25,14 @@ struct guest_memfd_operations {
+>   	int (*release)(struct inode *inode);
+>   };
+>   
+> +/**
+> + * @GUEST_MEMFD_FLAG_NO_DIRECT_MAP: When making folios inaccessible by host, also
+> + *                                  remove them from the kernel's direct map.
+> + */
 
-ATS, at least for SMMUv3, is controlled by a bit in the vSTE from the
-guest, the virtual PCI config space changes should not be reflected to
-real HW. There are data integrity/security concerns here. ATS must
-only be changed as part of a sequence that can flush the cache.
+Should we start introducing the concept of private and shared first, 
+such that we can then say that this only applies to private memory?
 
-Jason
+> +enum {
+> +	GUEST_MEMFD_FLAG_NO_DIRECT_MAP		= BIT(0),
+> +};
+> +
+>   /**
+>    * @GUEST_MEMFD_GRAB_UPTODATE: Ensure pages are zeroed/up to date.
+>    *                             If trusted hyp will do it, can ommit this flag
+> diff --git a/mm/guest_memfd.c b/mm/guest_memfd.c
+> index 580138b0f9d4..e9d8cab72b28 100644
+> --- a/mm/guest_memfd.c
+> +++ b/mm/guest_memfd.c
+> @@ -7,9 +7,55 @@
+>   #include <linux/falloc.h>
+>   #include <linux/guest_memfd.h>
+>   #include <linux/pagemap.h>
+> +#include <linux/set_memory.h>
+> +
+> +static inline int guest_memfd_folio_private(struct folio *folio)
+> +{
+> +	unsigned long nr_pages = folio_nr_pages(folio);
+
+guest_memfd only supports small folios, this can be simplified.
+
+> +	unsigned long i;
+> +	int r;
+> +
+> +	for (i = 0; i < nr_pages; i++) {
+> +		struct page *page = folio_page(folio, i);
+> +
+> +		r = set_direct_map_invalid_noflush(page);
+> +		if (r < 0)
+> +			goto out_remap;
+> +	}
+> +
+> +	folio_set_private(folio);
+> +	return 0;
+> +out_remap:
+> +	for (; i > 0; i--) {
+> +		struct page *page = folio_page(folio, i - 1);
+> +
+> +		BUG_ON(set_direct_map_default_noflush(page));
+> +	}
+> +	return r;
+> +}
+> +
+> +static inline void guest_memfd_folio_clear_private(struct folio *folio)
+
+Set set/clear private semantics in this context are a bit confusing. I 
+assume you mean "make inaccessible" "make accessible" and using the 
+PG_private flag is just an implementation detail.
+
+> +{
+> +	unsigned long start = (unsigned long)folio_address(folio);
+> +	unsigned long nr = folio_nr_pages(folio);
+> +	unsigned long i;
+> +
+> +	if (!folio_test_private(folio))
+> +		return;
+> +
+> +	for (i = 0; i < nr; i++) {
+> +		struct page *page = folio_page(folio, i);
+> +
+> +		BUG_ON(set_direct_map_default_noflush(page));
+> +	}
+> +	flush_tlb_kernel_range(start, start + folio_size(folio));
+> +
+> +	folio_clear_private(folio);
+> +}
+>   
+>   struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags)
+>   {
+> +	unsigned long gmem_flags = (unsigned long)file->private_data;
+>   	struct inode *inode = file_inode(file);
+>   	struct guest_memfd_operations *ops = inode->i_private;
+>   	struct folio *folio;
+> @@ -43,6 +89,12 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
+>   			goto out_err;
+>   	}
+>   
+> +	if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
+> +		r = guest_memfd_folio_private(folio);
+> +		if (r)
+> +			goto out_err;
+> +	}
+> +
+>   	/*
+>   	 * Ignore accessed, referenced, and dirty flags.  The memory is
+>   	 * unevictable and there is no storage to write back to.
+> @@ -213,14 +265,25 @@ static bool gmem_release_folio(struct folio *folio, gfp_t gfp)
+>   	if (ops->invalidate_end)
+>   		ops->invalidate_end(inode, offset, nr);
+>   
+> +	guest_memfd_folio_clear_private(folio);
+> +
+>   	return true;
+>   }
+>   
+> +static void gmem_invalidate_folio(struct folio *folio, size_t offset, size_t len)
+> +{
+> +	/* not yet supported */
+> +	BUG_ON(offset || len != folio_size(folio));
+> +
+> +	BUG_ON(!gmem_release_folio(folio, 0));
+
+In general, no BUG_ON please. WARN_ON_ONCE() is sufficient.
+
+> +}
+> +
+>   static const struct address_space_operations gmem_aops = {
+>   	.dirty_folio = noop_dirty_folio,
+>   	.migrate_folio = gmem_migrate_folio,
+>   	.error_remove_folio = gmem_error_folio,
+>   	.release_folio = gmem_release_folio,
+> +	.invalidate_folio = gmem_invalidate_folio,
+>   };
+>   
+>   static inline bool guest_memfd_check_ops(const struct guest_memfd_operations *ops)
+> @@ -241,7 +304,7 @@ struct file *guest_memfd_alloc(const char *name,
+>   	if (!guest_memfd_check_ops(ops))
+>   		return ERR_PTR(-EINVAL);
+>   
+> -	if (flags)
+> +	if (flags & ~GUEST_MEMFD_FLAG_NO_DIRECT_MAP)
+>   		return ERR_PTR(-EINVAL);
+>   
+>   	/*
+> 
+
+-- 
+Cheers,
+
+David / dhildenb
+
 
