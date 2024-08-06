@@ -1,150 +1,109 @@
-Return-Path: <kvm+bounces-23340-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23341-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5B0A948D42
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 12:53:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1355B948D60
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 13:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D72181C23575
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 10:53:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 459DC1C2093A
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 11:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1203C1C0DE3;
-	Tue,  6 Aug 2024 10:53:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82D0E1C0DF8;
+	Tue,  6 Aug 2024 11:02:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W0MOSvny"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PkQ5Fh3v"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36285161310;
-	Tue,  6 Aug 2024 10:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF46143C4B
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 11:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722941580; cv=none; b=ENlcGqloV+fYh924jfydYFOs+lGXFxDxD3zbc4YNm3eGsKuR1txR21nheA7FAzQjHw8xcMILNVq1cZnMoPRepoF+iieUeo0EcMbqnId38Q9IR7dRu9raqlMQShD3dZ2riC3sqEkKcZW4tKtHxo97QVTOVo1U1CTpgYxTjZnsJ7g=
+	t=1722942132; cv=none; b=SSMUJhRBAiuSfi6nGakKTGsu6uCjL+YQd0arsdTw1Qw/i0V38HcOK1+lG9aItJU2Mou2QaV4CrbwXnA/SajLXqEGwMBYPwEhYf+mrfVkWbFAreWsEakELpF9vOGX7nVDo2U64bW+4i96gRFPQd2dpWXLg59aL5Moi2AIDgMFgaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722941580; c=relaxed/simple;
-	bh=EkKMxxSMZRePpCMe2tSDiAV8730Q2+erHGgzoyi5cnU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GDlgPxpQ+QdbhYMkezCYpa4/er4WzqV7yJqqfTRwZPR9Qt37lzrX1Ouxgd60/1uKsPl0Vs0MKHMlFA8cj02h/uhFdAhJYbPT/fEU/WKfPJSV47puI9O+uJA/WJe0VRLT8InOyBvoX4ND0TcOnhC5+jkOJBs0d/UKZPRp9HUmKqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W0MOSvny; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E20FAC32786;
-	Tue,  6 Aug 2024 10:52:56 +0000 (UTC)
+	s=arc-20240116; t=1722942132; c=relaxed/simple;
+	bh=oqiT23uDpKUeijSSFEbDth2Jzc3Zi+OLqvslXYLWlXw=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=u1YeOilI1z07zTDsgNAfyUmi+J6imNx/kBV0bQBSlmQfFcIjxcFVcMi2DsPeUjk+O7KP5RNDgE8zH/fUwwQREhu0/4lxrYujlxLjL+ldq8gb+9RcixucP40E+KnWL8JjhnVPUfzSOKb9aPEFkHuVus+Ii9qs4XQ3THtwn8cwU4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PkQ5Fh3v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2599DC4AF10
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 11:02:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1722941579;
-	bh=EkKMxxSMZRePpCMe2tSDiAV8730Q2+erHGgzoyi5cnU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=W0MOSvnyLaflLR4yTGHlkzqkxOfeo1jiYOdIyCx42gEcQd1Td+TmiI/GR5mBu1o/Z
-	 MP2/oitYFqDmEYk33ZrhLSOhwSLhLTg0JmkB7e+vkaFCtKTwTHg1mArHowILqFe1NS
-	 LuyQnNu8pmLo7kcyMCScOhRaZQeKD+IUGXtvx8WjUla95rwasHEa+eKUeoXUV6j14e
-	 QQ5Fqg0nrXmBnhPwH1WejfJ9XVn7uR7rVxByXd25YVJp0SXujSJ7LQyfqwhqMhMAyo
-	 PynFNnD8BIQRa7M+KZvbXlvBV7AFz1RAyJIRZx6fteGqS1fwn1nztM1m2O2D/6U3xq
-	 EQwkoLTMqfUVw==
-From: Amit Shah <amit@kernel.org>
-To: seanjc@google.com,
-	pbonzini@redhat.com,
-	x86@kernel.org,
-	kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: amit.shah@amd.com,
-	tglx@linutronix.de,
-	mingo@redhat.com,
-	bp@alien8.de,
-	dave.hansen@linux.intel.com,
-	hpa@zytor.com,
-	kim.phillips@amd.com,
-	david.kaplan@amd.com
-Subject: [PATCH] KVM: SVM: let alternatives handle the cases when RSB filling is required
-Date: Tue,  6 Aug 2024 12:52:45 +0200
-Message-ID: <20240806105245.13993-1-amit@kernel.org>
-X-Mailer: git-send-email 2.45.2
+	s=k20201202; t=1722942132;
+	bh=oqiT23uDpKUeijSSFEbDth2Jzc3Zi+OLqvslXYLWlXw=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=PkQ5Fh3vrlKIogsB2VCdZ5Z+ZQFNdd2bP9iUrmtGO8Cwsp5gcVSH5NQl1rfsj/oz5
+	 huY+SVRoz3KDDIcG+IzCPFhOBHRG9rcdKkpLIBkzAad5g8Ac/r4gysgD4IFV6NgiIN
+	 SXcYhmFT5nxBBGmzxX9GQAREtPxKh2hRhB9v/z7Ha94SJcLshljP7KbBqYXghToJOx
+	 lsUydpuaISAPmghs1dxg2rD7VqcYnp2GZq3LR9/KPKXiJXa0DjH7xe+nHTWgA0X6vq
+	 VoaLZgaB79yUOcrr7ej3ZdM8rz9uxJP8LwvS5h+tXC31mQQpas9DVxJeKW4wz1WaCr
+	 pOLe7WFONa/XQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 1D313C53BBF; Tue,  6 Aug 2024 11:02:12 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 218267] [Sapphire Rapids][Upstream]Boot up multiple Windows VMs
+ hang
+Date: Tue, 06 Aug 2024 11:02:11 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: vkuznets@redhat.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-218267-28872-W4K1bxeLdP@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-218267-28872@https.bugzilla.kernel.org/>
+References: <bug-218267-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Amit Shah <amit.shah@amd.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D218267
 
-Remove superfluous RSB filling after a VMEXIT when the CPU already has
-flushed the RSB after a VMEXIT when AutoIBRS is enabled.
+vkuznets@redhat.com changed:
 
-The initial implementation for adding RETPOLINES added an ALTERNATIVES
-implementation for filling the RSB after a VMEXIT in
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |vkuznets@redhat.com
 
-commit 117cc7a908c836 ("x86/retpoline: Fill return stack buffer on vmexit")
+--- Comment #5 from vkuznets@redhat.com ---
+(In reply to Chao Gao from comment #3)
 
-Later, X86_FEATURE_RSB_VMEXIT was added in
+> Note that, APICv outperforms Hyper-V's synthetic MSRs; regardless of this
+> bug, it is recommended to remove "hv-vapic" if KVM enables APICv.
 
-commit 2b129932201673 ("x86/speculation: Add RSB VM Exit protections")
+'hv-vapic' is a prerequisite for some other Hyper-V features, e.g. Enlighte=
+ned
+VMCS so disabling it may not be desired.
 
-The AutoIBRS (on AMD CPUs) feature implementation added in
+Also, there's 'hv-apicv' (AKA 'hv-avic') feature which prevents AutoEOI
+advertisement (can't work with APICv and this KVM inhibits it with
+APICV_INHIBIT_REASON_HYPERV). AFAIR, newer Windows versions don't use AutoE=
+OI
+either way but Win8/Win7 may.
 
-commit e7862eda309ecf ("x86/cpu: Support AMD Automatic IBRS")
+--=20
+You may reply to this email to add a comment.
 
-used the already-implemented logic for EIBRS in
-spectre_v2_determine_rsb_fill_type_on_vmexit() -- but did not update the
-code at VMEXIT to act on the mode selected in that function -- resulting
-in VMEXITs continuing to clear the RSB when RETPOLINES are enabled,
-despite the presence of AutoIBRS.
-
-Signed-off-by: Amit Shah <amit.shah@amd.com>
-
----
-v3:
- - Add a comment mentioning SVM does not need RSB_VMEXIT_LITE unlike
-   VMX.
-v2:
- - tweak commit message re: Boris's comments.
-
- arch/x86/kvm/svm/vmenter.S | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
-
-diff --git a/arch/x86/kvm/svm/vmenter.S b/arch/x86/kvm/svm/vmenter.S
-index a0c8eb37d3e1..69d9825ebdd9 100644
---- a/arch/x86/kvm/svm/vmenter.S
-+++ b/arch/x86/kvm/svm/vmenter.S
-@@ -209,10 +209,14 @@ SYM_FUNC_START(__svm_vcpu_run)
- 7:	vmload %_ASM_AX
- 8:
- 
--#ifdef CONFIG_MITIGATION_RETPOLINE
--	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
--	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
--#endif
-+	/*
-+	 * IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET!
-+	 *
-+	 * Unlike VMX, AMD does not have the hardware bug that necessitates
-+	 * RSB_VMEXIT_LITE
-+	 */
-+
-+	FILL_RETURN_BUFFER %_ASM_AX, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
- 
- 	/* Clobbers RAX, RCX, RDX.  */
- 	RESTORE_HOST_SPEC_CTRL
-@@ -348,10 +352,14 @@ SYM_FUNC_START(__svm_sev_es_vcpu_run)
- 
- 2:	cli
- 
--#ifdef CONFIG_MITIGATION_RETPOLINE
--	/* IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET! */
--	FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RETPOLINE
--#endif
-+	/*
-+	 * IMPORTANT: Stuff the RSB immediately after VM-Exit, before RET!
-+	 *
-+	 * Unlike VMX, AMD does not have the hardware bug that necessitates
-+	 * RSB_VMEXIT_LITE
-+	 */
-+
-+	FILL_RETURN_BUFFER %rax, RSB_CLEAR_LOOPS, X86_FEATURE_RSB_VMEXIT
- 
- 	/* Clobbers RAX, RCX, RDX, consumes RDI (@svm) and RSI (@spec_ctrl_intercepted). */
- 	RESTORE_HOST_SPEC_CTRL
--- 
-2.45.2
-
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
