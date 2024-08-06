@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-23337-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23338-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE868948C74
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 11:56:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECE2948C8A
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 12:03:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CD722841EB
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 09:56:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0489F1C22F12
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 10:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02A271BE233;
-	Tue,  6 Aug 2024 09:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAC91BE242;
+	Tue,  6 Aug 2024 10:03:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ad9qQIof"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KPbquOJe"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1701BDAAD
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 09:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD8571BD516
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 10:03:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722938187; cv=none; b=p0v1a1S1RRclUuAtY1ffJWbMwQFEC5tdZpE+uJ0Vy+T/+dBDebC8Cw9kvZ910s2yive7vYbBEZEKMc9p/D0H+fxHYs5gIpE0B7PVAzhTOqrvm+uxerPJV3bcjwAuIHSpaXip+UtaqXNbwvJsO3r05qQZw3DnSvQSTkhMOGsJRMU=
+	t=1722938613; cv=none; b=iM1/YXMNYb8rljnxyTgVgyCf10AFkp0QPCQXxDjb4DmqpjfRNoHz1wAIRO2l1jIhYcH+dmoIU9HQyOkle+ACFcED/1J1QaMwPYhtVzUqrVXMXW5oQIIqQGHn9NBMogz4QiAJa8/3zFdLA5SyWxpiw77Rzx0YGFri+9px68ydBC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722938187; c=relaxed/simple;
-	bh=Ti7LxTdMM/GAdTYAF9fxDmku8ji0u+DIP+EbRV6ON8E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FEC560gskid2Vq0nNrJl3AR0gUMpjlp24LzlDPPEGpBsMaz9DpzL4I5OfWUHZjpWxlgAfHHaJGVSuczrpRl7bMA+Je90QjVgdbXBl0XdcJBHF15e/h1A75jN4pOjixZy2qDDDR3ivuZoBM45tFqjsUjqaTVjfFDHU3VOzRjw974=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ad9qQIof; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1722938613; c=relaxed/simple;
+	bh=6VDJg2q0Pms9imKEOgl9hv5CvalODEseeH7ts3QHROM=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=NCzmH0BACzW7n1+zqUTo7xK2aAOAK6lYgcSeZvwzmNPt1/IR5v7cQ8+nYaT3ZADWw2CPno2REpvgpc0EAvcewHp9L55ISFEdtgfwjFRHVkCw5hc6/gOk78OxEj7rYCHAD9rNtot0eSB30sDX+Si1hlVFVKvGs7DJsQRH8nVBT30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KPbquOJe; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722938184;
+	s=mimecast20190719; t=1722938610;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=vBQbeHUtRbShTjPALCR2c7k0HkoMBZRNLSHpsLdcSmo=;
-	b=Ad9qQIofW2pyjT7v8NfDmLYj3GmsAZVALw8qEh9QVskolRfs8JoHRA21Moe68/+oSyG65v
-	Ii1Y0wmiMM4tYr3RV5xsap+razHgseSGOGPYsC8NiOOql0DVzn4xMQFJkY3YE6m59GJCzJ
-	hNluA7qjHiojGUb3Ex8XaOzqczwmc1g=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=bgKUr6jif0ys53qB1n+utj32ZaC+P0IMdQH7NvSw5o4=;
+	b=KPbquOJenIGbQ5QojTygFqyxOyDZVmbPNYdqydefFM/vg39uTSY8gcTFo5p4nGYtcnMy1g
+	bOHU6v5hF227/JFefJyz/uW3IClB55tD4TFZTH7vPIVBnSm9jkHg+/o3JlANFLdtIpp+S+
+	AWGQb9r3oFy1kCQJo4FPxfiBLLKz8Bs=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-258c88RsNDyhf1iLVBTL0Q-1; Tue, 06 Aug 2024 05:56:22 -0400
-X-MC-Unique: 258c88RsNDyhf1iLVBTL0Q-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4281310bf7aso3643635e9.1
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 02:56:22 -0700 (PDT)
+ us-mta-663-xQChKx7qORCt3xNgRoue4g-1; Tue, 06 Aug 2024 06:03:29 -0400
+X-MC-Unique: xQChKx7qORCt3xNgRoue4g-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2ef311ad4bcso4761921fa.0
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 03:03:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722938181; x=1723542981;
+        d=1e100.net; s=20230601; t=1722938608; x=1723543408;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
+         :content-language:references:cc:to:from:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=vBQbeHUtRbShTjPALCR2c7k0HkoMBZRNLSHpsLdcSmo=;
-        b=YeKLKnyIdN5IbGmianTvMPr9FK5y5qnXDaYmLh9KIRqG7hkpx4sZ1KPd5LD6L9iqyX
-         AG9UV2+znjgdOcFowsrwZvBzHNcbSOjFtIZ5LipEv1smjiguwWSThIRxb3BpZoxp/7oU
-         OlR+fOWyBXXmCx8d83wvbfXPfpxrf2MixOPtkGKyDDjL11X02IfT2jApfJvSBihv48J9
-         XG7Cfz6d87V8lUFjfTvY82NK1mI+iq+/GPNvqpNtH0scZb0Ych4q7UZAazjCuO+Niwwf
-         RxUUER2dtx/RulAzgvxSbX9U/Ig4hQzGvL4QSz72N0XPtRYm4B8wMXqQUYHeubaCj4qo
-         4OuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVsu1JP6Xr4DBfBJVtbtFrzgW/qe74fVarXSac0WHV64xECPK8DSefmt6kUXEITO1FXEx0FM7iNn9MbtzRSxJB+t+yw
-X-Gm-Message-State: AOJu0YwkcZoumPbcedH9BwTjJKhqQIBu30x5e055o3SorNn6nCXaqM07
-	LiD9PCSNtP7Zh+8KCP2HiCtnOflKTu9BPXLKgNKMoRHyGBUUyZG/R+cB0s66h3hzupUTY/w16LS
-	6oDFivHsg/L4WzMddw8MLtATXWp97QjPLB4TD0b/QTbp8Mq9lSAGBeomLZw==
-X-Received: by 2002:a05:600c:4451:b0:426:616e:db8d with SMTP id 5b1f17b1804b1-428e6b090eamr97972245e9.15.1722938181427;
-        Tue, 06 Aug 2024 02:56:21 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGfP5KCXnsTh/UB7wgpJpEYZk3HSm4U8XqukDLtT1XwMJtEIW1gpaFv2fU6boTUbNdjaKb94w==
-X-Received: by 2002:a05:600c:4451:b0:426:616e:db8d with SMTP id 5b1f17b1804b1-428e6b090eamr97971975e9.15.1722938180840;
-        Tue, 06 Aug 2024 02:56:20 -0700 (PDT)
+        bh=bgKUr6jif0ys53qB1n+utj32ZaC+P0IMdQH7NvSw5o4=;
+        b=MsiImgAsArS6/mQeF79Mkx12NrZjE23kMak5b1wB1rTy1+8TnM0h+nl2cYt5yzvcm5
+         DXDn6nQKqY7IsYCS6q+UtpL02bdYj2Uy2NlJHYxSwFWH30by+Ifix0R+9TWCV6Yb+etw
+         puwLXykz9gYENCpQVxo5uU+GP8QRkMSXhcz5LNV9LPmJz84wKP2egwwlFRfdBvKwtJxT
+         IHZI/0fQMDz9peA7tRpNgUrwZ87MxoVcxe3zjto+Z0hVo1BX/DXuZyw5UKXit5E98odm
+         2QoqJLOzElb3L2IMieCQV92U6KNZzNZ2S+SH6pqGkrAtYWFpoa4evWYuI98/rOEs7xnj
+         06bg==
+X-Forwarded-Encrypted: i=1; AJvYcCU56xChL9zFLAV766SqYrOAPCIBXQPC8NXgUidd+yk9aYZ1Gl+JaV4jnOl/iUoUzMyPM1zKkNcVylrk0VIgDkPkGnNX
+X-Gm-Message-State: AOJu0YzkqBHwLmXLn32JMpe5+pHLkLfWsreJ2KaE4zEdNiwxqooQQC6t
+	gTFq/JVOXaJ5qazvrnPCgufufFAAFdB/6Y8YtIA/gmQDSFsAMRgDasdsz0PC0M1LHoX+SeIzYNV
+	5F0YB9ZqZwl979TSZP6ksA3YWpVikfHFPrp/S4eFSsVZSYT7Uzg==
+X-Received: by 2002:a2e:914b:0:b0:2ef:17ee:62b0 with SMTP id 38308e7fff4ca-2f15aa8368bmr102971021fa.2.1722938607750;
+        Tue, 06 Aug 2024 03:03:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDWpK1rNaFPNuP9VBsXJMe+hBHNj54PFw4G+1WArEqaTVBZhlXcvM1Mh3AkfAZC1X5AtJ0zQ==
+X-Received: by 2002:a2e:914b:0:b0:2ef:17ee:62b0 with SMTP id 38308e7fff4ca-2f15aa8368bmr102970681fa.2.1722938607189;
+        Tue, 06 Aug 2024 03:03:27 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c73f:8500:f83c:3602:5300:88af? (p200300cbc73f8500f83c3602530088af.dip0.t-ipconnect.de. [2003:cb:c73f:8500:f83c:3602:5300:88af])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbcf0ccc5sm12576894f8f.23.2024.08.06.02.56.19
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282b8ad9ddsm234729945e9.17.2024.08.06.03.03.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Aug 2024 02:56:20 -0700 (PDT)
-Message-ID: <ac97ccdc-ee1e-4f07-8902-6360de80c2a0@redhat.com>
-Date: Tue, 6 Aug 2024 11:56:18 +0200
+        Tue, 06 Aug 2024 03:03:26 -0700 (PDT)
+Message-ID: <a5f059a0-32d6-453e-9d18-1f3bfec3a762@redhat.com>
+Date: Tue, 6 Aug 2024 12:03:25 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,6 +85,7 @@ MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH v1 07/11] mm/huge_memory: convert split_huge_pages_pid()
  from follow_page() to folio_walk
+From: David Hildenbrand <david@redhat.com>
 To: Ryan Roberts <ryan.roberts@arm.com>, linux-kernel@vger.kernel.org
 Cc: linux-mm@kvack.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org,
  linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
@@ -102,7 +103,7 @@ Cc: linux-mm@kvack.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org,
 References: <20240802155524.517137-1-david@redhat.com>
  <20240802155524.517137-8-david@redhat.com>
  <e1d44e36-06e4-4d1c-8daf-315d149ea1b3@arm.com>
-From: David Hildenbrand <david@redhat.com>
+ <ac97ccdc-ee1e-4f07-8902-6360de80c2a0@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
  xsFNBFXLn5EBEAC+zYvAFJxCBY9Tr1xZgcESmxVNI/0ffzE/ZQOiHJl6mGkmA1R7/uUpiCjJ
@@ -149,36 +150,40 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <e1d44e36-06e4-4d1c-8daf-315d149ea1b3@arm.com>
+In-Reply-To: <ac97ccdc-ee1e-4f07-8902-6360de80c2a0@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 06.08.24 11:46, Ryan Roberts wrote:
-> On 02/08/2024 16:55, David Hildenbrand wrote:
->> Let's remove yet another follow_page() user. Note that we have to do the
->> split without holding the PTL, after folio_walk_end(). We don't care
->> about losing the secretmem check in follow_page().
+On 06.08.24 11:56, David Hildenbrand wrote:
+> On 06.08.24 11:46, Ryan Roberts wrote:
+>> On 02/08/2024 16:55, David Hildenbrand wrote:
+>>> Let's remove yet another follow_page() user. Note that we have to do the
+>>> split without holding the PTL, after folio_walk_end(). We don't care
+>>> about losing the secretmem check in follow_page().
+>>
+>> Hi David,
+>>
+>> Our (arm64) CI is showing a regression in split_huge_page_test from mm selftests from next-20240805 onwards. Navigating around a couple of other lurking bugs, I was able to bisect to this change (which smells about right).
+>>
+>> Newly failing test:
+>>
+>> # # ------------------------------
+>> # # running ./split_huge_page_test
+>> # # ------------------------------
+>> # # TAP version 13
+>> # # 1..12
+>> # # Bail out! Still AnonHugePages not split
+>> # # # Planned tests != run tests (12 != 0)
+>> # # # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
+>> # # [FAIL]
+>> # not ok 52 split_huge_page_test # exit=1
+>>
+>> It's trying to split some pmd-mapped THPs then checking and finding that they are not split. The split is requested via /sys/kernel/debug/split_huge_pages, which I believe ends up in this function you are modifying here. Although I'll admit that looking at the change, there is nothing obviously wrong! Any ideas?
 > 
-> Hi David,
-> 
-> Our (arm64) CI is showing a regression in split_huge_page_test from mm selftests from next-20240805 onwards. Navigating around a couple of other lurking bugs, I was able to bisect to this change (which smells about right).
-> 
-> Newly failing test:
-> 
-> # # ------------------------------
-> # # running ./split_huge_page_test
-> # # ------------------------------
-> # # TAP version 13
-> # # 1..12
-> # # Bail out! Still AnonHugePages not split
-> # # # Planned tests != run tests (12 != 0)
-> # # # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
-> # # [FAIL]
-> # not ok 52 split_huge_page_test # exit=1
-> 
-> It's trying to split some pmd-mapped THPs then checking and finding that they are not split. The split is requested via /sys/kernel/debug/split_huge_pages, which I believe ends up in this function you are modifying here. Although I'll admit that looking at the change, there is nothing obviously wrong! Any ideas?
+> Nothing jumps at me as well. Let me fire up the debugger :)
 
-Nothing jumps at me as well. Let me fire up the debugger :)
+Ah, very likely the can_split_folio() check expects a raised refcount 
+already.
 
 -- 
 Cheers,
