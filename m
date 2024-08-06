@@ -1,163 +1,117 @@
-Return-Path: <kvm+bounces-23406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 322009495ED
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 18:53:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 827B0949608
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:00:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB0B7281D9F
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 16:53:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 978141C2274D
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD9243D984;
-	Tue,  6 Aug 2024 16:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90BD547F6B;
+	Tue,  6 Aug 2024 16:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="lv5kU9QK"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="oZbcNhfl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qv1-f43.google.com (mail-qv1-f43.google.com [209.85.219.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D8518EB0
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 16:53:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE27A44C81;
+	Tue,  6 Aug 2024 16:59:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722963196; cv=none; b=d3+Xp/7ugFTY9ZrIrhOgaepF2nUVnjQIjlKHJzV81UrGmndBtKMCLwBrn07m76yMC21pH8ozrqWUJgMTz3XzHMJ7j4ZuON3/NwRBJ2YU6J1oQtpvz81vY+rbXPLRbmgqThDnNyVARRQpSWlUTub0I6fXuGWEIbX/M9W02cEYTEk=
+	t=1722963594; cv=none; b=gWiKM35V7cKEuw6jS3Nmal/Ex9WOXckbXkpphWDnbTGvy7z+55/yB3N2r1pHguhsYgP1m5qzZHBNMbXLGnMBA9QQ07T+sjRLK97CU4EzLQouOfCtTto3SXrJcKyyM7bdzBSahf+zaFu0wt+ncUEX2HEzRul0MZxux0dgkSVaW9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722963196; c=relaxed/simple;
-	bh=59I/EfNtkhPFa32mMdLUDZ7Y8dwMwBuXWyOX3mbBBbg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TWOQ+YbCROjidptTnZ1etLPNCsFGSe+ROK9PUh/a9b6WnFIEvmZfxwu41d104tNP+Mkzu7yFUAf81VZwk+vMOpWPfBj+U4qmYWjT6/TKpPKx/zS5+5S1x9vc44dNyMeFMhBtUKgGM0+E37eN0tSs2V8VGEkYwRPsfJqyBEkdQ58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=lv5kU9QK; arc=none smtp.client-ip=209.85.219.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f43.google.com with SMTP id 6a1803df08f44-6b79b93a4c9so286426d6.1
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 09:53:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1722963193; x=1723567993; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xeg5GckbQBBaWWJXE7gVEgiW4GgyLv98Wv9htvQwTzI=;
-        b=lv5kU9QKcnn7eJGoic3H+fCrW/IjBSOBqGf8oA3kLRvvLr7+HVnQYAuJGZKOGBjY8P
-         u8S3aVzXT8lmwZf8UmCMCXp3RandiG4+8xoAImTup2nDSkOJGirm/xyL0wMeWPZqWgEO
-         4g/uLqb8tLElwOhzS7/t4R2SWVBzouxxAAq9amnzruLnfC4jxR8rbMisc7bmSEXxARu0
-         g9/N0GecnoGCLn/Nz6+7UfzX0tQjStLQGiffkjbZPQDbMJw/GaYlQ4HFu2CjQMGPmMzU
-         0LKHnD7VegJkIQSQML4Fe2/6j70fzRFvL9Su3Wf9dVcJ14XYVAmlS5iXXL6ob/DBbxWt
-         HMig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722963193; x=1723567993;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Xeg5GckbQBBaWWJXE7gVEgiW4GgyLv98Wv9htvQwTzI=;
-        b=tl0znspJjvjrRoIXzCwcfxeKe8IkhpZ+DRENW1ta14IQDsZM40aVtyqNlHMcOKf7/b
-         hPnqyBfGj/vZETedv/VHc11AXIiZJ0pRhIyjLSyHFe5uPdpbgUzZCXvhcB+rRA31WVC8
-         yT/GqYXzeNvuSRCiwcgZZ75odS9KU+7k+uRrWBmtXSWa6aH/NfNAinQsXEKbQvkt4RK6
-         /gk9MHRQLCAS94hxaK4EFBsZqmkv5BJ4vXj5xRHLC9FWnEpShQcpFfghXa3J7BYxm3V1
-         /XBSs5CrrGMFxtvVIVnKGotp9FT4Z7lQNT3Xs1pD0fB15PJT5LEwZSXW5E1f6q7FwFGd
-         gT1w==
-X-Forwarded-Encrypted: i=1; AJvYcCW+gYL9mWCEKLXniHOwiCuapC8nHlihXUxPfm3zQuTteuEcwdL5ey5LC7OhSLrb9oUDgBnd/jevhCHeGmiv1eg/72Ed
-X-Gm-Message-State: AOJu0Yyc20n8u6mOP+WXKcrg+XQRFQITsXX9d9/rx3ldOL/AWmDGTpEb
-	Uqqfv6ThlVraU0keq80EhzMP71f0U6qzjsHQM78KgKXOqtqDG0HUlnLaQj4OiV4=
-X-Google-Smtp-Source: AGHT+IEAkUJPDpscwJVh7JC5GryCgdtDEgFNrcWsgeSmMq5HgUXevzojlHCifyKfSkXtmu9upi4Zsw==
-X-Received: by 2002:ad4:41cf:0:b0:6b0:8991:a2f7 with SMTP id 6a1803df08f44-6bb91d83d3cmr336285196d6.12.1722963193456;
-        Tue, 06 Aug 2024 09:53:13 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c77099asm48527246d6.12.2024.08.06.09.53.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 09:53:12 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sbNQu-00FQAY-Fp;
-	Tue, 06 Aug 2024 13:53:12 -0300
-Date: Tue, 6 Aug 2024 13:53:12 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Alex Williamson <alex.williamson@redhat.com>
-Cc: Keith Busch <kbusch@meta.com>, kvm@vger.kernel.org,
-	Keith Busch <kbusch@kernel.org>
-Subject: Re: [PATCH rfc] vfio-pci: Allow write combining
-Message-ID: <20240806165312.GI676757@ziepe.ca>
-References: <20240801141914.GC3030761@ziepe.ca>
- <20240801094123.4eda2e91.alex.williamson@redhat.com>
- <20240801161130.GD3030761@ziepe.ca>
- <20240801105218.7c297f9a.alex.williamson@redhat.com>
- <20240801171355.GA4830@ziepe.ca>
- <20240801113344.1d5b5bfe.alex.williamson@redhat.com>
- <20240801175339.GB4830@ziepe.ca>
- <20240801121657.20f0fdb4.alex.williamson@redhat.com>
- <20240802115308.GA676757@ziepe.ca>
- <20240802110506.23815394.alex.williamson@redhat.com>
+	s=arc-20240116; t=1722963594; c=relaxed/simple;
+	bh=QIgo1oTbTGrJcGzsnRXNARSORVNQ40wyWmyE3akTlK8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nl0xG2ZvXIN1GLl6YVQ1hycer3Nz6XkiB85in0YaprSwSIhLQjgBmwrVo8qofP97QGldjDOAd/Mno8SDhwVFv8LnYXQK8jhI5j47PX5xoQ2j/xsQVKSevfJbd17uJ1t/bgTLuxaM6mpBz+FC6E3qKbZWsqqJrgI6KqGm1MElYsU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=oZbcNhfl; arc=none smtp.client-ip=185.226.149.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1sbNX9-00Dlqt-94; Tue, 06 Aug 2024 18:59:39 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
+	bh=+WAintw+rCDDHjJQ1WEuvYYp6tga3Qlo68DUf+AZz2E=; b=oZbcNhflrl3QMwFZMy95J0xYPz
+	ucXj5lNuUqxESPkkgplHqS98DaTmDRc7TgyWSH02QuvSq+fU2LLD8FFBGMOzYX+DbPQDhsHs2B48A
+	gIR2EMAbGdm2iOnDpzJxMS0Vji3pnAqBKFAqCklHzfhYCpiwBi+x5qJTXVgGcZVA140aqOw3D7zLx
+	AwN/O/SDP+L2bISoqMVAg8Ijy24COGql6NH+dsMgW1ra91TvQGRw4RD+F32qivJXDTfi5bNoWONRx
+	Y+rCd2OOjNBMWnhBncwoOBAUeimaM4DggwFRFlRnXICshmxL17thIOBXEUOF3jIzZ3sPT9QbM0n4N
+	St27Be4Q==;
+Received: from [10.9.9.72] (helo=submission01.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1sbNX8-0005ZD-QP; Tue, 06 Aug 2024 18:59:38 +0200
+Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1sbNWy-0021rb-T9; Tue, 06 Aug 2024 18:59:28 +0200
+Message-ID: <b0c3552b-1efd-4c48-8d86-91ee16e7222a@rbox.co>
+Date: Tue, 6 Aug 2024 18:59:27 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240802110506.23815394.alex.williamson@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] KVM: Fix error path in kvm_vm_ioctl_create_vcpu() on
+ xa_store() failure
+To: Sean Christopherson <seanjc@google.com>
+Cc: Will Deacon <will@kernel.org>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+ Alexander Potapenko <glider@google.com>, Marc Zyngier <maz@kernel.org>
+References: <20240730155646.1687-1-will@kernel.org>
+ <ccd40ae1-14aa-454e-9620-b34154f03e53@rbox.co> <Zql3vMnR86mMvX2w@google.com>
+ <20240731133118.GA2946@willie-the-truck>
+ <3e5f7422-43ce-44d4-bff7-cc02165f08c0@rbox.co> <Zqpj8M3xhPwSVYHY@google.com>
+ <20240801124131.GA4730@willie-the-truck>
+ <07987fc3-5c47-4e77-956c-dae4bdf4bc2b@rbox.co> <ZrFYsSPaDWUHOl0N@google.com>
+From: Michal Luczaj <mhal@rbox.co>
+Content-Language: pl-PL, en-GB
+In-Reply-To: <ZrFYsSPaDWUHOl0N@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 02, 2024 at 11:05:06AM -0600, Alex Williamson wrote:
+On 8/6/24 00:56, Sean Christopherson wrote:
+> [...]
+> +	/*
+> +	 * xa_store() should never fail, see xa_reserve() above.  Leak the vCPU
+> +	 * if the impossible happens, as userspace already has access to the
+> +	 * vCPU, i.e. freeing the vCPU before userspace puts its file reference
+> +	 * would trigger a use-after-free.
+> +	 */
+>  	if (KVM_BUG_ON(xa_store(&kvm->vcpu_array, vcpu->vcpu_idx, vcpu, 0), kvm)) {
+> -		r = -EINVAL;
+> -		goto kvm_put_xa_release;
+> +		mutex_unlock(&vcpu->mutex);
+> +		return -EINVAL;
+>  	}
+>  
+>  	/*
+> @@ -4302,6 +4310,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>  	 */
+>  	smp_wmb();
+>  	atomic_inc(&kvm->online_vcpus);
+> +	mutex_unlock(&vcpu->mutex);
+>  
+>  	mutex_unlock(&kvm->lock);
+>  	kvm_arch_vcpu_postcreate(vcpu);
+> @@ -4309,6 +4318,7 @@ static int kvm_vm_ioctl_create_vcpu(struct kvm *kvm, unsigned long id)
+>  	return r;
+>  
+>  kvm_put_xa_release:
+> +	mutex_unlock(&vcpu->mutex);
+>  	kvm_put_kvm_no_destroy(kvm);
+>  	xa_release(&kvm->vcpu_array, vcpu->vcpu_idx);
 
-> > Well, again, it is not a region, it is just a record that this mmap
-> > cookie uses X region with Y mapping flags. The number of regions don't
-> > change. Critically from a driver perspective the number of regions and
-> > region indexes wouldn't change.
-> 
-> Why is this critical?
+Since we're handling the impossible, isn't the BUG_ON part missing
+mutex_unlock(&kvm->lock)?
 
-So we don't leak this too much into the drivers? Why should all the
-VFIO drivers have to be changed to alter how their region indexes work
-just to add a single flag?? 
-
-> > Well, that is just the current implementation. What we did in RDMA
-> > when we switched from hard coded mmap cookies to dynamic ones is
-> > use an xarray (today this should be a maple tree) to dynamically
-> > allocate mmap cookies whenever the driver returns something to
-> > userspace. During the mmap fop the pgoff is fed back through the maple
-> > tree to get the description of what the cookie represents.
-> 
-> Sure, we could do that too, the current implementation (not uAPI) just
-> uses some upper bits to create fixed region address spaces.  The only
-> thing we should need to keep consistent is the mapping of indexes to
-> device resources up through VFIO_PCI_NUM_REGIONS.
-
-I fear we might need to do this as there may not be room in the pgoff
-space (at least for 32 bit) to duplicate everything....
-
-> > My point is to not confuse the pgoff encoding with the driver concept
-> > of a region. The region is a single peice of memory, the "mmap cookie"s
-> > are just handles to it. Adding more data to the handle is not the same
-> > as adding more regions.
-> 
-> I don't get it.  Take for instance PCI config space.  Given the right
-> GPU, I can get to config space through an I/O port region, an MMIO
-> region (possibly multiple ways), and the config space region itself.
-> Therefore based on this hardware implementation there is no unique
-> mapping that says that config space is uniquely accessible via a single
-> region.  
-
-That doesn't seem like this sitation. Those are multiple different HW
-paths with different HW addresses, sure they can have different
-regions.
-
-Here we are talking about the same HW path with the same HW
-addresses. It shouldn't be duplicated.
-
-> BAR can only be accessed via a signle region and we need to play games
-> with terminology to call it an mmap cookie rather than officially
-> creating a region with WC mmap semantics?
-
-Because if you keep adding more regions for what are attributes of a
-mapping we may end up with a combinatoral explosion of regions.
-
-I already know there is interest in doing non-cache/cache mapping
-attributes too.
-
-Approaching this as a fixed number of regions reflecting the HW
-addresses and a variable number of flags requested by the user is alot
-more reasonable than trying to have a list of every permutation of
-every address for every combination of flags.
-
-Jason
 
