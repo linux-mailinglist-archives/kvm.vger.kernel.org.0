@@ -1,219 +1,217 @@
-Return-Path: <kvm+bounces-23367-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23368-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C221D9491DE
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 15:44:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80BD79491D7
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 15:43:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E586B27D0A
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 13:40:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34F01287BA2
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 13:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191B31D47A1;
-	Tue,  6 Aug 2024 13:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC281D47BD;
+	Tue,  6 Aug 2024 13:43:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="p4cFGMkr"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="DEW6QBmm"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB19E1D2F65;
-	Tue,  6 Aug 2024 13:39:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8619B1D2F76;
+	Tue,  6 Aug 2024 13:43:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722951598; cv=none; b=NyAYsH9OQpKrbJTMdqh53JUtR2MfYVXnq5QZRgtWfI2AxVf1BrwE2Nr+EWbW3LFdKr0elUa7doeMGu8+TBT0s1CEoqr9wsZeQ5sS/TUrPG4XcsBxyhJx0z5u4envZWzoR91eERSbuC5A9WbDS/nA+k+mcp5bhTMTKm0F31wNz2s=
+	t=1722951792; cv=none; b=juzTc9NlnkqwIdqj5ctjmyW7dSiGM4bo0zNpskL74gbxzfbH3q/FrEtmvMhnuOpyBI4U+M3apa/3Qw0yH1QE6evGB6h74Lo/w+kY3eQh0C4Tn1nyTS6eUAoWPXQHTfnTEeXLFnID+VqGiDXTltAJ+jNZdUD+6v2mbK/WFCZhQG4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722951598; c=relaxed/simple;
-	bh=MIIj+2aB+sZt80S0nFf7IkcHqvJ60qc7qohzrgxynOE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gu80jjuTnZLgD9UFD04oDgOKydpjjaDW+XGw4ioLcjbeWvicDYPf9MGBIenp5mObrGCQ5HRDJvPLBeGh1M4vygayT85JPR2GvprX7R6iWcWzUmGVct4VM4wLz4XJ8Xc+bleJ59KLCpmuv9yZWljR9NP8d/uFxye1MAIo1loHfiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=p4cFGMkr; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1722951792; c=relaxed/simple;
+	bh=lA082ip22lLVe8x0ZBmmSfhhxufL60K2q987v+em9hQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jHek6JvqRtDh6mHdkJ0v3//96YymNBOYY2031GCL/v2+UfkHMrcdwtRR7hyR/wl6LzpT/KtxQ/YZGNpQB+MOh1Ywg7Mici1e0Y3Rkur+V3qfNWPABiXHkY3RblTvOJpm1Imz29Bm9NXYzWfiTwi2ulxcmnYC7iQDY5r0dtR6l8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=DEW6QBmm; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 476DMRN7030289;
-	Tue, 6 Aug 2024 13:39:52 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=I
-	yF3JX9dzNF8wjx4AQeo2PKbNRKfBMsUwc3zN0GUCNY=; b=p4cFGMkrZILAq1Ygn
-	s/wY3EgsssWVY9rgilz8psJqouIMtaXUGIypEptNessINkIFhtws3iSAheqrsNfG
-	spPssyuSH24GMEjfbTVQ+bKU6kFm/wV2GTUkCDYbnqqXpvYKP0VujPgrL7+2piYC
-	NJEvgz0DwRW9DwPHnM/IfUyPtOsICcyuzLbiZuGcRG3mrmnWrRbsMJhCl6AeLYxw
-	ZK64AvFO8QXIz0nqxPSNHF/bKcPb5VPzl9Gu9lHBGHmhWAjoBiMg1aazV82CvUhE
-	xRWR8bRM1Tw/b1msyi6B4Cr/xIPAsJzYjI4ba4In+Qn5Z/yi3jrvaj6hgh5sTHO1
-	/gO7Q==
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 476DRoHH018110;
+	Tue, 6 Aug 2024 13:42:59 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	ViIYKO1MfeiBQ75UOWsEMrvjkCQ9oS8o3NQEk+YD2SY=; b=DEW6QBmmpr1DTyaq
+	t/tb2eW3cW39ts4r8GQiQCZIdtWv59eyB12PC5kT0hSvwojxns5giEi8eyo3IlCS
+	xujOA+kCrZy+/MXCCVvE+Pt29SptJH418l6+GtfXbvJpeIS2M2Go/9MKM2vHdRVU
+	ZDIySbCU+HNsCet0n0Q0k5xG1S49u0qU9C8mNaBeEN7Se/6cEIb5mTgCpggTRNJB
+	CyvJeHOz5YkJJnaJPwwSMvHPzed7r0oQcxyL7gzq9GTdEuvCd+phB8daoKXUAzrb
+	EobOHbX80GNAr05M1hWI+o3X/Tt7wV0gvPPNxbxCmyjaAJwkxkud9j7urQUZmJdK
+	cRU/Vw==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40ukv5g51m-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40umqw0153-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 13:39:52 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 476DdqIh027377;
-	Tue, 6 Aug 2024 13:39:52 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40ukv5g51g-1
+	Tue, 06 Aug 2024 13:42:59 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 476DgwUb013419;
+	Tue, 6 Aug 2024 13:42:58 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40umqw0151-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 13:39:52 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 476CfLBd018033;
-	Tue, 6 Aug 2024 13:39:51 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40t0cmkr5u-1
+	Tue, 06 Aug 2024 13:42:58 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 476D07E5006490;
+	Tue, 6 Aug 2024 13:42:57 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 40t13mbjpt-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 13:39:51 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 476Ddj6A11862416
+	Tue, 06 Aug 2024 13:42:57 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 476DgpSx18809256
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 6 Aug 2024 13:39:47 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5C8672005A;
-	Tue,  6 Aug 2024 13:39:45 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D6ABA2004D;
-	Tue,  6 Aug 2024 13:39:44 +0000 (GMT)
-Received: from [9.171.47.164] (unknown [9.171.47.164])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  6 Aug 2024 13:39:44 +0000 (GMT)
-Message-ID: <4b4f9459-4b4a-48b8-8935-25e51ffa51c8@linux.ibm.com>
-Date: Tue, 6 Aug 2024 15:39:44 +0200
+	Tue, 6 Aug 2024 13:42:53 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9E1242004E;
+	Tue,  6 Aug 2024 13:42:51 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 5C71E20043;
+	Tue,  6 Aug 2024 13:42:51 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  6 Aug 2024 13:42:51 +0000 (GMT)
+Date: Tue, 6 Aug 2024 15:42:49 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jonathan Corbet
+ <corbet@lwn.net>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Gerald
+ Schaefer <gerald.schaefer@linux.ibm.com>
+Subject: Re: [PATCH v1 00/11] mm: replace follow_page() by folio_walk
+Message-ID: <20240806154249.7dbfe37e@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <20240802155524.517137-1-david@redhat.com>
+References: <20240802155524.517137-1-david@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 08/10] selftests: kvm: s390: Add uc_skey VM test case
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-References: <20240802155913.261891-1-schlameuss@linux.ibm.com>
- <20240802155913.261891-9-schlameuss@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- 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
-In-Reply-To: <20240802155913.261891-9-schlameuss@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: Ge6-RyiA4fhC4fGxYq9Sg7QfWr--9rGs
-X-Proofpoint-GUID: BXeppyvQaEWHNCR-JqG0GM-uSRoS36R6
+X-Proofpoint-GUID: UghynHGbhXTN53HNCkKi-DtAS3l2Q8wb
+X-Proofpoint-ORIG-GUID: _M5No_THOE1ACOCJ7EhjKWEJXSyhoXHM
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-08-06_11,2024-08-06_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 phishscore=0
- lowpriorityscore=0 spamscore=0 clxscore=1015 malwarescore=0
- impostorscore=0 priorityscore=1501 mlxscore=0 adultscore=0 suspectscore=0
- mlxlogscore=893 classifier=spam adjust=0 reason=mlx scancount=1
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 phishscore=0
+ malwarescore=0 bulkscore=0 suspectscore=0 mlxscore=0 adultscore=0
+ clxscore=1011 lowpriorityscore=0 priorityscore=1501 mlxlogscore=371
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2407110000 definitions=main-2408060093
 
-On 8/2/24 5:59 PM, Christoph Schlameuss wrote:
-> Add a test case manipulating s390 storage keys from within the ucontrol
-> VM.
+On Fri,  2 Aug 2024 17:55:13 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> Looking into a way of moving the last folio_likely_mapped_shared() call
+> in add_folio_for_migration() under the PTL, I found myself removing
+> follow_page(). This paves the way for cleaning up all the FOLL_, follow_*
+> terminology to just be called "GUP" nowadays.
 > 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> ---
->   .../selftests/kvm/s390x/ucontrol_test.c       | 78 +++++++++++++++++++
->   1 file changed, 78 insertions(+)
+> The new page table walker will lookup a mapped folio and return to the
+> caller with the PTL held, such that the folio cannot get unmapped
+> concurrently. Callers can then conditionally decide whether they really
+> want to take a short-term folio reference or whether the can simply
+> unlock the PTL and be done with it.
 > 
+> folio_walk is similar to page_vma_mapped_walk(), except that we don't know
+> the folio we want to walk to and that we are only walking to exactly one
+> PTE/PMD/PUD.
+> 
+> folio_walk provides access to the pte/pmd/pud (and the referenced folio
+> page because things like KSM need that), however, as part of this series
+> no page table modifications are performed by users.
+> 
+> We might be able to convert some other walk_page_range() users that really
+> only walk to one address, such as DAMON with
+> damon_mkold_ops/damon_young_ops. It might make sense to extend folio_walk
+> in the future to optionally fault in a folio (if applicable), such that we
+> can replace some get_user_pages() users that really only want to lookup
+> a single page/folio under PTL without unconditionally grabbing a folio
+> reference.
+> 
+> I have plans to extend the approach to a range walker that will try
+> batching various page table entries (not just folio pages) to be a better
+> replace for walk_page_range() -- and users will be able to opt in which
+> type of page table entries they want to process -- but that will require
+> more work and more thoughts.
+> 
+> KSM seems to work just fine (ksm_functional_tests selftests) and
+> move_pages seems to work (migration selftest). I tested the leaf
+> implementation excessively using various hugetlb sizes (64K, 2M, 32M, 1G)
+> on arm64 using move_pages and did some more testing on x86-64. Cross
+> compiled on a bunch of architectures.
+> 
+> I am not able to test the s390x Secure Execution changes, unfortunately.
 
-[...]
+the series looks good; we will do some tests and report back if
+everything is ok
 
-> +TEST_F(uc_kvm, uc_skey)
-> +{
-> +	u64 test_vaddr = self->base_gpa + VM_MEM_SIZE - (SZ_1M / 2);
-> +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
-> +	struct kvm_run *run = self->run;
-> +	u8 skeyvalue = 0x34;
-> +
-> +	init_st_pt(self);
-> +
-> +	/* copy test_skey_asm to code_hva / code_gpa */
-> +	TH_LOG("copy code %p to vm mapped memory %p / %p",
-> +	       &test_skey_asm, (void *)self->code_hva, (void *)self->code_gpa);
-> +	memcpy((void *)self->code_hva, &test_skey_asm, PAGE_SIZE);
-> +
-> +	/* set register content for test_skey_asm to access not mapped memory */
-> +	sync_regs->gprs[1] = skeyvalue;
-> +	sync_regs->gprs[5] = self->base_gpa;
-> +	sync_regs->gprs[6] = test_vaddr;
-> +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
-> +
-> +	run->kvm_dirty_regs |= KVM_SYNC_CRS;
-> +	TH_LOG("set CR0 to 0x%llx", sync_regs->crs[0]);
-
-You haven't touched any CRs here or am I missing something?
-
-> +
-> +	self->sie_block->ictl |= ICTL_OPEREXC | ICTL_PINT;
-> +	self->sie_block->cpuflags &= ~CPUSTAT_KSS;
-> +	/* DAT enabled + 64 bit mode */
-> +	run->psw_mask = 0x0400000180000000ULL;
-> +	run->psw_addr = self->code_gpa;
-> +
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(false, uc_handle_exit(self));
-> +	ASSERT_EQ(2, sync_regs->gprs[0]);
-> +	ASSERT_EQ(0x06, sync_regs->gprs[1]);
-
-/* ACC = 0, F & R = 1 */
-
-> +	uc_assert_diag44(self);
-> +
-> +	sync_regs->gprs[1] = skeyvalue;
-> +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(false, uc_handle_exit(self));
-> +	ASSERT_EQ(3, sync_regs->gprs[0]);
-> +	ASSERT_EQ(skeyvalue, sync_regs->gprs[1]);
-> +	uc_assert_diag44(self);
-
-Rest LGTM
+> 
+> Cc: Andrew Morton <akpm@linux-foundation.org>
+> Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>
+> Cc: Jonathan Corbet <corbet@lwn.net>
+> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Cc: Janosch Frank <frankja@linux.ibm.com>
+> Cc: Claudio Imbrenda <imbrenda@linux.ibm.com>
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> Cc: Sven Schnelle <svens@linux.ibm.com>
+> Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+> 
+> David Hildenbrand (11):
+>   mm: provide vm_normal_(page|folio)_pmd() with
+>     CONFIG_PGTABLE_HAS_HUGE_LEAVES
+>   mm/pagewalk: introduce folio_walk_start() + folio_walk_end()
+>   mm/migrate: convert do_pages_stat_array() from follow_page() to
+>     folio_walk
+>   mm/migrate: convert add_page_for_migration() from follow_page() to
+>     folio_walk
+>   mm/ksm: convert get_mergeable_page() from follow_page() to folio_walk
+>   mm/ksm: convert scan_get_next_rmap_item() from follow_page() to
+>     folio_walk
+>   mm/huge_memory: convert split_huge_pages_pid() from follow_page() to
+>     folio_walk
+>   s390/uv: convert gmap_destroy_page() from follow_page() to folio_walk
+>   s390/mm/fault: convert do_secure_storage_access() from follow_page()
+>     to folio_walk
+>   mm: remove follow_page()
+>   mm/ksm: convert break_ksm() from walk_page_range_vma() to folio_walk
+> 
+>  Documentation/mm/transhuge.rst |   6 +-
+>  arch/s390/kernel/uv.c          |  18 ++-
+>  arch/s390/mm/fault.c           |  16 ++-
+>  include/linux/mm.h             |   3 -
+>  include/linux/pagewalk.h       |  58 ++++++++++
+>  mm/filemap.c                   |   2 +-
+>  mm/gup.c                       |  24 +---
+>  mm/huge_memory.c               |  18 +--
+>  mm/ksm.c                       | 127 +++++++++------------
+>  mm/memory.c                    |   2 +-
+>  mm/migrate.c                   | 131 ++++++++++-----------
+>  mm/nommu.c                     |   6 -
+>  mm/pagewalk.c                  | 202 +++++++++++++++++++++++++++++++++
+>  13 files changed, 413 insertions(+), 200 deletions(-)
+> 
 
 
