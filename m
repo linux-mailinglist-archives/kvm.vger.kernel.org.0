@@ -1,133 +1,79 @@
-Return-Path: <kvm+bounces-23426-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23427-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CA9C949775
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 20:20:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E80B4949787
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 20:25:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CD091C2166C
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 18:20:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BBA11C206A8
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 18:25:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA987580A;
-	Tue,  6 Aug 2024 18:20:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531357AE5D;
+	Tue,  6 Aug 2024 18:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="qNV3ANn/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HuLFwHdB"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59C83C485
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 18:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63CCC28DD1;
+	Tue,  6 Aug 2024 18:25:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722968413; cv=none; b=iPts2AHLG70EdAd6l6NYfEE1Er0Eap1LBjQon6ZO57AibYY8S7ou/5+Alefe5IQw+47L+0SHWXJlAOzMUNvy7/SzAGTLhhQPdju4/h60Hm08VidEC3fzNRcNC3RUbi+4QvRODAv9nsX9UOoWS+r8NQqSN+P13u45q9L3pusstJw=
+	t=1722968732; cv=none; b=tWJAIBd6KfRRPa7h8BLnE5fdNyhrVf+ZAHFf/WPz3qn/McDeufXRV8ha59phXdP7PvyJ7g5wXOxdn8BuEErig5QmGxyUecFmFJ83Dd3rWu6iJeo89Kf1IXVQn+ncmr9dhEKOxk05jUm+c/m6gXe/9Ke0e55/qcYdDoWWQ3s7liQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722968413; c=relaxed/simple;
-	bh=ts64ONWj2+7xWVVnPqL5qtLUTr8+jtp5loVaHUChmn8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qEq/JPfVkySDUvxhqlC9S/eW0ixu8Qydn8TP/mkGE+E9b9v1uwV+HtsWXP41Nf8fPmE3uUxlvQZASJ8IxBDfTLUDv0DZ01LtBT1Efybph370wuNbs9YxW9jRRkCbGkJb47SfJiD9joQXO43dYeBkw0Q3VS84acGR9FsHbV8qL8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=qNV3ANn/; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a7a843bef98so105454866b.2
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 11:20:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1722968410; x=1723573210; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=F2Q8ARQWPkZG7WAqjFmxJ/8+odByxc1YLJGGmnQA2as=;
-        b=qNV3ANn/Y3weEVmgw83QQcO4ymtwxJTAbu+8qVEaQAwZ+nimK4GMqsaLLWwyXtweCl
-         AAZrayC/F4NNhKPFvnHr5hKZy2AJ0meHZyvkgx93nCkRVQkG6W+/ZkGeGFtT8q6/uvNe
-         p1RdyeIOSNmZT2S4B2+0AwWHenTfY8IQUCQjG9OyBHXg5dZxYXJnrv8x/LKtpmluBDSh
-         vwmizlxzTD4NPSiBKjfj31JRMNRy6WXLXh+buy2vDbsSz161QGjV/JW4TQiXeKVEtKwq
-         Ju5ROf8bWE61bbzQfUgWOSbvEQKdaAfL/0dqZhEreaMwT0DNeCW7Qzrd7tKS83aza7op
-         X0YA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722968410; x=1723573210;
-        h=content-transfer-encoding:in-reply-to:organization:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F2Q8ARQWPkZG7WAqjFmxJ/8+odByxc1YLJGGmnQA2as=;
-        b=w8lN5JWaujX5zMaQ6D1C7byQTwunuHmibpF9pQmG25eboxmHAfeFBDEVBkXpdrxHYf
-         8fOtW2+R5grg+XgfE3cNG+fWsdxevYu9MQE/NXM9LeoKa5ckCdAWV1iFSxVGmPPxk3tc
-         yU5Hl7Or5A3dd2BTz7VsYjWzYywFkm32QJWSP4M2Jih37bds3wWA0yt+Dr7cwOiEtqi+
-         5nL6IBM7t6qW94CiUa7cwUrFpu490doHqmEofPWB3G8v/konfayETFks5k2zi50mYy7z
-         E8x7yTkget0mc1zH3mLDJzdANj0pt2wjNzbUXrMUHTQEs54b68l1xiUQt482nXjC9yMq
-         jKXw==
-X-Forwarded-Encrypted: i=1; AJvYcCUhbuNS1UsPHr1o3vMIocCri6dPK0Jp3pchEV5zn3KYYNrgmYL13Q1PYE2eFazV4dEKKY1Kh4RiG/5JD288qLVHWtoR
-X-Gm-Message-State: AOJu0Yw1f3X/FNxD7tV+FVPMz8eZrwmFFaQ5FhirFaZv9vKRC/dUfCJ0
-	Wt1JlUTWDSqbzYby9gzPhpzIRj2MYaVYoL31HRex7X0jcp0of69XE5LrFlTSGkI=
-X-Google-Smtp-Source: AGHT+IGPn0ybi8q2QWtQUgttzKHLgQajIsoU7p0aIZGtYSOCPmuSWlb4w/FOZI/RAhpXXrZvysLW0A==
-X-Received: by 2002:a17:907:6d17:b0:a77:dde0:d669 with SMTP id a640c23a62f3a-a7dc506c299mr1149565066b.45.1722968409637;
-        Tue, 06 Aug 2024 11:20:09 -0700 (PDT)
-Received: from [192.168.200.25] (83.8.56.232.ipv4.supernova.orange.pl. [83.8.56.232])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9d89a9fsm563924066b.156.2024.08.06.11.20.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Aug 2024 11:20:09 -0700 (PDT)
-Message-ID: <9964eb0b-7466-4e99-8fbd-82f7efab1af9@linaro.org>
-Date: Tue, 6 Aug 2024 20:20:07 +0200
+	s=arc-20240116; t=1722968732; c=relaxed/simple;
+	bh=iU42ztsF59RemOZGmfY9bIY+jPcLw4R8DUsI3VzS39Y=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=DHKIdFns1AkoLH2WReKpO24xbD7VswVj/lPOdPCLVDuWBb0hL0/iPRGuVrnTjnEj/dfgEHshDIIBAgSassUao77pXX2GH9fJcO1V/hDXc7RDFY5ISDRV32Z+qdRSCWfSfln3kBLeQlo31w3jLTw6eLPSF1ZiBWm4E2dyJ40iKUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HuLFwHdB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41DB8C32786;
+	Tue,  6 Aug 2024 18:25:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1722968732;
+	bh=iU42ztsF59RemOZGmfY9bIY+jPcLw4R8DUsI3VzS39Y=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=HuLFwHdBoQA2ubJAqanE2ACb+DrYwGWc/hkRREtpq/34TCH/0pHBbQ3FEVm/C7F7t
+	 qwtcgEPysgBxWIIQdnqRb0sancQfuhFz1Dvs/1yfTv7lfXCqzzKa+wW1Phj7JoyGpg
+	 lxizAKOfUUcFyl4U3BUWr5aDGPXlFwA/rl1KO48tPMbxCFdXMmWHPogVLSHqZ0jewg
+	 Lh5AozScJTZc2Pj48KLmNky4mH9zcsgedGLKzOFtCENarbR5vvBpQnSz0xoMu4tE5j
+	 WOEeIh8FlLjxXMU8qJJxknY1qO9DObu+KKDcEwaFzuEhQSK3jjMFF0sRWN+hUhHLFi
+	 gsCEEcVgW2WDQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D9F3822F99;
+	Tue,  6 Aug 2024 18:25:32 +0000 (UTC)
+Subject: Re: [GIT PULL] virtio: bugfix
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240806135722-mutt-send-email-mst@kernel.org>
+References: <20240806135722-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240806135722-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 0823dc64586ba5ea13a7d200a5d33e4c5fa45950
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d4560686726f7a357922f300fc81f5964be8df04
+Message-Id: <172296873074.1388134.15266811486107132547.pr-tracker-bot@kernel.org>
+Date: Tue, 06 Aug 2024 18:25:30 +0000
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, dtatulea@nvidia.com, jasowang@redhat.com, mst@redhat.com, stable@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/9] Bump Avocado to 103.0 LTS and update tests for
- compatibility and new features
-To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
-Cc: Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
- Radoslaw Biernacki <rad@semihalf.com>, Troy Lee <leetroy@gmail.com>,
- Akihiko Odaki <akihiko.odaki@daynix.com>, Beraldo Leal <bleal@redhat.com>,
- kvm@vger.kernel.org, Joel Stanley <joel@jms.id.au>,
- Paolo Bonzini <pbonzini@redhat.com>,
- =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
- Aurelien Jarno <aurelien@aurel32.net>,
- Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>,
- =?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Paul Durrant
- <paul@xen.org>, Eric Auger <eric.auger@redhat.com>,
- David Woodhouse <dwmw2@infradead.org>, qemu-arm@nongnu.org,
- Andrew Jeffery <andrew@codeconstruct.com.au>,
- Jamin Lin <jamin_lin@aspeedtech.com>, Steven Lee
- <steven_lee@aspeedtech.com>, Peter Maydell <peter.maydell@linaro.org>,
- Yoshinori Sato <ysato@users.sourceforge.jp>,
- Wainer dos Santos Moschetta <wainersm@redhat.com>,
- Thomas Huth <thuth@redhat.com>, =?UTF-8?Q?Alex_Benn=C3=A9e?=
- <alex.bennee@linaro.org>, Leif Lindholm <quic_llindhol@quicinc.com>
-References: <20240806173119.582857-1-crosa@redhat.com>
-From: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
-Content-Language: pl-PL, en-GB, en-HK
-Organization: Linaro
-In-Reply-To: <20240806173119.582857-1-crosa@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 6.08.2024 19:31, Cleber Rosa wrote:
-> This is along  overdue update of the Avocado version used in QEMU.
-> It comes a time where the role of the runner and the libraries are
-> being discussed and questioned.
-> 
-> These exact commits have been staging on my side for over 30 days now,
-> and I was exceeding what I should in terms of testing before posting.
-> I apologize for the miscalculation.
-> 
-> Nevertheless, as pointed out, on the ML, these changes are needed NOW.
+The pull request you sent on Tue, 6 Aug 2024 13:57:22 -0400:
 
-Tested-by: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-SBSA Reference Platform tests can be done in 1/3rd of time is a nice update.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d4560686726f7a357922f300fc81f5964be8df04
 
-Serial run:
-real    6m20,324s
-user    12m18,446s
-sys     0m36,686s
+Thank you!
 
-Parallel (4) run:
-real    2m22,658s
-user    11m50,514s
-sys     0m26,088s
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
