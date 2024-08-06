@@ -1,260 +1,261 @@
-Return-Path: <kvm+bounces-23296-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23297-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99A789486BC
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 02:50:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 872B59486C3
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 02:53:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48645282B4F
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 00:50:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6959F1C21FE8
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 00:53:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC0EAD51;
-	Tue,  6 Aug 2024 00:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABADB660;
+	Tue,  6 Aug 2024 00:52:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AwwtJSAT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8T2Gd8H"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2926FBF;
-	Tue,  6 Aug 2024 00:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722905418; cv=fail; b=NzjwHgTveh2r72RX5WWL1uhBy7eAiy+sHUefBx+Q//lyX3ga87VbF+9qtClaChesZy4iQhNxF1XVd4loEm/etCiUsu3dbIMwTrR/VFlAJvFYQPq/MeTwGwxIQKieE8zPBvVdSh2k9NpqeMN5MsKG1ir/MWcTIB/cRL661tB8SBQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722905418; c=relaxed/simple;
-	bh=naCCUc7S3pKYEyLOtiL7qCAeGx+AftJUX+rcmsM0UhY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Z4M+916030LKr2hi+mNWfAerPmdDx4y4GMhfmi6TJmyfxR1YqSdyjtQOwT6BCJ15gyJy3qlvsp9CjfZD4prLN4fzaBoE8Ao5nQaBQwRCXvPD2LGcvxq6LCWOKZ9pVMU6M8Rxls6z63Kzca/1UT33D4cIVXAYFGoMELlaMSnFWLo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AwwtJSAT; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722905417; x=1754441417;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=naCCUc7S3pKYEyLOtiL7qCAeGx+AftJUX+rcmsM0UhY=;
-  b=AwwtJSATuPhbQyqiPycmyJPGHBfIMXjHCVquRu5pw+M/UhIWCM/a0Kel
-   qwAK5pzFHjaF9NT7g43MmS4GHiecfZHI8rwex/ng8DSZoRVsEPw/313Og
-   LVMBImi6qmMcNmJ/AEeoQbQvqCbJwr6rc6EcvdFuOxlzW98WrIrCPXNhr
-   DUOXbxXRIrLqI0rNXsF+UHRXQ3a7Keii0AOtmZ+8xD7VzuahW5qNh2Kek
-   KJdEk5+KNFafPjZnqDePtmXPfMcZgohCGI+YZTWO6ydU41RT0jT30hbXc
-   fvJ6jx7DbUivV/YPQTa921nc2+ego9Ot0LL0L5E8zTVOwtLqVu9W5j3+O
-   g==;
-X-CSE-ConnectionGUID: yO9B2sgFTza8e9+0kU4MeQ==
-X-CSE-MsgGUID: 9Zgq9hm2TNWGTLe0Dq+V7Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="21041940"
-X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
-   d="scan'208";a="21041940"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 17:50:16 -0700
-X-CSE-ConnectionGUID: iyvkKE1xQLe+T+xSwTyvEg==
-X-CSE-MsgGUID: 5zx+Kq1XSymW16ppDY11Gg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
-   d="scan'208";a="56545751"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Aug 2024 17:50:15 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 5 Aug 2024 17:50:14 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 5 Aug 2024 17:50:14 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 5 Aug 2024 17:50:14 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.49) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 5 Aug 2024 17:50:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xMYrkhUgu/0yP2iukVPsEOUZUoZLxGWpuvZp37TGH7URgMLhkRugNIC+hXgFYMG8emfRn0CJcc9udD+5dybYruCYmB7+tqEAoF6u+iIzGn3imxooOwQPYaU5jHru++9J2ChTtkguN76g0eSRsapuFF1AH7EF/rFhZKMl487I1LolYdlEkJU+SOVJgYlyrsYWTBmc2hhQuls4KBVIdFRUnPomE0oWFbrvfvDfitJv0/+sJxlNwi4pmUq7K4qh8+MmVEgb2dKcpITpWUSeFQI7PeHuBmpBVJpZNMTbKaynjQh2CFMJVDEv/kBVnk4AlNOiY+ezEwy8c5n2toHx1Bp99Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=naCCUc7S3pKYEyLOtiL7qCAeGx+AftJUX+rcmsM0UhY=;
- b=MT+qg+Ad2bk8NS6wd2YOQFd2Cwv9J/dJ3OmI5BUabphBxwW+cwoTr1KObqQBHp9s3VKgqqrSfqwItyNu/JeKUZI2CXgu0HvwcCkt1ADX0PUoVMF3ZbFrAelMea3UWaVYR4oxFT4fQ61HXbDsrabzgKYIvm5xa57r9EZryosPRc675b/QGul7Zcyxj8qJKWkHkNENTtVJCjA1gRC2RngMTIpP6Irm/dwPsHc0Rxn4tfEg+ZvkbZLskSyAK7hShJzKBj9NALuIFnDLFBaBEj8gsEzgoKaesHlwI2nlMMzv/JsxqWuARrFqiL9c863ivT/RfZtEfIOpeyrG37NN/RNNvg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by CY8PR11MB7313.namprd11.prod.outlook.com (2603:10b6:930:9c::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.26; Tue, 6 Aug
- 2024 00:50:08 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1%3]) with mapi id 15.20.7828.023; Tue, 6 Aug 2024
- 00:50:07 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: David Hildenbrand <david@redhat.com>, Mostafa Saleh <smostafa@google.com>,
-	John Hubbard <jhubbard@nvidia.com>, Elliot Berman <quic_eberman@quicinc.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>, "maz@kernel.org" <maz@kernel.org>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>, "linux-arm-msm@vger.kernel.org"
-	<linux-arm-msm@vger.kernel.org>, "linux-mm@kvack.org" <linux-mm@kvack.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>, Fuad Tabba <tabba@google.com>,
-	"Xu, Yilun" <yilun.xu@intel.com>, "Qiang, Chenyi" <chenyi.qiang@intel.com>
-Subject: RE: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-Thread-Topic: [PATCH RFC 0/5] mm/gup: Introduce exclusive GUP pinning
-Thread-Index: AQHawdyTbbj3CTyCxU2oU4wQ5oQq6rHOYY8AgABR7QCAAe6NAIAAEoqAgAAFggCAQyU6EIAAOWCAgAQfayCAAWDuAIAAEVrA
-Date: Tue, 6 Aug 2024 00:50:07 +0000
-Message-ID: <BN9PR11MB52768B4BFE518BC369DA3D848CBF2@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <20240618-exclusive-gup-v1-0-30472a19c5d1@quicinc.com>
- <7fb8cc2c-916a-43e1-9edf-23ed35e42f51@nvidia.com>
- <14bd145a-039f-4fb9-8598-384d6a051737@redhat.com>
- <ZnQpslcah7dcSS8z@google.com>
- <1ab73f42-9397-4fc7-8e62-2627b945f729@redhat.com>
- <20240620143406.GJ2494510@nvidia.com>
- <BN9PR11MB5276D7FAC258CFC02F75D0648CB32@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240802112205.GA478300@nvidia.com>
- <BN9PR11MB52763711D023C0A50171C2EB8CBE2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240805232246.GH478300@nvidia.com>
-In-Reply-To: <20240805232246.GH478300@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|CY8PR11MB7313:EE_
-x-ms-office365-filtering-correlation-id: 02623a8c-1dcc-4416-9899-08dcb5b1b7e7
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?utf-8?B?clhhdFpFQXFQcldWc3EwRWo3cFZvUWpPWmRxWC9XY0dqdlVPMS9pNXNLTUcr?=
- =?utf-8?B?aEhIcWNrblpyS0VzckwzMkZHbHVOUW1QeFF3OTVSYXJXc0d4bU5oamljL2NM?=
- =?utf-8?B?bVo4Wm1LL0g5TzAvc081aWw2ekpmZmhCNVRWWmhKOEc4MVRTaGFUakFrUnpF?=
- =?utf-8?B?OUlSZStlc3pnRjdGc0U2YXlnc3g0M3NSbnB0QlA4OWxIRzIzNVpBY1M2RlJt?=
- =?utf-8?B?UUlNZkcxYUl5MXN3NFhrMS9HM0EzSzZ5UExHa3hockhkcVFUZHpVVkJOdlRp?=
- =?utf-8?B?S2tqQVZWY2xqeW12L0ZGYW1WRU5qeVpOL084TEhFNUVON3BGazcxTjh5YnlF?=
- =?utf-8?B?TTFuTG5uc2xZVVptaXZpRzU3YTdWdWtVeHg2UkdJMkFwY3B2MWNVTUgya3hK?=
- =?utf-8?B?TWpBdjJUN2RoYzhHa3dvWXZ0M3phUkhwemduRlFqTENONEFOT2JTenpHOGRl?=
- =?utf-8?B?cS9PVERPaVJZaktKTFBobWJuUEVHTWgvUlpqbS92NE9RellrcFNLLytGK0lq?=
- =?utf-8?B?V1QzbjdtQ1loNFUwaTFkWjhSakU5YUVrSisvcFArR1BncGJ0R0VQeVR3STR6?=
- =?utf-8?B?UzlvZTJXZkZoTERLeEdVZ21xanZwNndGbHVXcGo5Wm5McXR0K25mWmJsbHRo?=
- =?utf-8?B?K3VYT3FDMTBIcHFhV0wyUzVjYW8yTGkwVEx0bnNqSWs4MzBPdVRtZ2cvbjhv?=
- =?utf-8?B?WHlIMFhrdVBZSWNOMEdOOUM4SXlNZTJpc2FxeHd3RjBIVUZIQUpUb21Zenc3?=
- =?utf-8?B?L0dyQkpNdjdFbDR6SVowbHpCZDlWbVh0djNaakw4ODQyV2xEcEdaN1dnRG1p?=
- =?utf-8?B?S0J6aG1nRFg2NUp4WTByZTZFaWMyTUZmUTlpUHU5UTlSbWpjL3p5QWRVazFq?=
- =?utf-8?B?SlVJS1hNbUNsSERtTG1mYkU0eS9jUmQwWTNGZmFlT3dNTGI3VGhlL2NaWFNy?=
- =?utf-8?B?VU9Ic0ZZcVNKRHBTVHpURndaay9MTFJFNGxEQkc4cUpVb3ZaNi8ycy96Lzk1?=
- =?utf-8?B?UUd6UmxGSytyOU1tOGcvcXd0eVF1eXJnRk5ma1d6NWllclllNUlncTZkV0sx?=
- =?utf-8?B?RGl1UURJWnNMOUJUTU9TQm9tLzJNWmpiOHQvN3pNMDNCbDhFZGRaUjhJVktF?=
- =?utf-8?B?TzNZdjZTcElCdVphY3NqZFFrR20xamNyZHYzeHdsd3djSFladFJ2K0l6enlw?=
- =?utf-8?B?d2pXcHFRaXJVM0tMMk85L2lOOHovUWdocVVkTzhYbEVLVGMwbDhtWC9iVU5V?=
- =?utf-8?B?Ny8zRzNOcVZBOEF1bUozbENUU1pIU01YZm1mVjZERDg0VEtRQ25HT2ZOUG9C?=
- =?utf-8?B?OUlpZlMxRWcrVW9xQW43c3N3Yi9LeVE3QmFMdUNqNXpIdWJzODZQV3l2ckph?=
- =?utf-8?B?UGIyMXNaRml5QXY2OWdXZ0Z1MUMrM29QY1N0Vjdza1BnTXNodmY5WFYrQ0VY?=
- =?utf-8?B?UWl0QzRVa3Jzb1pkRFVSTlJnY3NCZ2dMaHkxTW0wcG5VZ1drbjlDOGFUYzVD?=
- =?utf-8?B?KzBMcXkydU9YQ3FGN1FxSjczYklBUjI1VlRhN1NrK2tMRHlLdmYzV2hVQS8w?=
- =?utf-8?B?b2xIRm5hNzNaQlFMYlgvamVYQXo2dHFXU1QzU282UkJrR1R0OXI3M3VPSy9Z?=
- =?utf-8?B?WVJkWlc3dTBqMUk5SldTWEdsR1ZUN3ZzL0VNM2pINGVsQUZySWtIMTF2YVk3?=
- =?utf-8?B?L3FIUDNYRUJZaG53UEE3c3FRUWhYVmpUSmFrTERTaUVpQzZidHpVVzQ0RG5B?=
- =?utf-8?B?V2NsWE9qRHA1cUpUTkxFZW51bmpQKzI5Z3AzWUpSMlR2SkJjYlRQbWJVWm1u?=
- =?utf-8?B?M2JaQ3ExR3VhQkx5dURlck0xL0drdit5RkIzd1NlQ0tqOGFsY1JEcjh6QVRt?=
- =?utf-8?B?c0NNdkdIMUp3SUs3cUd0V0pXNWk0cVY4VklJb2UyRk5pSGc9PQ==?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?QUNNVXNDSGlUbkE0MSt3L1VYYWRWQnFpaUs4SVdiS05RWUpjMEY0cHhoTkk0?=
- =?utf-8?B?TjZyU2hLcG9nTVpJT05YYmxhWEZFUXhTdGt3RjlqdDNNc3VldGVHVm1RcGVw?=
- =?utf-8?B?UGVPZ2pDYldzQjlhWTVnNXBKUWk5UGI0dGVySi9JcDNJUi9aZEc0Ukhqd29P?=
- =?utf-8?B?MVpHUU9mT2tEMlB4akFmdEdockIyZmhic3IrZnU3dk5qd0dOVXNMdHVKODlR?=
- =?utf-8?B?SHlHT3Zsa0kzUFgzYjg4TTBiUytQRDd3RmswQXA3QkJIUTIwTEJ1RVFSaXVI?=
- =?utf-8?B?VkVkalJNTEJpR2tnZjdBTnBLUklxWDZHQlJmTzc4clJvTDEvZkVLblhzUW9l?=
- =?utf-8?B?UytaY24vcG9XK3dSNGFkWEV3bHBLNnZEbDFJeW9hQWhoaE5KTEo3S3FhOEly?=
- =?utf-8?B?SzQzRW82U05ScmwzVUZwMkZIcXIwVUE4OGh2WlJqUEQ0L2UxbWFweE5HOVhF?=
- =?utf-8?B?TXNIUm1yb3RocGZaRDVBT3ZRbndMbUduamVWRXl3cGxjL2c1WkR5anNQWmpK?=
- =?utf-8?B?WTkveVhRbnBmeEZIV1N6THRTUzZiSFBrbU5SbWJxejV0eWhnb0lhWkprWC9B?=
- =?utf-8?B?UExNdHpSN01nNDJyUWNKQ1BOVGtFMGY0OWlzZWlyOFVYb2tmVnBLL3NOa2I4?=
- =?utf-8?B?c21LUDNtY21aYjJQUWZTaVQzOFhiWGFEZ1REdFNoUmlGY0FuZWU4MHd0UDhG?=
- =?utf-8?B?aVZRcFFnUW8yRUlsZjZXdWljaWV6a0FFSU9BNkphQ3kxV0RPcG1YbjVCeFVT?=
- =?utf-8?B?U2tjTFpZWGFvSjNLVUh1Sk41TXBmTlpXZTBCTWMvVytxWWtQUFJacnI2UkNW?=
- =?utf-8?B?dXN6RDFEU3ZLQkJ1cnd5RU1sb1FOOUltWUJYUjV1cDFmZkR1RFNwc0ZSQ0JM?=
- =?utf-8?B?VXhocnBIbWJ0TkxNTGF6bE01dmVpeHlYWitsREFqSVFCL2RWWDFIK0kwRXpp?=
- =?utf-8?B?S00xTEhrTTZiMnBQVEF5Znp6eXVFS0UxNWdyWEp6bVgzcDFQbHI4R1g0di9R?=
- =?utf-8?B?OGR3MEwyNlZVYUkyUzVZQVFBN1V2RDMvOWx1S0JObmExanNISEVENHVyYkdr?=
- =?utf-8?B?K0ZIUmRyNnlKV294TW1CUkFIaDVZMWZxc3lWWXV3MGpsSmVYT2JPaVBYV09B?=
- =?utf-8?B?OWtjL1p2M0xkQVJGWUJFQVJib0IrZk1zbEpoMkViYnJxalRISEQzbG9lUGxL?=
- =?utf-8?B?WGh5cVhueUtxY3gvMG1UV0doaU9GNXNDUXAzcEpWVVdPeFhBMjE0NXF5ZlVF?=
- =?utf-8?B?c2Z0VmxSVmVubmpiazZHcXVZWkk2RUxKQllTak9oRDhZMGV2aUNGSS8wWWJk?=
- =?utf-8?B?MXFRNDRiYnZURXhRWkpvWVJQZlFJdWVwWkVKOHF2U0ljOGJXZnN4dnJWTGZi?=
- =?utf-8?B?L09zdTE3UjM3ZnkyK2NPTUpPaU94V29SWE1YUlM3QXlVRW8zM3YxL0NvY2lV?=
- =?utf-8?B?UXM1UThURkc2VldSM3plUGwxb2ZIbnJWUXVqSCtycTRmSU1vcG5odTdjUGQ2?=
- =?utf-8?B?SjViamljbVI4aFNORDd3MDZJQzBSblpkZ3RCYmF6YXRNd2ZLNlpLUjdHSmlm?=
- =?utf-8?B?WG9URktpMll2VWVQM3ZJYlRMV1h1QnNHS3FqN2tMVlZTemhXcnpiY0t1TUxC?=
- =?utf-8?B?QjgwZWF3WktSczJKRk5KRUM1Ri9tNEtOQTlUU3BTdDl6WDluWUlTSlBlMWVL?=
- =?utf-8?B?bndvUnp3enZYSks5R1B0eThnRVhVbElTTm4ya1VSOVAvVWU4T3JxdUtiVkVE?=
- =?utf-8?B?UTVjZ1BzT0I5eDNZd0ZZZ1RndU02TmZaZ2xhdmFhNnVNR1pQOFo2NGl2SFZI?=
- =?utf-8?B?MFNqN3EvdEVKbXkwYkh5NitROTNMMmNGZk9nV2VPRXdhWUFtNjN5YTI0WWtw?=
- =?utf-8?B?U1BEaUwrMnl5eUszbjhBYkkxREI2VmZkbDFzV3NBZHBmRTBrbUU3MnU2WHhx?=
- =?utf-8?B?K0ttT0YvK3RvZ1dicjk2Vkp4OG4xN2UrZGtaeTJMOUdIYlJqanNPazQxUTdl?=
- =?utf-8?B?WHBPT2gzK0FDUFJkSTg2MUZoYzRia2xIVzAyNitpVjRtQjZuTWFJRGtxMTNI?=
- =?utf-8?B?MUR5RFR6cTlxYXNZNVU4cE5HZ25LbDdCM1I0Ym1JMFY3OW8rM0J3SnlwOUsx?=
- =?utf-8?Q?eyIJCmTW8pqJXZCJGaW9dj4Uv?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FB21388;
+	Tue,  6 Aug 2024 00:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722905567; cv=none; b=CvycPpuLuVEbVCb9IJdrcbk5ZhTzArbPJ8tC3r4SwroyYuafCEQVzi9pDuOl3rbgHvKqaLG3WJJAOIcTP8//7wBh3/GxTxuzEYg67rAfpGQkIGWuNnctVzUent90YqUtljCN7L2iYjSVTDbRb7CX3hHy0fxD2zYYqspSSB4Bqfo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722905567; c=relaxed/simple;
+	bh=+m+W3mwS74dhm5CTDy5Jd1SPhQMqockB2uEXAZSjECM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bET47Ry+SDJ51qQM8qdx9CZnYyXRaYtVKweZAglGvYkzLIlD8CU8g3Zzt6eIDGrT0phLqDyAVkv5QI9qiw89AMz0UB0UnmArPWcFFwXMGpquxqVQgzmtmrLXUmgPC81Ri8r9+0qeiQ6B+TIpU45EyN93zrQeJZEElg8WLxb+nrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q8T2Gd8H; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4257d5fc9b7so880225e9.2;
+        Mon, 05 Aug 2024 17:52:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1722905564; x=1723510364; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vbMs5Emme3Wh6YV9L5YnP1YT4GqHd5pCxV5C0hflVMM=;
+        b=Q8T2Gd8Hj7F5mrT0vvdF/G6iDE3FXHoEvYcTVWEliBAkeHo5IDmcESeMONRhtwnMq+
+         C1jaCuZ08DTsODBlN25wWc2TzJea1v6KcLxs4HfZMUcP8Im6N1FgDyfowsYi//EpArTR
+         x8EX0Blb8ifjnkoq8lLAymBQhiS5VEdwXH6YjH8K2ZXYjRCioIdQglsZ9UP38I2OFeNb
+         dK6D1JXQHCN8b1v8t1oJUvgiQrJff4ta3A3cxCC7Mm27rmgpK6/4TWd5bcVfQHQCC14p
+         R+y1XmKR7G+qP4ur1ehpu/ARNFEZytEUpmN1FlJZIfa0c8QfXJ2hVuiYcIGjYukl+QVQ
+         KqQQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722905564; x=1723510364;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vbMs5Emme3Wh6YV9L5YnP1YT4GqHd5pCxV5C0hflVMM=;
+        b=tBi/tT19Zjq1Bnz6mpXtc3QX1rxaKcrBygYxeeMe15uZZw6kiSwDC/ETZlXacGYaWV
+         g1YlmCFM25SzE5RSgnenBmog34hq5rhfOhzbeXlC5qEirdTI/z2dAkQDSybJtxrmKHyH
+         1XZJ/KXenJtCnYZdN7wcCpf+IcQVVsj5i8z3dqcgr9oIETo4I3/G+PSpEcwQOT6a8b3z
+         Qx6PVtErc+PhKdZJdd+1KJH/09Zp+jHZ6Occ/Efq5SimhvaDN34OIiHRwT+9uw3wgWBS
+         NjGfj6PU2I9ODqe3w2LcFg0Yxu9Ezv6otMIBINFHAic2lyOMOdzHUpOT3oUnb0dmQt+U
+         pxaw==
+X-Forwarded-Encrypted: i=1; AJvYcCVMySugepxudVKgOzIg+gEiiIps+el6q+zZVGWfYcx3DrnaJjFH0/HySlOTFM6q39LloD9+T8GDHPOwNLXVl6NzVrkl5296Jeo9kLKbli+UY8dH5Ep5kuYqEweXgNQUk9riaYHfef70gwSxapdvwh29v32sMEKWSYHTdsVGRiCUcMVzQNsOwkpbmwVKKmZlQNOEYbywQhOqo4oVn0sMhkSaXs/vW5dj17VM
+X-Gm-Message-State: AOJu0YySGYqwbg8cw7WoMK2o+w8Krc4HGPH22OmpuMnUEWMyfx6fI+OO
+	qC3ji1P3AQCTT+yYfcdCDxAJghK7w8YjHGo0u2v4Y4CFZm/qqRS/Y3IhsHSIbMvRya2tZp/l/jZ
+	ubgA4rNAY5gtx+WgLT3fyDm8E8x0=
+X-Google-Smtp-Source: AGHT+IGqdqorrE2wlr/gRUXIf6uZerGtzKcZj5VR2LPXl0lkIPBaNlvbUHmQ57kNpAjkgdSFWmDjnDGMqxYFtJZpI1s=
+X-Received: by 2002:a5d:6042:0:b0:368:7f8f:ca68 with SMTP id
+ ffacd0b85a97d-36bbc117fd0mr8920631f8f.30.1722905564079; Mon, 05 Aug 2024
+ 17:52:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 02623a8c-1dcc-4416-9899-08dcb5b1b7e7
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Aug 2024 00:50:07.8638
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: iTe2Th7SczStaJEROiOgEP+aQYwbWZYZbgG/Ot55jfE6SJYPxlPK86xIpoclX1iL9/6DP6EQ1H7FNHC5jNlWdQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7313
-X-OriginatorOrg: intel.com
+References: <20240731124505.2903877-1-linyunsheng@huawei.com>
+ <20240731124505.2903877-5-linyunsheng@huawei.com> <CAKgT0UcqdeSJdjZ_FfwyCnT927TwOkE4zchHLOkrBEmhGzex9g@mail.gmail.com>
+ <22fda86c-d688-42e7-99e8-e2f8fcf1a5ba@huawei.com> <CAKgT0UcuGj8wvC87=A+hkarRupfhjGM0BPzLUT2AJc8Ovg_TFg@mail.gmail.com>
+ <877efebe-f316-4192-aada-dd2657b74125@huawei.com> <CAKgT0UfUkqR2TJQt6cSEdANNxQEOkjGqpPXhaXmrrxB0KwXmEQ@mail.gmail.com>
+ <2a29ce61-7136-4b9b-9940-504228b10cba@gmail.com>
+In-Reply-To: <2a29ce61-7136-4b9b-9940-504228b10cba@gmail.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 6 Aug 2024 06:22:08 +0530
+Message-ID: <CAKgT0Uc6yw4u5Tjw1i0cV=C_ph+A5w0b_mtQMXmnBfKN_vvaDA@mail.gmail.com>
+Subject: Re: [PATCH net-next v12 04/14] mm: page_frag: add '_va' suffix to
+ page_frag API
+To: Yunsheng Lin <yunshenglin0825@gmail.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
+	Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
+	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, intel-wired-lan@lists.osuosl.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	linux-nvme@lists.infradead.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-mm@kvack.org, bpf@vger.kernel.org, 
+	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPg0KPiBTZW50OiBUdWVzZGF5
-LCBBdWd1c3QgNiwgMjAyNCA3OjIzIEFNDQo+IA0KPiBPbiBNb24sIEF1ZyAwNSwgMjAyNCBhdCAw
-MjoyNDo0MkFNICswMDAwLCBUaWFuLCBLZXZpbiB3cm90ZToNCj4gPg0KPiA+IEFjY29yZGluZyB0
-byBbM10sDQo+ID4NCj4gPiAiDQo+ID4gICBXaXRoIFNOUCwgd2hlbiBwYWdlcyBhcmUgbWFya2Vk
-IGFzIGd1ZXN0LW93bmVkIGluIHRoZSBSTVAgdGFibGUsDQo+ID4gICB0aGV5IGFyZSBhc3NpZ25l
-ZCB0byBhIHNwZWNpZmljIGd1ZXN0L0FTSUQsIGFzIHdlbGwgYXMgYSBzcGVjaWZpYyBHRk4NCj4g
-PiAgIHdpdGggaW4gdGhlIGd1ZXN0LiBBbnkgYXR0ZW1wdHMgdG8gbWFwIGl0IGluIHRoZSBSTVAg
-dGFibGUgdG8gYSBkaWZmZXJlbnQNCj4gPiAgIGd1ZXN0L0FTSUQsIG9yIGEgZGlmZmVyZW50IEdG
-TiB3aXRoaW4gYSBndWVzdC9BU0lELCB3aWxsIHJlc3VsdCBpbiBhbiBSTVANCj4gPiAgIG5lc3Rl
-ZCBwYWdlIGZhdWx0Lg0KPiA+ICINCj4gPg0KPiA+IFdpdGggdGhhdCBtZWFzdXJlIGluIHBsYWNl
-IG15IGltcHJlc3Npb24gaXMgdGhhdCBldmVuIHRoZSBDUFUncyBHUEENCj4gPiB0cmFuc2xhdGlv
-biBjYW4gYmUgY29udHJvbGxlZCBieSB0aGUgdW5zZWN1cmUgd29ybGQgaW4gU0VWLVNOUC4NCj4g
-DQo+IFN1cmUsIGJ1dCB0aGUgR1BBIGlzIHRoZSBLVk0gUzIsIG5vdCB0aGUgSU9NTVUuIElmIHRo
-ZXJlIGlzIHNvbWUNCj4gY29tcGxpY2F0ZWQgd2F5IHRvIGxvY2sgZG93biB0aGUgS1ZNIFMyIHRo
-ZW4gaXQgZG9lc24ndCBuZWNlc3NhcmlseQ0KPiBhcHBseSB0byBldmVyeSBJT1ZBIHRvIEdQQSB0
-cmFuc2xhdGlvbiBhcyB3ZWxsLg0KPiANCj4gVGhlIGd1ZXN0L2h5cGVydmlzb3IgY291bGQgaGF2
-ZSBhIGh1Z2UgbnVtYmVyIG9mIGlvbW11IGRvbWFpbnMsIHdoZXJlDQo+IHdvdWxkIHlvdSBldmVu
-IHN0b3JlIHN1Y2ggZ3JhbnVsYXIgZGF0YT8NCj4gDQo+IEFib3V0IHRoZSBvbmx5IHRoaW5nIHRo
-YXQgY291bGQgcG9zc2libHkgZG8gaXMgc2V0dXAgYSBTMiBJT01NVQ0KPiBpZGVudGl0eSB0cmFu
-c2xhdGlvbiByZWxpYWJseSBhbmQgaGF2ZSBubyBzdXBwb3J0IGZvciB2SU9NTVUgLSB3aGljaA0K
-PiBkb2Vzbid0IHNvdW5kIGxpa2UgYSBzYW5lIGFyY2hpdGVjdHVyZSB0byBtZS4NCj4gDQoNCkFj
-Y29yZGluZyB0byB0aGUgU0VWLVRJTyBzcGVjIHRoZXJlIHdpbGwgYmUgYSBuZXcgc3RydWN0dXJl
-IGNhbGxlZA0KU2VjdXJlIERldmljZSBUYWJsZSB0byB0cmFjayBzZWN1cml0eSBhdHRyaWJ1dGVz
-IG9mIGEgVERJIGFuZCBhbHNvDQpsb2NhdGlvbiBvZiBndWVzdCBwYWdlIHRhYmxlcy4gSXQgYWxz
-byBwdXRzIGhhcmR3YXJlIGFzc2lzdGVkDQp2SU9NTVUgaW4gdGhlIFRDQiB0aGVuIHdpdGggbmVz
-dGVkIHRyYW5zbGF0aW9uIHRoZSBJT01NVSBTMg0Kd2lsbCBhbHdheXMgYmUgR1BBLg0KDQo+IEl0
-IGlzIG5vdCBpbnN1cm1vdW50YWJsZSwgYnV0IGl0IGlzIGdvaW5nIHRvIGJlIGFubm95aW5nIGlm
-IHNvbWVvbmUNCj4gbmVlZHMgYWNjZXNzIHRvIHRoZSBwcml2YXRlIHBhZ2VzIHBoeXNpY2FsIGFk
-ZHJlc3MgaW4gdGhlIGlvbW11ZmQNCj4gc2lkZS4NCj4gDQoNCkRvbid0IGtub3cgbXVjaCBhYm91
-dCBTRVYgYnV0IGJhc2VkIG9uIG15IHJlYWRpbmcgaXQgYXBwZWFycw0KdGhhdCBpdCBpcyBkZXNp
-Z25lZCB3aXRoIHRoZSBhc3N1bXB0aW9uIHRoYXQgR1BBIHBhZ2UgdGFibGVzIChib3RoDQpDUFUv
-SU9NTVUgUzIsIGluIG5lc3RlZCB0cmFuc2xhdGlvbikgYXJlIG1hbmFnZWQgYnkgdW50cnVzdGVk
-DQpob3N0LCBmb3IgYm90aCBzaGFyZWQgYW5kIHByaXZhdGUgcGFnZXMuDQoNClByb2JhYmx5IEFN
-RCBmb2xrcyBjYW4gY2hpbWUgaW4gdG8gaGVscCBjb25maXJtLiDwn5iKDQo=
+On Sun, Aug 4, 2024 at 10:00=E2=80=AFAM Yunsheng Lin <yunshenglin0825@gmail=
+.com> wrote:
+>
+> On 8/3/2024 1:00 AM, Alexander Duyck wrote:
+>
+> >>
+> >>>
+> >>> As far as your API extension and naming maybe you should look like
+> >>> something like bio_vec and borrow the naming from that since that is
+> >>> essentially what you are passing back and forth is essentially that
+> >>> instead of a page frag which is normally a virtual address.
+> >>
+> >> I thought about adding something like bio_vec before, but I am not sur=
+e
+> >> what you have in mind is somthing like I considered before?
+> >> Let's say that we reuse bio_vec like something below for the new APIs:
+> >>
+> >> struct bio_vec {
+> >>          struct page     *bv_page;
+> >>          void            *va;
+> >>          unsigned int    bv_len;
+> >>          unsigned int    bv_offset;
+> >> };
+> >
+> > I wasn't suggesting changing the bio_vec. I was suggesting that be
+> > what you pass as a pointer reference instead of the offset. Basically
+> > your use case is mostly just for populating bio_vec style structures
+> > anyway.
+>
+> I wasn't trying/going to reuse/change bio_vec for page_frag, I was just
+> having a hard time coming with a good new name for it.
+> The best one I came up with is pfrag_vec, but I am not sure about the
+> 'vec' as the "vec" portion of the name would suggest, iovec structures
+> tend to come in arrays, mentioned in the below article:
+> https://lwn.net/Articles/625077/
+>
+> Anther one is page_frag, which is currently in use.
+>
+> Or any better one in your mind?
+
+I was suggesting using bio_vec, not some new structure. The general
+idea is that almost all the values you are using are exposed by that
+structure already in the case of the page based calls you were adding,
+so it makes sense to use what is there rather than reinventing the
+wheel.
+
+> >
+> >> It seems we have the below options for the new API:
+> >>
+> >> option 1, it seems like a better option from API naming point of view,=
+ but
+> >> it needs to return a bio_vec pointer to the caller, it seems we need t=
+o have
+> >> extra space for the pointer, I am not sure how we can avoid the memory=
+ waste
+> >> for sk_page_frag() case in patch 12:
+> >> struct bio_vec *page_frag_alloc_bio(struct page_frag_cache *nc,
+> >>                                      unsigned int fragsz, gfp_t gfp_ma=
+sk);
+> >>
+> >> option 2, it need both the caller and callee to have a its own local s=
+pace
+> >> for 'struct bio_vec ', I am not sure if passing the content instead of
+> >> the pointer of a struct through the function returning is the common p=
+attern
+> >> and if it has any performance impact yet:
+> >> struct bio_vec page_frag_alloc_bio(struct page_frag_cache *nc,
+> >>                                     unsigned int fragsz, gfp_t gfp_mas=
+k);
+> >>
+> >> option 3, the caller passes the pointer of 'struct bio_vec ' to the ca=
+llee,
+> >> and page_frag_alloc_bio() fills in the data, I am not sure what is the=
+ point
+> >> of indirect using 'struct bio_vec ' instead of passing 'va' & 'fragsz'=
+ &
+> >> 'offset' through pointers directly:
+> >> bool page_frag_alloc_bio(struct page_frag_cache *nc,
+> >>                           unsigned int fragsz, gfp_t gfp_mask, struct =
+bio_vec *bio);
+> >>
+> >> If one of the above option is something in your mind? Yes, please be m=
+ore specific
+> >> about which one is the prefer option, and why it is the prefer option =
+than the one
+> >> introduced in this patchset?
+> >>
+> >> If no, please be more specific what that is in your mind?
+> >
+> > Option 3 is more or less what I had in mind. Basically you would
+> > return an int to indicate any errors and you would be populating a
+> > bio_vec during your allocation. In addition you would use the bio_vec
+>
+> Actually using this new bio_vec style structures does not seem to solve
+> the APIs naming issue this patch is trying to solve as my understanding,
+> as the new struct is only about passing one pointer or multi-pointers
+> from API naming perspective. It is part of the API naming, but not all
+> of it.
+
+I have no idea what you are talking about. The issue was you were
+splitting things page_frag_alloc_va and page_frag_alloc_pg. Now it
+would be page_frag_alloc and page_frag_alloc_bio or maybe
+page_frag_fill_bio which would better explain what you are doing with
+this function.
+
+> > as a tracker of the actual fragsz so when you commit you are
+> > committing with the fragsz as it was determined at the time of putting
+> > the bio_vec together so you can theoretically catch things like if the
+> > underlying offset had somehow changed from the time you setup the
+>
+> I think we might need a stronger argument than the above to use the new
+> *vec thing other than the above debugging feature.
+>
+> I looked throught the bio_vec related info, and come along somewhat not
+> really related, but really helpful "What=E2=80=99s all this get us" secti=
+on:
+> https://docs.kernel.org/block/biovecs.html
+>
+> So the question seems to be: what is this new struct for page_frag get
+> us?
+>
+> Generally, I am argeed with the new struct thing if it does bring us
+> something other than the above debugging feature. Otherwise we should
+> avoid introducing a new thing which is hard to argue about its existent.
+
+I don't want a new structure. I just want you to use the bio_vec for
+spots where you are needing to use a page because you are populating a
+bio_vec.
+
+> > allocation. It would fit well into your probe routines since they are
+> > all essentially passing the page, offset, and fragsz throughout the
+> > code.
+>
+> For the current probe routines, the 'va' need to be passed, do you
+> expect the 'va' to be passed by function return, double pointer, or
+> new the *_vec pointer?
+
+I would suggest doing so via the *_vec pointer. The problem as I see
+it is that the existing code is exposing too much of the internals and
+setting up the possibility for a system to get corrupted really
+easily. At least if you are doing this with a bio_vec you can verify
+that you have the correct page and offset before you move the offset
+up by the length which should have been provided by the API in the
+first place and not just guessed at based on what the fragsz was that
+you requested.
 
