@@ -1,299 +1,314 @@
-Return-Path: <kvm+bounces-23396-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23397-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D53C9494DE
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:53:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC02294950B
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 18:00:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 876E1B25B2F
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 15:48:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90C0328159C
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 16:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C406F3A1CD;
-	Tue,  6 Aug 2024 15:48:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA163FB1B;
+	Tue,  6 Aug 2024 15:58:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="HHujrAov"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lZqfK3fh"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8271946F;
-	Tue,  6 Aug 2024 15:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2521E3B7AC
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 15:57:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722959312; cv=none; b=ZGE90lAA3WDxE1anXllGRMXnqHj8GEqI2p0ketGVV2PJK0OBl+qyhG6ZYEag9WCnOmKxq1JNK9gmL3LwIsZXGadRqTZAPL5wVRtH3H/HVQN/vajkND2gVOkk+LnD2MbMtjYxcgnNmcOmibLqN6Rj5uJkKhnybUB4VUtpm0qfHAU=
+	t=1722959879; cv=none; b=D4DPh+SIZUCSnkCG5l9zVs+uNBOpccD/BPzrIijX18DjxXfWhw8BQbCtMYWpbd50w7YSgD7W3vzl/piCaI+qpx2yghKkXERvUwiVz1oSkMmxw+E6fQkCHdrMsIJCZSC8bXcy57LWaas/Jy0fyBq5xGamRCE8VEcK+C3BwUr65qo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722959312; c=relaxed/simple;
-	bh=79JKVVzj13bPR9TcVJePyTMWtYc/ZcBwbG0GynFLhKE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ggnY9RtA40Cu3Dl7qwdh3yqTYSxNoI+Ah4hB1fAIJ+yOzMvHTtdvgXsg7iQAjZ+lW8PtC0rmEsLfPHpRmURLvLx+dvcExyyK5oDKO/VF5777EKErdhJbItq/RnIKCZn3afucEASrDWOgydQRIouXN1ddFG0DZpGUmrXd9rC2k7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=HHujrAov; arc=none smtp.client-ip=207.171.190.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
+	s=arc-20240116; t=1722959879; c=relaxed/simple;
+	bh=OGGMAjOwlhW2rsfolNhMYTqFynIuhRKSFSaVNX4vztU=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=oHDdJNiM0s5vDT7wsVOjis0rm6LtNpKwzt+6sVegz4Ve9mZvjlBQEdOhlS3LE/2CWZXAzn8qUGVBwBZZcUdbHv/Wt0Sit2TcoMupBcpsQyGrqNT5K41BMZ6/XEdU84r7wGHVOjAKXm6VslZTcXrK+nH94ij0lxxm0SyCmxJZ5fQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lZqfK3fh; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fc54c57a92so10123325ad.3
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 08:57:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1722959310; x=1754495310;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=yc/1mWs6SeF5HnWAzCvUQzyjIjCuiLTryEo53m/a1v4=;
-  b=HHujrAovkv35QNQoE3kSDVDENlpgfrKlg04ay8Gk4LpTS7Tpnd1Ruf0Y
-   kaUR6eLw+tqJ0LGySMBBpJIfEM3DmCdX8hF+iXFuj90AFAtpAnW+3UQPe
-   R3kFow32R8LEWPX73IfO+bvNHa6iBBjm0OQLxCoB29PTOGnEaO/pY0Xdl
-   g=;
-X-IronPort-AV: E=Sophos;i="6.09,268,1716249600"; 
-   d="scan'208";a="360852274"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Aug 2024 15:48:27 +0000
-Received: from EX19MTAEUA001.ant.amazon.com [10.0.17.79:8908]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.26.94:2525] with esmtp (Farcaster)
- id 114b04b0-66ae-461d-8af3-867b0de2b6ff; Tue, 6 Aug 2024 15:48:26 +0000 (UTC)
-X-Farcaster-Flow-ID: 114b04b0-66ae-461d-8af3-867b0de2b6ff
-Received: from EX19D022EUC002.ant.amazon.com (10.252.51.137) by
- EX19MTAEUA001.ant.amazon.com (10.252.50.50) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 6 Aug 2024 15:48:25 +0000
-Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
- EX19D022EUC002.ant.amazon.com (10.252.51.137) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 6 Aug 2024 15:48:25 +0000
-Received: from [127.0.0.1] (172.19.88.180) by mail-relay.amazon.com
- (10.252.135.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34 via Frontend
- Transport; Tue, 6 Aug 2024 15:48:23 +0000
-Message-ID: <6660faa6-4cea-4ddc-a378-ab9da9139ee9@amazon.co.uk>
-Date: Tue, 6 Aug 2024 16:48:22 +0100
+        d=google.com; s=20230601; t=1722959877; x=1723564677; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mlT/xC9MI26w/5mH5bjuBQLZaiCef0X6LB6LYMI3QIk=;
+        b=lZqfK3fhRxU2d0ZWbDFL7U7IEUwguHIzXSnwUs+OT1/A9uz6DkKAfLPI1DLq6HGvtf
+         xX2E2ZHGBG7qsqic+RKuOSVL06xq5/BRjszDy0joUltS+DPdcP0RL0p220hzb1GHG/6v
+         BQk906SQOt0wQz1HiI/RJzAexZ1xxZ/GeKauh9jSZdLkbxzpXgeBAEGcXklru7XRpzxO
+         QVtdN3/fl8MfqQyVQcegGCEeLnVi5jP0aF0fnVwDLagcY+3zAZnXkLS+z1AgA/Ao7Kl6
+         1h/FX0q5TiaSVdVvaSgW1vzAMq7odwwXSAAQfekFcBQaFQCtT1d7Cxd+F/9soa+5gVvI
+         rvvw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722959877; x=1723564677;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=mlT/xC9MI26w/5mH5bjuBQLZaiCef0X6LB6LYMI3QIk=;
+        b=qVd4s2NiwHEe5O5wba3imx6K3c42BFg34Wd1/Z5fjaSsyYZZknalFInJhufy28Rkgl
+         zCt9mVeg2ogcTVnAHwswWNUokEwBrRIB8Cl3oDen2jC1KqVVJ/xhg3p3A5ARaONAcG5L
+         szfRpgoE0CdCh0QMBwm7o8v3xgZkDIpkvXxQ3qcFvTGcKZYBl+ccfb4fYzG0yi8t1nxG
+         +g2b/hc/MII0ASgn7Z2W0E2I9VxKTH+kbcjPHQlLSis+iC2mBD3Wy9UVT05EuABbr/bH
+         ENlFw240LU+J2tT2e6fCxHl76DNFRwRVXpV83Yt5juwW2vrT9LEUICFQCoFLgRLNyPXD
+         jiQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVW06PkFbsxtXOy4oQHcZ6M8JMcTgHJG2WbWhj49ftYeXkJ9EFWu5CPIzvKA6jGW8TIJ/iENThjAZXVGyFKK4PFai4O
+X-Gm-Message-State: AOJu0YyCC1h17sWTevkCPenuWY30mBZSqUkbm6vE6F8R9rHAM6KjPGVS
+	QX6yC0L5u0rUjFxagqPP8dNYgnLnEADUKrw6DNW4oYeNDBVB1cQ99zSEYaGePM7N1wHd45h+T3M
+	nDA==
+X-Google-Smtp-Source: AGHT+IELGJ9f0ZjvLPU8gCHpfqrCA0BDimPIfZAm14efTEPA1jwu6vtA8DKMXcUzX+n1HWsm4VBvaWnsy/w=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:f54b:b0:1fb:5a07:7977 with SMTP id
+ d9443c01a7336-1ff572549b5mr13868505ad.3.1722959877237; Tue, 06 Aug 2024
+ 08:57:57 -0700 (PDT)
+Date: Tue, 6 Aug 2024 08:57:55 -0700
+In-Reply-To: <a21a90c76af446951956b4423b1f87beb91cb660.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
-To: Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Paolo Bonzini <pbonzini@redhat.com>, "Sean
- Christopherson" <seanjc@google.com>, Fuad Tabba <tabba@google.com>, "David
- Hildenbrand" <david@redhat.com>, <qperret@google.com>, Ackerley Tng
-	<ackerleytng@google.com>
-CC: <linux-coco@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <kvm@vger.kernel.org>,
-	James Gowans <jgowans@amazon.com>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>, "Cali,
- Marco" <xmarcalx@amazon.co.uk>
-References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
- <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com>
-From: Patrick Roy <roypat@amazon.co.uk>
-Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20220427014004.1992589-1-seanjc@google.com> <20220427014004.1992589-7-seanjc@google.com>
+ <294c8c437c2e48b318b8c27eb7467430dfcba92b.camel@infradead.org>
+ <f862cefff2ed3f4211b69d785670f41667703cf3.camel@infradead.org>
+ <ZrFyM8rJZYjfFawx@google.com> <dd6ca54cfd23dba0d3cba7c1ceefea1fdfcdecbe.camel@infradead.org>
+ <ZrItHce2GqAWoN0o@google.com> <a21a90c76af446951956b4423b1f87beb91cb660.camel@infradead.org>
+Message-ID: <ZrJIA6t8S9Ucjqzn@google.com>
+Subject: Re: [PATCH] KVM: Move gfn_to_pfn_cache invalidation to
+ invalidate_range_end hook
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Mushahid Hussain <hmushi@amazon.co.uk>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
+	Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 2024-08-05 at 19:34 +0100, Elliot Berman wrote:
-> Confidential/protected guest virtual machines want to share some memory
-> back with the host Linux. For example, virtqueues allow host and
-> protected guest to exchange data. In MMU-only isolation of protected
-> guest virtual machines, the transition between "shared" and "private"
-> can be done in-place without a trusted hypervisor copying pages.
-> 
-> Add support for this feature and allow Linux to mmap host-accessible
-> pages. When the owner provides an ->accessible() callback in the
-> struct guest_memfd_operations, guest_memfd allows folios to be mapped
-> when the ->accessible() callback returns 0.
+On Tue, Aug 06, 2024, David Woodhouse wrote:
+> On Tue, 2024-08-06 at 07:03 -0700, Sean Christopherson wrote:
+> > On Tue, Aug 06, 2024, David Woodhouse wrote:
+> > > On Mon, 2024-08-05 at 17:45 -0700, Sean Christopherson wrote:
+> > > > On Mon, Aug 05, 2024, David Woodhouse wrote:
+> > > > > From: David Woodhouse <dwmw@amazon.co.uk>
+> > > > Servicing guest pages faults has the same problem, which is why
+> > > > mmu_invalidate_retry_gfn() was added.=C2=A0 Supporting hva-only GPC=
+s made our lives a
+> > > > little harder, but not horrifically so (there are ordering differen=
+ces regardless).
+> > > >=20
+> > > > Woefully incomplete, but I think this is the gist of what you want:
+> > >=20
+> > > Hm, maybe. It does mean that migration occurring all through memory
+> > > (indeed, just one at top and bottom of guest memory space) would
+> > > perturb GPCs which remain present.
+> >=20
+> > If that happens with a real world VMM, and it's not a blatant VMM goof,=
+ then we
+> > can fix KVM.=C2=A0 The stage-2 page fault path hammers the mmu_notifier=
+ retry logic
+> > far more than GPCs, so if a range-based check is inadequate for some us=
+e case,
+> > then we definitely need to fix both.
+> >=20
+> > In short, I don't see any reason to invent something different for GPCs=
+.
+> >=20
+> > > > > @@ -849,6 +837,8 @@ static void kvm_mmu_notifier_invalidate_range=
+_end(struct mmu_notifier *mn,
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0wake =3D !kvm->mn=
+_active_invalidate_count;
+> > > > > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0spin_unlock(&kvm-=
+>mn_invalidate_lock);
+> > > > > =C2=A0
+> > > > > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0gfn_to_pfn_cache_inval=
+idate(kvm, range->start, range->end);
+> > > >=20
+> > > > We can't do this.=C2=A0 The contract with mmu_notifiers is that sec=
+ondary MMUs must
+> > > > unmap the hva before returning from invalidate_range_start(), and m=
+ust not create
+> > > > new mappings until invalidate_range_end().
+>=20
+> Looking at that assertion harder... where is that rule written?
 
-Wouldn't the set of inaccessible folios always match exactly the set of
-folios that have PG_private=1 set? At least guest_memfd instances that
-have GUEST_MEMFD_FLAG_NO_DIRECT_MAP set, having folios without direct
-map entries marked "accessible" sound like it may cause a lot of mayhem
-(as those folios would essentially be secretmem folios, but this time
-without the GUP checks). But even more generally, wouldn't tracking
-accessibility via PG_private be enough?
+The big comment for invalidate_range_{start,end}() in include/linux/mmu_not=
+ifier.h.
+The relevant snippets are:
 
-> To safely make inaccessible:
-> 
-> ```
-> folio = guest_memfd_grab_folio(inode, index, flags);
-> r = guest_memfd_make_inaccessible(inode, folio);
-> if (r)
->         goto err;
-> 
-> hypervisor_does_guest_mapping(folio);
-> 
-> folio_unlock(folio);
-> ```
-> 
-> hypervisor_does_s2_mapping(folio) should make it so
-> ops->accessible(...) on those folios fails.
-> 
-> The folio lock ensures atomicity.
-> 
-> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
-> ---
->  include/linux/guest_memfd.h |  7 ++++
->  mm/guest_memfd.c            | 81 ++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 87 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/guest_memfd.h b/include/linux/guest_memfd.h
-> index f9e4a27aed67..edcb4ba60cb0 100644
-> --- a/include/linux/guest_memfd.h
-> +++ b/include/linux/guest_memfd.h
-> @@ -16,12 +16,18 @@
->   * @invalidate_end: called after invalidate_begin returns success. Optional.
->   * @prepare: called before a folio is mapped into the guest address space.
->   *           Optional.
-> + * @accessible: called after prepare returns success and before it's mapped
-> + *              into the guest address space. Returns 0 if the folio can be
-> + *              accessed.
-> + *              Optional. If not present, assumes folios are never accessible.
->   * @release: Called when releasing the guest_memfd file. Required.
->   */
->  struct guest_memfd_operations {
->         int (*invalidate_begin)(struct inode *inode, pgoff_t offset, unsigned long nr);
->         void (*invalidate_end)(struct inode *inode, pgoff_t offset, unsigned long nr);
->         int (*prepare)(struct inode *inode, pgoff_t offset, struct folio *folio);
-> +       int (*accessible)(struct inode *inode, struct folio *folio,
-> +                         pgoff_t offset, unsigned long nr);
->         int (*release)(struct inode *inode);
->  };
-> 
-> @@ -48,5 +54,6 @@ struct file *guest_memfd_alloc(const char *name,
->                                const struct guest_memfd_operations *ops,
->                                loff_t size, unsigned long flags);
->  bool is_guest_memfd(struct file *file, const struct guest_memfd_operations *ops);
-> +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio);
-> 
->  #endif
-> diff --git a/mm/guest_memfd.c b/mm/guest_memfd.c
-> index e9d8cab72b28..6b5609932ca5 100644
-> --- a/mm/guest_memfd.c
-> +++ b/mm/guest_memfd.c
-> @@ -9,6 +9,8 @@
->  #include <linux/pagemap.h>
->  #include <linux/set_memory.h>
-> 
-> +#include "internal.h"
-> +
->  static inline int guest_memfd_folio_private(struct folio *folio)
->  {
->         unsigned long nr_pages = folio_nr_pages(folio);
-> @@ -89,7 +91,7 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
->                         goto out_err;
->         }
-> 
-> -       if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
-> +       if (!ops->accessible && (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)) {
->                 r = guest_memfd_folio_private(folio);
->                 if (r)
->                         goto out_err;
-> @@ -107,6 +109,82 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
->  }
->  EXPORT_SYMBOL_GPL(guest_memfd_grab_folio);
-> 
-> +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio)
-> +{
-> +       unsigned long gmem_flags = (unsigned long)file->private_data;
-> +       unsigned long i;
-> +       int r;
-> +
-> +       unmap_mapping_folio(folio);
-> +
-> +       /**
-> +        * We can't use the refcount. It might be elevated due to
-> +        * guest/vcpu trying to access same folio as another vcpu
-> +        * or because userspace is trying to access folio for same reason
-> +        *
-> +        * folio_lock serializes the transitions between (in)accessible
-> +        */
-> +       if (folio_maybe_dma_pinned(folio))
-> +               return -EBUSY;
-> +
-> +       if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
-> +               r = guest_memfd_folio_private(folio);
-> +               if (r)
-> +                       return r;
-> +       }
-> +
-> +       return 0;
-> +}
-> +
-> +static vm_fault_t gmem_fault(struct vm_fault *vmf)
-> +{
-> +       struct file *file = vmf->vma->vm_file;
-> +       struct inode *inode = file_inode(file);
-> +       const struct guest_memfd_operations *ops = inode->i_private;
-> +       struct folio *folio;
-> +       pgoff_t off;
-> +       int r;
-> +
-> +       folio = guest_memfd_grab_folio(file, vmf->pgoff, GUEST_MEMFD_GRAB_UPTODATE);
-> +       if (!folio)
-> +               return VM_FAULT_SIGBUS;
-> +
-> +       off = vmf->pgoff & (folio_nr_pages(folio) - 1);
-> +       r = ops->accessible(inode, folio, off, 1);
-> +       if (r) {
+	 * If the subsystem can't guarantee that no additional references are
+	 * taken to the pages in the range, it has to implement the
+	 * invalidate_range() notifier to remove any references taken after
+	 * invalidate_range_start().
 
-This made be stumble at first. I know you say ops->accessible returning
-0 means "this is accessible", but if I only look at this if-statement it
-reads as "if the folio is accessible, send a SIGBUS", which is not
-what's actually happening.
+	 * invalidate_range_start() is called when all pages in the
+	 * range are still mapped and have at least a refcount of one.
+	 *
+	 * invalidate_range_end() is called when all pages in the
+	 * range have been unmapped and the pages have been freed by
+	 * the VM.
 
-> +               folio_unlock(folio);
-> +               folio_put(folio);
-> +               return VM_FAULT_SIGBUS;
-> +       }
-> +
-> +       guest_memfd_folio_clear_private(folio);
-> +
-> +       vmf->page = folio_page(folio, off);
-> +
-> +       return VM_FAULT_LOCKED;
-> +}
-> +
-> +static const struct vm_operations_struct gmem_vm_ops = {
-> +       .fault = gmem_fault,
-> +};
-> +
-> +static int gmem_mmap(struct file *file, struct vm_area_struct *vma)
-> +{
-> +       const struct guest_memfd_operations *ops = file_inode(file)->i_private;
-> +
-> +       if (!ops->accessible)
-> +               return -EPERM;
-> +
-> +       /* No support for private mappings to avoid COW.  */
-> +       if ((vma->vm_flags & (VM_SHARED | VM_MAYSHARE)) !=
-> +           (VM_SHARED | VM_MAYSHARE))
-> +               return -EINVAL;
-> +
-> +       file_accessed(file);
-> +       vma->vm_ops = &gmem_vm_ops;
-> +       return 0;
-> +}
-> +
->  static long gmem_punch_hole(struct file *file, loff_t offset, loff_t len)
->  {
->         struct inode *inode = file_inode(file);
-> @@ -220,6 +298,7 @@ static int gmem_release(struct inode *inode, struct file *file)
->  static struct file_operations gmem_fops = {
->         .open = generic_file_open,
->         .llseek = generic_file_llseek,
-> +       .mmap = gmem_mmap,
->         .release = gmem_release,
->         .fallocate = gmem_fallocate,
->         .owner = THIS_MODULE,
-> 
-> --
-> 2.34.1
-> 
+The last one is key: the pages have already been freed when invalidate_rang=
+e_end()
+is called, and so unmapping at that time would be too late.
+
+> It seems counter-intuitive to me; that isn't how TLBs work. Another CPU c=
+an
+> populate a TLB entry right up to the moment the PTE is actually *changed*=
+ in
+> the page tables, and then the CPU which is modifying/zapping the PTE need=
+s to
+> perform a remote TLB flush. That remote TLB flush is analogous to the
+> invalidate_range_end() call, surely?
+
+KVM's usage isn't about (hardware) TLBs.  Ah, and the history is even somew=
+hat
+evident in the above comment I referenced.  invalidate_range() no longer ex=
+ists,
+it was morphed into arch_invalidate_secondary_tlbs().  For secondary MMUs t=
+hat
+reuse the primary MMU's PTEs, mmu_notifier_arch_invalidate_secondary_tlbs()=
+ is
+indeed called after the PTEs have been modified.
+
+KVM's usage is different.  Because KVM has its own (Secondary) PTEs (commit
+1af5a8109904 ("mmu_notifiers: rename invalidate_range notifier") calls them
+"software TLBs", but I find that to be a confusing description), zapping on=
+-demand
+when the primary PTEs are modified is tricky and ultimately undesirable.
+
+E.g. invoking mmu_notifiers while holding a PTE lock would prevent KVM from
+blocking, which can be problematic if KVM needs to zap a large number SPTEs=
+.
+
+And doing invalidation on-demand for each primary PTE would be suboptimal f=
+or
+cases where a large VMA range is unmapped/modified, e.g. KVM would get a la=
+rge
+number of invalidation events instead of one big, all-encompassing invalida=
+tion.
+
+The obvious downside is what you've run into, where the start+end approach =
+forces
+KVM to wait for all in-flight invalidations to go away.  But again, in prac=
+tice
+the rudimentary range tracking suffices for all known use cases.
+
+> I'm fairly sure that's how it works for PASID support too; nothing
+> prevents the IOMMU+device from populating an IOTLB entry until the PTE
+> is actually changed in the process page tables.
+>=20
+> So why can't we do the same for the GPC?
+>=20
+> > > But in the context of the GPC, it is only "mapped" when the ->valid b=
+it is set.=20
+> > >=20
+> > > Even the invalidation callback just clears the valid bit, and that
+> > > means nobody is allowed to dereference the ->khva any more. It doesn'=
+t
+> > > matter that the underlying (stale) PFN is still kmapped.
+> > >=20
+> > > Can we not apply the same logic to the hva_to_pfn_retry() loop? Yes, =
+it
+> > > might kmap a page that gets removed, but it's not actually created a
+> > > new mapping if it hasn't set the ->valid bit.
+> > >=20
+> > > I don't think this version quite meets the constraints, and I might
+> > > need to hook *both* the start and end notifiers, and might not like i=
+t
+> > > once I get there. But I'll have a go...
+> >=20
+> > I'm pretty sure you're going to need the range-based retry logic.=C2=A0=
+ KVM can't
+> > safely set gpc->valid until mn_active_invalidate_count reaches zero, so=
+ if a GPC
+> > refresh comes along after mn_active_invalidate_count has been elevated,=
+ it won't
+> > be able to set gpc->valid until the MADV_DONTNEED storm goes away.=C2=
+=A0 Without
+> > range-based tracking, there's no way to know if a previous invalidation=
+ was
+> > relevant to the GPC.
+>=20
+> If it is indeed the case that KVM can't just behave like a normal TLB,
+> so it and can't set gpc->valid until mn_active_invalidate_count reaches
+> zero, it still only needs to *wait* (or spin, maybe). It certainly
+> doesn't need to keep looping and remapping the same PFN over and over
+> again, as it does at the moment.
+>=20
+> When mn_active_invalidate_count does reach zero, either the young GPC
+> will have been invalidated by clearing the (to be renamed) ->validating
+> flag, or it won't have been. If it *has* been invalidated, that's when
+> hva_to_pfn_retry() needs to go one more time round its full loop.
+>=20
+> So it just needs to wait until any pending (relevant) invalidations
+> have completed, *then* check and potentially loop once more.
+>=20
+> And yes, making that *wait* range-based does make some sense, I
+> suppose. It becomes "wait for gpc->uhva not to be within the range of
+> kvm->mmu_gpc_invalidate_range_{start,end}."
+
+Yep, exactly.  Without range-based tracking, there's no way for KVM to know=
+ when
+a relevant in-flight invalidation has completed.
+
+> Except... that range can never shrink *except* when
+> mn_active_invalidate_count becomes zero, can it?
+
+Not without more sophisticated logic, no.  E.g. if KVM supported tracking m=
+ultiple
+distinct ranges, then individual invalidation ranges could be dropped.  But=
+ to
+to avoid memory allocations in invalidate_range_start(), KVM would still ne=
+ed to
+hardcode the maximum number of in-flight ranges.  E.g. even if KVM used a d=
+ynamic
+container, we'd probably want the container entries to be "allocated" out o=
+f a
+cache, and that cache would need a maximum capacity.
+
+With a max limit on the number of ranges, KVM would still be forced to comb=
+ine
+ranges if there are too many in-flight invalidations.
+
+So, because tracking a single range has sufficed for all known use cases, a=
+nd
+it's significantly simpler than tracking multiple ranges, AFAIK no one has =
+pursued
+a multi-range tracking implementation.
+
+> So if we do end up waiting, the wake condition is *still* just that the c=
+ount
+> has become zero. There's already a wakeup in that case, on kvm-
+> >mn_memslots_update_rcuwait. Can I wait on that?
+
+I suspect you're trying to solve a problem that doesn't exist in practice.
+hva_to_pfn_retry() already has a cond_resched(), so getting stuck for a lon=
+g
+duration isn't fatal, just suboptimal.  And similar to the range-based trac=
+king,
+_if_ there's a problem in practice, then it also affects guest page faults.=
+  KVM
+simply resumes the vCPU and keeps re-faulting until the in-flight invalidat=
+ion(s)
+has gone away.
+
+Not without reworking mn_memslots_update_rcuwait.  KVM assumes there is at =
+most
+one waiter, as that wait+wake combination is specifically to handle the cas=
+e where
+a _relevant_ in-flight mmu_notifier invalidation needs to block a userspace=
+ memslot
+deletion.  KVM takes mmu_lock in invalidate_range_{start,end}() if and only=
+ if
+there is an overlapping memslot, and so KVM needs to prevent a memslot from=
+ being
+deleted between start() and end().
 
