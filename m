@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-23418-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23419-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401AA9496E0
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:33:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56F7D9496E1
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:33:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 700F41C21278
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:33:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12F4A2868F6
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8F673451;
-	Tue,  6 Aug 2024 17:33:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491687346F;
+	Tue,  6 Aug 2024 17:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BBjSPEsE"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iDGoy/k7"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD4629CE5
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E97534D9FE
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722965581; cv=none; b=kiBkIpPA7nz4QpcUS7rKCPezOImn4NR5/bCkuttrTHLKRc2p1M82nV5+sqDMmT+h3KNANfWbDEiNC6YA7kjE4xlhqOAxOCfN6AOLwdxFnbr1SvQXdVeKda1yhGmlD50EEyDjkhEdI/2Omx9IX6dyA1QkGd0iNHuEllz3NsPVanU=
+	t=1722965583; cv=none; b=eympQ7J6DnUFL0lWWijPkKdYYK5EetlDW5QSANPf2D2X3zSBEW9xpqB4HjCByDb0wz2pxAw7H1M9tYCkF59sxunM+6iHH/4veGtpIiw63f1mGRnxhRkvSoTBHO5vB8gUH/NQqxJX7jLM5jiBpqtfvZq2xmQheY+puvWhVabm5Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722965581; c=relaxed/simple;
-	bh=uOJJXadgsAZq3WmO2qAZQTeIcvR/iwwubszGqZNC0PM=;
+	s=arc-20240116; t=1722965583; c=relaxed/simple;
+	bh=k31f73xLdPxzX1A1daff9oOyY3w8/pU4WG8XseWt+ho=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YA72qxRWXvyH1S6RAK5WUrtxSnMv3b4q2F6Hj6wb8TzkSoKv7HmGrivloW1ynpu1oYAtgFL1lFFnYsMX2LQHPTuoWUpNt9H6UftGkEANg85mMKXIlTouYSoQyWa0YrhrXmIoQR2DUtp4XeMXEObyZjGLxvIp+RUYMgv/CHGLIU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BBjSPEsE; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=tp6acfDRNAGXDyfDzlNemEea5GN71o3kz3j0oB9wAO76XDFx0U7WGZeQfEizWpZUh+9AuM1TPa3GOwbN8rzWbD7B/igOVtygLi5R/OvUmqUvDsf1HpfMjbQ9aVAhY2TVhe3xV+wSdjtMu7+1cx8y9N8f83nlnsV2UPJTsZe0AFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iDGoy/k7; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722965579;
+	s=mimecast20190719; t=1722965580;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=SjcpbA2sD6CYVWhEq7nq8PpqkGiIsiq71NF+s5HMhDo=;
-	b=BBjSPEsEp5W/wmu/sQ3+mREGl0C9S3r45dxWPKI72jUnWA499pjqGkQQBPGEslMdUi6Pxt
-	WWOqSNxbTcWOOeZ5b5Ew8fsrXcOhDU/TMX4oACFim7Rv9HtLV14labUYVh6uImRlgIFLgQ
-	TsyS+ypQGkEQyvVabeRbAfygwkxzTDA=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+	bh=/43rvxiHluDKPSD2ULvPBKTQ4qhQty2OCaQvduh/gz8=;
+	b=iDGoy/k7iKj/XqthrNxrmnAC5lNSK4gQ8qjNaL6titvDoaPDJ/l9mcm+LuXDAECHvE5dFK
+	HUql15dfJ9oCD0MNKQVO+SvJH9tZgen1LXXZk9FY7KQoJz9LEPSRHNjQJSUIhiddQGq5cG
+	TnZH928x2rWxisGDJlrqhGeYizUd5TI=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-682-jdUwjjb2PYOdaJpWsbZVsg-1; Tue,
- 06 Aug 2024 13:32:56 -0400
-X-MC-Unique: jdUwjjb2PYOdaJpWsbZVsg-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-615-PKl5JxhrOmm8bMkomHdUyg-1; Tue,
+ 06 Aug 2024 13:32:59 -0400
+X-MC-Unique: PKl5JxhrOmm8bMkomHdUyg-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9BE3B1955D48;
-	Tue,  6 Aug 2024 17:32:46 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0E0DA1955F0D;
+	Tue,  6 Aug 2024 17:32:56 +0000 (UTC)
 Received: from p1.localdomain.com (unknown [10.39.192.15])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id CA23019560AE;
-	Tue,  6 Aug 2024 17:32:36 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C7EB91956046;
+	Tue,  6 Aug 2024 17:32:46 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
@@ -85,9 +85,9 @@ Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
 	Thomas Huth <thuth@redhat.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Leif Lindholm <quic_llindhol@quicinc.com>
-Subject: [PATCH v2 6/9] tests/avocado/boot_xen.py: fetch kernel during test setUp()
-Date: Tue,  6 Aug 2024 13:31:16 -0400
-Message-ID: <20240806173119.582857-7-crosa@redhat.com>
+Subject: [PATCH v2 7/9] tests/avocado/tuxrun_baselines.py: use Avocado's zstd support
+Date: Tue,  6 Aug 2024 13:31:17 -0400
+Message-ID: <20240806173119.582857-8-crosa@redhat.com>
 In-Reply-To: <20240806173119.582857-1-crosa@redhat.com>
 References: <20240806173119.582857-1-crosa@redhat.com>
 Precedence: bulk
@@ -99,57 +99,63 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-The kernel is a common blob used in all tests.  By moving it to the
-setUp() method, the "fetch asset" plugin will recognize the kernel and
-attempt to fetch it and cache it before the tests are started.
+This makes use of the avocado.utils.archive support for zstd.
 
+In order to not duplicate code, the skip condition uses a private
+utility from the module which is going to become public in Avocado
+versions 103.1 LTS (and also in versions >= 107.0).
+
+Reference: https://github.com/avocado-framework/avocado/pull/5996
+Reference: https://github.com/avocado-framework/avocado/pull/5953
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/avocado/boot_xen.py | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+ tests/avocado/tuxrun_baselines.py | 16 ++++++----------
+ 1 file changed, 6 insertions(+), 10 deletions(-)
 
-diff --git a/tests/avocado/boot_xen.py b/tests/avocado/boot_xen.py
-index f29bc58b9e..490a127a3e 100644
---- a/tests/avocado/boot_xen.py
-+++ b/tests/avocado/boot_xen.py
-@@ -30,23 +30,22 @@ class BootXen(LinuxKernelTest):
-     timeout = 90
-     XEN_COMMON_COMMAND_LINE = 'dom0_mem=128M loglvl=all guest_loglvl=all'
+diff --git a/tests/avocado/tuxrun_baselines.py b/tests/avocado/tuxrun_baselines.py
+index 736e4aa289..bd02e88ed6 100644
+--- a/tests/avocado/tuxrun_baselines.py
++++ b/tests/avocado/tuxrun_baselines.py
+@@ -17,6 +17,7 @@
+ from avocado_qemu import QemuSystemTest
+ from avocado_qemu import exec_command, exec_command_and_wait_for_pattern
+ from avocado_qemu import wait_for_console_pattern
++from avocado.utils import archive
+ from avocado.utils import process
+ from avocado.utils.path import find_command
  
--    def fetch_guest_kernel(self):
-+    def setUp(self):
-+        super(BootXen, self).setUp()
-+
-         # Using my own built kernel - which works
-         kernel_url = ('https://fileserver.linaro.org/'
-                       's/JSsewXGZ6mqxPr5/download?path=%2F&files='
-                       'linux-5.9.9-arm64-ajb')
-         kernel_sha1 = '4f92bc4b9f88d5ab792fa7a43a68555d344e1b83'
--        kernel_path = self.fetch_asset(kernel_url,
--                                       asset_hash=kernel_sha1)
+@@ -40,17 +41,12 @@ def get_tag(self, tagname, default=None):
+ 
+         return default
+ 
++    @skipUnless(archive._probe_zstd_cmd(),
++                'Could not find "zstd", or it is not able to properly '
++                'decompress decompress the rootfs')
+     def setUp(self):
+         super().setUp()
+ 
+-        # We need zstd for all the tuxrun tests
+-        # See https://github.com/avocado-framework/avocado/issues/5609
+-        zstd = find_command('zstd', False)
+-        if zstd is False:
+-            self.cancel('Could not find "zstd", which is required to '
+-                        'decompress rootfs')
+-        self.zstd = zstd
 -
--        return kernel_path
-+        self.kernel_path = self.fetch_asset(kernel_url,
-+                                            asset_hash=kernel_sha1)
+         # Process the TuxRun specific tags, most machines work with
+         # reasonable defaults but we sometimes need to tweak the
+         # config. To avoid open coding everything we store all these
+@@ -99,8 +95,8 @@ def fetch_tuxrun_assets(self, csums=None, dt=None):
+                                          asset_hash = isum,
+                                          algorithm = "sha256")
  
-     def launch_xen(self, xen_path):
-         """
-         Launch Xen with a dom0 guest kernel
-         """
-         self.log.info("launch with xen_path: %s", xen_path)
--        kernel_path = self.fetch_guest_kernel()
+-        cmd = f"{self.zstd} -d {disk_image_zst} -o {self.workdir}/rootfs.ext4"
+-        process.run(cmd)
++        archive.extract(disk_image_zst, os.path.join(self.workdir,
++                                                     "rootfs.ext4"))
  
-         self.vm.set_console()
- 
-@@ -56,7 +55,7 @@ def launch_xen(self, xen_path):
-                          '-append', self.XEN_COMMON_COMMAND_LINE,
-                          '-device',
-                          'guest-loader,addr=0x47000000,kernel=%s,bootargs=console=hvc0'
--                         % (kernel_path))
-+                         % (self.kernel_path))
- 
-         self.vm.launch()
- 
+         if dt:
+             dsum = csums.get(dt, None)
 -- 
 2.45.2
 
