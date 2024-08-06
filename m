@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-23416-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23417-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFEA19496DB
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:32:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C89F9496DC
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:32:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A94CE284C7D
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:32:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 180A21F2442D
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 718EE52F9B;
-	Tue,  6 Aug 2024 17:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD6B65B1FB;
+	Tue,  6 Aug 2024 17:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EacumavA"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XATz4wQL"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DDF64AEF4
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:32:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBCE38DE1
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722965555; cv=none; b=EaIJTSKisDAe50qs9Iz/kkTFi7rpGVEmXc4fJglWkhhHV1w7Z0lvoA6plvHMQS6+3JqaUfD3d/gj4FBzEpw5EXLIwOKCuRAg8mSoY1gExdERQQwoHsZ5PUE7412TMOAKDrIO90WTOgzCKpxr9iTwn26uF68XodcTqwn9kOBudBI=
+	t=1722965566; cv=none; b=XtuPzSN7zUyH4P2GfA3gmvx4Lkuw+ZxmCoGS5gLE4cn1TcsW6quwrSX3mDug3a1P++zF58Uc0TPFoH4bVFTc+3tT/nNk8wNnI26VbUPUJQOMFBok4W3rqjzKft9SdE0l+Pq8Szp1IcZhWxJYRgkrmZWTzGq+8TmUIbFuj2l9mEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722965555; c=relaxed/simple;
-	bh=OhzYNbZPzGg77MDx/pheT2uHbetV90+v1AP9GbtrVtI=;
+	s=arc-20240116; t=1722965566; c=relaxed/simple;
+	bh=FsuQNbQBP2SBdeZ94q7ludvQR7YYJ9Xh0f8eZsY4x7U=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z+n8cvckuPR0cfA2wma2IJ+j7D1dVgngMd2+O7RMkaFD4lhna/5T5a0ifb04HvAS7qBiJhvdIxIJqK3ytwC+S/hNicAczXW/VRhJQdwwOaCKNyhWuOR/JoVVYDV108OWkwbf+a0AQzz/+mY9vE2DIqcCP3xNRTQAQxJVfm78hRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EacumavA; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=mYSGcVhSKv+xCdrzNPbMamQo6DYxLHI7k8YdqnBrJCy0me/N6t561oqxsfghg2Xt5RIQRvBbHIYUOqdLtMNz3edb/YKDUnGqimwQ/teyslsBP2wBsVLA/Qnya4A8468gSLj1HTNj9mYn7VuqqObEgZf90hSLHhCH0TLBMMim52g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XATz4wQL; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722965553;
+	s=mimecast20190719; t=1722965563;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KL0H1z5/pg3dizYMSsFK6oSLNICej54wUK//KBAoyq8=;
-	b=EacumavArqJQAHHLIAZVw/W0V/2RCdX+a+L73LJ51kTYeLe+amc0sbupXqzMOJ7dsdyc/R
-	qakByiJtJ+Kzc39ist11KgWQ0h/5Qyscyg5jmLxzfpJ1rDTuJRnwZ4/TUXWDQUoznfBdts
-	pLqeD542CC5eJaHL9qQ7RDrUosk3Mws=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+	bh=01Mezu2vBS7e/Bbaib7lIYgCl8rkcleLFRElcDYTArc=;
+	b=XATz4wQLgQ8ICgGPDf+/zGd7zuIWWesdIdw1S81ovTCm0ecweuBEYxlOp6AYlBBxsOzCOa
+	d9VGUj+bHqSHTa2OHDPyVebRtffJu+nNMtt/IuKdlw2z21MZqE+lFVsTcAl1rxI8B+T5IO
+	ChRXb2yY73tNOmMcDz3iX2Ykt/YkWn8=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-459-9eWeJM_pNJ6UG27hhqXTPg-1; Tue,
- 06 Aug 2024 13:32:29 -0400
-X-MC-Unique: 9eWeJM_pNJ6UG27hhqXTPg-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-294-zxumTil8PJCidnFK9zrJIg-1; Tue,
+ 06 Aug 2024 13:32:40 -0400
+X-MC-Unique: zxumTil8PJCidnFK9zrJIg-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 76C5C1955BED;
-	Tue,  6 Aug 2024 17:32:26 +0000 (UTC)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4F6CD1955D45;
+	Tue,  6 Aug 2024 17:32:36 +0000 (UTC)
 Received: from p1.localdomain.com (unknown [10.39.192.15])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 7B3E21956046;
-	Tue,  6 Aug 2024 17:32:14 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C21A419560AE;
+	Tue,  6 Aug 2024 17:32:26 +0000 (UTC)
 From: Cleber Rosa <crosa@redhat.com>
 To: qemu-devel@nongnu.org
 Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
@@ -85,9 +85,9 @@ Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
 	Thomas Huth <thuth@redhat.com>,
 	=?UTF-8?q?Alex=20Benn=C3=A9e?= <alex.bennee@linaro.org>,
 	Leif Lindholm <quic_llindhol@quicinc.com>
-Subject: [PATCH v2 4/9] tests/avocado: machine aarch64: standardize location and RO access
-Date: Tue,  6 Aug 2024 13:31:14 -0400
-Message-ID: <20240806173119.582857-5-crosa@redhat.com>
+Subject: [PATCH v2 5/9] tests/avocado: simplify parameters on fetch_asset with name only
+Date: Tue,  6 Aug 2024 13:31:15 -0400
+Message-ID: <20240806173119.582857-6-crosa@redhat.com>
 In-Reply-To: <20240806173119.582857-1-crosa@redhat.com>
 References: <20240806173119.582857-1-crosa@redhat.com>
 Precedence: bulk
@@ -99,63 +99,43 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-The tests under machine_aarch64_virt.py and machine_aarch64_sbsaref.py
-should not be writing to the ISO files.  By adding "media=cdrom" the
-"ro" is autmatically set.
+When an asset has a single location, it's possible to use that
+URI as the name of the asset.
 
-While at it, let's use a single code style and hash for the ISO url.
+Reference: https://avocado-framework.readthedocs.io/en/103.0/api/utils/avocado.utils.html#avocado.utils.asset.Asset
+Reference: https://avocado-framework.readthedocs.io/en/103.0/api/test/avocado.html#avocado.Test.fetch_asset
 
 Signed-off-by: Cleber Rosa <crosa@redhat.com>
 ---
- tests/avocado/machine_aarch64_sbsaref.py |  2 +-
- tests/avocado/machine_aarch64_virt.py    | 14 +++++++-------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ tests/avocado/kvm_xen_guest.py  | 2 +-
+ tests/avocado/netdev-ethtool.py | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/tests/avocado/machine_aarch64_sbsaref.py b/tests/avocado/machine_aarch64_sbsaref.py
-index e920bbf08c..756f316ac9 100644
---- a/tests/avocado/machine_aarch64_sbsaref.py
-+++ b/tests/avocado/machine_aarch64_sbsaref.py
-@@ -129,7 +129,7 @@ def boot_alpine_linux(self, cpu):
-             "-cpu",
-             cpu,
-             "-drive",
--            f"file={iso_path},format=raw",
-+            f"file={iso_path},media=cdrom,format=raw",
-         )
+diff --git a/tests/avocado/kvm_xen_guest.py b/tests/avocado/kvm_xen_guest.py
+index f8cb458d5d..b6ee1ff752 100644
+--- a/tests/avocado/kvm_xen_guest.py
++++ b/tests/avocado/kvm_xen_guest.py
+@@ -40,7 +40,7 @@ def get_asset(self, name, sha1):
+         url = base_url + name
+         # use explicit name rather than failing to neatly parse the
+         # URL into a unique one
+-        return self.fetch_asset(name=name, locations=(url), asset_hash=sha1)
++        return self.fetch_asset(name=url, asset_hash=sha1)
  
-         self.vm.launch()
-diff --git a/tests/avocado/machine_aarch64_virt.py b/tests/avocado/machine_aarch64_virt.py
-index a90dc6ff4b..6831d2c0ed 100644
---- a/tests/avocado/machine_aarch64_virt.py
-+++ b/tests/avocado/machine_aarch64_virt.py
-@@ -37,13 +37,13 @@ def test_alpine_virt_tcg_gic_max(self):
-         :avocado: tags=machine:virt
-         :avocado: tags=accel:tcg
-         """
--        iso_url = ('https://dl-cdn.alpinelinux.org/'
--                   'alpine/v3.17/releases/aarch64/'
--                   'alpine-standard-3.17.2-aarch64.iso')
-+        iso_url = (
-+            "https://dl-cdn.alpinelinux.org/"
-+            "alpine/v3.17/releases/aarch64/alpine-standard-3.17.2-aarch64.iso"
-+        )
+     def common_vm_setup(self):
+         # We also catch lack of KVM_XEN support if we fail to launch
+diff --git a/tests/avocado/netdev-ethtool.py b/tests/avocado/netdev-ethtool.py
+index 5f33288f81..7345ded28c 100644
+--- a/tests/avocado/netdev-ethtool.py
++++ b/tests/avocado/netdev-ethtool.py
+@@ -27,7 +27,7 @@ def get_asset(self, name, sha1):
+         url = base_url + name
+         # use explicit name rather than failing to neatly parse the
+         # URL into a unique one
+-        return self.fetch_asset(name=name, locations=(url), asset_hash=sha1)
++        return self.fetch_asset(name=url, asset_hash=sha1)
  
--        # Alpine use sha256 so I recalculated this myself
--        iso_sha1 = '76284fcd7b41fe899b0c2375ceb8470803eea839'
--        iso_path = self.fetch_asset(iso_url, asset_hash=iso_sha1)
-+        iso_hash = "5a36304ecf039292082d92b48152a9ec21009d3a62f459de623e19c4bd9dc027"
-+        iso_path = self.fetch_asset(iso_url, algorithm="sha256", asset_hash=iso_hash)
- 
-         self.vm.set_console()
-         kernel_command_line = (self.KERNEL_COMMON_COMMAND_LINE +
-@@ -60,7 +60,7 @@ def test_alpine_virt_tcg_gic_max(self):
-         self.vm.add_args("-smp", "2", "-m", "1024")
-         self.vm.add_args('-bios', os.path.join(BUILD_DIR, 'pc-bios',
-                                                'edk2-aarch64-code.fd'))
--        self.vm.add_args("-drive", f"file={iso_path},format=raw")
-+        self.vm.add_args("-drive", f"file={iso_path},media=cdrom,format=raw")
-         self.vm.add_args('-device', 'virtio-rng-pci,rng=rng0')
-         self.vm.add_args('-object', 'rng-random,id=rng0,filename=/dev/urandom')
+     def common_test_code(self, netdev, extra_args=None):
  
 -- 
 2.45.2
