@@ -1,200 +1,275 @@
-Return-Path: <kvm+bounces-23300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5308C9486F0
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 03:17:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 374309486F3
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 03:18:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6CD91C21CA3
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 01:17:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 570DE1C221CC
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 01:18:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4129F4ED;
-	Tue,  6 Aug 2024 01:16:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FDAFA947;
+	Tue,  6 Aug 2024 01:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h8xBPOmK"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9ACDF42;
-	Tue,  6 Aug 2024 01:16:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722907004; cv=none; b=BEuabeh9vBagyzDh6n+EJSGFJ1p5snhObStYrTWbRIT/pZiTDdr86QuuR0M44Jns7kSGtDLhjgGE/NocK0SlBYcJeeWbe4TnzeSiDDrIMU4ZTp1N3AwbBVwRTVrU2f1DtGWa2NLmMIc4AF+bC6qoUNc12JYvzkcqrMF+8vETolU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722907004; c=relaxed/simple;
-	bh=f+cJnRA0D41KdlZZAwfr/fC1+z2E24XEyE8wtlLvSzY=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Rd/aBxDdg0wXqeP0xz5fa3U7i264/Oe3qy5mW8kqa90zRWiAmn5GwFlPng4L4j4SzVH+oMRYx56aR8ChwsOAjR7aXYGoVTz96AZTRSQSrbtHOjLuy/M3Qa9jHyu9JYL4lAvjTs/tTL3EY8WMWJm6NokKozFOh5pSJbEbcWxJLn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8BxrOp2ebFm5VkIAA--.28228S3;
-	Tue, 06 Aug 2024 09:16:38 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMAxVOBvebFm_VgFAA--.28281S3;
-	Tue, 06 Aug 2024 09:16:33 +0800 (CST)
-Subject: Re: [PATCH v12 64/84] KVM: LoongArch: Mark "struct page" pfns dirty
- only in "slow" page fault path
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
- Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
- <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
- Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
- Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
- loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
- linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
- David Matlack <dmatlack@google.com>, David Stevens <stevensd@chromium.org>
-References: <20240726235234.228822-1-seanjc@google.com>
- <20240726235234.228822-65-seanjc@google.com>
- <a039b758-d4e3-3798-806f-25bceb2f33a5@loongson.cn>
- <Zq00OYowF5kc9QFE@google.com>
- <345d89c1-4f31-6b49-2cd4-a0696210fa7c@loongson.cn>
- <ZrFezgVbCI3DRQH3@google.com>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <d673ec04-5445-6233-81e2-49863d044bf0@loongson.cn>
-Date: Tue, 6 Aug 2024 09:16:30 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 409AE64A;
+	Tue,  6 Aug 2024 01:18:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722907127; cv=fail; b=jrMaORAMBRK25rnB1qmAZi9crKegHh0Ny4gqCVOrISE5f74flx0USyzLUCGDZimS+MEniCI8zz6qRDh3r80AzQPXIS1UObxgz4G71NF8XfqVh6ZeQLyVV1TYWx3JpxcrX7JDApuE0HBOw62pw8nH/Wp6/6k5RaZUTyIpaxD8mwU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722907127; c=relaxed/simple;
+	bh=/gWestSb2RGqWRMntNsal321sUP696tpI9DlZcMV9QY=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=J8bwQEhybl28mzGtbTI4wt3stXoAGSDEo5gE5WYi03p0Yd8MtocRixitRCoWGdTX8mfKksiZeYOL6qNdIQuOYNj40gvyFQpLSKMwq8YdCp15DPC36JJI+t+74nz11M+9niyAW1XOrrI47pmtJCMbmqFtrxHRU+dt8y2FnX6qcsc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h8xBPOmK; arc=fail smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722907125; x=1754443125;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=/gWestSb2RGqWRMntNsal321sUP696tpI9DlZcMV9QY=;
+  b=h8xBPOmK/iRChCmioxCRuKoDQRSvkBQH0+pff8C2/XHhghH2WH5xu+eN
+   CJ23jeikuN0HpMgvHSWFqStVGVn/DhMJI9h4PA0G6nXjA1PThUpHsZkAF
+   ewokqSG8+37yj21bW5McSRWhFeFGw/4/ieOlDiUECRLXwoK/NDXpxf7/Z
+   srSjzlrRx0fD3oA1DU4RrYSAYCYzRQivbcQ9yZzlhvCNjVlRXMuSSYzrM
+   XKE8RB+MZOH8hbWr+E6Xm4phJf/faZ3qUr8rPnpSEoLFZi5zSS0kecQrp
+   sH6psIP2N3w2GJIWeQIAwmMLrYbwk+p4G9CLM4wYuQSyu+OKq+L49oPNY
+   Q==;
+X-CSE-ConnectionGUID: 8D4T/4BTRV2wnfnxVcRnVg==
+X-CSE-MsgGUID: 6b7olBmlQI2XbznAa59Usw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="24765461"
+X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
+   d="scan'208";a="24765461"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 18:18:44 -0700
+X-CSE-ConnectionGUID: eDF0/1GUSje+49qkXcelQw==
+X-CSE-MsgGUID: eygc4IO1RbaRvUnJY0fnRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
+   d="scan'208";a="56435883"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Aug 2024 18:18:44 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 5 Aug 2024 18:18:44 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 5 Aug 2024 18:18:43 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 5 Aug 2024 18:18:43 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 5 Aug 2024 18:18:43 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MPbIoHCzFs9ad6nUt1zvBbQ54gxF17fFnQLXZxIkDwGPTdznJUwdEXKr858omalNWZhPSSy+3VwO7rYXm9xDa0+LjyFYaXRYUga7CJHMq1z8MySGA9RMDrK+Lc9QlZglD5HggYpTSY6ke/fLQQ8yOAAS6OjPtWgtgtTGi1C01daakyp+bWZU5imhODW9IxlV8YTvR5v6+ZEsjsAsoiYvzzDeU0/8lpo6K6ELGFS84utnODVl1jg3knbtkqVd5bb902tktH5b4tMfksNKhev9RJ5g8sd+GV4ixea6Xs32Ztg5pvzaIqV6QdsF68SiPM2RHYouZleYpEfxuEb86j2Kvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+2YXjuMRV8R29Lhto0+Tka8xxkzz/Xk/y1SRXdb2bFI=;
+ b=DzlkwXIDKOFRH0+97PULxrwvGcVQuhy4PDTA6MxXeHhaDsWSmnYbk4mHYiIUe4ZgJ8006xCmDb9OzpwsQ9a91PwscEt6potqs9qPrXKF0hMXRtwgbkBSLzaaG81eLS8KFPCo4igILsI1VxEwvrBvqRYNJwsAAubQlUTJn9sIesbIysfYvFCWV+oD4Dso0Nd8xIGWNDurJrK09E6pjqGAVDWENZjHcEM33XdjQYiEx5SL/weTIYDD6t65wJcZdUKXsjJqpL53Lc7clTAImipDtBbmHhPQCuW1V2Iw2Dgxzcs8yxA814hk1W7Iz6ZhUtfxSwJMzGvYz/U+1Bf0yrbCsA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com (2603:10b6:610:1ce::13)
+ by CY8PR11MB7845.namprd11.prod.outlook.com (2603:10b6:930:72::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.26; Tue, 6 Aug
+ 2024 01:18:41 +0000
+Received: from CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b]) by CH3PR11MB8660.namprd11.prod.outlook.com
+ ([fe80::cfad:add4:daad:fb9b%6]) with mapi id 15.20.7828.023; Tue, 6 Aug 2024
+ 01:18:41 +0000
+Date: Tue, 6 Aug 2024 09:18:30 +0800
+From: Chao Gao <chao.gao@intel.com>
+To: Maxim Levitsky <mlevitsk@redhat.com>
+CC: <kvm@vger.kernel.org>, Sean Christopherson <seanjc@google.com>, "Dave
+ Hansen" <dave.hansen@linux.intel.com>, Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, "H. Peter
+ Anvin" <hpa@zytor.com>, <linux-kernel@vger.kernel.org>, Paolo Bonzini
+	<pbonzini@redhat.com>, <x86@kernel.org>
+Subject: Re: [PATCH v3 2/2] VMX: reset the segment cache after segment
+ initialization in vmx_vcpu_reset
+Message-ID: <ZrF55uIvX2rcHtSW@chao-email>
+References: <20240725175232.337266-1-mlevitsk@redhat.com>
+ <20240725175232.337266-3-mlevitsk@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240725175232.337266-3-mlevitsk@redhat.com>
+X-ClientProxiedBy: SG2PR04CA0185.apcprd04.prod.outlook.com
+ (2603:1096:4:14::23) To CH3PR11MB8660.namprd11.prod.outlook.com
+ (2603:10b6:610:1ce::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZrFezgVbCI3DRQH3@google.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMAxVOBvebFm_VgFAA--.28281S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW3WryUCFyxZw4kJrWxJr4kXwc_yoW7WF1rpF
-	W8CFWqkrs8Jr1Fyr9rtwsIvryYk39rKr4xXa47J34Yk3Wqvr12qF18W3yfWFyUA3yfC3WS
-	qr4UtF9xuFW5AwcCm3ZEXasCq-sJn29KB7ZKAUJUUUUt529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUPFb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07AIYI
-	kI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWUtVWr
-	XwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI48JMx
-	k0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vIr41l
-	4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxV
-	WUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI
-	7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r
-	4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI
-	42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUShiSDUUUU
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR11MB8660:EE_|CY8PR11MB7845:EE_
+X-MS-Office365-Filtering-Correlation-Id: c6c27e6d-b2b0-4b7a-0be6-08dcb5b5b523
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?6jPEvnsfbxkEo5d9K4YNiTlTImRt1CBCMBrZyZghgcVVt+YHe8nBQa9i4baE?=
+ =?us-ascii?Q?4jVwQc8dnBnjLB8P9Yoj0nXSUfwlLIm6F0OGU5pKC31oEejpej3QzCWqm1Wk?=
+ =?us-ascii?Q?lFwcR+6zaYeZxmS1jPRdCOEVEb31OWSptmJTth/7qQWt2xdZpmG4DjPN+oo8?=
+ =?us-ascii?Q?q99YWskRMOgo9rDyGnhs3pQh8+68pXXlGHAhUp1BOreMeGlMR+7l+mkheCNM?=
+ =?us-ascii?Q?xRkX4ZgavjcHppVmdQLbqqKIog94ZLchTCHiCJef1PtmvHAea7085mfkpTv0?=
+ =?us-ascii?Q?y98Fn0bnFwchbY2HtwlD/34+vpk2yGEiuCvB1hsambrmNhZ5JRwGT93KK5X3?=
+ =?us-ascii?Q?LnzXUnKx/CT3XGpn6AQZtYMGR+SmSX5JdHvul++yfgUtHYeg20p7u4K8ay0F?=
+ =?us-ascii?Q?JhWj1PECzKsAl3XBoqPiuzVkuiEFRjOZQG4RjeWNrxV6vqfF/6c0lE+GV19z?=
+ =?us-ascii?Q?bHwoiHypm7jLQ0Eh2cTvYNNXI43IN3eckHD+Z+Gf9vpF+pMvVxHxGF9dLbdo?=
+ =?us-ascii?Q?bhcp44RW1XZHQITV60m78Kk5EvW2sW/arpgaxQ2CUT5wFsONCO3SVWN3w2j9?=
+ =?us-ascii?Q?hpKRxSD1JvrzQDV0FhMsztV4FzjVQ8l4GK+2uvWCytKl72e50BpcGk5lMaez?=
+ =?us-ascii?Q?1FPR2Q1tiVhqvegxFhUb4scStzVfEH90wvU5fA/yeMVvgnvLQ0RTFsBnDAyn?=
+ =?us-ascii?Q?8CLZMXabT2G00qdteK/EfCGZIkZXIclyCduoHoPdnn4Grm1E3T7woxqK4vE+?=
+ =?us-ascii?Q?zhIfmkwB/gv874AAn1zD4SF6J1rbk//wyisZoTEomf/NnTZWWPy3iApLTSsk?=
+ =?us-ascii?Q?de1HB3lJXtQyfNWHg+fy8iT1vy5M0RegxPAk42uGfz/0uIxTIjDQ9IythNO/?=
+ =?us-ascii?Q?WIhlB6oYq87RQb94dhncK9sBADWuP+9ah0Kn4eJjnMcK4ljf1nyQzJNwQoNC?=
+ =?us-ascii?Q?LOVx1KK+mDasJgyRUVsCAkRV4nWOmD7LIccwkFipxe81w6wjdlGFNDRXiyzf?=
+ =?us-ascii?Q?9wq6GE3RdPjLL5dGyTut41b4QdiIwN+tONqrODDChNTf0TvXTFoKQYA+n1Eh?=
+ =?us-ascii?Q?TarZQeEYBdQtC3MTAARwU95xz9rgcSerOb50VnaABD3BjUe0/E3ioGcKB7ei?=
+ =?us-ascii?Q?MvuAhk7ZZVfa32WVAAy5E918DF348iitfODLZReHpKNjUPs5SORHkLzm/hIq?=
+ =?us-ascii?Q?HxbdctemkD1L2XSTKtzhIXPwgI6IGtQuvYhcYON8utoXIm+NsRDLKuyROjXo?=
+ =?us-ascii?Q?5mCQRtcN7CNI1M17xj9V6sITgIs4eoXneUS3YfdEBXjFPaudG+JAs+XNdNTp?=
+ =?us-ascii?Q?nqWcyIImDntRVx6Zzin1MkymlT0vK8hpMrvtLn5dwFBYPw=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8660.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?iLcloc/XJLdN16Y3aMhqe68mVZpy5OnkKJ9AisdVuQ2OLIesyZVDgkU5iaz8?=
+ =?us-ascii?Q?8zGZzm8k4FCmC9/45xdHXEPTPaYEYmukhrRjmM8JD6VTO6i1gW7tgqzyjNot?=
+ =?us-ascii?Q?8+9NUKayrofn0I6FGlw0vuh0YhSMVpD6BL1AQ/eIY4k/qD1xaNf1F8m/hJ1G?=
+ =?us-ascii?Q?HM3PSbJAnpa7pnbbse6gXFz2QDrIflTbfgyfgw0loJs8Eo3/cnC3mbNA0zLc?=
+ =?us-ascii?Q?CTS3qjfADFLvptFI9+MDk02MxW0TxEwh13PCj9aJx1NGNV0hilBaMIh5uh+A?=
+ =?us-ascii?Q?IPQ0KinW6BO4Py8D/1kx7WHwxd+dcYnkoZbR4hjPSmDe3+22KMXzc9FnvmNH?=
+ =?us-ascii?Q?IUvI4NTL0piscqC2FhkpCevOXNCOQ0tNVp55ucc6147jx36MWXYzO7Z1Zd8q?=
+ =?us-ascii?Q?vTS1Bcr3AJ9hevvuau/6qG+cUt7H9q1m/a8haPgwZ9vOm1/WFhzttRNlPdVq?=
+ =?us-ascii?Q?BPvf+6v/TTigvPmVMnl7el9FYBjt1fzC9rrm5CZL6wv3Uzcs4jlt5BncSwW8?=
+ =?us-ascii?Q?hSEdsa6Y7YraJbQ4l/AzHeHHbdymKEM+Le8cE03yiPOMv9KjXhyuZZiNvDae?=
+ =?us-ascii?Q?Q8bsAIhwsHdANgDL47fYEg1dci9Hgz9K4FqKBx/VNom1MMLnbfXd2ksoyevL?=
+ =?us-ascii?Q?UEcKeLXcmfJLpmWyl01B9WuJvK1Mk1kI+PDRmDNC67Mxs1jkmKgk+6n3KIg+?=
+ =?us-ascii?Q?NGlgQ1JDbzS7/g2QSOZ6vtcEoL7YA6XoH9naPWN467qdArrAeI3X033shBta?=
+ =?us-ascii?Q?cklo/FqsQV6TugqMp7BCrsQvBt5e1b3bybGWl/IbL7b6NHbKi59WAQwHK42/?=
+ =?us-ascii?Q?YvoVrCWAjIbtPyho9JXqTXCf2663EPXiwye0gbgTkZnT+WcItD1ZiZ9PtQhn?=
+ =?us-ascii?Q?kLlQS78gimjMSQf6bGTdW3qVj7XmHoLRKybmjUen7uBmZJwQkiM/aDOTVQlw?=
+ =?us-ascii?Q?0oD0EhVH1By3YfwG7SHwc9WmVPoly2BNxRfDv0L6hPO/p7l76j15VfDzt8pe?=
+ =?us-ascii?Q?NsmWlPMKHScII6h9Sb9xQGzDaT22Hi3l3aZm42+t6tWWJlO+eTfcRixj2Ydx?=
+ =?us-ascii?Q?i4ztSvJZS4l1D2b5mjIzPO9hNkwYPaX0yArADVflRmPzh48yW9DtKcqjlaOm?=
+ =?us-ascii?Q?ueL4hhHz6gmJsuYL2mdg53FhrUn4bMjQW7XD3laV1UN+R40EvkwBF6OleMiQ?=
+ =?us-ascii?Q?u+nWeiSg1Ktui1UEbaA9jCYqp6EpU5DI2XaeQ6Fz84o7FIdqwGbP1PBRO9Pl?=
+ =?us-ascii?Q?ETd9vL7VJ0jPHWC6v4urFDxAt9dNvNzDHJGxa0i08CAUyVN6zPjSQ7EyOQOW?=
+ =?us-ascii?Q?6Y9CuU46pbVvswPAAKI42TyujgWHR8smmwKJN9dSxHfSvvzBuHvDbunDhI1w?=
+ =?us-ascii?Q?yrgBSZNvmPZweQiTAO2oQl5n1CcbcKZCzyRgVHfkYH7sNcp2z/+gtVjycebw?=
+ =?us-ascii?Q?6qmlYf8+n7wthEks+WuYXKjTpaUQPRccMasiWsssr84xS3J71fzM7rqIDxzT?=
+ =?us-ascii?Q?aNEg9cGn7LzO8ED2dfmde3g+rg1Uyl1S+UZocA9CRmSshUKrYp50JkMiAS/I?=
+ =?us-ascii?Q?TxJrsxTLlxjUFOrcyWtb6xsKc64WF4Xes5QA5E1G?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6c27e6d-b2b0-4b7a-0be6-08dcb5b5b523
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8660.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2024 01:18:41.6298
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GbZUZ9DRYvi/rw6Zs208biwUqqceJ7P6DOdRksolBev0qXAV0TlLoNq/tWffjdojSwbAphmhEIenqGl7GsOS4A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7845
+X-OriginatorOrg: intel.com
 
+On Thu, Jul 25, 2024 at 01:52:32PM -0400, Maxim Levitsky wrote:
 
+KVM: VMX:
 
-On 2024/8/6 上午7:22, Sean Christopherson wrote:
-> On Sat, Aug 03, 2024, maobibo wrote:
->> On 2024/8/3 上午3:32, Sean Christopherson wrote:
->>> On Fri, Aug 02, 2024, maobibo wrote:
->>>> On 2024/7/27 上午7:52, Sean Christopherson wrote:
->>>>> Mark pages/folios dirty only the slow page fault path, i.e. only when
->>>>> mmu_lock is held and the operation is mmu_notifier-protected, as marking a
->>>>> page/folio dirty after it has been written back can make some filesystems
->>>>> unhappy (backing KVM guests will such filesystem files is uncommon, and
->>>>> the race is minuscule, hence the lack of complaints).
->>>>>
->>>>> See the link below for details.
->>>>>
->>>>> Link: https://lore.kernel.org/all/cover.1683044162.git.lstoakes@gmail.com
->>>>> Signed-off-by: Sean Christopherson <seanjc@google.com>
->>>>> ---
->>>>>     arch/loongarch/kvm/mmu.c | 18 ++++++++++--------
->>>>>     1 file changed, 10 insertions(+), 8 deletions(-)
->>>>>
->>>>> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
->>>>> index 2634a9e8d82c..364dd35e0557 100644
->>>>> --- a/arch/loongarch/kvm/mmu.c
->>>>> +++ b/arch/loongarch/kvm/mmu.c
->>>>> @@ -608,13 +608,13 @@ static int kvm_map_page_fast(struct kvm_vcpu *vcpu, unsigned long gpa, bool writ
->>>>>     		if (kvm_pte_young(changed))
->>>>>     			kvm_set_pfn_accessed(pfn);
->>>>> -		if (kvm_pte_dirty(changed)) {
->>>>> -			mark_page_dirty(kvm, gfn);
->>>>> -			kvm_set_pfn_dirty(pfn);
->>>>> -		}
->>>>>     		if (page)
->>>>>     			put_page(page);
->>>>>     	}
->>>>> +
->>>>> +	if (kvm_pte_dirty(changed))
->>>>> +		mark_page_dirty(kvm, gfn);
->>>>> +
->>>>>     	return ret;
->>>>>     out:
->>>>>     	spin_unlock(&kvm->mmu_lock);
->>>>> @@ -915,12 +915,14 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
->>>>>     	else
->>>>>     		++kvm->stat.pages;
->>>>>     	kvm_set_pte(ptep, new_pte);
->>>>> -	spin_unlock(&kvm->mmu_lock);
->>>>> -	if (prot_bits & _PAGE_DIRTY) {
->>>>> -		mark_page_dirty_in_slot(kvm, memslot, gfn);
->>>>> +	if (writeable)
->>>> Is it better to use write or (prot_bits & _PAGE_DIRTY) here?  writable is
->>>> pte permission from function hva_to_pfn_slow(), write is fault action.
->>>
->>> Marking folios dirty in the slow/full path basically necessitates marking the
->>> folio dirty if KVM creates a writable SPTE, as KVM won't mark the folio dirty
->>> if/when _PAGE_DIRTY is set.
->>>
->>> Practically speaking, I'm 99.9% certain it doesn't matter.  The folio is marked
->>> dirty by core MM when the folio is made writable, and cleaning the folio triggers
->>> an mmu_notifier invalidation.  I.e. if the page is mapped writable in KVM's
->> yes, it is. Thanks for the explanation. kvm_set_pfn_dirty() can be put only
->> in slow page fault path. I only concern with fault type, read fault type can
->> set pte entry writable however not _PAGE_DIRTY at stage-2 mmu table.
->>
->>> stage-2 PTEs, then its folio has already been marked dirty.
->> Considering one condition although I do not know whether it exists actually.
->> user mode VMM writes the folio with hva address firstly, then VCPU thread
->> *reads* the folio. With primary mmu table, pte entry is writable and
->> _PAGE_DIRTY is set, with secondary mmu table(state-2 PTE table), it is
->> pte_none since the filio is accessed at first time, so there will be slow
->> page fault path for stage-2 mmu page table filling.
->>
->> Since it is read fault, stage-2 PTE will be created with _PAGE_WRITE(coming
->> from function hva_to_pfn_slow()), however _PAGE_DIRTY is not set. Do we need
->> call kvm_set_pfn_dirty() at this situation?
+>reset the segment cache after segment initialization in vmx_vcpu_reset
+>to avoid stale uninitialized data being cached in the segment cache.
+>
+>In particular the following scenario is possible when full preemption
+>is enabled:
+>
+>- vCPU is just created, and the vCPU thread is preempted before SS.AR_BYTES
+>is written in vmx_vcpu_reset.
+>
+>- During preemption, the kvm_arch_vcpu_in_kernel is called which
+>reads SS's segment AR byte to determine if the CPU was in the kernel.
+>
+>That caches 0 value of SS.AR_BYTES, then eventually the vCPU thread will be
+>preempted back, then set the correct SS.AR_BYTES value in the vmcs
+>and the cached value will remain stale, and could be read e.g via
+>KVM_GET_SREGS.
+>
+>Usually this is not a problem because VMX segment cache is reset on each
+>vCPU run, but if the userspace (e.g KVM selftests do) reads the segment
+>registers just after the vCPU was created, and modifies some of them
+>but passes through other registers and in this case SS.AR_BYTES,
+>the stale value of it will make it into the vmcs,
+>and later lead to a VM entry failure due to incorrect SS segment type.
+
+I looked into the same issue last week, which was reported by someone
+internally.
+
+>
+>Fix this by moving the vmx_segment_cache_clear() call to be after the
+>segments are initialized.
+>
+>Note that this still doesn't fix the issue of kvm_arch_vcpu_in_kernel
+>getting stale data during the segment setup, and that issue will
+>be addressed later.
+>
+>Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
+
+Do you need a Fixes tag and/or Cc: stable?
+
+>---
+> arch/x86/kvm/vmx/vmx.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
+>
+>diff --git a/arch/x86/kvm/vmx/vmx.c b/arch/x86/kvm/vmx/vmx.c
+>index fa9f307d9b18..d43bb755e15c 100644
+>--- a/arch/x86/kvm/vmx/vmx.c
+>+++ b/arch/x86/kvm/vmx/vmx.c
+>@@ -4870,9 +4870,6 @@ void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> 	vmx->hv_deadline_tsc = -1;
+> 	kvm_set_cr8(vcpu, 0);
 > 
-> If KVM doesn't mark the folio dirty when the stage-2 _PAGE_DIRTY flag is set,
-> i.e. as proposed in this series, then yes, KVM needs to call kvm_set_pfn_dirty()
-> even though the VM hasn't (yet) written to the memory.  In practice, KVM calling
-> kvm_set_pfn_dirty() is redundant the majority of the time, as the stage-1 PTE
-> will have _PAGE_DIRTY set, and that will get propagated to the folio when the
-> primary MMU does anything relevant with the PTE.  And for file systems that care
-> about writeback, odds are very good that the folio was marked dirty even earlier,
-> when MM invoked vm_operations_struct.page_mkwrite().
+>-	vmx_segment_cache_clear(vmx);
+>-	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
+>-
+> 	seg_setup(VCPU_SREG_CS);
+> 	vmcs_write16(GUEST_CS_SELECTOR, 0xf000);
+> 	vmcs_writel(GUEST_CS_BASE, 0xffff0000ul);
+>@@ -4899,6 +4896,9 @@ void vmx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> 	vmcs_writel(GUEST_IDTR_BASE, 0);
+> 	vmcs_write32(GUEST_IDTR_LIMIT, 0xffff);
 > 
-> The reason I am pushing to have all architectures mark pages/folios dirty in the
-> slow page fault path is that a false positive (marking a folio dirty without the
-> folio ever being written in _any_ context since the last pte_mkclean()) is rare,
-> and at worst results an unnecessary writeback.  On the other hand, marking folios
-It does not influence the result. At worst there is one unnecessary 
-kvm_set_pfn_dirty() before the last pte_mkclean(). That is ok for me, 
-and thanks for your detailed explanation.
+>+	vmx_segment_cache_clear(vmx);
+>+	kvm_register_mark_available(vcpu, VCPU_EXREG_SEGMENTS);
 
-> dirty in fast page fault handlers (or anywhere else that isn't protected by
-> mmu_notifiers) is technically unsafe.
-yeap, moving marking folios dirty to slow fault handler makes logic 
-clear and simple here, and technically safer.
+vmx_segment_cache_clear() is called in a few other sites. I think at least the
+call in __vmx_set_segment() should be fixed, because QEMU may read SS.AR right
+after a write to it. if the write was preempted after the cache was cleared but
+before the new value being written into VMCS, QEMU would find that SS.AR held a
+stale value.
 
-Regards
-Bibo Mao
-> 
-> In other words, the intent is to sacrifice accuracy to improve stability/robustness,
-> because the vast majority of time the loss in accuracy has no effect, and the worst
-> case scenario is that the kernel does I/O that wasn't necessary.
-> 
-
+>+
+> 	vmcs_write32(GUEST_ACTIVITY_STATE, GUEST_ACTIVITY_ACTIVE);
+> 	vmcs_write32(GUEST_INTERRUPTIBILITY_INFO, 0);
+> 	vmcs_writel(GUEST_PENDING_DBG_EXCEPTIONS, 0);
+>-- 
+>2.26.3
+>
+>
 
