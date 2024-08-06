@@ -1,261 +1,312 @@
-Return-Path: <kvm+bounces-23297-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23299-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 872B59486C3
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 02:53:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E969486E8
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 03:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6959F1C21FE8
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 00:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C4E81C222A9
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 01:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ABADB660;
-	Tue,  6 Aug 2024 00:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC7E5AD5B;
+	Tue,  6 Aug 2024 01:14:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q8T2Gd8H"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R8Linlff"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FB21388;
-	Tue,  6 Aug 2024 00:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722905567; cv=none; b=CvycPpuLuVEbVCb9IJdrcbk5ZhTzArbPJ8tC3r4SwroyYuafCEQVzi9pDuOl3rbgHvKqaLG3WJJAOIcTP8//7wBh3/GxTxuzEYg67rAfpGQkIGWuNnctVzUent90YqUtljCN7L2iYjSVTDbRb7CX3hHy0fxD2zYYqspSSB4Bqfo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722905567; c=relaxed/simple;
-	bh=+m+W3mwS74dhm5CTDy5Jd1SPhQMqockB2uEXAZSjECM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bET47Ry+SDJ51qQM8qdx9CZnYyXRaYtVKweZAglGvYkzLIlD8CU8g3Zzt6eIDGrT0phLqDyAVkv5QI9qiw89AMz0UB0UnmArPWcFFwXMGpquxqVQgzmtmrLXUmgPC81Ri8r9+0qeiQ6B+TIpU45EyN93zrQeJZEElg8WLxb+nrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q8T2Gd8H; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4257d5fc9b7so880225e9.2;
-        Mon, 05 Aug 2024 17:52:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1722905564; x=1723510364; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vbMs5Emme3Wh6YV9L5YnP1YT4GqHd5pCxV5C0hflVMM=;
-        b=Q8T2Gd8Hj7F5mrT0vvdF/G6iDE3FXHoEvYcTVWEliBAkeHo5IDmcESeMONRhtwnMq+
-         C1jaCuZ08DTsODBlN25wWc2TzJea1v6KcLxs4HfZMUcP8Im6N1FgDyfowsYi//EpArTR
-         x8EX0Blb8ifjnkoq8lLAymBQhiS5VEdwXH6YjH8K2ZXYjRCioIdQglsZ9UP38I2OFeNb
-         dK6D1JXQHCN8b1v8t1oJUvgiQrJff4ta3A3cxCC7Mm27rmgpK6/4TWd5bcVfQHQCC14p
-         R+y1XmKR7G+qP4ur1ehpu/ARNFEZytEUpmN1FlJZIfa0c8QfXJ2hVuiYcIGjYukl+QVQ
-         KqQQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722905564; x=1723510364;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vbMs5Emme3Wh6YV9L5YnP1YT4GqHd5pCxV5C0hflVMM=;
-        b=tBi/tT19Zjq1Bnz6mpXtc3QX1rxaKcrBygYxeeMe15uZZw6kiSwDC/ETZlXacGYaWV
-         g1YlmCFM25SzE5RSgnenBmog34hq5rhfOhzbeXlC5qEirdTI/z2dAkQDSybJtxrmKHyH
-         1XZJ/KXenJtCnYZdN7wcCpf+IcQVVsj5i8z3dqcgr9oIETo4I3/G+PSpEcwQOT6a8b3z
-         Qx6PVtErc+PhKdZJdd+1KJH/09Zp+jHZ6Occ/Efq5SimhvaDN34OIiHRwT+9uw3wgWBS
-         NjGfj6PU2I9ODqe3w2LcFg0Yxu9Ezv6otMIBINFHAic2lyOMOdzHUpOT3oUnb0dmQt+U
-         pxaw==
-X-Forwarded-Encrypted: i=1; AJvYcCVMySugepxudVKgOzIg+gEiiIps+el6q+zZVGWfYcx3DrnaJjFH0/HySlOTFM6q39LloD9+T8GDHPOwNLXVl6NzVrkl5296Jeo9kLKbli+UY8dH5Ep5kuYqEweXgNQUk9riaYHfef70gwSxapdvwh29v32sMEKWSYHTdsVGRiCUcMVzQNsOwkpbmwVKKmZlQNOEYbywQhOqo4oVn0sMhkSaXs/vW5dj17VM
-X-Gm-Message-State: AOJu0YySGYqwbg8cw7WoMK2o+w8Krc4HGPH22OmpuMnUEWMyfx6fI+OO
-	qC3ji1P3AQCTT+yYfcdCDxAJghK7w8YjHGo0u2v4Y4CFZm/qqRS/Y3IhsHSIbMvRya2tZp/l/jZ
-	ubgA4rNAY5gtx+WgLT3fyDm8E8x0=
-X-Google-Smtp-Source: AGHT+IGqdqorrE2wlr/gRUXIf6uZerGtzKcZj5VR2LPXl0lkIPBaNlvbUHmQ57kNpAjkgdSFWmDjnDGMqxYFtJZpI1s=
-X-Received: by 2002:a5d:6042:0:b0:368:7f8f:ca68 with SMTP id
- ffacd0b85a97d-36bbc117fd0mr8920631f8f.30.1722905564079; Mon, 05 Aug 2024
- 17:52:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6DAC8F77;
+	Tue,  6 Aug 2024 01:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722906848; cv=fail; b=DGquV9IwcL5McMmFHecWu4BJfDeV0XRZiPgVNvf/fx7RdiWVny2NKjigF270dDH/2G/Kwt9drPMoOTLAHMDbXB1YD3aAUaYGVdfNlfQ1E5/Jiqf50RlYrkvr0l/m+Q6PqfXsQnYXbXqPDlFUfo/ECIgghDfiWOqvAhRSE3uKdhs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722906848; c=relaxed/simple;
+	bh=/QY7GBUDUSCLxqCcwQ3NZwkwcBr1tvBnEQYcPq9WRTk=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=jt5HvgM0p/2wUGa3py9OG2HcB4ePcR2x9cFoZVlJCw44ipg8B0pnyRqpbC/yVQOqt1wjxd9mNHNbhrFSn7NFwSEQYaZOj9pIOxpNACwA4iwDMCMq4j55zNWkmIaBlijj+Oe6j7O7VkXeuSyzv2CaAdxBDU0AAZcSer5/H4icTE4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R8Linlff; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1722906846; x=1754442846;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=/QY7GBUDUSCLxqCcwQ3NZwkwcBr1tvBnEQYcPq9WRTk=;
+  b=R8LinlffWscVGnwL7hI14VVP5LDzMgUvZETE7pceshV8NgC6aosRJ42W
+   o7ZBGig29PLQXi38+/2NZ8RYh8cIPLLGmmmB5PsC9FHnZXb/epCmSOaVY
+   ZT8QzFrIklrSQ5BDN24dNczuPSIPundwb8DcE+sJLEMzgPhJfXKP+ewEo
+   Zk+x0OnCI2hmOHmxb6k7iyOM+YvYeZcCjTyg+uMtg+/G7pVNO+J3NNJ6I
+   IutiNo4VSwsrHzofjc1XYpZckUiTZ6OPlCsiir94SN/9+ex2n246siUsZ
+   C+hJhAAhJLQvfDb/xBUnoX7LTZq0E2TQlX1Bl6XT18LEqcctFHFmR/ahx
+   A==;
+X-CSE-ConnectionGUID: 2kMhYm9RS62qDlHReXSEGg==
+X-CSE-MsgGUID: xmE5X56sR9K+Zoc1vOhWGg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="32279994"
+X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
+   d="scan'208";a="32279994"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 18:14:05 -0700
+X-CSE-ConnectionGUID: 4nt1I2fISwuBA7/NYUIz1Q==
+X-CSE-MsgGUID: xcAKHw8ETveg5IGQtxR+rQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
+   d="scan'208";a="79597445"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Aug 2024 18:14:05 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 5 Aug 2024 18:14:04 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 5 Aug 2024 18:14:04 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.168)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 5 Aug 2024 18:14:03 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=jyvQgd8H/8nNWrYfYhZnDOjFF60TMlIobKoX+9knTmyb81QW/gpqhzT8CVljrvvHnLFkLx3buIIMigzA2XyQ3lKMuc+9uNVmdCthqB4NgCNJ7Qx9y6ouPNtI5xQqiM5EQTg4LG0zU44OYCa8Rb+Z72vitp8Ml2ZWxttHPoo0cPSrR/f9L+srbE5IsTcvJ5sgcrge7ik4m7OYKGMSjGYqR73Vu4WvihgnDc6nYIDO6XRxPtWRjbJ07mf4F22P13Ro/mQrog5Az8mSONDZb83SJDdumNU3m9jl3zA1NtjrxX+bYB+i2rrr3mxc4O6lwXI4MYXEeGzWQa74hA8ZJoHQUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9rNEH6BuG+ZUcc+eg/R4qSMpVZZNUSLtTJTuArMFP/s=;
+ b=KG0EWyfw7IeTOeI+npgPLmL6VFtcqFdZ00gvglOVrkOzaD0cs+YhLkVrbBNMR2Y9hRU3NboBXTcwACMumD9gbGH5OKM5cEQFV0U+5wKqnPmD/ml9nqdoxYRBryUFtLGO2yTNOtBpwiNmxB3e8cerjremTV06DOiq00HFvIEFAOHvRXT+rl8Z5Bj+zg29rVMLrYwAAL2NwzumtD8T8MlKtWCAraehO/LYKa+cJGBIwFr5+fqAi6nrAu7vXWmG0HcWsTNpQs7kgFV3xOCV9sbGijs3Kfe1T0TbAJ15YBN+y80aQ9+QyYps2jTjuVdAxQjARmSfx+lDimz/LEcy+ql5FA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by CYYPR11MB8359.namprd11.prod.outlook.com (2603:10b6:930:ca::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Tue, 6 Aug
+ 2024 01:14:00 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.7828.021; Tue, 6 Aug 2024
+ 01:14:00 +0000
+Date: Mon, 5 Aug 2024 18:13:56 -0700
+From: Dan Williams <dan.j.williams@intel.com>
+To: "Huang, Kai" <kai.huang@intel.com>, "Williams, Dan J"
+	<dan.j.williams@intel.com>, "Hansen, Dave" <dave.hansen@intel.com>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"bp@alien8.de" <bp@alien8.de>, "tglx@linutronix.de" <tglx@linutronix.de>,
+	"peterz@infradead.org" <peterz@infradead.org>, "mingo@redhat.com"
+	<mingo@redhat.com>, "hpa@zytor.com" <hpa@zytor.com>, "seanjc@google.com"
+	<seanjc@google.com>, "pbonzini@redhat.com" <pbonzini@redhat.com>
+CC: "x86@kernel.org" <x86@kernel.org>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Edgecombe, Rick P"
+	<rick.p.edgecombe@intel.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
+	"Gao, Chao" <chao.gao@intel.com>, "binbin.wu@linux.intel.com"
+	<binbin.wu@linux.intel.com>
+Subject: Re: [PATCH v2 02/10] x86/virt/tdx: Unbind global metadata read with
+ 'struct tdx_tdmr_sysinfo'
+Message-ID: <66b178d4cfae4_4fc72944b@dwillia2-xfh.jf.intel.com.notmuch>
+References: <cover.1721186590.git.kai.huang@intel.com>
+ <7af2b06ec26e2964d8d5da21e2e9fa412e4ed6f8.1721186590.git.kai.huang@intel.com>
+ <66b16121c48f4_4fc729424@dwillia2-xfh.jf.intel.com.notmuch>
+ <7b65b317-397d-4a72-beac-6b0140b1d8dd@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <7b65b317-397d-4a72-beac-6b0140b1d8dd@intel.com>
+X-ClientProxiedBy: MW4PR03CA0087.namprd03.prod.outlook.com
+ (2603:10b6:303:b6::32) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240731124505.2903877-1-linyunsheng@huawei.com>
- <20240731124505.2903877-5-linyunsheng@huawei.com> <CAKgT0UcqdeSJdjZ_FfwyCnT927TwOkE4zchHLOkrBEmhGzex9g@mail.gmail.com>
- <22fda86c-d688-42e7-99e8-e2f8fcf1a5ba@huawei.com> <CAKgT0UcuGj8wvC87=A+hkarRupfhjGM0BPzLUT2AJc8Ovg_TFg@mail.gmail.com>
- <877efebe-f316-4192-aada-dd2657b74125@huawei.com> <CAKgT0UfUkqR2TJQt6cSEdANNxQEOkjGqpPXhaXmrrxB0KwXmEQ@mail.gmail.com>
- <2a29ce61-7136-4b9b-9940-504228b10cba@gmail.com>
-In-Reply-To: <2a29ce61-7136-4b9b-9940-504228b10cba@gmail.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Tue, 6 Aug 2024 06:22:08 +0530
-Message-ID: <CAKgT0Uc6yw4u5Tjw1i0cV=C_ph+A5w0b_mtQMXmnBfKN_vvaDA@mail.gmail.com>
-Subject: Re: [PATCH net-next v12 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Yunsheng Lin <yunshenglin0825@gmail.com>
-Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Subbaraya Sundeep <sbhatta@marvell.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Sagi Grimberg <sagi@grimberg.me>, 
-	Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Chuck Lever <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, 
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, intel-wired-lan@lists.osuosl.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	linux-nvme@lists.infradead.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-mm@kvack.org, bpf@vger.kernel.org, 
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|CYYPR11MB8359:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8347e188-9e7f-4e4b-d9a1-08dcb5b50d5c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?OfyApJCO+3yT91Sv7/5u/4XDzKZdJTRVmIpBgpujnvCc9mhg2hD5f/MtkHfd?=
+ =?us-ascii?Q?J4kLXWkeg4OrLarFwEGnM+pHeqUQaXZpzs95Eoa5W3p1hNAjTq+EPCajWt6Z?=
+ =?us-ascii?Q?Mt8myQN7jgUzcsJwz6ORmG7PAxmqVa/sfwxPAmwCseRkeZaVgD2lOgrG85FJ?=
+ =?us-ascii?Q?RdwVONb16gBI/lv8LdCZ1e1c5I7Nd3emKDuAge8eD7OJWOBGZ+NoLn4+3Amg?=
+ =?us-ascii?Q?ImOxIG8uxrTE9XRGgjYKWAA2q1Tj4vjfFg5lJp/C9BPCy7zvlnZgeHAfQxp4?=
+ =?us-ascii?Q?W8Yke6KP3kswsqQ9L/uBmXe/zKl3F+v8TVjIfwlgsSzaqLPrgUqyNO2PPkB/?=
+ =?us-ascii?Q?sln2M/lI69iDfDOkM6LVOXv+zka5YP+MDBrACNpQNlM6CzGpa33nU7w0Vf+Z?=
+ =?us-ascii?Q?DFRb5O/4cLhECQJD/5J88uEkDeLLTenWcZ7w/c60bI3lapLv4ZtrHK2a5gpa?=
+ =?us-ascii?Q?KW/YlpEMeq5Bps8MXe+fhpy1PEVWIJcaN2eVeujPyrzWaCKE9Ql/Lwys9M90?=
+ =?us-ascii?Q?EIReTZ9cTzUrAm86v/ypEv621hP7icOMZJxy0c0luT5bNYOh7I4/91qlaVcN?=
+ =?us-ascii?Q?IxEoM23J9A1pvfSWgK2dO6ZWojNom29gaPzEg5e6Bl3Q5L8iQEcbuoeD29Uh?=
+ =?us-ascii?Q?w18nWbSQ2FAvKtpqG+lo6RV8V+1oAu9aYXSYbTIX7wQxcTVY+6dUHHQtTCGi?=
+ =?us-ascii?Q?kW2yK8mmxslW3payQs5TM3UFP9Czni1EIwOlgyLpRVqLx2HtTq40yuvyxLqn?=
+ =?us-ascii?Q?lpYGeyJUCfVXRGA1hrQM19afHcFAdCUpDk6lYaZnWR7izsveL0tILx6AU0FH?=
+ =?us-ascii?Q?SduEJEGjh1RRqyXOVdJDdprkUl6TMD6DLD3PK0A3hxKxj+K4u0zic794Mtoj?=
+ =?us-ascii?Q?a+8/vO706mutAGTcYcl1oqGBnIfms0vuLdfZ59QZ8bDRGLxZ9XklUxKJxqa7?=
+ =?us-ascii?Q?EFmoHdpaQaLzBY6n064rpqhBpD1GsAcYLwvf96y3bByariDRuxytlBg+iiCo?=
+ =?us-ascii?Q?AMvrFErhG7/QL9xjWA7eXfOoWq6F9j/aPOrlobCqurPpqIDIsfPZ6fxfrpdI?=
+ =?us-ascii?Q?F4aIYVjHXLLENH7D26Ey4k8+WqNnf35oE/wDp8Hkmf1+GW+piUZuZhVf3MBI?=
+ =?us-ascii?Q?XH1TZp6Ds4EV6P+1eNW0+ptK4qI6IvNUHcH3h3e78Jh6nzwRO1Tm/6uRT1+L?=
+ =?us-ascii?Q?A6gBoNVpxbvMP4vip6gKEAvToiNo6zWH5JFLBB+yxzPRp4zhbNlgin9GsVYL?=
+ =?us-ascii?Q?6sJz3kSG4UmhlnEGn+Idzbg5xZDTtFkko8bqVT2l6c7t2aerxlkgNHpWyEmO?=
+ =?us-ascii?Q?/9oQK0wLF3S3V6T1I2SBAYUx6w74v7DaVm1pF7IjfUV38A=3D=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?l23T6qT5EmePwJ31Qz7yMo2mnnlraMCx6gTlW90vLSH3DNfGDhKXkdQebds9?=
+ =?us-ascii?Q?STHg+D5QHtKbtTr9zlfcNUa4OQ1cKt5Q/hJf6DN+1YUjXICRnhhKYEOqAO8B?=
+ =?us-ascii?Q?1qbGLguDb1g6UtpBwuUI8DBLnVDtujThURmFQJe4aDDzZtQWNIed1jyQRW2r?=
+ =?us-ascii?Q?ZUB+B9X4KHyaU6H06aiXF43yrm+eLalvMYrx2En3VujqYo9mXk6qypx4z2tH?=
+ =?us-ascii?Q?2pYgz+b4YB6wgqGSNczH/S7WQiDyVfYu3H+pU+vOTZZhil0JkivmebVTU11U?=
+ =?us-ascii?Q?ykx0DqG+S8RGTOrLWR2WY3rkNLU3hbyjyTMxHTM0Tx7km+KfEomTR7hVrQ6z?=
+ =?us-ascii?Q?hNnBqeWwozuWvnhoBMmLR4S6KYM4ymN8GLQHDW79xp+i1fpyse8BKvet925y?=
+ =?us-ascii?Q?sRLJKYRsu0XJapGrw59TzJmxWbWrJKX5waPslLNDO3HyntKcuhu9AWQRjgkT?=
+ =?us-ascii?Q?xwtj8x2CAS1nSUsItv5lBqgvY9DDFbnzZrP8NUx1GWD8E46qYN/xtohDE7Dw?=
+ =?us-ascii?Q?Z+1FQgoc+m2yQBJ/LD10bxyy1IVbfB+nO9KIiu81Xpzl0cpI0MGDEsKbw7IG?=
+ =?us-ascii?Q?LFurFTN2nces/PgxkH6Bu5KT6lX7WzNL5AMYkFRyEZCg/+IRaFWAmJCMflTs?=
+ =?us-ascii?Q?jZ9vx8kNZiayNcrmPpCcjHW2NsEIJdq2/mYZtZUbu18BV2wUBv4Wk9tlkv2O?=
+ =?us-ascii?Q?3fh1GDt3C99cavmRoEG75bKlmWsYp/sC/jP4JsdUVYcZgdy88nkCYTU3ysQr?=
+ =?us-ascii?Q?wl3LZ5kL3fwxlT28Y6V8odviSU9kYXJykkU4saFa4unUxvaAuMsThW2XmDCC?=
+ =?us-ascii?Q?zbqNq8Q5UMv84x0rs6nFm7n+J+wMiF8ZxUwS/dp//genRwQqX78zTNW7hSLU?=
+ =?us-ascii?Q?ySn/asxAODnC3y2dltyDI6SwYOaGKJwvzIomQ7p31oG5czlLYqT7X/OsQn2x?=
+ =?us-ascii?Q?gh1MtYze4HCQQSVrMaGNlnCEiILHywPxtFpbPDZ8c6WcktnzbJeCtB3QO+s7?=
+ =?us-ascii?Q?oTdHGe8naG7oc12RdW8em/B2GRNgjbZCvCtKjUMTMWtHcflJGZsvGqapRcNW?=
+ =?us-ascii?Q?fx3Iw3CbkM/1pKQnep9n7qvxVfths5G6PyCfVIzUiX1hPgXSREHq9IQMlAdB?=
+ =?us-ascii?Q?NnGfbFhRWJgHuWVWoY4YE403+5Fyg+E8896Yg7L7DnIGabwgI3qb9RzBBXZy?=
+ =?us-ascii?Q?jJU5M5i5kePiT3FdWi7Y67kJaE8cD4hcLavla47XEbwMpAcZnRz+pvlcm162?=
+ =?us-ascii?Q?wBBTKoTBb0LJKCdiHRqTHpK2ziQdgsNRlwHVqnP19rTqPFQjL7S5q3tYvl85?=
+ =?us-ascii?Q?dghxiLRA+Xs/uGyadYJY+vte4sH3hJPQcvzU7ScrCyylSdHEoZd9edrvUKsu?=
+ =?us-ascii?Q?1WMw/KJiLVQpBUY+t1sNpF18mGvOSs0fXaxehWSLCJvJvxaHsmSLL8/MPIsy?=
+ =?us-ascii?Q?lx0n1nH6wY4Znlb8vqezq4XUHUCg5PfhzJDjCyNC1bo+SKdRhIg+z2g2q4o7?=
+ =?us-ascii?Q?B7krF3UbRSXYblW9hU8sQlAIpTjftoZtAyj0/8u0ZTsPtDTmx3TP1zCWQ8ZE?=
+ =?us-ascii?Q?FcAwAyCpgBjQiyg6/mbKh/TgsyoF/TUAMB4UHaI6Kd51uJ6zTfrY1kT8NT4m?=
+ =?us-ascii?Q?Rg=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8347e188-9e7f-4e4b-d9a1-08dcb5b50d5c
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2024 01:14:00.7612
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: w8EQHaMNpxBKH1ZSk7WV/38ff0bLlGe983jAC+7irX1FrnTZS+pcv12IDLyCR605kvzHapheygrW5Qi5DYwsacihNZoz2BUCYSBcDBkRcj4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR11MB8359
+X-OriginatorOrg: intel.com
 
-On Sun, Aug 4, 2024 at 10:00=E2=80=AFAM Yunsheng Lin <yunshenglin0825@gmail=
-.com> wrote:
->
-> On 8/3/2024 1:00 AM, Alexander Duyck wrote:
->
-> >>
-> >>>
-> >>> As far as your API extension and naming maybe you should look like
-> >>> something like bio_vec and borrow the naming from that since that is
-> >>> essentially what you are passing back and forth is essentially that
-> >>> instead of a page frag which is normally a virtual address.
-> >>
-> >> I thought about adding something like bio_vec before, but I am not sur=
-e
-> >> what you have in mind is somthing like I considered before?
-> >> Let's say that we reuse bio_vec like something below for the new APIs:
-> >>
-> >> struct bio_vec {
-> >>          struct page     *bv_page;
-> >>          void            *va;
-> >>          unsigned int    bv_len;
-> >>          unsigned int    bv_offset;
-> >> };
-> >
-> > I wasn't suggesting changing the bio_vec. I was suggesting that be
-> > what you pass as a pointer reference instead of the offset. Basically
-> > your use case is mostly just for populating bio_vec style structures
-> > anyway.
->
-> I wasn't trying/going to reuse/change bio_vec for page_frag, I was just
-> having a hard time coming with a good new name for it.
-> The best one I came up with is pfrag_vec, but I am not sure about the
-> 'vec' as the "vec" portion of the name would suggest, iovec structures
-> tend to come in arrays, mentioned in the below article:
-> https://lwn.net/Articles/625077/
->
-> Anther one is page_frag, which is currently in use.
->
-> Or any better one in your mind?
+Huang, Kai wrote:
+[..]
+> > The unrolled loop is the same amount of work as maintaining @fields.
+> 
+> Hi Dan,
+> 
+> Thanks for the feedback.
+> 
+> AFAICT Dave didn't like this way:
+> 
+> https://lore.kernel.org/lkml/cover.1699527082.git.kai.huang@intel.com/T/#me6f615d7845215c278753b57a0bce1162960209d
 
-I was suggesting using bio_vec, not some new structure. The general
-idea is that almost all the values you are using are exposed by that
-structure already in the case of the page based calls you were adding,
-so it makes sense to use what is there rather than reinventing the
-wheel.
+I agree with Dave that the original was unreadable. However, I also
+think he glossed over the loss of type-safety and the silliness of
+defining an array to precisely map fields only to turn around and do a
+runtime check that the statically defined array was filled out
+correctly. So I think lets solve the readability problem *and* make the
+array definition identical in appearance to unrolled type-safe
+execution, something like (UNTESTED!):
 
-> >
-> >> It seems we have the below options for the new API:
-> >>
-> >> option 1, it seems like a better option from API naming point of view,=
- but
-> >> it needs to return a bio_vec pointer to the caller, it seems we need t=
-o have
-> >> extra space for the pointer, I am not sure how we can avoid the memory=
- waste
-> >> for sk_page_frag() case in patch 12:
-> >> struct bio_vec *page_frag_alloc_bio(struct page_frag_cache *nc,
-> >>                                      unsigned int fragsz, gfp_t gfp_ma=
-sk);
-> >>
-> >> option 2, it need both the caller and callee to have a its own local s=
-pace
-> >> for 'struct bio_vec ', I am not sure if passing the content instead of
-> >> the pointer of a struct through the function returning is the common p=
-attern
-> >> and if it has any performance impact yet:
-> >> struct bio_vec page_frag_alloc_bio(struct page_frag_cache *nc,
-> >>                                     unsigned int fragsz, gfp_t gfp_mas=
-k);
-> >>
-> >> option 3, the caller passes the pointer of 'struct bio_vec ' to the ca=
-llee,
-> >> and page_frag_alloc_bio() fills in the data, I am not sure what is the=
- point
-> >> of indirect using 'struct bio_vec ' instead of passing 'va' & 'fragsz'=
- &
-> >> 'offset' through pointers directly:
-> >> bool page_frag_alloc_bio(struct page_frag_cache *nc,
-> >>                           unsigned int fragsz, gfp_t gfp_mask, struct =
-bio_vec *bio);
-> >>
-> >> If one of the above option is something in your mind? Yes, please be m=
-ore specific
-> >> about which one is the prefer option, and why it is the prefer option =
-than the one
-> >> introduced in this patchset?
-> >>
-> >> If no, please be more specific what that is in your mind?
-> >
-> > Option 3 is more or less what I had in mind. Basically you would
-> > return an int to indicate any errors and you would be populating a
-> > bio_vec during your allocation. In addition you would use the bio_vec
->
-> Actually using this new bio_vec style structures does not seem to solve
-> the APIs naming issue this patch is trying to solve as my understanding,
-> as the new struct is only about passing one pointer or multi-pointers
-> from API naming perspective. It is part of the API naming, but not all
-> of it.
 
-I have no idea what you are talking about. The issue was you were
-splitting things page_frag_alloc_va and page_frag_alloc_pg. Now it
-would be page_frag_alloc and page_frag_alloc_bio or maybe
-page_frag_fill_bio which would better explain what you are doing with
-this function.
+diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
+index 4e2b2e2ac9f9..a177fb7332ae 100644
+--- a/arch/x86/virt/vmx/tdx/tdx.c
++++ b/arch/x86/virt/vmx/tdx/tdx.c
+@@ -270,60 +270,42 @@ static int read_sys_metadata_field(u64 field_id, u64 *data)
+ 	return 0;
+ }
+ 
+-static int read_sys_metadata_field16(u64 field_id,
+-				     int offset,
+-				     struct tdx_tdmr_sysinfo *ts)
++static int read_sys_metadata_field16(u64 field_id, u16 *val)
+ {
+-	u16 *ts_member = ((void *)ts) + offset;
+ 	u64 tmp;
+ 	int ret;
+ 
+-	if (WARN_ON_ONCE(MD_FIELD_ID_ELE_SIZE_CODE(field_id) !=
+-			MD_FIELD_ID_ELE_SIZE_16BIT))
+-		return -EINVAL;
+-
+ 	ret = read_sys_metadata_field(field_id, &tmp);
+ 	if (ret)
+ 		return ret;
+ 
+-	*ts_member = tmp;
++	*val = tmp;
+ 
+ 	return 0;
+ }
+ 
+-struct field_mapping {
+-	u64 field_id;
+-	int offset;
+-};
+-
+-#define TD_SYSINFO_MAP(_field_id, _offset) \
+-	{ .field_id = MD_FIELD_ID_##_field_id,	   \
+-	  .offset   = offsetof(struct tdx_tdmr_sysinfo, _offset) }
+-
+-/* Map TD_SYSINFO fields into 'struct tdx_tdmr_sysinfo': */
+-static const struct field_mapping fields[] = {
+-	TD_SYSINFO_MAP(MAX_TDMRS,	      max_tdmrs),
+-	TD_SYSINFO_MAP(MAX_RESERVED_PER_TDMR, max_reserved_per_tdmr),
+-	TD_SYSINFO_MAP(PAMT_4K_ENTRY_SIZE,    pamt_entry_size[TDX_PS_4K]),
+-	TD_SYSINFO_MAP(PAMT_2M_ENTRY_SIZE,    pamt_entry_size[TDX_PS_2M]),
+-	TD_SYSINFO_MAP(PAMT_1G_ENTRY_SIZE,    pamt_entry_size[TDX_PS_1G]),
+-};
+-
+-static int get_tdx_tdmr_sysinfo(struct tdx_tdmr_sysinfo *tdmr_sysinfo)
++/*
++ * Assumes locally defined @ret and @ts to convey the error code and the
++ * 'struct tdx_tdmr_sysinfo' instance to fill out
++ */
++#define TD_SYSINFO_MAP(_field_id, _offset)                              \
++	({                                                              \
++		if (ret == 0)                                           \
++			ret = read_sys_metadata_field16(                \
++				MD_FIELD_ID_##_field_id, &ts->_offset); \
++	})
++
++static int get_tdx_tdmr_sysinfo(struct tdx_tdmr_sysinfo *ts)
+ {
+-	int ret;
+-	int i;
++	int ret = 0;
+ 
+-	/* Populate 'tdmr_sysinfo' fields using the mapping structure above: */
+-	for (i = 0; i < ARRAY_SIZE(fields); i++) {
+-		ret = read_sys_metadata_field16(fields[i].field_id,
+-						fields[i].offset,
+-						tdmr_sysinfo);
+-		if (ret)
+-			return ret;
+-	}
++	TD_SYSINFO_MAP(MAX_TDMRS,	      max_tdmrs);
++	TD_SYSINFO_MAP(MAX_RESERVED_PER_TDMR, max_reserved_per_tdmr);
++	TD_SYSINFO_MAP(PAMT_4K_ENTRY_SIZE,    pamt_entry_size[TDX_PS_4K]);
++	TD_SYSINFO_MAP(PAMT_2M_ENTRY_SIZE,    pamt_entry_size[TDX_PS_2M]);
++	TD_SYSINFO_MAP(PAMT_1G_ENTRY_SIZE,    pamt_entry_size[TDX_PS_1G]);
+ 
+-	return 0;
++	return ret;
+ }
+ 
+ /* Calculate the actual TDMR size */
 
-> > as a tracker of the actual fragsz so when you commit you are
-> > committing with the fragsz as it was determined at the time of putting
-> > the bio_vec together so you can theoretically catch things like if the
-> > underlying offset had somehow changed from the time you setup the
->
-> I think we might need a stronger argument than the above to use the new
-> *vec thing other than the above debugging feature.
->
-> I looked throught the bio_vec related info, and come along somewhat not
-> really related, but really helpful "What=E2=80=99s all this get us" secti=
-on:
-> https://docs.kernel.org/block/biovecs.html
->
-> So the question seems to be: what is this new struct for page_frag get
-> us?
->
-> Generally, I am argeed with the new struct thing if it does bring us
-> something other than the above debugging feature. Otherwise we should
-> avoid introducing a new thing which is hard to argue about its existent.
 
-I don't want a new structure. I just want you to use the bio_vec for
-spots where you are needing to use a page because you are populating a
-bio_vec.
 
-> > allocation. It would fit well into your probe routines since they are
-> > all essentially passing the page, offset, and fragsz throughout the
-> > code.
->
-> For the current probe routines, the 'va' need to be passed, do you
-> expect the 'va' to be passed by function return, double pointer, or
-> new the *_vec pointer?
 
-I would suggest doing so via the *_vec pointer. The problem as I see
-it is that the existing code is exposing too much of the internals and
-setting up the possibility for a system to get corrupted really
-easily. At least if you are doing this with a bio_vec you can verify
-that you have the correct page and offset before you move the offset
-up by the length which should have been provided by the API in the
-first place and not just guessed at based on what the fragsz was that
-you requested.
+
 
