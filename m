@@ -1,144 +1,134 @@
-Return-Path: <kvm+bounces-23409-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23410-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FFC2949679
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:14:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F2FF94969B
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:24:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99F891C22D83
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:14:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57D16281E2F
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64504AEF4;
-	Tue,  6 Aug 2024 17:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD3450276;
+	Tue,  6 Aug 2024 17:23:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="WhUE7rvU"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="jia9AX2I"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A853A267;
-	Tue,  6 Aug 2024 17:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6433BB50
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:23:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722964487; cv=none; b=lJRJvRwLVqZP48NEEExeBBRQh6Bor2kGGU4o8ca/xzV8wKIbpyhjeKoqJUSre0nuKVTW1PMOn8hKeq2jUKH/PC1EeTHB+Y77HJd1awpZvdol0zVEt+XiK9G8yQJdksl2/uTOnAX1skcGr2RaRCxfMbrmrMDgCZXAr5s3eMsTZkY=
+	t=1722965033; cv=none; b=uuELYQBFgwO28+gVRZ5oAShAOFtPDrORI4/HyofoyT3thwNmiBLS15pjb7Jg/fHj9ZvMOxLsNQcmxEtPdAQE2FAeayWEwD2BBYrjbZGED8Z5LEA1BMKGoTZdGw0frB4FPjC5EtkG9I0N1LcE9UhHzLJq9C46m4pBWY3z/Sr/+ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722964487; c=relaxed/simple;
-	bh=xhS+H7iQiaDB12Ynm2FdXOxJMbniRh+wjTAQWI2WEfo=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iDL5IBnpVrdSuY1AvzczufdpIztiYhf4VWgSum4BmI5QQCohPaCgQO0UEFxTeZvqoD2HfMnx24VEExX1+Db3jGDO2xj06vcH2RjFV6AaSj4Wot1c7QEP0Pz7R5rJrF4aJl5cKVUnemo13syp3Z0UmJCYy4dNgzJbEbFhlzxTdvw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=WhUE7rvU; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 476H6cpp018995;
-	Tue, 6 Aug 2024 17:14:27 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=T+n7dvh64qYrN/shgqY+idk4
-	1vC5DMbfjHSVqiAN9yc=; b=WhUE7rvUUoNPuWvxRyP4CZsScWKjmalCjsHGAE2N
-	kRGTHkuk7l9OjwKqFV0HTsxUhvYLXIdRsH78hlg9jmdDt6so6Txmwcg5MaiDF9tF
-	qAPY2W+n9lf5Cv9vmy/KNIEWAgbaWepwP0Y/GJzjsBGee9tLDCzafVUp3OWWFsjr
-	ZJaIjgCCSDNPObNV0ageWipmuTMv4eTl6LYWYq9slF85BHfxuK2qzoXenCj0CLJx
-	xBjLUSv0RlrGd/c47RtOt2njOvegNHPan4B4nuQHFlhiL6DL4MZlU6h3+ChKULBx
-	okImzB0822Dktd1MkZvuzmTZYN+Q1pxvZ7gHaoI0WgZjqw==
-Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40u4cpk51q-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 17:14:27 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 476HEQC6024565
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 6 Aug 2024 17:14:26 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Tue, 6 Aug 2024 10:14:26 -0700
-Date: Tue, 6 Aug 2024 10:14:25 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: David Hildenbrand <david@redhat.com>
-CC: Andrew Morton <akpm@linux-foundation.org>,
-        Paolo Bonzini
-	<pbonzini@redhat.com>,
-        Sean Christopherson <seanjc@google.com>,
-        Fuad Tabba
-	<tabba@google.com>, Patrick Roy <roypat@amazon.co.uk>,
-        <qperret@google.com>, Ackerley Tng <ackerleytng@google.com>,
-        <linux-coco@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
-        <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
-Message-ID: <20240806093625007-0700.eberman@hu-eberman-lv.qualcomm.com>
-References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
- <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com>
- <4cdd93ba-9019-4c12-a0e6-07b430980278@redhat.com>
+	s=arc-20240116; t=1722965033; c=relaxed/simple;
+	bh=WbFlE5+qPAkFqLnreSC1NqqOFCvXcZe2PPM30+LdzcE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HlclvovBM3beyEkZ6Bnhw2Z6ZYoXzUFk2Ypa8of2PIsqTg8IkTsAiehb5Zb4N8FuXAO5Ci/Qvc/vynTWnTjMuUZbs0pYu6HOIYs0F/iq5fddDIn0SYzcEzA8pd8I04mAiRQTWhDLlH/c95v5ZNG31VedSAmoaDTnF8ZpSwRMOMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=jia9AX2I; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-7a1e0ff6871so56001785a.2
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 10:23:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1722965031; x=1723569831; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=F4rmNPnz+kGMra0RQJtqJ1i8be+boDPo204/oBt9Rcs=;
+        b=jia9AX2IwxxpNeVnIvgp/19a/HX+RXv3L7cvDxoJF+Fu43uKodSDtVMLcvttrHeoXs
+         pbAKye7Di66sH8ESpYcmctnvBXoMBks3gzdIGJDCCRQbMrAbAhFLsbndQX9UZpn9ypvs
+         TixyeUbRQ4mWxO+3tqc1z/bgaOZIT3+jhrsYo/5PIS+y+1FMKw6snw3+DUy/2YXLgLr4
+         FQNGCQC75wC1zgTzxkp/LFOFRzalJLD0GgzzM9L3dx6e6lcyl/edgplKEN391iQYcSkR
+         Ah8UpleU87LZ7JuscB/vaG026fENfZ2t62/sOxK/9AvYrNwyVgkW6bP6Uxoc/HXXih8S
+         UnDA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722965031; x=1723569831;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F4rmNPnz+kGMra0RQJtqJ1i8be+boDPo204/oBt9Rcs=;
+        b=tOLfFktyD+1lb8lumug8EGlkARItYFwJ0Cl7qqSb9eCaVXs9CEDMAw+3oT6Q1WCyJ8
+         EumKvx5n+J2PX2YwzUVL0ZUirS78cwZtuJDr8GzE/tlSnszFZeFTJSA0rsjMQGePZIyN
+         3G/obJ3nktKPFva9Ix57H9phtnCNxtLXDBZverjUJZL6k0PUD+Y00ar0TSoLmoqXnV00
+         UXxWkuI2m9DBPEDHz6uKsKghw9MYpbljfbd44QISwFOPZsfBJzrhy4PQ5fiyiqsgl7N1
+         CAFUdv9tDZ1iyXiay6CHy3wa2Qty9Xg/jaEuvfq80tO5/csj4+scsy2WEqESkZt7qFKz
+         cTzw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJms8YMJeS0ep1Fu3OYAQAjj6kXor7dVQBv4SgUQ/UpTIwT1IFwNquufgYbgL9yPXOd1M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxDQJz/bEAJFp4Ik2ttgDp3IoKA16LQOpZ92mTScNUynJshqhL/
+	NCoTSDFQCQAFGn1ZwQ+gJbc+d8hZDP5yUU3p5ZZZ3u+XSF8VDTTHLhnay55tnTQ=
+X-Google-Smtp-Source: AGHT+IGN/g/G+FXYvmY4HkM76lkSBKmxvlD+n6uvRjDt3aMuV/oycOrSHTiQPvVwSkF6jaF3MwJXew==
+X-Received: by 2002:a05:6214:5f03:b0:6b0:7ba0:ef67 with SMTP id 6a1803df08f44-6bb9840713dmr163494426d6.31.1722965030621;
+        Tue, 06 Aug 2024 10:23:50 -0700 (PDT)
+Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bb9c79744esm48263166d6.40.2024.08.06.10.23.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Aug 2024 10:23:50 -0700 (PDT)
+Received: from jgg by wakko with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1sbNuX-00FYRk-Mv;
+	Tue, 06 Aug 2024 14:23:49 -0300
+Date: Tue, 6 Aug 2024 14:23:49 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: James Houghton <jthoughton@google.com>
+Cc: David Hildenbrand <david@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Ankit Agrawal <ankita@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	David Matlack <dmatlack@google.com>,
+	David Rientjes <rientjes@google.com>,
+	James Morse <james.morse@arm.com>, Jonathan Corbet <corbet@lwn.net>,
+	Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Raghavendra Rao Ananta <rananta@google.com>,
+	Ryan Roberts <ryan.roberts@arm.com>,
+	Sean Christopherson <seanjc@google.com>,
+	Shaoqin Huang <shahuang@redhat.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>,
+	Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>,
+	kvmarm@lists.linux.dev, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mm@kvack.org
+Subject: Re: [PATCH v6 05/11] mm: Add fast_only bool to test_young and
+ clear_young MMU notifiers
+Message-ID: <20240806172349.GQ676757@ziepe.ca>
+References: <20240724011037.3671523-1-jthoughton@google.com>
+ <20240724011037.3671523-6-jthoughton@google.com>
+ <37ae59f2-777a-4a58-ae58-4a20066364dd@redhat.com>
+ <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <4cdd93ba-9019-4c12-a0e6-07b430980278@redhat.com>
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: IXdqrJVxXSKqBhFXqNY1RdXvAtHONbC5
-X-Proofpoint-GUID: IXdqrJVxXSKqBhFXqNY1RdXvAtHONbC5
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-06_13,2024-08-06_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- suspectscore=0 phishscore=0 malwarescore=0 bulkscore=0 spamscore=0
- lowpriorityscore=0 mlxscore=0 clxscore=1015 adultscore=0
- priorityscore=1501 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408060121
+In-Reply-To: <CADrL8HUmQWDc-75p=Z2KZzHkyWCCh8xnX=+ZXm5MZ-drALjKTA@mail.gmail.com>
 
-On Tue, Aug 06, 2024 at 03:51:22PM +0200, David Hildenbrand wrote:
-> > -	if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
-> > +	if (!ops->accessible && (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)) {
-> >   		r = guest_memfd_folio_private(folio);
-> >   		if (r)
-> >   			goto out_err;
-> > @@ -107,6 +109,82 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
-> >   }
-> >   EXPORT_SYMBOL_GPL(guest_memfd_grab_folio);
-> > +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio)
-> > +{
-> > +	unsigned long gmem_flags = (unsigned long)file->private_data;
-> > +	unsigned long i;
-> > +	int r;
-> > +
-> > +	unmap_mapping_folio(folio);
-> > +
-> > +	/**
-> > +	 * We can't use the refcount. It might be elevated due to
-> > +	 * guest/vcpu trying to access same folio as another vcpu
-> > +	 * or because userspace is trying to access folio for same reason
-> 
-> As discussed, that's insufficient. We really have to drive the refcount to 1
-> -- the single reference we expect.
-> 
-> What is the exact problem you are running into here? Who can just grab a
-> reference and maybe do nasty things with it?
-> 
+On Thu, Aug 01, 2024 at 04:13:40PM -0700, James Houghton wrote:
+> --- a/include/linux/mmu_notifier.h
+> +++ b/include/linux/mmu_notifier.h
+> @@ -106,6 +106,18 @@ struct mmu_notifier_ops {
+>          * clear_young is a lightweight version of clear_flush_young. Like the
+>          * latter, it is supposed to test-and-clear the young/accessed bitflag
+>          * in the secondary pte, but it may omit flushing the secondary tlb.
+> +        *
+> +        * The fast_only parameter indicates that this call should not block,
+> +        * and this function should not cause other MMU notifier calls to
+> +        * block. Usually this means that the implementation should be
+> +        * lockless.
+> +        *
+> +        * When called with fast_only, this notifier will be a no-op unless
+> +        * has_fast_aging is set on the struct mmu_notifier.
 
-Right, I remember we had discussed it. The problem I faced was if 2
-vcpus fault on same page, they would race to look up the folio in
-filemap, increment refcount, then try to lock the folio. One of the
-vcpus wins the lock, while the other waits. The vcpu that gets the
-lock vcpu will see the elevated refcount.
+If you add a has_fast_aging I wonder if it is better to introduce new
+ops instead? The semantics are a bit easier to explain that way
 
-I was in middle of writing an explanation why I think this is best
-approach and realized I think it should be possible to do
-shared->private conversion and actually have single reference. There
-would be some cost to walk through the allocated folios and convert them
-to private before any vcpu runs. The approach I had gone with was to
-do conversions as late as possible.
-
-Thanks,
-Elliot
+Jason
 
