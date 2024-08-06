@@ -1,309 +1,263 @@
-Return-Path: <kvm+bounces-23293-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23295-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2452B94868B
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 02:10:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BBF19486B1
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 02:45:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2E47284C67
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 00:10:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97A671F23DBC
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 00:45:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A238710F2;
-	Tue,  6 Aug 2024 00:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4BD63B9;
+	Tue,  6 Aug 2024 00:45:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dlbFBL/1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DM/qPMdL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 293FFA32;
-	Tue,  6 Aug 2024 00:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722903001; cv=fail; b=luwZn5XLnT8C4K1X8Tq3DelbpKZfz4vCmpwf/efRepmW/rc3BPJjE5bJ7GxoAtMw9hPqdEdkDJo8YaNchDtKMCfPBvZlS876nAk9UPna4DXmgqp0RDrBVKjbjBhL/d6YTkL/7GWExI8fxh9BuyaYZtrzWopwiJlDBu0C+L//n08=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722903001; c=relaxed/simple;
-	bh=sl3yWaqs5o73nmZ9OkIGHYguQcjP2oCyfqoGN4Hb5+U=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=HoR3pHL4JdbBAVqQiNqwpsODhtu1ZHkM3Uz3OurvtaKxeILCM2gRwTDTvsmfD3SH/WBPmHRg0OhstoltxdDJ2GieLDUvbFkMt1pUAwChjqPBaN859kwx0iHKtbLjfT2yWXfXC4jMiwrcRN25ABWulGBZCafoaRkdk7BN9rY4Uak=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dlbFBL/1; arc=fail smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1722903000; x=1754439000;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sl3yWaqs5o73nmZ9OkIGHYguQcjP2oCyfqoGN4Hb5+U=;
-  b=dlbFBL/1B1mCY5dp70vFkC87XVUFBkb0pMJghovs7B5I1aeklowJ+32N
-   XK0P/jkGid6N7OFyBvstQuiBtgk3JsD75t0Gq1BgJIcCjusSPylKq4yDF
-   7si9yA8Eh5wGQYL0XTHhB5kR7pPBYkiYqohnrP7O6HsavLAcgXO/31aZw
-   Rc9COZVtzV71iNxvtSt0MkwIJObxTwh88JyaJr8kbu9QxDcm9zYASZgav
-   42ES6FZXWMG3wrlW3ydRamrhTNQ/PPOpFu8MrPdSlUeCAXBtdK4Af47J0
-   H/EVlvdYoqK3RAK6OtBD+Z0+qW8qoJpoITfpGWHiaBsuBL/ieA2Wrz8Ad
-   A==;
-X-CSE-ConnectionGUID: PrqtNYSbSbCKTNufgQJhoQ==
-X-CSE-MsgGUID: Jk/bV0jTR6WXeJo5HphIFg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11155"; a="21073916"
-X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
-   d="scan'208";a="21073916"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Aug 2024 17:09:59 -0700
-X-CSE-ConnectionGUID: qNQOkYabQW6DLIcb2SAm9Q==
-X-CSE-MsgGUID: sLGQECtUSTeMyvvdxmi8AQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,266,1716274800"; 
-   d="scan'208";a="56245351"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Aug 2024 17:10:00 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 5 Aug 2024 17:09:58 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 5 Aug 2024 17:09:58 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 5 Aug 2024 17:09:58 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 5 Aug 2024 17:09:58 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=CMURatsFyOx8AsMQySlT23PgBtdvshpd/KRCrYkb76J7P5UpfA96IV8pArA8yINDRZ2LCVs6ltYmUIwB8YJy0v3K4u9mcXXkVp0oqLYnKpc9+eaPazwfeieuiX6U99SfUIFUmpJLC0YxdhgqYmx9BIdCt4hYQbr584QsJApjANF5gIkxas+6R37BpOyp+GcFb7Lf67bP8znoKdcD4Blp1lXkgjSpTsAU9mP6M3pxG+Opg4QN/FLxsSius23MEAUnlH4uKLOZXhx0GkzLIMhPxsjSeBZRwSQHAIJvl/lLJK126P0RrTOMhaNy2vWvSftF6ZUmIHxh1ds9rbfMcLduIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hFemsVxZcTLUv/+btFSQaYHBtE1i57CIigtEHCsudCA=;
- b=t7mbxVE9trH+b6WTmV+twmB8AL8XqVJqNku27hfijbx/qw3ZBdy2oU8Zf9aZERSQ8Ywdo8R8qH34SUfP6yyDWagzcudIIjIl/ZBhC3sUWbHXz2W8pyoGiNc1abvFaNFuD/xPBlhrEypoSH444XG8J2yFcOXsPaSiO/aWUfdJz0YZ6IN8FICnN4NumeiTwnErDQirFMabJi2bZXlrCz177LS9WjOYuxjzN+ikJVGJzzNEcbbC6xNqkG6YSuh3uM2R++umbCXNLgRu7so19WEe7kXfzpk6gK7dPRQr/k9eM/fIejgZg4sVWxXQEyxIy2n+F775fXZ5lnw8cmykkGfi6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
- by PH7PR11MB8123.namprd11.prod.outlook.com (2603:10b6:510:236::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.28; Tue, 6 Aug
- 2024 00:09:56 +0000
-Received: from BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
- ([fe80::fdb:309:3df9:a06b%7]) with mapi id 15.20.7828.023; Tue, 6 Aug 2024
- 00:09:56 +0000
-Message-ID: <7b65b317-397d-4a72-beac-6b0140b1d8dd@intel.com>
-Date: Tue, 6 Aug 2024 12:09:45 +1200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 02/10] x86/virt/tdx: Unbind global metadata read with
- 'struct tdx_tdmr_sysinfo'
-To: "Williams, Dan J" <dan.j.williams@intel.com>, "Hansen, Dave"
-	<dave.hansen@intel.com>, "kirill.shutemov@linux.intel.com"
-	<kirill.shutemov@linux.intel.com>, "bp@alien8.de" <bp@alien8.de>,
-	"tglx@linutronix.de" <tglx@linutronix.de>, "peterz@infradead.org"
-	<peterz@infradead.org>, "mingo@redhat.com" <mingo@redhat.com>,
-	"hpa@zytor.com" <hpa@zytor.com>, "seanjc@google.com" <seanjc@google.com>,
-	"pbonzini@redhat.com" <pbonzini@redhat.com>
-CC: "x86@kernel.org" <x86@kernel.org>, "kvm@vger.kernel.org"
-	<kvm@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Edgecombe, Rick P"
-	<rick.p.edgecombe@intel.com>, "Yamahata, Isaku" <isaku.yamahata@intel.com>,
-	"Gao, Chao" <chao.gao@intel.com>, "binbin.wu@linux.intel.com"
-	<binbin.wu@linux.intel.com>
-References: <cover.1721186590.git.kai.huang@intel.com>
- <7af2b06ec26e2964d8d5da21e2e9fa412e4ed6f8.1721186590.git.kai.huang@intel.com>
- <66b16121c48f4_4fc729424@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Language: en-US
-From: "Huang, Kai" <kai.huang@intel.com>
-In-Reply-To: <66b16121c48f4_4fc729424@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR03CA0352.namprd03.prod.outlook.com
- (2603:10b6:a03:39c::27) To BL1PR11MB5978.namprd11.prod.outlook.com
- (2603:10b6:208:385::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 403836FBF
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 00:45:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722905143; cv=none; b=RrPZNiK20w5dYS9RhJt0xyzAnvDk4nqPq9I6K0dxSqjIQciPirR9E93azYUL26YWm8ItRfUtP4vroOLoe9hYcevN0P2HLIJnARjq1GpACoPVL0q49edjoQGdW+HlTfQ0g/dbPeYMiTjzRhPYI/baH3TyaVMhFJJQYWGyDQszVuw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722905143; c=relaxed/simple;
+	bh=xJZinW9gvbRfqGqVK8gwS78zN2XDlEhctENfqDXkpIM=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gGTZs5AjSYthueXh3AIEHK3uffiFj14RRDYYpSGchpcOO+N6WGT1/+IXu8WTUHMD9+9nlB8VamTpm1uRgZXx9y9mC9XGc4F1lAq/Hyh6Bncr68Zdeo9Jj5OZk0EfpgGqh3ClJiFr8h/DFnyOtDtVLNzR35hokUL8y7SWQtwvYU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DM/qPMdL; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e0bbd1ca079so39633276.2
+        for <kvm@vger.kernel.org>; Mon, 05 Aug 2024 17:45:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1722905141; x=1723509941; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RlwWN4is+MXSZU2QpqY/Ao8/6cEmVqrwuY1O9PQnYgo=;
+        b=DM/qPMdLWJ9ZO29UeGwF3vnQGM0NhXi8PQXim6WrRMkrKBieu5/W201KvBCdM1PFzu
+         E7hP4j+dx7R6HKpb43h+68iZZ7tsKvghuS13Z8wAetYg7PSyJGmmYz0rIkYrovYTYgVv
+         5hyTY3xFj2Our9hOzUGl9iFsws9GTaVZtI4Nc7L5JGdMH15wvoTk3JPYbNUWFTK2RYw7
+         wNEztQL0o7YNsz4Enu8Odct1XXqasraD09OurmWWDZuiew/Y2HNV+mfwmLoh8y3yBuFP
+         BKUvLB/HK/SF/G4GOEnUSQj/e6oi32D8e/hVcmCEF0wnCTl9kmTiETXSsLd1upD76Uni
+         4Eaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722905141; x=1723509941;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RlwWN4is+MXSZU2QpqY/Ao8/6cEmVqrwuY1O9PQnYgo=;
+        b=dje24eelmIFZ6kmpK6ILB3N+/O9pnwjB2pVEYrRvU4atKgTDyA9lVSWu2hjseKR+Uu
+         U9NAPkWfXKeOLxL8wBp3/DQB8RKGUde69RsrP81oPRGzb1HtO0AMbjZkOXk7n12Aqjc8
+         PFpkd+DSTDVHqbPp/92lhX/FXnmd7jPcstl6+wTz2H0yTAeOFfbbDzFYkEYtavOFWS9N
+         p2iqYPn/+AzjlfwTrKE65PmnwTX47o/ie6wtO0+cJZfn5R/0W3DXHu5IpHsUWapKgq5m
+         YFQ8ys2hT8g9CWUOmOopriFauxuOyyqX9U2qidDQ4J2eVw4nc/fXAq17LBzZtVimgKHC
+         CCSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV9zaGBOcbzPCUZFJJ2/ciMfPVeK2DueFytQgkgCHD9dIxghrhuRCNofOnK/1XKiw5GKIEE4ztAACggwjXJhj2Kj/jG
+X-Gm-Message-State: AOJu0Yyk38xaRdIRhLLVc/BTjl43XBvV19YFAILBjZw4CVcJG7PC6nuy
+	TdJjwvA48UEoxS02Eu9MYJvVT1bp7ga+cTslQ/dF01TqgXPwCdXZxI0GDYPWsdcpw3iFBd0X5MN
+	26g==
+X-Google-Smtp-Source: AGHT+IHAlcDpPkJK+Ho8bhRXhblm6X1pytNk7PD61xxKNen6ECBnp7JfJ5NAekg+iOwpjGK6T15xL1tPhyo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:6902:1892:b0:e05:aa67:2d4b with SMTP id
+ 3f1490d57ef6-e0bde222289mr276960276.3.1722905141251; Mon, 05 Aug 2024
+ 17:45:41 -0700 (PDT)
+Date: Mon, 5 Aug 2024 17:45:39 -0700
+In-Reply-To: <f862cefff2ed3f4211b69d785670f41667703cf3.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|PH7PR11MB8123:EE_
-X-MS-Office365-Filtering-Correlation-Id: 746a42d2-9999-4a37-d0df-08dcb5ac1a58
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?YkwvUHpqQjZNS2VRUkxxcGtMbjVpYVd2K1Z4U0ROYS9HNVF4b3d5ZTN3QnU5?=
- =?utf-8?B?dVFJelF4bzJHYi9tUzMyNjZPdEFoelZEdHU0K0pScWhjRjN1bDNlakNPQ1ph?=
- =?utf-8?B?eEtacnd4UW5xOFV1Nnd0Sy9DRnJpUWI0NkRLV29palgzYUlFeHF6aTZoSWph?=
- =?utf-8?B?SDNvMDIvMWtFOFFrRjkzbHdpWlhOT0kwbTFFRlUwenhMVFB6c3lrWVU1eGpC?=
- =?utf-8?B?bG5oUFErd1RzYUZhQzNFdGVibElHQmNCUTRMZFIvSkwzbWpTWlZicS9WQnlP?=
- =?utf-8?B?NUhycmVUTWVZMTdTMnRCc0RNOEowVUkrb3ZiMGR1eTFZS1VGU0c4QTBTbmJ4?=
- =?utf-8?B?K2plaEhxV3duc2ZBTEtxSGJYNGhtaUlPZ2d5Q29SUnNHVHhQRHh2UGJKb0pK?=
- =?utf-8?B?cnZ5YXNhUWo0eWh0RFhaZkZSbTI2NFo5MUk0ZVJ0c252Z21tKzlkVC9oMXJW?=
- =?utf-8?B?VmI3RnFEd213YWlTWXZ1YmlyM2c2SjZQR2ozcHNZelpiWUdvblErWVJUNGpH?=
- =?utf-8?B?dVo3Wlo1dkVGWkVsUGN6L25WWlo4NUpOUnZVamJOcFRtQ2wrYkV1d3FXS2la?=
- =?utf-8?B?Sm1wTkRodzE2dzZ5THY5Uyt1NmE3eEkzdkxSc2tTL3dleFVOVEdpOXVQWGF6?=
- =?utf-8?B?blIzaFQ0MXJ3NDdJK0FVcjZWalJmM1V1WGxuTEpRRlF2c3RUSTdiS0NWRWNq?=
- =?utf-8?B?ems4dWF3NkVzMk5KZW9HWTRmc096YmZ0Njg5YnUvd1FBMDdXZjJHSlFWWjlO?=
- =?utf-8?B?UCt3L2NVSldDZ3V2UEpmWGI3ZEMzaWliT2E3QmExaEFVTDlCRFlRQlBoYjJq?=
- =?utf-8?B?Z2VkS282NjFVNThQMks3TjgrNjAvbDdpNkllYXV1N0lZYXJwVHpHOExTbHM5?=
- =?utf-8?B?MU1INGs0bGdNc08vL1BHVlFUTFB2aTNDWStoZVd0WnQ3ZkthcXMrS3Z0S3dZ?=
- =?utf-8?B?M1RDSHVMbTZ5NCswQ0lFUGFoZXcvQlhNaDFiNG52WUJKY0J4UU9XUjVGcXBi?=
- =?utf-8?B?MFFmdG1PMDY4MWFiRTVBa0luV1Z4SVEvTzVHR3BWQnZSTXZiZFFLYnBndVNp?=
- =?utf-8?B?YndrMHZhUHNkTzRmcTdLRXZ3ZDNoLzljbVJ1UG1YZjNFWnM5bUVPZGpPdHRL?=
- =?utf-8?B?UkJ2QkVqSnJnYlpSbnZLTC9JMUExTnZVbDBwR2lYRnNnR2x5a2hmclNPMWRQ?=
- =?utf-8?B?VHBsRWVUN3dScFViTW9MYXpkbStvQVhxK3N6UmdNdnhmQ0dDUXlsa3NnVjRt?=
- =?utf-8?B?bmZhU1FJWS9wam5KK2RzSjZ1STQ5OEd4TEgyYlJRcStpcFJUbG9xaWFyY0dr?=
- =?utf-8?B?M0VXZWMzeDNBRkV3NjBUbG51M1IvNkZRbGhuWWdVSkZucnVEYnN4cWtFZFNR?=
- =?utf-8?B?bXNFOWVUTWRaQ25BZHR2MTlLZDFJTnlEZDBJeUYzbmM1RnpJWXFXcXNVVEpH?=
- =?utf-8?B?YlVHMDNjdHpzTnhGWlE5WXJjRXRTd0dtWnA0SXNuM29IREFkTGlja21WNWdy?=
- =?utf-8?B?QzVWUkxVWkJtUkNEYlJYZ09hMWUxWlZFSHlkazV2d29BaUtySzJjdDl5UnBq?=
- =?utf-8?B?bS9TRHNJT1BHN3k2UFlvSStIUmJXZTBLdFIyWnZPOEpWQnk4M2VZaEVuNlR4?=
- =?utf-8?B?WG14RXBhbkRRYXF5c1lnUnJ5dXJmSHU0bm1jMDlRUGROSzlpYmtmTktLQ24w?=
- =?utf-8?B?QUY0WnFGSWRYMFY4RW1vcUZicUtkRDdEMk01WXpoek9CeEpVdm9XN3gzSjA2?=
- =?utf-8?B?NjNxU0xvWXFLVnRRaElqK3VOeDdOS1hmN0xzdXM0bmZsRVpkR2FkODZMek1E?=
- =?utf-8?B?SHU5WUIrL0RLM09XN013QT09?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eDZuTkRXa3h0clo0RFJuWXI1RUR5dHVrZHNUUzYzNVhzWDdJY1JMVnRoWmFk?=
- =?utf-8?B?RldHbXlYRVVSRno4cjlKUXd2VEc1VzhSbjByRWdURmZRV3JDb3NjajhvTFhs?=
- =?utf-8?B?bHNuT0h1NjRwTkxBblA3ZVNvTVQxS3lRU0g1RVhnSFBBQWxoTlNmUjNjOGtq?=
- =?utf-8?B?eFRVRXdBQlNuR2dQM3hLbWFJMGE0dFZHSEt4S2pnRVBka0lQZ0J5WkZsS1Zw?=
- =?utf-8?B?TkN2a3VMV1RFQkE1Z2hIZi8ybUZSaUVVNUcwSm1GTi9FU2Yrc1VKWVhnd0xt?=
- =?utf-8?B?Y28rcXZBWUVzT0dnY3BZQjFkcStZaUVxazlJbTNOK21YSXlpMGFBTjRiSThW?=
- =?utf-8?B?WW5yMjF3bi9idWhQeVpTN1pUZXJqazlITTZxVWdBNXpvc1YxbTlYWkY4b2d4?=
- =?utf-8?B?QURvVDdkZ0RqN3hUWUZvcXhCMXVhOGVlczI2Tmd6d01vT0tuTWNQdDJSRjV4?=
- =?utf-8?B?S1pxdlBOenhZNGxBc1dnNWxYb3FTRk5nZndqRmZrVmhUSGxCNVg1eGl6cjRX?=
- =?utf-8?B?TUxmV3FONDM1eUlDSnV5Q0VUdFRxUUgrTmttN1N4blcwMVRreHhmZXk0TWpO?=
- =?utf-8?B?U09WQ3FGZ0lXaTZzZ2pSNE9oMm5mTFhVa2M5Q1ExV1dXK1gweCsvcFJOYnpE?=
- =?utf-8?B?VWNIMkxRYjRkTmRkYTRpbWZQalhCUkRDb1Vnb3FwaXhsejFpQU56NlhOVnhk?=
- =?utf-8?B?YmcrcWE2RVQyeXVEU3J1WmIwUW5DeWZlUU1Db1hoZ2tFR09BeWVWSEZYbnlx?=
- =?utf-8?B?Q1k3L0I0SEdONTJyaFR4dk5IZFBrNmlHZ2Q3OVIvVWJtMjJYU2JmeVhybkdz?=
- =?utf-8?B?Tk85RHBHNW1wRkpJVW1vem5IZjRROEo5RTluSFdHeW1PaGdZWU8vTkhUZ01V?=
- =?utf-8?B?K1NBREd5MVZSV1YvSlFJN3pXb3k1VkRMbUNieHpjN2lndllmQUllMjdLRThI?=
- =?utf-8?B?ek55UmlSd0xQQThrYXdObkR2Z0VLMnphT2VnTU9sbVYwWTNhOXQzWTc5YjhN?=
- =?utf-8?B?QmFsWG9aVm1MbUtWYmlyRS84QmhQdDE5enVxbk5ybE54eUV4ZGNSb2tOSy9M?=
- =?utf-8?B?RkNkdUhObktzUG9MTk92NVhZYlJOYzM1dDlyN2dkRzZEMDJxbjMzWDgyM2hu?=
- =?utf-8?B?SU5RVUZKcjgycHJKQk9Ma3BOSFpoMXExUE9XM2o0Z25ORXNEUG5OSG95Slo2?=
- =?utf-8?B?YmZ2b3lHeVJVWWtKVlRnTjcxY0wySGRKZHljcWNIN1k4RXROck1RWkNTRFZV?=
- =?utf-8?B?L1dnaUprNWJDc3p5OTVFVGQvV2lNaHYydDN2UXRIRC9nYjUrZGYwTE9yUjUv?=
- =?utf-8?B?WjdpN3FhcS9FcDNCVnBYLy9HdThzaXdCU1RZSlpWSHhMZ3UrTWQ0dTlRNmEr?=
- =?utf-8?B?SC9BNTIxYVhnV09hc01LZkEzUFlUU1FxdXdia2ZmUVdIaWV0WkZOS3FNZTYy?=
- =?utf-8?B?VTZSQWt2ang4N2p0VnI0R2V3UjJzdStwcU16RlJLUjRDcXRPTEdCNkd3Sks0?=
- =?utf-8?B?cml4elJPTkNjcnNJcGJxRnFrRTdQanNJRTNvSWpkdUxITFBrTHF1Y0ZoQlFD?=
- =?utf-8?B?R0gvN0c3ZkxkMjE5M0R0Y1A2VFIyZm43ellCWmxGQkpSR2NPTko5elcrRDVo?=
- =?utf-8?B?RC8vK0V3ay9HSGs3L2grcDNsR2tqdEd2cHNaelREQ0NOYTFDc1MyTzA4Q0Jn?=
- =?utf-8?B?MlRWeUFMODJUVUJSRWxweUswWWN3RUtHLytQdW12K21jMGNsRjdjMHFxSEEv?=
- =?utf-8?B?a1NadkEvZGFaZ000alpvWVhudER5a1NXVHA3bW0za3FuMlhaeHoxeWx0UXB1?=
- =?utf-8?B?RXJRUFI3TkxnMVpPTXVob2lSRjVsUG5sWTF1QndTY0Zhck01M2JKejNoNjd5?=
- =?utf-8?B?Ly9JeGI3K1NzYUsrQVIrNTN3YUorSkRxMlA0NXBtaWRubEFsalhGRi9tVlpC?=
- =?utf-8?B?SWQxMWZvMzNYb2IzN1JTb1hxM0RyWHNrd0tUYjVCMVN3d2d6Q3ZwSW12VG15?=
- =?utf-8?B?aFljR2p5aG1IS0xaSEt2WUJIZnB6UzdzT3BRRjd1TnM1MFdpZEFHTWRRdTJ6?=
- =?utf-8?B?dXh5bDRYeE53c0FyVFVOZWVIaFRlWkIwK2ZKUDd0SmpmQ3diWkovVGVGVGla?=
- =?utf-8?Q?AfFQVvZHnhAjVJOzutskoeN89?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 746a42d2-9999-4a37-d0df-08dcb5ac1a58
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2024 00:09:56.2383
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: bkdBQmvwUEaUeR1N7kAvXDCGC1LHw9KvxMa6aH/98BnMtvpvU9qJ8M9v6YHO+SjvvyVRUl0AGRhbfs3PaaykJA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8123
-X-OriginatorOrg: intel.com
+Mime-Version: 1.0
+References: <20220427014004.1992589-1-seanjc@google.com> <20220427014004.1992589-7-seanjc@google.com>
+ <294c8c437c2e48b318b8c27eb7467430dfcba92b.camel@infradead.org> <f862cefff2ed3f4211b69d785670f41667703cf3.camel@infradead.org>
+Message-ID: <ZrFyM8rJZYjfFawx@google.com>
+Subject: Re: [PATCH] KVM: Move gfn_to_pfn_cache invalidation to
+ invalidate_range_end hook
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Mushahid Hussain <hmushi@amazon.co.uk>, 
+	Vitaly Kuznetsov <vkuznets@redhat.com>, Wanpeng Li <wanpengli@tencent.com>, 
+	Jim Mattson <jmattson@google.com>, Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
+	Maxim Levitsky <mlevitsk@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
 
+On Mon, Aug 05, 2024, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> The existing retry loop in hva_to_pfn_retry() is extremely pessimistic.
+> If there is an invalidation running concurrently, it is effectively just
+> a complex busy wait loop because its local mmu_notifier_retry_cache()
+> function will always return true.
+> 
+> It ends up functioning as a very unfair read/write lock. If userspace is
+> acting as a 'writer', performing many unrelated MM changes, then the
+> hva_to_pfn_retry() function acting as the 'reader' just backs off and
+> keep retrying for ever, not making any progress.
+> 
+> Solve this by introducing a separate 'validating' flag to the GPC, so
+> that it can be marked invalid before it's even mapped. This allows the
+> invalidation to be moved to the range_end hook, and the retry loop in
+> hva_to_pfn_retry() can be changed to loop only if its particular uHVA
+> has been affected.
 
+I think I'm missing something.  How does allowing hva_to_pfn_retry() allow KVM
+as a whole to make forward progress?  Doesn't getting past hva_to_pfn_retry()
+just move the problem to kvm_gpc_check()?
 
-On 6/08/2024 11:32 am, Williams, Dan J wrote:
-> Kai Huang wrote:
->> The TDX module provides a set of "global metadata fields".  They report
->> things like TDX module version, supported features, and fields related
->> to create/run TDX guests and so on.
->>
->> For now the kernel only reads "TD Memory Region" (TDMR) related global
->> metadata fields to a 'struct tdx_tdmr_sysinfo' for initializing the TDX
->> module, and the metadata reading code can only work with that structure.
->>
->> Future changes will need to read other metadata fields that don't make
->> sense to populate to the "struct tdx_tdmr_sysinfo".  It's essential to
->> provide a generic metadata read infrastructure which is not bound to any
->> specific structure.
->>
->> To start providing such infrastructure, unbind the metadata reading code
->> with the 'struct tdx_tdmr_sysinfo'.
->>
->> Note the kernel has a helper macro, TD_SYSINFO_MAP(), for marshaling the
->> metadata into the 'struct tdx_tdmr_sysinfo', and currently the macro
->> hardcodes the structure name.  As part of unbinding the metadata reading
->> code with 'struct tdx_tdmr_sysinfo', it is extended to accept different
->> structures.
->>
->> Unfortunately, this will result in the usage of TD_SYSINFO_MAP() for
->> populating 'struct tdx_tdmr_sysinfo' to be changed to use the structure
->> name explicitly for each structure member and make the code longer.  Add
->> a wrapper macro which hides the 'struct tdx_tdmr_sysinfo' internally to
->> make the code shorter thus better readability.
->>
->> Signed-off-by: Kai Huang <kai.huang@intel.com>
->> Reviewed-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
->> Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
->> ---
->>
->> v1 -> v2:
->>   - 'st_member' -> 'member'. (Nikolay)
->>
->> ---
->>   arch/x86/virt/vmx/tdx/tdx.c | 25 ++++++++++++++-----------
->>   1 file changed, 14 insertions(+), 11 deletions(-)
->>
->> diff --git a/arch/x86/virt/vmx/tdx/tdx.c b/arch/x86/virt/vmx/tdx/tdx.c
->> index d8fa9325bf5e..2ce03c3ea017 100644
->> --- a/arch/x86/virt/vmx/tdx/tdx.c
->> +++ b/arch/x86/virt/vmx/tdx/tdx.c
->> @@ -272,9 +272,9 @@ static int read_sys_metadata_field(u64 field_id, u64 *data)
->>   
->>   static int read_sys_metadata_field16(u64 field_id,
->>   				     int offset,
->> -				     struct tdx_tdmr_sysinfo *ts)
->> +				     void *stbuf)
-> 
-> The loss of all type-safety sticks out, and points to the fact that
-> @offset was awkward to pass in from the beginning. I would have expected
-> a calling convention like:
-> 
-> static int read_sys_metadata_field16(u64 field_id, u16 *val)
-> 
-> ...and make the caller calculate the buffer in a type-safe way.
-> 
-> The problem with the current code is that it feels like it is planning
-> ahead for a dynamic metdata reading future, that is not coming, Instead
-> it could be leaning further into initializing all metadata once.
-> 
-> In other words what is the point of defining:
-> 
-> static const struct field_mapping fields[]
-> 
-> ...only to throw away all type-safety and run it in a loop. Why not
-> unroll the loop, skip the array, and the runtime warning with something
-> like?
-> 
-> read_sys_metadata_field16(MD_FIELD_ID_MAX_TDMRS, &ts->max_tdmrs);
-> read_sys_metadata_field16(MD_FIELD_ID_MAX_RESERVED_PER_TDMR, &ts->max_reserved_per_tdmr);
-> ...etc
-> 
-> The unrolled loop is the same amount of work as maintaining @fields.
+kvm_gpc_refresh() can't be called with gpc->lock held, and nor does it return
+with gpc->lock held, so a racing mmu_notifier invalidation can/will acquire
+gpc->lock and clear gpc->active, no?
 
-Hi Dan,
+Oh, by "unrelated", you mean _completely_ unrelated?  As in, KVM happens to do a
+refresh when userspace is blasting MADV_DONTNEED, and gets stuck retrying for
+no good reason?
 
-Thanks for the feedback.
+Servicing guest pages faults has the same problem, which is why
+mmu_invalidate_retry_gfn() was added.  Supporting hva-only GPCs made our lives a
+little harder, but not horrifically so (there are ordering differences regardless).
 
-AFAICT Dave didn't like this way:
+Woefully incomplete, but I think this is the gist of what you want:
 
-https://lore.kernel.org/lkml/cover.1699527082.git.kai.huang@intel.com/T/#me6f615d7845215c278753b57a0bce1162960209d
+diff --git a/virt/kvm/pfncache.c b/virt/kvm/pfncache.c
+index f0039efb9e1e..1c4c95ab7d0a 100644
+--- a/virt/kvm/pfncache.c
++++ b/virt/kvm/pfncache.c
+@@ -28,6 +28,26 @@ void gfn_to_pfn_cache_invalidate_start(struct kvm *kvm, unsigned long start,
+        struct gfn_to_pfn_cache *gpc;
+ 
+        spin_lock(&kvm->gpc_lock);
++
++       if (likely(kvm_is_error_hva(kvm->mmu_gpc_invalidate_range_start)) {
++               kvm->mmu_gpc_invalidate_range_start = start;
++               kvm->mmu_gpc_invalidate_range_end = end;
++       } else {
++               /*
++                * Fully tracking multiple concurrent ranges has diminishing
++                * returns. Keep things simple and just find the minimal range
++                * which includes the current and new ranges. As there won't be
++                * enough information to subtract a range after its invalidate
++                * completes, any ranges invalidated concurrently will
++                * accumulate and persist until all outstanding invalidates
++                * complete.
++                */
++               kvm->mmu_gpc_invalidate_range_start =
++                       min(kvm->mmu_gpc_invalidate_range_start, start);
++               kvm->mmu_gpc_invalidate_range_end =
++                       max(kvm->mmu_gpc_invalidate_range_end, end);
++       }
++
+        list_for_each_entry(gpc, &kvm->gpc_list, list) {
+                read_lock_irq(&gpc->lock);
+ 
+@@ -124,8 +144,11 @@ static void gpc_unmap(kvm_pfn_t pfn, void *khva)
+ #endif
+ }
+ 
+-static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_seq)
++static inline bool mmu_notifier_retry_cache(struct gfn_to_pfn_cache *gpc,
++                                           unsigned long mmu_seq)
+ {
++       struct kvm *kvm = gpc->kvm;
++
+        /*
+         * mn_active_invalidate_count acts for all intents and purposes
+         * like mmu_invalidate_in_progress here; but the latter cannot
+@@ -138,7 +161,9 @@ static inline bool mmu_notifier_retry_cache(struct kvm *kvm, unsigned long mmu_s
+         * be elevated before the mmu_notifier acquires gpc->lock, and
+         * isn't dropped until after mmu_invalidate_seq is updated.
+         */
+-       if (kvm->mn_active_invalidate_count)
++       if (kvm->mn_active_invalidate_count &&
++           gpc->uhva >= kvm->mmu_gpc_invalidate_range_start &&
++           gpc->uhva < kvm->mmu_gpc_invalidate_range_end)
+                return true;
+ 
+        /*
+@@ -224,7 +249,7 @@ static kvm_pfn_t hva_to_pfn_retry(struct gfn_to_pfn_cache *gpc)
+                 * attempting to refresh.
+                 */
+                WARN_ON_ONCE(gpc->valid);
+-       } while (mmu_notifier_retry_cache(gpc->kvm, mmu_seq));
++       } while (mmu_notifier_retry_cache(gpc, mmu_seq));
+ 
+        gpc->valid = true;
+        gpc->pfn = new_pfn;
+
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+> I note I'm deleting a big comment in kvm_main.c about doing the
+> invalidation before acquiring mmu_lock. But we don't hold the lock
+> in the range_end callback either, do we?
+
+Correct, __kvm_handle_hva_range() acquires and releases mmu_lock.  However, the
+intent of the comment was to clarify why GPCs are invalidated in
+kvm_mmu_notifier_invalidate_range_start(), as opposed to kvm_mmu_invalidate_begin()
+which _is_ called under mmu_lock and is also called if and only if KVM has a
+relevant memslot.  E.g. that's why the comment also talks about memslot overlap
+checks.
+
+>  
+>  include/linux/kvm_types.h |  1 +
+>  virt/kvm/kvm_main.c       | 14 ++------
+>  virt/kvm/kvm_mm.h         | 12 +++----
+>  virt/kvm/pfncache.c       | 75 +++++++++++++++++++--------------------
+>  4 files changed, 45 insertions(+), 57 deletions(-)
+> 
+> diff --git a/include/linux/kvm_types.h b/include/linux/kvm_types.h
+> index 827ecc0b7e10..30ed1019cfc6 100644
+> --- a/include/linux/kvm_types.h
+> +++ b/include/linux/kvm_types.h
+> @@ -69,6 +69,7 @@ struct gfn_to_pfn_cache {
+>  	void *khva;
+>  	kvm_pfn_t pfn;
+>  	bool active;
+> +	bool validating;
+
+This is a confusing name, partly because KVM usually deals with invalidation
+events, but also because it's sticky and stays set long after the act of
+validating the GPC is complete.
+
+Something like "needs_invalidation" is the best I can come up with, but I believe
+this bikeshed is moot (see above and below).
+
+>  	bool valid;
+>  };
+>  
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d0788d0a72cc..ffd6ab4c2a16 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -777,18 +777,6 @@ static int kvm_mmu_notifier_invalidate_range_start(struct mmu_notifier *mn,
+>  	kvm->mn_active_invalidate_count++;
+>  	spin_unlock(&kvm->mn_invalidate_lock);
+>  
+> -	/*
+> -	 * Invalidate pfn caches _before_ invalidating the secondary MMUs, i.e.
+> -	 * before acquiring mmu_lock, to avoid holding mmu_lock while acquiring
+> -	 * each cache's lock.  There are relatively few caches in existence at
+> -	 * any given time, and the caches themselves can check for hva overlap,
+> -	 * i.e. don't need to rely on memslot overlap checks for performance.
+> -	 * Because this runs without holding mmu_lock, the pfn caches must use
+> -	 * mn_active_invalidate_count (see above) instead of
+> -	 * mmu_invalidate_in_progress.
+> -	 */
+> -	gfn_to_pfn_cache_invalidate_start(kvm, range->start, range->end);
+> -
+>  	/*
+>  	 * If one or more memslots were found and thus zapped, notify arch code
+>  	 * that guest memory has been reclaimed.  This needs to be done *after*
+> @@ -849,6 +837,8 @@ static void kvm_mmu_notifier_invalidate_range_end(struct mmu_notifier *mn,
+>  	wake = !kvm->mn_active_invalidate_count;
+>  	spin_unlock(&kvm->mn_invalidate_lock);
+>  
+> +	gfn_to_pfn_cache_invalidate(kvm, range->start, range->end);
+
+We can't do this.  The contract with mmu_notifiers is that secondary MMUs must
+unmap the hva before returning from invalidate_range_start(), and must not create
+new mappings until invalidate_range_end().
 
