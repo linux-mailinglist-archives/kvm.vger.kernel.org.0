@@ -1,123 +1,148 @@
-Return-Path: <kvm+bounces-23423-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23424-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8AFB94973B
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 19:59:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B22FE949764
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 20:15:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76D89B23F39
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 17:59:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE2451C215C3
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 18:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153447C6D4;
-	Tue,  6 Aug 2024 17:59:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3371770FD;
+	Tue,  6 Aug 2024 18:14:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="dfdWBFOl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FPNjut5F"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-oa1-f54.google.com (mail-oa1-f54.google.com [209.85.160.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6D1F4D9FE
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 17:59:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4575BAF0
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 18:14:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722967143; cv=none; b=k8Xfgaqw4Ll9IyIMG2n0I9rGOBXiVBXtlvFp0cqb6yqcCGp7nbILD6uZJdUJItw+6xk5mPamhYTefpBN0ObRHMqlXpaDELUuMt55yxx3oGJCbggjtEQTwue13U0sSvukEoDod0eu1ThIE+JLbjej8iugQLlk3HRiV4y2gsfzRiM=
+	t=1722968094; cv=none; b=kPETOgZGhqB0SjFRdTegAF1J+lM7eUNAqwfa/O+T1NpWhi7+J6GDJGvNYwu/K6P1KsJmv8B5pTyfgIvucmigadJAmDMHqEaP0gYEjj+Z4uHgnZYED4OkjCYDZx9zjyymOwe3H4VNByiixP+joWMy4rYQfsAJijVj5FPiZ+ifL5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722967143; c=relaxed/simple;
-	bh=Vr4ssX3LexIo2N6PgFRtbpKq5//JSwMuoHCZ2wWW88c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AQcP5vmPxapQbozFbBVTl1O21Y5uT/cQaltTSDk/F4hPqSEELgV2N4LYXfdiQiHeF1Y2eq4ePAAagaOWJEVf6O/2BHsT9/K3vKzNlmcSQmIXNIktdYiAMKyP5HEIKnUcs8fzgTFHRsPkC23jeieLjQMxr3anrfIXMkPZ6LHC9o4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=dfdWBFOl; arc=none smtp.client-ip=209.85.167.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3dc16d00ba6so490160b6e.0
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 10:59:01 -0700 (PDT)
+	s=arc-20240116; t=1722968094; c=relaxed/simple;
+	bh=nbOH63i1r/yo44GYJ2h3kR6UlpygqBW02KmvGZREjcE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T8SX+zPyK2stt2zn4U40a4yw2v9qfF/mY7iXevjjCg+UxVwQL2LYzUYxBioW9aRUh2ElXuO9uWe42NMQBaSavuv5ZXXIJ6Oy+2BYkz7cY70ovs+In055qY2H2JMPWN4HFpzfPbXB3hmfjrABq/y0xDxYohk+9Cm+E0y5jYCtyAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FPNjut5F; arc=none smtp.client-ip=209.85.160.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-oa1-f54.google.com with SMTP id 586e51a60fabf-260f94067bcso448024fac.3
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 11:14:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1722967141; x=1723571941; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=9reD6LjBIDqI3rzCI/2rJ/w7uTHYKxSa2MJZ9OknCy8=;
-        b=dfdWBFOlaaALwxoIKu0QSosUVGXBLx4UNDbO54AvopPTo9IOW8/NzY9mQXQfJfHnpv
-         7S+3ol2Kbt2hYwvLqhGzwl9aquRu/80zuvfXeD6qaKnefoTHn1mRUmb9tw2IRpaGYVcz
-         V731EOf8WLioZ7giCcg44U6TR2aJXJi3q088YwzTDxAI4nRl32JY5XDG//QtE/QCAnj5
-         cPgbU+W8RIW/rSq2Aun0u4bDRnnVGQ9BM+BabAKkBk6oy0GLaUZju+XBwww6a/3e3Pbq
-         MVMTU9QkSngPFAzPaeeQAhEkOkJJcOEKOCznKXrrmloa7gGU1ZZOb6mpSfSzE3Spsaid
-         fplg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722967141; x=1723571941;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1722968091; x=1723572891; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9reD6LjBIDqI3rzCI/2rJ/w7uTHYKxSa2MJZ9OknCy8=;
-        b=SEwKTCV6SucXU0crZzi/Wd/JJN5OkUn0ltyDNe9NLDxb5DyhqJjK87aI1W9ww+oCab
-         ieyv9o2Z3t3pPV64qiqSRbgc2qJzGTgpTgz+z1KY5ZJhJVwPELBbcnEI6+YdAXfbVbE9
-         UVel/9cm2Xp2mL7A4ULrdXT/mo+MpmczkziaiU4GboPRR81+6BfMS/hGdIurrvbDV21s
-         99aqQMjVk6aqhuSKiFZXjWiF7ldlAz2pPHkUhZCr5HjqCTTUyV1w1GPE1GUobjHZu/+K
-         9fUdOaIGMfEcvMnZgEBSPRBxP9rZoNchBtxMPU6ewmw67we5eBeDpOBJdUQuBntekM88
-         ee2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVMFboNmLNvuSOgs1q0IS00U6qNIXAAIaf8yIXktbgTyTEIoCt7KmdPiI44ENzXtoorO9YwiTKR7Do6L0wrdDK16VXN
-X-Gm-Message-State: AOJu0YwS6TQp8SQb0spKNteLXhAZq6O+Wb5DFVY4WloO30CRQXEnyZxW
-	g5aPazoUqFTRYGhIxDACcmeCn8V2Yabk+gJpfQcfvrETinn92ssRnpfWwyd+ETE=
-X-Google-Smtp-Source: AGHT+IEwktuJ1CtYSzQb94QGzgaDodUnXytdXmjscinDnu4jw335ZRMBxJxoUFxjs8sU40IQz5cmUA==
-X-Received: by 2002:a05:6808:2212:b0:3d9:e1d1:157e with SMTP id 5614622812f47-3db5582e299mr22117856b6e.35.1722967140874;
-        Tue, 06 Aug 2024 10:59:00 -0700 (PDT)
-Received: from ziepe.ca (hlfxns017vw-142-68-80-239.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.80.239])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4518a6c547asm39893111cf.30.2024.08.06.10.59.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Aug 2024 10:59:00 -0700 (PDT)
-Received: from jgg by wakko with local (Exim 4.95)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1sbOSZ-00Fhpe-RT;
-	Tue, 06 Aug 2024 14:58:59 -0300
-Date: Tue, 6 Aug 2024 14:58:59 -0300
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: linux-fsdevel@vger.kernel.org,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Christian Brauner <brauner@kernel.org>, bpf@vger.kernel.org,
-	Amir Goldstein <amir73il@gmail.com>, kvm@vger.kernel.org,
-	cgroups@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCHSET][RFC] struct fd and memory safety
-Message-ID: <20240806175859.GT676757@ziepe.ca>
-References: <20240730050927.GC5334@ZenIV>
+        bh=mFdjbs2mjIASOsCu96qW8fLgpB9sbXImHOr5xadmr5E=;
+        b=FPNjut5FewEZr6GxRbL41IbJuX9XFhyWGe8z8mwYGLOtlT4Bl8Wwv8LMUTGcJa9v1k
+         mtAlKuXpJT+QczSIx8BEBM9gD+mecQXkyAfouEA23whCRWa7zKKjmTflPCFRfJQXAP72
+         qK2HwtELbOjX2Ruh3ISVaHUS4/1A9OcbvXBe8XtITG3SllQ+4xGs0VKtZYoSmKlLvwiD
+         K6fmUiWQ+cyuq6zhL5DDTzm+Sz9mfUoEOcoE4Cbdm7+HUXKRcPgp7nnXIbmdx+9B/UYF
+         2NsQTe77gyLOfvpsd57qlAXzayVY/p4SY20m2AYRN8qw3bHWK5jZ0WJdGBh1LW9n0mY7
+         fwEQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1722968091; x=1723572891;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mFdjbs2mjIASOsCu96qW8fLgpB9sbXImHOr5xadmr5E=;
+        b=gyzvdQPsnPPacy8CNhMlWLP7mEYDol4ujROQB0AU04dY7Prm6GWHqKB8gmmTPgMUne
+         yErxXis8HNQ8aWRYOp2bhwAZ1rMbTl6xOdsO3zT0AmHSIjgGqqF0KxYx0WHmIfYkSWRB
+         MrxYyIcPUMhuN0iZ2aGe74UDy1Qf3FrXkWcT3/XVRUtTgj9fL8JVY1k0WjXS7vUup32h
+         wX2yQTuPDDILkFP+LNf5bRxfGHaCxr2aXvDRpR5dSig76jGbvByIaOf0K9DJ9xFUIsSi
+         RELLR6dsI6u+r3oaTBvtcvoFfBuwqzRYAlJmaGEMe+zG9c8iubaMtIIGGi3qxAE/642T
+         wtJw==
+X-Forwarded-Encrypted: i=1; AJvYcCVA98Y5fAOWyXC9933m878GKNIa81uiGgXwxpqzVqcHJsQ0kGPwq8zzLoZWy0y/4UtvC3N/Mbs3sBmIvE3qXNEbUJ7b
+X-Gm-Message-State: AOJu0Ywcn7ANsaInt3DjvraL0eyx14HCDc9tYk4H3w+nKlfiI5xkYBya
+	UuhhB4KVnRj6GLdzs3ScTELiBmkNrPlNfI6X3J9GMZdJs2saAhdyhJuSMGk3JuTbBDNeYKlv0+l
+	SpcdBofhshaLSCPHkEzhuHs+il6ju92YVyGMafoitLrybNHi+lbBC
+X-Google-Smtp-Source: AGHT+IFu4ku3WutNT7glrafGrvIvbfxBCcvM0b4ZV/axE4JgynlazXi+vp9yAoARE88Q8l5LZbFYEorYd+u/vifTLrw=
+X-Received: by 2002:a05:6870:b61b:b0:254:a753:d1c0 with SMTP id
+ 586e51a60fabf-26891ece96fmr20000977fac.48.1722968091357; Tue, 06 Aug 2024
+ 11:14:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240730050927.GC5334@ZenIV>
+References: <20240802224031.154064-1-amoorthy@google.com> <20240802224031.154064-3-amoorthy@google.com>
+ <ZrFXcHnhXUcjof1U@linux.dev>
+In-Reply-To: <ZrFXcHnhXUcjof1U@linux.dev>
+From: Anish Moorthy <amoorthy@google.com>
+Date: Tue, 6 Aug 2024 11:14:15 -0700
+Message-ID: <CAF7b7mouOmmDsU23r74s-z6JmLWvr2debGRjFgPdXotew_nAfA@mail.gmail.com>
+Subject: Re: [PATCH 2/3] KVM: arm64: Declare support for KVM_CAP_MEMORY_FAULT_INFO
+To: Oliver Upton <oliver.upton@linux.dev>
+Cc: seanjc@google.com, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	jthoughton@google.com, rananta@google.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jul 30, 2024 at 06:09:27AM +0100, Al Viro wrote:
+On Mon, Aug 5, 2024 at 3:51=E2=80=AFPM Oliver Upton <oliver.upton@linux.dev=
+> wrote:
+>
+> The wording of the cap documentation isn't as relaxed as I'd
+> anticipated. Perhaps:
+>
+>   The presence of this capability indicates that KVM_RUN *may* fill
+>   kvm_run.memory_fault if ...
+>
+> IOW, userspace is not guaranteed that the structure is filled for every
+> 'memory fault'.
 
-> 	* ib_uverbs_open_xrcd().  FWIW, a closer look shows that the
-> damn thing is buggy - it accepts _any_ descriptor and pins the associated
-> inode.  mount tmpfs, open a file there, feed it to that, unmount and
-> watch the show...
+Agreed, I can add a patch to update the docs
 
-What happens? There is still an igrab() while it is in the red black
-tree?
+While we're at it, what do we think of removing this disclaimer?
 
-> AFAICS, that's done for the sake of libibverbs and
-> I've no idea how it's actually used - all examples I'd been able to
-> find use -1 for descriptor here.  Needs to be discussed with infiniband
-> folks (Sean Hefty?).  For now, leave that as-is.
+>Note: Userspaces which attempt to resolve memory faults so that they can r=
+etry
+> KVM_RUN are encouraged to guard against repeatedly receiving the same
+> error/annotated fault.
 
-The design seems insane, but it is what it is from 20 years ago..
+I originally added this bit due to my concerns with the idea of
+filling kvm_run.memory_fault even for EFAULTs that weren't guaranteed
+to be returned by KVM_RUN [1]. However if I'm interpreting Sean's
+response to [2] correctly, I think we're now committed to only
+KVM_EXIT_MEMORY_FAULTing for EFAULTs/EHWPOISONs which return from
+KVM_RUN. At the very least, that seems to be true of current usages.
 
-Userspace can affiliate this "xrc domain" with a file in the
-filesystem. Any file. That is actually a deliberate part of the API.
+[1] https://lore.kernel.org/kvm/CAF7b7mrDt6sPQiTenSiqTOHORo1TSPhjSC-tt8fJtu=
+q55B86kg@mail.gmail.com/
+[2] https://lore.kernel.org/kvm/CAF7b7mqYr0J-J2oaU=3Dc-dzLys-m6Ttp7ZOb3Em7n=
+1wUj3rhh+A@mail.gmail.com/#t
 
-This is done as some ugly way to pass xrc domain object from process A
-to process B. IIRC the idea is process A will affiliate the object
-with a file and then B will be able to access the shared object if B
-is able to open the file.
-
-It looks like the code keeps a red/black tree of this association, and
-holds an igrab while the inode is in that tree..
-
-Jason
+> > -:Architectures: x86
+> > +:Architectures: x86, arm64
+>
+> nitpick: alphabetize
+>
+> >  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+> >
+> >  The presence of this capability indicates that KVM_RUN will fill
+> > diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
+> > index a7ca776b51ec..4121b5a43b9c 100644
+> > --- a/arch/arm64/kvm/arm.c
+> > +++ b/arch/arm64/kvm/arm.c
+> > @@ -335,6 +335,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, l=
+ong ext)
+> >       case KVM_CAP_ARM_SYSTEM_SUSPEND:
+> >       case KVM_CAP_IRQFD_RESAMPLE:
+> >       case KVM_CAP_COUNTER_OFFSET:
+> > +     case KVM_CAP_MEMORY_FAULT_INFO:
+> >               r =3D 1;
+> >               break;
+>
+> Please just squash this into the following patch. Introducing the
+> capability without the implied functionality doesn't make a lot of
+> sense.
+>
+> --
+> Thanks,
+> Oliver
 
