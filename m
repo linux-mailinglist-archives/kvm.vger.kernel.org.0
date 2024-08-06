@@ -1,152 +1,136 @@
-Return-Path: <kvm+bounces-23324-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23327-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75D34948B70
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 10:38:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 108D9948B8A
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 10:46:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A72441C23146
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 08:38:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C53ED2812BA
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 08:46:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C786F1BD4F4;
-	Tue,  6 Aug 2024 08:38:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE6916BE17;
+	Tue,  6 Aug 2024 08:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S25DXj2o"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A281BB696;
-	Tue,  6 Aug 2024 08:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF3CC1BDA80;
+	Tue,  6 Aug 2024 08:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722933486; cv=none; b=k0nDxCFZJkNpt/Y09D/qD3x+jBPiqgB04lgUo5MaSo9r6ypshJqUWI/nIgOTXPxMczq3UjxqC3UsBlcHNxTyRrl9xJt+8TE/b999Xin0WzpKF1KWVWc65vAYmvbrTWyT4Ywtdqvkv85qd7lDFPKuTvcWvNwKRddH7VqeUQMo/lM=
+	t=1722933949; cv=none; b=Ar7In/iTigayqjtZTZYYZYl03ZSWfzSncCCdSWEaSTbs7xvmGfj49AQjAcq83BvUevk4bBx2SMI/WooJ68mse5UtKXY/d+44xu3A2mBxy3MyNhwoiVfamAp4Rr/tyaYXscSY6p5YiDYn9XrvXKPfopOve4to/gole9K1MYmEeQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722933486; c=relaxed/simple;
-	bh=VPu/rXzZq8g+XxSQ3U883uFuFMe3J/6kQDDuYUb77Ng=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=r7kqizIW66QfKwuyHhCLiyXvoSFcABCBqJS/cHesf/3YNw8c5K8hPRJrBilvO1NxxXFpC4KrrtKm0OwCwBEzI7gRuK2k5D6M5A6x+gdKjY3PAKHwlKzWTc32wVfe+UnEqxjhBKE9MUsb7gMPzHtgXMMEvywpeKG1xCQ83UNdaW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4WdRX22k7Wzcd4J;
-	Tue,  6 Aug 2024 16:37:54 +0800 (CST)
-Received: from kwepemm600005.china.huawei.com (unknown [7.193.23.191])
-	by mail.maildlp.com (Postfix) with ESMTPS id 69C4A180AE6;
-	Tue,  6 Aug 2024 16:38:00 +0800 (CST)
-Received: from [10.67.121.110] (10.67.121.110) by
- kwepemm600005.china.huawei.com (7.193.23.191) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 6 Aug 2024 16:37:59 +0800
-Subject: Re: [PATCH v7 4/4] Documentation: add debugfs description for hisi
- migration
-To: Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>, "jgg@nvidia.com"
-	<jgg@nvidia.com>, Jonathan Cameron <jonathan.cameron@huawei.com>
-CC: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linuxarm@openeuler.org" <linuxarm@openeuler.org>
-References: <20240730121438.58455-1-liulongfang@huawei.com>
- <20240730121438.58455-5-liulongfang@huawei.com>
- <6b13310df6df42faba08eb7335c4b33b@huawei.com>
-From: liulongfang <liulongfang@huawei.com>
-Message-ID: <26fbc580-c626-db9f-44b5-40f7e47b7928@huawei.com>
-Date: Tue, 6 Aug 2024 16:37:59 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101
- Thunderbird/60.8.0
+	s=arc-20240116; t=1722933949; c=relaxed/simple;
+	bh=MTpvAa5ZdIwtyFlgbw3nzvFRRSzTur6/doN26CKr+wU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=teBPMYMQDm1cThQbnxtc2Yc3cx6qlTXQLxM0pchWN6PmgSEsCItuxLVW4aVa1YQNX95mlxIRmzwAXa0vnyraE9CPNL+QxRPLtT6Tn1Dnih/2cHGA5VuQPU1a71qL07iXxdZo38zbypG16MdI2mYspdL8twe7it2vZaGzRwVN2Kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S25DXj2o; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4766winu003006;
+	Tue, 6 Aug 2024 08:45:40 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=+YOf7NfAOCizzjI3BD88yyJHbd
+	+5feuhKgBXDm2j448=; b=S25DXj2ominhGJm85WI+3qdngEzFJl1poZ9VzhmxJ7
+	FZWWcuK+x6hy2OUEaIuO0fLOENd9BBnn72y+GWyhBPcqDyE1+VG9/igtSgpnmf6g
+	ul2UHF3yrOJLyAAmdK8s7SCof10vLitylHHXP71XLNlNQs3GQ+Sj7SoQFk+Yv8Sf
+	oG2W+RWrJaf2RjUwNnRsSmryfmK6KHz0QNkQVhEHQv2m5dpTxaBb2hNzvpnturTB
+	psKBEaLGoYCCIHWfJveTmSMqhgAILVtSfBUDzbik+8P9lZGnowcHLiUxI63cWCjn
+	GUFdaZVD7hZUzN02Hl+5MHNeCk3mtb51DPQ/32DAN2kA==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uf1hr7a8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Aug 2024 08:45:40 +0000 (GMT)
+Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4768jeMN019908;
+	Tue, 6 Aug 2024 08:45:40 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uf1hr7a5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Aug 2024 08:45:40 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47670bIV018626;
+	Tue, 6 Aug 2024 08:45:39 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40sxvu30w8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Aug 2024 08:45:39 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4768jXvB55509362
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 6 Aug 2024 08:45:35 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 59A9C20063;
+	Tue,  6 Aug 2024 08:45:33 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1E9F620043;
+	Tue,  6 Aug 2024 08:45:33 +0000 (GMT)
+Received: from a46lp67.lnxne.boe (unknown [9.152.108.100])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  6 Aug 2024 08:45:33 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, imbrenda@linux.ibm.com, nrb@linux.ibm.com,
+        schlameuss@linux.ibm.com, nsg@linux.ibm.com, npiggin@gmail.com,
+        mhartmay@linux.ibm.com
+Subject: [kvm-unit-tests PATCH v2 0/4] s390x: split off snippet and sie related code
+Date: Tue,  6 Aug 2024 08:42:26 +0000
+Message-ID: <20240806084409.169039-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <6b13310df6df42faba08eb7335c4b33b@huawei.com>
-Content-Type: text/plain; charset="gbk"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600005.china.huawei.com (7.193.23.191)
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: LcgBrnGxtiFMkcj4og_H4vwOjQkrb7_X
+X-Proofpoint-ORIG-GUID: atIxbGuA3_0Itp7JRH2Oyq0mL71KQfbJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-06_06,2024-08-02_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ priorityscore=1501 malwarescore=0 impostorscore=0 lowpriorityscore=0
+ bulkscore=0 mlxscore=0 suspectscore=0 clxscore=1015 spamscore=0
+ mlxlogscore=897 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2407110000 definitions=main-2408060060
 
-On 2024/8/5 17:09, Shameerali Kolothum Thodi wrote:
-> 
-> 
->> -----Original Message-----
->> From: liulongfang <liulongfang@huawei.com>
->> Sent: Tuesday, July 30, 2024 1:15 PM
->> To: alex.williamson@redhat.com; jgg@nvidia.com; Shameerali Kolothum
->> Thodi <shameerali.kolothum.thodi@huawei.com>; Jonathan Cameron
->> <jonathan.cameron@huawei.com>
->> Cc: kvm@vger.kernel.org; linux-kernel@vger.kernel.org;
->> linuxarm@openeuler.org; liulongfang <liulongfang@huawei.com>
->> Subject: [PATCH v7 4/4] Documentation: add debugfs description for hisi
->> migration
->>
->> Add a debugfs document description file to help users understand
->> how to use the hisilicon accelerator live migration driver's
->> debugfs.
->>
->> Update the file paths that need to be maintained in MAINTAINERS
->>
->> Signed-off-by: Longfang Liu <liulongfang@huawei.com>
->> ---
->>  .../ABI/testing/debugfs-hisi-migration        | 25 +++++++++++++++++++
->>  1 file changed, 25 insertions(+)
->>  create mode 100644 Documentation/ABI/testing/debugfs-hisi-migration
->>
->> diff --git a/Documentation/ABI/testing/debugfs-hisi-migration
->> b/Documentation/ABI/testing/debugfs-hisi-migration
->> new file mode 100644
->> index 000000000000..053f3ebba9b1
->> --- /dev/null
->> +++ b/Documentation/ABI/testing/debugfs-hisi-migration
->> @@ -0,0 +1,25 @@
->> +What:
->> 	/sys/kernel/debug/vfio/<device>/migration/hisi_acc/dev_data
->> +Date:		Jul 2024
->> +KernelVersion:  6.11
->> +Contact:	Longfang Liu <liulongfang@huawei.com>
->> +Description:	Read the configuration data and some status data
->> +		required for device live migration. These data include device
->> +		status data, queue configuration data, some task
->> configuration
->> +		data and device attribute data. The output format of the data
->> +		is defined by the live migration driver.
->> +
->> +What:
->> 	/sys/kernel/debug/vfio/<device>/migration/hisi_acc/migf_data
->> +Date:		Jul 2024
->> +KernelVersion:  6.11
->> +Contact:	Longfang Liu <liulongfang@huawei.com>
->> +Description:	Read the data from the last completed live migration.
->> +		This data includes the same device status data as in
->> "dev_data".
->> +		And some device status data after the migration is
->> completed.
-> 
-> Actually what info is different from dev_data here? Only that it is the
-> dev_data after a migration is attempted/completed, right?
->
+The makefile is getting long and increasingly complex. Let's move the
+snippet part to s390x/snippets/ and sprinkle a couple comments on top.
 
-Yes, the only difference is: The mig_data is the dev_data that is migrated.
+While we're moving things around we can split lib/s390x/sie.h into sie
+architecture code and sie library code and split the sie assembly in
+cpu.S into its own file.
 
-Thanks.
-Longfang.
+v2:
+	- Rebased on Marc's makefile patch
+	- Fixed commit messages in patches 1 & 4
+	- Picked up R-Bs
 
-> Thanks,
-> Shameer
-> 
->> +
->> +What:
->> 	/sys/kernel/debug/vfio/<device>/migration/hisi_acc/cmd_state
->> +Date:		Jul 2024
->> +KernelVersion:  6.11
->> +Contact:	Longfang Liu <liulongfang@huawei.com>
->> +Description:	Used to obtain the device command sending and receiving
->> +		channel status. Returns failure or success logs based on the
->> +		results.
->> --
->> 2.24.0
-> 
-> .
-> 
+Janosch Frank (4):
+  s390x/Makefile: Split snippet makefile rules into new file
+  s390x/Makefile: Add more comments
+  s390x: Move SIE assembly into new file
+  lib: s390x: Split SIE fw structs from lib structs
+
+ lib/s390x/{sie.h => asm/sie-arch.h} |  58 +------
+ lib/s390x/sie.h                     | 231 +---------------------------
+ s390x/Makefile                      |  45 ++----
+ s390x/{cpu.S => cpu-sie.S}          |  59 +------
+ s390x/cpu.S                         |  64 --------
+ s390x/snippets/Makefile             |  34 ++++
+ 6 files changed, 49 insertions(+), 442 deletions(-)
+ copy lib/s390x/{sie.h => asm/sie-arch.h} (81%)
+ copy s390x/{cpu.S => cpu-sie.S} (56%)
+ create mode 100644 s390x/snippets/Makefile
+
+-- 
+2.43.0
+
 
