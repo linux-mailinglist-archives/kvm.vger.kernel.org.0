@@ -1,82 +1,82 @@
-Return-Path: <kvm+bounces-23365-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23366-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CD7B948FE5
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 15:02:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4328D9490AF
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 15:17:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97F03B25B71
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 13:02:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEDD328176A
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 13:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 709161C57BE;
-	Tue,  6 Aug 2024 13:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F96A1D61B6;
+	Tue,  6 Aug 2024 13:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OQa/XMP6"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Kd7XRCvB"
 X-Original-To: kvm@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AE371C3F3A;
-	Tue,  6 Aug 2024 13:02:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B3961D6DA9;
+	Tue,  6 Aug 2024 13:13:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722949342; cv=none; b=XA8/DZl6kFkuykGcnKyVcWz7DnfNY1JxXInyFegZ0UMoiqFE3sxFKa3YOnxp1la21LagJsVneQok7hAnKw2Yi42j368UfuF29yh0vTRHPBxo3CV6r9zYOT8w86esT64Dczhb+3Jpq2KoWQWeugKH/ar2sCXK97Jekms2uVRwipw=
+	t=1722950029; cv=none; b=WQrE0f2gIoMp+A5FT2o2h5hYEb+Oez/v/cCh2M3M7XBplDwVjbqD+1djgTFRl6slKTQwSbRRQBMD3gihQo1HL8pjDVbDH7R2MOmXelQFiV83KKLskfu4MscPL0oYW8HMhvTVMWbPo7F1ib72L9FVBScCxvH2J6kelqUUe44QMz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722949342; c=relaxed/simple;
-	bh=v/u2+Ot5HPWyKFfLnpjfw3T437vdEj+uG86syAQjjCY=;
+	s=arc-20240116; t=1722950029; c=relaxed/simple;
+	bh=svcblnV0SYwvzIIAV9mk85PEOlNU3WwWPPoIZlHzTF0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AxDtobIMG0qHrN/2sq3V1f5RiOHTnEBFhT0uraLret7+ENdmgMskBZihWz2GnMQRsK1cMavM85ZDJQ6ifszRDdaBRUaZANEh0468XdGFKIe1UNjT7FBeVgIh7hjpFLKLwx9n5BW+vfLwvWwo0kGH2HpEk0kRt5ebqRvsjXuY0xw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OQa/XMP6; arc=none smtp.client-ip=148.163.158.5
+	 In-Reply-To:Content-Type; b=mEaE4kmioGNBJBZw0/8TmHvDRU2NdTXxDeS1m9nW2LGlod0Dei6H1uSGFeEkjLGapmQKzMe8P2qkIuNHL0By2gA7V4+xefxUASxL5ZYw8Y4umsu5BzUMtNoKchgC4VI0iOL7Dxb0NrrixlPIhZXt9d4M2ajp7BwOKKGHHaDZEcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Kd7XRCvB; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 476CxJDp002607;
-	Tue, 6 Aug 2024 13:02:15 GMT
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 476CqlNF004379;
+	Tue, 6 Aug 2024 13:13:42 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
 	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=z
-	9Xt0NeVuoV+TMUihP/55csyAvhwKI49eGWDlmUB2CM=; b=OQa/XMP6XxlP1twwP
-	0VI+qI7wUM0p1Dz+B6FIaiKtEFYQjC5JwHUCC+VBasXHvjxiNV/i6EavKnU7U/xT
-	hyZQO50KHgIXaDntngDobPz9/b1+8CrEVHb4Sa5WwDNaxsFa2Lp0ni8oHGDtmdqG
-	M8TCNlGon1B3rwhSxEUxkRkqqTQrPM9n1cae/aVysdKTjjOAWmR0+S1xifK0jGaE
-	sGYCfwLiKPO0wMRYbdD1BrakOu4RdlRl/K+Q/s+Pgs9mExRLat7j1CR8o0LKmZEs
-	MNEfGArHi/DKb/Z6T9vtjk9hMZlkvlrLHNmrqxeurun9rZ4NreH6RweLfCpOqLDg
-	+yUlQ==
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=d
+	du1uxRNM1RCETrQCvkgDb+WwQnUpTVk1gGnT1FTJT4=; b=Kd7XRCvBVB2CdgFUm
+	6Xx2yLm7h9q8B7wPtuCjXxT2OcHrlx+/cgGDnN32xBMK8y29wLnuGXXcQWpT32ly
+	j/v/rLbOc5njllERWW+x2MYcwI0nuYFhHJSEzYFtGzYvIBSf9hdBKZOXGzYnRjKQ
+	mLWUmykLxDii+DKBrgjoQ9c6+rV+dpQMnFjh0MZkHmNwD1QUaRxcZ4gqo37EDA04
+	H+pUanvHnAfVdgIiWLhZ8O/p+DQo3O2cl53sNSzuH0cZdgbdX/MYRyGJe97LmUIp
+	9PUQir3pHkTKH6JaVZcfKwEPWD4AGrgyIkgNu9LST4k7Jx+gDX7AjxnBX2+2InDm
+	se4HQ==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uma800ap-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uk0287f4-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 13:02:15 +0000 (GMT)
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 476D2EwB006907;
-	Tue, 6 Aug 2024 13:02:14 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uma800ak-1
+	Tue, 06 Aug 2024 13:13:42 +0000 (GMT)
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 476DDfa0007983;
+	Tue, 6 Aug 2024 13:13:41 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uk0287f0-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 13:02:14 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 476B6grl018818;
-	Tue, 6 Aug 2024 13:02:13 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40sxvu3y1n-1
+	Tue, 06 Aug 2024 13:13:41 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 476CZlMZ018027;
+	Tue, 6 Aug 2024 13:13:41 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40t0cmkmrf-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 13:02:13 +0000
+	Tue, 06 Aug 2024 13:13:40 +0000
 Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 476D28xH21889390
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 476DDZGM53019096
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 6 Aug 2024 13:02:10 GMT
+	Tue, 6 Aug 2024 13:13:37 GMT
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5E34020049;
-	Tue,  6 Aug 2024 13:02:08 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 1059C2004D;
+	Tue,  6 Aug 2024 13:13:35 +0000 (GMT)
 Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E50DE20040;
-	Tue,  6 Aug 2024 13:02:07 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 8BFD020040;
+	Tue,  6 Aug 2024 13:13:34 +0000 (GMT)
 Received: from [9.171.47.164] (unknown [9.171.47.164])
 	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  6 Aug 2024 13:02:07 +0000 (GMT)
-Message-ID: <9d45d403-6441-40da-8886-eb3e115dfe31@linux.ibm.com>
-Date: Tue, 6 Aug 2024 15:02:07 +0200
+	Tue,  6 Aug 2024 13:13:34 +0000 (GMT)
+Message-ID: <dc515da5-6b22-4e15-acfe-d7d0849d16a6@linux.ibm.com>
+Date: Tue, 6 Aug 2024 15:13:34 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -84,7 +84,8 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 06/10] selftests: kvm: s390: Add VM run test case
+Subject: Re: [PATCH v4 07/10] selftests: kvm: s390: Add uc_map_unmap VM test
+ case
 To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
 Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
         Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
@@ -93,7 +94,7 @@ Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
         David Hildenbrand <david@redhat.com>,
         Nina Schoetterl-Glausch <nsg@linux.ibm.com>
 References: <20240802155913.261891-1-schlameuss@linux.ibm.com>
- <20240802155913.261891-7-schlameuss@linux.ibm.com>
+ <20240802155913.261891-8-schlameuss@linux.ibm.com>
 Content-Language: en-US
 From: Janosch Frank <frankja@linux.ibm.com>
 Autocrypt: addr=frankja@linux.ibm.com; keydata=
@@ -138,32 +139,101 @@ Autocrypt: addr=frankja@linux.ibm.com; keydata=
  DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
  Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
  phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20240802155913.261891-7-schlameuss@linux.ibm.com>
+In-Reply-To: <20240802155913.261891-8-schlameuss@linux.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: mZ8YOX-H7K-IVXloHXP97C6PB-IhTCX0
-X-Proofpoint-GUID: t3Jzs7uv_W_qKyCTzaogAYsDGlAc_zks
+X-Proofpoint-ORIG-GUID: W7V-m4jz-_AHXQe_mVY39Hoaxuqw2yUK
+X-Proofpoint-GUID: JcuK0_vcWRimLFr5g_TYatI_7eAOXXxI
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
  definitions=2024-08-06_10,2024-08-06_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 spamscore=0
- lowpriorityscore=0 priorityscore=1501 phishscore=0 bulkscore=0
- mlxlogscore=747 adultscore=0 suspectscore=0 mlxscore=0 malwarescore=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxlogscore=999
+ priorityscore=1501 mlxscore=0 suspectscore=0 adultscore=0
+ lowpriorityscore=0 malwarescore=0 clxscore=1015 bulkscore=0 spamscore=0
  impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.19.0-2407110000 definitions=main-2408060090
 
 On 8/2/24 5:59 PM, Christoph Schlameuss wrote:
-> Add test case running code interacting with registers within a
-> ucontrol VM.
+> Add a test case verifying basic running and interaction of ucontrol VMs.
+> Fill the segment and page tables for allocated memory and map memory on
+> first access.
 > 
-> * Add uc_gprs test case
-> 
-> The test uses the same VM setup using the fixture and debug macros
-> introduced in earlier patches in this series.
+> * uc_map_unmap
+>    Store and load data to mapped and unmapped memory and use pic segment
+>    translation handling to map memory on access.
 > 
 > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> ---
+>   .../selftests/kvm/s390x/ucontrol_test.c       | 165 +++++++++++++++++-
+>   1 file changed, 164 insertions(+), 1 deletion(-)
+> 
+> diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> index 030c59010fe1..72ad30fbe4ac 100644
+> --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> @@ -16,7 +16,13 @@
+>   #include <linux/capability.h>
+>   #include <linux/sizes.h>
 
-Reviewed-by: Janosch Frank <frankja@linux.ibm.com>
+[...]
+
+> +#define VM_MEM_MAX (VM_MEM_SIZE + VM_MEM_EXT_SIZE)
+
+You defined this but never use it.
+Instead you're still adding up VM_MEM_SIZE and VM_MEM_EXT_SIZE.
+
+> +
+> +#define PAGES_PER_SEGMENT 4
+
+You mean pages per segment table?
+
+[...]
+
+> +/* initialize segment and page tables for uc_kvm tests */
+> +static void init_st_pt(FIXTURE_DATA(uc_kvm) * self)
+> +{
+> +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+> +	struct kvm_run *run = self->run;
+> +	void *se_addr;
+> +	int si, pi;
+> +	u64 *phd;
+> +
+> +	/* set PASCE addr */
+> +	self->pgd = self->base_gpa + SZ_1M;
+> +	phd = gpa2hva(self, self->pgd);
+> +	memset(phd, 0xff, PAGES_PER_SEGMENT * PAGE_SIZE);
+> +
+> +	for (si = 0; si < ((VM_MEM_SIZE + VM_MEM_EXT_SIZE) / SZ_1M); si++) {
+> +		/* create ste */
+> +		phd[si] = (self->pgd
+> +			+ (PAGES_PER_SEGMENT * PAGE_SIZE
+> +				* ((VM_MEM_SIZE + VM_MEM_EXT_SIZE) / SZ_1M))
+> +			+ (PAGES_PER_SEGMENT * PAGE_SIZE * si)) & ~0x7fful;
+> +		se_addr = gpa2hva(self, phd[si]);
+> +		memset(se_addr, 0xff, PAGES_PER_SEGMENT * PAGE_SIZE);
+> +		for (pi = 0; pi < (SZ_1M / PAGE_SIZE); pi++) {
+> +			/* create pte */
+> +			((u64 *)se_addr)[pi] = (self->base_gpa
+> +				+ (si * SZ_1M) + (pi * PAGE_SIZE)) & ~0xffful;
+> +		}
+
+That's barely readable, can you split that into functions or make it 
+more readable in some other way?
+
+> +	}
+> +	pr_debug("segment table entry %p (0x%lx) --> %p\n",
+> +		 phd, phd[0], gpa2hva(self, (phd[0] & ~0x7fful)));
+> +	print_hex_bytes("st", (u64)phd, 64);
+> +	print_hex_bytes("pt", (u64)gpa2hva(self, phd[0]), 128);
+> +	print_hex_bytes("pt+", (u64)
+> +			gpa2hva(self, phd[0] + (PAGES_PER_SEGMENT * PAGE_SIZE
+> +			* ((VM_MEM_SIZE + VM_MEM_EXT_SIZE) / SZ_1M)) - 0x64), 128);
+> +
+> +	/* PASCE TT=00 for segment table */
+> +	sync_regs->crs[1] = self->pgd | 0x3;
+> +	run->kvm_dirty_regs |= KVM_SYNC_CRS;
+> +}
+> +
 
 
