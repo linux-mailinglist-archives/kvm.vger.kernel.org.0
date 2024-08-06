@@ -1,216 +1,312 @@
-Return-Path: <kvm+bounces-23388-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23389-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32E7F949386
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 16:44:31 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0050F949394
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 16:48:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDA57288A00
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 14:44:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC49DB27CC1
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 14:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658B31C578B;
-	Tue,  6 Aug 2024 14:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0171D47AA;
+	Tue,  6 Aug 2024 14:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="m8qm6qvs"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="NjJduVL2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2065.outbound.protection.outlook.com [40.107.237.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E18DD17ADF7;
-	Tue,  6 Aug 2024 14:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722955462; cv=none; b=OLO8kRjZPOLoc0Gau1/aJn4oDTWeiGKXauSxzVXgXLXq2rPYmWOLTJ+7dW6E8AqsIU3ApIsD6WMA8LjxfWuf8hTItTS6IS/ZShwX47uiqOd1iSosPuu5qwaOK9UQHdYk+DtR2jayKXHcRC0BO/CZrVr3FeLIWp+C90e9jVVjKLw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722955462; c=relaxed/simple;
-	bh=0yKZy8KoZZcnYBR+6nF1cpfUdBSnUxj0VCc/DXNQDCU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JkrqDOQSBEq5eBzw/WdPxHjQ19yPPWacv+Dk5m+Z8EpbYFmK6Q2mqYxICLb+5xAoPke1yRAU1F/EPLkiZKYiO78N78ZB8HY2kAIVSKnLGpODBn4EQUJO9f6/+DLDqDTDmu9Tq00w11gFshW7Ir6me+mbxEwFJ4aYiHBD2NDq9xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=m8qm6qvs; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 476DLV4C031055;
-	Tue, 6 Aug 2024 14:44:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	6xV33/hFMWCvVf9tGKXFLcIPz/RxD2YHpaN9hc4yW2c=; b=m8qm6qvsjBwOSxfm
-	7FHneDRHu+BY8QoXu0ugBdNFaC/Q5/uDT0YfXPQxGo+5C3/1si83cW1ldk4A76V6
-	MnTFF0X/vGuwgzu55vTzZCLFHL7h8akiqOhb0zooqaIP+TS7sDVchp0WNGJ/NbzD
-	tvUI3G/UnPNtbSMoK9LOB+3NZyUUNDwFtoO6HNeWqrK9Esb+5B8UzqFerUevaIpy
-	J7wuuw6q+sR4ubLrfk2fmxYXKrRCMnCbLM7Ysc1pPADrcDvNwr8BvTCrtLEW9b35
-	zJzCq4y8IluTQqWQy3W9NUp8XYVx6U+V2Ex1FI2SHtAbuBcH8wjZtQ8VzhWZ3hpb
-	4uP+Pw==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uf1hrym7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 14:44:15 +0000 (GMT)
-Received: from m0353723.ppops.net (m0353723.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 476EiEB7012516;
-	Tue, 6 Aug 2024 14:44:15 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uf1hrym5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 14:44:14 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 476Bg3Fj024121;
-	Tue, 6 Aug 2024 14:44:14 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40syvpc4rr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Aug 2024 14:44:14 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 476Ei8fo31130144
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 6 Aug 2024 14:44:10 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2CFB32004B;
-	Tue,  6 Aug 2024 14:44:08 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 970EF20043;
-	Tue,  6 Aug 2024 14:44:07 +0000 (GMT)
-Received: from darkmoore (unknown [9.179.5.91])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Tue,  6 Aug 2024 14:44:07 +0000 (GMT)
-Date: Tue, 6 Aug 2024 16:44:05 +0200
-From: Christoph Schlameuss <schlameuss@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah
- Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand
- <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Subject: Re: [PATCH v4 07/10] selftests: kvm: s390: Add uc_map_unmap VM test
- case
-Message-ID: <20240806164405.6edeb801.schlameuss@linux.ibm.com>
-In-Reply-To: <dc515da5-6b22-4e15-acfe-d7d0849d16a6@linux.ibm.com>
-References: <20240802155913.261891-1-schlameuss@linux.ibm.com>
-	<20240802155913.261891-8-schlameuss@linux.ibm.com>
-	<dc515da5-6b22-4e15-acfe-d7d0849d16a6@linux.ibm.com>
-Organization: IBM
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282E3DF42;
+	Tue,  6 Aug 2024 14:45:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1722955550; cv=fail; b=YA02HpZeRdpG27UL6HrNOQUIoIOHQQKKqG9MMhUYuUUYlrnU0Cy4DBufVzm7BhsfEKFzTQW6P+Of7FtcZSrBs0ncKs8GlTdrqStysfhIAXOwzyXxWWRCFhTL3A+UZnwX7I7DVfuNQ97aqO2RAX61fM4/ueBwA+yDA9qXEevcgAw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1722955550; c=relaxed/simple;
+	bh=b6MGg1N9bEgfjKLd2OjIvpVDAPVQLgxDnDAbIj+rWug=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=bxpkSDniyl1CLxn+Zxi4tK5/qHRIXy3w62bydldPv8GgkhcWvJM7/2ZsDgbB1ZLYIreGHTeBV6LDCnjunqBNXH6NGarE1qs96jmwKz+A8h2tXZIQusiEnPIY2l/zpcQ9eljmWgsIJEU5cGZDpPd4BthktgnoTtA+gSYXKkfh5ug=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=NjJduVL2; arc=fail smtp.client-ip=40.107.237.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Zv6fDcqrZTI8RV8cQG/tGDriOQ2XYaV+ZQr47rF+Mxl7OhqFQMEPrE2+013HzyQ0AF0CIWLLr5SOYB7YbmODAHWkiHa9nmeY74gc2oH3iqLbojILN+OQVHRWAAKgIh1bgN+O+XcBlOP79MHy5u1Ue2kcLOia5PLlqIJYK5ZSzixoe4AKKEKl2tV6rsyJtkDoW9gX9wvxqeV52NJ37oIqjrKlnkDs3LS4T2LIGxJo5NW6nTWUE/NmhHOEx7/qo0dlH7DYOrfWkq09fcO154eIXwFAUrCaCctQPX12qZcuHC5Sj8QOVIXC8uyawViq13qUZgRq3BaVke7RVLlnR1EXvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=x8uU/72sJ+tn3MVWBcXmkC7b+dfBM9QXjE5lG6FkGnM=;
+ b=ZZUJjwazgz5TvCtMyOtxumCBlCZL+DHYWbrsSUJnkLzskyG4W5eridvc0edtm/SDdRGouH9tCAAvO3J8uspZQhOMQljYDMZdIa0Hrl3NzQ/Il6z8nsNCcPU+RODeMi7Nzlg1w/O2zW1AWR/3OAAsPQ7tCG6YNCM4NydPLskmQwFMZBwhvZ9IWUc94Sda369fbJfjcVbQiJ4eONVnEUQymv4JG5NTsZEVdx3Qz4UlDVsKs7D0ZUTJGJfX/3Z5BBPEfzNTtfyplvb7SLcApxA8scVrdXL7eA+rReU6Diw9S1ZUJZS84mveTndmpxyfodfEDOD5myU5sgMOl82e2OmQLg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=x8uU/72sJ+tn3MVWBcXmkC7b+dfBM9QXjE5lG6FkGnM=;
+ b=NjJduVL2SCmvZQMcEpnVEgRxTySV7XN0xeYLxZ68hURFviGRTTWT3NX7OUsNmpNzyTs3e58xyFNuY1Lz9QeoBHoY3BeIHRHAPUkHz5B4IkqkfL+AFextoRC2imDEWNvSoYjY8tAl6KtE+FrJcPBZYOF4JpAj61zag4Rj3srTcH93BzwFrIsXDlYvP+uy2T990CX1vaFdFJrOd8k3an3HcpzLXh+uuuKEGTIc+SW0kDcRaCp+7fGVkHMp9slvAKNEwSSMtaoWgA7bkV5Tf0J4iKfwdOM8czjKrd9AzPETHcFRyiEhJ0mHb7+Ki/rAtCHXDY8nDyQQ8Cxf3jd8z3i03w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY8PR12MB8297.namprd12.prod.outlook.com (2603:10b6:930:79::18)
+ by CH2PR12MB4263.namprd12.prod.outlook.com (2603:10b6:610:a6::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.27; Tue, 6 Aug
+ 2024 14:45:45 +0000
+Received: from CY8PR12MB8297.namprd12.prod.outlook.com
+ ([fe80::b313:73f4:6e6b:74a4]) by CY8PR12MB8297.namprd12.prod.outlook.com
+ ([fe80::b313:73f4:6e6b:74a4%7]) with mapi id 15.20.7849.008; Tue, 6 Aug 2024
+ 14:45:45 +0000
+Message-ID: <69850046-6b14-4910-9a89-cca8305c1bb9@nvidia.com>
+Date: Tue, 6 Aug 2024 16:45:40 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH vhost] vhost-vdpa: Fix invalid irq bypass unregister
+From: Dragos Tatulea <dtatulea@nvidia.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+ "mst@redhat.com" <mst@redhat.com>, "eperezma@redhat.com"
+ <eperezma@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20240801153722.191797-2-dtatulea@nvidia.com>
+ <CACGkMEutqWK+N+yddiTsnVW+ZDwyM+EV-gYC8WHHPpjiDzY4_w@mail.gmail.com>
+ <51e9ed8f37a1b5fbee9603905b925aedec712131.camel@nvidia.com>
+ <CACGkMEuHECjNVEu=QhMDCc5xT_ajaETqAxNFPfb2-_wRwgvyrA@mail.gmail.com>
+ <cc771916-62fe-4f6b-88d2-9c17dff65523@nvidia.com>
+ <CACGkMEvPNvdhYmAofP5Xoqf7mPZ97Sv2EaooyEtZVBoGuA-8vA@mail.gmail.com>
+ <b603ff51-88d6-4066-aafa-64a60335db37@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <b603ff51-88d6-4066-aafa-64a60335db37@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: FR4P281CA0241.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f5::6) To CY8PR12MB8297.namprd12.prod.outlook.com
+ (2603:10b6:930:79::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: FIXWTtPVKLftAlX1YjxE9Pato2mEff9t
-X-Proofpoint-ORIG-GUID: Cu6KRZJDS84BWckvarhSnEQuEIOb9UYa
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-06_12,2024-08-06_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
- priorityscore=1501 malwarescore=0 impostorscore=0 lowpriorityscore=0
- bulkscore=0 mlxscore=0 suspectscore=0 clxscore=1015 spamscore=0
- mlxlogscore=930 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408060100
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY8PR12MB8297:EE_|CH2PR12MB4263:EE_
+X-MS-Office365-Filtering-Correlation-Id: d787d717-0ceb-4845-6590-08dcb62673dc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?dmNOcWc1Mjd6bkpNcmY5OC9LZ2xmTlR0ellyRU4xY3BSYnl6ZnplNkNiK0Ix?=
+ =?utf-8?B?ZFN0SGlyNEU3RzFUNmJUK2tzcUNjaUFuVzdndDhyMGdkM2NmbVllQWMvbE9M?=
+ =?utf-8?B?YXN4WW9FeG1FejZoSVhZREg4YVNHV0dJVERZYXNucFNuVklVNnZkanhOcGNQ?=
+ =?utf-8?B?LzdJbmF5cjdOZVFtSnlXcHVFUGNCaE1sb3BTb2hGZEo0MTlNZW1SQ2FHSGZi?=
+ =?utf-8?B?MjE2ZkhobnpHM1FhVFJUNUg5VVpzNjB0S2U0eTRJZ0k5VEJxV2RmNUJvcFRY?=
+ =?utf-8?B?VWZrYWh4ZVBFSDVNdzkxWitTTzdFTy9LUk8wM0tjU0Vwa1Y1NDU0dFJadjBX?=
+ =?utf-8?B?alBESERmYmJ4dWdMdGRuNFR1YTRpN3k5cER3NmlaS3RYK0QrM0FDdjVBcUgx?=
+ =?utf-8?B?QlI0ZUVwNytKdmFQTHowRTllMklwK0tTUElEMVF0a2hMdVNMenI4VFJucXNJ?=
+ =?utf-8?B?cGhWVUViakJyNXhTaTVoSWRwM2xtbW9xMFZKbjFYeWdONVdYYjR1Q1paT1FU?=
+ =?utf-8?B?UU1ScFRFQ1ZJdUhpN05qS05TdHQxbEE0Z3pjd0RPaXJMT0NFeXVDNEx4UTY3?=
+ =?utf-8?B?dW5qQnRjLzRJTDB3YWtzc0pkVGRzRmRBMGtzdEt4a3dvVGNPVm5GTHVMcnNP?=
+ =?utf-8?B?VTFEdEYvQjZ5WFBxTExlNllhV2FSeXJrK2JQWVRwNkcvb0JSaGM1dEFGTjJw?=
+ =?utf-8?B?cC9TdlJXS2xXK2dheFNHSkVFdWRERWxyZVN4VGJhWkJSU2x5ZmFWSDRlVVF0?=
+ =?utf-8?B?VU8wVVJrT1ZEeXRXYnp5cUFUenlaUDNFcURDQUFMMXBnQWdhR1RVMUsvdE5s?=
+ =?utf-8?B?d2RkeGJOOHdkcG5PdTcxVk9UdVBoZFEwVUNRTytSVWE4WkRNYitJRlZnMzNC?=
+ =?utf-8?B?cmlhdTgrMjBjdUR3RVZPTWZyNUIyVjA2T0dSRGQybWtQTlhQUHd4WllmUEdC?=
+ =?utf-8?B?L3JTWXRsV2RJVlFoOVcwWGtacnRZclk5N2toWUQ4NVNGWGE3UUY4RWF5RDV0?=
+ =?utf-8?B?cGVROU1XcE9mdmVxdjZVRUNrVWRPamJKaWdia3pCdFo5WTJ1bW5YZjVnZ1Q1?=
+ =?utf-8?B?QlNCUzJOaGwwaG1jVVdMRTBVUFdzb3ovYWRjK0xFVGladkZYcWwwN2tuc1ly?=
+ =?utf-8?B?TjQ5N0ZrdFhvWjMvRCswQmZ2dmlmUVFwRXFuNWs5L2tGVlpOMllXNXFIZnVV?=
+ =?utf-8?B?aWNWMjRVNWFHd0pqQ2hObURxSEhpOWFRT0IrenlobXIxaXo5aVpHWWYzazkr?=
+ =?utf-8?B?eTdXRG5sSldDM2ZWUk9PMWd0SFcwNlRSbzF0NEJvN1JuL0dxa0V4UGYrT2pU?=
+ =?utf-8?B?TmlUQWJoUllVSGR0ZXphcTFyWmIvS0UvVkxpSlVXdW9vNi9QVVJ4WE1QVUli?=
+ =?utf-8?B?b2lPL2NqY1ZWcFdmeXFPdXdjcEpvWGx3clZucFo4SzhKSHQ2UXRCWENURG5i?=
+ =?utf-8?B?WWpzakNrZ1JDWEJtTVVSOTJNUG0wakJIMS9nYTMxWG05QURMMW4xWUFjaElV?=
+ =?utf-8?B?QSttQWJHVU12YmI0aEluOU9VS1ZzRVI4VWl6cGZYUmtDVkRYNFdnMS96VjUx?=
+ =?utf-8?B?TUN3bGxqamQ2QytOSWZBU3d0aFdjeGVTVEJqcS9Xd3VSdVRoVlhlYi9qaGJs?=
+ =?utf-8?B?OTAxb3kvbmtaVmsvcCtKenNvZThRYnc4cmFGa01GaUFXOG9XaVIvaVIvMUFX?=
+ =?utf-8?B?ZWRoNHUrVnNneDlXOXBWb3V3Z3JseHhsbUNsQ0tDYmh1cDdGZ2RMclhRM2cx?=
+ =?utf-8?B?dDZPYlJlK1hwMTgyNlBzYlRJVlhpL09jRkJRNllMRk9PUTVidTF6Q0s1QlVo?=
+ =?utf-8?B?eU5CSS81alVTSVBJUUpvQT09?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB8297.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WkpabE5rakMwWlBXYUZkejB1bFc3Q1NwTGpQM2tIbjZGSnkvUWRkK2lWcWpa?=
+ =?utf-8?B?NlZpYWZhM1hpajNuMGt3empFS3dKc3JMaldEN25QMkVMR1RFNUNiWVJaVEJo?=
+ =?utf-8?B?K0hJZWpVb3NMQ015TWJsMXdTNDE2V29uaitxZkgzdzRPOEo1cGRiQm11d3lX?=
+ =?utf-8?B?NkhXNGk0R0JnKzFhbnljKzNqYWMrNVpQaHNqaVhOTnRUd2VqY0pjWHRoUEFi?=
+ =?utf-8?B?aCtZRE1CbHprSDE1K3NPOHR0b2pES0M2RjhIbm45anlnYXBYWlBOWTMyWjdj?=
+ =?utf-8?B?aTFsL2VEQUtyQ2NUMU9sNHoyRmlvL3RGQTlCL0xIZmdxbVcwM01Qb1hrdWhs?=
+ =?utf-8?B?b0syQVBlUU9wY3lmZGpFK1RpRmxsd284V2YyQ2wxbHJuZDJROFE4THVMMTBt?=
+ =?utf-8?B?TzFIcXFSbkM0dzkvMkloanY2OXpDdC9uVkpVV2NSV1Q3OVRKWHp2VGtzSUhM?=
+ =?utf-8?B?VDZrcDIzdjlSUnMvYkdXRHg0ckpPbXU5dG5WRWQ4NjJhMTBscW55M1NYbWw1?=
+ =?utf-8?B?Q01NeU5lRnNXTE4wQVZncXdwRnlrL2RBaDdRL2JVMFFhQ1BBNlFxZ0xiMEFS?=
+ =?utf-8?B?UlVxVmt2N1NJbmtnNWFRRE40c3duN2UrNTRlNWFPWTN1akViNWZGeGVMejVY?=
+ =?utf-8?B?RlRwa0ZXS1MzZWVKMG4vcUg4aHcvRnVGemVlTllQMmhtTmRDdU5RWnFqWjRE?=
+ =?utf-8?B?VnlsMmJJMHhHaDZOK2pGb3FTbXkxV0cydTdaVzJSL1RRV3IxT0RVVVJHanRw?=
+ =?utf-8?B?bnJuUVNVRWRyVVo2aHhreUpXZWNBdUhiOXIycmY4UWlGOU1BMUFLZWFJQitn?=
+ =?utf-8?B?b0xYTGRzUHlJYS9tZzVVYUhmYjdjWU1lRjhDUW9JdVpPUlN6TmhzRWxFajFs?=
+ =?utf-8?B?TjdYU1pYQnpVNGdFTy9hNDlNcUlYd2FlR2gyNW1ncHcvVHJld1JYMUdBTzVi?=
+ =?utf-8?B?bENWVWpJUXZDem9YWDhGRitpeFp4M0lvSHZubnJ6aWljUEdsdWp4S0xRUVBa?=
+ =?utf-8?B?d2IrRGlvMHhtZGJlYmV5bGVxUmRHK1dqQkJqaVNnRUVOMW02L1J2aDV4bWtF?=
+ =?utf-8?B?MTRyMjlkL1F4bjRqZHk3Y1U0WTZVWFBablNSVDVteHpxVlhoVXBDQXNSS1dF?=
+ =?utf-8?B?U0dBZGtTOVBTdkRqRGtsMHUzelYzSjRxMy9Ob1RHZlZvakFMY2xXZndEYVRB?=
+ =?utf-8?B?a2lBVG9IMkVkVWpZU2gzS1RTU1dvcWJLOUlMSVNRWTEyY0NuRzgzSEZxN1JZ?=
+ =?utf-8?B?VDU1TzhSSjBwdmZ2SmNINjVsMTlWb1YreXU5ZTV0bUVzcG9aUWVuSWJsb1JS?=
+ =?utf-8?B?OWlCM283YUNMOW1wQTZxZHpmTmxEZ0pqMVh3Uk54blBmYW1ORnlrYjE0dEFW?=
+ =?utf-8?B?S1FqMWY1MUNnTFFQNnR3SkFLaU9SRVBaN3JnTy9QL2gzemo2c1FLemh2YTF6?=
+ =?utf-8?B?V0lVbTN4UVM2SFBQRkJ0N2VxTVQwaGZoUXFVQnorSjBqc2xJMHcwS213YTM2?=
+ =?utf-8?B?dURhVjNxL29wdXFnN3lZMjlOOEJqUzlsc0xHdTZ4dE95c0NSU2NCYnBaNisy?=
+ =?utf-8?B?bGNTMHBtUHF6aEVqbzNpeDFTd2YwQ0FkSkxOb09UVXVVNVFrZVh4VEpNQ1Zs?=
+ =?utf-8?B?MXdIQjF0dThwZUh0dDAvaDZTN2ExK0ZlNDkreTdsb3ZLZS9GYnRtdWJLakIz?=
+ =?utf-8?B?cnlkK1owQ0ZzNTlZMTY1bXpZYnFjRDkwcVFRcHNNWnJzTlpnWThXN1FGaFdj?=
+ =?utf-8?B?d1JRT1AxWGIrMDRLVEJhY2t0OUNoWkdWa3Y0VC9nekRDdGpnQkV3NTFManhp?=
+ =?utf-8?B?TXhsZ1pia1FJWE9jL1ZhS3d3U2lHelRqY1prQ0UxL0JvZmxTK3pCUU44ckt1?=
+ =?utf-8?B?RmlvNTVlL3NURXdWM09KSUs0cHVmWEFTemdrcUFPTnR5L1FndE82ODlFV0t3?=
+ =?utf-8?B?aVBlTXpWVWNyQ0FZSTJsNnBJc2ZBZS96cHYrYTduRHY3QW5PU0dZMWROdmQ0?=
+ =?utf-8?B?NXQrYmpkV0xWQmE4M24wYnAybnVPSm9uMGZhM2dpQjJlSjMveHNPTmQ4eElk?=
+ =?utf-8?B?S2dnbXM5Ymw4b3pvSC92bUZMK3pjaEgwZGM2R0N5eTRNcHZ0QjlTWjIxai8w?=
+ =?utf-8?Q?9qThhgIL38i09JTYa5aTRZEXb?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d787d717-0ceb-4845-6590-08dcb62673dc
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB8297.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Aug 2024 14:45:45.1198
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: R5q89+DchdQQGGYaCZRvG0YEu4xXx2sMmHSHyrMdHYxqlGFmjy7Uk1On70FxOkXOLkRI4wmAsL5KuL15VuZWTA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4263
 
-On Tue, 6 Aug 2024 15:13:34 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
 
-> On 8/2/24 5:59 PM, Christoph Schlameuss wrote:
-> > Add a test case verifying basic running and interaction of ucontrol VMs.
-> > Fill the segment and page tables for allocated memory and map memory on
-> > first access.
-> > 
-> > * uc_map_unmap
-> >    Store and load data to mapped and unmapped memory and use pic segment
-> >    translation handling to map memory on access.
-> > 
-> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> > ---
-> >   .../selftests/kvm/s390x/ucontrol_test.c       | 165 +++++++++++++++++-
-> >   1 file changed, 164 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> > index 030c59010fe1..72ad30fbe4ac 100644
-> > --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> > +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
-> > @@ -16,7 +16,13 @@
-> >   #include <linux/capability.h>
-> >   #include <linux/sizes.h>  
-> 
-> [...]
-> 
-> > +#define VM_MEM_MAX (VM_MEM_SIZE + VM_MEM_EXT_SIZE)  
-> 
-> You defined this but never use it.
-> Instead you're still adding up VM_MEM_SIZE and VM_MEM_EXT_SIZE.
-> 
 
-I will remove that.
+On 06.08.24 10:18, Dragos Tatulea wrote:
+> (Re-sending. I messed up the previous message, sorry about that.)
+> 
+> On 06.08.24 04:57, Jason Wang wrote:
+>> On Mon, Aug 5, 2024 at 11:59 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+>>>
+>>> On 05.08.24 05:17, Jason Wang wrote:
+>>>> On Fri, Aug 2, 2024 at 2:51 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+>>>>>
+>>>>> On Fri, 2024-08-02 at 11:29 +0800, Jason Wang wrote:
+>>>>>> On Thu, Aug 1, 2024 at 11:38 PM Dragos Tatulea <dtatulea@nvidia.com> wrote:
+>>>>>>>
+>>>>>>> The following workflow triggers the crash referenced below:
+>>>>>>>
+>>>>>>> 1) vhost_vdpa_unsetup_vq_irq() unregisters the irq bypass producer
+>>>>>>>    but the producer->token is still valid.
+>>>>>>> 2) vq context gets released and reassigned to another vq.
+>>>>>>
+>>>>>> Just to make sure I understand here, which structure is referred to as
+>>>>>> "vq context" here? I guess it's not call_ctx as it is a part of the vq
+>>>>>> itself.
+>>>>>>
+>>>>>>> 3) That other vq registers it's producer with the same vq context
+>>>>>>>    pointer as token in vhost_vdpa_setup_vq_irq().
+>>>>>>
+>>>>>> Or did you mean when a single eventfd is shared among different vqs?
+>>>>>>
+>>>>> Yes, that's what I mean: vq->call_ctx.ctx which is a eventfd_ctx.
+>>>>>
+>>>>> But I don't think it's shared in this case, only that the old eventfd_ctx value
+>>>>> is lingering in producer->token. And this old eventfd_ctx is assigned now to
+>>>>> another vq.
+>>>>
+>>>> Just to make sure I understand the issue. The eventfd_ctx should be
+>>>> still valid until a new VHOST_SET_VRING_CALL().
+>>>>
+>>> I think it's not about the validity of the eventfd_ctx. More about
+>>> the lingering ctx value of the producer after vhost_vdpa_unsetup_vq_irq().
+>>
+>> Probably, but
+>>
+>>> That value is the eventfd ctx, but it could be anything else really...
+>>
+>> I mean we hold a refcnt of the eventfd so it should be valid until the
+>> next set_vring_call() or vhost_dev_cleanup().
+>>
+>> But I do spot some possible issue:
+>>
+>> 1) We swap and assign new ctx in vhost_vring_ioctl():
+>>
+>>                 swap(ctx, vq->call_ctx.ctx);
+>>
+>> 2) and old ctx will be put there as well:
+>>
+>>                 if (!IS_ERR_OR_NULL(ctx))
+>>                         eventfd_ctx_put(ctx);
+>>
+>> 3) but in vdpa, we try to unregister the producer with the new token:
+>>
+>> static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>>                            void __user *argp)
+>> {
+>> ...
+>>         r = vhost_vring_ioctl(&v->vdev, cmd, argp);
+>> ...
+>>         switch (cmd) {
+>> ...
+>>         case VHOST_SET_VRING_CALL:
+>>                 if (vq->call_ctx.ctx) {
+>>                         cb.callback = vhost_vdpa_virtqueue_cb;
+>>                         cb.private = vq;
+>>                         cb.trigger = vq->call_ctx.ctx;
+>>                 } else {
+>>                         cb.callback = NULL;
+>>                         cb.private = NULL;
+>>                         cb.trigger = NULL;
+>>                 }
+>>                 ops->set_vq_cb(vdpa, idx, &cb);
+>>                 vhost_vdpa_setup_vq_irq(v, idx);
+>>
+>> in vhost_vdpa_setup_vq_irq() we had:
+>>
+>>         irq_bypass_unregister_producer(&vq->call_ctx.producer);
+>>
+>> here the producer->token still points to the old one...
+>>
+>> Is this what you have seen?
+> Yup. That is the issue. The unregister already happened at
+> vhost_vdpa_unsetup_vq_irq(). So this second unregister will
+> work on an already unregistered element due to the token still
+> being set.
+> 
+>>
+>>>
+>>>
+>>>> I may miss something but the only way to assign exactly the same
+>>>> eventfd_ctx value to another vq is where the guest tries to share the
+>>>> MSI-X vector among virtqueues, then qemu will use a single eventfd as
+>>>> the callback for multiple virtqueues. If this is true:
+>>>>
+>>> I don't think this is the case. I see the issue happening when running qemu vdpa
+>>> live migration tests on the same host. From a vdpa device it's basically a device
+>>> starting on a VM over and over.
+>>>
+>>>> For bypass registering, only the first registering can succeed as the
+>>>> following registering will fail because the irq bypass manager already
+>>>> had exactly the same producer token.
+>>>> For registering, all unregistering can succeed:
+>>>>
+>>>> 1) the first unregistering will do the real job that unregister the token
+>>>> 2) the following unregistering will do nothing by iterating the
+>>>> producer token list without finding a match one
+>>>>
+>>>> Maybe you can show me the userspace behaviour (ioctls) when you see this?
+>>>>
+>>> Sure, what would you need? qemu traces?
+>>
+>> Yes, that would be helpful.
+>>
+> Will try to get them.
+As the traces are quite large (~5MB), I uploaded them in this location [0].
+I used the following qemu traces:
+--trace vhost_vdpa* --trace virtio_net_handle*
 
-> > +
-> > +#define PAGES_PER_SEGMENT 4  
-> 
-> You mean pages per segment table?
-> 
+[0] https://drive.google.com/file/d/1XyXYyockJ_O7zMgI7vot6AxYjze9Ljju/view?usp=sharing
 
-Yes, I did name this analog to the existing PAGES_PER_REGION from
-"tools/testing/selftests/kvm/lib/s390x/processor.c".
-If you think that would be useful in the future we could also pull both
-constants into "processor.h".
-
-> [...]
-> 
-> > +/* initialize segment and page tables for uc_kvm tests */
-> > +static void init_st_pt(FIXTURE_DATA(uc_kvm) * self)
-> > +{
-> > +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
-> > +	struct kvm_run *run = self->run;
-> > +	void *se_addr;
-> > +	int si, pi;
-> > +	u64 *phd;
-> > +
-> > +	/* set PASCE addr */
-> > +	self->pgd = self->base_gpa + SZ_1M;
-> > +	phd = gpa2hva(self, self->pgd);
-> > +	memset(phd, 0xff, PAGES_PER_SEGMENT * PAGE_SIZE);
-> > +
-> > +	for (si = 0; si < ((VM_MEM_SIZE + VM_MEM_EXT_SIZE) / SZ_1M); si++) {
-> > +		/* create ste */
-> > +		phd[si] = (self->pgd
-> > +			+ (PAGES_PER_SEGMENT * PAGE_SIZE
-> > +				* ((VM_MEM_SIZE + VM_MEM_EXT_SIZE) / SZ_1M))
-> > +			+ (PAGES_PER_SEGMENT * PAGE_SIZE * si)) & ~0x7fful;
-> > +		se_addr = gpa2hva(self, phd[si]);
-> > +		memset(se_addr, 0xff, PAGES_PER_SEGMENT * PAGE_SIZE);
-> > +		for (pi = 0; pi < (SZ_1M / PAGE_SIZE); pi++) {
-> > +			/* create pte */
-> > +			((u64 *)se_addr)[pi] = (self->base_gpa
-> > +				+ (si * SZ_1M) + (pi * PAGE_SIZE)) & ~0xffful;
-> > +		}  
-> 
-> That's barely readable, can you split that into functions or make it 
-> more readable in some other way?
-> 
-
-I will tinker a bit to make this readable.
-
-> > +	}
-> > +	pr_debug("segment table entry %p (0x%lx) --> %p\n",
-> > +		 phd, phd[0], gpa2hva(self, (phd[0] & ~0x7fful)));
-> > +	print_hex_bytes("st", (u64)phd, 64);
-> > +	print_hex_bytes("pt", (u64)gpa2hva(self, phd[0]), 128);
-> > +	print_hex_bytes("pt+", (u64)
-> > +			gpa2hva(self, phd[0] + (PAGES_PER_SEGMENT * PAGE_SIZE
-> > +			* ((VM_MEM_SIZE + VM_MEM_EXT_SIZE) / SZ_1M)) - 0x64), 128);
-> > +
-> > +	/* PASCE TT=00 for segment table */
-> > +	sync_regs->crs[1] = self->pgd | 0x3;
-> > +	run->kvm_dirty_regs |= KVM_SYNC_CRS;
-> > +}
-> > +  
-> 
+Thanks,
+Dragos
 
 
