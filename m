@@ -1,80 +1,81 @@
-Return-Path: <kvm+bounces-23369-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23370-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5890A9491E5
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 15:44:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5371F949200
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 15:48:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4161BB20984
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 13:44:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C511D1F21D15
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 13:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4BD11D47D7;
-	Tue,  6 Aug 2024 13:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC59D1D47DB;
+	Tue,  6 Aug 2024 13:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NzMIUFs4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvbCcLFy"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 558131BD009
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 13:43:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E001D54F2
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 13:48:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722951815; cv=none; b=jjL+jagjmQlkluEN74WFpKqcQ4tu+DbCry87lVObrfA/g/KCv/sMiPIhx2ctLx8ysVA88uCf2RzLSZ05mCiIFExEpCacAkHAfp8PeYTo1dCgYC1SDcS5FtiunZGSvrXYjQ1PBa8muwLU4eb3WDd8YbJdj2jHZGCAEtxTDPZmwWQ=
+	t=1722952106; cv=none; b=S0xafCWITjYnKnN14LobiTq6jGvu8fO7Z5lVZYKWjlA4Snt03HKYbqiwuvDVoDldDNtqx75ydAL/oS1Wb0cvFXcciYRATrbyOmSSQM2DTP6af2E6CEEYkG72Yyo2ILGMO364zRFHfEpAYbrtRwG99Zsr85FSGiMpiD36uUDbbHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722951815; c=relaxed/simple;
-	bh=M8zXtgPGl3GmVlDT8c1//FMDG6JpU+brduXIeU/y23Y=;
+	s=arc-20240116; t=1722952106; c=relaxed/simple;
+	bh=xrxM1SqhWYYYwZ09b4/BbXYkJmOGRhJ6d/k55zrOR+Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kROVnOweJs/g5m/qFUhGmd9U2C3j+95aEuUV80gKCOKGbKbcan/vz7KFyycgy7HFjC8DSYIsjJTS7pwTEghMlnXjvtayic8eR1Bb5TELTh4ruT7481mC99RXzfiVj/ZLvtPPp/xtO767kP6opRvI6qJw6yAaNZHyTRcD0QrE+zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NzMIUFs4; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=lmuvO31RV+NjUIWQVZ9T+Y0g/xx56KyOfgmJHnlw90FoR+MfEh6H8nsUUUVZcJJ69dULkpdQKVorn8px/l7Jnzxaf325mEt3I1LkUUgnH8kDMZEVH4dHcc2qIWyN95B3ebJlsX6YFz/CLiMBT39LOb1sW893IO5JdXdxgX60lH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JvbCcLFy; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1722951813;
+	s=mimecast20190719; t=1722952103;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=i65iOJUqoj+kS1IUzfkGG2qrh7z3NVtE513m6YvoExI=;
-	b=NzMIUFs4nZ6HvGX1gnMiyZlsKmwQWAQfGQtVugxLhygZ2appnHygt7U8ibq16Qf9dDAoDk
-	RclJLgemuXPD1zW4mbh3K/FzNwhuTJPkD4BYATxSZBQ1E6sn++nCFYcCbzC6rBBn/08CzJ
-	5pEpm4MGgFnSp4qB9TsBD7/S/jTtM/w=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=gtpU5qSprfJ+UldEW+4kFQXg1kf7NdDamMPmiVRXcoY=;
+	b=JvbCcLFy45H9oRclbDwKkFIbV833D9Kb1KM2R3M2ouuQiZbKbeUXgX+IxQWfZVByE9Wucl
+	IFtL9EcHEHaNJh462oxmoj9jaXuJtdfAcgOh+2a6YnyOy8X8+dfiHV7K7EZfOfo0wbXc/R
+	xpgYHc1A150uthtFQDavn2LPCqfeIzk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-556-K5Nk7sbAPlSFjMLBg1r8ow-1; Tue, 06 Aug 2024 09:43:31 -0400
-X-MC-Unique: K5Nk7sbAPlSFjMLBg1r8ow-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42808685ef0so3944755e9.2
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 06:43:30 -0700 (PDT)
+ us-mta-664-UTIsb1ftPxiZjrQpLZL5pA-1; Tue, 06 Aug 2024 09:48:22 -0400
+X-MC-Unique: UTIsb1ftPxiZjrQpLZL5pA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3685e0df024so373203f8f.0
+        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 06:48:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722951810; x=1723556610;
+        d=1e100.net; s=20230601; t=1722952101; x=1723556901;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=i65iOJUqoj+kS1IUzfkGG2qrh7z3NVtE513m6YvoExI=;
-        b=p4GdOhV6VPlnhuAoDMWQExopMNiz2I1693QADke0R339T3QMZVJnnR2f8hAin8VP74
-         QauMOMNrSuSAiVO1wqGvr/VerWfA4flLqJp69kqwpwJ1kg1Gy6M+kJgx5fd9lIl2bw23
-         yX+J6fwCMqsws/5rUMsLi+2391Y96UVGGBn0z40Zp69XGVXsNtuwuqLlqVJknoqQn1Oy
-         DgDvZUaR2i1nKH5f/oP6JHDRKIT0hdC8B29O1E5wgywEXtbuSR//9tiKP/yKdlm2Dran
-         dLVcFuL1DRKVwShh9cN2Pcb2KUysC26PKNNHE4ndVNBmRZ5kxylDTJMOzlzs/ypLS7xy
-         my7w==
-X-Gm-Message-State: AOJu0Yz2QY0GBYYOPmDLsGWznc+Rs3Jbe93iv0oScjdhwB7s1uZHR9Ui
-	wixHOxIJGT7Rsd5gOxIlvwTyDWZKZNUqF80D6ZWQZLr84CbvdIAlDVeac6liY8ZSktIV7ygOkdh
-	rgR4ypOpzvOA77x5X3tkj7V7r8eXAIngDwpRsB0BqcRGEyZZPcQ==
-X-Received: by 2002:a05:600c:3ba9:b0:426:554a:e0bf with SMTP id 5b1f17b1804b1-428e6b037fcmr98323375e9.16.1722951809890;
-        Tue, 06 Aug 2024 06:43:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH/s1//lA1u4Wc1rgWG/YcdlvCfb4QgZvbrdHSXct6MeS9TCApHhXZa6xl1kW4kwHKMV90s1A==
-X-Received: by 2002:a05:600c:3ba9:b0:426:554a:e0bf with SMTP id 5b1f17b1804b1-428e6b037fcmr98323225e9.16.1722951809422;
-        Tue, 06 Aug 2024 06:43:29 -0700 (PDT)
+        bh=gtpU5qSprfJ+UldEW+4kFQXg1kf7NdDamMPmiVRXcoY=;
+        b=KWaEJR52iCZjEuxmUdG5auh8dFCrPCXlMzCWSGwjyt7tixSFu3Eb9hWq3qPBdiYKhZ
+         FqeNCzefgQFifPmbGOlBUW2uVkaUYkPlhvgq7DspM5x6ix4kxUoz6BkgwiD8DUzuZNQB
+         iCZ/f4OCEjvXms/7DyI9pKXgl8Es7fgEoUKdi98FAOMuOiEQOhould0yLF26s+0TqL5t
+         Xl14pvcDHerSZK2YCBkCZB4OKHYkRAWBr2iOUHS6MN8DYNUZAaSEqwIJKj4i3zX9AXsF
+         zbvllREIMknShUfY+Ls8w123eJNmYJ/KtQESoDSgwIgmu2KS3ctc+fES3qXKWzH11f3i
+         g11g==
+X-Forwarded-Encrypted: i=1; AJvYcCVMUV+YxtN4345ILbXdW+scqUGoD45k2wPysiRmsEayJKFqCLuYJNBh+juqNE5WqVMIUe2qu414MFc8cxgW+e0RoECC
+X-Gm-Message-State: AOJu0Yw6d1cH42kl/l1E6LuKhSo21K2JzaySOlkFRWSbEILHqB+CCMER
+	Ahhv0AOFyTL6s8eCNBpE/qcaWICkaHhXmBnTNvYOFdg3TYI4WxqG94jveRKTp/WSe1U5dvAh9lt
+	rRfA5v36A3+IMBVNid8TsrDKlwVsE2haxEDiRW16r5+BSD2d1BA==
+X-Received: by 2002:a5d:464b:0:b0:367:8e18:535c with SMTP id ffacd0b85a97d-36bbc14f832mr11022292f8f.43.1722952100702;
+        Tue, 06 Aug 2024 06:48:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGPRXCbw4R3JVze/f37dPQWjpfsvw8RLVk7FJ++mKPigRKg6a0Bo+6mw0dqBpIa26xORe/xBA==
+X-Received: by 2002:a5d:464b:0:b0:367:8e18:535c with SMTP id ffacd0b85a97d-36bbc14f832mr11022274f8f.43.1722952100155;
+        Tue, 06 Aug 2024 06:48:20 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c73f:8500:f83c:3602:5300:88af? (p200300cbc73f8500f83c3602530088af.dip0.t-ipconnect.de. [2003:cb:c73f:8500:f83c:3602:5300:88af])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4282bb6403bsm246406305e9.35.2024.08.06.06.43.27
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbcf0cc58sm13109166f8f.2.2024.08.06.06.48.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Aug 2024 06:43:29 -0700 (PDT)
-Message-ID: <883a0f0d-7342-479e-aa3c-13deb7e99338@redhat.com>
-Date: Tue, 6 Aug 2024 15:43:24 +0200
+        Tue, 06 Aug 2024 06:48:19 -0700 (PDT)
+Message-ID: <03db8091-d563-402b-9eec-ad36a364e5d9@redhat.com>
+Date: Tue, 6 Aug 2024 15:48:18 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,30 +83,17 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/10] Introduce guestmemfs: persistent in-memory
- filesystem
-To: "Gowans, James" <jgowans@amazon.com>, "jack@suse.cz" <jack@suse.cz>,
- "muchun.song@linux.dev" <muchun.song@linux.dev>
-Cc: "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "rppt@kernel.org" <rppt@kernel.org>, "brauner@kernel.org"
- <brauner@kernel.org>, "Graf (AWS), Alexander" <graf@amazon.de>,
- "anthony.yznaga@oracle.com" <anthony.yznaga@oracle.com>,
- "steven.sistare@oracle.com" <steven.sistare@oracle.com>,
- "akpm@linux-foundation.org" <akpm@linux-foundation.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Durrant, Paul" <pdurrant@amazon.co.uk>,
- "seanjc@google.com" <seanjc@google.com>,
- "pbonzini@redhat.com" <pbonzini@redhat.com>,
- "linux-mm@kvack.org" <linux-mm@kvack.org>,
- "Woodhouse, David" <dwmw@amazon.co.uk>,
- "Saenz Julienne, Nicolas" <nsaenz@amazon.es>,
- "viro@zeniv.linux.org.uk" <viro@zeniv.linux.org.uk>,
- "nh-open-source@amazon.com" <nh-open-source@amazon.com>,
- "linux-fsdevel@vger.kernel.org" <linux-fsdevel@vger.kernel.org>,
- "jgg@ziepe.ca" <jgg@ziepe.ca>
-References: <20240805093245.889357-1-jgowans@amazon.com>
- <20240805200151.oja474ju4i32y5bj@quack3>
- <9802ddc299c72b189487fd56668de65a84f7d94b.camel@amazon.com>
+Subject: Re: [PATCH RFC 1/4] mm: Introduce guest_memfd
+To: Elliot Berman <quic_eberman@quicinc.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
+ <seanjc@google.com>, Fuad Tabba <tabba@google.com>,
+ Patrick Roy <roypat@amazon.co.uk>, qperret@google.com,
+ Ackerley Tng <ackerleytng@google.com>
+Cc: linux-coco@lists.linux.dev, linux-arm-msm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mm@kvack.org, kvm@vger.kernel.org
+References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
+ <20240805-guest-memfd-lib-v1-1-e5a29a4ff5d7@quicinc.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -153,89 +141,30 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <9802ddc299c72b189487fd56668de65a84f7d94b.camel@amazon.com>
+In-Reply-To: <20240805-guest-memfd-lib-v1-1-e5a29a4ff5d7@quicinc.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-> 1. Secret hiding: with guestmemfs all of the memory is out of the kernel
-> direct map as an additional defence mechanism. This means no
-> read()/write() syscalls to guestmemfs files, and no IO to it. The only
-> way to access it is to mmap the file.
-
-There are people interested into similar things for guest_memfd.
-
+On 05.08.24 20:34, Elliot Berman wrote:
+> In preparation for adding more features to KVM's guest_memfd, refactor
+> and introduce a library which abstracts some of the core-mm decisions
+> about managing folios associated with the file. The goal of the refactor
+> serves two purposes:
 > 
-> 2. No struct page overhead: the intended use case is for systems whose
-> sole job is to be a hypervisor, typically for large (multi-GiB) VMs, so
-> the majority of system RAM would be donated to this fs. We definitely
-> don't want 4 KiB struct pages here as it would be a significant
-> overhead. That's why guestmemfs carves the memory out in early boot and
-> sets memblock flags to avoid struct page allocation. I don't know if
-> hugetlbfs does anything fancy to avoid allocating PTE-level struct pages
-> for its memory?
-
-Sure, it's called HVO and can optimize out a significant portion of the 
-vmemmap.
-
+> Provide an easier way to reason about memory in guest_memfd. With KVM
+> supporting multiple confidentiality models (TDX, SEV-SNP, pKVM, ARM
+> CCA), and coming support for allowing kernel and userspace to access
+> this memory, it seems necessary to create a stronger abstraction between
+> core-mm concerns and hypervisor concerns.
 > 
-> 3. guest_memfd interface: For confidential computing use-cases we need
-> to provide a guest_memfd style interface so that these FDs can be used
-> as a guest_memfd file in KVM memslots. Would there be interest in
-> extending hugetlbfs to also support a guest_memfd style interface?
+> Provide a common implementation for other hypervisors (Gunyah) to use.
 > 
+> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
 
-"Extending hugetlbfs" sounds wrong; hugetlbfs is a blast from the past 
-and not something people are particularly keen to extend for such use 
-cases. :)
+Instead of "Introduce guest_memfd" and "Convert to use mm/guest_memfd", 
+I suggest a single patch that factors out guest_memfd into core-mm.
 
-Instead, as Jason said, we're looking into letting guest_memfd own and 
-manage large chunks of contiguous memory.
-
-> 4. Metadata designed for persistence: guestmemfs will need to keep
-> simple internal metadata data structures (limited allocations, limited
-> fragmentation) so that pages can easily and efficiently be marked as
-> persistent via KHO. Something like slab allocations would probably be a
-> no-go as then we'd need to persist and reconstruct the slab allocator. I
-> don't know how hugetlbfs structures its fs metadata but I'm guessing it
-> uses the slab and does lots of small allocations so trying to retrofit
-> persistence via KHO to it may be challenging.
-> 
-> 5. Integration with persistent IOMMU mappings: to keep DMA running
-> across kexec, iommufd needs to know that the backing memory for an IOAS
-> is persistent too. The idea is to do some DMA pinning of persistent
-> files, which would require iommufd/guestmemfs integration - would we
-> want to add this to hugetlbfs?
-> 
-> 6. Virtualisation-specific APIs: starting to get a bit esoteric here,
-> but use-cases like being able to carve out specific chunks of memory
-> from a running VM and turn it into memory for another side car VM, or
-> doing post-copy LM via DMA by mapping memory into the IOMMU but taking
-> page faults on the CPU. This may require virtualisation-specific ioctls
-> on the files which wouldn't be generally applicable to hugetlbfs.
-> 
-> 7. NUMA control: a requirement is to always have correct NUMA affinity.
-> While currently not implemented the idea is to extend the guestmemfs
-> allocation to support specifying allocation sizes from each NUMA node at
-> early boot, and then having multiple mount points, one per NUMA node (or
-> something like that...). Unclear if this is something hugetlbfs would
-> want.
-> 
-> There are probably more potential issues, but those are the ones that
-> come to mind... That being said, if hugetlbfs maintainers are interested
-> in going in this direction then we can definitely look at enhancing
-> hugetlbfs.
-> 
-> I think there are two types of problems: "Would hugetlbfs want this
-> functionality?" - that's the majority. An a few are "This would be hard
-> with hugetlbfs!" - persistence probably falls into this category.
-
-I'm much rather asking myself if you should instead teach/extend the 
-guest_memfd concept by some of what you propose here.
-
-At least "guest_memfd" sounds a lot like the "anonymous fd" based 
-variant of guestmemfs ;)
-
-Like we have hugetlbfs and memfd with hugetlb pages.
+Or is there any particular reason for the split?
 
 -- 
 Cheers,
