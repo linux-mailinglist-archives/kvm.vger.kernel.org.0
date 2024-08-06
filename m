@@ -1,163 +1,134 @@
-Return-Path: <kvm+bounces-23447-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23448-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B05DF949B96
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 00:53:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3E50949BB1
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 00:59:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D38591C21874
-	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 22:53:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 720E5B278E1
+	for <lists+kvm@lfdr.de>; Tue,  6 Aug 2024 22:59:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341A8176FAE;
-	Tue,  6 Aug 2024 22:51:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9242D175D5F;
+	Tue,  6 Aug 2024 22:59:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="unct1XGg"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="MT7SOl/8"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96EC176AD0
-	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 22:51:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B8AD1741C8
+	for <kvm@vger.kernel.org>; Tue,  6 Aug 2024 22:58:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722984712; cv=none; b=LA5aAIRrrkkqq1US+BeJ+dpbzzzjxUppqTEHuRlj+Etq+rcwUeyHxsKvP+WqwS7pdPOJq7OOHBma876KIFcdSTTpQ7Vg+YvckSz17G2wk9q6tNWP91vJPouytXONTkNy9MWLnIaQNETL4UwKgEerovf9tuU5hLY+M+wB9lAcSws=
+	t=1722985142; cv=none; b=R9wnEMXYbFwC+6n7A2siTIf1eve+S3qyvUhKGygJY2zKyOROHCc/geZlDe36TptYuBp/qq9AnE7nKbUXdYPNU/nxMRoNY1MpRrJfBN6qbNiLRvA8UIcD1QllorvVcunohy0U5R3Q9MpxvAdmRjb9byJwGs19cbxbftu5QZCA4i8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722984712; c=relaxed/simple;
-	bh=6Y9hXA6AzSaU8XwI9by7FO/wehIsVP4L7s1hSbagEhw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s41SfC2BzE+RwZ/EjOOQArww4MB9/N624DZsVDLtASasFTzBbsGioMBSDAni4viWs6M3Hw+pwduhG/6wjQrCHt1ENipzw5dlO+MTvPEqfuTUgKoDOlv8mVmBLZGZzPo3P6oPaAKjJ7g8uFqIYhKwqEe2Z2OlFt6qwXIXAO4h2sQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=unct1XGg; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-428f5c0833bso1751525e9.0
-        for <kvm@vger.kernel.org>; Tue, 06 Aug 2024 15:51:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1722984708; x=1723589508; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xOOp/YKmc/A5dqoD58ohOhoIfvgLzdB4FRBJ9eYiJAE=;
-        b=unct1XGgi9fmnMD9iSK9pVlCxvNlDiD5Lp/gPbFv4uYzLvbw/7ow/iaTj6yPaj4WiD
-         Hs+No/YjVOTtkebV5p/COu+t6TD51OXcWB+ZV9zjiZg05UIczXQxX/xO4mfH8xQDfB2Q
-         ZkIUwfM9W2IWQ4JwNSeKjNIfbSl1G4AUUgDsZE+ujoGUMsJ5694m9iwAtDHKVIuyMLeV
-         9JFRFdhcc2MywhEi4q+r3jxX08UjoK7ARQw8+P+i/O8OU5RsG+q1OYF3KIR3hBK7wFcE
-         D9eUYwDtY3/O7XZAYSnuTJ15ZC1yHqOPfpMKdskU/MgvIkWkowaLO1PfWVh30+zv3Tnf
-         jjPA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1722984708; x=1723589508;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xOOp/YKmc/A5dqoD58ohOhoIfvgLzdB4FRBJ9eYiJAE=;
-        b=GZ8ioTf1BaAi74Nx1gHMpAo/9y8Kn/SXzvskwr2XHPMx8rbBXSggk6oJe3pIkgtry+
-         R8YzOUc8mCDvu0MVdbx8siWomqANTQ+0xZ0t5YuP6SpAKhQbBAJyT02f3WF+x+p6Ubb/
-         SKVD/5uNyrrWdIvDQexOyPQIWGcRCU/l5Vf2EIPlwdCgLIpVVfGERAKfS3vxt0a48QGk
-         15o63KgAaUjMo7wdKAX2jbavwBkzd80K/wlKWHByN8H3Tr4V/TfxxWfxz6jLngE/5/B5
-         DPCohQez3DUcd4aPqllhCjsZ7ra7HJmMKm+5GgrzPuvP3+P9BFJ8Yt2uG+sSoglyzkIL
-         31Wg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9UFs3Fjf1k+S2ZGourbLbqSa5bRex0GB/cncwYMy89gIGMjCKeTcr7VfrzRLvgU9zIN18nCUTvXe1VljHKSvjItVT
-X-Gm-Message-State: AOJu0YxN8OFil1XpHUHxUXOUbPPwjJhPdHK4uCSOidsRy68hH9e3v9da
-	L0HesxE/ugIvjWpvF06gDIzBHEHHsJ07dBe5OOOTp/QvVTCJbyPWcAmiuR31gThTV/SSkPkC8jd
-	yaEESrcMKX0jdzz+ulAb7MCAy+nsWOms9WL/9
-X-Google-Smtp-Source: AGHT+IHxsJV05SvHmbLBzfkJ2/9CLauQTre175KYcg3syg2jB0hoXO5m25jbwBC+niHAL4vOTLYlDRqj7cIekZQCpiY=
-X-Received: by 2002:a05:600c:4fd2:b0:426:676a:c4d1 with SMTP id
- 5b1f17b1804b1-429050c87famr1855145e9.8.1722984707966; Tue, 06 Aug 2024
- 15:51:47 -0700 (PDT)
+	s=arc-20240116; t=1722985142; c=relaxed/simple;
+	bh=Q0ZK1NZ0/1G1Bc9S2Bkbkfss4kUIKpeyfHdQCbRTI5Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sTOFRkNHoi9E6aTAgvBNDTt62y6Y3w9mFyils1C0maexS129vmVG1yGnEPOJg53ZQV5B4rPN2NyQS7xK1LEyXvzzkT7kGHPOb5ovl2IkDhqxHV+80kptVFt53yg4zqk1Fa0Wydw2GWz6g7E7ZjUr3Mx91NpNldwAIfm/LthK++8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=MT7SOl/8; arc=none smtp.client-ip=91.218.175.185
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Tue, 6 Aug 2024 15:58:52 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1722985137;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WqjCWx3iKIIOBiEbdFwU6vk7tX5x9+cQDaS5Z4GhKug=;
+	b=MT7SOl/8Qd4gf4AEhDylb4Tm6ZeYRaOaSslKQvFF4ia4a3atanaVQO6Og1knthtaT3Wpvu
+	f1jJgXNaYtwNpEJFN/BBB/A1miGtQhrkA/cL3/4wYElzBYDnAH/craMZsRCUWOso2hStin
+	AowjlBMtaUV65lr67ZlbOX8CE/OebHI=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Marc Zyngier <maz@kernel.org>, Paolo Bonzini <pbonzini@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Steve Rutherford <srutherford@google.com>
+Subject: Re: [PATCH 2/2] KVM: Protect vCPU's "last run PID" with rwlock, not
+ RCU
+Message-ID: <ZrKqrCnNpNQ_K_qi@linux.dev>
+References: <20240802200136.329973-1-seanjc@google.com>
+ <20240802200136.329973-3-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240806111157.1336532-1-suleiman@google.com>
-In-Reply-To: <20240806111157.1336532-1-suleiman@google.com>
-From: Joel Fernandes <joelaf@google.com>
-Date: Tue, 6 Aug 2024 18:51:36 -0400
-Message-ID: <CAJWu+oqp9sUDOvKB23p+_C1cTvFj8sQptfz30UwrWJyKhf1ckg@mail.gmail.com>
-Subject: Re: [PATCH] sched: Don't try to catch up excess steal time.
-To: Suleiman Souhlal <suleiman@google.com>
-Cc: Ingo Molnar <mingo@redhat.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Valentin Schneider <vschneid@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, vineethrp@google.com, 
-	linux-kernel@vger.kernel.org, kvm@vger.kernel.org, ssouhlal@freebsd.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240802200136.329973-3-seanjc@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Aug 6, 2024 at 7:13=E2=80=AFAM Suleiman Souhlal <suleiman@google.co=
-m> wrote:
->
-> When steal time exceeds the measured delta when updating clock_task, we
-> currently try to catch up the excess in future updates.
-> However, this results in inaccurate run times for the future clock_task
-> measurements, as they end up getting additional steal time that did not
-> actually happen, from the previous excess steal time being paid back.
->
-> For example, suppose a task in a VM runs for 10ms and had 15ms of steal
-> time reported while it ran. clock_task rightly doesn't advance. Then, a
-> different task runs on the same rq for 10ms without any time stolen.
-> Because of the current catch up mechanism, clock_sched inaccurately ends
-> up advancing by only 5ms instead of 10ms even though there wasn't any
-> actual time stolen. The second task is getting charged for less time
-> than it ran, even though it didn't deserve it.
-> In other words, tasks can end up getting more run time than they should
-> actually get.
->
-> So, we instead don't make future updates pay back past excess stolen time=
-.
->
-> Signed-off-by: Suleiman Souhlal <suleiman@google.com>
+On Fri, Aug 02, 2024 at 01:01:36PM -0700, Sean Christopherson wrote:
+> To avoid jitter on KVM_RUN due to synchronize_rcu(), use a rwlock instead
+> of RCU to protect vcpu->pid, a.k.a. the pid of the task last used to a
+> vCPU.  When userspace is doing M:N scheduling of tasks to vCPUs, e.g. to
+> run SEV migration helper vCPUs during post-copy, the synchronize_rcu()
+> needed to change the PID associated with the vCPU can stall for hundreds
+> of milliseconds, which is problematic for latency sensitive post-copy
+> operations.
+> 
+> In the directed yield path, do not acquire the lock if it's contended,
+> i.e. if the associated PID is changing, as that means the vCPU's task is
+> already running.
+> 
+> Reported-by: Steve Rutherford <srutherford@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
 > ---
->  kernel/sched/core.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> index bcf2c4cc0522..42b37da2bda6 100644
-> --- a/kernel/sched/core.c
-> +++ b/kernel/sched/core.c
-> @@ -728,13 +728,15 @@ static void update_rq_clock_task(struct rq *rq, s64=
- delta)
+>  arch/arm64/include/asm/kvm_host.h |  2 +-
+>  include/linux/kvm_host.h          |  3 ++-
+>  virt/kvm/kvm_main.c               | 32 +++++++++++++++++--------------
+>  3 files changed, 21 insertions(+), 16 deletions(-)
+> 
+> diff --git a/arch/arm64/include/asm/kvm_host.h b/arch/arm64/include/asm/kvm_host.h
+> index a33f5996ca9f..7199cb014806 100644
+> --- a/arch/arm64/include/asm/kvm_host.h
+> +++ b/arch/arm64/include/asm/kvm_host.h
+> @@ -1115,7 +1115,7 @@ int __kvm_arm_vcpu_set_events(struct kvm_vcpu *vcpu,
+>  void kvm_arm_halt_guest(struct kvm *kvm);
+>  void kvm_arm_resume_guest(struct kvm *kvm);
+>  
+> -#define vcpu_has_run_once(vcpu)	!!rcu_access_pointer((vcpu)->pid)
+> +#define vcpu_has_run_once(vcpu)	(!!READ_ONCE((vcpu)->pid))
+>  
+>  #ifndef __KVM_NVHE_HYPERVISOR__
+>  #define kvm_call_hyp_nvhe(f, ...)						\
+> diff --git a/include/linux/kvm_host.h b/include/linux/kvm_host.h
+> index 689e8be873a7..d6f4e8b2b44c 100644
+> --- a/include/linux/kvm_host.h
+> +++ b/include/linux/kvm_host.h
+> @@ -342,7 +342,8 @@ struct kvm_vcpu {
+>  #ifndef __KVM_HAVE_ARCH_WQP
+>  	struct rcuwait wait;
 >  #endif
->  #ifdef CONFIG_PARAVIRT_TIME_ACCOUNTING
->         if (static_key_false((&paravirt_steal_rq_enabled))) {
-> -               steal =3D paravirt_steal_clock(cpu_of(rq));
-> +               u64 prev_steal;
-> +
-> +               steal =3D prev_steal =3D paravirt_steal_clock(cpu_of(rq))=
-;
->                 steal -=3D rq->prev_steal_time_rq;
->
->                 if (unlikely(steal > delta))
->                         steal =3D delta;
->
-> -               rq->prev_steal_time_rq +=3D steal;
-> +               rq->prev_steal_time_rq =3D prev_steal;
->                 delta -=3D steal;
+> -	struct pid __rcu *pid;
+> +	struct pid *pid;
+> +	rwlock_t pid_lock;
+>  	int sigset_active;
+>  	sigset_t sigset;
+>  	unsigned int halt_poll_ns;
 
-Makes sense, but wouldn't this patch also do the following: If vCPU
-task is the only one running and has a large steal time, then
-sched_tick() will only freeze the clock for a shorter period, and not
-give future credits to the vCPU task itself?  Maybe it does not matter
-(and I probably don't understand the code enough) but thought I would
-mention.
-
-I am also not sure if the purpose of stealtime is to credit individual
-tasks, or rather all tasks on the runqueue because the "whole
-runqueue" had time stolen.. No where in this function is it dealing
-with individual tasks but rather the rq itself.
-
-Thoughts?
-
- - Joel
+Adding yet another lock is never exciting, but this looks fine. Can you
+nest this lock inside of the vcpu->mutex acquisition in
+kvm_vm_ioctl_create_vcpu() so lockdep gets the picture?
 
 
+> @@ -4466,7 +4469,7 @@ static long kvm_vcpu_ioctl(struct file *filp,
+>  		r = -EINVAL;
+>  		if (arg)
+>  			goto out;
+> -		oldpid = rcu_access_pointer(vcpu->pid);
+> +		oldpid = vcpu->pid;
 
->         }
->  #endif
-> --
-> 2.46.0.rc2.264.g509ed76dc8-goog
->
+It'd be good to add a comment here about how this is guarded by the
+vcpu->mutex, as Steve points out.
+
+-- 
+Thanks,
+Oliver
 
