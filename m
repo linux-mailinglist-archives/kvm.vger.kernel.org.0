@@ -1,301 +1,205 @@
-Return-Path: <kvm+bounces-23485-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23488-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B6394A429
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 11:21:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71ABE94A455
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 11:32:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 881B4B29C06
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:20:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9561F1C20C96
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EDC91D27B1;
-	Wed,  7 Aug 2024 09:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986001D0DE9;
+	Wed,  7 Aug 2024 09:32:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="jKh1Fz+F"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUqcVXJI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C7B41CB32D;
-	Wed,  7 Aug 2024 09:18:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD4D1CCB3A
+	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 09:32:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723022318; cv=none; b=dSNrF3w23mig2v1c2wKNN+uYaoI3ujpY6zvoJg7D8v7vvqFr8AL8pHK1Myt/DGbjII05Z9xPtxXcRjmZEKBYsXwbLKJD0qXHcty/Q4S5gQhs527FmsYHebC7InvLr2xBzDMHew0PDxxzjocJRCpi4pJVy0zg59HyJC5gY5fuU+c=
+	t=1723023123; cv=none; b=AbOvIkytDKHPxLoLi9zxG6SCs1F7oC3mtWkxV2n5oIE8YLKC0mSWI8VmEGRudrGW1WtT2OHD36c/WIww/0BEc+6KfSPU6TtPu9b4SpopF/FmH195FJ6BcVq3AQeVdMliSQJBb/a/5vcWQsV3+BPGmuEYSTkGqNxvnxLgj+KB9og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723022318; c=relaxed/simple;
-	bh=5cQDfC5Igy+dOMaINi4faL+vMKFD/gr0baG/OSkyspE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CHNg6Jpht97wYoIIHS6ChXAX1IZ5h401HcXysgHqMMpvnUhT20msAtavaIiJnPR7dQsasfUDUVKuHk4PfLbcfE4FF3ZaAZvdFYsfGgkMdrp06f900bVwjX7yM6eajMWsmvoRbfIwHnVDviuJFbfIXKD9CpM65mLVgKyPbQsNnLk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=jKh1Fz+F; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4772Mg4V004360;
-	Wed, 7 Aug 2024 09:18:29 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	uNsMZGr2oVWjL++x60ijGM9WGe6WYWv/kbq2yJwXg+M=; b=jKh1Fz+FBFi0mwqO
-	MV3ItSrRBe5scKiJTwWW1PHeaa9Ev790KK5d2nJzivCLdClu+POXpTChtz/qFybu
-	zriBWKLessToKX7ns9HjHiAuCkviaZ6BTvL3hpvEcbrPyoIZ3RHcVM9ZQnJRUQWI
-	bFJUXA219PmVG6jyKIJWKZje/Vx3qci2v4UDIoFUn6M9YtLlRzgWFKe4U4ArHDvM
-	h8J5zCbNm8gf0l58iQ/RLaMii68ylpcLtx5CiLp09nN8mRxb+CYUKNTmonj7+rJ/
-	j6P2eDeq+Sf3aT6dVPqb3HfFe+6E8UlrBUxcPJQQFHpWn2KZzIwA2F1m9Qk5ZWl/
-	eVhx8Q==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uqcmsuqg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Aug 2024 09:18:28 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4779ISxt022027;
-	Wed, 7 Aug 2024 09:18:28 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uqcmsuqe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Aug 2024 09:18:28 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4776jchf024334;
-	Wed, 7 Aug 2024 09:18:26 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40sy90re6a-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Aug 2024 09:18:26 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4779ILBw44499382
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 7 Aug 2024 09:18:23 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E777D2004D;
-	Wed,  7 Aug 2024 09:18:20 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 915442005A;
-	Wed,  7 Aug 2024 09:18:20 +0000 (GMT)
-Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  7 Aug 2024 09:18:20 +0000 (GMT)
-Date: Wed, 7 Aug 2024 11:17:54 +0200
-From: Claudio Imbrenda <imbrenda@linux.ibm.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        Andrew Morton <akpm@linux-foundation.org>,
-        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
-        Jonathan Corbet
- <corbet@lwn.net>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Janosch Frank <frankja@linux.ibm.com>,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        Gerald
- Schaefer <gerald.schaefer@linux.ibm.com>
-Subject: Re: [PATCH v1 02/11] mm/pagewalk: introduce folio_walk_start() +
- folio_walk_end()
-Message-ID: <20240807111754.2148d27e@p-imbrenda.boeblingen.de.ibm.com>
-In-Reply-To: <20240802155524.517137-3-david@redhat.com>
-References: <20240802155524.517137-1-david@redhat.com>
-	<20240802155524.517137-3-david@redhat.com>
-Organization: IBM
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1723023123; c=relaxed/simple;
+	bh=4OBonYVoKaYqooOH9w78gRoOT5dfAjXqwCMdj0E+AQY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BMlvM7SBI61L6ZeTrCP6FzTHOch223BJIwzv8PkEMnH3CvL7yfJQoXKH4ZV9rF1+oUiDTKdIuZ9iyt5LlgoJZlb6spMIquBLRQ5YePcA4617fMqATWi8GaR+9nIpNnaElramk2WcePLYkbg2jSVYRF/gSrpx7SndzAd8xrzKAf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MUqcVXJI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723023121;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=R31s1qlwd1wGwYZAVE+1E/NOM2YyN5bXLjbMgPRj0Hg=;
+	b=MUqcVXJIYUL8vPvxBcbZXQNW1FdJFfMDdwCdqeXMMNZ75GAg7/oBWcvRHErpBmdN1zoZLB
+	bNTn9If1vq46JkYyKebOpXjcr3sMo0juNnYrSfpTYdW7BT3rSzO+JniLCYwxsQn1Ixsjq8
+	qWw6RB/coayuGUCNVh3yaRvolVK8Lsg=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-339-55gIApHLPuKRE-ZJ1ofNUw-1; Wed, 07 Aug 2024 05:31:59 -0400
+X-MC-Unique: 55gIApHLPuKRE-ZJ1ofNUw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-52f02833519so2156286e87.2
+        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 02:31:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723023118; x=1723627918;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=R31s1qlwd1wGwYZAVE+1E/NOM2YyN5bXLjbMgPRj0Hg=;
+        b=Dj788puAGx57iPcjUr0Uzx9hYHaYdgDh3+zwlTLk+PTiWC+oT4twqyhzGhlbXr0y3G
+         qwhM12ELdxPiUm1jeLb1r1PV2RJu+yNB+WCrI+yEhtaJq/oXunoMKmea3EgLxyCSRKRJ
+         nsWdsDe8FfFPcEYUXMQ7T6s72W0TAVhxxVdBmR9j3vgWw/o/TJWNMp+Q95KChVXwxfHf
+         X4zTMduNa+KoWm0MnBriDGN4Yk932snjIzDky0iv595WMVHySpPy5sbUPWR9zdLhXPDM
+         unhn+tyc3jn7lW2wxV7mj1BLGeY85z0pf5gDD0Hqw061OhgaLHv/RQosIeVRYKZ2E388
+         wO9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXFAAfwsScIlpTYE06kvLLQGeltXeRqk6NPSCfxnqEwkMJotAWWRnFruZchZPjWw3LWXdvjZB1oPujGvXsyKW0qwuai
+X-Gm-Message-State: AOJu0Yz6e3pkBvNESIxmPeuohc7RVWh4aVJBvPHMEaEzazeN4pF0h1My
+	t+HT7k1QuO4GVZ38FQ6gDdts6poPjR7LLeaN49TlnJ4QM7gx/FgeB/LCojgxEnjGkba6ujmE3tx
+	i9n/BWav0kwc8Zad+Ma46Q5cKSD164VXveBTzwb92/KhvAv0ZDA==
+X-Received: by 2002:a05:6512:b08:b0:52e:9694:3f98 with SMTP id 2adb3069b0e04-530bb3a05c4mr11745164e87.27.1723023118267;
+        Wed, 07 Aug 2024 02:31:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHbSNeodwOIRVjf8BygI5G8mPHdm5QLJ8t/mFmXovDM4n7VsdwJ4Sdm5FWvkPbp2t0Sutbf0w==
+X-Received: by 2002:a05:6512:b08:b0:52e:9694:3f98 with SMTP id 2adb3069b0e04-530bb3a05c4mr11745147e87.27.1723023117621;
+        Wed, 07 Aug 2024 02:31:57 -0700 (PDT)
+Received: from ?IPV6:2003:cb:c708:1a00:df86:93fe:6505:d096? (p200300cbc7081a00df8693fe6505d096.dip0.t-ipconnect.de. [2003:cb:c708:1a00:df86:93fe:6505:d096])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290566729dsm11335695e9.0.2024.08.07.02.31.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Aug 2024 02:31:57 -0700 (PDT)
+Message-ID: <3230697b-55ea-4776-a5f8-5116366741ad@redhat.com>
+Date: Wed, 7 Aug 2024 11:31:55 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 02/11] mm/pagewalk: introduce folio_walk_start() +
+ folio_walk_end()
+To: Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+ linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-fsdevel@vger.kernel.org, Andrew Morton <akpm@linux-foundation.org>,
+ "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+ Jonathan Corbet <corbet@lwn.net>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
+ Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+References: <20240802155524.517137-1-david@redhat.com>
+ <20240802155524.517137-3-david@redhat.com>
+ <20240807111754.2148d27e@p-imbrenda.boeblingen.de.ibm.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240807111754.2148d27e@p-imbrenda.boeblingen.de.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: QZDnbRCTrHzGHPwcFsTSM6OgIGkWYGg-
-X-Proofpoint-ORIG-GUID: ExZxiMrxkJBcLr00SNuG5SU2WVyrL9U6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-07_06,2024-08-06_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
- priorityscore=1501 impostorscore=0 mlxscore=0 malwarescore=0 spamscore=0
- suspectscore=0 mlxlogscore=258 bulkscore=0 adultscore=0 lowpriorityscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408070061
 
-On Fri,  2 Aug 2024 17:55:15 +0200
-David Hildenbrand <david@redhat.com> wrote:
-
-> We want to get rid of follow_page(), and have a more reasonable way to
-> just lookup a folio mapped at a certain address, perform some checks while
-> still under PTL, and then only conditionally grab a folio reference if
-> really required.
+On 07.08.24 11:17, Claudio Imbrenda wrote:
+> On Fri,  2 Aug 2024 17:55:15 +0200
+> David Hildenbrand <david@redhat.com> wrote:
 > 
-> Further, we might want to get rid of some walk_page_range*() users that
-> really only want to temporarily lookup a single folio at a single address.
+>> We want to get rid of follow_page(), and have a more reasonable way to
+>> just lookup a folio mapped at a certain address, perform some checks while
+>> still under PTL, and then only conditionally grab a folio reference if
+>> really required.
+>>
+>> Further, we might want to get rid of some walk_page_range*() users that
+>> really only want to temporarily lookup a single folio at a single address.
+>>
+>> So let's add a new page table walker that does exactly that, similarly
+>> to GUP also being able to walk hugetlb VMAs.
+>>
+>> Add folio_walk_end() as a macro for now: the compiler is not easy to
+>> please with the pte_unmap()->kunmap_local().
+>>
+>> Note that one difference between follow_page() and get_user_pages(1) is
+>> that follow_page() will not trigger faults to get something mapped. So
+>> folio_walk is at least currently not a replacement for get_user_pages(1),
+>> but could likely be extended/reused to achieve something similar in the
+>> future.
 > 
-> So let's add a new page table walker that does exactly that, similarly
-> to GUP also being able to walk hugetlb VMAs.
-> 
-> Add folio_walk_end() as a macro for now: the compiler is not easy to
-> please with the pte_unmap()->kunmap_local().
-> 
-> Note that one difference between follow_page() and get_user_pages(1) is
-> that follow_page() will not trigger faults to get something mapped. So
-> folio_walk is at least currently not a replacement for get_user_pages(1),
-> but could likely be extended/reused to achieve something similar in the
-> future.
 
 [...]
 
-> +struct folio *folio_walk_start(struct folio_walk *fw,
-> +		struct vm_area_struct *vma, unsigned long addr,
-> +		folio_walk_flags_t flags)
-> +{
-> +	unsigned long entry_size;
-> +	bool expose_page = true;
-> +	struct page *page;
-> +	pud_t *pudp, pud;
-> +	pmd_t *pmdp, pmd;
-> +	pte_t *ptep, pte;
-> +	spinlock_t *ptl;
-> +	pgd_t *pgdp;
-> +	p4d_t *p4dp;
-> +
-> +	mmap_assert_locked(vma->vm_mm);
-> +	vma_pgtable_walk_begin(vma);
-> +
-> +	if (WARN_ON_ONCE(addr < vma->vm_start || addr >= vma->vm_end))
-> +		goto not_found;
-> +
-> +	pgdp = pgd_offset(vma->vm_mm, addr);
-> +	if (pgd_none_or_clear_bad(pgdp))
-> +		goto not_found;
-> +
-> +	p4dp = p4d_offset(pgdp, addr);
-> +	if (p4d_none_or_clear_bad(p4dp))
-> +		goto not_found;
-> +
-> +	pudp = pud_offset(p4dp, addr);
-> +	pud = pudp_get(pudp);
-> +	if (pud_none(pud))
-> +		goto not_found;
-> +	if (IS_ENABLED(CONFIG_PGTABLE_HAS_HUGE_LEAVES) && pud_leaf(pud)) {
-> +		ptl = pud_lock(vma->vm_mm, pudp);
-> +		pud = pudp_get(pudp);
-> +
-> +		entry_size = PUD_SIZE;
-> +		fw->level = FW_LEVEL_PUD;
-> +		fw->pudp = pudp;
-> +		fw->pud = pud;
-> +
-> +		if (!pud_present(pud) || pud_devmap(pud)) {
-> +			spin_unlock(ptl);
-> +			goto not_found;
-> +		} else if (!pud_leaf(pud)) {
-> +			spin_unlock(ptl);
-> +			goto pmd_table;
-> +		}
-> +		/*
-> +		 * TODO: vm_normal_page_pud() will be handy once we want to
-> +		 * support PUD mappings in VM_PFNMAP|VM_MIXEDMAP VMAs.
-> +		 */
-> +		page = pud_page(pud);
-> +		goto found;
-> +	}
-> +
-> +pmd_table:
-> +	VM_WARN_ON_ONCE(pud_leaf(*pudp));
+>> +pmd_table:
+>> +	VM_WARN_ON_ONCE(pud_leaf(*pudp));
+> 
 
-is this warning necessary? can this actually happen?
-and if it can happen, wouldn't it be more reasonable to return NULL?
+Thanks for the review!
 
-> +	pmdp = pmd_offset(pudp, addr);
-> +	pmd = pmdp_get_lockless(pmdp);
-> +	if (pmd_none(pmd))
-> +		goto not_found;
-> +	if (IS_ENABLED(CONFIG_PGTABLE_HAS_HUGE_LEAVES) && pmd_leaf(pmd)) {
-> +		ptl = pmd_lock(vma->vm_mm, pmdp);
-> +		pmd = pmdp_get(pmdp);
-> +
-> +		entry_size = PMD_SIZE;
-> +		fw->level = FW_LEVEL_PMD;
-> +		fw->pmdp = pmdp;
-> +		fw->pmd = pmd;
-> +
-> +		if (pmd_none(pmd)) {
-> +			spin_unlock(ptl);
-> +			goto not_found;
-> +		} else if (!pmd_leaf(pmd)) {
-> +			spin_unlock(ptl);
-> +			goto pte_table;
-> +		} else if (pmd_present(pmd)) {
-> +			page = vm_normal_page_pmd(vma, addr, pmd);
-> +			if (page) {
-> +				goto found;
-> +			} else if ((flags & FW_ZEROPAGE) &&
-> +				    is_huge_zero_pmd(pmd)) {
-> +				page = pfn_to_page(pmd_pfn(pmd));
-> +				expose_page = false;
-> +				goto found;
-> +			}
-> +		} else if ((flags & FW_MIGRATION) &&
-> +			   is_pmd_migration_entry(pmd)) {
-> +			swp_entry_t entry = pmd_to_swp_entry(pmd);
-> +
-> +			page = pfn_swap_entry_to_page(entry);
-> +			expose_page = false;
-> +			goto found;
-> +		}
-> +		spin_unlock(ptl);
-> +		goto not_found;
-> +	}
-> +
-> +pte_table:
-> +	VM_WARN_ON_ONCE(pmd_leaf(pmdp_get_lockless(pmdp)));
+> is this warning necessary? can this actually happen?
+> and if it can happen, wouldn't it be more reasonable to return NULL?
 
-same here
+The we have to turn this into an unconditional WARN_ON_ONCE() that 
+cannot be compiled out.
 
-> +	ptep = pte_offset_map_lock(vma->vm_mm, pmdp, addr, &ptl);
-> +	if (!ptep)
-> +		goto not_found;
-> +	pte = ptep_get(ptep);
-> +
-> +	entry_size = PAGE_SIZE;
-> +	fw->level = FW_LEVEL_PTE;
-> +	fw->ptep = ptep;
-> +	fw->pte = pte;
-> +
-> +	if (pte_present(pte)) {
-> +		page = vm_normal_page(vma, addr, pte);
-> +		if (page)
-> +			goto found;
-> +		if ((flags & FW_ZEROPAGE) &&
-> +		    is_zero_pfn(pte_pfn(pte))) {
-> +			page = pfn_to_page(pte_pfn(pte));
-> +			expose_page = false;
-> +			goto found;
-> +		}
-> +	} else if (!pte_none(pte)) {
-> +		swp_entry_t entry = pte_to_swp_entry(pte);
-> +
-> +		if ((flags & FW_MIGRATION) &&
-> +		    is_migration_entry(entry)) {
-> +			page = pfn_swap_entry_to_page(entry);
-> +			expose_page = false;
-> +			goto found;
-> +		}
-> +	}
-> +	pte_unmap_unlock(ptep, ptl);
-> +not_found:
-> +	vma_pgtable_walk_end(vma);
-> +	return NULL;
-> +found:
-> +	if (expose_page)
-> +		/* Note: Offset from the mapped page, not the folio start. */
-> +		fw->page = nth_page(page, (addr & (entry_size - 1)) >> PAGE_SHIFT);
-> +	else
-> +		fw->page = NULL;
-> +	fw->ptl = ptl;
-> +	return page_folio(page);
-> +}
+It's something that should be found early during testing (like I had a 
+bug where I misspelled "CONFIG_PGTABLE_HAS_HUGE_LEAVES" above that took 
+me 2h to debug, so I added it ;) ), and shouldn't need runtime checks.
+
+Same for the other one.
+
+Thanks!
+
+-- 
+Cheers,
+
+David / dhildenb
 
 
