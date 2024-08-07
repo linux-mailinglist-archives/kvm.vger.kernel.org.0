@@ -1,231 +1,124 @@
-Return-Path: <kvm+bounces-23563-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23564-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC1394AD59
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 17:50:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4994994AD6E
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 17:54:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 413F7B31F22
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 15:47:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64030B2190F
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 15:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB9411369BB;
-	Wed,  7 Aug 2024 15:46:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8AD12C46F;
+	Wed,  7 Aug 2024 15:49:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="x2gOGiDN";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PHEUpQ/O";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="x2gOGiDN";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PHEUpQ/O"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="Yiz+cnlc"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEA4328B6
-	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 15:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B87C328B6
+	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 15:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723045618; cv=none; b=At0aRnHPnUePdhaiZ6KVwp4PI2IQLoL4u6I0joRKrSb0GYWeYqDUTNYbYD8cJg9FXy8mXHUui4QhM5PE+/r60RGzDobxFl6BBOWoz66GU53u9UzEZWuC8wCGU3KGww6gT57a+q2gpWIKKGERs4X9CSR3wAY1DUOLo8MFEXIp6wA=
+	t=1723045789; cv=none; b=Je6exKrfFNFvSbJPbosG+xRkJnO3GRMuxt/dcMBpm7Sn/Ra3tocEeARJIrImBEE/lba9nVQlRyc0/edWDdxPPK5TxTlK9aKVFLTpQE93vnqF8nPf3FFMNWUY8VhrcVBr4ewLaNAjS0zePiblzz8rWf2ihxun7bhDzpuvXYezT9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723045618; c=relaxed/simple;
-	bh=9rwgNVf+sdadXBJdh3nN0WCPG91t59m5ynmAayirLqA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NMFuPQD03NmzB6UkZ+ry04nOQ3/cDInr8Ipu2W8+8HLmvQa25+9/mE8w2deWrceXPQUfLwK/rPBzQEOLiS8whiohft/T5Wc+wXdTnnbpPjFOqYylqLw8BOI8Hl8i4kWTgc7tDktCmTuHoWp1W+hSY88CVqlJtPAqQZ8zCgCRb0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=x2gOGiDN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PHEUpQ/O; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=x2gOGiDN; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PHEUpQ/O; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 46D561FB8D;
-	Wed,  7 Aug 2024 15:46:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723045614; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=baB1LujUNqyMj5NWzeN+yd2c34Xwt3hcJ4ZBa7qjBGw=;
-	b=x2gOGiDNkNG5u6WgjW8JkwJFwgNmJrSUscfFu1ZAhN1GFO8AbCRJF0wLZ4udJDwIMMTQiI
-	Sy9OJSdcHmcMAlrsz05eykcksTNQ2tZSPPlFpnjf1UxQyogDPHjQy7VhgkGx2Sm24omNP3
-	azDFBuTEfF8n5m3NDjEIZxpEJDrv+Yg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723045614;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=baB1LujUNqyMj5NWzeN+yd2c34Xwt3hcJ4ZBa7qjBGw=;
-	b=PHEUpQ/OPWyAgWj6s3iI3RrvkJ21wpMwggtAI2Al+5mJ+eCiqoCNCfg4QQXZGFJpiFlSgu
-	H3NIl+DMNAMKETCg==
-Authentication-Results: smtp-out2.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723045614; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=baB1LujUNqyMj5NWzeN+yd2c34Xwt3hcJ4ZBa7qjBGw=;
-	b=x2gOGiDNkNG5u6WgjW8JkwJFwgNmJrSUscfFu1ZAhN1GFO8AbCRJF0wLZ4udJDwIMMTQiI
-	Sy9OJSdcHmcMAlrsz05eykcksTNQ2tZSPPlFpnjf1UxQyogDPHjQy7VhgkGx2Sm24omNP3
-	azDFBuTEfF8n5m3NDjEIZxpEJDrv+Yg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723045614;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=baB1LujUNqyMj5NWzeN+yd2c34Xwt3hcJ4ZBa7qjBGw=;
-	b=PHEUpQ/OPWyAgWj6s3iI3RrvkJ21wpMwggtAI2Al+5mJ+eCiqoCNCfg4QQXZGFJpiFlSgu
-	H3NIl+DMNAMKETCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 2D64613A7D;
-	Wed,  7 Aug 2024 15:46:54 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id +BCECe6Ws2YNBAAAD6G6ig
-	(envelope-from <cfontana@suse.de>); Wed, 07 Aug 2024 15:46:54 +0000
-Message-ID: <afd29a7a-c944-4cf8-b8e1-082e9b0cb74e@suse.de>
-Date: Wed, 7 Aug 2024 17:46:53 +0200
+	s=arc-20240116; t=1723045789; c=relaxed/simple;
+	bh=lYXohf6wMY4JUEHAV5nXDvVLwxR5UBHN+KF1D+k82JQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=so7yCw+j5GJMmEWlyo5LqPtetrCut+3PCFdv4VgsoPaPrTaDZWyBx3RYei/R40FMXhnUt+kZhH9wMcjKyUuvhpnC9YT9oMNPSM2z2dIsKipfMlnUKaRoLrlna2rfKoN1AZluwG1V8WMugZLtv4z8+kW1wsrEKk5yXZzSUlKH+5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=Yiz+cnlc; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-52f04b3cb33so4537846e87.0
+        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 08:49:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1723045786; x=1723650586; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RYvpj69+AWcct2kjGgzqVMRUV32rPbq2i4gj3uwAY8M=;
+        b=Yiz+cnlcKDqkzXDGsKht7P1tlVxdGzUKSCsjy0x2t8AL06RawMoLp/VIfQV+8+wgiP
+         LV71D5OQgwrxnlw03go3jXSfLZpN723HYab+7H67kZteJqPP52ZAgXOzAbNfba904mKn
+         42kW9+b2qBUa9tDhJ180pqEIzSvAtp1KXmn4RCKQHV3Bh58rACPBwHpSBQe/ylNYD0KT
+         ByaOT2XptQh12GQXI+ZuEBuY2pPfR91YkQdK1Dj0IzwIhMgwabjxoiFKQj1kUBgZYPqk
+         oLZglvGXHehxX0MTybVMoCCn2gHEXjlL8x5P04RqErw1K5wqZQbDC+z1nNxFcnzIF4xp
+         Aulw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723045786; x=1723650586;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RYvpj69+AWcct2kjGgzqVMRUV32rPbq2i4gj3uwAY8M=;
+        b=dFuReqCQdn4rqlm0+y9rs5NJEUL0rCS/ifBi9y+Bchzq3S+V5uAEShq3ZfaVwm/7cx
+         rhqKjdze/D11T+/r4JMVOplG2Cht1+EzCtR5p93cXXgh4jRgUrZXmUWHyar0ulpLYApx
+         YJfyAZORRqfsH0eggBPkyfs9ADp1XdCmg7z17zGNRe+hPW5i7xBq4I/ADhqKTIIxkitE
+         h9QcYHw5ltM5eG/2GN9KDCU6g+naABZzL0Gh8EfPlH/ZyVZdFilbPbt41OjdDzp6+8fq
+         Ou+6VLT2oKAFX/8xIKclldxrDbUXHeKDFBglcMtldy5rfzYb3e7Iz8EfQENDa2X5EcMS
+         Dl+g==
+X-Gm-Message-State: AOJu0YwbSJtX7WVOgGAuGXfy7QyS35Bdr2VrwdfNrDnIpG+zYWnO8FnU
+	cPTZyT/R+xpzDUdSPnjvIT9E3QANzdekEQDX9+Qd1NFw5S464JUxicK5GT22u8N11oWlTC4vtWM
+	ygd4=
+X-Google-Smtp-Source: AGHT+IG/0qTiu3D4l4sc2pZF393ojWtcrWrltEaCHTsPfg6qHZ7oxPP+gwhZxN/GnQhjbENhLsFuKw==
+X-Received: by 2002:a05:6512:398a:b0:52c:df83:a740 with SMTP id 2adb3069b0e04-530bb38cfc7mr15457604e87.30.1723045785551;
+        Wed, 07 Aug 2024 08:49:45 -0700 (PDT)
+Received: from localhost (2001-1ae9-1c2-4c00-20f-c6b4-1e57-7965.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:20f:c6b4:1e57:7965])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a7dc9bc3c9asm649751966b.37.2024.08.07.08.49.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Aug 2024 08:49:44 -0700 (PDT)
+From: Andrew Jones <ajones@ventanamicro.com>
+To: kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Cc: anup@brainfault.org,
+	atishp@atishpatra.org,
+	cade.richard@berkeley.edu,
+	jamestiotio@gmail.com
+Subject: [PATCH] RISC-V: KVM: Fix sbiret init before forwarding to userspace
+Date: Wed,  7 Aug 2024 17:49:44 +0200
+Message-ID: <20240807154943.150540-2-ajones@ventanamicro.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: kvm_stat issue running in the background
-To: Stefan Hajnoczi <stefanha@redhat.com>
-Cc: kvm@vger.kernel.org
-References: <f21ffdee-1f29-4d89-9237-470dad9b0ef9@suse.de>
- <20240807133727.GB131475@fedora.redhat.com>
-Content-Language: en-US
-From: Claudio Fontana <cfontana@suse.de>
-In-Reply-To: <20240807133727.GB131475@fedora.redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spamd-Result: default: False [-4.29 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_TWO(0.00)[2];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo]
-X-Spam-Score: -4.29
-X-Spam-Flag: NO
-X-Spam-Level: 
+Content-Transfer-Encoding: 8bit
 
-Hi,
+When forwarding SBI calls to userspace ensure sbiret.error is
+initialized to SBI_ERR_NOT_SUPPORTED first, in case userspace
+neglects to set it to anything. If userspace neglects it then we
+can't be sure it did anything else either, so we just report it
+didn't do or try anything. Just init sbiret.value to zero, which is
+the preferred value to return when nothing special is specified.
 
-On 8/7/24 15:37, Stefan Hajnoczi wrote:
-> On Sat, Aug 03, 2024 at 11:23:21AM +0200, Claudio Fontana wrote:
->> Hello Stefan,
->>
->> did not know where to report this, but the man page mentions you specifically so here I am.
-> 
-> Hi Claudio,
-> I wrote the man page for kvm_stat(1) but am not the maintainer of the
-> tool. I have CCed the KVM mailing list although it's possible that no
-> one actively maintains the tool :).
-> 
->>
->>
->> There seems to be an issue when kvm_stat is run with:
->>
->> kvm_stat -p xxx -d -t -s yy -c -L FILENAME.csv &
->>
->> specifically due to the ampersand (&), thus running in the background.
->>
->>
->> It seems that kvm_stat gets the interrupt signal (SIGINT), and does write as a result the output to disk,
->> but then instead of terminating, it just hangs there forever.
-> 
-> That is strange. The only signal handler installed by kvm_stat is for
-> SIGHUP, so Python should perform the default behavior for SIGINT and
-> terminate. I'm not sure why the process would hang.
-> 
->>
->> So to avoid ending up with a large number of kvm_stat processes lingering on the system,
->> we needed to put a random sleep, and then send a SIGTERM to terminate the kvm_stat processes.
->>
->> Just sending a SIGTERM (without the SIGINT) does terminate the kvm_stat processes, but NO DATA is written to disk (the files show as 0 size).
-> 
-> That makes sense since kvm_stat does not handle SIGTERM. The default
-> SIGTERM behavior is to terminal and any output in Python's I/O buffers
-> may not have been written to the file.
-> 
-> Maybe kvm_stat should catch SIGINT and SIGTERM. That would give it a
-> chance to write out the log before terminating. Do you want to try
-> implementing that?I 
+KVM was already initializing both sbiret.error and sbiret.value, but
+the values used appear to come from a copy+paste of the __sbi_ecall()
+implementation, i.e. a0 and a1, which don't apply prior to the call
+being executed, nor at all when forwarding to userspace.
 
-I think SIGINT would be enough, sure I can give it a try,
+Fixes: dea8ee31a039 ("RISC-V: KVM: Add SBI v0.1 support")
+Signed-off-by: Andrew Jones <ajones@ventanamicro.com>
+---
+ arch/riscv/kvm/vcpu_sbi.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Thanks,
-
-C
-
-> 
->>
->> This is the workaround script that we currently have:
->>
->> ----
->>
->> #! /bin/bash                                                                                                            
->>
->> VM_PIDS=`pgrep qemu-system-`
->>
->> for VM_PID in ${VM_PIDS} ; do
->>     # warning: kvm_stat is very fragile, change with care                                                               
->>     kvm_stat -p ${VM_PID} -d -t -s 1 -c -L kvm_stat_${VM_PID}.csv &
->> done
->>
->> if test "x${VM_PID}" != "x" ; then
->>     echo "launched kvm_stat processes, capturing 10 seconds..."
->>     sleep 10
->>     echo "signaling all kvm_stat processes to write to disk..."
->>     pkill -INT -P $$
->>     sleep 5
->>     sync
->>     echo "signaling all kvm_stat processes to die..."
->>     pkill -TERM -P $$
->>     echo "waiting for kvm_stat processes to exit..."
->>     while pgrep -P $$ > /dev/null; do
->>     sleep 2
->>     echo "still waiting for kvm_stat processes to exit..."
->>     done
->> fi
->>
->> echo "Done."
->>
->> ----
->>
->> Feel free to forward to the appropriate mailing list if needed,
->>
->> thanks!
->>
->> Claudio
->>
->> -- 
->> Claudio Fontana
->> Engineering Manager Virtualization, SUSE Labs Core
->>
->> SUSE Software Solutions Italy Srl
->>
+diff --git a/arch/riscv/kvm/vcpu_sbi.c b/arch/riscv/kvm/vcpu_sbi.c
+index 62f409d4176e..7de128be8db9 100644
+--- a/arch/riscv/kvm/vcpu_sbi.c
++++ b/arch/riscv/kvm/vcpu_sbi.c
+@@ -127,8 +127,8 @@ void kvm_riscv_vcpu_sbi_forward(struct kvm_vcpu *vcpu, struct kvm_run *run)
+ 	run->riscv_sbi.args[3] = cp->a3;
+ 	run->riscv_sbi.args[4] = cp->a4;
+ 	run->riscv_sbi.args[5] = cp->a5;
+-	run->riscv_sbi.ret[0] = cp->a0;
+-	run->riscv_sbi.ret[1] = cp->a1;
++	run->riscv_sbi.ret[0] = SBI_ERR_NOT_SUPPORTED;
++	run->riscv_sbi.ret[1] = 0;
+ }
+ 
+ void kvm_riscv_vcpu_sbi_system_reset(struct kvm_vcpu *vcpu,
+-- 
+2.45.2
 
 
