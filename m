@@ -1,163 +1,231 @@
-Return-Path: <kvm+bounces-23551-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23558-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62CCF94ACEC
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 17:31:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE96794AD4A
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 17:46:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09FCA1F2200C
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 15:31:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73B30283384
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 15:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A29712FB0A;
-	Wed,  7 Aug 2024 15:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4384813BACC;
+	Wed,  7 Aug 2024 15:45:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RcL40yfM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="OaPzfGoO"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3925823DE;
-	Wed,  7 Aug 2024 15:30:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B78C584DE4;
+	Wed,  7 Aug 2024 15:45:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723044653; cv=none; b=kOo9bjICl2bGAcX/jwqSCpQylxr2pts4A8ryUUFSGM6AcevkTmfVKfHUgVsleeoQQ2OwBGZWglR32qywFpXiNlSmsV0jy6yh35866GokeD2+gjlkxGLGCZdVvNIaizJMttpKp1VHHNeBQ0hoaAKF9UAYQtJr9DAhTGHKpOTAhI0=
+	t=1723045555; cv=none; b=pzzFU11Z+QiyRQbCwwzke4N/Joq8vmKyIH092gR9qrHAKyq5RTp6Cs0p47x8HUxM4jBa9Fsok7B4cA+jMqUGPSgnJajay+lY+uB3la958mWqKcdWGSeBCguWfUcw3cKc3/tP09uopWTknDsHoYrlg7fzPNsLO8HtuxGuj+14mZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723044653; c=relaxed/simple;
-	bh=2XnifOrAEcvghCv0yWkE2XeW6zSqyK/G/NxfvmV+WMU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HMzj8SaWMAJdhJu8+irYp059Rv939vWEF11oNh7xTTlXSeJ9l2fkC9qTPfCPSqwRYDxZXyql8tdT3zz17B7IeR5QhgpYQfmVRkoRB3mwiy875tnQCKiiwfhlETQydrMtpDnmkjY6frgqhR3+T1vlHphAY49GAGzWQLnHkYxKvu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RcL40yfM; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a7b2dbd81e3so260599366b.1;
-        Wed, 07 Aug 2024 08:30:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723044650; x=1723649450; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0oyDFdnWOipjuzTZLeqx4CkLA/xSH6hcPg60gVyTjEU=;
-        b=RcL40yfMEPctF9ipKMMohxB7MIt0yR9z9kbWh9sH/xoUlk/oaQugfGHQHh/099X720
-         ofzVRyfje8rlWGMCFlU1X9DquHyNnv6c1c/8hMNgTqv1gNHxmYXhU4PP0tCPs8ouDKwp
-         7Hq9GxK4dSlBcdVVCjWW1PTot3Q5jbvyEzZn6PNGbsBpD6/6ZXX6+YQWWbgA5Wren4A6
-         Gmd87Qna/ZG6qaxhhJeJdJeugTIj/QSbne0JCbajq70DmgZlQaVFAQcYPPkivVj4PMOY
-         KoBKgamoJSD7jHTS1yCxgLgU8fdYE2+3vZoy+MYLGZR4rd+P5cZrgDhW5biCEQXxgWXl
-         iRIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723044650; x=1723649450;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0oyDFdnWOipjuzTZLeqx4CkLA/xSH6hcPg60gVyTjEU=;
-        b=orknJc1llqymqPvomeVF8+viDo7ruwiHBlUmgQP5wyMtg0PITWqjFU9EM+WLvKnl1o
-         TOHm5Fj5huvojNiLWbgTVxuQK/5b8Dnsz7Xuc4YG1j3S9y9stS9FtzhlOSPLY8haCB/i
-         4ny+MKAKhR/yD40yxJSf/YZf6iCuWEkxr0K+MY81uMkKoUZfoHb8SlScTLxDZOUksfMD
-         kXv2IadZ7alc8W9kC2GXwIwp/k8u8SdcbaFppyOHmuXpx7KSydpc1KT9SOCnRmH5ms5D
-         MFzQw6/v+0W+fUUcL9bvmFG+yXBNnVh1q21sTjSnXVislkBz8n5F3uT1vMdin6Y+/c8j
-         DD7A==
-X-Forwarded-Encrypted: i=1; AJvYcCW+G84y613iIt5JUKxXep1zOn4ljLsTrZ0MQktFLU/YeaeQ0/5JyDOdtaB/IF05rdAmoBHOmhqchysDWjxSdb0T6/sVbiz6EJ6zymFJwbi9uDDukwO4GCk0rpHrSd2QGF1y9omjyR5L+XvmmdypkViauC11sv/z+vXMUS9+o9RkcEwggCLmpTBE4zmsAjx9SOdoxBfGFQgy9ds+J8kH/WPsFv+pfoSsNiY=
-X-Gm-Message-State: AOJu0YwJSJy5bVG4i6AyTL6Hq72UxaLUlObKFWc77UU2Z5/pyjuS68vI
-	k5K9IQ85AcwAMi7HBTh+ztZoyirr7KWSkJ3oBRi5wNo7L9PpVEIbiX80vViHDnLc858aWH57VKb
-	JnL/OQki6yL4lRUp7e9U2kRSWwTU=
-X-Google-Smtp-Source: AGHT+IHPnhrxKaIpMWXKHqgXceVSV50kDl3BgP7lMNWmdSEa++OzozUr5LaDBKhp5CX9UYbJBNGqE+rUFxssFg96rns=
-X-Received: by 2002:a17:907:1c2a:b0:a7a:a138:dbd2 with SMTP id
- a640c23a62f3a-a7dc509f3bcmr1243934466b.50.1723044649601; Wed, 07 Aug 2024
- 08:30:49 -0700 (PDT)
+	s=arc-20240116; t=1723045555; c=relaxed/simple;
+	bh=PYRH2GffZArS3PJD2c3xZFSzawIYCw+IidzCx1f4O5M=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DwjcG8iht2flV/nEsVn0AYO4GNDvYOZBvQV2H4qL7iB9Z5A0En6AS6m9OH3pHNf2Qi7eXYbJL83Y6kpg0fg65AUozQ8s1GZGv/Bmy6bJQBOPYLaXhWNDvbJAVeGmFU2vSYAswNj7tmyvnGBiJb0YzgJ5T6NOh2CDb8+cc59oxqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=OaPzfGoO; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4772UNKe015737;
+	Wed, 7 Aug 2024 15:45:43 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding; s=pp1; bh=aLJtq8YSHa5mv/jwA1sdbtN8Jy
+	wSa82HBHRhw6obdrs=; b=OaPzfGoOJ1/B+vb5vrZw0YPnxhELTzfRA65e1ctzjT
+	aJu/8w+oiWcBD6EZalJ4srS1KUDZZupE8iCaJvgF5+kZykLfEqc/0mil3CquZ/CH
+	jpiPqX6dRfhXPsa5YsjuvQonNIvEboxNjqR64a+2yHNlJw0sodhIYEQkmZre4kVC
+	m72hMAInGicTVKt/OezlXp8gze6v/4nvwi8Xj+7OHHK9oZ2pk9slUQQAReifDj6I
+	lBSeDqfOYgsKseuLx/m3qiVZeaX/J9pOhJTbmBNwcqtItM8i67Lzk+MO0lfvlZvl
+	98GiyEIH2lOtyVxQUyUcSKVziTwIYNBnCyzVEDOQlG+g==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uqcmtppg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Aug 2024 15:45:43 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 477FjgKU006167;
+	Wed, 7 Aug 2024 15:45:42 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40uqcmtppe-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Aug 2024 15:45:42 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 477BpH8q018027;
+	Wed, 7 Aug 2024 15:45:41 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40t0cmskjk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Aug 2024 15:45:41 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 477FjZWj29557242
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 7 Aug 2024 15:45:37 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 4DA372004B;
+	Wed,  7 Aug 2024 15:45:35 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A7CD520040;
+	Wed,  7 Aug 2024 15:45:34 +0000 (GMT)
+Received: from darkmoore.boeblingen.de.ibm.com (unknown [9.155.210.150])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  7 Aug 2024 15:45:34 +0000 (GMT)
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>, schlameuss@linux.ibm.com
+Subject: [PATCH v5 00/10] selftests: kvm: s390: Add s390x ucontrol selftests
+Date: Wed,  7 Aug 2024 17:45:02 +0200
+Message-ID: <20240807154512.316936-1-schlameuss@linux.ibm.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730050927.GC5334@ZenIV> <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-17-viro@kernel.org> <CAEf4BzZipqBVhoY-S+WdeQ8=MhpKk-2dE_ESfGpV-VTm31oQUQ@mail.gmail.com>
- <20240807-fehlschlag-entfiel-f03a6df0e735@brauner>
-In-Reply-To: <20240807-fehlschlag-entfiel-f03a6df0e735@brauner>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 7 Aug 2024 08:30:29 -0700
-Message-ID: <CAEf4BzaeFTn41pP_hbcrCTKNZjwt3TPojv0_CYbP=+973YnWiA@mail.gmail.com>
-Subject: Re: [PATCH 17/39] bpf: resolve_pseudo_ldimm64(): take handling of a
- single ldimm64 insn into helper
-To: Christian Brauner <brauner@kernel.org>
-Cc: viro@kernel.org, bpf@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	amir73il@gmail.com, cgroups@vger.kernel.org, kvm@vger.kernel.org, 
-	netdev@vger.kernel.org, torvalds@linux-foundation.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 0wXhbjYrKbwdrSjxpd77MT-qAOBPQ_Zn
+X-Proofpoint-ORIG-GUID: cXebE93ffFEa9ZSXGhAfKpEWdYpgW7jZ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-07_11,2024-08-07_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 clxscore=1015
+ priorityscore=1501 impostorscore=0 mlxscore=0 malwarescore=0 spamscore=0
+ suspectscore=0 mlxlogscore=749 bulkscore=0 adultscore=0 lowpriorityscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
+ definitions=main-2408070107
 
-On Wed, Aug 7, 2024 at 3:30=E2=80=AFAM Christian Brauner <brauner@kernel.or=
-g> wrote:
->
-> On Tue, Aug 06, 2024 at 03:32:20PM GMT, Andrii Nakryiko wrote:
-> > On Mon, Jul 29, 2024 at 10:20=E2=80=AFPM <viro@kernel.org> wrote:
-> > >
-> > > From: Al Viro <viro@zeniv.linux.org.uk>
-> > >
-> > > Equivalent transformation.  For one thing, it's easier to follow that=
- way.
-> > > For another, that simplifies the control flow in the vicinity of stru=
-ct fd
-> > > handling in there, which will allow a switch to CLASS(fd) and make th=
-e
-> > > thing much easier to verify wrt leaks.
-> > >
-> > > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> > > ---
-> > >  kernel/bpf/verifier.c | 342 +++++++++++++++++++++-------------------=
---
-> > >  1 file changed, 172 insertions(+), 170 deletions(-)
-> > >
-> >
-> > This looks unnecessarily intrusive. I think it's best to extract the
-> > logic of fetching and adding bpf_map by fd into a helper and that way
-> > contain fdget + fdput logic nicely. Something like below, which I can
-> > send to bpf-next.
-> >
-> > commit b5eec08241cc0263e560551de91eda73ccc5987d
-> > Author: Andrii Nakryiko <andrii@kernel.org>
-> > Date:   Tue Aug 6 14:31:34 2024 -0700
-> >
-> >     bpf: factor out fetching bpf_map from FD and adding it to used_maps=
- list
-> >
-> >     Factor out the logic to extract bpf_map instances from FD embedded =
-in
-> >     bpf_insns, adding it to the list of used_maps (unless it's already
-> >     there, in which case we just reuse map's index). This simplifies th=
-e
-> >     logic in resolve_pseudo_ldimm64(), especially around `struct fd`
-> >     handling, as all that is now neatly contained in the helper and doe=
-sn't
-> >     leak into a dozen error handling paths.
-> >
-> >     Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> >
-> > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > index df3be12096cf..14e4ef687a59 100644
-> > --- a/kernel/bpf/verifier.c
-> > +++ b/kernel/bpf/verifier.c
-> > @@ -18865,6 +18865,58 @@ static bool bpf_map_is_cgroup_storage(struct
-> > bpf_map *map)
-> >          map->map_type =3D=3D BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE);
-> >  }
-> >
-> > +/* Add map behind fd to used maps list, if it's not already there, and=
- return
-> > + * its index. Also set *reused to true if this map was already in the =
-list of
-> > + * used maps.
-> > + * Returns <0 on error, or >=3D 0 index, on success.
-> > + */
-> > +static int add_used_map_from_fd(struct bpf_verifier_env *env, int fd,
-> > bool *reused)
-> > +{
-> > +    struct fd f =3D fdget(fd);
->
-> Use CLASS(fd, f)(fd) and you can avoid all that fdput() stuff.
+This patch series adds a selftest suite to validate the s390x
+architecture specific ucontrol KVM interface.
 
-That was the point of Al's next patch in the series, so I didn't want
-to do it in this one that just refactored the logic of adding maps.
-But I can fold that in and send it to bpf-next.
+When creating a VM on s390x it is possible to create it as userspace
+controlled VM or in short ucontrol VM.
+These VMs delegates the management of the VM to userspace instead
+of handling most events within the kernel. Consequently the userspace
+has to manage interrupts, memory allocation etc.
+
+Before this patch set this functionality lacks any public test cases.
+It is desirable to add test cases for this interface to be able to
+reduce the risk of breaking changes in the future.
+
+In order to provision a ucontrol VM the kernel needs to be compiled with
+the CONFIG_KVM_S390_UCONTROL enabled. The users with sys_admin capability
+can then create a new ucontrol VM providing the KVM_VM_S390_UCONTROL
+parameter to the KVM_CREATE_VM ioctl.
+
+The kernels existing selftest helper functions can only be partially be
+reused for these tests.
+
+The test cases cover existing special handling of ucontrol VMs within the
+implementation and basic VM creation and handling cases:
+* Reject setting HPAGE when VM is ucontrol
+* Assert KVM_GET_DIRTY_LOG is rejected
+* Assert KVM_S390_VM_MEM_LIMIT_SIZE is rejected
+* Assert state of initial SIE flags setup by the kernel
+* Run simple program in VM with and without DAT
+* Assert KVM_EXIT_S390_UCONTROL exit on not mapped memory access
+* Assert functionality of storage keys in ucontrol VM
+* Assert that memory region operations are rejected for ucontrol VMs
+
+Running the test cases requires sys_admin capabilities to start the
+ucontrol VM.
+This can be achieved by running as root or with a command like:
+
+    sudo setpriv --reuid nobody --inh-caps -all,+sys_admin \
+      --ambient-caps -all,+sys_admin --bounding-set -all,+sys_admin \
+      ./ucontrol_test
+
+The patch set does also contain some code cleanup / consolidation of
+architecture specific defines that are now used in multiple test cases.
+
+---
+
+v5:
+- PATCH 7: Simplify segment and page table generation
+- PATCH 8: Remove irrelevant code in skey test
+           Add some comments to skey test
+
+v4:
+- PATCH 5: Remove not yet used include for debug print functions
+- PATCH 6: Add include for debug print functions (removed from patch 5)
+           Remove no longer needed code since stopped but is reset
+           before starting since v3 (thanks Janosch)
+           Adjust test output to use leading zeros instead of spaces in sieic
+- PATCH 7: Rename constant to PGM_SEGMENT_TRANSLATION (thanks Janosch)
+           Put comments on their own lines
+
+v3:
+- Remove stopped bit before starting the VM (no initial stop in multiple
+  test cases) (thanks Janosch)
+- PATCH 2: Clarified SIE control block vs SIE instruction (thanks
+           Janosch)
+- PATCH 3: Make use of CAP_TO_MASK(CAP_SYS_ADMIN) instead of custom
+           define (thanks Janosch)
+           Removed Reviewed-By: Claudio
+- PATCH 4: Remove erroneous 1MB offset from self->base_hva (thanks
+           Janosch)
+- PATCH 6-8: Change name of test program _pgm to _asm to prevent confusion
+- PATCH 10: Move KVM_S390_UCONTROL default option to actual debug config
+            (thanks Christian)
+
+v2:
+- add ucontrol to s390 debug config (new patch)
+- PATCH 2: changed atomic_t to __u32 (thanks Claudio)
+- PATCH 4: reformatted comment in FIXTURE_SETUP(uc_kvm)
+- PATCH 5: refactored to display 8 byte blocks + more internal reuse
+           (thanks Claudio)
+- PATCH 7: make use of more declarative defines instead of magic values
+- PATCH 8: make use of more declarative defines instead of magic values
+           (thanks Claudio)
+- PATCH 9: add reference to fix verified by the test case
+
+
+Christoph Schlameuss (10):
+  selftests: kvm: s390: Define page sizes in shared header
+  selftests: kvm: s390: Add kvm_s390_sie_block definition for userspace
+    tests
+  selftests: kvm: s390: Add s390x ucontrol test suite with hpage test
+  selftests: kvm: s390: Add test fixture and simple VM setup tests
+  selftests: kvm: s390: Add debug print functions
+  selftests: kvm: s390: Add VM run test case
+  selftests: kvm: s390: Add uc_map_unmap VM test case
+  selftests: kvm: s390: Add uc_skey VM test case
+  selftests: kvm: s390: Verify reject memory region operations for
+    ucontrol VMs
+  s390: Enable KVM_S390_UCONTROL config in debug_defconfig
+
+ arch/s390/configs/debug_defconfig             |   1 +
+ tools/testing/selftests/kvm/.gitignore        |   1 +
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../selftests/kvm/include/s390x/debug_print.h |  69 ++
+ .../selftests/kvm/include/s390x/processor.h   |   5 +
+ .../testing/selftests/kvm/include/s390x/sie.h | 240 +++++++
+ .../selftests/kvm/lib/s390x/processor.c       |  10 +-
+ tools/testing/selftests/kvm/s390x/cmma_test.c |   7 +-
+ tools/testing/selftests/kvm/s390x/config      |   2 +
+ .../testing/selftests/kvm/s390x/debug_test.c  |   4 +-
+ tools/testing/selftests/kvm/s390x/memop.c     |   4 +-
+ tools/testing/selftests/kvm/s390x/tprot.c     |   5 +-
+ .../selftests/kvm/s390x/ucontrol_test.c       | 598 ++++++++++++++++++
+ 13 files changed, 931 insertions(+), 16 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/debug_print.h
+ create mode 100644 tools/testing/selftests/kvm/include/s390x/sie.h
+ create mode 100644 tools/testing/selftests/kvm/s390x/config
+ create mode 100644 tools/testing/selftests/kvm/s390x/ucontrol_test.c
+
+
+base-commit: de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed
+-- 
+2.45.2
+
 
