@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-23488-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23489-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71ABE94A455
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 11:32:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 693CE94A45E
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 11:34:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9561F1C20C96
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:32:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BCA31C20CD6
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986001D0DE9;
-	Wed,  7 Aug 2024 09:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D95481D1F5C;
+	Wed,  7 Aug 2024 09:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUqcVXJI"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jGfM7taW"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD4D1CCB3A
-	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 09:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDB01D1741
+	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 09:33:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723023123; cv=none; b=AbOvIkytDKHPxLoLi9zxG6SCs1F7oC3mtWkxV2n5oIE8YLKC0mSWI8VmEGRudrGW1WtT2OHD36c/WIww/0BEc+6KfSPU6TtPu9b4SpopF/FmH195FJ6BcVq3AQeVdMliSQJBb/a/5vcWQsV3+BPGmuEYSTkGqNxvnxLgj+KB9og=
+	t=1723023207; cv=none; b=f/Cmc+rGy8Xmf2qVYJI7+QKfdE0MSGRYFJ1XkwG4fItDBTmswcU/bLs2BzuDSs+TtFVl0VEUx4eqIsm6NyoL/hTODPpzVQyPNIBYKYeYIuLy6S/qdePRw94G/nFzZx/ed5XE9Y+jZXw5Gju2p34Nf4wNzPys+t8q3vr4G/QVHSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723023123; c=relaxed/simple;
-	bh=4OBonYVoKaYqooOH9w78gRoOT5dfAjXqwCMdj0E+AQY=;
+	s=arc-20240116; t=1723023207; c=relaxed/simple;
+	bh=VXzHaQm7XQbvOf5JyZxW17M3OZXWaTO3C/rchFehAvk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BMlvM7SBI61L6ZeTrCP6FzTHOch223BJIwzv8PkEMnH3CvL7yfJQoXKH4ZV9rF1+oUiDTKdIuZ9iyt5LlgoJZlb6spMIquBLRQ5YePcA4617fMqATWi8GaR+9nIpNnaElramk2WcePLYkbg2jSVYRF/gSrpx7SndzAd8xrzKAf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MUqcVXJI; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=algjvQ50/YLOsdNZ/jWLv3qIvaDkBViHoqJNm2FRPTyJDecipahDzbUkOpmkcmZFBHQZMK3e8NhZLJeodjdabSqQhIhMisY9gRJcn1CZpH18oPsCAMJ+cLxKQJ0buPXUXyAic1eWa2gvlRBt7EVoxiOu38nD60c5dj9Xb4wpxT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jGfM7taW; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723023121;
+	s=mimecast20190719; t=1723023204;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=R31s1qlwd1wGwYZAVE+1E/NOM2YyN5bXLjbMgPRj0Hg=;
-	b=MUqcVXJIYUL8vPvxBcbZXQNW1FdJFfMDdwCdqeXMMNZ75GAg7/oBWcvRHErpBmdN1zoZLB
-	bNTn9If1vq46JkYyKebOpXjcr3sMo0juNnYrSfpTYdW7BT3rSzO+JniLCYwxsQn1Ixsjq8
-	qWw6RB/coayuGUCNVh3yaRvolVK8Lsg=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=r1ao3oI2bC/T6YUDOi/z140Hom9Lwuz/axm2MilPj98=;
+	b=jGfM7taWlRY5BxXo0hm2ixuBhfjfyQgtHA+clp6QrUyhCjaPsa6fXu6j5CnkvudLm7Xonz
+	M0THgopqSk6XBc2JacdeU/mu5ns6MziRp76LgMMJNxaVHo2wM/Ba/QypTpMUWLSmTNPJ/b
+	BT8b5X7UzBSbZcKlAPrwCcQCzQp8WXY=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-339-55gIApHLPuKRE-ZJ1ofNUw-1; Wed, 07 Aug 2024 05:31:59 -0400
-X-MC-Unique: 55gIApHLPuKRE-ZJ1ofNUw-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-52f02833519so2156286e87.2
-        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 02:31:59 -0700 (PDT)
+ us-mta-387-rU_suDQsO8iCsEfwAUZrvQ-1; Wed, 07 Aug 2024 05:33:22 -0400
+X-MC-Unique: rU_suDQsO8iCsEfwAUZrvQ-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-427ffa0c9c7so17518375e9.1
+        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 02:33:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723023118; x=1723627918;
+        d=1e100.net; s=20230601; t=1723023201; x=1723628001;
         h=content-transfer-encoding:in-reply-to:organization:autocrypt
          :content-language:from:references:cc:to:subject:user-agent
          :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=R31s1qlwd1wGwYZAVE+1E/NOM2YyN5bXLjbMgPRj0Hg=;
-        b=Dj788puAGx57iPcjUr0Uzx9hYHaYdgDh3+zwlTLk+PTiWC+oT4twqyhzGhlbXr0y3G
-         qwhM12ELdxPiUm1jeLb1r1PV2RJu+yNB+WCrI+yEhtaJq/oXunoMKmea3EgLxyCSRKRJ
-         nsWdsDe8FfFPcEYUXMQ7T6s72W0TAVhxxVdBmR9j3vgWw/o/TJWNMp+Q95KChVXwxfHf
-         X4zTMduNa+KoWm0MnBriDGN4Yk932snjIzDky0iv595WMVHySpPy5sbUPWR9zdLhXPDM
-         unhn+tyc3jn7lW2wxV7mj1BLGeY85z0pf5gDD0Hqw061OhgaLHv/RQosIeVRYKZ2E388
-         wO9A==
-X-Forwarded-Encrypted: i=1; AJvYcCXFAAfwsScIlpTYE06kvLLQGeltXeRqk6NPSCfxnqEwkMJotAWWRnFruZchZPjWw3LWXdvjZB1oPujGvXsyKW0qwuai
-X-Gm-Message-State: AOJu0Yz6e3pkBvNESIxmPeuohc7RVWh4aVJBvPHMEaEzazeN4pF0h1My
-	t+HT7k1QuO4GVZ38FQ6gDdts6poPjR7LLeaN49TlnJ4QM7gx/FgeB/LCojgxEnjGkba6ujmE3tx
-	i9n/BWav0kwc8Zad+Ma46Q5cKSD164VXveBTzwb92/KhvAv0ZDA==
-X-Received: by 2002:a05:6512:b08:b0:52e:9694:3f98 with SMTP id 2adb3069b0e04-530bb3a05c4mr11745164e87.27.1723023118267;
-        Wed, 07 Aug 2024 02:31:58 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHbSNeodwOIRVjf8BygI5G8mPHdm5QLJ8t/mFmXovDM4n7VsdwJ4Sdm5FWvkPbp2t0Sutbf0w==
-X-Received: by 2002:a05:6512:b08:b0:52e:9694:3f98 with SMTP id 2adb3069b0e04-530bb3a05c4mr11745147e87.27.1723023117621;
-        Wed, 07 Aug 2024 02:31:57 -0700 (PDT)
+        bh=r1ao3oI2bC/T6YUDOi/z140Hom9Lwuz/axm2MilPj98=;
+        b=hKwoqJgNDUphYHZtktKTchIIcONZLpqKDblvhGCqU1OKhEgNoe+GtfOSrgvtO+Frtc
+         AYMB4/BAdp/IT7vx1GT6uuEYWjfv0VLGsUHGDVmzr4dTwikbjYzhDA+NQAlQNBhSYH3B
+         ZX63RtEIXxRhUQkSrW7lUFYDesU9WRCspNRfkD7u9N5NPQM4oPWqcvk2WTmJU/WbW9vC
+         wEvxyzji3naopsNwOTOF6OWGy479yvbnSpheP5THnjBfi7BSKSHsp2Ibptkh4GWFROkq
+         J6nkzFTvtMaYlvpLH1zVp1RVfinYhZkJHZntoL2ODq4F2qYseX0MFL8BCexE1OiNZz15
+         FdpQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWeQaTUa18XEWYPhRy15xNnp9DMCeOS+lxyrcWv2+AMSxirtjW+9SpLcHXnPwgOGmbmRiXRmDCIyCa10rGtog1D4x7H
+X-Gm-Message-State: AOJu0Yy006XcRnnu7ZLBWAD6n7wezWe1fFoayDt5EXWHFaALZk9KsYwj
+	4eKmPswvdJIpAhbvqPQJIfvCX0+ssXVrGBFcjRZzhu1fFHVMYqcSBPDDFdYTaWqJtmZLch6mSth
+	uWRZvryeuJRhd3BybnYBIxNOpDqUWSOHvd9Ir3Xx1WEhM8PTTYA==
+X-Received: by 2002:a05:600c:1c25:b0:426:5520:b835 with SMTP id 5b1f17b1804b1-428e6af241dmr135922215e9.5.1723023200865;
+        Wed, 07 Aug 2024 02:33:20 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGZ1EiCG7QsRTDVlK5w+6p4nKm5oU+kZSr1yFuVMrc+A2gerQdJIOXN4JQj6G7CIHOFRMSO6g==
+X-Received: by 2002:a05:600c:1c25:b0:426:5520:b835 with SMTP id 5b1f17b1804b1-428e6af241dmr135921805e9.5.1723023200220;
+        Wed, 07 Aug 2024 02:33:20 -0700 (PDT)
 Received: from ?IPV6:2003:cb:c708:1a00:df86:93fe:6505:d096? (p200300cbc7081a00df8693fe6505d096.dip0.t-ipconnect.de. [2003:cb:c708:1a00:df86:93fe:6505:d096])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4290566729dsm11335695e9.0.2024.08.07.02.31.56
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429059719ebsm19899155e9.18.2024.08.07.02.33.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Aug 2024 02:31:57 -0700 (PDT)
-Message-ID: <3230697b-55ea-4776-a5f8-5116366741ad@redhat.com>
-Date: Wed, 7 Aug 2024 11:31:55 +0200
+        Wed, 07 Aug 2024 02:33:19 -0700 (PDT)
+Message-ID: <aa577d5c-a992-4f82-aecf-266cb940d5a7@redhat.com>
+Date: Wed, 7 Aug 2024 11:33:18 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 02/11] mm/pagewalk: introduce folio_walk_start() +
- folio_walk_end()
+Subject: Re: [PATCH v1 00/11] mm: replace follow_page() by folio_walk
 To: Claudio Imbrenda <imbrenda@linux.ibm.com>
 Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  linux-doc@vger.kernel.org, kvm@vger.kernel.org, linux-s390@vger.kernel.org,
@@ -97,8 +96,7 @@ Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
  <agordeev@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>,
  Gerald Schaefer <gerald.schaefer@linux.ibm.com>
 References: <20240802155524.517137-1-david@redhat.com>
- <20240802155524.517137-3-david@redhat.com>
- <20240807111754.2148d27e@p-imbrenda.boeblingen.de.ibm.com>
+ <20240807111534.4e79d7fd@p-imbrenda.boeblingen.de.ibm.com>
 From: David Hildenbrand <david@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=david@redhat.com; keydata=
@@ -146,56 +144,65 @@ Autocrypt: addr=david@redhat.com; keydata=
  jPrnvUsUUsjRoRNJjKKA/REq+sAnhkNPPZ/NNMjaZ5b8Tovi8C0tmxiCHaQYqj7G2rgnT0kt
  WNyWQQ==
 Organization: Red Hat
-In-Reply-To: <20240807111754.2148d27e@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <20240807111534.4e79d7fd@p-imbrenda.boeblingen.de.ibm.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 07.08.24 11:17, Claudio Imbrenda wrote:
-> On Fri,  2 Aug 2024 17:55:15 +0200
+On 07.08.24 11:15, Claudio Imbrenda wrote:
+> On Fri,  2 Aug 2024 17:55:13 +0200
 > David Hildenbrand <david@redhat.com> wrote:
 > 
->> We want to get rid of follow_page(), and have a more reasonable way to
->> just lookup a folio mapped at a certain address, perform some checks while
->> still under PTL, and then only conditionally grab a folio reference if
->> really required.
+>> Looking into a way of moving the last folio_likely_mapped_shared() call
+>> in add_folio_for_migration() under the PTL, I found myself removing
+>> follow_page(). This paves the way for cleaning up all the FOLL_, follow_*
+>> terminology to just be called "GUP" nowadays.
 >>
->> Further, we might want to get rid of some walk_page_range*() users that
->> really only want to temporarily lookup a single folio at a single address.
+>> The new page table walker will lookup a mapped folio and return to the
+>> caller with the PTL held, such that the folio cannot get unmapped
+>> concurrently. Callers can then conditionally decide whether they really
+>> want to take a short-term folio reference or whether the can simply
+>> unlock the PTL and be done with it.
 >>
->> So let's add a new page table walker that does exactly that, similarly
->> to GUP also being able to walk hugetlb VMAs.
+>> folio_walk is similar to page_vma_mapped_walk(), except that we don't know
+>> the folio we want to walk to and that we are only walking to exactly one
+>> PTE/PMD/PUD.
 >>
->> Add folio_walk_end() as a macro for now: the compiler is not easy to
->> please with the pte_unmap()->kunmap_local().
+>> folio_walk provides access to the pte/pmd/pud (and the referenced folio
+>> page because things like KSM need that), however, as part of this series
+>> no page table modifications are performed by users.
 >>
->> Note that one difference between follow_page() and get_user_pages(1) is
->> that follow_page() will not trigger faults to get something mapped. So
->> folio_walk is at least currently not a replacement for get_user_pages(1),
->> but could likely be extended/reused to achieve something similar in the
->> future.
+>> We might be able to convert some other walk_page_range() users that really
+>> only walk to one address, such as DAMON with
+>> damon_mkold_ops/damon_young_ops. It might make sense to extend folio_walk
+>> in the future to optionally fault in a folio (if applicable), such that we
+>> can replace some get_user_pages() users that really only want to lookup
+>> a single page/folio under PTL without unconditionally grabbing a folio
+>> reference.
+>>
+>> I have plans to extend the approach to a range walker that will try
+>> batching various page table entries (not just folio pages) to be a better
+>> replace for walk_page_range() -- and users will be able to opt in which
+>> type of page table entries they want to process -- but that will require
+>> more work and more thoughts.
+>>
+>> KSM seems to work just fine (ksm_functional_tests selftests) and
+>> move_pages seems to work (migration selftest). I tested the leaf
+>> implementation excessively using various hugetlb sizes (64K, 2M, 32M, 1G)
+>> on arm64 using move_pages and did some more testing on x86-64. Cross
+>> compiled on a bunch of architectures.
+>>
+>> I am not able to test the s390x Secure Execution changes, unfortunately.
 > 
-
-[...]
-
->> +pmd_table:
->> +	VM_WARN_ON_ONCE(pud_leaf(*pudp));
+> The whole series looks good to me, but I do not feel confident enough
+> about all the folio details to actually r-b any of the non-s390
+> patches. (I do have a few questions, though)
 > 
+> As for the s390 patches: they look fine. I have tested the series on
+> s390 and nothing caught fire.
+> 
+> We will be able to get more CI coverage once this lands in -next.
 
-Thanks for the review!
-
-> is this warning necessary? can this actually happen?
-> and if it can happen, wouldn't it be more reasonable to return NULL?
-
-The we have to turn this into an unconditional WARN_ON_ONCE() that 
-cannot be compiled out.
-
-It's something that should be found early during testing (like I had a 
-bug where I misspelled "CONFIG_PGTABLE_HAS_HUGE_LEAVES" above that took 
-me 2h to debug, so I added it ;) ), and shouldn't need runtime checks.
-
-Same for the other one.
-
-Thanks!
+Thanks for the review! Note that it's already in -next.
 
 -- 
 Cheers,
