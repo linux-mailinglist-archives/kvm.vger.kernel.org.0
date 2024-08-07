@@ -1,130 +1,99 @@
-Return-Path: <kvm+bounces-23540-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23541-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7F2A94A9BB
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 16:16:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5661394A9C1
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 16:16:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95BAD2857B2
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 14:16:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 820281C22E69
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 14:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B81D77114;
-	Wed,  7 Aug 2024 14:15:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="odM5cGvs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71F678C8E;
+	Wed,  7 Aug 2024 14:15:39 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 557AE38DF9
-	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 14:15:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2932F26AFC;
+	Wed,  7 Aug 2024 14:15:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723040120; cv=none; b=rdI2EhDQl2zQni9HOoqpvSkhICDPR0CDbDbH2Q85JtklSfgxLvGJfWlAoOgGMRDuTvFAHcebEk3bDthfpJLiXvKjaGgXgcECEB6QdiQoapkzvlVAMuce4vLpqyuCdRmHRvX2dbd65AUyinNDOD+b0cxWAcv5WDUZNar1/uAFIIs=
+	t=1723040139; cv=none; b=XjcUSKFSfXo2xNRVCnESDtCglSnmvBTPvoszpbeUZlAD07CZU/WSQpNJca0sy8SIwnKm9tLVC+yeFtXp+GBFVBbDMuNujSmDg5MbMpIJkXk0bg7IOpdALyUP5jsiHx3zRfut+M6Ibv6RblFVBMwLCtMlXFlgoay5/fJjTXDkAW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723040120; c=relaxed/simple;
-	bh=qIZZqXvSK2dTj4OOR4TWFpTBy0obASFjlIhXZsvJN6c=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Xk7isHunyot0BRmxJ4EMfQp+KMJ/Z5/MPtyDXfxuTZBohxtnyPgmytByG6g8NPJogMT7BoHSFPjYeVJ8yLrozzPK8PIkzN++VmjDFKi7zjqXGu3MFx2YEGJN1NANquzhnYhQ7sllUfnCM5QADnKWVLsvOgnOBysPKMSEAdcJ/Ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=odM5cGvs; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0bfd36cda0so1588099276.0
-        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 07:15:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723040118; x=1723644918; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3ghOIw54hCGsAyiOMfVcHm566iY09Y1oNz8lmYYBe4I=;
-        b=odM5cGvsDjqA7JJfK5LcCRy8S5bvtOdtOBuUZYSnIN7kq6cTF90MLJYg/kWBZB0J0L
-         bT+sdJ9p2eUZyGLla8gwp3HZB/Jxe4N5DfMS0/yV1rXgyBuEUKpCgMcix8lSYtt8W2xE
-         le5YGMU3DwmZJerbnt0wDEpAtmCugFuLaNF+Z/0p4U98/q8KcBSMQDedjto+XpDkk/RN
-         UQdzpsk2sUzCRMSmuKG6ATMrns3CTBSUyVmkyDk5/VQk+SaaJEiAo/E3EWNZGc0hby5e
-         qCUA+bPbYcH6/r1nPU3ILwMnLF1F4nJOGcsFqbWce1zBDgI9iKGzWb66iAYlVTyM11D/
-         L1IQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723040118; x=1723644918;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=3ghOIw54hCGsAyiOMfVcHm566iY09Y1oNz8lmYYBe4I=;
-        b=klh6d8kSZCyi/mLi/vzzElTDvm9QAWQWKNpy0XWDGqlWLqZVmOH0N9x0LHg2zSq3qG
-         7achuzBjWAqOih+BUR+c/YbwVUxhULL/c/wQBUtnaEnIq2wOhh7tCqh09OQWyMu9Bwq3
-         Uhk/j7yXZBNp0RT6mlLcSZC38eSF5GyoJpr9ufL7iKEOjWINQeJso7zfROh4SDUekTbw
-         6sTX5X9/cj2OYFPrRfljmyld4PGwhKV9Z16+K6rKqOabVDdXcrL/pgCGQ9tm1IBYBW2O
-         DIAU6m2KC91VumFt1YmNpQh8tQhjBx0e/bVgowAANG01wz51vFFwD76utx5y3A7UIOHM
-         mSsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUNNKAGFlxaC26KXmgGU38GAyGDtkmN2fOVnDoo/tHUP57qM+CY5liWl5NXTXRQF+W7wBZpAobp21Cw9ph2m3B9HwxY
-X-Gm-Message-State: AOJu0YyqyMG/cCISfJDezTdK/PwrE5x3fwB1j4kG09d9kS2LTWloXn5C
-	YxwSykyudFrNBiLVH9GNDxoqtq51RsWhRUhu4c4Qhtp1bAu+wGkHHKDxTGj43x67weLrceGCw+O
-	LBw==
-X-Google-Smtp-Source: AGHT+IHbb3RmkB6VOeVJulhq/I4ys0iHpE5UZAynZajDuk/K2bUNwVgItbr4ODKjVBtTOTYTX55osDs7Uq8=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1895:b0:e0b:af9b:fb94 with SMTP id
- 3f1490d57ef6-e0e87c88673mr5767276.6.1723040118246; Wed, 07 Aug 2024 07:15:18
- -0700 (PDT)
-Date: Wed, 7 Aug 2024 07:15:16 -0700
-In-Reply-To: <ZrJ9DhNol2pUWp2M@linux.dev>
+	s=arc-20240116; t=1723040139; c=relaxed/simple;
+	bh=N3Upe6B3zDaIo7gAE4ChFYQqp1vXvS+k5/9lYXUJDpU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hiLcJ7HrtVu155KlOSO584KLToKqbfUiVALPcqIXVD1UdkyKNTBHfPYpwv033Gxa9v67+R58ltJp/7O9tW9zVZhCD4h+0djzbd1qzW62KPHnPwe9yzCjbWuqHANxoWXAt1zl9W2+iK3O5hiN4wN8dxqnPRVKuWVBxiJUjNESAWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3C09C4AF0B;
+	Wed,  7 Aug 2024 14:15:33 +0000 (UTC)
+Date: Wed, 7 Aug 2024 15:15:31 +0100
+From: Catalin Marinas <catalin.marinas@arm.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Bibo Mao <maobibo@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Anup Patel <anup@brainfault.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Janosch Frank <frankja@linux.ibm.com>,
+	Claudio Imbrenda <imbrenda@linux.ibm.com>, kvm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev,
+	loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
+	David Matlack <dmatlack@google.com>,
+	David Stevens <stevensd@chromium.org>,
+	Steven Price <steven.price@arm.com>
+Subject: Re: [PATCH v12 01/84] KVM: arm64: Release pfn, i.e. put page, if
+ copying MTE tags hits ZONE_DEVICE
+Message-ID: <ZrOBg70pCnv7PHyK@arm.com>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-2-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240802224031.154064-1-amoorthy@google.com> <20240802224031.154064-3-amoorthy@google.com>
- <ZrFXcHnhXUcjof1U@linux.dev> <CAF7b7mouOmmDsU23r74s-z6JmLWvr2debGRjFgPdXotew_nAfA@mail.gmail.com>
- <ZrJ9DhNol2pUWp2M@linux.dev>
-Message-ID: <ZrOBdBBAQZ55uoZt@google.com>
-Subject: Re: [PATCH 2/3] KVM: arm64: Declare support for KVM_CAP_MEMORY_FAULT_INFO
-From: Sean Christopherson <seanjc@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: Anish Moorthy <amoorthy@google.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
-	jthoughton@google.com, rananta@google.com
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240726235234.228822-2-seanjc@google.com>
 
-On Tue, Aug 06, 2024, Oliver Upton wrote:
-> On Tue, Aug 06, 2024 at 11:14:15AM -0700, Anish Moorthy wrote:
-> > On Mon, Aug 5, 2024 at 3:51=E2=80=AFPM Oliver Upton <oliver.upton@linux=
-.dev> wrote:
-> > >
-> > > The wording of the cap documentation isn't as relaxed as I'd
-> > > anticipated. Perhaps:
-> > >
-> > >   The presence of this capability indicates that KVM_RUN *may* fill
-> > >   kvm_run.memory_fault if ...
-> > >
-> > > IOW, userspace is not guaranteed that the structure is filled for eve=
-ry
-> > > 'memory fault'.
-> >=20
-> > Agreed, I can add a patch to update the docs
-> >=20
-> > While we're at it, what do we think of removing this disclaimer?
-> >=20
-> > >Note: Userspaces which attempt to resolve memory faults so that they c=
-an retry
-> > > KVM_RUN are encouraged to guard against repeatedly receiving the same
-> > > error/annotated fault.
-> >=20
-> > I originally added this bit due to my concerns with the idea of
-> > filling kvm_run.memory_fault even for EFAULTs that weren't guaranteed
-> > to be returned by KVM_RUN [1].
->=20
-> This sort of language generally isn't necessary in UAPI descriptions. We
-> cannot exhaustively describe the ways userspace might misuse an
-> interface.
+On Fri, Jul 26, 2024 at 04:51:10PM -0700, Sean Christopherson wrote:
+> Put the page reference acquired by gfn_to_pfn_prot() if
+> kvm_vm_ioctl_mte_copy_tags() runs into ZONE_DEVICE memory.  KVM's less-
+> than-stellar heuristics for dealing with pfn-mapped memory means that KVM
+> can get a page reference to ZONE_DEVICE memory.
+> 
+> Fixes: f0376edb1ddc ("KVM: arm64: Add ioctl to fetch/store tags in a guest")
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>  arch/arm64/kvm/guest.c | 1 +
+>  1 file changed, 1 insertion(+)
+> 
+> diff --git a/arch/arm64/kvm/guest.c b/arch/arm64/kvm/guest.c
+> index 11098eb7eb44..e1f0ff08836a 100644
+> --- a/arch/arm64/kvm/guest.c
+> +++ b/arch/arm64/kvm/guest.c
+> @@ -1059,6 +1059,7 @@ int kvm_vm_ioctl_mte_copy_tags(struct kvm *kvm,
+>  		page = pfn_to_online_page(pfn);
+>  		if (!page) {
+>  			/* Reject ZONE_DEVICE memory */
+> +			kvm_release_pfn_clean(pfn);
+>  			ret = -EFAULT;
+>  			goto out;
+>  		}
 
-I don't disagree in general, but I think this one is worth calling out beca=
-use
-it's easy to screw up and arguably the most likely "failure" scenario.  E.g=
-. KVM
-has had multiple bugs (I can think of four off the top of my head) where a =
-vCPU
-gets stuck because KVM doesn't resolve a fault.  It's not hard to imagine u=
-serspace
-doing the same.
+This patch makes sense irrespective of whether the above pfn is a
+ZONE_DEVICE or not. gfn_to_pfn_prot() increased the page refcount via
+GUP, so it must be released before bailing out of this loop.
+
+Reviewed-by: Catalin Marinas <catalin.marinas@arm.com>
 
