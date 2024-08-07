@@ -1,64 +1,91 @@
-Return-Path: <kvm+bounces-23543-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23544-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48A9694AA97
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 16:46:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1A6B94AAB9
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 16:54:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D0E51C21010
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 14:46:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C5CD51C210A8
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 14:54:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0893F823C8;
-	Wed,  7 Aug 2024 14:46:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD19130A7D;
+	Wed,  7 Aug 2024 14:52:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pPL7js9S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HLbRrR3o"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2079.outbound.protection.outlook.com [40.107.95.79])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0434A8060A;
-	Wed,  7 Aug 2024 14:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723041962; cv=fail; b=HeqO8Ot8zb7ox76UrTzVKy8A8qHATbuXSEaWEc9cUubPBRCezmyoAB4ExxxR6sPKgtYrEjPWeFqVYGPvCHbgarCtd8vPUBTQ5jMoDbtx/9WcstupRfqmQtykvR4GpPgWZsSvENSs1cyGB7rP/QuMa7rw3YPU/h5l3/kJc/WZFgA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723041962; c=relaxed/simple;
-	bh=Uuvr3QHNsHqwcm8+EQsNnQCqalRHWPtuWNfmzZ4OJDE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=D0gEzRs2LK1oJ0UE3u8RsXSDQEfxni85aE4sgviCrO6RRy+eSpDYrONZBFz2KizZRqllsB97aK+JNf23+Pt/tqGbTjUnKSbMqnHU4u1YO9/aFzjcygbg1k4u/8LrqWBcNP1kTJwSPMoAWtEESRKxkvylqvypV4b/JZJ7NN+GwI0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pPL7js9S; arc=fail smtp.client-ip=40.107.95.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nCyZR/D2x0pjDn0LqDECj4yEDxz3RGPG4YzIhH+ng1lDOG0kRCUzJfb/I+HeDhHBcy6tw1NXelUMmAjt0lj9Xmaljnj6/qFHDKvtrnfe8P6Kgw3iHLa4w628A+LKX5TjZK4MvfqVibjZh36YhKNS5RjJ8yW9XAwk0Gki9V75hv0ub49FBPtMP7m38WNY7t0kuwzNmvWO7WTelusFJRgdsQhoSdXPHTwd/nlwxdX5RNJhk8tyTsDlHpwveahyHET4blxQsy1n970XtreofjJTF+B9mPZJgAxKiBGn+p93J72iDEjuRtLz68k7RkVzQa7WYLgBTg13FSmQCLQP2Kr30g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qXnD6XEpmXhRbRhdfttEq0A+uWfityKw3qWhGwVeHQ0=;
- b=Ae33zF059JhIN+4VSppTAhRH/E1vb9BD0lyIH63HSYWKVDRctPpfWQoCA5eSTYSyN+ntGJnoxT4LnWABWG/x8lRw6Lu+CMk3pw1F7+b6FMPIjvygfdkv9RRF0MnPtl6LFSqyRXRN28eRW+iq8YQeQeJx1S49liUCVVsILxiweI9UNbK8h+mHRcOvLQNH3RWGZNBh9SlyT0Z0A83w2JJNsPOsp5sZx3x8owBJpdGGaRiDEHhK9MnvM3RsOwx+vKNgio+pAqzf/Mq55JUAU6ujsS3TjMn9nNYX5B9/ATQiEM5fY7j1wBbsN7lLS6XHIAR1rrOyM7dTJP0AFb+eh0ziBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qXnD6XEpmXhRbRhdfttEq0A+uWfityKw3qWhGwVeHQ0=;
- b=pPL7js9SoW9EGRLWihCgGdTOIpRzErwespS1ZWXWLrzH6KrUKDw1ok/TgczPXe+G7OPbFdRwfXP+bunpTIW2jeaom4HjDnlJ7STCWvGh753up2lTxb9QVT05gdSULawcLxWCMujDTUWeQroMlvbE2JqBc8MYo42BNJzGcp1EC8eBwzZYwj2R4Y+wiadRcW7JfucrSNnNRcY1C2K15VYDBTPU++wpGyPn7FCD0C/OTXUdnvjjyboDTQutVT0dkNHlju6HleW39pv+vIUQLNPVPdSoCWIh/A/u+hwOsu5RcLu/X0DZi9xn4SEH4aLRq2p6hxUZTDfjgBeJs6eYG8fc0g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CYXPR12MB9320.namprd12.prod.outlook.com (2603:10b6:930:e6::9)
- by CH0PR12MB8486.namprd12.prod.outlook.com (2603:10b6:610:18a::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.11; Wed, 7 Aug
- 2024 14:45:53 +0000
-Received: from CYXPR12MB9320.namprd12.prod.outlook.com
- ([fe80::9347:9720:e1df:bb5f]) by CYXPR12MB9320.namprd12.prod.outlook.com
- ([fe80::9347:9720:e1df:bb5f%3]) with mapi id 15.20.7828.023; Wed, 7 Aug 2024
- 14:45:53 +0000
-From: Zi Yan <ziy@nvidia.com>
-To: David Hildenbrand <david@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DC912C552
+	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 14:52:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723042360; cv=none; b=l8BGPfXO5in7slvsFeJxaquVMSZfTaNA2Wx38u7DGWO6wvYjS54eoz1c87nAGMTsLXYzijZ40cwTUXnNgWjYLiXbzjy4Qmaezw0fc6bhWgxIVHHCcKT9LioU1wKK20gqow3g8P2qpvzeZHx6IEZsJ4ltF8IYMjtD1c6QRN3h+nQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723042360; c=relaxed/simple;
+	bh=B3J2ogOdsV4qDV4Oa+2iqljxnaPGe6tNvLiHhXYQ7WI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Fbsyy1Elb5V5MPfwcOM41DurnVSrGRlVRp5/CA4XOdIldmh0AobkzVI9/q6lL8otaZlPBhN3jXNxrIX1HbsPKfYust2dibXDWE5U0kGurzXMeH49rC+zaFuuDj8Z1/WBhz9oY4a6lJxGvurnhXRpvlYPJrmQMsnk1lFE+FpWm5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HLbRrR3o; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723042357;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=bN3hmO+skbkw3n+26CLAyyVHBqbly3RyP/UF4y9H0xY=;
+	b=HLbRrR3oky3jqTVMKCH8wTIvdiQ/ieYjeBQShwB763NNBWy5aow9JUkT7X9degrj2HYaJT
+	4Pn+DUZ4ypIi2ZJK4K/Z4BS8jDbkzJtOySGTY+RjD9l9UMEjJ67rqIH0aMq0RM3tmLguRC
+	Hr5tTzD5uHPLW/rXfYckGmZMZ219agE=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-528-YEHMq3JhNoOI7XiWwEC7dQ-1; Wed, 07 Aug 2024 10:52:36 -0400
+X-MC-Unique: YEHMq3JhNoOI7XiWwEC7dQ-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ef31dbc770so19344781fa.1
+        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 07:52:35 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723042354; x=1723647154;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bN3hmO+skbkw3n+26CLAyyVHBqbly3RyP/UF4y9H0xY=;
+        b=TSxGxA1Cc9ZhmJ3OxQCaEYK6ew+62joMCR7mUhUoN2hrOLay/34i00I8+9whRigMIX
+         esN1GiI6iE59x138Lf3kyEzzjYK+0URjMdOFHTOf8Mb7S3P9hGyOCqdcrgTcWPTFH1EM
+         IbPG6NbFvR7r7E5ZQpdF9wKVWitSb+Zwc91pwQmeBWAfjQvdwBIqzOvj7PGCiNXWnhc8
+         2cweWFD8Gx5REZxg+zm10GCX9b5xV5vU0rHDZfNyhQ3etoLzyisWNR/oFHKlr6MUsdmu
+         8gXOpKHAZve9ENL7heoSdxJp3rnUeXrGHn3XKNJgdYDHQl2vpYa8YXYcxVPGRVAqeqHF
+         OKfw==
+X-Forwarded-Encrypted: i=1; AJvYcCWqZ5v2NnPnX3Z72PercRk/BC1q2FuBLAw7ffNr+lD2QgQ1aN8J0PbconLWTRiTTUWdKAkn2XGuUd5oq7feqI9BeTju
+X-Gm-Message-State: AOJu0YyFumB53c+avsKDflnxm4SWbjXWN6l/XQ65VT0n1k5EG1bEfISQ
+	9zdh3EZ2Nb9RBkw7wvot8/kgPOFjw9z85icxbhn0Lyf2QC/fSehS0NA1NPZSbhhe3dMCfd+xPUS
+	rXz0MglvNlF+NXgtZkezF8jIrClmS0scYDFhA4S3zHNHKItXMIw==
+X-Received: by 2002:a2e:9344:0:b0:2ef:2272:177f with SMTP id 38308e7fff4ca-2f15ab237d9mr120377981fa.34.1723042354365;
+        Wed, 07 Aug 2024 07:52:34 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHg8WtsQG2lkp1xR79Ab37WJjnDHJrGboN6q+6ey894aDgMHhfPQWAClK/RNGL0JQiohfK3IQ==
+X-Received: by 2002:a2e:9344:0:b0:2ef:2272:177f with SMTP id 38308e7fff4ca-2f15ab237d9mr120377741fa.34.1723042353715;
+        Wed, 07 Aug 2024 07:52:33 -0700 (PDT)
+Received: from [192.168.3.141] (p4ff23199.dip0.t-ipconnect.de. [79.242.49.153])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbcf0dc8fsm16402391f8f.6.2024.08.07.07.52.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Aug 2024 07:52:33 -0700 (PDT)
+Message-ID: <20e91e84-1e20-4998-935a-b310e6d9be5f@redhat.com>
+Date: Wed, 7 Aug 2024 16:52:31 +0200
+Precedence: bulk
+X-Mailing-List: kvm@vger.kernel.org
+List-Id: <kvm.vger.kernel.org>
+List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 07/11] mm/huge_memory: convert split_huge_pages_pid()
+ from follow_page() to folio_walk
+To: Zi Yan <ziy@nvidia.com>
 Cc: Ryan Roberts <ryan.roberts@arm.com>, linux-kernel@vger.kernel.org,
  linux-mm@kvack.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org,
  linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
@@ -67,18 +94,12 @@ Cc: Ryan Roberts <ryan.roberts@arm.com>, linux-kernel@vger.kernel.org,
  Jonathan Corbet <corbet@lwn.net>,
  Christian Borntraeger <borntraeger@linux.ibm.com>,
  Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
  Alexander Gordeev <agordeev@linux.ibm.com>,
  Sven Schnelle <svens@linux.ibm.com>,
  Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
  Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v1 07/11] mm/huge_memory: convert split_huge_pages_pid()
- from follow_page() to folio_walk
-Date: Wed, 07 Aug 2024 10:45:48 -0400
-X-Mailer: MailMate (1.14r6052)
-Message-ID: <2D2B77E0-66BE-4ECE-8262-3E28D7D073E6@nvidia.com>
-In-Reply-To: <a612c83f-071e-437f-99e1-d1fb157b62d7@redhat.com>
 References: <20240802155524.517137-1-david@redhat.com>
  <20240802155524.517137-8-david@redhat.com>
  <e1d44e36-06e4-4d1c-8daf-315d149ea1b3@arm.com>
@@ -87,325 +108,234 @@ References: <20240802155524.517137-1-david@redhat.com>
  <c75d1c6c-8ea6-424f-853c-1ccda6c77ba2@redhat.com>
  <5BEF38E0-359C-4927-98EF-A0EE7DC81251@nvidia.com>
  <a612c83f-071e-437f-99e1-d1fb157b62d7@redhat.com>
-Content-Type: multipart/signed;
- boundary="=_MailMate_25768A0B-705E-49FF-83F3-CB66AE39AA81_=";
- micalg=pgp-sha512; protocol="application/pgp-signature"
-X-ClientProxiedBy: BLAPR05CA0047.namprd05.prod.outlook.com
- (2603:10b6:208:335::28) To CYXPR12MB9320.namprd12.prod.outlook.com
- (2603:10b6:930:e6::9)
-Precedence: bulk
-X-Mailing-List: kvm@vger.kernel.org
-List-Id: <kvm.vger.kernel.org>
-List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CYXPR12MB9320:EE_|CH0PR12MB8486:EE_
-X-MS-Office365-Filtering-Correlation-Id: 288df178-0742-49aa-978a-08dcb6efa354
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?URv99x9m3NrwWzJm1sLquNWWxYK62iXntWGp4JMEq6iPIDInZQescRdHJQna?=
- =?us-ascii?Q?3Gb36TuuFqMlap0flvfhXNNOH5ccqioDPuIfmm8/DAdtQd6tcqDKMRGNHyCr?=
- =?us-ascii?Q?C2EHJf0Yybsaq9eyiesVaTVmEHFtm+oLLeiWpW0CQlfLkSLgFNfd5fiq4GYJ?=
- =?us-ascii?Q?z7/CObGD43mV4WQqF5jPgdScbvigntyqnUnvczXIEVd9a5VThlQfhL5HL6ZD?=
- =?us-ascii?Q?6+zv7UVJLiie2K5BidRsLU4IX3X2vNIfslH9u/NnaTDkdwdvtF9s48cZhKKN?=
- =?us-ascii?Q?zc8rzChbb/qRteJ6pAsFbO/WCJgt0eJhzlAXTnd28fV8TZIAthBp5eh3cbtd?=
- =?us-ascii?Q?wzHpJzCymrFvCZiNn7he6xhyWgPA0GME/XXcof16rDFGEQ7Q0zPq0jeUW3hN?=
- =?us-ascii?Q?Qipdw6t+ujc+PzXpZabyEkemVYSaA80Lmc0SfFVJ4bXBZ3P/wOpJhPZkhGVW?=
- =?us-ascii?Q?R52pQfzJeX89hnifdJ8vmNb88WKoCX3yd5h8fnnNHCqe86FO82mrHJb0/FG5?=
- =?us-ascii?Q?c6O4Pe41KZ8f7+TG1da45lVMSD3L8nHsJ+XxNYJT54XSwSBzBQYUSca1DXrh?=
- =?us-ascii?Q?heaa9WX/XayNlf1yUVSnKaMLrvZsbieihw2DBgKeoi4zQNg6tIxexRtwdpcI?=
- =?us-ascii?Q?WGwi5lh1f4nFEnRDMnEVTjpmCI7gfejt987nzsHvZIW/JoEaOLuCRMKKC2bo?=
- =?us-ascii?Q?/xXDRoeoJVmzQJu+lxzeZa53zv2vc9UtnD7/VysMdD2IkNnU+BGL4Ah8nig+?=
- =?us-ascii?Q?aanKiwW5uWhti2uJ1NtNuTddy8dcYMhETO68G01so32I/+giP0fZlKpLCyPm?=
- =?us-ascii?Q?XqAkblb/BcvlTCZElpp/a51WZ1H8vqpdubFIPbD1bbc1pgRIXXRg4mOPMOUg?=
- =?us-ascii?Q?2aJ7CJh6iTmM7njpXRfOAw+Ua/cLnhOW83A5dyKcbptM2K6EwZuR9mv+v03q?=
- =?us-ascii?Q?p0vw5eK7jza9VJl44Sz3fcCJTQCuvxqAs2+GNPf9dth2A5RNUhCXQKMABq6V?=
- =?us-ascii?Q?fu9QmTTAPJiIIauqrZowMNrW14L/r7GUfaq05+vEuyR/UI3mPob/OBTR8kcE?=
- =?us-ascii?Q?NmW16uqSlGsebhMiCztolrZMJfW2ujxc0gqtIjFWleLBgL3WMU6oYsKNEQ//?=
- =?us-ascii?Q?X56obz8Zd000jIHQ5bzbQ+9oiUij3v5X77owMO+IpjDNumSjK+Mrb+N6qEQI?=
- =?us-ascii?Q?1ElGVYPzvXHI3zpRMoLx1+wqU4rn9ADqW0AKJ6yv8GOHnHDO++A1dwEqfGLh?=
- =?us-ascii?Q?McCTndRZctUeywzmtGf/fuSyci0pdkXcE9P96TDtaorQAS3vstv11dcvk1kt?=
- =?us-ascii?Q?iHZmhFSbraSpaNuA7ReQygu98NZ31c0kiJMr+q/oSC+P7A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYXPR12MB9320.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?9AnnI0J1taUIL1hvak9HdYPuhfRTs6GXzp5lFe8vmUJF++LgX6PmYlukB9Qa?=
- =?us-ascii?Q?OlK6ngDrqe2zjqFT79eCARVcN66cFFRfE8oWEK9/FSzF6WWNnpQfuQahtOAI?=
- =?us-ascii?Q?jyfiDNm+uixNMS/22Wv7fOHZV5+ZE6sJ13JQcQc1Z/QMrChWuTYQiwW2+WWY?=
- =?us-ascii?Q?6HJRaPO/IIMoq74POw6WkGa+xWyfWk19kFrX9YEDFZJHoR0rDU4Rt9+5VAv7?=
- =?us-ascii?Q?o8IqLHsDjy6fWKAXE9hX/Ocbcu+iO9WGXZhWIBN7ehZfjH6x9ex9rynGy2W8?=
- =?us-ascii?Q?ymKKxE8OpUB0w6oDci4Za0G8zLolc7KNQKsiIR88CIFn9mjBemUQMix2MbRl?=
- =?us-ascii?Q?qm3x7cuGo+SLdPF6ijK9fxZelbN3v0aVAofTZrHTew21mzr8aNtCD8EYn31f?=
- =?us-ascii?Q?58vveVIpm4jJRE3+q/p5Q+eRHzTorsx/wZaNhp92BjK6ojakTLjQ9obs3kFO?=
- =?us-ascii?Q?nEPAkYjazYYC3ej5V0MT7V2NLzjRU2lZOniFAts0k5OSAOq4XSXY3sCgs0Il?=
- =?us-ascii?Q?/mNCon6QOjqp6CANCv+hQVKqHDK1JNA+aOVpanQNQixjfQZb4/O3OXu8+322?=
- =?us-ascii?Q?pTF7IlVK1ZUSSzpit5fZmYmwKeKA4oD/uCcP4orbmaNkWG09uZtP/V9Hp4XM?=
- =?us-ascii?Q?0+DeINnxGzPBQQZMN5rF8frXwgWxP0USu2t7xXci79NBAuE+NTctWg15b17B?=
- =?us-ascii?Q?RPF9yaRti9QeOH6QaSRCUDfEiTVpERvdv3Sa2nKRQdc6OqjquUzKp2Y/DySr?=
- =?us-ascii?Q?KK2yWEi/ro3nT4mwfJ5YiHoSn4nbkRQkOEs6cddZZs4e89TPa9dxT8Pci8g3?=
- =?us-ascii?Q?01FoL0BEEpUr2vUU/wxC0m0ZUoRxlc0raYmy4DhtbWpEQkyGOIYXfoREssyo?=
- =?us-ascii?Q?rbNv8OQEwojXWZysPv4sHWl8LR3ojJg8/Xv/fLdkEBASAo7adOsCZ5p4KBUE?=
- =?us-ascii?Q?mNJfj6cAkAwvqGH3i981Kk7foC3Os8xC4v19/kdS6Go3vl3dVUtI35HezpP6?=
- =?us-ascii?Q?y9eEem34z0rQdRcNLYWP2C92USlZisfxXZ106DlstHACAbvimq6+sKqvY8s3?=
- =?us-ascii?Q?N9ChfIDVty6/Kfkbt6rts5RjviR/1NPb/ebIk98VYeIAGAG8ZMsKVu22DGAR?=
- =?us-ascii?Q?fSQkBWmF3EvwnnC4PcvHaMrtxQ7mkgD7rLAbhz47RVy/0eTpI/aPauH/G51J?=
- =?us-ascii?Q?LvjfIv5r4KvZDjpXY6WlxeYAmw/4qgDS6fnW0TA/Dhfmq+UeTVGGyjg4T8dj?=
- =?us-ascii?Q?2Z54T2dkVGESsxMg8pJn8if+Y5k/q6bP3xlX8s6q5A19jfi4jMqDQ/dx6zmw?=
- =?us-ascii?Q?ypBBVab4G3p7Dxj1lp4F85pcj3Vk/X3kzhC95igAQtkkYBc7h/qsHDcriIYo?=
- =?us-ascii?Q?8/6hezeB2hlcdd0Jaymt0lnYsmLR2xDzzoj2Sc1wJzyjtRrUGXZ+Nyn9YkAU?=
- =?us-ascii?Q?Fi0AEr+jl4bNq80MA8r1oZstSF97S4U9eioOhhakV1DA1Rx0dbl1ailLy3Uy?=
- =?us-ascii?Q?wuqRyhUBJLvdQ/ZNUSUSVZuUxYQHT6vaRpGOcshBWFtSSygpKTlJ1o6j6Xiy?=
- =?us-ascii?Q?90eEOREjxh/tQwciHsfrkGZorLIGpCgGWYI8dXkR?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 288df178-0742-49aa-978a-08dcb6efa354
-X-MS-Exchange-CrossTenant-AuthSource: CYXPR12MB9320.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 14:45:53.5161
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PJ3iVXdjrVRDdc9E6lggCzNSdciAxfDfIK8vLmEO0Nzp4drmr5X0Go5BJhzPILp2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB8486
+ <2D2B77E0-66BE-4ECE-8262-3E28D7D073E6@nvidia.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <2D2B77E0-66BE-4ECE-8262-3E28D7D073E6@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---=_MailMate_25768A0B-705E-49FF-83F3-CB66AE39AA81_=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-
-On 7 Aug 2024, at 5:57, David Hildenbrand wrote:
-
-> On 06.08.24 17:36, Zi Yan wrote:
->> On 6 Aug 2024, at 6:24, David Hildenbrand wrote:
->>
->>> On 06.08.24 12:03, David Hildenbrand wrote:
->>>> On 06.08.24 11:56, David Hildenbrand wrote:
->>>>> On 06.08.24 11:46, Ryan Roberts wrote:
->>>>>> On 02/08/2024 16:55, David Hildenbrand wrote:
->>>>>>> Let's remove yet another follow_page() user. Note that we have to=
- do the
->>>>>>> split without holding the PTL, after folio_walk_end(). We don't c=
-are
->>>>>>> about losing the secretmem check in follow_page().
+On 07.08.24 16:45, Zi Yan wrote:
+> On 7 Aug 2024, at 5:57, David Hildenbrand wrote:
+> 
+>> On 06.08.24 17:36, Zi Yan wrote:
+>>> On 6 Aug 2024, at 6:24, David Hildenbrand wrote:
+>>>
+>>>> On 06.08.24 12:03, David Hildenbrand wrote:
+>>>>> On 06.08.24 11:56, David Hildenbrand wrote:
+>>>>>> On 06.08.24 11:46, Ryan Roberts wrote:
+>>>>>>> On 02/08/2024 16:55, David Hildenbrand wrote:
+>>>>>>>> Let's remove yet another follow_page() user. Note that we have to do the
+>>>>>>>> split without holding the PTL, after folio_walk_end(). We don't care
+>>>>>>>> about losing the secretmem check in follow_page().
+>>>>>>>
+>>>>>>> Hi David,
+>>>>>>>
+>>>>>>> Our (arm64) CI is showing a regression in split_huge_page_test from mm selftests from next-20240805 onwards. Navigating around a couple of other lurking bugs, I was able to bisect to this change (which smells about right).
+>>>>>>>
+>>>>>>> Newly failing test:
+>>>>>>>
+>>>>>>> # # ------------------------------
+>>>>>>> # # running ./split_huge_page_test
+>>>>>>> # # ------------------------------
+>>>>>>> # # TAP version 13
+>>>>>>> # # 1..12
+>>>>>>> # # Bail out! Still AnonHugePages not split
+>>>>>>> # # # Planned tests != run tests (12 != 0)
+>>>>>>> # # # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
+>>>>>>> # # [FAIL]
+>>>>>>> # not ok 52 split_huge_page_test # exit=1
+>>>>>>>
+>>>>>>> It's trying to split some pmd-mapped THPs then checking and finding that they are not split. The split is requested via /sys/kernel/debug/split_huge_pages, which I believe ends up in this function you are modifying here. Although I'll admit that looking at the change, there is nothing obviously wrong! Any ideas?
 >>>>>>
->>>>>> Hi David,
->>>>>>
->>>>>> Our (arm64) CI is showing a regression in split_huge_page_test fro=
-m mm selftests from next-20240805 onwards. Navigating around a couple of =
-other lurking bugs, I was able to bisect to this change (which smells abo=
-ut right).
->>>>>>
->>>>>> Newly failing test:
->>>>>>
->>>>>> # # ------------------------------
->>>>>> # # running ./split_huge_page_test
->>>>>> # # ------------------------------
->>>>>> # # TAP version 13
->>>>>> # # 1..12
->>>>>> # # Bail out! Still AnonHugePages not split
->>>>>> # # # Planned tests !=3D run tests (12 !=3D 0)
->>>>>> # # # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
->>>>>> # # [FAIL]
->>>>>> # not ok 52 split_huge_page_test # exit=3D1
->>>>>>
->>>>>> It's trying to split some pmd-mapped THPs then checking and findin=
-g that they are not split. The split is requested via /sys/kernel/debug/s=
-plit_huge_pages, which I believe ends up in this function you are modifyi=
-ng here. Although I'll admit that looking at the change, there is nothing=
- obviously wrong! Any ideas?
+>>>>>> Nothing jumps at me as well. Let me fire up the debugger :)
 >>>>>
->>>>> Nothing jumps at me as well. Let me fire up the debugger :)
+>>>>> Ah, very likely the can_split_folio() check expects a raised refcount
+>>>>> already.
 >>>>
->>>> Ah, very likely the can_split_folio() check expects a raised refcoun=
-t
->>>> already.
+>>>> Indeed, the following does the trick! Thanks Ryan, I could have sworn
+>>>> I ran that selftest as well.
+>>>>
+>>>> TAP version 13
+>>>> 1..12
+>>>> ok 1 Split huge pages successful
+>>>> ok 2 Split PTE-mapped huge pages successful
+>>>> # Please enable pr_debug in split_huge_pages_in_file() for more info.
+>>>> # Please check dmesg for more information
+>>>> ok 3 File-backed THP split test done
+>>>>
+>>>> ...
+>>>>
+>>>>
+>>>> @Andrew, can you squash the following?
+>>>>
+>>>>
+>>>>   From e5ea585de3e089ea89bf43d8447ff9fc9b371286 Mon Sep 17 00:00:00 2001
+>>>> From: David Hildenbrand <david@redhat.com>
+>>>> Date: Tue, 6 Aug 2024 12:08:17 +0200
+>>>> Subject: [PATCH] fixup: mm/huge_memory: convert split_huge_pages_pid() from
+>>>>    follow_page() to folio_walk
+>>>>
+>>>> We have to teach can_split_folio() that we are not holding an additional
+>>>> reference.
+>>>>
+>>>> Signed-off-by: David Hildenbrand <david@redhat.com>
+>>>> ---
+>>>>    include/linux/huge_mm.h | 4 ++--
+>>>>    mm/huge_memory.c        | 8 ++++----
+>>>>    mm/vmscan.c             | 2 +-
+>>>>    3 files changed, 7 insertions(+), 7 deletions(-)
+>>>>
+>>>> diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
+>>>> index e25d9ebfdf89..ce44caa40eed 100644
+>>>> --- a/include/linux/huge_mm.h
+>>>> +++ b/include/linux/huge_mm.h
+>>>> @@ -314,7 +314,7 @@ unsigned long thp_get_unmapped_area_vmflags(struct file *filp, unsigned long add
+>>>>    		unsigned long len, unsigned long pgoff, unsigned long flags,
+>>>>    		vm_flags_t vm_flags);
+>>>>    -bool can_split_folio(struct folio *folio, int *pextra_pins);
+>>>> +bool can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins);
+>>>>    int split_huge_page_to_list_to_order(struct page *page, struct list_head *list,
+>>>>    		unsigned int new_order);
+>>>>    static inline int split_huge_page(struct page *page)
+>>>> @@ -470,7 +470,7 @@ thp_get_unmapped_area_vmflags(struct file *filp, unsigned long addr,
+>>>>    }
+>>>>     static inline bool
+>>>> -can_split_folio(struct folio *folio, int *pextra_pins)
+>>>> +can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins)
+>>>>    {
+>>>>    	return false;
+>>>>    }
+>>>> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+>>>> index 697fcf89f975..c40b0dcc205b 100644
+>>>> --- a/mm/huge_memory.c
+>>>> +++ b/mm/huge_memory.c
+>>>> @@ -3021,7 +3021,7 @@ static void __split_huge_page(struct page *page, struct list_head *list,
+>>>>    }
+>>>>     /* Racy check whether the huge page can be split */
+>>>> -bool can_split_folio(struct folio *folio, int *pextra_pins)
+>>>> +bool can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins)
+>>>>    {
+>>>>    	int extra_pins;
+>>>>    @@ -3033,7 +3033,7 @@ bool can_split_folio(struct folio *folio, int *pextra_pins)
+>>>>    		extra_pins = folio_nr_pages(folio);
+>>>>    	if (pextra_pins)
+>>>>    		*pextra_pins = extra_pins;
+>>>> -	return folio_mapcount(folio) == folio_ref_count(folio) - extra_pins - 1;
+>>>> +	return folio_mapcount(folio) == folio_ref_count(folio) - extra_pins - caller_pins;
+>>>>    }
+>>>>     /*
+>>>> @@ -3201,7 +3201,7 @@ int split_huge_page_to_list_to_order(struct page *page, struct list_head *list,
+>>>>    	 * Racy check if we can split the page, before unmap_folio() will
+>>>>    	 * split PMDs
+>>>>    	 */
+>>>> -	if (!can_split_folio(folio, &extra_pins)) {
+>>>> +	if (!can_split_folio(folio, 1, &extra_pins)) {
+>>>>    		ret = -EAGAIN;
+>>>>    		goto out_unlock;
+>>>>    	}
+>>>> @@ -3537,7 +3537,7 @@ static int split_huge_pages_pid(int pid, unsigned long vaddr_start,
+>>>>    		 * can be split or not. So skip the check here.
+>>>>    		 */
+>>>>    		if (!folio_test_private(folio) &&
+>>>> -		    !can_split_folio(folio, NULL))
+>>>> +		    !can_split_folio(folio, 0, NULL))
+>>>>    			goto next;
+>>>>     		if (!folio_trylock(folio))
 >>>
->>> Indeed, the following does the trick! Thanks Ryan, I could have sworn=
-
->>> I ran that selftest as well.
+>>> The diff below can skip a folio with private and extra pin(s) early instead
+>>> of trying to lock and split it then failing at can_split_folio() inside
+>>> split_huge_page_to_list_to_order().
 >>>
->>> TAP version 13
->>> 1..12
->>> ok 1 Split huge pages successful
->>> ok 2 Split PTE-mapped huge pages successful
->>> # Please enable pr_debug in split_huge_pages_in_file() for more info.=
-
->>> # Please check dmesg for more information
->>> ok 3 File-backed THP split test done
->>>
->>> ...
+>>> Maybe worth applying on top of yours?
 >>>
 >>>
->>> @Andrew, can you squash the following?
->>>
->>>
->>>  From e5ea585de3e089ea89bf43d8447ff9fc9b371286 Mon Sep 17 00:00:00 20=
-01
->>> From: David Hildenbrand <david@redhat.com>
->>> Date: Tue, 6 Aug 2024 12:08:17 +0200
->>> Subject: [PATCH] fixup: mm/huge_memory: convert split_huge_pages_pid(=
-) from
->>>   follow_page() to folio_walk
->>>
->>> We have to teach can_split_folio() that we are not holding an additio=
-nal
->>> reference.
->>>
->>> Signed-off-by: David Hildenbrand <david@redhat.com>
->>> ---
->>>   include/linux/huge_mm.h | 4 ++--
->>>   mm/huge_memory.c        | 8 ++++----
->>>   mm/vmscan.c             | 2 +-
->>>   3 files changed, 7 insertions(+), 7 deletions(-)
->>>
->>> diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
->>> index e25d9ebfdf89..ce44caa40eed 100644
->>> --- a/include/linux/huge_mm.h
->>> +++ b/include/linux/huge_mm.h
->>> @@ -314,7 +314,7 @@ unsigned long thp_get_unmapped_area_vmflags(struc=
-t file *filp, unsigned long add
->>>   		unsigned long len, unsigned long pgoff, unsigned long flags,
->>>   		vm_flags_t vm_flags);
->>>   -bool can_split_folio(struct folio *folio, int *pextra_pins);
->>> +bool can_split_folio(struct folio *folio, int caller_pins, int *pext=
-ra_pins);
->>>   int split_huge_page_to_list_to_order(struct page *page, struct list=
-_head *list,
->>>   		unsigned int new_order);
->>>   static inline int split_huge_page(struct page *page)
->>> @@ -470,7 +470,7 @@ thp_get_unmapped_area_vmflags(struct file *filp, =
-unsigned long addr,
->>>   }
->>>    static inline bool
->>> -can_split_folio(struct folio *folio, int *pextra_pins)
->>> +can_split_folio(struct folio *folio, int caller_pins, int *pextra_pi=
-ns)
->>>   {
->>>   	return false;
->>>   }
 >>> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
->>> index 697fcf89f975..c40b0dcc205b 100644
+>>> index a218320a9233..ce992d54f1da 100644
 >>> --- a/mm/huge_memory.c
 >>> +++ b/mm/huge_memory.c
->>> @@ -3021,7 +3021,7 @@ static void __split_huge_page(struct page *page=
-, struct list_head *list,
->>>   }
->>>    /* Racy check whether the huge page can be split */
->>> -bool can_split_folio(struct folio *folio, int *pextra_pins)
->>> +bool can_split_folio(struct folio *folio, int caller_pins, int *pext=
-ra_pins)
->>>   {
->>>   	int extra_pins;
->>>   @@ -3033,7 +3033,7 @@ bool can_split_folio(struct folio *folio, int=
- *pextra_pins)
->>>   		extra_pins =3D folio_nr_pages(folio);
->>>   	if (pextra_pins)
->>>   		*pextra_pins =3D extra_pins;
->>> -	return folio_mapcount(folio) =3D=3D folio_ref_count(folio) - extra_=
-pins - 1;
->>> +	return folio_mapcount(folio) =3D=3D folio_ref_count(folio) - extra_=
-pins - caller_pins;
->>>   }
->>>    /*
->>> @@ -3201,7 +3201,7 @@ int split_huge_page_to_list_to_order(struct pag=
-e *page, struct list_head *list,
->>>   	 * Racy check if we can split the page, before unmap_folio() will
->>>   	 * split PMDs
->>>   	 */
->>> -	if (!can_split_folio(folio, &extra_pins)) {
->>> +	if (!can_split_folio(folio, 1, &extra_pins)) {
->>>   		ret =3D -EAGAIN;
->>>   		goto out_unlock;
->>>   	}
->>> @@ -3537,7 +3537,7 @@ static int split_huge_pages_pid(int pid, unsign=
-ed long vaddr_start,
->>>   		 * can be split or not. So skip the check here.
->>>   		 */
->>>   		if (!folio_test_private(folio) &&
->>> -		    !can_split_folio(folio, NULL))
->>> +		    !can_split_folio(folio, 0, NULL))
->>>   			goto next;
->>>    		if (!folio_trylock(folio))
+>>> @@ -3532,13 +3532,10 @@ static int split_huge_pages_pid(int pid, unsigned long vaddr_start,
+>>>                           goto next;
+>>>
+>>>                   total++;
+>>> -               /*
+>>> -                * For folios with private, split_huge_page_to_list_to_order()
+>>> -                * will try to drop it before split and then check if the folio
+>>> -                * can be split or not. So skip the check here.
+>>> -                */
+>>> -               if (!folio_test_private(folio) &&
+>>> -                   !can_split_folio(folio, 0, NULL))
+>>> +
+>>> +               if (!can_split_folio(folio,
+>>> +                                    folio_test_private(folio) ? 1 : 0,
+>>> +                                    NULL))
 >>
->> The diff below can skip a folio with private and extra pin(s) early in=
-stead
->> of trying to lock and split it then failing at can_split_folio() insid=
-e
->> split_huge_page_to_list_to_order().
+>> Hmm, it does look a bit odd. It's not something from the caller (caller_pins), but a
+>> folio property. Likely should be handled differently.
 >>
->> Maybe worth applying on top of yours?
+>> In vmscan code, we only call can_split_folio() on anon folios where
+>> folio_test_private() does not apply.
 >>
+>> But indeed, in split_huge_page_to_list_to_order() we'd have to fail if
+>> folio_test_private() still applies after
 >>
->> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
->> index a218320a9233..ce992d54f1da 100644
->> --- a/mm/huge_memory.c
->> +++ b/mm/huge_memory.c
->> @@ -3532,13 +3532,10 @@ static int split_huge_pages_pid(int pid, unsig=
-ned long vaddr_start,
->>                          goto next;
->>
->>                  total++;
->> -               /*
->> -                * For folios with private, split_huge_page_to_list_to=
-_order()
->> -                * will try to drop it before split and then check if =
-the folio
->> -                * can be split or not. So skip the check here.
->> -                */
->> -               if (!folio_test_private(folio) &&
->> -                   !can_split_folio(folio, 0, NULL))
->> +
->> +               if (!can_split_folio(folio,
->> +                                    folio_test_private(folio) ? 1 : 0=
-,
->> +                                    NULL))
->
-> Hmm, it does look a bit odd. It's not something from the caller (caller=
-_pins), but a
-> folio property. Likely should be handled differently.
->
-> In vmscan code, we only call can_split_folio() on anon folios where
-> folio_test_private() does not apply.
->
-> But indeed, in split_huge_page_to_list_to_order() we'd have to fail if
-> folio_test_private() still applies after
->
-> Not sure if that is really better:
+>> Not sure if that is really better:
+> 
+> Yeah, not worth the code churn to optimize for that debugfs code.
+> 
+> As I looked at this patch and the fix long enough, feel free to add
+> Reviewed-by: Zi Yan <ziy@nvidia.com>
 
-Yeah, not worth the code churn to optimize for that debugfs code.
+Thanks! :)
 
-As I looked at this patch and the fix long enough, feel free to add
-Reviewed-by: Zi Yan <ziy@nvidia.com>
+-- 
+Cheers,
 
+David / dhildenb
 
-Best Regards,
-Yan, Zi
-
---=_MailMate_25768A0B-705E-49FF-83F3-CB66AE39AA81_=
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename=signature.asc
-Content-Type: application/pgp-signature; name=signature.asc
-
------BEGIN PGP SIGNATURE-----
-
-iQJDBAEBCgAtFiEEh7yFAW3gwjwQ4C9anbJR82th+ooFAmaziJwPHHppeUBudmlk
-aWEuY29tAAoJEJ2yUfNrYfqKia0QAKfId6EHqNme9NQTHnfifrtthibI+P67+J4M
-nadxlgcUoaSQqkoPacztwXMr3BcIBOu7zQCkG71Odxynd0ByjBiu+bMT0uVfHPg6
-6Gu+amGevb9StcrryIfqUOvoFmfpx5pAQ3GoAttQnW7GlO+/7CNz+P32+1WKl1qm
-WS70GE932Tsiqt1nl/el0IdmbM59OWlbVnC23KczyDYnpfT+um6YVVT+0wJqo92f
-2PUuuppx6zmOCUN3B7wWIymRZGFoXDSLLwHUQKeZnW3BKdDH0ZJO6Tk+soxetKuF
-KHtzKWk234k8Rl9e527JzjCHkiNli6q/h33EdqtWM9SpWNeLmBixDhBh0yPcqc6o
-IpMW7Pu3TOV++oNokdujBvGoVt9ca/SCWte9pjiJOkqSU8Xc4eL9dk4dR6bjdu9V
-u5fC8RxaT94+06N+2dzV3epU9z9ROHNyc7d0slj7D54lq80tiB+Zp45k2jSJvxNz
-fj45Al+12wjdf/cacfad2QtrI3Z/MQKIGmV5sLj5YdI9F0sKP8dAt/R5ebX3Dxm3
-cXi5aAz8Rle7hakzEasOz+RbdGeiv5ICO3/kFmja7N7QkP1z5lJVIxfvCdIXoixF
-+cXL1+Em4uUjNa70t62qEXeufm0+RXdBof4UlEuY9phLUj2oHdJrisRSsMBJiMhd
-fXYuizlG
-=rxJC
------END PGP SIGNATURE-----
-
---=_MailMate_25768A0B-705E-49FF-83F3-CB66AE39AA81_=--
 
