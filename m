@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-23505-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23506-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26ED94A5B7
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 12:38:09 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9406094A5AB
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 12:36:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0264FB23D77
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 10:35:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9830B29A7A
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 10:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865BA1D1F70;
-	Wed,  7 Aug 2024 10:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 798811DF685;
+	Wed,  7 Aug 2024 10:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOyYDgRv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VqOJ+vvZ"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76EB71E212F;
-	Wed,  7 Aug 2024 10:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B2B31CCB57;
+	Wed,  7 Aug 2024 10:35:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723026856; cv=none; b=BaCY34JTZmgxkgKdCk5WDqw8xtfyILhRz1qbQh4luHz4SD9waqX7HNthlXUR0KAjIm5U4J3GzVfUCqNMRe8m6eaWGZ5IfROdrjpWFU6X/1EPDit8YkVijSn7Ok+Xj4qYsEGwitCmBFaEkD7Dn2Ic5HmLkzP8W07Oluztr90qkvE=
+	t=1723026955; cv=none; b=R27882shEDQX6SR7PnNc+aRFuiDIHbEBn68FSbKIONVye6dY1u29PXKC6g0mMG8cG6gbV5TXr7y27SVGiuN7+ppnkxHiT8tgxunkXe6SpLupEhU5feyE+7axXPQazqWAd0lBl5Sn4znbH/Su17fGQvHg+60k4U8mD5Oy7jzZesI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723026856; c=relaxed/simple;
-	bh=jPLqSGCpRkGnbsXm/cVyoaDc+YcARWTMRLiDm3XWJYE=;
+	s=arc-20240116; t=1723026955; c=relaxed/simple;
+	bh=DBQnHNz1pPrWejpohHbPX5AOCjYCHt3fHEfXpIq0zzs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l9ay4DXWhdNA118QlcZNiDIjtiM2HCorfdGpjpkHcWlekeoEdw4tNcZwNkvVUqM/q71MWJISZBO67T6wtj5a9/j/+iA79dUcdpE2nz4z3an8qWt3j6UNF9RFWaaPnZ28l4RUzZWfwRZCQxxu//rHjBFLNh3KF0t2Gbo2zigw/TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOyYDgRv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 114E2C4AF0B;
-	Wed,  7 Aug 2024 10:34:13 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=L5XtmFTDi7w1V62mcngbHE9tvMeoNtq3bX3KXoZm/OjpL8ZJbSKyRpeelgDfyMltG3mo7K+6fxQpMmfOhRpfYfr/XQZVUic/pMT3SvbNy59LIExzRvoFcgdbb2JNxblSedvwWKLvFm3DmqJXX5Is//s4aI2UwHoCtuB4LM7MbaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VqOJ+vvZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8919C32782;
+	Wed,  7 Aug 2024 10:35:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723026856;
-	bh=jPLqSGCpRkGnbsXm/cVyoaDc+YcARWTMRLiDm3XWJYE=;
+	s=k20201202; t=1723026955;
+	bh=DBQnHNz1pPrWejpohHbPX5AOCjYCHt3fHEfXpIq0zzs=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=IOyYDgRv9UUZ/XR5aF9tjceCkjSMoMc0hh3swpx3bU5UptypyE+MIP7nAiUNJkCDe
-	 b5FhyowMHW10igM7fkQuL/3/rZaMX0RQiWIXKJP912qwuxipjLDe6VEzHE97mVFrwi
-	 F0xQcPTfWVRy5p+MBJd+T8RGqC9nXKly80Tw0/EtWNrbzxlEYh9v5yIxTL0up3KE46
-	 b/fD9qowKmqkSTOA0hwRw7ORV86kN+Jz6xQxJpCnKr4ERUKPYusLory6jzAG0GgOvB
-	 DrkaCVS/QTendLEaaGHswP2c611Lwig6PFGgLbtVsK0oFsI6Hw0JiLBxznfidvGkmV
-	 XW5JDJq+ztbfw==
-Date: Wed, 7 Aug 2024 12:34:11 +0200
+	b=VqOJ+vvZEpr7C4RcfvW6/AOToDxnWpAa1jN3FM3Iedvd2ImdvmD6z8vaHbpnMzccS
+	 IZk8TMpRklRy8psEBJg38vlNQM0A8uMOr3fsK2pjo9NXEbvCzX0+rSaf/TPIhKpvEp
+	 /Ne2ZppwI20HsJ7T11+sPvE5BEECGC5S2x8yofXL6AAmD/I1HYt8ONerAmNDhwNWGB
+	 faBSp08noQicyctoi6JHFIeIRz/RQBcj+ajtRGlG6+Pg5Rh7aH10kV87nDp8TCLl/0
+	 N1P8DMgYL/2FvoljeQr0Iv0Xc0wzed/seD68sM+KjpuDDjN8qJrI+WcUDwhDcEsb2b
+	 Rz5VZ2FH1PN6w==
+Date: Wed, 7 Aug 2024 12:35:50 +0200
 From: Christian Brauner <brauner@kernel.org>
 To: viro@kernel.org
 Cc: linux-fsdevel@vger.kernel.org, amir73il@gmail.com, bpf@vger.kernel.org, 
 	cgroups@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
 	torvalds@linux-foundation.org
-Subject: Re: [PATCH 18/39] bpf maps: switch to CLASS(fd, ...)
-Message-ID: <20240807-deutung-distribuieren-e36fb2b86e56@brauner>
+Subject: Re: [PATCH 19/39] fdget_raw() users: switch to CLASS(fd_raw, ...)
+Message-ID: <20240807-jetzt-angeordnet-efb27b7e7fe7@brauner>
 References: <20240730050927.GC5334@ZenIV>
  <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-18-viro@kernel.org>
+ <20240730051625.14349-19-viro@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,22 +60,10 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240730051625.14349-18-viro@kernel.org>
+In-Reply-To: <20240730051625.14349-19-viro@kernel.org>
 
-On Tue, Jul 30, 2024 at 01:16:04AM GMT, viro@kernel.org wrote:
+On Tue, Jul 30, 2024 at 01:16:05AM GMT, viro@kernel.org wrote:
 > From: Al Viro <viro@zeniv.linux.org.uk>
-> 
->         Calling conventions for __bpf_map_get() would be more convenient
-> if it left fpdut() on failure to callers.  Makes for simpler logics
-> in the callers.
-> 
-> 	Among other things, the proof of memory safety no longer has to
-> rely upon file->private_data never being ERR_PTR(...) for bpffs files.
-> Original calling conventions made it impossible for the caller to tell
-> whether __bpf_map_get() has returned ERR_PTR(-EINVAL) because it has found
-> the file not be a bpf map one (in which case it would've done fdput())
-> or because it found that ERR_PTR(-EINVAL) in file->private_data of a
-> bpf map file (in which case fdput() would _not_ have been done).
 > 
 > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 > ---
