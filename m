@@ -1,167 +1,279 @@
-Return-Path: <kvm+bounces-23568-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23569-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C93494AED6
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 19:25:09 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82FE094AECE
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 19:24:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9036B28F2F
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 17:22:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 056791F22034
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 17:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCCF13D8A2;
-	Wed,  7 Aug 2024 17:22:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E226513C9CF;
+	Wed,  7 Aug 2024 17:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vojkabYJ"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gwbI1u6t";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sReSfxiL";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="gwbI1u6t";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sReSfxiL"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F6813D53F
-	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 17:22:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6251E7D08F
+	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 17:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723051353; cv=none; b=M5LCEfjhRpGBE1VPLB3C6RPcIakWLU2JLrmBEMEtQmdVDHJee0kj1i2Jt9bwXc+BkV+2gCajAMJis4PJiC5D4GGPfiSQKEIie2tdQUz+JlFowyOzoTz5+8JOBn3yLHW+lkKgAsBM3Eg0XWzK5OChBjvpFXJUcXijewYIubF2LjM=
+	t=1723051445; cv=none; b=ZbagQLuyWskDZ41FM+rvZFApfOkvSgU3eKBy91GuYkcbDB6rz2oq+VjG36G8Whakr9HgDxUXaK3utP5HlldpduHcVyLK+Ss6Qb0QvYwFbmKkcF0b2LjAhSBJCcWvVGpiEBc9jlbmcO8WAT4FoDmPkFT7r4gZ4RaRbcDw1mq4hKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723051353; c=relaxed/simple;
-	bh=FB03wuWz1lVB1LR8cmxDBitcZxa89F3VugKzV/0aqDk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X8Ly3LrYTLUPs2qEucVrajBBVFKQk4LDlNOZBDmGkfqsiMaZkkb5iQqPmNGuhlv9TiEsYOyHGxzes0CqW3M3G/INPH1e5noC4K5NHW3chU+DgnlBaj6Q9ZADCJBf5n3ogUQSmBuaqhrTL2A9OKwMrmN5I5Ayes04TB/b5ix4G28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vojkabYJ; arc=none smtp.client-ip=209.85.160.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-44fee2bfd28so15781cf.1
-        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 10:22:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723051351; x=1723656151; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LWky7w5Y44GMnU5k0FIP2ItcitwGvR0+r6HDv8rR6Cs=;
-        b=vojkabYJm5b5xtMZM5XX/Fz0H6CnRE/ULp268jVWvVux9LJvNo9vEjTZA47bHd9E4S
-         6bEEQlIyEqAWstOysSyfyUGywIcUUFaTuXK8nCVFJ6d1HWqgOBeVsf6PoU2d08+BLArF
-         CSoFkny0h3DI5LXbjgiGKVyzsGr/8u+kRTTmcy10jPeU8MOA+bWeqRLsW17tOP+Sl6BS
-         MaXGToEW+IlIGpE2o6+xd5x/7buk3C4se699BZ3P5Ibm6VJBd4BdySq/z6dd38cTtgmG
-         QjhF6VDlLAtVWvalQGApZaBZ6da8Qgf4/bwHIHaln5pHjAux0G5Htw0Sw++w/fSLqfY+
-         Z27g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723051351; x=1723656151;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LWky7w5Y44GMnU5k0FIP2ItcitwGvR0+r6HDv8rR6Cs=;
-        b=OoQ8wzwlag3ALU/0p5C2jFrXqaEDz5qph0drld/2xf9JORBewEygnRruKTWNuoOAWu
-         q/K/choroxALxEhZGEclAW0YMQjJHROpCLF7oZqC5DLBrZJ/pFaU6lvsYR4zAK76YeqO
-         /QxvevR0zQRWOXqxvcfSwesdezmdVpZfKifIap56U0yBsIL3RbB97/CZgYAK4bzR9zoc
-         yFCRGmtQpcnIMOyhbfCLRjZF1d7XgchMy4iO5+SlhTGyLrmSaAUR+qbH4VXQECesNaX3
-         dxHJdD2u3OLhGOGkXW5ItHggo4pxOrzpuIl1U7g0b8a4tdEtZTtr+dAn3sMbg2rRTeGY
-         naZQ==
-X-Gm-Message-State: AOJu0YzGwoFzTZW/xIw4OFbCY56Z9jj6m58DAjC9MoLZsl4r/Xsog+Mf
-	/cOoeu3zqJHTwJTjI/2XipOfEan+65GbDxVAKUjvLJL9Tw9rK0OvBw1Q2ULVI/7oUI/B7QH1Hkq
-	D44sDHdy5o4TTcfQLuCdAmMhgS03wu1yZxLZX
-X-Google-Smtp-Source: AGHT+IFd+q79tszYvqSxFu+Q65wSSLbtU/f7m9GI+TMXMbzFnzWiar7KmKanyMxfgwhNMMOTUJY8dCqJThehgXfoiac=
-X-Received: by 2002:ac8:5794:0:b0:447:e0e1:2a7b with SMTP id
- d75a77b69052e-451c7825bc5mr3560471cf.23.1723051350880; Wed, 07 Aug 2024
- 10:22:30 -0700 (PDT)
+	s=arc-20240116; t=1723051445; c=relaxed/simple;
+	bh=I6OSm4FIlGG5plBnNuxYzhN+ICozJCgrqsThFehPrIM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hyWjXvaaN2xwcMet+ndGNzaoas+PQcVVFk4cFxSUQqiEtc4el9QtVkWq1CnBzKUdxP1Ke6XwIGwG8FGwkUx0qfKwlkKN6PybivU91GVU9ZmJGag5OMl+wfxKtACw+u+b/XwJZ77p98p4GScPdyxxP/ml09duVtbx3L0hSpYCQFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gwbI1u6t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sReSfxiL; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=gwbI1u6t; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sReSfxiL; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id A1BCC21CA3;
+	Wed,  7 Aug 2024 17:24:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1723051441; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=9R2QwzdqSfsHhZEdXvPCXjRM5kllkSXFreOeNNMrPO4=;
+	b=gwbI1u6tiaqOrRD38hJOSE6ESsIPzXlINMLfvJqAYnjnjSFeTaq3mekRN2wDSt9dedYwng
+	wtK7hTFvtHq1R+CxM48puPIx8BC4m1l5VJcO9v3wF2o5z4yARgVIC0gRaED5VA7CY6sVTS
+	+FvmzfKKpObND5JWdNOVGzLwW3DOhVw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1723051441;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=9R2QwzdqSfsHhZEdXvPCXjRM5kllkSXFreOeNNMrPO4=;
+	b=sReSfxiLxAooTseXs2LGKH/vZPM+PHmI3Nx67lL4IbBv4OrpWqJIO97NSPJPdZGNfRfDus
+	mM/Zsh5QHxK10QDg==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1723051441; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=9R2QwzdqSfsHhZEdXvPCXjRM5kllkSXFreOeNNMrPO4=;
+	b=gwbI1u6tiaqOrRD38hJOSE6ESsIPzXlINMLfvJqAYnjnjSFeTaq3mekRN2wDSt9dedYwng
+	wtK7hTFvtHq1R+CxM48puPIx8BC4m1l5VJcO9v3wF2o5z4yARgVIC0gRaED5VA7CY6sVTS
+	+FvmzfKKpObND5JWdNOVGzLwW3DOhVw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1723051441;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+	bh=9R2QwzdqSfsHhZEdXvPCXjRM5kllkSXFreOeNNMrPO4=;
+	b=sReSfxiLxAooTseXs2LGKH/vZPM+PHmI3Nx67lL4IbBv4OrpWqJIO97NSPJPdZGNfRfDus
+	mM/Zsh5QHxK10QDg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 66F1B13297;
+	Wed,  7 Aug 2024 17:24:01 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id F++JF7Gts2ZCIQAAD6G6ig
+	(envelope-from <cfontana@suse.de>); Wed, 07 Aug 2024 17:24:01 +0000
+From: Claudio Fontana <cfontana@suse.de>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Claudio Fontana <cfontana@suse.de>,
+	Dario Faggioli <dfaggioli@suse.com>,
+	Fabiano Rosas <farosas@suse.de>
+Subject: [PATCH] tools/kvm_stat: fix termination behavior when not on a terminal
+Date: Wed,  7 Aug 2024 19:23:34 +0200
+Message-Id: <20240807172334.1006-1-cfontana@suse.de>
+X-Mailer: git-send-email 2.26.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240801224349.25325-1-seanjc@google.com>
-In-Reply-To: <20240801224349.25325-1-seanjc@google.com>
-From: James Houghton <jthoughton@google.com>
-Date: Wed, 7 Aug 2024 10:21:53 -0700
-Message-ID: <CADrL8HXVNcbcuu9qF3wtkccpW6_QEnXQ1ViWEceeS9QGdQUTiw@mail.gmail.com>
-Subject: Re: [ANNOUNCE] PUCK Agenda - 2024.08.07 - KVM userfault
- (guest_memfd/HugeTLB postcopy)
-To: Sean Christopherson <seanjc@google.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
-	Oliver Upton <oliver.upton@linux.dev>, Axel Rasmussen <axelrasmussen@google.com>, 
-	David Matlack <dmatlack@google.com>, Anish Moorthy <amoorthy@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Spamd-Result: default: False [-2.80 / 50.00];
+	BAYES_HAM(-3.00)[100.00%];
+	MID_CONTAINS_FROM(1.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	R_MISSING_CHARSET(0.50)[];
+	NEURAL_HAM_SHORT(-0.20)[-0.998];
+	MIME_GOOD(-0.10)[text/plain];
+	ARC_NA(0.00)[];
+	MIME_TRACE(0.00)[0:+];
+	RCVD_COUNT_TWO(0.00)[2];
+	TO_DN_SOME(0.00)[];
+	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	FROM_HAS_DN(0.00)[];
+	RCVD_VIA_SMTP_AUTH(0.00)[];
+	FROM_EQ_ENVFROM(0.00)[];
+	RCVD_TLS_ALL(0.00)[];
+	RCPT_COUNT_FIVE(0.00)[6];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[imap1.dmz-prg2.suse.org:helo,suse.de:email,suse.com:email]
+X-Spam-Score: -2.80
+X-Spam-Flag: NO
+X-Spam-Level: 
 
-On Thu, Aug 1, 2024 at 3:44=E2=80=AFPM Sean Christopherson <seanjc@google.c=
-om> wrote:
->
-> Early warning for next week's PUCK since there's actually a topic this ti=
-me.
-> James is going to lead a discussion on KVM userfault[*](name subject to c=
-hange).
+For the -l and -L options (logging mode), replace the use of the
+KeyboardInterrupt exception to gracefully terminate in favor
+of handling the SIGINT and SIGTERM signals.
 
-Thanks for attending, everyone!
+This allows the program to be run from scripts and still be
+signaled to gracefully terminate without an interactive terminal.
 
-We seemed to arrive at the following conclusions:
+Before this change, something like this script:
 
-1. For guest_memfd, stage 2 mapping installation will never go through
-GUP / virtual addresses to do the GFN --> PFN translation, including
-when it supports non-private memory.
-2. Something like KVM Userfault is indeed necessary to handle
-post-copy for guest_memfd VMs, especially when guest_memfd supports
-non-private memory.
-3. We should not hook into the overall GFN --> HVA translation, we
-should only be hooking the GFN --> PFN translation steps to figure out
-how to create stage 2 mappings. That is, KVM's own accesses to guest
-memory should just go through mm/userfaultfd.
-4. We don't need the concept of "async userfaults" (making KVM block
-when attempting to access userfault memory) in KVM Userfault.
+kvm_stat -p 85896 -d -t -s 1 -c -L kvm_stat_85896.csv &
+sleep 10
+pkill -TERM -P $$
 
-So I need to think more about what exactly the API should look like
-for controlling if a page should exit to userspace before KVM is
-allowed to map it into stage 2 and if this should apply to all of
-guest memory or only guest_memfd.
+would yield an empty log:
+-rw-r--r-- 1 root root     0 Aug  7 16:17 kvm_stat_85896.csv
 
-It sounds like it may most likely be something like a per-VM bitmap
-that describes which pages are allowed to be mapped into stage 2,
-applying to all memory, not just guest_memfd memory. Even though it is
-solving a problem for guest_memfd specifically, it is slightly cleaner
-to have it apply to all memory.
+after this commit:
+-rw-r--r-- 1 root root 13466 Aug  7 16:57 kvm_stat_85896.csv
 
-If this per-VM bitmap applies to all memory, then we don't need to
-wait for guest_memfd to support non-private memory before working on a
-full implementation. But if not, perhaps it makes sense to wait.
+Signed-off-by: Claudio Fontana <cfontana@suse.de>
+Cc: Dario Faggioli <dfaggioli@suse.com>
+Cc: Fabiano Rosas <farosas@suse.de>
+---
+ tools/kvm/kvm_stat/kvm_stat     | 64 ++++++++++++++++-----------------
+ tools/kvm/kvm_stat/kvm_stat.txt | 12 +++++++
+ 2 files changed, 44 insertions(+), 32 deletions(-)
 
-There will be a 30 minute session at LPC to discuss this topic more. I
-hope to see you there!
+diff --git a/tools/kvm/kvm_stat/kvm_stat b/tools/kvm/kvm_stat/kvm_stat
+index 15bf00e79e3f..2cf2da3ed002 100755
+--- a/tools/kvm/kvm_stat/kvm_stat
++++ b/tools/kvm/kvm_stat/kvm_stat
+@@ -297,8 +297,6 @@ IOCTL_NUMBERS = {
+     'RESET':       0x00002403,
+ }
+ 
+-signal_received = False
+-
+ ENCODING = locale.getpreferredencoding(False)
+ TRACE_FILTER = re.compile(r'^[^\(]*$')
+ 
+@@ -1598,7 +1596,19 @@ class CSVFormat(object):
+ 
+ def log(stats, opts, frmt, keys):
+     """Prints statistics as reiterating key block, multiple value blocks."""
+-    global signal_received
++    signal_received = defaultdict(bool)
++
++    def handle_signal(sig, frame):
++        nonlocal signal_received
++        signal_received[sig] = True
++        return
++
++
++    signal.signal(signal.SIGINT, handle_signal)
++    signal.signal(signal.SIGTERM, handle_signal)
++    if opts.log_to_file:
++        signal.signal(signal.SIGHUP, handle_signal)
++
+     line = 0
+     banner_repeat = 20
+     f = None
+@@ -1624,39 +1634,31 @@ def log(stats, opts, frmt, keys):
+     do_banner(opts)
+     banner_printed = True
+     while True:
+-        try:
+-            time.sleep(opts.set_delay)
+-            if signal_received:
+-                banner_printed = True
+-                line = 0
+-                f.close()
+-                do_banner(opts)
+-                signal_received = False
+-            if (line % banner_repeat == 0 and not banner_printed and
+-                not (opts.log_to_file and isinstance(frmt, CSVFormat))):
+-                do_banner(opts)
+-                banner_printed = True
+-            values = stats.get()
+-            if (not opts.skip_zero_records or
+-                any(values[k].delta != 0 for k in keys)):
+-                do_statline(opts, values)
+-                line += 1
+-                banner_printed = False
+-        except KeyboardInterrupt:
++        time.sleep(opts.set_delay)
++        # Do not use the KeyboardInterrupt exception, because we may be running without a terminal
++        if (signal_received[signal.SIGINT] or signal_received[signal.SIGTERM]):
+             break
++        if signal_received[signal.SIGHUP]:
++            banner_printed = True
++            line = 0
++            f.close()
++            do_banner(opts)
++            signal_received[signal.SIGHUP] = False
++        if (line % banner_repeat == 0 and not banner_printed and
++            not (opts.log_to_file and isinstance(frmt, CSVFormat))):
++            do_banner(opts)
++            banner_printed = True
++        values = stats.get()
++        if (not opts.skip_zero_records or
++            any(values[k].delta != 0 for k in keys)):
++            do_statline(opts, values)
++            line += 1
++            banner_printed = False
+ 
+     if opts.log_to_file:
+         f.close()
+ 
+ 
+-def handle_signal(sig, frame):
+-    global signal_received
+-
+-    signal_received = True
+-
+-    return
+-
+-
+ def is_delay_valid(delay):
+     """Verify delay is in valid value range."""
+     msg = None
+@@ -1869,8 +1871,6 @@ def main():
+         sys.exit(0)
+ 
+     if options.log or options.log_to_file:
+-        if options.log_to_file:
+-            signal.signal(signal.SIGHUP, handle_signal)
+         keys = sorted(stats.get().keys())
+         if options.csv:
+             frmt = CSVFormat(keys)
+diff --git a/tools/kvm/kvm_stat/kvm_stat.txt b/tools/kvm/kvm_stat/kvm_stat.txt
+index 3a9f2037bd23..4a99a111a93c 100644
+--- a/tools/kvm/kvm_stat/kvm_stat.txt
++++ b/tools/kvm/kvm_stat/kvm_stat.txt
+@@ -115,6 +115,18 @@ OPTIONS
+ --skip-zero-records::
+         omit records with all zeros in logging mode
+ 
++
++SIGNALS
++-------
++when kvm_stat is running in logging mode (either with -l or with -L),
++it handles the following signals:
++
++SIGHUP - closes and reopens the log file (-L only), then continues.
++
++SIGINT - closes the log file and terminates.
++SIGTERM - closes the log file and terminates.
++
++
+ SEE ALSO
+ --------
+ 'perf'(1), 'trace-cmd'(1)
+-- 
+2.26.2
 
-Here are the slides[2].
-
-Thanks!
-
-PS: I'll be away from August 9 - 25.
-
-[2]: https://docs.google.com/presentation/d/1Al9amGumF3ZPX2Wu50mQ4nkPRZZdBJ=
-itXmMH3n7j_RE/edit?usp=3Dsharing
-
-
-> I Cc'd folks a few folks that I know are interested, please forward this =
-on
-> as needed.
->
-> Early warning #2, PUCK is canceled for August 14th, as I'll be traveling,=
- though
-> y'all are welcome to meet without me.
->
-> [*] https://lore.kernel.org/all/20240710234222.2333120-1-jthoughton@googl=
-e.com
->
-> Time:     6am PDT
-> Video:    https://meet.google.com/vdb-aeqo-knk
-> Phone:    https://tel.meet/vdb-aeqo-knk?pin=3D3003112178656
->
-> Calendar: https://calendar.google.com/calendar/u/0?cid=3DY182MWE1YjFmNjQ0=
-NzM5YmY1YmVkN2U1ZWE1ZmMzNjY5Y2UzMmEyNTQ0YzVkYjFjN2M4OTE3MDJjYTUwOTBjN2Q1QGd=
-yb3VwLmNhbGVuZGFyLmdvb2dsZS5jb20
-> Drive:    https://drive.google.com/drive/folders/1aTqCrvTsQI9T4qLhhLs_l98=
-6SngGlhPH?resourcekey=3D0-FDy0ykM3RerZedI8R-zj4A&usp=3Ddrive_link
->
-> Future Schedule:
-> Augst   7th - KVM userfault
-> August 14th - Canceled (Sean unavailable)
-> August 21st - Available
-> August 28th - Available
 
