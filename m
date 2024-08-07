@@ -1,57 +1,57 @@
-Return-Path: <kvm+bounces-23500-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23501-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2267194A564
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 12:26:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6491994A56E
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 12:27:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE9F21F22A68
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 10:26:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FF4428111D
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 10:27:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 583731DE849;
-	Wed,  7 Aug 2024 10:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E00F1DF68A;
+	Wed,  7 Aug 2024 10:27:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="vKxRgmj+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WAe6vQGp"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E34E190077;
-	Wed,  7 Aug 2024 10:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455E91DE841;
+	Wed,  7 Aug 2024 10:27:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723026376; cv=none; b=saRWJA2ZjyEu7LKQeDylzUkS0zoRNtmzzB/ZgkTVTPBYgTYC+o5uIfgSSiRUx2AlBC4sQK1Z5VJMFnlReL9npOTMf3Tc8sAfd7Xx/X69/tuhHOovFkGtVEyrPcl+vTYdIeT+oKqrKUlIrkzAFBpfEiK9aSTYIL9PQOuVjg/d4PU=
+	t=1723026425; cv=none; b=J5abVWh2U6nK7O0PcvgQnX0StMrRp35PUPPQGYX1CwYb/pdP4BzkgVce3sLMtiaUV8j9vgE5PqLSA9UiJOQKD64Y5GWVHgfrwP85CI2fY/zH4p0iW/vvQ3txL02fb/ULjOMQXZhsmh4wC8wRVNoJ25rNH8zk0P1EFbIyQJrGi6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723026376; c=relaxed/simple;
-	bh=01AHvKOt3s9t+JgP0kcr/IY2jCKRiE80qh0V7HFdnFc=;
+	s=arc-20240116; t=1723026425; c=relaxed/simple;
+	bh=5BSdOkb+iDxlnAlZkWpaP8YnJiWaaw6FtzKmKu7mF7M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RreLXVtaLBNT9kahGattwdM6rs5neNh58CxW2gEWLnXsRRSjiiw8KU2NObRFbhU/heX6+XRtzCs8uji7/yp5lV3Rz/GzZDuzPGHzHWBjCWus1+ATDbBlJMSvo0HafZptnJqq/sB98HLtuMyY3pC0Y+psGjX+0G2bRmt5GQHWszU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=vKxRgmj+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD4CDC32782;
-	Wed,  7 Aug 2024 10:26:13 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=PlJ+X/Wml+qpGofj4vD2QDoTK+wAbCLXIxRjTWv6QhEOFbWNU3Y4gRSqNEva/eBEPwYDWZ/7xqRUJqfeLzBd3BMoUmGH1Dwei5aZZZUEMhOnyKvUoet4MMPxX3Jz6e05b0rE2HnDowsJ3RJ5hJ2sdLsL8WcxN51eTyIPQVCmyts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WAe6vQGp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9383C4AF0E;
+	Wed,  7 Aug 2024 10:27:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723026376;
-	bh=01AHvKOt3s9t+JgP0kcr/IY2jCKRiE80qh0V7HFdnFc=;
+	s=k20201202; t=1723026424;
+	bh=5BSdOkb+iDxlnAlZkWpaP8YnJiWaaw6FtzKmKu7mF7M=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=vKxRgmj+lOFL4AF9jABbKResiIPD9RBjibkttlFAjGoztf9/wGYEB7ir5Nz9dUPIF
-	 JxqZy52kpcgw3iPNvrI833d6H4F+jOw6nPvlKHc8jTlvlzNu9LjV/YCopJaIcXl9fB
-	 r1AHJvUy8KXdF4wjUS/bAXBz4jhMYiJFKm7ITcid0hcrKskZXoxYTcPzjvkLtfq61x
-	 w6BdmAeoDXUFvoI0JKqKjMpDMtYS9Yms8mq09eDfyoWEWKV++OPDnrwCqqsKWZyNt8
-	 YK3bTo6tbWS5CKM/L34GRpoyUGaaXI7je2+kb+aNWMRiN1+r2NpRFW95Ao/ALSxd6v
-	 sw0YsqJVqVvTQ==
-Date: Wed, 7 Aug 2024 12:26:11 +0200
+	b=WAe6vQGpj1ZsDTcw1xYHvSnJP4xAXpAjBxg+CXIPGK1whg7o0npI51HgfCyyEMO7/
+	 lOal8ON8w++M5RHmlaj5k9aaaLS3oNoqUP/R+e31C/v8B1UsSBx9dcCgsGrhR8ZpwU
+	 eSqbpDl8ZhgQhte/oDaNYYzuWNIcJnLqv0R7CRA4lH9doqDqRw+Pioe9h5qWEZpFxK
+	 Rn6b8gyrnPrGabswUVgCD7t7m+ysj044W8XFxqcqsGFtvHpwKyHikVv48fvtY/GekQ
+	 2YFl3ukW0NzyHapgXQCSa8En6t8nXrDps8yMbRFqNvTkEpn3mf9lxfuqtOmSiW3JC/
+	 yxe17AdpCfBpg==
+Date: Wed, 7 Aug 2024 12:27:00 +0200
 From: Christian Brauner <brauner@kernel.org>
 To: viro@kernel.org
 Cc: linux-fsdevel@vger.kernel.org, amir73il@gmail.com, bpf@vger.kernel.org, 
 	cgroups@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
 	torvalds@linux-foundation.org
-Subject: Re: [PATCH 11/39] switch netlink_getsockbyfilp() to taking descriptor
-Message-ID: <20240807-beunruhigen-klarstellen-881d9d97272f@brauner>
+Subject: Re: [PATCH 13/39] do_mq_notify(): switch to CLASS(fd, ...)
+Message-ID: <20240807-zeitraffer-milieu-b75a7470e0f0@brauner>
 References: <20240730050927.GC5334@ZenIV>
  <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-11-viro@kernel.org>
+ <20240730051625.14349-13-viro@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,10 +60,13 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240730051625.14349-11-viro@kernel.org>
+In-Reply-To: <20240730051625.14349-13-viro@kernel.org>
 
-On Tue, Jul 30, 2024 at 01:15:57AM GMT, viro@kernel.org wrote:
+On Tue, Jul 30, 2024 at 01:15:59AM GMT, viro@kernel.org wrote:
 > From: Al Viro <viro@zeniv.linux.org.uk>
+> 
+> semi-simple.  The only failure exit before fdget() is a return, the
+> only thing done after fdput() is transposable with it.
 > 
 > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 > ---
