@@ -1,243 +1,204 @@
-Return-Path: <kvm+bounces-23483-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23486-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D47394A1EC
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:43:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1715094A424
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 11:20:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC4C81F21733
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 07:43:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A0B11C2108C
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D661C7B77;
-	Wed,  7 Aug 2024 07:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A94E1D47CB;
+	Wed,  7 Aug 2024 09:18:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GK2asJNx"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="eficly/Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBB722EE5
-	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 07:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98E8E1CCB44;
+	Wed,  7 Aug 2024 09:18:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723016607; cv=none; b=VNzoxyzlt+izvCAC+3yR40sMTZ4h0bkUGA3UI2RYbyoNziNt/4ES7xP+UebHPDDiakssGMAqGt67CL5T1YcWzP9jPNtpgObdXV2H1FPk6dQaJDAMyKrVPUTq9VJR9ArLylm7MURY8htGVbW+zPWWVDGFEwrBCk1reGL5nK1W5SI=
+	t=1723022319; cv=none; b=m5bfyjU171ydW29MA4WarCpunELBG7cP19p2vwqpyu+LINgo7Ovzt7lUZziMAsy9aH7jJTDjR0R4DA/3YT0h+by7qOrJFjpG+IYm4gOivPklobmaVOYCML9IzLdcrsCLn26XgpzpPbm/kru15/tO6hQFcRkdBxoR+JE1DoqAdqc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723016607; c=relaxed/simple;
-	bh=p7LMmmzU1+cu3gDb4BNR5usgoqOn0JF56mNQORorlg4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=egbq/expjOtrIiAaXBB3rQRX4wk6WOEQ6kGawZ2NbhtUZ/VkXGR6QUZg8Y/T/grR6RD1K7jBaHMSZbje6nIXrup0kICUpDe4fQ0TtPq4iqa185e95PAE/jsXppIUwwxLIRnCW/8ZzMsA1LMcudxOOy8WV3ufr1MiCLiabZPiBbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GK2asJNx; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Wed, 7 Aug 2024 09:43:14 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723016602;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TXckcsmB40wwGZbeI2/syEiQW03ulJWzQIsf9BnqUys=;
-	b=GK2asJNxCDWRfr2biYpW3iPq8nNX52MfjS54NIXaiSF8SYme7MBu/5ZijowLFkgaFA1VBd
-	kGcrozU51h/YaHuFd6GTGiVmRJ4veVZfA4zyRRKInCj2JXcT8xw07V1p8OchFOr5Xoyx4h
-	56U9O8VgZdInVasP4hm9um5QLEAGN+g=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Andrew Jones <andrew.jones@linux.dev>
-To: Cade Richard <cade.richard@gmail.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	atishp@rivosinc.com, cade.richard@berkeley.edu, jamestiotio@gmail.com
-Subject: Re: [PATCH kvm-unit-tests] riscv: sbi: add dbcn write test
-Message-ID: <20240807-e5f14146934e63558f473337@orel>
-References: <20240806-sbi-dbcn-write-test-v1-1-7f198bb55525@berkeley.edu>
+	s=arc-20240116; t=1723022319; c=relaxed/simple;
+	bh=F7JHj5tx/WNkjygiOjcFymG8PkigNzUK09jzCY2n4cQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jq+pvl9ILrBxM4Xmb8eFUGgepmLYaZ6vddZUFjVioJn13Wyb3RpDMQyoyYudMekDoRUORtVAQPBPvRWKaeBpf4U8TuR+qaphjAWOGubRuUGT753rFOFCcge9h17oxOJ+/mnU869Uju+VNCNai4oYqZTGeD+6cL7SAVGcdSONRJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=eficly/Q; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4772MdjR012388;
+	Wed, 7 Aug 2024 09:18:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:in-reply-to:references
+	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
+	7mws3e+hPiZ9f81L9jK8hNBJFT3o16/dbOtA4SrzPe8=; b=eficly/Qy/axfXtC
+	iIBxs5amh72AMJu/MNn+9tcte6uD5ViowwjjKXtjbE04o/tbf/dxyIiyld6DS+0e
+	FfreqXS8yOd9dKi4ZJQ4H3+gRWRKNcZAyHAwdf9iUWoG6TGh0IloLICP7qm337cD
+	1rBEoHrU70jB98vRKnndPl3UIcPShZ61L5stUTCg67SMAd3bjRghfuJ8NQiiLT1g
+	t43HZGalmfDkK7jyD9XMIuuTCoT7IF1IMp3j9RZyK6SzsL88yxBZ8OEmudhYmWrh
+	OFrfV/TznLa/7LQFzKG6iqIigg1nd8SbvTi0xFu1PPhh2L8xrfGV2pL3RDrvX6mJ
+	mZZf6g==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40u5t3v40h-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Aug 2024 09:18:31 +0000 (GMT)
+Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4779IU5x006018;
+	Wed, 7 Aug 2024 09:18:30 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40u5t3v40f-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Aug 2024 09:18:30 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4776sGMF024166;
+	Wed, 7 Aug 2024 09:18:29 GMT
+Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40syvpga88-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 07 Aug 2024 09:18:29 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4779IMlT56164680
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 7 Aug 2024 09:18:24 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 947142004E;
+	Wed,  7 Aug 2024 09:18:22 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3937520040;
+	Wed,  7 Aug 2024 09:18:22 +0000 (GMT)
+Received: from p-imbrenda.boeblingen.de.ibm.com (unknown [9.152.224.66])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  7 Aug 2024 09:18:22 +0000 (GMT)
+Date: Wed, 7 Aug 2024 10:59:42 +0200
+From: Claudio Imbrenda <imbrenda@linux.ibm.com>
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+        linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        Andrew Morton <akpm@linux-foundation.org>,
+        "Matthew Wilcox (Oracle)" <willy@infradead.org>,
+        Jonathan Corbet
+ <corbet@lwn.net>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Janosch Frank <frankja@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Gerald
+ Schaefer <gerald.schaefer@linux.ibm.com>
+Subject: Re: [PATCH v1 08/11] s390/uv: convert gmap_destroy_page() from
+ follow_page() to folio_walk
+Message-ID: <20240807105942.09088ba3@p-imbrenda.boeblingen.de.ibm.com>
+In-Reply-To: <20240802155524.517137-9-david@redhat.com>
+References: <20240802155524.517137-1-david@redhat.com>
+	<20240802155524.517137-9-david@redhat.com>
+Organization: IBM
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240806-sbi-dbcn-write-test-v1-1-7f198bb55525@berkeley.edu>
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: o2XgfFV8At_JQmYslZlIFngIZRsFBdsZ
+X-Proofpoint-ORIG-GUID: 5-0t-jLhML_N2kJujz8vN9m8CxVGzemV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-07_06,2024-08-06_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ lowpriorityscore=0 mlxscore=0 suspectscore=0 mlxlogscore=999
+ impostorscore=0 clxscore=1015 adultscore=0 malwarescore=0 phishscore=0
+ bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408070061
 
-On Tue, Aug 06, 2024 at 10:51:54PM GMT, Cade Richard wrote:
+On Fri,  2 Aug 2024 17:55:21 +0200
+David Hildenbrand <david@redhat.com> wrote:
+
+> Let's get rid of another follow_page() user and perform the UV calls
+> under PTL -- which likely should be fine.
 > 
+> No need for an additional reference while holding the PTL:
+> uv_destroy_folio() and uv_convert_from_secure_folio() raise the
+> refcount, so any concurrent make_folio_secure() would see an unexpted
+> reference and cannot set PG_arch_1 concurrently.
 > 
+> Do we really need a writable PTE? Likely yes, because the "destroy"
+> part is, in comparison to the export, a destructive operation. So we'll
+> keep the writability check for now.
+> 
+> We'll lose the secretmem check from follow_page(). Likely we don't care
+> about that here.
+> 
+> Signed-off-by: David Hildenbrand <david@redhat.com>
+
+Reviewed-by: Claudio Imbrenda <imbrenda@linux.ibm.com>
+
 > ---
-
-not sure why this --- above is here, it'll remove the commit text from the
-commit. Also not sure where the changelog went. We want the changelog, but
-we want it under the --- below your sign-off.
-
-> Added a unit test for the RISC-V SBI debug console write() and write_byte() functions. The output of the tests must be inspected manually to verify that the correct bytes are written. For write(), the expected output is 'DBCN_WRITE_TEST_STRING'. For write_byte(), the expected output is 'a'.
-
-Need to wrap lines at 74 chars.
-
+>  arch/s390/kernel/uv.c | 18 ++++++++++++------
+>  1 file changed, 12 insertions(+), 6 deletions(-)
 > 
-> Signed-off-by: Cade Richard <cade.richard@berkeley.edu>
-> ---
->  lib/riscv/asm/sbi.h |  7 ++++++
->  riscv/sbi.c         | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->  2 files changed, 73 insertions(+)
-> 
-> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
-> index 73ab5438..47e91025 100644
-> --- a/lib/riscv/asm/sbi.h
-> +++ b/lib/riscv/asm/sbi.h
-> @@ -19,6 +19,7 @@ enum sbi_ext_id {
->  	SBI_EXT_TIME = 0x54494d45,
->  	SBI_EXT_HSM = 0x48534d,
->  	SBI_EXT_SRST = 0x53525354,
-> +	SBI_EXT_DBCN = 0x4442434E,
->  };
->  
->  enum sbi_ext_base_fid {
-> @@ -42,6 +43,12 @@ enum sbi_ext_time_fid {
->  	SBI_EXT_TIME_SET_TIMER = 0,
->  };
->  
-> +enum sbi_ext_dbcn_fid {
-> +	SBI_EXT_DBCN_CONSOLE_WRITE = 0,
-> +	SBI_EXT_DBCN_CONSOLE_READ,
-> +	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
-> +};
-> +
->  struct sbiret {
->  	long error;
->  	long value;
-> diff --git a/riscv/sbi.c b/riscv/sbi.c
-> index 2438c497..61993f08 100644
-> --- a/riscv/sbi.c
-> +++ b/riscv/sbi.c
-> @@ -15,6 +15,10 @@
->  #include <asm/sbi.h>
->  #include <asm/smp.h>
->  #include <asm/timer.h>
-> +#include <asm/io.h>
-
-The includes are currently in alphabetic order. Let's keep them that way.
-
-> +
-> +#define DBCN_WRITE_TEST_STRING		"DBCN_WRITE_TEST_STRING\n"
-> +#define DBCN_WRITE_BYTE_TEST_BYTE	(u8)'a'
->  
->  static void help(void)
+> diff --git a/arch/s390/kernel/uv.c b/arch/s390/kernel/uv.c
+> index 35ed2aea8891..9646f773208a 100644
+> --- a/arch/s390/kernel/uv.c
+> +++ b/arch/s390/kernel/uv.c
+> @@ -14,6 +14,7 @@
+>  #include <linux/memblock.h>
+>  #include <linux/pagemap.h>
+>  #include <linux/swap.h>
+> +#include <linux/pagewalk.h>
+>  #include <asm/facility.h>
+>  #include <asm/sections.h>
+>  #include <asm/uv.h>
+> @@ -462,9 +463,9 @@ EXPORT_SYMBOL_GPL(gmap_convert_to_secure);
+>  int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
 >  {
-> @@ -32,6 +36,11 @@ static struct sbiret __time_sbi_ecall(unsigned long stime_value)
->  	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
->  }
+>  	struct vm_area_struct *vma;
+> +	struct folio_walk fw;
+>  	unsigned long uaddr;
+>  	struct folio *folio;
+> -	struct page *page;
+>  	int rc;
 >  
-> +static struct sbiret __dbcn_sbi_ecall(int fid, unsigned long arg0, unsigned long arg1, unsigned long arg2)
-> +{
-> +	return sbi_ecall(SBI_EXT_DBCN, fid, arg0, arg1, arg2, 0, 0, 0);
-> +}
-> +
->  static bool env_or_skip(const char *env)
->  {
->  	if (!getenv(env)) {
-> @@ -248,6 +257,62 @@ static void check_time(void)
->  	report_prefix_pop();
->  }
+>  	rc = -EFAULT;
+> @@ -483,11 +484,15 @@ int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
+>  		goto out;
 >  
-
-What happened to the comment about the read test?
-
-> +static void check_dbcn(void)
-> +{
-> +	
-> +	struct sbiret ret;
-> +	unsigned long num_bytes, base_addr_lo, base_addr_hi;
-> +	int num_calls = 0;
-> +	
-> +	num_bytes = strlen(DBCN_WRITE_TEST_STRING);
-> +	phys_addr_t p = virt_to_phys((void *)&DBCN_WRITE_TEST_STRING);
-
-Put p's declaration with the rest above.
-
-> +	base_addr_lo = (unsigned long)p;
-> +	base_addr_hi = (unsigned long)(p >> __riscv_xlen);
-> +
-> +	report_prefix_push("dbcn");
-> +	
-> +	ret = __base_sbi_ecall(SBI_EXT_BASE_PROBE_EXT, SBI_EXT_DBCN);
-> +	if (!ret.value) {
-> +		report_skip("DBCN extension unavailable");
-> +		report_prefix_pop();
-> +		return;
-> +	}
-
-The report skip should be the first thing you do, i.e. the virt_to_phys
-stuff should be below it.
-
-> +
-> +	report_prefix_push("write");
-> +
-> +	do {
-> +		ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE, num_bytes, base_addr_lo, base_addr_hi);
-> +		num_bytes -= ret.value;
-> +		base_addr_lo += ret.value;
-
-We should increment the physical address and then split it again into lo
-and hi since lo could have been zero (only high addresses) or lo may
-have started nonzero but then wrapped since we were close the 4G boundary.
-
-> +		num_calls++;
-> +	} while (num_bytes != 0 && ret.error == SBI_SUCCESS) ;
-> +	report(ret.error == SBI_SUCCESS, "write success");
-> +	report_info("%d sbi calls made", num_calls);
-> +	
+>  	rc = 0;
+> -	/* we take an extra reference here */
+> -	page = follow_page(vma, uaddr, FOLL_WRITE | FOLL_GET);
+> -	if (IS_ERR_OR_NULL(page))
+> +	folio = folio_walk_start(&fw, vma, uaddr, 0);
+> +	if (!folio)
+>  		goto out;
+> -	folio = page_folio(page);
 > +	/*
-> +		Bytes are read from memory and written to the console
+> +	 * See gmap_make_secure(): large folios cannot be secure. Small
+> +	 * folio implies FW_LEVEL_PTE.
+> +	 */
+> +	if (folio_test_large(folio) || !pte_write(fw.pte))
+> +		goto out_walk_end;
+>  	rc = uv_destroy_folio(folio);
+>  	/*
+>  	 * Fault handlers can race; it is possible that two CPUs will fault
+> @@ -500,7 +505,8 @@ int gmap_destroy_page(struct gmap *gmap, unsigned long gaddr)
+>  	 */
+>  	if (rc)
+>  		rc = uv_convert_from_secure_folio(folio);
+> -	folio_put(folio);
+> +out_walk_end:
+> +	folio_walk_end(&fw, vma);
+>  out:
+>  	mmap_read_unlock(gmap->mm);
+>  	return rc;
 
-There should be a '*' on each line of a comment block. Doesn't checkpatch
-complain about that?
-
-> +	*/
-> +	if (env_or_skip("INVALID_READ_ADDR")) {
-> +		phys_addr_t p = strtoull(getenv("INVALID_READ_ADDR"), NULL, 0);
-
-Don't shadow p, you can use the same one again.
-
-> +		base_addr_lo = (unsigned long)p;
-> +		base_addr_hi = (unsigned long)(p >> __riscv_xlen);
-> +		ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE, 1, base_addr_lo, base_addr_hi);
-> +		report(ret.error == SBI_ERR_INVALID_PARAM, "invalid parameter: address");
-> +	};
-> +
-> +	report_prefix_pop();
-> +	
-> +	report_prefix_push("write_byte");
-> +
-> +	puts("DBCN_WRITE TEST CHAR: ");
-> +	ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE_BYTE, (u8)DBCN_WRITE_BYTE_TEST_BYTE, 0, 0);
-> +	puts("\n");
-> +	report(ret.error == SBI_SUCCESS, "write success");
-> +	report(ret.value == 0, "expected ret.value");
-> +
-> +	report_prefix_pop();
-> +}
-> +
->  int main(int argc, char **argv)
->  {
->  
-> @@ -259,6 +324,7 @@ int main(int argc, char **argv)
->  	report_prefix_push("sbi");
->  	check_base();
->  	check_time();
-> +	check_dbcn();
->  
->  	return report_summary();
->  }
-> 
-> ---
-> base-commit: 1878b4b663fd50b87de7ba2b1c90614e2703542f
-> change-id: 20240806-sbi-dbcn-write-test-70d305d511cf
-> 
-> Best regards,
-> -- 
-> Cade Richard <cade.richard@berkeley.edu>
->
-
-Thanks,
-drew
 
