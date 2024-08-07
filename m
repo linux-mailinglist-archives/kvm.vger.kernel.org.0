@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-23463-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23464-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B269949D2E
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 02:59:52 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B1F3949D31
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 03:00:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8772B24A8D
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 00:59:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB574B2520C
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 01:00:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662D23D0C5;
-	Wed,  7 Aug 2024 00:59:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A63736B17;
+	Wed,  7 Aug 2024 00:59:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="JAWwBBlC"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="rfFjvCGQ"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2077.outbound.protection.outlook.com [40.107.95.77])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2068.outbound.protection.outlook.com [40.107.92.68])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B925247F4D;
-	Wed,  7 Aug 2024 00:59:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4138629D06;
+	Wed,  7 Aug 2024 00:59:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.68
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1722992363; cv=fail; b=agswE6Qbb2Z+9eFP9wxQni2LO5phY3HvN00GS4+CL09gzRoYJRz4Eb6CrXLCJJDXvTcHxPb+Cscz3Sz74eermr/0V1Q6LqTrnGX1Lq3OCoQv/2cZswBpd1nK/OclxltO/iXlTlFxYUlM8aJ5f4lv7URHUnCk2xRlEsO5A8pl5j4=
+	t=1722992395; cv=fail; b=A/zMuBg5cpy4QSXK5fThtHlzTMg2DChov309jHHsciYbjvttD1moVwIX4E5e6mgjGcXylCgJWalWddbrkH7sGDpsYKAx9WEE4o8tp+CQr5Ijrgesa5H2mXJq+wrkjpr61RzhQnG2no3F1aF6wfArevKHCvD7RdTREhJleetsUDQ=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1722992363; c=relaxed/simple;
-	bh=YRxhSZcXzZ3N8gSf6PktoLzo3jlanXKSBRgOvIIXwAU=;
+	s=arc-20240116; t=1722992395; c=relaxed/simple;
+	bh=s41LjGE5nZIC7BCsf90Lv4GzrhJ8WVGUe19doM7vyOE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GwULCkZ2s7WTGIOZy6Kb/svpU2M4YyzxVkOPMMATAz4VeZ059LbuxWpePwM+cpIJYmnvJBWWfDx3LMuTlLfUFQhGGWnnRkILfEwp9r+0CN3Rk+rp6HOquaN3UPsc6TuIyFul8oN6gCQfbONGHTVTAVCysC5aIUo9mnHnglyVqYM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=JAWwBBlC; arc=fail smtp.client-ip=40.107.95.77
+	 MIME-Version:Content-Type; b=MN/YWQtDk4enPTcSrpWcjkduVD2AkWLEuqhRqTR0EfP8tvF699+CpdBLaUgM+K/XdvRikj+heeV8JFcAu7oEHbsS7jdGqAChIBrW8DP/VHiDg5JbtA2p/+nrkFDLNVMxGgAIUHbHH2Stw14JDUZulyAu0qCGu418xa7YrqxBOMk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=rfFjvCGQ; arc=fail smtp.client-ip=40.107.92.68
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PC3ZyMJaCuBJwYC9QqJQVi5p4GeC6ZX2dIDMwqmup1Yeplpmu0EsJ2YzTa1a/CBHdY9E5JQIDZ/vKJ1l5GoiftNgIFsz75R7s39YlFh9Wlgor37aEzt5RVVUja3Qy7l1ZDb2VfE441gxgl+9906X2PZRqLnyTVCwTbpKVVeXQuvLdY0I2JFdlCyGQ4KEBe66EQOJRcIDULlMLDp8UqxGkQ5WVZFldxc1tKrTvtSKUPPFQovDhkFviZv4nY8oMd7PRhqf6ZSLNLqVhEm/v8qNxkBZKbsCM4W4NzzICTCzXHCqOVMk/rYj9C5HHq7OwOU9et7w2g+4yFElwElltehdVw==
+ b=od/FW08UxFOdc6nxB/SPyk/iOen4q0wK1bxWpXg0Pzu7c3c14cs7AReoeq/IraTUv469WiVQZxJTpEerZTIMGOHDSF17DsSW+rQCSZ+n/VJSBr9UFUQbkSwyiSUwyz/EJINkJ9IYfqsJDXAPC3EfPxEQcYXo5SVXUDeTAdZWNWj73bYaeNzTGfNIdOHaOJqN0dQn0S0mJFZHHoBGDrOHFWH+ygFO5CuE6y1vaYa9jn4CwKMW/MZ2O4FHX/kkEem22GRHSv0nRPg5T9fFkG3UJGnowdaXHPLTNMa/L7r5XQbuG7vQvmPbrqKTGY6Wjrk1SiKXgLSx2xp4bC0B7Wj+WQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=yONzLncC5SPQJ0saSVsx2+agJazN3SngxHHPxFtrDKo=;
- b=xTjFW/sf0Elj15/s2nyh8T0p3vBDt3S+KKUqUZZiY0Fxmaud2qL7KCwn27RCs6P4yNdsqXU2WCAIhA6ySQbzfOH+LKhR6hx23NDzIS16ljGRyENkMD95tM1loOJP9Hlpgo9PZ9lMavnrukF+QQhDzrEYM3F74jrOQCKAcmzgrfOPgxTjksdg7DfjRS/O/NaS9MwGuTkDEP1b8NO0i0sLOmSvE9DaJ++sPOrNNz/W/4y2GomXFduzGVVLYWFB9JcP+wo8LLuQvo4hYODSD5CtX/CVxG0C29u/l7xaz2ulh9bPYHcGNiDLThbFoE5T0VhNbZ/bmMDcpZXT2BuagEFLUA==
+ bh=pAjtyXOJ+SnlJAkUKl2DdR8efYzHp74wt2fiIwaqP5Y=;
+ b=GpX2GkTH3S49RbNhXsSvFsy7AKA5lNsFAFF+Y/Y7ocIfCXVk4XF23sgdXe5z/AzK0wAspXf2reIEEbpFJbZ9ypLPmQdRbX5GFq4Y2SgLPT1qqPg18j5bntgXkm26xLsa2UacdNQw9CF9Byb4FbhscO5zsLwKC1PH+V8Ft5WkMnoi0GOy4ONZ/BmDlshsnFZ1AToJfPAWRvCM2cs04qCin/7/nbpfgaKetNhZ1Ct3QJoE5HwK0TMelfE85hGnozFe7cnpwS0cjkmpGio4Vnt9ZNAQ2ILHJKugTf9QqaqlgyEgLVwqefzaT5ixfyatxJMOv9b7k0a8s8CKc6inKiu6Gg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=yONzLncC5SPQJ0saSVsx2+agJazN3SngxHHPxFtrDKo=;
- b=JAWwBBlCMdNv245PVPHBxiLnnb88oudLg5n+YvaYLf9eYbSaZbXvLKsUSCI/9BPAhqFb88ToNY2RRlNhNEl4k2vfOX57AKjxOyP46aeQL+mlp+q+IJnMnirzi096Am27otsF6gl6TdIF5MHvnhJHz81EPFZGUADftYmhpGnGIh4=
-Received: from PH3PEPF000040A2.namprd05.prod.outlook.com (2603:10b6:518:1::56)
- by BY5PR12MB4145.namprd12.prod.outlook.com (2603:10b6:a03:212::11) with
+ bh=pAjtyXOJ+SnlJAkUKl2DdR8efYzHp74wt2fiIwaqP5Y=;
+ b=rfFjvCGQNrFhtp/lbDKyKwH5inAfNazVCD8amCZZggo98+C1B9xnghgVf0WWdNWTrTcRBG7lkVPuJxxIAw7Uj0YPNkh9QfQlHFAw0AlnFytLBK+wP+PjREehvafKDhjAJCA67qBz+JiXwqO4NmBY/bEmbAJVg1A8Uaa+O0cXM4g=
+Received: from BN9PR03CA0524.namprd03.prod.outlook.com (2603:10b6:408:131::19)
+ by SJ2PR12MB8782.namprd12.prod.outlook.com (2603:10b6:a03:4d0::21) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.27; Wed, 7 Aug
- 2024 00:59:18 +0000
-Received: from SN1PEPF0002BA4D.namprd03.prod.outlook.com
- (2a01:111:f403:f90c::) by PH3PEPF000040A2.outlook.office365.com
- (2603:1036:903:49::3) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.7 via Frontend
- Transport; Wed, 7 Aug 2024 00:59:17 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.24; Wed, 7 Aug
+ 2024 00:59:50 +0000
+Received: from BN3PEPF0000B076.namprd04.prod.outlook.com
+ (2603:10b6:408:131:cafe::3f) by BN9PR03CA0524.outlook.office365.com
+ (2603:10b6:408:131::19) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.28 via Frontend
+ Transport; Wed, 7 Aug 2024 00:59:49 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF0002BA4D.mail.protection.outlook.com (10.167.242.70) with Microsoft
+ BN3PEPF0000B076.mail.protection.outlook.com (10.167.243.121) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7828.19 via Frontend Transport; Wed, 7 Aug 2024 00:59:17 +0000
+ 15.20.7849.8 via Frontend Transport; Wed, 7 Aug 2024 00:59:49 +0000
 Received: from ruby-9130host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 6 Aug
- 2024 19:59:16 -0500
+ 2024 19:59:48 -0500
 From: Melody Wang <huibo.wang@amd.com>
 To: <kvm@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <x86@kernel.org>
 CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
@@ -78,9 +78,9 @@ CC: Sean Christopherson <seanjc@google.com>, Paolo Bonzini
 	<dave.hansen@linux.intel.com>, Tom Lendacky <thomas.lendacky@amd.com>,
 	"Ashish Kalra" <ashish.kalra@amd.com>, Michael Roth <michael.roth@amd.com>,
 	"Melody Wang" <huibo.wang@amd.com>
-Subject: [PATCH 2/6] KVM: SVM: Add support for the SEV-SNP #HV doorbell page NAE event
-Date: Wed, 7 Aug 2024 00:57:56 +0000
-Message-ID: <dc0a62a111793c6e1db36ecd92808d5874244f6b.1722989996.git.huibo.wang@amd.com>
+Subject: [PATCH 3/6] KVM: SVM: Inject #HV when restricted injection is active
+Date: Wed, 7 Aug 2024 00:57:57 +0000
+Message-ID: <7dfe041d3ad27a082c000fe1cc6d7eea14296519.1722989996.git.huibo.wang@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1722989996.git.huibo.wang@amd.com>
 References: <cover.1722989996.git.huibo.wang@amd.com>
@@ -96,202 +96,347 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA4D:EE_|BY5PR12MB4145:EE_
-X-MS-Office365-Filtering-Correlation-Id: c047f845-2992-4880-0e75-08dcb67c2a21
+X-MS-TrafficTypeDiagnostic: BN3PEPF0000B076:EE_|SJ2PR12MB8782:EE_
+X-MS-Office365-Filtering-Correlation-Id: d7b9d7fa-4a2f-4f1c-580d-08dcb67c3d1a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+	BCL:0;ARA:13230040|1800799024|82310400026|376014|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?dIqjzg8hcNehcmf9MCyzTc4spZspgvOuc+6kao+F8PWdlzK6xNSPEd1zq4Az?=
- =?us-ascii?Q?VJOEpG9WXmfRNK9yZ8Xbz0N6gpE8LtWMd3FVJQh8ALeYMBwxH8ewhK7Vwr8a?=
- =?us-ascii?Q?tLrcYN0r/ZduZ/FFrbVHtclcpZaRUe7rIYAX6SkX29cTMacKzXerZw/ELL3b?=
- =?us-ascii?Q?BN7P8k8GVYgONS2m8ywGLu7QrtZa3zBZ/Nog6IbQYRXGE3mMCEMuWDJKSWTl?=
- =?us-ascii?Q?WvdhfQ/J2bQrh+1f0TBWySsELDM9gOjZ9IZVDpOKAe+Qu5wuvOqSGpt6nlie?=
- =?us-ascii?Q?3Z1BOY295vTFQggv3uJDGPsyeyKN4qNT8oL6R4jlHd3iKcXru8JQ+xl83dlx?=
- =?us-ascii?Q?HYauUjYP5FH7q1s4gSBjPpPhMmlyKBkOKu6tkwd32skqbqj41dgph+D1OAHH?=
- =?us-ascii?Q?QbU4X1gRyzZGhEhJa8sWjOsOMnB90kFZOkVju3ZyCnZNYeEHVjy5t7bLDxx6?=
- =?us-ascii?Q?Ap4DGEPnCafUBopX9BylC78O03tIN9ebaJhezQdjOK9FRAnrCeT2gdhJoQDr?=
- =?us-ascii?Q?RrhIdqzYpN4qaYzUpx7SxbBeDeVTK04RLJ3HHp1ImJdr9iQpO2141JrLc/rn?=
- =?us-ascii?Q?lBqWLXHpjWdn6vP29ddIzzTpMyj+ZxJLoRDQ6idm5zvUGcfL/+PVC517RWp3?=
- =?us-ascii?Q?XI8y2DiViQIixmwXOzswmPfOlA8+xnxY4pRK7HVC/h/QdZlHU+/k9CkYlsf1?=
- =?us-ascii?Q?gZuuTlN7hM4h+9+trM4hQQbA+tDraUcOLZTonqrrxuIRrc1VOycnpjE1UzP3?=
- =?us-ascii?Q?LdlIqxiwZhdvc09tRr85Xs9EaPDtADWaSygdflG+wn2uCfjV6HBO5MfJJHbY?=
- =?us-ascii?Q?k0HRQQNWtl4Ydtd8VFuW3HMt5ebasiSb4jB2SZ3m5/oFO4fYs0vmHX/Vmolo?=
- =?us-ascii?Q?b+soJ6Q3b0O131YbOKGq2EeW700NSx+NuosRWyW7r7EUG4HCnPTN+qEwiGqI?=
- =?us-ascii?Q?B3lqCj8F2obgkQ++vXlmZwttkNjLLoHvTMagEvEunpKiI9WvrzMVsHz0y7dx?=
- =?us-ascii?Q?6x3W4X+TyGHwvagFLlUUgeSQKwYlR5/vjPAEKaYCgZ8ecWKiAFDWIdUuqDAJ?=
- =?us-ascii?Q?4lEC6SUycY0gfhOVURLxx5ueQkSUiRnzqSJ9WXPUsYhRqxBHJZCvXCJOGhnY?=
- =?us-ascii?Q?0+dJKONcIt9G/9jCiAh+n6aj9ZXG4wZndPhw+n9Lcp7nEKHGoN9dO1Lo70Dg?=
- =?us-ascii?Q?nhOV31oz9sYc0sV1uq+Getj5m/FOQo0m4hjjrxic1oTFz7Tt6XDhYQ5SF4PL?=
- =?us-ascii?Q?jGt2I8hHBTPuqN2z0tU3vxiTp2LBfLoqPtu6vuGBFXONVR26RRVsjxriPEbT?=
- =?us-ascii?Q?stnTvcTuZyljpbow+1vMwvYgmNhiiL9tBHk7qNIiywQKQ4ydVCcMLJxdh+E9?=
- =?us-ascii?Q?WmGDfr1YAhDTX4QQfPedPD4D3UA5ahyQIlYTLDMvhE0137xwSzZ4VX/28bjg?=
- =?us-ascii?Q?/KHGpCoeCbl2oQ6jx9CEgDCZC/yWnbEw?=
+	=?us-ascii?Q?VS2v/MKxnT1bB3kgVGhyUQ6FTNYBbo0c6ORrW7atyv8vSy3MQ8Z3bJTsO/Jq?=
+ =?us-ascii?Q?3ED2v+2Nnrx8nwKxIEz6dZXq/VTlzVIQr0+ztbFx473qcljsNfIZcrweKXMH?=
+ =?us-ascii?Q?5soQRP7OQ+/QgOcbUF4Uuixxik2EyJhUOKCmm0kK4lyR8hXmy9296l9ZUCiG?=
+ =?us-ascii?Q?5JLcuVnd/ctXAbCTe4l8V/v3L5HBTazgnmDD1P/c/kC5W8RTfberqSTRwFLw?=
+ =?us-ascii?Q?V1g0qGQURSv82Twi7WZgUw82LCKfGOaSZg9mw57UlrUntz9/WqVNdxC45Wih?=
+ =?us-ascii?Q?M43os8xEDK/Uzo/UMWW1ocjYFdgtBlk9tSYECYdabyxgfYqls8Pzih7RhW1O?=
+ =?us-ascii?Q?6Vypj15vIprGa4fS1J4vJfLBObWSP7GH9/bEGgjSA1ZKA1XjWqhFF2KNrgby?=
+ =?us-ascii?Q?PuHL1meecMl1xf61WdKnqvaBprKMWwSwbJUvss4BgHHOOVZiNYs8KzNqK5o1?=
+ =?us-ascii?Q?lLt522dLIoFJzBOgGcGNI4ETw4hFUU81RXq6KM5Ycel6RxcAoTWvLNqEXUIt?=
+ =?us-ascii?Q?SdpffAxmpZ1S7nGPWMt156/0cVmICN9rgPV5Nt4j4F3HaiT978TyJaTrzh8o?=
+ =?us-ascii?Q?E5fDlGVxkFC1dGwxoMLq+OWZv6MNv5i1ZPxhRAMpExkOmHfhCBKdM+Y6mn5C?=
+ =?us-ascii?Q?9dCqCTFmHjE8qRlmafq/IZmdde7UCZz9SCBUU6QLs7Sr6Qj89QwSwKo1lqtL?=
+ =?us-ascii?Q?zmsH5VbumEQZHi6rYFoh0E4ZtlpL4SYvLl6HU33qARo7C2Fzxl9hmw07jfqf?=
+ =?us-ascii?Q?s1gIu7mgHiEKJHofYCx6iGz8KTbYgW1uT3NTxFMpY0VItx9H0cRLI0BJJWbT?=
+ =?us-ascii?Q?Yh4k5u/bpYvinD96KP5BzfcBkR7+MaXR/qX4swluYedTXGyrSJZv+CG7GO3a?=
+ =?us-ascii?Q?nt9Q1Al7As9Q+x7zCl6P3ER7MJTzRfGl/S3v8HYp9UOvzN8bP4dUIeVWZkSt?=
+ =?us-ascii?Q?p+ovsGtP5qeENIlClZQ70y26lje75Sb8jjXCIonuf2FmgU91e3bCw+xItuQP?=
+ =?us-ascii?Q?MiEjpZS/8jTYlUAD7A6bH1ykctug2jNTfm3gQpu1QGvIw3esU/6nA7+S+X7U?=
+ =?us-ascii?Q?eVC+1J0Oqv+2QbK/r3CGH9YnwbXkXjfI1lnhIogk4APlT7fIW467pWAe4NAq?=
+ =?us-ascii?Q?T36c7pZhUTQopygfagicS5wsn/Pm9c2+55nhlEqlCGJthKN8LFCsiSghoZeQ?=
+ =?us-ascii?Q?XpfP3YQ3xr/tywRn6b94G+u5V3uqvM+7P+QDKGLIaPSGpKTSEnBQ+8tnXNms?=
+ =?us-ascii?Q?Fcp9JeegIz2otMyMT6MHQSYij3rwaQvY8COUs0Kxj+AQFihN9LSbIvLxoumA?=
+ =?us-ascii?Q?3ZxT8/ONRqgo8EUGblDTUjA2BACSqK0FvVKuB0v5eqOJQyAQcx0jD6hCOi9M?=
+ =?us-ascii?Q?ZBqRC0vmaUBJzTk5/NkqV6h+eoeAnrt/3xdUMxS8QDJe1Kh34v1HAK9Paax0?=
+ =?us-ascii?Q?5OdpucxBPsVJYnct+AhEJlaQ458bcUEf?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(376014)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 00:59:17.7839
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 00:59:49.6479
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c047f845-2992-4880-0e75-08dcb67c2a21
+X-MS-Exchange-CrossTenant-Network-Message-Id: d7b9d7fa-4a2f-4f1c-580d-08dcb67c3d1a
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002BA4D.namprd03.prod.outlook.com
+	BN3PEPF0000B076.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4145
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB8782
 
-To support the SEV-SNP Restricted Injection feature, the SEV-SNP guest must
-register a #HV doorbell page for use with the #HV.
+When restricted injection is active, only #HV exceptions can be injected into
+the SEV-SNP guest.
 
-The #HV doorbell page NAE event allows the guest to register a #HV doorbell
-page. The NAE event consists of four actions: GET_PREFERRED, SET, QUERY, CLEAR.
-Implement the NAE event as per GHCB specification.
+Detect that restricted injection feature is active for the guest, and then
+follow the #HV doorbell communication from the GHCB specification to inject the
+interrupt or exception.
 
 Co-developed-by: Thomas Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Thomas Lendacky <thomas.lendacky@amd.com>
 Signed-off-by: Melody Wang <huibo.wang@amd.com>
 ---
- arch/x86/include/uapi/asm/svm.h |  5 +++
- arch/x86/kvm/svm/sev.c          | 73 +++++++++++++++++++++++++++++++++
- arch/x86/kvm/svm/svm.h          |  2 +
- 3 files changed, 80 insertions(+)
+ arch/x86/include/uapi/asm/kvm.h |   1 +
+ arch/x86/kvm/svm/sev.c          | 153 ++++++++++++++++++++++++++++++++
+ arch/x86/kvm/svm/svm.c          |  19 +++-
+ arch/x86/kvm/svm/svm.h          |  21 ++++-
+ 4 files changed, 190 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/uapi/asm/svm.h b/arch/x86/include/uapi/asm/svm.h
-index 1814b413fd57..7905c9be44d1 100644
---- a/arch/x86/include/uapi/asm/svm.h
-+++ b/arch/x86/include/uapi/asm/svm.h
-@@ -115,6 +115,11 @@
- #define SVM_VMGEXIT_AP_CREATE_ON_INIT		0
- #define SVM_VMGEXIT_AP_CREATE			1
- #define SVM_VMGEXIT_AP_DESTROY			2
-+#define SVM_VMGEXIT_HVDB_PAGE                   0x80000014
-+#define SVM_VMGEXIT_HVDB_GET_PREFERRED          0
-+#define SVM_VMGEXIT_HVDB_SET                    1
-+#define SVM_VMGEXIT_HVDB_QUERY                  2
-+#define SVM_VMGEXIT_HVDB_CLEAR                  3
- #define SVM_VMGEXIT_SNP_RUN_VMPL		0x80000018
- #define SVM_VMGEXIT_HV_FEATURES			0x8000fffd
- #define SVM_VMGEXIT_TERM_REQUEST		0x8000fffe
+diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
+index bf57a824f722..f5d85174e658 100644
+--- a/arch/x86/include/uapi/asm/kvm.h
++++ b/arch/x86/include/uapi/asm/kvm.h
+@@ -35,6 +35,7 @@
+ #define MC_VECTOR 18
+ #define XM_VECTOR 19
+ #define VE_VECTOR 20
++#define HV_VECTOR 28
+ 
+ /* Select x86 specific features in <linux/kvm.h> */
+ #define __KVM_HAVE_PIT
 diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-index 532df12b43c5..19ee3f083cad 100644
+index 19ee3f083cad..0d330b3357bc 100644
 --- a/arch/x86/kvm/svm/sev.c
 +++ b/arch/x86/kvm/svm/sev.c
-@@ -3409,6 +3409,10 @@ static int sev_es_validate_vmgexit(struct vcpu_svm *svm)
- 		    control->exit_info_1 == control->exit_info_2)
- 			goto vmgexit_err;
- 		break;
-+	case SVM_VMGEXIT_HVDB_PAGE:
-+		if (!sev_snp_guest(vcpu->kvm))
-+			goto vmgexit_err;
-+		break;
- 	default:
- 		reason = GHCB_ERR_INVALID_EVENT;
- 		goto vmgexit_err;
-@@ -4124,6 +4128,66 @@ static int snp_handle_ext_guest_req(struct vcpu_svm *svm, gpa_t req_gpa, gpa_t r
- 	return 1; /* resume guest */
- }
+@@ -5022,3 +5022,156 @@ int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
  
-+static int sev_snp_hv_doorbell_page(struct vcpu_svm *svm)
+ 	return level;
+ }
++
++static void prepare_hv_injection(struct vcpu_svm *svm, struct hvdb *hvdb)
 +{
-+	struct kvm_vcpu *vcpu = &svm->vcpu;
-+	struct kvm_host_map hvdb_map;
-+	gpa_t hvdb_gpa;
-+	u64 request;
++	if (hvdb->events.no_further_signal)
++		return;
 +
-+	if (!sev_snp_guest(vcpu->kvm))
-+		return -EINVAL;
++	svm->vmcb->control.event_inj = HV_VECTOR |
++				       SVM_EVTINJ_TYPE_EXEPT |
++				       SVM_EVTINJ_VALID;
++	svm->vmcb->control.event_inj_err = 0;
 +
-+	request = svm->vmcb->control.exit_info_1;
-+	hvdb_gpa = svm->vmcb->control.exit_info_2;
-+
-+	switch (request) {
-+	case SVM_VMGEXIT_HVDB_GET_PREFERRED:
-+		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, ~0ULL);
-+		break;
-+	case SVM_VMGEXIT_HVDB_SET:
-+		svm->sev_es.hvdb_gpa = INVALID_PAGE;
-+
-+		if (!PAGE_ALIGNED(hvdb_gpa)) {
-+			vcpu_unimpl(vcpu, "vmgexit: unaligned #HV doorbell page address [%#llx] from guest\n",
-+				    hvdb_gpa);
-+			return -EINVAL;
-+		}
-+
-+		if (!page_address_valid(vcpu, hvdb_gpa)) {
-+			vcpu_unimpl(vcpu, "vmgexit: invalid #HV doorbell page address [%#llx] from guest\n",
-+				    hvdb_gpa);
-+			return -EINVAL;
-+		}
-+
-+		/* Map and unmap the GPA just to be sure the GPA is valid */
-+		if (kvm_vcpu_map(vcpu, gpa_to_gfn(hvdb_gpa), &hvdb_map)) {
-+			/* Unable to map #HV doorbell page from guest */
-+			vcpu_unimpl(vcpu, "vmgexit: error mapping #HV doorbell page [%#llx] from guest\n",
-+				    hvdb_gpa);
-+			return -EINVAL;
-+		}
-+		kvm_vcpu_unmap(vcpu, &hvdb_map, true);
-+
-+		svm->sev_es.hvdb_gpa = hvdb_gpa;
-+		fallthrough;
-+	case SVM_VMGEXIT_HVDB_QUERY:
-+		ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, svm->sev_es.hvdb_gpa);
-+		break;
-+	case SVM_VMGEXIT_HVDB_CLEAR:
-+		svm->sev_es.hvdb_gpa = INVALID_PAGE;
-+		break;
-+	default:
-+		svm->sev_es.hvdb_gpa = INVALID_PAGE;
-+
-+		vcpu_unimpl(vcpu, "vmgexit: invalid #HV doorbell page request [%#llx] from guest\n",
-+			    request);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
++	hvdb->events.no_further_signal = 1;
 +}
 +
- static int sev_handle_vmgexit_msr_protocol(struct vcpu_svm *svm)
- {
- 	struct vmcb_control_area *control = &svm->vmcb->control;
-@@ -4404,6 +4468,14 @@ int sev_handle_vmgexit(struct kvm_vcpu *vcpu)
- 	case SVM_VMGEXIT_EXT_GUEST_REQUEST:
- 		ret = snp_handle_ext_guest_req(svm, control->exit_info_1, control->exit_info_2);
- 		break;
-+	case SVM_VMGEXIT_HVDB_PAGE:
-+		if (sev_snp_hv_doorbell_page(svm)) {
-+			ghcb_set_sw_exit_info_1(svm->sev_es.ghcb, 2);
-+			ghcb_set_sw_exit_info_2(svm->sev_es.ghcb, GHCB_ERR_INVALID_INPUT);
-+		}
++static void unmap_hvdb(struct kvm_vcpu *vcpu, struct kvm_host_map *map)
++{
++	kvm_vcpu_unmap(vcpu, map, true);
++}
 +
-+		ret = 1;
-+		break;
- 	case SVM_VMGEXIT_UNSUPPORTED_EVENT:
- 		vcpu_unimpl(vcpu,
- 			    "vmgexit: unsupported event - exit_info_1=%#llx, exit_info_2=%#llx\n",
-@@ -4571,6 +4643,7 @@ void sev_es_vcpu_reset(struct vcpu_svm *svm)
- 					    sev_enc_bit));
++static struct hvdb *map_hvdb(struct kvm_vcpu *vcpu, struct kvm_host_map *map)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	if (!VALID_PAGE(svm->sev_es.hvdb_gpa))
++		return NULL;
++
++	if (kvm_vcpu_map(vcpu, gpa_to_gfn(svm->sev_es.hvdb_gpa), map)) {
++		/* Unable to map #HV doorbell page from guest */
++		vcpu_unimpl(vcpu, "snp: error mapping #HV doorbell page [%#llx] from guest\n",
++			    svm->sev_es.hvdb_gpa);
++
++		return NULL;
++	}
++
++	return map->hva;
++}
++
++static bool __sev_snp_inject(enum inject_type type, struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct kvm_host_map hvdb_map;
++	struct hvdb *hvdb;
++
++	hvdb = map_hvdb(vcpu, &hvdb_map);
++	if (!hvdb)
++		return false;
++
++	hvdb->events.vector = vcpu->arch.interrupt.nr;
++
++	prepare_hv_injection(svm, hvdb);
++
++	unmap_hvdb(vcpu, &hvdb_map);
++
++	return true;
++}
++
++bool sev_snp_queue_exception(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++
++	if (!sev_snp_is_rinj_active(vcpu))
++		return false;
++
++	/*
++	 * Restricted injection is enabled, only #HV is supported.
++	 * If the vector is not HV_VECTOR, do not inject the exception,
++	 * then return true to skip the original injection path.
++	 */
++	if (WARN_ONCE(vcpu->arch.exception.vector != HV_VECTOR,
++		      "restricted injection enabled, exception %u injection not supported\n",
++		      vcpu->arch.exception.vector))
++		return true;
++
++	/*
++	 * An intercept likely occurred during #HV delivery, so re-inject it
++	 * using the current HVDB pending event values.
++	 */
++	svm->vmcb->control.event_inj = HV_VECTOR |
++				       SVM_EVTINJ_TYPE_EXEPT |
++				       SVM_EVTINJ_VALID;
++	svm->vmcb->control.event_inj_err = 0;
++
++	return true;
++}
++
++bool sev_snp_inject(enum inject_type type, struct kvm_vcpu *vcpu)
++{
++	if (!sev_snp_is_rinj_active(vcpu))
++		return false;
++
++	return __sev_snp_inject(type, vcpu);
++}
++
++void sev_snp_cancel_injection(struct kvm_vcpu *vcpu)
++{
++	struct vcpu_svm *svm = to_svm(vcpu);
++	struct kvm_host_map hvdb_map;
++	struct hvdb *hvdb;
++
++	if (!sev_snp_is_rinj_active(vcpu))
++		return;
++
++	if (!svm->vmcb->control.event_inj)
++		return;
++
++	if ((svm->vmcb->control.event_inj & SVM_EVTINJ_VEC_MASK) != HV_VECTOR)
++		return;
++
++	/*
++	 * Copy the information in the doorbell page into the event injection
++	 * fields to complete the cancellation flow.
++	 */
++	hvdb = map_hvdb(vcpu, &hvdb_map);
++	if (!hvdb)
++		return;
++
++	if (!hvdb->events.pending_events) {
++		/* No pending events, then event_inj field should be 0 */
++		WARN_ON_ONCE(svm->vmcb->control.event_inj);
++		goto out;
++	}
++
++	/* Copy info back into event_inj field (replaces #HV) */
++	svm->vmcb->control.event_inj = SVM_EVTINJ_VALID;
++
++	if (hvdb->events.vector)
++		svm->vmcb->control.event_inj |= hvdb->events.vector |
++						SVM_EVTINJ_TYPE_INTR;
++
++	hvdb->events.pending_events = 0;
++
++out:
++	unmap_hvdb(vcpu, &hvdb_map);
++}
++
++bool sev_snp_blocked(enum inject_type type, struct kvm_vcpu *vcpu)
++{
++	struct kvm_host_map hvdb_map;
++	struct hvdb *hvdb;
++	bool blocked;
++
++	/* Indicate interrupts are blocked if doorbell page can't be mapped */
++	hvdb = map_hvdb(vcpu, &hvdb_map);
++	if (!hvdb)
++		return true;
++
++	/* Indicate interrupts blocked based on guest acknowledgment */
++	blocked = !!hvdb->events.vector;
++
++	unmap_hvdb(vcpu, &hvdb_map);
++
++	return blocked;
++}
+diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
+index d6f252555ab3..a48388d99c97 100644
+--- a/arch/x86/kvm/svm/svm.c
++++ b/arch/x86/kvm/svm/svm.c
+@@ -447,6 +447,9 @@ static int svm_update_soft_interrupt_rip(struct kvm_vcpu *vcpu)
+ 	svm->soft_int_old_rip = old_rip;
+ 	svm->soft_int_next_rip = rip;
  
- 	mutex_init(&svm->sev_es.snp_vmsa_mutex);
-+	svm->sev_es.hvdb_gpa = INVALID_PAGE;
++	if (sev_snp_queue_exception(vcpu))
++		return 0;
++
+ 	if (nrips)
+ 		kvm_rip_write(vcpu, old_rip);
+ 
+@@ -467,6 +470,9 @@ static void svm_inject_exception(struct kvm_vcpu *vcpu)
+ 	    svm_update_soft_interrupt_rip(vcpu))
+ 		return;
+ 
++	if (sev_snp_queue_exception(vcpu))
++		return;
++
+ 	svm->vmcb->control.event_inj = ex->vector
+ 		| SVM_EVTINJ_VALID
+ 		| (ex->has_error_code ? SVM_EVTINJ_VALID_ERR : 0)
+@@ -3662,10 +3668,12 @@ static void svm_inject_irq(struct kvm_vcpu *vcpu, bool reinjected)
+ 
+ 	trace_kvm_inj_virq(vcpu->arch.interrupt.nr,
+ 			   vcpu->arch.interrupt.soft, reinjected);
+-	++vcpu->stat.irq_injections;
+ 
+-	svm->vmcb->control.event_inj = vcpu->arch.interrupt.nr |
+-				       SVM_EVTINJ_VALID | type;
++	if (!sev_snp_inject(INJECT_IRQ, vcpu))
++		svm->vmcb->control.event_inj = vcpu->arch.interrupt.nr |
++						SVM_EVTINJ_VALID | type;
++
++	++vcpu->stat.irq_injections;
  }
  
- void sev_es_prepare_switch_to_guest(struct vcpu_svm *svm, struct sev_es_save_area *hostsa)
+ void svm_complete_interrupt_delivery(struct kvm_vcpu *vcpu, int delivery_mode,
+@@ -3810,6 +3818,9 @@ bool svm_interrupt_blocked(struct kvm_vcpu *vcpu)
+ 	if (!gif_set(svm))
+ 		return true;
+ 
++	if (sev_snp_is_rinj_active(vcpu))
++		return sev_snp_blocked(INJECT_IRQ, vcpu);
++
+ 	if (is_guest_mode(vcpu)) {
+ 		/* As long as interrupts are being delivered...  */
+ 		if ((svm->nested.ctl.int_ctl & V_INTR_MASKING_MASK)
+@@ -4128,6 +4139,8 @@ static void svm_cancel_injection(struct kvm_vcpu *vcpu)
+ 	struct vcpu_svm *svm = to_svm(vcpu);
+ 	struct vmcb_control_area *control = &svm->vmcb->control;
+ 
++	sev_snp_cancel_injection(vcpu);
++
+ 	control->exit_int_info = control->event_inj;
+ 	control->exit_int_info_err = control->event_inj_err;
+ 	control->event_inj = 0;
 diff --git a/arch/x86/kvm/svm/svm.h b/arch/x86/kvm/svm/svm.h
-index 76107c7d0595..f0f14801e122 100644
+index f0f14801e122..95c0a7070bd1 100644
 --- a/arch/x86/kvm/svm/svm.h
 +++ b/arch/x86/kvm/svm/svm.h
-@@ -225,6 +225,8 @@ struct vcpu_sev_es_state {
- 	gpa_t snp_vmsa_gpa;
- 	bool snp_ap_waiting_for_reset;
- 	bool snp_has_guest_vmsa;
-+
-+	gpa_t hvdb_gpa;
- };
+@@ -41,6 +41,10 @@ extern bool x2avic_enabled;
+ extern bool vnmi;
+ extern int lbrv;
  
- struct vcpu_svm {
++enum inject_type {
++	INJECT_IRQ,
++};
++
+ /*
+  * Clean bits in VMCB.
+  * VMCB_ALL_CLEAN_MASK might also need to
+@@ -751,6 +755,17 @@ void sev_snp_init_protected_guest_state(struct kvm_vcpu *vcpu);
+ int sev_gmem_prepare(struct kvm *kvm, kvm_pfn_t pfn, gfn_t gfn, int max_order);
+ void sev_gmem_invalidate(kvm_pfn_t start, kvm_pfn_t end);
+ int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn);
++bool sev_snp_queue_exception(struct kvm_vcpu *vcpu);
++bool sev_snp_inject(enum inject_type type, struct kvm_vcpu *vcpu);
++void sev_snp_cancel_injection(struct kvm_vcpu *vcpu);
++bool sev_snp_blocked(enum inject_type type, struct kvm_vcpu *vcpu);
++static inline bool sev_snp_is_rinj_active(struct kvm_vcpu *vcpu)
++{
++	struct kvm_sev_info *sev = &to_kvm_svm(vcpu->kvm)->sev_info;
++
++	return sev_snp_guest(vcpu->kvm) &&
++		(sev->vmsa_features & SVM_SEV_FEAT_RESTRICTED_INJECTION);
++};
+ #else
+ static inline struct page *snp_safe_alloc_page_node(int node, gfp_t gfp)
+ {
+@@ -781,7 +796,11 @@ static inline int sev_private_max_mapping_level(struct kvm *kvm, kvm_pfn_t pfn)
+ {
+ 	return 0;
+ }
+-
++static inline bool sev_snp_queue_exception(struct kvm_vcpu *vcpu) { return false; }
++static inline bool sev_snp_inject(enum inject_type type, struct kvm_vcpu *vcpu) { return false; }
++static inline void sev_snp_cancel_injection(struct kvm_vcpu *vcpu) {}
++static inline bool sev_snp_blocked(enum inject_type type, struct kvm_vcpu *vcpu) { return false; }
++static inline bool sev_snp_is_rinj_active(struct kvm_vcpu *vcpu) { return false; }
+ #endif
+ 
+ /* vmenter.S */
 -- 
 2.34.1
 
