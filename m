@@ -1,312 +1,371 @@
-Return-Path: <kvm+bounces-23584-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23585-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33FDB94B2E7
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 00:16:35 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E48C94B316
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 00:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8DA23B21D47
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 22:16:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F0D91F2314D
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 22:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CED7A155300;
-	Wed,  7 Aug 2024 22:16:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986E91552E0;
+	Wed,  7 Aug 2024 22:33:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Sf3e0laY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KAw0jKiL"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2084.outbound.protection.outlook.com [40.107.220.84])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6760112FF7B
-	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 22:16:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE088364A0;
+	Wed,  7 Aug 2024 22:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723068985; cv=fail; b=CNO6mASd8aRlTXEyQVWxtxglRFyqOIYylKiLV04s1cO+ixhrMgDOXR1ulk0pakXOErSJ3uuktZ+S1kuyjLJt8O+b2zbipIzkaxavreM9WdK9/RSIsmjzKJurWJip2HM9kY0CO5tsKNeyjjGcKTQ4ScUV/yQMOCu/rgp9LZA9nII=
+	t=1723069981; cv=fail; b=qRPnmTnjYu9fL0JS2+lhnMGfVb+cf3GQtcCwdJId/fs16k0jMYX87noXjaha0KDhSdI444izR65W12UaB4KzYnxvRTtFLmIQdT/6yXfzQqs7kwPzPk9yjfST8fRcEpPovb5r24RCK5G1yG8tt6N/vWkeLIETa4kEVni0BQWZWsk=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723068985; c=relaxed/simple;
-	bh=Fw9KVUBdGvsbEi8IcokP7GQKo0NzD2nk0LJXJF+JiLs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xg/2270Ex7oxoHVtVJsEhS+U5YG/o0S8tpF7fopVuscwk5bJCO3d0PDnLZfBFA4BmnDfnJOmkKUv/UsuKTye7ZEODo4ZUMzfIMUOWYTR+SnNU50MUjPsR53rL0gKCPHXVHV6p3a5ssmTWxdfneSyjFYjwED+8G5DdyFLhZMZpkc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Sf3e0laY; arc=fail smtp.client-ip=40.107.220.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+	s=arc-20240116; t=1723069981; c=relaxed/simple;
+	bh=Pw5FnqTYEW+Y0HQY4Fk3O6J44lUnq/WoUjnmbSpJe6c=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kIsacxs8aOa/SIz6H0WbBmFC4LRDfzlOrnm//nj908a+Wjz4fMWVvThIOdLeBUPLsTfh81qVB3gBHdrW9ZM1EsuC3gjXSIClXDTWkYb7PhEfLA8lCyWgugAReCoktz/N15IltgaRTs7xnFdH96E8meZPYIFJcK+W2e88IWDN8fY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KAw0jKiL; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723069980; x=1754605980;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=Pw5FnqTYEW+Y0HQY4Fk3O6J44lUnq/WoUjnmbSpJe6c=;
+  b=KAw0jKiLuLA/EqUvSZvYfsBwwqqWhj0nbeEDqtAQZ+CSD9lYIfVTE3Tn
+   2AnCj9SDuNGkwx3HTLRLxRkT1neUBruKJKUdLE00pdhhLFUiyuhFKsvwj
+   t7ocUMElT4ewr0/Z48o4bjc5/kwq4AtmqoW/dV0VodzXyxGoCIUVEgYXQ
+   25Uj653TCauBwQVvjPIzSXLHqIDKb0hfa/GDZ9qBZzOxG16Rqv6cuN4HY
+   J8YFhKtbZ3scCCqB+pvr4fNuRUth2RaQrtwFHj91nHDCAstIFMlDk8434
+   B85gvgvrpGO8GMB8Csw38Qahdy5WoYkfpQcFad16xj0+9NyVyv4UTDQC9
+   Q==;
+X-CSE-ConnectionGUID: h+g9PrVwRcKxktWxDmhyRw==
+X-CSE-MsgGUID: cyo8YCFNQpK/ckSnpATryA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="21330206"
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="21330206"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 15:32:59 -0700
+X-CSE-ConnectionGUID: EsG5YQw7SmOcI3g/doKQqQ==
+X-CSE-MsgGUID: 2JLNcimwTQesNQCjqTpTmA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="56966991"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Aug 2024 15:32:59 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 7 Aug 2024 15:32:58 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 7 Aug 2024 15:32:58 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.47) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 7 Aug 2024 15:32:58 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=B2SsSXXeWzPIdnJfrEQnZnZsXg8YLc88maSYB7SzFHUGZr5dPzbs9nm1qHhA6e0CrJH+qszP77vUzNyDHGkhWUh8f4HYE6thj9XpI580Ox6zgA6z6KN0Tv0mRF+GXqxbv2S6G1wAJUqWysWJQZNsUsWIwMMQIMAI604ZanctZpdXI2S0YpYy0z856lSP7dnmNWIKwXK0d3T3sTH+ei7KGqCxuxrrqF4UWTbxzJSex/vsayEIl7GEdOi177sUuz56QqZA9dcPqYn+imb42xMM2dz2t8grgHa3l0n9GfpsJ1MrtqOs57jyf9bPoHHTPqjEm6EOgyv3B+HX0vYU4PQb8g==
+ b=Ekj4ElmoqYVlB3mEeA9aP4TYJHwJRMSj74Qj82zKPHb2BBovFaCALCQs+UGs4vqeLANDh+STEtl0HqMKuwvMzGTlJLGyHUa35jZGdKHR5qdc7iL690sotYcWv8HSK751AOHcmTGthArFNjTFAgEzKlLNqPdI43JuCH3qIbcuqPOpufbG4Z2se0vSNoZvBT7JMyLISYoR4JB+wpt1nY6DR7qMwUOldiI3odjxVkHpxahonyujr0WUnsLJLG8rh4VRZWeTW3SUcGHlOUJ2RINAXjqzNls3eJj6E9xRqy4jp1VcafKgD75MSxmR/qNlu8OSISx507zKIU3kQKRN1AXjAQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qU01wNr2K0GjJI3XmGsd5NMH67il5Lz5Cf7NsaqNyAA=;
- b=tYpvWHd1+RDdxJaHOrBGSl8bGdxUDKGII0Fz70UX0O6v21oywny0yQJatzmM/rFx2LRTF2O73H98H1bWATQ6Ek6LQ4414swZubuQxyq4dszMgJE24VZKTDVW7wpj2KFqQ2kJuHgK8fQ/FAUXt9IarP++KmxysD3M6+p9I7CE6WRd85vv4N5coodqIp7knc/2mD7N6LnOVCGxjiTO2lS9r58JJ+Xot5lZeAraWAG0u6BT/LhEqj0JjohUS8rhQ3WsakQkpPGMV4V+vPfLNGw2S4J7Z5FsWuxo9GuSrwrleqUSw2r/skX9UAFa55LvTZHDimyeuEwv2Tr22nQPRmUWxg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=redhat.com smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qU01wNr2K0GjJI3XmGsd5NMH67il5Lz5Cf7NsaqNyAA=;
- b=Sf3e0laYTD7PQc5UEcrYX3CFY4w1tw4DK/yLaLzYeVibnEqV26RsoEzMxzP7Jt92hNNUsV30vNwpVBtMDJGRH7BPc1DbPdHHS7rwT/fcDnEPs9xMZJVdFZUjY4Ia5Q3mnFX8VTnVWnrdKx642CyfFpeK9QXiGZxyZk372YEe3k4=
-Received: from CH0PR03CA0336.namprd03.prod.outlook.com (2603:10b6:610:11a::8)
- by SJ1PR12MB6074.namprd12.prod.outlook.com (2603:10b6:a03:45f::14) with
+ bh=PlcVuXgqRveslBtflwEGc3Ww99KULbOquglkofy9zuI=;
+ b=ujs2PFurpYjQHG+aMfU3RrsmBeuV8JlupDawbpKSxB6w8H/w1LN6RzomDtJN1luKrulL7Lhw3vsdorwcUXGb4g50xGza1Cyjp9ZnGKBa9HWXPx8YOzrzG/3YKS08RfajQYDvIuFZxQoUWgNOoptA8LrHgnPCl8Vta+sh/siaEPTw4nX1JFRFDgt5Q2QLkDPW5EEeK3Uum946AvbqqEdEATYoDHbdXN1FfD9HAz9DjtoOv0U6HrbBEjOmn2BZWTdUSBe2KB8v13/X7LjU2N1mjkJqfF2uf49+HdESxyueHvPmnWXb9lrTQFmP5AHJTM8OlQIheMZy1Dv8+X9KUXw6bA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com (2603:10b6:208:385::18)
+ by MW4PR11MB6811.namprd11.prod.outlook.com (2603:10b6:303:208::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.27; Wed, 7 Aug
- 2024 22:16:20 +0000
-Received: from CH2PEPF00000145.namprd02.prod.outlook.com
- (2603:10b6:610:11a:cafe::99) by CH0PR03CA0336.outlook.office365.com
- (2603:10b6:610:11a::8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.29 via Frontend
- Transport; Wed, 7 Aug 2024 22:16:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF00000145.mail.protection.outlook.com (10.167.244.102) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7849.8 via Frontend Transport; Wed, 7 Aug 2024 22:16:20 +0000
-Received: from bmoger-ubuntu.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Wed, 7 Aug
- 2024 17:16:19 -0500
-From: Babu Moger <babu.moger@amd.com>
-To: <pbonzini@redhat.com>
-CC: <babu.moger@amd.com>, <qemu-devel@nongnu.org>, <kvm@vger.kernel.org>
-Subject: [PATCH v2 4/4] i386/cpu: Add support for EPYC-Turin model
-Date: Wed, 7 Aug 2024 17:15:46 -0500
-Message-ID: <5dfba6e394efd09ad397ebf812757235ddac84f9.1723068946.git.babu.moger@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cover.1723068946.git.babu.moger@amd.com>
-References: <cover.1723068946.git.babu.moger@amd.com>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Wed, 7 Aug
+ 2024 22:32:56 +0000
+Received: from BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b]) by BL1PR11MB5978.namprd11.prod.outlook.com
+ ([fe80::fdb:309:3df9:a06b%7]) with mapi id 15.20.7828.023; Wed, 7 Aug 2024
+ 22:32:56 +0000
+Message-ID: <179f9713-29d1-40db-8cfc-7a7596f73859@intel.com>
+Date: Thu, 8 Aug 2024 10:32:37 +1200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 08/10] x86/virt/tdx: Print TDX module basic information
+To: Dan Williams <dan.j.williams@intel.com>, "Hansen, Dave"
+	<dave.hansen@intel.com>, "seanjc@google.com" <seanjc@google.com>,
+	"bp@alien8.de" <bp@alien8.de>, "peterz@infradead.org" <peterz@infradead.org>,
+	"hpa@zytor.com" <hpa@zytor.com>, "mingo@redhat.com" <mingo@redhat.com>,
+	"kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
+	"pbonzini@redhat.com" <pbonzini@redhat.com>, "tglx@linutronix.de"
+	<tglx@linutronix.de>
+CC: "Gao, Chao" <chao.gao@intel.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "binbin.wu@linux.intel.com"
+	<binbin.wu@linux.intel.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "Edgecombe, Rick P"
+	<rick.p.edgecombe@intel.com>, "x86@kernel.org" <x86@kernel.org>, "Yamahata,
+ Isaku" <isaku.yamahata@intel.com>
+References: <cover.1721186590.git.kai.huang@intel.com>
+ <1e71406eec47ae7f6a47f8be3beab18c766ff5a7.1721186590.git.kai.huang@intel.com>
+ <66b1a44236bf8_4fc72945a@dwillia2-xfh.jf.intel.com.notmuch>
+ <ccf6974cb0c0b30cd019abf195276c2e1dff49a2.camel@intel.com>
+ <66b3ed82a47c9_4fc72943f@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Language: en-US
+From: "Huang, Kai" <kai.huang@intel.com>
+In-Reply-To: <66b3ed82a47c9_4fc72943f@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SJ0PR05CA0037.namprd05.prod.outlook.com
+ (2603:10b6:a03:33f::12) To BL1PR11MB5978.namprd11.prod.outlook.com
+ (2603:10b6:208:385::18)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000145:EE_|SJ1PR12MB6074:EE_
-X-MS-Office365-Filtering-Correlation-Id: 31760b82-927c-48f6-3db0-08dcb72e909b
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5978:EE_|MW4PR11MB6811:EE_
+X-MS-Office365-Filtering-Correlation-Id: 03ab703d-c280-4fc8-f467-08dcb730e21c
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0kAlC5kjiOH8In0KDAZ87gBkzUpGbQMKlrbuiOuUgxPHx/pja2FtAsAqJ1nv?=
- =?us-ascii?Q?EOXfyi/Eh24e7oDt+x63ILBeY3EnMt/0aYGCL3kznBvYH9/pvhnHBo3lOneH?=
- =?us-ascii?Q?Xol0s/2fTuFqeNAG/J8GM4uC3E9bvpd8slM7QqP02+zLDeQ/vkWupJVTXg6c?=
- =?us-ascii?Q?qW6G6s6YcdO4fdOa1c4MjlobRwZzXQbfNqpkUDktRkFhQx/0yXhHx9fAwleJ?=
- =?us-ascii?Q?ge59qBHjiC391Asxo/FnW8JjjyCSZevo6eCVILshD5CeTJkhLYdpA3Qy2cZN?=
- =?us-ascii?Q?1QoG3up8gTbM08BfB0IroXsb4v8riE5Fnk87tyfWORS8xZF8QciSlvHfy5L+?=
- =?us-ascii?Q?eKUZx4CtQY4Y5vWBaoOIJUbpAYlSreXFgNuD3fe07Tc/rUTqzagMlI03nAa4?=
- =?us-ascii?Q?an4H1Lypk+wISdFpbsJGrSDfd8SOzENq2M7xI0gar2a9s38pFYYLaRvpFljN?=
- =?us-ascii?Q?cew32UrkI7dQxZMTfmpwfixLp/2spFIaUUAk4QG04aS5QanEZeKIxOAJJLGv?=
- =?us-ascii?Q?zZgSUc5i71rzMSFQwlW8fnKPqFbB0/zpbDZvW31ehOPYMl68HFbugB/6fHIc?=
- =?us-ascii?Q?yTzKChJnGdFUSzUVOStUe4ooc+CCz/HmzEUDAbW1PZhJ4H2ia9RZYEo86sYv?=
- =?us-ascii?Q?vfjI3Gba5LlpBXQT8GIU9/xo1XTr3KGglPjCCfilaeWQpoB5dhddab3cRbjq?=
- =?us-ascii?Q?pGK99cl5OTPXYdk2JxLS2v4G0Ox30Dyc6pLYv3GH+4ts56y9jUVqHIslh7dm?=
- =?us-ascii?Q?i5asf0WddbeR+7gC4ogPClNReR7p5KMqwnRkMNWq2b1AlO/INVz1FyKbPasn?=
- =?us-ascii?Q?KqWkdJojQY84ng3vr38YFyD5RpIeTCbyAy7tSAXkExkXdK+f+BtfTIM/5fwX?=
- =?us-ascii?Q?CLDYRMXxeJOPoUUWIqUX/LXgbAhNGVRhsmLh5/Z4SwjPAn2yQp2/QVJC2KaQ?=
- =?us-ascii?Q?ONIEKZSdC5BpfzDNdFlmPuwz+GozWY4PO1NxMVX/+ANZtJKfXN9vQIJOzBvA?=
- =?us-ascii?Q?cqM46GAuTuwa3S1He6nSjQF1pKdT+yxK9nazrg3MahBu2mzI/UFubIJJkxsD?=
- =?us-ascii?Q?Et1lHIO7KTNTDm7umzAzdQk1VJvnHsoSGZE2VvbM6hXvBDyWbFJ6Dktpyl0j?=
- =?us-ascii?Q?rC3aLuBDG/EkRIkc577rfpBB6dQ+CT7PJFo+x4j21wWJRfn9a4ZXLwVfiz4Q?=
- =?us-ascii?Q?wR88huqswidClyTIpVPYkTE6pwqhmwMQQPGXsSl03jhjEU3ysCL+dYwjgGsD?=
- =?us-ascii?Q?JYVwLpgSTPLReaXMpWiYQEYH0DGMpBGqux/vqXZPGaIWyOH8YuMqeX/TqLt3?=
- =?us-ascii?Q?UzGz/vKLGDkGLGG4oqm9kWFvtSEobcxZhku+H1KhvLC5tqU7Mvnf+EEGhtF+?=
- =?us-ascii?Q?X8Jy1RfLzDuoC6Z0k80fYJjiqo/xFLwzqs9Jb8tgjn5GxhYIy1qBtAcdLLuP?=
- =?us-ascii?Q?IV24gSysF0ap6xTj5SfY7jTS0zv7aZsF?=
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 22:16:20.1301
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?THNyNDZ0bHU3SlQ5akxIYlpwM0tsTkpFRjU4ajI3U0w2WFR6dVhBUWVuWC9P?=
+ =?utf-8?B?VG9Rc1V2ZCtvcFprK0tOOEtRdmVmcVpXS1pUbkdpY3RXRFhZMnlRYTdxL05x?=
+ =?utf-8?B?TzBQWmNGb3ZTd2FjOUQyNzg2VS9IWVZXTXc0YnI5cXZlVVVrRWxteXh4RHZv?=
+ =?utf-8?B?L2Qyd1hqTnk1K0tRZGJ5UDFESDdmU3FkYWVUWkhtbk05VVRjUDg2Qm5STUtI?=
+ =?utf-8?B?aGdUVXIrRXF4cGFsU0IyQzhEWnhPWjg1dCtiT2NSV3lLYjl5ckhibXd6bHRu?=
+ =?utf-8?B?Ym5mTnVhbXBPakthWDNWWkdCRVoyczFHdXVMd05mVWc5TjIxYnJoUkFXeGZa?=
+ =?utf-8?B?VTJ2aDdQYzFnQzhOamRVV25vVVIxK2syNmxhblVxNGp0T2Y2ZDY2N0FyWHZm?=
+ =?utf-8?B?L2FFdFFUYWJTaGh3UXVCbWhENExoeGg1YUFWa2VpM0x0WHdBYnJsUlVZWTNE?=
+ =?utf-8?B?MXJUMDNCakV5QmwycmpxUUtVcXRiNzhvV3hNeTJBcHpsUGVCYlpVOS9ydlR2?=
+ =?utf-8?B?WHhxUzRScWlxRklGd2IzWk0zcks2UGZmOUoxeTdJeEhiaHU4UHpZNGI0bWhJ?=
+ =?utf-8?B?enR3Z0JTSEJEbWQ2UVRjR2tZY09aa0cxcVgxZjVEdkNHenhadDRwVzhacnp6?=
+ =?utf-8?B?Y1gvbFFWMHJaNGN5cUtwMXgyWGtFUUFscU51TzEwZjJtbStKM1lvUmhDNmNL?=
+ =?utf-8?B?OURBalh3dzZLTlo2b3N2UmJMWWx5NHUvamFiVHhyVjFKT3k5ZUl5NTRVZmFs?=
+ =?utf-8?B?bXgrUks2QTdBbU02LzBZTEcyaE9CVEdGVzdIWjR6aUVmVXVVbFRseFRKWjB2?=
+ =?utf-8?B?alVWeFk3UnY1dXBnR3Rmak11d1EzMlZxZEpIekVNalpTVlpvSTJsT2NlMzVQ?=
+ =?utf-8?B?TFlOS0wvN1MxSmVjMUNtMnV6eGVBZC9LSEduMVVDMlE5RDRYL1lKNjI0Y3lE?=
+ =?utf-8?B?MXUwQWxnekFSWk1vNFRnVit1SG5QTDduUG9TTWhhUnpsQ3pMVFNvYS9VSCtB?=
+ =?utf-8?B?SXVzZk9hZDZXMkVINDA4Rk9QcVlSU2ZiQXFhTjNCNnN3Wnl2VDNoc21saGN6?=
+ =?utf-8?B?VitOMzZ2WHFzdjZOZG1wVlBXUVI4NXBvNzkrVzZPc1JoWlZPendlNUdzZTFl?=
+ =?utf-8?B?NDhsQmpXU3hTNHJ1Y0hXVjBHT2M4VnZoWVZWbXNsWVhBWDUrVk5NQmFIeWlj?=
+ =?utf-8?B?aG9FakR3NUYzaStsOWJYSC9sNFd2M0xOK0hCQlNqY0ZZd1kwaEI2ZVQ3ZHVo?=
+ =?utf-8?B?cjBDUTFiV3ZwRjg0YXhTWE80MVNwQlhIbllIVG9rMkRTMFozWUYvSDlqaWtU?=
+ =?utf-8?B?ejV1eVc5YVFxK2cwUSt2VlpkK3hKblErSENtREpoVTArSUp3U0dia3BYYVBH?=
+ =?utf-8?B?T08xUFN1L2JuaDZpZ242L3JnWUdYd3RPZVBxQ2Y4MFY0WnVFNE1jV1ErRzlG?=
+ =?utf-8?B?RXBjaUF5dDZqbkZVSnpLQmJkNXlUWUlsM2NTNlQwOEV2K1lRMVRSYzcxNkRK?=
+ =?utf-8?B?dDBPdnlTU1d6TzhjNE9PMVYxU2c1RUhwRHhHbURVTXArL3pjK3NhMnRkRkQy?=
+ =?utf-8?B?b1EwalVBakdYRkJhQjNBMXVNbFNpYm91OUNQQjVVRk5mWW5GQTNlTjVKalc2?=
+ =?utf-8?B?eXhHamRkbzZIaDVoQjdRdDU5ZzJXZ2VKQnMwZ2lCcVNPLzJXUjFjeTluY3U4?=
+ =?utf-8?B?TkxaK1ZoU3BrTS9mSlpPMDhHOVdyUlVIQ0hYZllkczh5UWVVTEJMc05UeW83?=
+ =?utf-8?B?S3N6Rmk2MVY3M2NsSncrK2RqYlAzT1JUU21QQmtyQmJjMy9IWG00Mm96citP?=
+ =?utf-8?B?VW1DSEZPN01jNk90TUwwUT09?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5978.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bGluUHdsVGpVaSs1aEdQMWs2djhuZ1JnNHNsWWdSSXdvMkt6RkNSMzFaeVBC?=
+ =?utf-8?B?OWFCYkE3SEdpM1YzcDlKRERqMTdxc2d1dkIwaWZyeXRaV3VpZCtYSHZuNnk1?=
+ =?utf-8?B?MGcwWG83UTNKaGU0TSthdmxwRkd4eTRjNGFtc0cxcGpIQkgyalVmdlJmVGRT?=
+ =?utf-8?B?bk04dTBaOXhaMkZVc2lPbkU5RkpXd3VNVE5FR1FyR1FuMkE1SWg3N1lhRXAx?=
+ =?utf-8?B?Qk94dm1WN1JFS3N4aVpWbzU0Wk9KTXRtVi96YVpqV1REL1BsWDY5SGlPR0FO?=
+ =?utf-8?B?eThPQWYxNHVmMkNERHAzYjFWbTlxRlo5MTRHTWhKT2VQbUJ0R3l0WmFHdXF5?=
+ =?utf-8?B?STlMT3NtL3N1ZkVjNG1jU090K1BIWGNxZ2tKUzhLTkhka0IwN1ZwcjVweUF4?=
+ =?utf-8?B?aWh0UXEwRFlMWE9haVVrUXRua1QxZ3hSUkpaM2NVWFVUT0huK3VCM1IzZ0Yv?=
+ =?utf-8?B?QUNMaHZnWlc3aWZBR3RSWkR1U3ZITTd0WDczN3VtWDRhUFh1YUNpbEc4dTBF?=
+ =?utf-8?B?eGRad0ZzdFN5MEk0VWZsbFR0Y1NHTnFsNkJhdkpoNEJBTG1kOHk0dlR2ZGhI?=
+ =?utf-8?B?RjZQelRITHlMWDMrSjE2REZEVFUyU3hQREdRYlJWbk5KdnlBL0VqTENFWlgx?=
+ =?utf-8?B?YWZxeGVHclhhbXVneEJPdHF3ZTNTWDBxMngxSGlUaTdZMkFobU5NdHBKLzBK?=
+ =?utf-8?B?RzVxaHh2U1FycC9uclRvL2tFRTNHM3FVVkpYRk5maW9oMXdFTVBRb3E4eDc0?=
+ =?utf-8?B?dWJaZUJtcTJ3ZGZiQm5lTzNwTkU5Y1FiemZGK1dWcTMraTJ6UHFKckVoMU4w?=
+ =?utf-8?B?enk0VC9iZ09tcDNjVm51K1hWKzBURlNjNW53M2FsVzVONVVkU1BYUHFkRWdS?=
+ =?utf-8?B?bmpvZDcrRHRydGx3dWZZSDZMcUR4MTdWaktiNVhkb3FxR1V1dThqbzQ4aW1X?=
+ =?utf-8?B?UjlQQTRXYlFLVWpnR0puNG1NZjRsck1EU1ZwNlZjdEwwbEhURHp1SVNZU2px?=
+ =?utf-8?B?RStnaXRXQ0tqbnRaeitDVjZvMStKUG1PaC9ORSsrcm9rKzdSZHhQcGVjdGFa?=
+ =?utf-8?B?a3c2ckRwMGljS256RXlpck5obmg4anBJTkxBeGZsL2ZIT2dkaUpXSTFoZWlB?=
+ =?utf-8?B?K2VhTGZWUmNHeXIrRitMUkM2eG9pVUdOeW43dWlBN2gwVzM3elhTNTg5OEo2?=
+ =?utf-8?B?TDBpRmk5NkQ0bU9LS1lFQkk3Vm1nbisxU3pyYkxpRXZaWUxmNXBqR0pwdldn?=
+ =?utf-8?B?MHowK2ltU0lrYXZMcTlmNEQ4Z0duekxSZC9YV3VQcEVBaS9Vd2hEc2YreXI2?=
+ =?utf-8?B?WnNVa2xXOUdBWFNqTnA5OE8wb3o0VGdxWkFUVWlXR2puL0tEMGFXNG52bC9w?=
+ =?utf-8?B?b1pnTkVwSWdOZ3FJVVUyVnFvUG00UkhwekxqN05yaU1ScG9Ha0YrVWRwRXVI?=
+ =?utf-8?B?WW9vajFIWm5qellYcU54SDJOQTZtSHErQmdsSVRDeEZ0L0VLL2p4VG1mcGN2?=
+ =?utf-8?B?MUIwdStzYnIxMithQThiQXdBeDNXMzlWT3Jkd0NidmRxQjZWdWwvRTdzSW1x?=
+ =?utf-8?B?Q3dSaGszSmRybE02SGIyZll3RXVZR1pmQWd4NXhvM0g5TUNEc2VXZFQwZGUx?=
+ =?utf-8?B?VWhkYVdKM0ZlQ051eThyeEhabHpLSzc2VkVGMjdiNjgvZFFCQkNzbzgzbjl6?=
+ =?utf-8?B?SFlRM0dMOEVMejZJREZLejZDSFVWcnY0SDZ2TklKMlF5Z2NGNUFVR2pFV2lo?=
+ =?utf-8?B?L0dmcFFnZC9ib3lwaFlGVHp4TENjTWVGdVN3RGJaaCthQ0pBVWtuemNqbHkr?=
+ =?utf-8?B?Z3VWOWpFMWp2cDM1SitoRGd6NS81RDRIU0xPc3JwdTAxeFlEZzhRTU5pamp5?=
+ =?utf-8?B?V3BjQ1IwdFVyVFF6WEk0RGJUdkVBaUVZTXBKN00xY3FpVFF2a3R4TFVCREo3?=
+ =?utf-8?B?NG5wNkl0S2dmNnAyRjcxSXl4dzJZd2l4WGZ0ZnBYbUt6anFDalVZcGVWbGVP?=
+ =?utf-8?B?TzEyMU9Ma0VqbHZBWXZrVzJYY05ydlpCSVhON2YvVkxBL2gvVE5UYW5WZ0Uw?=
+ =?utf-8?B?U2pPakNTVUlWRzdlKzl4dlZRcVdFL2docW1Tc011M09ZSFBmYVF2OVNLSUha?=
+ =?utf-8?Q?HdlRrLIoo1urqtkJIsNnCCBnN?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03ab703d-c280-4fc8-f467-08dcb730e21c
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5978.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 22:32:56.1330
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31760b82-927c-48f6-3db0-08dcb72e909b
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000145.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6074
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: aWwjaaqpqgZAbFTsb+soMwa6FJ5FXU157EFkCtN+CYjTF0ojgH/JPvZ5XEGrrK8d2b/fhnjRyXy1rMfgLFunYQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6811
+X-OriginatorOrg: intel.com
 
-Add the support for AMD EPYC zen 5 processors(EPYC-Turin).
 
-Add the following new feature bits on top of the feature bits from
-the previous generation EPYC models.
+>>>> +static void print_basic_sysinfo(struct tdx_sysinfo *sysinfo)
+>>>> +{
+>>>> +	struct tdx_sysinfo_module_version *modver = &sysinfo->module_version;
+>>>> +	struct tdx_sysinfo_module_info *modinfo = &sysinfo->module_info;
+>>>> +	bool debug = modinfo->sys_attributes & TDX_SYS_ATTR_DEBUG_MODULE;
+>>>
+>>> Why is this casually checking for debug modules, but doing nothing with
+>>> that indication? Shouldn't the kernel have policy around whether it
+>>> wants to interoperate with a debug module? I would expect that kernel
+>>> operation with a debug module would need explicit opt-in consideration.
+>>
+>> For now the purpose is just to print whether module is debug or
+>> production in the dmesg to let the user easily see, just like the module
+>> version info.
+>>
+>> Currently Linux depends on the BIOS to load the TDX module.  For that we
+>> need to put the module at /boot/efi/EFI/TDX/ and name it TDX-SEAM.so.  So
+>> given a machine, it's hard for the user to know whether a module is debug
+>> one (the user may be able to get such info from the BIOS log, but it is
+>> not always available for the user).
+>>
+>> Yes I agree we should have a policy in the kernel to handle debug module,
+>> but I don't see urgent need of it.  So I would prefer to leave it as
+>> future work when needed.
+> 
+> Then lets leave printing it as future work as well. It has no value
+> outside of folks that can get their hands on a platform and a
+> module-build that enables debug and to my knowledge that capability is
+> not openly available.
+> 
+> In the meantime I assume TDs will just need to be careful to check for
+> this detail in their attestation report. It serves no real purpose to
+> the VMM kernel.
 
-movdiri            : Move Doubleword as Direct Store Instruction
-movdir64b          : Move 64 Bytes as Direct Store Instruction
-avx512-vp2intersect: AVX512 Vector Pair Intersection to a Pair
-                     of Mask Register
-avx-vnni           : AVX VNNI Instruction
+Sure I'll remove.
 
-Signed-off-by: Babu Moger <babu.moger@amd.com>
-Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
----
-v2: Fixed minor typo.
-    Added Zhao's Reviewed-by.
----
- target/i386/cpu.c | 131 ++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 131 insertions(+)
+It's basically for kernel developers and customers who are trying to 
+integrating TDX to their environment to easily find some basic module 
+info when something went wrong or they just want to check.
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index d88a2e0e4c..2e1d6d957c 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -2399,6 +2399,60 @@ static const CPUCaches epyc_genoa_cache_info = {
-     },
- };
- 
-+static const CPUCaches epyc_turin_cache_info = {
-+    .l1d_cache = &(CPUCacheInfo) {
-+        .type = DATA_CACHE,
-+        .level = 1,
-+        .size = 48 * KiB,
-+        .line_size = 64,
-+        .associativity = 12,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+        .share_level = CPU_TOPO_LEVEL_CORE,
-+    },
-+    .l1i_cache = &(CPUCacheInfo) {
-+        .type = INSTRUCTION_CACHE,
-+        .level = 1,
-+        .size = 32 * KiB,
-+        .line_size = 64,
-+        .associativity = 8,
-+        .partitions = 1,
-+        .sets = 64,
-+        .lines_per_tag = 1,
-+        .self_init = 1,
-+        .no_invd_sharing = true,
-+        .share_level = CPU_TOPO_LEVEL_CORE,
-+    },
-+    .l2_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 2,
-+        .size = 1 * MiB,
-+        .line_size = 64,
-+        .associativity = 16,
-+        .partitions = 1,
-+        .sets = 1024,
-+        .lines_per_tag = 1,
-+        .share_level = CPU_TOPO_LEVEL_CORE,
-+    },
-+    .l3_cache = &(CPUCacheInfo) {
-+        .type = UNIFIED_CACHE,
-+        .level = 3,
-+        .size = 32 * MiB,
-+        .line_size = 64,
-+        .associativity = 16,
-+        .partitions = 1,
-+        .sets = 32768,
-+        .lines_per_tag = 1,
-+        .self_init = true,
-+        .inclusive = true,
-+        .complex_indexing = false,
-+        .share_level = CPU_TOPO_LEVEL_DIE,
-+    },
-+};
-+
- /* The following VMX features are not supported by KVM and are left out in the
-  * CPU definitions:
-  *
-@@ -5317,6 +5371,83 @@ static const X86CPUDefinition builtin_x86_defs[] = {
-             { /* end of list */ }
-         }
-     },
-+    {
-+        .name = "EPYC-Turin",
-+        .level = 0xd,
-+        .vendor = CPUID_VENDOR_AMD,
-+        .family = 26,
-+        .model = 0,
-+        .stepping = 0,
-+        .features[FEAT_1_ECX] =
-+            CPUID_EXT_RDRAND | CPUID_EXT_F16C | CPUID_EXT_AVX |
-+            CPUID_EXT_XSAVE | CPUID_EXT_AES |  CPUID_EXT_POPCNT |
-+            CPUID_EXT_MOVBE | CPUID_EXT_SSE42 | CPUID_EXT_SSE41 |
-+            CPUID_EXT_PCID | CPUID_EXT_CX16 | CPUID_EXT_FMA |
-+            CPUID_EXT_SSSE3 | CPUID_EXT_MONITOR | CPUID_EXT_PCLMULQDQ |
-+            CPUID_EXT_SSE3,
-+        .features[FEAT_1_EDX] =
-+            CPUID_SSE2 | CPUID_SSE | CPUID_FXSR | CPUID_MMX | CPUID_CLFLUSH |
-+            CPUID_PSE36 | CPUID_PAT | CPUID_CMOV | CPUID_MCA | CPUID_PGE |
-+            CPUID_MTRR | CPUID_SEP | CPUID_APIC | CPUID_CX8 | CPUID_MCE |
-+            CPUID_PAE | CPUID_MSR | CPUID_TSC | CPUID_PSE | CPUID_DE |
-+            CPUID_VME | CPUID_FP87,
-+        .features[FEAT_6_EAX] =
-+            CPUID_6_EAX_ARAT,
-+        .features[FEAT_7_0_EBX] =
-+            CPUID_7_0_EBX_FSGSBASE | CPUID_7_0_EBX_BMI1 | CPUID_7_0_EBX_AVX2 |
-+            CPUID_7_0_EBX_SMEP | CPUID_7_0_EBX_BMI2 | CPUID_7_0_EBX_ERMS |
-+            CPUID_7_0_EBX_INVPCID | CPUID_7_0_EBX_AVX512F |
-+            CPUID_7_0_EBX_AVX512DQ | CPUID_7_0_EBX_RDSEED | CPUID_7_0_EBX_ADX |
-+            CPUID_7_0_EBX_SMAP | CPUID_7_0_EBX_AVX512IFMA |
-+            CPUID_7_0_EBX_CLFLUSHOPT | CPUID_7_0_EBX_CLWB |
-+            CPUID_7_0_EBX_AVX512CD | CPUID_7_0_EBX_SHA_NI |
-+            CPUID_7_0_EBX_AVX512BW | CPUID_7_0_EBX_AVX512VL,
-+        .features[FEAT_7_0_ECX] =
-+            CPUID_7_0_ECX_AVX512_VBMI | CPUID_7_0_ECX_UMIP | CPUID_7_0_ECX_PKU |
-+            CPUID_7_0_ECX_AVX512_VBMI2 | CPUID_7_0_ECX_GFNI |
-+            CPUID_7_0_ECX_VAES | CPUID_7_0_ECX_VPCLMULQDQ |
-+            CPUID_7_0_ECX_AVX512VNNI | CPUID_7_0_ECX_AVX512BITALG |
-+            CPUID_7_0_ECX_AVX512_VPOPCNTDQ | CPUID_7_0_ECX_LA57 |
-+            CPUID_7_0_ECX_RDPID | CPUID_7_0_ECX_MOVDIRI |
-+            CPUID_7_0_ECX_MOVDIR64B,
-+        .features[FEAT_7_0_EDX] =
-+            CPUID_7_0_EDX_FSRM | CPUID_7_0_EDX_AVX512_VP2INTERSECT,
-+        .features[FEAT_7_1_EAX] =
-+            CPUID_7_1_EAX_AVX_VNNI | CPUID_7_1_EAX_AVX512_BF16,
-+        .features[FEAT_8000_0001_ECX] =
-+            CPUID_EXT3_OSVW | CPUID_EXT3_3DNOWPREFETCH |
-+            CPUID_EXT3_MISALIGNSSE | CPUID_EXT3_SSE4A | CPUID_EXT3_ABM |
-+            CPUID_EXT3_CR8LEG | CPUID_EXT3_SVM | CPUID_EXT3_LAHF_LM |
-+            CPUID_EXT3_TOPOEXT | CPUID_EXT3_PERFCORE,
-+        .features[FEAT_8000_0001_EDX] =
-+            CPUID_EXT2_LM | CPUID_EXT2_RDTSCP | CPUID_EXT2_PDPE1GB |
-+            CPUID_EXT2_FFXSR | CPUID_EXT2_MMXEXT | CPUID_EXT2_NX |
-+            CPUID_EXT2_SYSCALL,
-+        .features[FEAT_8000_0007_EBX] =
-+            CPUID_8000_0007_EBX_OVERFLOW_RECOV | CPUID_8000_0007_EBX_SUCCOR,
-+        .features[FEAT_8000_0008_EBX] =
-+            CPUID_8000_0008_EBX_CLZERO | CPUID_8000_0008_EBX_XSAVEERPTR |
-+            CPUID_8000_0008_EBX_WBNOINVD | CPUID_8000_0008_EBX_IBPB |
-+            CPUID_8000_0008_EBX_IBRS | CPUID_8000_0008_EBX_STIBP |
-+            CPUID_8000_0008_EBX_STIBP_ALWAYS_ON |
-+            CPUID_8000_0008_EBX_AMD_SSBD | CPUID_8000_0008_EBX_AMD_PSFD,
-+        .features[FEAT_8000_0021_EAX] =
-+            CPUID_8000_0021_EAX_No_NESTED_DATA_BP |
-+            CPUID_8000_0021_EAX_LFENCE_ALWAYS_SERIALIZING |
-+            CPUID_8000_0021_EAX_NULL_SEL_CLR_BASE |
-+            CPUID_8000_0021_EAX_AUTO_IBRS,
-+        .features[FEAT_8000_0022_EAX] =
-+            CPUID_8000_0022_EAX_PERFMON_V2,
-+        .features[FEAT_XSAVE] =
-+            CPUID_XSAVE_XSAVEOPT | CPUID_XSAVE_XSAVEC |
-+            CPUID_XSAVE_XGETBV1 | CPUID_XSAVE_XSAVES,
-+        .features[FEAT_SVM] =
-+            CPUID_SVM_NPT | CPUID_SVM_NRIPSAVE | CPUID_SVM_VNMI |
-+            CPUID_SVM_SVME_ADDR_CHK,
-+        .xlevel = 0x80000022,
-+        .model_id = "AMD EPYC-Turin Processor",
-+        .cache_info = &epyc_turin_cache_info,
-+    },
- };
- 
- /*
--- 
-2.34.1
+So if we don't print debug, then the 'sys_attributes' member is no 
+longer needed, that means if we want to keep 'struct 
+tdx_sysinfo_module_info' (or a better name in the next version) then it 
+will only have one member, which is 'tdx_features0'.
 
+In the long term, we might need to query other 'tdx_featuresN' fields 
+since TDX module actually provides a metadata field 'NUM_TDX_FEATURES' 
+to report how many fields like 'TDX_FEATURES0' the module has.  But I 
+don't see that coming in any near future.
+
+So perhaps we don't need to restrictly follow 1:1 between 'linux 
+structure' <-> 'TDX class', and put the 'tdx_features0' together with 
+TDX module version members and rename that one to 'struct 
+tdx_sys_module_info'?
+
+> 
+> [..]
+>>> This name feels too generic, perhaps 'tdx_sys_info_features' makes it
+>>> clearer?
+>>
+>> I wanted to name the structure following the "Class" name in the JSON
+>> file.  Both 'sys_attributes' and 'tdx_featueres0' are under class "Module
+>> Info".
+> 
+> I am not sure how far we need to take fidelity to the naming choices
+> that the TDX module makes. It would likely be sufficient to
+> note the class name in a comment for the origin of the fields, i.e. the
+> script has some mapping like:
+> 
+> { class name, field name } => { linux struct name, linux attribute name }
+> 
+> ...where they are mostly 1:1, but Linux has the option of picking more
+> relevant names, especially since the class names are not directly
+> reusable as Linux data type names.
+
+Yes this seems better.
+
+> 
+>> I guess "attributes" are not necessarily features.
+> 
+> Sure, but given that attributes have no real value to the VMM kernel at
+> this point and features do, then name the data structure by its primary
+> use.
+
+Sure.
+
+> 
+>>>> +	u32 sys_attributes;
+>>>> +	u64 tdx_features0;
+>>>> +};
+>>>> +
+>>>> +#define TDX_SYS_ATTR_DEBUG_MODULE	0x1
+>>>> +
+>>>> +/* Class "TDX Module Version" */
+>>>> +struct tdx_sysinfo_module_version {
+>>>> +	u16 major;
+>>>> +	u16 minor;
+>>>> +	u16 update;
+>>>> +	u16 internal;
+>>>> +	u16 build_num;
+>>>> +	u32 build_date;
+>>>> +};
+>>>> +
+>>>>   /* Class "TDMR Info" */
+>>>>   struct tdx_sysinfo_tdmr_info {
+>>>>   	u16 max_tdmrs;
+>>>> @@ -134,7 +163,9 @@ struct tdx_sysinfo_tdmr_info {
+>>>>   };
+>>>>   
+>>>>   struct tdx_sysinfo {
+>>>> -	struct tdx_sysinfo_tdmr_info tdmr_info;
+>>>> +	struct tdx_sysinfo_module_info		module_info;
+>>>> +	struct tdx_sysinfo_module_version	module_version;
+>>>> +	struct tdx_sysinfo_tdmr_info		tdmr_info;
+>>>
+>>> Compare that to:
+>>>
+>>>          struct tdx_sys_info {
+>>>                  struct tdx_sys_info_features features;
+>>>                  struct tdx_sys_info_version version;
+>>>                  struct tdx_sys_info_tdmr tdmr;
+>>>          };
+>>>
+>>> ...and tell me which oine is easier to read.
+>>
+>> I agree this is easier to read if we don't look at the JSON file.  On the
+>> other hand, following JSON file's "Class" names IMHO we can more easily
+>> find which class to look at for a given member.
+>>
+>> So I think they both have pros/cons, and I have no hard opinion on this.
+> 
+> Yeah, it is arbitrary. All I can offer is this quote from Ingo when I
+> did the initial ACPI NFIT enabling and spilled all of its awkward
+> terminology into the Linux implementation [1]:
+> 
+> "So why on earth is this whole concept and the naming itself
+> ('drivers/block/nd/' stands for 'NFIT Defined', apparently) revolving
+> around a specific 'firmware' mindset and revolving around specific,
+> weirdly named, overly complicated looking firmware interfaces that come
+> with their own new weird glossary??"
+> 
+> The TDX "Class" names are not completely unreasonable, but if they only
+> get replicated as part of kdoc comments on the data structures I think
+> that's ok.
+> 
+> [1]: http://lore.kernel.org/20150420070624.GB13876@gmail.com
+
+Thanks for the info!
+
+I agree we don't need exactly follow TDX "class" to name linux 
+structures. We can add a comment to mention which structure/member 
+corresponds to which class/member in TDX spec when needed.
 
