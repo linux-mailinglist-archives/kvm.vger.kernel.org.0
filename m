@@ -1,224 +1,243 @@
-Return-Path: <kvm+bounces-23482-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23483-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2EEE94A1A7
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:27:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D47394A1EC
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:43:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80DD51F23A75
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 07:27:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC4C81F21733
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 07:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31C11C7B92;
-	Wed,  7 Aug 2024 07:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34D661C7B77;
+	Wed,  7 Aug 2024 07:43:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="esJcbvyy"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="GK2asJNx"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2051.outbound.protection.outlook.com [40.107.100.51])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49F092868D;
-	Wed,  7 Aug 2024 07:27:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.51
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723015662; cv=fail; b=XvVVKMoKNcggds6VddlPei8IRHKLX0ZlibCjBvMfe38KhAgcdxyaxRaLtyhtAmqeoMBIuNgiAvXY09NjFRGFeJnsX53wTQ1BIBoZdnRSNNn7m1dN1n3xYMXg49ZOQonHxwU3zUcy0ZYOoE73z7ntRAmI2DQJJlCA6+4peu2U+Fw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723015662; c=relaxed/simple;
-	bh=dcaan5J+O4d/iEhHfvPJmPUuuOgPfxDmoYxv7dMDb04=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=krUaO8bSUUIZ2is+6+egF20j2XIZ/LIV8fY9rWY2Lb09KX62qspnK+HWFHLGSlrfrEO3WRZRKvNuBDBoBeW38BDDqdKYffjdF83Hnaxssc0cf3874Ma+Y7SHgoY8nPa1chvK1QbHhRpjPK5EK4lRHnf/IJ28Hgl9nkvlcc7W0BI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=esJcbvyy; arc=fail smtp.client-ip=40.107.100.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Fviozwe5L00fHqY2pQQQXgA5/ybzSaTCwn/AI3Z98GC1OkeT/+nxlpCzBnDqsKLf0vsWcpXdTo4b7CJ+pzIA9l0PwlhsPjCOIx2ae2SgNIIAnF7AbqwFkEQN58pBl97s2TFd/Dm6bqC7XCKSJDxMbRW1+h5gDxgM7iibpz3wqDmZcsVuq6MvnK+eoqPq8MSyQ68zcEqy+m4QIkLSXCUU3qVlgn7n9PNN8RmtuxHRXCPh2ON5huvCfGOJsguHnqBOkGaQL1rA6PeQKcpLoOEMplbBqHCfXin5p8DY9Ok+kVekCG4q/FpMDKHD9EoZKANfKOMgDM/DH5ZVTgoNXGhzwg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=luY5H8TpV3wFgRNOjUvUuvr2JBHItScTYTylWSbexgI=;
- b=pGI3HsnWVUwd6PHNBR2CkSc9SgqioklT/EYTKIHcdHfoHhe0YpV7z3ZPjVGC8n8KDsn/jj4otLt+CGhNE51ij+8qbxKojMYU1qkvG+6ZUKYDP4VmjUfUR8El2G3Q1Huk7BMufaR59YdG8LDxhqGvrxkcMe/Mlla6pOs2QeXP/9QyVPiujCibGv82vNTpX4mRhZnv2745RF0WDqDw5mRkwgiS9JdhJJeTmNAYKGVhNWz4rqY3VpFtc/tZqUiPEzgF5q3fh3B9RuYaXQEkaR9WhwLEcEV2BTR02CzQPluLPODwJmZI8YaXRKPABCqcJd8G819O8dTaeKW4Kf8PWQgHbw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=luY5H8TpV3wFgRNOjUvUuvr2JBHItScTYTylWSbexgI=;
- b=esJcbvyyNsjWQj0jiCYL42ZaECuDBsyYxXLRlpTUWG93JLHyVV9dwCIR8KiMkrz52bm1YthpOfu2j3mR4bW/2LjZY7oIPqRVbMLhxDJ+u5bZVFWLZCLi+1OeYjS/X8K9OjpuvN7vGHzzT4lFpRHKdn2OgCdVNxnDszEOau+R3DI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
- by MW3PR12MB4363.namprd12.prod.outlook.com (2603:10b6:303:56::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Wed, 7 Aug
- 2024 07:27:37 +0000
-Received: from IA1PR12MB8189.namprd12.prod.outlook.com
- ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
- ([fe80::193b:bbfd:9894:dc48%6]) with mapi id 15.20.7828.023; Wed, 7 Aug 2024
- 07:27:35 +0000
-Message-ID: <f72d8d77-80f5-e21c-39d2-48789c232c51@amd.com>
-Date: Wed, 7 Aug 2024 09:27:30 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Subject: Re: [PATCH] KVM: x86: Use this_cpu_ptr() instead of
- per_cpu_ptr(smp_processor_id())
-Content-Language: en-US
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Isaku Yamahata <isaku.yamahata@intel.com>, Chao Gao <chao.gao@intel.com>,
- Yuan Yao <yuan.yao@intel.com>
-References: <20240802201630.339306-1-seanjc@google.com>
-From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
-In-Reply-To: <20240802201630.339306-1-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR3P281CA0193.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a4::6) To IA1PR12MB8189.namprd12.prod.outlook.com
- (2603:10b6:208:3f0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBB722EE5
+	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 07:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723016607; cv=none; b=VNzoxyzlt+izvCAC+3yR40sMTZ4h0bkUGA3UI2RYbyoNziNt/4ES7xP+UebHPDDiakssGMAqGt67CL5T1YcWzP9jPNtpgObdXV2H1FPk6dQaJDAMyKrVPUTq9VJR9ArLylm7MURY8htGVbW+zPWWVDGFEwrBCk1reGL5nK1W5SI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723016607; c=relaxed/simple;
+	bh=p7LMmmzU1+cu3gDb4BNR5usgoqOn0JF56mNQORorlg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=egbq/expjOtrIiAaXBB3rQRX4wk6WOEQ6kGawZ2NbhtUZ/VkXGR6QUZg8Y/T/grR6RD1K7jBaHMSZbje6nIXrup0kICUpDe4fQ0TtPq4iqa185e95PAE/jsXppIUwwxLIRnCW/8ZzMsA1LMcudxOOy8WV3ufr1MiCLiabZPiBbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=GK2asJNx; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 7 Aug 2024 09:43:14 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1723016602;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TXckcsmB40wwGZbeI2/syEiQW03ulJWzQIsf9BnqUys=;
+	b=GK2asJNxCDWRfr2biYpW3iPq8nNX52MfjS54NIXaiSF8SYme7MBu/5ZijowLFkgaFA1VBd
+	kGcrozU51h/YaHuFd6GTGiVmRJ4veVZfA4zyRRKInCj2JXcT8xw07V1p8OchFOr5Xoyx4h
+	56U9O8VgZdInVasP4hm9um5QLEAGN+g=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Cade Richard <cade.richard@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu, jamestiotio@gmail.com
+Subject: Re: [PATCH kvm-unit-tests] riscv: sbi: add dbcn write test
+Message-ID: <20240807-e5f14146934e63558f473337@orel>
+References: <20240806-sbi-dbcn-write-test-v1-1-7f198bb55525@berkeley.edu>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|MW3PR12MB4363:EE_
-X-MS-Office365-Filtering-Correlation-Id: 307fbdd9-2839-4d3e-04ac-08dcb6b2689d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?TWoyTyt2bHpPK2dZcE5CNjhhaXQ3QzROODNySDlVUHVCMjRpZlJkVXdHY0FO?=
- =?utf-8?B?bHExS1ZZdTV4K3hCL0tOREhXZS9NNk5LWWpaaEdrMHBMTGNNODBDc3NXaUVW?=
- =?utf-8?B?L0ZwaTB3YnZSVkJBc0M2eFhFRDloeWIyQWgvcDQ0d2pTRzE4cllkci8vVksr?=
- =?utf-8?B?Skh6dnRGUC9mUUJHZ3VBL3BCYU5LVUd2clFmWkdoMzF0NVBNMFg2TG1sa2d1?=
- =?utf-8?B?eWRveXQ5NGUrVjRIcEcyRHk0eUVDN0ZTWDIrTWRVUSsyc1lnQVZncGNhR25z?=
- =?utf-8?B?dm5lTnV1bHcwTnJybWRUZENJeHZyU2IrajV0VnJyckJJTDZ6OVBSSEJJZHBm?=
- =?utf-8?B?R04zMmdYQTlEYmxWTEJjQWlPWllVdVc3dWZIVHQzRTFHSHp6RGhURG4raktK?=
- =?utf-8?B?b2t1RngzWmViZ2ZhYTIrN3QvckhEbDRHMmJVNFl1VDV3SzRYQmFIVmV1RVc2?=
- =?utf-8?B?ZVhZUHc5bkp1Tmt6Y2o3QU4yRldFN05JSFk4czBKb2V1MUVaSXIrUzFyVGtD?=
- =?utf-8?B?UnY0UnpyWkxNaHhFYnBNZ3BKcDFQdnNOVUFpcTV2MWxrdksvSW9QMVNwWThi?=
- =?utf-8?B?WElVWG5TQmhaR1dSWVhMOXFjNXhyVitjUDZiN2lxUkVtOEtlUTZLeS9WMHhW?=
- =?utf-8?B?d2wzTGJIeVpDemQxM3VBY1JvYWpCU01pQzJVWmxWeGgvTWQvdGFkMzlRRXQ1?=
- =?utf-8?B?M2pwTUhMTVMwUkgrdWhkbW1EcDNPSTk1VFplTlZJRG9WTmdwcEM1NlB6b0dp?=
- =?utf-8?B?eXQwVmdHRWRlVG9Pa0pxZFA1NG9Yc2pUWEx4eHYwMEgrWUM0YkZKN1U4OFBz?=
- =?utf-8?B?QjVhOXNlMmI0NiszNTI5UG1Hb3FtZG9pQUhEbGVQaG45RFZUdWpSdWdOZ2Jw?=
- =?utf-8?B?cGhmMGxsVmozZnpnOTBiSUxrdXdWc1ZZc0VWZjdNUnNvZjdKMG5iRGdFVkVO?=
- =?utf-8?B?NGV3QjFrUGpxRm8wKzNteGNrRnBsYm5NOUhER09pcG5DUVlsZXYwa2VnVnBt?=
- =?utf-8?B?UklXd3NTT2NjdExiSE56M0xWK1h6SFBPcS9zSE9jSWVzQjVEVDk1eHFrOFM1?=
- =?utf-8?B?SjZ6SDRRdENTb0tESkxGM2JQQWtXNGo1L0FzVFpYT2hCdHBVRXhCUGV3OTdW?=
- =?utf-8?B?YW4yUTQrMVowUGk4QUNzVWRiSDVSZmNGbllzT3R2ZzFBeGkyYnhUMStGV1JQ?=
- =?utf-8?B?SDhLd1Rjb24rblhDYTgrS0UwR0JBa2xJRmdaYXg0Kzc5OGx0WkJGQ1l3TW5G?=
- =?utf-8?B?MUF5Wi9FOUZpWDRlM2ZvaGhGZGNRTGYxSFk3U1YyNVFFcUpXTnM5bWM1c28y?=
- =?utf-8?B?bXhhekt6N1BjVE1tbmh3azVqRkJpUnl5L3B5TFRwSVROMEhlTXo1bFFBTlI3?=
- =?utf-8?B?eCtheHZBR29NTFFraXBhRVB6dDNyeUk3OXpQVXNPYTlDbnUwd0RUdlJYQWlh?=
- =?utf-8?B?T2FiNTZNeE8wWjRwNkoxME1vUGlzcEdCL2grY0RoUks3OUFHMklKT2R3QndC?=
- =?utf-8?B?TGN5TVBnd0RGQWJaUGJ4cTRhamFybVRYRnlnQmxGNTVKMHB0T3lvbXFmUWda?=
- =?utf-8?B?aWVob0JZbFg0ZkIyN2E3ZUdaNVJkdjNxc1A2b3FIanlKUjRlazBuN25lMkVm?=
- =?utf-8?B?VW81dWtQL0JESU11VVdMSTVBOWRacC93bCtkbkZEOFEvRzFCVGw3RmYvVTEx?=
- =?utf-8?B?MStPWkZCdHQxTWtNY011NERsRGlzblZFUDVNNytXZ1Ntd05zQ3k0d0lhOVVP?=
- =?utf-8?B?MGpSaDZIZU1kNjJYSk41d0JuWjYyK0cxcC9nc0FLTUdDR29VSWowTDZtR1hv?=
- =?utf-8?B?djNSWlFWU2lyMGtwdXFzQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eFAzYU8zaG1kbjlOZ0lxS1JDTkg5QzVzblR0SHdQVkpTZVNrbkNyWTgyWC9w?=
- =?utf-8?B?S1pJTU9CV0tNVmwwNWhBWjlqbmFMQ240Y2lEaHYxb0N3Slk2NUZEU09mdjBu?=
- =?utf-8?B?Y3p4dCtnSzFHSldsWXNsc1dGeVhJMVNoNm9nUTlTd2tDb1lGdEVHM0U5Tkxx?=
- =?utf-8?B?N2ZpVU5sdGhpaUFUMk1hSnpwb002MzdhZ3p6OUpHWlB3WTdzS3pqT1hKWStr?=
- =?utf-8?B?UUVDb0lwbXBjVjYyUkNVdkZvOTNFRkxRUzFEcEROVVJRcjZLVEtlV1VzT2Zz?=
- =?utf-8?B?TnFPcHdNNk5vWmMxTlltdDBFSDB5QmlKcFBnRnBYWlBlbVpoc2U5NVRnWEx6?=
- =?utf-8?B?T0I0bmRhNDJQbDVJZ2didjB0U0ZHNm5mdGM4dUxid3N6Tkl4WnBLblFzNk1Q?=
- =?utf-8?B?SHQvWjZ6VG1TSmZXMWRVQVcyTEhVUWlDU3h1a2Q3eUtoSUJMcGtLUmNNM242?=
- =?utf-8?B?NUJDY1NEYWNPUWZnMFJuZk9taTlKRGVKcGdHeUtjaU85KzYvc3d0NTBLMCty?=
- =?utf-8?B?VVM2U240Z3NIeXJGK3BWQVBpVTRNb2JNbDY5bWZIRHppdUFHNm41N3E1Nm9Y?=
- =?utf-8?B?OFJPc3J5ZmlFR3B2K0IxYVgxcHZEbFRlR3hWeDVEVFA1TUp4bCtrWUdZcHcw?=
- =?utf-8?B?SzVPbXZ6R3ZnMWg4VldCR0NIWGhEUlpGSjlHUzR4QXI4TytrbzRJY1ZyTElo?=
- =?utf-8?B?NUN2d2Q4Mi9WeDI3V2szeWprMnliR2VOdmtvVXlmMGdxcmIrRzQ2SWtmTU82?=
- =?utf-8?B?K2tlL1ZuZys4TlpUMHMyQVJIQ0h6S3dJcDBtV1M0eWttckp4cWhmNVc4V2Q4?=
- =?utf-8?B?SjZGbVVDNGpRZlRUNm10MVdNeTArSHhyUmg3ZWVaMGVRNThTaDZubVpCbHpz?=
- =?utf-8?B?VjF5MUc3d1VrTk1YUENkeUtLQnEvazI1WEgzWHBGYjBQYXFpSTV2aVp2c0xZ?=
- =?utf-8?B?aVp2TXI3a3piR292Wjh2WjFxcS9NNTVHTThLZTFQVndkYklqbThLc25uN0Nx?=
- =?utf-8?B?Y3h3Z1h3bTlPaTlLZzBTYmk4MWV4ZmhWVEZHUElUZzFsNWQ4RlN3T0cvZjdV?=
- =?utf-8?B?b0VySTRONjBBZ0NtbDFKekdZSVVjL1dXazJkamVxZXZ2VEprR3BJTG4rSS9X?=
- =?utf-8?B?dUF2VTUxM21GR3ZXZ1FqN0lJbHZtY2lZYVV4OHlmV0JCZzgzdkt0UnExdkt2?=
- =?utf-8?B?d3Q0aUtvVTdLRkRBbEpLR3NHNlNMQUJoaUtVYmhKSzlWNWhrUWRUMlIrcFRR?=
- =?utf-8?B?blAwOXExRFFXRGVDZ2QydkEwZFhhMlpxVVR3WmRVSFRGQUx5ajJsRHlpWkVF?=
- =?utf-8?B?dFFTb3Y3MnVYalRRZGgzSTZvNWIySGJiSVdSZ2puNGVab1hlVFlvMFNMM0h5?=
- =?utf-8?B?SkF5RXBkSUZ5UUN6SVorb0x1b3RpaWt3SGFZQ2FMOG9ZSVJmN2tnUXBQTHBt?=
- =?utf-8?B?OXVhQUw5NnFZZWV6UUpHT2Fya2ViUyttUXNtcGR4Z2kycnh1cTVNOHRjblBG?=
- =?utf-8?B?ajVFc3ozNVBVMGppM1BBalNwSmtXd1A4M3ZLQ2FBaWM2Ri9vUFNzRWRrMnQx?=
- =?utf-8?B?U3ZCRGNyTFZkeUcxazJuTFExWktxbzRjNDA3UU9pZE9XMEFhYjRORVRyMUtV?=
- =?utf-8?B?czhhb3FIM1BPNnZ4TW8wbnlKaWRmNHM0VnpvL3dQNGFPSzc1clcrUHhTU0ZP?=
- =?utf-8?B?YVgrRWttQk1mU3lhZXR6bGRCeTZVbm9rMm5FUDlmRUVkSGpsL3dXdkpteEsz?=
- =?utf-8?B?M2pJN010OVJWN2NOaGloNlNVVzBsTnVFTmsyemlhOVA3dW1PanhhdVNZNlJX?=
- =?utf-8?B?UUoyL2djTTJFNmYwcDM1YzQwUkY1Ynp6QjFHUDNSS1B3dWk5bjlWT2VFU3J4?=
- =?utf-8?B?SkZvVXhOWDcrbGlJbzllZXgrY1BuVVRWRXlEZ0lsM0kyWjJzWWI2NERtTE1r?=
- =?utf-8?B?MEE5V21KWHhLaG1JQm5Jam9BM1RsbkVzblIzb1VacGFmdUxZNi9lYTlmcFJh?=
- =?utf-8?B?OXFrNW5qaldnaHdaNVd5SkFjcGVuem43OVJTWkoyYmtLYlI4am92S01ONEI5?=
- =?utf-8?B?S0tvdFUxTWJmSkN2YUJKek1mSjdXUzhaNzVuVWVFOXVyVndmd0t2djFxamNT?=
- =?utf-8?Q?n0OcqPbbXIk439v2dUUiEsCDs?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 307fbdd9-2839-4d3e-04ac-08dcb6b2689d
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 07:27:35.6880
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: UNpaWX9SBh6491vF0crDJDs4rqtLxOrCSFvo5CcWCX/wCcYOGjuJqu9YJ36dQzrO5QHAWz5OiKNkuXlsCKFTDQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4363
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240806-sbi-dbcn-write-test-v1-1-7f198bb55525@berkeley.edu>
+X-Migadu-Flow: FLOW_OUT
 
-On 8/2/2024 10:16 PM, Sean Christopherson wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
+On Tue, Aug 06, 2024 at 10:51:54PM GMT, Cade Richard wrote:
 > 
-> Use this_cpu_ptr() instead of open coding the equivalent in various
-> user return MSR helpers.
 > 
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Reviewed-by: Chao Gao <chao.gao@intel.com>
-> Reviewed-by: Yuan Yao <yuan.yao@intel.com>
-> [sean: massage changelog]
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-
-Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
-
 > ---
-> 
-> Not entirely sure where this came from, found it in one of my myriad branches
-> while doing "spring" cleaning.
-> 
->   arch/x86/kvm/x86.c | 6 ++----
->   1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index af6c8cf6a37a..518baf47ef1c 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -427,8 +427,7 @@ static void kvm_user_return_msr_cpu_online(void)
->   
->   int kvm_set_user_return_msr(unsigned slot, u64 value, u64 mask)
->   {
-> -	unsigned int cpu = smp_processor_id();
-> -	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-> +	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
->   	int err;
->   
->   	value = (value & mask) | (msrs->values[slot].host & ~mask);
-> @@ -450,8 +449,7 @@ EXPORT_SYMBOL_GPL(kvm_set_user_return_msr);
->   
->   static void drop_user_return_notifiers(void)
->   {
-> -	unsigned int cpu = smp_processor_id();
-> -	struct kvm_user_return_msrs *msrs = per_cpu_ptr(user_return_msrs, cpu);
-> +	struct kvm_user_return_msrs *msrs = this_cpu_ptr(user_return_msrs);
->   
->   	if (msrs->registered)
->   		kvm_on_user_return(&msrs->urn);
-> 
-> base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 
+not sure why this --- above is here, it'll remove the commit text from the
+commit. Also not sure where the changelog went. We want the changelog, but
+we want it under the --- below your sign-off.
+
+> Added a unit test for the RISC-V SBI debug console write() and write_byte() functions. The output of the tests must be inspected manually to verify that the correct bytes are written. For write(), the expected output is 'DBCN_WRITE_TEST_STRING'. For write_byte(), the expected output is 'a'.
+
+Need to wrap lines at 74 chars.
+
+> 
+> Signed-off-by: Cade Richard <cade.richard@berkeley.edu>
+> ---
+>  lib/riscv/asm/sbi.h |  7 ++++++
+>  riscv/sbi.c         | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 73 insertions(+)
+> 
+> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> index 73ab5438..47e91025 100644
+> --- a/lib/riscv/asm/sbi.h
+> +++ b/lib/riscv/asm/sbi.h
+> @@ -19,6 +19,7 @@ enum sbi_ext_id {
+>  	SBI_EXT_TIME = 0x54494d45,
+>  	SBI_EXT_HSM = 0x48534d,
+>  	SBI_EXT_SRST = 0x53525354,
+> +	SBI_EXT_DBCN = 0x4442434E,
+>  };
+>  
+>  enum sbi_ext_base_fid {
+> @@ -42,6 +43,12 @@ enum sbi_ext_time_fid {
+>  	SBI_EXT_TIME_SET_TIMER = 0,
+>  };
+>  
+> +enum sbi_ext_dbcn_fid {
+> +	SBI_EXT_DBCN_CONSOLE_WRITE = 0,
+> +	SBI_EXT_DBCN_CONSOLE_READ,
+> +	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
+> +};
+> +
+>  struct sbiret {
+>  	long error;
+>  	long value;
+> diff --git a/riscv/sbi.c b/riscv/sbi.c
+> index 2438c497..61993f08 100644
+> --- a/riscv/sbi.c
+> +++ b/riscv/sbi.c
+> @@ -15,6 +15,10 @@
+>  #include <asm/sbi.h>
+>  #include <asm/smp.h>
+>  #include <asm/timer.h>
+> +#include <asm/io.h>
+
+The includes are currently in alphabetic order. Let's keep them that way.
+
+> +
+> +#define DBCN_WRITE_TEST_STRING		"DBCN_WRITE_TEST_STRING\n"
+> +#define DBCN_WRITE_BYTE_TEST_BYTE	(u8)'a'
+>  
+>  static void help(void)
+>  {
+> @@ -32,6 +36,11 @@ static struct sbiret __time_sbi_ecall(unsigned long stime_value)
+>  	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
+>  }
+>  
+> +static struct sbiret __dbcn_sbi_ecall(int fid, unsigned long arg0, unsigned long arg1, unsigned long arg2)
+> +{
+> +	return sbi_ecall(SBI_EXT_DBCN, fid, arg0, arg1, arg2, 0, 0, 0);
+> +}
+> +
+>  static bool env_or_skip(const char *env)
+>  {
+>  	if (!getenv(env)) {
+> @@ -248,6 +257,62 @@ static void check_time(void)
+>  	report_prefix_pop();
+>  }
+>  
+
+What happened to the comment about the read test?
+
+> +static void check_dbcn(void)
+> +{
+> +	
+> +	struct sbiret ret;
+> +	unsigned long num_bytes, base_addr_lo, base_addr_hi;
+> +	int num_calls = 0;
+> +	
+> +	num_bytes = strlen(DBCN_WRITE_TEST_STRING);
+> +	phys_addr_t p = virt_to_phys((void *)&DBCN_WRITE_TEST_STRING);
+
+Put p's declaration with the rest above.
+
+> +	base_addr_lo = (unsigned long)p;
+> +	base_addr_hi = (unsigned long)(p >> __riscv_xlen);
+> +
+> +	report_prefix_push("dbcn");
+> +	
+> +	ret = __base_sbi_ecall(SBI_EXT_BASE_PROBE_EXT, SBI_EXT_DBCN);
+> +	if (!ret.value) {
+> +		report_skip("DBCN extension unavailable");
+> +		report_prefix_pop();
+> +		return;
+> +	}
+
+The report skip should be the first thing you do, i.e. the virt_to_phys
+stuff should be below it.
+
+> +
+> +	report_prefix_push("write");
+> +
+> +	do {
+> +		ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE, num_bytes, base_addr_lo, base_addr_hi);
+> +		num_bytes -= ret.value;
+> +		base_addr_lo += ret.value;
+
+We should increment the physical address and then split it again into lo
+and hi since lo could have been zero (only high addresses) or lo may
+have started nonzero but then wrapped since we were close the 4G boundary.
+
+> +		num_calls++;
+> +	} while (num_bytes != 0 && ret.error == SBI_SUCCESS) ;
+> +	report(ret.error == SBI_SUCCESS, "write success");
+> +	report_info("%d sbi calls made", num_calls);
+> +	
+> +	/*
+> +		Bytes are read from memory and written to the console
+
+There should be a '*' on each line of a comment block. Doesn't checkpatch
+complain about that?
+
+> +	*/
+> +	if (env_or_skip("INVALID_READ_ADDR")) {
+> +		phys_addr_t p = strtoull(getenv("INVALID_READ_ADDR"), NULL, 0);
+
+Don't shadow p, you can use the same one again.
+
+> +		base_addr_lo = (unsigned long)p;
+> +		base_addr_hi = (unsigned long)(p >> __riscv_xlen);
+> +		ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE, 1, base_addr_lo, base_addr_hi);
+> +		report(ret.error == SBI_ERR_INVALID_PARAM, "invalid parameter: address");
+> +	};
+> +
+> +	report_prefix_pop();
+> +	
+> +	report_prefix_push("write_byte");
+> +
+> +	puts("DBCN_WRITE TEST CHAR: ");
+> +	ret = __dbcn_sbi_ecall(SBI_EXT_DBCN_CONSOLE_WRITE_BYTE, (u8)DBCN_WRITE_BYTE_TEST_BYTE, 0, 0);
+> +	puts("\n");
+> +	report(ret.error == SBI_SUCCESS, "write success");
+> +	report(ret.value == 0, "expected ret.value");
+> +
+> +	report_prefix_pop();
+> +}
+> +
+>  int main(int argc, char **argv)
+>  {
+>  
+> @@ -259,6 +324,7 @@ int main(int argc, char **argv)
+>  	report_prefix_push("sbi");
+>  	check_base();
+>  	check_time();
+> +	check_dbcn();
+>  
+>  	return report_summary();
+>  }
+> 
+> ---
+> base-commit: 1878b4b663fd50b87de7ba2b1c90614e2703542f
+> change-id: 20240806-sbi-dbcn-write-test-70d305d511cf
+> 
+> Best regards,
+> -- 
+> Cade Richard <cade.richard@berkeley.edu>
+>
+
+Thanks,
+drew
 
