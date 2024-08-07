@@ -1,375 +1,293 @@
-Return-Path: <kvm+bounces-23480-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23481-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAEB694A113
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 08:52:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442C994A19F
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:26:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AC1B1F25B22
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 06:52:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3973286540
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 07:26:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020F61BC073;
-	Wed,  7 Aug 2024 06:48:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F1DA1C7B90;
+	Wed,  7 Aug 2024 07:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b="hSYWo2EM"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="oKHopScw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2069.outbound.protection.outlook.com [40.107.100.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D441B86D5;
-	Wed,  7 Aug 2024 06:48:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723013334; cv=none; b=N9u26a/Ap04ClqDFBQG7OZ9MCNT2D1MD8CbDwOUz8PMb52vXhJOH+Mvqf5WlQ7fIf/Y4O5/2DA7ZG8AuiMQ5cwz9kz7FEqjT2PXTc7wNnfYiiZR7LJwYJKQGjiJKk3tQGQqmVHwCAfqwflwxs9A+wKrmoebG5tG+4Wx4JGOHmgE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723013334; c=relaxed/simple;
-	bh=McTJC16ImboS2GB3tQx9VdnRtfUHGiPerIbqJgRGpio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=UN2SYNikPGVk4cjoTW+Hg/NRBRnKVlk2YqbUud/Ma3EzpQtMesAaH2y2NGX6OrJQEHE11qMuamY3Of37WMK/VsEuWKlO6XC2FcnXawqJ2x4oVFQ4DSDUscC8xLIV1h/DJx8zhlRcLImwom/Ur+CLPBfEWxLYtX8syB1SID8kJ2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk; spf=pass smtp.mailfrom=amazon.co.uk; dkim=pass (1024-bit key) header.d=amazon.co.uk header.i=@amazon.co.uk header.b=hSYWo2EM; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.co.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.uk
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.co.uk; i=@amazon.co.uk; q=dns/txt;
-  s=amazon201209; t=1723013332; x=1754549332;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=jV7x65iO3TS+Xtz93B1NNcsREThnhf6CB1pAqiiBCL0=;
-  b=hSYWo2EMTJjWMeDRfTrdKXREF3BwyJC55d6siyWapmJBZu9CH5XpvkXV
-   sprv9qLjB/xo7J+h6gRSGgCGEv9qU4XsojXz3+EOBs+y9DGbYDEAReFts
-   Q913+odX7pZqckm5uTy0mIpz+2+3YfzTTN5zS8yRInEle5U4Wvw1dn9vf
-   o=;
-X-IronPort-AV: E=Sophos;i="6.09,269,1716249600"; 
-   d="scan'208";a="672481162"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 06:48:48 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:33616]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.27.192:2525] with esmtp (Farcaster)
- id 1baea4c4-6fee-4395-9bcf-6df811592900; Wed, 7 Aug 2024 06:48:47 +0000 (UTC)
-X-Farcaster-Flow-ID: 1baea4c4-6fee-4395-9bcf-6df811592900
-Received: from EX19D003UWB002.ant.amazon.com (10.13.138.11) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 7 Aug 2024 06:48:44 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (10.250.64.248) by
- EX19D003UWB002.ant.amazon.com (10.13.138.11) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 7 Aug 2024 06:48:44 +0000
-Received: from [127.0.0.1] (172.19.88.180) by mail-relay.amazon.com
- (10.250.64.254) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34 via Frontend
- Transport; Wed, 7 Aug 2024 06:48:40 +0000
-Message-ID: <a43ae745-9907-425f-b09d-a49405d6bc2d@amazon.co.uk>
-Date: Wed, 7 Aug 2024 07:48:38 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7757E2868D;
+	Wed,  7 Aug 2024 07:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.100.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723015554; cv=fail; b=Fh902saA/WME9lHGYta7b9GyjyBf0/+HH3Q6bmH64JkOiwrmHoFwqKNCw5dajzpHrD6psmOaXLh6DvaFBqjyyIpw9k7Lkn4xY33MXYc1em6G3xsSn86id4cShuWL7yUFtTRBHzxnKaG/QZXaO40egxyNaChMoAyQqdVzxKkZ87U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723015554; c=relaxed/simple;
+	bh=sED/Uq5wp7pu7sFkN/Lx8YW3bXcwLh1hKvq8cfg07mY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=HAkIfoANgNbd6id+fozrO66SJ2mJJNXDqgyrmaO1WVc3Tvh9DLf7fBBQc2zzDMMwVE1fCfpg2hYUDGPTraLM872II3sC6F26TyZjV2vr84XfOQ0HJbwO6bQkW91wgmtG6zWDNBLzX5JxV4p8b4EBq4pW+gzj/BUld7F8Ybs1WuE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=oKHopScw; arc=fail smtp.client-ip=40.107.100.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=qXiaoCjAFB0ZuceWopZb/ZRV+8UyDHjDFyGmtwmLn06AmoVlN+lmlUXgdjN/jExPwI0t0xqAKC6PD3alnO7abQMwJRXnfTpvFLWUzs2KaAbHumV8N6Wjfy5OD81+O7eoioh0Pfnh4qBMeqqd12Gg0hqWQ0sp+ab9JqC7QPMMbyqR5yMy+aA0JoRA7xm5R/u66dBLUxfactOmS/nPNcFnNH9+qbBNzUp3a1zUbBmxfSRF98qSMiamBV3Su83PN9U+y6WqFV2dNa2G0dUa9Zv9pUVWmBPc7IMQ0IvPDVKnFqqIP+2dDqdW8J7IjHQxbjvQJw2+tlVAIpZpSpc+2VfZ8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=dO1EfKRdzixGg7LDBwqs6g9f05YF/7eoBvc1QLPChEs=;
+ b=U8yfUD3aZvZb554urmPBSm94EjCrpxyIFyw4/7Iec3qHmR1rLw+LnoDcpk5VLzzwl4qy3EMwDOXPOg41OEe6zDp95hKXO2s1Ruop0bcoAJTSngaxg8sD4S3BaeIFZezNj5JkvYvKZ+x7VbZDT3eNNxtbjtNjlOfvqR4iAaChGjheH3HB+BY2Mnzwu1KWjUS6qrGteWDMoNniketIDDRpwElTCKO54TY/FLNxL4VKd5kCr2xvcQ6nTre4bBHWKR1obu28QI/SiXlWaoEhvAto1Lb6UM0U+7Bet66gLhtSPNsrss1vktwa75u4zpZDiXz2gmP0f80Uci8WR27Oe6ae2g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=dO1EfKRdzixGg7LDBwqs6g9f05YF/7eoBvc1QLPChEs=;
+ b=oKHopScwAEdWYvzOrHawGiLXzVwR9xg9pUQT4xIoTMFEK8dF3UGYlW1PR4IX+s3NK2ZPGL3a+CZl6ynTqs55mPjDGa3/RfkpWnO8U5MLyuEdnbQqGpdqMe8R7RpNbDTnuj+9+yeEslOypEggBkOD00L75Hs2IDrZ85lULxum2Dc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com (2603:10b6:208:3f0::13)
+ by MW3PR12MB4363.namprd12.prod.outlook.com (2603:10b6:303:56::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.21; Wed, 7 Aug
+ 2024 07:25:48 +0000
+Received: from IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48]) by IA1PR12MB8189.namprd12.prod.outlook.com
+ ([fe80::193b:bbfd:9894:dc48%6]) with mapi id 15.20.7828.023; Wed, 7 Aug 2024
+ 07:25:48 +0000
+Message-ID: <6a82ee1a-b0d0-b6c2-21e9-8d8e2d2b6827@amd.com>
+Date: Wed, 7 Aug 2024 09:25:42 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+Subject: Re: [PATCH v2] KVM: x86/mmu: Clean up function comments for dirty
+ logging APIs
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ David Matlack <dmatlack@google.com>
+References: <20240802202006.340854-1-seanjc@google.com>
+Content-Language: en-US
+From: "Gupta, Pankaj" <pankaj.gupta@amd.com>
+In-Reply-To: <20240802202006.340854-1-seanjc@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0171.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b7::18) To IA1PR12MB8189.namprd12.prod.outlook.com
+ (2603:10b6:208:3f0::13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 3/4] mm: guest_memfd: Add option to remove guest
- private memory from direct map
-To: Elliot Berman <quic_eberman@quicinc.com>
-CC: Andrew Morton <akpm@linux-foundation.org>, Paolo Bonzini
-	<pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, Fuad Tabba
-	<tabba@google.com>, David Hildenbrand <david@redhat.com>,
-	<qperret@google.com>, Ackerley Tng <ackerleytng@google.com>,
-	<linux-coco@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <kvm@vger.kernel.org>,
-	James Gowans <jgowans@amazon.com>, "Kalyazin, Nikita"
-	<kalyazin@amazon.co.uk>, "Manwaring, Derek" <derekmn@amazon.com>, "Cali,
- Marco" <xmarcalx@amazon.co.uk>
-References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
- <20240805-guest-memfd-lib-v1-3-e5a29a4ff5d7@quicinc.com>
- <3fc11402-53e1-4325-a3ee-5ebd616b5b63@amazon.co.uk>
- <20240806104702482-0700.eberman@hu-eberman-lv.qualcomm.com>
-From: Patrick Roy <roypat@amazon.co.uk>
-Content-Language: en-US
-Autocrypt: addr=roypat@amazon.co.uk; keydata=
- xjMEY0UgYhYJKwYBBAHaRw8BAQdA7lj+ADr5b96qBcdINFVJSOg8RGtKthL5x77F2ABMh4PN
- NVBhdHJpY2sgUm95IChHaXRodWIga2V5IGFtYXpvbikgPHJveXBhdEBhbWF6b24uY28udWs+
- wpMEExYKADsWIQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbAwULCQgHAgIiAgYVCgkI
- CwIEFgIDAQIeBwIXgAAKCRBVg4tqeAbEAmQKAQC1jMl/KT9pQHEdALF7SA1iJ9tpA5ppl1J9
- AOIP7Nr9SwD/fvIWkq0QDnq69eK7HqW14CA7AToCF6NBqZ8r7ksi+QLOOARjRSBiEgorBgEE
- AZdVAQUBAQdAqoMhGmiXJ3DMGeXrlaDA+v/aF/ah7ARbFV4ukHyz+CkDAQgHwngEGBYKACAW
- IQQ5DAcjaM+IvmZPLohVg4tqeAbEAgUCY0UgYgIbDAAKCRBVg4tqeAbEAtjHAQDkh5jZRIsZ
- 7JMNkPMSCd5PuSy0/Gdx8LGgsxxPMZwePgEAn5Tnh4fVbf00esnoK588bYQgJBioXtuXhtom
- 8hlxFQM=
-In-Reply-To: <20240806104702482-0700.eberman@hu-eberman-lv.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: IA1PR12MB8189:EE_|MW3PR12MB4363:EE_
+X-MS-Office365-Filtering-Correlation-Id: 585cc3e0-1dbd-43b5-c453-08dcb6b2286c
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?OWpDV2VwYjVmeDFBcG9kZGhnMkNXcjBReTlnN1haVEcrcnNleHIraTVuZS93?=
+ =?utf-8?B?NE5UdDRvRkViNkUzOXNLMnBQNHFXdU8zRVBDejVhb0JjTjRRMDZ2dk9lWUhk?=
+ =?utf-8?B?cys2UWkvcDQvZVN0QWZZbzR5S3BreS9OZnVTTkZVbmJBTzU4MnpZeTZPOFNw?=
+ =?utf-8?B?VzRnN09jTHJRZFRuYUkyeTBnRHpTR0FXNi90U29SMjlsbXo1REEvYWlGY1o0?=
+ =?utf-8?B?YlhxcW1oM3FadVBrdGN1NmlKVGEydU9EdDBRSGNSWEVtQkFpQmFiVnNBeWY3?=
+ =?utf-8?B?M3dYNGdzMEJ5ZEJZTVNLUHVocUUwdWdQNGFkWlRrMkdSaThzeHdCRllWWXNs?=
+ =?utf-8?B?cVN1QzNiMGZESGpSL2duWVNLRFR4L2JqdDlWUzlnK2ZrRWI1K21vcXFLdVRB?=
+ =?utf-8?B?VXJWdFA3SzNZRW81NGVzQzhnU0o5TWJ1bDJKcjliWk9KVytkdVo2UGVxbUtP?=
+ =?utf-8?B?VkN1MkJObGRBQnVuLzR6Qm9ZRGNuYmdvSnFScFRidmozN2Z4cjByWEo2NkpL?=
+ =?utf-8?B?MTNUbmxWM1hhTkFyN0Z3NHlwMEVubThCZ25nbHVjUEt3MmhqSGFZcjRQMTJs?=
+ =?utf-8?B?cWo2UUE4UkVnbENJeHVLOGZPT21uejVvZDhUT3pINDhyY01EczFRZXBBYm01?=
+ =?utf-8?B?V2dXUDNmQ1NiSnh3MytBbUx2MElzSVl5U3JvZ2JsVzVYZXR5Zmp1NlR2OG1i?=
+ =?utf-8?B?bkRSbllqMmdXSEduTzZmdFRIWkdoOElUcmdkRm41c0p2M3NlRldHUUxDcmVp?=
+ =?utf-8?B?MStIM250bEFlV3o4czlXeXhkdUtxSVQ0bFFCQWM1ZStXRVhYWVJ3SldQbllk?=
+ =?utf-8?B?WjVNeHFKaG5ySElYK0Ftd1pHMm9yWWlyZHd5MzJRM0RXYlhqSGd3NVJSSVhY?=
+ =?utf-8?B?dVBwbnByVTlaVnM0dkpSUjJMbzFNd1FKcjVHOUl1cWdybmFFQmdXVGltNFlC?=
+ =?utf-8?B?WjIydnNEbEpUL0p5WDJiNTBkMUJmZUZOUngwR202RndqNG85R3FWUWhJSFJ5?=
+ =?utf-8?B?TklXTTNTSHhqNHh2c0NhNWpJTUtHcDNMS2ZSeW0vSFoxSVFqejVQVlBKOXda?=
+ =?utf-8?B?QkxVR1N0elgzRDY1RXVacCtDMmxwTnZkSzBhazVyUjBUTmp3V2xTeExHbEZT?=
+ =?utf-8?B?Vi9jbDR0OGptb29tc09zUG9DUjNmL21maG9TNVREOUkxcGxmT2NVOFNNVEpY?=
+ =?utf-8?B?QnV3T0NUeFZoZFJsVXdiWlExZGtpbkN5UFN1OUIreHFsVHhxS0w3R1NQTHIy?=
+ =?utf-8?B?dTVKbWhWM2x2dzk2dXFtT0dOR000OTU2bzRXOHZyWHl4UkZqTkZ0SFdRQ3Ny?=
+ =?utf-8?B?ditGRjVYRDRyUGVmc3FVSFBMRyt1SkdHRmFKTlRURHBPUFc2dy8wNnM3ZlQ5?=
+ =?utf-8?B?K2hjKzQzR2VUVG1nNVN1ell6dVpBalI2RkVNaHA0bUQ4UmtVcUNYVkltcGNW?=
+ =?utf-8?B?TzZ1d0pvR29JcEpqdFJKMTRLbnRJVzRPS0FnU014ZzVXM0lqOXZrVUVRU0NZ?=
+ =?utf-8?B?QVR6OUJwTjVjZWhocHhNVnk0ZGFNUzJmNHk0dncyV3Z6Qmc3YXhSbGJFMnVM?=
+ =?utf-8?B?WDFBSmpPYURrb1liN0FQZzh6cUY5Mzk0RWFXaFlxckZSL05RNnlvUW1vTGZT?=
+ =?utf-8?B?MFJObk15UFhmVXNoVnFzOTJVenlWT2M5aEE2bUFaVXVwVCsvaXBHWEhtNUtG?=
+ =?utf-8?B?T3lieXJHbmY2d0hNMituSGVKM1NrWnd0TWtjcG50cXFWamcraUJiOGFvcGMv?=
+ =?utf-8?Q?WRsc5Br0z+kCr5WpLM=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR12MB8189.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?THFTb3UxcFhjOG5IZmVrYmhzd2FHUXg0TENpUjdrcEpnOGtHYzFRSS9MRGl4?=
+ =?utf-8?B?NENkSnBXNlNPaFNXVzJBUmV2RkxPY3l5RkVEOWQ1MytERmpBcEJod244dlJj?=
+ =?utf-8?B?blF1ODNEOGkrSlY3V3ZHcUo0blZ1TVY5ekxabEhOa3QyQWkwaUNRSTBOQ1lV?=
+ =?utf-8?B?L2kzR2xSa2F5aWZrRENsTFp3YjN1dDlyTDhRVHJYdXlTSm1vcGRlVkhKZFhC?=
+ =?utf-8?B?eS9VTEhaTEh1cG9wN3BVejgyWE0rcFFtcWxqMDFGRUxvWTJqV2xaVU5IN0J1?=
+ =?utf-8?B?d2kvRnpXZnZ3dFZEZHJtZE1DNlpXQTNhZFl5WmtYdlppNWtFUEhQTW9IK0F0?=
+ =?utf-8?B?V3lRSVpXMlVZdEZHQmFUb3ErVE9CWGs3M3NucU1wSUR4MDMyU205QTJJeFp4?=
+ =?utf-8?B?ZncrQVhtU2NCODJKTWE5Tkw3SkxyT2d0SWVqRmlob2M4MDVSN3d4K0pCTWEz?=
+ =?utf-8?B?RktZdkR6Y0d0VExWaEtmVk5ZQVdiSnZLcGkwSWVOUlllOVhjOVkxYlJJQkVF?=
+ =?utf-8?B?Mnp6YUhxVXNocjFWd2ovMUZQZ1d6MWhuZ3pjdkw5WjhScFVObkVkRlNvMEJD?=
+ =?utf-8?B?clBXY2xycnovVG1STTYwQnhacFBxRzVsUnVYVUdZcVhtV2ZhZHE0YXJwaUxs?=
+ =?utf-8?B?RWFKZnlNWEYrT2NVNFlUK3JxR0FvbG9LNVdRZEhINldTRWoxM29obTdzMXFu?=
+ =?utf-8?B?RG5oajBHOTdUa1lEdXA0MnJHdFV1WC9nb1kveWhkZ3o3NmlyUk5VZWt1QVVJ?=
+ =?utf-8?B?T1RxbWt6cUhTUzZKdU1rUmNEcnRYdXdCUVIrcm0wSU1lKy9PWk1JVkdmV2R3?=
+ =?utf-8?B?VmRWYkNUMEFWZ2xXMmRVR3Zubi9DaE95K1E2SHZvaTA3aE1jVklteUkxZjkv?=
+ =?utf-8?B?QWNWNW5RelZ1U3RnaWRLdVBpcjZpdUtoWXVXdFFTc3NXaFJFSDUyYmZmUEhP?=
+ =?utf-8?B?Y1FDYk1Ndi9KUkpoMUdOQWdkdkVyU1p3SjVSb3B1M3ZPeDRaWVUvVGFKVUMv?=
+ =?utf-8?B?amQ5N2RXaEFHVGVrSUlGKzdZc1piVm1IUERaT0tITXlQZE9jY3AwWEhKYWE5?=
+ =?utf-8?B?R2ZydkF4NDgrVEJmVXByUXlNQUhtajc2QnJ1RUtxa1FLUUlpRTJRRE56WDUy?=
+ =?utf-8?B?NDgrWmd2Z0wvcWRvRm1YK1JYOVFyL2ZKWktlMW1HRVA4UEo3THpRSjJiOXVM?=
+ =?utf-8?B?Mi8yU1lNS204M2NXbDdyV2lOb1VwMFF3ZnJlVGhRWUJUUWprZk0vS2E5djhq?=
+ =?utf-8?B?OWxwWjJLR3k2YndhbTZoZGhhR2Zaa0VjOVdXb1Z4YS9hMjl2QXJqc0h0MlR0?=
+ =?utf-8?B?MDdxUWc0bFpFRUxpdDdvY2Z2OW9LcXltT2Nra2IzelpESkQwQmM2aWhvU3FM?=
+ =?utf-8?B?NTYxeXpsVWNkOFZHTGs3QTBMVHVESCtGTGlCaHRnR0NtbUwxZ0VSV0Z2UHRB?=
+ =?utf-8?B?RFZrajlWNTVQSkV0ZUM2ZzBJbEJ6K3ZpQ0RnaUJHZ0xjcDdSR2w2VzhFbDhK?=
+ =?utf-8?B?V2lXbDAyRG14WHpGa25QVlZIakNIN1h2VHFKNFRHWHFZQ2tkV3J4eUt3djBr?=
+ =?utf-8?B?dUI1bDVlSEVLeUtzUmp0NTl1N3lSa0NVeEloWE5qdFQwRGhXYWxKZjk3V3Jl?=
+ =?utf-8?B?dUZUd1dKYXhEOGZJOHJScU9QcnNNRUFQZVFxSHJjbTA0SmlyY0crSEtXRHhv?=
+ =?utf-8?B?V0FqalRUb2poaFRMckQ2ckZpRFZ4ZTRadGNZeDRmVERud2ROM3FjQTl0TTRC?=
+ =?utf-8?B?QWhaalNvMEJTbmhaSXdRWnpXRHQ2b1YwWFRkdGxxRHNDYXlINjFnQit5a292?=
+ =?utf-8?B?MThaNTRLd050YUVzbS9NR2hESXRic25IalRTOG44Y25PK1JFMSsySDFDTmV6?=
+ =?utf-8?B?dkg2aEkzQXB2OUNMb0hneXRqdjV0bWtBN0gyQ2VLd0pkSDY4Z21GQTljeGZT?=
+ =?utf-8?B?MjUwYlF0cjRvMWt2RjFNNWUzcUJid3BxNktoRXBIbENEMGtsb3pwSHk2Unp5?=
+ =?utf-8?B?QzJPRm9TZm5EWjk4UFMyUlI5RmVwVGpLRmE1aUVUL3R3T3hTTXA2U3c1d04w?=
+ =?utf-8?B?VlE0dGFPSUMrbVdTNHZhNkVQNXNuaFBoQ2xoUzNQQXltVFVGcE5IRmlhYjlS?=
+ =?utf-8?Q?wzBhdau2t6f+8VT08berRPm+d?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 585cc3e0-1dbd-43b5-c453-08dcb6b2286c
+X-MS-Exchange-CrossTenant-AuthSource: IA1PR12MB8189.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 07:25:48.0281
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mwJw2UTxpDB7z4cNb2W0hJdu4znRyz7SJpv2zRUx5kN99161xcLXk9ovZSawlIujG3SqI+K14oKUYCTq/QQv9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4363
+
+> Rework the function comment for kvm_arch_mmu_enable_log_dirty_pt_masked()
+> into the body of the function, as it has gotten a bit stale, is harder to
+> read without the code context, and is the last source of warnings for W=1
+> builds in KVM x86 due to using a kernel-doc comment without documenting
+> all parameters.
+> 
+> Opportunistically subsume the functions comments for
+> kvm_mmu_write_protect_pt_masked() and kvm_mmu_clear_dirty_pt_masked(), as
+> there is no value in regurgitating similar information at a higher level,
+> and capturing the differences between write-protection and PML-based dirty
+> logging is best done in a common location.
+> 
+> No functional change intended.
+> 
+> Cc: David Matlack <dmatlack@google.com>
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+> 
+> v2: Put the comments in the function body. [David]
+> 
+> v1: https://lore.kernel.org/all/20240611215805.340664-1-seanjc@google.com
+> 
+>   arch/x86/kvm/mmu/mmu.c | 48 +++++++++++++-----------------------------
+>   1 file changed, 15 insertions(+), 33 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 901be9e420a4..45e7e9bd5e76 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -1307,15 +1307,6 @@ static bool __rmap_clear_dirty(struct kvm *kvm, struct kvm_rmap_head *rmap_head,
+>   	return flush;
+>   }
+>   
+> -/**
+> - * kvm_mmu_write_protect_pt_masked - write protect selected PT level pages
+> - * @kvm: kvm instance
+> - * @slot: slot to protect
+> - * @gfn_offset: start of the BITS_PER_LONG pages we care about
+> - * @mask: indicates which pages we should protect
+> - *
+> - * Used when we do not need to care about huge page mappings.
+> - */
+>   static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+>   				     struct kvm_memory_slot *slot,
+>   				     gfn_t gfn_offset, unsigned long mask)
+> @@ -1339,16 +1330,6 @@ static void kvm_mmu_write_protect_pt_masked(struct kvm *kvm,
+>   	}
+>   }
+>   
+> -/**
+> - * kvm_mmu_clear_dirty_pt_masked - clear MMU D-bit for PT level pages, or write
+> - * protect the page if the D-bit isn't supported.
+> - * @kvm: kvm instance
+> - * @slot: slot to clear D-bit
+> - * @gfn_offset: start of the BITS_PER_LONG pages we care about
+> - * @mask: indicates which pages we should clear D-bit
+> - *
+> - * Used for PML to re-log the dirty GPAs after userspace querying dirty_bitmap.
+> - */
+>   static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+>   					 struct kvm_memory_slot *slot,
+>   					 gfn_t gfn_offset, unsigned long mask)
+> @@ -1372,24 +1353,16 @@ static void kvm_mmu_clear_dirty_pt_masked(struct kvm *kvm,
+>   	}
+>   }
+>   
+> -/**
+> - * kvm_arch_mmu_enable_log_dirty_pt_masked - enable dirty logging for selected
+> - * PT level pages.
+> - *
+> - * It calls kvm_mmu_write_protect_pt_masked to write protect selected pages to
+> - * enable dirty logging for them.
+> - *
+> - * We need to care about huge page mappings: e.g. during dirty logging we may
+> - * have such mappings.
+> - */
+>   void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>   				struct kvm_memory_slot *slot,
+>   				gfn_t gfn_offset, unsigned long mask)
+>   {
+>   	/*
+> -	 * Huge pages are NOT write protected when we start dirty logging in
+> -	 * initially-all-set mode; must write protect them here so that they
+> -	 * are split to 4K on the first write.
+> +	 * If the slot was assumed to be "initially all dirty", write-protect
+> +	 * huge pages to ensure they are split to 4KiB on the first write (KVM
+> +	 * dirty logs at 4KiB granularity). If eager page splitting is enabled,
+> +	 * immediately try to split huge pages, e.g. so that vCPUs don't get
+> +	 * saddled with the cost of splitting.
+>   	 *
+>   	 * The gfn_offset is guaranteed to be aligned to 64, but the base_gfn
+>   	 * of memslot has no such restriction, so the range can cross two large
+> @@ -1411,7 +1384,16 @@ void kvm_arch_mmu_enable_log_dirty_pt_masked(struct kvm *kvm,
+>   						       PG_LEVEL_2M);
+>   	}
+>   
+> -	/* Now handle 4K PTEs.  */
+> +	/*
+> +	 * (Re)Enable dirty logging for all 4KiB SPTEs that map the GFNs in
+> +	 * mask.  If PML is enabled and the and the GFN doesn't need to be
+> +	 * write-protected for other reasons, e.g. shadow paging, clear the
+> +	 * Dirty bit.  Otherwise clear the Writable bit.
+> +	 *
+> +	 * Note that kvm_mmu_clear_dirty_pt_masked() is called whenever PML is
+> +	 * enabled but it chooses between clearing the Dirty bit and Writeable
+> +	 * bit based on the context.
+> +	 */
+>   	if (kvm_x86_ops.cpu_dirty_log_size)
+>   		kvm_mmu_clear_dirty_pt_masked(kvm, slot, gfn_offset, mask);
+>   	else
+
+Thanks for fixing this comment. Indeed it required to look a bit in code 
+if the condition means, PML is enabled, I faced this as well.
+
+Reviewed-by: Pankaj Gupta <pankaj.gupta@amd.com>
 
 
+> 
+> base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
 
-On Tue, 2024-08-06 at 21:13 +0100, Elliot Berman wrote:
-> On Tue, Aug 06, 2024 at 04:39:24PM +0100, Patrick Roy wrote:
->>
->> Hi Elliot,
->>
->> On Mon, 2024-08-05 at 19:34 +0100, Elliot Berman wrote:
->>> This patch was reworked from Patrick's patch:
->>> https://lore.kernel.org/all/20240709132041.3625501-6-roypat@amazon.co.uk/
->>
->> yaay :D
->>
->>> While guest_memfd is not available to be mapped by userspace, it is
->>> still accessible through the kernel's direct map. This means that in
->>> scenarios where guest-private memory is not hardware protected, it can
->>> be speculatively read and its contents potentially leaked through
->>> hardware side-channels. Removing guest-private memory from the direct
->>> map, thus mitigates a large class of speculative execution issues
->>> [1, Table 1].
->>>
->>> Direct map removal do not reuse the `.prepare` machinery, since
->>> `prepare` can be called multiple time, and it is the responsibility of
->>> the preparation routine to not "prepare" the same folio twice [2]. Thus,
->>> instead explicitly check if `filemap_grab_folio` allocated a new folio,
->>> and remove the returned folio from the direct map only if this was the
->>> case.
->>
->> My patch did this, but you separated the PG_uptodate logic from the
->> direct map removal, right?
->>
->>> The patch uses release_folio instead of free_folio to reinsert pages
->>> back into the direct map as by the time free_folio is called,
->>> folio->mapping can already be NULL. This means that a call to
->>> folio_inode inside free_folio might deference a NULL pointer, leaving no
->>> way to access the inode which stores the flags that allow determining
->>> whether the page was removed from the direct map in the first place.
->>
->> I thought release_folio was only called for folios with PG_private=1?
->> You choose PG_private=1 to mean "this folio is in the direct map", so it
->> gets called for exactly the wrong folios (more on that below, too).
->>
-> 
-> PG_private=1 should be meaning "this folio is not in the direct map".
-
-Right. I just checked my patch and it indeed means the same there. No
-idea what I was on about yesterday. I think I only had Paolo's comment
-about using folio->private for refcounting sharings in mind, so I
-thought "to use folio->private, you need PG_private=1, therefore
-PG_private=1 means shared" (I just checked, and while
-folio_attach_private causes PG_private=1 to be set, page_set_private
-does not). Obviously my comments below and especially here on PG_private
-were nonsense. Sorry about that!
-
->>> [1]: https://download.vusec.net/papers/quarantine_raid23.pdf
->>>
->>> Cc: Patrick Roy <roypat@amazon.co.uk>
->>> Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
->>> ---
->>>  include/linux/guest_memfd.h |  8 ++++++
->>>  mm/guest_memfd.c            | 65 ++++++++++++++++++++++++++++++++++++++++++++-
->>>  2 files changed, 72 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/linux/guest_memfd.h b/include/linux/guest_memfd.h
->>> index be56d9d53067..f9e4a27aed67 100644
->>> --- a/include/linux/guest_memfd.h
->>> +++ b/include/linux/guest_memfd.h
->>> @@ -25,6 +25,14 @@ struct guest_memfd_operations {
->>>         int (*release)(struct inode *inode);
->>>  };
->>>
->>> +/**
->>> + * @GUEST_MEMFD_FLAG_NO_DIRECT_MAP: When making folios inaccessible by host, also
->>> + *                                  remove them from the kernel's direct map.
->>> + */
->>> +enum {
->>> +       GUEST_MEMFD_FLAG_NO_DIRECT_MAP          = BIT(0),
->>> +};
->>> +
->>>  /**
->>>   * @GUEST_MEMFD_GRAB_UPTODATE: Ensure pages are zeroed/up to date.
->>>   *                             If trusted hyp will do it, can ommit this flag
->>> diff --git a/mm/guest_memfd.c b/mm/guest_memfd.c
->>> index 580138b0f9d4..e9d8cab72b28 100644
->>> --- a/mm/guest_memfd.c
->>> +++ b/mm/guest_memfd.c
->>> @@ -7,9 +7,55 @@
->>>  #include <linux/falloc.h>
->>>  #include <linux/guest_memfd.h>
->>>  #include <linux/pagemap.h>
->>> +#include <linux/set_memory.h>
->>> +
->>> +static inline int guest_memfd_folio_private(struct folio *folio)
->>> +{
->>> +       unsigned long nr_pages = folio_nr_pages(folio);
->>> +       unsigned long i;
->>> +       int r;
->>> +
->>> +       for (i = 0; i < nr_pages; i++) {
->>> +               struct page *page = folio_page(folio, i);
->>> +
->>> +               r = set_direct_map_invalid_noflush(page);
->>> +               if (r < 0)
->>> +                       goto out_remap;
->>> +       }
->>> +
->>> +       folio_set_private(folio);
->>
->> Mh, you've inverted the semantics of PG_private in the context of gmem
->> here, compared to my patch. For me, PG_private=1 meant "this folio is
->> back in the direct map". For you it means "this folio is removed from
->> the direct map".
->>
->> Could you elaborate on why you require these different semantics for
->> PG_private? Actually, I think in this patch series, you could just drop
->> the PG_private stuff altogether, as the only place you do
->> folio_test_private is in guest_memfd_clear_private, but iirc calling
->> set_direct_map_default_noflush on a page that's already in the direct
->> map is a NOOP anyway.
->>
->> On the other hand, as Paolo pointed out in my patches [1], just using a
->> page flag to track direct map presence for gmem is not enough. We
->> actually need to keep a refcount in folio->private to keep track of how
->> many different actors request a folio's direct map presence (in the
->> specific case in my patch series, it was different pfn_to_gfn_caches for
->> the kvm-clock structures of different vcpus, which the guest can place
->> into the same gfn). While this might not be a concern for the the
->> pKVM/Gunyah case, where the guest dictates memory state, it's required
->> for the non-CoCo case where KVM/userspace can set arbitrary guest gfns
->> to shared if it needs/wants to access them for whatever reason. So for
->> this we'd need to have PG_private=1 mean "direct map entry restored" (as
->> if PG_private=0, there is no folio->private).
->>
->> [1]: https://lore.kernel.org/kvm/20240709132041.3625501-1-roypat@amazon.co.uk/T/#m0608c4b6a069b3953d7ee97f48577d32688a3315
->>
-> 
-> I wonder if we can use the folio refcount itself, assuming we can rely
-> on refcount == 1 means we can do shared->private conversion.
-> 
-> In gpc_map_gmem, we convert private->shared. There's no problem here in
-> the non-CoCo case.
-> 
-> In gpc_unmap, we *try* to convert back from shared->private. If
-> refcount>2, then the conversion would fail. The last gpc_unmap would be
-> able to successfully convert back to private.
-> 
-> Do you see any concerns with this approach?
-
-The gfn_to_pfn_cache does not keep an elevated refcount on the cached
-page, and instead responds to MMU notifiers to detect whether the cached
-translation has been invalidated, iirc. So the folio refcount will
-not reflect the number of gpcs holding that folio.
-
->>> +       return 0;
->>> +out_remap:
->>> +       for (; i > 0; i--) {
->>> +               struct page *page = folio_page(folio, i - 1);
->>> +
->>> +               BUG_ON(set_direct_map_default_noflush(page));
->>> +       }
->>> +       return r;
->>> +}
->>> +
->>> +static inline void guest_memfd_folio_clear_private(struct folio *folio)
->>> +{
->>> +       unsigned long start = (unsigned long)folio_address(folio);
->>> +       unsigned long nr = folio_nr_pages(folio);
->>> +       unsigned long i;
->>> +
->>> +       if (!folio_test_private(folio))
->>> +               return;
->>> +
->>> +       for (i = 0; i < nr; i++) {
->>> +               struct page *page = folio_page(folio, i);
->>> +
->>> +               BUG_ON(set_direct_map_default_noflush(page));
->>> +       }
->>> +       flush_tlb_kernel_range(start, start + folio_size(folio));
->>> +
->>> +       folio_clear_private(folio);
->>> +}
->>>
->>>  struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags)
->>>  {
->>> +       unsigned long gmem_flags = (unsigned long)file->private_data;
->>>         struct inode *inode = file_inode(file);
->>>         struct guest_memfd_operations *ops = inode->i_private;
->>>         struct folio *folio;
->>> @@ -43,6 +89,12 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
->>>                         goto out_err;
->>>         }
->>>
->>> +       if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
->>> +               r = guest_memfd_folio_private(folio);
->>> +               if (r)
->>> +                       goto out_err;
->>> +       }
->>> +
->>
->> How does a caller of guest_memfd_grab_folio know whether a folio needs
->> to be removed from the direct map? E.g. how can a caller know ahead of
->> time whether guest_memfd_grab_folio will return a freshly allocated
->> folio (which thus needs to be removed from the direct map), vs a folio
->> that already exists and has been removed from the direct map (probably
->> fine to remove from direct map again), vs a folio that already exists
->> and is currently re-inserted into the direct map for whatever reason
->> (must not remove these from the direct map, as other parts of
->> KVM/userspace probably don't expect the direct map entries to disappear
->> from underneath them). I couldn't figure this one out for my series,
->> which is why I went with hooking into the PG_uptodate logic to always
->> remove direct map entries on freshly allocated folios.
->>
-> 
-> gmem_flags come from the owner. If the caller (in non-CoCo case) wants
-> to restore the direct map right away, it'd have to be a direct
-> operation. As an optimization, we could add option that asks for page in
-> "shared" state. If allocating new page, we can return it right away
-> without removing from direct map. If grabbing existing folio, it would
-> try to do the private->shared conversion.
-> 
-> Thanks for the feedback, it was helpful!
-> 
-> - Elliot
-> 
->>>         /*
->>>          * Ignore accessed, referenced, and dirty flags.  The memory is
->>>          * unevictable and there is no storage to write back to.
->>> @@ -213,14 +265,25 @@ static bool gmem_release_folio(struct folio *folio, gfp_t gfp)
->>>         if (ops->invalidate_end)
->>>                 ops->invalidate_end(inode, offset, nr);
->>>
->>> +       guest_memfd_folio_clear_private(folio);
->>> +
->>>         return true;
->>>  }
->>>
->>> +static void gmem_invalidate_folio(struct folio *folio, size_t offset, size_t len)
->>> +{
->>> +       /* not yet supported */
->>> +       BUG_ON(offset || len != folio_size(folio));
->>> +
->>> +       BUG_ON(!gmem_release_folio(folio, 0));
->>> +}
->>> +
->>>  static const struct address_space_operations gmem_aops = {
->>>         .dirty_folio = noop_dirty_folio,
->>>         .migrate_folio = gmem_migrate_folio,
->>>         .error_remove_folio = gmem_error_folio,
->>>         .release_folio = gmem_release_folio,
->>> +       .invalidate_folio = gmem_invalidate_folio,
->>>  };
->>>
->>>  static inline bool guest_memfd_check_ops(const struct guest_memfd_operations *ops)
->>> @@ -241,7 +304,7 @@ struct file *guest_memfd_alloc(const char *name,
->>>         if (!guest_memfd_check_ops(ops))
->>>                 return ERR_PTR(-EINVAL);
->>>
->>> -       if (flags)
->>> +       if (flags & ~GUEST_MEMFD_FLAG_NO_DIRECT_MAP)
->>>                 return ERR_PTR(-EINVAL);
->>>
->>>         /*
->>>
->>> --
->>> 2.34.1
->>>
->>
->> Best,
->> Patrick
->>
 
