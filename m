@@ -1,115 +1,198 @@
-Return-Path: <kvm+bounces-23534-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23535-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E41394A860
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 15:10:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3787594A874
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 15:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCE7A285B9E
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 13:10:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAE73285962
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 13:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC64F1E7A37;
-	Wed,  7 Aug 2024 13:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77E71E7A53;
+	Wed,  7 Aug 2024 13:19:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UdGBNWUC"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TyJfZ5yw"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9BA81E7A20
-	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 13:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BF3F1E6732
+	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 13:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723036206; cv=none; b=j1llrLgUKldaB8J5YtZNq+H4cJUUX4dMy4gcoA99bqRlxKq9lVGVgv1Lk2AMSy8AO+1aplI1OX5eQRWQOJAxprqBM5yCNlrdQk7p5cjTW2EW0ka07I8KiquXn8KYXnm6zFNz622L6T6X1Wi6c/CNNrbEs7pxtoRHHg40QFfjnAA=
+	t=1723036792; cv=none; b=Gi69R/TS3h316wp197j5ysMcvyn2shYwzRjGIxN3BfARM58GoCN7/6eZ9igpYy70j529uy9zm5vT9qurtkUH9B9Plu8EhTIxJ6ZQty9zC3919c8nmrqWPNKpcxTpNtuPROh0b3CuJTtqzH0Iyi3Ayzhy7nB8OpCOe7OQNnZRQVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723036206; c=relaxed/simple;
-	bh=+eZhBjSmjCvbGRPfzlj09DpLXMmDSZBMnkw9b2jdTR0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=u/IBeqDJdY68W9IbLlsJfxIBjghRHctRT/Zkxh4k+AQcqNrvJW3ZXMr3EKD1pMQ6dtIMmxu5ddpoTSJW6AcTCRajwW3TV7HHlifNFf0E6zYKH+mabB5wV+nHlqy0vQnoQ8Yl2LcEo86WojkLnFFjpY/8T09Cywfg2xVvimng+pw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UdGBNWUC; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7a30753fe30so1869510a12.3
-        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 06:10:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723036204; x=1723641004; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FeNfd38uETkIH61CYDkuc4TtszXpvrSFcKS3wi21Vds=;
-        b=UdGBNWUCMP8F0seUlwGHMvrHWgf0i9Bmc+epuYM0KqtfzWEh+jxga1ea+Snt2UJOdP
-         0E+gh81QB9FlGWAf3QDHgTxbneEiGbQfjoDmRttzavF3LblX2dauSeo1jyb4gZHVAPve
-         q9tZxaqy6Z5iuXJPwaWZUu8oe8bdDg2G2pfAtZCgxEpJTRKTwPSMjh7sn8bXAgJdmLwc
-         IoyOcuQJwh6Zhyt7h9lGyDSVeTUmOoYJVseZWV7ur3UqVaO5oia+aewUxcM3ossXAaQB
-         JErG+gwsVof4Y7DZcDbxIHhUsUmQm8efFCydZH5ADBKbCFuaD3QfBFpAsJZ79PWkkttu
-         AIOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723036204; x=1723641004;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=FeNfd38uETkIH61CYDkuc4TtszXpvrSFcKS3wi21Vds=;
-        b=FKw0ecFmXiS5GDsfWN9gSC/mUzITGh/3zGIJVywX+8JG8ng1uQuZ+cOu6vCoQGaYMW
-         btfjfjZjzKztJ17AV9Bj2tcLp/SpgAHrL3Pt3GmJ5N99VEp1V2nN4xJXhTsh80/ozcWZ
-         72AXeV82i99KlGfgHxljWw5B0e0Rtj8jDcspkphQF8MShUsu5+rWIOLvmNlM2FMjBTuy
-         vUKuVNSSA046X7j2tLiJ/xqKPX87NPFfXZcJvRsfVn2DOBLnAaysHqiBflkg3hNXS1UU
-         O9hDylUyfHA1mXdwMi1uPxBQJFvwpS/xWiGA6AE5gOWR7bP7mz9Sw1B/H8HC+TmEnobW
-         wUUQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUoPjfOkR+sDPR7cQVhqhxiVvsWmSPddAPcNX2pQpJENJBxbUGIlz451W0ae7SSJhEv0vZuFYHgzHdfcgEpCdHPM9f3
-X-Gm-Message-State: AOJu0YzASDJxxzZLzptmY+D/Xy5Zmz8wYNdKK4yPpw+yeLuE+X0YBOeu
-	AECARA0Lr3fNwyEt4ZXQFkodfasq5ec0M7AeGaRq3HZ0JoKUDAVm13EMRii4FKQ+WgCYD27r4Vr
-	Nsg==
-X-Google-Smtp-Source: AGHT+IGpZQvns4Yv1Ia7UPGh54uJfN/xbxbZf9g7hwoRt6m+NYgzW4Xj758L8HuOWnwP714lqGXrlndPbvM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:f07:b0:7bd:91f4:e07c with SMTP id
- 41be03b00d2f7-7bd920429c2mr6356a12.0.1723036203694; Wed, 07 Aug 2024 06:10:03
- -0700 (PDT)
-Date: Wed, 7 Aug 2024 06:10:02 -0700
-In-Reply-To: <CABgObfZQsCVYO5v47p=X0CoHQCYnAfgpyYR=3PTwv7BWhdm5vw@mail.gmail.com>
+	s=arc-20240116; t=1723036792; c=relaxed/simple;
+	bh=SsU2iF/kr87GRPwKXL7dEKrDmhbhkz6VOTu0Y6hDdu8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pcMPvDrtx9iu73bS/eoo693r0TaOg00WTAlYwlQdc9VuYGO6zMyRHgEbqfjvncsJm9VhnkPwgvV70ZK670sin3l6y4hXvcOqXzucNG+IHVFG/SudDGEW89Gr6ec9qwhJGxatiIJbRAodznXEEGj8U4qf9feAcq2K8UqLiimrHY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TyJfZ5yw; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723036790;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SsU2iF/kr87GRPwKXL7dEKrDmhbhkz6VOTu0Y6hDdu8=;
+	b=TyJfZ5ywgC1zgjml3rzYZmnlIaE6Njq041zPZcTXtk6bzmHNftG3RltSSL7/np8H20yV2F
+	e64819FmnE1+7ZtC3GqEvfcnhWfwTrVe4mlrm/pwknwTbA4dgnwiEGNuYMFudfUN/Pgi9H
+	IoO/Tgs5aT2gTTfkmJq3zr/4/VAt74w=
+Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-136-0PCfTmtjPXW91nZBK36-Cw-1; Wed,
+ 07 Aug 2024 09:19:42 -0400
+X-MC-Unique: 0PCfTmtjPXW91nZBK36-Cw-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 8263119560A2;
+	Wed,  7 Aug 2024 13:19:41 +0000 (UTC)
+Received: from localhost (unknown [10.2.16.129])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 73EB43000197;
+	Wed,  7 Aug 2024 13:19:40 +0000 (UTC)
+Date: Wed, 7 Aug 2024 09:19:39 -0400
+From: Stefan Hajnoczi <stefanha@redhat.com>
+To: Max Gurtovoy <mgurtovoy@nvidia.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev,
+	axboe@kernel.dk, kvm@vger.kernel.org, linux-block@vger.kernel.org,
+	oren@nvidia.com
+Subject: Re: [PATCH 1/1] virtio_blk: implement init_hctx MQ operation
+Message-ID: <20240807131939.GA131475@fedora.redhat.com>
+References: <20240801111337-mutt-send-email-mst@kernel.org>
+ <0888da3b-3283-405b-b1a8-a315e2623289@nvidia.com>
+ <20240801112843-mutt-send-email-mst@kernel.org>
+ <9400fb28-47c2-4629-af17-df2a95f2d3d8@nvidia.com>
+ <20240801114205-mutt-send-email-mst@kernel.org>
+ <6a8f0c72-ba77-42c3-8d85-6bb23a23f025@nvidia.com>
+ <20240801175617.GA1133773@fedora.redhat.com>
+ <a10e97ce-792a-410f-b68e-d00292987b3a@nvidia.com>
+ <20240803083824-mutt-send-email-mst@kernel.org>
+ <7022d183-f98e-40b4-b3cb-00eb43c1ff06@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240806053701.138337-1-eiichi.tsukata@nutanix.com>
- <ZrJJPwX-1YjichNB@google.com> <CABgObfZQsCVYO5v47p=X0CoHQCYnAfgpyYR=3PTwv7BWhdm5vw@mail.gmail.com>
-Message-ID: <ZrNyKqjSiAhJGwIW@google.com>
-Subject: Re: [RFC PATCH] KVM: x86: hyper-v: Inhibit APICv with VP Assist on SPR/EMR
-From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Eiichi Tsukata <eiichi.tsukata@nutanix.com>, chao.gao@intel.com, tglx@linutronix.de, 
-	mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, 
-	hpa@zytor.com, vkuznets@redhat.com, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, jon@nutanix.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="cD+r1+2b44WpCs/0"
+Content-Disposition: inline
+In-Reply-To: <7022d183-f98e-40b4-b3cb-00eb43c1ff06@nvidia.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+
+
+--cD+r1+2b44WpCs/0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Aug 06, 2024, Paolo Bonzini wrote:
-> On Tue, Aug 6, 2024 at 6:03=E2=80=AFPM Sean Christopherson <seanjc@google=
-.com> wrote:
-> > > As is noted in [1], this issue is considered to be a microcode issue
-> > > specific to SPR/EMR.
-> >
-> > I don't think we can claim that without a more explicit statement from =
-Intel.
-> > And I would really like Intel to clarify exactly what is going on, so t=
-hat (a)
-> > it can be properly documented and (b) we can implement a precise, targe=
-ted
-> > workaround in KVM.
+On Sat, Aug 03, 2024 at 08:54:45PM +0300, Max Gurtovoy wrote:
 >=20
-> It is not even clear to me why this patch has any effect at all,
-> because PV EOI and APICv don't work together anyway: PV EOI requires
-> apic->highest_isr_cache =3D=3D -1 (see apic_sync_pv_eoi_to_guest()) but
-> the cache is only set without APICv (see apic_set_isr()).  Therefore,
-> PV EOI should be basically a no-op with APICv in use.
+> On 03/08/2024 15:39, Michael S. Tsirkin wrote:
+> > On Sat, Aug 03, 2024 at 01:07:27AM +0300, Max Gurtovoy wrote:
+> > > On 01/08/2024 20:56, Stefan Hajnoczi wrote:
+> > > > On Thu, Aug 01, 2024 at 06:56:44PM +0300, Max Gurtovoy wrote:
+> > > > > On 01/08/2024 18:43, Michael S. Tsirkin wrote:
+> > > > > > On Thu, Aug 01, 2024 at 06:39:16PM +0300, Max Gurtovoy wrote:
+> > > > > > > On 01/08/2024 18:29, Michael S. Tsirkin wrote:
+> > > > > > > > On Thu, Aug 01, 2024 at 06:17:21PM +0300, Max Gurtovoy wrot=
+e:
+> > > > > > > > > On 01/08/2024 18:13, Michael S. Tsirkin wrote:
+> > > > > > > > > > On Thu, Aug 01, 2024 at 06:11:37PM +0300, Max Gurtovoy =
+wrote:
+> > > > > > > > > > > In this operation set the driver data of the hctx to =
+point to the virtio
+> > > > > > > > > > > block queue. By doing so, we can use this reference i=
+n the and reduce
+> > > > > > > > > > in the .... ?
+> > > > > > > > > sorry for the type.
+> > > > > > > > >=20
+> > > > > > > > > should be :
+> > > > > > > > >=20
+> > > > > > > > > "By doing so, we can use this reference and reduce the nu=
+mber of operations in the fast path."
+> > > > > > > > ok. what kind of benefit do you see with this patch?
+> > > > > > > As mentioned. This is a micro optimization that reduce the nu=
+mber of
+> > > > > > > instructions/dereferences in the fast path.
+> > > > > > By how much? How random code tweaks affect object code is unpre=
+dictable.
+> > > > > > Pls show results of objdump to prove it does anything
+> > > > > > useful.
+> > > > > This is the way all modern block drivers such as NVMe PCI/RDMA/TC=
+P use the
+> > > > > driver_data.
+> > > > >=20
+> > > > > These drivers don't have driver specific mechanisms to find the q=
+ueue from
+> > > > > the hctx->queue->queuedata like vblk driver has for some unknown =
+reason.
+> > > > >=20
+> > > > > It is pretty easy to review this patch and see its benefits, isn'=
+t it ?
+> > > > >=20
+> > > > > It is not expected to provide extreme perf improvement.
+> > > > >=20
+> > > > > It is introduced for aligning the driver to use common MQ mechani=
+sms and
+> > > > > reduce dereferences.
+> > > > >=20
+> > > > > This is not "random code tweaks".
+> > > > If you cannot observe a performance change, then adjusting the comm=
+it
+> > > > description to explain this as a code cleanup to reduce dereference=
+s and
+> > > > local variables, improving code readability seems fine to me. I thi=
+nk
+> > > > it's a nice cleanup when presented as such rather than a performance
+> > > > optimization.
+> > > >=20
+> > > > Stefan
+> > > Sure. Please check the bellow adjustment:
+> > >=20
+> > > virtio_blk: implement init_hctx MQ operation
+> > >=20
+> > > Set the driver data of the hardware context (hctx) to point directly =
+to
+> > > the virtio block queue. This cleanup improves code readability, reduc=
+es
+> > > the number of dereferences, and minimizes local variables in the fast
+> > > path.
+> > I'd drop the local variables part, it is not at all clear why is that
+> > a win.
+>=20
+> We can drop it:
+>=20
+> virtio_blk: implement init_hctx MQ operation
+>=20
+> Set the driver data of the hardware context (hctx) to point directly to
+> the virtio block queue. This cleanup improves code readability and reduces
+> the number of dereferences in the fast path.
+>=20
+>=20
 
-Per Chao, this is a ucode bug though.  Speculating wildly, I wonder if Inte=
-l added
-acceleration and/or redirection of HV_X64_MSR_EOI when APICv is enabled, e.=
-g. to
-speed up existing VMs, and something went sideways.
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--cD+r1+2b44WpCs/0
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmazdGoACgkQnKSrs4Gr
+c8hZnggArijtbcstPiHweHlu7ZUx9IZcfreWeGf372o4b/T2ImRDfuqNzzNZK/Eg
+8kCYY6URkZwAIwO8tYyNUH0jFfL6JI/E/Gy6V02R+4Oniq3y7SjKoUj5Znc0m0hj
+SGkbQTpE9jg+sq9PX/xcSgZedN0hC+TBjgL1v+5HVKDmUg+biy4wBxEIVP7KjTbg
+mezG1iZd1tnFNnKZ21AacbHDfl56r6MXZ+F/S1DF6g2G/lUs9DiaaHJomRee3seZ
+vD5JnA+N700wWVr3EJUpvOU7z7K14/ej9V6id4eTHftXTx24je3aPhpmpDojJ1wc
+47yp+/3m0tTStzvO7eElwco3G/E/8g==
+=q0mn
+-----END PGP SIGNATURE-----
+
+--cD+r1+2b44WpCs/0--
+
 
