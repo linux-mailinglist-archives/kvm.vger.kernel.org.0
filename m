@@ -1,191 +1,169 @@
-Return-Path: <kvm+bounces-23527-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23528-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C1094A68A
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 13:02:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E687794A70A
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 13:36:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4D25283A1B
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 11:02:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68D65B22780
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 11:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C7A1E286B;
-	Wed,  7 Aug 2024 11:02:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2852D1E3CA4;
+	Wed,  7 Aug 2024 11:36:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="rtgQWOCZ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BwZzZeKy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 818911B9B43;
-	Wed,  7 Aug 2024 11:02:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F18F31B86DB
+	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 11:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723028563; cv=none; b=RNR8+cXI7Ougc3qLFtMcD467U0okZ0k8vqHnPPcNSlOgIk7BicOaiJULGCy8pF9eT7vZ86nKaff4fn3AVA8jMrj/n7J/0QbLgqrE2xwehrBrXSvugJt6a6w18ZQna9wtU+Y/UsnPfNMojz+QHhIT0HbaHPdk3zqMomitqbzt+zs=
+	t=1723030603; cv=none; b=HVzcIGlkNjnj3YcKc5VIHh/suS8wlduPVyLczoq477Yq5q8hu8dLbQgwra6IZ/eKgI+QjvX1IHskZdXdm/cv2zVTOdF851zGF4oZVH7V1MUTIngXJogbazOs9gB7A+mTU5EOHaSC2zt1QBOp49br4JXxRfffq2FRgPdHbBEwpwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723028563; c=relaxed/simple;
-	bh=6jIjO/YzCC0JAUWX6XQ3qSYdTAbSolktYYq1hpL6PiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tfx8+O3G3J97s2fvSlgQt2gDv8+lfUGtbnQDlNoaA65h5/LFSQ5Hy4XifW1ZoHZdgCmiFXDtaWKMrc69Z6ADMtNDod4Jrj2AeGj8al2YeN8OaKM35bEa4uTMrf/MkOMocENqSDT/h/0VwB/AiXUgpbP8nfdDoaeuZxGKdRSRG0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=rtgQWOCZ; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353726.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4772Mb22012366;
-	Wed, 7 Aug 2024 11:02:37 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
-	:from:to:cc:subject:message-id:in-reply-to:references
-	:mime-version:content-type:content-transfer-encoding; s=pp1; bh=
-	K8SJ5DfZZqNnSsupVRItmzj3t1W0RVs7ge3xrM7xGX4=; b=rtgQWOCZEnq1xWnx
-	sm8Cn97Sb0+tZrJNJxFsPBBOY7ReRM2D18BNqYUJNzHKkXLrVrf0Ysv5rLeqjzrL
-	2yBPhar3VSOwr80L6hkSIexKcIdkgs+IPwYrLfq8fNUCFZdH2E9ovLVxrZU3tvRV
-	E81XGuYZQZeAiky4Yoc4bN0IjH03RQg3kyd0CQFyCJkY/wmopkAOsCDvdVWnJV2p
-	WmUJsMa3Yy1t4DKzwTbjhl2nfTcnZwQNwX/twyX0p+MrusW+5tlhLFMzvq7YoHzL
-	XlHy3KVwU09ko20cWJL8oylA2pFSABjN/URFA96zte84RgeEq1HXpmUT2XSm4dbW
-	OPiDRQ==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40u5t3vaxb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Aug 2024 11:02:36 +0000 (GMT)
-Received: from m0353726.ppops.net (m0353726.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 477AwR2p017334;
-	Wed, 7 Aug 2024 11:02:36 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40u5t3vax9-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Aug 2024 11:02:36 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4779KKZb030487;
-	Wed, 7 Aug 2024 11:02:35 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 40t1k38ac2-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Aug 2024 11:02:35 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 477B2Tmq57803250
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 7 Aug 2024 11:02:31 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id E8F2320040;
-	Wed,  7 Aug 2024 11:02:28 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A97702004D;
-	Wed,  7 Aug 2024 11:02:28 +0000 (GMT)
-Received: from darkmoore.boeblingen.de.ibm.com (unknown [9.155.210.150])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed,  7 Aug 2024 11:02:28 +0000 (GMT)
-Date: Wed, 7 Aug 2024 13:02:26 +0200
-From: Christoph Schlameuss <schlameuss@linux.ibm.com>
-To: Janosch Frank <frankja@linux.ibm.com>
-Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
-        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
-        Shuah
- Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand
- <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-Subject: Re: [PATCH v4 08/10] selftests: kvm: s390: Add uc_skey VM test case
-Message-ID: <20240807130226.00b9d1ca.schlameuss@linux.ibm.com>
-In-Reply-To: <4b4f9459-4b4a-48b8-8935-25e51ffa51c8@linux.ibm.com>
-References: <20240802155913.261891-1-schlameuss@linux.ibm.com>
-	<20240802155913.261891-9-schlameuss@linux.ibm.com>
-	<4b4f9459-4b4a-48b8-8935-25e51ffa51c8@linux.ibm.com>
-Organization: IBM
+	s=arc-20240116; t=1723030603; c=relaxed/simple;
+	bh=MIs+gv7rBTsc0LbEkyilDP/fIr2FHG8J3xY4FZp/PdU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eR2VrVxTwgz7p9IjwKOIjEdBhvscWJ2q+nhzRqnMTuJiL5/gA7m3kW8cZrE3ewkIJVPnpfONTu3uhMLJ8uprMVQQ/Kd1LHZ8EtBdrJ4KIeQYQNhLWbNWiYy4tFHrDkLoXNscd4ryPKbJutc2JkuYZFFNxggzADb1yVXYxw2upvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BwZzZeKy; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 7 Aug 2024 13:36:33 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1723030597;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vVsKop0OmydFEaNh7SQvDrbJswAXEPpWLvYOGMEvabE=;
+	b=BwZzZeKyaGX3IsgDGUxZieHy0HxIBu2Vx0KKlZl7An7NngLgI/6DS33aHda1FFLYKrDo11
+	SXzwp0vQSH2684pzfQZygmJmfGLysDoS47qg5qF4HcxjFiIU0FFOinNqpi0O1dapsRQ8Md
+	hs5I9p20gAAUuetiHUKsxbrIaKunGDo=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Andrew Jones <andrew.jones@linux.dev>
+To: Cade Richard <cade.richard@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu, jamestiotio@gmail.com
+Subject: Re: [PATCH kvm-unit-tests] riscv: sbi: add dbcn write test
+Message-ID: <20240807-2c3b28a78c80c6db80a80588@orel>
+References: <20240806-sbi-dbcn-write-test-v1-1-7f198bb55525@berkeley.edu>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 6iefWQHKb383ipd2xCz1eM-VTEfsxb5Z
-X-Proofpoint-ORIG-GUID: R0iBQ2xWlJfZLAlHp1u8dFjfreNTG5KN
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-07_08,2024-08-06_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- lowpriorityscore=0 mlxscore=0 suspectscore=0 mlxlogscore=884
- impostorscore=0 clxscore=1015 adultscore=0 malwarescore=0 phishscore=0
- bulkscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408070076
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240806-sbi-dbcn-write-test-v1-1-7f198bb55525@berkeley.edu>
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, 6 Aug 2024 15:39:44 +0200
-Janosch Frank <frankja@linux.ibm.com> wrote:
+On Tue, Aug 06, 2024 at 10:51:54PM GMT, Cade Richard wrote:
+> 
+> 
+> ---
+> Added a unit test for the RISC-V SBI debug console write() and write_byte() functions. The output of the tests must be inspected manually to verify that the correct bytes are written. For write(), the expected output is 'DBCN_WRITE_TEST_STRING'. For write_byte(), the expected output is 'a'.
+> 
+> Signed-off-by: Cade Richard <cade.richard@berkeley.edu>
+> ---
+>  lib/riscv/asm/sbi.h |  7 ++++++
+>  riscv/sbi.c         | 66 +++++++++++++++++++++++++++++++++++++++++++++++++++++
+>  2 files changed, 73 insertions(+)
+> 
+> diff --git a/lib/riscv/asm/sbi.h b/lib/riscv/asm/sbi.h
+> index 73ab5438..47e91025 100644
+> --- a/lib/riscv/asm/sbi.h
+> +++ b/lib/riscv/asm/sbi.h
+> @@ -19,6 +19,7 @@ enum sbi_ext_id {
+>  	SBI_EXT_TIME = 0x54494d45,
+>  	SBI_EXT_HSM = 0x48534d,
+>  	SBI_EXT_SRST = 0x53525354,
+> +	SBI_EXT_DBCN = 0x4442434E,
+>  };
+>  
+>  enum sbi_ext_base_fid {
+> @@ -42,6 +43,12 @@ enum sbi_ext_time_fid {
+>  	SBI_EXT_TIME_SET_TIMER = 0,
+>  };
+>  
+> +enum sbi_ext_dbcn_fid {
+> +	SBI_EXT_DBCN_CONSOLE_WRITE = 0,
+> +	SBI_EXT_DBCN_CONSOLE_READ,
+> +	SBI_EXT_DBCN_CONSOLE_WRITE_BYTE,
+> +};
+> +
+>  struct sbiret {
+>  	long error;
+>  	long value;
+> diff --git a/riscv/sbi.c b/riscv/sbi.c
+> index 2438c497..61993f08 100644
+> --- a/riscv/sbi.c
+> +++ b/riscv/sbi.c
+> @@ -15,6 +15,10 @@
+>  #include <asm/sbi.h>
+>  #include <asm/smp.h>
+>  #include <asm/timer.h>
+> +#include <asm/io.h>
+> +
+> +#define DBCN_WRITE_TEST_STRING		"DBCN_WRITE_TEST_STRING\n"
+> +#define DBCN_WRITE_BYTE_TEST_BYTE	(u8)'a'
+>  
+>  static void help(void)
+>  {
+> @@ -32,6 +36,11 @@ static struct sbiret __time_sbi_ecall(unsigned long stime_value)
+>  	return sbi_ecall(SBI_EXT_TIME, SBI_EXT_TIME_SET_TIMER, stime_value, 0, 0, 0, 0, 0);
+>  }
+>  
+> +static struct sbiret __dbcn_sbi_ecall(int fid, unsigned long arg0, unsigned long arg1, unsigned long arg2)
+> +{
+> +	return sbi_ecall(SBI_EXT_DBCN, fid, arg0, arg1, arg2, 0, 0, 0);
+> +}
+> +
+>  static bool env_or_skip(const char *env)
+>  {
+>  	if (!getenv(env)) {
+> @@ -248,6 +257,62 @@ static void check_time(void)
+>  	report_prefix_pop();
+>  }
+>  
+> +static void check_dbcn(void)
+> +{
+> +	
 
-> On 8/2/24 5:59 PM, Christoph Schlameuss wrote:
-> > Add a test case manipulating s390 storage keys from within the ucontrol
-> > VM.
-> > 
-> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> > ---
-> >   .../selftests/kvm/s390x/ucontrol_test.c       | 78 +++++++++++++++++++
-> >   1 file changed, 78 insertions(+)
-> >   
-> 
-> [...]
-> 
-> > +TEST_F(uc_kvm, uc_skey)
-> > +{
-> > +	u64 test_vaddr = self->base_gpa + VM_MEM_SIZE - (SZ_1M / 2);
-> > +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
-> > +	struct kvm_run *run = self->run;
-> > +	u8 skeyvalue = 0x34;
-> > +
-> > +	init_st_pt(self);
-> > +
-> > +	/* copy test_skey_asm to code_hva / code_gpa */
-> > +	TH_LOG("copy code %p to vm mapped memory %p / %p",
-> > +	       &test_skey_asm, (void *)self->code_hva, (void *)self->code_gpa);
-> > +	memcpy((void *)self->code_hva, &test_skey_asm, PAGE_SIZE);
-> > +
-> > +	/* set register content for test_skey_asm to access not mapped memory */
-> > +	sync_regs->gprs[1] = skeyvalue;
-> > +	sync_regs->gprs[5] = self->base_gpa;
-> > +	sync_regs->gprs[6] = test_vaddr;
-> > +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
-> > +
-> > +	run->kvm_dirty_regs |= KVM_SYNC_CRS;
-> > +	TH_LOG("set CR0 to 0x%llx", sync_regs->crs[0]);  
-> 
-> You haven't touched any CRs here or am I missing something?
-> 
+I still see whitespace issues, like this blank line here that has spaces,
+which I pointed out before. And there are several more blank lines with
+spaces too.
 
-No I am not. Removing that.
+> +	struct sbiret ret;
+> +	unsigned long num_bytes, base_addr_lo, base_addr_hi;
+> +	int num_calls = 0;
+> +	
+> +	num_bytes = strlen(DBCN_WRITE_TEST_STRING);
+> +	phys_addr_t p = virt_to_phys((void *)&DBCN_WRITE_TEST_STRING);
+> +	base_addr_lo = (unsigned long)p;
+> +	base_addr_hi = (unsigned long)(p >> __riscv_xlen);
 
-> > +
-> > +	self->sie_block->ictl |= ICTL_OPEREXC | ICTL_PINT;
-> > +	self->sie_block->cpuflags &= ~CPUSTAT_KSS;
-> > +	/* DAT enabled + 64 bit mode */
-> > +	run->psw_mask = 0x0400000180000000ULL;
-> > +	run->psw_addr = self->code_gpa;
-> > +
-> > +	ASSERT_EQ(0, uc_run_once(self));
-> > +	ASSERT_EQ(false, uc_handle_exit(self));
-> > +	ASSERT_EQ(2, sync_regs->gprs[0]);
-> > +	ASSERT_EQ(0x06, sync_regs->gprs[1]);  
-> 
-> /* ACC = 0, F & R = 1 */
-> 
+This doesn't compile for 64-bit. We get
 
-I will sprinkle in some comments here to make it more clear what is
-tested in the different blocks.
+riscv/sbi.c: In function 'check_dbcn':
+riscv/sbi.c:270:42: error: right shift count >= width of type [-Werror=shift-count-overflow]
+  270 |         base_addr_hi = (unsigned long)(p >> __riscv_xlen);
+      |                                          ^~
+riscv/sbi.c:298:50: error: right shift count >= width of type [-Werror=shift-count-overflow]
+  298 |                 base_addr_hi = (unsigned long)(p >> __riscv_xlen);
+      |                                                  ^~
+cc1: all warnings being treated as errors
+make: *** [<builtin>: riscv/sbi.o] Error 1
 
-> > +	uc_assert_diag44(self);
-> > +
-> > +	sync_regs->gprs[1] = skeyvalue;
-> > +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
-> > +	ASSERT_EQ(0, uc_run_once(self));
-> > +	ASSERT_EQ(false, uc_handle_exit(self));
-> > +	ASSERT_EQ(3, sync_regs->gprs[0]);
-> > +	ASSERT_EQ(skeyvalue, sync_regs->gprs[1]);
-> > +	uc_assert_diag44(self);  
-> 
-> Rest LGTM
-> 
+So I guess you didn't test with 64-bit? You should at least test with
+both 32-bit and 64-bit on QEMU, and, ideally, also test both on KVM and
+also 64-bit EFI on QEMU.
 
+I just tried 32-bit KVM and see that the DBCN write test fails the
+'write success' test. That may be a KVM bug.
+
+Thanks,
+drew
 
