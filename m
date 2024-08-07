@@ -1,57 +1,58 @@
-Return-Path: <kvm+bounces-23496-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23497-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B9D794A536
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 12:13:37 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 661CC94A54C
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 12:23:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18B802835E4
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 10:13:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5FBCB25CC9
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 10:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840AC1D54F3;
-	Wed,  7 Aug 2024 10:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF79C1DD3BC;
+	Wed,  7 Aug 2024 10:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkpsVuLe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVrexHsk"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958953612D;
-	Wed,  7 Aug 2024 10:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCAB71803A;
+	Wed,  7 Aug 2024 10:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723025601; cv=none; b=rrfa5xZ5H87dAOhclFINoBMqOCs9m+6L7B5LcQGiMrWvyh3kyNktorVSXKxwe3wYf/trZwmzi5xArlwCbheyyzlysAgZfzu5+RQ4Xnl0zbhChcCpqdMzGbk+AFb/0xS6nwM+w3bVi4LTVHwsYZQ7ANETaH8PkjHtjefEkQCmmYs=
+	t=1723026203; cv=none; b=EIpZDnDBAHGBbNlOK8akiBBxS+nJiaEBOyUD06ansZg1wnGGijU2aEPpknZzH0R7PKjtWhLDtpbv8fwLaLArEnWGjoYHlDt9IY6qtW+ztfnSyjgJ6zahmXaZFZqIpia3g/jU/oammV4BpwceBjvqkiPfsZ8+V7HaNf/9s5ocEZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723025601; c=relaxed/simple;
-	bh=32sFIlH+nIuN+Gj/4FUt6FCBFZ1/79vLbWF2rG8Tqdk=;
+	s=arc-20240116; t=1723026203; c=relaxed/simple;
+	bh=DN/7Kag72g7FaNidtmN/v8paJJdJ6G1PIHJ8z7NPSTU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P+C3KOceR5ab1+ayDH0kD/gzn+GK9MoCNr5h17u2XIwXoOnNyVcaOdtIL457EBtT71Qqi8se5b910yUmY+tfh0lXnDEBnd4BKt2hjabaIFXlxoHVNFF5Eqif8uBP9eD5wmQaNHwkKWF7ViVeJCQzodOc2somA72MBU66hCmIZ4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkpsVuLe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07F93C32782;
-	Wed,  7 Aug 2024 10:13:18 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=skeP6TH+TcYU+FDQvMf0fhgxSFm1xpiFTsYfGfSHJnPLAn4eHA06u7RQ2iYREi+PNRdq5oWd3nvWH6rKOL9T68f5HntnQ8tTsMsRpeC/HpUkLtPS9spN0xbhXzDRUBIcIjkRAMXHJ+8LeM+zMvqASpjjfX7qYVXqzl6ZlxBt4ew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVrexHsk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62CBDC32782;
+	Wed,  7 Aug 2024 10:23:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723025601;
-	bh=32sFIlH+nIuN+Gj/4FUt6FCBFZ1/79vLbWF2rG8Tqdk=;
+	s=k20201202; t=1723026203;
+	bh=DN/7Kag72g7FaNidtmN/v8paJJdJ6G1PIHJ8z7NPSTU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nkpsVuLexk5mBFnVJr4I7MG9rIb+LbDGs5pjJycdt3xVTMc1B1btTfi7xUo5Ju8YD
-	 MEMyS9y7+TKz714x+T2mP/rQaxPYXxjdrxnYEWPA5wKGvjJsmX8xhXgklFn6aI5z3N
-	 wFXhtxxvMd21s8wc+gDwMJ73bSLg4p2UCOsM0bK9CrhRN9+Tv+ZUbvbgb9Ey1b7/Mg
-	 Uf3NisLbMkrr5JM6ee6lRjfpjh1W19aJT64qKdHKTqZOGgB4qLRnwWFr5W11DNzazP
-	 ru3ERorOK85dj35fKi7TUmOIuOt0MPbL1a0UXsCzVPWltEPo0lGXeN5slb+6dO5TOd
-	 lZ7pHEJG47Bsw==
-Date: Wed, 7 Aug 2024 12:13:16 +0200
+	b=BVrexHskepkcm5QVFYzSuwDJtxkx0inW5YvKf3pIyXYWzqnf6Am2in5vPYUu5xG30
+	 53fu1Iu+7IAjvUaamLW6YdMNhpqm50N/yS9tEx+2aJNfWwCH9k9MDaRBkNyWrCIqxH
+	 4Qkt+KTK3EapDHVCf/ERPiIxjkGp8fiyLV9YY8h7vu3ebNzyGGcvp5/HKIHBTGS3R7
+	 MNoLx9neFwS/MZwa7NGQ0hh3hvVSuz2jZyM+ncse/jmwietSOQPGcI1iOTYhw87xhY
+	 h2dzzwUqk4h9swuQEUl1qilMggCcff6ZBt+JcEgjdh95yK3sc5X+hzEzZ2Sh3XN2I5
+	 mJ/FLJP25sVOA==
+Date: Wed, 7 Aug 2024 12:23:18 +0200
 From: Christian Brauner <brauner@kernel.org>
 To: viro@kernel.org
 Cc: linux-fsdevel@vger.kernel.org, amir73il@gmail.com, bpf@vger.kernel.org, 
 	cgroups@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
 	torvalds@linux-foundation.org
-Subject: Re: [PATCH 06/39] net/socket.c: switch to CLASS(fd)
-Message-ID: <20240807-erbarmen-getextet-77b673347599@brauner>
+Subject: Re: [PATCH 08/39] experimental: convert fs/overlayfs/file.c to
+ CLASS(...)
+Message-ID: <20240807-kundschaft-bauhof-fea71dc229dd@brauner>
 References: <20240730050927.GC5334@ZenIV>
  <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-6-viro@kernel.org>
+ <20240730051625.14349-8-viro@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -60,46 +61,15 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240730051625.14349-6-viro@kernel.org>
+In-Reply-To: <20240730051625.14349-8-viro@kernel.org>
 
-On Tue, Jul 30, 2024 at 01:15:52AM GMT, viro@kernel.org wrote:
+On Tue, Jul 30, 2024 at 01:15:54AM GMT, viro@kernel.org wrote:
 > From: Al Viro <viro@zeniv.linux.org.uk>
 > 
-> 	I strongly suspect that important part in sockfd_lookup_light()
-> is avoiding needless file refcount operations, not the marginal reduction
-> of the register pressure from not keeping a struct file pointer in
-> the caller.
-> 
-> 	If that's true, we should get the same benefits from straight
-> fdget()/fdput().  And AFAICS with sane use of CLASS(fd) we can get a
-> better code generation...
-> 
-> 	Would be nice if somebody tested it on networking test suites
-> (including benchmarks)...
-> 
-> 	sockfd_lookup_light() does fdget(), uses sock_from_file() to
-> get the associated socket and returns the struct socket reference to
-> the caller, along with "do we need to fput()" flag.  No matching fdput(),
-> the caller does its equivalent manually, using the fact that sock->file
-> points to the struct file the socket has come from.
-> 
-> 	Get rid of that - have the callers do fdget()/fdput() and
-> use sock_from_file() directly.  That kills sockfd_lookup_light()
-> and fput_light() (no users left).
-> 
-> 	What's more, we can get rid of explicit fdget()/fdput() by
-> switching to CLASS(fd, ...) - code generation does not suffer, since
-> now fdput() inserted on "descriptor is not opened" failure exit
-> is recognized to be a no-op by compiler.
-> 
-> 	We could split that commit in two (getting rid of sockd_lookup_light()
-> and switch to CLASS(fd, ...)), but AFAICS it ends up being harder to read
-> that way.
-> 
-> [conflicts in a couple of functions]
-> 
-> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> ---
+> There are four places where we end up adding an extra scope
+> covering just the range from constructor to destructor;
+> not sure if that's the best way to handle that.
 
+I think it's fine and not worth obsessing about it.
 Reviewed-by: Christian Brauner <brauner@kernel.org>
 
