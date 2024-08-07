@@ -1,385 +1,220 @@
-Return-Path: <kvm+bounces-23491-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23492-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1224194A4D7
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 11:57:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B07CA94A4E7
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 12:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6925CB2318B
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 09:57:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D45131C21403
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 10:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334941D1F59;
-	Wed,  7 Aug 2024 09:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B361D2799;
+	Wed,  7 Aug 2024 10:03:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GQpjA40t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jjaXtdj0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EBF51C7B77
-	for <kvm@vger.kernel.org>; Wed,  7 Aug 2024 09:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96FE3A267;
+	Wed,  7 Aug 2024 10:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723024647; cv=none; b=C+xLl88MCdZrvIQmJUbJMq3HOs8Ntr8AeJIzS2Lu4g/3e6UevbXMq3Mqz/WDdFlqBaIx/DrTQgFMSFJNC3jXw/7edyf/8uSc6llSLsOUZsc21/a1UXYpQmv1u4uohZ0Dc7Wr5P5s/c/rKCoiNylPZ4JV99XdVLueeSROsU3Ncx4=
+	t=1723024994; cv=none; b=cQevnuf+/HaMY2vlhEV88YJl1UWsC68fpNqRsMaM7qqs1H3XJtwQXp1sVaAbjttLAxbxWjIfx8CsJHZZuwu4OARdx0Gdoc6QNFwnn5ZpaLmBCKcyXamtoAnydmxK5TO3FWV8JzKZ9hjCryFKU0GEU04sGBSxCxQlVijoHr2Mthg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723024647; c=relaxed/simple;
-	bh=/g/ZZBUWUCDmIebaIcxyRJ/+V1joRJfSKEwLEKzaum4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QGlMPSmEwFvyIAPiCb6lrdKbZvVNer6dHauKLmDFFLikR3MBS4XS72R+7XQJmPW34gBgqU8J8tn1zKioZpztoCorYlT/BdfRR2bZi+qSjKbqKzk5iJdCr1QvcQzjWcGieCUDAT7WvR5Moxiv9Ho91zIYLcDg7/oN2Sg+CFR/NNA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GQpjA40t; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723024644;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=QhYDHmXmJQi46+6UhfMma7vbUjGkXIsu5WZQ+uaDpWE=;
-	b=GQpjA40t4oRc9pPJtQL5wfLiw7CCkqmSZXsfNvGKe46iS1TF2CXUwwoiJu1q1RrYhkQ5fK
-	AKTHfDtrgcum14IeD6t4bhLeElWGTrzX02PxRgaTr00US78jhC7qy3vrGoohB9xh98z6Fo
-	KO63MSJXHqbLk7287pl1ZP0H7TC2EGc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-K22eO4c4PdqfKfPUxh-XeA-1; Wed, 07 Aug 2024 05:57:23 -0400
-X-MC-Unique: K22eO4c4PdqfKfPUxh-XeA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4280e1852f3so11551665e9.3
-        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 02:57:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723024642; x=1723629442;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QhYDHmXmJQi46+6UhfMma7vbUjGkXIsu5WZQ+uaDpWE=;
-        b=dXrFV3OvXN9zpBC2u4Uxk0mw8qGniPz3bC+i7K+J/JR0xnA7+7Ie4kKXySj6MtJDZP
-         ZSL58RmpWNH4HyuGTjXVg6ksUlGzJFXfvlGkwDovV62V6frFadQjuoVW7ojeC5638StB
-         KEsjbDhpB62z1mjRdJBY7TX63N2rlkHCQHq+eDTJpE4mOq/8rf6F7PeJNaSX/3tmMQ4N
-         WqvXhx4ubt1ki50WVjZ4hpAOPy3NZ/pKjHWV2J3Q0qtG/JEapGnvSOhOJZb+hhZf58h8
-         gfOyeBANU2ZuCfRRlvnia/VP2hD7bDMvKHkD3iZHBu8Tp9DpXwIiB/eDWjkThePiWUyv
-         F6lQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWtnFqTvri9296VPT7G/NQ6PA36jT0BNCdRIqsV3rRqqfuL3DNuI3a+Vdef6k4JviMaKBmDCFM0WdqY0DnqBxvo3gwk
-X-Gm-Message-State: AOJu0YwybZzhEpUhsW3NcQZBHUkE/ra2tlJEKuiqjHuhHVj5s2rKRlzc
-	hT52042klhx+7rq9m2rl+MIzp7GVEcdt4C9Sb59bVd3S3RuF5Uy+Otna4X8QS3BjO+BgqwwxlX4
-	PLkVhgRIXoAoBCxUxSVyeUdwUtf6wJve9Z67lvT8EyEOUIj6Zhw==
-X-Received: by 2002:a5d:47ae:0:b0:366:e31a:500e with SMTP id ffacd0b85a97d-36bbc1d7791mr11661187f8f.63.1723024642085;
-        Wed, 07 Aug 2024 02:57:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEKIx+UH5dY/dVRyBapAk0Th6PLBq9S/ArQBuC3qjkAHZvhs3V3G3ABB3G0VEJbKGtXsfMI5w==
-X-Received: by 2002:a5d:47ae:0:b0:366:e31a:500e with SMTP id ffacd0b85a97d-36bbc1d7791mr11661166f8f.63.1723024641470;
-        Wed, 07 Aug 2024 02:57:21 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c708:1a00:df86:93fe:6505:d096? (p200300cbc7081a00df8693fe6505d096.dip0.t-ipconnect.de. [2003:cb:c708:1a00:df86:93fe:6505:d096])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36bbd0597ddsm15632741f8f.77.2024.08.07.02.57.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Aug 2024 02:57:20 -0700 (PDT)
-Message-ID: <a612c83f-071e-437f-99e1-d1fb157b62d7@redhat.com>
-Date: Wed, 7 Aug 2024 11:57:19 +0200
+	s=arc-20240116; t=1723024994; c=relaxed/simple;
+	bh=nuA8I7Y8ffJxxkHPqZ/eRwOW3VtvVOP1ALTGr9adw6s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ib0Qsvq2X5AJfnqpc0M/GykoZZbpn+ThF+9NiSXdozj1D/7qt9r1MPzynfNlpjcnY3K/kyXXary0B66SJwEbESGfCwVCQMly6qqpW0QHfkAe1BOdb40SnYj2vfS9xyU4JY+4ckUmkbSZN1QIncSyvsX0X8X5oVBffmtzqoGjZ+A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jjaXtdj0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8328AC32782;
+	Wed,  7 Aug 2024 10:03:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723024993;
+	bh=nuA8I7Y8ffJxxkHPqZ/eRwOW3VtvVOP1ALTGr9adw6s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=jjaXtdj083OirwYOMnJ8pkTZ+gMavr68qpkhsQdtpf+ykKNvrUR3g0LHYzCNFgj10
+	 amLMbPk1FTvZ/qexTJSxz52hpf9qkIU1bhdmdeskB55laoaPDb2BVE3DL7vWM7KID7
+	 54eE68PyXJD2P6hDwwScvw0M6RdYEqAP8vzvSemC5rJqgKRjy+GFYZ3ohodLSueQCB
+	 akqCXE5f9uPyPwAARG3/cgcxW9UbRhDS7TK/SsPmzprJCvhfrVCr1+g2kSL0aAcVAU
+	 BsgEtei108fDnPxkmbKuTZ9rv0CNTMn2/kVddlSyqEYap+AjlZxZVQ5SONLllFjLGv
+	 0zSpiIY42TmAw==
+Date: Wed, 7 Aug 2024 12:03:08 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: viro@kernel.org
+Cc: linux-fsdevel@vger.kernel.org, amir73il@gmail.com, bpf@vger.kernel.org, 
+	cgroups@vger.kernel.org, kvm@vger.kernel.org, netdev@vger.kernel.org, 
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH 03/39] struct fd: representation change
+Message-ID: <20240807-gecheckt-groll-94355086496f@brauner>
+References: <20240730050927.GC5334@ZenIV>
+ <20240730051625.14349-1-viro@kernel.org>
+ <20240730051625.14349-3-viro@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 07/11] mm/huge_memory: convert split_huge_pages_pid()
- from follow_page() to folio_walk
-To: Zi Yan <ziy@nvidia.com>
-Cc: Ryan Roberts <ryan.roberts@arm.com>, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- Andrew Morton <akpm@linux-foundation.org>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Jonathan Corbet <corbet@lwn.net>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Janosch Frank <frankja@linux.ibm.com>,
- Claudio Imbrenda <imbrenda@linux.ibm.com>, Heiko Carstens
- <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
- Mark Brown <broonie@kernel.org>
-References: <20240802155524.517137-1-david@redhat.com>
- <20240802155524.517137-8-david@redhat.com>
- <e1d44e36-06e4-4d1c-8daf-315d149ea1b3@arm.com>
- <ac97ccdc-ee1e-4f07-8902-6360de80c2a0@redhat.com>
- <a5f059a0-32d6-453e-9d18-1f3bfec3a762@redhat.com>
- <c75d1c6c-8ea6-424f-853c-1ccda6c77ba2@redhat.com>
- <5BEF38E0-359C-4927-98EF-A0EE7DC81251@nvidia.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <5BEF38E0-359C-4927-98EF-A0EE7DC81251@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240730051625.14349-3-viro@kernel.org>
 
-On 06.08.24 17:36, Zi Yan wrote:
-> On 6 Aug 2024, at 6:24, David Hildenbrand wrote:
+On Tue, Jul 30, 2024 at 01:15:49AM GMT, viro@kernel.org wrote:
+> From: Al Viro <viro@zeniv.linux.org.uk>
 > 
->> On 06.08.24 12:03, David Hildenbrand wrote:
->>> On 06.08.24 11:56, David Hildenbrand wrote:
->>>> On 06.08.24 11:46, Ryan Roberts wrote:
->>>>> On 02/08/2024 16:55, David Hildenbrand wrote:
->>>>>> Let's remove yet another follow_page() user. Note that we have to do the
->>>>>> split without holding the PTL, after folio_walk_end(). We don't care
->>>>>> about losing the secretmem check in follow_page().
->>>>>
->>>>> Hi David,
->>>>>
->>>>> Our (arm64) CI is showing a regression in split_huge_page_test from mm selftests from next-20240805 onwards. Navigating around a couple of other lurking bugs, I was able to bisect to this change (which smells about right).
->>>>>
->>>>> Newly failing test:
->>>>>
->>>>> # # ------------------------------
->>>>> # # running ./split_huge_page_test
->>>>> # # ------------------------------
->>>>> # # TAP version 13
->>>>> # # 1..12
->>>>> # # Bail out! Still AnonHugePages not split
->>>>> # # # Planned tests != run tests (12 != 0)
->>>>> # # # Totals: pass:0 fail:0 xfail:0 xpass:0 skip:0 error:0
->>>>> # # [FAIL]
->>>>> # not ok 52 split_huge_page_test # exit=1
->>>>>
->>>>> It's trying to split some pmd-mapped THPs then checking and finding that they are not split. The split is requested via /sys/kernel/debug/split_huge_pages, which I believe ends up in this function you are modifying here. Although I'll admit that looking at the change, there is nothing obviously wrong! Any ideas?
->>>>
->>>> Nothing jumps at me as well. Let me fire up the debugger :)
->>>
->>> Ah, very likely the can_split_folio() check expects a raised refcount
->>> already.
->>
->> Indeed, the following does the trick! Thanks Ryan, I could have sworn
->> I ran that selftest as well.
->>
->> TAP version 13
->> 1..12
->> ok 1 Split huge pages successful
->> ok 2 Split PTE-mapped huge pages successful
->> # Please enable pr_debug in split_huge_pages_in_file() for more info.
->> # Please check dmesg for more information
->> ok 3 File-backed THP split test done
->>
->> ...
->>
->>
->> @Andrew, can you squash the following?
->>
->>
->>  From e5ea585de3e089ea89bf43d8447ff9fc9b371286 Mon Sep 17 00:00:00 2001
->> From: David Hildenbrand <david@redhat.com>
->> Date: Tue, 6 Aug 2024 12:08:17 +0200
->> Subject: [PATCH] fixup: mm/huge_memory: convert split_huge_pages_pid() from
->>   follow_page() to folio_walk
->>
->> We have to teach can_split_folio() that we are not holding an additional
->> reference.
->>
->> Signed-off-by: David Hildenbrand <david@redhat.com>
->> ---
->>   include/linux/huge_mm.h | 4 ++--
->>   mm/huge_memory.c        | 8 ++++----
->>   mm/vmscan.c             | 2 +-
->>   3 files changed, 7 insertions(+), 7 deletions(-)
->>
->> diff --git a/include/linux/huge_mm.h b/include/linux/huge_mm.h
->> index e25d9ebfdf89..ce44caa40eed 100644
->> --- a/include/linux/huge_mm.h
->> +++ b/include/linux/huge_mm.h
->> @@ -314,7 +314,7 @@ unsigned long thp_get_unmapped_area_vmflags(struct file *filp, unsigned long add
->>   		unsigned long len, unsigned long pgoff, unsigned long flags,
->>   		vm_flags_t vm_flags);
->>   -bool can_split_folio(struct folio *folio, int *pextra_pins);
->> +bool can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins);
->>   int split_huge_page_to_list_to_order(struct page *page, struct list_head *list,
->>   		unsigned int new_order);
->>   static inline int split_huge_page(struct page *page)
->> @@ -470,7 +470,7 @@ thp_get_unmapped_area_vmflags(struct file *filp, unsigned long addr,
->>   }
->>    static inline bool
->> -can_split_folio(struct folio *folio, int *pextra_pins)
->> +can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins)
->>   {
->>   	return false;
->>   }
->> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
->> index 697fcf89f975..c40b0dcc205b 100644
->> --- a/mm/huge_memory.c
->> +++ b/mm/huge_memory.c
->> @@ -3021,7 +3021,7 @@ static void __split_huge_page(struct page *page, struct list_head *list,
->>   }
->>    /* Racy check whether the huge page can be split */
->> -bool can_split_folio(struct folio *folio, int *pextra_pins)
->> +bool can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins)
->>   {
->>   	int extra_pins;
->>   @@ -3033,7 +3033,7 @@ bool can_split_folio(struct folio *folio, int *pextra_pins)
->>   		extra_pins = folio_nr_pages(folio);
->>   	if (pextra_pins)
->>   		*pextra_pins = extra_pins;
->> -	return folio_mapcount(folio) == folio_ref_count(folio) - extra_pins - 1;
->> +	return folio_mapcount(folio) == folio_ref_count(folio) - extra_pins - caller_pins;
->>   }
->>    /*
->> @@ -3201,7 +3201,7 @@ int split_huge_page_to_list_to_order(struct page *page, struct list_head *list,
->>   	 * Racy check if we can split the page, before unmap_folio() will
->>   	 * split PMDs
->>   	 */
->> -	if (!can_split_folio(folio, &extra_pins)) {
->> +	if (!can_split_folio(folio, 1, &extra_pins)) {
->>   		ret = -EAGAIN;
->>   		goto out_unlock;
->>   	}
->> @@ -3537,7 +3537,7 @@ static int split_huge_pages_pid(int pid, unsigned long vaddr_start,
->>   		 * can be split or not. So skip the check here.
->>   		 */
->>   		if (!folio_test_private(folio) &&
->> -		    !can_split_folio(folio, NULL))
->> +		    !can_split_folio(folio, 0, NULL))
->>   			goto next;
->>    		if (!folio_trylock(folio))
+> 	The absolute majority of instances comes from fdget() and its
+> relatives; the underlying primitives actually return a struct file
+> reference and a couple of flags encoded into an unsigned long - the lower
+> two bits of file address are always zero, so we can stash the flags
+> into those.  On the way out we use __to_fd() to unpack that unsigned
+> long into struct fd.
 > 
-> The diff below can skip a folio with private and extra pin(s) early instead
-> of trying to lock and split it then failing at can_split_folio() inside
-> split_huge_page_to_list_to_order().
+> 	Let's use that representation for struct fd itself - make it
+> a structure with a single unsigned long member (.word), with the value
+> equal either to (unsigned long)p | flags, p being an address of some
+> struct file instance, or to 0 for an empty fd.
 > 
-> Maybe worth applying on top of yours?
+> 	Note that we never used a struct fd instance with NULL ->file
+> and non-zero ->flags; the emptiness had been checked as (!f.file) and
+> we expected e.g. fdput(empty) to be a no-op.  With new representation
+> we can use (!f.word) for emptiness check; that is enough for compiler
+> to figure out that (f.word & FDPUT_FPUT) will be false and that fdput(f)
+> will be a no-op in such case.
 > 
+> 	For now the new predicate (fd_empty(f)) has no users; all the
+> existing checks have form (!fd_file(f)).  We will convert to fd_empty()
+> use later; here we only define it (and tell the compiler that it's
+> unlikely to return true).
 > 
-> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-> index a218320a9233..ce992d54f1da 100644
-> --- a/mm/huge_memory.c
-> +++ b/mm/huge_memory.c
-> @@ -3532,13 +3532,10 @@ static int split_huge_pages_pid(int pid, unsigned long vaddr_start,
->                          goto next;
+> 	This commit only deals with representation change; there will
+> be followups.
 > 
->                  total++;
-> -               /*
-> -                * For folios with private, split_huge_page_to_list_to_order()
-> -                * will try to drop it before split and then check if the folio
-> -                * can be split or not. So skip the check here.
-> -                */
-> -               if (!folio_test_private(folio) &&
-> -                   !can_split_folio(folio, 0, NULL))
-> +
-> +               if (!can_split_folio(folio,
-> +                                    folio_test_private(folio) ? 1 : 0,
-> +                                    NULL))
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> ---
+>  drivers/infiniband/core/uverbs_cmd.c |  2 +-
+>  fs/overlayfs/file.c                  | 28 +++++++++++++++-------------
+>  fs/xfs/xfs_handle.c                  |  2 +-
+>  include/linux/file.h                 | 22 ++++++++++++++++------
+>  kernel/events/core.c                 |  2 +-
+>  net/socket.c                         |  2 +-
+>  6 files changed, 35 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/infiniband/core/uverbs_cmd.c b/drivers/infiniband/core/uverbs_cmd.c
+> index 3f85575cf971..a4cce360df21 100644
+> --- a/drivers/infiniband/core/uverbs_cmd.c
+> +++ b/drivers/infiniband/core/uverbs_cmd.c
+> @@ -572,7 +572,7 @@ static int ib_uverbs_open_xrcd(struct uverbs_attr_bundle *attrs)
+>  	struct inode                   *inode = NULL;
+>  	int				new_xrcd = 0;
+>  	struct ib_device *ib_dev;
+> -	struct fd f = {};
+> +	struct fd f = EMPTY_FD;
+>  	int ret;
+>  
+>  	ret = uverbs_request(attrs, &cmd, sizeof(cmd));
+> diff --git a/fs/overlayfs/file.c b/fs/overlayfs/file.c
+> index c4963d0c5549..2b7a5a3a7a2f 100644
+> --- a/fs/overlayfs/file.c
+> +++ b/fs/overlayfs/file.c
+> @@ -93,11 +93,11 @@ static int ovl_real_fdget_meta(const struct file *file, struct fd *real,
+>  			       bool allow_meta)
+>  {
+>  	struct dentry *dentry = file_dentry(file);
+> +	struct file *realfile = file->private_data;
+>  	struct path realpath;
+>  	int err;
+>  
+> -	real->flags = 0;
+> -	real->file = file->private_data;
+> +	real->word = (unsigned long)realfile;
+>  
+>  	if (allow_meta) {
+>  		ovl_path_real(dentry, &realpath);
+> @@ -113,16 +113,17 @@ static int ovl_real_fdget_meta(const struct file *file, struct fd *real,
+>  		return -EIO;
+>  
+>  	/* Has it been copied up since we'd opened it? */
+> -	if (unlikely(file_inode(real->file) != d_inode(realpath.dentry))) {
+> -		real->flags = FDPUT_FPUT;
+> -		real->file = ovl_open_realfile(file, &realpath);
+> -
+> -		return PTR_ERR_OR_ZERO(real->file);
+> +	if (unlikely(file_inode(realfile) != d_inode(realpath.dentry))) {
+> +		struct file *f = ovl_open_realfile(file, &realpath);
+> +		if (IS_ERR(f))
+> +			return PTR_ERR(f);
+> +		real->word = (unsigned long)ovl_open_realfile(file, &realpath) | FDPUT_FPUT;
+> +		return 0;
+>  	}
+>  
+>  	/* Did the flags change since open? */
+> -	if (unlikely((file->f_flags ^ real->file->f_flags) & ~OVL_OPEN_FLAGS))
+> -		return ovl_change_flags(real->file, file->f_flags);
+> +	if (unlikely((file->f_flags ^ realfile->f_flags) & ~OVL_OPEN_FLAGS))
+> +		return ovl_change_flags(realfile, file->f_flags);
+>  
+>  	return 0;
+>  }
+> @@ -130,10 +131,11 @@ static int ovl_real_fdget_meta(const struct file *file, struct fd *real,
+>  static int ovl_real_fdget(const struct file *file, struct fd *real)
+>  {
+>  	if (d_is_dir(file_dentry(file))) {
+> -		real->flags = 0;
+> -		real->file = ovl_dir_real_file(file, false);
+> -
+> -		return PTR_ERR_OR_ZERO(real->file);
+> +		struct file *f = ovl_dir_real_file(file, false);
+> +		if (IS_ERR(f))
+> +			return PTR_ERR(f);
+> +		real->word = (unsigned long)f;
+> +		return 0;
+>  	}
+>  
+>  	return ovl_real_fdget_meta(file, real, false);
+> diff --git a/fs/xfs/xfs_handle.c b/fs/xfs/xfs_handle.c
+> index 7bcc4f519cb8..49e5e5f04e60 100644
+> --- a/fs/xfs/xfs_handle.c
+> +++ b/fs/xfs/xfs_handle.c
+> @@ -85,7 +85,7 @@ xfs_find_handle(
+>  	int			hsize;
+>  	xfs_handle_t		handle;
+>  	struct inode		*inode;
+> -	struct fd		f = {NULL};
+> +	struct fd		f = EMPTY_FD;
+>  	struct path		path;
+>  	int			error;
+>  	struct xfs_inode	*ip;
+> diff --git a/include/linux/file.h b/include/linux/file.h
+> index 0f3f369f2450..bdd6e1766839 100644
+> --- a/include/linux/file.h
+> +++ b/include/linux/file.h
+> @@ -35,18 +35,28 @@ static inline void fput_light(struct file *file, int fput_needed)
+>  		fput(file);
+>  }
+>  
+> +/* either a reference to struct file + flags
+> + * (cloned vs. borrowed, pos locked), with
+> + * flags stored in lower bits of value,
+> + * or empty (represented by 0).
+> + */
+>  struct fd {
+> -	struct file *file;
+> -	unsigned int flags;
+> +	unsigned long word;
+>  };
+>  #define FDPUT_FPUT       1
+>  #define FDPUT_POS_UNLOCK 2
+>  
+> -#define fd_file(f) ((f).file)
+> +#define fd_file(f) ((struct file *)((f).word & ~3))
 
-Hmm, it does look a bit odd. It's not something from the caller (caller_pins), but a
-folio property. Likely should be handled differently.
+Minor thing but it would be nice if you'd use the macros for this
+instead of the raw number:
 
-In vmscan code, we only call can_split_folio() on anon folios where
-folio_test_private() does not apply.
+#define fd_file(f) ((struct file *)((f).word & ~(FDPUT_FPUT | FDPUT_POS_UNLOCK))
 
-But indeed, in split_huge_page_to_list_to_order() we'd have to fail if
-folio_test_private() still applies after
-
-Not sure if that is really better:
-
-
-diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-index c40b0dcc205b..7cb743047566 100644
---- a/mm/huge_memory.c
-+++ b/mm/huge_memory.c
-@@ -3026,11 +3026,14 @@ bool can_split_folio(struct folio *folio, int caller_pins, int *pextra_pins)
-         int extra_pins;
-  
-         /* Additional pins from page cache */
--       if (folio_test_anon(folio))
-+       if (folio_test_anon(folio)) {
-                 extra_pins = folio_test_swapcache(folio) ?
-                                 folio_nr_pages(folio) : 0;
--       else
-+       } else {
-                 extra_pins = folio_nr_pages(folio);
-+               if (unlikely(folio_test_private(folio)))
-+                       extra_pins++;
-+       }
-         if (pextra_pins)
-                 *pextra_pins = extra_pins;
-         return folio_mapcount(folio) == folio_ref_count(folio) - extra_pins - caller_pins;
-@@ -3199,9 +3202,11 @@ int split_huge_page_to_list_to_order(struct page *page, struct list_head *list,
-  
-         /*
-          * Racy check if we can split the page, before unmap_folio() will
--        * split PMDs
-+        * split PMDs. filemap_release_folio() will try to free buffer; if that
-+        * fails, filemap_release_folio() fails.
-          */
--       if (!can_split_folio(folio, 1, &extra_pins)) {
-+       if (WARN_ON_ONCE(folio_test_private(folio)) ||
-+           !can_split_folio(folio, 1, &extra_pins)) {
-                 ret = -EAGAIN;
-                 goto out_unlock;
-         }
-@@ -3531,13 +3536,7 @@ static int split_huge_pages_pid(int pid, unsigned long vaddr_start,
-                         goto next;
-  
-                 total++;
--               /*
--                * For folios with private, split_huge_page_to_list_to_order()
--                * will try to drop it before split and then check if the folio
--                * can be split or not. So skip the check here.
--                */
--               if (!folio_test_private(folio) &&
--                   !can_split_folio(folio, 0, NULL))
-+               if (!can_split_folio(folio, 0, NULL))
-                         goto next;
-  
-                 if (!folio_trylock(folio))
-
-
-It assumes that folio_set_private() is impossible after filemap_release_folio() succeeded
-and we're still holding the folio lock. Then we could even get rid of the WARN_ON_ONCE().
-
--- 
-Cheers,
-
-David / dhildenb
-
+Reviewed-by: Christian Brauner <brauner@kernel.org>
 
