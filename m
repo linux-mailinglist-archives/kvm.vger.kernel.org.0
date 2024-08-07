@@ -1,276 +1,386 @@
-Return-Path: <kvm+bounces-23586-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23587-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5874394B332
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 00:42:03 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D779894B3A0
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 01:31:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B8F51C21390
-	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 22:42:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 286B5B2386A
+	for <lists+kvm@lfdr.de>; Wed,  7 Aug 2024 23:31:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF7D155325;
-	Wed,  7 Aug 2024 22:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F55145FF5;
+	Wed,  7 Aug 2024 23:31:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Xmny7Ji3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OnNXKNnd"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2086.outbound.protection.outlook.com [40.107.243.86])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B30F84037;
-	Wed,  7 Aug 2024 22:41:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723070511; cv=fail; b=aSet6G5pPVXg9qEXhbhsijxSMqI0PpwsKVNNqV9A+ALDjmbSCdhobPjXes8RGXfsbWxwpphsvhJduhGrEUSkqa547js8ExmdCXCyiozlTer84mZCHrmXoneVGDvfTOg9v3BucuTco8/OT83PfDHEAlJV3xY8GJK7G3+NvMFvcUw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723070511; c=relaxed/simple;
-	bh=+OOVJx+oZ3mA7y2n2ucNNovYvh+RsakGflK1nEG3wmo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E+LESF9uYx1WbLHUW2JPnryn9mUmtXJ/ccyzUEB8eB2QNJH8nYDNUL7cNpXzaxYk7CzoKGfSD/YbJB07QyZBwVD0dhR7SnTM5YJkYaVksHUuLcKex49Rp3+E5QwYxH7GMZPXoGsMxfLgGu93kfkvK7SF6WCXv8m74Hi4591JL2A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Xmny7Ji3; arc=fail smtp.client-ip=40.107.243.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=p0ld5f1CngEpcnZvbltQKgWiUukeVg6J1SxqkXhn6rN3pjhAv3bVrm0Lct+UKbA72Rk4HS/tcxXRSe4/ThSPDCwT+mILkZkpZsXyFYtmn8KNIAKTuDBiNMSkDvXfKez7+3oob3GX7YPCT9MsAV3xWOkcUDyNQvFgp//K6Zae9HQ1WsU3zvSQZ3ix8sm1YcUaGoQfhYk+/IL6ratd+/Ny3DeJRwsHVZ7ftJ1yU0gJt2kzifNnLgXqAyf7u4tsPhLW2Hf791TcrOowgMppFFHHKjKnv0REdxQ8t04s4XrJURIC89Gx6svki/cBFdhnkCD1l453mEvebhBjN6Qdn7ocLA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H2CzQ0CmMxzzrpO0I/9AQ4gzwGh/pa5CVmBoWKnSsZc=;
- b=KCGf43v9+NCvy5WcETB/rDuUDBb2dKaGVKB0UMV9478H06OZk3lO9VHOq58qKCx/QwpmkUsOfJnTfcKir0PF8U7yA+3HwSqrh/2aPpHP0ZixUFGOATBPfn99JDnYI7ceC3q1uV3s2Dr787rIa2isFnklZ1St8y42xqzYouchzN5HnFXmWvBMwZFlxz+gY/n8Jggh05yDOr6e1WD9gEdW8AP66S/hZG6NZHnnE9DH6vG/6ltpfCJzlrlBCH2UNil84BG4WcY97EkjwnZMR7FH3bqOEbF2V/1ixJ/PMFsnlq352gIpYuDTCLVtXMI7JZi1bcLHAfNNb95aOpgH4S769g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=redhat.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=H2CzQ0CmMxzzrpO0I/9AQ4gzwGh/pa5CVmBoWKnSsZc=;
- b=Xmny7Ji3CSFqwdGYS4W0LPvMDIrYeo0D/BfHtNE0t4hRsERowuJqYYXdiIRrRlgroo9tVswQJZYRizcwBi+InZ5nUtWiUBkBAtzO8/l/nM3rVgVmGWn9WkZAGpX/mQ927yBVoVmgSHJUzLCGx40DUhwkP3Oo1J41P0v7fJH+L+/VhS8hnK2uVALHdJkbHSiz8/h2ctVhPxVpYHJ0SzQBfpNAScQClNQp5BQMRUHRys1S7KZdD8FntgkD2bR5ggdZljMlvxN2l7SvzndZnNNkx681/8RYdTQsjdBbywPeKh+4yeF/ayCJhlVm472ftuUGRHUZck04xOLtApj25l11Iw==
-Received: from BN9PR03CA0589.namprd03.prod.outlook.com (2603:10b6:408:10d::24)
- by PH8PR12MB6699.namprd12.prod.outlook.com (2603:10b6:510:1ce::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.22; Wed, 7 Aug
- 2024 22:41:46 +0000
-Received: from BN2PEPF000044A1.namprd02.prod.outlook.com
- (2603:10b6:408:10d:cafe::d2) by BN9PR03CA0589.outlook.office365.com
- (2603:10b6:408:10d::24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.30 via Frontend
- Transport; Wed, 7 Aug 2024 22:41:45 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- BN2PEPF000044A1.mail.protection.outlook.com (10.167.243.152) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7849.8 via Frontend Transport; Wed, 7 Aug 2024 22:41:45 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 7 Aug 2024
- 15:41:32 -0700
-Received: from drhqmail201.nvidia.com (10.126.190.180) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Wed, 7 Aug 2024 15:41:32 -0700
-Received: from r-arch-stor03.mtr.labs.mlnx (10.127.8.14) by mail.nvidia.com
- (10.126.190.180) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Wed, 7 Aug 2024 15:41:30 -0700
-From: Max Gurtovoy <mgurtovoy@nvidia.com>
-To: <stefanha@redhat.com>, <virtualization@lists.linux.dev>, <mst@redhat.com>,
-	<axboe@kernel.dk>
-CC: <kvm@vger.kernel.org>, <linux-block@vger.kernel.org>, <oren@nvidia.com>,
-	Max Gurtovoy <mgurtovoy@nvidia.com>
-Subject: [PATCH v2] virtio_blk: implement init_hctx MQ operation
-Date: Thu, 8 Aug 2024 01:41:29 +0300
-Message-ID: <20240807224129.34237-1-mgurtovoy@nvidia.com>
-X-Mailer: git-send-email 2.18.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944C72B9A1;
+	Wed,  7 Aug 2024 23:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723073489; cv=none; b=tYgqJhd+fbvVjbsv1YYMSzo0cSETQcrBk4zszDHIe1LmquGQLL0M4NeIHylJsQrYsrG1YfnHx6bSKdy5+DEkLvryxqvW4QVXWOgoB0r1lVEfZU24bJCFuCLYXnnGWPgmGShYaaYMBVbpA4PIVQ75JPa8Qnabrhux2uLm91+/EnU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723073489; c=relaxed/simple;
+	bh=bMG1okqwNx0sMoRctqPVg2TXYbATA2m/erTIpjDvr6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W69vZ02USEb1aiB2lXawzYzsm6xuO7V8On494Gx+/5RialFmMUn54HdPP6LLPKhhmF8q5EtXFgjx5fJTlf3WSVoTFp0emB3a8rmqB2xx1H33SEGHnlsEmY2IREE9y2jhz0FDiahAeG0v2mHoEPahCP3OokjAkdtiYVNmgb/0Rn8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OnNXKNnd; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723073487; x=1754609487;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=bMG1okqwNx0sMoRctqPVg2TXYbATA2m/erTIpjDvr6Y=;
+  b=OnNXKNnd+lHttDDZkIGUCu7LLwmxsgEUtCI4NG1FGXSOXQDzNUrxWnio
+   4tOpMu7+j4uKza/9p/z5QJ8dlxJHDmZTK+CMD50fWj3frZiE+DSlf+nq9
+   S8y6ev6Ap5KCQgAcHo+0L6BQKYyzAMHH2a4ocZe+yhhI1h0AIczh7zdLB
+   524SBbs11GWsl6VsoKekGCuoLoMrunyxBXH7A+322rjXv9F6I+GVeQKWR
+   Zxe/se13nSDoZyg3+ncgoGkuZhMJ9uE7ovCMPc5wF3Rvv+N/LOTP5pHM4
+   94fIsknNQQdQSHhUzfJOAbKTcgihlATbyVsnpZHx36FtW6VuHAuxGRfXV
+   Q==;
+X-CSE-ConnectionGUID: O7qH/u9sR5aK8rrcPVkcrQ==
+X-CSE-MsgGUID: OyVnK/GURmefiVCLz3Zngw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="12909325"
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="12909325"
+Received: from fmviesa010.fm.intel.com ([10.60.135.150])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Aug 2024 16:31:25 -0700
+X-CSE-ConnectionGUID: h6X0Mo2wRAG1yZdsG8tEqQ==
+X-CSE-MsgGUID: 4NdFmQXsQTSvyXQFa1oXKg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,271,1716274800"; 
+   d="scan'208";a="57097037"
+Received: from unknown (HELO b6bf6c95bbab) ([10.239.97.151])
+  by fmviesa010.fm.intel.com with ESMTP; 07 Aug 2024 16:31:21 -0700
+Received: from kbuild by b6bf6c95bbab with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1sbq7j-0005nW-2D;
+	Wed, 07 Aug 2024 23:31:19 +0000
+Date: Thu, 8 Aug 2024 07:30:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Melody Wang <huibo.wang@amd.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, x86@kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Sean Christopherson <seanjc@google.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Tom Lendacky <thomas.lendacky@amd.com>,
+	Ashish Kalra <ashish.kalra@amd.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Melody Wang <huibo.wang@amd.com>
+Subject: Re: [PATCH 5/6] KVM: SVM: Inject MCEs when restricted injection is
+ active
+Message-ID: <202408080703.tBFpvbaa-lkp@intel.com>
+References: <ec9b446fe9554effef9a9c5cec348e3f627ff581.1722989996.git.huibo.wang@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A1:EE_|PH8PR12MB6699:EE_
-X-MS-Office365-Filtering-Correlation-Id: 288d3d4b-9851-41e4-0805-08dcb7321dc1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|1800799024|36860700013;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Nbh1s61WkqWkJ59r+u4oEixuIC3hmGzTKkfp54xN6IQeGFhxA7fTlwzUx6Tt?=
- =?us-ascii?Q?5ABH42pflMB7PqhARL0E+M5jA0pjUOTXVIwgDLQ+Bvlwzd7u+CjQkiPHrXkJ?=
- =?us-ascii?Q?UCnG44yDEoy16aT1QdD4+o/ws21aUEBYUvLZUfB2h3r8HiO9IZ5YcjyAqk5o?=
- =?us-ascii?Q?hbORji387daofbw2afzhR1curlai6Gnyozspn7Rg/MLCFmKfLqM2j1m5H24R?=
- =?us-ascii?Q?QI3GYD8e5e8SgZccHLscR+pj36tC9lAMke+XzK2YFXuwJejviRljNUa5aC3R?=
- =?us-ascii?Q?I8HuR+7dIYj73eGVxS2/5gfpV0s3cU5sJxfsfnwZUtbJNUWDfTAO2oMTXOj/?=
- =?us-ascii?Q?UTpwf0Dhjaaagg3Plk8Ur3ZOBr9Ao3eL+FVsWlwpbhtaYepAyLCwOWkzNecE?=
- =?us-ascii?Q?NE0jWX0KdreMINl9TU8UnGWgke5/omKhD5tw23PNAD2pPWIFvKag0xBeccNS?=
- =?us-ascii?Q?JLhUPIyHLPwwcNurn1U2tGUUVulKfmzLcXZ+eA9oRHaDt3ZewSTaB8A67SdK?=
- =?us-ascii?Q?5QjoKl4Zootkngu0egUeGJTdKw/ATT10hzriQwEkdZAa9U1mpMzlwW53eNO4?=
- =?us-ascii?Q?4UIVbXCDAjaEpB5FA1cY1KQkoBIcFcPnJsG2Tsqw/LhfJDlAvXLReQEmmg03?=
- =?us-ascii?Q?t01iEBM081OHXnG6RA1wGi3tS+FcbQbUwpVVaX14OnboDMdHrZEQ3r6eDbff?=
- =?us-ascii?Q?EAS0T1BzzrPF5MZDhcR/xS4L0LPt+BqwhiSZj1dYs7OaccaC0G2UG2kLM/Gd?=
- =?us-ascii?Q?RFXav87GeynPi1PhPIVe4TCbdYS5XoaynkrSytoWdAd5pN7o6108MRIxlcrZ?=
- =?us-ascii?Q?2laPBeRqewdASJ6Gwf/Ql3pl3nLF/GjCeI9fgGtZQ8Sg6Ybz8gemWv8wZ+aw?=
- =?us-ascii?Q?VqKAEi+Wcgy/X+W3zeotK8vQdvrZeHYl3Hk1FJ+0A07wsd8PaGGQnde6h2sS?=
- =?us-ascii?Q?zV5cztCxvmvbjPZ5+jAInj8Prg41D4TqCCP9DCd4XfQSNzkd86ZK9QS+7Rqb?=
- =?us-ascii?Q?lwdbpnLkOag2VSOIU1oLQf7F5wpyrlVRfaKNBrcdJWW409tManxu1K+ZtS33?=
- =?us-ascii?Q?KSdqsAJhGq7mAb0agjvFwmUehUKDkfTDKW3VNpntr4zcBQfXP2UC/cKmzVX+?=
- =?us-ascii?Q?93mrvwMSHABe6YNNCiFMj8pGGtQ43djexGrlyjrisdPFs1/6vt/7HsdIKVyB?=
- =?us-ascii?Q?fTAIKeFEmZMoxN+u1hY20f4jj2yNjwAWW2bYWvstiAZcKK1Esv698rP/2lEH?=
- =?us-ascii?Q?wLQLSeHH3XlfzfAeLgWbemn9ICVTZRNQ+D8yGKkajyQRa5kuHJgYlyCZmCpl?=
- =?us-ascii?Q?nsllLNcFEmOr72OSLm7hCZuO0NVLjgJR4UCJ220Sb0/si1xGtrgvhr3tO7W9?=
- =?us-ascii?Q?UPqEKjLSCj/Klj+kk/c+lht7X5LTyxBZp6skCrHDLIDdnfroO5j/W5vgPjXH?=
- =?us-ascii?Q?jh5HhI3EpqzRzgSbRtGpIBBts/S5YRKH?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(376014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Aug 2024 22:41:45.3330
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 288d3d4b-9851-41e4-0805-08dcb7321dc1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044A1.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6699
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ec9b446fe9554effef9a9c5cec348e3f627ff581.1722989996.git.huibo.wang@amd.com>
 
-Set the driver data of the hardware context (hctx) to point directly to
-the virtio block queue. This cleanup improves code readability and
-reduces the number of dereferences in the fast path.
+Hi Melody,
 
-Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
-Signed-off-by: Max Gurtovoy <mgurtovoy@nvidia.com>
----
- drivers/block/virtio_blk.c | 42 ++++++++++++++++++++------------------
- 1 file changed, 22 insertions(+), 20 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/block/virtio_blk.c b/drivers/block/virtio_blk.c
-index 2351f411fa46..35a7a586f6f5 100644
---- a/drivers/block/virtio_blk.c
-+++ b/drivers/block/virtio_blk.c
-@@ -129,14 +129,6 @@ static inline blk_status_t virtblk_result(u8 status)
- 	}
- }
- 
--static inline struct virtio_blk_vq *get_virtio_blk_vq(struct blk_mq_hw_ctx *hctx)
--{
--	struct virtio_blk *vblk = hctx->queue->queuedata;
--	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
--
--	return vq;
--}
--
- static int virtblk_add_req(struct virtqueue *vq, struct virtblk_req *vbr)
- {
- 	struct scatterlist out_hdr, in_hdr, *sgs[3];
-@@ -377,8 +369,7 @@ static void virtblk_done(struct virtqueue *vq)
- 
- static void virtio_commit_rqs(struct blk_mq_hw_ctx *hctx)
- {
--	struct virtio_blk *vblk = hctx->queue->queuedata;
--	struct virtio_blk_vq *vq = &vblk->vqs[hctx->queue_num];
-+	struct virtio_blk_vq *vq = hctx->driver_data;
- 	bool kick;
- 
- 	spin_lock_irq(&vq->lock);
-@@ -428,10 +419,10 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 			   const struct blk_mq_queue_data *bd)
- {
- 	struct virtio_blk *vblk = hctx->queue->queuedata;
-+	struct virtio_blk_vq *vq = hctx->driver_data;
- 	struct request *req = bd->rq;
- 	struct virtblk_req *vbr = blk_mq_rq_to_pdu(req);
- 	unsigned long flags;
--	int qid = hctx->queue_num;
- 	bool notify = false;
- 	blk_status_t status;
- 	int err;
-@@ -440,26 +431,26 @@ static blk_status_t virtio_queue_rq(struct blk_mq_hw_ctx *hctx,
- 	if (unlikely(status))
- 		return status;
- 
--	spin_lock_irqsave(&vblk->vqs[qid].lock, flags);
--	err = virtblk_add_req(vblk->vqs[qid].vq, vbr);
-+	spin_lock_irqsave(&vq->lock, flags);
-+	err = virtblk_add_req(vq->vq, vbr);
- 	if (err) {
--		virtqueue_kick(vblk->vqs[qid].vq);
-+		virtqueue_kick(vq->vq);
- 		/* Don't stop the queue if -ENOMEM: we may have failed to
- 		 * bounce the buffer due to global resource outage.
- 		 */
- 		if (err == -ENOSPC)
- 			blk_mq_stop_hw_queue(hctx);
--		spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
-+		spin_unlock_irqrestore(&vq->lock, flags);
- 		virtblk_unmap_data(req, vbr);
- 		return virtblk_fail_to_queue(req, err);
- 	}
- 
--	if (bd->last && virtqueue_kick_prepare(vblk->vqs[qid].vq))
-+	if (bd->last && virtqueue_kick_prepare(vq->vq))
- 		notify = true;
--	spin_unlock_irqrestore(&vblk->vqs[qid].lock, flags);
-+	spin_unlock_irqrestore(&vq->lock, flags);
- 
- 	if (notify)
--		virtqueue_notify(vblk->vqs[qid].vq);
-+		virtqueue_notify(vq->vq);
- 	return BLK_STS_OK;
- }
- 
-@@ -504,7 +495,7 @@ static void virtio_queue_rqs(struct request **rqlist)
- 	struct request *requeue_list = NULL;
- 
- 	rq_list_for_each_safe(rqlist, req, next) {
--		struct virtio_blk_vq *vq = get_virtio_blk_vq(req->mq_hctx);
-+		struct virtio_blk_vq *vq = req->mq_hctx->driver_data;
- 		bool kick;
- 
- 		if (!virtblk_prep_rq_batch(req)) {
-@@ -1164,6 +1155,16 @@ static const struct attribute_group *virtblk_attr_groups[] = {
- 	NULL,
- };
- 
-+static int virtblk_init_hctx(struct blk_mq_hw_ctx *hctx, void *data,
-+		unsigned int hctx_idx)
-+{
-+	struct virtio_blk *vblk = data;
-+	struct virtio_blk_vq *vq = &vblk->vqs[hctx_idx];
-+
-+	hctx->driver_data = vq;
-+	return 0;
-+}
-+
- static void virtblk_map_queues(struct blk_mq_tag_set *set)
- {
- 	struct virtio_blk *vblk = set->driver_data;
-@@ -1205,7 +1206,7 @@ static void virtblk_complete_batch(struct io_comp_batch *iob)
- static int virtblk_poll(struct blk_mq_hw_ctx *hctx, struct io_comp_batch *iob)
- {
- 	struct virtio_blk *vblk = hctx->queue->queuedata;
--	struct virtio_blk_vq *vq = get_virtio_blk_vq(hctx);
-+	struct virtio_blk_vq *vq = hctx->driver_data;
- 	struct virtblk_req *vbr;
- 	unsigned long flags;
- 	unsigned int len;
-@@ -1236,6 +1237,7 @@ static const struct blk_mq_ops virtio_mq_ops = {
- 	.queue_rqs	= virtio_queue_rqs,
- 	.commit_rqs	= virtio_commit_rqs,
- 	.complete	= virtblk_request_done,
-+	.init_hctx	= virtblk_init_hctx,
- 	.map_queues	= virtblk_map_queues,
- 	.poll		= virtblk_poll,
- };
+[auto build test WARNING on tip/x86/core]
+[also build test WARNING on linus/master v6.11-rc2 next-20240807]
+[cannot apply to kvm/queue mst-vhost/linux-next kvm/linux-next]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Melody-Wang/x86-sev-Define-the-HV-doorbell-page-structure/20240807-090812
+base:   tip/x86/core
+patch link:    https://lore.kernel.org/r/ec9b446fe9554effef9a9c5cec348e3f627ff581.1722989996.git.huibo.wang%40amd.com
+patch subject: [PATCH 5/6] KVM: SVM: Inject MCEs when restricted injection is active
+config: x86_64-buildonly-randconfig-004-20240808 (https://download.01.org/0day-ci/archive/20240808/202408080703.tBFpvbaa-lkp@intel.com/config)
+compiler: clang version 18.1.5 (https://github.com/llvm/llvm-project 617a15a9eac96088ae5e9134248d8236e34b91b1)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240808/202408080703.tBFpvbaa-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408080703.tBFpvbaa-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> arch/x86/kvm/x86.c:10503:2: warning: label at end of compound statement is a C23 extension [-Wc23-extensions]
+    10503 |         }
+          |         ^
+   1 warning generated.
+
+
+vim +10503 arch/x86/kvm/x86.c
+
+b97f074583736c Maxim Levitsky      2021-02-25  10344  
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10345  /*
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10346   * Check for any event (interrupt or exception) that is ready to be injected,
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10347   * and if there is at least one event, inject the event with the highest
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10348   * priority.  This handles both "pending" events, i.e. events that have never
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10349   * been injected into the guest, and "injected" events, i.e. events that were
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10350   * injected as part of a previous VM-Enter, but weren't successfully delivered
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10351   * and need to be re-injected.
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10352   *
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10353   * Note, this is not guaranteed to be invoked on a guest instruction boundary,
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10354   * i.e. doesn't guarantee that there's an event window in the guest.  KVM must
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10355   * be able to inject exceptions in the "middle" of an instruction, and so must
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10356   * also be able to re-inject NMIs and IRQs in the middle of an instruction.
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10357   * I.e. for exceptions and re-injected events, NOT invoking this on instruction
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10358   * boundaries is necessary and correct.
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10359   *
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10360   * For simplicity, KVM uses a single path to inject all events (except events
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10361   * that are injected directly from L1 to L2) and doesn't explicitly track
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10362   * instruction boundaries for asynchronous events.  However, because VM-Exits
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10363   * that can occur during instruction execution typically result in KVM skipping
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10364   * the instruction or injecting an exception, e.g. instruction and exception
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10365   * intercepts, and because pending exceptions have higher priority than pending
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10366   * interrupts, KVM still honors instruction boundaries in most scenarios.
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10367   *
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10368   * But, if a VM-Exit occurs during instruction execution, and KVM does NOT skip
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10369   * the instruction or inject an exception, then KVM can incorrecty inject a new
+54aa699e8094ef Bjorn Helgaas       2024-01-02  10370   * asynchronous event if the event became pending after the CPU fetched the
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10371   * instruction (in the guest).  E.g. if a page fault (#PF, #NPF, EPT violation)
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10372   * occurs and is resolved by KVM, a coincident NMI, SMI, IRQ, etc... can be
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10373   * injected on the restarted instruction instead of being deferred until the
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10374   * instruction completes.
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10375   *
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10376   * In practice, this virtualization hole is unlikely to be observed by the
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10377   * guest, and even less likely to cause functional problems.  To detect the
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10378   * hole, the guest would have to trigger an event on a side effect of an early
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10379   * phase of instruction execution, e.g. on the instruction fetch from memory.
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10380   * And for it to be a functional problem, the guest would need to depend on the
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10381   * ordering between that side effect, the instruction completing, _and_ the
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10382   * delivery of the asynchronous event.
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10383   */
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10384  static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
+e746c1f1b94ac9 Sean Christopherson 2022-08-30  10385  				       bool *req_immediate_exit)
+95ba82731374eb Gleb Natapov        2009-04-21  10386  {
+28360f88706837 Sean Christopherson 2022-08-30  10387  	bool can_inject;
+b6b8a1451fc404 Jan Kiszka          2014-03-07  10388  	int r;
+b6b8a1451fc404 Jan Kiszka          2014-03-07  10389  
+6c593b5276e6ce Sean Christopherson 2022-08-30  10390  	/*
+54aa699e8094ef Bjorn Helgaas       2024-01-02  10391  	 * Process nested events first, as nested VM-Exit supersedes event
+6c593b5276e6ce Sean Christopherson 2022-08-30  10392  	 * re-injection.  If there's an event queued for re-injection, it will
+6c593b5276e6ce Sean Christopherson 2022-08-30  10393  	 * be saved into the appropriate vmc{b,s}12 fields on nested VM-Exit.
+6c593b5276e6ce Sean Christopherson 2022-08-30  10394  	 */
+6c593b5276e6ce Sean Christopherson 2022-08-30  10395  	if (is_guest_mode(vcpu))
+6c593b5276e6ce Sean Christopherson 2022-08-30  10396  		r = kvm_check_nested_events(vcpu);
+6c593b5276e6ce Sean Christopherson 2022-08-30  10397  	else
+6c593b5276e6ce Sean Christopherson 2022-08-30  10398  		r = 0;
+b59bb7bdf08ee9 Gleb Natapov        2009-07-09  10399  
+664f8e26b00c76 Wanpeng Li          2017-08-24  10400  	/*
+6c593b5276e6ce Sean Christopherson 2022-08-30  10401  	 * Re-inject exceptions and events *especially* if immediate entry+exit
+6c593b5276e6ce Sean Christopherson 2022-08-30  10402  	 * to/from L2 is needed, as any event that has already been injected
+6c593b5276e6ce Sean Christopherson 2022-08-30  10403  	 * into L2 needs to complete its lifecycle before injecting a new event.
+6c593b5276e6ce Sean Christopherson 2022-08-30  10404  	 *
+6c593b5276e6ce Sean Christopherson 2022-08-30  10405  	 * Don't re-inject an NMI or interrupt if there is a pending exception.
+6c593b5276e6ce Sean Christopherson 2022-08-30  10406  	 * This collision arises if an exception occurred while vectoring the
+6c593b5276e6ce Sean Christopherson 2022-08-30  10407  	 * injected event, KVM intercepted said exception, and KVM ultimately
+6c593b5276e6ce Sean Christopherson 2022-08-30  10408  	 * determined the fault belongs to the guest and queues the exception
+6c593b5276e6ce Sean Christopherson 2022-08-30  10409  	 * for injection back into the guest.
+6c593b5276e6ce Sean Christopherson 2022-08-30  10410  	 *
+6c593b5276e6ce Sean Christopherson 2022-08-30  10411  	 * "Injected" interrupts can also collide with pending exceptions if
+6c593b5276e6ce Sean Christopherson 2022-08-30  10412  	 * userspace ignores the "ready for injection" flag and blindly queues
+6c593b5276e6ce Sean Christopherson 2022-08-30  10413  	 * an interrupt.  In that case, prioritizing the exception is correct,
+6c593b5276e6ce Sean Christopherson 2022-08-30  10414  	 * as the exception "occurred" before the exit to userspace.  Trap-like
+6c593b5276e6ce Sean Christopherson 2022-08-30  10415  	 * exceptions, e.g. most #DBs, have higher priority than interrupts.
+6c593b5276e6ce Sean Christopherson 2022-08-30  10416  	 * And while fault-like exceptions, e.g. #GP and #PF, are the lowest
+6c593b5276e6ce Sean Christopherson 2022-08-30  10417  	 * priority, they're only generated (pended) during instruction
+6c593b5276e6ce Sean Christopherson 2022-08-30  10418  	 * execution, and interrupts are recognized at instruction boundaries.
+6c593b5276e6ce Sean Christopherson 2022-08-30  10419  	 * Thus a pending fault-like exception means the fault occurred on the
+6c593b5276e6ce Sean Christopherson 2022-08-30  10420  	 * *previous* instruction and must be serviced prior to recognizing any
+6c593b5276e6ce Sean Christopherson 2022-08-30  10421  	 * new events in order to fully complete the previous instruction.
+6c593b5276e6ce Sean Christopherson 2022-08-30  10422  	 */
+6c593b5276e6ce Sean Christopherson 2022-08-30  10423  	if (vcpu->arch.exception.injected)
+b97f074583736c Maxim Levitsky      2021-02-25  10424  		kvm_inject_exception(vcpu);
+7709aba8f71613 Sean Christopherson 2022-08-30  10425  	else if (kvm_is_exception_pending(vcpu))
+6c593b5276e6ce Sean Christopherson 2022-08-30  10426  		; /* see above */
+6c593b5276e6ce Sean Christopherson 2022-08-30  10427  	else if (vcpu->arch.nmi_injected)
+896046474f8d2e Wei Wang            2024-05-07  10428  		kvm_x86_call(inject_nmi)(vcpu);
+6c593b5276e6ce Sean Christopherson 2022-08-30  10429  	else if (vcpu->arch.interrupt.injected)
+896046474f8d2e Wei Wang            2024-05-07  10430  		kvm_x86_call(inject_irq)(vcpu, true);
+b6b8a1451fc404 Jan Kiszka          2014-03-07  10431  
+6c593b5276e6ce Sean Christopherson 2022-08-30  10432  	/*
+6c593b5276e6ce Sean Christopherson 2022-08-30  10433  	 * Exceptions that morph to VM-Exits are handled above, and pending
+6c593b5276e6ce Sean Christopherson 2022-08-30  10434  	 * exceptions on top of injected exceptions that do not VM-Exit should
+6c593b5276e6ce Sean Christopherson 2022-08-30  10435  	 * either morph to #DF or, sadly, override the injected exception.
+6c593b5276e6ce Sean Christopherson 2022-08-30  10436  	 */
+3b82b8d7fdf7c1 Sean Christopherson 2020-04-22  10437  	WARN_ON_ONCE(vcpu->arch.exception.injected &&
+3b82b8d7fdf7c1 Sean Christopherson 2020-04-22  10438  		     vcpu->arch.exception.pending);
+3b82b8d7fdf7c1 Sean Christopherson 2020-04-22  10439  
+1a680e355c9477 Liran Alon          2018-03-23  10440  	/*
+6c593b5276e6ce Sean Christopherson 2022-08-30  10441  	 * Bail if immediate entry+exit to/from the guest is needed to complete
+6c593b5276e6ce Sean Christopherson 2022-08-30  10442  	 * nested VM-Enter or event re-injection so that a different pending
+6c593b5276e6ce Sean Christopherson 2022-08-30  10443  	 * event can be serviced (or if KVM needs to exit to userspace).
+6c593b5276e6ce Sean Christopherson 2022-08-30  10444  	 *
+6c593b5276e6ce Sean Christopherson 2022-08-30  10445  	 * Otherwise, continue processing events even if VM-Exit occurred.  The
+6c593b5276e6ce Sean Christopherson 2022-08-30  10446  	 * VM-Exit will have cleared exceptions that were meant for L2, but
+6c593b5276e6ce Sean Christopherson 2022-08-30  10447  	 * there may now be events that can be injected into L1.
+1a680e355c9477 Liran Alon          2018-03-23  10448  	 */
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10449  	if (r < 0)
+a5f6909a71f922 Jim Mattson         2021-06-04  10450  		goto out;
+95ba82731374eb Gleb Natapov        2009-04-21  10451  
+7709aba8f71613 Sean Christopherson 2022-08-30  10452  	/*
+7709aba8f71613 Sean Christopherson 2022-08-30  10453  	 * A pending exception VM-Exit should either result in nested VM-Exit
+7709aba8f71613 Sean Christopherson 2022-08-30  10454  	 * or force an immediate re-entry and exit to/from L2, and exception
+7709aba8f71613 Sean Christopherson 2022-08-30  10455  	 * VM-Exits cannot be injected (flag should _never_ be set).
+7709aba8f71613 Sean Christopherson 2022-08-30  10456  	 */
+7709aba8f71613 Sean Christopherson 2022-08-30  10457  	WARN_ON_ONCE(vcpu->arch.exception_vmexit.injected ||
+7709aba8f71613 Sean Christopherson 2022-08-30  10458  		     vcpu->arch.exception_vmexit.pending);
+7709aba8f71613 Sean Christopherson 2022-08-30  10459  
+28360f88706837 Sean Christopherson 2022-08-30  10460  	/*
+28360f88706837 Sean Christopherson 2022-08-30  10461  	 * New events, other than exceptions, cannot be injected if KVM needs
+28360f88706837 Sean Christopherson 2022-08-30  10462  	 * to re-inject a previous event.  See above comments on re-injecting
+28360f88706837 Sean Christopherson 2022-08-30  10463  	 * for why pending exceptions get priority.
+28360f88706837 Sean Christopherson 2022-08-30  10464  	 */
+28360f88706837 Sean Christopherson 2022-08-30  10465  	can_inject = !kvm_event_needs_reinjection(vcpu);
+28360f88706837 Sean Christopherson 2022-08-30  10466  
+664f8e26b00c76 Wanpeng Li          2017-08-24  10467  	if (vcpu->arch.exception.pending) {
+5623f751bd9c43 Sean Christopherson 2022-08-30  10468  		/*
+5623f751bd9c43 Sean Christopherson 2022-08-30  10469  		 * Fault-class exceptions, except #DBs, set RF=1 in the RFLAGS
+5623f751bd9c43 Sean Christopherson 2022-08-30  10470  		 * value pushed on the stack.  Trap-like exception and all #DBs
+5623f751bd9c43 Sean Christopherson 2022-08-30  10471  		 * leave RF as-is (KVM follows Intel's behavior in this regard;
+5623f751bd9c43 Sean Christopherson 2022-08-30  10472  		 * AMD states that code breakpoint #DBs excplitly clear RF=0).
+5623f751bd9c43 Sean Christopherson 2022-08-30  10473  		 *
+5623f751bd9c43 Sean Christopherson 2022-08-30  10474  		 * Note, most versions of Intel's SDM and AMD's APM incorrectly
+5623f751bd9c43 Sean Christopherson 2022-08-30  10475  		 * describe the behavior of General Detect #DBs, which are
+5623f751bd9c43 Sean Christopherson 2022-08-30  10476  		 * fault-like.  They do _not_ set RF, a la code breakpoints.
+5623f751bd9c43 Sean Christopherson 2022-08-30  10477  		 */
+d4963e319f1f78 Sean Christopherson 2022-08-30  10478  		if (exception_type(vcpu->arch.exception.vector) == EXCPT_FAULT)
+664f8e26b00c76 Wanpeng Li          2017-08-24  10479  			__kvm_set_rflags(vcpu, kvm_get_rflags(vcpu) |
+664f8e26b00c76 Wanpeng Li          2017-08-24  10480  					     X86_EFLAGS_RF);
+664f8e26b00c76 Wanpeng Li          2017-08-24  10481  
+d4963e319f1f78 Sean Christopherson 2022-08-30  10482  		if (vcpu->arch.exception.vector == DB_VECTOR) {
+d4963e319f1f78 Sean Christopherson 2022-08-30  10483  			kvm_deliver_exception_payload(vcpu, &vcpu->arch.exception);
+f10c729ff96528 Jim Mattson         2018-10-16  10484  			if (vcpu->arch.dr7 & DR7_GD) {
+664f8e26b00c76 Wanpeng Li          2017-08-24  10485  				vcpu->arch.dr7 &= ~DR7_GD;
+664f8e26b00c76 Wanpeng Li          2017-08-24  10486  				kvm_update_dr7(vcpu);
+664f8e26b00c76 Wanpeng Li          2017-08-24  10487  			}
+f10c729ff96528 Jim Mattson         2018-10-16  10488  		}
+664f8e26b00c76 Wanpeng Li          2017-08-24  10489  
+fc9708f9726240 Melody Wang         2024-08-07  10490  		if (vcpu->arch.exception.vector == MC_VECTOR) {
+fc9708f9726240 Melody Wang         2024-08-07  10491  			r = static_call(kvm_x86_mce_allowed)(vcpu);
+fc9708f9726240 Melody Wang         2024-08-07  10492  			if (!r)
+fc9708f9726240 Melody Wang         2024-08-07  10493  				goto out_except;
+fc9708f9726240 Melody Wang         2024-08-07  10494  		}
+fc9708f9726240 Melody Wang         2024-08-07  10495  
+b97f074583736c Maxim Levitsky      2021-02-25  10496  		kvm_inject_exception(vcpu);
+a61d7c5432ac5a Sean Christopherson 2022-05-02  10497  
+a61d7c5432ac5a Sean Christopherson 2022-05-02  10498  		vcpu->arch.exception.pending = false;
+a61d7c5432ac5a Sean Christopherson 2022-05-02  10499  		vcpu->arch.exception.injected = true;
+a61d7c5432ac5a Sean Christopherson 2022-05-02  10500  
+c6b22f59d694d0 Paolo Bonzini       2020-05-26  10501  		can_inject = false;
+fc9708f9726240 Melody Wang         2024-08-07  10502  out_except:
+1a680e355c9477 Liran Alon          2018-03-23 @10503  	}
+1a680e355c9477 Liran Alon          2018-03-23  10504  
+61e5f69ef08379 Maxim Levitsky      2021-08-11  10505  	/* Don't inject interrupts if the user asked to avoid doing so */
+61e5f69ef08379 Maxim Levitsky      2021-08-11  10506  	if (vcpu->guest_debug & KVM_GUESTDBG_BLOCKIRQ)
+61e5f69ef08379 Maxim Levitsky      2021-08-11  10507  		return 0;
+61e5f69ef08379 Maxim Levitsky      2021-08-11  10508  
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10509  	/*
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10510  	 * Finally, inject interrupt events.  If an event cannot be injected
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10511  	 * due to architectural conditions (e.g. IF=0) a window-open exit
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10512  	 * will re-request KVM_REQ_EVENT.  Sometimes however an event is pending
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10513  	 * and can architecturally be injected, but we cannot do it right now:
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10514  	 * an interrupt could have arrived just now and we have to inject it
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10515  	 * as a vmexit, or there could already an event in the queue, which is
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10516  	 * indicated by can_inject.  In that case we request an immediate exit
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10517  	 * in order to make progress and get back here for another iteration.
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10518  	 * The kvm_x86_ops hooks communicate this by returning -EBUSY.
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10519  	 */
+31e83e21cf00fe Paolo Bonzini       2022-09-29  10520  #ifdef CONFIG_KVM_SMM
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10521  	if (vcpu->arch.smi_pending) {
+896046474f8d2e Wei Wang            2024-05-07  10522  		r = can_inject ? kvm_x86_call(smi_allowed)(vcpu, true) :
+896046474f8d2e Wei Wang            2024-05-07  10523  				 -EBUSY;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10524  		if (r < 0)
+a5f6909a71f922 Jim Mattson         2021-06-04  10525  			goto out;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10526  		if (r) {
+c43203cab1e2e1 Paolo Bonzini       2016-06-01  10527  			vcpu->arch.smi_pending = false;
+52797bf9a875c4 Liran Alon          2017-11-15  10528  			++vcpu->arch.smi_count;
+ee2cd4b7555e3a Paolo Bonzini       2016-06-01  10529  			enter_smm(vcpu);
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10530  			can_inject = false;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10531  		} else
+896046474f8d2e Wei Wang            2024-05-07  10532  			kvm_x86_call(enable_smi_window)(vcpu);
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10533  	}
+31e83e21cf00fe Paolo Bonzini       2022-09-29  10534  #endif
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10535  
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10536  	if (vcpu->arch.nmi_pending) {
+896046474f8d2e Wei Wang            2024-05-07  10537  		r = can_inject ? kvm_x86_call(nmi_allowed)(vcpu, true) :
+896046474f8d2e Wei Wang            2024-05-07  10538  				 -EBUSY;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10539  		if (r < 0)
+a5f6909a71f922 Jim Mattson         2021-06-04  10540  			goto out;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10541  		if (r) {
+7460fb4a340033 Avi Kivity          2011-09-20  10542  			--vcpu->arch.nmi_pending;
+95ba82731374eb Gleb Natapov        2009-04-21  10543  			vcpu->arch.nmi_injected = true;
+896046474f8d2e Wei Wang            2024-05-07  10544  			kvm_x86_call(inject_nmi)(vcpu);
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10545  			can_inject = false;
+896046474f8d2e Wei Wang            2024-05-07  10546  			WARN_ON(kvm_x86_call(nmi_allowed)(vcpu, true) < 0);
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10547  		}
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10548  		if (vcpu->arch.nmi_pending)
+896046474f8d2e Wei Wang            2024-05-07  10549  			kvm_x86_call(enable_nmi_window)(vcpu);
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10550  	}
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10551  
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10552  	if (kvm_cpu_has_injectable_intr(vcpu)) {
+896046474f8d2e Wei Wang            2024-05-07  10553  		r = can_inject ? kvm_x86_call(interrupt_allowed)(vcpu, true) :
+896046474f8d2e Wei Wang            2024-05-07  10554  				 -EBUSY;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10555  		if (r < 0)
+a5f6909a71f922 Jim Mattson         2021-06-04  10556  			goto out;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10557  		if (r) {
+bf672720e83cf0 Maxim Levitsky      2023-07-26  10558  			int irq = kvm_cpu_get_interrupt(vcpu);
+bf672720e83cf0 Maxim Levitsky      2023-07-26  10559  
+bf672720e83cf0 Maxim Levitsky      2023-07-26  10560  			if (!WARN_ON_ONCE(irq == -1)) {
+bf672720e83cf0 Maxim Levitsky      2023-07-26  10561  				kvm_queue_interrupt(vcpu, irq, false);
+896046474f8d2e Wei Wang            2024-05-07  10562  				kvm_x86_call(inject_irq)(vcpu, false);
+896046474f8d2e Wei Wang            2024-05-07  10563  				WARN_ON(kvm_x86_call(interrupt_allowed)(vcpu, true) < 0);
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10564  			}
+bf672720e83cf0 Maxim Levitsky      2023-07-26  10565  		}
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10566  		if (kvm_cpu_has_injectable_intr(vcpu))
+896046474f8d2e Wei Wang            2024-05-07  10567  			kvm_x86_call(enable_irq_window)(vcpu);
+95ba82731374eb Gleb Natapov        2009-04-21  10568  	}
+ee2cd4b7555e3a Paolo Bonzini       2016-06-01  10569  
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10570  	if (is_guest_mode(vcpu) &&
+5b4ac1a1b71373 Paolo Bonzini       2022-09-21  10571  	    kvm_x86_ops.nested_ops->has_events &&
+32f55e475ce2c4 Sean Christopherson 2024-06-07  10572  	    kvm_x86_ops.nested_ops->has_events(vcpu, true))
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10573  		*req_immediate_exit = true;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10574  
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10575  	/*
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10576  	 * KVM must never queue a new exception while injecting an event; KVM
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10577  	 * is done emulating and should only propagate the to-be-injected event
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10578  	 * to the VMCS/VMCB.  Queueing a new exception can put the vCPU into an
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10579  	 * infinite loop as KVM will bail from VM-Enter to inject the pending
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10580  	 * exception and start the cycle all over.
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10581  	 *
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10582  	 * Exempt triple faults as they have special handling and won't put the
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10583  	 * vCPU into an infinite loop.  Triple fault can be queued when running
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10584  	 * VMX without unrestricted guest, as that requires KVM to emulate Real
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10585  	 * Mode events (see kvm_inject_realmode_interrupt()).
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10586  	 */
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10587  	WARN_ON_ONCE(vcpu->arch.exception.pending ||
+dea0d5a2fde622 Sean Christopherson 2022-09-30  10588  		     vcpu->arch.exception_vmexit.pending);
+a5f6909a71f922 Jim Mattson         2021-06-04  10589  	return 0;
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10590  
+a5f6909a71f922 Jim Mattson         2021-06-04  10591  out:
+a5f6909a71f922 Jim Mattson         2021-06-04  10592  	if (r == -EBUSY) {
+c9d40913ac5a21 Paolo Bonzini       2020-05-22  10593  		*req_immediate_exit = true;
+a5f6909a71f922 Jim Mattson         2021-06-04  10594  		r = 0;
+a5f6909a71f922 Jim Mattson         2021-06-04  10595  	}
+a5f6909a71f922 Jim Mattson         2021-06-04  10596  	return r;
+95ba82731374eb Gleb Natapov        2009-04-21  10597  }
+95ba82731374eb Gleb Natapov        2009-04-21  10598  
+
 -- 
-2.18.1
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
