@@ -1,102 +1,148 @@
-Return-Path: <kvm+bounces-23628-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23630-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79AE394BEA0
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 15:37:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A97AD94C077
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 17:01:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A2861C22000
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 13:37:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB2631C25F04
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 15:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E861018E746;
-	Thu,  8 Aug 2024 13:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9DD18F2CA;
+	Thu,  8 Aug 2024 15:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="sJ6wbF9N"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="M1lmXShS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 879B418B482
-	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 13:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EBB18C321;
+	Thu,  8 Aug 2024 15:01:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723124246; cv=none; b=vBts4n52nkYrUe1UzTye1nSOlkDudZd0vjmil9+tWz+nAhLgEX4KlPZ1+vQKZmqvwL5JaFn4r+eC2MnCGslj6DOB6z9HFyCeCgL7aBKXzbD3aEiEniIhfdysfNAsG9ryGP9HNxLYrDMUYx702vX4NZ//94fndz++5FSqj6Z1rjk=
+	t=1723129307; cv=none; b=Qa++gqQXYAwtkeRtbdLPhqV+nQQprwtNXYLA1BW5jdtmB+Lf4G94Z5lQSqCxd4w2yvTRQYI+NEPILKZx9e//FYXMJLf00vZ8Qwunp9Xtz/fJGY11sqUA4DLQFegA9qPe+nYJcFZ2UAvrksBcCrBT5RxkurBuvNeNiQdUPGSeZbc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723124246; c=relaxed/simple;
-	bh=3ZiTOAaXUPmHMS+kcP/7fLCSSJvy0HJAPk8oCSO93e4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LWOkdL/MIMZ9LvGY6TepnXWFWIVttuQPIUjMS9R3cDcSTD4Y3tyJ2iM1hCoTEK3B1VFHOC+2B+07mY2ZEzDCamTyehZU3Q3qhnrpS5BZ5arGsN7mYLKmPnS2Os7TGbMCzJBSB34J+kMHmLULB3j/xvwbMxbBIe5dTMl21es4xZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=sJ6wbF9N; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-72703dd2b86so85842a12.1
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 06:37:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1723124241; x=1723729041; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XVChcYY30Mpv4pcrAWYyddiPC20nI4GsEyGh5Z8PoV4=;
-        b=sJ6wbF9NuWemgk+CVIcZ7ElWmsHZUhNO5Thb4E59bsBhgy8ROvRpz4XfGqIhCBM+m1
-         oanCivvzQ+H8IdyfKAAggF64Hr8L67dPaowYXjdqP/JNqFrIzcYa/3wQ5H5YonJGjJX4
-         w4KFUdu8wxIBFv5zFDe3nbHtIxd9etzXBliwnFCdzIgIB1aVL4k9X4xYcpnHVo9k32qg
-         u/YNLNECNKbynU7HNUdy0Zg8Gm0KENVVga/605HMY7C4Yj8qFWJ9pubJntwpXRs5aBaJ
-         g8diXNllRWq6qxymLu5eHwmskQYtfzfwmgJpVo6+Ca+GZekTlelfBpI6AXmD9AVkotIo
-         V27Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723124241; x=1723729041;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XVChcYY30Mpv4pcrAWYyddiPC20nI4GsEyGh5Z8PoV4=;
-        b=cOFDzNdE/5hWW+/2WDxyWdXL9gTVuo7ccyNRm8a5IameytmyTYqyv5da5u/uNSr8WS
-         AnU1p235aQuZdFGQ1yrgTC1l0FSz1JO8tgSVuhr9gOoicjsFJa5P1rWXd3BX0JRjYlUu
-         4xeH2FnnfcCxmjD2Mewcjg7H+z7z/ARD2T8Bl8LXJnNbgbB+s6b3MEqwMWZjTL/9GrnW
-         7onLKTZJQosPAx82ynt4yQ6rCTYw7ta++yWvxUCBIoHeS8/9hk4DP8dxfHGLbC+vt6K0
-         hoyohWhdeMHuYeP1vpSGwrawJxpVSsQEcjxnqSVFns+VBaTZ14ZKwyrsJKoeXCeUPWeV
-         jtWw==
-X-Gm-Message-State: AOJu0YzOlgzrrn+7iApX1J8lbbE2jVC+uc5ZbgPH+nUkZGTaIqI2oRMP
-	8U1M4l8RvmcaKn8J5rBMC9rhTdr4Ur/DQ2IYTx9sJUXm6ZkxR+brIN3gFqotfdY=
-X-Google-Smtp-Source: AGHT+IEk6xoZ/zlRSb3U/GJSm3CHUT6KiD1J07T2LKOms6ygd4Jc8qBlHMKfZG58uLAif+L2dix3TA==
-X-Received: by 2002:a05:6a20:7487:b0:1c4:84ee:63d1 with SMTP id adf61e73a8af0-1c6fd05f845mr1187450637.9.1723124241540;
-        Thu, 08 Aug 2024 06:37:21 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.157])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f219f5sm124997345ad.29.2024.08.08.06.37.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Aug 2024 06:37:20 -0700 (PDT)
-Message-ID: <35c7b39f-415d-4d23-bf44-75e655f3eb8a@kernel.dk>
-Date: Thu, 8 Aug 2024 07:37:19 -0600
+	s=arc-20240116; t=1723129307; c=relaxed/simple;
+	bh=9e4wjzp0e1e7SRkcMRAhZaNNaTtr1K3WnMN4766ZiFc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NmPXDG8diXvCnR0o06XYJAmPlnTcNtiMV0kiRRIAk0o4hXzJ/4cls9KpA9F7ADl8HYXxLYoe7nVQRd5VzPoAFVeEXb93uueKT2AuygmoWv8k0TLXtfO5gPw9IKAzpSmcfvyrSuyduitkN/O5J1T//FVyLAVVlrDGXZwZrT6LcPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=M1lmXShS; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 478CaRgc007476;
+	Thu, 8 Aug 2024 15:01:36 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from
+	:to:cc:subject:date:message-id:content-transfer-encoding
+	:mime-version; s=pp1; bh=hqYZ71vgm59bmStqe+W7m9vOR1J+RaoL268X2LS
+	X3Lg=; b=M1lmXShScKnILxJEq5Zf96tCK+jXuj6wo6/HJNAgqHD5LE5IWyxQSPy
+	EMTiQcV7NLYoH5EXRJ+oLDX0Ju6YbYm20WKvOqkmRpAQZExiTh0TvHk6+8Royr6T
+	Obve83NLdyKSWOVRHbrDRtpe6M3FzW436WdRJ7F69kU7Q49T/94y8yAYdiF+qc5e
+	7EiJUNIuBeYDuM1Yu4IcmC2+cQ94o4mZXDZFXrKgZ8yyfWH/mIuSoXpCnzJfiIms
+	pnndP1uJeKMOPeKTCfobHRlOgJMsGY1CUdRaETSf7ZNxGirwy0TS14NI1H25owNf
+	pKIdK4/1P3D7roVD/KRPP3fHxbxXKvw==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40vwkbrdn9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 15:01:36 +0000 (GMT)
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 478F1ZsL031565;
+	Thu, 8 Aug 2024 15:01:35 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40vwkbrdn5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 15:01:35 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 478EQjs5018618;
+	Thu, 8 Aug 2024 15:01:34 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 40sxvuf3r1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 15:01:34 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 478F1T2B50987370
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 8 Aug 2024 15:01:31 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 62A2720040;
+	Thu,  8 Aug 2024 15:01:29 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D5F1F20075;
+	Thu,  8 Aug 2024 15:01:28 +0000 (GMT)
+Received: from li-9fd7f64c-3205-11b2-a85c-df942b00d78d.ibm.com.com (unknown [9.171.38.33])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  8 Aug 2024 15:01:28 +0000 (GMT)
+From: Janosch Frank <frankja@linux.ibm.com>
+To: pbonzini@redhat.com
+Cc: kvm@vger.kernel.org, frankja@linux.ibm.com, david@redhat.com,
+        borntraeger@linux.ibm.com, cohuck@redhat.com,
+        linux-s390@vger.kernel.org, imbrenda@linux.ibm.com
+Subject: [GIT PULL 0/2] KVM: s390: Fixes for 6.11
+Date: Thu,  8 Aug 2024 16:52:11 +0200
+Message-ID: <20240808150026.11404-1-frankja@linux.ibm.com>
+X-Mailer: git-send-email 2.46.0
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: Y9SnwOJ6ZAO5nwvk-CZocBydsnUMF6Vm
+X-Proofpoint-ORIG-GUID: A73dzeWco_NmcDYCAYa7UYhDSyWOZLEZ
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] virtio_blk: implement init_hctx MQ operation
-To: Max Gurtovoy <mgurtovoy@nvidia.com>, stefanha@redhat.com,
- virtualization@lists.linux.dev, mst@redhat.com
-Cc: kvm@vger.kernel.org, linux-block@vger.kernel.org, oren@nvidia.com
-References: <20240807224129.34237-1-mgurtovoy@nvidia.com>
-Content-Language: en-US
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240807224129.34237-1-mgurtovoy@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-08_15,2024-08-07_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ priorityscore=1501 phishscore=0 spamscore=0 mlxscore=0 clxscore=1015
+ adultscore=0 malwarescore=0 bulkscore=0 mlxlogscore=709 impostorscore=0
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408080103
 
-On 8/7/24 4:41 PM, Max Gurtovoy wrote:
-> Set the driver data of the hardware context (hctx) to point directly to
-> the virtio block queue. This cleanup improves code readability and
-> reduces the number of dereferences in the fast path.
+Paolo,
+two fixes for s390.
 
-Looks good, and that is the idiomatic way to do this.
+Turning gisa off was making us write an uninitialized value into the
+SIE control block due to the V!=R changes.
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Errors when (un)sharing SE memory which were previously unchecked are
+now resulting in panics since there's nothing that the guest can do to
+fix the situation.
+
+Please pull.
+
+The following changes since commit de9c2c66ad8e787abec7c9d7eff4f8c3cdd28aed:
+
+  Linux 6.11-rc2 (2024-08-04 13:50:53 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/kvms390/linux.git tags/kvm-s390-master-6.11-1
+
+for you to fetch changes up to cff59d8631e1409ffdd22d9d717e15810181b32c:
+
+  s390/uv: Panic for set and remove shared access UVC errors (2024-08-07 11:04:43 +0000)
+
+----------------------------------------------------------------
+Fix invalid gisa designation value when gisa is not in use.
+Panic if (un)share fails to maintain security.
+----------------------------------------------------------------
+
+
+Claudio Imbrenda (1):
+  s390/uv: Panic for set and remove shared access UVC errors
+
+Michael Mueller (1):
+  KVM: s390: fix validity interception issue when gisa is switched off
+
+ arch/s390/include/asm/uv.h | 5 ++++-
+ arch/s390/kvm/kvm-s390.h   | 7 ++++++-
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
 -- 
-Jens Axboe
-
+2.46.0
 
 
