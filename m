@@ -1,157 +1,161 @@
-Return-Path: <kvm+bounces-23616-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23617-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BCC794BCC2
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 14:00:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8358694BD24
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 14:13:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94C031C226E1
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 12:00:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B548C1C22891
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 12:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D93ED18B48A;
-	Thu,  8 Aug 2024 12:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745581487C8;
+	Thu,  8 Aug 2024 12:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="zGzr8n4p"
+	dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b="hc4vZEWs"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 763DC18C33F
-	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 12:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723118407; cv=none; b=eJMWPv6LpVtjPhgXmM2qwLRujmpRpmGOJ86tjmYBCO+NkfE7i+K32njOougy2qLSmmzGw5y6y0n7GLgNirBcPwQ1yHKEuuwarUpgV3s7A2H4JLRA7AJZMx1XgpOuTpHOCvFlQWvvzJm0q7wotv1k9Gj1cihC1hIFyDMDfXUBRpc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723118407; c=relaxed/simple;
-	bh=4VJkCGOnJpRwR4YKBH81A1uxdWFs9jOzqwkiDCMslRY=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=COWwSVER0HqJZuoqv7GgFE4u01OdI3wz0L//ZQdjvuWf3sVkVXfQ3FtYgmi6myh2YHhpn34e0kvInHf6Lsbr1NSalP+mAo6UAxhCuu9sLRWgzES3GjASLRAKcSOidI6zMriwld2f9Qg9ryn6zPIarhCo/7sc/s0/fWGgEF0VFC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=zGzr8n4p; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-36868fcb919so526891f8f.2
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 05:00:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723118403; x=1723723203; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=l8fBZbfSfQMp8/8SurSvfBz+MaimrqNdI2CubOLP3Ew=;
-        b=zGzr8n4pjD1TW6J38rzhxbkp5A4UhJhcFdUMRoKC3AgIdDKG2mBpMVtI2x8AIu+OtB
-         OJOEaNvB7kyLOtwoP++6Zr4KHWs+zkEtkJrybjLqj6rWkyzSWVQmtfT4aSKVynVFFXF/
-         FxuWOUho+LZFi6bwbE9Szd8vBaxRU14uaXRno+lkKiZzW4rl0Nrpa3w/B+3aEtWDpTAz
-         RPKWqaM4yQzdqZuJq3KdXHdpPUBrxSZRC6sl9+nmBmdhRsS4qxiFmRnXkLZP1T2nUoUJ
-         JbEaJkPwA4k0anB6nltN2kLKtUIkSmkt3puWFpa3P80Up9yFxsjN35NDDX/eXqftEhcq
-         /7cQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723118403; x=1723723203;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l8fBZbfSfQMp8/8SurSvfBz+MaimrqNdI2CubOLP3Ew=;
-        b=u6VOl5GDeZ6aRapZHFC6X/GPaTXsB2V1BX4jAVf8CVkd0ZvSamjwBSmzSG06W7AkEZ
-         lej/FJ5OWSxb9S9lx3z3P9j6dpp1HokDuGUV766gS6pAmP3Ci4pSHeuVkUlaiQGMbjXx
-         sUNjx20jVI1x133IMEuieK/Z/K6BSoCQnOds8ysGSDl5CPX33NRiyDDOmkhSpiBV9ZmU
-         YwG3HDMFIhkhypWUY/zKsMvxUYTeusK59GvjUSSHLKYD0Ge8oR4Cih51yuep1d8Dyzwv
-         Gi3r7XiuA3K9VuI5PZCFJuAAi2YIjcomvyy0ufQl5hu+PKCwLsVChpruNFVj1tCbwDsk
-         l/Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCXeOOxFP2tLPCYuF6ZlaWR6KKLSmp8n/520CFXqyk5gDLKpsz3r+wtcpujOe50Lhfpf0fLqL+0rvPvoSsKNoD1XPRDX
-X-Gm-Message-State: AOJu0YwrM7D+bkagxdmxC5vsriPXlPdj+UcIBDj3IE9zS91AEkesEgQt
-	WrAkcatQQv5Xnl9UqSlBRttv7aQ4uhT4s88UWzufgblTErdKDohv0FWIKn9kA6s=
-X-Google-Smtp-Source: AGHT+IHHX2fBYyF3bzrkIN6FI+lRc2WcNWD9HizbtFbwpwdbf6zDJoYFHOfDyhNaZKL5sM+Jijm6XQ==
-X-Received: by 2002:a5d:698f:0:b0:367:8fee:443b with SMTP id ffacd0b85a97d-36d27561461mr1129489f8f.41.1723118402280;
-        Thu, 08 Aug 2024 05:00:02 -0700 (PDT)
-Received: from draig.lan ([85.9.250.243])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27156c8asm1700288f8f.24.2024.08.08.05.00.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 05:00:01 -0700 (PDT)
-Received: from draig (localhost [IPv6:::1])
-	by draig.lan (Postfix) with ESMTP id 751635F769;
-	Thu,  8 Aug 2024 13:00:00 +0100 (BST)
-From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
-To: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
-  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
- <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
- <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
- Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
-  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
-  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
- <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
-  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
-  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
-  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
-  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
-  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
-  David Stevens <stevensd@chromium.org>
-Subject: Re: [PATCH v12 13/84] KVM: Annotate that all paths in hva_to_pfn()
- might sleep
-In-Reply-To: <20240726235234.228822-14-seanjc@google.com> (Sean
-	Christopherson's message of "Fri, 26 Jul 2024 16:51:22 -0700")
-References: <20240726235234.228822-1-seanjc@google.com>
-	<20240726235234.228822-14-seanjc@google.com>
-Date: Thu, 08 Aug 2024 13:00:00 +0100
-Message-ID: <87bk23ql6n.fsf@draig.linaro.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1AE18C33F;
+	Thu,  8 Aug 2024 12:13:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723119221; cv=pass; b=oNofKVVrMQzBMkkxJ27vkb1R6AjSvZ+diZqrYrwT2iCHhsMH9ylWDv1ICV+M8pw0cPeK2VqY8z0fQS7ussKD6nos9L69M+Jvfnxd3M+Et//5jo8aibv6i0wgpKmkc6AyzQMTuA46RlNwRDhIofE52MmHGLnymJbXHViUR49YQXQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723119221; c=relaxed/simple;
+	bh=QzvagPocBMPggTIX12bFJFKHgxeSG5y1VbNlylh5auc=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=Soj1nZTZBViavvEpXPNIg6KurQs/dlrHR8G/o/uyafkkX/Rv12RZk9Hf6ILvHwdsfdm5aQo6x9jYH3gjWq+dOl7wOT3VGGowZouQ8o0xiMcePoW1zNXAHcbJYA5zz73m6mteR+FNez7pYCWUmbTe6W80PScsb3QbHP85aO0Kx+k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b=hc4vZEWs; arc=pass smtp.client-ip=136.143.188.112
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+Delivered-To: Usama.Anjum@collabora.com
+ARC-Seal: i=1; a=rsa-sha256; t=1723119202; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=U99jicL82PCU1jrffm1R1ZbeESCSBg/8lvQ+9bAGyhCmzFLK0lOej7eAPYmikE5k2CDYBkVcRH4N0Bd48CqlRQMbuHPyujEEE4zJIMvPee2wsuZLeLyuYBs2BPNyqyIDtcGB+e8EIRLEsvGl5kXWrd2x/Wn4mtujfglO5sJE/7g=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1723119202; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=hq/XaxzCcWVgtRDvj+CIXL2RHMKW1r7R6H31mG379zE=; 
+	b=JfvEGCaD/+W1DgbcT7VRX3rbOkuysH0VlxtIKeTABn9/hUMhQuyt/3NaP4X/FQ5OedHm6o1+qialv/cwuT3NLlzrJTOHQeG7Ud3BdRYqwdi/lyI/Fc91wMqUJU9v+QgL45ixs9cng3VhTI82v22acGhOvkhS5JYoL7CewN//wCs=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=collabora.com;
+	spf=pass  smtp.mailfrom=Usama.Anjum@collabora.com;
+	dmarc=pass header.from=<Usama.Anjum@collabora.com>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1723119202;
+	s=zohomail; d=collabora.com; i=Usama.Anjum@collabora.com;
+	h=Message-ID:Date:Date:MIME-Version:Cc:Cc:Subject:Subject:To:To:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=hq/XaxzCcWVgtRDvj+CIXL2RHMKW1r7R6H31mG379zE=;
+	b=hc4vZEWshPSf5fKC1bwqzBqN7xmtwi1FLpzXxR3rylQKjyy5i15u3YGWNUMzJQ/R
+	LwjUDHplhxD7lyuMKt8dAIQn8fg6spylzDwfEy9iMJm57LBS1HUuFK59BKTrwW37WLY
+	0Im6RWethigeqy0zCVLaEsfu1ku5u6Ufw70F4Hwk=
+Received: by mx.zohomail.com with SMTPS id 1723119200600165.83064247266782;
+	Thu, 8 Aug 2024 05:13:20 -0700 (PDT)
+Message-ID: <c2aaa06e-e86d-4af9-bce4-6067e53cdf39@collabora.com>
+Date: Thu, 8 Aug 2024 17:13:12 +0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Cc: Usama.Anjum@collabora.com, kernel@collabora.com, kvm@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Shuah Khan <shuah@kernel.org>, Shuah Khan <skhan@linuxfoundation.org>
+Subject: Re: [PATCH] selftests: kvm: fix mkdir error when building for
+ non-supported arch
+To: Paolo Bonzini <pbonzini@redhat.com>,
+ Sean Christopherson <seanjc@google.com>
+References: <20240806121029.1199794-1-usama.anjum@collabora.com>
+ <6a3b2f3c-b733-4f64-a550-2f7dcbaf7cb7@linuxfoundation.org>
+ <ca500f5c-57e7-43bc-9a1a-015021582af2@collabora.com>
+ <5703a55a-95ab-44ee-a070-2bca6e9e23bc@collabora.com>
+Content-Language: en-US
+From: Muhammad Usama Anjum <Usama.Anjum@collabora.com>
+In-Reply-To: <5703a55a-95ab-44ee-a070-2bca6e9e23bc@collabora.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ZohoMailClient: External
 
-Sean Christopherson <seanjc@google.com> writes:
+Adding Sean
 
-> Now that hva_to_pfn() no longer supports being called in atomic context,
-> move the might_sleep() annotation from hva_to_pfn_slow() to
-> hva_to_pfn().
+On 8/7/24 11:33 AM, Muhammad Usama Anjum wrote:
+> On 8/7/24 11:08 AM, Muhammad Usama Anjum wrote:
+>> On 8/6/24 9:00 PM, Shuah Khan wrote:
+>>> On 8/6/24 06:10, Muhammad Usama Anjum wrote:
+>>>> The mkdir generates an error when kvm suite is build for non-supported
+>>>
+>>> built
+>>> unsupported
+>>>
+>>>> architecture such as arm. Fix it by ignoring the error from mkdir.
+>>>>
+>>>> mkdir: missing operand
+>>>> Try 'mkdir --help' for more information.
+>>>
+>>> Simply suppressing the message isn't a good fix. Can you investigate
+>>> a bit more on why mkdir is failing and the architectures it is failing
+>>> on?
+>>>
+>>> This change simply suppresses the error message and continues - Should
+>>> this error end the build process or not run mkdir to begin with by
+>>> checking why $(sort $(dir $(TEST_GEN_PROGS)))) results in an empty
+>>> string?
+>> The tests are specified on per architecture basis. As KVM isn't supported on arm, there are no tests in TEST_GEN_PROGS and it is empty. While lib.mk infrastructure has support to ignore and not build anything in such cases, the Makefile's behaviour isn't robust enough.
+>>
+>> I think the better fix would be to check if TEST_GEN_PROGS isn't empty and then call mkdir. I'll reiterate and send the fix.
+> 
+> Waiting on Paolo's response before sending the following fix. Maybe he
+> has better idea here.
+> --- a/tools/testing/selftests/kvm/Makefile
+> +++ b/tools/testing/selftests/kvm/Makefile
+> @@ -317,7 +317,9 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
+>  $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+>  	$(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
+> 
+> -$(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+> +ifneq ($(strip $(TEST_GEN_PROGS)),)
+> +$(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+> +endif
+>  $(SPLIT_TEST_GEN_OBJ): $(GEN_HDRS)
+>  $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+>  $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+Do you agree with the fix or is there better fix? Please feel free to
+jump in to propose better fix here.
 
-The commentary for hva_to_pfn_fast disagrees.
+> 
+> 
+>>
+>>>
+>>>>
+>>>> Signed-off-by: Muhammad Usama Anjum <usama.anjum@collabora.com>
+>>>> ---
+>>>>   tools/testing/selftests/kvm/Makefile | 2 +-
+>>>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
+>>>> index 48d32c5aa3eb7..8ff46a0a8d1cd 100644
+>>>> --- a/tools/testing/selftests/kvm/Makefile
+>>>> +++ b/tools/testing/selftests/kvm/Makefile
+>>>> @@ -317,7 +317,7 @@ $(LIBKVM_S_OBJ): $(OUTPUT)/%.o: %.S $(GEN_HDRS)
+>>>>   $(LIBKVM_STRING_OBJ): $(OUTPUT)/%.o: %.c
+>>>>       $(CC) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c -ffreestanding $< -o $@
+>>>>   -$(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))))
+>>>> +$(shell mkdir -p $(sort $(dir $(TEST_GEN_PROGS))) > /dev/null 2>&1)
+>>>>   $(SPLIT_TEST_GEN_OBJ): $(GEN_HDRS)
+>>>>   $(TEST_GEN_PROGS): $(LIBKVM_OBJS)
+>>>>   $(TEST_GEN_PROGS_EXTENDED): $(LIBKVM_OBJS)
+>>>
+>>>
+>>> thanks,
+>>> -- Shuah
+>>
+> 
 
-  /*
-   * The fast path to get the writable pfn which will be stored in @pfn,
-   * true indicates success, otherwise false is returned.  It's also the
-   * only part that runs if we can in atomic context.
-   */
-  static bool hva_to_pfn_fast(struct kvm_follow_pfn *kfp, kvm_pfn_t *pfn)
+-- 
+BR,
+Muhammad Usama Anjum
 
-At which point did it loose the ability to run in the atomic context? I
-couldn't work it out from the commits.
-
->
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->  virt/kvm/kvm_main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
->
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 84c73b4fc804..03af1a0090b1 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -2807,8 +2807,6 @@ static int hva_to_pfn_slow(unsigned long addr, bool=
- *async, bool write_fault,
->  	struct page *page;
->  	int npages;
->=20=20
-> -	might_sleep();
-> -
->  	if (writable)
->  		*writable =3D write_fault;
->=20=20
-> @@ -2947,6 +2945,8 @@ kvm_pfn_t hva_to_pfn(unsigned long addr, bool inter=
-ruptible, bool *async,
->  	kvm_pfn_t pfn;
->  	int npages, r;
->=20=20
-> +	might_sleep();
-> +
->  	if (hva_to_pfn_fast(addr, write_fault, writable, &pfn))
->  		return pfn;
-
---=20
-Alex Benn=C3=A9e
-Virtualisation Tech Lead @ Linaro
 
