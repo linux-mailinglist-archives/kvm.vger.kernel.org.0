@@ -1,226 +1,126 @@
-Return-Path: <kvm+bounces-23614-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23615-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D5E994BC66
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 13:39:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DCE794BC7A
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 13:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C8EE285F48
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 11:39:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67ADA1C212E2
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 11:48:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C41818B486;
-	Thu,  8 Aug 2024 11:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QovoMGOO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0158318C329;
+	Thu,  8 Aug 2024 11:48:01 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BA1513A257
-	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 11:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DD5E156220;
+	Thu,  8 Aug 2024 11:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723117145; cv=none; b=UqPnGIRskikkmFYUaFkEteyVl8dqqo3HLyK6UtOCN6vAZLUkbl/7WBafBnzsCu5PhT5tjL2vShuv5SUDme/W353SwewxcNkgjV2kNy93b9l5+kelOn1AXI6b1dmIbhoI1RaTb0FXlKBBQDTZX+k+v6d3WRYSR+W2IcyOI0fjiW4=
+	t=1723117680; cv=none; b=BigzAj+bfHl5ejfKrgwVqHbfoj2Qlng74H2MQg71b9Dzy79ftl9m+cX+VUO8JOaR7zGjCK0cK7nnvVgTm4qf6PXzxSmfv+KowWWDRqnGbIb3NzOTPyfwnOnftkyc49cCr3yZ3fFPQsLgxHijeyzuHUlWV1Qfq+gMnrQrhdOwd8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723117145; c=relaxed/simple;
-	bh=2yJX9Pd0EIxgWv4hkKRGi6Y8zjXSU7rLIm993cp6jLY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=olyLJwnSgDulxBE9ebrCaMVHa3NBMH2qI6e3LDAfik8EwOMYS8I0FXSj2nO81acoubh1EOMG67B9ARLwPtHLk9iglQBrEIBJfhLMoWemdZDjjU+/OZaJmD7Wxqe+9tI7R1zreCs0tgCUR+jmnkgiLeP0cRkFg8E0m3tQ1RiLETk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QovoMGOO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723117142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=nXtLRQ2oPUYqp5KSsNYob3Fl3+peknmF9tE6ROEjpF0=;
-	b=QovoMGOOis+SyzHiL7gU4x5CaQTGkHWvzpp3SCg04M+XrAfoKc8V1mmJ8NFux1f0c6gADT
-	b6sggyDEE8ocutvF904sucNoLb3s6mCdaJDJDqW/z4HIb6LOniykDrQIxx9zh6aO9d6Kz9
-	MldBRtzruvGYfDdVyOIaoNo8Mwe+VOc=
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com
- [209.85.214.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-477-1VIOtUPdN8ewyFq5B6hPvQ-1; Thu, 08 Aug 2024 07:38:58 -0400
-X-MC-Unique: 1VIOtUPdN8ewyFq5B6hPvQ-1
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1fc6f3ac7beso8965505ad.1
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 04:38:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723117138; x=1723721938;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=nXtLRQ2oPUYqp5KSsNYob3Fl3+peknmF9tE6ROEjpF0=;
-        b=MSXquztzBE7de+ej7tngzGCt0UJt5IZsuFgfwMwA+C/35BDSG2KzP69vJZkH9trJZd
-         wzx4ys2fKk8r0qh2m3RQ0GPRef1GN3iNWJJKz7PVVTax8/c70Heyo9b0ju95SmL8pp7n
-         pKiUNn6bl4yUlCSNPm6cm12P8WlEj+ms4Zz+GZRRsyEZ9n44dmW0uFsRB1F6N9n8Z01U
-         dvle5p9vPyHnxBDzkppWCjQUZ7nAY4aW+3O0sQbbPLycLoRWpEYDLhaXM7JXCI2Bpos6
-         8EBdCphC7mM03ic8AjbVCImzNwbm4T2nmpfA4DKpJaZnMfcvTzBXyX9y9+IGWvdHo2ig
-         E9oQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUDU6YePeRf3zykLTen5xj899fi5HNuna6wVVJAAKa3P2A17g7qAW5f1evR96wC4R51uGRO3zQZaXeK7x1B3Uhb1T3A
-X-Gm-Message-State: AOJu0YzZqcWFuf34ilNwECcnIOFa74xWReCEMUPnD9/JnLlZ7TNBYefh
-	2htp/5jFd1fzSifsknvnkBrF3ItiK3sIQU1s2jJIQlUiufdfHveqM6tUzDoUnmJkMxXWXxRE6fe
-	oiUXg5CL1JRoVk3B41kBhdftG7ocha+zI5sIGMRzsD2mUKvFVcQ==
-X-Received: by 2002:a17:902:ced2:b0:1fc:726e:15b4 with SMTP id d9443c01a7336-2009525ebf4mr20323275ad.28.1723117137758;
-        Thu, 08 Aug 2024 04:38:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEvVFaLF9oQkLVng5OH4Ty0GBNS1LouM5Ox2xgGRWOluP8qj8etxA0d22WlIXoCbwu3GvQ+wA==
-X-Received: by 2002:a17:902:ced2:b0:1fc:726e:15b4 with SMTP id d9443c01a7336-2009525ebf4mr20323025ad.28.1723117137292;
-        Thu, 08 Aug 2024 04:38:57 -0700 (PDT)
-Received: from localhost.localdomain ([115.96.146.217])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1ff58f19efdsm122143365ad.31.2024.08.08.04.38.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 04:38:56 -0700 (PDT)
-From: Ani Sinha <anisinha@redhat.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Ani Sinha <anisinha@redhat.com>,
-	zhao1.liu@intel.com,
-	kvm@vger.kernel.org,
-	qemu-devel@nongnu.org
-Subject: [PATCH v2] kvm: refactor core virtual machine creation into its own function
-Date: Thu,  8 Aug 2024 17:08:38 +0530
-Message-ID: <20240808113838.1697366-1-anisinha@redhat.com>
-X-Mailer: git-send-email 2.45.2
+	s=arc-20240116; t=1723117680; c=relaxed/simple;
+	bh=Kncq3aQvPDNzR5MXdC1R61flmS6grHdueG7CSyf/7Q0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=iKCQEOH9pg6E3GjmqHioO+LpFTsuRXj+taaiZki55kZDp7ZIKcCv96WVle4DApYaQ0oRhKrj9oIOpStm30lfH82+NQOanjHZqop9P5lfdBtJtpXXsVPlWUIGVShQloudLfISFTOpr3diF7XBq1p9hwn2KreLodWC5IQcQpApcPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.20.42.62])
+	by gateway (Coremail) with SMTP id _____8DxPJtpsLRmBsYLAA--.9052S3;
+	Thu, 08 Aug 2024 19:47:53 +0800 (CST)
+Received: from [10.20.42.62] (unknown [10.20.42.62])
+	by front1 (Coremail) with SMTP id qMiowMDx0uFmsLRmn7IJAA--.48554S3;
+	Thu, 08 Aug 2024 19:47:52 +0800 (CST)
+Subject: Re: [PATCH v12 66/84] KVM: LoongArch: Mark "struct page" pfn accessed
+ before dropping mmu_lock
+To: Sean Christopherson <seanjc@google.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Marc Zyngier <maz@kernel.org>,
+ Oliver Upton <oliver.upton@linux.dev>, Tianrui Zhao
+ <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>,
+ Michael Ellerman <mpe@ellerman.id.au>, Anup Patel <anup@brainfault.org>,
+ Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Janosch Frank <frankja@linux.ibm.com>,
+ Claudio Imbrenda <imbrenda@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ kvmarm@lists.linux.dev, loongarch@lists.linux.dev,
+ linux-mips@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+ kvm-riscv@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-kernel@vger.kernel.org, David Matlack <dmatlack@google.com>,
+ David Stevens <stevensd@chromium.org>
+References: <20240726235234.228822-1-seanjc@google.com>
+ <20240726235234.228822-67-seanjc@google.com>
+From: maobibo <maobibo@loongson.cn>
+Message-ID: <9492f63e-8257-d911-1c67-33c9c7498c50@loongson.cn>
+Date: Thu, 8 Aug 2024 19:47:48 +0800
+User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
+ Thunderbird/68.7.0
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <20240726235234.228822-67-seanjc@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDx0uFmsLRmn7IJAA--.48554S3
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBj9xXoWrKry8Wr17XrWkXF4Utw1DurX_yoWkXFb_uF
+	4Ikw1DGrWkJa90q3WDt3WrJr4Fgay8JFs0vFyDZrWxAa4qy390yFsaga1fAa4jqrWq9FW5
+	ArWqyas0krZYqosvyTuYvTs0mTUanT9S1TB71UUUU1DqnTZGkaVYY2UrUUUUj1kv1TuYvT
+	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
+	cSsGvfJTRUUUbqAYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
+	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
+	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
+	WxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUtVW8ZwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxk0xIA0c2IEe2xFo4CEbIxvr21lc7CjxVAaw2AFwI0_GFv_Wryl42xK82IYc2Ij64vI
+	r41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Xr0_Ar1lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWx
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUShiSDU
+	UUU
 
-Refactoring the core logic around KVM_CREATE_VM into its own separate function
-so that it can be called from other functions in subsequent patches. There is
-no functional change in this patch.
 
-CC: pbonzini@redhat.com
-CC: zhao1.liu@intel.com
-Signed-off-by: Ani Sinha <anisinha@redhat.com>
----
- accel/kvm/kvm-all.c | 93 +++++++++++++++++++++++++++------------------
- 1 file changed, 56 insertions(+), 37 deletions(-)
 
-changelog:
-v2: s/fprintf/warn_report as suggested by zhao
-
-diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 75d11a07b2..c2e177c39f 100644
---- a/accel/kvm/kvm-all.c
-+++ b/accel/kvm/kvm-all.c
-@@ -2385,6 +2385,60 @@ uint32_t kvm_dirty_ring_size(void)
-     return kvm_state->kvm_dirty_ring_size;
- }
- 
-+static int do_kvm_create_vm(MachineState *ms, int type)
-+{
-+    KVMState *s;
-+    int ret;
-+
-+    s = KVM_STATE(ms->accelerator);
-+
-+    do {
-+        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
-+    } while (ret == -EINTR);
-+
-+    if (ret < 0) {
-+        warn_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
-+                    strerror(-ret));
-+
-+#ifdef TARGET_S390X
-+        if (ret == -EINVAL) {
-+            warn_report("Host kernel setup problem detected. Please verify:");
-+            warn_report("- for kernels supporting the switch_amode or"
-+                        " user_mode parameters, whether");
-+            warn_report("  user space is running in primary address space");
-+            warn_report("- for kernels supporting the vm.allocate_pgste "
-+                        "sysctl, whether it is enabled");
-+        }
-+#elif defined(TARGET_PPC)
-+        if (ret == -EINVAL) {
-+            warn_report("PPC KVM module is not loaded. Try modprobe kvm_%s.",
-+                        (type == 2) ? "pr" : "hv");
-+        }
-+#endif
-+    }
-+
-+    return ret;
-+}
-+
-+static int find_kvm_machine_type(MachineState *ms)
-+{
-+    MachineClass *mc = MACHINE_GET_CLASS(ms);
-+    int type;
-+
-+    if (object_property_find(OBJECT(current_machine), "kvm-type")) {
-+        g_autofree char *kvm_type;
-+        kvm_type = object_property_get_str(OBJECT(current_machine),
-+                                           "kvm-type",
-+                                           &error_abort);
-+        type = mc->kvm_type(ms, kvm_type);
-+    } else if (mc->kvm_type) {
-+        type = mc->kvm_type(ms, NULL);
-+    } else {
-+        type = kvm_arch_get_default_type(ms);
-+    }
-+    return type;
-+}
-+
- static int kvm_init(MachineState *ms)
- {
-     MachineClass *mc = MACHINE_GET_CLASS(ms);
-@@ -2467,49 +2521,14 @@ static int kvm_init(MachineState *ms)
-     }
-     s->as = g_new0(struct KVMAs, s->nr_as);
- 
--    if (object_property_find(OBJECT(current_machine), "kvm-type")) {
--        g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
--                                                            "kvm-type",
--                                                            &error_abort);
--        type = mc->kvm_type(ms, kvm_type);
--    } else if (mc->kvm_type) {
--        type = mc->kvm_type(ms, NULL);
--    } else {
--        type = kvm_arch_get_default_type(ms);
--    }
--
-+    type = find_kvm_machine_type(ms);
-     if (type < 0) {
-         ret = -EINVAL;
-         goto err;
-     }
- 
--    do {
--        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
--    } while (ret == -EINTR);
--
-+    ret = do_kvm_create_vm(ms, type);
-     if (ret < 0) {
--        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
--                strerror(-ret));
--
--#ifdef TARGET_S390X
--        if (ret == -EINVAL) {
--            fprintf(stderr,
--                    "Host kernel setup problem detected. Please verify:\n");
--            fprintf(stderr, "- for kernels supporting the switch_amode or"
--                    " user_mode parameters, whether\n");
--            fprintf(stderr,
--                    "  user space is running in primary address space\n");
--            fprintf(stderr,
--                    "- for kernels supporting the vm.allocate_pgste sysctl, "
--                    "whether it is enabled\n");
--        }
--#elif defined(TARGET_PPC)
--        if (ret == -EINVAL) {
--            fprintf(stderr,
--                    "PPC KVM module is not loaded. Try modprobe kvm_%s.\n",
--                    (type == 2) ? "pr" : "hv");
--        }
--#endif
-         goto err;
-     }
- 
--- 
-2.45.2
+On 2024/7/27 上午7:52, Sean Christopherson wrote:
+> Mark pages accessed before dropping mmu_lock when faulting in guest memory
+> so that LoongArch can convert to kvm_release_faultin_page() without
+> tripping its lockdep assertion on mmu_lock being held.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/loongarch/kvm/mmu.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/loongarch/kvm/mmu.c b/arch/loongarch/kvm/mmu.c
+> index 52b5c16cf250..230cafa178d7 100644
+> --- a/arch/loongarch/kvm/mmu.c
+> +++ b/arch/loongarch/kvm/mmu.cBibo Mao <maobibo@loongson.cn>
+> @@ -902,13 +902,13 @@ static int kvm_map_page(struct kvm_vcpu *vcpu, unsigned long gpa, bool write)
+>   
+>   	if (writeable)
+>   		kvm_set_pfn_dirty(pfn);
+> +	kvm_release_pfn_clean(pfn);
+>   
+>   	spin_unlock(&kvm->mmu_lock);
+>   
+>   	if (prot_bits & _PAGE_DIRTY)
+>   		mark_page_dirty_in_slot(kvm, memslot, gfn);
+>   
+> -	kvm_release_pfn_clean(pfn);
+>   out:
+>   	srcu_read_unlock(&kvm->srcu, srcu_idx);
+>   	return err;
+> 
+Reviewed-by: Bibo Mao <maobibo@loongson.cn>
 
 
