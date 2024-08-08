@@ -1,120 +1,213 @@
-Return-Path: <kvm+bounces-23651-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23652-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47E4494C57E
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 21:58:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B53894C5C5
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 22:35:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 796BD1C21F59
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 19:58:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D6951C227C0
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 20:35:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DB8158A18;
-	Thu,  8 Aug 2024 19:58:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E933B15957D;
+	Thu,  8 Aug 2024 20:35:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y1rWjo1M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vsn9B0oC"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E56F15666D
-	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 19:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 567D652F88;
+	Thu,  8 Aug 2024 20:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723147121; cv=none; b=oZbyPAWgjydzM5TdhTO+vlWq9i8/UEetjLpc9nvqJtwjGpNSmXCXRqUm3h97rxlotv/QQaVGI8rLAQefskxkcAdUK/lKw7XzFIR9anxJzLHFuM5GDtqBtB8FPWs8K/yVw9ORFdqfuKCmKQzIbOX55Xw/irfUu87bi1yGWe3ZbKs=
+	t=1723149332; cv=none; b=ax9CTXRbbJiSWAwHJMWdkE097oPMMfaaQtl2zPI/ojIeBAmN8PNh64tgw7Xa90hKhU0gC8oYuVA+DV7WP0uhuLEvLFKxFnuDO6UWDT81qszLCrKznlstF0pp+iiouRGaxVKtqsTNwIKyDjQBOUt53hvRTUhfnFI5e+5mjNiezMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723147121; c=relaxed/simple;
-	bh=qhoRELp0nXoI/COuYWXvg+4+/JGWDI6UHeZkQ4j9XoE=;
-	h=Date:In-Reply-To:Mime-Version:Message-ID:Subject:From:To:Cc:
-	 Content-Type; b=pSevUbhlKkYq5aCBPcKh1EMK4fVQMw07NKSR84Tc0njJdfWK/Po2Mg1pt9K8iX7wYEIj0LT3CdLTS8DY/Sy0lGzl7/lCxZ/LsxcnjseDyVOmys/jDz/0B9GAKHC6nGZm2tapwnd87AsN4AhOg8evPaZv9+C4ozOmVBBeO2qYl44=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y1rWjo1M; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-690404fd230so30007197b3.3
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 12:58:40 -0700 (PDT)
+	s=arc-20240116; t=1723149332; c=relaxed/simple;
+	bh=Z3cZHo0C5dOGdJs4XsVHj5/15eTWcTCsSV4t/f39zoI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ie11jfkxkNayKhQUGyNSKslbDq2ZnyX8fkUeqHtWhyO5DA8XZ5KKR3HZgnOYCUoQNeKf4dJ3S/AWkwus0goXLJ8ArRusSjkaxzu/e3a7MgEyoCwxsCiKuJRqqdylWM0x1qtzyqQ96eLLs6P3M8qb+PrfxOUJScmoY59IDAggaXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vsn9B0oC; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5a156557029so1704290a12.2;
+        Thu, 08 Aug 2024 13:35:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723147119; x=1723751919; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=qhoRELp0nXoI/COuYWXvg+4+/JGWDI6UHeZkQ4j9XoE=;
-        b=Y1rWjo1MmB56vrMwCSjaOyrqRVfet7Pc55deKEta7HwhEODBRe9zQRtAqTfErA9hZX
-         mlKYkDcQIVJ7G3Z1RjAExq3uWAogDjKWuSDFKxv1IVIM4YPKfqV7hy0a0Bjkp0xUWZ2K
-         tkwbUg7ubYibG6WUfczAeAFQMtqW4Y3veQt/bv67kwuIr1mWqU6uGz65M8R8oFjzUWtG
-         j4cK6rGue8ISJ/iwziRcevq38i2S+VIHxEpMazi85EObR5JhW4l9QmNJ4NIyaLmlXFeN
-         bSDTJd4NbnMbZ4PYjwRJvPudGUWuPZn5Nrhr5BqtMQmCZDoiWmIzrNly+4e7/3qojNdT
-         O78Q==
+        d=gmail.com; s=20230601; t=1723149329; x=1723754129; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/BckQp3equBHDw/iWdFm9ZpTvFrdGPYRY5a2tKkfZo0=;
+        b=Vsn9B0oCUqBUHTVYVRgdKVGiJNqt7okkcANodbc8v/6+WkhW2mp8as0lfl9i0QYx19
+         9izdxq+sMlQv2UKXUkJuNImP5tqoViZkG/F4wsg6cJbojHuwop2tWydEa//iZzpbckvj
+         oln8RZe3eqwk76zrr7jSq0whvCmzYeB+KJhK4NeJhr76yh2IBx2DXLFxxV7s0dPMQGnm
+         j0R2iVx8od5nxvuIdnaA2+FHxdfQYyLZlZQSY5JqrDaPQZZ/6USmDyvo3jy+6mxty5tr
+         7iGMKePFmoBdorEsJG6itRsh1bjYjKAhRA7M+NmlOpQVVHKVqwEPNIKF/MD1fIbjVPQR
+         HJuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723147119; x=1723751919;
-        h=cc:to:from:subject:message-id:mime-version:in-reply-to:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qhoRELp0nXoI/COuYWXvg+4+/JGWDI6UHeZkQ4j9XoE=;
-        b=jbj22Idf51kA10A8On6I+1TCJioRErcCNfoAHt1d9dzQADDQVUAmMwWKJgJpJqMW/W
-         zm29BmPX31mk0PXybXBJvPQ/3EDMWDwqumFa1P9MLePkOqRl8bGTPQcdOInIIM5BbCyo
-         ZxScKAAqJztWWR2SXXt23iFoyud2i2UKmYPCJYgALKTlsfF744zUTwP0Vdvjp6ygr07Y
-         VNn8Gg/Nie0O6b0G+zEwaHYJz0L9Vyzhp11s4q6ogNHLHgadvjJi9gdDH/HhQLFUHEE4
-         J97Nc/85nC61e8rdcNjLPYVZCrMuxUa9xv05dsgNNIuFR9lk551RzaoKM6uzsBusSJ4W
-         x60g==
-X-Gm-Message-State: AOJu0YwrMk1CLsLrRcGxNnFqaQudL/GhyPqJBjgH46h6vMdsnOibILNR
-	sCNFbqOx5jm8cVPx1jQ+BhHYDx7CC/JEhkN+Ofo39bqwfp9pW7TBjhsg4AEsSi05G44NBQJe5Te
-	3oCGcxBUJU8Tsf7ti2H2vwg==
-X-Google-Smtp-Source: AGHT+IEigNweiXDrAdz21J+YdPs1Skcc9+Ege+GZLI1vt28thJN0TK7T9V1VytHT8g9OrCSwhqlqBNlR2BBx3Tt0VQ==
-X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:690c:3082:b0:66a:764f:e57f with
- SMTP id 00721157ae682-69bfb7e34admr335247b3.7.1723147119376; Thu, 08 Aug 2024
- 12:58:39 -0700 (PDT)
-Date: Thu, 08 Aug 2024 19:58:38 +0000
-In-Reply-To: <ZrUGpZVnUN1NaVga@linux.dev> (message from Oliver Upton on Thu, 8
- Aug 2024 17:55:49 +0000)
+        d=1e100.net; s=20230601; t=1723149329; x=1723754129;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/BckQp3equBHDw/iWdFm9ZpTvFrdGPYRY5a2tKkfZo0=;
+        b=NqnUI7Q5VmwHxcPud0yz3IUncC4xp4i1nkKIj4D4nldGMa/L9xomUvZ2CH8KcjuHL6
+         Px6Yln91wRZxlxL5WyzQcfgTKYfpi1XOZDsnqhymob3JlQ3+JXvtrWDYXaZDzkekJskD
+         S9kLu8kuyoeqXrQ1UH2WQL5qcDXY2FXMTtrnbxEky8Ob6BulacWlVvZbWNMJGnkdK4OP
+         m9gXM5j60dvZ+/AlKtnQNXHxwy/1t0ksXFOiWSfAtjc0n1psn0UMfKkajQTFGlN2bnrr
+         z+UOPzqFcSLKZASDd/ISUBjRht4rtl/usXWJ1sIoZINIaZdxOrIuC+G/dhujB7opr0qv
+         yrAg==
+X-Forwarded-Encrypted: i=1; AJvYcCX0gzcMzL0frQuTASKwmRrpLhxMb3zH6KM84/MYc4wbTCMUoHlCpiU4bZoPGKWnSShYypyze/y9s5zL/9kSXSxanQyJNb+iLvwBJNbSfCTkfK8Qxcb0kCjGPP88Zqy/BrRzxFydhiYkvITUuB7nPK7YAmALQ3KAvyhW3GQ47aMpXcqNpgYN3w1L0NwzOTUunBXjhZwivNoRnwOAbxKDkzjryXF06U+3AwM=
+X-Gm-Message-State: AOJu0YyRZqE3N/DqaYJu33LP9N8hGlRFdldLsNLQvFnUKBpSltNcj86i
+	0pw0uFZHbRSMoU0b15JHfrWzOhpJmStV8HWSG7cw73uDUIumsirMeCliyWz36sytgxZKjvTihEe
+	Na4BygOkrGMjDmPA4oPhpmGat5Pazyw==
+X-Google-Smtp-Source: AGHT+IG4oe0p6bZ+T5aZ4llYKbhvvCigDfXVXTLyvXUGYJ3vy2BD0AdCsmhO+xVhCMcs3KROzGsFRQjEW1tbCe49jCg=
+X-Received: by 2002:a17:907:f701:b0:a7d:c148:ec85 with SMTP id
+ a640c23a62f3a-a8090f2dad8mr204887866b.62.1723149328292; Thu, 08 Aug 2024
+ 13:35:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-ID: <gsnted6y23dd.fsf@coltonlewis-kvm.c.googlers.com>
-Subject: Re: [PATCH v2] KVM: arm64: Move data barrier to end of split walk
-From: Colton Lewis <coltonlewis@google.com>
-To: Oliver Upton <oliver.upton@linux.dev>
-Cc: kvm@vger.kernel.org, maz@kernel.org, ricarkol@google.com, 
-	james.morse@arm.com, suzuki.poulose@arm.com, yuzenghui@huawei.com, 
-	catalin.marinas@arm.com, will@kernel.org, 
-	linux-arm-kernel@lists.infradead.org, kvmarm@lists.linux.dev, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"; format=flowed; delsp=yes
+MIME-Version: 1.0
+References: <20240730050927.GC5334@ZenIV> <20240730051625.14349-1-viro@kernel.org>
+ <20240730051625.14349-17-viro@kernel.org> <CAEf4BzZipqBVhoY-S+WdeQ8=MhpKk-2dE_ESfGpV-VTm31oQUQ@mail.gmail.com>
+ <20240807-fehlschlag-entfiel-f03a6df0e735@brauner> <CAEf4BzaeFTn41pP_hbcrCTKNZjwt3TPojv0_CYbP=+973YnWiA@mail.gmail.com>
+ <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
+In-Reply-To: <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Thu, 8 Aug 2024 13:35:13 -0700
+Message-ID: <CAEf4Bzauw1tD4UsyhX1PmRs_Y1MzfPqsoRUf40cmNuu7SJKi9w@mail.gmail.com>
+Subject: Re: [PATCH 17/39] bpf: resolve_pseudo_ldimm64(): take handling of a
+ single ldimm64 insn into helper
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Christian Brauner <brauner@kernel.org>, viro@kernel.org, bpf <bpf@vger.kernel.org>, 
+	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, Amir Goldstein <amir73il@gmail.com>, 
+	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>, kvm@vger.kernel.org, 
+	Network Development <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Oliver Upton <oliver.upton@linux.dev> writes:
+On Thu, Aug 8, 2024 at 9:51=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Wed, Aug 7, 2024 at 8:31=E2=80=AFAM Andrii Nakryiko
+> <andrii.nakryiko@gmail.com> wrote:
+> >
+> > On Wed, Aug 7, 2024 at 3:30=E2=80=AFAM Christian Brauner <brauner@kerne=
+l.org> wrote:
+> > >
+> > > On Tue, Aug 06, 2024 at 03:32:20PM GMT, Andrii Nakryiko wrote:
+> > > > On Mon, Jul 29, 2024 at 10:20=E2=80=AFPM <viro@kernel.org> wrote:
+> > > > >
+> > > > > From: Al Viro <viro@zeniv.linux.org.uk>
+> > > > >
+> > > > > Equivalent transformation.  For one thing, it's easier to follow =
+that way.
+> > > > > For another, that simplifies the control flow in the vicinity of =
+struct fd
+> > > > > handling in there, which will allow a switch to CLASS(fd) and mak=
+e the
+> > > > > thing much easier to verify wrt leaks.
+> > > > >
+> > > > > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+> > > > > ---
+> > > > >  kernel/bpf/verifier.c | 342 +++++++++++++++++++++---------------=
+------
+> > > > >  1 file changed, 172 insertions(+), 170 deletions(-)
+> > > > >
+> > > >
+> > > > This looks unnecessarily intrusive. I think it's best to extract th=
+e
+> > > > logic of fetching and adding bpf_map by fd into a helper and that w=
+ay
+> > > > contain fdget + fdput logic nicely. Something like below, which I c=
+an
+> > > > send to bpf-next.
+> > > >
+> > > > commit b5eec08241cc0263e560551de91eda73ccc5987d
+> > > > Author: Andrii Nakryiko <andrii@kernel.org>
+> > > > Date:   Tue Aug 6 14:31:34 2024 -0700
+> > > >
+> > > >     bpf: factor out fetching bpf_map from FD and adding it to used_=
+maps list
+> > > >
+> > > >     Factor out the logic to extract bpf_map instances from FD embed=
+ded in
+> > > >     bpf_insns, adding it to the list of used_maps (unless it's alre=
+ady
+> > > >     there, in which case we just reuse map's index). This simplifie=
+s the
+> > > >     logic in resolve_pseudo_ldimm64(), especially around `struct fd=
+`
+> > > >     handling, as all that is now neatly contained in the helper and=
+ doesn't
+> > > >     leak into a dozen error handling paths.
+> > > >
+> > > >     Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
+> > > >
+> > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> > > > index df3be12096cf..14e4ef687a59 100644
+> > > > --- a/kernel/bpf/verifier.c
+> > > > +++ b/kernel/bpf/verifier.c
+> > > > @@ -18865,6 +18865,58 @@ static bool bpf_map_is_cgroup_storage(stru=
+ct
+> > > > bpf_map *map)
+> > > >          map->map_type =3D=3D BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE);
+> > > >  }
+> > > >
+> > > > +/* Add map behind fd to used maps list, if it's not already there,=
+ and return
+> > > > + * its index. Also set *reused to true if this map was already in =
+the list of
+> > > > + * used maps.
+> > > > + * Returns <0 on error, or >=3D 0 index, on success.
+> > > > + */
+> > > > +static int add_used_map_from_fd(struct bpf_verifier_env *env, int =
+fd,
+> > > > bool *reused)
+> > > > +{
+> > > > +    struct fd f =3D fdget(fd);
+> > >
+> > > Use CLASS(fd, f)(fd) and you can avoid all that fdput() stuff.
+> >
+> > That was the point of Al's next patch in the series, so I didn't want
+> > to do it in this one that just refactored the logic of adding maps.
+> > But I can fold that in and send it to bpf-next.
+>
+> +1.
+>
+> The bpf changes look ok and Andrii's approach is easier to grasp.
+> It's better to route bpf conversion to CLASS(fd,..) via bpf-next,
+> so it goes through bpf CI and our other testing.
+>
+> bpf patches don't seem to depend on newly added CLASS(fd_pos, ...
+> and fderr, so pretty much independent from other patches.
 
-> Hi Colton,
+Ok, so CLASS(fd, f) won't work just yet because of peculiar
+__bpf_map_get() contract: if it gets valid struct fd but it doesn't
+contain a valid struct bpf_map, then __bpf_map_get() does fdput()
+internally. In all other cases the caller has to do fdput() and
+returned struct bpf_map's refcount has to be bumped by the caller
+(__bpf_map_get() doesn't do that, I guess that's why it's
+double-underscored).
 
-> On Thu, Aug 08, 2024 at 05:42:43PM +0000, Colton Lewis wrote:
->> This DSB guarantees page table updates have been made visible to the
->> hardware table walker. Moving the DSB from stage2_split_walker() to
->> after the walk is finished in kvm_pgtable_stage2_split() results in a
->> roughly 70% reduction in Clear Dirty Log Time in
->> dirty_log_perf_test (modified to use eager page splitting) when using
->> huge pages. This gain holds steady through a range of vcpus
->> used (tested 1-64) and memory used (tested 1-64GB).
+I think the reason it was done was just a convenience to not have to
+get/put bpf_map for temporary uses (and instead rely on file's
+reference keeping bpf_map alive), plus we have bpf_map_inc() and
+bpf_map_inc_uref() variants, so in some cases we need to bump just
+refcount, and in some both user and normal refcounts.
 
-> Would you have time to put together a patch for the dirty_log_perf_test
-> changes you've made? This would be quite valuable for testing future
-> improvements to eager page splitting.
+So can't use CLASS(fd, ...) without some more clean up.
 
-I can do that.
+Alexei, how about changing __bpf_map_get(struct fd f) to
+__bpf_map_get_from_fd(int ufd), doing fdget/fdput internally, and
+always returning bpf_map with (normal) refcount bumped (if successful,
+of course). We can then split bpf_map_inc_with_uref() into just
+bpf_map_inc() and bpf_map_inc_uref(), and callers will be able to do
+extra uref-only increment, if necessary.
 
->> This is safe to do because nothing else is using the page tables while
->> they are still being mapped and this is how other page table walkers
->> already function. None of them have a data barrier in the walker
->> itself because relative ordering of table PTEs to table contents comes
->> from the release semantics of stage2_make_pte().
-
->> Signed-off-by: Colton Lewis <coltonlewis@google.com>
-
-> The diff itself looks good to me, so:
-
-> Acked-by: Oliver Upton <oliver.upton@linux.dev>
-
-> --
-> Thanks,
-> Oliver
+I can do that as a pre-patch, there are about 15 callers, so not too
+much work to clean this up. Let me know.
 
