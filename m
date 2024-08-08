@@ -1,178 +1,123 @@
-Return-Path: <kvm+bounces-23603-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23604-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B63C194B80B
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 09:41:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD8C994B8B7
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 10:14:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CF2C286097
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 07:41:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19B141C243F4
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 08:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C5D188CD1;
-	Thu,  8 Aug 2024 07:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344F8189502;
+	Thu,  8 Aug 2024 08:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V63Vty4h"
+	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="l+HCar1t"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F60512E1C7;
-	Thu,  8 Aug 2024 07:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4141891C3
+	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 08:14:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723102887; cv=none; b=s2kvMFf45ZNtvKt3BYOlwhDukwIqCx4kYH9EiYKYKIm20DKk5ZFqqW5lHvmfyWORiyRvcDH47APCeIRyCRwlC1JOAuWJFIHLXPjbwv1A4iNihIMCYtGCfUR3Pq3+TwAe992LDmPcYxNTswPzgP3zu1ESpxKr9FDCg+yyqQwSPWA=
+	t=1723104886; cv=none; b=O/FIYURrT46fMqetVD7/MT7l/lko5ZmQs2Z8gQUNxj3wjAyCIAupYtSxOKCM27CRxus5EMzQQ4DRhwDU74BscLpkR/n30zDbiyBXUFdpC1r1K03PheBMKfEkg4DQTDM6f9kEMKJA7lx47vgMctUahZqocjXgVA5JCFLEAghbYXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723102887; c=relaxed/simple;
-	bh=lajLtdSPaYb3RZF6tZ1cHdAvL4k1IFEHMhUa4dUnK/o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Gog+LbJR1rBW1ubw0GYBpoiRrODKI8vGEJcOYGhKrwVclL1aYQfBoYLN+ebNWh3UdXixzZFYRLSTMU2M9oaLgEOKy+Pt/DmyI/YB7slA+VhJ5zk3jWeCR2Yl7kD0cZxsXJMfnNSk2xvGGLUeSO1aQHfxz0CnunI/nYxQAZB5uFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V63Vty4h; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723102886; x=1754638886;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=lajLtdSPaYb3RZF6tZ1cHdAvL4k1IFEHMhUa4dUnK/o=;
-  b=V63Vty4hwd34DI5mEOqcgBepWOHcDxMN3gz91OP783AeEqqb+XMjhMbv
-   Y0I99bTgrMQ1dYW9CNVV2NJAvVdtMLLDuZyxxrdwtEZUpWxSR5CQK+Tuf
-   lbpTdZYlT6tagUf2/IEEYK1MHE4hUy/s6ckSEATQGEV0AQPxcUqBk2eiO
-   X5XRnd4JGavUEtC1xWJPV9+JQrqyz5G2MeIojNoS6uMTxhJxmSSC6irV8
-   Xgn/ilfDZS43VnJls31xAD1TMZ9k2gdZGd04ul//LCvhaqPHCqpQI25kx
-   tnbWb8Hu5u8VCBf3OkMSUfgv6ZoMmYq3BZt6WFf11DrWKhtFXvhhVxz4y
-   w==;
-X-CSE-ConnectionGUID: 0w8VEGc1TGOazHtr0bM1Zw==
-X-CSE-MsgGUID: Vhgi9eeAT5WekRfeFYuH+A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11157"; a="21380452"
-X-IronPort-AV: E=Sophos;i="6.09,272,1716274800"; 
-   d="scan'208";a="21380452"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 00:41:25 -0700
-X-CSE-ConnectionGUID: NiEX1bqeSsKhqlfYvJwbgQ==
-X-CSE-MsgGUID: 0grGwWvHSaeSoFbut2ZJ/g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,272,1716274800"; 
-   d="scan'208";a="88043110"
-Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.228.22]) ([10.124.228.22])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 00:41:24 -0700
-Message-ID: <0a8fea1b-955e-4a34-91ac-79870c3989d8@intel.com>
-Date: Thu, 8 Aug 2024 15:41:21 +0800
+	s=arc-20240116; t=1723104886; c=relaxed/simple;
+	bh=eYH/t+EqSzgoXAk6bItXHNsosxzNFpOP3Tl4KqWYQGM=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=pi8jX9zeKhpgHh6QydyvU8Zghr05eiqsVfcJlFldxEZX7c3QeX4LKt7r5Gk0h5GWqtz76zIIm3gCO8GB6Xhk8rktbJH9sbh/Z1YLiT2Oa4T+J28fPi9GfHkiRDlljNgzmREZKN8Gm25Ig2VXjhMNp47zaa9MUZx6YYebckzQX1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=l+HCar1t; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-6bce380eb96so457802a12.0
+        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 01:14:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=sifive.com; s=google; t=1723104884; x=1723709684; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Uz2Q34geGJiRJ8e8z0pDWtJTTDFKWyWloO9Btu2KCw8=;
+        b=l+HCar1tYDnQ2TsXG4W+EppSebZY7831K8m7qvv/mX9k9LwDxyLWFadzeRinlBdR6f
+         lSffAKyF2XKlG7ewoZUqVtdkYCWL2A9YNeanKiiCI8uhnbORYZ+zhYnyTeorHUWqPMB9
+         QkvsOzU+cwxb4sXY8tk9yEJlEbAA4D8GczY714e/Qo1FwpUv0Sn+WMKPX7uhv/wiHIXz
+         FSUyhY2LRHOIYJJi32ggs8/1qNkgLK4UalPoUEL4iPoW/Agib4/O5MH7cc1DxP4SUrLj
+         YfR5vUsvqjq1fIcMV/Ttfs+yDQfp5WVRnlOaNGrSXTJx5hD4Wvbm+zxEOAok1ojoRuNF
+         A5kQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723104884; x=1723709684;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Uz2Q34geGJiRJ8e8z0pDWtJTTDFKWyWloO9Btu2KCw8=;
+        b=wF5B5TZXw6qDkt35Io/JG1GKUKyBpzZusfNWbpXLP8/Uzl6fmBGr1Mbfl0bH+mKR1q
+         6OlaxYXn38lfkusIf3NYr1eDSbQx6PoD3eVxx8VUBvXc5fgJby7Hy2X3b9zftGr9vMLN
+         8AY5iOmu+TRf0vUZFEvHw2cqB7Z89/CQZN1J1JKkbxw/VMnIVu78YxWQV3fof3SyTiNq
+         3rIwwC4iv0EnXw55fboCtpdVkbWCRuWx2b5BOaoFR+R2Dmar1kl/CM4FodKD6XkdSzgh
+         LLEQ+4M3vvU72jklmb2xzlOkKFHgXZn/0coVEtIcl+CnaVb+t9tQ2eUrQagdmiWBNr+G
+         qvVg==
+X-Forwarded-Encrypted: i=1; AJvYcCWfpqItH/zZMcmoEcm7MpM/pTs+ji1ux7FY0I++wON5i1BndwHuWEWbmrkVeogxt53IykJLpFBDYY8yLYYO6l0t8GWx
+X-Gm-Message-State: AOJu0YzmJhjuwiObjgPkT+D9VSzRdzHaOAPWxK4EcrNlGcYthO4wPQ16
+	cyq1g3c6jxXDcQWIC2v5MS9+kXlOavT6ODcgzP6oQ/c9IRBM2lVW8Dk6/OUyOsQ=
+X-Google-Smtp-Source: AGHT+IE8I00iIp/1AKllHFcYCJLmvvu0pdzTgwwUhvhBSbA/p5VCIfIk3GciGH9HF1hk5jCo+FswWg==
+X-Received: by 2002:a05:6a20:5501:b0:1c2:912f:ca70 with SMTP id adf61e73a8af0-1c6fcf7b166mr898421637.42.1723104884149;
+        Thu, 08 Aug 2024 01:14:44 -0700 (PDT)
+Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f18616sm118451765ad.39.2024.08.08.01.14.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Aug 2024 01:14:43 -0700 (PDT)
+From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+To: linux-kernel@vger.kernel.org,
+	linux-riscv@lists.infradead.org,
+	kvm-riscv@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: greentime.hu@sifive.com,
+	vincent.chen@sifive.com,
+	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
+	Anup Patel <anup@brainfault.org>,
+	Atish Patra <atishp@atishpatra.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>
+Subject: [PATCH 1/1] RISC-V: KVM: Fix APLIC in_clrip and clripnum write emulation
+Date: Thu,  8 Aug 2024 16:14:38 +0800
+Message-Id: <20240808081439.24661-1-yongxuan.wang@sifive.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 6/6] KVM: Move flags check for user memory regions to the
- ioctl() specific API
-To: Sean Christopherson <seanjc@google.com>,
- Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240802205003.353672-1-seanjc@google.com>
- <20240802205003.353672-7-seanjc@google.com>
-Content-Language: en-US
-From: Xiaoyao Li <xiaoyao.li@intel.com>
-In-Reply-To: <20240802205003.353672-7-seanjc@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
 
-On 8/3/2024 4:50 AM, Sean Christopherson wrote:
-> Move the check on memory region flags to kvm_vm_ioctl_set_memory_region()
-> now that the internal API, kvm_set_internal_memslot(), disallows any and
-> all flags.
-> 
-> No functional change intended.
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   virt/kvm/kvm_main.c | 54 ++++++++++++++++++---------------------------
->   1 file changed, 22 insertions(+), 32 deletions(-)
-> 
-> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-> index 84fcb20e3e1c..09cc261b080a 100644
-> --- a/virt/kvm/kvm_main.c
-> +++ b/virt/kvm/kvm_main.c
-> @@ -1566,34 +1566,6 @@ static void kvm_replace_memslot(struct kvm *kvm,
->   #define KVM_SET_USER_MEMORY_REGION_V1_FLAGS \
->   	(KVM_MEM_LOG_DIRTY_PAGES | KVM_MEM_READONLY)
->   
-> -static int check_memory_region_flags(struct kvm *kvm,
-> -				     const struct kvm_userspace_memory_region2 *mem)
-> -{
-> -	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
-> -
-> -	if (kvm_arch_has_private_mem(kvm))
-> -		valid_flags |= KVM_MEM_GUEST_MEMFD;
-> -
-> -	/* Dirty logging private memory is not currently supported. */
-> -	if (mem->flags & KVM_MEM_GUEST_MEMFD)
-> -		valid_flags &= ~KVM_MEM_LOG_DIRTY_PAGES;
-> -
-> -#ifdef CONFIG_HAVE_KVM_READONLY_MEM
-> -	/*
-> -	 * GUEST_MEMFD is incompatible with read-only memslots, as writes to
-> -	 * read-only memslots have emulated MMIO, not page fault, semantics,
-> -	 * and KVM doesn't allow emulated MMIO for private memory.
-> -	 */
-> -	if (!(mem->flags & KVM_MEM_GUEST_MEMFD))
-> -		valid_flags |= KVM_MEM_READONLY;
-> -#endif
-> -
-> -	if (mem->flags & ~valid_flags)
-> -		return -EINVAL;
-> -
-> -	return 0;
-> -}
+In the section "4.7 Precise effects on interrupt-pending bits"
+of the RISC-V AIA specification defines that:
 
-I would vote for keeping it instead of open coding it.
+If the source mode is Level1 or Level0 and the interrupt domain
+is configured in MSI delivery mode (domaincfg.DM = 1):
+The pending bit is cleared whenever the rectified input value is
+low, when the interrupt is forwarded by MSI, or by a relevant
+write to an in_clrip register or to clripnum.
 
-> -
->   static void kvm_swap_active_memslots(struct kvm *kvm, int as_id)
->   {
->   	struct kvm_memslots *slots = kvm_get_inactive_memslots(kvm, as_id);
-> @@ -1986,10 +1958,6 @@ static int kvm_set_memory_region(struct kvm *kvm,
->   
->   	lockdep_assert_held(&kvm->slots_lock);
->   
-> -	r = check_memory_region_flags(kvm, mem);
-> -	if (r)
-> -		return r;
-> -
->   	as_id = mem->slot >> 16;
->   	id = (u16)mem->slot;
->   
-> @@ -2114,6 +2082,28 @@ EXPORT_SYMBOL_GPL(kvm_set_internal_memslot);
->   static int kvm_vm_ioctl_set_memory_region(struct kvm *kvm,
->   					  struct kvm_userspace_memory_region2 *mem)
->   {
-> +	u32 valid_flags = KVM_MEM_LOG_DIRTY_PAGES;
-> +
-> +	if (kvm_arch_has_private_mem(kvm))
-> +		valid_flags |= KVM_MEM_GUEST_MEMFD;
-> +
-> +	/* Dirty logging private memory is not currently supported. */
-> +	if (mem->flags & KVM_MEM_GUEST_MEMFD)
-> +		valid_flags &= ~KVM_MEM_LOG_DIRTY_PAGES;
-> +
-> +#ifdef CONFIG_HAVE_KVM_READONLY_MEM
-> +	/*
-> +	 * GUEST_MEMFD is incompatible with read-only memslots, as writes to
-> +	 * read-only memslots have emulated MMIO, not page fault, semantics,
-> +	 * and KVM doesn't allow emulated MMIO for private memory.
-> +	 */
-> +	if (!(mem->flags & KVM_MEM_GUEST_MEMFD))
-> +		valid_flags |= KVM_MEM_READONLY;
-> +#endif
-> +
-> +	if (mem->flags & ~valid_flags)
-> +		return -EINVAL;
-> +
->   	if ((u16)mem->slot >= KVM_USER_MEM_SLOTS)
->   		return -EINVAL;
->   
+Update the aplic_write_pending() to match the spec.
+
+Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
+Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
+---
+ arch/riscv/kvm/aia_aplic.c | 2 --
+ 1 file changed, 2 deletions(-)
+
+diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
+index da6ff1bade0d..97c6dbcabf47 100644
+--- a/arch/riscv/kvm/aia_aplic.c
++++ b/arch/riscv/kvm/aia_aplic.c
+@@ -142,8 +142,6 @@ static void aplic_write_pending(struct aplic *aplic, u32 irq, bool pending)
+ 
+ 	if (sm == APLIC_SOURCECFG_SM_LEVEL_HIGH ||
+ 	    sm == APLIC_SOURCECFG_SM_LEVEL_LOW) {
+-		if (!pending)
+-			goto skip_write_pending;
+ 		if ((irqd->state & APLIC_IRQ_STATE_INPUT) &&
+ 		    sm == APLIC_SOURCECFG_SM_LEVEL_LOW)
+ 			goto skip_write_pending;
+-- 
+2.17.1
 
 
