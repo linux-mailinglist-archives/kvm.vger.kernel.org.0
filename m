@@ -1,289 +1,159 @@
-Return-Path: <kvm+bounces-23641-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23640-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C93C94C2D6
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 18:37:59 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 940F494C263
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 18:16:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D37F1C221D3
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 16:37:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C8491F24D42
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 16:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C6618FC9C;
-	Thu,  8 Aug 2024 16:37:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 921AD18E02A;
+	Thu,  8 Aug 2024 16:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jbbSxESm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EhqEGc1n";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="jbbSxESm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="EhqEGc1n"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q357/xha"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2ADF12FB0A
-	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 16:37:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAFF0148307
+	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 16:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723135070; cv=none; b=mLyWh/1i5Fc2sSv2sQMMphmL8IUhXfYHhMck3QtF9Gd719qImMW/yat+XMT3IfSxu/ITeHd9DjRXvroWg26qD31orWmq2P2o+XYRGQwUuqZILL97NUSP1AEWfShGMdUCQVyQE+hhHLdON0YdXnzqOCZKh7+b2haf0fSi1da6tSs=
+	t=1723133782; cv=none; b=h8dxLFopLvnpKNctFe4BjcMwRqwnIM6ps2fENJYjx0zk1Ehcs5zudvvx5ItDGhWNiZxWwBQdw96pwmwpgZYInljvpd3JJldwtajQJ3dLVSE2MF6KxX1V0PXEGExsRECvs8wnixtWqZmxYAfTpM5IWGp2pMh0Wj70zOYb+Wy+Zlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723135070; c=relaxed/simple;
-	bh=NUrB6sJ73kiOk5iF0dfbIq5VtRKVr5MwvPrr0T4uMM8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O0Rgob+tZexjzDHDkHXjr2Y+VWLQp2/uo3p5N+Oyumfnf/A1dEVbpJ0ds/7XGgtka7EDAHTK8AZJC2geLVYKyL4mZp7OoHGRbk9kzKyHdeJdDMHjWbdIj02FNLya3UfGSqty4ERQTIYgZA8HM+J7B99StKnH8LCmWZCLbjjqwQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jbbSxESm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EhqEGc1n; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=jbbSxESm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=EhqEGc1n; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (unknown [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 20B7B21D34;
-	Thu,  8 Aug 2024 16:37:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723135067; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FT6POBvoe+yceWz2dTOKo85Viu9VOo9r/g2Kos0kDdI=;
-	b=jbbSxESmx7Dph6AXufN+jgTTbBSkt5d0dMyKbXVAcx04p+vh7JX1/g5ayz2QJhtI/DsHla
-	L2nBJ9FnTWTEPhhifZrednIBYgLLi9/oxIgw05kv06HrTxuXa0IxAZT6zwdJb6Uo/Om+3E
-	+V0BkClbhvAgdowjI6rE/6jw8NDWTSs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723135067;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FT6POBvoe+yceWz2dTOKo85Viu9VOo9r/g2Kos0kDdI=;
-	b=EhqEGc1n9UhPT747OUq3VGiibPinN/b9RWZiJzSMj3CaK+WezjB2u52Z/rjUY+p3lta+7H
-	DwGiOvHLVqoUn4AQ==
-Authentication-Results: smtp-out1.suse.de;
-	none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723135067; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FT6POBvoe+yceWz2dTOKo85Viu9VOo9r/g2Kos0kDdI=;
-	b=jbbSxESmx7Dph6AXufN+jgTTbBSkt5d0dMyKbXVAcx04p+vh7JX1/g5ayz2QJhtI/DsHla
-	L2nBJ9FnTWTEPhhifZrednIBYgLLi9/oxIgw05kv06HrTxuXa0IxAZT6zwdJb6Uo/Om+3E
-	+V0BkClbhvAgdowjI6rE/6jw8NDWTSs=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723135067;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=FT6POBvoe+yceWz2dTOKo85Viu9VOo9r/g2Kos0kDdI=;
-	b=EhqEGc1n9UhPT747OUq3VGiibPinN/b9RWZiJzSMj3CaK+WezjB2u52Z/rjUY+p3lta+7H
-	DwGiOvHLVqoUn4AQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E3CA313BAF;
-	Thu,  8 Aug 2024 12:58:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id B6yrMwXBtGZsZwAAD6G6ig
-	(envelope-from <cfontana@suse.de>); Thu, 08 Aug 2024 12:58:45 +0000
-Message-ID: <34b23dba-52ef-400b-a876-47bafc8989ce@suse.de>
-Date: Thu, 8 Aug 2024 14:58:41 +0200
+	s=arc-20240116; t=1723133782; c=relaxed/simple;
+	bh=R8R/7XxJiD8SbGw4qFqr3w25VlObii1GrVvmAIP4ewA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Hr1eZrj6CE8RvS/E6OVjhcV0XYlK6v7/PCAR/HvmchVwnE+1bgcMD7LECJVzkPhbywlMqspGD9jWB+ogtU2pFcRJM3MwYB+ynppGQv7wsExWD+tkW1zH7W1MOftC3cJzOc7bbPYdZyFa12V7cZ613tlZxgwVexac206Gsw4zS3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q357/xha; arc=none smtp.client-ip=209.85.208.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2ef2cb7d562so10766591fa.3
+        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 09:16:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1723133779; x=1723738579; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QLPa+w6AdBa1cUfelytt4eYDYgnS/jumqOLX9cOCUyA=;
+        b=q357/xhaX8+B9uqiRegLs63n/OipYuG36M23UmMKavLdEByApOcJ6b9u6FDyjTWlSv
+         s2pVstliksWsU9xqkhPMqxvjDZNupDw/yl8sLJRf6EjP9dG5PBClbB03aY2huFVWP+/h
+         g0a9+cH3hS0T9mWP8exkmaMYJZxAt92wDt/kuPYwp/VHhRRQDIqdmZWxqCmbaJ8K6h38
+         bQcI/99KKl3nntuybmUWz1nD5ttbtsoxbAW+4qYbxCpdUJd9uHIHp8Q49pHuVmJd6MqD
+         OFOwZ8Pod82PZV98/yubfqJ0dTYJUsU35WKkhShg3lDWD50D9YtaFgqi6MmzdCDb4AIU
+         kvOg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723133779; x=1723738579;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QLPa+w6AdBa1cUfelytt4eYDYgnS/jumqOLX9cOCUyA=;
+        b=qtumCFM3DF6o7rIHuX0mFoxHNBQdu+3YYljv2yPNWsYnzlHu5UDi9dXfNp/jZDM0jp
+         wD1Mvp9GitEMZdVt1CN1WmDR8FjT0HEwkVaMmCxGPJWndsYVnOJTeB1ZJcwZ3WvFe+vF
+         kauiUG9gUyWipj/ePTVdf0ueygGvw+dK770K01W/uYdTR7Y2gclwZLCFyI3ExgLYt4XN
+         s/kHjbO2rCWO9tENxu9rxc8I5S06qJKGoXcbZjlwmjXCht9jbrrBl6vCSSCV2lzz1ab3
+         QKOh8KtanxXV8nN4bpZwKkmY6SUYkfdbDm1h9/JkF8CZU9TOSDnlNnqJne3RH/fhnT+c
+         kvGg==
+X-Forwarded-Encrypted: i=1; AJvYcCXeezlPQBgocWdd4+fMwm+laln+nlOqZKx2z8UCzgjX21PHn4rpRASdHsa1z6r6sZHm38vdNHDHO7oFAIb2LvYFxisn
+X-Gm-Message-State: AOJu0YwFhvOUcDWlx+bzuIO3bBvPHpVjamo2WxpQ2sofqz2vLMeRcKlz
+	CvVLRKsbiX86R379PZcye9lZw+6MQ7wkNzDsMQQ6055Qdgariz5bijRCKL9wJmQ=
+X-Google-Smtp-Source: AGHT+IFeg1aw2R2jdtW33+RTmD0GoFD4AbJwR/eufpV8IO4HacBEUsTerwG6znblRji34uNx3VzDqg==
+X-Received: by 2002:a2e:331a:0:b0:2f0:2d85:2238 with SMTP id 38308e7fff4ca-2f19de75d02mr16453671fa.44.1723133777752;
+        Thu, 08 Aug 2024 09:16:17 -0700 (PDT)
+Received: from draig.lan ([85.9.250.243])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27229eaasm2377515f8f.103.2024.08.08.09.16.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Aug 2024 09:16:16 -0700 (PDT)
+Received: from draig (localhost [IPv6:::1])
+	by draig.lan (Postfix) with ESMTP id 824915F769;
+	Thu,  8 Aug 2024 17:16:15 +0100 (BST)
+From: =?utf-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>,  Marc Zyngier <maz@kernel.org>,
+  Oliver Upton <oliver.upton@linux.dev>,  Tianrui Zhao
+ <zhaotianrui@loongson.cn>,  Bibo Mao <maobibo@loongson.cn>,  Huacai Chen
+ <chenhuacai@kernel.org>,  Michael Ellerman <mpe@ellerman.id.au>,  Anup
+ Patel <anup@brainfault.org>,  Paul Walmsley <paul.walmsley@sifive.com>,
+  Palmer Dabbelt <palmer@dabbelt.com>,  Albert Ou <aou@eecs.berkeley.edu>,
+  Christian Borntraeger <borntraeger@linux.ibm.com>,  Janosch Frank
+ <frankja@linux.ibm.com>,  Claudio Imbrenda <imbrenda@linux.ibm.com>,
+  kvm@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
+  kvmarm@lists.linux.dev,  loongarch@lists.linux.dev,
+  linux-mips@vger.kernel.org,  linuxppc-dev@lists.ozlabs.org,
+  kvm-riscv@lists.infradead.org,  linux-riscv@lists.infradead.org,
+  linux-kernel@vger.kernel.org,  David Matlack <dmatlack@google.com>,
+  David Stevens <stevensd@chromium.org>
+Subject: Re: [PATCH v12 13/84] KVM: Annotate that all paths in hva_to_pfn()
+ might sleep
+In-Reply-To: <ZrTk4sQS8k1-GBb3@google.com> (Sean Christopherson's message of
+	"Thu, 8 Aug 2024 08:31:46 -0700")
+References: <20240726235234.228822-1-seanjc@google.com>
+	<20240726235234.228822-14-seanjc@google.com>
+	<87bk23ql6n.fsf@draig.linaro.org> <ZrTFPhy0e1fFb9vA@google.com>
+	<877ccrqc06.fsf@draig.linaro.org> <ZrTk4sQS8k1-GBb3@google.com>
+Date: Thu, 08 Aug 2024 17:16:15 +0100
+Message-ID: <8734nfq9bk.fsf@draig.linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] kvm: refactor core virtual machine creation into its
- own function
-To: Ani Sinha <anisinha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: zhao1.liu@intel.com, kvm@vger.kernel.org, qemu-devel@nongnu.org
-References: <20240808113838.1697366-1-anisinha@redhat.com>
-Content-Language: en-US
-From: Claudio Fontana <cfontana@suse.de>
-In-Reply-To: <20240808113838.1697366-1-anisinha@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-X-Spamd-Result: default: False [-1.29 / 50.00];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	NEURAL_HAM_SHORT(-0.20)[-0.998];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	URIBL_BLOCKED(0.00)[imap1.dmz-prg2.suse.org:helo,intel.com:email];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	FROM_EQ_ENVFROM(0.00)[];
-	RCPT_COUNT_FIVE(0.00)[5];
-	RCVD_COUNT_TWO(0.00)[2];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MID_RHS_MATCH_FROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[intel.com:email,imap1.dmz-prg2.suse.org:helo]
-X-Spam-Flag: NO
-X-Spam-Score: -1.29
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Sean Christopherson <seanjc@google.com> writes:
 
-as a suggestion you could adjust the names of the functions to match the existing pattern in this module.
+> On Thu, Aug 08, 2024, Alex Benn=C3=A9e wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>>=20
+>> > On Thu, Aug 08, 2024, Alex Benn=C3=A9e wrote:
+>> >> Sean Christopherson <seanjc@google.com> writes:
+>> >>=20
+>> >> > Now that hva_to_pfn() no longer supports being called in atomic con=
+text,
+>> >> > move the might_sleep() annotation from hva_to_pfn_slow() to
+>> >> > hva_to_pfn().
+>> >>=20
+>> >> The commentary for hva_to_pfn_fast disagrees.
+>> >>=20
+>> >>   /*
+>> >>    * The fast path to get the writable pfn which will be stored in @p=
+fn,
+>> >>    * true indicates success, otherwise false is returned.  It's also =
+the
+>> >>    * only part that runs if we can in atomic context.
+>> >>    */
+>> >>   static bool hva_to_pfn_fast(struct kvm_follow_pfn *kfp, kvm_pfn_t *=
+pfn)
+>> >>=20
+>> >> At which point did it loose the ability to run in the atomic context?=
+ I
+>> >> couldn't work it out from the commits.
+>> >
+>> > It didn't lose the ability per se (calling hva_to_pfn_fast() in atomic=
+ context
+>> > would still be functionally ok), rather the previous patch
+>> >
+>> >   KVM: Drop @atomic param from gfn=3D>pfn and hva=3D>pfn APIs
+>> >
+>> > removed support for doing so in order to simplify hva_to_pfn() as a wh=
+ole.
+>>=20
+>> It still sticks out given the only caller no longer enforces this.=20
+>
+> Oh, sorry, I should have been more explicit.  I'll fix the comment, I sim=
+ply
+> missed it.
 
-It is modulename_method ie kvm_* , so:
+No worries, with the fixed comment:
 
-On 8/8/24 13:38, Ani Sinha wrote:
-> Refactoring the core logic around KVM_CREATE_VM into its own separate function
-> so that it can be called from other functions in subsequent patches. There is
-> no functional change in this patch.
-> 
-> CC: pbonzini@redhat.com
-> CC: zhao1.liu@intel.com
-> Signed-off-by: Ani Sinha <anisinha@redhat.com>
-> ---
->  accel/kvm/kvm-all.c | 93 +++++++++++++++++++++++++++------------------
->  1 file changed, 56 insertions(+), 37 deletions(-)
-> 
-> changelog:
-> v2: s/fprintf/warn_report as suggested by zhao
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 75d11a07b2..c2e177c39f 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2385,6 +2385,60 @@ uint32_t kvm_dirty_ring_size(void)
->      return kvm_state->kvm_dirty_ring_size;
->  }
->  
-> +static int do_kvm_create_vm(MachineState *ms, int type)
+Reviewed-by: Alex Benn=C3=A9e <alex.bennee@linaro.org>
 
-kvm_do_create_vm()
-
-btw does the "_do_" part add anything of value? Otherwise I would do:
-
-kvm_create_vm()
-
-
-
-> +{
-> +    KVMState *s;
-> +    int ret;
-> +
-> +    s = KVM_STATE(ms->accelerator);
-> +
-> +    do {
-> +        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
-> +    } while (ret == -EINTR);
-> +
-> +    if (ret < 0) {
-> +        warn_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
-> +                    strerror(-ret));
-> +
-> +#ifdef TARGET_S390X
-> +        if (ret == -EINVAL) {
-> +            warn_report("Host kernel setup problem detected. Please verify:");
-> +            warn_report("- for kernels supporting the switch_amode or"
-> +                        " user_mode parameters, whether");
-> +            warn_report("  user space is running in primary address space");
-> +            warn_report("- for kernels supporting the vm.allocate_pgste "
-> +                        "sysctl, whether it is enabled");
-> +        }
-> +#elif defined(TARGET_PPC)
-> +        if (ret == -EINVAL) {
-> +            warn_report("PPC KVM module is not loaded. Try modprobe kvm_%s.",
-> +                        (type == 2) ? "pr" : "hv");
-> +        }
-> +#endif
-> +    }
-> +
-> +    return ret;
-> +}
-> +
-> +static int find_kvm_machine_type(MachineState *ms)
-
-kvm_find_machine_type
-
-Thanks,
-
-C
-
-> +{
-> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
-> +    int type;
-> +
-> +    if (object_property_find(OBJECT(current_machine), "kvm-type")) {
-> +        g_autofree char *kvm_type;
-> +        kvm_type = object_property_get_str(OBJECT(current_machine),
-> +                                           "kvm-type",
-> +                                           &error_abort);
-> +        type = mc->kvm_type(ms, kvm_type);
-> +    } else if (mc->kvm_type) {
-> +        type = mc->kvm_type(ms, NULL);
-> +    } else {
-> +        type = kvm_arch_get_default_type(ms);
-> +    }
-> +    return type;
-> +}
-> +
->  static int kvm_init(MachineState *ms)
->  {
->      MachineClass *mc = MACHINE_GET_CLASS(ms);
-> @@ -2467,49 +2521,14 @@ static int kvm_init(MachineState *ms)
->      }
->      s->as = g_new0(struct KVMAs, s->nr_as);
->  
-> -    if (object_property_find(OBJECT(current_machine), "kvm-type")) {
-> -        g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
-> -                                                            "kvm-type",
-> -                                                            &error_abort);
-> -        type = mc->kvm_type(ms, kvm_type);
-> -    } else if (mc->kvm_type) {
-> -        type = mc->kvm_type(ms, NULL);
-> -    } else {
-> -        type = kvm_arch_get_default_type(ms);
-> -    }
-> -
-> +    type = find_kvm_machine_type(ms);
->      if (type < 0) {
->          ret = -EINVAL;
->          goto err;
->      }
->  
-> -    do {
-> -        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
-> -    } while (ret == -EINTR);
-> -
-> +    ret = do_kvm_create_vm(ms, type);
->      if (ret < 0) {
-> -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
-> -                strerror(-ret));
-> -
-> -#ifdef TARGET_S390X
-> -        if (ret == -EINVAL) {
-> -            fprintf(stderr,
-> -                    "Host kernel setup problem detected. Please verify:\n");
-> -            fprintf(stderr, "- for kernels supporting the switch_amode or"
-> -                    " user_mode parameters, whether\n");
-> -            fprintf(stderr,
-> -                    "  user space is running in primary address space\n");
-> -            fprintf(stderr,
-> -                    "- for kernels supporting the vm.allocate_pgste sysctl, "
-> -                    "whether it is enabled\n");
-> -        }
-> -#elif defined(TARGET_PPC)
-> -        if (ret == -EINVAL) {
-> -            fprintf(stderr,
-> -                    "PPC KVM module is not loaded. Try modprobe kvm_%s.\n",
-> -                    (type == 2) ? "pr" : "hv");
-> -        }
-> -#endif
->          goto err;
->      }
->  
-
+--=20
+Alex Benn=C3=A9e
+Virtualisation Tech Lead @ Linaro
 
