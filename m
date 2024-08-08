@@ -1,123 +1,156 @@
-Return-Path: <kvm+bounces-23604-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23605-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD8C994B8B7
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 10:14:55 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FB3F94B8E6
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 10:21:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 19B141C243F4
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 08:14:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B39CB21AFB
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 08:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344F8189502;
-	Thu,  8 Aug 2024 08:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB0E1898E2;
+	Thu,  8 Aug 2024 08:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b="l+HCar1t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vj63zg45"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE4141891C3
-	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 08:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66FE1145B0C
+	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 08:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723104886; cv=none; b=O/FIYURrT46fMqetVD7/MT7l/lko5ZmQs2Z8gQUNxj3wjAyCIAupYtSxOKCM27CRxus5EMzQQ4DRhwDU74BscLpkR/n30zDbiyBXUFdpC1r1K03PheBMKfEkg4DQTDM6f9kEMKJA7lx47vgMctUahZqocjXgVA5JCFLEAghbYXE=
+	t=1723105259; cv=none; b=MSZFYM8WW5aw4nOk3HRiDICum3Ti5B5tAcuZGX/oWZ4FkHu/yHqEGkdSRIjcC2bOZYP8b+ilLvlKnQOequ+cMeHMm/FkHBlhbs5aJZqMnO0eToVum93V0RWdZ12/I4PUDQpI3F7kbhf9sUrIA8RtnvDWfPBiI5E2ygcgjdbvBlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723104886; c=relaxed/simple;
-	bh=eYH/t+EqSzgoXAk6bItXHNsosxzNFpOP3Tl4KqWYQGM=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=pi8jX9zeKhpgHh6QydyvU8Zghr05eiqsVfcJlFldxEZX7c3QeX4LKt7r5Gk0h5GWqtz76zIIm3gCO8GB6Xhk8rktbJH9sbh/Z1YLiT2Oa4T+J28fPi9GfHkiRDlljNgzmREZKN8Gm25Ig2VXjhMNp47zaa9MUZx6YYebckzQX1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com; spf=pass smtp.mailfrom=sifive.com; dkim=pass (2048-bit key) header.d=sifive.com header.i=@sifive.com header.b=l+HCar1t; arc=none smtp.client-ip=209.85.215.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=sifive.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sifive.com
-Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-6bce380eb96so457802a12.0
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 01:14:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=sifive.com; s=google; t=1723104884; x=1723709684; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uz2Q34geGJiRJ8e8z0pDWtJTTDFKWyWloO9Btu2KCw8=;
-        b=l+HCar1tYDnQ2TsXG4W+EppSebZY7831K8m7qvv/mX9k9LwDxyLWFadzeRinlBdR6f
-         lSffAKyF2XKlG7ewoZUqVtdkYCWL2A9YNeanKiiCI8uhnbORYZ+zhYnyTeorHUWqPMB9
-         QkvsOzU+cwxb4sXY8tk9yEJlEbAA4D8GczY714e/Qo1FwpUv0Sn+WMKPX7uhv/wiHIXz
-         FSUyhY2LRHOIYJJi32ggs8/1qNkgLK4UalPoUEL4iPoW/Agib4/O5MH7cc1DxP4SUrLj
-         YfR5vUsvqjq1fIcMV/Ttfs+yDQfp5WVRnlOaNGrSXTJx5hD4Wvbm+zxEOAok1ojoRuNF
-         A5kQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723104884; x=1723709684;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uz2Q34geGJiRJ8e8z0pDWtJTTDFKWyWloO9Btu2KCw8=;
-        b=wF5B5TZXw6qDkt35Io/JG1GKUKyBpzZusfNWbpXLP8/Uzl6fmBGr1Mbfl0bH+mKR1q
-         6OlaxYXn38lfkusIf3NYr1eDSbQx6PoD3eVxx8VUBvXc5fgJby7Hy2X3b9zftGr9vMLN
-         8AY5iOmu+TRf0vUZFEvHw2cqB7Z89/CQZN1J1JKkbxw/VMnIVu78YxWQV3fof3SyTiNq
-         3rIwwC4iv0EnXw55fboCtpdVkbWCRuWx2b5BOaoFR+R2Dmar1kl/CM4FodKD6XkdSzgh
-         LLEQ+4M3vvU72jklmb2xzlOkKFHgXZn/0coVEtIcl+CnaVb+t9tQ2eUrQagdmiWBNr+G
-         qvVg==
-X-Forwarded-Encrypted: i=1; AJvYcCWfpqItH/zZMcmoEcm7MpM/pTs+ji1ux7FY0I++wON5i1BndwHuWEWbmrkVeogxt53IykJLpFBDYY8yLYYO6l0t8GWx
-X-Gm-Message-State: AOJu0YzmJhjuwiObjgPkT+D9VSzRdzHaOAPWxK4EcrNlGcYthO4wPQ16
-	cyq1g3c6jxXDcQWIC2v5MS9+kXlOavT6ODcgzP6oQ/c9IRBM2lVW8Dk6/OUyOsQ=
-X-Google-Smtp-Source: AGHT+IE8I00iIp/1AKllHFcYCJLmvvu0pdzTgwwUhvhBSbA/p5VCIfIk3GciGH9HF1hk5jCo+FswWg==
-X-Received: by 2002:a05:6a20:5501:b0:1c2:912f:ca70 with SMTP id adf61e73a8af0-1c6fcf7b166mr898421637.42.1723104884149;
-        Thu, 08 Aug 2024 01:14:44 -0700 (PDT)
-Received: from hsinchu26.internal.sifive.com (59-124-168-89.hinet-ip.hinet.net. [59.124.168.89])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-1ff58f18616sm118451765ad.39.2024.08.08.01.14.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 01:14:43 -0700 (PDT)
-From: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-To: linux-kernel@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	kvm-riscv@lists.infradead.org,
-	kvm@vger.kernel.org
-Cc: greentime.hu@sifive.com,
-	vincent.chen@sifive.com,
-	Yong-Xuan Wang <yongxuan.wang@sifive.com>,
-	Anup Patel <anup@brainfault.org>,
-	Atish Patra <atishp@atishpatra.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>
-Subject: [PATCH 1/1] RISC-V: KVM: Fix APLIC in_clrip and clripnum write emulation
-Date: Thu,  8 Aug 2024 16:14:38 +0800
-Message-Id: <20240808081439.24661-1-yongxuan.wang@sifive.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1723105259; c=relaxed/simple;
+	bh=L4QVc0wP7198xEmpO0X7efWPkh+oSVw5VC1I4eAC4Ao=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=opYx//CR1vnSp7DNyf1SaRiniYFNOYBowE6nUzrwagRDbPPH8D2UMC3uAUBLAAdwp5IJ1pkbXXM8nQLG2Bs/8xIDh5xLvhnDgC+8B0Ux4eJzMhAs5gdyvImjl72qlrgSWz0a3PpWGB6RBLBytiz4dqWjJF2m9+XKJVd28IK0dOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vj63zg45; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723105257;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=gG94da4yH+PQWtMlfckLeFlS4xJDYul1j2UMjM7QZ6w=;
+	b=Vj63zg45ks+/VS64BlkkVnkv8HVBF/NylI0IEdQzMhGbhIqe0lCgrjnW9WCY/6O0a0vJA7
+	zlabyoClBbwQdydPsuyWf1qSIyCYZBk06J7KXwiv3vwZvlRty3/L0zEXbCE6KORFkuylpJ
+	g1HIcYarllvHw8reCu2ZEB2w11IRPN4=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-201-L2LIPp_9N2-E-uRSXdAEgg-1; Thu,
+ 08 Aug 2024 04:20:53 -0400
+X-MC-Unique: L2LIPp_9N2-E-uRSXdAEgg-1
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1749F1955F43;
+	Thu,  8 Aug 2024 08:20:52 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.72.113.0])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 7BD3519560A3;
+	Thu,  8 Aug 2024 08:20:46 +0000 (UTC)
+From: Jason Wang <jasowang@redhat.com>
+To: mst@redhat.com,
+	jasowang@redhat.com,
+	dtatulea@nvidia.com
+Cc: lingshan.zhu@intel.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC PATCH] vhost_vdpa: assign irq bypass producer token correctly
+Date: Thu,  8 Aug 2024 16:20:44 +0800
+Message-ID: <20240808082044.11356-1-jasowang@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-In the section "4.7 Precise effects on interrupt-pending bits"
-of the RISC-V AIA specification defines that:
+We used to call irq_bypass_unregister_producer() in
+vhost_vdpa_setup_vq_irq() which is problematic as we don't know if the
+token pointer is still valid or not.
 
-If the source mode is Level1 or Level0 and the interrupt domain
-is configured in MSI delivery mode (domaincfg.DM = 1):
-The pending bit is cleared whenever the rectified input value is
-low, when the interrupt is forwarded by MSI, or by a relevant
-write to an in_clrip register or to clripnum.
+Actually, we use the eventfd_ctx as the token so the life cycle of the
+token should be bound to the VHOST_SET_VRING_CALL instead of
+vhost_vdpa_setup_vq_irq() which could be called by set_status().
 
-Update the aplic_write_pending() to match the spec.
+Fixing this by setting up  irq bypass producer's token when handling
+VHOST_SET_VRING_CALL and un-registering the producer before calling
+vhost_vring_ioctl() to prevent a possible use after free as eventfd
+could have been released in vhost_vring_ioctl().
 
-Signed-off-by: Yong-Xuan Wang <yongxuan.wang@sifive.com>
-Reviewed-by: Vincent Chen <vincent.chen@sifive.com>
+Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_vdpa")
+Signed-off-by: Jason Wang <jasowang@redhat.com>
 ---
- arch/riscv/kvm/aia_aplic.c | 2 --
- 1 file changed, 2 deletions(-)
+Note for Dragos: Please check whether this fixes your issue. I
+slightly test it with vp_vdpa in L2.
+---
+ drivers/vhost/vdpa.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-diff --git a/arch/riscv/kvm/aia_aplic.c b/arch/riscv/kvm/aia_aplic.c
-index da6ff1bade0d..97c6dbcabf47 100644
---- a/arch/riscv/kvm/aia_aplic.c
-+++ b/arch/riscv/kvm/aia_aplic.c
-@@ -142,8 +142,6 @@ static void aplic_write_pending(struct aplic *aplic, u32 irq, bool pending)
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index e31ec9ebc4ce..388226a48bcc 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhost_vdpa *v, u16 qid)
+ 	if (irq < 0)
+ 		return;
  
- 	if (sm == APLIC_SOURCECFG_SM_LEVEL_HIGH ||
- 	    sm == APLIC_SOURCECFG_SM_LEVEL_LOW) {
--		if (!pending)
--			goto skip_write_pending;
- 		if ((irqd->state & APLIC_IRQ_STATE_INPUT) &&
- 		    sm == APLIC_SOURCECFG_SM_LEVEL_LOW)
- 			goto skip_write_pending;
+-	irq_bypass_unregister_producer(&vq->call_ctx.producer);
+ 	if (!vq->call_ctx.ctx)
+ 		return;
+ 
+-	vq->call_ctx.producer.token = vq->call_ctx.ctx;
+ 	vq->call_ctx.producer.irq = irq;
+ 	ret = irq_bypass_register_producer(&vq->call_ctx.producer);
+ 	if (unlikely(ret))
+@@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 			vq->last_avail_idx = vq_state.split.avail_index;
+ 		}
+ 		break;
++	case VHOST_SET_VRING_CALL:
++		if (vq->call_ctx.ctx) {
++			vhost_vdpa_unsetup_vq_irq(v, idx);
++			vq->call_ctx.producer.token = NULL;
++		}
++		break;
+ 	}
+ 
+ 	r = vhost_vring_ioctl(&v->vdev, cmd, argp);
+@@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+ 			cb.callback = vhost_vdpa_virtqueue_cb;
+ 			cb.private = vq;
+ 			cb.trigger = vq->call_ctx.ctx;
++			vq->call_ctx.producer.token = vq->call_ctx.ctx;
++			vhost_vdpa_setup_vq_irq(v, idx);
+ 		} else {
+ 			cb.callback = NULL;
+ 			cb.private = NULL;
+ 			cb.trigger = NULL;
+ 		}
+ 		ops->set_vq_cb(vdpa, idx, &cb);
+-		vhost_vdpa_setup_vq_irq(v, idx);
+ 		break;
+ 
+ 	case VHOST_SET_VRING_NUM:
+@@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode, struct file *filep)
+ 	for (i = 0; i < nvqs; i++) {
+ 		vqs[i] = &v->vqs[i];
+ 		vqs[i]->handle_kick = handle_vq_kick;
++		vqs[i]->call_ctx.ctx = NULL;
+ 	}
+ 	vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
+ 		       vhost_vdpa_process_iotlb_msg);
 -- 
-2.17.1
+2.31.1
 
 
