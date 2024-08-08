@@ -1,286 +1,208 @@
-Return-Path: <kvm+bounces-23656-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23657-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CC9594C666
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 23:43:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB0B194C674
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 23:48:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA0EEB247AF
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 21:43:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FC7DB24757
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 21:48:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3916015B97B;
-	Thu,  8 Aug 2024 21:43:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1080115B109;
+	Thu,  8 Aug 2024 21:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="eEVhIfjZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fMmTWglI"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEEF5145324;
-	Thu,  8 Aug 2024 21:43:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93D588827
+	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 21:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723153393; cv=none; b=QLwyfnXE3m5SfMVuXGA8AKZo+vcDtGKyqlgz2y8rJ3iHc5XIH3fMNyG0jmn9/U2MCNSI1e+8zstdxkkMPpShFUp2bKLcO0VcOGJygJtiND02FTC84NEBCyUiDjSg+BvkxgHPa4n43IYkvmdtTFLPURFIP9nCuatQwrVOzZL6snY=
+	t=1723153674; cv=none; b=RzjgrSWpCidLjEStuiVdknUpoY41LFdh8JV3VV2ctEtltLOjUvvp1Pibe/eDHeYIJn/ioa3Ng5pGKrAAjvCUa8rWHXFmw+rIzjPsVoMr6QnPjR0Rts48A3POqlcMXnrSOLnKmqcYYSrbzS7ugr4ECBviP6fspacnU+wz97WZcg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723153393; c=relaxed/simple;
-	bh=iiVOkB4xyNGt5Ji9BBZS0LrYXkdJzAuatNcxlThBVP8=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GseZ8qyRnYek2pZeC3sGyZNxPUp0oaELpJ/6xtOEJDYcQu4VOuS98MqgmIxWfdZwJbxppl48sF9NtDxjFVJFXIZ/bC+ygEDOjdaosBCvgfXbX/y+3tmJK2wOGjK25rCJzcppl1qKYSPg7XwzZRA1EKvnW424/UpzvV58M+RiFPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=eEVhIfjZ; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 478AgTUL018279;
-	Thu, 8 Aug 2024 21:43:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=qcppdkim1; bh=/w4EXjUZu5VjQ6P9pS53rZX6
-	79O69cN7CRSEqBYc/6o=; b=eEVhIfjZ+Jko3gqbT23mzlDSqmOt4qv5TjmNpLb9
-	79vj8+wqQjZ4EMaBCrNanYXEBrXj/cpEn/Et3wNWH/tpHE/XYSBSBNlZzuYK3zTo
-	7Ov9ATuBKsAczdv6tJbBa6c2DU9efWF6tnM3rSCRxf4LH/nF16DuAXOgj927q68d
-	kOL/ycSNxKB/zQQnvLF9mnzf7VMqkCBR+P+LAj41DD9d05/GQXCKKEuhPUZUFJ6Q
-	2fb/FacrdG+6FNiZGpL6CNRla7BJZ7dHj3je7OHiNio4m8RL7tLK6JqktAcrpF2A
-	3koSy9sLnEUrTC1YinovWehFgCGHdp1hl0lCVCUXwShXMQ==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40vvgm1n2d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Aug 2024 21:43:00 +0000 (GMT)
-Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
-	by NASANPPMTA01.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 478Lgwtf010204
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 8 Aug 2024 21:42:58 GMT
-Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
- nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Thu, 8 Aug 2024 14:42:58 -0700
-Date: Thu, 8 Aug 2024 14:42:57 -0700
-From: Elliot Berman <quic_eberman@quicinc.com>
-To: Ackerley Tng <ackerleytng@google.com>
-CC: <akpm@linux-foundation.org>, <pbonzini@redhat.com>, <seanjc@google.com>,
-        <tabba@google.com>, <david@redhat.com>, <roypat@amazon.co.uk>,
-        <qperret@google.com>, <linux-coco@lists.linux.dev>,
-        <linux-arm-msm@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-mm@kvack.org>, <kvm@vger.kernel.org>
-Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
-Message-ID: <20240808132450196-0700.eberman@hu-eberman-lv.qualcomm.com>
-References: <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com>
- <diqzr0ayn90d.fsf@ackerleytng-ctop.c.googlers.com>
+	s=arc-20240116; t=1723153674; c=relaxed/simple;
+	bh=s4XkxCp6B8NmYy2SASddwVP3Gr+y7OJEdxvm73dk1+0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rNxIp4vtAsgHGiQ7n8raOFt9JFtHPh7+HgrpZQJyEqwiKBPrgnUQkuuV9imQWY+aF3ybf6LM3ATD1DwyHFYfDFksqHVUEZi+HK3JbI+0c0RdNxyoZAuz8HDTFn7OzXj4bKjHFHbuwQrv6xeNtfmNfjrpKgkiCB4+5nvM0MfDdDM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fMmTWglI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723153671;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y4cQ3dGvl+e98q+IJj301khv7EGPDrAUXWE89nsHh7w=;
+	b=fMmTWglIu/fehKMmR18U820CqEY0EUkJ2/NAt0Rq3I1UUyCQX3DjC6NXz4jqCKjGxfn/BE
+	BfkVzFAr51ei61I/Nsc7pd9FtUy5Kyop1D2vWkqYhSMXBU7xXNTgNzO9MkNJTII7Mxp6Mt
+	0PNYG1doRjTCQAfFf4BQuwp4nXmpwXA=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-604-EbsBYCgqMA--pA1Dzav7hQ-1; Thu, 08 Aug 2024 17:47:49 -0400
+X-MC-Unique: EbsBYCgqMA--pA1Dzav7hQ-1
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-8407b0b7b3bso68440241.0
+        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 14:47:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723153669; x=1723758469;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y4cQ3dGvl+e98q+IJj301khv7EGPDrAUXWE89nsHh7w=;
+        b=FajQ7qFjQibcM0PM0y8w9c//DPPBLOPZDtloysW8LSAXyhdJkpbfNsdw6d6KBIIpR2
+         JZ7g+ibPV2147hkBVLTA3tk89NtCYVVyf3/aQA2ziMlD58zDz8zDJ3fHeix2Cb/WSYMF
+         fY1NPtqDjJbtfwfVS1WColOH0jwgZaeBRD56Hyyt/iGsnT7Dd+HIIxIw7KWcAAB25UKk
+         D41PL0gPKvrXj8s055WlP4SVgdh7t8jNX4tVUOzb5awlQNRkb68yHB5u4zDtq4YTOw85
+         FF1vg6u+o5VPwQSZmW1xP2l6GNLLxmSgvcC/G+WFaHwNYaNq+I68oCU2pHxTb2Vy6yqE
+         VsMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWf0ThDe1kiodtlOgmNMb8h73EMFRodQIqv+gVET666l0XGip537+lBpHD4AFw3nofVlnvY4+BjJaTUzfmhPfKBYt/3
+X-Gm-Message-State: AOJu0YzihdgSgbFfH5cw+SnDzo+faG5RZSLelGkZ52t6ojUGP+XTrhLs
+	rTJqo8Fd1bTUYlSTLmylP62EigDyuhVLDEIt3B7IvLN5OECe04VQR7qok4OLmSw86xQGttuKd2c
+	lJ6ArGU7fHA2YxWyP2B3oekujbwHkVuWU9npxKj7M6Xl8k5kMRkdlTKq8dg==
+X-Received: by 2002:a05:6122:1696:b0:4f4:959b:8342 with SMTP id 71dfb90a1353d-4f9028ededfmr2281577e0c.2.1723153669036;
+        Thu, 08 Aug 2024 14:47:49 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGBUCPV/3BJaIuZdMerz+8wpoNJAPGodVbwYONTfq25mwe5QVB/HX82z8YwrBUiUNO7Dj9CXg==
+X-Received: by 2002:a05:6122:1696:b0:4f4:959b:8342 with SMTP id 71dfb90a1353d-4f9028ededfmr2281559e0c.2.1723153668575;
+        Thu, 08 Aug 2024 14:47:48 -0700 (PDT)
+Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a3785e13fdsm198784985a.34.2024.08.08.14.47.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Aug 2024 14:47:48 -0700 (PDT)
+Date: Thu, 8 Aug 2024 17:47:44 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+	"Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Oscar Salvador <osalvador@suse.de>,
+	Dan Williams <dan.j.williams@intel.com>,
+	James Houghton <jthoughton@google.com>,
+	Matthew Wilcox <willy@infradead.org>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Rik van Riel <riel@surriel.com>, Dave Jiang <dave.jiang@intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org,
+	Ingo Molnar <mingo@redhat.com>,
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+	"Kirill A . Shutemov" <kirill@shutemov.name>,
+	linuxppc-dev@lists.ozlabs.org,
+	Mel Gorman <mgorman@techsingularity.net>,
+	Hugh Dickins <hughd@google.com>, Borislav Petkov <bp@alien8.de>,
+	David Hildenbrand <david@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Vlastimil Babka <vbabka@suse.cz>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Huang Ying <ying.huang@intel.com>, kvm@vger.kernel.org,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	David Rientjes <rientjes@google.com>
+Subject: Re: [PATCH v4 2/7] mm/mprotect: Push mmu notifier to PUDs
+Message-ID: <ZrU9AJi7-pHT_UWS@x1n>
+References: <20240807194812.819412-1-peterx@redhat.com>
+ <20240807194812.819412-3-peterx@redhat.com>
+ <ZrTlZ4vZ74sK8Ydd@google.com>
+ <ZrU20AqADICwwmCy@x1n>
+ <ZrU5JyjIa1CwZ_KD@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <diqzr0ayn90d.fsf@ackerleytng-ctop.c.googlers.com>
-X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
- nasanex01b.na.qualcomm.com (10.46.141.250)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: wKWq1rQBhn0g9QePO9TgwnTys_nyqsBy
-X-Proofpoint-GUID: wKWq1rQBhn0g9QePO9TgwnTys_nyqsBy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-08_21,2024-08-07_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015
- priorityscore=1501 impostorscore=0 mlxscore=0 suspectscore=0
- lowpriorityscore=0 malwarescore=0 adultscore=0 mlxlogscore=999 bulkscore=0
- phishscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2407110000 definitions=main-2408080155
+In-Reply-To: <ZrU5JyjIa1CwZ_KD@google.com>
 
-On Thu, Aug 08, 2024 at 06:51:14PM +0000, Ackerley Tng wrote:
-> Elliot Berman <quic_eberman@quicinc.com> writes:
+On Thu, Aug 08, 2024 at 02:31:19PM -0700, Sean Christopherson wrote:
+> On Thu, Aug 08, 2024, Peter Xu wrote:
+> > Hi, Sean,
+> > 
+> > On Thu, Aug 08, 2024 at 08:33:59AM -0700, Sean Christopherson wrote:
+> > > On Wed, Aug 07, 2024, Peter Xu wrote:
+> > > > mprotect() does mmu notifiers in PMD levels.  It's there since 2014 of
+> > > > commit a5338093bfb4 ("mm: move mmu notifier call from change_protection to
+> > > > change_pmd_range").
+> > > > 
+> > > > At that time, the issue was that NUMA balancing can be applied on a huge
+> > > > range of VM memory, even if nothing was populated.  The notification can be
+> > > > avoided in this case if no valid pmd detected, which includes either THP or
+> > > > a PTE pgtable page.
+> > > > 
+> > > > Now to pave way for PUD handling, this isn't enough.  We need to generate
+> > > > mmu notifications even on PUD entries properly.  mprotect() is currently
+> > > > broken on PUD (e.g., one can easily trigger kernel error with dax 1G
+> > > > mappings already), this is the start to fix it.
+> > > > 
+> > > > To fix that, this patch proposes to push such notifications to the PUD
+> > > > layers.
+> > > > 
+> > > > There is risk on regressing the problem Rik wanted to resolve before, but I
+> > > > think it shouldn't really happen, and I still chose this solution because
+> > > > of a few reasons:
+> > > > 
+> > > >   1) Consider a large VM that should definitely contain more than GBs of
+> > > >   memory, it's highly likely that PUDs are also none.  In this case there
+> > > 
+> > > I don't follow this.  Did you mean to say it's highly likely that PUDs are *NOT*
+> > > none?
+> > 
+> > I did mean the original wordings.
+> > 
+> > Note that in the previous case Rik worked on, it's about a mostly empty VM
+> > got NUMA hint applied.  So I did mean "PUDs are also none" here, with the
+> > hope that when the numa hint applies on any part of the unpopulated guest
+> > memory, it'll find nothing in PUDs. Here it's mostly not about a huge PUD
+> > mapping as long as the guest memory is not backed by DAX (since only DAX
+> > supports 1G huge pud so far, while hugetlb has its own path here in
+> > mprotect, so it must be things like anon or shmem), but a PUD entry that
+> > contains pmd pgtables.  For that part, I was trying to justify "no pmd
+> > pgtable installed" with the fact that "a large VM that should definitely
+> > contain more than GBs of memory", it means the PUD range should hopefully
+> > never been accessed, so even the pmd pgtable entry should be missing.
 > 
-> > Confidential/protected guest virtual machines want to share some memory
-> > back with the host Linux. For example, virtqueues allow host and
-> > protected guest to exchange data. In MMU-only isolation of protected
-> > guest virtual machines, the transition between "shared" and "private"
-> > can be done in-place without a trusted hypervisor copying pages.
-> >
-> > Add support for this feature and allow Linux to mmap host-accessible
-> > pages. When the owner provides an ->accessible() callback in the
-> > struct guest_memfd_operations, guest_memfd allows folios to be mapped
-> > when the ->accessible() callback returns 0.
-> >
-> > To safely make inaccessible:
-> >
-> > ```
-> > folio = guest_memfd_grab_folio(inode, index, flags);
-> > r = guest_memfd_make_inaccessible(inode, folio);
-> > if (r)
-> >         goto err;
-> >
-> > hypervisor_does_guest_mapping(folio);
-> >
-> > folio_unlock(folio);
-> > ```
-> >
-> > hypervisor_does_s2_mapping(folio) should make it so
-> > ops->accessible(...) on those folios fails.
-> >
-> > The folio lock ensures atomicity.
+> Ah, now I get what you were saying.
 > 
-> I am also working on determining faultability not based on the
-> private-ness of the page but based on permission given by the
-> guest. I'd like to learn from what you've discovered here.
+> Problem is, walking the rmaps for the shadow MMU doesn't benefit (much) from
+> empty PUDs, because KVM needs to blindly walk the rmaps for every gfn covered by
+> the PUD to see if there are any SPTEs in any shadow MMUs mapping that gfn.  And
+> that walk is done without ever yielding, which I suspect is the source of the
+> soft lockups of yore.
 > 
-> Could you please elaborate on this? What races is the folio_lock
-> intended to prevent, what operations are we ensuring atomicity of?
+> And there's no way around that conundrum (walking rmaps), at least not without a
+> major rewrite in KVM.  In a nested TDP scenario, KVM's stage-2 page tables (for
+> L2) key off of L2 gfns, not L1 gfns, and so the only way to find mappings is
+> through the rmaps.
 
-The contention I've been paying most attention to are racing userspace
-and vcpu faults where guest needs the page to be private. There could
-also be multiple vcpus demanding same page.
+I think the hope here is when the whole PUDs being hinted are empty without
+pgtable installed, there'll be no mmu notifier to be kicked off at all.
 
-We had some chatter about doing the private->shared conversion via
-separate ioctl (mem attributes). I think the same race can happen with
-userspace whether it's vcpu fault or ioctl making the folio "finally
-guest-private".
+To be explicit, I meant after this patch applied, the pud loop for numa
+hints look like this:
 
-Also, in non-CoCo KVM private guest_memfd, KVM or userspace could also
-convert private->shared and need to make sure that all the tracking for
-the current state is consistent.
+        FOR_EACH_PUD() {
+                ...
+                if (pud_none(pud))
+                        continue;
 
-> Is this why you did a guest_memfd_grab_folio() before checking
-> ->accessible(), and then doing folio_unlock() if the page is
-> inaccessible?
-> 
+                if (!range.start) {
+                        mmu_notifier_range_init(&range,
+                                                MMU_NOTIFY_PROTECTION_VMA, 0,
+                                                vma->vm_mm, addr, end);
+                        mmu_notifier_invalidate_range_start(&range);
+                }
+                ...
+        }
 
-Right, I want to guard against userspace being able to fault in a page
-concurrently with that same page doing a shared->private conversion. The
-folio_lock seems like the best fine-grained lock to grab.
-
-If the shared->private converter wins the folio_lock first, then the
-userspace fault waits and will see ->accessible() == false as desired. 
-
-If userspace fault wins the folio_lock first, it relinquishes the lock
-only after installing the folio in page tables[*]. When the
-shared->private converter finally gets the lock,
-guest_memfd_make_inaccessible() will be able to unmap the folio from any
-userspace page tables (and direct map, if applicable).
-
-[*]: I'm not mm expert, but that was what I could find when I went
-digging.
+So the hope is that pud_none() is always true for the hinted area (just
+like it used to be when pmd_none() can be hopefully true always), then we
+skip the mmu notifier as a whole (including KVM's)!
 
 Thanks,
-Elliot
 
-> >
-> > Signed-off-by: Elliot Berman <quic_eberman@quicinc.com>
-> > ---
-> >  include/linux/guest_memfd.h |  7 ++++
-> >  mm/guest_memfd.c            | 81 ++++++++++++++++++++++++++++++++++++++++++++-
-> >  2 files changed, 87 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/linux/guest_memfd.h b/include/linux/guest_memfd.h
-> > index f9e4a27aed67..edcb4ba60cb0 100644
-> > --- a/include/linux/guest_memfd.h
-> > +++ b/include/linux/guest_memfd.h
-> > @@ -16,12 +16,18 @@
-> >   * @invalidate_end: called after invalidate_begin returns success. Optional.
-> >   * @prepare: called before a folio is mapped into the guest address space.
-> >   *           Optional.
-> > + * @accessible: called after prepare returns success and before it's mapped
-> > + *              into the guest address space. Returns 0 if the folio can be
-> > + *              accessed.
-> > + *              Optional. If not present, assumes folios are never accessible.
-> >   * @release: Called when releasing the guest_memfd file. Required.
-> >   */
-> >  struct guest_memfd_operations {
-> >  	int (*invalidate_begin)(struct inode *inode, pgoff_t offset, unsigned long nr);
-> >  	void (*invalidate_end)(struct inode *inode, pgoff_t offset, unsigned long nr);
-> >  	int (*prepare)(struct inode *inode, pgoff_t offset, struct folio *folio);
-> > +	int (*accessible)(struct inode *inode, struct folio *folio,
-> > +			  pgoff_t offset, unsigned long nr);
-> >  	int (*release)(struct inode *inode);
-> >  };
-> >  
-> > @@ -48,5 +54,6 @@ struct file *guest_memfd_alloc(const char *name,
-> >  			       const struct guest_memfd_operations *ops,
-> >  			       loff_t size, unsigned long flags);
-> >  bool is_guest_memfd(struct file *file, const struct guest_memfd_operations *ops);
-> > +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio);
-> >  
-> >  #endif
-> > diff --git a/mm/guest_memfd.c b/mm/guest_memfd.c
-> > index e9d8cab72b28..6b5609932ca5 100644
-> > --- a/mm/guest_memfd.c
-> > +++ b/mm/guest_memfd.c
-> > @@ -9,6 +9,8 @@
-> >  #include <linux/pagemap.h>
-> >  #include <linux/set_memory.h>
-> >  
-> > +#include "internal.h"
-> > +
-> >  static inline int guest_memfd_folio_private(struct folio *folio)
-> >  {
-> >  	unsigned long nr_pages = folio_nr_pages(folio);
-> > @@ -89,7 +91,7 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
-> >  			goto out_err;
-> >  	}
-> >  
-> > -	if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
-> > +	if (!ops->accessible && (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)) {
-> >  		r = guest_memfd_folio_private(folio);
-> >  		if (r)
-> >  			goto out_err;
-> > @@ -107,6 +109,82 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
-> >  }
-> >  EXPORT_SYMBOL_GPL(guest_memfd_grab_folio);
-> >  
-> > +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio)
-> > +{
-> > +	unsigned long gmem_flags = (unsigned long)file->private_data;
-> > +	unsigned long i;
-> > +	int r;
-> > +
-> > +	unmap_mapping_folio(folio);
-> > +
-> > +	/**
-> > +	 * We can't use the refcount. It might be elevated due to
-> > +	 * guest/vcpu trying to access same folio as another vcpu
-> > +	 * or because userspace is trying to access folio for same reason
-> > +	 *
-> > +	 * folio_lock serializes the transitions between (in)accessible
-> > +	 */
-> > +	if (folio_maybe_dma_pinned(folio))
-> > +		return -EBUSY;
-> > +
-> > +	if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
-> > +		r = guest_memfd_folio_private(folio);
-> > +		if (r)
-> > +			return r;
-> > +	}
-> > +
-> > +	return 0;
-> > +}
-> > +
-> > +static vm_fault_t gmem_fault(struct vm_fault *vmf)
-> > +{
-> > +	struct file *file = vmf->vma->vm_file;
-> > +	struct inode *inode = file_inode(file);
-> > +	const struct guest_memfd_operations *ops = inode->i_private;
-> > +	struct folio *folio;
-> > +	pgoff_t off;
-> > +	int r;
-> > +
-> > +	folio = guest_memfd_grab_folio(file, vmf->pgoff, GUEST_MEMFD_GRAB_UPTODATE);
-> 
-> Could grabbing the folio with GUEST_MEMFD_GRAB_UPTODATE cause unintended
-> zeroing of the page if the page turns out to be inaccessible?
-> 
-
-I assume that if page is inaccessible, it would already have been marked
-up to date and we wouldn't try to zero the page.
-
-I'm thinking that if hypervisor zeroes the page when making the page
-private, it would not give the GUEST_MEMFD_GRAB_UPTODATE flag when
-grabbing the folio. I believe the hypervisor should know when grabbing
-the folio if it's about to donate to the guest.
-
-Thanks,
-Elliot
+-- 
+Peter Xu
 
 
