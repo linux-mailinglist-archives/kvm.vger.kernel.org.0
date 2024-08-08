@@ -1,154 +1,186 @@
-Return-Path: <kvm+bounces-23654-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23655-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874E294C649
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 23:31:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2D5194C661
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 23:41:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39EA3281AB0
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 21:31:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CF4F1C2206B
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 21:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421BE15A87F;
-	Thu,  8 Aug 2024 21:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7408915B57D;
+	Thu,  8 Aug 2024 21:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fKU4CAtu"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VCMc1MOo"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175AC10A1E
-	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 21:31:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2578C13DDC0;
+	Thu,  8 Aug 2024 21:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723152683; cv=none; b=LbymVEcNUoOEBt1UM5jr77dKzJkKJbXgcrTydT//5PqMBWMyi+ouHgVTPJnBsp9BLKQ0/3TM09NHEhLEsqhtgLE7K20qTv+rt9pqq+T30HY3Yo+/7QpwWuDeJ9Ezaavw6cD9c3FF2NGJ4bmq9It/MmcQq8IN3ZkZnZDD2wFT/LM=
+	t=1723153301; cv=none; b=EL08tR2l1zTZ+mPSC3yiPZyP65IEvwAuevttB8ouzdrCMVAq/sEx8Vq5EvCnnapHFUu8Li103rq+IuAAYdd1KQ9N77DxyaLBlutnXuXzFQ+P21un1j3nUfbDBqjOInQ7IbcCVtz1d7PEdONwwqnup3DJLD+pkK2P1g6GdhuHR40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723152683; c=relaxed/simple;
-	bh=3XZtyGNlZXDt7eNoA4oyrfYWL2zKbyb0O6wqXlfUMFs=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=EQ57ilBFxhK/YnppmRB9SyPlzGiF82aMuEbhXyJZePCPLCQv95f6KXJI0W4AQch1ZMRp1HI0Gc7t19BgbwzBFXLb7V6wI7XTHXf51pvh5E/Y4IhFyXXKbsrNBs48y/AJK7L2z3sQQIpWJial+INdHMDMkSF3mpzoqAnPz/H/QS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fKU4CAtu; arc=none smtp.client-ip=209.85.215.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso1238272a12.0
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 14:31:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723152681; x=1723757481; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=YuGkjDtUlaXTtwi32m/glrLrjhcbyitEhoCA9sFmL3A=;
-        b=fKU4CAtu65pXgGmld0UGr1lx8mu1vEmCvuUnLMwbed035yM7u+oE4XWo4e9smQZ1Ye
-         ZYssDDXKDV3ygbTtxPBavcst+sMDNJWoA/b13ucQvaEJxe/2GU16kvxeEWBrlVsTR8pB
-         mdBV2McPrOQfak4gu9tV2VU6tVA55U/72or0Gj+TGt6ZFtQ9XGuu34Q8xaCh98IBBBQG
-         AxYL9l6Z++aQvbt4Zkn/Pu0qnTUSo6I+uFeGvt3nG8IWMPg02Dh8XZa9fsioom9nPFl5
-         gaX8n3bBlPdBHXgHSaBdWhVLTuQU2seYFmkKuB9I9+2Xi3Fo98vIWmKlt44lfs+odlLq
-         RGgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723152681; x=1723757481;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YuGkjDtUlaXTtwi32m/glrLrjhcbyitEhoCA9sFmL3A=;
-        b=asMwR7lalq20ZonVtGUM7xY+54U5BQU+z3XvXfkBlCirRFTqqI6/BYU7ViSJqE0tqN
-         AVL1my8QvMJ8CgM+/UHpT90viBJgEX4GmiyiiLtW8lD94ySiJzYKtzNtuiPl3z+uSOqz
-         oTpEic06KcoVQvQ1Eo/gdLhwUiVRivfaxfpOCvgbmuG/AakEdX5J9a8i+qsEj2WGLeT2
-         Za4pAV0GbsB2q+Sz6aSaU4Et8/ji0nUrMvUb8lMtA5nv85xvPR/hAz4o+ToJY3ditcuN
-         lDXSulBeKGW09/3MzlhEYGATXu4CHXuRAYoQ4i62ykMv3TyQ+Xuh4Al8ApTVGmMJ9vr9
-         mOPw==
-X-Forwarded-Encrypted: i=1; AJvYcCWpDuR0rehqP3WoKpL4yWtEP6pmclT/660k2YFlofPFMN++En3LWPQEs5lELVpZdHa8xwbRXiteb41pCrjJiuNBRALI
-X-Gm-Message-State: AOJu0YyYdUcRtBb0mItsIXvWqRflSXbWk3cW0K1pgKdaQyY+J0Iyc0tP
-	PRUF0ep7CXs3ns8GvOmpxW+OtGQvpvXVU+6hFmQ6QTlMNqiKOgGqEzEhNwnwslvmnkNtc8zWPvJ
-	Qgw==
-X-Google-Smtp-Source: AGHT+IEP73Lm+ojwFY0B1vludlYBr1Am2NVgxUI9/0Rde9EmSF7EgK1uLnCg73xCWYIY67KH9l4Ygd6Hklk=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:6685:0:b0:7a1:1b9f:2b16 with SMTP id
- 41be03b00d2f7-7c268c1d3d2mr6887a12.2.1723152681108; Thu, 08 Aug 2024 14:31:21
- -0700 (PDT)
-Date: Thu, 8 Aug 2024 14:31:19 -0700
-In-Reply-To: <ZrU20AqADICwwmCy@x1n>
+	s=arc-20240116; t=1723153301; c=relaxed/simple;
+	bh=xhr9p7JdqgcOa7fpmW6RYHZNQ3ZvuZwb/QBQWdIHuCE=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IG58ykzKzrCnSbz82p5p1XUsLcxMj70SwBK9woMOjMrp0uvwf9LnzMTdJenycx4FoTOorKbWzoCswfVXbmMe7gdmD9iybeJXfBtWSmUPvGPt8BwlhCbDCSo7ZZ+XYwDDWzMPjJIHov/YIs800PqS1dEqTDRV038LUIn5/9UyMWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=VCMc1MOo; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4789kCvp015673;
+	Thu, 8 Aug 2024 21:41:29 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=yzRuJMoAZ9lO0AnlBJXQ65P+
+	OT5URHclW0jsSuS9+i0=; b=VCMc1MOorbejCZcF06LV/yx91VH22tyBOpaxi878
+	wb7rJY4hwJy3OMIaX7AMdXup4sWzmfxfOBYg75RRJL/tIhtfXSBMcJKS4Kin1ZOG
+	7wgPEyQgqiX/GfaCOq7l1ebg0f2SsyBxH0oC7hVikWn5Is1ec5iqqdTLdMX6t/Lx
+	z7qwFv2j/m343JUQP4BmE0M9RUVTyjUy2edxFady5VBFcWX77RtjqI8c6IdQ/Dfj
+	OK6n/wQEBYoHAvupdDeJ2fXVFgVKJmt0OvhsD3lrLkDzgp1c8CUIjwoK9OYWwUkK
+	GLo3ym+SPPszt5ihilkTc0Y2Z7nwn7bZPkwWb3hM6AIyvQ==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40sc4yf3s2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 21:41:28 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA05.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 478LfRdV013151
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 8 Aug 2024 21:41:27 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 8 Aug 2024 14:41:26 -0700
+Date: Thu, 8 Aug 2024 14:41:26 -0700
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: David Hildenbrand <david@redhat.com>
+CC: Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini
+	<pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Fuad Tabba
+	<tabba@google.com>, Patrick Roy <roypat@amazon.co.uk>,
+        <qperret@google.com>, Ackerley Tng <ackerleytng@google.com>,
+        <linux-coco@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <kvm@vger.kernel.org>
+Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
+Message-ID: <20240808101944778-0700.eberman@hu-eberman-lv.qualcomm.com>
+References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
+ <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com>
+ <4cdd93ba-9019-4c12-a0e6-07b430980278@redhat.com>
+ <20240806093625007-0700.eberman@hu-eberman-lv.qualcomm.com>
+ <a7c5bfc0-1648-4ae1-ba08-e706596e014b@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240807194812.819412-1-peterx@redhat.com> <20240807194812.819412-3-peterx@redhat.com>
- <ZrTlZ4vZ74sK8Ydd@google.com> <ZrU20AqADICwwmCy@x1n>
-Message-ID: <ZrU5JyjIa1CwZ_KD@google.com>
-Subject: Re: [PATCH v4 2/7] mm/mprotect: Push mmu notifier to PUDs
-From: Sean Christopherson <seanjc@google.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-mm@kvack.org, 
-	"Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, 
-	Oscar Salvador <osalvador@suse.de>, Dan Williams <dan.j.williams@intel.com>, 
-	James Houghton <jthoughton@google.com>, Matthew Wilcox <willy@infradead.org>, 
-	Nicholas Piggin <npiggin@gmail.com>, Rik van Riel <riel@surriel.com>, Dave Jiang <dave.jiang@intel.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, x86@kernel.org, Ingo Molnar <mingo@redhat.com>, 
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>, "Kirill A . Shutemov" <kirill@shutemov.name>, 
-	linuxppc-dev@lists.ozlabs.org, Mel Gorman <mgorman@techsingularity.net>, 
-	Hugh Dickins <hughd@google.com>, Borislav Petkov <bp@alien8.de>, David Hildenbrand <david@redhat.com>, 
-	Thomas Gleixner <tglx@linutronix.de>, Vlastimil Babka <vbabka@suse.cz>, 
-	Dave Hansen <dave.hansen@linux.intel.com>, 
-	Christophe Leroy <christophe.leroy@csgroup.eu>, Huang Ying <ying.huang@intel.com>, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, David Rientjes <rientjes@google.com>
+MIME-Version: 1.0
 Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <a7c5bfc0-1648-4ae1-ba08-e706596e014b@redhat.com>
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: yIMS181wrrjh2V_923pIGptH-dEIuvfy
+X-Proofpoint-GUID: yIMS181wrrjh2V_923pIGptH-dEIuvfy
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-08_21,2024-08-07_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ spamscore=0 clxscore=1015 lowpriorityscore=0 impostorscore=0
+ suspectscore=0 mlxscore=0 malwarescore=0 mlxlogscore=999 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408080155
 
-On Thu, Aug 08, 2024, Peter Xu wrote:
-> Hi, Sean,
-> 
-> On Thu, Aug 08, 2024 at 08:33:59AM -0700, Sean Christopherson wrote:
-> > On Wed, Aug 07, 2024, Peter Xu wrote:
-> > > mprotect() does mmu notifiers in PMD levels.  It's there since 2014 of
-> > > commit a5338093bfb4 ("mm: move mmu notifier call from change_protection to
-> > > change_pmd_range").
+On Wed, Aug 07, 2024 at 06:12:00PM +0200, David Hildenbrand wrote:
+> On 06.08.24 19:14, Elliot Berman wrote:
+> > On Tue, Aug 06, 2024 at 03:51:22PM +0200, David Hildenbrand wrote:
+> > > > -	if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
+> > > > +	if (!ops->accessible && (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)) {
+> > > >    		r = guest_memfd_folio_private(folio);
+> > > >    		if (r)
+> > > >    			goto out_err;
+> > > > @@ -107,6 +109,82 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
+> > > >    }
+> > > >    EXPORT_SYMBOL_GPL(guest_memfd_grab_folio);
+> > > > +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio)
+> > > > +{
+> > > > +	unsigned long gmem_flags = (unsigned long)file->private_data;
+> > > > +	unsigned long i;
+> > > > +	int r;
+> > > > +
+> > > > +	unmap_mapping_folio(folio);
+> > > > +
+> > > > +	/**
+> > > > +	 * We can't use the refcount. It might be elevated due to
+> > > > +	 * guest/vcpu trying to access same folio as another vcpu
+> > > > +	 * or because userspace is trying to access folio for same reason
 > > > 
-> > > At that time, the issue was that NUMA balancing can be applied on a huge
-> > > range of VM memory, even if nothing was populated.  The notification can be
-> > > avoided in this case if no valid pmd detected, which includes either THP or
-> > > a PTE pgtable page.
+> > > As discussed, that's insufficient. We really have to drive the refcount to 1
+> > > -- the single reference we expect.
 > > > 
-> > > Now to pave way for PUD handling, this isn't enough.  We need to generate
-> > > mmu notifications even on PUD entries properly.  mprotect() is currently
-> > > broken on PUD (e.g., one can easily trigger kernel error with dax 1G
-> > > mappings already), this is the start to fix it.
+> > > What is the exact problem you are running into here? Who can just grab a
+> > > reference and maybe do nasty things with it?
 > > > 
-> > > To fix that, this patch proposes to push such notifications to the PUD
-> > > layers.
-> > > 
-> > > There is risk on regressing the problem Rik wanted to resolve before, but I
-> > > think it shouldn't really happen, and I still chose this solution because
-> > > of a few reasons:
-> > > 
-> > >   1) Consider a large VM that should definitely contain more than GBs of
-> > >   memory, it's highly likely that PUDs are also none.  In this case there
 > > 
-> > I don't follow this.  Did you mean to say it's highly likely that PUDs are *NOT*
-> > none?
+> > Right, I remember we had discussed it. The problem I faced was if 2
+> > vcpus fault on same page, they would race to look up the folio in
+> > filemap, increment refcount, then try to lock the folio. One of the
+> > vcpus wins the lock, while the other waits. The vcpu that gets the
+> > lock vcpu will see the elevated refcount.
+> > 
+> > I was in middle of writing an explanation why I think this is best
+> > approach and realized I think it should be possible to do
+> > shared->private conversion and actually have single reference. There
+> > would be some cost to walk through the allocated folios and convert them
+> > to private before any vcpu runs. The approach I had gone with was to
+> > do conversions as late as possible.
 > 
-> I did mean the original wordings.
+> We certainly have to support conversion while the VCPUs are running.
 > 
-> Note that in the previous case Rik worked on, it's about a mostly empty VM
-> got NUMA hint applied.  So I did mean "PUDs are also none" here, with the
-> hope that when the numa hint applies on any part of the unpopulated guest
-> memory, it'll find nothing in PUDs. Here it's mostly not about a huge PUD
-> mapping as long as the guest memory is not backed by DAX (since only DAX
-> supports 1G huge pud so far, while hugetlb has its own path here in
-> mprotect, so it must be things like anon or shmem), but a PUD entry that
-> contains pmd pgtables.  For that part, I was trying to justify "no pmd
-> pgtable installed" with the fact that "a large VM that should definitely
-> contain more than GBs of memory", it means the PUD range should hopefully
-> never been accessed, so even the pmd pgtable entry should be missing.
+> The VCPUs might be able to avoid grabbing a folio reference for the
+> conversion and only do the folio_lock(): as long as we have a guarantee that
+> we will disallow freeing the folio in gmem, for example, by syncing against
+> FALLOC_FL_PUNCH_HOLE.
+> 
+> So if we can rely on the "gmem" reference to the folio that cannot go away
+> while we do what we do, we should be fine.
+> 
+> <random though>
+> 
+> Meanwhile, I was thinking if we would want to track the references we
+> hand out to "safe" users differently.
+> 
+> Safe references would only be references that would survive a
+> private<->shared conversion, like KVM MMU mappings maybe?
+> 
+> KVM would then have to be thought to return these gmem references
+> differently.
+> 
+> The idea would be to track these "safe" references differently
+> (page->private?) and only allow dropping *our* guest_memfd reference if all
+> these "safe" references are gone. That is, FALLOC_FL_PUNCH_HOLE would also
+> fail if there are any "safe" reference remaining.
+> 
+> <\random though>
+> 
 
-Ah, now I get what you were saying.
+I didn't find a path in filemap where we can grab folio without
+increasing its refcount. I liked the idea of keeping track of a "safe"
+refcount, but I believe there is a small window to race comparing the
+main folio refcount and the "safe" refcount. A vcpu could have
+incremented the main folio refcount and on the way to increment the safe
+refcount. Before that happens, another thread does the comparison and
+sees a mismatch.
 
-Problem is, walking the rmaps for the shadow MMU doesn't benefit (much) from
-empty PUDs, because KVM needs to blindly walk the rmaps for every gfn covered by
-the PUD to see if there are any SPTEs in any shadow MMUs mapping that gfn.  And
-that walk is done without ever yielding, which I suspect is the source of the
-soft lockups of yore.
+Thanks,
+Elliot
 
-And there's no way around that conundrum (walking rmaps), at least not without a
-major rewrite in KVM.  In a nested TDP scenario, KVM's stage-2 page tables (for
-L2) key off of L2 gfns, not L1 gfns, and so the only way to find mappings is
-through the rmaps.
 
