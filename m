@@ -1,163 +1,155 @@
-Return-Path: <kvm+bounces-23590-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23591-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75A6694B401
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 02:14:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B53AC94B411
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 02:17:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0759A1F22FAA
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 00:14:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46BD61F23B30
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 00:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6111854;
-	Thu,  8 Aug 2024 00:14:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C8E933EC;
+	Thu,  8 Aug 2024 00:17:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="b08Es367"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RWLcg4lK"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FFA039B;
-	Thu,  8 Aug 2024 00:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216AC184E
+	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 00:17:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723076057; cv=none; b=AEz4iIEqqZQF6LsSa1SRVkSIRYQMugiIRkWjzWopSEuS6gdj9vgNqlHaWZ84GETRcj2msrfwOXI9PBw4BiGTaxue1WcuQ2Kc0mhI5Lzo3GEPUjR+Rj8pcxJR5AwzxYBcRtcdEtprW7LfOMOSfj4LUMAyF3raGUq4W/5Kd057V1A=
+	t=1723076269; cv=none; b=cR5UJ6xdckGTYVxdD3C0QZzDxN2E9gqpfitwgYTbokjwDGG8DxYYTKvzqkPrvk2qViWwv/ZnXbuRK+W9htVH0REp51AUjZtZWx5wSvEGJYYv4kOAiYVhbdU2wIqaoACu+b1qr4Y5Cku8lp1xQKknJ0QwuxqZ9Ns+5l0ZW8SpSIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723076057; c=relaxed/simple;
-	bh=rnk6NOm5/KnK6BxpfKd8TEgRBafhnCiGpVfQ3d/QHPs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=duj4DYvWsulcw4C0oD8OxpZF78mGVPAqBlFi0fuirRYErXYLYab5td7M0ZjX1rG7wsQbzAHy10II60sOiLSpdzXpHpRCIjZAS5FaiCYfYbe2P9c8n+DnRUiMToKkKRLdTOBHtxg4QVgxn6kgfMXLxArugXZOeQOvIkhKzJ4a5xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=b08Es367; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1723076269; c=relaxed/simple;
+	bh=gwourquQqQgArHZuQMizcUTmxF5q+y+29ipyy+zP9eQ=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=qT/FNew6cl/i/mxjNMD/rpNfBb0QpGLXUlDq2mtV/Zka1L75esfjGIT5TCzxfJzmxaC8DT8orzZ0dg+6B/jhSQjZFUcOZDhS1G1tUOZeKFSlYWHEbHP/OBPdhkQgr6BR5vq2e80K8y1I2ZVinLnl7Ec2FztcbcKsSTsKnKVg1jY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RWLcg4lK; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e035f7b5976so1087512276.0
+        for <kvm@vger.kernel.org>; Wed, 07 Aug 2024 17:17:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1723076056; x=1754612056;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=rnk6NOm5/KnK6BxpfKd8TEgRBafhnCiGpVfQ3d/QHPs=;
-  b=b08Es367ayKGpfJBmbsQt752c9CsU1NGxj4dtSubTJ2XjniSWPn1d9na
-   ulFkCn5p7vxuqhBIcvtEe8NrMDq+ipGjrDX+UlcagGbjJR+ov+xYydtdT
-   dKnvbPQUiktSJD7yjtFkUekXYosc2axAJImqykomu4VjGw/Tt/KgbFeiu
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.09,271,1716249600"; 
-   d="scan'208";a="672677906"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 00:14:14 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:52573]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.252:2525] with esmtp (Farcaster)
- id 95d0d38e-fff9-4f42-8e2e-4808f7d9cca0; Thu, 8 Aug 2024 00:14:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 95d0d38e-fff9-4f42-8e2e-4808f7d9cca0
-Received: from EX19D003UWC002.ant.amazon.com (10.13.138.169) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 8 Aug 2024 00:14:10 +0000
-Received: from [192.168.198.222] (10.106.100.47) by
- EX19D003UWC002.ant.amazon.com (10.13.138.169) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 8 Aug 2024 00:14:09 +0000
-Message-ID: <396fb134-f43e-4263-99a8-cfcef82bfd99@amazon.com>
-Date: Wed, 7 Aug 2024 17:14:07 -0700
+        d=google.com; s=20230601; t=1723076267; x=1723681067; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=r/kJVEFH5qjayplD5GVSM8FS6nnkv+gRXSy0GjQP8O0=;
+        b=RWLcg4lKiZLnYLOu2aaa3R8qvcCd2YS0/Zk0xseWhG5jfMbG/nPIFQLwvd8kqy+col
+         UV7HJtjS6q9UnuE/Pd7sxL5dDQSjetrakKmVYUZrbmesO9hReR81pCLzO4cEGKQsgLdU
+         4Tghsd2DWgq/kTevIPe09mDVmXIGVwBQnsiEYe2lqWboGgWRVElXjYopD3aSyDeA8+YN
+         O/erW2jdaWQsXsKxD/ncDZQYe2qQm8vCzqr3rmnilusEjJBA1uzPAn/K9Lb6lGx0fWMd
+         +7XPldOKhrdmdJHcGZFmC2EzoIJ4kYO3mvNfeH3iUWunciA26pJuxV1vxYkkYpyJR2dC
+         c0jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723076267; x=1723681067;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=r/kJVEFH5qjayplD5GVSM8FS6nnkv+gRXSy0GjQP8O0=;
+        b=my8P6JQq6oeQDXGVvP9fOYM8sWYEWcVY1PDnFaubbiyOnvL9kDOJTO6slW+wchCv4G
+         mmxl9WTrUA/S+SUljS4llhIahrfvO02CaeHkeMmOQoT284YcCeTO261y/uLTdcIod22E
+         Z2R2owlP/+M1fwSQqascBcD7oVaTwpBIvFZjfRqsopLPSqucBWnAn5Dh7HJvBQiDsH7p
+         7+0re0IBE6sXszL8gE0a8X0lR8UBMsZ0Samx7jps6tbolSrTUIiOl9+STqy6brdOyOMW
+         IZvpepACQlqPv1+oj27PTwYD1m7BN36kzEM9CDNOjRJayD0y8MOat5o5djXYn0HjV0at
+         PzEg==
+X-Gm-Message-State: AOJu0Yx3ZK03l08JPHxbvggyDZOgiNz/tJ0h9MH8Gr9a4O8LAY6wk96t
+	85kRfkfTGWhkYErupcJlPJCT318pBR2AnOqUz9qlSQbUKZepvyRzEs1iHr5kfh/LmNmNLY0f5cr
+	D/A==
+X-Google-Smtp-Source: AGHT+IGd41vgvUvW9KjGrejv+hMEBy5r1ZRLxG0BRevHpPhbssnp8x8WU7uASiTBL/HsemDLzKvEtYI71OM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a5b:98a:0:b0:e03:52c8:ad30 with SMTP id
+ 3f1490d57ef6-e0e9f93ec17mr161276.3.1723076266966; Wed, 07 Aug 2024 17:17:46
+ -0700 (PDT)
+Date: Wed, 7 Aug 2024 17:17:45 -0700
+In-Reply-To: <CADrL8HXVNcbcuu9qF3wtkccpW6_QEnXQ1ViWEceeS9QGdQUTiw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 3/4] mm: guest_memfd: Add option to remove guest
- private memory from direct map
-To: David Hildenbrand <david@redhat.com>, Elliot Berman
-	<quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>, "Paolo
- Bonzini" <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>,
-	"Fuad Tabba" <tabba@google.com>, Patrick Roy <roypat@amazon.co.uk>,
-	<qperret@google.com>, Ackerley Tng <ackerleytng@google.com>
-CC: <linux-coco@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>, <kvm@vger.kernel.org>,
-	Alexander Graf <graf@amazon.de>, Moritz Lipp <mlipp@amazon.at>, "Claudio
- Canella" <canellac@amazon.at>
-References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
- <20240805-guest-memfd-lib-v1-3-e5a29a4ff5d7@quicinc.com>
- <c55fc93d-270b-4b11-9b38-b54f350ea6c9@redhat.com>
-Content-Language: en-US
-From: "Manwaring, Derek" <derekmn@amazon.com>
-In-Reply-To: <c55fc93d-270b-4b11-9b38-b54f350ea6c9@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
- EX19D003UWC002.ant.amazon.com (10.13.138.169)
+Mime-Version: 1.0
+References: <20240801224349.25325-1-seanjc@google.com> <CADrL8HXVNcbcuu9qF3wtkccpW6_QEnXQ1ViWEceeS9QGdQUTiw@mail.gmail.com>
+Message-ID: <ZrQOqVsyEulBt7S9@google.com>
+Subject: Re: [ANNOUNCE] PUCK Agenda - 2024.08.07 - KVM userfault
+ (guest_memfd/HugeTLB postcopy)
+From: Sean Christopherson <seanjc@google.com>
+To: James Houghton <jthoughton@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Peter Xu <peterx@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Oliver Upton <oliver.upton@linux.dev>, Axel Rasmussen <axelrasmussen@google.com>, 
+	David Matlack <dmatlack@google.com>, Anish Moorthy <amoorthy@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-08-06 07:10-0700 David Hildenbrand wrote:
-> > While guest_memfd is not available to be mapped by userspace, it is
-> > still accessible through the kernel's direct map. This means that in
-> > scenarios where guest-private memory is not hardware protected, it can
-> > be speculatively read and its contents potentially leaked through
-> > hardware side-channels. Removing guest-private memory from the direct
-> > map, thus mitigates a large class of speculative execution issues
-> > [1, Table 1].
->
-> I think you have to point out here that the speculative execution issues
-> are primarily only an issue when guest_memfd private memory is used
-> without TDX and friends where the memory would be encrypted either way.
->
-> Or am I wrong?
+On Wed, Aug 07, 2024, James Houghton wrote:
+> On Thu, Aug 1, 2024 at 3:44=E2=80=AFPM Sean Christopherson <seanjc@google=
+.com> wrote:
+> >
+> > Early warning for next week's PUCK since there's actually a topic this =
+time.
+> > James is going to lead a discussion on KVM userfault[*](name subject to=
+ change).
+>=20
+> Thanks for attending, everyone!
+>=20
+> We seemed to arrive at the following conclusions:
+>=20
+> 1. For guest_memfd, stage 2 mapping installation will never go through
+> GUP / virtual addresses to do the GFN --> PFN translation, including
+> when it supports non-private memory.
+> 2. Something like KVM Userfault is indeed necessary to handle
+> post-copy for guest_memfd VMs, especially when guest_memfd supports
+> non-private memory.
+> 3. We should not hook into the overall GFN --> HVA translation, we
+> should only be hooking the GFN --> PFN translation steps to figure out
+> how to create stage 2 mappings. That is, KVM's own accesses to guest
+> memory should just go through mm/userfaultfd.
+> 4. We don't need the concept of "async userfaults" (making KVM block
+> when attempting to access userfault memory) in KVM Userfault.
+>=20
+> So I need to think more about what exactly the API should look like
+> for controlling if a page should exit to userspace before KVM is
+> allowed to map it into stage 2 and if this should apply to all of
+> guest memory or only guest_memfd.
+>=20
+> It sounds like it may most likely be something like a per-VM bitmap
+> that describes which pages are allowed to be mapped into stage 2,
+> applying to all memory, not just guest_memfd memory. Even though it is
+> solving a problem for guest_memfd specifically, it is slightly cleaner
+> to have it apply to all memory.
+>=20
+> If this per-VM bitmap applies to all memory, then we don't need to
+> wait for guest_memfd to support non-private memory before working on a
+> full implementation. But if not, perhaps it makes sense to wait.
 
-Actually, I'm not sure how much protection CoCo solutions offer in this
-regard. I'd love to hear more from Intel and AMD on this, but it looks
-like they are not targeting full coverage for these types of attacks
-(beyond protecting guest mitigation settings from manipulation by the
-host).  For example, see this selection from AMD's 2020 whitepaper [1]
-on SEV-SNP:
+Per-memslot likely makes more sense.  Unlike attributes, the bitmap only ne=
+eds
+to exist during post-copy, and unless we do something clever, i.e. use some=
+thing
+other than a bitmap, the bitmap needs to be fully allocated, which would re=
+sult
+in unnecessary overhead if there are gaps in guest physical memory.
 
-"There are certain classes of attacks that are not in scope for any of
-these three features. Architectural side channel attacks on CPU data
-structures are not specifically prevented by any hardware means. As with
-standard software security practices, code which is sensitive to such
-side channel attacks (e.g., cryptographic libraries) should be written
-in a way which helps prevent such attacks."
+The other hiccup with a per-VM bitmap is that it would force us to define A=
+BI
+for things we don't care about.  E.g. what happens if the local APIC is in-=
+kernel
+and userspace marks the APIC page as USERFAULT?  Ditto for gfns without mem=
+slots.
 
-And:
+E.g. add a KVM_MEM_USERFAULT flag along with a userfault_bitmap user pointe=
+r
+that is valid when the flag is set.  Unlike dirty logging, KVM is only a re=
+ader
+of the bitmap, so I'm pretty sure we don't need a copy in KVM.
 
-"While SEV-SNP offers guests several options when it comes to protection
-from speculative side channel attacks and SMT, it is not able to protect
-against all possible side channel attacks. For example, traditional side
-channel attacks on software such as PRIME+PROBE are not protected by
-SEV-SNP."
-
-Intel's docs also indicate guests need to protect themselves in some
-cases saying, "TD software should be aware that potentially untrusted
-software running outside a TD may be able to influence conditional
-branch predictions of software running in a TD" [2] and "a TDX guest VM
-is no different from a legacy guest VM in terms of protecting this
-userspace <-> OS kernel boundary" [3]. But these focus on hardening
-kernel & software within the guest.
-
-What's not clear to me is what happens during transient execution when
-the host kernel attempts to access a page in physical memory that
-belongs to a guest. I assume if it only happens transiently, it will not
-result in a machine check like it would if the instructions were
-actually retired. As far as I can tell encryption happens between the
-CPU & main memory, so cache contents will be plaintext. This seems to
-leave open the possibility of the host kernel retrieving the plaintext
-cache contents with a transient execution attack. I assume vendors have
-controls in place to stop this, but Foreshadow/L1TF is a good example of
-one place this fell apart for SGX [4].
-
-All that said, we're also dependent on hardware not being subject to
-L1TF-style issues for the currently proposed non-CoCo method to be
-effective.  We're simply clearing the Present bit while the physmap PTE
-still points to the guest physical page. This was found to be
-exploitable across OS & VMM boundaries on Intel server parts before
-Cascade Lake [5] (thanks to Claudio for highlighting this). So that's a
-long way of saying TDX may offer similar protection, but not because of
-encryption.
-
-Derek
-
-[1] https://www.amd.com/content/dam/amd/en/documents/epyc-business-docs/white-papers/SEV-SNP-strengthening-vm-isolation-with-integrity-protection-and-more.pdf#page=19
-[2] https://www.intel.com/content/www/us/en/developer/articles/technical/software-security-guidance/best-practices/trusted-domain-security-guidance-for-developers.html
-[3] https://intel.github.io/ccc-linux-guest-hardening-docs/security-spec.html#transient-execution-attacks-and-their-mitigation
-[4] https://foreshadowattack.eu/foreshadow.pdf
-[5] https://foreshadowattack.eu/foreshadow-NG.pdf
+When userspace creates the VM on the target, it allocates a bitmap for each
+memslot and sets KVM_MEM_USERFAULT.  When migration completes, userspace cl=
+ears
+KVM_MEM_USERFAULT for each memslot, and then deletes the associated bitmap.
 
