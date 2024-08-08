@@ -1,269 +1,310 @@
-Return-Path: <kvm+bounces-23658-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23659-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBE2F94C683
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 23:55:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E533994C6E7
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 00:16:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A76792832B8
-	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 21:55:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 13F3D1C2161A
+	for <lists+kvm@lfdr.de>; Thu,  8 Aug 2024 22:16:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA31E15CD7F;
-	Thu,  8 Aug 2024 21:55:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A424515ECD2;
+	Thu,  8 Aug 2024 22:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YfCU6iah"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="l3BH/IeB"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59898158853
-	for <kvm@vger.kernel.org>; Thu,  8 Aug 2024 21:55:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230FF155C8E;
+	Thu,  8 Aug 2024 22:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723154123; cv=none; b=L/QYblRbsjmS0ywSvuqlpCSEgrfgqNl5Bbm6Qhd8D+x2tUeBC1GmB9aylZl1t1MBUtuUA8PaxzqmKXBwM6eWsmFFtc9fwMuzKhsWbBLIxhlc+CajUMwJUI23qcol/GYu0DVsB0Mmtl4WMaS5qRcxSAVQ1p1l1QScna92eJJrgyQ=
+	t=1723155383; cv=none; b=j4bkG7XdogxstjllAdX7UXYuQJevQpo+S+Vel3xXyoOrO7mxbMoP9XMqwrCgIhsbnhRVsb0y4u+J7hfQ56BIt4BfWBJNYYhBhebC9iSfh8o+PB3oqI5nb0auMg8Pdt6xs1uvw2Oh0we0kvU2sHmsyQLQllQsp/AezTTayPvHKY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723154123; c=relaxed/simple;
-	bh=BMV8MGIwoNq7eg6c5quIkLMm6LIlrHrK3hmh7Z2JRoI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=j7P8Zd6zBN4Xs6IYGyVMijVSmPt6ynmOz/xpRHon2oVTO6oMxeDDzUjMiG88z5oHDnlbwxcWlNjWaOKDgD6YcFzHHD6BFndpwzhIwCSB/U8HUZCNMWX5BHcgjcFbYVXvkzAACCu+/PdAFJOp2oSTimCeO8gxNNgwF/I0REQ2LGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YfCU6iah; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723154121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=k3wrIksGrEilBm2A+K8GdCmrycdMLC/icwH1wgjwvN4=;
-	b=YfCU6iahUfhBhLESAD7+jYOC9cgYyC9MBBdJ6ab6MEjQjjV5oULRI0N/xXVM7Y6SNVMaTm
-	YINZbte/mjZVwihtcue+mZiqqROJGaxaCAa6KgSf7/DT3tjsoWNZcQxEI5vIUL3eMLH+If
-	hdQJm2Cz+Ri8QaWso4km0v4xLaUZlxQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-314-gXgKvkcsMp2LIUhzyhcong-1; Thu, 08 Aug 2024 17:55:19 -0400
-X-MC-Unique: gXgKvkcsMp2LIUhzyhcong-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-42820c29a76so10372165e9.2
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 14:55:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723154117; x=1723758917;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=k3wrIksGrEilBm2A+K8GdCmrycdMLC/icwH1wgjwvN4=;
-        b=W+DK3OgRgRBRvGHL9LjMv4eGBI2qEzOgfXYGguV6ODBByocpzII8YVmU75eVNmEQ3L
-         CPzphVHWNMObg1WuXdO5u44gywi33p5YOc/J2Rh8fbKGrUMjH0l/TmcC1H3MTkMkD/R4
-         pl+AG2Dqn2y0d+PzqnuhVAtnwLDQHPv3r/s3ebsYAtTye/Urkb51/JeUeEpYMfC2NFR9
-         W6SEbqDeFC2ndWVtYkzNt58WOt/ieOTDym0u4LN+GfEeNSjLxpExo7rRyV5+yTQNUuEl
-         ncIrYgkWkk8/aAdBED8zrHzVtGpwfVpqKIKBsHQ6UyFz1Ga2ZOXdcwRroDz4vcoUTRvq
-         +HFA==
-X-Forwarded-Encrypted: i=1; AJvYcCWH8jBKbXZV7MX50/Z14cBWGFPJKU2qaHbX1D3xaSPV3N63I1OixQBJxtYjPZaeS9nmA+xhwFmzrERZebj4qrzWt62S
-X-Gm-Message-State: AOJu0YxRwhYc8ULGwLL+boP93XNP6DsJeTHlKx3dXVMiFUQ/X2BkvEBY
-	YHVlA1a2YuuFsV1f1xVtfPx4G532Q87JoS0DawSFuiw3sUsbyh1UrX3XRsWazqU0kMv2f+5apXm
-	RBXN+ZlPGht4gM6ADvP0hqiVULZ9ejFcbEGqT6dv2TkibfmBc9w==
-X-Received: by 2002:a05:600c:45d0:b0:426:60d7:d299 with SMTP id 5b1f17b1804b1-4290ae99ac6mr27131805e9.7.1723154117399;
-        Thu, 08 Aug 2024 14:55:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF1X2P2ifl7KjEfzzVADvx2Yez3V8VQTV9J7YgJ62njZVhPj0eKKGqXaxHHLuT355LQdF5TmA==
-X-Received: by 2002:a05:600c:45d0:b0:426:60d7:d299 with SMTP id 5b1f17b1804b1-4290ae99ac6mr27131595e9.7.1723154116839;
-        Thu, 08 Aug 2024 14:55:16 -0700 (PDT)
-Received: from ?IPV6:2003:cb:c713:2a00:f151:50f1:7164:32e6? (p200300cbc7132a00f15150f1716432e6.dip0.t-ipconnect.de. [2003:cb:c713:2a00:f151:50f1:7164:32e6])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d2716f333sm3226724f8f.43.2024.08.08.14.55.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Aug 2024 14:55:16 -0700 (PDT)
-Message-ID: <6f3b5c38-fc33-43cd-8ab7-5b0f49169d5c@redhat.com>
-Date: Thu, 8 Aug 2024 23:55:15 +0200
+	s=arc-20240116; t=1723155383; c=relaxed/simple;
+	bh=t63ZZLDq2/nQ+VQGBPCg/bW2uLKB2nNZHE/2yk+Lm84=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iqZCgjxdUJWq0vrO0HqTFpp05YXORXQQIewWwPyPCqZ4JU9WnocKLbOd6ANExczoIThPRFAsGFmOv2+cUCume/XsqNtha9vqVsBVYY6BSYwghfum+YhMElDtp+qzp+LpGZttNCHF1eCEww7RTZVRWN7Yqd8OAEbm8pruLvofpv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=l3BH/IeB; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 478MBSST008155;
+	Thu, 8 Aug 2024 22:16:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=qcppdkim1; bh=nL3u+k6A/dv1Xe3KTcQ29Mj4
+	89OIsNIerAdn3j53pCs=; b=l3BH/IeBBggrLBFKC1idrJciacBCPcGIDLjA4B/t
+	VQnrImxCDtchrkq/5hVgbGghWUWc6LMuA0iS7zK+IK8fg2itNrrheLwP7UT/YtxE
+	eBRBLcLoyx6eaJSAnGU5nZvjkzk+NSM4nOq+EmCTfW+kFcOYNJFxx/mzoXRpdFTr
+	sIC7gjTWSiWYQI2p2lrag2BzId8iaFZc3kzpQYYyPFgLX4cKJdaUcTPUSEXLv0XR
+	dyqlbT+nc0GnXqhDPSP5DnKRvGBV606TxhNl3e3iKMA9kHa7LAAwsr2rnPJ2Hisy
+	SbAca2/hy0FYSmAffdvR3hmEb4RLp51uqAUL7xwFsDB49Q==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 40vfy5bej0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 08 Aug 2024 22:16:11 +0000 (GMT)
+Received: from nasanex01b.na.qualcomm.com (nasanex01b.na.qualcomm.com [10.46.141.250])
+	by NASANPPMTA02.qualcomm.com (8.17.1.19/8.17.1.19) with ESMTPS id 478MGA6T016945
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 8 Aug 2024 22:16:10 GMT
+Received: from hu-eberman-lv.qualcomm.com (10.49.16.6) by
+ nasanex01b.na.qualcomm.com (10.46.141.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Thu, 8 Aug 2024 15:16:09 -0700
+Date: Thu, 8 Aug 2024 15:16:09 -0700
+From: Elliot Berman <quic_eberman@quicinc.com>
+To: Patrick Roy <roypat@amazon.co.uk>
+CC: Andrew Morton <akpm@linux-foundation.org>,
+        Paolo Bonzini
+	<pbonzini@redhat.com>,
+        Sean Christopherson <seanjc@google.com>,
+        Fuad Tabba
+	<tabba@google.com>, David Hildenbrand <david@redhat.com>,
+        <qperret@google.com>, Ackerley Tng <ackerleytng@google.com>,
+        <linux-coco@lists.linux.dev>, <linux-arm-msm@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-mm@kvack.org>,
+        <kvm@vger.kernel.org>, James Gowans <jgowans@amazon.com>,
+        "Kalyazin, Nikita"
+	<kalyazin@amazon.co.uk>,
+        "Manwaring, Derek" <derekmn@amazon.com>,
+        "Cali,
+ Marco" <xmarcalx@amazon.co.uk>
+Subject: Re: [PATCH RFC 3/4] mm: guest_memfd: Add option to remove guest
+ private memory from direct map
+Message-ID: <20240808145103617-0700.eberman@hu-eberman-lv.qualcomm.com>
+References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
+ <20240805-guest-memfd-lib-v1-3-e5a29a4ff5d7@quicinc.com>
+ <3fc11402-53e1-4325-a3ee-5ebd616b5b63@amazon.co.uk>
+ <20240806104702482-0700.eberman@hu-eberman-lv.qualcomm.com>
+ <a43ae745-9907-425f-b09d-a49405d6bc2d@amazon.co.uk>
+ <90886a03-ad62-4e98-bc05-63875faa9ccc@amazon.co.uk>
+ <20240807113514068-0700.eberman@hu-eberman-lv.qualcomm.com>
+ <7166d51c-7757-44f2-a6f8-36da3e86bf90@amazon.co.uk>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
-To: Elliot Berman <quic_eberman@quicinc.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson
- <seanjc@google.com>, Fuad Tabba <tabba@google.com>,
- Patrick Roy <roypat@amazon.co.uk>, qperret@google.com,
- Ackerley Tng <ackerleytng@google.com>, linux-coco@lists.linux.dev,
- linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mm@kvack.org, kvm@vger.kernel.org
-References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
- <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com>
- <4cdd93ba-9019-4c12-a0e6-07b430980278@redhat.com>
- <20240806093625007-0700.eberman@hu-eberman-lv.qualcomm.com>
- <a7c5bfc0-1648-4ae1-ba08-e706596e014b@redhat.com>
- <20240808101944778-0700.eberman@hu-eberman-lv.qualcomm.com>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <20240808101944778-0700.eberman@hu-eberman-lv.qualcomm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <7166d51c-7757-44f2-a6f8-36da3e86bf90@amazon.co.uk>
+X-ClientProxiedBy: nalasex01b.na.qualcomm.com (10.47.209.197) To
+ nasanex01b.na.qualcomm.com (10.46.141.250)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: BV9dcG3O0hDNp8CTu0jKw-Sde_t8cyjh
+X-Proofpoint-ORIG-GUID: BV9dcG3O0hDNp8CTu0jKw-Sde_t8cyjh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-08_22,2024-08-07_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 malwarescore=0
+ adultscore=0 clxscore=1015 priorityscore=1501 lowpriorityscore=0
+ impostorscore=0 spamscore=0 phishscore=0 bulkscore=0 mlxlogscore=999
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408080159
 
-On 08.08.24 23:41, Elliot Berman wrote:
-> On Wed, Aug 07, 2024 at 06:12:00PM +0200, David Hildenbrand wrote:
->> On 06.08.24 19:14, Elliot Berman wrote:
->>> On Tue, Aug 06, 2024 at 03:51:22PM +0200, David Hildenbrand wrote:
->>>>> -	if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
->>>>> +	if (!ops->accessible && (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)) {
->>>>>     		r = guest_memfd_folio_private(folio);
->>>>>     		if (r)
->>>>>     			goto out_err;
->>>>> @@ -107,6 +109,82 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
->>>>>     }
->>>>>     EXPORT_SYMBOL_GPL(guest_memfd_grab_folio);
->>>>> +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio)
->>>>> +{
->>>>> +	unsigned long gmem_flags = (unsigned long)file->private_data;
->>>>> +	unsigned long i;
->>>>> +	int r;
->>>>> +
->>>>> +	unmap_mapping_folio(folio);
->>>>> +
->>>>> +	/**
->>>>> +	 * We can't use the refcount. It might be elevated due to
->>>>> +	 * guest/vcpu trying to access same folio as another vcpu
->>>>> +	 * or because userspace is trying to access folio for same reason
->>>>
->>>> As discussed, that's insufficient. We really have to drive the refcount to 1
->>>> -- the single reference we expect.
->>>>
->>>> What is the exact problem you are running into here? Who can just grab a
->>>> reference and maybe do nasty things with it?
->>>>
->>>
->>> Right, I remember we had discussed it. The problem I faced was if 2
->>> vcpus fault on same page, they would race to look up the folio in
->>> filemap, increment refcount, then try to lock the folio. One of the
->>> vcpus wins the lock, while the other waits. The vcpu that gets the
->>> lock vcpu will see the elevated refcount.
->>>
->>> I was in middle of writing an explanation why I think this is best
->>> approach and realized I think it should be possible to do
->>> shared->private conversion and actually have single reference. There
->>> would be some cost to walk through the allocated folios and convert them
->>> to private before any vcpu runs. The approach I had gone with was to
->>> do conversions as late as possible.
->>
->> We certainly have to support conversion while the VCPUs are running.
->>
->> The VCPUs might be able to avoid grabbing a folio reference for the
->> conversion and only do the folio_lock(): as long as we have a guarantee that
->> we will disallow freeing the folio in gmem, for example, by syncing against
->> FALLOC_FL_PUNCH_HOLE.
->>
->> So if we can rely on the "gmem" reference to the folio that cannot go away
->> while we do what we do, we should be fine.
->>
->> <random though>
->>
->> Meanwhile, I was thinking if we would want to track the references we
->> hand out to "safe" users differently.
->>
->> Safe references would only be references that would survive a
->> private<->shared conversion, like KVM MMU mappings maybe?
->>
->> KVM would then have to be thought to return these gmem references
->> differently.
->>
->> The idea would be to track these "safe" references differently
->> (page->private?) and only allow dropping *our* guest_memfd reference if all
->> these "safe" references are gone. That is, FALLOC_FL_PUNCH_HOLE would also
->> fail if there are any "safe" reference remaining.
->>
->> <\random though>
->>
+On Thu, Aug 08, 2024 at 02:05:55PM +0100, Patrick Roy wrote:
+> On Wed, 2024-08-07 at 20:06 +0100, Elliot Berman wrote:
+> >>>>>>  struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags)
+> >>>>>>  {
+> >>>>>> +       unsigned long gmem_flags = (unsigned long)file->private_data;
+> >>>>>>         struct inode *inode = file_inode(file);
+> >>>>>>         struct guest_memfd_operations *ops = inode->i_private;
+> >>>>>>         struct folio *folio;
+> >>>>>> @@ -43,6 +89,12 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
+> >>>>>>                         goto out_err;
+> >>>>>>         }
+> >>>>>>
+> >>>>>> +       if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
+> >>>>>> +               r = guest_memfd_folio_private(folio);
+> >>>>>> +               if (r)
+> >>>>>> +                       goto out_err;
+> >>>>>> +       }
+> >>>>>> +
+> >>>>>
+> >>>>> How does a caller of guest_memfd_grab_folio know whether a folio needs
+> >>>>> to be removed from the direct map? E.g. how can a caller know ahead of
+> >>>>> time whether guest_memfd_grab_folio will return a freshly allocated
+> >>>>> folio (which thus needs to be removed from the direct map), vs a folio
+> >>>>> that already exists and has been removed from the direct map (probably
+> >>>>> fine to remove from direct map again), vs a folio that already exists
+> >>>>> and is currently re-inserted into the direct map for whatever reason
+> >>>>> (must not remove these from the direct map, as other parts of
+> >>>>> KVM/userspace probably don't expect the direct map entries to disappear
+> >>>>> from underneath them). I couldn't figure this one out for my series,
+> >>>>> which is why I went with hooking into the PG_uptodate logic to always
+> >>>>> remove direct map entries on freshly allocated folios.
+> >>>>>
+> >>>>
+> >>>> gmem_flags come from the owner. If the caller (in non-CoCo case) wants
+> >>
+> >> Ah, oops, I got it mixed up with the new `flags` parameter.
+> >>
+> >>>> to restore the direct map right away, it'd have to be a direct
+> >>>> operation. As an optimization, we could add option that asks for page in
+> >>>> "shared" state. If allocating new page, we can return it right away
+> >>>> without removing from direct map. If grabbing existing folio, it would
+> >>>> try to do the private->shared conversion.
+> >>
+> >> My concern is more with the implicit shared->private conversion that
+> >> happens on every call to guest_memfd_grab_folio (and thus
+> >> kvm_gmem_get_pfn) when grabbing existing folios. If something else
+> >> marked the folio as shared, then we cannot punch it out of the direct
+> >> map again until that something is done using the folio (when working on
+> >> my RFC, kvm_gmem_get_pfn was indeed called on existing folios that were
+> >> temporarily marked shared, as I was seeing panics because of this). And
+> >> if the folio is currently private, there's nothing to do. So either way,
+> >> guest_memfd_grab_folio shouldn't touch the direct map entry for existing
+> >> folios.
+> >>
+> >
+> > What I did could be documented/commented better.
 > 
-> I didn't find a path in filemap where we can grab folio without
-> increasing its refcount. I liked the idea of keeping track of a "safe"
-> refcount, but I believe there is a small window to race comparing the
-> main folio refcount and the "safe" refcount.
+> No worries, thanks for taking the time to walk me through understanding
+> it!
+> 
+> > If ops->accessible() is *not* provided, all guest_memfd allocations will
+> > immediately remove from direct map and treat them immediately like guest
+> > private (goal is to match what KVM does today on tip).
+> 
+> Ah, so if ops->accessible() is not provided, then there will never be
+> any shared memory inside gmem (like today, where gmem doesn't support
+> shared memory altogether), and thus there's no problems with just
+> unconditionally doing set_direct_map_invalid_noflush in
+> guest_memfd_grab_folio, because all existing folios already have their
+> direct map entry removed. Got it!
+> 
+> > If ops->accessible() is provided, then guest_memfd allocations start
+> > as "shared" and KVM/Gunyah need to do the shared->private conversion
+> > when they want to do the private conversion on the folio. "Shared" is
+> > the default because that is effectively a no-op.
+> > For the non-CoCo case you're interested in, we'd have the
+> > ops->accessible() provided and we wouldn't pull out the direct map from
+> > gpc.
+> 
+> So in pKVM/Gunyah's case, guest memory starts as shared, and at some
+> point the guest will issue a hypercall (or similar) to flip it to
+> private, at which point it'll get removed from the direct map?
+> 
+> That isn't really what we want for our case. We consider the folios as
+> private straight away, as we do not let the guest control their state at
+> all. Everything is always "accessible" to both KVM and userspace in the
+> sense that they can just flip gfns to shared as they please without the
+> guest having any say in it.
+> 
+> I think we should untangle the behavior of guest_memfd_grab_folio from
+> the presence of ops->accessible. E.g.  instead of direct map removal
+> being dependent on ops->accessible we should have some
+> GRAB_FOLIO_RETURN_SHARED flag for gmem_flags, which is set for y'all,
+> and not set for us (I don't think we should have a "call
+> set_direct_map_invalid_noflush unconditionally in
+> guest_memfd_grab_folio" mode at all, because if sharing gmem is
+> supported, then that is broken, and if sharing gmem is not supported
+> then only removing direct map entries for freshly allocated folios gets
+> us the same result of "all folios never in the direct map" while
+> avoiding some no-op direct map operations).
+> 
+> Because we would still use ->accessible, albeit for us that would be
+> more for bookkeeping along the lines of "which gfns does userspace
+> currently require to be in the direct map?". I haven't completely
+> thought it through, but what I could see working for us would be a pair
+> of ioctls for marking ranges accessible/inaccessible, with
+> "accessibility" stored in some xarray (somewhat like Fuad's patches, I
+> guess? [1]).
+> 
+> In a world where we have a "sharing refcount", the "make accessible"
+> ioctl reinserts into the direct map (if needed), lifts the "sharings
+> refcount" for each folio in the given gfn range, and marks the range as
+> accessible.  And the "make inaccessible" ioctl would first check that
+> userspace has unmapped all those gfns again, and if yes, mark them as
+> inaccessible, drop the "sharings refcount" by 1 for each, and removes
+> from the direct map again if it held the last reference (if userspace
+> still has some gfns mapped, the ioctl would just fail).
+> 
 
-There are various possible models. To detect unexpected references, we 
-could either use
+I am warming up to the sharing refcount idea. How does the sharing
+refcount look for kvm gpc?
 
-folio_ref_count(folio) == gmem_folio_safe_ref_count(folio) + 1
+> I guess for pKVM/Gunyah, there wouldn't be userspace ioctls, but instead
+> the above would happen in handlers for share/unshare hypercalls. But the
+> overall flow would be similar. The only difference is the default state
+> of guest memory (shared for you, private for us). You want a
+> guest_memfd_grab_folio that essentially returns folios with "sharing
+> refcount == 1" (and thus present in the direct map), while we want the
+> opposite.
+> 
+> So I think something like the following should work for both of us
+> (modulo some error handling):
+> 
+> static struct folio *__kvm_gmem_get_folio(struct file *file, pgoff_t index, bool prepare, bool *fresh)
+> {
+>     // as today's kvm_gmem_get_folio, except
+>     ...
+>     if (!folio_test_uptodate(folio)) {
+>         ...
+>         if (fresh)
+>             *fresh = true
+>     }
+>     ...
+> }
+> 
+> struct folio *kvm_gmem_get_folio(struct file *file, pgoff_t index, bool prepare)
+> {
+>     bool fresh;
+>     unsigned long gmem_flags = /* ... */
+>     struct folio *folio = __kvm_gmem_get_folio(file, index, prepare, &fresh);
+>     if (gmem_flag & GRAB_FOLIO_RETURN_SHARED != 0) {
+>         // if "sharing refcount == 0", inserts back into direct map and lifts refcount, otherwise just lifts refcount
+>         guest_memfd_folio_clear_private(folio);
+>     } else {
+>         if (fresh)
+>             guest_memfd_folio_private(folio);
+>     }
+>     return folio;
+> }
+> 
+> Now, thinking ahead, there's probably optimizations here where we defer
+> the direct map manipulations to gmem_fault, at which point having a
+> guest_memfd_grab_folio that doesn't remove direct map entries for fresh
+> folios would be useful in our non-CoCo usecase too. But that should also
+> be easily achievable by maybe having a flag to kvm_gmem_get_folio that
+> forces the behavior of GRAB_FOLIO_RETURN_SHARED, indendently of whether
+> GRAB_FOLIO_RETURN_SHARED is set in gmem_flags.
+> 
+> How does that sound to you?
+> 
 
-[we increment both ref counter]
+Yeah, I think this is a good idea.
 
-or
+I'm also thinking to make a few tweaks to the ops structure:
 
-folio_ref_count(folio) == 1
+struct guest_memfd_operations {
+        int (*invalidate_begin)(struct inode *inode, pgoff_t offset, unsigned long nr);
+        void (*invalidate_end)(struct inode *inode, pgoff_t offset, unsigned long nr);
+        int (*prepare_accessible)(struct inode *inode, struct folio *folio);
+        int (*prepare_private)(struct inode *inode, struct folio *folio);
+        int (*release)(struct inode *inode);
+};
 
-[we only increment the safe refcount and let other magic handle it as 
-described]
+When grabbing a folio, we'd always call either prepare_accessible() or
+prepare_private() based on GRAB_FOLIO_RETURN_SHARED. In the
+prepare_private() case, guest_memfd can also ensure the folio is
+unmapped and not pinned. If userspace tries to grab the folio in
+pKVM/Gunyah case, prepare_accessible() will fail and grab_folio returns
+error. There's a lot of details I'm glossing over, but I hope it gives
+some brief idea of the direction I was thinking.
 
-A vcpu could have
-> incremented the main folio refcount and on the way to increment the safe
-> refcount. Before that happens, another thread does the comparison and
-> sees a mismatch.
+In some cases, prepare_accessible() and the invalidate_*() functions
+might effectively be the same thing, except that invalidate_*() could
+operate on a range larger-than-a-folio. That would be useful becase we
+might offer optimization to reclaim a batch of pages versus e.g.
+flushing caches every page.
 
-Likely there won't be a way around coming up with code that is able to 
-deal with such temporary, "speculative" folio references.
-
-In the simplest case, these references will be obtained from our gmem 
-code only, and we'll have to detect that it happened and retry (a 
-seqcount would be a naive solution).
-
-In the complex case, these references are temporarily obtained from 
-other core-mm code -- using folio_try_get(). We can minimize some of 
-them (speculative references from GUP or the pagecache), and try 
-optimizing others (PFN walkers like page migration).
-
-But likely we'll need some retry magic, at least initially.
-
--- 
-Cheers,
-
-David / dhildenb
-
+Thanks,
+Elliot
 
