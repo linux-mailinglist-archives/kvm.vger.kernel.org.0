@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-23718-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23719-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB3A94D448
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 18:13:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52D1B94D44B
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 18:13:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 438E71F22933
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 16:13:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA5B71F2126B
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 16:13:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47BB219CD13;
-	Fri,  9 Aug 2024 16:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0857F1990D3;
+	Fri,  9 Aug 2024 16:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="amiC2tTi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DzLn74dv"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0536219B3DD
-	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 16:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7CD819D071
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 16:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723219782; cv=none; b=Ea9sAyiVhSbqtu+jt9kcL7RgSX9F8eXTNrVLXZO8FELIMYHfp24jNJZlPePD/mbxlZYDVPHQUFiA9yQvAgGsMeg+c0Pj4JVt7jYuGSdwcGm1aQgBtOL9y6mLnx9HuNWogNKbf8yIvXSwD3pNYLjYwp6fEh24z+unqul+0ZmXoT8=
+	t=1723219786; cv=none; b=EetaEi5ayarMEFgGgbqrJRPKQyJCkiHxA2ZAgW3h4GQHD1oQkfEOTi2cgbIEEZAGww788D3aBl4WGI+fz3KUc76Qq5wtd7XGKSHk65XYq0izXThNleEWCYhYFjECzzd4U9fAH6qIYpCzusvuYQWdHy35S7XmoKKqnNzTVU9bosM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723219782; c=relaxed/simple;
-	bh=KfYE5tIQA4wIRG7So5bdir7+S/1uf3KsBeoybnD12MQ=;
+	s=arc-20240116; t=1723219786; c=relaxed/simple;
+	bh=F3zrw7GW4L3DDhmifn0KqTitiZnPFDtSbk8TCndoYpY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=okGw8q/Cj5OPGcCx7WTb2+QfGm8hVpeuA7QPV3b8HhOXcYSUEDbfD6SyUycodaA0qfdojfn5dsOi0l7GpMC1iiBQNO3pDSK8/PjhfJstUWgR2TXar4bG33lg0sZZ/Z9MMcWVNhVcdB1tql5p4d9fZUsgkzs9hQuI2WIa1sMubHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=amiC2tTi; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=MBbOTnIVqlGRNAdZml5aAhgw9HcURyIXPeibvwTOR6wGRnxI5Xshq/tJxNm89R6Ibm1USIxuxpOTjWkq/6wWktmOIj8tQBT7Ub7HmsKga4KGBTmFS1b3C+S4i1LGgBeAfETqhrFb7hz6JrVi0YAc/egjanA4uZ1qPkWNp4aDdyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DzLn74dv; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723219780;
+	s=mimecast20190719; t=1723219783;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XgMG3z25w/FU4W74BEAmfGyy8QhkBSj3TNUPa/vYriM=;
-	b=amiC2tTiiJWK+7NM6JHHnTQqJXVJstQiiLHVgPfnlhcWoYFspVa+3MiamqftqPpMZh/O70
-	KfU/DwV8l959mx3LcKyoBb7bo7wlmVXJ/GypS87u1Ug/iOqgAEoCY1egmRGUflyuPxdDdE
-	vA+XjF88W4k8EB1uKJneWfMi1AjY1qc=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=kaY3EfeA+k09YWgS+MfGM8qkjlv58srLyvVau/9jXnU=;
+	b=DzLn74dvuR9SXv0dLM+3DF359zb3zRK69RemrXXjuSh0+28EwxbG9tvOE4GEnCgDRVdz8P
+	SbLOjlpJkDt03IOafLHUxYl4wDgIhSI7eN875jUGHJJiGl3+Q/KMImDOXSgf99fJ7KJ8Do
+	tsu9XwqlhrWWB3r/fbadlNaPut/YmsY=
+Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
+ [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-600-vzpY8QQnPy6H62q7XPSglQ-1; Fri, 09 Aug 2024 12:09:38 -0400
-X-MC-Unique: vzpY8QQnPy6H62q7XPSglQ-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6b7678caf7dso6679376d6.1
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 09:09:38 -0700 (PDT)
+ us-mta-352-ml8DzDuIMm667dfu79W5xA-1; Fri, 09 Aug 2024 12:09:41 -0400
+X-MC-Unique: ml8DzDuIMm667dfu79W5xA-1
+Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-44fea369811so4530231cf.0
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 09:09:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723219778; x=1723824578;
+        d=1e100.net; s=20230601; t=1723219780; x=1723824580;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XgMG3z25w/FU4W74BEAmfGyy8QhkBSj3TNUPa/vYriM=;
-        b=CzJu3KJY671FbG9EDQXhfnaYEjkKVpT0trMelTw/Iwzxfk0loDvPs7zdafHXY/FynC
-         drQWgqtKjuhq2LwOb7d9vpIJCuDdhfKCdg9FUE061JA4SLzgC1QL7IseuoXTQEdaynB/
-         205kEOCTJ937fYI2d2UDtPu8hqWUo24fQ4xHtg+VH7NDGCJMMWGujqurCVrQMhI684d8
-         Cgy+0Z2IFku0qybFgWj+1v/Wm85Xf0UUBdm79Wp4aqDGD1N/868VX+JrAk9C7Y9we0Nr
-         74aTmuwG6DjZKJvsYvdYT/Cci8Dt/hA2MgNaQ3fZwZVamGe89hM6pVYnXkyBKJIDPfoQ
-         83Eg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+ht088hTzdu3ef0SGxLORTGl5UCm1PbKFF6uW4r+aZI+vfvdi28HTlhPoVVX/+7svWdqmY51tzDpRRXc2q/LgI4bj
-X-Gm-Message-State: AOJu0YzBIhKbDfYrA9HgQP2Uy8Ljca1hREs2xWdZ2loj5lF89Mh8iaS2
-	Jc07J4eUy9waE5KbxBCl3a3DoS2gdQQp3rOdN7RJNN9wgJ2vvS4Um6WFCrR1YYWqlV7w6qCH4sD
-	tkEaJt6eLh7WadeiSk6WVKMdbS2sCcCO8fbb+RzkqfWnhFq5WiA==
-X-Received: by 2002:ac8:5dd3:0:b0:447:dfa0:283e with SMTP id d75a77b69052e-4531251fe34mr11225551cf.1.1723219778002;
-        Fri, 09 Aug 2024 09:09:38 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE6MoN+Dd8Hdt5Y2cXuQIqSY6AztxI8VpmGorOFfK4YC2KlFlbKhz5m1DVHT1NSvONycoblfw==
-X-Received: by 2002:ac8:5dd3:0:b0:447:dfa0:283e with SMTP id d75a77b69052e-4531251fe34mr11225161cf.1.1723219777518;
-        Fri, 09 Aug 2024 09:09:37 -0700 (PDT)
+        bh=kaY3EfeA+k09YWgS+MfGM8qkjlv58srLyvVau/9jXnU=;
+        b=Butxo7gH07NpbVfD0J6Ww3y4PZUpXZQxPv5SYWC73PzbVbuJCRrcTCJfsjfA9UMOqN
+         IgLoAU27xbCORv6Gjsn8BVNsIPv+bir29Uz9Mw7MT7PTWbaY98yPTxrJrFSJkgBdv4g9
+         4zZFvX5qH25W9v8AW6u4d1b/6RKeMdDO3wNqXy7tK7MCzNwuzyMYffOegMFerkTtGSnp
+         Fd6Nrppz2WB2oHOpk1bifvlnzOu8UClhohhkqyhk+2OhO7/5eOi0jOJBokfH5NSXDtEu
+         9+GSmBW5+lGiCtlJMAsBzUQdEMuL/6LU51sURHID7+Sk9DAhSyrOy1Ft314T4BmLLoa0
+         rQjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ+kQcBwYTLQwCd4upu0alZIxtvTA93tahDzLTKBWPratCvhKS1U0978dgzpO5ti9/Cwot3a8iurOl4TDUZlowRcRM
+X-Gm-Message-State: AOJu0YzJEQI1yaSP24w+4o6pUmp+3QOoTeveRPE0LFi9L8DBHuQHQ9il
+	JMPHKhdUzYLcfmQacJ17zDvvzqEJT6VTU9x/xEd8NxQacjf08k7Wr+8+ChuK0P/NebF3RvAlUjr
+	RC0PS+lppjb4IXzAOpbIpN07xZiC3um3/d+0fVM2U3LPNY4eQPw==
+X-Received: by 2002:ac8:5912:0:b0:450:efd:723 with SMTP id d75a77b69052e-453125552fbmr13163141cf.4.1723219780554;
+        Fri, 09 Aug 2024 09:09:40 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFtbIkutydCKQHHfrahTRflQkyMYGSh3zYrObmthmw14T659Ni251Xo72HIqIFQZU+hooLp2A==
+X-Received: by 2002:ac8:5912:0:b0:450:efd:723 with SMTP id d75a77b69052e-453125552fbmr13162951cf.4.1723219780083;
+        Fri, 09 Aug 2024 09:09:40 -0700 (PDT)
 Received: from x1n.redhat.com (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-451c870016csm22526741cf.19.2024.08.09.09.09.35
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-451c870016csm22526741cf.19.2024.08.09.09.09.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 09:09:36 -0700 (PDT)
+        Fri, 09 Aug 2024 09:09:39 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: linux-mm@kvack.org,
 	linux-kernel@vger.kernel.org
@@ -97,10 +97,18 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	kvm@vger.kernel.org,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH 10/19] KVM: Use follow_pfnmap API
-Date: Fri,  9 Aug 2024 12:09:00 -0400
-Message-ID: <20240809160909.1023470-11-peterx@redhat.com>
+	Yan Zhao <yan.y.zhao@intel.com>,
+	Niklas Schnelle <schnelle@linux.ibm.com>,
+	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	linux-s390@vger.kernel.org
+Subject: [PATCH 11/19] s390/pci_mmio: Use follow_pfnmap API
+Date: Fri,  9 Aug 2024 12:09:01 -0400
+Message-ID: <20240809160909.1023470-12-peterx@redhat.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240809160909.1023470-1-peterx@redhat.com>
 References: <20240809160909.1023470-1-peterx@redhat.com>
@@ -112,73 +120,103 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Use the new pfnmap API to allow huge MMIO mappings for VMs.  The rest work
-is done perfectly on the other side (host_pfn_mapping_level()).
+Use the new API that can understand huge pfn mappings.
 
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: Sean Christopherson <seanjc@google.com>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>
+Cc: Gerald Schaefer <gerald.schaefer@linux.ibm.com>
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- virt/kvm/kvm_main.c | 19 +++++++------------
- 1 file changed, 7 insertions(+), 12 deletions(-)
+ arch/s390/pci/pci_mmio.c | 22 ++++++++++++----------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
-index d0788d0a72cc..9fb1c527a8e1 100644
---- a/virt/kvm/kvm_main.c
-+++ b/virt/kvm/kvm_main.c
-@@ -2862,13 +2862,11 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
- 			       unsigned long addr, bool write_fault,
- 			       bool *writable, kvm_pfn_t *p_pfn)
+diff --git a/arch/s390/pci/pci_mmio.c b/arch/s390/pci/pci_mmio.c
+index 5398729bfe1b..de5c0b389a3e 100644
+--- a/arch/s390/pci/pci_mmio.c
++++ b/arch/s390/pci/pci_mmio.c
+@@ -118,12 +118,11 @@ static inline int __memcpy_toio_inuser(void __iomem *dst,
+ SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
+ 		const void __user *, user_buffer, size_t, length)
  {
-+	struct follow_pfnmap_args args = { .vma = vma, .address = addr };
- 	kvm_pfn_t pfn;
++	struct follow_pfnmap_args args = { };
+ 	u8 local_buf[64];
+ 	void __iomem *io_addr;
+ 	void *buf;
+ 	struct vm_area_struct *vma;
 -	pte_t *ptep;
--	pte_t pte;
 -	spinlock_t *ptl;
- 	int r;
+ 	long ret;
  
--	r = follow_pte(vma, addr, &ptep, &ptl);
-+	r = follow_pfnmap_start(&args);
- 	if (r) {
- 		/*
- 		 * get_user_pages fails for VM_IO and VM_PFNMAP vmas and does
-@@ -2883,21 +2881,19 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
- 		if (r)
- 			return r;
+ 	if (!zpci_is_enabled())
+@@ -169,11 +168,13 @@ SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
+ 	if (!(vma->vm_flags & VM_WRITE))
+ 		goto out_unlock_mmap;
  
--		r = follow_pte(vma, addr, &ptep, &ptl);
-+		r = follow_pfnmap_start(&args);
- 		if (r)
- 			return r;
- 	}
+-	ret = follow_pte(vma, mmio_addr, &ptep, &ptl);
++	args.address = mmio_addr;
++	args.vma = vma;
++	ret = follow_pfnmap_start(&args);
+ 	if (ret)
+ 		goto out_unlock_mmap;
  
--	pte = ptep_get(ptep);
--
--	if (write_fault && !pte_write(pte)) {
-+	if (write_fault && !args.writable) {
- 		pfn = KVM_PFN_ERR_RO_FAULT;
- 		goto out;
- 	}
+-	io_addr = (void __iomem *)((pte_pfn(*ptep) << PAGE_SHIFT) |
++	io_addr = (void __iomem *)((args.pfn << PAGE_SHIFT) |
+ 			(mmio_addr & ~PAGE_MASK));
  
- 	if (writable)
--		*writable = pte_write(pte);
--	pfn = pte_pfn(pte);
-+		*writable = args.writable;
-+	pfn = args.pfn;
+ 	if ((unsigned long) io_addr < ZPCI_IOMAP_ADDR_BASE)
+@@ -181,7 +182,7 @@ SYSCALL_DEFINE3(s390_pci_mmio_write, unsigned long, mmio_addr,
  
- 	/*
- 	 * Get a reference here because callers of *hva_to_pfn* and
-@@ -2918,9 +2914,8 @@ static int hva_to_pfn_remapped(struct vm_area_struct *vma,
- 	 */
- 	if (!kvm_try_get_pfn(pfn))
- 		r = -EFAULT;
--
- out:
+ 	ret = zpci_memcpy_toio(io_addr, buf, length);
+ out_unlock_pt:
 -	pte_unmap_unlock(ptep, ptl);
 +	follow_pfnmap_end(&args);
- 	*p_pfn = pfn;
+ out_unlock_mmap:
+ 	mmap_read_unlock(current->mm);
+ out_free:
+@@ -260,12 +261,11 @@ static inline int __memcpy_fromio_inuser(void __user *dst,
+ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned long, mmio_addr,
+ 		void __user *, user_buffer, size_t, length)
+ {
++	struct follow_pfnmap_args args = { };
+ 	u8 local_buf[64];
+ 	void __iomem *io_addr;
+ 	void *buf;
+ 	struct vm_area_struct *vma;
+-	pte_t *ptep;
+-	spinlock_t *ptl;
+ 	long ret;
  
- 	return r;
+ 	if (!zpci_is_enabled())
+@@ -308,11 +308,13 @@ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned long, mmio_addr,
+ 	if (!(vma->vm_flags & VM_WRITE))
+ 		goto out_unlock_mmap;
+ 
+-	ret = follow_pte(vma, mmio_addr, &ptep, &ptl);
++	args.vma = vma;
++	args.address = mmio_addr;
++	ret = follow_pfnmap_start(&args);
+ 	if (ret)
+ 		goto out_unlock_mmap;
+ 
+-	io_addr = (void __iomem *)((pte_pfn(*ptep) << PAGE_SHIFT) |
++	io_addr = (void __iomem *)((args.pfn << PAGE_SHIFT) |
+ 			(mmio_addr & ~PAGE_MASK));
+ 
+ 	if ((unsigned long) io_addr < ZPCI_IOMAP_ADDR_BASE) {
+@@ -322,7 +324,7 @@ SYSCALL_DEFINE3(s390_pci_mmio_read, unsigned long, mmio_addr,
+ 	ret = zpci_memcpy_fromio(buf, io_addr, length);
+ 
+ out_unlock_pt:
+-	pte_unmap_unlock(ptep, ptl);
++	follow_pfnmap_end(&args);
+ out_unlock_mmap:
+ 	mmap_read_unlock(current->mm);
+ 
 -- 
 2.45.0
 
