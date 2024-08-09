@@ -1,218 +1,182 @@
-Return-Path: <kvm+bounces-23684-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23685-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005FA94CC5F
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 10:36:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6170C94CCDF
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 11:04:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CDE3B24F20
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 08:36:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F11CBB20F6E
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 09:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A68918FDD0;
-	Fri,  9 Aug 2024 08:36:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EBB218FDC9;
+	Fri,  9 Aug 2024 09:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q7Jaxm49"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DdND/p2k"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4868118E05C
-	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 08:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FC87BA41
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 09:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723192565; cv=none; b=qBjS9t/PO/jOtB/WnZMwhIHrGKpoaRm4iJvDtOhwfpi2YgnN3k6AfFY3iND/53Qoozd6n0tUyocVENif+S8hp6ltB8ZnBkZu4Wk/dnCxRIW+SRrQFter26++xMwsD6wIYQYbMPzJgmfDdFlTAK0W9QXaL2YvjWXqiE81UbY7Dtc=
+	t=1723194249; cv=none; b=AgxNYPt0T7QKNc8OjR9NLmYTZBtVysfhdR9TWr9AKqdZGhH5TTnp9IiFqe3xp/MHzoi/UWWxquPBKNfttwf4/2hcyBuIGANMzhM/o6Wn4GV+DZDeI+0lnggL0y3gJxh2F1L+zzFbKWQRY2MLkVuSsvEC6dbcqX2LJIustWvm9YI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723192565; c=relaxed/simple;
-	bh=Ny5F9426Jn13U9Y6S4ojrazmy84wbDgbVFRfNFm4xeg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LhkglLj4P2IWJmw4+xnhyKcqUHGd6FQp0pa/SBY0u2o4DyKbZT3+I+8ohAWgm6qyMJNnc746T2pHGR6dG7bfD4Q7tuhv02pJ8UjPYQzGjmDqwKIii6I3WeU34OYtptqmGcuTkTPKKofMko/k9LnHd5pd+mAaLll+9OrOVNOwzLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q7Jaxm49; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4257d5fc9b7so17366525e9.2
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 01:36:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1723192562; x=1723797362; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RmPnqqIvpdZM4vhUuidGITgg4c+/KkmwE6KbcUE8uOE=;
-        b=q7Jaxm49XpbiB2rEWvhAKQrMBeVnikCtqc+zljwGI6KfKLkCVeg3NWHaPose2SK5SJ
-         JqUqJphshgy3a3e0WxczkI+EpZMz6q0l44UFoRS39iXRoeNeNDSm+5bGJVJ1i6mkxS+I
-         vHx1v98eXXjqqC0t2Y2hwKDpvl4i8fW87Ac959maknXmElq2WttdIp89jXdOzPXuha3S
-         gHwp3xH5t1OiszYx+b3AFOYGoFD0A8pJd3ZLlgyElI4gY9EXXLzUyKSLPhyOJTy4ic4T
-         PdjTsHSYnaE2JQwYnWYWJ+y4y+7fW5AVk21ZsJEXeK9AekCy7kpMx4Wzsk/occz3TRwh
-         wQWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723192562; x=1723797362;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RmPnqqIvpdZM4vhUuidGITgg4c+/KkmwE6KbcUE8uOE=;
-        b=XxX+oSUBE8ESN7P5rVZb7HVuBKEtdYY0xUPCXOQyrNZtDdhpIvKhd/afPhPXd+Bki1
-         UdFMs0yhKS+yrpveaucWOxxmywPaAO8QRk2OK9ZQmj0XhuOduQDdve+AGW1m7Ron04yt
-         jFANsTauA5FAdz0nT+fFnqBunLS9Z916dVZWhUECr2/uqXmdy/lK7Jh2EFwZMZe/zBGF
-         8nq+AiDxWsc1zmX+NaAUuo3RlkrPFyRVKXE3vAB0ZdMeKrh1GtK+kkvJUYBtMD+AqyyW
-         P/hiUUWY2yidMZw/fLzi9E4bxN7iS0dqidp6r3SyCS0zNWHeYt60TPpNYBxfPXzko5Ea
-         8EMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUvc89orH6Csp6sBp5urkB8u2cC0nq7Rqp2RlgiZ6GV0AmbJ9ePHDM5uwhmtNH9RLOdUPJpLiJ9KJGzHQ4N11k9/qR7
-X-Gm-Message-State: AOJu0Yy3Iwb7ylJKtzTqy0R47nzqaKk+zRXP6j3VB1jhc12c9ujEKYzC
-	Ua6YLd0NXxbtf1BiLcO5lkAu+t1SsFvGN2H7NZCN9eaP4R0w3RyOV+M0+auy00o=
-X-Google-Smtp-Source: AGHT+IEa3cisiuaD0zuqPELtHiYuT/1QmPpy3KQHu8b3fcyhdByakMcRk0FZJDOOY6bwpRsFOFsvvg==
-X-Received: by 2002:a05:600c:a48:b0:428:fcb:962 with SMTP id 5b1f17b1804b1-429c3a5c30fmr6542285e9.36.1723192561442;
-        Fri, 09 Aug 2024 01:36:01 -0700 (PDT)
-Received: from [192.168.178.175] (41.red-95-127-42.staticip.rima-tde.net. [95.127.42.41])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429059714d5sm117810195e9.13.2024.08.09.01.35.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Aug 2024 01:36:01 -0700 (PDT)
-Message-ID: <8913b8c7-4103-4f69-8567-afdc29f8d0d3@linaro.org>
-Date: Fri, 9 Aug 2024 10:35:57 +0200
+	s=arc-20240116; t=1723194249; c=relaxed/simple;
+	bh=1lYBxYmj0yP3L5nl4vsLslkpwynKSXWgXkQxvcQasvg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=d+HxLeSgGuPw1GtwWc3gKWfDR5XqKHeJM28H9eib5Lox52VVEUxoOueNeus9c0sKtywn7wiNX+84UW6xys5v/lvOwrVo2vKlex4qLFiHI2yZYg1SyykzKNclFm61h1RIDOUv0zaIDLM96ALSU/MAQnlSeIl4MUp6n1Q+y0v1h+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DdND/p2k; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723194246;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XET1oSFvQl4264GUGqTzYsP7+4ofJLFq0ARdUYsJBcI=;
+	b=DdND/p2khwVJ+jHP4mTphFpBNzhnzaqsFSil98yb79y8lYaYc3ZXEPpGNaM3lmFNo6f+Td
+	6OstYnAzOYuyDhYlWGYYckIostJE3awUUKzYxiLcUHTl4zPEQEEuyw3F1gq21qouhaBu6K
+	/g0cSiGwDOyXrJelO8oRVaQALEttCKc=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-266-kkpEvW6XP1K4uU7bnbTbkg-1; Fri,
+ 09 Aug 2024 05:04:04 -0400
+X-MC-Unique: kkpEvW6XP1K4uU7bnbTbkg-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 842DF19772EE;
+	Fri,  9 Aug 2024 09:03:56 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.193.245])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 21FCD300019F;
+	Fri,  9 Aug 2024 09:03:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id D3A9F21E668B; Fri,  9 Aug 2024 11:03:44 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Kevin Wolf <kwolf@redhat.com>
+Cc: qemu-devel@nongnu.org,  alex.williamson@redhat.com,
+  andrew@codeconstruct.com.au,  andrew@daynix.com,
+  arei.gonglei@huawei.com,  berrange@redhat.com,  berto@igalia.com,
+  borntraeger@linux.ibm.com,  clg@kaod.org,  david@redhat.com,
+  den@openvz.org,  eblake@redhat.com,  eduardo@habkost.net,
+  farman@linux.ibm.com,  farosas@suse.de,  hreitz@redhat.com,
+  idryomov@gmail.com,  iii@linux.ibm.com,  jamin_lin@aspeedtech.com,
+  jasowang@redhat.com,  joel@jms.id.au,  jsnow@redhat.com,
+  leetroy@gmail.com,  marcandre.lureau@redhat.com,
+  marcel.apfelbaum@gmail.com,  michael.roth@amd.com,  mst@redhat.com,
+  mtosatti@redhat.com,  nsg@linux.ibm.com,  pasic@linux.ibm.com,
+  pbonzini@redhat.com,  peter.maydell@linaro.org,  peterx@redhat.com,
+  philmd@linaro.org,  pizhenwei@bytedance.com,  pl@dlhnet.de,
+  richard.henderson@linaro.org,  stefanha@redhat.com,
+  steven_lee@aspeedtech.com,  thuth@redhat.com,  vsementsov@yandex-team.ru,
+  wangyanan55@huawei.com,  yuri.benditovich@daynix.com,
+  zhao1.liu@intel.com,  qemu-block@nongnu.org,  qemu-arm@nongnu.org,
+  qemu-s390x@nongnu.org,  kvm@vger.kernel.org
+Subject: Re: [PATCH 01/18] qapi: Smarter camel_to_upper() to reduce need for
+ 'prefix'
+In-Reply-To: <ZqoHWPOeqF7uGncx@redhat.com> (Kevin Wolf's message of "Wed, 31
+	Jul 2024 11:43:52 +0200")
+References: <20240730081032.1246748-1-armbru@redhat.com>
+	<20240730081032.1246748-2-armbru@redhat.com>
+	<ZqoHWPOeqF7uGncx@redhat.com>
+Date: Fri, 09 Aug 2024 11:03:44 +0200
+Message-ID: <87y156kqz3.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3] kvm: replace fprintf with error_report/printf() in
- kvm_init()
-To: Ani Sinha <anisinha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: qemu-trivial@nongnu.org, zhao1.liu@intel.com, kvm@vger.kernel.org,
- qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
-References: <20240809064940.1788169-1-anisinha@redhat.com>
-Content-Language: en-US
-From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
-In-Reply-To: <20240809064940.1788169-1-anisinha@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-Hi Ani,
+Kevin Wolf <kwolf@redhat.com> writes:
 
-On 9/8/24 08:49, Ani Sinha wrote:
-> error_report() is more appropriate for error situations. Replace fprintf with
-> error_report. Cosmetic. No functional change.
-> 
-> CC: qemu-trivial@nongnu.org
-> CC: zhao1.liu@intel.com
+> Am 30.07.2024 um 10:10 hat Markus Armbruster geschrieben:
+>> camel_to_upper() converts its argument from camel case to upper case
+>> with '_' between words.  Used for generated enumeration constant
+>> prefixes.
+>> 
+>> When some of the words are spelled all caps, where exactly to insert
+>> '_' is guesswork.  camel_to_upper()'s guesses are bad enough in places
+>> to make people override them with a 'prefix' in the schema.
+>> 
+>> Rewrite it to guess better:
+>> 
+>> 1. Insert '_' after a non-upper case character followed by an upper
+>>    case character:
+>> 
+>>        OneTwo -> ONE_TWO
+>>        One2Three -> ONE2_THREE
+>> 
+>> 2. Insert '_' before the last upper case character followed by a
+>>    non-upper case character:
+>> 
+>>        ACRONYMWord -> ACRONYM_Word
+>> 
+>>    Except at the beginning (as in OneTwo above), or when there is
+>>    already one:
+>> 
+>>        AbCd -> AB_CD
+>
+> Maybe it's just me, but the exception "at the beginning" (in the sense
+> of "after the first character") seems to be exactly where I thought
+> "that looks strange" while going through your list below.
 
-(Pointless to carry Cc line when patch is already reviewed next line)
+By "except at the beginning", I mean don't map "One" to "_ONE".
 
-> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-> Signed-off-by: Ani Sinha <anisinha@redhat.com>
-> ---
->   accel/kvm/kvm-all.c | 40 ++++++++++++++++++----------------------
->   1 file changed, 18 insertions(+), 22 deletions(-)
-> 
-> changelog:
-> v2: fix a bug.
-> v3: replace one instance of error_report() with error_printf(). added tags.
-> 
-> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> index 75d11a07b2..5bc9d35b61 100644
-> --- a/accel/kvm/kvm-all.c
-> +++ b/accel/kvm/kvm-all.c
-> @@ -2427,7 +2427,7 @@ static int kvm_init(MachineState *ms)
->       QLIST_INIT(&s->kvm_parked_vcpus);
->       s->fd = qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
->       if (s->fd == -1) {
-> -        fprintf(stderr, "Could not access KVM kernel module: %m\n");
-> +        error_report("Could not access KVM kernel module: %m");
->           ret = -errno;
->           goto err;
->       }
-> @@ -2437,13 +2437,13 @@ static int kvm_init(MachineState *ms)
->           if (ret >= 0) {
->               ret = -EINVAL;
->           }
-> -        fprintf(stderr, "kvm version too old\n");
-> +        error_report("kvm version too old");
->           goto err;
->       }
->   
->       if (ret > KVM_API_VERSION) {
->           ret = -EINVAL;
-> -        fprintf(stderr, "kvm version not supported\n");
-> +        error_report("kvm version not supported");
->           goto err;
->       }
->   
-> @@ -2488,26 +2488,22 @@ static int kvm_init(MachineState *ms)
->       } while (ret == -EINTR);
->   
->       if (ret < 0) {
-> -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
-> -                strerror(-ret));
-> +        error_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
-> +                    strerror(-ret));
->   
->   #ifdef TARGET_S390X
->           if (ret == -EINVAL) {
-> -            fprintf(stderr,
-> -                    "Host kernel setup problem detected. Please verify:\n");
-> -            fprintf(stderr, "- for kernels supporting the switch_amode or"
-> -                    " user_mode parameters, whether\n");
-> -            fprintf(stderr,
-> -                    "  user space is running in primary address space\n");
-> -            fprintf(stderr,
-> -                    "- for kernels supporting the vm.allocate_pgste sysctl, "
-> -                    "whether it is enabled\n");
-> +            error_report("Host kernel setup problem detected.
+>                                                           In particular,
+> I'd expect X_DBG_* instead of XDBG_*.
 
-\n"
+What's the intent of the X in the XDbgFOO types?  Signify unstable?
 
-Should we use error_printf_unless_qmp() for the following?
+If yes: we don't do that elsewhere.  Type names are not part of the
+external interface.  We never used an X prefix for names of unstable
+types.  We use an x- prefix for names of unstable commands, arguments
+and members, but even that is optional today.  Feature flag @unstable is
+the source of truth.
 
-" Please verify:");
-> +            error_report("- for kernels supporting the switch_amode or"
-> +                        " user_mode parameters, whether");
-> +            error_report("  user space is running in primary address space");
-> +            error_report("- for kernels supporting the vm.allocate_pgste "
-> +                        "sysctl, whether it is enabled");
->           }
->   #elif defined(TARGET_PPC)
->           if (ret == -EINVAL) {
-> -            fprintf(stderr,
-> -                    "PPC KVM module is not loaded.
+The XDbgFOO appear to be used just by x-debug-query-block-graph, which
+has feature @unstable.
 
-\n"
+If the XDBG name bothers you, we can strip the X prefix from the type
+names.  Happy to do that in this series.
 
-Ditto.
+>                                       I also thought that the Q_*
+> spelling made more sense, though this might be less clear.
 
-" Try modprobe kvm_%s.\n",
-> -                    (type == 2) ? "pr" : "hv");
-> +            error_report("PPC KVM module is not loaded. Try modprobe kvm_%s.",
-> +                        (type == 2) ? "pr" : "hv");
->           }
->   #endif
->           goto err;
-> @@ -2526,9 +2522,9 @@ static int kvm_init(MachineState *ms)
->                           nc->name, nc->num, soft_vcpus_limit);
->   
->               if (nc->num > hard_vcpus_limit) {
-> -                fprintf(stderr, "Number of %s cpus requested (%d) exceeds "
-> -                        "the maximum cpus supported by KVM (%d)\n",
-> -                        nc->name, nc->num, hard_vcpus_limit);
-> +                error_report("Number of %s cpus requested (%d) exceeds "
-> +                             "the maximum cpus supported by KVM (%d)",
-> +                             nc->name, nc->num, hard_vcpus_limit);
->                   exit(1);
->               }
->           }
-> @@ -2542,8 +2538,8 @@ static int kvm_init(MachineState *ms)
->       }
->       if (missing_cap) {
->           ret = -EINVAL;
-> -        fprintf(stderr, "kvm does not support %s\n%s",
-> -                missing_cap->name, upgrade_note);
-> +        error_printf("kvm does not support %s\n%s",
-> +                     missing_cap->name, upgrade_note);
+The crypto subsystem spells its prefix qcrypto_, QCRYPTO_, and QCrypto.
+Before this series, it forces QAPI to generate QCRYPTO_ with 'prefix'
+with two exceptions, probably oversights.
 
-Similarly, should we print upgrade_note using error_printf_unless_qmp?
+>                                                            But in case
+> of doubt, less exceptions seems like a good choice.
 
->           goto err;
->       }
->   
+Agree.  I want to be able to predict generated names :)
+
+>> +    # Copy remainder of ``value`` to ``ret`` with '_' inserted
+>> +    for ch in value[1:]:
+>> +        if ch.isupper() == upc:
+>> +            pass
+>> +        elif upc:
+>> +            # ``ret`` ends in upper case, next char isn't: insert '_'
+>> +            # before the last upper case char unless there is one
+>> +            # already, or it's at the beginning
+>> +            if len(ret) > 2 and ret[-2] != '_':
+>> +                ret = ret[:-1] + '_' + ret[-1]
+>
+> I think in the code this means I would have expected len(ret) >= 2.
+
+I'm not sure I understand what you mean.
+
+With len(ret) > 2, we map "QType" to "QTYPE".
+
+With len(ret) >= 2, we'd map it to "Q_TYPE".
 
 
