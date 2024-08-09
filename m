@@ -1,261 +1,318 @@
-Return-Path: <kvm+bounces-23742-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23743-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 408DB94D5EF
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 20:00:19 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F2694D5F5
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 20:03:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACF291F225FD
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 18:00:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF4F11F227F9
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 18:03:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 816DF7E76D;
-	Fri,  9 Aug 2024 18:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D5A1CA94;
+	Fri,  9 Aug 2024 18:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ch4+HOjI"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oXD9YIBd"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2046.outbound.protection.outlook.com [40.107.223.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CB774413
-	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 18:00:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723226406; cv=none; b=g0136QzEP5hc1DAbgF+c/H8gG0dDTfsYyLrQxP8tGGnqB0svcmA7Urxcf76KtXS6CcSXWzBcXuEGnRhzfzYMWGa3GX8puSOMVmK1CAFPeYiGEwnZy2W3M6tRbh7MehmqFxIoM1JjLstwo+DW0UVF08ajbArxlgbfFSS0h1/GjQY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723226406; c=relaxed/simple;
-	bh=oCvuE7ykKSdNrjtp0MSGG2YO7SOy0k+4f6Y0lgKnYqc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=J5N/Q9RrHGJw/5322+oXqnm4mRxq8Tm6gfvqrdC/mD26jKQbnTVi4V5nw0qwR0zXPkS8kQDfwzC/wPXBTVk/h/WxQ9W/+23MnOvYmWnlMQWTMZFuo3IaXiTif9MN7L5fDiL2UmAcGxU3XilXgNXbLCVqyZdDKXJkRFKE582TKAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ch4+HOjI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723226403;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=DX4RN1Et8eu8M9wJHr8iJWlu/fe0EnkKpPUfaVGTg7I=;
-	b=ch4+HOjIa8/2VprH4wnL51Hu7E4oVy9vP36HCQbE14AFPdSrjcOP33ZfCoGs78pzZKpf/B
-	3Gh8RSTwtUiCufiiiAkCOBR0xSxt/b4+S3qdzi23HkkwXcQ5xDxUUCu1txRz1nF5ZG7dHF
-	oDl/sBrRxhT5LFJhCgJxVCp/6eieqf4=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-apeDtj5uPVa7ZNODsxvEYA-1; Fri, 09 Aug 2024 14:00:02 -0400
-X-MC-Unique: apeDtj5uPVa7ZNODsxvEYA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280a39ecebso16320065e9.0
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 11:00:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723226401; x=1723831201;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt
-         :content-language:from:references:cc:to:subject:user-agent
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=DX4RN1Et8eu8M9wJHr8iJWlu/fe0EnkKpPUfaVGTg7I=;
-        b=gm1DuIlUl3kAZ22wzfS2OEc5UQwAVSpDJBTA7zo1zGxOjfHzc3W9Tux1D9rCx1Cr0x
-         ha59gojA2Nan2zG0ZEtvFj1Zm+4Jo7RpjlWq/NJOxq11w08tQ09g8ZQhBKpTFfYz1s82
-         vgbwG5ztxwfhASlXXQwq4lrHB0sFnr4AgWYyyimj9xqCWTwqmc6bqODAU0y6VzuBjiuP
-         t5euLHomSLhrQ2GSlGC8EOIr7bMK8aJuuM6mWBj7CZSj2gsdr2VRJAH988ftkl7G8pEQ
-         25Qsei1Dv6ITJwM0PStZt7XW5MNH3prA1rMIcoFocnqj6guY7HBbqXiezNF63+ftxcPs
-         vRsA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNXE81mP4yXyXsJ5J09wGEHsnNwVd9maMAGO4RzgHM+ngbpQBaoo/PJAgf7ZQZO7lb3Do=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvNBmXAXmNJdsuD3OaufUfkMZgEX9uxLCXuatbXaI2jPSjzoFl
-	ShUQpQBIA4r0+rlQAR7Y/8OImLAlAXwsrlrfiEpvKDUj7kg8gBbjRmn3v0vyW++/CV+M2XKSgV8
-	pTvJWw7Y5HgOIJkmgPyizAkJdyIgc60NKeSKshh2fQXcpwdc45fiJ780VxscM
-X-Received: by 2002:a05:600c:1d92:b0:426:5e32:4857 with SMTP id 5b1f17b1804b1-429c3a56054mr21757185e9.0.1723226401450;
-        Fri, 09 Aug 2024 11:00:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IECbfH0ejIYTjOVYWYYJA8AiDUjGL07T0f+A833d33g0qdGRZHggLq4pZxtx0Xz/M05a/t+Ow==
-X-Received: by 2002:a05:600c:1d92:b0:426:5e32:4857 with SMTP id 5b1f17b1804b1-429c3a56054mr21756905e9.0.1723226400905;
-        Fri, 09 Aug 2024 11:00:00 -0700 (PDT)
-Received: from ?IPV6:2003:d8:2f09:3f00:d228:bd67:7baa:d604? (p200300d82f093f00d228bd677baad604.dip0.t-ipconnect.de. [2003:d8:2f09:3f00:d228:bd67:7baa:d604])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429c74ffb1esm1582035e9.5.2024.08.09.10.59.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Aug 2024 11:00:00 -0700 (PDT)
-Message-ID: <8ef394e6-a964-41c4-b33c-0e940b6b9bd8@redhat.com>
-Date: Fri, 9 Aug 2024 19:59:58 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7D523DE;
+	Fri,  9 Aug 2024 18:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723226602; cv=fail; b=Xmi9pQxaLDGirmCtGr0JYbd47DYu9weCbC9jouWijEqxLQi3xKf+fvLSSCMJBVlMULxk0/Trcbo7la9H74MPwOSv8i9P/I1OAH2rm489+iGWIwreQNa+b54j2S1u/U0DYiAKH31EMKuXBBrMll7iLkeEYZG/sGcCSVKSgWbVTNA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723226602; c=relaxed/simple;
+	bh=BQABcOpJdiB6lr2JxuX9mcH7gnMOC4E6BdFeHL514Ds=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=sYRH5gVGEW4Z23hLltkAQMzBEOpTZnoPQ/C/gfp9enJ9nW7du+r860xPN82caAOhty+LtxNw4heuvqsTU8LlA9UZcNHtAV8oUxKtIGhmHPv8PaceFfVmIlvTMDFTIX3xB6sV6whNEVgrjhmSsvakFG8CDs7/nn6yCnjxPPHKO08=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oXD9YIBd; arc=fail smtp.client-ip=40.107.223.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QnjMX/C5109VUPLZhI9iLgpyM7iQCTv/9QDV5B2mc+Cg5hFFSWBUsdH5mjFQlOb8hPLFpe86oyuDWANA5T1uWXwHy9Fs+PcHxPbDpZNjHPlSaP+UpnjNHliPqboolLiHKJFPH2gZYQydN9WLrw11qgBPPgTkVNrjdwFTv0+9zgt5zYEWX9Oat1tfEoiXTB83NFUFRczDl05w7sfppDITSvjWsPXp/SVQhrnE8xdiE9zkNCxBGuwvos7bTo1vmTgUg+HjRt8ZxyGJQSZJzDcnuScsPR7sH+zAcJnLU7sfemE0NukLGKgCzl+CiCypgsl2R+AD7feVo1JpQ4ilfU5DZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=xuiQPMlB+Dwf/qhC9VxlPCsKgu/tsCcohJeYPkxvFt0=;
+ b=x5yhYLDScRoTO+kSxxchCrhbJQcCA4vWM6L+Aelwj2jkQwFCExe8Ihgicge9J4eK/8ARje6aCe6/Tb9TzguRC8rAXiKNh2/LnKspcQ1G47073qiryXqjDUC6UC6F1E61V8JXL0axTjedIPsOjFoA5PQNbrTF8w/W4zFnirWgPsQ2Ui9KyLT+mKehlX3t/d2T1M3Gg6MZLIb69K5vDAW2l9Fn/SvnJ4ywrUregkDy5/GB4qET59pOtPvX10LAYbxapxmMpz0Vzs7zoE7zlzugn/nDKta6C8C1YAZrsO3n7OaGl9BcBBUg9DZ4NO+D2tTF6PRBUxnxMryOh4ptfky1/Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=xuiQPMlB+Dwf/qhC9VxlPCsKgu/tsCcohJeYPkxvFt0=;
+ b=oXD9YIBdzsqrg++ml5dT+PlZYhJr4JZ9A5nzBtY20D2NLaO1nSS3yfkX2h4xSLJD2zzQorIH8hfqX7f9UIGkzDRseh40wdzc7bC4kq6yXFdvfYVxoGesELSoXvY+gmihUc+CZfFizC87hc+J0XO6QwOHGNVCz6JJ3QP3axV4TGU2n+rTXoJLOy/0LIt57V+c++4n1SRjV9jnNypLaa4owqpEkxQe7CUYxHkPahJGtYZZVfCTB7uO4WeL7O4HiA8zjnIYoPPGXgZfePu6eB5kPrO84btUEWDfFKo5rjhktaRLbEGYhUZAloHn96hN19Ju1Xk8+cA3u4rzFrqoUA4FKg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
+ by LV2PR12MB5800.namprd12.prod.outlook.com (2603:10b6:408:178::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.13; Fri, 9 Aug
+ 2024 18:03:11 +0000
+Received: from CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
+ ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7849.014; Fri, 9 Aug 2024
+ 18:03:11 +0000
+Date: Fri, 9 Aug 2024 15:03:08 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: Robin Murphy <robin.murphy@arm.com>
+Cc: acpica-devel@lists.linux.dev,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Hanjun Guo <guohanjun@huawei.com>, iommu@lists.linux.dev,
+	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
+	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
+	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Robert Moore <robert.moore@intel.com>,
+	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
+	Eric Auger <eric.auger@redhat.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	Moritz Fischer <mdf@kernel.org>,
+	Michael Shavit <mshavit@google.com>,
+	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
+	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
+Subject: Re: [PATCH 7/8] iommu/arm-smmu-v3: Support IOMMU_DOMAIN_NESTED
+Message-ID: <20240809180308.GK8378@nvidia.com>
+References: <7-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
+ <506de4bc-8beb-4cd3-be2b-86de004d6129@arm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <506de4bc-8beb-4cd3-be2b-86de004d6129@arm.com>
+X-ClientProxiedBy: MN0P220CA0021.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:208:52e::11) To CH3PR12MB7763.namprd12.prod.outlook.com
+ (2603:10b6:610:145::10)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 07/19] mm/fork: Accept huge pfnmap entries
-To: Peter Xu <peterx@redhat.com>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
- Sean Christopherson <seanjc@google.com>, Oscar Salvador <osalvador@suse.de>,
- Jason Gunthorpe <jgg@nvidia.com>, Axel Rasmussen <axelrasmussen@google.com>,
- linux-arm-kernel@lists.infradead.org, x86@kernel.org,
- Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
- Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
- Andrew Morton <akpm@linux-foundation.org>,
- Catalin Marinas <catalin.marinas@arm.com>, Ingo Molnar <mingo@redhat.com>,
- Alistair Popple <apopple@nvidia.com>, Borislav Petkov <bp@alien8.de>,
- Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
- Dave Hansen <dave.hansen@linux.intel.com>,
- Alex Williamson <alex.williamson@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>
-References: <20240809160909.1023470-1-peterx@redhat.com>
- <20240809160909.1023470-8-peterx@redhat.com>
- <d7fcec73-16f6-4d54-b334-6450a29e0a1d@redhat.com> <ZrZOqbS3bcj52JZP@x1n>
-From: David Hildenbrand <david@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=david@redhat.com; keydata=
- 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
- WNyWQQ==
-Organization: Red Hat
-In-Reply-To: <ZrZOqbS3bcj52JZP@x1n>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|LV2PR12MB5800:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3c4567d9-ad91-40f2-3704-08dcb89d87f9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?G0itM+vqy37L39l3o1xh272KXO8/tIpHb8JM3PNuXJEULc+TEa4LajsKNr1g?=
+ =?us-ascii?Q?PQ2BJIaYfE/qoF8X43/OxiAcscKX8hB6J1p03eoTpKG2BIEi0gx2BzPVudjX?=
+ =?us-ascii?Q?KwGXi4W5tDPVyBzj25PEiVeXHU/HBA7iCN/qHwu2W6y83TDRMSmu1ONuuZtc?=
+ =?us-ascii?Q?ElpJChCMe8lF7cD6756ugRkOvkpUVO01OhxfjJ6zZuzTC+gBcKQBzvonuQuB?=
+ =?us-ascii?Q?OWWW/XH3cBZefVglf/4uHqeEO3tkGndUeSq0z0EUMI3Dr4sV4LA6xSO0iCjr?=
+ =?us-ascii?Q?qYWzquN03VD/xoBBwLdBvrkCFTFPyYLv+CNkw7M9Ayb3NUlsYiVsp6C7ZGTA?=
+ =?us-ascii?Q?rDEblE0GvlmjVVVnO1+DAhVFgGWoAbXqOOLsk8j9RJQ7PNkSWb3/eq52JY67?=
+ =?us-ascii?Q?OYwmBBYG0ZT4SFdBpsiPNe6OO7nSrIOIobM9x5Uju6EhE6tfNRre6mLISl2e?=
+ =?us-ascii?Q?ys4HZACoxigc+WnZZAW/IkYWVCOsphwmG44JoHVnrgYAZsE/++o2RHWiqk3T?=
+ =?us-ascii?Q?5eE9e4OtnOBHKqm8//YC3ewRl3GLZiV3Q084I897ZNxlJ/HNwomK3id2KsxY?=
+ =?us-ascii?Q?KrYQCDlZphoqwYjkks6+EbjG1oW/SiRzCSUyIcLc2jwafeUwSHTk44BYMEWh?=
+ =?us-ascii?Q?L/ixeixzWW+Tje7qV2qpCxhUA/M5J45jJOv0C90/Sfbb/qzbc4+59WZQmgP9?=
+ =?us-ascii?Q?DZ2wvX4n1ny3oXdf6Vulyj8fhUNVfX6r15USkUovOqZxb/xpu1KC3RL0LPm5?=
+ =?us-ascii?Q?Tv+3HBRPTnnTBsATAeTW4ORxNsUvWmp9Ge5rPlQDXRE4eFwWzdUyLmLFbeTh?=
+ =?us-ascii?Q?pxxgCEUI/MUPmjCwjDcHQOvj2qVj4v/BC0nHjZcrw9uzwqguywP/We+LCIsI?=
+ =?us-ascii?Q?iQIMMP//m0nPj4wpQ4nwk+3vbUiOrxY3krCpEiwOPrnHR3D3Qp9HkO6ezPsd?=
+ =?us-ascii?Q?NY88MIApSV1D/bZRr1T071EIyzgzVwjMlg77uMcK++OPVtKn64UcEJHYLASF?=
+ =?us-ascii?Q?u0uDWungROssnjAfjJzbrfOA6tHJhPpkebv3Vnni7vp4cXdQKeHHeGKLqLnh?=
+ =?us-ascii?Q?z1u1VCPLFz+dQrZIPk63KMFp8YQTrm3rinVy9TRoUwIsssLV7nair8Zhxxei?=
+ =?us-ascii?Q?xDFIkVH+TyxeqO9+5BmeuA8jW4gsjSQyYo235KImgmf2oq9PXQToAoZxqXOM?=
+ =?us-ascii?Q?+8fpY3LOWjtl9NHpZC1ls9S/nnlaqTDJ1Aqx95LUV9rfams6x3C+uDs/s35+?=
+ =?us-ascii?Q?DM3YnBvCsTG2jj9LYQc4q0NtDqycQA3r9SJNE7doinvLVaAbtTXq9U0PblHK?=
+ =?us-ascii?Q?K7SOVYiy6JoT1IRC/KoOWhOn0dcznupCaspcM4fwSa94JA=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?qvGJghG5n3ZF3YaDp68apn8QsRca8+SJOoRpHiHpcbuwTQl/muzTWORqPB70?=
+ =?us-ascii?Q?KWHRoTa+ykJBpm3rTGkEXOlneWKfZhUg5EDlv0WoDHkmIHE99EKyvkH/hTXu?=
+ =?us-ascii?Q?tv0HU0V8SAtv3/4CQW3LQ810Wsekwa5H0s6VolRIqD0dTFhvuzbCutOwb5RF?=
+ =?us-ascii?Q?6OpTQDlXBzYF9ivWGmQ7L2VVmm1gt/WAoBJEz+SO8T7ALD/CXXOOq67wOfQz?=
+ =?us-ascii?Q?0OQ3dz19s8oBP7jNnh8snUH/e4/zaw9aodtITuj+4nGsfgl/t05cG4GnKmPM?=
+ =?us-ascii?Q?DEkpYGedgMzZQQa2ksb6es3rtH68VHWNeVII5tOZHBhmc45oOr47SwAW+T39?=
+ =?us-ascii?Q?QXw/h+V/ffV+jU4viggP/cpCHEI7paQ9d9sjxqeGPh4XBbUdFCGEomqJSB4q?=
+ =?us-ascii?Q?0O3wQJFQ3lYfhn7+WtB6ez6/CWDcchS02GQf1Sh0s9M9CyfJ/1ZEFN9ztzoP?=
+ =?us-ascii?Q?pyWhU1FHs+TSq4fy8EjBJGFAE/B+QkD8D1m50wnAXQd2hOAoNxqzGr2PoEKn?=
+ =?us-ascii?Q?cTEzlPKKNc2Wi/ndRMR4WW/Uy2KMJ1l9Cyyj9MCXaAZwgjIMcnPFFwhzM7JL?=
+ =?us-ascii?Q?j0jV8bvzO+D7fU3BHtL974L691d8ULpKjaOhcuN4v9s3uMx41OXzHC9mrGir?=
+ =?us-ascii?Q?4aADecZJP4dUi1bv9lChTCy0Gwyc7muAr4KeWn/EU56nEjZ/XDHME6hp+hnX?=
+ =?us-ascii?Q?WkiqLrxJKw7wEBnjWt3aldMOVzbgW1OVt0WAog6n0ulb+N9s6cXbR5IGCFCI?=
+ =?us-ascii?Q?ln+GFBH+bES2FkS35W8wj/LflNl7TEd43/ipO9fwQuRXngw4ocVsEcMXnyxc?=
+ =?us-ascii?Q?8uBLBPIdGLbb4dy4BFSyYuVvsWlDSEymbHsr4JEhNNvbRx1jP/rCOrRKTp/i?=
+ =?us-ascii?Q?QxfmxJpIMK20/4+wGeHNlu/dz/zMu0Yq/FgubrvgkL4YwvlihAeOPnklzdkU?=
+ =?us-ascii?Q?Fdt9pOkkKHXoAfu7JMcoKkTXPro4CjX26LlFaS60L7ZK38HHldRIugHmjU0S?=
+ =?us-ascii?Q?djZv21FpszGrNTzdfs0lEiO62t24764DcXtS0Pz8fS18GMMNyc69iITEdL0E?=
+ =?us-ascii?Q?sITGDBSw9ZxR8EhIre4qKJBeOaAgCtDwN3HRZcm8D4sGiD4519dJ6Tcy8+x+?=
+ =?us-ascii?Q?pbg6ahyZETPRFCXFJdej8VosYfIndpNzgNYm39k14qnYqwY16eIRJqXucbRr?=
+ =?us-ascii?Q?s0cWB5CdmijsXpNG6ehLkP0VCmsxdddz3+4+Ig/uyHDp7n/3Fxz7IrrhxEMA?=
+ =?us-ascii?Q?jSKBsnVoYpW9GeRz2oj/07FoY6U0cIitubALVM0fpCjTnLXXZUKNjDK4qsCP?=
+ =?us-ascii?Q?dg/x4mCHwrem3Fk6AKtVqb/4ZvpDw4hLrZPJi5rs3JysWnfOFd9YKUUIU4vp?=
+ =?us-ascii?Q?wE3A0gC4VzjYCT0iZqUAdZL8S65OMOnNWkC98BAfTCoXDb+Xb8USXCQilx3j?=
+ =?us-ascii?Q?5kGqMJGyuDPB7QWUamnKU0ZreFuH1j4id4SHHtSzFImkpNyn415bUhobMjxB?=
+ =?us-ascii?Q?p8Is3RtqaRrTP1rQQij2LbwmGNdpqay/UZOmVdcVVOAU36ftBTnaFqnbDeBR?=
+ =?us-ascii?Q?YYgantWNzMXYKQYzkPQ=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3c4567d9-ad91-40f2-3704-08dcb89d87f9
+X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2024 18:03:11.2043
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SzmP7necSjc7nXR2pxN54dcVX8qQe0tfl75Hl8fpBBLsFfDOzgnv13ZN5XW8sDK6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV2PR12MB5800
 
-On 09.08.24 19:15, Peter Xu wrote:
-> On Fri, Aug 09, 2024 at 06:32:44PM +0200, David Hildenbrand wrote:
->> On 09.08.24 18:08, Peter Xu wrote:
->>> Teach the fork code to properly copy pfnmaps for pmd/pud levels.  Pud is
->>> much easier, the write bit needs to be persisted though for writable and
->>> shared pud mappings like PFNMAP ones, otherwise a follow up write in either
->>> parent or child process will trigger a write fault.
->>>
->>> Do the same for pmd level.
->>>
->>> Signed-off-by: Peter Xu <peterx@redhat.com>
->>> ---
->>>    mm/huge_memory.c | 27 ++++++++++++++++++++++++---
->>>    1 file changed, 24 insertions(+), 3 deletions(-)
->>>
->>> diff --git a/mm/huge_memory.c b/mm/huge_memory.c
->>> index 6568586b21ab..015c9468eed5 100644
->>> --- a/mm/huge_memory.c
->>> +++ b/mm/huge_memory.c
->>> @@ -1375,6 +1375,22 @@ int copy_huge_pmd(struct mm_struct *dst_mm, struct mm_struct *src_mm,
->>>    	pgtable_t pgtable = NULL;
->>>    	int ret = -ENOMEM;
->>> +	pmd = pmdp_get_lockless(src_pmd);
->>> +	if (unlikely(pmd_special(pmd))) {
->>> +		dst_ptl = pmd_lock(dst_mm, dst_pmd);
->>> +		src_ptl = pmd_lockptr(src_mm, src_pmd);
->>> +		spin_lock_nested(src_ptl, SINGLE_DEPTH_NESTING);
->>> +		/*
->>> +		 * No need to recheck the pmd, it can't change with write
->>> +		 * mmap lock held here.
->>> +		 */
->>> +		if (is_cow_mapping(src_vma->vm_flags) && pmd_write(pmd)) {
->>> +			pmdp_set_wrprotect(src_mm, addr, src_pmd);
->>> +			pmd = pmd_wrprotect(pmd);
->>> +		}
->>> +		goto set_pmd;
->>> +	}
->>> +
->>
->> I strongly assume we should be using using vm_normal_page_pmd() instead of
->> pmd_page() further below. pmd_special() should be mostly limited to GUP-fast
->> and vm_normal_page_pmd().
+On Fri, Aug 09, 2024 at 05:05:36PM +0100, Robin Murphy wrote:
+> > +static void arm_smmu_make_nested_domain_ste(
+> > +	struct arm_smmu_ste *target, struct arm_smmu_master *master,
+> > +	struct arm_smmu_nested_domain *nested_domain, bool ats_enabled)
+> > +{
+> > +	/*
+> > +	 * Userspace can request a non-valid STE through the nesting interface.
+> > +	 * We relay that into a non-valid physical STE with the intention that
+> > +	 * C_BAD_STE for this SID can be delivered to userspace.
 > 
-> One thing to mention that it has this:
+> NAK, that is a horrible idea. If userspace really wants to emulate that it
+> can install a disabled S1 context or move the device to an empty s2 domain,
+> get translation faults signalled through the normal path, and synthesise
+> C_BAD_STE for itself because it knows what it's done. 
+
+The main point is that we need the VIOMMU to become linked to the SID
+though a IOMMU_DOMAIN_NESTED attachment so we know how to route events
+to userspace. Some of these options won't allow that.
+
+> Otherwise, how do you propose we would actually tell whether a real
+> C_BAD_STE is due to a driver
+
+It is the same as every other SID based event, you lookup the SID, see
+there is an IOMMU_DOMAIN_NESTED attached, extract the VIOMMU and route
+the whole event to the VIOMMU's event queue.
+
+For C_BAD_STE you'd want to also check that the STE is all zeros
+before doing this to detect hypervisor driver bugs. It is not perfect,
+but it is not wildly unworkable either.
+
+> Yes, userspace can spam up the event queue with translation/permission etc.
+> faults, but those are at least clearly attributable and an expected part of
+> normal operation; giving it free reign to spam up the event queue with what
+> are currently considered *host kernel errors*, with no handling or
+> mitigation, is another thing entirely.
+
+Let's use arm_smmu_make_abort_ste():
+
+	if (!(nested_domain->ste[0] & cpu_to_le64(STRTAB_STE_0_V))) {
+		arm_smmu_make_abort_ste(target);
+		return;
+	}
+
+We can look into how to transform that into a virtual C_BAD_STE as
+part of the event infrastructure patches?
+
+> > @@ -2192,6 +2255,16 @@ static void arm_smmu_tlb_inv_range_domain(unsigned long iova, size_t size,
+> >   	}
+> >   	__arm_smmu_tlb_inv_range(&cmd, iova, size, granule, smmu_domain);
+> > +	if (smmu_domain->stage == ARM_SMMU_DOMAIN_S2 &&
+> > +	    smmu_domain->nesting_parent) {
 > 
-> 	if (!vma_is_anonymous(dst_vma))
-> 		return 0;
+> Surely nesting_parent must never be set on anything other than S2 domains in
+> the first place?
 
-Another obscure thing in this function. It's not the job of 
-copy_huge_pmd() to make the decision whether to copy, it's the job of 
-vma_needs_copy() in copy_page_range().
+Done
 
-And now I have to suspect that uffd-wp is broken with this function, 
-because as vma_needs_copy() clearly states, we must copy, and we don't 
-do that for PMDs. Ugh.
-
-What a mess, we should just do what we do for PTEs and we will be fine ;)
-
-Also, we call copy_huge_pmd() only if "is_swap_pmd(*src_pmd) || 
-pmd_trans_huge(*src_pmd) || pmd_devmap(*src_pmd)"
-
-Would that even be the case with PFNMAP? I suspect that pmd_trans_huge() 
-would return "true" for special pfnmap, which is rather "surprising", 
-but fortunate for us.
-
-Likely we should be calling copy_huge_pmd() if pmd_leaf() ... cleanup 
-for another day.
-
+> > @@ -2608,13 +2681,15 @@ arm_smmu_find_master_domain(struct arm_smmu_domain *smmu_domain,
+> >   			    ioasid_t ssid)
+> >   {
+> >   	struct arm_smmu_master_domain *master_domain;
+> > +	bool nested_parent = smmu_domain->domain.type == IOMMU_DOMAIN_NESTED;
+> >   	lockdep_assert_held(&smmu_domain->devices_lock);
+> >   	list_for_each_entry(master_domain, &smmu_domain->devices,
+> >   			    devices_elm) {
+> >   		if (master_domain->master == master &&
+> > -		    master_domain->ssid == ssid)
+> > +		    master_domain->ssid == ssid &&
+> > +		    master_domain->nested_parent == nested_parent)
 > 
-> So it's only about anonymous below that.  In that case I feel like the
-> pmd_page() is benign, and actually good.
+> As if nested_parent vs. nesting parent wasn't bad enough, 
 
-Yes, it would likely currently work.
+Done - we used IOMMU_HWPT_ALLOC_NEST_PARENT so lets call them all nest_parent
 
+> why would we need additional disambiguation here?
+
+Oh there is mistake here, that is why it looks so weird, the
+smmu_domain here is the S2 always we are supposed to be testing the
+attaching domain:
+
+--- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
++++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
+@@ -2677,11 +2677,10 @@ static void arm_smmu_disable_pasid(struct arm_smmu_master *master)
+ 
+ static struct arm_smmu_master_domain *
+ arm_smmu_find_master_domain(struct arm_smmu_domain *smmu_domain,
+-                           struct arm_smmu_master *master,
+-                           ioasid_t ssid)
++                           struct arm_smmu_master *master, ioasid_t ssid,
++                           bool nest_parent)
+ {
+        struct arm_smmu_master_domain *master_domain;
+-       bool nested_parent = smmu_domain->domain.type == IOMMU_DOMAIN_NESTED;
+ 
+        lockdep_assert_held(&smmu_domain->devices_lock);
+ 
+@@ -2689,7 +2688,7 @@ arm_smmu_find_master_domain(struct arm_smmu_domain *smmu_domain,
+                            devices_elm) {
+                if (master_domain->master == master &&
+                    master_domain->ssid == ssid &&
+-                   master_domain->nest_parent == nested_parent)
++                   master_domain->nest_parent == nest_parent)
+                        return master_domain;
+        }
+        return NULL;
+@@ -2727,7 +2726,8 @@ static void arm_smmu_remove_master_domain(struct arm_smmu_master *master,
+                return;
+ 
+        spin_lock_irqsave(&smmu_domain->devices_lock, flags);
+-       master_domain = arm_smmu_find_master_domain(smmu_domain, master, ssid);
++       master_domain = arm_smmu_find_master_domain(
++               smmu_domain, master, ssid, domain->type == IOMMU_DOMAIN_NESTED);
+        if (master_domain) {
+                list_del(&master_domain->devices_elm);
+                kfree(master_domain);
+
+> How could more than one attachment to the same SID:SSID exist at the
+> same time?
+
+The attachment logic puts both the new and old domain in this list
+while it works on invalidating caches. This ensures we don't loose any
+invalidation. We also directly put the S2 into the list when attaching
+an IOMMU_DOMAIN_NESTED.
+
+Thus, it is possible for the same S2 to be in the list twice for a
+short time as switching between the S2 to an IOMMU_DOMAIN_NESTED will
+cause it. They are not the same as one will have nest_parent set to do
+heavier ATC invalidation.
+
+It is an optimization to allow the naked S2 to be used as an identity
+translation with less expensive ATC invalidation.
+
+> > @@ -792,6 +803,14 @@ struct arm_smmu_domain {
+> >   	u8				enforce_cache_coherency;
+> >   	struct mmu_notifier		mmu_notifier;
+> > +	bool				nesting_parent : 1;
 > 
-> Though what you're saying here made me notice my above check doesn't seem
-> to be necessary, I mean, "(is_cow_mapping(src_vma->vm_flags) &&
-> pmd_write(pmd))" can't be true when special bit is set, aka, pfnmaps.. and
-> if it's writable for CoW it means it's already an anon.
-> 
-> I think I can probably drop that line there, perhaps with a
-> VM_WARN_ON_ONCE() making sure it won't happen.
-> 
->>
->> Again, we should be doing this similar to how we handle PTEs.
->>
->> I'm a bit confused about the "unlikely(!pmd_trans_huge(pmd)" check, below:
->> what else should we have here if it's not a migration entry but a present
->> entry?
-> 
-> I had a feeling that it was just a safety belt since the 1st day of thp
-> when Andrea worked that out, so that it'll work with e.g. file truncation
-> races.
-> 
-> But with current code it looks like it's only anonymous indeed, so looks
-> not possible at least from that pov.
+> Erm, please use bool consistently, or use integer bitfields consistently,
+> but not a deranged mess of bool bitfields while also assigning true/false to
+> full u8s... :/
 
-Yes, as stated above, likely broken with UFFD-WP ...
+I made it like this:
 
-I really think we should make this code just behave like it would with 
-PTEs, instead of throwing in more "different" handling.
+	struct list_head		devices;
+	spinlock_t			devices_lock;
+	bool				enforce_cache_coherency : 1;
+	bool				nest_parent : 1;
 
--- 
-Cheers,
-
-David / dhildenb
-
+Thanks,
+Jason
 
