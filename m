@@ -1,88 +1,89 @@
-Return-Path: <kvm+bounces-23666-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23667-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AF1294C96A
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 06:53:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 739BB94C96B
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 06:53:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 874921F248AF
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 04:53:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01FF31F25101
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 04:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BF3216728E;
-	Fri,  9 Aug 2024 04:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66CDF167DB8;
+	Fri,  9 Aug 2024 04:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="V3bu/l5R"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="av5wUfbq"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03AB24B34
-	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 04:53:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B14167D83
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 04:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723179224; cv=none; b=SG4vqFTDW2x7WxAKRVUD/bnK5MsspI2hW/OA7UF65XPnt60D/WpHym7oZZzssLHBDd4DMYyzye75/revmJMg6U/1J+gGBeOY2WF50WHeBCJBKdpFpsxy1V1usHQvfITCiN9B6NMZyxsQnSOyoODBBJ+BO0xjCr9aWvLVxsXY9Do=
+	t=1723179227; cv=none; b=TM0C3ISLfDPAuhhoWiJdSRJlr9WWdb/ayuyqsDE6HWOGMRe2nfjiSEw6Y2JyaCgOPfit1VxvHNXAUMVEAMcWgQzjgI8b8OoZH5UolM7SUFoobv7MD42caN0NY4lDF2W/ljJwmO7kRnmbfJF5yTG1w+9DFJUWC5nP+siEzQqOvvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723179224; c=relaxed/simple;
-	bh=+L8SQdFJXXqDe1qbFN1BR4gCQVawaP9pb7iQb+RWN4Y=;
+	s=arc-20240116; t=1723179227; c=relaxed/simple;
+	bh=rDNEov/cRhEnGQ7pld5Hbi6C7dXUskxK8d7UN6XaKPU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rdpHeBwUZ4HX86+hmG9ySUWGMhWV+gkVNOh0MgFk+mZUi0jTZk5TEgLNYxflQ5jAca4wYBqx2Z3ry4oOI+DjN5T0vDBuhfE3r3G/FVbfALvBLgiNOhAtYhHtZZtjGidKuGUhmtTJqV8BTawGHfgzfd41p5EkjfcydJaK3NZ6GbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=V3bu/l5R; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version; b=UKUnx5Ly0Idg2gQKS7TpX+J/rQ35WakufGeWmCxXwMCvI17pKLVQID8t+XBSJVhJLtp7H0fQ9aFSi2+dKbZRF1RolOw975h3bRsgiSCWgaKhIU8smDhI3K5R9ZHSPxS2mNZF5nX1T/Xavx3ax0cnB07KGrtwUE8vrBKgSsOHPJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=av5wUfbq; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723179220;
+	s=mimecast20190719; t=1723179224;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FfU6XyO2Jk8i4FOiwyJKt1ccqOlc2vNSvzjRNpOVJfs=;
-	b=V3bu/l5RtioFB7QOePeUCsW3BmBAiC9sDIanc7EwCRa2L9qwcIzLLwPO0gXSZKqyhUUvvP
-	ccg2aDktLSxnzVVv82vnOvsaXkonthKb3sH2RUW0bxAXk4siSfgW4jemHNFxmfe37C4zG9
-	LyWghoFaDN/qjuIVsNdvoWZxOQR0zmY=
-Received: from mail-pf1-f200.google.com (mail-pf1-f200.google.com
- [209.85.210.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=6y/Dx9WfBuoEyBP+LUel142LcScGzpkHOUr2wWRP0X0=;
+	b=av5wUfbqQC4nVhcbRv4gRqZbgF/5L67UJOTOlGMQH+zOgWAnXK3myuGjCyGRnq2F8bImKf
+	Fho/yk6216Q3WMe0iOleT7ijs4jNwnupSGSAHsXnELlwlq+TUNeAyyd1Co2eO50xHaPjxz
+	M74trJ8SyZc+qGn3xH491P+U6yvYwbw=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-263-eUWN-kl4Nay04xdQBiTB0Q-1; Fri, 09 Aug 2024 00:53:39 -0400
-X-MC-Unique: eUWN-kl4Nay04xdQBiTB0Q-1
-Received: by mail-pf1-f200.google.com with SMTP id d2e1a72fcca58-70eab26e146so1726389b3a.3
-        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 21:53:38 -0700 (PDT)
+ us-mta-110-wZqBIn-jMfOqhplCEjS5wg-1; Fri, 09 Aug 2024 00:53:42 -0400
+X-MC-Unique: wZqBIn-jMfOqhplCEjS5wg-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-7a242496897so1749010a12.2
+        for <kvm@vger.kernel.org>; Thu, 08 Aug 2024 21:53:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723179218; x=1723784018;
+        d=1e100.net; s=20230601; t=1723179221; x=1723784021;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=FfU6XyO2Jk8i4FOiwyJKt1ccqOlc2vNSvzjRNpOVJfs=;
-        b=KEdFq/Q4KEU+1j0WQfelAqKeB5yJD8+8KApYzvauAcOMSMYATJMXsCcYdOHKXWoJwO
-         5nmhMt5pYohVrWbwXEdOC4maWDMweiR9EL/sRNPGTVN95H4/OJYovmCne9+FLWGlfvgU
-         0rn3ZoO50Lhw4UmYyVL60fXY+wVMeAkpX9cgpolqWpeIqkwd6eWC1bUHK9IAPZ5MO0md
-         e1n9i/hAoVngrwD8T1GJwbNvPixJKLHyGCGt7W2snGOPwxoUQ5HQZieVv4//NxW4iGtU
-         XFrKxcFYMekczPr2g+qZcm3IV9KhYM/MAL7agaAvAQsXo6Mrbm7P44vSBCjvOCqbjxSj
-         CGGg==
-X-Forwarded-Encrypted: i=1; AJvYcCWJUXdkmDv4VlPZmmVvy8BANCJsKpkKReQ7/XFSz9jvNK0wZdacIYCGX4wRgkvu1CFZk34+ST2r3BDRDlI9io8rzVCI
-X-Gm-Message-State: AOJu0Yyk/IaJkyrwq2HUVaxMO2rnBYiZyjLeE95YYR66rZz0xpO6qw0t
-	ccnkWtmNshUK1qCIS3WT2E0KqnD/OcbNtseEF4nW0DB5mgzxPqpLcEe4Z0519EB4WBp1g8CsoNL
-	AmZcMuqUtraVsXgN12D0Ug4pKpmGnkKpWi90OZZg6cJA8Aaxggg==
-X-Received: by 2002:a05:6a21:3993:b0:1c0:f5fa:d1e9 with SMTP id adf61e73a8af0-1c89fce5652mr592196637.15.1723179217722;
-        Thu, 08 Aug 2024 21:53:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFXIKuqH70u2Lx+GwuqOZ8MGvHc3rF9cXAtufWKuQhkfNhxF7aPPB1+YhD3cDXDoG1FQCrEFQ==
-X-Received: by 2002:a05:6a21:3993:b0:1c0:f5fa:d1e9 with SMTP id adf61e73a8af0-1c89fce5652mr592182637.15.1723179217298;
-        Thu, 08 Aug 2024 21:53:37 -0700 (PDT)
+        bh=6y/Dx9WfBuoEyBP+LUel142LcScGzpkHOUr2wWRP0X0=;
+        b=D0mqc90u8r8ozUhNo5OABmDbenJqSxFUSIhl7AeLHGfgPEW1q7VmKKdYNyron1WoIP
+         wD8vwCFwBSt39x3ldw6SDVqUWal6HCout6I+1jDeBN/foFHh5qjlbn+fl03BFyaHaoTU
+         Pe1KfvLanart7iAQY8N2EHLDfdPJsDmNiW5ILI5YALn9xpjAWc/f4fR+sG4GmZIHuATW
+         Pr1LHF7F75tXUA6shEpAZwIjNWHa3A+inTEYwSX6BxQaZ8ETnPEd9TKtpJwZWlcxbY2I
+         wv+wQ8rJyirqh7XO7MhNRmBkXzH6KBRl8eQMUNr8ChXJzPOc2/72Kr63RVsR39d/sHZb
+         50CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtT7M11zyrg9TNnsFDB4qhcfXuhM1mLdCIO5i4bDtuPEAn+iQHvaL29VyL1Di/lwRyVRFvHvhchcWQa0Ayd9PxKa++
+X-Gm-Message-State: AOJu0YyoI2PG2LvZX5T477YOAgHYVo+zWYtETF600UOeYV6h1tqwwuos
+	WbKOpBq6YvXNkKtdoArPyLfemMl6gY7RRFsTPsLjNPvVJMvAYdzRbsvbP0YIEP0O5EE9/rWd3Ke
+	kh8Bnue/qHgd9xjgM5hLOxK1C9QqxhR/MwpqgQk8HI9KH4ohC5g==
+X-Received: by 2002:a05:6a21:458a:b0:1c4:8650:d6d7 with SMTP id adf61e73a8af0-1c89fec2cd2mr507346637.16.1723179221102;
+        Thu, 08 Aug 2024 21:53:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG7CZUoFnBycRjnM0orNNjv+/SuxPUpkqJGSE9wtp9gfcdEF73syhQeo7PZom0vG5inUvKBJQ==
+X-Received: by 2002:a05:6a21:458a:b0:1c4:8650:d6d7 with SMTP id adf61e73a8af0-1c89fec2cd2mr507328637.16.1723179220671;
+        Thu, 08 Aug 2024 21:53:40 -0700 (PDT)
 Received: from localhost.localdomain ([115.96.114.241])
-        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1ff58f6a540sm133516895ad.118.2024.08.08.21.53.34
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-1ff58f6a540sm133516895ad.118.2024.08.08.21.53.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Aug 2024 21:53:36 -0700 (PDT)
+        Thu, 08 Aug 2024 21:53:40 -0700 (PDT)
 From: Ani Sinha <anisinha@redhat.com>
 To: Paolo Bonzini <pbonzini@redhat.com>
 Cc: Ani Sinha <anisinha@redhat.com>,
-	qemu-trivial@nongnu.org,
 	zhao1.liu@intel.com,
+	cfontana@suse.de,
+	qemu-trivial@nongnu.org,
 	kvm@vger.kernel.org,
 	qemu-devel@nongnu.org
-Subject: [PATCH 1/2] kvm: replace fprintf with error_report() in kvm_init() for error conditions
-Date: Fri,  9 Aug 2024 10:21:52 +0530
-Message-ID: <20240809045153.1744397-2-anisinha@redhat.com>
+Subject: [PATCH v3 2/2] kvm: refactor core virtual machine creation into its own function
+Date: Fri,  9 Aug 2024 10:21:53 +0530
+Message-ID: <20240809045153.1744397-3-anisinha@redhat.com>
 X-Mailer: git-send-email 2.45.2
 In-Reply-To: <20240809045153.1744397-1-anisinha@redhat.com>
 References: <20240809045153.1744397-1-anisinha@redhat.com>
@@ -94,110 +95,136 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-error_report() is more appropriate for error situations. Replace fprintf with
-error_report. Cosmetic. No functional change.
+Refactoring the core logic around KVM_CREATE_VM into its own separate function
+so that it can be called from other functions in subsequent patches. There is
+no functional change in this patch.
 
-CC: qemu-trivial@nongnu.org
+CC: pbonzini@redhat.com
 CC: zhao1.liu@intel.com
+CC: cfontana@suse.de
+CC: qemu-trivial@nongnu.org
 Signed-off-by: Ani Sinha <anisinha@redhat.com>
 ---
- accel/kvm/kvm-all.c | 42 +++++++++++++++++++-----------------------
- 1 file changed, 19 insertions(+), 23 deletions(-)
+ accel/kvm/kvm-all.c | 88 +++++++++++++++++++++++++++------------------
+ 1 file changed, 54 insertions(+), 34 deletions(-)
+
+changelog:
+v2: s/fprintf/warn_report as suggested by zhao
+v3: s/warn_report/error_report. function names adjusted to conform to
+other names. fprintf -> error_report() moved to its own patch.
 
 diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-index 75d11a07b2..899b5264e3 100644
+index 899b5264e3..610b3ead32 100644
 --- a/accel/kvm/kvm-all.c
 +++ b/accel/kvm/kvm-all.c
-@@ -2427,7 +2427,7 @@ static int kvm_init(MachineState *ms)
-     QLIST_INIT(&s->kvm_parked_vcpus);
-     s->fd = qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
-     if (s->fd == -1) {
--        fprintf(stderr, "Could not access KVM kernel module: %m\n");
-+        error_report("Could not access KVM kernel module: %m");
-         ret = -errno;
-         goto err;
-     }
-@@ -2437,13 +2437,13 @@ static int kvm_init(MachineState *ms)
-         if (ret >= 0) {
-             ret = -EINVAL;
-         }
--        fprintf(stderr, "kvm version too old\n");
-+        error_report("kvm version too old");
-         goto err;
-     }
+@@ -2385,6 +2385,57 @@ uint32_t kvm_dirty_ring_size(void)
+     return kvm_state->kvm_dirty_ring_size;
+ }
  
-     if (ret > KVM_API_VERSION) {
-         ret = -EINVAL;
--        fprintf(stderr, "kvm version not supported\n");
-+        error_report("kvm version not supported");
-         goto err;
-     }
- 
-@@ -2488,30 +2488,26 @@ static int kvm_init(MachineState *ms)
-     } while (ret == -EINTR);
- 
-     if (ret < 0) {
--        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
--                strerror(-ret));
++static int kvm_create_vm(MachineState *ms, KVMState *s, int type)
++{
++    int ret;
++
++    do {
++        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
++    } while (ret == -EINTR);
++
++    if (ret < 0) {
 +        error_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
 +                    strerror(-ret));
- 
- #ifdef TARGET_S390X
-         if (ret == -EINVAL) {
--            fprintf(stderr,
--                    "Host kernel setup problem detected. Please verify:\n");
--            fprintf(stderr, "- for kernels supporting the switch_amode or"
--                    " user_mode parameters, whether\n");
--            fprintf(stderr,
--                    "  user space is running in primary address space\n");
--            fprintf(stderr,
--                    "- for kernels supporting the vm.allocate_pgste sysctl, "
--                    "whether it is enabled\n");
++
++#ifdef TARGET_S390X
++        if (ret == -EINVAL) {
 +            error_report("Host kernel setup problem detected. Please verify:");
 +            error_report("- for kernels supporting the switch_amode or"
 +                        " user_mode parameters, whether");
 +            error_report("  user space is running in primary address space");
 +            error_report("- for kernels supporting the vm.allocate_pgste "
 +                        "sysctl, whether it is enabled");
-         }
- #elif defined(TARGET_PPC)
-         if (ret == -EINVAL) {
--            fprintf(stderr,
--                    "PPC KVM module is not loaded. Try modprobe kvm_%s.\n",
--                    (type == 2) ? "pr" : "hv");
++        }
++#elif defined(TARGET_PPC)
++        if (ret == -EINVAL) {
 +            error_report("PPC KVM module is not loaded. Try modprobe kvm_%s.",
 +                        (type == 2) ? "pr" : "hv");
-         }
- #endif
--        goto err;
++        }
++#endif
++    }
++
++    return ret;
++}
++
++static int kvm_machine_type(MachineState *ms)
++{
++    MachineClass *mc = MACHINE_GET_CLASS(ms);
++    int type;
++
++    if (object_property_find(OBJECT(current_machine), "kvm-type")) {
++        g_autofree char *kvm_type;
++        kvm_type = object_property_get_str(OBJECT(current_machine),
++                                           "kvm-type",
++                                           &error_abort);
++        type = mc->kvm_type(ms, kvm_type);
++    } else if (mc->kvm_type) {
++        type = mc->kvm_type(ms, NULL);
++    } else {
++        type = kvm_arch_get_default_type(ms);
++    }
++    return type;
++}
++
+ static int kvm_init(MachineState *ms)
+ {
+     MachineClass *mc = MACHINE_GET_CLASS(ms);
+@@ -2467,47 +2518,16 @@ static int kvm_init(MachineState *ms)
      }
-+        goto err;
+     s->as = g_new0(struct KVMAs, s->nr_as);
  
-     s->vmfd = ret;
- 
-@@ -2526,9 +2522,9 @@ static int kvm_init(MachineState *ms)
-                         nc->name, nc->num, soft_vcpus_limit);
- 
-             if (nc->num > hard_vcpus_limit) {
--                fprintf(stderr, "Number of %s cpus requested (%d) exceeds "
--                        "the maximum cpus supported by KVM (%d)\n",
--                        nc->name, nc->num, hard_vcpus_limit);
-+                error_report("Number of %s cpus requested (%d) exceeds "
-+                             "the maximum cpus supported by KVM (%d)",
-+                             nc->name, nc->num, hard_vcpus_limit);
-                 exit(1);
-             }
-         }
-@@ -2542,8 +2538,8 @@ static int kvm_init(MachineState *ms)
-     }
-     if (missing_cap) {
+-    if (object_property_find(OBJECT(current_machine), "kvm-type")) {
+-        g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
+-                                                            "kvm-type",
+-                                                            &error_abort);
+-        type = mc->kvm_type(ms, kvm_type);
+-    } else if (mc->kvm_type) {
+-        type = mc->kvm_type(ms, NULL);
+-    } else {
+-        type = kvm_arch_get_default_type(ms);
+-    }
+-
++    type = kvm_machine_type(ms);
+     if (type < 0) {
          ret = -EINVAL;
--        fprintf(stderr, "kvm does not support %s\n%s",
--                missing_cap->name, upgrade_note);
-+        error_report("kvm does not support %s", missing_cap->name);
-+        error_report("%s", upgrade_note);
          goto err;
      }
+ 
+-    do {
+-        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
+-    } while (ret == -EINTR);
+-
++    ret = kvm_create_vm(ms, s, type);
+     if (ret < 0) {
+-        error_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
+-                    strerror(-ret));
+-
+-#ifdef TARGET_S390X
+-        if (ret == -EINVAL) {
+-            error_report("Host kernel setup problem detected. Please verify:");
+-            error_report("- for kernels supporting the switch_amode or"
+-                        " user_mode parameters, whether");
+-            error_report("  user space is running in primary address space");
+-            error_report("- for kernels supporting the vm.allocate_pgste "
+-                        "sysctl, whether it is enabled");
+-        }
+-#elif defined(TARGET_PPC)
+-        if (ret == -EINVAL) {
+-            error_report("PPC KVM module is not loaded. Try modprobe kvm_%s.",
+-                        (type == 2) ? "pr" : "hv");
+-        }
+-#endif
+-    }
+         goto err;
++    }
+ 
+     s->vmfd = ret;
  
 -- 
 2.45.2
