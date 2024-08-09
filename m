@@ -1,71 +1,71 @@
-Return-Path: <kvm+bounces-23772-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23773-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B035F94D6F5
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 21:10:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85B1194D6F8
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 21:10:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67DA3288203
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 19:10:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04365B2233B
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 19:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B039161320;
-	Fri,  9 Aug 2024 19:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D1119DF60;
+	Fri,  9 Aug 2024 19:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="m1kAB4Wy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BtQcNZHX"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2829419D096
-	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 19:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBCC519D8AF
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 19:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723230247; cv=none; b=QoIh2Yo2c/hl9spdryPL6UhcGXfRGY+6mHcd/ble26Y8PWictSdNtI+U+ZrBGcztBmfjoz52V/v4r1CbPUt3vv5ByZXF/WgUoVXuN+kp5LFMkjCp5PTx2EvcmCftD89FTuM2jyuyLq3jEOk7aM9fOYF0OFGoV5bj18ew4DiqzAk=
+	t=1723230249; cv=none; b=vDjz0svskfsegNqy8Kq5K8RytZxBhQJZWgkKZokZiK0oK5AffEay1GpkrnYelrxMDjS9yA10IvFHMslZwp0Y3vr/2Q18z2VaQTDk8OaQEV7LOTWt6JoNnywzU2cn8ACmLoOfGkvCj/DfBB6jDtCXU4fb9nk7iiumUHveywgiGiE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723230247; c=relaxed/simple;
-	bh=RAj0k26L7e6hItfq0DdkXBLRRrgYaa5pBwltIWlH7wA=;
+	s=arc-20240116; t=1723230249; c=relaxed/simple;
+	bh=fQuuC8h+my/ip7xEVnWzpMj4lV5hpjnXHtbzdkoRqRI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fcB+StWowb2IEMyqiqfzHzkwnp7fv8d5agmFxO/08+zSMad65+SvaqIDwMIgcrAiBmlvEs/MiaKsHN9/YfEEzOgs/ez9pCcyNWpQanUYdTIRJDOJqjVSLyTczL1te6BrEqQOsmzmUOfX7fkxn6V9aQ6LJaf5Z1hOjFfFn2l5Teo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=m1kAB4Wy; arc=none smtp.client-ip=209.85.215.201
+	 To:Cc:Content-Type; b=WR+sy2w5R/jC+tPM7m5Hhm8THjNZRz1XRo0XilStZtv90fMq0Hga2Q/WXa2UvYKlsmTRUdgjwvSeNwJJApjtjg697R7+13ikDXI4//QdM8B3YjBJRFLM8gWRaLWcyMl+67RMFNGLf6tu2U+0EMae9WzEqT7tuQrwDZ4XDJd+UIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BtQcNZHX; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a994e332a8so2108116a12.3
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 12:04:06 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb576921b6so2826308a91.1
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 12:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723230246; x=1723835046; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723230247; x=1723835047; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:from:to:cc:subject:date:message-id:reply-to;
-        bh=G4BNuwtJ6NMA4YiBcM1PUSgleR458VStyd6GBZZF8w8=;
-        b=m1kAB4WyqvGB5XwCXRyTuFYrHtxBGoNOXUcb6HR14TUPMOgJcXlNK2Bu5GyDZt/qGd
-         jkP23gqlrOUwcA6SM3WWw5dipdSzj4GCLBcEkKULOrOexMmjzgDurbmJwjAyozXS1c5Y
-         Ftg2l+bMOI1tM2b9qd/ddLvmEogJrRb3Nt5jGiR3xkdDWg6e11OqPx69xLB8Xkbn6kLD
-         M8Z2BPmgelXxBUHx7abL6MioJTHEsHVLt6jA5uLnllkEpIJPDAUeobv8x8D++x2/P3N4
-         XFtK0tDcZ2r/xtKx2HkuaO/wptfHUo+8HfLASr6H6GT2ILZdKoLKnU/vYK23DEf8gfx7
-         CbJA==
+        bh=oWpScC2lPAOYQSvm8ofyxB/d7cOw2/4qi1QTT+90O+I=;
+        b=BtQcNZHXhmSs64QAR2YOmmt44qJx16MN0wvYFpE4NKJQYAKOrch1mmZ4RJLN/JijtZ
+         /54RyTnlbUhvzsFYk5SnfTosafZpskQk15P5lXSo4FGNyIf9xmey5RtbUYRaK2uC0qJe
+         HZJtm65BKrobVAoUnbHk7hCevCsJhXbKs+HFo2bEIzl/rPnUC1U2iFzKj8Dye1Hx00Q9
+         axYvDCNfVienClKv9u8EkBVDRljsvtToxTQgNQ6Wfr04y8soD4ki5TNmoJe80nLaY3mo
+         3DKhFyX5fr6xG4EDnCzWW6u7+JQdiNzjI3UdMxx4LB4g0ISVG2F857CNIBCVBPV6g5LK
+         wOyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723230246; x=1723835046;
+        d=1e100.net; s=20230601; t=1723230247; x=1723835047;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:reply-to:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=G4BNuwtJ6NMA4YiBcM1PUSgleR458VStyd6GBZZF8w8=;
-        b=k20Ucm+PZjj6tqwjDyYK1UYnTt8uE4VsjWHuEv9EHGmlGzcOpLnzTwginMlPP2uHhp
-         VshuP4HA1LQBMat/4mSn3alijm+SR4/RFSALWNLZ1maHJVmjYEhhPJXaYxui4Al7mxN1
-         E05b+gz3fOYm9mBPXX3SdpyrcswxhMYsrD0EbgS61jXvU2daHkOU0FlEoWNTRGIxOSx6
-         MM272USFf3ARmoUBS3831Vq7/FuAXlLhtitEGWl0hVWG+OCR+pWjFR9XneVVTrLDhe0p
-         VRVdA2r0cAOGNCAZtK5yqVtNUNj5xHXJm9kRr9Th0Jooojv8bHSa0f6jKmEqZ5+X/bbZ
-         kMPg==
-X-Gm-Message-State: AOJu0YyUgn9108BOPoy6JoYjewuGIouNpX4dTJV+aB/XLIP9njXnNxuX
-	AERP9Snh6u3Lbz0Q/EsWEuOiyiMoYX7sCjyUdM0SIk7eG1E0CmTHcBQlR1TjzwuMPMHNY9T4jAq
-	jow==
-X-Google-Smtp-Source: AGHT+IEDzFUCPnHj7AFwv0nC2uk2Vq5ql39xuChh1cZ88t8pY1ewqFSi2d5sUYKbJsHcj8NSBHzLWancOaM=
+        bh=oWpScC2lPAOYQSvm8ofyxB/d7cOw2/4qi1QTT+90O+I=;
+        b=NxThy7JkiypHaKMkXaS3EEfGQHiw0/cDOetuMLQget/I1LDXlZ9xpWvilDDeOaQWRn
+         6fLmjPhaNsDPVXj2ZL64WAkzXVP0yrRMffYjdOKd6P9DNjd9Gz/sxe9vbFjziWMUMNfW
+         5vPdxr2CDx0nvijoRnYI0Zj8UonIegDjkCHltjX9qEXzjHr/weAuKWnLKLE6W8pSAz6l
+         7muiVCt1gLtmMoG4IMJHLeUbZeTGjc1rmRzXK+1eQV7XGAyQXmTSHoEjiWXVCOtPyrmk
+         lYldSohdhF/p6Mi2zDimgcyrSl+mua++u8W/c/Gk1ctXrcx6QGHdcg1NZYA63IqO28HX
+         2vNg==
+X-Gm-Message-State: AOJu0YwmSrRmkkP1uckho6kWuRgVS/TsWbDNLxCEn1dyRXonBo/RDQ/L
+	mEshIWv747CrbUA1h4CsVkaHTLWeem3Xmqlx0RI8jiWwsqc3G1TlQYxb3XgrHquIFsQ0h4Bo5x2
+	RbQ==
+X-Google-Smtp-Source: AGHT+IGa40bwUoG33bFhX/FYTpen2eZdAbi/a/MWhlBc3vfk78wwXJqpBLLJqIKqaXmEqi+kQcPOVyN0PcA=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:d64e:0:b0:7c1:89ee:a9fe with SMTP id
- 41be03b00d2f7-7c3d2c14841mr4639a12.8.1723230245533; Fri, 09 Aug 2024 12:04:05
- -0700 (PDT)
+ (user=seanjc job=sendgmr) by 2002:a17:90a:d812:b0:2cf:dafd:b793 with SMTP id
+ 98e67ed59e1d1-2d1e80674c6mr10196a91.5.1723230247317; Fri, 09 Aug 2024
+ 12:04:07 -0700 (PDT)
 Reply-To: Sean Christopherson <seanjc@google.com>
-Date: Fri,  9 Aug 2024 12:03:18 -0700
+Date: Fri,  9 Aug 2024 12:03:19 -0700
 In-Reply-To: <20240809190319.1710470-1-seanjc@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -75,9 +75,9 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240809190319.1710470-1-seanjc@google.com>
 X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
-Message-ID: <20240809190319.1710470-22-seanjc@google.com>
-Subject: [PATCH 21/22] KVM: x86/mmu: Subsume kvm_mmu_unprotect_page() into the
- and_retry() version
+Message-ID: <20240809190319.1710470-23-seanjc@google.com>
+Subject: [PATCH 22/22] KVM: x86/mmu: Detect if unprotect will do anything
+ based on invalid_list
 From: Sean Christopherson <seanjc@google.com>
 To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,86 +85,44 @@ Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Vishal Annapurve <vannapurve@google.com>, Ackerly Tng <ackerleytng@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Fold kvm_mmu_unprotect_page() into kvm_mmu_unprotect_gfn_and_retry() now
-that all other direct usage is gone.
+Explicitly query the list of to-be-zapped shadow pages when checking to
+see if unprotecting a gfn for retry has succeeded, i.e. if KVM should
+retry the faulting instruction.
+
+Add a comment to explain why the list needs to be checked before zapping,
+which is the primary motivation for this change.
 
 No functional change intended.
 
 Signed-off-by: Sean Christopherson <seanjc@google.com>
 ---
- arch/x86/include/asm/kvm_host.h |  1 -
- arch/x86/kvm/mmu/mmu.c          | 33 +++++++++++++--------------------
- 2 files changed, 13 insertions(+), 21 deletions(-)
+ arch/x86/kvm/mmu/mmu.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-index b3a2793fc89c..e2df07b3c411 100644
---- a/arch/x86/include/asm/kvm_host.h
-+++ b/arch/x86/include/asm/kvm_host.h
-@@ -2131,7 +2131,6 @@ int kvm_get_nr_pending_nmis(struct kvm_vcpu *vcpu);
- 
- void kvm_update_dr7(struct kvm_vcpu *vcpu);
- 
--int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn);
- bool __kvm_mmu_unprotect_gfn_and_retry(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 				       bool always_retry);
- 
 diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 59af085a6e8e..300a47801685 100644
+index 300a47801685..50695eb2ee22 100644
 --- a/arch/x86/kvm/mmu/mmu.c
 +++ b/arch/x86/kvm/mmu/mmu.c
-@@ -2713,31 +2713,16 @@ void kvm_mmu_change_mmu_pages(struct kvm *kvm, unsigned long goal_nr_mmu_pages)
- 	write_unlock(&kvm->mmu_lock);
- }
- 
--int kvm_mmu_unprotect_page(struct kvm *kvm, gfn_t gfn)
--{
--	struct kvm_mmu_page *sp;
--	LIST_HEAD(invalid_list);
--	int r;
--
--	r = 0;
--	write_lock(&kvm->mmu_lock);
--	for_each_gfn_valid_sp_with_gptes(kvm, sp, gfn) {
--		r = 1;
--		kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
--	}
--	kvm_mmu_commit_zap_page(kvm, &invalid_list);
--	write_unlock(&kvm->mmu_lock);
--
--	return r;
--}
--
- bool __kvm_mmu_unprotect_gfn_and_retry(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
- 				       bool always_retry)
- {
-+	struct kvm *kvm = vcpu->kvm;
-+	LIST_HEAD(invalid_list);
-+	struct kvm_mmu_page *sp;
- 	gpa_t gpa = cr2_or_gpa;
- 	bool r = false;
- 
--	if (!vcpu->kvm->arch.indirect_shadow_pages)
-+	if (!kvm->arch.indirect_shadow_pages)
- 		goto out;
- 
- 	if (!vcpu->arch.mmu->root_role.direct) {
-@@ -2746,7 +2731,15 @@ bool __kvm_mmu_unprotect_gfn_and_retry(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+@@ -2731,12 +2731,15 @@ bool __kvm_mmu_unprotect_gfn_and_retry(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
  			goto out;
  	}
  
--	r = kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(gpa));
-+	r = false;
-+	write_lock(&kvm->mmu_lock);
-+	for_each_gfn_valid_sp_with_gptes(kvm, sp, gpa_to_gfn(gpa)) {
-+		r = true;
-+		kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
-+	}
-+	kvm_mmu_commit_zap_page(kvm, &invalid_list);
-+	write_unlock(&kvm->mmu_lock);
+-	r = false;
+ 	write_lock(&kvm->mmu_lock);
+-	for_each_gfn_valid_sp_with_gptes(kvm, sp, gpa_to_gfn(gpa)) {
+-		r = true;
++	for_each_gfn_valid_sp_with_gptes(kvm, sp, gpa_to_gfn(gpa))
+ 		kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
+-	}
 +
- out:
- 	if (r || always_retry) {
- 		vcpu->arch.last_retry_eip = kvm_rip_read(vcpu);
++	/*
++	 * Snapshot the result before zapping, as zapping will remove all list
++	 * entries, i.e. checking the list later would yield a false negative.
++	 */
++	r = !list_empty(&invalid_list);
+ 	kvm_mmu_commit_zap_page(kvm, &invalid_list);
+ 	write_unlock(&kvm->mmu_lock);
+ 
 -- 
 2.46.0.76.ge559c4bf1a-goog
 
