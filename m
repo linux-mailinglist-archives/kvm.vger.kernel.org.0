@@ -1,78 +1,78 @@
-Return-Path: <kvm+bounces-23724-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23725-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 925FF94D455
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 18:15:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B228894D458
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 18:16:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10A221F22AC6
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 16:15:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32A641F21633
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 16:16:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C837519E7EB;
-	Fri,  9 Aug 2024 16:09:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C51319E839;
+	Fri,  9 Aug 2024 16:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EDJ3sZfv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hprFUyNs"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838BA19DF8D
-	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 16:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D702D19E7EF
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 16:09:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723219795; cv=none; b=sczpQ/YF70Ya//j69s5a5QgNVTNHAKnpJgSThFzOixo/RAQQ49orQKMJ0EocyUlrQmn5Y2ptyj6T4S8Ym+9bhRTLajSDGaBEgeSi9cPOSYbUW66oY3jiKFxoYFsLUYORwxrenTSAA13cL20dx5uig30CdJuShhK7jrIZ8UvKgcg=
+	t=1723219797; cv=none; b=ho4IWOIU+XG4EFbRgAPPUYNGu/v8B8FXV5iO/EpRxGHUsvqu8NDbtKNJE3loaVnIzodqSLIMZ8nLw7Ow7fdPk4YZvMMaqWmibFlhZP+PX+1Wz5jdnnZROpdz5p+9gBBwvt45xwixjJyKD0WDLiJkmC7wl6pfKHdrpIPPqksWm4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723219795; c=relaxed/simple;
-	bh=jYEp23FOIF/6kH+o3wuOpGOrvsbC/NmaM2/0jhGYsK8=;
+	s=arc-20240116; t=1723219797; c=relaxed/simple;
+	bh=6vd9dKzSoYHnE87pbZ79rfnDAvgUPCtQqMHJIVAxycI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XZcmAUz+GVsM+BibuQchJRnESSUGwl6j1hy4qAFKC+bZGtiJB6GMkp3VWB4ueiFE50uE0ZANVI1/gAx1vSVjRzyXapwv6XOX2VOzlxDZ5fuc67s2AGCLf0Lk9OBREus3ULBBZOwzjrHbdjFeUQ1We1ZN5NZWQoH/yh0h3vL4ysU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EDJ3sZfv; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=bEHSFeL/OW3vTcZgYhA0p2Y/eEgdtbWmWw6pjOMahrHRvBgGXX5Pw/P4trlHQ77MK18yIUxWwnju35oYV+Fy2lDenXleXjUo7uMVCNfmz5Ig4ob3mmwLD4bk0DPfOSTjRHI0+yrQzEjPlewAnkwOeMro7Qb39Mg4tmoT03fSGAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hprFUyNs; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723219792;
+	s=mimecast20190719; t=1723219795;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=rQ5uhZ2uiWdH1/UlOzJ8LVGX9FzFBDg5i1FarWNBfgY=;
-	b=EDJ3sZfvJOAoL/XjHxfXyGwrwHufTelKwswGuzgdGQNDGqDvEmTEjKkt5yPmvTfZRw0OMA
-	nMRUy+wOJqvy1geBhF/abXLGjZwRAxr7ZWLUgQGN/qt+P9zGa+OOAO+tkiIic05B7BY0DP
-	H8I2wpa7K/VwKVGN0bH6/TRCwlg09lQ=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=YoGoBxg1RIhRUWN8551lXVuosUhfDUfYXVK/Rz8tB4Q=;
+	b=hprFUyNsXu62UOaW2ILvBg7uWsxhM3gv11ZLAxlf4KKM9ghkPhiXGh9IucHRr/f0/doycp
+	htU9oEmYo291aq5zOGkqyMsy22a8ACoBjkEGHDIOaxpZKTkqERnJvvR6cbAdMGkM+lyi/E
+	vpEium1+71XvyZkIMr9s2V93k1wyaNw=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-YcosiXs-OXyHZjt4TVJ9aw-1; Fri, 09 Aug 2024 12:09:51 -0400
-X-MC-Unique: YcosiXs-OXyHZjt4TVJ9aw-1
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-44fe28cd027so3758561cf.0
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 09:09:51 -0700 (PDT)
+ us-mta-678-xiAWKRP_Ppu4CKXKvjgz0g-1; Fri, 09 Aug 2024 12:09:53 -0400
+X-MC-Unique: xiAWKRP_Ppu4CKXKvjgz0g-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-45009e27b83so4906271cf.1
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 09:09:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723219791; x=1723824591;
+        d=1e100.net; s=20230601; t=1723219793; x=1723824593;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rQ5uhZ2uiWdH1/UlOzJ8LVGX9FzFBDg5i1FarWNBfgY=;
-        b=OgJrEPLPSBhFwZQlm2EwBEcXvImPKOHuT4c4q7aUjU2LFS2KzR3G7zMd3VIcxfNWFZ
-         PlfwQ3nukIXZZ7c/mEef5jm1Cy/jFpEUZ7PHLuC6Fq4/4ccSAyE44QzIfCFePVJ41Q0W
-         HUkvun32JHmBMRhwSchUzhZLaaXO/lIewtkXY9mAbGoFmW9lV36tR7s9jtKE4jpLPPtz
-         kF2+jt3PI5G+87hWu8gcnPaHSdXGfgHbBx7Rhvb+JbSJw1dxSxyOqEaRixmuCdsOZLmi
-         7/UUGLq0JVAL9l5/Ejl4q0p+sVcZiSnHsNizr+F6QY8HRb9E/LaYnupG0z4wr6xwDfGA
-         DCLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXCiY3VA5HmbcYE/0M52QVsa+NcZMD4F7F0vBUcOHTn7QuSL/7JC+j3H1ZQncv13iE6+9s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgVmdzMrkKUDLDjGzTPHmuP2H8fhk6YOmR/cnEk0Mrdq7mbnm7
-	sUBtLS5eTXG/ze01JeJ2rmwDGDog0N+AtiGdYdX+dbMncJbA9NxxR/PqTWKVhL7gH3yw2+bEKSd
-	dWNUSzN2XYgAtoYby+RhmmqoCB8jsRa5C3ORYLaZXL5o+7QqPVw==
-X-Received: by 2002:a05:622a:412:b0:444:b935:ebb5 with SMTP id d75a77b69052e-45312359fbcmr13373571cf.0.1723219790803;
-        Fri, 09 Aug 2024 09:09:50 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH2UCzm8Bb1pveediLGLwWSJm3e36K8ZWtfh9bSQqsAnCTBAfRwieQENSqzRtCTpHEz3lk41Q==
-X-Received: by 2002:a05:622a:412:b0:444:b935:ebb5 with SMTP id d75a77b69052e-45312359fbcmr13373301cf.0.1723219790408;
-        Fri, 09 Aug 2024 09:09:50 -0700 (PDT)
+        bh=YoGoBxg1RIhRUWN8551lXVuosUhfDUfYXVK/Rz8tB4Q=;
+        b=JC7lOhXKa5evAwD9F3aUS/8RJYi1mGmuAmAZL/jCVbwJQu6/Z8RKCSMRo7WQ1jYbgN
+         ySAigj0JsaAEDuivvEg8E5vXV8l5r35rRmtVFrKvRF9UITysdQR2UjmQaZOHsAvddLAi
+         tR0ZKRy0O7JNwxGfsJ9PYJvOjEQcqTxK/xd2SudWLu8SI+n8tYrC6x3z13BW9nFrajFG
+         5jED69adsrEywQY6HyIoADaUoXuVG6PUsUmiU21QrZNVxdMY4Zk/xQp6qufDTcV6NilW
+         gSXClqWtVj/ClOEhlRB8j0eCfW02aMD6vNI0gLMJQ2e6EH3bc4uWUxAfcKYpP5syhwr+
+         tYnw==
+X-Forwarded-Encrypted: i=1; AJvYcCWx7nJEcS/kWqGTFkyT0+TsIs469tW1Ig/m2Pn4THZC9ePEW7mzf04QhDdZSKL46hqGkOQnbRyvjcQZ4UvwmCmT/b3O
+X-Gm-Message-State: AOJu0YyzFSyABL62nYDlPcmkWS9sjcltVGdpamT02XJV8BcNgeSDRU16
+	bbJom05tR98HJOPNMPetaRpoJP4RD1wXImtDWFNQ1cYD5dtPdSiXbk3FT/BUWH/W44CewL2sF97
+	6wsOpX+sCbkYelfySSinLAFs5HF8bRthrZg8lOTAtPuCHUVX3eQ==
+X-Received: by 2002:ac8:5e07:0:b0:44e:cff7:3741 with SMTP id d75a77b69052e-45312646da2mr14005731cf.7.1723219793238;
+        Fri, 09 Aug 2024 09:09:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHyC9JbjVCeQC7LVvckqh3sKVh2QUlZ0IzLJIVdarr6jR5vj53aOO53iHwQIsrAsjgq+0MAjA==
+X-Received: by 2002:ac8:5e07:0:b0:44e:cff7:3741 with SMTP id d75a77b69052e-45312646da2mr14005321cf.7.1723219792685;
+        Fri, 09 Aug 2024 09:09:52 -0700 (PDT)
 Received: from x1n.redhat.com (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-451c870016csm22526741cf.19.2024.08.09.09.09.48
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-451c870016csm22526741cf.19.2024.08.09.09.09.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Aug 2024 09:09:49 -0700 (PDT)
+        Fri, 09 Aug 2024 09:09:51 -0700 (PDT)
 From: Peter Xu <peterx@redhat.com>
 To: linux-mm@kvack.org,
 	linux-kernel@vger.kernel.org
@@ -98,9 +98,9 @@ Cc: Sean Christopherson <seanjc@google.com>,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: [PATCH 16/19] mm: Remove follow_pte()
-Date: Fri,  9 Aug 2024 12:09:06 -0400
-Message-ID: <20240809160909.1023470-17-peterx@redhat.com>
+Subject: [PATCH 17/19] mm/x86: Support large pfn mappings
+Date: Fri,  9 Aug 2024 12:09:07 -0400
+Message-ID: <20240809160909.1023470-18-peterx@redhat.com>
 X-Mailer: git-send-email 2.45.0
 In-Reply-To: <20240809160909.1023470-1-peterx@redhat.com>
 References: <20240809160909.1023470-1-peterx@redhat.com>
@@ -112,112 +112,150 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-follow_pte() users have been converted to follow_pfnmap*().  Remove the
-API.
+Helpers to install and detect special pmd/pud entries.  In short, bit 9 on
+x86 is not used for pmd/pud, so we can directly define them the same as the
+pte level.  One note is that it's also used in _PAGE_BIT_CPA_TEST but that
+is only used in the debug test, and shouldn't conflict in this case.
 
+One note is that pxx_set|clear_flags() for pmd/pud will need to be moved
+upper so that they can be referenced by the new special bit helpers.
+There's no change in the code that was moved.
+
+Cc: x86@kernel.org
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Ingo Molnar <mingo@redhat.com>
+Cc: Borislav Petkov <bp@alien8.de>
+Cc: Dave Hansen <dave.hansen@linux.intel.com>
 Signed-off-by: Peter Xu <peterx@redhat.com>
 ---
- include/linux/mm.h |  2 --
- mm/memory.c        | 73 ----------------------------------------------
- 2 files changed, 75 deletions(-)
+ arch/x86/Kconfig               |  1 +
+ arch/x86/include/asm/pgtable.h | 80 ++++++++++++++++++++++------------
+ 2 files changed, 53 insertions(+), 28 deletions(-)
 
-diff --git a/include/linux/mm.h b/include/linux/mm.h
-index 7471302658af..c5949b8052c6 100644
---- a/include/linux/mm.h
-+++ b/include/linux/mm.h
-@@ -2369,8 +2369,6 @@ void free_pgd_range(struct mmu_gather *tlb, unsigned long addr,
- 		unsigned long end, unsigned long floor, unsigned long ceiling);
- int
- copy_page_range(struct vm_area_struct *dst_vma, struct vm_area_struct *src_vma);
--int follow_pte(struct vm_area_struct *vma, unsigned long address,
--	       pte_t **ptepp, spinlock_t **ptlp);
- int generic_access_phys(struct vm_area_struct *vma, unsigned long addr,
- 			void *buf, int len, int write);
+diff --git a/arch/x86/Kconfig b/arch/x86/Kconfig
+index acd9745bf2ae..7a3fb2ff3e72 100644
+--- a/arch/x86/Kconfig
++++ b/arch/x86/Kconfig
+@@ -28,6 +28,7 @@ config X86_64
+ 	select ARCH_HAS_GIGANTIC_PAGE
+ 	select ARCH_SUPPORTS_INT128 if CC_HAS_INT128
+ 	select ARCH_SUPPORTS_PER_VMA_LOCK
++	select ARCH_SUPPORTS_HUGE_PFNMAP if TRANSPARENT_HUGEPAGE
+ 	select HAVE_ARCH_SOFT_DIRTY
+ 	select MODULES_USE_ELF_RELA
+ 	select NEED_DMA_MAP_STATE
+diff --git a/arch/x86/include/asm/pgtable.h b/arch/x86/include/asm/pgtable.h
+index a7c1e9cfea41..1e463c9a650f 100644
+--- a/arch/x86/include/asm/pgtable.h
++++ b/arch/x86/include/asm/pgtable.h
+@@ -120,6 +120,34 @@ extern pmdval_t early_pmd_flags;
+ #define arch_end_context_switch(prev)	do {} while(0)
+ #endif	/* CONFIG_PARAVIRT_XXL */
  
-diff --git a/mm/memory.c b/mm/memory.c
-index 313c17eedf56..72f61fffdda2 100644
---- a/mm/memory.c
-+++ b/mm/memory.c
-@@ -6265,79 +6265,6 @@ int __pmd_alloc(struct mm_struct *mm, pud_t *pud, unsigned long address)
++static inline pmd_t pmd_set_flags(pmd_t pmd, pmdval_t set)
++{
++	pmdval_t v = native_pmd_val(pmd);
++
++	return native_make_pmd(v | set);
++}
++
++static inline pmd_t pmd_clear_flags(pmd_t pmd, pmdval_t clear)
++{
++	pmdval_t v = native_pmd_val(pmd);
++
++	return native_make_pmd(v & ~clear);
++}
++
++static inline pud_t pud_set_flags(pud_t pud, pudval_t set)
++{
++	pudval_t v = native_pud_val(pud);
++
++	return native_make_pud(v | set);
++}
++
++static inline pud_t pud_clear_flags(pud_t pud, pudval_t clear)
++{
++	pudval_t v = native_pud_val(pud);
++
++	return native_make_pud(v & ~clear);
++}
++
+ /*
+  * The following only work if pte_present() is true.
+  * Undefined behaviour if not..
+@@ -317,6 +345,30 @@ static inline int pud_devmap(pud_t pud)
  }
- #endif /* __PAGETABLE_PMD_FOLDED */
+ #endif
  
--/**
-- * follow_pte - look up PTE at a user virtual address
-- * @vma: the memory mapping
-- * @address: user virtual address
-- * @ptepp: location to store found PTE
-- * @ptlp: location to store the lock for the PTE
-- *
-- * On a successful return, the pointer to the PTE is stored in @ptepp;
-- * the corresponding lock is taken and its location is stored in @ptlp.
-- *
-- * The contents of the PTE are only stable until @ptlp is released using
-- * pte_unmap_unlock(). This function will fail if the PTE is non-present.
-- * Present PTEs may include PTEs that map refcounted pages, such as
-- * anonymous folios in COW mappings.
-- *
-- * Callers must be careful when relying on PTE content after
-- * pte_unmap_unlock(). Especially if the PTE maps a refcounted page,
-- * callers must protect against invalidation with MMU notifiers; otherwise
-- * access to the PFN at a later point in time can trigger use-after-free.
-- *
-- * Only IO mappings and raw PFN mappings are allowed.  The mmap semaphore
-- * should be taken for read.
-- *
-- * This function must not be used to modify PTE content.
-- *
-- * Return: zero on success, -ve otherwise.
-- */
--int follow_pte(struct vm_area_struct *vma, unsigned long address,
--	       pte_t **ptepp, spinlock_t **ptlp)
++#ifdef CONFIG_ARCH_SUPPORTS_PMD_PFNMAP
++static inline bool pmd_special(pmd_t pmd)
++{
++	return pmd_flags(pmd) & _PAGE_SPECIAL;
++}
++
++static inline pmd_t pmd_mkspecial(pmd_t pmd)
++{
++	return pmd_set_flags(pmd, _PAGE_SPECIAL);
++}
++#endif	/* CONFIG_ARCH_SUPPORTS_PMD_PFNMAP */
++
++#ifdef CONFIG_ARCH_SUPPORTS_PUD_PFNMAP
++static inline bool pud_special(pud_t pud)
++{
++	return pud_flags(pud) & _PAGE_SPECIAL;
++}
++
++static inline pud_t pud_mkspecial(pud_t pud)
++{
++	return pud_set_flags(pud, _PAGE_SPECIAL);
++}
++#endif	/* CONFIG_ARCH_SUPPORTS_PUD_PFNMAP */
++
+ static inline int pgd_devmap(pgd_t pgd)
+ {
+ 	return 0;
+@@ -487,20 +539,6 @@ static inline pte_t pte_mkdevmap(pte_t pte)
+ 	return pte_set_flags(pte, _PAGE_SPECIAL|_PAGE_DEVMAP);
+ }
+ 
+-static inline pmd_t pmd_set_flags(pmd_t pmd, pmdval_t set)
 -{
--	struct mm_struct *mm = vma->vm_mm;
--	pgd_t *pgd;
--	p4d_t *p4d;
--	pud_t *pud;
--	pmd_t *pmd;
--	pte_t *ptep;
+-	pmdval_t v = native_pmd_val(pmd);
 -
--	mmap_assert_locked(mm);
--	if (unlikely(address < vma->vm_start || address >= vma->vm_end))
--		goto out;
--
--	if (!(vma->vm_flags & (VM_IO | VM_PFNMAP)))
--		goto out;
--
--	pgd = pgd_offset(mm, address);
--	if (pgd_none(*pgd) || unlikely(pgd_bad(*pgd)))
--		goto out;
--
--	p4d = p4d_offset(pgd, address);
--	if (p4d_none(*p4d) || unlikely(p4d_bad(*p4d)))
--		goto out;
--
--	pud = pud_offset(p4d, address);
--	if (pud_none(*pud) || unlikely(pud_bad(*pud)))
--		goto out;
--
--	pmd = pmd_offset(pud, address);
--	VM_BUG_ON(pmd_trans_huge(*pmd));
--
--	ptep = pte_offset_map_lock(mm, pmd, address, ptlp);
--	if (!ptep)
--		goto out;
--	if (!pte_present(ptep_get(ptep)))
--		goto unlock;
--	*ptepp = ptep;
--	return 0;
--unlock:
--	pte_unmap_unlock(ptep, *ptlp);
--out:
--	return -EINVAL;
+-	return native_make_pmd(v | set);
 -}
--EXPORT_SYMBOL_GPL(follow_pte);
 -
- static inline void pfnmap_args_setup(struct follow_pfnmap_args *args,
- 				     spinlock_t *lock, pte_t *ptep,
- 				     pgprot_t pgprot, unsigned long pfn_base,
+-static inline pmd_t pmd_clear_flags(pmd_t pmd, pmdval_t clear)
+-{
+-	pmdval_t v = native_pmd_val(pmd);
+-
+-	return native_make_pmd(v & ~clear);
+-}
+-
+ /* See comments above mksaveddirty_shift() */
+ static inline pmd_t pmd_mksaveddirty(pmd_t pmd)
+ {
+@@ -595,20 +633,6 @@ static inline pmd_t pmd_mkwrite_novma(pmd_t pmd)
+ pmd_t pmd_mkwrite(pmd_t pmd, struct vm_area_struct *vma);
+ #define pmd_mkwrite pmd_mkwrite
+ 
+-static inline pud_t pud_set_flags(pud_t pud, pudval_t set)
+-{
+-	pudval_t v = native_pud_val(pud);
+-
+-	return native_make_pud(v | set);
+-}
+-
+-static inline pud_t pud_clear_flags(pud_t pud, pudval_t clear)
+-{
+-	pudval_t v = native_pud_val(pud);
+-
+-	return native_make_pud(v & ~clear);
+-}
+-
+ /* See comments above mksaveddirty_shift() */
+ static inline pud_t pud_mksaveddirty(pud_t pud)
+ {
 -- 
 2.45.0
 
