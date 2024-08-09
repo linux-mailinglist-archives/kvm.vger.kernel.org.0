@@ -1,232 +1,198 @@
-Return-Path: <kvm+bounces-23728-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23729-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FFF794D461
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 18:17:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7565B94D474
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 18:20:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 029D31C2161D
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 16:17:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99C5C1C21438
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 16:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D01E1A00E3;
-	Fri,  9 Aug 2024 16:10:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56C71990BB;
+	Fri,  9 Aug 2024 16:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VihUyOHu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dquab2Fx"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2043.outbound.protection.outlook.com [40.107.237.43])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3AFF1A00C5;
-	Fri,  9 Aug 2024 16:10:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723219807; cv=fail; b=PHs/hhDeAWT0e4LwvVQ/g20UVlRkJZatRrn1J73aaUCHud2WvMK8UT/cnUQCrjM3h8XNk4UKAW/+cJiqcMmMovd4zVnCwc/0AvoJywUYf0A1GKGIkjGwaaCajvmkc/IUL0Np1C3tkJLLKwNq1tocRFUFnXVBd0p7S/y5EYPvgVQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723219807; c=relaxed/simple;
-	bh=cqQSZ6/O7yB85djSspPW8sK7fXuV4kPJxBx3cSZ6gjw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=jfoAu8qxGoPYZzJvUHO4AR9vupgT0eXNVFlfZ3JRjJseIU1KIfjZs5Yodq1D8HrYLfTbW7miaM2wjAiVL8VEP8qRg/0U/FKH4SrOoEIJSzPAfDmsjGZGamTa9YvYtnZWGJqO/Y+a5EsvyJ4KnLwoDQlrSPofK95he/qWumvQiJ4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VihUyOHu; arc=fail smtp.client-ip=40.107.237.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gRg0BTJNW5p0UDeqoTzdt35pkMcBoA/k+dQPhNvfTI1hTm6SRNOUjnK7Sce4vqibbSIURiIHG0JGiHkyoGfdbBrgObcv4+8iVOMKCtefDpazfwBW/zVfIbHG+e8x8dUNfxxo3qJZMFaDBXZF394PQZMrrYOZ2kdc9KqLr0M40KKs7YdowTVX9wzsVXP/WMzJTlMncqyAIiy4I5a/eh+kWFaTLw9ax0O6YpZZkFqcd90EnYDt08OSrn2DPzdycYaBiniq5mXFK6tLScVJ3K2csUDuvNtRfoVumBkaEGghHd88GUEjnlcu6xfL6vCi/BVelXNVfF3PectHNXLD063WVA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=DrexOOdlf1UjKTYvIch7TPrjRc6vPMhDWUocBr0Lv2M=;
- b=uPO2fvBwLx5XITejoGiFy+hUTBkH7HxDWeYRqvj8reJSpPVOQYpOz/cn8L9M3TFscdzQ+I/fCNp8G+aljpy8WyBP9XpEbmNO2ax8JaNLbDOTWau2AJV8jhYqVMB5ro48nA4itpoxytujdRDm7K3GqCLzyFz8rtKdBO0C+BDxfUf0cOVkELuV2ezgKeGFKDTnrBDGLgBiOam/9MAMuGI1NFqSLikWl2LKSXlG43RAKDLN31eFHkKlV4/VSt2YO1h2nIK1MPtpa5cSmFtCFVsPlemah2aU/8LxqskBaDt/URIyGTXWC9A/YNSq2szRabUkTVzlOmqR2GDrfL8i5jdcLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=DrexOOdlf1UjKTYvIch7TPrjRc6vPMhDWUocBr0Lv2M=;
- b=VihUyOHuNSqhZXxUthdPEzhpkUwP3tghyc0XBcG9EQs4VjI9cnyyMnnKRiqBat3RmhJrZQ3hoPSx8QmbNCROrBt8ByjvFQek7yRb85RVouR/noZWGs3LDNYTMo3H5AWJDiYsWxu/V0g6+piHh4mtsLo8G49+QvrpyxTE5wAdEBJKg2PPr9lgy1HzOjyCiEgQ8BSIqV/wAMEmgNKXJT+WRpPLjaa1hP1OMtOiuVJ77USv/NgshojVU1CFCPkt4aidv5N39GeiEp+Wia4iQkgTkIhwAHqqraR6+r1naeuL/xhrzAylptTLgCMdVcCLDlkvQaZGrMRdCayQl02f3JmsAQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by SN7PR12MB6744.namprd12.prod.outlook.com (2603:10b6:806:26c::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7807.32; Fri, 9 Aug
- 2024 16:10:02 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7849.014; Fri, 9 Aug 2024
- 16:10:02 +0000
-Date: Fri, 9 Aug 2024 13:09:59 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: acpica-devel@lists.linux.dev,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Hanjun Guo <guohanjun@huawei.com>, iommu@lists.linux.dev,
-	Joerg Roedel <joro@8bytes.org>, Kevin Tian <kevin.tian@intel.com>,
-	kvm@vger.kernel.org, Len Brown <lenb@kernel.org>,
-	linux-acpi@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Robert Moore <robert.moore@intel.com>,
-	Sudeep Holla <sudeep.holla@arm.com>, Will Deacon <will@kernel.org>,
-	Eric Auger <eric.auger@redhat.com>,
-	Jean-Philippe Brucker <jean-philippe@linaro.org>,
-	Moritz Fischer <mdf@kernel.org>,
-	Michael Shavit <mshavit@google.com>,
-	Nicolin Chen <nicolinc@nvidia.com>, patches@lists.linux.dev,
-	Shameerali Kolothum Thodi <shameerali.kolothum.thodi@huawei.com>
-Subject: Re: [PATCH 6/8] iommu/arm-smmu-v3: Implement
- IOMMU_HWPT_ALLOC_NEST_PARENT
-Message-ID: <20240809160959.GJ8378@nvidia.com>
-References: <6-v1-54e734311a7f+14f72-smmuv3_nesting_jgg@nvidia.com>
- <cd79f790-1281-4280-bc02-6ca9a9d0d26b@arm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cd79f790-1281-4280-bc02-6ca9a9d0d26b@arm.com>
-X-ClientProxiedBy: BN0PR04CA0135.namprd04.prod.outlook.com
- (2603:10b6:408:ed::20) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95AEF12B71
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 16:20:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723220414; cv=none; b=NvAzgKqv1oUF5cayX6D5ViFdH6Qf9QAPlIg0Vv70tdmRSbN2JBC8+u/RXNsJdjwwD0pruS41YMfxKPq8ksGYNlsektON77mgk58g8004/9TjKB2p7mef9IrARAbsScrkfCOHYRCQoA9ifDWhSPWaRO87s2lw3SC9d8U9hABew9Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723220414; c=relaxed/simple;
+	bh=Yc/lu1hQq+6Q9dS52dkHNBiA42cV0GK0dZQdz+si7Tw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=X8X/r3kmuUyOI8cP2Q/gAD2f15q7uuoqXSTE4Wdvbb4fZ7AlVEaCUXWg1b8sAkkq1e49fKt+x8dUTNX3SVqRT5pTegUWpoUhd5axC12BNCCZHYaYG06T/nMMeaSBbYW2HRVN3y7wTKu/B3SO+0b+QyMO7KsCYsosx1si0pZVBas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dquab2Fx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723220411;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Zm5EAdsOXCZvMyPDQvIBSQFNRt+tuy0GlLgmv3TFe5I=;
+	b=dquab2FxtGtEQoUMEWIvVzOKQUO/OPwpjEJ+WQ9oW3cH6kvhOct6OC1+FEW9fFhm2x2Wwo
+	FNLJlsz6Yk59kd63MWJACX8R8wrLQMTNQqIa10NTP6KJwGYAj9WgHyvsQZdPrIZxeD2zFb
+	D+TMMqM6jrOH3twtLbT/3p3lHziOqKc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-209-7DwyPsG0NluBEs7u6arC5A-1; Fri, 09 Aug 2024 12:20:10 -0400
+X-MC-Unique: 7DwyPsG0NluBEs7u6arC5A-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36b356a73fcso1239876f8f.1
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 09:20:10 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723220409; x=1723825209;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt
+         :content-language:from:references:cc:to:subject:user-agent
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Zm5EAdsOXCZvMyPDQvIBSQFNRt+tuy0GlLgmv3TFe5I=;
+        b=SsQtXiR/UfyYYrEMSF3Qa5znRmOFLbRo7DEo2AH9yVufalD1dgma8Ln9RdosDDnq73
+         PSIQfi3W/hyGKTqwML11ZgCxp3HbMzPOrXQDsfuOhJifzA7ezEQ+VIXgGSu1q9Qpurk3
+         OxEvzxb5/BJsar9zE0fY1jdvkkqmqkKIXy9R/+czJWWtpaS36QL2ePf0HoZ7F6X3A3WF
+         xqC1M+VjsQu+Zl8R6h88C5VF9J+6xoPjx1rmfX3+B0jJhapjWENch6vDf7LAoSah1g+i
+         5ZDxfPnzETDiQfXPF9GagXd4wWOTM3DUzFoGQ6qqIs+3IHM3xTu8hX5CybiVRJDpFdnk
+         34BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZSO8jpr3OmFVT1qSWLXcY99qWC9OzxjQXuFtuw0636Yn/DsQvRkQrSII5smJGFdp9BJjUdv9NkQ/40tfcJmxseWBK
+X-Gm-Message-State: AOJu0YwZPvdh0nwvF95G42kLW/VvdUoMacdZZuwPryPPEFlbUESlarCD
+	E8eljQJsLBcPMzBOx/LrVLSPAOLlxlKp9rK6FxQO3wsnCATFEz+XSoteQeDqFak36UeezDN/aB3
+	yOpBmtRu+3vRokw+jCHAJOATMq2Y0IyyzbIsOMesf7yygNDdvcw==
+X-Received: by 2002:a5d:694c:0:b0:367:94a7:12cb with SMTP id ffacd0b85a97d-36d5fe77778mr1563519f8f.43.1723220409020;
+        Fri, 09 Aug 2024 09:20:09 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG199tNHrasXyWylAho8FwcYUzg97ydDg4FbqU1Td01GP7GqR4CztpyDD4hV0dMDBM1OiMjuA==
+X-Received: by 2002:a5d:694c:0:b0:367:94a7:12cb with SMTP id ffacd0b85a97d-36d5fe77778mr1563481f8f.43.1723220408476;
+        Fri, 09 Aug 2024 09:20:08 -0700 (PDT)
+Received: from ?IPV6:2003:d8:2f09:3f00:d228:bd67:7baa:d604? (p200300d82f093f00d228bd677baad604.dip0.t-ipconnect.de. [2003:d8:2f09:3f00:d228:bd67:7baa:d604])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36d27209a69sm5763536f8f.79.2024.08.09.09.20.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Aug 2024 09:20:08 -0700 (PDT)
+Message-ID: <b103edb7-c41b-4a5b-9d9f-9690c5b25eb7@redhat.com>
+Date: Fri, 9 Aug 2024 18:20:06 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|SN7PR12MB6744:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5d92ecd6-5bb8-4a83-dcc3-08dcb88db922
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?PyofhfjmvXPp/IYl6O1vveLM4WykrnUpIzP6ISeYWNMelOuDo2sQsc7K6KkG?=
- =?us-ascii?Q?19v0uM/yTYlUG6giclo4egkY66nP9sORaHKvE4VRPObwgJaZAyabeNpXTUsu?=
- =?us-ascii?Q?8peeH0EYzCIA68mx5QKRHMQhDgHlszBi21ZT12CFAWChuoKYo0EPwtff42VX?=
- =?us-ascii?Q?wxGi5pb0qwhcgNrEwePfQbtpDuQ4Rj3f/SQHIr1N7C/kxldngtAyLXXvOnBE?=
- =?us-ascii?Q?SU/HteIbQPqtGOdwhXOllWV4Hxfkc1FxclCbb+QDBJYfPollL8KVk6DiX8jf?=
- =?us-ascii?Q?jaGChQZ9NJ/0MPxcLxaSYqLbYNCG8cHESZ1Rs69h1zZPyuowDJ6XkEpr6Vq9?=
- =?us-ascii?Q?vIoU4bSNnJ+t4wNrDf9axxYqXr5ujasD/vbN7XRegsXwPY7BUolNNFl1s6Ez?=
- =?us-ascii?Q?Ds2RMD4BZZCiSYGvfsEAFKf4ku3euDhATHsh6O31+OowTFoDY8QqG6P267T+?=
- =?us-ascii?Q?vWfeKxxxubQpb3dJ0zljCRFrbNrjq6RgcTm+m3cvcCB3XH4aXnre3eC4nq0C?=
- =?us-ascii?Q?0+dzRApEc/pyj1nVu0ckyYHYB8VOMbwEuenOQjbyX4JFeh+W43blF5dJZoA2?=
- =?us-ascii?Q?8rdYIILcswRn5WhcE3/3ZQ14dNOsSlvAnFxs9pWQoCn6f4MsL2pR48xWaxnk?=
- =?us-ascii?Q?XapX2SR30MThRwYEVVvBK7Gc+dHMuKrdFLNsM1YofIO9S3ubbnFuJg2gnkhl?=
- =?us-ascii?Q?PsR8nByP3JLf800AnkJ60bxIbdsnLP5UWusQMzHmP0827jD2SrL3Sg2bIYQE?=
- =?us-ascii?Q?pklGmb2zMxNGnn1PRwbP8LaIsFW+OymFgIvJKTggRtdvNOeLXpKknj5HHWY4?=
- =?us-ascii?Q?mTOcapQs6kpNmuqjc9QanPIvXOZ8KK0T/XXjd/sIqcNJeCDVbMckNZMDJoqO?=
- =?us-ascii?Q?cPW39Hk9CBIG4SCi/XKOdxCoqyhTje6E/4qTzAkR82tT3gTsWeOs3FkUavyX?=
- =?us-ascii?Q?WCSS+8OSLNspl0i4ySQt640sz6HbdIX8v3pXmhQyr6jq4ndWH+SkISsrAO8K?=
- =?us-ascii?Q?0SSe4lmfqpOdugnQAjzqwT7hBS7jDos7zqtzbATtkAZSVor8Uxakw1Mjlmju?=
- =?us-ascii?Q?TzbQ0WAqSo5jjm5B7PJ31pJlNXm92qWiLzG/gBgtG5xMtZ1xgoOvGX8ZoMPv?=
- =?us-ascii?Q?D+cN9JmyEp7Ssxzj/ssho99zYDPId+vFNoWdXNu2w/GJwLbWi5qtAGT+ZNQj?=
- =?us-ascii?Q?s+xaxd9gmOzWRHd+FptuWoWwAHDhJXMBEyTRW8w85PXSkCGDNpNfa86pQrBK?=
- =?us-ascii?Q?9je5zsDw9OVsfPB8/thIz30Lzx7cGTqVvklNvjoAKUICyowwt+IZ5b4WeAnJ?=
- =?us-ascii?Q?o0V5mvOvfn2NbbxiE+5P9OKZ9Bfd4LUzat3xauVtsRn+bQ=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?jZhsmdsMFnA+Sr8bkx7bumbbx71mXfh38mseecYxCmubGmMK/ylzRJ1uzbsT?=
- =?us-ascii?Q?DQXWclL6hOyVhI6CQAXHyONY45KUzSlhWnJwUVcJein/d3SD+FSsonxdiLw7?=
- =?us-ascii?Q?ssuYq9HJ5wIjnMACTmIRE7JWRgN+hMdewnwCr9klk9YzGvKp/r4X8NzV54cA?=
- =?us-ascii?Q?3Vl1afj+ubxtL+yxLEXUeo8oNBheNFJJ8IBrBZNeAyxvn2Cp4et/6ZF3y6w1?=
- =?us-ascii?Q?Vmr04K0vhV7Dylr/WoX6W36e+LiAbLDkel8ZEBcPRBImPAXeCq0Vpps2ZmqA?=
- =?us-ascii?Q?CYJTAVx/mkzI9Uc05/l7JiAvHlFrtR0Pdu9AZnYclAQy+D8xS70DE6lZ9ED2?=
- =?us-ascii?Q?LvMQPRnaNEN/ey6q8q7pkGFMW2bJM29dm7UFfowpnUF1MWl1P26EnFGYABV0?=
- =?us-ascii?Q?P6WqvL5tLsDLVWzV/p4YKIM7H5QKm7cQ/dugKjFIm5m3DdgKMSLRk+LTXtOv?=
- =?us-ascii?Q?6hxnjS9a7vASOP00PfD+0saYFvgj3mZt2jNShaeCpeUdBTVUeyhe6GT2ULfq?=
- =?us-ascii?Q?VgRMdR3m6KjIolhsUqlCCZdzMkiNbqFvkzLU/8LG2ddp/9Mrs61KfHlnItoh?=
- =?us-ascii?Q?dmfgF1XdzccRTz/S0dvP54mA8fD6JafU+V71CuuJt5/C+F8EjaaeZNeHqIfq?=
- =?us-ascii?Q?TVbU6gc6pI4dKxK5Ltj71lJT5TUm9qhAgEk4RptyUcXsml+F/8EJSUzGFFfx?=
- =?us-ascii?Q?BVzQLNItPwY0LujEd23e8OkL5IXKNuxAXrOZ8d2O1IUS4Gv4/FtpZLOKTZnn?=
- =?us-ascii?Q?/lske5wIxs+iD3ThSuVvpGf572bVo75p5o4nqzkqcm5obL5sVOD+xHWmT2m3?=
- =?us-ascii?Q?p+X+m2KLZHH9PgdKYKLt3yS9IWwfVWqRk1boFyEX/vKjIkwUC4nnl7WViOWx?=
- =?us-ascii?Q?u7fTT/5ynWOMssdaj9g1DbJ2L2xxP/qzc6QtbpKWG97QSxKlkQBm8XFBR8Cu?=
- =?us-ascii?Q?XfJnKsYXTCBAWLIRiNUYF+4+cEO00LoH/dhEAFNvUB0+c6/y8cZvaNjB8RmF?=
- =?us-ascii?Q?fvdM9r2nU1cy1wNKr6F+b1ZKEztMmPZeCfrsPNW3+1AVh8MRz9YuIw4qmlQv?=
- =?us-ascii?Q?JwYDiEroesVgbUACY4VUd9seLvRihi8TLn659f4vhS/LOtJr3seMGuAzN9LE?=
- =?us-ascii?Q?thDzlAkhaGJ5kFcgEHNqrOXnXpOGfmT45CpSJQ5uAePUeSkH5TUQ13sRoEkP?=
- =?us-ascii?Q?qyIZwQn8o1UMbsweVj7Ik1RShDxzJuris47Rw+3s2yD01NfETQqjdrj1zMJB?=
- =?us-ascii?Q?JyIe4jqb4NMB2SMQHTHrUC2U5HoTS0qZl5017duVNYdHOlaWRFg5/GCusVUi?=
- =?us-ascii?Q?+UfVQr58wU3LH+HCHryXaUA7i2PhmOanjEkHxtQJsTLKj3WKCbtYGtaWJ+SB?=
- =?us-ascii?Q?Z2+KzmRsFDM9pEQBlJNqFcPZXOvzL125Mlc095gpoA4qUMO3cPGqrydHySNI?=
- =?us-ascii?Q?yTv2VCg3oRWvxrkEjHKyl7Tlx0hyT86aZCa9NAXHLjXwzCkAIqwj628umMfA?=
- =?us-ascii?Q?iZ1r3wvst1o98pEnd0swfWRRgP/Ss4TwHF7/ecCjGmnqsz2vXQlmnGrw2MDy?=
- =?us-ascii?Q?knx7RSuxfs/FQYivlP8=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d92ecd6-5bb8-4a83-dcc3-08dcb88db922
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Aug 2024 16:10:01.6915
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5sxDmXM6ekYnq9dfDjvImNuB9L5eS4QWOcIT8JnvW9ZPjlQZI+1xDIQwaLDqNzRI
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6744
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 06/19] mm/pagewalk: Check pfnmap early for
+ folio_walk_start()
+To: Peter Xu <peterx@redhat.com>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org
+Cc: Sean Christopherson <seanjc@google.com>,
+ Oscar Salvador <osalvador@suse.de>, Jason Gunthorpe <jgg@nvidia.com>,
+ Axel Rasmussen <axelrasmussen@google.com>,
+ linux-arm-kernel@lists.infradead.org, x86@kernel.org,
+ Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ Catalin Marinas <catalin.marinas@arm.com>, Ingo Molnar <mingo@redhat.com>,
+ Alistair Popple <apopple@nvidia.com>, Borislav Petkov <bp@alien8.de>,
+ Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+ Dave Hansen <dave.hansen@linux.intel.com>,
+ Alex Williamson <alex.williamson@redhat.com>, Yan Zhao <yan.y.zhao@intel.com>
+References: <20240809160909.1023470-1-peterx@redhat.com>
+ <20240809160909.1023470-7-peterx@redhat.com>
+From: David Hildenbrand <david@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=david@redhat.com; keydata=
+ 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
+ WNyWQQ==
+Organization: Red Hat
+In-Reply-To: <20240809160909.1023470-7-peterx@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 09, 2024 at 04:06:22PM +0100, Robin Murphy wrote:
-> On 2024-08-07 12:41 am, Jason Gunthorpe wrote:
-> > For SMMUv3 the parent must be a S2 domain, which can be composed
-> > into a IOMMU_DOMAIN_NESTED.
-> > 
-> > In future the S2 parent will also need a VMID linked to the VIOMMU and
-> > even to KVM.
-> > 
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> > ---
-> >   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c | 11 ++++++++++-
-> >   1 file changed, 10 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > index 6bbe4aa7b9511c..5faaccef707ef1 100644
-> > --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> > @@ -3103,7 +3103,8 @@ arm_smmu_domain_alloc_user(struct device *dev, u32 flags,
-> >   			   const struct iommu_user_data *user_data)
-> >   {
-> >   	struct arm_smmu_master *master = dev_iommu_priv_get(dev);
-> > -	const u32 PAGING_FLAGS = IOMMU_HWPT_ALLOC_DIRTY_TRACKING;
-> > +	const u32 PAGING_FLAGS = IOMMU_HWPT_ALLOC_DIRTY_TRACKING |
-> > +				 IOMMU_HWPT_ALLOC_NEST_PARENT;
-> >   	struct arm_smmu_domain *smmu_domain;
-> >   	int ret;
-> > @@ -3116,6 +3117,14 @@ arm_smmu_domain_alloc_user(struct device *dev, u32 flags,
-> >   	if (!smmu_domain)
-> >   		return ERR_PTR(-ENOMEM);
-> > +	if (flags & IOMMU_HWPT_ALLOC_NEST_PARENT) {
-> > +		if (!(master->smmu->features & ARM_SMMU_FEAT_TRANS_S2)) {
+On 09.08.24 18:08, Peter Xu wrote:
+> Pfnmaps can always be identified with special bits in the ptes/pmds/puds.
+> However that's unnecessary if the vma is stable, and when it's mapped under
+> VM_PFNMAP | VM_IO.
 > 
-> Nope, nesting needs to rely on FEAT_NESTING, that's why it exists. S2 alone
-> isn't sufficient - without S1 there's nothing to expose to userspace, so
-> zero point in having a "nested" domain with nothing to nest into it - but
-> furthermore we need S2 *without* unsafe broken TLBs.
+> Instead of adding similar checks in all the levels for huge pfnmaps, let
+> folio_walk_start() fail even earlier for these mappings.  It's also
+> something gup-slow already does, so make them match.
+> 
+> Cc: David Hildenbrand <david@redhat.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>   mm/pagewalk.c | 5 +++++
+>   1 file changed, 5 insertions(+)
+> 
+> diff --git a/mm/pagewalk.c b/mm/pagewalk.c
+> index cd79fb3b89e5..fd3965efe773 100644
+> --- a/mm/pagewalk.c
+> +++ b/mm/pagewalk.c
+> @@ -727,6 +727,11 @@ struct folio *folio_walk_start(struct folio_walk *fw,
+>   	p4d_t *p4dp;
+>   
+>   	mmap_assert_locked(vma->vm_mm);
+> +
+> +	/* It has no folio backing the mappings at all.. */
+> +	if (vma->vm_flags & (VM_IO | VM_PFNMAP))
+> +		return NULL;
+> +
 
-I do tend to agree we should fail earlier if IOMMU_DOMAIN_NESTED is
-not possible so let's narrow it.
+That is in general not what we want, and we still have some places that 
+wrongly hard-code that behavior.
 
-However, the above was matching how the driver already worked (ie the
-old arm_smmu_enable_nesting()) where just asking for a normal S2 was
-gated only by FEAT_S2.
+In a MAP_PRIVATE mapping you might have anon pages that we can happily walk.
 
-This does add a CMDQ_OP_TLBI_NH_ALL, but I didn't think that hit an
-errata?
+vm_normal_page() / vm_normal_page_pmd() [and as commented as a TODO, 
+vm_normal_page_pud()] should be able to identify PFN maps and reject 
+them, no?
 
-The nesting specific stuff that touches things that FEAT_NESTING
-covers in the driver is checked here:
+-- 
+Cheers,
 
-static struct iommu_domain *
-arm_smmu_domain_alloc_nesting(struct device *dev, u32 flags,
-			      struct iommu_domain *parent,
-			      const struct iommu_user_data *user_data)
-{
-	if (!(master->smmu->features & ARM_SMMU_FEAT_NESTING))
-		return ERR_PTR(-EOPNOTSUPP);
+David / dhildenb
 
-Which prevents creating a IOMMU_DOMAIN_NESTED, meaning you can't get a
-CD table on top of the S2 or issue any S1 invalidations.
-
-Thanks,
-Jason
 
