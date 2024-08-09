@@ -1,217 +1,180 @@
-Return-Path: <kvm+bounces-23775-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23776-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73E4E94D708
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 21:12:30 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C74D894D782
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 21:43:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8C2BB222AB
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 19:12:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4905C1F22D1C
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 19:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 266B716729D;
-	Fri,  9 Aug 2024 19:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16B4F1607B7;
+	Fri,  9 Aug 2024 19:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RBJi1Q/8"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pmwlJHrB"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3737115921B;
-	Fri,  9 Aug 2024 19:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B3E101E6
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 19:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723230653; cv=none; b=S4E5v7f+WV999I6VqQkI1XgZf9Y1HvZya8aLSDmO1+hAHGgM6DNBYcXc0PvZWR52uI2xDzuhPQN0/8EtBOwCuWgvR+IciZ3b3DXA/a1ZpQN7z3w5GRJfpVGuyQBCCFZEJj34Flw6TPDam4G5YQz8kGnalP9wFmCtJkvkVc+imi4=
+	t=1723232622; cv=none; b=ZO0bdocDHThZg6USPjebEknFzN9vjUdc3vAxt0E4nF9ZZ54QNeF1AvZMiQnq37iiB9e5rzP9cfOyDnk96TZi3VehFs1sLcBGxlCrRKB+b8Ne1UQVXtYdm5s40HPiG3WBFbB63aCbBjsbmQMUgoBydmXb0sJjlMesgSBshtFnAYo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723230653; c=relaxed/simple;
-	bh=xI5Rbfi+pxcRJzLQc5ic3pdeHhvxFHNMZb8wh/45EZ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=ZNrdaGm8QHbHPM5evbwB6l+YJxYvn3RbwYqylxccUAFSyLPTsADYxmSHlBP+GFLnD+tTfxsVX/3pgUNVNCdqo2IXXxAbdeDCM/gcn7OT2dUwLmxDwAATvt1v3m/aB/ja5OAksnfL2VcGq6Fni+USXUj8JDTRQTcYORQzBQwunjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RBJi1Q/8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A8F8C32782;
-	Fri,  9 Aug 2024 19:10:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723230652;
-	bh=xI5Rbfi+pxcRJzLQc5ic3pdeHhvxFHNMZb8wh/45EZ0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=RBJi1Q/8quzblW4+FN960AoXuXHmEhNfbm9HZpN2JIzI2CqfcBTTnCpSde+mQMyWM
-	 obSIfu8PqQCiHx2ESCdA1YIffLyG1BokpNr7zizU7NVriAPGPY0uL3Ecy2RRePi6Wh
-	 cWXQIG4MPoZMzVajNEROuIsLFo+UtKH3t48IFY81Pu6DbKO1AtxfTtMuG+aolKJ/45
-	 eXeEl7OixN1aFoFsRPpxwrsT/Yjh7TO6TreBz22Qulj2KfgrlCAeUTdjoR39e1goSI
-	 QkcZmW2we3hNqn4CjDAEoVtrpAYLQN278jTiMG1lkCudLR4sxlFCB/bgGYrrOhLMLM
-	 0aYj99n6+5nMw==
-Date: Fri, 9 Aug 2024 14:10:50 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Lu Baolu <baolu.lu@linux.intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-	Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
-	Robin Murphy <robin.murphy@arm.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Will Deacon <will@kernel.org>, patches@lists.linux.dev
-Subject: Re: [PATCH] iommu: Allow ATS to work on VFs when the PF uses IDENTITY
-Message-ID: <20240809191050.GA206627@bhelgaas>
+	s=arc-20240116; t=1723232622; c=relaxed/simple;
+	bh=1XlkVjHo+suzkHDpODakK3YnPz0xLR07kWNXlLZwdNY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=DPHaaPEtGubbqS5M0fcY/ZRG+MW2lA0lxWg9wuIQE2VdehnfVJBk/OJZ3h/uK3Y/bkT/mnPeV3fOCetPJ9fJziIlUMdBgGe1RITkPbxR7tlccWXR2i/YSdS9XFKZtgBh5ilVcj0i7b8CIQpmRh9Q4iw3olJJ0KEDYljdjmGIlLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pmwlJHrB; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-66890dbb7b8so55870647b3.0
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 12:43:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723232619; x=1723837419; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EgnPdPJ37XkRkd0MNy853KicoIlpIy484NkRqLT7dIc=;
+        b=pmwlJHrBVaVp24Bda74go0FLWflaT/2/GqFiWP7+PbPum0y20CoeyhmDhTKjqTmvuH
+         aW9H+5wGQ6+l07UCgLx9mH07f0RV4Hl9tfxK/uvbQHTBYDpvfz1imsBkellhb0I73RYN
+         Rf/44kj5RJTu9v7A9GYvhdwGh1XyFKI/ItCnYzSsGDLnv4hINTsLDIqJF8N34TYuJicQ
+         hIQwjbcJewlX6lPD7QsNDIAMOH7gS6hayxwp5pvFYZE6LCjWHNFwUM1Ruwzv0ClfYweY
+         iN5xB70PjpgysZmHRuMhU9NxX59Hlon6mVeDgTvvxDjJ3/ocGYMuoYt7sGhABAchNG4N
+         IgeA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723232619; x=1723837419;
+        h=cc:to:from:subject:message-id:mime-version:date:reply-to
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EgnPdPJ37XkRkd0MNy853KicoIlpIy484NkRqLT7dIc=;
+        b=RHNUaoUBV7vO8GMyxOCGFzH+czvKvFL0sWg6GC9EDcj/ShDKBsFITkd9hr/Q1iAkU4
+         1ILY3X7LFH2rraEfsgn0UI6meJcY6QfzYCMMM1dFVBfBBXaeTZ42eNt9XAe8bajq2I7h
+         jFxMbPPidtS3NnxDgocmoSJJ979IlvfBo0RfCni/E4oWoVghCS6ykvGZqlqUKT5b3FjR
+         LoQtqoEIbmuR2u1sjDJuCdCqvEJqaDz26/Oet3BUg2+KmmLnugtbZzegWYXklwY4R1/E
+         h+tc1RmqgtNYVMs69HlZ+QdwPLs6MTYyS/h4wM1IwEdzOrrfHtNWWdHeu1wM84Nj2hIM
+         q8Sg==
+X-Gm-Message-State: AOJu0YzYq2vUD6UBMe934suEqpdXdNYAd6PiMgRe70eoIzPSyvLg1zk9
+	OcV0Z4dMFRjqhFOpu3meJQ1NIZhP/vi7HwQ9eoBxRPKhQpM3bv7lAhSw00dvAE+IUh1/3mkXQHs
+	0cA==
+X-Google-Smtp-Source: AGHT+IHSbQtzYx2tkfW7590mmdt6dl9zn2glE7iKVYY/9v60Qq7jrhPhZwoWuWBhDE6LSdVzbuCPHHbm6x0=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a0d:f4c3:0:b0:62c:ff73:83f with SMTP id
+ 00721157ae682-69ec9637eefmr863697b3.8.1723232619634; Fri, 09 Aug 2024
+ 12:43:39 -0700 (PDT)
+Reply-To: Sean Christopherson <seanjc@google.com>
+Date: Fri,  9 Aug 2024 12:43:12 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
+Message-ID: <20240809194335.1726916-1-seanjc@google.com>
+Subject: [PATCH 00/22] KVM: x86/mmu: Allow yielding on mmu_notifier zap
+From: Sean Christopherson <seanjc@google.com>
+To: Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Aug 07, 2024 at 03:19:20PM -0300, Jason Gunthorpe wrote:
-> PCI ATS has a global Smallest Translation Unit field that is located in
-> the PF but shared by all of the VFs.
-> 
-> The expectation is that the STU will be set to the root port's global STU
-> capability which is driven by the IO page table configuration of the iommu
-> HW. Today it becomes set when the iommu driver first enables ATS.
-> 
-> Thus, to enable ATS on the VF, the PF must have already had the correct
-> STU programmed, even if ATS is off on the PF.
-> 
-> Unfortunately the PF only programs the STU when the PF enables ATS. The
-> iommu drivers tend to leave ATS disabled when IDENTITY translation is
-> being used.
-> 
-> Thus we can get into a state where the PF is setup to use IDENTITY with
-> the DMA API while the VF would like to use VFIO with a PAGING domain and
-> have ATS turned on. This fails because the PF never loaded a PAGING domain
-> and so it never setup the STU, and the VF can't do it.
-> 
-> The simplest solution is to have the iommu driver set the ATS STU when it
-> probes the device. This way the ATS STU is loaded immediately at boot time
-> to all PFs and there is no issue when a VF comes to use it.
-> 
-> Add a new call pci_prepare_ats() which should be called by iommu drivers
-> in their probe_device() op for every PCI device if the iommu driver
-> supports ATS. This will setup the STU based on whatever page size
-> capability the iommu HW has.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/iommu/amd/iommu.c                   |  3 ++
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  6 ++++
->  drivers/iommu/intel/iommu.c                 |  1 +
->  drivers/pci/ats.c                           | 33 +++++++++++++++++++++
->  include/linux/pci-ats.h                     |  1 +
->  5 files changed, 44 insertions(+)
+The main intent of this series is to allow yielding, i.e. cond_resched(),
+when unmapping memory in shadow MMUs in response to an mmu_notifier
+invalidation.  There is zero reason not to yield, and in fact I _thought_
+KVM did yield, but because of how KVM grew over the years, the unmap path
+got left behind.
 
-For the pci/ats.c change:
+The first half of the series is reworks max_guest_memory_test into
+mmu_stress_test, to give some confidence in the mmu_notifier-related
+changes.
 
-Acked-by: Bjorn Helgaas <bhelgaas@google.com>
+Oliver and Marc, there's on patch lurking in here to enable said test on
+arm64.  It's as well tested as I can make it (and that took much longer
+than anticipated because arm64 hit races in the test that x86 doesn't
+for whatever reason).
 
-Happy to merge via PCI if the IOMMU folks ack it, but the behavior
-change is more important on the IOMMU side, so maybe it makes more
-sense to merge there.
+The middle of the series reworks x86's shadow MMU logic to use the
+zap flow that can yield.
 
-> diff --git a/drivers/iommu/amd/iommu.c b/drivers/iommu/amd/iommu.c
-> index b19e8c0f48fa25..98054497d343bc 100644
-> --- a/drivers/iommu/amd/iommu.c
-> +++ b/drivers/iommu/amd/iommu.c
-> @@ -2203,6 +2203,9 @@ static struct iommu_device *amd_iommu_probe_device(struct device *dev)
->  
->  	iommu_completion_wait(iommu);
->  
-> +	if (dev_is_pci(dev))
-> +		pci_prepare_ats(to_pci_dev(dev), PAGE_SHIFT);
-> +
->  	return iommu_dev;
->  }
->  
-> diff --git a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> index a31460f9f3d421..9bc50bded5af72 100644
-> --- a/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> +++ b/drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c
-> @@ -3295,6 +3295,12 @@ static struct iommu_device *arm_smmu_probe_device(struct device *dev)
->  	    smmu->features & ARM_SMMU_FEAT_STALL_FORCE)
->  		master->stall_enabled = true;
->  
-> +	if (dev_is_pci(dev)) {
-> +		unsigned int stu = __ffs(smmu->pgsize_bitmap);
-> +
-> +		pci_prepare_ats(to_pci_dev(dev), stu);
-> +	}
-> +
->  	return &smmu->iommu;
->  
->  err_free_master:
-> diff --git a/drivers/iommu/intel/iommu.c b/drivers/iommu/intel/iommu.c
-> index 9ff8b83c19a3e2..ad81db026ab236 100644
-> --- a/drivers/iommu/intel/iommu.c
-> +++ b/drivers/iommu/intel/iommu.c
-> @@ -4091,6 +4091,7 @@ static struct iommu_device *intel_iommu_probe_device(struct device *dev)
->  
->  	dev_iommu_priv_set(dev, info);
->  	if (pdev && pci_ats_supported(pdev)) {
-> +		pci_prepare_ats(pdev, VTD_PAGE_SHIFT);
->  		ret = device_rbtree_insert(iommu, info);
->  		if (ret)
->  			goto free;
-> diff --git a/drivers/pci/ats.c b/drivers/pci/ats.c
-> index c570892b209095..87fa03540b8a21 100644
-> --- a/drivers/pci/ats.c
-> +++ b/drivers/pci/ats.c
-> @@ -47,6 +47,39 @@ bool pci_ats_supported(struct pci_dev *dev)
->  }
->  EXPORT_SYMBOL_GPL(pci_ats_supported);
->  
-> +/**
-> + * pci_prepare_ats - Setup the PS for ATS
-> + * @dev: the PCI device
-> + * @ps: the IOMMU page shift
-> + *
-> + * This must be done by the IOMMU driver on the PF before any VFs are created to
-> + * ensure that the VF can have ATS enabled.
-> + *
-> + * Returns 0 on success, or negative on failure.
-> + */
-> +int pci_prepare_ats(struct pci_dev *dev, int ps)
-> +{
-> +	u16 ctrl;
-> +
-> +	if (!pci_ats_supported(dev))
-> +		return -EINVAL;
-> +
-> +	if (WARN_ON(dev->ats_enabled))
-> +		return -EBUSY;
-> +
-> +	if (ps < PCI_ATS_MIN_STU)
-> +		return -EINVAL;
-> +
-> +	if (dev->is_virtfn)
-> +		return 0;
-> +
-> +	dev->ats_stu = ps;
-> +	ctrl = PCI_ATS_CTRL_STU(dev->ats_stu - PCI_ATS_MIN_STU);
-> +	pci_write_config_word(dev, dev->ats_cap + PCI_ATS_CTRL, ctrl);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(pci_prepare_ats);
-> +
->  /**
->   * pci_enable_ats - enable the ATS capability
->   * @dev: the PCI device
-> diff --git a/include/linux/pci-ats.h b/include/linux/pci-ats.h
-> index df54cd5b15db09..d98929c86991be 100644
-> --- a/include/linux/pci-ats.h
-> +++ b/include/linux/pci-ats.h
-> @@ -8,6 +8,7 @@
->  /* Address Translation Service */
->  bool pci_ats_supported(struct pci_dev *dev);
->  int pci_enable_ats(struct pci_dev *dev, int ps);
-> +int pci_prepare_ats(struct pci_dev *dev, int ps);
->  void pci_disable_ats(struct pci_dev *dev);
->  int pci_ats_queue_depth(struct pci_dev *dev);
->  int pci_ats_page_aligned(struct pci_dev *dev);
-> 
-> base-commit: e7153d9c8cee2f17fdcd011509860717bfa91423
-> -- 
-> 2.46.0
-> 
+The last third or so is a wee bit adventurous, and is kinda of an RFC, but
+well tested.  It's essentially prep/post work for James' MGLRU, and allows
+aging SPTEs in x86's shadow MMU to run outside of mmu_lock, e.g. so that
+nested TDP (stage-2) MMUs can participate in MGLRU.
+
+If everything checks out, my goal is to land the selftests and yielding
+changes in 6.12.  The aging stuff is incomplete and meaningless without
+James' MGLRU, I'm posting it here purely so that folks can see the end
+state when the mmu_notifier invalidation paths also moves to a different
+API.
+
+James, the aging stuff is quite well tested (see below).  Can you try
+working into/on-top of your MGLRU series?  And if you're feeling very
+kind, hammer it a bit more? :-)  I haven't looked at the latest ideas
+and/or discussion on the MGLRU series, but I'm hoping that being able to
+support the shadow MMU (absent the stupid eptad=0 case) in MGLRU will
+allow for few shenanigans, e.g. no need to toggle flags during runtime.
+
+As for testing, I spun up a VM and ran a compilation loop and `stress` in
+the VM, while simultaneously running a small userspace program to age the
+VM's memory (also in an infinite loop), using the same basic methodology as
+access_tracking_perf_test.c (I put almost all of guest memory into a
+memfd and then aged only that range of memory).
+
+I confirmed that the locking does work, e.g. that there was (infrequent)
+contention, and am fairly confident that the idea pans out.  E.g. I hit
+the BUG_ON(!is_shadow_present_pte()) using that setup, which is the only
+reason those patches exist :-)
+
+Sean Christopherson (22):
+  KVM: selftests: Check for a potential unhandled exception iff KVM_RUN
+    succeeded
+  KVM: selftests: Rename max_guest_memory_test to mmu_stress_test
+  KVM: selftests: Only muck with SREGS on x86 in mmu_stress_test
+  KVM: selftests: Compute number of extra pages needed in
+    mmu_stress_test
+  KVM: selftests: Enable mmu_stress_test on arm64
+  KVM: selftests: Use vcpu_arch_put_guest() in mmu_stress_test
+  KVM: selftests: Precisely limit the number of guest loops in
+    mmu_stress_test
+  KVM: selftests: Add a read-only mprotect() phase to mmu_stress_test
+  KVM: selftests: Verify KVM correctly handles mprotect(PROT_READ)
+  KVM: x86/mmu: Move walk_slot_rmaps() up near
+    for_each_slot_rmap_range()
+  KVM: x86/mmu: Plumb a @can_yield parameter into __walk_slot_rmaps()
+  KVM: x86/mmu: Add a helper to walk and zap rmaps for a memslot
+  KVM: x86/mmu: Honor NEED_RESCHED when zapping rmaps and blocking is
+    allowed
+  KVM: x86/mmu: Morph kvm_handle_gfn_range() into an aging specific
+    helper
+  KVM: x86/mmu: Fold mmu_spte_age() into kvm_rmap_age_gfn_range()
+  KVM: x86/mmu: Add KVM_RMAP_MANY to replace open coded '1' and '1ul'
+    literals
+  KVM: x86/mmu: Refactor low level rmap helpers to prep for walking w/o
+    mmu_lock
+  KVM: x86/mmu: Use KVM_PAGES_PER_HPAGE() instead of an open coded
+    equivalent
+  KVM: x86/mmu: Add infrastructure to allow walking rmaps outside of
+    mmu_lock
+  KVM: x86/mmu: Add support for lockless walks of rmap SPTEs
+  KVM: x86/mmu: Support rmap walks without holding mmu_lock when aging
+    gfns
+  ***HACK*** KVM: x86: Don't take mmu_lock when aging gfns
+
+ arch/x86/kvm/mmu/mmu.c                        | 527 +++++++++++-------
+ arch/x86/kvm/svm/svm.c                        |   2 +
+ arch/x86/kvm/vmx/vmx.c                        |   2 +
+ tools/testing/selftests/kvm/Makefile          |   3 +-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |   3 +-
+ ..._guest_memory_test.c => mmu_stress_test.c} | 144 ++++-
+ virt/kvm/kvm_main.c                           |   7 +-
+ 7 files changed, 482 insertions(+), 206 deletions(-)
+ rename tools/testing/selftests/kvm/{max_guest_memory_test.c => mmu_stress_test.c} (65%)
+
+
+base-commit: 332d2c1d713e232e163386c35a3ba0c1b90df83f
+-- 
+2.46.0.76.ge559c4bf1a-goog
+
 
