@@ -1,279 +1,260 @@
-Return-Path: <kvm+bounces-23664-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23665-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA39294C89B
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 04:36:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442BE94C8DC
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 05:25:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4857FB22128
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 02:36:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFB91282237
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 03:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95EAF17BB6;
-	Fri,  9 Aug 2024 02:36:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331FF182A0;
+	Fri,  9 Aug 2024 03:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nPcwsZ3G"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fLVa0V46"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34219175B1;
-	Fri,  9 Aug 2024 02:36:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723170980; cv=fail; b=OHzSp8N8Vc8bzUKTjO736Mz38FAwu7jVfHAkSClIGMjgJHcuALpDfCiMwojRIAbM4JFLn7VvE6T6LrwOyfUWDQJ+qaMFeQXfL5jBnixAIBSw5lLMeHMqxmJzYfkD27yEiwZaFwVhlvks6CNw1ncxBy8ztuNXNeW27HsdkZQwSok=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723170980; c=relaxed/simple;
-	bh=ewiDOR5lvzjBNewFLdrJZ32gj/SAfEguY/PxGiwotJA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NI3JkvnZJeXiy+b6Efryi9p3W8tVLa4emScM0T/WmljI3IlF5MGSpbdzVjJiy8yqmc8vKQ3iU5gR2q3J0yLiE76mnoQbLCwXf+tAofDcMiwx4kJVlMourozFYAJZBnBgr6mq00nTLaTWTeJXBy6pDkV4eyKc6LDNQA0BKhzNX34=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nPcwsZ3G; arc=fail smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43324171AA
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 03:25:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723173919; cv=none; b=apxfBmFrIUfStheop+RU95dbcUXscrbDj7dvpE4d6QxkveNpP8sKlbQiGt9scjwCRhJKs7ZjHalNbiKnQq6U5wBfqMaeQbOcle8E0wlAHjYOLAaD7IfhOSuY+Yov4T34eyUIezegM41obTCiFY88SLcBTXjJBx0a8RTy51ZRKvE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723173919; c=relaxed/simple;
+	bh=Tw+oP3IUd1a2tjFWuBay+BRp/YDXjyJCFYsMxwsCFAA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hc1cKcBb8v0yGJ5B9N7o81RgwQDjrK5fCWp8w4Gs/yJtBtCF4D5JBJmwslZZLyqpeApAP/vi3/zUu7//U3hO9oldaqEDQ59PD2sfDS3/nveXSHN76c8J3hbLyzOD7w94EcE8fVx7ZBxcrzO2q2QnnmAormfW5nBrv4JxgJMsHVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fLVa0V46; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723170979; x=1754706979;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ewiDOR5lvzjBNewFLdrJZ32gj/SAfEguY/PxGiwotJA=;
-  b=nPcwsZ3GD/9sfJBbQ1ogAjoKkuTD7JzidSBuuFl1bOj+CKLdTyR9H1J0
-   cwUU7qq0Ui/3CA2dtE3vAaVjGr7byawm41HGaAt61sfuhSrtQSNkM/hrt
-   DKO8sJ6RQXYS2VAiSQaFWemxiOeEgTvGybUwl+/+BKoqfXRdOnUrwCudQ
-   f834NiAp7b9L0Ymd3cY5E8k+iXaqoTa+4j9BuETkHYSu01leKUAU5CfHV
-   IktSk+Ghla4F51cjKJ0M9386d6wKQBwQPr2nw9cOWY055iM6MMK4IYM3T
-   KYLS2q9zUFmvhJj05jddtK7VxoYlfXSkHEnztotQdBPZhnLsF7e/WRxGO
+  t=1723173918; x=1754709918;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Tw+oP3IUd1a2tjFWuBay+BRp/YDXjyJCFYsMxwsCFAA=;
+  b=fLVa0V4698TvNJLjqmSFeSakdJBvNMCA6bMq7x+WlwNLzR9LHFY1CPMK
+   FIltBEy3tmeR78dYIEHya4TDnUv/l+Fw1Ei3+SJ4RII6gbV6Vhjs9gsYd
+   dNyqtCrO0FadzbiAG6NRKhEm2Jmjq14mreB/pxEpNWK0kITxAcZk1vrTv
+   IHykCdRs7jLinfmN8E6ekLLd97RMzFDFCz+u5IJokpoEhCtKTfguqTLqN
+   X63dzgeKkAbgH9kDTfHZoIoiZldk+OJNWQ+w0r9gN11XOuHsMe5jG8HQK
+   GCDWVX8EdKThHsOVNNt+9ShmraKZj2pE7VZeTfz9LvqsrddW+gTJWtCzU
    Q==;
-X-CSE-ConnectionGUID: zVI0l8GdR9y3OFhD0Mp9zA==
-X-CSE-MsgGUID: sEo7l+wnSAK0Y9i2Hgp3Cg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="46737733"
-X-IronPort-AV: E=Sophos;i="6.09,274,1716274800"; 
-   d="scan'208";a="46737733"
+X-CSE-ConnectionGUID: XlKbsJVlRMybvcrwCtf0EQ==
+X-CSE-MsgGUID: +4FrcpYIQNab2LV26Gs38g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11158"; a="31909005"
+X-IronPort-AV: E=Sophos;i="6.09,275,1716274800"; 
+   d="scan'208";a="31909005"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 19:36:18 -0700
-X-CSE-ConnectionGUID: qBMACLqDTFycRExIMALKfQ==
-X-CSE-MsgGUID: IT7ZYKafRvapOKNLc3fSoQ==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Aug 2024 20:25:17 -0700
+X-CSE-ConnectionGUID: TUDafeUTQROSXWiRTIUWbg==
+X-CSE-MsgGUID: Z1EXJPldT+Sok75tUmhTgw==
 X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,274,1716274800"; 
-   d="scan'208";a="57299577"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 08 Aug 2024 19:36:18 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 8 Aug 2024 19:36:17 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Thu, 8 Aug 2024 19:36:17 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Thu, 8 Aug 2024 19:36:17 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Thu, 8 Aug 2024 19:36:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nH71IKhad6OzlYBJ3XTkv3kPOTozHh5vnfG4XOU+ZevSOmHDZamdLjPHekdPrppkVd2bI6hUOD8KIxlI0lVXv2u+eue6HyPmKIEpd6Vj970ZiG0IJO/TXqJ37Y/7jIM95FoVEuUvtEGR6QbkdKN/aJ6Apf+8new+wfXexGJcePLslwrjbLhZEJE28DAQcFbqfSoNt+rbQfOD4AXndF4NHTQYGph/asde4SyE8jhh4G+9IOevCw7I3OEPMNAWW8kN1plBJpDzBX4jmCUdfhYskaE8UHZPcJHebhMeGp88bngyB/Zz7My2faQORGNpXejUVR+5RHDUpSw+iYuia8qAkQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YPHomvYe7lz31NuTzZWVENEKRGBF3SrPu8Uw4IpaNx4=;
- b=WzLJHnB86I/XtCtlOVyJR5IHLyydasvPUI4Ge9tjbKra1iOCyw3ko1iHc8NHk7OLEhYDxDm078LcyRKDm3iKxtgzdpLDlDPV8yUqjxQsa4OE5HmZfnRO1OQ308PjTyxbF9FxmFMkdunIVqyhzTd4S2F2N8Crojr4zFmA/7mIGyOhXS0Dn2dsrYlJF7k7fHiTmVrU9MrEDQ8jUebHFLRxXNzbbvoJO9N5aRqV6V0EIVS7Yc2Hgix7PZ61Kji27JAFErREyLGh7VHAdUHWGmyoI6BvkIvkuda0tCRcbDrmyVW//XTHEKoXRSZ/3nHnP9dxW8eo64EEVzx1WYKtMueyAA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
- by SJ0PR11MB5072.namprd11.prod.outlook.com (2603:10b6:a03:2db::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.29; Fri, 9 Aug
- 2024 02:36:14 +0000
-Received: from BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1]) by BN9PR11MB5276.namprd11.prod.outlook.com
- ([fe80::b576:d3bd:c8e0:4bc1%3]) with mapi id 15.20.7828.023; Fri, 9 Aug 2024
- 02:36:14 +0000
-From: "Tian, Kevin" <kevin.tian@intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>, Lu Baolu <baolu.lu@linux.intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, David Woodhouse <dwmw2@infradead.org>,
-	"iommu@lists.linux.dev" <iommu@lists.linux.dev>, Joerg Roedel
-	<joro@8bytes.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-pci@vger.kernel.org"
-	<linux-pci@vger.kernel.org>, Robin Murphy <robin.murphy@arm.com>, "Suravee
- Suthikulpanit" <suravee.suthikulpanit@amd.com>, Will Deacon <will@kernel.org>
-CC: "patches@lists.linux.dev" <patches@lists.linux.dev>
-Subject: RE: [PATCH] iommu: Allow ATS to work on VFs when the PF uses IDENTITY
-Thread-Topic: [PATCH] iommu: Allow ATS to work on VFs when the PF uses
- IDENTITY
-Thread-Index: AQHa6PZmMIHnBjt+Fk633+Z4DoVWPrIeNWKg
-Date: Fri, 9 Aug 2024 02:36:14 +0000
-Message-ID: <BN9PR11MB52762296EEA7F307A48591518CBA2@BN9PR11MB5276.namprd11.prod.outlook.com>
-References: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
-In-Reply-To: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|SJ0PR11MB5072:EE_
-x-ms-office365-filtering-correlation-id: 86a8a317-cfbb-4873-6a45-08dcb81c09d0
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|7416014|1800799024|376014|38070700018|921020;
-x-microsoft-antispam-message-info: =?us-ascii?Q?01+RCnq+EzhsS1EBKIRm/y88FU8R4U4X83uWUvL6c3hgbxMqXUYpboUusskK?=
- =?us-ascii?Q?hMr4zK1aWZJ8ztH4SZm75GrM/GNCExA5wck7Sgc1Y9I/gWQg7HyxCGfqPe9y?=
- =?us-ascii?Q?FJfVlNEda0hlNrgbeOeJcIQG2dncUjaIZ6ulGqOyuBuJYALsBuq54vk/p1Kk?=
- =?us-ascii?Q?L6xdYpmKl0twTzNYFa/L9zZxmo97hSkmYbnc67K1GTVX4tjLVXpCWvTawruU?=
- =?us-ascii?Q?OyLmg4xc305bYNABG++PSq+ua8ydngXZ6E3d/AeNz0+UTT2WMWETyDbY5eWR?=
- =?us-ascii?Q?pmXcSDMH3GO6NT9ysM7FauSsjvsTpAYUHvwsqgdQ5U3KRLlgfKBGM0E5q3dH?=
- =?us-ascii?Q?FcRxdkHb/ofO0Fo0aulz1sgnyxHUzpZcHNJ1JXdq4UjfgYeFf8rrun0nZVbQ?=
- =?us-ascii?Q?+tvViTRplEWO8mUwnUYrdWgjyZKQ6TycF221k1/SAdyOoyn3H0l0wEfQaOgm?=
- =?us-ascii?Q?Pqu8qBluzEB385u+FelL4rJcQ8+8TNMKYETpfFabPLMaevAum/ojv757rmYh?=
- =?us-ascii?Q?NkAZw+BB1lHo/a/BuI5tG5dDYtzjtr2J7fUjXfK3dySimosTPvDH3z61u8sT?=
- =?us-ascii?Q?Dr0YHNZU6ZsbAf1GKOXxIoluv2A/N2g5E/CEeHtizCZ9hXGRr+cjTpyKOmd3?=
- =?us-ascii?Q?Gvvqkzx8nGvaHk1s2Ux1HmpwSqKaIylX5WDdOhoz0dJSoiG7klRwOaNaMVkx?=
- =?us-ascii?Q?ZYYlXtpS8iYNVSQBoQR61IL3IBE5eAU+c9LvYEke9wy6FCkqU+5+lsM3Frjd?=
- =?us-ascii?Q?BlmeADsbymQCA3ex7PKZU9fHIH7SSZE4JS0soiYFQ8BMlpbETPVWw//kNZXx?=
- =?us-ascii?Q?54TsCHTReMOTPjh+bJgjpzONXZ3AN8c1GF/RJ90jEJmaVl1R5cVKZE0whBKs?=
- =?us-ascii?Q?nkVV+MYqsnC4HwYzCoSprqa3hG9RkqLXS9EfV7QINRkbrr3as99JckJI+KR3?=
- =?us-ascii?Q?sRI4plgizK2rx4dJb0wF8mlHAsasYh1wAl64XLSiYGRIlQQ4nqfXD/a+upRF?=
- =?us-ascii?Q?zE81O3D4gLwS4kqLFN8PDnTlNaPrJFvukm6OTxkPKjYXKhjlXKX2PrafS0+p?=
- =?us-ascii?Q?QOWp+kgNIl3Qt35MqgrWBk0fdFJQuxq0Wfcmjuzh2IqhH9ZOx33xjCxhlLF6?=
- =?us-ascii?Q?ljtGoSG3uv43mVRuVSBVv6lGOmbcaWmTWX+fmreeRH8a3syF5FpVKyKT37va?=
- =?us-ascii?Q?y9ewQRJ+HN4Pb5kLYiN9bPeSGwJEhiLJ/jg5igd74+oE3Cjoo0gDqNxwaGkL?=
- =?us-ascii?Q?1GEjE9+nt7h8WUAY+zG+r1nILh2WgPtqo+rYIOkrfCNEIc7+DZ1Lrqzq9ovM?=
- =?us-ascii?Q?kkTTn7+U0yV0qN0rJ+6QG1XgInpUD3kuFW0pM03YzO4j9JRohI8bQ2DsolkR?=
- =?us-ascii?Q?PopoYkZhTumG0HovFwFp2Vklko/7d+TEvGY52tdHMZXg8xwHvFT6xkniZY0p?=
- =?us-ascii?Q?z9D0mXqjyBs=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(1800799024)(376014)(38070700018)(921020);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?IvgbWknofpJjLymro6pvhaz79NEazGDA6FjZC2fx8b3d9b2XxtUZ+gWXYz7F?=
- =?us-ascii?Q?Qfs0o7y6+0Y8jn7AhRaYWXQsdw6FcG/DG6cKW3ZwuUVpitpbNylPFs8nUOev?=
- =?us-ascii?Q?HBmFCF3CTZtjrImFRQG4NWalpbzZd8qK6zztaxWnQj0DfNdFZV8JBVZ8dFXv?=
- =?us-ascii?Q?m2P1JQ52mWNjzmL6qoueRwowJ5RVSxkSDoyeqF1Sw7fbNXAnO/j6EMJQIJp5?=
- =?us-ascii?Q?rbTnRcSyCKHPIQi+9KuVviugmWtcTGTrAF9HWtYwJ0nlGH7uJO6rWDwfPoTd?=
- =?us-ascii?Q?dNOAVW2wouQ120j9gzgCtg+JXYfroBOfjxdiSJLqh24RGdtc0PNlDYybNi9T?=
- =?us-ascii?Q?su349O5kvigPfjAa+dRb2S6Wh4C+5Fz+w7ehYWxCMQxupN/V5bdm49lLq/Qq?=
- =?us-ascii?Q?4AyWY+mEyP6owH5N8j/VDk8EmCfM/OikN7tHvhLUflc0FcbSFAVWpCTl6ziK?=
- =?us-ascii?Q?ZESFZXTbLKRtvoh/3gafvicB64XT8OP9G56xEdIZ0b3IqLrgzE+fmqZv3GY6?=
- =?us-ascii?Q?E3u2XKl6M0iujZNgPnJRf8bQ4glgAN/aqfmQpx+Z4/dY/WsZsF9Ph+vD49ds?=
- =?us-ascii?Q?2K6UfsI8wPBedqkZRKCorL2rLjxRhs/+qblyUyCS4il3M4VE7kSQNtvsBaZr?=
- =?us-ascii?Q?tLMTaOoPpnMlhxTK+IkqR7GRGCiBhcvJ115m6+Tfds/ypy5cIAnHKc4X+IWG?=
- =?us-ascii?Q?Hvj89D38yTfgw4h7UIKMEWAR88oH+3scoqK8A/G/J//hAaSod+MbdOp09dUC?=
- =?us-ascii?Q?FASD91qlPaRUPRZVhZOgkrvoXKpkcD1TFKsKqwf1V1advdIxunzmqD8qjwXB?=
- =?us-ascii?Q?fTc1fvMuZ3zi/c8KhXA/hQ1CXQXuIiZuBB2Gvw48L3fLSPcN8wxmmy5GFJa5?=
- =?us-ascii?Q?jlPF02+FWoNtvyNrVaVMHR8xyLv/38o4e2IIcjqJwrteBymc/uEXWP//z1OX?=
- =?us-ascii?Q?galgMtht59BFMpOY7YoyXsCBOx1Wt301pYwtGmMUPoHmSLfNz1M425x+tDqy?=
- =?us-ascii?Q?NHUCAPH6Io9dwNc2EZyoTOINGSoH7IWH35KpKcUMknyeh/2auXwn7g5eqgNe?=
- =?us-ascii?Q?f1Ko2LwpwIn0/6wlRmbVen9WWChGEen6mFBP5V1QfKkPhguEW8honXiqnKhl?=
- =?us-ascii?Q?b2ua5sGiRxtxSVP9RaKnmg/B6czGMaFRG8ouvTosk8kDqpzmedu41/RJoeLO?=
- =?us-ascii?Q?DxRZGu8/tYL/cT+uiSq0axYzhRvJkL+KIOppIjTMwv3cmenGR+Tr0qyOw6gQ?=
- =?us-ascii?Q?MVFt1ubv6sU+VKAQ5NM4LA/McpIsHdFfHZxsQjKPxe2uY/XrYRxeF617i18Q?=
- =?us-ascii?Q?TL04aBa5eKRRXB85oU8U3EccXV5e5Xihk5MT0ha/RzcETcbDughmUODl0+NA?=
- =?us-ascii?Q?trSKH4Z6qq3zja3crmrYXSZveewOi7vpMKiTWmE0dJBK2C2lu6aKRpKE1vX/?=
- =?us-ascii?Q?bmDMMs7biSrkqdkirfECrMb83qRugqzkqa6UzVPfksZa+2Yf2Mix6ClaS3Hf?=
- =?us-ascii?Q?ZzLxr4/GV6LZiXv0BpVMgo5/692hwCSM162wbkY79t8QIExoCVpKtN4GnMXd?=
- =?us-ascii?Q?6vZfKN35WOu8gmXGjNCnj9HONA6IJqiBtznIeo0B?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+X-IronPort-AV: E=Sophos;i="6.09,275,1716274800"; 
+   d="scan'208";a="57306512"
+Received: from liuzhao-optiplex-7080.sh.intel.com (HELO localhost) ([10.239.160.36])
+  by orviesa010.jf.intel.com with ESMTP; 08 Aug 2024 20:25:15 -0700
+Date: Fri, 9 Aug 2024 11:41:05 +0800
+From: Zhao Liu <zhao1.liu@intel.com>
+To: Ani Sinha <anisinha@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	qemu-devel@nongnu.org
+Subject: Re: [PATCH v2] kvm: refactor core virtual machine creation into its
+ own function
+Message-ID: <ZrWP0fWPNzeAvjja@intel.com>
+References: <20240808113838.1697366-1-anisinha@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 86a8a317-cfbb-4873-6a45-08dcb81c09d0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Aug 2024 02:36:14.2639
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lw5ND0b5y7/hgPU/UVjjedr0xPDdwQBprwuOHTGSLDM9unSMHM92X3eAvEv9zXPbB2FIXIRp1+3kQynXGJdnbg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5072
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240808113838.1697366-1-anisinha@redhat.com>
 
-> From: Jason Gunthorpe <jgg@nvidia.com>
-> Sent: Thursday, August 8, 2024 2:19 AM
->=20
-> PCI ATS has a global Smallest Translation Unit field that is located in
-> the PF but shared by all of the VFs.
->=20
-> The expectation is that the STU will be set to the root port's global STU
-> capability which is driven by the IO page table configuration of the iomm=
-u
-> HW. Today it becomes set when the iommu driver first enables ATS.
->=20
-> Thus, to enable ATS on the VF, the PF must have already had the correct
-> STU programmed, even if ATS is off on the PF.
->=20
-> Unfortunately the PF only programs the STU when the PF enables ATS. The
-> iommu drivers tend to leave ATS disabled when IDENTITY translation is
-> being used.
+Hi Ani,
 
-Is there more context on this?
+On Thu, Aug 08, 2024 at 05:08:38PM +0530, Ani Sinha wrote:
+> Date: Thu,  8 Aug 2024 17:08:38 +0530
+> From: Ani Sinha <anisinha@redhat.com>
+> Subject: [PATCH v2] kvm: refactor core virtual machine creation into its
+>  own function
+> X-Mailer: git-send-email 2.45.2
+> 
+> Refactoring the core logic around KVM_CREATE_VM into its own separate function
+> so that it can be called from other functions in subsequent patches. There is
+> no functional change in this patch.
+> 
+> CC: pbonzini@redhat.com
+> CC: zhao1.liu@intel.com
+> Signed-off-by: Ani Sinha <anisinha@redhat.com>
+> ---
+>  accel/kvm/kvm-all.c | 93 +++++++++++++++++++++++++++------------------
+>  1 file changed, 56 insertions(+), 37 deletions(-)
+> 
+> changelog:
+> v2: s/fprintf/warn_report as suggested by zhao
 
-Looking at intel-iommu driver ATS is disabled for IDENETITY when
-the iommu is in legacy mode:
+Thanks for your change!
 
-dmar_domain_attach_device()
-{
-	...
-	if (sm_supported(info->iommu) || !domain_type_is_si(info->domain))
-		iommu_enable_pci_caps(info);
-	...
-}
-
-But this follows what VT-d spec says (section 9.3):
-
-TT: Translate Type
-10b: Untranslated requests are processed as pass-through. The SSPTPTR
-field is ignored by hardware. Translated and Translation Requests are
-blocked.
-
-=20
-> +/**
-> + * pci_prepare_ats - Setup the PS for ATS
-> + * @dev: the PCI device
-> + * @ps: the IOMMU page shift
-> + *
-> + * This must be done by the IOMMU driver on the PF before any VFs are
-> created to
-> + * ensure that the VF can have ATS enabled.
-> + *
-> + * Returns 0 on success, or negative on failure.
-> + */
-> +int pci_prepare_ats(struct pci_dev *dev, int ps)
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 75d11a07b2..c2e177c39f 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2385,6 +2385,60 @@ uint32_t kvm_dirty_ring_size(void)
+>      return kvm_state->kvm_dirty_ring_size;
+>  }
+>  
+> +static int do_kvm_create_vm(MachineState *ms, int type)
 > +{
-> +	u16 ctrl;
+> +    KVMState *s;
+> +    int ret;
 > +
-> +	if (!pci_ats_supported(dev))
-> +		return -EINVAL;
+> +    s = KVM_STATE(ms->accelerator);
 > +
-> +	if (WARN_ON(dev->ats_enabled))
-> +		return -EBUSY;
+> +    do {
+> +        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
+> +    } while (ret == -EINTR);
 > +
-> +	if (ps < PCI_ATS_MIN_STU)
-> +		return -EINVAL;
+> +    if (ret < 0) {
+> +        warn_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
+> +                    strerror(-ret));
 > +
-> +	if (dev->is_virtfn)
-> +		return 0;
+> +#ifdef TARGET_S390X
+> +        if (ret == -EINVAL) {
+> +            warn_report("Host kernel setup problem detected. Please verify:");
+> +            warn_report("- for kernels supporting the switch_amode or"
+> +                        " user_mode parameters, whether");
+> +            warn_report("  user space is running in primary address space");
+> +            warn_report("- for kernels supporting the vm.allocate_pgste "
+> +                        "sysctl, whether it is enabled");
+> +        }
+> +#elif defined(TARGET_PPC)
+> +        if (ret == -EINVAL) {
+> +            warn_report("PPC KVM module is not loaded. Try modprobe kvm_%s.",
+> +                        (type == 2) ? "pr" : "hv");
+> +        }
+> +#endif
 
-missed a check that 'ps' matches pf's ats_stu.
+I think error level message is more appropriate than warn because after
+the print QEMU handles error and terminates the Guest startup.
 
+What about the following change?
+
+#ifdef TARGET_S390X
+        if (ret == -EINVAL) {
+            error_report("Host kernel setup problem detected");
+            error_printf("Please verify:\n");
+            error_printf("- for kernels supporting the switch_amode or"
+                         " user_mode parameters, whether\n");
+            error_printf("  user space is running in primary address space\n");
+            error_printf("- for kernels supporting the vm.allocate_pgste "
+                         "sysctl, whether it is enabled\n");
+        }
+#elif defined(TARGET_PPC)
+        if (ret == -EINVAL) {
+            error_report("PPC KVM module is not loaded");
+            error_printf("Try modprobe kvm_%s.\n",
+                         (type == 2) ? "pr" : "hv");
+	}
+#endif
+
+The above uses error_report() to just print error reason/error code
+since for error_report, "The resulting message should be a single
+phrase, with no newline or trailing punctuation."
+
+Other specific hints or information are printed by error_printf()
+because style.rst suggests "Use error_printf() & friends to print
+additional information."
+
+Thanks,
+Zhao
+
+> +    }
 > +
-> +	dev->ats_stu =3D ps;
-> +	ctrl =3D PCI_ATS_CTRL_STU(dev->ats_stu - PCI_ATS_MIN_STU);
-> +	pci_write_config_word(dev, dev->ats_cap + PCI_ATS_CTRL, ctrl);
-> +	return 0;
+> +    return ret;
 > +}
-> +EXPORT_SYMBOL_GPL(pci_prepare_ats);
 > +
-
-Then there is no need to keep the 'ps' parameter in pci_enable_ats().
-
+> +static int find_kvm_machine_type(MachineState *ms)
+> +{
+> +    MachineClass *mc = MACHINE_GET_CLASS(ms);
+> +    int type;
+> +
+> +    if (object_property_find(OBJECT(current_machine), "kvm-type")) {
+> +        g_autofree char *kvm_type;
+> +        kvm_type = object_property_get_str(OBJECT(current_machine),
+> +                                           "kvm-type",
+> +                                           &error_abort);
+> +        type = mc->kvm_type(ms, kvm_type);
+> +    } else if (mc->kvm_type) {
+> +        type = mc->kvm_type(ms, NULL);
+> +    } else {
+> +        type = kvm_arch_get_default_type(ms);
+> +    }
+> +    return type;
+> +}
+> +
+>  static int kvm_init(MachineState *ms)
+>  {
+>      MachineClass *mc = MACHINE_GET_CLASS(ms);
+> @@ -2467,49 +2521,14 @@ static int kvm_init(MachineState *ms)
+>      }
+>      s->as = g_new0(struct KVMAs, s->nr_as);
+>  
+> -    if (object_property_find(OBJECT(current_machine), "kvm-type")) {
+> -        g_autofree char *kvm_type = object_property_get_str(OBJECT(current_machine),
+> -                                                            "kvm-type",
+> -                                                            &error_abort);
+> -        type = mc->kvm_type(ms, kvm_type);
+> -    } else if (mc->kvm_type) {
+> -        type = mc->kvm_type(ms, NULL);
+> -    } else {
+> -        type = kvm_arch_get_default_type(ms);
+> -    }
+> -
+> +    type = find_kvm_machine_type(ms);
+>      if (type < 0) {
+>          ret = -EINVAL;
+>          goto err;
+>      }
+>  
+> -    do {
+> -        ret = kvm_ioctl(s, KVM_CREATE_VM, type);
+> -    } while (ret == -EINTR);
+> -
+> +    ret = do_kvm_create_vm(ms, type);
+>      if (ret < 0) {
+> -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
+> -                strerror(-ret));
+> -
+> -#ifdef TARGET_S390X
+> -        if (ret == -EINVAL) {
+> -            fprintf(stderr,
+> -                    "Host kernel setup problem detected. Please verify:\n");
+> -            fprintf(stderr, "- for kernels supporting the switch_amode or"
+> -                    " user_mode parameters, whether\n");
+> -            fprintf(stderr,
+> -                    "  user space is running in primary address space\n");
+> -            fprintf(stderr,
+> -                    "- for kernels supporting the vm.allocate_pgste sysctl, "
+> -                    "whether it is enabled\n");
+> -        }
+> -#elif defined(TARGET_PPC)
+> -        if (ret == -EINVAL) {
+> -            fprintf(stderr,
+> -                    "PPC KVM module is not loaded. Try modprobe kvm_%s.\n",
+> -                    (type == 2) ? "pr" : "hv");
+> -        }
+> -#endif
+>          goto err;
+>      }
+>  
+> -- 
+> 2.45.2
+> 
 
