@@ -1,210 +1,167 @@
-Return-Path: <kvm+bounces-23677-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23678-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F64394CAF0
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 09:06:56 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 739C194CAFC
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 09:11:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDEDEB21DA9
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 07:06:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C8761F23662
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 07:11:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9882816D4E1;
-	Fri,  9 Aug 2024 07:06:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B1D16DC38;
+	Fri,  9 Aug 2024 07:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="P4Bjql5Q"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cmz2BC/8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F27CF2905
-	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 07:06:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4AAE16DC22
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 07:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723187205; cv=none; b=gk5eDySdxplvGA6Vr97tJXFy5x3PacYK5Yi/ovGyibmpXBH+HSSWU/uV8g1VwM9ykb2NAvbEgqOyDRp+sDGtXUeTnwItMXNocNRl1pLeuVo2KffM+jLNr3U0KiOcFAdgZX/Y0lkxaqFVUohox+x034UFAsRjyLCP2pDJvjIIyEA=
+	t=1723187472; cv=none; b=Mk0eImSeWbPSstHIVxTG6pcBufIMQ3kWvkIbfOoMK54oZpNLphcAOXjLRBoe0cwHH0M99CQ4KNJhpjEAgwtA+OUu3vmoU+o9BByvh9otMsJvntk0+S2TJGwBF8c/L1XVMF6Z0g3Bu6VijRDsQycqU2Tzyf9iE8XpuYP+8lbJSOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723187205; c=relaxed/simple;
-	bh=mTWT48DI98q5kicu3TbOU9OyomTTk26ny86o2OpuPL0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cUWkoZRtJLqvMX0C2wiPaCAPNyk7FrN2DoHw6Ou5HFb5mgAFzp3SLJAM3iaNbvXa2vhJlfxzCW8JlYafW3zKqtpFxnjwXh58t6oJQ1zDia9bAtXL3btUj7+5Fkpv4G7ADl/k3Fz7jzCZv8GspxBC/NI/0McpPxJ8JNHj95HU9JE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=P4Bjql5Q; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1723187472; c=relaxed/simple;
+	bh=tpEMj+sY7jg8GfgIPxEaNok9prbpmPGZipqrn6g+n1I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=k5sEQcOw72sBWIxaJtGSyTalpZsyjkEuP27YG+5maybCNnhAMHXduBAAEbJzLdw8w1vn5qtpuS7Yi4zV9mbyVpeIAqN4+pI8yyKoV5/0sHAK9yzRxv7G0LSpIh3KWQ6Ahh9SZkAiPQ5xyGNdvyy0fupZZe7QkbmMuLqt4OPy1/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cmz2BC/8; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723187202;
+	s=mimecast20190719; t=1723187469;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=IWR5XSabljgIgY4FlRNT+4+pydzf/00CjDvJVldKvNA=;
-	b=P4Bjql5Q4kc+57Dh4ZeHMJ8xZyfakSUWHLpyerUsrYUGIZgGOBvMDVG/LCnHUwRtPVxqDp
-	BOwnM7UcxCHOmyy2hDDdnh068pmRWe6AXyYfPaV/vFLN+koN0XfhqaXLgBkp3inPV4as8k
-	0xJKHguh1YG0IcYyFIQvRdI+cQoOj8g=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-NTxdzsYZNtisAk-YPK2B9A-1; Fri, 09 Aug 2024 03:06:41 -0400
-X-MC-Unique: NTxdzsYZNtisAk-YPK2B9A-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a7aa5885be3so143403966b.0
-        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 00:06:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723187200; x=1723792000;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IWR5XSabljgIgY4FlRNT+4+pydzf/00CjDvJVldKvNA=;
-        b=euz1DzWqrZnL2MUMHDgHHgXsIH/9IcKF71PqbVNcjOKDHnlwHoprDugXwO7h4OOQI4
-         WfZGQiq7qaymhE6gYPZQPFcQhBPBYJIA+WABLDbin4xjlMXRIUWHAjQfBN7s/i9Jw7oi
-         kDEmomDoqMZ6nX3e5sOY5jxjGBnJxNcn8TDuZP+mFmVPP2ywtHRbNJ8RrXX+iKPgvNQ3
-         LInv8HeBdAWm1uijH+dpghbo0uZvTqEPrkrNUIx3fxhNeyUPNIi6eJr5Rzxd3TJLlSwT
-         UETRNCun+Z2wlCt2Pz1TaaKjttYV2LJysAXMtQLH7aZMrTw5ZshD1KfB5bakPZrCiTVK
-         Q8AA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCYq/hlFii4MJTFU0G18Tn3IuK7ncXj8cPJjwMtdpvEL6jlrbeuarVoa6rbnmpxpN79aFMQdBIPH+s/O156q1JTBmC
-X-Gm-Message-State: AOJu0Ywvp5+X/ZNeAvVoVabjBQJenfuuYAlE9WW8AhcnQKC5PlxgwNU+
-	dWsSq8n8WnwkcSB5m4H/ljILLO5Fe7+Y/2MBObPGvX89SHVJad+2WLb/C0xxZpOf0AIZ6B6fAVk
-	8nyKT78/jSlvau65SBLdZD2dD6nwwYzmFWCDe+luTG9LzfGpkaoNkec9kmnD+RvBioskCr2BW8T
-	l7P4a4xYYSag57qFMjRLiLR5FNoBZsrup/p6g=
-X-Received: by 2002:a17:907:e9f:b0:a77:eb34:3b53 with SMTP id a640c23a62f3a-a80aa54a106mr50345866b.8.1723187200223;
-        Fri, 09 Aug 2024 00:06:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEvS5lezVzvNSN1dUYNrZE/sRuTw78FPTUh9oAbkAfwMkDzSes8eZqi0QGbhpzCPpOLyg+cJ5EkUUX+pPGxdv4=
-X-Received: by 2002:a17:907:e9f:b0:a77:eb34:3b53 with SMTP id
- a640c23a62f3a-a80aa54a106mr50344866b.8.1723187199733; Fri, 09 Aug 2024
- 00:06:39 -0700 (PDT)
+	bh=55FiknPVOjMgPerwYdzxQyFRVU6c8E5y8pIIfmOhXag=;
+	b=cmz2BC/8RfMxIdQv7ByVpTi980mLWUwdIdNAlL8i+ndBeLl4XtEK5nLswe8pLKgm48sDSe
+	R6m77uC6wEX6dTZK05P23ewT/VKIHYUAR+1uH9FFIxRObd6DqZIRGHVDw7td4jjUBjzZbw
+	9dtJKVwq9I/siSH2B++aPvbb1JfJnxM=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-127-juI5lSNNN12rJ7wUww4ndQ-1; Fri,
+ 09 Aug 2024 03:11:06 -0400
+X-MC-Unique: juI5lSNNN12rJ7wUww4ndQ-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 6B0191955F49;
+	Fri,  9 Aug 2024 07:10:53 +0000 (UTC)
+Received: from blackfin.pond.sub.org (unknown [10.39.193.245])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id ABFD83000198;
+	Fri,  9 Aug 2024 07:10:47 +0000 (UTC)
+Received: by blackfin.pond.sub.org (Postfix, from userid 1000)
+	id 9DBF721E6682; Fri,  9 Aug 2024 09:10:45 +0200 (CEST)
+From: Markus Armbruster <armbru@redhat.com>
+To: Zhao Liu <zhao1.liu@intel.com>
+Cc: qemu-devel@nongnu.org,  alex.williamson@redhat.com,
+  andrew@codeconstruct.com.au,  andrew@daynix.com,
+  arei.gonglei@huawei.com,  berrange@redhat.com,  berto@igalia.com,
+  borntraeger@linux.ibm.com,  clg@kaod.org,  david@redhat.com,
+  den@openvz.org,  eblake@redhat.com,  eduardo@habkost.net,
+  farman@linux.ibm.com,  farosas@suse.de,  hreitz@redhat.com,
+  idryomov@gmail.com,  iii@linux.ibm.com,  jamin_lin@aspeedtech.com,
+  jasowang@redhat.com,  joel@jms.id.au,  jsnow@redhat.com,
+  kwolf@redhat.com,  leetroy@gmail.com,  marcandre.lureau@redhat.com,
+  marcel.apfelbaum@gmail.com,  michael.roth@amd.com,  mst@redhat.com,
+  mtosatti@redhat.com,  nsg@linux.ibm.com,  pasic@linux.ibm.com,
+  pbonzini@redhat.com,  peter.maydell@linaro.org,  peterx@redhat.com,
+  philmd@linaro.org,  pizhenwei@bytedance.com,  pl@dlhnet.de,
+  richard.henderson@linaro.org,  stefanha@redhat.com,
+  steven_lee@aspeedtech.com,  thuth@redhat.com,  vsementsov@yandex-team.ru,
+  wangyanan55@huawei.com,  yuri.benditovich@daynix.com,
+  qemu-block@nongnu.org,  qemu-arm@nongnu.org,  qemu-s390x@nongnu.org,
+  kvm@vger.kernel.org
+Subject: Re: [PATCH 09/18] qapi/machine: Rename CpuS390* to S390Cpu, and
+ drop 'prefix'
+In-Reply-To: <Zqix4UGgy4adBVFG@intel.com> (Zhao Liu's message of "Tue, 30 Jul
+	2024 17:26:57 +0800")
+References: <20240730081032.1246748-1-armbru@redhat.com>
+	<20240730081032.1246748-10-armbru@redhat.com>
+	<Zqix4UGgy4adBVFG@intel.com>
+Date: Fri, 09 Aug 2024 09:10:45 +0200
+Message-ID: <87ttfumaru.fsf@pond.sub.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240809051054.1745641-1-anisinha@redhat.com> <20240809051054.1745641-2-anisinha@redhat.com>
- <ZrWziCQWgLogq+lV@intel.com>
-In-Reply-To: <ZrWziCQWgLogq+lV@intel.com>
-From: Ani Sinha <anisinha@redhat.com>
-Date: Fri, 9 Aug 2024 12:36:28 +0530
-Message-ID: <CAK3XEhPioDt8HsaZXSChPZG=xR7ahjZJbp3COG0K+JhcTftPkg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] kvm: replace fprintf with error_report() in
- kvm_init() for error conditions
-To: Zhao Liu <zhao1.liu@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, kvm@vger.kernel.org, 
-	qemu-devel@nongnu.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-On Fri, Aug 9, 2024 at 11:27=E2=80=AFAM Zhao Liu <zhao1.liu@intel.com> wrot=
-e:
->
-> On Fri, Aug 09, 2024 at 10:40:53AM +0530, Ani Sinha wrote:
-> > Date: Fri,  9 Aug 2024 10:40:53 +0530
-> > From: Ani Sinha <anisinha@redhat.com>
-> > Subject: [PATCH v2 1/2] kvm: replace fprintf with error_report() in
-> >  kvm_init() for error conditions
-> > X-Mailer: git-send-email 2.45.2
-> >
-> > error_report() is more appropriate for error situations. Replace fprint=
-f with
-> > error_report. Cosmetic. No functional change.
-> >
-> > CC: qemu-trivial@nongnu.org
-> > CC: zhao1.liu@intel.com
-> > Signed-off-by: Ani Sinha <anisinha@redhat.com>
-> > ---
-> >  accel/kvm/kvm-all.c | 40 ++++++++++++++++++----------------------
-> >  1 file changed, 18 insertions(+), 22 deletions(-)
-> >
-> > changelog:
-> > v2: fix a bug.
->
-> Generally good to me. Only some nits below, otherwise,
->
-> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
->
-> >  #ifdef TARGET_S390X
-> >          if (ret =3D=3D -EINVAL) {
-> > -            fprintf(stderr,
-> > -                    "Host kernel setup problem detected. Please verify=
-:\n");
-> > -            fprintf(stderr, "- for kernels supporting the switch_amode=
- or"
-> > -                    " user_mode parameters, whether\n");
-> > -            fprintf(stderr,
-> > -                    "  user space is running in primary address space\=
-n");
-> > -            fprintf(stderr,
-> > -                    "- for kernels supporting the vm.allocate_pgste sy=
-sctl, "
-> > -                    "whether it is enabled\n");
-> > +            error_report("Host kernel setup problem detected. Please v=
-erify:");
->
-> The doc of error_report() said it doesn't want multiple sentences or trai=
-ling
-> punctuation:
->
-> "The resulting message should be a single phrase, with no newline or trai=
-ling
-> punctuation."
->
-> So I think these extra messages (with complex formatting & content) are
-> better printed with error_printf() as I suggested in [1].
->
-> [1]: https://lore.kernel.org/qemu-devel/ZrWP0fWPNzeAvjja@intel.com/T/#m95=
-3afd879eb6279fcdf03cda594c43f1829bdffe
->
-> > +            error_report("- for kernels supporting the switch_amode or=
-"
-> > +                        " user_mode parameters, whether");
-> > +            error_report("  user space is running in primary address s=
-pace");
-> > +            error_report("- for kernels supporting the vm.allocate_pgs=
-te "
-> > +                        "sysctl, whether it is enabled");
-> >          }
-> >  #elif defined(TARGET_PPC)
-> >          if (ret =3D=3D -EINVAL) {
-> > -            fprintf(stderr,
-> > -                    "PPC KVM module is not loaded. Try modprobe kvm_%s=
-.\n",
-> > -                    (type =3D=3D 2) ? "pr" : "hv");
-> > +            error_report("PPC KVM module is not loaded. Try modprobe k=
-vm_%s.",
-> > +                        (type =3D=3D 2) ? "pr" : "hv");
->
-> Same here. A trailing punctuation. If possible, feel free to refer to
-> the comment in [1].
+Zhao Liu <zhao1.liu@intel.com> writes:
 
-vreport() adds a training newline, so I think its ok to remove the
-training newline and replace with error_report().
+> On Tue, Jul 30, 2024 at 10:10:23AM +0200, Markus Armbruster wrote:
+>> Date: Tue, 30 Jul 2024 10:10:23 +0200
+>> From: Markus Armbruster <armbru@redhat.com>
+>> Subject: [PATCH 09/18] qapi/machine: Rename CpuS390* to S390Cpu, and drop
+>>  'prefix'
+>> 
+>> QAPI's 'prefix' feature can make the connection between enumeration
+>> type and its constants less than obvious.  It's best used with
+>> restraint.
+>> 
+>> CpuS390Entitlement has a 'prefix' to change the generated enumeration
+>> constants' prefix from CPU_S390_POLARIZATION to S390_CPU_POLARIZATION.
+>                          ^^^^^^^^^^^^^^^^^^^^^    ^^^^^^^^^^^^^^^^^^^^^
+> 			 CPU_S390_ENTITLEMENT     S390_CPU_ENTITLEMENT
 
->
-> >          }
-> >  #endif
+Yes.
+
+>> Rename the type to S390CpuEntitlement, so that 'prefix' is not needed.
+>> 
+>> Likewise change CpuS390Polarization to S390CpuPolarization, and
+>> CpuS390State to S390CpuState.
+>> 
+>> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+>> ---
+>>  qapi/machine-common.json            |  5 ++---
+>>  qapi/machine-target.json            | 11 +++++------
+>>  qapi/machine.json                   |  9 ++++-----
+>>  qapi/pragma.json                    |  6 +++---
+>>  include/hw/qdev-properties-system.h |  2 +-
+>>  include/hw/s390x/cpu-topology.h     |  2 +-
+>>  target/s390x/cpu.h                  |  2 +-
+>>  hw/core/qdev-properties-system.c    |  6 +++---
+>>  hw/s390x/cpu-topology.c             |  6 +++---
+>>  9 files changed, 23 insertions(+), 26 deletions(-)
 >
 > [snip]
 >
-> > @@ -2542,8 +2538,8 @@ static int kvm_init(MachineState *ms)
-> >      }
-> >      if (missing_cap) {
-> >          ret =3D -EINVAL;
-> > -        fprintf(stderr, "kvm does not support %s\n%s",
-> > -                missing_cap->name, upgrade_note);
-> > +        error_report("kvm does not support %s", missing_cap->name);
-> > +        error_report("%s", upgrade_note);
+>> diff --git a/qapi/pragma.json b/qapi/pragma.json
+>> index 59fbe74b8c..beddea5ca4 100644
+>> --- a/qapi/pragma.json
+>> +++ b/qapi/pragma.json
+>> @@ -47,9 +47,9 @@
+>>          'BlockdevSnapshotWrapper',
+>>          'BlockdevVmdkAdapterType',
+>>          'ChardevBackendKind',
+>> -        'CpuS390Entitlement',
+>> -        'CpuS390Polarization',
+>> -        'CpuS390State',
+>> +        'S390CpuEntitlement',
+>> +        'S390CpuPolarization',
+>> +        'S390CpuState',
+>>          'CxlCorErrorType',
+>>          'DisplayProtocol',
+>>          'DriveBackupWrapper',
 >
-> "upgrade_note" string also has the trailing punctuation, and it's
-> also better to use error_printf() to replace the 2nd error_report().
+> It seems to be in alphabetical order. The new names don't follow the
+> original order.
 
-Yes this looks ugly and I will replace this one with error_printf()
+You're right.
 
+> Just the above nits,
 >
-> For this patch, error_report() is already a big step forward, so I think
-> these few nits doesn't block this patch.
+> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
 
-Thanks but I will send another version with your tag added.
-
->
-> Thank you for your patience.
-> Zhao
->
+Thanks!
 
 
