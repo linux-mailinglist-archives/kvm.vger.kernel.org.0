@@ -1,252 +1,180 @@
-Return-Path: <kvm+bounces-23738-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23739-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BE3894D559
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 19:23:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C01294D55C
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 19:24:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3C1E1C21117
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 17:23:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51DF91C20DEB
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 17:24:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EBA6EB7C;
-	Fri,  9 Aug 2024 17:23:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1955E61FD8;
+	Fri,  9 Aug 2024 17:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jv1qewTm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="qwv4A3nl"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A53E61FD8;
-	Fri,  9 Aug 2024 17:23:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5EAA14F70
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 17:24:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723224203; cv=none; b=MHICQOYM1b4DfuooSHq1goofCAN8COneY1KSJVj0Bz7RkcacnKP39mTKbHs5XSa0pGpWPNOTfJe4km7e/i6C1WLvVXzofNnbz6G9sSpIYso+9HWhD7SlmdfQFwr9LkeMV7eSiyM/T1e+JH2rpTTKwt0LC1KEfM30xRfw7Ea6V30=
+	t=1723224243; cv=none; b=bvNYFh62w65FJpSwLlcXtOscaFpE46aZ3bnld15k8Pn3sd6LLys5ZhhiHRzn5Ilr07VjDb9OLiUgNk+ZU3yVogm78MHqc/6pLDzSU+hPEA0LOrp9Nck/UavoLstfZdXt2Q0gspgiJjsQpw+P2G0mzWgbr2LHlm88BdE8gZ+qaTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723224203; c=relaxed/simple;
-	bh=0PZo/Ac9ke36wG6AVSpgHrTHheHjhZfH3xagdecugsg=;
+	s=arc-20240116; t=1723224243; c=relaxed/simple;
+	bh=U79tLyON/wgpPV2sORNRCWw4Qth2wqbqkWm0MKGXRQI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BUbSD+VKgP+yUXR7dlLEJLG7mR3Pl94IbcnEUFIlUlb0f3AUCDUgOebntton7J2kpzo1EQRMWGdwScbMbEoRhkFABF9edn63FWK/tHONIbo0YpgIvFzYB7muccOdcve7AYq8+PKdYNHL0w1Og6KBfLHOqueMDUGuUWSiQ9Qzm2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jv1qewTm; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2caff99b1c9so1927374a91.3;
-        Fri, 09 Aug 2024 10:23:21 -0700 (PDT)
+	 To:Cc:Content-Type; b=mcfsrIfbLh/qY3lZEi5nsrcyTm63N6UVZfIhP5uLkB87STZ+pofsaA9ovx5XhxrR2sjFZPZkNsuHjRDSezxdoRejUBvw5Qpd8tge6iaanF8tum24kIDuiob5+/Mc0p4/+ck+kp2wID6c2MD9/8wsYfciSAv5zOvl5JcTIBH9ZGM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=qwv4A3nl; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-36bb2047bf4so1486160f8f.2
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 10:24:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723224200; x=1723829000; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723224239; x=1723829039; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=E4nf2vVsE4rNUghEnE6rx77U4NSKcuKPAo9x1pxrGbo=;
-        b=jv1qewTmpmPgxMvEDzSH1CBdK07PWwrGOxnzORqGIigBvrarMwPkMevUO1mWizxphm
-         TA4jVXmE0tyVrgFP4xEMUPg5c8gJgRq61aY1ttVffFZGsWZeCO5oM1rlzwdGUmlbLyLz
-         OVp73wgIy7Odh2UfLpwUSefi5Kek3Ic4nxo6BsXQyRSNC7xlMg0tYJHZ1fIWrEg8QHrv
-         aR0TbQxZEQu1xC7sJYQ28HtRI0EMf4UBMvcpHfM0P6SNQjmtK1iytNGU1ISh/damRgVC
-         /62/HrzyiH/d2cN6PM/+XyT9tLZFxSPAa9RbNGTf/SBN9vt7m9S4g+XTXP/lQSOtrVG+
-         uYeA==
+        bh=4QdjlOHuBnkWT9u/9CGI9uaBMM/Qi29TBnTB7AP5Y7M=;
+        b=qwv4A3nlUQvK0itivuk/DGYak6pyIzD/uhRLfoqU1RBLYzF2k6bha39TYNijg1d0OJ
+         6EjK4amSE0Ey3w260FAC7ZJYBGSfmUuokEmbXUY6VaJQYCd5O1NAwfAuz6Hi1QaYi828
+         obj5tkVWuhTo84yUQkxCXPkEUyp5/mKVKwZ8S+zZR8HYa++E/sdIYvJ/YLsi/c6fOM7X
+         b1SG2EqMX3zKcrUlrt1W0RQRxSkVqRicxS6FaIzC6qV+jjyDLLCaEfkjLcaZ0ih/ro/f
+         3DpDQqYki4OIIe5/PBaCqGgeMB7wtDa+SYN4+8TsF1e3VdOSqnTdH2i7erO/GMdT33u2
+         bamA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723224200; x=1723829000;
+        d=1e100.net; s=20230601; t=1723224239; x=1723829039;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=E4nf2vVsE4rNUghEnE6rx77U4NSKcuKPAo9x1pxrGbo=;
-        b=TRvaFUe3P5edMVQ1MvEknu6qPvIUcKkUSaKxB/8vQhxvdQ1syPwIuU7ZAlkYbmF4DI
-         9bkFY3VI0/pi5irNJA3R59uoQavxmIWEMkElrEOUbVoaBfsITizh4KtHzpKjM/VIn3wC
-         vYj4dQ+awPiK5nJwaVxo/CNupHzSUGeO6uaVxBkGtg8g/3PdUR0b7t0Z68tTtEkame+/
-         5pLkIG7DQLtAeLC0CyvoG6hGQeNusy2OMsrm8BRUuB3XjF9DGcLbKyD+dRM+eB9qPRAs
-         M97uDGSMHNYM1+6ltFDaxLQnpkSLyAIYUFC9uzhCajVYATouuz8IA7nEIN8712ZUGLWU
-         p3Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCV70eiijf6W1sjI6/MFVhzOo4sv3o39eR0l80TdpyW0Axsa1M+yvTBToi6xMBFRI1RGuchbQp4/YOvDOXvQZ7/9eYtI0wm4wx6eyiaALKTWCRrSi3iRJ7F94Yu2o2QOGCyLQoBzkYUZJabGyW/uYlDy8TZ2JFihWG+oeBgadDF7WzZTP0+QfuYqjT/K9ze2KtMVHTD3dJspsQFxnFbw8+rFxPLOr3kyvho=
-X-Gm-Message-State: AOJu0Yx9TQ6zOypQ488WpjEkJKe9ugMU3eJfx1DRi9f+X+NvVi8HLyTR
-	hzabhWEjfY88FcZo4sRCsRDRxNDqJ8PcPOcm7lo2bKiydYpjrPZZtsT5GHp7QaWTjs6+xtfIeCC
-	dH+/aB0g7iOY9TKPSXXMxaWRjvPl9Fw==
-X-Google-Smtp-Source: AGHT+IEpnb6/gaAmxrz4Xp5pn0+3G4YQxfp9iu1mxL9WijR0M987FyzWp5uOkoCxw99MaeryCykCUqfcrz831oW7wsA=
-X-Received: by 2002:a17:90a:b113:b0:2cd:b915:c80b with SMTP id
- 98e67ed59e1d1-2d1e8082b97mr2434499a91.27.1723224200505; Fri, 09 Aug 2024
- 10:23:20 -0700 (PDT)
+        bh=4QdjlOHuBnkWT9u/9CGI9uaBMM/Qi29TBnTB7AP5Y7M=;
+        b=A0kuuYnQnNZUQ5ZYPJRGfCqZukgwSrll1bUfScx0dy8fKStj29F3arAdM7CpI7gFHd
+         nsPBVjXSv01dr3JVLSUQ3d/JANnVmPJEKlABP/wQpa3g/CZ90b/sF5EHQiU3skcxhnz8
+         1Hjf6VAZqhX/YdeQhqPPmVPQqNlrk2Y6PQ86PelOiHqcMWlGPZVqN5lQjsWcbQXl9Igf
+         2wuLDBy3rm+1eD75anvHkJ9WQ0SATe8beTdsLFkeTVTVExTa+knHPttJXChiB8v5Mfx9
+         o9W19qgC7NTpODrYg7cGA7ottPjK8IlFV3CW6AgQf1DLp+YJ60U4+Kml3ykMSTKmAUT3
+         kmgA==
+X-Forwarded-Encrypted: i=1; AJvYcCXs3lrPSrlVYX09n12KitVX43npCqZlZO9R37Vd8II4r+Di4XkdaU6vFNIMkrya5AtCgF7om9V/ArlOL0XhReK3/fKt
+X-Gm-Message-State: AOJu0YybbGqxhOa9ov2g9pEQCNBdO9q/3+UrNRGGKFgIfUjPRMdtqbkB
+	uadtcL/tl5zvcaJaY6GHo3NvYxqWR4vfdKArjBFRgDGkarG/mELp6L+Qq6PsYlS5Y7F4HmGpuTZ
+	P2e5JpsfqXzLQ6ruCrmsx+WU5TgcGbdhHv41Q
+X-Google-Smtp-Source: AGHT+IGV1vzsTB3E9qHHAZ2PxwMColOAwLwBW9dzPhmi0xSxisZYI7WVPSVv2jYwNAL5k0yIXCNHSXuqEEMn/3swSXc=
+X-Received: by 2002:a05:6000:d04:b0:365:f52f:cd44 with SMTP id
+ ffacd0b85a97d-36d61cd2059mr1603070f8f.57.1723224238792; Fri, 09 Aug 2024
+ 10:23:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730050927.GC5334@ZenIV> <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-17-viro@kernel.org> <CAEf4BzZipqBVhoY-S+WdeQ8=MhpKk-2dE_ESfGpV-VTm31oQUQ@mail.gmail.com>
- <20240807-fehlschlag-entfiel-f03a6df0e735@brauner> <CAEf4BzaeFTn41pP_hbcrCTKNZjwt3TPojv0_CYbP=+973YnWiA@mail.gmail.com>
- <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
- <CAEf4Bzauw1tD4UsyhX1PmRs_Y1MzfPqsoRUf40cmNuu7SJKi9w@mail.gmail.com> <CAADnVQ+55NKkEaAsjGh52=VsSgr9G-qvjBCPmaPrTxiN6eCZOw@mail.gmail.com>
-In-Reply-To: <CAADnVQ+55NKkEaAsjGh52=VsSgr9G-qvjBCPmaPrTxiN6eCZOw@mail.gmail.com>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 9 Aug 2024 10:23:08 -0700
-Message-ID: <CAEf4BzYLQhO_UwaQLfpwoiQMvb0-wLQM6Yr7v-5CYLvoa8qzkA@mail.gmail.com>
-Subject: Re: [PATCH 17/39] bpf: resolve_pseudo_ldimm64(): take handling of a
- single ldimm64 insn into helper
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Christian Brauner <brauner@kernel.org>, viro@kernel.org, bpf <bpf@vger.kernel.org>, 
-	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>, Amir Goldstein <amir73il@gmail.com>, 
-	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>, kvm@vger.kernel.org, 
-	Network Development <netdev@vger.kernel.org>, Linus Torvalds <torvalds@linux-foundation.org>
+References: <20240809160909.1023470-1-peterx@redhat.com> <20240809160909.1023470-11-peterx@redhat.com>
+In-Reply-To: <20240809160909.1023470-11-peterx@redhat.com>
+From: Axel Rasmussen <axelrasmussen@google.com>
+Date: Fri, 9 Aug 2024 10:23:20 -0700
+Message-ID: <CAJHvVciF4riGPQBhyBwNeSWHq8m+7Zag7ewEWgLJk=VsaqKNPQ@mail.gmail.com>
+Subject: Re: [PATCH 10/19] KVM: Use follow_pfnmap API
+To: Peter Xu <peterx@redhat.com>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	Sean Christopherson <seanjc@google.com>, Oscar Salvador <osalvador@suse.de>, Jason Gunthorpe <jgg@nvidia.com>, 
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org, 
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Zi Yan <ziy@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Ingo Molnar <mingo@redhat.com>, 
+	Alistair Popple <apopple@nvidia.com>, Borislav Petkov <bp@alien8.de>, David Hildenbrand <david@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Alex Williamson <alex.williamson@redhat.com>, 
+	Yan Zhao <yan.y.zhao@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 8, 2024 at 6:23=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
+On Fri, Aug 9, 2024 at 9:09=E2=80=AFAM Peter Xu <peterx@redhat.com> wrote:
 >
-> On Thu, Aug 8, 2024 at 1:35=E2=80=AFPM Andrii Nakryiko
-> <andrii.nakryiko@gmail.com> wrote:
-> >
-> > On Thu, Aug 8, 2024 at 9:51=E2=80=AFAM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Wed, Aug 7, 2024 at 8:31=E2=80=AFAM Andrii Nakryiko
-> > > <andrii.nakryiko@gmail.com> wrote:
-> > > >
-> > > > On Wed, Aug 7, 2024 at 3:30=E2=80=AFAM Christian Brauner <brauner@k=
-ernel.org> wrote:
-> > > > >
-> > > > > On Tue, Aug 06, 2024 at 03:32:20PM GMT, Andrii Nakryiko wrote:
-> > > > > > On Mon, Jul 29, 2024 at 10:20=E2=80=AFPM <viro@kernel.org> wrot=
-e:
-> > > > > > >
-> > > > > > > From: Al Viro <viro@zeniv.linux.org.uk>
-> > > > > > >
-> > > > > > > Equivalent transformation.  For one thing, it's easier to fol=
-low that way.
-> > > > > > > For another, that simplifies the control flow in the vicinity=
- of struct fd
-> > > > > > > handling in there, which will allow a switch to CLASS(fd) and=
- make the
-> > > > > > > thing much easier to verify wrt leaks.
-> > > > > > >
-> > > > > > > Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
-> > > > > > > ---
-> > > > > > >  kernel/bpf/verifier.c | 342 +++++++++++++++++++++-----------=
-----------
-> > > > > > >  1 file changed, 172 insertions(+), 170 deletions(-)
-> > > > > > >
-> > > > > >
-> > > > > > This looks unnecessarily intrusive. I think it's best to extrac=
-t the
-> > > > > > logic of fetching and adding bpf_map by fd into a helper and th=
-at way
-> > > > > > contain fdget + fdput logic nicely. Something like below, which=
- I can
-> > > > > > send to bpf-next.
-> > > > > >
-> > > > > > commit b5eec08241cc0263e560551de91eda73ccc5987d
-> > > > > > Author: Andrii Nakryiko <andrii@kernel.org>
-> > > > > > Date:   Tue Aug 6 14:31:34 2024 -0700
-> > > > > >
-> > > > > >     bpf: factor out fetching bpf_map from FD and adding it to u=
-sed_maps list
-> > > > > >
-> > > > > >     Factor out the logic to extract bpf_map instances from FD e=
-mbedded in
-> > > > > >     bpf_insns, adding it to the list of used_maps (unless it's =
-already
-> > > > > >     there, in which case we just reuse map's index). This simpl=
-ifies the
-> > > > > >     logic in resolve_pseudo_ldimm64(), especially around `struc=
-t fd`
-> > > > > >     handling, as all that is now neatly contained in the helper=
- and doesn't
-> > > > > >     leak into a dozen error handling paths.
-> > > > > >
-> > > > > >     Signed-off-by: Andrii Nakryiko <andrii@kernel.org>
-> > > > > >
-> > > > > > diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
-> > > > > > index df3be12096cf..14e4ef687a59 100644
-> > > > > > --- a/kernel/bpf/verifier.c
-> > > > > > +++ b/kernel/bpf/verifier.c
-> > > > > > @@ -18865,6 +18865,58 @@ static bool bpf_map_is_cgroup_storage(=
-struct
-> > > > > > bpf_map *map)
-> > > > > >          map->map_type =3D=3D BPF_MAP_TYPE_PERCPU_CGROUP_STORAG=
-E);
-> > > > > >  }
-> > > > > >
-> > > > > > +/* Add map behind fd to used maps list, if it's not already th=
-ere, and return
-> > > > > > + * its index. Also set *reused to true if this map was already=
- in the list of
-> > > > > > + * used maps.
-> > > > > > + * Returns <0 on error, or >=3D 0 index, on success.
-> > > > > > + */
-> > > > > > +static int add_used_map_from_fd(struct bpf_verifier_env *env, =
-int fd,
-> > > > > > bool *reused)
-> > > > > > +{
-> > > > > > +    struct fd f =3D fdget(fd);
-> > > > >
-> > > > > Use CLASS(fd, f)(fd) and you can avoid all that fdput() stuff.
-> > > >
-> > > > That was the point of Al's next patch in the series, so I didn't wa=
-nt
-> > > > to do it in this one that just refactored the logic of adding maps.
-> > > > But I can fold that in and send it to bpf-next.
-> > >
-> > > +1.
-> > >
-> > > The bpf changes look ok and Andrii's approach is easier to grasp.
-> > > It's better to route bpf conversion to CLASS(fd,..) via bpf-next,
-> > > so it goes through bpf CI and our other testing.
-> > >
-> > > bpf patches don't seem to depend on newly added CLASS(fd_pos, ...
-> > > and fderr, so pretty much independent from other patches.
-> >
-> > Ok, so CLASS(fd, f) won't work just yet because of peculiar
-> > __bpf_map_get() contract: if it gets valid struct fd but it doesn't
-> > contain a valid struct bpf_map, then __bpf_map_get() does fdput()
-> > internally. In all other cases the caller has to do fdput() and
-> > returned struct bpf_map's refcount has to be bumped by the caller
-> > (__bpf_map_get() doesn't do that, I guess that's why it's
-> > double-underscored).
-> >
-> > I think the reason it was done was just a convenience to not have to
-> > get/put bpf_map for temporary uses (and instead rely on file's
-> > reference keeping bpf_map alive), plus we have bpf_map_inc() and
-> > bpf_map_inc_uref() variants, so in some cases we need to bump just
-> > refcount, and in some both user and normal refcounts.
-> >
-> > So can't use CLASS(fd, ...) without some more clean up.
-> >
-> > Alexei, how about changing __bpf_map_get(struct fd f) to
-> > __bpf_map_get_from_fd(int ufd), doing fdget/fdput internally, and
-> > always returning bpf_map with (normal) refcount bumped (if successful,
-> > of course). We can then split bpf_map_inc_with_uref() into just
-> > bpf_map_inc() and bpf_map_inc_uref(), and callers will be able to do
-> > extra uref-only increment, if necessary.
-> >
-> > I can do that as a pre-patch, there are about 15 callers, so not too
-> > much work to clean this up. Let me know.
+> Use the new pfnmap API to allow huge MMIO mappings for VMs.  The rest wor=
+k
+> is done perfectly on the other side (host_pfn_mapping_level()).
+
+I don't think it has to be done in this series, but a future
+optimization to consider is having follow_pfnmap just tell the caller
+about the mapping level directly. It already found this information as
+part of its walk. I think there's a possibility to simplify KVM /
+avoid it having to do its own walk again later.
+
 >
-> Yeah. Let's kill __bpf_map_get(struct fd ..) altogether.
-> This logic was added in 2014.
-> fdget() had to be first and fdput() last to make sure
-> the map won't disappear while sys_bpf command is running.
-> All of the places can use bpf_map_get(), bpf_map_put() pair
-> and rely on map->refcnt, but...
 >
-> - it's atomic64_inc(&map->refcnt); The cost is probably
-> in the noise compared to all the work that map sys_bpf commands do.
+> Cc: Paolo Bonzini <pbonzini@redhat.com>
+> Cc: Sean Christopherson <seanjc@google.com>
+> Signed-off-by: Peter Xu <peterx@redhat.com>
+> ---
+>  virt/kvm/kvm_main.c | 19 +++++++------------
+>  1 file changed, 7 insertions(+), 12 deletions(-)
 >
-
-agreed, not too worried about this
-
-> - It also opens new fuzzing opportunity to do some map operation
-> in one thread and close(map_fd) in the other, so map->usercnt can
-> drop to zero and map_release_uref() cleanup can start while
-> the other thread is still busy doing something like map_update_elem().
-> It can be mitigated by doing bpf_map_get_with_uref(), but two
-> atomic64_inc() is kinda too much.
+> diff --git a/virt/kvm/kvm_main.c b/virt/kvm/kvm_main.c
+> index d0788d0a72cc..9fb1c527a8e1 100644
+> --- a/virt/kvm/kvm_main.c
+> +++ b/virt/kvm/kvm_main.c
+> @@ -2862,13 +2862,11 @@ static int hva_to_pfn_remapped(struct vm_area_str=
+uct *vma,
+>                                unsigned long addr, bool write_fault,
+>                                bool *writable, kvm_pfn_t *p_pfn)
+>  {
+> +       struct follow_pfnmap_args args =3D { .vma =3D vma, .address =3D a=
+ddr };
+>         kvm_pfn_t pfn;
+> -       pte_t *ptep;
+> -       pte_t pte;
+> -       spinlock_t *ptl;
+>         int r;
 >
-
-yep, with_uref() is an overkill for most cases. I'd rather fix any
-such bugs, if we have them.
-
-> So let's remove __bpf_map_get() and replace all users with bpf_map_get(),
-> but we may need to revisit that later.
-
-Ok, I will probably send something next week.
+> -       r =3D follow_pte(vma, addr, &ptep, &ptl);
+> +       r =3D follow_pfnmap_start(&args);
+>         if (r) {
+>                 /*
+>                  * get_user_pages fails for VM_IO and VM_PFNMAP vmas and =
+does
+> @@ -2883,21 +2881,19 @@ static int hva_to_pfn_remapped(struct vm_area_str=
+uct *vma,
+>                 if (r)
+>                         return r;
+>
+> -               r =3D follow_pte(vma, addr, &ptep, &ptl);
+> +               r =3D follow_pfnmap_start(&args);
+>                 if (r)
+>                         return r;
+>         }
+>
+> -       pte =3D ptep_get(ptep);
+> -
+> -       if (write_fault && !pte_write(pte)) {
+> +       if (write_fault && !args.writable) {
+>                 pfn =3D KVM_PFN_ERR_RO_FAULT;
+>                 goto out;
+>         }
+>
+>         if (writable)
+> -               *writable =3D pte_write(pte);
+> -       pfn =3D pte_pfn(pte);
+> +               *writable =3D args.writable;
+> +       pfn =3D args.pfn;
+>
+>         /*
+>          * Get a reference here because callers of *hva_to_pfn* and
+> @@ -2918,9 +2914,8 @@ static int hva_to_pfn_remapped(struct vm_area_struc=
+t *vma,
+>          */
+>         if (!kvm_try_get_pfn(pfn))
+>                 r =3D -EFAULT;
+> -
+>  out:
+> -       pte_unmap_unlock(ptep, ptl);
+> +       follow_pfnmap_end(&args);
+>         *p_pfn =3D pfn;
+>
+>         return r;
+> --
+> 2.45.0
+>
 
