@@ -1,96 +1,74 @@
-Return-Path: <kvm+bounces-23683-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23684-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA3294CC34
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 10:30:17 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 005FA94CC5F
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 10:36:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D86441F2378F
-	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 08:30:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CDE3B24F20
+	for <lists+kvm@lfdr.de>; Fri,  9 Aug 2024 08:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F24C18DF9E;
-	Fri,  9 Aug 2024 08:30:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A68918FDD0;
+	Fri,  9 Aug 2024 08:36:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XWUIFakO";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="o/UhUNnC";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XWUIFakO";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="o/UhUNnC"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q7Jaxm49"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFCA177981
-	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 08:29:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4868118E05C
+	for <kvm@vger.kernel.org>; Fri,  9 Aug 2024 08:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723192200; cv=none; b=YpGWCej0sJ9VC/vFvOPupelcBVwYFxnbBMrBFrAMgkNyJe085TqMnwuwmAmKMtdons87FtcyilFUJnH+JtJJ6oN/eHmqd2Zq58srtPmBse348Ep3jvkM79dkefxBOQJEtMoanID3GcP7oQOvaDKjAJaIn92gql+k6XwaFdvFxAw=
+	t=1723192565; cv=none; b=qBjS9t/PO/jOtB/WnZMwhIHrGKpoaRm4iJvDtOhwfpi2YgnN3k6AfFY3iND/53Qoozd6n0tUyocVENif+S8hp6ltB8ZnBkZu4Wk/dnCxRIW+SRrQFter26++xMwsD6wIYQYbMPzJgmfDdFlTAK0W9QXaL2YvjWXqiE81UbY7Dtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723192200; c=relaxed/simple;
-	bh=u02H8kdsGrDV6/YXs6M02qCTYUuSDQpJHb/LNOOU2V4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=g7UmmMSJC+8ooBSrxeDh8GfMYS84fKItxhyatnGnf1zp3MX2lhBFOCp8KGoka9LScHRz7pl4+6E7XQq09su5/O6xVMP4qksXB0eCn4xn3ZLblWQNbdpCbkU7jHOV9OPr1dK9Cktcx4EHbV/VbXqs2ZdOp0nM4thwEk6T9OZsXYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XWUIFakO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=o/UhUNnC; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XWUIFakO; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=o/UhUNnC; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 13F4D21EC7;
-	Fri,  9 Aug 2024 08:29:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723192197; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8crL4hgpZsCfvMZI3nwmKCZuw+Wu1EjFQmOb/3okYt4=;
-	b=XWUIFakOsiauGCI3ASvBCQ/d5Qn3zOQuucywsCol2RN9P55NiXZmmdIugkXMqt63z6qvO7
-	73IPbw61tb83b3o7xw0ioQCMOb6xZ7llnGa0TnncYrHypBj5UKIkQ1dZROw1EF6JCYFfJv
-	URdkEJDmX//UMWTMPJ1SZSQr71+afcA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723192197;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8crL4hgpZsCfvMZI3nwmKCZuw+Wu1EjFQmOb/3okYt4=;
-	b=o/UhUNnClsR0FMXDLJ6+bwsHSMpEegpP9y9V0VpKupqSs1vTMx6520lb2WuvwyKvNyfb+q
-	nMZ/YogCpa5ll9Dg==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=XWUIFakO;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="o/UhUNnC"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1723192197; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8crL4hgpZsCfvMZI3nwmKCZuw+Wu1EjFQmOb/3okYt4=;
-	b=XWUIFakOsiauGCI3ASvBCQ/d5Qn3zOQuucywsCol2RN9P55NiXZmmdIugkXMqt63z6qvO7
-	73IPbw61tb83b3o7xw0ioQCMOb6xZ7llnGa0TnncYrHypBj5UKIkQ1dZROw1EF6JCYFfJv
-	URdkEJDmX//UMWTMPJ1SZSQr71+afcA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1723192197;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8crL4hgpZsCfvMZI3nwmKCZuw+Wu1EjFQmOb/3okYt4=;
-	b=o/UhUNnClsR0FMXDLJ6+bwsHSMpEegpP9y9V0VpKupqSs1vTMx6520lb2WuvwyKvNyfb+q
-	nMZ/YogCpa5ll9Dg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id E321113A7D;
-	Fri,  9 Aug 2024 08:29:56 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ro+RNYTTtWauJAAAD6G6ig
-	(envelope-from <cfontana@suse.de>); Fri, 09 Aug 2024 08:29:56 +0000
-Message-ID: <e05e62da-e765-4d99-9095-989c774615fc@suse.de>
-Date: Fri, 9 Aug 2024 10:29:41 +0200
+	s=arc-20240116; t=1723192565; c=relaxed/simple;
+	bh=Ny5F9426Jn13U9Y6S4ojrazmy84wbDgbVFRfNFm4xeg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LhkglLj4P2IWJmw4+xnhyKcqUHGd6FQp0pa/SBY0u2o4DyKbZT3+I+8ohAWgm6qyMJNnc746T2pHGR6dG7bfD4Q7tuhv02pJ8UjPYQzGjmDqwKIii6I3WeU34OYtptqmGcuTkTPKKofMko/k9LnHd5pd+mAaLll+9OrOVNOwzLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q7Jaxm49; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4257d5fc9b7so17366525e9.2
+        for <kvm@vger.kernel.org>; Fri, 09 Aug 2024 01:36:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1723192562; x=1723797362; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RmPnqqIvpdZM4vhUuidGITgg4c+/KkmwE6KbcUE8uOE=;
+        b=q7Jaxm49XpbiB2rEWvhAKQrMBeVnikCtqc+zljwGI6KfKLkCVeg3NWHaPose2SK5SJ
+         JqUqJphshgy3a3e0WxczkI+EpZMz6q0l44UFoRS39iXRoeNeNDSm+5bGJVJ1i6mkxS+I
+         vHx1v98eXXjqqC0t2Y2hwKDpvl4i8fW87Ac959maknXmElq2WttdIp89jXdOzPXuha3S
+         gHwp3xH5t1OiszYx+b3AFOYGoFD0A8pJd3ZLlgyElI4gY9EXXLzUyKSLPhyOJTy4ic4T
+         PdjTsHSYnaE2JQwYnWYWJ+y4y+7fW5AVk21ZsJEXeK9AekCy7kpMx4Wzsk/occz3TRwh
+         wQWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723192562; x=1723797362;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RmPnqqIvpdZM4vhUuidGITgg4c+/KkmwE6KbcUE8uOE=;
+        b=XxX+oSUBE8ESN7P5rVZb7HVuBKEtdYY0xUPCXOQyrNZtDdhpIvKhd/afPhPXd+Bki1
+         UdFMs0yhKS+yrpveaucWOxxmywPaAO8QRk2OK9ZQmj0XhuOduQDdve+AGW1m7Ron04yt
+         jFANsTauA5FAdz0nT+fFnqBunLS9Z916dVZWhUECr2/uqXmdy/lK7Jh2EFwZMZe/zBGF
+         8nq+AiDxWsc1zmX+NaAUuo3RlkrPFyRVKXE3vAB0ZdMeKrh1GtK+kkvJUYBtMD+AqyyW
+         P/hiUUWY2yidMZw/fLzi9E4bxN7iS0dqidp6r3SyCS0zNWHeYt60TPpNYBxfPXzko5Ea
+         8EMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUvc89orH6Csp6sBp5urkB8u2cC0nq7Rqp2RlgiZ6GV0AmbJ9ePHDM5uwhmtNH9RLOdUPJpLiJ9KJGzHQ4N11k9/qR7
+X-Gm-Message-State: AOJu0Yy3Iwb7ylJKtzTqy0R47nzqaKk+zRXP6j3VB1jhc12c9ujEKYzC
+	Ua6YLd0NXxbtf1BiLcO5lkAu+t1SsFvGN2H7NZCN9eaP4R0w3RyOV+M0+auy00o=
+X-Google-Smtp-Source: AGHT+IEa3cisiuaD0zuqPELtHiYuT/1QmPpy3KQHu8b3fcyhdByakMcRk0FZJDOOY6bwpRsFOFsvvg==
+X-Received: by 2002:a05:600c:a48:b0:428:fcb:962 with SMTP id 5b1f17b1804b1-429c3a5c30fmr6542285e9.36.1723192561442;
+        Fri, 09 Aug 2024 01:36:01 -0700 (PDT)
+Received: from [192.168.178.175] (41.red-95-127-42.staticip.rima-tde.net. [95.127.42.41])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429059714d5sm117810195e9.13.2024.08.09.01.35.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 09 Aug 2024 01:36:01 -0700 (PDT)
+Message-ID: <8913b8c7-4103-4f69-8567-afdc29f8d0d3@linaro.org>
+Date: Fri, 9 Aug 2024 10:35:57 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -98,160 +76,143 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: kvm_stat issue running in the background
-From: Claudio Fontana <cfontana@suse.de>
-To: Stefan Hajnoczi <stefanha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org
-References: <f21ffdee-1f29-4d89-9237-470dad9b0ef9@suse.de>
- <20240807133727.GB131475@fedora.redhat.com>
- <afd29a7a-c944-4cf8-b8e1-082e9b0cb74e@suse.de>
+Subject: Re: [PATCH v3] kvm: replace fprintf with error_report/printf() in
+ kvm_init()
+To: Ani Sinha <anisinha@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>
+Cc: qemu-trivial@nongnu.org, zhao1.liu@intel.com, kvm@vger.kernel.org,
+ qemu-devel@nongnu.org, Markus Armbruster <armbru@redhat.com>
+References: <20240809064940.1788169-1-anisinha@redhat.com>
 Content-Language: en-US
-In-Reply-To: <afd29a7a-c944-4cf8-b8e1-082e9b0cb74e@suse.de>
-Content-Type: text/plain; charset=UTF-8
+From: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>
+In-Reply-To: <20240809064940.1788169-1-anisinha@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Score: -6.50
-X-Rspamd-Queue-Id: 13F4D21EC7
-X-Spamd-Result: default: False [-6.50 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	MX_GOOD(-0.01)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MID_RHS_MATCH_FROM(0.00)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCPT_COUNT_THREE(0.00)[3];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Action: no action
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Level: 
-X-Spam-Flag: NO
 
-On 8/7/24 17:46, Claudio Fontana wrote:
-> Hi,
+Hi Ani,
+
+On 9/8/24 08:49, Ani Sinha wrote:
+> error_report() is more appropriate for error situations. Replace fprintf with
+> error_report. Cosmetic. No functional change.
 > 
-> On 8/7/24 15:37, Stefan Hajnoczi wrote:
->> On Sat, Aug 03, 2024 at 11:23:21AM +0200, Claudio Fontana wrote:
->>> Hello Stefan,
->>>
->>> did not know where to report this, but the man page mentions you specifically so here I am.
->>
->> Hi Claudio,
->> I wrote the man page for kvm_stat(1) but am not the maintainer of the
->> tool. I have CCed the KVM mailing list although it's possible that no
->> one actively maintains the tool :).
->>
->>>
->>>
->>> There seems to be an issue when kvm_stat is run with:
->>>
->>> kvm_stat -p xxx -d -t -s yy -c -L FILENAME.csv &
->>>
->>> specifically due to the ampersand (&), thus running in the background.
->>>
->>>
->>> It seems that kvm_stat gets the interrupt signal (SIGINT), and does write as a result the output to disk,
->>> but then instead of terminating, it just hangs there forever.
->>
->> That is strange. The only signal handler installed by kvm_stat is for
->> SIGHUP, so Python should perform the default behavior for SIGINT and
->> terminate. I'm not sure why the process would hang.
->>
->>>
->>> So to avoid ending up with a large number of kvm_stat processes lingering on the system,
->>> we needed to put a random sleep, and then send a SIGTERM to terminate the kvm_stat processes.
->>>
->>> Just sending a SIGTERM (without the SIGINT) does terminate the kvm_stat processes, but NO DATA is written to disk (the files show as 0 size).
->>
->> That makes sense since kvm_stat does not handle SIGTERM. The default
->> SIGTERM behavior is to terminal and any output in Python's I/O buffers
->> may not have been written to the file.
->>
->> Maybe kvm_stat should catch SIGINT and SIGTERM. That would give it a
->> chance to write out the log before terminating. Do you want to try
->> implementing that?I 
+> CC: qemu-trivial@nongnu.org
+> CC: zhao1.liu@intel.com
+
+(Pointless to carry Cc line when patch is already reviewed next line)
+
+> Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
+> Signed-off-by: Ani Sinha <anisinha@redhat.com>
+> ---
+>   accel/kvm/kvm-all.c | 40 ++++++++++++++++++----------------------
+>   1 file changed, 18 insertions(+), 22 deletions(-)
 > 
-> I think SIGINT would be enough, sure I can give it a try,
-
-It seemed to make sense to process SIGINT and SIGTERM the same way in the end.
-
-I sent a patch to the mailing list, Paolo and you:
-
-https://marc.info/?l=kvm&m=172305139224516&w=2
-
-
-There was some local problem with email, so the email might have reached the list but not you specifically also.
-
-Thanks,
-
-Claudio
-
-
+> changelog:
+> v2: fix a bug.
+> v3: replace one instance of error_report() with error_printf(). added tags.
 > 
-> Thanks,
-> 
-> C
-> 
->>
->>>
->>> This is the workaround script that we currently have:
->>>
->>> ----
->>>
->>> #! /bin/bash                                                                                                            
->>>
->>> VM_PIDS=`pgrep qemu-system-`
->>>
->>> for VM_PID in ${VM_PIDS} ; do
->>>     # warning: kvm_stat is very fragile, change with care                                                               
->>>     kvm_stat -p ${VM_PID} -d -t -s 1 -c -L kvm_stat_${VM_PID}.csv &
->>> done
->>>
->>> if test "x${VM_PID}" != "x" ; then
->>>     echo "launched kvm_stat processes, capturing 10 seconds..."
->>>     sleep 10
->>>     echo "signaling all kvm_stat processes to write to disk..."
->>>     pkill -INT -P $$
->>>     sleep 5
->>>     sync
->>>     echo "signaling all kvm_stat processes to die..."
->>>     pkill -TERM -P $$
->>>     echo "waiting for kvm_stat processes to exit..."
->>>     while pgrep -P $$ > /dev/null; do
->>>     sleep 2
->>>     echo "still waiting for kvm_stat processes to exit..."
->>>     done
->>> fi
->>>
->>> echo "Done."
->>>
->>> ----
->>>
->>> Feel free to forward to the appropriate mailing list if needed,
->>>
->>> thanks!
->>>
->>> Claudio
->>>
->>> -- 
->>> Claudio Fontana
->>> Engineering Manager Virtualization, SUSE Labs Core
->>>
->>> SUSE Software Solutions Italy Srl
->>>
-> 
+> diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
+> index 75d11a07b2..5bc9d35b61 100644
+> --- a/accel/kvm/kvm-all.c
+> +++ b/accel/kvm/kvm-all.c
+> @@ -2427,7 +2427,7 @@ static int kvm_init(MachineState *ms)
+>       QLIST_INIT(&s->kvm_parked_vcpus);
+>       s->fd = qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
+>       if (s->fd == -1) {
+> -        fprintf(stderr, "Could not access KVM kernel module: %m\n");
+> +        error_report("Could not access KVM kernel module: %m");
+>           ret = -errno;
+>           goto err;
+>       }
+> @@ -2437,13 +2437,13 @@ static int kvm_init(MachineState *ms)
+>           if (ret >= 0) {
+>               ret = -EINVAL;
+>           }
+> -        fprintf(stderr, "kvm version too old\n");
+> +        error_report("kvm version too old");
+>           goto err;
+>       }
+>   
+>       if (ret > KVM_API_VERSION) {
+>           ret = -EINVAL;
+> -        fprintf(stderr, "kvm version not supported\n");
+> +        error_report("kvm version not supported");
+>           goto err;
+>       }
+>   
+> @@ -2488,26 +2488,22 @@ static int kvm_init(MachineState *ms)
+>       } while (ret == -EINTR);
+>   
+>       if (ret < 0) {
+> -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
+> -                strerror(-ret));
+> +        error_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
+> +                    strerror(-ret));
+>   
+>   #ifdef TARGET_S390X
+>           if (ret == -EINVAL) {
+> -            fprintf(stderr,
+> -                    "Host kernel setup problem detected. Please verify:\n");
+> -            fprintf(stderr, "- for kernels supporting the switch_amode or"
+> -                    " user_mode parameters, whether\n");
+> -            fprintf(stderr,
+> -                    "  user space is running in primary address space\n");
+> -            fprintf(stderr,
+> -                    "- for kernels supporting the vm.allocate_pgste sysctl, "
+> -                    "whether it is enabled\n");
+> +            error_report("Host kernel setup problem detected.
+
+\n"
+
+Should we use error_printf_unless_qmp() for the following?
+
+" Please verify:");
+> +            error_report("- for kernels supporting the switch_amode or"
+> +                        " user_mode parameters, whether");
+> +            error_report("  user space is running in primary address space");
+> +            error_report("- for kernels supporting the vm.allocate_pgste "
+> +                        "sysctl, whether it is enabled");
+>           }
+>   #elif defined(TARGET_PPC)
+>           if (ret == -EINVAL) {
+> -            fprintf(stderr,
+> -                    "PPC KVM module is not loaded.
+
+\n"
+
+Ditto.
+
+" Try modprobe kvm_%s.\n",
+> -                    (type == 2) ? "pr" : "hv");
+> +            error_report("PPC KVM module is not loaded. Try modprobe kvm_%s.",
+> +                        (type == 2) ? "pr" : "hv");
+>           }
+>   #endif
+>           goto err;
+> @@ -2526,9 +2522,9 @@ static int kvm_init(MachineState *ms)
+>                           nc->name, nc->num, soft_vcpus_limit);
+>   
+>               if (nc->num > hard_vcpus_limit) {
+> -                fprintf(stderr, "Number of %s cpus requested (%d) exceeds "
+> -                        "the maximum cpus supported by KVM (%d)\n",
+> -                        nc->name, nc->num, hard_vcpus_limit);
+> +                error_report("Number of %s cpus requested (%d) exceeds "
+> +                             "the maximum cpus supported by KVM (%d)",
+> +                             nc->name, nc->num, hard_vcpus_limit);
+>                   exit(1);
+>               }
+>           }
+> @@ -2542,8 +2538,8 @@ static int kvm_init(MachineState *ms)
+>       }
+>       if (missing_cap) {
+>           ret = -EINVAL;
+> -        fprintf(stderr, "kvm does not support %s\n%s",
+> -                missing_cap->name, upgrade_note);
+> +        error_printf("kvm does not support %s\n%s",
+> +                     missing_cap->name, upgrade_note);
+
+Similarly, should we print upgrade_note using error_printf_unless_qmp?
+
+>           goto err;
+>       }
+>   
 
 
