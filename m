@@ -1,70 +1,62 @@
-Return-Path: <kvm+bounces-23806-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23807-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED82A94DA4B
-	for <lists+kvm@lfdr.de>; Sat, 10 Aug 2024 05:30:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA46F94DA5D
+	for <lists+kvm@lfdr.de>; Sat, 10 Aug 2024 05:47:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31DADB21E6E
-	for <lists+kvm@lfdr.de>; Sat, 10 Aug 2024 03:30:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE23A1C214FD
+	for <lists+kvm@lfdr.de>; Sat, 10 Aug 2024 03:47:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F27130E4A;
-	Sat, 10 Aug 2024 03:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E644E13B5AF;
+	Sat, 10 Aug 2024 03:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="iKBHWi4d"
+	dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b="OKcteNk8"
 X-Original-To: kvm@vger.kernel.org
 Received: from zeniv.linux.org.uk (zeniv.linux.org.uk [62.89.141.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73FD3A1BA;
-	Sat, 10 Aug 2024 03:30:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11A361802B;
+	Sat, 10 Aug 2024 03:46:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.89.141.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723260603; cv=none; b=NIe6RXkWSxWnUsf2GJSk1BvgM9AhzQ+aCcHKkmUVxkcH0jFk96ygQCVT8lxNqcnuoK0iYMdQ9XC57xPpq3K+vByW1ZQW0iUaRr9u0RWBoWPoW8QasRNJ+gHlpM3XAgHZ4nFHSudC04fyxhDxlUd2n7/scxO9b0oZG0dzmc62uuA=
+	t=1723261609; cv=none; b=NvccSnj+CyxJVmcQ9XBRvOtjGjyTj/HDeSA+Z2IKt1UmXlmjPGvsYYSrkLiRCsY3wTruTYuEU1+a7hWVVsjDmZTDpS6hTtTIovkweoywkI7YfULqEUo5OyEdrVt8XhJ/zQLUkDILw1ZeewuJ2Fhvs6ZHrV+UE6MVamxVhgA3ZuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723260603; c=relaxed/simple;
-	bh=JG+S2VriE6vC0cT+340V8uthrcWccIelXM0OAvLdhgI=;
+	s=arc-20240116; t=1723261609; c=relaxed/simple;
+	bh=pCc5rZlUkjug+JYB2R0ck8yvhlhb886WMpEdh1diQiY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BDmR4jgNqWOH+xWNlIIUsHFvUVDBMXNfLd9NL7MvT5DZ7pywlA7Og2J/IRsfeYF3wIxb418ftXbYRszYuVluXTsD8xz4HF4FxYX4yeSC1jMUfLNBUfsHr/ogtvtSXQlmFpXBhF5miH7/BE4j0zNV09K6kVu/8HzAD1rvcX91KqM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=iKBHWi4d; arc=none smtp.client-ip=62.89.141.173
+	 Content-Type:Content-Disposition:In-Reply-To; b=PKy6vmaUrfS13GGbxD3vC836Jnmu6WQ0T2AY5KjN6E4HDf49d1qUk5ECJU57SDmNZA0ke8raHkPWUcuyEV5D0V7bf9s39a8R9L9Jc7nHHsPULEkZGWebkrcCV/SbeNT673L+U6vY9wPJ1OLmkVmSUDuMOEAQ9/+TxRId8dmf4Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk; spf=none smtp.mailfrom=ftp.linux.org.uk; dkim=pass (2048-bit key) header.d=linux.org.uk header.i=@linux.org.uk header.b=OKcteNk8; arc=none smtp.client-ip=62.89.141.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zeniv.linux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ftp.linux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=linux.org.uk; s=zeniv-20220401; h=Sender:In-Reply-To:Content-Type:
 	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
 	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=ln3k/EoX0oy3RTS4qxSKawW+zSS5fT3VDPUtbvDbogs=; b=iKBHWi4dDscoWrVq2GpUUY+I5f
-	CANm6lIKUVTom7BQ4pQZh8oyxyXPsoKSfYmrCkES5HHakyaboJ6cdw1q3Nq5KTuobtQ9kjZ6cGdi1
-	s/Z1ST9zS5Po7DZab5R4djkM/KMWMmakyJtSuvBGb0wtxbreWHNrmSNzRPnr6pu4Y1zXyvTERigcD
-	Z4P7HN20LWzh9JLiu8b3ZeW0lBHSqTZGzTnsMEHHILRuYbwk7SR4W9//R9pdWb9qKgA06Uw3aEkUA
-	k+tuEOb4mM3SwOHzU82Jntj/OZeLiFg82/PMzlQw/p7WkMcg6UmEzK/F+z/B+iYOLHGRelFE8UFeF
-	0SETaWIg==;
+	bh=V4V88+6ORKnoZTEvMKe3KHy18Q83Bw1qagLhsOGfx48=; b=OKcteNk84wbrZYnhyixObNQn0q
+	HY4geaS3G4th988swtHI8B8dbTHZtTjWxKG9ZWCXLdJJ84bP6ZuG/ZG0cwe95qpA2QAbJ6LydzCOO
+	CdQOPA7cndO56rD+DLrmBBX5yNwTgBrb5cA946JLXoLe9juipYYLmT79oKtaLhuIjJ/uYqggLQuMU
+	3Z8chDpZsZqPOk7cuDu2ZLNYf0I9nKHg8INUeoS8K7nrc8YIzW8PdWalnKRoXT1o87kjDa7EwZCMo
+	xV0HIlFdOOxSAJOmNvSnnVP5+bRilPjlGAn7IMz9fCVFXk773ZB0rpAFO9SPCByK8xjbV8I+756Mk
+	dTDHk5Aw==;
 Received: from viro by zeniv.linux.org.uk with local (Exim 4.98 #2 (Red Hat Linux))
-	id 1sccng-00000000Km3-0pCw;
-	Sat, 10 Aug 2024 03:29:52 +0000
-Date: Sat, 10 Aug 2024 04:29:52 +0100
+	id 1scd40-00000000Ku3-1OUp;
+	Sat, 10 Aug 2024 03:46:44 +0000
+Date: Sat, 10 Aug 2024 04:46:44 +0100
 From: Al Viro <viro@zeniv.linux.org.uk>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>,
-	Christian Brauner <brauner@kernel.org>, viro@kernel.org,
-	bpf <bpf@vger.kernel.org>,
-	Linux-Fsdevel <linux-fsdevel@vger.kernel.org>,
-	Amir Goldstein <amir73il@gmail.com>,
-	"open list:CONTROL GROUP (CGROUP)" <cgroups@vger.kernel.org>,
-	kvm@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
-	Linus Torvalds <torvalds@linux-foundation.org>
-Subject: Re: [PATCH 17/39] bpf: resolve_pseudo_ldimm64(): take handling of a
- single ldimm64 insn into helper
-Message-ID: <20240810032952.GB13701@ZenIV>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: viro@kernel.org, linux-fsdevel@vger.kernel.org, amir73il@gmail.com,
+	bpf@vger.kernel.org, brauner@kernel.org, cgroups@vger.kernel.org,
+	kvm@vger.kernel.org, netdev@vger.kernel.org,
+	torvalds@linux-foundation.org
+Subject: Re: [PATCH 35/39] convert bpf_token_create()
+Message-ID: <20240810034644.GC13701@ZenIV>
 References: <20240730050927.GC5334@ZenIV>
  <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-17-viro@kernel.org>
- <CAEf4BzZipqBVhoY-S+WdeQ8=MhpKk-2dE_ESfGpV-VTm31oQUQ@mail.gmail.com>
- <20240807-fehlschlag-entfiel-f03a6df0e735@brauner>
- <CAEf4BzaeFTn41pP_hbcrCTKNZjwt3TPojv0_CYbP=+973YnWiA@mail.gmail.com>
- <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
+ <20240730051625.14349-35-viro@kernel.org>
+ <CAEf4BzasSXFx5edPknxVnmk+o6oAyOU0h_Tg_yHVaJcaJfpPOQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -73,22 +65,14 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAADnVQKZW--EOkn5unFybxTKPNw-6rPB+=mY+cy_yUUsXe8R-w@mail.gmail.com>
+In-Reply-To: <CAEf4BzasSXFx5edPknxVnmk+o6oAyOU0h_Tg_yHVaJcaJfpPOQ@mail.gmail.com>
 Sender: Al Viro <viro@ftp.linux.org.uk>
 
-On Thu, Aug 08, 2024 at 09:51:34AM -0700, Alexei Starovoitov wrote:
+On Tue, Aug 06, 2024 at 03:42:56PM -0700, Andrii Nakryiko wrote:
 
-> The bpf changes look ok and Andrii's approach is easier to grasp.
-> It's better to route bpf conversion to CLASS(fd,..) via bpf-next,
-> so it goes through bpf CI and our other testing.
-> 
-> bpf patches don't seem to depend on newly added CLASS(fd_pos, ...
-> and fderr, so pretty much independent from other patches.
+> By constify you mean something like below?
 
-Representation change and switch to accessors do matter, though.
-OTOH, I can put just those into never-rebased branch (basically,
-"introduce fd_file(), convert all accessors to it" +
-"struct fd representation change" + possibly "add struct fd constructors,
-get rid of __to_fd()", for completeness sake), so you could pull it.
-Otherwise you'll get textual conflicts on all those f.file vs. fd_file(f)...
+Yep.  Should go through LSM folks, probably, and once it's in
+those path_get() and path_put() around the call can go to hell,
+along with 'path' itself (we can use file->f_path instead).
 
