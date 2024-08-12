@@ -1,130 +1,138 @@
-Return-Path: <kvm+bounces-23819-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23821-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F23094E4CE
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 04:24:21 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F05D94E555
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 05:02:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECC9528186A
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 02:24:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0BF91F22088
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 03:02:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE93482481;
-	Mon, 12 Aug 2024 02:24:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NavN4KGD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48B31474C3;
+	Mon, 12 Aug 2024 03:02:17 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1504690;
-	Mon, 12 Aug 2024 02:24:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7D7F13634F;
+	Mon, 12 Aug 2024 03:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723429445; cv=none; b=ClOy47kg1ZgznmyZLLGDmWtRj/z7GrKpjPBuAykvR66iyvRmrneyLUFTGGrsk73Qx66xK9pJN5HxUsPrtsNCyUc0dSqDKGgWoziOt5LgUVj1UOzp7c20xvbiAPZv5q7JXf2DcJN2M3XYZVgb4ZSGT8zjwKg3PccuGglxhE0mO2E=
+	t=1723431737; cv=none; b=JFwQYkYGDQ62IGY0bN4gJ9XIH9k9aIf2ODXF4MWVwHzYK8QNt7ExhEAM4Wu/Y8Rw27f7RADQjybJkuljz/pvgj8XwNRTuXqszXSAGbWnwhVMTwW+Rc3TrlrxQU4bMuVh2jUh3llR5NaMYQhZK9M2gWqQipVIthqvTwV5R95e52Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723429445; c=relaxed/simple;
-	bh=FqGg5DIw49XQ7Uc49eBDwirJ08MyI6X0CPTIL7COrkM=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=aR+Aeq/Z2Ir1US1owS6C6HMWwo31VKjroszuVFjzP8jVq9M1J+yj0tDSClbUAq6mAS10QXiaFTFcDbkaB+F3dC8EqLYX3XucXusWcsNkQSAK895Yk+n0DZjc/M+Okglpfq59eHbBkrDyZyLImTqi1SB3eVAWYJgQw6YCsO0eTJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NavN4KGD; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723429444; x=1754965444;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=FqGg5DIw49XQ7Uc49eBDwirJ08MyI6X0CPTIL7COrkM=;
-  b=NavN4KGDtPDTn+HJcbhlA45OXBHWkLWpe52EeBm7YJ1EcT5fbTvH2aVf
-   wecgEsbrsTRATRIh/hXgXlq5gI0XHjQ/GrkK5sG0tGYYN5QQd1IwuuS/M
-   BBcVrWCDdtiGX8sKL9Ig+bHoyMWT7eVv99uL3YjOouq0zey3xEll2m1ip
-   8F1wBDhmWoh28gHu83A61qdPPgiKlSM+veOYUzehkE7MPBS2dVJdVm5Pr
-   QLbdTOOhfpfj9pViUqWlzLF03+/uzgBguyfxiwLx6KALImgCNb7GlBtGE
-   IvgJaHnL+drd58wSvnzH5JC/qarRO/bFRpY833SoRWTBmmwXE9QrECZFo
-   g==;
-X-CSE-ConnectionGUID: QA0Lb5R6RJiYHChKXZByXw==
-X-CSE-MsgGUID: 4dVvdAJ0QuyQkl0WjbGhBQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11161"; a="32197516"
-X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
-   d="scan'208";a="32197516"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2024 19:24:03 -0700
-X-CSE-ConnectionGUID: GYcgJn7UReyXGjarYyDrkA==
-X-CSE-MsgGUID: 7I8pB5x5QceZjJsh9TtACw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
-   d="scan'208";a="58020573"
-Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
-  by orviesa009.jf.intel.com with ESMTP; 11 Aug 2024 19:24:00 -0700
-Message-ID: <ac2ef4ae-ef1d-47b0-bd60-f203baaf124e@linux.intel.com>
-Date: Mon, 12 Aug 2024 10:20:32 +0800
+	s=arc-20240116; t=1723431737; c=relaxed/simple;
+	bh=KP2uXyiwJnp29CnVHLu1GgQJEl2kGhUBo2xj1pRvqho=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=M5xMwTpWddbBJf9pvKldGE4kOyovnz9k2CY9I8PpsOPsmto1i1schmUQFaEFm6gFVFoRn4DKNndWqRAd9fflhXAyMFckb0coVElbMtsttD8RvVw0zUtoUlGofR2CXu0sikU7zcAvBykO9rCreV4xofWsb8iDevVTI8qnoj38j1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [10.2.5.213])
+	by gateway (Coremail) with SMTP id _____8Cx65o0e7lmllAQAA--.5510S3;
+	Mon, 12 Aug 2024 11:02:12 +0800 (CST)
+Received: from localhost.localdomain (unknown [10.2.5.213])
+	by front1 (Coremail) with SMTP id qMiowMDxvmcze7lmTagPAA--.59431S2;
+	Mon, 12 Aug 2024 11:02:11 +0800 (CST)
+From: Bibo Mao <maobibo@loongson.cn>
+To: Tianrui Zhao <zhaotianrui@loongson.cn>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>
+Cc: WANG Xuerui <kernel@xen0n.name>,
+	kvm@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-kernel@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	x86@kernel.org,
+	Song Gao <gaosong@loongson.cn>
+Subject: [PATCH v6 0/3] Add extioi virt extension support
+Date: Mon, 12 Aug 2024 11:02:07 +0800
+Message-Id: <20240812030210.500240-1-maobibo@loongson.cn>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, patches@lists.linux.dev
-Subject: Re: [PATCH] iommu: Allow ATS to work on VFs when the PF uses IDENTITY
-To: Jason Gunthorpe <jgg@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
- David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
- Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
- Robin Murphy <robin.murphy@arm.com>,
- Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
- Will Deacon <will@kernel.org>
-References: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:qMiowMDxvmcze7lmTagPAA--.59431S2
+X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3UbIjqfuFe4nvWSU5nxnvy29KBjDU0xBIdaVrnUUvcSsGvfC2Kfnx
+	nUUI43ZEXa7xR_UUUUUUUUU==
 
-On 8/8/24 2:19 AM, Jason Gunthorpe wrote:
-> PCI ATS has a global Smallest Translation Unit field that is located in
-> the PF but shared by all of the VFs.
-> 
-> The expectation is that the STU will be set to the root port's global STU
-> capability which is driven by the IO page table configuration of the iommu
-> HW. Today it becomes set when the iommu driver first enables ATS.
-> 
-> Thus, to enable ATS on the VF, the PF must have already had the correct
-> STU programmed, even if ATS is off on the PF.
-> 
-> Unfortunately the PF only programs the STU when the PF enables ATS. The
-> iommu drivers tend to leave ATS disabled when IDENTITY translation is
-> being used.
-> 
-> Thus we can get into a state where the PF is setup to use IDENTITY with
-> the DMA API while the VF would like to use VFIO with a PAGING domain and
-> have ATS turned on. This fails because the PF never loaded a PAGING domain
-> and so it never setup the STU, and the VF can't do it.
-> 
-> The simplest solution is to have the iommu driver set the ATS STU when it
-> probes the device. This way the ATS STU is loaded immediately at boot time
-> to all PFs and there is no issue when a VF comes to use it.
-> 
-> Add a new call pci_prepare_ats() which should be called by iommu drivers
-> in their probe_device() op for every PCI device if the iommu driver
-> supports ATS. This will setup the STU based on whatever page size
-> capability the iommu HW has.
-> 
-> Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
-> ---
->   drivers/iommu/amd/iommu.c                   |  3 ++
->   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  6 ++++
->   drivers/iommu/intel/iommu.c                 |  1 +
->   drivers/pci/ats.c                           | 33 +++++++++++++++++++++
->   include/linux/pci-ats.h                     |  1 +
->   5 files changed, 44 insertions(+)
+KVM_FEATURE_VIRT_EXTIOI is paravirt feature defined with EXTIOI
+interrupt controller, it can route interrupt to 256 vCPUs and CPU 
+interrupt pin IP0-IP7. Now EXTIOI irqchip is emulated in user space
+rather than kernel space, here interface is provided for VMM to pass
+this feature to KVM hypervisor.
 
-For Intel VT-d,
+Also interface is provided for user-mode VMM to detect and enable/disable
+paravirt features from KVM hypervisor. And api kvm_para_has_feature() is
+available on LoongArch for device driver to detect paravirt features and
+do some optimization.
 
-Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
+---
+v5 ... v6:
+  1. Put KVM hypervisor type checking function kvm_para_available()
+     inside function kvm_arch_para_features(), so that upper caller
+     is easy to use.
+  2. Add inline function guest_pv_has() in KVM module to judge whether
+     the specific paravirt feature is supported or not. And do valid
+     checking at hypercall and user space ioctl entrance with it.
+  3. Fix some coding style issue such as variable declarations and spell
+     checking.
 
-Thanks,
-baolu
+v4 ... v5:
+  1. Refresh annotation "WITH Linux-syscall-note" about uapi header file
+     arch/loongarch/include/uapi/asm/kvm_para.h
+
+v3 ... v4:
+  1. Implement function kvm_para_has_feature() on LoongArch platform,
+     and redefine feature with normal number rather than bitmap number,
+     since function kvm_para_has_feature() requires this.
+  2. Add extioi virt extension support in this patch set.
+  3. Update extioi virt extension support patch with review comments,
+     including documentation, using kvm_para_has_feature() to detect
+     features etc.
+
+v2 ... v3:
+  1. Add interface to detect and enable/disable paravirt features in
+     KVM hypervisor.
+  2. Implement function kvm_arch_para_features() for device driver in
+     VM side to detected supported paravirt features.
+
+v1 ... v2:
+  1. Update changelog suggested by WangXuerui.
+  2. Fix typo issue in function kvm_loongarch_cpucfg_set_attr(),
+     usr_features should be assigned directly, also suggested by
+     WangXueRui.
+---
+Bibo Mao (3):
+  LoongArch: KVM: Enable paravirt feature control from VMM
+  LoongArch: KVM: Implement function kvm_para_has_feature
+  irqchip/loongson-eiointc: Add extioi virt extension support
+
+ .../arch/loongarch/irq-chip-model.rst         |  64 ++++++++++
+ .../zh_CN/arch/loongarch/irq-chip-model.rst   |  55 +++++++++
+ arch/loongarch/include/asm/irq.h              |   1 +
+ arch/loongarch/include/asm/kvm_host.h         |   7 ++
+ arch/loongarch/include/asm/kvm_para.h         |  11 ++
+ arch/loongarch/include/asm/kvm_vcpu.h         |   4 +
+ arch/loongarch/include/asm/loongarch.h        |  13 ---
+ arch/loongarch/include/uapi/asm/Kbuild        |   2 -
+ arch/loongarch/include/uapi/asm/kvm.h         |   5 +
+ arch/loongarch/include/uapi/asm/kvm_para.h    |  24 ++++
+ arch/loongarch/kernel/paravirt.c              |  35 +++---
+ arch/loongarch/kvm/exit.c                     |  19 +--
+ arch/loongarch/kvm/vcpu.c                     |  47 ++++++--
+ arch/loongarch/kvm/vm.c                       |  43 ++++++-
+ drivers/irqchip/irq-loongson-eiointc.c        | 109 ++++++++++++++----
+ 15 files changed, 370 insertions(+), 69 deletions(-)
+ create mode 100644 arch/loongarch/include/uapi/asm/kvm_para.h
+
+
+base-commit: 7c626ce4bae1ac14f60076d00eafe71af30450ba
+-- 
+2.39.3
+
 
