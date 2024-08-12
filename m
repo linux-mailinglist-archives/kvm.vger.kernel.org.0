@@ -1,55 +1,53 @@
-Return-Path: <kvm+bounces-23863-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23864-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBAA594EF6A
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 16:21:33 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD8D494EFA0
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 16:32:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 674E61F2253A
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 14:21:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 485ACB23D01
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 14:32:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91930183084;
-	Mon, 12 Aug 2024 14:21:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CCF181B87;
+	Mon, 12 Aug 2024 14:32:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y+Por+2Q"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="o1e4Nanw"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from out-179.mta1.migadu.com (out-179.mta1.migadu.com [95.215.58.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DC717D8A9
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 14:21:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B05416E87A
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 14:32:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723472474; cv=none; b=kgMHhOpopjIw+wjmqVCTKAkCH4Idc18nS/UIlAOfzB8e0rPmBUKQYsUo+R2p6HtL189kPLIR3Rk71u6uIgWXJRE6qfksSz8AKx5RUPKd3AepcywFEOhXq/4okWLFNrZFFhb+EoNTjO9Q52DooY+Q7PmsX9tktSD3wZbLyMlw+LA=
+	t=1723473137; cv=none; b=YjoZOaCWkLgTKkKat0sW304RB5lBlUM245JVSgXC8FrUsPFbyXlPHwKJCmn7Ct7J+SUZPzKHP3B6n/8vdxASEhxPHHSJkv/77HVXbdkwzApDsNQl5gwYOTyPrNQnRYbr8P19cLMP6fvCz4cJ8HLxhfEXhT466WJBQCytlJIkTHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723472474; c=relaxed/simple;
-	bh=bznRfkavE8gz5GSMpFFXyzdgUcVe1kjpO/qgo6apdm8=;
+	s=arc-20240116; t=1723473137; c=relaxed/simple;
+	bh=evv8vzISKyHqWiTzA9mBLg5H2wB1aSQlD4XSblSo8nE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MHny8dceEVy4ekrnMfn1tpYpF+icU8m7TpEaPBOz4uHh4CYQmDzbveWMi7aIc3Ft+NlXfcFcQv+reR2CHGv8zNwAg49qlqazQ/OsqAh9s6moQpJ6aeDfIEmBVXKrAKQm2isyske+971a6a4UoR18G42ZLVWlqT/p15ZwC7ZAz4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y+Por+2Q; arc=none smtp.client-ip=95.215.58.183
+	 Content-Type:Content-Disposition:In-Reply-To; b=SQE7DsA9ZGKCToaUq3nRz48aJ/kI12SPPeDHh5NtRjtJBc0ri8IvCzkGI4e3PrIxsJ0LbQt4WeujWRjy+GsNlspiJbZKeovmEW5cAJMfKmnX8J6I5dwwf9LDnW+mRCpiGX3KJavOM7PWWVZfyQG+z8+8wzwGqPv0P03p3g4VfjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=o1e4Nanw; arc=none smtp.client-ip=95.215.58.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 12 Aug 2024 16:21:09 +0200
+Date: Mon, 12 Aug 2024 16:32:09 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723472471;
+	t=1723473131;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AgaYljEONxrM+2ayk3RUMmQAOWsjXZDGkdEXbTyanJU=;
-	b=Y+Por+2Q2Tm8F0V+bjvBhYMq9t0G+rjyE8IQHIKVO8f2HMeqNbJ/u9kU/h768FYSrSQojY
-	ZfaducSjotJmD04G/f9PPXx8mMK/8thKvBoMNhEvsLdkOynnbMAVmYOKSUzY7dN755So5W
-	hT68iXCNUeMHGK2Tr9rjGtYcU98Bq2g=
+	bh=O0BHsk7p7pyM9FCKtndFIBNXHJ/yqo6BMqJCtQdHc1I=;
+	b=o1e4NanwN5DO2BCeLQfRpch6/pTVlpkxaTtO1n6WD040ZcNeN73FMVejFKBnNHNCYLVtkD
+	HmrYxE3ngaai4qVG0qM03G6cqTSdxkWQplbWdIh3tA12xjKiQCL9cK8kNDrSVkolrQZYD0
+	iCJvxiLzH0KWLQP8OGWsDARl8MxBj5A=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: James Raphael Tiovalen <jamestiotio@gmail.com>
-Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
-	atishp@rivosinc.com, cade.richard@berkeley.edu
-Subject: Re: [kvm-unit-tests PATCH 0/3] riscv: sbi: Add support to test HSM
- extension
-Message-ID: <20240812-ad8171c2d4e3bf1355e85326@orel>
-References: <20240810175744.166503-1-jamestiotio@gmail.com>
+To: Nicholas Piggin <npiggin@gmail.com>
+Cc: Thomas Huth <thuth@redhat.com>, kvm@vger.kernel.org
+Subject: Re: [kvm-unit-tests PATCH 0/6] Checking and CI improvements
+Message-ID: <20240812-84356f0889e97c6849d65513@orel>
+References: <20240726070456.467533-1-npiggin@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -58,35 +56,47 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240810175744.166503-1-jamestiotio@gmail.com>
+In-Reply-To: <20240726070456.467533-1-npiggin@gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Sun, Aug 11, 2024 at 01:57:41AM GMT, James Raphael Tiovalen wrote:
-> This patch series adds support for testing all 4 functions of the HSM
-> extension as defined in the RISC-V SBI specification. The first 2
-> patches add some helper routines to prepare for the HSM test, while the
-> last patch adds the actual test for the HSM extension.
+On Fri, Jul 26, 2024 at 05:04:41PM GMT, Nicholas Piggin wrote:
+> Here's some assorted fixes and improvements to static checking
+> and CI.
 > 
-> James Raphael Tiovalen (3):
->   riscv: sbi: Add IPI extension support
->   riscv: sbi: Add HSM extension functions
->   riscv: sbi: Add tests for HSM extension
+> checkpatch support is a big one and you could consider it RFC
+> for now. We may want to customise it somewhat (but IMO fewer
+> customisations the easier to maintain the script if we can agree
+> on close to kernel style). It's nice because it gets DCO, license
+> headers, etc., not just code style.
 > 
->  riscv/Makefile      |   7 +-
->  lib/riscv/asm/sbi.h |  23 ++++
->  lib/riscv/sbi.c     |  15 +++
->  riscv/sbi-asm.S     |  38 ++++++
->  riscv/sbi.c         | 285 ++++++++++++++++++++++++++++++++++++++++++++
->  5 files changed, 365 insertions(+), 3 deletions(-)
->  create mode 100644 riscv/sbi-asm.S
+> Here is a pipeline with this series applied:
 > 
-> --
-> 2.43.0
+> https://gitlab.com/npiggin/kvm-unit-tests/-/pipelines/1388888286
+> 
+> Thanks,
+> Nick
+> 
+> Nicholas Piggin (6):
+>   gitlab-ci: fix CentOS mirror list
+>   arm: Fix kerneldoc
+>   gitlab-ci: upgrade to CentOS 8
+>   gitlab-ci: Move check-kerneldoc test out of the centos test
+>   gitlab-ci: add a shellcheck test
+>   checkpatch support
+> 
+>  .gitlab-ci.yml         |   83 +-
+>  arm/fpu.c              |   24 +-
+>  scripts/check-patch.py |   61 +
+>  scripts/checkpatch.pl  | 7839 ++++++++++++++++++++++++++++++++++++++++
+>  4 files changed, 7986 insertions(+), 21 deletions(-)
+>  create mode 100755 scripts/check-patch.py
+>  create mode 100755 scripts/checkpatch.pl
+> 
+> -- 
+> 2.45.2
 >
 
-Hi James,
-
-When you send v2, please base on riscv/sbi, https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv%2Fsbi
+Merged
 
 Thanks,
 drew
