@@ -1,241 +1,173 @@
-Return-Path: <kvm+bounces-23833-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23834-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21DC494EA4E
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 11:53:29 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7E0A94EA70
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 12:04:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC31B281F39
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 09:53:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EA231F228D1
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 10:04:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF92716E862;
-	Mon, 12 Aug 2024 09:53:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB2B116EB56;
+	Mon, 12 Aug 2024 10:04:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EVBwVeJj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YUWzAy/b"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 584ED16C85D
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 09:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8298B16EB4B
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 10:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723456402; cv=none; b=bzJiBH7MgZv8Z0L9VSk6xxGtqKIn4wk/aT86GQSwPLnNsei2L9jLkUNB+LpXM27qG2/Nhya3R3f+Py3J8tfT2rXbgwd7N87GdCEIBL7ZihyMlOG9cx6qow/euDFdEVFq5i2bX8MGSd+tmLZIyZvm/DJVTIHdGuax/fCxFTa8ld8=
+	t=1723457063; cv=none; b=D3iZlGZ63qcYhgaTpTbZHi9P1YKr5DSZnljhn51OyAJaioCIViPbLqTt8fok3WrLRW4IVYOCYcXqIPR1VAwa/YI1szIQ1dpSDFQq5pOiBlzCM80lei0R1gAFGnBW5jI7/oN7g4Gyn+C5Xc0EMyncAQlIVK0ES3OJ7SaxcsVxqCs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723456402; c=relaxed/simple;
-	bh=SwIS8v+BZF5z9FMgqbfwDDBc77R8uZGvAjV+LF4U8xc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AfxPH2hOa3/p6uxWDq+MA+oFFV+JI5jznIgaY7e6EsYEleI56lLrkJUGfpnbi1te+jlAPo6jZCMFLK+w1oGTHdGicXXCJX9+xSdMafU8Kx4xmtnZ0TbRxSBM0Av6Y6Db/vH8T8wpcT66gHprFo2q8el2VeyLxQ5GI05C7dVOa3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EVBwVeJj; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1723457063; c=relaxed/simple;
+	bh=FMhv9gR//hL+oW5Y92Px+f0x2+KYZGuRYJkizZjcMzQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q4tXajqKqD6CR4iTY6DeZsvdqqrRfwzohyfK3R2aCRmZ8A9sJFw8wskJvgX1G3/ZY0YwidSDe/4Rokln5FbWZFX+G4mPW6rmxeW0kOx4JEjhrbQJPdYqzcnjBJdejOkf8X+b4TdZl/dWYYy7bWio0HW2zP2wWzmo1WaqoP0S2fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YUWzAy/b; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723456399;
+	s=mimecast20190719; t=1723457060;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DaNd/0SeJ2+vXikjwkP3r5pLGCe1rmKQoREGvBy59qk=;
-	b=EVBwVeJjlQMAmrwa6/Cjyj/wql7FcmTZ5Q+TH43fu9rEea2v1plBSFk1nKMNh55o6AAOHs
-	HnVW+96/6Dl+nYZQH8T7XUlMU/X//wCTu7xyq/Fc8ZKdBFoFcF7AXVBu1hHTrvq8IjquL3
-	CT+8YDGm1KyHEQ9wgoS5rG1s3j3QN3k=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=WH+34UDAHX79Po2Yq7ExNVjTPxlkArwIEowUs+SryDk=;
+	b=YUWzAy/bsLiJCql5oggu3PSSp6BgO2kilFrka9T7o+0z7Ph2fsKKf56Rh5SykcGHhTZCu9
+	jBY63U8PeLz5GFCfsBHdg6W95kXssc5to9I2CibflglYtN3LiV6cqHEdb0C18c/UOw48WM
+	WI0vWFzk401OZnVp4BLJBH6Iy7y+Gn8=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-133-X9rGPip1N9mX-Y032-f2TA-1; Mon, 12 Aug 2024 05:53:17 -0400
-X-MC-Unique: X9rGPip1N9mX-Y032-f2TA-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a80c12dede1so220837666b.0
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 02:53:17 -0700 (PDT)
+ us-mta-501-5WZRAee_OLC3iOhV_bBt8A-1; Mon, 12 Aug 2024 06:04:19 -0400
+X-MC-Unique: 5WZRAee_OLC3iOhV_bBt8A-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-52e9557e312so3286636e87.0
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 03:04:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723456396; x=1724061196;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DaNd/0SeJ2+vXikjwkP3r5pLGCe1rmKQoREGvBy59qk=;
-        b=UY7EeJ6NV/cVpTgsXUJHfsE8JQBXzvD83C8l+jgLbwkmHKr3f9xSqVqcY2KLbCt+MU
-         tWCeE3pMqTmGlj4mYhKSZ9PqMlyjucqix3U4AQwlLNvEugyr5YSxe9q6H4nueP6uWkMQ
-         4NReJK8eqKmglmssUJFGz6Bkvp5eT7LBvPcQbxU5wVQnKWggec+nIKe9Eh1cw4wgXvw2
-         1znej+aPkGzlRmg6itEIL+XVoYrpCM+UNkARkk/e+XhUJTxvxxMlX2+AHr4BogHkVPSi
-         1YcO43kKls29yabq8ljJU6ZKsJNPs93zKRIbrf2+T/oWKr2BuoBf7jLQMNAH2CpeX/tf
-         dmYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW8sxMgH8+8ZHaxYZwdo06oNi9+fiSGALdqAlfnAmxhC3hZb60m7I9sURgopvzz+zewpLZQ9qxU6xgsukFz8oXPSTXE
-X-Gm-Message-State: AOJu0Yw14+BhtugPfQRNVByansXoU06XRJQz6MNj68dDX6sTFlNVgELr
-	qcLPqHH0CU1C+75b+V9x61vTKaQrkhUredu3IQnf1lSOTrg1JFDIdLr5jgW349yy7+jxpTHbUfO
-	0qGxxyyOWdOUc/LC4JnChUVx7MaoYHcTQCQJtLYkldghN1nktTGiy8xQuN1n7ogppbYJoM+w95v
-	ubCbkR+JgdcaV7fp+7J0Ijmg1H
-X-Received: by 2002:a17:907:dac:b0:a7a:bcbc:f7f4 with SMTP id a640c23a62f3a-a80ab795802mr667106966b.14.1723456396352;
-        Mon, 12 Aug 2024 02:53:16 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFTpvWhvzJKJINItgkEHZvMCgHN2cqJ5ObqV2x/QDvdU+IVRKhPZr+44cYlBD1rk5d7utrzPNmjj/9yTQ7l2g8=
-X-Received: by 2002:a17:907:dac:b0:a7a:bcbc:f7f4 with SMTP id
- a640c23a62f3a-a80ab795802mr667105066b.14.1723456395764; Mon, 12 Aug 2024
- 02:53:15 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723457058; x=1724061858;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WH+34UDAHX79Po2Yq7ExNVjTPxlkArwIEowUs+SryDk=;
+        b=uK8ateWEalq+Kf0756/PMAAu4lkkvKUOTFb570L2cFMQrdXyWpgI4LIUYzMIcEPmPw
+         vk0EVjBAmDnoHsoLNcKA1M9/O9PY2wtHXnS9IVC1ZuB0MV0b2bpGIAKRyWcaoXOqS901
+         dhVFqfn2JJN45D6fJCBdOwoH3uZKSzTzH1uyloFqb4zX2p341VhJ049quVObho6tDPDL
+         No1E7KwJdNaCA0YdYlJNsIeFfF9Xfhpp8HkOn5KUsAwHOsy/qFaVRKAlCtiQCinuhGSy
+         wHfarHB+3C5Q6mDlSEnher2uSlfEK4b4mr3mmDmyiYmiDwt4BJHhBafcN8JQKYEdfomz
+         fsaA==
+X-Forwarded-Encrypted: i=1; AJvYcCVAZeFssZxy4zscYmPdOg1nAk7LAEmyjqrwjrXFn9ZWEZbP7p/2rJ/XJiIn484Bixc3jZKmexnGwAFCZa2+rIefMFu3
+X-Gm-Message-State: AOJu0YzIEvYpEKnqiV7E336N2fYEUVhARj/IB3asASCB/oX2MjAmg985
+	cr7qq0p0g5dBWx9EkiYz+y3EE59GraxLtOxFA9mwCGhyt63mYfBgn7eJck4WsV3dZgvrPK6DVuZ
+	IA7V9cDvA7IDxb+VsgrUkUhNX9GVzxOkMSBTuezUUdhQ5EhimBw==
+X-Received: by 2002:a05:6512:31c3:b0:52e:9ebe:7325 with SMTP id 2adb3069b0e04-530ee9958f5mr6282344e87.31.1723457057821;
+        Mon, 12 Aug 2024 03:04:17 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFK+STVX8B0xyGRx+La+5znM6BFUq1kpM5Ysu0IPnW/eI+XUkLxbNRlUYjVBqeS0udHBDKzRQ==
+X-Received: by 2002:a05:6512:31c3:b0:52e:9ebe:7325 with SMTP id 2adb3069b0e04-530ee9958f5mr6282294e87.31.1723457057213;
+        Mon, 12 Aug 2024 03:04:17 -0700 (PDT)
+Received: from [192.168.0.6] (ip-109-43-178-125.web.vodafone.de. [109.43.178.125])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5bd187f5671sm2009223a12.3.2024.08.12.03.04.14
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 12 Aug 2024 03:04:16 -0700 (PDT)
+Message-ID: <ae5f3a65-4cee-466b-aac4-ddd83c8fd1e5@redhat.com>
+Date: Mon, 12 Aug 2024 12:04:13 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240809064940.1788169-1-anisinha@redhat.com> <8913b8c7-4103-4f69-8567-afdc29f8d0d3@linaro.org>
-In-Reply-To: <8913b8c7-4103-4f69-8567-afdc29f8d0d3@linaro.org>
-From: Ani Sinha <anisinha@redhat.com>
-Date: Mon, 12 Aug 2024 15:23:04 +0530
-Message-ID: <CAK3XEhM+SR39vYxG_ygQ=hCj_bmDE3dOH6EPFQZbLYrE-Yj-ow@mail.gmail.com>
-Subject: Re: [PATCH v3] kvm: replace fprintf with error_report/printf() in kvm_init()
-To: =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, qemu-trivial@nongnu.org, zhao1.liu@intel.com, 
-	kvm@vger.kernel.org, qemu-devel@nongnu.org, 
-	Markus Armbruster <armbru@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 02/18] tests/qapi-schema: Drop temporary 'prefix'
+To: Markus Armbruster <armbru@redhat.com>, qemu-devel@nongnu.org
+Cc: alex.williamson@redhat.com, andrew@codeconstruct.com.au,
+ andrew@daynix.com, arei.gonglei@huawei.com, berrange@redhat.com,
+ berto@igalia.com, borntraeger@linux.ibm.com, clg@kaod.org, david@redhat.com,
+ den@openvz.org, eblake@redhat.com, eduardo@habkost.net,
+ farman@linux.ibm.com, farosas@suse.de, hreitz@redhat.com,
+ idryomov@gmail.com, iii@linux.ibm.com, jamin_lin@aspeedtech.com,
+ jasowang@redhat.com, joel@jms.id.au, jsnow@redhat.com, kwolf@redhat.com,
+ leetroy@gmail.com, marcandre.lureau@redhat.com, marcel.apfelbaum@gmail.com,
+ michael.roth@amd.com, mst@redhat.com, mtosatti@redhat.com,
+ nsg@linux.ibm.com, pasic@linux.ibm.com, pbonzini@redhat.com,
+ peter.maydell@linaro.org, peterx@redhat.com, philmd@linaro.org,
+ pizhenwei@bytedance.com, pl@dlhnet.de, richard.henderson@linaro.org,
+ stefanha@redhat.com, steven_lee@aspeedtech.com, vsementsov@yandex-team.ru,
+ wangyanan55@huawei.com, yuri.benditovich@daynix.com, zhao1.liu@intel.com,
+ qemu-block@nongnu.org, qemu-arm@nongnu.org, qemu-s390x@nongnu.org,
+ kvm@vger.kernel.org
+References: <20240730081032.1246748-1-armbru@redhat.com>
+ <20240730081032.1246748-3-armbru@redhat.com>
+From: Thomas Huth <thuth@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=thuth@redhat.com; keydata=
+ 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
+In-Reply-To: <20240730081032.1246748-3-armbru@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Aug 9, 2024 at 2:06=E2=80=AFPM Philippe Mathieu-Daud=C3=A9 <philmd@=
-linaro.org> wrote:
->
-> Hi Ani,
->
-> On 9/8/24 08:49, Ani Sinha wrote:
-> > error_report() is more appropriate for error situations. Replace fprint=
-f with
-> > error_report. Cosmetic. No functional change.
-> >
-> > CC: qemu-trivial@nongnu.org
-> > CC: zhao1.liu@intel.com
->
-> (Pointless to carry Cc line when patch is already reviewed next line)
->
-> > Reviewed-by: Zhao Liu <zhao1.liu@intel.com>
-> > Signed-off-by: Ani Sinha <anisinha@redhat.com>
-> > ---
-> >   accel/kvm/kvm-all.c | 40 ++++++++++++++++++----------------------
-> >   1 file changed, 18 insertions(+), 22 deletions(-)
-> >
-> > changelog:
-> > v2: fix a bug.
-> > v3: replace one instance of error_report() with error_printf(). added t=
-ags.
-> >
-> > diff --git a/accel/kvm/kvm-all.c b/accel/kvm/kvm-all.c
-> > index 75d11a07b2..5bc9d35b61 100644
-> > --- a/accel/kvm/kvm-all.c
-> > +++ b/accel/kvm/kvm-all.c
-> > @@ -2427,7 +2427,7 @@ static int kvm_init(MachineState *ms)
-> >       QLIST_INIT(&s->kvm_parked_vcpus);
-> >       s->fd =3D qemu_open_old(s->device ?: "/dev/kvm", O_RDWR);
-> >       if (s->fd =3D=3D -1) {
-> > -        fprintf(stderr, "Could not access KVM kernel module: %m\n");
-> > +        error_report("Could not access KVM kernel module: %m");
-> >           ret =3D -errno;
-> >           goto err;
-> >       }
-> > @@ -2437,13 +2437,13 @@ static int kvm_init(MachineState *ms)
-> >           if (ret >=3D 0) {
-> >               ret =3D -EINVAL;
-> >           }
-> > -        fprintf(stderr, "kvm version too old\n");
-> > +        error_report("kvm version too old");
-> >           goto err;
-> >       }
-> >
-> >       if (ret > KVM_API_VERSION) {
-> >           ret =3D -EINVAL;
-> > -        fprintf(stderr, "kvm version not supported\n");
-> > +        error_report("kvm version not supported");
-> >           goto err;
-> >       }
-> >
-> > @@ -2488,26 +2488,22 @@ static int kvm_init(MachineState *ms)
-> >       } while (ret =3D=3D -EINTR);
-> >
-> >       if (ret < 0) {
-> > -        fprintf(stderr, "ioctl(KVM_CREATE_VM) failed: %d %s\n", -ret,
-> > -                strerror(-ret));
-> > +        error_report("ioctl(KVM_CREATE_VM) failed: %d %s", -ret,
-> > +                    strerror(-ret));
-> >
-> >   #ifdef TARGET_S390X
-> >           if (ret =3D=3D -EINVAL) {
-> > -            fprintf(stderr,
-> > -                    "Host kernel setup problem detected. Please verify=
-:\n");
-> > -            fprintf(stderr, "- for kernels supporting the switch_amode=
- or"
-> > -                    " user_mode parameters, whether\n");
-> > -            fprintf(stderr,
-> > -                    "  user space is running in primary address space\=
-n");
-> > -            fprintf(stderr,
-> > -                    "- for kernels supporting the vm.allocate_pgste sy=
-sctl, "
-> > -                    "whether it is enabled\n");
-> > +            error_report("Host kernel setup problem detected.
->
-> \n"
->
-> Should we use error_printf_unless_qmp() for the following?
+On 30/07/2024 10.10, Markus Armbruster wrote:
+> Recent commit "qapi: Smarter camel_to_upper() to reduce need for
+> 'prefix'" added a temporary 'prefix' to delay changing the generated
+> code.
+> 
+> Revert it.  This changes TestUnionEnumA's generated enumeration
+> constant prefix from TEST_UNION_ENUMA to TEST_UNION_ENUM_A.
+> 
+> Signed-off-by: Markus Armbruster <armbru@redhat.com>
+> ---
+>   tests/unit/test-qobject-input-visitor.c  | 4 ++--
+>   tests/unit/test-qobject-output-visitor.c | 4 ++--
+>   tests/qapi-schema/qapi-schema-test.json  | 1 -
+>   tests/qapi-schema/qapi-schema-test.out   | 1 -
+>   4 files changed, 4 insertions(+), 6 deletions(-)
 
-Do you believe that qemu_init() -> configure_accelerators() ->
-do_configure_accelerator,() -> accel_init_machine() -> kvm_init()  can
-be called from QMP context?
+Reviewed-by: Thomas Huth <thuth@redhat.com>
 
->
-> " Please verify:");
-> > +            error_report("- for kernels supporting the switch_amode or=
-"
-> > +                        " user_mode parameters, whether");
-> > +            error_report("  user space is running in primary address s=
-pace");
-> > +            error_report("- for kernels supporting the vm.allocate_pgs=
-te "
-> > +                        "sysctl, whether it is enabled");
-> >           }
-> >   #elif defined(TARGET_PPC)
-> >           if (ret =3D=3D -EINVAL) {
-> > -            fprintf(stderr,
-> > -                    "PPC KVM module is not loaded.
->
-> \n"
->
-> Ditto.
->
-> " Try modprobe kvm_%s.\n",
-> > -                    (type =3D=3D 2) ? "pr" : "hv");
-> > +            error_report("PPC KVM module is not loaded. Try modprobe k=
-vm_%s.",
-> > +                        (type =3D=3D 2) ? "pr" : "hv");
-> >           }
-> >   #endif
-> >           goto err;
-> > @@ -2526,9 +2522,9 @@ static int kvm_init(MachineState *ms)
-> >                           nc->name, nc->num, soft_vcpus_limit);
-> >
-> >               if (nc->num > hard_vcpus_limit) {
-> > -                fprintf(stderr, "Number of %s cpus requested (%d) exce=
-eds "
-> > -                        "the maximum cpus supported by KVM (%d)\n",
-> > -                        nc->name, nc->num, hard_vcpus_limit);
-> > +                error_report("Number of %s cpus requested (%d) exceeds=
- "
-> > +                             "the maximum cpus supported by KVM (%d)",
-> > +                             nc->name, nc->num, hard_vcpus_limit);
-> >                   exit(1);
-> >               }
-> >           }
-> > @@ -2542,8 +2538,8 @@ static int kvm_init(MachineState *ms)
-> >       }
-> >       if (missing_cap) {
-> >           ret =3D -EINVAL;
-> > -        fprintf(stderr, "kvm does not support %s\n%s",
-> > -                missing_cap->name, upgrade_note);
-> > +        error_printf("kvm does not support %s\n%s",
-> > +                     missing_cap->name, upgrade_note);
->
-> Similarly, should we print upgrade_note using error_printf_unless_qmp?
->
-> >           goto err;
-> >       }
-> >
->
 
 
