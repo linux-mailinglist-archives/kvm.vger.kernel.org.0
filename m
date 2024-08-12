@@ -1,54 +1,54 @@
-Return-Path: <kvm+bounces-23874-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23875-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 232DA94F631
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 19:58:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC83C94F63F
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 20:05:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 564EB1C2217C
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 17:58:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A69E281FB0
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 18:05:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE01018952D;
-	Mon, 12 Aug 2024 17:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4AA18953E;
+	Mon, 12 Aug 2024 18:05:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cSHdShd5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jR9/CQ6j"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C03139587;
-	Mon, 12 Aug 2024 17:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE084C156;
+	Mon, 12 Aug 2024 18:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723485508; cv=none; b=nHy38IkNvqInkM9OgQTz1d49zSrK5+9Fifa7a/MMB+OV4DeYbYtQWfLQbVw8JPw/qt5jSdyYbBWRos6Ar/SL3Zppk/MiXDXCX58xE43+sqz+xM2VjUEgJQfy+pbY7utWm6cJLux197rELx2mmzoidP846cpdorjFxz92Kjgd120=
+	t=1723485902; cv=none; b=jBYp5GlYWoJV/WLcLAhxhGuV6vPyN2AMFC00He9e3jsJXLv6GmOfRp6n1GL1JnOiuMTv+vOJEFBOdaaTGRisDuDmH7dqHAjVUHgK8gh2y4LQdv61ZAyqZ/x/pJa83lZsAe6Cs3CgxfByNHWH2uPgmt5/b/2/InNqLVy/V+ZZlk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723485508; c=relaxed/simple;
-	bh=Cy3qTesXri0xQrDzbne5E9vZ/VR8p1PM2HsTm5Jvf3w=;
+	s=arc-20240116; t=1723485902; c=relaxed/simple;
+	bh=U7qc2svI0870+6cT4W//HuRzvJZzOIOWuylXoGD4yFs=;
 	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hplozyc2KmKKJ4nZjv186d9A7Mky4+tjHz7OA7ic5awgUxXy/JZwO+BtBHk4/VBZHlinMZQGOxWjYjDrH4/RZo5JJNc1bQz7SMJkHaZUjex+jKldxzGGtrzr/SvFc1uF+vYonImQyXJPNdSKF8mV8a+YLaNf4Bi/NS9QUzIHFLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cSHdShd5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A776DC32782;
-	Mon, 12 Aug 2024 17:58:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=lHkU3LLFzvxv1q6zd+icrsn8nJQ2Ir7TVcF+xXBbIW7XThjFUlakEV0xIBXqgN9aDW1cqst7zVHEkcpiKU7BFqSplTl7tAIucYMVAmNFSDld/i8e0AbZD3s9n5o2TQANwMIwPJoNalpLbA4aqVO1OCGtgdvEsRKouxgy1PsDSKU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jR9/CQ6j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0274C32782;
+	Mon, 12 Aug 2024 18:05:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723485507;
-	bh=Cy3qTesXri0xQrDzbne5E9vZ/VR8p1PM2HsTm5Jvf3w=;
+	s=k20201202; t=1723485901;
+	bh=U7qc2svI0870+6cT4W//HuRzvJZzOIOWuylXoGD4yFs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cSHdShd5JoAPrP60jfFjPOJTva0x+z2oABcUEj+CdlUtRPuX2aIrSNLB9Z/AHGoOY
-	 T54oXMegEL0jcDGKMK+xmO1kxyfR5PJvfGyxOtq7Tnhu3cLhy0Tr/BwSj+KhEBdJMx
-	 /8N9EnAOYdpz7A1XVlwlKfFSPCAINAxDGfC1Z05h6EEfGPicLPZsrlzuM2kXMBg1eC
-	 /03JePCTiM48WJOuQVXczW1+fJ+TIs9WKFEdZubMBYMu4pPiy1ehyJl6gJcGjCPnhP
-	 yDpIYCUaLov0SszNXUcoCkaa3l2jA/mdr9Ke0OY910MmBQOsGsTtBrsggw3ZQr9ES8
-	 ZcSmVzYbin7Iw==
+	b=jR9/CQ6jYx9ws2sovRA7I1dz0ecyrbIVWr7t+qi32fvxIdmhEY1MttrUukVfNI1qL
+	 oNIUW7Hr5SMfNypdj2+YgIybkSlSLZTgsUILlCZBWVPRqZntaY4Z2IuaT2cKMVFdDK
+	 LRnaVjotay90awufaQ6SRmMNgBIguduW9ikcPc8EQj5Rx0LYtps0TEcXdZ/+4RAN3j
+	 vkuMixIsffOpPpIgphWtV3AoydCNGKBYoT36HiqJ2lB3952aT9jwc/DVNblvOFPfui
+	 RoWPZcLjTwvGPb680fSL1KoLVeovJNh469IUxKlPA3duh4pkqrNnENCBqyMyXKQhtk
+	 KWAa/xnbP2/tQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdZJJ-0035rY-5x;
-	Mon, 12 Aug 2024 18:58:25 +0100
-Date: Mon, 12 Aug 2024 18:58:24 +0100
-Message-ID: <8634n91v3z.wl-maz@kernel.org>
+	id 1sdZPf-0035xD-Bf;
+	Mon, 12 Aug 2024 19:04:59 +0100
+Date: Mon, 12 Aug 2024 19:04:59 +0100
+Message-ID: <861q2t1ut0.wl-maz@kernel.org>
 From: Marc Zyngier <maz@kernel.org>
 To: Alexandru Elisei <alexandru.elisei@arm.com>
 Cc: kvmarm@lists.linux.dev,
@@ -62,12 +62,13 @@ Cc: kvmarm@lists.linux.dev,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
 Subject: Re: [PATCH v2 13/17] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <ZromBtfbjaHbcjT7@arm.com>
+In-Reply-To: <8634n91v3z.wl-maz@kernel.org>
 References: <20240731194030.1991237-1-maz@kernel.org>
 	<20240731194030.1991237-14-maz@kernel.org>
 	<ZrYO9SK52rHhGvEd@arm.com>
 	<867cco1y4w.wl-maz@kernel.org>
 	<ZromBtfbjaHbcjT7@arm.com>
+	<8634n91v3z.wl-maz@kernel.org>
 User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
  FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
  (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
@@ -83,83 +84,54 @@ X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-k
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Hi Alex,
-
-On Mon, 12 Aug 2024 16:11:02 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+On Mon, 12 Aug 2024 18:58:24 +0100,
+Marc Zyngier <maz@kernel.org> wrote:
 > 
-> Hi Marc,
+> Hi Alex,
 > 
-> On Sat, Aug 10, 2024 at 11:16:15AM +0100, Marc Zyngier wrote:
-> > Hi Alex,
+> On Mon, 12 Aug 2024 16:11:02 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > > 
-> > @@ -136,12 +137,22 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
-> >  	va = (u64)sign_extend64(va, 55);
-> >  
-> >  	/* Let's put the MMU disabled case aside immediately */
-> > -	if (!(sctlr & SCTLR_ELx_M) ||
-> > -	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
-> > +	switch (wi->regime) {
-> > +	case TR_EL10:
-> > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
-> > +			wr->level = S1_MMU_DISABLED;
+> > Hi Marc,
+> > 
+> > On Sat, Aug 10, 2024 at 11:16:15AM +0100, Marc Zyngier wrote:
+> > > Hi Alex,
+> > > 
+> > > @@ -136,12 +137,22 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+> > >  	va = (u64)sign_extend64(va, 55);
+> > >  
+> > >  	/* Let's put the MMU disabled case aside immediately */
+> > > -	if (!(sctlr & SCTLR_ELx_M) ||
+> > > -	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > > +	switch (wi->regime) {
+> > > +	case TR_EL10:
+> > > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
+> > > +			wr->level = S1_MMU_DISABLED;
+> > 
+> > In compute_translation_regime(), for AT instructions other than AT S1E2*, when
+> > {E2H,TGE} = {0,1}, regime is Regime_EL10. As far as I can tell, when regime is
+> > Regime_EL10 and TGE is set, stage 1 is disabled, according to
+> > AArch64.S1Enabled() and the decription of the TGE bit.
 > 
-> In compute_translation_regime(), for AT instructions other than AT S1E2*, when
-> {E2H,TGE} = {0,1}, regime is Regime_EL10. As far as I can tell, when regime is
-> Regime_EL10 and TGE is set, stage 1 is disabled, according to
-> AArch64.S1Enabled() and the decription of the TGE bit.
-
-Grmbl... I really dislike E2H=0. May it die a painful death. How about
-this on top?
-
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 10017d990bc3..870e77266f80 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -139,7 +139,19 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 	/* Let's put the MMU disabled case aside immediately */
- 	switch (wi->regime) {
- 	case TR_EL10:
--		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
-+		/*
-+		 * If dealing with the EL1&0 translation regime, 3 things
-+		 * can disable the S1 translation:
-+		 *
-+		 * - HCR_EL2.DC = 0
-+		 * - HCR_EL2.{E2H,TGE} = {0,1}
-+		 * - SCTLR_EL1.M = 0
-+		 *
-+		 * The TGE part is interesting. If we have decided that this
-+		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
-+		 * {0,x}, and we only need to test for TGE == 1.
-+		 */
-+		if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_DC | HCR_TGE))
- 			wr->level = S1_MMU_DISABLED;
- 		fallthrough;
- 	case TR_EL2:
-
-[...]
-
->
-> 	switch (desc & GENMASK_ULL(1, 0)) {
-> 	case 0b00:
-> 	case 0b10:
-> 		goto transfault;
-> 	case 0b01:
-> 		/* Block mapping */
-> 		break;
-> 	default:
-> 		if (level == 3)
-> 			break;
-> 	}
+> Grmbl... I really dislike E2H=0. May it die a painful death. How about
+> this on top?
 > 
-> Is this better? Perhaps slightly easier to match against the descriptor layouts,
-> but I'm not sure it's an improvement over your suggestion. Up to you, no point
-> in bikeshedding over it.
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 10017d990bc3..870e77266f80 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -139,7 +139,19 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+>  	/* Let's put the MMU disabled case aside immediately */
+>  	switch (wi->regime) {
+>  	case TR_EL10:
+> -		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
+> +		/*
+> +		 * If dealing with the EL1&0 translation regime, 3 things
+> +		 * can disable the S1 translation:
+> +		 *
+> +		 * - HCR_EL2.DC = 0
 
-I think I'll leave it as is for now. I'm getting sick of this code...
-
-Thanks,
+s/0/1/
 
 	M.
 
