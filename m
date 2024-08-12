@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-23898-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23899-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C85EE94F9D9
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 00:49:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B01694F9DA
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 00:49:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED7621C221D0
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 22:49:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9F4B282728
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 22:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A60219B59F;
-	Mon, 12 Aug 2024 22:48:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DB819CD0E;
+	Mon, 12 Aug 2024 22:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZsmDBZHy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g5vsVRUt"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CD919A2B7;
-	Mon, 12 Aug 2024 22:48:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FA319AD94;
+	Mon, 12 Aug 2024 22:48:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723502913; cv=none; b=NiSPDHQD/UIRqjKPk5JL7MSbYqrcSKh7NT8WQypHVGVpsGhM/U9QQP0T81w0XPVfv8JhDWBRLayjho1As0fsiGlQxgnRLRF4PWDx6GE1fM4QmzNi1aZrnNx0acZHaPLB0ZuZ/KIFz1ZHOUR/CeAEPysP4XWKHoFzOc3ZfrwsApQ=
+	t=1723502915; cv=none; b=Fb6P1h7uIQKDTvH9VnKIphxjzlze4vT+TsTE3s/WMIWywex5Ck8sRKAB2e7YkikEDt4Sd22G9IDk2PJuQhK6VayS2fGyshQyUPblSN3CHOSHqm7SUsawiXU+HqlbJRvrKdXfu7mKXHbinD+gmgU8ZzU3fDfLAPvZtsNyxZRIoWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723502913; c=relaxed/simple;
-	bh=O4KNAoozn4Ay1xs1V20iKsDNVRH9VIPe+59YYboNtkg=;
+	s=arc-20240116; t=1723502915; c=relaxed/simple;
+	bh=VT61EAOEqeW+bKLIJKXCdw1CBLyvciFpNO6T7mZ4HlA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=SSvRtdN3g5nv9PrJZmTMOtYZLO0EWyGMN0yDiqbiNTu8a3SlWbQZP8+g9VeAURcUzmvB99juY3Ws64/94+6H+x2wBKbfI+Xgo/uyGaxcQDhRz8k8N/80C+lg5mTkZtdzvFS8VrASj6C2LnfqR+bjf81fLQK/SJWwAX5irVrVXU0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZsmDBZHy; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=g8EVUieiytb4Mg/QpxVQwPJqPj/knELiXpMgjq2Hx9dUMpVX5MGZwJ24SJKsxdN9yavsW7c3ofMdK45GaHMAjXHKJNx0dGBMs3ckF6nlYokDxGh51ruo/sPlfeRPLDVaccIhOoscSl3emysm0vWThapWqnbaePHumPjLUC2s9N4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g5vsVRUt; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723502911; x=1755038911;
+  t=1723502913; x=1755038913;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=O4KNAoozn4Ay1xs1V20iKsDNVRH9VIPe+59YYboNtkg=;
-  b=ZsmDBZHyeuSm0uVk0xo9JmSUAVcCnkmmTyI6Uo5aG1spVZiG+WRXjDu2
-   FkQebG2LErNJ8JkUKnIeVjPdX4ZOPDWFHHisFapZ8m4rEd0VaX+jVUrWA
-   +wCzrNGfOAPLTx6OO+c+7DTQcOQuI+XC454e/U2KMIn61iujNG+lOBCZU
-   RyCslMXR2gasWb6RJ2lbLnyJVV5uAI+X5l8gynCQ7ffOcDKjz39mrGeAW
-   g5cS4+PGT4bDXWEby8Q28Ae261ANpwDtChP7Wvph2uJ7aNEFhO7R9V5As
-   aRtjc91aLibo3W7jiBtOMKZXs1n84GltdzX97w7QKhafqehO1x0YBmxRE
+  bh=VT61EAOEqeW+bKLIJKXCdw1CBLyvciFpNO6T7mZ4HlA=;
+  b=g5vsVRUtnre2WpH9S8mssYXLH9En9XwMuSEXVLd84YiZ8sg5nvkwl4up
+   8mSUBBLLyS9nes9AYAklkUTkOklxJ1iJh+jfpKLYLuZ5NlVD1fLaebko+
+   Tn2cYKoQi+2hNMu86n5glrhV+vp0XQFU9GDa7PK5VqLZEAciAWE1yTMEm
+   R7kXQeTTFs3tAhJh8op6CLaitfxrUBQfNIv0yFzpD1FYQ6XapG+hlcQwJ
+   xz/YED4WdvYWP91St0rH7IdHMVkEHk6l8iI48LO5OUDjiqRqldmNdKgsj
+   iS1qrktD4Dfu1SmgZ0K2Tf/nCMjDpWwWGdAv/X8bPBC7TH7xne+bbC0nF
    Q==;
-X-CSE-ConnectionGUID: TlfJ4cpdTdGiSEEWFqOKlA==
-X-CSE-MsgGUID: mrN5PzCXRoCK1HjMz2WcTQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="33041344"
+X-CSE-ConnectionGUID: /lWNKRrLQqO8dELR37VNyQ==
+X-CSE-MsgGUID: RTVlqtBMQgSdkE8BB9dm9Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="33041352"
 X-IronPort-AV: E=Sophos;i="6.09,284,1716274800"; 
-   d="scan'208";a="33041344"
+   d="scan'208";a="33041352"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 15:48:28 -0700
-X-CSE-ConnectionGUID: HT8Ekh3nTVGgqvgp0xvFtA==
-X-CSE-MsgGUID: XbajYQitRg6a2RUuMng/Vg==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 15:48:29 -0700
+X-CSE-ConnectionGUID: CDc8z0VuRoWMRQKexj6BbA==
+X-CSE-MsgGUID: +hwN9Uu7Si2edeKMx6kh/Q==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,284,1716274800"; 
-   d="scan'208";a="59008348"
+   d="scan'208";a="59008352"
 Received: from jdoman-desk1.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.222.53])
   by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 15:48:28 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
@@ -69,12 +69,11 @@ Cc: kai.huang@intel.com,
 	linux-kernel@vger.kernel.org,
 	rick.p.edgecombe@intel.com,
 	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Sean Christopherson <sean.j.christopherson@intel.com>,
 	Binbin Wu <binbin.wu@linux.intel.com>,
 	Yuan Yao <yuan.yao@intel.com>
-Subject: [PATCH 04/25] KVM: TDX: Add C wrapper functions for SEAMCALLs to the TDX module
-Date: Mon, 12 Aug 2024 15:47:59 -0700
-Message-Id: <20240812224820.34826-5-rick.p.edgecombe@intel.com>
+Subject: [PATCH 05/25] KVM: TDX: Add helper functions to print TDX SEAMCALL error
+Date: Mon, 12 Aug 2024 15:48:00 -0700
+Message-Id: <20240812224820.34826-6-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
@@ -88,478 +87,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Isaku Yamahata <isaku.yamahata@intel.com>
 
-A VMM interacts with the TDX module using a new instruction (SEAMCALL).
-For instance, a TDX VMM does not have full access to the VM control
-structure corresponding to VMX VMCS.  Instead, a VMM induces the TDX module
-to act on behalf via SEAMCALLs.
+Add helper functions to print out errors from the TDX module in a uniform
+manner.
 
-Define C wrapper functions for SEAMCALLs for readability.
-
-Some SEAMCALL APIs donate host pages to TDX module or guest TD, and the
-donated pages are encrypted.  Those require the VMM to flush the cache
-lines to avoid cache line alias.
-
-Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
 Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 Reviewed-by: Binbin Wu <binbin.wu@linux.intel.com>
 Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 ---
 uAPI breakout v1:
-- Make argument to C wrapper function struct kvm_tdx * or
-  struct vcpu_tdx * .(Sean)
-- Drop unused helpers (Kai)
+- Update for the wrapper functions for SEAMCALLs. (Sean)
+- Reorder header file include to adjust argument change of the C wrapper.
 - Fix bisectability issues in headers (Kai)
 - Updates from seamcall overhaul (Kai)
 
 v19:
-- Update the commit message to match the patch by Yuan
-- Use seamcall() and seamcall_ret() by paolo
+- dropped unnecessary include <asm/tdx.h>
 
 v18:
-- removed stub functions for __seamcall{,_ret}()
-- Added Reviewed-by Binbin
-- Make tdx_seamcall() use struct tdx_module_args instead of taking
-  each inputs.
-
-v15 -> v16:
-- use struct tdx_module_args instead of struct tdx_module_output
-- Add tdh_mem_sept_rd() for SEPT_VE_DISABLE=1.
+- Added Reviewed-by Binbin.
 ---
- arch/x86/kvm/vmx/tdx.h     |  14 +-
- arch/x86/kvm/vmx/tdx_ops.h | 387 +++++++++++++++++++++++++++++++++++++
- 2 files changed, 399 insertions(+), 2 deletions(-)
- create mode 100644 arch/x86/kvm/vmx/tdx_ops.h
+ arch/x86/kvm/vmx/tdx_ops.h | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
-index faed454385ca..78f84c53a948 100644
---- a/arch/x86/kvm/vmx/tdx.h
-+++ b/arch/x86/kvm/vmx/tdx.h
-@@ -12,12 +12,14 @@ extern bool enable_tdx;
- 
- struct kvm_tdx {
- 	struct kvm kvm;
--	/* TDX specific members follow. */
-+
-+	unsigned long tdr_pa;
- };
- 
- struct vcpu_tdx {
- 	struct kvm_vcpu	vcpu;
--	/* TDX specific members follow. */
-+
-+	unsigned long tdvpr_pa;
- };
- 
- static inline bool is_td(struct kvm *kvm)
-@@ -40,6 +42,14 @@ static __always_inline struct vcpu_tdx *to_tdx(struct kvm_vcpu *vcpu)
- 	return container_of(vcpu, struct vcpu_tdx, vcpu);
- }
- 
-+/*
-+ * SEAMCALL wrappers
-+ *
-+ * Put it here as most of those wrappers need declaration of
-+ * 'struct kvm_tdx' and 'struct vcpu_tdx'.
-+ */
-+#include "tdx_ops.h"
-+
- #else
- static inline void tdx_bringup(void) {}
- static inline void tdx_cleanup(void) {}
 diff --git a/arch/x86/kvm/vmx/tdx_ops.h b/arch/x86/kvm/vmx/tdx_ops.h
-new file mode 100644
-index 000000000000..a9b9ad15f6a8
---- /dev/null
+index a9b9ad15f6a8..3f64c871a3f2 100644
+--- a/arch/x86/kvm/vmx/tdx_ops.h
 +++ b/arch/x86/kvm/vmx/tdx_ops.h
-@@ -0,0 +1,387 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * Constants/data definitions for TDX SEAMCALLs
-+ *
-+ * This file is included by "tdx.h" after declarations of 'struct
-+ * kvm_tdx' and 'struct vcpu_tdx'.  C file should never include
-+ * this header directly.
-+ */
-+
-+#ifndef __KVM_X86_TDX_OPS_H
-+#define __KVM_X86_TDX_OPS_H
-+
-+#include <asm/cacheflush.h>
-+#include <asm/page.h>
-+#include <asm/tdx.h>
-+
-+#include "x86.h"
-+
-+static inline u64 tdh_mng_addcx(struct kvm_tdx *kvm_tdx, hpa_t addr)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = addr,
-+		.rdx = kvm_tdx->tdr_pa,
-+	};
-+
-+	clflush_cache_range(__va(addr), PAGE_SIZE);
-+	return seamcall(TDH_MNG_ADDCX, &in);
-+}
-+
-+static inline u64 tdh_mem_page_add(struct kvm_tdx *kvm_tdx, gpa_t gpa,
-+				   hpa_t hpa, hpa_t source,
-+				   u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = gpa,
-+		.rdx = kvm_tdx->tdr_pa,
-+		.r8 = hpa,
-+		.r9 = source,
-+	};
-+	u64 ret;
-+
-+	clflush_cache_range(__va(hpa), PAGE_SIZE);
-+	ret = seamcall_ret(TDH_MEM_PAGE_ADD, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mem_sept_add(struct kvm_tdx *kvm_tdx, gpa_t gpa,
-+				   int level, hpa_t page,
-+				   u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = gpa | level,
-+		.rdx = kvm_tdx->tdr_pa,
-+		.r8 = page,
-+	};
-+	u64 ret;
-+
-+	clflush_cache_range(__va(page), PAGE_SIZE);
-+
-+	ret = seamcall_ret(TDH_MEM_SEPT_ADD, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mem_sept_remove(struct kvm_tdx *kvm_tdx, gpa_t gpa,
-+				      int level, u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = gpa | level,
-+		.rdx = kvm_tdx->tdr_pa,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_MEM_SEPT_REMOVE, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_vp_addcx(struct vcpu_tdx *tdx, hpa_t addr)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = addr,
-+		.rdx = tdx->tdvpr_pa,
-+	};
-+
-+	clflush_cache_range(__va(addr), PAGE_SIZE);
-+	return seamcall(TDH_VP_ADDCX, &in);
-+}
-+
-+static inline u64 tdh_mem_page_aug(struct kvm_tdx *kvm_tdx, gpa_t gpa, hpa_t hpa,
-+				   u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = gpa,
-+		.rdx = kvm_tdx->tdr_pa,
-+		.r8 = hpa,
-+	};
-+	u64 ret;
-+
-+	clflush_cache_range(__va(hpa), PAGE_SIZE);
-+	ret = seamcall_ret(TDH_MEM_PAGE_AUG, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mem_range_block(struct kvm_tdx *kvm_tdx, gpa_t gpa,
-+				      int level, u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = gpa | level,
-+		.rdx = kvm_tdx->tdr_pa,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_MEM_RANGE_BLOCK, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mng_key_config(struct kvm_tdx *kvm_tdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+	};
-+
-+	return seamcall(TDH_MNG_KEY_CONFIG, &in);
-+}
-+
-+static inline u64 tdh_mng_create(struct kvm_tdx *kvm_tdx, int hkid)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+		.rdx = hkid,
-+	};
-+
-+	clflush_cache_range(__va(kvm_tdx->tdr_pa), PAGE_SIZE);
-+	return seamcall(TDH_MNG_CREATE, &in);
-+}
-+
-+static inline u64 tdh_vp_create(struct vcpu_tdx *tdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = tdx->tdvpr_pa,
-+		.rdx = to_kvm_tdx(tdx->vcpu.kvm)->tdr_pa,
-+	};
-+
-+	clflush_cache_range(__va(tdx->tdvpr_pa), PAGE_SIZE);
-+	return seamcall(TDH_VP_CREATE, &in);
-+}
-+
-+static inline u64 tdh_mng_rd(struct kvm_tdx *kvm_tdx, u64 field, u64 *data)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+		.rdx = field,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_MNG_RD, &in);
-+
-+	*data = in.r8;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mr_extend(struct kvm_tdx *kvm_tdx, gpa_t gpa,
-+				u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = gpa,
-+		.rdx = kvm_tdx->tdr_pa,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_MR_EXTEND, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mr_finalize(struct kvm_tdx *kvm_tdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+	};
-+
-+	return seamcall(TDH_MR_FINALIZE, &in);
-+}
-+
-+static inline u64 tdh_vp_flush(struct vcpu_tdx *tdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = tdx->tdvpr_pa,
-+	};
-+
-+	return seamcall(TDH_VP_FLUSH, &in);
-+}
-+
-+static inline u64 tdh_mng_vpflushdone(struct kvm_tdx *kvm_tdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+	};
-+
-+	return seamcall(TDH_MNG_VPFLUSHDONE, &in);
-+}
-+
-+static inline u64 tdh_mng_key_freeid(struct kvm_tdx *kvm_tdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+	};
-+
-+	return seamcall(TDH_MNG_KEY_FREEID, &in);
-+}
-+
-+static inline u64 tdh_mng_init(struct kvm_tdx *kvm_tdx, hpa_t td_params,
-+			       u64 *rcx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+		.rdx = td_params,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_MNG_INIT, &in);
-+
-+	*rcx = in.rcx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_vp_init(struct vcpu_tdx *tdx, u64 rcx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = tdx->tdvpr_pa,
-+		.rdx = rcx,
-+	};
-+
-+	return seamcall(TDH_VP_INIT, &in);
-+}
-+
-+static inline u64 tdh_vp_init_apicid(struct vcpu_tdx *tdx, u64 rcx, u32 x2apicid)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = tdx->tdvpr_pa,
-+		.rdx = rcx,
-+		.r8 = x2apicid,
-+	};
-+
-+	/* apicid requires version == 1. */
-+	return seamcall(TDH_VP_INIT | (1ULL << TDX_VERSION_SHIFT), &in);
-+}
-+
-+static inline u64 tdh_vp_rd(struct vcpu_tdx *tdx, u64 field, u64 *data)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = tdx->tdvpr_pa,
-+		.rdx = field,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_VP_RD, &in);
-+
-+	*data = in.r8;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mng_key_reclaimid(struct kvm_tdx *kvm_tdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+	};
-+
-+	return seamcall(TDH_MNG_KEY_RECLAIMID, &in);
-+}
-+
-+static inline u64 tdh_phymem_page_reclaim(hpa_t page, u64 *rcx, u64 *rdx,
-+					  u64 *r8)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = page,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_PHYMEM_PAGE_RECLAIM, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+	*r8 = in.r8;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mem_page_remove(struct kvm_tdx *kvm_tdx, gpa_t gpa,
-+				      int level, u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = gpa | level,
-+		.rdx = kvm_tdx->tdr_pa,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_MEM_PAGE_REMOVE, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_mem_track(struct kvm_tdx *kvm_tdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = kvm_tdx->tdr_pa,
-+	};
-+
-+	return seamcall(TDH_MEM_TRACK, &in);
-+}
-+
-+static inline u64 tdh_mem_range_unblock(struct kvm_tdx *kvm_tdx, gpa_t gpa,
-+					int level, u64 *rcx, u64 *rdx)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = gpa | level,
-+		.rdx = kvm_tdx->tdr_pa,
-+	};
-+	u64 ret;
-+
-+	ret = seamcall_ret(TDH_MEM_RANGE_UNBLOCK, &in);
-+
-+	*rcx = in.rcx;
-+	*rdx = in.rdx;
-+
-+	return ret;
-+}
-+
-+static inline u64 tdh_phymem_cache_wb(bool resume)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = resume ? 1 : 0,
-+	};
-+
-+	return seamcall(TDH_PHYMEM_CACHE_WB, &in);
-+}
-+
-+static inline u64 tdh_phymem_page_wbinvd(hpa_t page)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = page,
-+	};
-+
-+	return seamcall(TDH_PHYMEM_PAGE_WBINVD, &in);
-+}
-+
-+static inline u64 tdh_vp_wr(struct vcpu_tdx *tdx, u64 field, u64 val, u64 mask)
-+{
-+	struct tdx_module_args in = {
-+		.rcx = tdx->tdvpr_pa,
-+		.rdx = field,
-+		.r8 = val,
-+		.r9 = mask,
-+	};
-+
-+	return seamcall(TDH_VP_WR, &in);
-+}
-+
-+#endif /* __KVM_X86_TDX_OPS_H */
+@@ -16,6 +16,21 @@
+ 
+ #include "x86.h"
+ 
++#define pr_tdx_error(__fn, __err)	\
++	pr_err_ratelimited("SEAMCALL %s failed: 0x%llx\n", #__fn, __err)
++
++#define pr_tdx_error_N(__fn, __err, __fmt, ...)		\
++	pr_err_ratelimited("SEAMCALL %s failed: 0x%llx, " __fmt, #__fn, __err,  __VA_ARGS__)
++
++#define pr_tdx_error_1(__fn, __err, __rcx)		\
++	pr_tdx_error_N(__fn, __err, "rcx 0x%llx\n", __rcx)
++
++#define pr_tdx_error_2(__fn, __err, __rcx, __rdx)	\
++	pr_tdx_error_N(__fn, __err, "rcx 0x%llx, rdx 0x%llx\n", __rcx, __rdx)
++
++#define pr_tdx_error_3(__fn, __err, __rcx, __rdx, __r8)	\
++	pr_tdx_error_N(__fn, __err, "rcx 0x%llx, rdx 0x%llx, r8 0x%llx\n", __rcx, __rdx, __r8)
++
+ static inline u64 tdh_mng_addcx(struct kvm_tdx *kvm_tdx, hpa_t addr)
+ {
+ 	struct tdx_module_args in = {
 -- 
 2.34.1
 
