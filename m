@@ -1,265 +1,173 @@
-Return-Path: <kvm+bounces-23880-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23881-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A0FF94F732
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 21:06:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3551894F794
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 21:42:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D296E1F216A3
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 19:06:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6CBE281D03
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 19:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B21818EFC5;
-	Mon, 12 Aug 2024 19:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DB4219306C;
+	Mon, 12 Aug 2024 19:41:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TWzbYCfg"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="bSoE5pG1"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2065.outbound.protection.outlook.com [40.107.244.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111C8190686
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 19:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723489557; cv=none; b=YgW6co2T+lHbLR2teYJiHepnrnWi51fPr6oCXB64VHvvhdLT5xYESSzynGuYaXenHQE2cZZNMbC8pJfhunk5AE2ejP302l3ZvZBMTaM64adSeQ7NlrM82idKn1UBjNKdKBTPp7Nw2Ulc1q9IityTtNfons+V+eJh8Rlc606FIEA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723489557; c=relaxed/simple;
-	bh=qex7tbBtNhCnUhGbju+uO76z0q9IsTf6CB4hr36kAc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eZIio+0oKzFjG1IzNACPHWZhjB+wP/YYxtR8if2J3kElOwsLLesSMNSdxjpxkz2wJAHWhHIVBjDIK/eOESbaNRHHVRqpK5ugZpe8WEN9an0cg6OG1Eh34AYD542tp7lByHsA225YkU9iKttSY8AfkBEl5M9TmJhuWUpvKzuKd2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TWzbYCfg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723489555;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HzakOI9YGqv9HtFf9jIxuThCq3IEoBU6xpTlkdeG+TM=;
-	b=TWzbYCfg7CRZU7EnIiU+BMbe0rA719Qv/jH7/NuR9ueo9rP/lqQkVV18ZsychPZGkgTgVQ
-	91DVNvH9upz9RUrN6Q6mqmby5tK7fSQX7EGv9fyrdHZRRWr+eniHDgVS5NCXqLLBLD/rYn
-	P/DJBGqYJG3i20t9eLUtnubhAIY3qEM=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-573-FOvBosMtN8S9g-v6I-pDow-1; Mon, 12 Aug 2024 15:05:53 -0400
-X-MC-Unique: FOvBosMtN8S9g-v6I-pDow-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6ba92dd246fso10461886d6.0
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 12:05:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723489553; x=1724094353;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HzakOI9YGqv9HtFf9jIxuThCq3IEoBU6xpTlkdeG+TM=;
-        b=FDn3QKu26GzfdQdwBvq24JqhaXodgkrIj/a1Hw7+N2hzeW8/ZrXZp+ZSmTEH+JYSzG
-         G2sa/H+RpcvzFZI7ifogeIRm7rR0KteO8pJC1VN1NZhJf6MjY1ozJpss+X180aLaijk6
-         7OTavLc0izdP4NxFU/RKYll/CfO5oTN9G+00dOvMR1vxxVuzeYlbKnoYnLymz808dLY2
-         VN2o8sZpGiI7poHab8V/zMC67dSV5k2TY3vF5Vqz9QDaejLRqLYVZzAIZ5+OTXpaxqx4
-         Zhx26bo8jM5b42ZP+rno58GU0G/jPVsyWlubcp47QPDOhxSrHurEPMsMJF1dufF+9nyV
-         AG/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVNn574Sy/839SRp6OfmUHE8IDg5tzc/7Z3xhlTS8uie6XekmL8SGTe2xducl518Nul710=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTdtWraE2In9/sGUjvb1DOO5oImgk5YBeMAbBsWvaXwClg9X4t
-	BCEBmwJesnj3gw2VOiPqpasSjl4+nEevdMVinxhCOm6sMbMocc+pmApfgWR5nZCC/fynLVCBobJ
-	KbV9wHH/s0Sjw9h7zrjldhdKOxf0l6Lzt6mQdjWbr30yR0qVpl2PhGdD4wg==
-X-Received: by 2002:a05:6214:e41:b0:6bf:5037:34f2 with SMTP id 6a1803df08f44-6bf5266e6damr316346d6.0.1723489552702;
-        Mon, 12 Aug 2024 12:05:52 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHULEPrzuVK7C4EVg3OxKvCsQnbJxY4NNhAXiFtPbLqFyv/lM4Rh6yLbZbETy8EfhglpTaRGQ==
-X-Received: by 2002:a05:6214:e41:b0:6bf:5037:34f2 with SMTP id 6a1803df08f44-6bf5266e6damr316036d6.0.1723489552107;
-        Mon, 12 Aug 2024 12:05:52 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bd82e6dcb3sm27136416d6.144.2024.08.12.12.05.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 12:05:51 -0700 (PDT)
-Date: Mon, 12 Aug 2024 15:05:48 -0400
-From: Peter Xu <peterx@redhat.com>
-To: David Hildenbrand <david@redhat.com>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Jason Gunthorpe <jgg@nvidia.com>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
-	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 07/19] mm/fork: Accept huge pfnmap entries
-Message-ID: <ZrpdDI18wnYJcyIM@x1n>
-References: <20240809160909.1023470-1-peterx@redhat.com>
- <20240809160909.1023470-8-peterx@redhat.com>
- <d7fcec73-16f6-4d54-b334-6450a29e0a1d@redhat.com>
- <ZrZOqbS3bcj52JZP@x1n>
- <8ef394e6-a964-41c4-b33c-0e940b6b9bd8@redhat.com>
- <ZrpUm-Lz-plw_fZy@x1n>
- <9155deaa-b6c5-4e6c-95a7-9a5311b7085a@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A1441922CF;
+	Mon, 12 Aug 2024 19:41:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723491715; cv=fail; b=sZc3iZfH/wcsZ6YmNxSFik7T5DChkU8jXE/plEWZuvNXbLRv+T3thtT/rzETZtQOnrQCDpqcwru44HXlq5NlMGzhV187653+09VHqJ+0LWMnYsZD1pECRGXWjREwg0eOAI0+640kgE2BhZfVCI3pTNpRePmHUNcBTkdcfmns2Ts=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723491715; c=relaxed/simple;
+	bh=UFj9eHPcLkk7oXvPmmaPyhR3mU5qhO5CNDtJhug1HbI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=eBJM4swwh0dYkf1l6t9Nlr4Jwx/ya1oLv2bXqAjfVB3Gu64Rw1ziOR2GeBGNK8ES/KqrebSDUwnev4nxJIiaL20kupxO976Q6w6rOmAxx00YWcMhuuYEnILh27gz6ncesLR15AwChXK1eAE2gAi+HNA/KQBa2xlRy7KJw0d8jt4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=bSoE5pG1; arc=fail smtp.client-ip=40.107.244.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Q2D/nUuWTYcrAviKkaYJl4AMK6ZA6EVsaE4go9E5t+qqrvOgh4+/RYzF/7DkdrRYpZLCDLg0/4H1tGtlogxNmSxMrQ3neFZSp9GxftRhQGDYjK6GNKcQ/dQjGaeBDud6CWRsQCdn0cc2yQnXB0zcZ4W3BL0dxbxcq56JAeszCXPLztLP1J8bY9MaAqOoOqkb39Q6XRCRW9f95mWQzyx7dSQarvFNGTVEZmXNgydlLZiCU/PBtuht+noaRYECu+4aWNX/9Pmfd2gL+Jm5lOSZZrhJWOGqIcL5WcnQoGexzdXZ4dInORDYUzceGRVzWsEVPLFdLVko4VklhMMGXjobmQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=aXdepIP/YD0ikGZUttiEVBERKNajKvq2pkszGK2DhZc=;
+ b=NIkTOXocsxzThsXcD9fEe1tIZspc9j/83NyfL8ct8j7hRFOuxo8E8gFOVTWX8ybo1ILClZfx5UnfccunBPt/fUvlHIoYb+b6K/amwITG95YTx1dwpTK9SplPAr1uf0QMaAzTuEYjA3vtDn6aAHqGmDbPi+D5LBPjUWoEd8cyjFl2U+58KnzV3zYIpvOutkkYxANj5GX30wiiapH09KELbbCox+MOe2q+jUEOP3smrz+0XujMciJvFC6z3LahGmXAbmTkhtrvC5bv3Btl4lG51B95rwc6lgiA9CTkjlr0Uus+StDmq0sKDp3HkxrzPd9FtRwXETpgYXpExpdWJQ0eyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=aXdepIP/YD0ikGZUttiEVBERKNajKvq2pkszGK2DhZc=;
+ b=bSoE5pG16uTfq/l8FU7IJDSjise8KmcS1KzPzlFMP3az0XGj0d7hkeHW0Y9YEn9n9WJishTLFPNb2KVmVNnUHbDYUw3+VbdkVZ5ve2XTByEchgX8P4DufBs3fgA+Va6bS4BPAxayhyLzzlqvlUIc3jCGGN+cvvZQmAy+hFzT/Z0=
+Received: from BL1PR13CA0391.namprd13.prod.outlook.com (2603:10b6:208:2c2::6)
+ by PH7PR12MB9223.namprd12.prod.outlook.com (2603:10b6:510:2f2::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Mon, 12 Aug
+ 2024 19:41:51 +0000
+Received: from BL02EPF0001A0FD.namprd03.prod.outlook.com
+ (2603:10b6:208:2c2:cafe::8f) by BL1PR13CA0391.outlook.office365.com
+ (2603:10b6:208:2c2::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20 via Frontend
+ Transport; Mon, 12 Aug 2024 19:41:50 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ BL02EPF0001A0FD.mail.protection.outlook.com (10.167.242.104) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7828.19 via Frontend Transport; Mon, 12 Aug 2024 19:41:50 +0000
+Received: from purico-ed09host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 12 Aug
+ 2024 14:41:49 -0500
+From: Ashish Kalra <Ashish.Kalra@amd.com>
+To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
+	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
+	<hpa@zytor.com>, <thomas.lendacky@amd.com>, <herbert@gondor.apana.org.au>
+CC: <x86@kernel.org>, <john.allen@amd.com>, <davem@davemloft.net>,
+	<michael.roth@amd.com>, <kvm@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
+Subject: [PATCH 0/3] Add SEV-SNP CipherTextHiding feature support
+Date: Mon, 12 Aug 2024 19:41:39 +0000
+Message-ID: <cover.1723490152.git.ashish.kalra@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <9155deaa-b6c5-4e6c-95a7-9a5311b7085a@redhat.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FD:EE_|PH7PR12MB9223:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3d0c12fa-9326-47f3-12f1-08dcbb06cfa8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|82310400026|36860700013|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?rPqNNtsjN3lEsGoYxY4dKQW3csaZ7GdjW1GEiul8A02+kwYQza+Gy2ok2OeT?=
+ =?us-ascii?Q?Diarm7wKuuyQEeF17+MNgms/Ti4LX7gV5arZKEJaaDc+BCvCLxIowcR/J/ia?=
+ =?us-ascii?Q?EM/fZS5ma6PXg/9iiAdpB/DraCvpcquwKXVKrwV1fmwH/lroy2gCNBZP63Ur?=
+ =?us-ascii?Q?smWha/SP+w877yhe8BiFd5E527WJjN0TBPLpY3LnZjRKqJKyZqkXHP2EN1BW?=
+ =?us-ascii?Q?gUuIKNEXF2yKN3KXwKEP+0M1iAGWIbxMuQcmR67O259b9VogRFMVSa7O9i02?=
+ =?us-ascii?Q?BmWIsfDZptICEIpPIwFTL/2TFr58du4Arfa4Y1eSFDi10wUOY+IzlAG0IirE?=
+ =?us-ascii?Q?mRosCMdfW7YXcHgK6243YuGQlFEA5PkanhyHSx5CQk+C4JXADCY0YZmFo1zX?=
+ =?us-ascii?Q?JqiyqOd1x8njYMipRZKqT4f7+hM/heOKZ8gKG+fZ89K7syYRAxxwRSlHt+Kn?=
+ =?us-ascii?Q?z0YEbJLkIiJ6yBtOyl4goVAG4T47ohQdRL9Ws089miUaPg3ieQxEyv+enWbk?=
+ =?us-ascii?Q?J/nrwKkJJHhvPupRBdQfOR4tzgXy8b/O50iw968/pwz6IgGi0MoHWlW1stz3?=
+ =?us-ascii?Q?VnR2UO/X+KvxF9MsYX6xKjI70vp4BJUzMM5Q3SPbo2Uju41qfiAOaoujVru0?=
+ =?us-ascii?Q?eNc5HNbai46maAII1zq4klbUGAu3ZasCq4vCsgnlaZLDKR4C1ekvVKrkEqw1?=
+ =?us-ascii?Q?La5DfxyaGaSj6qtpuUb3S6JnF8ZeTiVTFBj7rIjbSKb5wNYXTwsVZFpJwDj4?=
+ =?us-ascii?Q?SCyBCLNS3exNbaxTsyg0g+lf8GHlfNWy9UnhLypaF1byPRuNcYZiOJlJWBzg?=
+ =?us-ascii?Q?/JUUrRBlhi9fTg47v0RmLHo9R4tDMuJ1kH/aLcaXzZZvgqfG4lnHjdEWqUhr?=
+ =?us-ascii?Q?anyzrS8SWELG1jNNoql8lXxllbENCNjk9C5pxOzt0pYno8RZOCMxv7ieITTh?=
+ =?us-ascii?Q?NAIYJgsPnSFfDexsZeYblQu8/NHJ3g4EY5wpb5P508Jm50tEApjESRarDm4h?=
+ =?us-ascii?Q?iXkne1LK2Y0cplMo+uJjthOsJG3b2gJwejQ/y4ExxOpovGosJTz7Ak8rnYrS?=
+ =?us-ascii?Q?Yq3Xk8olGdRejTdOAAZetT7kZF4lOnv7AsosxYjmaupu8L8tEn6aZqWEfO9s?=
+ =?us-ascii?Q?CE0U85BLXV4rhPb3X3bR7QvNjgx/zZSPTl/v0cj+W8rap0BttAt/0aZZ6jum?=
+ =?us-ascii?Q?XBJgusbaftG1ceY7Affo3Hl2FqKVqW8S33Ona7lvUcL+7WDNESbQyeK/6Oyd?=
+ =?us-ascii?Q?1YXS7AXIte+FfWsPVtjqCzcvzyaQJSpPFplSSnDoggZ6plBZDTwkculyPfiG?=
+ =?us-ascii?Q?FjrQttpaEXLpbQuBgLndq1X2Jz519ISFrAbMni0gTV4OL9n2+NhrryuUjJeh?=
+ =?us-ascii?Q?HBSGuj6pCE7B9REo9UX0Bb7MGBYWR98VXJoyUni7z/mI/TMoVupv8httAdNK?=
+ =?us-ascii?Q?1QCAVvAnCSw7xcUqAIrikFvUtGSsGSK+?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(7416014)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 19:41:50.7239
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3d0c12fa-9326-47f3-12f1-08dcbb06cfa8
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BL02EPF0001A0FD.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9223
 
-On Mon, Aug 12, 2024 at 08:50:12PM +0200, David Hildenbrand wrote:
-> On 12.08.24 20:29, Peter Xu wrote:
-> > On Fri, Aug 09, 2024 at 07:59:58PM +0200, David Hildenbrand wrote:
-> > > On 09.08.24 19:15, Peter Xu wrote:
-> > > > On Fri, Aug 09, 2024 at 06:32:44PM +0200, David Hildenbrand wrote:
-> > > > > On 09.08.24 18:08, Peter Xu wrote:
-> > > > > > Teach the fork code to properly copy pfnmaps for pmd/pud levels.  Pud is
-> > > > > > much easier, the write bit needs to be persisted though for writable and
-> > > > > > shared pud mappings like PFNMAP ones, otherwise a follow up write in either
-> > > > > > parent or child process will trigger a write fault.
-> > > > > > 
-> > > > > > Do the same for pmd level.
-> > > > > > 
-> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > > > > > ---
-> > > > > >     mm/huge_memory.c | 27 ++++++++++++++++++++++++---
-> > > > > >     1 file changed, 24 insertions(+), 3 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/mm/huge_memory.c b/mm/huge_memory.c
-> > > > > > index 6568586b21ab..015c9468eed5 100644
-> > > > > > --- a/mm/huge_memory.c
-> > > > > > +++ b/mm/huge_memory.c
-> > > > > > @@ -1375,6 +1375,22 @@ int copy_huge_pmd(struct mm_struct *dst_mm, struct mm_struct *src_mm,
-> > > > > >     	pgtable_t pgtable = NULL;
-> > > > > >     	int ret = -ENOMEM;
-> > > > > > +	pmd = pmdp_get_lockless(src_pmd);
-> > > > > > +	if (unlikely(pmd_special(pmd))) {
-> > > > > > +		dst_ptl = pmd_lock(dst_mm, dst_pmd);
-> > > > > > +		src_ptl = pmd_lockptr(src_mm, src_pmd);
-> > > > > > +		spin_lock_nested(src_ptl, SINGLE_DEPTH_NESTING);
-> > > > > > +		/*
-> > > > > > +		 * No need to recheck the pmd, it can't change with write
-> > > > > > +		 * mmap lock held here.
-> > > > > > +		 */
-> > > > > > +		if (is_cow_mapping(src_vma->vm_flags) && pmd_write(pmd)) {
-> > > > > > +			pmdp_set_wrprotect(src_mm, addr, src_pmd);
-> > > > > > +			pmd = pmd_wrprotect(pmd);
-> > > > > > +		}
-> > > > > > +		goto set_pmd;
-> > > > > > +	}
-> > > > > > +
-> > > > > 
-> > > > > I strongly assume we should be using using vm_normal_page_pmd() instead of
-> > > > > pmd_page() further below. pmd_special() should be mostly limited to GUP-fast
-> > > > > and vm_normal_page_pmd().
-> > > > 
-> > > > One thing to mention that it has this:
-> > > > 
-> > > > 	if (!vma_is_anonymous(dst_vma))
-> > > > 		return 0;
-> > > 
-> > > Another obscure thing in this function. It's not the job of copy_huge_pmd()
-> > > to make the decision whether to copy, it's the job of vma_needs_copy() in
-> > > copy_page_range().
-> > > 
-> > > And now I have to suspect that uffd-wp is broken with this function, because
-> > > as vma_needs_copy() clearly states, we must copy, and we don't do that for
-> > > PMDs. Ugh.
-> > > 
-> > > What a mess, we should just do what we do for PTEs and we will be fine ;)
-> > 
-> > IIUC it's not a problem: file uffd-wp is different from anonymous, in that
-> > it pushes everything down to ptes.
-> > 
-> > It means if we skipped one huge pmd here for file, then it's destined to
-> > have nothing to do with uffd-wp, otherwise it should have already been
-> > split at the first attempt to wr-protect.
-> 
-> Is that also true for UFFD_FEATURE_WP_ASYNC, when we call
-> pagemap_scan_thp_entry()->make_uffd_wp_pmd() ?
-> 
-> I'm not immediately finding the code that does the "pushes everything down
-> to ptes", so I might miss that part.
+From: Ashish Kalra <ashish.kalra@amd.com>
 
-UFFDIO_WRITEPROTECT should have all those covered, while I guess you're
-right, looks like the pagemap ioctl is overlooked..
+Ciphertext hiding prevents host accesses from reading the ciphertext
+of SNP guest private memory. Instead of reading ciphertext, the host
+will see constant default values (0xff).
 
-> 
-> > 
-> > > 
-> > > Also, we call copy_huge_pmd() only if "is_swap_pmd(*src_pmd) ||
-> > > pmd_trans_huge(*src_pmd) || pmd_devmap(*src_pmd)"
-> > > 
-> > > Would that even be the case with PFNMAP? I suspect that pmd_trans_huge()
-> > > would return "true" for special pfnmap, which is rather "surprising", but
-> > > fortunate for us.
-> > 
-> > It's definitely not surprising to me as that's the plan.. and I thought it
-> > shoulidn't be surprising to you - if you remember before I sent this one, I
-> > tried to decouple that here with the "thp agnostic" series:
-> > 
-> >    https://lore.kernel.org/r/20240717220219.3743374-1-peterx@redhat.com
-> > 
-> > in which you reviewed it (which I appreciated).
-> > 
-> > So yes, pfnmap on pmd so far will report pmd_trans_huge==true.
-> 
-> I review way to much stuff to remember everything :) That certainly screams
-> for a cleanup ...
+Ciphertext hiding separates the ASID space into SNP guest ASIDs and 
+host ASIDs. All SNP active guests must have an ASID less than or
+equal to MAX_SNP_ASID provided to the SNP_INIT_EX command.
+All SEV-legacy guests must be greater than MAX_SNP_ASID.
 
-Definitely.
+This patch-set adds a new module parameter to the CCP driver defined
+as psp_max_snp_asid which is a user configurable MAX_SNP_ASID to
+define the system-wide maximum SNP ASID value. If this value is
+not set, then the ASID space is equally divided between SEV-SNP
+and SEV-ES guests.
 
-> 
-> > 
-> > > 
-> > > Likely we should be calling copy_huge_pmd() if pmd_leaf() ... cleanup for
-> > > another day.
-> > 
-> > Yes, ultimately it should really be a pmd_leaf(), but since I didn't get
-> > much feedback there, and that can further postpone this series from being
-> > posted I'm afraid, then I decided to just move on with "taking pfnmap as
-> > THPs".  The corresponding change on this path is here in that series:
-> > 
-> > https://lore.kernel.org/all/20240717220219.3743374-7-peterx@redhat.com/
-> > 
-> > @@ -1235,8 +1235,7 @@ copy_pmd_range(struct vm_area_struct *dst_vma, struct vm_area_struct *src_vma,
-> >   	src_pmd = pmd_offset(src_pud, addr);
-> >   	do {
-> >   		next = pmd_addr_end(addr, end);
-> > -		if (is_swap_pmd(*src_pmd) || pmd_trans_huge(*src_pmd)
-> > -			|| pmd_devmap(*src_pmd)) {
-> > +		if (is_swap_pmd(*src_pmd) || pmd_is_leaf(*src_pmd)) {
-> >   			int err;
-> >   			VM_BUG_ON_VMA(next-addr != HPAGE_PMD_SIZE, src_vma);
-> >   			err = copy_huge_pmd(dst_mm, src_mm, dst_pmd, src_pmd,
-> > 
-> 
-> Ah, good.
-> 
-> [...]
-> 
-> > > Yes, as stated above, likely broken with UFFD-WP ...
-> > > 
-> > > I really think we should make this code just behave like it would with PTEs,
-> > > instead of throwing in more "different" handling.
-> > 
-> > So it could simply because file / anon uffd-wp work very differently.
-> 
-> Or because nobody wants to clean up that code ;)
+Ashish Kalra (3):
+  crypto: ccp: Extend SNP_PLATFORM_STATUS command
+  crypto: ccp: Add support for SNP_FEATURE_INFO command
+  x86/sev: Add SEV-SNP CipherTextHiding support
 
-I think in this case maybe the fork() part is all fine? As long as we can
-switch pagemap ioctl to do proper break-downs when necessary, or even try
-to reuse what UFFDIO_WRITEPROTECT does if still possible in some way.
-
-In all cases, definitely sounds like another separate effort.
-
-Thanks,
+ arch/x86/kvm/svm/sev.c       | 24 ++++++++--
+ drivers/crypto/ccp/sev-dev.c | 90 ++++++++++++++++++++++++++++++++++++
+ drivers/crypto/ccp/sev-dev.h |  3 ++
+ include/linux/psp-sev.h      | 41 +++++++++++++++-
+ include/uapi/linux/psp-sev.h | 10 +++-
+ 5 files changed, 162 insertions(+), 6 deletions(-)
 
 -- 
-Peter Xu
+2.34.1
 
 
