@@ -1,61 +1,61 @@
-Return-Path: <kvm+bounces-23883-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23884-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9794894F79A
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 21:43:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D7E3794F79D
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 21:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 257B41F21D8C
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 19:43:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6958B1F2162F
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 19:43:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D9C193087;
-	Mon, 12 Aug 2024 19:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2531C1917C9;
+	Mon, 12 Aug 2024 19:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="H1SVTpku"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="uD7kJpmS"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2085.outbound.protection.outlook.com [40.107.220.85])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2077.outbound.protection.outlook.com [40.107.237.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731181917C9;
-	Mon, 12 Aug 2024 19:42:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D71B191F87;
+	Mon, 12 Aug 2024 19:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.77
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723491762; cv=fail; b=qsgEV7CUbvfLTcMrIa2mU+oPhS8E7wleYwwmGXZ86XTNDd1Aki/ocQeX6PfUxhOGaMDsJVwWgQp6TX8C96xG8djautUcAmfSh1uqdxNHdBaQ5UkI4SNxUj8ONpMXFVmD97OFmnb8qjifksq1AYM9OeKUfZL4yRGeIOwzyfDzye0=
+	t=1723491781; cv=fail; b=Lhm0jnk3F36HU6ETip+JdEfV0n2JUU33fE4svi6I80p5LVeMVMYLBwRh4j16HAY7sN3l+9AYDDQObcbamiUMnMouCHXkhQpsOxaGFKRSjUHqN6Lxt/I1Mt1jq3n1QvD61DD4WFHdoHup4geuE8y3OAPGRk+upxI2UUeMWej85Zw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723491762; c=relaxed/simple;
-	bh=eLujWlpcM3GwnxmIsWGH8V0yRezZTHjnAUK9utqO7+E=;
+	s=arc-20240116; t=1723491781; c=relaxed/simple;
+	bh=8hzBBpcsKib8XlsvoqsB6iaEUqueXQuu0VIcQG3c1Ac=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rByT21rLphB23Fyt+6qKF9lfqDFEfk2YoYTI8s0eqhw4LDmoRPyTZ8LT6VAgTfE2NyjODakMDThqf9pOjJW9xnoTh4IVE5OUWLEytAizKtS4gKbKBMX4RWLjxGtdvSD+YtEeQXU9ZfyoJPeXUWCDcfSosqXW9EvYWuAFTv3s6w8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=H1SVTpku; arc=fail smtp.client-ip=40.107.220.85
+	 MIME-Version:Content-Type; b=rLwAMAKaElbFicyNAuhV2mjE5A54XsWSg3FV3ENFs1SFmm8CtBGpoj8SnTkau6B0uh5o4wjD65+4RcatuQdLrCsaBGUzanQ8+WHydmtZ49no9VHUV7TIf7rqrQOGz4Aokuc1d8RHsWesKt2GJSl96suR5jKjOkGOH99Zy5ihmRs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=uD7kJpmS; arc=fail smtp.client-ip=40.107.237.77
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XSnaEOfAQIeKsw85hjydJtI0L5ZPq2weXYyZS6bSzTn4ntEV3jVwMpVhk55Dy+6LunCBMv22a+8YjgDBkl3DdxcOpACnmT2kBLCyDrYV8tMuZqTT1kFcp7XkNrIxedyrWMugckJQ8LLzDMs2tfHWRSvM+5vv8w+M1jTQqj8fw+gm65kfPkdv1tKhQIK0vs3jc/YrCxAK0IeQX2sxoU3u534HOl6abmlMQCiaXScdPZ4YUVs78sSsv2NpRhcUnp4vA2SxXX0PYBy8gE7jh14NZHMjzvAvU6mI46cTQxcIcVt7GSeQrMRAUfNW4Qftkct2cr29RqLEWIIxKDOHwv4mIw==
+ b=GMNSUBIji/DWem5ciOW+DRi5W4vVbG8cqZfAXCXkHEg98Y33QKpG5E8Do34eCTUApl9kC00Nwmt8AyKSijfOgbdmQ2lcK67TssRaJR1mU0NJsoenWfGDbw777bWMdL8nxE0+RSmRUXxgndDEZaQWOZzTiR8eqgd1wZAkTimbBVt1AY+OytoXj1PuVdw9m9KjXPmhERV6+83XpQSOSmRAYZfqH56UVDaU9g2AhF9jl3XqF6SvPcyLac8MpAESFBS2XnmiQcYemjSh+dZZN8zIWIVJmkl2/JHkDSXJxdNTrYLz3SUAkq4TslcVRsIbz39lANGQ0ZmTAZ7gOJuHPriPkw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=L886+9zxBPKlF9uhCu8Z4gx2+ck0aYzOtEvNPtj+44U=;
- b=SPYfN6vJkXDBZFcn3OW++QaBtrjpkRilN5FmwpfzoZW+Z4wcDw2KPuykUt6dItou6tRaPofe/NQi4B87Xo6e/0qMKZNrTg2n9BqEq0QHsIb4q1gHhRSRfVjO8bmbLPdqRSnIA8hQzYHdBVy1T27k+JYfyxX4ympn6yDM8vDI23eqFtfS9YnH83oQCDRmPz+p9LPpkU+EA0yOOuvoYIabaSYbBDG0VOJm46W1rJOX/5IvE8IXpPCgi1GdoK/An1dRKKaNVVjo7UxG4KQ4Q4pcVRK9NmMv4nPH1vLsnQSvY1rHtL/rVm4rJj6BJsTbJFHklSMrCURiZ6vfGpjM1w60ww==
+ bh=cvUhsD5rDMhC9dzbEnOfdQPnUxiNmTcUaj+pau+k/dY=;
+ b=ydSUorlD/3/XxJ/8e4qhh7lBbt49fi2Wz9yjamkdWPg7VobSuds211Ghi6ZcoN55Yz8GC+jltTE3xu+Vs4pklwu2TY/qvU3YXLCg3tDLHbxAjEkqBWxjF/a7EwXscbqXfe40O+EZICpe16MRY5yEZKnEiSkNctT2E0szOlAfpMpxd/Bd50N6nY1IqRNp0mJtv/oC2b18sgH4sKCbcD9vuaRE9BU05gYs/ZUTq2XzZwQcFbHM9AwY4VimHLbumr2qoIlTkDPj3BIrEimoBQGtFmyWa5IbHU/zC3pcQIpuUZ4U524SrlmDvHUYFOumiH+PqX8LCGQaV8Ow2u8GI6eO8g==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
  (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=L886+9zxBPKlF9uhCu8Z4gx2+ck0aYzOtEvNPtj+44U=;
- b=H1SVTpkuAkpxs1BtSVONvuiK4OhG1H2v5VykOczwph7OW15vgQd2/Hup64W7C23s6T0JyvG6fxATkzkBrmL7CPfjPGCrGuoz4LSS9DziXOg6RmTVGgjvzceZRHbGFrokExCUsYIcRVhV//wMQFH9JHF9p1Bt+Kk/x7ftNr7SYcs=
-Received: from BN9PR03CA0324.namprd03.prod.outlook.com (2603:10b6:408:112::29)
- by SA3PR12MB8801.namprd12.prod.outlook.com (2603:10b6:806:312::17) with
+ bh=cvUhsD5rDMhC9dzbEnOfdQPnUxiNmTcUaj+pau+k/dY=;
+ b=uD7kJpmSf6GSo4MnkgV9psoqBYoQLJncsRf8KOi3u4DIb179Fxq93iMfPcplhuj4j70zrdtlgRqI/N9S3jihH+4cGuTW5qw18tzj0BMKEqlqKDfTuANtnZSsPWZWg/rEd2FgCJ2IojAJflYy1w0M2vOItPXVbq7LshxT2rRl924=
+Received: from BN9P222CA0012.NAMP222.PROD.OUTLOOK.COM (2603:10b6:408:10c::17)
+ by DM3PR12MB9434.namprd12.prod.outlook.com (2603:10b6:0:4b::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.15; Mon, 12 Aug
- 2024 19:42:37 +0000
-Received: from BL02EPF0001A0FA.namprd03.prod.outlook.com
- (2603:10b6:408:112:cafe::c9) by BN9PR03CA0324.outlook.office365.com
- (2603:10b6:408:112::29) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7828.33 via Frontend
- Transport; Mon, 12 Aug 2024 19:42:37 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.22; Mon, 12 Aug
+ 2024 19:42:55 +0000
+Received: from BL02EPF0001A0FC.namprd03.prod.outlook.com
+ (2603:10b6:408:10c:cafe::be) by BN9P222CA0012.outlook.office365.com
+ (2603:10b6:408:10c::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.22 via Frontend
+ Transport; Mon, 12 Aug 2024 19:42:55 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
@@ -63,13 +63,13 @@ Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
  client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
 Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF0001A0FA.mail.protection.outlook.com (10.167.242.101) with Microsoft
+ BL02EPF0001A0FC.mail.protection.outlook.com (10.167.242.103) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7828.19 via Frontend Transport; Mon, 12 Aug 2024 19:42:37 +0000
+ 15.20.7828.19 via Frontend Transport; Mon, 12 Aug 2024 19:42:55 +0000
 Received: from purico-ed09host.amd.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 12 Aug
- 2024 14:42:35 -0500
+ 2024 14:42:53 -0500
 From: Ashish Kalra <Ashish.Kalra@amd.com>
 To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
 	<mingo@redhat.com>, <bp@alien8.de>, <dave.hansen@linux.intel.com>,
@@ -77,9 +77,9 @@ To: <seanjc@google.com>, <pbonzini@redhat.com>, <tglx@linutronix.de>,
 CC: <x86@kernel.org>, <john.allen@amd.com>, <davem@davemloft.net>,
 	<michael.roth@amd.com>, <kvm@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>, <linux-crypto@vger.kernel.org>
-Subject: [PATCH 2/3] crypto: ccp: Add support for SNP_FEATURE_INFO command
-Date: Mon, 12 Aug 2024 19:42:26 +0000
-Message-ID: <e11d4bbb11008ab89982d889b1833e158b8ed6ba.1723490152.git.ashish.kalra@amd.com>
+Subject: [PATCH 3/3] x86/sev: Add SEV-SNP CipherTextHiding support
+Date: Mon, 12 Aug 2024 19:42:44 +0000
+Message-ID: <b05c6de0c3cd47f804fd77be60ca2d90a6d28f8d.1723490152.git.ashish.kalra@amd.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <cover.1723490152.git.ashish.kalra@amd.com>
 References: <cover.1723490152.git.ashish.kalra@amd.com>
@@ -95,197 +95,237 @@ X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
  (10.181.40.145)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FA:EE_|SA3PR12MB8801:EE_
-X-MS-Office365-Filtering-Correlation-Id: 3402d09d-1e3c-42ca-a4c5-08dcbb06eb76
+X-MS-TrafficTypeDiagnostic: BL02EPF0001A0FC:EE_|DM3PR12MB9434:EE_
+X-MS-Office365-Filtering-Correlation-Id: 52977baf-6829-4a0e-0827-08dcbb06f625
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|376014|7416014|1800799024|36860700013;
+	BCL:0;ARA:13230040|36860700013|7416014|376014|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?ki9PDEy9cGOyQ+XnukpPt4g4qSZSTXQe/TjEwsNA3tHjxM2htKxuC+GwoBuW?=
- =?us-ascii?Q?2MG1tCoDJ/ITxCyizdjp6eGDKMajEf7w+YXi6s1muePnz13B5/x70KUYqME5?=
- =?us-ascii?Q?1J/1d92jtMUtMSeOi6LIiKkyRZ1nPze20JzkHMqE/HIX/oZPSiab11opnbWO?=
- =?us-ascii?Q?YrRK+lPBPhC3kI1kSa5lC/Xbc4N0QSqe+E7CvHQSNPamJEd7m0dwJTUV1Jm0?=
- =?us-ascii?Q?fVgxyG/laLSPVNPN6gYcPGzYaAmHSP2rjDAMYYDajk71KNBytrtUmkce72nC?=
- =?us-ascii?Q?vp3nkBeEyDr8tgIuhZZX3s5ud77neRiYEZFdshR6GfAg6KgRVOERIUXjGtO9?=
- =?us-ascii?Q?g4Gc48UieCprwI1EWxosm8aiHofNNGDTo/QfugaMqT+Bk8kCvZLzMlUy2XH/?=
- =?us-ascii?Q?dhjTAKuxjtzFphiPIQn1OW6iudOsA6VLWjamWW21siWddgV4M2s+pPUpN7mR?=
- =?us-ascii?Q?wENCvmGDWMgH3IhDmTzeJG2xzz2cmXNp7r3JLicNxCz0CcvrHrvChlNGLjLT?=
- =?us-ascii?Q?YkTgAK/Z9nVmj02YGz5eSB/JkNHumAcbnQo70I/TMJMKYUkNzO7SqzP7qaiz?=
- =?us-ascii?Q?s9W6j5pOFKRBRV+EH+rVmBtD0wVXbRUDkRQNGykqM6TTBhykLu7cV+R0sxb0?=
- =?us-ascii?Q?6aOE6k8d91yOz6u+QP5L7gg6wH1oH6DaObcCfiFxW6+cV/u4bxauybGsFfly?=
- =?us-ascii?Q?mP1QLk8h1a9Cdz0LzicjCDQ/xIMtPKc3WuF/gz9IfB+UdfQ/3Gz33SlZVHud?=
- =?us-ascii?Q?OgRxWa1urwg+w6ZuUJR7+QsOsfGGYAlKbz33RMgS+oUct+JUFedXe3KZyfLN?=
- =?us-ascii?Q?rQW/5FPFZniIDkz9Tb0m8i6ZuqTjKfbJujDc0mR78tGD8dQXyz7UWjSB8/0o?=
- =?us-ascii?Q?0/GSq9DwWfYHt5OlpQsjxh6OXy/M1CwvGG85JKaPeIbipkopto3qMooCE9MP?=
- =?us-ascii?Q?pWs/qfP0TeY88x/z9Ze4hqMqpKU5r75k+8E8qf2Vu8HG84tL7USXqtwotqHS?=
- =?us-ascii?Q?3dFJahVjeXL+RNoWpvthOJrZWeqXp2isrMOb4J2v10MohxtOMFv3rZCt7fwe?=
- =?us-ascii?Q?fWets+J/yedzDPE+lC7Gfj6XCqwXme0fIigz+d8/Yl/z6l5B+5+Z66F2UIZT?=
- =?us-ascii?Q?Iv1Jp5pH5btlO1g6NmymWza3L5CG8tKYF2U5VfR7NhcUmga7pNdP70OW7iRk?=
- =?us-ascii?Q?ptl8uE5tJu78X12SkddxogzSNdTMyCbeO74w7DSI8TUWfdOejUBrEHM4yK7t?=
- =?us-ascii?Q?QmK7cRWQTX+4rOTE0+pyscV3ZNrTwfu0w9CZk8+2jGwlsxfOuOGbK3KJ+O9+?=
- =?us-ascii?Q?gm1k3Ry7FrnYPILuIytfRueCEUWhZ6ABaklZbMwxTYLSK2o0ve4Ufzq7e9nG?=
- =?us-ascii?Q?zO3sosXgY5kp1oaQYoQnDG92BWFH1wZZjYkbQ/qdtVyBdPIxeJsF/94W/uKj?=
- =?us-ascii?Q?ViEDqDDTPwG2g+K6rPlf5Gd6rWcN5ckB?=
+	=?us-ascii?Q?oiL62vhFoXGOqb2lt80deVNcDs2h6EymWymF52EAknwTiNpbp5XyJQTeblbr?=
+ =?us-ascii?Q?E8oOE2U9d6oj6BklAR4zYqfqGzm+tBUQ8DU8gMFwcP4kzT6e9vxyc3PEC6vi?=
+ =?us-ascii?Q?OCZaY1kMX50K5I1POA8Z06ErLjVY36/PyZNWQn0KpKG+17OyVq+Wt8rQKV8D?=
+ =?us-ascii?Q?dsB9lfSm88P+TTJC+JMJz4UEGWaL74LnH9/LBzjsPoHEOCWb2dR3vLkXQF6z?=
+ =?us-ascii?Q?ASGS3zryw4Ldyea+F9Fo/qR8x1hvRwuzzCWrA9AP7lWDyUmp+j7DGWzVIAO1?=
+ =?us-ascii?Q?M2T3MfgobXaCY8Zej/lDzOctpZu0aQQun6zsla5xuf34nU8rn69GAaPqIkf1?=
+ =?us-ascii?Q?Nm7LlYW/Y4mO8xGjtftIsy4o8f43mjb3gy1SM50wt4Ac77gDCa4cvKAkHOYF?=
+ =?us-ascii?Q?eWwiVy19EF3w64pT03R9HE+vKOwJgP5abMWUyx4wnYOH1e8oRNMrQ1Rv+cyw?=
+ =?us-ascii?Q?bZxz0sWARnkWB1vGB9p9MqCXsAjAs63vIgEzKh8SsmhZNhq6OPDZY6iGQCo2?=
+ =?us-ascii?Q?630Gezhcms58PYYD57KpoyzaFJeLs4CTyvsDAkjHF38N3jvpnnTrUFHG+gpL?=
+ =?us-ascii?Q?K91nyP7Hso0VFffBknPHNQgZzkQyc7CrEr5ap6Y7KLARh0njRmpPdZN7Y2K/?=
+ =?us-ascii?Q?G+hzexWbuQnJ5Wt9FKh2LDsyKjUGd+ts3V2KGPaznHgQ63OhsAawWpGbFb7U?=
+ =?us-ascii?Q?Abw9eNLG6pG8AUcP/jxTyzxFld4NxoHVa9I+dJ2iO+yE1IRwAhhZfEUh6nsm?=
+ =?us-ascii?Q?yZIuu6vZ2Rg24kHhtqa6TgJUKX4Z8E8y6RNC+X+wcQ7SGsWZyRoLkeQ0rTGF?=
+ =?us-ascii?Q?KOXz1/2cNRE3+QRWrRGzRWemFI1jjUTQAwueGtR2WtlGjqFApg2WPjVctO39?=
+ =?us-ascii?Q?FqDvyNmN2vKuw3b7US+XZeRxcouwXRz2nYQ8bGwOXqq/RRxz99Pvj4rob9Kj?=
+ =?us-ascii?Q?y4feWJPoPepCsMLn+3Kie4it2BfzpqS5apUzyQrP4zl7wVLHLEeeOlpXNauh?=
+ =?us-ascii?Q?qFeg63hOKR2DnI25qqp5rM+IDjmN8UKuZ3J+/VR4xQ4BZT+PJNz8vVK9mily?=
+ =?us-ascii?Q?a9gamyeork5Xe9E6DB9xbV0YfxfCS4d5E2l4gohxO6VdENiPLgN/e31zv9PG?=
+ =?us-ascii?Q?qRKgIxyveh/3Mcv2YtJqC2X4zKCCN5AjX3YBCA85ooTcOnRhDlLrH3r1Vp04?=
+ =?us-ascii?Q?1u4rWXsNeRfiEk6b+zWklLggvh8KA1lVzc2hIGiWKbK8DSKRWB/kBN/95Vz+?=
+ =?us-ascii?Q?Pe+a4Tv0uYaG/iTUwJk0xLZiRyzqCNOGgwUONIbDnj9swkp/53CxFTNlcEsg?=
+ =?us-ascii?Q?jrRUZEApCC/pmDke8p2M4WmApq61CVJoCNG002XxZCnWOtKMjRwMB09HBfYb?=
+ =?us-ascii?Q?ONdQBfYLEvTfx8PXWYnzCF9Te1jLHHez5jgVgGP4tskISyZA9lyPqBuqESpK?=
+ =?us-ascii?Q?lXL8xOoWuEXapW+TNys9Pks0Woy+35ip?=
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(82310400026)(376014)(7416014)(1800799024)(36860700013);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(7416014)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 19:42:37.3605
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Aug 2024 19:42:55.2962
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 3402d09d-1e3c-42ca-a4c5-08dcbb06eb76
+X-MS-Exchange-CrossTenant-Network-Message-Id: 52977baf-6829-4a0e-0827-08dcbb06f625
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF0001A0FA.namprd03.prod.outlook.com
+	BL02EPF0001A0FC.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB8801
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR12MB9434
 
 From: Ashish Kalra <ashish.kalra@amd.com>
 
-The FEATURE_INFO command provides host and guests a programmatic means
-to learn about the supported features of the currently loaded firmware.
-FEATURE_INFO command leverages the same mechanism as the CPUID instruction.
-Instead of using the CPUID instruction to retrieve Fn8000_0024,
-software can use FEATURE_INFO.
+Ciphertext hiding prevents host accesses from reading the ciphertext of
+SNP guest private memory. Instead of reading ciphertext, the host reads
+will see constant default values (0xff).
 
-During CCP module initialization, after firmware update, the SNP
-platform status and feature information from CPUID 0x8000_0024,
-sub-function 0, are cached in the sev_device structure.
+Ciphertext hiding separates the ASID space into SNP guest ASIDs and host
+ASIDs. All SNP active guests must have an ASID less than or equal to
+MAX_SNP_ASID provided to the SNP_INIT_EX command. All SEV-legacy guests
+(SEV and SEV-ES) must be greater than MAX_SNP_ASID.
+
+This patch-set adds a new module parameter to the CCP driver defined as
+psp_max_snp_asid which is a user configurable MAX_SNP_ASID to define the
+system-wide maximum SNP ASID value. If this value is not set, then the
+ASID space is equally divided between SEV-SNP and SEV-ES guests.
 
 Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
 ---
- drivers/crypto/ccp/sev-dev.c | 40 ++++++++++++++++++++++++++++++++++++
- drivers/crypto/ccp/sev-dev.h |  3 +++
- include/linux/psp-sev.h      | 31 ++++++++++++++++++++++++++++
- 3 files changed, 74 insertions(+)
+ arch/x86/kvm/svm/sev.c       | 24 ++++++++++++++---
+ drivers/crypto/ccp/sev-dev.c | 50 ++++++++++++++++++++++++++++++++++++
+ include/linux/psp-sev.h      | 10 ++++++--
+ 3 files changed, 79 insertions(+), 5 deletions(-)
 
+diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+index 532df12b43c5..954ef99a1aa8 100644
+--- a/arch/x86/kvm/svm/sev.c
++++ b/arch/x86/kvm/svm/sev.c
+@@ -173,6 +173,9 @@ static void sev_misc_cg_uncharge(struct kvm_sev_info *sev)
+ 
+ static int sev_asid_new(struct kvm_sev_info *sev)
+ {
++	struct kvm_svm *svm = container_of(sev, struct kvm_svm, sev_info);
++	struct kvm *kvm = &svm->kvm;
++
+ 	/*
+ 	 * SEV-enabled guests must use asid from min_sev_asid to max_sev_asid.
+ 	 * SEV-ES-enabled guest can use from 1 to min_sev_asid - 1.
+@@ -199,6 +202,18 @@ static int sev_asid_new(struct kvm_sev_info *sev)
+ 
+ 	mutex_lock(&sev_bitmap_lock);
+ 
++	/*
++	 * When CipherTextHiding is enabled, all SNP guests must have an
++	 * ASID less than or equal to MAX_SNP_ASID provided on the
++	 * SNP_INIT_EX command and all the SEV-ES guests must have
++	 * an ASID greater than MAX_SNP_ASID.
++	 */
++	if (snp_cipher_text_hiding_en && sev->es_active) {
++		if (kvm->arch.vm_type == KVM_X86_SNP_VM)
++			max_asid = max_snp_asid;
++		else
++			min_asid = max_snp_asid + 1;
++	}
+ again:
+ 	asid = find_next_zero_bit(sev_asid_bitmap, max_asid + 1, min_asid);
+ 	if (asid > max_asid) {
+@@ -3058,14 +3073,17 @@ void __init sev_hardware_setup(void)
+ 								       "unusable" :
+ 								       "disabled",
+ 			min_sev_asid, max_sev_asid);
+-	if (boot_cpu_has(X86_FEATURE_SEV_ES))
++	if (boot_cpu_has(X86_FEATURE_SEV_ES)) {
++		if (max_snp_asid >= (min_sev_asid - 1))
++			sev_es_supported = false;
+ 		pr_info("SEV-ES %s (ASIDs %u - %u)\n",
+ 			sev_es_supported ? "enabled" : "disabled",
+-			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
++			min_sev_asid > 1 ? max_snp_asid ? max_snp_asid + 1 : 1 : 0, min_sev_asid - 1);
++	}
+ 	if (boot_cpu_has(X86_FEATURE_SEV_SNP))
+ 		pr_info("SEV-SNP %s (ASIDs %u - %u)\n",
+ 			sev_snp_supported ? "enabled" : "disabled",
+-			min_sev_asid > 1 ? 1 : 0, min_sev_asid - 1);
++			min_sev_asid > 1 ? 1 : 0, max_snp_asid ? : min_sev_asid - 1);
+ 
+ 	sev_enabled = sev_supported;
+ 	sev_es_enabled = sev_es_supported;
 diff --git a/drivers/crypto/ccp/sev-dev.c b/drivers/crypto/ccp/sev-dev.c
-index 9810edbb272d..eefb481db5af 100644
+index eefb481db5af..9ee81a6defc5 100644
 --- a/drivers/crypto/ccp/sev-dev.c
 +++ b/drivers/crypto/ccp/sev-dev.c
-@@ -223,6 +223,7 @@ static int sev_cmd_buffer_len(int cmd)
- 	case SEV_CMD_SNP_GUEST_REQUEST:		return sizeof(struct sev_data_snp_guest_request);
- 	case SEV_CMD_SNP_CONFIG:		return sizeof(struct sev_user_data_snp_config);
- 	case SEV_CMD_SNP_COMMIT:		return sizeof(struct sev_data_snp_commit);
-+	case SEV_CMD_SNP_FEATURE_INFO:		return sizeof(struct sev_feature_info);
- 	default:				return 0;
- 	}
+@@ -73,11 +73,27 @@ static bool psp_init_on_probe = true;
+ module_param(psp_init_on_probe, bool, 0444);
+ MODULE_PARM_DESC(psp_init_on_probe, "  if true, the PSP will be initialized on module init. Else the PSP will be initialized on the first command requiring it");
  
-@@ -1052,6 +1053,43 @@ static void snp_set_hsave_pa(void *arg)
++static bool psp_cth_enabled = true;
++module_param(psp_cth_enabled, bool, 0444);
++MODULE_PARM_DESC(psp_cth_enabled, "  if true, the PSP will enable Cipher Text Hiding");
++
++static int psp_max_snp_asid;
++module_param(psp_max_snp_asid, int, 0444);
++MODULE_PARM_DESC(psp_max_snp_asid, "  override MAX_SNP_ASID for Cipher Text Hiding");
++
+ MODULE_FIRMWARE("amd/amd_sev_fam17h_model0xh.sbin"); /* 1st gen EPYC */
+ MODULE_FIRMWARE("amd/amd_sev_fam17h_model3xh.sbin"); /* 2nd gen EPYC */
+ MODULE_FIRMWARE("amd/amd_sev_fam19h_model0xh.sbin"); /* 3rd gen EPYC */
+ MODULE_FIRMWARE("amd/amd_sev_fam19h_model1xh.sbin"); /* 4th gen EPYC */
+ 
++/* Cipher Text Hiding Enabled */
++bool snp_cipher_text_hiding_en;
++EXPORT_SYMBOL(snp_cipher_text_hiding_en);
++
++/* MAX_SNP_ASID */
++unsigned int max_snp_asid;
++EXPORT_SYMBOL(max_snp_asid);
++
+ static bool psp_dead;
+ static int psp_timeout;
+ 
+@@ -1053,6 +1069,36 @@ static void snp_set_hsave_pa(void *arg)
  	wrmsrl(MSR_VM_HSAVE_PA, 0);
  }
  
-+static void sev_cache_snp_platform_status_and_discover_features(void)
++static void sev_snp_enable_ciphertext_hiding(struct sev_data_snp_init_ex *data, int *error)
 +{
-+	struct sev_device *sev = psp_master->sev_data;
-+	struct sev_snp_feature_info snp_feat_info;
-+	struct sev_feature_info *feat_info;
-+	struct sev_data_snp_addr buf;
-+	int error = 0, rc;
++	struct psp_device *psp = psp_master;
++	struct sev_device *sev;
++	unsigned int edx;
 +
-+	if (!cc_platform_has(CC_ATTR_HOST_SEV_SNP))
-+		return;
-+
-+	buf.address = __psp_pa(&sev->snp_plat_status);
-+	rc = __sev_do_cmd_locked(SEV_CMD_SNP_PLATFORM_STATUS, &buf, &error);
++	sev = psp->sev_data;
 +
 +	/*
-+	 * Do feature discovery of the currently loaded firmware,
-+	 * and cache feature information from CPUID 0x8000_0024,
-+	 * sub-function 0.
++	 * Check if CipherTextHiding feature is supported and enabled
++	 * in the Platform/BIOS.
 +	 */
-+	if (!rc && sev->snp_plat_status.feature_info) {
-+		/*
-+		 * Use dynamically allocated structure for the SNP_FEATURE_INFO
-+		 * command to handle any alignment and page boundary check
-+		 * requirements.
-+		 */
-+		feat_info = kzalloc(sizeof(*feat_info), GFP_KERNEL);
-+		snp_feat_info.length = sizeof(snp_feat_info);
-+		snp_feat_info.ecx_in = 0;
-+		snp_feat_info.feature_info_paddr = __psp_pa(feat_info);
-+
-+		rc = __sev_do_cmd_locked(SEV_CMD_SNP_FEATURE_INFO, &snp_feat_info, &error);
-+		if (!rc)
-+			sev->feat_info = *feat_info;
-+		kfree(feat_info);
++	if (sev->feat_info.ecx & FEAT_CIPHERTEXTHIDING_SUPPORTED &&
++	    sev->snp_plat_status.ciphertext_hiding_cap) {
++		/* Retrieve SEV CPUID information */
++		edx = cpuid_edx(0x8000001f);
++		/* Do sanity checks on user-defined MAX_SNP_ASID */
++		if (psp_max_snp_asid > (edx - 1)) {
++			dev_info(sev->dev, "user-defined MAX_SNP_ASID invalid, limiting to %d\n",
++				 edx - 1);
++			psp_max_snp_asid = edx - 1;
++		}
++		max_snp_asid = psp_max_snp_asid ? : (edx - 1) / 2;
++		snp_cipher_text_hiding_en = 1;
++		data->ciphertext_hiding_en = 1;
++		data->max_snp_asid = max_snp_asid;
++		dev_dbg(sev->dev, "SEV-SNP CipherTextHiding feature support enabled\n");
 +	}
 +}
 +
- static int snp_filter_reserved_mem_regions(struct resource *rs, void *arg)
+ static void sev_cache_snp_platform_status_and_discover_features(void)
  {
- 	struct sev_data_range_list *range_list = arg;
-@@ -2395,6 +2433,8 @@ void sev_pci_init(void)
- 	if (sev_update_firmware(sev->dev) == 0)
- 		sev_get_api_version();
+ 	struct sev_device *sev = psp_master->sev_data;
+@@ -1181,6 +1227,10 @@ static int __sev_snp_init_locked(int *error)
+ 		}
  
-+	sev_cache_snp_platform_status_and_discover_features();
+ 		memset(&data, 0, sizeof(data));
 +
- 	/* Initialize the platform */
- 	args.probe = true;
- 	rc = sev_platform_init(&args);
-diff --git a/drivers/crypto/ccp/sev-dev.h b/drivers/crypto/ccp/sev-dev.h
-index 3e4e5574e88a..11e571e87e18 100644
---- a/drivers/crypto/ccp/sev-dev.h
-+++ b/drivers/crypto/ccp/sev-dev.h
-@@ -57,6 +57,9 @@ struct sev_device {
- 	bool cmd_buf_backup_active;
- 
- 	bool snp_initialized;
++		if (psp_cth_enabled)
++			sev_snp_enable_ciphertext_hiding(&data, error);
 +
-+	struct sev_user_data_snp_status snp_plat_status;
-+	struct sev_feature_info feat_info;
- };
- 
- int sev_dev_init(struct psp_device *psp);
+ 		data.init_rmp = 1;
+ 		data.list_paddr_en = 1;
+ 		data.list_paddr = __psp_pa(snp_range_list);
 diff --git a/include/linux/psp-sev.h b/include/linux/psp-sev.h
-index 903ddfea8585..d46d73911a76 100644
+index d46d73911a76..a26b43c2eab9 100644
 --- a/include/linux/psp-sev.h
 +++ b/include/linux/psp-sev.h
-@@ -107,6 +107,7 @@ enum sev_cmd {
- 	SEV_CMD_SNP_DOWNLOAD_FIRMWARE_EX = 0x0CA,
- 	SEV_CMD_SNP_COMMIT		= 0x0CB,
- 	SEV_CMD_SNP_VLEK_LOAD		= 0x0CD,
-+	SEV_CMD_SNP_FEATURE_INFO	= 0x0CE,
- 
- 	SEV_CMD_MAX,
+@@ -27,6 +27,9 @@ enum sev_state {
+ 	SEV_STATE_MAX
  };
-@@ -812,6 +813,36 @@ struct sev_data_snp_commit {
- 	u32 len;
- } __packed;
  
-+/**
-+ * struct sev_snp_feature_info - SEV_SNP_FEATURE_INFO structure
-+ *
-+ * @length: len of the command buffer read by the PSP
-+ * @ecx_in: subfunction index
-+ * @feature_info_paddr : SPA of the FEATURE_INFO structure
-+ */
-+struct sev_snp_feature_info {
-+	u32 length;
-+	u32 ecx_in;
-+	u64 feature_info_paddr;
-+} __packed;
++extern bool snp_cipher_text_hiding_en;
++extern unsigned int max_snp_asid;
 +
-+/**
-+ * struct feature_info - FEATURE_INFO structure
-+ *
-+ * @eax: output of SEV_SNP_FEATURE_INFO command
-+ * @ebx: output of SEV_SNP_FEATURE_INFO command
-+ * @ecx: output of SEV_SNP_FEATURE_INFO command
-+ * #edx: output of SEV_SNP_FEATURE_INFO command
-+ */
-+struct sev_feature_info {
-+	u32 eax;
-+	u32 ebx;
-+	u32 ecx;
-+	u32 edx;
-+} __packed;
-+
-+#define FEAT_CIPHERTEXTHIDING_SUPPORTED	BIT(3)
-+
- #ifdef CONFIG_CRYPTO_DEV_SP_PSP
+ /**
+  * SEV platform and guest management commands
+  */
+@@ -746,10 +749,13 @@ struct sev_data_snp_guest_request {
+ struct sev_data_snp_init_ex {
+ 	u32 init_rmp:1;
+ 	u32 list_paddr_en:1;
+-	u32 rsvd:30;
++	u32 rapl_dis:1;
++	u32 ciphertext_hiding_en:1;
++	u32 rsvd:28;
+ 	u32 rsvd1;
+ 	u64 list_paddr;
+-	u8  rsvd2[48];
++	u16 max_snp_asid;
++	u8  rsvd2[46];
+ } __packed;
  
  /**
 -- 
