@@ -1,56 +1,56 @@
-Return-Path: <kvm+bounces-23846-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23847-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2455D94EE95
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 15:46:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D870B94EE97
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 15:46:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 581081C2168F
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 13:46:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9619928320F
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 13:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2B0183CC0;
-	Mon, 12 Aug 2024 13:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FE9183CC5;
+	Mon, 12 Aug 2024 13:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="kqfN1eoj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="CFr4KKRU"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-174.mta1.migadu.com (out-174.mta1.migadu.com [95.215.58.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF28117C9F9
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 13:44:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2805183CB5
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 13:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723470302; cv=none; b=A3nMrirhC9bJ9GzUVrXZWKTEpv0CxmrlKcAdAt31/N4C00Prz5ssbkrc6ni3TcaXyee6MD3KX0XJlPWQ9uMg68wDKqrB5voqMjdW1y2MWdjk22ktxC0+SJdntWhMiDDZOPNaNHHpq6f6GHN2Lzk4Rdeyw2T7QsqtSlfH4GVL3gY=
+	t=1723470304; cv=none; b=GAlovJRYbjlXz494zoFXdwkXfzM2GpxbnJ5qbhh8GXB6wTHD3bLEsYfWUr1607AxWFMwYq+4LYQ2vX5ZYvkAIuVnYWX6WRTB8x3Z1aT1d4tA4c0fr4Ll4BheTWLQrI1ychzuAXmQsfnePRUVWYUGtTE61y/lm2BS9GB0E/OSBGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723470302; c=relaxed/simple;
-	bh=yauA6eDczoyHsEMvB/ScoIlvpidBjdOd0bYLDrs8kVQ=;
+	s=arc-20240116; t=1723470304; c=relaxed/simple;
+	bh=xMMD6lbF1Q8SU34AXHQ+A7gAtY/+5St/83LVg8jlPAs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Hmod4m+1kLCKJhe/E3ACS1Iws0UxVNXt4QG0ofE7itcMGuyrDd3QnaGTNrmHQDvUQNF5jr91JpFmaXrzJAnP/e91FjA7SUtzqyoqZjCZDuaOBLocphCAq/w9Lp2thL2+fE8GMxUe/+N0KleXQtTXDBsTqaU9zbHZaIZd7rNZI0g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=kqfN1eoj; arc=none smtp.client-ip=95.215.58.182
+	 MIME-Version; b=YZ4+FCX4RvBW50zYUoHBgzS6d52iXW+DpzXwNPFMz8ZpQL2Blv3hkL5jQ95wqE7iaI7WuUqVohaVr9mrdgk8/HmxsedYMqIqUlOv1WdJJmU99n48njMcE8qB9AlsZMtk5qft9yJifwkv2I+Ed3ot2icBFmGxqcNnrXsnV5wCE9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=CFr4KKRU; arc=none smtp.client-ip=95.215.58.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723470297;
+	t=1723470299;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=0JnWydVRlcUj9MsWlBjRPKAbHtiO4c0GMGL7PGlxT7Y=;
-	b=kqfN1eojpXs34yYaoOgQt7JdO8JfGcn2+PJWFLEVac7i2RBkt5Inza8z+di1ROKMSrj++o
-	u1U5VtGR/AFeJJii3lmlQEUJ1NYhABF+QMs9Ae4vuwQgqzkjq14lg1VTEvUGJ+boDiw/n/
-	Ag+SxWzZ3Y6t6OpMro4n/Ejmwdvospg=
+	bh=3M9iRKgv8aV/QZsAf7pAIKygkuBgiAEBkmW/A2oWcjU=;
+	b=CFr4KKRUymigKA+2Uu9AdwmCHJE18lUGxfIXQoPy7vCVq40k4ttkVneCfMRc1Fg/pKaA9l
+	6Ix5s8GhsDkZZHlRkB21rqQ9XYmqKy+qVw6Go8IcdxQ5dHDyxCINSQ5hK7XGBxLs5U+Uds
+	SXQCeziSaHbvXEsUht3fjoXKMYhNSvw=
 From: Andrew Jones <andrew.jones@linux.dev>
 To: kvm@vger.kernel.org,
 	kvm-riscv@lists.infradead.org
 Cc: atishp@rivosinc.com,
 	cade.richard@berkeley.edu,
 	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH v2 1/7] riscv: Fix virt_to_phys again
-Date: Mon, 12 Aug 2024 15:44:53 +0200
-Message-ID: <20240812134451.112498-10-andrew.jones@linux.dev>
+Subject: [kvm-unit-tests PATCH v2 2/7] riscv: setup: Apply VA_BASE check to rv64
+Date: Mon, 12 Aug 2024 15:44:54 +0200
+Message-ID: <20240812134451.112498-11-andrew.jones@linux.dev>
 In-Reply-To: <20240812134451.112498-9-andrew.jones@linux.dev>
 References: <20240812134451.112498-9-andrew.jones@linux.dev>
 Precedence: bulk
@@ -62,42 +62,29 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-The last fix was a bit hasty since we didn't double check that
-virt_to_phys() was the right place for the fix, rather than
-virt_to_pte_phys(), and of course it was the latter... All
-architectures add on the offset in virt_to_pte_phys() and then
-simply wrap virt_to_pte_phys() with virt_to_phys(), if they
-implement virt_to_phys() at all. RISCV shouldn't be different.
+The VA_BASE check in setup() also applies to rv64, as is clear from
+the later VA_BASE check in mem_allocator_init(), which ensures
+freemem_start < freemem_end < VA_BASE.
 
-Fixes: e1dd4ea76894 ("riscv: Fix virt_to_phys")
-Fixes: 23100d972705 ("riscv: Enable vmalloc")
+Fixes: 6895ce6dc618 ("riscv: Populate memregions and switch to page allocator")
 Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
 ---
- lib/riscv/mmu.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ lib/riscv/setup.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/lib/riscv/mmu.c b/lib/riscv/mmu.c
-index 165a7034bc69..2c9c4f376ac9 100644
---- a/lib/riscv/mmu.c
-+++ b/lib/riscv/mmu.c
-@@ -179,7 +179,7 @@ phys_addr_t virt_to_pte_phys(pgd_t *pgtable, void *virt)
- 	if (!pte_val(*ptep))
- 		return 0;
+diff --git a/lib/riscv/setup.c b/lib/riscv/setup.c
+index e0b5f6f7daf5..2c7792a5b0bd 100644
+--- a/lib/riscv/setup.c
++++ b/lib/riscv/setup.c
+@@ -193,7 +193,7 @@ void setup(const void *fdt, phys_addr_t freemem_start)
+ 	const char *bootargs;
+ 	int ret;
  
--	return __pa(pteval_to_ptep(pte_val(*ptep)));
-+	return __pa(pteval_to_ptep(pte_val(*ptep))) | offset_in_page(virt);
- }
+-	assert(sizeof(long) == 8 || freemem_start < VA_BASE);
++	assert(freemem_start < VA_BASE);
+ 	freemem = __va(freemem_start);
  
- unsigned long virt_to_phys(volatile void *address)
-@@ -194,7 +194,7 @@ unsigned long virt_to_phys(volatile void *address)
- 	paddr = virt_to_pte_phys(pgtable, (void *)address);
- 	assert(sizeof(long) == 8 || !(paddr >> 32));
- 
--	return (unsigned long)paddr | offset_in_page(address);
-+	return (unsigned long)paddr;
- }
- 
- void *phys_to_virt(unsigned long address)
+ 	freemem_push_fdt(&freemem, fdt);
 -- 
 2.45.2
 
