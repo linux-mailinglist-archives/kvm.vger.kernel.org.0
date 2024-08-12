@@ -1,63 +1,63 @@
-Return-Path: <kvm+bounces-23918-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23917-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D5DD94FA02
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 00:56:18 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DE2994FA00
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 00:55:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07C6AB22DAA
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 22:56:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B13361F25D1B
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 22:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D32681A38CA;
-	Mon, 12 Aug 2024 22:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24CE1A2C12;
+	Mon, 12 Aug 2024 22:48:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="L0cR/LLX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HQHXmcbL"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 346451A0B07;
-	Mon, 12 Aug 2024 22:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B1D31A08B5;
+	Mon, 12 Aug 2024 22:48:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723502931; cv=none; b=hHosPBkW9+9Yq7nWV0oC6p8oTosJ1YC5hMGg7D3bfeXaaHwhkUMdgFSkWwdU2Exmf/+yGmKEZOA2AVdvBqtcuHkIWGnwUUukJAkiYkW+MRFkOiiL6INgKugY/hSlmEgtx4VDsWoXZyIPqMHDEKV8dvog7lhMkIIQcPkn0mt0STM=
+	t=1723502930; cv=none; b=ARW4vBpu0dToPROzKS2wrAPDGUbYJxLuVyLgTuvBYdzYAoFRrbmrW+CamrzgNsG2410uWn2Oqs/7y/mLs0rIJpucGUsHEpr0j5XP025CvvcFV9V+dZuY6n3oxTEZh50iHHLITS2MHcpgOC4j2DtgXiMfyjoxU3IyQGRW8snU3Fc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723502931; c=relaxed/simple;
-	bh=XIFhgsS6zqe720LVooXdtdZp14vJaW+49JUGtZO8bOk=;
+	s=arc-20240116; t=1723502930; c=relaxed/simple;
+	bh=0Gqv13mAvcWK2D1HLrVD5lk09yLAPvz02xaqOkAihRU=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cexOirSYH1HQZakd5LoFkIzR+vLqhVohZizExaSidK1VrW8WapJzr8ULPi7TjunjEqt+SUbDiChyDckMh6YUVtSEGa7IC9fQeKCPamMmb6hPRuxWxwzMFvID26a9DUsn8EgjbNiFoxNmOtl+aODaEyF+9b7Tl/kvcJJ70nGMi3k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=L0cR/LLX; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=iqFLxmRT4MV5yVuzH8lxVQSGfhfWwOlDyWNQbHipU0pJPADkUvIHvcx/cO/WTQVSGn9qr1DVZ3etU/MdMuwV/2+z84EI+Rj2dD/0EBba38Fcfjw9/cseqNVXcAVYLPGyDmM6R5XI55K+HJreH6LEvEuUa0q/ffvwmyCAv+suWAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HQHXmcbL; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723502929; x=1755038929;
+  t=1723502928; x=1755038928;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=XIFhgsS6zqe720LVooXdtdZp14vJaW+49JUGtZO8bOk=;
-  b=L0cR/LLXyV7xRFjJNjQanA4iNxt+67DASd2lrdfL0ibEHUf68GGG1hXH
-   4CEO203C6ZxEuWAxgQ2fb6EV7p3I6bjHTzEZx7AVo6WpRln4lYK63aH39
-   rpbCUFPrbtc1HM4LhC+Nl3FRNPe6TsPlfENByzZgjExSE7w0ivHCxQpEh
-   JzTG53U0Y380icn+QMA0kOLnEGbWEGQEH6oy/JDWaT9vRTC7uBIoNFgG6
-   wPP67JduVu3YpHIMIg5uSD409UqsLiH2w+Q+hqus6uuYasPQHLdf98N3m
-   LttQWAX4cg0oYHprEFArD55oyKfjuNm8omX+UuaAWgV874z/lFUGKUFeZ
-   A==;
-X-CSE-ConnectionGUID: 5klYzvdsTrKM3jkoeDoThg==
-X-CSE-MsgGUID: S9uIeY88R3W1EEDMhlkgbA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="33041493"
+  bh=0Gqv13mAvcWK2D1HLrVD5lk09yLAPvz02xaqOkAihRU=;
+  b=HQHXmcbLHy34Lvm0UDSbB70h4er3HPQAFIh7kcjTox5p+MYAA6uO9rQG
+   hBpb4LBV+YCQ3PNQ2weaaKkMFSKhfFTEWwIjR6rnWCPCNLrjaUWaLngSh
+   IjK7SHxW4OoG5+1BupMdr24XnGZs6o7E8fe47mDz5RtaTe8eldsevrHYb
+   LkA1qP8CZLZtNoxLdwpzXr01m89qp6YWQ8sDPF4aYHAZiAsSsgjYPLX38
+   O4yIDIwyCofkhqSvcuNF498Oe0WLc/1oKTZrepUG4NnieXzTmbc7UBIDv
+   q4tDDELfiFPBkenRgoZ4FUmagzg8b2+dWElXOTspdst/AjZBCdQqs0HBw
+   g==;
+X-CSE-ConnectionGUID: kFxZ/bxCSDiX07fJeWd3dw==
+X-CSE-MsgGUID: kcrw94rlTjSZRrPNHAz3EQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="33041498"
 X-IronPort-AV: E=Sophos;i="6.09,284,1716274800"; 
-   d="scan'208";a="33041493"
+   d="scan'208";a="33041498"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 15:48:39 -0700
-X-CSE-ConnectionGUID: ELLNTBYTRyyvtYnyJzUYbQ==
-X-CSE-MsgGUID: lpPzjbA7Q5KmpR7IK7doCw==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 15:48:40 -0700
+X-CSE-ConnectionGUID: oRanxMFVRpmI3xbhM1l9gA==
+X-CSE-MsgGUID: kVsaMHZ0SrOtFrvIh8rkTQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,284,1716274800"; 
-   d="scan'208";a="59008458"
+   d="scan'208";a="59008462"
 Received: from jdoman-desk1.amr.corp.intel.com (HELO rpedgeco-desk4..) ([10.124.222.53])
-  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 15:48:39 -0700
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 15:48:40 -0700
 From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 To: seanjc@google.com,
 	pbonzini@redhat.com,
@@ -68,9 +68,9 @@ Cc: kai.huang@intel.com,
 	xiaoyao.li@intel.com,
 	linux-kernel@vger.kernel.org,
 	rick.p.edgecombe@intel.com
-Subject: [PATCH 23/25] KVM: x86/mmu: Taking guest pa into consideration when calculate tdp level
-Date: Mon, 12 Aug 2024 15:48:18 -0700
-Message-Id: <20240812224820.34826-24-rick.p.edgecombe@intel.com>
+Subject: [PATCH 24/25] KVM: x86: Filter directly configurable TDX CPUID bits
+Date: Mon, 12 Aug 2024 15:48:19 -0700
+Message-Id: <20240812224820.34826-25-rick.p.edgecombe@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
 References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
@@ -82,88 +82,87 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Xiaoyao Li <xiaoyao.li@intel.com>
+Future TDX modules may provide support for future HW features, but run with
+KVM versions that lack support for them. In this case, userspace may try to
+use features that KVM does not have support, and develop assumptions around
+KVM's behavior. Then KVM would have to deal with not breaking such
+userspace.
 
-For TDX, the maxpa (CPUID.0x80000008.EAX[7:0]) is fixed as native and
-the max_gpa (CPUID.0x80000008.EAX[23:16]) is configurable and used
-to configure the EPT level and GPAW.
+Simplify KVM's job by preventing userspace from configuring any unsupported
+CPUID feature bits.
 
-Use max_gpa to determine the TDP level.
-
-Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 ---
 uAPI breakout v1:
  - New patch
 ---
- arch/x86/kvm/cpuid.c   | 14 ++++++++++++++
- arch/x86/kvm/cpuid.h   |  1 +
- arch/x86/kvm/mmu/mmu.c | 10 +++++++++-
- 3 files changed, 24 insertions(+), 1 deletion(-)
+ arch/x86/kvm/vmx/tdx.c | 25 ++++++++++++++++++++++---
+ 1 file changed, 22 insertions(+), 3 deletions(-)
 
-diff --git a/arch/x86/kvm/cpuid.c b/arch/x86/kvm/cpuid.c
-index 499479c769d8..ebebff0dbd3b 100644
---- a/arch/x86/kvm/cpuid.c
-+++ b/arch/x86/kvm/cpuid.c
-@@ -423,6 +423,20 @@ int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu)
- 	return 36;
+diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
+index c6bfeb0b3cc9..d45b4f7b69ba 100644
+--- a/arch/x86/kvm/vmx/tdx.c
++++ b/arch/x86/kvm/vmx/tdx.c
+@@ -1086,8 +1086,9 @@ static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
+ 	return ret;
  }
  
-+int cpuid_query_maxguestphyaddr(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpuid_entry2 *best;
-+
-+	best = kvm_find_cpuid_entry(vcpu, 0x80000000);
-+	if (!best || best->eax < 0x80000008)
-+		goto not_found;
-+	best = kvm_find_cpuid_entry(vcpu, 0x80000008);
-+	if (best)
-+		return (best->eax >> 16) & 0xff;
-+not_found:
-+	return 0;
-+}
-+
- /*
-  * This "raw" version returns the reserved GPA bits without any adjustments for
-  * encryption technologies that usurp bits.  The raw mask should be used if and
-diff --git a/arch/x86/kvm/cpuid.h b/arch/x86/kvm/cpuid.h
-index 5cc13d1b7991..2db458e4c450 100644
---- a/arch/x86/kvm/cpuid.h
-+++ b/arch/x86/kvm/cpuid.h
-@@ -39,6 +39,7 @@ bool kvm_cpuid(struct kvm_vcpu *vcpu, u32 *eax, u32 *ebx,
- u32 xstate_required_size(u64 xstate_bv, bool compacted);
- 
- int cpuid_query_maxphyaddr(struct kvm_vcpu *vcpu);
-+int cpuid_query_maxguestphyaddr(struct kvm_vcpu *vcpu);
- u64 kvm_vcpu_reserved_gpa_bits_raw(struct kvm_vcpu *vcpu);
- 
- static inline int cpuid_maxphyaddr(struct kvm_vcpu *vcpu)
-diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-index 3a00bf062a46..694edcb7ef46 100644
---- a/arch/x86/kvm/mmu/mmu.c
-+++ b/arch/x86/kvm/mmu/mmu.c
-@@ -5440,12 +5440,20 @@ void __kvm_mmu_refresh_passthrough_bits(struct kvm_vcpu *vcpu,
- 
- static inline int kvm_mmu_get_tdp_level(struct kvm_vcpu *vcpu)
+-static int __maybe_unused tdx_get_kvm_supported_cpuid(struct kvm_cpuid2 **cpuid)
++static int tdx_get_kvm_supported_cpuid(struct kvm_cpuid2 **cpuid)
  {
-+	int maxpa = 0;
 +
-+	if (vcpu->kvm->arch.vm_type == KVM_X86_TDX_VM)
-+		maxpa = cpuid_query_maxguestphyaddr(vcpu);
-+
-+	if (!maxpa)
-+		maxpa = cpuid_maxphyaddr(vcpu);
-+
- 	/* tdp_root_level is architecture forced level, use it if nonzero */
- 	if (tdp_root_level)
- 		return tdp_root_level;
+ 	int r;
+ 	static const u32 funcs[] = {
+ 		0, 0x80000000, KVM_CPUID_SIGNATURE,
+@@ -1235,8 +1236,10 @@ int tdx_vcpu_ioctl(struct kvm_vcpu *vcpu, void __user *argp)
+ static int __init setup_kvm_tdx_caps(void)
+ {
+ 	const struct tdx_sysinfo_td_conf *td_conf = &tdx_sysinfo->td_conf;
++	struct kvm_cpuid_entry2 *cpuid_e;
++	struct kvm_cpuid2 *supported_cpuid;
+ 	u64 kvm_supported;
+-	int i;
++	int i, r = -EIO;
  
- 	/* Use 5-level TDP if and only if it's useful/necessary. */
--	if (max_tdp_level == 5 && cpuid_maxphyaddr(vcpu) <= 48)
-+	if (max_tdp_level == 5 && maxpa <= 48)
- 		return 4;
+ 	kvm_tdx_caps = kzalloc(sizeof(*kvm_tdx_caps) +
+ 			       sizeof(struct kvm_tdx_cpuid_config) * td_conf->num_cpuid_config,
+@@ -1263,6 +1266,10 @@ static int __init setup_kvm_tdx_caps(void)
  
- 	return max_tdp_level;
+ 	kvm_tdx_caps->supported_xfam = kvm_supported & td_conf->xfam_fixed0;
+ 
++	r = tdx_get_kvm_supported_cpuid(&supported_cpuid);
++	if (r)
++		goto err;
++
+ 	kvm_tdx_caps->num_cpuid_config = td_conf->num_cpuid_config;
+ 	for (i = 0; i < td_conf->num_cpuid_config; i++) {
+ 		struct kvm_tdx_cpuid_config source = {
+@@ -1283,12 +1290,24 @@ static int __init setup_kvm_tdx_caps(void)
+ 		/* Work around missing support on old TDX modules */
+ 		if (dest->leaf == 0x80000008)
+ 			dest->eax |= 0x00ff0000;
++
++		cpuid_e = kvm_find_cpuid_entry2(supported_cpuid->entries, supported_cpuid->nent,
++						dest->leaf, dest->sub_leaf);
++		if (!cpuid_e) {
++			dest->eax = dest->ebx = dest->ecx = dest->edx = 0;
++		} else {
++			dest->eax &= cpuid_e->eax;
++			dest->ebx &= cpuid_e->ebx;
++			dest->ecx &= cpuid_e->ecx;
++			dest->edx &= cpuid_e->edx;
++		}
+ 	}
+ 
++	kfree(supported_cpuid);
+ 	return 0;
+ err:
+ 	kfree(kvm_tdx_caps);
+-	return -EIO;
++	return r;
+ }
+ 
+ static void free_kvm_tdx_cap(void)
 -- 
 2.34.1
 
