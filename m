@@ -1,148 +1,130 @@
-Return-Path: <kvm+bounces-23818-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23819-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05EC694E46D
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 03:11:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F23094E4CE
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 04:24:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53B481F21F5A
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 01:11:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECC9528186A
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 02:24:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F5D10A14;
-	Mon, 12 Aug 2024 01:10:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE93482481;
+	Mon, 12 Aug 2024 02:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NavN4KGD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82594C7B;
-	Mon, 12 Aug 2024 01:10:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1504690;
+	Mon, 12 Aug 2024 02:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723425058; cv=none; b=ASdSwbMab9ChTTbJDc8IG8kqLk7Us4Z/EdCGbQ65brbvVN9ax2/I1fcZafreBcaAn8OYzFwNYUQYEgiBsMcjc4wbNgP9rg+tocvQyPThEOZjHWgwnkjDMhgDcUEp2Fp9cxWJCdTlKxi9rL20gs6TT2s6orSF1XUtOS9A3DRXbZY=
+	t=1723429445; cv=none; b=ClOy47kg1ZgznmyZLLGDmWtRj/z7GrKpjPBuAykvR66iyvRmrneyLUFTGGrsk73Qx66xK9pJN5HxUsPrtsNCyUc0dSqDKGgWoziOt5LgUVj1UOzp7c20xvbiAPZv5q7JXf2DcJN2M3XYZVgb4ZSGT8zjwKg3PccuGglxhE0mO2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723425058; c=relaxed/simple;
-	bh=rJrFm7yEqlB7PpqcS2AkAo08q2R8lUg3ybyZjtiWt9k=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=f6JiNSRIE2IaGlqOwBt7d7MjYAP9pYB+0YOyV0UR1uw09aicUKI5niaqB4nUMr6TMPE6vGoTdG7SW/Rjn9PALS7OwIfPxEIpdJcuSudurww2g77mtiYPI+KROEsBIPl2IfWBOWUjuAYxI8L0JUSCZGUeg1Jo3+yAHmi25NbWgl4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [10.20.42.62])
-	by gateway (Coremail) with SMTP id _____8Bxa+ocYblmfzgQAA--.41743S3;
-	Mon, 12 Aug 2024 09:10:52 +0800 (CST)
-Received: from [10.20.42.62] (unknown [10.20.42.62])
-	by front1 (Coremail) with SMTP id qMiowMDxkeEZYblmzYkPAA--.8190S3;
-	Mon, 12 Aug 2024 09:10:49 +0800 (CST)
-Subject: Re: [PATCH v5 3/3] irqchip/loongson-eiointc: Add extioi virt
- extension support
-To: Thomas Gleixner <tglx@linutronix.de>,
- Tianrui Zhao <zhaotianrui@loongson.cn>, Huacai Chen <chenhuacai@kernel.org>
-Cc: WANG Xuerui <kernel@xen0n.name>, kvm@vger.kernel.org,
- loongarch@lists.linux.dev, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, x86@kernel.org,
- Song Gao <gaosong@loongson.cn>
-References: <20240805073546.668475-1-maobibo@loongson.cn>
- <20240805073546.668475-4-maobibo@loongson.cn> <87wmkortqo.ffs@tglx>
-From: maobibo <maobibo@loongson.cn>
-Message-ID: <09d4ad7a-0548-28e6-f60e-c1b68c8c20b5@loongson.cn>
-Date: Mon, 12 Aug 2024 09:10:47 +0800
-User-Agent: Mozilla/5.0 (X11; Linux loongarch64; rv:68.0) Gecko/20100101
- Thunderbird/68.7.0
+	s=arc-20240116; t=1723429445; c=relaxed/simple;
+	bh=FqGg5DIw49XQ7Uc49eBDwirJ08MyI6X0CPTIL7COrkM=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=aR+Aeq/Z2Ir1US1owS6C6HMWwo31VKjroszuVFjzP8jVq9M1J+yj0tDSClbUAq6mAS10QXiaFTFcDbkaB+F3dC8EqLYX3XucXusWcsNkQSAK895Yk+n0DZjc/M+Okglpfq59eHbBkrDyZyLImTqi1SB3eVAWYJgQw6YCsO0eTJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NavN4KGD; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723429444; x=1754965444;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=FqGg5DIw49XQ7Uc49eBDwirJ08MyI6X0CPTIL7COrkM=;
+  b=NavN4KGDtPDTn+HJcbhlA45OXBHWkLWpe52EeBm7YJ1EcT5fbTvH2aVf
+   wecgEsbrsTRATRIh/hXgXlq5gI0XHjQ/GrkK5sG0tGYYN5QQd1IwuuS/M
+   BBcVrWCDdtiGX8sKL9Ig+bHoyMWT7eVv99uL3YjOouq0zey3xEll2m1ip
+   8F1wBDhmWoh28gHu83A61qdPPgiKlSM+veOYUzehkE7MPBS2dVJdVm5Pr
+   QLbdTOOhfpfj9pViUqWlzLF03+/uzgBguyfxiwLx6KALImgCNb7GlBtGE
+   IvgJaHnL+drd58wSvnzH5JC/qarRO/bFRpY833SoRWTBmmwXE9QrECZFo
+   g==;
+X-CSE-ConnectionGUID: QA0Lb5R6RJiYHChKXZByXw==
+X-CSE-MsgGUID: 4dVvdAJ0QuyQkl0WjbGhBQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11161"; a="32197516"
+X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
+   d="scan'208";a="32197516"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Aug 2024 19:24:03 -0700
+X-CSE-ConnectionGUID: GYcgJn7UReyXGjarYyDrkA==
+X-CSE-MsgGUID: 7I8pB5x5QceZjJsh9TtACw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,282,1716274800"; 
+   d="scan'208";a="58020573"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by orviesa009.jf.intel.com with ESMTP; 11 Aug 2024 19:24:00 -0700
+Message-ID: <ac2ef4ae-ef1d-47b0-bd60-f203baaf124e@linux.intel.com>
+Date: Mon, 12 Aug 2024 10:20:32 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <87wmkortqo.ffs@tglx>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, patches@lists.linux.dev
+Subject: Re: [PATCH] iommu: Allow ATS to work on VFs when the PF uses IDENTITY
+To: Jason Gunthorpe <jgg@nvidia.com>, Bjorn Helgaas <bhelgaas@google.com>,
+ David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
+ Joerg Roedel <joro@8bytes.org>, kvm@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org,
+ Robin Murphy <robin.murphy@arm.com>,
+ Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
+ Will Deacon <will@kernel.org>
+References: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMDxkeEZYblmzYkPAA--.8190S3
-X-CM-SenderInfo: xpdruxter6z05rqj20fqof0/
-X-Coremail-Antispam: 1Uk129KBj93XoW7tw4DCFWxurykJrWfWF47Jrc_yoW8Aw4kpF
-	W8tFsI9w4DtryavwsYqrn7JF1FvrsxJFWUK3W8KayrJa9rZryrtFnYvFy3A3WDC348AasI
-	qFW5JF4j9a4SyrXCm3ZEXasCq-sJn29KB7ZKAUJUUUU5529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUv0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Jr0_JF4l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	Gr0_Gr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6xACxx1l5I
-	8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AK
-	xVWUJVW8JwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lc7I2V7IY0VAS07AlzV
-	AYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F40E
-	14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIx
-	kGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxVAF
-	wI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6r1j6r1xMIIF0xvEx4A2jsIE14v26r1j6r
-	4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2KfnxnUUI43ZEXa7IU8zwZ7UU
-	UUU==
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 8/8/24 2:19 AM, Jason Gunthorpe wrote:
+> PCI ATS has a global Smallest Translation Unit field that is located in
+> the PF but shared by all of the VFs.
+> 
+> The expectation is that the STU will be set to the root port's global STU
+> capability which is driven by the IO page table configuration of the iommu
+> HW. Today it becomes set when the iommu driver first enables ATS.
+> 
+> Thus, to enable ATS on the VF, the PF must have already had the correct
+> STU programmed, even if ATS is off on the PF.
+> 
+> Unfortunately the PF only programs the STU when the PF enables ATS. The
+> iommu drivers tend to leave ATS disabled when IDENTITY translation is
+> being used.
+> 
+> Thus we can get into a state where the PF is setup to use IDENTITY with
+> the DMA API while the VF would like to use VFIO with a PAGING domain and
+> have ATS turned on. This fails because the PF never loaded a PAGING domain
+> and so it never setup the STU, and the VF can't do it.
+> 
+> The simplest solution is to have the iommu driver set the ATS STU when it
+> probes the device. This way the ATS STU is loaded immediately at boot time
+> to all PFs and there is no issue when a VF comes to use it.
+> 
+> Add a new call pci_prepare_ats() which should be called by iommu drivers
+> in their probe_device() op for every PCI device if the iommu driver
+> supports ATS. This will setup the STU based on whatever page size
+> capability the iommu HW has.
+> 
+> Signed-off-by: Jason Gunthorpe<jgg@nvidia.com>
+> ---
+>   drivers/iommu/amd/iommu.c                   |  3 ++
+>   drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  6 ++++
+>   drivers/iommu/intel/iommu.c                 |  1 +
+>   drivers/pci/ats.c                           | 33 +++++++++++++++++++++
+>   include/linux/pci-ats.h                     |  1 +
+>   5 files changed, 44 insertions(+)
 
+For Intel VT-d,
 
-On 2024/8/11 上午4:46, Thomas Gleixner wrote:
-> On Mon, Aug 05 2024 at 15:35, Bibo Mao wrote:
-> 
->> Interrupts can be routed to maximal four virtual CPUs with one external
->> hardware interrupt. Add the extioi virt extension support so that
->> Interrupts can be routed to 256 vcpus on hypervisor mode.
-> 
-> interrupts .... 256 vCPUs in hypervisor mode.
-will modify in next version.
+Reviewed-by: Lu Baolu <baolu.lu@linux.intel.com>
 
-> 
->>   static int cpu_to_eio_node(int cpu)
->>   {
->> -	return cpu_logical_map(cpu) / CORES_PER_EIO_NODE;
->> +	int cores;
->> +
->> +	if (kvm_para_available() && kvm_para_has_feature(KVM_FEATURE_VIRT_EXTIOI))
-> 
-> Why isn't that kvm_para_available() check inside of
-> kvm_para_has_feature() instead of inflicting it on every usage site?
-> That's just error prone.
-I had the same idea but not sure about it, it is to follow the 
-implemantion of x86.
-
-Yeap, it is better to put kvm_para_available() in function 
-kvm_para_has_feature(), one api for caller is simple and enough.
-
-Will do in next version.
-> 
->> +		cores = CORES_PER_VEIO_NODE;
->> +	else
->> +		cores = CORES_PER_EIO_NODE;
->> +	return cpu_logical_map(cpu) / cores;
->>   }
-> 
->> @@ -105,18 +144,24 @@ static int eiointc_set_irq_affinity(struct irq_data *d, const struct cpumask *af
->> @@ -140,17 +185,23 @@ static int eiointc_index(int node)
->>   
->>   static int eiointc_router_init(unsigned int cpu)
->>   {
->> -	int i, bit;
->> -	uint32_t data;
->> -	uint32_t node = cpu_to_eio_node(cpu);
->> -	int index = eiointc_index(node);
->> +	uint32_t data, node;
->> +	int i, bit, cores, index;
-> 
-> Is it so hard to follow:
-> 
->    https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#variable-declarations
-> 
-> ?
-Sorry to have the same coding style issue for the second time. I am not 
-familiar with it.
-
-Will do in next version.
-
-Regards
-Bibo Mao
-> 
-> Thanks,
-> 
->          tglx
-> 
-
+Thanks,
+baolu
 
