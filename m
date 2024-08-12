@@ -1,81 +1,81 @@
-Return-Path: <kvm+bounces-23836-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23837-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94E8294EA97
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 12:17:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B78094EAA1
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 12:21:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E83E1B217FF
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 10:17:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 402841C20F7F
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 10:21:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EE516EBE0;
-	Mon, 12 Aug 2024 10:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CA416EBE4;
+	Mon, 12 Aug 2024 10:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BCSmfl3V"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NQV2lLT8"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35C416DEB2
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 10:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD17633C7
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 10:21:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723457857; cv=none; b=b4DqfeBEqAcUcqPqjqWeYHZYLABhp+N2xTip2YLkd06mbl8BO1YArlkbkY0tEVD0+WrlFvHYdlb97e+ylOR2vnYSSjgYY5GgThQj3Nxczyb/SWDeO3COQPj8M2y7RUbNA24lksGRzQ8wEehxFy/il+hBKgIZVMSFLfLIWyN+HdU=
+	t=1723458095; cv=none; b=GLNEs0c3OoRmVjFQkewirYr6mcCQ5xKbJlQqwE8XJRjx2gXqu266mPfbyt/hltRslkdpezk6UpHSpvI5syMELYCtKEQMB06Ut6a2DMOuxGhziadxZmRSVXqEQo1jikJOQy0iJAcnv2hW2kIypCuo90pO/DxzYxQr4ORygwZlFfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723457857; c=relaxed/simple;
-	bh=wlf+NaXWaEQjELZ0vJCmPiLuJUBMSiiQIdYcl829RYA=;
+	s=arc-20240116; t=1723458095; c=relaxed/simple;
+	bh=E3w2sdp+fGsMoOhFno3buiQdzM4pPc/+fj1g2ozSTb8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b1UTIstiVAlpwhzZT6auTTs3bzg4rir2vIjCXMT1m5lDi9UKOTgAjIWOszdpFRgVZmrD2VMBPqf03oBg0C7+C2eATSSYUVO1xxCgGyA/KdbkLJOqJ96PzmbH64F14qtGMUaiCe1COoTPwTEIsvl/ugMhgGVuuGcBq4Gmype11x4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BCSmfl3V; arc=none smtp.client-ip=170.10.129.124
+	 In-Reply-To:Content-Type; b=MQU6fheW+D2oHe7x66pPKegYqglfgO4eRBPLeYzlMXxPNRUuQ+ZiYXeBX7dU6hVkyGBh31c5a7BR96vW3T8KItk/gqxyWiJS6oL9538/YYrORB3WnXib97q1Kennfu0MRdcfYMkvgGSPgHV68DhhUM2wmwZrmjYV4NegUpwNPi0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NQV2lLT8; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723457854;
+	s=mimecast20190719; t=1723458090;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=lVcqCYPpo9W+fFj+K5rl8msH5Np6HFRkYMqj7Uwzb6g=;
-	b=BCSmfl3V/gEhytK658XsX/BY4mnItmKtOCWZbOrtkiUrzWEWFF56FoP7uqPlQ2x6nuBDFL
-	1h+s3QJ5tfZCRwp9yS7YoM2D3B1FdfUqEb7raV8lQ/7bqe/SNFwl928N3/ITAFtcrIBINs
-	Bvuyhgj0U9AMdE6LqooctFw6UcfMjOU=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=gyJDd+GXnuxBnd4cSdoB2aJ+H6UcavMzMJL5XfuHTfc=;
+	b=NQV2lLT8t8GpnWdKrog+BHI08g2S1zTTU0vy1YTUW72uo9ETAq2dgy8ikIymeFTkYo6ZUG
+	m1QSKrnlXWEX+MOg1/1XGjoCJVA6WnwdS4cMxgOIGalq+FsGPChpXCXQv0IZFE8I6tgyIK
+	AR5gmSilVaed9lnTNLnk3fIVRXslCas=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-629-htUE0ArdPLCvzZad9sv_lA-1; Mon, 12 Aug 2024 06:17:31 -0400
-X-MC-Unique: htUE0ArdPLCvzZad9sv_lA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-427b7a2052bso49410675e9.2
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 03:17:31 -0700 (PDT)
+ us-mta-290-6lS1W578PT6bJ9LTc6IaqQ-1; Mon, 12 Aug 2024 06:21:29 -0400
+X-MC-Unique: 6lS1W578PT6bJ9LTc6IaqQ-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3687eca5980so2066885f8f.0
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 03:21:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723457850; x=1724062650;
+        d=1e100.net; s=20230601; t=1723458088; x=1724062888;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=lVcqCYPpo9W+fFj+K5rl8msH5Np6HFRkYMqj7Uwzb6g=;
-        b=ouvtz57MvZFa7m5jPECNbtqcbWoXhAscEuAtmFeNdvEhD67pwCCJRuAuQlbWZ1+sLY
-         2ahBXf70yMS9e2lqVnjvox12/t1ROvHtUzTJFnAu2cHm/gtN17rJsL/IzyktdzneE5vf
-         hMr8B0dd6Q6f0IFXSVc7mJMZR0EyArbJseD5oxTYx1/qHvMnMhjWdL7sWdz/M6R+CO/F
-         sezP98Dz15vqYjbNbnZjiE3LyAgnQbKn2dOaZflF3PntRHBS4LUY3ThN/GJbRTyLytRW
-         3e//OGBn/3/CF8XbPgGRxsxUNgNEl7E6Vp3sXapXeVD7LwDpK+MUqvdvk0ssvPDUlvDy
-         I1Jg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHEriLm6hxOpm56+/Ms+vvPtuiEZuSncU4h8jovQotUq61WmtmHP2JqZZgJ0FQyylIEekhkK9d5dKZl6d0k0+L/hR/
-X-Gm-Message-State: AOJu0YyKQoDMcF/MVcUR9illoO7l2XBPQnE5bI6spJDHpz8K2I04/Mw+
-	taHL8jYcH5jnpMeCWZXcjztgKJ0uVZMsjD57q4AAt2yTcfUZ6THYKHX9rKz1qxXpWNyhjGr7ivA
-	vxgbeEErDLQjaDdQfwZaNAzfbVdKReDCiGSvCU5nzk51Yr7zZPg==
-X-Received: by 2002:a05:600c:a48:b0:428:fcb:962 with SMTP id 5b1f17b1804b1-429c3a5c30fmr69153485e9.36.1723457850094;
-        Mon, 12 Aug 2024 03:17:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IH9KaVH/YQWzNv+camNIPrJrOZ2kXGpngJmHnV3vUr3/NqX5jpx3SkoLO+uMuWYwLmMrltXnQ==
-X-Received: by 2002:a05:600c:a48:b0:428:fcb:962 with SMTP id 5b1f17b1804b1-429c3a5c30fmr69153255e9.36.1723457849535;
-        Mon, 12 Aug 2024 03:17:29 -0700 (PDT)
+        bh=gyJDd+GXnuxBnd4cSdoB2aJ+H6UcavMzMJL5XfuHTfc=;
+        b=fkN7NbVFrZ4HaZHwQ5mDwbmQYd6VdZQp0KoaUvAWY7RGwQGXCQLoObw6a11n2PWsab
+         a9NxiUZ3FOQMdqlPgLHnQS5aBM3oZ7KA146xwiICWoV3nVQ546uTCMEcAoqspaW9IZ9L
+         yuWDwklgCTvrCLtb5gYrruCYWnoEm2WXDl5YGj6hmepZj5PqxTcTn0Oe9XCjOgxaKfSX
+         SXZunNvFuryr5+C2lwvrvw2qTpiVvCLHE5cc7VUkDCpqq+SwvAByCgJaApyhxPPFuhvb
+         XIhWpjlq0PjDpFagFHQrIe95Q2NpuzpRdpJxju+vxFYgOtlTdq0cEbSEK2zG4yovEj04
+         JEag==
+X-Forwarded-Encrypted: i=1; AJvYcCWuzKaHwTdCbfDxzjXH7GO1tMDpVbE5ycf0xoWdYfTPwYxLMD5d4u7XLcFwJquY5mlSBQI/TPy46INk5e3WEalIzz1U
+X-Gm-Message-State: AOJu0Yw+uIFoKFuA7O9s0BKlMZ4vu8wwaKEqXf5VMIl5vraEKamE/YHy
+	JkhhTe8lWcESg9E8lK4ueoRUYt7AtbiG44Rel9u9mq4zSgzYGqo7LGDon7CErAPAACmHdpDp6kU
+	yrmiShfvRqHqfg5JBZGA35V2VwUJG8a6M8T+Vkj11jcWkHq0XIA==
+X-Received: by 2002:a5d:5225:0:b0:367:8875:dd4c with SMTP id ffacd0b85a97d-36d5fb92e41mr5613121f8f.23.1723458088047;
+        Mon, 12 Aug 2024 03:21:28 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFzwRiis6oW8sn3ZC9pWSrEURbWVTth+3DWBBECscEQmVNpESGSCXjc3w1jq320tNn7VsbXJg==
+X-Received: by 2002:a5d:5225:0:b0:367:8875:dd4c with SMTP id ffacd0b85a97d-36d5fb92e41mr5613093f8f.23.1723458087581;
+        Mon, 12 Aug 2024 03:21:27 -0700 (PDT)
 Received: from [192.168.0.6] (ip-109-43-178-125.web.vodafone.de. [109.43.178.125])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429c751b021sm97414005e9.21.2024.08.12.03.17.27
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e48c784basm7153521f8f.0.2024.08.12.03.21.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 12 Aug 2024 03:17:29 -0700 (PDT)
-Message-ID: <1f645137-c621-4fa3-ace0-415087267a7b@redhat.com>
-Date: Mon, 12 Aug 2024 12:17:27 +0200
+        Mon, 12 Aug 2024 03:21:27 -0700 (PDT)
+Message-ID: <0658b06b-024e-484c-861d-1b1ef3ce7888@redhat.com>
+Date: Mon, 12 Aug 2024 12:21:24 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -83,8 +83,7 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 9/9] Avocado tests: allow for parallel execution of
- tests
+Subject: Re: [PATCH v2 2/9] tests/avocado: apply proper skipUnless decorator
 To: Cleber Rosa <crosa@redhat.com>, qemu-devel@nongnu.org
 Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
  Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>,
@@ -106,7 +105,7 @@ Cc: Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>,
  =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
  Leif Lindholm <quic_llindhol@quicinc.com>
 References: <20240806173119.582857-1-crosa@redhat.com>
- <20240806173119.582857-10-crosa@redhat.com>
+ <20240806173119.582857-3-crosa@redhat.com>
 From: Thomas Huth <thuth@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=thuth@redhat.com; keydata=
@@ -151,63 +150,31 @@ Autocrypt: addr=thuth@redhat.com; keydata=
  oiT+z+/E59qj/EKfyce3sbC9XLjXv3mHMrq1tKX4G7IJGnS989E/fg6crv6NHae9Ckm7+lSs
  IQu4bBP2GxiRQ+NV3iV/KU3ebMRzqIC//DCOxzQNFNJAKldPe/bKZMCxEqtVoRkuJtNdp/5a
  yXFZ6TfE1hGKrDBYAm4vrnZ4CXFSBDllL59cFFOJCkn4Xboj/aVxxJxF30bn
-In-Reply-To: <20240806173119.582857-10-crosa@redhat.com>
+In-Reply-To: <20240806173119.582857-3-crosa@redhat.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 06/08/2024 19.31, Cleber Rosa wrote:
-> The updated Avocado version allows for the execution of tests in
-> parallel.
-> 
-> While on a CI environment it may not be a good idea to increase the
-> parallelization level in a single runner, developers may leverage that
-> on specific CI runners or on their development environments.
-> 
-> This also multiplies the timeout for each test accordingly.  The
-> reason is that more concurrency can lead to less resources, and less
-> resources can lead to some specific tests taking longer to complete
-> and then time out.  The timeout factor being used here is very
-> conservative (being equal to the amount of parallel tasks).  The worst
-> this possibly oversized timeout value can do is making users wait a
-> bit longer for the job to finish if a test hangs.
-> 
-> Overall, users can expect a much quicker turnaround on most systems
-> with a value such as 8 on a 12 core machine.
+> Commit 9b45cc993 added many cases of skipUnless for the sake of
+> organizing flaky tests.  But, Python decorators *must* follow what
+
+s/follow/directly precede/ ?
+
+Apart from that:
+Reviewed-by: Thomas Huth <thuth@redhat.com>
+
+> they decorate, so the newlines added should *not* exist there.
 > 
 > Signed-off-by: Cleber Rosa <crosa@redhat.com>
 > ---
-...
-> diff --git a/tests/Makefile.include b/tests/Makefile.include
-> index 537804d101..545b5155f9 100644
-> --- a/tests/Makefile.include
-> +++ b/tests/Makefile.include
-> @@ -94,6 +94,9 @@ TESTS_RESULTS_DIR=$(BUILD_DIR)/tests/results
->   ifndef AVOCADO_TESTS
->   	AVOCADO_TESTS=tests/avocado
->   endif
-> +ifndef AVOCADO_PARALLEL
-> +	AVOCADO_PARALLEL=1
-> +endif
->   # Controls the output generated by Avocado when running tests.
->   # Any number of command separated loggers are accepted.  For more
->   # information please refer to "avocado --help".
-> @@ -141,7 +144,8 @@ check-avocado: check-venv $(TESTS_RESULTS_DIR) get-vm-images
->               --show=$(AVOCADO_SHOW) run --job-results-dir=$(TESTS_RESULTS_DIR) \
->               $(if $(AVOCADO_TAGS),, --filter-by-tags-include-empty \
->   			--filter-by-tags-include-empty-key) \
-> -            $(AVOCADO_CMDLINE_TAGS) --max-parallel-tasks=1 \
-> +            $(AVOCADO_CMDLINE_TAGS) --max-parallel-tasks=$(AVOCADO_PARALLEL) \
-> +			-p timeout_factor=$(AVOCADO_PARALLEL) \
->               $(if $(GITLAB_CI),,--failfast) $(AVOCADO_TESTS), \
->               "AVOCADO", "tests/avocado")
-
-I think it was nicer in the previous attempt to bump the avocado version:
-
-https://gitlab.com/qemu-project/qemu/-/commit/ec5ffa0056389c3c10ea2de1e783
-
-This re-used the "-j" option from "make", so you could do "make -j$(nproc) 
-check-avocado" just like with the other "check" targets.
-
-  Thomas
+>   tests/avocado/boot_linux_console.py | 1 -
+>   tests/avocado/intel_iommu.py        | 1 -
+>   tests/avocado/linux_initrd.py       | 1 -
+>   tests/avocado/machine_aspeed.py     | 2 --
+>   tests/avocado/machine_mips_malta.py | 2 --
+>   tests/avocado/machine_rx_gdbsim.py  | 2 --
+>   tests/avocado/reverse_debugging.py  | 4 ----
+>   tests/avocado/smmu.py               | 1 -
+>   8 files changed, 14 deletions(-)
 
 
