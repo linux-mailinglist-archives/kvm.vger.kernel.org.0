@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-23887-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23888-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C976294F92E
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 23:54:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8661994F930
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 23:59:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53354B22550
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 21:54:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4396B283393
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 21:59:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C61195F04;
-	Mon, 12 Aug 2024 21:54:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C61C196D8F;
+	Mon, 12 Aug 2024 21:59:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K6sJK8QD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CnWqPKo/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A7B1586D3
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 21:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22291586D3
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 21:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723499640; cv=none; b=mHok9+m71fin5RHMJoPSFbpuqoCnD3sybLCoAxxGooWJEeAAK3xofXgj8xpkYRk2EZi8oQyBAogr0VyNpocGsxSgkbGkuaQUy+PuVt0UDwKBhYAELQbkfy9nogvtvR3G9U0lKz/rxAXwVUynX2FC3Z6q9ywE2J5R3RouIJ1lQWA=
+	t=1723499957; cv=none; b=OOEXy7+sXft5jp/TT9aICwxT4xSKNCOsFUpXCPRcPd5iqeu5KzIpC2KZEeqVrbdvV7olJJ85GzpmcOwM/BbdhxK/CVdhK2EoD/v+pJ33ipmtcMscnvmpCv7ltKoM3UzuOoUjU/YaT8yv6bLpk9uuJIq38Dn7x+u0m5lGsxI5AS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723499640; c=relaxed/simple;
-	bh=iFb81utD+kxg5AVUC9OJqvlmXZarFcIDLBfi3Zt5x5M=;
+	s=arc-20240116; t=1723499957; c=relaxed/simple;
+	bh=eaEm1/G9eIZ0Ax/mETbWHt8Rk/ajLxiS3U/lBhO6fr8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IoBd/RzFB/R4BavwZNYZ2+v1cC1EkV9w4s4coETHuxR/cCEyPB2lL+8KurXgMoXt46w1pDCXgiDFfMJEXtS5nfkn1Xdt8+NWa2dkWAFRzeLaNtEatsrfHgeXxXo8TXr5hUvksbFTFjySqADXp01WY+6sVjWqvjDj1nJ/LPFAw2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K6sJK8QD; arc=none smtp.client-ip=209.85.221.51
+	 To:Cc:Content-Type; b=GQYaHQIQw0yqpcu6FSqQFVZeJubwUfeyOqYWjuKfJXlBXqSm4KQAqo6T/reEWWjriXvKpUvRPPu6wbt9Pu+sbAVODWsOuJEee/mftA5Cv51DidOIvrW0rbHS8Glan9b3hwZp2jHz/N+txhaG4OhD3O2Osrl+eezcakKT0B7PWoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CnWqPKo/; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-36bd70f6522so2635977f8f.1
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 14:53:58 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4281ca54fd3so36881785e9.2
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 14:59:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723499637; x=1724104437; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723499954; x=1724104754; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=imKlkkFUg+JvJB0nb5f6d/5Hvt3G5KlID+hC9c1+ZW0=;
-        b=K6sJK8QDL4qjeVSaQ98zRvHUjHiN2oBZhzJS4pTe+STiY298GQXaiBErY9YcBxrxH3
-         +9eJqlSeF6DdHM3wqeSXvdm95aufpCiklX4WeZs0wyuQx4ZnSnhi5kdaRTSDu05Cychg
-         l38RL+tZioqSDsTjKBO2ADb4HvsMFmqXBC0CSgrJa3jlx5Tc5/ZhrZ+mY4e1R69EZmS5
-         zhmP6ikv1lQWyq3dtD5kdtJwosRlkQDaNdZWZR1BpfrGMQ8g4dfB8SNjzKCACqMnsUhF
-         rk6xz1lyjhvcm6uhJLadUOfYi8uKrh4497+JTY7YuvCD96FwpuZkmDjEcSMUdloPwvkm
-         YT4w==
+        bh=32AKu6esuiq7RMdqH+zKe95PkUgMqLZi/1g6Bq3g66I=;
+        b=CnWqPKo/lWWpGiwDnYV/zyNjUcI+LwUyunJkI9R+K7v6P99fskHtR/NYR2h59z9o7d
+         ufpZueXApsfxaetR9X/ASIk67RjVySVkPwcUCjHKNbiHRXqeXkosYVbMm5n3TQGrLDYD
+         80wOajMfZB2jxB2ip7tMTnUNDAaw8J8jM2oLNOp2Fw+hYmPmgbHS5DU+dLuz4AYpxq5h
+         fOkoQU/841bXk2V0s0QCuUPJ1PS1/LnxhWoFOF5m3FnZD4LP/3AXxii2gKC1pbsIfrzu
+         80DtRPEbLwnbi4FTGyTFNGq6B9NQqlwNAZ8tRUXxDImeiIr8x7HOHY32gbD2RvDEkzxl
+         W9/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723499637; x=1724104437;
+        d=1e100.net; s=20230601; t=1723499954; x=1724104754;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=imKlkkFUg+JvJB0nb5f6d/5Hvt3G5KlID+hC9c1+ZW0=;
-        b=f3rVWgsnfQE0Ck83gOmvQLZr/jyr2nY7xi4JjnLj/Z4EbP9djJEJOmUkjoArOAfRfb
-         qOBfY+dgfal0a6ALN4F0wxa87ucf+3zIa0mDFjhxuOdhFD/NQ0lUg+Ae5EHqqhLtqX1N
-         5183k/+Z1dem4LVjyy9rXIN4qP0n1IxcYJorzfeubbfLqW7bDxFDv3C6KOt80nRG5OqE
-         /oDwspm6vjlPkUgLe2BXrT7GdMUJMEDyauayPU9qT36I8nelQDeZbf8jDG8zzo68M4VJ
-         EOMBaHFzulkbzFHjF7NodNPh8mEkVDh2tL+nZTL3IJawEDszLTaX2q1yxQC/gXZ0LTMv
-         V/Cg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6/3mtoCwMaHxuoKWxpHabFJrURAIb4IVaGY0z0YSdNUxoSqK1abSY54G9nemequR6Enpb4TtqNat9J2CIPkP0Ib2y
-X-Gm-Message-State: AOJu0YwRKMKDS4MVfelspo/YqQBh1WQeexOuut1QSrufDs78iy+GaCDx
-	wWRrsKF5ZPkS3ZYJc+SIVkqW+oPL9JPH89iRvPnLZn6GE5FA90HSR5BurmUmmyNQwfft59CzK6W
-	8Gk15+OYyZeeA/AtdZU4Aw2+1jVwXy5Zvd55A
-X-Google-Smtp-Source: AGHT+IEq9Z3A8c6NJnVvf2RQgYE7P88YKMQaUxK73bXmj83aH6DHf5GTXyarL8Mu9mgSiyFTWmwXtiXjB7rGW2BOKIM=
-X-Received: by 2002:a05:6000:1842:b0:368:4bc0:9210 with SMTP id
- ffacd0b85a97d-3716ccf39e2mr1378800f8f.25.1723499637114; Mon, 12 Aug 2024
- 14:53:57 -0700 (PDT)
+        bh=32AKu6esuiq7RMdqH+zKe95PkUgMqLZi/1g6Bq3g66I=;
+        b=tKC34mtvh9CrbwYOD1xMm0w11lRN75YhwrYkUGUlXfUlqo7CWMEyX66evqKCovYRyV
+         6zxSo/zxxkEQwCt/VGaRiCnMNcGa6F5EXP10UjwzBl8+aPfpqub6DjglELZ6GHlG+emJ
+         lnOgLDeZ91FRFQ/BUI3heWzyzM9oHmQ7GLwZ5wMghkPJYbssVrSgjYpoC4HN+9WWwKWz
+         RnXqB80LkLHSIEEjDZTAwGpnJ3uiiwk+Sfz61NdoBw+QZgkUFShD29qy8512tnRYAE4S
+         b4FUdURnYYD8CKZGPIHWHRr8QuSAAHGfFELYO9pUKRDqnNDS5f4Y8SWdGuQj8/EwIQH7
+         AJAA==
+X-Forwarded-Encrypted: i=1; AJvYcCWlqueZgB52/NYXAJAAeSGL6rc69V58HcR3ouMtGaEugB5sFgjxt3GyJBLlpQJObbpTkRY4ju7a9kumdKw+mJVVLDi8
+X-Gm-Message-State: AOJu0YxLbggMrQIZy2/xe9w2P8IIrI73g57T9Wa0r5WORDeJ3CpXBMWp
+	taw/aYm2ysvPlFhYtXvK7uPXTdcUbqBcOWtEVKOFz/NcyWAAvNQVBiXUdZ/zXHBb+7jpDCdL1Y6
+	txU8JTNdq67CoBNE2oIa/nDc3FCH1DrFcJPWi
+X-Google-Smtp-Source: AGHT+IGpQR4kIRSOioBB8aRbn1/lCXeqn51RFDvtwpsOfR0VW8YdEmHVWS2iLr5ZLie1AWw0fBCU3Rz+Gpvuy8h0Fn8=
+X-Received: by 2002:a05:600c:4f46:b0:426:50e1:ea6e with SMTP id
+ 5b1f17b1804b1-429d4818767mr14511085e9.18.1723499953689; Mon, 12 Aug 2024
+ 14:59:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,10 +72,11 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-15-seanjc@google.com>
-In-Reply-To: <20240809194335.1726916-15-seanjc@google.com>
+ <CALzav=cYv4ZqD5q6-hP=WN8gYFxt7xYKCTm8dLaGtjk-kmCy=w@mail.gmail.com>
+In-Reply-To: <CALzav=cYv4ZqD5q6-hP=WN8gYFxt7xYKCTm8dLaGtjk-kmCy=w@mail.gmail.com>
 From: David Matlack <dmatlack@google.com>
-Date: Mon, 12 Aug 2024 14:53:29 -0700
-Message-ID: <CALzav=cYv4ZqD5q6-hP=WN8gYFxt7xYKCTm8dLaGtjk-kmCy=w@mail.gmail.com>
+Date: Mon, 12 Aug 2024 14:58:47 -0700
+Message-ID: <CALzav=fPS3Q43tq74Le754EvxboCvW--TMKWES3e2z=kjV+0cg@mail.gmail.com>
 Subject: Re: [PATCH 14/22] KVM: x86/mmu: Morph kvm_handle_gfn_range() into an
  aging specific helper
 To: Sean Christopherson <seanjc@google.com>
@@ -85,34 +86,39 @@ Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 9, 2024 at 12:48=E2=80=AFPM Sean Christopherson <seanjc@google.=
-com> wrote:
+On Mon, Aug 12, 2024 at 2:53=E2=80=AFPM David Matlack <dmatlack@google.com>=
+ wrote:
 >
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 0a33857d668a..88b656a1453d 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> +static bool kvm_rmap_age_gfn_range(struct kvm *kvm,
-> +                                  struct kvm_gfn_range *range, bool test=
-_only)
-> +{
-> +       struct slot_rmap_walk_iterator iterator;
-> +       struct rmap_iterator iter;
-> +       bool young =3D false;
-> +       u64 *sptep;
-> +
-> +       for_each_slot_rmap_range(range->slot, PG_LEVEL_4K, KVM_MAX_HUGEPA=
-GE_LEVEL,
-> +                                range->start, range->end - 1, &iterator)=
- {
-> +               for_each_rmap_spte(iterator.rmap, &iter, sptep) {
-> +                       if (test_only && is_accessed_spte(*sptep))
-> +                               return true;
-> +
-> +                       young =3D mmu_spte_age(sptep);
+> On Fri, Aug 9, 2024 at 12:48=E2=80=AFPM Sean Christopherson <seanjc@googl=
+e.com> wrote:
+> >
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 0a33857d668a..88b656a1453d 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > +static bool kvm_rmap_age_gfn_range(struct kvm *kvm,
+> > +                                  struct kvm_gfn_range *range, bool te=
+st_only)
+> > +{
+> > +       struct slot_rmap_walk_iterator iterator;
+> > +       struct rmap_iterator iter;
+> > +       bool young =3D false;
+> > +       u64 *sptep;
+> > +
+> > +       for_each_slot_rmap_range(range->slot, PG_LEVEL_4K, KVM_MAX_HUGE=
+PAGE_LEVEL,
+> > +                                range->start, range->end - 1, &iterato=
+r) {
+> > +               for_each_rmap_spte(iterator.rmap, &iter, sptep) {
+> > +                       if (test_only && is_accessed_spte(*sptep))
+> > +                               return true;
+> > +
+> > +                       young =3D mmu_spte_age(sptep);
+>
+> It's jarring to see that mmu_spte_age() can get called in the
+> test_only case, even though I think the code is technically correct
+> (it will only be called if !is_accessed_spte() in which case
+> mmu_spte_age() will do nothing).
 
-It's jarring to see that mmu_spte_age() can get called in the
-test_only case, even though I think the code is technically correct
-(it will only be called if !is_accessed_spte() in which case
-mmu_spte_age() will do nothing).
+Nevermind, I see this is cleaned up in the following patch.
 
