@@ -1,90 +1,99 @@
-Return-Path: <kvm+bounces-23852-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23853-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD1C794EE9C
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 15:46:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B83E894EEF3
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 15:56:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 581A01F22816
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 13:46:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75F01283948
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 13:56:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93D117E47A;
-	Mon, 12 Aug 2024 13:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E73049647;
+	Mon, 12 Aug 2024 13:54:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Te8KoT86"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="teIZL9RY"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422E817E44A
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 13:45:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33C0516E89B
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 13:54:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723470325; cv=none; b=BLoI+7u2fSTLCD6Q44/cF568XDGsyLFQ8OrpsOOyHJv+LgWQb7RKAYNdZSyT5vo001zIwLZx0rvLgFL1Sd65znH9ZEGlk2OqFubIse7p0NfWVburT3gNvXd8f/9Wr8+pvXffjzPKV0B5NzmyZN8MkLCUyIiiAGOoD518CuSqlyI=
+	t=1723470852; cv=none; b=AmH9LMt84R9Ib5l9pXFcNAlbNFLOKzhM1zRajlupW58o1ZRg88cW3vQwM8Y+26W10f5Em6lrfQWV0QULy1lZRRTlKXj489UckqeCJ5CRKfLLgE8JpTxo9fjMnOKbPCe9wejx+9pRwnJ1hduATFI6xgGty2/bSp84oprT8V01Y8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723470325; c=relaxed/simple;
-	bh=lhF3pTH4I8xK/IBvlxVSscLk3/iBHjh5SV8iq7IJ+oA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mybejx36RTAeUNuF61cLQKMz5aPr56ESIaAO7vBqHX7D3A68+KKXhXMJSd8koUml3qYqF8bSF90dhqJJnRGSLJdXX2yQWBMdT6ehKC9IbLYhhVAY+12K/vcK3FkJ8xF7jyoXuTDUXQA/EnmpvjZwFCXGPNOrT/A4ri1KRwhje4E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Te8KoT86; arc=none smtp.client-ip=95.215.58.187
+	s=arc-20240116; t=1723470852; c=relaxed/simple;
+	bh=95m+tqYcnE0XlSJuLNhY+/gac1K9gx6tKJESX32oEIo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sOUQrf6Gkn01Y+StWvFLsuCT6C9lRoU3IHh+RvhdOaA1HH5TiFnQWdkYPXSHfwwLeYQS+avM0sSFWGDotRu1siTD+Ysz6+z3kG6WFvCUDyX9jASD8xEUZPCrTTPBsZgnJrT4dmYDEM4t9+flczjgm4Ws+qHl+eBGyuYcSuaZMhk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=teIZL9RY; arc=none smtp.client-ip=91.218.175.185
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+Date: Mon, 12 Aug 2024 15:53:58 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723470321;
+	t=1723470848;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=7vPIBP2a9yupeSh/dTtIjIhVHAEaR6O7IF7oJLTZlss=;
-	b=Te8KoT86Agc628rl3kVeA7m0vcuzoOnAkLe+eT0X9RfwGXM+2ahGGIRm5G5DrGs1L6RxhQ
-	CREKtkAZUXw7/fVeT1PWOx+P6UqTdVzFDwQEgfWry4DntLi52iecwvTQCp8tJZhKI0Fvqa
-	z0YeeqzKC3OCmcBqsCiMzO0fzFXml1I=
+	bh=+HlaHYBFzlVH6FzjV5qgulRj5J5LLSvjH+FLRM4vdBE=;
+	b=teIZL9RYjPZFpzjLsH+ymKTAGaC0wWO39ees3//eNJm07HDbSIeh/mDRmcL1499MzSZdHS
+	pERALs0oC4qKcz5BI1RD5S9wVrRsovS2HRfvV+L+HoOTKc4WTOSGE9ZuswKMcigGH35DeA
+	0MUrK+KSFc63ZNa1W9ZtocYrbxweaks=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org
-Cc: atishp@rivosinc.com,
-	cade.richard@berkeley.edu,
-	jamestiotio@gmail.com
-Subject: [kvm-unit-tests PATCH v2 7/7] riscv: mmu: Ensure order of PTE update and sfence
-Date: Mon, 12 Aug 2024 15:44:59 +0200
-Message-ID: <20240812134451.112498-16-andrew.jones@linux.dev>
-In-Reply-To: <20240812134451.112498-9-andrew.jones@linux.dev>
-References: <20240812134451.112498-9-andrew.jones@linux.dev>
+To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
+Cc: pbonzini@redhat.com, thuth@redhat.com, atishp@rivosinc.com, 
+	cade.richard@berkeley.edu, jamestiotio@gmail.com
+Subject: Re: [kvm-unit-tests PATCH v2 0/4] riscv: Extend CI
+Message-ID: <20240812-e97009553ee2983da3448575@orel>
+References: <20240808154223.79686-6-andrew.jones@linux.dev>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240808154223.79686-6-andrew.jones@linux.dev>
 X-Migadu-Flow: FLOW_OUT
 
-Use WRITE_ONCE to ensure the compiler won't order the page table
-write after the TLB flush.
+On Thu, Aug 08, 2024 at 05:42:24PM GMT, Andrew Jones wrote:
+> So far we were only building and testing 64-bit, non-efi in the CI for
+> riscv. I had mistakenly thought Fedora's riscv compiler could only build
+> 64-bit, but it's multilib so we just need to add some CFLAGS to get it
+> to work. To preserve building with a 32-bit-only riscv compiler we need
+> to introduce limits.h to our tiny libc. And, while adding 32-bit builds
+> to CI we also add EFI builds so now we test 32-bit, 64-bit, and 64-bit
+> EFI. And, since Fedora has been udpated, bringing in a later QEMU, we
+> can now do the testing with the 'max' cpu type.
+> 
+> v2:
+>  - *Actually* test out-of-tree builds in the rv32 CI (I was missing
+>    a few important lines, like 'cd build'...
+>  - Add another patch to fix out-of-tree builds for riscv
+>  - Added some indentation in the new limits.h
+> 
+> Andrew Jones (4):
+>   lib: Add limits.h
+>   riscv: Build with explicit ABI
+>   riscv: Fix out-of-tree builds
+>   riscv: Extend gitlab CI
+> 
+>  .gitlab-ci.yml | 36 +++++++++++++++++++++++++++++++-----
+>  configure      |  8 ++++++--
+>  lib/limits.h   | 43 +++++++++++++++++++++++++++++++++++++++++++
+>  riscv/Makefile | 12 +++++++-----
+>  4 files changed, 87 insertions(+), 12 deletions(-)
+>  create mode 100644 lib/limits.h
+> 
+> -- 
+> 2.45.2
+>
 
-Signed-off-by: Andrew Jones <andrew.jones@linux.dev>
----
- lib/riscv/mmu.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Queued on riscv/queue, https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv%2Fqueue
 
-diff --git a/lib/riscv/mmu.c b/lib/riscv/mmu.c
-index ce49e67be84b..577c66aa77ba 100644
---- a/lib/riscv/mmu.c
-+++ b/lib/riscv/mmu.c
-@@ -64,7 +64,8 @@ static pteval_t *__install_page(pgd_t *pgtable, phys_addr_t paddr,
- 	assert(!(ppn & ~PTE_PPN));
- 
- 	ptep = get_pte(pgtable, vaddr);
--	*ptep = __pte(pte | pgprot_val(prot) | _PAGE_PRESENT | _PAGE_ACCESSED | _PAGE_DIRTY);
-+	pte |= pgprot_val(prot) | _PAGE_PRESENT | _PAGE_ACCESSED | _PAGE_DIRTY;
-+	WRITE_ONCE(*ptep, __pte(pte));
- 
- 	if (flush)
- 		local_flush_tlb_page(vaddr);
--- 
-2.45.2
-
+drew
 
