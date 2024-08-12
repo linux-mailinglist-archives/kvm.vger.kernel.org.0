@@ -1,256 +1,265 @@
-Return-Path: <kvm+bounces-23876-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23877-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F7F194F662
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 20:13:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0501494F6C1
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 20:32:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDE6B1F21C91
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 18:13:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29BE91C211DF
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 18:32:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BA718DF6C;
-	Mon, 12 Aug 2024 18:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3789A1917CD;
+	Mon, 12 Aug 2024 18:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qi9aIuwq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HSbIYrXX"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB144189BA2
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 18:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C782178381
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 18:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723486360; cv=none; b=VkbM3aPMDvfEIVnLay16grcZVQJdgI7gLwXeDLCqY4slF+v6NeSudCnkSompBWW+sVHxcDPIlGaIP73h63s7E0wo+77wSyLZnu+WNlkPXCjSeuhZGugGp7b1PexBu24dSWLP2/ZVipDAD54AgZZmpBNTGzl3lGK3CsaA8pIW2cs=
+	t=1723487456; cv=none; b=a+3psXhjpr1iRDfOYclGHo0vPRFJsq6pq78f57O2b86uuUowiBjTYm1SwtGFLDHqZdUOc3XfwzJIZCTlHH9QMjiLynETne1jr/v9lvvMVBuMjnOq76XLKX2BB5WOnNJSPhUHvR6OVVMDltl7KVcXYSv2To89Yl5v4LeDpcRrmOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723486360; c=relaxed/simple;
-	bh=7RUkptmdOEoTaWI5G/XfwfT/YiV+5T3HhVmyBbiSmpw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CIWwla8CuHoWDiU86XEpe4WA7QXAfghjfHlvtrNe4Y4Vms9rILrDK5OQqVF6gtb33k7BKUkybXitXC9XXISbHEjDkkoXsZAeMsMMQKYgXxzkgzIGokl6xitPj/fLNMwERPmk2nTObKwejkFFFOp56si6G9kWKxmcIZB9OUTn8ro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qi9aIuwq; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1723487456; c=relaxed/simple;
+	bh=Zn57kG3fHkqhYjr0Vb+8fA7GL+EkzEs46JqrGXATWlA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N+mvDVoxKWb1jCLCEKXe4y6PvdMQl5fyD74DjDFmH0YI2h+Mv0pR5QYvYUfIws5azWY2CjbvAiX5vSia1DDSjYYIGVM6VVOeSsBNNydMaz2GUmd8fNpnim6aTF7Sca49s4p7VcqMiFcwdQgkC/o+70ilp27iS55GHLpD2YfLvm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HSbIYrXX; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723486355;
+	s=mimecast20190719; t=1723487453;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6aC2RF+//p0GJfjgH/iZrlW9ATLJl4mVfe8Rdc4jHgk=;
-	b=Qi9aIuwqKpGRlW5RGVCo3ruUU1VS4IfUwpQD+Sc4JDThAlfE5GQZfIQ/UqEpl/f1/oJ7qH
-	A4OBnPqf6+H8kc2vlr8nvCKatGSTI74WvW5p56Gw/T4VZgnaAZuJ4cg4asuZuXawKKgY2L
-	KFiLRBrUcc7Q/Es/0ht3m83ewSPP1xc=
-Received: from mail-ot1-f71.google.com (mail-ot1-f71.google.com
- [209.85.210.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3lzHa+4oPgNh0JbtSfXdnixp3cbcHkW2yBVpxgt+hHU=;
+	b=HSbIYrXXHZz5UpHxJGGfI2PxN9cXnnpwA1Jx+j927VyzmWqkhIRO3SKbPHH+z1DIbn6bHD
+	53bsaRRdXX/Lo4jAIIIucyZBNkIRQSMVd3m68douih8byMhRDViql85iF01ziSOFxokqkc
+	jMidpDzksFDbI3SHmGowXMt9u3uLRKk=
+Received: from mail-vs1-f70.google.com (mail-vs1-f70.google.com
+ [209.85.217.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-117-iSLAp6YyOEuwebSCQUTZlQ-1; Mon, 12 Aug 2024 14:12:34 -0400
-X-MC-Unique: iSLAp6YyOEuwebSCQUTZlQ-1
-Received: by mail-ot1-f71.google.com with SMTP id 46e09a7af769-7093f4569b3so148704a34.1
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 11:12:34 -0700 (PDT)
+ us-mta-33-5YcEkiwENRGsouL01FjfQQ-1; Mon, 12 Aug 2024 14:29:52 -0400
+X-MC-Unique: 5YcEkiwENRGsouL01FjfQQ-1
+Received: by mail-vs1-f70.google.com with SMTP id ada2fe7eead31-49291c389b9so195883137.2
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 11:29:51 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723486354; x=1724091154;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6aC2RF+//p0GJfjgH/iZrlW9ATLJl4mVfe8Rdc4jHgk=;
-        b=HJ8Y+v7UtbPz19bAwQkRUQcB6hMHvEt/WYhoZ3XLn8QK2UtTBQkKWp00Mo/bqAcmZb
-         qcOFG6Wj+2DLBv8tgmpbNkZAUgHtsy4KYdCK1H6p6e3CASF9Cj1sVCLj95LXdH6ruhCy
-         KctgHI8GP+xVQ1PitDRtTw2kCn56lyBAT85MBK/6rZP3XhhbbC1I7/6Eq84k7tHKD+vO
-         ZiIRYEuMW9mdZALnnMX+8PUN2mN7tv55ILLYxLueDnf2QD1Rnsss1JvMw9Vp04NScrnu
-         1LSyZBrRv3kUKv86ZVuQ4y5xhNzl8an05M/p4lk3Dlm2LXZYy/bMHfqvtbcPcM/NlVU9
-         g5BA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbhtftq8oXSF3n7kXITpUkl6pMGBHxpoMQ8JoEdhf+s0VuOh1Vsk2TpHQ0jSi6I1zB8RcQmprPg2su5SZljrOxP82S
-X-Gm-Message-State: AOJu0YyGWFs4U2MDBoktU35CZn27weXVYTDgFT1g8Qlo6sGQkyAANiHi
-	kbuAHV7eNKnH7v9B2Te10BPXY5kMXWoYFy0D6s9SjmMpNUuPPgcIp5nFQ7tKEbocAVJqqVVFisH
-	L1jx38ji+U04StuRNX75Kqo9/Q8fiqGEr4mrzGPjwbC2kC+roLQ==
-X-Received: by 2002:a05:6358:d25:b0:1ac:a26c:a07a with SMTP id e5c5f4694b2df-1b1a02f2896mr3255d.4.1723486353703;
-        Mon, 12 Aug 2024 11:12:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFKB0h9tqBDznq7jPudw+rKB1F4j/lDBjBP5vz8Ij/mXfeVHheDU0KW5XKnOwJHdaPAJFxqTQ==
-X-Received: by 2002:a05:6358:d25:b0:1ac:a26c:a07a with SMTP id e5c5f4694b2df-1b1a02f2896mr2555d.4.1723486353186;
-        Mon, 12 Aug 2024 11:12:33 -0700 (PDT)
-Received: from x1n.redhat.com (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4c7dee013sm268663985a.84.2024.08.12.11.12.30
+        d=1e100.net; s=20230601; t=1723487391; x=1724092191;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3lzHa+4oPgNh0JbtSfXdnixp3cbcHkW2yBVpxgt+hHU=;
+        b=jhBIcl5UX/5wUnyceVaz/f9w2A6so0AgkyII8ODMIaojWk1ephjlUZiPE1sA5zEhCj
+         je9KzMO/A7+BLlGX2pIwR6eUh9wd9UzIinDR0WCsvxNH3kfVrDRcTURRD0/88d+JF950
+         zAnps3BPGHEYgbqz8JZI5fGwCYAWLEPBymZo3XPzmMPbg559OhbqlWF8mp+SjsuWM+RK
+         +x6jaJjy9XP7lLl46A2cyAGuawZs4iCI9T1Rfs5DX2D7lOkhZwR8YxS9ApzuMtJjDO7p
+         PcneddXI+vvsJYljBA0OAsaZlHvHCgadDTaUwx9Sv9HFoCeHVikQXklJZaaBIarUHIh2
+         V3nw==
+X-Forwarded-Encrypted: i=1; AJvYcCWtmh9HIlYOn9+T47Q8f6v7eGAXLOXuyDDtL2z1XMY7gtzPX5fEsSIhqQRKmWMehaWlR+g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbtia1tZkqzysO0H/kM/DD1u7OsJRhmvygKOd9L6BPiKzxijKW
+	3Y7UckCHMeJWNustMJTwBXU8+mNQR2vWsLVRd0ITtsrn+B2Y8G8yDq1i4MKcSPru9xp4MZODphG
+	Ec5bBWI1eZCHXTM9uOXrD8tyX9YkrdnA82WVm77XNu2I0AjNwLg==
+X-Received: by 2002:a05:6102:38d1:b0:493:31f9:d14e with SMTP id ada2fe7eead31-4974398cf6amr814418137.2.1723487391384;
+        Mon, 12 Aug 2024 11:29:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEgRvFG1AyF51iCR4QUK+iwha9x9ZVtk0r/+P1oFdTeH6YoJu+ZSYhqn/ax3TJ2lpn0JjOZGQ==
+X-Received: by 2002:a05:6102:38d1:b0:493:31f9:d14e with SMTP id ada2fe7eead31-4974398cf6amr814391137.2.1723487390933;
+        Mon, 12 Aug 2024 11:29:50 -0700 (PDT)
+Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-4531c26dc23sm25342021cf.75.2024.08.12.11.29.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 11:12:32 -0700 (PDT)
+        Mon, 12 Aug 2024 11:29:50 -0700 (PDT)
+Date: Mon, 12 Aug 2024 14:29:47 -0400
 From: Peter Xu <peterx@redhat.com>
-To: linux-kernel@vger.kernel.org,
-	linux-mm@kvack.org
-Cc: "Kirill A . Shutemov" <kirill@shutemov.name>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	David Hildenbrand <david@redhat.com>,
-	Matthew Wilcox <willy@infradead.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	James Houghton <jthoughton@google.com>,
-	Huang Ying <ying.huang@intel.com>,
-	"Aneesh Kumar K . V" <aneesh.kumar@linux.ibm.com>,
-	peterx@redhat.com,
-	Vlastimil Babka <vbabka@suse.cz>,
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>,
-	Hugh Dickins <hughd@google.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Rik van Riel <riel@surriel.com>,
-	Dan Williams <dan.j.williams@intel.com>,
-	Mel Gorman <mgorman@techsingularity.net>,
-	x86@kernel.org,
-	Ingo Molnar <mingo@redhat.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Dave Jiang <dave.jiang@intel.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	kvm@vger.kernel.org,
+To: David Hildenbrand <david@redhat.com>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
 	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	David Rientjes <rientjes@google.com>
-Subject: [PATCH v5 2/7] mm/mprotect: Push mmu notifier to PUDs
-Date: Mon, 12 Aug 2024 14:12:20 -0400
-Message-ID: <20240812181225.1360970-3-peterx@redhat.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20240812181225.1360970-1-peterx@redhat.com>
-References: <20240812181225.1360970-1-peterx@redhat.com>
+	Oscar Salvador <osalvador@suse.de>,
+	Jason Gunthorpe <jgg@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH 07/19] mm/fork: Accept huge pfnmap entries
+Message-ID: <ZrpUm-Lz-plw_fZy@x1n>
+References: <20240809160909.1023470-1-peterx@redhat.com>
+ <20240809160909.1023470-8-peterx@redhat.com>
+ <d7fcec73-16f6-4d54-b334-6450a29e0a1d@redhat.com>
+ <ZrZOqbS3bcj52JZP@x1n>
+ <8ef394e6-a964-41c4-b33c-0e940b6b9bd8@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <8ef394e6-a964-41c4-b33c-0e940b6b9bd8@redhat.com>
 
-mprotect() does mmu notifiers in PMD levels.  It's there since 2014 of
-commit a5338093bfb4 ("mm: move mmu notifier call from change_protection to
-change_pmd_range").
+On Fri, Aug 09, 2024 at 07:59:58PM +0200, David Hildenbrand wrote:
+> On 09.08.24 19:15, Peter Xu wrote:
+> > On Fri, Aug 09, 2024 at 06:32:44PM +0200, David Hildenbrand wrote:
+> > > On 09.08.24 18:08, Peter Xu wrote:
+> > > > Teach the fork code to properly copy pfnmaps for pmd/pud levels.  Pud is
+> > > > much easier, the write bit needs to be persisted though for writable and
+> > > > shared pud mappings like PFNMAP ones, otherwise a follow up write in either
+> > > > parent or child process will trigger a write fault.
+> > > > 
+> > > > Do the same for pmd level.
+> > > > 
+> > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > ---
+> > > >    mm/huge_memory.c | 27 ++++++++++++++++++++++++---
+> > > >    1 file changed, 24 insertions(+), 3 deletions(-)
+> > > > 
+> > > > diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+> > > > index 6568586b21ab..015c9468eed5 100644
+> > > > --- a/mm/huge_memory.c
+> > > > +++ b/mm/huge_memory.c
+> > > > @@ -1375,6 +1375,22 @@ int copy_huge_pmd(struct mm_struct *dst_mm, struct mm_struct *src_mm,
+> > > >    	pgtable_t pgtable = NULL;
+> > > >    	int ret = -ENOMEM;
+> > > > +	pmd = pmdp_get_lockless(src_pmd);
+> > > > +	if (unlikely(pmd_special(pmd))) {
+> > > > +		dst_ptl = pmd_lock(dst_mm, dst_pmd);
+> > > > +		src_ptl = pmd_lockptr(src_mm, src_pmd);
+> > > > +		spin_lock_nested(src_ptl, SINGLE_DEPTH_NESTING);
+> > > > +		/*
+> > > > +		 * No need to recheck the pmd, it can't change with write
+> > > > +		 * mmap lock held here.
+> > > > +		 */
+> > > > +		if (is_cow_mapping(src_vma->vm_flags) && pmd_write(pmd)) {
+> > > > +			pmdp_set_wrprotect(src_mm, addr, src_pmd);
+> > > > +			pmd = pmd_wrprotect(pmd);
+> > > > +		}
+> > > > +		goto set_pmd;
+> > > > +	}
+> > > > +
+> > > 
+> > > I strongly assume we should be using using vm_normal_page_pmd() instead of
+> > > pmd_page() further below. pmd_special() should be mostly limited to GUP-fast
+> > > and vm_normal_page_pmd().
+> > 
+> > One thing to mention that it has this:
+> > 
+> > 	if (!vma_is_anonymous(dst_vma))
+> > 		return 0;
+> 
+> Another obscure thing in this function. It's not the job of copy_huge_pmd()
+> to make the decision whether to copy, it's the job of vma_needs_copy() in
+> copy_page_range().
+> 
+> And now I have to suspect that uffd-wp is broken with this function, because
+> as vma_needs_copy() clearly states, we must copy, and we don't do that for
+> PMDs. Ugh.
+> 
+> What a mess, we should just do what we do for PTEs and we will be fine ;)
 
-At that time, the issue was that NUMA balancing can be applied on a huge
-range of VM memory, even if nothing was populated.  The notification can be
-avoided in this case if no valid pmd detected, which includes either THP or
-a PTE pgtable page.
+IIUC it's not a problem: file uffd-wp is different from anonymous, in that
+it pushes everything down to ptes.
 
-Now to pave way for PUD handling, this isn't enough.  We need to generate
-mmu notifications even on PUD entries properly.  mprotect() is currently
-broken on PUD (e.g., one can easily trigger kernel error with dax 1G
-mappings already), this is the start to fix it.
+It means if we skipped one huge pmd here for file, then it's destined to
+have nothing to do with uffd-wp, otherwise it should have already been
+split at the first attempt to wr-protect.
 
-To fix that, this patch proposes to push such notifications to the PUD
-layers.
+> 
+> Also, we call copy_huge_pmd() only if "is_swap_pmd(*src_pmd) ||
+> pmd_trans_huge(*src_pmd) || pmd_devmap(*src_pmd)"
+> 
+> Would that even be the case with PFNMAP? I suspect that pmd_trans_huge()
+> would return "true" for special pfnmap, which is rather "surprising", but
+> fortunate for us.
 
-There is risk on regressing the problem Rik wanted to resolve before, but I
-think it shouldn't really happen, and I still chose this solution because
-of a few reasons:
+It's definitely not surprising to me as that's the plan.. and I thought it
+shoulidn't be surprising to you - if you remember before I sent this one, I
+tried to decouple that here with the "thp agnostic" series:
 
-  1) Consider a large VM that should definitely contain more than GBs of
-  memory, it's highly likely that PUDs are also none.  In this case there
-  will have no regression.
+  https://lore.kernel.org/r/20240717220219.3743374-1-peterx@redhat.com
 
-  2) KVM has evolved a lot over the years to get rid of rmap walks, which
-  might be the major cause of the previous soft-lockup.  At least TDP MMU
-  already got rid of rmap as long as not nested (which should be the major
-  use case, IIUC), then the TDP MMU pgtable walker will simply see empty VM
-  pgtable (e.g. EPT on x86), the invalidation of a full empty region in
-  most cases could be pretty fast now, comparing to 2014.
+in which you reviewed it (which I appreciated).
 
-  3) KVM has explicit code paths now to even give way for mmu notifiers
-  just like this one, e.g. in commit d02c357e5bfa ("KVM: x86/mmu: Retry
-  fault before acquiring mmu_lock if mapping is changing").  It'll also
-  avoid contentions that may also contribute to a soft-lockup.
+So yes, pfnmap on pmd so far will report pmd_trans_huge==true.
 
-  4) Stick with PMD layer simply don't work when PUD is there...  We need
-  one way or another to fix PUD mappings on mprotect().
+> 
+> Likely we should be calling copy_huge_pmd() if pmd_leaf() ... cleanup for
+> another day.
 
-Pushing it to PUD should be the safest approach as of now, e.g. there's yet
-no sign of huge P4D coming on any known archs.
+Yes, ultimately it should really be a pmd_leaf(), but since I didn't get
+much feedback there, and that can further postpone this series from being
+posted I'm afraid, then I decided to just move on with "taking pfnmap as
+THPs".  The corresponding change on this path is here in that series:
 
-Cc: kvm@vger.kernel.org
-Cc: Sean Christopherson <seanjc@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>
-Cc: David Rientjes <rientjes@google.com>
-Cc: Rik van Riel <riel@surriel.com>
-Signed-off-by: Peter Xu <peterx@redhat.com>
----
- mm/mprotect.c | 32 ++++++++++++++++----------------
- 1 file changed, 16 insertions(+), 16 deletions(-)
+https://lore.kernel.org/all/20240717220219.3743374-7-peterx@redhat.com/
 
-diff --git a/mm/mprotect.c b/mm/mprotect.c
-index 37cf8d249405..d423080e6509 100644
---- a/mm/mprotect.c
-+++ b/mm/mprotect.c
-@@ -363,9 +363,6 @@ static inline long change_pmd_range(struct mmu_gather *tlb,
- 	unsigned long next;
- 	long pages = 0;
- 	unsigned long nr_huge_updates = 0;
--	struct mmu_notifier_range range;
--
--	range.start = 0;
- 
- 	pmd = pmd_offset(pud, addr);
+@@ -1235,8 +1235,7 @@ copy_pmd_range(struct vm_area_struct *dst_vma, struct vm_area_struct *src_vma,
+ 	src_pmd = pmd_offset(src_pud, addr);
  	do {
-@@ -383,14 +380,6 @@ static inline long change_pmd_range(struct mmu_gather *tlb,
- 		if (pmd_none(*pmd))
- 			goto next;
- 
--		/* invoke the mmu notifier if the pmd is populated */
--		if (!range.start) {
--			mmu_notifier_range_init(&range,
--				MMU_NOTIFY_PROTECTION_VMA, 0,
--				vma->vm_mm, addr, end);
--			mmu_notifier_invalidate_range_start(&range);
--		}
--
- 		_pmd = pmdp_get_lockless(pmd);
- 		if (is_swap_pmd(_pmd) || pmd_trans_huge(_pmd) || pmd_devmap(_pmd)) {
- 			if ((next - addr != HPAGE_PMD_SIZE) ||
-@@ -431,9 +420,6 @@ static inline long change_pmd_range(struct mmu_gather *tlb,
- 		cond_resched();
- 	} while (pmd++, addr = next, addr != end);
- 
--	if (range.start)
--		mmu_notifier_invalidate_range_end(&range);
--
- 	if (nr_huge_updates)
- 		count_vm_numa_events(NUMA_HUGE_PTE_UPDATES, nr_huge_updates);
- 	return pages;
-@@ -443,22 +429,36 @@ static inline long change_pud_range(struct mmu_gather *tlb,
- 		struct vm_area_struct *vma, p4d_t *p4d, unsigned long addr,
- 		unsigned long end, pgprot_t newprot, unsigned long cp_flags)
- {
-+	struct mmu_notifier_range range;
- 	pud_t *pud;
- 	unsigned long next;
- 	long pages = 0, ret;
- 
-+	range.start = 0;
-+
- 	pud = pud_offset(p4d, addr);
- 	do {
- 		next = pud_addr_end(addr, end);
- 		ret = change_prepare(vma, pud, pmd, addr, cp_flags);
--		if (ret)
--			return ret;
-+		if (ret) {
-+			pages = ret;
-+			break;
-+		}
- 		if (pud_none_or_clear_bad(pud))
- 			continue;
-+		if (!range.start) {
-+			mmu_notifier_range_init(&range,
-+						MMU_NOTIFY_PROTECTION_VMA, 0,
-+						vma->vm_mm, addr, end);
-+			mmu_notifier_invalidate_range_start(&range);
-+		}
- 		pages += change_pmd_range(tlb, vma, pud, addr, next, newprot,
- 					  cp_flags);
- 	} while (pud++, addr = next, addr != end);
- 
-+	if (range.start)
-+		mmu_notifier_invalidate_range_end(&range);
-+
- 	return pages;
- }
- 
+ 		next = pmd_addr_end(addr, end);
+-		if (is_swap_pmd(*src_pmd) || pmd_trans_huge(*src_pmd)
+-			|| pmd_devmap(*src_pmd)) {
++		if (is_swap_pmd(*src_pmd) || pmd_is_leaf(*src_pmd)) {
+ 			int err;
+ 			VM_BUG_ON_VMA(next-addr != HPAGE_PMD_SIZE, src_vma);
+ 			err = copy_huge_pmd(dst_mm, src_mm, dst_pmd, src_pmd,
+
+> 
+> > 
+> > So it's only about anonymous below that.  In that case I feel like the
+> > pmd_page() is benign, and actually good.
+> 
+> Yes, it would likely currently work.
+> 
+> > 
+> > Though what you're saying here made me notice my above check doesn't seem
+> > to be necessary, I mean, "(is_cow_mapping(src_vma->vm_flags) &&
+> > pmd_write(pmd))" can't be true when special bit is set, aka, pfnmaps.. and
+> > if it's writable for CoW it means it's already an anon.
+> > 
+> > I think I can probably drop that line there, perhaps with a
+> > VM_WARN_ON_ONCE() making sure it won't happen.
+> > 
+> > > 
+> > > Again, we should be doing this similar to how we handle PTEs.
+> > > 
+> > > I'm a bit confused about the "unlikely(!pmd_trans_huge(pmd)" check, below:
+> > > what else should we have here if it's not a migration entry but a present
+> > > entry?
+> > 
+> > I had a feeling that it was just a safety belt since the 1st day of thp
+> > when Andrea worked that out, so that it'll work with e.g. file truncation
+> > races.
+> > 
+> > But with current code it looks like it's only anonymous indeed, so looks
+> > not possible at least from that pov.
+> 
+> Yes, as stated above, likely broken with UFFD-WP ...
+> 
+> I really think we should make this code just behave like it would with PTEs,
+> instead of throwing in more "different" handling.
+
+So it could simply because file / anon uffd-wp work very differently.
+
+Let me know if you still spot something that is suspicious, but in all
+cases I guess we can move on with this series, but maybe if you can find
+something I can tackle them together when I decide to go back to the
+mremap() issues in the other thread.
+
+Thanks,
+
 -- 
-2.45.0
+Peter Xu
 
 
