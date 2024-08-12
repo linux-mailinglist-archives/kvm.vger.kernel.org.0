@@ -1,102 +1,118 @@
-Return-Path: <kvm+bounces-23886-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23887-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93DD794F7F2
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 22:07:53 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C976294F92E
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 23:54:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A109281DC8
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 20:07:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53354B22550
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 21:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C04B2198A0E;
-	Mon, 12 Aug 2024 20:06:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C61195F04;
+	Mon, 12 Aug 2024 21:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fnlWM/Jk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K6sJK8QD"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929F11953B9;
-	Mon, 12 Aug 2024 20:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A7B1586D3
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 21:53:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723493191; cv=none; b=fcSlo6JrYH9MLIS2Y8gpYpX0K9n1ptVolTFj4txCo9u7ijajNtt+cUQW70nqG2DGT6hszpc4+Q4ozafNEguq5NwGfOyFVKybN4jzBZeVIJbon1RRwj6jlURyX/Wit2tMgYgSFjrMQH0Ai2Sr0S925dgQXsEv9VdYDXFyYnpCSKk=
+	t=1723499640; cv=none; b=mHok9+m71fin5RHMJoPSFbpuqoCnD3sybLCoAxxGooWJEeAAK3xofXgj8xpkYRk2EZi8oQyBAogr0VyNpocGsxSgkbGkuaQUy+PuVt0UDwKBhYAELQbkfy9nogvtvR3G9U0lKz/rxAXwVUynX2FC3Z6q9ywE2J5R3RouIJ1lQWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723493191; c=relaxed/simple;
-	bh=YsL1C655win8Uvf7tw+7VbikqZnhSC3xRrRZZ+RmAGU=;
+	s=arc-20240116; t=1723499640; c=relaxed/simple;
+	bh=iFb81utD+kxg5AVUC9OJqvlmXZarFcIDLBfi3Zt5x5M=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dw49QrsVXJiTv2OLtl6I7gAvhLl4jhZ1drA8/KMzqoTnaXkyjoz1cx6Xte4KGhiByMteAR7fFWZuyYeKPtOZ6Wdt281VRp0vAxn9jbwCrNlZ9vWW4sH+2leTK+2wTLzbDPGsnN0o9IQJsDjy3uwiamAeTfO1wtIiPgFXszyfojs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fnlWM/Jk; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2cb5789297eso3125616a91.3;
-        Mon, 12 Aug 2024 13:06:30 -0700 (PDT)
+	 To:Cc:Content-Type; b=IoBd/RzFB/R4BavwZNYZ2+v1cC1EkV9w4s4coETHuxR/cCEyPB2lL+8KurXgMoXt46w1pDCXgiDFfMJEXtS5nfkn1Xdt8+NWa2dkWAFRzeLaNtEatsrfHgeXxXo8TXr5hUvksbFTFjySqADXp01WY+6sVjWqvjDj1nJ/LPFAw2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K6sJK8QD; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-36bd70f6522so2635977f8f.1
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 14:53:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1723493190; x=1724097990; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723499637; x=1724104437; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=dpOEroGtysYF4ielafugNiaUnt54QpoeMG73y+fLisk=;
-        b=fnlWM/JkZEXIJfcMZXkvt/77h805czG1WgN/Y4BcGwHSaRgwcTdprarHOXCq9knBNH
-         umiMzQuoFV7PBS7uzesdWf+MXDqBzEHaH0eQHHOLfAAjNIjvyTVD0A6M3k8f5n497QtV
-         8/Fp1aSFcRWzEDOxXR9uV+OOIbC/LMm4OAmbyzypEj/n8xjqxXg/S93SNChHUdn/C4V0
-         AzrZ2GVqb9L1P9DmVBFrfnyZNKsGVdXnuLVOO1hZgtoGb/WMbBWxH/sMccWFypheDfVA
-         vKy9AEy1PFrEtYfg9n9IY+Saf0qxWLWQTr642HAwvE7PURoGmxQr76uO8aDk+diyYCsf
-         ai5A==
+        bh=imKlkkFUg+JvJB0nb5f6d/5Hvt3G5KlID+hC9c1+ZW0=;
+        b=K6sJK8QDL4qjeVSaQ98zRvHUjHiN2oBZhzJS4pTe+STiY298GQXaiBErY9YcBxrxH3
+         +9eJqlSeF6DdHM3wqeSXvdm95aufpCiklX4WeZs0wyuQx4ZnSnhi5kdaRTSDu05Cychg
+         l38RL+tZioqSDsTjKBO2ADb4HvsMFmqXBC0CSgrJa3jlx5Tc5/ZhrZ+mY4e1R69EZmS5
+         zhmP6ikv1lQWyq3dtD5kdtJwosRlkQDaNdZWZR1BpfrGMQ8g4dfB8SNjzKCACqMnsUhF
+         rk6xz1lyjhvcm6uhJLadUOfYi8uKrh4497+JTY7YuvCD96FwpuZkmDjEcSMUdloPwvkm
+         YT4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723493190; x=1724097990;
+        d=1e100.net; s=20230601; t=1723499637; x=1724104437;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=dpOEroGtysYF4ielafugNiaUnt54QpoeMG73y+fLisk=;
-        b=OAIq/eXOTbneP+g4w7mzs9doEV0c+vKekgQma9qy93HUDehtyQUHwDlT2bN0mwbTxz
-         RJNJLO9y4hx0KMKadXxWrs54CeEAjejmBlJA6kzqI5gK51IJ7/De5/IviCPCBTizXAhP
-         F5qgQoZKrAiZ+pM3gGk5pLFOjfi9DPTuFPbui3E9Fte4vABUyNDuKxmxnvrHSxai8kie
-         TnqjsqxEFN3LWU5jdgvbD8trW9W+wmsjeYOtQEPCb1o+X+nrl8O1aw3hOWsjxe2Tyytg
-         NwIhgqElAj5rT6Vu56p49ZH7lFVQFSLE24iU9VIq65+jRl5+hamWddug1suy9w7m3XZP
-         WwBg==
-X-Forwarded-Encrypted: i=1; AJvYcCUB5x4noJddlFkM7D8WE7qqtKWBq9Dk/7knQTHsfKO6x0s/IXbSpU9M+uTkMV8qZbpX2J4OIHnEDcLiTljEzwjbY2vzPyKk8sTZ3FBsmtSIbNm6uETQamE5efgemiJ5lTx2Y3KfSFDYQT5hb4SEVZlZfv1vxqijdJTboD1E34Wlkp2M+L8R49wKVsxwYNwtdHikHnuf+/Rh8DQJ65W6tUrIPGVO3eAlSAg=
-X-Gm-Message-State: AOJu0YzehjenyvlLCkoq6ZAbvgyAMLfy/IxXwSH+yXyjcAfRZy/G9i5i
-	VXsOPdRqgBGYvOppdsldJVIeS6RR5KI6cZbYJ8K3ZWznNFiyQ5pvbNWM9Uqj2OkduR/1E9coIjk
-	VzItct6KEsaIcUlebJPs+GW9g/GI=
-X-Google-Smtp-Source: AGHT+IElPb2EaTXK/MBk35WwyrKLUOG1Ydv8xeHRyMsqe2bfhQXzbIVKz1s7TXLnA6y6XoLOJpoxQtvntqfBMRcK1VE=
-X-Received: by 2002:a17:90b:230b:b0:2c9:69cc:3a6a with SMTP id
- 98e67ed59e1d1-2d3924d6069mr1539107a91.3.1723493190015; Mon, 12 Aug 2024
- 13:06:30 -0700 (PDT)
+        bh=imKlkkFUg+JvJB0nb5f6d/5Hvt3G5KlID+hC9c1+ZW0=;
+        b=f3rVWgsnfQE0Ck83gOmvQLZr/jyr2nY7xi4JjnLj/Z4EbP9djJEJOmUkjoArOAfRfb
+         qOBfY+dgfal0a6ALN4F0wxa87ucf+3zIa0mDFjhxuOdhFD/NQ0lUg+Ae5EHqqhLtqX1N
+         5183k/+Z1dem4LVjyy9rXIN4qP0n1IxcYJorzfeubbfLqW7bDxFDv3C6KOt80nRG5OqE
+         /oDwspm6vjlPkUgLe2BXrT7GdMUJMEDyauayPU9qT36I8nelQDeZbf8jDG8zzo68M4VJ
+         EOMBaHFzulkbzFHjF7NodNPh8mEkVDh2tL+nZTL3IJawEDszLTaX2q1yxQC/gXZ0LTMv
+         V/Cg==
+X-Forwarded-Encrypted: i=1; AJvYcCU6/3mtoCwMaHxuoKWxpHabFJrURAIb4IVaGY0z0YSdNUxoSqK1abSY54G9nemequR6Enpb4TtqNat9J2CIPkP0Ib2y
+X-Gm-Message-State: AOJu0YwRKMKDS4MVfelspo/YqQBh1WQeexOuut1QSrufDs78iy+GaCDx
+	wWRrsKF5ZPkS3ZYJc+SIVkqW+oPL9JPH89iRvPnLZn6GE5FA90HSR5BurmUmmyNQwfft59CzK6W
+	8Gk15+OYyZeeA/AtdZU4Aw2+1jVwXy5Zvd55A
+X-Google-Smtp-Source: AGHT+IEq9Z3A8c6NJnVvf2RQgYE7P88YKMQaUxK73bXmj83aH6DHf5GTXyarL8Mu9mgSiyFTWmwXtiXjB7rGW2BOKIM=
+X-Received: by 2002:a05:6000:1842:b0:368:4bc0:9210 with SMTP id
+ ffacd0b85a97d-3716ccf39e2mr1378800f8f.25.1723499637114; Mon, 12 Aug 2024
+ 14:53:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240730050927.GC5334@ZenIV> <20240730051625.14349-1-viro@kernel.org>
- <20240730051625.14349-35-viro@kernel.org> <CAEf4BzasSXFx5edPknxVnmk+o6oAyOU0h_Tg_yHVaJcaJfpPOQ@mail.gmail.com>
- <20240810034644.GC13701@ZenIV>
-In-Reply-To: <20240810034644.GC13701@ZenIV>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Mon, 12 Aug 2024 13:06:17 -0700
-Message-ID: <CAEf4BzYGF1aur6W9PDzN3MFoDmVNDQ6G5k0=gv-04m6ZpeK3Jg@mail.gmail.com>
-Subject: Re: [PATCH 35/39] convert bpf_token_create()
-To: Al Viro <viro@zeniv.linux.org.uk>
-Cc: viro@kernel.org, linux-fsdevel@vger.kernel.org, amir73il@gmail.com, 
-	bpf@vger.kernel.org, brauner@kernel.org, cgroups@vger.kernel.org, 
-	kvm@vger.kernel.org, netdev@vger.kernel.org, torvalds@linux-foundation.org
+References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-15-seanjc@google.com>
+In-Reply-To: <20240809194335.1726916-15-seanjc@google.com>
+From: David Matlack <dmatlack@google.com>
+Date: Mon, 12 Aug 2024 14:53:29 -0700
+Message-ID: <CALzav=cYv4ZqD5q6-hP=WN8gYFxt7xYKCTm8dLaGtjk-kmCy=w@mail.gmail.com>
+Subject: Re: [PATCH 14/22] KVM: x86/mmu: Morph kvm_handle_gfn_range() into an
+ aging specific helper
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>, 
+	James Houghton <jthoughton@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Aug 9, 2024 at 8:46=E2=80=AFPM Al Viro <viro@zeniv.linux.org.uk> wr=
-ote:
+On Fri, Aug 9, 2024 at 12:48=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
 >
-> On Tue, Aug 06, 2024 at 03:42:56PM -0700, Andrii Nakryiko wrote:
->
-> > By constify you mean something like below?
->
-> Yep.  Should go through LSM folks, probably, and once it's in
-> those path_get() and path_put() around the call can go to hell,
-> along with 'path' itself (we can use file->f_path instead).
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 0a33857d668a..88b656a1453d 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> +static bool kvm_rmap_age_gfn_range(struct kvm *kvm,
+> +                                  struct kvm_gfn_range *range, bool test=
+_only)
+> +{
+> +       struct slot_rmap_walk_iterator iterator;
+> +       struct rmap_iterator iter;
+> +       bool young =3D false;
+> +       u64 *sptep;
+> +
+> +       for_each_slot_rmap_range(range->slot, PG_LEVEL_4K, KVM_MAX_HUGEPA=
+GE_LEVEL,
+> +                                range->start, range->end - 1, &iterator)=
+ {
+> +               for_each_rmap_spte(iterator.rmap, &iter, sptep) {
+> +                       if (test_only && is_accessed_spte(*sptep))
+> +                               return true;
+> +
+> +                       young =3D mmu_spte_age(sptep);
 
-Ok, cool. Let's then do that branch you proposed, and I can send
-everything on top of it, removing path_get()+path_put() you add here.
+It's jarring to see that mmu_spte_age() can get called in the
+test_only case, even though I think the code is technically correct
+(it will only be called if !is_accessed_spte() in which case
+mmu_spte_age() will do nothing).
 
