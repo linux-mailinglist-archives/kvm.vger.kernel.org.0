@@ -1,53 +1,55 @@
-Return-Path: <kvm+bounces-23862-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23863-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65B8C94EF5A
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 16:18:25 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBAA594EF6A
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 16:21:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 970ED1C20F73
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 14:18:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 674E61F2253A
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 14:21:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB9D417E46E;
-	Mon, 12 Aug 2024 14:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91930183084;
+	Mon, 12 Aug 2024 14:21:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cwhJ5lrt"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Y+Por+2Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C785A16B38D
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 14:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0DC717D8A9
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 14:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723472296; cv=none; b=R2KqAD86UBBb0Tbuew2tzj/DUF1LsYcFomddJtDeKCdCrX2HFuEPNJR3Sdm+T4fsXv+lRBHaI/jAjMZ6a/54lzMMRJPce+xgWtOM1rx8iGY7YfS0WJL35Gz/GtI7P8+okVtSaw2oK+U9s1g0HLzbgixRGaK98roFil0tJglM4Xo=
+	t=1723472474; cv=none; b=kgMHhOpopjIw+wjmqVCTKAkCH4Idc18nS/UIlAOfzB8e0rPmBUKQYsUo+R2p6HtL189kPLIR3Rk71u6uIgWXJRE6qfksSz8AKx5RUPKd3AepcywFEOhXq/4okWLFNrZFFhb+EoNTjO9Q52DooY+Q7PmsX9tktSD3wZbLyMlw+LA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723472296; c=relaxed/simple;
-	bh=+XqXRdRDS7fH/Qr4dLMgiIgHdP7tqvnCJ5SS8TKCTLs=;
+	s=arc-20240116; t=1723472474; c=relaxed/simple;
+	bh=bznRfkavE8gz5GSMpFFXyzdgUcVe1kjpO/qgo6apdm8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VNmHBr6Cx9TAPQYuNo4iJtLFIozTGNSHRy4rTpkX6haT8n3GDIEj17MWiJNeJWiRsazit3RTcop4DV3SNaNOsMomdo0r5nPWPEe3E5MrzrDG0wuU/Lr1M72wc9kCbhDDIUo2yt72Y/5YbTKZ5rewGPrrjS40jHGGUqRajYpPN1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cwhJ5lrt; arc=none smtp.client-ip=95.215.58.182
+	 Content-Type:Content-Disposition:In-Reply-To; b=MHny8dceEVy4ekrnMfn1tpYpF+icU8m7TpEaPBOz4uHh4CYQmDzbveWMi7aIc3Ft+NlXfcFcQv+reR2CHGv8zNwAg49qlqazQ/OsqAh9s6moQpJ6aeDfIEmBVXKrAKQm2isyske+971a6a4UoR18G42ZLVWlqT/p15ZwC7ZAz4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Y+Por+2Q; arc=none smtp.client-ip=95.215.58.183
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Mon, 12 Aug 2024 16:18:08 +0200
+Date: Mon, 12 Aug 2024 16:21:09 +0200
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1723472292;
+	t=1723472471;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=nXVtc9Ey9rgRBdNJC/nm2cLjyxf+MaJ3vC2dOyKPuAI=;
-	b=cwhJ5lrtZVEXe/CiYwTQzTdGBrn2Qf0n12LPvKe3clELTtH3T55PoQ8e2p8AQ2L9qc3X5B
-	ELKQ1X1geg+FCiNaENJ4dIzI9+7MseFEqrlTRZOuyujo3YB9gqgQPkFV9hueOSvJgUsvcE
-	p03SrbZ3bI+Urrs7d/0Ew85tYqSodHM=
+	bh=AgaYljEONxrM+2ayk3RUMmQAOWsjXZDGkdEXbTyanJU=;
+	b=Y+Por+2Q2Tm8F0V+bjvBhYMq9t0G+rjyE8IQHIKVO8f2HMeqNbJ/u9kU/h768FYSrSQojY
+	ZfaducSjotJmD04G/f9PPXx8mMK/8thKvBoMNhEvsLdkOynnbMAVmYOKSUzY7dN755So5W
+	hT68iXCNUeMHGK2Tr9rjGtYcU98Bq2g=
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Andrew Jones <andrew.jones@linux.dev>
-To: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org
-Cc: atishp@rivosinc.com, cade.richard@berkeley.edu, jamestiotio@gmail.com
-Subject: Re: [kvm-unit-tests PATCH 0/4] riscv: sbi: More DBCN tests
-Message-ID: <20240812-067579d76c30484592009ced@orel>
-References: <20240812141354.119889-6-andrew.jones@linux.dev>
+To: James Raphael Tiovalen <jamestiotio@gmail.com>
+Cc: kvm@vger.kernel.org, kvm-riscv@lists.infradead.org, 
+	atishp@rivosinc.com, cade.richard@berkeley.edu
+Subject: Re: [kvm-unit-tests PATCH 0/3] riscv: sbi: Add support to test HSM
+ extension
+Message-ID: <20240812-ad8171c2d4e3bf1355e85326@orel>
+References: <20240810175744.166503-1-jamestiotio@gmail.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -56,29 +58,36 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240812141354.119889-6-andrew.jones@linux.dev>
+In-Reply-To: <20240810175744.166503-1-jamestiotio@gmail.com>
 X-Migadu-Flow: FLOW_OUT
 
-On Mon, Aug 12, 2024 at 04:13:55PM GMT, Andrew Jones wrote:
-> The current DBCN tests found a several bugs and with high address
-> support for rv32 we were able to find even more. Add the new tests
-> which checks high use page boundary crossing. The first three patches
-> a various improvements to the SBI tests.
+On Sun, Aug 11, 2024 at 01:57:41AM GMT, James Raphael Tiovalen wrote:
+> This patch series adds support for testing all 4 functions of the HSM
+> extension as defined in the RISC-V SBI specification. The first 2
+> patches add some helper routines to prepare for the HSM test, while the
+> last patch adds the actual test for the HSM extension.
 > 
-> Based on riscv/queue, https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv%2Fqueue
+> James Raphael Tiovalen (3):
+>   riscv: sbi: Add IPI extension support
+>   riscv: sbi: Add HSM extension functions
+>   riscv: sbi: Add tests for HSM extension
 > 
-> Andrew Jones (4):
->   riscv: sbi: dbcn: Output return values
->   riscv: sbi: Use strtoul to avoid overflow
->   riscv: sbi: Prefix several environment variables with SBI
->   riscv: sbi: dbcn: Add high address tests
+>  riscv/Makefile      |   7 +-
+>  lib/riscv/asm/sbi.h |  23 ++++
+>  lib/riscv/sbi.c     |  15 +++
+>  riscv/sbi-asm.S     |  38 ++++++
+>  riscv/sbi.c         | 285 ++++++++++++++++++++++++++++++++++++++++++++
+>  5 files changed, 365 insertions(+), 3 deletions(-)
+>  create mode 100644 riscv/sbi-asm.S
 > 
->  riscv/sbi.c | 163 +++++++++++++++++++++++++++++++++++++++++-----------
->  1 file changed, 131 insertions(+), 32 deletions(-)
-> 
-> -- 
-> 2.45.2
+> --
+> 2.43.0
 >
 
-Queued on riscv/sbi, https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv%2Fsbi
+Hi James,
+
+When you send v2, please base on riscv/sbi, https://gitlab.com/jones-drew/kvm-unit-tests/-/commits/riscv%2Fsbi
+
+Thanks,
+drew
 
