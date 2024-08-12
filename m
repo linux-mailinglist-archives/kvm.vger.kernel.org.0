@@ -1,85 +1,85 @@
-Return-Path: <kvm+bounces-23879-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23880-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F11B94F710
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 20:58:26 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A0FF94F732
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 21:06:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE0281F21B28
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 18:58:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D296E1F216A3
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 19:06:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0607818E05B;
-	Mon, 12 Aug 2024 18:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B21818EFC5;
+	Mon, 12 Aug 2024 19:05:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SA/QspGr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TWzbYCfg"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD1F318B486
-	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 18:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111C8190686
+	for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 19:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723489095; cv=none; b=P/RtAZzFSjKKaYXafqlcgUb0Yn5yLwYk5/5SAbT06P39COCyQF8cQ9dsDpO+HuzfSzLtAVYlddLuFaQ9AWT3GfpRXPz4P/fkT48rkNRR5I+5GMqskew/y/wTgaQJEOjErVMhltItJdEP9uc08i6qZ3aU0bD4kPtHqL8sE81jDEA=
+	t=1723489557; cv=none; b=YgW6co2T+lHbLR2teYJiHepnrnWi51fPr6oCXB64VHvvhdLT5xYESSzynGuYaXenHQE2cZZNMbC8pJfhunk5AE2ejP302l3ZvZBMTaM64adSeQ7NlrM82idKn1UBjNKdKBTPp7Nw2Ulc1q9IityTtNfons+V+eJh8Rlc606FIEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723489095; c=relaxed/simple;
-	bh=LfPOpidqehegUt+tof4iurxTgEAidoDbHKOZE2NlWB4=;
+	s=arc-20240116; t=1723489557; c=relaxed/simple;
+	bh=qex7tbBtNhCnUhGbju+uO76z0q9IsTf6CB4hr36kAc4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Mb6peutcXwnRVujSfhqCx2Y5DxnDxAc1gMtlshvYBY/NfJTsQ6oRulCYVJ2Z8P/+RKrbeLo/i1vTHbSqiK3P86L9N9kxcXlPskrBn65lxcWwud7dJRWth1llm+tAvOGtKgcGccJ4Gjtem5VUU34ituW2w+bc5g1olAVNlZKKl2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SA/QspGr; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=eZIio+0oKzFjG1IzNACPHWZhjB+wP/YYxtR8if2J3kElOwsLLesSMNSdxjpxkz2wJAHWhHIVBjDIK/eOESbaNRHHVRqpK5ugZpe8WEN9an0cg6OG1Eh34AYD542tp7lByHsA225YkU9iKttSY8AfkBEl5M9TmJhuWUpvKzuKd2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TWzbYCfg; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723489092;
+	s=mimecast20190719; t=1723489555;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=CS/foRtcZMYFWa8Ji2iV8cMwHHCfkc9T1S0QgRlZmIU=;
-	b=SA/QspGrAn+5OeRX3LupCnXgZF37EB/xbzo+WF0BhiWbvxbpbBkW/DLTqcxPBYrkGSUS/O
-	cGMUBeG3Esg1LMWRzwcaQitvdWTO8sFV21PZQUKz3uFwHa0AsfSffdvwuHS46W/Xg5KrOW
-	T3MaUD2S5KPqZ1ec7a7+fek0gY01Jyw=
-Received: from mail-vk1-f200.google.com (mail-vk1-f200.google.com
- [209.85.221.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=HzakOI9YGqv9HtFf9jIxuThCq3IEoBU6xpTlkdeG+TM=;
+	b=TWzbYCfg7CRZU7EnIiU+BMbe0rA719Qv/jH7/NuR9ueo9rP/lqQkVV18ZsychPZGkgTgVQ
+	91DVNvH9upz9RUrN6Q6mqmby5tK7fSQX7EGv9fyrdHZRRWr+eniHDgVS5NCXqLLBLD/rYn
+	P/DJBGqYJG3i20t9eLUtnubhAIY3qEM=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-543-sFqYjx5-N1efxbvdCBcsVg-1; Mon, 12 Aug 2024 14:58:11 -0400
-X-MC-Unique: sFqYjx5-N1efxbvdCBcsVg-1
-Received: by mail-vk1-f200.google.com with SMTP id 71dfb90a1353d-4f51ae60628so190344e0c.3
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 11:58:11 -0700 (PDT)
+ us-mta-573-FOvBosMtN8S9g-v6I-pDow-1; Mon, 12 Aug 2024 15:05:53 -0400
+X-MC-Unique: FOvBosMtN8S9g-v6I-pDow-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-6ba92dd246fso10461886d6.0
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 12:05:53 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723489091; x=1724093891;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CS/foRtcZMYFWa8Ji2iV8cMwHHCfkc9T1S0QgRlZmIU=;
-        b=KggBzVfpT8Wwfge2SfT3zTrUHoDZQ5pDt9MYfTo1MYVcd8HqeVigfnjGEU1mOFWzEe
-         BKMxTwHgE3vZ80wa5pDSyM0g3ZHXuIk2B3862qq8t2VOnKjer0cAaAQavmJks4ocv05K
-         s2+Ye87vsWu719MaERFEHnIEmuJ1lDNzzT1uX3lGI43/7KohmFUmUagWqWKK9lMOJiUw
-         MfWhb/xvuztMI9IpEFjYwtqg9NbF9ACApgcKba+F9TjYGfMDiMNAswORuMhsYb2r9A1G
-         HTJHhYFYREP72ftJNFaZxH2I+9d2bA2gD95IvXSVdNlPAutKXVsSLkZlVKhufleGUMfd
-         9Q1w==
-X-Forwarded-Encrypted: i=1; AJvYcCV5diRrNCywPfR5ZoyIb7F/n+BlzTFv9mc4IqlCxWGxjIQSdJC2VpggkKUYVM9Qe3cCe18=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQYhpU4+mEMvQ348gkxSqWO/cCXLFYyBbE/4HC5QPmJaSicrKL
-	SdJXLJSCvcPUqu3PAPC75AvwB2qu358x9pGgdp+gr7L8hpBQOcRq1nyrYRY1cRKWsMm++73m1qD
-	hejH+xXQs5yhnRMMqTj1ZXcb6Syk6cy6ABQyCIr7yIzm90RvQ6Q==
-X-Received: by 2002:a05:6102:509f:b0:48d:aced:abff with SMTP id ada2fe7eead31-49743942d92mr923679137.1.1723489090931;
-        Mon, 12 Aug 2024 11:58:10 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEepDCRiassfXhH0DrId4yrgbBwPcT6rwZlyon1JDzVmoNGkXNaVZAYMSjbHfXIwNLjo/ZC3Q==
-X-Received: by 2002:a05:6102:509f:b0:48d:aced:abff with SMTP id ada2fe7eead31-49743942d92mr923659137.1.1723489090577;
-        Mon, 12 Aug 2024 11:58:10 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723489553; x=1724094353;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HzakOI9YGqv9HtFf9jIxuThCq3IEoBU6xpTlkdeG+TM=;
+        b=FDn3QKu26GzfdQdwBvq24JqhaXodgkrIj/a1Hw7+N2hzeW8/ZrXZp+ZSmTEH+JYSzG
+         G2sa/H+RpcvzFZI7ifogeIRm7rR0KteO8pJC1VN1NZhJf6MjY1ozJpss+X180aLaijk6
+         7OTavLc0izdP4NxFU/RKYll/CfO5oTN9G+00dOvMR1vxxVuzeYlbKnoYnLymz808dLY2
+         VN2o8sZpGiI7poHab8V/zMC67dSV5k2TY3vF5Vqz9QDaejLRqLYVZzAIZ5+OTXpaxqx4
+         Zhx26bo8jM5b42ZP+rno58GU0G/jPVsyWlubcp47QPDOhxSrHurEPMsMJF1dufF+9nyV
+         AG/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVNn574Sy/839SRp6OfmUHE8IDg5tzc/7Z3xhlTS8uie6XekmL8SGTe2xducl518Nul710=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTdtWraE2In9/sGUjvb1DOO5oImgk5YBeMAbBsWvaXwClg9X4t
+	BCEBmwJesnj3gw2VOiPqpasSjl4+nEevdMVinxhCOm6sMbMocc+pmApfgWR5nZCC/fynLVCBobJ
+	KbV9wHH/s0Sjw9h7zrjldhdKOxf0l6Lzt6mQdjWbr30yR0qVpl2PhGdD4wg==
+X-Received: by 2002:a05:6214:e41:b0:6bf:5037:34f2 with SMTP id 6a1803df08f44-6bf5266e6damr316346d6.0.1723489552702;
+        Mon, 12 Aug 2024 12:05:52 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHULEPrzuVK7C4EVg3OxKvCsQnbJxY4NNhAXiFtPbLqFyv/lM4Rh6yLbZbETy8EfhglpTaRGQ==
+X-Received: by 2002:a05:6214:e41:b0:6bf:5037:34f2 with SMTP id 6a1803df08f44-6bf5266e6damr316036d6.0.1723489552107;
+        Mon, 12 Aug 2024 12:05:52 -0700 (PDT)
 Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-841367f32besm801295241.40.2024.08.12.11.58.08
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bd82e6dcb3sm27136416d6.144.2024.08.12.12.05.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Aug 2024 11:58:10 -0700 (PDT)
-Date: Mon, 12 Aug 2024 14:58:07 -0400
+        Mon, 12 Aug 2024 12:05:51 -0700 (PDT)
+Date: Mon, 12 Aug 2024 15:05:48 -0400
 From: Peter Xu <peterx@redhat.com>
-To: Axel Rasmussen <axelrasmussen@google.com>
+To: David Hildenbrand <david@redhat.com>
 Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
 	Sean Christopherson <seanjc@google.com>,
 	Oscar Salvador <osalvador@suse.de>,
 	Jason Gunthorpe <jgg@nvidia.com>,
+	Axel Rasmussen <axelrasmussen@google.com>,
 	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
 	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
 	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
@@ -88,16 +88,19 @@ Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
 	Ingo Molnar <mingo@redhat.com>,
 	Alistair Popple <apopple@nvidia.com>,
 	Borislav Petkov <bp@alien8.de>,
-	David Hildenbrand <david@redhat.com>,
 	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
 	Dave Hansen <dave.hansen@linux.intel.com>,
 	Alex Williamson <alex.williamson@redhat.com>,
 	Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 10/19] KVM: Use follow_pfnmap API
-Message-ID: <ZrpbP9Ow9EcpQtCF@x1n>
+Subject: Re: [PATCH 07/19] mm/fork: Accept huge pfnmap entries
+Message-ID: <ZrpdDI18wnYJcyIM@x1n>
 References: <20240809160909.1023470-1-peterx@redhat.com>
- <20240809160909.1023470-11-peterx@redhat.com>
- <CAJHvVciF4riGPQBhyBwNeSWHq8m+7Zag7ewEWgLJk=VsaqKNPQ@mail.gmail.com>
+ <20240809160909.1023470-8-peterx@redhat.com>
+ <d7fcec73-16f6-4d54-b334-6450a29e0a1d@redhat.com>
+ <ZrZOqbS3bcj52JZP@x1n>
+ <8ef394e6-a964-41c4-b33c-0e940b6b9bd8@redhat.com>
+ <ZrpUm-Lz-plw_fZy@x1n>
+ <9155deaa-b6c5-4e6c-95a7-9a5311b7085a@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -106,30 +109,153 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJHvVciF4riGPQBhyBwNeSWHq8m+7Zag7ewEWgLJk=VsaqKNPQ@mail.gmail.com>
+In-Reply-To: <9155deaa-b6c5-4e6c-95a7-9a5311b7085a@redhat.com>
 
-On Fri, Aug 09, 2024 at 10:23:20AM -0700, Axel Rasmussen wrote:
-> On Fri, Aug 9, 2024 at 9:09 AM Peter Xu <peterx@redhat.com> wrote:
-> >
-> > Use the new pfnmap API to allow huge MMIO mappings for VMs.  The rest work
-> > is done perfectly on the other side (host_pfn_mapping_level()).
+On Mon, Aug 12, 2024 at 08:50:12PM +0200, David Hildenbrand wrote:
+> On 12.08.24 20:29, Peter Xu wrote:
+> > On Fri, Aug 09, 2024 at 07:59:58PM +0200, David Hildenbrand wrote:
+> > > On 09.08.24 19:15, Peter Xu wrote:
+> > > > On Fri, Aug 09, 2024 at 06:32:44PM +0200, David Hildenbrand wrote:
+> > > > > On 09.08.24 18:08, Peter Xu wrote:
+> > > > > > Teach the fork code to properly copy pfnmaps for pmd/pud levels.  Pud is
+> > > > > > much easier, the write bit needs to be persisted though for writable and
+> > > > > > shared pud mappings like PFNMAP ones, otherwise a follow up write in either
+> > > > > > parent or child process will trigger a write fault.
+> > > > > > 
+> > > > > > Do the same for pmd level.
+> > > > > > 
+> > > > > > Signed-off-by: Peter Xu <peterx@redhat.com>
+> > > > > > ---
+> > > > > >     mm/huge_memory.c | 27 ++++++++++++++++++++++++---
+> > > > > >     1 file changed, 24 insertions(+), 3 deletions(-)
+> > > > > > 
+> > > > > > diff --git a/mm/huge_memory.c b/mm/huge_memory.c
+> > > > > > index 6568586b21ab..015c9468eed5 100644
+> > > > > > --- a/mm/huge_memory.c
+> > > > > > +++ b/mm/huge_memory.c
+> > > > > > @@ -1375,6 +1375,22 @@ int copy_huge_pmd(struct mm_struct *dst_mm, struct mm_struct *src_mm,
+> > > > > >     	pgtable_t pgtable = NULL;
+> > > > > >     	int ret = -ENOMEM;
+> > > > > > +	pmd = pmdp_get_lockless(src_pmd);
+> > > > > > +	if (unlikely(pmd_special(pmd))) {
+> > > > > > +		dst_ptl = pmd_lock(dst_mm, dst_pmd);
+> > > > > > +		src_ptl = pmd_lockptr(src_mm, src_pmd);
+> > > > > > +		spin_lock_nested(src_ptl, SINGLE_DEPTH_NESTING);
+> > > > > > +		/*
+> > > > > > +		 * No need to recheck the pmd, it can't change with write
+> > > > > > +		 * mmap lock held here.
+> > > > > > +		 */
+> > > > > > +		if (is_cow_mapping(src_vma->vm_flags) && pmd_write(pmd)) {
+> > > > > > +			pmdp_set_wrprotect(src_mm, addr, src_pmd);
+> > > > > > +			pmd = pmd_wrprotect(pmd);
+> > > > > > +		}
+> > > > > > +		goto set_pmd;
+> > > > > > +	}
+> > > > > > +
+> > > > > 
+> > > > > I strongly assume we should be using using vm_normal_page_pmd() instead of
+> > > > > pmd_page() further below. pmd_special() should be mostly limited to GUP-fast
+> > > > > and vm_normal_page_pmd().
+> > > > 
+> > > > One thing to mention that it has this:
+> > > > 
+> > > > 	if (!vma_is_anonymous(dst_vma))
+> > > > 		return 0;
+> > > 
+> > > Another obscure thing in this function. It's not the job of copy_huge_pmd()
+> > > to make the decision whether to copy, it's the job of vma_needs_copy() in
+> > > copy_page_range().
+> > > 
+> > > And now I have to suspect that uffd-wp is broken with this function, because
+> > > as vma_needs_copy() clearly states, we must copy, and we don't do that for
+> > > PMDs. Ugh.
+> > > 
+> > > What a mess, we should just do what we do for PTEs and we will be fine ;)
+> > 
+> > IIUC it's not a problem: file uffd-wp is different from anonymous, in that
+> > it pushes everything down to ptes.
+> > 
+> > It means if we skipped one huge pmd here for file, then it's destined to
+> > have nothing to do with uffd-wp, otherwise it should have already been
+> > split at the first attempt to wr-protect.
 > 
-> I don't think it has to be done in this series, but a future
-> optimization to consider is having follow_pfnmap just tell the caller
-> about the mapping level directly. It already found this information as
-> part of its walk. I think there's a possibility to simplify KVM /
-> avoid it having to do its own walk again later.
+> Is that also true for UFFD_FEATURE_WP_ASYNC, when we call
+> pagemap_scan_thp_entry()->make_uffd_wp_pmd() ?
+> 
+> I'm not immediately finding the code that does the "pushes everything down
+> to ptes", so I might miss that part.
 
-AFAIU pfnmap isn't special in this case, as we do the "walk pgtable twice"
-idea also to a generic page here, so probably not directly relevant to this
-patch alone.
+UFFDIO_WRITEPROTECT should have all those covered, while I guess you're
+right, looks like the pagemap ioctl is overlooked..
 
-But I agree with you, sounds like something we can consider trying.  I
-would be curious on whether the perf difference would be measurable in this
-specific case, though.  I mean, this first walk will heat up all the
-things, so I'd expect the 2nd walk (which is lockless) later be pretty fast
-normally.
+> 
+> > 
+> > > 
+> > > Also, we call copy_huge_pmd() only if "is_swap_pmd(*src_pmd) ||
+> > > pmd_trans_huge(*src_pmd) || pmd_devmap(*src_pmd)"
+> > > 
+> > > Would that even be the case with PFNMAP? I suspect that pmd_trans_huge()
+> > > would return "true" for special pfnmap, which is rather "surprising", but
+> > > fortunate for us.
+> > 
+> > It's definitely not surprising to me as that's the plan.. and I thought it
+> > shoulidn't be surprising to you - if you remember before I sent this one, I
+> > tried to decouple that here with the "thp agnostic" series:
+> > 
+> >    https://lore.kernel.org/r/20240717220219.3743374-1-peterx@redhat.com
+> > 
+> > in which you reviewed it (which I appreciated).
+> > 
+> > So yes, pfnmap on pmd so far will report pmd_trans_huge==true.
+> 
+> I review way to much stuff to remember everything :) That certainly screams
+> for a cleanup ...
+
+Definitely.
+
+> 
+> > 
+> > > 
+> > > Likely we should be calling copy_huge_pmd() if pmd_leaf() ... cleanup for
+> > > another day.
+> > 
+> > Yes, ultimately it should really be a pmd_leaf(), but since I didn't get
+> > much feedback there, and that can further postpone this series from being
+> > posted I'm afraid, then I decided to just move on with "taking pfnmap as
+> > THPs".  The corresponding change on this path is here in that series:
+> > 
+> > https://lore.kernel.org/all/20240717220219.3743374-7-peterx@redhat.com/
+> > 
+> > @@ -1235,8 +1235,7 @@ copy_pmd_range(struct vm_area_struct *dst_vma, struct vm_area_struct *src_vma,
+> >   	src_pmd = pmd_offset(src_pud, addr);
+> >   	do {
+> >   		next = pmd_addr_end(addr, end);
+> > -		if (is_swap_pmd(*src_pmd) || pmd_trans_huge(*src_pmd)
+> > -			|| pmd_devmap(*src_pmd)) {
+> > +		if (is_swap_pmd(*src_pmd) || pmd_is_leaf(*src_pmd)) {
+> >   			int err;
+> >   			VM_BUG_ON_VMA(next-addr != HPAGE_PMD_SIZE, src_vma);
+> >   			err = copy_huge_pmd(dst_mm, src_mm, dst_pmd, src_pmd,
+> > 
+> 
+> Ah, good.
+> 
+> [...]
+> 
+> > > Yes, as stated above, likely broken with UFFD-WP ...
+> > > 
+> > > I really think we should make this code just behave like it would with PTEs,
+> > > instead of throwing in more "different" handling.
+> > 
+> > So it could simply because file / anon uffd-wp work very differently.
+> 
+> Or because nobody wants to clean up that code ;)
+
+I think in this case maybe the fork() part is all fine? As long as we can
+switch pagemap ioctl to do proper break-downs when necessary, or even try
+to reuse what UFFDIO_WRITEPROTECT does if still possible in some way.
+
+In all cases, definitely sounds like another separate effort.
 
 Thanks,
 
