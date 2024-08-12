@@ -1,163 +1,129 @@
-Return-Path: <kvm+bounces-23829-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23830-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A14594E816
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 09:51:38 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBDDD94E8BD
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 10:39:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8F7FB22448
-	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 07:51:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6534EB22B76
+	for <lists+kvm@lfdr.de>; Mon, 12 Aug 2024 08:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 164A115C154;
-	Mon, 12 Aug 2024 07:51:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09C516BE24;
+	Mon, 12 Aug 2024 08:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDJlpqF1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YqVOzP9o"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8E313E40F;
-	Mon, 12 Aug 2024 07:51:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18034D599;
+	Mon, 12 Aug 2024 08:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723449087; cv=none; b=BlaBAM5l+K6Ff+EJUVzeaTMO/MoLE2ADoYiQDgenGoBoc/D34f27HiBQXQLBNYR7F+sP2ycA7dDiDpBsp58KuuVsQYWKxff0tEwxCoMa4S5BUbi/4IV+d5cMvXSd6Q3FdZJftQU6bE0zc7QQvGqyO/V1e21jTelpDnR6/fNrovA=
+	t=1723451976; cv=none; b=sRvS0mzjkHNf4th4EAXsVT1Ir4k6ENKimlkh2Q/BhMiOUp2zbHo8gJ74IzNXl/CdF8T5EmF6LWSKwfroh+ij2E0uucYQtYejD9+VQ8Gyxj7/+WxojjUJnB5WQH1/3pM/R4k329mo8fnuBEfIRdsBxtsL9AhvtUhpx5J+kahvLcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723449087; c=relaxed/simple;
-	bh=ROUL+tcwVdI8Nxxa9S18LN7O+XGXQCvdy68gp6/Ukg8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=QDZouPtJWCjjj1z+kH23nPGP382v5QUu8+1G3oV873ajOqD1LjXWvlGOlce0b3DuKayysQkIkSIOw9mBJm6AaLQvkxOLkVBzBrvSEz+fuOeaftYINykj88kgXt0K8L5WQ4yBXSqV3HkrcqulEMWG6AbWPMg4ZIb3UCxWjhPTkRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mDJlpqF1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42E3C4AF0C;
-	Mon, 12 Aug 2024 07:51:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723449086;
-	bh=ROUL+tcwVdI8Nxxa9S18LN7O+XGXQCvdy68gp6/Ukg8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=mDJlpqF1Sv02SfX0k0D2wl2KjtMAS3s/56zIkKV3K1oirRnl1tlJPP8UuC/oEhqT2
-	 0Lu5nUbRA8+XNkt93tiOKiTAEQ5G/1CakiJxM5GNxX6Q02Z8KjgjeKIIaLIG2+57Zn
-	 6e3Yz0RzAVkJFcaIVRz0Kx4UuWmMdSV6O5V5aHVn/oTOKsAZoYNBbsOZBheGK8YoKl
-	 wcUcbjak5vtD8yOtEyBzHs/NcC+B3vJwBbml4cw6TJWM5VMrgF2GSx4BkjYQrtN+S1
-	 H3b2cttpOd9bS2piUrRprWZFahEDM9qIEKqD8u45S4VFsmrcJQVztF6n1+cXuK/hs0
-	 ATp+jujZk0vSw==
-X-Mailer: emacs 31.0.50 (via feedmail 11-beta-1 I)
-From: Aneesh Kumar K.V <aneesh.kumar@kernel.org>
-To: Anish Moorthy <amoorthy@google.com>, seanjc@google.com,
-	oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: jthoughton@google.com, amoorthy@google.com, rananta@google.com
-Subject: Re: [PATCH v2 3/3] KVM: arm64: Perform memory fault exits when
- stage-2 handler EFAULTs
-In-Reply-To: <20240809205158.1340255-4-amoorthy@google.com>
-References: <20240809205158.1340255-1-amoorthy@google.com>
- <20240809205158.1340255-4-amoorthy@google.com>
-Date: Mon, 12 Aug 2024 13:21:19 +0530
-Message-ID: <yq5aikw6ji14.fsf@kernel.org>
+	s=arc-20240116; t=1723451976; c=relaxed/simple;
+	bh=XV9nUjhCLyBExk+VSw3rxsjG7FtPdvav3bqcyHbHGkQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nA86uGZNlDzquTLX1rjl0sQNFK0pdXWtufwMD9V7TgfYpCOeQ1eITgIvTfMTGHKBea/4Gg9Mpy3WgtifYaeBG9/9B7jikeSumcnZelJ4OhYXjN26j7IOX8VA+OS4BCHD6/YsN9R9GK0NyJRIOqFGuJ9xqig4u8nSHBXOG2WBqyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YqVOzP9o; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2cb4b6ecb3dso2676011a91.3;
+        Mon, 12 Aug 2024 01:39:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723451974; x=1724056774; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xBMPxTNOVtFQ5xIdEF+qAroCx/SMbY1g0f4CRcJTrug=;
+        b=YqVOzP9oM42kWqvxFpPeD3Xw/CJ8H2/PBm4tMg2JtoBzujuWkTCqOXyRC9tw4esDRA
+         3Y4Gc0oefxkvqx65h65WuUmJ9xn40PpiGX7PJWRPVSWKcS88TiLGc+nhuvzWXuN0YTir
+         nzWt11H03LejuosnuIdlJwY3eZXISIudxPKZkC6ZFvtQlqXTkutjps8y1zDWB7q1UTM9
+         A2ZGJV/G18vBn8GzHRPoXT+w03s9vpRky2NFf6XhBWJ8RbB/zFJa8RUSAnAEjiC1tKzy
+         YgBB7AltQVs5lFdisKcv7E+ZERYqenBkQTon+Q7zgwo1pZIM933nTc3d+Q3P83vuPzNb
+         /iEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723451974; x=1724056774;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xBMPxTNOVtFQ5xIdEF+qAroCx/SMbY1g0f4CRcJTrug=;
+        b=YUaQjS+B3MzK9dF/NxOrTAdSjXP6BVsShPtdZUPgcCP8K5EIeMTd66Vx/XQpff84R4
+         Nli3lwOiktdWVfsk2tw+EXKNAalRVRYU0rl9ubh7E/AejA+3qCy/3XmBr7U0yKkUn3L9
+         gjkR0hO7OI/9vPNMRmakHjmJRh55Xsa1xmQ8GaHapwuRKaru/b6vMpMmModrajyzoPNb
+         z/XccHOKJVWUvR6PazDM4l5WAbgnH010JUVCoWNo9naNMV2KvsrCtcRcVi+U7weGSAS+
+         9V8mFATpFeZY1hpvHE0+OZFIv3nQu/2I+spX/iIaQOn4jzxUvxDWmONGxAIohz6isAYi
+         A/AA==
+X-Forwarded-Encrypted: i=1; AJvYcCWqXhj0EEJ87VZMZTwJ5M2URWC5VL+DJL0Oi07aNF3P3TCMN5ZooUkRpf7K66ICNSoLGx0xpCxLsG8T/7XjavRRU8Wq8Ha8QosD8YAU63iRhE6K2zQyglqufPXhZT4xqmJl
+X-Gm-Message-State: AOJu0YwPNaVRmoc3XJcouDWDsKfpYBArNFtX/vOXk/xsnWYrW6gm+KWF
+	2xcoecPnuj7x1DWcwofPoIYC7KH/vyntGza71H8l4v/v6vCDvwdNtvle0b+cRqDFAF/7MfC0pm0
+	x0RKOPhdxXkRBKaoSKzr9N6jSieporD7O
+X-Google-Smtp-Source: AGHT+IH6HghSMo+9Sxukc4P5KkTBPEh7Tn0fTZUIAUJi80M4JJMpJiInTSz+J+l7UC2Qak+l8kDuTrE2/oRUmDNLcIo=
+X-Received: by 2002:a17:90a:d812:b0:2c9:6ad9:b75b with SMTP id
+ 98e67ed59e1d1-2d1e806a0d7mr5647208a91.40.1723451973922; Mon, 12 Aug 2024
+ 01:39:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-20-seanjc@google.com>
+In-Reply-To: <20240809194335.1726916-20-seanjc@google.com>
+From: Lai Jiangshan <jiangshanlai@gmail.com>
+Date: Mon, 12 Aug 2024 16:39:21 +0800
+Message-ID: <CAJhGHyDjsmQOQQoU52vA95sddWtzg1wh139jpPYBT1miUAgj6Q@mail.gmail.com>
+Subject: Re: [PATCH 19/22] KVM: x86/mmu: Add infrastructure to allow walking
+ rmaps outside of mmu_lock
+To: Sean Christopherson <seanjc@google.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>, 
+	James Houghton <jthoughton@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Anish Moorthy <amoorthy@google.com> writes:
+On Sat, Aug 10, 2024 at 3:49=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
 
-> Right now userspace just gets a bare EFAULT when the stage-2 fault
-> handler fails to fault in the relevant page. Set up a
-> KVM_EXIT_MEMORY_FAULT whenever this happens, which at the very least
-> eases debugging and might also let userspace decide on/take some
-> specific action other than crashing the VM.
->
-> In some cases, user_mem_abort() EFAULTs before the size of the fault is
-> calculated: return 0 in these cases to indicate that the fault is of
-> unknown size.
->
+> +
+> +static unsigned long kvm_rmap_lock(struct kvm_rmap_head *rmap_head)
+> +{
+> +       unsigned long old_val, new_val;
+> +
+> +       old_val =3D READ_ONCE(rmap_head->val);
+> +       if (!old_val)
+> +               return 0;
+> +
+> +       do {
+> +               /*
+> +                * If the rmap is locked, wait for it to be unlocked befo=
+re
+> +                * trying acquire the lock, e.g. to bounce the cache line=
+.
+> +                */
+> +               while (old_val & KVM_RMAP_LOCKED) {
+> +                       old_val =3D READ_ONCE(rmap_head->val);
+> +                       cpu_relax();
 
-VMMs are now converting private memory to shared or vice-versa on vcpu
-exit due to memory fault. This change will require VMM track each page's
-private/shared state so that they can now handle an exit fault on a
-shared memory where the fault happened due to reasons other than
-conversion. Should we make it easy by adding additional flag bits to
-indicate the fault was due to attribute and access type mismatch?
+The sequence of these two lines of code can be improved.
 
-
-> Signed-off-by: Anish Moorthy <amoorthy@google.com>
-> ---
->  Documentation/virt/kvm/api.rst |  2 +-
->  arch/arm64/kvm/arm.c           |  1 +
->  arch/arm64/kvm/mmu.c           | 11 ++++++++++-
->  3 files changed, 12 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
-> index c5ce7944005c..7b321fefcb3e 100644
-> --- a/Documentation/virt/kvm/api.rst
-> +++ b/Documentation/virt/kvm/api.rst
-> @@ -8129,7 +8129,7 @@ unavailable to host or other VMs.
->  7.34 KVM_CAP_MEMORY_FAULT_INFO
->  ------------------------------
->  
-> -:Architectures: x86
-> +:Architectures: arm64, x86
->  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
->  
->  The presence of this capability indicates that KVM_RUN *may* fill
-> diff --git a/arch/arm64/kvm/arm.c b/arch/arm64/kvm/arm.c
-> index a7ca776b51ec..4121b5a43b9c 100644
-> --- a/arch/arm64/kvm/arm.c
-> +++ b/arch/arm64/kvm/arm.c
-> @@ -335,6 +335,7 @@ int kvm_vm_ioctl_check_extension(struct kvm *kvm, long ext)
->  	case KVM_CAP_ARM_SYSTEM_SUSPEND:
->  	case KVM_CAP_IRQFD_RESAMPLE:
->  	case KVM_CAP_COUNTER_OFFSET:
-> +	case KVM_CAP_MEMORY_FAULT_INFO:
->  		r = 1;
->  		break;
->  	case KVM_CAP_SET_GUEST_DEBUG2:
-> diff --git a/arch/arm64/kvm/mmu.c b/arch/arm64/kvm/mmu.c
-> index 6981b1bc0946..c97199d1feac 100644
-> --- a/arch/arm64/kvm/mmu.c
-> +++ b/arch/arm64/kvm/mmu.c
-> @@ -1448,6 +1448,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  
->  	if (fault_is_perm && !write_fault && !exec_fault) {
->  		kvm_err("Unexpected L2 read permission error\n");
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, 0,
-> +					      write_fault, exec_fault, false);
->  		return -EFAULT;
->  	}
->  
-> @@ -1473,6 +1475,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  	if (unlikely(!vma)) {
->  		kvm_err("Failed to find VMA for hva 0x%lx\n", hva);
->  		mmap_read_unlock(current->mm);
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, 0,
-> +					      write_fault, exec_fault, false);
->  		return -EFAULT;
->  	}
->  
-> @@ -1568,8 +1572,11 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		kvm_send_hwpoison_signal(hva, vma_shift);
->  		return 0;
->  	}
-> -	if (is_error_noslot_pfn(pfn))
-> +	if (is_error_noslot_pfn(pfn)) {
-> +		kvm_prepare_memory_fault_exit(vcpu, fault_ipa, vma_pagesize,
-> +					      write_fault, exec_fault, false);
->  		return -EFAULT;
-> +	}
->  
->  	if (kvm_is_device_pfn(pfn)) {
->  		/*
-> @@ -1643,6 +1650,8 @@ static int user_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa,
->  		if (mte_allowed) {
->  			sanitise_mte_tags(kvm, pfn, vma_pagesize);
->  		} else {
-> +			kvm_prepare_memory_fault_exit(vcpu, fault_ipa, vma_pagesize,
-> +						      write_fault, exec_fault, false);
->  			ret = -EFAULT;
->  			goto out_unlock;
->  		}
-> -- 
-> 2.46.0.76.ge559c4bf1a-goog
+> +               }
+> +
+> +               /*
+> +                * Recheck for an empty rmap, it may have been purged by =
+the
+> +                * task that held the lock.
+> +                */
+> +               if (!old_val)
+> +                       return 0;
+> +
+> +               new_val =3D old_val | KVM_RMAP_LOCKED;
+> +       } while (!try_cmpxchg(&rmap_head->val, &old_val, new_val));
+> +
+> +       /* Return the old value, i.e. _without_ the LOCKED bit set. */
+> +       return old_val;
+> +}
 
