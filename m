@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-23971-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23972-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 484D4950210
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 12:08:46 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84358950211
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 12:08:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AC8128707C
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:08:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3ABBE1F236FB
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:08:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC3919D078;
-	Tue, 13 Aug 2024 10:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4939919D088;
+	Tue, 13 Aug 2024 10:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jbTqKpK7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mF1gzqUW"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6087119D062;
-	Tue, 13 Aug 2024 10:06:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BFFB19D07A;
+	Tue, 13 Aug 2024 10:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723543587; cv=none; b=DNRFiXolFFkx7rsljqdkM0LkugL1vQg1CcANtEvQj9F/Jap9BuG+xYsXV60y9ds3WWGi7QYH99HK1MPCRAAGWeOP34yH5oDp5Y3J2+7qsvFvK4xNJk6OdxHAcNo1j001iQbI/phAJ1IxolRJbb2Ybc+L4VxN3Q46R4j+gwZBXAI=
+	t=1723543588; cv=none; b=nM4m4j+qSt/C4cCItfwfoDLZ1dUm6uY/MaeOUYbGOCZHF36fN84kjX/U2vQLNtJu0hB19jLyKjAytTb+0yV10ctXnC9n7LmSwyjhD04/OXfQoVJGQFekWWoihET5UDbGAPGz6gAnph3lEdEG383jQBafuK1i6nQt0OG9ngpOGRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723543587; c=relaxed/simple;
-	bh=9mdkinhl2LH71GlqtWIUfQT9XRURynjNzc/O94RFrjk=;
+	s=arc-20240116; t=1723543588; c=relaxed/simple;
+	bh=TuS/6cRtmtNveKfMTQt2TRlXalUYKcoPDKFjEDaud+I=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ehaRu8sC0RNRmp3xFOmKh4tyr35khh8fu1BDbsdUIE5XiTVUc9+JwXC1s4fhsOnyFkUW+6d7pkQdL9MaB8v6Qs6PZLMERj54vWjZKY2ohSvryTtypkWq7l0khmM86M4+jkOR8W92cS3RzUQdi6Y4+ULG+zmGX9iWhGcUyRCWto0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jbTqKpK7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3914DC4AF0B;
+	 MIME-Version; b=WZwklKQZctq7j4Sqa6xDlAbfneNn0BWLzmdEogPUw4CpzwQVNTMmLQ9gOUXWgFRnQSSx+JNGo6p25/REwieJyTTHfKr53z9Vv54UcKwbKGXJwTy9wU/5r+gP14ywMBJdhYMMog2HqOVtZQOuuNiJSAgAr3kW3SAOvTvKklgP4tA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mF1gzqUW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE839C4AF09;
 	Tue, 13 Aug 2024 10:06:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723543587;
-	bh=9mdkinhl2LH71GlqtWIUfQT9XRURynjNzc/O94RFrjk=;
+	s=k20201202; t=1723543588;
+	bh=TuS/6cRtmtNveKfMTQt2TRlXalUYKcoPDKFjEDaud+I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jbTqKpK7oYSqeI9I5eMZczPVlW/58zRIpuvD4jASfthpAxeitcPPvlPJt3rV5GCoO
-	 OqoM6Sia+w5JL11FAUNqzUpX1ubBYT6zYmcF4R1dhg0rgWFSaQc2+VYOzVzn5Fiudf
-	 WQZv7TjekM9Ay6VMxH0IYLGPKHzC2/n/nHKyN5Kedqldqp4kAxKFTkxfBHWXl8kLXw
-	 iH99ChBIjMN+PIYNt8LPuQnWZF6sMuRgp3P4mizrwjLOIjcypC3+KOOJANz27rsaPy
-	 DOjSbxHM0AJFg/xvwc8+HCFyzi9zg0xnt05b0VcnySF7at+oFumpji5zSQ7dkpHqfr
-	 v+ggI/KjugDhg==
+	b=mF1gzqUWJthPinHN/3ChnQ6VUoqcTMpb41g+La3DOw9cDR6ZlDQniTmGauDnaVECx
+	 FxOqODv/WvR6MJnBo6lz4CNmzFLTCZ7d8EQ2KvM3n58lcSvVLVcKXDlqoL4qbXj1W0
+	 tXH1sAgrUhFbuqygYbDECgN8hLF3Bgoc4ahR3xfY7WPpXUR6aWWG/ez8q8XMQJC3qI
+	 pzJ4RjokVD5j00d8r2GUx4wUh1rUFhJt2WYFVm1pVO9HMnI97GI+6SYpqdVmgb3AAe
+	 yhPtxwmnhg9gVEk5JAjZ81Q0TeR3QXo+ED9wF+XHHF0liRY+T3Re0I2Oc+z1SpvHNx
+	 6KBzXyLFVEzhQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdoQ5-003INM-1u;
+	id 1sdoQ5-003INM-Oo;
 	Tue, 13 Aug 2024 11:06:25 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -59,9 +59,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v3 16/18] KVM: arm64: nv: Make AT+PAN instructions aware of FEAT_PAN3
-Date: Tue, 13 Aug 2024 11:05:38 +0100
-Message-Id: <20240813100540.1955263-17-maz@kernel.org>
+Subject: [PATCH v3 17/18] KVM: arm64: nv: Plumb handling of AT S1* traps from EL2
+Date: Tue, 13 Aug 2024 11:05:39 +0100
+Message-Id: <20240813100540.1955263-18-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240813100540.1955263-1-maz@kernel.org>
 References: <20240813100540.1955263-1-maz@kernel.org>
@@ -77,50 +77,84 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-FEAT_PAN3 added a check for executable permissions to FEAT_PAN2.
-Add the required SCTLR_ELx.EPAN and descriptor checks to handle
-this correctly.
+Hooray, we're done. Plug the AT traps into the system instruction
+table, and let it rip.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/at.c | 17 ++++++++++++++++-
- 1 file changed, 16 insertions(+), 1 deletion(-)
+ arch/arm64/kvm/sys_regs.c | 45 +++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 45 insertions(+)
 
-diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
-index 6d5555e98557..c134bcd0338d 100644
---- a/arch/arm64/kvm/at.c
-+++ b/arch/arm64/kvm/at.c
-@@ -728,6 +728,21 @@ static u64 compute_par_s1(struct kvm_vcpu *vcpu, struct s1_walk_result *wr,
- 	return par;
- }
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index e7e5e0df119e..9f3cf82e5231 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2803,6 +2803,36 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	EL2_REG(SP_EL2, NULL, reset_unknown, 0),
+ };
  
-+static bool pan3_enabled(struct kvm_vcpu *vcpu, enum trans_regime regime)
++static bool handle_at_s1e01(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			    const struct sys_reg_desc *r)
 +{
-+	u64 sctlr;
++	u32 op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
 +
-+	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, PAN, PAN3))
-+		return false;
++	__kvm_at_s1e01(vcpu, op, p->regval);
 +
-+	if (regime == TR_EL10)
-+		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL1);
-+	else
-+		sctlr = vcpu_read_sys_reg(vcpu, SCTLR_EL2);
-+
-+	return sctlr & SCTLR_EL1_EPAN;
++	return true;
 +}
 +
- static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
++static bool handle_at_s1e2(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			   const struct sys_reg_desc *r)
++{
++	u32 op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++
++	__kvm_at_s1e2(vcpu, op, p->regval);
++
++	return true;
++}
++
++static bool handle_at_s12(struct kvm_vcpu *vcpu, struct sys_reg_params *p,
++			  const struct sys_reg_desc *r)
++{
++	u32 op = sys_insn(p->Op0, p->Op1, p->CRn, p->CRm, p->Op2);
++
++	__kvm_at_s12(vcpu, op, p->regval);
++
++	return true;
++}
++
+ static bool kvm_supported_tlbi_s12_op(struct kvm_vcpu *vpcu, u32 instr)
  {
- 	bool perm_fail, ur, uw, ux, pr, pw, px;
-@@ -794,7 +809,7 @@ static u64 handle_at_slow(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
- 			bool pan;
+ 	struct kvm *kvm = vpcu->kvm;
+@@ -3065,6 +3095,14 @@ static struct sys_reg_desc sys_insn_descs[] = {
+ 	{ SYS_DESC(SYS_DC_ISW), access_dcsw },
+ 	{ SYS_DESC(SYS_DC_IGSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_IGDSW), access_dcgsw },
++
++	SYS_INSN(AT_S1E1R, handle_at_s1e01),
++	SYS_INSN(AT_S1E1W, handle_at_s1e01),
++	SYS_INSN(AT_S1E0R, handle_at_s1e01),
++	SYS_INSN(AT_S1E0W, handle_at_s1e01),
++	SYS_INSN(AT_S1E1RP, handle_at_s1e01),
++	SYS_INSN(AT_S1E1WP, handle_at_s1e01),
++
+ 	{ SYS_DESC(SYS_DC_CSW), access_dcsw },
+ 	{ SYS_DESC(SYS_DC_CGSW), access_dcgsw },
+ 	{ SYS_DESC(SYS_DC_CGDSW), access_dcgsw },
+@@ -3144,6 +3182,13 @@ static struct sys_reg_desc sys_insn_descs[] = {
+ 	SYS_INSN(TLBI_VALE1NXS, handle_tlbi_el1),
+ 	SYS_INSN(TLBI_VAALE1NXS, handle_tlbi_el1),
  
- 			pan = *vcpu_cpsr(vcpu) & PSR_PAN_BIT;
--			pan &= ur || uw;
-+			pan &= ur || uw || (pan3_enabled(vcpu, wi.regime) && ux);
- 			pw &= !pan;
- 			pr &= !pan;
- 		}
++	SYS_INSN(AT_S1E2R, handle_at_s1e2),
++	SYS_INSN(AT_S1E2W, handle_at_s1e2),
++	SYS_INSN(AT_S12E1R, handle_at_s12),
++	SYS_INSN(AT_S12E1W, handle_at_s12),
++	SYS_INSN(AT_S12E0R, handle_at_s12),
++	SYS_INSN(AT_S12E0W, handle_at_s12),
++
+ 	SYS_INSN(TLBI_IPAS2E1IS, handle_ipas2e1is),
+ 	SYS_INSN(TLBI_RIPAS2E1IS, handle_ripas2e1is),
+ 	SYS_INSN(TLBI_IPAS2LE1IS, handle_ipas2e1is),
 -- 
 2.39.2
 
