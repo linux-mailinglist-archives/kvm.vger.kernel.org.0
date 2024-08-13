@@ -1,50 +1,51 @@
-Return-Path: <kvm+bounces-24001-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24002-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D41950819
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD3B5950818
 	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:48:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CAE11C2284E
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 14:48:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8724A2857B6
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 14:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6040219EED6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 603B619EED3;
 	Tue, 13 Aug 2024 14:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BiM73EWE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mua16IWe"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8D9199389;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8811D68F;
 	Tue, 13 Aug 2024 14:47:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723560477; cv=none; b=Fmz6t8hPxm8FQY5MYZIhWFXvCssHscOANX8uxUoHsV8OR5WIMCq+7ZAtCHKuydDQztQjnzb8SoWw/fKzquVHeETAJx5Hoc77zER+TWTsd3wycQq/+HaztMtf924WN/nvj3ONiH353czuZCBZNC5HQQs2+qIDtDnWhw0CvPDh0OI=
+	t=1723560477; cv=none; b=svlva5izgerxkztL/NXQTMcLao1DjKOsBwVCOAK1RkzfF4V9vE6PeJ50UzGZNDBpFSvonZoh0BBYyT3F/tdO4fkzD08GQd9OZhRh6KX3CYFf2Sxpmq+R88IG8WmnlJrS23Vs/vhkM75RYH73OE+3+jH8M4oqb9z96Bph0JWa+98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723560477; c=relaxed/simple;
-	bh=ybweyFTPZIsemP1mTBqOWgja4nvW2VxgY6ZJsmy/cTo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=owCCAAO3Ulph34hIScP0+gyouwd1Mc31iS+LINbdyXyYz44Ti5oZNydGm6F6ejLlEAlH60lbQNfMhkIe1UqVpl2Z1doe1hcc3gcVBWSvSvXt2SH7yP+IN53Jtk8eTxQZlya5htZBEWFXM9uvC3fvfjpu6wWiviFHl2kpduz0BeA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BiM73EWE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35E37C4AF09;
+	bh=tQhs6sQmLRKSXnFl/3yZscrAIYRb7Tz89+/QXGEXSMs=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=d2jKcF7ccjFYmK3FBmXDzPet/fdqSMgZ54PG+1kbVlY/upRZDqm1fOJ6ygrWsIgut2s7BVy9lzzxH2dxfwcJXkQa3G9BI1nySC/MIg3DkykqzDm2kd4D8MW76emxRkAW+yX9p3XYt0Mh0SjQbd9wXN430xT2B3eBeBb0CDlflk4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mua16IWe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39227C4AF0F;
 	Tue, 13 Aug 2024 14:47:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723560477;
-	bh=ybweyFTPZIsemP1mTBqOWgja4nvW2VxgY6ZJsmy/cTo=;
-	h=From:To:Cc:Subject:Date:From;
-	b=BiM73EWECVBgrpxuBT4Klb7KylyZpjAXyuaCSBn/PAMJnktoOJ8RyTEl3cEoQLMEX
-	 HgKfgtXkMmqVzrIDV8cH2CWEJM1zqoc5MazXnuv39+55day0+NydDykBuDZa2LWMVO
-	 29TwmrKNwwcranLM/J1GAEHy7K/CPucYpWUR2XcFvSsv7YgtEs4KnfpdASLIOuU3ys
-	 AfqaOsUk3a8iKsCB8e1s6PxIbkkBzSWKvCGtDL+5VNEEKE/Z3luRwsLiGJBlfelwl0
-	 rrGgOCvY9xDQDwbCLl1UWk4nthStTOWUfVTcJpVI9QsS/PO5BXdYURqC4exLm/DVdJ
-	 l8DDG4U4MfztQ==
+	bh=tQhs6sQmLRKSXnFl/3yZscrAIYRb7Tz89+/QXGEXSMs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=mua16IWe6C4QYn718rOjMLNbcblOr9rsWmY/KNFHaN/rzsgwnJ2FYozg3S0ZXHdn3
+	 XQqvSKUmzsFM35dhx/cX4M+iQX6oPUYRLzg5SEHAiotV6yp8PnENggPN7wRFON2QZq
+	 WT1vZ/oVaslkagtXHsZPDncrFnM69Log5qb2FwBXSKKldd+FZdgwQJbXZLMhAB3+Sm
+	 GjBnQF7BchOLmTtemcYGleEXt49v8BPK0ce0BtIDO1bA2ftTGiNFaXhypcghIv/kVH
+	 GsvtmU3jrhUoJvlpf2ds+ZBh1YkfHP4iiy4SrPisFAecIV+fdL6J8wfYDGLGtsdqQv
+	 /xUCotHq+So0g==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdsoV-003O27-5X;
+	id 1sdsoV-003O27-D7;
 	Tue, 13 Aug 2024 15:47:55 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -56,10 +57,12 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH 00/10] KVM: arm64: Add EL2 support to FEAT_S1PIE
-Date: Tue, 13 Aug 2024 15:47:28 +0100
-Message-Id: <20240813144738.2048302-1-maz@kernel.org>
+Subject: [PATCH 01/10] KVM: arm64: nv: Handle CNTHCTL_EL2 specially
+Date: Tue, 13 Aug 2024 15:47:29 +0100
+Message-Id: <20240813144738.2048302-2-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240813144738.2048302-1-maz@kernel.org>
+References: <20240813144738.2048302-1-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -72,42 +75,82 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-This series serves a few purposes:
+Accessing CNTHCTL_EL2 is fraught with danger if running with
+HCR_EL2.E2H=1: half of the bits are held in CNTKCTL_EL1, and
+thus can be changed behind our back, while the rest lives
+in the CNTHCTL_EL2 shadow copy that is memory-based.
 
-- Complete the S1PIE support to include EL2
-- Sneak in the EL2 system register world switch
+Yes, this is a lot of fun!
 
-As this is a parallel series to the one implementing Address
-Translation, the S1PIE part of AT is not in any of the two. Depending
-on which series goes in first, I'll add whatever is needed on top.
+Make sure that we merge the two on read access, while we can
+write to CNTKCTL_EL1 in a more straightforward manner.
 
-As mentioned in few of the patches, this implementation relies on a
-very recent fix to the architecture (D22677 in [1]).
+Signed-off-by: Marc Zyngier <maz@kernel.org>
+---
+ arch/arm64/kvm/sys_regs.c    | 28 ++++++++++++++++++++++++++++
+ include/kvm/arm_arch_timer.h |  3 +++
+ 2 files changed, 31 insertions(+)
 
-[1] https://developer.arm.com/documentation/102105/ka-04/
-
-Marc Zyngier (10):
-  KVM: arm64: nv: Handle CNTHCTL_EL2 specially
-  KVM: arm64: nv: Save/Restore vEL2 sysregs
-  KVM: arm64: Add TCR2_EL2 to the sysreg arrays
-  KVM: arm64: Add save/restore for TCR2_EL2
-  arm64: Add encoding for PIRE0_EL2
-  arm64: Remove VNCR definition for PIRE0_EL2
-  KVM: arm64: Add PIR{,E0}_EL2 to the sysreg arrays
-  KVM: arm64: Add save/restore for PIR{,E0}_EL2
-  KVM: arm64: Handle  PIR{,E0}_EL2 traps
-  KVM: arm64: Sanitise ID_AA64MMFR3_EL1
-
- arch/arm64/include/asm/kvm_host.h          |   3 +
- arch/arm64/include/asm/vncr_mapping.h      |   1 -
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h |   5 +-
- arch/arm64/kvm/hyp/nvhe/sysreg-sr.c        |   2 +-
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c         | 155 ++++++++++++++++++++-
- arch/arm64/kvm/sys_regs.c                  |  61 +++++++-
- arch/arm64/tools/sysreg                    |   4 +
- include/kvm/arm_arch_timer.h               |   3 +
- 8 files changed, 227 insertions(+), 7 deletions(-)
-
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..95832881fd66 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -140,6 +140,21 @@ u64 vcpu_read_sys_reg(const struct kvm_vcpu *vcpu, int reg)
+ 		if (!is_hyp_ctxt(vcpu))
+ 			goto memory_read;
+ 
++		/*
++		 * CNTHCTL_EL2 requires some special treatment to
++		 * account for the bits that can be set via CNTKCTL_EL1.
++		 */
++		switch (reg) {
++		case CNTHCTL_EL2:
++			if (vcpu_el2_e2h_is_set(vcpu)) {
++				val = read_sysreg_el1(SYS_CNTKCTL);
++				val &= CNTKCTL_VALID_BITS;
++				val |= __vcpu_sys_reg(vcpu, reg) & ~CNTKCTL_VALID_BITS;
++				return val;
++			}
++			break;
++		}
++
+ 		/*
+ 		 * If this register does not have an EL1 counterpart,
+ 		 * then read the stored EL2 version.
+@@ -190,6 +205,19 @@ void vcpu_write_sys_reg(struct kvm_vcpu *vcpu, u64 val, int reg)
+ 		 */
+ 		__vcpu_sys_reg(vcpu, reg) = val;
+ 
++		switch (reg) {
++		case CNTHCTL_EL2:
++			/*
++			 * If E2H=0, CNHTCTL_EL2 is a pure shadow register.
++			 * Otherwise, some of the bits are backed by
++			 * CNTKCTL_EL1, while the rest is kept in memory.
++			 * Yes, this is fun stuff.
++			 */
++			if (vcpu_el2_e2h_is_set(vcpu))
++				write_sysreg_el1(val, SYS_CNTKCTL);
++			return;
++		}
++
+ 		/* No EL1 counterpart? We're done here.? */
+ 		if (reg == el1r)
+ 			return;
+diff --git a/include/kvm/arm_arch_timer.h b/include/kvm/arm_arch_timer.h
+index c819c5d16613..fd650a8789b9 100644
+--- a/include/kvm/arm_arch_timer.h
++++ b/include/kvm/arm_arch_timer.h
+@@ -147,6 +147,9 @@ u64 timer_get_cval(struct arch_timer_context *ctxt);
+ void kvm_timer_cpu_up(void);
+ void kvm_timer_cpu_down(void);
+ 
++/* CNTKCTL_EL1 valid bits as of DDI0487J.a */
++#define CNTKCTL_VALID_BITS	(BIT(17) | GENMASK_ULL(9, 0))
++
+ static inline bool has_cntpoff(void)
+ {
+ 	return (has_vhe() && cpus_have_final_cap(ARM64_HAS_ECV_CNTPOFF));
 -- 
 2.39.2
 
