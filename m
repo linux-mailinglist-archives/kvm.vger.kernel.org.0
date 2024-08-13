@@ -1,86 +1,102 @@
-Return-Path: <kvm+bounces-24015-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24016-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08DD2950899
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:11:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4519508AC
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:14:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B3C061F223C4
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:11:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 708BD1C22737
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:14:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 398CE1A01C5;
-	Tue, 13 Aug 2024 15:10:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63C0D1A01AB;
+	Tue, 13 Aug 2024 15:14:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AzcKh0Fc"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA9219EED6
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 15:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4CA3B192;
+	Tue, 13 Aug 2024 15:14:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723561847; cv=none; b=bdtDV6ph3TdLAZnwP4RkTa7hcP4wvkxPnS0Wy9sspzbRG3Zs7Y8+l3xUDt8CNx9l7ebRyGaPm4DJhc7vbw5KYtU1cTF5wTKmb7AHum/6ZJ3u8Tnu+0lr1UrEgwa15kcoqjm6M7UvCmu7fqEhIosH/0uQUxD66SKdikZwzgnbCbo=
+	t=1723562079; cv=none; b=XeIz7TQLXulHl96+B575C7o2cxpAonUHvTnhtu9yMc2qOw9SDUV8ILGRLzyYqNzMIYc7/KV8smmDtLB7BrA6XMLz/d8EQXhKqo9ND7riMJ8yu69of4rq5jJ4EfnXkradkUn/g6dGZQC4W2jsorooY3BgF31mebSnFxn66v/4U6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723561847; c=relaxed/simple;
-	bh=vzusSZPUHOfEHplCDELxs8sW6d1y/V2522VBvA665ZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Df2vGd66UIn/eaRgySZ4IdU6xn5VCmNHnvDXzkQ2kIOsC7Kj7V4IVGqnNlc1Fgz6xvIWCnVGrRmiDm45on8sY/v8dgro4qZrN6iPKRBo9OZlbpRA/PehrQaYfKALb4WnhR2nHX96b7HAYDgHd5I9dqA+sZAWOjyXsTPLSue8zKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id DD0251596;
-	Tue, 13 Aug 2024 08:11:11 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id CC1F63F6A8;
-	Tue, 13 Aug 2024 08:10:44 -0700 (PDT)
-Date: Tue, 13 Aug 2024 16:10:42 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 06/10] arm64: Remove VNCR definition for PIRE0_EL2
-Message-ID: <20240813151042.GC3321997@e124191.cambridge.arm.com>
-References: <20240813144738.2048302-1-maz@kernel.org>
- <20240813144738.2048302-7-maz@kernel.org>
+	s=arc-20240116; t=1723562079; c=relaxed/simple;
+	bh=WBQDgpze3nOImWdFR2VP7QJc+vFPXo94UaLalSef/cQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jDzN2gl6uhgrbqNqmPot6VqNEpc2UuHnjjKIZO69j7dwNLgZqbKmVMfUZNus7mM8LfJd+hb18y0y5mz0ASQP6Gc78+mdw2Cd4fNacleRR77aUBm6NhcAiZFwRqJoj+e9yCGuckZ3PEQd5q1YcPgexXjIRsrp1/azYxAGDq8dHko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AzcKh0Fc; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723562078; x=1755098078;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=WBQDgpze3nOImWdFR2VP7QJc+vFPXo94UaLalSef/cQ=;
+  b=AzcKh0FcNwx9B5LdWTqCTJ5dWGLhIs5WAbSSadPLrsajs2PM2lVkcPDt
+   AvLxYyZaTJNOiYRnNhaN7uEbtFto4EpiqV/WLWioBmaaaxt66OcT6L9vL
+   wFZ2HlFbxYTuPXpkoXDRxEHiVXksKVMwzCNsJksMOOmxmy3HF6OBjUfm7
+   fk2J0Ox/nkdPAfue/C3JaTAf8NEteoXpnQ5CXy3CltzorJ68G0dC4h6pb
+   lqhWehU7NF/cfY8KhYpTxrcF5xpU2wP7l667tpNrrmm4eh80MvOxWiTjK
+   BCi7yi1PNdJU+jez+7Vm24mAyxdxrEAiy9oLKtXplXhbAonbk+d9PgU6M
+   A==;
+X-CSE-ConnectionGUID: JlPQHC8EQX6vhkiNtAPZgA==
+X-CSE-MsgGUID: kl+8lUJOTdOnqw7fYPe9yQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="33136463"
+X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
+   d="scan'208";a="33136463"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 08:14:37 -0700
+X-CSE-ConnectionGUID: 4QLPTbJrTc2D49Rf/SSRHQ==
+X-CSE-MsgGUID: lWGoRVsIRkqcp+mRKGnprQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
+   d="scan'208";a="81925585"
+Received: from xiaoyaol-hp-g830.ccr.corp.intel.com (HELO [10.124.228.22]) ([10.124.228.22])
+  by fmviesa002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 08:14:34 -0700
+Message-ID: <efc22d22-9cb6-41f7-a703-e96cbaf0aca7@intel.com>
+Date: Tue, 13 Aug 2024 23:14:31 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240813144738.2048302-7-maz@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 25/25] KVM: x86: Add CPUID bits missing from
+ KVM_GET_SUPPORTED_CPUID
+To: Chao Gao <chao.gao@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, linux-kernel@vger.kernel.org
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-26-rick.p.edgecombe@intel.com>
+ <ZrtEvEh4UJ6ZbPq5@chao-email>
+Content-Language: en-US
+From: Xiaoyao Li <xiaoyao.li@intel.com>
+In-Reply-To: <ZrtEvEh4UJ6ZbPq5@chao-email>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 13, 2024 at 03:47:34PM +0100, Marc Zyngier wrote:
-> As of the ARM ARM Known Issues document 102105_K.a_04_en, D22677
-> fixes a problem with the PIRE0_EL2 register, resulting in its
-> removal from the VNCR page (it had no purpose being there the
-> first place).
-> 
-> Follow the architecture update by removing this offset.
-> 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/include/asm/vncr_mapping.h | 1 -
->  1 file changed, 1 deletion(-)
-> 
-> diff --git a/arch/arm64/include/asm/vncr_mapping.h b/arch/arm64/include/asm/vncr_mapping.h
-> index df2c47c55972..9e593bb60975 100644
-> --- a/arch/arm64/include/asm/vncr_mapping.h
-> +++ b/arch/arm64/include/asm/vncr_mapping.h
-> @@ -50,7 +50,6 @@
->  #define VNCR_VBAR_EL1           0x250
->  #define VNCR_TCR2_EL1		0x270
->  #define VNCR_PIRE0_EL1		0x290
-> -#define VNCR_PIRE0_EL2		0x298
->  #define VNCR_PIR_EL1		0x2A0
->  #define VNCR_ICH_LR0_EL2        0x400
->  #define VNCR_ICH_LR1_EL2        0x408
+On 8/13/2024 7:34 PM, Chao Gao wrote:
+> I think adding new fixed-1 bits is fine as long as they don't break KVM, i.e.,
+> KVM shouldn't need to take any action for the new fixed-1 bits, like
+> saving/restoring more host CPU states across TD-enter/exit or emulating
+> CPUID/MSR accesses from guests
 
-Reviewed-by: Joey Gouly <joey.gouly@arm.com>
+I disagree. Adding new fixed-1 bits in a newer TDX module can lead to a 
+different TD with same cpu model.
+
+People may argue that for the new features that have no vmcs control bit 
+(usually the new instruction) face the similar issue. Booting a VM with 
+same cpu model on a new platform with such new feature leads to the VM 
+actually can use the new feature.
+
+However, for the perspective of CPUID, VMM at least can make sure it 
+unchanged, though guest can access the feature even when guest CPUID 
+tells no such feature. This is virtualization hole. no one like it.
 
