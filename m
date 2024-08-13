@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-24006-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24004-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E1E395081E
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:48:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8588B95081B
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:48:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90A541C220D7
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 14:48:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B83141C2269C
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 14:48:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E7671A01D9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176521A01D5;
 	Tue, 13 Aug 2024 14:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FFuLmPln"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsGJ919E"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4433119FA8E;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40C1719FA6B;
 	Tue, 13 Aug 2024 14:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723560479; cv=none; b=lOCXAikRMLSm5c8jnF/hHjZ//fi7kGlwpDyFgSh6FYWWpWiY+Wdv4mXo02WspfbK6NsIlSxQmh9/b3nhWIhyfY6sNi5vkM1216ADX4iXUlDrpLBl/vRFfBHdBpPTxkMOTXUtFWep37H3z8VeFbm7NyPj/i8BrWzPkA9y/3jf1iQ=
+	t=1723560479; cv=none; b=tgDi41Dwxpu9tlaNkUP0WojjoTL18xMh1i1ljRIyK6f7x4b18MqHCpOoabOknQVvO2PTj+4oZBhVo3w/F6FFRPnPr9PdfsLHykeRMpTVnSL+nAQl+hr6R+bF94aEF7ByOHQZuF8FcNQqYlUCb/YihTuiGY7+srFUnH0Y2+MRs/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723560479; c=relaxed/simple;
-	bh=hMvaTIIDsws2gWarUwjsfFWKccw4pmnymZDpQdb9O2M=;
+	bh=vT/5asr8l07sZbrUs7NSkiwidQ979neRK/s0Vwf6rPA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GZKzvVyOyL34T2iqFvNZIpH8upT4T9L8DqY5akacYB/7V1zsAZD+doWx9YHZFp7QTKxLUbwD9J1kfMFMfBpigtgENgX8mEXbaJl9I9suHPQTPJpvSVnoJTaOkt+dqtcyTwVXu+3vBt9WmcFsKv0mK6lpMrLdGYCMSGF+li0kYPo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FFuLmPln; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 16697C4AF18;
-	Tue, 13 Aug 2024 14:47:59 +0000 (UTC)
+	 MIME-Version; b=Qjj0KXtaoEohni4nmea84XZTvT5uJqg8laGTsBlyvopml7zGpcbAjd1NhZnW3yM7t5UnX6/t5RTKLZzWxF/axrZJj5h8tJmW77cqEIvhvwIFZ72+8fJAUA0ZKZtlDjfOZ7JNnmIpRAZoAaUxVEvYZU7zGRk9ROIbzf05QgzdE6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qsGJ919E; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA2E0C4AF17;
+	Tue, 13 Aug 2024 14:47:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723560479;
-	bh=hMvaTIIDsws2gWarUwjsfFWKccw4pmnymZDpQdb9O2M=;
+	s=k20201202; t=1723560478;
+	bh=vT/5asr8l07sZbrUs7NSkiwidQ979neRK/s0Vwf6rPA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=FFuLmPlnki+A6KNzfNt3bJRtM120mELggB2D0lAavBB1tIQZ9nbigi0OMG9ZvuVVs
-	 auGmEKfO96zwikNqfO+KJS+y2kMWy02XGPY1IVCzoPg3fcitJ9OAeCNMMv/HLhz4Wh
-	 tn/Ipgh60DbUmVqYfWkwuhHnZnvhSXFFTmSWJUQDnHaxjuJmlxxMDdM5UqmsYmhT3O
-	 HMKJ9hoUAAiQm5OHI4x9OocSegOO+m3ffw3mS+i0mLqg52efWMTNc+Sa2NkVqSYbnJ
-	 LD2G6d3D9+BprlnC/zUGLeTDvZdGu7BnUC/YaKVMxu0ax8jqS2Eu2Y5B4d6fRxbOUQ
-	 pGOoC478eM8Qw==
+	b=qsGJ919E5blg80Wg3QFLF39t16IkKhfRmKXBO3HXWSN64qjKCN6pkmJkSil044iCG
+	 5WpqU6aMPlDfy2nzqqFc9TRjB73SBKfipXVyx5bUqc+ZEc9RWEG7XA9hklzDcRJed0
+	 W6vdHrul5sPxWFI+pqPeZCwXBkLNVMRvVdRL1MbqWObz73tUH/MDN7prf0PKPC5KT+
+	 oOGF+BYSNPOLRqUyFYPYn62LC/8+USaJvpr5tZGitxvM/2SlKQPfMhYXIvbMnau3k3
+	 +LcNpU2Fn9zaPlHB+v64fXhwlERNBS2HSST4ZgXC986AHfnX8dIZ97JmpN+PmQSI+O
+	 TsYxs8FnByGWg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdsoW-003O27-VD;
+	id 1sdsoX-003O27-4v;
 	Tue, 13 Aug 2024 15:47:57 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -57,9 +57,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Zenghui Yu <yuzenghui@huawei.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: [PATCH 04/10] KVM: arm64: Add save/restore for TCR2_EL2
-Date: Tue, 13 Aug 2024 15:47:32 +0100
-Message-Id: <20240813144738.2048302-5-maz@kernel.org>
+Subject: [PATCH 05/10] arm64: Add encoding for PIRE0_EL2
+Date: Tue, 13 Aug 2024 15:47:33 +0100
+Message-Id: <20240813144738.2048302-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240813144738.2048302-1-maz@kernel.org>
 References: <20240813144738.2048302-1-maz@kernel.org>
@@ -75,38 +75,31 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Like its EL1 equivalent, TCR2_EL2 gets context-switched.
-This is made conditional on FEAT_TCRX being adversised.
+PIRE0_EL2 is the equivalent of PIRE0_EL1 for the EL2&0 translation
+regime, and it is sorely missing from the sysreg file.
+
+Add the sucker.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/vhe/sysreg-sr.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ arch/arm64/tools/sysreg | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-index 6db5b4d0f3a4..7099775cd505 100644
---- a/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-+++ b/arch/arm64/kvm/hyp/vhe/sysreg-sr.c
-@@ -51,6 +51,9 @@ static void __sysreg_save_vel2_state(struct kvm_cpu_context *ctxt)
- 		ctxt_sys_reg(ctxt, TTBR1_EL2)	= read_sysreg_el1(SYS_TTBR1);
- 		ctxt_sys_reg(ctxt, TCR_EL2)	= read_sysreg_el1(SYS_TCR);
+diff --git a/arch/arm64/tools/sysreg b/arch/arm64/tools/sysreg
+index 7ceaa1e0b4bc..8e1aed548e93 100644
+--- a/arch/arm64/tools/sysreg
++++ b/arch/arm64/tools/sysreg
+@@ -2853,6 +2853,10 @@ Sysreg	PIRE0_EL12	3	5	10	2	2
+ Fields	PIRx_ELx
+ EndSysreg
  
-+		if (ctxt_has_tcrx(ctxt))
-+			ctxt_sys_reg(ctxt, TCR2_EL2) = read_sysreg_el1(SYS_TCR2);
++Sysreg	PIRE0_EL2	3	4	10	2	2
++Fields	PIRx_ELx
++EndSysreg
 +
- 		/*
- 		 * The EL1 view of CNTKCTL_EL1 has a bunch of RES0 bits where
- 		 * the interesting CNTHCTL_EL2 bits live. So preserve these
-@@ -108,6 +111,9 @@ static void __sysreg_restore_vel2_state(struct kvm_cpu_context *ctxt)
- 		write_sysreg_el1(val, SYS_TCR);
- 	}
- 
-+	if (ctxt_has_tcrx(ctxt))
-+		write_sysreg_el1(ctxt_sys_reg(ctxt, TCR2_EL2), SYS_TCR2);
-+
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, ESR_EL2),	SYS_ESR);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR0_EL2),	SYS_AFSR0);
- 	write_sysreg_el1(ctxt_sys_reg(ctxt, AFSR1_EL2),	SYS_AFSR1);
+ Sysreg	PIR_EL1		3	0	10	2	3
+ Fields	PIRx_ELx
+ EndSysreg
 -- 
 2.39.2
 
