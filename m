@@ -1,156 +1,282 @@
-Return-Path: <kvm+bounces-23942-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23943-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD31F94FDCA
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 08:26:07 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D30094FDCE
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 08:26:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFAC81C20F4B
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 06:26:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3320FB2384D
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 06:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 085C53BBCF;
-	Tue, 13 Aug 2024 06:25:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA7F43165;
+	Tue, 13 Aug 2024 06:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iJeLcwGG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GlFSO6VE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FEC51C68C;
-	Tue, 13 Aug 2024 06:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 236B7381B8
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 06:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723530357; cv=none; b=C5CnogSXnmwz9twVVjTmOoSO2uPwtwkuCl9s/Skat6EjzpyrbNdYHcCKQELQGqPRfQyqS68UOvnP2r+A01IPQfxpBYhNma9YR5YScDAQZNIOTZnufg53Pgb+Tkln4InPURwctEum7dU5mtiDy/IxwYUv+51FoOofv9tUMXFExUI=
+	t=1723530387; cv=none; b=tvR9i3ZLUqylH+7LHKvdW5g0AoqcpWCaeqr4q8kYiJyo9cM9Kb783C94DJI6Izm0peQRIcPLyAY3IDuCwkiut/q1K+GIfvyvYaNlanbFgVCyqkRUY1BD3SpophDCCn4L9wOZsqd4wZvbgHFUFv7l52dYkjwX28c7NOQcOKSZ1Ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723530357; c=relaxed/simple;
-	bh=4ph18impfwnuKJQRFnczRQosU8MAKr3namoLIzlx+dM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JKtSOLbntPUXs8OoRw0QihuIG9cVAaKCh1tvUXIQXvmDDaE6QQ37RHiwEbifNU2UYxMYB+1PzTNI/rgmVspkP/dwDzua4fKmPr+zlxjoGpAtfNcB8AhiiOIJUL1guAzY09nCyUS9DCKRSqTiMuHKq8eZrHqlwfqTu8WxSwAOl1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iJeLcwGG; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723530355; x=1755066355;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=4ph18impfwnuKJQRFnczRQosU8MAKr3namoLIzlx+dM=;
-  b=iJeLcwGGpfbgxhDQD/aHvc5JIrUeLqNmFbAOxsIE/1EoYOFAX1qt6qUZ
-   doiFRTsWZr5YpkFPPB3LuBRk4TWnrF42HdQAjZ4QosgdOJiTK6bOYMSB0
-   rbLFzUgG4VrWgr62n9ssaEwXUsMM77enIeTcxD4cO5MTDo+gD4CuUib5E
-   1f963NbMsMY3TaL+dDbFY406EmHXwVHZsO9hpgMnMDIcA7uknha0DZ+bk
-   J36QdtUQo3SHeOy9WdYMA37eqoo6o+zWZmwSdkvHb5DPS36FvzFTc7hXq
-   nCwDLHrFv/g9UQpglFWcl387KqabaqWs8BuAcRXuXGmy8qN935SM26r42
-   A==;
-X-CSE-ConnectionGUID: K0OZ24rMQCifJWeDwObPxQ==
-X-CSE-MsgGUID: Gcn7BZR8SEa2K59QAOhsZA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="32818841"
-X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
-   d="scan'208";a="32818841"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 23:25:54 -0700
-X-CSE-ConnectionGUID: SzLsM7PlTeqDySK3ltogtQ==
-X-CSE-MsgGUID: mXvJyyd+TyiuCO77u5XOMg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
-   d="scan'208";a="58630966"
-Received: from unknown (HELO [10.238.8.207]) ([10.238.8.207])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2024 23:25:52 -0700
-Message-ID: <0efc9ac6-7cb3-4d94-97ef-0d2d6c11f63a@linux.intel.com>
-Date: Tue, 13 Aug 2024 14:25:50 +0800
+	s=arc-20240116; t=1723530387; c=relaxed/simple;
+	bh=z11k9/2dZSsWNeKMT/eTZ5hgojGyvlyRrk8ZA0dU1Pk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=osDIlO466UsWn42S72CEo2Ey2dbqLOGLAAffnzok5inxIVvUsJPZ+S3dOlBJfEe2DZZ3VMGDp0JZWOo43pOjnoP2/uQxgL0peefRKbkizIAqi5jLQjZ+avHeM/bNBgxGPIjzNdE6O3CxhWJUX3G6mWGFugsLMe7VotnuDUyOHjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GlFSO6VE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723530384;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/+1NdbA2w9xTyXuvlnpdZMCH9uHX+JdiWBK5zQ7c8Ig=;
+	b=GlFSO6VE/K8K5j88WC8iFwhYvgoPbsIkhCHUk7Zthx4R+0a6T+Pmo83enZVSYl+Sijmb04
+	ThR1eJCmWhmCdnjKeBwC+gGfoVEC7O7BBRgZUlfUmwfwYu5t7g2tpbFOh/bQZhAyc/zcEF
+	NGrs75A21R5zKxDFkqSE93uUrssNXl4=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-529-2wD1OSUKPmWT6JKnBRVSuA-1; Tue, 13 Aug 2024 02:26:21 -0400
+X-MC-Unique: 2wD1OSUKPmWT6JKnBRVSuA-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-7109d532601so4789561b3a.3
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 23:26:20 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723530380; x=1724135180;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/+1NdbA2w9xTyXuvlnpdZMCH9uHX+JdiWBK5zQ7c8Ig=;
+        b=NMA/i7I+exMrYpfPV+DjTk+iZ3Onwyxt2tpK2GRTXKabCGxlyy1Z7g35mRdxuWEmy2
+         pdWgzUcoeogFsZhLhHgjCXKKk+ENTqfAse3DXSJlujMx6Wz1v8jiauBZK+YIf04RFxi0
+         XqCD+bphrUwOcV175otbGpNpaMOcjtbvPgaEl1yDcAS9/Rr/wBkKzUEuzE3AV10OjT4v
+         JG69pETAnPG46drH//jU6w4KJ8l70jGJ48i37zWAmX1gG6BHw8KxGxYef3dt5L6g2gz+
+         NKkKiXodC+TleUUnulhXGUPDDCKSxVYkLPD9UTVW6TeVxRH4XMabwl/PwhMSi3jb9BTP
+         Gp3g==
+X-Forwarded-Encrypted: i=1; AJvYcCV4FGsyTD5fEBuc+2jT0D52dH8GgxkvRmnQzxaorssOTjYKvIN+TPEPvV0ofPLmtpsPehVpxfbmWYK5pzpmQPmM1Z75
+X-Gm-Message-State: AOJu0YwlIC4tW9gmRr8NUVNPDvX+/xJfU/QOGQxCApisLX+bX68oHj1c
+	T1l14kyHIjlCE8OqzPKhVLNPgGETaqDFcg1PxgZjqTVH0YTBRFNOokuAabUExElTIbrh/oPmQ8K
+	7jfMIUr9mYW/wavy2RQDoetGevNWEpK3rFcvIxzn7TnMLts2+AfAkPba+p5lVZXq3GOw6TZVLJg
+	29vnhil97LSzzRThszVck11dZk
+X-Received: by 2002:a05:6a20:d521:b0:1c6:f213:83b with SMTP id adf61e73a8af0-1c8d759479fmr3489564637.37.1723530379978;
+        Mon, 12 Aug 2024 23:26:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFopEJBlYstjGCBUbkbkaEQoKLTASbBt41MNZwlAjPX+uIybIJEIIPhsS6+4J/MoFLwBa1wfojohNxemgd72HU=
+X-Received: by 2002:a05:6a20:d521:b0:1c6:f213:83b with SMTP id
+ adf61e73a8af0-1c8d759479fmr3489538637.37.1723530379372; Mon, 12 Aug 2024
+ 23:26:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/25] KVM: TDX: Add place holder for TDX VM specific
- mem_enc_op ioctl
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
- kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-9-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240812224820.34826-9-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20240808082044.11356-1-jasowang@redhat.com> <9da68127-23d8-48a4-b56f-a3ff54fa213c@nvidia.com>
+ <CACGkMEshq0=djGQ0gJe=AinZ2EHSpgE6CykspxRgLS_Ok55FKw@mail.gmail.com>
+ <CACGkMEvAVM+KLpq7=+m8q1Wajs_FSSfftRGE+HN16OrFhqX=ow@mail.gmail.com> <ede5a20f-0314-4281-9100-89a265ff6411@nvidia.com>
+In-Reply-To: <ede5a20f-0314-4281-9100-89a265ff6411@nvidia.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 13 Aug 2024 14:26:08 +0800
+Message-ID: <CACGkMEtVMq83rK9ykrN3OvGDYKg6L1Jnpa2wsnfDEbswpcnM1g@mail.gmail.com>
+Subject: Re: [RFC PATCH] vhost_vdpa: assign irq bypass producer token correctly
+To: Dragos Tatulea <dtatulea@nvidia.com>
+Cc: mst@redhat.com, lingshan.zhu@intel.com, kvm@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Aug 12, 2024 at 7:22=E2=80=AFPM Dragos Tatulea <dtatulea@nvidia.com=
+> wrote:
+>
+>
+>
+> On 12.08.24 08:49, Jason Wang wrote:
+> > On Mon, Aug 12, 2024 at 1:47=E2=80=AFPM Jason Wang <jasowang@redhat.com=
+> wrote:
+> >>
+> >> On Fri, Aug 9, 2024 at 2:04=E2=80=AFAM Dragos Tatulea <dtatulea@nvidia=
+.com> wrote:
+> >>>
+> >>>
+> >>>
+> >>> On 08.08.24 10:20, Jason Wang wrote:
+> >>>> We used to call irq_bypass_unregister_producer() in
+> >>>> vhost_vdpa_setup_vq_irq() which is problematic as we don't know if t=
+he
+> >>>> token pointer is still valid or not.
+> >>>>
+> >>>> Actually, we use the eventfd_ctx as the token so the life cycle of t=
+he
+> >>>> token should be bound to the VHOST_SET_VRING_CALL instead of
+> >>>> vhost_vdpa_setup_vq_irq() which could be called by set_status().
+> >>>>
+> >>>> Fixing this by setting up  irq bypass producer's token when handling
+> >>>> VHOST_SET_VRING_CALL and un-registering the producer before calling
+> >>>> vhost_vring_ioctl() to prevent a possible use after free as eventfd
+> >>>> could have been released in vhost_vring_ioctl().
+> >>>>
+> >>>> Fixes: 2cf1ba9a4d15 ("vhost_vdpa: implement IRQ offloading in vhost_=
+vdpa")
+> >>>> Signed-off-by: Jason Wang <jasowang@redhat.com>
+> >>>> ---
+> >>>> Note for Dragos: Please check whether this fixes your issue. I
+> >>>> slightly test it with vp_vdpa in L2.
+> >>>> ---
+> >>>>  drivers/vhost/vdpa.c | 12 +++++++++---
+> >>>>  1 file changed, 9 insertions(+), 3 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> >>>> index e31ec9ebc4ce..388226a48bcc 100644
+> >>>> --- a/drivers/vhost/vdpa.c
+> >>>> +++ b/drivers/vhost/vdpa.c
+> >>>> @@ -209,11 +209,9 @@ static void vhost_vdpa_setup_vq_irq(struct vhos=
+t_vdpa *v, u16 qid)
+> >>>>       if (irq < 0)
+> >>>>               return;
+> >>>>
+> >>>> -     irq_bypass_unregister_producer(&vq->call_ctx.producer);
+> >>>>       if (!vq->call_ctx.ctx)
+> >>>>               return;
+> >>>>
+> >>>> -     vq->call_ctx.producer.token =3D vq->call_ctx.ctx;
+> >>>>       vq->call_ctx.producer.irq =3D irq;
+> >>>>       ret =3D irq_bypass_register_producer(&vq->call_ctx.producer);
+> >>>>       if (unlikely(ret))
+> >>>> @@ -709,6 +707,12 @@ static long vhost_vdpa_vring_ioctl(struct vhost=
+_vdpa *v, unsigned int cmd,
+> >>>>                       vq->last_avail_idx =3D vq_state.split.avail_in=
+dex;
+> >>>>               }
+> >>>>               break;
+> >>>> +     case VHOST_SET_VRING_CALL:
+> >>>> +             if (vq->call_ctx.ctx) {
+> >>>> +                     vhost_vdpa_unsetup_vq_irq(v, idx);
+> >>>> +                     vq->call_ctx.producer.token =3D NULL;
+> >>>> +             }
+> >>>> +             break;
+> >>>>       }
+> >>>>
+> >>>>       r =3D vhost_vring_ioctl(&v->vdev, cmd, argp);
+> >>>> @@ -747,13 +751,14 @@ static long vhost_vdpa_vring_ioctl(struct vhos=
+t_vdpa *v, unsigned int cmd,
+> >>>>                       cb.callback =3D vhost_vdpa_virtqueue_cb;
+> >>>>                       cb.private =3D vq;
+> >>>>                       cb.trigger =3D vq->call_ctx.ctx;
+> >>>> +                     vq->call_ctx.producer.token =3D vq->call_ctx.c=
+tx;
+> >>>> +                     vhost_vdpa_setup_vq_irq(v, idx);
+> >>>>               } else {
+> >>>>                       cb.callback =3D NULL;
+> >>>>                       cb.private =3D NULL;
+> >>>>                       cb.trigger =3D NULL;
+> >>>>               }
+> >>>>               ops->set_vq_cb(vdpa, idx, &cb);
+> >>>> -             vhost_vdpa_setup_vq_irq(v, idx);
+> >>>>               break;
+> >>>>
+> >>>>       case VHOST_SET_VRING_NUM:
+> >>>> @@ -1419,6 +1424,7 @@ static int vhost_vdpa_open(struct inode *inode=
+, struct file *filep)
+> >>>>       for (i =3D 0; i < nvqs; i++) {
+> >>>>               vqs[i] =3D &v->vqs[i];
+> >>>>               vqs[i]->handle_kick =3D handle_vq_kick;
+> >>>> +             vqs[i]->call_ctx.ctx =3D NULL;
+> >>>>       }
+> >>>>       vhost_dev_init(dev, vqs, nvqs, 0, 0, 0, false,
+> >>>>                      vhost_vdpa_process_iotlb_msg);
+> >>>
+> >>> No more crashes, but now getting a lot of:
+> >>>  vhost-vdpa-X: vq Y, irq bypass producer (token 00000000a66e28ab) reg=
+istration fails, ret =3D  -16
+> >>>
+> >>> ... seems like the irq_bypass_unregister_producer() that was removed
+> >>> might still be needed somewhere?
+> >>
+> My statement above was not quite correct. The error comes from the
+> VQ irq being registered twice:
+>
+> 1) VHOST_SET_VRING_CALL ioctl gets called for vq 0. VQ irq is unregistere=
+d
+>    (vhost_vdpa_unsetup_vq_irq() and re-registered (vhost_vdpa_setup_vq_ir=
+q())
+>    successfully. So far so good.
+>
+> 2) set status !DRIVER_OK -> DRIVER_OK happens. VQ irq setup is done
+>    once again (vhost_vdpa_setup_vq_irq()). As the producer unregister
+>    was removed in this patch, the register will complain because the prod=
+ucer
+>    token already exists.
 
+I see. I think it's probably too tricky to try to register/unregister
+a producer during set_vring_call if DRIVER_OK is not set.
 
+Does it work if we only do vhost_vdpa_unsetup/setup_vq_irq() if
+DRIVER_OK is set in vhost_vdpa_vring_ioctl() (on top of this patch)?
 
-On 8/13/2024 6:48 AM, Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> KVM_MEMORY_ENCRYPT_OP was introduced for VM-scoped operations specific for
-> guest state-protected VM.  It defined subcommands for technology-specific
-> operations under KVM_MEMORY_ENCRYPT_OP.  Despite its name, the subcommands
-> are not limited to memory encryption, but various technology-specific
-> operations are defined.  It's natural to repurpose KVM_MEMORY_ENCRYPT_OP
-> for TDX specific operations and define subcommands.
->
-> Add a place holder function for TDX specific VM-scoped ioctl as mem_enc_op.
-> TDX specific sub-commands will be added to retrieve/pass TDX specific
-> parameters.  Make mem_enc_ioctl non-optional as it's always filled.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> uAPI breakout v1:
->   - rename error->hw_error (Kai)
->   - Include "x86_ops.h" to tdx.c as the patch to initialize TDX module
->     doesn't include it anymore.
->   - Introduce tdx_vm_ioctl() as the first tdx func in x86_ops.h
->   - Drop middle paragraph in the commit log (Tony)
->
-> v15:
->    - change struct kvm_tdx_cmd to drop unused member.
-> ---
->   arch/x86/include/asm/kvm-x86-ops.h |  2 +-
->   arch/x86/include/uapi/asm/kvm.h    | 26 ++++++++++++++++++++++++
->   arch/x86/kvm/vmx/main.c            | 10 ++++++++++
->   arch/x86/kvm/vmx/tdx.c             | 32 ++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/x86_ops.h         |  6 ++++++
->   arch/x86/kvm/x86.c                 |  4 ----
->   6 files changed, 75 insertions(+), 5 deletions(-)
->
-> diff --git a/arch/x86/include/asm/kvm-x86-ops.h b/arch/x86/include/asm/kvm-x86-ops.h
-> index af58cabcf82f..538f50eee86d 100644
-> --- a/arch/x86/include/asm/kvm-x86-ops.h
-> +++ b/arch/x86/include/asm/kvm-x86-ops.h
-> @@ -123,7 +123,7 @@ KVM_X86_OP(leave_smm)
->   KVM_X86_OP(enable_smi_window)
->   #endif
->   KVM_X86_OP_OPTIONAL(dev_get_attr)
-> -KVM_X86_OP_OPTIONAL(mem_enc_ioctl)
-> +KVM_X86_OP(mem_enc_ioctl)
->   KVM_X86_OP_OPTIONAL(mem_enc_register_region)
->   KVM_X86_OP_OPTIONAL(mem_enc_unregister_region)
->   KVM_X86_OP_OPTIONAL(vm_copy_enc_context_from)
-> diff --git a/arch/x86/include/uapi/asm/kvm.h b/arch/x86/include/uapi/asm/kvm.h
-> index cba4351b3091..d91f1bad800e 100644
-> --- a/arch/x86/include/uapi/asm/kvm.h
-> +++ b/arch/x86/include/uapi/asm/kvm.h
-> @@ -926,4 +926,30 @@ struct kvm_hyperv_eventfd {
->   #define KVM_X86_SNP_VM		4
->   #define KVM_X86_TDX_VM		5
->   
-> +/* Trust Domain eXtension sub-ioctl() commands. */
-> +enum kvm_tdx_cmd_id {
-> +	KVM_TDX_CAPABILITIES = 0,
-It's not used yet.
-This cmd id can be introduced in the next patch.
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index 388226a48bcc..ab441b8ccd2e 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -709,7 +709,9 @@ static long vhost_vdpa_vring_ioctl(struct
+vhost_vdpa *v, unsigned int cmd,
+                break;
+        case VHOST_SET_VRING_CALL:
+                if (vq->call_ctx.ctx) {
+-                       vhost_vdpa_unsetup_vq_irq(v, idx);
++                       if (ops->get_status(vdpa) &
++                           VIRTIO_CONFIG_S_DRIVER_OK)
++                               vhost_vdpa_unsetup_vq_irq(v, idx);
+                        vq->call_ctx.producer.token =3D NULL;
+                }
+                break;
+@@ -752,7 +754,9 @@ static long vhost_vdpa_vring_ioctl(struct
+vhost_vdpa *v, unsigned int cmd,
+                        cb.private =3D vq;
+                        cb.trigger =3D vq->call_ctx.ctx;
+                        vq->call_ctx.producer.token =3D vq->call_ctx.ctx;
+-                       vhost_vdpa_setup_vq_irq(v, idx);
++                       if (ops->get_status(vdpa) &
++                           VIRTIO_CONFIG_S_DRIVER_OK)
++                               vhost_vdpa_setup_vq_irq(v, idx);
+                } else {
+                        cb.callback =3D NULL;
+                        cb.private =3D NULL;
 
-> +
-> +	KVM_TDX_CMD_NR_MAX,
-> +};
-> +
 >
-[...]
+>
+> >> Probably, but I didn't see this when testing vp_vdpa.
+> >>
+> >> When did you meet those warnings? Is it during the boot or migration?
+> During boot, on the first 2 VQs only (so before the QPs are resized).
+> Traffic does work though when the VM is booted.
+
+Right.
+
+>
+> >
+> > Btw, it would be helpful to check if mlx5_get_vq_irq() works
+> > correctly. I believe it should return an error if the virtqueue
+> > interrupt is not allocated. After a glance at the code, it seems not
+> > straightforward to me.
+> >
+> I think we're good on that front:
+> mlx5_get_vq_irq() returns EOPNOTSUPP if the vq irq is not allocated.
+
+Good to know that.
+
+Thanks
+
+>
+>
+> Thanks,
+> Dragos
+>
+
 
