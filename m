@@ -1,116 +1,161 @@
-Return-Path: <kvm+bounces-24025-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24026-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62EC095093C
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:38:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 839E895095A
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:45:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 122591F22EE1
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:38:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF01F1C21956
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFED1A071A;
-	Tue, 13 Aug 2024 15:38:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED1E1A0729;
+	Tue, 13 Aug 2024 15:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="onDHvVdj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzzD2/d9"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 475D31991BE
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 15:38:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB56749654;
+	Tue, 13 Aug 2024 15:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723563490; cv=none; b=WINZT+67vr6oyjAerFOsCOFW7tqCEcFA8JdcRNbpjSDZXHdtL3t2ZmJPwva/4pIEIDnJ8+P8P/v5uAvclGnu2AXrRs3EXzXBA7AL1rVszW8B5JQUpLlKRiB4Q/0UNOfrp2uldFMfVSqjVbeomtgF+WWAMA5CxN86OhZfJ6aFNto=
+	t=1723563952; cv=none; b=QUCGgao7Yl4EMvjEGed1XhH7E5utAJX1UgrWmfPvNDbpRsbrddVKF/i35GajmJZ/Wri4Cre+2pntTIFez6FO90FRo1kvr9WyON94fUnMJiYZUhrfYvJGvGAoU/18mCpEE1QRuSdD5kFmb2K9fz4nkvJD/mKvKkiWeMzXdJpSnq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723563490; c=relaxed/simple;
-	bh=0c7sx9C1jet5WdcmyMpMYsHb/i7UcO2KmcsxAf7KKwU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=XAZ16R18Ck4oY77SQm5uBZ0PlvEHwc8sTLjiSJ2vt3XHX3p09YmhO8m+h4/dw/falflqrTbHNBtcm6Yg087H1FxhCNLgct04vLDuWFSfAp7PUhimeiQND18sNqCsWNzzQYbSnuaKEq+hhayieJEegc9SULPBl+2QzKWSJi640mI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=onDHvVdj; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6506bfeaf64so112201917b3.1
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 08:38:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723563488; x=1724168288; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7kMHZ1GdUJDWple2nUqgyCrw9nVKP78R5QKQXwtWMxY=;
-        b=onDHvVdjonoCqEgmVmdh2AF12EWK0H3RUS03tyRqISJhXVgvoEtnMBOzFkts5KYTAU
-         2PEekqYYmaHNuL6vN7ALRhVkIeFGlGfSOrhgX7ESiGEVTSCBHqHBLVpKRHqeRaOvSQi5
-         SMUkNz7Yxr7OZ4xOJjwPPxIOP6xvJhSpchWX/LlK6xCEwf27paOVK37O5/3UoMNhWYXU
-         1f/pb47N09xK0Ptn1zSi6fn29GqJFdLVAFD5/tNFXp4+SMzPevXfGKhsvTehn/GvbA3O
-         VZB068KhSZ87nU6uOPHmP+onBwulaPiKdXht/XxlPUNuzE8WckSay2DiKBN+mM/d7BxD
-         kScQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723563488; x=1724168288;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7kMHZ1GdUJDWple2nUqgyCrw9nVKP78R5QKQXwtWMxY=;
-        b=QeK9n9ZTR5a19OSIevd1wEQm4Va60/Fq9ppl4d36jTJjIo002iT/f+FiACfLsIjO5x
-         L/T1zSP7RVs9c1TsJxlbf+u0xUL8ceYuvbvU7Ahk/RvQ4Tdq1wSqnSgwGD7mymeNKZMs
-         QfSYo6cFMZtnoc4P0jXlzISS9Z/rQdC1NN31iNErLKpCzWqDRpBK+V1jYDHb76KMzGOF
-         M8glSphOryXLRQzygObT8k922yu4IY1nBAD+ej0GyCKkzJ7Q3aaSixbRjCioFYq5wpLd
-         5P9VsFjcH4MvFcCHoygSKcBo+j7Mkt2nBm/GfvuhukMxso3Qndgrq/c2RHMNJq/QcKFn
-         JlYA==
-X-Forwarded-Encrypted: i=1; AJvYcCXQA1kpaUHtYokSPzT3CwIXJQKn8C1Cc1Ahzjw8zG927P5ESzkKsQds3QFakuYh2d77G5+EQwMV2s7ev4Ln+KfQVgVN
-X-Gm-Message-State: AOJu0YwqFtK9DO9cma+utmUY4w7bzM0I2CJoLtSYtOXjE7RAcEVY879l
-	ZDp+WSqaLh+Bqooc1wwOSPXqcgQ/1fZsRlgCFTgfNdvSvKKx/bpnjYzA+OboJEJ+1nfODcnQrgl
-	bNg==
-X-Google-Smtp-Source: AGHT+IGOOFdbk3PmOx25fWh05KbLnU14MAEXTZc2fD/h9QtctdaISVEo25EHB58NCnb+Ip+BcGxnuI2+OWc=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:eb11:0:b0:e0e:89e6:aad4 with SMTP id
- 3f1490d57ef6-e113c907c61mr140833276.0.1723563488277; Tue, 13 Aug 2024
- 08:38:08 -0700 (PDT)
-Date: Tue, 13 Aug 2024 08:38:06 -0700
-In-Reply-To: <ZllzCoYvMQOkMo90@chao-email>
+	s=arc-20240116; t=1723563952; c=relaxed/simple;
+	bh=qiupYbycqVBit5agDXmiS2ivXVrYBP8IffrAeg8D5Vw=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FDkavrxnqt/KpCMzDzF/IhLZcxiXRZFqy41CApruHWlY5aATDjjm/yvwGKHaU75HIxEugF+PH5mt3p8rB28TjGp0d4hvnP2q8+r+fDezcNWORTSi5725F4KjisjxZ1BVMuFkhle6MZ1cWTkqAwXbAmknZS8kLZO9ZTsR8+29RUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzzD2/d9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F27DC4AF09;
+	Tue, 13 Aug 2024 15:45:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723563952;
+	bh=qiupYbycqVBit5agDXmiS2ivXVrYBP8IffrAeg8D5Vw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OzzD2/d9xpMH/LzWE9QUn7DlL0zA0MeRBeAmcl4kZeEpC6zuhxBMlUouGmd7/GT3n
+	 Ofmx9QLwqa6+UJc5T962vuEviLaGv62x4u56b2l5LYf1qG+2HXUgc9T/9Gzqr81a7O
+	 LW1+RIM9F7KzscDDD+rMShK/cWent4kd7oHqIqJBuNcFO3wKfHrvjnnHJvdtur2eCU
+	 b1LiGR0c6RC8tM95bCfWEOgEhOi644mvNA+5YZb0fhgQ/mRfuEOckBhB79uTOx+vD1
+	 XqkzRwEQ2Qp3yP1TfOUoDJpSorluR8cDblTTEotfgGuEZYNoaQEOkFBTsDsRRSe4aD
+	 NMquau0YWlYKg==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sdtiY-003PH1-FD;
+	Tue, 13 Aug 2024 16:45:50 +0100
+Date: Tue, 13 Aug 2024 16:45:46 +0100
+Message-ID: <878qx05sut.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Joey Gouly <joey.gouly@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 09/10] KVM: arm64: Handle  PIR{,E0}_EL2 traps
+In-Reply-To: <20240813152452.GD3321997@e124191.cambridge.arm.com>
+References: <20240813144738.2048302-1-maz@kernel.org>
+	<20240813144738.2048302-10-maz@kernel.org>
+	<20240813152452.GD3321997@e124191.cambridge.arm.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240528041926.3989-1-manali.shukla@amd.com> <20240528041926.3989-6-manali.shukla@amd.com>
- <ZlWLupfpODawPX3P@chao-email> <b45bc797-9087-4456-ba18-463c3f638096@amd.com> <ZllzCoYvMQOkMo90@chao-email>
-Message-ID: <Zrt93t29X6A0nmys@google.com>
-Subject: Re: [PATCH v3 5/5] KVM: selftests: KVM: SVM: Add Idle HLT intercept test
-From: Sean Christopherson <seanjc@google.com>
-To: Chao Gao <chao.gao@intel.com>
-Cc: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, 
-	nikunj@amd.com, thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de, 
-	ajones@ventanamicro.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On Fri, May 31, 2024, Chao Gao wrote:
-> On Thu, May 30, 2024 at 06:49:56PM +0530, Manali Shukla wrote:
-> >>> +	/* Check the extension for binary stats */
-> >>> +	TEST_REQUIRE(this_cpu_has(X86_FEATURE_IDLE_HLT));
-> >> 
-> >> IIUC, this test assumes that the IDLE_HLT feature is enabled for guests if it
-> >> is supported by the CPU. But this isn't true in some cases:
-> >> 
-> >I understand you are intending to create a capability for IDLE HLT intercept
-> >feature, but in my opinion, the IDLE Halt intercept feature doesn't require
-> >user space to do anything for the feature itself.
+On Tue, 13 Aug 2024 16:24:52 +0100,
+Joey Gouly <joey.gouly@arm.com> wrote:
 > 
-> Yes, I agree. Actually, I was thinking about:
+> On Tue, Aug 13, 2024 at 03:47:37PM +0100, Marc Zyngier wrote:
+> > Add the FEAT_S1PIE EL2 registers the sysreg descriptor array so that
+> > they can be handled as a trap.
+> > 
+> > Access to these registers is conditionned on ID_AA64MMFR3_EL1.S1PIE
+> > being advertised.
+> > 
+> > Similarly to other other changes, PIRE0_EL2 is guaranteed to trap
+> > thanks to the D22677 update to the architecture..
+> > 
+> > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > ---
+> >  arch/arm64/kvm/sys_regs.c | 14 ++++++++++++++
+> >  1 file changed, 14 insertions(+)
+> > 
+> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > index 52250db3c122..a5f604e24e05 100644
+> > --- a/arch/arm64/kvm/sys_regs.c
+> > +++ b/arch/arm64/kvm/sys_regs.c
+> > @@ -346,6 +346,18 @@ static bool access_rw(struct kvm_vcpu *vcpu,
+> >  	return true;
+> >  }
+> >  
+> > +static bool check_s1pie_access_rw(struct kvm_vcpu *vcpu,
+> > +				  struct sys_reg_params *p,
+> > +				  const struct sys_reg_desc *r)
+> > +{
+> > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
+> > +		kvm_inject_undefined(vcpu);
+> > +		return false;
+> > +	}
+> > +
+> > +	return access_rw(vcpu, p, r);
+> > +}
+> > +
+> >  /*
+> >   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+> >   */
+> > @@ -2827,6 +2839,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> >  	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
+> >  
+> >  	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
+> > +	EL2_REG(PIRE0_EL2, check_s1pie_access_rw, reset_val, 0),
+> > +	EL2_REG(PIR_EL2, check_s1pie_access_rw, reset_val, 0),
+> >  	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
+> >  
+> >  	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
 > 
-> 1. make the feature bit visible from /proc/cpuinfo by removing the leading ""
->    from the comment following the bit definition in patch 1
+> I think we should also use this for PIR_EL1 / PIRE0_EL1? We have NULL for their access field.
 > 
-> 2. parse /proc/cpuinfo to determine if this IDLE_HLT feature is supported by the
->    kernel
+> 	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
 
-Neither of these is sufficient/correct.  E.g. they'll get false positives if run
-on a kernel that recognizes IDLE_HLT, but that doesn't have KVM support for
-enabling the feature.
+I don't think we need this. In general, the EL1 FEAT_S1PIE registers
+are directly accessed by the VM, and do not trap.
 
-The canonical way to check for features in KVM selftests is kvm_cpu_has(), which
-looks at KVM_GET_SUPPORTED_CPUID (by default, selftests VMs enable all features,
-i.e. reflect the result of KVM_GET_SUPPORTED_CPUID into KVM_SET_CPUID2).
+However, if the VM has been configured to not expose S1PIE, then we
+set the corresponding FGU bits in kvm_calculate_traps():
 
-> But I am not sure if it's worth it. I'll defer to maintainers.
+	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
+		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
+						HFGxTR_EL2_nPIR_EL1);
+
+The effect of this is that we don't even make to the sysreg array, and
+inject an UNDEF directly from the point of decoding the trap (see the
+beginning of triage_sysreg_trap()).
+
+For EL2 registers, there is no concept of FGT since they always trap,
+so no architectural trick we can play to shortcut the handling.
+Therefore we make it to the handler and have to triage things there.
+
+Does it make sense?
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
