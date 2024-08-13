@@ -1,194 +1,122 @@
-Return-Path: <kvm+bounces-24048-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24049-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63F02950B53
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 19:21:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 939E5950B79
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 19:30:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93D5A1C20C33
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:21:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5566F286154
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01E7E1A2C08;
-	Tue, 13 Aug 2024 17:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA021A2C23;
+	Tue, 13 Aug 2024 17:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VD2k6eBS"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Mt41DhNp";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UUeC+kSb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A9C6170A18;
-	Tue, 13 Aug 2024 17:21:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9AC282E5;
+	Tue, 13 Aug 2024 17:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723569673; cv=none; b=UpZaLlQ1ZhfZUV9GTmjFM+Mu5XsABRgcgpcu/+uf4eZDLJYjdx1VdFdWOP7hE/Qst5JgX43ZLAoSZLKm7PVLCIcBZ9fizqXHPysLni4lPqQOPiWDPnD81QSqMLbF8VxQJrjLGigsO0g+Xk8vFXufBPApIGIix8jhCRyBpnlyIWc=
+	t=1723570245; cv=none; b=Xt1Ns9gD22GAEUktGUEoyfciEvPxr4QN2x53ylxD8IxRjNDVvr0gVoGp7e6SQllUx1MGv8snA6t9U9+IGuKv8DTGpQldJmV5iPYLw+4JUWWRjv3+tmD5mM5FE0BHYiFRYlfz7p1R4OBXYWu2E9RNtUBDoCQeKoMwOlAljoQDan8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723569673; c=relaxed/simple;
-	bh=EJ3zddtN4dHsXAIsUca3NlyAITki0vkXaggYKAmVHmo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q+fPYjRztqRKHfyjZ9Wc1jFTU5VJGBVfwPWczx6Gmoz0Jy5HoKBO0AjIvZLXnPwoSebs9pWTKGbXG80yHS2Hyc+KBJF3oMhbeuIgyLPfVq7RWkdiKIwGlj0BF7CZ+tb+662bflv4+WCEn870Ev4J9B7wX+K7WsmBMChVYnzc8iQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VD2k6eBS; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723569672; x=1755105672;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EJ3zddtN4dHsXAIsUca3NlyAITki0vkXaggYKAmVHmo=;
-  b=VD2k6eBSxE+0SvIfsqdmrcv/Xni5HMpRiipmtqQKuT94nzc/MKPNAv4L
-   wtzsFS5NIrPRc/jgXHoWXbWNrN4BjtHxFJnFHB7ODSotSZ/cKHJREAih5
-   dxCfMVSg2++4lGHHelO4iYyQNzhckwSeniaUyNl2kbYuHyPfKfKbxwIv5
-   wSdDJVHqOa2jAWMfNHFBvcAn4mygru7lFDg2mIeO6xITml+f9g5CgRHQS
-   2aoKy1v0jCuAop7qHuIORz1425md3nSLHiesc3MwiKKfwBq8qiWZWBSJ6
-   VL+2SErwjbbm/d25vRrPbay76NMtY+0qHd+wsBz/G4EwJu+7xPijHIIcu
-   Q==;
-X-CSE-ConnectionGUID: XiuI+sqkRquwu3DQfVMyBg==
-X-CSE-MsgGUID: aVn2UqGCSiG+KV96Fn/uug==
-X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="21883718"
-X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
-   d="scan'208";a="21883718"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 10:21:10 -0700
-X-CSE-ConnectionGUID: Y/cVAO4QTlmfVXabz4w3kg==
-X-CSE-MsgGUID: rerKu6oTRuuzDX2C4q5b4w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
-   d="scan'208";a="62890101"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.54])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 10:21:09 -0700
-Date: Tue, 13 Aug 2024 10:21:08 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: Yuan Yao <yuan.yao@linux.intel.com>
-Cc: Rick Edgecombe <rick.p.edgecombe@intel.com>, seanjc@google.com,
-	pbonzini@redhat.com, kvm@vger.kernel.org, kai.huang@intel.com,
-	isaku.yamahata@gmail.com, tony.lindgren@linux.intel.com,
-	xiaoyao.li@intel.com, linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Sean Christopherson <sean.j.christopherson@intel.com>
-Subject: Re: [PATCH 18/25] KVM: TDX: Do TDX specific vcpu initialization
-Message-ID: <ZruWBHdNwIAwm7QE@ls.amr.corp.intel.com>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-19-rick.p.edgecombe@intel.com>
- <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
+	s=arc-20240116; t=1723570245; c=relaxed/simple;
+	bh=CgPGSw4BGQN7J8xvALSQIjXECj3FjxVzt0UM38Sz2A4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fm/iqNU8IgMIcVwpSFH2UgiXaI/llorfe0xNudh+5CyGb1b9VjSsEwLTXIER9tCHA8D38VGCjhNF8HC4SYsPoAK5qMFlnoPmy5nnrNR63h/AMx1cDkCl+2NB9Y2IbM/o57ebcUuFyMMY3ZE4nUGyxqbjpGuvOiVO4WYYP2bi4dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Mt41DhNp; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UUeC+kSb; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1723570241;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nLYNakiS7XZO9BB9N7Fyevs65e05aWL1XGxAXFuVTVk=;
+	b=Mt41DhNpxne5dyvSWgRTV6r+1D1ctf2j+254poZWoREb4GDghU04Y2szQGHLkI3gN7t4kM
+	v6wEkhb2pXN7567WzcsGBuMdCtGXkJwAmFVkrHczTaZuaDXITsJfa20vPfdyK0kksWotLb
+	c8Khw3bmVQBOyfxb/Qx5CnNyyZwU0Jl6DrVXgq5G//8pgMvoSFPBeDntPX/Sq1bqmLAfFi
+	3uc9S/l86hXzj0IgNLXdAD3y/0sl6+VKbknoEx/OnamdPsNtVl227kKLOgMbIKDWedXBPD
+	N2871RW+cIpw9nXcr5qrvIkzDDnToTwCEya6tLvbvzJdNnpGI4+cSYznQXAAsQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1723570241;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nLYNakiS7XZO9BB9N7Fyevs65e05aWL1XGxAXFuVTVk=;
+	b=UUeC+kSbV/jkQoPN5g2XCYL6IeWXke547KIvgCJIkeRYW1M/RBV5YV7R8JmQCcz7gS6exg
+	20LAmw5r7AVtNzCg==
+To: Jason Gunthorpe <jgg@ziepe.ca>, Alex Williamson
+ <alex.williamson@redhat.com>
+Cc: kvm@vger.kernel.org, quic_bqiang@quicinc.com, kvalo@kernel.org,
+ prestwoj@gmail.com, linux-wireless@vger.kernel.org,
+ ath11k@lists.infradead.org, dwmw2@infradead.org, iommu@lists.linux.dev,
+ kernel@quicinc.com, johannes@sipsolutions.net, jtornosm@redhat.com
+Subject: Re: [PATCH RFC/RFT] vfio/pci: Create feature to disable MSI
+ virtualization
+In-Reply-To: <20240813163053.GK1985367@ziepe.ca>
+References: <adcb785e-4dc7-4c4a-b341-d53b72e13467@gmail.com>
+ <20240812170014.1583783-1-alex.williamson@redhat.com>
+ <20240813163053.GK1985367@ziepe.ca>
+Date: Tue, 13 Aug 2024 19:30:41 +0200
+Message-ID: <87r0aspby6.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240813080009.zowu3woyffwlyazu@yy-desk-7060>
+Content-Type: text/plain
 
-On Tue, Aug 13, 2024 at 04:00:09PM +0800,
-Yuan Yao <yuan.yao@linux.intel.com> wrote:
+On Tue, Aug 13 2024 at 13:30, Jason Gunthorpe wrote:
+> On Mon, Aug 12, 2024 at 10:59:12AM -0600, Alex Williamson wrote:
+>> vfio-pci has always virtualized the MSI address and data registers as
+>> MSI programming is performed through the SET_IRQS ioctl.  Often this
+>> virtualization is not used, and in specific cases can be unhelpful.
+>> 
+>> One such case where the virtualization is a hinderance is when the
+>> device contains an onboard interrupt controller programmed by the guest
+>> driver.  Userspace VMMs have a chance to quirk this programming,
+>> injecting the host physical MSI information, but only if the userspace
+>> driver can get access to the host physical address and data registers.
+>> 
+>> This introduces a device feature which allows the userspace driver to
+>> disable virtualization of the MSI capability address and data registers
+>> in order to provide read-only access the the physical values.
+>
+> Personally, I very much dislike this. Encouraging such hacky driver
+> use of the interrupt subsystem is not a good direction. Enabling this
+> in VMs will further complicate fixing the IRQ usages in these drivers
+> over the long run.
+>
+> If the device has it's own interrupt sources then the device needs to
+> create an irq_chip and related and hook them up properly. Not hackily
+> read the MSI-X registers and write them someplace else.
+>
+> Thomas Gleixner has done alot of great work recently to clean this up.
+>
+> So if you imagine the driver is fixed, then this is not necessary.
 
-> > +/* VMM can pass one 64bit auxiliary data to vcpu via RCX for guest BIOS. */
-> > +static int tdx_td_vcpu_init(struct kvm_vcpu *vcpu, u64 vcpu_rcx)
-> > +{
-> > +	const struct tdx_sysinfo_module_info *modinfo = &tdx_sysinfo->module_info;
-> > +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> > +	unsigned long va;
-> > +	int ret, i;
-> > +	u64 err;
-> > +
-> > +	if (is_td_vcpu_created(tdx))
-> > +		return -EINVAL;
-> > +
-> > +	/*
-> > +	 * vcpu_free method frees allocated pages.  Avoid partial setup so
-> > +	 * that the method can't handle it.
-> > +	 */
-> 
-> This looks not that clear, why vcpu_free can't handle it is not explained.
-> 
-> Looking the whole function, page already added into TD by
-> SEAMCALL should be cleared before free back to kernel,
-> tdx_vcpu_free() can handle them. Other pages can be freed
-> directly and can't be handled by tdx_vcpu_free() because
-> they're not added into TD. Is this right understanding ?
+Yes. I looked at the at11k driver when I was reworking the PCI/MSI
+subsystem and that's a perfect candidate for a proper device specific
+interrupt domain to replace the horrible MSI hackery it has.
 
-Yes.  If we result in error in the middle of TDX vCPU initialization,
-TDH.MEM.PAGE.RECLAIM() result in error due to TDX module state check.
-TDX module seems to assume that we don't fail in the middle of TDX vCPU
-initialization.  Maybe we can add WARN_ON_ONCE() for such cases.
+> Howver, it will still not work in a VM. Making IMS and non-MSI
+> interrupt controlers work within VMs is still something that needs to
+> be done.
 
+Sure, but we really want to do that in a generic way and not based on ad
+hoc workarounds.
 
-> > +		ret = -EIO;
-> > +		pr_tdx_error(TDH_VP_CREATE, err);
-> > +		goto free_tdvpx;
-> > +	}
-> > +
-> > +	for (i = 0; i < tdx_sysinfo_nr_tdcx_pages(); i++) {
-> > +		va = __get_free_page(GFP_KERNEL_ACCOUNT);
-> > +		if (!va) {
-> > +			ret = -ENOMEM;
-> > +			goto free_tdvpx;
-> 
-> It's possible that some pages already added into TD by
-> tdh_vp_addcx() below and they won't be handled by
-> tdx_vcpu_free() if goto free_tdvpx here;
+Did the debate around this go anywhere?
 
-Due to TDX TD state check, we can't free partially assigned TDCS pages.
-TDX module seems to assume that TDH.VP.ADDCX() won't fail in the middle.
+Thanks,
 
-
-> > +	else
-> > +		err = tdh_vp_init(tdx, vcpu_rcx);
-> > +
-> > +	if (KVM_BUG_ON(err, vcpu->kvm)) {
-> > +		pr_tdx_error(TDH_VP_INIT, err);
-> > +		return -EIO;
-> > +	}
-> > +
-> > +	vcpu->arch.mp_state = KVM_MP_STATE_RUNNABLE;
-> > +	tdx->td_vcpu_created = true;
-> > +
-> > +	return 0;
-> > +
-> > +free_tdvpx:
-> 
-> How about s/free_tdvpx/free_tdcx
-> 
-> In 1.5 TDX spec these pages are all called TDCX pages, and
-> the function context already indicates that we're talking about
-> vcpu's TDCX pages.
-
-Oops, this is left over when tdvpx was converted to tdcs.
-
-
-> > +static int tdx_vcpu_init(struct kvm_vcpu *vcpu, struct kvm_tdx_cmd *cmd)
-> > +{
-> > +	struct msr_data apic_base_msr;
-> > +	struct vcpu_tdx *tdx = to_tdx(vcpu);
-> > +	int ret;
-> > +
-> > +	if (cmd->flags)
-> > +		return -EINVAL;
-> > +	if (tdx->initialized)
-> > +		return -EINVAL;
-> > +
-> > +	/*
-> > +	 * As TDX requires X2APIC, set local apic mode to X2APIC.  User space
-> > +	 * VMM, e.g. qemu, is required to set CPUID[0x1].ecx.X2APIC=1 by
-> > +	 * KVM_SET_CPUID2.  Otherwise kvm_set_apic_base() will fail.
-> > +	 */
-> > +	apic_base_msr = (struct msr_data) {
-> > +		.host_initiated = true,
-> > +		.data = APIC_DEFAULT_PHYS_BASE | LAPIC_MODE_X2APIC |
-> > +		(kvm_vcpu_is_reset_bsp(vcpu) ? MSR_IA32_APICBASE_BSP : 0),
-> > +	};
-> > +	if (kvm_set_apic_base(vcpu, &apic_base_msr))
-> > +		return -EINVAL;
-> > +
-> > +	ret = tdx_td_vcpu_init(vcpu, (u64)cmd->data);
-
-Because we set guest rcx only, we use cmd->data.  Can we add reserved area for
-future use similar to struct kvm_tdx_init_vm?
-i.e. introduce something like
-struct kvm_tdx_init_vcpu {u64 rcx; u64 reserved[]; }
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+        tglx
 
