@@ -1,166 +1,122 @@
-Return-Path: <kvm+bounces-24028-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24029-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 288B49509A9
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:01:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DBA49509C3
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:06:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D58E5282AA8
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:01:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC60F2811CC
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:06:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CBF1A08DF;
-	Tue, 13 Aug 2024 16:01:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727C31A2C15;
+	Tue, 13 Aug 2024 16:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZEgZsGw"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iEuaiS9Q"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366771DDD1
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459A61A2C0F
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723564897; cv=none; b=Cz9fX2F93b4LAnuEC5yWxQ3l6U6vSO6zyKhSPetLmbD4S+ff4JOWW1pbiIhOjqiyC3JAjvRERpgNFyP/YxAk23w+6g+WP/mowhRF6UXK+Mm7nvR1bn6u4yxgope4cxkkUFKGb3SCFxjAZVme26jTnwIcV3SpjzmZhP6eMJEWjeQ=
+	t=1723564996; cv=none; b=DdwO88w5EebWasQ4nxDklDYG/6HSdkbXIMvfWTLHLs1+qmVeH5zWoDkVD7EVSyAPRmZHGKo6c0bHWGqmNsHEHRNqUeY7Ld06OZVPfJq2f1WyW32x2xOZv0EjYbjWXwabbVQH/la1QLT6MhYcHKgSZp+0V7VQszCSTbM9lwsWQpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723564897; c=relaxed/simple;
-	bh=pb5iWyGbLBoSRfc066A41J8/Por/3wIu1JOSbbaHA7Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hsKPRvfIs/xn+IX/PGAyvO8CZ1jUGYUJzk/VY1330juCPmPxBA5sjNXBuKhbOFM8YNfr+GjY0ekDCjLkrhF6H29XOzBBaASDqxq8FwxfRWLIHxmqAWoSAmcsQnIsKG7uYAz9L7cOq//rTcdyJnrrbqtwMpu6ChhEwH43OKMjlfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cZEgZsGw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723564895;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=b5sTfG8EAhu68ZB0jEuQAT/8JuG7U9BrME4k1pn/3mk=;
-	b=cZEgZsGwC91jGYSPLMRF4IQaGfJmMsdEG7hg1eywXdWmjQ0pOXZTB/K7/m9C+DQjnHQsL9
-	2s2QtOU5iSO8KF8P+45S15Os5kciSs/Uda4ZwCyfgPueOO6kPgklwLqoRvxPT9RZjNhlvI
-	HXXUjt2hIfq7LPNIDE6msRU8fSlYhwI=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-577-f6BU45xUOp2oybKLDXNCEw-1; Tue, 13 Aug 2024 12:01:33 -0400
-X-MC-Unique: f6BU45xUOp2oybKLDXNCEw-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ef22e62457so58320491fa.2
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 09:01:33 -0700 (PDT)
+	s=arc-20240116; t=1723564996; c=relaxed/simple;
+	bh=F47EHq77023/lXDUUAO6aOhPpP6rSjWKXO8beR/YKzw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LWGGQqQS56RXdvZTWKpbx3qPIBzdObWFBUj9sg5PkOxNVNMdTMN5E3PG5LrVH9TxAprf/xQWmZyRx7zVj1KDJivXOef+CZAlWXyKSNdDNT+a43R/EKtEpwN5lel6TfTDW453gj+H+ysjAwvgPzqjXbZOReiUuX0oWUFTAroDeTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iEuaiS9Q; arc=none smtp.client-ip=209.85.215.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-7a28f78c67aso4751611a12.1
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 09:03:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723564994; x=1724169794; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=aeNjHU/ydo2HnfKI/EhoPeOvQeF9OBxuIzvOW3Q9mwY=;
+        b=iEuaiS9Qb7yn5SNdbrToERBYer7PDbIuNgcpkyDw/DMFHB3C16IiEcpoGCa/7qA+lz
+         p2oo/e/abvxG//chKpjCTuYST5s4AEl+jZ4grR7x+KAjcWwmW+Iswou7N+vHgU0absZh
+         gEgN2lPWNctjGkT19HfCgvMs8TgbrUNUO2gY9DUmoE/z934V3YMYOKEhJHLrBtOCxX9r
+         VkupIZCjmnUnYVv3cILS2IHI6q4NNRJV6aBxM2EEB/vpXgwHrC+tiWAuZLS9ooakAsXx
+         0oL3HveoG+HgceK77BRdBjAF5lrlNIZCHepoUQqfcGkxAS9WxN2kFAmc2oXVEfVONzXC
+         /sXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723564891; x=1724169691;
-        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
-         :from:references:cc:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=b5sTfG8EAhu68ZB0jEuQAT/8JuG7U9BrME4k1pn/3mk=;
-        b=Rs8lK9dHZVmP41DdLXGtp2O79uFODYt+b7bTdaLBgYmvml1GdJXSfXapJ5LaCAExyH
-         tU7HM/7dDDOve5c29rNHpirVQ1zU/8TOJkRht4aFOeX1om+nVgROGoFnVsoGEo/+6jpy
-         bV6e6X4YHW6YwcrWJWcJJnjaz7WzIrX/1wlpL2TbFhG51JhBe3N0ZCoervswMWx5uzRs
-         4H6Erp6mAhzB30IPWp2lBo3054SdklCrNlhY/wvSAOrrNB6FW1nZdgcUDqO43MSDMrXS
-         Nf+5aBr5oJKHB37E8iu+4fIV1bNl3K9hJrrHUusw0CMS8McDBE17VpjO9mkqBOxZ/KaP
-         jaqQ==
-X-Gm-Message-State: AOJu0Yw/DVDNkTrItgwHADwmjHHgk0KEct45Ofs2oKTsVXlmklR0oU4N
-	QOWhLXznvfWWNxgZ+CjBOgSGIvSL/jvNYzmsaMNTUWnBOgzTnw7zhqeeri96EkOkXNfiIfeeZRO
-	yK/hamt7msiOEUSiWowSaYNtZ3sBJwU6Ih9hgg73m2Swd+VjpNOiT7X3xRg==
-X-Received: by 2002:a2e:8182:0:b0:2ef:2ce0:6ac with SMTP id 38308e7fff4ca-2f2b7159b18mr26043331fa.22.1723564891158;
-        Tue, 13 Aug 2024 09:01:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFDVbG5v5nEDdy/okoFzo4viEw/a96f3I306vHv1Wu7okdK1LYg4YOioEsPtg07VeG2gjICSQ==
-X-Received: by 2002:a2e:8182:0:b0:2ef:2ce0:6ac with SMTP id 38308e7fff4ca-2f2b7159b18mr26042931fa.22.1723564890495;
-        Tue, 13 Aug 2024 09:01:30 -0700 (PDT)
-Received: from [192.168.10.81] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a80f4181439sm79513666b.190.2024.08.13.09.01.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 13 Aug 2024 09:01:29 -0700 (PDT)
-Message-ID: <1186d821-41ce-47c2-a7b2-70445816ed1c@redhat.com>
-Date: Tue, 13 Aug 2024 18:01:26 +0200
+        d=1e100.net; s=20230601; t=1723564994; x=1724169794;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aeNjHU/ydo2HnfKI/EhoPeOvQeF9OBxuIzvOW3Q9mwY=;
+        b=FGdJgk++dTFtB55p2sDlMAb2nZgcuhB0372T8GnYKLRVG8CFsqnNcSbYKj1TXhJl62
+         Jbg4PkUBKUF1jNXlz/gstWNhRQSfIjt6pTY1l5n+qQqJraVjT7otQHa72rSTx/bwTBB2
+         oZxoQ5PKUkf/qLf+OdkjYWinVAkQu8v6FAq0YeB11fwHFrLqLT99lTN68doDNjIBudpq
+         VWk9ziBszpMeqzo88cNBb8oRxDUJEB1ErSfAK6FCJdjiyz82zdG0TlVyxKFNIqumq4Ij
+         iwnneU4hXvfTG1d4FaU3Ny85Rctw3dqEhFYkULSOVzB7CPhGxcudLEHpTNmwfMROWxV/
+         eTtQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUdYFz5XVf4OOqPxd0mo9SMo4Ep7ABG54qF2bGw60/6eU2joHHIr4JuKIXd0dPmZEPDWlDrZcrjWZgLZAK1ZFevk41D
+X-Gm-Message-State: AOJu0YzGSuFPwP9t2DTOx2evC+arVuOmvHnxFyWluIkRkOvPoKDD/SBa
+	yqLdKINTsUVRAXbwxN50JI1uXyCYVLL/rOqX/TIIpsbYcjhYmR/D8vPYvRurPzVpwLr/N5ns4Su
+	HLw==
+X-Google-Smtp-Source: AGHT+IFrZp46NTMczg8GibpwuCklDdZnw9n1ZZZOHuXqAFPYRO449Qj5pKywAnxXfAGO7Ccz6pU2oEs5TDs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:ec85:b0:1fb:7f2c:5652 with SMTP id
+ d9443c01a7336-201ca19cadamr3716485ad.7.1723564994439; Tue, 13 Aug 2024
+ 09:03:14 -0700 (PDT)
+Date: Tue, 13 Aug 2024 09:03:13 -0700
+In-Reply-To: <Zrt93t29X6A0nmys@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/2] KVM: x86: Make x2APIC ID 100% readonly
-To: Sean Christopherson <seanjc@google.com>, Michal Luczaj <mhal@rbox.co>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- Haoyu Wu <haoyuwu254@gmail.com>,
- syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
-References: <20240802202941.344889-1-seanjc@google.com>
- <20240802202941.344889-2-seanjc@google.com>
- <eaa907ef-6839-48c6-bfb7-0e6ba2706c52@rbox.co> <ZrD9HHaMBqNGEaaW@google.com>
-From: Paolo Bonzini <pbonzini@redhat.com>
-Content-Language: en-US
-Autocrypt: addr=pbonzini@redhat.com; keydata=
- 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
-In-Reply-To: <ZrD9HHaMBqNGEaaW@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240528041926.3989-1-manali.shukla@amd.com> <20240528041926.3989-6-manali.shukla@amd.com>
+ <ZlWLupfpODawPX3P@chao-email> <b45bc797-9087-4456-ba18-463c3f638096@amd.com>
+ <ZllzCoYvMQOkMo90@chao-email> <Zrt93t29X6A0nmys@google.com>
+Message-ID: <ZruDweYzQRRcJeTO@google.com>
+Subject: Re: [PATCH v3 5/5] KVM: selftests: KVM: SVM: Add Idle HLT intercept test
+From: Sean Christopherson <seanjc@google.com>
+To: Chao Gao <chao.gao@intel.com>
+Cc: Manali Shukla <manali.shukla@amd.com>, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, pbonzini@redhat.com, shuah@kernel.org, 
+	nikunj@amd.com, thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de, 
+	ajones@ventanamicro.com
+Content-Type: text/plain; charset="us-ascii"
 
-On 8/5/24 18:26, Sean Christopherson wrote:
-> On Sun, Aug 04, 2024, Michal Luczaj wrote:
->> On 8/2/24 22:29, Sean Christopherson wrote:
->>> [...]
->>> Making the x2APIC ID fully readonly fixes a WARN in KVM's optimized map
->>> calculation, which expects the LDR to align with the x2APIC ID.
->>>
->>>    WARNING: CPU: 2 PID: 958 at arch/x86/kvm/lapic.c:331 kvm_recalculate_apic_map+0x609/0xa00 [kvm]
->>>    CPU: 2 PID: 958 Comm: recalc_apic_map Not tainted 6.4.0-rc3-vanilla+ #35
->>>    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.2-1-1 04/01/2014
->>>    RIP: 0010:kvm_recalculate_apic_map+0x609/0xa00 [kvm]
->>>    Call Trace:
->>>     <TASK>
->>>     kvm_apic_set_state+0x1cf/0x5b0 [kvm]
->>>     kvm_arch_vcpu_ioctl+0x1806/0x2100 [kvm]
->>>     kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
->>>     __x64_sys_ioctl+0xb8/0xf0
->>>     do_syscall_64+0x56/0x80
->>>     entry_SYSCALL_64_after_hwframe+0x46/0xb0
->>>    RIP: 0033:0x7fade8b9dd6f
->>
->> Isn't this WARN_ON_ONCE() inherently racy, though? With your patch applied,
->> it can still be hit by juggling the APIC modes.
+On Tue, Aug 13, 2024, Sean Christopherson wrote:
+> On Fri, May 31, 2024, Chao Gao wrote:
+> > On Thu, May 30, 2024 at 06:49:56PM +0530, Manali Shukla wrote:
+> > >>> +	/* Check the extension for binary stats */
+> > >>> +	TEST_REQUIRE(this_cpu_has(X86_FEATURE_IDLE_HLT));
+> > >> 
+> > >> IIUC, this test assumes that the IDLE_HLT feature is enabled for guests if it
+> > >> is supported by the CPU. But this isn't true in some cases:
+> > >> 
+> > >I understand you are intending to create a capability for IDLE HLT intercept
+> > >feature, but in my opinion, the IDLE Halt intercept feature doesn't require
+> > >user space to do anything for the feature itself.
+> > 
+> > Yes, I agree. Actually, I was thinking about:
+> > 
+> > 1. make the feature bit visible from /proc/cpuinfo by removing the leading ""
+> >    from the comment following the bit definition in patch 1
+> > 
+> > 2. parse /proc/cpuinfo to determine if this IDLE_HLT feature is supported by the
+> >    kernel
 > 
-> Doh, right, the logic is unfortunately cross-vCPU.  The sanity check could be
-> conditioned on the APIC belonging to the running/loaded vCPU, but I'm leaning
-> towards deleting it entirely.  Though it did detect the KVM_SET_LAPIC backdoor...
+> Neither of these is sufficient/correct.  E.g. they'll get false positives if run
+> on a kernel that recognizes IDLE_HLT, but that doesn't have KVM support for
+> enabling the feature.
+> 
+> The canonical way to check for features in KVM selftests is kvm_cpu_has(), which
+> looks at KVM_GET_SUPPORTED_CPUID (by default, selftests VMs enable all features,
+> i.e. reflect the result of KVM_GET_SUPPORTED_CPUID into KVM_SET_CPUID2).
 
-Yeah, let's drop it since we do have a test (in userspace).
+Never mind, brain fart.  That only works for features KVM is exposing to the guest,
+this is purely a KVM/host feature.
 
-Paolo
-
+That said, doesn't this test also require that AVIC be enabled?  Oh, or does this
+happen to work because KVM uses V_INTR to detect interrupt windows?
 
