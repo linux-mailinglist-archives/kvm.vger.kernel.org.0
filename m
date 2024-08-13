@@ -1,70 +1,70 @@
-Return-Path: <kvm+bounces-24044-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24045-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39F5A950AA2
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:44:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B7D0950AA5
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:45:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66C221C218D4
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:44:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF1A828189C
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 111CA1A4F0D;
-	Tue, 13 Aug 2024 16:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF2B1A4F31;
+	Tue, 13 Aug 2024 16:43:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VrzOUOEH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xQlIjD6n"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f202.google.com (mail-il1-f202.google.com [209.85.166.202])
+Received: from mail-il1-f201.google.com (mail-il1-f201.google.com [209.85.166.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899A11A2557
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DF61A3BB8
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723567401; cv=none; b=KjvrQZZbWL0sPe0SIeKJcWV7KVnHrqtTWrIaQbsoM/o5GRTAqieoEeADWFJ+cDKNY4kmKWi94DcdIB7oSqlNmcghWdiAjzGonit/aaZMNVe5E04UGTuCFtnVGKPPVgo2kIiJ3zHhAysMh8QnW+OO/ftZOTVZlYIA0WejvZrUVhA=
+	t=1723567402; cv=none; b=g1aLUmbXyaeaLLjFPE8HqneqEpySzoYhr6mFZTWf7J6Kq5iTfMfMibyF+5CtUd5rdYSH6hqZCiaJVkivIk8wRT8GNRXYPrYm58FS9Rk7rlgSgEsJZ72wBkSjzRUvIgAoMX9b2KIQUPnQhH5YZYvyS2rs6JSdfUoqCXjE8VBsbZg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723567401; c=relaxed/simple;
-	bh=BzUrNU2ZraWOWTk3Iv7hgsDb8BFWgPE59A3h3IKeVYE=;
+	s=arc-20240116; t=1723567402; c=relaxed/simple;
+	bh=hbna4WT6ykCjoJ+xsQHxPsp0+nTsv9npl8xnbl9uBlQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=FUXfy5plI1GC8c7MxWtnEd2obM2oY7XgEQQd64hwq3aQPmiVquqtzE0aKrN/8ruzrdYcfDzSICaWPSi0KbhktLDUPfOkU4vx5OOCUjF+bAWmXRsW5E1E0WiWxN/OImpDPvwcBh8A1kUjTD9ShHiqo4g53+yLdWkXuuhHBXD7RiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VrzOUOEH; arc=none smtp.client-ip=209.85.166.202
+	 To:Cc:Content-Type; b=NdCXNeiWLKT28KEes8hZQYi6jos1eX5Pcfsr7vtzBLK2GW0lvcfiqVHpQWhFM7r+h7Nnenac0b7aa9R/47Z/HfxXggRiE9euAXzUgmI1aKzkje3QJEH6+0zMVBHj7MTPiVTMDp77Db/RUNvmppLcIHXZgXt7WMp5vrXKDD5jGfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xQlIjD6n; arc=none smtp.client-ip=209.85.166.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
-Received: by mail-il1-f202.google.com with SMTP id e9e14a558f8ab-39a1f627b3dso72509775ab.1
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 09:43:19 -0700 (PDT)
+Received: by mail-il1-f201.google.com with SMTP id e9e14a558f8ab-39b349a0234so533065ab.0
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 09:43:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723567398; x=1724172198; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723567400; x=1724172200; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IzizhsPZKqLhOYK5bcLEvi2PU+wjRDK8IZyA0qEp6YM=;
-        b=VrzOUOEHmrqS26UeI9aa6DFkSDvoY7PrSBtJ5meZaZ2yinAohhuuSd7PTPYpu941Pw
-         gaQkL/r6sDh/3sHyBvQxsbNaoLZ2CIl9VMbrTo3/OeOMiBXYSZAGeJz4gzhMyVDqb1Uq
-         JEftC4PBbmPPlsEPdGvf2cHvWx5J2UA1V/t6OlvTlt/af7EaB32AKZ/mJh6V6bWZGcQH
-         W0CgztozWTeCXQ9CFU//NaUEiBOxCcd66lbGgefz1lMf5RlKXRTvR9Zu5bT+laCyL9ot
-         EMp40RvFYVs2wKs/m3HWUzzXE0b6IljU4g6bEfUN+DSzRRFix8BbxF7ocnxuBHFCBq34
-         80nA==
+        bh=sxu2u9J8ROI353JNXDar5TUy9JdYSVQrvfs197UIlhk=;
+        b=xQlIjD6nbccd9DDoZNij1kLNLgCr/bTdr+6twJbBKLJ+6/qw79+RXtbXAwGJ3QoVn+
+         bKsGtS1/B0K8TsViqU3YoDBsZXUj+0MNg8odeW2sOcCS0iaEIjPgnWYW/66XSoTIk+8O
+         91MKlusltWepRR0ue5P7QLuctqs0/ncQourPlxvBPviRLvmmpzpubcvs+LPS82wvzr+Q
+         tJYIgBaBqDuv3x99QvueWC5TL7EAyZ+XVZkYauPjQKUbQl3U7D9nc/+ypmSChjbWFLsp
+         lQYVMn63GiG5oFCfkOhH0DR78BN643gEnxINoVdTQhI4dS8V+8gLgai52m8Bvi+ibHDZ
+         oQnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723567398; x=1724172198;
+        d=1e100.net; s=20230601; t=1723567400; x=1724172200;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IzizhsPZKqLhOYK5bcLEvi2PU+wjRDK8IZyA0qEp6YM=;
-        b=Ri1IxozUtlmTHZg/HQBvAOpgUcchgr8rt4zZdjj8BV1kaAyS3gHA5WAO/lU+vhIjpM
-         qYaV4JgK3HlxJJ7316rEuYhla+JA3UnlEhHcMzIcYDtveZ8qgxeZRFqmeAKQzggmYsmS
-         AA+Fl3Yu6raWW5CwGKtLO3++vd5ErVg0sjLLGjEjiMGyT2I3FsVbALETjwwWxD9j2zn7
-         VLLMewqCAGF6pBN4SJYrnRSlRUpIeOzBbhfWu8NHj48B+yuzi/BTNaiWIoN7g1vtHQ+a
-         F3fZQEpyEy7rvHMj3FZ2cyCpt5ZCDl1WTVtegg4ga3FwUjT8Z93rF8LPosJvrIdEQ0QA
-         yb+w==
-X-Gm-Message-State: AOJu0Ywx7g9QaUTcPQED9BlUTcTnfM67v83kRkAzHVu5bpEfQWBYBG7F
-	ZRkktoO2uKdgvsUJo3zqj3JYum9bpj1pzZbrRsx4WfZH/Pdyyqygarn9SLEU8UE6jkGWppimas/
-	T/kcqsuB8XsqwL2dzFzhxQtvIQjIzK8Tz7pKrjjqAK6WEWgMtEtxE8z74VzRqCDcSKugGD+yPeU
-	QeuQkMrisOE0Y1WaIXXEK2uFD5EXzRG03Qb2RK+GPxGDKEu827HD12vR4=
-X-Google-Smtp-Source: AGHT+IGPy3YYdvJsVhd7Cm67IXVaqYPxT1CYYkGdmWcZNua9lh4lwNUJwrMH4rshgZzNfM+CSzuFOiFv8IYTpJVxUQ==
+        bh=sxu2u9J8ROI353JNXDar5TUy9JdYSVQrvfs197UIlhk=;
+        b=My+XFF8epknT/WzVZ31AxbNH8WxoJa/+n4tpuuwqLUqMis3ECH2rDc7Cs/vVXkabcc
+         Zx+0UxRKTZWuuZkZzuj0WZ4p+vTQkJvONE35Y8gqQN3ZORV8fUFeVfjWhTL/GC6O8Pgt
+         roRPpk1HwdqXc2LU7EnbGrPoeZLUPclTnLuAqx3jOQAjkGRdIo+p1A4UaC90qGyyqA4e
+         uWOs+/qmHRJZGVMdgt2ir62fGtkhgaaL0rOhTXv7Cw/ggk1KuwK57Hld4imNH4XFmSr/
+         UfLO780CERL+fUywgGcVxscYHh9gmH+53sBlYEub2EBy0hEm2uA+Y/lAK1rSh5nNm0Ve
+         ErQA==
+X-Gm-Message-State: AOJu0YzNVFh5SVcVKzbnn8gJvRA3TbWHriVpnpp3ud7AfqLHQfD6Ya3P
+	0xVfT/KrMXv8Q1vReuXxxasn0xpuY9krrXVXtoAh2HfGpLzAG1ApAQxCZgGL9CLGZ2CJp08eLnC
+	4gu79+4mPcMbdhzgb9mHzuTDoo6yL04wIimJdh/0TBlJ/l4RphBLupYyJtIQDDtDG0mPE/RslXj
+	HwC5x438Nlp0UWJXNH3nmwHH2bwKA6QCbHo+wugraBUsgXqXEZZQbK2Ag=
+X-Google-Smtp-Source: AGHT+IElI/1oLpRVwVZMfLBr3yjf0cJI9FMrVKLvemCl2STD5dQWccho2EdHMGhA6wjGDeXQ60Glka2UTwaKewegew==
 X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
- (user=coltonlewis job=sendgmr) by 2002:a05:6e02:b46:b0:397:fa4e:3df0 with
- SMTP id e9e14a558f8ab-39d124c23bbmr102925ab.3.1723567398720; Tue, 13 Aug 2024
- 09:43:18 -0700 (PDT)
-Date: Tue, 13 Aug 2024 16:42:43 +0000
+ (user=coltonlewis job=sendgmr) by 2002:a05:6638:9818:b0:4c2:31f5:3137 with
+ SMTP id 8926c6da1cb9f-4caaf459bcfmr5907173.0.1723567399664; Tue, 13 Aug 2024
+ 09:43:19 -0700 (PDT)
+Date: Tue, 13 Aug 2024 16:42:44 +0000
 In-Reply-To: <20240813164244.751597-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
@@ -74,8 +74,8 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240813164244.751597-1-coltonlewis@google.com>
 X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
-Message-ID: <20240813164244.751597-6-coltonlewis@google.com>
-Subject: [PATCH 5/6] KVM: x86: selftests: Test core events
+Message-ID: <20240813164244.751597-7-coltonlewis@google.com>
+Subject: [PATCH 6/6] KVM: x86: selftests: Test PerfMonV2
 From: Colton Lewis <coltonlewis@google.com>
 To: kvm@vger.kernel.org
 Cc: Mingwei Zhang <mizhang@google.com>, Jinrong Liang <ljr.kernel@gmail.com>, 
@@ -85,173 +85,83 @@ Cc: Mingwei Zhang <mizhang@google.com>, Jinrong Liang <ljr.kernel@gmail.com>,
 	Colton Lewis <coltonlewis@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Test events on core counters by iterating through every combination of
-events in amd_pmu_zen_events with every core counter.
+Test PerfMonV2, which defines global registers to enable multiple
+performance counters with a single MSR write, in its own function.
 
-For each combination, calculate the appropriate register addresses for
-the event selection/control register and the counter register. The
-base addresses and layout schemes change depending on whether we have
-the CoreExt feature.
-
-To do the testing, reuse GUEST_TEST_EVENT to run a standard known
-workload. Decouple it from guest_assert_event_count (now
-guest_assert_intel_event_count) to generalize to AMD.
-
-Then assert the most specific detail that can be reasonably known
-about the counter result. Exact count is defined and known for some
-events and for other events merely asserted to be nonzero.
-
-Note on exact counts: AMD counts one more branch than Intel for the
-same workload. Though I can't confirm a reason, the only thing it
-could be is the boundary of the loop instruction being counted
-differently. Presumably, when the counter reaches 0 and execution
-continues to the next instruction, AMD counts this as a branch and
-Intel doesn't.
+If the feature is available, ensure the global control register has
+the ability to start and stop the performance counters and the global
+status register correctly flags an overflow by the associated counter.
 
 Signed-off-by: Colton Lewis <coltonlewis@google.com>
 ---
- .../selftests/kvm/x86_64/pmu_counters_test.c  | 87 ++++++++++++++++---
- 1 file changed, 77 insertions(+), 10 deletions(-)
+ .../selftests/kvm/x86_64/pmu_counters_test.c  | 53 +++++++++++++++++++
+ 1 file changed, 53 insertions(+)
 
 diff --git a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-index 9620fc33d26e..fae078b444b3 100644
+index fae078b444b3..a6aa37ee460a 100644
 --- a/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
 +++ b/tools/testing/selftests/kvm/x86_64/pmu_counters_test.c
-@@ -29,6 +29,9 @@
- /* Total number of instructions retired within the measured section. */
- #define NUM_INSNS_RETIRED		(NUM_LOOPS * NUM_INSNS_PER_LOOP + NUM_EXTRA_INSNS)
- 
-+/* AMD counting one extra branch. Probably at loop boundary condition. */
-+#define NUM_BRANCH_INSNS_RETIRED_AMD	(NUM_LOOPS+1)
-+#define NUM_INSNS_RETIRED_AMD		(NUM_INSNS_RETIRED+1)
- 
- static uint8_t kvm_pmu_version;
- static bool kvm_has_perf_caps;
-@@ -98,7 +101,7 @@ static uint8_t guest_get_pmu_version(void)
-  * Sanity check that in all cases, the event doesn't count when it's disabled,
-  * and that KVM correctly emulates the write of an arbitrary value.
-  */
--static void guest_assert_event_count(uint8_t idx,
-+static void guest_assert_intel_event_count(uint8_t idx,
- 				     struct kvm_x86_pmu_feature event,
- 				     uint32_t pmc, uint32_t pmc_msr)
- {
-@@ -140,6 +143,33 @@ static void guest_assert_event_count(uint8_t idx,
- 	GUEST_ASSERT_EQ(_rdpmc(pmc), 0xdead);
- }
- 
-+static void guest_assert_amd_event_count(uint8_t evt_idx, uint8_t cnt_idx, uint32_t pmc_msr)
-+{
-+	uint64_t count;
-+	uint64_t count_pmc;
-+
-+	count = rdmsr(pmc_msr);
-+	count_pmc = _rdpmc(cnt_idx);
-+	GUEST_ASSERT_EQ(count, count_pmc);
-+
-+	switch (evt_idx) {
-+	case AMD_ZEN_CORE_CYCLES_INDEX:
-+		GUEST_ASSERT_NE(count, 0);
-+		break;
-+	case AMD_ZEN_INSTRUCTIONS_INDEX:
-+		GUEST_ASSERT_EQ(count, NUM_INSNS_RETIRED_AMD);
-+		break;
-+	case AMD_ZEN_BRANCHES_INDEX:
-+		GUEST_ASSERT_EQ(count, NUM_BRANCH_INSNS_RETIRED_AMD);
-+		break;
-+	case AMD_ZEN_BRANCH_MISSES_INDEX:
-+		GUEST_ASSERT_NE(count, 0);
-+		break;
-+	default:
-+		break;
-+	}
-+
-+}
- /*
-  * Enable and disable the PMC in a monolithic asm blob to ensure that the
-  * compiler can't insert _any_ code into the measured sequence.  Note, ECX
-@@ -172,28 +202,29 @@ do {										\
- 	);									\
- } while (0)
- 
--#define GUEST_TEST_EVENT(_idx, _event, _pmc, _pmc_msr, _ctrl_msr, _value, FEP)	\
-+#define GUEST_TEST_EVENT(_pmc_msr, _ctrl_msr, _ctrl_value, FEP)			\
- do {										\
- 	wrmsr(_pmc_msr, 0);							\
- 										\
- 	if (this_cpu_has(X86_FEATURE_CLFLUSHOPT))				\
--		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflushopt .", FEP);	\
-+		GUEST_MEASURE_EVENT(_ctrl_msr, _ctrl_value, "clflushopt .", FEP);	\
- 	else if (this_cpu_has(X86_FEATURE_CLFLUSH))				\
--		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "clflush .", FEP);	\
-+		GUEST_MEASURE_EVENT(_ctrl_msr, _ctrl_value, "clflush .", FEP);	\
- 	else									\
--		GUEST_MEASURE_EVENT(_ctrl_msr, _value, "nop", FEP);		\
--										\
--	guest_assert_event_count(_idx, _event, _pmc, _pmc_msr);			\
-+		GUEST_MEASURE_EVENT(_ctrl_msr, _ctrl_value, "nop", FEP);		\
- } while (0)
- 
- static void __guest_test_arch_event(uint8_t idx, struct kvm_x86_pmu_feature event,
- 				    uint32_t pmc, uint32_t pmc_msr,
- 				    uint32_t ctrl_msr, uint64_t ctrl_msr_value)
- {
--	GUEST_TEST_EVENT(idx, event, pmc, pmc_msr, ctrl_msr, ctrl_msr_value, "");
-+	GUEST_TEST_EVENT(pmc_msr, ctrl_msr, ctrl_msr_value, "");
-+	guest_assert_intel_event_count(idx, event, pmc, pmc_msr);
- 
--	if (is_forced_emulation_enabled)
--		GUEST_TEST_EVENT(idx, event, pmc, pmc_msr, ctrl_msr, ctrl_msr_value, KVM_FEP);
-+	if (is_forced_emulation_enabled) {
-+		GUEST_TEST_EVENT(pmc_msr, ctrl_msr, ctrl_msr_value, KVM_FEP);
-+		guest_assert_intel_event_count(idx, event, pmc, pmc_msr);
-+	}
- }
- 
- #define X86_PMU_FEATURE_NULL						\
-@@ -684,9 +715,45 @@ static void guest_test_rdwr_core_counters(void)
+@@ -750,10 +750,63 @@ static void guest_test_core_events(void)
  	}
  }
  
-+static void __guest_test_core_event(uint8_t event_idx, uint8_t counter_idx)
++static void guest_test_perf_mon_v2(void)
 +{
-+	/* One fortunate area of actual compatibility! This register
-+	 * layout is the same for both AMD and Intel.
-+	 */
++	uint64_t i;
 +	uint64_t eventsel = ARCH_PERFMON_EVENTSEL_OS |
 +		ARCH_PERFMON_EVENTSEL_ENABLE |
-+		amd_pmu_zen_events[event_idx];
++		AMD_ZEN_CORE_CYCLES;
 +	bool core_ext = this_cpu_has(X86_FEATURE_PERF_CTR_EXT_CORE);
-+	uint64_t esel_msr_base = core_ext ? MSR_F15H_PERF_CTL : MSR_K7_EVNTSEL0;
++	uint64_t sel_msr_base = core_ext ? MSR_F15H_PERF_CTL : MSR_K7_EVNTSEL0;
 +	uint64_t cnt_msr_base = core_ext ? MSR_F15H_PERF_CTR : MSR_K7_PERFCTR0;
 +	uint64_t msr_step = core_ext ? 2 : 1;
-+	uint64_t esel_msr = esel_msr_base + msr_step * counter_idx;
-+	uint64_t cnt_msr = cnt_msr_base + msr_step * counter_idx;
-+
-+	GUEST_TEST_EVENT(cnt_msr, esel_msr, eventsel, "");
-+	guest_assert_amd_event_count(event_idx, counter_idx, cnt_msr);
-+
-+	if (is_forced_emulation_enabled) {
-+		GUEST_TEST_EVENT(cnt_msr, esel_msr, eventsel, KVM_FEP);
-+		guest_assert_amd_event_count(event_idx, counter_idx, cnt_msr);
-+	}
-+
-+}
-+
-+static void guest_test_core_events(void)
-+{
 +	uint8_t nr_counters = this_cpu_property(X86_PROPERTY_NUM_PERF_CTR_CORE);
++	bool perf_mon_v2 = this_cpu_has(X86_FEATURE_PERF_MON_V2);
++	uint64_t sel_msr;
++	uint64_t cnt_msr;
 +
-+	for (uint8_t i = 0; i < NR_AMD_ZEN_EVENTS; i++) {
-+		for (uint8_t j = 0; j < nr_counters; j++)
-+			__guest_test_core_event(i, j);
++	if (!perf_mon_v2)
++		return;
++
++	for (i = 0; i < nr_counters; i++) {
++		sel_msr = sel_msr_base + msr_step * i;
++		cnt_msr = cnt_msr_base + msr_step * i;
++
++		/* Ensure count stays 0 when global register disables counter. */
++		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
++		wrmsr(sel_msr, eventsel);
++		wrmsr(cnt_msr, 0);
++		__asm__ __volatile__("loop ." : "+c"((int){NUM_LOOPS}));
++		GUEST_ASSERT(!_rdpmc(i));
++
++		/* Ensure counter is >0 when global register enables counter. */
++		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, BIT_ULL(i));
++		__asm__ __volatile__("loop ." : "+c"((int){NUM_LOOPS}));
++		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
++		GUEST_ASSERT(_rdpmc(i));
++
++		/* Ensure global status register flags a counter overflow. */
++		wrmsr(cnt_msr, -1);
++		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, 0xff);
++		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, BIT_ULL(i));
++		__asm__ __volatile__("loop ." : "+c"((int){NUM_LOOPS}));
++		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_CTL, 0);
++		GUEST_ASSERT(rdmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS) &
++			     BIT_ULL(i));
++
++		/* Ensure global status register flag is cleared correctly. */
++		wrmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS_CLR, BIT_ULL(i));
++		GUEST_ASSERT(!(rdmsr(MSR_AMD64_PERF_CNTR_GLOBAL_STATUS) &
++			     BIT_ULL(i)));
 +	}
 +}
++
 +
  static void guest_test_core_counters(void)
  {
  	guest_test_rdwr_core_counters();
-+	guest_test_core_events();
+ 	guest_test_core_events();
++	guest_test_perf_mon_v2();
  	GUEST_DONE();
  }
  
