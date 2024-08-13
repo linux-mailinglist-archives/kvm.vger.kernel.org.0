@@ -1,136 +1,249 @@
-Return-Path: <kvm+bounces-24017-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24018-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06FC29508D2
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:20:24 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0352B9508EE
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:23:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B08701F25343
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:20:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54273B21117
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2B81A08BB;
-	Tue, 13 Aug 2024 15:19:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B63D1A01BD;
+	Tue, 13 Aug 2024 15:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jKXpVNU2"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="DtXFdbM/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2063.outbound.protection.outlook.com [40.107.220.63])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4335F1A08AB
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 15:19:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723562364; cv=none; b=PJfObbWuUK5nBjPs9RdC7Z7MpgOpHf3WH9joDH8uRqOHrDFZ7ARNBwQWbxLArhG/5d+9XVz3VE67bXmPsWruaCx3mf+gZHVSOyylSPEfcG1fbxPWQLGBAM/1Ez2TWcpdxylj4N6cJTJDsBldHLI5Da9O53ihXNC/VZVv9fzJC8s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723562364; c=relaxed/simple;
-	bh=4Xp48SJMLcVIZJiAwvicvIafG9pNg+39hHzu6XF0VPQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=jHmuLMMU4e72thG+qr8lmALYyveGdOG9YNhcQp7wkz9x/xBgX+m5VFTW+tglRLSi1zFhy4XwVq8ISWPuMf54J5HNJssPTGq4dB/pe+K+LOppgJDWOMCp02esqy31AtffBcgnPq/QJ6zZhm55r+jqZpX18YDha7ytfB4biBgH0Fg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jKXpVNU2; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-710ca162162so4431873b3a.0
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 08:19:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723562362; x=1724167162; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yiVajlnnhMg/Yh+qfX66bQ3bWZlc6mtowqxiGC0tj8M=;
-        b=jKXpVNU2Ld1vGetyzbbs8IiJ4B9FR+acfv2T1ufUnPQVqP3/6WpDd//qmRe0M0wpch
-         bnVK9tEcAbH4pSxPq08NyWkT45blPM7ZkKOYzXemR9JrEsjIqft2Mk7SAxeyhzIy4Hj3
-         izsNjZ+XKsm3EwJtM5gzPF78Q+3henvnvHL/ZvzbnGdmsp7XXh7awAJ3Xzb+xERPN2Gy
-         wFeO/inL2GWfj2Ado6PAPqw1Js0yRTmNeYGsqbJ7ho2maWEdLX1intB3/bqpFdcylI0o
-         Sf3HXw6N9fb1ASJ2w5V66x6Zo396+Xg/4bRXeIA3yNlGbuiV41FhbZ0Y65SpJKkbmo1Y
-         gOQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723562362; x=1724167162;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=yiVajlnnhMg/Yh+qfX66bQ3bWZlc6mtowqxiGC0tj8M=;
-        b=F1oixeUYCB1/gto9VyZTNsVlpB9D++W1772vq8j4iRsmQ8/Llb5TRnK0kMoB64PDlQ
-         1YjYaraih9rJRhKOiNqre+UGrUrS6LF2E+gthJ/+1o1R4ThIJCMR+pfihYEimxU1/1O0
-         RfFmzwXOvIXMiY3irp3OgwqZSFwYHoRWBFh9Sv2X7+PPGUtqhDialSSBRzm1BFly+MKD
-         H7pHPKnSKB6I2f7DwB4YsTmWllcGXJrKQyXVDssr11gfaXvNb4hkJqqJad+DeM+n3tfB
-         yO0zFh/NPuQx3by1Is/Wg9chBJaiALDySNxw6iT9O5qLWeSQt+crTfpCRTHOfXp1gLUT
-         0r2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWjcoNWvaxbrW9LZIUbcECqWh72DLVsbTC0UHaBOEJ0hbtzpvetrEKyq4oycICGT5Tw/nTzKGsmEZXX2XQJE17BfLz4
-X-Gm-Message-State: AOJu0YziDjyq/4nsvdfLweezRoPe53TQxZJfLzWyR7rykjD6Er0dKvn6
-	KjFd6wRzesxfM+sT6QW5maeKe/Un0jU2tj09EY/SMOEZzr9JM2L4EpLX9OgKNRW/JYkdogPsiKm
-	G5A==
-X-Google-Smtp-Source: AGHT+IGZphdjDZHrlcnKAsnjY8cAGv5jEiizyXDCv8b9DV58tXXEL/E/tosVycOuJ/VmvuOmGLWv2ESAQ/s=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a00:bef:b0:710:4d08:e41f with SMTP id
- d2e1a72fcca58-712554d8bbamr9757b3a.4.1723562362321; Tue, 13 Aug 2024 08:19:22
- -0700 (PDT)
-Date: Tue, 13 Aug 2024 08:19:20 -0700
-In-Reply-To: <CAJhGHyDa+-ehMOeLGhZ9-y-ubB4fSXG83hBGUWMRmBOtJ-wSLg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9854619925A;
+	Tue, 13 Aug 2024 15:23:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.63
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723562594; cv=fail; b=riXR+UryLSr3vP+NYHcbqLzUyQeagjUGinfzUBFvzuE5hJjwrIw6tvAbmNfuRsgqX9Jz8w6TzKZ20Ja7EYdX7eczt/t+RTJLHg/9S/eSdV5DWeQNLTratTCS+0q3FJrEc7PvlTrAqy+wahixa6dBlx96qsqMiMZveO1K/VE4FKA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723562594; c=relaxed/simple;
+	bh=XdVejaol+qYWTcvE/i7YtC0X9y7hlnG5WNkPISoz7uk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Vn1XPf+awPEwT2m9KFYPqKKKcrcFvU0vrF/gslptk3ZbYN8GFjl+USC3Bd9EJrRQmbIJjjk4Cw8eC2e+AFQZdZXSh4lv3CY7TCR3b1Z97ZNWZJhRLAhMu1UZfKr9tBK5NLcygjHDZ/8MDui3GJ6rz327hew3Ytp5hG9rfUliKcI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=DtXFdbM/; arc=fail smtp.client-ip=40.107.220.63
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=gdhzsisqQhzakOoP8zgU5FiALv8lVhDKZmQNFTjRYgmZ7NvhTnRgJ6rd15Or4DRrEeDmdYZV+fJbZEsLHLL+nkioa5WlacoV0vGHnpGJnDnJZxKBV/Lil5zYwFgl26beCdxvPs/3E1NqTUR6qXCYQB0ZMx7I5By9qa4eWEblfSWNlaFvz67kC56fhDcc2MGoMgor0zZT9C5KVxpj86bFHpuZD2QhOwAnQzcy349QrcmPal5p6LfQvvOutksMuWrNkdTD1F00n1z4aiWZTW2BzZraqkEyYZ6onsD9N7FwOnHTmeEEDlRjXkogl0Rl0jqus8hVMbCtdtMzBrB6zbHaoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=MyQN+7vMFubnfGPDH818CrGGJWmV01Hkr4KzaR6GEAk=;
+ b=G3CTAxlKrZ9v688Olfs939wJtTp4KSRXPanzcpCnKuua7LtGLv0JtQfbCo4xIWVsB/jwfgwc8ZJwyYoIf2wZpzsq2CnpxOFhyfBz6NaIcFt62JldfZwA55YFhcATUCgqkzxs8bATlDkoqzZQe1IcOT5jLb3PhPexjT2bWDolZFsAxlpaMc/u5XCfTiEpf32MMxIa1XO6qWoXDdqy6j/cUBJbxIfaWPKtBM4itlQhX7vuu2mE4uw9K8+t2MzaGZvj/l9EEYlq0bRRvtTlvdJuOL7ut6aMEqM/GlwtE3XQSlRG29tFLQiCMooWTH2YLQs/FVnJi7/MON70r1PAABNS9g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=google.com smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=MyQN+7vMFubnfGPDH818CrGGJWmV01Hkr4KzaR6GEAk=;
+ b=DtXFdbM/JJDMjaZCpsNzH18GtmMMb219lh2A7qlq/h005tkqckXpoLueQZzHwQoIfX6jVam9kYCQWRyUJvYwNpaWDAVDBnx8314q99F5gLlpN25Kesgi8FqtVDRfC6EMdVs3Ve0lT65Tv2psO6KfYnFNR6ksICIuXbSl8NAGR1U=
+Received: from CH2PR10CA0019.namprd10.prod.outlook.com (2603:10b6:610:4c::29)
+ by PH7PR12MB6538.namprd12.prod.outlook.com (2603:10b6:510:1f1::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Tue, 13 Aug
+ 2024 15:23:07 +0000
+Received: from CH1PEPF0000AD7A.namprd04.prod.outlook.com
+ (2603:10b6:610:4c:cafe::2d) by CH2PR10CA0019.outlook.office365.com
+ (2603:10b6:610:4c::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.23 via Frontend
+ Transport; Tue, 13 Aug 2024 15:23:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CH1PEPF0000AD7A.mail.protection.outlook.com (10.167.244.59) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7849.8 via Frontend Transport; Tue, 13 Aug 2024 15:23:06 +0000
+Received: from [10.236.31.51] (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Tue, 13 Aug
+ 2024 10:23:05 -0500
+Message-ID: <5b32da03-addf-4f34-bcf4-76fbe420b8f5@amd.com>
+Date: Tue, 13 Aug 2024 10:23:04 -0500
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240809194335.1726916-1-seanjc@google.com> <20240809194335.1726916-20-seanjc@google.com>
- <CAJhGHyDjsmQOQQoU52vA95sddWtzg1wh139jpPYBT1miUAgj6Q@mail.gmail.com>
- <ZrooozABEWSnwzxh@google.com> <CAJhGHyDa+-ehMOeLGhZ9-y-ubB4fSXG83hBGUWMRmBOtJ-wSLg@mail.gmail.com>
-Message-ID: <Zrt5eNArfQA7x1qj@google.com>
-Subject: Re: [PATCH 19/22] KVM: x86/mmu: Add infrastructure to allow walking
- rmaps outside of mmu_lock
-From: Sean Christopherson <seanjc@google.com>
-To: Lai Jiangshan <jiangshanlai@gmail.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Oliver Upton <oliver.upton@linux.dev>, Marc Zyngier <maz@kernel.org>, Peter Xu <peterx@redhat.com>, 
-	James Houghton <jthoughton@google.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC 2/5] selftests: KVM: Decouple SEV ioctls from asserts
+To: Sean Christopherson <seanjc@google.com>
+CC: <kvm@vger.kernel.org>, <shuah@kernel.org>, <thomas.lendacky@amd.com>,
+	<michael.roth@amd.com>, <pbonzini@redhat.com>, <pgonda@google.com>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240710220540.188239-1-pratikrajesh.sampat@amd.com>
+ <20240710220540.188239-3-pratikrajesh.sampat@amd.com>
+ <ZrY4e39Q2_WxhrkI@google.com>
+Content-Language: en-US
+From: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>
+In-Reply-To: <ZrY4e39Q2_WxhrkI@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH1PEPF0000AD7A:EE_|PH7PR12MB6538:EE_
+X-MS-Office365-Filtering-Correlation-Id: 355200c3-5ced-44d8-cde7-08dcbbabd536
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?S2FabEh2MTNpVjl2ekh6L01SMlozUU5hKzdrTVRDb1VqdEhNWEY1d25NRk5J?=
+ =?utf-8?B?T2pTSEttdzhJbjJwRWVrUXJoeTVhWEJSbkcrMjR2dTM2bGZXdXpONEtYZFR5?=
+ =?utf-8?B?RU1DbHYzb2o0UDJLMUNWR3dqbkNzRWEzNFlJV2N3T09GQVBjd0xSaUNRbnov?=
+ =?utf-8?B?MFFjb1QyMk1TVUkvUHhnVWxYUUI2MFNhYkxmUTZ1OG0rYkhFbGRDWWxackhq?=
+ =?utf-8?B?L2ZzY3hXWFIzZlp6NlpHcVdaVDh1MEJ3eXRWbGFoOXVCSzRUS2xhcFNYTW4y?=
+ =?utf-8?B?ZFcrci8xZWQ1Y0Frd2hyMDNnWHdhdUpRYnZtZ003Q05WaTdwUWVXS0N6WndT?=
+ =?utf-8?B?SlZnNS9EdHoyMGEwcjNtVy9aOThicHhFcnBib1JSZXl4RGVSeGs2MHRzcUZ4?=
+ =?utf-8?B?ZzZTUnpicXAwZ3RJNVRoOEF6UFpXTUo3NHlaajZ1Rlk4YTVqZ1ZTNlVKWVM2?=
+ =?utf-8?B?Z0krN3UyTC84OTVNMHpxMExxbGJIS0UvNTl4UHk2TmZMR0JlNXdpbmRCYzgw?=
+ =?utf-8?B?aFVpOWVPRzZmRGErT1hkTTU1aG05a0laZzlUZWVOeFpGU29TM2Y0K2pleDZm?=
+ =?utf-8?B?TFc4MENBdEpaUXBJa0UzQ2NsbnloYjhlQ2VlZzFqalZCVHBaZVZhOWVrUkY5?=
+ =?utf-8?B?cTI5eW1PVFhISU03ZkR1L0NZclRPckozREhsdjRvWWZIU2FhVmdDcHdpMHEz?=
+ =?utf-8?B?VyswZWd4Z0cxSEt6Q3E0Y0ZBMTcwY1BxNzQ5TWRxOHVlUnVKTlZjNlBXd1RL?=
+ =?utf-8?B?dUppMWErRnRhbzVBNDF2Um9rdUlxY0wwdnF6TnF6cXBURDFXOHNoV2IyMmhS?=
+ =?utf-8?B?dG9FKzdmMjU5Z3FDRXpPVmRkTnlBOHVhRGdNMk1JRTh1bHJnem10akVndDBl?=
+ =?utf-8?B?MTVqQ3VDLzZjSEN0ZDh4MGQ4SDBoeGZQZzhtTnZzUStSdTBDYlV2aTNDWkhh?=
+ =?utf-8?B?V1BsRVkweUJIVnpzeTB0bi9XSVU2RWRhSkRYWnRGNnQ0dzlkdTJLZktneE9T?=
+ =?utf-8?B?YWtPb2RtNFZ3RlJseGZHMnd1Q2lhM3FVMTFUUmVBK0c2WHk2VWY1bm55UlNq?=
+ =?utf-8?B?UkxkY1hBRkhBVXRscXdoK3FqbFVrSmxrU0FTN2hDOFllQ1h6eUxOQW4wMnhM?=
+ =?utf-8?B?bHY5ajh6U3IveVk1MEo4c2JwZzgvRTB4Wk05a28vSzNYRm11dU5NbkM4WENh?=
+ =?utf-8?B?WVZWZFJJcHNBeUpQODAyVU44S0o1OE8vRjRWS3h3cmYxSG96WVVUSFl1dUty?=
+ =?utf-8?B?a01QZGFwUHdlSldNKzZZaDVKdHlXMTdlcDRNSmhNem1NcHdJYnlINmhwSmZB?=
+ =?utf-8?B?YWI1RGljTVljc0FYRUdqRkVpbzZqUnI3V3hDMHVKcFUwRVc3QWhKazZGTlN2?=
+ =?utf-8?B?ZkQwYmxmenZ4dWs4S1pYdnFVakp1NFlhVDNyeThzUFgrYTB6VVo4REN0bU1H?=
+ =?utf-8?B?SUJFbHpZK0ZHTnJWbGdzdzdXc3REWS9Mb0J6MzdEdmliU3BpSVFtQ3FjSGp2?=
+ =?utf-8?B?OHhwT3dEZnBiV29wcE1vUmo0dHRWZlJBWU1LS3JibTRYYllDKzErbU12aXdP?=
+ =?utf-8?B?T1RVMEtrU2lPQ3FSd3QxR29uRFl0eWNiOU5Na1VpZHdZZ2duT0lCZG1XU09M?=
+ =?utf-8?B?MG1EWW9USWRUbk5qaTlwOXh0S25JejNzSUhxRzloV05HMzNKZlRWSnVvQVcw?=
+ =?utf-8?B?Q0xpNjR5bHN6bThxSFVHZktiWUthVzg2NjZTYllZTUljVUwwNURUbE5NUEoz?=
+ =?utf-8?B?VmJaY2VKYVpISVJYbFFVMW5tbFBVZ3doa2lKS2pGVjlsTTFMQ3pnMWtsWlBn?=
+ =?utf-8?B?MDUwVllQbXZpUXNjcjhNTW4wb2RTMmlwZDlVa1hyemowQTF4eCtWNkFVbUZ1?=
+ =?utf-8?B?bld5b0VCWFJRay9WNWRzVDIvV2p3UVVtdUtMbEtnQmU5a1NyM3VlM1BpekZT?=
+ =?utf-8?Q?H8q1LuffESkz1rpM10VmSt03OZCzsGSe?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Aug 2024 15:23:06.9772
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 355200c3-5ced-44d8-cde7-08dcbbabd536
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH1PEPF0000AD7A.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6538
 
-On Tue, Aug 13, 2024, Lai Jiangshan wrote:
-> On Mon, Aug 12, 2024 at 11:22=E2=80=AFPM Sean Christopherson <seanjc@goog=
-le.com> wrote:
->=20
-> >
-> > Oh yeah, duh, re-read after PAUSE, not before.
-> >
-> > Definitely holler if you have any alternative ideas for walking rmaps
-> > without taking mmu_lock, I guarantee you've spent more time than me
-> > thinking about the shadow MMU :-)
->=20
-> We use the same bit and the same way for the rmap lock.
->=20
-> We just use bit_spin_lock() and the optimization for empty rmap_head is
-> handled out of kvm_rmap_lock().
+Hi Sean,
 
-Hmm, I'm leaning towards keeping the custom locking.  There are a handful o=
-f
-benefits, none of which are all that meaningful on their own, but do add up=
-.
+Thanks for your review.
 
- - Callers don't need to manually check for an empty rmap_head.
- - Can avoid the redundant preempt_{disable,enable}() entirely in the commo=
-n case
-   of being called while mmu_lock is held.
- - Handles the (likely super rare) edge case where a read-only walker encou=
-nters
-   an rmap that was just emptied (rmap_head->val goes to zero after the ini=
-tial
-   check to elide the lock).
- - Avoids an atomic when releasing the lock, and any extra instructions ent=
-irely
-   for writers since they always write the full rmap_head->val when releasi=
-ng.
+On 8/9/2024 10:40 AM, Sean Christopherson wrote:
+> On Wed, Jul 10, 2024, Pratik R. Sampat wrote:
+>> This commit separates the SEV, SEV-ES, SEV-SNP ioctl calls from its
+> 
+> Don't start with "This commit".  Please read Documentation/process/maintainer-kvm-x86.rst,
+> and by extension, Documentation/process/maintainer-tip.rst.
 
-> bit_spin_lock() has the most-needed preempt_disable(). I'm not sure if th=
-e
-> new kvm_rmap_age_gfn_range_lockless() is called in a preempt disabled reg=
-ion.
+Sure, I will frame the message better.
 
-Oof, it doesn't.  Disabling IRQs crossed my mind, but I completely forgot a=
-bout
-preemption.
+> 
+>> positive test asserts. This is done so that negative tests can be
+>> introduced and both kinds of testing can be performed independently
+>> using the same base helpers of the ioctl.
+>>
+>> This commit also adds additional parameters such as flags to improve
+>> testing coverage for the ioctls.
+>>
+>> Cleanups performed with no functional change intended.
+>>
+>> Signed-off-by: Pratik R. Sampat <pratikrajesh.sampat@amd.com>
+>> ---
+>>  .../selftests/kvm/include/x86_64/sev.h        |  20 +--
+>>  tools/testing/selftests/kvm/lib/x86_64/sev.c  | 145 ++++++++++++------
+>>  2 files changed, 108 insertions(+), 57 deletions(-)
+>>
+>> diff --git a/tools/testing/selftests/kvm/include/x86_64/sev.h b/tools/testing/selftests/kvm/include/x86_64/sev.h
+>> index 43b6c52831b2..ef99151e13a7 100644
+>> --- a/tools/testing/selftests/kvm/include/x86_64/sev.h
+>> +++ b/tools/testing/selftests/kvm/include/x86_64/sev.h
+>> @@ -37,14 +37,16 @@ enum sev_guest_state {
+>>  #define GHCB_MSR_TERM_REQ	0x100
+>>  
+>>  void sev_vm_launch(struct kvm_vm *vm, uint32_t policy);
+>> -void sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement);
+>> -void sev_vm_launch_finish(struct kvm_vm *vm);
+>> +int sev_vm_launch_start(struct kvm_vm *vm, uint32_t policy);
+>> +int sev_vm_launch_update(struct kvm_vm *vm, uint32_t policy);
+>> +int sev_vm_launch_measure(struct kvm_vm *vm, uint8_t *measurement);
+>> +int sev_vm_launch_finish(struct kvm_vm *vm);
+>>  
+>>  bool is_kvm_snp_supported(void);
+>>  
+>> -void snp_vm_launch(struct kvm_vm *vm, uint32_t policy);
+>> -void snp_vm_launch_update(struct kvm_vm *vm);
+>> -void snp_vm_launch_finish(struct kvm_vm *vm);
+>> +int snp_vm_launch(struct kvm_vm *vm, uint32_t policy, uint8_t flags);
+>> +int snp_vm_launch_update(struct kvm_vm *vm, uint8_t page_type);
+>> +int snp_vm_launch_finish(struct kvm_vm *vm, uint16_t flags);
+>>  
+>>  struct kvm_vm *vm_sev_create_with_one_vcpu(uint32_t type, void *guest_code,
+>>  					   struct kvm_vcpu **cpu);
+>> @@ -98,7 +100,7 @@ static inline void sev_register_encrypted_memory(struct kvm_vm *vm,
+>>  	vm_ioctl(vm, KVM_MEMORY_ENCRYPT_REG_REGION, &range);
+>>  }
+>>  
+>> -static inline void snp_launch_update_data(struct kvm_vm *vm, vm_paddr_t gpa,
+>> +static inline int snp_launch_update_data(struct kvm_vm *vm, vm_paddr_t gpa,
+>>  					   uint64_t size, uint8_t type)
+>>  {
+>>  	struct kvm_sev_snp_launch_update update_data = {
+>> @@ -108,10 +110,10 @@ static inline void snp_launch_update_data(struct kvm_vm *vm, vm_paddr_t gpa,
+>>  		.type = type,
+>>  	};
+>>  
+>> -	vm_sev_ioctl(vm, KVM_SEV_SNP_LAUNCH_UPDATE, &update_data);
+>> +	return __vm_sev_ioctl(vm, KVM_SEV_SNP_LAUNCH_UPDATE, &update_data);
+> 
+> Don't introduce APIs and then immediately rewrite all of the users.  If you want
+> to rework similar APIs, do the rework, then add the new APIs.  Doing things in
+> this order adds a pile of pointless churn.
+> 
+> But that's a moot point, because it's far easier to just add __snp_launch_update_data().
+> And if you look through other APIs in kvm_util.h, you'll see that the strong
+> preference is to let vm_ioctl(), or in this case vm_sev_ioctl(), do the heavy
+> lifting.  Yeah, it requires copy+pasting marshalling parameters into the struct,
+> but that's relatively uninteresting code, _and_ piggybacking the "good" version
+> means you can't do things like pass in a garbage virtual address (because the
+> "good" version always guarantees a good virtual address).
 
-Thanks much!
+I am a little confused by this.
+
+Are you suggesting that I leave the original functions intact with using
+vm_sev_ioctl() and have an additional variant such as
+__snp_launch_update_data() which calls into __vm_sev_ioctl() to decouple
+the ioctl from the assert for negative asserts?
+
+Or, do you suggest that I alter vm_sev_ioctl() to handle both positive
+and negative asserts?
+
+Thanks!
+-Pratik
+
 
