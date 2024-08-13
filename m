@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-23982-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23983-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9278F9502B5
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 12:44:48 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E98079502B6
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 12:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C62D91C21AE5
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:44:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0C461F22AF6
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:44:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505E919B3C7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3BC19B3D6;
 	Tue, 13 Aug 2024 10:44:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BfC/dzN/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nkyje5/5"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41AF019AA43;
-	Tue, 13 Aug 2024 10:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41B5819AA53;
+	Tue, 13 Aug 2024 10:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723545851; cv=none; b=ncw0EVwjLKqReuqUEbpeXBHcLpLunSICvi5Z23Dm/r4xkXzE+Vz+wRRqvHWel3T6fRtQoQ5pyiTeTIOXnJvqjOfe5HPYfIm0+ZxHX85SEILkcrwuW8I1q8kacc3v/TSexpubB0zgxuXbKRj7aVMLuEtFfEJi604IwLzZDsmLolM=
+	t=1723545851; cv=none; b=ge6nyH+okz1kttPU7Caad7M8oCIytsV3wMU8zU/tb7dxX0D0CVjPzD9yq9KBXaiUtMiTytfHCIv9eKvRuGdzAK+Bh24xbsJnmFf1uxrcpZsb3NJ2tENcPoSmJQjxLRS/JkON2daTsDgYR3KRMZtrUt4VKSfXlR9pQJtG/xYKyQM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723545851; c=relaxed/simple;
-	bh=mcDksh3U4KLI5FYXHkvHzDVOLwp0prVY32Ojy0Do63s=;
+	bh=c3Z1JxPnPDc0JyvzdjgMda935deX6eK6ajc0Q+Qvets=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CDZ2uUluIEVfAjujlglvHp2kYoe8y3Zq2Zn1W6uzHNxRx7c5uxg5Jf9UWBFh0ONqQu3YHFQwJ+ziBp6Abqsz5kd7ah6xpCpll/cS4gqAFVTNN4b3TTjFxJmgBlua0Y99Msmjv+h1vYv3ZUq9R7FcFjHg6kMOQC17JIsXBxCzwPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BfC/dzN/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3FF0C4AF18;
+	 MIME-Version; b=j4XkdO58GtO8qptmsneESvBa0U1I7NXOKCup0PNx9w+RQ1GMRBwf8zGn5twCN+OU7lSNev4JjKsGYUpMPZ7s9XW2OwLIQTnx3KrjV7WFNapqjfOqDStKEPHNrpvGkHMG4FULcZoDc8jAM/suLpNsUT1WnFBRYm8UQZuhWQUQAcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nkyje5/5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF9BBC4AF16;
 	Tue, 13 Aug 2024 10:44:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723545850;
-	bh=mcDksh3U4KLI5FYXHkvHzDVOLwp0prVY32Ojy0Do63s=;
+	bh=c3Z1JxPnPDc0JyvzdjgMda935deX6eK6ajc0Q+Qvets=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BfC/dzN/e+su9MZ88MNp39yik96svabW4uzOQhzH5ld/K23H/8iUeLI56Zx+PgOYn
-	 ipaNi44Hn+N5LlaqQv3Gl6a5apTpcXTR2UTeFs7f3RU7/0O68eEIWQsBoDM/ld8z7s
-	 eKEZxnoa9utQudtYOXYuch9w15gg9GJzxRQupbCE/oLTFafAGrjojgH5Yl3YwR6Rog
-	 p15MhntB5QoHGQUzTNQjyBbWeu7UYfnZqguaOxCQbaw2NSkbE0cLh6mqb8ZVPCeRq/
-	 8qfNohFygoe3//LfpZGp45zhAv5nO2b/tmaDigarvbdiNr9yh3X3Nd5qedF6aRa4Bq
-	 stu3jL3x2qw2w==
+	b=nkyje5/5HfUnG64bziPwdwV9abferWbjpB7tSV0XfZpYuU14Zj622q4oxm7umZNQm
+	 JmMlwz8zzlDTR3iMGaw/mnwXb7kclEhKaniui92/xxRFTDAFAsU9J7BQfZHB6CB9Hi
+	 yuU6RIAJpj3fA/+I/MjsgIDTZg/8xYmF7dqhYAgJ6RGDEVwsKQqhR5aAAd72PblfHo
+	 zMPLoS6UdW2Mmr9KTWiR9Hid/KGjfo5fWNeaYG46qAd1+TCHzYGuBrWogUOw8BKCx3
+	 eTYk7Wx01jyb+NOlcNcOUFjR7G1U2hPHJsmD4xtCN7v59yAgZsn0FefVnAaOXmJ/wa
+	 pKGsNAKZM50XQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdp0a-003JD1-UN;
-	Tue, 13 Aug 2024 11:44:08 +0100
+	id 1sdp0b-003JD1-43;
+	Tue, 13 Aug 2024 11:44:09 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -58,9 +58,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Fuad Tabba <tabba@google.com>,
 	Joey Gouly <joey.gouly@arm.com>,
 	Mark Brown <broonie@kernel.org>
-Subject: [PATCH v3 5/8] KVM: arm64: Honor trap routing for FPMR
-Date: Tue, 13 Aug 2024 11:43:57 +0100
-Message-Id: <20240813104400.1956132-6-maz@kernel.org>
+Subject: [PATCH v3 6/8] KVM: arm64: Expose ID_AA64FPFR0_EL1 as a writable ID reg
+Date: Tue, 13 Aug 2024 11:43:58 +0100
+Message-Id: <20240813104400.1956132-7-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240813104400.1956132-1-maz@kernel.org>
 References: <20240813104400.1956132-1-maz@kernel.org>
@@ -76,50 +76,30 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-HCRX_EL2.EnFPM controls the trapping of FPMR (as well as the validity
-of any FP8 instruction, but we don't really care about this last part).
+ID_AA64FPFR0_EL1 contains all sort of bits that contain a description
+of which FP8 subfeatures are implemented.
 
-Describe the trap bit so that the exception can be reinjected in a
-NV guest.
+We don't really care about them, so let's just expose that register
+and allow userspace to disable subfeatures at will.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/emulate-nested.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ arch/arm64/kvm/sys_regs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/emulate-nested.c b/arch/arm64/kvm/emulate-nested.c
-index 05166eccea0a..ee280239f14f 100644
---- a/arch/arm64/kvm/emulate-nested.c
-+++ b/arch/arm64/kvm/emulate-nested.c
-@@ -83,6 +83,7 @@ enum cgt_group_id {
- 	CGT_CPTR_TAM,
- 	CGT_CPTR_TCPAC,
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 79d67f19130d..4c2f7c0af537 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -2386,7 +2386,7 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+ 	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
+ 	ID_HIDDEN(ID_AA64SMFR0_EL1),
+ 	ID_UNALLOCATED(4,6),
+-	ID_UNALLOCATED(4,7),
++	ID_WRITABLE(ID_AA64FPFR0_EL1, ~ID_AA64FPFR0_EL1_RES0),
  
-+	CGT_HCRX_EnFPM,
- 	CGT_HCRX_TCR2En,
- 
- 	/*
-@@ -372,6 +373,12 @@ static const struct trap_bits coarse_trap_bits[] = {
- 		.mask		= CPTR_EL2_TCPAC,
- 		.behaviour	= BEHAVE_FORWARD_ANY,
- 	},
-+	[CGT_HCRX_EnFPM] = {
-+		.index		= HCRX_EL2,
-+		.value 		= 0,
-+		.mask		= HCRX_EL2_EnFPM,
-+		.behaviour	= BEHAVE_FORWARD_ANY,
-+	},
- 	[CGT_HCRX_TCR2En] = {
- 		.index		= HCRX_EL2,
- 		.value 		= 0,
-@@ -1108,6 +1115,7 @@ static const struct encoding_to_trap_config encoding_to_cgt[] __initconst = {
- 	SR_TRAP(SYS_CNTP_CTL_EL0,	CGT_CNTHCTL_EL1PTEN),
- 	SR_TRAP(SYS_CNTPCT_EL0,		CGT_CNTHCTL_EL1PCTEN),
- 	SR_TRAP(SYS_CNTPCTSS_EL0,	CGT_CNTHCTL_EL1PCTEN),
-+	SR_TRAP(SYS_FPMR,		CGT_HCRX_EnFPM),
- };
- 
- static DEFINE_XARRAY(sr_forward_xa);
+ 	/* CRm=5 */
+ 	{ SYS_DESC(SYS_ID_AA64DFR0_EL1),
 -- 
 2.39.2
 
