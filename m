@@ -1,122 +1,101 @@
-Return-Path: <kvm+bounces-24049-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24050-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 939E5950B79
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 19:30:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40A7A950B84
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 19:36:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5566F286154
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:30:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 593201C2202C
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:36:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BA021A2C23;
-	Tue, 13 Aug 2024 17:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B6C1A2C2A;
+	Tue, 13 Aug 2024 17:36:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Mt41DhNp";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UUeC+kSb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OQo0XQ32"
 X-Original-To: kvm@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9AC282E5;
-	Tue, 13 Aug 2024 17:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89C951A0B00
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 17:36:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723570245; cv=none; b=Xt1Ns9gD22GAEUktGUEoyfciEvPxr4QN2x53ylxD8IxRjNDVvr0gVoGp7e6SQllUx1MGv8snA6t9U9+IGuKv8DTGpQldJmV5iPYLw+4JUWWRjv3+tmD5mM5FE0BHYiFRYlfz7p1R4OBXYWu2E9RNtUBDoCQeKoMwOlAljoQDan8=
+	t=1723570577; cv=none; b=mg86YeiRF50p7RQodn+9+6zXbaDqR7TahlNezZFfAFMPyO8SJd7BAuQf+deaAVH0/cyGRyAKiAGTe6OK+wjVXy7iyqg1L6gIUrOOZvKRtL4d9vICP5yIwM9AqfXs0NXExIFywdDKbCsz523eU+omrufmhV2FYIY8At1qsZ7Q008=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723570245; c=relaxed/simple;
-	bh=CgPGSw4BGQN7J8xvALSQIjXECj3FjxVzt0UM38Sz2A4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fm/iqNU8IgMIcVwpSFH2UgiXaI/llorfe0xNudh+5CyGb1b9VjSsEwLTXIER9tCHA8D38VGCjhNF8HC4SYsPoAK5qMFlnoPmy5nnrNR63h/AMx1cDkCl+2NB9Y2IbM/o57ebcUuFyMMY3ZE4nUGyxqbjpGuvOiVO4WYYP2bi4dg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Mt41DhNp; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UUeC+kSb; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1723570241;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nLYNakiS7XZO9BB9N7Fyevs65e05aWL1XGxAXFuVTVk=;
-	b=Mt41DhNpxne5dyvSWgRTV6r+1D1ctf2j+254poZWoREb4GDghU04Y2szQGHLkI3gN7t4kM
-	v6wEkhb2pXN7567WzcsGBuMdCtGXkJwAmFVkrHczTaZuaDXITsJfa20vPfdyK0kksWotLb
-	c8Khw3bmVQBOyfxb/Qx5CnNyyZwU0Jl6DrVXgq5G//8pgMvoSFPBeDntPX/Sq1bqmLAfFi
-	3uc9S/l86hXzj0IgNLXdAD3y/0sl6+VKbknoEx/OnamdPsNtVl227kKLOgMbIKDWedXBPD
-	N2871RW+cIpw9nXcr5qrvIkzDDnToTwCEya6tLvbvzJdNnpGI4+cSYznQXAAsQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1723570241;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nLYNakiS7XZO9BB9N7Fyevs65e05aWL1XGxAXFuVTVk=;
-	b=UUeC+kSbV/jkQoPN5g2XCYL6IeWXke547KIvgCJIkeRYW1M/RBV5YV7R8JmQCcz7gS6exg
-	20LAmw5r7AVtNzCg==
-To: Jason Gunthorpe <jgg@ziepe.ca>, Alex Williamson
- <alex.williamson@redhat.com>
-Cc: kvm@vger.kernel.org, quic_bqiang@quicinc.com, kvalo@kernel.org,
- prestwoj@gmail.com, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, dwmw2@infradead.org, iommu@lists.linux.dev,
- kernel@quicinc.com, johannes@sipsolutions.net, jtornosm@redhat.com
-Subject: Re: [PATCH RFC/RFT] vfio/pci: Create feature to disable MSI
- virtualization
-In-Reply-To: <20240813163053.GK1985367@ziepe.ca>
-References: <adcb785e-4dc7-4c4a-b341-d53b72e13467@gmail.com>
- <20240812170014.1583783-1-alex.williamson@redhat.com>
- <20240813163053.GK1985367@ziepe.ca>
-Date: Tue, 13 Aug 2024 19:30:41 +0200
-Message-ID: <87r0aspby6.ffs@tglx>
+	s=arc-20240116; t=1723570577; c=relaxed/simple;
+	bh=Snsxhi3LIQZcXAKg3rDQSNDIeb30hQkyvxggbi0dWFw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=sCicgaR8L1k+U0uUc6e3sIMdaDvy1okjhwtXbafqE2fqJnYaDJvOXDQaFXTavuvxCh9LHzKPmFnYUfaKG/lG0suBH8l35XGjmIFm72yhg7VwyceSoTbm5ICiUSsPNquOu9O7dUsUOeFo3o6+MJYhym9j6jwCvfC+yteuewFMv38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OQo0XQ32; arc=none smtp.client-ip=209.85.214.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-201cdfca5deso8717275ad.2
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 10:36:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723570576; x=1724175376; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qaxx+RIlGX+ihV0yke86zTWP07hgBW9xJr8rC5KpwXM=;
+        b=OQo0XQ32bjh0iBL5axa6SqPpuz/ew1BXtJu1dzlV6iVZ61Ojh5edef7Lnhtkndv6V7
+         xqK8V+/2pHd9RL3u8gfMoDCQacUNStIog2s7MgkKma04UDSuQ2yrUHtDsLGcJu6etvex
+         W+zdmOOf7ycJ6dYEj9NA24+BSpadURfId87UQXUf7FoWgJdlKKZe6VqM1SFTbj0hqIu8
+         SRxnGAGgKik2dMx9/UQPQyGeNKIUW+/xaOLyPi8yZoCwCShz4YdOEbbpaNGO3tmbz77W
+         dLBFKh+fan5KJlcum9jMg5KQQ3PBpUt2QF3SQZmoIaBTaHFpnMKG0H9MGUs3fdMORP09
+         tRDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723570576; x=1724175376;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Qaxx+RIlGX+ihV0yke86zTWP07hgBW9xJr8rC5KpwXM=;
+        b=THrAMJZkUL9JCXBGv7LG+cnw0iK2nM5gL1TyWS/LPmU4oWFAZFnpTFeOWMSM3t1PMb
+         ZZyoMB6CNDzE1RogSXdpezPdXlkYpnkGhLzDKDRGSJWp01S9g1c9mh6/5yuCu5IIpbmv
+         Vbgn7Z/CA9Cj5OcWdBg85N+50+8JE41HhfDXdC4dWnA+EvPH+HHjtSHffQOqjL6ZUL1A
+         yRqTLqZBFkKdpNWWl5IPHXg7Ledeb9Rq4Fx55RfzRJk8fsb+oPPYlpQzWDkRYWGNl/Wb
+         ofMcCSB4XSOVNFCeuCbeFBbdKd9nh9dDK7B7pBEXS3z6Q6y8r662YquOn0D8hme4on+Y
+         Ea/g==
+X-Gm-Message-State: AOJu0Yz1dwIxayY4MSXIzPesHqX4Jf9x6jrD0hakRXQM9KT29ZgLpkGM
+	3dqfHPiTK8HpVqyb88KYg8zN4IJm9zxFYVIIaAqQQ1fcIG8pLoXWo2aEP49WWTUF7lBFfTrW8wE
+	LqQ==
+X-Google-Smtp-Source: AGHT+IEAaxGWcx079WWkKDEjS2dVuIZWuu8HYSM3PufJYi/0hU7fPNMjSiLPVYS4fPuoi7FYVv5lbw02/Yo=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:d2d1:b0:1fb:6151:f630 with SMTP id
+ d9443c01a7336-201d64a5e6bmr80045ad.10.1723570575607; Tue, 13 Aug 2024
+ 10:36:15 -0700 (PDT)
+Date: Tue, 13 Aug 2024 10:36:14 -0700
+In-Reply-To: <20240813164244.751597-1-coltonlewis@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+References: <20240813164244.751597-1-coltonlewis@google.com>
+Message-ID: <ZruZjhSRqo7Zx_1r@google.com>
+Subject: Re: [PATCH 0/6] Extend pmu_counters_test to AMD CPUs
+From: Sean Christopherson <seanjc@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, Mingwei Zhang <mizhang@google.com>, 
+	Jinrong Liang <ljr.kernel@gmail.com>, Jim Mattson <jmattson@google.com>, 
+	Aaron Lewis <aaronlewis@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Aug 13 2024 at 13:30, Jason Gunthorpe wrote:
-> On Mon, Aug 12, 2024 at 10:59:12AM -0600, Alex Williamson wrote:
->> vfio-pci has always virtualized the MSI address and data registers as
->> MSI programming is performed through the SET_IRQS ioctl.  Often this
->> virtualization is not used, and in specific cases can be unhelpful.
->> 
->> One such case where the virtualization is a hinderance is when the
->> device contains an onboard interrupt controller programmed by the guest
->> driver.  Userspace VMMs have a chance to quirk this programming,
->> injecting the host physical MSI information, but only if the userspace
->> driver can get access to the host physical address and data registers.
->> 
->> This introduces a device feature which allows the userspace driver to
->> disable virtualization of the MSI capability address and data registers
->> in order to provide read-only access the the physical values.
->
-> Personally, I very much dislike this. Encouraging such hacky driver
-> use of the interrupt subsystem is not a good direction. Enabling this
-> in VMs will further complicate fixing the IRQ usages in these drivers
-> over the long run.
->
-> If the device has it's own interrupt sources then the device needs to
-> create an irq_chip and related and hook them up properly. Not hackily
-> read the MSI-X registers and write them someplace else.
->
-> Thomas Gleixner has done alot of great work recently to clean this up.
->
-> So if you imagine the driver is fixed, then this is not necessary.
+On Tue, Aug 13, 2024, Colton Lewis wrote:
+> (I was positive I had sent this already, but I couldn't find it on the
+> mailing list to reply to and ask for reviews.)
 
-Yes. I looked at the at11k driver when I was reworking the PCI/MSI
-subsystem and that's a perfect candidate for a proper device specific
-interrupt domain to replace the horrible MSI hackery it has.
+You did[*], it's sitting in my todo folder.  Two things.
 
-> Howver, it will still not work in a VM. Making IMS and non-MSI
-> interrupt controlers work within VMs is still something that needs to
-> be done.
+1. Err on the side of caution when potentially resending, and tag everything
+RESEND.  Someone seeing a RESEND version without having seen the original version
+is no big deal.  But someone seeing two copies of the same patches/emails can get
+quite confusing.
 
-Sure, but we really want to do that in a generic way and not based on ad
-hoc workarounds.
+2. Something is funky in your send flow.  The original posing says 0/7 in the
+cover letter, but there are only 6 patches.
 
-Did the debate around this go anywhere?
-
-Thanks,
-
-        tglx
+[*] https://lore.kernel.org/all/20240802182240.1916675-1-coltonlewis@google.com
 
