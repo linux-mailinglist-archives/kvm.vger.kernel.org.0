@@ -1,176 +1,151 @@
-Return-Path: <kvm+bounces-23952-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23953-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A1495010B
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 11:16:14 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1880950114
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 11:17:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F550287730
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 09:16:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BB781F221E3
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 09:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A064F183CB5;
-	Tue, 13 Aug 2024 09:15:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GoxUe6Qh"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902A0170A24;
+	Tue, 13 Aug 2024 09:17:34 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C7C3BB47;
-	Tue, 13 Aug 2024 09:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04F0339A1
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 09:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723540535; cv=none; b=U26azifrMf1nzCSDH1LLLqYZ1G9dKEfIdQWAw/WNZNsNwlk9aVj042ktphA1gptOTyJEYCIDLPuKlztZ/P0NIyWODx5lWNWbzKigt32IojteliBXCFkP8LFSrW2mhS7j8wS7pOuTm43CgN0sVVHWMSS4l1jwft5kaQ+/uP8qZNE=
+	t=1723540654; cv=none; b=WfpjhsUEXWFh3EHVHJCrNOtFxl94yHoHdTc+sHAeF/FobsUWqA7wYO9vnivc9Olsl2Ba/Tl8y+AcucajcjIJrxe6PwJhXoPUvrlSFDOI+vGwiUlFhOF+OgIggYiglZ/TQmpwDUG89b8UZB1OnN917PrSU36b4Wxj2C2xynqNEHU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723540535; c=relaxed/simple;
-	bh=PKnElOekxHXRG3WvWmm9EC/3/V9TPm4/L/L/JXal7YI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=m7Q1nggvMPo7gtSV1DsVRK3TWTt6OWdWz/K/WC4iq3PWi2QEY20llxpNn9UPhXhMQ+wJHeqFe6GNCMVMRjyYUds6Ej9bsuTRPO18OXgEYUhVJDZxTOKyrG4hl4BUF+t73RyO4S2X4PVojINQRbW0xEp1IuZVZN1Fy1+xnHQSITU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GoxUe6Qh; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723540535; x=1755076535;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=PKnElOekxHXRG3WvWmm9EC/3/V9TPm4/L/L/JXal7YI=;
-  b=GoxUe6QhsvjLbYvlQ2dQbXRQ5s1cSJTuN8ZcohWgxGPUZ/90m3h18QSa
-   EhdwDzjDVE83XzAfleRckaYNGpaIeiZ8YsFaAtbGGjSuEX0A/8UhQN/XT
-   Jmfi/kf/kotSkBrdW5CmsIJAEaONQnpdd/CUFtIW0bsuMePfEOoaPFi8P
-   qNpEIBI5Jqj2GON0IfXxq/jRFCoPHtSo+kdzygojkDaYSzjUJq94OhDuF
-   VMWZfRFPDqfkRoFusilmYAXzca5QgDbniCsXkIblXVnsak22Uc31yERTT
-   396nlmjcGy0K4uhuICxXC9Mv2QMo3XwTNdzcY0ewELIyN+R0bq7jzNVRW
-   g==;
-X-CSE-ConnectionGUID: GtMPKnhaShWeyHgi0PxlDw==
-X-CSE-MsgGUID: GAAuVsn9SveFoqCrgdol1A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="44212049"
-X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
-   d="scan'208";a="44212049"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 02:15:34 -0700
-X-CSE-ConnectionGUID: RESNh+4vQqmIf046iR2EVw==
-X-CSE-MsgGUID: mzo6rkFTT6e7/el7rtBtpA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
-   d="scan'208";a="58532073"
-Received: from unknown (HELO [10.238.8.207]) ([10.238.8.207])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 02:15:31 -0700
-Message-ID: <c03df364-4cce-4c7e-b9db-191f7b10ca70@linux.intel.com>
-Date: Tue, 13 Aug 2024 17:15:28 +0800
+	s=arc-20240116; t=1723540654; c=relaxed/simple;
+	bh=ZqjwqbtEbJdz0EI/ONsVhvlf8aUL8C4HoEu8grOYelU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u6kxo/pb/aOj3yvVPfU7jke8aG7Fhts+P7VUWi8sb8fLzu50Slmbh9OLXbHjffTJR9vHkFflES+DAlaAo4+oSwFlfWaAHa57+9lgwkUj/lvQBO0bJxJ09wPOoCdmZ76K4mMwmAxqF4CIFBbmUIUAkAvSMY0Rl9HvMeud8d33FcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 0B9C212FC;
+	Tue, 13 Aug 2024 02:17:57 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3BCAA3F73B;
+	Tue, 13 Aug 2024 02:17:29 -0700 (PDT)
+Date: Tue, 13 Aug 2024 10:17:26 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v2 13/17] KVM: arm64: nv: Add SW walker for AT S1
+ emulation
+Message-ID: <ZrskpqmkoLNVE2H4@raptor>
+References: <20240731194030.1991237-1-maz@kernel.org>
+ <20240731194030.1991237-14-maz@kernel.org>
+ <ZrYO9SK52rHhGvEd@arm.com>
+ <867cco1y4w.wl-maz@kernel.org>
+ <ZromBtfbjaHbcjT7@arm.com>
+ <8634n91v3z.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 17/25] KVM: TDX: create/free TDX vcpu structure
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
- kai.huang@intel.com, isaku.yamahata@gmail.com,
- tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
- linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-18-rick.p.edgecombe@intel.com>
-Content-Language: en-US
-From: Binbin Wu <binbin.wu@linux.intel.com>
-In-Reply-To: <20240812224820.34826-18-rick.p.edgecombe@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8634n91v3z.wl-maz@kernel.org>
 
+Hi Marc,
 
+On Mon, Aug 12, 2024 at 06:58:24PM +0100, Marc Zyngier wrote:
+> Hi Alex,
+> 
+> On Mon, 12 Aug 2024 16:11:02 +0100,
+> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > Hi Marc,
+> > 
+> > On Sat, Aug 10, 2024 at 11:16:15AM +0100, Marc Zyngier wrote:
+> > > Hi Alex,
+> > > 
+> > > @@ -136,12 +137,22 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+> > >  	va = (u64)sign_extend64(va, 55);
+> > >  
+> > >  	/* Let's put the MMU disabled case aside immediately */
+> > > -	if (!(sctlr & SCTLR_ELx_M) ||
+> > > -	    (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)) {
+> > > +	switch (wi->regime) {
+> > > +	case TR_EL10:
+> > > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
+> > > +			wr->level = S1_MMU_DISABLED;
+> > 
+> > In compute_translation_regime(), for AT instructions other than AT S1E2*, when
+> > {E2H,TGE} = {0,1}, regime is Regime_EL10. As far as I can tell, when regime is
+> > Regime_EL10 and TGE is set, stage 1 is disabled, according to
+> > AArch64.S1Enabled() and the decription of the TGE bit.
+> 
+> Grmbl... I really dislike E2H=0. May it die a painful death. How about
+> this on top?
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 10017d990bc3..870e77266f80 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -139,7 +139,19 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+>  	/* Let's put the MMU disabled case aside immediately */
+>  	switch (wi->regime) {
+>  	case TR_EL10:
+> -		if (__vcpu_sys_reg(vcpu, HCR_EL2) & HCR_DC)
+> +		/*
+> +		 * If dealing with the EL1&0 translation regime, 3 things
+> +		 * can disable the S1 translation:
+> +		 *
+> +		 * - HCR_EL2.DC = 0
+> +		 * - HCR_EL2.{E2H,TGE} = {0,1}
+> +		 * - SCTLR_EL1.M = 0
+> +		 *
+> +		 * The TGE part is interesting. If we have decided that this
+> +		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
+> +		 * {0,x}, and we only need to test for TGE == 1.
+> +		 */
+> +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_DC | HCR_TGE))
+>  			wr->level = S1_MMU_DISABLED;
 
+The condition looks good now.
 
-On 8/13/2024 6:48 AM, Rick Edgecombe wrote:
-> From: Isaku Yamahata <isaku.yamahata@intel.com>
->
-> Implement vcpu related stubs for TDX for create, reset and free.
->
-> For now, create only the features that do not require the TDX SEAMCALL.
-> The TDX specific vcpu initialization will be handled by KVM_TDX_INIT_VCPU.
->
-> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
-> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
-> ---
-> uAPI breakout v1:
->   - Dropped unnecessary WARN_ON_ONCE() in tdx_vcpu_create().
->     WARN_ON_ONCE(vcpu->arch.cpuid_entries),
->     WARN_ON_ONCE(vcpu->arch.cpuid_nent)
->   - Use kvm_tdx instead of to_kvm_tdx() in tdx_vcpu_create() (Chao)
->
-> v19:
->   - removed stale comment in tdx_vcpu_create().
->
-> v18:
->   - update commit log to use create instead of allocate because the patch
->     doesn't newly allocate memory for TDX vcpu.
->
-> v16:
->   - Add AMX support as the KVM upstream supports it.
-> --
-> 2.46.0
-> ---
->   arch/x86/kvm/vmx/main.c    | 44 ++++++++++++++++++++++++++++++++++----
->   arch/x86/kvm/vmx/tdx.c     | 41 +++++++++++++++++++++++++++++++++++
->   arch/x86/kvm/vmx/x86_ops.h | 10 +++++++++
->   arch/x86/kvm/x86.c         |  2 ++
->   4 files changed, 93 insertions(+), 4 deletions(-)
->
-[...]
-> +
-> +static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +{
-> +	if (is_td_vcpu(vcpu)) {
-> +		tdx_vcpu_reset(vcpu, init_event);
-> +		return;
-> +	}
-> +
-> +	vmx_vcpu_reset(vcpu, init_event);
-> +}
-> +
-[...]
-> +
-> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
-> +{
-> +
-> +	/* Ignore INIT silently because TDX doesn't support INIT event. */
-> +	if (init_event)
-> +		return;
-> +
-> +	/* This is stub for now. More logic will come here. */
-> +}
-> +
-For TDX, it actually doesn't do any thing meaningful in vcpu reset.
-Maybe we can drop the helper and move the comments to vt_vcpu_reset()?
+>  		fallthrough;
+>  	case TR_EL2:
+> 
+> [...]
+> 
+> >
+> > 	switch (desc & GENMASK_ULL(1, 0)) {
+> > 	case 0b00:
+> > 	case 0b10:
+> > 		goto transfault;
+> > 	case 0b01:
+> > 		/* Block mapping */
+> > 		break;
+> > 	default:
+> > 		if (level == 3)
+> > 			break;
+> > 	}
+> > 
+> > Is this better? Perhaps slightly easier to match against the descriptor layouts,
+> > but I'm not sure it's an improvement over your suggestion. Up to you, no point
+> > in bikeshedding over it.
+> 
+> I think I'll leave it as is for now. I'm getting sick of this code...
 
->   
->   #endif /* __KVM_X86_VMX_X86_OPS_H */
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index ce2ef63f30f2..9cee326f5e7a 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -488,6 +488,7 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
->   	kvm_recalculate_apic_map(vcpu->kvm);
->   	return 0;
->   }
-> +EXPORT_SYMBOL_GPL(kvm_set_apic_base);
->   
->   /*
->    * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
-> @@ -12630,6 +12631,7 @@ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
->   {
->   	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
->   }
-> +EXPORT_SYMBOL_GPL(kvm_vcpu_is_reset_bsp);
->   
->   bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
->   {
+Agreed!
 
-kvm_set_apic_base() and kvm_vcpu_is_reset_bsp() is not used in
-this patch. The symbol export should move to the next patch, which
-uses them.
-
+Thanks,
+Alex
 
