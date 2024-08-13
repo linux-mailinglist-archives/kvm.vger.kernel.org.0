@@ -1,161 +1,91 @@
-Return-Path: <kvm+bounces-24026-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24027-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 839E895095A
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:45:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43C4D95095B
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:46:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF01F1C21956
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:45:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C13B6B26B7A
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:46:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AED1E1A0729;
-	Tue, 13 Aug 2024 15:45:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CDE1A071F;
+	Tue, 13 Aug 2024 15:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OzzD2/d9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDAtOi+u"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB56749654;
-	Tue, 13 Aug 2024 15:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D28F49654
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 15:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723563952; cv=none; b=QUCGgao7Yl4EMvjEGed1XhH7E5utAJX1UgrWmfPvNDbpRsbrddVKF/i35GajmJZ/Wri4Cre+2pntTIFez6FO90FRo1kvr9WyON94fUnMJiYZUhrfYvJGvGAoU/18mCpEE1QRuSdD5kFmb2K9fz4nkvJD/mKvKkiWeMzXdJpSnq8=
+	t=1723563961; cv=none; b=lX6uo1JuGo5A8tlb9gwC2k7CiXY1FML2eXD7RsFa/kC7ow6+8kS7RtpDge6mc4fH0NIaVVZTuU81TcXeHm+UmYMCeC0UUKJRrswsvVZTvYwHTSmMRkY7bfNjbHj3+FQzWFW1vgqSgLfeDA8D4bw9K4Y2Z4BX7paexvHwLnkwy9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723563952; c=relaxed/simple;
-	bh=qiupYbycqVBit5agDXmiS2ivXVrYBP8IffrAeg8D5Vw=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=FDkavrxnqt/KpCMzDzF/IhLZcxiXRZFqy41CApruHWlY5aATDjjm/yvwGKHaU75HIxEugF+PH5mt3p8rB28TjGp0d4hvnP2q8+r+fDezcNWORTSi5725F4KjisjxZ1BVMuFkhle6MZ1cWTkqAwXbAmknZS8kLZO9ZTsR8+29RUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OzzD2/d9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F27DC4AF09;
-	Tue, 13 Aug 2024 15:45:52 +0000 (UTC)
+	s=arc-20240116; t=1723563961; c=relaxed/simple;
+	bh=HcuWH6ZJ+x+CkbMHJznoY6Lf6yboNUiXtFY2KW46u+Q=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=RPqBL4l871XJyOjSNVMgNud4EIGa5oN7hF14n6muBi6hMI8R4isQoV50mHPGVyR1d0IN3hiGrmq4ZRhcH4YaSlj+oL4KqlCj1b7rxORBXQ/x68tDXQNmpH/RAbXYAL30evorlEJ1EHn9HLCLv15fq2WDGRcHsWedzgOuOs+SP+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mDAtOi+u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D1BFC4AF16
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 15:46:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723563952;
-	bh=qiupYbycqVBit5agDXmiS2ivXVrYBP8IffrAeg8D5Vw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OzzD2/d9xpMH/LzWE9QUn7DlL0zA0MeRBeAmcl4kZeEpC6zuhxBMlUouGmd7/GT3n
-	 Ofmx9QLwqa6+UJc5T962vuEviLaGv62x4u56b2l5LYf1qG+2HXUgc9T/9Gzqr81a7O
-	 LW1+RIM9F7KzscDDD+rMShK/cWent4kd7oHqIqJBuNcFO3wKfHrvjnnHJvdtur2eCU
-	 b1LiGR0c6RC8tM95bCfWEOgEhOi644mvNA+5YZb0fhgQ/mRfuEOckBhB79uTOx+vD1
-	 XqkzRwEQ2Qp3yP1TfOUoDJpSorluR8cDblTTEotfgGuEZYNoaQEOkFBTsDsRRSe4aD
-	 NMquau0YWlYKg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sdtiY-003PH1-FD;
-	Tue, 13 Aug 2024 16:45:50 +0100
-Date: Tue, 13 Aug 2024 16:45:46 +0100
-Message-ID: <878qx05sut.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Joey Gouly <joey.gouly@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Alexandru Elisei <alexandru.elisei@arm.com>
-Subject: Re: [PATCH 09/10] KVM: arm64: Handle  PIR{,E0}_EL2 traps
-In-Reply-To: <20240813152452.GD3321997@e124191.cambridge.arm.com>
-References: <20240813144738.2048302-1-maz@kernel.org>
-	<20240813144738.2048302-10-maz@kernel.org>
-	<20240813152452.GD3321997@e124191.cambridge.arm.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=k20201202; t=1723563961;
+	bh=HcuWH6ZJ+x+CkbMHJznoY6Lf6yboNUiXtFY2KW46u+Q=;
+	h=From:To:Subject:Date:In-Reply-To:References:From;
+	b=mDAtOi+udZxgSwAHEBnd+m8l6Gb57u/ZrC7LnCGykFa6VQpAP/twCr5hFRyjDOP07
+	 seN4wqz8ICyoN+gMp96SjAMT+SSL5dZ0aw+TyfgbEhvF/5T2BbaY50jnGVXASdXTfZ
+	 S30PA/qCv7g6Awh2kszYCGRTDKql15rEk/Z1K62jcbRSh3MhftgahEbku2TQNr+uv0
+	 W8pZZv7Xp4mTRO0dQoWf7BLobZf6nWxCbC6zlj95ppjlT+qAJfhhrzGYCp+Cwdi5JJ
+	 YT1zzdwXKPkul35fW6v3RohQQ/vKe7z2N3SFi7TnK3pwTl+SrBxR3F+JbF6B1A67xt
+	 Pu397DHUJy6LQ==
+Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
+	id 44990C433E5; Tue, 13 Aug 2024 15:46:01 +0000 (UTC)
+From: bugzilla-daemon@kernel.org
+To: kvm@vger.kernel.org
+Subject: [Bug 219129] virtio net performance degradation between Windows and
+ Linux guest in kernel 6.10.3
+Date: Tue, 13 Aug 2024 15:46:00 +0000
+X-Bugzilla-Reason: None
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Product: Virtualization
+X-Bugzilla-Component: kvm
+X-Bugzilla-Version: unspecified
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: alexucu@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P3
+X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-219129-28872-qOpIPNXq95@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-219129-28872@https.bugzilla.kernel.org/>
+References: <bug-219129-28872@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: joey.gouly@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, alexandru.elisei@arm.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
 
-On Tue, 13 Aug 2024 16:24:52 +0100,
-Joey Gouly <joey.gouly@arm.com> wrote:
-> 
-> On Tue, Aug 13, 2024 at 03:47:37PM +0100, Marc Zyngier wrote:
-> > Add the FEAT_S1PIE EL2 registers the sysreg descriptor array so that
-> > they can be handled as a trap.
-> > 
-> > Access to these registers is conditionned on ID_AA64MMFR3_EL1.S1PIE
-> > being advertised.
-> > 
-> > Similarly to other other changes, PIRE0_EL2 is guaranteed to trap
-> > thanks to the D22677 update to the architecture..
-> > 
-> > Signed-off-by: Marc Zyngier <maz@kernel.org>
-> > ---
-> >  arch/arm64/kvm/sys_regs.c | 14 ++++++++++++++
-> >  1 file changed, 14 insertions(+)
-> > 
-> > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> > index 52250db3c122..a5f604e24e05 100644
-> > --- a/arch/arm64/kvm/sys_regs.c
-> > +++ b/arch/arm64/kvm/sys_regs.c
-> > @@ -346,6 +346,18 @@ static bool access_rw(struct kvm_vcpu *vcpu,
-> >  	return true;
-> >  }
-> >  
-> > +static bool check_s1pie_access_rw(struct kvm_vcpu *vcpu,
-> > +				  struct sys_reg_params *p,
-> > +				  const struct sys_reg_desc *r)
-> > +{
-> > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
-> > +		kvm_inject_undefined(vcpu);
-> > +		return false;
-> > +	}
-> > +
-> > +	return access_rw(vcpu, p, r);
-> > +}
-> > +
-> >  /*
-> >   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
-> >   */
-> > @@ -2827,6 +2839,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
-> >  	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
-> >  
-> >  	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
-> > +	EL2_REG(PIRE0_EL2, check_s1pie_access_rw, reset_val, 0),
-> > +	EL2_REG(PIR_EL2, check_s1pie_access_rw, reset_val, 0),
-> >  	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
-> >  
-> >  	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
-> 
-> I think we should also use this for PIR_EL1 / PIRE0_EL1? We have NULL for their access field.
-> 
-> 	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
+https://bugzilla.kernel.org/show_bug.cgi?id=3D219129
 
-I don't think we need this. In general, the EL1 FEAT_S1PIE registers
-are directly accessed by the VM, and do not trap.
+--- Comment #4 from alexucu@gmail.com ---
+This doesn't seem to be fixed in 6.10.4 just yet, at least on Arch's default
+kernel variant.
 
-However, if the VM has been configured to not expose S1PIE, then we
-set the corresponding FGU bits in kvm_calculate_traps():
+--=20
+You may reply to this email to add a comment.
 
-	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
-		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
-						HFGxTR_EL2_nPIR_EL1);
-
-The effect of this is that we don't even make to the sysreg array, and
-inject an UNDEF directly from the point of decoding the trap (see the
-beginning of triage_sysreg_trap()).
-
-For EL2 registers, there is no concept of FGT since they always trap,
-so no architectural trick we can play to shortcut the handling.
-Therefore we make it to the handler and have to triage things there.
-
-Does it make sense?
-
-	M.
-
--- 
-Without deviation from the norm, progress is not possible.
+You are receiving this mail because:
+You are watching the assignee of the bug.=
 
