@@ -1,96 +1,124 @@
-Return-Path: <kvm+bounces-24038-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24039-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62026950A87
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:42:36 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AA34950A91
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:43:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 133BA1F25E18
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:42:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56594B23D82
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:43:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6B171A257B;
-	Tue, 13 Aug 2024 16:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125F11A2561;
+	Tue, 13 Aug 2024 16:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ovdPvJBk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2GWcwcXf"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f73.google.com (mail-io1-f73.google.com [209.85.166.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19E241A257E
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6FE19D084
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723567186; cv=none; b=Oc5lVa4CQWsdQBpcIKKwQWyUCU4h1Tv2huc1oBLt/4VkTyLvayJqLNa5UXDfj52lsq4flX/jW8jvr0Z1i2HtSwpu86zlGDzYTtLD2T+hz7xEt2k6Pz8TVVvMbK/I2twH1zkwI+3KifXMmj1GZVTEgr1CbXTkXLLl6uU5itX3OeE=
+	t=1723567396; cv=none; b=ZmIb3+6VJ2Vu5boPPQ1R6TD8Xp4HOChfUnB9ec2B+sZY+tm1S14xZ/HQB/yKJnwfUmusvRrE+MkzgMgW+z9Bv/qqCCk8vnwwVPmu46uWMhqnJnbtTwwdBmcBEZRWPxNLYR09JnMOg0tdw3ZW6gw5F3MM1Z7ILTNjDXNkmnqt9FE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723567186; c=relaxed/simple;
-	bh=aOPEKmg7GiaRYhCby/S4varJgX6i9Shaudh0InX2b04=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=EqcWoIQsVdEXNgOS1CEs7BUFoVYqGYDbsaT0E04jCXBYf3Z04NVBIGWWOVeiiLPdXWG7a6slHBJ4tkewLuVKuiqpoAIFaLI4XODGxDFVBp30U0YR6+T/nnrXEUl/MNTjwIz+5A+f0jWQWdo7T1WwG8kM9eoSNX2A8A40Ioi5To0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ovdPvJBk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 88EDAC4AF15
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:39:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723567185;
-	bh=aOPEKmg7GiaRYhCby/S4varJgX6i9Shaudh0InX2b04=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ovdPvJBkbzpfuvVE0eMcQmx37s6At8PpkPr/VpoyKAtN/X+RW1zcLtG5tXxM3vuWj
-	 O0ku3XwJ7xOCjZV0hy5yBBJLGzpTQl7YDlxQEElRSWo+17sEF69Y7aP9QDdkhPrRat
-	 kuF/dW16MvtliNEKXowVhYTLVszzo2j/PaVskjWfUVSsHWd1rXG2W41kSnpqgAHkLZ
-	 3EIawIImUfiiNujOntI+Qtrb2/CM1mQReduenK+cQ7L2X1adIpMtA5v4Wgactj6F3M
-	 OHDEXqHBLgX4bFH/By65vmK4Quctq+LQMoBZA/3G/eqimH9tr2wQg/IEYC9UGrcJr/
-	 GTWXyIsKTl79Q==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 8384FC53BBF; Tue, 13 Aug 2024 16:39:45 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219129] virtio net performance degradation between Windows and
- Linux guest in kernel 6.10.3
-Date: Tue, 13 Aug 2024 16:39:45 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: jordan@jordanwhited.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219129-28872-akUNQWEv5i@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219129-28872@https.bugzilla.kernel.org/>
-References: <bug-219129-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1723567396; c=relaxed/simple;
+	bh=a76Sn8lUGnQIx1tPlDSzmCkNqiGpbPkord6pZ2O1lNA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=p9vDA9rGEEVrMSUSyBIYVKuabywl3wjnI0wF8hbJZM8PwKHIC6oqukop+mSDebiK0uqXmxoQMLSKb1UIrvNWlprLhi1NtELg9XSnncRLAq6BzzSEavF5nX6eE/q5eRh1zGRrkwsKqf3gOvMym/HsL075w8N1Q1RQGupR8tP7L6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2GWcwcXf; arc=none smtp.client-ip=209.85.166.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--coltonlewis.bounces.google.com
+Received: by mail-io1-f73.google.com with SMTP id ca18e2360f4ac-81f8489097eso712986139f.3
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 09:43:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723567394; x=1724172194; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=jk7IQol6duajyqIm/9vwpiSEjjpf9mSBlNXL0oxxX8g=;
+        b=2GWcwcXfj7vogo9cxryMT0WfApNC+IET82huWJEPSrXXWXKvnaJ+5ha6n4gOa0ZbAh
+         b46FffgEJll1VTUDlGZJTu9y/YyIszhJWnmMN3CUR04NTlqvhSi/F4paVKENVCJLP+j7
+         6toX1I2QEC4AtIpjNrdKvx6/lxbvG/ovTt9HOEDRx4IjZ98yvp1hf58d/hoQiW71QWbb
+         nzy3KSrN+E0MHLveunrcXHjRFparwKjMzxjERrJ6UodFd7wTvaWu6hIB7wHAgHtai0Ye
+         3S2SpFuEydAiN31iIke7pkWdkHibAmpmA3W+l830So3+37linAoTHaq4Ed1MhiZDnCQC
+         WA0A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723567394; x=1724172194;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jk7IQol6duajyqIm/9vwpiSEjjpf9mSBlNXL0oxxX8g=;
+        b=OSD/F+LJy2yzVfS+09siV+KSfR7Naq35IBH03fJ/ldBOCuTqSaPxN+OdYVxo7ezzgY
+         sRIPrZLbGOzZDQwLwCBPGSz2ZdrxIPxmZwdQYt9lgx2I4q3xh8yKZpwJwtV27eDm53t6
+         YtPsDRy3rxDiLhpIe1B/21OopcPrCFnWK78zsf44/IToe0gew22ZJNi5YnYG4KR5glvX
+         yEbUgd4GXKXYxCQgWI20nXmqYknAOE8UyrG4qavgX9k1NpQcYnsXpsU8zRS4s1p2myH6
+         JJ1kVO77TqNLF/m9h0cgSgxgmHv0JrvHn0mJxk2zvhsEjPUh2Asn9phRuxf+bc8ZyUJA
+         Givw==
+X-Gm-Message-State: AOJu0Ywg6D7Clys/wNqyM01xgyevBRl2Tg5jDuXB7LHmkw6jlNucLz84
+	s6WiDYZ647cfImdav+KRsXGM8mwDO6A/8a/eoUVE5MftmibsYqQpv6gBA7J32NiFB0TmZMd4Rzi
+	PxXYIAk0mxdyjfHZisAcIUE8o30921DgKb3TmMU9PPFoDT0U2dnouCf8NDjmIhbR7DoKVLT1x9R
+	0mxxIZQugGOYtOU4k44+4ilr6grBpOU6FeXS86aZR5uGov1ZBjZMpPp4E=
+X-Google-Smtp-Source: AGHT+IHlSFQqmN9TKjjYPCTzVt/OdeV4DkEj+bFrAV1W7DSNq4vagSFdnRo0HqbFUXWJpNm2rfh5f2AZY2PBIEOLKA==
+X-Received: from coltonlewis-kvm.c.googlers.com ([fda3:e722:ac3:cc00:2b:ff92:c0a8:14ce])
+ (user=coltonlewis job=sendgmr) by 2002:a05:6e02:12ca:b0:383:4db4:cbe0 with
+ SMTP id e9e14a558f8ab-39d12502a17mr150075ab.5.1723567393828; Tue, 13 Aug 2024
+ 09:43:13 -0700 (PDT)
+Date: Tue, 13 Aug 2024 16:42:38 +0000
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.46.0.76.ge559c4bf1a-goog
+Message-ID: <20240813164244.751597-1-coltonlewis@google.com>
+Subject: [PATCH 0/6] Extend pmu_counters_test to AMD CPUs
+From: Colton Lewis <coltonlewis@google.com>
+To: kvm@vger.kernel.org
+Cc: Mingwei Zhang <mizhang@google.com>, Jinrong Liang <ljr.kernel@gmail.com>, 
+	Jim Mattson <jmattson@google.com>, Aaron Lewis <aaronlewis@google.com>, 
+	Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Colton Lewis <coltonlewis@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219129
+(I was positive I had sent this already, but I couldn't find it on the
+mailing list to reply to and ask for reviews.)
 
---- Comment #6 from Jordan Whited (jordan@jordanwhited.com) ---
-https://github.com/jwhited/tun-einval-repro/blob/main/main.go contains a
-simplified reproduction of the issue. This writes a GSO_TCPv4 packet to a T=
-UN
-device w/GSO=3D1240 and 2 equal length segments. The write returns EINVAL w=
-ith
-e269d79c7d35aa3808b1f3c1737d63dab504ddc8 absent the fix in
-89add40066f9ed9abe5f7f886fe5789ff7e0c50e.
+Extend pmu_counters_test to AMD CPUs.
 
---=20
-You may reply to this email to add a comment.
+As the AMD PMU is quite different from Intel with different events and
+feature sets, this series introduces a new code path to test it,
+specifically focusing on the core counters including the
+PerfCtrExtCore and PerfMonV2 features. Northbridge counters and cache
+counters exist, but are not as important and can be deferred to a
+later series.
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
+The first patch is a bug fix that could be submitted separately.
+
+The series has been tested on both Intel and AMD machines, but I have
+not found an AMD machine old enough to lack PerfCtrExtCore. I have
+made efforts that no part of the code has any dependency on its
+presence.
+
+I am aware of similar work in this direction done by Jinrong Liang
+[1]. He told me he is not working on it currently and I am not
+intruding by making my own submission.
+
+[1] https://lore.kernel.org/kvm/20231121115457.76269-1-cloudliang@tencent.com/
+
+Colton Lewis (6):
+  KVM: x86: selftests: Fix typos in macro variable use
+  KVM: x86: selftests: Define AMD PMU CPUID leaves
+  KVM: x86: selftests: Set up AMD VM in pmu_counters_test
+  KVM: x86: selftests: Test read/write core counters
+  KVM: x86: selftests: Test core events
+  KVM: x86: selftests: Test PerfMonV2
+
+ .../selftests/kvm/include/x86_64/processor.h  |   7 +
+ .../selftests/kvm/x86_64/pmu_counters_test.c  | 267 ++++++++++++++++--
+ 2 files changed, 249 insertions(+), 25 deletions(-)
+
+--
+2.46.0.76.ge559c4bf1a-goog
 
