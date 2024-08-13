@@ -1,91 +1,166 @@
-Return-Path: <kvm+bounces-24027-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24028-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C4D95095B
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:46:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 288B49509A9
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:01:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C13B6B26B7A
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 15:46:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D58E5282AA8
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CDE1A071F;
-	Tue, 13 Aug 2024 15:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CBF1A08DF;
+	Tue, 13 Aug 2024 16:01:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mDAtOi+u"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZEgZsGw"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D28F49654
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 15:46:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366771DDD1
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723563961; cv=none; b=lX6uo1JuGo5A8tlb9gwC2k7CiXY1FML2eXD7RsFa/kC7ow6+8kS7RtpDge6mc4fH0NIaVVZTuU81TcXeHm+UmYMCeC0UUKJRrswsvVZTvYwHTSmMRkY7bfNjbHj3+FQzWFW1vgqSgLfeDA8D4bw9K4Y2Z4BX7paexvHwLnkwy9Y=
+	t=1723564897; cv=none; b=Cz9fX2F93b4LAnuEC5yWxQ3l6U6vSO6zyKhSPetLmbD4S+ff4JOWW1pbiIhOjqiyC3JAjvRERpgNFyP/YxAk23w+6g+WP/mowhRF6UXK+Mm7nvR1bn6u4yxgope4cxkkUFKGb3SCFxjAZVme26jTnwIcV3SpjzmZhP6eMJEWjeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723563961; c=relaxed/simple;
-	bh=HcuWH6ZJ+x+CkbMHJznoY6Lf6yboNUiXtFY2KW46u+Q=;
-	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=RPqBL4l871XJyOjSNVMgNud4EIGa5oN7hF14n6muBi6hMI8R4isQoV50mHPGVyR1d0IN3hiGrmq4ZRhcH4YaSlj+oL4KqlCj1b7rxORBXQ/x68tDXQNmpH/RAbXYAL30evorlEJ1EHn9HLCLv15fq2WDGRcHsWedzgOuOs+SP+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mDAtOi+u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4D1BFC4AF16
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 15:46:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723563961;
-	bh=HcuWH6ZJ+x+CkbMHJznoY6Lf6yboNUiXtFY2KW46u+Q=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=mDAtOi+udZxgSwAHEBnd+m8l6Gb57u/ZrC7LnCGykFa6VQpAP/twCr5hFRyjDOP07
-	 seN4wqz8ICyoN+gMp96SjAMT+SSL5dZ0aw+TyfgbEhvF/5T2BbaY50jnGVXASdXTfZ
-	 S30PA/qCv7g6Awh2kszYCGRTDKql15rEk/Z1K62jcbRSh3MhftgahEbku2TQNr+uv0
-	 W8pZZv7Xp4mTRO0dQoWf7BLobZf6nWxCbC6zlj95ppjlT+qAJfhhrzGYCp+Cwdi5JJ
-	 YT1zzdwXKPkul35fW6v3RohQQ/vKe7z2N3SFi7TnK3pwTl+SrBxR3F+JbF6B1A67xt
-	 Pu397DHUJy6LQ==
-Received: by aws-us-west-2-korg-bugzilla-1.web.codeaurora.org (Postfix, from userid 48)
-	id 44990C433E5; Tue, 13 Aug 2024 15:46:01 +0000 (UTC)
-From: bugzilla-daemon@kernel.org
-To: kvm@vger.kernel.org
-Subject: [Bug 219129] virtio net performance degradation between Windows and
- Linux guest in kernel 6.10.3
-Date: Tue, 13 Aug 2024 15:46:00 +0000
-X-Bugzilla-Reason: None
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: AssignedTo virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Product: Virtualization
-X-Bugzilla-Component: kvm
-X-Bugzilla-Version: unspecified
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: alexucu@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P3
-X-Bugzilla-Assigned-To: virtualization_kvm@kernel-bugs.osdl.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-219129-28872-qOpIPNXq95@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-219129-28872@https.bugzilla.kernel.org/>
-References: <bug-219129-28872@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+	s=arc-20240116; t=1723564897; c=relaxed/simple;
+	bh=pb5iWyGbLBoSRfc066A41J8/Por/3wIu1JOSbbaHA7Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hsKPRvfIs/xn+IX/PGAyvO8CZ1jUGYUJzk/VY1330juCPmPxBA5sjNXBuKhbOFM8YNfr+GjY0ekDCjLkrhF6H29XOzBBaASDqxq8FwxfRWLIHxmqAWoSAmcsQnIsKG7uYAz9L7cOq//rTcdyJnrrbqtwMpu6ChhEwH43OKMjlfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cZEgZsGw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723564895;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=b5sTfG8EAhu68ZB0jEuQAT/8JuG7U9BrME4k1pn/3mk=;
+	b=cZEgZsGwC91jGYSPLMRF4IQaGfJmMsdEG7hg1eywXdWmjQ0pOXZTB/K7/m9C+DQjnHQsL9
+	2s2QtOU5iSO8KF8P+45S15Os5kciSs/Uda4ZwCyfgPueOO6kPgklwLqoRvxPT9RZjNhlvI
+	HXXUjt2hIfq7LPNIDE6msRU8fSlYhwI=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-577-f6BU45xUOp2oybKLDXNCEw-1; Tue, 13 Aug 2024 12:01:33 -0400
+X-MC-Unique: f6BU45xUOp2oybKLDXNCEw-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2ef22e62457so58320491fa.2
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 09:01:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723564891; x=1724169691;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :from:references:cc:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=b5sTfG8EAhu68ZB0jEuQAT/8JuG7U9BrME4k1pn/3mk=;
+        b=Rs8lK9dHZVmP41DdLXGtp2O79uFODYt+b7bTdaLBgYmvml1GdJXSfXapJ5LaCAExyH
+         tU7HM/7dDDOve5c29rNHpirVQ1zU/8TOJkRht4aFOeX1om+nVgROGoFnVsoGEo/+6jpy
+         bV6e6X4YHW6YwcrWJWcJJnjaz7WzIrX/1wlpL2TbFhG51JhBe3N0ZCoervswMWx5uzRs
+         4H6Erp6mAhzB30IPWp2lBo3054SdklCrNlhY/wvSAOrrNB6FW1nZdgcUDqO43MSDMrXS
+         Nf+5aBr5oJKHB37E8iu+4fIV1bNl3K9hJrrHUusw0CMS8McDBE17VpjO9mkqBOxZ/KaP
+         jaqQ==
+X-Gm-Message-State: AOJu0Yw/DVDNkTrItgwHADwmjHHgk0KEct45Ofs2oKTsVXlmklR0oU4N
+	QOWhLXznvfWWNxgZ+CjBOgSGIvSL/jvNYzmsaMNTUWnBOgzTnw7zhqeeri96EkOkXNfiIfeeZRO
+	yK/hamt7msiOEUSiWowSaYNtZ3sBJwU6Ih9hgg73m2Swd+VjpNOiT7X3xRg==
+X-Received: by 2002:a2e:8182:0:b0:2ef:2ce0:6ac with SMTP id 38308e7fff4ca-2f2b7159b18mr26043331fa.22.1723564891158;
+        Tue, 13 Aug 2024 09:01:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFDVbG5v5nEDdy/okoFzo4viEw/a96f3I306vHv1Wu7okdK1LYg4YOioEsPtg07VeG2gjICSQ==
+X-Received: by 2002:a2e:8182:0:b0:2ef:2ce0:6ac with SMTP id 38308e7fff4ca-2f2b7159b18mr26042931fa.22.1723564890495;
+        Tue, 13 Aug 2024 09:01:30 -0700 (PDT)
+Received: from [192.168.10.81] ([151.95.101.29])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a80f4181439sm79513666b.190.2024.08.13.09.01.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Aug 2024 09:01:29 -0700 (PDT)
+Message-ID: <1186d821-41ce-47c2-a7b2-70445816ed1c@redhat.com>
+Date: Tue, 13 Aug 2024 18:01:26 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] KVM: x86: Make x2APIC ID 100% readonly
+To: Sean Christopherson <seanjc@google.com>, Michal Luczaj <mhal@rbox.co>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Haoyu Wu <haoyuwu254@gmail.com>,
+ syzbot+545f1326f405db4e1c3e@syzkaller.appspotmail.com
+References: <20240802202941.344889-1-seanjc@google.com>
+ <20240802202941.344889-2-seanjc@google.com>
+ <eaa907ef-6839-48c6-bfb7-0e6ba2706c52@rbox.co> <ZrD9HHaMBqNGEaaW@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Content-Language: en-US
+Autocrypt: addr=pbonzini@redhat.com; keydata=
+ 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
+In-Reply-To: <ZrD9HHaMBqNGEaaW@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D219129
+On 8/5/24 18:26, Sean Christopherson wrote:
+> On Sun, Aug 04, 2024, Michal Luczaj wrote:
+>> On 8/2/24 22:29, Sean Christopherson wrote:
+>>> [...]
+>>> Making the x2APIC ID fully readonly fixes a WARN in KVM's optimized map
+>>> calculation, which expects the LDR to align with the x2APIC ID.
+>>>
+>>>    WARNING: CPU: 2 PID: 958 at arch/x86/kvm/lapic.c:331 kvm_recalculate_apic_map+0x609/0xa00 [kvm]
+>>>    CPU: 2 PID: 958 Comm: recalc_apic_map Not tainted 6.4.0-rc3-vanilla+ #35
+>>>    Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.2-1-1 04/01/2014
+>>>    RIP: 0010:kvm_recalculate_apic_map+0x609/0xa00 [kvm]
+>>>    Call Trace:
+>>>     <TASK>
+>>>     kvm_apic_set_state+0x1cf/0x5b0 [kvm]
+>>>     kvm_arch_vcpu_ioctl+0x1806/0x2100 [kvm]
+>>>     kvm_vcpu_ioctl+0x663/0x8a0 [kvm]
+>>>     __x64_sys_ioctl+0xb8/0xf0
+>>>     do_syscall_64+0x56/0x80
+>>>     entry_SYSCALL_64_after_hwframe+0x46/0xb0
+>>>    RIP: 0033:0x7fade8b9dd6f
+>>
+>> Isn't this WARN_ON_ONCE() inherently racy, though? With your patch applied,
+>> it can still be hit by juggling the APIC modes.
+> 
+> Doh, right, the logic is unfortunately cross-vCPU.  The sanity check could be
+> conditioned on the APIC belonging to the running/loaded vCPU, but I'm leaning
+> towards deleting it entirely.  Though it did detect the KVM_SET_LAPIC backdoor...
 
---- Comment #4 from alexucu@gmail.com ---
-This doesn't seem to be fixed in 6.10.4 just yet, at least on Arch's default
-kernel variant.
+Yeah, let's drop it since we do have a test (in userspace).
 
---=20
-You may reply to this email to add a comment.
+Paolo
 
-You are receiving this mail because:
-You are watching the assignee of the bug.=
 
