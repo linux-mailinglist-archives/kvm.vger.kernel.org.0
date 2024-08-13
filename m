@@ -1,168 +1,138 @@
-Return-Path: <kvm+bounces-24052-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24053-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04196950BAD
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 19:50:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD396950BAF
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 19:52:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29A151C228D9
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:50:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B3C11C21026
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 17:52:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E071A38D4;
-	Tue, 13 Aug 2024 17:50:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8740C1A38CB;
+	Tue, 13 Aug 2024 17:51:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UCgcMZOW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bDff7bnp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49C091A2C3A
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 17:50:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0D41A2C32;
+	Tue, 13 Aug 2024 17:51:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723571444; cv=none; b=MxXHW7YOUKPCvk/EpNfTFc/SG5tXEyQMvoO9usM4ij9kmScCBfc6bbeGPjFAAq5xbafFyB14MR06lUP7EyivQo5unPx1yn0gRQnVQv+7elu68+KL/eV7GWAxJLeuDxYvRkmC23UwkjRmyVgNO4na6VRmElxB6l3feeP/KHxvojE=
+	t=1723571509; cv=none; b=pwTmzOWeoCQvdqs3oat5939W9n9Y1hyI2bAgpEz0agI6f8KZrPNGNhPU4pPzCRdkYExLQtzk6J+LOvQbv4iJrnhRYRi41gCoOY1Qi1ZQ2vBmbwgiCCfj3gFsTLSTveUIniqSH0+JasZnbe7mH3IHHaU1tbZg17wzKt86Y1qK5r0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723571444; c=relaxed/simple;
-	bh=FstfrUToh1EXfJSAiePToOTUvVOqDVYBssuR0AmtO98=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Du/D/zj0ZXTOSwRexD//9ccVat0XuMqWo1wwxBZx8u6lOtYKCOgYTlBTYsJ+0hc2l1IQuHr0yQi37HfMNDldJBCyuigN4OX7X6wVeKJhyEGyGJ/9D8rlGLZw7PZD/0yfC/ihBIJ/5/2N+TReogLX3DsPij/tAhvpMv79+qYp9uI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UCgcMZOW; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb68c23a00so69692a91.0
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 10:50:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723571443; x=1724176243; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dN2AMVI/niFAXBXumTdMHyNBUN/yv7txGaV0Nn3/UZg=;
-        b=UCgcMZOWSf6RiBOyCeOWD0S0VOPcF4dNB1QIi2LzfmNdc0MoS4T5hUGQe66N3PJusv
-         hwMqcn7uleWIRW0YCw9qkesTned05fptFJj9xieRbYcSqisbZGpNrn2Ddd+uSluTSRR5
-         mLsNcM3UxVFcazGkvi5K7TkSXJIXBK65tKnawV+EdGJY8vt+vjJjqulxxTFnLOOklraP
-         Yml8qHx7OYhQK2OxglU5inVvOCvR/PdFpINZpHWbbAnkikgvidYn3leb0cmKlUNMli1U
-         sg0eC4hZBR5hdmC40LodImM4CQ1fyMvx0umjVk+L72ykuftkquowl2zUArbRqiotU20P
-         BhMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723571443; x=1724176243;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dN2AMVI/niFAXBXumTdMHyNBUN/yv7txGaV0Nn3/UZg=;
-        b=OyF0WXG3GUgcTNURg8zZilph+Vh+XS1PXENZVyJD44rdwsrulrJTnF5+ZCN9Hj9KD8
-         nFqUyK3kNGoAvnCtM4ty+vknU1ItZj2TNTzVRAaEk0Lh+UmQxDq3kH2AK2e7x/uhS4wP
-         Wx4aL5NPW0QQb0m/q+HtTQ1b6MmL5whjaKMLHr/svw25uC7/v7nw5g5uL0b6RznJf0iW
-         4qW5JpijHpQOTvF/NxTH574Wz4aJ2eDTfOkhbNWEIJRAHg1MLZvA5OPRotMqcX2OFBKv
-         zQ8HFHNngW8+I3jfKR8uQd1PEpDbaqS2gUVrCFq+kT0WF7eYJslSIef37TVt6FlVL2Lt
-         Rk4w==
-X-Gm-Message-State: AOJu0YxAURnybMi9wWWQfATOa1vDgcquNBy9f3i+V+tLPKnbmS9wquXR
-	vVVn4uKdJow9uOEmdJjjcavEQhNqO101o8jU04ErEtY6ZvpvwEr5UOYfCrkU6oRN50bmGtTqp/3
-	XjQ==
-X-Google-Smtp-Source: AGHT+IH7Zxucylz6R95aLD54zFrs2SBkGeRrDQqkhFde13ApbPQ4ZM/p/JbtmnqpgndbwN/eAgc+8ZtkApw=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90b:4ec8:b0:2ca:7f5a:db6c with SMTP id
- 98e67ed59e1d1-2d3942d60b8mr56913a91.3.1723571442217; Tue, 13 Aug 2024
- 10:50:42 -0700 (PDT)
-Date: Tue, 13 Aug 2024 10:50:40 -0700
-In-Reply-To: <20240522001817.619072-3-dwmw2@infradead.org>
+	s=arc-20240116; t=1723571509; c=relaxed/simple;
+	bh=CSQq8lKHKJYcYR2uxzATV/yKyJcOtXWbihzEXB5uc1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ofu8HqxmFmmpDhGTg/I5ql+B/Vj0SoiIGrkiY4pvAkHxHYg+KNOxTYlSqsiP7HTdUetNs+9rd0UfDXInhskBrIIu5kgVzDImPkSsG5lP5VGmFaYxCWoykYL2TNfQZ5C8M51j4WoxpguG+K1P23PHj8+itdpaFAODzVZHynoHkV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bDff7bnp; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723571508; x=1755107508;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=CSQq8lKHKJYcYR2uxzATV/yKyJcOtXWbihzEXB5uc1w=;
+  b=bDff7bnpOmCMy8DHXtCpDV0gNgTvOc9OvqnMl59QtUIA2K04ufdllPoK
+   oa0+IBoqBKMNVn6yxBXc0zbQIncm/o1cU3Ru66bod1zO+7YJfA3BSQc7b
+   6G1FIJ3ZtkMnY+cGfYfE3trUTToNcfVd8vGg6A7l2pJqZgsNZZLffFAJO
+   y5+b0Sg11hB03w4QLwvVIeNDDJ9t3u6YWsyOO5U1cusv6rHvBawJadmwt
+   gkH6Wos5TTr3zavC7MnH3gnAHbnwqXD1KUZDkQVbvyt/ke/tj8y9ge1RE
+   oXBJ4YUuHX9RSIJ7CZi4EIpnoF2I1Xkk3jMG4dTVR1W2q07/C9rhGopQ/
+   w==;
+X-CSE-ConnectionGUID: EWuDol23Su+AYdcouNh4UA==
+X-CSE-MsgGUID: w1ZDY+p/TCa9dqIeInu87w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="21567847"
+X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
+   d="scan'208";a="21567847"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 10:51:47 -0700
+X-CSE-ConnectionGUID: N46dxCNkRyWrBpf082kcJA==
+X-CSE-MsgGUID: 1RafmUaYSR+34HQMVVldAg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,286,1716274800"; 
+   d="scan'208";a="63408135"
+Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.54])
+  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 10:51:38 -0700
+Date: Tue, 13 Aug 2024 10:51:37 -0700
+From: Isaku Yamahata <isaku.yamahata@intel.com>
+To: Binbin Wu <binbin.wu@linux.intel.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+	seanjc@google.com, isaku.yamahata@intel.com,
+	rick.p.edgecombe@intel.com, michael.roth@amd.com
+Subject: Re: [PATCH v2 2/2] KVM: x86: Use is_kvm_hc_exit_enabled() instead of
+ opencode
+Message-ID: <ZrudKcslzzO4TP3m@ls.amr.corp.intel.com>
+References: <20240813051256.2246612-1-binbin.wu@linux.intel.com>
+ <20240813051256.2246612-3-binbin.wu@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240522001817.619072-1-dwmw2@infradead.org> <20240522001817.619072-3-dwmw2@infradead.org>
-Message-ID: <Zruc8CohpYUa1Im8@google.com>
-Subject: Re: [RFC PATCH v3 02/21] KVM: x86: Improve accuracy of KVM clock when
- TSC scaling is in force
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jalliste@amazon.co.uk, sveith@amazon.de, zide.chen@intel.com, 
-	Dongli Zhang <dongli.zhang@oracle.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240813051256.2246612-3-binbin.wu@linux.intel.com>
 
-On Wed, May 22, 2024, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On Tue, Aug 13, 2024 at 01:12:56PM +0800,
+Binbin Wu <binbin.wu@linux.intel.com> wrote:
+
+> Use is_kvm_hc_exit_enabled() instead of opencode.
 > 
-> The kvm_guest_time_update() function scales the host TSC frequency to
-> the guest's using kvm_scale_tsc() and the v->arch.l1_tsc_scaling_ratio
-> scaling ratio previously calculated for that vCPU. Then calcuates the
-> scaling factors for the KVM clock itself based on that guest TSC
-> frequency.
+> No functional change intended.
 > 
-> However, it uses kHz as the unit when scaling, and then multiplies by
-> 1000 only at the end.
-> 
-> With a host TSC frequency of 3000MHz and a guest set to 2500MHz, the
-> result of kvm_scale_tsc() will actually come out at 2,499,999kHz. So
-> the KVM clock advertised to the guest is based on a frequency of
-> 2,499,999,000 Hz.
-> 
-> By using Hz as the unit from the beginning, the KVM clock would be based
-> on a more accurate frequency of 2,499,999,999 Hz in this example.
-> 
-> Fixes: 78db6a503796 ("KVM: x86: rewrite handling of scaled TSC for kvmclock")
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> Reviewed-by: Paul Durrant <paul@xen.org>
+> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
 > ---
->  arch/x86/include/asm/kvm_host.h |  2 +-
->  arch/x86/kvm/x86.c              | 17 +++++++++--------
->  arch/x86/kvm/xen.c              |  2 +-
->  3 files changed, 11 insertions(+), 10 deletions(-)
+>  arch/x86/kvm/svm/sev.c | 4 ++--
+>  arch/x86/kvm/x86.c     | 2 +-
+>  2 files changed, 3 insertions(+), 3 deletions(-)
 > 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index 01c69840647e..8440c4081727 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -887,7 +887,7 @@ struct kvm_vcpu_arch {
+> diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
+> index a16c873b3232..d622aab8351d 100644
+> --- a/arch/x86/kvm/svm/sev.c
+> +++ b/arch/x86/kvm/svm/sev.c
+> @@ -3635,7 +3635,7 @@ static int snp_begin_psc_msr(struct vcpu_svm *svm, u64 ghcb_msr)
+>  		return 1; /* resume guest */
+>  	}
 >  
->  	gpa_t time;
->  	struct pvclock_vcpu_time_info hv_clock;
-> -	unsigned int hw_tsc_khz;
-> +	unsigned int hw_tsc_hz;
-
-Isn't there an overflow issue here?  The local variable is a 64-bit value, but
-kvm_vcpu_arch.hw_tsc_hz is a 32-bit value.  And unless I'm having an even worse
-review week than I thought, a guest TSC frequency > 4Ghz will get truncated.
-
->  	struct gfn_to_pfn_cache pv_time;
->  	/* set guest stopped flag in pvclock flags field */
->  	bool pvclock_set_guest_stopped_request;
+> -	if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_MAP_GPA_RANGE))) {
+> +	if (!is_kvm_hc_exit_enabled(vcpu->kvm, KVM_HC_MAP_GPA_RANGE)) {
+>  		set_ghcb_msr(svm, GHCB_MSR_PSC_RESP_ERROR);
+>  		return 1; /* resume guest */
+>  	}
+> @@ -3718,7 +3718,7 @@ static int snp_begin_psc(struct vcpu_svm *svm, struct psc_buffer *psc)
+>  	bool huge;
+>  	u64 gfn;
+>  
+> -	if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_MAP_GPA_RANGE))) {
+> +	if (!is_kvm_hc_exit_enabled(vcpu->kvm, KVM_HC_MAP_GPA_RANGE)) {
+>  		snp_complete_psc(svm, VMGEXIT_PSC_ERROR_GENERIC);
+>  		return 1;
+>  	}
 > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 2d2619d3eee4..23281c508c27 100644
+> index 6e16c9751af7..9857c1984ef7 100644
 > --- a/arch/x86/kvm/x86.c
 > +++ b/arch/x86/kvm/x86.c
-> @@ -3215,7 +3215,8 @@ static void kvm_setup_guest_pvclock(struct kvm_vcpu *v,
+> @@ -10171,7 +10171,7 @@ unsigned long __kvm_emulate_hypercall(struct kvm_vcpu *vcpu, unsigned long nr,
+>  		u64 gpa = a0, npages = a1, attrs = a2;
 >  
->  static int kvm_guest_time_update(struct kvm_vcpu *v)
->  {
-> -	unsigned long flags, tgt_tsc_khz;
-> +	unsigned long flags;
-> +	uint64_t tgt_tsc_hz;
-
-s/uint64_t/u64 for kernel code.  There are more than a few uses of uint64_t in
-KVM, but u64 is far and away the dominant flavor.
-
-> diff --git a/arch/x86/kvm/xen.c b/arch/x86/kvm/xen.c
-> index 5a83a8154b79..014048c22652 100644
-> --- a/arch/x86/kvm/xen.c
-> +++ b/arch/x86/kvm/xen.c
-> @@ -2273,7 +2273,7 @@ void kvm_xen_update_tsc_info(struct kvm_vcpu *vcpu)
+>  		ret = -KVM_ENOSYS;
+> -		if (!(vcpu->kvm->arch.hypercall_exit_enabled & (1 << KVM_HC_MAP_GPA_RANGE)))
+> +		if (!is_kvm_hc_exit_enabled(vcpu->kvm, KVM_HC_MAP_GPA_RANGE))
+>  			break;
 >  
->  	entry = kvm_find_cpuid_entry_index(vcpu, function, 2);
->  	if (entry)
-> -		entry->eax = vcpu->arch.hw_tsc_khz;
-> +		entry->eax = vcpu->arch.hw_tsc_hz / 1000;
+>  		if (!PAGE_ALIGNED(gpa) || !npages ||
+> -- 
+> 2.43.2
+> 
+> 
 
-And if hw_tsc_hz is a u64, this will need to use div_u64() to play nice with
-32-bit kernels.
+Reviewed-by: Isaku Yamahata <isaku.yamahata@intel.com>
+-- 
+Isaku Yamahata <isaku.yamahata@intel.com>
 
