@@ -1,143 +1,145 @@
-Return-Path: <kvm+bounces-24031-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24032-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B9BC950A00
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:20:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD714950A01
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 18:20:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E61AAB24B5A
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:20:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E44282107
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 16:20:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 493ED1A0B00;
-	Tue, 13 Aug 2024 16:19:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DV1nYA4P"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 799961A0AFB;
+	Tue, 13 Aug 2024 16:20:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2711A0709
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:19:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291E61A0709
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 16:20:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723565997; cv=none; b=CFe72CniBGqiPshzSRvpSFnRQvmOxc9HMcC77+/g0Su1narESXROQaLTgWFYe5AtEpfZeyoTaLQI6Cs3/ZAy4oRJgB9CwbHQa6vnI9ytytir73y1/eH/obIbBDYB6r79EcU/F3C3W9aZiajJvmpX9GqVh6DcK8T8AuBecLJT0j4=
+	t=1723566011; cv=none; b=QP+hk7WktF2tG9Rlj6KW00i9EZdqYyaQs3VzgdrYVn8ysIfeKi4LMfYv6oB3YPmFnYE0K2nJlnNVIX/NRpoUtY3ntxFVz3t8LAcL3lFWWTyBC9NRrM3HqZtWnoG5DZ7k3h7Kgb5LXF3NHlVPSOfd3loDLdpXbz1gVckzwzR8RTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723565997; c=relaxed/simple;
-	bh=fwvtbPRrnhU9JDW6k7vFkywZk1R1B9bgqmZPfUzSZfE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Q3ZaWfXciERcK6v3RinaWzeh5H4gxmAjzgqHxcnpCKVXNxfZJEYNBKdwnDUPyMrCX6juIn4c7qrgKy+1kvHZb4oSXiY3gpUQHtPmQIhyIhjyiDIg+VbI3A3r7EZgpauqPa7O17CMCBmr55i6clYsOQUBpjm5Zj8AbkYavppKGIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DV1nYA4P; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb77ab2074so6008389a91.1
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 09:19:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723565995; x=1724170795; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jxbzQRkRTBS9epafRwyVqalVAhDx8HH/aK+YY0S1gVc=;
-        b=DV1nYA4Poxp6VSTJJJKQq83jH7Uye6saIhg+drfR0Vv2dEiPMCoJVF4Vprgj+1tWRq
-         6FKhzesOJslhIXPoheJ69RNysPoe0+o+/skUrDanAmI0J3DAOK9Xe9Y/6ui1Kx0xqPv4
-         G6xAyP4wg+hzv0ZFGaYIeGjuXzo0uMFL18NJDlVocbxDVTHirGSUR4YHHq3P5XqL9gsn
-         lwMCecDk1cGYvlzhDn9VyR/XgbIPIjZ9SsP/p7lfUluV19I34IYJXut+jy3DmAcFm81c
-         7MQrO/5SlbhqQVmeqFqn82vhYxZTna176n1uXOVGXxMdJoHnfkbpMad/JH213LrrbUkv
-         pxIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723565995; x=1724170795;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jxbzQRkRTBS9epafRwyVqalVAhDx8HH/aK+YY0S1gVc=;
-        b=jV5mb5wgwshf+eUEk8kTrw1lEpdsyZ/B26t7V7sFO0pGaYaGRqyzOiltmg1lRlOvVM
-         m8ni3Y5Rj4tjLg708amM570nwu27te8Y06QRjmsDwP6ixfXlsv1GTLyP1R8702shQDQ7
-         vKJkkGmiskjcZ2kDbopCjAaQRlG4KlV1H+O0Jmkqml7UHbz7Lk4gf3diESeGo2t1LyQh
-         Sc6xHgGwhLhCef1OIqSccNELMipqRslK4A06AFdHBIuEsLNJh8hki54gY/pQqhU+3Qfc
-         W3FrjVuE6xDB6mHUJKMUHhUN6cc3YkNEuIy3eb4YpmnySDODFlXKhlH0tzFrUB3vcvpo
-         5tjQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUN/r3DZ5bpV/prfPr/0pGSMnGO/0h1eKUvqwFwWjQOgcdqSIvDxvvJxMEnWxwZhCWaBsPS7b/tAsKKOBWYvHi4WyVX
-X-Gm-Message-State: AOJu0YzW6XOhrwvplRcJiIlzD+SSM2GlibrL/NO853CmaN7bpUmuO2f4
-	IoLEwXVPIkURmA/CoRqhv8kjS3AjCQ6kX+uM+fZx/Oym1r6TVBqJDGint8RAmvAfuTNBqrV1d/b
-	l4Q==
-X-Google-Smtp-Source: AGHT+IHJOBYOGLfOsSIj1L4isKWLN1SiBNX/UssBmCLYnWNSmeqqNHiquUNhnOOFmY/z8a8nbvIuqL+5sOI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:e10a:b0:2cf:deef:4261 with SMTP id
- 98e67ed59e1d1-2d39269b500mr16432a91.7.1723565994916; Tue, 13 Aug 2024
- 09:19:54 -0700 (PDT)
-Date: Tue, 13 Aug 2024 09:19:53 -0700
-In-Reply-To: <009cbe00-dfc3-4a94-b6ab-9d6ec9605473@amd.com>
+	s=arc-20240116; t=1723566011; c=relaxed/simple;
+	bh=ZKTCFZmbG5pTOi9ndxbq9LGUYrME/QFRl3HIWniT/i4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Fo49b3849dvl/4RTODnkzw3NmBJVcshy901CNWAhcTqqUwPhm2pKFuPMBibd/qZRDqAzIrngXtyDu6jVwZ8jFXukatnrguXiE001yO5MI8pBwJtoAwqRYvOdvSHlpkvYAKjRmDb+endKEdAZ94jtaIIgKZSwljlc0EDT4/1Be+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 4221412FC;
+	Tue, 13 Aug 2024 09:20:32 -0700 (PDT)
+Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id F1CB13F6A8;
+	Tue, 13 Aug 2024 09:20:04 -0700 (PDT)
+Date: Tue, 13 Aug 2024 17:19:59 +0100
+From: Joey Gouly <joey.gouly@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Alexandru Elisei <alexandru.elisei@arm.com>
+Subject: Re: [PATCH 09/10] KVM: arm64: Handle  PIR{,E0}_EL2 traps
+Message-ID: <20240813154937.GA3328587@e124191.cambridge.arm.com>
+References: <20240813144738.2048302-1-maz@kernel.org>
+ <20240813144738.2048302-10-maz@kernel.org>
+ <20240813152452.GD3321997@e124191.cambridge.arm.com>
+ <878qx05sut.wl-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240528041926.3989-1-manali.shukla@amd.com> <CABgObfbz5kZZObu9dO=KPu8_mZvGmV1752SQzQckkrj5jPaTQg@mail.gmail.com>
- <009cbe00-dfc3-4a94-b6ab-9d6ec9605473@amd.com>
-Message-ID: <ZruHqe4in12RnNuf@google.com>
-Subject: Re: [PATCH v3 0/5] Add support for the Idle HLT intercept feature
-From: Sean Christopherson <seanjc@google.com>
-To: Manali Shukla <manali.shukla@amd.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, shuah@kernel.org, nikunj@amd.com, 
-	thomas.lendacky@amd.com, vkuznets@redhat.com, bp@alien8.de, 
-	ajones@ventanamicro.com
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <878qx05sut.wl-maz@kernel.org>
 
-On Tue, Jun 04, 2024, Manali Shukla wrote:
-> On 5/28/2024 3:52 PM, Paolo Bonzini wrote:
-> > Does this have an effect on the number of vmexits for KVM, unless AVIC
-> > is enabled?
+On Tue, Aug 13, 2024 at 04:45:46PM +0100, Marc Zyngier wrote:
+> On Tue, 13 Aug 2024 16:24:52 +0100,
+> Joey Gouly <joey.gouly@arm.com> wrote:
+> > 
+> > On Tue, Aug 13, 2024 at 03:47:37PM +0100, Marc Zyngier wrote:
+> > > Add the FEAT_S1PIE EL2 registers the sysreg descriptor array so that
+> > > they can be handled as a trap.
+> > > 
+> > > Access to these registers is conditionned on ID_AA64MMFR3_EL1.S1PIE
+> > > being advertised.
+> > > 
+> > > Similarly to other other changes, PIRE0_EL2 is guaranteed to trap
+> > > thanks to the D22677 update to the architecture..
+> > > 
+> > > Signed-off-by: Marc Zyngier <maz@kernel.org>
+> > > ---
+> > >  arch/arm64/kvm/sys_regs.c | 14 ++++++++++++++
+> > >  1 file changed, 14 insertions(+)
+> > > 
+> > > diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+> > > index 52250db3c122..a5f604e24e05 100644
+> > > --- a/arch/arm64/kvm/sys_regs.c
+> > > +++ b/arch/arm64/kvm/sys_regs.c
+> > > @@ -346,6 +346,18 @@ static bool access_rw(struct kvm_vcpu *vcpu,
+> > >  	return true;
+> > >  }
+> > >  
+> > > +static bool check_s1pie_access_rw(struct kvm_vcpu *vcpu,
+> > > +				  struct sys_reg_params *p,
+> > > +				  const struct sys_reg_desc *r)
+> > > +{
+> > > +	if (!kvm_has_feat(vcpu->kvm, ID_AA64MMFR3_EL1, S1PIE, IMP)) {
+> > > +		kvm_inject_undefined(vcpu);
+> > > +		return false;
+> > > +	}
+> > > +
+> > > +	return access_rw(vcpu, p, r);
+> > > +}
+> > > +
+> > >  /*
+> > >   * See note at ARMv7 ARM B1.14.4 (TL;DR: S/W ops are not easily virtualized).
+> > >   */
+> > > @@ -2827,6 +2839,8 @@ static const struct sys_reg_desc sys_reg_descs[] = {
+> > >  	EL2_REG(HPFAR_EL2, access_rw, reset_val, 0),
+> > >  
+> > >  	EL2_REG(MAIR_EL2, access_rw, reset_val, 0),
+> > > +	EL2_REG(PIRE0_EL2, check_s1pie_access_rw, reset_val, 0),
+> > > +	EL2_REG(PIR_EL2, check_s1pie_access_rw, reset_val, 0),
+> > >  	EL2_REG(AMAIR_EL2, access_rw, reset_val, 0),
+> > >  
+> > >  	EL2_REG(VBAR_EL2, access_rw, reset_val, 0),
+> > 
+> > I think we should also use this for PIR_EL1 / PIRE0_EL1? We have NULL for their access field.
+> > 
+> > 	{ SYS_DESC(SYS_PIR_EL1), NULL, reset_unknown, PIR_EL1 },
+> 
+> I don't think we need this. In general, the EL1 FEAT_S1PIE registers
+> are directly accessed by the VM, and do not trap.
+> 
+> However, if the VM has been configured to not expose S1PIE, then we
+> set the corresponding FGU bits in kvm_calculate_traps():
+> 
+> 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
+> 		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
+> 						HFGxTR_EL2_nPIR_EL1);
+> 
+> The effect of this is that we don't even make to the sysreg array, and
+> inject an UNDEF directly from the point of decoding the trap (see the
+> beginning of triage_sysreg_trap()).
+> 
+> For EL2 registers, there is no concept of FGT since they always trap,
+> so no architectural trick we can play to shortcut the handling.
+> Therefore we make it to the handler and have to triage things there.
+> 
+> Does it make sense?
 
-Ah, I suspect it will (as Manali's trace shows), because KVM will pend a V_INTR
-(V_IRQ in KVM's world) in order to detect the interrupt window.  And while KVM
-will still exit on the V_INTR, it'll avoid an exit on HLT.
+Ah yes, forgot how that worked, thanks for the reminder!
 
-Of course, we could (should?) address that in KVM by clearing the V_INTR (and its
-intercept) when there are no pending, injectable IRQs at the end of
-kvm_check_and_inject_events().  VMX would benefit from that change as well.
+There's another 'conditionned' typo in the commit message, but otherwise:
 
-I think it's just this?  Because enabling an IRQ window for userspace happens
-after this.
+Reviewed-by: Joey Gouly <joey.gouly@arm.com>
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index af6c8cf6a37a..373c850cc325 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -10556,9 +10556,11 @@ static int kvm_check_and_inject_events(struct kvm_vcpu *vcpu,
-                                WARN_ON(kvm_x86_call(interrupt_allowed)(vcpu, true) < 0);
-                        }
-                }
--               if (kvm_cpu_has_injectable_intr(vcpu))
--                       kvm_x86_call(enable_irq_window)(vcpu);
-        }
-+       if (kvm_cpu_has_injectable_intr(vcpu))
-+               kvm_x86_call(enable_irq_window)(vcpu);
-+       else
-+               kvm_x86_call(disable_irq_window)(vcpu);
- 
-        if (is_guest_mode(vcpu) &&
-            kvm_x86_ops.nested_ops->has_events &&
-
-
-> Snippet of the Test case:
-> +static void idle_hlt_test(void)
-> +{
-> +       x = 0;
-> +       cli();
-> +       apic_self_ipi(IPI_TEST_VECTOR);
-> +       safe_halt();
-> +       if (x != 1) printf("%d", x);
-> +}
-
-This isn't very representative of real world behavior.  In practice, the window
-for a wake event to arrive between CLI and STI;HLT is quite small, i.e. having a
-V_INTR (or V_NMI) pending when HLT is executed is fairly uncommon.
-
-A more compelling benchmark would be something like a netperf latency test.
-
-I honestly don't know how high of a bar we should set for this feature.  On one
-hand, it's a tiny amount of enabling.  On the other hand, it would be extremely
-unfortunate if this somehow caused latency/throughput regressions, which seems
-highly improbably, but never say never...
+Thanks,
+Joey
 
