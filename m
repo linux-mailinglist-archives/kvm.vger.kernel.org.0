@@ -1,52 +1,95 @@
-Return-Path: <kvm+bounces-23985-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23986-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B61B4950319
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 12:58:20 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 185D7950323
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 12:59:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4242CB261FA
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:58:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 79123B26483
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9257419ADA3;
-	Tue, 13 Aug 2024 10:57:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E41E819AD71;
+	Tue, 13 Aug 2024 10:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UA0we/aN"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2567919AD87
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 10:57:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA00419412F;
+	Tue, 13 Aug 2024 10:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723546642; cv=none; b=dMxt6/CBrgbDMFVXyLamebRq922olPBBfMQNFxQmc3D9CJl7rHRMaieJaxoleMBuZWk24w5JEkH9vtxisWdBYcVoKPQcw+67t3G//fMzhqjdDQot0Ed1YG4u99QV1Kg2wpboy6WC2Re6Dun+ECZzzDo7gGSknXU+TiCueWLHrJA=
+	t=1723546750; cv=none; b=qcXMnpNYNakwCaeazEfFRnS8PTALC437mFATdFmJRzJ0BLyEHrGlFAXzjh0rWJmo10pHJ84l+hroZUdG3ueaZHb69euOWUgTvANEOeVVN+VyCMHV6jPgvS5uw9DDk4AQzdkeNEdv6oLMlRZtQMsM1YV/CeJvbgkOSKEAUEBY9ZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723546642; c=relaxed/simple;
-	bh=0CM555P4TDe9NXVLbFtgJqoPE81YdUZznXRYeBbk4dg=;
+	s=arc-20240116; t=1723546750; c=relaxed/simple;
+	bh=3Hg1d0q3PaFfnCAN8/nimKc+SRolk1WgNo4zb7AOCnA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gk+FVZXYfycDLnB0QqvGxjqKj1gKnoYjSj1vIdZ1mUuxUE5ggdWEoWcoh85AvuTFrhCyCR4ztAq7E3EL+dF/i4avA0KNc8zqK45rUCOPqfqDNiLbBFSc2dUZkFsBhFdj5BeHh9u+qWn7V0sPLdGU99ja4wqATPX/q497k6mkef0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 6607012FC;
-	Tue, 13 Aug 2024 03:57:44 -0700 (PDT)
-Received: from e124191.cambridge.arm.com (e124191.cambridge.arm.com [10.1.197.45])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 3AABA3F587;
-	Tue, 13 Aug 2024 03:57:17 -0700 (PDT)
-Date: Tue, 13 Aug 2024 11:57:10 +0100
-From: Joey Gouly <joey.gouly@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Fuad Tabba <tabba@google.com>,
-	Mark Brown <broonie@kernel.org>
-Subject: Re: [PATCH v3 8/8] KVM: arm64: Expose ID_AA64PFR2_EL1 to userspace
- and guests
-Message-ID: <20240813105710.GA3154421@e124191.cambridge.arm.com>
-References: <20240813104400.1956132-1-maz@kernel.org>
- <20240813104400.1956132-9-maz@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=gWLB7MtetFG1IMLwPwA+WpyZJurYHx5XKG+B6Avki2ACDwNxp1/kSZPhlJ31/QTmsX48LZkni6FPHUgt5VfBZuJZT0ZbkrI9uvRANYpzkx8cxkIaxM69S9/eHJdEkZmWgIJvIk7LmVEWOGt4WIqIlNbCR/fCTmb/5xx791+XwAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UA0we/aN; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47D17DCx023368;
+	Tue, 13 Aug 2024 10:59:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pp1; bh=EMHSqVSaNDDVL+/5VuZ9DPquIo0
+	UnfhZK5n6GmCJef8=; b=UA0we/aN7OZ9D0IVaQkNkCotjuE59KtuBH9+slJkss/
+	vhtXL4UBuLpdGQIQE+uc+gS2tYu3Lh859OY3BxqWO6WIlv11C9cS/XuhV3E6eHWP
+	PHvFWeDsYofdiuENZjyLQWSMF+7OtPzO3/Ec0UjmshRKICW34dN4F/nAFJdl+vho
+	H5eRJk/2D8ZARsWNqWaiAf1HnF+82/4FnfM/wDhIm35ZpCmcw+GEsTXmrIw/MZLK
+	cZHCDz04nmAV+Yy4W+LJFZDV2HfULpLQUW5rTi+Da1NAkV/k2osC08V01PlDDBZz
+	oRZbY1aZ7TWX5tYKEQ18vG+pnALyTNtdXy4qGh3FdgQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40wyuxqatt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Aug 2024 10:59:04 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47DAwNsJ008760;
+	Tue, 13 Aug 2024 10:59:04 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 40wyuxqatr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Aug 2024 10:59:03 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47D7YRYL010068;
+	Tue, 13 Aug 2024 10:59:03 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40xjx0kaga-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 13 Aug 2024 10:59:02 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47DAwvin57737570
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 13 Aug 2024 10:58:59 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0E1E420043;
+	Tue, 13 Aug 2024 10:58:57 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 92FB720040;
+	Tue, 13 Aug 2024 10:58:56 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.80.42])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue, 13 Aug 2024 10:58:56 +0000 (GMT)
+Date: Tue, 13 Aug 2024 12:57:53 +0200
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>
+Cc: kvm@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-kselftest@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>,
+        Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: Re: [PATCH v5 07/10] selftests: kvm: s390: Add uc_map_unmap VM test
+ case
+Message-ID: <20240813123526.256667.schlameuss@linux.ibm.com>
+References: <20240807154512.316936-1-schlameuss@linux.ibm.com>
+ <20240807154512.316936-8-schlameuss@linux.ibm.com>
+ <c1af035e-2bc3-4d61-a318-11f2490cb0d5@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -55,64 +98,88 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240813104400.1956132-9-maz@kernel.org>
+In-Reply-To: <c1af035e-2bc3-4d61-a318-11f2490cb0d5@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: XFG0IvWz7n4nirEgXfAwIrFEh2Wk8G6z
+X-Proofpoint-ORIG-GUID: RpSJJQzcW7JmePmFh9JlzNNr4fPwZtUP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-13_02,2024-08-13_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 phishscore=0 priorityscore=1501 adultscore=0 spamscore=0
+ impostorscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0 suspectscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408130075
 
-Hello!
-
-On Tue, Aug 13, 2024 at 11:44:00AM +0100, Marc Zyngier wrote:
-> Everything is now in place for a guest to "enjoy" FP8 support.
-> Expose ID_AA64PFR2_EL1 to both userspace and guests, with the
-> explicit restriction of only being able to clear FPMR.
+On Tue, Aug 13, 2024 at 09:21:12AM +0200, Janosch Frank wrote:
+> On 8/7/24 5:45 PM, Christoph Schlameuss wrote:
+> > Add a test case verifying basic running and interaction of ucontrol VMs.
+> > Fill the segment and page tables for allocated memory and map memory on
+> > first access.
+> > 
+> > * uc_map_unmap
+> >    Store and load data to mapped and unmapped memory and use pic segment
+> >    translation handling to map memory on access.
+> > 
+> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> > ---
+> >   .../selftests/kvm/s390x/ucontrol_test.c       | 167 +++++++++++++++++-
+> >   1 file changed, 166 insertions(+), 1 deletion(-)
+> > 
 > 
-> All other features (MTE* at the time of writing) are hidden
-> and not writable.
+> [...]
 > 
-> Signed-off-by: Marc Zyngier <maz@kernel.org>
-> ---
->  arch/arm64/kvm/sys_regs.c | 16 +++++++++++++++-
->  1 file changed, 15 insertions(+), 1 deletion(-)
+> > +static void init_st_pt(FIXTURE_DATA(uc_kvm) * self)
+> > +{
+> > +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+> > +	u64 first_pt_addr, ste, s_addr, pte;
+> > +	struct kvm_run *run = self->run;
+> > +	void *se_addr;
+> > +	int si, pi;
+> > +	u64 *phd;
+> > +
+> > +	/* set PASCE addr */
+> > +	self->pgd = self->base_gpa + SZ_1M;
+> > +	phd = gpa2hva(self, self->pgd);
+> > +	memset(phd, 0xff, VM_MEM_TABLE_SIZE);
+> > +
+> > +	first_pt_addr = self->pgd + (VM_MEM_TABLE_SIZE * VM_MEM_MAX_M);
+> > +	/* for each segment in the VM */
+> > +	for (si = 0; si < VM_MEM_MAX_M; si++) {
+> > +		/* build segment table entry (ste) */
+> > +		ste = (first_pt_addr + (VM_MEM_TABLE_SIZE * si)) & ~0x7fful;
+> > +		/* store ste in st */
+> > +		phd[si] = ste;
+> > +
+> > +		se_addr = gpa2hva(self, phd[si]);
+> > +		s_addr = self->base_gpa + (si * SZ_1M);
+> > +		memset(se_addr, 0xff, VM_MEM_TABLE_SIZE);
+> > +		/* for each page in the segment (VM) */
+> > +		for (pi = 0; pi < (SZ_1M / PAGE_SIZE); pi++) {
+> > +			/* build page table entry (pte) */
+> > +			pte = (s_addr + (pi * PAGE_SIZE)) & ~0xffful;
+> > +			/* store pte in pt */
+> > +			((u64 *)se_addr)[pi] = pte;
+> > +		}
+> > +	}
+> > +	pr_debug("segment table entry %p (0x%lx) --> %p\n",
+> > +		 phd, phd[0], gpa2hva(self, (phd[0] & ~0x7fful)));
+> > +	print_hex_bytes("st", (u64)phd, 64);
+> > +	print_hex_bytes("pt", (u64)gpa2hva(self, phd[0]), 128);
+> > +
+> > +	/* PASCE TT=00 for segment table */
+> > +	sync_regs->crs[1] = self->pgd | 0x3;
+> > +	run->kvm_dirty_regs |= KVM_SYNC_CRS;
+> > +}
 > 
-> diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
-> index 51627add0a72..da6d017f24a1 100644
-> --- a/arch/arm64/kvm/sys_regs.c
-> +++ b/arch/arm64/kvm/sys_regs.c
-> @@ -1722,6 +1722,15 @@ static u64 read_sanitised_id_aa64pfr0_el1(struct kvm_vcpu *vcpu,
->  	return val;
->  }
->  
-> +static u64 read_sanitised_id_aa64pfr2_el1(struct kvm_vcpu *vcpu,
-> +					  const struct sys_reg_desc *rd)
-> +{
-> +	u64 val = read_sanitised_ftr_reg(SYS_ID_AA64PFR2_EL1);
-> +
-> +	/* We only expose FPMR */
-> +	return val & ID_AA64PFR2_EL1_FPMR;
-> +}
+> Having a closer look at this I don't understand why we need to setup DAT in
+> the guest. Also, the guest's memory easily fits in a couple of segment
+> entries so you could set the table length TL in the ASCE to one page instead
+> of 4.
+> 
 
-Wondering why you're adding this function instead of extending __kvm_read_sanitised_id_reg()?
-
-> +
->  #define ID_REG_LIMIT_FIELD_ENUM(val, reg, field, limit)			       \
->  ({									       \
->  	u64 __f_val = FIELD_GET(reg##_##field##_MASK, val);		       \
-> @@ -2381,7 +2390,12 @@ static const struct sys_reg_desc sys_reg_descs[] = {
->  		   ID_AA64PFR0_EL1_AdvSIMD |
->  		   ID_AA64PFR0_EL1_FP), },
->  	ID_SANITISED(ID_AA64PFR1_EL1),
-> -	ID_UNALLOCATED(4,2),
-> +	{ SYS_DESC(SYS_ID_AA64PFR2_EL1),
-> +	  .access	= access_id_reg,
-> +	  .get_user	= get_id_reg,
-> +	  .set_user	= set_id_reg,
-> +	  .reset	= read_sanitised_id_aa64pfr2_el1,
-> +	  .val		= ID_AA64PFR2_EL1_FPMR, },
-
-Then I think this would just be ID_WRITABLE(ID_AA64PFR2_EL1, ID_AA64PFR2_EL1_FPMR).
-
->  	ID_UNALLOCATED(4,3),
->  	ID_WRITABLE(ID_AA64ZFR0_EL1, ~ID_AA64ZFR0_EL1_RES0),
->  	ID_HIDDEN(ID_AA64SMFR0_EL1),
-
-Thanks,
-Joey
+I did only create the tables to be able to switch the DAT on and with that use a
+PSW that is a bit more normal.
+Switching the DAT off will work fine for the tests here without loosing any
+coverage in KVM. So I will remove it here and in the skey test.
 
