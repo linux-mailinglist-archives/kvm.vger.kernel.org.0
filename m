@@ -1,110 +1,176 @@
-Return-Path: <kvm+bounces-23951-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23952-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0059D950060
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:52:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2A1495010B
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 11:16:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8E6C1F231E4
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 08:52:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F550287730
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 09:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 145ED6A8CF;
-	Tue, 13 Aug 2024 08:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A064F183CB5;
+	Tue, 13 Aug 2024 09:15:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b="ieUQMxe0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GoxUe6Qh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail.8bytes.org (mail.8bytes.org [85.214.250.239])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B39C339A1;
-	Tue, 13 Aug 2024 08:52:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.250.239
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723539147; cv=none; b=r3oETvWe5h0qNZIdGnLV4cjG5oh5mvEjlAWlO9MGw3rQXZvlTCaZnrBJVlghSoapP2hAqwMKvlfuDm4FJMceyRSe0qMXr+ykq7HtGvYpXuGIta3aepEC+Bd1QsZlH69fuNME9iZmcGhl9oab/0wwMcchp4757bloCkfW3okU/hw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723539147; c=relaxed/simple;
-	bh=YMj67aL6wIKEzLDPFc93NrmMN0mrzP4ToduOyz628Qs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QKnWQrXLBtIqWFbmJFpwAaoSiXmZDZ6HCSZfeoGtUaiiCSctnKSZuI1fCgYQ1G44QvRMKi1plCMoOQufooAz5pEj+0IhMiKJtW5d06bXPD2+rtrxmyLOznd6w4ciZeWXWgzoor5a8lcSYUmvHuu6CcKQK0gcXLKXn9MoN2fkNmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org; spf=pass smtp.mailfrom=8bytes.org; dkim=pass (2048-bit key) header.d=8bytes.org header.i=@8bytes.org header.b=ieUQMxe0; arc=none smtp.client-ip=85.214.250.239
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=8bytes.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=8bytes.org
-Received: from 8bytes.org (pd9fe9dd8.dip0.t-ipconnect.de [217.254.157.216])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by mail.8bytes.org (Postfix) with ESMTPSA id 06BAA2A50EF;
-	Tue, 13 Aug 2024 10:52:24 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=8bytes.org;
-	s=default; t=1723539144;
-	bh=YMj67aL6wIKEzLDPFc93NrmMN0mrzP4ToduOyz628Qs=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ieUQMxe0HigcQJaqZh3zZsFiLkq0a1eBi2t5Pzt3YFymmi01Ww7+zL7cQPyhBKe00
-	 Tv+IxDclbBH33noPMUZuJQ9t6T0YDDv95L+RRshXSwKEhqyZjHhC4pCMsJQk16HeNA
-	 kOcqb6zF9TORWNX5c5ULAvMValaCgFGYUf8E6LEOsBK/MDe3BTwb3QcHe9mwiczHJD
-	 AbrCE2QzIFnVacFRHILEeAHiQxJO3LUqMXn/qlZOjbttijsa3YQO7SqIeQ4SAAOvKT
-	 DAoIAy9lpwIR30CvgRCaqf23OwAuncjTWDSDmSFFCObdQAUuEbBXuTYunB7Fu9UbMc
-	 kv2dvXaUOmdEw==
-Date: Tue, 13 Aug 2024 10:52:22 +0200
-From: Joerg Roedel <joro@8bytes.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Lu Baolu <baolu.lu@linux.intel.com>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	David Woodhouse <dwmw2@infradead.org>, iommu@lists.linux.dev,
-	kvm@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-pci@vger.kernel.org, Robin Murphy <robin.murphy@arm.com>,
-	Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>,
-	Will Deacon <will@kernel.org>, patches@lists.linux.dev
-Subject: Re: [PATCH] iommu: Allow ATS to work on VFs when the PF uses IDENTITY
-Message-ID: <ZrsexhlEKgFqwbXa@8bytes.org>
-References: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C7C3BB47;
+	Tue, 13 Aug 2024 09:15:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723540535; cv=none; b=U26azifrMf1nzCSDH1LLLqYZ1G9dKEfIdQWAw/WNZNsNwlk9aVj042ktphA1gptOTyJEYCIDLPuKlztZ/P0NIyWODx5lWNWbzKigt32IojteliBXCFkP8LFSrW2mhS7j8wS7pOuTm43CgN0sVVHWMSS4l1jwft5kaQ+/uP8qZNE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723540535; c=relaxed/simple;
+	bh=PKnElOekxHXRG3WvWmm9EC/3/V9TPm4/L/L/JXal7YI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m7Q1nggvMPo7gtSV1DsVRK3TWTt6OWdWz/K/WC4iq3PWi2QEY20llxpNn9UPhXhMQ+wJHeqFe6GNCMVMRjyYUds6Ej9bsuTRPO18OXgEYUhVJDZxTOKyrG4hl4BUF+t73RyO4S2X4PVojINQRbW0xEp1IuZVZN1Fy1+xnHQSITU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GoxUe6Qh; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723540535; x=1755076535;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=PKnElOekxHXRG3WvWmm9EC/3/V9TPm4/L/L/JXal7YI=;
+  b=GoxUe6QhsvjLbYvlQ2dQbXRQ5s1cSJTuN8ZcohWgxGPUZ/90m3h18QSa
+   EhdwDzjDVE83XzAfleRckaYNGpaIeiZ8YsFaAtbGGjSuEX0A/8UhQN/XT
+   Jmfi/kf/kotSkBrdW5CmsIJAEaONQnpdd/CUFtIW0bsuMePfEOoaPFi8P
+   qNpEIBI5Jqj2GON0IfXxq/jRFCoPHtSo+kdzygojkDaYSzjUJq94OhDuF
+   VMWZfRFPDqfkRoFusilmYAXzca5QgDbniCsXkIblXVnsak22Uc31yERTT
+   396nlmjcGy0K4uhuICxXC9Mv2QMo3XwTNdzcY0ewELIyN+R0bq7jzNVRW
+   g==;
+X-CSE-ConnectionGUID: GtMPKnhaShWeyHgi0PxlDw==
+X-CSE-MsgGUID: GAAuVsn9SveFoqCrgdol1A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11162"; a="44212049"
+X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
+   d="scan'208";a="44212049"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 02:15:34 -0700
+X-CSE-ConnectionGUID: RESNh+4vQqmIf046iR2EVw==
+X-CSE-MsgGUID: mzo6rkFTT6e7/el7rtBtpA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,285,1716274800"; 
+   d="scan'208";a="58532073"
+Received: from unknown (HELO [10.238.8.207]) ([10.238.8.207])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 02:15:31 -0700
+Message-ID: <c03df364-4cce-4c7e-b9db-191f7b10ca70@linux.intel.com>
+Date: Tue, 13 Aug 2024 17:15:28 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0-v1-0fb4d2ab6770+7e706-ats_vf_jgg@nvidia.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 17/25] KVM: TDX: create/free TDX vcpu structure
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+ kai.huang@intel.com, isaku.yamahata@gmail.com,
+ tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
+ linux-kernel@vger.kernel.org, Isaku Yamahata <isaku.yamahata@intel.com>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-18-rick.p.edgecombe@intel.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <20240812224820.34826-18-rick.p.edgecombe@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Aug 07, 2024 at 03:19:20PM -0300, Jason Gunthorpe wrote:
-> PCI ATS has a global Smallest Translation Unit field that is located in
-> the PF but shared by all of the VFs.
-> 
-> The expectation is that the STU will be set to the root port's global STU
-> capability which is driven by the IO page table configuration of the iommu
-> HW. Today it becomes set when the iommu driver first enables ATS.
-> 
-> Thus, to enable ATS on the VF, the PF must have already had the correct
-> STU programmed, even if ATS is off on the PF.
-> 
-> Unfortunately the PF only programs the STU when the PF enables ATS. The
-> iommu drivers tend to leave ATS disabled when IDENTITY translation is
-> being used.
-> 
-> Thus we can get into a state where the PF is setup to use IDENTITY with
-> the DMA API while the VF would like to use VFIO with a PAGING domain and
-> have ATS turned on. This fails because the PF never loaded a PAGING domain
-> and so it never setup the STU, and the VF can't do it.
-> 
-> The simplest solution is to have the iommu driver set the ATS STU when it
-> probes the device. This way the ATS STU is loaded immediately at boot time
-> to all PFs and there is no issue when a VF comes to use it.
-> 
-> Add a new call pci_prepare_ats() which should be called by iommu drivers
-> in their probe_device() op for every PCI device if the iommu driver
-> supports ATS. This will setup the STU based on whatever page size
-> capability the iommu HW has.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+
+
+
+On 8/13/2024 6:48 AM, Rick Edgecombe wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> Implement vcpu related stubs for TDX for create, reset and free.
+>
+> For now, create only the features that do not require the TDX SEAMCALL.
+> The TDX specific vcpu initialization will be handled by KVM_TDX_INIT_VCPU.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > ---
->  drivers/iommu/amd/iommu.c                   |  3 ++
->  drivers/iommu/arm/arm-smmu-v3/arm-smmu-v3.c |  6 ++++
->  drivers/iommu/intel/iommu.c                 |  1 +
->  drivers/pci/ats.c                           | 33 +++++++++++++++++++++
->  include/linux/pci-ats.h                     |  1 +
->  5 files changed, 44 insertions(+)
+> uAPI breakout v1:
+>   - Dropped unnecessary WARN_ON_ONCE() in tdx_vcpu_create().
+>     WARN_ON_ONCE(vcpu->arch.cpuid_entries),
+>     WARN_ON_ONCE(vcpu->arch.cpuid_nent)
+>   - Use kvm_tdx instead of to_kvm_tdx() in tdx_vcpu_create() (Chao)
+>
+> v19:
+>   - removed stale comment in tdx_vcpu_create().
+>
+> v18:
+>   - update commit log to use create instead of allocate because the patch
+>     doesn't newly allocate memory for TDX vcpu.
+>
+> v16:
+>   - Add AMX support as the KVM upstream supports it.
+> --
+> 2.46.0
+> ---
+>   arch/x86/kvm/vmx/main.c    | 44 ++++++++++++++++++++++++++++++++++----
+>   arch/x86/kvm/vmx/tdx.c     | 41 +++++++++++++++++++++++++++++++++++
+>   arch/x86/kvm/vmx/x86_ops.h | 10 +++++++++
+>   arch/x86/kvm/x86.c         |  2 ++
+>   4 files changed, 93 insertions(+), 4 deletions(-)
+>
+[...]
+> +
+> +static void vt_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> +{
+> +	if (is_td_vcpu(vcpu)) {
+> +		tdx_vcpu_reset(vcpu, init_event);
+> +		return;
+> +	}
+> +
+> +	vmx_vcpu_reset(vcpu, init_event);
+> +}
+> +
+[...]
+> +
+> +void tdx_vcpu_reset(struct kvm_vcpu *vcpu, bool init_event)
+> +{
+> +
+> +	/* Ignore INIT silently because TDX doesn't support INIT event. */
+> +	if (init_event)
+> +		return;
+> +
+> +	/* This is stub for now. More logic will come here. */
+> +}
+> +
+For TDX, it actually doesn't do any thing meaningful in vcpu reset.
+Maybe we can drop the helper and move the comments to vt_vcpu_reset()?
 
-Applied, thanks.
+>   
+>   #endif /* __KVM_X86_VMX_X86_OPS_H */
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ce2ef63f30f2..9cee326f5e7a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -488,6 +488,7 @@ int kvm_set_apic_base(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
+>   	kvm_recalculate_apic_map(vcpu->kvm);
+>   	return 0;
+>   }
+> +EXPORT_SYMBOL_GPL(kvm_set_apic_base);
+>   
+>   /*
+>    * Handle a fault on a hardware virtualization (VMX or SVM) instruction.
+> @@ -12630,6 +12631,7 @@ bool kvm_vcpu_is_reset_bsp(struct kvm_vcpu *vcpu)
+>   {
+>   	return vcpu->kvm->arch.bsp_vcpu_id == vcpu->vcpu_id;
+>   }
+> +EXPORT_SYMBOL_GPL(kvm_vcpu_is_reset_bsp);
+>   
+>   bool kvm_vcpu_is_bsp(struct kvm_vcpu *vcpu)
+>   {
+
+kvm_set_apic_base() and kvm_vcpu_is_reset_bsp() is not used in
+this patch. The symbol export should move to the next patch, which
+uses them.
+
 
