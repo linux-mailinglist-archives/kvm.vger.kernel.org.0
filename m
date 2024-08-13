@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-23962-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23963-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3AC2950207
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 12:07:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80BFD950208
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 12:07:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3146E1C2197A
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:07:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADC5E1C21024
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 10:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7307719B3C1;
-	Tue, 13 Aug 2024 10:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34E3319A2AC;
+	Tue, 13 Aug 2024 10:06:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e7BhBKxz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KL/7hgB4"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6B519A2AC;
-	Tue, 13 Aug 2024 10:06:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A4D319ADBB;
+	Tue, 13 Aug 2024 10:06:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723543582; cv=none; b=IlNlxSKbqCgxrzCYC+llNNJ0bepO4UgcqfSQDHoL8U6HuahcqF9aF1BvStztGldHueDBzbpLxJiLTpq+IHQy6tuf4Et7OkbiP9UYFAI06T8+GczraqM77/RV+zHjjSEST3L3U5I1RXXJiCjsRiH8L4+h5yEuotquwXkhyzmgIeQ=
+	t=1723543583; cv=none; b=NJn8RVQFFI8deq4R3jWb5AcYg1KJCVA6yU1O6zpZ5kBZHwt09d6f4QgJewSNPSC2xU0mocBhS0ovNRVLHZdc5+/sb/jPPynpgpNCJbZGsEU9olVmRhbOG+lNc579lui8JRRiVI5C/ilNvOy0dhtyqgTRC29LNKECTJnBy0a1Vmw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723543582; c=relaxed/simple;
-	bh=ieTMTaAqPI0uXqUb/t7GfVXDy9HiKnxjPwOFgy9V0hk=;
+	s=arc-20240116; t=1723543583; c=relaxed/simple;
+	bh=Mpd41u/OQb/mH4vQMFgyLtSbBnfY5mHwiO+lMECYSFQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZyBIg9vsyx4hv+JlCQEH3TOLpVyRwdrpcmfUyIovpyL+FzP7gYTsXomhuNlLNW8f8K2uC+llpob7Ujfc+UIJzAoxu6M0RTILwVh8l/SdWGDWMfjbL6jjq9NMIknipBnEsvSMYjrsNlIVKVxUsc2kGPIZNs+LhJM/ygMcJAgNqZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e7BhBKxz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A69EC4AF16;
-	Tue, 13 Aug 2024 10:06:22 +0000 (UTC)
+	 MIME-Version; b=TDf2brY6SDW6Xb5yz19rftaNzKdlNViS7rTF8bsdMnjzjouoaN9J+85LXXpCwQAwfuBuHlTaXMJvcFxycjyBVf1RzvlF4QeNDQlnsLhrdpQ1tDYyvFPdL/BYGGl3xIggVmVHb8xcMV6OMGv9yCZZ4MPkehgADXZ9nvy0QrEhO/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KL/7hgB4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D196C4AF0B;
+	Tue, 13 Aug 2024 10:06:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723543582;
-	bh=ieTMTaAqPI0uXqUb/t7GfVXDy9HiKnxjPwOFgy9V0hk=;
+	s=k20201202; t=1723543583;
+	bh=Mpd41u/OQb/mH4vQMFgyLtSbBnfY5mHwiO+lMECYSFQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=e7BhBKxzoE+VReV2fzgA51VdodWHOrvyR9GQLWF1hJNd2Tg2vH+i/JEnLcQeDIkmI
-	 a7bOrUZXQF0fb+DH/G5I9o4PnHw5ImFuFsvMkWrk6BR2ZVLIQLqgGJuQRNDbzevxzL
-	 iighGWFgmCCzmwOxxxWgh1yOFU/xDv0cm5I9frh0PQuskyW28YBFRyPf/Xc+N5B+jp
-	 5RYCqR2T9+IugQV/+cu/+DiTQAKSBBCTHEKRNlyOc6KkhaPDy0cAIvSWy9Pv8xh5bf
-	 zvQT+8Dx/7N8qfFhdqq7fBIf/2kfz7h9JIQNIUBLB/NzTmqqgzXEsOeo37L2Taqe1K
-	 nr3qflT8kwjvg==
+	b=KL/7hgB4Ev/RmQbEWOjNk21dO8wbs+g+ZDHnijdQ4A3UgOyz5m9beuTZ3uBA4fV/S
+	 N/1OeJDlPqXg0cWxNJtGzXTaIaDrTvJQXKBJlgqpFYljUPkPir1His8o+ihZaBIZIm
+	 lWv7w3jQK8ZhrF9tNyhMheZnM6pwSeVW17tbNWhh6C5phdngrGeD4Y/PU07E9fPZWD
+	 5gU4zTY9A6mGyRuLz6URcAkkQDbStazvtJ9+oL9P0PF4tOyRW3ih3kITyr3+mHJmom
+	 xyG/GNP1JG/TrsDeByZ2fC99jXWowxqNX2/qkWRnJ4mmorpwVCRrsarzzc+X4Eviwk
+	 G6Q50/Rrbjvgg==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sdoQ0-003INM-Iw;
-	Tue, 13 Aug 2024 11:06:20 +0100
+	id 1sdoQ0-003INM-TW;
+	Tue, 13 Aug 2024 11:06:21 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -59,9 +59,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Alexandru Elisei <alexandru.elisei@arm.com>,
 	Anshuman Khandual <anshuman.khandual@arm.com>,
 	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: [PATCH v3 07/18] KVM: arm64: nv: Turn upper_attr for S2 walk into the full descriptor
-Date: Tue, 13 Aug 2024 11:05:29 +0100
-Message-Id: <20240813100540.1955263-8-maz@kernel.org>
+Subject: [PATCH v3 08/18] KVM: arm64: nv: Honor absence of FEAT_PAN2
+Date: Tue, 13 Aug 2024 11:05:30 +0100
+Message-Id: <20240813100540.1955263-9-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240813100540.1955263-1-maz@kernel.org>
 References: <20240813100540.1955263-1-maz@kernel.org>
@@ -77,94 +77,30 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The upper_attr attribute has been badly named, as it most of the
-time carries the full "last walked descriptor".
+If our guest has been configured without PAN2, make sure that
+AT S1E1{R,W}P will generate an UNDEF.
 
-Rename it to "desc" and make ti contain the full 64bit descriptor.
-This will be used by the S1 PTW.
-
+Reviewed-by: Anshuman Khandual <anshuman.khandual@arm.com>
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/include/asm/kvm_nested.h |  4 ++--
- arch/arm64/kvm/nested.c             | 12 ++++++------
- 2 files changed, 8 insertions(+), 8 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-diff --git a/arch/arm64/include/asm/kvm_nested.h b/arch/arm64/include/asm/kvm_nested.h
-index 6e163501f13e..43e531c67311 100644
---- a/arch/arm64/include/asm/kvm_nested.h
-+++ b/arch/arm64/include/asm/kvm_nested.h
-@@ -85,7 +85,7 @@ struct kvm_s2_trans {
- 	bool readable;
- 	int level;
- 	u32 esr;
--	u64 upper_attr;
-+	u64 desc;
- };
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index c90324060436..e7e5e0df119e 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4600,6 +4600,10 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 						HFGITR_EL2_TLBIRVAAE1OS	|
+ 						HFGITR_EL2_TLBIRVAE1OS);
  
- static inline phys_addr_t kvm_s2_trans_output(struct kvm_s2_trans *trans)
-@@ -115,7 +115,7 @@ static inline bool kvm_s2_trans_writable(struct kvm_s2_trans *trans)
- 
- static inline bool kvm_s2_trans_executable(struct kvm_s2_trans *trans)
- {
--	return !(trans->upper_attr & BIT(54));
-+	return !(trans->desc & BIT(54));
- }
- 
- extern int kvm_walk_nested_s2(struct kvm_vcpu *vcpu, phys_addr_t gipa,
-diff --git a/arch/arm64/kvm/nested.c b/arch/arm64/kvm/nested.c
-index 49a7832a3fb1..234d0f6006c6 100644
---- a/arch/arm64/kvm/nested.c
-+++ b/arch/arm64/kvm/nested.c
-@@ -256,7 +256,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
- 		/* Check for valid descriptor at this point */
- 		if (!(desc & 1) || ((desc & 3) == 1 && level == 3)) {
- 			out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
--			out->upper_attr = desc;
-+			out->desc = desc;
- 			return 1;
- 		}
- 
-@@ -266,7 +266,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
- 
- 		if (check_output_size(wi, desc)) {
- 			out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
--			out->upper_attr = desc;
-+			out->desc = desc;
- 			return 1;
- 		}
- 
-@@ -278,19 +278,19 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
- 
- 	if (level < first_block_level) {
- 		out->esr = compute_fsc(level, ESR_ELx_FSC_FAULT);
--		out->upper_attr = desc;
-+		out->desc = desc;
- 		return 1;
- 	}
- 
- 	if (check_output_size(wi, desc)) {
- 		out->esr = compute_fsc(level, ESR_ELx_FSC_ADDRSZ);
--		out->upper_attr = desc;
-+		out->desc = desc;
- 		return 1;
- 	}
- 
- 	if (!(desc & BIT(10))) {
- 		out->esr = compute_fsc(level, ESR_ELx_FSC_ACCESS);
--		out->upper_attr = desc;
-+		out->desc = desc;
- 		return 1;
- 	}
- 
-@@ -304,7 +304,7 @@ static int walk_nested_s2_pgd(phys_addr_t ipa,
- 	out->readable = desc & (0b01 << 6);
- 	out->writable = desc & (0b10 << 6);
- 	out->level = level;
--	out->upper_attr = desc & GENMASK_ULL(63, 52);
-+	out->desc = desc;
- 	return 0;
- }
- 
++	if (!kvm_has_feat(kvm, ID_AA64MMFR1_EL1, PAN, PAN2))
++		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_ATS1E1RP |
++						HFGITR_EL2_ATS1E1WP);
++
+ 	if (!kvm_has_feat(kvm, ID_AA64MMFR3_EL1, S1PIE, IMP))
+ 		kvm->arch.fgu[HFGxTR_GROUP] |= (HFGxTR_EL2_nPIRE0_EL1 |
+ 						HFGxTR_EL2_nPIR_EL1);
 -- 
 2.39.2
 
