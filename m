@@ -1,165 +1,121 @@
-Return-Path: <kvm+bounces-23931-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-23932-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9BCD94FC81
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 06:04:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C30C94FC8E
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 06:08:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 653111F22BE2
-	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 04:04:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EF3B1C22379
+	for <lists+kvm@lfdr.de>; Tue, 13 Aug 2024 04:08:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074541CD23;
-	Tue, 13 Aug 2024 04:04:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246A91CD02;
+	Tue, 13 Aug 2024 04:08:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Cx71XHCJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pttmDIC3"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66D629A5
-	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 04:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1284A1B815
+	for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 04:08:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723521869; cv=none; b=pnmpxALrsLIDfeYYdHqqvHhTovZH36R8dwvUPcce5nFRRSFIrTQ5RnX6lrQrujVEwPbIes0GapfC17uvIrGXnHU+sdlK1JKhR9Udj73Gwj0xZCKT1vnNoPJjqXPviu+K/MJCBr3ccL2M+hhNPUs3MwyG8lUUH7c9qHw6++5Xqtg=
+	t=1723522123; cv=none; b=glpCDB5l3to+u/QYrdpw4qYDMhN+iLrW5gphrCzC2S7eexSoUMxwQMG0xr7g2UBoyWvCn//SI4CINh8VU/UQYxmeuzCNAbMMyP/21RkM71P9lGCuiGi28XxWg+tdjYs8BCJaTs+xflqaKAFvWVuq9eLVnMvXANVpkEsE5d+vRtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723521869; c=relaxed/simple;
-	bh=RBLuOpa6/6KuZb5ZUiFSN5p9kDO6fr0QcfXEYDrzFlM=;
+	s=arc-20240116; t=1723522123; c=relaxed/simple;
+	bh=fntJhyjcOy7oflqhtRO9KzJcdMa1SeI7MODbm3MN5k8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=s/J3WWxPW8pwyssjlqllMlA5B1pwfnnvlCnGnHCn238dbLFj1vZAHpcM7/C/+X7aP/IALSZtVtk+97FteIyMsOl+jyLYluTxHLXBjyWoz8PxO7B1k5XhD1YkoLMxh/bKhtDHQewby7oyYStE8dvhvJVMu935061ulTR8TEcG+Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Cx71XHCJ; arc=none smtp.client-ip=209.85.214.202
+	 To:Cc:Content-Type; b=eE+AZ0v+qCiQ/QQE5VC9xynM1TFuKhvt8kcz5rourEOFZYCC8UUTcswt4fdatYsye6reNUJ5YYx69Bpz/JPTg8yl74lgO6sXKYh2VlmgjT7LHpVyGAe7h0glHOP0gtAc4iwHhAKa1xDa8BnnxIQFozxYZAi0aMjqrnfkQ9L3obE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pttmDIC3; arc=none smtp.client-ip=209.85.215.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fc6ac9a4aaso53250645ad.1
-        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 21:04:26 -0700 (PDT)
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a134fd9261so4398139a12.3
+        for <kvm@vger.kernel.org>; Mon, 12 Aug 2024 21:08:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723521866; x=1724126666; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723522121; x=1724126921; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xr7C32v6c2xit879iiq1ZVSHFKFJKtQ1IiBykzo7yK0=;
-        b=Cx71XHCJRnpgif2r0Lkuqu8QgLe6fvYg4Kodi+lROB2tj3YBk5grbuDgBLDof4OkVm
-         0auB+p7U/cWcmJ53VBv4hstNZPE8Utxn0GDhmA4c8QyrZhU5q/ecYvWuwgU5ZcPwwu45
-         rkS+8PN4oX2WUA0XRO+oZfoXPsBiLyOu6pkQcHO+dIANxauzW9zD9cKYxRmEB/X14BZf
-         hhOfyDInD0V8w7wemgsmHC02Sj5t2vf6gk+yKlOFtcsT3TR0Pr5uncvyEfqbJdsuFqgM
-         k3Km2rzgC0DwT8s4pzsYg9v3TnhPZ2OUnudKhSTMIZu5wGXLNI72J9/PSyxXeakgL0W+
-         msig==
+        bh=SHWstkZJouFpjxURopjUp/N24tS1IjVlq4SVfgNsTjg=;
+        b=pttmDIC3mo2QvDY0rB/HLf9xG8H5+2h+oxtP6JF3ueCkClU6ipnmFiGJeRgp0Fr/fP
+         O08xiI9cALKHYN41+5BpUkYRtc5zfqGUTZddwWnzg0lOvdwqShPDQNPwyI7aOZSiWMct
+         kfcVxEqDk2C83YJ3kr3jAuibwGaYdzi++0YfhuZcGV9kX23UwoHdpYoyQCdbvWs3rFQ3
+         xESPpvKpmZUe7rSgLiOh/ttK9TwXkCZnhfgCgPFfvHkB3+YrBLl6Q8YxUMdDxG5308mG
+         OZkTouYL3WQibvAiG7WvLAtXtYSBGbfiYk/BCRUhIh81e1qha42K/zV62q+MFdYf9XUC
+         AlnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723521866; x=1724126666;
+        d=1e100.net; s=20230601; t=1723522121; x=1724126921;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xr7C32v6c2xit879iiq1ZVSHFKFJKtQ1IiBykzo7yK0=;
-        b=J5L+oxBinr0fhmFEzXT/hu0C4EMNGibUBoqF+f0EhHQGY7CVSfSf8Au/a3g/3tdJtI
-         HYzh1KJqw43q1UCnc258h1RJ+txmqGRVXLrXeCAdhQcLYPGYiKI/hX/w57j2QQfqUmYp
-         XiIsl+2C4sw9M5xDy06sqfwoYtULPBnBlj99xHgGBmSdS1kJPudo4ufsAahEvJw7CPSt
-         98Pjcj5EEEnh49rDmCk7KV35Y2a8n4UFojQDSfzo4axRvJQNCgSdahsaEZamuEGOq+jY
-         PxO7cBZZgLl26z563XiJSA48exvxbiC/Dr4m/ops1snsRYS5/iZ4cAGy5db/b2aTwmF2
-         hLqA==
-X-Forwarded-Encrypted: i=1; AJvYcCWoQYcXNqQbNMvVd5cHFoVhJtFqHiZC8KCpFYEtRlLo0Fv5GbEkJfLY/nVRVmABM81wRfTXAYQuympKSmjtUSyy5QEX
-X-Gm-Message-State: AOJu0YwFM7kjem/N00/hOEGFViI35SLhi11Fpapa7AlyRiWmzU6ifPzi
-	6C/BZX56F5XTRZK/YydnarHCgFeTQT2mp+5OyrxTXYaZjI2DZgsEdNZc6pmW5W+I3mkExRj+6On
-	7Rw==
-X-Google-Smtp-Source: AGHT+IE0Ey9nvTvCCBhSwJ3Y5zSB2eUuiv0MOxdgaSuEN1zHD4D5H59HYPhmPXB6LWhWDDa9QhdhzhYYnUg=
+        bh=SHWstkZJouFpjxURopjUp/N24tS1IjVlq4SVfgNsTjg=;
+        b=trCojWXtUknbzmjMDQfZhiyhWe1JvBg/57TcRFZDG2gShvuA15Lswcnwxo95EtHRKO
+         Mybiq1A0ODy6bxEafGZ01gBSROeRsw9eVaYSiFCC+EE/rpGG+dQ6yXIkiQhT9dcdKKIC
+         3qtUNDGnBIxgRgk+ebi4BXyfLVsCR0TeXOqzbgoUiHssFiBVrqynazFRUSDKwZs137TS
+         VlMonRw0BsUrSrdEVpa+nOtnUFgH7edndbd/hcYIPSUgaFLE2/XUZLTDXk/x0vBslHJu
+         l8D0QKoONa4OdbFqWsDLIV2zbhxRrkAo9kT2BXOlqXy+kMhICgFdiJbtBtYuzVtNE9OG
+         UqLA==
+X-Forwarded-Encrypted: i=1; AJvYcCV43dE7OmnKjaEw9ewgInTc0u/RGVcdHtJ2XiiR/BB+TovScS95iXm8ujcUpSvaV0inHbRlO+qgZwhAGM/d+fJiQBQZ
+X-Gm-Message-State: AOJu0Yy9uU4J0QeRFfQunNMgHEh5Eqj09GFu0sNCQ/vYIovOzW4zsAF0
+	S51fzElDaycq6amDN1jTWLZzbAJLinuplEJGoJOGbo4tnxWL7etDHJ8LZZoQpATHMKPKP9MaJVe
+	+QQ==
+X-Google-Smtp-Source: AGHT+IFy3tS0mDbLSJ3VFDM24v3F0/Bto9CsIFpJ5YeCwKlmxhaKPoZAnTM6U8EqvRJ7bCMM985q93CMz9Q=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:2311:b0:1fd:8e8d:8695 with SMTP id
- d9443c01a7336-201ca1ecf6bmr102765ad.12.1723521865969; Mon, 12 Aug 2024
- 21:04:25 -0700 (PDT)
-Date: Mon, 12 Aug 2024 21:04:24 -0700
-In-Reply-To: <20240612115040.2423290-4-dan.carpenter@linaro.org>
+ (user=seanjc job=sendgmr) by 2002:a63:db46:0:b0:6e3:e0bc:a332 with SMTP id
+ 41be03b00d2f7-7c69507d656mr4242a12.2.1723522121034; Mon, 12 Aug 2024 21:08:41
+ -0700 (PDT)
+Date: Mon, 12 Aug 2024 21:08:39 -0700
+In-Reply-To: <20240612115040.2423290-3-dan.carpenter@linaro.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240612115040.2423290-2-dan.carpenter@linaro.org> <20240612115040.2423290-4-dan.carpenter@linaro.org>
-Message-ID: <ZrrbSFVpVs0eX1ZQ@google.com>
-Subject: Re: [PATCH 2/2] KVM: SVM: Fix an error code in sev_gmem_post_populate()
+References: <20240612115040.2423290-2-dan.carpenter@linaro.org> <20240612115040.2423290-3-dan.carpenter@linaro.org>
+Message-ID: <ZrrcR-kJ8hP6afWb@google.com>
+Subject: Re: [PATCH 1/2] KVM: SVM: Fix uninitialized variable bug
 From: Sean Christopherson <seanjc@google.com>
 To: Dan Carpenter <dan.carpenter@linaro.org>
 Cc: error27@gmail.com, Paolo Bonzini <pbonzini@redhat.com>, 
 	Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
 	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Brijesh Singh <brijesh.singh@amd.com>, 
-	Michael Roth <michael.roth@amd.com>, Ashish Kalra <ashish.kalra@amd.com>, kvm@vger.kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Ashish Kalra <ashish.kalra@amd.com>, 
+	Brijesh Singh <brijesh.singh@amd.com>, Michael Roth <michael.roth@amd.com>, kvm@vger.kernel.org, 
 	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="us-ascii"
 
 On Wed, Jun 12, 2024, Dan Carpenter wrote:
-> The copy_from_user() function returns the number of bytes which it
-> was not able to copy.  Return -EFAULT instead.
-
-Unless I'm misreading the code and forgetting how all this works, this is
-intentional.  The direct caller treats any non-zero value as a error:
-
-		ret = post_populate(kvm, gfn, pfn, p, max_order, opaque);
-
-		put_page(pfn_to_page(pfn));
-		if (ret)
-			break;
-	}
-
-	filemap_invalidate_unlock(file->f_mapping);
-
-	fput(file);
-	return ret && !i ? ret : i;
-
-and the indirect caller specifically handles a non-zero count:
-
-	count = kvm_gmem_populate(kvm, params.gfn_start, src, npages,
-				  sev_gmem_post_populate, &sev_populate_args);
-	if (count < 0) {
-		argp->error = sev_populate_args.fw_error;
-		pr_debug("%s: kvm_gmem_populate failed, ret %ld (fw_error %d)\n",
-			 __func__, count, argp->error);
-		ret = -EIO;
-	} else {
-		params.gfn_start += count;
-		params.len -= count * PAGE_SIZE;
-		if (params.type != KVM_SEV_SNP_PAGE_TYPE_ZERO)
-			params.uaddr += count * PAGE_SIZE;
-
-		ret = 0;
-		if (copy_to_user(u64_to_user_ptr(argp->data), &params, sizeof(params)))
-			ret = -EFAULT;
-	}
-
-and KVM's docs even call out that success doesn't mean "done".
-
-  Upon success, this command is not guaranteed to have processed the entire
-  range requested. Instead, the ``gfn_start``, ``uaddr``, and ``len`` fields of
-  ``struct kvm_sev_snp_launch_update`` will be updated to correspond to the
-  remaining range that has yet to be processed. The caller should continue
-  calling this command until those fields indicate the entire range has been
-  processed, e.g. ``len`` is 0, ``gfn_start`` is equal to the last GFN in the
-  range plus 1, and ``uaddr`` is the last byte of the userspace-provided source
-  buffer address plus 1. In the case where ``type`` is KVM_SEV_SNP_PAGE_TYPE_ZERO,
-  ``uaddr`` will be ignored completely.
-
+> If snp_lookup_rmpentry() fails then "assigned" is printed in the error
+> message but it was never initialized.  Initialize it to false.
 > 
 > Fixes: dee5a47cc7a4 ("KVM: SEV: Add KVM_SEV_SNP_LAUNCH_UPDATE command")
 > Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 > ---
->  arch/x86/kvm/svm/sev.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
+> The compiler is generally already zeroing stack variables so this doesn't cost
+> anything.
+> 
+>  arch/x86/kvm/svm/sev.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/arch/x86/kvm/svm/sev.c b/arch/x86/kvm/svm/sev.c
-> index 70d8d213d401..14bb52ebd65a 100644
+> index 43a450fb01fd..70d8d213d401 100644
 > --- a/arch/x86/kvm/svm/sev.c
 > +++ b/arch/x86/kvm/svm/sev.c
-> @@ -2220,9 +2220,10 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn_start, kvm_pfn_t pf
->  		if (src) {
->  			void *vaddr = kmap_local_pfn(pfn + i);
+> @@ -2199,7 +2199,7 @@ static int sev_gmem_post_populate(struct kvm *kvm, gfn_t gfn_start, kvm_pfn_t pf
 >  
-> -			ret = copy_from_user(vaddr, src + i * PAGE_SIZE, PAGE_SIZE);
-> -			if (ret)
-> +			if (copy_from_user(vaddr, src + i * PAGE_SIZE, PAGE_SIZE)) {
-> +				ret = -EFAULT;
->  				goto err;
-> +			}
->  			kunmap_local(vaddr);
->  		}
+>  	for (gfn = gfn_start, i = 0; gfn < gfn_start + npages; gfn++, i++) {
+>  		struct sev_data_snp_launch_update fw_args = {0};
+> -		bool assigned;
+> +		bool assigned = false;
+
+I would rather delete all the printks, or if people really like the printks, at
+least provide some helpers to dedup the code.  E.g. sev_gmem_prepare() has more
+or less the exact same behavior, but doesn't have the same flaw.
+
+>  		int level;
 >  
+>  		if (!kvm_mem_is_private(kvm, gfn)) {
 > -- 
 > 2.43.0
 > 
