@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-24183-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24184-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C3D6952190
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 19:54:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B77449521AB
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 19:58:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D08FF1C2146F
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:54:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E5B12848D1
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9580A1BD00F;
-	Wed, 14 Aug 2024 17:54:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3A41BD4F7;
+	Wed, 14 Aug 2024 17:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZTM1FSP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IN7nOMvW"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5608B1BC082
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 17:54:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18DE1BCA19
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 17:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723658042; cv=none; b=kngGvwd0kWTEY4iUR1RYPkFUTSazNwKyyEdQalz8Q9ANTALwi/wtk1WOAk8ZKnHyNDG2m+ySajxmNsHWv2CYYz+NERdlpqgosGL+xEZ5svVuYcpJUwv87KbUyoTQGOOogtxYlX0TQAFb7YpIK7Oez/d62JoF60B/MQqavqe9+qU=
+	t=1723658286; cv=none; b=rxnpgCliv1UX9iBK76rIt1dQ+5J81J1y22h/gl7Kq6/9FVkHsxvZMrV1ST8wOkWPzefIgEPS4+vTF7DNRQ2TOHnm+q3/Q0kMyTMa0JBynT+IjpkQMDiO/zPo4qYmrw6oawIuzeTTXfWn91F98RokylSZuluxteLdPlKJHvjpG2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723658042; c=relaxed/simple;
-	bh=K9ZcCXNR6AhP16LYTClrH523SOz36Om1uAG1kkWUekA=;
+	s=arc-20240116; t=1723658286; c=relaxed/simple;
+	bh=rUZCZSuAi1h96XDH07V4ivoXQ31utrr9lhxuwp8RHgY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rz7Th5Gj6p1Ffq/Yhp2aOxBn3vPlaoJK7SqF0LnhzH9tg13okxsAYho0+zhx+eoaYL/8VPOQwNpYsdbczHiZEm8Nuug5TVOOE4c0zCG6+3T63mJc9JFxc5o2SYKVJlH8i+Iziz7ccOlypYIwghyrk14CjH/0km5ODDKUlpu5bIg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BZTM1FSP; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=D5+gvWbW500K/Gja8uHqUNJ+F0jhd+V1bsna4KRsYraGaSoa831G7EuStIxnxIGdBtU7Mc/ZcaBf/VuvOgEiCmoUkrXtKecFkKKjZp/2YJzcj4CQJU7siZKV3w2s/W3ytQXvOTXtVPcxyaOP0880ilUxc/x7eqX8v2pcFe1lHqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IN7nOMvW; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723658040;
+	s=mimecast20190719; t=1723658283;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=aqW1pStkkqE8bSHAyK2eetUPj2vtzB+TVj0YShqKUw8=;
-	b=BZTM1FSPQVW5zw/8N/grYxcDGW/1Skdz+elwCDe9QAG9wu9ZI3GUHbDHxFaM40xTO2xOs9
-	AjLUFvIwy2uYzHNmdsYmQv1z38/PC7zHgTClT0vtmgsebzD0VgFgO/lgNf/oW3pFIFu+zi
-	TxAhP9Isvo89im5iVmdrFyEA7kkOczI=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=89Qpoy/8XSxEnmGVZvkO72frQAWI1Kmg3p1IknMu/FI=;
+	b=IN7nOMvWsnURcn/u7U5cheX/1hmLaef8SqJx5OAaxQ4NuLD3Mo6HEVRWaSQTAskhFoT3/J
+	y2sXQFuG6HRZcQ4kikYdoiKFbLs6PHRas0jkASxaUByughZoDC1dOq/jxYVXtIAf1IKnWU
+	iJ14qKSjk2ka9oBMjK9UPoVx+lG/ol4=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-644-Zc7D2JWVM12GRGjMT2vAaw-1; Wed, 14 Aug 2024 13:53:58 -0400
-X-MC-Unique: Zc7D2JWVM12GRGjMT2vAaw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-369bbbdb5a1so49363f8f.1
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 10:53:58 -0700 (PDT)
+ us-mta-383-gpsEPS0jMYSvJggmR6NmIg-1; Wed, 14 Aug 2024 13:58:02 -0400
+X-MC-Unique: gpsEPS0jMYSvJggmR6NmIg-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-42816aacabcso297355e9.1
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 10:58:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723658037; x=1724262837;
+        d=1e100.net; s=20230601; t=1723658280; x=1724263080;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=aqW1pStkkqE8bSHAyK2eetUPj2vtzB+TVj0YShqKUw8=;
-        b=bewb//BSTnKwSwvCaujAVFngr9FfkDkgsr70Yfa944/IDoqsDRa22QeWRFhsxWViNv
-         T3lydbtDjEy++ZvMEMC585vnHgOdvT/AepjouQnLN/eNAW9P3q3PJmB+kEEOaNWTp9re
-         FehhdF1lUbZoVWEvTsctXjGVGntKw5KQPvoLEBsgDFW84eA3akTQRen5PGebJ/FT78ID
-         7AUlfH1IZXiDkk3RMdakXK8XIiBQgITal5SSqW5wjnAQUMj7T8DY7xUZSFFlaRqLhOj4
-         3xHkZAncWb/XXXJ2+ToBenAYvpieOij8vKOrkmjo/mxzmvijPnNO/Xmt6fbz46Ir4rCY
-         3DNQ==
-X-Gm-Message-State: AOJu0YzjR7WDZsPo94kaA24sydoeZK0OVlSulWLxXm1fJvfzrv4thUdc
-	hQP1zNvHLWSpQkiJ5Cn0+2Ite2RaelTCOxfbeRE69itO8UD+q1DuHhWF27TBfMk8wFZGVizvGnL
-	FJUneY6dX2Qz9SBgKJT5zBCxzDB864pVmydLZsuf1z05Zhr6PNw==
-X-Received: by 2002:adf:e3cf:0:b0:366:e9fa:17b with SMTP id ffacd0b85a97d-37186b85f8dmr478963f8f.1.1723658037486;
-        Wed, 14 Aug 2024 10:53:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE0gtugkRTcQm7G8pkJF3tmkwxTEKg02g/XJX7ambB07oT/yEXqXmEM1X4Q43rWoTjJipEklw==
-X-Received: by 2002:adf:e3cf:0:b0:366:e9fa:17b with SMTP id ffacd0b85a97d-37186b85f8dmr478945f8f.1.1723658037010;
-        Wed, 14 Aug 2024 10:53:57 -0700 (PDT)
+        bh=89Qpoy/8XSxEnmGVZvkO72frQAWI1Kmg3p1IknMu/FI=;
+        b=E2rMqF8qFYWVKg9DcHHFd2gG6rnhk9wk6ZW1PJJWvAWFeNOnKhbhrXMQupZR0WP54+
+         02zFRjAHnlTxIWP0nKXvwKOryZOYuG5eTSZnFmxuQ0RIYqqpC21f7VnEvVN+AB6s/UED
+         LcW6yy5z0LMuCUodx4U7HYqulaiVRdhqRK8w82ld7L5vB6jSBKjJy1dMb1ejGAhwlNzA
+         DY4Y0/sOSclJAW7PAG7WfY4A00vrCRCVLjblVky90A8CJIj92Z+YW0YMEd2M7ZV3A9W5
+         Klxz7HBwGvDWmsPWoBU7y4cXd21gEPsbnw5J8ABA79j9AlREzyNPbCKEgPgCZOhynjj3
+         1J4g==
+X-Gm-Message-State: AOJu0YyowLzehMxKtn/gJRrm+aCamq61KjxC6AnMbSQdZSe7PCFJcQpT
+	VR+Z2m1IngJQ9Wq8aOp9XmOvhL6y+AyFkq9aMtrOSIGm9uKXX00CgOhY4P3f/Kzr/T7IsE86LOa
+	xH+AY1ufvqjt0HonoRGCeyJ/VJoBcJ1vMwOXohnFwHch173YTgA==
+X-Received: by 2002:a05:600c:1da6:b0:426:5471:156a with SMTP id 5b1f17b1804b1-429dd23b7b8mr28648715e9.13.1723658279776;
+        Wed, 14 Aug 2024 10:57:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGSCwDwNXwiqgNc8qTmHDkSdNy4unKmAQEh5uyse96W8/CeXQ9UmxrPFPRv7DJnqCF/7Y7tMQ==
+X-Received: by 2002:a05:600c:1da6:b0:426:5471:156a with SMTP id 5b1f17b1804b1-429dd23b7b8mr28648565e9.13.1723658279229;
+        Wed, 14 Aug 2024 10:57:59 -0700 (PDT)
 Received: from [192.168.10.47] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-36e4e51ea09sm13463097f8f.71.2024.08.14.10.53.54
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-429ded71ee3sm26570925e9.29.2024.08.14.10.57.58
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Aug 2024 10:53:56 -0700 (PDT)
-Message-ID: <aede9ea1-099a-47db-a133-28ad22206858@redhat.com>
-Date: Wed, 14 Aug 2024 19:53:53 +0200
+        Wed, 14 Aug 2024 10:57:58 -0700 (PDT)
+Message-ID: <5f8c0ca4-ae99-4d1c-8525-51c6f1096eaa@redhat.com>
+Date: Wed, 14 Aug 2024 19:57:57 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,15 +82,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 17/22] KVM: x86: Check EMULTYPE_WRITE_PF_TO_SP before
- unprotecting gfn
+Subject: Re: [PATCH 22/22] KVM: x86/mmu: Detect if unprotect will do anything
+ based on invalid_list
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Peter Gonda <pgonda@google.com>, Michael Roth <michael.roth@amd.com>,
  Vishal Annapurve <vannapurve@google.com>,
  Ackerly Tng <ackerleytng@google.com>
 References: <20240809190319.1710470-1-seanjc@google.com>
- <20240809190319.1710470-18-seanjc@google.com>
+ <20240809190319.1710470-23-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -128,24 +128,63 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240809190319.1710470-18-seanjc@google.com>
+In-Reply-To: <20240809190319.1710470-23-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 8/9/24 21:03, Sean Christopherson wrote:
-> +	 * Retry even if _this_ vCPU didn't unprotect the gfn, as it's possible
-> +	 * all SPTEs were already zapped by a different task.  The alternative
-> +	 * is to report the error to userspace and likely terminate the guest,
-> +	 * and the infinite loop detection logic will prevent retrying the page
-> +	 * fault indefinitely, i.e. there's nothing to lose by retrying.
+> Explicitly query the list of to-be-zapped shadow pages when checking to
+> see if unprotecting a gfn for retry has succeeded, i.e. if KVM should
+> retry the faulting instruction.
+> 
+> Add a comment to explain why the list needs to be checked before zapping,
+> which is the primary motivation for this change.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 11 +++++++----
+>   1 file changed, 7 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 300a47801685..50695eb2ee22 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -2731,12 +2731,15 @@ bool __kvm_mmu_unprotect_gfn_and_retry(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>   			goto out;
+>   	}
+>   
+> -	r = false;
+>   	write_lock(&kvm->mmu_lock);
+> -	for_each_gfn_valid_sp_with_gptes(kvm, sp, gpa_to_gfn(gpa)) {
+> -		r = true;
+> +	for_each_gfn_valid_sp_with_gptes(kvm, sp, gpa_to_gfn(gpa))
+>   		kvm_mmu_prepare_zap_page(kvm, sp, &invalid_list);
+> -	}
+> +
+> +	/*
+> +	 * Snapshot the result before zapping, as zapping will remove all list
+> +	 * entries, i.e. checking the list later would yield a false negative.
+> +	 */
 
-Putting myself in the shoes of someone unfamiliar with the code, I might 
-prefer "the last_retry_eip/last_retry_addr checks" to "the infinite loop 
-detection logic"; after all, you're saying in the same sentence that 
-it's preventing an infinite loop.
+Hmm, the comment is kinda overkill?  Maybe just
+
+	/* Return whether there were sptes to zap.  */
+	r = !list_empty(&invalid_test);
+
+I'm not sure about patch 21 - I like the simple kvm_mmu_unprotect_page() 
+function.  Maybe rename it to kvm_mmu_zap_gfn() and make it static in 
+the same patch?
+
+Either way, this small cleanup applies even if the function is not inlined.
 
 Thanks,
 
 Paolo
+> +	r = !list_empty(&invalid_list);
+>   	kvm_mmu_commit_zap_page(kvm, &invalid_list);
+>   	write_unlock(&kvm->mmu_lock);
+>   
 
 
