@@ -1,72 +1,72 @@
-Return-Path: <kvm+bounces-24107-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24108-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35937951603
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 10:03:05 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3C90951604
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 10:03:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD78E1F22DD6
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 08:03:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 801BE1F22DD6
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 08:03:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D8B413F01A;
-	Wed, 14 Aug 2024 08:02:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700D7140E23;
+	Wed, 14 Aug 2024 08:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KdMZ9jrX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GHk9qu2n"
 X-Original-To: kvm@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C369113D606
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 08:02:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45FF813DDBD
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 08:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723622560; cv=none; b=LJdeuLufljIvdPc4ayXTemXU+qlT7ELent+yFqlGKj/gTzTZnL8LeyqVDwTmhpkOY3JpWzqusNZ4P8Z0Ijj7xfA0QfT+Cu7Fym7U6/beneV51TuHx1vGtquizih57MXtz5nuEO3ebKYaJeKGdl7YYyKUFEoij1N9FG5LxzXeETM=
+	t=1723622561; cv=none; b=rMkyRKyZUZDKVQ+lU2tK43JvNlIvji5C3bxyD41p6FAKlKn0fgUHS0ya/JDZZwkUTr0YlH7fIBRaxoxPiOsonAOskgHxuMhQK6iHR+jAHVTvt1rR016Kl/LawWmY4Jcl/taKTEkjjMq8ETQIXlgN2GpMkNfqMdeHW/4AB8Hadhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723622560; c=relaxed/simple;
-	bh=X3na6+L70Cfx64EUlxwZzmPxVDrsGV+622+OsmsswRI=;
+	s=arc-20240116; t=1723622561; c=relaxed/simple;
+	bh=l9ibDxi4pjx2BEry03rv9wc5np14WZq/dpLp+/IOpk4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZwXt87a3y2+FYon6YkpbbHXFtpqDMInMvu4N1JjmjQkyAtFVmTAvvQBtu24m7qt28SUbdUb9yZBHVriP2IQWYZ/6t1tKNT9sjlXeevRKuSwqJxdnzJ8qdd8Z0Pq4gYkRGuBRtl9kNq0+Qj/PqGR2gUOOhmUjHQiqST6AkqfjtX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KdMZ9jrX; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=ieliIbwngif0479/rO+eH2DcxcEWwTB7JyPQnYwOX+ypsZXOnpuKL1GulZBHxwW64y6Ex32KU7VwBaikjutGJy84FlGv2cevt0zAkf3PRwIpzwqf9hW1z5zk8qgl1zq/gznX8aA8Vm5A/+SL3ROj4FsNN+iZpHkpctENtTVcyBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GHk9qu2n; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723622559; x=1755158559;
+  t=1723622561; x=1755158561;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=X3na6+L70Cfx64EUlxwZzmPxVDrsGV+622+OsmsswRI=;
-  b=KdMZ9jrXjAZ8jQ6xXhSI2g8acyE7hl1AXZX8sZbEyT4bvyj2DF+4vWOx
-   UicynWVgnYOOPKs7WvoL7Wjk8XBRjizenOjVddIgDBUhnka8bZDmi9oB6
-   6v8vAQyWMmJ6mOH7Sj+kD7k7LS/yIsotozjNODf7EK+AH6cuCrzVaYsVQ
-   CFnK8n9laD1dflhDMESQSt2mWs2pOrx56QwKkLNW110uqR7pGNUIs8nJU
-   kwVwAO7uS5fCYKlf8FgnugMxKb4bAd6RCUrWzA1X3v74Ur7Mu08eGlhV7
-   LQhsinEsL4r8R4hd6PCVJ8TKK1wj+uRjXbDuiTGhAF/s1UI1O7lwCO3qL
-   w==;
-X-CSE-ConnectionGUID: 8lR253FMQd+Q77ixnyq/Wg==
-X-CSE-MsgGUID: JQzIiad5QMezLGXCcHF+kQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="25584480"
+  bh=l9ibDxi4pjx2BEry03rv9wc5np14WZq/dpLp+/IOpk4=;
+  b=GHk9qu2n2Rshd+ymqXaHf5XECD6ASMUJj5MiQrArUrYanrjIVO1nskxv
+   duwKDm5ogDzQ5JJqgycjjaFuAyExRnhA1BKkOZBn0Q1pmcKBUAvqaVsGz
+   EVflQfORHFIm1Rzs4NEsos796khYEcPtw8AEuBymOfwLayts3xVl9LTYZ
+   8VP1R2n9NjOXGYX6bNzazFiDj6VfQYwEuUPWi5iYypg78yAAZ0eT1bG/M
+   rSvNDzZwk9AsxdAEJLg7i7TSGYKiRTPyPUihDpPwiW9izznTEDhVBBMXJ
+   mcV6bV61EcdpPXC94oWf8EcZhn0BNJpCngPu7mDYyd7etCo6K+/Q2fA5T
+   Q==;
+X-CSE-ConnectionGUID: 3v73tpX0QgmmfovHBY6zOQ==
+X-CSE-MsgGUID: +E6r+WDfS7+po20l7C+RoA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="25584483"
 X-IronPort-AV: E=Sophos;i="6.09,288,1716274800"; 
-   d="scan'208";a="25584480"
+   d="scan'208";a="25584483"
 Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 01:02:39 -0700
-X-CSE-ConnectionGUID: BUEn6TXQQ9G9BU38uK4/2g==
-X-CSE-MsgGUID: sSJofb4dTDqskubB5/BOIg==
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 01:02:41 -0700
+X-CSE-ConnectionGUID: w+NWm/qsQEObMRIL6k8yPQ==
+X-CSE-MsgGUID: SZlHgF/pR8av3GAvF8+zDA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.09,288,1716274800"; 
-   d="scan'208";a="59048952"
+   d="scan'208";a="59048955"
 Received: from lxy-clx-4s.sh.intel.com ([10.239.48.52])
-  by fmviesa010.fm.intel.com with ESMTP; 14 Aug 2024 01:02:37 -0700
+  by fmviesa010.fm.intel.com with ESMTP; 14 Aug 2024 01:02:38 -0700
 From: Xiaoyao Li <xiaoyao.li@intel.com>
 To: Paolo Bonzini <pbonzini@redhat.com>,
 	Marcelo Tosatti <mtosatti@redhat.com>
 Cc: qemu-devel@nongnu.org,
 	kvm@vger.kernel.org,
 	xiaoyao.li@intel.com
-Subject: [PATCH 4/9] i386/cpu: Construct valid CPUID leaf 5 iff CPUID_EXT_MONITOR
-Date: Wed, 14 Aug 2024 03:54:26 -0400
-Message-Id: <20240814075431.339209-5-xiaoyao.li@intel.com>
+Subject: [PATCH 5/9] i386/cpu: Construct CPUID 2 as stateful iff times > 1
+Date: Wed, 14 Aug 2024 03:54:27 -0400
+Message-Id: <20240814075431.339209-6-xiaoyao.li@intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240814075431.339209-1-xiaoyao.li@intel.com>
 References: <20240814075431.339209-1-xiaoyao.li@intel.com>
@@ -78,37 +78,32 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When CPUID_EXT_MONITOR is not set, it means no support of MONITOR/MWAIT
-leaf, i.e., CPUID leaf 5.
+When times == 1, the CPUID leaf 2 is not stateful.
 
 Signed-off-by: Xiaoyao Li <xiaoyao.li@intel.com>
 ---
- target/i386/cpu.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ target/i386/kvm/kvm.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/target/i386/cpu.c b/target/i386/cpu.c
-index 03376ccf3e75..5bee84333089 100644
---- a/target/i386/cpu.c
-+++ b/target/i386/cpu.c
-@@ -6553,10 +6553,14 @@ void cpu_x86_cpuid(CPUX86State *env, uint32_t index, uint32_t count,
-         break;
-     case 5:
-         /* MONITOR/MWAIT Leaf */
--        *eax = cpu->mwait.eax; /* Smallest monitor-line size in bytes */
--        *ebx = cpu->mwait.ebx; /* Largest monitor-line size in bytes */
--        *ecx = cpu->mwait.ecx; /* flags */
--        *edx = cpu->mwait.edx; /* mwait substates */
-+        if (env->features[FEAT_1_ECX] & CPUID_EXT_MONITOR) {
-+            *eax = cpu->mwait.eax; /* Smallest monitor-line size in bytes */
-+            *ebx = cpu->mwait.ebx; /* Largest monitor-line size in bytes */
-+            *ecx = cpu->mwait.ecx; /* flags */
-+            *edx = cpu->mwait.edx; /* mwait substates */
-+        } else {
-+            *eax = *ebx = *ecx = *edx = 0;
-+        }
-         break;
-     case 6:
-         /* Thermal and Power Leaf */
+diff --git a/target/i386/kvm/kvm.c b/target/i386/kvm/kvm.c
+index c168ff5691df..6618259f265c 100644
+--- a/target/i386/kvm/kvm.c
++++ b/target/i386/kvm/kvm.c
+@@ -1818,10 +1818,12 @@ static uint32_t kvm_x86_build_cpuid(CPUX86State *env,
+             int times;
+ 
+             c->function = i;
+-            c->flags = KVM_CPUID_FLAG_STATEFUL_FUNC |
+-                       KVM_CPUID_FLAG_STATE_READ_NEXT;
+             cpu_x86_cpuid(env, i, 0, &c->eax, &c->ebx, &c->ecx, &c->edx);
+             times = c->eax & 0xff;
++            if (times > 1) {
++                c->flags = KVM_CPUID_FLAG_STATEFUL_FUNC |
++                           KVM_CPUID_FLAG_STATE_READ_NEXT;
++            }
+ 
+             for (j = 1; j < times; ++j) {
+                 if (cpuid_i == KVM_MAX_CPUID_ENTRIES) {
 -- 
 2.34.1
 
