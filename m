@@ -1,293 +1,496 @@
-Return-Path: <kvm+bounces-24090-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24091-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46C609512BE
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 04:58:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AC7F9512E6
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 05:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C784B2166C
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 02:58:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CC81B244E1
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 03:09:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD4332C85;
-	Wed, 14 Aug 2024 02:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B41337171;
+	Wed, 14 Aug 2024 03:08:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zYhhB9Vj"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nH2tlkdb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6683D18E3F
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 02:58:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847381CAA2;
+	Wed, 14 Aug 2024 03:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723604300; cv=none; b=IfO0w/YjbcsYTXYGTm4LaxwDQ0lipMHCGb7UD+f6fDli14YFwwY3PtT9s3fkWkuXhtisPxy+DMW7ZCQ4krkKAQxXd8hmsW3rJZq7yp6N4PCSJxJ1pqucHdVDOYPSMh5xgdg5S6r33t3HsnFcJvaxI7LELr97e4BN5qk8nQZHKFI=
+	t=1723604936; cv=none; b=GdXJo2H864H0C7kcCUCNbS759Yb8txDaJPEY8kaj5IKkQ9G+qAv5YYGzzQQyLEdoDS6iUvMUOGRqngz0Y+Dx4QYJrXgdJa/rkaWOEHPEqd5pvQFeFfyV+bjI3favYiPhNWkua0+RH/V96Htxgjp4TXlt4GIEGQImuDWnmnn+aFs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723604300; c=relaxed/simple;
-	bh=Es5KsrEC1BxHcts1C6mDXT8TpgRA/q5oXkaroAxBcPY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=mLZ36GtYgVetIFufSFRRwYFAz0CyUW4B+qO+GHmt6ABjEaE+ep6EfGaL92DEt0gQnEgvJxDZdPxBZ/aJ+SbkGzxhzfz+x9bQ1D4X5CzlszLAXnJpK1wDGB7Tb5/TTk2LMRLWdMR/wMjawWuK1WeaVv7jHTNRELmyKtvZMcQB8J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zYhhB9Vj; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cb68c23a00so414453a91.0
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 19:58:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723604298; x=1724209098; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/TbiCqhnCvnsz9ogWMe2mKYUfm6ld6l7PiIeVapd+tc=;
-        b=zYhhB9Vj27jeTFmc+wnOYR7AWhWHDZk5KkadNavhZjbMgqMaje8cqIiBoKt4x5qLv1
-         geT0v2W94kvjpFHg830NPU/yOsd6YqfVLcFSeNpQa2K3Z71rPI8ssKT9xzMTFrL2K7wb
-         lHPmBy72exROmEnJtmPND5HkFZyjrws+ID7ZUq8T3ArdA3CGdeRmmJsJmSAC5SduOJF6
-         +zpCjE6a2KN44WBdUYFC4S0WpevuhpTVTYaQTWnZKY5DQWjPlYpKQCEfCURSeaXiYKbI
-         ezb9YeTTFsS9dSgnuY9JKeX4rpBfRzdEkuv3MSryssqg3oIVdJzXeIx/5ZpCPZqCbrvv
-         3HcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723604298; x=1724209098;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/TbiCqhnCvnsz9ogWMe2mKYUfm6ld6l7PiIeVapd+tc=;
-        b=XWeYHGGUNulAY2SKp8LcnMR2QiL9N2AhoyBm1nPj/3P42g4FXEnjOUChOKHj9JLuGs
-         HFIAnOBqnwnUwSQv7TdEUAPgvbAli9nwm8OmmsWDk8PyPl764PYPi4IPLqP+hMSznHZv
-         6mIIO18OfW55Wt9mn+d2RN7zkpehxCPEeGoFoajKGIoL+IMmDMDDPv02Q0m+5AN0RhLo
-         AXJdTcz7HKXj5MVCtKSlAoiAkAjIwz4qWGntiAtpUqxClD+eVq6XCCtw2CZ9u55PmANx
-         A/1OviCu0hxny/aTaKJNRYgCdy03b3SDk7nZMc2Sk61RZKQ+32v+w9A/OVRjnILMZN61
-         Pq/Q==
-X-Gm-Message-State: AOJu0Yxx4LODzgJV8RejE0JHgbjj1jtZz/pkJLmPftXujcgAwzxwV/sW
-	rJya0gjZYq6cHwcdoFd1R4D6IxyyKO+67rW2PMR0oejUg3+v1/m6a4Rlxc+LlZBc3WN8vEdS3ZW
-	Bjg==
-X-Google-Smtp-Source: AGHT+IGAHPSVk4Du2ortUE2qCh4n0/+jkWQcVqkje8HZoyPJTj2YYbKInTjuo66+vNywSakhJZPTGE8bey4=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:a613:b0:2d3:96b5:4940 with SMTP id
- 98e67ed59e1d1-2d3a9c67b9dmr7183a91.0.1723604297438; Tue, 13 Aug 2024 19:58:17
- -0700 (PDT)
-Date: Tue, 13 Aug 2024 19:58:16 -0700
-In-Reply-To: <20240522001817.619072-10-dwmw2@infradead.org>
+	s=arc-20240116; t=1723604936; c=relaxed/simple;
+	bh=Qk7mEvYHo85REyjzvBa8f+wXCzKEXfe3EEwF4d9zNyk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o07YEPnmBprm4/Pe8ftYXNPqes+2tTFaEnMh0jii5yGpHDk5BjCgaw6Wt+N3nG+nPz7pTJGunRw+KbYgN/7DGU7SMuh5QVY9wXfLXLZJXnUL+ks8TtNEnLkO2affg7vIPLwtXJqJ8wZoAW+N2Heu/JL7Ymdl0JBrQkn89pA0fTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nH2tlkdb; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723604934; x=1755140934;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Qk7mEvYHo85REyjzvBa8f+wXCzKEXfe3EEwF4d9zNyk=;
+  b=nH2tlkdbWU6IsdAnyfzaDwm/8gBXS/D2g4h3575b4WN07orB6LrShAx0
+   r0Eg3Ih6R9q6pIkoLOsWj1wFdNw4xP1ck6A+acjwTNeQNK0mw3edQnSGz
+   6Q0D1iy0CGx09GGYEeeEKIxLYqe+/lrgDkInmH/UgJHcTpkMks2S60pWE
+   Ms17ou0T45BjVibEjEnOatybTJ08yvnrJtTOcaplDFQ/mC5ba3mC+MqpJ
+   r36SnlJEEBQSDKtOTlEkLW8sI0caB38QsW8eUNOe7Zs2722SkPTpX8yNn
+   +gYJn7hbthwTseu0HRgNuRzwFh5BMh3YrmlQqpGbXcc4YpAYoQX+9Cfe3
+   A==;
+X-CSE-ConnectionGUID: 7rgvmNbYSkm4LJQ3IJUP2A==
+X-CSE-MsgGUID: LLz6LZ1TTmmv27G6ElDvNg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="21943683"
+X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
+   d="scan'208";a="21943683"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 20:08:53 -0700
+X-CSE-ConnectionGUID: H4BHdK13TEmW3KXH/AIZ3A==
+X-CSE-MsgGUID: 4a2z6lQsTI+6gNAInmCnBQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
+   d="scan'208";a="63268792"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by fmviesa005.fm.intel.com with ESMTP; 13 Aug 2024 20:08:50 -0700
+Date: Wed, 14 Aug 2024 11:08:49 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
+To: Rick Edgecombe <rick.p.edgecombe@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
+	kai.huang@intel.com, isaku.yamahata@gmail.com,
+	tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
+	linux-kernel@vger.kernel.org,
+	Isaku Yamahata <isaku.yamahata@intel.com>,
+	Sean Christopherson <sean.j.christopherson@intel.com>,
+	Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH 13/25] KVM: TDX: create/destroy VM structure
+Message-ID: <20240814030849.7yqx3db4oojsoh5k@yy-desk-7060>
+References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
+ <20240812224820.34826-14-rick.p.edgecombe@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240522001817.619072-1-dwmw2@infradead.org> <20240522001817.619072-10-dwmw2@infradead.org>
-Message-ID: <ZrwdSLvlhde6uaAB@google.com>
-Subject: Re: [RFC PATCH v3 09/21] KVM: x86: Fix KVM clock precision in __get_kvmclock()
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jalliste@amazon.co.uk, sveith@amazon.de, zide.chen@intel.com, 
-	Dongli Zhang <dongli.zhang@oracle.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812224820.34826-14-rick.p.edgecombe@intel.com>
+User-Agent: NeoMutt/20171215
 
-On Wed, May 22, 2024, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> When in 'master clock mode' (i.e. when host and guest TSCs are behaving
-> sanely and in sync), the KVM clock is defined in terms of the guest TSC.
-> 
-> When TSC scaling is used, calculating the KVM clock directly from *host*
-> TSC cycles leads to a systemic drift from the values calculated by the
-> guest from its TSC.
-> 
-> Commit 451a707813ae ("KVM: x86/xen: improve accuracy of Xen timers")
-> had a simple workaround for the specific case of Xen timers, as it had an
-> actual vCPU to hand and could use its scaling information. That commit
-> noted that it was broken for the general case of get_kvmclock_ns(), and
-> said "I'll come back to that".
-> 
-> Since __get_kvmclock() is invoked without a specific CPU, it needs to
-> be able to find or generate the scaling values required to perform the
-> correct calculation.
-> 
-> Thankfully, TSC scaling can only happen with X86_FEATURE_CONSTANT_TSC,
-> so it isn't as complex as it might have been.
-> 
-> In __kvm_synchronize_tsc(), note the current vCPU's scaling ratio in
-> kvm->arch.last_tsc_scaling_ratio. That is only protected by the
-> tsc_write_lock, so in pvclock_update_vm_gtod_copy(), copy it into a
-> separate kvm->arch.master_tsc_scaling_ratio so that it can be accessed
-> using the kvm->arch.pvclock_sc seqcount lock. Also generate the mul and
-> shift factors to convert to nanoseconds for the corresponding KVM clock,
-> just as kvm_guest_time_update() would.
-> 
-> In __get_kvmclock(), which runs within a seqcount retry loop, use those
-> values to convert host to guest TSC and then to nanoseconds. Only fall
-> back to using get_kvmclock_base_ns() when not in master clock mode.
-> 
-> There was previously a code path in __get_kvmclock() which looked like
-> it could set KVM_CLOCK_TSC_STABLE without KVM_CLOCK_REALTIME, perhaps
-> even on 32-bit hosts. In practice that could never happen as the
-> ka->use_master_clock flag couldn't be set on 32-bit, and even on 64-bit
-> hosts it would never be set when the system clock isn't TSC-based. So
-> that code path is now removed.
-
-This should be a separate patch.  Actually, patches, plural.  More below
-
-> The kvm_get_wall_clock_epoch() function had the same problem; make it
-> just call get_kvmclock() and subtract kvmclock from wallclock, with
-> the same fallback as before.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+On Mon, Aug 12, 2024 at 03:48:08PM -0700, Rick Edgecombe wrote:
+> From: Isaku Yamahata <isaku.yamahata@intel.com>
+>
+> Implement managing the TDX private KeyID to implement, create, destroy
+> and free for a TDX guest.
+>
+> When creating at TDX guest, assign a TDX private KeyID for the TDX guest
+> for memory encryption, and allocate pages for the guest. These are used
+> for the Trust Domain Root (TDR) and Trust Domain Control Structure (TDCS).
+>
+> On destruction, free the allocated pages, and the KeyID.
+>
+> Before tearing down the private page tables, TDX requires the guest TD to
+> be destroyed by reclaiming the KeyID. Do it at vm_destroy() kvm_x86_ops
+> hook.
+>
+> Add a call for vm_free() at the end of kvm_arch_destroy_vm() because the
+> per-VM TDR needs to be freed after the KeyID.
+>
+> Signed-off-by: Isaku Yamahata <isaku.yamahata@intel.com>
+> Co-developed-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+> Co-developed-by: Kai Huang <kai.huang@intel.com>
+> Signed-off-by: Kai Huang <kai.huang@intel.com>
+> Co-developed-by: Yan Zhao <yan.y.zhao@intel.com>
+> Signed-off-by: Yan Zhao <yan.y.zhao@intel.com>
+> Co-developed-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
 > ---
-
 ...
-
-> @@ -3100,36 +3131,49 @@ static unsigned long get_cpu_tsc_khz(void)
->  static void __get_kvmclock(struct kvm *kvm, struct kvm_clock_data *data)
->  {
->  	struct kvm_arch *ka = &kvm->arch;
-> -	struct pvclock_vcpu_time_info hv_clock;
+> +void tdx_mmu_release_hkid(struct kvm *kvm)
+> +{
+> +	bool packages_allocated, targets_allocated;
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	cpumask_var_t packages, targets;
+> +	u64 err;
+> +	int i;
 > +
-> +#ifdef CONFIG_X86_64
-> +	uint64_t cur_tsc_khz = 0;
-> +	struct timespec64 ts;
->  
->  	/* both __this_cpu_read() and rdtsc() should be on the same cpu */
->  	get_cpu();
->  
-> -	data->flags = 0;
->  	if (ka->use_master_clock &&
-> -	    (static_cpu_has(X86_FEATURE_CONSTANT_TSC) || __this_cpu_read(cpu_tsc_khz))) {
-> -#ifdef CONFIG_X86_64
-> -		struct timespec64 ts;
-> +	    (cur_tsc_khz = get_cpu_tsc_khz()) &&
-
-That is mean.  And if you push it inside the if-statement, the {get,put}_cpu()
-can be avoided when the master clock isn't being used, e.g.
-
-	if (ka->use_master_clock) {
-		/*
-		 * The RDTSC needs to happen on the same CPU whose frequency is
-		 * used to compute kvmclock's time.
-		 */
-		get_cpu();
-    
-    		cur_tsc_khz = get_cpu_tsc_khz();
-		if (cur_tsc_khz &&
-	    	    !kvm_get_walltime_and_clockread(&ts, &data->host_tsc))
-			cur_tsc_khz = 0;
-
-		put_cpu();
-	}
-
-However, the changelog essentially claims kvm_get_walltime_and_clockread() should
-never fail when use_master_clock is enabled, which suggests a WARN is warranted.
-
-    There was previously a code path in __get_kvmclock() which looked like
-    it could set KVM_CLOCK_TSC_STABLE without KVM_CLOCK_REALTIME, perhaps
-    even on 32-bit hosts. In practice that could never happen as the
-    ka->use_master_clock flag couldn't be set on 32-bit, and even on 64-bit
-    hosts it would never be set when the system clock isn't TSC-based. So
-    that code path is now removed.
-
-But, I think kvm_get_walltime_and_clockread() can fail when use_master_clock is
-true, i.e. I don't think a WARN is viable as it could get false positives.
-
-Ah, this is protected by pvclock_sc, so a stale use_master_clock should result
-in a retry.  What if we WARN on that?
-
-Hrm, that requires plumbing in the original sequence count.  Ah, but looking at
-the patch as a whole, if we keep kvm_get_wall_clock_epoch()'s style, then it's
-much easier.  And FWIW, I like the existing kvm_get_wall_clock_epoch() style a
-lot more than the get_kvmclock() => __get_kvmclock() approach.
-
-So, can we do this as prep patch #1?
-
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index 9c14d0f5a684..98806a59e110 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -3360,9 +3360,16 @@ uint64_t kvm_get_wall_clock_epoch(struct kvm *kvm)
- 
-                local_tsc_khz = get_cpu_tsc_khz();
- 
-+               /*
-+                * The master clock depends on the pvclock being based on TSC,
-+                * so the only way kvm_get_walltime_and_clockread() can fail is
-+                * if the clocksource changed and use_master_clock is stale, in
-+                * which case a seqcount retry should be pending.
-+                */
-                if (local_tsc_khz &&
--                   !kvm_get_walltime_and_clockread(&ts, &host_tsc))
--                       local_tsc_khz = 0; /* Fall back to old method */
-+                   !kvm_get_walltime_and_clockread(&ts, &host_tsc) &&
-+                   WARN_ON_ONCE(!read_seqcount_retry(&ka->pvclock_sc, seq)))
-+                           local_tsc_khz = 0; /* Fall back to old method */
- 
-                put_cpu();
- 
-
-And then as patch(es) 2..7 (give or take)
-
-  (2) fold __get_kvmclock() into get_kvmclock()
-  (3) and the same WARN on the seqcount in get_kvmclock() (but skimp on the comments)
-  (4) use get_kvmclock_base_ns() as the fallback in get_kvmclock(), i.e. delete
-      the raw rdtsc() and setting of KVM_CLOCK_TSC_STABLE w/o KVM_CLOCK_REALTIME
-  (5) use get_cpu_tsc_khz() instead of open coding something similar
-  (6) scale TSC when computing kvmclock (the core of this patch)
-  (7) use get_kvmclock() in kvm_get_wall_clock_epoch() as the will be 100%
-      equivalent at this point.
-
-> +	    !kvm_get_walltime_and_clockread(&ts, &data->host_tsc))
-> +		cur_tsc_khz = 0;
->  
-> -		if (kvm_get_walltime_and_clockread(&ts, &data->host_tsc)) {
-> -			data->realtime = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
-> -			data->flags |= KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC;
-> -		} else
-> -#endif
-> -		data->host_tsc = rdtsc();
-> -
-> -		data->flags |= KVM_CLOCK_TSC_STABLE;
-> -		hv_clock.tsc_timestamp = ka->master_cycle_now;
-> -		hv_clock.system_time = ka->master_kernel_ns + ka->kvmclock_offset;
-> -		kvm_get_time_scale(NSEC_PER_SEC, get_cpu_tsc_khz() * 1000LL,
-> -				   &hv_clock.tsc_shift,
-> -				   &hv_clock.tsc_to_system_mul);
-> -		data->clock = __pvclock_read_cycles(&hv_clock, data->host_tsc);
-> -	} else {
-> -		data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> +	put_cpu();
-> +
-> +	if (cur_tsc_khz) {
-> +		uint64_t tsc_cycles;
-> +		uint32_t mul;
-> +		int8_t shift;
-> +
-> +		tsc_cycles = data->host_tsc - ka->master_cycle_now;
-> +
-> +		if (kvm_caps.has_tsc_control)
-> +			tsc_cycles = kvm_scale_tsc(tsc_cycles,
-> +						   ka->master_tsc_scaling_ratio);
-> +
-> +		if (static_cpu_has(X86_FEATURE_CONSTANT_TSC)) {
-> +			mul = ka->master_tsc_mul;
-> +			shift = ka->master_tsc_shift;
-> +		} else {
-> +			kvm_get_time_scale(NSEC_PER_SEC, cur_tsc_khz * 1000LL,
-> +					   &shift, &mul);
-> +		}
-> +		data->clock = ka->master_kernel_ns + ka->kvmclock_offset +
-> +			pvclock_scale_delta(tsc_cycles, mul, shift);
-> +		data->realtime = ts.tv_nsec + NSEC_PER_SEC * ts.tv_sec;
-> +		data->flags = KVM_CLOCK_REALTIME | KVM_CLOCK_HOST_TSC | KVM_CLOCK_TSC_STABLE;
+> +	if (!is_hkid_assigned(kvm_tdx))
 > +		return;
->  	}
-> +#endif
->  
-> -	put_cpu();
-> +	data->clock = get_kvmclock_base_ns() + ka->kvmclock_offset;
-> +	data->flags = 0;
->  }
+> +
+> +	/* KeyID has been allocated but guest is not yet configured */
+> +	if (!is_td_created(kvm_tdx)) {
+> +		tdx_hkid_free(kvm_tdx);
+> +		return;
+> +	}
+> +
+> +	packages_allocated = zalloc_cpumask_var(&packages, GFP_KERNEL);
+> +	targets_allocated = zalloc_cpumask_var(&targets, GFP_KERNEL);
+> +	cpus_read_lock();
+> +
+> +	/*
+> +	 * TDH.PHYMEM.CACHE.WB tries to acquire the TDX module global lock
+> +	 * and can fail with TDX_OPERAND_BUSY when it fails to get the lock.
+> +	 * Multiple TDX guests can be destroyed simultaneously. Take the
+> +	 * mutex to prevent it from getting error.
+> +	 */
+> +	mutex_lock(&tdx_lock);
+> +
+> +	/*
+> +	 * We need three SEAMCALLs, TDH.MNG.VPFLUSHDONE(), TDH.PHYMEM.CACHE.WB(),
+> +	 * and TDH.MNG.KEY.FREEID() to free the HKID. When the HKID is assigned,
+> +	 * we need to use TDH.MEM.SEPT.REMOVE() or TDH.MEM.PAGE.REMOVE(). When
+> +	 * the HKID is free, we need to use TDH.PHYMEM.PAGE.RECLAIM().  Get lock
+> +	 * to not present transient state of HKID.
+> +	 */
+> +	write_lock(&kvm->mmu_lock);
+> +
+> +	for_each_online_cpu(i) {
+> +		if (packages_allocated &&
+> +		    cpumask_test_and_set_cpu(topology_physical_package_id(i),
+> +					     packages))
+> +			continue;
+> +		if (targets_allocated)
+> +			cpumask_set_cpu(i, targets);
+> +	}
+> +	if (targets_allocated)
+> +		on_each_cpu_mask(targets, smp_func_do_phymem_cache_wb, NULL, true);
+> +	else
+> +		on_each_cpu(smp_func_do_phymem_cache_wb, NULL, true);
+> +	/*
+> +	 * In the case of error in smp_func_do_phymem_cache_wb(), the following
+> +	 * tdh_mng_key_freeid() will fail.
+> +	 */
+> +	err = tdh_mng_key_freeid(kvm_tdx);
+> +	if (KVM_BUG_ON(err, kvm)) {
+> +		pr_tdx_error(TDH_MNG_KEY_FREEID, err);
+> +		pr_err("tdh_mng_key_freeid() failed. HKID %d is leaked.\n",
+> +		       kvm_tdx->hkid);
+> +	} else {
+> +		tdx_hkid_free(kvm_tdx);
+> +	}
+> +
+> +	write_unlock(&kvm->mmu_lock);
+> +	mutex_unlock(&tdx_lock);
+> +	cpus_read_unlock();
+> +	free_cpumask_var(targets);
+> +	free_cpumask_var(packages);
+> +}
+> +
+> +static inline u8 tdx_sysinfo_nr_tdcs_pages(void)
+> +{
+> +	return tdx_sysinfo->td_ctrl.tdcs_base_size / PAGE_SIZE;
+> +}
+> +
+> +void tdx_vm_free(struct kvm *kvm)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	u64 err;
+> +	int i;
+> +
+> +	/*
+> +	 * tdx_mmu_release_hkid() failed to reclaim HKID.  Something went wrong
+> +	 * heavily with TDX module.  Give up freeing TD pages.  As the function
+> +	 * already warned, don't warn it again.
+> +	 */
+> +	if (is_hkid_assigned(kvm_tdx))
+> +		return;
+> +
+> +	if (kvm_tdx->tdcs_pa) {
+> +		for (i = 0; i < tdx_sysinfo_nr_tdcs_pages(); i++) {
+> +			if (!kvm_tdx->tdcs_pa[i])
+> +				continue;
+> +
+> +			tdx_reclaim_control_page(kvm_tdx->tdcs_pa[i]);
+> +		}
+> +		kfree(kvm_tdx->tdcs_pa);
+> +		kvm_tdx->tdcs_pa = NULL;
+> +	}
+> +
+> +	if (!kvm_tdx->tdr_pa)
+> +		return;
+> +
+> +	if (__tdx_reclaim_page(kvm_tdx->tdr_pa))
+> +		return;
+> +
+> +	/*
+> +	 * Use a SEAMCALL to ask the TDX module to flush the cache based on the
+> +	 * KeyID. TDX module may access TDR while operating on TD (Especially
+> +	 * when it is reclaiming TDCS).
+> +	 */
+> +	err = tdh_phymem_page_wbinvd(set_hkid_to_hpa(kvm_tdx->tdr_pa,
+> +						     tdx_global_keyid));
+> +	if (KVM_BUG_ON(err, kvm)) {
+> +		pr_tdx_error(TDH_PHYMEM_PAGE_WBINVD, err);
+> +		return;
+> +	}
+> +	tdx_clear_page(kvm_tdx->tdr_pa);
+> +
+> +	free_page((unsigned long)__va(kvm_tdx->tdr_pa));
+> +	kvm_tdx->tdr_pa = 0;
+> +}
+> +
+...
+> +static int __tdx_td_init(struct kvm *kvm)
+> +{
+> +	struct kvm_tdx *kvm_tdx = to_kvm_tdx(kvm);
+> +	cpumask_var_t packages;
+> +	unsigned long *tdcs_pa = NULL;
+> +	unsigned long tdr_pa = 0;
+> +	unsigned long va;
+> +	int ret, i;
+> +	u64 err;
+> +
+> +	ret = tdx_guest_keyid_alloc();
+> +	if (ret < 0)
+> +		return ret;
+> +	kvm_tdx->hkid = ret;
+> +
+> +	va = __get_free_page(GFP_KERNEL_ACCOUNT);
+> +	if (!va)
+> +		goto free_hkid;
+> +	tdr_pa = __pa(va);
+> +
+> +	tdcs_pa = kcalloc(tdx_sysinfo_nr_tdcs_pages(), sizeof(*kvm_tdx->tdcs_pa),
+> +			  GFP_KERNEL_ACCOUNT | __GFP_ZERO);
+> +	if (!tdcs_pa)
+> +		goto free_tdr;
+> +
+> +	for (i = 0; i < tdx_sysinfo_nr_tdcs_pages(); i++) {
+> +		va = __get_free_page(GFP_KERNEL_ACCOUNT);
+> +		if (!va)
+> +			goto free_tdcs;
+> +		tdcs_pa[i] = __pa(va);
+> +	}
+> +
+> +	if (!zalloc_cpumask_var(&packages, GFP_KERNEL)) {
+> +		ret = -ENOMEM;
+> +		goto free_tdcs;
+> +	}
+> +
+> +	cpus_read_lock();
+> +
+> +	/*
+> +	 * Need at least one CPU of the package to be online in order to
+> +	 * program all packages for host key id.  Check it.
+> +	 */
+> +	for_each_present_cpu(i)
+> +		cpumask_set_cpu(topology_physical_package_id(i), packages);
+> +	for_each_online_cpu(i)
+> +		cpumask_clear_cpu(topology_physical_package_id(i), packages);
+> +	if (!cpumask_empty(packages)) {
+> +		ret = -EIO;
+> +		/*
+> +		 * Because it's hard for human operator to figure out the
+> +		 * reason, warn it.
+> +		 */
+> +#define MSG_ALLPKG	"All packages need to have online CPU to create TD. Online CPU and retry.\n"
+> +		pr_warn_ratelimited(MSG_ALLPKG);
+> +		goto free_packages;
+> +	}
+> +
+> +	/*
+> +	 * TDH.MNG.CREATE tries to grab the global TDX module and fails
+> +	 * with TDX_OPERAND_BUSY when it fails to grab.  Take the global
+> +	 * lock to prevent it from failure.
+> +	 */
+> +	mutex_lock(&tdx_lock);
+> +	kvm_tdx->tdr_pa = tdr_pa;
+> +	err = tdh_mng_create(kvm_tdx, kvm_tdx->hkid);
+> +	mutex_unlock(&tdx_lock);
+> +
+> +	if (err == TDX_RND_NO_ENTROPY) {
+> +		kvm_tdx->tdr_pa = 0;
 
+code path after 'free_packages' set it to 0, so this can be removed.
+
+> +		ret = -EAGAIN;
+> +		goto free_packages;
+> +	}
+> +
+> +	if (WARN_ON_ONCE(err)) {
+> +		kvm_tdx->tdr_pa = 0;
+
+Ditto.
+
+> +		pr_tdx_error(TDH_MNG_CREATE, err);
+> +		ret = -EIO;
+> +		goto free_packages;
+> +	}
+> +
+> +	for_each_online_cpu(i) {
+> +		int pkg = topology_physical_package_id(i);
+> +
+> +		if (cpumask_test_and_set_cpu(pkg, packages))
+> +			continue;
+> +
+> +		/*
+> +		 * Program the memory controller in the package with an
+> +		 * encryption key associated to a TDX private host key id
+> +		 * assigned to this TDR.  Concurrent operations on same memory
+> +		 * controller results in TDX_OPERAND_BUSY. No locking needed
+> +		 * beyond the cpus_read_lock() above as it serializes against
+> +		 * hotplug and the first online CPU of the package is always
+> +		 * used. We never have two CPUs in the same socket trying to
+> +		 * program the key.
+> +		 */
+> +		ret = smp_call_on_cpu(i, tdx_do_tdh_mng_key_config,
+> +				      kvm_tdx, true);
+> +		if (ret)
+> +			break;
+> +	}
+> +	cpus_read_unlock();
+> +	free_cpumask_var(packages);
+> +	if (ret) {
+> +		i = 0;
+> +		goto teardown;
+> +	}
+> +
+> +	kvm_tdx->tdcs_pa = tdcs_pa;
+> +	for (i = 0; i < tdx_sysinfo_nr_tdcs_pages(); i++) {
+> +		err = tdh_mng_addcx(kvm_tdx, tdcs_pa[i]);
+> +		if (err == TDX_RND_NO_ENTROPY) {
+> +			/* Here it's hard to allow userspace to retry. */
+> +			ret = -EBUSY;
+> +			goto teardown;
+> +		}
+> +		if (WARN_ON_ONCE(err)) {
+> +			pr_tdx_error(TDH_MNG_ADDCX, err);
+> +			ret = -EIO;
+> +			goto teardown;
+
+This and above 'goto teardown' under same for() free the
+partially added TDCX pages w/o take ownership back, may
+'goto teardown_reclaim' (or any better name) below can
+handle this, see next comment for this patch.
+
+> +		}
+> +	}
+> +
+> +	/*
+> +	 * Note, TDH_MNG_INIT cannot be invoked here.  TDH_MNG_INIT requires a dedicated
+> +	 * ioctl() to define the configure CPUID values for the TD.
+> +	 */
+> +	return 0;
+> +
+> +	/*
+> +	 * The sequence for freeing resources from a partially initialized TD
+> +	 * varies based on where in the initialization flow failure occurred.
+> +	 * Simply use the full teardown and destroy, which naturally play nice
+> +	 * with partial initialization.
+> +	 */
+> +teardown:
+> +	for (; i < tdx_sysinfo_nr_tdcs_pages(); i++) {
+> +		if (tdcs_pa[i]) {
+> +			free_page((unsigned long)__va(tdcs_pa[i]));
+> +			tdcs_pa[i] = 0;
+> +		}
+> +	}
+> +	if (!kvm_tdx->tdcs_pa)
+> +		kfree(tdcs_pa);
+
+Add 'teardown_reclaim:' Here, pair with my last comment.
+
+> +	tdx_mmu_release_hkid(kvm);
+> +	tdx_vm_free(kvm);
+> +
+> +	return ret;
+> +
+> +free_packages:
+> +	cpus_read_unlock();
+> +	free_cpumask_var(packages);
+> +
+> +free_tdcs:
+> +	for (i = 0; i < tdx_sysinfo_nr_tdcs_pages(); i++) {
+> +		if (tdcs_pa[i])
+> +			free_page((unsigned long)__va(tdcs_pa[i]));
+> +	}
+> +	kfree(tdcs_pa);
+> +	kvm_tdx->tdcs_pa = NULL;
+> +
+> +free_tdr:
+> +	if (tdr_pa)
+> +		free_page((unsigned long)__va(tdr_pa));
+> +	kvm_tdx->tdr_pa = 0;
+> +
+> +free_hkid:
+> +	tdx_hkid_free(kvm_tdx);
+> +
+> +	return ret;
+> +}
+> +
+>  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp)
+>  {
+>  	struct kvm_tdx_cmd tdx_cmd;
+> @@ -274,6 +747,11 @@ static int __init __tdx_bringup(void)
+>  {
+>  	int r;
+>
+> +	if (!cpu_feature_enabled(X86_FEATURE_MOVDIR64B)) {
+> +		pr_warn("MOVDIR64B is reqiured for TDX\n");
+> +		return -EOPNOTSUPP;
+> +	}
+> +
+>  	if (!enable_ept) {
+>  		pr_err("Cannot enable TDX with EPT disabled.\n");
+>  		return -EINVAL;
+> diff --git a/arch/x86/kvm/vmx/tdx.h b/arch/x86/kvm/vmx/tdx.h
+> index 78f84c53a948..268959d0f74f 100644
+> --- a/arch/x86/kvm/vmx/tdx.h
+> +++ b/arch/x86/kvm/vmx/tdx.h
+> @@ -14,6 +14,9 @@ struct kvm_tdx {
+>  	struct kvm kvm;
+>
+>  	unsigned long tdr_pa;
+> +	unsigned long *tdcs_pa;
+> +
+> +	int hkid;
+>  };
+>
+>  struct vcpu_tdx {
+> diff --git a/arch/x86/kvm/vmx/x86_ops.h b/arch/x86/kvm/vmx/x86_ops.h
+> index c1bdf7d8fee3..96c74880bd36 100644
+> --- a/arch/x86/kvm/vmx/x86_ops.h
+> +++ b/arch/x86/kvm/vmx/x86_ops.h
+> @@ -120,12 +120,18 @@ void vmx_setup_mce(struct kvm_vcpu *vcpu);
+>
+>  #ifdef CONFIG_INTEL_TDX_HOST
+>  int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap);
+> +int tdx_vm_init(struct kvm *kvm);
+> +void tdx_mmu_release_hkid(struct kvm *kvm);
+> +void tdx_vm_free(struct kvm *kvm);
+>  int tdx_vm_ioctl(struct kvm *kvm, void __user *argp);
+>  #else
+>  static inline int tdx_vm_enable_cap(struct kvm *kvm, struct kvm_enable_cap *cap)
+>  {
+>  	return -EINVAL;
+>  };
+> +static inline int tdx_vm_init(struct kvm *kvm) { return -EOPNOTSUPP; }
+> +static inline void tdx_mmu_release_hkid(struct kvm *kvm) {}
+> +static inline void tdx_vm_free(struct kvm *kvm) {}
+>  static inline int tdx_vm_ioctl(struct kvm *kvm, void __user *argp) { return -EOPNOTSUPP; }
+>  #endif
+>
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index 751b3841c48f..ce2ef63f30f2 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -12852,6 +12852,7 @@ void kvm_arch_destroy_vm(struct kvm *kvm)
+>  	kvm_page_track_cleanup(kvm);
+>  	kvm_xen_destroy_vm(kvm);
+>  	kvm_hv_destroy_vm(kvm);
+> +	static_call_cond(kvm_x86_vm_free)(kvm);
+>  }
+>
+>  static void memslot_rmap_free(struct kvm_memory_slot *slot)
+> --
+> 2.34.1
+>
+>
 
