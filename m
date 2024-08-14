@@ -1,111 +1,112 @@
-Return-Path: <kvm+bounces-24078-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24079-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B8D5951130
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 02:53:58 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A65E395115B
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 03:03:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE9EA1C228C3
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 00:53:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2EFCEB22B29
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 01:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92BE3947E;
-	Wed, 14 Aug 2024 00:53:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF0A10953;
+	Wed, 14 Aug 2024 01:03:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HEx1I8Q3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sloy322b"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E794F171A5;
-	Wed, 14 Aug 2024 00:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3D58C04
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 01:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723596828; cv=none; b=JDek51/m5IcCD7D2zfkA8i9zu6G8rZ748k2+fNzYTXr5tsoCtLD4juF+7meK5HVpP8PjJymCwSGjgez5o917aw6jAPTxBxRhM9+0qgd6H+WV9NME8pqWRRKkMNkmXjbwgGd8Jb3WNfzjFYlIa7lb+Zj6HJdHRVcBpUEuraHKZFk=
+	t=1723597426; cv=none; b=TUDqO48cSC5iwjPJ6tCi5Wgt5E+PfId7xkE+q6M/b7vui4uGxRgSXM9NNcvpxGtvYzJAB2/x8YmBWXet/1OQxS0TLgIf6Y6f85Ffgs3t8+ZMRTMRdcwctCLpyBq3ryQlOr+VddMGQxXpW/SbL8aRLPYxg7RZxU1N5Kl4hQ4SxuY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723596828; c=relaxed/simple;
-	bh=RMZYDQ24Wd2mO+vaoGlTsQlnxWg83fgryxlAoEv0KdA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IUFfHLxfOzeT91/HlTg64CarxOigOUlVMkkt8gJ2NolYQuBJszuIj90KRDc0HH3YX6IBM14dtidDmltgAbnLzDwR995oHIRnbai1upmkkVS7hAlG5AWFoVL2v5SlTFyb8vwrOk8tAfz/JpV5+i64H+x7JqZhsqdBdgWdQPBNAXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HEx1I8Q3; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723596827; x=1755132827;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=RMZYDQ24Wd2mO+vaoGlTsQlnxWg83fgryxlAoEv0KdA=;
-  b=HEx1I8Q3lXeO/yEJA8zWSBl8hsYqLxllfZ/gnnNWPHqIDd4JZNI2YA2F
-   ME0Bz00Jb3NS+yBG5EBbZykYviHYpAzBT90Xg72Yce25mttn94CGqENVX
-   s5cIOTJPklj2zWqqE61nhoLwnlrEFIn2LghRVWdbPZh7/qR/KbaafSQq/
-   dCAYIeT473xrGGuhxB8q7yGcHF/0HLUBSfjSgVk61iZA/0dL/cUaDpXHc
-   xoNgmCZPjHccfX5kGqEYv4WfLILJBkyRoJZxvHEPG0d+x0hbTk71GFRz2
-   MkBupXZN6EUhtWEmRq1vlmdhuzTWpoToox4kWaUQ3dh60vegsoGA2sB0q
-   g==;
-X-CSE-ConnectionGUID: hi4ZnxggTdKZCBAt0sTrgQ==
-X-CSE-MsgGUID: LN+GNln/TVuAuw3TPJYXxQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="21761041"
-X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
-   d="scan'208";a="21761041"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 17:53:46 -0700
-X-CSE-ConnectionGUID: EOHcmZ0JT4uyQ3rGjvvZtg==
-X-CSE-MsgGUID: 7inkNjP2RtqAGmyXJILYDQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
-   d="scan'208";a="58476420"
-Received: from ls.sc.intel.com (HELO localhost) ([172.25.112.54])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 17:53:45 -0700
-Date: Tue, 13 Aug 2024 17:53:45 -0700
-From: Isaku Yamahata <isaku.yamahata@intel.com>
-To: "Huang, Kai" <kai.huang@intel.com>
-Cc: Binbin Wu <binbin.wu@linux.intel.com>, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, pbonzini@redhat.com,
-	seanjc@google.com, isaku.yamahata@intel.com,
-	rick.p.edgecombe@intel.com, michael.roth@amd.com
-Subject: Re: [PATCH v2 1/2] KVM: x86: Check hypercall's exit to userspace
- generically
-Message-ID: <ZrwAGc/UPtcrN4ug@ls.amr.corp.intel.com>
-References: <20240813051256.2246612-1-binbin.wu@linux.intel.com>
- <20240813051256.2246612-2-binbin.wu@linux.intel.com>
- <d7ae5009-748f-4aa2-937e-d805a3172216@intel.com>
+	s=arc-20240116; t=1723597426; c=relaxed/simple;
+	bh=/l0rXDlvw7NhjD2gM02gSHjD7vmJYerckruLlAuFmaE=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=gqReJWAYXB+D9maWEuO2+6XdEPEF7Y5H7xQMyA3NrukqjS/3xhARzsu8Z572naUoR/G2GSYBImPgFMvpSpRZ9o3+fT5lsu6LKSX3vM3iL00Sl04JXy1MTuxnDB3SljLti8D7x2zbMSHeg+UuZtiP49HWsAKo9HzIFrAB/ZaI1jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sloy322b; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fd72932d74so57151885ad.1
+        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 18:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723597424; x=1724202224; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q6GXHPkr3SYkJk/BjQwBdG1N86V9MTczoF7nIyPuYFg=;
+        b=sloy322bjPljuN3JUyLo9gt8trnhqIIjr3GV/47Hde1uxkYEhLzWStZsYHSyZEYfid
+         Y2awcIQ4KcVRzEoErYf90Q2RfMap6l6CJamS/gUJ2uWCBKS+Fp/ZXJhjZ8ELTzFOshqe
+         lVUKqU8vOVf5Y7NjlbbUFtvyio3Uc5Kqbq6wEOQ2eJikVK+o8Yr7iOhnE+Lgv+jCbruT
+         1+rVwpXvESAYXTzrkSEfekahRrShqkYKYT6Bn5I9tiValjFo0U8mngoFmIfJKAPETbpA
+         9/n8K8Zx/Pzq9xA2CyGrB3OIXcKBWNAGt16j9d0tnyfBXbSwi3+waNr6xRkfg2tZ8RW8
+         YKRA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723597424; x=1724202224;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q6GXHPkr3SYkJk/BjQwBdG1N86V9MTczoF7nIyPuYFg=;
+        b=JBCosHE21/xpoTnjhKGP4snZ2nmhFyLPhvMUbOb0MGU4nJXee9szD1oKp0OKl4dUCf
+         yTIlwFwQAcxbcEOuMAQxviiLTHdfyuSrfLIXPhhTsVF3WtLwD1fQlGkLku0tUQW5lU+v
+         MVZLCAZQLLlIbBAqMLtgpa0izmnLE7GcBrhUpVMqCXObgwfTed11tPzzGcKNPlohKbGs
+         0b6jmxxLM0iftI7/GfZKmkuPMHthPAo3JZRfCA5N2iXKxqsfcy6nj+jc7ejTZDcRHBkn
+         ChzKx9FPIPCqn6qI5qlq48nYYDcY0s+1ZaB9kbMm551HhUl6CUivLZDoTQeVrfTeQorj
+         359w==
+X-Gm-Message-State: AOJu0Yxo5caykqs0DpF4xYrXuE1rQ2bNHKIH8A30KWdhM1iIlQpBijHA
+	bFA2FsHUT4T9gHZEium0L44pViCVcSSa8M6PzHYmO2C6Dh2YUEHxJfxB2QEzMZFG5i5JTGDbUw1
+	xUQ==
+X-Google-Smtp-Source: AGHT+IFp+zkpt1P27X4CXq7C4fu6+sC7L/9JCX5CTa8notXBHyrfBfo5f7Po9lUup6Tm8E2ohsfwgwS1+Wk=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:da8b:b0:1fd:6529:7443 with SMTP id
+ d9443c01a7336-201d64b4f7bmr898275ad.11.1723597424379; Tue, 13 Aug 2024
+ 18:03:44 -0700 (PDT)
+Date: Tue, 13 Aug 2024 18:03:42 -0700
+In-Reply-To: <gsntv8049obx.fsf@coltonlewis-kvm.c.googlers.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <d7ae5009-748f-4aa2-937e-d805a3172216@intel.com>
+Mime-Version: 1.0
+References: <ZruZjhSRqo7Zx_1r@google.com> <gsntv8049obx.fsf@coltonlewis-kvm.c.googlers.com>
+Message-ID: <ZrwCbsBWf3ZxAH3d@google.com>
+Subject: Re: [PATCH 0/6] Extend pmu_counters_test to AMD CPUs
+From: Sean Christopherson <seanjc@google.com>
+To: Colton Lewis <coltonlewis@google.com>
+Cc: kvm@vger.kernel.org, mizhang@google.com, ljr.kernel@gmail.com, 
+	jmattson@google.com, aaronlewis@google.com, pbonzini@redhat.com, 
+	shuah@kernel.org, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Wed, Aug 14, 2024 at 11:16:44AM +1200,
-"Huang, Kai" <kai.huang@intel.com> wrote:
-
-> > ---
-> >   arch/x86/kvm/x86.c | 4 ++--
-> >   arch/x86/kvm/x86.h | 7 +++++++
-> >   2 files changed, 9 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> > index af6c8cf6a37a..6e16c9751af7 100644
-> > --- a/arch/x86/kvm/x86.c
-> > +++ b/arch/x86/kvm/x86.c
-> > @@ -10226,8 +10226,8 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
-> >   	cpl = kvm_x86_call(get_cpl)(vcpu);
-> >   	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
-> > -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
-> > -		/* MAP_GPA tosses the request to the user space. */
-> > +	if (!ret && is_kvm_hc_exit_enabled(vcpu->kvm, nr))
-> > +		/* The hypercall is requested to exit to userspace. */
-> >   		return 0;
+On Tue, Aug 13, 2024, Colton Lewis wrote:
+> Sean Christopherson <seanjc@google.com> writes:
 > 
-> I believe you put "!ret" check first for a reason?  Perhaps you can add a
-> comment.
+> > On Tue, Aug 13, 2024, Colton Lewis wrote:
+> > > (I was positive I had sent this already, but I couldn't find it on the
+> > > mailing list to reply to and ask for reviews.)
+> 
+> > You did[*], it's sitting in my todo folder.  Two things.
+> 
+> > 1. Err on the side of caution when potentially resending, and tag
+> > everything
+> > RESEND.  Someone seeing a RESEND version without having seen the
+> > original version
+> > is no big deal.  But someone seeing two copies of the same
+> > patches/emails can get
+> > quite confusing.
+> 
+> Sorry for jumping the gun. I couldn't find the original patches in my
+> email or on the (wrong) list and panicked.
 
-I think he'd like to avoid to hit WARN_ON_ONCE().
--- 
-Isaku Yamahata <isaku.yamahata@intel.com>
+Ha, no worries.  FWIW, I highly recommend using lore if you can't (quickly) find
+something in your own mailbox.  If it hit a tracked list, lore will have it.  And
+if you use our corporate mail, the retention policy is 18 months unless you go
+out of your way to tag mails to be kept, i.e. lore is more trustworthy in the
+long run.
+
+https://lore.kernel.org/all/?q=f:coltonlewis@google.com
 
