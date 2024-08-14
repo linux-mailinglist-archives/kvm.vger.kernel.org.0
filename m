@@ -1,202 +1,139 @@
-Return-Path: <kvm+bounces-24159-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24160-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EE78951EA7
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:35:50 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78555951EBE
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:38:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0A851F23132
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 15:35:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D4921F227EE
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 15:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 776131B4C5F;
-	Wed, 14 Aug 2024 15:35:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD38D1B580B;
+	Wed, 14 Aug 2024 15:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WnmyIZFc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Th+u4Q2M"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B75C1AED24
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 15:35:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C811B4C42
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 15:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723649739; cv=none; b=Sz0AqS2gI4pCo1E2J+1sZJxyOsGlIySb9WyYx3yuehe444cLn7G3bzQBmimePIxfg9713NLjO+mpO6xBwxGIdPH1V5YmjVhTb1Yxpo1vuadZ+YgHXMuO36Fl6d48p6YcxWUpyVsQHutdaEeo1eSAY6mU1Ae7KUmMhew802sNQzY=
+	t=1723649927; cv=none; b=iMCzdA4ha3K/rOXRYtGZ2C0tA8OCTwjR7tg3PtKAw5VnXBE2GVqUkkUb0xePQoEn+b28OSE0fOdmy/jDt5/Zw1obJcwwd5SEyP4uKsMbEubYNUZLBs5lEU9rKKadsGc1z90nERQGLiqJaCxRfFw3dLlldQxVxc06Cf1wOzFcaO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723649739; c=relaxed/simple;
-	bh=EgpycVgrTE4OZBnLiqJp21Ba+1k3djK1u2mFfbGKv44=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lqldSbznlkyI8tDhnHcgp51ZblYDUHEhfKieqYRqQCTe1NQIhI/H2Pp12iR9ko7BwAQJ++6+Npmr1dDnvjZ05wYCHGoor9Puzy24ngCWjddEQAEQwKBu2xdo0htS2TEeSgV8qNcLM7+8NXgr2nF1It8KMrGcjw9eY/N2w71Z9wA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WnmyIZFc; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1ff5713901eso45960355ad.0
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 08:35:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723649737; x=1724254537; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UJIHPsY2YwVSqQ2bZ1yyvT61kPfWuElvrVIzEKc/5m4=;
-        b=WnmyIZFcXbTr7tLEXMQtlCkrj7fG4v7GrQpzYZuYjn7f3Wgsq7HBzhQuOLo2WUMuAe
-         DnwtNKX1ZvEHmENpWmG8g9iWnr0x/xQyHycNVos0XHv7r6JzOKqDKsU64j4G5/pIU1u6
-         uB/B+QsXC6m7qdxPDj0H4c67wufMSF6o80B8xEvBTFbRGM4TvgzNARut1lLzNxUsRSXx
-         NffLZseVk8UK889Jc6dqIyx7bOO/1yuYvgzobuOuEHRSyQtPefLUL3P076+YWa2CwbzI
-         7T23lIHEESUA5md4sGMR4ZWW4Q6mypU+WNL/lNUf5zq6AthuCmMqsBKDo02w/Tk9fdDC
-         JzGQ==
+	s=arc-20240116; t=1723649927; c=relaxed/simple;
+	bh=ZoPRwGV6+5ZCXltJco4xn5q57HOxugw7ILBN8Sr55hU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=YDxGT3EpoRDYQGoBbCw1UxxOyTUY5CDjhIycEfQxqBaQTHNkgbD5M65SqR3vpUciLeQYGLYGnuwu+x8CZ2ulh6hxIRCLaBvpg55JaNSHrcIBj8+8QnZjsOM/TAaDggF/3D+5HJOoiPDPSTgGfY410wCKObE4P7+yOmFKMUZvb3Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Th+u4Q2M; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723649923;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i0mN78AI6OH+5rESlWtNBfWAVjVg3g3wv0fs76AUNNE=;
+	b=Th+u4Q2MlnfQEsp/KRD2wdJJiM5dzUvU4Flv2zkQieRkyIa8VuwSDSQjqd6ae3cQGqYvmT
+	SnG+9TO40LqTqTBoQRv2W1aRRA1pg/QwlcmXdEGIju2LFwLXi3nzLg2kRe+unnBLaGr3Hz
+	my8kxA4FBf1FIooN9ht3o6sJXIugxuc=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-FkTD88dXNh2l8gFdhbItzA-1; Wed, 14 Aug 2024 11:38:42 -0400
+X-MC-Unique: FkTD88dXNh2l8gFdhbItzA-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-428207daff2so46033695e9.0
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 08:38:42 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723649737; x=1724254537;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=UJIHPsY2YwVSqQ2bZ1yyvT61kPfWuElvrVIzEKc/5m4=;
-        b=GgPRY5T8NpAuFeVyO/yH1lokASiFJ75rmG1qbYP5q4aZ+CWx4GaqT90Eq/wbJrOaAR
-         vqerQmL0X9gPo3yvW7kb3E5+TdoeRxXoCdRyQnwC/IjsVmYHMqzOiBLXZ1gYfoDnUvJU
-         gQuWG1+p2g5WQ/Ei+QgK1OCcFtrEAI1aw3jKG7droNV0sw/HQLTP0YSgv4saAinRbvBa
-         yZgWCKe/6CtMpUAfAwqn1u/7NRlILzwaItEy2c3JRxPzbSovsglpB86Lgwh2gLNdcbBj
-         w9tz6cLVXDZQuB83FMQjmtILvgA76V7I72SoaCv3mA0I14+dLSABUKNkMSWbd78rBO9b
-         E8Ng==
-X-Forwarded-Encrypted: i=1; AJvYcCW26mJQmtUNBB3ri4f9F5gvpPMKVChO+bkqhGJiXb7K3ubfjd5WvZVWi8R5oxmsqa2JLTU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwMNmxOu4BwYsquspGa/szdFsMwY0xzhoBsHSZYljDceT+MsHL
-	EttznD1l6dSULUePXfQ6eayo49B4w1urZ4KJVB/gfUs8Tl0CndPeaLn6sTcluUOQl2CKM1gXtDC
-	Utw==
-X-Google-Smtp-Source: AGHT+IGjGXRjCPUvJkPrRgmiEyz3DbO4hm3AtgTjq6rNLjZrlosXmtEcLdfbrMhwoJWLy46rEvpZtD/6dLU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:6845:b0:201:ec02:2761 with SMTP id
- d9443c01a7336-201ec02294dmr13345ad.0.1723649737244; Wed, 14 Aug 2024 08:35:37
- -0700 (PDT)
-Date: Wed, 14 Aug 2024 08:35:35 -0700
-In-Reply-To: <CABCjUKD2BAXzBZixrXKJwybEPoZvkmSPfy-vPKMbxcAt0qk0uQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1723649921; x=1724254721;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=i0mN78AI6OH+5rESlWtNBfWAVjVg3g3wv0fs76AUNNE=;
+        b=lMTS5G/E2Wxq4x9XQ9X37+deDzDvnICpYImdA6h8bL4ctndKMg99VqEDfSgKwbPedV
+         5dewxrEmfuQb5hyH1Nj8gnA3F436K5gLz73CUotnRaN66dusHRKlEZ1AymR8NuddBOWC
+         bVMy4afRb18z/zhi98R8DsrNr5wa50MNkY0UlbANnREHlQO3Dh5V33smocMDxJ5/Ak3B
+         0MXWxfgl936L0zpWhJ+JhrRPGJiP2lecHIj9l6vOIIqbwPrY8PQuFefR9p9tvivM1sTB
+         RrjZ4eT00PYFk+AQNbZaVSvzUoUSxDB0TqEn0CIuwVRtLgDA22PS05ILQzSR4Mx6XJyU
+         aRzA==
+X-Forwarded-Encrypted: i=1; AJvYcCUm59tkwq6wxIoPkKCIvI4JQLYkmZZLbq7FwH68ii997FLtMMj6NTGe/7pMZ9j1ZesYxAmi6q2ngFGwsRJYxOipfTkn
+X-Gm-Message-State: AOJu0Yz34JANXLB9mGt0FvsjucMICVbBSkZNcfayfl5RkQAxwSKZIBE9
+	5wz3GnLGjR8YF+1VRZ7vFylmA6iPiL2LdNL1MIK05Ev/ree45esOP7femGWgqA6fCOrAk7rU+mr
+	Ervb9Rjj9v8GWHHC8GXvNMFJYU3+PbHoTfLEcu9m5SSS4cpHcSw==
+X-Received: by 2002:a05:600c:1e23:b0:426:6e86:f82 with SMTP id 5b1f17b1804b1-429dd248517mr23328475e9.22.1723649921066;
+        Wed, 14 Aug 2024 08:38:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGEWMPGp7i0MQzIzTAb1271vYV1dkuMqPnhA1T15TWPhCom5X/iJ3a44d0WDgW36QkR+Ea3VA==
+X-Received: by 2002:a05:600c:1e23:b0:426:6e86:f82 with SMTP id 5b1f17b1804b1-429dd248517mr23328145e9.22.1723649920511;
+        Wed, 14 Aug 2024 08:38:40 -0700 (PDT)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429dec83d2asm23671175e9.0.2024.08.14.08.38.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Aug 2024 08:38:40 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mirsad Todorovac <mtodorovac69@gmail.com>, kvm@vger.kernel.org, Paolo
+ Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo
+ Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [BUG] arch/x86/kvm/vmx/vmx_onhyperv.h:109:36: error:
+ dereference of NULL =?utf-8?B?4oCYMOKAmQ==?=
+In-Reply-To: <ZrzIVnkLqcbUKVDZ@google.com>
+References: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
+ <Zpq2Lqd5nFnA0VO-@google.com>
+ <207a5c75-b6ad-4bfb-b436-07d4a3353003@gmail.com>
+ <87a5i05nqj.fsf@redhat.com>
+ <b20eded4-0663-49fb-ba88-5ff002a38a7f@gmail.com>
+ <87plqbfq7o.fsf@redhat.com> <ZrzIVnkLqcbUKVDZ@google.com>
+Date: Wed, 14 Aug 2024 17:38:39 +0200
+Message-ID: <87mslff728.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240710074410.770409-1-suleiman@google.com> <ZqhPVnmD7XwFPHtW@chao-email>
- <Zqi2RJKp8JxSedOI@freefall.freebsd.org> <ZruSpDcysc2B-HQ-@google.com> <CABCjUKD2BAXzBZixrXKJwybEPoZvkmSPfy-vPKMbxcAt0qk0uQ@mail.gmail.com>
-Message-ID: <ZrzOxxu1_-f5ZZ1m@google.com>
-Subject: Re: [PATCH] KVM: x86: Include host suspended time in steal time.
-From: Sean Christopherson <seanjc@google.com>
-To: Suleiman Souhlal <suleiman@google.com>
-Cc: Suleiman Souhlal <ssouhlal@freebsd.org>, Chao Gao <chao.gao@intel.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain
 
-On Wed, Aug 14, 2024, Suleiman Souhlal wrote:
-> On Wed, Aug 14, 2024 at 2:06=E2=80=AFAM Sean Christopherson <seanjc@googl=
-e.com> wrote:
-> > > > Additionally, it seems that if a guest migrates to another system a=
-fter a
-> > > > suspend and before updating steal time, the suspended time is lost =
-during
-> > > > migration. I'm not sure if this is a practical issue.
-> > >
-> > > The systems where the host suspends don't usually do VM migrations. O=
-r at
-> > > least the ones where we're encountering the problem this patch is try=
-ing to
-> > > address don't (laptops).
-> > >
-> > > But even if they did, it doesn't seem that likely that the migration =
-would
-> > > happen over a host suspend.
-> >
-> > I think we want to account for this straightaway, or at least have defi=
-ned and
-> > documented behavior, else we risk rehashing the issues with marking a v=
-CPU as
-> > preempted when it's loaded, but not running.  Which causes problems for=
- live
-> > migration as it results in KVM marking the steal-time page as dirty aft=
-er vCPUs
-> > have been paused.
-> >
-> > [*] https://lkml.kernel.org/r/20240503181734.1467938-4-dmatlack%40googl=
-e.com
->=20
-> Can you explain how the steal-time page could get marked as dirty after V=
-CPUs
-> have been paused? From what I can tell, record_steal_time() gets called f=
-rom
-> vcpu_enter_guest(), which shouldn't happen when the VCPU has been paused,=
- but
-> I have to admit I don't really know anything about how live migration wor=
-ks.
+Sean Christopherson <seanjc@google.com> writes:
 
-It's not record_steal_time(), it's kvm_steal_time_set_preempted().  The fla=
-g
-KVM uses to tell the guest that the vCPU has been scheduled out, KVM_VCPU_P=
-REEMPTED,
-resides in the kvm_steal_time structure, i.e. in the steal-time page.
+> On Wed, Aug 14, 2024, Vitaly Kuznetsov wrote:
+>> What I meant is something along these lines (untested):
+>> 
+>> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> index eb48153bfd73..e2d8c67d0cad 100644
+>> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> @@ -104,6 +104,14 @@ static inline void evmcs_load(u64 phys_addr)
+>>         struct hv_vp_assist_page *vp_ap =
+>>                 hv_get_vp_assist_page(smp_processor_id());
+>>  
+>> +       /*
+>> +        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
+>> +        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
+>> +        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
+>> +        * but compilers may still complain.
+>> +        */
+>> +       BUG_ON(!vp_ap);
+>
+> A full BUG_ON() is overkill, and easily avoided.  If we want to add a sanity
+> check here and do more than just WARN, then it's easy enough to plumb in @vcpu
+> and make this a KVM_BUG_ON() so that the VM dies, i.e. so that KVM doesn't risk
+> corrupting the guest somehow.
+>
 
-Userspace "pauses" vCPUs when it enters blackout to complete live migration=
-.  After
-pausing vCPUs, the VMM invokes various KVM_GET_* ioctls to retrieve vCPU st=
-ate
-so that it can be transfered to the destination.  Without the above series,=
- KVM
-marks vCPUs as preempted when the associated task is scheduled out and the =
-vCPU
-is "loaded", even if the vCPU is not actively running.  This results in KVM=
- writing
-to kvm_steal_time.preempted and dirtying the page, after userspace thinks i=
-t
-should be impossible for KVM to dirty guest memory (because vCPUs are no lo=
-nger
-being run).
+I'm still acting under the impression this is an absolutely impossible
+situation :-)
 
-> The series you linked is addressing an issue when the steal-time page get=
-s
-> written to outside of record_steal_time(), but we aren't doing this for t=
-his
-> proposed patch.
+AFAICS, we only call evmcs_load() from vmcs_load() but this one doesn't
+have @vcpu/@kvm either and I wasn't sure it's worth the effort to do the
+plumbing (or am I missing an easy way to go back from @vmcs to
+@vcpu?). On the other hand, vmcs_load() should not be called that ofter
+so if we prefer to have @vcpu there for some other reason -- why not.
 
-I know.  What I am saying is that I don't want to punt on the issue Chao ra=
-ised,
-because _if_ we want to properly account suspend time when a vCPU is migrat=
-ed
-(or saved/restored for any reason) without doing KVM_RUN after suspect, the=
-n that
-either requires updating the steal-time information outside of KVM_RUN, or =
-it
-requires new uAPI to explicitly migrate the unaccounted suspend timd.
+-- 
+Vitaly
 
-Given that new uAPI is generally avoided when possible, that makes updating
-steal-time outside of KVM_RUN the default choice (which isn,t necessarily t=
-he
-best choice), which in turn means KVM now has to worry about the above scen=
-ario
-of writing to guest memory after vCPUs have been paused by userespace.
-
-> With the proposed approach, the steal time page would get copied to the n=
-ew
-> host and everything would keep working correctly, with the exception of a
-> possible host suspend happening between when the migration started and wh=
-en
-> it finishes, not being reflected post-migration.  That seems like a
-> reasonable compromise.
-
-Maybe, but I'm not keen on sweeping this under the rug.  Ignoring issues be=
-cause
-they'll "never" happen has bitten KVM more than once.
-
-At the absolute bare minimum, the flaw needs to be documented, with a sugge=
-sted
-workaround provided (do KVM on all vCPUs before migrating after suspend), e=
-.g.
-so that userspace can workaround the issue in the unlikely scenario userspa=
-ce
-does suspend+resume, saves/restores a VM, *and* cares about steal-time.
-
-Even better would be if we can figure out a way to effectively require KVM_=
-RUN
-after suspend+resume, but I can't think of a way to do that without breakin=
-g
-userspace or adding new uAPI, and adding new uAPI for this feels like overk=
-ill.
 
