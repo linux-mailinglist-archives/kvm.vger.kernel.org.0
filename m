@@ -1,278 +1,184 @@
-Return-Path: <kvm+bounces-24094-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24095-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8426E9513AF
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 06:58:02 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7D479513B8
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 07:00:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A920E1C239A3
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 04:58:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F1040B22A8C
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 05:00:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCD096F2FE;
-	Wed, 14 Aug 2024 04:57:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D68F955898;
+	Wed, 14 Aug 2024 04:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aIPF1wv9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OmYToklE"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8677A55887
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 04:57:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA99745F4;
+	Wed, 14 Aug 2024 04:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723611453; cv=none; b=VbGNZpoV1BVMn3pCHHJT7Tm/7UBqTI4R/eENnebctvVfVipQlA3h/27VPUED31YWQW6U6aIp0RtuSx//kVKwflWoalOEGdUTgjB3tN1U1l9FkWLQ6FBgMFOJeCDa2mMjDjqKb9uiBcKsaZsVgpdB3FbiLgID9cWdzuy0fjGdMH8=
+	t=1723611594; cv=none; b=dGPDUiSJA/y5HX5P1q6C8xn32/xa8K9tQynvnoHPh2hPdqHcXDdGCI44EVMeAi7uXU8HbgDYtqnz2ItyrQ6SSF+qy2M/GcSq7pgy7sUOr6f6/sgWDsx4PDqoA4BTChq2mRkw5ul4jhR68QPJgsKRhOO2/8zwFBFnOc/w+twIn+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723611453; c=relaxed/simple;
-	bh=YXccYMLFa96XMfu1WDEP2Dt5RSZkFd9vtGe9PaTJtwU=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=qQ5bgcx7hT1YTPUdIGgU72fO3V9fv8SBZ+b5jSFPIYyDC/iaFPpyOehgtJ6dORKa21PltehLOn9n9eT61+ARVNbN4itD/leV74xaIiXyHzqHWsqvszlw0q4N0kUQVmsS8Gt9H3GlWcOzVQmgTE4VMGvuA5SzCQXqLRjOe8TCYn8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aIPF1wv9; arc=none smtp.client-ip=209.85.214.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1fee7c9e4a4so54631925ad.2
-        for <kvm@vger.kernel.org>; Tue, 13 Aug 2024 21:57:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723611450; x=1724216250; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cWgG6XKabHVJipLdUK4SmJLHmxQeqEES8mvhtsUgneU=;
-        b=aIPF1wv9ZdGWS052nfKsh4TBtObsDzhhtks4rCaQWTNoGqSo8odJoOl666K8JnjmkT
-         uvKBjT44BzQQYIojDmmo7gSejz7l4YK27SSsackji1UoJ2fz88ekPg1+LY3utdfEHy1u
-         UWIgGxOl5qB7mlscHUpUfesN1KiRgJ9dZp9ersXQslXcCv4Bmla8MQcrBpad7Y4fLC9m
-         XIYa59a7hljpJQ6f0pLFmyfIuopeBAQ7cmu4Mp4BHKoeNbGMlFLtFOz87D3mVxGWau3x
-         kFp3/Sw//rKhTVYK7XmUeYIsnPpoJeKP10QvVg2MIwxMn3SiG7H13y9zrnQLcT8nAMkA
-         1qRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723611450; x=1724216250;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cWgG6XKabHVJipLdUK4SmJLHmxQeqEES8mvhtsUgneU=;
-        b=XaFPAVwBJ9Am0SgB1x5lYz0xhTWDSY8B5RFg1Mie61bVLSwPLr1TQ4bds/60VA5AU/
-         SIOJLx64WSac9Q7JDxlz9SG4HSQe8soQKuo/MojW3RGWgLO3SiTuxDpJC6nJ9Ru2Uy8i
-         aguEY3AxxD9g35lBwtjjHQmWwOVnqELBZzTJYVyaWzZevyqT3DMvvSK6al8/zZCfWW4V
-         dwzuR1LRolft4ygUdQsIPdba6qF4xqLSP/6FOOPWpM3nXbwtnWVkh+g7oVAiPm9O+UmF
-         PJ1GCU3iHEIDMW8X9IBhNvfsNcAcwlDuaW/dPP2yp9gUxv6CkWrVQ/36r2Xddaja1WNX
-         qcPQ==
-X-Gm-Message-State: AOJu0YxehM67QXU1ewx8NIAm/eGi2oftY8O2x6SvXaDU6rZkYwBhp9Lt
-	rhg3KqX5gxC8WmTod/cCJp+iatIH+xCi7AUeJ3lPUpzFqhP3aaxxCwIFyiVGHgjSSAaDChhqkzo
-	1pg==
-X-Google-Smtp-Source: AGHT+IEjuqIH2I7nKGtbSjNMqKc3S2bpfZK77l9Ly4zJZH6+/tKqDOzzvO1sJg9+jVPQQo695sOQz18bnEs=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:da8b:b0:1fd:6529:7443 with SMTP id
- d9443c01a7336-201d64b4f7bmr1285895ad.11.1723611450408; Tue, 13 Aug 2024
- 21:57:30 -0700 (PDT)
-Date: Tue, 13 Aug 2024 21:57:29 -0700
-In-Reply-To: <20240522001817.619072-11-dwmw2@infradead.org>
+	s=arc-20240116; t=1723611594; c=relaxed/simple;
+	bh=p091EtRspnbX44KHYi6UcQSSQSNEqSr5Aoj/x8yrcAo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j0UNbUujoWyxcRU8FoxRt6YG1AjPvP/ZfhynSE3b6YuWSgl1FyXIQW8BazL6NUxL6eSiVWtn3xGmRNkaEkDOWbcIyGHqv+3gMLWkZpZuH3mC5q6g7gVVidk2gF14+/qUBmvgRx6JBJoM7BdTCy7RpDfqfENdhxHkIQQBHU02Q/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OmYToklE; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723611592; x=1755147592;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=p091EtRspnbX44KHYi6UcQSSQSNEqSr5Aoj/x8yrcAo=;
+  b=OmYToklEpIIS2+z6ZsW00vd7yC8tIJEJMaKjxLYGpPKcMxbSfaM9/NnC
+   TCgnJZAgxqy5WUk/GGGKv4mvSogHDyvoVJQaClagZhIU0i8ecBWOCWS0y
+   q/SbuwcFPAnm+paHe6KWFzVhNBrCjNraZGzWxjsL1T+QCBBhYelDB6GOs
+   D9cgJxtuIgFAN8QOSmI9CAnukH3nteNZtvTwkoAcNPH8wF5XW5WKGQJd0
+   HOpMTodR7ZJqzhA4GIsuZ31QWS5przG8jFCvpooo5PPKc4CSP+3iaptvs
+   AxmJhgogGVJacOoc1KZc/KkrrDm6mWGfiScIqpz8p0UwJx7BwsBb5dQui
+   g==;
+X-CSE-ConnectionGUID: crDl0L9dQQ6bYstNF7miaA==
+X-CSE-MsgGUID: sfd9G5RRQre/Ti2TjgiEjg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="44325203"
+X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
+   d="scan'208";a="44325203"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 21:59:51 -0700
+X-CSE-ConnectionGUID: GZre7wTGTNeOyv8/C4hXPw==
+X-CSE-MsgGUID: rrsLMKpbROKxfb4jOVVUAw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,287,1716274800"; 
+   d="scan'208";a="63044022"
+Received: from unknown (HELO [10.238.8.207]) ([10.238.8.207])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2024 21:59:49 -0700
+Message-ID: <6b68ee3f-a438-455b-b867-1e8524956f6c@linux.intel.com>
+Date: Wed, 14 Aug 2024 12:59:47 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240522001817.619072-1-dwmw2@infradead.org> <20240522001817.619072-11-dwmw2@infradead.org>
-Message-ID: <Zrw5ORlemXZPrIWl@google.com>
-Subject: Re: [RFC PATCH v3 10/21] KVM: x86: Fix software TSC upscaling in kvm_update_guest_time()
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jalliste@amazon.co.uk, sveith@amazon.de, zide.chen@intel.com, 
-	Dongli Zhang <dongli.zhang@oracle.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] KVM: x86: Check hypercall's exit to userspace
+ generically
+To: Sean Christopherson <seanjc@google.com>,
+ Isaku Yamahata <isaku.yamahata@intel.com>
+Cc: Kai Huang <kai.huang@intel.com>, kvm@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pbonzini@redhat.com,
+ rick.p.edgecombe@intel.com, michael.roth@amd.com
+References: <20240813051256.2246612-1-binbin.wu@linux.intel.com>
+ <20240813051256.2246612-2-binbin.wu@linux.intel.com>
+ <ZrucyCn8rfTrKeNE@ls.amr.corp.intel.com>
+ <b58771a0-352e-4478-b57d-11fa2569f084@intel.com>
+ <Zrv/60HrjlPCaXsi@ls.amr.corp.intel.com> <ZrwI-927_7cBxYT1@google.com>
+Content-Language: en-US
+From: Binbin Wu <binbin.wu@linux.intel.com>
+In-Reply-To: <ZrwI-927_7cBxYT1@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 22, 2024, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
-> 
-> There was some confusion in kvm_update_guest_time() when software needs
-> to advance the guest TSC.
-> 
-> In master clock mode, there are two points of time which need to be taken
-> into account. First there is the master clock reference point, stored in
-> kvm->arch.master_kernel_ns (and associated host TSC ->master_cycle_now).
-> Secondly, there is the time *now*, at the point kvm_update_guest_time()
-> is being called.
-> 
-> With software TSC upscaling, the guest TSC is getting further and further
-> ahead of the host TSC as time elapses. So at time "now", the guest TSC
-> should be further ahead of the host, than it was at master_kernel_ns.
-> 
-> The adjustment in kvm_update_guest_time() was not taking that into
-> account, and was only advancing the guest TSC by the appropriate amount
-> for master_kernel_ns, *not* the current time.
-> 
-> Fix it to calculate them both correctly.
-> 
-> Since the KVM clock reference point in master_kernel_ns might actually
-> be *earlier* than the reference point used for the guest TSC
-> (vcpu->last_tsc_nsec), this might lead to a negative delta. Fix the
-> compute_guest_tsc() function to cope with negative numbers, which
-> then means there is no need to force a master clock update when the
-> guest TSC is written.
 
-Please do this in a separate patch.  There's no need to squeeze it in here, and
-this change is complex/subtle enough as it is.
 
-> @@ -3300,8 +3306,6 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
->  		kernel_ns = get_kvmclock_base_ns();
->  	}
->  
-> -	tsc_timestamp = kvm_read_l1_tsc(v, host_tsc);
-> -
->  	/*
->  	 * We may have to catch up the TSC to match elapsed wall clock
->  	 * time for two reasons, even if kvmclock is used.
-> @@ -3313,11 +3317,46 @@ static int kvm_guest_time_update(struct kvm_vcpu *v)
->  	 *	very slowly.
->  	 */
->  	if (vcpu->tsc_catchup) {
-> -		u64 tsc = compute_guest_tsc(v, kernel_ns);
 
-Random side topic, kernel_ns is a s64, shouldn't it be a u64?
+On 8/14/2024 9:31 AM, Sean Christopherson wrote:
+> On Tue, Aug 13, 2024, Isaku Yamahata wrote:
+>> On Wed, Aug 14, 2024 at 11:11:29AM +1200,
+>> Kai Huang <kai.huang@intel.com> wrote:
+>>
+>>>
+>>> On 14/08/2024 5:50 am, Isaku Yamahata wrote:
+>>>> On Tue, Aug 13, 2024 at 01:12:55PM +0800,
+>>>> Binbin Wu <binbin.wu@linux.intel.com> wrote:
+>>>>
+>>>>> Check whether a KVM hypercall needs to exit to userspace or not based on
+>>>>> hypercall_exit_enabled field of struct kvm_arch.
+>>>>>
+>>>>> Userspace can request a hypercall to exit to userspace for handling by
+>>>>> enable KVM_CAP_EXIT_HYPERCALL and the enabled hypercall will be set in
+>>>>> hypercall_exit_enabled.  Make the check code generic based on it.
+>>>>>
+>>>>> Signed-off-by: Binbin Wu <binbin.wu@linux.intel.com>
+>>>>> ---
+>>>>>    arch/x86/kvm/x86.c | 4 ++--
+>>>>>    arch/x86/kvm/x86.h | 7 +++++++
+>>>>>    2 files changed, 9 insertions(+), 2 deletions(-)
+>>>>>
+>>>>> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+>>>>> index af6c8cf6a37a..6e16c9751af7 100644
+>>>>> --- a/arch/x86/kvm/x86.c
+>>>>> +++ b/arch/x86/kvm/x86.c
+>>>>> @@ -10226,8 +10226,8 @@ int kvm_emulate_hypercall(struct kvm_vcpu *vcpu)
+>>>>>    	cpl = kvm_x86_call(get_cpl)(vcpu);
+>>>>>    	ret = __kvm_emulate_hypercall(vcpu, nr, a0, a1, a2, a3, op_64_bit, cpl);
+>>>>> -	if (nr == KVM_HC_MAP_GPA_RANGE && !ret)
+>>>>> -		/* MAP_GPA tosses the request to the user space. */
+>>>>> +	if (!ret && is_kvm_hc_exit_enabled(vcpu->kvm, nr))
+>>>>> +		/* The hypercall is requested to exit to userspace. */
+>>>>>    		return 0;
+>>>>>    	if (!op_64_bit)
+>>>>> diff --git a/arch/x86/kvm/x86.h b/arch/x86/kvm/x86.h
+>>>>> index 50596f6f8320..0cbec76b42e6 100644
+>>>>> --- a/arch/x86/kvm/x86.h
+>>>>> +++ b/arch/x86/kvm/x86.h
+>>>>> @@ -547,4 +547,11 @@ int kvm_sev_es_string_io(struct kvm_vcpu *vcpu, unsigned int size,
+>>>>>    			 unsigned int port, void *data,  unsigned int count,
+>>>>>    			 int in);
+>>>>> +static inline bool is_kvm_hc_exit_enabled(struct kvm *kvm, unsigned long hc_nr)
+> I would rather have "hypercall" in the name, "hc" never jumps out to me as being
+> "hypercall". Maybe is_hypercall_exit_enabled(), user_exit_on_hypercall(), or just
+> exit_on_hypercall()?
+>
+> I'd probably vote for user_exit_on_hypercall(), as that clarifies it's all about
+> exiting to userspace, not from the guest.
+user_exit_on_hypercall() looks good to me.
+Thanks!
 
-> -		if (tsc > tsc_timestamp) {
-> -			adjust_tsc_offset_guest(v, tsc - tsc_timestamp);
-> -			tsc_timestamp = tsc;
-> +		uint64_t now_host_tsc, now_guest_tsc;
-> +		int64_t adjustment;
-> +
-> +		/*
-> +		 * First, calculate what the guest TSC should be at the
-> +		 * time (kernel_ns) which will be placed in the hvclock.
-> +		 * This may be the *current* time, or it may be the time
-> +		 * of the master clock reference. This is 'tsc_timestamp'.
-> +		 */
-> +		tsc_timestamp = compute_guest_tsc(v, kernel_ns);
-> +
-> +		now_guest_tsc = tsc_timestamp;
-> +		now_host_tsc = host_tsc;
-> +
-> +#ifdef CONFIG_X86_64
-> +		/*
-> +		 * If the master clock was used, calculate what the guest
-> +		 * TSC should be *now* in order to advance to that.
-> +		 */
-> +		if (use_master_clock) {
-> +			int64_t now_kernel_ns;
-> +
-> +			if (!kvm_get_time_and_clockread(&now_kernel_ns,
 
-Doesn't this need to be called under protection of the seqcount?
+>
+>>>>> +{
+>>>>> +	if(WARN_ON_ONCE(hc_nr >= sizeof(kvm->arch.hypercall_exit_enabled) * 8))
+>>>>> +		return false;
+>>>> Is this to detect potential bug? Maybe
+>>>> BUILD_BUG_ON(__builtin_constant_p(hc_nr) &&
+>>>>                !(BIT(hc_nr) & KVM_EXIT_HYPERCALL_VALID_MASK));
+>>>> Overkill?
+>>> I don't think this is the correct way to use __builtin_constant_p(), i.e. it
+>>> doesn't make sense to use __builtin_constant_p() in BUILD_BUG_ON().
+> KVM does use __builtin_constant_p() to effectively disable some assertions when
+> it's allowed (by KVM's arbitrary rules) to pass in a non-constant value.  E.g.
+> see all the vmcs_checkNN() helpers.  If we didn't waive the assertion for values
+> that aren't constant at compile-time, all of the segmentation code would need to
+> be unwound into switch statements.
+>
+> But for things like guest_cpuid_has(), the rule is that the input must be a
+> compile-time constant.
+>
+>>> IIUC you need some build time guarantee here, but __builtin_constant_p() can
+>>> return false, in which case the above BUILD_BUG_ON() does nothing, which
+>>> defeats the purpose.
+>> It depends on what we'd like to detect.  BUILT_BUG_ON(__builtin_constant_p())
+>> can detect the usage in the patch 2/2,
+>> is_kvm_hc_exit_enabled(vcpu->kvm, KVM_HC_MAP_GPA_RANGE).  The potential
+>> future use of is_kvm_hc_exit_enabled(, KVM_HC_MAP_future_hypercall).
+>>
+>> Although this version doesn't help for the one in kvm_emulate_hypercall(),
+>> !ret check is done first to avoid WARN_ON_ONCE() to hit here.
+>>
+>> Maybe we can just drop this WARN_ON_ONCE().
+> Yeah, I think it makes sense to drop the WARN, otherwise I suspect we'll end up
+> dancing around the helper just to avoid the warning.
+>
+> I'm 50/50 on the BUILD_BUG_ON().  One one hand, it's kinda overkill.  On the other
+> hand, it's zero generated code.
+>
+Will remove the WARN_ON_ONCE().
 
-Ahh, but with that change, then get_cpu_tsc_khz() isn't guaranteed to be from
-the same CPU.
-
-Oof, disabling IRQs to protect against migration is complete overkill, and at
-this point dumb luck as much as anything.  Saving IRQs was added by commit
-commit 18068523d3a0 ("KVM: paravirtualized clocksource: host part") before there
-was any coordination with timekeeping.  And then after the coordination and
-locking was added, commit c09664bb4418 ("KVM: x86: fix deadlock in clock-in-progress
-request handling") moved the locking/coordination out of IRQ protection, and thus
-made disabling IRQs completely pointless, except for protecting get_cpu_tsc_khz()
-and now kvm_get_time_and_clockread().
-
-Ha!  And if we slowly unwind that mess, this all ends up being _excrutiatingly_
-close to the same code as get_kvmclock().  Sadly, I don't think it's close enough
-to be reusable, unless we want to play macro games.
-
-> +							&now_host_tsc)) {
-> +				now_kernel_ns = get_kvmclock_base_ns();
-> +				now_host_tsc = rdtsc();
-> +			}
-> +			now_guest_tsc = compute_guest_tsc(v, now_kernel_ns);
-
-I find the mixed state of kernel_ns and host_tsc to be terribly confusing.  It's
-hard to see and remember that kernel_ns/host_tsc aren't "now" when use_master_clock
-is true.
-
-For TSC upscaling, I think we can have kernel_ns/host_tsc always be "now", we just
-need to snapshot the master clock tsc+ns, and then shove those into kernel_ns and
-host_tsc after doing the software upscaling.  That simplifies the TSC upscaling
-code considerably, and IMO makes it more obvious how tsc_timestamp is computed,
-and what its role is.
-
-When all is said and done, I think we can get to this?
-
-	/*
-	 * If the host uses TSC clock, then passthrough TSC as stable
-	 * to the guest.
-	 */
-	do {
-		seq = read_seqcount_begin(&ka->pvclock_sc);
-
-		use_master_clock = ka->use_master_clock;
-
-		/*
-		 * The TSC read and the call to get_cpu_tsc_khz() must happen
-		 * on the same CPU.
-		 */
-		get_cpu();
-
-		tgt_tsc_hz = get_cpu_tsc_khz();
-
-		if (use_master_clock &&
-		    !kvm_get_time_and_clockread(&kernel_ns, &host_tsc) &&
-		    WARN_ON_ONCE(!read_seqcount_retry(&ka->pvclock_sc, seq)))
-			use_master_clock = false;
-
-		put_cpu();
-
-		if (!use_master_clock)
-			break;
-
-		master_host_tsc = ka->master_cycle_now;
-		master_kernel_ns = ka->master_kernel_ns;
-	while (read_seqcount_retry(&ka->pvclock_sc, seq))
-
-	if (unlikely(!tgt_tsc_hz)) {
-		kvm_make_request(KVM_REQ_CLOCK_UPDATE, v);
-		return 1;
-	}
-	if (!use_master_clock) {
-		host_tsc = rdtsc();
-		kernel_ns = get_kvmclock_base_ns();
-	}
-
-	/*
-	 * We may have to catch up the TSC to match elapsed wall clock
-	 * time for two reasons, even if kvmclock is used.
-	 *   1) CPU could have been running below the maximum TSC rate
-	 *   2) Broken TSC compensation resets the base at each VCPU
-	 *      entry to avoid unknown leaps of TSC even when running
-	 *      again on the same CPU.  This may cause apparent elapsed
-	 *      time to disappear, and the guest to stand still or run
-	 *	very slowly.
-	 */
-	if (vcpu->tsc_catchup) {
-		int64_t adjustment;
-
-		/*
-		 * Calculate the delta between what the guest TSC *should* be,
-		 * and what it actually is according to kvm_read_l1_tsc().
-		 */
-		adjustment = compute_guest_tsc(v, kernel_ns) -
-			     kvm_read_l1_tsc(v, host_tsc);
-		if (adjustment > 0)
-			adjust_tsc_offset_guest(v, adjustment);
-	}
-
-	/*
-	 * Now that TSC upscaling is out of the way, the remaining calculations
-	 * are all relative to the reference time that's placed in hv_clock.
-	 * If the master clock is NOT in use, the reference time is "now".  If
-	 * master clock is in use, the reference time comes from there.
-	 */
-	if (use_master_clock) {
-		host_tsc = master_host_tsc;
-		kernel_ns = master_kernel_ns;
-	}
-	tsc_timestamp = kvm_read_l1_tsc(v, host_tsc);
 
