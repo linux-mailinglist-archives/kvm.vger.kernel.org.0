@@ -1,197 +1,155 @@
-Return-Path: <kvm+bounces-24118-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24119-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5BB49516DF
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 10:45:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 175259517C5
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 11:33:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4147B215E4
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 08:45:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEF812845A6
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 09:33:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6332214373B;
-	Wed, 14 Aug 2024 08:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85BD114A4D2;
+	Wed, 14 Aug 2024 09:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fTygB0x1"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XJYlDezI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8E217721
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 08:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00AE714A0AD;
+	Wed, 14 Aug 2024 09:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723625108; cv=none; b=DzYe17maTvSGIUWCONEGNXwioxG2mrwBPATMMt0iFUnls8y4OlwpU6/dkDBnVQdWnaE9NszPx0DvxqMvKoq4A2I3CppV2D9G5OkVtQlRLMuofHG7joZVoXW6odGyZz+21AxZ5+hLJxCDOi1XUkLz625XWMyE59RL0y0jUu/i3hs=
+	t=1723628026; cv=none; b=L9TKm0YdVHXgcoOcNGd0xLySszpzwIrqvjt6w5krfAr/yVuXOcAeQauEyfVOVpMvgnlVTcupTgN8Gdsxa6aHrGrqydc3ChHyUQS4N5rf9WyMz4mjwmlfJLu74lZC0bka2p5flxzbzs2PLQzDA9rHX7E8Yqrks/7OP9wAWKzWLP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723625108; c=relaxed/simple;
-	bh=QrDGC86x1xaRXuKpPMO6Uk2eDrZ9ud7JG3yamK/yxnk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=PoPlGjXcLmcLDNWpzYTp9BPyo8hrmbe3P5Wrn0fV7tPLvvXnVoo0/oOjqn2Lfw2EoSM5z4p/E9kf2BZm7k+jrfMAhXhG532Dc/VF68JR9UwfZUdyYPI2nX442i8dr297Vo8+j4eg4xKr6e7sAen7LkG1SF85KCZP9cNLCIhFxJM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fTygB0x1; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723625105;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7hwkKCoOBN+b1OvqT/QSoUQZv/ejIIMA/dhfZb9tdx0=;
-	b=fTygB0x1qVdDpgUlzFHzCBNX8rT+mg5fs1CP4EoYkGMnrJrLlGhz40BCmD5Sk8IYf1AhAx
-	2YzYY549epLBxIJTC9TFh7rqoAoIVBairU21KhSAiim6ZRu/qPQMLQERj62h68VNonn+wb
-	Ajb9QdzQcnVzGpm0zywI96c7FNi8GTE=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-363-ZkB5xVjdPYqJz0b5TJdG1A-1; Wed, 14 Aug 2024 04:45:03 -0400
-X-MC-Unique: ZkB5xVjdPYqJz0b5TJdG1A-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-52efce218feso7905033e87.1
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 01:45:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723625102; x=1724229902;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7hwkKCoOBN+b1OvqT/QSoUQZv/ejIIMA/dhfZb9tdx0=;
-        b=H20lQn0QkVOl9CgvIuhp3mpq7PHnM2tfHMakTa2zAqDwNf/QMwYwS9k+TTzH232/Cj
-         4jOMKUQBtlDNygNBDHIsvzwdMKHrfTpeM4PY5Yxv8HUsoN2mai5jhjVzRF+AXPZaxa4T
-         LogLXhF06lRYoF1EwRNltsyxZtI/EvAjKOvM8wqnGVq1OL3AQv4HpkxrhEjfwnzXWg/J
-         mnCuawmAV1DWSruG7aTbcuNArvPeVfp72VY7IkpIydS4ObvtlEtmldx2nKd7/L7h/6xD
-         jZjcz6lHGoQTUAgx8+F3Zn8l4WtOu+SWhdiKmrvOrQPONUdy30LOYU8i8m3+saLLyEhW
-         sK8A==
-X-Gm-Message-State: AOJu0YzuGxqfaqnrKrwl3kKA5LlgOk2/JBJ2qlJmRbuKtqpHP0aUB325
-	PzZYBGBbFMuPP8WRNc0JdoUdLufsM6a7CLO1J9mWM3V0/XNz+HulY3mf8Xeacd2QtGH9ce97oUA
-	8lblIMg5CTmh8VxuBPJajkddfkvl9KTKef7Yu+tlFMbqTs2u7vA==
-X-Received: by 2002:a05:6512:1388:b0:52e:7542:f471 with SMTP id 2adb3069b0e04-532eda83bd3mr1535837e87.29.1723625101821;
-        Wed, 14 Aug 2024 01:45:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IExvv2JH1bujn3OdzYrvDxJ3jmVSbA8zfxLsfLv8SXbL6vxyV/RWT5TFXZWT1E65o1HmeWJUQ==
-X-Received: by 2002:a05:6512:1388:b0:52e:7542:f471 with SMTP id 2adb3069b0e04-532eda83bd3mr1535805e87.29.1723625101246;
-        Wed, 14 Aug 2024 01:45:01 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-36e4ebd2bb4sm12394742f8f.91.2024.08.14.01.45.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 01:45:00 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
-To: Mirsad Todorovac <mtodorovac69@gmail.com>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, Thomas
- Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav
- Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
- linux-kernel@vger.kernel.org, Sean Christopherson <seanjc@google.com>
-Subject: Re: [BUG] arch/x86/kvm/vmx/vmx_onhyperv.h:109:36: error:
- dereference of NULL =?utf-8?B?4oCYMOKAmQ==?=
-In-Reply-To: <b20eded4-0663-49fb-ba88-5ff002a38a7f@gmail.com>
-References: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
- <Zpq2Lqd5nFnA0VO-@google.com>
- <207a5c75-b6ad-4bfb-b436-07d4a3353003@gmail.com>
- <87a5i05nqj.fsf@redhat.com>
- <b20eded4-0663-49fb-ba88-5ff002a38a7f@gmail.com>
-Date: Wed, 14 Aug 2024 10:44:59 +0200
-Message-ID: <87plqbfq7o.fsf@redhat.com>
+	s=arc-20240116; t=1723628026; c=relaxed/simple;
+	bh=qMVgxt+7Ss1AA3wSvp0fvB6rLrSxpJ8aL45BP/09Peg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wcg9n6SxnjZT5f1qUNoTAOdTgOZOZQ69QSLiha1MwG/Nqn87mAIqXOBn1wtUpOI/Tcd+IWNJ8V/9uj+geE/AN7F7RIOAIe8Fn6MSaEyvajN5KAlafrbjMuF+FboNpYGhd98XcWiXWVUZ+e7OQfod6jCIxhDIkiya7OeEaJqAKQA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XJYlDezI; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723628025; x=1755164025;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qMVgxt+7Ss1AA3wSvp0fvB6rLrSxpJ8aL45BP/09Peg=;
+  b=XJYlDezIaK1dCp6CGHPjCfvRv7VVQFtR5ulk8bDVOZ2f8g1xv4Ve/ODd
+   5qp21CUg4fSjMMQQ86CllEN0y4SLpx/+krsbEjZSyt6k91a6rSM8Up9cD
+   v/G5iFDVqZHU8lyHkH8l/BirwKazJBHS0pODNtxrxSh12Vm4tupdYN5c4
+   5WDlL2Y4t7wOwnZpQgmMmeJchVHvelQnhfm5JTynCvrZcnH1m/vEaypdr
+   tFLX+EnS1lRDowsGH2H9rs5+OXvHsOol1fRgQz3dbgB+Z0FHvpkPoZaHp
+   RpZkuX4mo2hTfvh4mJoZTvMrLvDYDcfqAGlfLF7ryOp+kdeLJhmA7ShoX
+   w==;
+X-CSE-ConnectionGUID: 6Lt6UqEWTpSPSQZtneJ1cg==
+X-CSE-MsgGUID: xrPByqW3TpmSBZgG55sD0Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11163"; a="25593431"
+X-IronPort-AV: E=Sophos;i="6.09,288,1716274800"; 
+   d="scan'208";a="25593431"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2024 02:33:44 -0700
+X-CSE-ConnectionGUID: qPD2f555SMaOwVJih+WFXg==
+X-CSE-MsgGUID: dGEWQ0gsRTmyzGGR5+k2xw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.09,288,1716274800"; 
+   d="scan'208";a="59529376"
+Received: from lkp-server01.sh.intel.com (HELO 9a732dc145d3) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 14 Aug 2024 02:33:42 -0700
+Received: from kbuild by 9a732dc145d3 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1seANw-0001Xz-0d;
+	Wed, 14 Aug 2024 09:33:40 +0000
+Date: Wed, 14 Aug 2024 17:33:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vipin Sharma <vipinsh@google.com>, seanjc@google.com,
+	pbonzini@redhat.com
+Cc: oe-kbuild-all@lists.linux.dev, dmatlack@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Vipin Sharma <vipinsh@google.com>
+Subject: Re: [PATCH 2/2] KVM: x86/mmu: Recover NX Huge pages belonging to TDP
+ MMU under MMU read lock
+Message-ID: <202408141753.ZY1CSmGo-lkp@intel.com>
+References: <20240812171341.1763297-3-vipinsh@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240812171341.1763297-3-vipinsh@google.com>
 
-Mirsad Todorovac <mtodorovac69@gmail.com> writes:
+Hi Vipin,
 
-> On 7/29/24 15:31, Vitaly Kuznetsov wrote:
->> Mirsad Todorovac <mtodorovac69@gmail.com> writes:
->> 
->>> On 7/19/24 20:53, Sean Christopherson wrote:
->>>> On Fri, Jul 19, 2024, Mirsad Todorovac wrote:
->>>>> Hi, all!
->>>>>
->>>>> Here is another potential NULL pointer dereference in kvm subsystem of linux
->>>>> stable vanilla 6.10, as GCC 12.3.0 complains.
->>>>>
->>>>> (Please don't throw stuff at me, I think this is the last one for today :-)
->>>>>
->>>>> arch/x86/include/asm/mshyperv.h
->>>>> -------------------------------
->>>>>   242 static inline struct hv_vp_assist_page *hv_get_vp_assist_page(unsigned int cpu)
->>>>>   243 {
->>>>>   244         if (!hv_vp_assist_page)
->>>>>   245                 return NULL;
->>>>>   246 
->>>>>   247         return hv_vp_assist_page[cpu];
->>>>>   248 }
->>>>>
->>>>> arch/x86/kvm/vmx/vmx_onhyperv.h
->>>>> -------------------------------
->>>>>   102 static inline void evmcs_load(u64 phys_addr)
->>>>>   103 {
->>>>>   104         struct hv_vp_assist_page *vp_ap =
->>>>>   105                 hv_get_vp_assist_page(smp_processor_id());
->>>>>   106 
->>>>>   107         if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
->>>>>   108                 vp_ap->nested_control.features.directhypercall = 1;
->>>>>   109         vp_ap->current_nested_vmcs = phys_addr;
->>>>>   110         vp_ap->enlighten_vmentry = 1;
->>>>>   111 }
->>>>>
->> 
->> ...
->> 
->>>
->>> GCC 12.3.0 appears unaware of this fact that evmcs_load() cannot be called with hv_vp_assist_page() == NULL.
->>>
->>> This, for example, silences the warning and also hardens the code against the "impossible" situations:
->>>
->>> -------------------><------------------------------------------------------------------
->>> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
->>> index eb48153bfd73..8b0e3ffa7fc1 100644
->>> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
->>> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
->>> @@ -104,6 +104,11 @@ static inline void evmcs_load(u64 phys_addr)
->>>         struct hv_vp_assist_page *vp_ap =
->>>                 hv_get_vp_assist_page(smp_processor_id());
->>>  
->>> +       if (!vp_ap) {
->>> +               pr_warn("BUG: hy_get_vp_assist_page(%d) returned NULL.\n", smp_processor_id());
->>> +               return;
->>> +       }
->>> +
->>>         if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
->>>                 vp_ap->nested_control.features.directhypercall = 1;
->>>         vp_ap->current_nested_vmcs = phys_addr;
->> 
->> As Sean said, this does not seem to be possible today but I uderstand
->> why the compiler is not able to infer this. If we were to fix this, I'd
->> suggest we do something like "BUG_ON(!vp_ap)" (with a comment why)
->> instead of the suggested patch:
->
-> That sounds awesome, but I really dare not poke into KVM stuff at my level. :-/
->
+kernel test robot noticed the following build errors:
 
-What I meant is something along these lines (untested):
+[auto build test ERROR on 332d2c1d713e232e163386c35a3ba0c1b90df83f]
 
-diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
-index eb48153bfd73..e2d8c67d0cad 100644
---- a/arch/x86/kvm/vmx/vmx_onhyperv.h
-+++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
-@@ -104,6 +104,14 @@ static inline void evmcs_load(u64 phys_addr)
-        struct hv_vp_assist_page *vp_ap =
-                hv_get_vp_assist_page(smp_processor_id());
- 
-+       /*
-+        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
-+        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
-+        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
-+        * but compilers may still complain.
-+        */
-+       BUG_ON(!vp_ap);
-+
-        if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
-                vp_ap->nested_control.features.directhypercall = 1;
-        vp_ap->current_nested_vmcs = phys_addr;
+url:    https://github.com/intel-lab-lkp/linux/commits/Vipin-Sharma/KVM-x86-mmu-Split-NX-hugepage-recovery-flow-into-TDP-and-non-TDP-flow/20240814-091542
+base:   332d2c1d713e232e163386c35a3ba0c1b90df83f
+patch link:    https://lore.kernel.org/r/20240812171341.1763297-3-vipinsh%40google.com
+patch subject: [PATCH 2/2] KVM: x86/mmu: Recover NX Huge pages belonging to TDP MMU under MMU read lock
+config: i386-buildonly-randconfig-005-20240814 (https://download.01.org/0day-ci/archive/20240814/202408141753.ZY1CSmGo-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240814/202408141753.ZY1CSmGo-lkp@intel.com/reproduce)
 
-the BUG_ON() will silence compiler warning as well as become a sentinel
-for future code changes.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202408141753.ZY1CSmGo-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   arch/x86/kvm/mmu/mmu.c: In function 'kvm_mmu_possible_nx_huge_page':
+>> arch/x86/kvm/mmu/mmu.c:7324:29: error: 'struct kvm_arch' has no member named 'tdp_mmu_pages_lock'
+    7324 |         spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+         |                             ^
+   arch/x86/kvm/mmu/mmu.c:7335:47: error: 'struct kvm_arch' has no member named 'tdp_mmu_pages_lock'
+    7335 |                         spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+         |                                               ^
+   arch/x86/kvm/mmu/mmu.c:7340:31: error: 'struct kvm_arch' has no member named 'tdp_mmu_pages_lock'
+    7340 |         spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+         |                               ^
+
+
+vim +7324 arch/x86/kvm/mmu/mmu.c
+
+  7313	
+  7314	/*
+  7315	 * Get the first shadow mmu page of desired type from the NX huge pages list.
+  7316	 * Return NULL if list doesn't have the needed page with in the first max pages.
+  7317	 */
+  7318	struct kvm_mmu_page *kvm_mmu_possible_nx_huge_page(struct kvm *kvm, bool tdp_mmu,
+  7319							   ulong max)
+  7320	{
+  7321		struct kvm_mmu_page *sp = NULL;
+  7322		ulong i = 0;
+  7323	
+> 7324		spin_lock(&kvm->arch.tdp_mmu_pages_lock);
+  7325		/*
+  7326		 * We use a separate list instead of just using active_mmu_pages because
+  7327		 * the number of shadow pages that be replaced with an NX huge page is
+  7328		 * expected to be relatively small compared to the total number of shadow
+  7329		 * pages. And because the TDP MMU doesn't use active_mmu_pages.
+  7330		 */
+  7331		list_for_each_entry(sp, &kvm->arch.possible_nx_huge_pages, possible_nx_huge_page_link) {
+  7332			if (i++ >= max)
+  7333				break;
+  7334			if (is_tdp_mmu_page(sp) == tdp_mmu) {
+  7335				spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+  7336				return sp;
+  7337			}
+  7338		}
+  7339	
+  7340		spin_unlock(&kvm->arch.tdp_mmu_pages_lock);
+  7341		return NULL;
+  7342	}
+  7343	
 
 -- 
-Vitaly
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
