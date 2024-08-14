@@ -1,156 +1,124 @@
-Return-Path: <kvm+bounces-24153-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24154-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D242951DD1
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 16:55:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84016951E1F
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:08:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5E432845C1
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 14:55:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B4131F22A54
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 15:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 209481B4C21;
-	Wed, 14 Aug 2024 14:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4448F1B3F31;
+	Wed, 14 Aug 2024 15:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aJ8xBrik"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="C6h+AwkI"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D735C1B3F02
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 14:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92A161B0137
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 15:08:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723647312; cv=none; b=igO25Z5an9YSEI0I22cYu7WP23nryygj41f5l0r2gRSqRuX7fJqwYFzNHQzsEweQXZhFeJqwrEMT/fLanLHJNFuGd8Orsew1w3lWICOos5RP/RvHxtAVWVwknxLDGBo++NvuOQNcGacZcpZ0m3T7R18kHtrn5UVeu6vtvugVG3c=
+	t=1723648090; cv=none; b=YICzWQ+xBNP28kzD9s7284H4FpiG68bArb3+6Ma5uy+KBg/SXkVfZY3MMMQTMKjAvq0to79TEktj+bQPKobJzZisBUoFBrYb8rkiy5SglBYIyN/3sBtYgKlwGIhiAbAKYXtX5a5RCAtlsaZ5pF3ab6dhA6hln8KK5aY4LDeOmZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723647312; c=relaxed/simple;
-	bh=WoccYl5tJ4uS73R5zSqJbENwLN3ciC51K4xWuQmtihA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dCQF+sFYN8Nmahyfe3l5fc6hhEGsPw5xDNN03HxQH8XxznTBjHAygjfHc7eVUSXhafkvsfrYPGfp5gYGE4FzQn8AYuHmi22cI8oR+3PqzQNvkr36e06i2FKOSCUcW98LhZkKLIvab9v8Vcnv78vR1IfjYWgUnHNhJdBvZYuJBGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aJ8xBrik; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723647309;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oPm3R6PblHeNKQdvTaJGKrEzfWm2oR4v27v3xkNgebw=;
-	b=aJ8xBrikto+YSH+2J5Sb/9wMQ/74XEcwJk1JW1Ogb2864/1M7TuQqkJ2L9mjuQleMO66BE
-	1FDwPQ5It0voQVd6CGPUw3zBMHqLeSQhZmcv3Cipi4qEe+llh1sdWg91eR/IW9Xu89WVrE
-	ZKOo6xWegCSTbkTkrwGR33hFLS9A1qI=
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com
- [209.85.166.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-682-HSEm8Q_MNXG5xpdmKi814g-1; Wed, 14 Aug 2024 10:55:08 -0400
-X-MC-Unique: HSEm8Q_MNXG5xpdmKi814g-1
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-81fb21a0e41so759339f.2
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 07:55:08 -0700 (PDT)
+	s=arc-20240116; t=1723648090; c=relaxed/simple;
+	bh=Oq75bF6b7Xsf6oaRIc8eb6zXZ+JAV3xZdtoY0XlEz1s=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=G6gMjw2/zWIG+SNccyrXfv9yw4AMTlRpdu/BM/e7Pvlpk7G+qM74LtJi0o5TWqAzg4uIndsNRAFJGAC3f0VAITxCUVk4yKEjyWqpU4UX3N87lmd/HfBDHbhOtAS5bXUu9sgT9uO6DiueelhMn5smtXOl6B5g3Q65WX+1c26UyYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=C6h+AwkI; arc=none smtp.client-ip=209.85.215.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a30753fe30so15970a12.3
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 08:08:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723648088; x=1724252888; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yoJQXmjJ2IVbbFRZhVVje/CJkcjIPZibKaR4ShslcHA=;
+        b=C6h+AwkI0P/r/ti5DuS3cs6m8ZePqjV+r+EgwJ8k72cNep7Gla20DGmFKb6xLKoV7x
+         se89resCetyD1XuYMDYIcZ0eX9DqgDLvI6jGC5sxWOVt4YdH2zn/q8USAqrI+IPVuuug
+         0K2NdoOABoFcFaybw+qYuJ6p4K1k79sPKrWjWhji72FVvNEtunXRAmSY99rgdP7XclIm
+         S0EUyaSwlizowGxG3pS82wAY9t7V+pIUcFNlw8wBAkuj9a7UV/kS9RRa4Z1IJNgr0PxX
+         jhsNgyq/A/cJT2ufBnW/on4LAenIzSLWXt6JfH4Ybo9RRUbK28/P4u6fCR0dVDWC+tu/
+         LprQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723647308; x=1724252108;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oPm3R6PblHeNKQdvTaJGKrEzfWm2oR4v27v3xkNgebw=;
-        b=ojNm3MzaxdqTo/vkLV8ouE7XIdsZnyKfB8b5jUkK++TpNUplDcgNJ0VPfzDPeiD7xf
-         rOYplP1j56gJf9mIOvbFo+VHr7e9f7IQntsUU4cY6czJbtT6kIbbAqezTTX/ZdET6O4L
-         bmekJj5y2HeH+Knv0hzgBFXY3wWlhiSWPplZiyWsUbOQujt7rs4PkVqb570cJgHGij8Y
-         BmC9znbW8At7hYMoyWKXMpGnM9oxGSxPPEQvTboiJZ0rWGxLNjPyXcLWD6+okt4Y7ACi
-         XKUgaLhvg3BZX6WfBk1TJVJ5S1/dLXkiw5ybcazArFHqA4fZVhfno0FvFy33oEr4yYu0
-         CLIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXBcsVV74PicO7VMglkF6lTjHd/TsTB19swOdhiDaeXo+Aurk/sStSkkyUioJ9pIDCFJJ5jbt5mmxxoH9YTtRLct3Cf
-X-Gm-Message-State: AOJu0YwpttExAv7mQYOVT52qAZF9s0dtBRlLqsg67GFjLcl2+uROOZIO
-	bkXrC1oI37KjWD0+4aAuK04pZS2SxUVLGX6dQ5Dtz2ppj/exrkJCy7ptvG6KkV08xWu8orSdURI
-	RFwUNBlBPLS9ouvg9YcQkJhb6MgXHiuvacZtquPIR8GozkZcGFw==
-X-Received: by 2002:a05:6602:4c8a:b0:7f9:b435:4f5 with SMTP id ca18e2360f4ac-824dae79033mr337940939f.11.1723647307733;
-        Wed, 14 Aug 2024 07:55:07 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFKOB2u3ExmlngG/ZGX6m16GkR9QFQMCyYiDK1GqVIcqqNhWRQ6U/pFLSxgUSO2c6mZ3lkevw==
-X-Received: by 2002:a05:6602:4c8a:b0:7f9:b435:4f5 with SMTP id ca18e2360f4ac-824dae79033mr337937239f.11.1723647307328;
-        Wed, 14 Aug 2024 07:55:07 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ca769102a4sm3274045173.18.2024.08.14.07.55.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 07:55:06 -0700 (PDT)
-Date: Wed, 14 Aug 2024 08:55:05 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
- quic_bqiang@quicinc.com, kvalo@kernel.org, prestwoj@gmail.com,
- linux-wireless@vger.kernel.org, ath11k@lists.infradead.org,
- dwmw2@infradead.org, iommu@lists.linux.dev, kernel@quicinc.com,
- johannes@sipsolutions.net, jtornosm@redhat.com
-Subject: Re: [PATCH RFC/RFT] vfio/pci: Create feature to disable MSI
- virtualization
-Message-ID: <20240814085505.60819623.alex.williamson@redhat.com>
-In-Reply-To: <20240813231642.GR1985367@ziepe.ca>
-References: <adcb785e-4dc7-4c4a-b341-d53b72e13467@gmail.com>
-	<20240812170014.1583783-1-alex.williamson@redhat.com>
-	<20240813163053.GK1985367@ziepe.ca>
-	<20240813151401.789c578f.alex.williamson@redhat.com>
-	<20240813231642.GR1985367@ziepe.ca>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+        d=1e100.net; s=20230601; t=1723648088; x=1724252888;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yoJQXmjJ2IVbbFRZhVVje/CJkcjIPZibKaR4ShslcHA=;
+        b=hBw54yV690XKCj9RlH9ivBtuuH2SAyJvowFfQ55X7a0gJu7pWe1uaRFfR/T6dISzEV
+         0D8I1PpuL/zsmHtyvLLNXSdnDtwqfcTJwRrfZ+YyM1nZ5KN57mmHu6adjrOAHuxIpBMf
+         nH73nuHQ/14U90iqHq/6I1epFEbx2RV9+KDcpwRVK4CpIZSug7y2afwgfpm0k09AVo5j
+         aZwru/by7VCFgNBW1lAUrMOKgzT6GD5HWfGH0oXZjCmuO32UrjKPMaSRUoDinT9Hj41i
+         eQVGBGzRpMSHzpGnqsukJrbJvRTbyo9sM3EDg/jYc5CgO8hvY/PFnUzkq9xQe51wubVM
+         zN+w==
+X-Forwarded-Encrypted: i=1; AJvYcCUw0v+txNKgo3+/BAdHMD/DnW29ooF3ZzixpqLPwB0f7pZ2vpS/3NvrNzg4ivl6WUj+7hwkvAqVZSAM639G/5Kwt06k
+X-Gm-Message-State: AOJu0YzhWIj2kR00gcTBMMfy0cBvAvLfdLYiEHLIdB41neqs52V/M/Uk
+	/MWL6xw/YtObfjDVV6Bco0I66INhbyM5DBll6HMxfYlvgvZyNeqQlnTZLLLRkSkgA8II7MYJIeq
+	7Uw==
+X-Google-Smtp-Source: AGHT+IFSo0qHJU5DQKCgeqRIDwH7U8xGwP62B3Xnf0u1/CK6HYU/5v7+V60gWz2HotfzMrnqap4rQiN4yTs=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a63:155a:0:b0:7a0:d530:86b8 with SMTP id
+ 41be03b00d2f7-7c6a568e1afmr5246a12.2.1723648087768; Wed, 14 Aug 2024 08:08:07
+ -0700 (PDT)
+Date: Wed, 14 Aug 2024 08:08:06 -0700
+In-Reply-To: <87plqbfq7o.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
+ <Zpq2Lqd5nFnA0VO-@google.com> <207a5c75-b6ad-4bfb-b436-07d4a3353003@gmail.com>
+ <87a5i05nqj.fsf@redhat.com> <b20eded4-0663-49fb-ba88-5ff002a38a7f@gmail.com> <87plqbfq7o.fsf@redhat.com>
+Message-ID: <ZrzIVnkLqcbUKVDZ@google.com>
+Subject: Re: [BUG] =?utf-8?Q?arch=2Fx86=2Fkvm=2Fvmx?= =?utf-8?Q?=2Fvmx=5Fonhyperv=2Eh=3A109=3A36=3A_error=3A_dereference_of_NUL?=
+ =?utf-8?B?TCDigJgw4oCZ?=
+From: Sean Christopherson <seanjc@google.com>
+To: Vitaly Kuznetsov <vkuznets@redhat.com>
+Cc: Mirsad Todorovac <mtodorovac69@gmail.com>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="us-ascii"
 
-On Tue, 13 Aug 2024 20:16:42 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
-
-> On Tue, Aug 13, 2024 at 03:14:01PM -0600, Alex Williamson wrote:
+On Wed, Aug 14, 2024, Vitaly Kuznetsov wrote:
+> What I meant is something along these lines (untested):
 > 
-> > > Personally, I very much dislike this. Encouraging such hacky driver
-> > > use of the interrupt subsystem is not a good direction. Enabling this
-> > > in VMs will further complicate fixing the IRQ usages in these drivers
-> > > over the long run.  
-> > 
-> > Clearly these _guest_ drivers are doing this regardless of the
-> > interfaces provided by vfio, so I don't see how we're encouraging hacky
-> > driver behavior, especially when it comes to Windows guest drivers.  
+> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
+> index eb48153bfd73..e2d8c67d0cad 100644
+> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
+> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
+> @@ -104,6 +104,14 @@ static inline void evmcs_load(u64 phys_addr)
+>         struct hv_vp_assist_page *vp_ap =
+>                 hv_get_vp_assist_page(smp_processor_id());
+>  
+> +       /*
+> +        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
+> +        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
+> +        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
+> +        * but compilers may still complain.
+> +        */
+> +       BUG_ON(!vp_ap);
+
+A full BUG_ON() is overkill, and easily avoided.  If we want to add a sanity
+check here and do more than just WARN, then it's easy enough to plumb in @vcpu
+and make this a KVM_BUG_ON() so that the VM dies, i.e. so that KVM doesn't risk
+corrupting the guest somehow.
+
+> +
+>         if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
+>                 vp_ap->nested_control.features.directhypercall = 1;
+>         vp_ap->current_nested_vmcs = phys_addr;
 > 
-> Because people will then say the Linux driver can't be fixed to
-> properly use an irq_domain/etc as the only option that works in VMs
-> will be the hacky copy from MSI-X approach :\
-
-Ironically QEMU already has direct access to the MSI-X vector table in
-MMIO space and could implement this type of quirk with no kernel
-changes.  It's MSI that is now blocked by virtualization of the address
-and data registers.  Note also that QEMU is still virtualizing these
-registers, the values seen in the guest are unchanged.  It's only the
-VMM that can bypass that virtualization to see the host values.
-
-Let's imagine the guest driver does change to implement an irq_domain.
-How does that fundamentally change the problem for the VMM that guest
-MSI values are being written to other portions of the device?  The
-guest driver can have whatever architecture it wants (we don't know
-the architecture of the Windows driver) but we still need to trap
-writes of the guest MSI address/data and replace it with host values.
-
-> > > Thomas Gleixner has done alot of great work recently to clean this up.
-> > > 
-> > > So if you imagine the driver is fixed, then this is not necessary.  
-> > 
-> > How so?   
+> the BUG_ON() will silence compiler warning as well as become a sentinel
+> for future code changes.
 > 
-> Because if the driver is properly using the new irq_domain/etc
-> infrastructure to model its additional interrupt source then this
-> patch won't make it work in the VM anyhow, so it is not necessary..
+> -- 
+> Vitaly
 > 
-> Your other patch would be the only short term answer.
-
-The QEMU patch relies on this kernel patch in order to be able to
-access the host physical MSI address and data values through the vfio
-interface.  Otherwise QEMU has no host values with which to patch-up
-guest values.  As noted above, this does not provide any visible change
-to a QEMU guest, it only enables QEMU to implement the quirk in the
-other patch.  Thanks,
-
-Alex
-
 
