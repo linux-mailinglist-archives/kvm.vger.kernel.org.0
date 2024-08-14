@@ -1,229 +1,137 @@
-Return-Path: <kvm+bounces-24202-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24203-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEC8E952500
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 23:54:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8309295252B
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 00:01:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45F45B235C6
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 21:54:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6D111C24DCD
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 22:01:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917E81C9DD4;
-	Wed, 14 Aug 2024 21:54:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEE6E14D719;
+	Wed, 14 Aug 2024 22:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="lym6aHT3"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AP3trLNF"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2049.outbound.protection.outlook.com [40.107.93.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBE141B9B50;
-	Wed, 14 Aug 2024 21:54:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.49
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723672443; cv=fail; b=Fu3wuo/3x0z2+o4Cfdg5wU5u51uoq2+MwPacCcQeBLZMmpV//yEHDnNxEWf6uvAUd3bZ3Q/AJL379EAAKHr6lShezhn2fUf8HRDgP6W4wedruJBv0rO7ALHDUYOv1K4BhV0bdnR5gyJ+Tes6ubEq/Y5Wi2EJPATM16CP61h3G+E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723672443; c=relaxed/simple;
-	bh=UAvaBLzdUa3f9xAi+s5sZunTvF7R1fZGWh9sQQxlfZQ=;
-	h=Message-ID:Date:To:Cc:References:From:Subject:In-Reply-To:
-	 Content-Type:MIME-Version; b=kbarRMuJBOlWBF1XzRUupTk/WpkByK1a4L7shjoCKQntu7sYPKjQUgyFhEZhQkvXxjvRDapyveCa4PkE/lrga2h3rz0bhb+ENCOXUNcPc5M5uFMlXu40G6Z2fKHfb4GNMrVatgnUbAVN5aaszF5MrHSCvPu0LeksOReFUlCLkWU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=lym6aHT3; arc=fail smtp.client-ip=40.107.93.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DWfdU2viiOHCDGlyiNS50xh6WazD7oczVk5mbgFVnVp42FYBr2j3uOxwTuvHptIHS21kBQK2IRv2wemaquzfXUrSqb/CvjVSDZ4ZyQtYyIsxUk58iKvCxFHyhupxBNqXRSYi0rZETNDd0KkT/Af6MX5WqTIKKKzmLFbuxL4ZUnpigN5RqDtiqUiXoVm4gxNP536/LPGIXqLVMcFRBE9FVGc74rqmVcXfFxubi78z05iKX1tHVuIuAm0B0b9jNBZZ6JMFi3yAtkoBrrfENi3So1whaBHqxbRI/+FA0oDA+0sykVjr7VoRMbTtI5inkPkmIEh/ChLratn1ayXHfH3OqQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jbnK9NA8q3juN2EzxjnWzagET0r1rG7j7t8FP+rO9r0=;
- b=wB6R1HhAnKnYZDld+YkhFMGRpL3QWmAZ5BDJpzHLM04gdjbR9AZJbj0aqf99841DzDRDSKfJ/lOVK3t9FzI/f3LdZXSTONmng+DgjsrS50mXXLswpDIqtXINEUO+HcPoA3+KeK5fmKtk1XhVLOBf8g84qiwIMQEvM00F2rv/cTEPNqv3RrIdqaxN4neJPbQYVIqgqlHWo9rxKLbT9ufbFFQBjPul2IopctX8kV8yez8eCXI1eQgbwEsRpdRxCERp4iNm6YBf9R6XFjXdysktgd8QPRTS6Vd33VCuV2+k7XtO5+af95j0QmSTUkqsjmlF/hvOllbWwY0qsSBUNHnFPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jbnK9NA8q3juN2EzxjnWzagET0r1rG7j7t8FP+rO9r0=;
- b=lym6aHT3AjhXMWnte7yXzO5WKgn9Z8Llubwy5ywbXpHOe32lDMnqiHJgh9DuEAulPw0CI01ZDN8rjUKJFA9hGX6ratRejIVAIG+2481iCwCc9m4TPzR++MLJQV0jb7xl+98LIhXHa4Lznt9+kd5/0rscZdmMZ2BZ0Fn35RpDZow=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
- by SN7PR12MB7786.namprd12.prod.outlook.com (2603:10b6:806:349::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.20; Wed, 14 Aug
- 2024 21:53:58 +0000
-Received: from DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e]) by DM4PR12MB5070.namprd12.prod.outlook.com
- ([fe80::20a9:919e:fd6b:5a6e%5]) with mapi id 15.20.7849.021; Wed, 14 Aug 2024
- 21:53:58 +0000
-Message-ID: <24a87bc0-11a5-eec4-d9fe-a1b28381b971@amd.com>
-Date: Wed, 14 Aug 2024 16:53:54 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
-Content-Language: en-US
-To: Ashish Kalra <Ashish.Kalra@amd.com>, seanjc@google.com,
- pbonzini@redhat.com, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, hpa@zytor.com, herbert@gondor.apana.org.au
-Cc: x86@kernel.org, john.allen@amd.com, davem@davemloft.net,
- michael.roth@amd.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-crypto@vger.kernel.org
-References: <cover.1723490152.git.ashish.kalra@amd.com>
- <be626a28eeecd08eac7f68fb23283c5ecf5e2c68.1723490152.git.ashish.kalra@amd.com>
-From: Tom Lendacky <thomas.lendacky@amd.com>
-Subject: Re: [PATCH 1/3] crypto: ccp: Extend SNP_PLATFORM_STATUS command
-In-Reply-To: <be626a28eeecd08eac7f68fb23283c5ecf5e2c68.1723490152.git.ashish.kalra@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR01CA0027.prod.exchangelabs.com (2603:10b6:a02:80::40)
- To DM4PR12MB5070.namprd12.prod.outlook.com (2603:10b6:5:389::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E111149000
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 22:00:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723672845; cv=none; b=G/0KIr9cNxbNY28Mw3ckxceTywA7Wo/5GdoFKuP7igL2m60r8FzYjlatbWVVo8yCoz+luagEZ60cVORSnE5S8Mv9zHLFA5q3NmFvAHeJbi36Z7oTs9IjG1/zZSSxgrvPcTSZ0lkezehMOZJnpWGLPrPiKf8SRDc16KKAu/e6vfo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723672845; c=relaxed/simple;
+	bh=uRXjIX6o3jqniHqBvNFoA/0kF5YG9DuENMSbXpC82UY=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=lF+aFsRhe2qhkzK/Uycug2WWNypAmDdmpStQ+jwpZJFjFJOJDNKK025ojMirWSoOIOBdr1DmQA1Bhw/mSJcsGrw7tumiCNOTu0y/yKTYC8H+UjPaLmr22yCgNYnbvc9STo9LTtQg0/ewn7INwlcGLJwBdNn/qSNSmo74xsmOHq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AP3trLNF; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-200aa7dbc3bso4240905ad.3
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 15:00:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723672844; x=1724277644; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5oH6P3nqpQ94wKrIC/Mozd39AchaUcxSzRhAmiF3FGo=;
+        b=AP3trLNFoIDfDlK7Z7oGentd32HbvVd9DlajPaRESkORInffK4pSuO2aMh/HC+RL6S
+         4nD8AgNqE5oEoWMX0rPqASBKpKC1Kgucu6TdIDkLnj+a3CuJJBEKNurrZ+URfIC6rAuu
+         g46wwKTZZrssXndjkzqWxlU3zJAZE5ytyRjKJ0P3eN4mCcHqM58qP4hVTFmqKMHRGBmj
+         otj0iXb/CjAgj59x0KsBapxUUype3NwGlWIZbtxL6APIRnOkbnQoLiBoDOyYcS7wgJID
+         0Y07xKn2vaILqWXILBChZW8Y34SXd4MTUXjbDmK14cNi8WROog/27PelvIIydV0rg98n
+         OcuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723672844; x=1724277644;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5oH6P3nqpQ94wKrIC/Mozd39AchaUcxSzRhAmiF3FGo=;
+        b=A7YheLU8zCvGBcS597jBZByfRjzhyoT8UG/YCKVnrpZhWPl/OalnlVTZeUf2Z8n4VI
+         6os4PUrEnrvoyBdTENOS/VEBkz4+BMvd032TembJ0/DY7OPP8kqGiH7LCYt5nQg1gTIh
+         VEMltY40xLKKNFykCTHwFOYHbSP3qbOP9jjJHgrIccVnrm/ot4/skeU8rZTAjoeCQmpZ
+         ZBuqdkUKxUaSKHxnbHGra3pR4XQ+S96clNgvIE02kG44EeSFTBYVPZHCjGsSeqpPg0gQ
+         2MWaK7VUuuOYC2iEGAKz7BKqAfgXzGQMgwg8prNmYADrG17Kg6EF33JA+8efZweewgAk
+         wBjA==
+X-Forwarded-Encrypted: i=1; AJvYcCX4UD69j3bnD/kwzScdRWLbfmlUeIKnbtC/LLNE6DqRsf8xTMkCwolcPwKozBAOW/+Pi4PQWdNCwFQFCV9Qqw7VK3/9
+X-Gm-Message-State: AOJu0YxgKsO72CsGyd2yDhq1ocsWGvZj3BcQ6Yor4xTxnfmdWjAcam92
+	SVhczbXc2uDB6ldve/zp28Ac0MUdJnUBmtMmV3MAex45YbvIxW6R8fbBnSs8qW9ihDblyFO9f5f
+	XDA==
+X-Google-Smtp-Source: AGHT+IELSmNcIfcWqD1y6wfROgLi5On6yYa9ztLE8WB0+uhpire+X0WHbKhlLbGeYLBF6mQ5SB34xpmbxzM=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a17:902:da8b:b0:1fd:6529:7443 with SMTP id
+ d9443c01a7336-201d64b4f7bmr3318245ad.11.1723672843639; Wed, 14 Aug 2024
+ 15:00:43 -0700 (PDT)
+Date: Wed, 14 Aug 2024 15:00:42 -0700
+In-Reply-To: <Zr0ZbPQHVNzmvwa6@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR12MB5070:EE_|SN7PR12MB7786:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2f05058c-0ad4-4eaa-f6eb-08dcbcab9966
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|366016|376014|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?NGg4cHlvQ3hnU3B6T0h1SnNjTGVOZnJXVGtsZEZ2dEV3MExzKzF2SWREbnN5?=
- =?utf-8?B?L0pldWhvdGh4Wjk0bnRubVRybk5jZjVCQWxzcUZJT20wc0xTWWV1dlc5eXZy?=
- =?utf-8?B?bXpzTlUvV2g3eEFscXF6MHZJVEZKNlpWWXZsb1dKamU4cHhQaUQ4RTRhZTBu?=
- =?utf-8?B?U0RRL2NWaXZVWUNYaURaZXcxWi94NGhObkczVy9IS1RBS3liMDluSnB4Rm5Z?=
- =?utf-8?B?SUhieUU4ZkJCaitvbzBFSXFSZTRKMDlsemYwZ0lSeUExNWpjejU0MXRBTzdE?=
- =?utf-8?B?RUhIbFl3QnNNNmV3TGxxR3Z5bkNWQmpkdnd0eUVGbXptazNQNy9aOVJ6RXUz?=
- =?utf-8?B?T2ZDSk05V3JhazJ0dEM0ZTB1S2RaV2owZ1dNdEZxeUN6K3M0a0Zrbi80YlZ6?=
- =?utf-8?B?bDVybWpldWFoS2taZ1l3ak1lNUszQk5IMHNwemdzQ3hlZ3N0SHQ4NXVYMUQ4?=
- =?utf-8?B?WlYrc045YU1MTTlaamF0eFB3Y2xUOElmZnhucXhyaUdWUFg2ZW1xeEY2cko2?=
- =?utf-8?B?eHdQS1A4Y1oyREl0ckRXYnlnQU9UbEJPdkJsWXRTMUc2K256N3BpeGZMY1dH?=
- =?utf-8?B?VDlRb3kwUmdTL2ZNYm5ZaWU0MFRPOVFaWlVVSENTSEkwWjV1Y1FVWFlPNFY2?=
- =?utf-8?B?RkZQMTRXOTFzRnJmbVRCTldQVW9HbWpNWDFiVnJzQUFpQUZ6Y1JHVFhpNWNt?=
- =?utf-8?B?M3NiV3pUOFpnYmdMYzl6RmhmOWFDRXIrZU1XL3pGSDVDcG5HQmNZM1JTbDZD?=
- =?utf-8?B?eVVlMi9Qd25HdHlEUWMrUzBTeGxXUDQrWW5ZRzkvTnorT1ZldjcxbmdZWFFv?=
- =?utf-8?B?QnoyUEhXMU5Qd1dkZTNpelN0MS9iak8wT0JzR2pxemtyS09aa254OVF5WlFW?=
- =?utf-8?B?VCt5MjMxemN0WStHL005S1M1Y0tVMUYzWlMvWEZhaGZEc28yMjVES3BhZFp5?=
- =?utf-8?B?RVRDT2NNTVI0UkFrVGdJNVViWW1CK0ZFTDVBY2x5cFlFVEEvWmFCekM0UUtq?=
- =?utf-8?B?a05qMi9iUlZPVTI4dHFiL1l5ckI3aUx1NXZOT3NTdTNqSmExeHhGUlduTTFU?=
- =?utf-8?B?VUE5WmJhWTcvVTlNNzNPenNYbjNuanI3aHR4L1lCTUhtakR5ODA3c29IS3F0?=
- =?utf-8?B?c3FvNTZwb3VlOElxYU9NVC9nWDUzTjBiMXFiQ0Jpbk12aFhrMzN4SDJQZUZ1?=
- =?utf-8?B?ZXRrMG1sMzZHMkhvMm1UZi81SDZOYlV4MFB1dzJ0YjN4YkVmN0hwazB4cWV6?=
- =?utf-8?B?NTJ4RklYbG8ralFhejFCUWFObzZJZDQ2VnZUMzJ2cHdBbWhxZUxpU0RxSnho?=
- =?utf-8?B?aHo1ZHQvY1BKQ0YybC83Q3pVam5wZmg2YWFXanZ6RHo5cC8zSnJkZml0RlBu?=
- =?utf-8?B?SlRnemJBdGY3M2RZUUVPMFJTZDNWRDdlOUJ0ZHZ4TG14cHVpdVA2aHpNVXg1?=
- =?utf-8?B?WG1DWEhTa1VwQTg4WHFFSXM3UDh6NUFDR3hjZXFWbzRLaTNxLzRzQWlRazkr?=
- =?utf-8?B?SU5DbVdGam9zNzdDQTdqaU0rcy9mdktVNk9WK2wrSEdlMkozOExDSlVFNG5G?=
- =?utf-8?B?QVNocmpRN0xKSzBRenFvRkF4NE1VakNjMGtDTDdmTG5HVVY5NW5mNDdxU25F?=
- =?utf-8?B?SnN2bG8wZWRta0RGSWhQU2dNV3NGRm9QV0pkMERIZ3lhVVF3Y2s1a1VNNDRX?=
- =?utf-8?B?Ni9jT1NCQXU5Z3FYdjI1MXZ3MmhxalF6QUFsaDZ0L3JXODl2dldXajh2ZjF6?=
- =?utf-8?B?b0tyMkJnR1hnU013VUhydkNLNlZPazUvZGNLaDVYQzdvYW5veFV2QlpzVW5K?=
- =?utf-8?B?QkJsODJFcVk5RFVJSjdrQT09?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR12MB5070.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(366016)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZjdsUUtLN1F1NmdlUmFpQW43Z0xZWWJWa29QNFh3d2I1b1hjZkRSN1lId2ZR?=
- =?utf-8?B?d3RHN1laK3U3QmYzQi8yRHA2Y1pHYS9YSW5kaEFIYWRUZ0JiRUpodHF3S08r?=
- =?utf-8?B?U0FsdzhyZzRJTWFwSXhEb054QWNBTGRxSlRkeEVkSGY3VXlUREVOY0JESVZy?=
- =?utf-8?B?eFcyNWFnZjdIV1k2dFJPU0Vuc2JiMzNOSGtwMkdQMjZuZGkwUU43a1k2b3BT?=
- =?utf-8?B?T3k1OSswdzArVjROYkJadFUwZWhvOG1pT1lVZ3piOG85bkhHQi9YY1VkR0dh?=
- =?utf-8?B?ZXBheXR6aVlIdGY3TERIT0JPS3laRVRhRnRsZ3JEekExcStDU0xscDI0YzlO?=
- =?utf-8?B?bHV0UUxjamR4Vyt2a1lPQkh5ajhYbWpKWVM5Ri9vaEVPRDVYYTN6SmpjeFlM?=
- =?utf-8?B?UFY0bFMwaytGSk9zVlV0UnlPTytma2lGdDQ5cmJidFdUL2Vxc2l4dHR4RVhL?=
- =?utf-8?B?OXVyTFVNbEdSSFVnMnYvSCtJWmhRZGVDUkFrTlJLazJDaERrbXE2MjR1Qjhn?=
- =?utf-8?B?WllMSGYzM3NHNk1zUlRwU2piWnFVcm5Yb3kvSkRvQi9JMVdsaExjOEhoa05I?=
- =?utf-8?B?YnBDc1UxZXBTaFZVck5CWGpsTm5EZ3EzeUx5WG9ocXB0WlQ1WEU0NzZUMHJB?=
- =?utf-8?B?VW53OENPZlVmSU5ETk9yMkFVMjlpaENXa1dGbEhIeitFN283V0JQMFpaVHdn?=
- =?utf-8?B?M3U5Tk9LajdUdWxXR3ZqSE9LditpbHAyVlpwT0tFdElhYXdJQWFoV3JrRVll?=
- =?utf-8?B?Y0FSQU1qUWMrWlhvekNnYmxFUFNVS0xBaUxLeDVEUVROY2pQREVGdjN0dTNQ?=
- =?utf-8?B?bUp5SkRveGtuYklRZmZsUFVLOWZmRGFnYVovYmtwQmxXM2RtSzAwZG90TkFn?=
- =?utf-8?B?SG9tRy9pcTBRK0w1WVJaVldLakF6dWpBM3dkdTNsWm53SkhGRmNOL2dpdFVM?=
- =?utf-8?B?elhid3o3UTNTUlozM1g3cW1JbWJmU0ZIV3VQMGR2amdzLzNBc3RVQ0Flai9E?=
- =?utf-8?B?azhmTEF2bWFZbFBFNXI1WlpkYWwydTF4d1VxbUM5aFh1b3pxMVM5R3FQYkJS?=
- =?utf-8?B?emthTmhCY1krWGJxT1luamJXOVdTTGpJMVRRWVhkOEpDR1BPM0lzeDBpUEIr?=
- =?utf-8?B?T1kyYU1YaUEzREFnZTl0ZGE0MnVjM1JqSkxGaHFBalNwdnhPY2dJcUIxbzFx?=
- =?utf-8?B?M0l0U1k4MldWUzA2alQ2RG4vVWNmV1JqVTN5Ly92MFNYY1RhWm5MWFE4YlYr?=
- =?utf-8?B?SjVGVkNGeWFFVzAyNTNjajcwVGFKWEhGUm9ycmlKYnpGT1hicS96R1FQWEdt?=
- =?utf-8?B?MEt4V1hnTytRcERHcjlwT3pyaUNFQm5HenF1eWh2dEJCMEFFT3BaZlVPNU5r?=
- =?utf-8?B?SFJ0SEpndXA3amFqcUM3MFg2NzNBOWZYVjRNRStoTXFDSXYzMW4wa1Q5azQr?=
- =?utf-8?B?SUxPZklNOE1KUnJ3YVVtb29raCswT2h6YURIWldkVUswcTVrcDZOZy9PUHVO?=
- =?utf-8?B?UlNhM3plbjVVNk95amNzV2dHWTIyT09oWk4zZklNOTNveGJHYzNMN0JtUFdl?=
- =?utf-8?B?NGg5OE9sa0xiUGFTWHZmdTdKb3NQWEl5Qy8rby9SVm1Cazlhejc3MHdPSDZD?=
- =?utf-8?B?NFZoZEhGRGp4anNhdFVMUS9lM0Z6K1lLUTFhMzIrWVJ2S1RqRUJxSnFCUmtU?=
- =?utf-8?B?K0ZsWStWL0Jaa29EMXRmS1NxRlVDU3JCZTI2SnA3NFlzSTJNMm50bkVPWWZL?=
- =?utf-8?B?cjg0VWlBaHkwYTA3OU45MDFnNFNGMFFIcVZ2a3hvdSttWlpuMHdOMWZEQ2dE?=
- =?utf-8?B?Q1FjK0ZnZjNlamE4bi9XaGQ3UEFWSFhQeDZrRVkxR2ZmV3RhOXlXb1ZaQXQ3?=
- =?utf-8?B?a3ZVY2Q3dnQrZWNuNHA4c2hldU1UWFU4ZXN4Mk9MV3BqZHhhRjAxcVBUaTk3?=
- =?utf-8?B?TkV2anc5S2tlWnpJeFFDWldxS0pLWEhIdTAvdkgyQ3ZtUXVEcDZqQmc1SUk4?=
- =?utf-8?B?a0pUbmNMaW9Nbk9QZ2gxZWtxR1VwSENQZ0NFN01vNy9VTC9pcERuaTVZcTBM?=
- =?utf-8?B?NjNEbnZNeWg4dlovU0FLeVlMMWIzelgxTll6c0JMZ21BV25qK0xtY05oNU5a?=
- =?utf-8?Q?nwCVB3jufk7OpX7ED/zOJibuA?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2f05058c-0ad4-4eaa-f6eb-08dcbcab9966
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR12MB5070.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Aug 2024 21:53:58.0416
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QQ14g2mXl0wXOvAo9rvq0RC2FGP6+tfyGxHpJGuiQTLIKvKkgesT1zBd1fHAZ7N+7hen4p6pe3tA1fIhLnKauA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7786
+Mime-Version: 1.0
+References: <20240809160909.1023470-1-peterx@redhat.com> <20240814123715.GB2032816@nvidia.com>
+ <ZrzAlchCZx0ptSfR@google.com> <20240814144307.GP2032816@nvidia.com> <Zr0ZbPQHVNzmvwa6@google.com>
+Message-ID: <Zr0pCqo1YtkiuGqb@google.com>
+Subject: Re: [PATCH 00/19] mm: Support huge pfnmaps
+From: Sean Christopherson <seanjc@google.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Peter Xu <peterx@redhat.com>, linux-mm@kvack.org, linux-kernel@vger.kernel.org, 
+	Oscar Salvador <osalvador@suse.de>, Axel Rasmussen <axelrasmussen@google.com>, 
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org, 
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Zi Yan <ziy@nvidia.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Ingo Molnar <mingo@redhat.com>, 
+	Alistair Popple <apopple@nvidia.com>, Borislav Petkov <bp@alien8.de>, David Hildenbrand <david@redhat.com>, 
+	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Alex Williamson <alex.williamson@redhat.com>, 
+	Yan Zhao <yan.y.zhao@intel.com>, Oliver Upton <oliver.upton@linux.dev>, 
+	Marc Zyngier <maz@kernel.org>
+Content-Type: text/plain; charset="us-ascii"
 
-On 8/12/24 14:42, Ashish Kalra wrote:
-> From: Ashish Kalra <ashish.kalra@amd.com>
+On Wed, Aug 14, 2024, Sean Christopherson wrote:
+> TL;DR: it's probably worth looking at mmu_stress_test (was: max_guest_memory_test)
+> on arm64, specifically the mprotect() testcase[1], as performance is significantly
+> worse compared to x86, and there might be bugs lurking the mmu_notifier flows.
 > 
-> Extend information returned about SNP platform's status and capabilities
-> such as SNP_FEATURE_INFO command availability, ciphertext hiding enabled
-> and ciphertext hiding capability.
-
-Just saying something like:
-
-Define new bit-field definitions returned by the SNP_PLATFORM_STATUS
-command.
-
-You're not actually extending the command or struct.
-
+> When running mmu_stress_test the mprotect() phase that makes guest memory read-only
+> takes more than three times as long on arm64 versus x86.  The time to initially
+> popuplate memory (run1) is also notably higher on arm64, as is the time to
+> mprotect() back to RW protections.
 > 
-> Signed-off-by: Ashish Kalra <ashish.kalra@amd.com>
-> ---
->  include/uapi/linux/psp-sev.h | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
+> The test doesn't go super far out of its way to control the environment, but it
+> should be a fairly reasonable apples-to-apples comparison.  
 > 
-> diff --git a/include/uapi/linux/psp-sev.h b/include/uapi/linux/psp-sev.h
-> index 2289b7c76c59..19a0a284b798 100644
-> --- a/include/uapi/linux/psp-sev.h
-> +++ b/include/uapi/linux/psp-sev.h
-> @@ -177,6 +177,10 @@ struct sev_user_data_get_id2 {
->   * @mask_chip_id: whether chip id is present in attestation reports or not
->   * @mask_chip_key: whether attestation reports are signed or not
->   * @vlek_en: VLEK (Version Loaded Endorsement Key) hashstick is loaded
-> + * @feature_info: whether SNP_FEATURE_INFO command is available
-> + * @rapl_dis: whether RAPL is disabled
-> + * @ciphertext_hiding_cap: whether platform has ciphertext hiding enabled
+> Ouch.  I take that back, it's not apples-to-apples, because the test does more
+> work for x86.  On x86, during mprotect(PROT_READ), the userspace side skips the
+> faulting instruction on -EFAULT and so vCPUs keep writing for the entire duration.
+> Other architectures stop running the vCPU after the first write -EFAULT and wait
+> for the mproptect() to complete.  If I comment out the x86-only logic and have
+> vCPUs stop on the first -EFAULT, the mprotect() goes way down.
+> 
+> /me fiddles with arm64
+> 
+> And if I have arm64 vCPUs keep faulting, the time goes up, as exptected.
+> 
+> With 128GiB of guest memory (aliased to a single 2GiB chunk of physical memory),
+> and 48 vCPUs (on systems with 64+ CPUs), stopping on the first fault:
+> 
+>  x86:
+>   run1 =  6.873408794s, reset = 0.000165898s, run2 = 0.035537803s, ro =  6.149083106s, rw = 7.713627355s
+> 
+>  arm64:
+>   run1 = 13.960144969s, reset = 0.000178596s, run2 = 0.018020005s, ro = 50.924434051s, rw = 14.712983786
+> 
+> and skipping on -EFAULT and thus writing throughout mprotect():
+> 
+>  x86:
+>   run1 =  6.923218747s, reset = 0.000167050s, run2 = 0.034676225s, ro = 14.599445790s, rw = 7.763152792s
+> 
+>  arm64:
+>   run1 = 13.543469513s, reset = 0.000018763s, run2 = 0.020533896s, ro = 81.063504438s, rw = 14.967504024s
 
-s/enabled/capability/
-
-Thanks,
-Tom
-
-> + * @ciphertext_hiding_en: whether ciphertext hiding is enabled
->   * @rsvd1: reserved
->   * @guest_count: the number of guest currently managed by the firmware
->   * @current_tcb_version: current TCB version
-> @@ -192,7 +196,11 @@ struct sev_user_data_snp_status {
->  	__u32 mask_chip_id:1;		/* Out */
->  	__u32 mask_chip_key:1;		/* Out */
->  	__u32 vlek_en:1;		/* Out */
-> -	__u32 rsvd1:29;
-> +	__u32 feature_info:1;		/* Out */
-> +	__u32 rapl_dis:1;		/* Out */
-> +	__u32 ciphertext_hiding_cap:1;	/* Out */
-> +	__u32 ciphertext_hiding_en:1;	/* Out */
-> +	__u32 rsvd1:25;
->  	__u32 guest_count;		/* Out */
->  	__u64 current_tcb_version;	/* Out */
->  	__u64 reported_tcb_version;	/* Out */
+Oliver pointed out off-list that the hardware I was using doesn't have forced
+write-back, and so the overhead on arm64 is likely due to cache maintenance.
 
