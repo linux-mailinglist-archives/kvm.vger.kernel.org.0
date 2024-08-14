@@ -1,135 +1,114 @@
-Return-Path: <kvm+bounces-24217-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24218-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81070952609
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 00:57:57 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7848395262F
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 01:28:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4BD71C213B2
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 22:57:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 17239B22F50
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 23:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A76E414B08E;
-	Wed, 14 Aug 2024 22:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5679714EC6E;
+	Wed, 14 Aug 2024 23:28:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tW5yhGUl"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="nsc/bZr/"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E9D4146A7D
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 22:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F015A1494D9
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 23:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723676273; cv=none; b=s14JrkE4MeuRSaC8A90Z/OpPETD4a9zBFK5Sy0TkjayOZuI0LGddnKRvsfSM7ievTOqBCCMoiiVTjjEHIzxngfNxAi0+OB0ZMkClabh0xOBQbU1orT2pnAh1BrH2i3QYFl61mYVqDldACCp8MZQY1dTYs3wUjljBVQs9sL/6vDk=
+	t=1723678083; cv=none; b=KrkyUCVNrMgCv18hQsaSQH/HaVfRI088bS934gGDYgV4UqcWKgtSurbU30w6AKHa1O+6FOmfi3On4kDRvrKtZc1N/1rwh515hfngDi/xexH7SQrJZptd/OsedOucTGc9Mnn/9sygGuK5K9r84yu8Sb5q34Ve2lySlD2UhHFyGUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723676273; c=relaxed/simple;
-	bh=R4rBzep3wt8cwF8iJPcpyPemhVqeacKhVyDXdn6hDLY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Of0AUl+VUnyV2rtSUgHe360Lcmmx8lNaSn4ZMzcDXyZ9l2IBRp3aUU9WgGQEy/CqOslt/rnqkymigsZ35MRBjopLhWOCkXD9Y/KD1gbQr+tZ4IRco3lJOoJvNnv+FDwUHwKtfvNZgF66R0LaU3+Q1olDF7rpGbOdp6sC2FtKZOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tW5yhGUl; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47EHtNxv013013;
-	Wed, 14 Aug 2024 22:57:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:subject:from:to:cc:date:in-reply-to:references
-	:content-type:content-transfer-encoding:mime-version; s=pp1; bh=
-	R4rBzep3wt8cwF8iJPcpyPemhVqeacKhVyDXdn6hDLY=; b=tW5yhGUlNLsMKxnx
-	iAGkV7fI2TRQ2u9plrjMlmK558/vzkX8m9+QtV4H6VsOE6m9yzWOmbD6la434cdP
-	pXd9XhwMVA2619gzVu9j8xjOtOrbgvTovEbdTPFuWVtLlzTtUgRFw/fjhGZeZ/D7
-	alyHhpSQXQ60YTHUA5JuN4Gjgkb8RY7CrEVghgqvsClXEt/xD1q/0rbEeYdcD+C0
-	+rDi7NYdeD3uvr2Sz+prKgBSEBX4T9nG/ErFRlG9MJ26sqqccP6AApApxQr05ZA+
-	rDPxJXRCtTgOVNy2ssinzVGA2sdRQ0ez3KhP1H1eF3UI1qfcjKf+HlCpJ9Ri3sfN
-	7HMMIA==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d693kq-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Aug 2024 22:57:43 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47EMurnq012331;
-	Wed, 14 Aug 2024 22:57:42 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d693kh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Aug 2024 22:57:42 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47EJe93x010088;
-	Wed, 14 Aug 2024 22:57:41 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40xjx0uyr3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 14 Aug 2024 22:57:41 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47EMvb9M53674384
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 14 Aug 2024 22:57:39 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 447FB20043;
-	Wed, 14 Aug 2024 22:57:37 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 76E2A20040;
-	Wed, 14 Aug 2024 22:57:36 +0000 (GMT)
-Received: from [127.0.0.1] (unknown [9.152.108.100])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Wed, 14 Aug 2024 22:57:36 +0000 (GMT)
-Message-ID: <e7478b1e0116882c5cbbff61fac5f2221841877c.camel@linux.ibm.com>
-Subject: Re: [PATCH v2 3/4] target/s390x: fix build warning (gcc-12
- -fsanitize=thread)
-From: Ilya Leoshkevich <iii@linux.ibm.com>
-To: Pierrick Bouvier <pierrick.bouvier@linaro.org>, qemu-devel@nongnu.org
-Cc: Beraldo Leal <bleal@redhat.com>, David Hildenbrand <david@redhat.com>,
-        Thomas Huth <thuth@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
-        Philippe =?ISO-8859-1?Q?Mathieu-Daud=E9?= <philmd@linaro.org>,
-        Paolo
- Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
-        Wainer dos Santos
- Moschetta <wainersm@redhat.com>,
-        qemu-s390x@nongnu.org,
-        "Daniel P."
- =?ISO-8859-1?Q?Berrang=E9?= <berrange@redhat.com>,
-        =?ISO-8859-1?Q?Marc-Andr=E9?= Lureau <marcandre.lureau@redhat.com>,
-        Richard
- Henderson <richard.henderson@linaro.org>,
-        Alex =?ISO-8859-1?Q?Benn=E9e?=
- <alex.bennee@linaro.org>
-Date: Thu, 15 Aug 2024 00:57:35 +0200
-In-Reply-To: <20240814224132.897098-4-pierrick.bouvier@linaro.org>
-References: <20240814224132.897098-1-pierrick.bouvier@linaro.org>
-	 <20240814224132.897098-4-pierrick.bouvier@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+	s=arc-20240116; t=1723678083; c=relaxed/simple;
+	bh=dYa2tzAJ6Cdw1W4KgGQX8E+iTD2pOCbZkqL986wEhDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qGYXKFbQN4xE6nUzqvqZSAzfKsDgnn69ai70lYm7sitSfWKwNuVpy2FYLZqnR4VzN7VHLILwFXxdDt6ohlTEP5aoK/HCJJ2uJ/HtSOfvR0WkGO2C42zUcCxUt8ERACNBvSRLHDxKwE9EqSeLF14SvKMecLot4LGoaugJ5xt5dNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=nsc/bZr/; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Date: Wed, 14 Aug 2024 16:27:47 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1723678078;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8eQ90tE9+0xy2m1p8J2TRyAO3oFmDIcWuzH3FCL6Ggw=;
+	b=nsc/bZr/eIAVrZJRD7FjVR0EMURLDMYdP2P6CaJSQamBq1RarDknj2/UwwhEWTNcIxAdwt
+	4tStaF6wh0JB9KM4qNfkpXnLwEDP+/IdOhbNWv7jY7g8xjwVLvzwJvsMy9C5F1QgUQcNWF
+	JVk9O7hDFOKVn4LwjePpEZMMjlHuYbw=
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Oliver Upton <oliver.upton@linux.dev>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Peter Xu <peterx@redhat.com>,
+	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	Oscar Salvador <osalvador@suse.de>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Borislav Petkov <bp@alien8.de>,
+	David Hildenbrand <david@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Yan Zhao <yan.y.zhao@intel.com>, Marc Zyngier <maz@kernel.org>
+Subject: Re: [PATCH 00/19] mm: Support huge pfnmaps
+Message-ID: <Zr09cyPZNShzeZc6@linux.dev>
+References: <20240809160909.1023470-1-peterx@redhat.com>
+ <20240814123715.GB2032816@nvidia.com>
+ <ZrzAlchCZx0ptSfR@google.com>
+ <20240814144307.GP2032816@nvidia.com>
+ <Zr0ZbPQHVNzmvwa6@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: AuD4AOgyxvUz_qqmdMkzwrQKCGm8U92K
-X-Proofpoint-ORIG-GUID: tiqy8AfNNfwo-eIdKn9mriTFTZZj3Fqg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-14_18,2024-08-13_02,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=841 phishscore=0
- spamscore=0 malwarescore=0 priorityscore=1501 impostorscore=0 adultscore=0
- bulkscore=0 mlxscore=0 lowpriorityscore=0 suspectscore=0 clxscore=1011
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2407110000
- definitions=main-2408140157
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zr0ZbPQHVNzmvwa6@google.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 2024-08-14 at 15:41 -0700, Pierrick Bouvier wrote:
-> Found on debian stable.
->=20
-> ../target/s390x/tcg/translate.c: In function =E2=80=98get_mem_index=E2=80=
-=99:
-> ../target/s390x/tcg/translate.c:398:1: error: control reaches end of
-> non-void function [-Werror=3Dreturn-type]
-> =C2=A0 398 | }
->=20
-> Signed-off-by: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+On Wed, Aug 14, 2024 at 01:54:04PM -0700, Sean Christopherson wrote:
+> TL;DR: it's probably worth looking at mmu_stress_test (was: max_guest_memory_test)
+> on arm64, specifically the mprotect() testcase[1], as performance is significantly
+> worse compared to x86,
 
-Acked-by: Ilya Leoshkevich <iii@linux.ibm.com>
+Sharing what we discussed offline:
+
+Sean was using a machine w/o FEAT_FWB for this test, so the increased
+runtime on arm64 is likely explained by the CMOs we're doing when
+creating or invalidating a stage-2 PTE.
+
+Using a machine w/ FEAT_FWB would be better for making these sort of
+cross-architecture comparisons. Beyond CMOs, we do have some 
+
+> and there might be bugs lurking the mmu_notifier flows.
+
+Impossible! :)
+
+> Jumping back to mmap_lock, adding a lock, vma_lookup(), and unlock in x86's page
+> fault path for valid VMAs does introduce a performance regression, but only ~30%,
+> not the ~6x jump from x86 to arm64.  So that too makes it unlikely taking mmap_lock
+> is the main problem, though it's still good justification for avoid mmap_lock in
+> the page fault path.
+
+I'm curious how much of that 30% in a microbenchmark would translate to
+real world performance, since it isn't *that* egregious. We also have
+other uses for getting at the VMA beyond mapping granularity (MTE and
+the VFIO Normal-NC hint) that'd require some attention too.
+
+-- 
+Thanks,
+Oliver
 
