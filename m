@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-24182-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24183-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18918952184
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 19:50:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C3D6952190
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 19:54:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 849141F226AD
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:50:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D08FF1C2146F
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6587C1BD002;
-	Wed, 14 Aug 2024 17:50:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9580A1BD00F;
+	Wed, 14 Aug 2024 17:54:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dAIo8Sn3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BZTM1FSP"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B351BA870
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 17:50:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5608B1BC082
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 17:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723657811; cv=none; b=EkqLD9XPRaMoykW2Lo5VyVOSlMwQbROU8+2LRxeLYGQNVR2DtPldxxQwc6kA4yBjv6j0qR/v50G8qJ2KNkCI1lbtrA41JweVTOupDdbM3XPM2imLf0g61vqGZrB8FQXlo/hToE6pY+sq20E3f9aVFC7iLC2Vt888Lspkvux18WA=
+	t=1723658042; cv=none; b=kngGvwd0kWTEY4iUR1RYPkFUTSazNwKyyEdQalz8Q9ANTALwi/wtk1WOAk8ZKnHyNDG2m+ySajxmNsHWv2CYYz+NERdlpqgosGL+xEZ5svVuYcpJUwv87KbUyoTQGOOogtxYlX0TQAFb7YpIK7Oez/d62JoF60B/MQqavqe9+qU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723657811; c=relaxed/simple;
-	bh=o7UnWKGC5ImuqDKd0A+y4X+zbi4zjYGIUvZ598GJQx4=;
+	s=arc-20240116; t=1723658042; c=relaxed/simple;
+	bh=K9ZcCXNR6AhP16LYTClrH523SOz36Om1uAG1kkWUekA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p7zqN7xtF0UkF7ga9dWe74iviv5NO5T8B6pmjSFdEJAYaC0Ga8jzx7makNXcLkr4WxZAkftT66aHgSU+6XX1CGqy2JaG2+/aEO/9ZPzt1QzsrxuyHKSiBvhbi0+pVp5FTc8svJACYoWtQbuNCnAe/WlR0qRnCLhcDy30KJ3m3fo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dAIo8Sn3; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=rz7Th5Gj6p1Ffq/Yhp2aOxBn3vPlaoJK7SqF0LnhzH9tg13okxsAYho0+zhx+eoaYL/8VPOQwNpYsdbczHiZEm8Nuug5TVOOE4c0zCG6+3T63mJc9JFxc5o2SYKVJlH8i+Iziz7ccOlypYIwghyrk14CjH/0km5ODDKUlpu5bIg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BZTM1FSP; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723657808;
+	s=mimecast20190719; t=1723658040;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=D60tbrlKP7Gw+YlhJwC85uUtehBLMwc9/zsHx1WY5pU=;
-	b=dAIo8Sn3CVi5A4ym+bn/EVp/UXpNFTXRDyRjgRkMb0/QcJni0oCoZyn09y+K1sNMGDp/Fz
-	FLISHw/T9hg1W4FgYoHKtM/MZlAoTTrr1MfC1NfIm7W0yVZuOmnY61mLRxfg0Kpj7LrvA0
-	hO4FN8ZULksOVl3F3QJrxKen8oaGJwg=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=aqW1pStkkqE8bSHAyK2eetUPj2vtzB+TVj0YShqKUw8=;
+	b=BZTM1FSPQVW5zw/8N/grYxcDGW/1Skdz+elwCDe9QAG9wu9ZI3GUHbDHxFaM40xTO2xOs9
+	AjLUFvIwy2uYzHNmdsYmQv1z38/PC7zHgTClT0vtmgsebzD0VgFgO/lgNf/oW3pFIFu+zi
+	TxAhP9Isvo89im5iVmdrFyEA7kkOczI=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-290-DTAdoPp5NjaZbyEdMxBGKA-1; Wed, 14 Aug 2024 13:50:07 -0400
-X-MC-Unique: DTAdoPp5NjaZbyEdMxBGKA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-36bbcecebb4so124846f8f.0
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 10:50:06 -0700 (PDT)
+ us-mta-644-Zc7D2JWVM12GRGjMT2vAaw-1; Wed, 14 Aug 2024 13:53:58 -0400
+X-MC-Unique: Zc7D2JWVM12GRGjMT2vAaw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-369bbbdb5a1so49363f8f.1
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 10:53:58 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723657806; x=1724262606;
+        d=1e100.net; s=20230601; t=1723658037; x=1724262837;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=D60tbrlKP7Gw+YlhJwC85uUtehBLMwc9/zsHx1WY5pU=;
-        b=qyW+Q09lFHqyaof45dDMTt87PLqPB6y+au8Nr8+mw+OochPcY4I42Zx8h00R49fBlw
-         P6tVFFfApE79EyAXHFttKZ973wioDxQYFJn/nO2NDjbW7111Gs8x7t7HGo0lsnmyg7z/
-         O/rpAMAtooDRJqpFLfnG5AL94icjiJWTMhd2ABxGNzNyHYMyBi73jXLq0cXBUC12KSuq
-         JGHf+ufmEMMsskUOar+EocIoydIglmW4NEQXBzZrJxDj658FIjTnvL6Qs17FN6GOq2gI
-         NwUAe8u1VjrkQYrn1/1LMSbC7dSxBxiqzeaKefIHmXc1YkZ7vlMvOxtlLewmvgSt3+ns
-         ryvQ==
-X-Gm-Message-State: AOJu0YxR5B3hoifJAMRZLw0KssIh4Vr68VqLQveiwKBD8XSAVV0orBYT
-	NKshsz/vrZBnMrgOvfeMJKsyEQvx6xpxQsjG6ce8dr5VD8DEJNmuS0mRTC4T+OwkzXVhW2+/uXj
-	PIRgbfR1Y/jfBYA8vUfw3sjZo+Xx3Uu11xz5nj/zEAaZ2cuVXtg==
-X-Received: by 2002:adf:fb4d:0:b0:368:78d0:c240 with SMTP id ffacd0b85a97d-37177785ebemr2965849f8f.35.1723657805847;
-        Wed, 14 Aug 2024 10:50:05 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG5RNDAtSjrNSf17qwEzrd6g2TkSGUK2wx5/qSGkwfZKkZy0bGLK/2llpLIbYk1QHtZWfCfOg==
-X-Received: by 2002:adf:fb4d:0:b0:368:78d0:c240 with SMTP id ffacd0b85a97d-37177785ebemr2965825f8f.35.1723657805330;
-        Wed, 14 Aug 2024 10:50:05 -0700 (PDT)
+        bh=aqW1pStkkqE8bSHAyK2eetUPj2vtzB+TVj0YShqKUw8=;
+        b=bewb//BSTnKwSwvCaujAVFngr9FfkDkgsr70Yfa944/IDoqsDRa22QeWRFhsxWViNv
+         T3lydbtDjEy++ZvMEMC585vnHgOdvT/AepjouQnLN/eNAW9P3q3PJmB+kEEOaNWTp9re
+         FehhdF1lUbZoVWEvTsctXjGVGntKw5KQPvoLEBsgDFW84eA3akTQRen5PGebJ/FT78ID
+         7AUlfH1IZXiDkk3RMdakXK8XIiBQgITal5SSqW5wjnAQUMj7T8DY7xUZSFFlaRqLhOj4
+         3xHkZAncWb/XXXJ2+ToBenAYvpieOij8vKOrkmjo/mxzmvijPnNO/Xmt6fbz46Ir4rCY
+         3DNQ==
+X-Gm-Message-State: AOJu0YzjR7WDZsPo94kaA24sydoeZK0OVlSulWLxXm1fJvfzrv4thUdc
+	hQP1zNvHLWSpQkiJ5Cn0+2Ite2RaelTCOxfbeRE69itO8UD+q1DuHhWF27TBfMk8wFZGVizvGnL
+	FJUneY6dX2Qz9SBgKJT5zBCxzDB864pVmydLZsuf1z05Zhr6PNw==
+X-Received: by 2002:adf:e3cf:0:b0:366:e9fa:17b with SMTP id ffacd0b85a97d-37186b85f8dmr478963f8f.1.1723658037486;
+        Wed, 14 Aug 2024 10:53:57 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE0gtugkRTcQm7G8pkJF3tmkwxTEKg02g/XJX7ambB07oT/yEXqXmEM1X4Q43rWoTjJipEklw==
+X-Received: by 2002:adf:e3cf:0:b0:366:e9fa:17b with SMTP id ffacd0b85a97d-37186b85f8dmr478945f8f.1.1723658037010;
+        Wed, 14 Aug 2024 10:53:57 -0700 (PDT)
 Received: from [192.168.10.47] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-371874c7e1asm151669f8f.9.2024.08.14.10.50.03
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-36e4e51ea09sm13463097f8f.71.2024.08.14.10.53.54
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Aug 2024 10:50:04 -0700 (PDT)
-Message-ID: <6530eb94-b937-415c-8457-f5c598d94e7b@redhat.com>
-Date: Wed, 14 Aug 2024 19:50:01 +0200
+        Wed, 14 Aug 2024 10:53:56 -0700 (PDT)
+Message-ID: <aede9ea1-099a-47db-a133-28ad22206858@redhat.com>
+Date: Wed, 14 Aug 2024 19:53:53 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,15 +82,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 16/22] KVM: x86: Remove manual pfn lookup when retrying
- #PF after failed emulation
+Subject: Re: [PATCH 17/22] KVM: x86: Check EMULTYPE_WRITE_PF_TO_SP before
+ unprotecting gfn
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Peter Gonda <pgonda@google.com>, Michael Roth <michael.roth@amd.com>,
  Vishal Annapurve <vannapurve@google.com>,
  Ackerly Tng <ackerleytng@google.com>
 References: <20240809190319.1710470-1-seanjc@google.com>
- <20240809190319.1710470-17-seanjc@google.com>
+ <20240809190319.1710470-18-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -128,69 +128,24 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240809190319.1710470-17-seanjc@google.com>
+In-Reply-To: <20240809190319.1710470-18-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 8/9/24 21:03, Sean Christopherson wrote:
-> Drop the manual pfn look when retrying an instruction that KVM failed to
-> emulation in response to a #PF due to a write-protected gfn.  Now that KVM
-> sets EMULTYPE_PF if and only if the page fault it a write-protected gfn,
+> +	 * Retry even if _this_ vCPU didn't unprotect the gfn, as it's possible
+> +	 * all SPTEs were already zapped by a different task.  The alternative
+> +	 * is to report the error to userspace and likely terminate the guest,
+> +	 * and the infinite loop detection logic will prevent retrying the page
+> +	 * fault indefinitely, i.e. there's nothing to lose by retrying.
 
-Pointing out where this happened will likely help a few years from now:
+Putting myself in the shoes of someone unfamiliar with the code, I might 
+prefer "the last_retry_eip/last_retry_addr checks" to "the infinite loop 
+detection logic"; after all, you're saying in the same sentence that 
+it's preventing an infinite loop.
 
-With the introduction of RET_PF_WRITE_PROTECTED, KVM sets EMULTYPE_PF if 
-and only if the page fault it a write-protected gfn, i.e. if and only if 
-there's a writable memslot.  KVM will never try to redo an instruction 
-that failed on emulated MMIO (no slot, or a write to a read-only slot), 
-so therefore there's no redo the lookup in reexecute_instruction().
+Thanks,
 
 Paolo
-
-> i.e. if and only if there's a writable memslot, there's no need to redo
-> the lookup to avoid retrying an instruction that failed on emulated MMIO
-> (no slot, or a write to a read-only slot).
-> 
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/x86.c | 18 ------------------
->   1 file changed, 18 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 771e67381fce..67f9871990fb 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -8867,7 +8867,6 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->   				  int emulation_type)
->   {
->   	gpa_t gpa = cr2_or_gpa;
-> -	kvm_pfn_t pfn;
->   
->   	if (!(emulation_type & EMULTYPE_ALLOW_RETRY_PF))
->   		return false;
-> @@ -8887,23 +8886,6 @@ static bool reexecute_instruction(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
->   			return true;
->   	}
->   
-> -	/*
-> -	 * Do not retry the unhandleable instruction if it faults on the
-> -	 * readonly host memory, otherwise it will goto a infinite loop:
-> -	 * retry instruction -> write #PF -> emulation fail -> retry
-> -	 * instruction -> ...
-> -	 */
-> -	pfn = gfn_to_pfn(vcpu->kvm, gpa_to_gfn(gpa));
-> -
-> -	/*
-> -	 * If the instruction failed on the error pfn, it can not be fixed,
-> -	 * report the error to userspace.
-> -	 */
-> -	if (is_error_noslot_pfn(pfn))
-> -		return false;
-> -
-> -	kvm_release_pfn_clean(pfn);
-> -
->   	/*
->   	 * If emulation may have been triggered by a write to a shadowed page
->   	 * table, unprotect the gfn (zap any relevant SPTEs) and re-enter the
 
 
