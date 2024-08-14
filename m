@@ -1,164 +1,174 @@
-Return-Path: <kvm+bounces-24161-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24162-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B83951ED0
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:43:22 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62551951F13
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 17:50:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3BF751F238F9
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 15:43:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7C50B276DB
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 15:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347A71B5810;
-	Wed, 14 Aug 2024 15:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BAB61B86D2;
+	Wed, 14 Aug 2024 15:50:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISF0kBo5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eLOWP2sR"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D25FB1B3F20
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 15:43:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 136A628DC3;
+	Wed, 14 Aug 2024 15:50:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723650195; cv=none; b=HxEeMhnX7m+HWoM26gAT/wGq3JTMOj61ljaVirh+fu1i27H/z8hgw1tkX1hbJMk0pLa4sRkEvggr5TQSndQTfole9eGQveWXUz/kC0HcfW7kFud6/iSrltFy6HY1K8WUMp5E6MIXtYGWemftkb2bjxvnPTgf6L7ScUNdbrbR0Y8=
+	t=1723650602; cv=none; b=VfqJZmtmpCafY8LVqTl6ejKEFDwJbQPhoLqT/sc+fF7vOU/h702FKiBPYTK1X4u/5cCS+wAHR4NOaYMUVHMAkgNNDv8d8AxIh/hAmXybEacA87WEy1GP90DfGhJY8aJBV9+3XwPDTT4gmdEkXGkqx5FAHp35lMO4OIc05qfhb30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723650195; c=relaxed/simple;
-	bh=5jNNP4J3iRDusoNj6f1v6htvMRdKOmxlTHHzIfa/yOw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ijS8QAtmC53vTYgmBJLOXaqLUOtg872zNKuD+6qKsOJK2SMJkxLUvVXKX87SON0GEhTwVRyUzx9WuOW1wPD5S8Qfuqhr3fRbTiWb4gj5wtyBdKdBk6szj4i5Xu3O2YpOhYxwjirEAuX0zx7kxCvxddrLF2+w1oaBusfL98TdjxQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ISF0kBo5; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723650192;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Wp3RgWPkdUCFzuPHgIrGTTZ3GUOXugzLWnj/fmKQBpI=;
-	b=ISF0kBo539jLEWcAPnCvwkworbu+GGOnbD8d6392qPlKMsEMu+ICcOjngXvvWTVOyMalwm
-	PkRXDNHae99exBxInXY/oNAyWEurTNYcFmn6q4ltQZj68igrxdq/UGGcU/H4OaCU5yaeaF
-	X4eBkZ3mZb5x+W3h5O3xtoksDRD3jn4=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-658-MADtsq_7PTWWi-LqQ4QsYg-1; Wed, 14 Aug 2024 11:43:11 -0400
-X-MC-Unique: MADtsq_7PTWWi-LqQ4QsYg-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6b798c6b850so539376d6.0
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 08:43:11 -0700 (PDT)
+	s=arc-20240116; t=1723650602; c=relaxed/simple;
+	bh=6vcFZWl/iSCK/BZGfGXgt8ur06Ij2rRs68cC5ThdJyg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=YrFzmcvlRvWA4Kr3gzyAOzaCDsRsLDN269BpFCF9F99aUqJKMCrOksIzB/ZgjTp7SNfJqBMlRQtAA6l3koTLwrXltrWVvYBu7C9QyROdbCshTuB67uwyIU8t1TzSvqVL63fSOICfxy10C1EBvu5zcWiiDPRDphqgSPMyYZ5HEZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eLOWP2sR; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-7093472356dso3808967a34.0;
+        Wed, 14 Aug 2024 08:50:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1723650600; x=1724255400; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fDv9V0v7KkpdJrpMs0piYzLNRxXj+irK5gUuUzZpGhs=;
+        b=eLOWP2sR+BDKCHyg1t27NoPaSeje4K4pIGR9xPHFZdEA7vIadrUaxzXJY9HKNHZDgh
+         Ko7dYBloGZWSNBULmrWdpL9j6RsTMpfUfePQ81CoCjQX2UVJPxH6NwW5dG3fvttfnsqp
+         f/bxETrCpDybYP4O/Z2k/PPPr7dbEi41mLrY/6a7oMfPvufWbhn2AA60HSnF7TOhMZ7q
+         Yt/EiZZFellVwdiCI4uCPibIuzSvuFZ/rWXY0KZxJMA82OtmsVc0onHKeMsiJLqaHuGk
+         FxodljGBwBqOgnmvAGwiQqxs2Gf5flh3mrVBxQd9dE+kME5yJG9xN5x9KW/Wh3wG/rGA
+         YU1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723650191; x=1724254991;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Wp3RgWPkdUCFzuPHgIrGTTZ3GUOXugzLWnj/fmKQBpI=;
-        b=p92q2laoDXi7kf5fY3kZ+aTsp7gtWrmh6TTAhErtXsmDumcfwa5leiY3RFtiWPjVsD
-         7eG4KpRHvsVd7bUny/JathEpwmeD17jt/k5ARoaZnYbBhWFVfcUQr8K1/Zz24Dcn9L5I
-         Z175d7b92Y+81oiI2EvASgO8qADmA+0f+14Oz/wcTk9W5GK86YoLDJRLMRt4Zq1g0U3d
-         K6kBX2Yb6ZTV+IFJ5tm49FH9ZuX2fqUiXbBRo69kN602onQVVD/92VnbOnLiG3pYQK9o
-         isSuGMT3utHBy5v60KfHYy4jm4zKFUh++YXaNWxIDPARexYFNp/lRBMJxI71uhMjmMCC
-         0TKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWKJ0dv0eubxiwLJp67RzaXZYg98CETmFQOgXyKBkrrXACo0VP0LqjJr7jhpmIiZLN4246tOKJgnYhLzl9OoJfHoJ0X
-X-Gm-Message-State: AOJu0YyG8XBhIHviqmV1ATKBZqP+cdOuDfhiN2FJ4lrcYp4oT/VYog5Y
-	86SgL7C90PeLiO0zCJviXRuozK/SlmJ9RtUFY8ACs4ijJQNZQtTE8Twkcb8Bo1dp9ZA0nrQ26BW
-	nGJoaLmrrxgPndGoe5QhunAoJ5DSiMtuK53cIPM3RBQr1UtumxA==
-X-Received: by 2002:a05:620a:3704:b0:79f:44d:2b8a with SMTP id af79cd13be357-7a4ee3907bdmr238904185a.5.1723650191075;
-        Wed, 14 Aug 2024 08:43:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGYXNGxrMlqiMBIZ5ST7AxhHtA/FbXaG+GaqvRqPuCV6WzqEPOJp/I4t+RerfXsa1wlbiNflw==
-X-Received: by 2002:a05:620a:3704:b0:79f:44d:2b8a with SMTP id af79cd13be357-7a4ee3907bdmr238901485a.5.1723650190692;
-        Wed, 14 Aug 2024 08:43:10 -0700 (PDT)
-Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4c7e051d4sm448353485a.123.2024.08.14.08.43.08
+        d=1e100.net; s=20230601; t=1723650600; x=1724255400;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fDv9V0v7KkpdJrpMs0piYzLNRxXj+irK5gUuUzZpGhs=;
+        b=i/wVqWdoHd2tFl8xcEaUOj/G0qStpT4zH/eUP4CDLSE/ChptxXWnczqa9Ym+1fqLIL
+         Oy/WqyYxfl15hqM3t7kefnFkaDUjjZooxW4HQXfBxJylwbZ/cQQmYzcUbpP6aXjV5ykx
+         srKfqJ/Z0YKHE2oSrtljGxYPnUcGNUKPSKh3YBH/vSC4jKokk8uWwj5MsyMI9Gods+Dm
+         Sst9VsmrPk2cEkylXk2Ko7YnVgPp9VxnxfvTi5vcbrI0J6FW8OeHkI1bA8v6by8zmmjL
+         opASoHX7TPLm1L+j4/w9kl7r72WXHyRdtFM+cZ3LiwoNOaa1oieOjwUg3ZiX35v/hR1/
+         hEyw==
+X-Forwarded-Encrypted: i=1; AJvYcCXJCiznzieD6tQyaYwwroalQbZA2dmX1LIayV6sPfsO8edRT26kxQ/sbOzpziFDxJOjmhYlhi6HCB5uWS1/JUQc0HyqEShtJ9yUE0xmuTqtTX8yJxmZRijNOTq9V6eODMgAJhsRnnRvuIqx9H7ABI2YngI8NLWzd5lLb78hkNtwxuSOorZT07wCS8ExpD3x3YTbGPBsevcDibeoCk/oROzm4HlS345x3rU0WU5YGJsViYc5
+X-Gm-Message-State: AOJu0Yy+1LZLxzdrEfzX5+W4NDgHcaggD6grGK0IPom8RBeR0/WOl32c
+	HkavQDuSm0ENvoM/PPPRDitZ9QJnq30/EfrlxIK4oUhIeK1azUun
+X-Google-Smtp-Source: AGHT+IF+xU5hTvBzD845HScA3WjHDYwvu17hmSc7al7mxeLt+8xp5o7SMvsr67KFPwp2VJkvDAOPFA==
+X-Received: by 2002:a05:6830:638b:b0:709:3f84:c1e0 with SMTP id 46e09a7af769-70c9d9c25a1mr3660423a34.26.1723650600144;
+        Wed, 14 Aug 2024 08:50:00 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id 46e09a7af769-70c7b880badsm2269478a34.54.2024.08.14.08.49.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Aug 2024 08:43:10 -0700 (PDT)
-Date: Wed, 14 Aug 2024 11:43:08 -0400
-From: Peter Xu <peterx@redhat.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
-	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Borislav Petkov <bp@alien8.de>,
-	David Hildenbrand <david@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 08/19] mm: Always define pxx_pgprot()
-Message-ID: <ZrzQjEJG3rEZhLTE@x1n>
-References: <20240809160909.1023470-1-peterx@redhat.com>
- <20240809160909.1023470-9-peterx@redhat.com>
- <20240814130915.GI2032816@nvidia.com>
+        Wed, 14 Aug 2024 08:49:59 -0700 (PDT)
+Message-ID: <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
+Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
+ page_frag API
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org,  pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Subbaraya Sundeep
+ <sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, Sagi Grimberg
+ <sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, Praveen
+ Kaligineedi <pkaligineedi@google.com>, Shailend Chand
+ <shailend@google.com>, Eric Dumazet <edumazet@google.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>,
+ Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>,
+ Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, Mark Lee
+ <Mark-MC.Lee@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>,
+  Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Chaitanya
+ Kulkarni <kch@nvidia.com>,  "Michael S. Tsirkin" <mst@redhat.com>, Jason
+ Wang <jasowang@redhat.com>, Eugenio =?ISO-8859-1?Q?P=E9rez?=
+ <eperezma@redhat.com>, Andrew Morton <akpm@linux-foundation.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,  David Howells
+ <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Jeff Layton
+ <jlayton@kernel.org>,  Neil Brown <neilb@suse.de>, Olga Kornievskaia
+ <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
+ <tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
+ <anna@kernel.org>,  Shuah Khan <shuah@kernel.org>,
+ intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
+ kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org, 
+ bpf@vger.kernel.org, linux-afs@lists.infradead.org,
+ linux-nfs@vger.kernel.org,  linux-kselftest@vger.kernel.org
+Date: Wed, 14 Aug 2024 08:49:53 -0700
+In-Reply-To: <20240808123714.462740-5-linyunsheng@huawei.com>
+References: <20240808123714.462740-1-linyunsheng@huawei.com>
+	 <20240808123714.462740-5-linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240814130915.GI2032816@nvidia.com>
 
-On Wed, Aug 14, 2024 at 10:09:15AM -0300, Jason Gunthorpe wrote:
-> On Fri, Aug 09, 2024 at 12:08:58PM -0400, Peter Xu wrote:
-> > There're:
-> > 
-> >   - 8 archs (arc, arm64, include, mips, powerpc, s390, sh, x86) that
-> >   support pte_pgprot().
-> > 
-> >   - 2 archs (x86, sparc) that support pmd_pgprot().
-> > 
-> >   - 1 arch (x86) that support pud_pgprot().
-> > 
-> > Always define them to be used in generic code, and then we don't need to
-> > fiddle with "#ifdef"s when doing so.
-> > 
-> > Signed-off-by: Peter Xu <peterx@redhat.com>
-> > ---
-> >  arch/arm64/include/asm/pgtable.h    |  1 +
-> >  arch/powerpc/include/asm/pgtable.h  |  1 +
-> >  arch/s390/include/asm/pgtable.h     |  1 +
-> >  arch/sparc/include/asm/pgtable_64.h |  1 +
-> >  include/linux/pgtable.h             | 12 ++++++++++++
-> >  5 files changed, 16 insertions(+)
-> 
-> Reviewed-by: Jason Gunthorpe <jgg@nvidia.com>
-> 
-> > diff --git a/arch/arm64/include/asm/pgtable.h b/arch/arm64/include/asm/pgtable.h
-> > index 7a4f5604be3f..b78cc4a6758b 100644
-> > --- a/arch/arm64/include/asm/pgtable.h
-> > +++ b/arch/arm64/include/asm/pgtable.h
-> > @@ -384,6 +384,7 @@ static inline void __sync_cache_and_tags(pte_t pte, unsigned int nr_pages)
-> >  /*
-> >   * Select all bits except the pfn
-> >   */
-> > +#define pte_pgprot pte_pgprot
-> >  static inline pgprot_t pte_pgprot(pte_t pte)
-> >  {
-> >  	unsigned long pfn = pte_pfn(pte);
-> 
-> Stylistically I've been putting the #defines after the function body,
-> I wonder if there is a common pattern..
+On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
+> Currently the page_frag API is returning 'virtual address'
+> or 'va' when allocing and expecting 'virtual address' or
+> 'va' as input when freeing.
+>=20
+> As we are about to support new use cases that the caller
+> need to deal with 'struct page' or need to deal with both
+> 'va' and 'struct page'. In order to differentiate the API
+> handling between 'va' and 'struct page', add '_va' suffix
+> to the corresponding API mirroring the page_pool_alloc_va()
+> API of the page_pool. So that callers expecting to deal with
+> va, page or both va and page may call page_frag_alloc_va*,
+> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
+>=20
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> Acked-by: Chuck Lever <chuck.lever@oracle.com>
+> Acked-by: Sagi Grimberg <sagi@grimberg.me>
+> ---
+>  drivers/net/ethernet/google/gve/gve_rx.c      |  4 ++--
+>  drivers/net/ethernet/intel/ice/ice_txrx.c     |  2 +-
+>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
+>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  2 +-
+>  .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  4 ++--
+>  .../marvell/octeontx2/nic/otx2_common.c       |  2 +-
+>  drivers/net/ethernet/mediatek/mtk_wed_wo.c    |  4 ++--
+>  drivers/nvme/host/tcp.c                       |  8 +++----
+>  drivers/nvme/target/tcp.c                     | 22 +++++++++----------
+>  drivers/vhost/net.c                           |  6 ++---
+>  include/linux/page_frag_cache.h               | 21 +++++++++---------
+>  include/linux/skbuff.h                        |  2 +-
+>  kernel/bpf/cpumap.c                           |  2 +-
+>  mm/page_frag_cache.c                          | 12 +++++-----
+>  net/core/skbuff.c                             | 16 +++++++-------
+>  net/core/xdp.c                                |  2 +-
+>  net/rxrpc/txbuf.c                             | 15 +++++++------
+>  net/sunrpc/svcsock.c                          |  6 ++---
+>  .../selftests/mm/page_frag/page_frag_test.c   | 13 ++++++-----
+>  19 files changed, 75 insertions(+), 70 deletions(-)
+>=20
 
-Right, I see both happening in tree right now and I don't know which is
-better.  Personally I preferred "before function" as it makes spell checks
-easy to match macro/func names, and also cscope indexes both macro and
-func, so a jump to any of them would make me look at the entry of func.
+I still say no to this patch. It is an unnecessary name change and adds
+no value. If you insist on this patch I will reject the set every time.
 
-I'll keep it as-is for now just to make it easy for me.. but please comment
-if we do have a preferred pattern the other way round, then I'll follow.
-
-Thanks,
-
--- 
-Peter Xu
+The fact is it is polluting the git history and just makes things
+harder to maintain without adding any value as you aren't changing what
+the function does and there is no need for this. In addition it just
+makes it that much harder to backport fixes in the future as people
+will have to work around the rename.
 
 
