@@ -1,80 +1,80 @@
-Return-Path: <kvm+bounces-24167-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24168-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 557DB95203B
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 18:41:10 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB8795205D
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 18:48:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A05B1C22A3F
-	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 16:41:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71A52B242ED
+	for <lists+kvm@lfdr.de>; Wed, 14 Aug 2024 16:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D2E91B9B48;
-	Wed, 14 Aug 2024 16:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E291BA86E;
+	Wed, 14 Aug 2024 16:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="H4hAidHw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kzpm//R0"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4011B1405
-	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 16:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8708F1B9B26
+	for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 16:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723653664; cv=none; b=stHEsn+pQYx5qzARPnNNZZojYKtsPgNtMlfP7mCWvDgQXZG++vGDGFigeF8yb3PxlL3fk/TuJjx80i2wefJmRgcP7N+LeTiOE9Bskf6Ax741ddKNCUPxYexW4LBFbvZ/dmYC7ZmiqgZx2YnqigCJdgwBPn6WhD+sTqAz6UD7pEA=
+	t=1723654084; cv=none; b=m1YMLrOVHg4NyVMkmlxTZesmo9CeLdTx22z+D/LLnE4olJQ3776x4i8WA1Z1G0ehwquw1wGakQwZZ8chqeNlOzEHULFl+h6emPgNulXomvbQT4ly1Tz8D8yEozPGwUoeOE2PQifP7CsFQvcTUilVV6qTtQbq/0DofC/4wHTsNHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723653664; c=relaxed/simple;
-	bh=7AB5XL5Leu1w77lulF3bSCcoPu0jslyenRtKKCGnLPA=;
+	s=arc-20240116; t=1723654084; c=relaxed/simple;
+	bh=vTfAPEk2c1Ct83IEMiOqxGera7uARBbWF1WLwgPNSIs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uDQ2HRRJCHI1QKCwTmhdmwoHseCIcAEdrRpHedhgMHOawqc2xHeX426Uumd3hbdoo5Ke7U7tQkqlvgQN2qQbbQyFf62S25I9JxxyDA6O6pCPDPigGRPsAplEdT+ZY8vEakg8enKW6B0vVkgT7kIdXyevrQ+codW7tDt0QYmRHZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=H4hAidHw; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=jPJX+cxVuXBZszIaBCjmHKxaSLYOuyGqUKIRdvutdML5Bk8c3VRXvjhXIF0p9hDe1xCnJ9GeF3b3vCdLfc/yNEuhsqvMKL2rqCbaaRxU9iiGrjxlFip4AcPa4220TUOTJ9t+d03KI1nc5b2yV56Ds5i2eBAGFUKLh5yxwu39mw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kzpm//R0; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723653661;
+	s=mimecast20190719; t=1723654081;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=6q4Gfk/lIOoinbvdgXo7rUdEdQMPSJAVb4LqB5Anl/M=;
-	b=H4hAidHwnrzNzcOQl1KuGBDfH5ep2lJiB3ULnwhCLrQa3P7or9vEhsHBfWxxuYhHRKSWs5
-	CDuR1SSjYJmYs7SS+DHsEedkKhT7jc/ZuQaBnwH424reBe7knVj1OATB81X8Y2ey5qHEi/
-	IK58tUNXfbj74yBLzk7+Q6DGVv36SaM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=QYxda2UDwR4Xmvyg0lcuf9BUoRVgq+CvoIu/NKSta7Q=;
+	b=Kzpm//R0KArimu3RMB3Sx2Ealmq0vZsbcF6zVy48lZXF6QE7rt+HnoA4EfGhAYaKA6fiDm
+	H46U//Wg5VNOKm7cJbiwacbdBmiA0qH5MSF0KUBuGDorovJsottQlxXZljnox3J9SW41Jf
+	m/7CFY3gJqAqZANl8cDsZfYDtw2/CHE=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-466-B1SH18_5PRaoPDeIS2DHpw-1; Wed, 14 Aug 2024 12:40:59 -0400
-X-MC-Unique: B1SH18_5PRaoPDeIS2DHpw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4280e1852f3so53876275e9.3
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 09:40:58 -0700 (PDT)
+ us-mta-467-jJbuy6VmP4S8iXXUH7ZFuQ-1; Wed, 14 Aug 2024 12:48:00 -0400
+X-MC-Unique: jJbuy6VmP4S8iXXUH7ZFuQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-36835daf8b7so60319f8f.2
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 09:47:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723653658; x=1724258458;
+        d=1e100.net; s=20230601; t=1723654079; x=1724258879;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :from:references:cc:to:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=6q4Gfk/lIOoinbvdgXo7rUdEdQMPSJAVb4LqB5Anl/M=;
-        b=dW8uB/T13pdE9zLvfbLt3XTP0euKyAlHSy0XIkiA/+Tml2c2r/BewK/4zsxKt359VB
-         wHl0myBJpFIzUDcPBWv5JMDxeZsj2h4bnlOMeYFUyx8nr76CIv1Tp6yUaULfkcw1PUKA
-         FyJOzssPtV7lV1fDWuMS6QomHYR7LIRkyv8QMCWYN+nTyCVCx7A8fdkD6OTtNa7TXEmE
-         XXAf9v/906LVM08nx0n0TV40t/Mv/TvpfiTQ5jX4XyQg0uNh/UeCAoN8eBUWB6/uPs6A
-         OnJS9I5k5ZZKMLOCXFX64izbGYzr0Nim3b2dMg4I8pBxonB07AhTyz8NbHvJenVPDd8l
-         8D/Q==
-X-Gm-Message-State: AOJu0Yw1Gt/8U8oN6SfebN1ht3awA9iLDNjSXjAb+yI7YiaZAA0z7NS/
-	ErsomTafz5XV8CByhxTqRsG9Jo/FVLUwWM+aOs4uXgA8QEEIYpaUCqnpxYZFfncxAGBVG8WWpvi
-	jSoYRZxUkz4ZNiLMj/yMoPteRk6MqlxkbA8EUUixZSfT1/lU5Sw==
-X-Received: by 2002:a05:600c:4686:b0:428:e140:88c4 with SMTP id 5b1f17b1804b1-429dd26749dmr20611445e9.33.1723653657588;
-        Wed, 14 Aug 2024 09:40:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnFK08Vl87WzQqs3F1Brre5kODaABIS4VX+/eU65GczibuUE4Dv7UmwPOShh4Rj083IwRo5w==
-X-Received: by 2002:a05:600c:4686:b0:428:e140:88c4 with SMTP id 5b1f17b1804b1-429dd26749dmr20611285e9.33.1723653657032;
-        Wed, 14 Aug 2024 09:40:57 -0700 (PDT)
+        bh=QYxda2UDwR4Xmvyg0lcuf9BUoRVgq+CvoIu/NKSta7Q=;
+        b=ScH5LUVOPBMkOg4EQv8zC0mqSLKoYAc4K26/vKTFom3lM/o20aReHU9dXq3FxAQN2r
+         IACqqQmDGYEXjFAJOfZuZCdVuXUa52v5Es/WoLpeS4map5JpEG49Yx9ySK1tcyfvHrF/
+         nrmP6JIFKcrq4a3w0ymz2t2U3gdM7euBAAM9WzbsLwvEv0/01+1zi8HRPUdOkCp9OoWz
+         9AOmKZYWfPzRlLrEstbGe9iCT0wA3oMH4dsclS2yWG7g38B2lTW+15ffUWzU5KRedRao
+         VEsK249/meiKpox5fhZs7gnE++l7fiDxBH7m04aKVR2MyTeZKpUnqW9J3KH1+f2uD94w
+         8BwQ==
+X-Gm-Message-State: AOJu0YxOJPD0ByrYNIkBMWAkcjIcOQh8D1Puts+TT8yvcHY9g9zjC2RX
+	o6YKBAcYfslt14d+KN7erOIIZ6NvCM3i0Rz0PqCCID0AsegjAOQ7cXLR3CxGpKG6OxkV43EGYwy
+	RquZN9LwmkjcQImUYC7mJmlQt+ldsSepv0irj5F0v3wUYpDYBfQ==
+X-Received: by 2002:a5d:63d2:0:b0:368:4e35:76f9 with SMTP id ffacd0b85a97d-37177792c5cmr3202376f8f.37.1723654078839;
+        Wed, 14 Aug 2024 09:47:58 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHlHisBwwOgDSWWZAt8jetKNRxWN9mxvxPG18APJHAdr+BzMtyO7krVv2Z7CFUDIx3n93TEAQ==
+X-Received: by 2002:a5d:63d2:0:b0:368:4e35:76f9 with SMTP id ffacd0b85a97d-37177792c5cmr3202351f8f.37.1723654078206;
+        Wed, 14 Aug 2024 09:47:58 -0700 (PDT)
 Received: from [192.168.10.3] ([151.95.101.29])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-429ded19670sm25059625e9.9.2024.08.14.09.40.55
+        by smtp.googlemail.com with ESMTPSA id ffacd0b85a97d-36e4e51eaa9sm13321050f8f.68.2024.08.14.09.47.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Aug 2024 09:40:56 -0700 (PDT)
-Message-ID: <96293a7d-0347-458e-9776-d11f55894d34@redhat.com>
-Date: Wed, 14 Aug 2024 18:40:51 +0200
+        Wed, 14 Aug 2024 09:47:57 -0700 (PDT)
+Message-ID: <2bec792d-22aa-4c79-8324-2f801407a4eb@redhat.com>
+Date: Wed, 14 Aug 2024 18:47:51 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -82,15 +82,15 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 03/22] KVM: x86/mmu: Trigger unprotect logic only on
- write-protection page faults
+Subject: Re: [PATCH 04/22] KVM: x86/mmu: Skip emulation on page fault iff 1+
+ SPs were unprotected
 To: Sean Christopherson <seanjc@google.com>
 Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
  Peter Gonda <pgonda@google.com>, Michael Roth <michael.roth@amd.com>,
  Vishal Annapurve <vannapurve@google.com>,
  Ackerly Tng <ackerleytng@google.com>
 References: <20240809190319.1710470-1-seanjc@google.com>
- <20240809190319.1710470-4-seanjc@google.com>
+ <20240809190319.1710470-5-seanjc@google.com>
 From: Paolo Bonzini <pbonzini@redhat.com>
 Content-Language: en-US
 Autocrypt: addr=pbonzini@redhat.com; keydata=
@@ -128,87 +128,74 @@ Autocrypt: addr=pbonzini@redhat.com; keydata=
  JBrdmNZSQDz0iKmSrx8xkoXYfA3bgtFN8WJH2xgFL28XnqY4M6dLhJwV3z08tPSRqYFm4NMP
  dRsn0/7oymhneL8RthIvjDDQ5ktUjMe8LtHr70OZE/TT88qvEdhiIVUogHdo4qBrk41+gGQh
  b906Dudw5YhTJFU3nC6bbF2nrLlB4C/XSiH76ZvqzV0Z/cAMBo5NF/w=
-In-Reply-To: <20240809190319.1710470-4-seanjc@google.com>
+In-Reply-To: <20240809190319.1710470-5-seanjc@google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 On 8/9/24 21:03, Sean Christopherson wrote:
-> Trigger KVM's various "unprotect gfn" paths if and only if the page fault
-> was a write to a write-protected gfn.  To do so, add a new page fault
-> return code, RET_PF_WRITE_PROTECTED, to explicitly and precisely track
-> such page faults.
+> When doing "fast unprotection" of nested TDP page tables, skip emulation
+> if and only if at least one gfn was unprotected, i.e. continue with
+> emulation if simply resuming is likely to hit the same fault and risk
+> putting the vCPU into an infinite loop.
 > 
-> If a page fault requires emulation for any MMIO (or any reason besides
-> write-protection), trying to unprotect the gfn is pointless and risks
-> putting the vCPU into an infinite loop.  E.g. KVM will put the vCPU into
-> an infinite loop if the vCPU manages to trigger MMIO on a page table walk.
-> 
-> Fixes: 147277540bbc ("kvm: svm: Add support for additional SVM NPF error codes")
-> Cc: stable@vger.kernel.org
+> Note, it's entirely possible to get a false negative, e.g. if a different
+> vCPU faults on the same gfn and unprotects the gfn first, but that's a
+> relatively rare edge case, and emulating is still functionally ok, i.e.
+> the risk of putting the vCPU isn't an infinite loop isn't justified.
 
-Do we really want Cc: stable@ for all these patches?  Most of them are 
-of the "if it hurts, don't do it" kind; as long as there are no infinite 
-loops in a non-killable region, I prefer not to complicate our lives 
-with cherry picks of unknown quality.
-
-That said, this patch could be interesting for 6.11 because of the 
-effect on prefaulting (see below).
-
-> Signed-off-by: Sean Christopherson <seanjc@google.com>
-> ---
->   arch/x86/kvm/mmu/mmu.c          | 78 +++++++++++++++++++--------------
->   arch/x86/kvm/mmu/mmu_internal.h |  3 ++
->   arch/x86/kvm/mmu/mmutrace.h     |  1 +
->   arch/x86/kvm/mmu/paging_tmpl.h  |  2 +-
->   arch/x86/kvm/mmu/tdp_mmu.c      |  6 +--
->   5 files changed, 53 insertions(+), 37 deletions(-)
-> 
-> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
-> index 901be9e420a4..e3aa04c498ea 100644
-> --- a/arch/x86/kvm/mmu/mmu.c
-> +++ b/arch/x86/kvm/mmu/mmu.c
-> @@ -2914,10 +2914,8 @@ static int mmu_set_spte(struct kvm_vcpu *vcpu, struct kvm_memory_slot *slot,
->   		trace_kvm_mmu_set_spte(level, gfn, sptep);
->   	}
->   
-> -	if (wrprot) {
-> -		if (write_fault)
-> -			ret = RET_PF_EMULATE;
-> -	}
-> +	if (wrprot && write_fault)
-> +		ret = RET_PF_WRITE_PROTECTED;
->   
->   	if (flush)
->   		kvm_flush_remote_tlbs_gfn(vcpu->kvm, gfn, level);
-> @@ -4549,7 +4547,7 @@ static int direct_page_fault(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault
->   		return RET_PF_RETRY;
->   
->   	if (page_fault_handle_page_track(vcpu, fault))
-> -		return RET_PF_EMULATE;
-> +		return RET_PF_WRITE_PROTECTED;
->   
->   	r = fast_page_fault(vcpu, fault);
->   	if (r != RET_PF_INVALID)
-> @@ -4642,7 +4640,7 @@ static int kvm_tdp_mmu_page_fault(struct kvm_vcpu *vcpu,
->   	int r;
->   
->   	if (page_fault_handle_page_track(vcpu, fault))
-> -		return RET_PF_EMULATE;
-> +		return RET_PF_WRITE_PROTECTED;
->   
->   	r = fast_page_fault(vcpu, fault);
->   	if (r != RET_PF_INVALID)
-> @@ -4726,6 +4724,9 @@ static int kvm_tdp_map_page(struct kvm_vcpu *vcpu, gpa_t gpa, u64 error_code,
->   	case RET_PF_EMULATE:
->   		return -ENOENT;
->   
-> +	case RET_PF_WRITE_PROTECTED:
-> +		return -EPERM;
-
-Shouldn't this be a "return 0"?  Even if kvm_mmu_do_page_fault() cannot 
-fully unprotect the page, it was nevertheless prefaulted as much as 
-possible.
+English snafu - "the risk of causing a livelock for the vCPU is 
+negligible", perhaps?
 
 Paolo
+
+> Fixes: 147277540bbc ("kvm: svm: Add support for additional SVM NPF error codes")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Sean Christopherson <seanjc@google.com>
+> ---
+>   arch/x86/kvm/mmu/mmu.c | 28 ++++++++++++++++++++--------
+>   1 file changed, 20 insertions(+), 8 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index e3aa04c498ea..95058ac4b78c 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5967,17 +5967,29 @@ static int kvm_mmu_write_protect_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>   	bool direct = vcpu->arch.mmu->root_role.direct;
+>   
+>   	/*
+> -	 * Before emulating the instruction, check if the error code
+> -	 * was due to a RO violation while translating the guest page.
+> -	 * This can occur when using nested virtualization with nested
+> -	 * paging in both guests. If true, we simply unprotect the page
+> -	 * and resume the guest.
+> +	 * Before emulating the instruction, check to see if the access may be
+> +	 * due to L1 accessing nested NPT/EPT entries used for L2, i.e. if the
+> +	 * gfn being written is for gPTEs that KVM is shadowing and has write-
+> +	 * protected.  Because AMD CPUs walk nested page table using a write
+> +	 * operation, walking NPT entries in L1 can trigger write faults even
+> +	 * when L1 isn't modifying PTEs, and thus result in KVM emulating an
+> +	 * excessive number of L1 instructions without triggering KVM's write-
+> +	 * flooding detection, i.e. without unprotecting the gfn.
+> +	 *
+> +	 * If the error code was due to a RO violation while translating the
+> +	 * guest page, the current MMU is direct (L1 is active), and KVM has
+> +	 * shadow pages, then the above scenario is likely being hit.  Try to
+> +	 * unprotect the gfn, i.e. zap any shadow pages, so that L1 can walk
+> +	 * its NPT entries without triggering emulation.  If one or more shadow
+> +	 * pages was zapped, skip emulation and resume L1 to let it natively
+> +	 * execute the instruction.  If no shadow pages were zapped, then the
+> +	 * write-fault is due to something else entirely, i.e. KVM needs to
+> +	 * emulate, as resuming the guest will put it into an infinite loop.
+>   	 */
+>   	if (direct &&
+> -	    (error_code & PFERR_NESTED_GUEST_PAGE) == PFERR_NESTED_GUEST_PAGE) {
+> -		kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(cr2_or_gpa));
+> +	    (error_code & PFERR_NESTED_GUEST_PAGE) == PFERR_NESTED_GUEST_PAGE &&
+> +	    kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(cr2_or_gpa)))
+>   		return RET_PF_FIXED;
+> -	}
+>   
+>   	/*
+>   	 * The gfn is write-protected, but if emulation fails we can still
 
 
