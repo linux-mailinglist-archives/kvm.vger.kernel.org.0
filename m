@@ -1,173 +1,183 @@
-Return-Path: <kvm+bounces-24316-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24317-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46BFA9538C5
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 19:09:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A6BE9538D1
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 19:12:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C15961F25377
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 17:09:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 871871F256E2
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 17:12:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F043D1B4C26;
-	Thu, 15 Aug 2024 17:09:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25E41BB69D;
+	Thu, 15 Aug 2024 17:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="CmMAxUux"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tInm7iFn"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978AC21105
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 17:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6588B1B14F6
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 17:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723741758; cv=none; b=CcmTc7M6VOIPSLvZ73chu17+v0VJFboKkrunkeruA6YbJ0Qf0JBunrGirSTIVU9VQVFiOi+D0IpylGtDTd1I4IkmnnXHVeh8p2M+tD6gPX0CNns0b9jEFhwdK32HI+3rhmt/UsnciivimMO7C90BADbuHxxup7odB3i+cNj22sM=
+	t=1723741952; cv=none; b=FoHkQZqf7WnfRn9qYBCbfbYZBK+hzw3yglF/5qqKyIPLyzzGB++c8RFfD3lxKbncgs7kbzbvJrUVh+A+xoNlIPDFN2sSfIG/hUHGcpz4TJwMgiL2A2+lGRlmbcWPCPDXcb/onEgYPo80ohQfc038Hw/pmPtsD3op5Yf8+LWXgZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723741758; c=relaxed/simple;
-	bh=X5L5hwnjmA/iS+JyOjzWx8Qds/xtd74+wB99jhBeUsQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YIc+tC/TO32U+BNt9QWByueXkmb5JAJ4EKldUUZfpKHuJi2lOKWysVkRrbQ+BmDyvz2xeJewLKm3i+5zfoLDcxV5+oeaBz+4oeqngNmS0DWxHfT0GCkXN611NLycPIb7hXgJi4lz68kRvJ3gdTwRhE9zINFrkZr3/cmBXj+M2Hc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=CmMAxUux; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-201fae21398so3884985ad.1
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 10:09:16 -0700 (PDT)
+	s=arc-20240116; t=1723741952; c=relaxed/simple;
+	bh=YnedXFXmNlTUmV4EtthEbEnVIL2LfqX3Jy0XQNW8IYc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=YoxFPyqcZ8gcFn0XiX/LZRn95GMUQQznprMb/DdNzhzJt2gqq4/tll3cSnaynNXOiygKGbU0TAL8sJUvvDfxkZAX8AmfUJomGuydjFKfL0uHxe/ERZPLzmwf+HXwmLG6TV/WFwN7EjuLMqXWlm3Q0GgncfBer2ND0WPOTTDNYbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tInm7iFn; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ad26d5b061so18222347b3.2
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 10:12:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ventanamicro.com; s=google; t=1723741756; x=1724346556; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=lVJxT5QcdO7Ui6miH35lV51PmIys+9/MJB+dZzASdvk=;
-        b=CmMAxUuxB9TsXBqMO3V8lG4dOvi6Cq4OO8gfz1SzBjxxH/h7V+yVz+u2xuJt8IDDyl
-         m+qPNdvsi6iPe2r6wr8s4BVSDtGMRJ25WTxVznbBX4VwhWqhKWLXD5vWwmr9vyqa99uo
-         y/nQ6TAY2+gpxdr0loAVdGUBUM+E5DrUu6S2u+2NXTkslVqfU6S1JsoB3WOdr6l5DIRv
-         0VpETlQMvPdFDQ5FZHMke2vBDsBLw1KVA+U+cCQDWn3pyP3/i36F2MMyLiG9A3RQyIT9
-         EON+mCsTKN8e2rSOV0j6TdyTCjz2fnIYTtjqWTIopWMGVXsoKlzpjb7AfIlE71SAhNCJ
-         lmdg==
+        d=google.com; s=20230601; t=1723741949; x=1724346749; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yvhrlQOvT1qaF0wyf19GNpeoicAZhXdNzp2/56IfXXY=;
+        b=tInm7iFnfYKWdteXtxTKy07sGNdwrItS0H6Z+a1/gIcuiq5TuxmCiuLJDH32j35N7i
+         zQ3HJLEIuf2TGXD7QuTMOs1yy3WFv3IY3dWOMgzicgikK8LH7hBEosYXdi4rgkP1Mioj
+         YaxDo21Nw16yfJr/uz2ocl2cmt3i5IPC255oJpOhfVPo+4jHjj1iROPJ8tioyKUOzdp8
+         gfd9VvDWZ+EMM+tkWxE9wIFPVcjUPQ4xqbKEO0Pk5nx53uq3HokWnb3dS0YbiJBIAg3A
+         EzsYIB/pumEgrhShK4S6K67nG38SLe9Pwn2KdTq3K2/2J5R+8THIu5mFDwrR6aUBLG4p
+         T8Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723741756; x=1724346556;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lVJxT5QcdO7Ui6miH35lV51PmIys+9/MJB+dZzASdvk=;
-        b=PcH4mylHovW3ASA4guaH524YLUY2DVeTbLQzA4nDq8GCqbj2vRBpS8YiV7U+kZYKKM
-         FDcWvuikkihwZo0IKii7M3yTJJgFLqlWcaEV8AtX58gidi+PrgwHxFHE8vyPG1jzR1wa
-         W3pD7Ri2OCx5/Mm54Z5zDN+U3skRjBDHIf+YxfOsQphl4RW/WxYNzSncgYERprU9vjVZ
-         mSR0eTkDJ+sAz01bQpXokUqnpro7keGxWCCx0dm+leaI+/qWOzOtVUkDuGmOzbdJke2Z
-         DxH33yKh4+5kMnhk+oJf5AXXNuHPFRrz+GTbiN8tOh0xxFlaWXJEgj4v3I1GsXbaskWt
-         /ypA==
-X-Forwarded-Encrypted: i=1; AJvYcCV/PS5zfiZYZRSP3BBOM78LP8VyTFWiMMPBf2pRto0D/4X4HF5u3cqtG5iJrWfISsY2IceBZmsY1w8mQMxXrddu7RGi
-X-Gm-Message-State: AOJu0YwLkv/ZZsb7EAB+vNjhyxlJ5ds5YYSqwA18wW+qVZr/meiJg7U4
-	Q1m/NKazsDR41qm6GX9Qus16930YmcZIxXEof+jkTHBCtSGOctkAmpsvk274AjI=
-X-Google-Smtp-Source: AGHT+IEJsKSb7GMBEJwKRJb18oE3FCx/YFCHoyOQ+/rTrCh0U70ekG6XQEIGyKSA9piI909Jdbh/YA==
-X-Received: by 2002:a17:903:32c8:b0:201:f44d:6f00 with SMTP id d9443c01a7336-20203f51592mr4328345ad.57.1723741755569;
-        Thu, 15 Aug 2024 10:09:15 -0700 (PDT)
-Received: from anup-ubuntu-vm.localdomain ([223.185.130.49])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f03022d9sm12369535ad.25.2024.08.15.10.09.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 10:09:14 -0700 (PDT)
-From: Anup Patel <apatel@ventanamicro.com>
-To: Palmer Dabbelt <palmer@dabbelt.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>
-Cc: Atish Patra <atishp@atishpatra.org>,
-	Andrew Jones <ajones@ventanamicro.com>,
-	Anup Patel <anup@brainfault.org>,
-	kvm@vger.kernel.org,
-	kvm-riscv@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	Anup Patel <apatel@ventanamicro.com>
-Subject: [PATCH] RISC-V: KVM: Don't zero-out PMU snapshot area before freeing data
-Date: Thu, 15 Aug 2024 22:39:07 +0530
-Message-Id: <20240815170907.2792229-1-apatel@ventanamicro.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1723741949; x=1724346749;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=yvhrlQOvT1qaF0wyf19GNpeoicAZhXdNzp2/56IfXXY=;
+        b=I8hll+kV+K+3+NETwR3+DU+8Tu5O9ZgMaZ2M87oLzckZ0bNI8uBFI9eUze2Oaycyt7
+         NSQOsyVKs8nb7obuUF19Qsrxo0drggZT1c3hnpYqomknik2LfXn9FZ6N7zT+QCH9z+az
+         N2FSa9IMUXFcAYpe9TteH1MKCK8OvXZepyr9I3/T68NNPa0zxL6rLDP0sn3c9iZ0p1Ih
+         JJzTI8p5U7o5nA6ZByF1wchr9zDyn/QVKf5n02OD8N2wFy5TYVEvtRiniW9Dt0+OZD3Q
+         Ow2lVR5aQZG2uJETlo+sn38HqOyi2SL0yG8Y5i10Ztev3yCDkz/FX/K6ZBJh9YnACjg4
+         Gpqw==
+X-Gm-Message-State: AOJu0YyD++VZfdqo9zvk8Nok04n5VYDkKUDyJ5ZDjg6mX2W2oWeXFTAY
+	af896CP2qfz2k2SXeWWjzvyPVZUmhK7RIM/ZnyD/c3zkJJYJCPgA0PX9QTCjoSkMZ51aVBLbZ4D
+	kiQ==
+X-Google-Smtp-Source: AGHT+IH/O74nUjl4sfpshsDyjxeZHvEjEYPoU6nLVkktHrMXY003wqNpVWSkAh256RPFReDLYAEdJvcIYMw=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a05:690c:288d:b0:669:e266:2c56 with SMTP id
+ 00721157ae682-6b1bb85ee65mr91497b3.6.1723741949511; Thu, 15 Aug 2024 10:12:29
+ -0700 (PDT)
+Date: Thu, 15 Aug 2024 10:12:27 -0700
+In-Reply-To: <20240522001817.619072-17-dwmw2@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240522001817.619072-1-dwmw2@infradead.org> <20240522001817.619072-17-dwmw2@infradead.org>
+Message-ID: <Zr42-6sLSg0a9l1I@google.com>
+Subject: Re: [RFC PATCH v3 16/21] KVM: x86: Factor out kvm_use_master_clock()
+From: Sean Christopherson <seanjc@google.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>, Peter Zijlstra <peterz@infradead.org>, 
+	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
+	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
+	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
+	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	jalliste@amazon.co.uk, sveith@amazon.de, zide.chen@intel.com, 
+	Dongli Zhang <dongli.zhang@oracle.com>, Chenyi Qiang <chenyi.qiang@intel.com>
+Content-Type: text/plain; charset="us-ascii"
 
-With the latest Linux-6.11-rc3, the below NULL pointer crash is observed
-when SBI PMU snapshot is enabled for the guest and the guest is forcefully
-powered-off.
+The shortlog is rather misleading.  This is more than just a refactor, and I
+would argue the refactor aspect is secondary, i.e. the main goal of this patch
+is to apply the exceptons to kvm_track_tsc_matching().
 
-  Unable to handle kernel NULL pointer dereference at virtual address 0000000000000508
-  Oops [#1]
-  Modules linked in: kvm
-  CPU: 0 UID: 0 PID: 61 Comm: term-poll Not tainted 6.11.0-rc3-00018-g44d7178dd77a #3
-  Hardware name: riscv-virtio,qemu (DT)
-  epc : __kvm_write_guest_page+0x94/0xa6 [kvm]
-   ra : __kvm_write_guest_page+0x54/0xa6 [kvm]
-  epc : ffffffff01590e98 ra : ffffffff01590e58 sp : ffff8f80001f39b0
-   gp : ffffffff81512a60 tp : ffffaf80024872c0 t0 : ffffaf800247e000
-   t1 : 00000000000007e0 t2 : 0000000000000000 s0 : ffff8f80001f39f0
-   s1 : 00007fff89ac4000 a0 : ffffffff015dd7e8 a1 : 0000000000000086
-   a2 : 0000000000000000 a3 : ffffaf8000000000 a4 : ffffaf80024882c0
-   a5 : 0000000000000000 a6 : ffffaf800328d780 a7 : 00000000000001cc
-   s2 : ffffaf800197bd00 s3 : 00000000000828c4 s4 : ffffaf800248c000
-   s5 : ffffaf800247d000 s6 : 0000000000001000 s7 : 0000000000001000
-   s8 : 0000000000000000 s9 : 00007fff861fd500 s10: 0000000000000001
-   s11: 0000000000800000 t3 : 00000000000004d3 t4 : 00000000000004d3
-   t5 : ffffffff814126e0 t6 : ffffffff81412700
-  status: 0000000200000120 badaddr: 0000000000000508 cause: 000000000000000d
-  [<ffffffff01590e98>] __kvm_write_guest_page+0x94/0xa6 [kvm]
-  [<ffffffff015943a6>] kvm_vcpu_write_guest+0x56/0x90 [kvm]
-  [<ffffffff015a175c>] kvm_pmu_clear_snapshot_area+0x42/0x7e [kvm]
-  [<ffffffff015a1972>] kvm_riscv_vcpu_pmu_deinit.part.0+0xe0/0x14e [kvm]
-  [<ffffffff015a2ad0>] kvm_riscv_vcpu_pmu_deinit+0x1a/0x24 [kvm]
-  [<ffffffff0159b344>] kvm_arch_vcpu_destroy+0x28/0x4c [kvm]
-  [<ffffffff0158e420>] kvm_destroy_vcpus+0x5a/0xda [kvm]
-  [<ffffffff0159930c>] kvm_arch_destroy_vm+0x14/0x28 [kvm]
-  [<ffffffff01593260>] kvm_destroy_vm+0x168/0x2a0 [kvm]
-  [<ffffffff015933d4>] kvm_put_kvm+0x3c/0x58 [kvm]
-  [<ffffffff01593412>] kvm_vm_release+0x22/0x2e [kvm]
+On Wed, May 22, 2024, David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> Both kvm_track_tsc_matching() and pvclock_update_vm_gtod_copy() make a
+> decision about whether the KVM clock should be in master clock mode.
+> 
+> They use *different* criteria for the decision though. This isn't really
+> a problem; it only has the potential to cause unnecessary invocations of
+> KVM_REQ_MASTERCLOCK_UPDATE if the masterclock was disabled due to TSC
+> going backwards, or the guest using the old MSR. But it isn't pretty.
+> 
+> Factor the decision out to a single function. And document the historical
+> reason why it's disabled for guests that use the old MSR_KVM_SYSTEM_TIME.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>  arch/x86/kvm/x86.c | 27 +++++++++++++++++++++++----
+>  1 file changed, 23 insertions(+), 4 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index e21b8c075bf6..437412b36cae 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2518,6 +2518,27 @@ static inline bool gtod_is_based_on_tsc(int mode)
+>  }
+>  #endif
+>  
+> +static bool kvm_use_master_clock(struct kvm *kvm)
 
-Clearly, the kvm_vcpu_write_guest() function is crashing because it is
-being called from kvm_pmu_clear_snapshot_area() upon guest tear down.
+Maybe kvm_can_use_master_clock() so that this isn't misconstrued with the actual
+ka->user_master_clock field.
 
-To address the above issue, simplify the kvm_pmu_clear_snapshot_area() to
-not zero-out PMU snapshot area from kvm_pmu_clear_snapshot_area() because
-the guest is anyway being tore down.
+> +{
+> +	struct kvm_arch *ka = &kvm->arch;
+> +
+> +	/*
+> +	 * The 'old kvmclock' check is a workaround (from 2015) for a
+> +	 * SUSE 2.6.16 kernel that didn't boot if the system_time in
+> +	 * its kvmclock was too far behind the current time. So the
+> +	 * mode of just setting the reference point and allowing time
+> +	 * to proceed linearly from there makes it fail to boot.
+> +	 * Despite that being kind of the *point* of the way the clock
+> +	 * is exposed to the guest. By coincidence, the offending
+> +	 * kernels used the old MSR_KVM_SYSTEM_TIME, which was moved
+> +	 * only because it resided in the wrong number range. So the
+> +	 * workaround is activated for *all* guests using the old MSR.
+> +	 */
+> +	return ka->all_vcpus_matched_tsc &&
+> +		!ka->backwards_tsc_observed &&
+> +		!ka->boot_vcpu_runs_old_kvmclock;
 
-The kvm_pmu_clear_snapshot_area() is also called when guest changes
-PMU snapshot area of a VCPU but even in this case the previous PMU
-snaphsot area must not be zeroed-out because the guest might have
-reclaimed the pervious PMU snapshot area for some other purpose.
+Please align indentation:
 
-Fixes: c2f41ddbcdd7 ("RISC-V: KVM: Implement SBI PMU Snapshot feature")
-Signed-off-by: Anup Patel <apatel@ventanamicro.com>
----
- arch/riscv/kvm/vcpu_pmu.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
+	return ka->all_vcpus_matched_tsc &&
+	       !ka->backwards_tsc_observed &&
+	       !ka->boot_vcpu_runs_old_kvmclock;
 
-diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
-index bcf41d6e0df0..2707a51b082c 100644
---- a/arch/riscv/kvm/vcpu_pmu.c
-+++ b/arch/riscv/kvm/vcpu_pmu.c
-@@ -391,19 +391,9 @@ int kvm_riscv_vcpu_pmu_read_hpm(struct kvm_vcpu *vcpu, unsigned int csr_num,
- static void kvm_pmu_clear_snapshot_area(struct kvm_vcpu *vcpu)
- {
- 	struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
--	int snapshot_area_size = sizeof(struct riscv_pmu_snapshot_data);
- 
--	if (kvpmu->sdata) {
--		if (kvpmu->snapshot_addr != INVALID_GPA) {
--			memset(kvpmu->sdata, 0, snapshot_area_size);
--			kvm_vcpu_write_guest(vcpu, kvpmu->snapshot_addr,
--					     kvpmu->sdata, snapshot_area_size);
--		} else {
--			pr_warn("snapshot address invalid\n");
--		}
--		kfree(kvpmu->sdata);
--		kvpmu->sdata = NULL;
--	}
-+	kfree(kvpmu->sdata);
-+	kvpmu->sdata = NULL;
- 	kvpmu->snapshot_addr = INVALID_GPA;
- }
- 
--- 
-2.34.1
+> +}
+> +
+>  static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
+>  {
+>  #ifdef CONFIG_X86_64
+> @@ -2550,7 +2571,7 @@ static void kvm_track_tsc_matching(struct kvm_vcpu *vcpu)
+>  	 * To use the masterclock, the host clocksource must be based on TSC
+>  	 * and all vCPUs must have matching TSC frequencies.
+>  	 */
+> -	bool use_master_clock = ka->all_vcpus_matched_tsc &&
+> +	bool use_master_clock = kvm_use_master_clock(vcpu->kvm) &&
+>  				gtod_is_based_on_tsc(gtod->clock.vclock_mode);
+>  
+>  	/*
+> @@ -3096,9 +3117,7 @@ static void pvclock_update_vm_gtod_copy(struct kvm *kvm)
+>  					&ka->master_cycle_now);
+>  
+>  	ka->use_master_clock = host_tsc_clocksource
+> -				&& ka->all_vcpus_matched_tsc
+> -				&& !ka->backwards_tsc_observed
+> -				&& !ka->boot_vcpu_runs_old_kvmclock;
+> +				&& kvm_use_master_clock(kvm);
 
+Perfect opportuity to put the "&&" on the preceding line.
+>  
+>  	/*
+>  	 * When TSC scaling is in use (which can thankfully only happen
+> -- 
+> 2.44.0
+> 
 
