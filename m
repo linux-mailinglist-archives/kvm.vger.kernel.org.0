@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-24252-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24251-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DB5C952EA3
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:00:39 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71EFF952EA4
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:00:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 440BD1F21BFC
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 13:00:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1A91B2681A
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 13:00:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1710619F482;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EEE19F47A;
 	Thu, 15 Aug 2024 13:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UFUShYj9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XG+M6Wdt"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B3A19D8B5;
-	Thu, 15 Aug 2024 13:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36AE219D89D;
+	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723726805; cv=none; b=rluAOizOr7kh2kpgxP7Pxv3m1SVUKZrMZAGd9sqDmzu8+gliGERXu3lia/Y9axyRfyFn1/tLdvdYLyqq8PkWcQYZjh1p+6Expk48E5t18I9Syh1dxhvK/23u+DZwkZPUX5IjXF8VhIGMwLG8jofhPWuQSM9kTtEnaQq/C8ra/gY=
+	t=1723726805; cv=none; b=SDbl6iLEWrHqJk2sXvai3GMqpou8Ym9Vpkc+woqsk2DFH3Pv4ilIuGizm9dpHMQqDUcL1X6SxDsoRQV/91RW7Q2ppvmp3rKlioxkG2mcqhgfvUKHUQ6ybUJR4syCCgBdD8Jd7qP0OLDNEx0a7uBofGSSsfoCr9JdWEwxPux8PoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723726805; c=relaxed/simple;
-	bh=HG45eYtHH12sqQC97/SWs8xCRMEbpDiQ1tJj7NKCsls=;
+	bh=Rw+oG70QnJ4dX4Pty/A4PbvCVTYBSSQWvkzzsj/HeD4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OIQhsVig0/wg6t9JunrSVTuazyHATDnI/Rzjdx2GHVuEcu3HRsLSrVH940vLrPTnncRNlo3fW8yP5YxD19v7yyRa6TbTlyMAnagiAyXLyZTzoZafu5iWBSddP2mSWGfip9La3varx0RU3D/+Redo8/h0AOiF83TGEM9/P8/2mF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UFUShYj9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D64D5C4AF0B;
+	 MIME-Version; b=kYc+ht9mRQjT/qGvzBjnbjXUqv4WPemqsjn905dYgJaCWbQtnopuK0YPyhFNz4jaglhurkxLNmVO3gg1vYZKhPXAIVFaG2r63PORDqkt2Kncyfgpj9pKriLZtRuTC+bZAao2MoToEIPKtDcjp6kvIsjAWvzhdlPt5oywqlWXkdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XG+M6Wdt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6083C4AF0E;
 	Thu, 15 Aug 2024 13:00:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723726804;
-	bh=HG45eYtHH12sqQC97/SWs8xCRMEbpDiQ1tJj7NKCsls=;
+	bh=Rw+oG70QnJ4dX4Pty/A4PbvCVTYBSSQWvkzzsj/HeD4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UFUShYj9z2wvrBjmP4YZ62S/jHHk2FTvroICQn7SOrrbH0glXh6fxDOvhDMhMHZSc
-	 teefCeKMIqiySnOXp4NIME0Jv4WQxMLwAEHZXrPFDOiIJSkVc8Jag6PeG3bp71cUXR
-	 1+QPg/DxgYEFj5QzjsSVEvSsPnz3ll1BXKK1ZWdQ+2oHphwPlA5hou3fX11bfsrB3u
-	 vUE1y+mKEGj8jwakbcpWkJwg8N6nQANiAoLsNAc+WVt9ogERLsVtfSaAcm1ylCLRJb
-	 TYpx4+KrdEXFZeLmqDPKDnJimvUHJiG/4TJilowO7eFH5uzri1ufBMGU2pH73i7w3t
-	 1jwFvIlB9lMOw==
+	b=XG+M6Wdtlj0+qoeUh2LReYONRjTITOVjA9LGIpPpuzYn7t8mWDM+i4tsJq3F1kbYU
+	 qaA4TnAjshvZ+U3syJU8E+nux7L+YxAKcLejuH973JFIHMevu58mYIWzXQ0hg1l/nP
+	 42gz7Zru+DwEub9ig3GQ95LbYv4ucO+/lS7FVRT7swSpZmaLAat2DV1uiFcn7oCo47
+	 dzm3mMBMv5RX5WF7zByIxqGHzrmmO7EjXea6Kb2gmXtnO5ExmxHeQQgyGCE+Z4uzC5
+	 nZzusfopgzSnwnwD01dAdb0N+zF14NBEkKEmukyZ+Dpfyui6q2q3Bg4xzvDT6xmfWm
+	 OljWi5+BREWVA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sea5C-003xld-Rg;
-	Thu, 15 Aug 2024 14:00:02 +0100
+	id 1sea5D-003xld-3N;
+	Thu, 15 Aug 2024 14:00:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -55,9 +55,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 01/11] arm64: Expose ID_AA64ISAR1_EL1.XS to sanitised feature consumers
-Date: Thu, 15 Aug 2024 13:59:49 +0100
-Message-Id: <20240815125959.2097734-2-maz@kernel.org>
+Subject: [PATCH 02/11] arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
+Date: Thu, 15 Aug 2024 13:59:50 +0100
+Message-Id: <20240815125959.2097734-3-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240815125959.2097734-1-maz@kernel.org>
 References: <20240815125959.2097734-1-maz@kernel.org>
@@ -73,29 +73,40 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Despite KVM now being able to deal with XS-tagged TLBIs, we still don't
-expose these feature bits to KVM.
+Provide the architected EC and ISS values for all the FEAT_LS64*
+instructions.
 
-Plumb in the feature in ID_AA64ISAR1_EL1.
-
-Fixes: 0feec7769a63 ("KVM: arm64: nv: Add handling of NXS-flavoured TLBI operations")
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kernel/cpufeature.c | 1 +
- 1 file changed, 1 insertion(+)
+ arch/arm64/include/asm/esr.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/cpufeature.c b/arch/arm64/kernel/cpufeature.c
-index 646ecd3069fd..4901daace5a3 100644
---- a/arch/arm64/kernel/cpufeature.c
-+++ b/arch/arm64/kernel/cpufeature.c
-@@ -228,6 +228,7 @@ static const struct arm64_ftr_bits ftr_id_aa64isar0[] = {
- };
+diff --git a/arch/arm64/include/asm/esr.h b/arch/arm64/include/asm/esr.h
+index 56c148890daf..4a76883616ab 100644
+--- a/arch/arm64/include/asm/esr.h
++++ b/arch/arm64/include/asm/esr.h
+@@ -20,7 +20,8 @@
+ #define ESR_ELx_EC_FP_ASIMD	(0x07)
+ #define ESR_ELx_EC_CP10_ID	(0x08)	/* EL2 only */
+ #define ESR_ELx_EC_PAC		(0x09)	/* EL2 and above */
+-/* Unallocated EC: 0x0A - 0x0B */
++#define ESR_ELx_EC_LS64B	(0x0A)
++/* Unallocated EC: 0x0B */
+ #define ESR_ELx_EC_CP14_64	(0x0C)
+ #define ESR_ELx_EC_BTI		(0x0D)
+ #define ESR_ELx_EC_ILL		(0x0E)
+@@ -172,6 +173,11 @@
+ #define ESR_ELx_WFx_ISS_WFE	(UL(1) << 0)
+ #define ESR_ELx_xVC_IMM_MASK	((UL(1) << 16) - 1)
  
- static const struct arm64_ftr_bits ftr_id_aa64isar1[] = {
-+	ARM64_FTR_BITS(FTR_HIDDEN, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_XS_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_I8MM_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_DGH_SHIFT, 4, 0),
- 	ARM64_FTR_BITS(FTR_VISIBLE, FTR_STRICT, FTR_LOWER_SAFE, ID_AA64ISAR1_EL1_BF16_SHIFT, 4, 0),
++/* ISS definitions for LD64B/ST64B instructions */
++#define ESR_ELx_ISS_ST64BV	(0)
++#define ESR_ELx_ISS_ST64BV0	(1)
++#define ESR_ELx_ISS_LDST64B	(2)
++
+ #define DISR_EL1_IDS		(UL(1) << 24)
+ /*
+  * DISR_EL1 and ESR_ELx share the bottom 13 bits, but the RES0 bits may mean
 -- 
 2.39.2
 
