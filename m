@@ -1,122 +1,85 @@
-Return-Path: <kvm+bounces-24226-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24227-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADD5095288A
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 06:33:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66C759528B6
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 07:05:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76E782842B0
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 04:33:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21E57287750
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 05:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9BC3BBC9;
-	Thu, 15 Aug 2024 04:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E7856742;
+	Thu, 15 Aug 2024 05:05:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X4Ua0H7n"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Ae/UEYWx"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06242C182
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 04:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 772295381B
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 05:05:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723696400; cv=none; b=KqyIipDxQhOj07zrmLkHpv3Gg5S6CFiRC+njIiRCKeJKWSMumsRIRU3xNxXudLANHFKRRtOUBxVAZxwQ2V8x69+bgv/nLxkEfolYQtws+tvZ7J1/95ws1+npUWSSsfC5OxsN4kQXBJTVKadJSJZBzgSYKYk+mmmluWtq18T28Ro=
+	t=1723698309; cv=none; b=giaxhBLKGg7cFguABG2XUbkbJbPuD4Z6PwukjTLoYvsGh7GBl2G6kooKZ10NXj710K37BTXBNh8dg6Z0WAAbNIOp6k/XvFza1bqx+3sxa3JlCnZXL7R0fryQ5Alv8Nq4IBVr6mTpa7vLDMeyajUX9WZKjtX39T5pMxMLySBNX9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723696400; c=relaxed/simple;
-	bh=PHkFHT7aXgDsIO27iXXdIhiAjWMTlwp+vnPJOk/XSzw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rL05O7tZw/FHjRVYBLa6vKP4lXLH9rJdt+9PCRLSVeDt8FOv4UZaEKMs/YvBiCXCXJNcqurDTuTek+RFc8OVCe/0/MLTH+ndBg0qrVd/jm+ZkfYLz0tuHgUtzW1RTt+nOxqCSTU6uRQAFp5W2lS13gml7HlYlmvOFvQjXOajeXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X4Ua0H7n; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7a4df9dc840so28378685a.2
-        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 21:33:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723696398; x=1724301198; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0mL7lVxheOuOGYib+u42mSKDtfjugmG5E83SSWvNp9o=;
-        b=X4Ua0H7nIelBfyePLimYO7Td497gMyRtv/JuYjxlR3RyFDnLAacExhAqL4Qd9ZMJdB
-         rPy7MciFNiSCqixg9o0VSkXZ4nKfXw4ezZ4gAsidkxhgXSn7MjmkIndbVD7TjCFcBg6k
-         QgEq541KsLN7Wlt18X+6gtP3lPc+xLMfDWutRwOcSMoRvJ9laeeCMwkKtL7H1toZLCvl
-         DHKoXr6wy7GkttoHpJ3GCPTSyYAuBpFpBE9QOBWkwUB9/0z311sxM8v3Z5LzH7KCWa+h
-         C1DNGuEO+wQpwQqNK2o3kb8D8Ze6aC0iC81CXSGqzpz8RUMBKZZr1PuU9pchadKBHVHW
-         3H+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723696398; x=1724301198;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0mL7lVxheOuOGYib+u42mSKDtfjugmG5E83SSWvNp9o=;
-        b=BAXGKK4gn87NA6teh4kVTMhq8zLGai/bg8f9njlmdIvIf6yaxzZLHUyUxnXKNmSQXt
-         GsjiFQIi84tFosEk3uY2+2xaR2FrFUa/Gh8zQPRH7Qc6laMdfSHlRS5IoFPK8EeS2TQR
-         5QjJcBPZGG+dVmxpeOtVuRq/Y2JFfIby/aLw9HS9vd3rXnirLmErjFJeDiXcXlMu6m6Y
-         ZMfHzNf0auKpp3Qck0oGZHMLIgnl8ci4JZDSIS1AuA18Q4BJR/hURjoVJf5Cmms6+o8Z
-         EiD7b7fTIj/Y9BVdKSMeNM+g/iDcPEP218DN2wQqkehmht0n8qFIxwX+Z+zO2bwqlH01
-         yGxg==
-X-Forwarded-Encrypted: i=1; AJvYcCUY06eWTewDx59ugi9tVnjlnBq0nY2ZhAaGQwW8i9C0GMWeTuxutGObbwZ60QJXDam0sRf2HJ9dhUUAMTnxVcnYqYFW
-X-Gm-Message-State: AOJu0YxA/M/IC/EsGbBMaa8ZuRltT3GQt+jesM8q7WP7TdlfYHTCusbZ
-	2T9WgJdV73cIvH/coKpEayqLXxgg++mecNlVXVt+v6/KCffLs/Zd5PzqTxsDkNH9yq5kweviNNv
-	D8/Lz6UHEYB8zChWWWHzEeNM13EfIodwQdUs5
-X-Google-Smtp-Source: AGHT+IHp0Mv0umuwx4M7j9iBHKv4L2D7jjyHbT0rsHN9Fp+h3T+KIQJZ6zUxV73fDUj4HBH+tKjmCgBON3DJRI6T8YM=
-X-Received: by 2002:a05:620a:4489:b0:7a1:dc97:5a51 with SMTP id
- af79cd13be357-7a4ee3e4e08mr565255985a.58.1723696397516; Wed, 14 Aug 2024
- 21:33:17 -0700 (PDT)
+	s=arc-20240116; t=1723698309; c=relaxed/simple;
+	bh=PA5Hwj+tfgC6UoZCE/5fxSQR+GLHW6h7nA1pX+OUEMY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E5RFrbp1CokTW3b+Iu3zWIIyNlq0njAqJG2rbVeSS3FkBia7uneLYikDO9Z+fWuonESNiN3ZR83V1kvQq3WE+C5YcFvP4ITDCw14A2wAAqCHpTJW1sgELpB6/658kZ6r12B6AT9DWYvogBpJIiKDbR4hfsB+7UPrbFd/38hLMDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Ae/UEYWx; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=5H163FAIJf+dNKAeDC1P4tskQtErqFRv7CGKy1izrqo=; b=Ae/UEYWx+pwHkeXMkJ8fj3eNZv
+	QBsNGhjI7ErsjKR4IAR7mX3X4B/zUpfphe1eUaa2ysLZoFz2ZtJZ0fsPGCRLMbvJ/NDc6lCsRjrBY
+	xVw+O0S0oHOnvk79zBtNSBONi+FiJPwNjaQYhb7XOCtCnugy2ShPQGVm2d7PFOTczVOO8876MX9UH
+	P0uU01+PbXqQvaMeWOMgiDfkCj3jQMV4OIjKH/tRXGHD/l9XOW6JKZ/21JBGi2xKO7yvis3qnzex6
+	TTMNormUxWvW1Pq9j22oedeWUDzMLt4/Jna8F7XKjZlBzLuVqYsJRl98bFu1VYTsUHiNfW5YS/xPE
+	J7YjG10A==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1seSfa-000000092Bh-0wzn;
+	Thu, 15 Aug 2024 05:05:06 +0000
+Date: Wed, 14 Aug 2024 22:05:06 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: Keith Busch <kbusch@kernel.org>
+Cc: Alex Williamson <alex.williamson@redhat.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Keith Busch <kbusch@meta.com>,
+	kvm@vger.kernel.org
+Subject: Re: [PATCH rfc] vfio-pci: Allow write combining
+Message-ID: <Zr2Mgst5KNCvUlhV@infradead.org>
+References: <20240731155352.3973857-1-kbusch@meta.com>
+ <20240801141914.GC3030761@ziepe.ca>
+ <20240801094123.4eda2e91.alex.williamson@redhat.com>
+ <20240801161130.GD3030761@ziepe.ca>
+ <20240801105218.7c297f9a.alex.williamson@redhat.com>
+ <20240801171355.GA4830@ziepe.ca>
+ <20240801113344.1d5b5bfe.alex.williamson@redhat.com>
+ <ZqzsMcrEg5MCV48t@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240710074410.770409-1-suleiman@google.com> <ZqhPVnmD7XwFPHtW@chao-email>
- <Zqi2RJKp8JxSedOI@freefall.freebsd.org> <ZruSpDcysc2B-HQ-@google.com>
- <CABCjUKD2BAXzBZixrXKJwybEPoZvkmSPfy-vPKMbxcAt0qk0uQ@mail.gmail.com> <ZrzOxxu1_-f5ZZ1m@google.com>
-In-Reply-To: <ZrzOxxu1_-f5ZZ1m@google.com>
-From: Suleiman Souhlal <suleiman@google.com>
-Date: Thu, 15 Aug 2024 13:33:06 +0900
-Message-ID: <CABCjUKAkBDCs6knb34sDxOsXT7JwCS_jcknmu9rainx=eM_4zQ@mail.gmail.com>
-Subject: Re: [PATCH] KVM: x86: Include host suspended time in steal time.
-To: Sean Christopherson <seanjc@google.com>
-Cc: Suleiman Souhlal <ssouhlal@freebsd.org>, Chao Gao <chao.gao@intel.com>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZqzsMcrEg5MCV48t@kbusch-mbp.dhcp.thefacebook.com>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-On Thu, Aug 15, 2024 at 12:35=E2=80=AFAM Sean Christopherson <seanjc@google=
-.com> wrote:
->
-> On Wed, Aug 14, 2024, Suleiman Souhlal wrote:
->
-> > With the proposed approach, the steal time page would get copied to the=
- new
-> > host and everything would keep working correctly, with the exception of=
- a
-> > possible host suspend happening between when the migration started and =
-when
-> > it finishes, not being reflected post-migration.  That seems like a
-> > reasonable compromise.
->
-> Maybe, but I'm not keen on sweeping this under the rug.  Ignoring issues =
-because
-> they'll "never" happen has bitten KVM more than once.
->
-> At the absolute bare minimum, the flaw needs to be documented, with a sug=
-gested
-> workaround provided (do KVM on all vCPUs before migrating after suspend),=
- e.g.
-> so that userspace can workaround the issue in the unlikely scenario users=
-pace
-> does suspend+resume, saves/restores a VM, *and* cares about steal-time.
+On Fri, Aug 02, 2024 at 08:24:49AM -0600, Keith Busch wrote:
+> Which itself follows the existing pattern from
+> pci_create_resource_files(), which creates a write combine
+> resource<X>_wc file only when IORESOURCE_PREFETCH is set. But yeah,
+> prefetch isn't necessary for wc, but it seems to indicate it's safe.
 
-I can write a comment in record_steal_time() that describes the
-scenario, mention it in
-the commit message and add something to the steal time part of
-Documentation/virt/kvm/x86/msr.rst.
+Apparently IORESOURCE_PREFETCH never implied anything about write
+combinability, and Linux got this wrong long time ago.  The fact that
+we do this now clashes with PCI SIGs desire to kill the concept of
+prefetcable BARs that they are forcing down everyones throat.
 
--- Suleiman
 
