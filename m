@@ -1,93 +1,153 @@
-Return-Path: <kvm+bounces-24305-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24306-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51C7F9537F4
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:10:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EF369537FB
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:10:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1A36282296
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:10:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3233D1C25734
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC9171B374C;
-	Thu, 15 Aug 2024 16:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C50D1B3F33;
+	Thu, 15 Aug 2024 16:10:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J3WLmRvk"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E1831B012B
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 16:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66751B012B
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 16:10:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723738205; cv=none; b=YqBSGf/OqiMfor16IavJ9ts3+GeucO9GppOtTQg14sulOZks4nHx1O27ADEp+pCnpjn3hlmFJy3v3Ys58n9VQejhzo8a885ESNZoMHny76qQ7aaEY9njT/9cmscHMPkidXYnAuYMjGxw2osrquhN8s1QPo3BcNX58/m8bK+gsaE=
+	t=1723738243; cv=none; b=q+7EuubKracHh5D8bmWsRZ/hrjKBW958rWg1rQyc0WJklaMGFNVB+HetPVKKWeQAc+TFKydeZmKp5YqnsRw9AjHhJWoti12qNc4lrkwjadqbkElA53UeERNgxXo42B/C30Wb1p8bZkdz5fHEBexu35vvGwkVygVFGF7WP5HnqoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723738205; c=relaxed/simple;
-	bh=j2uYupfeKSgh0DfZRYYlMyC99HExdau3jIZqN4BrbAk=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=A1xM8khtX3sP3kwwlB32iDOVZrGMwAaZc96q8Mhl8cDATmc20fArKQKW2ZcNz7rxXs14ja5coams8Q6bJvx5cqZWVWzOldKlq+uGLlO6dYWxRXr4LHtDNIpxewOPo8eMVyuRXVL4QAGg06blBKztJoLOpAO84jXiw2y3zB6NLnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3962d4671c7so12775475ab.2
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 09:10:03 -0700 (PDT)
+	s=arc-20240116; t=1723738243; c=relaxed/simple;
+	bh=nhUoeQTxPlzxHkRrHDGgpJTsk5svcnXwNkNbkHZdq+4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Brt2P+wzWR1c4WlTeR7yMd7A4FVA2Y0nN9A2bPI+ttVzt29rJX7lbiF6qz75dxJDVXCmjVtdqpi9c+melu0eudO1t9QuJne40n4p1k1fDpHRe3zEk4dVLCc1RZ4Dmqq0p/zytpcrXApDUP6G7VLc39rcb6SLSmA599oDtKOYXl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J3WLmRvk; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723738240;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0C29WUxU/0x21D0S2vEXYwTrRtZFHVrz4TucO9zGe6Q=;
+	b=J3WLmRvk46vC/fHbRsdBP9YKrGORs/js//rlRD1w2jywsyhmtc5cyhpKlN0QEQ/hRHG1Wj
+	m27uDlAodXyufVx4P2ngGES11p33X+ptE9l3Nnlb+5HZLrfuU2rTpnfD44lNmb0WMEIKAM
+	YNbkcYh/q6Q3fD0D7w9iW0eD48/hcyw=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-642-jYptmzOzMFSLBgjjkq1LEg-1; Thu, 15 Aug 2024 12:10:39 -0400
+X-MC-Unique: jYptmzOzMFSLBgjjkq1LEg-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2cb5847ff53so1086506a91.2
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 09:10:36 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723738203; x=1724343003;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+48SOAuLFWa3vOYJchc0yB8E8pO6GvAZqc/FFORHhSw=;
-        b=JkEtoLGl8KF9zK+wNb0ktdui0DWgn/TCteM1Gox0zXNCrNAxCeKkq5nA8X4Hzr74+M
-         xLKKNPYciuEan1uqSacsqsJFCgG1U6rpsPz+1OKY7wtZ3FHJpSut4VfJ2kV3ybZ1I9Hp
-         A/JalKvRqC8a0oP65z2ZLNFKaWVWOQFGoIqEg93gQ8dK8vEGhfat8vSyDojL29Whxt4p
-         pgLZV2j9fiK3Gcsxo1wbxS9zSTHqDjLtPHJabsOp4u/M/Fd9/qwtEPYMfmw3Pfm2frDl
-         jqeyHk7USP14z4l7pazCE3IQIxQyBRvUE0T0e/eWu22GwO8qG3vQ81NWtJUW3Ib89oj2
-         tghQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVGEbuBrKbV6DOK30WTLyB3Q7aWfEiinEOXe9L0vCTwZkOVkP8p4lQOBACEUPcpMwjOqtHgs1l7yelWAIlhy93Tbx59
-X-Gm-Message-State: AOJu0YwvBMn90btGigwPtAxu99z2baJzyXb2griI1kzNaeVdWTxlazA6
-	PJ3s4x6QRHzArhrGE8khEi+qUWZzAiKljrbTHjWCEdNtiveBug8oEcaBfrzPwH1ys5IPUF3sdWY
-	zOJKE9bWjJi2lNqiLKyM2Y6IjHg40GR9NrmLzhWUyh0WHEZNPFjY8UGY=
-X-Google-Smtp-Source: AGHT+IFhijMKxOHvEmejfGCrN0UCTcPcB8Qp17m0Xsh3eQixZLpUkNfc3bISLAfaoqkI5L5Rer4110AXeccsAco0NPqCdduTR/JH
+        d=1e100.net; s=20230601; t=1723738235; x=1724343035;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0C29WUxU/0x21D0S2vEXYwTrRtZFHVrz4TucO9zGe6Q=;
+        b=EomPkBpHtauzj/V6GI8aKfv3zdAfoNj761d/yPDQvulCQ9+clLziJfd3ZF8thaqAh5
+         JWrN8jst5vPPzKbcrxhcm44puRmRVQeglmzwb4HLNnF2CdnkrmlWLE86TqWNOhiSM1pl
+         X8IFaoN+PercP3NbQvG47jvAAveBtmxBS4pR35HkrXMMAtiHGmHxhQL3o8xDZDZVUt/q
+         VX2E769V95NYtcOWQSYtCeZOoA6z5TPmOLSeYAkfYhV3hihgx0bic5jbghURcOepdEN9
+         D1dug7p+jaPw1YsK3sethRK7wnuGPqknnO+LUcshWys2fHnWb56Azj4VPxoUUXeWj+k4
+         kRXw==
+X-Gm-Message-State: AOJu0YwMOFf/2s8lGJmELlUngGKA55DKjv3ZrREw6KpuO339fgvgStmU
+	LpfvproAM+mxszDddO0l8ExesRdFbgAZpKHzTcjBdT1fJLVt9CLC3Nw8P3WB1/aeWPcmuQRvqwO
+	Nass0PBUxFFwvVpmLrJWq1nBPpM7ur9v7Q8CtNhBx2tueka6iwz2uXIEXxVKD95y5pJMvek9ec2
+	6mmK+VpNwgdnxl9W/jjXr21mmM
+X-Received: by 2002:a17:90a:d783:b0:2d3:d8b0:967b with SMTP id 98e67ed59e1d1-2d3dffdb9fcmr122252a91.27.1723738235489;
+        Thu, 15 Aug 2024 09:10:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHXuGOKn3nZprVHVB8nhKQZZwCrztWxBA90Dez4sQ0Fhc7M3UCle8kaUQQiO4lzZNCSrEAKKrx6iXw5ZY7dSyg=
+X-Received: by 2002:a17:90a:d783:b0:2d3:d8b0:967b with SMTP id
+ 98e67ed59e1d1-2d3dffdb9fcmr122224a91.27.1723738235138; Thu, 15 Aug 2024
+ 09:10:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:164c:b0:397:95c7:6f72 with SMTP id
- e9e14a558f8ab-39d26d95de3mr190845ab.6.1723738203044; Thu, 15 Aug 2024
- 09:10:03 -0700 (PDT)
-Date: Thu, 15 Aug 2024 09:10:03 -0700
-In-Reply-To: <0000000000006923bb06178ce04a@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000004754de061fbb1356@google.com>
-Subject: Re: [syzbot] [mm?] WARNING in hpage_collapse_scan_pmd (2)
-From: syzbot <syzbot+5ea2845f44caa77f5543@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, axboe@kernel.dk, borntraeger@linux.ibm.com, 
-	david@redhat.com, frankja@linux.ibm.com, imbrenda@linux.ibm.com, 
-	io-uring@vger.kernel.org, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-mm@kvack.org, pbonzini@redhat.com, 
-	peterx@redhat.com, shuah@kernel.org, syzkaller-bugs@googlegroups.com
+References: <20240608000639.3295768-1-seanjc@google.com> <20240608000639.3295768-2-seanjc@google.com>
+ <efb9af41-21ed-4b97-8c67-40d6cda10484@redhat.com> <Zr4TPVQ_SNEKyfUz@google.com>
+In-Reply-To: <Zr4TPVQ_SNEKyfUz@google.com>
+From: Paolo Bonzini <pbonzini@redhat.com>
+Date: Thu, 15 Aug 2024 18:10:21 +0200
+Message-ID: <CABgObfZSCZ-dgK3zWao573+RmZSPhnaoMsrify9-48UVhbKVdw@mail.gmail.com>
+Subject: Re: [PATCH v3 1/8] KVM: Use dedicated mutex to protect
+ kvm_usage_count to avoid deadlock
+To: Sean Christopherson <seanjc@google.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot suspects this issue was fixed by commit:
+On Thu, Aug 15, 2024 at 4:40=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Wed, Aug 14, 2024, Paolo Bonzini wrote:
+> > On 6/8/24 02:06, Sean Christopherson wrote:
+> > > Use a dedicated mutex to guard kvm_usage_count to fix a potential dea=
+dlock
+> > > on x86 due to a chain of locks and SRCU synchronizations.  Translatin=
+g the
+> > > below lockdep splat, CPU1 #6 will wait on CPU0 #1, CPU0 #8 will wait =
+on
+> > > CPU2 #3, and CPU2 #7 will wait on CPU1 #4 (if there's a writer, due t=
+o the
+> > > fairness of r/w semaphores).
+> > >
+> > >      CPU0                     CPU1                     CPU2
+> > > 1   lock(&kvm->slots_lock);
+> > > 2                                                     lock(&vcpu->mut=
+ex);
+> > > 3                                                     lock(&kvm->srcu=
+);
+> > > 4                            lock(cpu_hotplug_lock);
+> > > 5                            lock(kvm_lock);
+> > > 6                            lock(&kvm->slots_lock);
+> > > 7                                                     lock(cpu_hotplu=
+g_lock);
+> > > 8   sync(&kvm->srcu);
+> > >
+> > > Note, there are likely more potential deadlocks in KVM x86, e.g. the =
+same
+> > > pattern of taking cpu_hotplug_lock outside of kvm_lock likely exists =
+with
+> > > __kvmclock_cpufreq_notifier()
+> >
+> > Offhand I couldn't see any places where {,__}cpufreq_driver_target() is
+> > called within cpus_read_lock().  I didn't look too closely though.
+>
+> Anyways...
+>
+>   cpuhp_cpufreq_online()
+>   |
+>   -> cpufreq_online()
+>      |
+>      -> cpufreq_gov_performance_limits()
+>         |
+>         -> __cpufreq_driver_target()
+>            |
+>            -> __target_index()
 
-commit c88033efe9a391e72ba6b5df4b01d6e628f4e734
-Author: Peter Xu <peterx@redhat.com>
-Date:   Mon Apr 22 13:33:11 2024 +0000
+Ah, I only looked in generic code.
 
-    mm/userfaultfd: reset ptes when close() for wr-protected ones
+Can you add a comment to the comment message suggesting switching the
+vm_list to RCU? All the occurrences of list_for_each_entry(...,
+&vm_list, ...) seem amenable to that, and it should be as easy to
+stick all or part of kvm_destroy_vm() behind call_rcu().
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12f2396b980000
-start commit:   e67572cd2204 Linux 6.9-rc6
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3310e643b6ef5d69
-dashboard link: https://syzkaller.appspot.com/bug?extid=5ea2845f44caa77f5543
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10874a40980000
+Thanks,
 
-If the result looks correct, please mark the issue as fixed by replying with:
+Paolo
 
-#syz fix: mm/userfaultfd: reset ptes when close() for wr-protected ones
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
