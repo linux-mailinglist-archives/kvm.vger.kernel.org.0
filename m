@@ -1,172 +1,176 @@
-Return-Path: <kvm+bounces-24236-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24237-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04828952AAC
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 10:34:49 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67DE5952AD4
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 10:46:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A91411C20DDD
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 08:34:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC9571F22EF6
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 08:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56FD21A00FF;
-	Thu, 15 Aug 2024 08:01:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1AF1AE843;
+	Thu, 15 Aug 2024 08:16:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ry/IzBCg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IhuvzyuS"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFD719DF92;
-	Thu, 15 Aug 2024 08:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E6513D245
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 08:15:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723708903; cv=none; b=sxLFKm0KRen7AbqXAmKp/9v+c0DsYzqljjmqKmXKVnkW7tNfta5XkZU2hb2Z8tCPutvNxhnR7rHwdLm4AKvVyluq0L4vWUuw8xc3WkjM4T4Dq1vR++Liq+onoVL6tSxPHNTMZ1MSOEgrtR2dv07j54IjTzryPVRVUx+j6fQZeGk=
+	t=1723709761; cv=none; b=b58IkL4nusdBrnAPJpmPLW1yRPbKkPhhr6ui+xtmF7+gcJON6Cu2JZjHn4IAxoji96HK7C43hCq2CEnXf/tg4jRHBwSQ2a7NkEoWL2Bjk8YgUPxg3i18M76YLzhyOjuNf6FH1u+N7AynNimWuXdpBZT4GtfOOLn5cM8xCtvsa6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723708903; c=relaxed/simple;
-	bh=L+iIkWaROx53+mbR/KlFrGWriCKk7KswEX0BCz+zJXk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pgjaFERcxm0cwVsx0vfxnFgUT4EpavSn72lDY7M5r6VYeAcjAN0qwBfhC4X08TRgCCMuEMZyNPnyCKmhwY8cQWj7FuTPoneenpnm9WChmsoP7EvTaWHPWznELVcWrZoDHLYM31juPsNe9pEUKy52GXS3ywfYMIeRqrQx0AyUg9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ry/IzBCg; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723708902; x=1755244902;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=L+iIkWaROx53+mbR/KlFrGWriCKk7KswEX0BCz+zJXk=;
-  b=Ry/IzBCgswXC2xhj9JNbB35qu8CCzawKwohbRvT7qsN3SXRX6wQ/ErMl
-   kwjYmOHSb7eLejswMz34zdKgBzgynUoKihSdDo3mjod0M1RsfPuKIu9Pd
-   q1ju6vgZKUHNW8KZp3MdBXqZGyAxzzAuCRM+jr/GzCq3dbMlVTd0n9XxR
-   sTxSQxfGbbhmkcN4mch2lUGZ4OOj9pm8IHBbf7wLR4UWnO1IbJcF5aj4o
-   RWgIwnsQ5FcblnRKNQlt4EfYeNWRp10ERz1SQfQD8Re7ir64qeoAcLKRI
-   pTRd/kgFBsY5YfIjLXBeq8p77lbgkkHAJ1OtjLLafSD8q//2nKFk0En17
-   g==;
-X-CSE-ConnectionGUID: A8s0lY62S3Crzlp0fbodVQ==
-X-CSE-MsgGUID: d4G1Au7LTdm0Vo6EpOt0wQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11164"; a="22090508"
-X-IronPort-AV: E=Sophos;i="6.10,148,1719903600"; 
-   d="scan'208";a="22090508"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 01:01:41 -0700
-X-CSE-ConnectionGUID: At7ErGaiRciMc6LYfxJrhw==
-X-CSE-MsgGUID: QNiy1+u9RbyVeLD72TnEnA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,148,1719903600"; 
-   d="scan'208";a="63438239"
-Received: from yilunxu-optiplex-7050.sh.intel.com (HELO localhost) ([10.239.159.165])
-  by fmviesa003.fm.intel.com with ESMTP; 15 Aug 2024 01:01:38 -0700
-Date: Thu, 15 Aug 2024 15:59:26 +0800
-From: Xu Yilun <yilun.xu@linux.intel.com>
-To: Rick Edgecombe <rick.p.edgecombe@intel.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, kvm@vger.kernel.org,
-	kai.huang@intel.com, isaku.yamahata@gmail.com,
-	tony.lindgren@linux.intel.com, xiaoyao.li@intel.com,
-	linux-kernel@vger.kernel.org,
-	Isaku Yamahata <isaku.yamahata@intel.com>,
-	Binbin Wu <binbin.wu@linux.intel.com>
-Subject: Re: [PATCH 09/25] KVM: TDX: Get system-wide info about TDX module on
- initialization
-Message-ID: <Zr21XioOyi0CZ+FV@yilunxu-OptiPlex-7050>
-References: <20240812224820.34826-1-rick.p.edgecombe@intel.com>
- <20240812224820.34826-10-rick.p.edgecombe@intel.com>
+	s=arc-20240116; t=1723709761; c=relaxed/simple;
+	bh=It2n54/Wszz22dJy2yFkRqq3oHwCh6v6hF6ITpdTWaA=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=h6yDqTMWFxYXHfUiLUeHmZUn02JGKxP0hFWX1kIpPxTubp+zKDow5Mw5l+BhPgIz0g42/ZqbjBDjY2Rjfa/NlchN9G6KjhMOLCWhHM533NBMTD/5M2vDbWK46osZVZMPD51Z3BC4JWm3diy3BHIeJdY48G82V1pZwcpFEnHvLfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IhuvzyuS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723709758;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6siwQRc65l8C/JRIpOzVH+/lh/N1bi7Q5Wrmcr0+NwY=;
+	b=IhuvzyuSpylJsuXEmU1GoeMFuupKnqzLMsmmPzZMCoI91LcLIq9baHcZ9j+qCmUiuYxTdq
+	HtzOLKMKyQqANVpTKZbTJoRmlhHimDmZ5jqJXHVDBfv3tXyP/2skp6bu9eCt8DdLn9ISe3
+	4HxAsLzApOCP6iE/pggeoOKJlfxz0uc=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-297-rgq3nb15NUmyY0F83FeGUA-1; Thu, 15 Aug 2024 04:15:57 -0400
+X-MC-Unique: rgq3nb15NUmyY0F83FeGUA-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-428fc34f41bso3925945e9.3
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 01:15:56 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723709756; x=1724314556;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6siwQRc65l8C/JRIpOzVH+/lh/N1bi7Q5Wrmcr0+NwY=;
+        b=BRFiODOysnv7lqQF0Ig8TBY5SujGQXQL+4BXYSLQJ3AlC+VsWHDEBPG2bZCO6uPjQ/
+         xkxUwJd577jsUVaQfQavKufSbuhFiyjtq6jaiLT54Li/ZEQRrPPz8xJghl3o9kBeoDtG
+         AEBop0zq+lnKzPmv7Tthrww3q3Iom0y3W6gIg2mawqy1TLbaWFvo51xpQEf89NNegXTc
+         /6IxCv1A3O0JK8ePWzmt4Y/7nu3y2afqsKZIGPIsBll5vH0MV5ejxQdfVK0FO0JkldsR
+         DzbMFCPSllxFHl5/Fptswt+q93958w1ZdTFMurKq83q2J0HemZNFxf9uaXkFToj7DBdI
+         t3vQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWq22DjZTavcdZWUuznTBWNtHefZqNcwb1wdEoNvxsndYcl0ZmHy0FWz7ca6KV/ts7a0bH1XN4Q2E+qMggREOAaegfw
+X-Gm-Message-State: AOJu0YwPSIF0oa5LSYWC2R9qgNegLWIe6OXs6YMiTdW2f2Glj3KjOYiB
+	lHk8q7oyGILennrohckJwVPxChk1RfMdReuRvRVsOE+uNGhbufs742uIWe3CmfyNdtN+KYKEb4h
+	ZR7PiCjE0iN8naB1XnFwJU2p1jgPxSEfqKJf65xTFh8seRJuDfg==
+X-Received: by 2002:a05:600c:190e:b0:427:ff7a:79e with SMTP id 5b1f17b1804b1-429dd2393f0mr36254965e9.16.1723709755693;
+        Thu, 15 Aug 2024 01:15:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEoCzTh17WSwxryGBjxZNK9ZCVO20bZbVHu6qlfgD4Z3joMLanQfxCiyYHbDAD7X7wJK27mdQ==
+X-Received: by 2002:a05:600c:190e:b0:427:ff7a:79e with SMTP id 5b1f17b1804b1-429dd2393f0mr36254675e9.16.1723709755074;
+        Thu, 15 Aug 2024 01:15:55 -0700 (PDT)
+Received: from fedora (g2.ign.cz. [91.219.240.8])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429e7e1ca28sm11970905e9.44.2024.08.15.01.15.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 01:15:54 -0700 (PDT)
+From: Vitaly Kuznetsov <vkuznets@redhat.com>
+To: Sean Christopherson <seanjc@google.com>
+Cc: Mirsad Todorovac <mtodorovac69@gmail.com>, kvm@vger.kernel.org, Paolo
+ Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo
+ Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, linux-kernel@vger.kernel.org
+Subject: Re: [BUG] arch/x86/kvm/vmx/vmx_onhyperv.h:109:36: error:
+ dereference of NULL =?utf-8?B?4oCYMOKAmQ==?=
+In-Reply-To: <Zr0rEy0bO1ju_f1C@google.com>
+References: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
+ <Zpq2Lqd5nFnA0VO-@google.com>
+ <207a5c75-b6ad-4bfb-b436-07d4a3353003@gmail.com>
+ <87a5i05nqj.fsf@redhat.com>
+ <b20eded4-0663-49fb-ba88-5ff002a38a7f@gmail.com>
+ <87plqbfq7o.fsf@redhat.com> <ZrzIVnkLqcbUKVDZ@google.com>
+ <87mslff728.fsf@redhat.com> <Zr0rEy0bO1ju_f1C@google.com>
+Date: Thu, 15 Aug 2024 10:15:53 +0200
+Message-ID: <87h6bmfbgm.fsf@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240812224820.34826-10-rick.p.edgecombe@intel.com>
+Content-Type: text/plain
 
-> diff --git a/arch/x86/kvm/vmx/tdx.c b/arch/x86/kvm/vmx/tdx.c
-> index de14e80d8f3a..90b44ebaf864 100644
-> --- a/arch/x86/kvm/vmx/tdx.c
-> +++ b/arch/x86/kvm/vmx/tdx.c
-> @@ -3,6 +3,7 @@
->  #include <asm/tdx.h>
->  #include "capabilities.h"
->  #include "x86_ops.h"
-> +#include "mmu.h"
+Sean Christopherson <seanjc@google.com> writes:
 
-Is the header file still needed?
+> On Wed, Aug 14, 2024, Vitaly Kuznetsov wrote:
+>> Sean Christopherson <seanjc@google.com> writes:
+>> 
+>> > On Wed, Aug 14, 2024, Vitaly Kuznetsov wrote:
+>> >> What I meant is something along these lines (untested):
+>> >> 
+>> >> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> >> index eb48153bfd73..e2d8c67d0cad 100644
+>> >> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> >> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
+>> >> @@ -104,6 +104,14 @@ static inline void evmcs_load(u64 phys_addr)
+>> >>         struct hv_vp_assist_page *vp_ap =
+>> >>                 hv_get_vp_assist_page(smp_processor_id());
+>> >>  
+>> >> +       /*
+>> >> +        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
+>> >> +        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
+>> >> +        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
+>> >> +        * but compilers may still complain.
+>> >> +        */
+>> >> +       BUG_ON(!vp_ap);
+>> >
+>> > A full BUG_ON() is overkill, and easily avoided.  If we want to add a sanity
+>> > check here and do more than just WARN, then it's easy enough to plumb in @vcpu
+>> > and make this a KVM_BUG_ON() so that the VM dies, i.e. so that KVM doesn't risk
+>> > corrupting the guest somehow.
+>> >
+>> 
+>> I'm still acting under the impression this is an absolutely impossible
+>> situation :-)
+>> 
+>> AFAICS, we only call evmcs_load() from vmcs_load() but this one doesn't
+>> have @vcpu/@kvm either and I wasn't sure it's worth the effort to do the
+>> plumbing (or am I missing an easy way to go back from @vmcs to
+>> @vcpu?). On the other hand, vmcs_load() should not be called that ofter
+>> so if we prefer to have @vcpu there for some other reason -- why not.
+>
+> kvm_get_running_vcpu(), though I honestly purposely didn't suggest it earlier
+> because I am not a fan of using kvm_get_running_vcpu() unless it's absolutely
+> necessary.  But for this situation, I'd be fine with using it.
 
->  #include "tdx.h"
->  
->  #undef pr_fmt
-> @@ -30,6 +31,72 @@ static void __used tdx_guest_keyid_free(int keyid)
->  	ida_free(&tdx_guest_keyid_pool, keyid);
->  }
->  
-> +static int tdx_get_capabilities(struct kvm_tdx_cmd *cmd)
-> +{
-> +	const struct tdx_sysinfo_td_conf *td_conf = &tdx_sysinfo->td_conf;
-> +	struct kvm_tdx_capabilities __user *user_caps;
-> +	struct kvm_tdx_capabilities *caps = NULL;
-> +	int i, ret = 0;
-> +
-> +	/* flags is reserved for future use */
-> +	if (cmd->flags)
-> +		return -EINVAL;
-> +
-> +	caps = kmalloc(sizeof(*caps), GFP_KERNEL);
-> +	if (!caps)
-> +		return -ENOMEM;
-> +
-> +	user_caps = u64_to_user_ptr(cmd->data);
-> +	if (copy_from_user(caps, user_caps, sizeof(*caps))) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	if (caps->nr_cpuid_configs < td_conf->num_cpuid_config) {
-> +		ret = -E2BIG;
+Ah, nice, so we don't even need the plumbing then I guess? Compile-tested only:
 
-How about output the correct num_cpuid_config to userspace as a hint,
-to avoid user blindly retries.
+diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
+index eb48153bfd73..318f5f95f211 100644
+--- a/arch/x86/kvm/vmx/vmx_onhyperv.h
++++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
+@@ -104,6 +104,19 @@ static inline void evmcs_load(u64 phys_addr)
+        struct hv_vp_assist_page *vp_ap =
+                hv_get_vp_assist_page(smp_processor_id());
+ 
++       /*
++        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
++        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
++        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
++        * but compilers may still complain.
++        */
++       if (!vp_ap) {
++               struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
++
++               KVM_BUG_ON(1, vcpu->kvm);
++               return;
++       }
++
+        if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
+                vp_ap->nested_control.features.directhypercall = 1;
+        vp_ap->current_nested_vmcs = phys_addr;
 
-> +		goto out;
-> +	}
-> +
-> +	*caps = (struct kvm_tdx_capabilities) {
-> +		.attrs_fixed0 = td_conf->attributes_fixed0,
-> +		.attrs_fixed1 = td_conf->attributes_fixed1,
-> +		.xfam_fixed0 = td_conf->xfam_fixed0,
-> +		.xfam_fixed1 = td_conf->xfam_fixed1,
-> +		.supported_gpaw = TDX_CAP_GPAW_48 |
-> +		((kvm_host.maxphyaddr >= 52 &&
-> +		  cpu_has_vmx_ept_5levels()) ? TDX_CAP_GPAW_52 : 0),
-> +		.nr_cpuid_configs = td_conf->num_cpuid_config,
-> +		.padding = 0,
-> +	};
-> +
-> +	if (copy_to_user(user_caps, caps, sizeof(*caps))) {
-> +		ret = -EFAULT;
-> +		goto out;
-> +	}
-> +
-> +	for (i = 0; i < td_conf->num_cpuid_config; i++) {
-> +		struct kvm_tdx_cpuid_config cpuid_config = {
-> +			.leaf = (u32)td_conf->cpuid_config_leaves[i],
-> +			.sub_leaf = td_conf->cpuid_config_leaves[i] >> 32,
-> +			.eax = (u32)td_conf->cpuid_config_values[i].eax_ebx,
-> +			.ebx = td_conf->cpuid_config_values[i].eax_ebx >> 32,
-> +			.ecx = (u32)td_conf->cpuid_config_values[i].ecx_edx,
-> +			.edx = td_conf->cpuid_config_values[i].ecx_edx >> 32,
-> +		};
-> +
-> +		if (copy_to_user(&(user_caps->cpuid_configs[i]), &cpuid_config,
-                                  ^                           ^
+(I hope we can't reach here with kvm_running_vcpu unset, can we?)
 
-I think the brackets could be removed.
+-- 
+Vitaly
 
-> +					sizeof(struct kvm_tdx_cpuid_config))) {
-
-sizeof(cpuid_config) could be better.
-
-Thanks,
-Yilun
 
