@@ -1,51 +1,51 @@
-Return-Path: <kvm+bounces-24253-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24256-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7084F952EA5
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:00:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 56150952EA8
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:01:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00CA9B267DB
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 13:00:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E76DAB26BBC
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 13:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E6E019F499;
-	Thu, 15 Aug 2024 13:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6EA1A01BF;
+	Thu, 15 Aug 2024 13:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMKdasHC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="c08KVrqi"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5081E19DF58;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A596C19DF42;
 	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723726805; cv=none; b=OHjE7XvCAC6BX3alvJgSNlG2BwVyC5YZhk7LGFOZLASgVhErB43X35kuA1cn1Th1dlR+/bvz4aTLjpco1UY1QkQ/P1eRuHzFjAXmfAVUvzYoMiCRqOt+xvciISGqXplfYZxxSrvD+weVOMvcuOML9dJOc5kwiw+kn6f2FA52nLg=
+	t=1723726805; cv=none; b=UMkcvf75jNXYBU5eQ8i3DK2Jc7PzvX7XLnXu6cTsbdVhgsLMZaqQoYtF2nUq9WbJ8XDqlqwPb8NEK3tCI40XtUcqJ83LhG9I7P4GbqyBPwvMpFbAU6PtoJkc8aNA9WGlUlsoV+4vYk8Z1rMSN5fhFAy4CAFq52smoCJwYe8X14Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723726805; c=relaxed/simple;
-	bh=7yPgO+gFWmtYo2hX7bb0kFw4QbZDVO3VBIpTe6cAldM=;
+	bh=qEawXgiyDbzCTmN/dR322ZhS1/QnoFktWqU0ISs5GK0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HD4yz4A6y3+ccpaIksl+IxQ2/tZstv6sVyiKZtC9dYuvAITbLThIfXgbUeJRhVH/ZHb38f1aLWNUaa/7hbWxeaBoafE0mgQbKDMk/VxwynBypBgxpJvPyrPf2/i3wBU2GIt5RIi84AoJOVkgOo/zgIN3EbRT5T02OlIVBuSuzPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qMKdasHC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2C020C4AF0D;
+	 MIME-Version; b=Iaif3iP8oh03JxP4okhemAMXEOe0J3Ih8bIazX26nQT1kV3+5qAGNY2zUFOR2jp7HeR2R7SctVIBp5cqnY+avUMgdogrp+oPMJdQ8it+G6I7d20JLGWkjiXf5NzxHsOnA/1On/CetPW996blwFEW6SMFI86Ejj5MfPck2V9YEvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=c08KVrqi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BDF7C32786;
 	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723726805;
-	bh=7yPgO+gFWmtYo2hX7bb0kFw4QbZDVO3VBIpTe6cAldM=;
+	bh=qEawXgiyDbzCTmN/dR322ZhS1/QnoFktWqU0ISs5GK0=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=qMKdasHC5YS4Rlmnbt4dvh5r5AeObcjiPwiU5fwMpoeNG++dJLoCFXsPjq356SVYU
-	 mpbfTqsooVdK10bPI4f38Y3Uu/JpTPRVjds06qwEFCH1gh7O3IvR1glCp68CA9tuSN
-	 d/SbJlubQ3OkvlsQ79Gn80vWJSC+Foaf6tgdIBxr18GcmhKN2Q7NCPCB3sOOpX00lO
-	 4h96kJtkEDJP7O0VWc4Qgfeb0VmLczZJ6Jgv+J4ETDwUVgU6RjdMOtjgh5+FXBBCSr
-	 ld3uO4dsTgfhOmNixEyYLcnYZ/L4HWk4BqFH6NjqepLMr4YwZuvYoGlTxhoQWlaiFd
-	 owrwbNvWUlZhw==
+	b=c08KVrqibvuFKIuE596yw2ZbQGR5Lt7W5JiYUqXqxTIvMtiT8QkuT9NIWya/VHx+x
+	 +QkJxRC1Dt8oJMxgfKHBc8a/WCRlb/typkXYeN4B2vzM3verGxwlAp7/0A6F5ZYVK4
+	 m34VLwZoASkGU2TvCC3x3YBV4+aACbuxD2i338fwiapaAFXwYxefWgNUaXc2pL2JbV
+	 eLTOdKq6hM05gbFUDzrpqaTA+wIj9FV/89/ciPmX0qETKHdjbBs7r1Vg4mdcktQJf4
+	 uH+6BuHgPAQbpYdpb17dlfRry0pPPXauRflc+7nYIZkddA5yzOK0jjjVtfpCkXDLQn
+	 5u2pxjarLhyOQ==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sea5D-003xld-Dl;
+	id 1sea5D-003xld-J4;
 	Thu, 15 Aug 2024 14:00:03 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
@@ -55,9 +55,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 04/11] KVM: arm64: Add context-switch of ACCDATA_EL1
-Date: Thu, 15 Aug 2024 13:59:52 +0100
-Message-Id: <20240815125959.2097734-5-maz@kernel.org>
+Subject: [PATCH 05/11] KVM: arm64: Handle trapping of FEAT_LS64* instructions
+Date: Thu, 15 Aug 2024 13:59:53 +0100
+Message-Id: <20240815125959.2097734-6-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240815125959.2097734-1-maz@kernel.org>
 References: <20240815125959.2097734-1-maz@kernel.org>
@@ -73,69 +73,100 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-Add ACCDATA_EL1 save/restore as part of the EL0 context. This is
-conditioned on the guest's view of ID_AA64ISAR1_EL1.LS64 reporting
-that this register is supported.
+We generally don't expect FEAT_LS64* instructions to trap, unless
+they are trapped by a guest hypervisor.
+
+Otherwise, this is just the guest playing tricks on us by using
+an instruction that isn't advertised, which we handle with a well
+deserved UNDEF.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 29 +++++++++++++++++-----
- 1 file changed, 23 insertions(+), 6 deletions(-)
+ arch/arm64/kvm/handle_exit.c | 64 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 64 insertions(+)
 
-diff --git a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-index 4c0fdabaf8ae..d23d7113261b 100644
---- a/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-+++ b/arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h
-@@ -21,12 +21,6 @@ static inline void __sysreg_save_common_state(struct kvm_cpu_context *ctxt)
- 	ctxt_sys_reg(ctxt, MDSCR_EL1)	= read_sysreg(mdscr_el1);
+diff --git a/arch/arm64/kvm/handle_exit.c b/arch/arm64/kvm/handle_exit.c
+index d7c2990e7c9e..8cb0091f8e1e 100644
+--- a/arch/arm64/kvm/handle_exit.c
++++ b/arch/arm64/kvm/handle_exit.c
+@@ -291,6 +291,69 @@ static int handle_svc(struct kvm_vcpu *vcpu)
+ 	return 1;
  }
  
--static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
--{
--	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
--	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
--}
--
- static inline struct kvm_vcpu *ctxt_to_vcpu(struct kvm_cpu_context *ctxt)
- {
- 	struct kvm_vcpu *vcpu = ctxt->__hyp_running_vcpu;
-@@ -66,6 +60,26 @@ static inline bool ctxt_has_tcrx(struct kvm_cpu_context *ctxt)
- 	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64MMFR3_EL1, TCRX, IMP);
- }
- 
-+static inline bool ctxt_has_accdata(struct kvm_cpu_context *ctxt)
++static int handle_ls64b(struct kvm_vcpu *vcpu)
 +{
-+	struct kvm_vcpu *vcpu = ctxt_to_vcpu(ctxt);
++	struct kvm *kvm = vcpu->kvm;
++	u64 esr = kvm_vcpu_get_esr(vcpu);
++	u64 iss = ESR_ELx_ISS(esr);
++	bool allowed;
 +
-+	return kvm_has_feat(kern_hyp_va(vcpu->kvm), ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
-+}
++	switch (iss) {
++	case ESR_ELx_ISS_ST64BV:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_V);
++		break;
++	case ESR_ELx_ISS_ST64BV0:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA);
++		break;
++	case ESR_ELx_ISS_LDST64B:
++		allowed = kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64);
++		break;
++	default:
++		/* Clearly, we're missing something. */
++		goto unknown_trap;
++	}
 +
-+static inline void __sysreg_save_user_state(struct kvm_cpu_context *ctxt)
-+{
-+	ctxt_sys_reg(ctxt, TPIDR_EL0)	= read_sysreg(tpidr_el0);
-+	ctxt_sys_reg(ctxt, TPIDRRO_EL0)	= read_sysreg(tpidrro_el0);
++	if (!allowed)
++		goto undef;
 +
++	if (vcpu_has_nv(vcpu) && !is_hyp_ctxt(vcpu)) {
++		u64 hcrx = __vcpu_sys_reg(vcpu, HCRX_EL2);
++		bool fwd;
++
++		switch (iss) {
++		case ESR_ELx_ISS_ST64BV:
++			fwd = !(hcrx & HCRX_EL2_EnASR);
++			break;
++		case ESR_ELx_ISS_ST64BV0:
++			fwd = !(hcrx & HCRX_EL2_EnAS0);
++			break;
++		case ESR_ELx_ISS_LDST64B:
++			fwd = !(hcrx & HCRX_EL2_EnALS);
++			break;
++		default:
++			/* We don't expect to be here */
++			fwd = false;
++		}
++
++		if (fwd) {
++			kvm_inject_nested_sync(vcpu, esr);
++			return 1;
++		}
++	}
++
++unknown_trap:
 +	/*
-+	 * Despite the appearances, ACCDATA_EL1 is part of the EL0
-+	 * context, as it can only be used using ST64BV0.
++	 * If we land here, something must be very wrong, because we
++	 * have no idea why we trapped at all. Warn and undef as a
++	 * fallback.
 +	 */
-+	if (ctxt_has_accdata(ctxt))
-+		ctxt_sys_reg(ctxt, ACCDATA_EL1)	= read_sysreg_s(SYS_ACCDATA_EL1);
++	WARN_ON(1);
++
++undef:
++	kvm_inject_undefined(vcpu);
++	return 1;
 +}
 +
- static inline void __sysreg_save_el1_state(struct kvm_cpu_context *ctxt)
- {
- 	ctxt_sys_reg(ctxt, SCTLR_EL1)	= read_sysreg_el1(SYS_SCTLR);
-@@ -126,6 +140,9 @@ static inline void __sysreg_restore_user_state(struct kvm_cpu_context *ctxt)
- {
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDR_EL0),	tpidr_el0);
- 	write_sysreg(ctxt_sys_reg(ctxt, TPIDRRO_EL0),	tpidrro_el0);
-+
-+	if (ctxt_has_accdata(ctxt))
-+		write_sysreg_s(ctxt_sys_reg(ctxt, ACCDATA_EL1), SYS_ACCDATA_EL1);
- }
- 
- static inline void __sysreg_restore_el1_state(struct kvm_cpu_context *ctxt)
+ static exit_handle_fn arm_exit_handlers[] = {
+ 	[0 ... ESR_ELx_EC_MAX]	= kvm_handle_unknown_ec,
+ 	[ESR_ELx_EC_WFx]	= kvm_handle_wfx,
+@@ -300,6 +363,7 @@ static exit_handle_fn arm_exit_handlers[] = {
+ 	[ESR_ELx_EC_CP14_LS]	= kvm_handle_cp14_load_store,
+ 	[ESR_ELx_EC_CP10_ID]	= kvm_handle_cp10_id,
+ 	[ESR_ELx_EC_CP14_64]	= kvm_handle_cp14_64,
++	[ESR_ELx_EC_LS64B]	= handle_ls64b,
+ 	[ESR_ELx_EC_HVC32]	= handle_hvc,
+ 	[ESR_ELx_EC_SMC32]	= handle_smc,
+ 	[ESR_ELx_EC_HVC64]	= handle_hvc,
 -- 
 2.39.2
 
