@@ -1,78 +1,63 @@
-Return-Path: <kvm+bounces-24249-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24250-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B897952E59
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 14:35:42 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0938A952EA2
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:00:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 443091F22766
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 12:35:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B180A1F226CB
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 13:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB7E19F49D;
-	Thu, 15 Aug 2024 12:34:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA3AA19DF73;
+	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dTv2b0MX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fn3tmV9i"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFD219E811
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 12:34:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B7841991B1;
+	Thu, 15 Aug 2024 13:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723725271; cv=none; b=CSCt716hA85mulaQeWAcXhNHqTPo2XNqxoBS8TmR0YIHqUXwP+hJBK4XvG9HBP7V4lWSru8p36JIZNA8sNeQ53wOAVJ7WdSGfBSsHc4ilIz2YM6+O6V+eE8TvX0SFOo0dPCbnLUJMg1i+ftpJ8QuPaCnblSU8la/FPxEwri4N+k=
+	t=1723726805; cv=none; b=hDX/tdvGMiEtMEYKbimitftQjSvjKqWUNcI41+wlKEXntub1b152leI2kYuOMINBAqLeaYjShzxUt5oo1HgP4NFDLV+i1jZB0b2EWWSdNg6+sapYImKE1bABiePaydAbVWP8+VK2lzUwuCFb49RbyS295XqYExVz6oVPBYxn1XI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723725271; c=relaxed/simple;
-	bh=L38KGcXOZCqzPnVmWq/RPsXYJhQOqQHT3IpQY6HAono=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WlT0p0YIsJe8II28KLO/7YIkgdPV8YvD1cw1lVN3oOKxdo/F7id3Z75BmfyJ4ywoEFlxoKRlv/KwJBiDwPAO7MUKqDRVbGgOEntvL5N+wKrDNqMFviiO16ocLMLkrVUlj5O29/KPJlgHbCmkRBe3PjuriKhUlvJToXP5Z64r68o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dTv2b0MX; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723725269;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+bN7ZCwzjk9Oq6TRygQGi4kAzwB1IuXFDbclXlvZiww=;
-	b=dTv2b0MXEiLJccXUZxgjZ+fBloGIymRpaxjGaBRBfDnqgS2T0v1QKmiAx5bEid9RKElOCm
-	VwtN03h5PIBkblwxzQZ72xJnPjNhxizmhNwJq+jkPBx0eqra3AQ7CNACHvM7ObNntT1X0j
-	L5tdlcDR5eAPQESsCcsFfx9V84M4nt0=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-445-DWoiEdSUO5uNOwOCiyPTZA-1; Thu,
- 15 Aug 2024 08:34:25 -0400
-X-MC-Unique: DWoiEdSUO5uNOwOCiyPTZA-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 663D51955D48;
-	Thu, 15 Aug 2024 12:34:24 +0000 (UTC)
-Received: from intellaptop.lan (unknown [10.47.238.120])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 578DF300019C;
-	Thu, 15 Aug 2024 12:34:20 +0000 (UTC)
-From: Maxim Levitsky <mlevitsk@redhat.com>
-To: kvm@vger.kernel.org
-Cc: Ingo Molnar <mingo@redhat.com>,
-	x86@kernel.org,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Sean Christopherson <seanjc@google.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Borislav Petkov <bp@alien8.de>,
-	linux-kernel@vger.kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Maxim Levitsky <mlevitsk@redhat.com>
-Subject: [PATCH v3 4/4] KVM: SVM: fix emulation of msr reads/writes of MSR_FS_BASE and MSR_GS_BASE
-Date: Thu, 15 Aug 2024 15:33:49 +0300
-Message-Id: <20240815123349.729017-5-mlevitsk@redhat.com>
-In-Reply-To: <20240815123349.729017-1-mlevitsk@redhat.com>
-References: <20240815123349.729017-1-mlevitsk@redhat.com>
+	s=arc-20240116; t=1723726805; c=relaxed/simple;
+	bh=5P04ykbmzh8C6jEQrvdjizXGGEpPVWPIOo78t8wPxO0=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=KxZHkiEZU7F+Y6Pv7e5al7O2OLuJT/cufWNiapek4KOGxgXxQvpBj2xngB8VKg0eta6ZWgE/uBL1f+rV68cryon88qlZU926c9NfewLPG4S//VwxUs1gfAQmO7C2NvYNqar3l+iWSyZXOeNtSregeenhSkNp39aTdZogM3/y9E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fn3tmV9i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A36C6C32786;
+	Thu, 15 Aug 2024 13:00:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723726804;
+	bh=5P04ykbmzh8C6jEQrvdjizXGGEpPVWPIOo78t8wPxO0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=fn3tmV9iCXVehiYp45JhYoCAFk8j7Xefo9L/vbhK5lyeFDdR2RYRBC9OMOtakRsL3
+	 PP27JlUdw2LO84yLQnH4EK6NaU2sVKck39lu/+d+9u15i37unjIueEJCN+PLS3DYT/
+	 QEvKl3wJIOWAzcTi4WizveU/UlivWhIMlzUiUPMYaagxCFH4lB3GUm/+m5CjWjgSl6
+	 5pvaEK+ULsRPlpS8mh0y/ysYyAJA44KXSNZ7/+fL/cuMHUqf+8a6JtxQwdjmhfDlFb
+	 E3T9F77c9p/dQCPYvnWlWFOx4m9X9NRtP8nBN0YtdIcXM4SiSHmFv6CKPWxcu3d5+2
+	 PezwWJ5YzILNQ==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sea5C-003xld-LH;
+	Thu, 15 Aug 2024 14:00:02 +0100
+From: Marc Zyngier <maz@kernel.org>
+To: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org
+Cc: James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>
+Subject: [PATCH 00/11] KVM: arm64: Add support for FEAT_LS64 and co
+Date: Thu, 15 Aug 2024 13:59:48 +0100
+Message-Id: <20240815125959.2097734-1-maz@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -80,50 +65,68 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-If these msrs are read by the emulator (e.g due to 'force emulation'
-prefix), SVM code currently fails to extract the corresponding segment
-bases, and return them to the emulator.
+The ARM architecture has introduced a while back some 64 byte
+Load/Store operations that are targeting NormalNC or Device memory.
+People have been threatening of using this in actual code, so we might
+as well support it. It also fits my plans to cover the features
+enabled by HCRX_EL2.
 
-Fix that.
+From a KVM perspective, it is only a load/store. Nothing to call home
+about. However, there are two situations where this is interesting:
 
-Signed-off-by: Maxim Levitsky <mlevitsk@redhat.com>
----
- arch/x86/kvm/svm/svm.c | 12 ++++++++++++
- 1 file changed, 12 insertions(+)
+- a NV guest wants to trap these instructions: we need to correctly
+  route them.
 
-diff --git a/arch/x86/kvm/svm/svm.c b/arch/x86/kvm/svm/svm.c
-index a04f6627b237..be3fc54700e3 100644
---- a/arch/x86/kvm/svm/svm.c
-+++ b/arch/x86/kvm/svm/svm.c
-@@ -2876,6 +2876,12 @@ static int svm_get_msr(struct kvm_vcpu *vcpu, struct msr_data *msr_info)
- 	case MSR_CSTAR:
- 		msr_info->data = svm->vmcb01.ptr->save.cstar;
- 		break;
-+	case MSR_GS_BASE:
-+		msr_info->data = svm->vmcb01.ptr->save.gs.base;
-+		break;
-+	case MSR_FS_BASE:
-+		msr_info->data = svm->vmcb01.ptr->save.fs.base;
-+		break;
- 	case MSR_KERNEL_GS_BASE:
- 		msr_info->data = svm->vmcb01.ptr->save.kernel_gs_base;
- 		break;
-@@ -3101,6 +3107,12 @@ static int svm_set_msr(struct kvm_vcpu *vcpu, struct msr_data *msr)
- 	case MSR_CSTAR:
- 		svm->vmcb01.ptr->save.cstar = data;
- 		break;
-+	case MSR_GS_BASE:
-+		svm->vmcb01.ptr->save.gs.base = data;
-+		break;
-+	case MSR_FS_BASE:
-+		svm->vmcb01.ptr->save.fs.base = data;
-+		break;
- 	case MSR_KERNEL_GS_BASE:
- 		svm->vmcb01.ptr->save.kernel_gs_base = data;
- 		break;
+- the access falls outside of a memslot, and userspace needs to handle
+  this.
+
+This last point is of special interest. Instead of going through the
+pain of doing all the decoding in the kernel and presenting the VMM
+with a fully decoded access (like it is the case for normal MMIO), we
+brutally return the ESR+IPA and let userspace deal with the outcome,
+hijacking the data structures for KVM_EXIT_ARM_NISV for that purpose.
+
+It has all the information at its disposal through the vcpu ioctl
+interface, and can definitely do what's asked. Just not very quickly
+
+I don't think this is a problem, and that approximately 100% of the
+VMMs will simply inject an external abort as an indication that they
+are not handling this.
+
+This is otherwise pretty uninteresting code.
+
+Marc Zyngier (11):
+  arm64: Expose ID_AA64ISAR1_EL1.XS to sanitised feature consumers
+  arm64: Add syndrome information for trapped LD64B/ST64B{,V,V0}
+  KVM: arm64: Add ACCDATA_EL1 to the sysreg array
+  KVM: arm64: Add context-switch of ACCDATA_EL1
+  KVM: arm64: Handle trapping of FEAT_LS64* instructions
+  KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
+  KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_ST64_ACCDATA being
+    disabled
+  KVM: arm64: Conditionnaly enable FEAT_LS64* instructions
+  KVM: arm64: nv: Expose FEAT_LS64* to a nested guest
+  arm64: Expose ID_AA64ISAR1_EL1.LS64 to sanitised feature consumers
+  KVM: arm64: Add documentation for KVM_EXIT_ARM_LDST64B
+
+ Documentation/virt/kvm/api.rst             | 43 ++++++++++++---
+ arch/arm64/include/asm/esr.h               |  8 ++-
+ arch/arm64/include/asm/kvm_host.h          |  3 +
+ arch/arm64/kernel/cpufeature.c             |  2 +
+ arch/arm64/kvm/handle_exit.c               | 64 ++++++++++++++++++++++
+ arch/arm64/kvm/hyp/include/hyp/sysreg-sr.h | 29 ++++++++--
+ arch/arm64/kvm/mmio.c                      | 27 ++++++++-
+ arch/arm64/kvm/nested.c                    |  5 +-
+ arch/arm64/kvm/sys_regs.c                  | 25 ++++++++-
+ include/uapi/linux/kvm.h                   |  3 +-
+ 10 files changed, 188 insertions(+), 21 deletions(-)
+
 -- 
-2.40.1
+2.39.2
 
 
