@@ -1,178 +1,158 @@
-Return-Path: <kvm+bounces-24310-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24311-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B4FB95383D
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:30:39 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5933A953878
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:43:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD47C1F22141
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:30:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDA811F24965
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:43:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1321B8EA8;
-	Thu, 15 Aug 2024 16:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0675E1BA875;
+	Thu, 15 Aug 2024 16:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HPeLZTBf"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QHMXQqqp"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108D41AC8BF
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 16:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B601714BB
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 16:42:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723739428; cv=none; b=mKGuo6aCa4eThLZ5lgdXWt1VJ3EsyVtJK4omXuylB+FEfWQwvGo7SYPdRfl2sleJSQMAtWC8PfA7dFqnOwAoXr9Wh2IjwRGTDkmHguk2MUnlIaWoBX5EIDo2xic7ysuk+vbgoh+NxOEQmKbBO+8XR4lQBaJSvVREPRKzQrb2LM4=
+	t=1723740173; cv=none; b=RJR/NEcBzbo9eDOTtYsUFqG0KsLGtlxRcu/QrGGprG7+skeqiQ3sPEVtdgYNA+EGYMeUBA0V/uasemhYQ8Is9GsvD7nhmNOtJpfgh92iUcDrDj5s/UtVFClW95rNIkWT5AniADh2djTa51Nrzeai7BrBqpDy/pRfoRN3VjP2lOE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723739428; c=relaxed/simple;
-	bh=wbk2LZUDRbV1K6GyGuP81W+lgL2ESCb6Ofdh8qj+So0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=MG6plaIkZGgJBGoQTDaeZRZ1cC3nM4T99TKchvgzbwTY5jWQ3au+90cdh2HnWtbWqP2u3jGsVudpR4iTvpvwMM8HPjPfNQJbwFiTBkM775mxdINvmyvvUi9HP3troc6tSRL7VybBKCOMCaZNZNTZqkXMpI+s56c4/3otXf/zDNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HPeLZTBf; arc=none smtp.client-ip=209.85.214.201
+	s=arc-20240116; t=1723740173; c=relaxed/simple;
+	bh=1zRUFULarkTq6LPHVNJ0pkCLjhF3gvttZE7Jb/DKsk4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=irw3c6A7KwXWaNaAgra3fAIwilU1Pc8VGjma4WwAP64Bi8E12c3sU9vAo0xAZqJx5mdnVAiPftI9Rn8qV66zv5xHacoY+zRBRhZHvlHhcwcrp4qX8NXTig+WfSY2CDrGs6kmql+7cAkP0PRHWCyyRN3ldcz3SeuZgpJwGz+ZUTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QHMXQqqp; arc=none smtp.client-ip=209.85.167.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-1fc5b60f416so10069315ad.3
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 09:30:26 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3db18102406so614238b6e.1
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 09:42:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723739426; x=1724344226; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8FLTrRaaj4IbDFlX9Gb5bpYCUef69cHd3D95ZRPBkgE=;
-        b=HPeLZTBfX6W45guZs0bLdjOSQ2uy8p2Mi2DTS97NN+qyd027MN+J7zQd85gjgUWwQV
-         rKd87GjCQEtfj+nzXvi5e9DEt3ivnZY5XxxBIy3ykr65RUcpnqPYOXop+URmjq9OnLkV
-         UHQupA3yOwPea72uRr1AxVUcAHGJsmLLly21EKmAd7tx4mmqrnxyr5t0NC2lZdcwHbXU
-         loZpOSkexYSzLSSI9zxybBrYVp8YPl0K02jUTmP47CRpkpZDWtrE9rJQAmCJPs61zmTw
-         4UCAqN1D6Hk3knV6fHN2SHkoBY3heLSr3P4d+8MvoGH0i5hdK9DOVn9iikuB3QrfyZNg
-         BdLw==
+        d=google.com; s=20230601; t=1723740171; x=1724344971; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=f9XWOzgA/HPz/G4P1h718yGI+VzmZbkZwfnQInlVNGo=;
+        b=QHMXQqqp0faOlKAPErne6hqqOve9t3QxZ8ty67nwkIUROLh34MGXfI7bliG0RtkeSF
+         9rCCO8BgHeAeHGqg63hvu+VuAYE6DdLuhpQSeStjC2dYjBEGB4SXUCYP2686IP7FFcpR
+         rh3Tq9cK1xqctLKQ3WWKIaMmqvl50QLfwsKfxX5MgPydR7XuCIEH4KYvekPCOk7lSprA
+         XHAttpT48PZFtEHpO8npLkq+WhvmrlTJaMkrU8Z8MUvAvYn9N4TXUgAc1YtrO5ubYa/x
+         NJFCwFezWMx+eGY0UnLmVO3IoINGl/j/ZmEsAa7KJFbvOqAPG4VpHJK6/eNaRQrQp1yF
+         rL4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723739426; x=1724344226;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8FLTrRaaj4IbDFlX9Gb5bpYCUef69cHd3D95ZRPBkgE=;
-        b=uymBG/+wQ0Paqh/nqCcgAfvS7guWJ/8hTZirkvzt58ImYfCwtkFBSq0PWj0Sq5vFpL
-         ut0Vd4dtggl7lAJXvCbI9yxjQhmCK7zP14143NEnqOOxUFBQ1P0YX+O81xX3t3/idPgA
-         osEpekba0/r81THsLtn6KrLq+7mJHlWVPuzrRJf3tHcvmzBaOWKqkbT90kbO3joVKmGp
-         YS2rHAWvG918+weis6++tEukjYPt8IsKAWVi07q+JR+EGJJOIM0UoMkooO8giYOPE1Ik
-         BYJfUk4cu2i4q5rJkLEUNrMKdoTed5jyA0heAkFCdtF1YsNZG5m6t6lUTsZ3SDLSLU9m
-         q8pA==
-X-Gm-Message-State: AOJu0YwBnkVH60rUYU7bZLIPP9ryFzY778I50wqS75uBnsOOjuEttY0v
-	qlpJyCekHlQvJzDOz3mNrb3W76mwnPxNwALPiKKsxRtmtVwTLJwBxTxUKjbso2UeXztba+nVHX4
-	aLg==
-X-Google-Smtp-Source: AGHT+IEV9UpSNiomlwj7ADa+36foJFadkRZk55Var7flLGlvN2nm00oB0ZbZgDAFzXltC6drlNlP+R4Q4rU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:903:32c1:b0:1f9:b35f:a2b6 with SMTP id
- d9443c01a7336-20203e3c0d5mr6145ad.1.1723739425641; Thu, 15 Aug 2024 09:30:25
- -0700 (PDT)
-Date: Thu, 15 Aug 2024 09:30:24 -0700
-In-Reply-To: <20240522001817.619072-15-dwmw2@infradead.org>
+        d=1e100.net; s=20230601; t=1723740171; x=1724344971;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f9XWOzgA/HPz/G4P1h718yGI+VzmZbkZwfnQInlVNGo=;
+        b=RHAuBQbVdRJ8EH7hNAT5Ycv+VisiU+Tm4X46Hy9cM1bniR6JcKHEv4A5iE6bIjhsc0
+         TLUVX3z+tdFLlMeAGwOYfg4xzuWrdJO7Ypih8UqdOIWADiYC0x8tcgdXWzuJrBlhFtbr
+         UXWX9DuvYXlFZ1nqhqS9QpGjqcOV95uKj7MyTJsMbJVb/IDdxfdyTdXKdV7Y4weLyr9T
+         s2o/JDp6byfcj4ihC9w7FiQw9wP34cdtumu+OX/2zLjPQaIcvswNF58+n6MmHDGHRFU2
+         TUaCf8mkJJV+bK0cCCmokJ/RRNxnuM4uU+6oCrYLvDC7jNE9IqFlGTETYwX0VFlIVLJh
+         xtdA==
+X-Forwarded-Encrypted: i=1; AJvYcCVMuZRp1Ib1vB5VYr9T45cMHn8Er+StUYBKmhVdw0FkjYxDErdmp/09Xq5hnHSd+N2bFO8ymVeE8MNtB0TpTXhknwNh
+X-Gm-Message-State: AOJu0Yztf9aciDXwmyCkbeUcB5o+vllyBLK3teRQloNY428Klsxco82Q
+	M9mwFcMyFN+6CIRz+/jf19S3oG78wTO/N9Eo2ZM5cgqePnk6xfZkv73ZzYJyfg==
+X-Google-Smtp-Source: AGHT+IGcK7SGE8EjW4QiHlEKJJHDBb8NIW/RbvoYkf19zDjo/HtqxIAEn4/qp/U2DyWRmGixwywMhA==
+X-Received: by 2002:a05:6808:1b13:b0:3da:57b8:22f3 with SMTP id 5614622812f47-3dd29971d90mr8649806b6e.43.1723740170612;
+        Thu, 15 Aug 2024 09:42:50 -0700 (PDT)
+Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c6b636ca92sm1324086a12.91.2024.08.15.09.42.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 09:42:49 -0700 (PDT)
+Date: Thu, 15 Aug 2024 09:42:44 -0700
+From: Vipin Sharma <vipinsh@google.com>
+To: kernel test robot <lkp@intel.com>
+Cc: seanjc@google.com, pbonzini@redhat.com, oe-kbuild-all@lists.linux.dev,
+	dmatlack@google.com, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 2/2] KVM: x86/mmu: Recover NX Huge pages belonging to TDP
+ MMU under MMU read lock
+Message-ID: <20240815164244.GA132028.vipinsh@google.com>
+References: <20240812171341.1763297-3-vipinsh@google.com>
+ <202408150646.VV4z8Znl-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240522001817.619072-1-dwmw2@infradead.org> <20240522001817.619072-15-dwmw2@infradead.org>
-Message-ID: <Zr4tIK5I17NcIxRz@google.com>
-Subject: Re: [RFC PATCH v3 14/21] KVM: x86: Kill cur_tsc_{nsec,offset,write} fields
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jalliste@amazon.co.uk, sveith@amazon.de, zide.chen@intel.com, 
-	Dongli Zhang <dongli.zhang@oracle.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202408150646.VV4z8Znl-lkp@intel.com>
 
-On Wed, May 22, 2024, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On 2024-08-15 06:50:04, kernel test robot wrote:
+> sparse warnings: (new ones prefixed by >>)
+> >> arch/x86/kvm/mmu/tdp_mmu.c:847:21: sparse: sparse: incompatible types in comparison expression (different address spaces):
+>    arch/x86/kvm/mmu/tdp_mmu.c:847:21: sparse:    unsigned long long [usertype] *
+>    arch/x86/kvm/mmu/tdp_mmu.c:847:21: sparse:    unsigned long long [noderef] [usertype] __rcu *
+>    arch/x86/kvm/mmu/tdp_mmu.c: note: in included file (through include/linux/rbtree.h, include/linux/mm_types.h, include/linux/mmzone.h, ...):
+>    include/linux/rcupdate.h:812:25: sparse: sparse: context imbalance in '__tdp_mmu_zap_root' - unexpected unlock
+>    arch/x86/kvm/mmu/tdp_mmu.c:1447:33: sparse: sparse: context imbalance in 'tdp_mmu_split_huge_pages_root' - unexpected unlock
 > 
-> These pointlessly duplicate the last_tsc_{nsec,offset,write} values.
+> vim +847 arch/x86/kvm/mmu/tdp_mmu.c
 > 
-> The only place they were used was where the TSC is stable and a new vCPU
-> is being synchronized to the previous setting, in which case the 'last_'
-> value is definitely identical.
-> 
-> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
-> ---
->  arch/x86/include/asm/kvm_host.h |  3 ---
->  arch/x86/kvm/x86.c              | 19 ++++++++-----------
->  2 files changed, 8 insertions(+), 14 deletions(-)
-> 
-> diff --git a/arch/x86/include/asm/kvm_host.h b/arch/x86/include/asm/kvm_host.h
-> index b01c1d000fff..7d06f389a607 100644
-> --- a/arch/x86/include/asm/kvm_host.h
-> +++ b/arch/x86/include/asm/kvm_host.h
-> @@ -1354,9 +1354,6 @@ struct kvm_arch {
->  	u32 last_tsc_khz;
->  	u64 last_tsc_offset;
->  	u64 last_tsc_scaling_ratio;
-> -	u64 cur_tsc_nsec;
-> -	u64 cur_tsc_write;
-> -	u64 cur_tsc_offset;
->  	u64 cur_tsc_generation;
->  	int nr_vcpus_matched_tsc;
->  
-> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-> index 6ec43f39bdb0..ab5d55071253 100644
-> --- a/arch/x86/kvm/x86.c
-> +++ b/arch/x86/kvm/x86.c
-> @@ -2713,11 +2713,9 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
->  	lockdep_assert_held(&kvm->arch.tsc_write_lock);
->  
->  	/*
-> -	 * We also track th most recent recorded KHZ, write and time to
-> -	 * allow the matching interval to be extended at each write.
-> +	 * Track the last recorded kHz (and associated scaling ratio for
-> +	 * calculating the guest TSC), and offset.
->  	 */
-> -	kvm->arch.last_tsc_nsec = ns;
-> -	kvm->arch.last_tsc_write = tsc;
->  	kvm->arch.last_tsc_khz = vcpu->arch.virtual_tsc_khz;
->  	kvm->arch.last_tsc_scaling_ratio = vcpu->arch.l1_tsc_scaling_ratio;
->  	kvm->arch.last_tsc_offset = offset;
-> @@ -2736,10 +2734,9 @@ static void __kvm_synchronize_tsc(struct kvm_vcpu *vcpu, u64 offset, u64 tsc,
->  		 *
->  		 * These values are tracked in kvm->arch.cur_xxx variables.
+>    819	
+>    820	static bool tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+>    821	{
+>    822		struct tdp_iter iter = {};
+>    823	
+>    824		lockdep_assert_held_read(&kvm->mmu_lock);
+>    825	
+>    826		/*
+>    827		 * This helper intentionally doesn't allow zapping a root shadow page,
+>    828		 * which doesn't have a parent page table and thus no associated entry.
+>    829		 */
+>    830		if (WARN_ON_ONCE(!sp->ptep))
+>    831			return false;
+>    832	
+>    833		iter.old_spte = kvm_tdp_mmu_read_spte(sp->ptep);
+>    834		iter.sptep = sp->ptep;
+>    835		iter.level = sp->role.level + 1;
+>    836		iter.gfn = sp->gfn;
+>    837		iter.as_id = kvm_mmu_page_as_id(sp);
+>    838	
+>    839	retry:
+>    840		/*
+>    841		 * Since mmu_lock is held in read mode, it's possible to race with
+>    842		 * another CPU which can remove sp from the page table hierarchy.
+>    843		 *
+>    844		 * No need to re-read iter.old_spte as tdp_mmu_set_spte_atomic() will
+>    845		 * update it in the case of failure.
+>    846		 */
+>  > 847		if (sp->spt != spte_to_child_pt(iter.old_spte, iter.level))
 
-This comment is now stale, as most of the fields are now .last_xxx, not cur_xxx.
+Hmm, I need to wrap spte_to_child_pt() with rcu_access_pointer() before
+comparing it to sp->spt. Following patch makes this Sparse error go
+away.
 
-However...
+diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
+index 7c7d207ee590..7d5dbfe48c4b 100644
+--- a/arch/x86/kvm/mmu/tdp_mmu.c
++++ b/arch/x86/kvm/mmu/tdp_mmu.c
+@@ -820,6 +820,7 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
+ static bool tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+ {
+        struct tdp_iter iter = {};
++       tdp_ptep_t pt;
 
->  		 */
-> +		kvm->arch.last_tsc_nsec = ns;
+        lockdep_assert_held_read(&kvm->mmu_lock);
 
+@@ -844,7 +845,8 @@ static bool tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
+         * No need to re-read iter.old_spte as tdp_mmu_set_spte_atomic() will
+         * update it in the case of failure.
+         */
+-       if (sp->spt != spte_to_child_pt(iter.old_spte, iter.level))
++       pt = spte_to_child_pt(iter.old_spte, iter.level);
++       if (sp->spt != rcu_access_pointer(pt))
+                return false;
 
-There is a functional change here, and it's either incorrect or misleading (I
-think the latter).  If the TSC is unstable, "ns" in kvm_synchronize_tsc() will
-come from get_kvmclock_base_ns(), and only the TSC frequency is checked for a
-match when synchronizing.
+        if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE))
 
-That results in .last_tsc_nsec not being updated, and so subsequent syncs will
-compute a larger elapsed time (relative to the current generation's timestamp,
-not the "last" timestamp).
-
-Functionally, I think that's ok?  So long as all vCPUs sync against the same
-baseline, it should work?  I think.
-
-But if that's the case, then I would prefer to delete last_tsc_{nsec,write,offset},
-not the cur_xxx versions.  For nsec and write it shows that they are valid/used
-only in the context of the current generation.
-
-And for the offset, updating it _outside_ of the loop makes it more obvious that
-the offset can change (by design) within a generation if the TSC is unstable.
-
-Ooh, and if I'm reading the code correctly, last_tsc_khz can be renamed to
-cur_tsc_khz and moved in the !matched statement too, as it's guaranteed to be
-vcpu->arch.virtual_tsc_khz if matched==true.
-
-Ah, right, and last_tsc_scaling_ratio is just an deriviation of virtual_tsc_khz,
-so it too can be cur_xxx and put under !matched.
-
-Am I missing something?  That seems too easy...
 
