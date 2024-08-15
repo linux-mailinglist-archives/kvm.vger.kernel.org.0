@@ -1,52 +1,52 @@
-Return-Path: <kvm+bounces-24258-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24255-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1A27952EAA
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:01:10 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2418952EA7
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:01:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3DAEB1F22662
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 13:01:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5752C1F21CEF
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 13:01:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723A61A01CB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F69C19B3DD;
 	Thu, 15 Aug 2024 13:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ym+pQGrT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b50XmLDK"
 X-Original-To: kvm@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4DA19E7FA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD49219E7F6;
 	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723726805; cv=none; b=HkLqyWbkPB6/sTAz1WqnZur12saB8YBE2qleSmy6x1oKJJIT+iNoU0k9bGk7J3X1wsakKvFrOXpdMm+CkFKJHMjvXFFUngbNAm2Cef6Gf4WTQ8SEUxbLW523YXPDeXXve04enQMTlnsUVP+frmhhe1UJOkBVNCwzTPESh0o7ewY=
+	t=1723726805; cv=none; b=qLqg9+4c6hUR6mmpHPuus2zF+roK5EOJTo4yVVEkCf1R3yKKJw+wunVf5642HYdpvnIrgR+49GCOx45mTkT77D6KbBtYK0OgrxGVuwLvVfRsknEG3uer8lY8x8muygv6rn6u3KhZAS4ZiPShe3ZQu5xPsEkfCjAkClsAWV/UC+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1723726805; c=relaxed/simple;
-	bh=Z5arUx8uy4/p8czJmXc+Ziy7eFggj2Eqlg0vkEgpMBo=;
+	bh=elhHN6q3wNJu3gQxFTv4Q2GV0VvzvpMyf883cw9HyZA=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VV7Fdc0R4rZX/bxd8MXTKW3AlLxBotEbJNr/vpxwQMPYfqgJqe1EivB76JfUt1QdbRdwgKgIMSls0uJ/A/M+98GYjiHxJmn8psZoYA0UdsV1u6dizEy+6FAIhEY1aglHIxL1H01eQf/pwrKQ7plepxpISDoH7mdeIuqg3I+z6y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ym+pQGrT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3343C4AF0F;
+	 MIME-Version; b=Fl7pgsYS6OKHcsbawQkRxxJZLWMr81s6D6xZrdXfinHeTKtD/dh5weNo6nfbHchArhunlsr/8y5wJAc80/9ar81aZbuzoZMj6V48usYomh7Z621Lv+gek0eBOjl77fwzTrwedbgdd39ceyI9F9NeuS0dJEeX/pjUlroisphFcTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b50XmLDK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2A5CC4AF0E;
 	Thu, 15 Aug 2024 13:00:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1723726805;
-	bh=Z5arUx8uy4/p8czJmXc+Ziy7eFggj2Eqlg0vkEgpMBo=;
+	bh=elhHN6q3wNJu3gQxFTv4Q2GV0VvzvpMyf883cw9HyZA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Ym+pQGrTQ+IcsJz/7GDy7dFouSL5lfqNdTEbsr1lBbbHRHj5zwPy/IstuQe4MYIMf
-	 ZFotPS/KYE6BmjGE4JxxhoT7j8ch2lRRP93fRo2MERoI7e3V0wW5KhrP8tzoUdfETG
-	 WmvLhogdXWmz3cOHlRmuYCooKJY8WcobTLGWk4q152guHix7Ex+McBvBwsn6n0t1wh
-	 Knd4I7SklfS2bavA9YVHGtXEzBdkSqZJat6G046qWrz+hVIy6WWZsFZeM0a1/oVXN/
-	 CodFKra/BwnfuFd+V8X2kJlrQb3TlSIx8q0Oq7BZhlUGZk7RBc6hb1xCYqO1KU5Utt
-	 8R9FKW4UMdpXw==
+	b=b50XmLDKgpWqwQ+J+8Fpdlz/fsF7bOuMPyQSHI0DWZlCE26lvNsnoot1nc1YKM2LP
+	 KtfGZDwXz8TylnYtwKDgK+NU7p+b9o2e//UARF2g1+4CyFV0kFKGNzpCdQSZL1z2p1
+	 1yFo6zgCSgpBSdslbED2E3p6jKwUNAEO0b8rbkZ9l6VCzjywWB177PHfQnkGU3gqhB
+	 SqbIkYM7iWFA128/tBHy/4dLlDCI9RG5lye112XL3hpXJAsV9xrt+mPP9aRLG+zkL0
+	 5rgNfFb7zmO3d+fx6M4TLEzbarCj/aBQhjBoqqBlVTZkQMgmMvOT+zuV+ogY5CI4Q3
+	 xUAtk0CXgenXA==
 Received: from sofa.misterjones.org ([185.219.108.64] helo=valley-girl.lan)
 	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.95)
 	(envelope-from <maz@kernel.org>)
-	id 1sea5D-003xld-QD;
-	Thu, 15 Aug 2024 14:00:03 +0100
+	id 1sea5D-003xld-Vb;
+	Thu, 15 Aug 2024 14:00:04 +0100
 From: Marc Zyngier <maz@kernel.org>
 To: kvmarm@lists.linux.dev,
 	linux-arm-kernel@lists.infradead.org,
@@ -55,9 +55,9 @@ Cc: James Morse <james.morse@arm.com>,
 	Suzuki K Poulose <suzuki.poulose@arm.com>,
 	Oliver Upton <oliver.upton@linux.dev>,
 	Zenghui Yu <yuzenghui@huawei.com>
-Subject: [PATCH 06/11] KVM: arm64: Add exit to userspace on {LD,ST}64B* outside of memslots
-Date: Thu, 15 Aug 2024 13:59:54 +0100
-Message-Id: <20240815125959.2097734-7-maz@kernel.org>
+Subject: [PATCH 07/11] KVM: arm64: Restrict ACCDATA_EL1 undef to FEAT_ST64_ACCDATA being disabled
+Date: Thu, 15 Aug 2024 13:59:55 +0100
+Message-Id: <20240815125959.2097734-8-maz@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240815125959.2097734-1-maz@kernel.org>
 References: <20240815125959.2097734-1-maz@kernel.org>
@@ -73,103 +73,34 @@ X-SA-Exim-Rcpt-To: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
 X-SA-Exim-Mail-From: maz@kernel.org
 X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-The main use of {LD,ST}64B* is to talk to a device, which is hopefully
-directly assigned to the guest and requires no additional handling.
+We currently unconditionally make ACCDATA_EL1 accesses UNDEF.
 
-However, this does not preclude a VMM from exposing a virtual device
-to the guest, and to allow 64 byte accesses as part of the programming
-interface. A direct consequence of this is that we need to be able
-to forward such access to userspace.
-
-Given that such a contraption is very unlikely to ever exist, we choose
-to offer a limited service: userspace gets (as part of a new exit reason)
-the ESR, the IPA, and that's it. It is fully expected to handle the full
-semantics of the instructions, deal with ACCDATA, the return values and
-increment PC. Much fun.
-
-A canonical implementation can also simply inject an abort and be done
-with it. Frankly, don't try to do anything else unless you have time
-to waste.
+As we are about to support it, restrict the UNDEF behaviour to cases
+where FEAT_ST64_ACCDATA is not exposed to the guest.
 
 Signed-off-by: Marc Zyngier <maz@kernel.org>
 ---
- arch/arm64/kvm/mmio.c    | 27 ++++++++++++++++++++++++++-
- include/uapi/linux/kvm.h |  3 ++-
- 2 files changed, 28 insertions(+), 2 deletions(-)
+ arch/arm64/kvm/sys_regs.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kvm/mmio.c b/arch/arm64/kvm/mmio.c
-index cd6b7b83e2c3..849ea6a02d7b 100644
---- a/arch/arm64/kvm/mmio.c
-+++ b/arch/arm64/kvm/mmio.c
-@@ -129,6 +129,9 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	bool is_write;
- 	int len;
- 	u8 data_buf[8];
-+	u64 esr;
+diff --git a/arch/arm64/kvm/sys_regs.c b/arch/arm64/kvm/sys_regs.c
+index 7b540811aa38..39c2ee15dc0a 100644
+--- a/arch/arm64/kvm/sys_regs.c
++++ b/arch/arm64/kvm/sys_regs.c
+@@ -4580,10 +4580,12 @@ void kvm_calculate_traps(struct kvm_vcpu *vcpu)
+ 				       HFGxTR_EL2_nS2POR_EL1		|
+ 				       HFGxTR_EL2_nPOR_EL1		|
+ 				       HFGxTR_EL2_nPOR_EL0		|
+-				       HFGxTR_EL2_nACCDATA_EL1		|
+ 				       HFGxTR_EL2_nSMPRI_EL1_MASK	|
+ 				       HFGxTR_EL2_nTPIDR2_EL0_MASK);
+ 
++	if (!kvm_has_feat(kvm, ID_AA64ISAR1_EL1, LS64, LS64_ACCDATA))
++		kvm->arch.fgu[HFGxTR_GROUP] |= HFGxTR_EL2_nACCDATA_EL1;
 +
-+	esr = kvm_vcpu_get_esr(vcpu);
- 
- 	/*
- 	 * No valid syndrome? Ask userspace for help if it has
-@@ -138,7 +141,7 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 	 * though, so directly deliver an exception to the guest.
- 	 */
- 	if (!kvm_vcpu_dabt_isvalid(vcpu)) {
--		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), kvm_vcpu_get_esr(vcpu),
-+		trace_kvm_mmio_nisv(*vcpu_pc(vcpu), esr,
- 				    kvm_vcpu_get_hfar(vcpu), fault_ipa);
- 
- 		if (vcpu_is_protected(vcpu)) {
-@@ -157,6 +160,28 @@ int io_mem_abort(struct kvm_vcpu *vcpu, phys_addr_t fault_ipa)
- 		return -ENOSYS;
- 	}
- 
-+	/*
-+	 * When (DFSC == 0b00xxxx || DFSC == 0b10101x) && DFSC != 0b0000xx
-+	 * ESR_EL2[12:11] describe the Load/Store Type. This allows us to
-+	 * punt the LD64B/ST64B/ST64BV/ST64BV0 instructions to luserspace,
-+	 * which will have to provide a full emulation of these 4
-+	 * instructions.  No, we don't expect this do be fast.
-+	 *
-+	 * We rely on traps being set if the corresponding features are not
-+	 * enabled, so if we get here, userspace has promised us to handle
-+	 * it already.
-+	 */
-+	switch (kvm_vcpu_trap_get_fault(vcpu)) {
-+	case 0b000100 ... 0b001111:
-+	case 0b101010 ... 0b101011:
-+		if (FIELD_GET(GENMASK(12, 11), esr)) {
-+			run->exit_reason = KVM_EXIT_ARM_LDST64B;
-+			run->arm_nisv.esr_iss = esr & ~(u64)ESR_ELx_FSC;
-+			run->arm_nisv.fault_ipa = fault_ipa;
-+			return 0;
-+		}
-+	}
-+
- 	/*
- 	 * Prepare MMIO operation. First decode the syndrome data we get
- 	 * from the CPU. Then try if some in-kernel emulation feels
-diff --git a/include/uapi/linux/kvm.h b/include/uapi/linux/kvm.h
-index 637efc055145..24fcbc8d7dc3 100644
---- a/include/uapi/linux/kvm.h
-+++ b/include/uapi/linux/kvm.h
-@@ -178,6 +178,7 @@ struct kvm_xen_exit {
- #define KVM_EXIT_NOTIFY           37
- #define KVM_EXIT_LOONGARCH_IOCSR  38
- #define KVM_EXIT_MEMORY_FAULT     39
-+#define KVM_EXIT_ARM_LDST64B      40
- 
- /* For KVM_EXIT_INTERNAL_ERROR */
- /* Emulate instruction failed. */
-@@ -399,7 +400,7 @@ struct kvm_run {
- 		} eoi;
- 		/* KVM_EXIT_HYPERV */
- 		struct kvm_hyperv_exit hyperv;
--		/* KVM_EXIT_ARM_NISV */
-+		/* KVM_EXIT_ARM_NISV / KVM_EXIT_ARM_LDST64B */
- 		struct {
- 			__u64 esr_iss;
- 			__u64 fault_ipa;
+ 	if (!kvm_has_feat(kvm, ID_AA64ISAR0_EL1, TLB, OS))
+ 		kvm->arch.fgu[HFGITR_GROUP] |= (HFGITR_EL2_TLBIRVAALE1OS|
+ 						HFGITR_EL2_TLBIRVALE1OS	|
 -- 
 2.39.2
 
