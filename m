@@ -1,181 +1,168 @@
-Return-Path: <kvm+bounces-24263-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24264-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3F53953090
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:44:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C8179532DC
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:11:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 692B2287E86
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 13:44:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C6901F217AF
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 14:11:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADD219FA9D;
-	Thu, 15 Aug 2024 13:44:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579C01B1517;
+	Thu, 15 Aug 2024 14:08:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zlWjmqXg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="beqbAlls"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB40F19F49B
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 13:44:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B5819F471
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 14:08:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723729452; cv=none; b=iWwkAIRGPy1ZXXf8yVshSSRmeWLc4Ls1PnslSjJ9KJ7vuFTRW+aLpqvgKqAGVczNfWl4KHq3qI0ndKchHGMnNw7shFRhL9keegXNOS+WV41rKGqGKFFBEaml0R+Qes4RT81iyW/FwjTH7XTax+Xwg1/ghwdZCUpKH8H69FzzLCA=
+	t=1723730907; cv=none; b=NmAyZFRZtgqtOQiBecbzOwtZUhsRLTnSjehtyfcCO8A7nwhGiY/ru302s5gk7Hqwc3X7k2HyVy5KOlKCvuDHbA+n4EnHSGN4XUJvylFa2JVvZXfUM9f72N8HpIOdQehWsP81XE177noBi+L5m3UnMyGoZesKxNRjAqcEJWIQGXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723729452; c=relaxed/simple;
-	bh=9AGELrkuV7EZRikIMXBDlNIHEDvCKbJikKbwKsHwsv4=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=gCA90QQCOqgieWW6qV2sCAtV/HpwLicw4TFWoIN+cGpJzP7rRHU86vkXGFBu0gA0rUCdUhCoLOuAAenDIG+TBqj9QOa+QF/Utm/XBtxFtL48Mxygge07Nahp61qPF8uClRGeRcW/kCX+gb6G0Geaytz/NZUQeVSuOZaAfrmGBbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zlWjmqXg; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-690404fd34eso19338057b3.1
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 06:44:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723729450; x=1724334250; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XPX484PwSJ0KtNfnOFVCkU6UyyOJERQv814+10anCE0=;
-        b=zlWjmqXgu7ZI7yiWh4lZlj/LPHkFQ92UZhA0QLww3rePfrlIcAgHVsXbXq2bz1DYMV
-         IM3s/VLLokKueOjzMoAUjuGauO43FPqC57f06Vke122IGQt9cpmDjl23FLiMTMhAu6Yk
-         Qwffh0TndhPTKK6GGsmiDLRPAp0Jov9//9fbuw0i+k0LXP7B9w0Aw2JR55yQlvb4qP3e
-         6N1zFoYAQo/x9mvaBa8yGliWbUunSNr6TgDMx1oraaQKZhdH0CfMojzdYNttaPRLZJpb
-         ZmbxVaImKwptDKID8V7B68Dtia/WhmH7N+QRt5aGWgetyxRLlLRe4jRdiQQ8hWnK9b/g
-         prKw==
+	s=arc-20240116; t=1723730907; c=relaxed/simple;
+	bh=1WCwi3zf8B7UjUYMn2Mg/MGq3dt4hzBwK2exA2fG0ZE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Jhh2C62QxE26x5cDelRtEs6g26eCWVbPFD2e3yVdhKZ152tnqMcBN9D5WeTQVnXMCYNYy1KrvnulJcjkqKt64nsR+yoS43wMvk8HX+KrzfledtFbzmkeKaWaAzlvMsQoKooCz5zr+TMzpqfZjwYEfxdqcVNyaKrhXOW4bOoAC9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=beqbAlls; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723730904;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=vzr3KYLk8750O7gOgaxuZ0lSzVhIlcuDGPfj02xRDb8=;
+	b=beqbAllsONlaYSmNgsWKgLSD6EkFW8TqzVinJB1sLZTjZrd3zDWKTkCNojkApIkO2NwehW
+	JSkLMfSMDndHk+T0Hac3Nl4eZXzkP4bQyAGeHC7RPoeWFETL+OOgiE3abWO/6HyAuIkIu0
+	PqQuxsHiM/dD6SiD7bb5+QtDeiVslug=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-177-oeX9ux-dMBqIi0iUNZzbDg-1; Thu, 15 Aug 2024 10:08:23 -0400
+X-MC-Unique: oeX9ux-dMBqIi0iUNZzbDg-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-6ad97b9a0fbso20140927b3.0
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 07:08:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723729450; x=1724334250;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XPX484PwSJ0KtNfnOFVCkU6UyyOJERQv814+10anCE0=;
-        b=VHmsMZDAdSO92v3FL4ks7JSX2sTia94Xso9/qYJxOj4E/6Kh3x8x6pd1H7HNxxxpZ3
-         gBz9mVGQjQDseTwIVpUDXCwnnGLznLtLh7joSiyqxWB3Cwq+UwMGeex6igFYVdFL5nxV
-         XkvCf1VFSgOTfvo9/tQbF9B0dd45PQh4bNZkEiZivTV5WEJzBPM2eq/juxAfINHfNr68
-         B/H+d8SuSLNDfXet0g/qFhiWcZL8wJ61SsOWHZWWeaUsVK4oZ3Zpi5m/J2Rx+DGluCtH
-         gzG0IhRaitL/tib9Ff/Lsm2eQP4KjZ3Ey53AX/2pFFuLzQahphHzBl6N6p2XSIF82X1Y
-         tR8g==
-X-Forwarded-Encrypted: i=1; AJvYcCWdJpipgKef/wl9ygzF6nyY8VYnqLpg/cld+tHm+BP71ecv7/dK61xQ6iALFaG0IqvpIw1+NU5gAQ0NRgRReL4x4Lab
-X-Gm-Message-State: AOJu0Yz3SVXeQ6NEBfg6sXVehZrbRfIJtprcCjCoYW6xP5LmCcTtUgyc
-	lqNnaai7sTHEP7d6PpKMYSBUeozsh9TxRfLrHGvQ/bvbyQTX2z24QwmAZ60n1C/leQIW28eZ8qC
-	xgA==
-X-Google-Smtp-Source: AGHT+IGSgylacpA/2U2pcu8PcEw6cZjfuj/ASwhZ1QB063VQnq4fE/QQFvRwasAXHSOpiMB5bZZ2pZbZXxU=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:e4c4:0:b0:e03:6556:9fb5 with SMTP id
- 3f1490d57ef6-e1155ba2c78mr102561276.11.1723729449919; Thu, 15 Aug 2024
- 06:44:09 -0700 (PDT)
-Date: Thu, 15 Aug 2024 06:44:08 -0700
-In-Reply-To: <87h6bmfbgm.fsf@redhat.com>
+        d=1e100.net; s=20230601; t=1723730903; x=1724335703;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vzr3KYLk8750O7gOgaxuZ0lSzVhIlcuDGPfj02xRDb8=;
+        b=uPveyeYNiKWR8HOaUD34fR28mPzdcsRW2DRNbqxjNDSFRGuDv6FMyvWELvxyK1+Gkz
+         Dc6b5hyRu6X/l7WP5LxXNfKBV0Dej5EdolH0zKUDUo7y2dTOhnqL+e4bv2vMOICaXBB3
+         OWl+ySS44DOUYLd2hQdDJ1GfAE6K1yjUCC3c2ngNtgX9lrRj6rTdZ5oPqy8EGk3HoMl5
+         1T/eiX2OPYqmP4XZTLLVww+tcR7fStMOi8dLK8vqJWVh7ZP+le6bsKnVk10pb+a6yz5q
+         YZ6BqE+TmNp7lAeueipYNKw7Oa3XYqUGTjD4klXZSzIuPbZsIfZLGbSuSDyASRFStdPR
+         NuYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHqMdq2n4iL/wUX2PurrMkBcriOG6BizJJ/1VUldAIKb9Mt28rw+6PD1sRBzcbRt9jhtqNmdHMipLrWLubIYgAPuIw
+X-Gm-Message-State: AOJu0Yz/DI4TQbJRDq01i+smGUfzEreYynBFbDHg43O05wcv5P+kgnh3
+	oz6zETN5LdHuACTM93AKqgKUomJJy0X37mpyYPHHZIOutS8b9k4d1iQ8lQdfcU+lguONQaZ1w7N
+	ATw5axhhxSv68b/WLx2PpSRCd5HSp3ZKFgyJwRZ2hsovTLdchO5nB5/qb8yq0bHtEBi3APYxu0O
+	qrt7U0rSdqtjj0H+/ATTQUH/f3
+X-Received: by 2002:a05:690c:4710:b0:651:6e6f:32d2 with SMTP id 00721157ae682-6ac9a4787c2mr61877257b3.43.1723730902726;
+        Thu, 15 Aug 2024 07:08:22 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFT7vDXefVC4Et5zdVF0bwaa4s7FPKN+0th/aIjv2bWaCiNvtKshmdfN94YlL0srm5N1LZPSBnK/+GCQt+WDjs=
+X-Received: by 2002:a05:690c:4710:b0:651:6e6f:32d2 with SMTP id
+ 00721157ae682-6ac9a4787c2mr61876777b3.43.1723730902291; Thu, 15 Aug 2024
+ 07:08:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
- <Zpq2Lqd5nFnA0VO-@google.com> <207a5c75-b6ad-4bfb-b436-07d4a3353003@gmail.com>
- <87a5i05nqj.fsf@redhat.com> <b20eded4-0663-49fb-ba88-5ff002a38a7f@gmail.com>
- <87plqbfq7o.fsf@redhat.com> <ZrzIVnkLqcbUKVDZ@google.com> <87mslff728.fsf@redhat.com>
- <Zr0rEy0bO1ju_f1C@google.com> <87h6bmfbgm.fsf@redhat.com>
-Message-ID: <Zr4GKEzp8eQDDH1d@google.com>
-Subject: Re: [BUG] =?utf-8?Q?arch=2Fx86=2Fkvm=2Fvmx?= =?utf-8?Q?=2Fvmx=5Fonhyperv=2Eh=3A109=3A36=3A_error=3A_dereference_of_NUL?=
- =?utf-8?B?TCDigJgw4oCZ?=
-From: Sean Christopherson <seanjc@google.com>
-To: Vitaly Kuznetsov <vkuznets@redhat.com>
-Cc: Mirsad Todorovac <mtodorovac69@gmail.com>, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+References: <20240806173119.582857-1-crosa@redhat.com> <20240806173119.582857-10-crosa@redhat.com>
+ <1f645137-c621-4fa3-ace0-415087267a7b@redhat.com>
+In-Reply-To: <1f645137-c621-4fa3-ace0-415087267a7b@redhat.com>
+From: Cleber Rosa <crosa@redhat.com>
+Date: Thu, 15 Aug 2024 10:08:11 -0400
+Message-ID: <CA+bd_6LTqGbx2+GOyYHyJ4d5gpg4v8Ddx5apjghiB0vjt8Abhg@mail.gmail.com>
+Subject: Re: [PATCH v2 9/9] Avocado tests: allow for parallel execution of tests
+To: Thomas Huth <thuth@redhat.com>
+Cc: qemu-devel@nongnu.org, Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, 
+	Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Radoslaw Biernacki <rad@semihalf.com>, 
+	Troy Lee <leetroy@gmail.com>, Akihiko Odaki <akihiko.odaki@daynix.com>, 
+	Beraldo Leal <bleal@redhat.com>, kvm@vger.kernel.org, Joel Stanley <joel@jms.id.au>, 
+	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
+	Aurelien Jarno <aurelien@aurel32.net>, Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, 
+	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Paul Durrant <paul@xen.org>, 
+	Eric Auger <eric.auger@redhat.com>, David Woodhouse <dwmw2@infradead.org>, qemu-arm@nongnu.org, 
+	Andrew Jeffery <andrew@codeconstruct.com.au>, Jamin Lin <jamin_lin@aspeedtech.com>, 
+	Steven Lee <steven_lee@aspeedtech.com>, Peter Maydell <peter.maydell@linaro.org>, 
+	Yoshinori Sato <ysato@users.sourceforge.jp>, 
+	Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
+	Leif Lindholm <quic_llindhol@quicinc.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 15, 2024, Vitaly Kuznetsov wrote:
-> Sean Christopherson <seanjc@google.com> writes:
-> 
-> > On Wed, Aug 14, 2024, Vitaly Kuznetsov wrote:
-> >> Sean Christopherson <seanjc@google.com> writes:
-> >> 
-> >> > On Wed, Aug 14, 2024, Vitaly Kuznetsov wrote:
-> >> >> What I meant is something along these lines (untested):
-> >> >> 
-> >> >> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
-> >> >> index eb48153bfd73..e2d8c67d0cad 100644
-> >> >> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
-> >> >> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
-> >> >> @@ -104,6 +104,14 @@ static inline void evmcs_load(u64 phys_addr)
-> >> >>         struct hv_vp_assist_page *vp_ap =
-> >> >>                 hv_get_vp_assist_page(smp_processor_id());
-> >> >>  
-> >> >> +       /*
-> >> >> +        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
-> >> >> +        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
-> >> >> +        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
-> >> >> +        * but compilers may still complain.
-> >> >> +        */
-> >> >> +       BUG_ON(!vp_ap);
-> >> >
-> >> > A full BUG_ON() is overkill, and easily avoided.  If we want to add a sanity
-> >> > check here and do more than just WARN, then it's easy enough to plumb in @vcpu
-> >> > and make this a KVM_BUG_ON() so that the VM dies, i.e. so that KVM doesn't risk
-> >> > corrupting the guest somehow.
-> >> >
-> >> 
-> >> I'm still acting under the impression this is an absolutely impossible
-> >> situation :-)
-> >> 
-> >> AFAICS, we only call evmcs_load() from vmcs_load() but this one doesn't
-> >> have @vcpu/@kvm either and I wasn't sure it's worth the effort to do the
-> >> plumbing (or am I missing an easy way to go back from @vmcs to
-> >> @vcpu?). On the other hand, vmcs_load() should not be called that ofter
-> >> so if we prefer to have @vcpu there for some other reason -- why not.
-> >
-> > kvm_get_running_vcpu(), though I honestly purposely didn't suggest it earlier
-> > because I am not a fan of using kvm_get_running_vcpu() unless it's absolutely
-> > necessary.  But for this situation, I'd be fine with using it.
-> 
-> Ah, nice, so we don't even need the plumbing then I guess? Compile-tested only:
-> 
-> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
-> index eb48153bfd73..318f5f95f211 100644
-> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
-> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
-> @@ -104,6 +104,19 @@ static inline void evmcs_load(u64 phys_addr)
->         struct hv_vp_assist_page *vp_ap =
->                 hv_get_vp_assist_page(smp_processor_id());
->  
-> +       /*
-> +        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
-> +        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
-> +        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
-> +        * but compilers may still complain.
-> +        */
-> +       if (!vp_ap) {
-> +               struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-> +
-> +               KVM_BUG_ON(1, vcpu->kvm);
-> +               return;
+On Mon, Aug 12, 2024 at 6:17=E2=80=AFAM Thomas Huth <thuth@redhat.com> wrot=
+e:
+> ...
+> > diff --git a/tests/Makefile.include b/tests/Makefile.include
+> > index 537804d101..545b5155f9 100644
+> > --- a/tests/Makefile.include
+> > +++ b/tests/Makefile.include
+> > @@ -94,6 +94,9 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
+> >   ifndef AVOCADO_TESTS
+> >       AVOCADO_TESTS=3Dtests/avocado
+> >   endif
+> > +ifndef AVOCADO_PARALLEL
+> > +     AVOCADO_PARALLEL=3D1
+> > +endif
+> >   # Controls the output generated by Avocado when running tests.
+> >   # Any number of command separated loggers are accepted.  For more
+> >   # information please refer to "avocado --help".
+> > @@ -141,7 +144,8 @@ check-avocado: check-venv $(TESTS_RESULTS_DIR) get-=
+vm-images
+> >               --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_=
+RESULTS_DIR) \
+> >               $(if $(AVOCADO_TAGS),, --filter-by-tags-include-empty \
+> >                       --filter-by-tags-include-empty-key) \
+> > -            $(AVOCADO_CMDLINE_TAGS) --max-parallel-tasks=3D1 \
+> > +            $(AVOCADO_CMDLINE_TAGS) --max-parallel-tasks=3D$(AVOCADO_P=
+ARALLEL) \
+> > +                     -p timeout_factor=3D$(AVOCADO_PARALLEL) \
+> >               $(if $(GITLAB_CI),,--failfast) $(AVOCADO_TESTS), \
+> >               "AVOCADO", "tests/avocado")
+>
+> I think it was nicer in the previous attempt to bump the avocado version:
+>
+> https://gitlab.com/qemu-project/qemu/-/commit/ec5ffa0056389c3c10ea2de1e78=
+3
+>
+> This re-used the "-j" option from "make", so you could do "make -j$(nproc=
+)
+> check-avocado" just like with the other "check" targets.
+>
 
-Eh, I would just do:
+Hi Thomas,
 
-	if (KVM_BUG_ON(!vp_ap, kvm_get_running_vcpu()->kvm))
-		return
+I can see why it looks better, but in practice, I'm not getting the
+best behavior with such a change.
 
-> +       }
-> +
->         if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
->                 vp_ap->nested_control.features.directhypercall = 1;
->         vp_ap->current_nested_vmcs = phys_addr;
-> 
-> (I hope we can't reach here with kvm_running_vcpu unset, can we?)
+First, the fact that it enables the parallelization by default, while
+there still seems to be issues with test timeout issues, and even
+existing races between tests (which this series tried to address as
+much as possible) will not result in the best experience IMO.  On my
+12 core machine, and also on GitLab CI, having 4 tests running in
+parallel gets a nice speed up (as others have reported) while still
+being very stable.
 
-Yes?  kvm_running_vcpu is set before kvm_arch_vcpu_load() and cleared after
-kvm_arch_vcpu_put(), and I can't think of a scenario where it would be legal/sane
-to invoke vmcs_load() without a running/loaded vCPU.  VMX needs the current VMCS
-to be loaded to ensure guest state can be accessed, so any ioctl() that can touch
-guest state needs to do vcpu_load().
+I'd say making the number of parallel tests equal to `nproc` is best
+kept for a future round.
 
-x86's kvm_arch_vcpu_ioctl() unconditionally does vcpu_load(), and the only ioctls
-I see in kvm_vcpu_ioctl() that _don't_ do vcpu_load() are KVM_SET_SIGNAL_MASK and
-KVM_GET_STATS_FD, so I think we're good.
+Let me know if this sounds reasonable to you.
 
-And if I'm wrong and the impossible happens twice, so be it, we die on #GP :-)
+Regards,
+- Cleber.
+
+>   Thomas
+>
+
 
