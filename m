@@ -1,82 +1,53 @@
-Return-Path: <kvm+bounces-24311-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24312-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5933A953878
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:43:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66A9595387D
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:44:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDA811F24965
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:43:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88DFD1C20CF4
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0675E1BA875;
-	Thu, 15 Aug 2024 16:42:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QHMXQqqp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E50B71BA86F;
+	Thu, 15 Aug 2024 16:44:11 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6B601714BB
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 16:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8783E1B9B57
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 16:44:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723740173; cv=none; b=RJR/NEcBzbo9eDOTtYsUFqG0KsLGtlxRcu/QrGGprG7+skeqiQ3sPEVtdgYNA+EGYMeUBA0V/uasemhYQ8Is9GsvD7nhmNOtJpfgh92iUcDrDj5s/UtVFClW95rNIkWT5AniADh2djTa51Nrzeai7BrBqpDy/pRfoRN3VjP2lOE=
+	t=1723740251; cv=none; b=pyWwlmf6Zn73O6+t8rMov0iGsjjELTXZ07S6Ns6a5TX61X1IZUf0FRM65PC9hsKyeZ4/j8Yd/EfXmc3jOXi9wQ6ajh6k633E7a5VWCsC2VwOcwLtOUZkSfLElH06eDA32072VG97jYSgJTh530uJ8cBa06CjVCPrbS/4vYsJxaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723740173; c=relaxed/simple;
-	bh=1zRUFULarkTq6LPHVNJ0pkCLjhF3gvttZE7Jb/DKsk4=;
+	s=arc-20240116; t=1723740251; c=relaxed/simple;
+	bh=EOFWgsSo+wF/rLte8Ffy1d6rJFb6vDlFBhKywhtfso0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=irw3c6A7KwXWaNaAgra3fAIwilU1Pc8VGjma4WwAP64Bi8E12c3sU9vAo0xAZqJx5mdnVAiPftI9Rn8qV66zv5xHacoY+zRBRhZHvlHhcwcrp4qX8NXTig+WfSY2CDrGs6kmql+7cAkP0PRHWCyyRN3ldcz3SeuZgpJwGz+ZUTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QHMXQqqp; arc=none smtp.client-ip=209.85.167.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3db18102406so614238b6e.1
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 09:42:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723740171; x=1724344971; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=f9XWOzgA/HPz/G4P1h718yGI+VzmZbkZwfnQInlVNGo=;
-        b=QHMXQqqp0faOlKAPErne6hqqOve9t3QxZ8ty67nwkIUROLh34MGXfI7bliG0RtkeSF
-         9rCCO8BgHeAeHGqg63hvu+VuAYE6DdLuhpQSeStjC2dYjBEGB4SXUCYP2686IP7FFcpR
-         rh3Tq9cK1xqctLKQ3WWKIaMmqvl50QLfwsKfxX5MgPydR7XuCIEH4KYvekPCOk7lSprA
-         XHAttpT48PZFtEHpO8npLkq+WhvmrlTJaMkrU8Z8MUvAvYn9N4TXUgAc1YtrO5ubYa/x
-         NJFCwFezWMx+eGY0UnLmVO3IoINGl/j/ZmEsAa7KJFbvOqAPG4VpHJK6/eNaRQrQp1yF
-         rL4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723740171; x=1724344971;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=f9XWOzgA/HPz/G4P1h718yGI+VzmZbkZwfnQInlVNGo=;
-        b=RHAuBQbVdRJ8EH7hNAT5Ycv+VisiU+Tm4X46Hy9cM1bniR6JcKHEv4A5iE6bIjhsc0
-         TLUVX3z+tdFLlMeAGwOYfg4xzuWrdJO7Ypih8UqdOIWADiYC0x8tcgdXWzuJrBlhFtbr
-         UXWX9DuvYXlFZ1nqhqS9QpGjqcOV95uKj7MyTJsMbJVb/IDdxfdyTdXKdV7Y4weLyr9T
-         s2o/JDp6byfcj4ihC9w7FiQw9wP34cdtumu+OX/2zLjPQaIcvswNF58+n6MmHDGHRFU2
-         TUaCf8mkJJV+bK0cCCmokJ/RRNxnuM4uU+6oCrYLvDC7jNE9IqFlGTETYwX0VFlIVLJh
-         xtdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMuZRp1Ib1vB5VYr9T45cMHn8Er+StUYBKmhVdw0FkjYxDErdmp/09Xq5hnHSd+N2bFO8ymVeE8MNtB0TpTXhknwNh
-X-Gm-Message-State: AOJu0Yztf9aciDXwmyCkbeUcB5o+vllyBLK3teRQloNY428Klsxco82Q
-	M9mwFcMyFN+6CIRz+/jf19S3oG78wTO/N9Eo2ZM5cgqePnk6xfZkv73ZzYJyfg==
-X-Google-Smtp-Source: AGHT+IGcK7SGE8EjW4QiHlEKJJHDBb8NIW/RbvoYkf19zDjo/HtqxIAEn4/qp/U2DyWRmGixwywMhA==
-X-Received: by 2002:a05:6808:1b13:b0:3da:57b8:22f3 with SMTP id 5614622812f47-3dd29971d90mr8649806b6e.43.1723740170612;
-        Thu, 15 Aug 2024 09:42:50 -0700 (PDT)
-Received: from google.com (176.13.105.34.bc.googleusercontent.com. [34.105.13.176])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7c6b636ca92sm1324086a12.91.2024.08.15.09.42.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 09:42:49 -0700 (PDT)
-Date: Thu, 15 Aug 2024 09:42:44 -0700
-From: Vipin Sharma <vipinsh@google.com>
-To: kernel test robot <lkp@intel.com>
-Cc: seanjc@google.com, pbonzini@redhat.com, oe-kbuild-all@lists.linux.dev,
-	dmatlack@google.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/2] KVM: x86/mmu: Recover NX Huge pages belonging to TDP
- MMU under MMU read lock
-Message-ID: <20240815164244.GA132028.vipinsh@google.com>
-References: <20240812171341.1763297-3-vipinsh@google.com>
- <202408150646.VV4z8Znl-lkp@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=q024GzKSxBnoLvC/z3bxWj0QYBIqEEZ5BNbq4yJ2RLMQw6/K0oI7hsmZQqVOwZOODvqgaCLvLLi4IeWwWC0JIeXhOZ9CknrelR+8+iYw2fsCpep/pg+L1dtJR4qP5JLdNvhd1zC6MjJMR8GhZvCzN2yZRBcvHw++oPG13jd2LJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id AA3D114BF;
+	Thu, 15 Aug 2024 09:44:33 -0700 (PDT)
+Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 76EE03F6A8;
+	Thu, 15 Aug 2024 09:44:05 -0700 (PDT)
+Date: Thu, 15 Aug 2024 17:44:02 +0100
+From: Alexandru Elisei <alexandru.elisei@arm.com>
+To: Marc Zyngier <maz@kernel.org>
+Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1
+ emulation
+Message-ID: <Zr4wUj5mpKkwMyCq@raptor>
+References: <20240813100540.1955263-1-maz@kernel.org>
+ <20240813100540.1955263-15-maz@kernel.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -85,74 +56,407 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202408150646.VV4z8Znl-lkp@intel.com>
+In-Reply-To: <20240813100540.1955263-15-maz@kernel.org>
 
-On 2024-08-15 06:50:04, kernel test robot wrote:
-> sparse warnings: (new ones prefixed by >>)
-> >> arch/x86/kvm/mmu/tdp_mmu.c:847:21: sparse: sparse: incompatible types in comparison expression (different address spaces):
->    arch/x86/kvm/mmu/tdp_mmu.c:847:21: sparse:    unsigned long long [usertype] *
->    arch/x86/kvm/mmu/tdp_mmu.c:847:21: sparse:    unsigned long long [noderef] [usertype] __rcu *
->    arch/x86/kvm/mmu/tdp_mmu.c: note: in included file (through include/linux/rbtree.h, include/linux/mm_types.h, include/linux/mmzone.h, ...):
->    include/linux/rcupdate.h:812:25: sparse: sparse: context imbalance in '__tdp_mmu_zap_root' - unexpected unlock
->    arch/x86/kvm/mmu/tdp_mmu.c:1447:33: sparse: sparse: context imbalance in 'tdp_mmu_split_huge_pages_root' - unexpected unlock
+Hi Marc,
+
+On Tue, Aug 13, 2024 at 11:05:36AM +0100, Marc Zyngier wrote:
+> In order to plug the brokenness of our current AT implementation,
+> we need a SW walker that is going to... err.. walk the S1 tables
+> and tell us what it finds.
 > 
-> vim +847 arch/x86/kvm/mmu/tdp_mmu.c
+> Of course, it builds on top of our S2 walker, and share similar
+> concepts. The beauty of it is that since it uses kvm_read_guest(),
+> it is able to bring back pages that have been otherwise evicted.
 > 
->    819	
->    820	static bool tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
->    821	{
->    822		struct tdp_iter iter = {};
->    823	
->    824		lockdep_assert_held_read(&kvm->mmu_lock);
->    825	
->    826		/*
->    827		 * This helper intentionally doesn't allow zapping a root shadow page,
->    828		 * which doesn't have a parent page table and thus no associated entry.
->    829		 */
->    830		if (WARN_ON_ONCE(!sp->ptep))
->    831			return false;
->    832	
->    833		iter.old_spte = kvm_tdp_mmu_read_spte(sp->ptep);
->    834		iter.sptep = sp->ptep;
->    835		iter.level = sp->role.level + 1;
->    836		iter.gfn = sp->gfn;
->    837		iter.as_id = kvm_mmu_page_as_id(sp);
->    838	
->    839	retry:
->    840		/*
->    841		 * Since mmu_lock is held in read mode, it's possible to race with
->    842		 * another CPU which can remove sp from the page table hierarchy.
->    843		 *
->    844		 * No need to re-read iter.old_spte as tdp_mmu_set_spte_atomic() will
->    845		 * update it in the case of failure.
->    846		 */
->  > 847		if (sp->spt != spte_to_child_pt(iter.old_spte, iter.level))
+> This is then plugged in the two AT S1 emulation functions as
+> a "slow path" fallback. I'm not sure it is that slow, but hey.
+> 
+> Signed-off-by: Marc Zyngier <maz@kernel.org>
+> ---
+>  arch/arm64/kvm/at.c | 607 +++++++++++++++++++++++++++++++++++++++++++-
+>  1 file changed, 605 insertions(+), 2 deletions(-)
+> 
+> diff --git a/arch/arm64/kvm/at.c b/arch/arm64/kvm/at.c
+> index 9865d29b3149..6d5555e98557 100644
+> --- a/arch/arm64/kvm/at.c
+> +++ b/arch/arm64/kvm/at.c
+> @@ -4,9 +4,405 @@
+>   * Author: Jintack Lim <jintack.lim@linaro.org>
+>   */
+>  
+> +#include <linux/kvm_host.h>
+> +
+> +#include <asm/esr.h>
+>  #include <asm/kvm_hyp.h>
+>  #include <asm/kvm_mmu.h>
+>  
+> +enum trans_regime {
+> +	TR_EL10,
+> +	TR_EL20,
+> +	TR_EL2,
+> +};
+> +
+> +struct s1_walk_info {
+> +	u64	     		baddr;
+> +	enum trans_regime	regime;
+> +	unsigned int		max_oa_bits;
+> +	unsigned int		pgshift;
+> +	unsigned int		txsz;
+> +	int 	     		sl;
+> +	bool	     		hpd;
+> +	bool	     		be;
+> +	bool	     		s2;
+> +};
+> +
+> +struct s1_walk_result {
+> +	union {
+> +		struct {
+> +			u64	desc;
+> +			u64	pa;
+> +			s8	level;
+> +			u8	APTable;
+> +			bool	UXNTable;
+> +			bool	PXNTable;
+> +		};
+> +		struct {
+> +			u8	fst;
+> +			bool	ptw;
+> +			bool	s2;
+> +		};
+> +	};
+> +	bool	failed;
+> +};
+> +
+> +static void fail_s1_walk(struct s1_walk_result *wr, u8 fst, bool ptw, bool s2)
+> +{
+> +	wr->fst		= fst;
+> +	wr->ptw		= ptw;
+> +	wr->s2		= s2;
+> +	wr->failed	= true;
+> +}
+> +
+> +#define S1_MMU_DISABLED		(-127)
+> +
+> +static int get_ia_size(struct s1_walk_info *wi)
+> +{
+> +	return 64 - wi->txsz;
+> +}
+> +
+> +/* Return true if the IPA is out of the OA range */
+> +static bool check_output_size(u64 ipa, struct s1_walk_info *wi)
+> +{
+> +	return wi->max_oa_bits < 48 && (ipa & GENMASK_ULL(47, wi->max_oa_bits));
+> +}
+> +
+> +/* Return the translation regime that applies to an AT instruction */
+> +static enum trans_regime compute_translation_regime(struct kvm_vcpu *vcpu, u32 op)
+> +{
+> +	/*
+> +	 * We only get here from guest EL2, so the translation
+> +	 * regime AT applies to is solely defined by {E2H,TGE}.
+> +	 */
+> +	switch (op) {
+> +	case OP_AT_S1E2R:
+> +	case OP_AT_S1E2W:
+> +		return vcpu_el2_e2h_is_set(vcpu) ? TR_EL20 : TR_EL2;
+> +		break;
+> +	default:
+> +		return (vcpu_el2_e2h_is_set(vcpu) &&
+> +			vcpu_el2_tge_is_set(vcpu)) ? TR_EL20 : TR_EL10;
+> +	}
+> +}
+> +
+> +static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
+> +			 struct s1_walk_result *wr, u64 va)
+> +{
+> +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
+> +	unsigned int stride, x;
+> +	bool va55, tbi, lva, as_el0;
+> +
+> +	wi->regime = compute_translation_regime(vcpu, op);
+> +	as_el0 = (op == OP_AT_S1E0R || op == OP_AT_S1E0W);
+> +
+> +	va55 = va & BIT(55);
+> +
+> +	if (wi->regime == TR_EL2 && va55)
+> +		goto addrsz;
+> +
+> +	wi->s2 = (wi->regime == TR_EL10 &&
+> +		  (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)));
 
-Hmm, I need to wrap spte_to_child_pt() with rcu_access_pointer() before
-comparing it to sp->spt. Following patch makes this Sparse error go
-away.
+This could be written on one line if there were a local variable for the HCR_EL2
+register (which is already read multiple times in the function).
 
-diff --git a/arch/x86/kvm/mmu/tdp_mmu.c b/arch/x86/kvm/mmu/tdp_mmu.c
-index 7c7d207ee590..7d5dbfe48c4b 100644
---- a/arch/x86/kvm/mmu/tdp_mmu.c
-+++ b/arch/x86/kvm/mmu/tdp_mmu.c
-@@ -820,6 +820,7 @@ static void tdp_mmu_zap_root(struct kvm *kvm, struct kvm_mmu_page *root,
- static bool tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
- {
-        struct tdp_iter iter = {};
-+       tdp_ptep_t pt;
+> +
+> +	switch (wi->regime) {
+> +	case TR_EL10:
+> +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL1);
+> +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL1);
+> +		ttbr	= (va55 ?
+> +			   vcpu_read_sys_reg(vcpu, TTBR1_EL1) :
+> +			   vcpu_read_sys_reg(vcpu, TTBR0_EL1));
+> +		break;
+> +	case TR_EL2:
+> +	case TR_EL20:
+> +		sctlr	= vcpu_read_sys_reg(vcpu, SCTLR_EL2);
+> +		tcr	= vcpu_read_sys_reg(vcpu, TCR_EL2);
+> +		ttbr	= (va55 ?
+> +			   vcpu_read_sys_reg(vcpu, TTBR1_EL2) :
+> +			   vcpu_read_sys_reg(vcpu, TTBR0_EL2));
+> +		break;
+> +	default:
+> +		BUG();
+> +	}
+> +
+> +	tbi = (wi->regime == TR_EL2 ?
+> +	       FIELD_GET(TCR_EL2_TBI, tcr) :
+> +	       (va55 ?
+> +		FIELD_GET(TCR_TBI1, tcr) :
+> +		FIELD_GET(TCR_TBI0, tcr)));
+> +
+> +	if (!tbi && (u64)sign_extend64(va, 55) != va)
+> +		goto addrsz;
+> +
+> +	va = (u64)sign_extend64(va, 55);
+> +
+> +	/* Let's put the MMU disabled case aside immediately */
+> +	switch (wi->regime) {
+> +	case TR_EL10:
+> +		/*
+> +		 * If dealing with the EL1&0 translation regime, 3 things
+> +		 * can disable the S1 translation:
+> +		 *
+> +		 * - HCR_EL2.DC = 1
+> +		 * - HCR_EL2.{E2H,TGE} = {0,1}
+> +		 * - SCTLR_EL1.M = 0
+> +		 *
+> +		 * The TGE part is interesting. If we have decided that this
+> +		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
+> +		 * {0,x}, and we only need to test for TGE == 1.
+> +		 */
+> +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_DC | HCR_TGE))
+> +			wr->level = S1_MMU_DISABLED;
 
-        lockdep_assert_held_read(&kvm->mmu_lock);
+There's no need to fallthrough and check SCTLR_ELx.M if the MMU disabled check
+here is true.
 
-@@ -844,7 +845,8 @@ static bool tdp_mmu_zap_sp(struct kvm *kvm, struct kvm_mmu_page *sp)
-         * No need to re-read iter.old_spte as tdp_mmu_set_spte_atomic() will
-         * update it in the case of failure.
-         */
--       if (sp->spt != spte_to_child_pt(iter.old_spte, iter.level))
-+       pt = spte_to_child_pt(iter.old_spte, iter.level);
-+       if (sp->spt != rcu_access_pointer(pt))
-                return false;
+> +		fallthrough;
+> +	case TR_EL2:
+> +	case TR_EL20:
+> +		if (!(sctlr & SCTLR_ELx_M))
+> +			wr->level = S1_MMU_DISABLED;
+> +		break;
+> +	}
+> +
+> +	if (wr->level == S1_MMU_DISABLED) {
+> +		if (va >= BIT(kvm_get_pa_bits(vcpu->kvm)))
+> +			goto addrsz;
+> +
+> +		wr->pa = va;
+> +		return 0;
+> +	}
+> +
+> +	wi->be = sctlr & SCTLR_ELx_EE;
+> +
+> +	wi->hpd  = kvm_has_feat(vcpu->kvm, ID_AA64MMFR1_EL1, HPDS, IMP);
+> +	wi->hpd &= (wi->regime == TR_EL2 ?
+> +		    FIELD_GET(TCR_EL2_HPD, tcr) :
+> +		    (va55 ?
+> +		     FIELD_GET(TCR_HPD1, tcr) :
+> +		     FIELD_GET(TCR_HPD0, tcr)));
+> +
+> +	/* Someone was silly enough to encode TG0/TG1 differently */
+> +	if (va55) {
+> +		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
+> +		tg = FIELD_GET(TCR_TG1_MASK, tcr);
+> +
+> +		switch (tg << TCR_TG1_SHIFT) {
+> +		case TCR_TG1_4K:
+> +			wi->pgshift = 12;	 break;
+> +		case TCR_TG1_16K:
+> +			wi->pgshift = 14;	 break;
+> +		case TCR_TG1_64K:
+> +		default:	    /* IMPDEF: treat any other value as 64k */
+> +			wi->pgshift = 16;	 break;
+> +		}
 
-        if (tdp_mmu_set_spte_atomic(kvm, &iter, SHADOW_NONPRESENT_VALUE))
+Just a thought, wi->pgshift is used in several places to identify the guest page
+size, might be useful to have something like PAGE_SHIFT_{4K,16K,64K}. That would
+also make its usage consistent, because in some places wi->pgshift is compared
+directly to 12, 14 or 16, in other places the page size is computed from
+wi->pgshift and compared to SZ_4K, SZ_16K or SZ_64K.
 
+> +	} else {
+> +		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
+> +		tg = FIELD_GET(TCR_TG0_MASK, tcr);
+> +
+> +		switch (tg << TCR_TG0_SHIFT) {
+> +		case TCR_TG0_4K:
+> +			wi->pgshift = 12;	 break;
+> +		case TCR_TG0_16K:
+> +			wi->pgshift = 14;	 break;
+> +		case TCR_TG0_64K:
+> +		default:	    /* IMPDEF: treat any other value as 64k */
+> +			wi->pgshift = 16;	 break;
+> +		}
+> +	}
+> +
+> +	/* R_PLCGL, R_YXNYW */
+> +	if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, ST, 48_47)) {
+> +		if (wi->txsz > 39)
+> +			goto transfault_l0;
+> +	} else {
+> +		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
+> +			goto transfault_l0;
+> +	}
+> +
+> +	/* R_GTJBY, R_SXWGM */
+> +	switch (BIT(wi->pgshift)) {
+> +	case SZ_4K:
+> +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT);
+> +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
+> +		break;
+> +	case SZ_16K:
+> +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT);
+> +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
+> +		break;
+> +	case SZ_64K:
+> +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR2_EL1, VARange, 52);
+> +		break;
+> +	}
+> +
+> +	if ((lva && wi->txsz < 12) || wi->txsz < 16)
+> +		goto transfault_l0;
+
+Let's assume lva = true, wi->txsz greater than 12, but smaller than 16, which is
+architecturally allowed according to R_GTJBY and AArch64.S1MinTxSZ().
+
+(lva && wi->txsz < 12) = false
+wi->txsz < 16 = true
+
+KVM treats it as a fault.
+
+> +
+> +	ia_bits = get_ia_size(wi);
+> +
+> +	/* R_YYVYV, I_THCZK */
+> +	if ((!va55 && va > GENMASK(ia_bits - 1, 0)) ||
+> +	    (va55 && va < GENMASK(63, ia_bits)))
+> +		goto transfault_l0;
+> +
+> +	/* I_ZFSYQ */
+> +	if (wi->regime != TR_EL2 &&
+> +	    (tcr & ((va55) ? TCR_EPD1_MASK : TCR_EPD0_MASK)))
+> +		goto transfault_l0;
+
+Extra paranthesis around va55?
+
+> +
+> +	/* R_BNDVG and following statements */
+> +	if (kvm_has_feat(vcpu->kvm, ID_AA64MMFR2_EL1, E0PD, IMP) &&
+> +	    as_el0 && (tcr & ((va55) ? TCR_E0PD1 : TCR_E0PD0)))
+> +		goto transfault_l0;
+
+Same here with the extra paranthesis around va55.
+
+> +
+> +	/* AArch64.S1StartLevel() */
+> +	stride = wi->pgshift - 3;
+> +	wi->sl = 3 - (((ia_bits - 1) - wi->pgshift) / stride);
+> +
+> +	ps = (wi->regime == TR_EL2 ?
+> +	      FIELD_GET(TCR_EL2_PS_MASK, tcr) : FIELD_GET(TCR_IPS_MASK, tcr));
+> +
+> +	wi->max_oa_bits = min(get_kvm_ipa_limit(), ps_to_output_size(ps));
+> +
+> +	/* Compute minimal alignment */
+> +	x = 3 + ia_bits - ((3 - wi->sl) * stride + wi->pgshift);
+> +
+> +	wi->baddr = ttbr & TTBRx_EL1_BADDR;
+> +
+> +	/* R_VPBBF */
+> +	if (check_output_size(wi->baddr, wi))
+> +		goto transfault_l0;
+
+I think R_VPBBF says that an Address size fault is generated here, not a
+translation fault.
+
+> +
+> +	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
+> +
+> +	return 0;
+> +
+> +addrsz:				/* Address Size Fault level 0 */
+> +	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(0), false, false);
+> +	return -EFAULT;
+> +
+> +transfault_l0:			/* Translation Fault level 0 */
+> +	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(0), false, false);
+> +	return -EFAULT;
+> +}
+
+[..]
+
+> +static bool par_check_s1_perm_fault(u64 par)
+> +{
+> +	u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
+> +
+> +	return  ((fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM &&
+> +		 !(par & SYS_PAR_EL1_S));
+
+ESR_ELx_FSC_PERM = 0x0c is a permission fault, level 0, which Arm ARM says can
+only happen when FEAT_LPA2. I think the code should check that the value for
+PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PERM_L(3)].
+
+With the remaining minor issues fixed:
+
+Reviewed-by: Alexandru Elisei <alexandru.elisei@Arm.com>
+
+Thanks,
+Alex
+
+> +}
+> +
+>  void __kvm_at_s1e01(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  {
+>  	u64 par = __kvm_at_s1e01_fast(vcpu, op, vaddr);
+>  
+> +	/*
+> +	 * If PAR_EL1 reports that AT failed on a S1 permission fault, we
+> +	 * know for sure that the PTW was able to walk the S1 tables and
+> +	 * there's nothing else to do.
+> +	 *
+> +	 * If AT failed for any other reason, then we must walk the guest S1
+> +	 * to emulate the instruction.
+> +	 */
+> +	if ((par & SYS_PAR_EL1_F) && !par_check_s1_perm_fault(par))
+> +		par = handle_at_slow(vcpu, op, vaddr);
+> +
+>  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+>  }
+>  
+> @@ -407,6 +1006,10 @@ void __kvm_at_s1e2(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  		isb();
+>  	}
+>  
+> +	/* We failed the translation, let's replay it in slow motion */
+> +	if ((par & SYS_PAR_EL1_F) && !par_check_s1_perm_fault(par))
+> +		par = handle_at_slow(vcpu, op, vaddr);
+> +
+>  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+>  }
+>  
+> @@ -463,7 +1066,7 @@ void __kvm_at_s12(struct kvm_vcpu *vcpu, u32 op, u64 vaddr)
+>  	/* Check the access permission */
+>  	if (!out.esr &&
+>  	    ((!write && !out.readable) || (write && !out.writable)))
+> -		out.esr = ESR_ELx_FSC_PERM | (out.level & 0x3);
+> +		out.esr = ESR_ELx_FSC_PERM_L(out.level & 0x3);
+>  
+>  	par = compute_par_s12(vcpu, par, &out);
+>  	vcpu_write_sys_reg(vcpu, par, PAR_EL1);
+> -- 
+> 2.39.2
+> 
 
