@@ -1,109 +1,193 @@
-Return-Path: <kvm+bounces-24269-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24270-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14AE29535D7
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:43:25 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9333C95367B
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 17:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEF111F25342
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 14:43:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F319BB2155B
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2A31AB51B;
-	Thu, 15 Aug 2024 14:41:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96661A76C0;
+	Thu, 15 Aug 2024 15:01:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YhjXKMVy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dy8gyr0J"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9160F1A3BD0
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 14:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CF41AC8BD;
+	Thu, 15 Aug 2024 15:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723732908; cv=none; b=hsjYpJdgNM6YCWaNEaikP/hTcLsE3fqA/gnWbJz29GWqQ9QFXQd8imSV7d09pUouLTf+Dcek4ZjnAfXuBeTqXp58uAyVsbUG6QcU/RH99FUrDxWyYheh0skMyskvuDtndPgZo+qg8Tq4WHqfDjRKV9nmhA9MyPklx0Uz7A02hTw=
+	t=1723734089; cv=none; b=GQ/bPFkD59tDgIFK64ZwdFkdCDXgIQkykWMHXzxqt4tPWXeybwG5IYoyaHi64FvGnPwcE9v8/3fBptm41bU0CVBb4WDi1QIk4AI74ysYLl5QVlW5D7Kxw465dk2OaCkDZxj/BU6a6IMBNy7I/lkokAhXLnoovkD1/O3OQNSYSM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723732908; c=relaxed/simple;
-	bh=V8QdjGFb8F+F+uBmy8H9NtHYvs5qGYjs+alfqKY+Mes=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Fs0m5BRarF7yZlCiQLgMUGbv+yknHuUX9WNEL/OyKZC4kPuhi+OA4T+cuIg/fCzlafwwr/ZGekif2Xsnc8VpVYifGVmdNk6aQhsXV8qs7LeveWY7L4u597DeGcllsQKAUW0bDeF+HAD5PpxYmxpYyU2jo8XtvvZ4Q8cgwxoW8cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YhjXKMVy; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6adcb88da08so20691757b3.3
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 07:41:46 -0700 (PDT)
+	s=arc-20240116; t=1723734089; c=relaxed/simple;
+	bh=AZof4Bx69ydPqYVIrzeRixgG1XQf1cxPLetvRiCSI14=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Qj1kuWMuEj4ErKIwRqNW9DvmQ9FU2zQtoGh/5oO/p/7QVCZJ5kQCvWRVxKGPp2azoc0Y9v0yrjRGhrgluCxHICbKe8vCTscnayT9cRmvYhsRnVkZm8zr5SYwDbc4N8y7YNEnLWjHj9znoSLR/22wkfk1N+vRXC6J7fABv9mpn2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dy8gyr0J; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4281d812d3eso9485065e9.3;
+        Thu, 15 Aug 2024 08:01:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723732905; x=1724337705; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=V8QdjGFb8F+F+uBmy8H9NtHYvs5qGYjs+alfqKY+Mes=;
-        b=YhjXKMVy3wL4n/6wI9utVm7rRSlM+4+a2pwbZkfplXGRZEFOtkAkjj854VfCrFJwjl
-         Hold8vOKYyeFUnxE/VpUFqqvCa0lzSnlpo5PTj9Cp6chpL/qsFxmrcJlG4/FVOxy6Rv0
-         bs7RBZOpC0vNtzgrcm8AwiN9n5vqVbQQa1Ku3v/WTCtGmGPY66otH083I95ZMZsxPCDH
-         7R3QSo+UVbKH/OVit1NikJNS7AZPCuicWA7NY3shBpNzi8u95OD/QVw8HRi07vyV88Ax
-         y6xieO84SetyFfeaZojUBgHUAJGR8sKrZo6WK6WF7E4n+GDSuy0q+pcadE/Xf4RFh30p
-         h6xA==
+        d=gmail.com; s=20230601; t=1723734086; x=1724338886; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=X5A/Pf35dj4E2EpVtARhuhl6tAP8WNgJnMyspcYzO+k=;
+        b=dy8gyr0JZC/GvY1aYc/YPk/Si3wqqX1WVmY+sz6zEV+tvYhfV5pa7OcsvIRnsHYHdy
+         14JIXDiXrXRWZpUUp0AitQN6rTVZW59i4gxQdhQa7flGxfIX9AB41KlVWd0ctX1ghqIS
+         eU2BsGHZJnRJcipvmmnnUJvP6gSpNXLal968OxI87/dhqUgkGvn408xDDMrxlL5C6wSz
+         j4o3La6ObiqOUewr8MBq3ja5b9X1wrZw10yu7RYc7ogaLC3fBUupO9J/agBwBedMYH3Z
+         v1WXvH0t/zGTGiV3AzE7uaBRIdp/9uxUZaA3bkeZspa/KUh+5jFOZvTVtBFc5zmK9kkb
+         VS8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723732905; x=1724337705;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=V8QdjGFb8F+F+uBmy8H9NtHYvs5qGYjs+alfqKY+Mes=;
-        b=Ni4I58N6SLqeZ6doTMV4VFupLZkg1WCToqt9t6cdUzCvDJhGzZX3rgb0+t7Arky5uC
-         OhVmL2fj6XVLQ4OfyFgb0twCWHuI3pCBwHKV4lbnsTHo6TEUrElDYPtXjnoswkHgE1kQ
-         fhergz6AI9HpKqlYQUNX8LgCjLAe8e25+s2efk3YFAwXzqpr5+Yoss04GHcWB+kuLsEo
-         1WEZks+6yYOHRYacvXxslpRZT3196GrHn0sbOkXp6vw0q+Z/DvOcGfyiG5D76YV8DDTr
-         BpqlgLWUcGRpvZs6yIdYB+AyAddRwMHms46hSghkTgQcd3Pl9k5uMb6FCCYmQsgb6Pto
-         yj5g==
-X-Forwarded-Encrypted: i=1; AJvYcCUsqeYHc2rwjxcfpX7l+s2H/l+RI6v7gucK77lU3yFhaSEl65gIknFTroiOyuRLhcLnNqMc5ji/PuT2DgFh0lGX5SGg
-X-Gm-Message-State: AOJu0YxdMSjXTEVaKKOFo4DpGJdE+iabff+CDKhffJN5GGJ+eXvf2soP
-	IjAexAQO+9M+0b7yFwcmwCr9nWL0YJ+TVkpSSKY2lqnCSpl6iTmofAociNKtAencziM+j9/CY/8
-	nYg==
-X-Google-Smtp-Source: AGHT+IFSiCB9jnN8MHCdZgXQSjJCqbcr/Subh+gxUDVsexDTlSRc3K/rXclSfcwq3ddq5WwRJAk3mZhT5yM=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a81:5cd4:0:b0:64a:d1b0:4f24 with SMTP id
- 00721157ae682-6ac9b002b3dmr1171957b3.7.1723732905559; Thu, 15 Aug 2024
- 07:41:45 -0700 (PDT)
-Date: Thu, 15 Aug 2024 07:41:44 -0700
-In-Reply-To: <cc44c0da-4f9f-456f-84e5-87bd4fa47af6@intel.com>
+        d=1e100.net; s=20230601; t=1723734086; x=1724338886;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=X5A/Pf35dj4E2EpVtARhuhl6tAP8WNgJnMyspcYzO+k=;
+        b=VFFnBDVS/NMC+b3DyNFvVBc1uy01ELlBbq0O6PB9naBINyUwAtwJCNx1kPnlJqEWm8
+         zXoStR9Fbi+NDi+tkQpnRsj1xy0103wJVx1cUSIyLjrvNd+jD3gzljZTfARUUIbz7H7m
+         uHDzfJmUG7LGtcI3eejToEbUB1EalRqsiIdCTW1wZcAAezroM4Hn9aHAO3TrxeaQSsXh
+         KKVP9gCBEq/i7QNziozCC4Om8F6PhQSQZFGPgTC8av0sM16felOLoomTqjNINLYyhlaK
+         wz2aXQ3kdv7Cpy15jzpYwBl+CrQbL9HJSGtUNLu24glPHjHrqHO9Nx77VijMNeCbAB03
+         ajMw==
+X-Forwarded-Encrypted: i=1; AJvYcCXFIvoK/Ye7cwG7Xj7MtxetJBlPt9+PpOEobadnF64amBRKmc9pzWdPLC6ZhPHCz2m0S9kUSrRcEMFAiOVPmhD8zj+1B6iI3KZxXy5aou4ltMKLFtIN90CoXlzGUyq8/cHgigzP06wWSFrEvdAHFuneYrsib3WqIh5O3ujJSNcM5/cw/SQXZV8/PcPwISAF8EKVDENEX2CJGVmcMW93iGhtH76wBsStyCvY9o82mMiiMqj0UHWAJ3LO2Azzq85+cN2+8V2iDMJWsKZo
+X-Gm-Message-State: AOJu0YxHH2dZOcaDHHdY7RP+O6m5UP7ReZOpX2m6iDIVe7RpDdH1J6Yd
+	9wg89DwiL7Te/5CIavSeQOoBFYNeyokzW79xcQ+InGHTfD+AqAhg+7DsnhonU7ublJ62XvGY1DQ
+	75TbPM/i5yzO77NZuJlU/qKOC+H0=
+X-Google-Smtp-Source: AGHT+IFDnpMtbZ2O72JrYtKTcNGdeMRDRFuISj162VcIBgDVR4ZNDcEgvb9oYMQdJ7UgCrLds6/xYlzhvGcrtQXyvpA=
+X-Received: by 2002:a05:600c:511e:b0:426:59d3:8cae with SMTP id
+ 5b1f17b1804b1-429dd236521mr62262805e9.13.1723734085882; Thu, 15 Aug 2024
+ 08:01:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240608000639.3295768-1-seanjc@google.com> <e8db3e58-38de-47d4-ac6c-08408f9aaa10@redhat.com>
- <cc44c0da-4f9f-456f-84e5-87bd4fa47af6@intel.com>
-Message-ID: <Zr4TqH9dYk0BbGkd@google.com>
-Subject: Re: [PATCH v3 0/8] KVM: Register cpuhp/syscore callbacks when
- enabling virt
-From: Sean Christopherson <seanjc@google.com>
-To: Kai Huang <kai.huang@intel.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Gao <chao.gao@intel.com>, Marc Zyngier <Marc.Zyngier@arm.com>, 
-	Anup Patel <Anup.Patel@wdc.com>, Huacai Chen <chenhuacai@kernel.org>, 
-	Oliver Upton <oupton@google.com>
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <20240808123714.462740-1-linyunsheng@huawei.com>
+ <20240808123714.462740-5-linyunsheng@huawei.com> <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
+ <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com>
+In-Reply-To: <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 15 Aug 2024 08:00:49 -0700
+Message-ID: <CAKgT0Uct5ptfs9ZEoe-9u-fOVz4HLf+5MS-YidKV+xELCBHKNw@mail.gmail.com>
+Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
+ page_frag API
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, 
+	Sagi Grimberg <sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, 
+	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
+	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
+	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
+	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
+	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
+	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
+	kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org, 
+	bpf@vger.kernel.org, linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Aug 15, 2024, Kai Huang wrote:
->=20
-> > Also placed in kvm/queue, mostly as a reminder to myself, and added
-> > other maintainers for testing on ARM, RISC-V and LoongArch.=C2=A0 The c=
-hanges
-> > from v3 to v4 should be mostly nits, documentation and organization of
-> > the series.
-> >=20
->=20
-> Also another reminder:
->=20
-> Could you also remove the WARN_ON() in kvm_uninit_virtualization() so tha=
-t
-> we can allow additional kvm_disable_virtualization() after that for TDX?
+On Wed, Aug 14, 2024 at 8:00=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> On 2024/8/14 23:49, Alexander H Duyck wrote:
+> > On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
+> >> Currently the page_frag API is returning 'virtual address'
+> >> or 'va' when allocing and expecting 'virtual address' or
+> >> 'va' as input when freeing.
+> >>
+> >> As we are about to support new use cases that the caller
+> >> need to deal with 'struct page' or need to deal with both
+> >> 'va' and 'struct page'. In order to differentiate the API
+> >> handling between 'va' and 'struct page', add '_va' suffix
+> >> to the corresponding API mirroring the page_pool_alloc_va()
+> >> API of the page_pool. So that callers expecting to deal with
+> >> va, page or both va and page may call page_frag_alloc_va*,
+> >> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
+> >>
+> >> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> >> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> >> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> >> Acked-by: Chuck Lever <chuck.lever@oracle.com>
+> >> Acked-by: Sagi Grimberg <sagi@grimberg.me>
+> >> ---
+> >>  drivers/net/ethernet/google/gve/gve_rx.c      |  4 ++--
+> >>  drivers/net/ethernet/intel/ice/ice_txrx.c     |  2 +-
+> >>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
+> >>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  2 +-
+> >>  .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  4 ++--
+> >>  .../marvell/octeontx2/nic/otx2_common.c       |  2 +-
+> >>  drivers/net/ethernet/mediatek/mtk_wed_wo.c    |  4 ++--
+> >>  drivers/nvme/host/tcp.c                       |  8 +++----
+> >>  drivers/nvme/target/tcp.c                     | 22 +++++++++---------=
+-
+> >>  drivers/vhost/net.c                           |  6 ++---
+> >>  include/linux/page_frag_cache.h               | 21 +++++++++---------
+> >>  include/linux/skbuff.h                        |  2 +-
+> >>  kernel/bpf/cpumap.c                           |  2 +-
+> >>  mm/page_frag_cache.c                          | 12 +++++-----
+> >>  net/core/skbuff.c                             | 16 +++++++-------
+> >>  net/core/xdp.c                                |  2 +-
+> >>  net/rxrpc/txbuf.c                             | 15 +++++++------
+> >>  net/sunrpc/svcsock.c                          |  6 ++---
+> >>  .../selftests/mm/page_frag/page_frag_test.c   | 13 ++++++-----
+> >>  19 files changed, 75 insertions(+), 70 deletions(-)
+> >>
+> >
+> > I still say no to this patch. It is an unnecessary name change and adds
+> > no value. If you insist on this patch I will reject the set every time.
+> >
+> > The fact is it is polluting the git history and just makes things
+> > harder to maintain without adding any value as you aren't changing what
+> > the function does and there is no need for this. In addition it just
+>
+> I guess I have to disagree with the above 'no need for this' part for
+> now, as mentioned in [1]:
+>
+> "There are three types of API as proposed in this patchset instead of
+> two types of API:
+> 1. page_frag_alloc_va() returns [va].
+> 2. page_frag_alloc_pg() returns [page, offset].
+> 3. page_frag_alloc() returns [va] & [page, offset].
+>
+> You seemed to miss that we need a third naming for the type 3 API.
+> Do you see type 3 API as a valid API? if yes, what naming are you
+> suggesting for it? if no, why it is not a valid API?"
 
-Yeah, I'll take care of that in v4 (as above, Paolo put this in kvm/queue a=
-s a
-placeholder of sorts).
+I didn't. I just don't see the point in pushing out the existing API
+to support that. In reality 2 and 3 are redundant. You probably only
+need 3. Like I mentioned earlier you can essentially just pass a
+page_frag via pointer to the function. With that you could also look
+at just returning a virtual address as well if you insist on having
+something that returns all of the above. No point in having 2 and 3 be
+seperate functions.
+
+I am going to nack this patch set if you insist on this pointless
+renaming. The fact is it is just adding noise that adds no value.
 
