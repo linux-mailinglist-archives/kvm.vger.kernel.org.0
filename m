@@ -1,79 +1,79 @@
-Return-Path: <kvm+bounces-24300-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24301-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC4295379A
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 17:47:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E4589537A6
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 17:52:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 624AD1C2526C
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:47:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D00DC1C24827
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 15:52:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACBC1B9B58;
-	Thu, 15 Aug 2024 15:46:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16F6D1B14E9;
+	Thu, 15 Aug 2024 15:52:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2yTWgNQn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zdF2Efvh"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 950831B3F03
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 15:46:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E0E1AD3F7
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 15:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723736777; cv=none; b=JX11tj3FEaNJ2oMvPyZr/ki+BeEbkMhag+cBF/apjAWMIPyrebUQImG02Q47iRIc9SC5feX5wwAYcY4zN3feRBj9WJslffN6EbwwFLZiWN58BdI4SzlFAPJ04l7nq/GR0t7S/DufqqqvuWVN0cOoeAnf+7PKz3mnJwJQ8Uumq0Y=
+	t=1723737144; cv=none; b=KGKA9kIL5pcVCidtEbEqiBSIAa4pgGi9HO3X5dzyik9p+XSDXPmgRaIyFPf66KjZrHG2iBqcz+fFVJWZ2GyHR4mRZAkc8F+LjcV76HXZZuTRyowrwn8vWGkhS2zsQFS6IyTamTxAoXr2QMDcp5m1T9QXNhTtbHaNXLSC4U/ea7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723736777; c=relaxed/simple;
-	bh=ws8GfdSUu47l+8to0xmGScRHYvMXMXBZ18WnnqVNqf8=;
+	s=arc-20240116; t=1723737144; c=relaxed/simple;
+	bh=snKXFCF6FnyiOrGKJVBPz6luqmn6mmdCtFo8tjxYdls=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=hcJ0pJTj+mu+lZcrusH5gyx+6x+xJYdECQha0HLgUjNPXuG2w/gbzxEuMy7QWT8DybS+lX0UKkl+gWxC6olIS1Y7BI2agMfgtJHf23Mf/5t2xegQS5CkuyJH7yKwSk7tRyD4lHDeYouZYgEMkbMYLGB8UI9Irxo3jdzEd+LkPwo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2yTWgNQn; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=pVM1BhN16r7sm/4d3dESvWL4rcidIpXWPyeTCpJUg7B5vkPDH/Ea3PO6CoeNgBwhtJaQQLG03qNOJ/mqY6jKu3OJmoVwWXMuJOMeFdVozY6isUx/nPn2nBw6xn3KKYs1G8PqGrLtgzMgigPiJfn6iCuj4lBzQtDzJzEGWaLQzpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zdF2Efvh; arc=none smtp.client-ip=209.85.216.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc691f1f83aso486330276.1
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 08:46:15 -0700 (PDT)
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2d3c008e146so1052920a91.0
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 08:52:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723736774; x=1724341574; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723737142; x=1724341942; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=0AkcXZB6modEdwkxtKeqDp/qh9BD93b7/021rd0GWwg=;
-        b=2yTWgNQnI6EQjkftVc6NOS8ObTbqj0kGFLVPv/kQ4/GatzWdv89mOunS5q+coMcGuo
-         j82UBB532n0ntr8vQVsyK6ZC+i1iW696b9EYvID60qgg38hmtHIVzWOZ47q5KhgIkPh+
-         acAqKxdaGX3AePky7OAT7v3Z4nyM70lQZpeYgiVhpYts8uxn6084G/5JSPE4ZOmaQB15
-         faolPEU0s6Tyjy3rwEJTML8sB2rkvtUyGr6KxmDYFpfrqLc1QmO1mEBWmu/gh07Imxgz
-         wxgC6zKKyn4nyb4D1FsWSXdsPQku3Dy34OH8LHRvrtZNA6m7FRacYUObeP132qP6s+gC
-         SykQ==
+        bh=UsUSd9Woo/iqPvXMwajq5VMWihmQ0h2yWsEHJq+e+9A=;
+        b=zdF2Efvhw8kMRsbjOC6prXruy5KR/vKK84JMIFWniz2YoEP5U3m4SDTHKbSyb0t8Jt
+         +BMtOy2MF3VpOSPtyeY/Re7DtcnpV0/W7hxt9k5uMnNt9J4NdFzwTto5vcdI+a3FGpAn
+         WNkuDd3xFTum9/Vz5+nU4/7v9yMZk4WtOeQdM+T9uHie3vMKKjLtuUk0Zba9dK+8+ET5
+         ZFDGsN82/AqQg2+waIZW6xHQ7arn+xIr2YQkpY2E53Nx4Kr/sFDmLrohNDFnVTrVIanl
+         mmHbAU9kSdB0Pc/1Q1tZx8zAQWxavg4eK2/oZyUmtGbW/ZNbWj+pTxFLnEnT54KRhvvP
+         OlIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723736774; x=1724341574;
+        d=1e100.net; s=20230601; t=1723737142; x=1724341942;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0AkcXZB6modEdwkxtKeqDp/qh9BD93b7/021rd0GWwg=;
-        b=VE2ggKZY13MTeEqlSINx1I2N0Aoz7R40rrHUMOpb/q6WhVLrgesgPcfbk/5OtmPtyP
-         LU1fWTNvaGahjjQOuIn9c8Vw6fh3tJcB4chvtcThvAzdLFrfh4HQ8oKIN9/VMmCsARwx
-         q13h5QrT2puD4HIAkTFbE447vtnOcovooKiIJfkWnkKYYH8w8VsEjYRxFo4sV0Cgq7er
-         +HCF4YLJ4B2/WsC5nekmMcrg/8Y0J75T+wmw4HYf2fDfFlsqti6kujZiem72Nlhvy8UR
-         lZyvYJ7GqFZhcEOFFS/fOjBJX+0yAUELtzTtbU/s/relx5UTNJ3augfDi8TSzcNXVMk3
-         PX+Q==
-X-Gm-Message-State: AOJu0YzzNPXEFQnEI6b3ow0ZTzYS0eMQZlVHI13j1OlxAM6b+S8FgUXz
-	UddvhNgIqCoCFmok6pNgn2QFcykpYUOPwn4UfBzqvIgToHeJAKBeoTnSTMR4M6tc+VP7qllu0MU
-	cew==
-X-Google-Smtp-Source: AGHT+IFPglLKZPMGHJwVXlvcv72/tbAsvnR20LyLqWwDc+ZPBG1oo4ecJYW/lensDz3nlnwxMPoCR/Boa0Q=
+        bh=UsUSd9Woo/iqPvXMwajq5VMWihmQ0h2yWsEHJq+e+9A=;
+        b=CTxJIfPDd3n/sWOI1p5yuCleVDfkY1ir3kwKOIXsYdwz/UDdFOdwzqY8Jzy/fqBqn8
+         7AJHJrC3qTeP5jFfIM1qbzRJAZFQI0yuprzglKL7RDOVarCP37X6yy0kNUaugvKpuGrQ
+         zt1lFlQ6nCJk8L1AXIq2jQpPJGsK4z13QAd0TF4jXf1R5Z2oglOO+r+YlzYGWilvAmaH
+         5dcgz7LSS3wWbzHO6m32TMd33LOfFKvf/sPABvuHg4Y8uL6EA+tukYImZbEQ+h7UFicH
+         CKhzD39GEHBAStL+4sjP8nDsd0xBiW46qfyCeav8QnV/k2EVoqpOhu/2cgNMwipusWVH
+         4XVA==
+X-Gm-Message-State: AOJu0YySyyUbo71vX+utCTsjWZMA75dCKuisjVdP3xrx7LX6Fxk86idy
+	2cObifsJor7h6vwGHu/Csjpmi9Kt790nl8im3iXfModuveaGLevdLpdXaMYqI7lkVmzEAsYkPKN
+	IIg==
+X-Google-Smtp-Source: AGHT+IHMf5W2rCdu8YRq9VXD8sk35Ym0aHc+ICn2snu/UUL0F247jmEidV+J/NhiZtp1ZaUNES3oCsmPNJ4=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a5b:901:0:b0:e0b:acc7:b1fd with SMTP id
- 3f1490d57ef6-e116cd9ccbfmr101155276.4.1723736774549; Thu, 15 Aug 2024
- 08:46:14 -0700 (PDT)
-Date: Thu, 15 Aug 2024 08:46:13 -0700
-In-Reply-To: <20240522001817.619072-12-dwmw2@infradead.org>
+ (user=seanjc job=sendgmr) by 2002:a17:90a:f3cc:b0:2cd:bbfa:3e5e with SMTP id
+ 98e67ed59e1d1-2d3e03e9b1emr68a91.7.1723737141799; Thu, 15 Aug 2024 08:52:21
+ -0700 (PDT)
+Date: Thu, 15 Aug 2024 08:52:20 -0700
+In-Reply-To: <20240522001817.619072-13-dwmw2@infradead.org>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240522001817.619072-1-dwmw2@infradead.org> <20240522001817.619072-12-dwmw2@infradead.org>
-Message-ID: <Zr4ixaBGnk_6Zqef@google.com>
-Subject: Re: [RFC PATCH v3 11/21] KVM: x86: Simplify and comment kvm_get_time_scale()
+References: <20240522001817.619072-1-dwmw2@infradead.org> <20240522001817.619072-13-dwmw2@infradead.org>
+Message-ID: <Zr4kNNUUm4E6R5zC@google.com>
+Subject: Re: [RFC PATCH v3 12/21] KVM: x86: Remove implicit rdtsc() from kvm_compute_l1_tsc_offset()
 From: Sean Christopherson <seanjc@google.com>
 To: David Woodhouse <dwmw2@infradead.org>
 Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
@@ -92,74 +92,72 @@ Content-Type: text/plain; charset="us-ascii"
 On Wed, May 22, 2024, David Woodhouse wrote:
 > From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> Commit 3ae13faac400 ("KVM: x86: pass kvm_get_time_scale arguments in hertz")
-> made this function take 64-bit values in Hz rather than 32-bit kHz. Thus
-> making it entrely pointless to shadow its arguments into local 64-bit
-> variables. Just use scaled_hz and base_hz directly.
+> Let the callers pass the host TSC value in as an explicit parameter.
 > 
-> Also rename the 'tps32' variable to 'base32', having utterly failed to
-> think of any reason why it might have been called that in the first place.
-
-Ticks Per Second?
-
-> +	/*
-> +	 * Start by shifting the base_hz right until it fits in 32 bits, and
-> +	 * is lower than double the target rate. This introduces a negative
-> +	 * shift value which would result in pvclock_scale_delta() shifting
-> +	 * the actual tick count right before performing the multiplication.
-> +	 */
-> +	while (base_hz > scaled_hz*2 || base_hz & 0xffffffff00000000ULL) {
-> +		base_hz >>= 1;
->  		shift--;
->  	}
+> This leaves some fairly obviously stupid code, which using this function
+> to compare the guest TSC at some *other* time, with the newly-minted TSC
+> value from rdtsc(). Unless it's being used to measure *elapsed* time,
+> that isn't very sensible.
+> 
+> In this case, "obviously stupid" is an improvement over being non-obviously
+> so.
+> 
+> No functional change intended.
+> 
+> Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+> ---
+>  arch/x86/kvm/x86.c | 14 ++++++++------
+>  1 file changed, 8 insertions(+), 6 deletions(-)
+> 
+> diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
+> index ef3cd6113037..ea59694d712a 100644
+> --- a/arch/x86/kvm/x86.c
+> +++ b/arch/x86/kvm/x86.c
+> @@ -2601,11 +2601,12 @@ u64 kvm_scale_tsc(u64 tsc, u64 ratio)
+>  	return _tsc;
+>  }
 >  
-> -	tps32 = (uint32_t)tps64;
-> -	while (tps32 <= scaled64 || scaled64 & 0xffffffff00000000ULL) {
-> -		if (scaled64 & 0xffffffff00000000ULL || tps32 & 0x80000000)
-> -			scaled64 >>= 1;
-> +	/* Now the shifted base_hz fits in 32 bits, copy it to base32 */
-> +	base32 = (uint32_t)base_hz;
-> +
-> +	/*
-> +	 * Next, shift the scaled_hz right until it fits in 32 bits, and ensure
-> +	 * that the shifted base_hz is not larger (so that the result of the
-> +	 * final division also fits in 32 bits).
-> +	 */
-> +	while (base32 <= scaled_hz || scaled_hz & 0xffffffff00000000ULL) {
-> +		if (scaled_hz & 0xffffffff00000000ULL || base32 & 0x80000000)
-> +			scaled_hz >>= 1;
->  		else
-> -			tps32 <<= 1;
-> +			base32 <<= 1;
->  		shift++;
->  	}
+> -static u64 kvm_compute_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 target_tsc)
+> +static u64 kvm_compute_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 host_tsc,
+> +				     u64 target_tsc)
 
-Any chance you'd want to do this on top, so that it's easier to see that the
-loops are waiting for the upper bits to go to zero?  And so that readers don't
-have to count effs and zeros :-)
+Would it make sense to have a __kvm_compute_l1_tsc_offset() version that takes
+in the host TSC, and then this?
 
-diff --git a/arch/x86/kvm/x86.c b/arch/x86/kvm/x86.c
-index d30b12986e17..786d5a855459 100644
---- a/arch/x86/kvm/x86.c
-+++ b/arch/x86/kvm/x86.c
-@@ -2417,7 +2417,7 @@ static void kvm_get_time_scale(uint64_t scaled_hz, uint64_t base_hz,
-         * shift value which would result in pvclock_scale_delta() shifting
-         * the actual tick count right before performing the multiplication.
-         */
--       while (base_hz > scaled_hz*2 || base_hz & 0xffffffff00000000ULL) {
-+       while (base_hz > scaled_hz*2 || base_hz >> 32) {
-                base_hz >>= 1;
-                shift--;
-        }
-@@ -2430,8 +2430,8 @@ static void kvm_get_time_scale(uint64_t scaled_hz, uint64_t base_hz,
-         * that the shifted base_hz is not larger (so that the result of the
-         * final division also fits in 32 bits).
-         */
--       while (base32 <= scaled_hz || scaled_hz & 0xffffffff00000000ULL) {
--               if (scaled_hz & 0xffffffff00000000ULL || base32 & 0x80000000)
-+       while (base32 <= scaled_hz || scaled_hz >> 32) {
-+               if (scaled_hz >> 32 || base32 & BIT(31))
-                        scaled_hz >>= 1;
-                else
-                        base32 <<= 1;
+static u64 kvm_compute_l1_tsc_offset(struct kvm_vcpu *vcpu, u64 target_tsc)
+{
+	return __kvm_compute_l1_tsc_offset(vcpu, rdtsc(), target_tsc);
+}
+
+
+Hmm, or maybe a better option would be:
+
+static u64 kvm_compute_current_l1_tsc_offset(struct kvm_vcpu *vcpu,
+					     u64 target_tsc)
+{
+	return kvm_compute_l1_tsc_offset(vcpu, rdtsc(), target_tsc);
+}
+
+Meh, after typing those out, I don't like either one.  Let's keep it how you
+wrote it, I think there's quite a bit of added readability by forcing callers to
+provide the host TSC.
+
+>  {
+>  	u64 tsc;
+>  
+> -	tsc = kvm_scale_tsc(rdtsc(), vcpu->arch.l1_tsc_scaling_ratio);
+> +	tsc = kvm_scale_tsc(host_tsc, vcpu->arch.l1_tsc_scaling_ratio);
+>  
+>  	return target_tsc - tsc;
+
+Opportunistically drop "tsc" too?  E.g.
+
+	return target_tsc -
+	       kvm_scale_tsc(host_tsc, vcpu->arch.l1_tsc_scaling_ratio);
+
+or
+
+	return target_tsc - kvm_scale_tsc(host_tsc, vcpu->arch.l1_tsc_scaling_ratio);
+
+I find either of those much easier to read.
 
