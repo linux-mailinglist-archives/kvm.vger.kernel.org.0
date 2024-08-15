@@ -1,176 +1,199 @@
-Return-Path: <kvm+bounces-24237-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24238-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67DE5952AD4
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 10:46:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC324952B15
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 11:13:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC9571F22EF6
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 08:46:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E3AC2812E2
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 09:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B1AF1AE843;
-	Thu, 15 Aug 2024 08:16:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484FA1BF32C;
+	Thu, 15 Aug 2024 08:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IhuvzyuS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hVvbmP+V"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5E6513D245
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 08:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5667D1BF31C;
+	Thu, 15 Aug 2024 08:30:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723709761; cv=none; b=b58IkL4nusdBrnAPJpmPLW1yRPbKkPhhr6ui+xtmF7+gcJON6Cu2JZjHn4IAxoji96HK7C43hCq2CEnXf/tg4jRHBwSQ2a7NkEoWL2Bjk8YgUPxg3i18M76YLzhyOjuNf6FH1u+N7AynNimWuXdpBZT4GtfOOLn5cM8xCtvsa6k=
+	t=1723710645; cv=none; b=qk4V82XwD3xXBDB9AxlIivAv6ZB2qfTXxCTZyaHlsP+FYns269OYHhQLeIGkRLDKuerIbCd9lEdShm36KLFKKgUj3TsdSn/QxLksUdoRfBQEjiWTtqz8SEbG4yrAWNZ63Z1v4lQbkdpe83DDNlAlyLjH+I0r+4GCeFQRzuMLEQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723709761; c=relaxed/simple;
-	bh=It2n54/Wszz22dJy2yFkRqq3oHwCh6v6hF6ITpdTWaA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=h6yDqTMWFxYXHfUiLUeHmZUn02JGKxP0hFWX1kIpPxTubp+zKDow5Mw5l+BhPgIz0g42/ZqbjBDjY2Rjfa/NlchN9G6KjhMOLCWhHM533NBMTD/5M2vDbWK46osZVZMPD51Z3BC4JWm3diy3BHIeJdY48G82V1pZwcpFEnHvLfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IhuvzyuS; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723709758;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=6siwQRc65l8C/JRIpOzVH+/lh/N1bi7Q5Wrmcr0+NwY=;
-	b=IhuvzyuSpylJsuXEmU1GoeMFuupKnqzLMsmmPzZMCoI91LcLIq9baHcZ9j+qCmUiuYxTdq
-	HtzOLKMKyQqANVpTKZbTJoRmlhHimDmZ5jqJXHVDBfv3tXyP/2skp6bu9eCt8DdLn9ISe3
-	4HxAsLzApOCP6iE/pggeoOKJlfxz0uc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-297-rgq3nb15NUmyY0F83FeGUA-1; Thu, 15 Aug 2024 04:15:57 -0400
-X-MC-Unique: rgq3nb15NUmyY0F83FeGUA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-428fc34f41bso3925945e9.3
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 01:15:56 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723709756; x=1724314556;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6siwQRc65l8C/JRIpOzVH+/lh/N1bi7Q5Wrmcr0+NwY=;
-        b=BRFiODOysnv7lqQF0Ig8TBY5SujGQXQL+4BXYSLQJ3AlC+VsWHDEBPG2bZCO6uPjQ/
-         xkxUwJd577jsUVaQfQavKufSbuhFiyjtq6jaiLT54Li/ZEQRrPPz8xJghl3o9kBeoDtG
-         AEBop0zq+lnKzPmv7Tthrww3q3Iom0y3W6gIg2mawqy1TLbaWFvo51xpQEf89NNegXTc
-         /6IxCv1A3O0JK8ePWzmt4Y/7nu3y2afqsKZIGPIsBll5vH0MV5ejxQdfVK0FO0JkldsR
-         DzbMFCPSllxFHl5/Fptswt+q93958w1ZdTFMurKq83q2J0HemZNFxf9uaXkFToj7DBdI
-         t3vQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWq22DjZTavcdZWUuznTBWNtHefZqNcwb1wdEoNvxsndYcl0ZmHy0FWz7ca6KV/ts7a0bH1XN4Q2E+qMggREOAaegfw
-X-Gm-Message-State: AOJu0YwPSIF0oa5LSYWC2R9qgNegLWIe6OXs6YMiTdW2f2Glj3KjOYiB
-	lHk8q7oyGILennrohckJwVPxChk1RfMdReuRvRVsOE+uNGhbufs742uIWe3CmfyNdtN+KYKEb4h
-	ZR7PiCjE0iN8naB1XnFwJU2p1jgPxSEfqKJf65xTFh8seRJuDfg==
-X-Received: by 2002:a05:600c:190e:b0:427:ff7a:79e with SMTP id 5b1f17b1804b1-429dd2393f0mr36254965e9.16.1723709755693;
-        Thu, 15 Aug 2024 01:15:55 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEoCzTh17WSwxryGBjxZNK9ZCVO20bZbVHu6qlfgD4Z3joMLanQfxCiyYHbDAD7X7wJK27mdQ==
-X-Received: by 2002:a05:600c:190e:b0:427:ff7a:79e with SMTP id 5b1f17b1804b1-429dd2393f0mr36254675e9.16.1723709755074;
-        Thu, 15 Aug 2024 01:15:55 -0700 (PDT)
-Received: from fedora (g2.ign.cz. [91.219.240.8])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-429e7e1ca28sm11970905e9.44.2024.08.15.01.15.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 01:15:54 -0700 (PDT)
-From: Vitaly Kuznetsov <vkuznets@redhat.com>
+	s=arc-20240116; t=1723710645; c=relaxed/simple;
+	bh=umWuN6DJjYYUyFKidQehFx3KKXN+3HzPpnQu8tyFmbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IrwUpbYTNfHC4SfmZzlLqVOXmhWL9AmGqANZzTyg4qUVm25lbdO+PyzEToqhpcG+ILQ5XAcp73SVAjV34/5l2Y9bVaDkOB0bDku96aHCpZ8gs5Ce14OHKxXYbzZG8oZTtZD4UbOiu+ce1Wq/CF8O9sPkrRAP9wfBJ1YNxSvFrsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hVvbmP+V; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723710644; x=1755246644;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=umWuN6DJjYYUyFKidQehFx3KKXN+3HzPpnQu8tyFmbk=;
+  b=hVvbmP+V65RswPh5HNwzABQ6EkBnKFtzz3CfnzTAZc0HnNMdPHjcspqH
+   wCche49q+811Z9Kk7LIWOtBvdBEyqgv8hfDgj1bRqFWD7DtlXLyf5XG8u
+   SF/D/u9M5FT4sOQ3dX3DlHGiGsrWigaHWiMUyQpKfuHx3XrZDPZxLCc+f
+   otjXO1y0vckPzf9/eZb28WujkwO3rL+HKyRyLzkdyNeYAKRlcWk879qUu
+   sDleDo3V5S4rhRigP2DLONgdV5MND3i9q4vwsFar5CZyVqQ5VVT/1W9F8
+   ke/rnoMbdgi2z15ekCz1pCbUWP+5unmaUsvftSXk6KP3atF4/o0ul1Djc
+   g==;
+X-CSE-ConnectionGUID: e8yNsT83TPma7fK02bK78g==
+X-CSE-MsgGUID: g8pKFBliQFOOuUT7vQnWyA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11164"; a="32533749"
+X-IronPort-AV: E=Sophos;i="6.10,148,1719903600"; 
+   d="scan'208";a="32533749"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 01:30:43 -0700
+X-CSE-ConnectionGUID: CzdzmKY4RNmLhKSvjvD/pQ==
+X-CSE-MsgGUID: Fpc0aYNiR+ePp5bX3oUZQA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,148,1719903600"; 
+   d="scan'208";a="60052023"
+Received: from yy-desk-7060.sh.intel.com (HELO localhost) ([10.239.159.76])
+  by orviesa008.jf.intel.com with ESMTP; 15 Aug 2024 01:30:40 -0700
+Date: Thu, 15 Aug 2024 16:30:39 +0800
+From: Yuan Yao <yuan.yao@linux.intel.com>
 To: Sean Christopherson <seanjc@google.com>
-Cc: Mirsad Todorovac <mtodorovac69@gmail.com>, kvm@vger.kernel.org, Paolo
- Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo
- Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, linux-kernel@vger.kernel.org
-Subject: Re: [BUG] arch/x86/kvm/vmx/vmx_onhyperv.h:109:36: error:
- dereference of NULL =?utf-8?B?4oCYMOKAmQ==?=
-In-Reply-To: <Zr0rEy0bO1ju_f1C@google.com>
-References: <b44227c5-5af6-4243-8ed9-2b8cdc0e5325@gmail.com>
- <Zpq2Lqd5nFnA0VO-@google.com>
- <207a5c75-b6ad-4bfb-b436-07d4a3353003@gmail.com>
- <87a5i05nqj.fsf@redhat.com>
- <b20eded4-0663-49fb-ba88-5ff002a38a7f@gmail.com>
- <87plqbfq7o.fsf@redhat.com> <ZrzIVnkLqcbUKVDZ@google.com>
- <87mslff728.fsf@redhat.com> <Zr0rEy0bO1ju_f1C@google.com>
-Date: Thu, 15 Aug 2024 10:15:53 +0200
-Message-ID: <87h6bmfbgm.fsf@redhat.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Peter Gonda <pgonda@google.com>,
+	Michael Roth <michael.roth@amd.com>,
+	Vishal Annapurve <vannapurve@google.com>,
+	Ackerly Tng <ackerleytng@google.com>
+Subject: Re: [PATCH 03/22] KVM: x86/mmu: Trigger unprotect logic only on
+ write-protection page faults
+Message-ID: <20240815083039.737qa2bxhwxxhf32@yy-desk-7060>
+References: <20240809190319.1710470-1-seanjc@google.com>
+ <20240809190319.1710470-4-seanjc@google.com>
+ <20240814114230.hgzrh3cal6k6x2dn@yy-desk-7060>
+ <Zry9Us0HVEDmhCB4@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zry9Us0HVEDmhCB4@google.com>
+User-Agent: NeoMutt/20171215
 
-Sean Christopherson <seanjc@google.com> writes:
-
-> On Wed, Aug 14, 2024, Vitaly Kuznetsov wrote:
->> Sean Christopherson <seanjc@google.com> writes:
->> 
->> > On Wed, Aug 14, 2024, Vitaly Kuznetsov wrote:
->> >> What I meant is something along these lines (untested):
->> >> 
->> >> diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
->> >> index eb48153bfd73..e2d8c67d0cad 100644
->> >> --- a/arch/x86/kvm/vmx/vmx_onhyperv.h
->> >> +++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
->> >> @@ -104,6 +104,14 @@ static inline void evmcs_load(u64 phys_addr)
->> >>         struct hv_vp_assist_page *vp_ap =
->> >>                 hv_get_vp_assist_page(smp_processor_id());
->> >>  
->> >> +       /*
->> >> +        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
->> >> +        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
->> >> +        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
->> >> +        * but compilers may still complain.
->> >> +        */
->> >> +       BUG_ON(!vp_ap);
->> >
->> > A full BUG_ON() is overkill, and easily avoided.  If we want to add a sanity
->> > check here and do more than just WARN, then it's easy enough to plumb in @vcpu
->> > and make this a KVM_BUG_ON() so that the VM dies, i.e. so that KVM doesn't risk
->> > corrupting the guest somehow.
->> >
->> 
->> I'm still acting under the impression this is an absolutely impossible
->> situation :-)
->> 
->> AFAICS, we only call evmcs_load() from vmcs_load() but this one doesn't
->> have @vcpu/@kvm either and I wasn't sure it's worth the effort to do the
->> plumbing (or am I missing an easy way to go back from @vmcs to
->> @vcpu?). On the other hand, vmcs_load() should not be called that ofter
->> so if we prefer to have @vcpu there for some other reason -- why not.
+On Wed, Aug 14, 2024 at 07:21:06AM -0700, Sean Christopherson wrote:
+> On Wed, Aug 14, 2024, Yuan Yao wrote:
+> > > @@ -5960,6 +5961,41 @@ void kvm_mmu_track_write(struct kvm_vcpu *vcpu, gpa_t gpa, const u8 *new,
+> > >  	write_unlock(&vcpu->kvm->mmu_lock);
+> > >  }
+> > >
+> > > +static int kvm_mmu_write_protect_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+> > > +				       u64 error_code, int *emulation_type)
+> > > +{
+> > > +	bool direct = vcpu->arch.mmu->root_role.direct;
+> > > +
+> > > +	/*
+> > > +	 * Before emulating the instruction, check if the error code
+> > > +	 * was due to a RO violation while translating the guest page.
+> > > +	 * This can occur when using nested virtualization with nested
+> > > +	 * paging in both guests. If true, we simply unprotect the page
+> > > +	 * and resume the guest.
+> > > +	 */
+> > > +	if (direct &&
+> > > +	    (error_code & PFERR_NESTED_GUEST_PAGE) == PFERR_NESTED_GUEST_PAGE) {
+> > > +		kvm_mmu_unprotect_page(vcpu->kvm, gpa_to_gfn(cr2_or_gpa));
+> > > +		return RET_PF_FIXED;
+> > > +	}
+> > > +
+> > > +	/*
+> > > +	 * The gfn is write-protected, but if emulation fails we can still
+> > > +	 * optimistically try to just unprotect the page and let the processor
+> > > +	 * re-execute the instruction that caused the page fault.  Do not allow
+> > > +	 * retrying MMIO emulation, as it's not only pointless but could also
+> > > +	 * cause us to enter an infinite loop because the processor will keep
+> > > +	 * faulting on the non-existent MMIO address.  Retrying an instruction
+> > > +	 * from a nested guest is also pointless and dangerous as we are only
+> > > +	 * explicitly shadowing L1's page tables, i.e. unprotecting something
+> > > +	 * for L1 isn't going to magically fix whatever issue cause L2 to fail.
+> > > +	 */
+> > > +	if (!mmio_info_in_cache(vcpu, cr2_or_gpa, direct) && !is_guest_mode(vcpu))
+> >
+> > Looks the mmio_info_in_cache() checking can be removed,
+> > emulation should not come here with RET_PF_WRITE_PROTECTED
+> > introduced, may WARN_ON_ONCE() it.
 >
-> kvm_get_running_vcpu(), though I honestly purposely didn't suggest it earlier
-> because I am not a fan of using kvm_get_running_vcpu() unless it's absolutely
-> necessary.  But for this situation, I'd be fine with using it.
+> Yeah, that was my instinct as well.  I kept it mostly because I liked having the
+> comment, but also because I was thinking the cache could theoretically get a hit.
+> But that's not true.  KVM should return RET_PF_WRITE_PROTECTED if and only if
+> there is a memslot, and creating a memslot is supposed to invalidate the MMIO
+> cache by virtue of changing the memslot generation.
+>
+> Unless someone feels strongly that the mmio_info_in_cache() call should be
+> deleted entirely, I'll tack on this patch.  The cache lookup is cheap, and IMO
+> it's helpful to explicitly document that it should be impossible to reach this
+> point with what appears to be MMIO.
+>
+> ---
+>  arch/x86/kvm/mmu/mmu.c | 28 +++++++++++++++++++---------
+>  1 file changed, 19 insertions(+), 9 deletions(-)
+>
+> diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> index 50695eb2ee22..7f3f57237f23 100644
+> --- a/arch/x86/kvm/mmu/mmu.c
+> +++ b/arch/x86/kvm/mmu/mmu.c
+> @@ -5997,6 +5997,18 @@ static int kvm_mmu_write_protect_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  	vcpu->arch.last_retry_eip = 0;
+>  	vcpu->arch.last_retry_addr = 0;
+>
+> +	/*
+> +	 * It should be impossible to reach this point with an MMIO cache hit,
+> +	 * as RET_PF_WRITE_PROTECTED is returned if and only if there's a valid,
+> +	 * writable memslot, and creating a memslot should invalidate the MMIO
+> +	 * cache by way of changing the memslot generation.  WARN and disallow
+> +	 * retry if MMIO is detect, as retrying MMIO emulation is pointless and
+> +	 * could put the vCPU into an infinite loop because the processor will
+> +	 * keep faulting on the non-existent MMIO address.
+> +	 */
+> +	if (WARN_ON_ONCE(mmio_info_in_cache(vcpu, cr2_or_gpa, direct)))
+> +		return RET_PF_EMULATE;
+> +
 
-Ah, nice, so we don't even need the plumbing then I guess? Compile-tested only:
+LGTM.
 
-diff --git a/arch/x86/kvm/vmx/vmx_onhyperv.h b/arch/x86/kvm/vmx/vmx_onhyperv.h
-index eb48153bfd73..318f5f95f211 100644
---- a/arch/x86/kvm/vmx/vmx_onhyperv.h
-+++ b/arch/x86/kvm/vmx/vmx_onhyperv.h
-@@ -104,6 +104,19 @@ static inline void evmcs_load(u64 phys_addr)
-        struct hv_vp_assist_page *vp_ap =
-                hv_get_vp_assist_page(smp_processor_id());
- 
-+       /*
-+        * When enabling eVMCS, KVM verifies that every CPU has a valid hv_vp_assist_page()
-+        * and aborts enabling the feature otherwise. CPU onlining path is also checked in
-+        * vmx_hardware_enable(). With this, it is impossible to reach here with vp_ap == NULL
-+        * but compilers may still complain.
-+        */
-+       if (!vp_ap) {
-+               struct kvm_vcpu *vcpu = kvm_get_running_vcpu();
-+
-+               KVM_BUG_ON(1, vcpu->kvm);
-+               return;
-+       }
-+
-        if (current_evmcs->hv_enlightenments_control.nested_flush_hypercall)
-                vp_ap->nested_control.features.directhypercall = 1;
-        vp_ap->current_nested_vmcs = phys_addr;
+Reviewed-by: Yuan Yao <yuan.yao@intel.com>
 
-(I hope we can't reach here with kvm_running_vcpu unset, can we?)
-
--- 
-Vitaly
-
+>  	/*
+>  	 * Before emulating the instruction, check to see if the access may be
+>  	 * due to L1 accessing nested NPT/EPT entries used for L2, i.e. if the
+> @@ -6029,17 +6041,15 @@ static int kvm_mmu_write_protect_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa,
+>  		return RET_PF_FIXED;
+>
+>  	/*
+> -	 * The gfn is write-protected, but if emulation fails we can still
+> -	 * optimistically try to just unprotect the page and let the processor
+> +	 * The gfn is write-protected, but if KVM detects its emulating an
+> +	 * instruction that is unlikely to be used to modify page tables, or if
+> +	 * emulation fails, KVM can try to unprotect the gfn and let the CPU
+>  	 * re-execute the instruction that caused the page fault.  Do not allow
+> -	 * retrying MMIO emulation, as it's not only pointless but could also
+> -	 * cause us to enter an infinite loop because the processor will keep
+> -	 * faulting on the non-existent MMIO address.  Retrying an instruction
+> -	 * from a nested guest is also pointless and dangerous as we are only
+> -	 * explicitly shadowing L1's page tables, i.e. unprotecting something
+> -	 * for L1 isn't going to magically fix whatever issue cause L2 to fail.
+> +	 * retrying an instruction from a nested guest as KVM is only explicitly
+> +	 * shadowing L1's page tables, i.e. unprotecting something for L1 isn't
+> +	 * going to magically fix whatever issue cause L2 to fail.
+>  	 */
+> -	if (!mmio_info_in_cache(vcpu, cr2_or_gpa, direct) && !is_guest_mode(vcpu))
+> +	if (!is_guest_mode(vcpu))
+>  		*emulation_type |= EMULTYPE_ALLOW_RETRY_PF;
+>
+>  	return RET_PF_EMULATE;
+>
+> base-commit: 7d33880356496eb0640c6c825cc60898063c4902
+> --
 
