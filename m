@@ -1,167 +1,122 @@
-Return-Path: <kvm+bounces-24225-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24226-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAACA952810
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 05:00:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADD5095288A
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 06:33:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A0E0B233B7
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 03:00:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76E782842B0
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 04:33:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973B32C182;
-	Thu, 15 Aug 2024 03:00:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9BC3BBC9;
+	Thu, 15 Aug 2024 04:33:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="X4Ua0H7n"
 X-Original-To: kvm@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783081E884;
-	Thu, 15 Aug 2024 03:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06242C182
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 04:33:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723690804; cv=none; b=BZpr/dIsmzu51DEXUPWUuCL4zbEmboTpmp2n+O3gsyJou5m2NigWkYinDVXFvgVRbeFAX/r3dSAOZBawZ64+AdJZnxTt6cdxbBEbWIasXfjoV+y5fufCRTL7ZMDva3CUg/INxDCwb1obm+HGhgWufM7W75u+TfkQ2xrBWX4JsHg=
+	t=1723696400; cv=none; b=KqyIipDxQhOj07zrmLkHpv3Gg5S6CFiRC+njIiRCKeJKWSMumsRIRU3xNxXudLANHFKRRtOUBxVAZxwQ2V8x69+bgv/nLxkEfolYQtws+tvZ7J1/95ws1+npUWSSsfC5OxsN4kQXBJTVKadJSJZBzgSYKYk+mmmluWtq18T28Ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723690804; c=relaxed/simple;
-	bh=9ppxBCocPnEtgPPka1NCRYp9zcY55WpRrtq/MyyUvHs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=mCaraMZSJbBp0ysmZ7WN29CG2XLGDL5kmNMz+UB7X+pGQ2MFzHQGSo9IwCT9x09lI8h0D2FCtXjq83xyspAKXG/+4CIveBnm+G6njp/FGmeRbeMZW8S1PTLG3qN6EPSjxfpca4N6PavK8aazlxC8hwH52Ltzir117TK7upStVCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4WkqXP209yz1HGKB;
-	Thu, 15 Aug 2024 10:56:53 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 5EBEA1A0188;
-	Thu, 15 Aug 2024 10:59:58 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 15 Aug 2024 10:59:57 +0800
-Message-ID: <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com>
-Date: Thu, 15 Aug 2024 10:59:57 +0800
+	s=arc-20240116; t=1723696400; c=relaxed/simple;
+	bh=PHkFHT7aXgDsIO27iXXdIhiAjWMTlwp+vnPJOk/XSzw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rL05O7tZw/FHjRVYBLa6vKP4lXLH9rJdt+9PCRLSVeDt8FOv4UZaEKMs/YvBiCXCXJNcqurDTuTek+RFc8OVCe/0/MLTH+ndBg0qrVd/jm+ZkfYLz0tuHgUtzW1RTt+nOxqCSTU6uRQAFp5W2lS13gml7HlYlmvOFvQjXOajeXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=X4Ua0H7n; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7a4df9dc840so28378685a.2
+        for <kvm@vger.kernel.org>; Wed, 14 Aug 2024 21:33:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723696398; x=1724301198; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0mL7lVxheOuOGYib+u42mSKDtfjugmG5E83SSWvNp9o=;
+        b=X4Ua0H7nIelBfyePLimYO7Td497gMyRtv/JuYjxlR3RyFDnLAacExhAqL4Qd9ZMJdB
+         rPy7MciFNiSCqixg9o0VSkXZ4nKfXw4ezZ4gAsidkxhgXSn7MjmkIndbVD7TjCFcBg6k
+         QgEq541KsLN7Wlt18X+6gtP3lPc+xLMfDWutRwOcSMoRvJ9laeeCMwkKtL7H1toZLCvl
+         DHKoXr6wy7GkttoHpJ3GCPTSyYAuBpFpBE9QOBWkwUB9/0z311sxM8v3Z5LzH7KCWa+h
+         C1DNGuEO+wQpwQqNK2o3kb8D8Ze6aC0iC81CXSGqzpz8RUMBKZZr1PuU9pchadKBHVHW
+         3H+w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723696398; x=1724301198;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0mL7lVxheOuOGYib+u42mSKDtfjugmG5E83SSWvNp9o=;
+        b=BAXGKK4gn87NA6teh4kVTMhq8zLGai/bg8f9njlmdIvIf6yaxzZLHUyUxnXKNmSQXt
+         GsjiFQIi84tFosEk3uY2+2xaR2FrFUa/Gh8zQPRH7Qc6laMdfSHlRS5IoFPK8EeS2TQR
+         5QjJcBPZGG+dVmxpeOtVuRq/Y2JFfIby/aLw9HS9vd3rXnirLmErjFJeDiXcXlMu6m6Y
+         ZMfHzNf0auKpp3Qck0oGZHMLIgnl8ci4JZDSIS1AuA18Q4BJR/hURjoVJf5Cmms6+o8Z
+         EiD7b7fTIj/Y9BVdKSMeNM+g/iDcPEP218DN2wQqkehmht0n8qFIxwX+Z+zO2bwqlH01
+         yGxg==
+X-Forwarded-Encrypted: i=1; AJvYcCUY06eWTewDx59ugi9tVnjlnBq0nY2ZhAaGQwW8i9C0GMWeTuxutGObbwZ60QJXDam0sRf2HJ9dhUUAMTnxVcnYqYFW
+X-Gm-Message-State: AOJu0YxA/M/IC/EsGbBMaa8ZuRltT3GQt+jesM8q7WP7TdlfYHTCusbZ
+	2T9WgJdV73cIvH/coKpEayqLXxgg++mecNlVXVt+v6/KCffLs/Zd5PzqTxsDkNH9yq5kweviNNv
+	D8/Lz6UHEYB8zChWWWHzEeNM13EfIodwQdUs5
+X-Google-Smtp-Source: AGHT+IHp0Mv0umuwx4M7j9iBHKv4L2D7jjyHbT0rsHN9Fp+h3T+KIQJZ6zUxV73fDUj4HBH+tKjmCgBON3DJRI6T8YM=
+X-Received: by 2002:a05:620a:4489:b0:7a1:dc97:5a51 with SMTP id
+ af79cd13be357-7a4ee3e4e08mr565255985a.58.1723696397516; Wed, 14 Aug 2024
+ 21:33:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Alexander H Duyck <alexander.duyck@gmail.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Subbaraya
- Sundeep <sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, Sagi
- Grimberg <sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, Praveen
- Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>,
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, hariprasad
-	<hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, Sean Wang
-	<sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith
- Busch <kbusch@kernel.org>, Jens Axboe <axboe@kernel.dk>, Christoph Hellwig
-	<hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, "Michael S. Tsirkin"
-	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eduard
- Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Stanislav Fomichev
-	<sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey
-	<tom@talpey.com>, Trond Myklebust <trondmy@kernel.org>, Anna Schumaker
-	<anna@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	<intel-wired-lan@lists.osuosl.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>, <linux-nvme@lists.infradead.org>,
-	<kvm@vger.kernel.org>, <virtualization@lists.linux.dev>,
-	<linux-mm@kvack.org>, <bpf@vger.kernel.org>, <linux-afs@lists.infradead.org>,
-	<linux-nfs@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
- <20240808123714.462740-5-linyunsheng@huawei.com>
- <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
+References: <20240710074410.770409-1-suleiman@google.com> <ZqhPVnmD7XwFPHtW@chao-email>
+ <Zqi2RJKp8JxSedOI@freefall.freebsd.org> <ZruSpDcysc2B-HQ-@google.com>
+ <CABCjUKD2BAXzBZixrXKJwybEPoZvkmSPfy-vPKMbxcAt0qk0uQ@mail.gmail.com> <ZrzOxxu1_-f5ZZ1m@google.com>
+In-Reply-To: <ZrzOxxu1_-f5ZZ1m@google.com>
+From: Suleiman Souhlal <suleiman@google.com>
+Date: Thu, 15 Aug 2024 13:33:06 +0900
+Message-ID: <CABCjUKAkBDCs6knb34sDxOsXT7JwCS_jcknmu9rainx=eM_4zQ@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: Include host suspended time in steal time.
+To: Sean Christopherson <seanjc@google.com>
+Cc: Suleiman Souhlal <ssouhlal@freebsd.org>, Chao Gao <chao.gao@intel.com>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/8/14 23:49, Alexander H Duyck wrote:
-> On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
->> Currently the page_frag API is returning 'virtual address'
->> or 'va' when allocing and expecting 'virtual address' or
->> 'va' as input when freeing.
->>
->> As we are about to support new use cases that the caller
->> need to deal with 'struct page' or need to deal with both
->> 'va' and 'struct page'. In order to differentiate the API
->> handling between 'va' and 'struct page', add '_va' suffix
->> to the corresponding API mirroring the page_pool_alloc_va()
->> API of the page_pool. So that callers expecting to deal with
->> va, page or both va and page may call page_frag_alloc_va*,
->> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
->>
->> CC: Alexander Duyck <alexander.duyck@gmail.com>
->> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
->> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
->> Acked-by: Chuck Lever <chuck.lever@oracle.com>
->> Acked-by: Sagi Grimberg <sagi@grimberg.me>
->> ---
->>  drivers/net/ethernet/google/gve/gve_rx.c      |  4 ++--
->>  drivers/net/ethernet/intel/ice/ice_txrx.c     |  2 +-
->>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
->>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  2 +-
->>  .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  4 ++--
->>  .../marvell/octeontx2/nic/otx2_common.c       |  2 +-
->>  drivers/net/ethernet/mediatek/mtk_wed_wo.c    |  4 ++--
->>  drivers/nvme/host/tcp.c                       |  8 +++----
->>  drivers/nvme/target/tcp.c                     | 22 +++++++++----------
->>  drivers/vhost/net.c                           |  6 ++---
->>  include/linux/page_frag_cache.h               | 21 +++++++++---------
->>  include/linux/skbuff.h                        |  2 +-
->>  kernel/bpf/cpumap.c                           |  2 +-
->>  mm/page_frag_cache.c                          | 12 +++++-----
->>  net/core/skbuff.c                             | 16 +++++++-------
->>  net/core/xdp.c                                |  2 +-
->>  net/rxrpc/txbuf.c                             | 15 +++++++------
->>  net/sunrpc/svcsock.c                          |  6 ++---
->>  .../selftests/mm/page_frag/page_frag_test.c   | 13 ++++++-----
->>  19 files changed, 75 insertions(+), 70 deletions(-)
->>
-> 
-> I still say no to this patch. It is an unnecessary name change and adds
-> no value. If you insist on this patch I will reject the set every time.
-> 
-> The fact is it is polluting the git history and just makes things
-> harder to maintain without adding any value as you aren't changing what
-> the function does and there is no need for this. In addition it just
+On Thu, Aug 15, 2024 at 12:35=E2=80=AFAM Sean Christopherson <seanjc@google=
+.com> wrote:
+>
+> On Wed, Aug 14, 2024, Suleiman Souhlal wrote:
+>
+> > With the proposed approach, the steal time page would get copied to the=
+ new
+> > host and everything would keep working correctly, with the exception of=
+ a
+> > possible host suspend happening between when the migration started and =
+when
+> > it finishes, not being reflected post-migration.  That seems like a
+> > reasonable compromise.
+>
+> Maybe, but I'm not keen on sweeping this under the rug.  Ignoring issues =
+because
+> they'll "never" happen has bitten KVM more than once.
+>
+> At the absolute bare minimum, the flaw needs to be documented, with a sug=
+gested
+> workaround provided (do KVM on all vCPUs before migrating after suspend),=
+ e.g.
+> so that userspace can workaround the issue in the unlikely scenario users=
+pace
+> does suspend+resume, saves/restores a VM, *and* cares about steal-time.
 
-I guess I have to disagree with the above 'no need for this' part for
-now, as mentioned in [1]:
+I can write a comment in record_steal_time() that describes the
+scenario, mention it in
+the commit message and add something to the steal time part of
+Documentation/virt/kvm/x86/msr.rst.
 
-"There are three types of API as proposed in this patchset instead of
-two types of API:
-1. page_frag_alloc_va() returns [va].
-2. page_frag_alloc_pg() returns [page, offset].
-3. page_frag_alloc() returns [va] & [page, offset].
-
-You seemed to miss that we need a third naming for the type 3 API.
-Do you see type 3 API as a valid API? if yes, what naming are you
-suggesting for it? if no, why it is not a valid API?"
-
-
-1. https://lore.kernel.org/all/ca6be29e-ab53-4673-9624-90d41616a154@huawei.com/
-
-> makes it that much harder to backport fixes in the future as people
-> will have to work around the rename.
-> 
+-- Suleiman
 
