@@ -1,168 +1,143 @@
-Return-Path: <kvm+bounces-24264-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24265-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C8179532DC
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:11:32 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5912B9532EC
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:12:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C6901F217AF
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 14:11:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9B4CB23709
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 14:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579C01B1517;
-	Thu, 15 Aug 2024 14:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2401A01D4;
+	Thu, 15 Aug 2024 14:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="beqbAlls"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HWMotfgD"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01B5819F471
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 14:08:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5ED1AD41F
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 14:09:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723730907; cv=none; b=NmAyZFRZtgqtOQiBecbzOwtZUhsRLTnSjehtyfcCO8A7nwhGiY/ru302s5gk7Hqwc3X7k2HyVy5KOlKCvuDHbA+n4EnHSGN4XUJvylFa2JVvZXfUM9f72N8HpIOdQehWsP81XE177noBi+L5m3UnMyGoZesKxNRjAqcEJWIQGXA=
+	t=1723730948; cv=none; b=nYjbBCtkk4sxptrWnXMm7W11CnuUgQ0V448xmxjBB7KvruJNI/lmNJIZTHobfNP8yA9wH5LHrVrX+ohF7QdygASL1gkae++esDdimDDs/aVZCPj4/SA9SOYlKKKO2vCLelFjx1u7dafYODZtAfTmiokF6WeUTofJxM3oTy221cU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723730907; c=relaxed/simple;
-	bh=1WCwi3zf8B7UjUYMn2Mg/MGq3dt4hzBwK2exA2fG0ZE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jhh2C62QxE26x5cDelRtEs6g26eCWVbPFD2e3yVdhKZ152tnqMcBN9D5WeTQVnXMCYNYy1KrvnulJcjkqKt64nsR+yoS43wMvk8HX+KrzfledtFbzmkeKaWaAzlvMsQoKooCz5zr+TMzpqfZjwYEfxdqcVNyaKrhXOW4bOoAC9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=beqbAlls; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723730904;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vzr3KYLk8750O7gOgaxuZ0lSzVhIlcuDGPfj02xRDb8=;
-	b=beqbAllsONlaYSmNgsWKgLSD6EkFW8TqzVinJB1sLZTjZrd3zDWKTkCNojkApIkO2NwehW
-	JSkLMfSMDndHk+T0Hac3Nl4eZXzkP4bQyAGeHC7RPoeWFETL+OOgiE3abWO/6HyAuIkIu0
-	PqQuxsHiM/dD6SiD7bb5+QtDeiVslug=
-Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
- [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-177-oeX9ux-dMBqIi0iUNZzbDg-1; Thu, 15 Aug 2024 10:08:23 -0400
-X-MC-Unique: oeX9ux-dMBqIi0iUNZzbDg-1
-Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-6ad97b9a0fbso20140927b3.0
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 07:08:23 -0700 (PDT)
+	s=arc-20240116; t=1723730948; c=relaxed/simple;
+	bh=qo9ZE4dFQ6mM/Bc850JYi0KMklchFhxHbwhodm8U5P8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=m84FDEvJZxnfM0uXUaXd8J5NHndMp9/DzSS+xQWXvEV3YSKkUFS03KfbjTkAlqCl2P8lu9PidWI0Jaid2g+6CXah8NioOtFCKMHI8AGooM8bKQPy2Q6Ne4Ip7AC1jDcEE/J02AB2SpDMut5ljev2FYvEdpNg6TZV5rEroKIsKoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HWMotfgD; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0b3742b309so1498470276.1
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 07:09:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723730945; x=1724335745; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qIvQlh/LEmcc/D/obNuZ6E+YY/ClqP2nQTGGm+92/XA=;
+        b=HWMotfgDUfdZSYw8ZSXij6R9WdNMMsZ2E+HJc6307o4WXfBFy+834Bx3LYyDiMQjsf
+         Lesj5wm9Uj6kKEDoZfUTL/4Pf9onA+KqhU1IS+OaS7W4tgiitSppFfub0jEiMS3feSig
+         n7Sw39mWzCawqcZCR3h2zISm5Lp/JYKq/Lqd+vrXTfb7rQiItuQNBNPBbr2dUtbyCIIH
+         o8GeMlDlr+/IQSmOQtqzhzZuT9r/dmcIVfY3gMg4a2cXIFv9Ytv9vlysNcX4Q9QEBy49
+         1A1ppUw8CgpGCGzR3S7hD6NXOCLq6gmth89M7elHCD7WMgnEzwvC46XRY+H64InOiBEU
+         jB4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723730903; x=1724335703;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vzr3KYLk8750O7gOgaxuZ0lSzVhIlcuDGPfj02xRDb8=;
-        b=uPveyeYNiKWR8HOaUD34fR28mPzdcsRW2DRNbqxjNDSFRGuDv6FMyvWELvxyK1+Gkz
-         Dc6b5hyRu6X/l7WP5LxXNfKBV0Dej5EdolH0zKUDUo7y2dTOhnqL+e4bv2vMOICaXBB3
-         OWl+ySS44DOUYLd2hQdDJ1GfAE6K1yjUCC3c2ngNtgX9lrRj6rTdZ5oPqy8EGk3HoMl5
-         1T/eiX2OPYqmP4XZTLLVww+tcR7fStMOi8dLK8vqJWVh7ZP+le6bsKnVk10pb+a6yz5q
-         YZ6BqE+TmNp7lAeueipYNKw7Oa3XYqUGTjD4klXZSzIuPbZsIfZLGbSuSDyASRFStdPR
-         NuYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHqMdq2n4iL/wUX2PurrMkBcriOG6BizJJ/1VUldAIKb9Mt28rw+6PD1sRBzcbRt9jhtqNmdHMipLrWLubIYgAPuIw
-X-Gm-Message-State: AOJu0Yz/DI4TQbJRDq01i+smGUfzEreYynBFbDHg43O05wcv5P+kgnh3
-	oz6zETN5LdHuACTM93AKqgKUomJJy0X37mpyYPHHZIOutS8b9k4d1iQ8lQdfcU+lguONQaZ1w7N
-	ATw5axhhxSv68b/WLx2PpSRCd5HSp3ZKFgyJwRZ2hsovTLdchO5nB5/qb8yq0bHtEBi3APYxu0O
-	qrt7U0rSdqtjj0H+/ATTQUH/f3
-X-Received: by 2002:a05:690c:4710:b0:651:6e6f:32d2 with SMTP id 00721157ae682-6ac9a4787c2mr61877257b3.43.1723730902726;
-        Thu, 15 Aug 2024 07:08:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFT7vDXefVC4Et5zdVF0bwaa4s7FPKN+0th/aIjv2bWaCiNvtKshmdfN94YlL0srm5N1LZPSBnK/+GCQt+WDjs=
-X-Received: by 2002:a05:690c:4710:b0:651:6e6f:32d2 with SMTP id
- 00721157ae682-6ac9a4787c2mr61876777b3.43.1723730902291; Thu, 15 Aug 2024
- 07:08:22 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1723730945; x=1724335745;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qIvQlh/LEmcc/D/obNuZ6E+YY/ClqP2nQTGGm+92/XA=;
+        b=PZ0Jc6NYEUPDa6tr1uMLBsNtTTpA8LBG4NAxzArxNCOFskX3DiU6jWmoS5LV0Gndhj
+         KANphoHKQwG5E3CzzK6PvqBVPCjaXnrXrhgCnkqb7Tegu0/FQkXinr993q4J4CzHPVd9
+         wcrc2LxcCtuSdkEVOZGJ4oB/FHzcFRMgSurEhcTdVhEotuc9r819z5jZw9g15iqguf8b
+         ysiCaum2XgQMp/qqxx7CmosPO2S8t7EnZaFGPmdfWmHKXMOwQ+jTRCRP17atU5r5b7n1
+         X/5mmoIq0iDGc5jjcAhzn6x4ZB68+Oy1VX/0BokkM7awP4Wg44ke+JZ+4S17W09H5X9H
+         7M+w==
+X-Gm-Message-State: AOJu0Yz1WnJbGIWGxp7ndXa42Tuh4reVHMU7uIzHfplwwYya5ajbWIFA
+	Ns5riBQKfuNdYNDx99HR94mk0sjWta3c5q7mcYMMaQL5fHjw2hAXpiefc1omy6XemFD+M3Yh6ml
+	h2w==
+X-Google-Smtp-Source: AGHT+IF6xQQzYTHNueQz5cB9KMs+14iCDwXd48e2Sh7vGWOyT8D00eLV92GkWwL3v1SLnd0khMovT1/aszU=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:2783:0:b0:e05:eccb:95dc with SMTP id
+ 3f1490d57ef6-e1155aa6f02mr27854276.6.1723730945293; Thu, 15 Aug 2024 07:09:05
+ -0700 (PDT)
+Date: Thu, 15 Aug 2024 07:09:03 -0700
+In-Reply-To: <e50240f9-a476-4ace-86aa-f2fd33fbe320@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240806173119.582857-1-crosa@redhat.com> <20240806173119.582857-10-crosa@redhat.com>
- <1f645137-c621-4fa3-ace0-415087267a7b@redhat.com>
-In-Reply-To: <1f645137-c621-4fa3-ace0-415087267a7b@redhat.com>
-From: Cleber Rosa <crosa@redhat.com>
-Date: Thu, 15 Aug 2024 10:08:11 -0400
-Message-ID: <CA+bd_6LTqGbx2+GOyYHyJ4d5gpg4v8Ddx5apjghiB0vjt8Abhg@mail.gmail.com>
-Subject: Re: [PATCH v2 9/9] Avocado tests: allow for parallel execution of tests
-To: Thomas Huth <thuth@redhat.com>
-Cc: qemu-devel@nongnu.org, Marcin Juszkiewicz <marcin.juszkiewicz@linaro.org>, 
-	Pavel Dovgalyuk <pavel.dovgaluk@ispras.ru>, Radoslaw Biernacki <rad@semihalf.com>, 
-	Troy Lee <leetroy@gmail.com>, Akihiko Odaki <akihiko.odaki@daynix.com>, 
-	Beraldo Leal <bleal@redhat.com>, kvm@vger.kernel.org, Joel Stanley <joel@jms.id.au>, 
-	Paolo Bonzini <pbonzini@redhat.com>, =?UTF-8?Q?Philippe_Mathieu=2DDaud=C3=A9?= <philmd@linaro.org>, 
-	Aurelien Jarno <aurelien@aurel32.net>, Sriram Yagnaraman <sriram.yagnaraman@ericsson.com>, 
-	=?UTF-8?Q?C=C3=A9dric_Le_Goater?= <clg@kaod.org>, Paul Durrant <paul@xen.org>, 
-	Eric Auger <eric.auger@redhat.com>, David Woodhouse <dwmw2@infradead.org>, qemu-arm@nongnu.org, 
-	Andrew Jeffery <andrew@codeconstruct.com.au>, Jamin Lin <jamin_lin@aspeedtech.com>, 
-	Steven Lee <steven_lee@aspeedtech.com>, Peter Maydell <peter.maydell@linaro.org>, 
-	Yoshinori Sato <ysato@users.sourceforge.jp>, 
-	Wainer dos Santos Moschetta <wainersm@redhat.com>, =?UTF-8?B?QWxleCBCZW5uw6ll?= <alex.bennee@linaro.org>, 
-	Leif Lindholm <quic_llindhol@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+References: <20240809190319.1710470-1-seanjc@google.com> <20240809190319.1710470-10-seanjc@google.com>
+ <e50240f9-a476-4ace-86aa-f2fd33fbe320@redhat.com>
+Message-ID: <Zr4L_4dzZl-qa3xu@google.com>
+Subject: Re: [PATCH 09/22] KVM: x86/mmu: Try "unprotect for retry" iff there
+ are indirect SPs
+From: Sean Christopherson <seanjc@google.com>
+To: Paolo Bonzini <pbonzini@redhat.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Peter Gonda <pgonda@google.com>, Michael Roth <michael.roth@amd.com>, 
+	Vishal Annapurve <vannapurve@google.com>, Ackerly Tng <ackerleytng@google.com>
+Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Aug 12, 2024 at 6:17=E2=80=AFAM Thomas Huth <thuth@redhat.com> wrot=
-e:
-> ...
-> > diff --git a/tests/Makefile.include b/tests/Makefile.include
-> > index 537804d101..545b5155f9 100644
-> > --- a/tests/Makefile.include
-> > +++ b/tests/Makefile.include
-> > @@ -94,6 +94,9 @@ TESTS_RESULTS_DIR=3D$(BUILD_DIR)/tests/results
-> >   ifndef AVOCADO_TESTS
-> >       AVOCADO_TESTS=3Dtests/avocado
-> >   endif
-> > +ifndef AVOCADO_PARALLEL
-> > +     AVOCADO_PARALLEL=3D1
-> > +endif
-> >   # Controls the output generated by Avocado when running tests.
-> >   # Any number of command separated loggers are accepted.  For more
-> >   # information please refer to "avocado --help".
-> > @@ -141,7 +144,8 @@ check-avocado: check-venv $(TESTS_RESULTS_DIR) get-=
-vm-images
-> >               --show=3D$(AVOCADO_SHOW) run --job-results-dir=3D$(TESTS_=
-RESULTS_DIR) \
-> >               $(if $(AVOCADO_TAGS),, --filter-by-tags-include-empty \
-> >                       --filter-by-tags-include-empty-key) \
-> > -            $(AVOCADO_CMDLINE_TAGS) --max-parallel-tasks=3D1 \
-> > +            $(AVOCADO_CMDLINE_TAGS) --max-parallel-tasks=3D$(AVOCADO_P=
-ARALLEL) \
-> > +                     -p timeout_factor=3D$(AVOCADO_PARALLEL) \
-> >               $(if $(GITLAB_CI),,--failfast) $(AVOCADO_TESTS), \
-> >               "AVOCADO", "tests/avocado")
->
-> I think it was nicer in the previous attempt to bump the avocado version:
->
-> https://gitlab.com/qemu-project/qemu/-/commit/ec5ffa0056389c3c10ea2de1e78=
-3
->
-> This re-used the "-j" option from "make", so you could do "make -j$(nproc=
-)
-> check-avocado" just like with the other "check" targets.
->
+On Wed, Aug 14, 2024, Paolo Bonzini wrote:
+> On 8/9/24 21:03, Sean Christopherson wrote:
+> > Try to unprotect shadow pages if and only if indirect_shadow_pages is non-
+> > zero, i.e. iff there is at least one protected such shadow page.  Pre-
+> > checking indirect_shadow_pages avoids taking mmu_lock for write when the
+> > gfn is write-protected by a third party, i.e. not for KVM shadow paging,
+> > and in the *extremely* unlikely case that a different task has already
+> > unprotected the last shadow page.
+> > 
+> > Signed-off-by: Sean Christopherson <seanjc@google.com>
+> > ---
+> >   arch/x86/kvm/mmu/mmu.c | 3 +++
+> >   1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+> > index 09a42dc1fe5a..358294889baa 100644
+> > --- a/arch/x86/kvm/mmu/mmu.c
+> > +++ b/arch/x86/kvm/mmu/mmu.c
+> > @@ -2736,6 +2736,9 @@ bool kvm_mmu_unprotect_gfn_and_retry(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa)
+> >   	gpa_t gpa = cr2_or_gpa;
+> >   	bool r;
+> > +	if (!vcpu->kvm->arch.indirect_shadow_pages)
+> > +		return false;
+> 
+> indirect_shadow_pages is accessed without a lock, so here please add a note
+> that, while it may be stale, a false negative will only cause KVM to skip
+> the "unprotect and retry" optimization.
 
-Hi Thomas,
+Correct, I'll add a comment.
 
-I can see why it looks better, but in practice, I'm not getting the
-best behavior with such a change.
+> (This is preexisting in reexecute_instruction() and goes away in patch 18, if
+> I'm pre-reading that part of the series correctly).
+> 
+> Bonus points for opportunistically adding a READ_ONCE() here and in
+> kvm_mmu_track_write().
 
-First, the fact that it enables the parallelization by default, while
-there still seems to be issues with test timeout issues, and even
-existing races between tests (which this series tried to address as
-much as possible) will not result in the best experience IMO.  On my
-12 core machine, and also on GitLab CI, having 4 tests running in
-parallel gets a nice speed up (as others have reported) while still
-being very stable.
+Hmm, right, this one should have a READ_ONCE(), but I don't see any reason to
+add one in kvm_mmu_track_write().  If the compiler was crazy and generate multiple
+loads between the smp_mb() and write_lock(), _and_ the value transitioned from
+1->0, reading '0' on the second go is totally fine because it means the last
+shadow page was zapped.  Amusingly, it'd actually be "better" in that it would
+avoid unnecessary taking mmu_lock.
 
-I'd say making the number of parallel tests equal to `nproc` is best
-kept for a future round.
+Practically speaking, the compiler would have to be broken to generate multiple
+loads in the 0->1 case, as that would mean the generated code loaded the value
+but ignored the result.  But even if that were to happen, a final read of '1' is
+again a-ok.
 
-Let me know if this sounds reasonable to you.
+This code is different because a READ_ONCE() would ensure that indirect_shadow_pages
+isn't reloaded for every check.  Though that too would be functionally ok, just
+weird.
 
-Regards,
-- Cleber.
-
->   Thomas
->
-
+Obviously the READ_ONCE() would be harmless, but IMO it would be more confusing
+than helpful, e.g. would beg the question of why kvm_vcpu_exit_request() doesn't
+wrap vcpu->mode with READ_ONCE().  Heh, though arguably vcpu->mode should be
+wrapped with READ_ONCE() since it's a helper and could be called multiple times
+without any code in between that would guarantee a reload.
 
