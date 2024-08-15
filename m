@@ -1,135 +1,109 @@
-Return-Path: <kvm+bounces-24268-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24269-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C7089535A2
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:40:11 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14AE29535D7
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:43:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AEF71C25262
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 14:40:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEF111F25342
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 14:43:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDE91A08C6;
-	Thu, 15 Aug 2024 14:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2A31AB51B;
+	Thu, 15 Aug 2024 14:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3QdljX/+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YhjXKMVy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C372D19FA9D
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 14:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9160F1A3BD0
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 14:41:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723732801; cv=none; b=ccyv/ssiEnKiKZ0zX0LuJ5//radcjC62iNBhSpdxAnhNIxlY9fU38BUSgCZpuLdrxnRqumGaL9Q07nV7jSET0Qs3IcsCFm7Axe+pIHdABrTxMzt9JAoKPEH9MMYoZqgsOF9knXhkVW8LAJir1bmfmWvwOL7LyOWYcOKndsknr8k=
+	t=1723732908; cv=none; b=hsjYpJdgNM6YCWaNEaikP/hTcLsE3fqA/gnWbJz29GWqQ9QFXQd8imSV7d09pUouLTf+Dcek4ZjnAfXuBeTqXp58uAyVsbUG6QcU/RH99FUrDxWyYheh0skMyskvuDtndPgZo+qg8Tq4WHqfDjRKV9nmhA9MyPklx0Uz7A02hTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723732801; c=relaxed/simple;
-	bh=WPQTMYfsOfAymfXre3RJj6ZP8YMqHZV3gvzZQKZNjQM=;
+	s=arc-20240116; t=1723732908; c=relaxed/simple;
+	bh=V8QdjGFb8F+F+uBmy8H9NtHYvs5qGYjs+alfqKY+Mes=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tKK+SY0qLQRMNfDuoXISXGBUa2ZQVA1zLCljg2aiaZ9JO2zVHYxsmGaCxorp03q34dO+mQw0FA6UPLFIRIsYm/Ej7YtiB2lTAHiOjoOq4SYfyRogBcYd7E/EWKpPpuSU1P2jtPl5EpyI017ArWWX5/NXAH/l6VYVpJbxExtDNvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3QdljX/+; arc=none smtp.client-ip=209.85.215.202
+	 To:Cc:Content-Type; b=Fs0m5BRarF7yZlCiQLgMUGbv+yknHuUX9WNEL/OyKZC4kPuhi+OA4T+cuIg/fCzlafwwr/ZGekif2Xsnc8VpVYifGVmdNk6aQhsXV8qs7LeveWY7L4u597DeGcllsQKAUW0bDeF+HAD5PpxYmxpYyU2jo8XtvvZ4Q8cgwxoW8cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YhjXKMVy; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-721d20a0807so946870a12.1
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 07:39:59 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6adcb88da08so20691757b3.3
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 07:41:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723732799; x=1724337599; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=cpqWW/QzIPoV5K+iQm5YrEqDbkkjx2cyk1LgXuzath0=;
-        b=3QdljX/+jhBj5Rt4vfNgiOgvOK+9W1kbc317kjASVKa9ve1HZxBce663R0PwF606Gc
-         g2XCYUrEhBzgEN72bC5ledsf4qfp5zElG8rjfMtUgt0aK0hzSie9jYHuXUTird2IqeQ5
-         kMEbdes/OLpB4JQkgqo0DMiS98igy+9ehDtoe5d+4dtaKmOV3Kx/otUJvFAgW465nrqy
-         UJyjpZyrmUVugQkla0WxAjPHYRheKZJH0rueLQdm9CwbX1ycOFna+PZ6rt3UmK292LdK
-         K+zvf5zA9W1Xjb35N/QVvBano1yweJV5EOhh7esyB4VDmkDzeZEPnA6U11zajQZLxCfB
-         XPZw==
+        d=google.com; s=20230601; t=1723732905; x=1724337705; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=V8QdjGFb8F+F+uBmy8H9NtHYvs5qGYjs+alfqKY+Mes=;
+        b=YhjXKMVy3wL4n/6wI9utVm7rRSlM+4+a2pwbZkfplXGRZEFOtkAkjj854VfCrFJwjl
+         Hold8vOKYyeFUnxE/VpUFqqvCa0lzSnlpo5PTj9Cp6chpL/qsFxmrcJlG4/FVOxy6Rv0
+         bs7RBZOpC0vNtzgrcm8AwiN9n5vqVbQQa1Ku3v/WTCtGmGPY66otH083I95ZMZsxPCDH
+         7R3QSo+UVbKH/OVit1NikJNS7AZPCuicWA7NY3shBpNzi8u95OD/QVw8HRi07vyV88Ax
+         y6xieO84SetyFfeaZojUBgHUAJGR8sKrZo6WK6WF7E4n+GDSuy0q+pcadE/Xf4RFh30p
+         h6xA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723732799; x=1724337599;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cpqWW/QzIPoV5K+iQm5YrEqDbkkjx2cyk1LgXuzath0=;
-        b=MeBcayW86jube08LR7kuJudCjmGhZJOTXgWN1Moiolgic1JMJ6pnm6yvZ0sjr4GNZq
-         DXaFILgOTQOesuDAg6V+IWe9bDe1Nczm1J7AmVjTmc3lyzT8YUGEatw9PFi641MXWdW+
-         88VN6hIdts1i3u7cLIAAP1uuPcc6CVak7fCjFRKovUYzxnO6iBkviSN2GV9izPbkqJ6z
-         QHepJq2ZTG5JfJ/eQUjdNtF3r3ZLRuMWcSOICSsaj5/C2tAewbLsu2o/HLvJlZ4r5wgJ
-         uF/8DITPNirznmsisDSlN1O9KmusQBn3z6++TwJZS+NR/5hhjP6bOvPNGTiRb8TqD1us
-         no8g==
-X-Gm-Message-State: AOJu0YxC2TmeiEnvHEb9ZqgypS46b/vMJuREeqkHSaUGaJ2Chd3ld5Wf
-	9LR6x4QzWoqRTWDG/4DgBS96ZA4idCmoGZHrQ+CPU4d2i3df6eTX9lE1do3tNaZ8ZXg4gXv9F2i
-	meA==
-X-Google-Smtp-Source: AGHT+IFEkrnB4JXT6Dloh0C8+5/5YiZ42TL3t1XJbDSuXuEFFIc1s/Cjqy56yZFXsju+XxkBWgC8I/2rLr4=
+        d=1e100.net; s=20230601; t=1723732905; x=1724337705;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=V8QdjGFb8F+F+uBmy8H9NtHYvs5qGYjs+alfqKY+Mes=;
+        b=Ni4I58N6SLqeZ6doTMV4VFupLZkg1WCToqt9t6cdUzCvDJhGzZX3rgb0+t7Arky5uC
+         OhVmL2fj6XVLQ4OfyFgb0twCWHuI3pCBwHKV4lbnsTHo6TEUrElDYPtXjnoswkHgE1kQ
+         fhergz6AI9HpKqlYQUNX8LgCjLAe8e25+s2efk3YFAwXzqpr5+Yoss04GHcWB+kuLsEo
+         1WEZks+6yYOHRYacvXxslpRZT3196GrHn0sbOkXp6vw0q+Z/DvOcGfyiG5D76YV8DDTr
+         BpqlgLWUcGRpvZs6yIdYB+AyAddRwMHms46hSghkTgQcd3Pl9k5uMb6FCCYmQsgb6Pto
+         yj5g==
+X-Forwarded-Encrypted: i=1; AJvYcCUsqeYHc2rwjxcfpX7l+s2H/l+RI6v7gucK77lU3yFhaSEl65gIknFTroiOyuRLhcLnNqMc5ji/PuT2DgFh0lGX5SGg
+X-Gm-Message-State: AOJu0YxdMSjXTEVaKKOFo4DpGJdE+iabff+CDKhffJN5GGJ+eXvf2soP
+	IjAexAQO+9M+0b7yFwcmwCr9nWL0YJ+TVkpSSKY2lqnCSpl6iTmofAociNKtAencziM+j9/CY/8
+	nYg==
+X-Google-Smtp-Source: AGHT+IFSiCB9jnN8MHCdZgXQSjJCqbcr/Subh+gxUDVsexDTlSRc3K/rXclSfcwq3ddq5WwRJAk3mZhT5yM=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:725a:0:b0:7c1:89ee:a9d0 with SMTP id
- 41be03b00d2f7-7c6a54b35a3mr11260a12.0.1723732798726; Thu, 15 Aug 2024
- 07:39:58 -0700 (PDT)
-Date: Thu, 15 Aug 2024 07:39:57 -0700
-In-Reply-To: <efb9af41-21ed-4b97-8c67-40d6cda10484@redhat.com>
+ (user=seanjc job=sendgmr) by 2002:a81:5cd4:0:b0:64a:d1b0:4f24 with SMTP id
+ 00721157ae682-6ac9b002b3dmr1171957b3.7.1723732905559; Thu, 15 Aug 2024
+ 07:41:45 -0700 (PDT)
+Date: Thu, 15 Aug 2024 07:41:44 -0700
+In-Reply-To: <cc44c0da-4f9f-456f-84e5-87bd4fa47af6@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240608000639.3295768-1-seanjc@google.com> <20240608000639.3295768-2-seanjc@google.com>
- <efb9af41-21ed-4b97-8c67-40d6cda10484@redhat.com>
-Message-ID: <Zr4TPVQ_SNEKyfUz@google.com>
-Subject: Re: [PATCH v3 1/8] KVM: Use dedicated mutex to protect
- kvm_usage_count to avoid deadlock
+References: <20240608000639.3295768-1-seanjc@google.com> <e8db3e58-38de-47d4-ac6c-08408f9aaa10@redhat.com>
+ <cc44c0da-4f9f-456f-84e5-87bd4fa47af6@intel.com>
+Message-ID: <Zr4TqH9dYk0BbGkd@google.com>
+Subject: Re: [PATCH v3 0/8] KVM: Register cpuhp/syscore callbacks when
+ enabling virt
 From: Sean Christopherson <seanjc@google.com>
-To: Paolo Bonzini <pbonzini@redhat.com>
-Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Chao Gao <chao.gao@intel.com>, Kai Huang <kai.huang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+To: Kai Huang <kai.huang@intel.com>
+Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Chao Gao <chao.gao@intel.com>, Marc Zyngier <Marc.Zyngier@arm.com>, 
+	Anup Patel <Anup.Patel@wdc.com>, Huacai Chen <chenhuacai@kernel.org>, 
+	Oliver Upton <oupton@google.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Aug 14, 2024, Paolo Bonzini wrote:
-> On 6/8/24 02:06, Sean Christopherson wrote:
-> > Use a dedicated mutex to guard kvm_usage_count to fix a potential deadlock
-> > on x86 due to a chain of locks and SRCU synchronizations.  Translating the
-> > below lockdep splat, CPU1 #6 will wait on CPU0 #1, CPU0 #8 will wait on
-> > CPU2 #3, and CPU2 #7 will wait on CPU1 #4 (if there's a writer, due to the
-> > fairness of r/w semaphores).
-> > 
-> >      CPU0                     CPU1                     CPU2
-> > 1   lock(&kvm->slots_lock);
-> > 2                                                     lock(&vcpu->mutex);
-> > 3                                                     lock(&kvm->srcu);
-> > 4                            lock(cpu_hotplug_lock);
-> > 5                            lock(kvm_lock);
-> > 6                            lock(&kvm->slots_lock);
-> > 7                                                     lock(cpu_hotplug_lock);
-> > 8   sync(&kvm->srcu);
-> > 
-> > Note, there are likely more potential deadlocks in KVM x86, e.g. the same
-> > pattern of taking cpu_hotplug_lock outside of kvm_lock likely exists with
-> > __kvmclock_cpufreq_notifier()
-> 
-> Offhand I couldn't see any places where {,__}cpufreq_driver_target() is
-> called within cpus_read_lock().  I didn't look too closely though.
+On Thu, Aug 15, 2024, Kai Huang wrote:
+>=20
+> > Also placed in kvm/queue, mostly as a reminder to myself, and added
+> > other maintainers for testing on ARM, RISC-V and LoongArch.=C2=A0 The c=
+hanges
+> > from v3 to v4 should be mostly nits, documentation and organization of
+> > the series.
+> >=20
+>=20
+> Also another reminder:
+>=20
+> Could you also remove the WARN_ON() in kvm_uninit_virtualization() so tha=
+t
+> we can allow additional kvm_disable_virtualization() after that for TDX?
 
-Aha!  I think I finally found it and it's rather obvious now that I've found it.
-I looked quite deeply on multiple occasions in the past and never found such a
-case, but I could've sworn someone (Kai?) report a lockdep splat related to the
-cpufreq stuff when I did the big generic hardware enabling a while back.  Of
-course, I couldn't find that either :-)
-
-Anyways...
-
-  cpuhp_cpufreq_online()
-  |
-  -> cpufreq_online()
-     |
-     -> cpufreq_gov_performance_limits()
-        |
-        -> __cpufreq_driver_target()
-           |
-           -> __target_index()
-
-> 
-> > +``kvm_usage_count``
-> > +^^^^^^^^^^^^^^^^^^^
-> 
-> ``kvm_usage_lock``
-
-Good job me.
+Yeah, I'll take care of that in v4 (as above, Paolo put this in kvm/queue a=
+s a
+placeholder of sorts).
 
