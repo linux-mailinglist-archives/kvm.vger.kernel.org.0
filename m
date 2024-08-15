@@ -1,332 +1,210 @@
-Return-Path: <kvm+bounces-24327-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24328-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F9E953A0A
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 20:30:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6CB3953A5D
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 20:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A788B24563
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:30:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8FF31C230F3
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B5313CFAA;
-	Thu, 15 Aug 2024 18:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4EEF679E5;
+	Thu, 15 Aug 2024 18:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OcvS3ZMQ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K80YGl4I"
 X-Original-To: kvm@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C47513C909;
-	Thu, 15 Aug 2024 18:28:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07F6538382
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 18:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723746524; cv=none; b=fYoawLCwLWj4A9nVITT7rLLcx+7tE/JzenpIZQEOVeZP7t5oJdummfVFoPV/sdzfiORoM/mzVGRlp7WcmTzd8BZBH9XS1vRc5LLeTlsnK9paKRob/0r8Lx54jU/+A+qw9LtOBPnqWCK4BbI60j/g1sOTj8Puk1xlVtEUjEZmUek=
+	t=1723747984; cv=none; b=Ixt+467YKPLdYWXRSJdbijrhNFSeW/TsyAMinHEHEu3VmQfq1srgFb++HhQRxW0L4DaLXBeQAKMvr4bQm/uix932K/yJGpvx0n82FKCRDwxH9MhqWPqSMyQuNxxRoooFCGYOoGmDr3J1ISjVTZ8/Kyx1/dHSmALGFx3kBmeXHWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723746524; c=relaxed/simple;
-	bh=TnkEmfIWsIecDCCRKfcH9H2UtA9GK9Cl/t13FaOmFOg=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gJnIUP+RlQgpVkKFiqE29ZqehSXA4QfDOf4No6qcI0T+sQ+WuXsii07hoS66xSNZS5ym2nQMXdl2kDrlXtpVOvR1aJvIDt8X3SzAPUrFQYoXJSEQRq8bgafYLUjvWtxYxZWZllAIrnDBIevJlbSzOZwUBZDGKLzmuj9BUqy8yO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OcvS3ZMQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 052A7C4AF09;
-	Thu, 15 Aug 2024 18:28:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1723746524;
-	bh=TnkEmfIWsIecDCCRKfcH9H2UtA9GK9Cl/t13FaOmFOg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OcvS3ZMQiPNZfUqEYoW7vLYM3MpmYSz2RCqvTTtYppOpqLMDmc5rshwEbsygQpM47
-	 JfaIFFX4xql2E5P1KrZUuqttI8aucpQQZFIUObiilfjpbLvX+hnnLQb+NP5we7djqK
-	 7T4NJ6iLfAvTEj5dZiaNjroBnQOagFjIy2ZLjeYbHrdIU0CkOXQKICtak25ZheGVxd
-	 RYCvThg+qxg+ku6DYaVKJzAore1DFGnx7pA3+CV6z6kusaeRxf2rgUFKi5VryAd0fy
-	 /GjGbrwh17DGMWzeiHoKvv7Yrjzp2ZC7DbddOGf3gUij92WKEjskzw0/Hq7f6BBcJd
-	 UQTPAznhY/9ZA==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1sefDF-0042zX-JH;
-	Thu, 15 Aug 2024 19:28:41 +0100
-Date: Thu, 15 Aug 2024 19:28:41 +0100
-Message-ID: <86msldzlly.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Alexandru Elisei <alexandru.elisei@arm.com>
-Cc: kvmarm@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org,
-	James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>,
-	Joey Gouly <joey.gouly@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1 emulation
-In-Reply-To: <Zr4wUj5mpKkwMyCq@raptor>
-References: <20240813100540.1955263-1-maz@kernel.org>
-	<20240813100540.1955263-15-maz@kernel.org>
-	<Zr4wUj5mpKkwMyCq@raptor>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1723747984; c=relaxed/simple;
+	bh=ZSNQwCwNatoyo2l0AzrYpXBqkxgsmHz1umBeGb87XZ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VtyThV2beg637bvtMH+Ad1sENoBmE0/MxwHQM0Aw7ppCI7ra/it3ze7ScYtsSrRSv/ZxAFnBoPmilTOUbGwu5a8KJONXDYczrW3EWqKglef1CUlwgXdUNuP97hA19GfUKT34kzcxLYQuTf4loNLyJSy2l/1UM5cxe01lZ9Iuz7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K80YGl4I; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723747981;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=IhERV/jL6UlsHTgwO0rZfirsXuvPDZ9y+GMqTvo5SLU=;
+	b=K80YGl4IGjW0cw1lj47lV/mkgA3OCduiNbUhw5VC/HUsG0jRaE2Q2HifVTntY0+v//72bX
+	JJgqcJc7yh5lQjarXQmwLAG6dI3h0/wEZp1GnF4bF3/g4meHiIumfZ1GdIMYpkmbPkpp92
+	aRTD//TeYhCtatd0J4aRBg4JJZSetsY=
+Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com
+ [209.85.217.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-651-4KZs5YL_MiSCQz1l0LYmSQ-1; Thu, 15 Aug 2024 14:53:00 -0400
+X-MC-Unique: 4KZs5YL_MiSCQz1l0LYmSQ-1
+Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-4929ba5f7f4so30381137.3
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 11:53:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723747980; x=1724352780;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IhERV/jL6UlsHTgwO0rZfirsXuvPDZ9y+GMqTvo5SLU=;
+        b=pf1Fr2e8lIh2H18qn483LdyE9CPGU6eOde21Lx6C9sAxB6wv71WF7MHGrYZWBXbe7e
+         S5hL3P4dQsNJZujfvOprKsEq4x6JEdkmgNk5cqy+IZ1IX5G42JS1gvcgR81xwbgcLEBb
+         t6GhNppnRO3jo6JBAlIdq3j539sLddJypIwq8WjRMR0bItjT7hDgzI9SHDie5iiJDGB6
+         9AJVzVOXRhq6SA0jpX5ybk15Tok3j7jGKZBZLdHoHxqNl7rM+IwOqkwHC5AwG6qYL4WD
+         TCIhWjZSP5Kl3/8o/slOtfFRmwEp8/5nf3Am5UJq0pskGHG5i1c7oN0ACorOy77beO6B
+         qzmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWUhGOC/UwI83XQcfnfrGgO4YyJ1vyswgEg1+JVbw32QdJQpQPS5cUvgLU9pJJulCAIiLY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9aVmqe6Prgt8eTUXaAXmDh4vOgpblAjpl8bYMIh/26W+DMUGg
+	3s+/jCTT1Whl9GuCAHEq5ISjbeJJ19jDV9dXwrTJRgNSl6nFuWJ5mfK8zmsALvGaQp1zSE89pXj
+	tnFt8qOn0G4rrf4QWP+5qyQo3IwJT8JiUU80myhAwwp7ZEFE+Aw==
+X-Received: by 2002:a05:6102:cc7:b0:48d:aced:abff with SMTP id ada2fe7eead31-497798dde56mr529540137.1.1723747980116;
+        Thu, 15 Aug 2024 11:53:00 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IH5mqFNb1PXl4pf/EBUVsWqezNxIo7H5nHPjHSbbxlg0TjpV2kIgUEe/oeqxt6K3fJhgIgYNg==
+X-Received: by 2002:a05:6102:cc7:b0:48d:aced:abff with SMTP id ada2fe7eead31-497798dde56mr529525137.1.1723747979713;
+        Thu, 15 Aug 2024 11:52:59 -0700 (PDT)
+Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7a4ff105fe3sm88156085a.109.2024.08.15.11.52.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 15 Aug 2024 11:52:59 -0700 (PDT)
+Date: Thu, 15 Aug 2024 14:52:56 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Borislav Petkov <bp@alien8.de>,
+	David Hildenbrand <david@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH 09/19] mm: New follow_pfnmap API
+Message-ID: <Zr5OiOqvkv2Fr8dp@x1n>
+References: <20240809160909.1023470-1-peterx@redhat.com>
+ <20240809160909.1023470-10-peterx@redhat.com>
+ <20240814131954.GK2032816@nvidia.com>
+ <Zrz2b82-Z31h4Suy@x1n>
+ <20240814221441.GB2032816@nvidia.com>
+ <Zr4hs8AGbPRlieY4@x1n>
+ <20240815161603.GH2032816@nvidia.com>
+ <Zr44_VE_Z0qbH0yT@x1n>
+ <20240815172445.GK2032816@nvidia.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240815172445.GK2032816@nvidia.com>
 
-
-Hi Alex,
-
-On Thu, 15 Aug 2024 17:44:02 +0100,
-Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-
-[..]
-
-> > +static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
-> > +			 struct s1_walk_result *wr, u64 va)
-> > +{
-> > +	u64 sctlr, tcr, tg, ps, ia_bits, ttbr;
-> > +	unsigned int stride, x;
-> > +	bool va55, tbi, lva, as_el0;
-> > +
-> > +	wi->regime = compute_translation_regime(vcpu, op);
-> > +	as_el0 = (op == OP_AT_S1E0R || op == OP_AT_S1E0W);
-> > +
-> > +	va55 = va & BIT(55);
-> > +
-> > +	if (wi->regime == TR_EL2 && va55)
-> > +		goto addrsz;
-> > +
-> > +	wi->s2 = (wi->regime == TR_EL10 &&
-> > +		  (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_VM | HCR_DC)));
+On Thu, Aug 15, 2024 at 02:24:45PM -0300, Jason Gunthorpe wrote:
+> On Thu, Aug 15, 2024 at 01:21:01PM -0400, Peter Xu wrote:
+> > > Why? Either the function only returns PFN map no-struct page things or
+> > > it returns struct page stuff too, in which case why bother to check
+> > > the VMA flags if the caller already has to be correct for struct page
+> > > backed results?
+> > > 
+> > > This function is only safe to use under the proper locking, and under
+> > > those rules it doesn't matter at all what the result is..
+> > 
+> > Do you mean we should drop the PFNMAP|IO check?
 > 
-> This could be written on one line if there were a local variable for the HCR_EL2
-> register (which is already read multiple times in the function).
-
-Sure thing.
-
-[...]
-
-> > +	/* Let's put the MMU disabled case aside immediately */
-> > +	switch (wi->regime) {
-> > +	case TR_EL10:
-> > +		/*
-> > +		 * If dealing with the EL1&0 translation regime, 3 things
-> > +		 * can disable the S1 translation:
-> > +		 *
-> > +		 * - HCR_EL2.DC = 1
-> > +		 * - HCR_EL2.{E2H,TGE} = {0,1}
-> > +		 * - SCTLR_EL1.M = 0
-> > +		 *
-> > +		 * The TGE part is interesting. If we have decided that this
-> > +		 * is EL1&0, then it means that either {E2H,TGE} == {1,0} or
-> > +		 * {0,x}, and we only need to test for TGE == 1.
-> > +		 */
-> > +		if (__vcpu_sys_reg(vcpu, HCR_EL2) & (HCR_DC | HCR_TGE))
-> > +			wr->level = S1_MMU_DISABLED;
+> Yeah
 > 
-> There's no need to fallthrough and check SCTLR_ELx.M if the MMU disabled check
-> here is true.
-
-I'm not sure it makes the code more readable. But if you do, why not.
-
-[...]
-
-> > +	/* Someone was silly enough to encode TG0/TG1 differently */
-> > +	if (va55) {
-> > +		wi->txsz = FIELD_GET(TCR_T1SZ_MASK, tcr);
-> > +		tg = FIELD_GET(TCR_TG1_MASK, tcr);
-> > +
-> > +		switch (tg << TCR_TG1_SHIFT) {
-> > +		case TCR_TG1_4K:
-> > +			wi->pgshift = 12;	 break;
-> > +		case TCR_TG1_16K:
-> > +			wi->pgshift = 14;	 break;
-> > +		case TCR_TG1_64K:
-> > +		default:	    /* IMPDEF: treat any other value as 64k */
-> > +			wi->pgshift = 16;	 break;
-> > +		}
+> >  I didn't see all the
+> > callers to say that they won't rely on proper failing of !PFNMAP&&!IO vmas
+> > to work alright.  So I assume we should definitely keep them around.
 > 
-> Just a thought, wi->pgshift is used in several places to identify the guest page
-> size, might be useful to have something like PAGE_SHIFT_{4K,16K,64K}. That would
-> also make its usage consistent, because in some places wi->pgshift is compared
-> directly to 12, 14 or 16, in other places the page size is computed from
-> wi->pgshift and compared to SZ_4K, SZ_16K or SZ_64K.
+> But as before, if we care about this we should be using vm_normal_page
+> as that is sort of abusing the PFNMAP flags.
 
-I only found a single place where we compare wi->pgshift to a
-non-symbolic integer (as part of the R_YXNYW handling). Everywhere
-else, we use BIT(wi->pgshift) and compare it to SZ_*K. We moved away
-from the various PAGE_SHIFT_* macros some years ago, and I don't think
-we want them back.
+I can't say it's abusing..  Taking access_remote_vm() as example again, it
+can go back as far as 2008 with Rik's commit here:
 
-What I can do is to convert the places where we init pgshift to use an
-explicit size using const_ilog2():
+    commit 28b2ee20c7cba812b6f2ccf6d722cf86d00a84dc
+    Author: Rik van Riel <riel@redhat.com>
+    Date:   Wed Jul 23 21:27:05 2008 -0700
 
-@@ -185,12 +188,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 
- 		switch (tg << TCR_TG1_SHIFT) {
- 		case TCR_TG1_4K:
--			wi->pgshift = 12;	 break;
-+			wi->pgshift = const_ilog2(SZ_4K);	 break;
- 		case TCR_TG1_16K:
--			wi->pgshift = 14;	 break;
-+			wi->pgshift = const_ilog2(SZ_16K);	 break;
- 		case TCR_TG1_64K:
- 		default:	    /* IMPDEF: treat any other value as 64k */
--			wi->pgshift = 16;	 break;
-+			wi->pgshift = const_ilog2(SZ_64K);	 break;
- 		}
- 	} else {
- 		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-@@ -198,12 +201,12 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 
- 		switch (tg << TCR_TG0_SHIFT) {
- 		case TCR_TG0_4K:
--			wi->pgshift = 12;	 break;
-+			wi->pgshift = const_ilog2(SZ_4K);	 break;
- 		case TCR_TG0_16K:
--			wi->pgshift = 14;	 break;
-+			wi->pgshift = const_ilog2(SZ_16K);	 break;
- 		case TCR_TG0_64K:
- 		default:	    /* IMPDEF: treat any other value as 64k */
--			wi->pgshift = 16;	 break;
-+			wi->pgshift = const_ilog2(SZ_64K);	 break;
- 		}
- 	}
- 
-@@ -212,7 +215,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 		if (wi->txsz > 39)
- 			goto transfault_l0;
- 	} else {
--		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
-+		if (wi->txsz > 48 || (BIT(wi->pgshift) == SZ_64K && wi->txsz > 47))
- 			goto transfault_l0;
- 	}
+    access_process_vm device memory infrastructure
 
+So it starts with having GUP failing pfnmaps first for remote vm access, as
+what we also do right now with check_vma_flags(), then this whole walker is
+a remedy for that.
+
+It isn't used at all for normal VMAs, unless it's a private pfnmap mapping
+which should be extremely rare, or if it's IO+!PFNMAP, which is a world I
+am not familiar with..
+
+In all cases, I hope we can still leave this alone in the huge pfnmap
+effort, as they do not yet to be closely relevant.  From that POV, this
+patch as simple as "teach follow_pte() to know huge mappings", while it's
+just that we can't modify on top when the old interface won't work when
+stick with pte_t.  Most of the rest was inherited from follow_pte();
+there're still some trivial changes elsewhere, but here on the vma flag
+check we stick the same with old.
 
 > 
-> > +	} else {
-> > +		wi->txsz = FIELD_GET(TCR_T0SZ_MASK, tcr);
-> > +		tg = FIELD_GET(TCR_TG0_MASK, tcr);
-> > +
-> > +		switch (tg << TCR_TG0_SHIFT) {
-> > +		case TCR_TG0_4K:
-> > +			wi->pgshift = 12;	 break;
-> > +		case TCR_TG0_16K:
-> > +			wi->pgshift = 14;	 break;
-> > +		case TCR_TG0_64K:
-> > +		default:	    /* IMPDEF: treat any other value as 64k */
-> > +			wi->pgshift = 16;	 break;
-> > +		}
-> > +	}
-> > +
-> > +	/* R_PLCGL, R_YXNYW */
-> > +	if (!kvm_has_feat_enum(vcpu->kvm, ID_AA64MMFR2_EL1, ST, 48_47)) {
-> > +		if (wi->txsz > 39)
-> > +			goto transfault_l0;
-> > +	} else {
-> > +		if (wi->txsz > 48 || (wi->pgshift == 16 && wi->txsz > 47))
-> > +			goto transfault_l0;
-> > +	}
-> > +
-> > +	/* R_GTJBY, R_SXWGM */
-> > +	switch (BIT(wi->pgshift)) {
-> > +	case SZ_4K:
-> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN4, 52_BIT);
-> > +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
-> > +		break;
-> > +	case SZ_16K:
-> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR0_EL1, TGRAN16, 52_BIT);
-> > +		lva &= tcr & (wi->regime == TR_EL2 ? TCR_EL2_DS : TCR_DS);
-> > +		break;
-> > +	case SZ_64K:
-> > +		lva = kvm_has_feat(vcpu->kvm, ID_AA64MMFR2_EL1, VARange, 52);
-> > +		break;
-> > +	}
-> > +
-> > +	if ((lva && wi->txsz < 12) || wi->txsz < 16)
-> > +		goto transfault_l0;
+> > >   Any physical address obtained through this API is only valid while
+> > >   the @follow_pfnmap_args. Continuing to use the address after end(),
+> > >   without some other means to synchronize with page table updates
+> > >   will create a security bug.
+> > 
+> > Some misuse on wordings here (e.g. we don't return PA but PFN), and some
+> > sentence doesn't seem to be complete.. but I think I get the "scary" part
+> > of it.  How about this, appending the scary part to the end?
+> > 
+> >  * During the start() and end() calls, the results in @args will be valid
+> >  * as proper locks will be held.  After the end() is called, all the fields
+> >  * in @follow_pfnmap_args will be invalid to be further accessed.  Further
+> >  * use of such information after end() may require proper synchronizations
+> >  * by the caller with page table updates, otherwise it can create a
+> >  * security bug.
 > 
-> Let's assume lva = true, wi->txsz greater than 12, but smaller than 16, which is
-> architecturally allowed according to R_GTJBY and AArch64.S1MinTxSZ().
+> I would specifically emphasis that the pfn may not be used after
+> end. That is the primary mistake people have made.
 > 
-> (lva && wi->txsz < 12) = false
-> wi->txsz < 16 = true
-> 
-> KVM treats it as a fault.
+> They think it is a PFN so it is safe.
 
-Gah... Fixed with:
+I understand your concern. It's just that it seems still legal to me to use
+it as long as proper action is taken.
 
-@@ -231,7 +234,7 @@ static int setup_s1_walk(struct kvm_vcpu *vcpu, u32 op, struct s1_walk_info *wi,
- 		break;
- 	}
- 
--	if ((lva && wi->txsz < 12) || wi->txsz < 16)
-+	if ((lva && wi->txsz < 12) || (!lva && wi->txsz < 16))
- 		goto transfault_l0;
- 
- 	ia_bits = get_ia_size(wi);
-
-Not that it has an impact yet, given that we don't support any of the
-52bit stuff yet, but thanks for spotting this!
-
-[...]
-
-> > +	/* R_VPBBF */
-> > +	if (check_output_size(wi->baddr, wi))
-> > +		goto transfault_l0;
-> 
-> I think R_VPBBF says that an Address size fault is generated here, not a
-> translation fault.
-
-Indeed, another one fixed.
+I hope "require proper synchronizations" would be the best way to phrase
+this matter, but maybe you have even better suggestion to put this, which
+I'm definitely open to that too.
 
 > 
-> > +
-> > +	wi->baddr &= GENMASK_ULL(wi->max_oa_bits - 1, x);
-> > +
-> > +	return 0;
-> > +
-> > +addrsz:				/* Address Size Fault level 0 */
-> > +	fail_s1_walk(wr, ESR_ELx_FSC_ADDRSZ_L(0), false, false);
-> > +	return -EFAULT;
-> > +
-> > +transfault_l0:			/* Translation Fault level 0 */
-> > +	fail_s1_walk(wr, ESR_ELx_FSC_FAULT_L(0), false, false);
-> > +	return -EFAULT;
-> > +}
+> > It sounds like we need some mmu notifiers when mapping the IOMMU pgtables,
+> > as long as there's MMIO-region / P2P involved.  It'll make sure when
+> > tearing down the BAR mappings, the devices will at least see the same view
+> > as the processors.
 > 
-> [..]
-> 
-> > +static bool par_check_s1_perm_fault(u64 par)
-> > +{
-> > +	u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> > +
-> > +	return  ((fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM &&
-> > +		 !(par & SYS_PAR_EL1_S));
-> 
-> ESR_ELx_FSC_PERM = 0x0c is a permission fault, level 0, which Arm ARM says can
-> only happen when FEAT_LPA2. I think the code should check that the value for
-> PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PERM_L(3)].
+> I think the mmu notifiers can trigger too often for this to be
+> practical for DMA :(
 
-I honestly don't want to second-guess the HW. If it reports something
-that is the wrong level, why should we trust the FSC at all?
+I guess the DMAs are fine as normally the notifier will be no-op, as long
+as the BAR enable/disable happens rare.  But yeah, I see you point, and
+that is probably a concern if those notifier needs to be kicked off and
+walk a bunch of MMIO regions, even if 99% of the cases it'll do nothing.
 
-> With the remaining minor issues fixed:
-> 
-> Reviewed-by: Alexandru Elisei <alexandru.elisei@Arm.com>
-
-Again, many thanks for your patience going through this.
-
-	M.
+Thanks,
 
 -- 
-Without deviation from the norm, progress is not possible.
+Peter Xu
+
 
