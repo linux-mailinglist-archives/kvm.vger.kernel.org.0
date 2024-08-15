@@ -1,205 +1,173 @@
-Return-Path: <kvm+bounces-24315-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24316-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC6DC9538AA
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 18:59:24 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46BFA9538C5
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 19:09:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 074121C237EC
-	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 16:59:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C15961F25377
+	for <lists+kvm@lfdr.de>; Thu, 15 Aug 2024 17:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B421BB6AD;
-	Thu, 15 Aug 2024 16:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F043D1B4C26;
+	Thu, 15 Aug 2024 17:09:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DvHNT8Ks"
+	dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b="CmMAxUux"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6073F21105
-	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 16:59:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978AC21105
+	for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 17:09:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723741154; cv=none; b=D/Qd3U8ICMI1Wei5NS2HJHl+lz9HPMvmt5Rb90eCnNfig2J9eomvmGhNVcfPvTtgWf/OHBg79Jx7Gd0FXlvKGhpHy+SY4lh9oGJB0zUVtMHsd8OiddfXAM8D5U7uGiFyhAS7jUN+TBeydX8Fg/GOvjonh5H3YpDNlI10B9/LZMg=
+	t=1723741758; cv=none; b=CcmTc7M6VOIPSLvZ73chu17+v0VJFboKkrunkeruA6YbJ0Qf0JBunrGirSTIVU9VQVFiOi+D0IpylGtDTd1I4IkmnnXHVeh8p2M+tD6gPX0CNns0b9jEFhwdK32HI+3rhmt/UsnciivimMO7C90BADbuHxxup7odB3i+cNj22sM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723741154; c=relaxed/simple;
-	bh=3hIwpWIXEHc6rIHNNwobnugw6L7v+QjdIrBr1viVgI8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MVjfq+GMw44O7kdbh4LN/ppZrDyhKkVGaY8/jWjxsOficNyz97V6i6RCmvKk1e6jbOdaU7V1Vo3qbdBw7BpmQAWNH9EHMg2hVLXUDNno9mId5HlvyFGJs2QlfVxqjFt4ok2J6Er/3PfWicfAGUiuDokDN94Yl6GqJ7MkzsoWC7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DvHNT8Ks; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723741150;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZlcSz4KYwAPgWcAKkWXUG1nSmDKdddlqy88W5LmzqbQ=;
-	b=DvHNT8Ks9er0yzKFAFBZwcINolhnMs610dS63wH8jMV51W3CTZa8LY8GBbjOPWJRSSFvab
-	5jwcrulIeU4z1Klc31juwIUPKJA7hrJMlkvogHLm3lOv7iBZA7z5ckg4z54Yt+10fBRlB9
-	7hMPlIBXoIG+YS86XDmPNviCQnTEDdY=
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com
- [209.85.166.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-384-T8pkV5CEMQiLbz4vE9XOJg-1; Thu, 15 Aug 2024 12:59:08 -0400
-X-MC-Unique: T8pkV5CEMQiLbz4vE9XOJg-1
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-39d27488930so327425ab.3
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 09:59:08 -0700 (PDT)
+	s=arc-20240116; t=1723741758; c=relaxed/simple;
+	bh=X5L5hwnjmA/iS+JyOjzWx8Qds/xtd74+wB99jhBeUsQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YIc+tC/TO32U+BNt9QWByueXkmb5JAJ4EKldUUZfpKHuJi2lOKWysVkRrbQ+BmDyvz2xeJewLKm3i+5zfoLDcxV5+oeaBz+4oeqngNmS0DWxHfT0GCkXN611NLycPIb7hXgJi4lz68kRvJ3gdTwRhE9zINFrkZr3/cmBXj+M2Hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com; spf=pass smtp.mailfrom=ventanamicro.com; dkim=pass (2048-bit key) header.d=ventanamicro.com header.i=@ventanamicro.com header.b=CmMAxUux; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ventanamicro.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ventanamicro.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-201fae21398so3884985ad.1
+        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 10:09:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ventanamicro.com; s=google; t=1723741756; x=1724346556; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lVJxT5QcdO7Ui6miH35lV51PmIys+9/MJB+dZzASdvk=;
+        b=CmMAxUuxB9TsXBqMO3V8lG4dOvi6Cq4OO8gfz1SzBjxxH/h7V+yVz+u2xuJt8IDDyl
+         m+qPNdvsi6iPe2r6wr8s4BVSDtGMRJ25WTxVznbBX4VwhWqhKWLXD5vWwmr9vyqa99uo
+         y/nQ6TAY2+gpxdr0loAVdGUBUM+E5DrUu6S2u+2NXTkslVqfU6S1JsoB3WOdr6l5DIRv
+         0VpETlQMvPdFDQ5FZHMke2vBDsBLw1KVA+U+cCQDWn3pyP3/i36F2MMyLiG9A3RQyIT9
+         EON+mCsTKN8e2rSOV0j6TdyTCjz2fnIYTtjqWTIopWMGVXsoKlzpjb7AfIlE71SAhNCJ
+         lmdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723741148; x=1724345948;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZlcSz4KYwAPgWcAKkWXUG1nSmDKdddlqy88W5LmzqbQ=;
-        b=JUMJ3229Eu1Sce1HOqHXLTYMqsoGzOsMJiFyw8KuKhodMR3iV1djw+TOhDwr2QI7No
-         pbDp5XWQOSrZ+H/DXlCMYzxEl8OK0gFiY0kJC90KWputVIduwFIHADCJNXN0yJQf6Rek
-         0tTGQSjXl7Xzt7+mAkLyiud9MPUHYs63tvPNkUjpaXXC8ZODl20sbWF89QB/ibae/E1x
-         18MYSjCPTbvxGgiuNQjTLAvnyg6I9V580HNDDb4dhv5F8c2vUTeMU+P6Ti7vgFmPuNfF
-         1/hjXI2R/tjJEQhqrSG1sAHGop0/i0+4JtQPcRui9mp/nn2ukKIiIfE5Wuv9oU6tXoKk
-         5SBA==
-X-Forwarded-Encrypted: i=1; AJvYcCVxr5wzWHfn+BYJSESyCSFbw2y0sbGn/CqBES2GZiHPDvXr/GW+xlUkYC75z+nJNFcm9zsUd3BU74Lbjr6TsRzMKc7t
-X-Gm-Message-State: AOJu0YweepOHClNsw7u34kUaciEaMg0C/RRhm7t/xzurxkwCBSE+JJgl
-	fpzmhGOvlwvU3NveuNNLTgSLDmUaUgckNzvnus8TVg84dKbC75Ns7ahoWMxGjwy+D9NMWVzt8gc
-	rwB/+pjQkDzjEMXdH7rg1y1oYUD655hZB+uhGe5YBtsrGTTpreg==
-X-Received: by 2002:a05:6e02:1aaa:b0:39a:ea4c:8c26 with SMTP id e9e14a558f8ab-39d26cdf8fbmr6083185ab.1.1723741148120;
-        Thu, 15 Aug 2024 09:59:08 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGnffchl9WybcknzKF++o1mrFSsyjdEylnwuSiMZ5up4JHfQDmnQXUAj1Uo1c5erjQFGND9Ig==
-X-Received: by 2002:a05:6e02:1aaa:b0:39a:ea4c:8c26 with SMTP id e9e14a558f8ab-39d26cdf8fbmr6082925ab.1.1723741147721;
-        Thu, 15 Aug 2024 09:59:07 -0700 (PDT)
-Received: from redhat.com ([38.15.36.11])
-        by smtp.gmail.com with ESMTPSA id e9e14a558f8ab-39d1ec19de3sm6807035ab.45.2024.08.15.09.59.06
+        d=1e100.net; s=20230601; t=1723741756; x=1724346556;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lVJxT5QcdO7Ui6miH35lV51PmIys+9/MJB+dZzASdvk=;
+        b=PcH4mylHovW3ASA4guaH524YLUY2DVeTbLQzA4nDq8GCqbj2vRBpS8YiV7U+kZYKKM
+         FDcWvuikkihwZo0IKii7M3yTJJgFLqlWcaEV8AtX58gidi+PrgwHxFHE8vyPG1jzR1wa
+         W3pD7Ri2OCx5/Mm54Z5zDN+U3skRjBDHIf+YxfOsQphl4RW/WxYNzSncgYERprU9vjVZ
+         mSR0eTkDJ+sAz01bQpXokUqnpro7keGxWCCx0dm+leaI+/qWOzOtVUkDuGmOzbdJke2Z
+         DxH33yKh4+5kMnhk+oJf5AXXNuHPFRrz+GTbiN8tOh0xxFlaWXJEgj4v3I1GsXbaskWt
+         /ypA==
+X-Forwarded-Encrypted: i=1; AJvYcCV/PS5zfiZYZRSP3BBOM78LP8VyTFWiMMPBf2pRto0D/4X4HF5u3cqtG5iJrWfISsY2IceBZmsY1w8mQMxXrddu7RGi
+X-Gm-Message-State: AOJu0YwLkv/ZZsb7EAB+vNjhyxlJ5ds5YYSqwA18wW+qVZr/meiJg7U4
+	Q1m/NKazsDR41qm6GX9Qus16930YmcZIxXEof+jkTHBCtSGOctkAmpsvk274AjI=
+X-Google-Smtp-Source: AGHT+IEJsKSb7GMBEJwKRJb18oE3FCx/YFCHoyOQ+/rTrCh0U70ekG6XQEIGyKSA9piI909Jdbh/YA==
+X-Received: by 2002:a17:903:32c8:b0:201:f44d:6f00 with SMTP id d9443c01a7336-20203f51592mr4328345ad.57.1723741755569;
+        Thu, 15 Aug 2024 10:09:15 -0700 (PDT)
+Received: from anup-ubuntu-vm.localdomain ([223.185.130.49])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-201f03022d9sm12369535ad.25.2024.08.15.10.09.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 15 Aug 2024 09:59:07 -0700 (PDT)
-Date: Thu, 15 Aug 2024 10:59:05 -0600
-From: Alex Williamson <alex.williamson@redhat.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: qemu-devel@nongnu.org, kvm@vger.kernel.org, quic_bqiang@quicinc.com,
- kvalo@kernel.org, prestwoj@gmail.com, linux-wireless@vger.kernel.org,
- ath11k@lists.infradead.org, dwmw2@infradead.org, iommu@lists.linux.dev,
- kernel@quicinc.com, johannes@sipsolutions.net, jtornosm@redhat.com
-Subject: Re: [PATCH RFC/RFT] vfio/pci-quirks: Quirk for ath wireless
-Message-ID: <20240815105905.19d69576.alex.williamson@redhat.com>
-In-Reply-To: <20240813233724.GS1985367@ziepe.ca>
-References: <adcb785e-4dc7-4c4a-b341-d53b72e13467@gmail.com>
-	<20240812170045.1584000-1-alex.williamson@redhat.com>
-	<20240813164341.GL1985367@ziepe.ca>
-	<20240813150320.73df43d7.alex.williamson@redhat.com>
-	<20240813233724.GS1985367@ziepe.ca>
-Organization: Red Hat
+        Thu, 15 Aug 2024 10:09:14 -0700 (PDT)
+From: Anup Patel <apatel@ventanamicro.com>
+To: Palmer Dabbelt <palmer@dabbelt.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>
+Cc: Atish Patra <atishp@atishpatra.org>,
+	Andrew Jones <ajones@ventanamicro.com>,
+	Anup Patel <anup@brainfault.org>,
+	kvm@vger.kernel.org,
+	kvm-riscv@lists.infradead.org,
+	linux-riscv@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	Anup Patel <apatel@ventanamicro.com>
+Subject: [PATCH] RISC-V: KVM: Don't zero-out PMU snapshot area before freeing data
+Date: Thu, 15 Aug 2024 22:39:07 +0530
+Message-Id: <20240815170907.2792229-1-apatel@ventanamicro.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 13 Aug 2024 20:37:24 -0300
-Jason Gunthorpe <jgg@ziepe.ca> wrote:
+With the latest Linux-6.11-rc3, the below NULL pointer crash is observed
+when SBI PMU snapshot is enabled for the guest and the guest is forcefully
+powered-off.
 
-> On Tue, Aug 13, 2024 at 03:03:20PM -0600, Alex Williamson wrote:
-> 
-> > How does the guest know to write a remappable vector format?  How does
-> > the guest know the host interrupt architecture?  For example why would
-> > an aarch64 guest program an MSI vector of 0xfee... if the host is x86?  
-> 
-> All excellent questions.
-> 
-> Emulating real interrupt controllers in the VM is probably impossible
-> in every scenario. But certainly x86 emulating x86 and ARM emulating
-> ARM would be usefully achievable.
-> 
-> hyperv did a neat thing where their remapping driver seems to make VMM
-> traps and looks kind of like the VMM gives it the platform specific
-> addr/data pair.
-> 
-> It is a big ugly problem for sure, and we definately have painted
-> ourselves into a corner where the OS has no idea if IMS techniques
-> work properly or it is broken. :( :(
-> 
-> But I think there may not be a terribly impossible path where at least
-> the guest could be offered a, say, virtio-irq in addition to the
-> existing platform controllers that would process IMS for it.
-> 
-> > The idea of guest owning the physical MSI address space sounds great,
-> > but is it practical?    
-> 
-> In many cases yes, it is, but more importantly it is the only sane way
-> to support these IMS like techniques broadly since IMS is by
-> definition not generally trappable.
-> 
-> > Is it something that would be accomplished while
-> > this device is still relevant?  
-> 
-> I don't know, I fear not. But it keeps coming up. Too many things
-> don't work right with the trapping approach, including this.
-> 
-> > The Windows driver is just programming the MSI capability to use 16
-> > vectors.  We configure those vectors on the host at the time the
-> > capability is written.  Whereas the Linux driver is only using a single
-> > vector and therefore writing the same MSI address and data at the
-> > locations noted in the trace, the Windows driver is writing different
-> > data values at different locations to make use of those vectors.  This
-> > note is simply describing that we can't directly write the physical
-> > data value into the device, we need to determine which vector offset
-> > the guest is using and provide the same offset from the host data
-> > register value.  
-> 
-> I see, it seems to be assuming also that these extra interrupt sources
-> are generating the same MSI message as the main MSI, not something
-> else. That is more a SW quirk of Windows, I expect. I don't think
-> Linux would do that..
-> 
-> This is probably the only way to approach this, trap and emulate the
-> places in the device that program additional interrupt sources and do
-> a full MSI-like flow to set them up in the kernel.
+  Unable to handle kernel NULL pointer dereference at virtual address 0000000000000508
+  Oops [#1]
+  Modules linked in: kvm
+  CPU: 0 UID: 0 PID: 61 Comm: term-poll Not tainted 6.11.0-rc3-00018-g44d7178dd77a #3
+  Hardware name: riscv-virtio,qemu (DT)
+  epc : __kvm_write_guest_page+0x94/0xa6 [kvm]
+   ra : __kvm_write_guest_page+0x54/0xa6 [kvm]
+  epc : ffffffff01590e98 ra : ffffffff01590e58 sp : ffff8f80001f39b0
+   gp : ffffffff81512a60 tp : ffffaf80024872c0 t0 : ffffaf800247e000
+   t1 : 00000000000007e0 t2 : 0000000000000000 s0 : ffff8f80001f39f0
+   s1 : 00007fff89ac4000 a0 : ffffffff015dd7e8 a1 : 0000000000000086
+   a2 : 0000000000000000 a3 : ffffaf8000000000 a4 : ffffaf80024882c0
+   a5 : 0000000000000000 a6 : ffffaf800328d780 a7 : 00000000000001cc
+   s2 : ffffaf800197bd00 s3 : 00000000000828c4 s4 : ffffaf800248c000
+   s5 : ffffaf800247d000 s6 : 0000000000001000 s7 : 0000000000001000
+   s8 : 0000000000000000 s9 : 00007fff861fd500 s10: 0000000000000001
+   s11: 0000000000800000 t3 : 00000000000004d3 t4 : 00000000000004d3
+   t5 : ffffffff814126e0 t6 : ffffffff81412700
+  status: 0000000200000120 badaddr: 0000000000000508 cause: 000000000000000d
+  [<ffffffff01590e98>] __kvm_write_guest_page+0x94/0xa6 [kvm]
+  [<ffffffff015943a6>] kvm_vcpu_write_guest+0x56/0x90 [kvm]
+  [<ffffffff015a175c>] kvm_pmu_clear_snapshot_area+0x42/0x7e [kvm]
+  [<ffffffff015a1972>] kvm_riscv_vcpu_pmu_deinit.part.0+0xe0/0x14e [kvm]
+  [<ffffffff015a2ad0>] kvm_riscv_vcpu_pmu_deinit+0x1a/0x24 [kvm]
+  [<ffffffff0159b344>] kvm_arch_vcpu_destroy+0x28/0x4c [kvm]
+  [<ffffffff0158e420>] kvm_destroy_vcpus+0x5a/0xda [kvm]
+  [<ffffffff0159930c>] kvm_arch_destroy_vm+0x14/0x28 [kvm]
+  [<ffffffff01593260>] kvm_destroy_vm+0x168/0x2a0 [kvm]
+  [<ffffffff015933d4>] kvm_put_kvm+0x3c/0x58 [kvm]
+  [<ffffffff01593412>] kvm_vm_release+0x22/0x2e [kvm]
 
-Your last sentence here seems to agree with this approach, but
-everything else suggests disapproval, so I don't know where you're
-going here.
+Clearly, the kvm_vcpu_write_guest() function is crashing because it is
+being called from kvm_pmu_clear_snapshot_area() upon guest tear down.
 
-I have no specs for this device, nor any involvement from the device
-vendor, so the idea of creating a vfio-pci variant driver to setup an
-irq_domain and augment a device specific SET_IRQs ioctls not only sounds
-tremendously more complicated (host and VMM), it's simply not possible
-with the knowledge we have at hand.  Making this device work in a VM is
-dead in the water if that's the bar to achieve.
+To address the above issue, simplify the kvm_pmu_clear_snapshot_area() to
+not zero-out PMU snapshot area from kvm_pmu_clear_snapshot_area() because
+the guest is anyway being tore down.
 
-I observe that the device configures MSI vectors and then writes that
-same vector address/data elsewhere into the device.  Whether the device
-can trigger those vectors based only on the MSI capability programming
-and a secondary source piggybacks on those vectors or if this is just a
-hack by Qualcomm to use an MSI capability to acquire some vectors which
-are exclusively used by the secondary hardware, I have no idea.  Who
-can even say if this is just a cost saving measure that a PCI config
-space is slapped into a platform device and there's simply no hw/fw
-support to push the vector data into the hardware and the driver
-bridges the gap.
+The kvm_pmu_clear_snapshot_area() is also called when guest changes
+PMU snapshot area of a VCPU but even in this case the previous PMU
+snaphsot area must not be zeroed-out because the guest might have
+reclaimed the pervious PMU snapshot area for some other purpose.
 
-The solution here is arguably fragile, we're relying on having a
-sufficiently unique MSI address that we can recognize writes with that
-value in order to both replace it with the host value and mark the
-location of the data register.  If someone with some hardware insight
-wants to come along and provide a reference for static locations of
-these writes, I'd certainly welcome it.  My sample size is one, which
-is why this is posted as an RFT.
+Fixes: c2f41ddbcdd7 ("RISC-V: KVM: Implement SBI PMU Snapshot feature")
+Signed-off-by: Anup Patel <apatel@ventanamicro.com>
+---
+ arch/riscv/kvm/vcpu_pmu.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-I do not believe that introducing a vfio device feature that disables
-virtualization of the MSI address/data _only_ at the vfio interface
-(not to a QEMU VM) provides some implicit support of this device
-behavior.  These values are already available to a privileged user in
-the host and the same is available for an MSI-X use case by directly
-reading the MSI-X vector table.  The only point of the vfio device
-feature is that we need a vehicle to expose the MSI phsyical
-address/data values through he vfio channel, without additional host
-privileges.  The virtualized values are essentially unused by QEMU, so
-why not give QEMU a way to turn off the virtualization to expose the
-host values.  Thanks,
-
-Alex
+diff --git a/arch/riscv/kvm/vcpu_pmu.c b/arch/riscv/kvm/vcpu_pmu.c
+index bcf41d6e0df0..2707a51b082c 100644
+--- a/arch/riscv/kvm/vcpu_pmu.c
++++ b/arch/riscv/kvm/vcpu_pmu.c
+@@ -391,19 +391,9 @@ int kvm_riscv_vcpu_pmu_read_hpm(struct kvm_vcpu *vcpu, unsigned int csr_num,
+ static void kvm_pmu_clear_snapshot_area(struct kvm_vcpu *vcpu)
+ {
+ 	struct kvm_pmu *kvpmu = vcpu_to_pmu(vcpu);
+-	int snapshot_area_size = sizeof(struct riscv_pmu_snapshot_data);
+ 
+-	if (kvpmu->sdata) {
+-		if (kvpmu->snapshot_addr != INVALID_GPA) {
+-			memset(kvpmu->sdata, 0, snapshot_area_size);
+-			kvm_vcpu_write_guest(vcpu, kvpmu->snapshot_addr,
+-					     kvpmu->sdata, snapshot_area_size);
+-		} else {
+-			pr_warn("snapshot address invalid\n");
+-		}
+-		kfree(kvpmu->sdata);
+-		kvpmu->sdata = NULL;
+-	}
++	kfree(kvpmu->sdata);
++	kvpmu->sdata = NULL;
+ 	kvpmu->snapshot_addr = INVALID_GPA;
+ }
+ 
+-- 
+2.34.1
 
 
