@@ -1,134 +1,267 @@
-Return-Path: <kvm+bounces-24394-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24395-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D445F954C4E
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 16:25:34 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BD7E954C5E
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 16:29:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 933F52828B3
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 14:25:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27ACF1F246D7
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 14:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C9F81BD03D;
-	Fri, 16 Aug 2024 14:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DAD1BD006;
+	Fri, 16 Aug 2024 14:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UqepiSNE"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="A5Bxb5A+"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78711BCA0E
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 14:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00781A3BC0;
+	Fri, 16 Aug 2024 14:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723818316; cv=none; b=mBd4dx2fZi9YlHuBAimVrYjvP/rABxHNtmd6C0L3WhhoeCm38y0VsTxtAjc3YKc++fcTThmL2GGiczIiy+CuhoiYcQ78I5azo/EdD/gZbF78Mw8H5CIUMxXGTTTc4nvM2TOTVxUT2zoio3lcXa6MC8XjFFieX1Z0zBeSZrQyi8s=
+	t=1723818579; cv=none; b=ADisc803pKIQlo0c62EoJTcz37BeHoX59dI1ztVUEGSmp8zTiW+MgtzU5WkYHicxTQbcmgiV6c/L+AZJFZBMHD+v7Vu52sF2EWk26yc81NBEOerRbxmmo1Cz2gyEkxH8CV/PKe95PvqPuvwoXG9Hu/LEW5DPlAOaLwWjkApkGcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723818316; c=relaxed/simple;
-	bh=pQgwU3NbO3jD+NrUyzEISwoqYlpJSOXd4lLO8wLFpEE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=nPf+CYru7tMCpQW0TXQkjcfd17YJwfq2SjUrTzT3by876IDzodjHCsAd/UXlUN1Pk7LLtV5ffNCc0y7t3u8wU5HFj6D4qYTgJOJDiwH/14VMUsM8LUrNHNA1ZyR3YYdS27SCinnC3XKi4hB7cSkrVCNuKTRoKOMVhAIUyVZ1W70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UqepiSNE; arc=none smtp.client-ip=209.85.128.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6addeef41a2so37854667b3.2
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 07:25:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723818314; x=1724423114; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=+7Wk9OcwZMqzd5E5r+d5EdrzqKc0GN/xmYEHE1y96wE=;
-        b=UqepiSNE0y3W+SeEExyOA5CFOXgRFrKF2HnVvNLz8VXZr5viVrVJ+tbs98BOMwBd1d
-         zFQkdMrLGuBz3p7K9K/mAgjc6R69Fk+ULbC6/lI5K++AruMY8vGAqTl0RfcVTl084WrV
-         Mxmy4GtXOq5/0azTh3agKcTbBDH+UDVclKUGZZW4RjsWoGwMJNl8RStEth+JP9AGO6xZ
-         L6szkmy2tea8FbQCQEjKHKfqnIif2wiXxzfqCxAIOD/LJBi1hPGQQtYhBo/M8R/AYPho
-         PIMgkBYjHvyE2ikQGNFkCY2+odAa/sQvSeQNTuEuucsRtW7FpSsQhCtoOdOiYrBUhjRF
-         pu2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723818314; x=1724423114;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+7Wk9OcwZMqzd5E5r+d5EdrzqKc0GN/xmYEHE1y96wE=;
-        b=U7RCOLJpsdsCvmTtx2LAVDBYyi2w9HDK0Bh9R2JvM5VVhWMjg9IHa27Afhd7eNBK7Z
-         p23MYZsfhwDIARPGUVFHZRh0FkJvAp//vSBkrJTxXOK+oCluArpLd4x43PNepWZ3tLOr
-         2alfg/LGMqA5ES1ET/84lCqtr+1FZRgmid5HGChzFCPjyFHpr+I1QOOomZlMRryIU0bZ
-         fPYD/iFfunLcrl2E0QcL6Fa4dYoUREtqG5gcazJHr7+rp+33/3G6x7BdxTd6CBeVH7sD
-         /SufaAd+b9JwfCFKbVe6NbvrutUY9pfwKg084S5mdArpPVv65d4ruacrtVjSXBi8PyU7
-         yz8w==
-X-Forwarded-Encrypted: i=1; AJvYcCXseRcvyqAagREHjTpcO3chVxYX+F8biUVWdDPCYcHcJnc41Dx35JbCqNteTTF1R+CofytXSFJ6uxyJRrmnZ2i0WlvU
-X-Gm-Message-State: AOJu0Ywqqh3/mQh4wLLqBZJ0EgeEkMW5NwxIQvH8BK8/iT0NIAWoW415
-	nX6lLXXIvQE27Imx5j4cADhOYkMd5XcM8Ku8S3cDgCFfckwn7VXOw0FY2OxwkrsvJs+lKV38TT9
-	abg==
-X-Google-Smtp-Source: AGHT+IHSctE3hsbgibEX3NUUTSgxn3QNZgVHNZq+QwMDiVv5QgsBjUK7o0rfVlLVAL2MYAyhZ8nyqb8lfgI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:460b:b0:6b0:d571:3533 with SMTP id
- 00721157ae682-6b1bbb4af15mr582527b3.7.1723818313542; Fri, 16 Aug 2024
- 07:25:13 -0700 (PDT)
-Date: Fri, 16 Aug 2024 07:25:11 -0700
-In-Reply-To: <CALMp9eSBNjSXgsbhau-c68Ow_YoLvWBK6oUc1v1DqSfmDskmhg@mail.gmail.com>
+	s=arc-20240116; t=1723818579; c=relaxed/simple;
+	bh=JhmXKWhjdrG84FRgxq2myvwpgTSU4uVmrcF1oKCERZk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NB5x0ZBtNyVaK/lR5ISZpwgI9JLwkh7h7WTy9MM3k6vqnWXPknuee+I7zxY9/a13+3dxiH3M98UQzfVKl5WQ5Mz1yEmh8Ey+UMPG9ZOrvOwpz8XZwxq3MWP+O+2bMWFd83jvnxOn/cr6bvCVz8Ryur9GP9+4thLqvYIDhNB6Umg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=A5Bxb5A+; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47G2KT4u004516;
+	Fri, 16 Aug 2024 14:29:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=4
+	1hGsqTLvTIxU5BwIt+HASBMihq4OvuVWvFAGoo55no=; b=A5Bxb5A+pvpo4SnGr
+	/lknI9sDyAsrvuUwjE5fKf877tpK5wvADhJ6e5oMiNxee/fHFIrnvvrf7K2HA4xH
+	DEXVS+BljVJ5fIsa/0AN+n/BQ+fdZ+zMBUcPTi/ftalDe40fz0a6T/ynD4i7wiBq
+	y2RnYLdEbpMbR9PBUxvarF7MjpNKb+PlnIdWle5XjQCvsIokZXjnX0B3aYUepbEy
+	vhOI4VUxuoehSAuI3PwDsf6aC5LEFjCe2Ftf5lIMzVeAWd9VWukC0RoykrbxXhR1
+	RK0eZgQYtEyNJJqZT1lLwGL6GurBO+dd6erkLFjjj29LldRu2eMWKrsZok1gPL8h
+	G+F8A==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6rt4k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Aug 2024 14:29:31 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47GETUM7013825;
+	Fri, 16 Aug 2024 14:29:30 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6rt4b-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Aug 2024 14:29:30 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47GAbOta016357;
+	Fri, 16 Aug 2024 14:29:30 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40xkhq41vs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 16 Aug 2024 14:29:29 +0000
+Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47GETOHu34865844
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 16 Aug 2024 14:29:26 GMT
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2017320043;
+	Fri, 16 Aug 2024 14:29:24 +0000 (GMT)
+Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7437520040;
+	Fri, 16 Aug 2024 14:29:23 +0000 (GMT)
+Received: from [9.171.56.137] (unknown [9.171.56.137])
+	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri, 16 Aug 2024 14:29:23 +0000 (GMT)
+Message-ID: <4c049b39-af28-488c-9e19-f22691b43585@linux.ibm.com>
+Date: Fri, 16 Aug 2024 16:29:23 +0200
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240411205911.1684763-1-jmattson@google.com> <CAA0tLEor+Sqn6YjYdJWEs5+b9uPdaqQwDPChh1YEGWBi2NAAAw@mail.gmail.com>
- <CALMp9eSBNjSXgsbhau-c68Ow_YoLvWBK6oUc1v1DqSfmDskmhg@mail.gmail.com>
-Message-ID: <Zr9hRydHFvPIMfUp@google.com>
-Subject: Re: [PATCH] KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
-From: Sean Christopherson <seanjc@google.com>
-To: Jim Mattson <jmattson@google.com>
-Cc: Venkatesh Srinivas <venkateshs@chromium.org>, kvm@vger.kernel.org, 
-	Paolo Bonzini <pbonzini@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] selftests: kvm: s390: Add uc_map_unmap VM test case
+To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+References: <20240815154529.628087-1-schlameuss@linux.ibm.com>
+ <20240815154529.628087-2-schlameuss@linux.ibm.com>
+Content-Language: en-US
+From: Janosch Frank <frankja@linux.ibm.com>
+Autocrypt: addr=frankja@linux.ibm.com; keydata=
+ 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
+In-Reply-To: <20240815154529.628087-2-schlameuss@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: v9ITlVF5l6TX4Ebd1GjeD4zifVV-SmOs
+X-Proofpoint-GUID: fBwpW9bNRD-ZYOaybVo28IMOcNAbNlfp
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-16_05,2024-08-16_01,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
+ lowpriorityscore=0 clxscore=1015 spamscore=0 impostorscore=0
+ priorityscore=1501 suspectscore=0 malwarescore=0 mlxlogscore=737
+ phishscore=0 mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2407110000 definitions=main-2408160102
 
-On Thu, Apr 11, 2024, Jim Mattson wrote:
-> On Thu, Apr 11, 2024 at 6:32=E2=80=AFPM Venkatesh Srinivas
-> <venkateshs@chromium.org> wrote:
-> >
-> > On Thu, Apr 11, 2024 at 1:59=E2=80=AFPM Jim Mattson <jmattson@google.co=
-m> wrote:
-> > >
-> > > From Intel's documention [1], "CPUID.(EAX=3D07H,ECX=3D0):EDX[26]
-> > > enumerates support for indirect branch restricted speculation (IBRS)
-> > > and the indirect branch predictor barrier (IBPB)." Further, from [2],
-> > > "Software that executed before the IBPB command cannot control the
-> > > predicted targets of indirect branches (4) executed after the command
-> > > on the same logical processor," where footnote 4 reads, "Note that
-> > > indirect branches include near call indirect, near jump indirect and
-> > > near return instructions. Because it includes near returns, it follow=
-s
-> > > that **RSB entries created before an IBPB command cannot control the
-> > > predicted targets of returns executed after the command on the same
-> > > logical processor.**" [emphasis mine]
-> > >
-> > > On the other hand, AMD's "IBPB may not prevent return branch
-> > > predictions from being specified by pre-IBPB branch targets" [3].
-> > >
-> > > Since Linux sets the synthetic feature bit, X86_FEATURE_IBPB, on AMD
-> > > CPUs that implement the weaker version of IBPB, it is incorrect to
-> > > infer from this and X86_FEATURE_IBRS that the CPU supports the
-> > > stronger version of IBPB indicated by CPUID.(EAX=3D07H,ECX=3D0):EDX[2=
-6].
-> >
-> > AMD's IBPB does apply to RET predictions if Fn8000_0008_EBX[IBPB_RET] =
-=3D 1.
-> > Spot checking, Zen4 sets that bit; and the bulletin doesn't apply there=
-.
->=20
-> So, with a definition of X86_FEATURE_AMD_IBPB_RET, this could be:
->=20
->        if (boot_cpu_has(X86_FEATURE_AMD_IBPB_RET) &&
-> boot_cpu_has(X86_FEATURE_IBRS))
->                kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
->=20
-> And, in the other direction,
->=20
->     if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
->         kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
+On 8/15/24 5:45 PM, Christoph Schlameuss wrote:
+> Add a test case verifying basic running and interaction of ucontrol VMs.
+> Fill the segment and page tables for allocated memory and map memory on
+> first access.
+> 
+> * uc_map_unmap
+>    Store and load data to mapped and unmapped memory and use pic segment
+>    translation handling to map memory on access.
+> 
+> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> ---
+>   .../selftests/kvm/s390x/ucontrol_test.c       | 120 +++++++++++++++++-
+>   1 file changed, 119 insertions(+), 1 deletion(-)
+> 
 
-Jim, are you planning on sending a v2 with Venkatesh's suggested solution?
+> +static void uc_handle_exit_ucontrol(FIXTURE_DATA(uc_kvm) * self)
+> +{
+> +	struct kvm_run *run = self->run;
+> +
+> +	TEST_ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
+> +	switch (run->s390_ucontrol.pgm_code) {
+> +	case PGM_SEGMENT_TRANSLATION:
+> +		pr_info("ucontrol pic segment translation 0x%llx\n",
+> +			run->s390_ucontrol.trans_exc_code);
+> +		/* map / make additional memory available */
+> +		struct kvm_s390_ucas_mapping map2 = {
+> +			.user_addr = (u64)gpa2hva(self, run->s390_ucontrol.trans_exc_code),
+> +			.vcpu_addr = run->s390_ucontrol.trans_exc_code,
+> +			.length = VM_MEM_EXT_SIZE,
+> +		};
+> +		pr_info("ucas map %p %p 0x%llx\n",
+> +			(void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
+> +		TEST_ASSERT_EQ(0, ioctl(self->vcpu_fd, KVM_S390_UCAS_MAP, &map2));
+> +		break;
+
+Why is this necessary if you fix up the mapping in the test?
+
+[...]
+
+>   
+> +TEST_F(uc_kvm, uc_map_unmap)
+> +{
+> +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+> +	struct kvm_run *run = self->run;
+> +	int rc;
+> +
+> +	/* copy test_mem_asm to code_hva / code_gpa */
+> +	TH_LOG("copy code %p to vm mapped memory %p / %p",
+> +	       &test_mem_asm, (void *)self->code_hva, (void *)self->code_gpa);
+> +	memcpy((void *)self->code_hva, &test_mem_asm, PAGE_SIZE);
+> +
+> +	/* DAT disabled + 64 bit mode */
+> +	run->psw_mask = 0x0000000180000000ULL;
+> +	run->psw_addr = self->code_gpa;
+> +
+> +	/* set register content for test_mem_asm to access not mapped memory*/
+> +	sync_regs->gprs[1] = 0x55;
+> +	sync_regs->gprs[5] = self->base_gpa;
+> +	sync_regs->gprs[6] = VM_MEM_SIZE;
+> +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
+> +
+> +	/* run and expect to fail witch ucontrol pic segment translation */
+
+s/witch/with/
+
+> +	ASSERT_EQ(0, uc_run_once(self));
+> +	ASSERT_EQ(1, sync_regs->gprs[0]);
+> +	ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
+> +
+> +	ASSERT_EQ(PGM_SEGMENT_TRANSLATION, run->s390_ucontrol.pgm_code);
+> +	ASSERT_EQ(self->base_gpa + VM_MEM_SIZE, run->s390_ucontrol.trans_exc_code);
+> +	/* map / make additional memory available */
+> +	struct kvm_s390_ucas_mapping map2 = {
+> +		.user_addr = (u64)gpa2hva(self, self->base_gpa + VM_MEM_SIZE),
+> +		.vcpu_addr = self->base_gpa + VM_MEM_SIZE,
+> +		.length = VM_MEM_EXT_SIZE,
+> +	};
+> +	TH_LOG("ucas map %p %p 0x%llx",
+> +	       (void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
+> +	rc = ioctl(self->vcpu_fd, KVM_S390_UCAS_MAP, &map2);
+> +	ASSERT_EQ(0, rc)
+> +		TH_LOG("ucas map result %d not expected, %s", rc, strerror(errno));
+> +	ASSERT_EQ(0, uc_run_once(self));
+> +	ASSERT_EQ(false, uc_handle_exit(self));
+> +	uc_assert_diag44(self);
+> +
+> +	/* assert registers and memory are in expected state */
+> +	ASSERT_EQ(2, sync_regs->gprs[0]);
+> +	ASSERT_EQ(0x55, sync_regs->gprs[1]);
+> +	ASSERT_EQ(0x55, *(u32 *)gpa2hva(self, self->base_gpa + VM_MEM_SIZE));
+> +
+> +	/* unmap and run loop again */
+> +	TH_LOG("ucas unmap %p %p 0x%llx",
+> +	       (void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
+> +	rc = ioctl(self->vcpu_fd, KVM_S390_UCAS_UNMAP, &map2);
+> +	ASSERT_EQ(0, rc)
+> +		TH_LOG("ucas map result %d not expected, %s", rc, strerror(errno));
+
+s/map/unmap/
+
+
+> +	ASSERT_EQ(0, uc_run_once(self));
+> +	ASSERT_EQ(3, sync_regs->gprs[0]);
+> +	ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
+> +	ASSERT_EQ(true, uc_handle_exit(self));
+> +}
+> +
+>   TEST_F(uc_kvm, uc_gprs)
+>   {
+>   	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+
 
