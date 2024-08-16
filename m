@@ -1,252 +1,132 @@
-Return-Path: <kvm+bounces-24400-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24401-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BCE0954D6D
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 17:15:28 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDE1B954DAB
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 17:31:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 310E91C2188F
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 15:15:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 41134B22452
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 15:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F651BD4F7;
-	Fri, 16 Aug 2024 15:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A68221BDA9D;
+	Fri, 16 Aug 2024 15:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="K2HtIXfT"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="a51nZEd0"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pg1-f202.google.com (mail-pg1-f202.google.com [209.85.215.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00D435A0F5
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 15:15:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A26F1BDA95
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 15:30:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723821319; cv=none; b=iN3f/F5g6IXbTtzZnTj5lUwB6N3mZPLI3inzle8jWfHU1JuO5uswwXrKv2TqXJ4opXoObkN4LX4DGmRWjAp2vB1S/xLn/QUrnrPGw6Jct9h9uVsvmnzdgzei2qsun3iu2Rw4m8OCrkKy3pwEjQGiMoHFxnHqv6NQehiuYY4RQ9g=
+	t=1723822234; cv=none; b=SecF6BKCIDhyw/9lBE/POxm18iBYLX3wAGnGQBT8opA8+xXLa15kHWAoGVO+duuJ9aIGai0ZcfiH8/4bJjdlMa+0ujX8YkGCB2LCpNOcvphybXSSjh/UNUY4DWyFqkYABHzpUb9IVeTBnoyxe8efzZSu3P+znYD7/0gdaeE8S+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723821319; c=relaxed/simple;
-	bh=af3Wnlrqj51wLxCll+j/L/Km0zd0Y1WnD5ggVCwcI5g=;
+	s=arc-20240116; t=1723822234; c=relaxed/simple;
+	bh=z5ATbgW/5LMgDDgTlNnUOVOABQ26loeKbRHOmoueNJI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YrPQv9sIflPCW9GTHnrWRuP0nyQ9SA8KBL9+w7qvYoog0bw4KqzkM/iWQJCcQjBtvu1orx0CEboyFziK4Os7MpjPUW+So3PSaH1An4Me2uyC8Pu3uTxxIP2YhQC0JiBDtvtEvsQHEqgPqpH15XI/otQQVL+CjsIyeBbura60Lvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=K2HtIXfT; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=jZIOjohPHg2t4AeMa1VMLghKzDgr94pYrcz7+gMzVKKuFW/hc/ix46YJQriqZ5BsJFl9XTqfFgWrQv3OZ/fKS26gc3mSk4/vWJ7/pB7Od/QLbMlG+0dCioOhF1i3GmkNhQX8qKrYwvWHlUHBwrVzkaB374JUHPq7L0CSSKYPWx0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=a51nZEd0; arc=none smtp.client-ip=209.85.215.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e0bcd04741fso3409948276.2
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 08:15:17 -0700 (PDT)
+Received: by mail-pg1-f202.google.com with SMTP id 41be03b00d2f7-5e4df21f22dso1676060a12.0
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 08:30:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723821317; x=1724426117; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723822233; x=1724427033; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=audPgIvH9vGhPjDTkEQr2zmmu/dkfSOsV7tEwPaTB5k=;
-        b=K2HtIXfTI8m1akQM5of/uUdvLpNW2K8kPVBREgA2W3NCSCF5D+eD2G+R+lfVVUuM8G
-         FYhx16U78i7uQEjbH9NynuqpEUyrPm2NAv1ysBqVQZFhDqiFBnUjGF7Xoj1IbcpZ3J/i
-         zad+9wFLveze/EBA3EOIWT3hMQRWny6y2sWLxmvv6b2aLeoZhdyjlc6zZ84E8dr7Xq50
-         I49Lwt+t6A3iTb1xLuBhUEK/m9/e+9AUDVoEUGLFpd2emELRd15VpRWRMVLnDJBDO/CX
-         sGdGDRmvZ4dWwoK5coCinS4T2G6P1y/i46P1UdX4Ueiik7SmU/izcmjokYpcBtktOb1I
-         1n5Q==
+        bh=4+81pDhLGIHQkEcVg7Sm2NkkqyHauxzf0JjWdA/TkGw=;
+        b=a51nZEd0CJX4wFbZsmEdPfImBIeKIAJbgqT7h/N3/bcuMBlzVVlJt0ELiLuhow4FAd
+         8bn2l9VKMK4ELzQE5JLu8ucpwAPgKTaP8IJ1EBISCGhzVI6Gss/YRJ8utkgGf+BUhIjZ
+         9SuDSNqqy2KSZM3pbrdEZxS/wz+gku+PX1mtmCxGzxV2xXyI4gpyax1BaIMfE4TZGQ0b
+         CTz1C5+M/9TIEXJuqxd1Y0qDiFSHYU0MMUdniJh9GrmTOjIvP/kXybbldVZnrYMH3Olg
+         OwnUso5QrfaSa4SX9vB364vp6EZumSVirng5LuNw1g5wVNBZDuAdU5U9CgtMrbBYQMWf
+         kVhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723821317; x=1724426117;
+        d=1e100.net; s=20230601; t=1723822233; x=1724427033;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=audPgIvH9vGhPjDTkEQr2zmmu/dkfSOsV7tEwPaTB5k=;
-        b=l4fCdmMSZA91mVjxGrRr+d5vqzGCDwQBifafc7vwcfXSKghxh+t3k1b3JJKuXjgOku
-         ManUoIuG+RJW5DvI9D6Ii2jucS5Paqf1fDh6QDJmx4BRsIWK59e0KDq/6LJHPaueVFMG
-         JEKB/e4JSr0Nibl4Ek4Ooyrw+Fe7yUaet5tUPnDeT10gyaF3KPabzYKFwA8sMRxe259g
-         GNK6Lt/JI4M9sXkTBtbNknLNvZYubn9EghFJR9xkYkWOWOMX8PCRV/4jQWnOq8XuTETa
-         EVJCI0E0J6Y4KpmM3xeXHnqCOnP32/7nHnx9zrtzz7gwvSDasl52RYbqigXR77ZmHoKP
-         SecA==
-X-Gm-Message-State: AOJu0YzT/izAX19vJUOQIObyfGpA+UaUmDXJm1Y/1cRNI3DS9xGGun6H
-	vX9uVG+FYaRPHI4V+hFbx/u0UBSg5u+PthKWsIwpYJ2+JH6uHtuftNahVxs+Baw0+n8F20AlY2K
-	Emw==
-X-Google-Smtp-Source: AGHT+IFV3YYIqX95vEiDKWYNQFidNCj03voRsbMLSjJM2NsLTxC+YavJPcOkhhWt87y2JW6LNHEg1k7uXPs=
+        bh=4+81pDhLGIHQkEcVg7Sm2NkkqyHauxzf0JjWdA/TkGw=;
+        b=MwUqmgNp2wLmjrn8205gm2R0hgHUJyTpTKI4eqALgzgEWZZ62eOyWalk+A7EOMiSVB
+         GmnQredPUByfSkgP8usVWI7xxf0jXi99OU52/Mw8xAptS7Tnuh2Py1ZPUyLe+wovZua5
+         duE0k+6fWrInn4lCcWtu/3VjPeO2H5S9FO3LZWbrX4HI3XRN0SlW5g1DfY2UMaXQlaaQ
+         klR8kjZagwwIGN6kB0V/K7/1cHz0bMVvUFCYqUM4szFTr/VzM5hS9mWVKD5Dcd5G1Hr6
+         6QYzwTaLT9Woowqck5T7btp/eEozRWvAtjOZ9fV4oNR0VkdpsvMBIFcHOWb2ZKPIR4FV
+         u94w==
+X-Gm-Message-State: AOJu0YyoJzy9AK76T264ONYEkA0fqCyLL263WLqIICBJ5dP1zWcyWsJX
+	mF1jRd0CBzrCgCi1f1hKrm0kkOG5MAiTcbQicOo2zeCqrio/J07H3mp+9WgcwHjoZp8VDg4BwPK
+	ZNA==
+X-Google-Smtp-Source: AGHT+IHMP2EULpQy3kRqIMWCo3R3hZfjuGO0qczwWYdFXPJZ/k0bKRM2eUlmlyawlbcnwG9PKXD7yI2Fyqg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a25:6987:0:b0:e05:fb86:1909 with SMTP id
- 3f1490d57ef6-e1180e9caa5mr12919276.6.1723821316975; Fri, 16 Aug 2024 08:15:16
- -0700 (PDT)
-Date: Fri, 16 Aug 2024 08:15:15 -0700
-In-Reply-To: <20240106083346.29180-1-dongli.zhang@oracle.com>
+ (user=seanjc job=sendgmr) by 2002:a63:4e46:0:b0:7a0:b292:47cb with SMTP id
+ 41be03b00d2f7-7c6b2a69f5emr51372a12.0.1723822232602; Fri, 16 Aug 2024
+ 08:30:32 -0700 (PDT)
+Date: Fri, 16 Aug 2024 08:30:31 -0700
+In-Reply-To: <20240715225654.32614-1-kishen.maloor@intel.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240106083346.29180-1-dongli.zhang@oracle.com>
-Message-ID: <Zr9tA1Zo9QXmCm9V@google.com>
-Subject: Re: [PATCH 1/1] KVM: selftests: add kvmclock drift test
+References: <20240715225654.32614-1-kishen.maloor@intel.com>
+Message-ID: <Zr9wlwcwcNNm77iU@google.com>
+Subject: Re: [PATCH] KVM: nVMX: Simplify SMM entry/exit flows in nested guest mode
 From: Sean Christopherson <seanjc@google.com>
-To: Dongli Zhang <dongli.zhang@oracle.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
-	shuah@kernel.org, linux-kernel@vger.kernel.org, joe.jin@oracle.com
+To: Kishen Maloor <kishen.maloor@intel.com>
+Cc: kvm@vger.kernel.org, pbonzini@redhat.com, lprosek@redhat.com, 
+	mlevitsk@redhat.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Sat, Jan 06, 2024, Dongli Zhang wrote:
-> diff --git a/tools/testing/selftests/kvm/x86_64/kvm_clock_drift.c b/tools/testing/selftests/kvm/x86_64/kvm_clock_drift.c
-> new file mode 100644
-> index 000000000000..324f0dbc5762
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/kvm_clock_drift.c
+On Mon, Jul 15, 2024, Kishen Maloor wrote:
+> This change aims to resolve a TODO documented in commit 5d76b1f8c793
+> ("KVM: nVMX: Rename nested.vmcs01_* fields to nested.pre_vmenter_*"):
+> 
+> /*
+>  * TODO: Implement custom flows for forcing the vCPU out/in of L2 on
+>  * SMI and RSM.  Using the common VM-Exit + VM-Enter routines is wrong
+>  * SMI and RSM only modify state that is saved and restored via SMRAM.
 
-For better or worse, our selftests naming adds a _test at the end.
+Sorry, but this does not implement what the TODO suggest.  Specifically, it touches
+_far_ more state than what is saved/restored in SMRAM.  Implementing custom SMI+RSM
+handling will require an annoying amount of coding, which is why it hasn't been
+done yet.
 
-However, should we call this kvm_clock_hotplug_test.c?  That way the file level
-comment isn't necessary (those these always become stale), and David's live update
-suggestion won't conflict.
+>  * E.g. most MSRs are left untouched, but many are modified by VM-Exit
+>  * and VM-Enter, and thus L2's values may be corrupted on SMI+RSM.
+>  */
+> 
 
-Or if the live update code fits nicely in this test, then kvm_clock_drift_test.c
-is probably a good name.
+...
 
-> @@ -0,0 +1,223 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + * The kvmclock drift test. Emulate vCPU hotplug and online to verify if
-> + * there is kvmclock drift.
-> + *
-> + * Adapted from steal_time.c
-
-This is really uninteresting.
-
-> + * Copyright (C) 2020, Red Hat, Inc.
-> + * Copyright (C) 2024 Oracle and/or its affiliates.
-> + */
-> +
-> +#include <asm/kvm_para.h>
-> +#include <asm/pvclock.h>
-> +#include <asm/pvclock-abi.h>
-> +#include <sys/stat.h>
-> +
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +
-> +#define NR_VCPUS		2
-> +#define NR_SLOTS		2
-> +#define KVMCLOCK_SIZE		sizeof(struct pvclock_vcpu_time_info)
-> +/*
-> + * KVMCLOCK_GPA is identity mapped
-> + */
-> +#define KVMCLOCK_GPA		(1 << 30)
-> +
-> +static uint64_t kvmclock_gpa = KVMCLOCK_GPA;
-
-Why hardcode an address?  Can't the test have a global "struct pvclock_vcpu_time_info"
-whose address is then queried by the host by reading the MSR?
-
-Actually, can't the pvclock reads and asserts be done in the guest?  Which is
-arguably better since the guest observing drift (or not) is what we really care
-about.  Then the host side of the test never needs to resolve a host virtual
-address for the pvclock_vcpu_time_info structure.
-
-> +static void guest_code(int cpu)
+> +int nested_vmx_leave_smm(struct kvm_vcpu *vcpu)
 > +{
-> +	struct pvclock_vcpu_time_info *kvmclock;
+> +	enum vm_entry_failure_code entry_failure_code;
+> +	struct vmcs12 *vmcs12 = get_vmcs12(vcpu);
+> +	struct vcpu_vmx *vmx = to_vmx(vcpu);
 > +
-> +	/*
-> +	 * vCPU#0 is to detect the change of pvclock_vcpu_time_info
-
-Just vCPU0, which is the usually terminology in KVM land.
-
-> +	 */
-
-	/* Single line comments should look like this. */
-
-> +	if (cpu == 0) {
-
-Rather than switch inside the guest code, just use vcpu_arch_set_entry_point()
-to point vCPU1 at a different function entirely.  Then most of the commetns go
-away, and the code is generally much easier to read.
-
-> +		GUEST_SYNC(0);
+> +	kvm_service_local_tlb_flush_requests(vcpu);
 > +
-> +		kvmclock = (struct pvclock_vcpu_time_info *) kvmclock_gpa;
-> +		wrmsr(MSR_KVM_SYSTEM_TIME_NEW, kvmclock_gpa | KVM_MSR_ENABLED);
+> +	vmx_switch_vmcs(vcpu, &vmx->nested.vmcs02);
 > +
-> +		/*
-> +		 * Backup the pvclock_vcpu_time_info before vCPU#1 hotplug
-> +		 */
-> +		kvmclock[1] = kvmclock[0];
+> +	prepare_vmcs02_early(vmx, &vmx->vmcs01, vmcs12);
 > +
-> +		GUEST_SYNC(2);
-> +		/*
-> +		 * Enter the guest to update pvclock_vcpu_time_info
-> +		 */
-> +		GUEST_SYNC(4);
-> +	}
-> +
-> +	/*
-> +	 * vCPU#1 is to emulate the vCPU hotplug
-> +	 */
-> +	if (cpu == 1) {
-> +		GUEST_SYNC(1);
-> +		/*
-> +		 * This is after the host side MSR_IA32_TSC
-> +		 */
+> +	if (prepare_vmcs02(vcpu, vmcs12, false, &entry_failure_code)) {
+> +		vmx_switch_vmcs(vcpu, &vmx->vmcs01);
+> +		nested_vmx_restore_host_state(vcpu);
 
-Rather than add comments, use an enum to describe the stages:
+This is blatantly wrong, a failure during RSM results in shutdown.  And I'm 99%
+certain that restoring "critical VMX state" can't fail, i.e. this path shouldn't
+exist at all.
 
-	enum {
-		SYNC_VCPU0_???
-		SYNC_VCPU1_???
-		SYNC_VCPU0_???
-		SYNC_VCPU1_???
-	}
+Per the SDM, critical state is saved in a uarch-specific location, i.e. it can't
+be accessed by software and thus isn't validated on RSM.  And interestingly,
+CR0/4 fixed bits are _forced_, not validated:
 
-That said, why does this test "emulate" hotplug?  Why not literally hotplug a
-vCPU?  It's probably _less_ code, and the annoying NR_VCPUS #define goes away too,
-because you can do:
+  set to their fixed values any bits in CR0 and CR4 whose values must be fixed
+  in VMX operation (see Section 24.8);
 
-	vm = vm_create_with_one_vcpu(&vcpu0, vcpu0_code);
-
-	<setup kvmclock>
-
-	vcpu1 = vm_vcpu_add(vm, 1, vcpu1_code);
-
-Then you probably only need one sync, from vCPU to alert the host that kvmclock
-is setup.
-
-> +		GUEST_SYNC(3);
-> +	}
-> +}
-> +#define CLOCKSOURCE_PATH "/sys/devices/system/clocksource/clocksource0/current_clocksource"
-> +
-> +static void check_clocksource(void)
-> +{
-> +	char *clk_name;
-> +	struct stat st;
-> +	FILE *fp;
-> +
-> +	fp = fopen(CLOCKSOURCE_PATH, "r");
-> +	if (!fp) {
-> +		pr_info("failed to open clocksource file: %d; assuming TSC.\n",
-> +			errno);
-> +		return;
-> +	}
-> +
-> +	if (fstat(fileno(fp), &st)) {
-> +		pr_info("failed to stat clocksource file: %d; assuming TSC.\n",
-> +			errno);
-> +		goto out;
-> +	}
-> +
-> +	clk_name = malloc(st.st_size);
-> +	TEST_ASSERT(clk_name, "failed to allocate buffer to read file\n");
-> +
-> +	if (!fgets(clk_name, st.st_size, fp)) {
-> +		pr_info("failed to read clocksource file: %d; assuming TSC.\n",
-> +			ferror(fp));
-> +		goto out;
-> +	}
-> +
-> +	TEST_ASSERT(!strncmp(clk_name, "tsc\n", st.st_size),
-
-TEST_REQUIRE, not TEST_ASSERT, i.e. skip the test if the clocksource isn't
-supported, don't cause a failure.
-
-> +		    "clocksource not supported: %s", clk_name);
-> +out:
-> +	fclose(fp);
-> +}
-
-This can all be replaced with:
-
-	TEST_REQUIRE(sys_clocksource_is_based_on_tsc());
+Ditto for CS/SS RPL vs. DPL.
 
