@@ -1,176 +1,147 @@
-Return-Path: <kvm+bounces-24403-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24404-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E71954E6F
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 18:06:43 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 367EB954FC9
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 19:15:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48DFC1C22AF8
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 16:06:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4194B24D8A
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 17:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80DD01BE86E;
-	Fri, 16 Aug 2024 16:06:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFB61C2334;
+	Fri, 16 Aug 2024 17:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sGqmNSV4"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5581BDA87;
-	Fri, 16 Aug 2024 16:06:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D899E1C688E
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 17:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723824391; cv=none; b=Xobx+jOWS3DzBpzdGt7lV/tTYrqnyJriLLe+QnRSgIFckzhc7Ha5pH0QAky7UN3wyryjz6q7sEF6+wPMXL3OcYI7Y+b3ciwcOtrl1Yrf8g056c5/PlnEfmOrZou/R/OUt3CoaIE/9ftDYYQR23uH+tlbyk9LjjpdTWVcjIhdPPY=
+	t=1723828368; cv=none; b=CnHvGxGo0FEOdByFNcn6Paeho1Jfdc9m01iS2fQoPz9WtBuBu+4SqcMcAub6ZfEFevlT70Ss5bQ3RJ7yrjpTgATaInSdhwx6hrwVvgLApZP0TR/DTujWlNugN969uXVDVL6Nn/zS+8BrG/aqwNIhXbVMNFFTTLTfsSIAA8LOks4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723824391; c=relaxed/simple;
-	bh=37h/oRDfh6L4BPlZhucfApa/80jVTHA6BUgyGnnHCjs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qJauXQkuIrP1lxYLPJbOHtyX/Cu5wl978Sk4e6qjHGn0TogQXGqT624agarnH5v6DIol8HUvCPXV2s6PJoTXyBoH+smBvjl2+gG8JhS1L8oNrf0dkkBMJYm3JHcMX2fDvYkTwISuHrGmuy8aIUC5hrZkEaRgah/oumMAR+VQIJ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C928013D5;
-	Fri, 16 Aug 2024 09:06:54 -0700 (PDT)
-Received: from [10.1.34.14] (e122027.cambridge.arm.com [10.1.34.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44E003F58B;
-	Fri, 16 Aug 2024 09:06:26 -0700 (PDT)
-Message-ID: <27c942e0-0e7c-4e71-b1df-1a8f70df5411@arm.com>
-Date: Fri, 16 Aug 2024 17:06:24 +0100
+	s=arc-20240116; t=1723828368; c=relaxed/simple;
+	bh=8z33o3F5Y6XeaQhLnECYNElCo/2fUd1REfXyOLDd7CQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jF31cN/F1q+CMCj4UYRBsrYta4fP8J3TC/6ITQYK9dWcLXCpdIUVwTEQh4MIvOfOP8fPY66Q/2sPW7vjz8en5bBIBb+7d0uMHA1x2PZ/97iB+fmpyfOd2XNN0TaBsK+7jK7/jy+0QtSClvoeexghyikEULGDfDhrT9vMBZEoyZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sGqmNSV4; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-202018541afso2895ad.1
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 10:12:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723828366; x=1724433166; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ir6eje0jsCYBssOPZnnxPt2Wh12Vi3qWaY8S8o8nHcs=;
+        b=sGqmNSV48q0LpgbbBw9TiIg3kfQY1t2C542bRsKSfY9rO8Pq3uWbBfkGOHSjI1Vpsk
+         oPxO0LfcaU828FTPszjiuXbrGYG51pfUG6+8nSR/NCnYTHDlzYNbQOjPplwdUpX+wXO0
+         WWk9belXWH9gk8VjTncKOAQ46slCQwFRFU3hqfYzccYH+B+l1TqLAl3ADJRZMC5/rpNx
+         Dl5bzxypqF4keorZVkgwCn0CiyHNPd1DP2KXzXLQKM+4P3RCb9c1xRyP+vCs+uAs3b4x
+         L0vX3sbotrUk+Dn/giuYrwSs+27ukDEzk4JvN+zMxAmCSJXTVHuaItuQxhP/f5pr0zSc
+         82Bw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723828366; x=1724433166;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ir6eje0jsCYBssOPZnnxPt2Wh12Vi3qWaY8S8o8nHcs=;
+        b=ZtGxnRz7UYs5Ma4pzgt2/Ob1V5Wbd3Hi97wyWD/bhml4KzRQSDQAoMYSQ6EChXus7c
+         J/V1SQtx879Vk+/SuSzL5Lx5Mlj0ZEcK/M5hN7UrY9JFFlwN7fQBlvYoiWafElXFzsjm
+         SncvHZsU9bTXDcVWk76HR3UoFns6FOzQ35vSc5C7XxCO8H8q2i3aqMP00ntn2UA8iaeG
+         pVLyM1zMbtaACpr7zy7IqO+0/RJclTZGXa0kwU318vYY5bxAVGlgV4heNIVeBkfVhkQZ
+         8p/Q/9Um0Tq1mRy8HsDz827uGpoKb0UrrRS+Iy1OMqjJ+88hwiTyfzfJ0tuH4c46ShRY
+         jVrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVGGVg4FSJpEek5s3hgIGGRuy02GkL177KRce16Brq/uetiuTeu4CBWbr8mnSscmhWqaKUoP5JMmRz9Hc7laNk+mlXV
+X-Gm-Message-State: AOJu0YyeaPKx3bSaOr9LuzSwybwHVq2o/PwFWvgQ/YZZ2m9/S2xdRHCH
+	bnKjM57jjdbybmcw9e+LjqWVB0A+i1/5SPnwu0sPoeRn19w6X21EhZvhhnfXRYN4lGEdCg8XDQ2
+	4HUt1eKncwhJ2DoCOj3260mA7aj8JE+UTdYbA
+X-Google-Smtp-Source: AGHT+IHn0Dx6FjiBWoYRgVRCwgmtYmi1lpJaCbjb8ziezHcF/ZqJH7pFFHyjhk+CaHGHZLn/Hp6C3MURr2OKOa9OxGk=
+X-Received: by 2002:a17:902:ecca:b0:201:e646:4ca with SMTP id
+ d9443c01a7336-20206010631mr1616355ad.14.1723828365805; Fri, 16 Aug 2024
+ 10:12:45 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 00/15] arm64: Support for running as a guest in Arm CCA
-To: Shanker Donthineni <sdonthineni@nvidia.com>,
- Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
-Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
- Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
- Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>,
- Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
- <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
- Alexandru Elisei <alexandru.elisei@arm.com>,
- Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
- linux-coco@lists.linux.dev,
- Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
-References: <20240701095505.165383-1-steven.price@arm.com>
- <ZpDvTXMDq6i+4O0m@fedora> <09fdebd7-32a0-4a88-9002-0f24eebe00a8@nvidia.com>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <09fdebd7-32a0-4a88-9002-0f24eebe00a8@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20240411205911.1684763-1-jmattson@google.com> <CAA0tLEor+Sqn6YjYdJWEs5+b9uPdaqQwDPChh1YEGWBi2NAAAw@mail.gmail.com>
+ <CALMp9eSBNjSXgsbhau-c68Ow_YoLvWBK6oUc1v1DqSfmDskmhg@mail.gmail.com> <Zr9hRydHFvPIMfUp@google.com>
+In-Reply-To: <Zr9hRydHFvPIMfUp@google.com>
+From: Jim Mattson <jmattson@google.com>
+Date: Fri, 16 Aug 2024 10:12:34 -0700
+Message-ID: <CALMp9eQ9k+SicmeEFvvyBrJH39HJa-=wP9cMhRRGy21+6ihEew@mail.gmail.com>
+Subject: Re: [PATCH] KVM: x86: AMD's IBPB is not equivalent to Intel's IBPB
+To: Sean Christopherson <seanjc@google.com>
+Cc: Venkatesh Srinivas <venkateshs@chromium.org>, kvm@vger.kernel.org, 
+	Paolo Bonzini <pbonzini@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 15/08/2024 23:16, Shanker Donthineni wrote:
-> Hi Steven,
-> 
-> On 7/12/24 03:54, Matias Ezequiel Vara Larsen wrote:
->> On Mon, Jul 01, 2024 at 10:54:50AM +0100, Steven Price wrote:
->>> This series adds support for running Linux in a protected VM under the
->>> Arm Confidential Compute Architecture (CCA). This has been updated
->>> following the feedback from the v3 posting[1]. Thanks for the feedback!
->>> Individual patches have a change log. But things to highlight:
->>>
->>>   * a new patch ("firmware/psci: Add psci_early_test_conduit()") to
->>>     prevent SMC calls being made on systems which don't support them -
->>>     i.e. systems without EL2/EL3 - thanks Jean-Philippe!
->>>
->>>   * two patches dropped (overriding set_fixmap_io). Instead
->>>     FIXMAP_PAGE_IO is modified to include PROT_NS_SHARED. When support
->>>     for assigning hardware devices to a realm guest is added this will
->>>     need to be brought back in some form. But for now it's just adding
->>>     complixity and confusion for no gain.
->>>
->>>   * a new patch ("arm64: mm: Avoid TLBI when marking pages as valid")
->>>     which avoids doing an extra TLBI when doing the break-before-make.
->>>     Note that this changes the behaviour in other cases when making
->>>     memory valid. This should be safe (and saves a TLBI for those
->>> cases),
->>>     but it's a separate patch in case of regressions.
->>>
->>>   * GIC ITT allocation now uses a custom genpool-based allocator. I
->>>     expect this will be replaced with a generic way of allocating
->>>     decrypted memory (see [4]), but for now this gets things working
->>>     without wasting too much memory.
->>>
->>> The ABI to the RMM from a realm (the RSI) is based on the final RMM v1.0
->>> (EAC 5) specification[2]. Future RMM specifications will be backwards
->>> compatible so a guest using the v1.0 specification (i.e. this series)
->>> will be able to run on future versions of the RMM without modification.
->>>
->>> This series is based on v6.10-rc1. It is also available as a git
->>> repository:
->>>
->>> https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v4
-> 
-> Which cca-host branch should I use for testing cca-guest/v4?
-> 
-> I'm getting compilation errors with cca-host/v3 and cca-guest/v4, is there
-> any known WAR or fix to resolve this issue?
+On Fri, Aug 16, 2024 at 7:25=E2=80=AFAM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Apr 11, 2024, Jim Mattson wrote:
+> > On Thu, Apr 11, 2024 at 6:32=E2=80=AFPM Venkatesh Srinivas
+> > <venkateshs@chromium.org> wrote:
+> > >
+> > > On Thu, Apr 11, 2024 at 1:59=E2=80=AFPM Jim Mattson <jmattson@google.=
+com> wrote:
+> > > >
+> > > > From Intel's documention [1], "CPUID.(EAX=3D07H,ECX=3D0):EDX[26]
+> > > > enumerates support for indirect branch restricted speculation (IBRS=
+)
+> > > > and the indirect branch predictor barrier (IBPB)." Further, from [2=
+],
+> > > > "Software that executed before the IBPB command cannot control the
+> > > > predicted targets of indirect branches (4) executed after the comma=
+nd
+> > > > on the same logical processor," where footnote 4 reads, "Note that
+> > > > indirect branches include near call indirect, near jump indirect an=
+d
+> > > > near return instructions. Because it includes near returns, it foll=
+ows
+> > > > that **RSB entries created before an IBPB command cannot control th=
+e
+> > > > predicted targets of returns executed after the command on the same
+> > > > logical processor.**" [emphasis mine]
+> > > >
+> > > > On the other hand, AMD's "IBPB may not prevent return branch
+> > > > predictions from being specified by pre-IBPB branch targets" [3].
+> > > >
+> > > > Since Linux sets the synthetic feature bit, X86_FEATURE_IBPB, on AM=
+D
+> > > > CPUs that implement the weaker version of IBPB, it is incorrect to
+> > > > infer from this and X86_FEATURE_IBRS that the CPU supports the
+> > > > stronger version of IBPB indicated by CPUID.(EAX=3D07H,ECX=3D0):EDX=
+[26].
+> > >
+> > > AMD's IBPB does apply to RET predictions if Fn8000_0008_EBX[IBPB_RET]=
+ =3D 1.
+> > > Spot checking, Zen4 sets that bit; and the bulletin doesn't apply the=
+re.
+> >
+> > So, with a definition of X86_FEATURE_AMD_IBPB_RET, this could be:
+> >
+> >        if (boot_cpu_has(X86_FEATURE_AMD_IBPB_RET) &&
+> > boot_cpu_has(X86_FEATURE_IBRS))
+> >                kvm_cpu_cap_set(X86_FEATURE_SPEC_CTRL);
+> >
+> > And, in the other direction,
+> >
+> >     if (boot_cpu_has(X86_FEATURE_SPEC_CTRL))
+> >         kvm_cpu_cap_set(X86_FEATURE_AMD_IBPB_RET);
+>
+> Jim, are you planning on sending a v2 with Venkatesh's suggested solution=
+?
 
-cca-host/v3 should work with cca-guest/v4. I've been working on
-rebasing/updating the branches and should be able to post v4/v5 series
-next week.
-
-> 
-> arch/arm64/kvm/rme.c: In function ‘kvm_realm_reset_id_aa64dfr0_el1’:
-> ././include/linux/compiler_types.h:487:45: error: call to
-> ‘__compiletime_assert_650’ declared with attribute error: FIELD_PREP:
-> value too large for the field
->   487 |         _compiletime_assert(condition, msg,
-> __compiletime_assert_, __COUNTER__)
->       |                                             ^
-> ././include/linux/compiler_types.h:468:25: note: in definition of macro
-> ‘__compiletime_assert’
->   468 |                         prefix ##
-> suffix();                             \
->       |                         ^~~~~~
-> ././include/linux/compiler_types.h:487:9: note: in expansion of macro
-> ‘_compiletime_assert’
->   487 |         _compiletime_assert(condition, msg,
-> __compiletime_assert_, __COUNTER__)
->       |         ^~~~~~~~~~~~~~~~~~~
-> ./include/linux/build_bug.h:39:37: note: in expansion of macro
-> ‘compiletime_assert’
->    39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond),
-> msg)
->       |                                     ^~~~~~~~~~~~~~~~~~
-> ./include/linux/bitfield.h:68:17: note: in expansion of macro
-> ‘BUILD_BUG_ON_MSG’
->    68 |                 BUILD_BUG_ON_MSG(__builtin_constant_p(_val)
-> ?           \
->       |                 ^~~~~~~~~~~~~~~~
-> ./include/linux/bitfield.h:115:17: note: in expansion of macro
-> ‘__BF_FIELD_CHECK’
->   115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP:
-> ");    \
->       |                 ^~~~~~~~~~~~~~~~
-> arch/arm64/kvm/rme.c:315:16: note: in expansion of macro ‘FIELD_PREP’
->   315 |         val |= FIELD_PREP(ID_AA64DFR0_EL1_BRPs_MASK, bps - 1) |
->       |                ^~~~~~~~~~
-> make[5]: *** [scripts/Makefile.build:244: arch/arm64/kvm/rme.o] Error 1
-> make[4]: *** [scripts/Makefile.build:485: arch/arm64/kvm] Error 2
-> make[3]: *** [scripts/Makefile.build:485: arch/arm64] Error 2
-> make[3]: *** Waiting for unfinished jobs....
-> 
-> I'm using gcc-13.3.0 compiler and cross-compiling on X86 machine.
-
-I'm not sure quite how this happens. The 'value' (bps - 1) shouldn't be
-considered constant, so I don't see how the compiler has decided to
-complain here - the __builtin_constant_p() should really be evaluating to 0.
-
-The only thing I can think of is if the compiler has somehow determined
-that rmm_feat_reg0 is 0 - which in theory it could do if it knew that
-kvm_init_rme() cannot succeed (rmi_features() would never be called, so
-the variable will never be set). Which makes me wonder if you're
-building with a PAGE_SIZE other than 4k?
-
-Obviously the code should still build if that's the case (so this would
-be a bug) but we don't currently support CCA with PAGE_SIZE != 4k.
-
-Steve
-
+I really like the idea of moving all of the cross-vendor capability
+settings into userspace, but if we want to keep this in the kernel,
+then I'll send V2.
 
