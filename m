@@ -1,233 +1,202 @@
-Return-Path: <kvm+bounces-24424-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24425-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEA5B955152
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 21:21:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36CFC955155
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 21:23:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95336282076
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 19:21:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BF3E1C227A0
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 19:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20AB71C3F2D;
-	Fri, 16 Aug 2024 19:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C5E1C3F3D;
+	Fri, 16 Aug 2024 19:23:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1l1+JRrZ"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="Rbo3W742"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2083.outbound.protection.outlook.com [40.107.94.83])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7C21A4F04
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 19:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723836082; cv=none; b=m1tx6fi6bEOhZtLX5tdO6wLXiwrZoqtAzQ9qTo6od3y/wviD/uxpxt2q8+WYj6pm3H59bIAPdBJKUdliAhestYPyKq56TUPX43olJhB62WQApoyPVVbdBMeVcNtQNW7rl/llnW0DMEXrVqGAinqb9fEBtrLFRdJ6DahI2lQR0zI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723836082; c=relaxed/simple;
-	bh=EEBIa6fj/Pv2HSdlYiP/qAmyl9BfYOfm6PD9687aiWo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=QfRhCvEDSPqt/mH7dyVqO52Ke1M75JAtFLF/JKHAr2MYn+CFhWVxBlOyuWecuRB26/pl4XJOaQJMo2RYtWFm61+9KYnZoaCGKkAib0D/MDt5hDfFLr7B4yJwmHt1dS/ug2AjjB0KBuQkPRyWNAUp4xoqd+kp/v7nljNQxOdPXg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1l1+JRrZ; arc=none smtp.client-ip=209.85.215.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-7a1188b3bc2so2060938a12.2
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 12:21:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723836080; x=1724440880; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ftVQJ22uwhnVCu9sapxQkj0rYV8PxV9JBpHRmc+PMHc=;
-        b=1l1+JRrZVJDtBInOWZsqpJxDVFY9aZQ15RFIMgCrLCBTzQ5F/SU3es8Rc5H3LFU/Ab
-         /wft3Ze6Yz7fjFRsEhNs3aKkl3dGkeMgSug4gomMiiAra+IPZ6m43CBaYnztG/a4NzJi
-         Agnh196XRaenDSyuKNXC4AuTHvZQUbv2g6sLRH+atInNMjqMhbQy8ycgLEf/03thjL0Y
-         Zypc+GYCYkAJvK9AS+fdPxLV4YhYsAMCJ6OOGZg3Cv2ptmtyaesLGG86QSMHunlOcCSp
-         lo24U+2p8+GNWj4B3UUuniMhC924uwtgu51b2Jkh+fncepPRt0KKSayzxsjJqepIgbF9
-         TTvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723836080; x=1724440880;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ftVQJ22uwhnVCu9sapxQkj0rYV8PxV9JBpHRmc+PMHc=;
-        b=R9cNyRTIuE1CoKNvcMtAsqd7Hg6B5fMwlME/LVuPJxEAGDKQybmXyNdLfpxOSdcmmE
-         VECNMhfMYhjaLD07bvEfe1OOjPJ7pzvExxyLkK4xqVKDdZo/Pso343qhB+PpVCNCR62e
-         YXNEs5VZZduqWCSaBmrLr0zw4BIRhrlevy8diZhZ6Ad29mgs2jcBPPhNomMf2i+4mUt9
-         pEerooapNtoVOt/5Nu08WWSnhUVh/4AXk6/5SSBCMjth0BgygmkoKNyh+1LnF/bzAIAr
-         Rn6fgCK4s2GRmljNB5Akls6E0WGWpTe8DnWKoXmw/97r0hNzykfUIP5HrfrYqnMVbUwY
-         1tEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUilXRDiUgotGEKOxXkJWDHSnEvI7FjNaslG5N+hVVb8eYuNrHKpw7ZZmAKWAaZ34S+Irk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz3msyME0UYPF5uOIDlyP/1RiS7gh42ycIIgWpXIWLqif/Sc3jX
-	oMfxYnnImmw1chBZiMOWcu8zk2ns7ymoVHojwpr3SN/++PrBwIw1+58LtiquVAWDjmahYBH4r4T
-	kOA==
-X-Google-Smtp-Source: AGHT+IHf6qVj/b2zC94+HdArQXss/KprNTNzFkLYPIjrHyHGZ5yxwPLzjGqV4Tufr9LC9iVbmqgXfl1sOeQ=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a63:4e60:0:b0:7c6:acc8:3eb5 with SMTP id
- 41be03b00d2f7-7c978efc48fmr6574a12.1.1723836079882; Fri, 16 Aug 2024 12:21:19
- -0700 (PDT)
-Date: Fri, 16 Aug 2024 12:21:18 -0700
-In-Reply-To: <13-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1BE478C7D;
+	Fri, 16 Aug 2024 19:23:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.83
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723836202; cv=fail; b=KiV/oXRv+xshvT9As/MT5cAuBKXAedgtDcYEmQ734gOio5THivzICTLwwf/nNnW2n//Dhq7VxW6SeQcY0lzuJ7sypk2EONe/KMTqo4YCd+f5cQrdyTSyb2LJAjo4PmHoqq2uaj+2A4yw7kz9T+tRyntDgsrFElBbGb0wJXZ1G8M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723836202; c=relaxed/simple;
+	bh=QGQ2QevigeBrqDBEERDk/Wf4Vj0dD47XacxABGvk040=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=uFvTXs4f4FA2ajsxT2InmX5mV2dK6V5bdvUrgBlIkRDjp+DseIoKOlDkzKBUCW2y4JCo7Z6MPzWYyDhhxosoSFxQV6iJYu52S/hn10uI6ajvabiXZpjeczdYc7P5d9FIGmJ52AoA4oMY4BiUkwI9wbk9+4LBpC+x2UosqjkibB8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=Rbo3W742; arc=fail smtp.client-ip=40.107.94.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rWjEX24NfhGfABS/uXSpSNpQtwGbYMrczZ+jGyipm8mUg8dMKxUcGOWP78aqcgFQyK7tW9c6vpcEEBgd8goi5hIYO2TNVZnAyXJ6ear0z4lMJ4AKN7uCnC3vf2sCRIARFfl6bDjOLMoimpD1MS7xWE8IWUaz9+8PZXYkMEb8v93Cjlkr5PIZM6/KpwuQR5KAV4g1YRa+hvw17xSkcOp6zkUmW6eWc4SkU7QEkuLB9nAgStvmCrhwi+ST4MRJjwUq8tdtnf8pAbMmbYj3bX4DDOUXsUHkGOK/IsUp6jI/fha2Wjf0JQc3fC3bBjdyqQWE5DEzhgXSW07qYaCXPSDo3Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1W0ZdZLy7CeQMQMnOQI5vL1wozV3zpFs/D34nfPtrGU=;
+ b=w2bHWfGxgWaF7RM1qev60VskRV3HEBJc2DCyFtGLBrUhxT9MO0pvd5nejs0Cf9YvjUiIqs+Wlp90+LCZ0FHujX/S9nM/5RBOqA/qW1T3rlQaBiB9IrbZhr9d9z5iBOlDLIIP+UVKHsUQ+ub2cioxilYmwBduBRhg5mhuDC6ccq9XudTjOKnIzqrMznYi+qFdvrGkaaAbzPaz9TD6XWzMiruAwa7W5ZMBmk/KOo2U2Urif2D2v04k4pwYba8LWu9L8O7+nUKceM65qHAdyTHb+HERDOTnC1207gPzQcmGhBvhBjo1/lN9ibQ7KAKqpL1zct/oeQ0Pbcf+sx0Nj0Qyxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1W0ZdZLy7CeQMQMnOQI5vL1wozV3zpFs/D34nfPtrGU=;
+ b=Rbo3W742ZtODSyEFYDdRPNbQgCi/X6uhQiNVko2ir5dJp2f59es5FzuGjSOjNrMotLBayRTy/D8zum5f8lfJubgBP/ehEvIvnrSDebmU2J0ukmB9p986ZVkb4HnOg70XIcnVJ50AsL9tY40kZvVhyE4/C7ZfzhIBvdbkhqc3NFA=
+Received: from PH7P220CA0036.NAMP220.PROD.OUTLOOK.COM (2603:10b6:510:32b::35)
+ by PH0PR12MB7837.namprd12.prod.outlook.com (2603:10b6:510:282::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7849.22; Fri, 16 Aug
+ 2024 19:23:17 +0000
+Received: from CY4PEPF0000EDD6.namprd03.prod.outlook.com
+ (2603:10b6:510:32b:cafe::dd) by PH7P220CA0036.outlook.office365.com
+ (2603:10b6:510:32b::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7784.28 via Frontend
+ Transport; Fri, 16 Aug 2024 19:22:43 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CY4PEPF0000EDD6.mail.protection.outlook.com (10.167.241.202) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7828.19 via Frontend Transport; Fri, 16 Aug 2024 19:23:16 +0000
+Received: from AUSPRSAMPAT.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Fri, 16 Aug
+ 2024 14:23:15 -0500
+From: "Pratik R. Sampat" <pratikrajesh.sampat@amd.com>
+To: <kvm@vger.kernel.org>
+CC: <seanjc@google.com>, <pbonzini@redhat.com>, <pgonda@google.com>,
+	<thomas.lendacky@amd.com>, <michael.roth@amd.com>, <shuah@kernel.org>,
+	<linux-kselftest@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH v2 0/9] SEV Kernel Selftests
+Date: Fri, 16 Aug 2024 14:23:01 -0500
+Message-ID: <20240816192310.117456-1-pratikrajesh.sampat@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <0-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com> <13-v1-01fa10580981+1d-iommu_pt_jgg@nvidia.com>
-Message-ID: <Zr-mrsewGxXt1rAC@google.com>
-Subject: Re: [PATCH 13/16] iommupt: Add the x86 PAE page table format
-From: Sean Christopherson <seanjc@google.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Alejandro Jimenez <alejandro.j.jimenez@oracle.com>, Lu Baolu <baolu.lu@linux.intel.com>, 
-	David Hildenbrand <david@redhat.com>, Christoph Hellwig <hch@lst.de>, iommu@lists.linux.dev, 
-	Joao Martins <joao.m.martins@oracle.com>, Kevin Tian <kevin.tian@intel.com>, kvm@vger.kernel.org, 
-	linux-mm@kvack.org, Pasha Tatashin <pasha.tatashin@soleen.com>, 
-	Peter Xu <peterx@redhat.com>, Ryan Roberts <ryan.roberts@arm.com>, 
-	Tina Zhang <tina.zhang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EDD6:EE_|PH0PR12MB7837:EE_
+X-MS-Office365-Filtering-Correlation-Id: 11dc15aa-dd62-4fdc-0096-08dcbe28e167
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?N1q7oPR4DcVm5fjpudQcJPBW1mZpuNnj4x3Sj2YF/Zir0Ww0OvXoqixxD3uE?=
+ =?us-ascii?Q?fgDRILlByXJX5tibVmEj/xFhAU29Xb6BXq6mdDoGHDG8vTSN2Mn2WDg1P5lT?=
+ =?us-ascii?Q?If64hQH278HoBGv4OtdzoKfCLr5Q/3pCMuK7mksqhhg2D9UiKUvVJe4QHjUm?=
+ =?us-ascii?Q?7wCJxg1A8xbot2BMJ58ft1KVGwxxI88w10B2zLWNr1WFtblekQrjz2mlwjnv?=
+ =?us-ascii?Q?CZRJcELWHKlBOwgOPsNIDWMFBgj0/rl7IoXcGaudZTIDz6mpnrpVSedUOGws?=
+ =?us-ascii?Q?egltEzeSFiCO7XHsW3KQQSycCzvuRHGipJ+YfH8EMLOPl0uHxGR5fxgBQsUk?=
+ =?us-ascii?Q?0lvnSHYpSuRht8918qHKd4q5DuVX6bq9VHemcspESzhgTBbOKSNsrRhXg3XO?=
+ =?us-ascii?Q?EX1C29OavDZtiS9QfdBkHq2MwU3WhjG2z9vKbAXZLN+6hdGRA6vLuPCBXoTW?=
+ =?us-ascii?Q?ueLsOIqWsxDsqmRDJgNdUgBEslU0UssT4yzO73OGvo4LVlfXKVXQEdTNKcdu?=
+ =?us-ascii?Q?fdqjukGXrVGPLL97a/7NsHiu5Yn3ZGnrt2lyIKx6er/FJZuflWtEzpKK0oPr?=
+ =?us-ascii?Q?Xb9u3M8mMvyyz9MSAGopnv78nY4Z/jLBJGFuTQXqrI6ha6aYEoWzMLNRKmIl?=
+ =?us-ascii?Q?x7NnrBIyuw98SvHZD2UlQPHft6SDRvLDYcU+4fdGbRn3jgGlk1C7DP7bG/ZZ?=
+ =?us-ascii?Q?H5F4DUpfs6xvGutMGVc5z2R9VVsUCXJqAJ/nJqB6jO79rWku3mRtwia0ydBW?=
+ =?us-ascii?Q?oKGOtja3iZO6wxs+SW39nKvUnYJxeoSF/kfpMbjUGU1utk3I8jz4OBBKq1gj?=
+ =?us-ascii?Q?3bWTix99vXz5IzxgRMRh0FXPaiB7ExfndO/0u31TqrQ4AMC1BjZlFMeBmvVc?=
+ =?us-ascii?Q?AxPB8tK6uZGsccdtQkakSuN9rS9LJPYjxeVy5LZ1Tc78R0211+RxML+GZ299?=
+ =?us-ascii?Q?/dNdONnvYqO2DF/pWKIkqm16cvym1rwkm0tGzOw6DcG2vzzm1WheccfiWqay?=
+ =?us-ascii?Q?KOq+qRCLSP9DUgJPm8hFP99Hq4uDnhFtA3ORJly7FzJ7OAsdu0MxTAP70y8G?=
+ =?us-ascii?Q?nzKq6YuTXm5cV6txh9oS/ncE4ffF4hKlh2enlDbYZAMrwiDOT5+mt5oi4Mxc?=
+ =?us-ascii?Q?YNrfW3LTinuucbYPWLnVBUK6ccnv87VJCY7DcTAYiZbpjgy1vqE1UYF9xBtD?=
+ =?us-ascii?Q?k2vYOEO1HKD0k4YJc3/RrmcOun4vYWbziCCi0Cl5ftecwrVOXDZ8Hx30g82F?=
+ =?us-ascii?Q?VgfOoVoMLJCrvJJds5HSB6sdn7jmNGygcW5zBrCWqs68C2F7YM+5X0JUTAyl?=
+ =?us-ascii?Q?1so/E6l8S/tBM4zz5aRkrd/N9Gvx4394McOqenJWfcEFxlO66xaO1oI4slZp?=
+ =?us-ascii?Q?miMeMoEs0nVmark9RYE8j7Jgly9SadEO+JOYty76G7QO2jCDwNlKuLKUYvfT?=
+ =?us-ascii?Q?7g/XNF7aWNxFh3X+tKf7cF83hbKpKONl4sMnBcSIEQLUWJzfTSc06A=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2024 19:23:16.8111
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 11dc15aa-dd62-4fdc-0096-08dcbe28e167
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EDD6.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7837
 
-On Thu, Aug 15, 2024, Jason Gunthorpe wrote:
-> This is used by x86 CPUs and can be used in both x86 IOMMUs. When the x86
-> IOMMU is running SVA it is using this page table format.
-> 
-> This implementation follows the AMD v2 io-pgtable version.
-> 
-> There is nothing remarkable here, the format has a variable top and
-> limited support for different page sizes and no contiguous pages support.
-> 
-> In principle this can support the 32 bit configuration with fewer table
-> levels.
+This series primarily introduces SEV-SNP test for the kernel selftest
+framework. It tests boot, ioctl, pre fault, and fallocate in various
+combinations to exercise both positive and negative launch flow paths.
 
-What's "the 32 bit configuration"?
+Patch 1 - Adds a wrapper for the ioctl calls that decouple ioctl and
+asserts which enables the use of negative test cases. No functional
+change intended.
+Patch 2 - Extend the sev smoke tests to use the SNP specific ioctl
+calls and sets up memory to boot a SNP guest VM
+Patch 3 - Adds SNP to shutdown testing
+Patch 4, 5 - Tests the ioctl path for SEV, SEV-ES and SNP
+Patch 6 - Adds support for SNP in KVM_SEV_INIT2 tests
+Patch 7,8,9 - Enable Prefault tests for SEV, SEV-ES and SNP
 
-> FIXME: Compare the bits against the VT-D version too.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-> ---
->  drivers/iommu/generic_pt/Kconfig            |   6 +
->  drivers/iommu/generic_pt/fmt/Makefile       |   2 +
->  drivers/iommu/generic_pt/fmt/defs_x86pae.h  |  21 ++
->  drivers/iommu/generic_pt/fmt/iommu_x86pae.c |   8 +
->  drivers/iommu/generic_pt/fmt/x86pae.h       | 283 ++++++++++++++++++++
->  include/linux/generic_pt/common.h           |   4 +
->  include/linux/generic_pt/iommu.h            |  12 +
->  7 files changed, 336 insertions(+)
->  create mode 100644 drivers/iommu/generic_pt/fmt/defs_x86pae.h
->  create mode 100644 drivers/iommu/generic_pt/fmt/iommu_x86pae.c
->  create mode 100644 drivers/iommu/generic_pt/fmt/x86pae.h
-> 
-> diff --git a/drivers/iommu/generic_pt/Kconfig b/drivers/iommu/generic_pt/Kconfig
-> index e34be10cf8bac2..a7c006234fc218 100644
-> --- a/drivers/iommu/generic_pt/Kconfig
-> +++ b/drivers/iommu/generic_pt/Kconfig
-> @@ -70,6 +70,11 @@ config IOMMU_PT_ARMV8_64K
->  
->  	  If unsure, say N here.
->  
-> +config IOMMU_PT_X86PAE
-> +       tristate "IOMMU page table for x86 PAE"
-> +#include "iommu_template.h"
-> diff --git a/drivers/iommu/generic_pt/fmt/x86pae.h b/drivers/iommu/generic_pt/fmt/x86pae.h
-> new file mode 100644
-> index 00000000000000..9e0ee74275fcb3
-> --- /dev/null
-> +++ b/drivers/iommu/generic_pt/fmt/x86pae.h
-> @@ -0,0 +1,283 @@
-> +/* SPDX-License-Identifier: GPL-2.0-only */
-> +/*
-> + * Copyright (c) 2024, NVIDIA CORPORATION & AFFILIATES
-> + *
-> + * x86 PAE page table
-> + *
-> + * This is described in
-> + *   Section "4.4 PAE Paging" of the Intel Software Developer's Manual Volume 3
+The patchset is rebased on top of kvm/queue and and over the
+"KVM: selftests: Add SEV-ES shutdown test" patch.
+https://lore.kernel.org/kvm/20240709182936.146487-1-pgonda@google.com/
 
-I highly doubt what's implemented here is actually PAE paging, as the SDM (that
-is referenced above) and most x86 folks describe PAE paging.  PAE paging is
-specifically used when the CPU is in 32-bit mode (NOT including compatibility mode!).
+v2:
+1. Add SMT parsing check to populate SNP policy flags
+2. Extend Peter Gonda's shutdown test to include SNP
+3. Introduce new tests for prefault which include exercising prefault,
+   fallocate, hole-punch in various combinations.
+4. Decouple ioctl patch reworked to introduce private variants of the
+   the functions that call into the ioctl. Also reordered the patch for
+   it to arrive first so that new APIs are not written right after
+   their introduction.
+5. General cleanups - adding comments, avoiding local booleans, better
+   error message. Suggestions incorporated from Peter, Tom, and Sean.
 
-  PAE paging translates 32-bit linear addresses to 52-bit physical addresses.
+RFC:
+https://lore.kernel.org/kvm/20240710220540.188239-1-pratikrajesh.sampat@amd.com/
 
-Presumably what's implemented here is what Intel calls 4-level and 5-level paging.
-Those are _really_ similar to PAE paging, e.g. have the same encodings for bits
-11:0, and even require CR4.PAE=1, but they aren't 100% identical.  E.g. true PAE
-paging doesn't have software-available bits in 62:MAXPHYADDR.
+Michael Roth (2):
+  KVM: selftests: Add interface to manually flag protected/encrypted
+    ranges
+  KVM: selftests: Add a CoCo-specific test for KVM_PRE_FAULT_MEMORY
 
-Unfortuntately, I have no idea what name to use for this flavor.  x86pae is
-actually kinda good, but I think it'll be confusing to people that are familiar
-with the more canonical version of PAE paging.
+Pratik R. Sampat (7):
+  KVM: selftests: Decouple SEV ioctls from asserts
+  KVM: selftests: Add a basic SNP smoke test
+  KVM: selftests: Add SNP to shutdown testing
+  KVM: selftests: SEV IOCTL test
+  KVM: selftests: SNP IOCTL test
+  KVM: selftests: SEV-SNP test for KVM_SEV_INIT2
+  KVM: selftests: Interleave fallocate for KVM_PRE_FAULT_MEMORY
 
-> + *   Section "2.2.6 I/O Page Tables for Guest Translations" of the "AMD I/O
-> + *   Virtualization Technology (IOMMU) Specification"
-> + *
-> + * It is used by x86 CPUs and The AMD and VT-D IOMMU HW.
-> + *
-> + * The named levels in the spec map to the pts->level as:
-> + *   Table/PTE - 0
-> + *   Directory/PDE - 1
-> + *   Directory Ptr/PDPTE - 2
-> + *   PML4/PML4E - 3
-> + *   PML5/PML5E - 4
+ tools/testing/selftests/kvm/Makefile          |   1 +
+ .../testing/selftests/kvm/include/kvm_util.h  |  13 +
+ .../selftests/kvm/include/x86_64/processor.h  |   1 +
+ .../selftests/kvm/include/x86_64/sev.h        |  76 +++-
+ tools/testing/selftests/kvm/lib/kvm_util.c    |  53 ++-
+ .../selftests/kvm/lib/x86_64/processor.c      |   6 +-
+ tools/testing/selftests/kvm/lib/x86_64/sev.c  | 190 +++++++-
+ .../kvm/x86_64/coco_pre_fault_memory_test.c   | 421 ++++++++++++++++++
+ .../selftests/kvm/x86_64/sev_init2_tests.c    |  13 +
+ .../selftests/kvm/x86_64/sev_smoke_test.c     | 298 ++++++++++++-
+ 10 files changed, 1024 insertions(+), 48 deletions(-)
+ create mode 100644 tools/testing/selftests/kvm/x86_64/coco_pre_fault_memory_test.c
 
-Any particularly reason not to use x86's (and KVM's) effective 1-based system?
-(level '0' is essentially the 4KiB leaf entries in a page table)
+-- 
+2.34.1
 
-Starting at '1' is kinda odd, but it aligns with thing like PML4/5, allows using
-the pg_level enums from x86, and diverging from both x86 MM and KVM is likely
-going to confuse people.
-	
-> + * FIXME: __sme_set
-> + */
-> +#ifndef __GENERIC_PT_FMT_X86PAE_H
-> +#define __GENERIC_PT_FMT_X86PAE_H
-> +
-> +#include "defs_x86pae.h"
-> +#include "../pt_defs.h"
-> +
-> +#include <linux/bitfield.h>
-> +#include <linux/container_of.h>
-> +#include <linux/log2.h>
-> +
-> +enum {
-> +	PT_MAX_OUTPUT_ADDRESS_LG2 = 52,
-> +	PT_MAX_VA_ADDRESS_LG2 = 57,
-> +	PT_ENTRY_WORD_SIZE = sizeof(u64),
-> +	PT_MAX_TOP_LEVEL = 4,
-> +	PT_GRANUAL_LG2SZ = 12,
-> +	PT_TABLEMEM_LG2SZ = 12,
-> +};
-> +
-> +/* Shared descriptor bits */
-> +enum {
-> +	X86PAE_FMT_P = BIT(0),
-> +	X86PAE_FMT_RW = BIT(1),
-> +	X86PAE_FMT_U = BIT(2),
-> +	X86PAE_FMT_A = BIT(5),
-> +	X86PAE_FMT_D = BIT(6),
-> +	X86PAE_FMT_OA = GENMASK_ULL(51, 12),
-> +	X86PAE_FMT_XD = BIT_ULL(63),
-
-Any reason not to use the #defines in arch/x86/include/asm/pgtable_types.h?
-
-> +static inline bool x86pae_pt_install_table(struct pt_state *pts,
-> +					   pt_oaddr_t table_pa,
-> +					   const struct pt_write_attrs *attrs)
-> +{
-> +	u64 *tablep = pt_cur_table(pts, u64);
-> +	u64 entry;
-> +
-> +	/*
-> +	 * FIXME according to the SDM D is ignored by HW on table pointers?
-
-Correct, only leaf entries have dirty bits.  
-
-> +	 * io_pgtable_v2 sets it
-> +	 */
-> +	entry = X86PAE_FMT_P | X86PAE_FMT_RW | X86PAE_FMT_U | X86PAE_FMT_A |
-
-What happens with the USER bit for I/O page tables?  Ignored, I assume?
-
-> +		X86PAE_FMT_D |
-> +		FIELD_PREP(X86PAE_FMT_OA, log2_div(table_pa, PT_GRANUAL_LG2SZ));
-> +	return pt_table_install64(&tablep[pts->index], entry, pts->entry);
-> +}
 
