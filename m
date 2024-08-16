@@ -1,170 +1,143 @@
-Return-Path: <kvm+bounces-24407-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24408-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D83D2955037
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 19:45:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F88795504E
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 19:55:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 628771F277ED
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 17:45:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB0AC288702
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 17:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF081C37B7;
-	Fri, 16 Aug 2024 17:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D04951C379A;
+	Fri, 16 Aug 2024 17:54:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B4Hn31V8"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rTy0qKEy"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189DC1C3792
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 17:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576351BDABF
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 17:54:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723830304; cv=none; b=JmSXXnKCi0QRE2JWg0BDT/7D9zlDhzDb/Im6gUsfumNhpo2Z4JANGaj7uNe3Rv/oa6Jyx9hBSv6CX+KHmpikmmi8Np4sFFO9zr8I/4XBN98smFfZGeCJ42nBhsxZcJTUmHGzriaGFOvuU11rLw+reT6dWAa1XPHB5NwZpUYAYko=
+	t=1723830876; cv=none; b=r23PLOE42p4rKGUy4t4K64sVbHWDZRQ3SoNP3Oz8+mezoeKgN5fKp3F3y+ZfJHQx8d6v3XhQrLgto8tyKjAIFMl2MaiCEv8BZFI06Q0J6NY4G2PwxCwsU5EaVORp+PvUoWijsMfqYJz6/jhShf052dEZILFqW191FDgWIUAETMk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723830304; c=relaxed/simple;
-	bh=5Q1HgjloIR0MpwBSSkUVVWkbj04/nU+bFDjCRNPuhA0=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LSUdguZxffByRpqdebhiIxnyHBAWvQhCg/9vbGCpLAJCjASV61BBeJHU6rVb5STxqJIVp40xhp1mshAk762+5XWVqskB1RODHWu2LcFFY5UTGEHABoAHUYzeaFko8Iv08C4bh2bwBgyvL7apVaikcj8HPUz6ghRXV1QpgamzlMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B4Hn31V8; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ad9ffa0d77so42146847b3.2
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 10:45:02 -0700 (PDT)
+	s=arc-20240116; t=1723830876; c=relaxed/simple;
+	bh=vKkLRfLwd+3pXpbvNbngAZ+9T9Lz9kOCjy+cNgYYdAY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sZwRrmoV1xx3yEzHmpzwUlixed27JaxqDBazi7/1ekGoOanKQnyaeZRneFJ9Yd3ZTE9LTgM1YkTEGACtPEDweN2xpZNuL4IUDeqg7sTH4no5g6Ef/7UHK1nbZsE0bpNgvfelbI7W2qHWM0QRwyccY+dxck/61AjczeDCOcExVcg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rTy0qKEy; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-70d1c655141so1557251b3a.1
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 10:54:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723830302; x=1724435102; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vLqQ0W+kiaSmHiEqBrEtQ8fcmXJFfIb+9LXgj3vFom8=;
-        b=B4Hn31V87GZQ/zp1/MHdTkicOLR7IZGJSCJkrKOj7/TzObmKcJ4pN6NoWKeYc+B5Zb
-         butWqSxkfVPYHYAJTfjayFp93a69P5MMpBZJcbiNLJ2pOEg6j1qhq/uM0enFDwStlYcY
-         R6Q6Z8mlufuitY/pnfNDZayp+4mRQTFePKl1ivPFWh0DtjtDig170CC9HPCT0WDyxwv8
-         jHotshxkXQyOAeQ5or9+L7BbNIR+RBlrG3e7AZvTGX7wVDic9k6cud9Rkf1q0j5CRInJ
-         Klz7bJKGoWW2Lm6w1JVY+vyqzuuHHEcYb+8FWV8+GZnBzLDWAdcnyAJyoWD4c0XDnZ1J
-         Fy4A==
+        d=linaro.org; s=google; t=1723830873; x=1724435673; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vKkLRfLwd+3pXpbvNbngAZ+9T9Lz9kOCjy+cNgYYdAY=;
+        b=rTy0qKEygn7rcvdLS4upqVikKGudf2WAv8fcFLlDIbv4xwdefUDutsDfp8wAd7r5+K
+         cKi6CbgtKjPMeGyq8mYBN/e6CVwQxQG7IFaA+XfmTi0jZJqKj4NtLPDZecVCOyGnRqTy
+         EjyzLO9sxdmDpLGvyIXpa0t4bwUZN3EaewCHljRPMHt2PU/ByRZuIZz2DaYxZCvqtt5Q
+         mA7jO4Y9m8U0sneKB6xAM8kjm6Jbd80u5tqRUB4FzexpUguaHNjZ6IJIYaKyA3lQCHn2
+         8SaVu6NDqr7j9cjSx0MIeD0SUu3wkK1MyYmQSVv+0fFVpkaFyu7CuXMHVIDXFkLWo7J1
+         f9Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723830302; x=1724435102;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vLqQ0W+kiaSmHiEqBrEtQ8fcmXJFfIb+9LXgj3vFom8=;
-        b=ZGLnRGOehj+weWPnkANMeK7eBC57kgQa+3DE/WgVUBVAOh3YdHAejjaOMzJ2s85gnK
-         XuQvL0JhneObMBz/ODTZvNDJvMo1qlqT1c04thkZBRsge/AVMEUCJ2vIhilEPog/UOsx
-         KiYR9RibvfzXH0bhpGNiVc8GSK93zCSZe5MlZnJ1KUJya0i0tFf/cku9qMA6g/6UXs+t
-         fKknQMoJ3LkeOv7QBngW9XrtQxprVbwsNSBEH0m79V/E2LJ5n0ZShgPfLmYg69RZiwRB
-         zfYiVjdkfoFZ04YpV253wzXFLmigWQV5csaTIDNJB8RFqMpsyRo66HPhYOJFWeZYySrp
-         SAgw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSZuJDG6bGNi2QQNTBft7FGgT8Kw3QlWMDXxGkxRCc/aAavxRm1DsDCCapq4k/RiL1aiJkCqUfJyUjorBTDlD/3Js1
-X-Gm-Message-State: AOJu0YxSKTBRLljaTYsDb5fJaY6c7cwa9/Lj5a6N9QDSnELnQiyqPlOh
-	aB/ZM4DcPOtIuQ+3DCb3QUIAX+1RuF2tSBIpqWWPSRtI2BrFZqZ254tdpVwBDeVDTIesTj1/Yv5
-	MooAQNh4241z18rlAEB+c0g==
-X-Google-Smtp-Source: AGHT+IEi4/I6TDzoHhlZG83qsUH/gsU5TYse1nTv7CQbUM47gB6I7o2YM+wF22moMbfN4T1ecnVRfVCm4hd5c3ZkMQ==
-X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a05:690c:688d:b0:699:d8dc:668d with
- SMTP id 00721157ae682-6b1bb2899d5mr1670697b3.5.1723830302029; Fri, 16 Aug
- 2024 10:45:02 -0700 (PDT)
-Date: Fri, 16 Aug 2024 17:45:00 +0000
-In-Reply-To: <aa3b5be8-2c8a-4fe8-8676-a40a9886c715@redhat.com>
+        d=1e100.net; s=20230601; t=1723830873; x=1724435673;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vKkLRfLwd+3pXpbvNbngAZ+9T9Lz9kOCjy+cNgYYdAY=;
+        b=In3TRFm9orgye0B7K49lPlV4lV/BksWc/QSGTy8LOtPK2wckBTw5BJaZlda5h3JSbX
+         aPsQfQWtiiye3Tr9n1cXNzkh++IWeqPHxKqyeFe2m52mz9AU1UJ/mvScOnmus7GKnnKf
+         u2VDCj9BoYSdqiE0c0pY0Q3y+WRZaD5iyGbQHbtcglswB0m4QD6RpKlGKQ7IJMoLg+3x
+         0KGDJO1lDg3VUWjLgmFCf2c5AgiCxCHX4I15BAZBqQ5VqCW1XNdMcZe9RuY5n2D4nQQT
+         4WEaeTskEEe1qtss/7V54kxvL2ZMlcLQ73omsTB+2Uatc2KTWkOREIuNUUdiyBESjPXe
+         /AZw==
+X-Forwarded-Encrypted: i=1; AJvYcCVKVpTMDZ2PZMR8ZKz1SurY5H2W9WUFLwAMbVtI6Noan9pUJxfvQpOK3XcZ6DP70DWFFnbONZ+HV7Vi0bf/i0W+v5rm
+X-Gm-Message-State: AOJu0YwVn97FGLvOuOR6kE+6KccHihoXSO/IPhc2k4F9JK68AOqX3GmL
+	yvQM5D19RI4bpXhL5l6m7UfAh50zeZNRMnBsQ2XiCxcx2wDc0S558deU/lX6cLg=
+X-Google-Smtp-Source: AGHT+IEbfHawBN3cm/BrNhs25Miea0myhD7+YcS/i6OLgODWH/6jqWoXdfVk4cc6MbIKi0KX9CZc1Q==
+X-Received: by 2002:a05:6a00:915f:b0:70d:2693:d208 with SMTP id d2e1a72fcca58-713c4e857c5mr4269815b3a.15.1723830873559;
+        Fri, 16 Aug 2024 10:54:33 -0700 (PDT)
+Received: from ?IPV6:2604:3d08:9384:1d00::b861? ([2604:3d08:9384:1d00::b861])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7127aefa113sm2965498b3a.99.2024.08.16.10.54.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 16 Aug 2024 10:54:32 -0700 (PDT)
+Message-ID: <dbce200b-a6ac-46ed-aec3-4a87f1434797@linaro.org>
+Date: Fri, 16 Aug 2024 10:54:31 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
- <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com> <4cdd93ba-9019-4c12-a0e6-07b430980278@redhat.com>
- <CA+EHjTxNNinn7EzV_o1X1d0kwhEwrbj_O7H8WgDtEy2CwURZFQ@mail.gmail.com> <aa3b5be8-2c8a-4fe8-8676-a40a9886c715@redhat.com>
-Message-ID: <diqzjzggmkf7.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
-Cc: Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Patrick Roy <roypat@amazon.co.uk>, qperret@google.com, linux-coco@lists.linux.dev, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/4] target/i386: fix build warning (gcc-12
+ -fsanitize=thread)
+To: =?UTF-8?Q?Philippe_Mathieu-Daud=C3=A9?= <philmd@linaro.org>,
+ qemu-devel@nongnu.org
+Cc: Beraldo Leal <bleal@redhat.com>, David Hildenbrand <david@redhat.com>,
+ Thomas Huth <thuth@redhat.com>, Marcelo Tosatti <mtosatti@redhat.com>,
+ Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org,
+ Wainer dos Santos Moschetta <wainersm@redhat.com>, qemu-s390x@nongnu.org,
+ =?UTF-8?Q?Daniel_P=2E_Berrang=C3=A9?= <berrange@redhat.com>,
+ =?UTF-8?Q?Marc-Andr=C3=A9_Lureau?= <marcandre.lureau@redhat.com>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ =?UTF-8?Q?Alex_Benn=C3=A9e?= <alex.bennee@linaro.org>,
+ Ilya Leoshkevich <iii@linux.ibm.com>
+References: <20240814224132.897098-1-pierrick.bouvier@linaro.org>
+ <20240814224132.897098-3-pierrick.bouvier@linaro.org>
+ <54bb02a6-1b12-460a-97f6-3f478ef766c6@linaro.org>
+From: Pierrick Bouvier <pierrick.bouvier@linaro.org>
+Content-Language: en-US
+In-Reply-To: <54bb02a6-1b12-460a-97f6-3f478ef766c6@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: base64
 
-
-David Hildenbrand <david@redhat.com> writes:
-
-> On 15.08.24 09:24, Fuad Tabba wrote:
->> Hi David,
->
-> Hi!
->
->> 
->> On Tue, 6 Aug 2024 at 14:51, David Hildenbrand <david@redhat.com> wrote:
->>>
->>>>
->>>> -     if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
->>>> +     if (!ops->accessible && (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)) {
->>>>                r = guest_memfd_folio_private(folio);
->>>>                if (r)
->>>>                        goto out_err;
->>>> @@ -107,6 +109,82 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
->>>>    }
->>>>    EXPORT_SYMBOL_GPL(guest_memfd_grab_folio);
->>>>
->>>> +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio)
->>>> +{
->>>> +     unsigned long gmem_flags = (unsigned long)file->private_data;
->>>> +     unsigned long i;
->>>> +     int r;
->>>> +
->>>> +     unmap_mapping_folio(folio);
->>>> +
->>>> +     /**
->>>> +      * We can't use the refcount. It might be elevated due to
->>>> +      * guest/vcpu trying to access same folio as another vcpu
->>>> +      * or because userspace is trying to access folio for same reason
->>>
->>> As discussed, that's insufficient. We really have to drive the refcount
->>> to 1 -- the single reference we expect.
->>>
->>> What is the exact problem you are running into here? Who can just grab a
->>> reference and maybe do nasty things with it?
->> 
->> I was wondering, why do we need to check the refcount? Isn't it enough
->> to check for page_mapped() || page_maybe_dma_pinned(), while holding
->> the folio lock?
-
-Thank you Fuad for asking!
-
->
-> (folio_mapped() + folio_maybe_dma_pinned())
->
-> Not everything goes trough FOLL_PIN. vmsplice() is an example, or just 
-> some very simple read/write through /proc/pid/mem. Further, some 
-> O_DIRECT implementations still don't use FOLL_PIN.
->
-> So if you see an additional folio reference, as soon as you mapped that 
-> thing to user space, you have to assume that it could be someone 
-> reading/writing that memory in possibly sane context. (vmsplice() should 
-> be using FOLL_PIN|FOLL_LONGTERM, but that's a longer discussion)
->
-
-Thanks David for the clarification, this example is very helpful!
-
-IIUC folio_lock() isn't a prerequisite for taking a refcount on the
-folio.
-
-Even if we are able to figure out a "safe" refcount, and check that the
-current refcount == "safe" refcount before removing from direct map,
-what's stopping some other part of the kernel from taking a refcount
-just after the check happens and causing trouble with the folio's
-removal from direct map?
-
-> (noting that also folio_maybe_dma_pinned() can have false positives in 
-> some cases due to speculative references or *many* references).
-
-Are false positives (speculative references) okay since it's better to
-be safe than remove from direct map prematurely?
-
->
-> -- 
-> Cheers,
->
-> David / dhildenb
+T24gOC8xNi8yNCAwMzo1OSwgUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgd3JvdGU6DQo+IE9u
+IDE1LzgvMjQgMDA6NDEsIFBpZXJyaWNrIEJvdXZpZXIgd3JvdGU6DQo+PiBGb3VuZCBvbiBk
+ZWJpYW4gc3RhYmxlLg0KPj4NCj4+IC4uL3RhcmdldC9pMzg2L2t2bS9rdm0uYzogSW4gZnVu
+Y3Rpb24g4oCYa3ZtX2hhbmRsZV9yZG1zcuKAmToNCj4+IC4uL3RhcmdldC9pMzg2L2t2bS9r
+dm0uYzo1MzQ1OjE6IGVycm9yOiBjb250cm9sIHJlYWNoZXMgZW5kIG9mIG5vbi12b2lkIGZ1
+bmN0aW9uIFstV2Vycm9yPXJldHVybi10eXBlXQ0KPj4gICAgNTM0NSB8IH0NCj4+ICAgICAg
+ICAgfCBeDQo+PiAuLi90YXJnZXQvaTM4Ni9rdm0va3ZtLmM6IEluIGZ1bmN0aW9uIOKAmGt2
+bV9oYW5kbGVfd3Jtc3LigJk6DQo+PiAuLi90YXJnZXQvaTM4Ni9rdm0va3ZtLmM6NTM2NDox
+OiBlcnJvcjogY29udHJvbCByZWFjaGVzIGVuZCBvZiBub24tdm9pZCBmdW5jdGlvbiBbLVdl
+cnJvcj1yZXR1cm4tdHlwZV0NCj4+ICAgIDUzNjQgfCB9DQo+Pg0KPj4gU2lnbmVkLW9mZi1i
+eTogUGllcnJpY2sgQm91dmllciA8cGllcnJpY2suYm91dmllckBsaW5hcm8ub3JnPg0KPj4g
+LS0tDQo+PiAgICB0YXJnZXQvaTM4Ni9rdm0va3ZtLmMgfCA0ICsrLS0NCj4+ICAgIDEgZmls
+ZSBjaGFuZ2VkLCAyIGluc2VydGlvbnMoKyksIDIgZGVsZXRpb25zKC0pDQo+IA0KPiBSZXZp
+ZXdlZC1ieTogUGhpbGlwcGUgTWF0aGlldS1EYXVkw6kgPHBoaWxtZEBsaW5hcm8ub3JnPg0K
+PiANCj4gQnV0IHdoYXQgYWJvdXQgdGhlIG90aGVyIGNhc2VzPw0KPiANCj4gJCBnaXQgZ3Jl
+cCAnYXNzZXJ0KGZhbHNlKScNCj4gYmxvY2svcWNvdzIuYzo1MzAyOiAgICAgICAgYXNzZXJ0
+KGZhbHNlKTsNCj4gaHcvaHlwZXJ2L2h5cGVydl90ZXN0ZGV2LmM6OTE6ICAgIGFzc2VydChm
+YWxzZSk7DQo+IGh3L2h5cGVydi9oeXBlcnZfdGVzdGRldi5jOjE5MDogICAgYXNzZXJ0KGZh
+bHNlKTsNCj4gaHcvaHlwZXJ2L2h5cGVydl90ZXN0ZGV2LmM6MjQwOiAgICBhc3NlcnQoZmFs
+c2UpOw0KPiBody9oeXBlcnYvdm1idXMuYzoxODc3OiAgICBhc3NlcnQoZmFsc2UpOw0KPiBo
+dy9oeXBlcnYvdm1idXMuYzoxODkyOiAgICBhc3NlcnQoZmFsc2UpOw0KPiBody9oeXBlcnYv
+dm1idXMuYzoxOTM0OiAgICBhc3NlcnQoZmFsc2UpOw0KPiBody9oeXBlcnYvdm1idXMuYzox
+OTQ5OiAgICBhc3NlcnQoZmFsc2UpOw0KPiBody9oeXBlcnYvdm1idXMuYzoxOTk5OiAgICBh
+c3NlcnQoZmFsc2UpOw0KPiBody9oeXBlcnYvdm1idXMuYzoyMDIzOiAgICBhc3NlcnQoZmFs
+c2UpOw0KPiBody9uZXQvZTEwMDBlX2NvcmUuYzo1NjQ6ICAgICAgICBhc3NlcnQoZmFsc2Up
+Ow0KPiBody9uZXQvaWdiX2NvcmUuYzo0MDA6ICAgICAgICBhc3NlcnQoZmFsc2UpOw0KPiBo
+dy9uZXQvbmV0X3J4X3BrdC5jOjM3ODogICAgICAgIGFzc2VydChmYWxzZSk7DQo+IGh3L252
+bWUvY3RybC5jOjE4MTk6ICAgICAgICBhc3NlcnQoZmFsc2UpOw0KPiBody9udm1lL2N0cmwu
+YzoxODczOiAgICAgICAgYXNzZXJ0KGZhbHNlKTsNCj4gaHcvbnZtZS9jdHJsLmM6NDY1Nzog
+ICAgICAgIGFzc2VydChmYWxzZSk7DQo+IGh3L252bWUvY3RybC5jOjcyMDg6ICAgICAgICBh
+c3NlcnQoZmFsc2UpOw0KPiBody9wY2kvcGNpLXN0dWIuYzo0OTogICAgZ19hc3NlcnQoZmFs
+c2UpOw0KPiBody9wY2kvcGNpLXN0dWIuYzo1NTogICAgZ19hc3NlcnQoZmFsc2UpOw0KPiBo
+dy9wcGMvc3BhcHJfZXZlbnRzLmM6NjQ4OiAgICAgICAgZ19hc3NlcnQoZmFsc2UpOw0KPiBp
+bmNsdWRlL2h3L3MzOTB4L2NwdS10b3BvbG9neS5oOjYwOiAgICBhc3NlcnQoZmFsc2UpOw0K
+PiBpbmNsdWRlL3FlbXUvb3NkZXAuaDoyNDA6ICogYXNzZXJ0KGZhbHNlKSBhcyB1bnVzZWQu
+ICBXZSByZWx5IG9uIHRoaXMNCj4gd2l0aGluIHRoZSBjb2RlIGJhc2UgdG8gZGVsZXRlDQo+
+IG1pZ3JhdGlvbi9kaXJ0eXJhdGUuYzoyMzE6ICAgICAgICBhc3NlcnQoZmFsc2UpOyAvKiB1
+bnJlYWNoYWJsZSAqLw0KPiB0YXJnZXQvaTM4Ni9rdm0va3ZtLmM6NTc3MzogICAgYXNzZXJ0
+KGZhbHNlKTsNCj4gdGFyZ2V0L2kzODYva3ZtL2t2bS5jOjU3OTI6ICAgIGFzc2VydChmYWxz
+ZSk7DQo+IA0KDQpUaGV5IGRvbid0IHNlZW0gdG8gYmUgYSBwcm9ibGVtLCBidXQgSSdsbCBk
+byBhIHNlcmllcyB0byBjbGVhbiB0aGlzIA0KY29tcGxldGVseSBmcm9tIHRoZSBjb2RlIGJh
+c2UsIHNvIGFzc2VydChmYWxzZSkgaXMgZXJhZGljYXRlZC4NCg==
 
