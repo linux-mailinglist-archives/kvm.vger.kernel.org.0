@@ -1,143 +1,164 @@
-Return-Path: <kvm+bounces-24416-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24417-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AC2B9550AA
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 20:17:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34A5B9550B5
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 20:20:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D1D71C228F4
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 18:17:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F5742841CF
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 18:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75781C37BF;
-	Fri, 16 Aug 2024 18:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C703A1BF32C;
+	Fri, 16 Aug 2024 18:20:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KMz5fnqE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UcxQHT6A"
 X-Original-To: kvm@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 656321482F4
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 18:17:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD0978B50
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 18:20:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723832262; cv=none; b=TdG7P/WNu36wpe/Hp/4twtPzVEba+iXy6ywr6RksHCJ+LdgG5JJOzcDJrMCXwbkzwZ1KDzLgP/1FPdeVjLeT54gFAwNzBvpYrikc8fl8dVYyqIyXN0fFXUfCptcyOlrcV/bpYOOyUZ+0VDT1sngonFb+K6DmJEiKI9VD6D2U6lU=
+	t=1723832442; cv=none; b=iBl1dIskqRtjcoT0T816mvWZkEdZl8AH4VoyWF78+B8zqJNb9cDj1kZwObvYEjjHRWFliNFzTTUCRj+t3kJNuzfIm8+RqjVBlQ3ntxT1qWlZHORbhIHDzEXvZgmLXQWum7pWgBLFELUNJanRb9dXGkOTIsKCp1R3iwHkndB4WnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723832262; c=relaxed/simple;
-	bh=v7H2v+aBQQQLBDa/xPhBwsCdZvnTeVlc3DtFHbYiIsQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cTDSDlNGxSeGi1Q3IZK5GxhTpGIS2174R46avwGN4Wt3SH6Jytwul+5yp248YqSni5aIR9O1s1jULF9MXhhxSPFe0OeNIqd3dO6p9JpoAU8M4l9OSCbmGhZdRgjTqV10p2mqmgEm4fQa8AS2uznrCp21rzuVcSApkTbQZAjwZLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KMz5fnqE; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1723832260;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=w26DEP6I/1hWgkgvxN7UFiv+/Y1lgQMQcXbYEa3Fu2c=;
-	b=KMz5fnqEbw2nqbcr/oE9MHLKAWacDMzj4a2JHiG32tmEUg0Qx9M8Hzbxqn0GvJXHJCN0PY
-	ubC94CL/9mBU7N93cJ678W7LPRhcbI3Dlg7SaS2djlyRgTHtc8V4Xiq9p44V30IvuTP7KB
-	7bQTtLDOBjThfo7riKl3noZcBBzhRjI=
-Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
- [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-106-cFxGxjGIPO6Xm1l0uRqq6g-1; Fri, 16 Aug 2024 14:17:39 -0400
-X-MC-Unique: cFxGxjGIPO6Xm1l0uRqq6g-1
-Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-52efa034543so2326710e87.3
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 11:17:38 -0700 (PDT)
+	s=arc-20240116; t=1723832442; c=relaxed/simple;
+	bh=IbVmYFoIxyQulrGV2li59J1UGx7YeDN54yW8QQYBykc=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=h8pk1sgFW7vr1eu636iujUH73UwuoWorCsW4xVozKIdyhbu0Z5lTuC/hEBF/PQqQTsQlnDe75imh43ZGBJ++8Kj9ld5OG4BCtmgkl4GtccA/IzBk1FQtlsJcxGRtorfAIMcM0IpXiqg2pErbzD2daJZLVjzY34myCaOdSHA5Zzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UcxQHT6A; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e11703f1368so3004777276.1
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 11:20:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723832439; x=1724437239; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=N3tmSlk8QlfN4jJU+Ovee8DLWMKdOuytFzcWHsW6egI=;
+        b=UcxQHT6AhAMhgRKwkaWv2qwVvCbCIjDZanMpY+imawmgO+Jy84qqB9RqXLiWMh+PR7
+         mjVoZlhSZqm8u+A/3xNbro6CKu+ruI8AaUkfzH0sT9bzkOB6bsWk7W6LRuX2GfbNgvNk
+         A21uDumh7dZmWv04IUE42angsxrhbGYkgeUUfRB9EqhJmtzpKrfrK+aTxgVWR+BFJT05
+         GKJLPHwY+yHb9ZQBQhN4XqJWohTGj4jJpjbDC+AobV1DmoBn9jGZ3gwzCYxz2F3q5OBV
+         /z+GagH5wLXl2thfcFKP3/ibbuQXPf6BzF+X0C7HDQlnb2HbDPWG0cxo+8fNWgchoq+r
+         Jb/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723832257; x=1724437057;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w26DEP6I/1hWgkgvxN7UFiv+/Y1lgQMQcXbYEa3Fu2c=;
-        b=uVIRLNH2roFbtkn1fnTSW/m4juGbGgR/aa0HeCHmRIYn009wh3jOVCje0MDVxNGzRX
-         srUSGrbGJqG94fCR4n3NYUKehzQ5nRU/9cgA/Btuwnd6n2quUccohjwrCklWCExht6z0
-         NLxZHKNx77kPokrjNMHlxCfP/gUD72PdhG6GBXCvl4Xyxz6pbZ9c0rSjaGEA1sNPmhJ5
-         uTVphjqVExQSV2xbByULM0+JRzhJI0cW2DvAXMZNYh8tsD2UTpB802Yu+QHJmicXN+Fx
-         IaU1ZOKWhgXwRNh4P6aagiJyMn64BJNu+i9oQWC/+u4OJ3pAyW49mGE4uQPu3Waehy/+
-         IClA==
-X-Forwarded-Encrypted: i=1; AJvYcCW19q+l5qjnkXAJOdvS4K9Ax9ZgyeVrQWpcq7VzPV+RwulSyI3rGCUIvRuse0UezYSznnhGpr9EYUDXJumXKFSWJapr
-X-Gm-Message-State: AOJu0YxrZsWAELdhKcKKUoa4i5SoW4Nd+3ZWFehO82ZSEbuEh55YTyVh
-	7f+RJXbW76eNt7/JTpOToLiEVrKeOC8C65SDAyOUThQu05VMkoyoMeY0QGWHWI2EQJgTAS1z7lB
-	rO9+q/id3MKUjMjun487N8pYQ42OZR5jx6VLxJhh5bdQhEEAKJw==
-X-Received: by 2002:a05:6512:39c6:b0:52e:bdfc:1d09 with SMTP id 2adb3069b0e04-5331c69e8b3mr2425630e87.18.1723832257391;
-        Fri, 16 Aug 2024 11:17:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHxDJoZ5Qb2jeEyehNoICNOwZ2FOl92B7t2o0prXKfmYgWxwCynxbb3IvNph8kIMcufJQDgVA==
-X-Received: by 2002:a05:6512:39c6:b0:52e:bdfc:1d09 with SMTP id 2adb3069b0e04-5331c69e8b3mr2425597e87.18.1723832256432;
-        Fri, 16 Aug 2024 11:17:36 -0700 (PDT)
-Received: from redhat.com ([2a02:14f:1f5:b635:69bf:864a:d81a:d278])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a83838cf40csm288443666b.57.2024.08.16.11.17.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Aug 2024 11:17:35 -0700 (PDT)
-Date: Fri, 16 Aug 2024 14:17:30 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Sean Christopherson <seanjc@google.com>
-Cc: syzbot <syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com>,
-	eperezma@redhat.com, jasowang@redhat.com, kvm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev,
-	Mike Christie <michael.christie@oracle.com>, oleg@redhat.com,
-	ebiederm@xmission.com, sgarzare@redhat.com, stefanha@redhat.com,
-	brauner@kernel.org
-Subject: Re: [syzbot] [kvm?] [net?] [virt?] INFO: task hung in
- __vhost_worker_flush
-Message-ID: <20240816141505-mutt-send-email-mst@kernel.org>
-References: <Zr-VGSRrn0PDafoF@google.com>
- <000000000000fd6343061fd0d012@google.com>
- <Zr-WGJtLd3eAJTTW@google.com>
+        d=1e100.net; s=20230601; t=1723832439; x=1724437239;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N3tmSlk8QlfN4jJU+Ovee8DLWMKdOuytFzcWHsW6egI=;
+        b=g/8wToXYnLKi+gq25jeeqid7N02tRhjUb4TkrlAJoSjw/zs/bkjfiSm4H/AUKQIwgN
+         fe8eWaBqc00NjpGOY4VePO2XZ6RyzuhRAReLjCq7NXd8gBJxgVVGfudsOH28/4DbAcx6
+         r4f1wLXKzCGr6jg4bWSWlYk2cs31gdsCmcmZI/gq8xsgjl5QBY6uK3JIePIt4SdnOeum
+         1XHOx7HribzkpmDro5Kdniagn3tlyOuZ54Nxd7EL8K29CN8ORGGxuGbyIzE96dW5uHqg
+         0bGwAn1s+I9ObPfFjHnspaXL7xUxyKKXSIdIpMn9LF4gbvfbIcT8rF8TJNA0WE241Qt+
+         TWyw==
+X-Gm-Message-State: AOJu0YyUbewP9ykwLdSLdZUE/Y+yL/WvTWmI8HJy+CiFZKWLWva8rdTr
+	mT69zQKXjzDPVTqucYy3UF4uIEKsAgJ6fJJ/ogeLQUl7L5DuUtXF4tZi1y4dzo63LOxrJDyLJ+G
+	a/g==
+X-Google-Smtp-Source: AGHT+IH53F61lOun6gFWjC7pOAiTbzvO9f/I6y3MGI837xE97OoqGPqg4QBoHrpu5k9vU+7gjfC5O97rXuI=
+X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
+ (user=seanjc job=sendgmr) by 2002:a25:2943:0:b0:e11:5c41:54e2 with SMTP id
+ 3f1490d57ef6-e1180ba7fa8mr6979276.0.1723832439504; Fri, 16 Aug 2024 11:20:39
+ -0700 (PDT)
+Date: Fri, 16 Aug 2024 11:20:38 -0700
+In-Reply-To: <000000000000fd4bde061b17c4a0@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zr-WGJtLd3eAJTTW@google.com>
+Mime-Version: 1.0
+References: <000000000000fd4bde061b17c4a0@google.com>
+Message-ID: <Zr-Ydj8FBpiqmY_c@google.com>
+Subject: Re: [syzbot] [kvm?] WARNING in kvm_put_kvm
+From: Sean Christopherson <seanjc@google.com>
+To: syzbot <syzbot+d8775ae2dbebe5ab16fd@syzkaller.appspotmail.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, pbonzini@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="us-ascii"
 
-On Fri, Aug 16, 2024 at 11:10:32AM -0700, Sean Christopherson wrote:
-> On Fri, Aug 16, 2024, syzbot wrote:
-> > > On Wed, May 29, 2024, syzbot wrote:
-> > >> Hello,
-> > >> 
-> > >> syzbot found the following issue on:
-> > >> 
-> > >> HEAD commit:    9b62e02e6336 Merge tag 'mm-hotfixes-stable-2024-05-25-09-1..
-> > >> git tree:       upstream
-> > >> console output: https://syzkaller.appspot.com/x/log.txt?x=16cb0eec980000
-> > >> kernel config:  https://syzkaller.appspot.com/x/.config?x=3e73beba72b96506
-> > >> dashboard link: https://syzkaller.appspot.com/bug?extid=7f3bbe59e8dd2328a990
-> > >> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> > >> 
-> > >> Unfortunately, I don't have any reproducer for this issue yet.
-> > >> 
-> > >> Downloadable assets:
-> > >> disk image: https://storage.googleapis.com/syzbot-assets/61b507f6e56c/disk-9b62e02e.raw.xz
-> > >> vmlinux: https://storage.googleapis.com/syzbot-assets/6991f1313243/vmlinux-9b62e02e.xz
-> > >> kernel image: https://storage.googleapis.com/syzbot-assets/65f88b96d046/bzImage-9b62e02e.xz
-> > >> 
-> > >> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > >> Reported-by: syzbot+7f3bbe59e8dd2328a990@syzkaller.appspotmail.com
-> > >
-> > > #syz unset kvm
-> > 
-> > The following labels did not exist: kvm
+On Mon, Jun 17, 2024, syzbot wrote:
+> Hello,
 > 
-> Hrm, looks like there's no unset for a single subsytem, so:
+> syzbot found the following issue on:
 > 
-> #syz set subsystems: net,virt
+> HEAD commit:    2ccbdf43d5e7 Merge tag 'for-linus' of git://git.kernel.org..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1695b7ee980000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=b8786f381e62940f
+> dashboard link: https://syzkaller.appspot.com/bug?extid=d8775ae2dbebe5ab16fd
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> 
+> Unfortunately, I don't have any reproducer for this issue yet.
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/a4edf8b28d7f/disk-2ccbdf43.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/5f9b0fd6168d/vmlinux-2ccbdf43.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/a2c5f918ca4f/bzImage-2ccbdf43.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+d8775ae2dbebe5ab16fd@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 17017 at kernel/rcu/srcutree.c:653 cleanup_srcu_struct+0x37c/0x520 kernel/rcu/srcutree.c:653
+> Modules linked in:
+> CPU: 0 PID: 17017 Comm: syz-executor.4 Not tainted 6.10.0-rc3-syzkaller-00044-g2ccbdf43d5e7 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 06/07/2024
+> RIP: 0010:cleanup_srcu_struct+0x37c/0x520 kernel/rcu/srcutree.c:653
+> Code: 83 c4 20 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 90 0f 0b 90 48 83 c4 20 5b 5d 41 5c 41 5d 41 5e 41 5f c3 cc cc cc cc 90 <0f> 0b 90 e9 35 ff ff ff 90 0f 0b 90 48 b8 00 00 00 00 00 fc ff df
+> RSP: 0018:ffffc90003567d20 EFLAGS: 00010202
+> RAX: 0000000000000001 RBX: ffffc90002d6e000 RCX: 0000000000000002
+> RDX: fffff91ffffab294 RSI: 0000000000000008 RDI: ffffe8ffffd59498
+> RBP: ffff88805b6c0000 R08: 0000000000000000 R09: fffff91ffffab293
+> R10: ffffe8ffffd5949f R11: 0000000000000000 R12: ffffc90002d778a8
+> R13: ffffc90002d77880 R14: ffffc90002d77868 R15: 0000000000000004
+> FS:  00007fa719dec6c0(0000) GS:ffff8880b9200000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020078000 CR3: 000000006176a000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  kvm_destroy_vm arch/x86/kvm/../../../virt/kvm/kvm_main.c:1351 [inline]
+>  kvm_put_kvm+0x8df/0xb80 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1380
+>  kvm_vm_release+0x42/0x60 arch/x86/kvm/../../../virt/kvm/kvm_main.c:1403
+>  __fput+0x408/0xbb0 fs/file_table.c:422
+>  task_work_run+0x14e/0x250 kernel/task_work.c:180
+>  resume_user_mode_work include/linux/resume_user_mode.h:50 [inline]
+>  exit_to_user_mode_loop kernel/entry/common.c:114 [inline]
+>  exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
+>  __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+>  syscall_exit_to_user_mode+0x278/0x2a0 kernel/entry/common.c:218
+>  do_syscall_64+0xda/0x250 arch/x86/entry/common.c:89
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
-Must be this patchset:
+syzbot reported a rash of KVM cleanup_srcu_struct() splats, and while they suggest
+that KVM has a rogue SRCU reader, I strongly suspect that something is/was going
+sideways with bcachefs, and KVM is an innocent bystander.  All of the splats have
+bcachefs activity shortly before the failure, and syzbot has never managed to find
+a reproducer.
 
-https://lore.kernel.org/all/20240316004707.45557-1-michael.christie@oracle.com/
+If if KVM were at fault, e.g. was accessing SRCU after its freed, I would expect
+at least one report to not include bcachefs activity, and I would think we'd have
+at least one reproducer.
 
-but I don't see anything obvious there to trigger it, and it's not
-reproducible yet...
+Furthermore, except for the __timer_delete_sync() splat, all of the issues
+mysteriously stopped occuring at roughly the same time, and I definitely don't
+recall fixing anything remotely relevant in KVM.
 
--- 
-MST
+So, I'm going to close all of the stale reports as invalid, and assign the
+__timer_delete_sync() to bcachefs, because again there's nothing in there that
+suggests KVM is at fault.
 
+        general protection fault in detach_if_pending (3) bcachefs kvm		5	52d	52d	
+        general protection fault in get_work_pool (2) kvm			5	59d	59d	
+        WARNING in kvm_put_kvm kvm				                14	51d	60d	
+        KASAN: wild-memory-access Read in __timer_delete_sync kvm		5	14d	81d	<= ???
+        WARNING in srcu_check_nmi_safety kvm				        255	51d	104d	
+        WARNING in cleanup_srcu_struct (4) kvm bcachefs				3567	51d	105d	
+
+#syz invalid
 
