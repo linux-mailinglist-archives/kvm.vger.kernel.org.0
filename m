@@ -1,225 +1,170 @@
-Return-Path: <kvm+bounces-24406-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24407-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C66EB955020
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 19:40:51 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D83D2955037
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 19:45:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57DD4B22C65
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 17:40:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 628771F277ED
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 17:45:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF991C2338;
-	Fri, 16 Aug 2024 17:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AF081C37B7;
+	Fri, 16 Aug 2024 17:45:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Ij5wn8oH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="B4Hn31V8"
 X-Original-To: kvm@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2087.outbound.protection.outlook.com [40.107.244.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0DDC1AC8BE;
-	Fri, 16 Aug 2024 17:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.87
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723830039; cv=fail; b=jwdCIfuqOmGWIDIVNZYyZ/ALf+Y2D6jkz3HH5MPmeyVJVwzbBaX+dJnBJhc6SvavDP3hMt/pIOyaSK/12W44Dv6PJIMd4F6fNLM3hj402QowhiU3hJtnUg5jFjN2CQ3E/tVi/8kV4dpDnU4ydD4gYTDJwLmQKqoBMIZ2mYxmS4Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723830039; c=relaxed/simple;
-	bh=qw2Trbhg7WraKQc4Ffmr4xjpPzu2WZ/tG5DvOLdY2V8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=K22WYRg3X72adtUrb+46b1OnvyFn7CO6JRU6vZWNrdsGfeY/KSpvkkDAkoqOgXw6hiQHRkSDrWtthQ1KNVqKYXXrdnstuZpa5QJHH0wdlIfSnHs94gY2hSCld66wAqXxrNA77gOREPE2wy8FFnLEs59909xGzZmGeqC4q/8pf88=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Ij5wn8oH; arc=fail smtp.client-ip=40.107.244.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OR7kxfXYB1BqCc615CRmS91cToqoDzEsIzVvm2lWJjl7Qi6Uw/19i/Vibi8y78BNYaeH/+sevYyrY1/y4QJ7bboUXxv43bc04Kf+RIrnkiGW2rKwOSvOtmNi/WIC9UGln4AKmAt8pyhyFSMigpUPzkxGRgGHrCDmB9BqDb8wfRkqOZ57YHDAQpQ/eHhYGAgtXNm4V5cxTujWfaUm+2SHP+CoE2NrHzxsdyqrYK3dRy9yIa2hWH5kNA1Y2O6OdsuTm2T8zFEwK9UYQ/GqsLlSJAODANdAXhpYuDsHsFMia/5XTV2hJi9hEX+CQZBoNgwybSkuUNHxEBPAPaSzfl08Kw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4umQplemR+89QkBubgfFWDypoBLwNYMly4mIsImuFms=;
- b=SKd4ksEDKVOauUr1SPwAdWDPvUsutexdFdcKHWyqb2WYgiaygk7GDlAzNgOo+3AlgGp0dbxi/2CaW8LDk3UuCZ/vIsYmy7VIYZPSTr9wBl7R1qQYyuiZNk4GZp2Q9K5MiFjOls/goXkTw/LclPiAXLUEimrhJs+32T8lngdYqXzeMwhiNCRgQCTTHPVoHVmgqBqiZwdCZRiHYK34PEPzeXGgHB5f+1q9bj00HwBMbCU5ufhNl4NqHWSicIWyyRCEapx4gGXvMIllKlaPD7OkcSsLpnxNX6LClqHMuc/wOftpNdoIzFQbXPEGZswf3/QC3MlcFKuS1EWRzid2AunRaw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4umQplemR+89QkBubgfFWDypoBLwNYMly4mIsImuFms=;
- b=Ij5wn8oHXvOwQQEGezUhdrkaXxXiuiX4rfMXJUKGgqmTXzuAjny3rbVCEb21SzgL9Cd2bQbXkdnLZ/fhXXnflYmBqnB/54Lcjc7LOTElfBwZEoCrRza38sxxdN4DN4TSXMVwZi+KOcEyp8AbHulWxHlnqMcO65kpfSN/H3BFIBikxMIsCHj00Xu6E+m50fd83tTObH0+K7buaJTpFQ2h5n1MGp4YV24YGUeMGhY0qqS8eJumr0gB1takFmMCw+etqtdEKp6RM4u17ztW7sC9DAm1PwKBseVZir9hvanlyvG6HuUTf+0xVSdaPF1MomNTlKZRvNph3m1ORc4ozV1X1g==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com (2603:10b6:610:145::10)
- by SA3PR12MB7999.namprd12.prod.outlook.com (2603:10b6:806:312::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7875.18; Fri, 16 Aug
- 2024 17:40:34 +0000
-Received: from CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8]) by CH3PR12MB7763.namprd12.prod.outlook.com
- ([fe80::8b63:dd80:c182:4ce8%3]) with mapi id 15.20.7875.016; Fri, 16 Aug 2024
- 17:40:34 +0000
-Date: Fri, 16 Aug 2024 14:38:36 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: Peter Xu <peterx@redhat.com>
-Cc: David Hildenbrand <david@redhat.com>, linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	Sean Christopherson <seanjc@google.com>,
-	Oscar Salvador <osalvador@suse.de>,
-	Axel Rasmussen <axelrasmussen@google.com>,
-	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
-	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Alistair Popple <apopple@nvidia.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	Alex Williamson <alex.williamson@redhat.com>,
-	Yan Zhao <yan.y.zhao@intel.com>
-Subject: Re: [PATCH 06/19] mm/pagewalk: Check pfnmap early for
- folio_walk_start()
-Message-ID: <20240816173836.GD2032816@nvidia.com>
-References: <20240809160909.1023470-1-peterx@redhat.com>
- <20240809160909.1023470-7-peterx@redhat.com>
- <b103edb7-c41b-4a5b-9d9f-9690c5b25eb7@redhat.com>
- <ZrZJqd8FBLU_GqFH@x1n>
- <d9d1b682-cf3c-4808-ba50-56c75a406dae@redhat.com>
- <20240814130525.GH2032816@nvidia.com>
- <81080764-7c94-463f-80d3-e3b2968ddf5f@redhat.com>
- <Zr9gXek8ScalQs33@x1n>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zr9gXek8ScalQs33@x1n>
-X-ClientProxiedBy: BL1PR13CA0313.namprd13.prod.outlook.com
- (2603:10b6:208:2c1::18) To CH3PR12MB7763.namprd12.prod.outlook.com
- (2603:10b6:610:145::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 189DC1C3792
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 17:45:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1723830304; cv=none; b=JmSXXnKCi0QRE2JWg0BDT/7D9zlDhzDb/Im6gUsfumNhpo2Z4JANGaj7uNe3Rv/oa6Jyx9hBSv6CX+KHmpikmmi8Np4sFFO9zr8I/4XBN98smFfZGeCJ42nBhsxZcJTUmHGzriaGFOvuU11rLw+reT6dWAa1XPHB5NwZpUYAYko=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1723830304; c=relaxed/simple;
+	bh=5Q1HgjloIR0MpwBSSkUVVWkbj04/nU+bFDjCRNPuhA0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=LSUdguZxffByRpqdebhiIxnyHBAWvQhCg/9vbGCpLAJCjASV61BBeJHU6rVb5STxqJIVp40xhp1mshAk762+5XWVqskB1RODHWu2LcFFY5UTGEHABoAHUYzeaFko8Iv08C4bh2bwBgyvL7apVaikcj8HPUz6ghRXV1QpgamzlMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=B4Hn31V8; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6ad9ffa0d77so42146847b3.2
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 10:45:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723830302; x=1724435102; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vLqQ0W+kiaSmHiEqBrEtQ8fcmXJFfIb+9LXgj3vFom8=;
+        b=B4Hn31V87GZQ/zp1/MHdTkicOLR7IZGJSCJkrKOj7/TzObmKcJ4pN6NoWKeYc+B5Zb
+         butWqSxkfVPYHYAJTfjayFp93a69P5MMpBZJcbiNLJ2pOEg6j1qhq/uM0enFDwStlYcY
+         R6Q6Z8mlufuitY/pnfNDZayp+4mRQTFePKl1ivPFWh0DtjtDig170CC9HPCT0WDyxwv8
+         jHotshxkXQyOAeQ5or9+L7BbNIR+RBlrG3e7AZvTGX7wVDic9k6cud9Rkf1q0j5CRInJ
+         Klz7bJKGoWW2Lm6w1JVY+vyqzuuHHEcYb+8FWV8+GZnBzLDWAdcnyAJyoWD4c0XDnZ1J
+         Fy4A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723830302; x=1724435102;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vLqQ0W+kiaSmHiEqBrEtQ8fcmXJFfIb+9LXgj3vFom8=;
+        b=ZGLnRGOehj+weWPnkANMeK7eBC57kgQa+3DE/WgVUBVAOh3YdHAejjaOMzJ2s85gnK
+         XuQvL0JhneObMBz/ODTZvNDJvMo1qlqT1c04thkZBRsge/AVMEUCJ2vIhilEPog/UOsx
+         KiYR9RibvfzXH0bhpGNiVc8GSK93zCSZe5MlZnJ1KUJya0i0tFf/cku9qMA6g/6UXs+t
+         fKknQMoJ3LkeOv7QBngW9XrtQxprVbwsNSBEH0m79V/E2LJ5n0ZShgPfLmYg69RZiwRB
+         zfYiVjdkfoFZ04YpV253wzXFLmigWQV5csaTIDNJB8RFqMpsyRo66HPhYOJFWeZYySrp
+         SAgw==
+X-Forwarded-Encrypted: i=1; AJvYcCXSZuJDG6bGNi2QQNTBft7FGgT8Kw3QlWMDXxGkxRCc/aAavxRm1DsDCCapq4k/RiL1aiJkCqUfJyUjorBTDlD/3Js1
+X-Gm-Message-State: AOJu0YxSKTBRLljaTYsDb5fJaY6c7cwa9/Lj5a6N9QDSnELnQiyqPlOh
+	aB/ZM4DcPOtIuQ+3DCb3QUIAX+1RuF2tSBIpqWWPSRtI2BrFZqZ254tdpVwBDeVDTIesTj1/Yv5
+	MooAQNh4241z18rlAEB+c0g==
+X-Google-Smtp-Source: AGHT+IEi4/I6TDzoHhlZG83qsUH/gsU5TYse1nTv7CQbUM47gB6I7o2YM+wF22moMbfN4T1ecnVRfVCm4hd5c3ZkMQ==
+X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
+ (user=ackerleytng job=sendgmr) by 2002:a05:690c:688d:b0:699:d8dc:668d with
+ SMTP id 00721157ae682-6b1bb2899d5mr1670697b3.5.1723830302029; Fri, 16 Aug
+ 2024 10:45:02 -0700 (PDT)
+Date: Fri, 16 Aug 2024 17:45:00 +0000
+In-Reply-To: <aa3b5be8-2c8a-4fe8-8676-a40a9886c715@redhat.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR12MB7763:EE_|SA3PR12MB7999:EE_
-X-MS-Office365-Filtering-Correlation-Id: 83cea4f6-1379-4297-658c-08dcbe1a87aa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?X5VdMg5FAoHB/OZkF5IU3W/u/dUwwr4NG2/lgmfK7shSIFMALGeYoF9Ga+gd?=
- =?us-ascii?Q?1S+5vHraqnC65lncEzAxnCLD+X8R/BoRc3tuoSimGAKOheijKxd4N6kqnaU7?=
- =?us-ascii?Q?UBs8z08+eu8SsaLD1QAeuIUBagPGFWu8ZaTPNXfZn8Q0ECXCsPkP9drv00PM?=
- =?us-ascii?Q?uQ7wJJXl3iECp5zs0Zb+nxvx0Lxw0CTeFIX+TwTEEWRH6DSMTAcTGRijWMln?=
- =?us-ascii?Q?ba39bd5uydxV6a/NhC1zhcWbIb896Iea0xisbRCO5ruX3o6a1P48FOcZGKf1?=
- =?us-ascii?Q?5iZ2Yw1KJCTFL/ss+9fM8xiOHvAdnMrq1ph9XqhTxK/ZmRJAs7qGInb28hq3?=
- =?us-ascii?Q?4Vu/e3Cpm64tFhOCpm2I8/Ok99vKF7ybgUi5zQA0R8HLXb2C4IR4kxhWtEG5?=
- =?us-ascii?Q?jzM3/yDuO5LPVuY9d3tEkas1IwVjnK40kvtT0NC6SlOYTpn+LNVlKBOS6cwW?=
- =?us-ascii?Q?UTi0K0ly+nTDOJWRXJ9p5bqbdYSMf1L3iXm9BqDTODdvtLhY1tlJ9LbdgF0l?=
- =?us-ascii?Q?OxWXinYDh3k2f0jrtosaZgjqKrC2+D8c9gCgmt9peqkqUWvXHpvA5bUSKglE?=
- =?us-ascii?Q?pJCbD4GoLVSUgV+n+NErKSDHWFuzkdHTC4alaW8CX/HR6BTCPHaRIq0SpmWN?=
- =?us-ascii?Q?KbB9Lxut/xzT6I3/DgmQiHhUrerOKH+XGogrvZw7BD75FMcxRdc0n4TXTBtu?=
- =?us-ascii?Q?cx6Heen2iMcLE3l4IE2Yya3kBvNt2OkFTog/UfLjbee6kFsojwTxTahz1K7k?=
- =?us-ascii?Q?IGwqm2pnjQ5fZNvtej2ugh9ezCQvHKxXSnIpzWRXVJbUsBc3rtP4XVhGBCMc?=
- =?us-ascii?Q?bQHrhwTrHl6khZLcilJ7ozjvgTQvQooR+fTzpKAkv0HFG9aRxkk+JSVSYAIS?=
- =?us-ascii?Q?eIey3grKGsjsrwpTTD6hvXweAumsW/k1SWhOvrJNTKchxUpnuLRShf4LoPEf?=
- =?us-ascii?Q?kDefxj5b5YCKvb5Ce9o7jWUAFEHFBaMQADyuLUO4p35EGszcziUDw1x7eLnv?=
- =?us-ascii?Q?duciLNHiuzDbofg+tuaI6TDBjVZAS5/yfpmQiQRFGYoMN3rR+1QAiP2go9Ye?=
- =?us-ascii?Q?xeLRjTz6vhAMRUH01ONwaPsZrdnRmyGX7kaTFg6p/qQ0EfFZQY68fdjM0Qzq?=
- =?us-ascii?Q?2wyI+7XneCZia5dnipSvC/TwqoZdDtaaf9H2IJbiwIfxebUOYN7U/78rwqN2?=
- =?us-ascii?Q?0kFX8R3o424knwjs+yY9URcnsRfaF18EnUjmbP8fkoNKmRHecsvKVUi2xpi2?=
- =?us-ascii?Q?9rvgI/9tx8uMfu9flWw0GYQR4t/pihquYIiUrcqHJU6nJK6IXNK27Io1qZgV?=
- =?us-ascii?Q?DYaD50btG6LhMyvs1P+pxqCt68E9QDa6Qi5odxxqQ4t6cA=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR12MB7763.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QgLMkzXsx3YmQOkN5aavPWbfczSBEzRQmSL/FR2YVJKRj5eiCmVXizsdp9rT?=
- =?us-ascii?Q?Pqnebk8oZ+o9sEfVP33OpB9+M2TVdAF3Fw3p6UzNmRtfNbArvclc4zRHGvyC?=
- =?us-ascii?Q?FbEeNrd7mzU6YD1vYTQtkOmdmHlHHNQYFdvVBwWe/lCktvHZ58xwnR/dGOFl?=
- =?us-ascii?Q?xT1RBa9BjPTm4n5q+aa9WU/jhvTspOwJ8i2qXdWNDokfOBl5XmQ1gjkUDe4g?=
- =?us-ascii?Q?6BZ1J1eg914Z9u3fBAqExHFWtYqlGRbwnU0DompsOFViOxcRzspZV/Rl03Fz?=
- =?us-ascii?Q?3geMwTkW03QdlMhcvR1Xr+WaFpk3xnCBtlNLQCblQh+0LoZoeiH9F0YhCs7J?=
- =?us-ascii?Q?J/CtYNysgFzccdpWGoL98nA4GPluoXb19aG79AMROW6HkjRbZMsFFogJ0xTR?=
- =?us-ascii?Q?BPxmFfeL3f0WQHq6qA1U7u+5G861MWzG2c9B5PZMcAItM9iGi1cGM7EjLnOi?=
- =?us-ascii?Q?eeX9LtKJNdK39p12Gd2ys4dBAlZiS5un1eTrjRLbyjeKYnFvEcpXmrbaGnqp?=
- =?us-ascii?Q?NGKmnDFkxBaDn81hCCB4w0a/bN6Qgm2wGPIauKZXXEj9QJI/s1ISFRoZxnhx?=
- =?us-ascii?Q?SnHrWUKTljytiSueVZt2WM617OZnYCdVOo+DseOlh2esRuJfsYcMBcSp8vMo?=
- =?us-ascii?Q?mSmit7MrdLmrN4HSgbRM5sYMGIJyVigPThonNCQDYRVVoHYf6YBtHqhcvgyZ?=
- =?us-ascii?Q?95yP/B/l3AeM56+G4MyCN5z/8Vk8eTrRZh+llKTB8/B7o9jxvZ4c8aQbarkF?=
- =?us-ascii?Q?4a4gwls2EY9/IILT1ynqNwGqrLx0cuQ9ZGyU+h/FizDDzeTL98ib0QM+oNaK?=
- =?us-ascii?Q?ZSzHBx5/kH2Sl0y9+FrBXUiwDkg/wg9EZ/hVf45VCz6V/3F8qiSOG6JRR00t?=
- =?us-ascii?Q?nywGGtxFvuOUm5HKA1E+hRaptJYE1KYB/ioMGKF2c5tttWd7A7lRm6853bOq?=
- =?us-ascii?Q?GUwc3XuYYAfJ/ZDr8Eqyt7ofZ36hgcbeOJO4xZIWMHOtZZCV5psLTJ54tHti?=
- =?us-ascii?Q?NWnjr+ifE3f9cM7614VJi/9IkZqLISyD6NacQpyW6Op4qFj8vA6HNl7i3r0Z?=
- =?us-ascii?Q?F1NZZyxwvRYsizuHtlm1rkk3DhXbQKiXw2KhSwFKmcWzX5ZcbkW+oHZHNl2f?=
- =?us-ascii?Q?fMsQPuO61EXwSaBp3+CeFDCIsT1p43GR5IrWV7Imn18bqL5cmg+RWY94rP6x?=
- =?us-ascii?Q?soKYF+7lOI7lSxVpaF8F2rIw4q2yflgDK+JD7OiyYQginunfyBrrkndjBCBS?=
- =?us-ascii?Q?zuXaxU5bfeuLir4fBrWgled0rq092p30qUBfKY4LANTw7/NQyAVyS80sXJRZ?=
- =?us-ascii?Q?05tbqhTaJ1XgMmlHDi7y9sn/67a8Zh6ObCQXcGCrKMTDxiZeqLmPlQzzRi3S?=
- =?us-ascii?Q?MWrgcByU/tikTgDP5f0cBE0Y4dfJa3iLY3VQKGgFJf+YtcHvUD1iNiFNquKD?=
- =?us-ascii?Q?PPxF+7GSNOqHTIi4TPLknFkTJIjFqGjzpG4mAn/wWAVKG3/GFRITOBHlzHne?=
- =?us-ascii?Q?c2DNN8lnxfGysIWhphzPTbAoUS1bMchGER38kCkhbG/frWvtPPam0VDuOAji?=
- =?us-ascii?Q?R1XYDyuJdORsFe/5+rE=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 83cea4f6-1379-4297-658c-08dcbe1a87aa
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR12MB7763.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 16 Aug 2024 17:40:33.5374
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xa0b7PwddHG7ZSB0PEHL7Nwu6RhBKqJo61vX41BFaU3Zhn6x2Wl89U1F7v55UDQP
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7999
+Mime-Version: 1.0
+References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
+ <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com> <4cdd93ba-9019-4c12-a0e6-07b430980278@redhat.com>
+ <CA+EHjTxNNinn7EzV_o1X1d0kwhEwrbj_O7H8WgDtEy2CwURZFQ@mail.gmail.com> <aa3b5be8-2c8a-4fe8-8676-a40a9886c715@redhat.com>
+Message-ID: <diqzjzggmkf7.fsf@ackerleytng-ctop.c.googlers.com>
+Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
+From: Ackerley Tng <ackerleytng@google.com>
+To: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
+Cc: Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Patrick Roy <roypat@amazon.co.uk>, qperret@google.com, linux-coco@lists.linux.dev, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Aug 16, 2024 at 10:21:17AM -0400, Peter Xu wrote:
-> On Fri, Aug 16, 2024 at 11:30:31AM +0200, David Hildenbrand wrote:
-> > On 14.08.24 15:05, Jason Gunthorpe wrote:
-> > > On Fri, Aug 09, 2024 at 07:25:36PM +0200, David Hildenbrand wrote:
-> > > 
-> > > > > > That is in general not what we want, and we still have some places that
-> > > > > > wrongly hard-code that behavior.
-> > > > > > 
-> > > > > > In a MAP_PRIVATE mapping you might have anon pages that we can happily walk.
-> > > > > > 
-> > > > > > vm_normal_page() / vm_normal_page_pmd() [and as commented as a TODO,
-> > > > > > vm_normal_page_pud()] should be able to identify PFN maps and reject them,
-> > > > > > no?
-> > > > > 
-> > > > > Yep, I think we can also rely on special bit.
-> > > 
-> > > It is more than just relying on the special bit..
-> > > 
-> > > VM_PFNMAP/VM_MIXEDMAP should really only be used inside
-> > > vm_normal_page() because thay are, effectively, support for a limited
-> > > emulation of the special bit on arches that don't have them. There are
-> > > a bunch of weird rules that are used to try and make that work
-> > > properly that have to be followed.
-> > > 
-> > > On arches with the sepcial bit they should possibly never be checked
-> > > since the special bit does everything you need.
-> > > 
-> > > Arguably any place reading those flags out side of vm_normal_page/etc
-> > > is suspect.
-> > 
-> > IIUC, your opinion matches mine: VM_PFNMAP/VM_MIXEDMAP and pte_special()/...
-> > usage should be limited to vm_normal_page/vm_normal_page_pmd/ ... of course,
-> > GUP-fast is special (one of the reason for "pte_special()" and friends after
-> > all).
-> 
-> The issue is at least GUP currently doesn't work with pfnmaps, while
-> there're potentially users who wants to be able to work on both page +
-> !page use cases.  Besides access_process_vm(), KVM also uses similar thing,
-> and maybe more; these all seem to be valid use case of reference the vma
-> flags for PFNMAP and such, so they can identify "it's pfnmap" or more
-> generic issues like "permission check error on pgtable".
 
-Why are those valid compared with calling vm_normal_page() per-page
-instead?
+David Hildenbrand <david@redhat.com> writes:
 
-What reason is there to not do something based only on the PFNMAP
-flag?
+> On 15.08.24 09:24, Fuad Tabba wrote:
+>> Hi David,
+>
+> Hi!
+>
+>> 
+>> On Tue, 6 Aug 2024 at 14:51, David Hildenbrand <david@redhat.com> wrote:
+>>>
+>>>>
+>>>> -     if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
+>>>> +     if (!ops->accessible && (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)) {
+>>>>                r = guest_memfd_folio_private(folio);
+>>>>                if (r)
+>>>>                        goto out_err;
+>>>> @@ -107,6 +109,82 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
+>>>>    }
+>>>>    EXPORT_SYMBOL_GPL(guest_memfd_grab_folio);
+>>>>
+>>>> +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio)
+>>>> +{
+>>>> +     unsigned long gmem_flags = (unsigned long)file->private_data;
+>>>> +     unsigned long i;
+>>>> +     int r;
+>>>> +
+>>>> +     unmap_mapping_folio(folio);
+>>>> +
+>>>> +     /**
+>>>> +      * We can't use the refcount. It might be elevated due to
+>>>> +      * guest/vcpu trying to access same folio as another vcpu
+>>>> +      * or because userspace is trying to access folio for same reason
+>>>
+>>> As discussed, that's insufficient. We really have to drive the refcount
+>>> to 1 -- the single reference we expect.
+>>>
+>>> What is the exact problem you are running into here? Who can just grab a
+>>> reference and maybe do nasty things with it?
+>> 
+>> I was wondering, why do we need to check the refcount? Isn't it enough
+>> to check for page_mapped() || page_maybe_dma_pinned(), while holding
+>> the folio lock?
 
-Jason
+Thank you Fuad for asking!
+
+>
+> (folio_mapped() + folio_maybe_dma_pinned())
+>
+> Not everything goes trough FOLL_PIN. vmsplice() is an example, or just 
+> some very simple read/write through /proc/pid/mem. Further, some 
+> O_DIRECT implementations still don't use FOLL_PIN.
+>
+> So if you see an additional folio reference, as soon as you mapped that 
+> thing to user space, you have to assume that it could be someone 
+> reading/writing that memory in possibly sane context. (vmsplice() should 
+> be using FOLL_PIN|FOLL_LONGTERM, but that's a longer discussion)
+>
+
+Thanks David for the clarification, this example is very helpful!
+
+IIUC folio_lock() isn't a prerequisite for taking a refcount on the
+folio.
+
+Even if we are able to figure out a "safe" refcount, and check that the
+current refcount == "safe" refcount before removing from direct map,
+what's stopping some other part of the kernel from taking a refcount
+just after the check happens and causing trouble with the folio's
+removal from direct map?
+
+> (noting that also folio_maybe_dma_pinned() can have false positives in 
+> some cases due to speculative references or *many* references).
+
+Are false positives (speculative references) okay since it's better to
+be safe than remove from direct map prematurely?
+
+>
+> -- 
+> Cheers,
+>
+> David / dhildenb
 
