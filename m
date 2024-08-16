@@ -1,184 +1,113 @@
-Return-Path: <kvm+bounces-24448-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24449-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08BBB9552BB
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 23:52:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FAE9552E2
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 23:58:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AF8F1F23EC2
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 21:52:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 106261C24300
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 21:58:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D191C688C;
-	Fri, 16 Aug 2024 21:52:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013871C689B;
+	Fri, 16 Aug 2024 21:58:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aqHTPrmy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="koeDU4vt"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4D041C3F23
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 21:52:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F001C57A2
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 21:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723845149; cv=none; b=GvmoyFbxF7pBV7ZXo9kuW0/Vxd1gkdTLl//78Oxqs0wlOGK+ylQt9U/F2EBnPjPGz5p5RJcv5PkN0VewlfiM+olCCilPhhpHZFMOqBA0oOify/7PM2HRXqaCR6e8fDJBKOXGOv/oJkZf6D0nHIHhxTOsAw5rHv9iVCQ2QPWY1+4=
+	t=1723845505; cv=none; b=beZdKUlsXDiNwpq0I1R48QTxrw/jFgeZekEYcJ92TvbM8Lam2G7LFMN0rQocERMC/NvRpZST9IIcvvkgpmL5SU2oHQxJ9wrMkDRnPjXn/zIVtVA+OT1/BtwLCV0QXUdPkSXv20N7PTctSPH07Q1PtSUPun7sCijTsOFfyrIxOQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723845149; c=relaxed/simple;
-	bh=Tb2YsmBZ9MOyDI/stnMDhfutA+rVZT0BSt77il9pWyo=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=TlC385JfzYavNjP+kUHegRloetwU9dSyOF8P6y6Ue6hyyzW6pVeY/iT02AoHYaos8GvL8V6ItdcCXOQIBHoSkHVxmAB9OPoqdbt69PcO83u+wEL6BuoVyIyoWk69OENwCHyP5kFYS/25Hmshga1hUvR1G91m4U2S4ixuANoAAT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aqHTPrmy; arc=none smtp.client-ip=209.85.219.202
+	s=arc-20240116; t=1723845505; c=relaxed/simple;
+	bh=g0F/sd95+BjyUwrTk3+Pt47OK1/UutxibFLk9BmEr4U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Em/gUQ5MzpfvycRg2qRX7d73/eiwnE0Rm8mUcdvN1RNvIloOist2OXgVIvq09RpF76g/Q9OPveFhwBY1WLnNf20Zmm44MbyIEiqrAwptVWIMWAmJTen6rjMz81ONMrLZ85nF7MLnJ8UdHXl8hygeKgijLSce7/Da3zeiD3MGSYE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=koeDU4vt; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--ackerleytng.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e03623b24ddso3777883276.1
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 14:52:27 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-53310b07267so3217729e87.3
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 14:58:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723845147; x=1724449947; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=b4vUtlej2XubFdEQblSjm6EcKT3Hh6Wknx4PIkCBxnA=;
-        b=aqHTPrmyOPiy5wnLyIbdHWPcjD9ICyxdfWkYWwelrsCQhcIr/5UawMt9fRxpkK1q/t
-         wYjrV2Yk4kuFxsH1m8FnekLVd5RQI2ne3fNwMzoprenGs1/kUc5PTG2gJz++U5NtGtXj
-         vOccOAtVDky2y6orpb21VCYBzauWVJyNn4bh/+nrx+63Su56hD213JWLxPJXEWjZ3BIw
-         UqcTx/M2Rr5GUw3ZjuxMuq5S6pC65X4hu6WWnQ8vlji16NvG8T0bowJZUkUQZfuaAncY
-         Uzd/YOqB5wQpHfc/dDIWbBJqT39+dYzSkr//SdaS4IZuJIFa8f9mOW/JufBzjJUbvsZC
-         IFDQ==
+        d=google.com; s=20230601; t=1723845502; x=1724450302; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=vyAQI0mLIme3ritjMf52b0imeC+VEqOt65MTNAtgvRU=;
+        b=koeDU4vtFjFAzmg85sfLbDsSsDJuS1N7hiONdxc3UN3H9G9YYGisDKL+pDNF+HqKf2
+         kPo9AD81AMT5gQRO3V21mww3llQZHQKJhXCCH7dp0BD5tQX4/0tM4vLIDweczKzU16KB
+         eGlTBfOYs/SyhasP+LVwX4fqFHyOLQgtuB75Zkn9cX58Rva4cmq4yDakrRi/9raY02EV
+         XBZExrCs7wCHfdxjSh/OkZM9qHkC/Nb59QZ+079ZMbhiDEuDRNJnshh7wMh2xZF1wKZI
+         qLl6uLf/PVJ1RlI7wxSgEJO+V07wDV1Jm3MyRKelniCgCpB35tusqmQ4gENT9F0az3SF
+         wVTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723845147; x=1724449947;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=b4vUtlej2XubFdEQblSjm6EcKT3Hh6Wknx4PIkCBxnA=;
-        b=AAGpTOwXbLfWs6sltSzz2fjWcXaCr+63TFdiubdUkgfPmOHpz+UIfLb3dKenPsQGHg
-         Fi9ZdHDKeieLpTUgEOzVEDX9ySprXA/exUmH2Av+u76QsDWj4MiSl7JVgwJG5zQfgyC+
-         vd4CY2/8Yop15ej6vli853npFrBPUgOUf+v1q2Ib5T973jCsRu41n66gGNFuGuyM440j
-         OMgZIMEzzvnui296duB8jjCUEHu8L8HB7YEd2LqiVwj0jZw/sKO1H8pDbmrfBQntPXDn
-         nO+zrtLtRPtnZkQHKZTrTT1EABaDPW/Febe7ItIK44FC1yuI7WE0wHG6KSn2CfWNXUhq
-         5twQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWLfAPpkLzucXq4en5U+hHldFtA8FRdykFw1eeeHfV7ouCb9iOG9EevSBjohHdlRaE0y3k=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAMEo7Yd6GqMNRmCY7Dy5FlOTkbKfkXzyWwGuoEQC48JOpyZZK
-	RANv5sX2y5mEMX8fnoU3FSOIaInDCBWiELiT2wUZmM+KBJtdFdedjGAgiZpvhBsRFC4dxja2ljX
-	33FG9rihtWivpXKNDrrgnMA==
-X-Google-Smtp-Source: AGHT+IEs8zyvsoWuEvbphvAg5cMjHgbJYgPfPLSoGdtpOJDuLoPEAib3HGlcNl6V4/E+t5mIJiod+fTrhqt78lV+hg==
-X-Received: from ackerleytng-ctop.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:13f8])
- (user=ackerleytng job=sendgmr) by 2002:a25:8751:0:b0:e11:6fcc:b656 with SMTP
- id 3f1490d57ef6-e1180e97369mr34695276.6.1723845146700; Fri, 16 Aug 2024
- 14:52:26 -0700 (PDT)
-Date: Fri, 16 Aug 2024 21:52:25 +0000
-In-Reply-To: <94c5d735-821c-40ba-ae85-1881c6f4445d@redhat.com>
+        d=1e100.net; s=20230601; t=1723845502; x=1724450302;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vyAQI0mLIme3ritjMf52b0imeC+VEqOt65MTNAtgvRU=;
+        b=XHhGPzktd0vm/4QDvPyD03XWzpH/GzKvJCQw95aC8d9tI4eh+XutqF7ORPZYUeIeNH
+         twfxSPIpZNXHFjVrwZL3BdKIp0ucGbUgZSnoGUQhFX2jUFZfjot0d6RE+zgsgFc4k1cv
+         AHtS0UMq4T35VsPvnGAxSjTXYLbHO3kY+mSCbLpXhYVJMtNQq8FI3QvpcmCjH8c9+vWO
+         oriAYQFOzvIQfso/wxISfOX9m95iog5fSyeELQe5uz25d74CXpgX7CjLiZl41wnpWTbQ
+         mOY9IH+PetVpAopmvN8zhkzwkCHB0bkyxdXEcsig7temCH2r5A+sAJhWXkYI+3cVjQ/3
+         4OdA==
+X-Forwarded-Encrypted: i=1; AJvYcCWwqmGJZZYeu38uqn1eR/nh13K5i+KD7RkPD44CVAA57TuP76REyVRKY6XdFS1B1653llrTlZwfK4y43xGasu7RbZ49
+X-Gm-Message-State: AOJu0YxEizPzkgFkGTCjp6cEw1oWRTIV1g0gNP28Ur86nGGom96ves9L
+	0+/h/zUWYjeQvuWuF7zWb2OzucxkiNt5LjOmh8VyY/GRa39hYIqXT0t2MeF++Coh9sOPzEmCOE8
+	dmq7uGt4tGxzFggiofuYHs7m+YLboU1ETyuhb
+X-Google-Smtp-Source: AGHT+IE3OGYvE2Lmfx5P1zwYegVYlgr1AuU2FCcSFUysvWMVPGL4hd0/zjoroW1fldq0JWzGDaAIAmG9Jq4zoll+/tc=
+X-Received: by 2002:a05:6512:238f:b0:52e:9808:3f48 with SMTP id
+ 2adb3069b0e04-5331c6aee2cmr3903167e87.21.1723845501250; Fri, 16 Aug 2024
+ 14:58:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
- <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com> <4cdd93ba-9019-4c12-a0e6-07b430980278@redhat.com>
- <CA+EHjTxNNinn7EzV_o1X1d0kwhEwrbj_O7H8WgDtEy2CwURZFQ@mail.gmail.com>
- <aa3b5be8-2c8a-4fe8-8676-a40a9886c715@redhat.com> <diqzjzggmkf7.fsf@ackerleytng-ctop.c.googlers.com>
- <94c5d735-821c-40ba-ae85-1881c6f4445d@redhat.com>
-Message-ID: <diqz4j7km8yu.fsf@ackerleytng-ctop.c.googlers.com>
-Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
-From: Ackerley Tng <ackerleytng@google.com>
-To: David Hildenbrand <david@redhat.com>, Fuad Tabba <tabba@google.com>
-Cc: Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
-	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
-	Patrick Roy <roypat@amazon.co.uk>, qperret@google.com, linux-coco@lists.linux.dev, 
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, kvm@vger.kernel.org
+MIME-Version: 1.0
+References: <ZkN25BPuLtTUmDKk@google.com> <20240515012552.801134-1-michael.roth@amd.com>
+ <CAAH4kHb03Una2kcvyC3W=1ZfANBWF_7a7zsSmWhr_r9g3rCDZw@mail.gmail.com>
+In-Reply-To: <CAAH4kHb03Una2kcvyC3W=1ZfANBWF_7a7zsSmWhr_r9g3rCDZw@mail.gmail.com>
+From: Dionna Amalie Glaze <dionnaglaze@google.com>
+Date: Fri, 16 Aug 2024 14:58:10 -0700
+Message-ID: <CAAH4kHaCGraqmD8Zi6CtFzYFBvg5vgaQEc_DYJ7PayONp22B-w@mail.gmail.com>
+Subject: Re: [PATCH] KVM: SEV: Replace KVM_EXIT_VMGEXIT with KVM_EXIT_SNP_REQ_CERTS
+To: Michael Roth <michael.roth@amd.com>
+Cc: seanjc@google.com, kvm@vger.kernel.org, linux-coco@lists.linux.dev, 
+	linux-mm@kvack.org, linux-crypto@vger.kernel.org, x86@kernel.org, 
+	linux-kernel@vger.kernel.org, tglx@linutronix.de, mingo@redhat.com, 
+	jroedel@suse.de, thomas.lendacky@amd.com, hpa@zytor.com, ardb@kernel.org, 
+	pbonzini@redhat.com, vkuznets@redhat.com, jmattson@google.com, 
+	luto@kernel.org, dave.hansen@linux.intel.com, slp@redhat.com, 
+	pgonda@google.com, peterz@infradead.org, srinivas.pandruvada@linux.intel.com, 
+	rientjes@google.com, dovmurik@linux.ibm.com, tobin@ibm.com, bp@alien8.de, 
+	vbabka@suse.cz, kirill@shutemov.name, ak@linux.intel.com, tony.luck@intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, alpergun@google.com, 
+	jarkko@kernel.org, ashish.kalra@amd.com, nikunj.dadhania@amd.com, 
+	pankaj.gupta@amd.com, liam.merwick@oracle.com, papaluri@amd.com
 Content-Type: text/plain; charset="UTF-8"
 
-David Hildenbrand <david@redhat.com> writes:
-
-> On 16.08.24 19:45, Ackerley Tng wrote:
->> 
->> <snip>
->> 
->> IIUC folio_lock() isn't a prerequisite for taking a refcount on the
->> folio.
+> How do we avoid this?
+> 1. We can advise that the guest parses the certificate and the
+> attestation report to determine if their TCBs match expectations and
+> retry if they're different because of a bad luck data race.
+> 2. We can add a new global lock that KVM holds from CCP similar to
+> sev_cmd_lock to sequentialize req_certs, attestation reports, and
+> SNP_COMMIT. KVM releases the lock before returning to the guest.
+>   SNP_COMMIT must now hold this lock before attempting to grab the sev_cmd_lock.
 >
-> Right, to do folio_lock() you only have to guarantee that the folio 
-> cannot get freed concurrently. So you piggyback on another reference 
-> (you hold indirectly).
+> I think probably 2 is better.
 >
->> 
->> Even if we are able to figure out a "safe" refcount, and check that the
->> current refcount == "safe" refcount before removing from direct map,
->> what's stopping some other part of the kernel from taking a refcount
->> just after the check happens and causing trouble with the folio's
->> removal from direct map?
->
-> Once the page was unmapped from user space, and there were no additional 
-> references (e.g., GUP, whatever), any new references can only be 
-> (should, unless BUG :) ) temporary speculative references that should 
-> not try accessing page content, and that should back off if the folio is 
-> not deemed interesting or cannot be locked. (e.g., page 
-> migration/compaction/offlining).
 
-I thought about it again - I think the vmsplice() cases are taken care
-of once we check that the folios are not mapped into userspace, since
-vmsplice() reads from a mapping.
+Actually no, we shouldn't hold a global lock and only release it if
+user space returns to KVM in a specific way, unless we can ensure it
+will be unlocked safely on fd close.
 
-splice() reads from the fd directly, but that's taken care since
-guest_memfd doesn't have a .splice_read() handler.
-
-Reading /proc/pid/mem also requires the pages to first be mapped, IIUC,
-otherwise the pages won't show up, so checking that there are no more
-mappings to userspace takes care of this.
-
->
-> Of course, there are some corner cases (kgdb, hibernation, /proc/kcore), 
-> but most of these can be dealt with in one way or the other (make these 
-> back off and not read/write page content, similar to how we handled it 
-> for secretmem).
-
-Does that really leave us with these corner cases? And so perhaps we
-could get away with just taking the folio_lock() to keep away the
-speculative references? So something like
-
-  1. Check that the folio is not mapped and not pinned.
-  2. folio_lock() all the folios about to be removed from direct map
-  -- With the lock, all other accesses should be speculative --
-  3. Check that the refcount == "safe" refcount
-      3a. Unlock and return to userspace with -EAGAIN
-  4. Remove from direct map
-  5. folio_unlock() all those folios
-
-Perhaps a very naive question: can the "safe" refcount be statically
-determined by walking through the code and counting where refcount is
-expected to be incremented?
-
-Or perhaps the "safe" refcount may differ based on kernel config. Could
-we perhaps have a single static variable safe_refcount, and whenever a
-new guest_memfd folio is allocated, do
-
-  safe_refcount = min(new_folio_refcount, safe_refcount)
-
->
-> These (kgdb, /proc/kcore) might not even take a folio reference, they 
-> just "access stuff" and we only have to teach them to "not access that".
->
->> 
->>> (noting that also folio_maybe_dma_pinned() can have false positives in
->>> some cases due to speculative references or *many* references).
->> 
->> Are false positives (speculative references) okay since it's better to
->> be safe than remove from direct map prematurely?
->
-> folio_maybe_dma_pinned() is primarily used in fork context. Copying more 
-> (if the folio maybe pinned and, therefore, must not get COW-shared with 
-> other processes and must instead create a private page copy) is the 
-> "better safe than sorry". So false positives (that happen rarely) are 
-> tolerable.
->
-> Regading the directmap, it would -- just like with additional references 
-> -- detect that the page cannot currently be removed from the direct map. 
-> It's similarly "better safe than sorry", but here means that we likely 
-> must retry if we cannot easily fallback to something else like for the 
-> fork+COW case.
->
-> -- 
-> Cheers,
->
-> David / dhildenb
+-- 
+-Dionna Glaze, PhD, CISSP, CCSP (she/her)
 
