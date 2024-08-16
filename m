@@ -1,142 +1,155 @@
-Return-Path: <kvm+bounces-24380-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24381-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C284954762
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 13:02:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A5639547EA
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 13:20:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A614B21CF9
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 11:02:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EAFB1C2394B
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 11:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5486719644B;
-	Fri, 16 Aug 2024 11:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 565C919E7D0;
+	Fri, 16 Aug 2024 11:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="s2dXlMio"
 X-Original-To: kvm@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AEE22A1CF
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 11:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D6434CD8
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 11:19:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723806165; cv=none; b=llFHPeo6qv1CdfRMYL100QyFbwVI0KNmBHq3QzPbyU81675jIwSWVBkgWqgMX7G4aTf5VRg2cdLtRZu4ZaK9ZoEb3Rq/ZqDt3VPv7hKu32LWFtcSpu+HXG6dJL0h7TghRS6Xf2V2Hr+a3uU5nOVF5AuueheRDPTBTWZsvg/2f3I=
+	t=1723807190; cv=none; b=IF6MZY6UkQ4cWAI4pJQGnLkBr4+5oF9BMbbC+ftElPqihaxbngPJ7hMHtldb3mCfF6D+NawYIS8GkACG4PAoo4NfOQGYBBapdfoWirA+ykNbZo4WSyWO9WfcWNq6qOt2x/2uPgaU3p4AG4TYLmTmD/Zc42HE3Vz3IhcNUf6I9TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723806165; c=relaxed/simple;
-	bh=0uqMswupFDSpFIN7cjTdDuPtL/gYgIf6NZP3JsxGsBg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W0P7hBhx73D2uWddclC3MkroAoU8RdFVEyxmyYpgiAUW17sD/ZEtXC2cdYikIPyAJ7ojkeKZsLxeztkMakJNpknpCmWiDQsjxgzeXRMWHuE33Uefi+gydTqSMgk0/VXkO8gBzSpguWAUoJ9H9FB/MLUZ1u2YlXWSYqdbVY/PnXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 89846143D;
-	Fri, 16 Aug 2024 04:03:09 -0700 (PDT)
-Received: from raptor (usa-sjc-mx-foss1.foss.arm.com [172.31.20.19])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 23F1F3F73B;
-	Fri, 16 Aug 2024 04:02:40 -0700 (PDT)
-Date: Fri, 16 Aug 2024 12:02:37 +0100
-From: Alexandru Elisei <alexandru.elisei@arm.com>
-To: Marc Zyngier <maz@kernel.org>
-Cc: kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
-	kvm@vger.kernel.org, James Morse <james.morse@arm.com>,
-	Suzuki K Poulose <suzuki.poulose@arm.com>,
-	Oliver Upton <oliver.upton@linux.dev>,
-	Zenghui Yu <yuzenghui@huawei.com>, Joey Gouly <joey.gouly@arm.com>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Przemyslaw Gaj <pgaj@cadence.com>
-Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1
- emulation
-Message-ID: <Zr8xzdmMELK07YUo@raptor>
-References: <20240813100540.1955263-1-maz@kernel.org>
- <20240813100540.1955263-15-maz@kernel.org>
- <Zr4wUj5mpKkwMyCq@raptor>
- <86msldzlly.wl-maz@kernel.org>
- <Zr8aYymB_2xSqIQp@raptor>
- <86le0wzrbv.wl-maz@kernel.org>
+	s=arc-20240116; t=1723807190; c=relaxed/simple;
+	bh=0YEKbCgqjCKTnqIvucJPhNpFU/zKUOwOBiiXIpasgTs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KWcqV2aixi7ZijsxM1TAoOGZemGS8eMgjihwyrfGeN0UjIvKRCta+kVwNkjOvZQvjb5f74WlW6p+HCqTOiA/qG3c/BqjS5qlbHbdpfE5i52SLpSTpJEO8ZUL3YOGzmhP925/q3VjLGQmcBzHBtbmWazCP1+7GenzamTA+UU/g8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=s2dXlMio; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-427fc97a88cso14016495e9.0
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 04:19:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1723807187; x=1724411987; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=rZ/Girz08IZmHtZsrVU+idIVHnjPppCsG5oXI3Hdtsc=;
+        b=s2dXlMioN1qbV4CEl5gw2hyxbqedO1CTzQTK/YbtSZXVwjP7eDi2YFlS6KGltDTekd
+         SZNLndwRF9Mcw3f0e9ITiALoMsA8haeQhxxHdmf6zFjtXhlz8kmA7L/j8BtcF8Vz8OUe
+         vzLqyvE45hG+2Wt8L1rkzTzFzAFyjAh6k/RMO87AGHRsnTf7oeD5V2Z65z2/LloblcHq
+         +SdPxtfr41P6+A//WreI682gTlWGyAs96Pl8OLMtIbk/dLqDDiC/m9iXI7Nen5i+uOLn
+         p/CBfSE3wyyeqPUZqsJUCa+yT7QEJY5mrNdKNEDbzvQhiMD0SatoSFVQZFr7UXF2sMGC
+         Sh1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723807187; x=1724411987;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rZ/Girz08IZmHtZsrVU+idIVHnjPppCsG5oXI3Hdtsc=;
+        b=VLYtxMJQYyVLl7dUXHTjiKsNgpxclAhLW4fDvWQn6+tYZU5u8u27P5GRBpu63gStP1
+         AmuWq2jtqi/pYzXY4MMQIH2D9tlI3EwUOstGfVypv9gNPCboYAFc5ZTx8YGOy2jE41m2
+         TMFIxBLY80VU2Pe7m0KZyLoUUXu+x6iFe96dC3PMc0DejWB3W+Qf9i1zOxvuecXIb0DQ
+         GIRlEFKFIAMsiikqWpn8Ywbjp+9RNdyll/NRc4dmziC54YYagSuA+rOyS0uUFtS0yblg
+         rME7KVjWayo86CEnouiMhS2aprtAp3Drby7PMOtzL0YtRypXcKdYQ+8mhIQ+baJpU++L
+         MkqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlpxgtEpSEnMGpJOZffFkogoFDrCS+skPmbT4/tv4QMpk5JgvuDLk12QexImbtmVWJ9I8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvZ+MkBMCf+rcFdp1MY5OZZwPNhAl45gyM7+5gcex40L3vmbV9
+	XAZvHrEl6sefhFSpahdfdv/dsCtH72QFDOEYv6h0k+WaLQwBPkluRmUwYKoxuqB5jUnjWc+uNWn
+	OvzwT9Zrm0q87UUKicgnGWaW3uHR3UiPo9PZ7
+X-Google-Smtp-Source: AGHT+IFjh0jaZHz+bXJLGOwDlxY14HFpbgg6MC9AUdExHwCz1VC6lyjw8E/zebexbyTLHtHDRbeRFor8g+UdLx/zwRY=
+X-Received: by 2002:adf:e388:0:b0:368:4e28:47f7 with SMTP id
+ ffacd0b85a97d-37194314f7emr1429125f8f.6.1723807186811; Fri, 16 Aug 2024
+ 04:19:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <86le0wzrbv.wl-maz@kernel.org>
+References: <20240805-guest-memfd-lib-v1-0-e5a29a4ff5d7@quicinc.com>
+ <20240805-guest-memfd-lib-v1-4-e5a29a4ff5d7@quicinc.com> <4cdd93ba-9019-4c12-a0e6-07b430980278@redhat.com>
+ <CA+EHjTxNNinn7EzV_o1X1d0kwhEwrbj_O7H8WgDtEy2CwURZFQ@mail.gmail.com> <aa3b5be8-2c8a-4fe8-8676-a40a9886c715@redhat.com>
+In-Reply-To: <aa3b5be8-2c8a-4fe8-8676-a40a9886c715@redhat.com>
+From: Fuad Tabba <tabba@google.com>
+Date: Fri, 16 Aug 2024 12:19:09 +0100
+Message-ID: <CA+EHjTz6g_0P+t3wzV99hBtf9rd2Lvn-vwYb2oKZaXxSLs5BzQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 4/4] mm: guest_memfd: Add ability for mmap'ing pages
+To: David Hildenbrand <david@redhat.com>
+Cc: Elliot Berman <quic_eberman@quicinc.com>, Andrew Morton <akpm@linux-foundation.org>, 
+	Paolo Bonzini <pbonzini@redhat.com>, Sean Christopherson <seanjc@google.com>, 
+	Patrick Roy <roypat@amazon.co.uk>, qperret@google.com, 
+	Ackerley Tng <ackerleytng@google.com>, linux-coco@lists.linux.dev, 
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mm@kvack.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Marc,
+On Fri, 16 Aug 2024 at 10:48, David Hildenbrand <david@redhat.com> wrote:
+>
+> On 15.08.24 09:24, Fuad Tabba wrote:
+> > Hi David,
+>
+> Hi!
+>
+> >
+> > On Tue, 6 Aug 2024 at 14:51, David Hildenbrand <david@redhat.com> wrote:
+> >>
+> >>>
+> >>> -     if (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP) {
+> >>> +     if (!ops->accessible && (gmem_flags & GUEST_MEMFD_FLAG_NO_DIRECT_MAP)) {
+> >>>                r = guest_memfd_folio_private(folio);
+> >>>                if (r)
+> >>>                        goto out_err;
+> >>> @@ -107,6 +109,82 @@ struct folio *guest_memfd_grab_folio(struct file *file, pgoff_t index, u32 flags
+> >>>    }
+> >>>    EXPORT_SYMBOL_GPL(guest_memfd_grab_folio);
+> >>>
+> >>> +int guest_memfd_make_inaccessible(struct file *file, struct folio *folio)
+> >>> +{
+> >>> +     unsigned long gmem_flags = (unsigned long)file->private_data;
+> >>> +     unsigned long i;
+> >>> +     int r;
+> >>> +
+> >>> +     unmap_mapping_folio(folio);
+> >>> +
+> >>> +     /**
+> >>> +      * We can't use the refcount. It might be elevated due to
+> >>> +      * guest/vcpu trying to access same folio as another vcpu
+> >>> +      * or because userspace is trying to access folio for same reason
+> >>
+> >> As discussed, that's insufficient. We really have to drive the refcount
+> >> to 1 -- the single reference we expect.
+> >>
+> >> What is the exact problem you are running into here? Who can just grab a
+> >> reference and maybe do nasty things with it?
+> >
+> > I was wondering, why do we need to check the refcount? Isn't it enough
+> > to check for page_mapped() || page_maybe_dma_pinned(), while holding
+> > the folio lock?
+>
+> (folio_mapped() + folio_maybe_dma_pinned())
+>
+> Not everything goes trough FOLL_PIN. vmsplice() is an example, or just
+> some very simple read/write through /proc/pid/mem. Further, some
+> O_DIRECT implementations still don't use FOLL_PIN.
+>
+> So if you see an additional folio reference, as soon as you mapped that
+> thing to user space, you have to assume that it could be someone
+> reading/writing that memory in possibly sane context. (vmsplice() should
+> be using FOLL_PIN|FOLL_LONGTERM, but that's a longer discussion)
+>
+> (noting that also folio_maybe_dma_pinned() can have false positives in
+> some cases due to speculative references or *many* references).
 
-On Fri, Aug 16, 2024 at 11:37:24AM +0100, Marc Zyngier wrote:
-> Hi Alex,
-> 
-> On Fri, 16 Aug 2024 10:22:43 +0100,
-> Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> > 
-> > Hi Marc,
-> > 
-> > On Thu, Aug 15, 2024 at 07:28:41PM +0100, Marc Zyngier wrote:
-> > > 
-> > > Hi Alex,
-> > > 
-> > > On Thu, 15 Aug 2024 17:44:02 +0100,
-> > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
-> 
-> [...]
-> 
-> > > > > +static bool par_check_s1_perm_fault(u64 par)
-> > > > > +{
-> > > > > +	u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
-> > > > > +
-> > > > > +	return  ((fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM &&
-> > > > > +		 !(par & SYS_PAR_EL1_S));
-> > > > 
-> > > > ESR_ELx_FSC_PERM = 0x0c is a permission fault, level 0, which Arm ARM says can
-> > > > only happen when FEAT_LPA2. I think the code should check that the value for
-> > > > PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PERM_L(3)].
-> > > 
-> > > I honestly don't want to second-guess the HW. If it reports something
-> > > that is the wrong level, why should we trust the FSC at all?
-> > 
-> > Sorry, I should have been clearer.
-> > 
-> > It's not about the hardware reporting a fault on level 0 of the translation
-> > tables, it's about the function returning false if the hardware reports a
-> > permission fault on levels 1, 2 or 3 of the translation tables.
-> > 
-> > For example, on a permssion fault on level 3, PAR_EL1. FST = 0b001111 = 0x0F,
-> > which means that the condition:
-> > 
-> > (fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM (which is 0x0C) is false and KVM
-> > will fall back to the software walker.
-> > 
-> > Does that make sense to you?
-> 
-> I'm afraid I still don't get it.
-> 
-> From the kernel source:
-> 
-> #define ESR_ELx_FSC_TYPE	(0x3C)
-> 
-> This is a mask covering all fault types.
-> 
-> #define ESR_ELx_FSC_PERM	(0x0C)
-> 
-> This is the value for a permission fault, not encoding a level.
-> 
-> Taking your example:
-> 
-> (fst & ESR_ELx_FSC_TYPE) == (0x0F & 0x3C) == 0x0C == ESR_ELx_FSC_PERM
-> 
-> As I read it, the condition is true, as it catches a permission fault
-> on any level between 0 and 3.
-> 
-> You're obviously seeing something I don't, and I'm starting to
-> question my own sanity...
+Thanks for the clarification!
+/fuad
 
-No, no, sorry for leading you on a wild goose chase, I read 0x3F for
-ESR_ELx_FSC_TYPE, which the value for the variable directly above it, instead of
-0x3C :(
-
-My bad, the code is correct!
-
-Thanks,
-Alex
+> --
+> Cheers,
+>
+> David / dhildenb
+>
 
