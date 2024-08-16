@@ -1,122 +1,111 @@
-Return-Path: <kvm+bounces-24455-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24456-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EE4D955380
-	for <lists+kvm@lfdr.de>; Sat, 17 Aug 2024 00:48:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 494DD95538E
+	for <lists+kvm@lfdr.de>; Sat, 17 Aug 2024 00:59:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 399B01F21F02
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 22:48:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 753981C21A2E
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 22:59:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F032D1482F5;
-	Fri, 16 Aug 2024 22:47:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8670E146596;
+	Fri, 16 Aug 2024 22:59:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="M+KNaI25"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ofh8Ed8L"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A622313AD32
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 22:47:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EC22140E29
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 22:59:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723848471; cv=none; b=kNRmXvi/qzkxPmtqohXhsEQFsMNgmmmUx2GTQ6Fe58Aeq1jC+pDUqFYS81gchhZ7gZ5amQtMZmt5cxLa6bXx+c8nma8PkB1nHBA7k5up7tXAJm6MFkwK/QwqZrzTuP/PJjNoybWWqoEdbfb2U2YO7nA8S+hHvEz5fPakwTzLydk=
+	t=1723849156; cv=none; b=Yzb0OxkA4ffaOFDHu2xwEHDgB2TAHUkOZ7dHXeSS7NrSVHUFndbpa4dUPgFZJ3yTlbnxS6iBrFxYXm09Rulb/xRN/MDhFUPyINxIKDE8f8zKVRbvahCm+QIA++7flwsFYIXpJpGgr/u33O00Ex1LsZ0bMRGCCQAviyxIO45xNzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723848471; c=relaxed/simple;
-	bh=NCtt4uG7luCn1UHr133h5Og1wWNAgMrd6d/e+y3W9h0=;
+	s=arc-20240116; t=1723849156; c=relaxed/simple;
+	bh=MJs2a21yAaqbtR36kVTBt+DPGz0l0wyzYftG3vvf3t8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=cSWGXuxdvCZcvQKa40X3tB7YGJbGTNKB+985Sf/AJ/M1O/h4nyjJtv6uU12Vafzua6wy09FqGqK/BHP8869ntg3PJrlS2wa+3r7WnqbQjgb/L85d+Lxrms1I+B/Njl9zTC8Aw9AIxOZW9d/ewK0CWE0Bgb8bWOErQ+YtESPOaYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=M+KNaI25; arc=none smtp.client-ip=209.85.128.201
+	 To:Cc:Content-Type; b=Qd/DkJMkl0T/x9UUpwz5a6FvaZnbTkxI1Bq6H+JW0RJBybqy8ZAzIVWYvDRiuFcGTgxS9/KVM59LCmuQEwyqiOl8uOXZUJpMAA/aR2duxUadyObRF6Vni+IpkrX7JHr4M3MrR8wlNnjqYFOkC7QDuvo4D4q/Q6T9Sjcsnj0mkAg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ofh8Ed8L; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6506bfeaf64so37021797b3.1
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 15:47:49 -0700 (PDT)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-672bea19dd3so42795827b3.1
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 15:59:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723848468; x=1724453268; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723849154; x=1724453954; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qx2xpqcSpC4cFoxJ3aEKOULQV/1IY5MYlZGNVDIdPWA=;
-        b=M+KNaI25y14dyFU+nUmudV/ScDpNau0XTHXDTKMh1oG1rGMVtttKEwz3pwXoRCEas9
-         zLt9r5lAe0GDBMV0gTXhUAloDGmk94hqSLpf4CJl6zCam1rwe4rbnpJ/VgOmfCMWr6Ba
-         iGxfLuVGPlZ8QtrYvSxS5PAAEM1Hlpolw0RJbcQMtYp8dF6F1FvQ0jFE0Gj8G3dXxVnb
-         wQqkx/Km6uz7fWaDfxIJhyaqz5/PUZltLCPWgCVnQuU4U2EB3bKV9V7B0pfh+NgQ261O
-         nt1MxG1+TnDq9awd0L92sIV/Gt+O2v7nLG5cokYLrlF1/Xv1oXEDv+1fopBTNAjge75h
-         8GLw==
+        bh=6OigZl0tBlIvn+LyfmlGZPjZ8Rd3zNNzd+iuerO/zdw=;
+        b=ofh8Ed8LtJObjpPNPZwS5rUSfm4TaWr597j443IPNSW58ea/eOXePXdSRBxq5mR6gl
+         0KcG9INyVAUYkabl1R9kktS4U4JAzbWVI8q7YtMXkidR/H8rwYtRQYWF5zfhmorSe/Dc
+         TqGOSTEJ3TrnkPwGm+UcCO/2Gp7NXVNvwn1o53QaA40CL930ivBhbXeHY81Mm8mF6JlL
+         hqTbtRAO4m9Ny9+z9YPNHLfsOQomZVbouO8XqL2N7bF0WUYpWK3eDZKYbH3HNgljRlwR
+         IYaZPedxhQm9b1Er2ZUnC0VdPwMlNuvl5Cbc5eFaPhSP9hDV8jRmPVm4jOnFh681NvQm
+         BLFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723848468; x=1724453268;
+        d=1e100.net; s=20230601; t=1723849154; x=1724453954;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qx2xpqcSpC4cFoxJ3aEKOULQV/1IY5MYlZGNVDIdPWA=;
-        b=akgqBmJjH5kb82exLCpn1Fwy0C+bOR+nr3MotIygUjg3spw2ccLZct+baaW1MbCQD4
-         93m3ASkjr/+pCtnA3ITu2vhwurMiYo2pWygQ1xtvhnWz862eOv/NEo1SRhqI4+ghYf/B
-         tdDk1+6m/y8oTSAn3837FEU5K83+3gkmh2MqZVXErWFfOXIYu+06Yh83z4/ZQGWgjsr+
-         r55j32tcg8j1eCcvPVjcrrvMZqsSvNX6GFbRlQ47cZD3hr1GS9l+GNNrcMP1hDxS1+s7
-         PZCqGfGx9GzqKncTyrqDLsEf3wXnRxUbedm7jDvPjU85WHV6vIZVv0VuS45bnMKM+IW0
-         U3Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCVLsQJ9Pp+Xy1KJm6Oer0k5jQ1dHcSHx4tUwvWiRJDTOl85yO/qCFE53ykMeOKiVafrldHK8YWj8FKey87kfh/W+hGZ
-X-Gm-Message-State: AOJu0YzX5ZLQgzNnye4dtccc0BNaYueXTCmweNkSLbNtF2d0sq2gcQVt
-	6S/vpk8avKoPnh0x4bj2VO3PGxCAPSfFfTCqIgv2Uf4/4sAoU0uOZV4iivh907kW4cmaUykDW76
-	ibw==
-X-Google-Smtp-Source: AGHT+IEvwcxqpYtiL376cvIj3JHrLSqTvEq8J04/jlIE1T9J+0gyo2k3z2/2o9DseE+PZHCWw22pnTT8aVU=
+        bh=6OigZl0tBlIvn+LyfmlGZPjZ8Rd3zNNzd+iuerO/zdw=;
+        b=ceiLoVmvswlxViSSJQQD0AGNDArytxbi4L1aI357E/6xu+8cngGlfQWSKIR9CaLloz
+         E0QQX2ETk7VcJ9ana+v4IrIzO6hz20/iCn/hnV0LIkBBZzewuTFZhr5xOMTKHC+W4o0M
+         lsMMqPOxa1g44TWvf7t9H4UKwjzjLZVjrpkYBfKPzoy3CsmFvGfswv0ifXwr6gtkoPt3
+         +Hnt+sYhCp/Oft9ZWJFVJOVJS8XfK2z20WrunrS5gVt0uDNn6VgI1/p+YgPDxdMzPR9H
+         5fSRW+WBtQnYPL3fGUEXY66g+b5mevQ0vof22G8xb+mPl0v6pdF2Q2kwctZkdECfYmhT
+         j50A==
+X-Gm-Message-State: AOJu0YyXDzCnoSV9PlynogdDFJLoA0INU9noIRqsNDZuC3B1ghJ7lNea
+	/mMZdIal3drQxTW2UbCXMo4E7gtG3g8vkNUGs0TNjTecH6nF9IbAEhumJ0pSUHNgMCT+2kyYN9z
+	M1A==
+X-Google-Smtp-Source: AGHT+IEBjklcX/YjjkCqt7TUIQQPn/5VaTiXo1FTpq7Fi5uIK9LBoTkBv7DIWbdiZ7fQsq0WqKSltBd9lwc=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6902:1005:b0:e0b:f69b:da30 with SMTP id
- 3f1490d57ef6-e1180f70d60mr302559276.9.1723848468610; Fri, 16 Aug 2024
- 15:47:48 -0700 (PDT)
-Date: Fri, 16 Aug 2024 15:47:47 -0700
-In-Reply-To: <20240805233114.4060019-2-dmatlack@google.com>
+ (user=seanjc job=sendgmr) by 2002:a05:690c:2a87:b0:673:b39a:92ce with SMTP id
+ 00721157ae682-6b1b7c6a599mr999877b3.3.1723849153801; Fri, 16 Aug 2024
+ 15:59:13 -0700 (PDT)
+Date: Fri, 16 Aug 2024 15:59:12 -0700
+In-Reply-To: <20240802015732.3192877-3-kim.phillips@amd.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240805233114.4060019-1-dmatlack@google.com> <20240805233114.4060019-2-dmatlack@google.com>
-Message-ID: <Zr_XE6NG1c-rNXEl@google.com>
-Subject: Re: [PATCH 1/7] Revert "KVM: x86/mmu: Don't bottom out on leafs when
- zapping collapsible SPTEs"
+References: <20240802015732.3192877-1-kim.phillips@amd.com> <20240802015732.3192877-3-kim.phillips@amd.com>
+Message-ID: <Zr_ZwLsqqOTlxGl2@google.com>
+Subject: Re: [PATCH 2/2] KVM: SEV: Configure "ALLOWED_SEV_FEATURES" VMCB Field
 From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
-Cc: Paolo Bonzini <pbonzini@redhat.com>, kvm@vger.kernel.org
+To: Kim Phillips <kim.phillips@amd.com>
+Cc: kvm@vger.kernel.org, linux-kernel@vger.kernel.org, x86@kernel.org, 
+	Tom Lendacky <thomas.lendacky@amd.com>, Michael Roth <michael.roth@amd.com>, 
+	Ashish Kalra <ashish.kalra@amd.com>, Nikunj A Dadhania <nikunj@amd.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Ingo Molnar <mingo@redhat.com>, "H. Peter Anvin" <hpa@zytor.com>, Thomas Gleixner <tglx@linutronix.de>, 
+	Kishon Vijay Abraham I <kvijayab@amd.com>
 Content-Type: text/plain; charset="us-ascii"
 
-On Mon, Aug 05, 2024, David Matlack wrote:
-> This reverts commit 85f44f8cc07b5f61bef30fe5343d629fd4263230.
+On Thu, Aug 01, 2024, Kim Phillips wrote:
+> From: Kishon Vijay Abraham I <kvijayab@amd.com>
 > 
-> Bring back the logic that walks down to leafs when zapping collapsible
-> SPTEs. Stepping down to leafs is technically unnecessary when zapping,
-> but the leaf SPTE will be used in a subsequent commit to construct a
-> huge SPTE and recover the huge mapping in place.
+> AMD EPYC 5th generation processors have introduced a feature that allows
+> the hypervisor to control the SEV_FEATURES that are set for or by a
+> guest [1]. The ALLOWED_SEV_FEATURES feature can be used by the hypervisor
+> to enforce that SEV-ES and SEV-SNP guests cannot enable features that the
+> hypervisor does not want to be enabled.
 
-Please no, getting rid of the step-up code made me so happy. :-D
+How does the host communicate to the guest which features are allowed?  And based
+on this blurb:
 
-It's also suboptimal, e.g. in the worst case scenario (which is comically
-unlikely, but theoretically possible), if the first present leaf SPTE in a 1GiB
-region is the last SPTE in the last 2MiB range, and all non-leaf SPTEs are
-somehow present (this is the super unlikely part), then KVM will read 512*512
-SPTEs before encountering a shadow-present leaf SPTE.
+  Some SEV features can only be used if the Allowed SEV Features Mask is enabled,
+  and the mask is configured to permit the corresponding feature. If the Allowed
+  SEV Features Mask is not enabled, these features are not available (see SEV_FEATURES
+  in Appendix B, Table B-4).
 
-The proposed approach will also ignore nx_huge_page_disallowed, and just always
-create a huge NX page.  On the plus side, "free" NX hugepage recovery!  The
-downside is that it means KVM is pretty much guaranteed to force the guest to
-re-fault all of its code pages, and zap a non-trivial number of huge pages that
-were just created.  IIRC, we deliberately did that for the zapping case, e.g. to
-use the opportunity to recover NX huge pages, but zap+create+zap+create is a bit
-different than zap+create (if the guest is still using the region for code).
+and the appendix, this only applies to PmcVirtualization and SecureAvic.  Adding
+that info in the changelog would be *very* helpful.
 
-So rather than looking for a present leaf SPTE, what about "stopping" as soon as
-KVM find a SP that can be replaced with a huge SPTE, pre-checking
-nx_huge_page_disallowed, and invoking kvm_mmu_do_page_fault() to install a new
-SPTE?  Or maybe even use kvm_tdp_map_page()?  Though it might be more work to
-massage kvm_tdp_map_page() into a usable form.
-
-By virtue of there being a present non-leaf SPTE, KVM knows the guest accessed
-the region at some point.  And now that MTRR virtualization is gone, the only time
-KVM zaps _only_ leafs is for mmu_notifiers and and the APIC access page, i.e. the
-odds of stepping down NOT finding a present SPTE somewhere in the region is very
-small.  Lastly, kvm_mmu_max_mapping_level() has verified there is a valid mapping
-in the pr imary MMU, else the max level would be PG_LEVEL_4K.  So the odds of
-getting a false positive and effectively pre-faulting memory the guest isn't using
-are quite small.
+And I see that SVM_SEV_FEAT_DEBUG_SWAP, a.k.a. DebugVirtualization, is a guest
+controlled feature and doesn't honor ALLOWED_SEV_FEATURES.  Doesn't that mean
+sev_vcpu_has_debug_swap() is broken, i.e. that KVM must assume the guest can
+DebugVirtualization on and off at will?  Or am I missing something?
 
