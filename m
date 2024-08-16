@@ -1,40 +1,40 @@
-Return-Path: <kvm+bounces-24402-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24403-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4634C954E49
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 17:56:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24E71954E6F
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 18:06:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F18B8284FC4
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 15:56:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48DFC1C22AF8
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 16:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 292541BE241;
-	Fri, 16 Aug 2024 15:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80DD01BE86E;
+	Fri, 16 Aug 2024 16:06:31 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C9981B86FB;
-	Fri, 16 Aug 2024 15:56:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5581BDA87;
+	Fri, 16 Aug 2024 16:06:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723823791; cv=none; b=Bgn5WXDoQc/aXxeOMHgwctR8m7+zkToCUPq3qZKeS0s8Q8D+dt9rfST8GEOnNJHX9P8qkOiv7W2B0J4T79h3PltydQsvokLE5tSdX0HjWLJxIpznkdjAsZ66jMhSFacpcOc9QnTayC4hI/mbE6MV4GbAL/SXBZHC/L4MI20Hv0c=
+	t=1723824391; cv=none; b=Xobx+jOWS3DzBpzdGt7lV/tTYrqnyJriLLe+QnRSgIFckzhc7Ha5pH0QAky7UN3wyryjz6q7sEF6+wPMXL3OcYI7Y+b3ciwcOtrl1Yrf8g056c5/PlnEfmOrZou/R/OUt3CoaIE/9ftDYYQR23uH+tlbyk9LjjpdTWVcjIhdPPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723823791; c=relaxed/simple;
-	bh=LJSlKhDs2xULF9oOdsbFHOVL0MfKa7F/Jn4NmxHc14Y=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=HlaIB+hJBWOJbeVrdjPNHZyW4xG214pgLJ190J7zAdLRvRU3tUmDn+rCvD75vLRBQ4kBUTTBlv5cnQQLrWqTApCcRMwzRJgt1nACBA/sAXIs1jwYwpv+OVWOE/Z8Jqt3v/ouME9a0eYNHXKRK6uAdGZYayWUTA/vz0KMj3rYf7c=
+	s=arc-20240116; t=1723824391; c=relaxed/simple;
+	bh=37h/oRDfh6L4BPlZhucfApa/80jVTHA6BUgyGnnHCjs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qJauXQkuIrP1lxYLPJbOHtyX/Cu5wl978Sk4e6qjHGn0TogQXGqT624agarnH5v6DIol8HUvCPXV2s6PJoTXyBoH+smBvjl2+gG8JhS1L8oNrf0dkkBMJYm3JHcMX2fDvYkTwISuHrGmuy8aIUC5hrZkEaRgah/oumMAR+VQIJ0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 02A8A13D5;
-	Fri, 16 Aug 2024 08:56:54 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C928013D5;
+	Fri, 16 Aug 2024 09:06:54 -0700 (PDT)
 Received: from [10.1.34.14] (e122027.cambridge.arm.com [10.1.34.14])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id BF0D33F58B;
-	Fri, 16 Aug 2024 08:56:24 -0700 (PDT)
-Message-ID: <38fa2fd0-c03c-4dcb-814c-c7a397affc62@arm.com>
-Date: Fri, 16 Aug 2024 16:56:22 +0100
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 44E003F58B;
+	Fri, 16 Aug 2024 09:06:26 -0700 (PDT)
+Message-ID: <27c942e0-0e7c-4e71-b1df-1a8f70df5411@arm.com>
+Date: Fri, 16 Aug 2024 17:06:24 +0100
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
@@ -42,364 +42,135 @@ List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-From: Steven Price <steven.price@arm.com>
-Subject: Re: [PATCH v4 01/15] arm64: rsi: Add RSI definitions
-To: Gavin Shan <gshan@redhat.com>, kvm@vger.kernel.org, kvmarm@lists.linux.dev
-Cc: Suzuki K Poulose <suzuki.poulose@arm.com>,
+Subject: Re: [PATCH v4 00/15] arm64: Support for running as a guest in Arm CCA
+To: Shanker Donthineni <sdonthineni@nvidia.com>,
+ Matias Ezequiel Vara Larsen <mvaralar@redhat.com>
+Cc: kvm@vger.kernel.org, kvmarm@lists.linux.dev,
  Catalin Marinas <catalin.marinas@arm.com>, Marc Zyngier <maz@kernel.org>,
  Will Deacon <will@kernel.org>, James Morse <james.morse@arm.com>,
- Oliver Upton <oliver.upton@linux.dev>, Zenghui Yu <yuzenghui@huawei.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Joey Gouly <joey.gouly@arm.com>, Alexandru Elisei
- <alexandru.elisei@arm.com>, Christoffer Dall <christoffer.dall@arm.com>,
- Fuad Tabba <tabba@google.com>, linux-coco@lists.linux.dev,
+ Oliver Upton <oliver.upton@linux.dev>,
+ Suzuki K Poulose <suzuki.poulose@arm.com>, Zenghui Yu
+ <yuzenghui@huawei.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, Joey Gouly <joey.gouly@arm.com>,
+ Alexandru Elisei <alexandru.elisei@arm.com>,
+ Christoffer Dall <christoffer.dall@arm.com>, Fuad Tabba <tabba@google.com>,
+ linux-coco@lists.linux.dev,
  Ganapatrao Kulkarni <gankulkarni@os.amperecomputing.com>
 References: <20240701095505.165383-1-steven.price@arm.com>
- <20240701095505.165383-2-steven.price@arm.com>
- <a119ad47-11b7-42e5-a1e2-2706660c93d9@redhat.com>
+ <ZpDvTXMDq6i+4O0m@fedora> <09fdebd7-32a0-4a88-9002-0f24eebe00a8@nvidia.com>
+From: Steven Price <steven.price@arm.com>
 Content-Language: en-GB
-In-Reply-To: <a119ad47-11b7-42e5-a1e2-2706660c93d9@redhat.com>
+In-Reply-To: <09fdebd7-32a0-4a88-9002-0f24eebe00a8@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi Gavin,
-
-Sorry for the slow reply, I realised I'd never replied to this email.
-
-On 23/07/2024 07:22, Gavin Shan wrote:
-> On 7/1/24 7:54 PM, Steven Price wrote:
->> From: Suzuki K Poulose <suzuki.poulose@arm.com>
->>
->> The RMM (Realm Management Monitor) provides functionality that can be
->> accessed by a realm guest through SMC (Realm Services Interface) calls.
->>
->> The SMC definitions are based on DEN0137[1] version A-eac5.
->>
->> [1] https://developer.arm.com/documentation/den0137/latest
->>
->> Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
->> Signed-off-by: Steven Price <steven.price@arm.com>
->> ---
->> Changes since v3:
->>   * Drop invoke_rsi_fn_smc_with_res() function and call arm_smccc_smc()
->>     directly instead.
->>   * Rename header guard in rsi_smc.h to be consistent.
->> Changes since v2:
->>   * Rename rsi_get_version() to rsi_request_version()
->>   * Fix size/alignment of struct realm_config
->> ---
->>   arch/arm64/include/asm/rsi_cmds.h |  38 ++++++++
->>   arch/arm64/include/asm/rsi_smc.h  | 142 ++++++++++++++++++++++++++++++
->>   2 files changed, 180 insertions(+)
->>   create mode 100644 arch/arm64/include/asm/rsi_cmds.h
->>   create mode 100644 arch/arm64/include/asm/rsi_smc.h
->>
+On 15/08/2024 23:16, Shanker Donthineni wrote:
+> Hi Steven,
 > 
-> Some nits and questions like below.
+> On 7/12/24 03:54, Matias Ezequiel Vara Larsen wrote:
+>> On Mon, Jul 01, 2024 at 10:54:50AM +0100, Steven Price wrote:
+>>> This series adds support for running Linux in a protected VM under the
+>>> Arm Confidential Compute Architecture (CCA). This has been updated
+>>> following the feedback from the v3 posting[1]. Thanks for the feedback!
+>>> Individual patches have a change log. But things to highlight:
+>>>
+>>>   * a new patch ("firmware/psci: Add psci_early_test_conduit()") to
+>>>     prevent SMC calls being made on systems which don't support them -
+>>>     i.e. systems without EL2/EL3 - thanks Jean-Philippe!
+>>>
+>>>   * two patches dropped (overriding set_fixmap_io). Instead
+>>>     FIXMAP_PAGE_IO is modified to include PROT_NS_SHARED. When support
+>>>     for assigning hardware devices to a realm guest is added this will
+>>>     need to be brought back in some form. But for now it's just adding
+>>>     complixity and confusion for no gain.
+>>>
+>>>   * a new patch ("arm64: mm: Avoid TLBI when marking pages as valid")
+>>>     which avoids doing an extra TLBI when doing the break-before-make.
+>>>     Note that this changes the behaviour in other cases when making
+>>>     memory valid. This should be safe (and saves a TLBI for those
+>>> cases),
+>>>     but it's a separate patch in case of regressions.
+>>>
+>>>   * GIC ITT allocation now uses a custom genpool-based allocator. I
+>>>     expect this will be replaced with a generic way of allocating
+>>>     decrypted memory (see [4]), but for now this gets things working
+>>>     without wasting too much memory.
+>>>
+>>> The ABI to the RMM from a realm (the RSI) is based on the final RMM v1.0
+>>> (EAC 5) specification[2]. Future RMM specifications will be backwards
+>>> compatible so a guest using the v1.0 specification (i.e. this series)
+>>> will be able to run on future versions of the RMM without modification.
+>>>
+>>> This series is based on v6.10-rc1. It is also available as a git
+>>> repository:
+>>>
+>>> https://gitlab.arm.com/linux-arm/linux-cca cca-guest/v4
 > 
->> diff --git a/arch/arm64/include/asm/rsi_cmds.h
->> b/arch/arm64/include/asm/rsi_cmds.h
->> new file mode 100644
->> index 000000000000..89e907f3af0c
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rsi_cmds.h
->> @@ -0,0 +1,38 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_RSI_CMDS_H
->> +#define __ASM_RSI_CMDS_H
->> +
->> +#include <linux/arm-smccc.h>
->> +
->> +#include <asm/rsi_smc.h>
->> +
->> +static inline unsigned long rsi_request_version(unsigned long req,
->> +                        unsigned long *out_lower,
->> +                        unsigned long *out_higher)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_smc(SMC_RSI_ABI_VERSION, req, 0, 0, 0, 0, 0, 0, &res);
->> +
->> +    if (out_lower)
->> +        *out_lower = res.a1;
->> +    if (out_higher)
->> +        *out_higher = res.a2;
->> +
->> +    return res.a0;
->> +}
->> +
->> +static inline unsigned long rsi_get_realm_config(struct realm_config
->> *cfg)
->> +{
->> +    struct arm_smccc_res res;
->> +
->> +    arm_smccc_smc(SMC_RSI_REALM_CONFIG, virt_to_phys(cfg),
->> +              0, 0, 0, 0, 0, 0, &res);
->> +    return res.a0;
->> +}
->> +
->> +#endif
+> Which cca-host branch should I use for testing cca-guest/v4?
 > 
-> #endif /* __ASM_RSI_CMDS_H */
+> I'm getting compilation errors with cca-host/v3 and cca-guest/v4, is there
+> any known WAR or fix to resolve this issue?
+
+cca-host/v3 should work with cca-guest/v4. I've been working on
+rebasing/updating the branches and should be able to post v4/v5 series
+next week.
+
 > 
->> diff --git a/arch/arm64/include/asm/rsi_smc.h
->> b/arch/arm64/include/asm/rsi_smc.h
->> new file mode 100644
->> index 000000000000..b3b3aff88f71
->> --- /dev/null
->> +++ b/arch/arm64/include/asm/rsi_smc.h
->> @@ -0,0 +1,142 @@
->> +/* SPDX-License-Identifier: GPL-2.0-only */
->> +/*
->> + * Copyright (C) 2023 ARM Ltd.
->> + */
->> +
->> +#ifndef __ASM_RSI_SMC_H_
->> +#define __ASM_RSI_SMC_H_
->> +
->> +/*
->> + * This file describes the Realm Services Interface (RSI) Application
->> Binary
->> + * Interface (ABI) for SMC calls made from within the Realm to the
->> RMM and
->> + * serviced by the RMM.
->> + */
->> +
->> +#define SMC_RSI_CALL_BASE        0xC4000000
->> +
->> +/*
->> + * The major version number of the RSI implementation.  Increase this
->> whenever
->> + * the binary format or semantics of the SMC calls change.
->> + */
->> +#define RSI_ABI_VERSION_MAJOR        1
->> +
->> +/*
->> + * The minor version number of the RSI implementation.  Increase this
->> when
->> + * a bug is fixed, or a feature is added without breaking binary
->> compatibility.
->> + */
->> +#define RSI_ABI_VERSION_MINOR        0
->> +
->> +#define RSI_ABI_VERSION            ((RSI_ABI_VERSION_MAJOR << 16) | \
->> +                     RSI_ABI_VERSION_MINOR)
->> +
->> +#define RSI_ABI_VERSION_GET_MAJOR(_version) ((_version) >> 16)
->> +#define RSI_ABI_VERSION_GET_MINOR(_version) ((_version) & 0xFFFF)
->> +
->> +#define RSI_SUCCESS            0
->> +#define RSI_ERROR_INPUT            1
->> +#define RSI_ERROR_STATE            2
->> +#define RSI_INCOMPLETE            3
->> +
+> arch/arm64/kvm/rme.c: In function ‘kvm_realm_reset_id_aa64dfr0_el1’:
+> ././include/linux/compiler_types.h:487:45: error: call to
+> ‘__compiletime_assert_650’ declared with attribute error: FIELD_PREP:
+> value too large for the field
+>   487 |         _compiletime_assert(condition, msg,
+> __compiletime_assert_, __COUNTER__)
+>       |                                             ^
+> ././include/linux/compiler_types.h:468:25: note: in definition of macro
+> ‘__compiletime_assert’
+>   468 |                         prefix ##
+> suffix();                             \
+>       |                         ^~~~~~
+> ././include/linux/compiler_types.h:487:9: note: in expansion of macro
+> ‘_compiletime_assert’
+>   487 |         _compiletime_assert(condition, msg,
+> __compiletime_assert_, __COUNTER__)
+>       |         ^~~~~~~~~~~~~~~~~~~
+> ./include/linux/build_bug.h:39:37: note: in expansion of macro
+> ‘compiletime_assert’
+>    39 | #define BUILD_BUG_ON_MSG(cond, msg) compiletime_assert(!(cond),
+> msg)
+>       |                                     ^~~~~~~~~~~~~~~~~~
+> ./include/linux/bitfield.h:68:17: note: in expansion of macro
+> ‘BUILD_BUG_ON_MSG’
+>    68 |                 BUILD_BUG_ON_MSG(__builtin_constant_p(_val)
+> ?           \
+>       |                 ^~~~~~~~~~~~~~~~
+> ./include/linux/bitfield.h:115:17: note: in expansion of macro
+> ‘__BF_FIELD_CHECK’
+>   115 |                 __BF_FIELD_CHECK(_mask, 0ULL, _val, "FIELD_PREP:
+> ");    \
+>       |                 ^~~~~~~~~~~~~~~~
+> arch/arm64/kvm/rme.c:315:16: note: in expansion of macro ‘FIELD_PREP’
+>   315 |         val |= FIELD_PREP(ID_AA64DFR0_EL1_BRPs_MASK, bps - 1) |
+>       |                ^~~~~~~~~~
+> make[5]: *** [scripts/Makefile.build:244: arch/arm64/kvm/rme.o] Error 1
+> make[4]: *** [scripts/Makefile.build:485: arch/arm64/kvm] Error 2
+> make[3]: *** [scripts/Makefile.build:485: arch/arm64] Error 2
+> make[3]: *** Waiting for unfinished jobs....
 > 
-> I think these return values are copied from
-> tf-rmm/lib/smc/include/smc-rsi.h, but
-> UL() prefix has been missed. It's still probably worthy to have it to
-> indicate the
-> width of the return values. Besides, it seems that RSI_ERROR_COUNT is
-> also missed
-> here.
+> I'm using gcc-13.3.0 compiler and cross-compiling on X86 machine.
 
-The source of all these defines is the RMM spec[1], tf-rmm obviously
-also has similar defines but I haven't been copying from there because
-this code is intended to work with any RMM that complies with the spec.
+I'm not sure quite how this happens. The 'value' (bps - 1) shouldn't be
+considered constant, so I don't see how the compiler has decided to
+complain here - the __builtin_constant_p() should really be evaluating to 0.
 
-In particular RSI_ERROR_COUNT isn't defined by the spec and we
-(currently at least) have no use for it in Linux.
+The only thing I can think of is if the compiler has somehow determined
+that rmm_feat_reg0 is 0 - which in theory it could do if it knew that
+kvm_init_rme() cannot succeed (rmi_features() would never be called, so
+the variable will never be set). Which makes me wonder if you're
+building with a PAGE_SIZE other than 4k?
 
-I'm not sure how much benefit the UL() prefix brings, but I've no
-objection so I'll add it.
+Obviously the code should still build if that's the case (so this would
+be a bug) but we don't currently support CCA with PAGE_SIZE != 4k.
 
-[1] https://developer.arm.com/documentation/den0137/latest
-
->> +#define SMC_RSI_FID(_x)            (SMC_RSI_CALL_BASE + (_x))
->> +
->> +#define SMC_RSI_ABI_VERSION            SMC_RSI_FID(0x190)
->> +
->> +/*
->> + * arg1 == Challenge value, bytes:  0 -  7
->> + * arg2 == Challenge value, bytes:  7 - 15
->> + * arg3 == Challenge value, bytes: 16 - 23
->> + * arg4 == Challenge value, bytes: 24 - 31
->> + * arg5 == Challenge value, bytes: 32 - 39
->> + * arg6 == Challenge value, bytes: 40 - 47
->> + * arg7 == Challenge value, bytes: 48 - 55
->> + * arg8 == Challenge value, bytes: 56 - 63
->> + * ret0 == Status / error
->> + * ret1 == Upper bound of token size in bytes
->> + */
->> +#define SMC_RSI_ATTESTATION_TOKEN_INIT        SMC_RSI_FID(0x194)
->> +
-> 
-> In tf-rmm/lib/smc/include/smc-rsi.h, it is SMC_RSI_ATTEST_TOKEN_INIT
-> instead
-> of SMC_RSI_ATTESTATION_TOKEN_INIT. The short description for all SMC
-
-Here tf-rmm is deviating from the spec, the specification gives the long
-form, so I'd prefer to stick to the spec unless we have a good reason
-for deviating.
-
-> calls have
-> been dropped and I think they're worthy to be kept. At least, it helps
-> readers
-> to understand what the SMC call does. For this particular SMC call, the
-> short
-> description is something like below:
-> 
-> /*
->  * Initialize the operation to retrieve an attestation token.
->  * :
->  */
-
-Fair point, I'll include the one-line descriptions from the spec
-(although in most cases that level of detail is obvious from the name).
-
->> +/*
->> + * arg1 == The IPA of token buffer
->> + * arg2 == Offset within the granule of the token buffer
->> + * arg3 == Size of the granule buffer
->> + * ret0 == Status / error
->> + * ret1 == Length of token bytes copied to the granule buffer
->> + */
->> +#define SMC_RSI_ATTESTATION_TOKEN_CONTINUE    SMC_RSI_FID(0x195)
->> +
-> 
-> SMC_RSI_ATTEST_TOKEN_CONTINUE as defined in tf-rmm.
-
-As above, the abbreviation isn't used in the spec.
-
->> +/*
->> + * arg1  == Index, which measurements slot to extend
->> + * arg2  == Size of realm measurement in bytes, max 64 bytes
->> + * arg3  == Measurement value, bytes:  0 -  7
->> + * arg4  == Measurement value, bytes:  7 - 15
->> + * arg5  == Measurement value, bytes: 16 - 23
->> + * arg6  == Measurement value, bytes: 24 - 31
->> + * arg7  == Measurement value, bytes: 32 - 39
->> + * arg8  == Measurement value, bytes: 40 - 47
->> + * arg9  == Measurement value, bytes: 48 - 55
->> + * arg10 == Measurement value, bytes: 56 - 63
->> + * ret0  == Status / error
->> + */
->> +#define SMC_RSI_MEASUREMENT_EXTEND        SMC_RSI_FID(0x193)
->> +
->> +/*
->> + * arg1 == Index, which measurements slot to read
->> + * ret0 == Status / error
->> + * ret1 == Measurement value, bytes:  0 -  7
->> + * ret2 == Measurement value, bytes:  7 - 15
->> + * ret3 == Measurement value, bytes: 16 - 23
->> + * ret4 == Measurement value, bytes: 24 - 31
->> + * ret5 == Measurement value, bytes: 32 - 39
->> + * ret6 == Measurement value, bytes: 40 - 47
->> + * ret7 == Measurement value, bytes: 48 - 55
->> + * ret8 == Measurement value, bytes: 56 - 63
->> + */
->> +#define SMC_RSI_MEASUREMENT_READ        SMC_RSI_FID(0x192)
->> +
-> 
-> The order of these SMC call definitions are sorted based on their
-> corresponding
-> function IDs. For example, SMC_RSI_MEASUREMENT_READ would be appearing
-> prior to
-> SMC_RSI_MEASUREMENT_EXTEND.
-
-Good spot - the spec annoyingly sorts alphabetically so I do struggle to
-keep everything in the right order. Will fix.
-
->> +#ifndef __ASSEMBLY__
->> +
->> +struct realm_config {
->> +    union {
->> +        struct {
->> +            unsigned long ipa_bits; /* Width of IPA in bits */
->> +            unsigned long hash_algo; /* Hash algorithm */
->> +        };
->> +        u8 pad[0x1000];
->> +    };
->> +} __aligned(0x1000);
->> +
-> 
-> This describes the argument to SMC call RSI_REALM_CONFIG and its address
-> needs to
-> be aligned to 0x1000. Otherwise, RSI_ERROR_INPUT is returned. This maybe
-> worthy
-> a comment to explain it why we need 0x1000 alignment here.
-
-Will add.
-
-> It seems the only 4KB page size (GRANULE_SIZE) is supported by tf-rmm at
-> present.
-> The fixed alignment (0x1000) becomes broken if tf-rmm is extended to
-> support
-> 64KB in future. Maybe tf-rmm was designed to work with the minimal page
-> size (4KB).
-
-Again this is a specification requirement. The size of a granule is
-always 4k - even if the host, guest or RMM choose to use a different
-page size - the specification requires that the alignment is 4k. If a
-larger page size is used in the RMM then it must jump through whatever
-hoops are required to support the config address being only 4k aligned.
-
-In practice there is a distinction between page size (which could vary
-between the different components in the system) and granule size which
-is the size which the physical memory can be switched between the
-different PA spaces. The RMM specification defines the granule size as
-4k (and doesn't provide any configurability of this), see section A2.2.
-The system is expected to have a "GPT MMU" which controls which physical
-address spaces each granule is visible in. There's quite a good
-document[2] on the Arm website explaining this in more detail.
-
-[2]
-https://developer.arm.com/documentation/den0126/0100/Granule-Protection-Checks
-
-Thanks,
 Steve
-
->> +#endif /* __ASSEMBLY__ */
->> +
->> +/*
->> + * arg1 == struct realm_config addr
->> + * ret0 == Status / error
->> + */
->> +#define SMC_RSI_REALM_CONFIG            SMC_RSI_FID(0x196)
->> +
->> +/*
->> + * arg1 == Base IPA address of target region
->> + * arg2 == Top of the region
->> + * arg3 == RIPAS value
->> + * arg4 == flags
->> + * ret0 == Status / error
->> + * ret1 == Top of modified IPA range
->> + */
->> +#define SMC_RSI_IPA_STATE_SET            SMC_RSI_FID(0x197)
->> +
->> +#define RSI_NO_CHANGE_DESTROYED            0
->> +#define RSI_CHANGE_DESTROYED            1
->> +
->> +/*
->> + * arg1 == IPA of target page
->> + * ret0 == Status / error
->> + * ret1 == RIPAS value
->> + */
->> +#define SMC_RSI_IPA_STATE_GET            SMC_RSI_FID(0x198)
->> +
->> +/*
->> + * arg1 == IPA of host call structure
->> + * ret0 == Status / error
->> + */
->> +#define SMC_RSI_HOST_CALL            SMC_RSI_FID(0x199)
->> +
->> +#endif /* __ASM_RSI_SMC_H_ */
-> 
-> Thanks,
-> Gavin
-> 
 
 
