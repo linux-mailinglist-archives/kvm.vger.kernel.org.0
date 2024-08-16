@@ -1,191 +1,197 @@
-Return-Path: <kvm+bounces-24440-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24441-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7F779551CB
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 22:21:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D554395520E
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 22:53:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1723FB2269E
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 20:21:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 821B2286A35
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 20:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53BD91C4631;
-	Fri, 16 Aug 2024 20:21:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD671BF324;
+	Fri, 16 Aug 2024 20:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CJwC2KM/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i4Z9IKoh"
 X-Original-To: kvm@vger.kernel.org
 Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BDDA1C2325
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 20:21:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD0713AD32
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 20:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723839682; cv=none; b=Rk82dFDaFB7khmWWfNGhHbywwgoAXaZEeOZWi8xCCQduA3auGGYfOFQqSCrVzj1fvseHL+OSRxj5R4ujl/WOQ+rq24kHW1XUrG7Stio1rNpqQtuc6EtwNB2RaormU/NKKUrImYP39zh6VWXP5FKb9+qdoC2vSgtyV1cYSLfE1Bs=
+	t=1723841591; cv=none; b=FlNtTihG26HGQWzBDsxiIU+gfCv6MUvUfeRi0s+4yK80P/TW+t0ORrPXN3fyNrR0Tmb6IqrqMiMilCuei0rO2JVV27g1URYkcZZ0wHRMFty8W/zjy3DlUIgiUUrBd69yLC6IoPidhwHPgs9n74qV3aEG5F8VOLTc+PFOwYZ6p0c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723839682; c=relaxed/simple;
-	bh=RoxnupCzUJOlpAhtqFKUUXI5xaHaw4zPnWSvdo8kXEA=;
+	s=arc-20240116; t=1723841591; c=relaxed/simple;
+	bh=5UyYQI7yu8x9ERunnWfw8TX2oiDwoyPuYXK5BmikKNI=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=D9gbbf6TPEt7eFbRtrPuW5KmCO09VwnBonBy7Ihq+vE6usK7sORhNgWM3Q7sq8C91HwVMv1YVmZXGDGjsSk8PdI1Wl50jGXrVlWkCHK1nj55IRnWUn9beVhHncFfeGICWj8/mGjD5bzETiQBQDg8+ko90lURddyp+yiqsicchQ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CJwC2KM/; arc=none smtp.client-ip=209.85.216.74
+	 To:Cc:Content-Type; b=CB5AxL4wGCSX6UCiRxklxEvYr96h/rQV3bSfYYVU+SpFYg0hwvgC1KLL5AveYSKaoeHqgvptndHSZVMVBNJBbfG+7Of+++GSAdIHvrzuIZOtCsRyYn8ii3LTBx0XkTteoQHkCOzPj9N4lqy8M7zCVwm7miEGx4KYGrFD1UFPuu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i4Z9IKoh; arc=none smtp.client-ip=209.85.216.74
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2d3e42ef85eso1231780a91.2
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 13:21:19 -0700 (PDT)
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2cfe9270d82so2364313a91.3
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 13:53:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723839679; x=1724444479; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1723841589; x=1724446389; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ml/zrxgslqXooti6qi/7d+TVeFAnkInp/7O9MVydVgA=;
-        b=CJwC2KM/pqChuCXAri5t/b2G00a9DsJ8SGfE0U09MCDdblJg28GVrPt2dtjdhuN89g
-         /lGSP6MtcMuk1vxKg830TfQQozSiYe+SxDznB7qudGJMD99e1CZOzvjxjlEn+yiM3PN4
-         Uv6HzkiuT1huIyZCXYtzgrwKJqpHWw51CRCjuFLorTsSJw7/7RGh76qiuTLnztkfzAGC
-         b2LOLkchshuAsjwdcuH29BHODhhPxqvh7wN1OzZpEHd3X6VzKiiWwlMvb9VCKaWYFajz
-         NWRbLFCjKj3pPo7QZ1FGOFcLWGjTsKu2WhwD+KyGh7VzdLj3mVmMx5linoGaSflW/CNy
-         FuCQ==
+        bh=srTYGx2O1W3qN60rjYZPJHIr/dbzcFBsu06le/7UmjM=;
+        b=i4Z9IKohmq0y3QCt7VIbEdal91nljyISBm2PagymXlWZUwR5PwFzXUyLvin+MgdLwN
+         eJ8XtWRKfITbwa85K3nerzWMF5FUjY07XTuh260CIRAPHgPPshc2TEE5nQn0+MR2qPg+
+         DCsio8WSodoSLK9v7F9kdj4Rh8mAXMQdSMiF3OJwg+jDlZWAvscchN6en7uJ2PIJ5a2v
+         AdNps0mrwAML/Snam/8NL1YtqbInAQ3DwPc4sGmQhNjJqftOiwB/c12C/0WHMkIrLrBz
+         wV7UqdopD5r4ZdurGFyctofPYFosNSsUTP0Ar8/3pQRFrIkwoVekFU1R2yk0Kd6BDDef
+         k07g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723839679; x=1724444479;
+        d=1e100.net; s=20230601; t=1723841589; x=1724446389;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ml/zrxgslqXooti6qi/7d+TVeFAnkInp/7O9MVydVgA=;
-        b=ZOcAXrvZntFF4GtHJPOQyivGYfwkAWdlzs14njZNpTwBXzY3Vmqpdk4sotzaWE86nw
-         zoZAyWgzU4ygCYMVjmYy2SnsGMSKTgWw14Yv3dvs9gT2Qiri36xvnVbD1xWK18PmRdlc
-         sl/jxHV3qy7+YHNbtVTFhyG7UlIFNXm2kL8M7Bj43XGwE6bnXoXu3WrXma/oCqSoAYy+
-         rehlxJU3D2k9RModSlcj5x+ImZeBP7loLz3DzJNUy5xk9ydDoZ3lUHfdcFNCpvEFGdve
-         et90+ttE6HtZEVbKYJu527hERHhCpAR53WmOpooFr/WRd9VCVp3OYm2ay4Q82DLb+eFt
-         yRcg==
-X-Gm-Message-State: AOJu0YzpzHuheLmPt0AnXuocwTEG10juJSBy+c2c4v301wZ8m8IU6WWk
-	ZifULhQyvXIm6fuhd86iL8LoQgCCsp+JUZY3qWbPw/o0ItcKGkcqLGeMvp387ciBjitgFBuQKrt
-	g6A==
-X-Google-Smtp-Source: AGHT+IFE7Hb7GuPDt7biLsqGWREW3/8zJ3I3cOi53aNTPw9eNpkaFNskEMqAJ4gAR3ybyxYczKq7LZE55/o=
+        bh=srTYGx2O1W3qN60rjYZPJHIr/dbzcFBsu06le/7UmjM=;
+        b=hk20c8tvnFUucGOaZt3DcBvc619vq0T3NdSefkDRHzkICgtbYNN11sFXJbRzrnYgE8
+         JnIcrRBHo8vptmLvBtATNlj0O8qex0F1MLKvbslNOgeFhwya+FMqYFB9YEMbrO5Qvprn
+         xABD1eW1rJsGt3xcVJHGvxxpELmpK497mkSta6fG0NtXGUKJR+uxD1OCc4nCoPHu5DWn
+         23PW/V+DfD4bm3i3OsK7CMm6HF4xpalcFAWEj3zTFXu9hfIFaOmmb8VnSZOCVo/S3msS
+         CVVY7FYAVaBTFEMRQt3Hv5HVmONlXXw6vz7KbbmbbXCVDT30A8goUwmkgnvsWAXy7Jzh
+         JzvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVaXepYwbM4FIdru7zyq0oXRjgnjHio0SQnjusOLTMbj05AlgGbIXY2Jn80DP2+RUbnhl7Gv7cjW1dZFrabrVGMZ7cS
+X-Gm-Message-State: AOJu0YxyImD+qHWGefbn9mENClCpO/42VWsfgT9+GPvJ9+GKIx7v6OVJ
+	Qlk+I5FwrPxXqp3FCdkDezH8JNf21Hr9zb9PR3vwr/a6w7TmQRAsyymUB88/QMsaOl6sWe0jSoH
+	uFw==
+X-Google-Smtp-Source: AGHT+IGpyWIC88JQ8UpHHFnbzA9sTpzlT6P3gnU0rL654gJSXsYoPHhMaqAVVk4iprqVrw9qiV+Fuc1p7zg=
 X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:90a:ad98:b0:2d3:b7c7:d682 with SMTP id
- 98e67ed59e1d1-2d3dffdb498mr9761a91.3.1723839679171; Fri, 16 Aug 2024 13:21:19
+ (user=seanjc job=sendgmr) by 2002:a17:90a:9c05:b0:2d3:acfd:5805 with SMTP id
+ 98e67ed59e1d1-2d3e03e9c70mr9727a91.8.1723841588800; Fri, 16 Aug 2024 13:53:08
  -0700 (PDT)
-Date: Fri, 16 Aug 2024 13:21:17 -0700
-In-Reply-To: <20240709175145.9986-5-manali.shukla@amd.com>
+Date: Fri, 16 Aug 2024 13:53:07 -0700
+In-Reply-To: <20240809205158.1340255-2-amoorthy@google.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20240709175145.9986-1-manali.shukla@amd.com> <20240709175145.9986-5-manali.shukla@amd.com>
-Message-ID: <Zr-0vX9rZDY2qSwl@google.com>
-Subject: Re: [RFC PATCH v1 4/4] KVM: selftests: Add bus lock exit test
+References: <20240809205158.1340255-1-amoorthy@google.com> <20240809205158.1340255-2-amoorthy@google.com>
+Message-ID: <Zr-8M9rYplgN6IS3@google.com>
+Subject: Re: [PATCH v2 1/3] KVM: Documentation: Clarify docs for KVM_CAP_MEMORY_FAULT_INFO
 From: Sean Christopherson <seanjc@google.com>
-To: Manali Shukla <manali.shukla@amd.com>
-Cc: kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, pbonzini@redhat.com, 
-	shuah@kernel.org, nikunj@amd.com, thomas.lendacky@amd.com, 
-	vkuznets@redhat.com, bp@alien8.de, babu.moger@amd.com
+To: Anish Moorthy <amoorthy@google.com>
+Cc: oliver.upton@linux.dev, kvm@vger.kernel.org, kvmarm@lists.linux.dev, 
+	jthoughton@google.com, rananta@google.com
 Content-Type: text/plain; charset="us-ascii"
 
-On Tue, Jul 09, 2024, Manali Shukla wrote:
-> From: Nikunj A Dadhania <nikunj@amd.com>
+On Fri, Aug 09, 2024, Anish Moorthy wrote:
+> The initial paragraph of the documentation here makes it sound like a
+> KVM_EXIT_MEMORY_FAULT will always accompany an EFAULT from KVM_RUN, but
+> that's not a guarantee.
 > 
-> Malicious guests can cause bus locks to degrade the performance of
-> a system.  The Bus Lock Threshold feature is beneficial for
-> hypervisors aiming to restrict the ability of the guests to perform
-> excessive bus locks and slow down the system for all the tenants.
+> Also, define zero to be a special value for the "size" field. This
+> allows memory faults exits to be set up in spots where KVM_RUN must
+> EFAULT, but is not able to supply an accurate size.
 > 
-> Add a test case to verify the Bus Lock Threshold feature for SVM.
-> 
-> [Manali:
->   - The KVM_CAP_X86_BUS_LOCK_EXIT capability is not enabled while
->     vcpus are created, changed the VM and vCPU creation logic to
->     resolve the mentioned issue.
->   - Added nested guest test case for bus lock exit.
->   - massage commit message.
->   - misc cleanups. ]
-
-Again, 99% of the changelog is boilerplate that does nothing to help me
-understand what the test actually does.
-
-> 
-> Signed-off-by: Nikunj A Dadhania <nikunj@amd.com>
-> Co-developed-by: Manali Shukla <manali.shukla@amd.com>
-> Signed-off-by: Manali Shukla <manali.shukla@amd.com>
+> Signed-off-by: Anish Moorthy <amoorthy@google.com>
 > ---
->  tools/testing/selftests/kvm/Makefile          |   1 +
->  .../selftests/kvm/x86_64/svm_buslock_test.c   | 114 ++++++++++++++++++
->  2 files changed, 115 insertions(+)
->  create mode 100644 tools/testing/selftests/kvm/x86_64/svm_buslock_test.c
+>  Documentation/virt/kvm/api.rst | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
 > 
-> diff --git a/tools/testing/selftests/kvm/Makefile b/tools/testing/selftests/kvm/Makefile
-> index ce8ff8e8ce3a..711ec195e386 100644
-> --- a/tools/testing/selftests/kvm/Makefile
-> +++ b/tools/testing/selftests/kvm/Makefile
-> @@ -94,6 +94,7 @@ TEST_GEN_PROGS_x86_64 += x86_64/smaller_maxphyaddr_emulation_test
->  TEST_GEN_PROGS_x86_64 += x86_64/smm_test
->  TEST_GEN_PROGS_x86_64 += x86_64/state_test
->  TEST_GEN_PROGS_x86_64 += x86_64/vmx_preemption_timer_test
-> +TEST_GEN_PROGS_x86_64 += x86_64/svm_buslock_test
->  TEST_GEN_PROGS_x86_64 += x86_64/svm_vmcall_test
->  TEST_GEN_PROGS_x86_64 += x86_64/svm_int_ctl_test
->  TEST_GEN_PROGS_x86_64 += x86_64/svm_nested_shutdown_test
-> diff --git a/tools/testing/selftests/kvm/x86_64/svm_buslock_test.c b/tools/testing/selftests/kvm/x86_64/svm_buslock_test.c
-> new file mode 100644
-> index 000000000000..dcb595999046
-> --- /dev/null
-> +++ b/tools/testing/selftests/kvm/x86_64/svm_buslock_test.c
+> diff --git a/Documentation/virt/kvm/api.rst b/Documentation/virt/kvm/api.rst
+> index 8e5dad80b337..c5ce7944005c 100644
+> --- a/Documentation/virt/kvm/api.rst
+> +++ b/Documentation/virt/kvm/api.rst
+> @@ -7073,7 +7073,8 @@ spec refer, https://github.com/riscv/riscv-sbi-doc.
+>  
+>  KVM_EXIT_MEMORY_FAULT indicates the vCPU has encountered a memory fault that
+>  could not be resolved by KVM.  The 'gpa' and 'size' (in bytes) describe the
+> -guest physical address range [gpa, gpa + size) of the fault.  The 'flags' field
+> +guest physical address range [gpa, gpa + size) of the fault: when zero, it
+> +indicates that the size of the fault could not be determined. The 'flags' field
+>  describes properties of the faulting access that are likely pertinent:
+>  
+>   - KVM_MEMORY_EXIT_FLAG_PRIVATE - When set, indicates the memory fault occurred
+> @@ -8131,7 +8132,7 @@ unavailable to host or other VMs.
+>  :Architectures: x86
+>  :Returns: Informational only, -EINVAL on direct KVM_ENABLE_CAP.
+>  
+> -The presence of this capability indicates that KVM_RUN will fill
+> +The presence of this capability indicates that KVM_RUN *may* fill
 
-I would *very* strongly prefer to have a bus lock test that is comment to VMX
-and SVM.  For L1, there's no unique behavior.  And for L2, assuming we don't
-support nested bus lock enabling, the only vendor specific bits are launching
-L2.
+I would prefer to fix KVM than to change the documentation.  The "will fill" is
+specifically scoped to guest page fault VM-Exits, so it should be a fully solvable
+problem.  I don't want to leave wriggle room for KVM, because then it will be
+quite difficult for userspace to do anything useful with memory_fault.
 
-I.e. writing this so it works on both VMX and SVM should be quite straightforward.
+E.g. for x86, convert all -EFAULTs that are returned when KVM is hosed to -EIO
+and KVM_BUG_ON, and then there's only one -EFAULT that doesn't fill memory_fault.
+Completely untested...
 
-> @@ -0,0 +1,114 @@
-> +// SPDX-License-Identifier: GPL-2.0-only
-> +/*
-> + * svm_buslock_test
-> + *
-> + * Copyright (C) 2024 Advanced Micro Devices, Inc.
-> + *
-> + * SVM testing: Buslock exit
+---
+ arch/x86/kvm/mmu/mmu.c         | 13 +++++++------
+ arch/x86/kvm/mmu/paging_tmpl.h |  4 ++--
+ 2 files changed, 9 insertions(+), 8 deletions(-)
 
-Keep the Copyright, ditch everything else.
+diff --git a/arch/x86/kvm/mmu/mmu.c b/arch/x86/kvm/mmu/mmu.c
+index 928cf84778b0..cb4e3a1041ed 100644
+--- a/arch/x86/kvm/mmu/mmu.c
++++ b/arch/x86/kvm/mmu/mmu.c
+@@ -3225,8 +3225,8 @@ static int direct_map(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault)
+ 					     fault->req_level >= it.level);
+ 	}
+ 
+-	if (WARN_ON_ONCE(it.level != fault->goal_level))
+-		return -EFAULT;
++	if (KVM_BUG_ON(it.level != fault->goal_level, vcpu->kvm))
++		return -EIO;
+ 
+ 	ret = mmu_set_spte(vcpu, fault->slot, it.sptep, ACC_ALL,
+ 			   base_gfn, fault->pfn, fault);
+@@ -3264,6 +3264,7 @@ static int kvm_handle_error_pfn(struct kvm_vcpu *vcpu, struct kvm_page_fault *fa
+ 		return RET_PF_RETRY;
+ 	}
+ 
++	kvm_mmu_prepare_memory_fault_exit(vcpu, fault);
+ 	return -EFAULT;
+ }
+ 
+@@ -4597,8 +4598,8 @@ int kvm_handle_page_fault(struct kvm_vcpu *vcpu, u64 error_code,
+ 
+ #ifndef CONFIG_X86_64
+ 	/* A 64-bit CR2 should be impossible on 32-bit KVM. */
+-	if (WARN_ON_ONCE(fault_address >> 32))
+-		return -EFAULT;
++	if (KVM_BUG_ON(fault_address >> 32, vcpu->kvm))
++		return -EIO;
+ #endif
+ 	/*
+ 	 * Legacy #PF exception only have a 32-bit error code.  Simply drop the
+@@ -5988,8 +5989,8 @@ int noinline kvm_mmu_page_fault(struct kvm_vcpu *vcpu, gpa_t cr2_or_gpa, u64 err
+ 
+ 	r = RET_PF_INVALID;
+ 	if (unlikely(error_code & PFERR_RSVD_MASK)) {
+-		if (WARN_ON_ONCE(error_code & PFERR_PRIVATE_ACCESS))
+-			return -EFAULT;
++		if (KVM_BUG_ON(error_code & PFERR_PRIVATE_ACCESS, vcpu->kvm))
++			return -EIO;
+ 
+ 		r = handle_mmio_page_fault(vcpu, cr2_or_gpa, direct);
+ 		if (r == RET_PF_EMULATE)
+diff --git a/arch/x86/kvm/mmu/paging_tmpl.h b/arch/x86/kvm/mmu/paging_tmpl.h
+index 69941cebb3a8..4f4704c65c40 100644
+--- a/arch/x86/kvm/mmu/paging_tmpl.h
++++ b/arch/x86/kvm/mmu/paging_tmpl.h
+@@ -745,8 +745,8 @@ static int FNAME(fetch)(struct kvm_vcpu *vcpu, struct kvm_page_fault *fault,
+ 					     fault->req_level >= it.level);
+ 	}
+ 
+-	if (WARN_ON_ONCE(it.level != fault->goal_level))
+-		return -EFAULT;
++	if (KVM_BUG_ON(it.level != fault->goal_level, vcpu->kvm))
++		return -EIO;
+ 
+ 	ret = mmu_set_spte(vcpu, fault->slot, it.sptep, gw->pte_access,
+ 			   base_gfn, fault->pfn, fault);
 
-> + */
-> +
-> +#include "test_util.h"
-> +#include "kvm_util.h"
-> +#include "processor.h"
-> +#include "svm_util.h"
-> +
-> +#define NO_ITERATIONS 100
+base-commit: 12ac7b9981ff30f0deffe6331bb742c71b279300
+-- 
 
-Heh, NR_ITERATIONS.
-
-> +#define __cacheline_aligned __aligned(128)
-
-Eh, I would just split a page, that's about as future proof as we can get in
-terms of cache line sizes.
-
-> +
-> +struct buslock_test {
-> +	unsigned char pad[126];
-> +	atomic_long_t val;
-> +} __packed;
-> +
-> +struct buslock_test test __cacheline_aligned;
-> +
-> +static __always_inline void buslock_atomic_add(int i, atomic_long_t *v)
-> +{
-> +	asm volatile(LOCK_PREFIX "addl %1,%0"
-> +		     : "+m" (v->counter)
-> +		     : "ir" (i) : "memory");
-> +}
-> +
-> +static void buslock_add(void)
-> +{
-> +	/*
-> +	 * Increment a cache unaligned variable atomically.
-> +	 * This should generate a bus lock exit.
-
-So... this test doesn't actually verify that a bus lock exit occurs.  The userspace
-side will eat an exit if one occurs, but there's literally not a single TEST_ASSERT()
-in here.
 
