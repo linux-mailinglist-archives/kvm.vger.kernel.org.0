@@ -1,125 +1,174 @@
-Return-Path: <kvm+bounces-24391-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24392-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97665954AD5
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 15:14:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D777A954B53
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 15:46:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 01154B23787
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 13:14:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9518F2850CA
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 13:46:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B145E1B8EA6;
-	Fri, 16 Aug 2024 13:14:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AE591B583F;
+	Fri, 16 Aug 2024 13:45:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bA9cXxnV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X8pjbaC2"
 X-Original-To: kvm@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9608C1B86DC
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 13:14:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2451BDA89;
+	Fri, 16 Aug 2024 13:45:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723814085; cv=none; b=JoNaSlRQdOw1V7iOgEoK5oijBnM2tkJ0XUaY2PEnVoC1ZorodtAmqhpp9Sl5+kk7Agerey2fWedU/rP8j234Tounl9/sm03CPIQDOAeVotMBQ4FL0pqqnKlLmFyqOztVDfo1q2vqDTNmX4yQ3ZhfMkwzdAMzrE1Ovtz0V1qegmQ=
+	t=1723815901; cv=none; b=lZduBM9sJNJ2ISpHNslvps6Et5jtvjVmTK60W1QR1DTKjk+sIS+1D9cOMKNIZY5KBup2SBVNmEsGhVsj5VF+im7T4fKWEALiAO+L6pyPGQgVgyQSYrOQOMeNUfSOBE0pZVuWR57SkKPtoq8PIVP52I2wFVxeDic17IYVw7FER2c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723814085; c=relaxed/simple;
-	bh=Okg3+uwu0bCLZvjjHJ2snIchx4goVhonI4QHQBcac3s=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=DCsUUpD+t+5Xi7RNOyVkpQe3ZfhUhqk/vu0E0zLyV1CTifv9eldPw4Roc03OhjS2TzlOTHr8NU/FhFMBY68jDKtcg+ezjspKEcLdnb7PzRyxM3WBJaXC0HU6HIEtrBPGL09qGKtE4qgEVJOG8Yo/JcUkw+AuLiKrSZ3G69wP+DA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bA9cXxnV; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1723814084; x=1755350084;
-  h=message-id:date:mime-version:cc:subject:to:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=Okg3+uwu0bCLZvjjHJ2snIchx4goVhonI4QHQBcac3s=;
-  b=bA9cXxnVm0XZXMySrTr+qJgeE6JlrLZ5vw6iFIko1gn04rBPdD8bMmyj
-   jUKgdLzjPuHbkwmbgnIDnMMmeReDNpZb8XdEPnVL16A+UrmWbruXEORyt
-   oWVkoaA9ADQh6vcngyOaBUll7zzIxjmHVQWeP+zeSm1cyBkWsCYj0cfNw
-   tecNilf7Moxhjl89zmeqdWvqfP4BqO5jnXYvYs+2CD9sHGiGsrXMScMFn
-   WteKjUkNtemqWJLCCFRf3mA4Q3p5dGHmPjWLfKYtSguA9ipC9vgCwSIMj
-   WMhQKPzPQ1NTok2+XsSJ+z+/Ns0/p4yl6bL5DZabqxA9yoYmubEXeM0O5
-   g==;
-X-CSE-ConnectionGUID: SnxhNZZlSy+FGZ29Jzn/+Q==
-X-CSE-MsgGUID: exOGYvT/RQC4q+x4QbDdaw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11166"; a="25866873"
-X-IronPort-AV: E=Sophos;i="6.10,151,1719903600"; 
-   d="scan'208";a="25866873"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2024 06:14:44 -0700
-X-CSE-ConnectionGUID: Gyua7FRbSE2nKtlIbaowgg==
-X-CSE-MsgGUID: y6hKpDWTRJeNvbjkGWhTQA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.10,151,1719903600"; 
-   d="scan'208";a="64616054"
-Received: from blu2-mobl.ccr.corp.intel.com (HELO [10.125.248.220]) ([10.125.248.220])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Aug 2024 06:14:40 -0700
-Message-ID: <215647fb-5aec-48db-9e09-5034dd19977c@linux.intel.com>
-Date: Fri, 16 Aug 2024 21:14:37 +0800
+	s=arc-20240116; t=1723815901; c=relaxed/simple;
+	bh=YQT8ZDRJOg8IW7UFAymgBTObemrs1T7N8zH4s23+HPk=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aZJprsG53t9nH/58HlIsRn6PYrxOYD27vGAFSoaUrONAYfbi9dy72laC/oF2IeVmJWVkDf/X9xyVpcH8UnYQnB3lH7cTWmOE9Sz5Mxf38q6lOMLR20SKkwTJ3ED9xkcaThL+fwge1830a6D399Q0R7+Uh9ItZHiepFrGbh9ApBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X8pjbaC2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C322C4AF0C;
+	Fri, 16 Aug 2024 13:45:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1723815901;
+	bh=YQT8ZDRJOg8IW7UFAymgBTObemrs1T7N8zH4s23+HPk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X8pjbaC2F/ylOjRoBQrUnbKG7P1R3Q5ZbhpjbLNcy+SInKZNi9wdIIMQ0Vi1UzKFS
+	 ZqkC57XGsnaszGg5iTu6CYosPBMaiC+IuO/8UNVIBY4G2dUoLBu5uhDKkbZle4HuIa
+	 kN9b/6+InTLntdr6WUWAtoe1ghjNvwSXNEXluYT971G9d9XrukQ1tLbD5EyWiCMBMt
+	 5RUhAymAi5rtFX11Iv4BnpI37/rjmrX0uxn+TUdl1/1d3KujHjCZ9OJABjQCvz/mCA
+	 QT5qwO1q8HCSQ1JRwokdGqQMVCp/fcva8HwhmwTKKCZNYFtZ4JptJpVspE1Nc1u3/p
+	 pmi4J5w4XhmnA==
+Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
+	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.95)
+	(envelope-from <maz@kernel.org>)
+	id 1sexGF-004Hra-84;
+	Fri, 16 Aug 2024 14:44:59 +0100
+Date: Fri, 16 Aug 2024 14:44:58 +0100
+Message-ID: <86jzggzin9.wl-maz@kernel.org>
+From: Marc Zyngier <maz@kernel.org>
+To: Alexandru Elisei <alexandru.elisei@arm.com>
+Cc: kvmarm@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	kvm@vger.kernel.org,
+	James Morse <james.morse@arm.com>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Oliver Upton <oliver.upton@linux.dev>,
+	Zenghui Yu <yuzenghui@huawei.com>,
+	Joey Gouly <joey.gouly@arm.com>,
+	Anshuman Khandual <anshuman.khandual@arm.com>,
+	Przemyslaw Gaj <pgaj@cadence.com>
+Subject: Re: [PATCH v3 14/18] KVM: arm64: nv: Add SW walker for AT S1 emulation
+In-Reply-To: <Zr8xzdmMELK07YUo@raptor>
+References: <20240813100540.1955263-1-maz@kernel.org>
+	<20240813100540.1955263-15-maz@kernel.org>
+	<Zr4wUj5mpKkwMyCq@raptor>
+	<86msldzlly.wl-maz@kernel.org>
+	<Zr8aYymB_2xSqIQp@raptor>
+	<86le0wzrbv.wl-maz@kernel.org>
+	<Zr8xzdmMELK07YUo@raptor>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
+ FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.4
+ (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: baolu.lu@linux.intel.com, Yi Liu <yi.l.liu@intel.com>,
- "Tian, Kevin" <kevin.tian@intel.com>,
- Alex Williamson <alex.williamson@redhat.com>,
- "joro@8bytes.org" <joro@8bytes.org>,
- "robin.murphy@arm.com" <robin.murphy@arm.com>,
- "eric.auger@redhat.com" <eric.auger@redhat.com>,
- "nicolinc@nvidia.com" <nicolinc@nvidia.com>,
- "kvm@vger.kernel.org" <kvm@vger.kernel.org>,
- "chao.p.peng@linux.intel.com" <chao.p.peng@linux.intel.com>,
- "iommu@lists.linux.dev" <iommu@lists.linux.dev>,
- "Duan, Zhenzhong" <zhenzhong.duan@intel.com>,
- "Pan, Jacob jun" <jacob.jun.pan@intel.com>, =?UTF-8?Q?C=C3=A9dric_Le_Goater?=
- <clg@redhat.com>, Suravee Suthikulpanit <suravee.suthikulpanit@amd.com>
-Subject: Re: [PATCH v2 0/4] vfio-pci support pasid attach/detach
-To: Jason Gunthorpe <jgg@nvidia.com>, Vasant Hegde <vasant.hegde@amd.com>
-References: <BN9PR11MB5276318969A212AD0649C7BE8CBE2@BN9PR11MB5276.namprd11.prod.outlook.com>
- <20240806142047.GN478300@nvidia.com>
- <0ae87b83-c936-47d2-b981-ef1e8c87f7fa@intel.com>
- <BN9PR11MB5276871E150DC968B2F652798C872@BN9PR11MB5276.namprd11.prod.outlook.com>
- <4f5bfba2-c1e7-4923-aa9c-59d76ccc4390@intel.com>
- <20240814144031.GO2032816@nvidia.com>
- <b37a7336-36af-4ffc-a50f-c9b578cd9bda@intel.com>
- <6f293363-1c02-4389-a6b3-7e9845b0f251@amd.com>
- <8a73ef9c-bd37-403f-abdf-b00e8eb45236@intel.com>
- <f6c4e06e-e946-489f-8856-f18e1c1cc0aa@amd.com>
- <20240816125252.GA2032816@nvidia.com>
-Content-Language: en-US
-From: Baolu Lu <baolu.lu@linux.intel.com>
-In-Reply-To: <20240816125252.GA2032816@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=US-ASCII
+X-SA-Exim-Connect-IP: 185.219.108.64
+X-SA-Exim-Rcpt-To: alexandru.elisei@arm.com, kvmarm@lists.linux.dev, linux-arm-kernel@lists.infradead.org, kvm@vger.kernel.org, james.morse@arm.com, suzuki.poulose@arm.com, oliver.upton@linux.dev, yuzenghui@huawei.com, joey.gouly@arm.com, anshuman.khandual@arm.com, pgaj@cadence.com
+X-SA-Exim-Mail-From: maz@kernel.org
+X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
 
-On 2024/8/16 20:52, Jason Gunthorpe wrote:
-> On Fri, Aug 16, 2024 at 05:31:31PM +0530, Vasant Hegde wrote:
->>> I see. So AMD side also has a gap. Is it easy to make it suit Jason's
->>> suggestion in the above?
->> We can do that. We can enable ATS, PRI and PASID capability during probe time
->> and keep it enabled always.
-> I don't see a downside to enabling PASID at probe time, it exists to
-> handshake with the device if the root complex is able to understand
-> PASID TLPs.
+On Fri, 16 Aug 2024 12:02:37 +0100,
+Alexandru Elisei <alexandru.elisei@arm.com> wrote:
 > 
-> SMMU3 calls
->   arm_smmu_probe_device
->    arm_smmu_enable_pasid
->     pci_enable_pasid
+> Hi Marc,
 > 
-> So it looks Ok
+> On Fri, Aug 16, 2024 at 11:37:24AM +0100, Marc Zyngier wrote:
+> > Hi Alex,
+> > 
+> > On Fri, 16 Aug 2024 10:22:43 +0100,
+> > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > > 
+> > > Hi Marc,
+> > > 
+> > > On Thu, Aug 15, 2024 at 07:28:41PM +0100, Marc Zyngier wrote:
+> > > > 
+> > > > Hi Alex,
+> > > > 
+> > > > On Thu, 15 Aug 2024 17:44:02 +0100,
+> > > > Alexandru Elisei <alexandru.elisei@arm.com> wrote:
+> > 
+> > [...]
+> > 
+> > > > > > +static bool par_check_s1_perm_fault(u64 par)
+> > > > > > +{
+> > > > > > +	u8 fst = FIELD_GET(SYS_PAR_EL1_FST, par);
+> > > > > > +
+> > > > > > +	return  ((fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM &&
+> > > > > > +		 !(par & SYS_PAR_EL1_S));
+> > > > > 
+> > > > > ESR_ELx_FSC_PERM = 0x0c is a permission fault, level 0, which Arm ARM says can
+> > > > > only happen when FEAT_LPA2. I think the code should check that the value for
+> > > > > PAR_EL1.FST is in the interval (ESR_ELx_FSC_PERM_L(0), ESR_ELx_FSC_PERM_L(3)].
+> > > > 
+> > > > I honestly don't want to second-guess the HW. If it reports something
+> > > > that is the wrong level, why should we trust the FSC at all?
+> > > 
+> > > Sorry, I should have been clearer.
+> > > 
+> > > It's not about the hardware reporting a fault on level 0 of the translation
+> > > tables, it's about the function returning false if the hardware reports a
+> > > permission fault on levels 1, 2 or 3 of the translation tables.
+> > > 
+> > > For example, on a permssion fault on level 3, PAR_EL1. FST = 0b001111 = 0x0F,
+> > > which means that the condition:
+> > > 
+> > > (fst & ESR_ELx_FSC_TYPE) == ESR_ELx_FSC_PERM (which is 0x0C) is false and KVM
+> > > will fall back to the software walker.
+> > > 
+> > > Does that make sense to you?
+> > 
+> > I'm afraid I still don't get it.
+> > 
+> > From the kernel source:
+> > 
+> > #define ESR_ELx_FSC_TYPE	(0x3C)
+> > 
+> > This is a mask covering all fault types.
+> > 
+> > #define ESR_ELx_FSC_PERM	(0x0C)
+> > 
+> > This is the value for a permission fault, not encoding a level.
+> > 
+> > Taking your example:
+> > 
+> > (fst & ESR_ELx_FSC_TYPE) == (0x0F & 0x3C) == 0x0C == ESR_ELx_FSC_PERM
+> > 
+> > As I read it, the condition is true, as it catches a permission fault
+> > on any level between 0 and 3.
+> > 
+> > You're obviously seeing something I don't, and I'm starting to
+> > question my own sanity...
+> 
+> No, no, sorry for leading you on a wild goose chase, I read 0x3F for
+> ESR_ELx_FSC_TYPE, which the value for the variable directly above it, instead of
+> 0x3C :(
+> 
+> My bad, the code is correct!
 
-I made a patch for the Intel driver.
-
-https://lore.kernel.org/linux-iommu/20240816104945.97160-1-baolu.lu@linux.intel.com/
+Ah, glad we agree, I was starting to worry!
 
 Thanks,
-baolu
+
+	M.
+
+-- 
+Without deviation from the norm, progress is not possible.
 
