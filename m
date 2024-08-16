@@ -1,267 +1,272 @@
-Return-Path: <kvm+bounces-24395-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24396-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BD7E954C5E
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 16:29:47 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A4C1954C63
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 16:33:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27ACF1F246D7
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 14:29:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A74821F2312E
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 14:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43DAD1BD006;
-	Fri, 16 Aug 2024 14:29:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619FE1BCA0C;
+	Fri, 16 Aug 2024 14:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="A5Bxb5A+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fv6Qmkgz"
 X-Original-To: kvm@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F00781A3BC0;
-	Fri, 16 Aug 2024 14:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E159119D8BA
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 14:33:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723818579; cv=none; b=ADisc803pKIQlo0c62EoJTcz37BeHoX59dI1ztVUEGSmp8zTiW+MgtzU5WkYHicxTQbcmgiV6c/L+AZJFZBMHD+v7Vu52sF2EWk26yc81NBEOerRbxmmo1Cz2gyEkxH8CV/PKe95PvqPuvwoXG9Hu/LEW5DPlAOaLwWjkApkGcQ=
+	t=1723818792; cv=none; b=dcFBeSnUtiIgP++mGfbSDJKTzvpOA8k5JwH8Tt7ETtwkNVA0zakjS19jYMTkdfpkFJsOuxZmrSUGGGIGzy/ZtDYSCrKAw55EH6jyThX+E/DVZOOXk7FmPeJeDADnb5BcCFojzPoDQQJPrjLlrxALh4339slGAbC+9C1jTOEJHVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723818579; c=relaxed/simple;
-	bh=JhmXKWhjdrG84FRgxq2myvwpgTSU4uVmrcF1oKCERZk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=NB5x0ZBtNyVaK/lR5ISZpwgI9JLwkh7h7WTy9MM3k6vqnWXPknuee+I7zxY9/a13+3dxiH3M98UQzfVKl5WQ5Mz1yEmh8Ey+UMPG9ZOrvOwpz8XZwxq3MWP+O+2bMWFd83jvnxOn/cr6bvCVz8Ryur9GP9+4thLqvYIDhNB6Umg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=A5Bxb5A+; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47G2KT4u004516;
-	Fri, 16 Aug 2024 14:29:31 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=pp1; bh=4
-	1hGsqTLvTIxU5BwIt+HASBMihq4OvuVWvFAGoo55no=; b=A5Bxb5A+pvpo4SnGr
-	/lknI9sDyAsrvuUwjE5fKf877tpK5wvADhJ6e5oMiNxee/fHFIrnvvrf7K2HA4xH
-	DEXVS+BljVJ5fIsa/0AN+n/BQ+fdZ+zMBUcPTi/ftalDe40fz0a6T/ynD4i7wiBq
-	y2RnYLdEbpMbR9PBUxvarF7MjpNKb+PlnIdWle5XjQCvsIokZXjnX0B3aYUepbEy
-	vhOI4VUxuoehSAuI3PwDsf6aC5LEFjCe2Ftf5lIMzVeAWd9VWukC0RoykrbxXhR1
-	RK0eZgQYtEyNJJqZT1lLwGL6GurBO+dd6erkLFjjj29LldRu2eMWKrsZok1gPL8h
-	G+F8A==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6rt4k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Aug 2024 14:29:31 +0000 (GMT)
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47GETUM7013825;
-	Fri, 16 Aug 2024 14:29:30 GMT
-Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4111d6rt4b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Aug 2024 14:29:30 +0000 (GMT)
-Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 47GAbOta016357;
-	Fri, 16 Aug 2024 14:29:30 GMT
-Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
-	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 40xkhq41vs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 16 Aug 2024 14:29:29 +0000
-Received: from smtpav07.fra02v.mail.ibm.com (smtpav07.fra02v.mail.ibm.com [10.20.54.106])
-	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47GETOHu34865844
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 16 Aug 2024 14:29:26 GMT
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2017320043;
-	Fri, 16 Aug 2024 14:29:24 +0000 (GMT)
-Received: from smtpav07.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7437520040;
-	Fri, 16 Aug 2024 14:29:23 +0000 (GMT)
-Received: from [9.171.56.137] (unknown [9.171.56.137])
-	by smtpav07.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Fri, 16 Aug 2024 14:29:23 +0000 (GMT)
-Message-ID: <4c049b39-af28-488c-9e19-f22691b43585@linux.ibm.com>
-Date: Fri, 16 Aug 2024 16:29:23 +0200
+	s=arc-20240116; t=1723818792; c=relaxed/simple;
+	bh=sadaGM8x0iZBdQFbiv+WixEd0g4sLPwtOsoSIQDe20k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=shA/L/xxsLoQfCAxnIibGqwYcLxBohjjCwk3Fd8pK+RquFcG6BvLoFxGTI+E0eKu89t/NB0kHY8eKYsIFcMIO16YOK/43fgPvwTRVw+B/bIMbyOKXKuKWs05fg2cMc/pQyep5Yc6l3qs+hv+DtOBqYo/1pP84lyZbiH/8tL6eK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fv6Qmkgz; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1723818789;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pI+A4TxlCP26Io+FMl9dijsLZDh/SBaAeeqWjnr6+2U=;
+	b=fv6QmkgzKYK25zZyxcHmXPLpEzako8nExynguof2qA9bFRShmUUDXls9UbaWa0q0WhaRH9
+	pTW8/gomMPraZ5gQqx5tPcO3V1fAylKrSSWHrKifPtQft4kenDBQRoqhq/ZPEyQjFTOK+q
+	Yqc2BTEnW+utOpwkatxV4A3QGYJquCo=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-189-XEvAlO-MNs6HABMv6rG90A-1; Fri, 16 Aug 2024 10:33:08 -0400
+X-MC-Unique: XEvAlO-MNs6HABMv6rG90A-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6b7ad98c1f8so4228036d6.1
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 07:33:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1723818788; x=1724423588;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pI+A4TxlCP26Io+FMl9dijsLZDh/SBaAeeqWjnr6+2U=;
+        b=dLxXkM9xptWYb2alyCJvyP/Rp7oy+uXql6Wq7J9CKh7oiB5CJq4O5SZm7FKHsIATlX
+         Io8NbBcKUUiVZQU4EBz3OnPIqCZsbOrkMxLr/nhi1pDEsDg1Op1PjkbBTYwWFyodEs1V
+         fFBqNganPhubFXLYtAzQNxcD/4ain5+o1YLyz2hDTe5iX1FO16SHoVAtHcGQPzOzOvB2
+         +F8P1wcKD6Mjow0aX44tt5oNh4y8ZCd8D4k/JQ6tIszl2DLtmm1j4PhP79NAptTaHN67
+         c4OZS9kcy8XpKg/ZAWpUjnzY3AzqXDTr9DyloennabIw4MV1fYLix7yvlB1rZ40/lZjh
+         K7pw==
+X-Forwarded-Encrypted: i=1; AJvYcCULbTESWiBqYfC1nJ2Gdj5DgDrZzYBDZPRnm/8f/k1BzEj8NH+LXawTaCyd7m9HYbu/bX4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YydKxWYPHrP/mMk5077prMTvjIEG9x+B5WyveQEz7xC2v00lRq9
+	TQlR8Ap39uxzq59GMND/w4JG9ZNpuSbRatExkN7G9mhS216i70wO1FoCuR+YbCYKLbbli6jLaKV
+	6ldpvhG/zUnf6KzZ5S/gKovdCw0etMo7EFKNZ33Zawu1CgxVOKg==
+X-Received: by 2002:a05:6214:246c:b0:6bb:3f69:dd0c with SMTP id 6a1803df08f44-6bf7cf24591mr18243486d6.9.1723818787766;
+        Fri, 16 Aug 2024 07:33:07 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGAXotyBPW98wWBPOCwOllaVQ2bg66VXsApljb5NIRTUYVV9cPWLSGNiu0ld5IKhS5uOnqJhg==
+X-Received: by 2002:a05:6214:246c:b0:6bb:3f69:dd0c with SMTP id 6a1803df08f44-6bf7cf24591mr18243216d6.9.1723818787295;
+        Fri, 16 Aug 2024 07:33:07 -0700 (PDT)
+Received: from x1n (pool-99-254-121-117.cpe.net.cable.rogers.com. [99.254.121.117])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6bf6ff06d71sm17954566d6.129.2024.08.16.07.33.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Aug 2024 07:33:06 -0700 (PDT)
+Date: Fri, 16 Aug 2024 10:33:04 -0400
+From: Peter Xu <peterx@redhat.com>
+To: Kefeng Wang <wangkefeng.wang@huawei.com>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	Sean Christopherson <seanjc@google.com>,
+	Oscar Salvador <osalvador@suse.de>,
+	Axel Rasmussen <axelrasmussen@google.com>,
+	linux-arm-kernel@lists.infradead.org, x86@kernel.org,
+	Will Deacon <will@kernel.org>, Gavin Shan <gshan@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>, Zi Yan <ziy@nvidia.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Ingo Molnar <mingo@redhat.com>,
+	Alistair Popple <apopple@nvidia.com>,
+	Borislav Petkov <bp@alien8.de>,
+	David Hildenbrand <david@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>, kvm@vger.kernel.org,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	Alex Williamson <alex.williamson@redhat.com>,
+	Yan Zhao <yan.y.zhao@intel.com>
+Subject: Re: [PATCH 00/19] mm: Support huge pfnmaps
+Message-ID: <Zr9jIKp_vWyfCzQs@x1n>
+References: <20240809160909.1023470-1-peterx@redhat.com>
+ <20240814123715.GB2032816@nvidia.com>
+ <Zr5VA6QSBHO3rpS8@x1n>
+ <1147332f-790e-487f-8816-1860b8744ab2@huawei.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] selftests: kvm: s390: Add uc_map_unmap VM test case
-To: Christoph Schlameuss <schlameuss@linux.ibm.com>, kvm@vger.kernel.org
-Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
-        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Claudio Imbrenda <imbrenda@linux.ibm.com>,
-        David Hildenbrand <david@redhat.com>,
-        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
-References: <20240815154529.628087-1-schlameuss@linux.ibm.com>
- <20240815154529.628087-2-schlameuss@linux.ibm.com>
-Content-Language: en-US
-From: Janosch Frank <frankja@linux.ibm.com>
-Autocrypt: addr=frankja@linux.ibm.com; keydata=
- xsFNBFubpD4BEADX0uhkRhkj2AVn7kI4IuPY3A8xKat0ihuPDXbynUC77mNox7yvK3X5QBO6
- qLqYr+qrG3buymJJRD9xkp4mqgasHdB5WR9MhXWKH08EvtvAMkEJLnqxgbqf8td3pCQ2cEpv
- 15mH49iKSmlTcJ+PvJpGZcq/jE42u9/0YFHhozm8GfQdb9SOI/wBSsOqcXcLTUeAvbdqSBZe
- zuMRBivJQQI1esD9HuADmxdE7c4AeMlap9MvxvUtWk4ZJ/1Z3swMVCGzZb2Xg/9jZpLsyQzb
- lDbbTlEeyBACeED7DYLZI3d0SFKeJZ1SUyMmSOcr9zeSh4S4h4w8xgDDGmeDVygBQZa1HaoL
- Esb8Y4avOYIgYDhgkCh0nol7XQ5i/yKLtnNThubAcxNyryw1xSstnKlxPRoxtqTsxMAiSekk
- 0m3WJwvwd1s878HrQNK0orWd8BzzlSswzjNfQYLF466JOjHPWFOok9pzRs+ucrs6MUwDJj0S
- cITWU9Rxb04XyigY4XmZ8dywaxwi2ZVTEg+MD+sPmRrTw+5F+sU83cUstuymF3w1GmyofgsU
- Z+/ldjToHnq21MNa1wx0lCEipCCyE/8K9B9bg9pUwy5lfx7yORP3JuAUfCYb8DVSHWBPHKNj
- HTOLb2g2UT65AjZEQE95U2AY9iYm5usMqaWD39pAHfhC09/7NQARAQABzSVKYW5vc2NoIEZy
- YW5rIDxmcmFua2phQGxpbnV4LmlibS5jb20+wsF3BBMBCAAhBQJbm6Q+AhsjBQsJCAcCBhUI
- CQoLAgQWAgMBAh4BAheAAAoJEONU5rjiOLn4p9gQALjkdj5euJVI2nNT3/IAxAhQSmRhPEt0
- AmnCYnuTcHRWPujNr5kqgtyER9+EMQ0ZkX44JU2q7OWxTdSNSAN/5Z7qmOR9JySvDOf4d3mS
- bMB5zxL9d8SbnSs1uW96H9ZBTlTQnmLfsiM9TetAjSrR8nUmjGhe2YUhJLR1v1LguME+YseT
- eXnLzIzqqpu311/eYiiIGcmaOjPCE+vFjcXL5oLnGUE73qSYiujwhfPCCUK0850o1fUAYq5p
- CNBCoKT4OddZR+0itKc/cT6NwEDwdokeg0+rAhxb4Rv5oFO70lziBplEjOxu3dqgIKbHbjza
- EXTb+mr7VI9O4tTdqrwJo2q9zLqqOfDBi7NDvZFLzaCewhbdEpDYVu6/WxprAY94hY3F4trT
- rQMHJKQENtF6ZTQc9fcT5I3gAmP+OEvDE5hcTALpWm6Z6SzxO7gEYCnF+qGXqp8sJVrweMub
- UscyLqHoqdZC2UG4LQ1OJ97nzDpIRe0g6oJ9ZIYHKmfw5jjwH6rASTld5MFWajWdNsqK15k/
- RZnHAGICKVIBOBsq26m4EsBlfCdt3b/6emuBjUXR1pyjHMz2awWzCq6/6OWs5eANZ0sdosNq
- dq2v0ULYTazJz2rlCXV89qRa7ukkNwdBSZNEwsD4eEMicj1LSrqWDZMAALw50L4jxaMD7lPL
- jJbazsFNBFubpD4BEADAcUTRqXF/aY53OSH7IwIK9lFKxIm0IoFkOEh7LMfp7FGzaP7ANrZd
- cIzhZi38xyOkcaFY+npGEWvko7rlIAn0JpBO4x3hfhmhBD/WSY8LQIFQNNjEm3vzrMo7b9Jb
- JAqQxfbURY3Dql3GUzeWTG9uaJ00u+EEPlY8zcVShDltIl5PLih20e8xgTnNzx5c110lQSu0
- iZv2lAE6DM+2bJQTsMSYiwKlwTuv9LI9Chnoo6+tsN55NqyMxYqJgElk3VzlTXSr3+rtSCwf
- tq2cinETbzxc1XuhIX6pu/aCGnNfuEkM34b7G1D6CPzDMqokNFbyoO6DQ1+fW6c5gctXg/lZ
- 602iEl4C4rgcr3+EpfoPUWzKeM8JXv5Kpq4YDxhvbitr8Dm8gr38+UKFZKlWLlwhQ56r/zAU
- v6LIsm11GmFs2/cmgD1bqBTNHHcTWwWtRTLgmnqJbVisMJuYJt4KNPqphTWsPY8SEtbufIlY
- HXOJ2lqUzOReTrie2u0qcSvGAbSfec9apTFl2Xko/ddqPcZMpKhBiXmY8tJzSPk3+G4tqur4
- 6TYAm5ouitJsgAR61Cu7s+PNuq/pTLDhK+6/Njmc94NGBcRA4qTuysEGE79vYWP2oIAU4Fv6
- gqaWHZ4MEI2XTqH8wiwzPdCQPYsSE0fXWiYu7ObeErT6iLSTZGx4rQARAQABwsFfBBgBCAAJ
- BQJbm6Q+AhsMAAoJEONU5rjiOLn4DDEP/RuyckW65SZcPG4cMfNgWxZF8rVjeVl/9PBfy01K
- 8R0hajU40bWtXSMiby7j0/dMjz99jN6L+AJHJvrLz4qYRzn2Ys843W+RfXj62Zde4YNBE5SL
- jJweRCbMWKaJLj6499fctxTyeb9+AMLQS4yRSwHuAZLmAb5AyCW1gBcTWZb8ON5BmWnRqeGm
- IgC1EvCnHy++aBnHTn0m+zV89BhTLTUal35tcjUFwluBY39R2ux/HNlBO1GY3Z+WYXhBvq7q
- katThLjaQSmnOrMhzqYmdShP1leFTVbzXUUIYv/GbynO/YrL2gaQpaP1bEUEi8lUAfXJbEWG
- dnHFkciryi092E8/9j89DJg4mmZqOau7TtUxjRMlBcIliXkzSLUk+QvD4LK1kWievJse4mte
- FBdkWHfP4BH/+8DxapRcG1UAheSnSRQ5LiO50annOB7oXF+vgKIaie2TBfZxQNGAs3RQ+bga
- DchCqFm5adiSP5+OT4NjkKUeGpBe/aRyQSle/RropTgCi85pje/juYEn2P9UAgkfBJrOHvQ9
- Z+2Sva8FRd61NJLkCJ4LFumRn9wQlX2icFbi8UDV3do0hXJRRYTWCxrHscMhkrFWLhYiPF4i
- phX7UNdOWBQ90qpHyAxHmDazdo27gEjfvsgYMdveKknEOTEb5phwxWgg7BcIDoJf9UMC
-In-Reply-To: <20240815154529.628087-2-schlameuss@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: v9ITlVF5l6TX4Ebd1GjeD4zifVV-SmOs
-X-Proofpoint-GUID: fBwpW9bNRD-ZYOaybVo28IMOcNAbNlfp
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
- definitions=2024-08-16_05,2024-08-16_01,2024-05-17_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- lowpriorityscore=0 clxscore=1015 spamscore=0 impostorscore=0
- priorityscore=1501 suspectscore=0 malwarescore=0 mlxlogscore=737
- phishscore=0 mlxscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2407110000 definitions=main-2408160102
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1147332f-790e-487f-8816-1860b8744ab2@huawei.com>
 
-On 8/15/24 5:45 PM, Christoph Schlameuss wrote:
-> Add a test case verifying basic running and interaction of ucontrol VMs.
-> Fill the segment and page tables for allocated memory and map memory on
-> first access.
+On Fri, Aug 16, 2024 at 11:05:33AM +0800, Kefeng Wang wrote:
 > 
-> * uc_map_unmap
->    Store and load data to mapped and unmapped memory and use pic segment
->    translation handling to map memory on access.
 > 
-> Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
-> ---
->   .../selftests/kvm/s390x/ucontrol_test.c       | 120 +++++++++++++++++-
->   1 file changed, 119 insertions(+), 1 deletion(-)
+> On 2024/8/16 3:20, Peter Xu wrote:
+> > On Wed, Aug 14, 2024 at 09:37:15AM -0300, Jason Gunthorpe wrote:
+> > > > Currently, only x86_64 (1G+2M) and arm64 (2M) are supported.
+> > > 
+> > > There is definitely interest here in extending ARM to support the 1G
+> > > size too, what is missing?
+> > 
+> > Currently PUD pfnmap relies on THP_PUD config option:
+> > 
+> > config ARCH_SUPPORTS_PUD_PFNMAP
+> > 	def_bool y
+> > 	depends on ARCH_SUPPORTS_HUGE_PFNMAP && HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD
+> > 
+> > Arm64 unfortunately doesn't yet support dax 1G, so not applicable yet.
+> > 
+> > Ideally, pfnmap is too simple comparing to real THPs and it shouldn't
+> > require to depend on THP at all, but we'll need things like below to land
+> > first:
+> > 
+> > https://lore.kernel.org/r/20240717220219.3743374-1-peterx@redhat.com
+> > 
+> > I sent that first a while ago, but I didn't collect enough inputs, and I
+> > decided to unblock this series from that, so x86_64 shouldn't be affected,
+> > and arm64 will at least start to have 2M.
+> > 
+> > > 
+> > > > The other trick is how to allow gup-fast working for such huge mappings
+> > > > even if there's no direct sign of knowing whether it's a normal page or
+> > > > MMIO mapping.  This series chose to keep the pte_special solution, so that
+> > > > it reuses similar idea on setting a special bit to pfnmap PMDs/PUDs so that
+> > > > gup-fast will be able to identify them and fail properly.
+> > > 
+> > > Make sense
+> > > 
+> > > > More architectures / More page sizes
+> > > > ------------------------------------
+> > > > 
+> > > > Currently only x86_64 (2M+1G) and arm64 (2M) are supported.
+> > > > 
+> > > > For example, if arm64 can start to support THP_PUD one day, the huge pfnmap
+> > > > on 1G will be automatically enabled.
 > 
+> A draft patch to enable THP_PUD on arm64, only passed with DEBUG_VM_PGTABLE,
+> we may test pud pfnmaps on arm64.
 
-> +static void uc_handle_exit_ucontrol(FIXTURE_DATA(uc_kvm) * self)
+Thanks, Kefeng.  It'll be great if this works already, as simple.
+
+Might be interesting to know whether it works already if you have some
+few-GBs GPU around on the systems.
+
+Logically as long as you have HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD selected
+below, 1g pfnmap will be automatically enabled when you rebuild the kernel.
+You can double check that by looking for this:
+
+  CONFIG_ARCH_SUPPORTS_PUD_PFNMAP=y
+
+And you can try to observe the mappings by enabling dynamic debug for
+vfio_pci_mmap_huge_fault(), then map the bar with vfio-pci and read
+something from it.
+
+> 
+> diff --git a/arch/arm64/Kconfig b/arch/arm64/Kconfig
+> index a2f8ff354ca6..ff0d27c72020 100644
+> --- a/arch/arm64/Kconfig
+> +++ b/arch/arm64/Kconfig
+> @@ -184,6 +184,7 @@ config ARM64
+>  	select HAVE_ARCH_THREAD_STRUCT_WHITELIST
+>  	select HAVE_ARCH_TRACEHOOK
+>  	select HAVE_ARCH_TRANSPARENT_HUGEPAGE
+> +	select HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD if PGTABLE_LEVELS > 2
+>  	select HAVE_ARCH_VMAP_STACK
+>  	select HAVE_ARM_SMCCC
+>  	select HAVE_ASM_MODVERSIONS
+> diff --git a/arch/arm64/include/asm/pgtable.h
+> b/arch/arm64/include/asm/pgtable.h
+> index 7a4f5604be3f..e013fe458476 100644
+> --- a/arch/arm64/include/asm/pgtable.h
+> +++ b/arch/arm64/include/asm/pgtable.h
+> @@ -763,6 +763,25 @@ static inline unsigned long pmd_page_vaddr(pmd_t pmd)
+>  #define pud_valid(pud)		pte_valid(pud_pte(pud))
+>  #define pud_user(pud)		pte_user(pud_pte(pud))
+>  #define pud_user_exec(pud)	pte_user_exec(pud_pte(pud))
+> +#define pud_dirty(pud)		pte_dirty(pud_pte(pud))
+> +#define pud_devmap(pud)		pte_devmap(pud_pte(pud))
+> +#define pud_wrprotect(pud)	pte_pud(pte_wrprotect(pud_pte(pud)))
+> +#define pud_mkold(pud)		pte_pud(pte_mkold(pud_pte(pud)))
+> +#define pud_mkwrite(pud)	pte_pud(pte_mkwrite_novma(pud_pte(pud)))
+> +#define pud_mkclean(pud)	pte_pud(pte_mkclean(pud_pte(pud)))
+> +#define pud_mkdirty(pud)	pte_pud(pte_mkdirty(pud_pte(pud)))
+> +
+> +#ifdef CONFIG_HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD
+> +static inline int pud_trans_huge(pud_t pud)
 > +{
-> +	struct kvm_run *run = self->run;
-> +
-> +	TEST_ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
-> +	switch (run->s390_ucontrol.pgm_code) {
-> +	case PGM_SEGMENT_TRANSLATION:
-> +		pr_info("ucontrol pic segment translation 0x%llx\n",
-> +			run->s390_ucontrol.trans_exc_code);
-> +		/* map / make additional memory available */
-> +		struct kvm_s390_ucas_mapping map2 = {
-> +			.user_addr = (u64)gpa2hva(self, run->s390_ucontrol.trans_exc_code),
-> +			.vcpu_addr = run->s390_ucontrol.trans_exc_code,
-> +			.length = VM_MEM_EXT_SIZE,
-> +		};
-> +		pr_info("ucas map %p %p 0x%llx\n",
-> +			(void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
-> +		TEST_ASSERT_EQ(0, ioctl(self->vcpu_fd, KVM_S390_UCAS_MAP, &map2));
-> +		break;
-
-Why is this necessary if you fix up the mapping in the test?
-
-[...]
-
->   
-> +TEST_F(uc_kvm, uc_map_unmap)
-> +{
-> +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
-> +	struct kvm_run *run = self->run;
-> +	int rc;
-> +
-> +	/* copy test_mem_asm to code_hva / code_gpa */
-> +	TH_LOG("copy code %p to vm mapped memory %p / %p",
-> +	       &test_mem_asm, (void *)self->code_hva, (void *)self->code_gpa);
-> +	memcpy((void *)self->code_hva, &test_mem_asm, PAGE_SIZE);
-> +
-> +	/* DAT disabled + 64 bit mode */
-> +	run->psw_mask = 0x0000000180000000ULL;
-> +	run->psw_addr = self->code_gpa;
-> +
-> +	/* set register content for test_mem_asm to access not mapped memory*/
-> +	sync_regs->gprs[1] = 0x55;
-> +	sync_regs->gprs[5] = self->base_gpa;
-> +	sync_regs->gprs[6] = VM_MEM_SIZE;
-> +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
-> +
-> +	/* run and expect to fail witch ucontrol pic segment translation */
-
-s/witch/with/
-
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(1, sync_regs->gprs[0]);
-> +	ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
-> +
-> +	ASSERT_EQ(PGM_SEGMENT_TRANSLATION, run->s390_ucontrol.pgm_code);
-> +	ASSERT_EQ(self->base_gpa + VM_MEM_SIZE, run->s390_ucontrol.trans_exc_code);
-> +	/* map / make additional memory available */
-> +	struct kvm_s390_ucas_mapping map2 = {
-> +		.user_addr = (u64)gpa2hva(self, self->base_gpa + VM_MEM_SIZE),
-> +		.vcpu_addr = self->base_gpa + VM_MEM_SIZE,
-> +		.length = VM_MEM_EXT_SIZE,
-> +	};
-> +	TH_LOG("ucas map %p %p 0x%llx",
-> +	       (void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
-> +	rc = ioctl(self->vcpu_fd, KVM_S390_UCAS_MAP, &map2);
-> +	ASSERT_EQ(0, rc)
-> +		TH_LOG("ucas map result %d not expected, %s", rc, strerror(errno));
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(false, uc_handle_exit(self));
-> +	uc_assert_diag44(self);
-> +
-> +	/* assert registers and memory are in expected state */
-> +	ASSERT_EQ(2, sync_regs->gprs[0]);
-> +	ASSERT_EQ(0x55, sync_regs->gprs[1]);
-> +	ASSERT_EQ(0x55, *(u32 *)gpa2hva(self, self->base_gpa + VM_MEM_SIZE));
-> +
-> +	/* unmap and run loop again */
-> +	TH_LOG("ucas unmap %p %p 0x%llx",
-> +	       (void *)map2.user_addr, (void *)map2.vcpu_addr, map2.length);
-> +	rc = ioctl(self->vcpu_fd, KVM_S390_UCAS_UNMAP, &map2);
-> +	ASSERT_EQ(0, rc)
-> +		TH_LOG("ucas map result %d not expected, %s", rc, strerror(errno));
-
-s/map/unmap/
-
-
-> +	ASSERT_EQ(0, uc_run_once(self));
-> +	ASSERT_EQ(3, sync_regs->gprs[0]);
-> +	ASSERT_EQ(KVM_EXIT_S390_UCONTROL, run->exit_reason);
-> +	ASSERT_EQ(true, uc_handle_exit(self));
+> +	return pud_val(pud) && pud_present(pud) && !(pud_val(pud) &
+> PUD_TABLE_BIT);
 > +}
 > +
->   TEST_F(uc_kvm, uc_gprs)
->   {
->   	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+> +static inline pud_t pud_mkdevmap(pud_t pud)
+> +{
+> +	return pte_pud(set_pte_bit(pud_pte(pud), __pgprot(PTE_DEVMAP)));
+> +}
+> +#endif
+> 
+>  static inline bool pgtable_l4_enabled(void);
+> 
+> @@ -1137,10 +1156,20 @@ static inline int pmdp_set_access_flags(struct
+> vm_area_struct *vma,
+>  							pmd_pte(entry), dirty);
+>  }
+> 
+> +static inline int pudp_set_access_flags(struct vm_area_struct *vma,
+> +					unsigned long address, pud_t *pudp,
+> +					pud_t entry, int dirty)
+> +{
+> +	return __ptep_set_access_flags(vma, address, (pte_t *)pudp,
+> +							pud_pte(entry), dirty);
+> +}
+> +
+> +#ifndef CONFIG_HAVE_ARCH_TRANSPARENT_HUGEPAGE_PUD
+>  static inline int pud_devmap(pud_t pud)
+>  {
+>  	return 0;
+>  }
+> +#endif
+> 
+>  static inline int pgd_devmap(pgd_t pgd)
+>  {
+> @@ -1213,6 +1242,13 @@ static inline int pmdp_test_and_clear_young(struct
+> vm_area_struct *vma,
+>  {
+>  	return __ptep_test_and_clear_young(vma, address, (pte_t *)pmdp);
+>  }
+> +
+> +static inline int pudp_test_and_clear_young(struct vm_area_struct *vma,
+> +					    unsigned long address,
+> +					    pud_t *pudp)
+> +{
+> +	return __ptep_test_and_clear_young(vma, address, (pte_t *)pudp);
+> +}
+>  #endif /* CONFIG_TRANSPARENT_HUGEPAGE */
+> 
+>  static inline pte_t __ptep_get_and_clear(struct mm_struct *mm,
+> @@ -1433,6 +1469,7 @@ static inline void update_mmu_cache_range(struct
+> vm_fault *vmf,
+>  #define update_mmu_cache(vma, addr, ptep) \
+>  	update_mmu_cache_range(NULL, vma, addr, ptep, 1)
+>  #define update_mmu_cache_pmd(vma, address, pmd) do { } while (0)
+> +#define update_mmu_cache_pud(vma, address, pud) do { } while (0)
+> 
+>  #ifdef CONFIG_ARM64_PA_BITS_52
+>  #define phys_to_ttbr(addr)	(((addr) | ((addr) >> 46)) & TTBR_BADDR_MASK_52)
+> -- 
+> 2.27.0
+
+-- 
+Peter Xu
 
 
