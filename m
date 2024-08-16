@@ -1,112 +1,115 @@
-Return-Path: <kvm+bounces-24420-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24421-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A1B89550C5
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 20:25:34 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8248C9550C8
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 20:26:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E52C51F23AE7
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 18:25:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B83A8B2178E
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 18:26:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4C61C37BB;
-	Fri, 16 Aug 2024 18:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3668E1C3F1C;
+	Fri, 16 Aug 2024 18:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j28MxS6w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wJtZHI5c"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B64751C3793
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 18:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE60B2F43
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 18:26:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723832724; cv=none; b=RXTIpBMzy1oFV6CFjfPwZBMjb8XXBcbHBSglqF8+ICP5ZXFQ8NmEL8pHD1qk8yPqARuQC60I2ypnH2ds2LUYRe5WiupcDlwuwCKyezwQc5+oGUX/0fCvGIGppyf2m+KgTbLTdyZUcZbcIsmh2DYc9/9rpDFkWyXYarBUD+a60bE=
+	t=1723832767; cv=none; b=d9ylJ7dcV64xIjSslQzdFkwhjS7JFSacYETkXn/ON4QSy/7rvxYPM24EuNWICrrBasnzjuK8kxBl0P3OIEm0dgjbUdMSJR7mXldI3IJUz9MjJ/2OfqQJkHk09q80geZ8bU0eBfir11sOGI4m9yIQis1rT5BJZjpseKWQI6m0N28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723832724; c=relaxed/simple;
-	bh=bLv3LE7xzf34CPEENcBo075k8UT1C4f+1hdgmseoSxI=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SDs90qDUGn+uW5RLDO5qykw2Qn1XjTKA7uslmAcOUapSET1fcbknGR37kxNE2qT3gNavwuTURuT/e4Z9g8BoPiK8sBs7CXDpc049C9qxHPL7oRFOYaMVhshWgXjGrJu0Mt3TGeeKWSG/da0tTrf3RoIOUPM9AoaiB7oBZwOYsxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j28MxS6w; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1723832767; c=relaxed/simple;
+	bh=UpzadmpD5JAWm7JbXK79TiN9tBl/ICyRxDFsukaWQOQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=aJXjyd0GGomayfJouvkPPc2Mxk18LzaoubKKCShrvfxMLuZMKn6u6AsBDgfXReRqa3kapcxhUCyFQxZ6juC/Gx9YHl7xcRGS0Kt1CG9+XSraGi7ww31b8UWuvKp5WQrB+tGyc48cXHv4IyMOq3avHO6gevR3HrrUkVz6JACmSSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wJtZHI5c; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-202049f7100so11963645ad.2
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 11:25:22 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jmattson.bounces.google.com
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-6b3825748c2so8791727b3.2
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 11:26:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723832722; x=1724437522; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/7qvTYY149J1kqjtJQDvm/wIDojWO6TKOVvEvytD7Jg=;
-        b=j28MxS6wbXdDy+WPoWPMGIwscvgIjFuT8SJ6cUFD+Dh5OwNcMeHzH0BGSgqbazCr+e
-         NBNIOuDsXkJCFGQBjtk5I3hVuYN6oasOOgX2ssWCYIKnhAbCrdmNMatDA2ls55yCdice
-         t/PcHRJmq5r0nos5soOoil57ogE/QI9sWsgRykb4LEIoudTsJgsvwsmaktITpbsfLxmk
-         NUvTIpo5JMPWoySnpXjdlu7K+Q3UMR9osnTvjxNLbhtpjPeQWWL5S4o74yv9kITY5Dvm
-         BT/P0ZzpcB32E2Rf1j02yw4n2DlRHkxMjmWyNkokFaScE9kaoPIakNItaSBdNC5KUazG
-         snLw==
+        d=google.com; s=20230601; t=1723832764; x=1724437564; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vHU41TdFfuYSxHFsH0hBT59EzOX4pM0RwY0qoH1omnY=;
+        b=wJtZHI5cZJeo4CjdwaXHO8G5sGwfDwMwfrQi0ox/oO6twFWrMLVtIwnftmIOZpgsRK
+         oUCCAOriz1X289HRNoQrbOZWLIFNZ38vHGiukv+hzzCBUyx3p6wStRh6R92YkAHlHNfs
+         FS/mzOVSYePmhLfr8Lo+gTXt9Ze+zO4kkZyzRQz0sFbrPkgPjiCFoN4bwrjC2dC+Ex7c
+         NTODFMpxcRWxkzgOhSGIdya18gZElmtPY5A3oN+wQ+W7udT/evRjD+vbdKmeicxoJWVH
+         eMnwLpN/IakUOLWDpoXRw5/dBfA/8b9CsIfNpWfPja9wf6e4hjBcQMrIWaXgF8hCJqi/
+         /LBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723832722; x=1724437522;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/7qvTYY149J1kqjtJQDvm/wIDojWO6TKOVvEvytD7Jg=;
-        b=Ksrt+jTzf7eJpteWQgoiUoAEo7mhWJz1gq4dAYnTosqhjrmCGIsWFDwvqn83tDOpFj
-         /a21/lkHY+JMnOcePctseNg8fNZo85tDZ6WECVLUpebdMeHjNFuO98pHKcL0AB+yaa2J
-         ryeybiI9zdDKv5xjKqbfbB3rRxaC3Ln1EmcMFXB1VJBLDhUVr4XtoDlXuC7/ZCTC4q9y
-         iUCl0J18ZMUJvHiGAiahscu0N37Bh34O4RXwAqtIfoGFBDGfdAhrETty433o3NZesriE
-         QX/owWPIR/aJ9atDJUQoVIjwDdF2LxWnXNbsaJPrTSrI+U1xKTGoNAG29q/xVV4CYlUf
-         Nf/A==
-X-Forwarded-Encrypted: i=1; AJvYcCUb4Ua2vx4lAwLbKwHd5DMvyacwsPaO1Qog6/V8saMRnbiJ6dS2IzbgWUiL5L1siEFE9rE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfJBAY+hTlcO9DF+aYTDQK0iVmJ1yIpEaEzosc/FGELThiyFFr
-	zKlm52eFf/c2IwcNU0TbnYpTGB40Y9JU5VHLWMkd5jRy0Em8QKgCsf8okjDdqot443M6/UaxMDP
-	gMw==
-X-Google-Smtp-Source: AGHT+IE2e/YxsAd0hQUtNlW5it4ebVJhZ0hecml1WwILxzhgYwa7yj6o8Ej/0Eo+Wl+5FZnC9XXt0MuZGrI=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a17:902:ea11:b0:201:dc7b:a8b5 with SMTP id
- d9443c01a7336-20203f552f3mr2554995ad.12.1723832721695; Fri, 16 Aug 2024
- 11:25:21 -0700 (PDT)
-Date: Fri, 16 Aug 2024 11:25:20 -0700
-In-Reply-To: <0000000000009ca899061bab0a49@google.com>
+        d=1e100.net; s=20230601; t=1723832764; x=1724437564;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vHU41TdFfuYSxHFsH0hBT59EzOX4pM0RwY0qoH1omnY=;
+        b=iBi7GYzHmsefWJAyixgO8/BvnHqXZxOpkCLMGbLFXBWz/1Dr7D2rpJdFPbZAqvDk/W
+         HQbJ1pf991fRIiDLG+vPF4UuXLz9ZUt6zWhCI78DdE7M5glALT9i470jFNiBESgE4H6a
+         ttOO6AlTUgw0yMM5yprTTCdqS8SPWPEZOqkBbpBTeqFpBvuI/Kq3nA/Wf9oAZi9M7IZ7
+         XlrO+RdWxeDRJmzvwB6VcHyHY32rrqzOCh42EYY8mVwr/UubqqNwWKXxHB8V08uPUsBP
+         GpE4aNiPg/1R+scTCSG/RW/srwgqvAq6dPjJwKSqQ5DJdEE5OaYlKkG2YLHOZWg+ZkJW
+         VK/w==
+X-Forwarded-Encrypted: i=1; AJvYcCW35vTUoWlOLQMzhoju1qTObZUewAyEFIUGgWJFJhl74ENREiuXAk6yvxVIgUGgbmy0A1owcnxttvHtc7fPBDMwWPOj
+X-Gm-Message-State: AOJu0Yy3KmB7PxRCsAu3XHZXIFtJ8wWgthpz2F/CrizC/yrncfiewYDn
+	iymQ4HYsbyQwZyhSbIYtYd/kd8NRXf2COBQ6M7xjbm56szBw0bTK60p1KnvocTzq/PCzvU3s88c
+	B9FdESSH/WA==
+X-Google-Smtp-Source: AGHT+IEJc+hFQIAnQCVr0tRCdxFBw2gcFs1n3D9qIS2qPVf+9CWDN63ejNRhGhy2SGZLXx61jxNCjlGe4UDROQ==
+X-Received: from loggerhead.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:29a])
+ (user=jmattson job=sendgmr) by 2002:a81:a253:0:b0:650:a16c:91ac with SMTP id
+ 00721157ae682-6b1bd17dbaemr975007b3.8.1723832763870; Fri, 16 Aug 2024
+ 11:26:03 -0700 (PDT)
+Date: Fri, 16 Aug 2024 11:25:21 -0700
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <0000000000009ca899061bab0a49@google.com>
-Message-ID: <Zr-ZkD5wbcKhapom@google.com>
-Subject: Re: [syzbot] [bcachefs?] [kvm?] general protection fault in
- detach_if_pending (3)
-From: Sean Christopherson <seanjc@google.com>
-To: syzbot <syzbot+f4b2fbba4d8c2e290380@syzkaller.appspotmail.com>
-Cc: bfoster@redhat.com, kent.overstreet@linux.dev, kvm@vger.kernel.org, 
-	linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="us-ascii"
+X-Mailer: git-send-email 2.46.0.184.g6999bdac58-goog
+Message-ID: <20240816182533.2478415-1-jmattson@google.com>
+Subject: [PATCH v2 1/2] x86/cpufeatures: Define X86_FEATURE_AMD_IBPB_RET
+From: Jim Mattson <jmattson@google.com>
+To: Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Sean Christopherson <seanjc@google.com>, Paolo Bonzini <pbonzini@redhat.com>, 
+	Pawan Gupta <pawan.kumar.gupta@linux.intel.com>, 
+	Daniel Sneddon <daniel.sneddon@linux.intel.com>, Kai Huang <kai.huang@intel.com>, 
+	Sandipan Das <sandipan.das@amd.com>, linux-kernel@vger.kernel.org, kvm@vger.kernel.org
+Cc: Jim Mattson <jmattson@google.com>, Venkatesh Srinivas <venkateshs@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jun 24, 2024, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    626737a5791b Merge tag 'pinctrl-v6.10-2' of git://git.kern..
-> git tree:       upstream
-> console output: https://syzkaller.appspot.com/x/log.txt?x=117e90d6980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=53ab35b556129242
-> dashboard link: https://syzkaller.appspot.com/bug?extid=f4b2fbba4d8c2e290380
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> userspace arch: i386
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-626737a5.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/03802640516e/vmlinux-626737a5.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/09b1b299316b/bzImage-626737a5.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+f4b2fbba4d8c2e290380@syzkaller.appspotmail.com
+AMD's initial implementation of IBPB did not clear the return address
+predictor. Beginning with Zen4, AMD's IBPB *does* clear the return
+address predictor. This behavior is enumerated by
+CPUID.80000008H:EBX.IBPB_RET[bit 30].
 
-See https://lore.kernel.org/all/Zr-Ydj8FBpiqmY_c@google.com for an explanation.
+Define X86_FEATURE_AMD_IBPB_RET for use in KVM_GET_SUPPORTED_CPUID,
+when determining cross-vendor capabilities.
 
-#syz invalid
+Suggested-by: Venkatesh Srinivas <venkateshs@chromium.org>
+Signed-off-by: Jim Mattson <jmattson@google.com>
+---
+ arch/x86/include/asm/cpufeatures.h | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/arch/x86/include/asm/cpufeatures.h b/arch/x86/include/asm/cpufeatures.h
+index dd4682857c12..e5bcb428dcf9 100644
+--- a/arch/x86/include/asm/cpufeatures.h
++++ b/arch/x86/include/asm/cpufeatures.h
+@@ -348,6 +348,7 @@
+ #define X86_FEATURE_CPPC		(13*32+27) /* "cppc" Collaborative Processor Performance Control */
+ #define X86_FEATURE_AMD_PSFD            (13*32+28) /* Predictive Store Forwarding Disable */
+ #define X86_FEATURE_BTC_NO		(13*32+29) /* Not vulnerable to Branch Type Confusion */
++#define X86_FEATURE_AMD_IBPB_RET	(13*32+30) /* IBPB clears return address predictor */
+ #define X86_FEATURE_BRS			(13*32+31) /* "brs" Branch Sampling available */
+ 
+ /* Thermal and Power Management Leaf, CPUID level 0x00000006 (EAX), word 14 */
+-- 
+2.46.0.184.g6999bdac58-goog
+
 
