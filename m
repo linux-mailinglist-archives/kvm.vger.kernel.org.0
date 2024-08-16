@@ -1,34 +1,34 @@
-Return-Path: <kvm+bounces-24389-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24388-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AEC1954AAE
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 15:02:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0FA8954AAC
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 15:02:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C946DB2244F
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 13:02:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 030981C20A17
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 13:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEA51BB6AE;
-	Fri, 16 Aug 2024 13:01:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929AE1BB691;
+	Fri, 16 Aug 2024 13:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FZ/UszGP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QnjrmpUD"
 X-Original-To: kvm@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241CC1B9B5B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 213341B9B4E
 	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 13:01:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723813312; cv=none; b=JFLpRaJZUa1pAqHc0KIfIjFrCoFBDl7aro7P/5+iWoGKh/k9EZqZ1X04Fbv6xIW/5N5viy1LlYIuEsonpsBxbHEj7g/WwahAmoggWABHICz820YT4Ax6VN/W9sBvCsj0SSi/S5ZpckrS0RzQaS8TmY0dy8Y1klyBLjge1oEBB8w=
+	t=1723813311; cv=none; b=mVtSeg3zt8QCLVnaiTdLNhWEJxWj1PV/q2d/5ne2wwfthT7F9r/oC+1Vszwe/mpG4q87XPIgsT3NlIbsQh4vU7+0LtNwmXqojxmuex1RE22PFoQCb/pgV2S96IuFLTIg0TgHivq2zfV6Um0Z+ozOjJM1MzAUN2F5AC0/LCaIy1o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723813312; c=relaxed/simple;
-	bh=qhcu/p5Y0lVrlCoBtAiCYXExYbh2SsjI4qZ3YCL89Ak=;
+	s=arc-20240116; t=1723813311; c=relaxed/simple;
+	bh=mEgP2tc3vMFcEK8rKTT6ilkOYcPdY4qHPG0naGjwrf8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oal/mCFbLtzrN6ZyCvbIiyqG1R025c+t0Bn5cne3asiQqourD65rKSP+FmiqHzSxwBFRhjXvc1gmCGwJECHiNJ7rfWgiBAMiOo4gJZlBHs5gBTc4rK5cC21yAEu+RUCQswnaZ58wO00Fj64Yenzv8FhZuDyISh1SzIunsado2kU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FZ/UszGP; arc=none smtp.client-ip=170.10.129.124
+	 MIME-Version:Content-Type; b=YppwNy9FVi8kCpJ5Cn2Vyo8hbQknj4ReAEpuqZgenbIo4j4t0iR1vozqoJHxU+tOmkQ1jDqHyVtna9UBj5UOJXI2R+mv98m0ozgXMAV0IGEsLByQtRA+/+dLZtp5f/qQqkQQiSz4uSDhoggnqH4h5orsgOaa9KzDHp1ihSUNw3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QnjrmpUD; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -37,33 +37,33 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6ivNWicyJPF/QCcWPJiS3wxzNpcxW21UvmpukcvdAFw=;
-	b=FZ/UszGPADjp5X7Il3P4+yV7ue0WMSXM/2A2lVIAjq5CVu8IVTg/YcMyNMymwBBqEGXwzJ
-	nMf7yaPpgsAUstlNLYPMlNEvVq8hnkli4Pf2oJiSLrvIGhs/Vj0jXx1n9hUKi1YszXiOrg
-	eV9WHfOzCJ/mdowfZMkAKFDMhyLbbTE=
-Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
+	bh=pRywQ20dieOYbE4TiZ0Np1Bbhp1CoMBBM+YIuAbOks0=;
+	b=QnjrmpUDsltin25gmo1Cg5kjYS28r4YRVhUmJSXt0kiANNoSis+muN3Dqw1VfhKCNjNx/K
+	mbLvEWjBW86wrqNzWMoaeQl1dElFXdCNHgJue1Inj1xjW7g4NnBblK9IBlNZu0Kv8h7W7G
+	Zt0/USjbCrbiFR7sVvU2JN8lbHy3e7o=
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-613-beRk_kLXOA29hJ48KCDtHw-1; Fri,
- 16 Aug 2024 09:01:45 -0400
-X-MC-Unique: beRk_kLXOA29hJ48KCDtHw-1
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-101-56EMdacBMvydTfdlKV91-g-1; Fri,
+ 16 Aug 2024 09:01:47 -0400
+X-MC-Unique: 56EMdacBMvydTfdlKV91-g-1
 Received: from mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.12])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id C722A1955BFC;
-	Fri, 16 Aug 2024 13:01:44 +0000 (UTC)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id BE3271955F3B;
+	Fri, 16 Aug 2024 13:01:46 +0000 (UTC)
 Received: from fedora.redhat.com (unknown [10.45.225.56])
-	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E94351955F35;
-	Fri, 16 Aug 2024 13:01:42 +0000 (UTC)
+	by mx-prod-int-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0467F1955F38;
+	Fri, 16 Aug 2024 13:01:44 +0000 (UTC)
 From: Vitaly Kuznetsov <vkuznets@redhat.com>
 To: kvm@vger.kernel.org,
 	Paolo Bonzini <pbonzini@redhat.com>,
 	Sean Christopherson <seanjc@google.com>
 Cc: linux-kernel@vger.kernel.org
-Subject: [PATCH 1/2] KVM: selftests: Move Hyper-V specific functions out of processor.c
-Date: Fri, 16 Aug 2024 15:01:38 +0200
-Message-ID: <20240816130139.286246-2-vkuznets@redhat.com>
+Subject: [PATCH 2/2] KVM: selftests: Re-enable hyperv_evmcs/hyperv_svm_test on bare metal
+Date: Fri, 16 Aug 2024 15:01:39 +0200
+Message-ID: <20240816130139.286246-3-vkuznets@redhat.com>
 In-Reply-To: <20240816130139.286246-1-vkuznets@redhat.com>
 References: <20240816130139.286246-1-vkuznets@redhat.com>
 Precedence: bulk
@@ -76,226 +76,99 @@ Content-Type: text/plain
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.12
 
-Since there is 'hyperv.c' for Hyper-V specific functions already, move
-Hyper-V specific functions out of processor.c there.
+KVM_CAP_HYPERV_DIRECT_TLBFLUSH is only reported when KVM runs on top of
+Hyper-V and hyperv_evmcs/hyperv_svm_test don't need that, these tests check
+that the feature is properly emulated for Hyper-V on KVM guests. There's no
+corresponding CAP for that, the feature is reported in
+KVM_GET_SUPPORTED_HV_CPUID.
 
-No functional change intended.
+Hyper-V specific CPUIDs are not reported by KVM_GET_SUPPORTED_CPUID,
+implement dedicated kvm_hv_cpu_has() helper to do the job.
 
+Fixes: 6dac1195181c ("KVM: selftests: Make Hyper-V tests explicitly require KVM Hyper-V support")
 Signed-off-by: Vitaly Kuznetsov <vkuznets@redhat.com>
 ---
- .../selftests/kvm/include/x86_64/hyperv.h     |  4 ++
- .../selftests/kvm/include/x86_64/processor.h  |  7 ++-
- .../testing/selftests/kvm/lib/x86_64/hyperv.c | 59 ++++++++++++++++++
- .../selftests/kvm/lib/x86_64/processor.c      | 61 -------------------
- .../selftests/kvm/x86_64/xen_vmcall_test.c    |  1 +
- 5 files changed, 68 insertions(+), 64 deletions(-)
+ .../testing/selftests/kvm/include/x86_64/hyperv.h  | 14 ++++++++++++++
+ tools/testing/selftests/kvm/lib/x86_64/hyperv.c    |  8 ++++++++
+ tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c  |  2 +-
+ .../testing/selftests/kvm/x86_64/hyperv_svm_test.c |  2 +-
+ 4 files changed, 24 insertions(+), 2 deletions(-)
 
 diff --git a/tools/testing/selftests/kvm/include/x86_64/hyperv.h b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-index fa65b908b13e..a2e7cf7ee0ad 100644
+index a2e7cf7ee0ad..6849e2552f1b 100644
 --- a/tools/testing/selftests/kvm/include/x86_64/hyperv.h
 +++ b/tools/testing/selftests/kvm/include/x86_64/hyperv.h
-@@ -343,4 +343,8 @@ struct hyperv_test_pages *vcpu_alloc_hyperv_test_pages(struct kvm_vm *vm,
- /* HV_X64_MSR_TSC_INVARIANT_CONTROL bits */
- #define HV_INVARIANT_TSC_EXPOSED               BIT_ULL(0)
+@@ -186,6 +186,18 @@
+ #define HV_X64_ENLIGHTENED_VMCS_RECOMMENDED		\
+ 	KVM_X86_CPU_FEATURE(HYPERV_CPUID_ENLIGHTMENT_INFO, 0, EAX, 14)
  
-+const struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void);
-+const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu);
-+void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu);
++/* HYPERV_CPUID_NESTED_FEATURES.EAX */
++#define HV_X64_NESTED_DIRECT_FLUSH			\
++	KVM_X86_CPU_FEATURE(HYPERV_CPUID_NESTED_FEATURES, 0, EAX, 17)
++#define HV_X64_NESTED_GUEST_MAPPING_FLUSH		\
++	KVM_X86_CPU_FEATURE(HYPERV_CPUID_NESTED_FEATURES, 0, EAX, 18)
++#define HV_X64_NESTED_MSR_BITMAP			\
++	KVM_X86_CPU_FEATURE(HYPERV_CPUID_NESTED_FEATURES, 0, EAX, 19)
++
++/* HYPERV_CPUID_NESTED_FEATURES.EBX */
++#define HV_X64_NESTED_EVMCS1_PERF_GLOBAL_CTRL		\
++	KVM_X86_CPU_FEATURE(HYPERV_CPUID_NESTED_FEATURES, 0, EBX, 0)
++
+ /* HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES.EAX */
+ #define HV_X64_SYNDBG_CAP_ALLOW_KERNEL_DEBUGGING	\
+ 	KVM_X86_CPU_FEATURE(HYPERV_CPUID_SYNDBG_PLATFORM_CAPABILITIES, 0, EAX, 1)
+@@ -347,4 +359,6 @@ const struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void);
+ const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu);
+ void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu);
+ 
++bool kvm_hv_cpu_has(struct kvm_x86_cpu_feature feature);
 +
  #endif /* !SELFTEST_KVM_HYPERV_H */
-diff --git a/tools/testing/selftests/kvm/include/x86_64/processor.h b/tools/testing/selftests/kvm/include/x86_64/processor.h
-index a0c1440017bb..e247f99e0473 100644
---- a/tools/testing/selftests/kvm/include/x86_64/processor.h
-+++ b/tools/testing/selftests/kvm/include/x86_64/processor.h
-@@ -25,6 +25,10 @@ extern bool host_cpu_is_intel;
- extern bool host_cpu_is_amd;
- extern uint64_t guest_tsc_khz;
- 
-+#ifndef MAX_NR_CPUID_ENTRIES
-+#define MAX_NR_CPUID_ENTRIES 100
-+#endif
-+
- /* Forced emulation prefix, used to invoke the emulator unconditionally. */
- #define KVM_FEP "ud2; .byte 'k', 'v', 'm';"
- 
-@@ -908,8 +912,6 @@ static inline void vcpu_xcrs_set(struct kvm_vcpu *vcpu, struct kvm_xcrs *xcrs)
- const struct kvm_cpuid_entry2 *get_cpuid_entry(const struct kvm_cpuid2 *cpuid,
- 					       uint32_t function, uint32_t index);
- const struct kvm_cpuid2 *kvm_get_supported_cpuid(void);
--const struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void);
--const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu);
- 
- static inline uint32_t kvm_cpu_fms(void)
- {
-@@ -1009,7 +1011,6 @@ static inline struct kvm_cpuid2 *allocate_kvm_cpuid2(int nr_entries)
- }
- 
- void vcpu_init_cpuid(struct kvm_vcpu *vcpu, const struct kvm_cpuid2 *cpuid);
--void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu);
- 
- static inline struct kvm_cpuid_entry2 *__vcpu_get_cpuid_entry(struct kvm_vcpu *vcpu,
- 							      uint32_t function,
 diff --git a/tools/testing/selftests/kvm/lib/x86_64/hyperv.c b/tools/testing/selftests/kvm/lib/x86_64/hyperv.c
-index efb7e7a1354d..b4a5e4ad7105 100644
+index b4a5e4ad7105..15bc8cd583aa 100644
 --- a/tools/testing/selftests/kvm/lib/x86_64/hyperv.c
 +++ b/tools/testing/selftests/kvm/lib/x86_64/hyperv.c
-@@ -8,6 +8,65 @@
- #include "processor.h"
- #include "hyperv.h"
+@@ -67,6 +67,14 @@ const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu)
+ 	return cpuid;
+ }
  
-+const struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void)
++bool kvm_hv_cpu_has(struct kvm_x86_cpu_feature feature)
 +{
-+	static struct kvm_cpuid2 *cpuid;
-+	int kvm_fd;
++	if (!kvm_has_cap(KVM_CAP_SYS_HYPERV_CPUID))
++		return false;
 +
-+	if (cpuid)
-+		return cpuid;
-+
-+	cpuid = allocate_kvm_cpuid2(MAX_NR_CPUID_ENTRIES);
-+	kvm_fd = open_kvm_dev_path_or_exit();
-+
-+	kvm_ioctl(kvm_fd, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
-+
-+	close(kvm_fd);
-+	return cpuid;
-+}
-+
-+void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu)
-+{
-+	static struct kvm_cpuid2 *cpuid_full;
-+	const struct kvm_cpuid2 *cpuid_sys, *cpuid_hv;
-+	int i, nent = 0;
-+
-+	if (!cpuid_full) {
-+		cpuid_sys = kvm_get_supported_cpuid();
-+		cpuid_hv = kvm_get_supported_hv_cpuid();
-+
-+		cpuid_full = allocate_kvm_cpuid2(cpuid_sys->nent + cpuid_hv->nent);
-+		if (!cpuid_full) {
-+			perror("malloc");
-+			abort();
-+		}
-+
-+		/* Need to skip KVM CPUID leaves 0x400000xx */
-+		for (i = 0; i < cpuid_sys->nent; i++) {
-+			if (cpuid_sys->entries[i].function >= 0x40000000 &&
-+			    cpuid_sys->entries[i].function < 0x40000100)
-+				continue;
-+			cpuid_full->entries[nent] = cpuid_sys->entries[i];
-+			nent++;
-+		}
-+
-+		memcpy(&cpuid_full->entries[nent], cpuid_hv->entries,
-+		       cpuid_hv->nent * sizeof(struct kvm_cpuid_entry2));
-+		cpuid_full->nent = nent + cpuid_hv->nent;
-+	}
-+
-+	vcpu_init_cpuid(vcpu, cpuid_full);
-+}
-+
-+const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu)
-+{
-+	struct kvm_cpuid2 *cpuid = allocate_kvm_cpuid2(MAX_NR_CPUID_ENTRIES);
-+
-+	vcpu_ioctl(vcpu, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
-+
-+	return cpuid;
++	return kvm_cpuid_has(kvm_get_supported_hv_cpuid(), feature);
 +}
 +
  struct hyperv_test_pages *vcpu_alloc_hyperv_test_pages(struct kvm_vm *vm,
  						       vm_vaddr_t *p_hv_pages_gva)
  {
-diff --git a/tools/testing/selftests/kvm/lib/x86_64/processor.c b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-index 153739f2e201..7876f052ca39 100644
---- a/tools/testing/selftests/kvm/lib/x86_64/processor.c
-+++ b/tools/testing/selftests/kvm/lib/x86_64/processor.c
-@@ -19,8 +19,6 @@
- #define KERNEL_DS	0x10
- #define KERNEL_TSS	0x18
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+index e192720bfe14..74cf19661309 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_evmcs.c
+@@ -242,7 +242,7 @@ int main(int argc, char *argv[])
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_VMX));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_NESTED_STATE));
+ 	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_ENLIGHTENED_VMCS));
+-	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH));
++	TEST_REQUIRE(kvm_hv_cpu_has(HV_X64_NESTED_DIRECT_FLUSH));
  
--#define MAX_NR_CPUID_ENTRIES 100
--
- vm_vaddr_t exception_handlers;
- bool host_cpu_is_amd;
- bool host_cpu_is_intel;
-@@ -1195,65 +1193,6 @@ void xen_hypercall(uint64_t nr, uint64_t a0, void *a1)
- 	GUEST_ASSERT(!__xen_hypercall(nr, a0, a1));
- }
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
  
--const struct kvm_cpuid2 *kvm_get_supported_hv_cpuid(void)
--{
--	static struct kvm_cpuid2 *cpuid;
--	int kvm_fd;
--
--	if (cpuid)
--		return cpuid;
--
--	cpuid = allocate_kvm_cpuid2(MAX_NR_CPUID_ENTRIES);
--	kvm_fd = open_kvm_dev_path_or_exit();
--
--	kvm_ioctl(kvm_fd, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
--
--	close(kvm_fd);
--	return cpuid;
--}
--
--void vcpu_set_hv_cpuid(struct kvm_vcpu *vcpu)
--{
--	static struct kvm_cpuid2 *cpuid_full;
--	const struct kvm_cpuid2 *cpuid_sys, *cpuid_hv;
--	int i, nent = 0;
--
--	if (!cpuid_full) {
--		cpuid_sys = kvm_get_supported_cpuid();
--		cpuid_hv = kvm_get_supported_hv_cpuid();
--
--		cpuid_full = allocate_kvm_cpuid2(cpuid_sys->nent + cpuid_hv->nent);
--		if (!cpuid_full) {
--			perror("malloc");
--			abort();
--		}
--
--		/* Need to skip KVM CPUID leaves 0x400000xx */
--		for (i = 0; i < cpuid_sys->nent; i++) {
--			if (cpuid_sys->entries[i].function >= 0x40000000 &&
--			    cpuid_sys->entries[i].function < 0x40000100)
--				continue;
--			cpuid_full->entries[nent] = cpuid_sys->entries[i];
--			nent++;
--		}
--
--		memcpy(&cpuid_full->entries[nent], cpuid_hv->entries,
--		       cpuid_hv->nent * sizeof(struct kvm_cpuid_entry2));
--		cpuid_full->nent = nent + cpuid_hv->nent;
--	}
--
--	vcpu_init_cpuid(vcpu, cpuid_full);
--}
--
--const struct kvm_cpuid2 *vcpu_get_supported_hv_cpuid(struct kvm_vcpu *vcpu)
--{
--	struct kvm_cpuid2 *cpuid = allocate_kvm_cpuid2(MAX_NR_CPUID_ENTRIES);
--
--	vcpu_ioctl(vcpu, KVM_GET_SUPPORTED_HV_CPUID, cpuid);
--
--	return cpuid;
--}
--
- unsigned long vm_compute_max_gfn(struct kvm_vm *vm)
- {
- 	const unsigned long num_ht_pages = 12 << (30 - vm->page_shift); /* 12 GiB */
-diff --git a/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c b/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-index e149d0574961..2585087cdf5c 100644
---- a/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-+++ b/tools/testing/selftests/kvm/x86_64/xen_vmcall_test.c
-@@ -10,6 +10,7 @@
- #include "test_util.h"
- #include "kvm_util.h"
- #include "processor.h"
-+#include "hyperv.h"
+diff --git a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+index b987a3d79715..0ddb63229bcb 100644
+--- a/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
++++ b/tools/testing/selftests/kvm/x86_64/hyperv_svm_test.c
+@@ -157,7 +157,7 @@ int main(int argc, char *argv[])
+ 	int stage;
  
- #define HCALL_REGION_GPA	0xc0000000ULL
- #define HCALL_REGION_SLOT	10
+ 	TEST_REQUIRE(kvm_cpu_has(X86_FEATURE_SVM));
+-	TEST_REQUIRE(kvm_has_cap(KVM_CAP_HYPERV_DIRECT_TLBFLUSH));
++	TEST_REQUIRE(kvm_hv_cpu_has(HV_X64_NESTED_DIRECT_FLUSH));
+ 
+ 	/* Create VM */
+ 	vm = vm_create_with_one_vcpu(&vcpu, guest_code);
 -- 
 2.46.0
 
