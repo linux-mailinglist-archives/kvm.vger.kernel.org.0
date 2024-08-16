@@ -1,185 +1,116 @@
-Return-Path: <kvm+bounces-24336-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24337-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A84D4953FC7
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 04:39:00 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05182953FD5
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 04:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC5AB1C21575
-	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 02:38:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A48231F24865
+	for <lists+kvm@lfdr.de>; Fri, 16 Aug 2024 02:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B0DF60B96;
-	Fri, 16 Aug 2024 02:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C594F20E;
+	Fri, 16 Aug 2024 02:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aQwF2aqv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e4zm0KHb"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30AF487A5
-	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 02:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262332C1BA
+	for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 02:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723775926; cv=none; b=LU6PCVvBWzgLrR/sUbBk2s8wwUhaGN9gWf81/Q2KCWhUIXLuzCcdkcjdVMZt8h55eogbOD5k74FG3JIxy69Il6/BONLEovktXXjmbJeHkiuzSzM79n6wC6Drg2ndeWflcTH+CrZqpNKuQ5ycsxpAOY1uyIkpJVugD9x0NRUL1Ok=
+	t=1723776792; cv=none; b=QT9rejJNWIOIsn8OQOMD5y4QtJj6ZowrAqG/YWLFsEkeHkk3BSCUDeBC4qI0QBiFAo+YDR/yQpuDK/76kSgZPe6B6km/x2KiscHJSTLAO/LRrM6FvJF3sLxjafRZ6v0Bqbuig4Ipbixhh5DLSL/Un3RUcuTvbCqKagDWhRvVHr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723775926; c=relaxed/simple;
-	bh=Tg/mUA7GfRDkY08pK/TnN/m2P6YZYX8pzUAgRlRhh2Q=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PToHrCPjMINAAiAX6Z5DItJIsnOE9hNBFT+Rm86kCfZTI65FdOuQTGXyoinVuYg12D1LTNu8C9mDQN2G98xjV2Xi8JSkxBFoeGkkK8qCt+hHHlg6Z5fs7BRKfeKxwwpgGZeUvQjlcvxm54FyhDBYO7q3zxpjgjzy06dy+dJTzM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aQwF2aqv; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6acf8ac7569so30815857b3.3
-        for <kvm@vger.kernel.org>; Thu, 15 Aug 2024 19:38:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723775924; x=1724380724; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LyjbohY2C3uhRTrXGup/3TN9AtJjgG7LMPSUPTUSkaA=;
-        b=aQwF2aqv3cVokNoWV+pRbB6kEfNaJ59JQZLURZi+hITnc7ZwIgx0tC5TdlMqQjQER8
-         69tpwghC/A8DJGuSHRZvOattzykbYnv/jdyVf0DZsLcsScVqJfVPWGT1wLElK83Fu0iE
-         28m24ok/lubY9gW0azB0TbXPLEP9ml0j4bDiudLeqnrLlTMlHnM2gb+jxm68t5fCEdNt
-         PPsxcttjqAqCvZin8qZiF6ZuXjzPyBtcQH6JaDyS8NHFZwvOklr7mtwz3kDr9DU/toSN
-         0kKTBNIc0EHvPy/4ReTte2uV7W0UPhZWjB8mTTFGD+9dATLR5Kukc21lzcIOx5MXmLJG
-         /T4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723775924; x=1724380724;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LyjbohY2C3uhRTrXGup/3TN9AtJjgG7LMPSUPTUSkaA=;
-        b=r4Hmylb4/uzJSraGFwFUq3CT9JhSED4676ffYTOo0Ce64nyQlNO/Nk0RdOIK3XE8u1
-         B026ag66kW9qYj4hbChun727oB3gtF7qL13FaZisoqS0bQg9saaeG5NFHVu1MmVSyOOO
-         7p7RwrS6Hd/ThVZCzz9GCEqtt4Hb1nL3qK00TXNHH8OMl0qHKFlAGbrbl0e8OkpmvpC1
-         +WIMCMLH1UMuFJ1pZ4M6DRf+hBqKSt96E7IwrFaqunHhro+TEHE01mpNfIX8xNGUqBNy
-         y1LWQiq5hRwO+2++OdFIyORjC8ZD5EJ81QpTU4bl0Avutso7glO/16kDvDcBYBB36mlx
-         9cGQ==
-X-Gm-Message-State: AOJu0YwTbIDbZiGKfF1NwoL5Wk0uUFsuYonDrcnynNimJ4STlnUYNM4f
-	EdwnfAGv0wVDh/rYUI238GJ2MSg8DdOKG0CaGSC6KKq7YvOYZ+YmyelaXP7ZIH4AtCx9EZVO5+Q
-	v0Q==
-X-Google-Smtp-Source: AGHT+IE5aoR8QpfQBshABkJAvxMCtGn+ogdjhA8YhzRHzo0dzawE7uFYL81H+c5VKis6QxoS/7e7UbDurxE=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:690c:6784:b0:681:8b2d:81ae with SMTP id
- 00721157ae682-6b1bb85ee4bmr800067b3.9.1723775923786; Thu, 15 Aug 2024
- 19:38:43 -0700 (PDT)
-Date: Thu, 15 Aug 2024 19:38:36 -0700
-In-Reply-To: <20240522001817.619072-16-dwmw2@infradead.org>
+	s=arc-20240116; t=1723776792; c=relaxed/simple;
+	bh=i84QddIjngCTFCPwR/mFBzMs3YXGyH7E24SK8Jeqt84=;
+	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=aln5QiucUZGoy2zOLWlEeEJ+qpIFiXRvgY+NcZOdXDb3oA6YdsaPfn+29NWk8IkwaZofKAZaXDaTzogT2PqlzkmO8m1ZDZWX+X4pPyNSTZeGQoS5qgV949T8F/i8bf+Ojm9kZGnGnR6eVVilGSIV4JMh38rSlz+t/7ThcDkhZ90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e4zm0KHb; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1723776790; x=1755312790;
+  h=message-id:date:mime-version:cc:subject:to:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=i84QddIjngCTFCPwR/mFBzMs3YXGyH7E24SK8Jeqt84=;
+  b=e4zm0KHbPADMpo5IZWGIBjJvnWc43VeTlanwSGvUA5LAkDqEVhwvYJvq
+   zzFrCIqDfD/U0HFr+V6yNDIbHn0icXpb/HIKwXSdjhRyDFaqbsL5WZmGD
+   Z2dp8HnUDOyoTmvvqls3rYRPWRNjExuCmmvAx+IiFP1ywabLWKBeLu1DT
+   yD2ccvUQi3tNgvGKZ9QefvnpiKpLEigH4n92d92mkXJnp4NA/ucl13tHr
+   N1cAJf75JxM2nYQlH63vy2QiG8uYu22MK6FdRRLz006EKn3zAn4pSDU5B
+   qLMi/IO83pQJdrwAcaD6rvsjA+/+CrcDXOyoEYLw7Ul/kVACLZiNtsaJI
+   Q==;
+X-CSE-ConnectionGUID: SiUIYr98RgSaMFlUxFhFLA==
+X-CSE-MsgGUID: 9OpfZk5OSDCFrl3fJJkgbQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11165"; a="22205813"
+X-IronPort-AV: E=Sophos;i="6.10,150,1719903600"; 
+   d="scan'208";a="22205813"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Aug 2024 19:53:10 -0700
+X-CSE-ConnectionGUID: FWgAFBgaR9O/TPuefS+8vw==
+X-CSE-MsgGUID: H+pdqzH+QRysxSM5bWqXjA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.10,150,1719903600"; 
+   d="scan'208";a="59554224"
+Received: from allen-box.sh.intel.com (HELO [10.239.159.127]) ([10.239.159.127])
+  by fmviesa008.fm.intel.com with ESMTP; 15 Aug 2024 19:53:07 -0700
+Message-ID: <e15b1162-dcdc-4bcf-ab61-79400dba87c3@linux.intel.com>
+Date: Fri, 16 Aug 2024 10:49:33 +0800
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240522001817.619072-1-dwmw2@infradead.org> <20240522001817.619072-16-dwmw2@infradead.org>
-Message-ID: <Zr67rPxxSDYTYPYV@google.com>
-Subject: Re: [RFC PATCH v3 15/21] KVM: x86: Allow KVM master clock mode when
- TSCs are offset from each other
-From: Sean Christopherson <seanjc@google.com>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: kvm@vger.kernel.org, Paolo Bonzini <pbonzini@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
-	"H. Peter Anvin" <hpa@zytor.com>, Paul Durrant <paul@xen.org>, Peter Zijlstra <peterz@infradead.org>, 
-	Juri Lelli <juri.lelli@redhat.com>, Vincent Guittot <vincent.guittot@linaro.org>, 
-	Dietmar Eggemann <dietmar.eggemann@arm.com>, Steven Rostedt <rostedt@goodmis.org>, 
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>, 
-	Daniel Bristot de Oliveira <bristot@redhat.com>, Valentin Schneider <vschneid@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jalliste@amazon.co.uk, sveith@amazon.de, zide.chen@intel.com, 
-	Dongli Zhang <dongli.zhang@oracle.com>, Chenyi Qiang <chenyi.qiang@intel.com>
-Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Cc: baolu.lu@linux.intel.com, alex.williamson@redhat.com,
+ robin.murphy@arm.com, eric.auger@redhat.com, nicolinc@nvidia.com,
+ kvm@vger.kernel.org, chao.p.peng@linux.intel.com, iommu@lists.linux.dev
+Subject: Re: [PATCH 0/6] Make set_dev_pasid op supportting domain replacement
+To: Yi Liu <yi.l.liu@intel.com>, Vasant Hegde <vasant.hegde@amd.com>,
+ joro@8bytes.org, jgg@nvidia.com, kevin.tian@intel.com
+References: <20240628085538.47049-1-yi.l.liu@intel.com>
+ <99f66c8d-57cf-4f0d-8545-b019dcf78a94@amd.com>
+ <06f5fc87-b414-4266-a17a-cb2b86111e7a@intel.com>
+Content-Language: en-US
+From: Baolu Lu <baolu.lu@linux.intel.com>
+In-Reply-To: <06f5fc87-b414-4266-a17a-cb2b86111e7a@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, May 22, 2024, David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+On 8/16/24 9:19 AM, Yi Liu wrote:
+> On 2024/8/16 01:49, Vasant Hegde wrote:
+>> Hi All,
+>>
+>> On 6/28/2024 2:25 PM, Yi Liu wrote:
+>>> This splits the preparation works of the iommu and the Intel iommu 
+>>> driver
+>>> out from the iommufd pasid attach/replace series. [1]
+>>>
+>>> To support domain replacement, the definition of the set_dev_pasid op
+>>> needs to be enhanced. Meanwhile, the existing set_dev_pasid callbacks
+>>> should be extended as well to suit the new definition.
+>>
+>> IIUC this will remove PASID from old SVA domain and attaches to new 
+>> SVA domain.
+>> (basically attaching same dev/PASID to different process). Is that the 
+>> correct?
 > 
-> There is no reason why the KVM clock cannot be in masterclock mode when
-> the TSCs are not in sync, as long as they are at the same *frequency*.
+> In brief, yes. But it's not only for SVA domain. Remember that SIOVr1
+> extends the usage of PASID. At least on Intel side, a PASID may be
+> attached to paging domains.
 
-Yes there is.  KVM sets PVCLOCK_TSC_STABLE_BIT when the master clock is enabled:
+You are correct.
 
-	if (use_master_clock)
-		pvclock_flags |= PVCLOCK_TSC_STABLE_BIT;
+The idxd driver attaches a paging domain to a non-zero PASID for kernel
+DMA with PASID. From an architectural perspective, other architectures,
+like ARM, AMD, and RISC-V, also support this. Therefore, attaching a
+paging domain to a PASID is not Intel-specific but a generic feature.
 
-which tells the guest its safe to skip the cross-(v)CPU forced monotonicty goo:
-
-	if ((valid_flags & PVCLOCK_TSC_STABLE_BIT) &&
-		(flags & PVCLOCK_TSC_STABLE_BIT))
-		return ret;
-
-	/*
-	 * Assumption here is that last_value, a global accumulator, always goes
-	 * forward. If we are less than that, we should not be much smaller.
-	 * We assume there is an error margin we're inside, and then the correction
-	 * does not sacrifice accuracy.
-	 *
-	 * For reads: global may have changed between test and return,
-	 * but this means someone else updated poked the clock at a later time.
-	 * We just need to make sure we are not seeing a backwards event.
-	 *
-	 * For updates: last_value = ret is not enough, since two vcpus could be
-	 * updating at the same time, and one of them could be slightly behind,
-	 * making the assumption that last_value always go forward fail to hold.
-	 */
-	last = raw_atomic64_read(&last_value);
-	do {
-		if (ret <= last)
-			return last;
-	} while (!raw_atomic64_try_cmpxchg(&last_value, &last, ret));
-
-	return ret;
-
-As called out by commit b48aa97e3820 ("KVM: x86: require matched TSC offsets for
-master clock"), that was the motivation for requiring matched offsets.
-
-As an aside, Marcelo's assertion that "its obvious" was anything but to me.  Took
-me forever to piece together the PVCLOCK_TSC_STABLE_BIT angle.
-
-    KVM: x86: require matched TSC offsets for master clock
-    
-    With master clock, a pvclock clock read calculates:
-    
-    ret = system_timestamp + [ (rdtsc + tsc_offset) - tsc_timestamp ]
-    
-    Where 'rdtsc' is the host TSC.
-    
-    system_timestamp and tsc_timestamp are unique, one tuple
-    per VM: the "master clock".
-    
-    Given a host with synchronized TSCs, its obvious that
-    guest TSC must be matched for the above to guarantee monotonicity.
-    
-    Allow master clock usage only if guest TSCs are synchronized.
-    
-    Signed-off-by: Marcelo Tosatti <mtosatti@redhat.com>
-
-> Running at a different frequency would lead to a systemic skew between
-> the clock(s) as observed by different vCPUs due to arithmetic precision
-> in the scaling. So that should indeed force the clock to be based on the
-> host's CLOCK_MONOTONIC_RAW instead of being in masterclock mode where it
-> is defined by the (or 'a') guest TSC.
-> 
-> But when the vCPUs merely have a different TSC *offset*, that's not a
-> problem. The offset is applied to that vCPU's kvmclock->tsc_timestamp
-> field, and it all comes out in the wash.
-> 
-> So, remove ka->nr_vcpus_matched_tsc and replace it with a new field
-> ka->all_vcpus_matched_tsc which is not only changed to a boolean, but
-> also now tracks that the *frequency* matches, not the precise offset.
-> 
-> Using a *count* was always racy because a new vCPU could be being
-> created *while* kvm_track_tsc_matching() was running and comparing with
-> kvm->online_vcpus. That variable is only atomic with respect to itself.
-> In particular, kvm_arch_vcpu_create() runs before kvm->online_vcpus is
-> incremented for the new vCPU, and kvm_arch_vcpu_postcreate() runs later.
-> 
-> Repurpose kvm_track_tsc_matching() to be called from kvm_set_tsc_khz(),
-> and kill the cur_tsc_generation/last_tsc_generation fields which tracked
-> the precise TSC matching.
-
-If this goes anywhere, it needs to be at least three patches:
-
-  1. Bulk code movement
-  2. Chaning from a count to a bool/flag
-  3. Eliminating the offset matching
+Thanks,
+baolu
 
