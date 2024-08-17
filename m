@@ -1,124 +1,151 @@
-Return-Path: <kvm+bounces-24469-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24470-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6317F955471
-	for <lists+kvm@lfdr.de>; Sat, 17 Aug 2024 03:01:06 +0200 (CEST)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60814955477
+	for <lists+kvm@lfdr.de>; Sat, 17 Aug 2024 03:04:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 197721F22CD7
-	for <lists+kvm@lfdr.de>; Sat, 17 Aug 2024 01:01:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA80EB22492
+	for <lists+kvm@lfdr.de>; Sat, 17 Aug 2024 01:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF0A4A21;
-	Sat, 17 Aug 2024 01:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F8943FE4;
+	Sat, 17 Aug 2024 01:04:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="V3Dt8QVY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4xmK5PRf"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-pg1-f201.google.com (mail-pg1-f201.google.com [209.85.215.201])
+Received: from mail-ua1-f50.google.com (mail-ua1-f50.google.com [209.85.222.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16045653
-	for <kvm@vger.kernel.org>; Sat, 17 Aug 2024 01:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C3720E6
+	for <kvm@vger.kernel.org>; Sat, 17 Aug 2024 01:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1723856454; cv=none; b=FmrL5Lt9e3ziMRFa9TI0dNDa4WaBSgR+n77ArFBlIb7EjP6HjB+RJI7BiKUW+NfhXZx/5UwdYyjIByAAE2XkoZqI05ZNJRASv7w1jypaOWnKRJlEdd2/Yqg2Jb6obvNvPQK820HLkIvnAoFoxybfxXqNfBvwkkI6ABTof2NCL78=
+	t=1723856648; cv=none; b=Ere3/hJcRA7LHpavfU63vS69RakRIjxUq4CbGdMXSezpdQvIdFcXOzXvJAzWCNsoCEfrZ9VbqsAGz4npN2aysNVtfbvCKzAeL35mgDqcm4C4/n5aBc1/dmD1DhyzNtgIp6p+CSZAiO2ivtvuI0dtDcTgQAHma7DAFRreDEfyExc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1723856454; c=relaxed/simple;
-	bh=xME3BnPckt7E13btYdrc63u8unf/OOEIYZuvPJ+UGKE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZSxuT/s7jlM24xXuCrMKNRKsSUIS4gUJEPQhQJ6zK3s6TS5xWnjMv3JdJmI0Ys5xahvDPqCpPzs0+wiI1ubVcZHm74/ZIonacHE+MiLOnri59haUlGcy6bPrQtngEVU0wRYje1NHDgSKqhznlUU4wTlgRWumRmK7YAo3EWI5oZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=V3Dt8QVY; arc=none smtp.client-ip=209.85.215.201
+	s=arc-20240116; t=1723856648; c=relaxed/simple;
+	bh=WCZrkUgQEbVisIjIvmosSf/ZV8hiR799Km9gEhjpk4c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Dax4A+phC/T5ap4E1rQaSLiN7Lwq4dJZ+D+mYFEisbGlUIoQ3ZfuuFoxtgGhiBhYj6Frp87FzSSz1L0p/vubLEt7bBwR9Kz73LvujiEPbFwtyT26JH/4e/LyUkc+0S2mnqdijNtVWmhFCzN3Gu6UoIhS4gBtHkgg2Whp6+alcxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4xmK5PRf; arc=none smtp.client-ip=209.85.222.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--seanjc.bounces.google.com
-Received: by mail-pg1-f201.google.com with SMTP id 41be03b00d2f7-6507e2f0615so2154377a12.1
-        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 18:00:52 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ua1-f50.google.com with SMTP id a1e0cc1a2514c-842fdb1afb1so785775241.1
+        for <kvm@vger.kernel.org>; Fri, 16 Aug 2024 18:04:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1723856452; x=1724461252; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=DHurR+fx7zf8gF+fH8OqsanlwZHSvsgIt3z0suTHGLw=;
-        b=V3Dt8QVYNYP1rGEjPwFGBXgHTd3TBzf1yG7uwWxRMaLtNcOfpHUX+8pLnlz4t9g69q
-         C5cHPe5bWGKDY871aAS9VUIu+MQNcLW1j0+37hwaE2p/Igc++Mc1tLDbDV2lG22UYkI8
-         9X6O1R6sXI4X5Luk5Wd1OUrAompEejk/jV6N7xE/FlBt8KAOBz6ldM6qq7RDYLJSkt4o
-         ajYnb/Ta3Ko79fj1mlL2j4voqN9B33EMv3qlGO5ImSWV64p1P/1IdAHP978MR+/3o1i7
-         /fQ4FaYAqB3xZD2RifaNLqPiMAD2/zBD7RCKJsMypOBbfMD56grNHk/xU7Nkq1mzFn7f
-         1ySA==
+        d=google.com; s=20230601; t=1723856646; x=1724461446; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1ZkT/FAH8t+UEeZZlsBiF2qoKJwELVKvUU9sus3nhBA=;
+        b=4xmK5PRfQGsNo+nxrwxz8aY1iYGRXPtVlq8baI3aoUD9R3OWg46iBoVhwzvvuIux0v
+         QusATmhFV78vsqVrhH1vGOUQ2FreuixmS1jxylHXWPqq4Pl5Lf6c2XDpSAPhCyo2k0gJ
+         jVUrv7cs5JvNlp8yEXcj77XjhzbY3IGxeqy6Alz0PpZ7uX+p8E/+VqnGbzsrDVPdYCbZ
+         LeRwvVrOViZ1AJSjGraWjr8yJ9xz9XKVfhy/IKdNxhC8HqUh+eAqqAZC3c4pyk8I7jVK
+         Q/5glxwLFTPOVZ+kZtfGp2S0cnYhB5ayWx3LcgTYK4aKYNxdvjdYHivRtAPLGmPyx7HG
+         H7/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1723856452; x=1724461252;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DHurR+fx7zf8gF+fH8OqsanlwZHSvsgIt3z0suTHGLw=;
-        b=wa4Sn6erOZUYhpiaSevLp6Wg/IlcnS86vxcZYoI2OP7qjEqAFlfhkkBp6hsKpO7oFT
-         FxBwd3FdPy5mBfAo4yr/6LTyXHUTwK4hTn98Q0uRS29gNuKAWV/1G/qB39qr+bMrL+un
-         XdlmQ95p6FB87eP9yjKfpstvUX6SAwUcujkOdTLwAFeU3oBJm9ElcKzubtgsDIi1A7IM
-         TmJ8bTV3q1Cw9JuG4yD6uIipecEkyP8mhOVIPQl7smgetxCnxmrGs0SjfZw+4vSY2ipk
-         /iEaxPChz/RRi3IkvT5cC6tJ0To6MRycl1JCCC6Fl06nePq303NjY738Uhm7eQ8sJeBR
-         9rvA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCdCRJYKJYRMhMijCxGE4+MDwcGdCmDHOxGlUYViLmByRMIxrg09feYHcuaHWvFNWoOJ0bop+ib88mnCFouJZIy+DU
-X-Gm-Message-State: AOJu0Ywmn3HsjWdDvsllFGnkeMOEXGr9zBTCjdjjQfCufAH35tR4b+6M
-	jDSLm6mXGxtTGHCu/8XAVwBXwK7j1eoWzP0byjP+SlPsjQG+gknBNSBcEWlotdq12V6XLpWnD0N
-	Azw==
-X-Google-Smtp-Source: AGHT+IGgQ5L96WEtrOF85LpPpxMbEdlboogX890StOgCMUdrhDjVb+vU60wuE1WwXFLKi0Z3aJ4DtITuwPA=
-X-Received: from zagreus.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5c37])
- (user=seanjc job=sendgmr) by 2002:a05:6a02:4a3:b0:75f:3d6e:6461 with SMTP id
- 41be03b00d2f7-7c97af56e6bmr10481a12.6.1723856452244; Fri, 16 Aug 2024
- 18:00:52 -0700 (PDT)
-Date: Fri, 16 Aug 2024 18:00:50 -0700
-In-Reply-To: <ZqKWxfqRoJzUWroG@google.com>
+        d=1e100.net; s=20230601; t=1723856646; x=1724461446;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1ZkT/FAH8t+UEeZZlsBiF2qoKJwELVKvUU9sus3nhBA=;
+        b=goTTh3RcTq5ZNmDjZrx+zGe1AIPjRqQptaRace+2ENM/mAC/JIgnVQNtinFznhrbQU
+         iTL7yNrafMlFUn+GkQCfy2tTNWWdn2I0596w06HFe9zMhqkpTtd7nsJZOjLB+PbE4GF2
+         x2xgJHrcT+2KIyRYSNgFqIkX0gqRifi0Mvs5s3/qUPiSaONXLs96bucTpsNfFsoJgdnA
+         iabYJbi9gC+wQFfFoHXq9AA8IH9xZYxxnMSMpAF6X3N4xZkC5Ff1XlbjeF7c41WhABPk
+         sTLFkv8wzJ9a+3Kw2thhXiplD3nsT56Qra39HllRTc8ENe0XFTMNxPDVpJBCipGDMS2R
+         xzhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUKpK22CMLMOydnYyXkRIHqRArZfmba8/gbZ91wdsYBh6pQUJ9T949QhjDKrnX4r9GUuUrEtoDuW7P3GFVNYWaf0/8D
+X-Gm-Message-State: AOJu0Yz8kVBOR5cX+okRofQr0i72nbytpKLUhe0yL1DWBeUjzHix0KXV
+	t48pcOb1JxZ3BXAQ1Y0PTONSbD3ItT+lN7oIH9uKXyAPKCgcxZa3QpZMmTWGLbMJkP1OVjokjtt
+	MZrJaywB1Da3ugXnUzYpRCEfrH0MaehaoO9uG
+X-Google-Smtp-Source: AGHT+IH+z/yVUCGn/kvsFe3FWe5Y4PrsBx6c3aNhHuqGExQKF6hhvvYIWba1m2Vl5PvAw0UlZYeqJffhxIB+o44gihE=
+X-Received: by 2002:a05:6102:3e85:b0:48f:e7c2:1faf with SMTP id
+ ada2fe7eead31-497799a0eb9mr6016565137.28.1723856645893; Fri, 16 Aug 2024
+ 18:04:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+MIME-Version: 1.0
 References: <20240724011037.3671523-1-jthoughton@google.com>
- <20240724011037.3671523-9-jthoughton@google.com> <ZqKWxfqRoJzUWroG@google.com>
-Message-ID: <Zr_2Qhflx5xBhFCY@google.com>
-Subject: Re: [PATCH v6 08/11] KVM: x86: Optimize kvm_{test_,}age_gfn a little bit
-From: Sean Christopherson <seanjc@google.com>
-To: David Matlack <dmatlack@google.com>
+ <20240724011037.3671523-4-jthoughton@google.com> <CADrL8HV5M-n72KDseDKWpGrUVMjC147Jqz98PxyG2ZeRVbFu8g@mail.gmail.com>
+ <Zr_y7Fn63hdowfYM@google.com>
+In-Reply-To: <Zr_y7Fn63hdowfYM@google.com>
+From: Yu Zhao <yuzhao@google.com>
+Date: Fri, 16 Aug 2024 19:03:27 -0600
+Message-ID: <CAOUHufYc3hr-+fp14jgEkDN++v6t-z-PRf1yQdKtnje6SgLiiA@mail.gmail.com>
+Subject: Re: [PATCH v6 03/11] KVM: arm64: Relax locking for kvm_test_age_gfn
+ and kvm_age_gfn
+To: Sean Christopherson <seanjc@google.com>
 Cc: James Houghton <jthoughton@google.com>, Andrew Morton <akpm@linux-foundation.org>, 
 	Paolo Bonzini <pbonzini@redhat.com>, Ankit Agrawal <ankita@nvidia.com>, 
 	Axel Rasmussen <axelrasmussen@google.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	David Rientjes <rientjes@google.com>, James Morse <james.morse@arm.com>, 
-	Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, Marc Zyngier <maz@kernel.org>, 
-	Oliver Upton <oliver.upton@linux.dev>, Raghavendra Rao Ananta <rananta@google.com>, 
-	Ryan Roberts <ryan.roberts@arm.com>, Shaoqin Huang <shahuang@redhat.com>, 
-	Suzuki K Poulose <suzuki.poulose@arm.com>, Wei Xu <weixugc@google.com>, 
-	Will Deacon <will@kernel.org>, Yu Zhao <yuzhao@google.com>, Zenghui Yu <yuzenghui@huawei.com>, 
+	David Matlack <dmatlack@google.com>, David Rientjes <rientjes@google.com>, 
+	James Morse <james.morse@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>, Jonathan Corbet <corbet@lwn.net>, 
+	Marc Zyngier <maz@kernel.org>, Oliver Upton <oliver.upton@linux.dev>, 
+	Raghavendra Rao Ananta <rananta@google.com>, Ryan Roberts <ryan.roberts@arm.com>, 
+	Shaoqin Huang <shahuang@redhat.com>, Suzuki K Poulose <suzuki.poulose@arm.com>, 
+	Wei Xu <weixugc@google.com>, Will Deacon <will@kernel.org>, Zenghui Yu <yuzenghui@huawei.com>, 
 	kvmarm@lists.linux.dev, kvm@vger.kernel.org, 
 	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
 	linux-kernel@vger.kernel.org, linux-mm@kvack.org
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jul 25, 2024, David Matlack wrote:
-> On 2024-07-24 01:10 AM, James Houghton wrote:
-> > Optimize both kvm_age_gfn and kvm_test_age_gfn's interaction with the
-> 
-> nit: Use () when referring to functions.
-> 
-> > shadow MMU by, rather than checking if our memslot has rmaps, check if
-> > there are any indirect_shadow_pages at all.
-> 
-> What is optimized by checking indirect_shadow_pages instead of
-> have_rmaps and what's the benefit? Smells like a premature optimization.
+On Fri, Aug 16, 2024 at 6:46=E2=80=AFPM Sean Christopherson <seanjc@google.=
+com> wrote:
+>
+> On Thu, Jul 25, 2024, James Houghton wrote:
+> > On Tue, Jul 23, 2024 at 6:11=E2=80=AFPM James Houghton <jthoughton@goog=
+le.com> wrote:
+> > >
+> > > Replace the MMU write locks (taken in the memslot iteration loop) for
+> > > read locks.
+> > >
+> > > Grabbing the read lock instead of the write lock is safe because the
+> > > only requirement we have is that the stage-2 page tables do not get
+> > > deallocated while we are walking them. The stage2_age_walker() callba=
+ck
+> > > is safe to race with itself; update the comment to reflect the
+> > > synchronization change.
+> > >
+> > > Signed-off-by: James Houghton <jthoughton@google.com>
+> > > ---
+> >
+> > Here is some data to show that this patch at least *can* be helpful:
+> >
+> > # arm64 patched to do aging (i.e., set HAVE_KVM_MMU_NOTIFIER_YOUNG_FAST=
+_ONLY)
+> > # The test is faulting memory in while doing aging as fast as possible.
+> > # taskset -c 0-32 ./access_tracking_perf_test -l -r /dev/cgroup/memory
+> > -p -v 32 -m 3
+> >
+> > # Write lock
+> > vcpu wall time                : 3.039207157s
+> > lru_gen avg pass duration     : 1.660541541s, (passes:2, total:3.321083=
+083s)
+> >
+> > # Read lock
+> > vcpu wall time                : 3.010848445s
+> > lru_gen avg pass duration     : 0.306623698s, (passes:11, total:3.37286=
+0688s)
+> >
+> > Aging is able to run significantly faster, but vCPU runtime isn't
+> > affected much (in this test).
+>
+> Were you expecting vCPU runtime to improve (more)?  If so, lack of moveme=
+nt could
+> be due to KVM arm64 taking mmap_lock for read when handling faults:
+>
+> https://lore.kernel.org/all/Zr0ZbPQHVNzmvwa6@google.com
 
-Checking indirect_shadow_pages avoids taking mmu_lock for write when KVM doesn't
-currently have shadow MMU pages, but did at some point in the past, whereas
-kvm_memslots_have_rmaps() is sticky and will return true forever.
-
-> > Also, for kvm_test_age_gfn, reorder the TDP MMU check to be first. If we
-> > find that the range is young, we do not need to check the shadow MMU.
-> 
-> This should be a separate commit since it's a logically distinct change
-> and no dependency on the other change in this commit (other than both
-> touch the same function).
-> 
-> Splitting the commits up will also make it easier to write more specific
-> short logs (instead of "optimize a little bit" :)
-
-+1.  Especially code movement and refactoring, e.g. factoring out
-tdp_mmu_clear_spte_bits_atomic() would ideally be in a standalone patch that's
-dead simple to review.
+For the above test, I don't think it's mmap_lock -- the reclaim path,
+e.g., when zswapping guest memory, has two stages: aging (scanning
+PTEs) and eviction (unmapping PTEs). Only testing the former isn't
+realistic at all. IOW, for a r/w lock use case, only testing the read
+lock path would be bad coverage.
 
