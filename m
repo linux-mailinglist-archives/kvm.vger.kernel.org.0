@@ -1,236 +1,199 @@
-Return-Path: <kvm+bounces-24539-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24540-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6456D956F56
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 17:55:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF702956F8F
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 18:01:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B71B7B22410
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1748A280FDB
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 16:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B1513BAD5;
-	Mon, 19 Aug 2024 15:55:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4557816CD10;
+	Mon, 19 Aug 2024 16:01:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LEGegQAg"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="ex/M0rHN"
 X-Original-To: kvm@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142484964D;
-	Mon, 19 Aug 2024 15:55:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37E2C13B5AF;
+	Mon, 19 Aug 2024 16:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724082912; cv=none; b=nrHb105v5HG7Kugz4zoh4mXI0rIARR079rgQApmQTxJL1WCz5WtxyTGoOof91IgHjeoFz8eANNM7tJVMkDhW1qFICAnqLaZwHJQ/u+Yc4WAOBihLhSov1zXXzH77ItgMv/ZqMPAG0jHgS5e3O7x1BCwYrrLqV3hx1VCesACMtfw=
+	t=1724083271; cv=none; b=IHttvYh1IjjPlB6rsCd+H0HBk6LVPGfQ4ThygThs1krWfX6qAPrMUz3SrCxH4nzBAXBUxEbQEszPF1+SncWczTKZ1bxBxCBPpPrtIlSbUKyRMXIUlzVTEwGyk3Z7EwPZxgILDJvHPijth6WrNjYV7OdIWSs/Gn//5VmbhjebOAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724082912; c=relaxed/simple;
-	bh=nDiEC+oucoZKIe0++x2SH+xHDpiER8lsQQj93ua/syg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YLkdOW3EvwK+HPmX65F1gJ2POxOhkIR88Lo9i9g7iMHH1sTQWRJhKg4uWouCx2/X7Fapml4rBAVfIXjZHGzATN83PfcN9I5Q2UQIj1WuML+1Yb6lHfQlD2yA1ff+PX0IhWvUlIZJfQYrVT9aHm+B0/c7c0AZWk9EARIIAcLA+5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LEGegQAg; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-36d2a601c31so2625315f8f.0;
-        Mon, 19 Aug 2024 08:55:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1724082909; x=1724687709; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sIOAt7qcIh7yk+Ak6kXM6rwImTNnnUyR1orHAIYs4r4=;
-        b=LEGegQAgR/u/Pdp8PHauHk2xrJgMCZAbSXg17MdTqhvhkGgiQdwVs+BDXZfl/oDM5M
-         7zLRwRBxSRU+perNXuitonz8pw70SpMKJRela/GbT657vXPopPBF6TaDRE3l71jImLWw
-         8ptBH+DdAjJhAt51xQFHL+6lfAGg6Nn07Nc6N6edT3195VpQHQVxerLHp1NSmZJIYk/E
-         4UED7clX/gQXBJXE/Mhn+FHzXOEuFDseYH0Osvta3jQKkXD8OGwyn0GFTEX6Twt2Ndr4
-         4NUukM3NHw2g494hm8Q+5JIbs7DzznV55WawzgRdHs7Uptw7rgWGVyqdSUWCJUvwjqtI
-         9ziA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1724082909; x=1724687709;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sIOAt7qcIh7yk+Ak6kXM6rwImTNnnUyR1orHAIYs4r4=;
-        b=jJbF0X1dNiYKEr0DOtmmG/c/Bb/mSFTsxpubTiPs9/tStOFpSoxMggxn0Y65ZWE363
-         I0h6TsMImik1slPgI5ilvJmByTFCyzaZVQtcgMcTGBpYzwfB5dYBa1tZj62kADnP+b7n
-         QoiuEV2DuCdw6/pVSXiqDvQbvjNdeCiNKug8pLqgK+ozfTQjyVPcA96IqaW1ZRuCPP/M
-         mdplU9G9cd9rRxg4ISOxznjenM1YoYEz522IEFatY5qDOvMjuat4gUG1Z4mH3CpqN0Ke
-         YpdNII8ForTiC2N7p58fhrfKN95QHo/MwxTynE9bljvjdP7pmXBAZLsZY3/CWaq0x9nU
-         gKeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4l25kHT4WUCl1V+AytZ8wIUMhh5x1+x3sfav6L1rY62eT5RBgVQV4DmGr44Y+PfRraLvYcB09za4JFvNiiMmpjonyHb6Ne+k6/zRT5Q41q/MJR4FaXqDde8ZI9kU2ljbXACIt1HiLCFg/JNoO84ZMVS4x4PJGnrQTGyM3EWRRC4xY9OGl5YfauVn9wG4ihvulFVhtGG755rt4rS49LjAA1JiqYHkgX0aPR95FUbDNiihKDrg+cc20oGzRDQIp8Z7VrNeUQgzivr6F
-X-Gm-Message-State: AOJu0YyGvTGb7qmSz1y0QmIWJEO2ASdPnMsyEEx0ynD4iX/20ceqcObh
-	VxvVJ+QlzXKJD/5bxsc2t6OfHtkXMFZrpWtH0IlsJD43woSKXk2soXxxU7iIm2h9+zIYg2pI6Y+
-	xLINBffQmn8Gt+Y/KB7QM0U8aVag=
-X-Google-Smtp-Source: AGHT+IH+5SdMMmvczHHbCQS3d2lV+42NHIBp97s6EuIfp9v1lsrp5Tb1uRlaaTz2L+/Rjsor4cGm4qQ4+md5bQzOvmo=
-X-Received: by 2002:a05:6000:1006:b0:371:8eaf:3c49 with SMTP id
- ffacd0b85a97d-371946a32a9mr7016301f8f.40.1724082909035; Mon, 19 Aug 2024
- 08:55:09 -0700 (PDT)
+	s=arc-20240116; t=1724083271; c=relaxed/simple;
+	bh=fXXAqt1YPwYtxTiWk8BTaJmPqegxmIyUqP9bAIbB6Ic=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uCz+h71xjNE5GAtnALAtsGTfgeJFYNuPQLhGfZgMTQ6S7FKtuJ2HiSpsaNApduV/ZYv0jcpEK+0VJYuuUBzq7zBbOLZYqmlw7yLExcG2tqPoGILtIFShWZImhfjweA2+xDvDIKXuol4uKkFbNoWYwVuqVZgDadRuneFoLjgS3vQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=ex/M0rHN; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 47J7kpZY004580;
+	Mon, 19 Aug 2024 16:01:02 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date
+	:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pp1; bh=T7G4nb8U1Bham5UYQBM+MSjBoFH
+	onYEYM5RWeVextI8=; b=ex/M0rHN+kLj+WKuHkbY4runD4hLOKYCtOSVJjqcPAN
+	vls5ClCpl4RYFoLeJnFuOoz125MI4uCrrO75iEMfzJLTIyUtr600x4S/dCQLb6s8
+	LSldFFeFIHPOpw31JkIFaVsbV2pu464dDCryHvg2JYODKAf+6V5xmptMLAh9xF8r
+	56IUJKXkm66di4njxFyhePHx5B16uJWgv9aR4piykUUwqnbRL6q8wcRUV4Q4y4wh
+	SZ6CAMm+FCgmggPPec6xXUEvnjU+SIVT9MxsCvDdFcbQPifl7UkWYvTDpLrm6yJC
+	dwqyhLhSKDIik7eyiN8DAzfgY48FVs3a5FTj11bNPFg==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4141y1hykt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Aug 2024 16:01:01 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 47JG11Gj011266;
+	Mon, 19 Aug 2024 16:01:01 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 4141y1hykd-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Aug 2024 16:01:01 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 47JEOQjf017651;
+	Mon, 19 Aug 2024 16:01:00 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 4138w2xfub-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 19 Aug 2024 16:01:00 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 47JG0sSu49938708
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 19 Aug 2024 16:00:56 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9AFEB2004B;
+	Mon, 19 Aug 2024 16:00:54 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 228462004D;
+	Mon, 19 Aug 2024 16:00:54 +0000 (GMT)
+Received: from darkmoore (unknown [9.171.95.91])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Mon, 19 Aug 2024 16:00:54 +0000 (GMT)
+Date: Mon, 19 Aug 2024 18:00:48 +0200
+From: Christoph Schlameuss <schlameuss@linux.ibm.com>
+To: Janosch Frank <frankja@linux.ibm.com>, kvm@vger.kernel.org
+Cc: linux-s390@vger.kernel.org, linux-kselftest@vger.kernel.org,
+        Paolo Bonzini <pbonzini@redhat.com>, Shuah Khan <shuah@kernel.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Claudio Imbrenda <imbrenda@linux.ibm.com>,
+        David Hildenbrand <david@redhat.com>,
+        Nina Schoetterl-Glausch <nsg@linux.ibm.com>
+Subject: Re: [PATCH 2/3] selftests: kvm: s390: Add uc_skey VM test case
+Message-ID: <ZsNsMMc0Ir1w0BJy@darkmoore>
+References: <20240815154529.628087-1-schlameuss@linux.ibm.com>
+ <20240815154529.628087-3-schlameuss@linux.ibm.com>
+ <7f930ac3-a7af-47c7-8455-8c96d11754b5@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: kvm@vger.kernel.org
 List-Id: <kvm.vger.kernel.org>
 List-Subscribe: <mailto:kvm+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240808123714.462740-1-linyunsheng@huawei.com>
- <20240808123714.462740-5-linyunsheng@huawei.com> <d1a23116d054e2ebb00067227f0cffecefe33e11.camel@gmail.com>
- <676a2a15-d390-48a7-a8d7-6e491c89e200@huawei.com> <CAKgT0Uct5ptfs9ZEoe-9u-fOVz4HLf+5MS-YidKV+xELCBHKNw@mail.gmail.com>
- <3e069c81-a728-4d72-a5bb-3be00d182107@huawei.com>
-In-Reply-To: <3e069c81-a728-4d72-a5bb-3be00d182107@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 19 Aug 2024 08:54:32 -0700
-Message-ID: <CAKgT0UcDDFeMqD_eRe1-2Og0GEEFyNP90E9SDxDjskdgtMe0Uw@mail.gmail.com>
-Subject: Re: [PATCH net-next v13 04/14] mm: page_frag: add '_va' suffix to
- page_frag API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Subbaraya Sundeep <sbhatta@marvell.com>, Chuck Lever <chuck.lever@oracle.com>, 
-	Sagi Grimberg <sagi@grimberg.me>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>, Shailend Chand <shailend@google.com>, 
-	Eric Dumazet <edumazet@google.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Sunil Goutham <sgoutham@marvell.com>, 
-	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, Felix Fietkau <nbd@nbd.name>, 
-	Sean Wang <sean.wang@mediatek.com>, Mark Lee <Mark-MC.Lee@mediatek.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Keith Busch <kbusch@kernel.org>, 
-	Jens Axboe <axboe@kernel.dk>, Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	David Howells <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, 
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>, 
-	Trond Myklebust <trondmy@kernel.org>, Anna Schumaker <anna@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org, 
-	linux-mediatek@lists.infradead.org, linux-nvme@lists.infradead.org, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org, 
-	bpf@vger.kernel.org, linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7f930ac3-a7af-47c7-8455-8c96d11754b5@linux.ibm.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 7iKSOl4yQD_4xGidgXXJw_U6PZWRlOgh
+X-Proofpoint-ORIG-GUID: 0UuD9JQmScQ1M95LwUawmHDgMemuz4Wn
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.28.16
+ definitions=2024-08-19_13,2024-08-19_03,2024-05-17_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 adultscore=0
+ suspectscore=0 spamscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0
+ malwarescore=0 lowpriorityscore=0 phishscore=0 clxscore=1015
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2407110000 definitions=main-2408190104
 
-On Fri, Aug 16, 2024 at 4:55=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
+On Fri Aug 16, 2024 at 4:36 PM CEST, Janosch Frank wrote:
+> On 8/15/24 5:45 PM, Christoph Schlameuss wrote:
+> > Add a test case manipulating s390 storage keys from within the ucontrol
+> > VM.
+> > 
+> > Signed-off-by: Christoph Schlameuss <schlameuss@linux.ibm.com>
+> > ---
+> >   .../selftests/kvm/s390x/ucontrol_test.c       | 76 +++++++++++++++++++
+> >   1 file changed, 76 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/kvm/s390x/ucontrol_test.c b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > index 41306bb52f29..5f8815a80544 100644
+> > --- a/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > +++ b/tools/testing/selftests/kvm/s390x/ucontrol_test.c
+> > @@ -79,6 +79,32 @@ asm("test_mem_asm:\n"
+> >   	"	j	0b\n"
+> >   );
+> >   
+> > +/* Test program manipulating storage keys */
+> > +extern char test_skey_asm[];
+> > +asm("test_skey_asm:\n"
+> > +	"xgr	%r0, %r0\n"
+> > +
+> > +	"0:\n"
+> > +	"	ahi	%r0,1\n"
+> > +	"	st	%r1,0(%r5,%r6)\n"
+> > +
+> > +	"	iske	%r1,%r6\n"
+> > +	"	ahi	%r0,1\n"
+> > +	"	diag	0,0,0x44\n"
+> > +
+> > +	"	sske	%r1,%r6\n"
 >
-> On 2024/8/15 23:00, Alexander Duyck wrote:
-> > On Wed, Aug 14, 2024 at 8:00=E2=80=AFPM Yunsheng Lin <linyunsheng@huawe=
-i.com> wrote:
-> >>
-> >> On 2024/8/14 23:49, Alexander H Duyck wrote:
-> >>> On Thu, 2024-08-08 at 20:37 +0800, Yunsheng Lin wrote:
-> >>>> Currently the page_frag API is returning 'virtual address'
-> >>>> or 'va' when allocing and expecting 'virtual address' or
-> >>>> 'va' as input when freeing.
-> >>>>
-> >>>> As we are about to support new use cases that the caller
-> >>>> need to deal with 'struct page' or need to deal with both
-> >>>> 'va' and 'struct page'. In order to differentiate the API
-> >>>> handling between 'va' and 'struct page', add '_va' suffix
-> >>>> to the corresponding API mirroring the page_pool_alloc_va()
-> >>>> API of the page_pool. So that callers expecting to deal with
-> >>>> va, page or both va and page may call page_frag_alloc_va*,
-> >>>> page_frag_alloc_pg*, or page_frag_alloc* API accordingly.
-> >>>>
-> >>>> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> >>>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> >>>> Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
-> >>>> Acked-by: Chuck Lever <chuck.lever@oracle.com>
-> >>>> Acked-by: Sagi Grimberg <sagi@grimberg.me>
-> >>>> ---
-> >>>>  drivers/net/ethernet/google/gve/gve_rx.c      |  4 ++--
-> >>>>  drivers/net/ethernet/intel/ice/ice_txrx.c     |  2 +-
-> >>>>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
-> >>>>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  2 +-
-> >>>>  .../net/ethernet/intel/ixgbevf/ixgbevf_main.c |  4 ++--
-> >>>>  .../marvell/octeontx2/nic/otx2_common.c       |  2 +-
-> >>>>  drivers/net/ethernet/mediatek/mtk_wed_wo.c    |  4 ++--
-> >>>>  drivers/nvme/host/tcp.c                       |  8 +++----
-> >>>>  drivers/nvme/target/tcp.c                     | 22 +++++++++-------=
----
-> >>>>  drivers/vhost/net.c                           |  6 ++---
-> >>>>  include/linux/page_frag_cache.h               | 21 +++++++++-------=
---
-> >>>>  include/linux/skbuff.h                        |  2 +-
-> >>>>  kernel/bpf/cpumap.c                           |  2 +-
-> >>>>  mm/page_frag_cache.c                          | 12 +++++-----
-> >>>>  net/core/skbuff.c                             | 16 +++++++-------
-> >>>>  net/core/xdp.c                                |  2 +-
-> >>>>  net/rxrpc/txbuf.c                             | 15 +++++++------
-> >>>>  net/sunrpc/svcsock.c                          |  6 ++---
-> >>>>  .../selftests/mm/page_frag/page_frag_test.c   | 13 ++++++-----
-> >>>>  19 files changed, 75 insertions(+), 70 deletions(-)
-> >>>>
-> >>>
-> >>> I still say no to this patch. It is an unnecessary name change and ad=
-ds
-> >>> no value. If you insist on this patch I will reject the set every tim=
-e.
-> >>>
-> >>> The fact is it is polluting the git history and just makes things
-> >>> harder to maintain without adding any value as you aren't changing wh=
-at
-> >>> the function does and there is no need for this. In addition it just
-> >>
-> >> I guess I have to disagree with the above 'no need for this' part for
-> >> now, as mentioned in [1]:
-> >>
-> >> "There are three types of API as proposed in this patchset instead of
-> >> two types of API:
-> >> 1. page_frag_alloc_va() returns [va].
-> >> 2. page_frag_alloc_pg() returns [page, offset].
-> >> 3. page_frag_alloc() returns [va] & [page, offset].
-> >>
-> >> You seemed to miss that we need a third naming for the type 3 API.
-> >> Do you see type 3 API as a valid API? if yes, what naming are you
-> >> suggesting for it? if no, why it is not a valid API?"
-> >
-> > I didn't. I just don't see the point in pushing out the existing API
-> > to support that. In reality 2 and 3 are redundant. You probably only
-> > need 3. Like I mentioned earlier you can essentially just pass a
+> Might want to add a xgr here so you're sure that you're not reading your 
+> own values if iske fails.
 >
-> If the caller just expect [page, offset], do you expect the caller also
-> type 3 API, which return both [va] and [page, offset]?
->
-> I am not sure if I understand why you think 2 and 3 are redundant here?
-> If you think 2 and 3 are redundant here, aren't 1 and 3 also redundant
-> as the similar agrument?
 
-The big difference is the need to return page and offset. Basically to
-support returning page and offset you need to pass at least one value
-as a pointer so you can store the return there.
+Good point. Will change the r1 value here.
 
-The reason why 3 is just a redundant form of 2 is that you will
-normally just be converting from a va to a page and offset so the va
-should already be easily accessible.
+> > +	"	iske	%r1,%r6\n"
+> > +	"	ahi	%r0,1\n"
+> > +	"	diag	0,0,0x44\n"
+> > +
+> > +	"	rrbe	%r1,%r6\n"
+> > +	"	iske	%r1,%r6\n"
+> > +	"	ahi	%r0,1\n"
+> > +	"	diag	0,0,0x44\n"
+> > +
+> > +	"	j	0b\n"
+> > +);
+> > +
+> >   FIXTURE(uc_kvm)
+> >   {
+> >   	struct kvm_s390_sie_block *sie_block;
+> > @@ -345,6 +371,56 @@ static void uc_assert_diag44(FIXTURE_DATA(uc_kvm) * self)
+> >   	TEST_ASSERT_EQ(0x440000, sie_block->ipb);
+> >   }
+> >   
+> > +TEST_F(uc_kvm, uc_skey)
+> > +{
+> > +	u64 test_vaddr = self->base_gpa + VM_MEM_SIZE - (SZ_1M / 2);
+> > +	struct kvm_sync_regs *sync_regs = &self->run->s.regs;
+> > +	struct kvm_run *run = self->run;
+> > +	u8 skeyvalue = 0x34;
+> > +
+> > +	/* copy test_skey_asm to code_hva / code_gpa */
+> > +	TH_LOG("copy code %p to vm mapped memory %p / %p",
+> > +	       &test_skey_asm, (void *)self->code_hva, (void *)self->code_gpa);
+> > +	memcpy((void *)self->code_hva, &test_skey_asm, PAGE_SIZE);
+> > +
+> > +	/* set register content for test_skey_asm to access not mapped memory */
+> > +	sync_regs->gprs[1] = skeyvalue;
+> > +	sync_regs->gprs[5] = self->base_gpa;
+> > +	sync_regs->gprs[6] = test_vaddr;
+> > +	run->kvm_dirty_regs |= KVM_SYNC_GPRS;
+> > +
+> > +	self->sie_block->ictl |= ICTL_OPEREXC | ICTL_PINT;
+> > +	self->sie_block->cpuflags &= ~CPUSTAT_KSS;
+>
+> So you don't want KVM to initialize skeys?
+> Or am I missing a ucontrol skey interaction?
+>
+> What about the ICTLs if KSS is not available on the machine?
 
-> > page_frag via pointer to the function. With that you could also look
-> > at just returning a virtual address as well if you insist on having
-> > something that returns all of the above. No point in having 2 and 3 be
-> > seperate functions.
->
-> Let's be more specific about what are your suggestion here: which way
-> is the prefer way to return the virtual address. It seems there are two
-> options:
->
-> 1. Return the virtual address by function returning as below:
-> void *page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio=
-);
->
-> 2. Return the virtual address by double pointer as below:
-> int page_frag_alloc_bio(struct page_frag_cache *nc, struct bio_vec *bio,
->                         void **va);
-
-I was thinking more of option 1. Basically this is a superset of
-page_frag_alloc_va that is also returning the page and offset via a
-page frag. However instead of bio_vec I would be good with "struct
-page_frag *" being the value passed to the function to play the role
-of container. Basically the big difference between 1 and 2/3 if I am
-not mistaken is the fact that for 1 you pass the size, whereas with
-2/3 you are peeling off the page frag from the larger page frag cache
-after the fact via a commit type action.
+This is explicitly disabling KSS, not enabling it.
+Doing that explicitly might not strictly be necessary but I thought this does
+provide some clarity about the state.
 
