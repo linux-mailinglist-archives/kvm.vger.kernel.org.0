@@ -1,38 +1,38 @@
-Return-Path: <kvm+bounces-24510-lists+kvm=lfdr.de@vger.kernel.org>
+Return-Path: <kvm+bounces-24511-lists+kvm=lfdr.de@vger.kernel.org>
 X-Original-To: lists+kvm@lfdr.de
 Delivered-To: lists+kvm@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A71E1956BD9
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:25:43 +0200 (CEST)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 262DC956BDB
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 15:26:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B4F0B20DAF
-	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 13:25:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D09141F23FA2
+	for <lists+kvm@lfdr.de>; Mon, 19 Aug 2024 13:25:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9185718785D;
-	Mon, 19 Aug 2024 13:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB98218800A;
+	Mon, 19 Aug 2024 13:20:47 +0000 (UTC)
 X-Original-To: kvm@vger.kernel.org
 Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C530616CD18;
-	Mon, 19 Aug 2024 13:20:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3134016CD36;
+	Mon, 19 Aug 2024 13:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1724073643; cv=none; b=QCZ+8BFm2VE0Ej6rKF4G2Ac4ferhlWWvRpEIeV4INOHj+hROFT81+Ni+cg8AMBJQ0QKbaSLKXzvzx9jhMymkEqkF6n2U5bkNoDuH4NXBOohu8p9xucUb8r76YSbKfhCRDiihQpLPcxIdYzDBjDq2rdk5jnJWbY9KXZRKmHjzh9k=
+	t=1724073647; cv=none; b=r/wNnjjXxoY4Snhtl+n5U+6D+l1eho/eT+KCjsawrjlq5dnZDhh7AJchgd2M3FmA/Pj83yWsvCIJ7Voz5xMj7jGnwZfeu6NYS+d/vtXnNz21X8Zkl9YDbrFzf6yyrbDQcG4sw886tn2r+3SLy6PAXkiQxdOt1E5Jefv6KTij9x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1724073643; c=relaxed/simple;
-	bh=KaLWr6YZb+PWvDZSNXabheOdGWtip51iowgdcysufRw=;
+	s=arc-20240116; t=1724073647; c=relaxed/simple;
+	bh=UbbovNi33/o7xauGKxX994se+VOXHy9SSou9Bs4VBZE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=YDkFVGJ26CN/kRkY/wIF9S7rwiB8Fiif6rwrqFwN9YbIZrIauNty2oosY9C1vCKBJvI1twKNZPwRNyhEE5vFaQKJ8QH6yzc2zoQUsjpHxMO22y6R6KX4r8tkLSdm+bR4NnD8iuOnLrL/ouWOY0WYYhfhniXZGYNW39QZZ6i3OT4=
+	 MIME-Version; b=r8RbfL1Jj+1SfGHdw8V0ZDnJuv6mQEo51cxuiSanpYq7JOoLuIjvuipZ4zHlmJBR2d9F8DQgbo16lmf4T6q0VowswumHijfOqckeNQkws+bwV01aMCMGnTIsGJDH5Xfo7cNj18wzGn5zcMYC51ek04fmDy7lpH4JToNgk3H8wNI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
 Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 3EE82339;
-	Mon, 19 Aug 2024 06:21:07 -0700 (PDT)
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id C5BC2339;
+	Mon, 19 Aug 2024 06:21:11 -0700 (PDT)
 Received: from e122027.arm.com (unknown [10.57.85.21])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 2AAAE3F73B;
-	Mon, 19 Aug 2024 06:20:37 -0700 (PDT)
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 846A33F73B;
+	Mon, 19 Aug 2024 06:20:41 -0700 (PDT)
 From: Steven Price <steven.price@arm.com>
 To: kvm@vger.kernel.org,
 	kvmarm@lists.linux.dev
@@ -55,9 +55,9 @@ Cc: Steven Price <steven.price@arm.com>,
 	Gavin Shan <gshan@redhat.com>,
 	Shanker Donthineni <sdonthineni@nvidia.com>,
 	Alper Gun <alpergun@google.com>
-Subject: [PATCH v5 14/19] arm64: Enforce bounce buffers for realm DMA
-Date: Mon, 19 Aug 2024 14:19:19 +0100
-Message-Id: <20240819131924.372366-15-steven.price@arm.com>
+Subject: [PATCH v5 15/19] arm64: mm: Avoid TLBI when marking pages as valid
+Date: Mon, 19 Aug 2024 14:19:20 +0100
+Message-Id: <20240819131924.372366-16-steven.price@arm.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240819131924.372366-1-steven.price@arm.com>
 References: <20240819131924.372366-1-steven.price@arm.com>
@@ -69,74 +69,37 @@ List-Unsubscribe: <mailto:kvm+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Within a realm guest it's not possible for a device emulated by the VMM
-to access arbitrary guest memory. So force the use of bounce buffers to
-ensure that the memory the emulated devices are accessing is in memory
-which is explicitly shared with the host.
+When __change_memory_common() is purely setting the valid bit on a PTE
+(e.g. via the set_memory_valid() call) there is no need for a TLBI as
+either the entry isn't changing (the valid bit was already set) or the
+entry was invalid and so should not have been cached in the TLB.
 
-This adds a call to swiotlb_update_mem_attributes() which calls
-set_memory_decrypted() to ensure the bounce buffer memory is shared with
-the host. For non-realm guests or hosts this is a no-op.
-
-Co-developed-by: Suzuki K Poulose <suzuki.poulose@arm.com>
-Signed-off-by: Suzuki K Poulose <suzuki.poulose@arm.com>
 Signed-off-by: Steven Price <steven.price@arm.com>
 ---
-v3: Simplify mem_init() by using a 'flags' variable.
+v4: New patch
 ---
- arch/arm64/kernel/rsi.c |  1 +
- arch/arm64/mm/init.c    | 10 +++++++++-
- 2 files changed, 10 insertions(+), 1 deletion(-)
+ arch/arm64/mm/pageattr.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/arch/arm64/kernel/rsi.c b/arch/arm64/kernel/rsi.c
-index 5c2c977a50fb..69d8d9791c65 100644
---- a/arch/arm64/kernel/rsi.c
-+++ b/arch/arm64/kernel/rsi.c
-@@ -6,6 +6,7 @@
- #include <linux/jump_label.h>
- #include <linux/memblock.h>
- #include <linux/psci.h>
-+#include <linux/swiotlb.h>
+diff --git a/arch/arm64/mm/pageattr.c b/arch/arm64/mm/pageattr.c
+index 0e270a1c51e6..547a9e0b46c2 100644
+--- a/arch/arm64/mm/pageattr.c
++++ b/arch/arm64/mm/pageattr.c
+@@ -60,7 +60,13 @@ static int __change_memory_common(unsigned long start, unsigned long size,
+ 	ret = apply_to_page_range(&init_mm, start, size, change_page_range,
+ 					&data);
  
- #include <asm/io.h>
- #include <asm/rsi.h>
-diff --git a/arch/arm64/mm/init.c b/arch/arm64/mm/init.c
-index 9b5ab6818f7f..1d595b63da71 100644
---- a/arch/arm64/mm/init.c
-+++ b/arch/arm64/mm/init.c
-@@ -41,6 +41,7 @@
- #include <asm/kvm_host.h>
- #include <asm/memory.h>
- #include <asm/numa.h>
-+#include <asm/rsi.h>
- #include <asm/sections.h>
- #include <asm/setup.h>
- #include <linux/sizes.h>
-@@ -369,8 +370,14 @@ void __init bootmem_init(void)
-  */
- void __init mem_init(void)
- {
-+	unsigned int flags = SWIOTLB_VERBOSE;
- 	bool swiotlb = max_pfn > PFN_DOWN(arm64_dma_phys_limit);
+-	flush_tlb_kernel_range(start, start + size);
++	/*
++	 * If the memory is being made valid without changing any other bits
++	 * then a TLBI isn't required as a non-valid entry cannot be cached in
++	 * the TLB.
++	 */
++	if (pgprot_val(set_mask) != PTE_VALID || pgprot_val(clear_mask))
++		flush_tlb_kernel_range(start, start + size);
+ 	return ret;
+ }
  
-+	if (is_realm_world()) {
-+		swiotlb = true;
-+		flags |= SWIOTLB_FORCE;
-+	}
-+
- 	if (IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) && !swiotlb) {
- 		/*
- 		 * If no bouncing needed for ZONE_DMA, reduce the swiotlb
-@@ -382,7 +389,8 @@ void __init mem_init(void)
- 		swiotlb = true;
- 	}
- 
--	swiotlb_init(swiotlb, SWIOTLB_VERBOSE);
-+	swiotlb_init(swiotlb, flags);
-+	swiotlb_update_mem_attributes();
- 
- 	/* this will put all unused low memory onto the freelists */
- 	memblock_free_all();
 -- 
 2.34.1
 
